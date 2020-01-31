@@ -1,0 +1,131 @@
+@import '~themes/vars.less';
+@import (inline) './fonty.css';
+
+@LDarkMode-backgroud: rgba(47, 46, 48, 0.74);
+@LLightMode-backgroud: #fff;
+
+@LDarkMode-color: #fff;
+@LLightMode-color: #2F2E30;
+
+.siderwrapper {
+  height: 100%;
+  right: 0;
+  position: absolute;
+  :global {
+    .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
+      :hover {
+        color: #00FEA1;
+      }
+      border-right: 1px solid transparent;
+    }
+    .ant-layout-sider-dark {
+      background-color: @LDarkMode-backgroud;
+      color: @DarkMode-color;
+    }
+    .ant-layout-sider-light {
+      background-color: @LightMode-backgroud;
+      color: @LightMode-color;
+    } 
+  }
+}
+.sider {
+  height: 100%;
+  z-index: 50;
+  :global {
+     .ant-menu-sub {
+        font-size: 14px;
+        -webkit-box-shadow: 13px 4px 34px 0px rgba(0, 0, 0, 0.005);
+        -moz-box-shadow: 13px 4px 34px 0px rgba(0, 0, 0, 0.005);
+        box-shadow: 13px 4px 34px 0px rgba(0, 0, 0, 0.005);
+     }
+     .ant-menu-dark  {
+        background-color: @LDarkMode-backgroud;
+        color: @LDarkMode-color;
+    }
+     .ant-menu-light {
+        background-color: @LLightMode-backgroud;
+        color: @LLightMode-color;
+    }
+  }
+  .siderhead{
+    font-family: 'Source Sans Pro', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ::first-letter{
+      margin-left: 7px;
+    }
+    height: 60px;
+    font-size: 17px;
+  }
+  .sidercontainer{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .menuItems{
+    background-color: transparent;
+    color: @LDarkMode-color;
+    margin-bottom: 8px; 
+    width: 100%;
+    text-align: center;
+    animation: fadein 0.5s;
+      :global {
+        .ant-menu-item-selected{
+          background-color: rgba(82, 82, 82, 0.562);
+        }
+      }
+    
+  }
+  .SignOut{
+    margin-bottom: 7px;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+  }
+  .menuContainer {
+    height: ~'calc(100vh - 120px)';
+    overflow-x: hidden;
+    flex: 1;
+
+    &::-webkit-scrollbar-thumb {
+      background-color: transparent;
+    }
+
+    &:hover {
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(59, 59, 59, 0.2);
+      }
+    }
+
+    :global {
+      .ant-menu-inline .ant-menu-item {
+        font-size: 14px;
+        font-family: 'Source Sans Pro', sans-serif;
+      }
+
+      .ant-menu-dark .ant-menu-item a {
+        color: rgb(197, 197, 197);
+      }
+
+      .ant-menu-item a:hover {
+        color: #00FEA1;
+      }
+
+    }
+
+  }
+}
+
+@keyframes fadeLeftIn {
+  0% {
+    transform: translateX(5px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

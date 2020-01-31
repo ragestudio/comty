@@ -1,0 +1,29 @@
+coverage
+dist
+node_modules
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# ide
+.idea
+
+# Mac General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# umi
+.umi
+.umi-production
+
+# jslingui
+src/locales/_build
+src/locales/**/*.js
+recover/
+
+.env
+.env
+.env
+sockets/rs_develop
