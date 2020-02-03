@@ -33,6 +33,7 @@ module.exports = {
        get_marketplace_global: "https://api.ragestudio.net/RS-YIBTP/rs/marketplaceHandler?access_token=",
        get_config_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/get-site-settings?access_token=",
        get_userData_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/get-user-data?access_token=",
+       get_userPostFeed: "https://api.ragestudio.net/RS-YIBTP/yid/posts?access_token=",
        update_userData_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/update-user-data?access_token=",
        removeToken: "https://api.ragestudio.net/RS-YIBTP/yid/delete-access-token?access_token=",
        register_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/create-account",

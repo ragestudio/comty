@@ -1,34 +1,92 @@
 .cardWrapper{
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+
+    border-radius: 7px;
     width: auto;
     max-width: 75vw;
     min-width: 40vw;
+    margin: 50px 0 50px 0;
     :global{
         .ant-card-meta-detail > div:not(:last-child){
             margin: 0
         }
         .ant-card {
-            
-            border-radius: 10px;
+            border-radius: 7px;
+            border: 0;
+            border-top: 1px solid #4646460c;
         }
+        .ant-card-body {
+            padding: 13px 24px 24px 24px;
+        }
+        .ant-card-actions {
+            border-top: 0;
+            height: 30px;
+            background: #EBEBEB;
+        }
+        .ant-card-actions > li {
+            margin: -20px 0 0 0 ;
+            border-right: 0;
+            
+            i{
+               
+             vertical-align: middle;
+             height: 40px;
+             width: 40px;
+             background-color: #fff;
+             border-radius: 24px;
+            }
+            svg {
+                height: 20px;
+                width: 20px;
+                height: 100%;
+                vertical-align: middle;
+            }
+           
+        }
+      
     }
 }
 .postAvatar{
     position: absolute;
     left: -8px;
     top: -8px;
+    display: flex;
+}
+.titleUser{
+    display: flex;
+    font-family: 'Poppins', sans-serif;
+    margin: 0 0 0 25px;
+}
+.textAgo{
+    display: flex;
+    font-size: 10px;
+    margin: 0 0 0 25px;
 }
 .postContent{
+    display: flex;
+    img {
+       width: 70%;
+    }
+    video {
+        margin: auto;
+        width: 70%;
+    }
     h3{
         color: rgb(85, 85, 85);
         font-weight: 470;
     }
-    padding: 23px 13px 13px 13px;
+    border-radius: 3px;
+    margin: 23px 13px 23px 0;
 }
-.textAgo{
-    font-size: 10px;
-    margin: 0 0 0 0;
-}
-.titleUser{
-    font-family: 'Poppins', sans-serif;
-    margin: 0 0 0 25px;
+
+.likebtn{
+   :global{
+       svg{
+        color:rgba(0, 0, 0, 0.45);
+       }
+       svg:hover{
+           color: rgb(233, 35, 68);
+           transition: all 0.2s linear;
+       }
+   }
 }

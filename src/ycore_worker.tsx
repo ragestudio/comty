@@ -20,6 +20,11 @@ var yConfig = config.yConfig;
 // Export global objects
 exports.router = router;
 exports.endpoints = endpoints;
+
+// WARNING ONLY EXPORT IN DEVELOPMENT, FOR PRODUCTION REMOVE
+exports.yConfig = yConfig;
+//
+
 exports.DevOptions = DevOptions;
 exports.ycore_worker = {
     ServerVersion: package_json.version,

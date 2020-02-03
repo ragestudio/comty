@@ -1,3 +1,4 @@
+import CustomIcons from './CustomIcons'
 import PostCard from './PostCard'
 import Editor from './Editor'
 import FilterItem from './FilterItem'
@@ -9,4 +10,4 @@ import Page from './Page'
 import YulioID from './YulioID/experimental/index.js'
 import CoreLoader from './CoreLoader'
 
-export { MyLayout, Editor, FilterItem, DropOption, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard }
+export { MyLayout, Editor, FilterItem, DropOption, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard , CustomIcons}
