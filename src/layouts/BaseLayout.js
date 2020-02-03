@@ -10,15 +10,11 @@ import withRouter from 'umi/withRouter'
 
 import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'
-import SocketLayout from './SocketLayout'
-import PublicViewLayout from './PublicViewLayout'
 import './BaseLayout.less'
 
 const LayoutMap = {
-  socket: SocketLayout,
   primary: PrimaryLayout,
   public: PublicLayout,
-  publicview: PublicViewLayout,
 }
 
 @withRouter

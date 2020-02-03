@@ -5,16 +5,11 @@ import { Ellipsis } from 'ant-design-pro'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import styles from './Header.less'
+import { config } from 'utils'
+
 import * as ycore from 'ycore'
 import router from 'umi/router'
 import moment from 'moment'
-import Bread from './Bread'
-
-
-let userData = ycore.SDCP()
-
-
-
 
 @withI18n()
 class Header extends PureComponent {
@@ -38,10 +33,7 @@ class Header extends PureComponent {
       onAllNotificationsRead,
     } = this.props
 
-
-    
-
-    const menuContent = (
+    const notificationIcon = (
       <Popover
         placement="bottomRight"
         trigger="click"
@@ -68,9 +60,8 @@ class Header extends PureComponent {
                     description={moment(item.date).fromNow()}
                   />
                   <Icon
-                    style={{ fontSize: 10, color: '#ccc' }}
+                    style={{ fontSize: '15px', color: '#ccc' }}
                     type="right"
-                    theme="outlined"
                   />
                 </List.Item>
               )}
@@ -98,31 +89,16 @@ class Header extends PureComponent {
     )
 
     return (
-      <Layout.Header
-        style={{ padding: 0 }}
-        className={classnames(styles.header, {
-          [styles.fixed]: fixed,
-          [styles.collapsed]: collapsed,
-        })}
-        id={this.isDarkMode()? styles.header_dark : styles.header_light}
-      >
-          <div className={styles.button} onClick={onCollapseChange.bind(this, !collapsed)} >
-            <Icon
-              style={{ fontSize: '23px' }}
-              type={classnames({
-                'pic-right': collapsed,
-                'pic-center': !collapsed,
-              })}
-            />
-          </div>
-          <div className={styles.bread}><Bread theme={theme} routeList={newRouteList} /></div>
-          <div className={styles.rightContainer}>
-            <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="search" className={styles.iconButton} style={{ fontSize: '18px' }} /></a></Tooltip>
-            <Tooltip title={'Help'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="question-circle-o" className={styles.iconButton} style={{ fontSize: '18px' }} /></a></Tooltip>
-            {menuContent}
-           
-          </div>
-      
+      <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed})} > 
+            <div className={styles.leftContainer}>
+              <img className={styles.brand} src={config.FullLogoPath} />
+              <Tooltip title={'Main'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="home" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+              <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="search" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+            </div>
+            <div className={styles.rightContainer}>
+              <Tooltip title={'New'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="plus" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+              {notificationIcon}
+            </div>
       </Layout.Header>
     )
   }

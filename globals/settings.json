@@ -1,0 +1,26 @@
+[
+    {
+        "SettingID": "strict_lightMode",
+        "title": "Strict Light Mode",
+        "description": "Force the app to apply full light mode theme when the light mode is activated... (Experimental)",
+        "value": false
+      },
+      {
+        "SettingID": "force_collapse",
+        "title": "Collapsed Default",
+        "description": "Force the app to apply collapse mode when an component has updated",
+        "value": false
+      },
+      {
+        "SettingID": "force_showDevLogs",
+        "title": "Show Functions Logs",
+        "description": "Show all console logs... [Developer]",
+        "value": true
+      },
+      {
+        "SettingID": "sessions_noexpire",
+        "title": "No expire session",
+        "description": "Force the app to not expire any session... [Developer]",
+        "value": true
+      }
+]

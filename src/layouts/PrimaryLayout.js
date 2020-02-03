@@ -2,7 +2,6 @@
 /* global document */
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { RefreshONCE, LogoutCall, SDCP } from 'ycore'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
 import { MyLayout } from 'components'
@@ -159,7 +158,6 @@ class PrimaryLayout extends PureComponent {
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
           <Layout className={this.isDarkMode()? styles.container_dark : styles.container_light}>
-            <L_Sider {...LeftSiderProps} />
             <div className={styles.container}>
               <div style={{ paddingTop: config.fixedHeader ? 72 : 0 }} id="primaryLayout" >
                 <Header {...headerProps} />

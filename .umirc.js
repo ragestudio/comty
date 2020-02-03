@@ -63,12 +63,10 @@ export default {
   theme: './config/theme.config.js',
   // Webpack Configuration
   alias: {
-    sockets: resolve(__dirname, './sockets'),
     ycore: resolve(__dirname, './src/ycore_worker.tsx'),
     ycstyle: resolve(__dirname, './src/ycore_style.scss'),
     api: resolve(__dirname, './src/services/'),
     components: resolve(__dirname, './src/components'),
-    widgets: resolve(__dirname, './src/widgets'),
     config: resolve(__dirname, './config/ycore.config.js'),
     models: resolve(__dirname, './src/models'),
     routes: resolve(__dirname, './src/routes'),

@@ -1,5 +1,4 @@
 @import '~themes/vars.less';
-@import (inline) './fonty.css';
 
 @LDarkMode-backgroud: rgba(47, 46, 48, 0.74);
 @LLightMode-backgroud: #fff;
@@ -7,14 +6,41 @@
 @LDarkMode-color: #fff;
 @LLightMode-color: #2F2E30;
 
+.userInfo{
+  font-family: "Poppins", sans-serif;
+  align-items: center;
+  text-align: center;
+  h2{
+    color: @LDarkMode-color
+  }
+}
+.avatarFull{
+  width: 120px;
+}
+.avatar{
+  margin: 0 0 15px 0;
+}
+
+.something_thats_pulling_me_down{
+  :global{
+    text-align: center;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+ 
+  }
+}
+
 .siderwrapper {
+  font-size: 13px;
+  font-family: "Poppins", sans-serif;
   height: 100%;
   right: 0;
   position: absolute;
   :global {
     .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
       :hover {
-        color: #00FEA1;
+        color: #ffca1d;
       }
       border-right: 1px solid transparent;
     }
@@ -69,7 +95,6 @@
     color: @LDarkMode-color;
     margin-bottom: 8px; 
     width: 100%;
-    text-align: center;
     animation: fadein 0.5s;
       :global {
         .ant-menu-item-selected{
@@ -78,12 +103,7 @@
       }
     
   }
-  .SignOut{
-    margin-bottom: 7px;
-    bottom: 0;
-    position: absolute;
-    width: 100%;
-  }
+  
   .menuContainer {
     height: ~'calc(100vh - 120px)';
     overflow-x: hidden;
@@ -109,9 +129,7 @@
         color: rgb(197, 197, 197);
       }
 
-      .ant-menu-item a:hover {
-        color: #00FEA1;
-      }
+      
 
     }
 

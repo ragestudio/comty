@@ -7,6 +7,7 @@ import router from 'umi/router'
 import { SDCP, LogoutCall, DevOptions} from 'ycore'
 
 import styles from './R_Sider.less'
+import ycstyle from 'ycstyle'
 
 let userData = SDCP()
 
@@ -57,7 +58,20 @@ class R_Sider extends PureComponent {
       return "dark"
     }
   }
+  UserIsPro(){
+    if (userData.is_pro == 1){
+      return true
+    }
+    return false
+  }
+  UserIsAdmin(){
+    if (userData.admin == 1){
+      return true
+    }
+    return false
+  }
   render() {
+    
     const { theme, onThemeChange} = this.props;
    
     return (
@@ -65,7 +79,7 @@ class R_Sider extends PureComponent {
           <Layout.Sider  
             collapsedWidth="30"
             theme={this.StrictMode()}
-            width="140"
+            width="180"
             collapsed={this.Balancer()}
             className={styles.sider}
             style={this.Balancer()? {backgroundColor: 'rgba(0, 0, 0, 0.1)'} : null}
@@ -74,37 +88,68 @@ class R_Sider extends PureComponent {
           >
            
             <div className={styles.siderhead}>
-              <Avatar size={this.Balancer()? "small" : "large"} shape={this.Balancer()? "circle" : "square"} src={userData.avatar} className={styles.avatar} />
-              {this.Balancer()? null : <span>{userData.username}</span>}
+              <Avatar size={this.Balancer()? "small" : "large"} shape={this.Balancer()? "circle" : "square"} src={userData.avatar} className={this.Balancer()? styles.avatar : styles.avatarFull} />
             </div>
            {this.Balancer()? <div style={{ height: "100%", textAlign: "center" }} ><Icon onClick={this.hover} type="left" style={{ color: "#2F2E30", position: "absolute", bottom: "50%" }} /></div> :
-            <div className={styles.sidercontainer}>
-                  <Menu className={styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
-                      <Menu.Item key="accountpage">
-                        <Icon type="idcard" />
-                        <Trans>Account</Trans>
-                      </Menu.Item>
-                      <Menu.Item key="settingpage">
-                        <Icon type="setting" />
-                        <Trans>Settings</Trans>
-                      </Menu.Item>
-                      <Menu.Item key="LightMode" disabled={false}>
-                        <Icon type="bg-colors" />
-                        <Switch
-                          onChange={onThemeChange.bind(
-                            this,
-                            theme === 'light' ? 'dark' : 'light'
-                          )}
-                          checkedChildren="Dark"
-                          unCheckedChildren="Light"
-                          defaultChecked={theme === 'dark'}
-                        />
-                      </Menu.Item>
-                      <Menu.Item key="SignOut" className={styles.SignOut} >
-                        <Icon type="logout" style={{ color: 'red' }} />
-                        <Trans>Logout</Trans>
-                      </Menu.Item>
-                  </Menu>
+            <div>
+                <div className={styles.userInfo}>
+                    <h2>@{userData.username}</h2>
+                    <span>Points:  {userData.points} </span>
+                </div>
+                <Divider dashed style={{margin: '10px 0 2px 0', borderWidth: '0.8px 0 0.8px 0', letterSpacing: '0.6px'}} />
+                <div className={styles.sidercontainer}>
+                      <Menu className={styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
+                          {this.UserIsPro()? 
+                          <Menu.Item key="boosted_pages">
+                            <Icon style={{ fontSize: '15px' }} type="thunderbolt" />
+                            <Trans> Boosted Posts </Trans>
+                          </Menu.Item> 
+                          : 
+                        <Menu.Item key="upgrade_pro">
+                          <Icon style={{ fontSize: '15px' }} type="star" />
+                          <Trans> Upgrade to Pro </Trans>
+                        </Menu.Item>}
+                          <Menu.Item key="edit_profile">
+                            <Icon style={{ fontSize: '15px' }} type="profile" />
+                            <Trans>Edit Profile</Trans>
+                          </Menu.Item>
+                          <Menu.Item key="general_settings">
+                            <Icon style={{ fontSize: '15px' }} type="setting" />
+                            <Trans>General Settings</Trans>
+                          </Menu.Item>
+                          <Divider dashed style={{margin: '0 0 0 0', borderWidth: '1px 0 1px 0', letterSpacing: '0.6px'}} />
+                          {this.UserIsAdmin()? 
+                            <Menu.Item key="admin_area">
+                              <Icon style={{ fontSize: '15px' }} type="tool" />
+                              <Trans>Admin Area</Trans>
+                            </Menu.Item> 
+                                : 
+                            null
+                          }
+                        </Menu>
+                        
+                       
+                        <div className={styles.something_thats_pulling_me_down}>
+                        <Menu className={styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
+                            <Menu.Item style={{ fontSize: '15px' }} key="LightMode" disabled={false} >
+                              <Icon type="bg-colors" />
+                              <Switch
+                                onChange={onThemeChange.bind(
+                                  this,
+                                  theme === 'light' ? 'dark' : 'light'
+                                )}
+                                checkedChildren="Dark"
+                                unCheckedChildren="Light"
+                                defaultChecked={theme === 'dark'}
+                              />
+                            </Menu.Item>
+                            <Menu.Item key="SignOut">
+                              <Icon type="logout" style={{ color: 'red' }} />
+                              <Trans>Logout</Trans>
+                            </Menu.Item>
+                        </Menu>
+                    </div>
+                </div>
             </div>
             }
           </Layout.Sider>

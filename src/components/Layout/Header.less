@@ -1,59 +1,35 @@
 @import '~themes/vars.less';
 
-.bread {
-  float: left;
-}
-
-.darkmode_btn {
-  margin-bottom: 8px;
-  height: 40px;
-  line-height: 40px;
-  margin-top: 4px;
-  padding: 0 16px;
-  overflow: hidden;
-  font-size: 13px;
-  text-overflow: ellipsis;
-}
-
-#header_dark{
-  background-color: @DarkMode-backgroud_container;
-  color: @DarkMode-color;
-  transition: background-color 200ms linear;
-
-}
-#header_light{
-  background-color: @LightMode-backgroud;
-  color: @LightMode-color;
-  transition: background-color 200ms linear;
-
-}
-
-.header {
-  padding: 0;
-  position: relative;
+.brand {
   display: flex;
-  justify-content: space-between;
-  height: 64px;
+  margin: 0 20px 3px 23px;
+  width: 90px;
+}
+:global{
+  .ant-layout-header{
+    padding: 0;
+  }
+}
+.header {
+  -webkit-box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
+  -moz-box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
+  box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
+  display: flex;
+  width: 100%;
+  background-color: @DarkMode-backgroud;
+  height: 45px;
   z-index: 9;
   align-items: center;
-
-  &.fixed {
-    position: fixed;
-    top: 0;
-    width: ~'calc(100% - 370px)';
-    z-index: 10;
-    transition: width 0.2s;
-
-    &.collapsed {
-      width: ~'calc(100% - 115px)';
-    }
-  }
-
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  transition: width 0.2s;
   :global {
+    
     .ant-menu-submenu-title {
       height: 40px;
     }
-
 
     .ant-menu-horizontal {
       line-height: 40px;
@@ -93,10 +69,19 @@
 
   .rightContainer {
     display: flex;
-    align-items: center;
+    position: absolute;
+    right: 0; 
+    margin: 0 50px;
+  }
+  .leftContainer {
+    margin: 0 23px;
+    display: flex;
+
+
   }
 
   .button {
+    color: #b2b0c7;
     width: 40px;
     height: 40px;
     line-height: 40px;
@@ -115,6 +100,32 @@
 
 
 .iconButton {
+  color: #b2b0c7;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 53px;
+  cursor: pointer;
+  .background-hover();
+
+  &:hover {
+    .iconFont {
+      color: @primary-color;
+    }
+  }
+
+  &+.iconButton {
+    margin-left: 8px;
+  }
+
+  .iconFont {
+    color: #b2b0c7;
+    font-size: 24px;
+  }
+}
+.iconButtonADD {
   color: #b2b0c7;
   width: 48px;
   height: 48px;
@@ -135,10 +146,7 @@
     margin-left: 8px;
   }
 
-  .iconFont {
-    color: #b2b0c7;
-    font-size: 24px;
-  }
+
 }
 .search {
   padding: 0 12px;
