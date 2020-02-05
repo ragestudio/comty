@@ -16,6 +16,7 @@
         }
         .ant-card-body {
            padding: 13px 0 5px 0;
+           transition: height 150ms linear;
         }
         .ant-card-actions {
             border-top: 0;
@@ -51,18 +52,33 @@
         }
     }
 }
-.postAvatar{
+.titleIcon{
+    background-color: rgba(134, 134, 134, 0.171);
+    border-radius: 24px;
+    width: 45px;
+    height: 45px;
+   
     position: absolute;
     left: -8px;
     top: -8px;
     display: flex;
+    :global{
+        .anticon{
+            width: 100%;
+            height: 100%;
+            line-height: unset;
+            font-size: 35px;
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
 }
-.titleUser{
+.titlecreate{
     display: flex;
     font-family: 'Poppins', sans-serif;
     margin: 0 0 0 50px;
 }
-.textAgo{
+.shareWith{
     display: flex;
     font-size: 10px;
     margin: 0 0 0 53px;
@@ -119,4 +135,42 @@
 .ellipsisIcon:hover{
     opacity: 0;
     transition: opacity 150ms linear;
+}
+
+.inputWrapper{
+    width: 100%;
+    padding: 0 4px 22px 4px;
+    transition: height 150ms linear;
+    :global{
+        transition: height 150ms linear;
+        .ant-input {
+            height: 6vh;
+            padding: 5px 10px 5px 10px;
+            transition: height 150ms linear;
+        }
+        .ant-input-affix-wrapper .ant-input-affix-wrapper-textarea-with-clear-btn{
+            border-top: 0;
+        }
+        .ant-progress-inner{
+            height: 4px;
+            position: absolute;
+            bottom: -2px;
+            z-index: 10;
+            border-radius: 10px 10px 0 0;
+            transition: height 150ms linear;
+        }
+        .ant-progress{
+            transition: height 150ms linear;
+            height: 4px;
+            vertical-align: bottom;
+        }
+    }
+}
+.proccessUnset{
+    opacity: 0;
+    transition: opacity 250ms linear;
+}
+.proccessSet{
+    opacity: 1;
+    transition: opacity 250ms linear;
 }

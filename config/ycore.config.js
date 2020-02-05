@@ -52,7 +52,8 @@ module.exports = {
       DisablePasswordRecover: true,
       // Activating this, the logs must be trowed
       ShowFunctionsLogs: true,
-      StrictLightMode: false
+      StrictLightMode: false,
+      MaxLengthPosts: '512'
     },
     /* I18n configuration, `languages` and `defaultLanguage` are required currently. */
     i18n: {

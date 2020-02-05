@@ -2,9 +2,9 @@ import Cookies from "ts-cookies";
 import axios from "axios";
 import {SetControls, CloseControls} from "./components/Layout/Control"
 import {secretOrKey} from "../config/keys.js"
+import * as antd from "antd"
 
 var react = require("react");
-var antd = require("antd");
 var package_json = require("../package.json");
 var jquery = require("jquery");
 var uifx = require("uifx");
@@ -13,26 +13,17 @@ var utils = require("utils");
 var { router } = require("utils")
 var  jwt  = require("jsonwebtoken")
 
-var endpoints = config.Endpoints;
-var DevOptions = config.DevOptions;
-var yConfig = config.yConfig;
+export var endpoints = config.Endpoints;
+export var DevOptions = config.DevOptions;
+export var yConfig = config.yConfig;
 
-// Export global objects
-exports.router = router;
-exports.endpoints = endpoints;
-
-// WARNING ONLY EXPORT IN DEVELOPMENT, FOR PRODUCTION REMOVE
-exports.yConfig = yConfig;
-//
-
-exports.DevOptions = DevOptions;
-exports.ycore_worker = {
+export const ycore_worker = {
     ServerVersion: package_json.version,
     ServerType: package_json.VersionPhase,
     FXapiProvider: 'https://api.ragestudio.net/RS-YIBTP/lib/uiFXProvider/'
 };
 
-exports.about_this = {
+export const about_this = {
     Service_name: package_json.name,
     Version: package_json.version,
     Description: package_json.description,
@@ -42,16 +33,22 @@ exports.about_this = {
     logotype_uri: 'https://api.ragestudio.net/branding/lib/RDSeries-Branding/rDashboard/BLACK/SVG/T3/rDashboard-FullTextBlack-TM-T3.svg',
     Phase: package_json.VersionPhase
 };
-// UIFX LIBRARY 0.2v
-exports.UIFxList = {
-    notifyDefault: (exports.ycore_worker.FXapiProvider + 'NotifyDefault.wav'),
-    notifyWarning: (exports.ycore_worker.FXapiProvider + 'NotifyWarning.wav'),
-    notifySuccess: (exports.ycore_worker.FXapiProvider + 'notifySuccess.wav')
+export const UIFxList = {
+    notifyDefault: (ycore_worker.FXapiProvider + 'NotifyDefault.wav'),
+    notifyWarning: (ycore_worker.FXapiProvider + 'NotifyWarning.wav'),
+    notifySuccess: (ycore_worker.FXapiProvider + 'notifySuccess.wav')
 };
-exports.infoServer = (exports.ycore_worker.ServerType + ' Server | v' + exports.ycore_worker.ServerVersion);
+export const infoServer = (ycore_worker.ServerType + ' Server | v' + ycore_worker.ServerVersion);
 
+export function notifyError(err){
+    antd.notification.error({
+        message: 'Uupss, Error',
+        description: (<div><span>Some boring stuff: </span><br/><br/><div style={{ position: 'absolute', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{err.toString()}</div></div>),
+        placement: 'bottomLeft'
+    })
+}
 
-function InitSocket(id, params){
+export function InitSocket(id, params){
     console.log('Starting socket with _id: ', id)
     const defaultParams = {fullscreen: true, collapse: true}
     let globalParm;
@@ -73,9 +70,7 @@ function InitSocket(id, params){
         console.error('Failure starting the app... Invalid or Missing ID')
     }
 }
-exports.InitSocket = InitSocket;
-
-function requestFullscreen(){
+export function requestFullscreen(){
     var elem = document.documentElement;
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
@@ -87,9 +82,6 @@ function requestFullscreen(){
       elem.msRequestFullscreen();
     }
 }
-exports.requestFullscreen = requestFullscreen;
-
-
 export const asyncLocalStorage = {
     setItem: function (key, value) {
         return Promise.resolve().then(function () {
@@ -124,7 +116,6 @@ export const asyncSDCP = {
         return sessionStorage.getItem('SDCP');
     }
 };
-
 export const ControlBar = {
     set: (e) => {
         SetControls(e)
@@ -133,12 +124,12 @@ export const ControlBar = {
         CloseControls()
     }
 }
-function SyncSocketAccount(title:any, socket:any, logo:any) {
+export function SyncSocketAccount(title, socket, logo) {
     DevOptions.ShowFunctionsLogs? console.log('Initialising auth for ', title) : null
     const signkey = secretOrKey;
     const ExpireTime = '300';
 
-    const key:object = {title, socket, logo}
+    const key = {title, socket, logo}
     const ckey = jwt.sign(
         key,
         signkey,
@@ -150,8 +141,7 @@ function SyncSocketAccount(title:any, socket:any, logo:any) {
      window.open('/ec/authorize', title, "height=589,width=511")
     )
 }
-exports.SyncSocketAccount = SyncSocketAccount;
-function GetAuthSocket(sc, values) {
+export function GetAuthSocket(sc, values) {
     const prefix = '[YID Sync]'
     if (!sc) {
         DevOptions.ShowFunctionsLogs? console.warn(prefix, 'Socket API missing!') : null
@@ -162,10 +152,7 @@ function GetAuthSocket(sc, values) {
 
 
 }
-exports.GetAuthSockets = GetAuthSocket;
-
-
-function ValidLoginSession(){
+export function ValidLoginSession(){
     const prefix = '[YID Session]';
     let final = false;
     let ValidCookiesToken = false;
@@ -197,9 +184,7 @@ function ValidLoginSession(){
     return final
 
 }
-exports.ValidLoginSession = ValidLoginSession;
-
-function ValidBackup(){
+export function ValidBackup(){
     const prefix = '[YID SessionState]';
     let ValidBackupToken = false;
     let LastestToken = localStorage.getItem('last_backup');
@@ -211,17 +196,14 @@ function ValidBackup(){
     }
     return ValidBackupToken;
 }
-exports.ValidBackup = ValidBackup;
-
-function MakeBackup(){
+export function MakeBackup(){
     if (ValidBackup() == false) {
         asyncLocalStorage.setItem('last_backup', Cookies.get('token'))
         return
     }
 }
-exports.MakeBackup = MakeBackup;
 
-function LogoutCall(){
+export function LogoutCall(){
     const prefix = ('[YID Session]  ')
     console.log('Logout Called !')
     let DecodedToken = GetUserToken.decrypted()
@@ -257,9 +239,7 @@ function LogoutCall(){
         console.log("Successful logout in YulioID™", response, urlOBJ)    
         router.push({pathname: '/login',})
     })
-
   }
-exports.LogoutCall = LogoutCall;
 
 export function GetAuth(EncUsername, EncPassword, callback) {
     const prefix = '[Auth Server]:';
@@ -293,8 +273,6 @@ export function GetAuth(EncUsername, EncPassword, callback) {
         return callback(exception, response);
     });
 }
-exports.GetAuth = GetAuth;
-
 export const GetUserToken = {
     decrypted: function () {
         let final = jwt.decode(Cookies.get('token')) || jwt.decode(localStorage.getItem('last_backup'));
@@ -318,7 +296,7 @@ export const GetUserToken = {
     }
 };
 
-function GetUserData (values, customPayload, callback) {
+export function GetUserData (values, customPayload, callback) {
     const prefix = '[YID SDCP]';
     const request = 'user_data' || customPayload;
     const globalValue = values || GetUserToken.decrypted();
@@ -346,7 +324,7 @@ function GetUserData (values, customPayload, callback) {
     };
     jquery.ajax(settings)
       .done(
-        function (response) {
+         function (response) {
            let resString = JSON.stringify(response);
            let resParsed = JSON.parse(resString);
            DevOptions.ShowFunctionsLogs ? console.log(prefix, 'Fechted user data...' ) : null
@@ -355,17 +333,14 @@ function GetUserData (values, customPayload, callback) {
         }
        )
       .fail(
-        function (response) {
+         function (response) {
             DevOptions.ShowFunctionsLogs ? console.log(prefix, 'Server failure!', response) : null
             callback( null )
             return
         }
      );
 }
-
-exports.GetUserData = GetUserData;
-
-function InitSDCP(values, done) {
+export function InitSDCP(values, done) {
      const prefix = '[InitSDCP]';
      let payload = {};
      if (!values) {
@@ -388,14 +363,12 @@ function InitSDCP(values, done) {
          )
      }
 }
-exports.InitSDCP = InitSDCP;
-
-function UpdateSDCP() {
+export function UpdateSDCP() {
     const prefix = '[UpdateSDCP]';
     GetUserData(null, null, (callback) => {
         let cooked = JSON.parse(callback)['user_data']
-        let Lsdcp:any = [atob(sessionStorage.getItem('SDCP'))];
-        let Nsdcp:any = [JSON.stringify(cooked)]
+        let Lsdcp = [atob(sessionStorage.getItem('SDCP'))];
+        let Nsdcp = [JSON.stringify(cooked)]
         const e1 = btoa(Lsdcp)
         const e2 = btoa(Nsdcp)
         const n = e1.localeCompare(e2)
@@ -404,13 +377,11 @@ function UpdateSDCP() {
         }else{
             DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Update detected ! => ', n) : null
             asyncSDCP.setSDCP(e2)
-            GlobalRefreshONCE()
+          
         }
     })
 }
-exports.UpdateSDCP = UpdateSDCP;
-
-function SDCPCooker() {
+export function SDCP() {
     const prefix = '[SDCPCooker]';
     let SDCPContainer = sessionStorage.getItem('SDCP')
     if (SDCPContainer) {
@@ -422,18 +393,18 @@ function SDCPCooker() {
             return null
         }
         try {
+            let decodedSDCP = atob(SDCPContainer);
             let parsedSDCP = JSON.parse(decodedSDCP);
+            return parsedSDCP;
         } catch (err) {
             console.error(prefix, err)  
             router.push({pathname: '/login',})
             return null
         }
-        return parsedSDCP;
+       
     }
 }
-exports.SDCP = SDCPCooker;
-
-function PushUserData(inputIO1, inputIO2) {
+export function PushUserData(inputIO1, inputIO2) {
     var getStoragedToken = Cookies.get('access_token');
     var _this = this;
     var yCore_GUDEP = endpoints.update_userData_endpoint;
@@ -455,9 +426,7 @@ function PushUserData(inputIO1, inputIO2) {
         DevOptions.ShowFunctionsLogs? console.log(response) : null
     });
 }
-exports.PushUserData = PushUserData;
-
-function GetGlobalMarketplaceSource() {
+export function GetGlobalMarketplaceSource() {
     let global;
     let TokenContainer = Cookies.get('token') || localStorage.getItem('last_backup');
     let DecodedToken = jwt.decode(TokenContainer)
@@ -476,21 +445,13 @@ function GetGlobalMarketplaceSource() {
         return {global};
        
       })()
-    
 }
-exports.GetGlobalMarketplaceSource = GetGlobalMarketplaceSource;
-
-function StorageWidgets(id, socketMemoryAdress) {
-    // Dinamic Widgets Storage Container (DWSC)
-    var values = ([id + socketMemoryAdress]);
-}
-exports.StorageWidgets = StorageWidgets;
 
 
 //*              *//
 //*   Helpers    *//
 //*              *//
-function DetectNoNStableBuild(e1) {
+export function DetectNoNStableBuild(e1) {
     switch (e1) {
         case 'TagComponent':
             if (package_json.DevBuild == true) {
@@ -516,19 +477,16 @@ function DetectNoNStableBuild(e1) {
             break;
     }
 }
-exports.DetectNoNStableBuild = DetectNoNStableBuild;
 
-function getRandomBG(imgAr) {
+export function getRandomBG(imgAr) {
     var path = 'https://api.ragestudio.net/RS-YIBTP/lib/statics/heros/';
     var num = Math.floor(Math.random() * imgAr.length);
     var img = imgAr[num];
     var out = (path + img);
     return (out);
 }
-exports.getRandomBG = getRandomBG;
 
-
-function UIFxPY(value, customVLM) {
+export function UIFxPY(value, customVLM) {
     // UIFX Player v1.4A
     var dispatcher = value;
     var userVLM = localStorage.getItem('UIfx');
@@ -552,9 +510,9 @@ function UIFxPY(value, customVLM) {
     DevOptions.ShowFunctionsLogs? console.log('The Volume of UIFX is on ', VLM || customVLM, '/ User set on', conv) : null
     beep.setVolume(VLM || customVLM).play();
 }
-exports.UIFxPY = UIFxPY;
 
-function WeatherAPI() {
+
+export function WeatherAPI() {
     let city = 'pamplona';
     let country = 'spain';
     var Api_Key = yConfig.openwheater_apiKey;
@@ -574,12 +532,8 @@ function WeatherAPI() {
     });
     return (returnData);
 }
-exports.WeatherAPI = WeatherAPI;
 
-function GlobalRefreshONCE(){
-    window.location.reload(); 
+export function RefreshONCE(){
+ window.location.reload(); 
 }
-exports.RefreshONCE = GlobalRefreshONCE;
-
-
 

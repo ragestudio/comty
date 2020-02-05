@@ -1,25 +1,26 @@
 import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
-import {PostCard} from 'components'
-
+import {PostCard, PostCreator, MainSidebar} from 'components'
+import styles from './index.less'
 
 var userData = ycore.SDCP()
-
 
 class Main extends React.Component {
     constructor(props){
         super(props)
         this.state = {
             feedRaw: '',
+            loading: true,
         }
     }
-    fetchFeed() {
-        var formdata = new FormData();
+    GetFeedPosts() {
+        let global;
+        let formdata = new FormData();
         formdata.append("server_key", ycore.yConfig.server_key);
         formdata.append("type", "get_news_feed");
-
-        var requestOptions = {
+    
+        const requestOptions = {
           method: 'POST',
           body: formdata,
           redirect: 'follow'
@@ -29,13 +30,13 @@ class Main extends React.Component {
         fetch(objUrl, requestOptions)
           .then(response => response.text())
           .then(result => {
-              console.log(result)
-              this.setState({ feedRaw: result })
+            this.setState({ feedRaw: result, loading: false })
           })
           .catch(error => console.log('error', error));
+    
     }
     componentDidMount(){
-        this.fetchFeed()
+        this.GetFeedPosts()
     }
     
     renderFeedPosts(){
@@ -45,20 +46,25 @@ class Main extends React.Component {
             return (
                 feedParsed.map(item=> {
                     const {postText, post_time, publisher, postFile, postFileName} = item
-                    const paylodd = {user: publisher.username, ago: post_time, avatar: publisher.avatar, content: postText, file: postFile, postFileName: postFileName }
+                    const paylodd = {user: publisher.username, ago: post_time, avatar: publisher.avatar, content: postText, file: postFile, postFileName: postFileName, publisher: publisher }
                     console.log([item], paylodd)
                     return <PostCard payload={paylodd} />
                 })
             )
         } catch (err) {
-            console.error(`Error detected when proccessing the feed posts... =>  ${err}`)
+            ycore.notifyError(err)
+            const paylodd = {user: 'Error', ago: '', avatar: '', content: 'Woops an error spawns here :/, maybe reloading?',  publisher: '' }
+            return <PostCard payload={paylodd} />
         }
     
     }
     render(){
+        const { loading } = this.state;
         return (
-            <div>   
-              { this.renderFeedPosts() }
+            <div> 
+                <MainSidebar />
+                <PostCreator />
+                {loading? <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} ><antd.Skeleton avatar paragraph={{ rows: 4 }} active /></antd.Card> : <div className={styles.PostsWrapper}> {this.renderFeedPosts()} </div>}
             </div>
         )
     }

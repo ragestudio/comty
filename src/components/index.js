@@ -1,5 +1,7 @@
 import CustomIcons from './CustomIcons'
+import MainSidebar from './MainSidebar'
 import PostCard from './PostCard'
+import PostCreator from './PostCreator'
 import Editor from './Editor'
 import FilterItem from './FilterItem'
 import DropOption from './DropOption'
@@ -10,4 +12,4 @@ import Page from './Page'
 import YulioID from './YulioID/experimental/index.js'
 import CoreLoader from './CoreLoader'
 
-export { MyLayout, Editor, FilterItem, DropOption, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard , CustomIcons}
+export { MyLayout, Editor, FilterItem, DropOption, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar}
