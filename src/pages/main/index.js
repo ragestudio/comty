@@ -14,30 +14,14 @@ class Main extends React.Component {
             loading: true,
         }
     }
-    GetFeedPosts() {
-        let global;
-        let formdata = new FormData();
-        formdata.append("server_key", ycore.yConfig.server_key);
-        formdata.append("type", "get_news_feed");
-    
-        const requestOptions = {
-          method: 'POST',
-          body: formdata,
-          redirect: 'follow'
-        };
-        const objUrl = `${ycore.endpoints.get_userPostFeed}${ycore.GetUserToken.decrypted().UserToken}`
-        console.log(objUrl)
-        fetch(objUrl, requestOptions)
-          .then(response => response.text())
-          .then(result => {
-            this.setState({ feedRaw: result, loading: false })
-          })
-          .catch(error => console.log('error', error));
-    
-    }
+     
     componentDidMount(){
-        this.GetFeedPosts()
+        ycore.GetFeedPosts((err, result) => this.setState({ feedRaw: result, loading: false }))
     }
+    handleRefreshList(){
+        ycore.GetFeedPosts((err, result) => this.setState({ feedRaw: result, loading: false }))
+    }
+   
     
     renderFeedPosts(){
         const {feedRaw} = this.state
@@ -47,7 +31,7 @@ class Main extends React.Component {
                 feedParsed.map(item=> {
                     const {postText, post_time, publisher, postFile, postFileName} = item
                     const paylodd = {user: publisher.username, ago: post_time, avatar: publisher.avatar, content: postText, file: postFile, postFileName: postFileName, publisher: publisher }
-                    console.log([item], paylodd)
+                    ycore.DevOptions.ShowFunctionsLogs? console.log([item], paylodd) : null
                     return <PostCard payload={paylodd} />
                 })
             )
@@ -60,10 +44,12 @@ class Main extends React.Component {
     }
     render(){
         const { loading } = this.state;
+       
+        
         return (
             <div> 
                 <MainSidebar />
-                <PostCreator />
+                <PostCreator refreshPull={() => this.handleRefreshList()} />
                 {loading? <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} ><antd.Skeleton avatar paragraph={{ rows: 4 }} active /></antd.Card> : <div className={styles.PostsWrapper}> {this.renderFeedPosts()} </div>}
             </div>
         )

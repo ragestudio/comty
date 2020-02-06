@@ -21,14 +21,14 @@ class PostCard extends React.PureComponent{
         const ident = payload
         if (ident.includes('.mp4')) {
            return (
-                <video id="player" playsinline controls > 
+                <video id="player" playsInline controls > 
                      <source src={payload} type="video/mp4"/>
                 </video>
            )
         }
         if (ident.includes('.webm')) {
             return (
-                <video id="player" playsinline controls > 
+                <video id="player" playsInline controls > 
                      <source src={payload} type="video/webm"/>
                 </video>
            )

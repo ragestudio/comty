@@ -3,6 +3,7 @@ import axios from "axios";
 import {SetControls, CloseControls} from "./components/Layout/Control"
 import {secretOrKey} from "../config/keys.js"
 import * as antd from "antd"
+import { func } from "prop-types";
 
 var react = require("react");
 var package_json = require("../package.json");
@@ -42,10 +43,95 @@ export const infoServer = (ycore_worker.ServerType + ' Server | v' + ycore_worke
 
 export function notifyError(err){
     antd.notification.error({
-        message: 'Uupss, Error',
-        description: (<div><span>Some boring stuff: </span><br/><br/><div style={{ position: 'absolute', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{err.toString()}</div></div>),
+        message: 'Wopss',
+        description: (<div><span>An wild error appear! : </span><br/><br/><div style={{ position: 'absolute', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{err.toString()}</div></div>),
         placement: 'bottomLeft'
     })
+}
+export function notifyProccess(cust){
+    antd.notification.open({
+        icon: <antd.Icon type="loading" style={{ color: '#108ee9' }} />,
+        message: 'Please wait',
+        placement: 'bottomLeft'
+    })
+}
+export function GetFeedPosts(callback) {
+    let formdata = new FormData();
+    formdata.append("server_key", yConfig.server_key);
+    formdata.append("type", "get_news_feed");
+
+    const requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+    const objUrl = `${endpoints.get_userPostFeed}${GetUserToken.decrypted().UserToken}`
+    console.log(objUrl)
+    fetch(objUrl, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+       return callback( null, result)
+      })
+      .catch(error => console.log('error', error));
+
+}
+
+export const get_app_session = {
+    get_id: (callback) => {
+      const fromSto = sessionStorage.getItem('se_src')
+      if (!fromSto){
+        DevOptions.ShowFunctionsLogs? console.log("Missing session_id, setting up...") : null
+        let formdata = new FormData();
+        formdata.append("server_key", yConfig.server_key);
+        formdata.append("type", "get");
+        const requestOptions = {
+          method: 'POST',
+          body: formdata,
+          redirect: 'follow'
+        };
+        const uriObj = `${endpoints.get_sessions}${GetUserToken.decrypted().UserToken}`
+        notifyProccess()
+        fetch(uriObj, requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            const pre = JSON.stringify(result)
+            const pre2 = JSON.parse(pre)
+            const pre3 = JSON.stringify(JSON.parse(pre2)["data"])
+  
+            const obj = JSON.parse(pre3)["session_id"]
+            
+           return asyncSessionStorage.setItem('se_src', btoa(obj)).then( callback(null, obj) )
+          
+          })
+        .catch(error => console.log('error', error));
+      }
+        DevOptions.ShowFunctionsLogs? console.log("Returning from storage") : null
+        return callback( null, atob(fromSto) )
+    },
+    raw: (callback) => {
+        const formdata = new FormData();
+        formdata.append("server_key", yConfig.server_key);
+        formdata.append("type", "get");
+
+        const requestOptions = {
+          method: 'POST',
+          body: formdata,
+          redirect: 'follow'
+        };
+        const uriObj = `${endpoints.get_sessions}${GetUserToken.decrypted().UserToken}`
+        fetch(uriObj, requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            const pre = JSON.stringify(result)
+            const parsed = JSON.parse(pre)
+            const obj = JSON.parse(parsed)["data"]
+            DevOptions.ShowFunctionsLogs? console.log(result, obj) : null
+            return callback(null, obj)
+          })
+        .catch(error => console.log('error', error));
+    }
+
+ 
 }
 
 export function InitSocket(id, params){

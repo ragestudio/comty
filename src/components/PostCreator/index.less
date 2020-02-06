@@ -138,39 +138,84 @@
 }
 
 .inputWrapper{
+    display: flex;
+    z-index: 10;
     width: 100%;
-    padding: 0 4px 22px 4px;
+    padding: 18px 7px 0 7px;
     transition: height 150ms linear;
     :global{
-        transition: height 150ms linear;
+        .ant-btn-primary {
+            border-radius: 0 10px 10px 0;
+            height: 100%;
+            vertical-align: bottom;
+            border: none;
+            box-shadow: none;
+        }
         .ant-input {
-            height: 6vh;
+            border-color: #1890ff;
+            box-shadow: none;
+            border-radius: 3px 0 0 0;
+            height: 100%;
             padding: 5px 10px 5px 10px;
             transition: height 150ms linear;
+            width: 100%;
+            textarea{
+                resize: none; 
+            }
         }
-        .ant-input-affix-wrapper .ant-input-affix-wrapper-textarea-with-clear-btn{
-            border-top: 0;
+        .ant-input:hover{
+            border-color: #1890ff;
         }
-        .ant-progress-inner{
-            height: 4px;
-            position: absolute;
-            bottom: -2px;
-            z-index: 10;
-            border-radius: 10px 10px 0 0;
-            transition: height 150ms linear;
-        }
-        .ant-progress{
-            transition: height 150ms linear;
-            height: 4px;
-            vertical-align: bottom;
+        .ant-input-affix-wrapper{
+            height: 100%;
         }
     }
 }
+.progressHandler{
+    margin: 0 7px 0 7px;
+  
+    :global{
+        .ant-progress-bg{
+            border-radius: 0 0 10px 10px;
+        }
+        .ant-progress-inner{
+            border-radius: 0 0 14px 14px;
+            width: calc(100% - 32px);
+            vertical-align: top;
+        }
+    }
+}
+.postExtra{
+    width: 100%;
+    
+    display: flex;
+    :global{
+        .ant-btn{
+            margin: auto;
+            
+        }
+    }
+}
+
+
 .proccessUnset{
     opacity: 0;
     transition: opacity 250ms linear;
+    animation: proccessUnset 250ms linear;
 }
 .proccessSet{
-    opacity: 1;
     transition: opacity 250ms linear;
+    animation: proccessSet 250ms linear;
 }
+@keyframes proccessSet {
+   0% { opacity: 0; }
+   100% { opacity: 1; }
+}
+@keyframes proccessUnset {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+ }
+  
+ .fontct{
+     font-family: "Poppins", sans-serif;
+ }
