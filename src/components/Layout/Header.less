@@ -1,5 +1,12 @@
 @import '~themes/vars.less';
 
+.createMenu {
+  width: 30px;
+  margin: 0 auto 0 auto;
+  height: 190px;
+  
+  
+}
 .brand {
   display: flex;
   vertical-align: middle;
@@ -201,4 +208,26 @@
     }
   }
 }
+.createMenuPopover {
+  :global {
+    .ant-popover-inner {
+      background-color: transparent;
+      box-shadow: unset;
+    }
+
+    .ant-popover-inner-content {
+      padding: 0;
+    }
+
+    .ant-popover-arrow {
+      display: none;
+    }
+
+    .ant-list-item-content {
+      flex: 0;
+      margin-left: 16px;
+    }
+  }
+}
+
 

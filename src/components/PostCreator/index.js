@@ -6,10 +6,6 @@ import {CustomIcons} from 'components'
 
 const { Meta } = antd.Card;
 
-// Set default by configuration
-const emptyPayload = {user: 'Post Empty', ago: 'This Post is empty', avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', content: 'Test Test' }
-const defaultActions = [<antd.Icon type="heart" className={styles.likebtn} key="like" />,<antd.Icon type="share-alt" key="share" />,<antd.Icon type="more" key="actionMenu" />]
-
 class PostCreator extends React.PureComponent{
     constructor(props){
         super(props),
@@ -75,7 +71,7 @@ class PostCreator extends React.PureComponent{
     }
     PublishPost = (e) => {
         const { rawtext } = this.state;
-        const { refreshPull } = this.props
+        const { refreshPull, toggleShow } = this.props
         
         if(!rawtext){
             return null
@@ -95,10 +91,12 @@ class PostCreator extends React.PureComponent{
         const urlObj = `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`
         fetch(urlObj, requestOptions)
           .then(response => {
-              console.log(response)
+              ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
               this.setState({ posting_ok: true, posting: false, rawtext: ''})
-              refreshPull()
               setTimeout( () => { this.setState({ posting_ok: false }) }, 1000)
+              refreshPull()
+             // console.warn(`[EXCEPTION] refreshPull or/and toogleShow is not set, the controller handlers not working...`)
+              
             })
           .catch(error => console.log('error', error));
     }
@@ -139,5 +137,5 @@ class PostCreator extends React.PureComponent{
           </div>
         )
     }
-}
+}          
 export default PostCreator

@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
-import { Menu, Icon, Layout, Avatar, Popover, Badge, List, Switch, Tooltip } from 'antd'
+import { Menu, Icon, Layout, Avatar, Popover, Badge, List, Switch, Tooltip, Dropdown, Button } from 'antd'
 import { Trans, withI18n } from '@lingui/react'
 import { Ellipsis } from 'ant-design-pro'
 import classnames from 'classnames'
@@ -13,7 +13,12 @@ import moment from 'moment'
 
 @withI18n()
 class Header extends PureComponent {
- 
+  constructor(props){
+    super(props),
+    this.state = {
+      createMenuVisible: false,
+    }
+  }
   isDarkMode = () => {
     const {theme} = this.props
     if (theme == "light") {
@@ -21,6 +26,19 @@ class Header extends PureComponent {
     }
     return true;
   }
+  handleCreateMenuVisible() {
+    this.setState({ createMenuVisible: !this.state.createMenuVisible });
+  }
+  handleOpenMenu() {
+    let ListControls = [
+      (<div>
+          <Button type="dashed" icon="close" shape="circle" onClick={() => ycore.ControlBar.close()}></Button>
+      </div>
+     )
+    ]
+    ycore.ControlBar.set(ListControls)
+  }
+
   render() {
     const {
       i18n,
@@ -33,6 +51,7 @@ class Header extends PureComponent {
       onAllNotificationsRead,
     } = this.props
 
+    
     const notificationIcon = (
       <Popover
         placement="bottomRight"
@@ -87,7 +106,7 @@ class Header extends PureComponent {
         </Badge>
       </Popover>
     )
-
+  
     return (
       <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed})} > 
             <div className={styles.leftContainer}>
@@ -96,7 +115,7 @@ class Header extends PureComponent {
               <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="search" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
             </div>
             <div className={styles.rightContainer}>
-              <Tooltip title={'New'}><a target="_blank" href="" rel="noopener noreferrer"><Icon type="plus" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+              <Tooltip title={'Create'}><Icon type="plus" onClick={() => this.handleOpenMenu()} className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
               {notificationIcon}
             </div>
       </Layout.Header>

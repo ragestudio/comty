@@ -203,6 +203,9 @@ export const asyncSDCP = {
     }
 };
 export const ControlBar = {
+    setCreate: (e) =>{
+
+    },
     set: (e) => {
         SetControls(e)
     },

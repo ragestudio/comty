@@ -44,7 +44,6 @@ module.exports = {
     },
     DevOptions: {
       defaultSettings: [{id: 'strict_lightMode', value: false}, {id: 'force_collapse', value: false}, {id: 'force_showDevLogs', value: true}],
-
       // Global Behaviors 
       InfiniteLoading: false,
       InfiniteLogin: false,

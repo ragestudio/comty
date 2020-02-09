@@ -99,14 +99,13 @@ class PrimaryLayout extends PureComponent {
 
     // MenuParentId is equal to -1 is not a available menu.
     const menus = newRouteList.filter(_ => _.menuParentId !== '-1')
-    
     const headerProps = {
       menus,
       theme,
       collapsed,
       newRouteList,
       notifications,
-      onCollapseChange,
+      onCollapseChange,      
       onThemeChange(theme) {
         dispatch({
           type: 'app/handleThemeChange',
@@ -119,14 +118,6 @@ class PrimaryLayout extends PureComponent {
       },
       
     }
-
-    const LeftSiderProps = {
-      theme,
-      menus,
-      isMobile,
-      collapsed,
-      onCollapseChange,
-    }
     const RightSiderProps = {
       theme,
       collapsed,
@@ -138,7 +129,9 @@ class PrimaryLayout extends PureComponent {
         })
       },
     }
-    
+    const ContainerProps = {
+      theme,
+    }
     const MobileWarning = () =>{
       if (resbypass == false) {
          if (isMobile == true) {
@@ -153,7 +146,7 @@ class PrimaryLayout extends PureComponent {
       return null
     }
 
-      return (
+    return (
         <Fragment>
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
@@ -161,7 +154,7 @@ class PrimaryLayout extends PureComponent {
             <div className={styles.container}>
               <div style={{ paddingTop: config.fixedHeader ? 72 : 0 }} id="primaryLayout" >
                 <Header {...headerProps} />
-                <Content className={styles.content}>
+                <Content {...ContainerProps} className={styles.content}>
                     {children}
                 </Content>
               </div>
@@ -170,8 +163,6 @@ class PrimaryLayout extends PureComponent {
           </Layout>
         </Fragment>
       )
-   
-
   }
 }
 

@@ -18,7 +18,7 @@ class R_Sider extends PureComponent {
     this.state = {
       isHover: false
     };
-      this.hover = this.hover.bind(this);
+    this.hover = this.hover.bind(this);
   }
   hover(e) {
     this.setState({
@@ -124,7 +124,7 @@ class R_Sider extends PureComponent {
                               <Trans>Admin Area</Trans>
                             </Menu.Item> 
                                 : 
-                            null
+                            undefined
                           }
                         </Menu>
                         

@@ -1,3 +1,5 @@
+@import '~themes/vars.less';
+
 .main_menuWrapper{
     position: absolute;
     left: 2%;
@@ -5,6 +7,10 @@
     top: 70px;
     width: 20vw;
     vertical-align: middle;
+    background-color: #fff;
+    border: 1px rgba(128, 128, 128, 0.11) solid;
+    border-radius: 10px;
+    font-family: "Poppins", sans-serif;
     :global {
         .ant-menu{
             background-color: transparent;
@@ -14,13 +20,14 @@
             margin-bottom: 0;
         }
         .ant-menu-item{
+            margin-left: 15px;
             height: 28px;
             line-height: 28px;
         }
         .ant-divider-horizontal.ant-divider-with-text-center, .ant-divider-horizontal.ant-divider-with-text-left, .ant-divider-horizontal.ant-divider-with-text-right {
             display: table;
             margin: 7px 0;
-            color: rgba(0, 0, 0, 0.85);
+            color: rgba(0, 0, 0, 0.712);
             font-weight: 430;
             font-size: 13px;
             white-space: nowrap;
@@ -38,9 +45,10 @@
 }
 .profileKey{
     :global{
-         padding-left: 0;
+         padding-left: -0;
+         .ant-avatar {
+            margin: 0 5px 0 -15px;
+         }
     }
-    span{
-        margin: 0 0 0 5px;
-    }
+    
 }
