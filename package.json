@@ -1,6 +1,6 @@
 {
   "name": "comty-development",
-  "version": "0.1.06",
+  "version": "0.1.09",
   "description": "",
   "main": "index.js",
   "author": "",
@@ -9,7 +9,7 @@
     "@ant-design/pro-layout": "^4.9.11",
     "@lingui/react": "^2.9.0",
     "ant-design-pro": "^2.3.2",
-    "antd": "^3.26.3",
+    "antd": "^4.0.0-rc.0",
     "autoprefixer": "7.1.6",
     "axios": "^0.18.0",
     "babel-core": "7.0.0-bridge.0",
