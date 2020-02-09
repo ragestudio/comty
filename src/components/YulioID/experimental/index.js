@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import {GetAuth, InitSDCP, DevOptions, asyncSDCP} from 'ycore';
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
-import { Button, Form, Input, Drawer, Icon, Collapse } from 'antd'
+import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Input, Drawer, Collapse } from 'antd';
 import styles from './yid.scss';
 import formstyle from './formstyle.less'
 
@@ -104,7 +106,7 @@ class YulioID extends Component {
                 {ShowLoading ? (
                   <div style={{ height: '329px' }}>
                     <div className={styles.spinner__wrapper} id="loadingspn">
-                      {StateIcon ? (<Icon type={StateIcon} className={StateException? styles.StateIcon_exception : styles.StateIcon} /> ) : (<Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin />)}
+                      {StateIcon ? (<LegacyIcon type={StateIcon} className={StateException? styles.StateIcon_exception : styles.StateIcon} /> ) : (<LegacyIcon type="loading" style={{ fontSize: 24, margin: '13px' }} spin />)}
                       <div><br/><br/><br/>
                         <div style={{ margin: 'auto' }}>
                           <h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }} > {StateMessage} </h6>
@@ -118,7 +120,7 @@ class YulioID extends Component {
                   <div>
                     <div className={styles.input__wrapper}>
                       <label className={styles.labelform}>
-                        <Icon type="user" style={{ fontSize: '15px' }} />{' '}
+                        <LegacyIcon type="user" style={{ fontSize: '15px' }} />{' '}
                         Username
                       </label>
                       <FormItem>
@@ -140,7 +142,7 @@ class YulioID extends Component {
 
                     <div className={styles.input__wrapper}>
                       <label className={styles.labelform}>
-                        <Icon type="unlock" style={{ fontSize: '15px' }} />{' '}
+                        <LegacyIcon type="unlock" style={{ fontSize: '15px' }} />{' '}
                         Password
                       </label>
                       <FormItem>
@@ -183,7 +185,7 @@ class YulioID extends Component {
                         onClick={this.initFPassword}
                         style={{ top: '8px' }}
                       >
-                        <Icon type="exclamation-circle" /> Forgotten password
+                        <LegacyIcon type="exclamation-circle" /> Forgotten password
                       </Button>
                     </div>
                     <div style={{ float: 'right' }}>
@@ -192,7 +194,7 @@ class YulioID extends Component {
                         onClick={this.initRegister}
                         style={{ top: '8px' }}
                       >
-                        <Icon type="user-add" /> Create an account
+                        <LegacyIcon type="user-add" /> Create an account
                       </Button>
                     </div>
                   </div>
@@ -202,7 +204,7 @@ class YulioID extends Component {
           </main>
         </Drawer>
       </div>
-    )
+    );
   }
 }
 

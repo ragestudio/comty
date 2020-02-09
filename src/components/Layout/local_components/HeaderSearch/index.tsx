@@ -1,4 +1,5 @@
-import { AutoComplete, Icon, Input } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { AutoComplete, Input } from 'antd';
 import { AutoCompleteProps, DataSourceItemType } from 'antd/es/auto-complete';
 import React, { Component } from 'react';
 
@@ -122,7 +123,7 @@ export default class HeaderSearch extends Component<HeaderSearchProps, HeaderSea
           }
         }}
       >
-        <Icon type="search" key="Icon" />
+        <LegacyIcon type="search" key="Icon" />
         <AutoComplete
           key="AutoComplete"
           {...restProps}

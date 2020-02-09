@@ -1,6 +1,7 @@
 import React, { PureComponent, StrictMode } from 'react'
 import PropTypes from 'prop-types'
-import { Icon, Switch, Layout, Tag, Divider, Drawer, Avatar, Menu} from 'antd'
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Switch, Layout, Tag, Divider, Drawer, Avatar, Menu } from 'antd';
 import { withI18n, Trans } from '@lingui/react'
 import classNames from 'classnames'
 import router from 'umi/router'
@@ -90,7 +91,7 @@ class R_Sider extends PureComponent {
             <div className={styles.siderhead}>
               <Avatar size={this.Balancer()? "small" : "large"} shape={this.Balancer()? "circle" : "square"} src={userData.avatar} className={this.Balancer()? styles.avatar : styles.avatarFull} />
             </div>
-           {this.Balancer()? <div style={{ height: "100%", textAlign: "center" }} ><Icon onClick={this.hover} type="left" style={{ color: "#2F2E30", position: "absolute", bottom: "50%" }} /></div> :
+           {this.Balancer()? <div style={{ height: "100%", textAlign: "center" }} ><LegacyIcon onClick={this.hover} type="left" style={{ color: "#2F2E30", position: "absolute", bottom: "50%" }} /></div> :
             <div>
                 <div className={styles.userInfo}>
                     <h2>@{userData.username}</h2>
@@ -101,26 +102,26 @@ class R_Sider extends PureComponent {
                       <Menu className={styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
                           {this.UserIsPro()? 
                           <Menu.Item key="boosted_pages">
-                            <Icon style={{ fontSize: '15px' }} type="thunderbolt" />
+                            <LegacyIcon style={{ fontSize: '15px' }} type="thunderbolt" />
                             <Trans> Boosted Posts </Trans>
                           </Menu.Item> 
                           : 
                         <Menu.Item key="upgrade_pro">
-                          <Icon style={{ fontSize: '15px' }} type="star" />
+                          <LegacyIcon style={{ fontSize: '15px' }} type="star" />
                           <Trans> Upgrade to Pro </Trans>
                         </Menu.Item>}
                           <Menu.Item key="edit_profile">
-                            <Icon style={{ fontSize: '15px' }} type="profile" />
+                            <LegacyIcon style={{ fontSize: '15px' }} type="profile" />
                             <Trans>Edit Profile</Trans>
                           </Menu.Item>
                           <Menu.Item key="general_settings">
-                            <Icon style={{ fontSize: '15px' }} type="setting" />
+                            <LegacyIcon style={{ fontSize: '15px' }} type="setting" />
                             <Trans>General Settings</Trans>
                           </Menu.Item>
                           <Divider dashed style={{margin: '0 0 0 0', borderWidth: '1px 0 1px 0', letterSpacing: '0.6px'}} />
                           {this.UserIsAdmin()? 
                             <Menu.Item key="admin_area">
-                              <Icon style={{ fontSize: '15px' }} type="tool" />
+                              <LegacyIcon style={{ fontSize: '15px' }} type="tool" />
                               <Trans>Admin Area</Trans>
                             </Menu.Item> 
                                 : 
@@ -132,7 +133,7 @@ class R_Sider extends PureComponent {
                         <div className={styles.something_thats_pulling_me_down}>
                         <Menu className={styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
                             <Menu.Item style={{ fontSize: '15px' }} key="LightMode" disabled={false} >
-                              <Icon type="bg-colors" />
+                              <LegacyIcon type="bg-colors" />
                               <Switch
                                 onChange={onThemeChange.bind(
                                   this,
@@ -144,7 +145,7 @@ class R_Sider extends PureComponent {
                               />
                             </Menu.Item>
                             <Menu.Item key="SignOut">
-                              <Icon type="logout" style={{ color: 'red' }} />
+                              <LegacyIcon type="logout" style={{ color: 'red' }} />
                               <Trans>Logout</Trans>
                             </Menu.Item>
                         </Menu>
@@ -154,7 +155,7 @@ class R_Sider extends PureComponent {
             }
           </Layout.Sider>
       </div>
-    )
+    );
   }
 }
 

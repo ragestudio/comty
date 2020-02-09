@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown, Button, Icon, Menu } from 'antd'
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Dropdown, Button, Menu } from 'antd';
 
 const DropOption = ({
   onMenuClick,
@@ -17,11 +18,11 @@ const DropOption = ({
     } {...dropdownProps}>
 
       <Button style={{ border: 'none', ...buttonStyle }}>
-        <Icon style={{ marginRight: 2 }} type="bars" />
-        <Icon type="down" />
+        <LegacyIcon style={{ marginRight: 2 }} type="bars" />
+        <LegacyIcon type="down" />
       </Button>
     </Dropdown>
-  )
+  );
 }
 
 DropOption.propTypes = {

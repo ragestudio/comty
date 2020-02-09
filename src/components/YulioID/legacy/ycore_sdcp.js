@@ -9,7 +9,9 @@
 //****************************************|
 
 import React, { PureComponent } from 'react'
-import {  Form, Icon, message, notification } from 'antd'
+import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { message, notification } from 'antd';
 import { UIFxPY, UIFxList, DevOptions } from 'ycoreLegacy';
 import { endpoints } from 'ycoreLegacy';
 import $ from 'jquery';
@@ -139,7 +141,7 @@ export class SDCP extends PureComponent {
         message: 'For continue your request, is necessary to login with YulioID™ again',
         description:
           'LoginBridge™ report a access token expiration, and is required you for continue login again with security reasons.',
-        icon: <Icon type="login" style={{ color: '#108ee9' }} />,
+        icon: <LegacyIcon type="login" style={{ color: '#108ee9' }} />,
       });
       cookies.remove('access_token', { path: '/' })
     });
@@ -269,7 +271,7 @@ export class SDCP extends PureComponent {
         message: 'The instructions to recover your account have been sent to the email',
         description:
           'If you cant find the email, try looking for it in the spam folder or try again',
-        icon: <Icon type="mail" style={{ color: '#108ee9' }} />,
+        icon: <LegacyIcon type="mail" style={{ color: '#108ee9' }} />,
       });
       console.log(response)
     });
@@ -314,7 +316,7 @@ export class SDCP extends PureComponent {
             placement: 'topLeft',
             message: 'Currently our servers are having operating problems',
             description: 'Please be patient until the services become available again, try again later. We apologize for the inconveniences',
-            icon: <Icon type="login" style={{ color: '#ff0f2f' }} />
+            icon: <LegacyIcon type="login" style={{ color: '#ff0f2f' }} />
           }),
           $("#loadingspn").css({ opacity: 0, "z-index": -1 }),
           _this.triggerNOTF();
