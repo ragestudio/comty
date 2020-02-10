@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import * as icon from '@ant-design/icons';
 import { Dropdown, Button, Menu } from 'antd';
 
 const DropOption = ({
@@ -18,8 +18,8 @@ const DropOption = ({
     } {...dropdownProps}>
 
       <Button style={{ border: 'none', ...buttonStyle }}>
-        <LegacyIcon style={{ marginRight: 2 }} type="bars" />
-        <LegacyIcon type="down" />
+        <icon.BarsOutline style={{ marginRight: 2 }} />
+        <icon.DownOutline />
       </Button>
     </Dropdown>
   );

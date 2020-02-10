@@ -6,6 +6,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ant-design/compatible": "0.0.1-rc.1",
+    "@ant-design/icons": "^2.1.1",
     "@ant-design/pro-layout": "^4.9.11",
     "@lingui/react": "^2.9.0",
     "ant-design-pro": "^2.3.2",

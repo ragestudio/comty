@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import * as icon from '@ant-design/icons';
 import { Menu } from 'antd';
 import Navlink from 'umi/navlink'
 import withRouter from 'umi/withRouter'
@@ -13,6 +13,7 @@ import {
 } from 'utils'
 import store from 'store'
 import styles from './Menu.less'
+import { isTypeNode } from 'typescript';
 
 
 const { SubMenu } = Menu
@@ -52,7 +53,7 @@ class SiderMenu extends PureComponent {
             className={styles.SubMenuItems}
             title={
               <Fragment>
-                {item.icon && <LegacyIcon type={item.icon} />}
+                {item.icon && <item.icon />}
                 <span className={styles.SubItemTitle}>{item.name}</span>
               </Fragment>
             }
@@ -64,7 +65,7 @@ class SiderMenu extends PureComponent {
       return (
         <Menu.Item key={item.id} >
           <Navlink to={addLangPrefix(item.route) || '#'}>
-            {item.icon && <LegacyIcon type={item.icon} />}
+            {item.icon && <item.icon />}
             <span>{item.name}</span>
           </Navlink>
         </Menu.Item>

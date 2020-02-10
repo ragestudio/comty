@@ -1,6 +1,7 @@
 import React, { PureComponent, StrictMode } from 'react'
 import PropTypes from 'prop-types'
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Icons as LegacyIcon } from '@ant-design/compatible';
+import * as icon from '@ant-design/icons';
 import { Switch, Layout, Tag, Divider, Drawer, Avatar, Menu } from 'antd';
 import { withI18n, Trans } from '@lingui/react'
 import classNames from 'classnames'

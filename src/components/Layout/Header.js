@@ -1,5 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import * as icon from '@ant-design/icons';
 import {
   Menu,
   Layout,
@@ -44,7 +44,7 @@ class Header extends PureComponent {
   handleOpenMenu() {
     let ListControls = [
       (<div>
-          <Button type="dashed" icon={<LegacyIcon type="close" />} shape="circle" onClick={() => ycore.ControlBar.close()}></Button>
+          <Button type="dashed" icon={<icon.CloseOutline />} shape="circle" onClick={() => ycore.ControlBar.close()}></Button>
       </div>
      )
     ]
@@ -90,10 +90,7 @@ class Header extends PureComponent {
                     }
                     description={moment(item.date).fromNow()}
                   />
-                  <LegacyIcon
-                    style={{ fontSize: '15px', color: '#ccc' }}
-                    type="right"
-                  />
+                 <icon.RightOutlined />
                 </List.Item>
               )}
             />
@@ -114,7 +111,7 @@ class Header extends PureComponent {
           offset={[-10, 10]}
           className={styles.iconButton}
         >
-          <LegacyIcon className={styles.iconFont} type="bell" />
+          <icon.BellOutlined />
         </Badge>
       </Popover>
     )
@@ -123,11 +120,11 @@ class Header extends PureComponent {
       <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed})} > 
             <div className={styles.leftContainer}>
               <img className={styles.brand} src={config.FullLogoPath} />
-              <Tooltip title={'Main'}><a target="_blank" href="" rel="noopener noreferrer"><LegacyIcon type="home" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
-              <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><LegacyIcon type="search" className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+              <Tooltip title={'Main'}><a target="_blank" href="" rel="noopener noreferrer"><icon.HomeOutline className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
+              <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><icon.SearchOutline className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
             </div>
             <div className={styles.rightContainer}>
-              <Tooltip title={'Create'}><LegacyIcon type="plus" onClick={() => this.handleOpenMenu()} className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
+              <Tooltip title={'Create'}><icon.PlusCircleOutline onClick={() => this.handleOpenMenu()} className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
               {notificationIcon}
             </div>
       </Layout.Header>
