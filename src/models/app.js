@@ -27,7 +27,7 @@ export default {
     AppSettings: store.get('app_settings') || config.defaultSettings,
     locationQuery: {},
     theme: store.get('theme') || 'light',
-    collapsed: store.get('collapsed') || true,
+    collapsed: store.get('collapsed') || false,
     notifications: [
       {
         title: 'Hey! Test notification',

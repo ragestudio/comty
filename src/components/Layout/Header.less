@@ -1,11 +1,17 @@
 @import '~themes/vars.less';
 
+@LDarkMode-backgroud: rgba(47, 46, 48, 0.74);
+@LLightMode-backgroud: #fff;
+
+@LDarkMode-color: #fff;
+@LLightMode-color: #2F2E30;
 .createMenu {
   width: 30px;
   margin: 0 auto 0 auto;
   height: 190px;
   
   
+
 }
 .brand {
   display: flex;
@@ -18,13 +24,19 @@
     padding: 0;
   }
 }
+.containersWrappers{
+  display: flex;
+  &.collapsed {
+    width: ~'calc(100% - 80px)';
+  }
+}
 .header {
   -webkit-box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
   -moz-box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
   box-shadow: 0px 9px 15px -6px rgba(158,158,158,0.82);
   display: flex;
   width: 100%;
-  background-color: @DarkMode-backgroud;
+  background-color: #F3F3F3;
   height: 45px;
   z-index: 9;
   align-items: center;
@@ -33,6 +45,16 @@
   width: 100%;
   z-index: 10;
   transition: width 0.2s;
+  right: 0;
+  &.collapsed {
+    width: ~'calc(100% - 180px)';
+    background-color: rgb(80, 80, 80);
+    background-color: @LDarkMode-backgroud;
+    color: @DarkMode-color;
+    border-color: transparent;
+    box-shadow: none;
+    transition: box-shadow 1s linear;
+  }
   :global {
     
     .ant-menu-submenu-title {
@@ -82,10 +104,8 @@
     margin: 0 50px;
   }
   .leftContainer {
-    margin: 0 23px;
+    margin: 0 0 0 50px;
     display: flex;
-
-
   }
 
   .button {

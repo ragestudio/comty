@@ -1,12 +1,11 @@
 import Cookies from "ts-cookies";
 import axios from "axios";
-import {SetControls, CloseControls} from "./components/Layout/Control"
-import {secretOrKey} from "../config/keys.js"
+import {SetControls, CloseControls} from ".././components/Layout/Control"
+import {secretOrKey} from "../../config/keys.js"
 import * as antd from "antd"
-import { func } from "prop-types";
 
 var react = require("react");
-var package_json = require("../package.json");
+var package_json = require("../../package.json");
 var jquery = require("jquery");
 var uifx = require("uifx");
 var config = require("config");
@@ -39,7 +38,7 @@ export const UIFxList = {
     notifyWarning: (ycore_worker.FXapiProvider + 'NotifyWarning.wav'),
     notifySuccess: (ycore_worker.FXapiProvider + 'notifySuccess.wav')
 };
-export const infoServer = (ycore_worker.ServerType + ' Server | v' + ycore_worker.ServerVersion);
+
 
 export function notifyError(err){
     antd.notification.error({
@@ -598,28 +597,6 @@ export function UIFxPY(value, customVLM) {
     var beep = new uifx({ asset: dispatcher });
     DevOptions.ShowFunctionsLogs? console.log('The Volume of UIFX is on ', VLM || customVLM, '/ User set on', conv) : null
     beep.setVolume(VLM || customVLM).play();
-}
-
-
-export function WeatherAPI() {
-    let city = 'pamplona';
-    let country = 'spain';
-    var Api_Key = yConfig.openwheater_apiKey;
-    var _this = this;
-    var urlOBJ = ("http://api.openweathermap.org/data/2.5/weather?q=" + city + "," + country + "&appid=2acf34be0b8f033b89ba4de1e674d42a");
-    var returnData;
-    var AjaxRequest = {
-        "url": urlOBJ,
-        "method": "POST",
-        "timeout": 0,
-        "processData": true,
-        "contentType": false
-    };
-    jquery.ajax(AjaxRequest)
-        .done(function (response) {
-        returnData = response;
-    });
-    return (returnData);
 }
 
 export function RefreshONCE(){

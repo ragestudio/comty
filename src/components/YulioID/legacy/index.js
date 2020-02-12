@@ -11,21 +11,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import {
-  Button,
-  Row,
-  Input,
-  Drawer,
-  Collapse,
-  Select,
-  Checkbox,
-  Result,
-  Layout,
-  message,
-  notification,
-} from 'antd';
+import { Button, Row, Form, Input, Drawer, Icon, Collapse, Select, Checkbox, Result, Layout, message, notification } from 'antd'
 import { Trans, withI18n } from '@lingui/react'
 import { setLocale } from 'utils'
 import { UIFxPY, UIFxList, DevOptions } from 'ycore';
@@ -222,7 +208,7 @@ class YulioID extends PureComponent {
         message: 'For continue your request, is necessary to login with YulioID™ again',
         description:
           'LoginBridge™ report a access token expiration, and is required you for continue login again with security reasons.',
-        icon: <LegacyIcon type="login" style={{ color: '#108ee9' }} />,
+        icon: <Icon type="login" style={{ color: '#108ee9' }} />,
       });
       cookies.remove('access_token', { path: '/' })
     });
@@ -362,7 +348,7 @@ class YulioID extends PureComponent {
         message: 'The instructions to recover your account have been sent to the email',
         description:
           'If you cant find the email, try looking for it in the spam folder or try again',
-        icon: <LegacyIcon type="mail" style={{ color: '#108ee9' }} />,
+        icon: <Icon type="mail" style={{ color: '#108ee9' }} />,
       });
       console.log(response)
     });
@@ -409,7 +395,7 @@ class YulioID extends PureComponent {
             placement: 'topLeft',
             message: 'Currently our servers are having operating problems',
             description: 'Please be patient until the services become available again, try again later. We apologize for the inconveniences',
-            icon: <LegacyIcon type="login" style={{ color: '#ff0f2f' }} />
+            icon: <Icon type="login" style={{ color: '#ff0f2f' }} />
           }),
           $("#loadingspn").css({ opacity: 0, "z-index": -1 }),
           _this.triggerNOTF();

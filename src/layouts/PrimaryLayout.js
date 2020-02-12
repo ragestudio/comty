@@ -14,7 +14,7 @@ import Error from '../pages/404'
 import styles from './PrimaryLayout.less'
 
 const { Content } = Layout
-const { Header, L_Sider, R_Sider, Control } = MyLayout
+const { Header, L_Sider, Control } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -118,8 +118,10 @@ class PrimaryLayout extends PureComponent {
       },
       
     }
-    const RightSiderProps = {
+    const LeftSiderProps = {
+      menus,
       theme,
+      isMobile,
       collapsed,
       onCollapseChange,
       onThemeChange(theme) {
@@ -131,6 +133,7 @@ class PrimaryLayout extends PureComponent {
     }
     const ContainerProps = {
       theme,
+      location
     }
     const MobileWarning = () =>{
       if (resbypass == false) {
@@ -151,6 +154,7 @@ class PrimaryLayout extends PureComponent {
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
           <Layout className={this.isDarkMode()? styles.container_dark : styles.container_light}>
+           <L_Sider {...LeftSiderProps}/>
             <div className={styles.container}>
               <div style={{ paddingTop: config.fixedHeader ? 72 : 0 }} id="primaryLayout" >
                 <Header {...headerProps} />
@@ -159,7 +163,6 @@ class PrimaryLayout extends PureComponent {
                 </Content>
               </div>
             </div>  
-            <R_Sider {...RightSiderProps}/>
           </Layout>
         </Fragment>
       )

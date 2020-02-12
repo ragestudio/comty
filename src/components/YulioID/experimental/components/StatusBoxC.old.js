@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Icon } from 'antd';
 import styles from '../yid.scss';
 
 import PropTypes from 'prop-types';
@@ -22,13 +22,13 @@ class StatusBox extends Component {
         if (Reactive == 'loading') {
             return (
               <div className={styles.spinner__wrapper} id="loadingspn" >
-                <div><LegacyIcon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
+                <div><Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
                 <div>
                   <br /><br /><br />
                   <div style={{ margin: 'auto' }}><h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }}>Wait a sec...</h6></div>
                 </div>
               </div>
-            );
+            )
         }
         if (Reactive == '200') {
             return (

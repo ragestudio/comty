@@ -26,6 +26,7 @@ module.exports = {
       openwheater_apiKey:'2acf34be0b8f033b89ba4de1e674d42a',
     },
     Endpoints: {
+       search_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/search?access_token=",
        get_sessions: "https://api.ragestudio.net/RS-YIBTP/yid/session_id?access_token=",
        auth_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/auth",
        new_post: "https://api.ragestudio.net/RS-YIBTP/yid/new_post?access_token=",

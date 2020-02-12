@@ -12,11 +12,6 @@ class MainSidebar extends React.Component {
         collapsed: false,
     };
 
-    toggleCollapsed = () => {
-      this.setState({
-        collapsed: !this.state.collapsed,
-      });
-    };    
 
     render(){
         return(

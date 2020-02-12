@@ -1,5 +1,5 @@
 import Header from './Header'
-import R_Sider from './R_Sider'
+import L_Sider from './L_Sider'
 import Control from './Control'
 
-export { Header, R_Sider, Control }
+export { Header, L_Sider, Control }

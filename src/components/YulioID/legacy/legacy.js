@@ -11,21 +11,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import {
-  Button,
-  Row,
-  Input,
-  Drawer,
-  Collapse,
-  Select,
-  Checkbox,
-  Result,
-  Layout,
-  message,
-  notification,
-} from 'antd';
+import { Button, Row, Form, Input, Drawer, Icon, Collapse, Select, Checkbox, Result, Layout, message, notification } from 'antd'
 import { Trans, withI18n } from '@lingui/react'
 import { setLocale } from 'utils'
 import { UIFxPY, UIFxList, DevOptions, avilableSDCP } from 'ycore';
@@ -228,7 +214,7 @@ class YulioID extends PureComponent {
         message: 'For continue your request, is necessary to login with YulioID™ again',
         description:
           'LoginBridge™ report a access token expiration, and is required you for continue login again with security reasons.',
-        icon: <LegacyIcon type="login" style={{ color: '#108ee9' }} />,
+        icon: <Icon type="login" style={{ color: '#108ee9' }} />,
       });
       cookies.remove('access_token', { path: '/' })
     });
@@ -368,7 +354,7 @@ class YulioID extends PureComponent {
         message: 'The instructions to recover your account have been sent to the email',
         description:
           'If you cant find the email, try looking for it in the spam folder or try again',
-        icon: <LegacyIcon type="mail" style={{ color: '#108ee9' }} />,
+        icon: <Icon type="mail" style={{ color: '#108ee9' }} />,
       });
       console.log(response)
     });
@@ -415,7 +401,7 @@ class YulioID extends PureComponent {
             placement: 'topLeft',
             message: 'Currently our servers are having operating problems',
             description: 'Please be patient until the services become available again, try again later. We apologize for the inconveniences',
-            icon: <LegacyIcon type="login" style={{ color: '#ff0f2f' }} />
+            icon: <Icon type="login" style={{ color: '#ff0f2f' }} />
           }),
           $("#loadingspn").css({ opacity: 0, "z-index": -1 }),
           _this.triggerNOTF();
@@ -589,7 +575,7 @@ class YulioID extends PureComponent {
 
                 <div className={styles.input__wrapper}>
 
-                  <label className={styles.labelform}><LegacyIcon type="user" style={{ fontSize: '15px' }} /> Username</label>
+                  <label className={styles.labelform}><Icon type="user" style={{ fontSize: '15px' }} /> Username</label>
                   <FormItem hasFeedback>{getFieldDecorator('Username', { rules: [{ required: true }] })(
                     <input className={styles.inputform} type="text" onKeyDown={this.handleKeyDown} placeholder="Username" onChange={(text) => { this.handleUsername(text) }} />
                   )}
@@ -597,7 +583,7 @@ class YulioID extends PureComponent {
                 </div>
 
                 <div className={styles.input__wrapper}>
-                  <label className={styles.labelform}><LegacyIcon type="unlock" style={{ fontSize: '15px' }} /> Password</label>
+                  <label className={styles.labelform}><Icon type="unlock" style={{ fontSize: '15px' }} /> Password</label>
                   <FormItem hasFeedback>{getFieldDecorator('Password', { rules: [{ required: true }] })(
                     <input className={styles.inputform} type="password" onKeyDown={this.handleKeyDown} dplaceholder="Password (At least 8 characters)" onChange={(text) => { this.handlePassword(text) }} />
                   )}
@@ -606,11 +592,11 @@ class YulioID extends PureComponent {
 
                 <div style={{ margin: 'auto' }}><a className={styles.buttonlp} id="login" onClick={this.getAuth}  >Login</a></div>
                 <h2 style={{ textAlign: 'center', margin: '8px', color: '#666' }}>Or</h2>
-                <div style={{ float: 'left' }}><Button type="dashed" onClick={this.initFPassword} style={{ top: '8px' }}><LegacyIcon type="exclamation-circle" /> Forgotten password</Button></div>
-                <div style={{ float: 'right' }}><Button type="dashed" onClick={this.initRegister} style={{ top: '8px' }}><LegacyIcon type="user-add" /> Create an account</Button></div><br/><br/>
+                <div style={{ float: 'left' }}><Button type="dashed" onClick={this.initFPassword} style={{ top: '8px' }}><Icon type="exclamation-circle" /> Forgotten password</Button></div>
+                <div style={{ float: 'right' }}><Button type="dashed" onClick={this.initRegister} style={{ top: '8px' }}><Icon type="user-add" /> Create an account</Button></div><br/><br/>
                 <div style={{ textAlign: 'center', margin: '20px' }}> <RenderInclude data={include} /></div>
                 <div className={styles.spinner__wrapper} id="loadingspn">
-                  <div><LegacyIcon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
+                  <div><Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
                   <div>
                     <br /><br /><br />
                     <div style={{ margin: 'auto' }}><h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }}>Wait a sec...</h6></div>
@@ -639,21 +625,21 @@ class YulioID extends PureComponent {
                 <div className={styles.inputRG__wrapper}>
                   <label className={styles.labelform}> Choose your Username</label>
                   <FormItem hasFeedback>{getFieldDecorator('rgUsername', { rules: [{ required: true }] })(
-                    <Input type="text" prefix={<LegacyIcon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" onChange={(text) => { this.handleRGUsername(text) }} />
+                    <Input type="text" prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" onChange={(text) => { this.handleRGUsername(text) }} />
                   )}
                   </FormItem>
                 </div>
                 <div className={styles.inputRG__wrapper}>
                   <label className={styles.labelform}> Fill with your email</label>
                   <FormItem hasFeedback>{getFieldDecorator('rgEmail', { rules: [{ required: true }] })(
-                    <Input type="text" prefix={<LegacyIcon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" onChange={(text) => { this.handleRGEmail(text) }} />
+                    <Input type="text" prefix={<Icon type="link" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Email" onChange={(text) => { this.handleRGEmail(text) }} />
                   )}
                   </FormItem>
                 </div>
                 <div className={styles.inputRG__wrapper}>
                   <label className={styles.labelform}> Fill with your password</label>
                   <FormItem hasFeedback>{getFieldDecorator('rgPassword', { rules: [{ required: true }] })(
-                    <Input type="password" prefix={<LegacyIcon type="key" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Password" onChange={(text) => { this.handleRGPassword(text) }} />
+                    <Input type="password" prefix={<Icon type="key" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Password" onChange={(text) => { this.handleRGPassword(text) }} />
                   )}
                   </FormItem>
                 </div>
@@ -662,9 +648,9 @@ class YulioID extends PureComponent {
                 <div className={styles.TOSAccept}><span><span style={{ color: 'red', fontSize: '17px' }}>*</span> Clicking the register button you accept our <a href="#">terms and conditions</a></span> </div>
                 <a className={styles.buttonlp} id="register" onClick={this.getRegister}>Register</a>
                 <div className={styles.spinner__wrapper} id="loadingRGspn">
-                  <div style={{ position: 'absolute', marginLeft: '86%', marginTop: '-65%' }}><LegacyIcon type="loading" style={{ fontSize: 24 }} spin /></div>
+                  <div style={{ position: 'absolute', marginLeft: '86%', marginTop: '-65%' }}><Icon type="loading" style={{ fontSize: 24 }} spin /></div>
                   <div>
-                    <div><LegacyIcon style={{ fontSize: '160px', margin: '30px', color: '#5B2A86' }} type="smile" /></div>
+                    <div><Icon style={{ fontSize: '160px', margin: '30px', color: '#5B2A86' }} type="smile" /></div>
                     <h6 className={styles.h6lp} style={{ textAlign: 'center' }}>Ok thanks, wait a minute...</h6>
                   </div>
                 </div>
@@ -682,14 +668,14 @@ class YulioID extends PureComponent {
               <h3>To recover your account enter the email used to register</h3>
               <form className={styles.formlogin}>
                 <div className={styles.input__wrapper}>
-                  <label className={styles.labelform}><LegacyIcon type="mail" style={{ fontSize: '15px' }} /> Email</label>
+                  <label className={styles.labelform}><Icon type="mail" style={{ fontSize: '15px' }} /> Email</label>
                   <FormItem hasFeedback>{getFieldDecorator('Email', { rules: [{ required: true }] })(
                     <input className={styles.inputform} type="text" placeholder="myaccount@example.com" onChange={(text) => { this.handleFPEmail(text) }} /> )}
                   </FormItem>
                 </div>
                 {/* <div style={{ margin: 'auto' }}><a className={styles.buttonlp} id="login" onClick={this.RecoverPassword(this.state.FGEmail)}>Recover</a></div> */}
                 <div className={styles.spinner__wrapper} id="loadingspn">
-                  <div><LegacyIcon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
+                  <div><Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin /></div>
                   <div>
                     <br /><br /><br />
                     <div style={{ margin: 'auto' }}><h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }}>Wait a sec...</h6></div>
@@ -702,13 +688,13 @@ class YulioID extends PureComponent {
 
         {/* NOTF */}
         <Drawer width={320} closable={false} visible={this.state.NOTFdrawer} >
-          <div style={{ textAlign: 'center', color: 'orange' }}  ><LegacyIcon type="warning" style={{ fontSize: '230px' }} />
+          <div style={{ textAlign: 'center', color: 'orange' }}  ><Icon type="warning" style={{ fontSize: '230px' }} />
             <h2 className={styles.h2lp}> {this.state.FailArray} </h2>
             <h4 className={styles.apierrort}> {MensageException} </h4> <hr />
             <div id="details-collapse" style={{ textAlign: 'center' }}>
-              <Collapse bordered={false} defaultActiveKey={['0']} expandIcon={({ isActive }) => <LegacyIcon type="caret-right" rotate={isActive ? 90 : 0} />}>
+              <Collapse bordered={false} defaultActiveKey={['0']} expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}>
                 <Panel header="Details" key="1" style={{ borderRadius: 4, marginBottom: 24, border: 0, overflow: 'hidden', }}>
-                  <LegacyIcon type="exception" />
+                  <Icon type="exception" />
                   <h6>STATUS HANDLER  => {this.state.ErrorType}  </h6>
                   <h6>EXCEPTION => {this.state.api_response}  </h6>
                   <h6>EXCEPTION MENSAGE => {MensageException}</h6>
@@ -723,7 +709,7 @@ class YulioID extends PureComponent {
 
         {/* SOTF */}
         <Drawer width={320} closable={false} visible={this.state.SOTFdrawer}>
-          <div style={{ textAlign: 'center', color: '#4BB543' }}  ><LegacyIcon type="check" style={{ fontSize: '200px' }} />
+          <div style={{ textAlign: 'center', color: '#4BB543' }}  ><Icon type="check" style={{ fontSize: '200px' }} />
             <h2 className={styles.h2lp} style={{ color: '#4BB543' }}  > Success </h2>
             <h4>Please wait while process your data ...</h4>
           </div>
@@ -731,14 +717,14 @@ class YulioID extends PureComponent {
         {/* RGSOTF */}
         <Drawer width={320} closable={false} visible={this.state.RGSOTFdrawer}>
           <div style={{ textAlign: 'center', color: 'green' }}  >
-            <LegacyIcon type="check" style={{ fontSize: '200px' }} />
+            <Icon type="check" style={{ fontSize: '200px' }} />
             <h2 className={styles.h2lp} style={{ color: 'green' }}  > Registered </h2>
             <h4 className={styles.apierrort}> Welcome to Dashboard, you will start discovering now</h4>
             <h4>Please check your new data while we are process you ...</h4>
           </div>
         </Drawer>
       </div>
-    );
+    )
   }
 }
 

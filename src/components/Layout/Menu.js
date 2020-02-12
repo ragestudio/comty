@@ -1,7 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import * as icon from '@ant-design/icons';
-import { Menu } from 'antd';
+import { Menu, Icon } from 'antd'
 import Navlink from 'umi/navlink'
 import withRouter from 'umi/withRouter'
 import {SDCP} from 'ycore'
@@ -13,7 +12,6 @@ import {
 } from 'utils'
 import store from 'store'
 import styles from './Menu.less'
-import { isTypeNode } from 'typescript';
 
 
 const { SubMenu } = Menu
@@ -53,24 +51,24 @@ class SiderMenu extends PureComponent {
             className={styles.SubMenuItems}
             title={
               <Fragment>
-                {item.icon && <item.icon />}
+                {item.icon && <Icon type={item.icon} />}
                 <span className={styles.SubItemTitle}>{item.name}</span>
               </Fragment>
             }
           >
             {this.generateMenus(item.children)}
           </SubMenu>
-        );
+        )
       }
       return (
         <Menu.Item key={item.id} >
           <Navlink to={addLangPrefix(item.route) || '#'}>
-            {item.icon && <item.icon />}
+            {item.icon && <Icon type={item.icon} />}
             <span>{item.name}</span>
           </Navlink>
         </Menu.Item>
-      );
-    });
+      )
+    })
   }
 
   render() {

@@ -1,17 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
-import * as icon from '@ant-design/icons';
-import {
-  Menu,
-  Layout,
-  Avatar,
-  Popover,
-  Badge,
-  List,
-  Switch,
-  Tooltip,
-  Dropdown,
-  Button,
-} from 'antd';
+import { Menu, Icon, Layout, Avatar, Popover, Badge, List, Switch, Tooltip, Dropdown, Button } from 'antd'
+import HeaderSearch from './local_components/HeaderSearch/index.js'
 import { Trans, withI18n } from '@lingui/react'
 import { Ellipsis } from 'ant-design-pro'
 import classnames from 'classnames'
@@ -44,7 +33,7 @@ class Header extends PureComponent {
   handleOpenMenu() {
     let ListControls = [
       (<div>
-          <Button type="dashed" icon={<icon.CloseOutline />} shape="circle" onClick={() => ycore.ControlBar.close()}></Button>
+          <Button type="dashed" icon="close" shape="circle" onClick={() => ycore.ControlBar.close()}></Button>
       </div>
      )
     ]
@@ -90,7 +79,10 @@ class Header extends PureComponent {
                     }
                     description={moment(item.date).fromNow()}
                   />
-                 <icon.RightOutlined />
+                  <Icon
+                    style={{ fontSize: '15px', color: '#ccc' }}
+                    type="right"
+                  />
                 </List.Item>
               )}
             />
@@ -111,24 +103,25 @@ class Header extends PureComponent {
           offset={[-10, 10]}
           className={styles.iconButton}
         >
-          <icon.BellOutlined />
+          <Icon className={styles.iconFont} type="bell" />
         </Badge>
       </Popover>
     )
   
     return (
-      <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed})} > 
-            <div className={styles.leftContainer}>
-              <img className={styles.brand} src={config.FullLogoPath} />
-              <Tooltip title={'Main'}><a target="_blank" href="" rel="noopener noreferrer"><icon.HomeOutline className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
-              <Tooltip title={'Search'}><a target="_blank" href="" rel="noopener noreferrer"><icon.SearchOutline className={styles.iconButton} style={{ fontSize: '15px' }} /></a></Tooltip>
-            </div>
-            <div className={styles.rightContainer}>
-              <Tooltip title={'Create'}><icon.PlusCircleOutline onClick={() => this.handleOpenMenu()} className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
-              {notificationIcon}
+      <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed}, {[styles.collapsed]: !collapsed} )} > 
+            <div className={classnames(styles.containersWrappers, {[styles.collapsed]: !collapsed})} >
+              <div className={styles.leftContainer}>
+                <Tooltip title={'Main'}><Icon type="home" className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
+                <Tooltip title={'Search'}><Icon type="search" className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
+              </div>
+              <div className={styles.rightContainer}>
+                <Tooltip title={'Create'}><Icon type="plus" onClick={() => this.handleOpenMenu()} className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
+                {notificationIcon}
+              </div>
             </div>
       </Layout.Header>
-    );
+    )
   }
 }
 
