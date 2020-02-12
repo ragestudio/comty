@@ -22,6 +22,7 @@ class PrimaryLayout extends PureComponent {
   constructor(props){
     super(props)
     this.state = {
+      collapsed: store.get('collapsed') || false,
       isMobile: false,
       resbypass:  store.get('resbypass') || false,
       RemByPass: false,
@@ -48,11 +49,10 @@ class PrimaryLayout extends PureComponent {
     unenquireScreen(this.enquireHandler)
   }
 
-  onCollapseChange = collapsed => {
-    this.props.dispatch({
-      type: 'app/handleCollapseChange',
-      payload: collapsed,
-    })
+  onCollapseChange = () => {
+    this.setState({ collapsed: !this.state.collapsed })
+    store.set('collapsed', this.state.collapsed)
+
   }
 
   ResByPassHandler() {
@@ -76,8 +76,8 @@ class PrimaryLayout extends PureComponent {
     
   render() {
     const { app, location, dispatch, children } = this.props
-    const { theme, routeList, collapsed, notifications } = app
-    const { isMobile, resbypass, rememberbypass } = this.state
+    const { theme, routeList, notifications } = app
+    const { isMobile, resbypass, collapsed ,rememberbypass } = this.state
     const { onCollapseChange } = this
     // Localized route name.
     const lang = langFromPath(location.pathname)

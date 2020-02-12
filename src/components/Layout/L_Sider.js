@@ -97,6 +97,7 @@ class L_Sider extends PureComponent {
         breakpoint="lg"
         trigger={null}
         collapsible
+        defaultCollapsed="false"
         onBreakpoint={isMobile ? null : onCollapseChange}
         collapsedWidth={this.Balancer()? "35" : "90"}
         theme={this.StrictMode()}

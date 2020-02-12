@@ -1,3 +1,5 @@
+import { cloneDeep, isString, flow, curry } from 'lodash';
+import umiRouter from 'umi/router';
 import Cookies from "ts-cookies";
 import axios from "axios";
 import {SetControls, CloseControls} from ".././components/Layout/Control"
@@ -39,6 +41,17 @@ export const UIFxList = {
     notifySuccess: (ycore_worker.FXapiProvider + 'notifySuccess.wav')
 };
 
+export const crouter = {
+    native: (e) =>{
+        umiRouter.push({
+            pathname: `/${e}`,
+            search: window.location.search,
+          });
+    },
+    default: (e) =>{
+        router.push(e)
+    }
+}
 
 export function notifyError(err){
     antd.notification.error({
@@ -54,6 +67,56 @@ export function notifyProccess(cust){
         placement: 'bottomLeft'
     })
 }
+
+export function FindUser(key, callback){
+    let formdata = new FormData();
+    formdata.append("server_key", yConfig.server_key);
+    formdata.append("search_key", key);
+    const urlOBJ = `${endpoints.find_user}${GetUserToken.decrypted().UserToken}`
+    const settings = {
+        "url":  urlOBJ,
+        "method": "POST",
+        "timeout": 10000,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": formdata
+    };
+    jquery.ajax(settings)
+    .done(function (response) {
+        return callback(null, response);
+    })
+    .fail(function (response) {
+        const exception = 'API Bad response';
+        return callback(exception, response);
+    });
+}
+
+export function SeachKeywords(key, callback){
+    let formdata = new FormData();
+    formdata.append("server_key", yConfig.server_key);
+    formdata.append("search_key", key);
+    const urlOBJ = `${endpoints.search_endpoint}${GetUserToken.decrypted().UserToken}`
+    const settings = {
+        "url":  urlOBJ,
+        "method": "POST",
+        "timeout": 10000,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": formdata
+    };
+    jquery.ajax(settings)
+    .done(function (response) {
+        return callback(null, response);
+    })
+    .fail(function (response) {
+        const exception = 'Request Failed';
+        return callback(exception, response);
+    });
+  }
+
+
 export function GetFeedPosts(callback) {
     let formdata = new FormData();
     formdata.append("server_key", yConfig.server_key);
@@ -72,6 +135,7 @@ export function GetFeedPosts(callback) {
        return callback( null, result)
       })
       .catch(error => console.log('error', error));
+      
 
 }
 

@@ -46,14 +46,14 @@
   z-index: 10;
   transition: width 0.2s;
   right: 0;
+  transition: all 0.2s ease;
   &.collapsed {
     width: ~'calc(100% - 180px)';
-    background-color: rgb(80, 80, 80);
     background-color: @LDarkMode-backgroud;
     color: @DarkMode-color;
     border-color: transparent;
     box-shadow: none;
-    transition: box-shadow 1s linear;
+    transition: all 0.2s ease;
   }
   :global {
     

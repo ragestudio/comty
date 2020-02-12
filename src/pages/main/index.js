@@ -43,14 +43,23 @@ class Main extends React.Component {
         }
     
     }
+    getTarget = () => document.getElementById("PostsWrapper")
     render(){
-        const { loading, createPost } = this.state;
-        console.log('createPost =>', createPost)
+        const target = this.getTarget();
+        const { loading, createPost } = this.state;        
         return (
             <div> 
+                
                 <MainSidebar />
                 {createPost? <PostCreator refreshPull={() => {this.handleRefreshList()}} /> : null}
-                {loading? <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} ><antd.Skeleton avatar paragraph={{ rows: 4 }} active /></antd.Card> : <div className={styles.PostsWrapper}> {this.renderFeedPosts()} </div>}
+                {loading? 
+                    <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} >
+                        <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
+                    </antd.Card> :
+                    <div id="PostsWrapper" className={styles.PostsWrapper}> 
+                        <antd.BackTop target={() => document.getElementById("PostsWrapper") } />
+                        {this.renderFeedPosts()} 
+                    </div>}
             </div>
         )
     }

@@ -27,7 +27,6 @@ export default {
     AppSettings: store.get('app_settings') || config.defaultSettings,
     locationQuery: {},
     theme: store.get('theme') || 'light',
-    collapsed: store.get('collapsed') || false,
     notifications: [
       {
         title: 'Hey! Test notification',
@@ -118,11 +117,6 @@ export default {
     handleThemeChange(state, { payload }) {
       store.set('theme', payload)
       state.theme = payload
-    },
-
-    handleCollapseChange(state, { payload }) {
-      store.set('collapsed', payload)
-      state.collapsed = payload
     },
 
     allNotificationsRead(state) {

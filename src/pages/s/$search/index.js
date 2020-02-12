@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react'
-import { UserProfile } from 'components'
 import { pathMatchRegexp } from 'utils'
 import styles from './styles.less'
 import * as ycore from 'ycore'
@@ -14,24 +13,24 @@ class SearchPageIndexer extends PureComponent {
         SearchResult: ''
       }
     }
-    SeachKeywords(key){
-      let formdata = new FormData();
-      formdata.append("server_key", ycore.yConfig.server_key);
-      formdata.append("search_key", key);
-      const requestOptions = {
-        method: 'POST',
-        body: formdata,
+   
+    componentDidMount(){
+      try {
+        const {location} = this.props
+        const matchSearch = pathMatchRegexp("/s/:id", location.pathname);
+        const parsed = matchSearch.shift()
+        const raw = parsed.toString()
+        const string = raw.replace('/s/', "")
+        ycore.SeachKeywords(string, (exception, response) => {
+          console.log(response)
+          exception? ycore.notifyError(exception) : null
+          this.setState({ SearchResult: response })
+        })
+ 
+      } catch (err) {
+        ycore.notifyError(err)
       }
-      const uriObj = (`${ycore.endpoints.search_endpoint}${ycore.GetUserToken.decrypted().UserToken}`)
-      fetch(uriObj, requestOptions)
-      .then(result => {
-        console.log(result)
-        this.setState({ SearchResult: result })
-      
-      })
-      .catch(error => console.log('error', error));
     }
-    
   
     render() {
       const {location} = this.props
@@ -43,7 +42,7 @@ class SearchPageIndexer extends PureComponent {
 
       
       if (matchSearch) {
-        this.SeachKeywords(string)
+        
         console.log(`Search matched!  ${location.pathname}`)
         return(
             <div>
