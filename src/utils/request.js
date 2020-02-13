@@ -2,7 +2,6 @@ import axios from 'axios'
 import { cloneDeep, isEmpty } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import { message } from 'antd'
-import { CANCEL_REQUEST_MESSAGE } from 'utils/constant'
 import qs from 'qs'
 
 const { CancelToken } = axios
@@ -69,7 +68,7 @@ export default function request(options) {
     .catch(error => {
       const { response, message } = error
 
-      if (String(message) === CANCEL_REQUEST_MESSAGE) {
+      if (String(message) === 'Canceling...') {
         return {
           success: false,
         }

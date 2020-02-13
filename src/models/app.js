@@ -4,10 +4,8 @@ import { router } from 'utils'
 import { stringify } from 'qs'
 import store from 'store'
 import { queryLayout, pathMatchRegexp } from 'utils'
-import { CANCEL_REQUEST_MESSAGE } from 'utils/constant'
 import api from 'api'
 import config from 'config'
-import Cookies from 'js-cookie'
 import * as ycore from 'ycore'
 import jwt from 'jsonwebtoken'
 const { queryRouteList, logoutUser, queryUserInfo } = api
@@ -52,7 +50,7 @@ export default {
         const { cancelRequest = new Map() } = window
         cancelRequest.forEach((value, key) => {
           if (value.pathname !== window.location.pathname) {
-            value.cancel(CANCEL_REQUEST_MESSAGE)
+            value.cancel('Canceling...')
             cancelRequest.delete(key)
           }
         })
@@ -71,28 +69,25 @@ export default {
       
       const valid = ycore.ValidLoginSession();
       const validBackup = ycore.ValidBackup();
-      if ( valid == true) {
-        if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-          router.push({pathname: '/main',})
-          ycore.RefreshONCE()
-        }else{
+      if (valid == true) {
+          if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
+            router.push({pathname: '/main',})
+            ycore.RefreshONCE()
+          }
+          // Runtime
           ycore.MakeBackup()
           ycore.UpdateSDCP()
-        }
-      } else if (queryLayout(config.layouts, locationPathname) !== 'public') {
+        
+      } 
+      else if(!pathMatchRegexp(['/', '/login'], window.location.pathname)) {
           if (validBackup == true) {
             ycore.LogoutCall()
-            return
-          }else if (ycore.GetUserToken == false){
-              notification.open({
-                placement: 'topLeft',
-                message: 'Unexpectedly failed logout in YulioID™ ',
-                description: 'It seems that your token has been removed unexpectedly and could not log out from YulioID ',
-                icon: <Icon type="warning" style={{ color: 'orange' }} />
-              })
-              return
+          } 
+         else{
+              router.push({pathname: '/login',})
+              ycore.RefreshONCE()
           }
-          router.push({pathname: '/login',})
+          
       }
     },
 

@@ -57,6 +57,7 @@ class Main extends React.Component {
                         <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
                     </antd.Card> :
                     <div id="PostsWrapper" className={styles.PostsWrapper}> 
+                        
                         <antd.BackTop target={() => document.getElementById("PostsWrapper") } />
                         {this.renderFeedPosts()} 
                     </div>}

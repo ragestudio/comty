@@ -6,40 +6,21 @@ import {SetControls, CloseControls} from ".././components/Layout/Control"
 import {secretOrKey} from "../../config/keys.js"
 import * as antd from "antd"
 
+import * as lib from'./libs.js'
+export * from "./libs.js"
+
 var react = require("react");
 var package_json = require("../../package.json");
 var jquery = require("jquery");
-var uifx = require("uifx");
 var config = require("config");
 var utils = require("utils");
 var { router } = require("utils")
-var  jwt  = require("jsonwebtoken")
+var jwt = require("jsonwebtoken")
 
 export var endpoints = config.Endpoints;
 export var DevOptions = config.DevOptions;
 export var yConfig = config.yConfig;
 
-export const ycore_worker = {
-    ServerVersion: package_json.version,
-    ServerType: package_json.VersionPhase,
-    FXapiProvider: 'https://api.ragestudio.net/RS-YIBTP/lib/uiFXProvider/'
-};
-
-export const about_this = {
-    Service_name: package_json.name,
-    Version: package_json.version,
-    Description: package_json.description,
-    Branding: package_json.copyright,
-    Licensing: package_json.license,
-    // Temporaly added from yConfig
-    logotype_uri: 'https://api.ragestudio.net/branding/lib/RDSeries-Branding/rDashboard/BLACK/SVG/T3/rDashboard-FullTextBlack-TM-T3.svg',
-    Phase: package_json.VersionPhase
-};
-export const UIFxList = {
-    notifyDefault: (ycore_worker.FXapiProvider + 'NotifyDefault.wav'),
-    notifyWarning: (ycore_worker.FXapiProvider + 'NotifyWarning.wav'),
-    notifySuccess: (ycore_worker.FXapiProvider + 'notifySuccess.wav')
-};
 
 export function booleanFix(e){
     if(e == 1){
@@ -47,7 +28,6 @@ export function booleanFix(e){
     }
     return false
 }
-
 export const crouter = {
     native: (e) =>{
         umiRouter.push({
@@ -59,7 +39,6 @@ export const crouter = {
         router.push(e)
     }
 }
-
 export function notifyError(err){
     antd.notification.error({
         message: 'Wopss',
@@ -74,160 +53,6 @@ export function notifyProccess(cust){
         placement: 'bottomLeft'
     })
 }
-
-export function FindUser(key, callback){
-    let formdata = new FormData();
-    formdata.append("server_key", yConfig.server_key);
-    formdata.append("search_key", key);
-    const urlOBJ = `${endpoints.find_user}${GetUserToken.decrypted().UserToken}`
-    const settings = {
-        "url":  urlOBJ,
-        "method": "POST",
-        "timeout": 10000,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": formdata
-    };
-    jquery.ajax(settings)
-    .done(function (response) {
-        return callback(null, response);
-    })
-    .fail(function (response) {
-        const exception = 'API Bad response';
-        return callback(exception, response);
-    });
-}
-
-export function SeachKeywords(key, callback){
-    let formdata = new FormData();
-    formdata.append("server_key", yConfig.server_key);
-    formdata.append("search_key", key);
-    const urlOBJ = `${endpoints.search_endpoint}${GetUserToken.decrypted().UserToken}`
-    const settings = {
-        "url":  urlOBJ,
-        "method": "POST",
-        "timeout": 10000,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": formdata
-    };
-    jquery.ajax(settings)
-    .done(function (response) {
-        return callback(null, response);
-    })
-    .fail(function (response) {
-        const exception = 'Request Failed';
-        return callback(exception, response);
-    });
-  }
-
-export function GetUserPosts(id, callback) {
-    let formdata = new FormData();
-    formdata.append("server_key", yConfig.server_key);
-    formdata.append("type", "get_user_posts");
-    formdata.append("id", id)
-    const urlOBJ = `${endpoints.get_user_posts}${GetUserToken.decrypted().UserToken}`
-
-    const settings = {
-        "url":  urlOBJ,
-        "method": "POST",
-        "timeout": 10000,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": formdata
-    };
-    jquery.ajax(settings)
-    .done(function (response) {
-        return callback(null, response);
-    })
-    .fail(function (response) {
-        const exception = 'Request Failed';
-        return callback(exception, response);
-    });
- }
-
-
-export function GetFeedPosts(callback) {
-    let formdata = new FormData();
-    formdata.append("server_key", yConfig.server_key);
-    formdata.append("type", "get_news_feed");
-
-    const requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
-    const objUrl = `${endpoints.get_userPostFeed}${GetUserToken.decrypted().UserToken}`
-    console.log(objUrl)
-    fetch(objUrl, requestOptions)
-      .then(response => response.text())
-      .then(result => {
-       return callback( null, result)
-      })
-      .catch(error => console.log('error', error));
-}
-
-export const get_app_session = {
-    get_id: (callback) => {
-      const fromSto = sessionStorage.getItem('se_src')
-      if (!fromSto){
-        DevOptions.ShowFunctionsLogs? console.log("Missing session_id, setting up...") : null
-        let formdata = new FormData();
-        formdata.append("server_key", yConfig.server_key);
-        formdata.append("type", "get");
-        const requestOptions = {
-          method: 'POST',
-          body: formdata,
-          redirect: 'follow'
-        };
-        const uriObj = `${endpoints.get_sessions}${GetUserToken.decrypted().UserToken}`
-        notifyProccess()
-        fetch(uriObj, requestOptions)
-          .then(response => response.text())
-          .then(result => {
-            const pre = JSON.stringify(result)
-            const pre2 = JSON.parse(pre)
-            const pre3 = JSON.stringify(JSON.parse(pre2)["data"])
-  
-            const obj = JSON.parse(pre3)["session_id"]
-            
-           return asyncSessionStorage.setItem('se_src', btoa(obj)).then( callback(null, obj) )
-          
-          })
-        .catch(error => console.log('error', error));
-      }
-        DevOptions.ShowFunctionsLogs? console.log("Returning from storage") : null
-        return callback( null, atob(fromSto) )
-    },
-    raw: (callback) => {
-        const formdata = new FormData();
-        formdata.append("server_key", yConfig.server_key);
-        formdata.append("type", "get");
-
-        const requestOptions = {
-          method: 'POST',
-          body: formdata,
-          redirect: 'follow'
-        };
-        const uriObj = `${endpoints.get_sessions}${GetUserToken.decrypted().UserToken}`
-        fetch(uriObj, requestOptions)
-          .then(response => response.text())
-          .then(result => {
-            const pre = JSON.stringify(result)
-            const parsed = JSON.parse(pre)
-            const obj = JSON.parse(parsed)["data"]
-            DevOptions.ShowFunctionsLogs? console.log(result, obj) : null
-            return callback(null, obj)
-          })
-        .catch(error => console.log('error', error));
-    }
-
- 
-}
-
 export function InitSocket(id, params){
     console.log('Starting socket with _id: ', id)
     const defaultParams = {fullscreen: true, collapse: true}
@@ -297,9 +122,6 @@ export const asyncSDCP = {
     }
 };
 export const ControlBar = {
-    setCreate: (e) =>{
-
-    },
     set: (e) => {
         SetControls(e)
     },
@@ -311,14 +133,12 @@ export function SyncSocketAccount(title, socket, logo) {
     DevOptions.ShowFunctionsLogs? console.log('Initialising auth for ', title) : null
     const signkey = secretOrKey;
     const ExpireTime = '300';
-
     const key = {title, socket, logo}
     const ckey = jwt.sign(
         key,
         signkey,
         { expiresIn: ExpireTime },
     )
-
     DevOptions.ShowFunctionsLogs? console.log(key, jwt.decode(ckey)) : null
     asyncLocalStorage.setItem('AUTHRES', ckey).then(
      window.open('/ec/authorize', title, "height=589,width=511")
@@ -332,8 +152,6 @@ export function GetAuthSocket(sc, values) {
     }
     const PayloadData = new FormData();
     PayloadData.append("server_key", yConfig.server_key);
-
-
 }
 export function ValidLoginSession(){
     const prefix = '[YID Session]';
@@ -365,7 +183,6 @@ export function ValidLoginSession(){
         console.groupEnd() 
     ) : null
     return final
-
 }
 export function ValidBackup(){
     const prefix = '[YID SessionState]';
@@ -385,11 +202,10 @@ export function MakeBackup(){
         return
     }
 }
-
 export function LogoutCall(){
     const prefix = ('[YID Session]  ')
     console.log('Logout Called !')
-    let DecodedToken = GetUserToken.decrypted()
+    let DecodedToken = GetUserToken.decrypted().userToken
     if (DecodedToken == false) {
         antd.notification.open({
             placement: 'topLeft',
@@ -400,8 +216,8 @@ export function LogoutCall(){
         router.push({pathname: '/login',})
         return 
     }
-    const urlOBJ = "" + endpoints.removeToken + DecodedToken.UserToken;
-    DevOptions.ShowFunctionsLogs? console.log(prefix, ' Login out with token => ', DecodedToken.UserToken, urlOBJ) : null
+    const urlOBJ = "" + endpoints.removeToken + DecodedToken;
+    DevOptions.ShowFunctionsLogs? console.log(prefix, ' Login out with token => ', DecodedToken, urlOBJ) : null
     const form = new FormData();
     form.append("server_key", yConfig.server_key);
     const settings = {
@@ -414,16 +230,26 @@ export function LogoutCall(){
         "data": form
     };
     jquery.ajax(settings)
-    .done( (response) => {
-        const url = '/api/v1/user/logout'
-        const method = 'GET'
-        utils.request({method, url})
+    .done((response) => {
+        const api_state = JSON.parse(response)['api_status']
+        console.log(`Exit with => ${api_state}`)
+        if (api_state == '404') {
+            antd.notification.open({
+                placement: 'topLeft',
+                message: 'Unexpectedly failed logout in YulioID™ ',
+                description: 'It seems that your token has been removed unexpectedly and could not log out from YulioID ',
+                icon: <antd.Icon type="warning" style={{ color: 'orange' }} />
+              })
+        }
+        else {
+            console.log("Successful logout in YulioID™", response, urlOBJ)
+        }
+        // Runtime after dispatch API
         sessionStorage.clear() 
-        console.log("Successful logout in YulioID™", response, urlOBJ)    
+        Cookies.remove('token')
         router.push({pathname: '/login',})
     })
-  }
-
+}
 export function GetAuth(EncUsername, EncPassword, callback) {
     const prefix = '[Auth Server]:';
     if (!EncUsername || !EncPassword) {
@@ -454,7 +280,7 @@ export function GetAuth(EncUsername, EncPassword, callback) {
         .fail(function (response) {
         const exception = new Error("Server failed response . . . :( ");
         return callback(exception, response);
-    });
+    })
 }
 export const GetUserToken = {
     decrypted: function () {
@@ -477,8 +303,7 @@ export const GetUserToken = {
     raw: function () {
         return Cookies.get('token') || localStorage.getItem('last_backup');
     }
-};
-
+}
 export function GetUserData (values, customPayload, callback) {
     const prefix = '[YID SDCP]';
     const request = 'user_data' || customPayload;
@@ -504,7 +329,7 @@ export function GetUserData (values, customPayload, callback) {
         "mimeType": "multipart/form-data",
         "contentType": false,
         "data": ApiPayload
-    };
+    }
     jquery.ajax(settings)
       .done(
          function (response) {
@@ -521,7 +346,7 @@ export function GetUserData (values, customPayload, callback) {
             callback( null )
             return
         }
-     );
+     )
 }
 export function InitSDCP(values, done) {
      const prefix = '[InitSDCP]';
@@ -541,7 +366,7 @@ export function InitSDCP(values, done) {
              asyncSDCP.setSDCP(Ensamblator).then(() => {
                 DevOptions.ShowFunctionsLogs? console.log(prefix, ' SDCP Setup done') : null
                 return done(true)
-            });
+            })
            }
          )
      }
@@ -560,7 +385,6 @@ export function UpdateSDCP() {
         }else{
             DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Update detected ! => ', n) : null
             asyncSDCP.setSDCP(e2)
-          
         }
     })
 }
@@ -584,7 +408,6 @@ export function SDCP() {
             router.push({pathname: '/login',})
             return null
         }
-       
     }
 }
 export function PushUserData(inputIO1, inputIO2) {
@@ -614,10 +437,8 @@ export function GetGlobalMarketplaceSource() {
     let TokenContainer = Cookies.get('token') || localStorage.getItem('last_backup');
     let DecodedToken = jwt.decode(TokenContainer)
     let usertoken = DecodedToken.UserToken;
-
     const uri = endpoints.get_marketplace_global;
     const urlOBJ = "" + uri + usertoken;
-
     (async () => {
         const response = await axios({
           url: urlOBJ,
@@ -626,14 +447,8 @@ export function GetGlobalMarketplaceSource() {
         global = response.data
         console.log(response.data, global)
         return {global};
-       
       })()
 }
-
-
-//*              *//
-//*   Helpers    *//
-//*              *//
 export function DetectNoNStableBuild(e1) {
     switch (e1) {
         case 'TagComponent':
@@ -660,40 +475,6 @@ export function DetectNoNStableBuild(e1) {
             break;
     }
 }
-
-export function getRandomBG(imgAr) {
-    var path = 'https://api.ragestudio.net/RS-YIBTP/lib/statics/heros/';
-    var num = Math.floor(Math.random() * imgAr.length);
-    var img = imgAr[num];
-    var out = (path + img);
-    return (out);
-}
-
-export function UIFxPY(value, customVLM) {
-    // UIFX Player v1.4A
-    var dispatcher = value;
-    var userVLM = localStorage.getItem('UIfx');
-    var VLM;
-    var conv = parseFloat(userVLM);
-    if (conv < 1.1) {
-        if (conv == 1) {
-            VLM = 1.0;
-        }
-        if (conv == 0) {
-            VLM = 0.0;
-        }
-        else {
-            VLM = conv;
-        }
-    }
-    else {
-        VLM = 1.0;
-    }
-    var beep = new uifx({ asset: dispatcher });
-    DevOptions.ShowFunctionsLogs? console.log('The Volume of UIFX is on ', VLM || customVLM, '/ User set on', conv) : null
-    beep.setVolume(VLM || customVLM).play();
-}
-
 export function RefreshONCE(){
  window.location.reload(); 
 }
