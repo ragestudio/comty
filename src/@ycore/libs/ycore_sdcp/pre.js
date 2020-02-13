@@ -43,11 +43,11 @@ export function UpdateSDCP() {
        const e2 = btoa(Nsdcp)
        const n = e1.localeCompare(e2)
        if (!e2) {
-            console.log(prefix, 'API Returned empty response! We recommend to logout')
+            ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'API Returned empty response! We recommend to logout') : null
             return
        }
        if (e1 == e2) {
-           console.log(prefix, 'SDCP Equality')
+         ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Equality') : null
        }else{
            ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Update detected ! => ', n) : null
            ycore.DevOptions.ShowFunctionsLogs? console.debug(`Compare versions =>  NEW ${[e1]} || OLD ${[e2]}  `) : null

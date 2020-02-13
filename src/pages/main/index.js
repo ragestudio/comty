@@ -32,7 +32,6 @@ class Main extends React.Component {
                 feedParsed.map(item=> {
                     const {id, postText, post_time, publisher, postFile, postFileName} = item
                     const paylodd = {user: publisher.username, ago: post_time, avatar: publisher.avatar, content: postText, file: postFile, postFileName: postFileName, publisher: publisher }
-                    ycore.DevOptions.ShowFunctionsLogs? console.log([item], paylodd) : null
                     return <PostCard payload={paylodd} key={id} />
                 })
             )

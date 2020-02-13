@@ -14,6 +14,12 @@ const database = [
     name: 'Main',
     route: '/main',
   },
+  {
+    id: '2',
+    icon: 'user',
+    name: 'App Settings',
+    route: '/settings'
+  }
 
 ]
 

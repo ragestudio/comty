@@ -4,12 +4,14 @@ import * as antd from "antd"
 import './libs.js'
 export * from "./libs.js"
 
+import * as AppSettings from '../../globals/settings.js'
+export var DevOptions = AppSettings;
+
 var package_json = require("../../package.json");
 var config = require("config");
 
 export var { router } = require("utils")
 export var endpoints = config.Endpoints;
-export var DevOptions = config.DevOptions;
 export var yConfig = config.yConfig;
 
 export function booleanFix(e){

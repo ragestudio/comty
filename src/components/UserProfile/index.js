@@ -9,7 +9,7 @@ const userData = ycore.SDCP();
 
 function isOwnProfile(id){
   if(id == userData.username){
-    console.log('Is your own profile !!')
+    ycore.DevOptions.ShowFunctionsLogs ? console.log('Is your own profile !!'): null
     return true
   }
   return false
@@ -93,7 +93,7 @@ class UserProfile extends React.Component {
               const c1 = rp['0'].username.toLowerCase()
               const c2 = string.toLowerCase()
               if (c1 !== c2) {
-                console.log(`Using aproximate user! => ${c1}  /  ${c2}`)
+                ycore.DevOptions.ShowFunctionsLogs ? console.log(`Using aproximate user! => ${c1}  /  ${c2}`) : null
                 ycore.crouter.native(`@${c1}`)
               }
               ycore.GetUserPosts(rp['0'].user_id, (exception, response) => {

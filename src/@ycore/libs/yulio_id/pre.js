@@ -169,7 +169,7 @@ export const GetUserToken = {
         if (!FB) {
             final = FC
         }
-        console.log(final)
+        ycore.DevOptions.ShowFunctionsLogs ? console.debug(final) : null
         return final
     },
     raw: function () {
