@@ -1,18 +1,25 @@
+import {AppSettings} from  '../../globals/settings.js'
+import {Endpoints} from 'globals/endpoints.js'
 import umiRouter from 'umi/router';
 import * as antd from "antd"
-
+import config from 'config'
 import './libs.js'
-export * from "./libs.js"
 
-import * as AppSettings from '../../globals/settings.js'
-export var DevOptions = AppSettings;
+export * from "./libs.js"
+export * from "../../config/app.settings.js"
+export var { router } = require("utils")
+export var endpoints = Endpoints;
+export var yConfig = config.yConfig;
 
 var package_json = require("../../package.json");
-var config = require("config");
 
-export var { router } = require("utils")
-export var endpoints = config.Endpoints;
-export var yConfig = config.yConfig;
+export function ReturnDevOption(e){
+    const Ite = AppSettings.map(item => {
+      return item.SettingID === e? item.value : null
+    })
+    const fr = Ite.filter(Boolean)
+    return fr.toString()
+}
 
 export function booleanFix(e){
     if(e == 1){

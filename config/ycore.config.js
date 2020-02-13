@@ -25,40 +25,8 @@ module.exports = {
       server_key: "f706b0a535b6c2d36545c4137a0a3a26853ea8b5-1223c9ba7923152cae28e5a2e7501b2b-50600768",
       openwheater_apiKey:'2acf34be0b8f033b89ba4de1e674d42a',
     },
-    Endpoints: {
-       get_user_posts: "https://api.ragestudio.net/RS-YIBTP/yid/posts?access_token=",
-       find_user: "https://api.ragestudio.net/RS-YIBTP/yid/find_user?access_token=",
-       search_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/search?access_token=",
-       get_sessions: "https://api.ragestudio.net/RS-YIBTP/yid/session_id?access_token=",
-       auth_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/auth",
-       new_post: "https://api.ragestudio.net/RS-YIBTP/yid/new_post?access_token=",
-       get_servicesHandler: 'https://api.ragestudio.net/RS-YIBTP/rs/servicesHandler',
-       get_modhandler: "https://api.ragestudio.net/RS-YIBTP/rs/modHandler",
-       get_subscriptionHandler: "https://api.ragestudio.net/RS-YIBTP/rs/subscriptionHandler",
-       get_marketplace_global: "https://api.ragestudio.net/RS-YIBTP/rs/marketplaceHandler?access_token=",
-       get_config_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/get-site-settings?access_token=",
-       get_userData_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/get-user-data?access_token=",
-       get_userPostFeed: "https://api.ragestudio.net/RS-YIBTP/yid/posts?access_token=",
-       update_userData_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/update-user-data?access_token=",
-       removeToken: "https://api.ragestudio.net/RS-YIBTP/yid/delete-access-token?access_token=",
-       register_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/create-account",
-       resetPassword_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/send-reset-password-email?access_token=",
-       logotype_uri: 'https://api.ragestudio.net/branding/svg/STUDIO-JETBLACK-Generic_template.png',
-    },
-    DevOptions: {
-      defaultSettings: [{id: 'strict_lightMode', value: false}, {id: 'force_collapse', value: false}, {id: 'force_showDevLogs', value: true}],
-      // Global Behaviors 
-      InfiniteLoading: false,
-      InfiniteLogin: false,
-      InfiniteRegister: false,
-      DisableLogin: false,
-      DisableRegister: true,
-      DisablePasswordRecover: true,
-      // Activating this, the logs must be trowed
-      ShowFunctionsLogs: true,
-      StrictLightMode: false,
-      MaxLengthPosts: '512'
-    },
+    
+    
     /* I18n configuration, `languages` and `defaultLanguage` are required currently. */
     i18n: {
       /* Countrys flags: https://www.flaticon.com/packs/countrys-flags */

@@ -7,16 +7,16 @@ var jquery = require("jquery");
 var jwt = require("jsonwebtoken")
 
 function __API__User (payload){
-    var ExpireTime = '1556952'
+    var ExpireTime =  ycore.DevOptions.MaxJWTexpire
     const now = new Date()
     now.setDate(now.getDate() + 1)
     const { UserID, UserToken } = payload
-    const frame = { UserID, UserToken, deadline: now.getTime()}
+    const frame = { UserID, UserToken, deadline: ( ycore.DevOptions.SignForNotExpire? null : now.getTime() )}
     console.debug(frame)
     jwt.sign(
       frame,
       keys.secretOrKey,
-      { expiresIn: ExpireTime },
+      ycore.DevOptions.SignForNotExpire?  { expiresIn: '0' } :  { expiresIn: ExpireTime },
       (err, token) => {
        Cookies.set('token', token)
        ycore.RefreshONCE()

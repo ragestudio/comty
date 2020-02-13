@@ -1,15 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { List, Icon, Switch, Button, notification } from 'antd';
-import Settings from '../../../../globals/settings.js'
+import { AppSettings } from '../../../../globals/settings.js'
 import { DevOptions, ControlBar } from 'ycore'
-import update from 'immutability-helper'
 
 class Base extends Component { 
   constructor(props){
     super(props),
     this.state = {
-      SettingRepo:  Settings,
-      backupSettings: JSON.parse(localStorage.getItem('app_settings')) || Settings,
+      SettingRepo:  AppSettings,
       forSave: false
     }
   }
@@ -21,7 +19,6 @@ class Base extends Component {
   }
   SettingRender = data =>{
     try{
-    const {SettingRepo} = this.state
     return(
       <List
           itemLayout="horizontal"
@@ -43,18 +40,12 @@ class Base extends Component {
     const ListControls = [
       (<div>
           <Button type="done" icon='save' onClick={() => this.saveChanges()} >Save</Button>
-          <Button type="dashed" icon="close" shape="circle" onClick={() => this.handleCancel()}></Button>
       </div>
      )
     ]
     ControlBar.set(ListControls)
   }
-  handleCancel(){
-    const back = this.state.backupSettings;
-    this.setState({ SettingRepo: back, forSave: false})
-    DevOptions.ShowFunctionsLogs? console.log(`Restored ${JSON.stringify(back)}`) : null
-    ControlBar.close()
-  }
+ 
   saveChanges(){
     localStorage.setItem('app_settings', JSON.stringify(this.state.SettingRepo))
     this.setState({ forSave: false })

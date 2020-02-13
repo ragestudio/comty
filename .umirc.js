@@ -65,6 +65,7 @@ export default {
   alias: {
     ycore: resolve(__dirname, './src/@ycore/ycore_worker.js'),
     api: resolve(__dirname, './src/services/'),
+    globals: resolve(__dirname, './globals'),
     components: resolve(__dirname, './src/components'),
     config: resolve(__dirname, './config/ycore.config.js'),
     models: resolve(__dirname, './src/models'),

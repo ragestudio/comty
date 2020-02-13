@@ -6,7 +6,7 @@ function StorageValued(e){
   const fr = Ite.filter(Boolean)
   return fr.toString()
 }
-export default [
+export var AppSettings = [
     {
         "SettingID": "strict_lightMode",
         "title": "Strict Light Mode",
@@ -23,7 +23,7 @@ export default [
         "SettingID": "force_showDevLogs",
         "title": "Show Functions Logs",
         "description": "Show all console logs... [Developer]",
-        "value": StorageValued('force_showDevLogs') || true
+        "value": StorageValued('force_showDevLogs') || false
       },
       {
         "SettingID": "sessions_noexpire",
