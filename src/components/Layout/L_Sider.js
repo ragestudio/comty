@@ -169,7 +169,7 @@ class L_Sider extends PureComponent {
                     <div className={styles.siderhead}>
                       <antd.Avatar size={collapsed? "small" : "large"} shape={collapsed? "circle" : "square"} src={userData.avatar} className={collapsed? styles.avatar : styles.avatarFull} />
                     </div>  
-                    {collapsed? null : <div className={styles.userInfo}><h2>@{userData.username}</h2></div> }
+                    {collapsed? null : <div className={styles.userInfo}><a href={`/@${userData.username}`}><h2>@{userData.username}</h2></a></div> }
                 </div>
             </ScrollBar>
         </div>

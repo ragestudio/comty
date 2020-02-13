@@ -69,7 +69,7 @@ class PostCard extends React.PureComponent{
              <antd.Card actions={actions} >
                 <Meta
                     avatar={<div className={styles.postAvatar}><antd.Avatar shape="square" size={50} src={avatar} /></div>}
-                    title={<div><h4 className={styles.titleUser}>@{user} {this.isVerifiedAccount(publisher)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}</h4></div>}
+                    title={<div><a href={`/@${user}`}><h4 className={styles.titleUser}>@{user} {this.isVerifiedAccount(publisher)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}</h4></a></div>}
                     description={<span className={styles.textAgo}>{ago}</span>}
                     bordered="false"
                 />

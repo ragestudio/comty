@@ -3,7 +3,7 @@ import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { string } from 'prop-types';
+import {CustomIcons, PostCard} from 'components'
 
 const userData = ycore.SDCP();
 
@@ -23,13 +23,12 @@ const UserHeader = ({ values }) => {
         </div>
         <PageHeaderWrapper content={
           <div className={styles.pageHeaderContent}>
-          
             <div className={styles.avatar}>
                <antd.Avatar shape="square" size="large" src={values.avatar} /> 
             </div>
             <div className={styles.content}>
               <div className={styles.contentTitle}>
-                 <h1 style={{ marginBottom: '0px' }} >{values.username}</h1> 
+                 <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <antd.Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
                  <span style={{ fontSize: '14px', fontWeight: '100', lineHeight: '0', marginBottom: '5px' }}>{values.about}</span> 
               </div>
             </div>
@@ -37,7 +36,26 @@ const UserHeader = ({ values }) => {
          } />
       </div>
     );
-  };
+};
+const UserBody = ({ values }) => {
+    try {
+        const feedParsed = JSON.parse(values)['data']
+        return (
+            feedParsed.map(item=> {
+                const {id, postText, post_time, publisher, postFile, postFileName} = item
+                const paylodd = {user: publisher.username, ago: post_time, avatar: publisher.avatar, content: postText, file: postFile, postFileName: postFileName, publisher: publisher }
+                ycore.DevOptions.ShowFunctionsLogs? console.log([item], paylodd) : null
+                return <PostCard payload={paylodd} key={id} />
+            })
+        )
+    } catch (err) {
+        const paylodd = {user: 'Error', ago: '', avatar: '', content: 'Error displaying data :/',  publisher: '' }
+        return <PostCard payload={paylodd} />
+    }
+
+
+}
+
 class UserProfile extends React.Component {
     constructor(props){
       super(props),
@@ -46,21 +64,22 @@ class UserProfile extends React.Component {
         loading: true
       }
     }
-
     componentDidMount(){
         const { regx } = this.props
         this.initUser(regx)
-        
     }
+    
     initUser = (e) => {
         const parsed = e.shift()
         const raw = parsed.toString()
         const string = raw.replace('/@', "")
-
-        const selfProfile = { id: userData.id, username: userData.username, avatar: userData.avatar, about: userData.about }
       
-        isOwnProfile(e)? this.setState({RenderValue: selfProfile, loading: false}) : ( 
-          ycore.FindUser(string, (exception, response)=> {
+        isOwnProfile(e)? (
+          ycore.GetUserPosts(userData.id, (exception, response) => {
+            this.setState({ RenderValue: userData, rawbody: response, loading: false})
+          })) 
+              :
+         (ycore.FindUser(string, (exception, response)=> {
             exception? ycore.notifyError(exception) : null
             try {
               const rp = JSON.parse(response)
@@ -77,21 +96,31 @@ class UserProfile extends React.Component {
                 console.log(`Using aproximate user! => ${c1}  /  ${c2}`)
                 ycore.crouter.native(`@${c1}`)
               }
-              
+              ycore.GetUserPosts(rp['0'].user_id, (exception, response) => {
+                exception? ycore.notifyError(exception) : null
+                try {
+                  this.setState({ rawbody: response })
+                } catch (err) {
+                  core.notifyError(err)
+                }
+              })
               this.setState({ RenderValue: rp['0'], loading: false })
             } catch (err) {
               ycore.notifyError(err)
             }
           })
         )
-
-        
     }
     render(){
         const { loading } = this.state
         return(
             <div>
-              {loading? <antd.Skeleton active /> : <UserHeader values={this.state.RenderValue} />}
+              {loading? <antd.Skeleton active /> : 
+              (<div>
+                <UserHeader values={this.state.RenderValue} />
+                <UserBody values={this.state.rawbody} />
+              </div>)
+              }
             </div>
         )
     }

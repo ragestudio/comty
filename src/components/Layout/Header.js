@@ -9,7 +9,6 @@ import styles from './Header.less'
 import { config } from 'utils'
 
 import * as ycore from 'ycore'
-import router from 'umi/router'
 import moment from 'moment'
 
 @withI18n()
@@ -112,7 +111,7 @@ class Header extends PureComponent {
       <Layout.Header id='layoutHeader' className={classnames(styles.header, {[styles.fixed]: fixed}, {[styles.collapsed]: !collapsed} )} > 
             <div className={classnames(styles.containersWrappers, {[styles.collapsed]: !collapsed})} >
               <div className={styles.leftContainer}>
-                <Tooltip title={'Main'}><Icon type="home" className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
+                <Tooltip title={'Main'}><Icon type="home" className={styles.iconButton} onClick={() => ycore.crouter.native('main')} style={{ fontSize: '15px' }} /></Tooltip>
                 <Tooltip title={'Search'}><Icon type="search" className={styles.iconButton} style={{ fontSize: '15px' }} /></Tooltip>
               </div>
               <div className={styles.rightContainer}>

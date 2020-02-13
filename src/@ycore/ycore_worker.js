@@ -41,6 +41,13 @@ export const UIFxList = {
     notifySuccess: (ycore_worker.FXapiProvider + 'notifySuccess.wav')
 };
 
+export function booleanFix(e){
+    if(e == 1){
+        return true
+    }
+    return false
+}
+
 export const crouter = {
     native: (e) =>{
         umiRouter.push({
@@ -116,6 +123,32 @@ export function SeachKeywords(key, callback){
     });
   }
 
+export function GetUserPosts(id, callback) {
+    let formdata = new FormData();
+    formdata.append("server_key", yConfig.server_key);
+    formdata.append("type", "get_user_posts");
+    formdata.append("id", id)
+    const urlOBJ = `${endpoints.get_user_posts}${GetUserToken.decrypted().UserToken}`
+
+    const settings = {
+        "url":  urlOBJ,
+        "method": "POST",
+        "timeout": 10000,
+        "processData": false,
+        "mimeType": "multipart/form-data",
+        "contentType": false,
+        "data": formdata
+    };
+    jquery.ajax(settings)
+    .done(function (response) {
+        return callback(null, response);
+    })
+    .fail(function (response) {
+        const exception = 'Request Failed';
+        return callback(exception, response);
+    });
+ }
+
 
 export function GetFeedPosts(callback) {
     let formdata = new FormData();
@@ -135,8 +168,6 @@ export function GetFeedPosts(callback) {
        return callback( null, result)
       })
       .catch(error => console.log('error', error));
-      
-
 }
 
 export const get_app_session = {
