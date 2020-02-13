@@ -168,7 +168,7 @@ export function ValidLoginSession(){
     }
     if (SDCPContainer) {
         try {
-            let SDCPContainerDC = atob(SDCPContainer)
+            atob(SDCPContainer)
             ValidSDCP = true 
         } catch (error) {
             return
@@ -337,14 +337,12 @@ export function GetUserData (values, customPayload, callback) {
            let resParsed = JSON.parse(resString);
            DevOptions.ShowFunctionsLogs ? console.log(prefix, 'Fechted user data...' ) : null
            callback( resParsed )
-           return resParsed
         }
        )
       .fail(
          function (response) {
             DevOptions.ShowFunctionsLogs ? console.log(prefix, 'Server failure!', response) : null
             callback( null )
-            return
         }
      )
 }

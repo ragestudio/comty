@@ -3,9 +3,6 @@ import UserProfile from './UserProfile'
 import MainSidebar from './MainSidebar'
 import PostCard from './PostCard'
 import PostCreator from './PostCreator'
-import Editor from './Editor'
-import FilterItem from './FilterItem'
-import DropOption from './DropOption'
 import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
 import * as MyLayout from './Layout/index.js'
@@ -13,4 +10,4 @@ import Page from './Page'
 import YulioID from './YulioID/experimental/index.js'
 import CoreLoader from './CoreLoader'
 
-export { UserProfile, MyLayout, Editor, FilterItem, DropOption, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar}
+export { UserProfile, MyLayout, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar}

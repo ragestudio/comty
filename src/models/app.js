@@ -62,11 +62,6 @@ export default {
   },
   effects: {
     *query({payload}, { call, put, select }) {     
-      const { locationPathname } = yield select(_ => _.app)
-      const { list } = yield call(queryRouteList)
-      let routeList = list
-      yield put({type: 'updateState', payload: { routeList: list }, })
-      
       const valid = ycore.ValidLoginSession();
       const validBackup = ycore.ValidBackup();
       if (valid == true) {
@@ -74,30 +69,26 @@ export default {
             router.push({pathname: '/main',})
             ycore.RefreshONCE()
           }
+          const { locationPathname } = yield select(_ => _.app)
+          const { list } = yield call(queryRouteList)
+          let routeList = list
+          yield put({type: 'updateState', payload: { routeList: list }, })
           // Runtime
           ycore.MakeBackup()
           ycore.UpdateSDCP()
         
       } 
-      else if(!pathMatchRegexp(['/', '/login'], window.location.pathname)) {
+      else if(!pathMatchRegexp(['','/login'], window.location.pathname)) {
+          console.log('REP')
           if (validBackup == true) {
             ycore.LogoutCall()
           } 
          else{
-              router.push({pathname: '/login',})
-              ycore.RefreshONCE()
+            ycore.RefreshONCE()
           }
-          
       }
-    },
-
-    *signOut({ payload }, { call, put }) {
-      const data = yield call(logoutUser)
-      if (data.success) {
-        sessionStorage.clear() 
-        yield put({ type: 'query' })
-      } else {
-        throw data
+      if(pathMatchRegexp(['/'], window.location.pathname)){
+        router.push({pathname: '/login',})
       }
     },
   },
