@@ -84,13 +84,12 @@ export function GetFeedPosts(callback) {
       redirect: 'follow'
     };
     const objUrl = `${ycore.endpoints.get_userPostFeed}${ycore.GetUserToken.decrypted().UserToken}`
-    console.log(objUrl)
     fetch(objUrl, requestOptions)
       .then(response => response.text())
       .then(result => {
        return callback( null, result)
       })
-      .catch(error => console.log('error', error))
+      .catch(error => console.log('Load Post error => ', error))
 }
 
 export const get_app_session = {
@@ -143,4 +142,25 @@ export const get_app_session = {
           })
         .catch(error => console.log('error', error));
     }
+}
+export function PushUserData(inputIO1, inputIO2) {
+  var getStoragedToken = Cookies.get('access_token');
+  var yCore_GUDEP = ycore.endpoints.update_userData_endpoint;
+  var urlOBJ = "" + yCore_GUDEP + getStoragedToken;
+  ycore.DevOptions.ShowFunctionsLogs? console.log('Recived', global, 'sending to ', urlOBJ) : null
+  var form = new FormData();
+  form.append("server_key", ycore.yConfig.server_key);
+  form.append(inputIO1, inputIO2);
+  var settings = {
+      "url": urlOBJ,
+      "method": "POST",
+      "timeout": 0,
+      "processData": false,
+      "mimeType": "multipart/form-data",
+      "contentType": false,
+      "data": form
+  };
+  jquery.ajax(settings).done(function (response) {
+    ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+  });
 }

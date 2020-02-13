@@ -43,8 +43,6 @@ class YulioID extends Component {
     var EncPassword = btoa(RawPassword);
     var EncUsername = btoa(RawUsername);
     
-    const OriginalPayload = {EncUsername, EncPassword}
-
     if (!EncUsername || !EncPassword) {
       var message = 'Incomplete information!'
       console.log(prefix, message)
@@ -57,24 +55,16 @@ class YulioID extends Component {
       }
       else {
         console.log(prefix, 'Initialising login process...')
-        GetAuth(EncUsername, EncPassword, (exception, response) => exception? this.handleResponse(response) : ( this.setState({ AuthResponse: response }), this.handleResponse(response, OriginalPayload) ))
+        GetAuth(EncUsername, EncPassword, (exception, response) =>  this.handleResponse(response))
       }
-     
     }
   }
 
   handleResponse = (response) => {
-    var identState = JSON.parse(response)['api_status'];
-    if (identState == 200) {
-      const { dispatch } = this.props;
-      const UserID = JSON.parse(response)['user_id'];
-      const UserToken = JSON.parse(response)['access_token'];
-      let FramePayload = { UserID, UserToken }
-      DevOptions.ShowFunctionsLogs ? console.log(FramePayload) : null
+    if (response == '200') {
       this.setState({ StateIcon: 'login', StateMessage: 'Wait a sec...', StateException: false })
-      InitSDCP({UserID, UserToken}, (done) => done? dispatch({type: 'login/login', payload: FramePayload}) : null )
     }
-    if (identState == 400) {
+    if (response == '400') {
       this.setState({ StateIcon: 'exclamation-circle', StateMessage: 'Invalid credentials', StateException: true })
     }
   }

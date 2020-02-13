@@ -1,31 +1,9 @@
 import { Mock, Constant, qs, randomAvatar } from './_utils'
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import keys from '../config/keys.js';
 
 const { ApiPrefix } = Constant
-const queryArray = (array, key, keyAlias = 'key') => {
-  if (!(array instanceof Array)) {
-    return null
-  }
-  let data
 
-  for (let item of array) {
-    if (item[keyAlias] === key) {
-      data = item
-      break
-    }
-  }
-
-  if (data) {
-    return data
-  }
-  return null
-}
-const NOTFOUND = {
-  message: 'API Route Not Found',
-  documentation_url: 'http://localhost:8000/request',
-}
 
 module.exports = {
   [`POST ${ApiPrefix}/user/login`](req, res) {
