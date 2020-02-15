@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import * as antd from 'antd'
 import { withI18n, Trans } from '@lingui/react'
 import ScrollBar from '../ScrollBar'
 import { config } from 'utils'
-import styles from './L_Sider.less'
+import styles from './Sider.less'
 import * as ycore from 'ycore';
 import router from 'umi/router';
 import {CustomIcons} from 'components'
@@ -13,7 +14,7 @@ import {CustomIcons} from 'components'
 const userData = ycore.SDCP()
 
 @withI18n()
-class L_Sider extends PureComponent {
+class Sider extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,25 +49,10 @@ class L_Sider extends PureComponent {
     if (ycore.DevOptions.StrictLightMode == false) {
       return "dark"
     }
-    if (ycore.DevOptions.StrictLightMode == true && theme == "light") {
-      return "light"
-    }
-    if (ycore.DevOptions.StrictLightMode == true && theme == "dark") {
-      return "dark"
-    }
+    return theme
   }
-  UserIsPro(){
-    if (userData.is_pro == 1){
-      return true
-    }
-    return false
-  }
-  UserIsAdmin(){
-    if (userData.admin == 1){
-      return true
-    }
-    return false
-  }
+
+
   handleClickMenu = e => {
     e.key === 'SignOut' && ycore.LogoutCall()
     e.key === 'settingpage' && router.push('/settings')
@@ -103,11 +89,11 @@ class L_Sider extends PureComponent {
         theme={this.StrictMode()}
         width="180"
         collapsed={collapsed || false}
-        className={styles.sider}
+        className={classnames(styles.sider, {[styles.darkmd]: this.isDarkMode()} )}
         onMouseEnter={this.hover} 
         onMouseLeave={this.hover}
       >
-        <img className={styles.brand} src={collapsed? config.logoPath : config.FullLogoPath} />
+        <div className={styles.brand}><img onClick={() => ycore.crouter.native('main')} src={collapsed? config.LogoPath  : config.FullLogoPath } /></div>
         <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? (this.Balancer()? "right" : "double-right") : (this.Balancer()? "left" : "double-left") } /></div> 
         <div className={styles.menuContainer}>
           <ScrollBar
@@ -117,7 +103,7 @@ class L_Sider extends PureComponent {
             }}
           >
                 <antd.Menu selectable={false} className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
-                      {this.UserIsPro()? 
+                      {ycore.booleanFix(userData.is_pro)? 
                       <antd.Menu.Item key="boosted_pages">
                         <antd.Icon style={{ fontSize: '15px' }} type="thunderbolt" />
                         {collapsed ?  null : <Trans> Boosted Posts </Trans> }
@@ -135,7 +121,7 @@ class L_Sider extends PureComponent {
                         <antd.Icon style={{ fontSize: '15px' }} type="setting" />
                         {collapsed ?  null : <Trans>General Settings</Trans>}
                       </antd.Menu.Item>
-                      {this.UserIsAdmin()? 
+                      {ycore.booleanFix(userData.admin)? 
                         <antd.Menu.Item key="admin_area">
                           <antd.Icon style={{ fontSize: '15px' }} type="tool" />
                           {collapsed ?  null : <Trans>Admin Area</Trans>}
@@ -169,7 +155,7 @@ class L_Sider extends PureComponent {
                     <div className={styles.siderhead}>
                       <antd.Avatar size={collapsed? "small" : "large"} shape={collapsed? "circle" : "square"} src={userData.avatar} className={collapsed? styles.avatar : styles.avatarFull} />
                     </div>  
-                    {collapsed? null : <div className={styles.userInfo}><a href={`/@${userData.username}`}><h2>@{userData.username}</h2></a></div> }
+                    {collapsed? null : <div className={styles.userInfo}><a onClick={() => ycore.crouter.native(`@${userData.username}`)} ><h2>@{userData.username}</h2></a></div> }
                 </div>
             </ScrollBar>
         </div>
@@ -179,7 +165,7 @@ class L_Sider extends PureComponent {
   }
 }
 
-L_Sider.propTypes = {
+Sider.propTypes = {
   menus: PropTypes.array,
   theme: PropTypes.string,
   isMobile: PropTypes.bool,
@@ -188,4 +174,4 @@ L_Sider.propTypes = {
   onCollapseChange: PropTypes.func,
 }
 
-export default L_Sider
+export default Sider

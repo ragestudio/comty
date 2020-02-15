@@ -25,6 +25,7 @@ export function InitSDCP(values, done) {
           { 
             let cooked = JSON.parse(response)['user_data']
             let Ensamblator = btoa(JSON.stringify(cooked))
+            ycore.SetupApp()
             ycore.asyncSDCP.setSDCP(Ensamblator).then(() => {
                ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, ' SDCP Setup done') : null
                return done(true)
@@ -77,4 +78,13 @@ export function SDCP() {
            return null
        }
    }
+}
+export function SetupApp(){
+    // TODO: Default sets
+    const resourceLoad = localStorage.getItem('resource_bundle')
+    if (!resourceLoad) {
+        localStorage.setItem('resource_bundle', 'light_ng')
+    }
+   
+
 }

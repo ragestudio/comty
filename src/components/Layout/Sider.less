@@ -30,7 +30,6 @@
     .ant-btn:hover{
       background: rgb(255,255,255);
       background: linear-gradient(270deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.57) 95%);
-     
      }
   }
 }
@@ -44,7 +43,6 @@
   z-index: 200;
   vertical-align: middle;
   :global{
-    
     .ant-btn {
       border: none;
       border-radius: unset;
@@ -65,25 +63,25 @@
 }
 
 .brand {
-  display: flex;
-  vertical-align: middle;
-  padding: 5px;
-  width: 100%;
-  max-height: 50px;
-
-}
-
-.userInfo{
-  font-family: "Poppins", sans-serif;
-  align-items: center;
-  text-align: center;
-  h2{
-    color: @LDarkMode-color
+  img{
+    display: flex;
+    vertical-align: middle;
+    padding: 5px;
+    margin: 7px auto 15px auto;
+    width: 100%;
+    max-height: 58px;
   }
 }
+.brand:hover{
+  img{
+    size: 9cm;
+  }
+}
+
 .avatarFull{
   width: 120px;
 }
+
 .avatar{
   margin: 0 0 15px 0;
 }
@@ -97,42 +95,68 @@
  
   }
 }
+.siderhead{
+  font-family: 'Source Sans Pro', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ::first-letter{
+    margin-left: 7px;
+  }
+  height: 60px;
+  font-size: 17px;
+}
 
 .siderwrapper {
   border-color: transparent;
-
   font-size: 13px;
   font-family: "Poppins", sans-serif;
   height: 100%;
   width: 100%;
   left: 0;
   position: absolute;
+  
   :global {
-    .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
-      :hover {
-        background-color: rgb(80, 80, 80);
-        color: #fff;
-      }
-      border-right: 1px solid transparent;
-    }
     .ant-layout-sider-dark {
       background-color: @LDarkMode-backgroud;
       color: @DarkMode-color;
+      .ant-menu-item{
+        color: @DarkMode-color;
+      }
+      .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
+        :hover {
+          background-color: rgb(80, 80, 80);
+          color: #fff;
+        }
+        border-right: 1px solid transparent;
+      }
     }
     .ant-layout-sider-light {
-      background-color: @LightMode-backgroud;
-      color: @LightMode-color;
+      background-color: @Theme-SiderDeco-Backgroud;
+      color: @Theme-SiderDeco-Color;
+      .ant-menu-item{
+        color: @Theme-SiderDeco-Color;
+      }
+      .ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
+        :hover {
+          background-color: @Theme-Hover-Backgroud;
+          color: #fff;
+        }
+        border-right: 1px solid transparent;
+      }
     } 
   }
 }
 
 .sider {
+  border-right: 1px solid #dbdbdb;
+  border-radius: 0 10px 10px 0 ;
+  &.darkmd {
+    border: none;
+  }
   height: 100%;
   z-index: 50;
   :global {
-      .ant-sider{
-        background-color: #fff;
-      }
      .ant-menu-sub {
         font-size: 14px;
         -webkit-box-shadow: 13px 4px 34px 0px rgba(0, 0, 0, 0.005);
@@ -148,42 +172,21 @@
         color: @LLightMode-color;
     }
   }
-  .siderhead{
-    font-family: 'Source Sans Pro', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    ::first-letter{
-      margin-left: 7px;
-    }
-    height: 60px;
-    font-size: 17px;
-  }
-  .sidercontainer{
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
   .menuItems{
     background-color: transparent;
-    color: @LDarkMode-color;
     margin-bottom: 8px; 
     width: 100%;
     animation: fadein 0.5s;
       :global {
         .ant-menu-item-selected{
-          background-color: rgba(82, 82, 82, 0.562);
+          background-color: transparent;
         }
       }
-    
   }
   .menuItemsCollapsed{
     background-color: transparent;
     color: @LDarkMode-color;
-  
     width: 100%;
-
     animation: fadein 0.5s;
       :global {
         .ant-menu-item {
@@ -197,9 +200,7 @@
           background-color: rgba(82, 82, 82, 0.562);
         }
       }
-    
   }
-  
   .menuContainer {
     height: 100%;
     margin: 18px 0 8px 0;
@@ -209,17 +210,14 @@
     }
     overflow-x: hidden;
     flex: 1;
-    
     &::-webkit-scrollbar-thumb {
       background-color: transparent;
     }
-
     &:hover {
       &::-webkit-scrollbar-thumb {
         background-color: rgba(59, 59, 59, 0.2);
       }
     }
-
     :global {
       .ant-layout-sider-children {
         display: flex;
@@ -245,13 +243,10 @@
         font-size: 14px;
         font-family: 'Source Sans Pro', sans-serif;
       }
-
       .ant-menu-dark .ant-menu-item a {
         color: rgb(197, 197, 197);
       }
-
     }
-
   }
 }
 .scrollbar-container {

@@ -1,6 +1,8 @@
 {
   "name": "comty-development",
-  "version": "0.1.13",
+  "title": "Comty™",
+  "DevBuild": true,
+  "version": "0.1.15",
   "description": "",
   "main": "index.js",
   "author": "RageStudio",

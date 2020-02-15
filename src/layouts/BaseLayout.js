@@ -12,6 +12,11 @@ import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'
 import './BaseLayout.less'
 
+const bundle = localStorage.getItem('resource_bundle') 
+import(`themes/${bundle}/index.less`)
+
+
+
 const LayoutMap = {
   primary: PrimaryLayout,
   public: PublicLayout,

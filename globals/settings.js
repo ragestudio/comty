@@ -1,10 +1,15 @@
 const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
 function StorageValued(e){
-  const Ite = fromStorage.map(item => {
-    return item.SettingID === e? item.value : null
-  })
-  const fr = Ite.filter(Boolean)
-  return fr.toString()
+  try {
+    const Ite = fromStorage.map(item => {
+      return item.SettingID === e? item.value : null
+    })
+    const fr = Ite.filter(Boolean)
+    return fr.toString()
+  } catch (error) {
+    console.log(error)
+    return false
+  }
 }
 export var AppSettings = [
     {

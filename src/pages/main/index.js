@@ -37,7 +37,7 @@ class Main extends React.Component {
             )
         } catch (err) {
             ycore.notifyError(err)
-            const paylodd = {user: 'Error', ago: '', avatar: '', content: 'Error displaying data :/',  publisher: '' }
+            const paylodd = {user: '', ago: '', avatar: '', content: '',  publisher: '' }
             return <PostCard payload={paylodd} />
         }
     
@@ -48,15 +48,12 @@ class Main extends React.Component {
         const { loading, createPost } = this.state;        
         return (
             <div> 
-                
-                <MainSidebar />
                 {createPost? <PostCreator refreshPull={() => {this.handleRefreshList()}} /> : null}
                 {loading? 
                     <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} >
                         <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
                     </antd.Card> :
                     <div id="PostsWrapper" className={styles.PostsWrapper}> 
-                        
                         <antd.BackTop target={() => document.getElementById("PostsWrapper") } />
                         {this.renderFeedPosts()} 
                     </div>}

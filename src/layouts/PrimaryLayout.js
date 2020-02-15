@@ -5,16 +5,16 @@ import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
 import { MyLayout } from 'components'
+import classnames from 'classnames'
 import { Layout, Drawer, Result, Button, Checkbox } from 'antd'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import { config, pathMatchRegexp, langFromPath } from 'utils'
 import store from 'store';
-import classNames from 'classnames'
 import Error from '../pages/404'
 import styles from './PrimaryLayout.less'
 
 const { Content } = Layout
-const { Header, L_Sider, Control } = MyLayout
+const { Header, Sider, Control } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -44,17 +44,13 @@ class PrimaryLayout extends PureComponent {
       }
     })  
   }
-  
   componentWillUnmount() {
     unenquireScreen(this.enquireHandler)
   }
-
   onCollapseChange = () => {
     this.setState({ collapsed: !this.state.collapsed })
     store.set('collapsed', this.state.collapsed)
-
   }
-
   ResByPassHandler() {
     const {RemByPass} = this.state;
     if (RemByPass == true){
@@ -118,7 +114,7 @@ class PrimaryLayout extends PureComponent {
       },
       
     }
-    const LeftSiderProps = {
+    const SiderProps = {
       menus,
       theme,
       isMobile,
@@ -133,7 +129,8 @@ class PrimaryLayout extends PureComponent {
     }
     const ContainerProps = {
       theme,
-      location
+      location,
+      collapsed,
     }
     const MobileWarning = () =>{
       if (resbypass == false) {
@@ -149,19 +146,19 @@ class PrimaryLayout extends PureComponent {
       return null
     }
 
+  
     return (
         <Fragment>
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
           <Layout className={this.isDarkMode()? styles.container_dark : styles.container_light}>
-           <L_Sider {...LeftSiderProps}/>
-            <div className={styles.container}>
-              <div style={{ paddingTop: config.fixedHeader ? 72 : 0 }} id="primaryLayout" >
-                <Header {...headerProps} />
-                <Content {...ContainerProps} className={styles.content}>
+           <Sider {...SiderProps}/>
+            <div id="primaryLayout"className={styles.container}>
+      
+                <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
                     {children}
                 </Content>
-              </div>
+              
             </div>  
           </Layout>
         </Fragment>

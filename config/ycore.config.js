@@ -1,10 +1,15 @@
 module.exports = {
     siteName: 'Comty',
     copyright: 'RageStudio©',
-    logoPath: '/logo.svg',
+
+    LogoPath: '/logo.svg',
     FullLogoPath: '/full_logo.svg',
+    DarkFullLogoPath: '/dark_full_logo.svg',
+    DarkLogoPath: '/dark_logo.svg',
+
     apiPrefix: '/api/v1',
     fixedHeader: true, // sticky primary layout header
+    resource_bundle: 'light_ng',
 
     App_Config: {
       InitRes: { width: 1000, height: 900},

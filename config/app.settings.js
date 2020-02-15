@@ -12,5 +12,6 @@ export var DevOptions = {
     StrictLightMode: ReturnDevOption('strict_lightMode'),
     SignForNotExpire: ReturnDevOption('force_showDevLogs'),
     MaxJWTexpire: '1556952',
-    MaxLengthPosts: '512'
+    MaxLengthPosts: '512',
+    CurrentBundle: 'light_ng'
 }

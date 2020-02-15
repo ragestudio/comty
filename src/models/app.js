@@ -76,7 +76,7 @@ export default {
           // Runtime
           ycore.MakeBackup()
           ycore.UpdateSDCP()
-        
+          return 
       } 
       else if(!pathMatchRegexp(['','/login'], window.location.pathname)) {
           console.log('REP')
@@ -84,12 +84,14 @@ export default {
             ycore.LogoutCall()
           } 
          else{
+            router.push({pathname: '/login',})
             ycore.RefreshONCE()
           }
       }
-      if(pathMatchRegexp(['/'], window.location.pathname)){
+      if(pathMatchRegexp([''], window.location.pathname)){
         router.push({pathname: '/login',})
       }
+
     },
   },
   reducers: {

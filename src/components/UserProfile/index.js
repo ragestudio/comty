@@ -28,7 +28,6 @@ const UserHeader = ({ values }) => {
             </div>
             <div className={styles.content}>
               <div className={styles.contentTitle}>
-                {ycore.DevOptions.ShowFunctionsLogs? 'si' : 'sad'}
                  <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <antd.Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
                  <span style={{ fontSize: '14px', fontWeight: '100', lineHeight: '0', marginBottom: '5px' }}>{values.about}</span> 
               </div>
