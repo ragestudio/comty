@@ -57,7 +57,7 @@ class PostCard extends React.PureComponent{
     
     render(){
         const { payload, customActions,  } = this.props
-        const { user, ago, avatar, content, file, postFileName, publisher, post_likes } = payload || emptyPayload;
+        const { user, ago, avatar, content, file, postFileName, publisher, post_likes, is_post_pinned } = payload || emptyPayload;
         const defaultActions = [<div><LikeBTN active={true} key="like" /><span>{post_likes}</span></div>,<antd.Icon type="share-alt" key="share" />,<antd.Icon type="more" key="actionMenu" />]
         const actions = customActions || defaultActions;
         return(
@@ -65,7 +65,7 @@ class PostCard extends React.PureComponent{
              <antd.Card actions={actions} >
                 <Meta
                     avatar={<div className={styles.postAvatar}><antd.Avatar shape="square" size={50} src={avatar} /></div>}
-                    title={<div><a href={`/@${user}`}><h4 className={styles.titleUser}>@{user} {ycore.booleanFix(publisher.verified)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}</h4></a></div>}
+                    title={<div className={styles.titleWrapper} ><a href={`/@${user}`}><h4 className={styles.titleUser}>@{user} {ycore.booleanFix(publisher.verified)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}{ycore.booleanFix(publisher.nsfw_flag)? <antd.Tag style={{ margin: '0 0 0 13px' }} color="volcano" >NSFW</antd.Tag> : null} </h4></a> <div className={styles.PostTags}>{ycore.booleanFix(is_post_pinned)? <antd.Icon type="pushpin" /> : null }</div> </div>}
                     description={<span className={styles.textAgo}>{ago}</span>}
                     bordered="false"
                 />

@@ -28,10 +28,15 @@ const UserHeader = ({ values }) => {
                <antd.Avatar shape="square" size={140} src={values.avatar} /> 
             </div>
             <div className={styles.content}>
+              <div className={styles.TagWrappers}>
+                {ycore.booleanFix(values.nsfw_flag)? <antd.Tag color="volcano" >NSFW</antd.Tag> : null}
+                  
+              </div>
               <div className={styles.contentTitle}>
                  <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <antd.Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
                  <span style={{ fontSize: '14px', fontWeight: '100', lineHeight: '0', marginBottom: '5px' }}>{values.about}</span> 
               </div>
+             
             </div>
           </div>
          } />

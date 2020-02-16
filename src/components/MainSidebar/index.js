@@ -7,12 +7,9 @@ import styles from './index.less'
 var userData = ycore.SDCP()
 
 class MainSidebar extends React.Component {
-
     state = {
         collapsed: false,
     };
-
-
     render(){
         return(
             <div className={styles.main_menuWrapper}>

@@ -20,8 +20,9 @@ class Main extends React.Component {
     render(){
         return (
             <div> 
-                <PostCreator />
-                <MainFeed get="feed" />
+                <div><antd.Card bordered="false" > Kintxy xikito </antd.Card></div>
+                <div><PostCreator /></div>
+                <div><MainFeed get="feed" /></div>
             </div>
         )
     }

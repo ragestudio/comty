@@ -5,7 +5,7 @@
     width: 100%;
     height: auto;
     position: absolute;
-    z-index: 100;
+    z-index: 10;
     top: 0;
     text-align: center;
     :global {
@@ -14,9 +14,17 @@
             max-width: 7%;
             margin: auto;
             padding: 5px;
+            border-radius: 0 0 13px 13px;
+            transform: translate(0, -30px);
+            transition: all 150ms ease-in;
+        }
+        .ant-card-body:hover {
+
+            transform: translate(0, 0px);
+            transition: all 150ms ease-in;
         }
         .ant-btn {
-            background-color: rgba(0, 0, 0, 0.1);
+            background-color: transparent;
             margin: 3px;
         }
     }
