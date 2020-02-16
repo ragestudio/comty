@@ -3,13 +3,20 @@ import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './index.less'
 import {CustomIcons} from 'components'
+import { RefreshFeed } from 'components/MainFeed'
 
 const { Meta } = antd.Card;
 
+export function HandleVisibility(){
+    window.PostCreatorComponent.ToogleVisibility();
+    return
+}
 class PostCreator extends React.PureComponent{
     constructor(props){
         super(props),
+        window.PostCreatorComponent = this;
         this.state = {
+            visible: false,
             FadeIN: true,
             keys_remaining: '512',
             toolbox_open: false,
@@ -18,7 +25,9 @@ class PostCreator extends React.PureComponent{
             posting_ok: false
         }
     }
-
+    ToogleVisibility(){
+        this.setState({ visible: !this.state.visible })
+    }
     renderPostPlayer(payload){
         const ident = payload
         if (ident.includes('.mp4')) {
@@ -58,7 +67,6 @@ class PostCreator extends React.PureComponent{
     
     handleChanges = ({ target: { value } }) => {
         this.setState({ rawtext: value, keys_remaining: (ycore.DevOptions.MaxLengthPosts - value.length) })
-        
     }
     handleKeysProgressBar(){
         const { keys_remaining } = this.state;
@@ -93,8 +101,8 @@ class PostCreator extends React.PureComponent{
           .then(response => {
               ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
               this.setState({ posting_ok: true, posting: false, rawtext: ''})
-              setTimeout( () => { this.setState({ posting_ok: false }) }, 1000)
-              refreshPull()
+              setTimeout( () => { this.ToogleVisibility(),this.setState({ posting_ok: false }) }, 1000)
+              RefreshFeed()
              // console.warn(`[EXCEPTION] refreshPull or/and toogleShow is not set, the controller handlers not working...`)
               
             })
@@ -102,11 +110,12 @@ class PostCreator extends React.PureComponent{
     }
    
     render(){
-        const { keys_remaining, } = this.state;
+        const { keys_remaining, visible } = this.state;
         const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
+        if (visible) {
         return(
           <div className={styles.cardWrapper}>
-             <antd.Card  >
+             <antd.Card>
                 <Meta
                     avatar={<div className={styles.titleIcon}><antd.Icon type="plus" /></div>}
                     title={<div><h4 className={styles.titlecreate}>Create a post </h4></div>}
@@ -136,6 +145,8 @@ class PostCreator extends React.PureComponent{
                 </antd.Drawer>
           </div>
         )
+        }
+        return null
     }
 }          
 export default PostCreator

@@ -1,13 +1,13 @@
 import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
-import {CustomIcons} from 'components'
+import {CustomIcons, LikeBTN} from 'components'
+import * as ycore from 'ycore'
 
 const { Meta } = antd.Card;
 
 // Set default by configuration
 const emptyPayload = {user: 'Post Empty', ago: 'This Post is empty', avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', content: 'Test Test' }
-const defaultActions = [<antd.Icon type="heart"  className={styles.likebtn} key="like" />,<antd.Icon type="share-alt" key="share" />,<antd.Icon type="more" key="actionMenu" />]
 
 class PostCard extends React.PureComponent{
     constructor(props){
@@ -53,23 +53,19 @@ class PostCard extends React.PureComponent{
             )
         }
     }
-    isVerifiedAccount(e){
-       if(e.verified == 1){
-           return true
-       }
-       return false
-    }
+
+    
     render(){
         const { payload, customActions,  } = this.props
-        const { user, ago, avatar, content, file, postFileName, publisher } = payload || emptyPayload;
+        const { user, ago, avatar, content, file, postFileName, publisher, post_likes } = payload || emptyPayload;
+        const defaultActions = [<div><LikeBTN active={true} key="like" /><span>{post_likes}</span></div>,<antd.Icon type="share-alt" key="share" />,<antd.Icon type="more" key="actionMenu" />]
         const actions = customActions || defaultActions;
-
         return(
           <div className={styles.cardWrapper}>
              <antd.Card actions={actions} >
                 <Meta
                     avatar={<div className={styles.postAvatar}><antd.Avatar shape="square" size={50} src={avatar} /></div>}
-                    title={<div><a href={`/@${user}`}><h4 className={styles.titleUser}>@{user} {this.isVerifiedAccount(publisher)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}</h4></a></div>}
+                    title={<div><a href={`/@${user}`}><h4 className={styles.titleUser}>@{user} {ycore.booleanFix(publisher.verified)? <antd.Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}</h4></a></div>}
                     description={<span className={styles.textAgo}>{ago}</span>}
                     bordered="false"
                 />

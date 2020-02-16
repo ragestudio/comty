@@ -4,7 +4,7 @@ import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
-import { MyLayout } from 'components'
+import { MyLayout, MicroHeader } from 'components'
 import classnames from 'classnames'
 import { Layout, Drawer, Result, Button, Checkbox } from 'antd'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
@@ -153,8 +153,9 @@ class PrimaryLayout extends PureComponent {
           <div className={styles.BarControlWrapper}><Control /></div>
           <Layout className={this.isDarkMode()? styles.container_dark : styles.container_light}>
            <Sider {...SiderProps}/>
+           <MicroHeader />
             <div id="primaryLayout"className={styles.container}>
-      
+            
                 <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
                     {children}
                 </Content>

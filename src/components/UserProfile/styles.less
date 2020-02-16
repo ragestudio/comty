@@ -1,6 +1,10 @@
 @import '~themes/vars.less';
-
+.userWrapper{
+  padding: 0 68px 15px 68px;
+  margin: auto;
+}
 .UserCover {
+  border-radius: 15px 15px 0 0;
   position: relative;
   width: 100%;
   margin: -32px auto auto auto;
@@ -46,23 +50,30 @@
   }
 }
 
+.avatar {
+  vertical-align: top;
+  flex: 0 1 72px;
+  position: absolute;
+  z-index: 10;
+  margin: -6% 0 0 -3%;
+
+  & > span {
+    display: block;
+    width: 92px;
+    height: 92px;
+  }
+}
+
 .pageHeaderContent {
   vertical-align: top;
   display: flex;
-  .avatar {
-    flex: 0 1 72px;
-    & > span {
-      display: block;
-      width: 92px;
-      height: 92px;
-    }
-  }
+
   .content {
     font-family: "Poppins", sans-serif;
     position: relative;
     top: 4px;
     flex: 1 1 auto;
-    margin-left: 24px;
+    margin: 0 0 20px 110px;
     color: @text-color-secondary;
     line-height: 22px;
     .contentTitle {

@@ -3,17 +3,22 @@
 .titleHead{
   font-family: "Nunito", sans-serif;
 }
+
 .main {
   display: flex;
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: @menu-bg;
+  color: @DarkMode-color_container;
+  background-color: @DarkMode-backgroud;
   .leftMenu {
     width: 224px;
     border-right: @border-width-base @border-style-base @border-color-split;
     :global {
+      
       .ant-menu-inline {
+        color: @DarkMode-color_container;
+        background-color: @DarkMode-backgroud;
         border: none;
       }
       .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
@@ -72,16 +77,6 @@
     }
   }
 
-  // 密码强度
-  font.strong {
-    color: @success-color;
-  }
-  font.medium {
-    color: @warning-color;
-  }
-  font.weak {
-    color: @error-color;
-  }
 }
 
 @media screen and (max-width: @screen-md) {

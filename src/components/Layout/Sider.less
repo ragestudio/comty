@@ -63,6 +63,7 @@
 }
 
 .brand {
+  cursor: pointer;
   img{
     display: flex;
     vertical-align: middle;
@@ -72,11 +73,7 @@
     max-height: 58px;
   }
 }
-.brand:hover{
-  img{
-    size: 9cm;
-  }
-}
+
 
 .avatarFull{
   width: 120px;
@@ -92,7 +89,6 @@
     bottom: 0;
     position: absolute;
     width: 100%;
- 
   }
 }
 .siderhead{
@@ -120,6 +116,9 @@
     .ant-layout-sider-dark {
       background-color: @LDarkMode-backgroud;
       color: @DarkMode-color;
+      h2{
+        color: @Theme-SiderDeco-Color;
+      }
       .ant-menu-item{
         color: @DarkMode-color;
       }
@@ -134,6 +133,9 @@
     .ant-layout-sider-light {
       background-color: @Theme-SiderDeco-Backgroud;
       color: @Theme-SiderDeco-Color;
+      h2{
+        color: @Theme-SiderDeco-Color;
+      }
       .ant-menu-item{
         color: @Theme-SiderDeco-Color;
       }

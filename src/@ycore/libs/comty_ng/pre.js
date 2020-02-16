@@ -49,47 +49,39 @@ export function SeachKeywords(key, callback){
     })
 }
 
-export function GetUserPosts(id, callback) {
-    let formdata = new FormData();
-    formdata.append("server_key", ycore.yConfig.server_key);
-    formdata.append("type", "get_user_posts");
-    formdata.append("id", id)
-    const urlOBJ = `${ycore.endpoints.get_user_posts}${ycore.GetUserToken.decrypted().UserToken}`
-    const settings = {
-        "url":  urlOBJ,
-        "method": "POST",
-        "timeout": 10000,
-        "processData": false,
-        "mimeType": "multipart/form-data",
-        "contentType": false,
-        "data": formdata
-    };
-    jquery.ajax(settings)
-    .done(function (response) {
-        return callback(null, response);
-    })
-    .fail(function (response) {
-        const exception = 'Request Failed';
-        return callback(exception, response);
-    })
-}
-
-export function GetFeedPosts(callback) {
-    let formdata = new FormData();
-    formdata.append("server_key", ycore.yConfig.server_key);
-    formdata.append("type", "get_news_feed");
-    const requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
-    const objUrl = `${ycore.endpoints.get_userPostFeed}${ycore.GetUserToken.decrypted().UserToken}`
-    fetch(objUrl, requestOptions)
-      .then(response => response.text())
-      .then(result => {
-       return callback( null, result)
-      })
-      .catch(error => console.log('Load Post error => ', error))
+export function GetPosts(userid, type, callback) {
+  let formdata = new FormData();
+  formdata.append("server_key", ycore.yConfig.server_key);
+  switch (type) {
+    case 'feed':
+      formdata.append("type", "get_news_feed");
+      break;
+    case 'user':
+      formdata.append("type", "get_user_posts");
+      formdata.append("id", userid)
+      break;
+    default:
+      formdata.append("type", "get_news_feed");
+      break;
+  }
+  const urlOBJ = `${ycore.endpoints.get_posts}${ycore.GetUserToken.decrypted().UserToken}`
+  const settings = {
+      "url":  urlOBJ,
+      "method": "POST",
+      "timeout": 10000,
+      "processData": false,
+      "mimeType": "multipart/form-data",
+      "contentType": false,
+      "data": formdata
+  };
+  jquery.ajax(settings)
+  .done(function (response) {
+      return callback(null, response);
+  })
+  .fail(function (response) {
+      const exception = 'Request Failed';
+      return callback(exception, response);
+  })
 }
 
 export const get_app_session = {
