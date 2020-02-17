@@ -3,11 +3,10 @@ import {GetAuth, InitSDCP, DevOptions, asyncSDCP} from 'ycore';
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
 import { Button, Form, Input, Drawer, Icon, Collapse } from 'antd'
-import styles from './yid.scss';
+import styles from './index.less';
 import formstyle from './formstyle.less'
 
 const FormItem = Form.Item
-const RenderInclude = ({ data }) => { if (!data) { return null; } else { return data; } }
 
 @connect(({ loading }) => ({ loading }))
 @Form.create()
@@ -71,22 +70,29 @@ class YulioID extends Component {
   
 
   render() {
+    const { visible } = this.props
     const { getFieldDecorator } = this.props.form;
     const { ShowLoading, StateIcon, StateMessage, StateException } = this.state;
     const { Panel } = Collapse;
   
   
     return (
-      <div>
+      <div className={styles.loginWrapper}>
         <Drawer
-          width={520}
+          width="100%"
+          mask={false}
+          getContainer={false}
           closable={false}
-          visible={this.state.MainLoginVisible}
+          visible={visible}
+          className={styles.loginWrapper}
         >
           <main className={styles.mainlp}>
             <section className={styles.forms}>
-              <h6 className={styles.h6lp}>YulioID&trade;</h6>
-              <h1 className={styles.h1lp}>Welcome Back !</h1>
+              <div className={styles.logHeader}>
+                <h6><img src={"http://api.ragestudio.net/id.svg"} /> YulioID&trade;</h6>
+                <h1>Login</h1>
+              </div>
+              
 
               {/* <RenderInclude data={include} /> */}
 
@@ -150,11 +156,7 @@ class YulioID extends Component {
                     </div>
 
                     <div style={{ margin: 'auto' }}>
-                      <a
-                        className={styles.buttonlp}
-                        id="login"
-                        onClick={this.handleLogin}
-                      >
+                      <a className={styles.buttonlp} id="login" onClick={this.handleLogin}>
                         Login
                       </a>
                     </div>
@@ -167,24 +169,11 @@ class YulioID extends Component {
                     >
                       Or
                     </h2>
-                    <div style={{ float: 'left' }}>
-                      <Button
-                        type="dashed"
-                        onClick={this.initFPassword}
-                        style={{ top: '8px' }}
-                      >
-                        <Icon type="exclamation-circle" /> Forgotten password
-                      </Button>
+                    <div className={styles.moreActions}>
+                      <Button type="dashed"><Icon type="exclamation-circle" /> Forgotten password </Button>
+                      <Button type="dashed" ><Icon type="user-add" /> Create an account </Button>
                     </div>
-                    <div style={{ float: 'right' }}>
-                      <Button
-                        type="dashed"
-                        onClick={this.initRegister}
-                        style={{ top: '8px' }}
-                      >
-                        <Icon type="user-add" /> Create an account
-                      </Button>
-                    </div>
+                  
                   </div>
                 )}
               </form>

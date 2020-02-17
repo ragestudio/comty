@@ -14,7 +14,7 @@ import Error from '../pages/404'
 import styles from './PrimaryLayout.less'
 
 const { Content } = Layout
-const { Header, Sider, Control } = MyLayout
+const { ChatSider, Sider, Control } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -161,6 +161,7 @@ class PrimaryLayout extends PureComponent {
                 </Content>
               
             </div>  
+            <ChatSider />
           </Layout>
         </Fragment>
       )

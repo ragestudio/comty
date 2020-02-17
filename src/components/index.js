@@ -9,8 +9,7 @@ import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
 import * as MyLayout from './Layout/index.js'
 import Page from './Page'
-import YulioID from './YulioID/experimental/index.js'
 import CoreLoader from './CoreLoader'
 import MicroHeader from './MicroHeader'
 
-export { UserProfile, MyLayout, Loader, Page, ScrollBar, YulioID, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}
+export { UserProfile, MyLayout, Loader, Page, ScrollBar, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}

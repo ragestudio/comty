@@ -2,7 +2,7 @@
   "name": "comty-development",
   "title": "Comty™",
   "DevBuild": true,
-  "version": "0.1.16",
+  "version": "0.1.17",
   "description": "",
   "main": "index.js",
   "author": "RageStudio",
@@ -63,8 +63,6 @@
     "validator": "^12.2.0"
   },
   "devDependencies": {
-    "rimraf": "^3.0.2",
-    "wait-on": "^4.0.0",
     "@lingui/babel-preset-react": "^2.9.1",
     "@lingui/cli": "^2.9.1",
     "@lingui/loader": "^2.9.1",
@@ -88,12 +86,15 @@
     "module": "^1.2.5",
     "now": "^17.0.3",
     "prettier": "^1.19.1",
+    "rimraf": "^3.0.2",
     "stylelint": "^13.1.0",
     "stylelint-config-prettier": "^8.0.1",
     "stylelint-config-standard": "^20.0.0",
     "typescript": "^3.7.5",
     "umi": "^2.13.3",
-    "umi-plugin-react": "^1.15.2"
+    "umi-plugin-react": "^1.15.2",
+    "wait-on": "^4.0.0",
+    "workbox-webpack-plugin": "^5.0.0"
   },
   "lingui": {
     "fallbackLocale": "en",

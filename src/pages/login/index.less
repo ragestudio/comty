@@ -1,0 +1,64 @@
+@import '~themes/vars.less';
+
+.backgroud{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 0;
+	top: 0;
+	left: 0;
+}
+.version{
+	display: inline;
+	z-index: 2;
+	font-family: "Poppins", sans-serif;
+	font-size: 11px;
+	bottom: 0;
+	position: absolute;
+	float: left;
+	margin: 0 0 5px 3%;
+	color:  #F9F9F9;
+	h2{
+		color:  #F9F9F9;
+	}
+}
+.loginLandingWrapper{
+	background-color: #F9F9F9;
+	width: 100%;
+	height: 100%;
+	font-family: "Nunito", sans-serif;
+	padding: 15px 30px 15px 35px;
+}
+.brand{
+	width: 100%;
+	top: 0;
+	float: left;
+    vertical-align: middle;
+    position: relative;
+    img{
+        max-width: 11vw;
+    }
+}
+.prest{
+	z-index: 2;
+	position: relative;
+	font-family: "Source Sans Pro", sans-serif;
+	padding: 25px;
+	margin: auto;
+	vertical-align: bottom;
+	img{
+		width: 100%;
+		max-height: 60vh;
+	}
+	.loginbtn{
+		margin: auto;
+		position: relative;
+		display: flex;
+		width: 100%;
+		:global{
+			.ant-btn {
+				margin: auto;
+			}
+		}
+	}
+}

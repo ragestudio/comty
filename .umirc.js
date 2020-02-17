@@ -20,6 +20,7 @@ export default {
           webpackChunkName: true,
           loadingComponent: './components/Loader/Loader',
         },
+       
         routes: {
           exclude: [
             /model\.(j|t)sx?$/,

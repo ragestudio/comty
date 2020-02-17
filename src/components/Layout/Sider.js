@@ -55,7 +55,7 @@ class Sider extends PureComponent {
 
   handleClickMenu = e => {
     e.key === 'SignOut' && ycore.LogoutCall()
-    e.key === 'settingpage' && router.push('/settings')
+    e.key === 'general_settings' && ycore.crouter.native('settings')
     e.key === 'accountpage' && router.push('/account')
   }
   isDarkMode(){
@@ -103,6 +103,10 @@ class Sider extends PureComponent {
             }}
           >
                 <antd.Menu selectable={false} className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
+                     <antd.Menu.Item key="explore">
+                        <antd.Icon style={{ fontSize: '15px' }} type="compass" />
+                        {collapsed ?  null : <Trans> Explore </Trans> }
+                      </antd.Menu.Item> 
                       {ycore.booleanFix(userData.is_pro)? 
                       <antd.Menu.Item key="boosted_pages">
                         <antd.Icon style={{ fontSize: '15px' }} type="thunderbolt" />
@@ -113,10 +117,6 @@ class Sider extends PureComponent {
                       <antd.Icon style={{ fontSize: '15px' }} type="star" />
                       {collapsed ?  null : <Trans> Upgrade to Pro </Trans>}
                     </antd.Menu.Item>}
-                      <antd.Menu.Item key="edit_profile">
-                        <antd.Icon style={{ fontSize: '15px' }} type="profile" />
-                        {collapsed ?  null : <Trans>Edit Profile</Trans>}
-                      </antd.Menu.Item>
                       <antd.Menu.Item key="general_settings">
                         <antd.Icon style={{ fontSize: '15px' }} type="setting" />
                         {collapsed ?  null : <Trans>General Settings</Trans>}

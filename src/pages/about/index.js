@@ -10,7 +10,6 @@ class AppAbout extends React.Component {
             <div className={styles.aboutWrapper}>
                 <img src={ycore.AppInfo.logo} />
                 <antd.Card >
-                    
                     <h1 className={styles.appName}> {ycore.AppInfo.name} </h1>
                     <antd.Tag color="geekblue">v{ycore.AppInfo.version}</antd.Tag>{ycore.DetectNoNStableBuild('TagComponent')}
                 </antd.Card>

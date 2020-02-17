@@ -2,6 +2,8 @@ import React, { Component, Fragment } from 'react';
 import { List, Icon, Switch, Button, notification } from 'antd';
 import { AppSettings } from '../../../../globals/settings.js'
 import { DevOptions, ControlBar } from 'ycore'
+import * as ycore from "ycore"
+import { CustomIcons } from 'components'
 
 class Base extends Component { 
   constructor(props){
@@ -20,6 +22,7 @@ class Base extends Component {
   SettingRender = data =>{
     try{
     return(
+      <div>
       <List
           itemLayout="horizontal"
           dataSource={data}
@@ -30,6 +33,8 @@ class Base extends Component {
                  </List.Item>
                )}
         />
+      <Button onClick={() => ycore.RegSW()} > Upload Service Worker </Button>
+      </div>
       )
     }
     catch (err){
@@ -72,7 +77,7 @@ class Base extends Component {
     return (
       <Fragment>
          <div>
-            <h1><Icon type="global" /> Behaviors</h1>
+            <h1><CustomIcons.RobotOutlined /> Behaviors</h1>
              {this.SettingRender(this.state.SettingRepo)}
          </div>
       </Fragment>
