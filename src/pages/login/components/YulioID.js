@@ -86,12 +86,10 @@ class YulioID extends Component {
           visible={visible}
           className={styles.loginWrapper}
         >
+          <div className={styles.preheader}><h6><img src={"http://api.ragestudio.net/id.svg"} /> YulioID&trade;</h6>
+          <h1>Login</h1></div>
           <main className={styles.mainlp}>
-            <section className={styles.forms}>
-              <div className={styles.logHeader}>
-                <h6><img src={"http://api.ragestudio.net/id.svg"} /> YulioID&trade;</h6>
-                <h1>Login</h1>
-              </div>
+      
               
 
               {/* <RenderInclude data={include} /> */}
@@ -106,7 +104,6 @@ class YulioID extends Component {
                           <h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }} > {StateMessage} </h6>
                           {StateException ? <div className={styles.retryBTN}><Button style={{ width: '270px' }} type='dashed' onClick={this.handleRetry}>Retry</Button></div> : null}
                         </div>
-                        
                       </div>
                     </div>
                   </div>
@@ -177,7 +174,7 @@ class YulioID extends Component {
                   </div>
                 )}
               </form>
-            </section>
+            
           </main>
         </Drawer>
       </div>

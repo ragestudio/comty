@@ -10,6 +10,7 @@
   "dependencies": {
     "@ant-design/pro-layout": "^4.10.13",
     "@lingui/react": "^2.9.1",
+    "@steveeeie/react-page-transition": "^1.1.2",
     "ant-design-pro": "^2.3.2",
     "antd": "^3.26.9",
     "autoprefixer": "9.7.4",

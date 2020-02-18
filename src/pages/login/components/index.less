@@ -2,14 +2,24 @@
   
   .loginWrapper{
 	:global{
+	  .ant-drawer-right.ant-drawer-open.no-mask {
+	  	right: 1px;
+	  	-ms-transform: translateX(1px);
+	  	transform: translateX(1px);
+	  	width: 100%;
+	  }
 	  .ant-drawer-right.ant-drawer-open .ant-drawer-content-wrapper{
+		width: 100%;
 		border-radius:  20px 0 0 20px;
 	  }
+	  .ant-drawer-body{
+		height: 100%;
+	  }
 	  .ant-drawer {
-		  box-shadow: none;
-		  border-radius:  20px 0 0 20px;
-		  max-width: 490px;
-		  min-width: 34%;
+		box-shadow: none;
+		border-radius: 20px 0 0 20px;
+		max-width: 512px;
+		width: 100%;
 	  }
 	  .ant-drawer-content{
 		  background: #ffffff9f;
@@ -31,8 +41,13 @@
   	margin: 13px;
   }
   .mainlp {
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	width: 100%;
 	word-break: keep-all;
-	margin: 3em 20px 0 20px;
+	
 	color: @foregroundColor;
 	text-align: left;
   }
@@ -315,11 +330,13 @@
 
   
   .formlogin {
+	width: 95%;
+	height: auto;
 	border-radius: 10px;
 	padding: 30px;
 	box-shadow: 0 3px 15px rgba(51, 51, 51, 0.2);
 	background: #ffffff44;
-	margin-top: 30px;
+	margin: 20px 10px 20px 10px;
 	position: relative;
 	overflow: hidden;
 	vertical-align: middle;
@@ -339,17 +356,16 @@
   }
   
 
- 
-  
-
-  .logHeader{
-
+ .preheader{
+	position: relative;
+	top: 0;
 	h1{
-		font: 700 48px/1.2 "Nunito", sans-serif;
+		font: 700 48px "Nunito", sans-serif;
 		text-align: center;
 		margin-bottom: 10px;
 	}
 	h6{
+		padding: 3em 0 0 0;
 		line-height: 1px;
 		display: flex;
 		font: 500 16px/1 "Poppins", sans-serif;
@@ -359,10 +375,31 @@
 			height: 17px;
 		}
 	}
-}
-
+ }
+  
 .moreActions{
 	display: flex;
+	margin: auto;
+	align-content: center;
+	position: relative;
+	width: 100%;
+	:global{
+		.ant-btn{
+			margin: auto;
+		}
+	}
 }
   
- 
+@media (max-width: 472px) {
+	.moreActions{
+		display: grid;
+		align-content: center;
+		position: relative;
+		width: 100%;
+		:global{
+			.ant-btn{
+				margin: 5px;
+			}
+		}
+	}
+  }
