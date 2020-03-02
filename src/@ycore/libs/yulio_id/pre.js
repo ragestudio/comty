@@ -138,18 +138,23 @@ export function GetAuth(EncUsername, EncPassword, callback) {
     };
     jquery.ajax(settings)
         .done(function (response) {
-            console.log(prefix, 'Server response... Dispathing data to login API...');
-            var identState = JSON.parse(response)['api_status'];
-            if (identState == 200) {
-              const UserID = JSON.parse(response)['user_id'];
-              const UserToken = JSON.parse(response)['access_token'];
-              let FramePayload = { UserID, UserToken }
-              ycore.DevOptions.ShowFunctionsLogs ? console.log(FramePayload) : null
-              callback(null, '200')
-              ycore.InitSDCP(FramePayload, (done) => done? __API__User(FramePayload) : null )
-            }
-            if (identState == 400) {
-              callback(null, '400')
+            console.log(prefix, 'Server response... Dispathing data to login API...', response);
+            try {
+                var identState = JSON.parse(response)['api_status'];
+                if (identState == 200) {
+                  const UserID = JSON.parse(response)['user_id'];
+                  const UserToken = JSON.parse(response)['access_token'];
+                  let FramePayload = { UserID, UserToken }
+                  ycore.DevOptions.ShowFunctionsLogs ? console.log(FramePayload) : null
+                  callback(null, '200')
+                  ycore.InitSDCP(FramePayload, (done) => done? __API__User(FramePayload) : null )
+                }
+                if (identState == 400) {
+                  callback(null, '400')
+                }
+            } catch (error) {
+                callback(true, '500')
+                ycore.notifyError('Server bad response')
             }
             return;
     })

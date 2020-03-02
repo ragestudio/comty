@@ -66,6 +66,12 @@ class YulioID extends Component {
     if (response == '400') {
       this.setState({ StateIcon: 'exclamation-circle', StateMessage: 'Invalid credentials', StateException: true })
     }
+    if (response == '404') {
+      this.setState({ StateIcon: 'exclamation-circle', StateMessage: 'Invalid Data', StateException: true })
+    }
+    if (response == '500') {
+      this.setState({ StateIcon: 'cluster', StateMessage: 'Server Error', StateException: true })
+    }
   }
   
 
