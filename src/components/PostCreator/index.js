@@ -6,6 +6,7 @@ import {CustomIcons} from 'components'
 import { RefreshFeed } from 'components/MainFeed'
 
 const { Meta } = antd.Card;
+const userData = ycore.SDCP();
 
 export function HandleVisibility(){
     window.PostCreatorComponent.ToogleVisibility();
@@ -16,13 +17,28 @@ class PostCreator extends React.PureComponent{
         super(props),
         window.PostCreatorComponent = this;
         this.state = {
-            visible: false,
+            visible: true,
             FadeIN: true,
             keys_remaining: '512',
             toolbox_open: false,
             rawtext: '',
             posting: false,
-            posting_ok: false
+            posting_ok: false,
+            shareWith: 'any',
+        }
+    }
+    ShareWithValue(e){
+        switch (e) {
+            case 'any':
+                return  <span><antd.Icon type="global" /> Share with everyone</span>
+            case 'only_follow':
+                return <span><antd.Icon type="team" /> Share with people I follow</span>
+            case 'only_followers':
+                return <span><antd.Icon type="usergroup-add" /> Share with people follow me</span> 
+            case 'private':
+                return <span><antd.Icon type="eye-invisible" /> Dont share, only me</span>
+            default:
+                return <span>Unknown</span>
         }
     }
     ToogleVisibility(){
@@ -80,7 +96,6 @@ class PostCreator extends React.PureComponent{
     PublishPost = (e) => {
         const { rawtext } = this.state;
         const { refreshPull, toggleShow } = this.props
-        
         if(!rawtext){
             return null
         }
@@ -89,7 +104,6 @@ class PostCreator extends React.PureComponent{
         formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
         formdata.append("server_key", ycore.yConfig.server_key);
         formdata.append("postText", rawtext);
-      
         const requestOptions = {
           method: 'POST',
           body: formdata,
@@ -101,7 +115,7 @@ class PostCreator extends React.PureComponent{
           .then(response => {
               ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
               this.setState({ posting_ok: true, posting: false, rawtext: ''})
-              setTimeout( () => { this.ToogleVisibility(),this.setState({ posting_ok: false }) }, 1000)
+              setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
               RefreshFeed()
              // console.warn(`[EXCEPTION] refreshPull or/and toogleShow is not set, the controller handlers not working...`)
               
@@ -112,25 +126,37 @@ class PostCreator extends React.PureComponent{
     render(){
         const { keys_remaining, visible } = this.state;
         const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
+        const changeShare = ({ key }) => {
+            this.setState({ shareWith: key })
+        }
+        const shareOptionsMenu = (
+            <antd.Menu onClick={changeShare}>
+              <antd.Menu.Item key="any">{this.ShareWithValue("any")}</antd.Menu.Item>
+              <antd.Menu.Item key="only_follow">{this.ShareWithValue("only_follow")}</antd.Menu.Item>
+              <antd.Menu.Item key="only_followers">{this.ShareWithValue("only_followers")}</antd.Menu.Item>
+              <antd.Menu.Item key="private">{this.ShareWithValue("private")}</antd.Menu.Item>
+            </antd.Menu>
+          )
         if (visible) {
         return(
           <div className={styles.cardWrapper}>
-             <antd.Card>
-                <Meta
-                    avatar={<div className={styles.titleIcon}><antd.Icon type="plus" /></div>}
-                    title={<div><h4 className={styles.titlecreate}>Create a post </h4></div>}
-                    description={<span className={styles.shareWith}>Share with everyone</span>}
-                    bordered="false"
-                />
+             <antd.Card bordered="false">
                 <div className={styles.inputWrapper}>
-                    <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.PublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} placeholder="What's going on?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={4} />
+                    <div className={styles.titleAvatar}><img src={userData.avatar} /></div>
+                    <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.PublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={4} />
                     <div><antd.Button disabled={this.state.posting? true : (keys_remaining < 512? false : true)} onClick={this.PublishPost} type="primary" icon={this.state.posting_ok? "check-circle" : (this.state.posting? "loading" : "export")} /></div>
                 </div>
                 <div className={styles.progressHandler}><antd.Progress strokeWidth="4px" className={this.state.posting? styles.proccessUnset : (keys_remaining < 512? styles.proccessSet : styles.proccessUnset)} status={this.handleKeysProgressBar()}  showInfo={false} percent={percent} /></div>
+                
                 <div className={styles.postExtra} > 
-                    <antd.Button icon="upload" type="ghost"> Upload File </antd.Button>
-                    <antd.Button onClick={this.handleToggleToolbox} icon="container" type="ghost"> Toolbox </antd.Button>
-                    <antd.Button icon="setting" type="ghost"> Settings </antd.Button>
+                    <antd.Button type="ghost"> <antd.Icon type="camera" theme="filled" /></antd.Button>
+                    <antd.Button type="ghost"> <antd.Icon type="video-camera" theme="filled" /></antd.Button>
+                    <antd.Button onClick={this.handleToggleToolbox} type="ghost"><antd.Icon type="plus" /></antd.Button>
+                    <antd.Dropdown overlay={shareOptionsMenu}>
+                        <a className={styles.shareWith} onClick={e => e.preventDefault()}>
+                        {this.ShareWithValue(this.state.shareWith)}
+                        </a>
+                    </antd.Dropdown>
                 </div>
              </antd.Card>
                 <antd.Drawer

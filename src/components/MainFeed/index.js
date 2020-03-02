@@ -48,6 +48,7 @@ class MainFeed extends React.Component {
                 feedParsed.map(item=> {
                     const {id, postText, post_time, publisher, postFile, postFileName, is_liked, is_post_saved, is_post_reported, is_post_boosted, is_post_pinned, post_likes} = item
                     const paylodd = {
+                      id: id,
                       user: publisher.username, 
                       ago: post_time, 
                       avatar: publisher.avatar, 

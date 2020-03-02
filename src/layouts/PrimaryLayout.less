@@ -29,115 +29,119 @@
     transition: all 0.2s ease;
   }
 }
-.container_light {
+
+.layout{
   background-color: @Theme-Layout-Backgroud; //#E2E6E9;
   transition: background-color 200ms linear;
-}
-// TODO: Complete full dark theme
-.container_dark {
-  background-color: @DarkMode-backgroud_container;
-  color: @DarkMode-color_container;
-  transition: background-color 200ms linear;
-  :global {
-    h1{
-      color: @DarkMode-color_container;
-    }
-    h2{
-      color: @DarkMode-color_container;
-    }
-    h3{
-      color: @DarkMode-color_container;
-    }
-    h4{
-      color: @DarkMode-color_container;
-    }
-    h5{
-      color: @DarkMode-color_container;
-    }
-    h6{
-      color: @DarkMode-color_container;
-    }
-    p{
-      color: @DarkMode-color_container;
-    }
-    span{
-      color: @DarkMode-color_container;
-    }
-    pre{
-      color: @DarkMode-color_container;
-    }
-    .ant-pro-page-header-wrap-page-header-warp {
-      color: @DarkMode-color_container;
-      background-color: @DarkMode-backgroud_container;
+  &.md_radius{
+    width: 95%;
+    margin: auto;
+    position: relative;
+    border-radius: 15px;
+  }
+  &.md_dark{
+    background-color: @DarkMode-backgroud_container;
+    color: @DarkMode-color_container;
+    transition: background-color 200ms linear;
+    :global {
+      h1{
+        color: @DarkMode-color_container;
+      }
+      h2{
+        color: @DarkMode-color_container;
+      }
+      h3{
+        color: @DarkMode-color_container;
+      }
+      h4{
+        color: @DarkMode-color_container;
+      }
+      h5{
+        color: @DarkMode-color_container;
+      }
+      h6{
+        color: @DarkMode-color_container;
+      }
+      p{
+        color: @DarkMode-color_container;
+      }
+      span{
+        color: @DarkMode-color_container;
+      }
+      pre{
+        color: @DarkMode-color_container;
+      }
+      .ant-pro-page-header-wrap-page-header-warp {
+        color: @DarkMode-color_container;
+        background-color: @DarkMode-backgroud_container;
+        transition: background-color 200ms linear;
+      }
+      .ant-card{
+        background-color: @DarkMode-backgroud;
+      }
+      .ant-input {
+        color: @DarkMode-color_container;
+        background-color: @DarkMode-backgroud;
+      }
+      .ant-btn-primary[disabled]{
+        color: @DarkMode-color_container;
+        background-color: @DarkMode-backgroud;
+      }
       transition: background-color 200ms linear;
     }
-    .ant-card{
-      background-color: @DarkMode-backgroud;
-    }
-    .ant-input {
-      color: @DarkMode-color_container;
-      background-color: @DarkMode-backgroud;
-    }
-    .ant-btn-primary[disabled]{
-      color: @DarkMode-color_container;
-      background-color: @DarkMode-backgroud;
-    }
-    transition: background-color 200ms linear;
   }
 }
 
-.sider {
-  :global {
-    .ant-layout-sider{
-      background: #2d2d2d;
-    }
-    .ant-layout-sider-dark {
-      background-color: #2d2d2d;
-      color: white;
-    }
-    .ant-menu-dark {
-      background-color: #2d2d2d;
-      color: white;
-    }
-    .ant-layout-sider-dark .ant-layout-sider-children {
-      background-color: #2d2d2d;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .ant-layout-sider-children {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-  }
-}
-.container{
-  width: 100vh;
-  flex: 1;
-  overflow-x: hidden;
-  height: 100vh;
-  bottom: 0;
-}
 .BarControlWrapper{
   width: 100%;
   position: absolute;
   bottom: 0;
   z-index: 30;
 }
+
+.leftContainer{
+  align-self: center;
+  width: 100vw;
+  position: relative;
+  float: left;
+  overflow-x: hidden;
+  height: 100vh;
+  bottom: 0;
+ :global{
+  .iXUMqo{
+    overflow-y: scroll;
+  }
+ }
+}
+
+.rightContainer{
+  background-color:#201F23;
+  border-radius: 32px 0 0 32px;
+  padding: 15px 15px 15px 15px;
+  width: 27%;
+  height: 100vh;
+  position: relative;
+  float: left;
+  overflow-y: hidden !important;
+  overflow-x: hidden;
+  color: @DarkMode-color_container !important;
+  :global{
+    h1{
+       color: @DarkMode-color_container;
+    }
+    .iXUMqo{
+       color: @DarkMode-color_container !important;
+       overflow-y: hidden;
+    }
+  }
+}
+
 @media (max-width: 767px) {
   .content {
     padding: 12px;
   }
-
-  .container_light {
+  .layout {
     height: 100vh;
     flex: 1;
-    
-  }
-  .container_dark {
-    height: 100vh;
-    flex: 1;
-   
   }
 }

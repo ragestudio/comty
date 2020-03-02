@@ -10,6 +10,14 @@
   font-family: "Poppins", sans-serif;
   padding: 0 10px 0 0;
   float: right;
+  display: flex;
+  h1{
+    line-height: 1.2;
+    margin-right: 5px;
+  }
+  svg{
+    font-size: 20px;
+  }
 }
 
 
@@ -189,18 +197,18 @@
     opacity: 1;
   }
 }
-
-.themeSwitcher {
-  :global {
-    .ant-switch-checked {
-      background-color: #2F2E30;
-    }
-  }
-  svg {
-    height: 100%;
-    vertical-align: middle;
-  }
-  span {
-    line-height: 10px;
-  }
+.search{
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  visibility: bottom;
 }
+
+
+.chatbox{
+	width:100%;
+	background: transparent;
+	border-radius:6px;
+	height:100%;
+}
+

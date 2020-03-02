@@ -4,36 +4,41 @@ import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
-import { MyLayout, MicroHeader } from 'components'
+import { MyLayout, MicroHeader, HeaderSearch } from 'components'
 import classnames from 'classnames'
+import * as ycore from 'ycore'
 import { Layout, Drawer, Result, Button, Checkbox } from 'antd'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import { config, pathMatchRegexp, langFromPath } from 'utils'
 import store from 'store';
 import Error from '../pages/404'
 import styles from './PrimaryLayout.less'
+import { PageTransition } from '@steveeeie/react-page-transition';
 
 const { Content } = Layout
 const { ChatSider, Sider, Control } = MyLayout
+
+
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
 class PrimaryLayout extends PureComponent {
   constructor(props){
     super(props)
+    window.PrimaryComponent = this;
     this.state = {
-      collapsed: store.get('collapsed') || false,
+      collapsed: ycore.DevOptions.default_collapse_sider,
       isMobile: false,
       resbypass:  store.get('resbypass') || false,
       RemByPass: false,
       BarControls: [],
+      ContentSecondLayer: null,
     }
     this.ResByPassHandler = this.ResByPassHandler.bind(this);
   }
   setControls(e){
     this.setState({BarControls: e})
   }
-
   componentDidMount() {
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
@@ -48,8 +53,12 @@ class PrimaryLayout extends PureComponent {
     unenquireScreen(this.enquireHandler)
   }
   onCollapseChange = () => {
+    const fromStore = store.get('collapsed')
+
     this.setState({ collapsed: !this.state.collapsed })
-    store.set('collapsed', this.state.collapsed)
+    store.set('collapsed',  !fromStore)
+    
+    
   }
   ResByPassHandler() {
     const {RemByPass} = this.state;
@@ -73,7 +82,7 @@ class PrimaryLayout extends PureComponent {
   render() {
     const { app, location, dispatch, children } = this.props
     const { theme, routeList, notifications } = app
-    const { isMobile, resbypass, collapsed ,rememberbypass } = this.state
+    const { isMobile, resbypass, collapsed, rememberbypass, searchidden } = this.state
     const { onCollapseChange } = this
     // Localized route name.
     const lang = langFromPath(location.pathname)
@@ -127,9 +136,10 @@ class PrimaryLayout extends PureComponent {
         })
       },
     }
+    const currentPathname = location.pathname
     const ContainerProps = {
       theme,
-      location,
+      currentPathname,
       collapsed,
     }
     const MobileWarning = () =>{
@@ -151,17 +161,27 @@ class PrimaryLayout extends PureComponent {
         <Fragment>
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
-          <Layout className={this.isDarkMode()? styles.container_dark : styles.container_light}>
+          <Layout className={classnames( styles.layout, {[styles.md_dark]: this.isDarkMode() })}>
            <Sider {...SiderProps}/>
-           <MicroHeader />
-            <div id="primaryLayout"className={styles.container}>
-            
-                <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
-                    {children}
-                </Content>
-              
+
+            <div id="primaryLayout" className={styles.leftContainer}>
+                <PageTransition preset="moveToLeftFromRight" transitionKey={location.pathname}>
+                   
+                    <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
+                        <HeaderSearch />
+                        {children}
+                    </Content>
+                </PageTransition>
             </div>  
-            <ChatSider />
+
+            <div id="secondaryLayout" className={styles.rightContainer}>
+                <PageTransition preset="moveToLeftFromRight" transitionKey={location.pathname}>
+                 <Fragment>
+                    {this.state.ContentSecondLayer}
+                 </Fragment>
+                </PageTransition>
+            </div>
+
           </Layout>
         </Fragment>
       )

@@ -7,14 +7,11 @@
     box-sizing: border-box;
   }
   
-  :root {
+  .like_button {
     --color-heart: #EA442B;
     --easing: cubic-bezier(.7,0,.3,1);
     --duration: .5s;
-  }
-  
-  
-  .like_button {
+
     font-size: 40px;
     border: none;
     border-radius: 50%;
@@ -52,15 +49,8 @@
       z-index: -1;
     }
     
-    &:active {
-      &:before {
-        animation: depress-shadow var(--duration) var(--easing) both;
-      }
-    }
-    
-    &:focus:after {
-      animation: depress var(--duration) var(--easing) both;
-    }
+   
+   
     
     @keyframes depress {
       from, to {
@@ -96,86 +86,38 @@
     width: .5em;
     height: .5em;
     display: block;
-   
+    transform-origin:  center 80%;
+
     > path {
       stroke: var(--color-heart);
       stroke-width: 2;
-      fill: transparent;
       transition: fill var(--duration) var(--easing);
-     
-      .like_button:focus & {
-        fill: var(--color-heart); 
+      fill: var(--color-heart);
+    }
+  
+    &.empty{
+      > path {
+        stroke: var(--color-heart);
+        stroke-width: 2;
+        transition: fill var(--duration) var(--easing);
+        fill: transparent;
       }
     }
-    
-    transform-origin:  center 80%;
-    &.activated{
-        animation: heart-bounce var(--duration) var(--easing);
-        @keyframes heart-bounce {
-          40% { transform: scale(0.7); }
-          0%, 80%, 100% { transform: scale(1); }
-        }
-    }
-    .like_button:focus & {
+
+    &.clickanim{
       animation: heart-bounce var(--duration) var(--easing);
       @keyframes heart-bounce {
         40% { transform: scale(0.7); }
         0%, 80%, 100% { transform: scale(1); }
       }
     }
-  }
-  
-  /* Added wrapper to prevent layout jank with resizing particles */
-  .particles {
+
+    animation: none;
+   
     
-    width: 100%;
-    height: 100%;
-  }
-  
-  .particle {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: .1em;
-    width: .1em;
-    border-radius: .05em;
-    background-color: var(--color);
-    --percentage: calc( var(--i) / var(--total-particles) );
-    --Θ: calc( var(--percentage) * 1turn );
-    transform: translate(-50%, -50%) rotate( var(--Θ) ) translateY(0) scaleY(0);
-    transition: all var(--duration) var(--easing);
     
-    .like_button:focus & {
-      animation: particles-out calc(var(--duration) * 1.2) var(--easing) forwards;
-      
-      @keyframes particles-out {
-        50% {
-          height: .3em;
-        }
-        50%, 60% {
-          height: .3em;
-          transform:
-            translate(-50%, -50%) 
-            rotate( var(--Θ) )
-            translateY(.8em)
-            scale(1)
-            ;
-        }
-        60% {
-          height: .2em;
-        }
-        100% { 
-          transform:
-            translate(-50%, -50%) 
-            rotate( var(--Θ) )
-            translateY(1em)
-            scale(0)
-            ;
-        }
-      }
-    }
   }
-  
+
   .ripple {
     height: 1em;
     width: 1em;
@@ -194,8 +136,7 @@
       border-radius: inherit;
       transform: scale(0);
     }
-    
-    .like_button:focus & {
+    &.clickanim{
       &:before {
         animation: ripple-out var(--duration) var(--easing);
         @keyframes ripple-out {
@@ -204,11 +145,7 @@
         }
       }
     }
+    
   }
-  
 
-  /* Reset the animation when clicking again! */
-  .like_button:focus {
-    pointer-events: none;
-    cursor: normal;
-  }
+  

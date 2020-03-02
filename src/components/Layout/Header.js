@@ -1,6 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
 import { Menu, Icon, Layout, Avatar, Popover, Badge, List, Switch, Tooltip, Dropdown, Button } from 'antd'
-import HeaderSearch from './local_components/HeaderSearch/index.js'
 import { Trans, withI18n } from '@lingui/react'
 import { Ellipsis } from 'ant-design-pro'
 import classnames from 'classnames'

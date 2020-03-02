@@ -10,7 +10,12 @@ export var DevOptions = {
     // Activating this, the logs must be trowed
     ShowFunctionsLogs: ReturnDevOption('force_showDevLogs'),
     StrictLightMode: ReturnDevOption('strict_lightMode'),
-    SignForNotExpire: ReturnDevOption('force_showDevLogs'),
+    SignForNotExpire: ReturnDevOption('sessions_noexpire'),
+    auto_search_ontype: ReturnDevOption('auto_search_ontype'),
+    auto_feedrefresh: ReturnDevOption('auto_feedrefresh'),
+    default_showpostcreator: ReturnDevOption('default_showpostcreator'),
+    default_collapse_sider: ReturnDevOption('default_collapse_sider'),
+    use_dev_server: ReturnDevOption('use_dev_server'),
     MaxJWTexpire: '1556952',
     MaxLengthPosts: '512',
     CurrentBundle: 'light_ng'

@@ -100,8 +100,8 @@ class YulioID extends Component {
                     <div className={styles.spinner__wrapper} id="loadingspn">
                       {StateIcon ? (<Icon type={StateIcon} className={StateException? styles.StateIcon_exception : styles.StateIcon} /> ) : (<Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin />)}
                       <div><br/><br/><br/>
-                        <div style={{ margin: 'auto' }}>
-                          <h6 className={styles.h6lp} style={{ textAlign: 'center', marginTop: '15%' }} > {StateMessage} </h6>
+                        <div className={styles.resultbox}>
+                          <h6 > {StateMessage} </h6>
                           {StateException ? <div className={styles.retryBTN}><Button style={{ width: '270px' }} type='dashed' onClick={this.handleRetry}>Retry</Button></div> : null}
                         </div>
                       </div>
@@ -130,7 +130,6 @@ class YulioID extends Component {
                         )}
                       </FormItem>
                     </div>
-
                     <div className={styles.input__wrapper}>
                       <label className={styles.labelform}>
                         <Icon type="unlock" style={{ fontSize: '15px' }} />{' '}
@@ -151,7 +150,6 @@ class YulioID extends Component {
                         )}
                       </FormItem>
                     </div>
-
                     <div style={{ margin: 'auto' }}>
                       <a className={styles.buttonlp} id="login" onClick={this.handleLogin}>
                         Login
@@ -167,7 +165,7 @@ class YulioID extends Component {
                       Or
                     </h2>
                     <div className={styles.moreActions}>
-                      <Button type="dashed"><Icon type="exclamation-circle" /> Forgotten password </Button>
+                      <Button type="dashed"><Icon type="question-circle" /> Forgotten password </Button>
                       <Button type="dashed" ><Icon type="user-add" /> Create an account </Button>
                     </div>
                   

@@ -1,6 +1,4 @@
 import * as ycore from 'ycore'
-import localforage from 'localforage'
-
 
 export const asyncSDCP = {
     setSDCP: function (value) {

@@ -1,0 +1,29 @@
+@import '~themes/vars.less';
+
+.HeaderSearchWrapper{
+  z-index: 20;
+  top: 0;
+  display: flex;
+  margin: auto;
+  width: 100%;
+  &.hidden{
+    display: none;
+  }
+}
+
+.headerSearch {
+  margin: auto;
+  :global{
+    .ant-input-prefix{
+      color: #9D9DA7;
+    }
+    .ant-input{
+      border-radius: 12px;
+      color: #9D9DA7;
+      background-color: #FFFFFF;
+      border-color: transparent;
+      height: 50px;
+      width: 510px;
+    }
+  }
+}

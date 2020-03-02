@@ -6,6 +6,10 @@ import keys from '../../../../config/keys.js';
 var jquery = require("jquery");
 var jwt = require("jsonwebtoken")
 
+function __ServerAlive(a, callback){
+    
+}
+
 function __API__User (payload){
     var ExpireTime =  ycore.DevOptions.MaxJWTexpire
     const now = new Date()
@@ -105,8 +109,8 @@ export function LogoutCall(){
             console.log("Successful logout with YulioID™", response, urlOBJ)
         }
         // Runtime after dispatch API
-        sessionStorage.clear() 
         Cookies.remove('token')
+        Cookies.remove('SDCP')
         ycore.router.push({pathname: '/login',})
     })
 }

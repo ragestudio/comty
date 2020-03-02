@@ -48,7 +48,32 @@ export function SeachKeywords(key, callback){
         return callback(exception, response);
     })
 }
-
+export function ActionPost(type, id, value, callback){
+  var formdata = new FormData();
+  formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("action", type);
+  formdata.append("post_id", id);
+  if (value) {
+    formdata.append("text", value)
+  }
+  const urlOBJ = `${ycore.endpoints.action_post}${ycore.GetUserToken.decrypted().UserToken}`
+  const settings = {
+      "url":  urlOBJ,
+      "method": "POST",
+      "timeout": 3000,
+      "processData": false,
+      "mimeType": "multipart/form-data",
+      "contentType": false,
+      "data": formdata
+  };
+  jquery.ajax(settings)
+  .done(function (response) {
+      return callback(null, response);
+  })
+  .fail(function (response) {
+      return callback(true, `[Server error] We couldnt ${type} this post`);
+  })
+}
 export function GetPosts(userid, type, callback) {
   let formdata = new FormData();
   formdata.append("server_key", ycore.yConfig.server_key);

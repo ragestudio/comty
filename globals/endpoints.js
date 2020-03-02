@@ -1,5 +1,6 @@
 module.exports = {
     Endpoints: {
+        action_post: "https://api.ragestudio.net/RS-YIBTP/yid/post-actions?access_token=",
         get_posts: "https://api.ragestudio.net/RS-YIBTP/yid/posts?access_token=",
         find_user: "https://api.ragestudio.net/RS-YIBTP/yid/find_user?access_token=",
         search_endpoint: "https://api.ragestudio.net/RS-YIBTP/yid/search?access_token=",

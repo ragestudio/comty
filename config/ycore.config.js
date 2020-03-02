@@ -1,4 +1,5 @@
 module.exports = {
+    server_endpoint: 'https://comty.julioworld.club',
     siteName: 'Comty',
     copyright: 'RageStudio©',
 

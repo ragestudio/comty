@@ -9,11 +9,10 @@ import * as sw from '../../service-worker.js'
 
 export * from "./libs.js"
 export * from "../../config/app.settings.js"
+
 export var { router } = require("utils")
 export var endpoints = Endpoints;
 export var yConfig = config.yConfig;
-
-
 
 var package_json = require("../../package.json");
 export const AppInfo = {
@@ -25,6 +24,20 @@ export const AppInfo = {
 export function RegSW(){
     console.log('Registering Service Worker...')
     sw.register()
+}
+
+export function StorageValued(e){
+    try {
+      const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
+      const Ite = fromStorage.map(item => {
+        return item.SettingID === e? item.value : null
+      })
+      const fr = Ite.filter(Boolean)
+      return fr.toString()
+    } 
+    catch (error) {
+      return null
+    }
 }
 
 export function ReturnDevOption(e){

@@ -46,7 +46,6 @@ class GeneralSettings extends React.Component {
       default:
         break;
     }
-
     return null;
   };
 

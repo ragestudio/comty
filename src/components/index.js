@@ -1,5 +1,7 @@
 import CustomIcons from './CustomIcons'
 import MainFeed from './MainFeed'
+import YulioID from './YulioID'
+import UserCard from './UserCard'
 import LikeBTN from './LikeBtn'
 import UserProfile from './UserProfile'
 import MainSidebar from './MainSidebar'
@@ -11,5 +13,6 @@ import * as MyLayout from './Layout/index.js'
 import Page from './Page'
 import CoreLoader from './CoreLoader'
 import MicroHeader from './MicroHeader'
+import HeaderSearch from './HeaderSearch'
 
-export { UserProfile, MyLayout, Loader, Page, ScrollBar, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}
+export { UserCard, HeaderSearch, YulioID, UserProfile, MyLayout, Loader, Page, ScrollBar, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}

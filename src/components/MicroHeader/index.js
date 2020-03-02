@@ -27,7 +27,9 @@ class MicroHeader extends React.Component {
             Show? (
                 <div>
                     <antd.Card bordered={false} className={styles.MicroHeader}> 
+                         <antd.Button icon="notification" />
                          <antd.Button icon="plus" onClick={() => HandleVisibility()} />
+                         <antd.Button icon="filter" /> 
                     </antd.Card>
               
                 </div>

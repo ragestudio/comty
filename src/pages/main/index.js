@@ -7,23 +7,21 @@ import { RefreshFeed } from 'components/MainFeed'
 import { HandleVisibility } from 'components/PostCreator'
 import { HandleShow } from 'components/MicroHeader'
 
-var userData = ycore.SDCP()
+const userData = ycore.SDCP()
 
 class Main extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            loading: true,
-            createPost: true,
         }
     }
+ 
     render(){
         return (
-            <div> 
-                <div><antd.Card className={styles.FeedTools} bordered="false" > Kintxy xikito </antd.Card></div>
-                <div><PostCreator /></div>
-                <div><MainFeed get="feed" /></div>
-            </div>
+           <div className={styles.mainWrapper}>
+                    <PostCreator />
+                    <MainFeed get="feed" />
+           </div>
         )
     }
 }

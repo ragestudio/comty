@@ -1,12 +1,25 @@
 @import '~themes/vars.less';
 .cardWrapper{
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    // box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     border-radius: 7px;
     max-width: 510px;
     min-width: 265px;
     width: auto;
-    margin: 23px auto 50px auto;
+    margin: 7px auto 50px auto;
     :global{
+        textarea{
+            font-weight: 500;
+            resize: none;
+        }
+        textarea:focus {
+            outline: none !important;
+            border: 0 !important;
+        }
+        textarea:hover {
+            outline: none !important;
+            border: 0 !important;
+        }
+    
         .ant-card-meta-detail > div:not(:last-child){
             margin: 0
         }
@@ -16,7 +29,7 @@
             border-top: 1px solid #4646460c;
         }
         .ant-card-body {
-           padding: 13px 0 5px 0;
+           padding: 5px 15px 5px 15px;
         }
         .ant-card-actions {
             border-top: 0;
@@ -52,89 +65,18 @@
         }
     }
 }
-.titleIcon{
-    background-color: rgba(134, 134, 134, 0.171);
-    border-radius: 24px;
+
+.titleAvatar{
     width: 45px;
     height: 45px;
-   
-    position: absolute;
-    left: -8px;
-    top: -8px;
     display: flex;
     :global{
-        .anticon{
-            width: 100%;
-            height: 100%;
-            line-height: unset;
-            font-size: 35px;
-            vertical-align: middle;
-            text-align: center;
+        img{
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
         }
     }
-}
-.titlecreate{
-    display: flex;
-    font-family: 'Poppins', sans-serif;
-    margin: 0 0 0 50px;
-}
-.shareWith{
-    display: flex;
-    font-size: 10px;
-    margin: 0 0 0 53px;
-}
-.postContent{
-    display: flex;
-    border-radius: 3px;
-    margin: 23px 24px 23px 24px;
-    h3{
-        color: rgb(85, 85, 85);
-        font-weight: 470;
-    }
-}
-.postContentFILE{
-    display: flex;
-    margin: 23px 0 5px 0;
-    max-height: 600px;
-    overflow: hidden;
-    img {
-        width: calc(100% + 30px);
-        overflow: hidden;
-        margin: auto;
-    }
-    video {
-        max-height: 600px;
-        width: calc(100% + 30px);
-        overflow: hidden;
-    }
-    h3{
-        color: rgb(85, 85, 85);
-        font-weight: 470;
-    }
-}
-.likebtn{
-   :global{
-       svg{
-        color:rgba(0, 0, 0, 0.45);
-       }
-       svg:hover{
-           color: rgb(233, 35, 68);
-           transition: all 0.2s linear;
-       }
-   }
-}
-
-.ellipsisIcon{
-    width: 100%;
-    position: absolute;
-    text-align: center;
-    margin: auto;
-    font-size: 30px;
-    transition: opacity 150ms linear;
-}
-.ellipsisIcon:hover{
-    opacity: 0;
-    transition: opacity 150ms linear;
 }
 
 .inputWrapper{
@@ -152,16 +94,14 @@
             box-shadow: none;
         }
         .ant-input {
-            border-color: #1890ff;
+            border-color: transparent !important;
             box-shadow: none;
             border-radius: 3px 0 0 0;
             height: 100%;
             padding: 5px 10px 5px 10px;
             transition: height 150ms linear;
             width: 100%;
-            textarea{
-                resize: none; 
-            }
+            
         }
         .ant-input:hover{
             border-color: #1890ff;
@@ -171,9 +111,9 @@
         }
     }
 }
+
 .progressHandler{
     margin: 0 7px 0 7px;
-  
     :global{
         .ant-progress-bg{
             border-radius: 0 0 10px 10px;
@@ -185,24 +125,45 @@
         }
     }
 }
+
 .postExtra{
     width: 100%;
-    
-    display: flex;
+    height: 100%;
+    position: relative;
+    margin: 0 0 40px 0;
+    .shareWith{
+        color: rgb(53, 53, 53);
+        float: right;
+        font-size: 11px;
+        line-height: 30px;
+    }
     :global{
-        .ant-btn{
-            margin: auto;
-            
+        .ant-btn .anticon {
+            transition: margin-left 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            margin: 8px;
         }
+        .ant-btn{
+            float: left;
+            padding: 0;
+            border-radius: 11px;
+            margin: 0 10px;
+            background-color: #eeeeee;
+            border-color: transparent;
+        }
+        .ant-btn:hover{
+            border-color: rgb(53, 53, 53);
+            color: rgb(53, 53, 53);
+        }
+       
     }
 }
-
 
 .proccessUnset{
     opacity: 0;
     transition: opacity 250ms linear;
     animation: proccessUnset 250ms linear;
 }
+
 .proccessSet{
     transition: opacity 250ms linear;
     animation: proccessSet 250ms linear;

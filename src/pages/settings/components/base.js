@@ -58,6 +58,7 @@ class Base extends Component {
        message: 'Settings saved',
        description:'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
     })
+    setTimeout((ycore.RefreshONCE()), 1000)
     ControlBar.close()
   }
   onChange(item) {

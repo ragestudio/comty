@@ -83,12 +83,11 @@ class Sider extends PureComponent {
         breakpoint="lg"
         trigger={null}
         collapsible
-        defaultCollapsed="false"
-        onBreakpoint={isMobile ? null : onCollapseChange}
+        defaultCollapsed="true"
         collapsedWidth={this.Balancer()? "35" : "90"}
         theme={this.StrictMode()}
         width="180"
-        collapsed={collapsed || false}
+        collapsed={collapsed}
         className={classnames(styles.sider, {[styles.darkmd]: this.isDarkMode()} )}
         onMouseEnter={this.hover} 
         onMouseLeave={this.hover}
@@ -96,35 +95,30 @@ class Sider extends PureComponent {
         <div className={styles.brand}><img onClick={() => ycore.crouter.native('main')} src={collapsed? config.LogoPath  : config.FullLogoPath } /></div>
         <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? (this.Balancer()? "right" : "double-right") : (this.Balancer()? "left" : "double-left") } /></div> 
         <div className={styles.menuContainer}>
-          <ScrollBar
-            options={{
-              // Disabled horizontal scrolling, https://github.com/utatti/perfect-scrollbar#options
-              suppressScrollX: true,
-            }}
-          >
-                <antd.Menu selectable={false} className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
-                     <antd.Menu.Item key="explore">
-                        <antd.Icon style={{ fontSize: '15px' }} type="compass" />
-                        {collapsed ?  null : <Trans> Explore </Trans> }
+          <ScrollBar options={{  suppressScrollX: true,  }} >
+                <antd.Menu className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
+                     <antd.Menu.Item icon="compass" key="explore">
+                        <antd.Icon type="compass" />
+                         <Trans><span>Explore</span></Trans> 
                       </antd.Menu.Item> 
                       {ycore.booleanFix(userData.is_pro)? 
                       <antd.Menu.Item key="boosted_pages">
-                        <antd.Icon style={{ fontSize: '15px' }} type="thunderbolt" />
-                        {collapsed ?  null : <Trans> Boosted Posts </Trans> }
+                        <antd.Icon type="thunderbolt" />
+                       <Trans><span>Boost</span></Trans> 
                       </antd.Menu.Item> 
                       : 
                     <antd.Menu.Item key="upgrade_pro">
-                      <antd.Icon style={{ fontSize: '15px' }} type="star" />
-                      {collapsed ?  null : <Trans> Upgrade to Pro </Trans>}
+                      <antd.Icon type="star" />
+                      <Trans><span>PRO</span></Trans>
                     </antd.Menu.Item>}
                       <antd.Menu.Item key="general_settings">
-                        <antd.Icon style={{ fontSize: '15px' }} type="setting" />
-                        {collapsed ?  null : <Trans>General Settings</Trans>}
+                        <antd.Icon type="setting" />
+                        <Trans><span>Settings</span></Trans>
                       </antd.Menu.Item>
                       {ycore.booleanFix(userData.admin)? 
                         <antd.Menu.Item key="admin_area">
-                          <antd.Icon style={{ fontSize: '15px' }} type="tool" />
-                          {collapsed ?  null : <Trans>Admin Area</Trans>}
+                          <antd.Icon type="tool" />
+                          <Trans><span>Admin Area</span></Trans>
                         </antd.Menu.Item> 
                             : 
                         undefined
