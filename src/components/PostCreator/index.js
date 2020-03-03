@@ -10,6 +10,21 @@ import Icon from '@ant-design/icons'
 const { Meta } = antd.Card;
 const userData = ycore.SDCP();
 
+
+const fileList = [];
+
+  
+const UploadProps = {
+  name:'file',
+  action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+  multiple: true,
+  listType: 'picture',
+  defaultFileList: [...fileList],
+  className: 'upload-list-inline',
+};
+
+
+
 export function HandleVisibility(){
     window.PostCreatorComponent.ToogleVisibility();
     return
@@ -29,20 +44,7 @@ class PostCreator extends React.PureComponent{
             shareWith: 'any',
         }
     }
-    ShareWithValue(e){
-        switch (e) {
-            case 'any':
-                return  <span><Icons.GlobalOutlined /> Share with everyone</span>
-            case 'only_follow':
-                return <span><Icons.TeamOutlined /> Share with people I follow</span>
-            case 'only_followers':
-                return <span><Icons.UsergroupAddOutlined /> Share with people follow me</span> 
-            case 'private':
-                return <span><Icons.EyeInvisibleOutlined /> Dont share, only me</span>
-            default:
-                return <span>Unknown</span>
-        }
-    }
+   
     ToogleVisibility(){
         this.setState({ visible: !this.state.visible })
     }
@@ -95,34 +97,21 @@ class PostCreator extends React.PureComponent{
     handleToggleToolbox = () =>{
         this.setState({ toolbox_open: !this.state.toolbox_open })
     }
-    PublishPost = (e) => {
-        const { rawtext } = this.state;
-        const { refreshPull, toggleShow } = this.props
+    HandlePublishPost = (e) => {
+        const { rawtext, shareWith, postFile} = this.state;
         if(!rawtext){
             return null
         }
         this.setState({ posting: true, keys_remaining: '512' })
-        let formdata = new FormData();
-        formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
-        formdata.append("server_key", ycore.yConfig.server_key);
-        formdata.append("postText", rawtext);
-        const requestOptions = {
-          method: 'POST',
-          body: formdata,
-          redirect: 'follow'
-        };  
-        ycore.DevOptions.ShowFunctionsLogs? console.log(`Sending new post => ${rawtext} `) : null
-        const urlObj = `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`
-        fetch(urlObj, requestOptions)
-          .then(response => {
-              ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
-              this.setState({ posting_ok: true, posting: false, rawtext: ''})
-              setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
-              RefreshFeed()
-             // console.warn(`[EXCEPTION] refreshPull or/and toogleShow is not set, the controller handlers not working...`)
-              
-            })
-          .catch(error => console.log('error', error));
+        ycore.PublishPost(ycore.GetPostPrivacy.bool(shareWith), rawtext, postFile, (err, res) => {
+           if (err) {
+               ycore.notifyError(err)
+               return
+           }
+           this.setState({ posting_ok: true, posting: false, rawtext: ''})
+           setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
+           RefreshFeed()
+        })
     }
    
     render(){
@@ -133,10 +122,10 @@ class PostCreator extends React.PureComponent{
         }
         const shareOptionsMenu = (
             <antd.Menu onClick={changeShare}>
-              <antd.Menu.Item key="any">{this.ShareWithValue("any")}</antd.Menu.Item>
-              <antd.Menu.Item key="only_follow">{this.ShareWithValue("only_follow")}</antd.Menu.Item>
-              <antd.Menu.Item key="only_followers">{this.ShareWithValue("only_followers")}</antd.Menu.Item>
-              <antd.Menu.Item key="private">{this.ShareWithValue("private")}</antd.Menu.Item>
+              <antd.Menu.Item key="any">{ycore.GetPostPrivacy.decorator("any")}</antd.Menu.Item>
+              <antd.Menu.Item key="only_follow">{ycore.GetPostPrivacy.decorator("only_follow")}</antd.Menu.Item>
+              <antd.Menu.Item key="only_followers">{ycore.GetPostPrivacy.decorator("only_followers")}</antd.Menu.Item>
+              <antd.Menu.Item key="private">{ycore.GetPostPrivacy.decorator("private")}</antd.Menu.Item>
             </antd.Menu>
           )
         if (visible) {
@@ -145,18 +134,22 @@ class PostCreator extends React.PureComponent{
              <antd.Card bordered="false">
                 <div className={styles.inputWrapper}>
                     <div className={styles.titleAvatar}><img src={userData.avatar} /></div>
-                    <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.PublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={4} />
-                    <div><antd.Button disabled={this.state.posting? true : (keys_remaining < 512? false : true)} onClick={this.PublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
+                    <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.HandlePublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={4} />
+                    <div><antd.Button disabled={this.state.posting? true : (keys_remaining < 512? false : true)} onClick={this.HandlePublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
+                    
                 </div>
                 <div className={styles.progressHandler}><antd.Progress strokeWidth="4px" className={this.state.posting? styles.proccessUnset : (keys_remaining < 512? styles.proccessSet : styles.proccessUnset)} status={this.handleKeysProgressBar()}  showInfo={false} percent={percent} /></div>
                 
                 <div className={styles.postExtra} > 
-                    <antd.Button type="ghost"> <Icons.CameraFilled /></antd.Button>
+                    <antd.Upload {...UploadProps}>
+                        <antd.Button type="ghost"> <Icons.CameraFilled /></antd.Button>
+                    </antd.Upload>
+                   
                     <antd.Button type="ghost"> <Icons.VideoCameraFilled /></antd.Button>
                     <antd.Button onClick={this.handleToggleToolbox} type="ghost"><Icons.PlusCircleOutlined /></antd.Button>
                     <antd.Dropdown overlay={shareOptionsMenu}>
                         <a className={styles.shareWith} onClick={e => e.preventDefault()}>
-                        {this.ShareWithValue(this.state.shareWith)}
+                        {ycore.GetPostPrivacy.decorator(this.state.shareWith)}
                         </a>
                     </antd.Dropdown>
                 </div>

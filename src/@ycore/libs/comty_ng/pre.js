@@ -1,5 +1,67 @@
 import * as ycore from 'ycore'
 var jquery = require("jquery");
+import * as Icons from '@ant-design/icons'
+
+export const GetPostPrivacy = {
+  bool: (e) => {
+    switch (e) {
+      case 'any':
+          return '0'
+      case 'only_followers':
+          return '1'
+      case 'only_follow':
+          return '2'
+      case 'private':
+          return '3'
+      default:
+          return '0'
+    }
+  },
+  decorator: (e) => {
+      switch (e) {
+          case 'any':
+              return  <span><Icons.GlobalOutlined /> Share with everyone</span>
+          case 'only_follow':
+              return <span><Icons.TeamOutlined /> Share with people I follow</span>
+          case 'only_followers':
+              return <span><Icons.UsergroupAddOutlined /> Share with people follow me</span> 
+          case 'private':
+              return <span><Icons.EyeInvisibleOutlined /> Dont share, only me</span>
+          default:
+              return <span>Unknown</span>
+      }
+  },
+
+}
+
+export function PublishPost(privacy, raw, file, callback){
+  const  rawtext  = raw;
+  if(!rawtext){
+      return null
+  }
+  console.log(privacy)
+  let formdata = new FormData();
+  formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
+  formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("postPrivacy", privacy)
+  formdata.append("postText", raw);
+  const requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow'
+  };  
+  ycore.DevOptions.ShowFunctionsLogs? console.log(`Sending new post => ${rawtext} `) : null
+  const urlObj = `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`
+  fetch(urlObj, requestOptions)
+    .then(response => {
+        ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+        return callback(false, response)
+      })
+    .catch(error => {
+      console.log('error', error)
+      return callback(true, error)
+    });
+}
 
 export function FindUser(key, callback){
     let formdata = new FormData();
