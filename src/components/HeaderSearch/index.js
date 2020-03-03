@@ -3,7 +3,8 @@ import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './index.less'
 import classnames from 'classnames'
-
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
 
 export const SetHeaderSearchType = {
   disable: () => {
@@ -62,7 +63,7 @@ export default class HeaderSearch extends Component {
       <span className={styles.headerSearch}>
           <antd.Input
             id='search_input'
-            prefix={<antd.Icon type="search" key="Icon" />}
+            prefix={<Icons.SearchOutlined />}
             placeholder=' Search on Comty...'
             onChange={ this.onChange }
             onPressEnter={this.sendToSearch}

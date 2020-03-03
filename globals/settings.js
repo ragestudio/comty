@@ -45,6 +45,12 @@ export var AppSettings = [
         "value": fromStorage? ycore.StorageValued('default_showpostcreator') : false
       },
       {
+        "SettingID": "force_show_postactions",
+        "title": "Not auto hide Posts Actions",
+        "description": "Force the app to dont hide the post actions (likes, comments ...etc) automaticly... [Developer]",
+        "value": fromStorage? ycore.StorageValued('force_show_postactions') : false
+      },
+      {
         "SettingID": "use_dev_server",
         "title": "Use Comty™ Development Server",
         "description": "Force the app to connect to an development server... [High Recomended]",

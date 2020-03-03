@@ -1,12 +1,12 @@
 import React from 'react'
-import { Icon } from 'antd'
+import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Page } from 'components'
 import styles from './404.less'
 
 const Error404 = () => (
   <Page inner>
     <div className={styles.error}>
-    <Icon type="api" />
+    <LegacyIcon type="api" />
       <h1>OBA BLYAT</h1>
       <p><strong>ERROR 404</strong></p>
     </div>

@@ -2,6 +2,9 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import * as antd from 'antd'
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
+
 import { withI18n, Trans } from '@lingui/react'
 import ScrollBar from '../ScrollBar'
 import { config } from 'utils'
@@ -93,31 +96,31 @@ class Sider extends PureComponent {
         onMouseLeave={this.hover}
       >
         <div className={styles.brand}><img onClick={() => ycore.crouter.native('main')} src={collapsed? config.LogoPath  : config.FullLogoPath } /></div>
-        <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? (this.Balancer()? "right" : "double-right") : (this.Balancer()? "left" : "double-left") } /></div> 
+        <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? (this.Balancer()? <Icons.RightOutlined/>: <Icons.DoubleLeftOutlined/>) : (this.Balancer()? <Icons.LeftOutlined /> : <Icons.DoubleLeftOutlined/>) } /></div> 
         <div className={styles.menuContainer}>
           <ScrollBar options={{  suppressScrollX: true,  }} >
                 <antd.Menu className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
-                     <antd.Menu.Item icon="compass" key="explore">
-                        <antd.Icon type="compass" />
-                         <Trans><span>Explore</span></Trans> 
+                     <antd.Menu.Item key="explore">
+                          <Icons.CompassOutlined />
+                          <Trans><span>Explore</span></Trans> 
                       </antd.Menu.Item> 
                       {ycore.booleanFix(userData.is_pro)? 
                       <antd.Menu.Item key="boosted_pages">
-                        <antd.Icon type="thunderbolt" />
-                       <Trans><span>Boost</span></Trans> 
+                          <Icons.ThunderboltOutlined />
+                          <Trans><span>Boost</span></Trans> 
                       </antd.Menu.Item> 
                       : 
                     <antd.Menu.Item key="upgrade_pro">
-                      <antd.Icon type="star" />
+                      <Icons.StarOutlined/>
                       <Trans><span>PRO</span></Trans>
                     </antd.Menu.Item>}
                       <antd.Menu.Item key="general_settings">
-                        <antd.Icon type="setting" />
+                        <Icons.SettingOutlined/>
                         <Trans><span>Settings</span></Trans>
                       </antd.Menu.Item>
                       {ycore.booleanFix(userData.admin)? 
                         <antd.Menu.Item key="admin_area">
-                          <antd.Icon type="tool" />
+                          <Icons.ToolOutlined />
                           <Trans><span>Admin Area</span></Trans>
                         </antd.Menu.Item> 
                             : 
@@ -128,7 +131,7 @@ class Sider extends PureComponent {
                     <div className={styles.something_thats_pulling_me_down}>
                     <antd.Menu selectable={false} className={collapsed ?  styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
                         <antd.Menu.Item style={{ fontSize: '15px' }} key="LightMode" disabled={false} >
-                        {collapsed? <antd.Icon type="bulb" /> :
+                        {collapsed? <Icons.BulbOutlined /> :
                             <div className={styles.themeSwitcher}>
                               <antd.Switch
                                 onChange={onThemeChange.bind(
@@ -142,7 +145,7 @@ class Sider extends PureComponent {
                             </div>}
                         </antd.Menu.Item>
                         <antd.Menu.Item key="SignOut">
-                          <antd.Icon type="logout" style={{ color: 'red' }} />
+                          <Icons.LogoutOutlined style={{ color: 'red' }} />
                          {collapsed ?  null : <Trans>Logout</Trans>}
                         </antd.Menu.Item>
                     </antd.Menu>

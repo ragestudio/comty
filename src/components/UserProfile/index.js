@@ -5,8 +5,10 @@ import * as antd from 'antd'
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {CustomIcons, MainFeed} from 'components'
 import { SetHeaderSearchType } from 'components/HeaderSearch'
-const userData = ycore.SDCP();
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
 
+const userData = ycore.SDCP();
 function isOwnProfile(id){
   if(id == userData.username){
     ycore.DevOptions.ShowFunctionsLogs ? console.log('Is your own profile !!'): null
@@ -33,7 +35,7 @@ const UserHeader = ({ values }) => {
                   
               </div>
               <div className={styles.contentTitle}>
-                 <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <antd.Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
+                 <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
                  <span style={{ fontSize: '14px', fontWeight: '100', lineHeight: '0', marginBottom: '5px' }} dangerouslySetInnerHTML={{__html:  values.about }}  />
               </div>
              

@@ -4,6 +4,8 @@ import { UserCard } from 'components'
 import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
 
 const userData = ycore.SDCP()
 
@@ -49,22 +51,24 @@ class SearchPageIndexer extends PureComponent {
           console.log('Users => ', usersParsed)
           return(
             <div>
-              <span>Users => </span>
-              <antd.List
-               grid={{
-                gutter: 16,
-                xs: 1,
-                sm: 2,
-                md: 4,
-                lg: 4,
-                xl: 6,
-                xxl: 3,
-              }}
-              dataSource={usersParsed}
-              renderItem={item => (
-                <UserCard source={item} />
-              )}
-               />
+              <antd.Typography.Title level={2} ><Icons.TeamOutlined /> Users </antd.Typography.Title>
+              <div className={styles.searchEntry}>
+                  <antd.List
+                    grid={{
+                      gutter: 16,
+                      xs: 1,
+                      sm: 2,
+                      md: 4,
+                      lg: 4,
+                      xl: 6,
+                      xxl: 3,
+                    }}
+                    dataSource={usersParsed}
+                    renderItem={item => (
+                      <UserCard source={item} />
+                    )}
+                  />
+               </div>
             </div>
           )
         }
@@ -78,7 +82,7 @@ class SearchPageIndexer extends PureComponent {
         return null
       } catch (error) {
         console.log(error)
-        return <h2>Wooups</h2>
+        return <center><h2>Render Error</h2></center>
       }
      
       
@@ -98,15 +102,17 @@ class SearchPageIndexer extends PureComponent {
         console.log(`Search matched!  ${location.pathname}`)
         return(
             <div>
-              <h1 className={styles.searchHeader}><antd.Icon type="search" /> Results of {string} </h1>
-              <antd.Card> 
-              {this.state.loading? null : this.renderResult(this.state.SearchResult)}
-              </antd.Card>
+              <h1 className={styles.searchHeader}><Icons.SearchOutlined /> Results of {string} </h1>
+                <antd.Card> 
+                  <div className={styles.results}>
+                     {this.state.loading? null : this.renderResult(this.state.SearchResult)}
+                  </div>
+                </antd.Card>
             </div>
         )
       }
       
-      return(<div><center> Input Error </center></div>)
+      return(<div><center> Render Error </center></div>)
     }
 }
 

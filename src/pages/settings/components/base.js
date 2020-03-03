@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
-import { List, Icon, Switch, Button, notification } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { List, Switch, Button, notification } from 'antd';
 import { AppSettings } from '../../../../globals/settings.js'
 import { DevOptions, ControlBar } from 'ycore'
 import * as ycore from "ycore"
@@ -44,7 +45,7 @@ class Base extends Component {
   handleControlBar(){
     const ListControls = [
       (<div>
-          <Button type="done" icon='save' onClick={() => this.saveChanges()} >Save</Button>
+          <Button type="done" icon={<LegacyIcon type='save' />} onClick={() => this.saveChanges()} >Save</Button>
       </div>
      )
     ]

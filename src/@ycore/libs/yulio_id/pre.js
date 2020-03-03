@@ -2,6 +2,8 @@ import * as ycore from 'ycore'
 import * as antd from 'antd'
 import Cookies from "ts-cookies";
 import keys from '../../../../config/keys.js';
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
 
 var jquery = require("jquery");
 var jwt = require("jsonwebtoken")
@@ -101,7 +103,7 @@ export function LogoutCall(){
                 placement: 'topLeft',
                 message: 'Unexpectedly failed logout in YulioID™ ',
                 description: 'It seems that your token has been removed unexpectedly and could not log out from YulioID ',
-                icon: <antd.Icon type="warning" style={{ color: 'orange' }} />
+                icon: <Icons.WarningOutlined style={{ color: 'orange' }} />
             })
             console.log("Failed logout with YulioID™", response)
         }

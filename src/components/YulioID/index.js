@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import {GetAuth, InitSDCP, DevOptions, asyncSDCP} from 'ycore';
 import PropTypes from 'prop-types';
 import { connect } from 'dva';
-import { Button, Form, Input, Drawer, Icon, Collapse } from 'antd'
+import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Input, Drawer, Collapse } from 'antd';
 import styles from './index.less';
 import formstyle from './formstyle.less'
 
@@ -104,7 +106,7 @@ class YulioID extends Component {
                 {ShowLoading ? (
                   <div style={{ height: '329px' }}>
                     <div className={styles.spinner__wrapper} id="loadingspn">
-                      {StateIcon ? (<Icon type={StateIcon} className={StateException? styles.StateIcon_exception : styles.StateIcon} /> ) : (<Icon type="loading" style={{ fontSize: 24, margin: '13px' }} spin />)}
+                      {StateIcon ? (<LegacyIcon type={StateIcon} className={StateException? styles.StateIcon_exception : styles.StateIcon} /> ) : (<LegacyIcon type="loading" style={{ fontSize: 24, margin: '13px' }} spin />)}
                       <div><br/><br/><br/>
                         <div className={styles.resultbox}>
                           <h6 > {StateMessage} </h6>
@@ -117,7 +119,7 @@ class YulioID extends Component {
                   <div>
                     <div className={styles.input__wrapper}>
                       <label className={styles.labelform}>
-                        <Icon type="user" style={{ fontSize: '15px' }} />{' '}
+                        <LegacyIcon type="user" style={{ fontSize: '15px' }} />{' '}
                         Username
                       </label>
                       <FormItem>
@@ -138,7 +140,7 @@ class YulioID extends Component {
                     </div>
                     <div className={styles.input__wrapper}>
                       <label className={styles.labelform}>
-                        <Icon type="unlock" style={{ fontSize: '15px' }} />{' '}
+                        <LegacyIcon type="unlock" style={{ fontSize: '15px' }} />{' '}
                         Password
                       </label>
                       <FormItem>
@@ -147,7 +149,7 @@ class YulioID extends Component {
                         })(
                           <Input.Password
                             onPressEnter={this.handleEnter}
-                            className={formstyle.inputform}
+                            className={styles.inputform}
                             placeholder="Password"
                             onChange={text => {
                               this.handlePassword(text)
@@ -171,8 +173,8 @@ class YulioID extends Component {
                       Or
                     </h2>
                     <div className={styles.moreActions}>
-                      <Button type="dashed"><Icon type="question-circle" /> Forgotten password </Button>
-                      <Button type="dashed" ><Icon type="user-add" /> Create an account </Button>
+                      <Button type="dashed"><LegacyIcon type="question-circle" /> Forgotten password </Button>
+                      <Button type="dashed" ><LegacyIcon type="user-add" /> Create an account </Button>
                     </div>
                   
                   </div>
@@ -182,7 +184,7 @@ class YulioID extends Component {
           </main>
         </Drawer>
       </div>
-    )
+    );
   }
 }
 

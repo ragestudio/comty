@@ -3,6 +3,9 @@ import {AppSettings} from  '../../globals/settings.js'
 import {Endpoints} from 'globals/endpoints.js'
 import umiRouter from 'umi/router';
 import * as antd from "antd"
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
+
 import config from 'config'
 import './libs.js'
 import * as sw from '../../service-worker.js'
@@ -74,7 +77,7 @@ export function notifyError(err){
 }
 export function notifyProccess(cust){
     antd.notification.open({
-        icon: <antd.Icon type="loading" style={{ color: '#108ee9' }} />,
+        icon: <Icons.LoadingOutlined style={{ color: '#108ee9' }} />,
         message: 'Please wait',
         placement: 'bottomLeft'
     })

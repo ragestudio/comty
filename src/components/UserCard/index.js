@@ -2,7 +2,10 @@ import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './index.less'
+import * as Icons from '@ant-design/icons';
+import Icon from '@ant-design/icons'
 
+const userData = ycore.SDCP()
 const { Meta } = antd.Card;
 // Set default by configuration
 const emptyPayload = {user: 'User Unknown', ago: 'This User is empty', avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', content: 'Test Test' }
@@ -16,11 +19,11 @@ class UserCard extends React.PureComponent{
         }
     }
 
-    
     render(){
         const { source, } = this.props
-        const { username, avatar, about  } = source || emptyPayload;
-        
+        const { username, avatar, about, id  } = source || emptyPayload;
+        const DevInfo = `ID #${id} | Developer ${ycore.booleanFix(source.dev)? 'yes' : 'no'} |`
+        const AdminInfo = `Email ${source.email} | `
         return(
           <div className={styles.cardWrapper}>
              <antd.Card >
@@ -30,7 +33,7 @@ class UserCard extends React.PureComponent{
                         <div className={styles.titleWrapper} >
                             <h4 onClick={() => ycore.crouter.native(`@${username}`)} className={styles.titleUser}>@{username} </h4> 
                         </div>}
-                    description={<span className={styles.textAgo}>test</span>}
+                    description={ycore.booleanFix(userData.dev)? <span className={styles.textAgo}>{DevInfo} {AdminInfo}</span> : null}
                     bordered="false"
                 />
                  <div className={styles.postContent}> <h3>{about}</h3></div> 
