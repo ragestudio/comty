@@ -138,7 +138,7 @@ export function GetAuth(EncUsername, EncPassword, callback) {
     };
     jquery.ajax(settings)
         .done(function (response) {
-            console.log(prefix, 'Server response... Dispathing data to login API...', response);
+            console.log(prefix, 'Server response... Dispathing data to login API...');
             try {
                 var identState = JSON.parse(response)['api_status'];
                 if (identState == 200) {

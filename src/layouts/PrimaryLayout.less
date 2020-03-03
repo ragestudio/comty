@@ -108,9 +108,10 @@
   height: 100vh;
   bottom: 0;
  :global{
-  .iXUMqo{
-    overflow-y: scroll;
+  #scroller{
+    overflow-y: scroll !important;
   }
+  
  }
 }
 
@@ -129,7 +130,10 @@
     h1{
        color: @DarkMode-color_container;
     }
-    .iXUMqo{
+    #scroller{
+      overflow-y: hidden;
+    }
+    .gCVnuz{
        color: @DarkMode-color_container !important;
        overflow-y: hidden;
     }

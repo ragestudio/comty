@@ -1,4 +1,5 @@
 import CustomIcons from './CustomIcons'
+import PageTransition from './PageTransition'
 import MainFeed from './MainFeed'
 import YulioID from './YulioID'
 import UserCard from './UserCard'
@@ -15,4 +16,4 @@ import CoreLoader from './CoreLoader'
 import MicroHeader from './MicroHeader'
 import HeaderSearch from './HeaderSearch'
 
-export { UserCard, HeaderSearch, YulioID, UserProfile, MyLayout, Loader, Page, ScrollBar, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}
+export { PageTransition, UserCard, HeaderSearch, YulioID, UserProfile, MyLayout, Loader, Page, ScrollBar, CoreLoader, PostCard, PostCreator, CustomIcons, MainSidebar, LikeBTN, MainFeed, MicroHeader}

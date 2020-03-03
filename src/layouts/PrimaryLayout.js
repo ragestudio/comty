@@ -4,7 +4,7 @@ import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
-import { MyLayout, MicroHeader, HeaderSearch } from 'components'
+import { MyLayout, PageTransition, HeaderSearch } from 'components'
 import classnames from 'classnames'
 import * as ycore from 'ycore'
 import { Layout, Drawer, Result, Button, Checkbox } from 'antd'
@@ -13,7 +13,6 @@ import { config, pathMatchRegexp, langFromPath } from 'utils'
 import store from 'store';
 import Error from '../pages/404'
 import styles from './PrimaryLayout.less'
-import { PageTransition } from '@steveeeie/react-page-transition';
 
 const { Content } = Layout
 const { ChatSider, Sider, Control } = MyLayout
@@ -165,7 +164,7 @@ class PrimaryLayout extends PureComponent {
            <Sider {...SiderProps}/>
 
             <div id="primaryLayout" className={styles.leftContainer}>
-                <PageTransition preset="moveToLeftFromRight" transitionKey={location.pathname}>
+                <PageTransition preset="moveToLeftFromRight" id="scroller" transitionKey={location.pathname}>
                    
                     <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
                         <HeaderSearch />
