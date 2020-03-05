@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { pathMatchRegexp } from 'utils'
-import { UserCard } from 'components'
+import { SearchCard } from 'components'
 import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
@@ -8,8 +8,6 @@ import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
 
 const userData = ycore.SDCP()
-
-
 
 class SearchPageIndexer extends PureComponent {
     constructor(props){
@@ -43,43 +41,70 @@ class SearchPageIndexer extends PureComponent {
 
     renderResult = (source) => {
       try {
+        const Empty = (
+          <div>
+            <antd.Result
+              status="404"
+              title="Nothing..."
+              subTitle="Sorry, this does not exist."
+            />
+          </div>
+        )
+    
         // TO DO:  Settings serach & Post Search
         const usersParsed = JSON.parse(source)['users']
         const groupsParsed = JSON.parse(source)['groups']
         const pagesParsed = JSON.parse(source)['pages']
-        if (usersParsed.length >= 1) {
+        
+        const users = () => {if (usersParsed.length >= 1) {
           console.log('Users => ', usersParsed)
-          return(
-            <div>
-              <antd.Typography.Title level={2} ><Icons.TeamOutlined /> Users </antd.Typography.Title>
-              <div className={styles.searchEntry}>
-                  <antd.List
-                    grid={{
-                      gutter: 16,
-                      xs: 1,
-                      sm: 2,
-                      md: 4,
-                      lg: 4,
-                      xl: 6,
-                      xxl: 3,
-                    }}
-                    dataSource={usersParsed}
-                    renderItem={item => (
-                      <UserCard source={item} />
-                    )}
-                  />
-               </div>
-            </div>
-          )
-        }
-        if (groupsParsed.length >= 1) {
-          return console.log('Groups => ', groupsParsed)
-        }
-        if (pagesParsed.length >= 1) {
-          return console.log('Pages => ', pagesParsed)
+          return this.EntryComponent('Users', usersParsed)
+        }}
+        const groups = () => {if (groupsParsed.length >= 1) {
+          console.log('Groups => ', groupsParsed)
+          return this.EntryComponent('Groups', groupsParsed)
+        }}
+        const pages = () => {if (pagesParsed.length >= 1) {
+          console.log('Pages => ', pagesParsed)
+          return this.EntryComponent('Pages', pagesParsed)
+        }}
+
+        if (!usersParsed.length >= 1 && !groupsParsed.length >= 1 && !pagesParsed.length >= 1){
+          return Empty
         }
         
-        return null
+        return [users(), groups(), pages()]
+        
+      } catch (error) {
+        console.log(error)
+        return <center><h2>Render Error</h2></center>
+      }
+    }
+    EntryComponent = (t, source) => {
+      try {
+        return(
+          <div>
+            <antd.Typography.Title level={2} ><Icons.TeamOutlined /> {t} </antd.Typography.Title>
+            <div className={styles.searchEntry}>
+                <antd.List
+                  grid={{
+                    gutter: 16,
+                    xs: 1,
+                    sm: 2,
+                    md: 4,
+                    lg: 4,
+                    xl: 6,
+                    xxl: 3,
+                  }}
+                  dataSource={source}
+                  renderItem={item => (
+                    <SearchCard type={t} source={item} />
+                  )}
+                />
+             </div>
+          </div>
+        )
+
       } catch (error) {
         console.log(error)
         return <center><h2>Render Error</h2></center>

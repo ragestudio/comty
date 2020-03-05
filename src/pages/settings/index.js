@@ -2,17 +2,21 @@ import React from 'react';
 import { GridContent } from '@ant-design/pro-layout';
 import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Menu, Typography } from 'antd';
+import * as antd from 'antd'
+import * as ycore from 'ycore'
 import styles from './style.less';
 
 import NotificationView from './components/notification.js';
 import SecurityView from './components/security.js';
 import Base from './components/base.js'
+import AppAbout from './components/about.js'
 
 const { Item } = Menu;
 const menuMap = {
   base: 'App',
   security: 'Security',
   notification: 'Notification',
+  about: 'App About'
 };
 
 const { Title } = Typography;
@@ -44,6 +48,8 @@ class GeneralSettings extends React.Component {
         return <SecurityView />;
       case 'notification':
         return <NotificationView />;
+      case 'about':
+        return <AppAbout />;
       default:
         break;
     }

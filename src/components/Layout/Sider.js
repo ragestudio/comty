@@ -55,12 +55,13 @@ class Sider extends PureComponent {
     return theme
   }
 
-
   handleClickMenu = e => {
     e.key === 'SignOut' && ycore.LogoutCall()
     e.key === 'general_settings' && ycore.crouter.native('settings')
     e.key === 'accountpage' && router.push('/account')
+    e.key === 'explore' && router.push('main')
   }
+
   isDarkMode(){
     const { theme } = this.props
     if (theme == 'dark'){
@@ -104,16 +105,6 @@ class Sider extends PureComponent {
                           <Icons.CompassOutlined />
                           <Trans><span>Explore</span></Trans> 
                       </antd.Menu.Item> 
-                      {ycore.booleanFix(userData.is_pro)? 
-                      <antd.Menu.Item key="boosted_pages">
-                          <Icons.ThunderboltOutlined />
-                          <Trans><span>Boost</span></Trans> 
-                      </antd.Menu.Item> 
-                      : 
-                    <antd.Menu.Item key="upgrade_pro">
-                      <Icons.StarOutlined/>
-                      <Trans><span>PRO</span></Trans>
-                    </antd.Menu.Item>}
                       <antd.Menu.Item key="general_settings">
                         <Icons.SettingOutlined/>
                         <Trans><span>Settings</span></Trans>
@@ -150,7 +141,7 @@ class Sider extends PureComponent {
                         </antd.Menu.Item>
                     </antd.Menu>
                     <div className={styles.siderhead}>
-                      <antd.Avatar size={collapsed? "small" : "large"} shape={collapsed? "circle" : "square"} src={userData.avatar} className={collapsed? styles.avatar : styles.avatarFull} />
+                      <antd.Avatar onClick={() => ycore.crouter.native(`@${userData.username}`)} size={collapsed? "small" : "large"} shape={collapsed? "circle" : "square"} src={userData.avatar} className={collapsed? styles.avatar : styles.avatarFull} />
                     </div>  
                     {collapsed? null : <div className={styles.userInfo}><a onClick={() => ycore.crouter.native(`@${userData.username}`)} ><h2>@{userData.username}</h2></a></div> }
                 </div>

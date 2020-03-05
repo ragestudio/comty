@@ -1,5 +1,6 @@
 module.exports = {
     Endpoints: {
+        follow_user: "https://api.ragestudio.net/RSA-COMTY/yid/follow-user?access_token=",
         action_post: "https://api.ragestudio.net/RSA-COMTY/yid/post-actions?access_token=",
         get_posts: "https://api.ragestudio.net/RSA-COMTY/yid/posts?access_token=",
         find_user: "https://api.ragestudio.net/RSA-COMTY/yid/find_user?access_token=",

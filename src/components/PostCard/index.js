@@ -57,7 +57,7 @@ class PostCard extends React.PureComponent{
     }
     
     render(){
-        const { payload, customActions,  } = this.props
+        const { payload, customActions } = this.props
         const { id, user, ago, avatar, content, file, postFileName, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
         const defaultActions = [<div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,<Icons.ShareAltOutlined key="share" />,<Icons.MoreOutlined key="actionMenu" />]
         const actions = customActions || defaultActions;

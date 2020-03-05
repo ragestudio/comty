@@ -2,6 +2,28 @@ import * as ycore from 'ycore'
 var jquery = require("jquery");
 import * as Icons from '@ant-design/icons'
 
+export function follow_user(id, callback) {
+  let formdata = new FormData();
+  formdata.append("user_id", id);
+  formdata.append("server_key", ycore.yConfig.server_key);
+  const requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow'
+  };  
+  ycore.DevOptions.ShowFunctionsLogs? console.log(`Following user => ${id} `) : null
+  const urlObj = `${ycore.endpoints.follow_user}${ycore.GetUserToken.decrypted().UserToken}`
+  fetch(urlObj, requestOptions)
+    .then(response => {
+        ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+        return callback(false, response)
+      })
+    .catch(error => {
+      console.log('error', error)
+      return callback(true, error)
+    });
+}
+
 export const GetPostPrivacy = {
   bool: (e) => {
     switch (e) {
@@ -39,12 +61,12 @@ export function PublishPost(privacy, raw, file, callback){
   if(!rawtext){
       return null
   }
-  console.log(privacy)
   let formdata = new FormData();
   formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
   formdata.append("server_key", ycore.yConfig.server_key);
   formdata.append("postPrivacy", privacy)
   formdata.append("postText", raw);
+  file? formdata.append("postPhotos", file) : null
   const requestOptions = {
     method: 'POST',
     body: formdata,

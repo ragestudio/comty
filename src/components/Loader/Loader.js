@@ -10,7 +10,16 @@ const Loader = ({ spinning = true, fullScreen }) => {
     return (
       <div className={styles.loader}>
         <div className={styles.warpper}>
-          <CoreLoader type='circle' />
+          <div className={styles.newloader}>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+          </div>
         </div>
       </div>
     )
@@ -23,7 +32,16 @@ const Loader = ({ spinning = true, fullScreen }) => {
       })}
     >
       <div className={styles.warpper}>
-        <CoreLoader type='circle' />
+      <div className={classNames(styles.newloader, {[styles.end]: !spinning}) }>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+        </div>
       </div>
     </div>
   )

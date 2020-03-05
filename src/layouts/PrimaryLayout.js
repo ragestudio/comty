@@ -17,6 +17,7 @@ import styles from './PrimaryLayout.less'
 const { Content } = Layout
 const { ChatSider, Sider, Control } = MyLayout
 
+const userData = ycore.SDCP()
 
 
 @withRouter
@@ -175,9 +176,13 @@ class PrimaryLayout extends PureComponent {
 
             <div id="secondaryLayout" className={styles.rightContainer}>
                 <PageTransition preset="moveToLeftFromRight" transitionKey={location.pathname}>
-                 <Fragment>
-                    {this.state.ContentSecondLayer}
-                 </Fragment>
+                  <div className={styles.SecondHeader}>
+                    <div className={styles.notif_box}></div>
+                    <img src={userData.avatar} />
+                  </div>
+                  <Fragment>
+                     {this.state.ContentSecondLayer}
+                  </Fragment>
                 </PageTransition>
             </div>
 
