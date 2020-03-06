@@ -7,11 +7,12 @@ import {CustomIcons, MainFeed} from 'components'
 import { SetHeaderSearchType } from 'components/HeaderSearch'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
-import Like_btn from './components/like_btn.js'
+import Follow_btn from './components/Follow_btn.js'
 
 const userData = ycore.SDCP();
+
 function isOwnProfile(id){
-  if(id == userData.username){
+  if(id == userData.id){
     ycore.DevOptions.ShowFunctionsLogs ? console.log('Is your own profile !!'): null
     return true
   }
@@ -91,7 +92,7 @@ class UserProfile extends React.Component {
                   {ycore.booleanFix(values.nsfw_flag)? <antd.Tag color="volcano" >NSFW</antd.Tag> : null}
                   {ycore.booleanFix(values.is_pro)? <antd.Tag color="purple">CPRO™ <Icons.RocketOutlined /></antd.Tag> : null}
                   {ycore.booleanFix(values.dev)? <antd.Tag color="default">DEVELOPER <Icons.CodeOutlined /></antd.Tag> : null}
-                  {isOwnProfile()? <div className={styles.follow_wrapper} onClick={() => this.handleFollowUser()} ><Like_btn followed={this.state.Followed? true : false} /></div> : null}
+                  {isOwnProfile(values.id)?  null : <div className={styles.follow_wrapper} onClick={() => this.handleFollowUser()} ><Follow_btn followed={this.state.Followed? true : false} /></div>}
                 </div>
                 <div className={styles.contentTitle}>
                    <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
