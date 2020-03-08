@@ -91,12 +91,10 @@ class PostCreator extends React.PureComponent{
         const filter = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'video/mp4';
         if (!filter) {
           antd.message.error('Invalid File!');
-          this.FlushPostState('error')
         }
         const maxsize = file.size / 1024 / 1024 < ycore.DevOptions.MaximunAPIPayload;
         if (!maxsize) {
           antd.message.error('Image must smaller than 99MB!');
-          this.FlushPostState('error')
         }
         return filter && maxsize;
     }
@@ -116,31 +114,17 @@ class PostCreator extends React.PureComponent{
         this.setState({ toolbox_open: !this.state.toolbox_open })
     }
 
-    FlushPostState = (type) =>{
-        switch (type) {
-            case 'error':
-                this.setState({ 
-                    posting_ok: false, 
-                    posting: false, 
-                    rawtext: '', 
-                    fileURL: '',
-                    file: ''
-                })
-                setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
-                break;
-        
-            default:
-                this.setState({ 
-                    posting_ok: true, 
-                    posting: false, 
-                    rawtext: '', 
-                    fileURL: '',
-                    file: ''
-                })
-                setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
-                RefreshFeed()
-                return
-        }
+    FlushPostState(){
+        this.setState({ 
+            posting_ok: true, 
+            posting: false, 
+            rawtext: '', 
+            fileURL: '',
+            file: ''
+        })
+        setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
+        RefreshFeed()
+        return true
     }
 
     handlePublishPost = (e) => {
