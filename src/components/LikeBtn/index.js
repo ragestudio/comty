@@ -31,7 +31,7 @@ class LikeBTN extends React.PureComponent {
 
     dispatchLike(e){
       const { type } = this.state
-      console.log(`Dispatch ${type} to post id => ${e}`)
+      ycore.yconsole.log(`Dispatch ${type} to post id => ${e}`)
       this.setState({ clicked: true })
       setTimeout(() => {
         this.setState({ clicked: false  })
@@ -57,7 +57,7 @@ class LikeBTN extends React.PureComponent {
         const { id } = this.props
         const { likes, liked, clicked } = this.state
         if (!id){
-          console.error('[LikeBTN] No post id provided!')
+          ycore.yconsole.error('[LikeBTN] No post id provided!')
           return null
         }
         return(

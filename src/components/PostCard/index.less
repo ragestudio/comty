@@ -6,6 +6,7 @@
     min-width: 265px;
     width: auto;
     margin: 23px auto 50px auto;
+
     :global{
         .ant-card-meta-detail > div:not(:last-child){
             margin: 0
@@ -18,30 +19,47 @@
         .ant-card-body {
            padding: 13px 0 5px 0;
         }
+
         .ant-card-actions {
             border-top: 0;
             background: #EBEBEB;
-            opacity: 0;
             height: 30px;
             position: relative;
             transition: opacity 150ms linear, position 150ms linear, transform 150ms linear;
             border-radius: 0 0 10px 10px;
+            opacity: 0;
+            // Doesn't work... So sad :C
+            &.showMode{
+                opacity: 1;
+                transform: translate(0, 15px);
+            }
         }
+
         .ant-card-actions:hover {
             opacity: 1;
             transform: translate(0, 15px);
             transition: opacity 150ms linear, position 150ms linear, transform 150ms linear;
         }
+        .ant-card-actions > li > span > .anticon {
+            font-size: 16px;
+            line-height: 22px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 23px;
+        
+        }
         .ant-card-actions > li {
             margin: -20px 0 0 0 ;
             border-right: 0;
-            i{
-               
-             vertical-align: middle;
-             height: 40px;
-             width: 40px;
-             background-color: #fff;
-             border-radius: 24px;
+            span {
+                font-size: 16px;
+                line-height: 22px;
+                width: 40px;
+                height: 40px;
+                background: white;
+                border-radius: 23px;
+                margin: auto;
             }
             svg {
                 height: 20px;
@@ -50,6 +68,14 @@
                 vertical-align: middle;
             }
         }
+    }
+}
+.showMode{
+    :global{
+       ul {
+           opacity: 1 !important;
+           transform: translate(0, 15px);
+       }
     }
 }
 .postAvatar{
@@ -73,10 +99,12 @@
     color:rgb(249, 179, 64);
     width: 100%;
     z-index: 10;
-    i{
-        float: right;
-        margin: -0 6px 0 0;;
-        font-size: 17px;
+    :global {
+        .anticon{
+            float: right;
+            margin: -0 6px 0 0;;
+            font-size: 17px;
+        }
     }
 }
 .titleWrapper{

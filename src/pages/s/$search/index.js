@@ -28,7 +28,7 @@ class SearchPageIndexer extends PureComponent {
         const raw = parsed.toString()
         const string = raw.replace('/s/', "")
         ycore.SeachKeywords(string, (exception, response) => {
-          ycore.DevOptions.ShowFunctionsLogs? console.log('Founded entries => ', JSON.parse(response)) : null
+          ycore.yconsole.log('Founded entries => ', JSON.parse(response))
           exception? ycore.notifyError(exception) : null
           this.setState({ SearchResult: response })
           this.toogleLoading()

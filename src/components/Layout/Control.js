@@ -35,14 +35,14 @@ class Control extends React.Component {
         }
     }
     DummySetControls = (e) =>{
-        ycore.DevOptions.ShowFunctionsLogs?  console.log('Controls recived => ', e) : null
+        ycore.yconsole.log('Controls recived => ', e)
         if (this.state.Show == false) {
             this.setState({ FadeIN: true })
         }
         this.setState({Show: true, RenderFragment: e})
     }
     DummyCloseControls(){
-        ycore.DevOptions.ShowFunctionsLogs? console.log('Closing Control Bar...') : null
+        ycore.yconsole.log('Closing Control Bar...')
         this.setState({FadeIN: false})
         setTimeout(() => this.setState({ Show: false, RenderFragment: null}), 1000)
     }

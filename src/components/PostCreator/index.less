@@ -138,11 +138,24 @@
         line-height: 30px;
     }
     :global{
+        .MuiSvgIcon-root {
+            width: 1em;
+            height: 1em;
+            display: inline-block;
+            font-size: 18px;
+            transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+            flex-shrink: 0;
+            margin: 8px;
+            line-height: 1px;
+            user-select: none;
+        }
         .ant-btn .anticon {
             transition: margin-left 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
             margin: 8px;
         }
         .ant-btn{
+            width: 35px;
+            height: 35px;
             float: left;
             padding: 0;
             border-radius: 11px;
@@ -151,8 +164,7 @@
             border-color: transparent;
         }
         .ant-btn:hover{
-            border-color: rgb(53, 53, 53);
-            color: rgb(53, 53, 53);
+            border-color: transparent;
         }
        
     }

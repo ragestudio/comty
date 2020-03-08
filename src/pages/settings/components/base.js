@@ -17,7 +17,7 @@ class Base extends Component {
   
   componentDidMount(){
     if (!localStorage.getItem('app_settings')) {
-      DevOptions.ShowFunctionsLogs? console.warn('The settings for this app in your Account isnt set yet, Using stock settings...') : null
+      ycore.yconsole.warn('The settings for this app in your Account isnt set yet, Using stock settings...')
     }
   }
   SettingRender = data =>{
@@ -69,7 +69,7 @@ class Base extends Component {
       const updatedValue = [...this.state.SettingRepo]
       .map(ita => ita === item? Object.assign(ita, { "value": to }) : ita);
       this.setState({SettingRepo: updatedValue, forSave: true})
-      DevOptions.ShowFunctionsLogs? console.log(`Changing ${item.SettingID} to value ${to}`) : null
+      yconsole.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }

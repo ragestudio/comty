@@ -6,6 +6,7 @@ import {CustomIconss} from 'components'
 import { RefreshFeed } from 'components/MainFeed'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
+import * as MICONS from '@material-ui/icons'
 
 const { Meta } = antd.Card;
 const userData = ycore.SDCP();
@@ -38,7 +39,29 @@ class PostCreator extends React.PureComponent{
             UploadActive: false,
         }
     }
-   
+    renderPostPlayer(payload){
+        const {file, fileURL} = this.state
+        const videofilter = file.type === 'video/mp4'
+        const imagefilter = file.type === 'image/jpeg' || file.type === 'image/png'
+        if (imagefilter) {
+           return (
+                <div className={styles.imagePreviewWrapper}>
+                    <img className={styles.imagePreview} src={fileURL} />
+                </div>
+           )
+        }
+        if (videofilter) {
+            return (
+                <div className={styles.imagePreviewWrapper}>
+                <video id="player" playsInline controls > 
+                     <source className={styles.imagePreview} src={file} type={file.type}/>
+                </video>
+                </div>
+            )
+        }
+        return null
+       
+    }
     ToogleVisibility(){
         this.setState({ visible: !this.state.visible })
     }
@@ -48,17 +71,16 @@ class PostCreator extends React.PureComponent{
     }
 
     handleFileUpload = info => {
-        console.log(info.file.originFileObj)
         if (info.file.status === 'uploading') {
           this.setState({ loading: true });
           return;
         }
         if (info.file.status === 'done') {
           this.ToogleUpload()
-          // Get this url from response in real world.
-          getBase64(info.file.originFileObj, imageUrl =>
+          this.setState({ file: info.file.originFileObj })
+          getBase64(info.file.originFileObj, fileURL =>
             this.setState({
-              imageUrl,
+              fileURL,
               loading: false,
             }),
           );
@@ -66,16 +88,17 @@ class PostCreator extends React.PureComponent{
     };
 
     beforeUpload(file) {
-        console.log('before')
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
-          message.error('You can only upload JPG/PNG file!');
+        const filter = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'video/mp4';
+        if (!filter) {
+          antd.message.error('Invalid File!');
+          this.FlushPostState('error')
         }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-          message.error('Image must smaller than 2MB!');
+        const maxsize = file.size / 1024 / 1024 < ycore.DevOptions.MaximunAPIPayload;
+        if (!maxsize) {
+          antd.message.error('Image must smaller than 99MB!');
+          this.FlushPostState('error')
         }
-        return isJpgOrPng && isLt2M;
+        return filter && maxsize;
     }
 
     handleChanges = ({ target: { value } }) => {
@@ -93,43 +116,49 @@ class PostCreator extends React.PureComponent{
         this.setState({ toolbox_open: !this.state.toolbox_open })
     }
 
-    handlePublishPost = (e) => {
-        const { rawtext, shareWith, imageUrl } = this.state;
-        let postFile;
-        if (imageUrl) {
-            console.log('EXIST                   ',imageUrl)
-            postFile = imageUrl;
+    FlushPostState = (type) =>{
+        switch (type) {
+            case 'error':
+                this.setState({ 
+                    posting_ok: false, 
+                    posting: false, 
+                    rawtext: '', 
+                    fileURL: '',
+                    file: ''
+                })
+                setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
+                break;
+        
+            default:
+                this.setState({ 
+                    posting_ok: true, 
+                    posting: false, 
+                    rawtext: '', 
+                    fileURL: '',
+                    file: ''
+                })
+                setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
+                RefreshFeed()
+                return
         }
-        if(!rawtext){
+    }
+
+    handlePublishPost = (e) => {
+        const { rawtext, shareWith, file } = this.state;
+        if(!rawtext || !file){
             return null
         }
-        this.setState({ posting: true, keys_remaining: '512' })
-        console.log('to post    ',postFile)
-        ycore.PublishPost(ycore.GetPostPrivacy.bool(shareWith), rawtext, postFile, (err, res) => {
+        this.setState({ posting: true, keys_remaining: '512' })        
+        ycore.PublishPost(ycore.GetPostPrivacy.bool(shareWith), rawtext, file, (err, res) => {
            if (err) {
                ycore.notifyError(err)
                return
            }
-           this.setState({ posting_ok: true, posting: false, rawtext: ''})
-           setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
-           RefreshFeed()
+           this.FlushPostState()
+           
         })
     }
-    OpenControl = () =>{
-        let controls = [(
-            <div> <antd.Button onClick={() => this.ResetUpload()} icon={<Icons.DeleteOutlined />} /> </div>
-        )]
-        ycore.ControlBar.set(controls)
-    }
-    CloseControl = () =>{
-        ycore.ControlBar.close()
-    }
-    ResetUpload (){
-        this.setState({
-            imageUrl: null
-        })
-        this.ToogleUpload()
-    }
+   
 
     render(){
         const { keys_remaining, visible } = this.state;
@@ -166,6 +195,7 @@ class PostCreator extends React.PureComponent{
                                   <Icons.InboxOutlined />
                                 </p>
                                 <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                <span>*Allowed PNG, JPG, MP4 </span>
                             </div>
                         </antd.Upload.Dragger>
                      </div>
@@ -179,14 +209,11 @@ class PostCreator extends React.PureComponent{
                 <div className={styles.progressHandler}><antd.Progress strokeWidth="4px" className={this.state.posting? styles.proccessUnset : (keys_remaining < 512? styles.proccessSet : styles.proccessUnset)} status={this.handleKeysProgressBar()}  showInfo={false} percent={percent} /></div>
                 
                 <div className={styles.postExtra} > 
-                    { this.state.imageUrl? 
-                        <div className={styles.imagePreviewWrapper}>
-                            <img className={styles.imagePreview} src={this.state.imageUrl} /> 
-                        </div> : null
+                    { this.state.file? 
+                        this.renderPostPlayer() : null
                     }
-                    <antd.Button type="ghost" onClick={() => this.ToogleUpload()} > <Icons.CameraFilled /></antd.Button>
-                    <antd.Button type="ghost"> <Icons.VideoCameraFilled /></antd.Button>
-                    <antd.Button onClick={this.handleToggleToolbox} type="ghost"><Icons.PlusCircleOutlined /></antd.Button>
+                    <antd.Button type="ghost" onClick={() => this.ToogleUpload()} > <MICONS.AddCircle /></antd.Button>
+                    <antd.Button type="ghost" onClick={this.handleToggleToolbox} ><MICONS.Tune /></antd.Button>
                     <antd.Dropdown overlay={shareOptionsMenu}>
                         <a className={styles.shareWith} onClick={e => e.preventDefault()}>
                         {ycore.GetPostPrivacy.decorator(this.state.shareWith)}

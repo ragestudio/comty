@@ -11,11 +11,11 @@ export function follow_user(id, callback) {
     body: formdata,
     redirect: 'follow'
   };  
-  ycore.DevOptions.ShowFunctionsLogs? console.log(`Following user => ${id} `) : null
+  ycore.yconsole.log(`Following user => ${id} `) 
   const urlObj = `${ycore.endpoints.follow_user}${ycore.GetUserToken.decrypted().UserToken}`
   fetch(urlObj, requestOptions)
     .then(response => {
-        ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+        ycore.yconsole.log(response)
         return callback(false, response)
       })
     .catch(error => {
@@ -61,27 +61,34 @@ export function PublishPost(privacy, raw, file, callback){
   if(!rawtext){
       return null
   }
+
   let formdata = new FormData();
   formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
+  formdata.append("type", "new_post")
   formdata.append("server_key", ycore.yConfig.server_key);
   formdata.append("postPrivacy", privacy)
   formdata.append("postText", raw);
-  file? formdata.append("postPhotos", file) : null
+  file? formdata.append("postPhoto", file) : null
+
   const requestOptions = {
-    method: 'POST',
-    body: formdata,
-    redirect: 'follow'
+    "url": `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`,
+    "method": "POST",
+    "timeout": 0,
+    "data": formdata,
+    "mimeType": "multipart/form-data",
+    "processData": false,
+    "contentType": false
   };  
-  ycore.DevOptions.ShowFunctionsLogs? console.log(`Sending new post => ${rawtext} `) : null
-  const urlObj = `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`
-  fetch(urlObj, requestOptions)
-    .then(response => {
-        ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+  
+  ycore.yconsole.log(`Sending new post => ${rawtext} `)
+  jquery.ajax(requestOptions)
+    .done(response => {
+        ycore.yconsole.log(response)
         return callback(false, response)
       })
-    .catch(error => {
-      console.log('error', error)
-      return callback(true, error)
+    .fail(error => {
+        ycore.yconsole.log('error', error)
+        return callback(true, error)
     });
 }
 
@@ -195,32 +202,26 @@ export function GetPosts(userid, type, callback) {
 
 export const get_app_session = {
     get_id: (callback) => {
-      const fromSto = sessionStorage.getItem('se_src')
-      if (!fromSto){
-        ycore.DevOptions.ShowFunctionsLogs? console.log("Missing session_id, setting up...") : null
-        let formdata = new FormData();
-        formdata.append("server_key", ycore.yConfig.server_key);
-        formdata.append("type", "get");
-        const requestOptions = {
-          method: 'POST',
-          body: formdata,
-          redirect: 'follow'
-        };
-        const uriObj = `${ycore.endpoints.get_sessions}${ycore.GetUserToken.decrypted().UserToken}`
-        notifyProccess()
-        fetch(uriObj, requestOptions)
-          .then(response => response.text())
-          .then(result => {
-            const pre = JSON.stringify(result)
-            const pre2 = JSON.parse(pre)
-            const pre3 = JSON.stringify(JSON.parse(pre2)["data"])
-            const obj = JSON.parse(pre3)["session_id"]
-            return asyncSessionStorage.setItem('se_src', btoa(obj)).then( callback(null, obj) )
-          })
-        .catch(error => console.log('error', error));
-      }
-        ycore.DevOptions.ShowFunctionsLogs? console.log("Returning from storage") : null
-        return callback( null, atob(fromSto) )
+      let formdata = new FormData();
+      formdata.append("server_key", ycore.yConfig.server_key);
+      formdata.append("type", "get");
+      const requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow'
+      };
+      const uriObj = `${ycore.endpoints.get_sessions}${ycore.GetUserToken.decrypted().UserToken}`
+      ycore.notifyProccess('Getting session data...')
+      fetch(uriObj, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          const pre = JSON.stringify(result)
+          const pre2 = JSON.parse(pre)
+          const pre3 = JSON.stringify(JSON.parse(pre2)["data"])
+          const obj = JSON.parse(pre3)["session_id"]
+          return callback(null, obj) 
+        })
+      .catch(error => ycore.yconsole.log('error', error));
     },
     raw: (callback) => {
         const formdata = new FormData();
@@ -238,17 +239,17 @@ export const get_app_session = {
             const pre = JSON.stringify(result)
             const parsed = JSON.parse(pre)
             const obj = JSON.parse(parsed)["data"]
-            ycore.DevOptions.ShowFunctionsLogs? console.log(result, obj) : null
+            ycore.yconsole.log(result, obj)
             return callback(null, obj)
           })
-        .catch(error => console.log('error', error));
+        .catch(error => ycore.yconsole.log('error', error));
     }
 }
 export function PushUserData(inputIO1, inputIO2) {
   var getStoragedToken = Cookies.get('access_token');
   var yCore_GUDEP = ycore.endpoints.update_userData_endpoint;
   var urlOBJ = "" + yCore_GUDEP + getStoragedToken;
-  ycore.DevOptions.ShowFunctionsLogs? console.log('Recived', global, 'sending to ', urlOBJ) : null
+  ycore.yconsole.log('Recived', global, 'sending to ', urlOBJ)
   var form = new FormData();
   form.append("server_key", ycore.yConfig.server_key);
   form.append(inputIO1, inputIO2);
@@ -262,6 +263,6 @@ export function PushUserData(inputIO1, inputIO2) {
       "data": form
   };
   jquery.ajax(settings).done(function (response) {
-    ycore.DevOptions.ShowFunctionsLogs? console.log(response) : null
+    ycore.yconsole.log(response)
   });
 }

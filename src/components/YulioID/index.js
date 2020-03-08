@@ -7,6 +7,7 @@ import '@ant-design/compatible/assets/index.css';
 import { Button, Input, Drawer, Collapse } from 'antd';
 import styles from './index.less';
 import formstyle from './formstyle.less'
+import * as ycore from 'ycore'
 
 const FormItem = Form.Item
 
@@ -46,16 +47,16 @@ class YulioID extends Component {
     
     if (!EncUsername || !EncPassword) {
       var message = 'Incomplete information!'
-      console.log(prefix, message)
+      ycore.yconsole.log(prefix, message)
     }
 
     if (EncUsername && EncPassword){
       this.setState({ ShowLoading: true, StateMessage: 'Wait a sec...' });
       if (DevOptions.InfiniteLogin == true) {
-        console.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
+        ycore.yconsole.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
       }
       else {
-        console.log(prefix, 'Initialising login process...')
+        ycore.yconsole.log(prefix, 'Initialising login process...')
         GetAuth(EncUsername, EncPassword, (exception, response) =>  this.handleResponse(response))
       }
     }

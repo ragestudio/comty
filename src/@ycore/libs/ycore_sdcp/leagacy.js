@@ -15,7 +15,7 @@ export function InitSDCP(values, done) {
     let payload = {};
     if (!values) {
         const message = 'Missing payload! Exception while request data...';
-        ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, message) : null
+        ycore.yconsole.log(prefix, message)
         return;
     }
     payload.UserToken = values.UserToken;
@@ -27,7 +27,7 @@ export function InitSDCP(values, done) {
             let Ensamblator = btoa(JSON.stringify(cooked))
             ycore.SetupApp()
             ycore.asyncSDCP.setSDCP(Ensamblator).then(() => {
-               ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, ' SDCP Setup done') : null
+               ycore.yconsole.log(prefix, ' SDCP Setup done')
                return done(true)
            })
           }
@@ -44,14 +44,14 @@ export function UpdateSDCP() {
        const e2 = btoa(Nsdcp)
        const n = e1.localeCompare(e2)
        if (!e2) {
-            ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'API Returned empty response! We recommend to logout') : null
+            ycore.yconsole.log(prefix, 'API Returned empty response! We recommend to logout')
             return
        }
        if (e1 == e2) {
-         ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Equality') : null
+         ycore.yconsole.log(prefix, 'SDCP Equality')
        }else{
-           ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, 'SDCP Update detected ! => ', n) : null
-           ycore.DevOptions.ShowFunctionsLogs? console.debug(`Compare versions =>  NEW ${[e1]} || OLD ${[e2]}  `) : null
+           ycore.yconsole.log(prefix, 'SDCP Update detected ! => ', n)
+           ycore.yconsole.debug(`Compare versions =>  NEW ${[e1]} || OLD ${[e2]}  `)
            ycore.asyncSDCP.setSDCP(e2)
        }
 

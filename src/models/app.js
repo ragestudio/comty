@@ -79,7 +79,6 @@ export default {
           return 
       } 
       else if(!pathMatchRegexp(['','/login'], window.location.pathname)) {
-          console.log('REP')
           if (validBackup == true) {
             ycore.LogoutCall()
           } 

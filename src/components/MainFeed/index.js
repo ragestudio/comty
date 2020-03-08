@@ -6,7 +6,7 @@ import {PostCard} from 'components'
 var userData = ycore.SDCP()
 
 export function RefreshFeed(){
-    ycore.DevOptions.ShowFunctionsLogs? console.log('Refreshing Feed...') : null
+    ycore.yconsole.log('Refreshing Feed...')
     window.MainFeedComponent.handleRefreshList();
     return
 }
@@ -43,7 +43,7 @@ class MainFeed extends React.Component {
         const { get, filters } = this.props
         try {
             const feedParsed = JSON.parse(feedRaw)['data']
-            ycore.DevOptions.ShowFunctionsLogs? console.log(feedParsed) : null
+            ycore.yconsole.log(feedParsed)
             return (
                 feedParsed.map(item=> {
                     const {id, postText, post_time, publisher, postFile, postFileName, is_liked, is_post_saved, is_post_reported, is_post_boosted, is_post_pinned, post_likes} = item

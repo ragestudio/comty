@@ -16,7 +16,9 @@ export var DevOptions = {
     default_showpostcreator: ReturnDevOption('default_showpostcreator'),
     default_collapse_sider: ReturnDevOption('default_collapse_sider'),
     use_dev_server: ReturnDevOption('use_dev_server'),
+    force_show_postactions: ReturnDevOption('force_show_postactions'),
     MaxJWTexpire: '1556952',
     MaxLengthPosts: '512',
-    CurrentBundle: 'light_ng'
+    CurrentBundle: 'light_ng',
+    MaximunAPIPayload: '101376'
 }

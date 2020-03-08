@@ -60,6 +60,7 @@ class Sider extends PureComponent {
     e.key === 'general_settings' && ycore.crouter.native('settings')
     e.key === 'accountpage' && router.push('/account')
     e.key === 'explore' && router.push('main')
+    e.key === 'admin_area' && router.push('__m')
   }
 
   isDarkMode(){

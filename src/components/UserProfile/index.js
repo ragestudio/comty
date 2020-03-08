@@ -13,7 +13,7 @@ const userData = ycore.SDCP();
 
 function isOwnProfile(id){
   if(id == userData.id){
-    ycore.DevOptions.ShowFunctionsLogs ? console.log('Is your own profile !!'): null
+    ycore.yconsole.log('Is your own profile !!')
     return true
   }
   return false
@@ -54,9 +54,9 @@ class UserProfile extends React.Component {
             exception? ycore.notifyError(exception) : null
             try {
               const rp = JSON.parse(response)
-              ycore.DevOptions.ShowFunctionsLogs? console.log(rp) : null
+              ycore.yconsole.log(rp)
               if (!rp['0']) {
-                ycore.DevOptions.ShowFunctionsLogs? console.log('Bad response / User not found') : null
+                ycore.yconsole.log('Bad response / User not found') 
                 const val = { id: null, username: 'User not found!'}
                 this.setState({ RenderValue: val, loading: false })
                 return 
@@ -64,7 +64,7 @@ class UserProfile extends React.Component {
               const c1 = rp['0'].username.toLowerCase()
               const c2 = string.toLowerCase()
               if (c1 !== c2) {
-                ycore.DevOptions.ShowFunctionsLogs ? console.log(`Using aproximate user! => ${c1}  /  ${c2}`) : null
+                ycore.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
                 ycore.crouter.native(`@${c1}`)
               }
               this.setState({ UUID: rp['0'].user_id,  RenderValue: rp['0'], loading: false , Followed: ycore.booleanFix(rp['0'].is_following)})            
@@ -107,7 +107,6 @@ class UserProfile extends React.Component {
   };
     render(){
         const { loading, UUID } = this.state
-        console.log(UUID)
         return(
             <div>
               {loading? <antd.Skeleton active /> : 

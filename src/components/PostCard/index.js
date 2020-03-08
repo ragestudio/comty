@@ -5,6 +5,8 @@ import {CustomIcons, LikeBTN} from 'components'
 import * as ycore from 'ycore'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
+import classnames from 'classnames'
+import * as MICON from '@material-ui/icons';
 
 const { Meta } = antd.Card;
 
@@ -55,15 +57,36 @@ class PostCard extends React.PureComponent{
             )
         }
     }
-    
+
     render(){
         const { payload, customActions } = this.props
+        const ActShowMode = ycore.DevOptions.force_show_postactions
         const { id, user, ago, avatar, content, file, postFileName, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
-        const defaultActions = [<div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,<Icons.ShareAltOutlined key="share" />,<Icons.MoreOutlined key="actionMenu" />]
+        const defaultActions = [
+            <div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,
+            <MICON.InsertComment key="share" />,
+            <div><antd.Dropdown overlay={MoreMenu} trigger={['click']}>
+            <Icons.MoreOutlined key="actionMenu" />
+            </antd.Dropdown></div>,
+        ]
         const actions = customActions || defaultActions;
+       
+        const MoreMenu = (
+            <antd.Menu>
+              <antd.Menu.Item key="0">
+                <a href="http://www.alipay.com/">1st menu item</a>
+              </antd.Menu.Item>
+              <antd.Menu.Item key="1">
+                <a href="http://www.taobao.com/">2nd menu item</a>
+              </antd.Menu.Item>
+              <antd.Menu.Divider />
+              <antd.Menu.Item key="3">3rd menu item</antd.Menu.Item>
+            </antd.Menu>
+          );
+
         return(
           <div className={styles.cardWrapper}>
-             <antd.Card actions={actions} >
+             <antd.Card hoverable className={ActShowMode? styles.showMode : null} actions={actions} >
                 <Meta
                     avatar={<div className={styles.postAvatar}><antd.Avatar shape="square" size={50} src={avatar} /></div>}
                     title={<div className={styles.titleWrapper} ><h4 onClick={() => ycore.crouter.native(`@${user}`)} className={styles.titleUser}>@{user} {ycore.booleanFix(publisher.verified)? <Icon style={{ color: 'blue' }} component={CustomIcons.VerifiedBadge} /> : null}{ycore.booleanFix(publisher.nsfw_flag)? <antd.Tag style={{ margin: '0 0 0 13px' }} color="volcano" >NSFW</antd.Tag> : null} </h4> <div className={styles.PostTags}>{ycore.booleanFix(is_post_pinned)? (<Icons.PushpinFilled /> ): null }</div> </div>}

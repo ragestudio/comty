@@ -12,13 +12,18 @@ function __ServerAlive(a, callback){
     
 }
 
+export function __permission(id){
+  const userAdmin = ycore.SDCP().admin
+  return ycore.booleanFix(userAdmin)
+}
+
 function __API__User (payload){
     var ExpireTime =  ycore.DevOptions.MaxJWTexpire
     const now = new Date()
     now.setDate(now.getDate() + 1)
     const { UserID, UserToken } = payload
     const frame = { UserID, UserToken, deadline: ( ycore.DevOptions.SignForNotExpire? null : now.getTime() )}
-    console.debug(frame)
+    ycore.yconsole.debug(frame)
     jwt.sign(
       frame,
       keys.secretOrKey,
@@ -79,10 +84,10 @@ export function MakeBackup(){
 }
 export function LogoutCall(){
     const prefix = ('[YID Session]  ')
-    console.log('Logout Called !')
+    ycore.yconsole.log('Logout Called !')
     let DecodedToken = ycore.GetUserToken.decrypted().UserToken || atob(localStorage.getItem('last_backup'))
     const urlOBJ = (`${ycore.endpoints.removeToken}${DecodedToken}`)
-    ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, ' Login out with token => ', DecodedToken, urlOBJ) : null
+    ycore.yconsole.log(prefix, ' Login out with token => ', DecodedToken, urlOBJ)
     const form = new FormData();
     form.append("server_key", ycore.yConfig.server_key);
     const settings = {
@@ -97,7 +102,7 @@ export function LogoutCall(){
     jquery.ajax(settings)
     .done((response) => {
         const api_state = JSON.parse(response)['api_status']
-        console.log(`Exit with => ${api_state}`)
+        ycore.yconsole.log(`Exit with => ${api_state}`)
         if (api_state == '404') {
             antd.notification.open({
                 placement: 'topLeft',
@@ -105,10 +110,10 @@ export function LogoutCall(){
                 description: 'It seems that your token has been removed unexpectedly and could not log out from YulioID ',
                 icon: <Icons.WarningOutlined style={{ color: 'orange' }} />
             })
-            console.log("Failed logout with YulioID™", response)
+            ycore.yconsole.log("Failed logout with YulioID™", response)
         }
         else {
-            console.log("Successful logout with YulioID™", response, urlOBJ)
+            ycore.yconsole.log("Successful logout with YulioID™", response, urlOBJ)
         }
         // Runtime after dispatch API
         Cookies.remove('token')
@@ -120,7 +125,7 @@ export function GetAuth(EncUsername, EncPassword, callback) {
     const prefix = '[Auth Server]:';
     if (!EncUsername || !EncPassword) {
         const message = 'Missing Data! Process Aborted...';
-        console.log(prefix, message);
+        ycore.yconsole.log(prefix, message);
     }
     const server_key = ycore.yConfig.server_key;
     let username = atob(EncUsername);
@@ -140,14 +145,14 @@ export function GetAuth(EncUsername, EncPassword, callback) {
     };
     jquery.ajax(settings)
         .done(function (response) {
-            console.log(prefix, 'Server response... Dispathing data to login API...');
+            ycore.yconsole.log(prefix, 'Server response... Dispathing data to login API...');
             try {
                 var identState = JSON.parse(response)['api_status'];
                 if (identState == 200) {
                   const UserID = JSON.parse(response)['user_id'];
                   const UserToken = JSON.parse(response)['access_token'];
                   let FramePayload = { UserID, UserToken }
-                  ycore.DevOptions.ShowFunctionsLogs ? console.log(FramePayload) : null
+                  ycore.yconsole.log(FramePayload)
                   callback(null, '200')
                   ycore.InitSDCP(FramePayload, (done) => done? __API__User(FramePayload) : null )
                 }
@@ -180,7 +185,7 @@ export const GetUserToken = {
         if (!FB) {
             final = FC
         }
-        ycore.DevOptions.ShowFunctionsLogs ? console.debug(final) : null
+        ycore.yconsole.debug(final)
         return final
     },
     raw: function () {
@@ -195,7 +200,7 @@ export function GetUserData (values, callback) {
     const userid = globalValue.UserID
     if (!globalValue) {
         const message = 'Missing payload! Exception while request data... Maybe the user is not login';
-        ycore.DevOptions.ShowFunctionsLogs? console.log(prefix, message) : null
+        ycore.yconsole.log(prefix, message)
         return;
     }
     const ApiPayload = new FormData();
@@ -222,7 +227,7 @@ export function GetUserData (values, callback) {
        )
       .fail(
          function (response) {
-            ycore.DevOptions.ShowFunctionsLogs ? console.log(prefix, 'Server failure!', response) : null
+            ycore.yconsole.log(prefix, 'Server failure!', response)
             callback(true, response )
         }
      )

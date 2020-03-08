@@ -18,14 +18,48 @@ export var endpoints = Endpoints;
 export var yConfig = config.yConfig;
 
 var package_json = require("../../package.json");
+
+/**
+ * Convert a base64 string in a Blob according to the data and contentType.
+ * 
+ * @param b64Data {String} Pure base64 string without contentType
+ * @param contentType {String} the content type of the file i.e (image/jpeg - image/png - text/plain)
+ * @param sliceSize {Int} SliceSize to process the byteCharacters
+ * @return Blob
+ */
+export function b64toBlob(b64Data, contentType, sliceSize) {
+    contentType = contentType || '';
+    sliceSize = sliceSize || 512;
+
+    var byteCharacters = atob(b64Data);
+    var byteArrays = [];
+
+    for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        var byteArray = new Uint8Array(byteNumbers);
+
+        byteArrays.push(byteArray);
+    }
+
+  var blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
+
 export const AppInfo = {
     name: package_json.title,
     version: package_json.version,
     logo: config.FullLogoPath,
     logo_dark: config.DarkFullLogoPath
 }
+
 export function RegSW(){
-    console.log('Registering Service Worker...')
+    yconsole.log('Registering Service Worker...')
     sw.register()
 }
 
@@ -79,6 +113,7 @@ export function notifyProccess(cust){
     antd.notification.open({
         icon: <Icons.LoadingOutlined style={{ color: '#108ee9' }} />,
         message: 'Please wait',
+        description: (<div>{cust}</div>),
         placement: 'bottomLeft'
     })
 }
@@ -118,9 +153,11 @@ export const asyncSessionStorage = {
         });
     }
 };
+
 export function RefreshONCE(){
  window.location.reload(); 
 }
+
 export function DetectNoNStableBuild(e1) {
     switch (e1) {
         case 'TagComponent':
@@ -145,5 +182,24 @@ export function DetectNoNStableBuild(e1) {
                 return ('No Stable');
             }
             break;
+    }
+}
+
+export const yconsole = {
+    log: (...cont)=>{
+        ReturnDevOption('force_showDevLogs')? console.log(...cont) : null
+        return
+    },
+    debug: (...cont)=>{
+        ReturnDevOption('force_showDevLogs')? console.debug(...cont) : null
+        return
+    },
+    error: (...cont)=>{
+        ReturnDevOption('force_showDevLogs')? console.error(...cont) : null
+        return
+    },
+    warn: (...cont)=>{
+        ReturnDevOption('force_showDevLogs')? console.warn(...cont) : null
+        return
     }
 }
