@@ -141,10 +141,6 @@ class Sider extends PureComponent {
                          {collapsed ?  null : <Trans>Logout</Trans>}
                         </antd.Menu.Item>
                     </antd.Menu>
-                    <div className={styles.siderhead}>
-                      <antd.Avatar onClick={() => ycore.crouter.native(`@${userData.username}`)} size={collapsed? "small" : "large"} shape={collapsed? "circle" : "square"} src={userData.avatar} className={collapsed? styles.avatar : styles.avatarFull} />
-                    </div>  
-                    {collapsed? null : <div className={styles.userInfo}><a onClick={() => ycore.crouter.native(`@${userData.username}`)} ><h2>@{userData.username}</h2></a></div> }
                 </div>
             </ScrollBar>
         </div>

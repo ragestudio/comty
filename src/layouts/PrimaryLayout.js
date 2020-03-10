@@ -165,7 +165,7 @@ class PrimaryLayout extends PureComponent {
            <Sider {...SiderProps}/>
 
             <div id="primaryLayout" className={styles.leftContainer}>
-                <PageTransition preset="moveToLeftFromRight" id="scroller" transitionKey={location.pathname}>
+                <PageTransition preset="moveToRightScaleUp" id="scroller" transitionKey={location.pathname}>
                    
                     <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
                         <HeaderSearch />
@@ -175,15 +175,15 @@ class PrimaryLayout extends PureComponent {
             </div>  
 
             <div id="secondaryLayout" className={styles.rightContainer}>
-                <PageTransition preset="moveToLeftFromRight" transitionKey={location.pathname}>
+                
                   <div className={styles.SecondHeader}>
                     <div className={styles.notif_box}></div>
-                    <img src={userData.avatar} />
+                    <img onClick={() => ycore.crouter.native(`@${userData.username}`)} src={userData.avatar} />
                   </div>
                   <Fragment>
                      {this.state.ContentSecondLayer}
                   </Fragment>
-                </PageTransition>
+ 
             </div>
 
           </Layout>

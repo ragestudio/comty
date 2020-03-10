@@ -20,5 +20,7 @@ export var DevOptions = {
     MaxJWTexpire: '1556952',
     MaxLengthPosts: '512',
     CurrentBundle: 'light_ng',
-    MaximunAPIPayload: '101376'
+    // In KB
+    MaximunAPIPayload: '101376',
+    limit_post_catch: ReturnDevOption('limit_post_catch')
 }

@@ -42,9 +42,8 @@ class UserProfile extends React.Component {
         const { regx } = this.props
         this.initUser(regx)
         SetHeaderSearchType.disable()
-        // console.log('%c Halo, sabias que el gatitos es gai? ', 'font-weight: bold; font-size: 50px;color: red; text-shadow: 3px 3px 0 rgb(217,31,38) , 6px 6px 0 rgb(226,91,14) , 9px 9px 0 rgb(245,221,8) , 12px 12px 0 rgb(5,148,68) , 15px 15px 0 rgb(2,135,206) , 18px 18px 0 rgb(4,77,145) , 21px 21px 0 rgb(42,21,113)')
     }
-    
+
     initUser = (e) => {
         const parsed = e.shift()
         const raw = parsed.toString()
@@ -67,6 +66,12 @@ class UserProfile extends React.Component {
                 ycore.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
                 ycore.crouter.native(`@${c1}`)
               }
+              ycore.GetUserTags(rp['0'].user_id, (err, res) => {
+                if (err) {
+                  ycore.notifyError(err)
+                  return
+                }
+              })
               this.setState({ UUID: rp['0'].user_id,  RenderValue: rp['0'], loading: false , Followed: ycore.booleanFix(rp['0'].is_following)})            
             } catch (err) {
               ycore.notifyError(err)
@@ -92,8 +97,8 @@ class UserProfile extends React.Component {
                   {ycore.booleanFix(values.nsfw_flag)? <antd.Tag color="volcano" >NSFW</antd.Tag> : null}
                   {ycore.booleanFix(values.is_pro)? <antd.Tag color="purple">CPRO™ <Icons.RocketOutlined /></antd.Tag> : null}
                   {ycore.booleanFix(values.dev)? <antd.Tag color="default">DEVELOPER <Icons.CodeOutlined /></antd.Tag> : null}
-                  {isOwnProfile(values.id)?  null : <div className={styles.follow_wrapper} onClick={() => this.handleFollowUser()} ><Follow_btn followed={this.state.Followed? true : false} /></div>}
                 </div>
+                {isOwnProfile(values.id)?  null : <div className={styles.follow_wrapper} onClick={() => this.handleFollowUser()} ><Follow_btn followed={this.state.Followed? true : false} /></div>}
                 <div className={styles.contentTitle}>
                    <h1 style={{ marginBottom: '0px' }} >{values.username}<antd.Tooltip title="User Verified">{ycore.booleanFix(values.verified)? <Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null}</antd.Tooltip></h1> 
                    <span style={{ fontSize: '14px', fontWeight: '100', lineHeight: '0', marginBottom: '5px' }} dangerouslySetInnerHTML={{__html:  values.about }}  />

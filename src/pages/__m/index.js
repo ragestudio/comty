@@ -3,18 +3,21 @@ import React from 'react';
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons';
+import $ from 'jquery'
 import Icon from '@ant-design/icons'
 
 import styles from './style.less'
 import { GridContent } from '@ant-design/pro-layout';
+import { json } from 'body-parser';
 
-
+const UserData = ycore.SDCP()
 
 export default class __m extends React.Component {
   constructor(props){
     super(props),
     this.state = {
       s_id: '',
+      coninfo: 'Getting info...',
     };
   }
 
@@ -33,43 +36,57 @@ export default class __m extends React.Component {
       this.setState({ s_id: response})
     })
   }
+  DescompileSDCP(){
+    let result = {};
+    for (var i = 0; i < UserData.length; i++) {
+      result[UserData[i].key] = UserData[i].value;
+    }
+    console.log([result])
+  }
 
   render() {
-    return (
-      <GridContent>
-        <React.Fragment>
-            <div className={styles.titleHeader}>
-              <h1><Icons.ApartmentOutlined /> Administration</h1>
-            </div>
+    const arrayOfSDCP = Object.entries(UserData).map((e) => ( { [e[0]]: e[1] } ));
 
-            <div className={styles.titleHeader}>
-              <h1><Icons.BugOutlined /> Debug</h1>
-            </div>
-            <div className={styles.sectionWrapper}>
-              <div>
-                <antd.Button onClick={() => this.handleSID()} > Refresh Session ID</antd.Button>
-                <span> {this.state.s_id} </span>
-              </div>
-            </div>
-          <antd.Row
-            gutter={24}
-            type="flex"
-            style={{
-              marginTop: 24,
-            }}
-          >
-      
-            <antd.Col xl={12} lg={24} md={24} sm={24} xs={24}>
-           
-                <h1>__m2</h1>
-             
-            </antd.Col>
-          </antd.Row>
-         
-            <h1>__m3 offline</h1>
-      
-        </React.Fragment>
-      </GridContent>
-    );
+    return (
+      <div className={styles.Wrapper}>
+          <div className={styles.titleHeader}>
+            <h1><Icons.DeploymentUnitOutlined /> yCore™ Server</h1>
+          </div>
+          <div className={styles.sectionWrapper}>
+            <antd.Card>
+              <h2><Icons.CloudServerOutlined /> Server UID</h2>
+              <span> {ycore.yConfig.server_key} </span>
+            </antd.Card>  
+            <antd.Card>
+              <h2><Icons.UserOutlined /> Your SID</h2>
+              <span> {this.state.s_id} </span>
+            </antd.Card>
+            <antd.Card>
+              <span> Using v{ycore.AppInfo.version} | User @{UserData.username}#{UserData.id} | </span>  
+            </antd.Card>
+          </div>
+
+          <div className={styles.titleHeader}>
+            <h1><Icons.DatabaseOutlined  /> SDCP™</h1>
+          </div>
+          <div className={styles.sectionWrapper}>
+            <antd.Card>
+              <h2><Icons.CloudServerOutlined /> UserData</h2>
+              <antd.Collapse>
+                <antd.Collapse.Panel  header="WARNING: High Heap when descompile data! " key="1">
+                  { JSON.stringify(arrayOfSDCP) }
+                </antd.Collapse.Panel>
+              </antd.Collapse>
+
+              
+              
+              
+            
+            </antd.Card>  
+            
+          </div>
+
+      </div>
+    )
   }
 }

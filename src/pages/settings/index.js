@@ -1,9 +1,9 @@
 import React from 'react';
 import { GridContent } from '@ant-design/pro-layout';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Menu, Typography } from 'antd';
 import * as antd from 'antd'
 import * as ycore from 'ycore'
+import * as Icons from '@ant-design/icons'
 import styles from './style.less';
 
 import NotificationView from './components/notification.js';
@@ -60,7 +60,7 @@ class GeneralSettings extends React.Component {
     const { mode, selectKey } = this.state;
     return (
       <div>
-        <Title className={styles.titleHead}><LegacyIcon type="setting" /> Settings</Title>
+        <Title className={styles.titleHead}><Icons.SettingOutlined /> Settings</Title>
         <GridContent>
           <div
             className={styles.main}

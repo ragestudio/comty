@@ -82,11 +82,14 @@
 .inputWrapper{
     display: flex;
     z-index: 10;
+    position: relative;
     width: 100%;
     padding: 18px 7px 0 7px;
     transition: height 150ms linear;
     :global{
         .ant-btn-primary {
+            z-index: 10;
+            position: relative;
             border-radius: 0 10px 10px 0;
             height: 100%;
             vertical-align: bottom;
@@ -94,6 +97,8 @@
             box-shadow: none;
         }
         .ant-input {
+            z-index: 10;
+            position: relative;
             border-color: transparent !important;
             box-shadow: none;
             border-radius: 3px 0 0 0;
@@ -113,6 +118,8 @@
 }
 
 .progressHandler{
+    z-index: 10;
+    position: relative;
     margin: 0 7px 0 7px;
     :global{
         .ant-progress-bg{
@@ -182,18 +189,39 @@
 }
 
 .imagePreviewWrapper{
-    display: flex;
     position: relative;
-    z-index: 30;
     width: 100%;
     height: 100%;
-    margin: 15px 0 15px 0;
+    // top: -100px;
+    margin: 0 0 15px 0;
     .imagePreview{
+        z-index: 5;
+        position: relative;
         margin: auto;
-        max-width: 300px;
-        object-fit: cover;
         border-radius: 8px;
+        img{
+            width: 100%;
+            border: 0.5px rgba(56, 56, 56, 0.459) solid;
+        }
+        transition: all 150ms linear;
+
     }
+    .imageOverlay{
+        z-index: 10;
+        position: relative;
+        opacity: 0;
+        transition: all 150ms linear;
+
+    }
+}
+.imagePreviewWrapper:hover .imagePreview{
+    opacity: 0.5;
+    transition: all 150ms linear;
+}
+.imagePreviewWrapper:hover .imageOverlay{
+    opacity: 1;
+    transition: all 150ms linear;
+
 }
 
 .proccessUnset{

@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { List, Switch, Button, notification } from 'antd';
+import { List, Switch, Button, notification, InputNumber } from 'antd';
 import { AppSettings } from '../../../../globals/settings.js'
 import { DevOptions, ControlBar } from 'ycore'
 import * as ycore from "ycore"
+import * as Icons from '@ant-design/icons'
 import { CustomIcons } from 'components'
 
 class Base extends Component { 
@@ -20,6 +20,19 @@ class Base extends Component {
       ycore.yconsole.warn('The settings for this app in your Account isnt set yet, Using stock settings...')
     }
   }
+
+  rendersets = (item) => {
+  let e = item.type
+   switch (e) {
+     case 'switch':
+      return <Switch checkedChildren={'Enabled'} unCheckedChildren={'Disabled'} checked={item.value} onChange={() => this.onChangeSwitch(item)} />
+      case 'numeric':
+        return <InputNumber min={1} max={50} defaultValue={item.value} onChange={() => this.onChangeNumeric(item, value)} />
+     default:
+       break;
+   }
+  }
+
   SettingRender = data =>{
     try{
     return(
@@ -28,30 +41,29 @@ class Base extends Component {
           itemLayout="horizontal"
           dataSource={data}
           renderItem={item => (
-                 <List.Item actions={item.actions}  >
+                 <List.Item actions={item.actions} key={item.SettingID}  >
                    <List.Item.Meta title={item.title} description={item.description} />
-                   <Switch checkedChildren={'Enabled'} unCheckedChildren={'Disabled'} checked={item.value} onChange={() => this.onChange(item)} />
+                    { this.rendersets(item) }
                  </List.Item>
                )}
         />
-      <Button onClick={() => ycore.RegSW()} > Upload Service Worker </Button>
       </div>
       )
     }
     catch (err){
-      return console.log(err)
+      return ycore.yconsole.log(err)
     }
   }
   handleControlBar(){
     const ListControls = [
       (<div>
-          <Button type="done" icon={<LegacyIcon type='save' />} onClick={() => this.saveChanges()} >Save</Button>
+          <Button type="done" icon={<Icons.SaveOutlined />} onClick={() => this.saveChanges()} >Save</Button>
       </div>
      )
     ]
     ControlBar.set(ListControls)
   }
- 
+
   saveChanges(){
     localStorage.setItem('app_settings', JSON.stringify(this.state.SettingRepo))
     this.setState({ forSave: false })
@@ -62,24 +74,39 @@ class Base extends Component {
     setTimeout((ycore.RefreshONCE()), 1000)
     ControlBar.close()
   }
-  onChange(item) {
+
+  onChangeSwitch(item) {
     try {
       this.handleControlBar()
       const to = !item.value
       const updatedValue = [...this.state.SettingRepo]
       .map(ita => ita === item? Object.assign(ita, { "value": to }) : ita);
       this.setState({SettingRepo: updatedValue, forSave: true})
-      yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      ycore.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }
   }
-
+  onChangeNumeric(value, item) {
+    this.HandleChangeNumeric(value)
+  }
+  HandleChangeNumeric(item, value) {
+    try {
+      this.handleControlBar()
+      console.log(item.SettingID, value)
+      const updatedValue = [...this.state.SettingRepo]
+      .map(ita => ita === item? Object.assign(ita, { "value": value }) : ita);
+      this.setState({SettingRepo: updatedValue, forSave: true})
+      ycore.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+    } catch (err) {
+      console.log(err)
+    }
+  }
   render() {
     return (
       <Fragment>
          <div>
-            <h1><CustomIcons.RobotOutlined /> Behaviors</h1>
+            <h1><Icons.PullRequestOutlined /> Behaviors</h1>
              {this.SettingRender(this.state.SettingRepo)}
          </div>
       </Fragment>

@@ -1,14 +1,19 @@
-import React from 'react'
-import {AppSettings} from  '../../globals/settings.js'
-import {Endpoints} from 'globals/endpoints.js'
-import umiRouter from 'umi/router';
-import * as antd from "antd"
-import * as Icons from '@ant-design/icons';
-import Icon from '@ant-design/icons'
+/**
+ *    @yCore_Worker
+ * 
+ * @author rStudio© 2020
+ * @licensed Pending...
+ */
 
-import config from 'config'
-import './libs.js'
-import * as sw from '../../service-worker.js'
+import React from "react";
+import {AppSettings} from  "../../globals/settings.js";
+import {Endpoints} from "globals/endpoints.js";
+import umiRouter from "umi/router";
+import * as antd from "antd";
+import * as Icons from '@ant-design/icons';
+
+import config from "config"
+import "./libs.js"
 
 export * from "./libs.js"
 export * from "../../config/app.settings.js"
@@ -51,6 +56,11 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   return blob;
 }
 
+/**
+ * Return parsed some information about this App
+ * 
+ * @return {object}
+ */
 export const AppInfo = {
     name: package_json.title,
     version: package_json.version,
@@ -58,11 +68,12 @@ export const AppInfo = {
     logo_dark: config.DarkFullLogoPath
 }
 
-export function RegSW(){
-    yconsole.log('Registering Service Worker...')
-    sw.register()
-}
-
+/**
+ * Convert the localStorage values (AppSettings) parsed
+ * 
+ * @param e {String} String of SettingID for search
+ * @return {string} Boolean value
+ */
 export function StorageValued(e){
     try {
       const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
@@ -77,6 +88,12 @@ export function StorageValued(e){
     }
 }
 
+/**
+ * Return the values as alias (AppSettings, DevOptions)
+ * 
+ * @param e {String} String of SettingID for search
+ * @return {string} Boolean value
+ */
 export function ReturnDevOption(e){
     const Ite = AppSettings.map(item => {
       return item.SettingID === e? item.value : null
@@ -85,12 +102,23 @@ export function ReturnDevOption(e){
     return fr.toString()
 }
 
+/**
+ * Global fix for convert '1, 0' to string boolean 'true, false'
+ * 
+ * @param e {int} Numeric boolean reference
+ * @return {bool} Boolean value
+ */
 export function booleanFix(e){
     if(e == 1){
         return true
     }
     return false
 }
+
+/**
+ * Framework functionality for navigate between pages (Router)
+ * 
+ */
 export const crouter = {
     native: (e) =>{
         umiRouter.push({
@@ -102,6 +130,11 @@ export const crouter = {
         router.push(e)
     }
 }
+/**
+ * Render User Notification about an Error
+ * 
+ * @param err {String} String of error for show
+ */
 export function notifyError(err){
     antd.notification.error({
         message: 'Wopss',
@@ -109,6 +142,11 @@ export function notifyError(err){
         placement: 'bottomLeft'
     })
 }
+/**
+ * Render User Notification about an proccess
+ * 
+ * @param cust {String} String of proccess for show
+ */
 export function notifyProccess(cust){
     antd.notification.open({
         icon: <Icons.LoadingOutlined style={{ color: '#108ee9' }} />,
@@ -117,6 +155,10 @@ export function notifyProccess(cust){
         placement: 'bottomLeft'
     })
 }
+/**
+ * Request FullScreen mode
+ * 
+ */
 export function requestFullscreen(){
     var elem = document.documentElement;
     if (elem.requestFullscreen) {
@@ -129,6 +171,13 @@ export function requestFullscreen(){
       elem.msRequestFullscreen();
     }
 }
+/**
+ * Async get/set localStorage method
+ * 
+ * @param key {string} String for search
+ * @param value {string} Value for set
+ * @return {any} An callback for async/await
+ */
 export const asyncLocalStorage = {
     setItem: function (key, value) {
         return Promise.resolve().then(function () {
@@ -141,6 +190,13 @@ export const asyncLocalStorage = {
         });
     }
 };
+/**
+ * Async get/set sessionStorage method
+ * 
+ * @param key {string} String for search
+ * @param value {string} Value for set
+ * @return {any} An callback for async/await
+ */
 export const asyncSessionStorage = {
     setItem: function (key, value) {
         return Promise.resolve().then(function () {
@@ -153,11 +209,19 @@ export const asyncSessionStorage = {
         });
     }
 };
-
+/**
+ * Request browser for refresh the windows 
+ * 
+ */
 export function RefreshONCE(){
  window.location.reload(); 
 }
-
+/**
+ * Parse information about this App
+ * 
+ * @param e1 {string} Declare type
+ * @return {any} JSX Component / Object information
+ */
 export function DetectNoNStableBuild(e1) {
     switch (e1) {
         case 'TagComponent':
@@ -184,7 +248,11 @@ export function DetectNoNStableBuild(e1) {
             break;
     }
 }
-
+/**
+ * User console with setting user permissions
+ * 
+ * @param ... {any} Use for type of console
+ */
 export const yconsole = {
     log: (...cont)=>{
         ReturnDevOption('force_showDevLogs')? console.log(...cont) : null

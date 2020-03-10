@@ -1,6 +1,9 @@
 import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
+
+import InfiniteScroll from 'react-infinite-scroller';
+
 import {PostCard} from 'components'
 
 var userData = ycore.SDCP()
@@ -15,30 +18,38 @@ class MainFeed extends React.Component {
         super(props)
         window.MainFeedComponent = this;
         this.state = {
+            feedRaw: [],
             loading: true,
+            hasMore: true,
         }
     }
+
     toogleLoader(){
         this.setState({ loading: !this.state.loading })
     }
-    componentDidMount(){
-        const { get, uid, filters } = this.props
+    
+    GetPostsData(fkey){
+        const { get, uid, filters } = this.props;
         if (!get) {
-            console.error('Please, fill params with an catch type...')
+            ycore.yconsole.error('Please, fill params with an catch type...')
             return
         }
-        ycore.GetPosts(uid, get, (err, result) => this.setState({ feedRaw: result, loading: false }))
-    }
-    handleRefreshList(){
-        const { get, uid, filters } = this.props
-        if (!get) {
-            console.error('Please, fill params with an catch type...')
-            return
+        if (!fkey) {
+            ycore.yconsole.warn('Please, provide a fkey for offset the feed, default using => 0');
+            
         }
         this.toogleLoader()
-        ycore.GetPosts(uid, get, (err, result) => this.setState({ feedRaw: result, loading: false }))
+        ycore.GetPosts(uid, get, (fkey || '0'), (err, result) => {
+            this.setState({ feedRaw: result, loading: false })
+        })
     }
-    renderFeedPosts(e){
+
+    componentDidMount(){
+        this.GetPostsData()
+        
+    }
+
+    renderFeedPosts = (e) =>{
         const {feedRaw} = this.state
         const { get, filters } = this.props
         try {
@@ -71,18 +82,68 @@ class MainFeed extends React.Component {
             const paylodd = {user: '', ago: '', avatar: '', content: '',  publisher: '' }
             return <PostCard payload={paylodd} />
         }
-    
     }
+
+    handleInfiniteOnLoad = () => {
+      const { get, uid, filters } = this.props;
+      let { feedRaw } = this.state;
+      this.setState({
+        loading: true,
+      });
+      if (feedRaw.length > 300) {
+        antd.message.warning('Infinite List loaded all');
+        this.setState({
+          hasMore: false,
+          loading: false,
+        });
+        return;
+      }
+      console.log('LENGTHT', feedRaw.length)
+      ycore.GetPostsData(uid, get, feedRaw.length, (err, res) => {
+        feedRaw = feedRaw.concat(res.results);
+        this.setState({
+          feedRaw,
+          loading: false,
+        });
+      });
+    };
+    
+ 
+
     render(){
-        const { loading } = this.state;   
+        const { loading, feedRaw } = this.state;   
+        const loaderCard = ( <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} >
+        <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
+    </antd.Card>)
+    
         return (
-            <div>   
-                {loading? 
-                    <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} >
-                        <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
-                    </antd.Card> :
-                    this.renderFeedPosts()
-                }
+            <div>      
+                <InfiniteScroll
+          initialLoad={false}
+          pageStart={0}
+          loadMore={this.handleInfiniteOnLoad}
+          hasMore={!this.state.loading && this.state.hasMore}
+          useWindow={false}
+        >
+          <List
+            dataSource={this.state.feedRaw}
+            renderItem={item => (
+              <List.Item key={item.id}>
+                <List.Item.Meta
+                  avatar={
+                    <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
+                  }
+                  title={<a href="https://ant.design">{item.name.last}</a>}
+                  description={item.email}
+                />
+                <div>Content</div>
+              </List.Item>
+            )}
+          >
+            {this.state.loading && this.state.hasMore && (loaderCard)}
+          </List>
+        </InfiniteScroll>
+              
             </div>
         )
     }

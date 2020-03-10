@@ -1,5 +1,8 @@
 @import '~themes/vars.less';
 
+.Wrapper{
+  padding: 10px;
+}
 .titleHeader{
   position: relative;
   width: 100%;
@@ -16,8 +19,9 @@
   
 }
 .sectionWrapper{
-  display: flex;
-  position: relative;
+  word-break: break-all;
+  max-width: 100%;
+  text-overflow: clip;
   margin: 15px auto 15px 0;
   padding: 15px;
   background-color: rgb(236, 236, 236);

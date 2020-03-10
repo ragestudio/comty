@@ -2,6 +2,28 @@ import * as ycore from 'ycore'
 var jquery = require("jquery");
 import * as Icons from '@ant-design/icons'
 
+
+export function GetGeneralData(callback){
+  let formdata = new FormData();
+  formdata.append("user_id", id);
+  formdata.append("server_key", ycore.yConfig.server_key);
+  const requestOptions = {
+    method: 'POST',
+    body: formdata,
+    redirect: 'follow'
+  };  
+  const urlObj = `${ycore.endpoints.get_general_data}${ycore.GetUserToken.decrypted().UserToken}`
+  fetch(urlObj, requestOptions)
+    .then(response => {
+        ycore.yconsole.log(response)
+        return callback(false, response)
+      })
+    .catch(error => {
+      console.log('error', error)
+      return callback(true, error)
+    });
+}
+
 export function follow_user(id, callback) {
   let formdata = new FormData();
   formdata.append("user_id", id);
@@ -165,9 +187,38 @@ export function ActionPost(type, id, value, callback){
       return callback(true, `[Server error] We couldnt ${type} this post`);
   })
 }
-export function GetPosts(userid, type, callback) {
+export function GetUserTags(id, callback){
+  if (!id) {
+    return false
+  }
   let formdata = new FormData();
   formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("user_id", id )
+
+  const urlOBJ = `${ycore.endpoints.get_user_tags}${ycore.GetUserToken.decrypted().UserToken}`
+  const settings = {
+      "url":  urlOBJ,
+      "method": "POST",
+      "timeout": 0,
+      "processData": false,
+      "mimeType": "multipart/form-data",
+      "contentType": false,
+      "data": formdata
+  };
+  jquery.ajax(settings)
+  .done(function (response) {
+      return callback(null, response);
+  })
+  .fail(function (response) {
+      const exception = 'Request Failed';
+      return callback(exception, response);
+  })
+}
+export function GetPosts(userid, type, fkey, callback) {
+  let formdata = new FormData();
+  formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("after_post_id", (fkey || 0))
+  formdata.append("limit", ycore.DevOptions.limit_post_catch || 20)
   switch (type) {
     case 'feed':
       formdata.append("type", "get_news_feed");
@@ -211,7 +262,6 @@ export const get_app_session = {
         redirect: 'follow'
       };
       const uriObj = `${ycore.endpoints.get_sessions}${ycore.GetUserToken.decrypted().UserToken}`
-      ycore.notifyProccess('Getting session data...')
       fetch(uriObj, requestOptions)
         .then(response => response.text())
         .then(result => {
