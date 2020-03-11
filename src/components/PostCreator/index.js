@@ -35,8 +35,7 @@ class PostCreator extends React.PureComponent{
             posting: false,
             posting_ok: false,
             shareWith: 'any',
-            UploadActive: false,
-            dragging: false,
+            uploader: false,
         }
     }
     renderPostPlayer(payload){
@@ -73,7 +72,7 @@ class PostCreator extends React.PureComponent{
     }
 
     ToogleUpload(){
-        this.setState({ UploadActive: !this.state.UploadActive })
+        this.setState({ uploader: !this.state.uploader })
     }
 
     handleFileUpload = info => {
@@ -82,8 +81,7 @@ class PostCreator extends React.PureComponent{
           return;
         }
         if (info.file.status === 'done') {
-          this.ToogleUpload()
-          this.setState({ file: info.file.originFileObj })
+          this.setState({ file: info.file.originFileObj, uploader: false })
           getBase64(info.file.originFileObj, fileURL =>
             this.setState({
               fileURL,
@@ -93,7 +91,7 @@ class PostCreator extends React.PureComponent{
         }
     };
 
-    beforeUpload(file) {
+    beforeUpload = (file) => {
         const filter = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'video/mp4';
         if (!filter) {
           antd.message.error(`${file.type} This file is not valid!`);
@@ -135,7 +133,7 @@ class PostCreator extends React.PureComponent{
 
     handlePublishPost = (e) => {
         const { rawtext, shareWith, file } = this.state;
-        if(!rawtext || !file){
+        if(!rawtext){
             return null
         }
         this.setState({ posting: true, keys_remaining: ycore.DevOptions.MaxLengthPosts })        
@@ -151,45 +149,35 @@ class PostCreator extends React.PureComponent{
     dropRef = React.createRef()
 
     handleDragIn = (e) => {
-        console.log(' DRAG IN ')
         e.preventDefault()
         e.stopPropagation()
-        this.dragCounter++  
-        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-          this.setState({dragging: true})
+        if (this.state.uploader == true) {
+            return
         }
+        this.setState({ uploader: true })
     }
     handleDragOut = (e) => {
-        console.log(' DRAG OUT ')
         e.preventDefault()
         e.stopPropagation()
-        this.dragCounter--
-        if (this.dragCounter > 0) return
-        this.setState({dragging: false})
-    }
-    handleDrop = (e) => { 
-        console.log(' DRAG DROP ')   
-        e.preventDefault()
-        e.stopPropagation()
+        if (this.state.uploader == false) {
+            return
+        }
+        this.setState({ uploader: false })
     }
 
     componentDidMount() {
-        this.dragCounter = 0
         let div = this.dropRef.current
         div.addEventListener('dragenter', this.handleDragIn)
         div.addEventListener('dragleave', this.handleDragOut)
-        div.addEventListener('drop', this.handleDrop)
-      }  
-      componentWillUnmount() {
-        let div = this.dropRef.current
-        div.removeEventListener('dragenter', this.handleDragIn)
-        div.removeEventListener('dragleave', this.handleDragOut)
-        div.removeEventListener('dragover', this.handleDrag)
-        div.removeEventListener('drop', this.handleDrop)
-        
-      }
+    }  
+    componentWillUnmount() {
+      let div = this.dropRef.current
+      div.removeEventListener('dragenter', this.handleDragIn)
+      div.removeEventListener('dragleave', this.handleDragOut)
+    }
+
     render(){
-        const { keys_remaining, visible } = this.state;
+        const { keys_remaining, visible, fileURL, file } = this.state;
         const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
         const changeShare = ({ key }) => {
             this.setState({ shareWith: key })
@@ -209,25 +197,26 @@ class PostCreator extends React.PureComponent{
           <div className={styles.cardWrapper}>
              <antd.Card bordered="false">
           
-                <div    ref={this.dropRef} className={styles.inputWrapper}>
+                <div ref={this.dropRef} className={styles.inputWrapper}>
                
-                 {this.state.dragging? 
+                 {this.state.uploader? 
                     <div className={styles.uploader}>
-                   
                         <antd.Upload.Dragger 
-                            multiple={true}
+                            multiple={false}
                             listType="picture"
-                            showUploadList={true}
+                            showUploadList={false}
                             beforeUpload={this.beforeUpload}
                             onChange={this.handleFileUpload}
                         >
-                           
+                            <Icons.CloudUploadOutlined />
+                           <span>Drop your file here o click for upload</span>
                         </antd.Upload.Dragger>
                      </div> 
                      :  <>
                         <div className={styles.titleAvatar}><img src={userData.avatar} /></div>
                         <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.handlePublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={8} />
                         <div><antd.Button disabled={this.state.posting? true : (keys_remaining < ycore.DevOptions.MaxLengthPosts? false : true)} onClick={this.handlePublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
+                      
                     </> }
          
       
@@ -235,9 +224,9 @@ class PostCreator extends React.PureComponent{
                    
                 </div>
                 <div className={styles.progressHandler}><antd.Progress strokeWidth="4px" className={this.state.posting? styles.proccessUnset : (keys_remaining < 512? styles.proccessSet : styles.proccessUnset)} status={this.handleKeysProgressBar()} showInfo={false} percent={percent} /></div>
-                
+                {fileURL? this.renderPostPlayer(this.state.fileURL) : null}
                 <div className={styles.postExtra} > 
-                    <antd.Button type="ghost" onClick={() => this.ToogleUpload()} > {this.state.UploadActive? <MICONS.Cancel /> : <MICONS.AddCircle />} </antd.Button>
+                    <antd.Button styles={this.state.uploader? {fontSize: '20px'} : null} type="ghost" onClick={() => this.ToogleUpload()} > {this.state.uploader? <MICONS.Cancel /> : <MICONS.AddCircle />} </antd.Button>
                     <antd.Button type="ghost" onClick={this.handleToggleToolbox} ><MICONS.Tune /></antd.Button>
                     <antd.Dropdown overlay={shareOptionsMenu}>
                         <a className={styles.shareWith} onClick={e => e.preventDefault()}>

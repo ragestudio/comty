@@ -55,6 +55,20 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   var blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
+export function objectLast(array, n) {
+    if (array == null) 
+      return void 0;
+    if (n == null) 
+       return array[array.length - 1];
+    return array.slice(Math.max(array.length - n, 0));  
+};
+export function gotoBottom(id){
+    const element = document.getElementById(id);
+    element.scrollTop = element.scrollHeight - element.clientHeight;
+}
+export function gotoElement(element){   
+     document.getElementById(element).scrollIntoView();   
+}
 
 /**
  * Return parsed some information about this App
