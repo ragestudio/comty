@@ -207,12 +207,19 @@
     height: 100%;
     // top: -100px;
     margin: 0 0 15px 0;
+    background-color: #eeeeee;
     .imagePreview{
         z-index: 5;
         position: relative;
+        width: 50%;
         margin: auto;
         border-radius: 8px;
+        transition: all 150ms linear;
         img{
+            width: 100%;
+            border: 0.5px rgba(56, 56, 56, 0.459) solid;
+        }
+        video{
             width: 100%;
             border: 0.5px rgba(56, 56, 56, 0.459) solid;
         }
@@ -224,7 +231,7 @@
         position: relative;
         opacity: 0;
         transition: all 150ms linear;
-
+        margin: auto;
     }
 }
 .imagePreviewWrapper:hover .imagePreview{

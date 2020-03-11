@@ -38,6 +38,7 @@ class PostCreator extends React.PureComponent{
             uploader: false,
         }
     }
+
     renderPostPlayer(payload){
         const {file, fileURL} = this.state
         const videofilter = file.type === 'video/mp4'
@@ -46,7 +47,7 @@ class PostCreator extends React.PureComponent{
            return (
                 <div className={styles.imagePreviewWrapper}>
                     <div className={styles.imageOverlay}>
-                        <antd.Button onClick={() => null} icon={<Icons.DeleteOutlined />} />
+                        <antd.Button onClick={() => this.handleDeleteFile()} icon={<Icons.DeleteOutlined />} />
                     </div>
                     <div className={styles.imagePreview}>
                         <img className={styles.imagePreview} src={fileURL} />
@@ -58,9 +59,14 @@ class PostCreator extends React.PureComponent{
         if (videofilter) {
             return (
                 <div className={styles.imagePreviewWrapper}>
-                <video id="player" playsInline controls > 
-                     <source className={styles.imagePreview} src={fileURL} type={file.type}/>
-                </video>
+                    <div className={styles.imageOverlay}>
+                        <antd.Button onClick={() => this.handleDeleteFile()} icon={<Icons.DeleteOutlined />} />
+                    </div>
+                    <div className={styles.imagePreview}>
+                        <video id="player" playsInline controls > 
+                             <source className={styles.imagePreview} src={fileURL} type={file.type}/>
+                        </video>
+                    </div>
                 </div>
             )
         }
@@ -74,10 +80,12 @@ class PostCreator extends React.PureComponent{
     ToogleUpload(){
         this.setState({ uploader: !this.state.uploader })
     }
-
+    handleDeleteFile = () =>{
+        this.setState({ fileURL: null })
+    }
     handleFileUpload = info => {
         if (info.file.status === 'uploading') {
-          this.setState({ loading: true });
+          this.setState({ loading: true, });
           return;
         }
         if (info.file.status === 'done') {
@@ -176,6 +184,15 @@ class PostCreator extends React.PureComponent{
       div.removeEventListener('dragleave', this.handleDragOut)
     }
 
+    canPost(){
+        const { fileURL, keys_remaining,  } = this.state
+
+        const isTypedSomething = (keys_remaining < ycore.DevOptions.MaxLengthPosts)
+        const isUploadedFile = (fileURL? true : false)
+
+        return isUploadedFile || isTypedSomething
+    }
+
     render(){
         const { keys_remaining, visible, fileURL, file } = this.state;
         const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
@@ -196,9 +213,7 @@ class PostCreator extends React.PureComponent{
         return(
           <div className={styles.cardWrapper}>
              <antd.Card bordered="false">
-          
                 <div ref={this.dropRef} className={styles.inputWrapper}>
-               
                  {this.state.uploader? 
                     <div className={styles.uploader}>
                         <antd.Upload.Dragger 
@@ -215,13 +230,9 @@ class PostCreator extends React.PureComponent{
                      :  <>
                         <div className={styles.titleAvatar}><img src={userData.avatar} /></div>
                         <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.handlePublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={8} />
-                        <div><antd.Button disabled={this.state.posting? true : (keys_remaining < ycore.DevOptions.MaxLengthPosts? false : true)} onClick={this.handlePublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
+                        <div><antd.Button disabled={this.state.posting? true : !this.canPost()  } onClick={this.handlePublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
                       
                     </> }
-         
-      
-                     
-                   
                 </div>
                 <div className={styles.progressHandler}><antd.Progress strokeWidth="4px" className={this.state.posting? styles.proccessUnset : (keys_remaining < 512? styles.proccessSet : styles.proccessUnset)} status={this.handleKeysProgressBar()} showInfo={false} percent={percent} /></div>
                 {fileURL? this.renderPostPlayer(this.state.fileURL) : null}
