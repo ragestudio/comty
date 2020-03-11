@@ -22,5 +22,5 @@ export var DevOptions = {
     CurrentBundle: 'light_ng',
     // In KB
     MaximunAPIPayload: '101376',
-    limit_post_catch: ReturnDevOption('limit_post_catch')
+    limit_post_catch: '20'
 }
