@@ -106,22 +106,35 @@ class Sider extends PureComponent {
                           <Icons.CompassOutlined />
                           <Trans><span>Explore</span></Trans> 
                       </antd.Menu.Item> 
+
+                      <antd.Menu.Item key="general_settings">
+                        <Icons.ReadOutlined />
+                        <Trans><span>Journal</span></Trans>
+                      </antd.Menu.Item>
+                      
+                      <antd.Menu.Item key="general_settings">
+                        <Icons.ReconciliationOutlined />
+                        <Trans><span>Marketplace</span></Trans>
+                      </antd.Menu.Item>
+                      
+                    
+                    </antd.Menu>
+                   
+                    <div className={styles.something_thats_pulling_me_down}>
+                    <antd.Menu selectable={false} className={collapsed ?  styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
+                       
                       <antd.Menu.Item key="general_settings">
                         <Icons.SettingOutlined/>
                         <Trans><span>Settings</span></Trans>
                       </antd.Menu.Item>
                       {ycore.booleanFix(userData.admin)? 
                         <antd.Menu.Item key="admin_area">
-                          <Icons.ToolOutlined />
-                          <Trans><span>Admin Area</span></Trans>
+                          <Icons.ThunderboltOutlined />
+                          <Trans><span>{userData.username}</span></Trans>
                         </antd.Menu.Item> 
                             : 
                         undefined
                       }
-                    </antd.Menu>
-                   
-                    <div className={styles.something_thats_pulling_me_down}>
-                    <antd.Menu selectable={false} className={collapsed ?  styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
                         <antd.Menu.Item style={{ fontSize: '15px' }} key="LightMode" disabled={false} >
                         {collapsed? <Icons.BulbOutlined /> :
                             <div className={styles.themeSwitcher}>

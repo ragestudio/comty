@@ -14,20 +14,18 @@ import Earnings from './components/earnings.js'
 
 const { Item } = Menu;
 const menuMap = {
-  base: 'General',
-  security: 'Security & Privacity',
-  notification: 'Notification',
-  earnings: 'Earnings',
-  about: 'About'
+  base: (<span><Icons.ControlOutlined /> General</span>),
+  security: (<span><Icons.SafetyCertificateOutlined /> Security & Privacity</span>),
+  notification: (<span><Icons.MailOutlined /> Notification</span>),
+  earnings: (<span><Icons.DollarCircleOutlined /> Earnings</span>),
+  about: (<span><Icons.ContainerOutlined /> About</span>)
 
 };
 
-const { Title } = Typography;
 class GeneralSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      mode: 'inline',
       selectKey: 'base',
     };
   }
@@ -62,33 +60,22 @@ class GeneralSettings extends React.Component {
   };
 
   render() {
-    const { mode, selectKey } = this.state;
+    const { selectKey } = this.state;
     return (
-      <div>
-        <Title className={styles.titleHead}> {this.getMenu()} </Title>
-        <GridContent>
-          <div
-            className={styles.main}
-            ref={ref => {
-              if (ref) {
-                this.main = ref;
-              }
-            }}
+      <div className={styles.main}>
+        <div className={styles.leftMenu}>
+          <h2><Icons.SettingOutlined /> Settings </h2>
+          <Menu
+            mode="inline"
+            selectedKeys={[selectKey]}
+            onClick={({ key }) => this.selectKey(key)}
           >
-            <div className={styles.leftMenu}>
-              <Menu
-                mode={mode}
-                selectedKeys={[selectKey]}
-                onClick={({ key }) => this.selectKey(key)}
-              >
-                {this.getMenu()}
-              </Menu>
-            </div>
-            <div className={styles.right}>
-              {this.renderChildren()}
-            </div>
-          </div>
-        </GridContent>
+            {this.getMenu()}
+          </Menu>
+        </div>
+        <div className={styles.right}>
+          {this.renderChildren()}
+        </div>
       </div>
     );
   }

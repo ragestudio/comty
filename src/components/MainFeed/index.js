@@ -15,6 +15,7 @@ class MainFeed extends React.Component {
         super(props)
         window.MainFeedComponent = this;
         this.state = {
+            invalid: false,
             loading: false,
             data: [],
             fkey: 0
@@ -38,7 +39,17 @@ class MainFeed extends React.Component {
              }
              this.toogleLoader()
              ycore.GetPosts(uid, get, '0', (err, result) => {
+                 if (err) {
+                     ycore.notifyError('Error when get data from this input')
+                     return
+                 }
+                 console.log(result)
+                 if (JSON.parse(result).api_status == '400') {
+                    this.setState({ invalid: true })
+                    return
+                }
                  const parsed = JSON.parse(result)['data']
+                
                  const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false 
                  this.setState({ isEnd: isEnd, data: parsed, loading: false })
              })
@@ -105,10 +116,17 @@ class MainFeed extends React.Component {
     }
 
     render(){
-        const { loading } = this.state;
+        const { loading, invalid } = this.state;
         return (
            <div id='mainfeed'> 
-               { loading? 
+              {invalid? 
+                <antd.Card style={{ borderRadius: "10px", maxWidth: '26.5vw', margin: 'auto', textAlign: 'center' }} >
+                 
+                    <h2><Icons.ExclamationCircleOutlined />  Invalid Data </h2>
+                    <span>If this error has occurred several times, try restarting the app</span>
+                </antd.Card>
+                :   
+              loading? 
                  <antd.Card style={{  maxWidth: '26.5vw', margin: 'auto' }} >
                         <antd.Skeleton avatar paragraph={{ rows: 4 }} active />
                  </antd.Card>

@@ -152,7 +152,7 @@ export const crouter = {
 export function notifyError(err){
     antd.notification.error({
         message: 'Wopss',
-        description: (<div><span>An wild error appear! : </span><br/><br/><div style={{ position: 'absolute', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{err.toString()}</div></div>),
+        description: (<div><span>An wild error appear! : </span><br/><br/><div style={{ position: 'relative', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{err.toString()}</div></div>),
         placement: 'bottomLeft'
     })
 }

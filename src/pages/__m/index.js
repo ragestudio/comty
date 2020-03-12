@@ -67,6 +67,20 @@ export default class __m extends React.Component {
           </div>
 
           <div className={styles.titleHeader}>
+            <h1><Icons.DeploymentUnitOutlined /> Test yCore™</h1>
+          </div>
+          <div className={styles.sectionWrapper}>
+            <antd.Button onClick={() => ycore.notifyError('Yep, its not empty, jeje funny')} > Send empty notifyError() </antd.Button>
+            <antd.Button onClick={() => ycore.notifyError(`ycore.GetPosts(uid, get, '0', (err, result) => {
+const parsed = JSON.parse(result)['data']
+const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false
+this.setState({ isEnd: isEnd, data: parsed, loading: false })
+})
+
+`)} > Send mock notifyError() </antd.Button>
+          </div>
+
+          <div className={styles.titleHeader}>
             <h1><Icons.DatabaseOutlined  /> SDCP™</h1>
           </div>
           <div className={styles.sectionWrapper}>

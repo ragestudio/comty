@@ -23,6 +23,7 @@ class UserProfile extends React.Component {
     constructor(props){
       super(props),
       this.state = {
+        invalid: false,
         UUID: '',
         RenderValue: {},
         loading: true,
@@ -57,7 +58,9 @@ class UserProfile extends React.Component {
               if (!rp['0']) {
                 ycore.yconsole.log('Bad response / User not found') 
                 const val = { id: null, username: 'User not found!'}
-                this.setState({ RenderValue: val, loading: false })
+                this.setState({ invalid: true, RenderValue: val, loading: false })
+                ycore.crouter.native(`main`)
+                antd.message.warning(`Its seams like @${string} not exist`);
                 return 
               }
               const c1 = rp['0'].username.toLowerCase()
@@ -111,12 +114,12 @@ class UserProfile extends React.Component {
       );
   };
     render(){
-        const { loading, UUID } = this.state
+        const { loading, UUID, invalid } = this.state
         return(
             <div>
               {loading? <antd.Skeleton active /> : 
               (<div>
-                {this.UserHeader(this.state.RenderValue)}
+                {invalid? null: this.UserHeader(this.state.RenderValue)}
                 <MainFeed get='user' uid={UUID} />
               </div>)
               }

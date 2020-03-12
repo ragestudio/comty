@@ -4,6 +4,7 @@ import { AppSettings } from '../../../../globals/settings.js'
 import { DevOptions, ControlBar } from 'ycore'
 import * as ycore from "ycore"
 import * as Icons from '@ant-design/icons'
+import Icon from '@ant-design/icons'
 import { CustomIcons } from 'components'
 
 class Base extends Component { 
@@ -107,6 +108,8 @@ class Base extends Component {
       <Fragment>
          <div>
             <h1><Icons.PullRequestOutlined /> Behaviors</h1>
+            <Icon type="message" style={{ fontSize: '16px', color: '#08c' }} theme="outlined" />
+
              {this.SettingRender(this.state.SettingRepo)}
          </div>
       </Fragment>

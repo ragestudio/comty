@@ -1,48 +1,16 @@
-import * as antd from 'antd';
-import React, { Component, Fragment } from 'react';
+import React from 'react';
+import * as ycore from "ycore"
+import * as Icons from '@ant-design/icons'
+import styles from './notification.less'
 
-class NotificationView extends Component {
-  getData = () => {
-    const Action = (
-      <antd.Switch
-        checkedChildren={'open'}
-        unCheckedChildren={'close'}
-        defaultChecked
-      />
-    );
-    return [
-      {
-        title: 'Title 1',
-        description: 'Description 1',
-        actions: [Action],
-      },
-      {
-        title: 'Title 2',
-        description: 'Description 2',
-        actions: [Action],
-      },
-      {
-        title: 'Title 3',
-        description: 'Description 3',
-        actions: [Action],
-      },
-    ];
-  };
 
+class NotificationView extends React.Component {
   render() {
-    const data = this.getData();
     return (
-      <Fragment>
-        <antd.List
-          itemLayout="horizontal"
-          dataSource={data}
-          renderItem={item => (
-            <antd.List.Item actions={item.actions}>
-              <antd.List.Item.Meta title={item.title} description={item.description} />
-            </antd.List.Item>
-          )} />
-      </Fragment>
-    );
+      <div className={styles.main}>
+        <h2><Icons.NotificationOutlined /> Notifications</h2>
+      </div>
+    )
   }
 }
 
