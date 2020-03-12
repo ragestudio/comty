@@ -10,13 +10,16 @@ import NotificationView from './components/notification.js';
 import SecurityView from './components/security.js';
 import Base from './components/base.js'
 import AppAbout from './components/about.js'
+import Earnings from './components/earnings.js'
 
 const { Item } = Menu;
 const menuMap = {
-  base: 'App',
-  security: 'Security',
+  base: 'General',
+  security: 'Security & Privacity',
   notification: 'Notification',
-  about: 'App About'
+  earnings: 'Earnings',
+  about: 'About'
+
 };
 
 const { Title } = Typography;
@@ -50,6 +53,8 @@ class GeneralSettings extends React.Component {
         return <NotificationView />;
       case 'about':
         return <AppAbout />;
+      case 'earnings':
+        return <Earnings />
       default:
         break;
     }
@@ -60,7 +65,7 @@ class GeneralSettings extends React.Component {
     const { mode, selectKey } = this.state;
     return (
       <div>
-        <Title className={styles.titleHead}><Icons.SettingOutlined /> Settings</Title>
+        <Title className={styles.titleHead}> {this.getMenu()} </Title>
         <GridContent>
           <div
             className={styles.main}

@@ -5,20 +5,22 @@ import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
 import { MyLayout, PageTransition, HeaderSearch } from 'components'
-import classnames from 'classnames'
-import * as ycore from 'ycore'
-import { Layout, Drawer, Result, Button, Checkbox } from 'antd'
+import { Layout, Result, Button } from 'antd'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
-import { config, pathMatchRegexp, langFromPath } from 'utils'
+import { langFromPath } from 'utils'
 import store from 'store';
-import Error from '../pages/404'
+import classnames from 'classnames'
+
+import * as ycore from 'ycore'
+import * as antd from 'antd'
+import * as Icons from '@ant-design/icons'
+
 import styles from './PrimaryLayout.less'
 
 const { Content } = Layout
-const { ChatSider, Sider, Control } = MyLayout
+const { Sider, Control } = MyLayout
 
 const userData = ycore.SDCP()
-
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -36,9 +38,7 @@ class PrimaryLayout extends PureComponent {
     }
     this.ResByPassHandler = this.ResByPassHandler.bind(this);
   }
-  setControls(e){
-    this.setState({BarControls: e})
-  }
+
   componentDidMount() {
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
@@ -49,17 +49,21 @@ class PrimaryLayout extends PureComponent {
       }
     })  
   }
+
   componentWillUnmount() {
     unenquireScreen(this.enquireHandler)
   }
+
+  setControls(e){
+    this.setState({BarControls: e})
+  }
+
   onCollapseChange = () => {
     const fromStore = store.get('collapsed')
-
     this.setState({ collapsed: !this.state.collapsed })
-    store.set('collapsed',  !fromStore)
-    
-    
+    store.set('collapsed',  !fromStore) 
   }
+
   ResByPassHandler() {
     const {RemByPass} = this.state;
     if (RemByPass == true){
@@ -82,7 +86,9 @@ class PrimaryLayout extends PureComponent {
   render() {
     const { app, location, dispatch, children } = this.props
     const { theme, routeList, notifications } = app
-    const { isMobile, resbypass, collapsed, rememberbypass, searchidden } = this.state
+    const { isMobile, resbypass } = this.state
+    const collapsed = (this.state.collapsed? true : false)
+
     const { onCollapseChange } = this
     // Localized route name.
     const lang = langFromPath(location.pathname)
@@ -97,34 +103,9 @@ class PrimaryLayout extends PureComponent {
           })
         : routeList
 
-    // Find a route that matches the pathname.
-    const currentRoute = newRouteList.find(
-      _ => _.route && pathMatchRegexp(_.route, location.pathname)
-    )
 
-    // MenuParentId is equal to -1 is not a available menu.
-    const menus = newRouteList.filter(_ => _.menuParentId !== '-1')
-    const headerProps = {
-      menus,
-      theme,
-      collapsed,
-      newRouteList,
-      notifications,
-      onCollapseChange,      
-      onThemeChange(theme) {
-        dispatch({
-          type: 'app/handleThemeChange',
-          payload: theme,
-        })
-      },
-      fixed: config.fixedHeader,
-      onAllNotificationsRead() {
-        dispatch({ type: 'app/allNotificationsRead' })
-      },
-      
-    }
+    
     const SiderProps = {
-      menus,
       theme,
       isMobile,
       collapsed,
@@ -136,10 +117,9 @@ class PrimaryLayout extends PureComponent {
         })
       },
     }
-    const currentPathname = location.pathname
+  
     const ContainerProps = {
       theme,
-      currentPathname,
       collapsed,
     }
     const MobileWarning = () =>{
@@ -148,7 +128,7 @@ class PrimaryLayout extends PureComponent {
             return(
               <div className={styles.mobilewarning}>
                  <Result status="warning" title="Low resolution warning" 
-                  extra={ <div style={{ color: "white" }}><h3 style={{ color: "white" }}>This version of the application is not fully compatible with the resolution of this screen, a higher resolution is recommended for an optimal experience</h3><span>Please choose an option to continue</span><br /><br /><br /><Checkbox onChange={this.setState({ RemByPass: true })}>Don't Show this again</Checkbox><br /><br /><br /><Button type="dashed" onClick={this.ResByPassHandler}>Continue</Button></div> }/>
+                  extra={ <div style={{ color: "white" }}><h3 style={{ color: "white" }}>This version of the application is not fully compatible with the resolution of this screen, a higher resolution is recommended for an optimal experience</h3><span>Please choose an option to continue</span><br /><br /><Button type="dashed" onClick={this.ResByPassHandler}>Continue</Button></div> }/>
               </div>
             )
          }

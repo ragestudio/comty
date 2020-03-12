@@ -9,15 +9,17 @@ start_cli_dev(){
 }
 
 start_dev(){
-    systemctl start comty_dev
+    sudo systemctl start comty_dev
     echo "Starting dev server..."
 }
  
 stop_dev(){
-	systemctl stop comty_dev
+	sudo systemctl stop comty_dev
     echo "Stoping dev server..."
 }
-
+show_logs(){
+	sudo journalctl -u comty_dev
+}
 
 show_menus() {
 	clear
@@ -27,18 +29,19 @@ show_menus() {
 	echo "1. Start CLI Server"
 	echo "2. Start Server"
     echo "3. Stop Server"
+	echo "4. Show DevServer Logs"
 	echo "0. Exit"
 }
 
 read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 3] " choice
+	read -p "Enter choice [ 1 - 4 ] " choice
 	case $choice in
         0) exit 0;;
 		1) start_cli_dev ;;
 		2) start_dev ;;
         3) stop_dev ;;
-		
+		4) show_logs;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
 }

@@ -5,13 +5,11 @@ import CustomIcons from './CustomIcons'
 import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
 import Page from './Page'
-import CoreLoader from './CoreLoader'
 
 // App Layout Components
 import * as MyLayout from './Layout/index.js'
 import MicroHeader from './MicroHeader'
 import HeaderSearch from './HeaderSearch'
-import MainSidebar from './MainSidebar'
 import PageTransition from './PageTransition'
 import YulioID from './YulioID'
 
@@ -39,11 +37,9 @@ export
     Loader, 
     Page, 
     ScrollBar, 
-    CoreLoader, 
     PostCard, 
     PostCreator, 
     CustomIcons, 
-    MainSidebar, 
     LikeBTN, 
     MainFeed, 
     MicroHeader
