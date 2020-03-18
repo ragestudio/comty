@@ -1,8 +1,9 @@
 {
   "name": "comty-development",
+  "UUID": "annyudx7eo",
   "title": "Comty™",
   "DevBuild": true,
-  "version": "0.2.12",
+  "version": "0.2.18",
   "description": "",
   "main": "index.js",
   "author": "RageStudio",

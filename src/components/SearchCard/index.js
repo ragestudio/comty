@@ -6,7 +6,6 @@ import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
 import { CustomIcons } from 'components'
 
-const userData = ycore.SDCP()
 const { Meta } = antd.Card;
 
 
@@ -50,7 +49,7 @@ class SearchCard extends React.PureComponent{
                             <h4 onClick={() => ycore.crouter.native(`@${username}`)} className={styles.titleUser}>{DataStrip.title()}</h4>
                             <antd.Tooltip title="User Verified">{ycore.booleanFix(source.verified)? <Icon style={{ color: 'blue', verticalAlign:'top' }} component={CustomIcons.VerifiedBadge} /> : null} </antd.Tooltip> 
                         </div>}
-                    description={ycore.booleanFix(userData.dev)? <span className={styles.textAgo}>{DataStrip.description()}</span> : null}
+                    description={ycore.IsThisUser.dev()? <span className={styles.textAgo}>{DataStrip.description()}</span> : null}
                     bordered="false"
                 />
                  <div className={styles.postContent}> <h3 dangerouslySetInnerHTML={{__html: DataStrip.about() }} /> </div> 

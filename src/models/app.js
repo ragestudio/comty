@@ -7,30 +7,13 @@ import { queryLayout, pathMatchRegexp } from 'utils'
 import api from 'api'
 import config from 'config'
 import * as ycore from 'ycore'
-import jwt from 'jsonwebtoken'
-const { queryRouteList, logoutUser, queryUserInfo } = api
 
 export default {
   namespace: 'app',
   state: {
-    routeList: [
-      {
-        id: '1',
-        icon: 'home',
-        name: 'Main',
-        router: '/Main',
-      },
-    ],
-    locationPathname: '',
     AppSettings: store.get('app_settings') || config.defaultSettings,
-    locationQuery: {},
     theme: store.get('theme') || 'light',
-    notifications: [
-      {
-        title: 'Hey! Test notification',
-        date: new Date(Date.now() - 50000000),
-      },
-    ],
+    locationQuery: {},
   },
   subscriptions: {
     setupHistory({ dispatch, history }) {
@@ -62,21 +45,16 @@ export default {
   },
   effects: {
     *query({payload}, { call, put, select }) {     
-      const valid = ycore.ValidLoginSession();
+     
       const validBackup = ycore.ValidBackup();
-      if (valid == true) {
+      if ( ycore.ValidLoginSession() == true) {
           if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
             router.push({pathname: '/main',})
             ycore.RefreshONCE()
           }
-          const { locationPathname } = yield select(_ => _.app)
-          const { list } = yield call(queryRouteList)
-          let routeList = list
-          yield put({type: 'updateState', payload: { routeList: list }, })
-          // Runtime
           ycore.MakeBackup()
           ycore.UpdateSDCP()
-          return 
+          return true
       } 
       else if(!pathMatchRegexp(['','/login'], window.location.pathname)) {
           if (validBackup == true) {

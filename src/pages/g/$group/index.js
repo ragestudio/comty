@@ -7,8 +7,6 @@ import * as antd from 'antd'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
 
-const userData = ycore.SDCP()
-
 class GroupIndexer extends PureComponent {
     constructor(props){
       super(props),

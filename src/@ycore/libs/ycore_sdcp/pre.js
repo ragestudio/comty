@@ -5,14 +5,30 @@ import localforage from 'localforage'
 export const asyncSDCP = {
     setSDCP: function (value) {
         return Promise.resolve().then(function () {
-            sessionStorage.setItem('SDCP', value);
+            localforage.setItem('SDCP', value)
         });
     },
-    getSDCP: function () {
-        return sessionStorage.getItem('SDCP');
-    }
+    getRaw: () => {
+        try {
+            return localforage.getItem('SDCP');
+        } catch (err) {
+            return false
+        }
+    },
+    get: (callback) => {
+        try {
+            const a = ycore.asyncSDCP.getRaw((err, value)=> {
+                const b = ycore.CryptSDCP.atob_parse(value)
+                return callback(null, b)
+            })
+        } catch (err) {
+            console.log(err);
+            return false
+        }
+    },
 };
-export function InitSDCP(values, done) {
+
+export function GetSDCPfromCloud(values, res) {
     const prefix = '[InitSDCP]';
     let payload = {};
     if (!values) {
@@ -27,15 +43,12 @@ export function InitSDCP(values, done) {
           { 
             let cooked = JSON.parse(response)['user_data']
             let Ensamblator = btoa(JSON.stringify(cooked))
-            ycore.SetupApp()
-            ycore.asyncSDCP.setSDCP(Ensamblator).then(() => {
-               ycore.yconsole.log(prefix, ' SDCP Setup done')
-               return done(true)
-           })
+            res(Ensamblator);
           }
         )
     }
 }
+
 export function UpdateSDCP() {
    const prefix = '[UpdateSDCP]';
    ycore.GetUserData(null, (err, response) => {
@@ -59,28 +72,45 @@ export function UpdateSDCP() {
 
    })
 }
+
 export function SDCP() {
-   const prefix = '[SDCPCooker]';
-   let SDCPContainer = sessionStorage.getItem('SDCP')
-   if (SDCPContainer) {
-       try {
-         atob(SDCPContainer);
-       } catch (err) {
-           ycore.yconsole.error(prefix, err)
-           ycore.router.push({pathname: '/login',})
-           return null
-       }
-       try {
-           let decodedSDCP = atob(SDCPContainer);
-           let parsedSDCP = JSON.parse(decodedSDCP);
-           return parsedSDCP;
-       } catch (err) {
-           ycore.yconsole.error(prefix, err)  
-           ycore.router.push({pathname: '/login',})
-           return null
-       }
+   let a = ycore.asyncSDCP.get()
+   if (a) {
+     return a
    }
+   return false
 }
+
+export const CryptSDCP = {
+    atob_parse:  (e) => {
+        if (e) {
+            try {
+                atob(e);
+              } catch (err) {
+                  ycore.notifyError(err)
+                  ycore.router.push({pathname: '/login',})
+                  return false
+              }
+            try {
+                let decodedSDCP = atob(e);
+                let parsedSDCP = JSON.parse(decodedSDCP);
+                return parsedSDCP;
+            } catch (err) {
+                ycore.notifyError(err)  
+                ycore.router.push({pathname: '/login',})
+                return false
+            }
+        }
+        return false
+    },
+    valid: () => {
+        const a = ycore.asyncSDCP.get()
+        console.log(a)
+        return a? true : false
+    }
+
+}
+
 export function SetupApp(){
     // TODO: Default sets
     const resourceLoad = localStorage.getItem('resource_bundle')

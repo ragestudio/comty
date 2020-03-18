@@ -2,14 +2,16 @@ import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './index.less'
-import {CustomIconss} from 'components'
 import { RefreshFeed } from 'components/MainFeed'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
 import * as MICONS from '@material-ui/icons'
 
+import Post_options from './local_components/post_options'
+import {toogleOptionsBox} from './local_components/post_options'
+
 const { Meta } = antd.Card;
-const userData = ycore.SDCP();
+const userData = ycore.userData();
 
 
 function getBase64(img, callback) {
@@ -30,15 +32,15 @@ class PostCreator extends React.PureComponent{
             visible: true,
             FadeIN: true,
             keys_remaining: ycore.DevOptions.MaxLengthPosts,
-            toolbox_open: false,
             rawtext: '',
             posting: false,
             posting_ok: false,
             shareWith: 'any',
             uploader: false,
+            Schedule: false,
         }
     }
-
+  
     renderPostPlayer(payload){
         const {file, fileURL} = this.state
         const videofilter = file.type === 'video/mp4'
@@ -123,7 +125,7 @@ class PostCreator extends React.PureComponent{
     }
 
     handleToggleToolbox = () =>{
-        this.setState({ toolbox_open: !this.state.toolbox_open })
+        toogleOptionsBox()
     }
 
     FlushPostState(){
@@ -246,16 +248,7 @@ class PostCreator extends React.PureComponent{
                     </antd.Dropdown>
                 </div>
              </antd.Card>
-                <antd.Drawer
-                     title={<h1 className={styles.fontct}> Toolbox </h1>}
-                     placement="top"
-                     closable={false}
-                     onClose={this.handleToggleToolbox}
-                     visible={this.state.toolbox_open}
-                 >
-                     <antd.Button icon="upload" type="ghost"> Create Poll </antd.Button>
-                     <antd.Button icon="upload" type="ghost"> StickerPost </antd.Button>
-                </antd.Drawer>
+            <Post_options visible={this.state.toolbox_open} />
           </div>
         )
         }

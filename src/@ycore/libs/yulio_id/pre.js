@@ -3,59 +3,112 @@ import * as antd from 'antd'
 import Cookies from "ts-cookies";
 import keys from '../../../../config/keys.js';
 import * as Icons from '@ant-design/icons';
-import Icon from '@ant-design/icons'
 
 var jquery = require("jquery");
 var jwt = require("jsonwebtoken")
 
-function __ServerAlive(a, callback){
-    
+
+export function userData(){
+    return ycore.handlerYIDT.get()
 }
 
-export function __permission(id){
-  const userAdmin = ycore.SDCP().admin
-  return ycore.booleanFix(userAdmin)
-}
 
-function __API__User (payload){
-    var ExpireTime =  ycore.DevOptions.MaxJWTexpire
+
+function __API__User (payload, sdcp){
     const now = new Date()
     now.setDate(now.getDate() + 1)
     const { UserID, UserToken } = payload
-    const frame = { UserID, UserToken, deadline: ( ycore.DevOptions.SignForNotExpire? null : now.getTime() )}
-    ycore.yconsole.debug(frame)
-    jwt.sign(
-      frame,
-      keys.secretOrKey,
-      ycore.DevOptions.SignForNotExpire?  { expiresIn: '0' } :  { expiresIn: ExpireTime },
-      (err, token) => {
-       Cookies.set('token', token)
-       ycore.RefreshONCE()
-      }
-    )
+
+    const a = ycore.CryptSDCP.atob_parse(sdcp)
+    const { avatar, admin, pro, dev, is_pro, username } = a;
+
+    const frame = { 
+        UserID, 
+        UserToken, 
+        avatar,
+        admin,
+        pro,
+        dev,
+        is_pro,
+        username,
+        deadline: ( ycore.DevOptions.SignForNotExpire? null : now.getTime() )
+    }
+    ycore.handlerYIDT.set(frame, done => {
+        ycore.RefreshONCE()
+    })
 }
-export function ValidLoginSession(){
+
+export const handlerYIDT = {
+    set: (value, callback) => {
+        const ExpireTime =  ycore.DevOptions.MaxJWTexpire
+        jwt.sign(
+            value,
+            keys.secretOrKey,
+            ycore.DevOptions.SignForNotExpire?  { expiresIn: '0' } :  { expiresIn: ExpireTime },
+            (err, token) => {
+                err? null : Cookies.set('cid', token)
+                callback(true)
+            }
+        )
+        ycore.yconsole.debug(frame)
+        return true
+    },
+    getRaw: () => {
+        return Cookies.get('cid')
+    },
+    get: () => {
+        let final = jwt.decode(Cookies.get('cid')) || jwt.decode(localStorage.getItem('last_backup'));
+        const a = jwt.decode(Cookies.get('cid'))
+        const b = jwt.decode(localStorage.getItem('last_backup'))
+        if (!a && !b) {
+            final = false
+            return final
+        }
+        if (!a) {
+            final = b
+        }
+        if (!b) {
+            final = a
+        }
+        ycore.yconsole.debug(final)
+        return final
+    },
+    remove: () =>{
+        Cookies.remove('cid')
+    },
+    __token: () => {
+        return ycore.handlerYIDT.get().UserToken
+    },
+    __id: () => {
+        return ycore.handlerYIDT.get().UserID
+    }
+
+}
+
+export function ValidLoginSession(callback){
     const prefix = '[YID Session]';
     let final = false;
     let ValidCookiesToken = false;
     let ValidSDCP = false;
-    let TokenContainer = Cookies.get('token');
-    let SDCPContainer = ycore.asyncSDCP.getSDCP();
+
+    let TokenContainer = Cookies.get('cid');
+
     if (TokenContainer) {
       let TokenContainerDC = jwt.decode(TokenContainer)
       if (TokenContainerDC){
         ValidCookiesToken = true
       }
     }
-    if (SDCPContainer) {
-        try {
-            atob(SDCPContainer)
-            ValidSDCP = true 
-        } catch (error) {
-            return
-        }
+
+    if (ycore.CryptSDCP.valid()){
+        ValidSDCP = true;
     }
-    if (ValidCookiesToken == true  && ValidSDCP == true) {final = true} 
+
+    if (ValidCookiesToken == true){
+        final = true
+    } 
+
+    const finalvalids = { ValidSDCP, ValidCookiesToken, final }
     ycore.DevOptions.ShowFunctionsLogs? (
         console.group(`%c ${prefix} `, 'background: #339edf; color: #fff'),
         console.log(`Valid SDCP => ${ValidSDCP}`),
@@ -63,6 +116,9 @@ export function ValidLoginSession(){
         console.log(`Session is valid => ${final}`),
         console.groupEnd() 
     ) : null
+    if (callback) {
+        callback(finalvalids)
+    }
     return final
 }
 export function ValidBackup(){
@@ -78,14 +134,14 @@ export function ValidBackup(){
 }
 export function MakeBackup(){
     if (ValidBackup() == false) {
-        ycore.asyncLocalStorage.setItem('last_backup', Cookies.get('token'))
+        ycore.asyncLocalStorage.setItem('last_backup', Cookies.get('cid'))
         return
     }
 }
 export function LogoutCall(){
     const prefix = ('[YID Session]  ')
     ycore.yconsole.log('Logout Called !')
-    let DecodedToken = ycore.GetUserToken.decrypted().UserToken || atob(localStorage.getItem('last_backup'))
+    let DecodedToken = ycore.handlerYIDT.__token() || atob(localStorage.getItem('last_backup'))
     const urlOBJ = (`${ycore.endpoints.removeToken}${DecodedToken}`)
     ycore.yconsole.log(prefix, ' Login out with token => ', DecodedToken, urlOBJ)
     const form = new FormData();
@@ -116,12 +172,11 @@ export function LogoutCall(){
             ycore.yconsole.log("Successful logout with YulioID™", response, urlOBJ)
         }
         // Runtime after dispatch API
-        Cookies.remove('token')
-        Cookies.remove('SDCP')
+        ycore.handlerYIDT.remove()
         ycore.router.push({pathname: '/login',})
     })
 }
-export function GetAuth(EncUsername, EncPassword, callback) {
+export function __AppSetup__(EncUsername, EncPassword, callback) {
     const prefix = '[Auth Server]:';
     if (!EncUsername || !EncPassword) {
         const message = 'Missing Data! Process Aborted...';
@@ -154,7 +209,9 @@ export function GetAuth(EncUsername, EncPassword, callback) {
                   let FramePayload = { UserID, UserToken }
                   ycore.yconsole.log(FramePayload)
                   callback(null, '200')
-                  ycore.InitSDCP(FramePayload, (done) => done? __API__User(FramePayload) : null )
+                  
+                  ycore.GetSDCPfromCloud(FramePayload, (res) => res? __API__User(FramePayload, res) : null )
+                  ycore.SetupApp()
                 }
                 if (identState == 400) {
                   callback(null, '400')
@@ -170,31 +227,10 @@ export function GetAuth(EncUsername, EncPassword, callback) {
         return;
     })
 }
-export const GetUserToken = {
-    decrypted: function () {
-        let final = jwt.decode(Cookies.get('token')) || jwt.decode(localStorage.getItem('last_backup'));
-        const FC = jwt.decode(Cookies.get('token'))
-        const FB = jwt.decode(localStorage.getItem('last_backup'))
-        if (!FC && !FB) {
-            final = false
-            return final
-        }
-        if (!FC) {
-            final = FB
-        }
-        if (!FB) {
-            final = FC
-        }
-        ycore.yconsole.debug(final)
-        return final
-    },
-    raw: function () {
-        return Cookies.get('token') || localStorage.getItem('last_backup');
-    },
-}
+
 export function GetUserData (values, callback) {
     const prefix = '[YID SDCP]';
-    const offlineAPI = ycore.GetUserToken.decrypted();
+    const offlineAPI = ycore.handlerYIDT.get();
     const globalValue = values || {UserToken: offlineAPI.UserToken, UserID: offlineAPI.UserID};
     const usertoken = globalValue.UserToken
     const userid = globalValue.UserID
@@ -231,4 +267,25 @@ export function GetUserData (values, callback) {
             callback(true, response )
         }
      )
+}
+
+export const IsThisUser = {
+    admin: () => {
+        const a = ycore.userData()
+        return ycore.booleanFix(a.admin)? true : false
+    },
+    dev: () => {
+        const a = ycore.userData()
+        return ycore.booleanFix(a.dev)? true : false
+    },
+    pro: () => {
+        const a = ycore.userData()
+        return ycore.booleanFix(a.is_pro)? true : false
+    },
+    same: (a) => {
+        if(a == ycore.userData().UserID){
+            return true
+          }
+        return false
+    }
 }

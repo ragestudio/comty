@@ -1,10 +1,40 @@
-.like_button, .like_button:before, .like_button:after {
+  .like_button, .like_button:before, .like_button:after {
     position: relative;
     box-sizing: border-box;
   }
   .ripple, .ripple:before, .ripple:after {
     position: relative;
     box-sizing: border-box;
+  }
+
+  .btnWrapper{
+    display: flex;
+  }
+
+  .likeCounter{
+    font-family: "Poppins", sans-serif;
+    line-height: 70px;
+    margin: 0 0 0 10px;
+
+    opacity: 0;
+    transform: perspective(100px) translateZ(10px);
+    filter: blur(10px);
+    letter-spacing: 0.1em;
+    &.active{
+      opacity: 1;
+      transform: perspective(100px) translateZ(0px);
+      filter: blur(0px);
+      letter-spacing: 0.15em;
+      transition: opacity 1000ms linear, transform 1000ms linear, filter 400ms linear, letter-spacing 1000ms linear;
+    }
+    &.past{
+      opacity: 0;
+      transform: perspective(100px) translateZ(-10px);
+      filter: blur(10px);
+      letter-spacing: 0.2em;
+      transition: opacity 1000ms linear, transform 1000ms linear, filter 400ms linear, letter-spacing 1000ms linear;
+    }
+    
   }
   
   .like_button {

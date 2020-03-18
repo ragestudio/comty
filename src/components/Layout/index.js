@@ -1,5 +1,5 @@
 import Sider from './Sider'
-import ChatSider from './ChatSider'
 import Control from './Control'
+import Secondary from './Secondary'
 
-export { Sider, Control, ChatSider }
+export { Sider, Control, Secondary }

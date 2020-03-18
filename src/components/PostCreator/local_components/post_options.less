@@ -1,0 +1,47 @@
+@import '~themes/vars.less';
+
+.optionsWrapper{
+    font-family: "Poppins", sans-serif;
+    :global{
+        .ant-drawer-body {
+            -ms-flex-positive: 1;
+            flex-grow: 1;
+            padding: 12px;
+            overflow: auto;
+            font-size: 14px;
+            line-height: 1.5715;
+            word-wrap: break-word;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+            margin-bottom: 0;
+            color: rgba(0, 0, 0, 0.85);
+            font-weight: 500;
+        }
+        .ant-list-item {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+    }
+}
+
+.PostOptionsWrapper{
+    margin: 0 10px 0 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    justify-items: stretch;
+    align-items: stretch;
+    .optionItem{
+        display: inline;
+    }
+}
+.optionItemIcon{
+    margin: 0 5px 0 0;
+}

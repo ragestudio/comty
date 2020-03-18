@@ -37,7 +37,7 @@ class LikeBTN extends React.PureComponent {
         this.setState({ clicked: false  })
       }, 500);
 
-      ycore.ActionPost('like', e, null,(exception, response) => {
+      ycore.ActionPost('like', e, null, (exception, response) => {
         if (exception) {
           ycore.notifyError(response)
           return
@@ -61,10 +61,8 @@ class LikeBTN extends React.PureComponent {
           return null
         }
         return(
-          <div>
-           
+          <div className={styles.btnWrapper}>
             <button onClick={() => this.dispatchLike(id)} className={classnames(styles.like_button, {[styles.clickanim]: clicked})}>
-            
             <div className={styles.like_wrapper}>
                 <div className={classnames(styles.ripple, (liked? null : {[styles.clickanim]: clicked} ))}></div>
                 <svg className={classnames( styles.heart, {[styles.empty]: !liked}  , (liked? null : {[styles.clickanim]: clicked} )  )} width="24" height="24" viewBox="0 0 24 24">
@@ -72,7 +70,7 @@ class LikeBTN extends React.PureComponent {
                 </svg>
               </div>
             </button>
-            <span>{likes}</span>
+            <p className={classnames(styles.likeCounter, {[styles.active]: !clicked, [styles.past]: clicked }) }>{likes}</p>
           </div>
         )
     }

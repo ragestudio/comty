@@ -57,7 +57,7 @@ class YulioID extends Component {
       }
       else {
         ycore.yconsole.log(prefix, 'Initialising login process...')
-        GetAuth(EncUsername, EncPassword, (exception, response) =>  this.handleResponse(response))
+        ycore.__AppSetup__(EncUsername, EncPassword, (exception, response) =>  this.handleResponse(response))
       }
     }
   }

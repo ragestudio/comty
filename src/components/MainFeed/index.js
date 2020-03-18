@@ -43,7 +43,6 @@ class MainFeed extends React.Component {
                      ycore.notifyError('Error when get data from this input')
                      return
                  }
-                 console.log(result)
                  if (JSON.parse(result).api_status == '400') {
                     this.setState({ invalid: true })
                     return

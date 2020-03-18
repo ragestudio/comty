@@ -1,28 +1,5 @@
 @import '~themes/vars.less';
 
-.SecondHeader{
-  float: right;
-  display: flex;
-  img {
-    border-radius: 15px;
-    width: 40px;
-    transition: all 150ms linear;
-    box-shadow: 0px 0px 0 0px rgba(255, 255, 255, 0);
-
-  }
-  img:hover{
-    box-shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.205);
-    transition: all 150ms linear;
-  }
-  transition: all 150ms linear;
-  .notif_box {
-    margin: 0 15px 0 5px;
-    width: 40px;
-    height: 40px;
-    border-radius: 15px;
-    background-color: #78CFED;
-  }
-}
 
 .mobilewarning{
   background-color: rgba(0, 0, 0, 0.975);
@@ -139,30 +116,7 @@
  }
 }
 
-.rightContainer{
-  background-color:#201F23;
-  border-radius: 32px 0 0 32px;
-  padding: 20px 15px 15px 15px;
-  width: 27%;
-  height: 100vh;
-  position: relative;
-  float: left;
-  overflow-y: hidden !important;
-  overflow-x: hidden;
-  color: @DarkMode-color_container !important;
-  :global{
-    h1{
-       color: @DarkMode-color_container;
-    }
-    #scroller{
-      overflow-y: hidden;
-    }
-    .gCVnuz{
-       color: @DarkMode-color_container !important;
-       overflow-y: hidden;
-    }
-  }
-}
+
 
 @media (max-width: 767px) {
   .content {

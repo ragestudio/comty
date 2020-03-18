@@ -5,24 +5,34 @@
  * @licensed Pending...
  */
 
-import React from "react";
 import {AppSettings} from  "../../globals/settings.js";
 import {Endpoints} from "globals/endpoints.js";
+import * as Icons from '@ant-design/icons';
+import localforage from "localforage"
 import umiRouter from "umi/router";
 import * as antd from "antd";
-import * as Icons from '@ant-design/icons';
+import React from "react";
 
 import config from "config"
 import "./libs.js"
 
-export * from "./libs.js"
 export * from "../../config/app.settings.js"
+export * from "./libs.js"
 
 export var { router } = require("utils")
-export var endpoints = Endpoints;
 export var yConfig = config.yConfig;
+export var endpoints = Endpoints;
 
 var package_json = require("../../package.json");
+
+export const UUAID = `${package_json.name}==${package_json.UUID}`
+
+localforage.config({
+    name        : UUAID,
+    version     : 1.0,
+    size        : 4980736,
+    storeName   : package_json.name
+});
 
 /**
  * Convert a base64 string in a Blob according to the data and contentType.
@@ -76,6 +86,7 @@ export function gotoElement(element){
  * @return {object}
  */
 export const AppInfo = {
+    apid: package_json.name,
     name: package_json.title,
     version: package_json.version,
     logo: config.FullLogoPath,
@@ -185,44 +196,7 @@ export function requestFullscreen(){
       elem.msRequestFullscreen();
     }
 }
-/**
- * Async get/set localStorage method
- * 
- * @param key {string} String for search
- * @param value {string} Value for set
- * @return {any} An callback for async/await
- */
-export const asyncLocalStorage = {
-    setItem: function (key, value) {
-        return Promise.resolve().then(function () {
-            localStorage.setItem(key, value);
-        });
-    },
-    getItem: function (key) {
-        return Promise.resolve().then(function () {
-            return localStorage.getItem(key);
-        });
-    }
-};
-/**
- * Async get/set sessionStorage method
- * 
- * @param key {string} String for search
- * @param value {string} Value for set
- * @return {any} An callback for async/await
- */
-export const asyncSessionStorage = {
-    setItem: function (key, value) {
-        return Promise.resolve().then(function () {
-            sessionStorage.setItem(key, value);
-        });
-    },
-    getItem: function (key) {
-        return Promise.resolve().then(function () {
-            return sessionStorage.getItem(key);
-        });
-    }
-};
+
 /**
  * Request browser for refresh the windows 
  * 

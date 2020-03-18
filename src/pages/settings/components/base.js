@@ -109,7 +109,6 @@ class Base extends Component {
          <div>
             <h1><Icons.PullRequestOutlined /> Behaviors</h1>
             <Icon type="message" style={{ fontSize: '16px', color: '#08c' }} theme="outlined" />
-
              {this.SettingRender(this.state.SettingRepo)}
          </div>
       </Fragment>

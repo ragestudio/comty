@@ -18,13 +18,11 @@ import * as Icons from '@ant-design/icons'
 import styles from './PrimaryLayout.less'
 
 const { Content } = Layout
-const { Sider, Control } = MyLayout
-
-const userData = ycore.SDCP()
+const { Sider, Control, Secondary } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
-class PrimaryLayout extends PureComponent {
+class PrimaryLayout extends React.Component {
   constructor(props){
     super(props)
     window.PrimaryComponent = this;
@@ -33,13 +31,12 @@ class PrimaryLayout extends PureComponent {
       isMobile: false,
       resbypass:  store.get('resbypass') || false,
       RemByPass: false,
-      BarControls: [],
-      ContentSecondLayer: null,
+      userData: ''
     }
-    this.ResByPassHandler = this.ResByPassHandler.bind(this);
   }
 
   componentDidMount() {
+    this.setState({ userData:  ycore.userData() })
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
@@ -54,17 +51,13 @@ class PrimaryLayout extends PureComponent {
     unenquireScreen(this.enquireHandler)
   }
 
-  setControls(e){
-    this.setState({BarControls: e})
-  }
-
   onCollapseChange = () => {
     const fromStore = store.get('collapsed')
     this.setState({ collapsed: !this.state.collapsed })
     store.set('collapsed',  !fromStore) 
   }
 
-  ResByPassHandler() {
+  ResByPassHandler = () => {
     const {RemByPass} = this.state;
     if (RemByPass == true){
       this.setState({resbypass: true})
@@ -85,8 +78,8 @@ class PrimaryLayout extends PureComponent {
     
   render() {
     const { app, location, dispatch, children } = this.props
-    const { theme, routeList, notifications } = app
-    const { isMobile, resbypass } = this.state
+    const { theme, routeList } = app
+    const { userData, isMobile, resbypass } = this.state
     const collapsed = (this.state.collapsed? true : false)
 
     const { onCollapseChange } = this
@@ -107,6 +100,7 @@ class PrimaryLayout extends PureComponent {
     
     const SiderProps = {
       theme,
+      userData,
       isMobile,
       collapsed,
       onCollapseChange,
@@ -120,8 +114,14 @@ class PrimaryLayout extends PureComponent {
   
     const ContainerProps = {
       theme,
+      userData,
       collapsed,
     }
+
+    const SecondaryProps = {
+      userData
+    }
+  
     const MobileWarning = () =>{
       if (resbypass == false) {
          if (isMobile == true) {
@@ -136,8 +136,8 @@ class PrimaryLayout extends PureComponent {
       return null
     }
 
-  
-    return (
+ 
+      return (
         <Fragment>
           <MobileWarning />
           <div className={styles.BarControlWrapper}><Control /></div>
@@ -154,21 +154,12 @@ class PrimaryLayout extends PureComponent {
                 </PageTransition>
             </div>  
 
-            <div id="secondaryLayout" className={styles.rightContainer}>
-                
-                  <div className={styles.SecondHeader}>
-                    <div className={styles.notif_box}></div>
-                    <img onClick={() => ycore.crouter.native(`@${userData.username}`)} src={userData.avatar} />
-                  </div>
-                  <Fragment>
-                     {this.state.ContentSecondLayer}
-                  </Fragment>
- 
-            </div>
-
+            <Secondary {...SecondaryProps} />
+          
           </Layout>
         </Fragment>
       )
+    
   }
 }
 

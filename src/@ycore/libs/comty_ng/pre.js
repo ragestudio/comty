@@ -12,7 +12,7 @@ export function GetGeneralData(callback){
     body: formdata,
     redirect: 'follow'
   };  
-  const urlObj = `${ycore.endpoints.get_general_data}${ycore.GetUserToken.decrypted().UserToken}`
+  const urlObj = `${ycore.endpoints.get_general_data}${ycore.handlerYIDT.__token()}`
   fetch(urlObj, requestOptions)
     .then(response => {
         ycore.yconsole.log(response)
@@ -34,7 +34,7 @@ export function follow_user(id, callback) {
     redirect: 'follow'
   };  
   ycore.yconsole.log(`Following user => ${id} `) 
-  const urlObj = `${ycore.endpoints.follow_user}${ycore.GetUserToken.decrypted().UserToken}`
+  const urlObj = `${ycore.endpoints.follow_user}${ycore.handlerYIDT.__token()}`
   fetch(urlObj, requestOptions)
     .then(response => {
         ycore.yconsole.log(response)
@@ -85,7 +85,7 @@ export function PublishPost(privacy, raw, file, callback){
   }
 
   let formdata = new FormData();
-  formdata.append("user_id", ycore.GetUserToken.decrypted().UserID);
+  formdata.append("user_id", ycore.handlerYIDT.__id());
   formdata.append("type", "new_post")
   formdata.append("server_key", ycore.yConfig.server_key);
   formdata.append("postPrivacy", privacy)
@@ -93,7 +93,7 @@ export function PublishPost(privacy, raw, file, callback){
   file? formdata.append("postPhoto", file) : null
 
   const requestOptions = {
-    "url": `${ycore.endpoints.new_post}${ycore.GetUserToken.decrypted().UserToken}`,
+    "url": `${ycore.endpoints.new_post}${ycore.handlerYIDT.__token()}`,
     "method": "POST",
     "timeout": 0,
     "data": formdata,
@@ -118,7 +118,7 @@ export function FindUser(key, callback){
     let formdata = new FormData();
     formdata.append("server_key", ycore.yConfig.server_key);
     formdata.append("search_key", key);
-    const urlOBJ = `${ycore.endpoints.find_user}${ycore.GetUserToken.decrypted().UserToken}`
+    const urlOBJ = `${ycore.endpoints.find_user}${ycore.handlerYIDT.__token()}`
     const settings = {
         "url":  urlOBJ,
         "method": "POST",
@@ -142,7 +142,7 @@ export function SeachKeywords(key, callback){
     let formdata = new FormData();
     formdata.append("server_key", ycore.yConfig.server_key);
     formdata.append("search_key", key);
-    const urlOBJ = `${ycore.endpoints.search_endpoint}${ycore.GetUserToken.decrypted().UserToken}`
+    const urlOBJ = `${ycore.endpoints.search_endpoint}${ycore.handlerYIDT.__token()}`
     const settings = {
         "url":  urlOBJ,
         "method": "POST",
@@ -164,12 +164,46 @@ export function SeachKeywords(key, callback){
 export function ActionPost(type, id, value, callback){
   var formdata = new FormData();
   formdata.append("server_key", ycore.yConfig.server_key);
-  formdata.append("action", type);
-  formdata.append("post_id", id);
-  if (value) {
-    formdata.append("text", value)
+  if (!type || !id) {
+    ycore.notifyError('[ActionPost] No type or id Provided !!!')
+    return false
   }
-  const urlOBJ = `${ycore.endpoints.action_post}${ycore.GetUserToken.decrypted().UserToken}`
+  switch (type) {
+    case 'like':
+    {
+      formdata.append("action", "like");
+      formdata.append("post_id", id);
+      break
+    }
+    case 'commet':
+      {
+        if (!value) {
+          return false
+        }
+        formdata.append("action", "commet");
+        formdata.append("text", value)
+        break
+      }
+    case 'edit': 
+    {
+      if (!value) {
+        return false
+      }
+      formdata.append("action", "edit");
+      formdata.append("text", value)
+      break
+    }
+    case 'delete': 
+    {
+      formdata.append("action", "delete");
+      formdata.append("post_id", id);
+      break
+    }
+    default:
+      break;
+  }
+ 
+  const urlOBJ = `${ycore.endpoints.action_post}${ycore.handlerYIDT.__token()}`
   const settings = {
       "url":  urlOBJ,
       "method": "POST",
@@ -195,7 +229,7 @@ export function GetUserTags(id, callback){
   formdata.append("server_key", ycore.yConfig.server_key);
   formdata.append("user_id", id )
 
-  const urlOBJ = `${ycore.endpoints.get_user_tags}${ycore.GetUserToken.decrypted().UserToken}`
+  const urlOBJ = `${ycore.endpoints.get_user_tags}${ycore.handlerYIDT.__token()}`
   const settings = {
       "url":  urlOBJ,
       "method": "POST",
@@ -231,7 +265,7 @@ export function GetPosts(userid, type, fkey, callback) {
       formdata.append("type", "get_news_feed");
       break;
   }
-  const urlOBJ = `${ycore.endpoints.get_posts}${ycore.GetUserToken.decrypted().UserToken}`
+  const urlOBJ = `${ycore.endpoints.get_posts}${ycore.handlerYIDT.__token()}`
   const settings = {
       "url":  urlOBJ,
       "method": "POST",
@@ -261,7 +295,7 @@ export const get_app_session = {
         body: formdata,
         redirect: 'follow'
       };
-      const uriObj = `${ycore.endpoints.get_sessions}${ycore.GetUserToken.decrypted().UserToken}`
+      const uriObj = `${ycore.endpoints.get_sessions}${ycore.handlerYIDT.__token()}`
       fetch(uriObj, requestOptions)
         .then(response => response.text())
         .then(result => {
@@ -282,7 +316,7 @@ export const get_app_session = {
           body: formdata,
           redirect: 'follow'
         };
-        const uriObj = `${ycore.endpoints.get_sessions}${ycore.GetUserToken.decrypted().UserToken}`
+        const uriObj = `${ycore.endpoints.get_sessions}${ycore.handlerYIDT.__token()}`
         fetch(uriObj, requestOptions)
           .then(response => response.text())
           .then(result => {

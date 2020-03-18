@@ -14,37 +14,15 @@ import router from 'umi/router';
 import {CustomIcons} from 'components'
 
 
-const userData = ycore.SDCP()
 
 @withI18n()
 class Sider extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isHover: false
+      isHover: false,
+      collapsedWidth: '30',
     };
-    this.hover = this.hover.bind(this);
-  }
-
-  hover(e) {
-    this.setState({
-      isHover: !this.state.isHover
-    });
-  }
-  Balancer() {
-    const { collapsed,  } = this.props;
-    const { isHover } = this.state;
-    if (collapsed == false) {
-      return false
-    }
-    if (isHover == false ){
-      if (collapsed == true) {
-        return true
-      }
-      return true
-    }else{
-      return false
-    }
   }
 
   StrictMode = () =>{
@@ -73,15 +51,12 @@ class Sider extends PureComponent {
 
   render() {
     const {
-      i18n,
-      menus,
       theme,
-      isMobile,
+      userData,
       collapsed,
       onThemeChange,
       onCollapseChange,
     } = this.props
-    
     return (
       <div className={styles.siderwrapper}> 
       <antd.Layout.Sider
@@ -89,16 +64,16 @@ class Sider extends PureComponent {
         trigger={null}
         collapsible
         defaultCollapsed="true"
-        collapsedWidth={this.Balancer()? "35" : "90"}
+        collapsedWidth={this.state.collapsedWidth}
         theme={this.StrictMode()}
         width="180"
         collapsed={collapsed}
         className={classnames(styles.sider, {[styles.darkmd]: this.isDarkMode()} )}
-        onMouseEnter={this.hover} 
-        onMouseLeave={this.hover}
+        onMouseEnter={() => this.setState({ collapsedWidth: '90' })} 
+        onMouseLeave={() => this.setState({ collapsedWidth: '35' })}
       >
         <div className={styles.brand}><img onClick={() => ycore.crouter.native('main')} src={collapsed? config.LogoPath  : config.FullLogoPath } /></div>
-        <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? (this.Balancer()? <Icons.RightOutlined/>: <Icons.DoubleLeftOutlined/>) : (this.Balancer()? <Icons.LeftOutlined /> : <Icons.DoubleLeftOutlined/>) } /></div> 
+        <div className={this.StrictMode()? styles.CollapserWrapperLight : styles.CollapserWrapperDark} ><antd.Button width={'20px'} onClick={() => onCollapseChange(!collapsed)} icon={collapsed? <Icons.RightOutlined/> : <Icons.DoubleLeftOutlined/> } /></div> 
         <div className={styles.menuContainer}>
           <ScrollBar options={{  suppressScrollX: true,  }} >
                 <antd.Menu className={collapsed? styles.menuItemsCollapsed : styles.menuItems} mode="vertical" onClick={this.handleClickMenu}>
@@ -107,12 +82,12 @@ class Sider extends PureComponent {
                           <Trans><span>Explore</span></Trans> 
                       </antd.Menu.Item> 
 
-                      <antd.Menu.Item key="general_settings">
+                      <antd.Menu.Item key="journal_page">
                         <Icons.ReadOutlined />
                         <Trans><span>Journal</span></Trans>
                       </antd.Menu.Item>
                       
-                      <antd.Menu.Item key="general_settings">
+                      <antd.Menu.Item key="marketplace_page">
                         <Icons.ReconciliationOutlined />
                         <Trans><span>Marketplace</span></Trans>
                       </antd.Menu.Item>

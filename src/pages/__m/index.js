@@ -10,7 +10,7 @@ import styles from './style.less'
 import { GridContent } from '@ant-design/pro-layout';
 import { json } from 'body-parser';
 
-const UserData = ycore.SDCP()
+const UserData = ycore.userData()
 
 export default class __m extends React.Component {
   constructor(props){
@@ -18,14 +18,17 @@ export default class __m extends React.Component {
     this.state = {
       s_id: '',
       coninfo: 'Getting info...',
+      s_token: '',
+      s_ses: ''
     };
   }
 
   componentDidMount() {
-    if (ycore.__permission() == false) {
+    if (ycore.IsThisUser.admin() == false) {
       return ycore.crouter.native('main')
     }
     this.handleSID()
+    this.handleToken()
   }
 
   handleSID(){
@@ -35,6 +38,12 @@ export default class __m extends React.Component {
       }
       this.setState({ s_id: response})
     })
+  }
+  handleToken(){
+    this.setState({ s_token: ycore.handlerYIDT.get() })
+    {ycore.ValidLoginSession(res => {
+     this.setState({s_ses: res})
+    })}
   }
   DescompileSDCP(){
     let result = {};
@@ -46,7 +55,8 @@ export default class __m extends React.Component {
 
   render() {
     const arrayOfSDCP = Object.entries(UserData).map((e) => ( { [e[0]]: e[1] } ));
-
+    const { UserID, UserToken, deadline } = this.state.s_token
+    const { ValidSDCP, ValidCookiesToken, final } = this.state.s_ses
     return (
       <div className={styles.Wrapper}>
           <div className={styles.titleHeader}>
@@ -62,22 +72,33 @@ export default class __m extends React.Component {
               <span> {this.state.s_id} </span>
             </antd.Card>
             <antd.Card>
+              <h2><Icons.UserOutlined /> Current Session</h2>
+              <p> UID => {UserID} </p>
+              <p> Session Token => {UserToken} </p>
+              <p> Deadline => {deadline} </p>
+              <hr />
+              <p> ValidSDCP => {JSON.stringify(ValidSDCP)} </p>
+              <p> ValidCookiesToken => {JSON.stringify(ValidCookiesToken)} </p>
+              <p> Valid? => {JSON.stringify(final)} </p>
+         
+            </antd.Card>
+            <antd.Card>
               <span> Using v{ycore.AppInfo.version} | User @{UserData.username}#{UserData.id} | </span>  
             </antd.Card>
           </div>
 
           <div className={styles.titleHeader}>
-            <h1><Icons.DeploymentUnitOutlined /> Test yCore™</h1>
+            <h1><Icons.DeploymentUnitOutlined /> Test yCore™ </h1>
           </div>
           <div className={styles.sectionWrapper}>
             <antd.Button onClick={() => ycore.notifyError('Yep, its not empty, jeje funny')} > Send empty notifyError() </antd.Button>
-            <antd.Button onClick={() => ycore.notifyError(`ycore.GetPosts(uid, get, '0', (err, result) => {
-const parsed = JSON.parse(result)['data']
-const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false
-this.setState({ isEnd: isEnd, data: parsed, loading: false })
-})
-
-`)} > Send mock notifyError() </antd.Button>
+            <antd.Button onClick={() => ycore.notifyError(`
+            ycore.GetPosts(uid, get, '0', (err, result) => {
+              const parsed = JSON.parse(result)['data']
+              const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false
+              this.setState({ isEnd: isEnd, data: parsed, loading: false })
+            })`
+            )} > Send mock notifyError() </antd.Button>
           </div>
 
           <div className={styles.titleHeader}>
