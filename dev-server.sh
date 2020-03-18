@@ -20,6 +20,11 @@ stop_dev(){
 show_logs(){
 	sudo journalctl -u comty_dev
 }
+update(){
+	git reset --merge&&git fetch --all&&git reset --hard origin/master
+
+
+}
 
 show_menus() {
 	clear
@@ -30,18 +35,21 @@ show_menus() {
 	echo "2. Start Server"
     echo "3. Stop Server"
 	echo "4. Show DevServer Logs"
+	echo "5. Update from Git"
+	echo ""
 	echo "0. Exit"
 }
 
 read_options(){
 	local choice
-	read -p "Enter choice [ 1 - 4 ] " choice
+	read -p "Enter choice [ 1 - 5 ] " choice
 	case $choice in
         0) exit 0;;
 		1) start_cli_dev ;;
 		2) start_dev ;;
         3) stop_dev ;;
 		4) show_logs;;
+		5) update;;
 		*) echo -e "${RED}Error...${STD}" && sleep 2
 	esac
 }
