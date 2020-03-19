@@ -1,19 +1,15 @@
 import React from 'react'
-import * as antd from 'antd'
 import * as ycore from 'ycore'
 import {PostCreator, MainFeed} from 'components'
 import styles from './index.less'
 
-class Main extends React.Component {
-  
- 
+export default class Main extends React.Component {
     render(){
         return (
            <div className={styles.mainWrapper}>
-                    <PostCreator />
+                    <PostCreator userData={ycore.userData()} />
                     <MainFeed get="feed" />
            </div>
         )
     }
 }
-export default Main;

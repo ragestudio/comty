@@ -80,7 +80,6 @@ export const handlerYIDT = {
 
 export function ValidLoginSession(callback){
     let validtoken = false;
- 
     const a = Cookies.get('cid');
     if (a) {
         const modExp = ycore.DevOptions.SignForNotExpire;
@@ -95,10 +94,8 @@ export function ValidLoginSession(callback){
         const tokenExpLocale = new Date(tokenExp).toLocaleString()
         const now = new Date().getTime()
 
-
         ycore.yconsole.log(`TOKEN EXP => ${tokenExp} ${modExp? '( Infinite )' : `( ${tokenExpLocale} )` } || NOW => ${now}`)
     
-       
         if (modExp == false) {
             if(tokenExp < now) {
                 ycore.yconsole.log('This token is expired !!!')
@@ -108,7 +105,6 @@ export function ValidLoginSession(callback){
         if (notexp && exists) {
             validtoken = true
         }
-       
         
     }
 

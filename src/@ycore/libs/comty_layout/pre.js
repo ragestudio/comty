@@ -1,5 +1,5 @@
 import {SetControls, CloseControls} from "../../../components/Layout/Control"
-import {SwapMode} from '../../../components/Layout/Secondary.js'
+import {SwapMode} from '../../../components/Layout/Secondary'
 
 export const SecondarySwap = {
     ext: ()=> {
@@ -8,6 +8,9 @@ export const SecondarySwap = {
     PostComments: (e) => {
         SwapMode.PostComments(e)
     },
+    openPost: (e) => {
+        SwapMode.openPost(e)
+    }
 }
 
 export const ControlBar = {

@@ -9,18 +9,30 @@ export default class Indexer_Post extends React.Component{
     constructor(props){
         super(props),
         this.state = {
-          loading: true
+          loading: true,
+          swaped: false,
+          UUID: ''
         }
+    }
+
+    toSwap(id){
+      ycore.GetPostData(id, null, (err, res) => {
+        if (err) { return false }
+        ycore.SecondarySwap.openPost(res)
+      })
     }
 
     componentDidMount(){
       try {
         const {location} = this.props
-        const matchSearch = pathMatchRegexp("/s/:id", location.pathname);
-        const parsed = matchSearch.shift()
-        const raw = parsed.toString()
-        const string = raw.replace('/s/', "")
-        console.log(string)
+        const regexp = pathMatchRegexp("/p/:id", location.pathname)
+        const match = regexp.shift().toString()
+    
+        const string = match.replace('/p/', "")
+        this.setState({ UUID: string })
+        if (string) {
+          this.toSwap(string)
+        }
 
       } catch (err) {
         ycore.notifyError(err)
@@ -28,8 +40,7 @@ export default class Indexer_Post extends React.Component{
     }
 
     render(){
-        return(
-            <div>Ajam</div>
-        )
+        ycore.crouter.native('main')
+        return null
     }
 }

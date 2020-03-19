@@ -20,6 +20,7 @@ import UserProfile from './UserProfile'
 import SearchCard from './SearchCard'
 
 // Post Components
+import MediaPlayer from './MediaPlayer'
 import PostCard from './PostCard'
 import LikeBTN from './LikeBtn'
 import MainFeed from './MainFeed'
@@ -28,6 +29,7 @@ import PostCreator from './PostCreator'
 // Mix & Export all
 export 
 { 
+    MediaPlayer,
     UserBadges,
     MobileWarning, 
     PageTransition, 

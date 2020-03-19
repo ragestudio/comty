@@ -10,9 +10,6 @@ import * as MICONS from '@material-ui/icons'
 import Post_options from './local_components/post_options'
 import {toogleOptionsBox} from './local_components/post_options'
 
-const { Meta } = antd.Card;
-const userData = ycore.userData();
-
 
 function getBase64(img, callback) {
     const reader = new FileReader();
@@ -196,6 +193,7 @@ class PostCreator extends React.PureComponent{
     }
 
     render(){
+        const {userData} = this.props
         const { keys_remaining, visible, fileURL, file } = this.state;
         const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
         const changeShare = ({ key }) => {

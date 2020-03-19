@@ -284,6 +284,35 @@ export function GetPosts(userid, type, fkey, callback) {
       return callback(exception, response);
   })
 }
+export function GetPostData(a, b, callback){
+  if(!a){ 
+    ycore.notifyError('Is required to provide an post id!!!')
+    return false 
+  }
+  let formdata = new FormData();
+  formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("post_id", a)
+  formdata.append("fetch", (b || "post_data,post_comments,post_wondered_users,post_liked_users"))
+ 
+  const urlOBJ = `${ycore.endpoints.get_post_data}${ycore.handlerYIDT.__token()}`
+  const settings = {
+      "url":  urlOBJ,
+      "method": "POST",
+      "timeout": 10000,
+      "processData": false,
+      "mimeType": "multipart/form-data",
+      "contentType": false,
+      "data": formdata
+  };
+  jquery.ajax(settings)
+  .done(function (response) {
+      return callback(null, response);
+  })
+  .fail(function (response) {
+      const exception = 'Request Failed';
+      return callback(exception, response);
+  })
+}
 
 export const get_app_session = {
     get_id: (callback) => {

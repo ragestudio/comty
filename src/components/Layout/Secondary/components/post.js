@@ -1,19 +1,16 @@
 import React from 'react'
 import * as antd from 'antd'
-import styles from './index.less'
+import styles from './post.less'
 import {CustomIcons, LikeBTN} from 'components'
 import * as ycore from 'ycore'
 import * as Icons from '@ant-design/icons';
-import Icon from '@ant-design/icons'
-import classnames from 'classnames'
-import * as MICON from '@material-ui/icons';
 
 const { Meta } = antd.Card;
 
 // Set default by configuration
 const emptyPayload = {user: 'Post Empty', ago: 'This Post is empty', avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png', content: 'Test Test' }
 
-class PostCard extends React.PureComponent{
+export default class SecondaryPostCard extends React.Component{
     constructor(props){
         super(props),
         this.state = {
@@ -58,14 +55,6 @@ class PostCard extends React.PureComponent{
         }
     }
 
-    goToPost(postID){
-        localStorage.setItem('p_back_uid', postID)
-        ycore.GetPostData(postID, null, (err, res) => {
-            if (err) { return false }
-            ycore.SecondarySwap.openPost(res)
-        })
-    }
-
     render(){
         const { payload, customActions } = this.props
         const ActShowMode = ycore.DevOptions.force_show_postactions
@@ -73,7 +62,7 @@ class PostCard extends React.PureComponent{
        
         const defaultActions = [
             <div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,
-            <MICON.InsertComment key="comments" onClick={ ()=> this.goToPost(id) }  />
+            <MICON.InsertComment key="comments" onClick={ ()=> ycore.crouter.native(`p/${id}`)  }  />
         ]
         const actions = customActions || defaultActions;
        
@@ -87,7 +76,7 @@ class PostCard extends React.PureComponent{
 
         return(
           <div className={styles.cardWrapper}>
-             <antd.Card onDoubleClick={ ()=> this.goToPost(id) } hoverable className={ActShowMode? styles.showMode : null} actions={actions} >
+             <antd.Card hoverable className={ActShowMode? styles.showMode : null} actions={actions} >
                 <Meta
                     avatar={<div className={styles.postAvatar}><antd.Avatar shape="square" size={50} src={publisher.avatar} /></div>}
                     title={
@@ -111,4 +100,3 @@ class PostCard extends React.PureComponent{
         )
     }
 }
-export default PostCard

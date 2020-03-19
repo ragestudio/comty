@@ -26,7 +26,7 @@ class Base extends Component {
   let e = item.type
    switch (e) {
      case 'switch':
-      return <Switch checkedChildren={'Enabled'} unCheckedChildren={'Disabled'} checked={item.value} onChange={() => this.onChangeSwitch(item)} />
+      return <Switch checkedChildren={'Enabled'} unCheckedChildren={'Disabled'} checked={item.value? true : false} onChange={() => this.onChangeSwitch(item)} />
       case 'numeric':
         return <InputNumber min={1} max={50} defaultValue={item.value} onChange={() => this.onChangeNumeric(item, value)} />
      default:
@@ -57,7 +57,7 @@ class Base extends Component {
   }
   handleControlBar(){
     const ListControls = [
-      (<div>
+      (<div key={Math.random()}>
           <Button type="done" icon={<Icons.SaveOutlined />} onClick={() => this.saveChanges()} >Save</Button>
       </div>
      )
@@ -108,7 +108,6 @@ class Base extends Component {
       <Fragment>
          <div>
             <h1><Icons.PullRequestOutlined /> Behaviors</h1>
-            <Icon type="message" style={{ fontSize: '16px', color: '#08c' }} theme="outlined" />
              {this.SettingRender(this.state.SettingRepo)}
          </div>
       </Fragment>

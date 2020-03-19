@@ -1,0 +1,176 @@
+@import '~themes/vars.less';
+.cardWrapper{
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    border-radius: 7px;
+    max-width: 510px;
+    min-width: 265px;
+    width: auto;
+    margin: 23px auto 50px auto;
+
+    :global{
+        .ant-card-meta-detail > div:not(:last-child){
+            margin: 0
+        }
+        .ant-card {
+            border-radius: 7px;
+            border: 0;
+            border-top: 1px solid #4646460c;
+        }
+        .ant-card-body {
+           padding: 13px 0 5px 0;
+        }
+
+        .ant-card-actions {
+            border-top: 0;
+            background: #EBEBEB;
+            height: 30px;
+            position: relative;
+            transition: opacity 150ms linear, position 150ms linear, transform 150ms linear;
+            border-radius: 0 0 10px 10px;
+            opacity: 0;
+            // Doesn't work... So sad :C
+            &.showMode{
+                opacity: 1;
+                transform: translate(0, 15px);
+            }
+        }
+
+        .ant-card-actions:hover {
+            opacity: 1;
+            transform: translate(0, 15px);
+            transition: opacity 150ms linear, position 150ms linear, transform 150ms linear;
+        }
+        .ant-card-actions > li > span > .anticon {
+            font-size: 16px;
+            line-height: 22px;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 23px;
+        
+        }
+        .ant-card-actions > li {
+            margin: -20px 0 0 0 ;
+            border-right: 0;
+            span {
+                font-size: 16px;
+                line-height: 22px;
+                width: 40px;
+                height: 40px;
+                background: white;
+                border-radius: 23px;
+                margin: auto;
+            }
+            svg {
+                height: 20px;
+                width: 20px;
+                height: 100%;
+                vertical-align: middle;
+            }
+        }
+    }
+}
+.showMode{
+    :global{
+       ul {
+           opacity: 1 !important;
+           transform: translate(0, 15px);
+       }
+    }
+}
+.postAvatar{
+    position: absolute;
+    left: -8px;
+    top: -8px;
+    display: flex;
+}
+.titleUser{
+    display: flex;
+    font-family: 'Poppins', sans-serif;
+    margin: 0 0 0 50px;
+}
+.textAgo{
+    display: flex;
+    font-size: 10px;
+    margin: 0 0 0 53px;
+}
+.PostTags{
+    float: right;
+    width: 100%;
+    z-index: 10;
+    :global {
+        .anticon{
+            color:rgb(249, 179, 64);
+            float: right;
+            margin: -0 6px 0 0;;
+            font-size: 17px;
+        }
+        .MoreMenu{
+            color: #2d2d2d !important;
+        }
+    }
+}
+.titleWrapper{
+    display: flex;
+    h4{
+        cursor: pointer;
+    }
+}
+.postContent{
+    word-break: break-all;
+    display: flex;
+    border-radius: 3px;
+    margin: 23px 24px 23px 24px;
+    h3{
+        font-family: "Poppins", sans-serif;
+        color: #555555;
+        font-weight: 400;
+        font-size: 15px;
+        letter-spacing: -0.3px;
+    }
+}
+.postContentFILE{
+    display: flex;
+    margin: 23px 0 5px 0;
+    max-height: 600px;
+    overflow: hidden;
+    img {
+        width: calc(100% + 30px);
+        overflow: hidden;
+        margin: auto;
+    }
+    video {
+        max-height: 600px;
+        width: calc(100% + 30px);
+        overflow: hidden;
+    }
+    h3{
+        color: rgb(85, 85, 85);
+        font-weight: 470;
+    }
+}
+.likebtn{
+   :global{
+       svg{
+        color:rgba(0, 0, 0, 0.45);
+       }
+       svg:hover{
+           color: rgb(233, 35, 68);
+           transition: all 0.2s linear;
+       }
+   }
+}
+
+.ellipsisIcon{
+    color:rgba(0, 0, 0, 0.45);
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    margin: auto;
+    font-size: 30px;
+    transition: opacity 150ms linear;
+}
+.ellipsisIcon:hover{
+    opacity: 0;
+    transition: opacity 150ms linear;
+}

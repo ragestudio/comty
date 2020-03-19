@@ -52,9 +52,9 @@ class Control extends React.Component {
         return(
           Show? (
             <StyleRoot>
-                <div key={Math.random()} style={FadeIN? animationStyles.fadeInUp : animationStyles.bounceOutDown }>
-                    <antd.Card key={Math.random()} bordered={false} className={styles.ControlCard}> 
-                      <React.Fragment>{RenderFragment}</React.Fragment> 
+                <div style={FadeIN? animationStyles.fadeInUp : animationStyles.bounceOutDown }>
+                    <antd.Card bordered={false} className={styles.ControlCard}> 
+                      <React.Fragment >{RenderFragment}</React.Fragment> 
                     </antd.Card>
                 </div>
             </StyleRoot>

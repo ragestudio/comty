@@ -2,9 +2,10 @@ import React from 'react'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
-import styles from './Secondary.less'
+import styles from './index.less'
 import classnames from 'classnames'
 
+import SecRenderPost from './post'
 
 export const SwapMode = {
     ext: () => {
@@ -19,6 +20,13 @@ export const SwapMode = {
             mode: 'post_comments',
             s_raw: e
         })
+    },
+    openPost: (e) => {
+        SecondaryLayoutComponent.setState({
+            swap: true,
+            mode: 'open_post',
+            s_raw: e
+        })
     }
 }
 
@@ -30,10 +38,24 @@ export default class Secondary extends React.PureComponent{
             swap: false,
             mode: 'ext',
             s_raw: '',
-            s_postData: '',
         }
     }
-    
+    closeSwap(){
+        this.setState({ 
+            swap: !this.state.swap,
+            s_raw: null,
+            mode: 'ext'
+         })
+    }
+    renderPost = (payload) => {
+        const post_data = JSON.parse(payload)['post_data']
+        console.log(post_data)
+        return(
+           <SecRenderPost payload={post_data} />
+        )
+    }
+
+
     renderMode(){
         const { mode } = this.state
         switch (mode) {
@@ -46,6 +68,11 @@ export default class Secondary extends React.PureComponent{
                       <PostComments s_raw={this.state.s_raw} />
                    ) 
                }
+            case 'open_post':{
+                return(
+                    this.renderPost(this.state.s_raw)
+                )
+            }
         
             default:
                 break;
@@ -64,8 +91,8 @@ export default class Secondary extends React.PureComponent{
                 </div>
 
                 <div className={styles.container} >
-                {this.state.swap? <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => this.setState({ swap: !this.state.swap })} > Back </antd.Button> : null}
-                <h1>container</h1>
+                {this.state.swap? <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => this.closeSwap()} > Back </antd.Button> : null}
+                {this.renderMode()}
                 
 
                 </div>
