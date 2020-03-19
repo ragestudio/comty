@@ -3,12 +3,10 @@ import React from 'react';
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons';
-import $ from 'jquery'
-import Icon from '@ant-design/icons'
+import jwt from 'jsonwebtoken'
 
 import styles from './style.less'
-import { GridContent } from '@ant-design/pro-layout';
-import { json } from 'body-parser';
+
 
 const UserData = ycore.userData()
 
@@ -40,7 +38,9 @@ export default class __m extends React.Component {
     })
   }
   handleToken(){
-    this.setState({ s_token: ycore.handlerYIDT.get() })
+    const a = ycore.handlerYIDT.getRaw()
+    const b = jwt.decode(a)
+    this.setState({ s_token: b})
     {ycore.ValidLoginSession(res => {
      this.setState({s_ses: res})
     })}
@@ -55,7 +55,7 @@ export default class __m extends React.Component {
 
   render() {
     const arrayOfSDCP = Object.entries(UserData).map((e) => ( { [e[0]]: e[1] } ));
-    const { UserID, UserToken, deadline } = this.state.s_token
+    const { UserID, UserToken, expiresIn } = this.state.s_token
     const { ValidSDCP, ValidCookiesToken, final } = this.state.s_ses
     return (
       <div className={styles.Wrapper}>
@@ -73,9 +73,10 @@ export default class __m extends React.Component {
             </antd.Card>
             <antd.Card>
               <h2><Icons.UserOutlined /> Current Session</h2>
+              <p> Raw => {JSON.stringify(this.state.s_token)} </p>
               <p> UID => {UserID} </p>
               <p> Session Token => {UserToken} </p>
-              <p> Deadline => {deadline} </p>
+              <p> expiresIn => {expiresIn} </p>
               <hr />
               <p> ValidSDCP => {JSON.stringify(ValidSDCP)} </p>
               <p> ValidCookiesToken => {JSON.stringify(ValidCookiesToken)} </p>

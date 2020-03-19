@@ -25,7 +25,7 @@ class PrimaryLayout extends React.Component {
     super(props)
     window.PrimaryComponent = this;
     this.state = {
-      collapsed: ycore.DevOptions.default_collapse_sider,
+      collapsed: (ycore.DevOptions.default_collapse_sider? true : false),
       isMobile: false,
       userData: ''
     }
@@ -53,7 +53,6 @@ class PrimaryLayout extends React.Component {
     store.set('collapsed',  !fromStore) 
   }
 
-  
   isDarkMode = () => {
     const {app} = this.props
     const { theme } = app
@@ -68,7 +67,6 @@ class PrimaryLayout extends React.Component {
     const { userData, collapsed, isMobile } = this.state
     const { onCollapseChange } = this
     const { theme } = app
-    
     
     const SiderProps = {
       theme,

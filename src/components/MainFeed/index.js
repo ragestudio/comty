@@ -120,7 +120,6 @@ class MainFeed extends React.Component {
            <div id='mainfeed'> 
               {invalid? 
                 <antd.Card style={{ borderRadius: "10px", maxWidth: '26.5vw', margin: 'auto', textAlign: 'center' }} >
-                 
                     <h2><Icons.ExclamationCircleOutlined />  Invalid Data </h2>
                     <span>If this error has occurred several times, try restarting the app</span>
                 </antd.Card>

@@ -22,7 +22,6 @@ export const asyncSDCP = {
                 return callback(null, b)
             })
         } catch (err) {
-            console.log(err);
             return false
         }
     },
@@ -105,7 +104,6 @@ export const CryptSDCP = {
     },
     valid: () => {
         const a = ycore.asyncSDCP.get()
-        console.log(a)
         return a? true : false
     }
 
@@ -117,6 +115,4 @@ export function SetupApp(){
     if (!resourceLoad) {
         localStorage.setItem('resource_bundle', 'light_ng')
     }
-   
-
 }

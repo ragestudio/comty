@@ -12,11 +12,7 @@ export function userData(){
     return ycore.handlerYIDT.get()
 }
 
-
-
 function __API__User (payload, sdcp){
-    const now = new Date()
-    now.setDate(now.getDate() + 1)
     const { UserID, UserToken } = payload
 
     const a = ycore.CryptSDCP.atob_parse(sdcp)
@@ -31,26 +27,23 @@ function __API__User (payload, sdcp){
         dev,
         is_pro,
         username,
-        deadline: ( ycore.DevOptions.SignForNotExpire? null : now.getTime() )
+        exp: ycore.DevOptions.SignForNotExpire? 0 : Math.floor(Date.now() / 1000) + (60 * 60),
     }
     ycore.handlerYIDT.set(frame, done => {
-        ycore.RefreshONCE()
+        done? ycore.RefreshONCE() : null
     })
 }
 
 export const handlerYIDT = {
     set: (value, callback) => {
-        const ExpireTime =  ycore.DevOptions.MaxJWTexpire
         jwt.sign(
             value,
             keys.secretOrKey,
-            ycore.DevOptions.SignForNotExpire?  { expiresIn: '0' } :  { expiresIn: ExpireTime },
             (err, token) => {
                 err? null : Cookies.set('cid', token)
                 callback(true)
             }
         )
-        ycore.yconsole.debug(frame)
         return true
     },
     getRaw: () => {
@@ -86,40 +79,43 @@ export const handlerYIDT = {
 }
 
 export function ValidLoginSession(callback){
-    const prefix = '[YID Session]';
-    let final = false;
-    let ValidCookiesToken = false;
-    let ValidSDCP = false;
+    let validtoken = false;
+ 
+    const a = Cookies.get('cid');
+    if (a) {
+        const modExp = ycore.DevOptions.SignForNotExpire;
+        const ad = jwt.decode(a)
 
-    let TokenContainer = Cookies.get('cid');
+        let notexp = true; // Sets if this is expired  (Default is not expired)
+        let exists = false; // Sets if this exist
 
-    if (TokenContainer) {
-      let TokenContainerDC = jwt.decode(TokenContainer)
-      if (TokenContainerDC){
-        ValidCookiesToken = true
-      }
+        ad? (exists = true) : null
+
+        const tokenExp = (ad.exp * 1000)
+        const tokenExpLocale = new Date(tokenExp).toLocaleString()
+        const now = new Date().getTime()
+
+
+        ycore.yconsole.log(`TOKEN EXP => ${tokenExp} ${modExp? '( Infinite )' : `( ${tokenExpLocale} )` } || NOW => ${now}`)
+    
+       
+        if (modExp == false) {
+            if(tokenExp < now) {
+                ycore.yconsole.log('This token is expired !!!')
+                notexp = false
+            }
+        }
+        if (notexp && exists) {
+            validtoken = true
+        }
+       
+        
     }
 
-    if (ycore.CryptSDCP.valid()){
-        ValidSDCP = true;
-    }
-
-    if (ValidCookiesToken == true){
-        final = true
-    } 
-
-    const finalvalids = { ValidSDCP, ValidCookiesToken, final }
-    ycore.DevOptions.ShowFunctionsLogs? (
-        console.group(`%c ${prefix} `, 'background: #339edf; color: #fff'),
-        console.log(`Valid SDCP => ${ValidSDCP}`),
-        console.log(`Valid Token => ${ValidCookiesToken}`),
-        console.log(`Session is valid => ${final}`),
-        console.groupEnd() 
-    ) : null
     if (callback) {
-        callback(finalvalids)
+        callback(validtoken)
     }
-    return final
+    return validtoken
 }
 export function ValidBackup(){
     let ValidBackupToken = false;
@@ -134,7 +130,7 @@ export function ValidBackup(){
 }
 export function MakeBackup(){
     if (ValidBackup() == false) {
-        ycore.asyncLocalStorage.setItem('last_backup', Cookies.get('cid'))
+        localStorage.setItem('last_backup', Cookies.get('cid'))
         return
     }
 }

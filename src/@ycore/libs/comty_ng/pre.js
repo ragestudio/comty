@@ -329,24 +329,3 @@ export const get_app_session = {
         .catch(error => ycore.yconsole.log('error', error));
     }
 }
-export function PushUserData(inputIO1, inputIO2) {
-  var getStoragedToken = Cookies.get('access_token');
-  var yCore_GUDEP = ycore.endpoints.update_userData_endpoint;
-  var urlOBJ = "" + yCore_GUDEP + getStoragedToken;
-  ycore.yconsole.log('Recived', global, 'sending to ', urlOBJ)
-  var form = new FormData();
-  form.append("server_key", ycore.yConfig.server_key);
-  form.append(inputIO1, inputIO2);
-  var settings = {
-      "url": urlOBJ,
-      "method": "POST",
-      "timeout": 0,
-      "processData": false,
-      "mimeType": "multipart/form-data",
-      "contentType": false,
-      "data": form
-  };
-  jquery.ajax(settings).done(function (response) {
-    ycore.yconsole.log(response)
-  });
-}

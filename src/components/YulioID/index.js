@@ -1,13 +1,11 @@
 import React, { Component } from 'react'
-import {GetAuth, InitSDCP, DevOptions, asyncSDCP} from 'ycore';
-import PropTypes from 'prop-types';
 import { connect } from 'dva';
 import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Button, Input, Drawer, Collapse } from 'antd';
-import styles from './index.less';
-import formstyle from './formstyle.less'
+
+import { Button, Input, Drawer } from 'antd';
 import * as ycore from 'ycore'
+
+import styles from './index.less';
 
 const FormItem = Form.Item
 
@@ -23,7 +21,6 @@ class YulioID extends Component {
       ShowLoading: false,
       Answered: false,
     }
-    this.handleRetry = this.handleRetry.bind(this);
   }
   // Handlers & others
   handleUsername(text) {
@@ -32,7 +29,7 @@ class YulioID extends Component {
   handlePassword(text) {
     this.setState({ RawPassword: text.target.value });
   }
-  handleRetry() {
+  handleRetry = () => {
     this.setState({ShowLoading: false, StateException: false, StateIcon: ''})
   }
   handleEnter = (e) => {
@@ -52,7 +49,7 @@ class YulioID extends Component {
 
     if (EncUsername && EncPassword){
       this.setState({ ShowLoading: true, StateMessage: 'Wait a sec...' });
-      if (DevOptions.InfiniteLogin == true) {
+      if (ycore.DevOptions.InfiniteLogin == true) {
         ycore.yconsole.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
       }
       else {
@@ -81,9 +78,7 @@ class YulioID extends Component {
   render() {
     const { visible } = this.props
     const { getFieldDecorator } = this.props.form;
-    const { ShowLoading, StateIcon, StateMessage, StateException } = this.state;
-    const { Panel } = Collapse;
-  
+    const { ShowLoading, StateIcon, StateMessage, StateException } = this.state;  
   
     return (
       <div className={styles.loginWrapper}>
@@ -98,11 +93,6 @@ class YulioID extends Component {
           <div className={styles.preheader}><h6><img src={"https://api.ragestudio.net/id.svg"} /> YulioID&trade;</h6>
           <h1>Login</h1></div>
           <main className={styles.mainlp}>
-      
-              
-
-              {/* <RenderInclude data={include} /> */}
-
               <form className={styles.formlogin}>
                 {ShowLoading ? (
                   <div style={{ height: '329px' }}>
@@ -111,7 +101,7 @@ class YulioID extends Component {
                       <div><br/><br/><br/>
                         <div className={styles.resultbox}>
                           <h6 > {StateMessage} </h6>
-                          {StateException ? <div className={styles.retryBTN}><Button style={{ width: '270px' }} type='dashed' onClick={this.handleRetry}>Retry</Button></div> : null}
+                          {StateException ? <div className={styles.retryBTN}><Button style={{ width: '270px' }} type='dashed' onClick={() => this.handleRetry()}>Retry</Button></div> : null}
                         </div>
                       </div>
                     </div>
@@ -187,13 +177,6 @@ class YulioID extends Component {
       </div>
     );
   }
-}
-
-YulioID.propTypes = {
-  form: PropTypes.object,
-  dispatch: PropTypes.func,
-  loading: PropTypes.object,
-  include: PropTypes.object,
 }
 
 export default YulioID
