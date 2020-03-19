@@ -1,6 +1,7 @@
 // @alias from 'components'
 
 // Helpers & Misc
+import MobileWarning from './MobileWarning'
 import CustomIcons from './CustomIcons'
 import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
@@ -27,7 +28,8 @@ import PostCreator from './PostCreator'
 // Mix & Export all
 export 
 { 
-    UserBadges, 
+    UserBadges,
+    MobileWarning, 
     PageTransition, 
     SearchCard, 
     HeaderSearch, 

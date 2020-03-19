@@ -1,13 +1,11 @@
 /* global window */
 /* global document */
-import React, { PureComponent, Fragment } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import withRouter from 'umi/withRouter'
 import { connect } from 'dva'
-import { MyLayout, PageTransition, HeaderSearch } from 'components'
-import { Layout, Result, Button } from 'antd'
+import { MyLayout, PageTransition, HeaderSearch, MobileWarning } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
-import { langFromPath } from 'utils'
 import store from 'store';
 import classnames from 'classnames'
 
@@ -17,7 +15,7 @@ import * as Icons from '@ant-design/icons'
 
 import styles from './PrimaryLayout.less'
 
-const { Content } = Layout
+const { Content } = antd.Layout
 const { Sider, Control, Secondary } = MyLayout
 
 @withRouter
@@ -29,8 +27,6 @@ class PrimaryLayout extends React.Component {
     this.state = {
       collapsed: ycore.DevOptions.default_collapse_sider,
       isMobile: false,
-      resbypass:  store.get('resbypass') || false,
-      RemByPass: false,
       userData: ''
     }
   }
@@ -57,16 +53,7 @@ class PrimaryLayout extends React.Component {
     store.set('collapsed',  !fromStore) 
   }
 
-  ResByPassHandler = () => {
-    const {RemByPass} = this.state;
-    if (RemByPass == true){
-      this.setState({resbypass: true})
-      store.set('resbypass', true)
-      return
-    }
-    this.setState({resbypass: true})
-  }
-
+  
   isDarkMode = () => {
     const {app} = this.props
     const { theme } = app
@@ -78,25 +65,10 @@ class PrimaryLayout extends React.Component {
     
   render() {
     const { app, location, dispatch, children } = this.props
-    const { theme, routeList } = app
-    const { userData, isMobile, resbypass } = this.state
-    const collapsed = (this.state.collapsed? true : false)
-
+    const { userData, collapsed, isMobile } = this.state
     const { onCollapseChange } = this
-    // Localized route name.
-    const lang = langFromPath(location.pathname)
-    const newRouteList =
-      lang !== 'en'
-        ? routeList.map(item => {
-            const { name, ...other } = item
-            return {
-              ...other,
-              name: (item[lang] || {}).name || name,
-            }
-          })
-        : routeList
-
-
+    const { theme } = app
+    
     
     const SiderProps = {
       theme,
@@ -111,43 +83,23 @@ class PrimaryLayout extends React.Component {
         })
       },
     }
-  
-    const ContainerProps = {
-      theme,
-      userData,
-      collapsed,
-    }
 
     const SecondaryProps = {
-      userData
-    }
-  
-    const MobileWarning = () =>{
-      if (resbypass == false) {
-         if (isMobile == true) {
-            return(
-              <div className={styles.mobilewarning}>
-                 <Result status="warning" title="Low resolution warning" 
-                  extra={ <div style={{ color: "white" }}><h3 style={{ color: "white" }}>This version of the application is not fully compatible with the resolution of this screen, a higher resolution is recommended for an optimal experience</h3><span>Please choose an option to continue</span><br /><br /><Button type="dashed" onClick={this.ResByPassHandler}>Continue</Button></div> }/>
-              </div>
-            )
-         }
-      }
-      return null
+      userData,
+      isMobile,
+      theme,
     }
 
- 
       return (
-        <Fragment>
-          <MobileWarning />
+        <React.Fragment>
+          {isMobile?  <MobileWarning /> : null}
           <div className={styles.BarControlWrapper}><Control /></div>
-          <Layout className={classnames( styles.layout, {[styles.md_dark]: this.isDarkMode() })}>
+          <antd.Layout className={classnames( styles.layout, {[styles.md_dark]: this.isDarkMode() })}>
            <Sider {...SiderProps}/>
 
             <div id="primaryLayout" className={styles.leftContainer}>
                 <PageTransition preset="moveToRightScaleUp" id="scroller" transitionKey={location.pathname}>
-                   
-                    <Content {...ContainerProps} className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
+                    <Content className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
                         <HeaderSearch />
                         {children}
                     </Content>
@@ -156,8 +108,8 @@ class PrimaryLayout extends React.Component {
 
             <Secondary {...SecondaryProps} />
           
-          </Layout>
-        </Fragment>
+          </antd.Layout>
+        </React.Fragment>
       )
     
   }
