@@ -98,7 +98,7 @@ class PostCreator extends React.PureComponent{
     };
 
     beforeUpload = (file) => {
-        const filter = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'video/mp4';
+        const filter = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg' || file.type === 'image/gif' || file.type === 'video/mp4';
         if (!filter) {
           antd.message.error(`${file.type} This file is not valid!`);
         }
@@ -193,7 +193,7 @@ class PostCreator extends React.PureComponent{
 
     render(){
         const {userData} = this.props
-        const { keys_remaining, visible, fileURL, file } = this.state;
+        const { keys_remaining, visible, fileURL } = this.state;
         const percent = (((keys_remaining/ycore.AppSettings.MaxLengthPosts) * 100).toFixed(2) )
         const changeShare = ({ key }) => {
             this.setState({ shareWith: key })

@@ -70,7 +70,7 @@ class PostCard extends React.PureComponent{
     render(){
         const { payload, customActions } = this.props
         const ActShowMode = ycore.AppSettings.force_show_postactions
-        const { id, post_time, postText, postFile, get_post_comments, postFileName, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
+        const { id, post_time, postText, postFile, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
         const handlePostActions = {
             delete: (post_id) => {
                 ycore.ActionPost('delete', post_id, null, (err, res)=>{
@@ -91,8 +91,6 @@ class PostCard extends React.PureComponent{
         ]
         const actions = customActions || defaultActions;
        
-        
-
         const MoreMenu = (
             <antd.Menu>
                 {ycore.IsThisPost.owner(publisher.id)?
@@ -101,11 +99,8 @@ class PostCard extends React.PureComponent{
                     </antd.Menu.Item>
                     : null  
                 }
-                <antd.Menu.Item pid={id} key="save_post">
+                <antd.Menu.Item key="save_post">
                     <Icons.SaveOutlined /> Save post
-                </antd.Menu.Item>
-                <antd.Menu.Item pid={id} key="test">
-                    <Icons.SaveOutlined /> Test CRAZY GAI
                 </antd.Menu.Item>
             </antd.Menu>
           );

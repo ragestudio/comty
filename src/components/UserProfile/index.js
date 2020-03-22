@@ -111,7 +111,7 @@ class UserProfile extends React.Component {
               {loading? <antd.Skeleton active /> : 
               (<div>
                 {invalid? null: this.UserHeader(this.state.RenderValue)}
-                <PostCreator userData={ycore.userData()} />
+                {ycore.IsThisUser.same(UUID)? <PostCreator userData={ycore.userData()} /> : null}
                 <MainFeed get='user' uid={UUID} />
               </div>)
               }

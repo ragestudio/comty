@@ -23,7 +23,7 @@ export default class __m extends React.Component {
   }
 
   componentDidMount() {
-    if (ycore.IsThisUser.admin() == false) {
+    if (ycore.IsThisUser.dev() == false || ycore.IsThisUser.admin() == false) {
       return ycore.crouter.native('main')
     }
     this.handleSID()
@@ -59,7 +59,7 @@ export default class __m extends React.Component {
     const { UserID, UserToken, expiresIn } = this.state.s_token
     const { ValidSDCP, ValidCookiesToken, final } = this.state.s_ses
 
-    const AddDummy = {id: `${Math.random()}`, publisher: {id: "1"},post_id: "1", user_id: "48", recipient_id: "0", postText: "Dummy Payload"}
+    const AddDummy = {id: "3", publisher: {id: "1"},post_id: "1", user_id: "48", recipient_id: "0", postText: "New by ID Dummy Payload"}
     
     return (
       <div className={styles.Wrapper}>
@@ -104,6 +104,9 @@ export default class __m extends React.Component {
               this.setState({ isEnd: isEnd, data: parsed, loading: false })
             })`
             )} > Send mock notifyError() </antd.Button>
+
+            <antd.Button onClick={() => ycore.notify.error('Error Mock 1')} > notify.error </antd.Button>
+            <antd.Button onClick={() => ycore.notify.proccess('Proccess Mock 1')} > notify.proccess </antd.Button>
           </div>
 
           <div className={styles.titleHeader}>
@@ -132,7 +135,7 @@ export default class __m extends React.Component {
           <div className={styles.sectionWrapper}>
             <antd.Card>
               <antd.Button onClick={() => ycore.FeedHandler.addToRend(AddDummy)}> ADD DUMMY </antd.Button>
-              <antd.Button> KillByID  </antd.Button>
+              <antd.Button onClick={()=> ycore.FeedHandler.killByID(3)} > KillByID (3) </antd.Button>
               <hr />
               <MainFeed custompayload={[{id: "1", publisher: {id: "1"},post_id: "1", user_id: "48", recipient_id: "0", postText: "Dummy Payload"}, {id: "2", post_id: "2", publisher: {id: "1"}, user_id: "48", recipient_id: "0", postText: "Dummy Payload"}]} />
               

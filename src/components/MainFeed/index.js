@@ -40,11 +40,15 @@ class MainFeed extends React.Component {
     }
 
     killByID(post_id){
-
+        const a = this.state.data
+        const b = ycore.arrayRemoveByID(a, post_id)
+        this.setState({data: b})
     }
 
     addToRend(payload){
-        console.log(payload)
+        let a = this.state.data
+        a.unshift(payload)
+        this.setState({ data: a })
     }
 
     FirstGet() {

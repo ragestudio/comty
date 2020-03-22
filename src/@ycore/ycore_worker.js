@@ -141,6 +141,24 @@ export const crouter = {
         router.push(e)
     }
 }
+
+export const notify = {
+    error: (...res) => {
+        antd.notification.error({
+            message: 'Wopss',
+            description: (<div><span>An wild error appear! : </span><br/><br/><div style={{ position: 'relative', width: '100%',backgroundColor: 'rgba(243, 19, 19, 0.329)', bottom: '0', color: 'black', padding: '3px' }} >{res.toString()}</div></div>),
+            placement: 'bottomLeft'
+        })
+    },
+   proccess: (...res) => {
+        antd.notification.open({
+            icon: <Icons.LoadingOutlined style={{ color: '#108ee9' }} />,
+            message: 'Please wait',
+            description: (<div>{res}</div>),
+            placement: 'bottomLeft'
+        })
+   }
+}
 /**
  * Render User Notification about an Error
  * 
@@ -166,6 +184,14 @@ export function notifyProccess(cust){
         placement: 'bottomLeft'
     })
 }
+
+
+export function arrayRemoveByID(arr, value) {
+    return arr.filter(function(ele){
+        return ele.id != value;
+    });
+}
+ 
 /**
  * Request FullScreen mode
  * 

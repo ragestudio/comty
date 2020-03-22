@@ -21,7 +21,7 @@ class PageIndexer extends PureComponent {
         </div>)
       }
       if (matchMaster){
-        return ycore.IsThisUser.admin()?  <__m /> : <Error404 />
+        return ycore.IsThisUser.dev() || ycore.IsThisUser.admin()?  <__m /> : <Error404 />
       }
       // By default return Error 404
       return(<div><Error404 /></div>)
