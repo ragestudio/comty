@@ -1,7 +1,39 @@
 import * as ycore from 'ycore'
 var jquery = require("jquery");
 import * as Icons from '@ant-design/icons'
+import { RenderFeed } from 'components/MainFeed'
 
+
+export const FeedHandler = {
+  refresh: () => {
+    RenderFeed.RefreshFeed()
+  },
+  killByID: (post_id) => {
+    RenderFeed.killByID(post_id)
+  },
+  addToRend: (payload) => {
+    RenderFeed.addToRend(payload)
+  }
+}
+
+export const IsThisPost = {
+  owner: (post_uid) => {
+    const a = ycore.handlerYIDT.__id()
+    if (post_uid == a) {
+      return true
+    }
+    return false
+  },
+  boosted: () => {
+
+  },
+  pinned: () => {
+
+  },
+  flagged: () => {
+
+  }
+}
 
 export function GetGeneralData(callback){
   let formdata = new FormData();
@@ -252,7 +284,7 @@ export function GetPosts(userid, type, fkey, callback) {
   let formdata = new FormData();
   formdata.append("server_key", ycore.yConfig.server_key);
   formdata.append("after_post_id", (fkey || 0))
-  formdata.append("limit", ycore.DevOptions.limit_post_catch || 20)
+  formdata.append("limit", ycore.AppSettings.limit_post_catch || 20)
   switch (type) {
     case 'feed':
       formdata.append("type", "get_news_feed");

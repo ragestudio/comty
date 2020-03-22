@@ -5,7 +5,7 @@
  * @licensed Pending...
  */
 
-import {AppSettings} from  "../../globals/settings.js";
+import {ListSettings} from  "../../globals/settings.js";
 import {Endpoints} from "globals/endpoints.js";
 import * as Icons from '@ant-design/icons';
 import localforage from "localforage"
@@ -99,7 +99,7 @@ export const AppInfo = {
  * @param e {String} String of SettingID for search
  * @return {string} Boolean value
  */
-export function StorageValued(e){
+export function SettingStoragedValue(e){
     try {
       const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
       const Ite = fromStorage.map(item => {
@@ -111,20 +111,6 @@ export function StorageValued(e){
     catch (error) {
       return null
     }
-}
-
-/**
- * Return the values as alias (AppSettings, DevOptions)
- * 
- * @param e {String} String of SettingID for search
- * @return {string} Boolean value
- */
-export function ReturnDevOption(e){
-    const Ite = AppSettings.map(item => {
-      return item.SettingID === e? item.value : null
-    })
-    const fr = Ite.filter(Boolean)
-    return fr.toString()
 }
 
 /**
@@ -202,7 +188,7 @@ export function requestFullscreen(){
  * 
  */
 export function RefreshONCE(){
- window.location.reload(); 
+    window.location = "/"
 }
 /**
  * Parse information about this App
@@ -236,6 +222,7 @@ export function DetectNoNStableBuild(e1) {
             break;
     }
 }
+
 /**
  * User console with setting user permissions
  * 
@@ -243,19 +230,19 @@ export function DetectNoNStableBuild(e1) {
  */
 export const yconsole = {
     log: (...cont)=>{
-        ReturnDevOption('force_showDevLogs')? console.log(...cont) : null
+        SettingStoragedValue('force_showDevLogs')? console.log(...cont) : null
         return
     },
     debug: (...cont)=>{
-        ReturnDevOption('force_showDevLogs')? console.debug(...cont) : null
+        SettingStoragedValue('force_showDevLogs')? console.debug(...cont) : null
         return
     },
     error: (...cont)=>{
-        ReturnDevOption('force_showDevLogs')? console.error(...cont) : null
+        SettingStoragedValue('force_showDevLogs')? console.error(...cont) : null
         return
     },
     warn: (...cont)=>{
-        ReturnDevOption('force_showDevLogs')? console.warn(...cont) : null
+        SettingStoragedValue('force_showDevLogs')? console.warn(...cont) : null
         return
     }
 }

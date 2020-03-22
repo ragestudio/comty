@@ -39,7 +39,7 @@ export default class HeaderSearch extends Component {
   onChange = e => {
     const { value } = e.target;
     this.setState({value: value})
-    if (ycore.DevOptions.auto_search_ontype == 'true') {
+    if (ycore.AppSettings.auto_search_ontype == 'true') {
       this.autosend()
     }
   };

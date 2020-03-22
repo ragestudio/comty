@@ -6,6 +6,7 @@ import * as Icons from '@ant-design/icons';
 import jwt from 'jsonwebtoken'
 
 import styles from './style.less'
+import MainFeed from '../../components/MainFeed';
 
 
 const UserData = ycore.userData()
@@ -57,6 +58,9 @@ export default class __m extends React.Component {
     const arrayOfSDCP = Object.entries(UserData).map((e) => ( { [e[0]]: e[1] } ));
     const { UserID, UserToken, expiresIn } = this.state.s_token
     const { ValidSDCP, ValidCookiesToken, final } = this.state.s_ses
+
+    const AddDummy = {id: `${Math.random()}`, publisher: {id: "1"},post_id: "1", user_id: "48", recipient_id: "0", postText: "Dummy Payload"}
+    
     return (
       <div className={styles.Wrapper}>
           <div className={styles.titleHeader}>
@@ -96,7 +100,7 @@ export default class __m extends React.Component {
             <antd.Button onClick={() => ycore.notifyError(`
             ycore.GetPosts(uid, get, '0', (err, result) => {
               const parsed = JSON.parse(result)['data']
-              const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false
+              const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false
               this.setState({ isEnd: isEnd, data: parsed, loading: false })
             })`
             )} > Send mock notifyError() </antd.Button>
@@ -116,6 +120,21 @@ export default class __m extends React.Component {
 
               
               
+              
+            
+            </antd.Card>  
+            
+          </div>
+
+          <div className={styles.titleHeader}>
+            <h1><Icons.BugOutlined  /> MainFeed | ENV Test</h1>
+          </div>
+          <div className={styles.sectionWrapper}>
+            <antd.Card>
+              <antd.Button onClick={() => ycore.FeedHandler.addToRend(AddDummy)}> ADD DUMMY </antd.Button>
+              <antd.Button> KillByID  </antd.Button>
+              <hr />
+              <MainFeed custompayload={[{id: "1", publisher: {id: "1"},post_id: "1", user_id: "48", recipient_id: "0", postText: "Dummy Payload"}, {id: "2", post_id: "2", publisher: {id: "1"}, user_id: "48", recipient_id: "0", postText: "Dummy Payload"}]} />
               
             
             </antd.Card>  

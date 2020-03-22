@@ -25,7 +25,7 @@ class PrimaryLayout extends React.Component {
     super(props)
     window.PrimaryComponent = this;
     this.state = {
-      collapsed: (ycore.DevOptions.default_collapse_sider? true : false),
+      collapsed: (ycore.AppSettings.default_collapse_sider? true : false),
       isMobile: false,
       userData: ''
     }

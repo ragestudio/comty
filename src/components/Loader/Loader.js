@@ -1,12 +1,12 @@
 import React from 'react'
 import {CoreLoader} from 'components'
-import { DevOptions } from 'ycore'
+import { AppSettings } from 'ycore'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import styles from './Loader.less'
 
 const Loader = ({ spinning = true, fullScreen }) => {
-  if (DevOptions.InfiniteLoading == true) {
+  if (AppSettings.InfiniteLoading == true) {
     return (
       <div className={styles.loader}>
         <div className={styles.warpper}>

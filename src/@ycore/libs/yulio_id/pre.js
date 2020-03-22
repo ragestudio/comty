@@ -27,10 +27,10 @@ function __API__User (payload, sdcp){
         dev,
         is_pro,
         username,
-        exp: ycore.DevOptions.SignForNotExpire? 0 : Math.floor(Date.now() / 1000) + (60 * 60),
+        exp: ycore.AppSettings.SignForNotExpire? 0 : Math.floor(Date.now() / 1000) + (60 * 60),
     }
     ycore.handlerYIDT.set(frame, done => {
-        done? ycore.RefreshONCE() : null
+        done? ycore.crouter.native('main') : null
     })
 }
 
@@ -82,7 +82,7 @@ export function ValidLoginSession(callback){
     let validtoken = false;
     const a = Cookies.get('cid');
     if (a) {
-        const modExp = ycore.DevOptions.SignForNotExpire;
+        const modExp = ycore.AppSettings.SignForNotExpire;
         const ad = jwt.decode(a)
 
         let notexp = true; // Sets if this is expired  (Default is not expired)

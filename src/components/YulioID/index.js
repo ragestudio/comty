@@ -49,7 +49,7 @@ class YulioID extends Component {
 
     if (EncUsername && EncPassword){
       this.setState({ ShowLoading: true, StateMessage: 'Wait a sec...' });
-      if (ycore.DevOptions.InfiniteLogin == true) {
+      if (ycore.AppSettings.InfiniteLogin == true) {
         ycore.yconsole.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
       }
       else {

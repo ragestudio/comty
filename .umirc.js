@@ -2,6 +2,7 @@
 import { resolve } from 'path';
 import { i18n } from './config/ycore.config.js';
 export default {
+  
   ignoreMomentLocale: true,
   targets: {
     ie: 9,

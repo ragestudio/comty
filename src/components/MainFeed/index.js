@@ -5,10 +5,19 @@ import * as Icons from '@ant-design/icons'
 
 import {PostCard} from 'components'
 
-export function RefreshFeed(){
-    ycore.yconsole.log('Refreshing Feed...')
-    window.MainFeedComponent.FirstGet();
-    return
+export const RenderFeed = {
+    RefreshFeed: () => {
+        window.MainFeedComponent.FirstGet();
+        return
+    },
+    killByID: (post_id) => {
+        window.MainFeedComponent.killByID(post_id);
+        return
+    },
+    addToRend: (payload) => {
+        window.MainFeedComponent.addToRend(payload);
+        return
+    }
 }
 class MainFeed extends React.Component {
     constructor(props){
@@ -29,10 +38,22 @@ class MainFeed extends React.Component {
     toogleLoader(){
         this.setState({ loading: !this.state.loading })
     }
- 
+
+    killByID(post_id){
+
+    }
+
+    addToRend(payload){
+        console.log(payload)
+    }
+
     FirstGet() {
          try{
              const { get, uid, filters } = this.props;
+             if (this.props.custompayload) {
+                this.setState({ isEnd: true, data: this.props.custompayload, loading: false })
+                return 
+            }
              if (!get) {
                  ycore.yconsole.error('Please, fill params with an catch type...')
                  return
@@ -49,7 +70,7 @@ class MainFeed extends React.Component {
                 }
                  const parsed = JSON.parse(result)['data']
                 
-                 const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false 
+                 const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
                  this.setState({ isEnd: isEnd, data: parsed, loading: false })
              })
          }catch(err){
@@ -76,7 +97,7 @@ class MainFeed extends React.Component {
                  const oldData = this.state.data
                  const parsed = JSON.parse(res)['data']
                  const mix = oldData.concat(parsed)
-                 const isEnd = parsed.length < ycore.DevOptions.limit_post_catch? true : false 
+                 const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
                  this.setState({ isEnd: isEnd, data: mix, loading: false }, () =>  ycore.gotoElement(getLastPost.id) )
                  return true
                 })
@@ -88,6 +109,7 @@ class MainFeed extends React.Component {
     
     renderFeedPosts = () =>{
         const {data, loading, isEnd} = this.state  
+      
         const loadMore =
         !isEnd && !loading ? (
           <div style={{

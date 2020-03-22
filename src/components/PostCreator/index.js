@@ -2,7 +2,6 @@ import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './index.less'
-import { RefreshFeed } from 'components/MainFeed'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
 import * as MICONS from '@material-ui/icons'
@@ -28,7 +27,7 @@ class PostCreator extends React.PureComponent{
         this.state = {
             visible: true,
             FadeIN: true,
-            keys_remaining: ycore.DevOptions.MaxLengthPosts,
+            keys_remaining: ycore.AppSettings.MaxLengthPosts,
             rawtext: '',
             posting: false,
             posting_ok: false,
@@ -103,20 +102,20 @@ class PostCreator extends React.PureComponent{
         if (!filter) {
           antd.message.error(`${file.type} This file is not valid!`);
         }
-        const maxsize = file.size / 1024 / 1024 < ycore.DevOptions.MaximunAPIPayload;
+        const maxsize = file.size / 1024 / 1024 < ycore.AppSettings.MaximunAPIPayload;
         if (!maxsize) {
-          antd.message.error(`Image must smaller than ${ycore.DevOptions.MaximunAPIPayload} KB!`);
+          antd.message.error(`Image must smaller than ${ycore.AppSettings.MaximunAPIPayload} KB!`);
         }
         return filter && maxsize;
     }
 
     handleChanges = ({ target: { value } }) => {
-        this.setState({ rawtext: value, keys_remaining: (ycore.DevOptions.MaxLengthPosts - value.length) })
+        this.setState({ rawtext: value, keys_remaining: (ycore.AppSettings.MaxLengthPosts - value.length) })
     }
 
     handleKeysProgressBar(){
         const { keys_remaining } = this.state;
-        if (keys_remaining <= (ycore.DevOptions.MaxLengthPosts/100*30)) {
+        if (keys_remaining <= (ycore.AppSettings.MaxLengthPosts/100*30)) {
             return 'exception'
         }else return('active')
     }
@@ -134,7 +133,7 @@ class PostCreator extends React.PureComponent{
             file: ''
         })
         setTimeout( () => {this.setState({ posting_ok: false }) }, 1000)
-        RefreshFeed()
+        ycore.FeedHandler.refresh()
         return true
     }
 
@@ -143,7 +142,7 @@ class PostCreator extends React.PureComponent{
         if(!rawtext){
             return null
         }
-        this.setState({ posting: true, keys_remaining: ycore.DevOptions.MaxLengthPosts })        
+        this.setState({ posting: true, keys_remaining: ycore.AppSettings.MaxLengthPosts })        
         ycore.PublishPost(ycore.GetPostPrivacy.bool(shareWith), rawtext, file, (err, res) => {
            if (err) {
                ycore.notifyError(err)
@@ -186,7 +185,7 @@ class PostCreator extends React.PureComponent{
     canPost(){
         const { fileURL, keys_remaining,  } = this.state
 
-        const isTypedSomething = (keys_remaining < ycore.DevOptions.MaxLengthPosts)
+        const isTypedSomething = (keys_remaining < ycore.AppSettings.MaxLengthPosts)
         const isUploadedFile = (fileURL? true : false)
 
         return isUploadedFile || isTypedSomething
@@ -195,7 +194,7 @@ class PostCreator extends React.PureComponent{
     render(){
         const {userData} = this.props
         const { keys_remaining, visible, fileURL, file } = this.state;
-        const percent = (((keys_remaining/ycore.DevOptions.MaxLengthPosts) * 100).toFixed(2) )
+        const percent = (((keys_remaining/ycore.AppSettings.MaxLengthPosts) * 100).toFixed(2) )
         const changeShare = ({ key }) => {
             this.setState({ shareWith: key })
         }
@@ -229,7 +228,7 @@ class PostCreator extends React.PureComponent{
                      </div> 
                      :  <>
                         <div className={styles.titleAvatar}><img src={userData.avatar} /></div>
-                        <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.handlePublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.DevOptions.MaxLengthPosts} rows={8} />
+                        <antd.Input.TextArea disabled={this.state.posting? true : false} onPressEnter={this.handlePublishPost} value={this.state.rawtext} autoSize={{ minRows: 3, maxRows: 5 }} dragable="false" placeholder="What are you thinking?" onChange={this.handleChanges} allowClear maxLength={ycore.AppSettings.MaxLengthPosts} rows={8} />
                         <div><antd.Button disabled={this.state.posting? true : !this.canPost()  } onClick={this.handlePublishPost} type="primary" icon={this.state.posting_ok? <Icons.CheckCircleOutlined/> : (this.state.posting? <Icons.LoadingOutlined /> : <Icons.ExportOutlined /> )} /></div>
                       
                     </> }

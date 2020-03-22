@@ -3,7 +3,7 @@ import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import {CustomIcons, MainFeed} from 'components'
+import {CustomIcons, MainFeed, PostCreator} from 'components'
 import { SetHeaderSearchType } from 'components/HeaderSearch'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
@@ -111,6 +111,7 @@ class UserProfile extends React.Component {
               {loading? <antd.Skeleton active /> : 
               (<div>
                 {invalid? null: this.UserHeader(this.state.RenderValue)}
+                <PostCreator userData={ycore.userData()} />
                 <MainFeed get='user' uid={UUID} />
               </div>)
               }

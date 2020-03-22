@@ -44,13 +44,11 @@ export default {
     },
   },
   effects: {
-    *query({payload}, { call, put, select }) {     
-     
+    *query({payload}, { call, put, select }) {
       const validBackup = ycore.ValidBackup();
       if ( ycore.ValidLoginSession() == true) {
           if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
             router.push({pathname: '/main',})
-            ycore.RefreshONCE()
           }
           ycore.MakeBackup()
           ycore.UpdateSDCP()
@@ -60,9 +58,8 @@ export default {
           if (validBackup == true) {
             ycore.LogoutCall()
           } 
-         else{
+          else{
             router.push({pathname: '/login',})
-            ycore.RefreshONCE()
           }
       }
       if(pathMatchRegexp([''], window.location.pathname)){

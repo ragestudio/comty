@@ -8,6 +8,7 @@ import Icon from '@ant-design/icons'
 import classnames from 'classnames'
 import * as MICON from '@material-ui/icons';
 
+
 const { Meta } = antd.Card;
 
 // Set default by configuration
@@ -68,20 +69,44 @@ class PostCard extends React.PureComponent{
 
     render(){
         const { payload, customActions } = this.props
-        const ActShowMode = ycore.DevOptions.force_show_postactions
+        const ActShowMode = ycore.AppSettings.force_show_postactions
         const { id, post_time, postText, postFile, get_post_comments, postFileName, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
-       
+        const handlePostActions = {
+            delete: (post_id) => {
+                ycore.ActionPost('delete', post_id, null, (err, res)=>{
+                    if (err) {
+                        return false
+                    }
+                    ycore.yconsole.log(res)
+                    ycore.FeedHandler.killByID(post_id)
+                })
+            },
+            save: () => {
+                
+            }
+        }
         const defaultActions = [
             <div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,
             <MICON.InsertComment key="comments" onClick={ ()=> this.goToPost(id) }  />
         ]
         const actions = customActions || defaultActions;
        
+        
+
         const MoreMenu = (
             <antd.Menu>
-              <antd.Menu.Item key="0">
-                key 0
-              </antd.Menu.Item>
+                {ycore.IsThisPost.owner(publisher.id)?
+                    <antd.Menu.Item onClick={ ()=> handlePostActions.delete(id) } key="remove_post">
+                        <Icons.DeleteOutlined /> Remove post
+                    </antd.Menu.Item>
+                    : null  
+                }
+                <antd.Menu.Item pid={id} key="save_post">
+                    <Icons.SaveOutlined /> Save post
+                </antd.Menu.Item>
+                <antd.Menu.Item pid={id} key="test">
+                    <Icons.SaveOutlined /> Test CRAZY GAI
+                </antd.Menu.Item>
             </antd.Menu>
           );
 

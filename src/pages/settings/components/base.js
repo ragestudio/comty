@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { List, Switch, Button, notification, InputNumber } from 'antd';
-import { AppSettings } from '../../../../globals/settings.js'
-import { DevOptions, ControlBar } from 'ycore'
+import { ListSettings } from '../../../../globals/settings.js'
+import { ControlBar } from 'ycore'
 import * as ycore from "ycore"
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
@@ -11,7 +11,7 @@ class Base extends Component {
   constructor(props){
     super(props),
     this.state = {
-      SettingRepo:  AppSettings,
+      SettingRepo:  ListSettings,
       forSave: false
     }
   }

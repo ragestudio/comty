@@ -27,7 +27,7 @@ class Sider extends PureComponent {
 
   StrictMode = () =>{
     const { theme } = this.props;
-    if (ycore.DevOptions.StrictLightMode == false) {
+    if (ycore.AppSettings.StrictLightMode == false) {
       return "dark"
     }
     return theme
