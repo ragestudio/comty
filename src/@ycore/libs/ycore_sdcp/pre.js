@@ -1,7 +1,6 @@
 import * as ycore from 'ycore'
 import localforage from 'localforage'
 
-
 export const asyncSDCP = {
     setSDCP: function (value) {
         return Promise.resolve().then(function () {
@@ -111,6 +110,7 @@ export const CryptSDCP = {
 
 export function SetupApp(){
     // TODO: Default sets
+    ycore.notify.success('Authorised, please reload the app for login!')
     const resourceLoad = localStorage.getItem('resource_bundle')
     if (!resourceLoad) {
         localStorage.setItem('resource_bundle', 'light_ng')

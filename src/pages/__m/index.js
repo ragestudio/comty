@@ -46,6 +46,18 @@ export default class __m extends React.Component {
      this.setState({s_ses: res})
     })}
   }
+  handleDesktop(){
+    const a = localStorage.getItem('desktop_src')
+    let to;
+    if (a == 'false') {
+      to = true
+    }else {
+      to = false
+    }
+    ycore.notify.proccess('Switching to ', to? 'Desktop Mode' : 'Normal Mode')
+    localStorage.setItem('desktop_src', to)
+    setTimeout(() => ycore.RefreshONCE(), 2000)
+  }
   DescompileSDCP(){
     let result = {};
     for (var i = 0; i < UserData.length; i++) {
@@ -107,6 +119,7 @@ export default class __m extends React.Component {
 
             <antd.Button onClick={() => ycore.notify.error('Error Mock 1')} > notify.error </antd.Button>
             <antd.Button onClick={() => ycore.notify.proccess('Proccess Mock 1')} > notify.proccess </antd.Button>
+            <antd.Button onClick={() => this.handleDesktop()} > Switch to Desktop_mode </antd.Button>
           </div>
 
           <div className={styles.titleHeader}>

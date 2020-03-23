@@ -13,8 +13,6 @@ import * as ycore from 'ycore';
 import router from 'umi/router';
 import {CustomIcons} from 'components'
 
-
-
 @withI18n()
 class Sider extends PureComponent {
   constructor(props) {
@@ -68,7 +66,7 @@ class Sider extends PureComponent {
         theme={this.StrictMode()}
         width="180"
         collapsed={collapsed}
-        className={classnames(styles.sider, {[styles.darkmd]: this.isDarkMode()} )}
+        className={classnames(styles.sider, {[styles.darkmd]: this.isDarkMode(), [styles.desktop_mode]: this.props.desktop_mode} )}
         onMouseEnter={() => this.setState({ collapsedWidth: '90' })} 
         onMouseLeave={() => this.setState({ collapsedWidth: '35' })}
       >

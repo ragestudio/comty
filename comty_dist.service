@@ -1,0 +1,11 @@
+[Unit]
+Description=Comty_Development
+
+[Service]
+ExecStart=serve ./dist
+Restart=always
+User=root
+WorkingDirectory=/ycore/development/comty-development
+
+[Install]
+WantedBy=multi-user.target

@@ -1,21 +1,9 @@
 @import '~themes/vars.less';
 
-
-.mobilewarning{
-  background-color: rgba(0, 0, 0, 0.975);
-  color: white;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  z-index: 100000;
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  :global {
-    .ant-result-title {
-      color: white;
-    }
+.AppWrapper{
+  &.desktop_mode{ 
+  padding: 0 30px 0 30px;
+  border-radius: 10px;
   }
 }
 
@@ -32,8 +20,12 @@
 }
 
 .layout{
+ 
   background-color: @Theme-Layout-Backgroud; //#E2E6E9;
   transition: background-color 200ms linear;
+  &.desktop_mode{
+    border-radius: 12px;
+  }
   &.md_radius{
     width: 95%;
     margin: auto;

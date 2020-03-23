@@ -16,7 +16,11 @@
       width: 96vw;
       position: absolute;
       right: 0;
+      >.container{
+        border-radius: 12px 12px 12px 12px;
+      }
     }
+   
 
     transition: all @SwapAnimDuration ease-in-out;
 
@@ -53,8 +57,9 @@
     position: relative;
     background-color: #201F23;
     color: @DarkMode-color_container !important;
-    border-radius: 32px 0 0 32px;
-    padding: 30px 375px 30px 75px;
+    &.desktop_mode{
+      border-radius: 0 12px 12px 0;
+    }
     width: 100%;
     height: 100vh;
     :global{
@@ -72,6 +77,9 @@
         transition: all 150ms linear;
       }
     }
+  }
+  .container_body{
+    padding: 30px 375px 30px 75px;
   }
 
   .container_2{

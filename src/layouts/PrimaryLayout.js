@@ -16,7 +16,7 @@ import * as Icons from '@ant-design/icons'
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Control, Secondary } = MyLayout
+const { Sider, Control, Secondary, WindowAppBar } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -27,12 +27,17 @@ class PrimaryLayout extends React.Component {
     this.state = {
       collapsed: (ycore.AppSettings.default_collapse_sider? true : false),
       isMobile: false,
+      desktop_mode: false,
       userData: ''
     }
   }
 
   componentDidMount() {
-    this.setState({ userData:  ycore.userData() })
+    this.setState({ 
+      userData: ycore.userData(),
+      desktop_mode: ycore.CheckThisApp.desktop_mode()
+    })
+   
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
@@ -64,11 +69,12 @@ class PrimaryLayout extends React.Component {
     
   render() {
     const { app, location, dispatch, children } = this.props
-    const { userData, collapsed, isMobile } = this.state
+    const { userData, collapsed, isMobile, desktop_mode } = this.state
     const { onCollapseChange } = this
     const { theme } = app
-    
+  
     const SiderProps = {
+      desktop_mode: desktop_mode,
       theme,
       userData,
       isMobile,
@@ -83,30 +89,33 @@ class PrimaryLayout extends React.Component {
     }
 
     const SecondaryProps = {
+      desktop_mode: desktop_mode,
       userData,
       isMobile,
       theme,
     }
 
       return (
-        <React.Fragment>
-          {isMobile?  <MobileWarning /> : null}
-          <div className={styles.BarControlWrapper}><Control /></div>
-          <antd.Layout className={classnames( styles.layout, {[styles.md_dark]: this.isDarkMode() })}>
-           <Sider {...SiderProps}/>
+        <React.Fragment >
+          <div className={classnames(styles.AppWrapper, {[styles.desktop_mode]: desktop_mode})}>
+            {isMobile?  <MobileWarning /> : null}
+            <div className={styles.BarControlWrapper}><Control /></div>
+            <antd.Layout className={classnames( styles.layout, {[styles.md_dark]: this.isDarkMode(), [styles.desktop_mode]: desktop_mode })}>
+             <Sider {...SiderProps}/>
 
-            <div id="primaryLayout" className={styles.leftContainer}>
-                <PageTransition preset="moveToRightScaleUp" id="scroller" transitionKey={location.pathname}>
-                    <Content className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
-                        <HeaderSearch />
-                        {children}
-                    </Content>
-                </PageTransition>
-            </div>  
+              <div id="primaryLayout" className={styles.leftContainer}>
+                  <PageTransition preset="moveToRightScaleUp" id="scroller" transitionKey={location.pathname}>
+                      <Content className={classnames(styles.content, {[styles.collapsed]: !collapsed} )}>
+                          <HeaderSearch />
+                          {children}
+                      </Content>
+                  </PageTransition>
+              </div>  
 
-            <Secondary {...SecondaryProps} />
-          
-          </antd.Layout>
+              <Secondary {...SecondaryProps} />
+
+            </antd.Layout>
+          </div>
         </React.Fragment>
       )
     

@@ -12,7 +12,7 @@ export function userData(){
     return ycore.handlerYIDT.get()
 }
 
-function __API__User (payload, sdcp){
+function __API__User (payload, sdcp, callback){
     const { UserID, UserToken } = payload
 
     const a = ycore.CryptSDCP.atob_parse(sdcp)
@@ -30,7 +30,7 @@ function __API__User (payload, sdcp){
         exp: ycore.AppSettings.SignForNotExpire? 0 : Math.floor(Date.now() / 1000) + (60 * 60),
     }
     ycore.handlerYIDT.set(frame, done => {
-        done? ycore.crouter.native('main') : null
+        done? callback(false, true) : callback(true, false)
     })
 }
 
@@ -202,8 +202,15 @@ export function __AppSetup__(EncUsername, EncPassword, callback) {
                   ycore.yconsole.log(FramePayload)
                   callback(null, '200')
                   
-                  ycore.GetSDCPfromCloud(FramePayload, (res) => res? __API__User(FramePayload, res) : null )
-                  ycore.SetupApp()
+                  ycore.GetSDCPfromCloud(FramePayload, (res) => res? __API__User(FramePayload, res, 
+                    (err, done) => {
+                        if (err){ 
+                            ycore.notify.error('Critical error, token declined!') 
+                            return false
+                        } 
+                        ycore.SetupApp() 
+                    }) : null )
+                
                 }
                 if (identState == 400) {
                   callback(null, '400')

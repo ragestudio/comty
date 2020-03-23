@@ -143,6 +143,13 @@ export const crouter = {
 }
 
 export const notify = {
+    success: (...res) => {
+        antd.notification.success({
+            message: 'Well',
+            description: (res.toString()),
+            placement: 'bottomLeft'
+        })
+    },
     error: (...res) => {
         antd.notification.error({
             message: 'Wopss',

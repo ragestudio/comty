@@ -6,6 +6,8 @@ import { Button, Input, Drawer } from 'antd';
 import * as ycore from 'ycore'
 
 import styles from './index.less';
+import { ANT_MARK } from 'antd/lib/locale-provider';
+import { validateLocaleAndSetLanguage } from 'typescript';
 
 const FormItem = Form.Item
 
@@ -101,6 +103,7 @@ class YulioID extends Component {
                       <div><br/><br/><br/>
                         <div className={styles.resultbox}>
                           <h6 > {StateMessage} </h6>
+                          <Button onClick={() => ycore.RefreshONCE()}> Reload </Button>
                           {StateException ? <div className={styles.retryBTN}><Button style={{ width: '270px' }} type='dashed' onClick={() => this.handleRetry()}>Retry</Button></div> : null}
                         </div>
                       </div>

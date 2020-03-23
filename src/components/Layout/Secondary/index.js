@@ -90,9 +90,12 @@ export default class Secondary extends React.PureComponent{
                   <img onClick={() => ycore.crouter.native(`@${userData.username}`)} src={userData.avatar} />
                 </div>
 
-                <div className={styles.container} >
-                {this.state.swap? <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => this.closeSwap()} > Back </antd.Button> : null}
-                {this.renderMode()}
+                <div className={classnames(styles.container, {[styles.desktop_mode]: this.props.desktop_mode})} >
+                    <div className={styles.container_body}>
+                        {this.state.swap? <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => this.closeSwap()} > Back </antd.Button> : null}
+                        {this.renderMode()}
+                    </div>
+                
                 
 
                 </div>
