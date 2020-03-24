@@ -5,12 +5,13 @@
  * @licensed Pending...
  */
 
-import {ListSettings} from  "../../globals/settings.js";
 import {Endpoints} from "globals/endpoints.js";
 import * as Icons from '@ant-design/icons';
 import localforage from "localforage"
+import { format } from 'timeago.js';
 import umiRouter from "umi/router";
 import * as antd from "antd";
+import moment from 'moment'
 import React from "react";
 
 import config from "config"
@@ -65,6 +66,22 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   var blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
+export const time = {
+    ago: (a) => {
+        const format = moment(a).format('DDMMYYYY');  
+        const b = new Date(format).toLocaleString();
+        return time.relativeToNow(b);
+    },
+    stmToAgo: (a) => {
+        const b = (a*1000);
+        return format(b);
+    },
+    relativeToNow: (a, b) => {
+        return moment(a, b || "DDMMYYYY").fromNow();
+    }
+} 
+
+
 export function objectLast(array, n) {
     if (array == null) 
       return void 0;

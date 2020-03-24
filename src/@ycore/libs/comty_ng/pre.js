@@ -34,7 +34,56 @@ export const IsThisPost = {
 
   }
 }
+export const Post_Comments = {
+  delete: (callback, payload) => {
+    if (!payload) {
+      return false
+    }
+    const { comment_id } = payload
 
+    let formdata = new FormData();
+    formdata.append("type", "delete");
+    formdata.append("comment_id", comment_id);
+  
+    API_Call((err,res)=> {
+      return callback(err,res)
+    },
+    ycore.endpoints.comments_actions,
+    formdata,
+    )
+  }
+}
+
+function API_Call(callback, endpoint, payload, options){
+  if (!payload || !endpoint) {
+    return false
+  }
+  let payloadContainer = payload;
+  payloadContainer.append("server_key", ycore.yConfig.server_key);
+  const defaultOptions = { method: "POST", timeout: 0, processData: false }
+  const { method, timeout, processData } = options || defaultOptions
+
+  const requestOptions = {
+    "url": `${endpoint}${ycore.handlerYIDT.__token()}`,
+    "method": method,
+    "timeout": timeout,
+    "data": payloadContainer,
+    "mimeType": "multipart/form-data",
+    "processData": processData,
+    "contentType": false
+  };  
+
+  jquery.ajax(requestOptions)
+  .done(response => {
+      ycore.yconsole.log(response)
+      return callback(false, response)
+    })
+  .fail(error => {
+      ycore.yconsole.log('error', error)
+      ycore.Alive_API.fail(error)
+      return callback(true, error)
+  });
+}
 export function GetGeneralData(callback){
   let formdata = new FormData();
   formdata.append("user_id", id);
@@ -52,6 +101,7 @@ export function GetGeneralData(callback){
       })
     .catch(error => {
       console.log('error', error)
+      ycore.Alive_API.fail(error)
       return callback(true, error)
     });
 }
@@ -73,6 +123,7 @@ export function follow_user(id, callback) {
         return callback(false, response)
       })
     .catch(error => {
+      ycore.Alive_API.fail(error)
       console.log('error', error)
       return callback(true, error)
     });
@@ -142,6 +193,7 @@ export function PublishPost(privacy, raw, file, callback){
       })
     .fail(error => {
         ycore.yconsole.log('error', error)
+        ycore.Alive_API.fail(error)
         return callback(true, error)
     });
 }
@@ -166,6 +218,7 @@ export function FindUser(key, callback){
     })
     .fail(function (response) {
         const exception = 'API Bad response';
+        ycore.Alive_API.fail(response)
         return callback(exception, response);
     })
 }
@@ -190,29 +243,30 @@ export function SeachKeywords(key, callback){
     })
     .fail(function (response) {
         const exception = 'Request Failed';
+        ycore.Alive_API.fail(response)
         return callback(exception, response);
     })
 }
 export function ActionPost(type, id, value, callback){
-  var formdata = new FormData();
-  formdata.append("server_key", ycore.yConfig.server_key);
   if (!type || !id) {
     ycore.notifyError('[ActionPost] No type or id Provided !!!')
     return false
   }
+  var formdata = new FormData();
+  formdata.append("server_key", ycore.yConfig.server_key);
+  formdata.append("post_id", id);
   switch (type) {
     case 'like':
     {
       formdata.append("action", "like");
-      formdata.append("post_id", id);
       break
     }
-    case 'commet':
+    case 'comment':
       {
         if (!value) {
           return false
         }
-        formdata.append("action", "commet");
+        formdata.append("action", "comment");
         formdata.append("text", value)
         break
       }
@@ -228,7 +282,6 @@ export function ActionPost(type, id, value, callback){
     case 'delete': 
     {
       formdata.append("action", "delete");
-      formdata.append("post_id", id);
       break
     }
     default:
@@ -250,6 +303,7 @@ export function ActionPost(type, id, value, callback){
       return callback(null, response);
   })
   .fail(function (response) {
+      ycore.Alive_API.fail(response)
       return callback(true, `[Server error] We couldnt ${type} this post`);
   })
 }
@@ -277,6 +331,7 @@ export function GetUserTags(id, callback){
   })
   .fail(function (response) {
       const exception = 'Request Failed';
+      ycore.Alive_API.fail(response)
       return callback(exception, response);
   })
 }
@@ -313,6 +368,7 @@ export function GetPosts(userid, type, fkey, callback) {
   })
   .fail(function (response) {
       const exception = 'Request Failed';
+      ycore.Alive_API.fail(response)
       return callback(exception, response);
   })
 }
@@ -342,6 +398,7 @@ export function GetPostData(a, b, callback){
   })
   .fail(function (response) {
       const exception = 'Request Failed';
+      ycore.Alive_API.fail(response)
       return callback(exception, response);
   })
 }

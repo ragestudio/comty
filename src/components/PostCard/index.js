@@ -62,6 +62,7 @@ class PostCard extends React.PureComponent{
     goToPost(postID){
         localStorage.setItem('p_back_uid', postID)
         ycore.GetPostData(postID, null, (err, res) => {
+            console.log(res)
             if (err) { return false }
             ycore.SecondarySwap.openPost(res)
         })
@@ -70,7 +71,7 @@ class PostCard extends React.PureComponent{
     render(){
         const { payload, customActions } = this.props
         const ActShowMode = ycore.AppSettings.force_show_postactions
-        const { id, post_time, postText, postFile, publisher, post_likes, is_post_pinned, is_liked } = payload || emptyPayload;
+        const { id, post_time, postText, postFile, publisher, post_likes, is_post_pinned, is_liked, post_comments } = payload || emptyPayload;
         const handlePostActions = {
             delete: (post_id) => {
                 ycore.ActionPost('delete', post_id, null, (err, res)=>{
@@ -87,7 +88,7 @@ class PostCard extends React.PureComponent{
         }
         const defaultActions = [
             <div><LikeBTN count={post_likes} id={id} liked={ycore.booleanFix(is_liked)? true : false} key="like" /></div>,
-            <MICON.InsertComment key="comments" onClick={ ()=> this.goToPost(id) }  />
+            <antd.Badge dot={post_comments > 0 ? true : false}><MICON.InsertComment key="comments" onClick={ ()=> this.goToPost(id) }  /></antd.Badge>
         ]
         const actions = customActions || defaultActions;
        

@@ -5,27 +5,17 @@ import * as Icons from '@ant-design/icons'
 import styles from './index.less'
 import classnames from 'classnames'
 
-import SecRenderPost from './post'
+import {__priPost, __secComments} from './renders.js'
 
 export const SwapMode = {
-    ext: () => {
-        SecondaryLayoutComponent.setState({
-            swap: true,
-            mode: 'ext'
-        })
+    close: () => {
+        SecondaryLayoutComponent.closeSwap()
     },
-    PostComments: (e) => {
+    openPost: (a, b) => {
         SecondaryLayoutComponent.setState({
             swap: true,
-            mode: 'post_comments',
-            s_raw: e
-        })
-    },
-    openPost: (e) => {
-        SecondaryLayoutComponent.setState({
-            swap: true,
-            mode: 'open_post',
-            s_raw: e
+            mode: 'post',
+            global_raw: a,
         })
     }
 }
@@ -36,47 +26,68 @@ export default class Secondary extends React.PureComponent{
         window.SecondaryLayoutComponent = this;
         this.state = {
             swap: false,
-            mode: 'ext',
-            s_raw: '',
+            mode: '',
+            global_raw: '',
+            pri_raw: '',
+            sec_raw: '',
         }
     }
+    
     closeSwap(){
         this.setState({ 
             swap: !this.state.swap,
-            s_raw: null,
-            mode: 'ext'
+            pri_raw: null,
+            sec_raw: null,
+            mode: ''
          })
     }
+
+    SwapBalanceContent(container){
+        switch (container){
+            case '__pri': {
+                return this.__pri()
+            }
+            case '__sec': {
+                return this.__sec()
+            }
+            default: return null
+        }
+    }
+
+    __pri(){
+        const dtraw = this.state.pri_raw;
+        switch (this.state.mode){
+            case 'post': {
+                return this.renderPost(this.state.global_raw)
+            }
+            default: return null
+        }
+    }
+    __sec(){
+        const dtraw = this.state.sec_raw;
+        switch (this.state.mode){
+            case 'post': {
+                return this.renderComments(this.state.global_raw)
+            }
+            default: return null
+        }
+    }
+
     renderPost = (payload) => {
         const post_data = JSON.parse(payload)['post_data']
         console.log(post_data)
         return(
-           <SecRenderPost payload={post_data} />
+           <__priPost payload={post_data} />
         )
     }
 
-
-    renderMode(){
-        const { mode } = this.state
-        switch (mode) {
-            case 'ext':
-                return (
-                    <h1></h1>
-                )
-            case 'post_comments':{
-                   return(
-                      <PostComments s_raw={this.state.s_raw} />
-                   ) 
-               }
-            case 'open_post':{
-                return(
-                    this.renderPost(this.state.s_raw)
-                )
-            }
-        
-            default:
-                break;
-        }
+    renderComments = (payload) => {
+        const post_comments = JSON.parse(payload)['post_comments']
+        const post_data = JSON.parse(payload)['post_data']
+        console.log(post_comments)
+        return(
+            <__secComments post_id={post_data.post_id} payload={post_comments} />
+        )
     }
 
 
@@ -93,15 +104,12 @@ export default class Secondary extends React.PureComponent{
                 <div className={classnames(styles.container, {[styles.desktop_mode]: this.props.desktop_mode})} >
                     <div className={styles.container_body}>
                         {this.state.swap? <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => this.closeSwap()} > Back </antd.Button> : null}
-                        {this.renderMode()}
+                        {this.SwapBalanceContent('__pri')}
                     </div>
-                
-                
-
                 </div>
 
                 <div className={classnames(styles.container_2, {[styles.active]: this.state.swap})}>
-                    <h1>container_2</h1>
+                    {this.SwapBalanceContent('__sec')}
                 </div> 
                
             

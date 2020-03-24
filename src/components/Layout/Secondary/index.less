@@ -3,6 +3,7 @@
   .SecondaryWrapper{
     width: 27%;
     height: 100vh;
+    
 
     position: relative;
     float: left;
@@ -12,7 +13,6 @@
     display: flex;
 
     &.active{
-      z-index: 10000;
       width: 96vw;
       position: absolute;
       right: 0;
@@ -31,7 +31,7 @@
     top: 25px;
     display: flex;
     position: absolute;
-    z-index: 202;
+    z-index: 52;
     img {
       border-radius: 15px;
       width: 40px;
@@ -53,7 +53,7 @@
     }
   }
   .container{
-    z-index: 200;
+    z-index: 50;
     position: relative;
     background-color: #201F23;
     color: @DarkMode-color_container !important;
@@ -83,7 +83,7 @@
   }
 
   .container_2{
-    z-index: 201;
+    z-index: 51;
 
     background-color: #fff;
     border-radius: 32px 0 0 32px;
@@ -103,4 +103,8 @@
     }
 
     transition: all @SwapAnimDuration ease-in-out;
+  }
+
+  .comments_body{
+
   }

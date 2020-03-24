@@ -11,6 +11,14 @@ var jwt = require("jsonwebtoken")
 export function userData(){
     return ycore.handlerYIDT.get()
 }
+export const Alive_API = {
+    fail: (a) => {
+        if (a){
+            ycore.yconsole.log(a)
+            ycore.notify.error(a)
+        }
+    }
+}
 
 function __API__User (payload, sdcp, callback){
     const { UserID, UserToken } = payload
@@ -167,6 +175,9 @@ export function LogoutCall(){
         ycore.handlerYIDT.remove()
         ycore.router.push({pathname: '/login',})
     })
+    .fail((response) => {
+        ycore.Alive_API.fail(response)
+    })
 }
 export function __AppSetup__(EncUsername, EncPassword, callback) {
     const prefix = '[Auth Server]:';
@@ -221,8 +232,9 @@ export function __AppSetup__(EncUsername, EncPassword, callback) {
             }
             return;
     })
-        .fail(function (response) {
+    .fail(function (response) {
         const exception = new Error("Server failed response . . . :( ");
+        ycore.Alive_API.fail(response)
         return;
     })
 }
@@ -263,6 +275,7 @@ export function GetUserData (values, callback) {
       .fail(
          function (response) {
             ycore.yconsole.log(prefix, 'Server failure!', response)
+            ycore.Alive_API.fail(response)
             callback(true, response )
         }
      )

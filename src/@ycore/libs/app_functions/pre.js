@@ -13,15 +13,11 @@ export const CheckThisApp = {
         }
         return false
     },
-
 }
 
 export const SecondarySwap = {
-    ext: ()=> {
-        SwapMode.ext()
-    },
-    PostComments: (e) => {
-        SwapMode.PostComments(e)
+    close: () => {
+        SwapMode.close()
     },
     openPost: (e) => {
         SwapMode.openPost(e)
