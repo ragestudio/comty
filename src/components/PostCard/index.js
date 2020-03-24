@@ -61,11 +61,11 @@ class PostCard extends React.PureComponent{
 
     goToPost(postID){
         localStorage.setItem('p_back_uid', postID)
-        ycore.GetPostData(postID, null, (err, res) => {
-            console.log(res)
+        const payload = {post_id: postID}
+        ycore.comty_post.get((err,res)=>{
             if (err) { return false }
             ycore.SecondarySwap.openPost(res)
-        })
+        }, payload)
     }
 
     render(){
@@ -74,13 +74,13 @@ class PostCard extends React.PureComponent{
         const { id, post_time, postText, postFile, publisher, post_likes, is_post_pinned, is_liked, post_comments } = payload || emptyPayload;
         const handlePostActions = {
             delete: (post_id) => {
-                ycore.ActionPost('delete', post_id, null, (err, res)=>{
+                const payload = {post_id: post_id}
+                ycore.comty_post.delete((err,res)=> {
                     if (err) {
                         return false
                     }
-                    ycore.yconsole.log(res)
                     ycore.FeedHandler.killByID(post_id)
-                })
+                }, payload)
             },
             save: () => {
                 

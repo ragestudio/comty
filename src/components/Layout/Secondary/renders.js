@@ -65,6 +65,22 @@ export class __secComments extends React.Component {
         console.log(`Removing Comment with id => ${id}`)
         ycore.Post_Comments.delete((err, res) => { if(err){return false} return this.reloadComments() }, {comment_id: id})
     }
+    handleNewComment(){
+        const { raw_comment } = this.state
+        const { post_id } = this.props
+        if (raw_comment) {
+            const payload = { post_id: post_id, raw_text: raw_comment }
+            ycore.Post_Comments.new((err,res) =>{
+                if (err) {
+                    ycore.notify.error('This action could not be performed.', err)
+                }
+                this.setState({ raw_comment: '' })
+                return this.reloadComments()
+            }, payload)
+        }
+        return false
+    }
+
     renderComment = (a) => {
         const {id, time, Orginaltext, publisher} = a
         const CommentMenu = (
@@ -95,29 +111,17 @@ export class __secComments extends React.Component {
     reloadComments(){
         try {
             this.setState({ loading: true })
-            ycore.GetPostData(this.props.post_id, null, (err, res) =>{
+            const payload = { post_id: this.props.post_id }
+            ycore.comty_post.get((err, res) => {
                 const post_comments = JSON.parse(res)['post_comments']
                 this.setState({ comment_data: post_comments, loading: false})
-            })
+            }, payload)
+           
         } catch (error) {
             return false
         }
     }
-    dispatchNewComment(){
-        const { raw_comment } = this.state
-        const { post_id } = this.props
-        if (raw_comment) {
-            ycore.ActionPost('comment', post_id, raw_comment, (err,res) =>{
-                if (err) {
-                    ycore.notify.error('This action could not be performed.', err)
-                }
-                this.setState({ raw_comment: '' })
-                this.reloadComments()
-                return true
-            })
-        }
-        return false
-    }
+   
 
 
     render(){
@@ -141,7 +145,7 @@ export class __secComments extends React.Component {
                 </div>
                 <div className={styles.comment_box}>
                    <div className={styles.comment_box_body}>
-                    <antd.Input value={this.state.raw_comment} onPressEnter={() => this.dispatchNewComment()} placeholder="Write a comment..." allowClear onChange={this.HandleCommentInput} />
+                    <antd.Input value={this.state.raw_comment} onPressEnter={() => this.handleNewComment()} placeholder="Write a comment..." allowClear onChange={this.HandleCommentInput} />
                    </div>
                 </div>
                 

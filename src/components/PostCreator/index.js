@@ -4,6 +4,7 @@ import * as ycore from 'ycore'
 import styles from './index.less'
 import * as Icons from '@ant-design/icons';
 import Icon from '@ant-design/icons'
+import $ from 'jquery'
 import * as MICONS from '@material-ui/icons'
 
 import Post_options from './local_components/post_options'
@@ -20,6 +21,7 @@ export function HandleVisibility(){
     window.PostCreatorComponent.ToogleVisibility();
     return
 }
+
 class PostCreator extends React.PureComponent{
     constructor(props){
         super(props),
@@ -74,7 +76,6 @@ class PostCreator extends React.PureComponent{
     ToogleVisibility(){
         this.setState({ visible: !this.state.visible })
     }
-
     ToogleUpload(){
         this.setState({ uploader: !this.state.uploader })
     }
@@ -87,13 +88,10 @@ class PostCreator extends React.PureComponent{
           return;
         }
         if (info.file.status === 'done') {
-          this.setState({ file: info.file.originFileObj, uploader: false })
-          getBase64(info.file.originFileObj, fileURL =>
-            this.setState({
-              fileURL,
-              loading: false,
-            }),
-          );
+            this.setState({ file: info.file.originFileObj, uploader: false })
+            getBase64(info.file.originFileObj, fileURL =>{
+                this.setState({fileURL,loading: false})
+            });
         }
     };
 
@@ -143,14 +141,17 @@ class PostCreator extends React.PureComponent{
             return null
         }
         this.setState({ posting: true, keys_remaining: ycore.AppSettings.MaxLengthPosts })        
-        ycore.PublishPost(ycore.GetPostPrivacy.bool(shareWith), rawtext, file, (err, res) => {
-           if (err) {
-               ycore.notifyError(err)
-               return
-           }
-           this.FlushPostState()
-           
-        })
+        
+       
+        const payload = { privacy: ycore.GetPostPrivacy.bool(shareWith), text: rawtext, file: file }
+        ycore.comty_post.new((err,res)=>{
+            if (err) { 
+                ycore.notify.error(err)
+                return false
+            }
+            this.FlushPostState()
+        },payload)
+        
     }
     dropRef = React.createRef()
 
@@ -172,6 +173,27 @@ class PostCreator extends React.PureComponent{
     }
 
     componentDidMount() {
+        const _this = this
+        $("body").bind('paste', function(je){
+            var e = je.originalEvent;
+            for (var i = 0; i < e.clipboardData.items.length; i++) {
+              var item = e.clipboardData.items[i];
+              ycore.yconsole.log('Item: ' + item.type);
+              if (item.type.indexOf('image') != -1) {
+                //item.
+                let a = item.getAsFile()
+                a
+                _this.setState({ file: a })
+                ycore.ReadFileAsB64(a, (res) =>{
+                    _this.setState({ fileURL: res })
+                })
+              } else {
+                // ignore not images
+                ycore.yconsole.log('Discarding not image paste data');
+              }
+            }
+         } 
+        )
         let div = this.dropRef.current
         div.addEventListener('dragenter', this.handleDragIn)
         div.addEventListener('dragleave', this.handleDragOut)
@@ -207,7 +229,7 @@ class PostCreator extends React.PureComponent{
               <antd.Menu.Item key="private">{ycore.GetPostPrivacy.decorator("private")}</antd.Menu.Item>
             </antd.Menu>
         )
-
+       
         if (visible) {
         return(
           <div className={styles.cardWrapper}>

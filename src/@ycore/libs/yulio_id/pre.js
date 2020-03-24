@@ -11,14 +11,7 @@ var jwt = require("jsonwebtoken")
 export function userData(){
     return ycore.handlerYIDT.get()
 }
-export const Alive_API = {
-    fail: (a) => {
-        if (a){
-            ycore.yconsole.log(a)
-            ycore.notify.error(a)
-        }
-    }
-}
+
 
 function __API__User (payload, sdcp, callback){
     const { UserID, UserToken } = payload

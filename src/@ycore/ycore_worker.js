@@ -16,6 +16,7 @@ import React from "react";
 
 import config from "config"
 import "./libs.js"
+import { func } from "prop-types";
 
 export * from "../../config/app.settings.js"
 export * from "./libs.js"
@@ -66,6 +67,36 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   var blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
+
+export function ReadFileAsB64(file, callback){
+    if (file) {
+        var reader = new FileReader();
+    
+        reader.onload = function(readerEvt) {
+            var binaryString = readerEvt.target.result;
+            const a = `data:image/png;base64, ${btoa(binaryString)}`
+            return callback(a)
+        };
+    
+        reader.readAsBinaryString(file);
+    }
+}
+
+export function uploadFile(file) {
+    var formData = new FormData();
+    formData.append("userfile", file);
+    var request = new XMLHttpRequest();
+    request.onload = function () {
+      if (request.status == 200) {
+        return true
+     } else {
+        alert('Error! Upload failed');
+      }
+    };
+    request.open("POST", "/temp/file");
+    request.send(formData);
+  }
+
 export const time = {
     ago: (a) => {
         const format = moment(a).format('DDMMYYYY');  
@@ -296,3 +327,4 @@ export const yconsole = {
         return
     }
 }
+

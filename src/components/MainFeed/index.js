@@ -63,20 +63,22 @@ class MainFeed extends React.Component {
                  return
              }
              this.toogleLoader()
-             ycore.GetPosts(uid, get, '0', (err, result) => {
-                 if (err) {
-                     ycore.notifyError('Error when get data from this input')
-                     return
-                 }
-                 if (JSON.parse(result).api_status == '400') {
-                    this.setState({ invalid: true })
+             const payload = { fkey: 0, type: get, id: uid }
+             ycore.comty_post.getFeed((err,res) => {
+                if (err) {
+                    ycore.notifyError('Error when get data from this input')
                     return
                 }
-                 const parsed = JSON.parse(result)['data']
-                
-                 const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
-                 this.setState({ isEnd: isEnd, data: parsed, loading: false })
-             })
+                if (JSON.parse(res).api_status == '400') {
+                   this.setState({ invalid: true })
+                   return
+               }
+                const parsed = JSON.parse(res)['data']
+               
+                const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
+                this.setState({ isEnd: isEnd, data: parsed, loading: false })
+             }, payload)
+
          }catch(err){
              ycore.notifyError('err')
          }
@@ -96,15 +98,16 @@ class MainFeed extends React.Component {
              const getLastPost = ycore.objectLast(this.state.data)
              ycore.yconsole.log('LAST POST ID =>', getLastPost.id)
              
-             ycore.GetPosts(uid, get, getLastPost.id, (err, res) => { 
-                 if (err){return false} 
-                 const oldData = this.state.data
-                 const parsed = JSON.parse(res)['data']
-                 const mix = oldData.concat(parsed)
-                 const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
-                 this.setState({ isEnd: isEnd, data: mix, loading: false }, () =>  ycore.gotoElement(getLastPost.id) )
-                 return true
-                })
+             const payload = { fkey: getLastPost.id, type: get, id: uid }
+             ycore.comty_post.getFeed((err,res) => {
+                if (err){return false} 
+                const oldData = this.state.data
+                const parsed = JSON.parse(res)['data']
+                const mix = oldData.concat(parsed)
+                const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false 
+                this.setState({ isEnd: isEnd, data: mix, loading: false }, () =>  ycore.gotoElement(getLastPost.id) )
+                return true
+             }, payload)
          }catch(err){
              ycore.notifyError(err)
          }

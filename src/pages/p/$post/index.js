@@ -16,10 +16,12 @@ export default class Indexer_Post extends React.Component{
     }
 
     toSwap(id){
-      ycore.GetPostData(id, null, (err, res) => {
+      const payload = {post_id: id}
+      ycore.comty_post.get((err,res)=>{
         if (err) { return false }
         ycore.SecondarySwap.openPost(res)
-      })
+      }, payload)
+     
     }
 
     componentDidMount(){

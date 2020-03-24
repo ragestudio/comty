@@ -23,11 +23,12 @@ class UserProfile extends React.Component {
     }
 
     handleFollowUser = () => {
-      ycore.follow_user(this.state.UUID, (exception, response)=>{
-        if(exception){return ycore.notifyError(exception) }
+      const payload = { user_id: this.state.UUID }
+      ycore.comty_user.follow((err,res)=> {
+        if (err) { return false } 
         this.setState({Followed: !this.state.Followed})
         return
-      })
+      }, payload)
     }
 
     componentDidMount(){
@@ -40,11 +41,12 @@ class UserProfile extends React.Component {
         const parsed = e.shift()
         const raw = parsed.toString()
         const string = raw.replace('/@', "")
-      
-        ycore.FindUser(string, (exception, response)=> {
-            exception? ycore.notifyError(exception) : null
+
+        const payload = { key: string }
+        ycore.comty_user.find((err,res)=>{
+          err? ycore.notifyError(err) : null
             try {
-              const rp = JSON.parse(response)
+              const rp = JSON.parse(res)
               ycore.yconsole.log(rp)
               if (!rp['0']) {
                 ycore.yconsole.log('Bad response / User not found') 
@@ -60,17 +62,20 @@ class UserProfile extends React.Component {
                 ycore.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
                 ycore.crouter.native(`@${c1}`)
               }
-              ycore.GetUserTags(rp['0'].user_id, (err, res) => {
+
+              const payload = { id: rp['0'].user_id }
+              ycore.comty_user.__tags((err,res)=>{
                 if (err) {
                   ycore.notifyError(err)
                   return
                 }
-              })
+              },payload)
+              
               this.setState({ UUID: rp['0'].user_id,  RenderValue: rp['0'], loading: false , Followed: ycore.booleanFix(rp['0'].is_following)})            
             } catch (err) {
               ycore.notifyError(err)
             }
-          })
+        },payload)
         
     }
 
