@@ -1,98 +1,116 @@
 @import '~themes/vars.less';
 
-.AppWrapper{
-  &.desktop_mode{ 
-  padding: 0 30px 0 30px;
-  border-radius: 10px;
+.AppWrapper {
+  &.desktop_mode {
+    padding: 0 30px 0 30px;
+    border-radius: 10px;
   }
 }
 
 .content {
   vertical-align: middle;
-  width: 100%; 
+  width: 100%;
   float: right;
   padding: 35px 25px 15px 60px;
   transition: all 0.2s ease;
+
   &.collapsed {
     width: ~'calc(100% - 180px)';
     transition: all 0.2s ease;
   }
 }
 
-.layout{
- 
+.layout {
+
   background-color: @Theme-Layout-Backgroud; //#E2E6E9;
   transition: background-color 200ms linear;
-  &.desktop_mode{
+
+  &.desktop_mode {
     border-radius: 12px;
   }
-  &.md_radius{
+
+  &.md_radius {
     width: 95%;
     margin: auto;
     position: relative;
     border-radius: 15px;
   }
-  &.md_dark{
+
+  &.md_dark {
     background-color: @DarkMode-backgroud_container;
     color: @DarkMode-color_container;
     transition: background-color 200ms linear;
+
     :global {
-      h1{
+      h1 {
         color: @DarkMode-color_container;
       }
-      h2{
+
+      h2 {
         color: @DarkMode-color_container;
       }
-      h3{
+
+      h3 {
         color: @DarkMode-color_container;
       }
-      h4{
+
+      h4 {
         color: @DarkMode-color_container;
       }
-      h5{
+
+      h5 {
         color: @DarkMode-color_container;
       }
-      h6{
+
+      h6 {
         color: @DarkMode-color_container;
       }
-      p{
+
+      p {
         color: @DarkMode-color_container;
       }
-      span{
+
+      span {
         color: @DarkMode-color_container;
       }
-      pre{
+
+      pre {
         color: @DarkMode-color_container;
       }
+
       .ant-pro-page-header-wrap-page-header-warp {
         color: @DarkMode-color_container;
         background-color: @DarkMode-backgroud_container;
         transition: background-color 200ms linear;
       }
-      .ant-card{
+
+      .ant-card {
         background-color: @DarkMode-backgroud;
       }
+
       .ant-input {
         color: @DarkMode-color_container;
         background-color: @DarkMode-backgroud;
       }
-      .ant-btn-primary[disabled]{
+
+      .ant-btn-primary[disabled] {
         color: @DarkMode-color_container;
         background-color: @DarkMode-backgroud;
       }
+
       transition: background-color 200ms linear;
     }
   }
 }
 
-.BarControlWrapper{
+.BarControlWrapper {
   width: 100%;
   position: absolute;
   bottom: 0;
   z-index: 30;
 }
 
-.leftContainer{
+.leftContainer {
   align-self: center;
   width: 100vw;
   position: relative;
@@ -100,12 +118,13 @@
   overflow-x: hidden;
   height: 100vh;
   bottom: 0;
- :global{
-  #scroller{
-    overflow-y: scroll !important;
+
+  :global {
+    #scroller {
+      overflow-y: scroll !important;
+    }
+
   }
-  
- }
 }
 
 
@@ -114,6 +133,7 @@
   .content {
     padding: 12px;
   }
+
   .layout {
     height: 100vh;
     flex: 1;

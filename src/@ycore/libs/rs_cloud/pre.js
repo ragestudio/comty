@@ -1,62 +1,73 @@
-import jquery from 'jquery'
 import * as ycore from 'ycore'
-import { FormatColorResetOutlined } from '@material-ui/icons'
+export * from './api_call.js'
 
 export const Alive_API = {
-    fail: (a) => {
-        if (a){
-            ycore.yconsole.log(a)
-            ycore.notify.error(a)
-        }
+  fail: a => {
+    if (a) {
+      ycore.yconsole.log(a)
+      ycore.notify.error(a)
     }
+  },
 }
+export const __rscloud = {
+  yulio_id: {
+    auth: (callback, payload) => {
+      if (!payload) return false
+      const { username, password } = payload
 
-export function API_Call(callback, endpoint, payload, options){
-    if (!payload || !endpoint) {
-      return false
-    }
-    let payloadContainer = payload;
-    payloadContainer.append("server_key", ycore.yConfig.server_key);
-    
-    let method;
-    let timeout;
-    let processData;
-    let includeUserID;
+      const formdata = new FormData()
+      formdata.append('username', username)
+      formdata.append('password', password)
 
-    if (options) {
-        method = options.method? options.method : "POST"
-        timeout = options.timeout? options.timeout : 0
-        processData = options.processData? options.processData : false
-        includeUserID = options.includeUserID? options.includeUserID : false
-    }else {
-        method = "POST"
-        timeout = 0
-        processData = false
-        includeUserID = false
-    }
-    
-    if (includeUserID) {
-        payloadContainer.append("user_id", ycore.handlerYIDT.__id());
-    }
+      const callOptions = { disabledToken: true }
+      ycore.API_Call(
+        (err, res) => {
+          return callback(err, res)
+        },
+        ycore.endpoints.auth_endpoint,
+        formdata,
+        callOptions
+      )
+    },
+    logout: callback => {
+      const callOptions = { includeUserID: true }
+      ycore.API_Call(
+        (err, res) => {
+          return callback(err, res)
+        },
+        ycore.endpoints.removeToken,
+        null,
+        callOptions
+      )
+    },
+    verify: (callback, payload) => {},
+    sign: (callback, payload) => {},
+  },
+  sdcp_cloud: {
+    get: (callback, payload) => {
+      if (!payload) return false
+      const { user_token, user_id } = payload
+      const formdata = new FormData()
+      formdata.append('fetch', 'user_data')
+      formdata.append('user_id', user_id)
 
-    const requestOptions = {
-      "url": `${endpoint}${ycore.handlerYIDT.__token()}`,
-      "method": method,
-      "timeout": timeout,
-      "data": payloadContainer,
-      "mimeType": "multipart/form-data",
-      "processData": processData,
-      "contentType": false
-    };  
-  
-    jquery.ajax(requestOptions)
-    .done(response => {
-        ycore.yconsole.log(response)
-        return callback(false, response)
-      })
-    .fail(error => {
-        ycore.yconsole.log('error', error)
-        ycore.Alive_API.fail(error)
-        return callback(true, error)
-    });
-  }
+      const optionCall = { override__token: true }
+      ycore.API_Call(
+        (err, res) => {
+          try {
+            let cooked = JSON.parse(res)['user_data']
+            let Ensamblator = btoa(JSON.stringify(cooked))
+            return callback(err, Ensamblator)
+          } catch (error) {
+            return callback(true, error)
+          }
+        },
+        ycore.endpoints.get_userData_endpoint,
+        formdata,
+        optionCall,
+        user_token
+      )
+    },
+    set: () => {},
+  },
+}

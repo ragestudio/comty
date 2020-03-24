@@ -1,4 +1,4 @@
-$width:  120px;
+$width: 120px;
 $height: 40px;
 $border: 0;
 
@@ -7,36 +7,36 @@ $orange: #ff7159;
 
 $border-radius: 8px;
 
-$deg:  120deg;
+$deg: 120deg;
 $size: 400%;
-$dur:  15s;
+$dur: 15s;
 
 @mixin clip-frame($width, $height, $border) {
   -webkit-clip-path: polygon(0% 100%, $border 100%, $border $border, $width - $border $border, $width - $border $height - $border, $border $height - $border, $border 100%, 100% 100%, 100% 0%, 0% 0%);
 }
 
 .like_btn {
-    width: 100px;
-    height: 30px;
-    line-height: 28px;
-    padding: 5px 15px 5px 15px;
-    @extend .text-formatting;
+  width: 100px;
+  height: 30px;
+  line-height: 28px;
+  padding: 5px 15px 5px 15px;
+  @extend .text-formatting;
 
+  &:hover {
+    color: #7e7e7e;
+  }
+
+  &.nofollowed {
     &:hover {
-        color: #7e7e7e;
+      border: none;
+      content: '';
+      color: white;
+      border-radius: $border-radius;
+      background: linear-gradient($deg, $violet, $orange, $violet);
+      background-size: $size $size;
+      animation: gradient $dur ease-in-out infinite, border 1s forwards ease-in-out reverse;
     }
-
-    &.nofollowed{
-        &:hover {
-            border: none;
-            content: '';
-            color: white;
-            border-radius: $border-radius;
-            background: linear-gradient($deg, $violet, $orange, $violet);
-            background-size: $size $size;
-            animation: gradient $dur ease-in-out infinite, border 1s forwards ease-in-out reverse;
-          }
-    }
+  }
 }
 
 /* helpers */
@@ -50,8 +50,16 @@ $dur:  15s;
 
 /* motion */
 
-@keyframes gradient { 
-    0%   { background-position: 14% 0%; }
-    50%  { background-position: 87% 100%; }
-    100% { background-position: 14% 0%; }
+@keyframes gradient {
+  0% {
+    background-position: 14% 0%;
+  }
+
+  50% {
+    background-position: 87% 100%;
+  }
+
+  100% {
+    background-position: 14% 0%;
+  }
 }

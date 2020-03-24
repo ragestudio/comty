@@ -1,8 +1,7 @@
 // https://umijs.org/config/
-import { resolve } from 'path';
-import { i18n } from './config/ycore.config.js';
+import { resolve } from 'path'
+import { i18n } from './config/ycore.config.js'
 export default {
-  
   ignoreMomentLocale: true,
   targets: {
     ie: 9,
@@ -21,7 +20,7 @@ export default {
           webpackChunkName: true,
           loadingComponent: './components/Loader/Loader',
         },
-       
+
         routes: {
           exclude: [
             /model\.(j|t)sx?$/,
@@ -31,23 +30,26 @@ export default {
             /services\//,
           ],
           update: routes => {
-            if (!i18n) return routes;
-            const newRoutes = [];
+            if (!i18n) return routes
+            const newRoutes = []
 
             for (const item of routes[0].routes) {
-              newRoutes.push(item);
+              newRoutes.push(item)
 
               if (item.path) {
                 newRoutes.push(
                   Object.assign({}, item, {
-                    path: `/:lang(${i18n.languages.map(item => item.key).join('|')})` + item.path,
+                    path:
+                      `/:lang(${i18n.languages
+                        .map(item => item.key)
+                        .join('|')})` + item.path,
                   })
-                );
+                )
               }
             }
 
-            routes[0].routes = newRoutes;
-            return routes;
+            routes[0].routes = newRoutes
+            return routes
           },
         },
         dll: false,
@@ -88,5 +90,4 @@ export default {
       'lodash',
     ],
   ],
-};
-
+}

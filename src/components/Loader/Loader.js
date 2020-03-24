@@ -1,5 +1,5 @@
 import React from 'react'
-import {CoreLoader} from 'components'
+import { CoreLoader } from 'components'
 import { AppSettings } from 'ycore'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -11,14 +11,14 @@ const Loader = ({ spinning = true, fullScreen }) => {
       <div className={styles.loader}>
         <div className={styles.warpper}>
           <div className={styles.newloader}>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         </div>
       </div>
@@ -32,15 +32,17 @@ const Loader = ({ spinning = true, fullScreen }) => {
       })}
     >
       <div className={styles.warpper}>
-      <div className={classNames(styles.newloader, {[styles.end]: !spinning}) }>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+        <div
+          className={classNames(styles.newloader, { [styles.end]: !spinning })}
+        >
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
         </div>
       </div>
     </div>
@@ -51,4 +53,4 @@ Loader.propTypes = {
   fullScreen: PropTypes.bool,
 }
 
-export default Loader;
+export default Loader

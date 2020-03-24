@@ -1,24 +1,26 @@
 @import '~themes/vars.less';
 
-.HeaderSearchWrapper{
+.HeaderSearchWrapper {
   z-index: 20;
   top: 0;
   display: flex;
   margin: auto;
   width: 100%;
-  &.hidden{
+
+  &.hidden {
     display: none;
   }
 }
 
 .headerSearch {
   margin: auto;
-  :global{
+
+  :global {
     .ant-input-affix-wrapper {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      color: rgba(0,0,0,.65);
+      color: rgba(0, 0, 0, .65);
       font-size: 14px;
       font-variant: tabular-nums;
       line-height: 1.5;
@@ -31,19 +33,23 @@
     }
 
     .ant-input-affix-wrapper .ant-input-prefix {
-        left: 12px;
+      left: 12px;
     }
-    .ant-input-affix-wrapper{
+
+    .ant-input-affix-wrapper {
       background-color: transparent !important;
       border-color: transparent;
       border-radius: 12px;
     }
-    .ant-input-affix-wrapper > input.ant-input {
+
+    .ant-input-affix-wrapper>input.ant-input {
       padding: 0 0 0 30px;
-      border: inherit; 
-      outline: inherit; 
-  }
-    .ant-input-affix-wrapper .ant-input-prefix, .ant-input-affix-wrapper .ant-input-suffix {
+      border: inherit;
+      outline: inherit;
+    }
+
+    .ant-input-affix-wrapper .ant-input-prefix,
+    .ant-input-affix-wrapper .ant-input-suffix {
       background-color: transparent !important;
       border-color: transparent;
       border-radius: 12px;
@@ -54,14 +60,14 @@
       display: flex;
       -ms-flex-align: center;
       align-items: center;
-      color: rgba(0,0,0,.65);
+      color: rgba(0, 0, 0, .65);
       line-height: 0;
       -ms-transform: translateY(-50%);
       transform: translateY(-50%);
       color: #9d9da7 !important;
     }
- 
-    .ant-input{
+
+    .ant-input {
       border-radius: 12px;
       color: #9D9DA7;
       background-color: #FFFFFF;

@@ -1,12 +1,12 @@
-import { cloneDeep, isString, flow, curry } from 'lodash';
-import umiRouter from 'umi/router';
-import pathToRegexp from 'path-to-regexp';
-import { i18n } from 'config';
+import { cloneDeep, isString, flow, curry } from 'lodash'
+import umiRouter from 'umi/router'
+import pathToRegexp from 'path-to-regexp'
+import { i18n } from 'config'
 
-export classnames from 'classnames';
-export config from 'config';
-export request from './request';
-export { Color } from './theme';
+export classnames from 'classnames'
+export config from 'config'
+export request from './request'
+export { Color } from './theme'
 
 export const { defaultLanguage } = i18n
 export const languages = i18n.languages.map(item => item.key)
@@ -20,9 +20,9 @@ export const languages = i18n.languages.map(item => item.key)
  */
 export function queryArray(array, key, value) {
   if (!Array.isArray(array)) {
-    return;
+    return
   }
-  return array.find(_ => _[key] === value);
+  return array.find(_ => _[key] === value)
 }
 
 /**
@@ -39,9 +39,9 @@ export function arrayToTree(
   parentId = 'pid',
   children = 'children'
 ) {
-  const result = [];
-  const hash = {};
-  const data = cloneDeep(array);
+  const result = []
+  const hash = {}
+  const data = cloneDeep(array)
 
   data.forEach((item, index) => {
     hash[data[index][id]] = data[index]
@@ -53,10 +53,10 @@ export function arrayToTree(
       !hashParent[children] && (hashParent[children] = [])
       hashParent[children].push(item)
     } else {
-      result.push(item);
+      result.push(item)
     }
   })
-  return result;
+  return result
 }
 
 export const langFromPath = curry(
@@ -70,10 +70,10 @@ export const langFromPath = curry(
   (languages, defaultLanguage, pathname) => {
     for (const item of languages) {
       if (pathname.startsWith(`/${item}/`)) {
-        return item;
+        return item
       }
     }
-    return defaultLanguage;
+    return defaultLanguage
   }
 )(languages)(defaultLanguage)
 
@@ -86,7 +86,7 @@ export const deLangPrefix = curry(
    */
   (languages, pathname) => {
     if (!pathname) {
-      return;
+      return
     }
     for (const item of languages) {
       if (pathname.startsWith(`/${item}/`)) {
@@ -94,7 +94,7 @@ export const deLangPrefix = curry(
       }
     }
 
-    return pathname;
+    return pathname
   }
 )(languages)
 
@@ -105,7 +105,7 @@ export const deLangPrefix = curry(
  */
 export function addLangPrefix(pathname) {
   const prefix = langFromPath(window.location.pathname)
-  return `/${prefix}${deLangPrefix(pathname)}`;
+  return `/${prefix}${deLangPrefix(pathname)}`
 }
 
 const routerAddLangPrefix = params => {
@@ -114,7 +114,7 @@ const routerAddLangPrefix = params => {
   } else {
     params.pathname = addLangPrefix(params.pathname)
   }
-  return params;
+  return params
 }
 
 /**
@@ -122,15 +122,9 @@ const routerAddLangPrefix = params => {
  */
 const myRouter = { ...umiRouter }
 
-myRouter.push = flow(
-  routerAddLangPrefix,
-  umiRouter.push
-)
+myRouter.push = flow(routerAddLangPrefix, umiRouter.push)
 
-myRouter.replace = flow(
-  routerAddLangPrefix,
-  myRouter.replace
-)
+myRouter.replace = flow(routerAddLangPrefix, myRouter.replace)
 
 export const router = myRouter
 
@@ -166,7 +160,7 @@ export function queryPathKeys(array, current, parentId, id = 'id') {
   }
 
   getPath(current)
-  return result;
+  return result
 }
 
 /**
@@ -191,7 +185,7 @@ export function queryAncestors(array, current, parentId, id = 'id') {
   }
 
   getPath(current)
-  return result;
+  return result
 }
 
 /**
@@ -201,7 +195,7 @@ export function queryAncestors(array, current, parentId, id = 'id') {
  * @return  {string}   Return frist object when query success.
  */
 export function queryLayout(layouts, pathname) {
-  let result = 'public';
+  let result = 'public'
 
   const isMatch = regepx => {
     return regepx instanceof RegExp
@@ -215,8 +209,8 @@ export function queryLayout(layouts, pathname) {
     if (item.include) {
       for (const regepx of item.include) {
         if (isMatch(regepx)) {
-          include = true;
-          break;
+          include = true
+          break
         }
       }
     }
@@ -224,23 +218,23 @@ export function queryLayout(layouts, pathname) {
     if (include && item.exclude) {
       for (const regepx of item.exclude) {
         if (isMatch(regepx)) {
-          exclude = true;
-          break;
+          exclude = true
+          break
         }
       }
     }
 
     if (include && !exclude) {
-      result = item.name;
-      break;
+      result = item.name
+      break
     }
   }
 
-  return result;
+  return result
 }
 
 export function getLocale() {
-  return langFromPath(window.location.pathname);
+  return langFromPath(window.location.pathname)
 }
 
 export function setLocale(language) {
@@ -248,6 +242,6 @@ export function setLocale(language) {
     umiRouter.push({
       pathname: `/${language}${deLangPrefix(window.location.pathname)}`,
       search: window.location.search,
-    });
+    })
   }
 }

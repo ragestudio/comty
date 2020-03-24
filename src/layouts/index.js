@@ -28,7 +28,7 @@ class Layout extends Component {
     const language = langFromPath(nextProps.location.pathname)
     const preLanguage = this.language
     const { catalogs } = nextState
-  
+
     if (preLanguage !== language && !catalogs[language]) {
       this.loadCatalog(language)
       this.language = language
@@ -40,8 +40,10 @@ class Layout extends Component {
   }
 
   loadCatalog = async language => {
-    const catalog = await import(/* webpackMode: "lazy", webpackChunkName: "i18n-[index]" */
-    `@lingui/loader!../locales/${language}/messages.json`)
+    const catalog = await import(
+      /* webpackMode: "lazy", webpackChunkName: "i18n-[index]" */
+      `@lingui/loader!../locales/${language}/messages.json`
+    )
 
     this.setState(state => ({
       catalogs: {

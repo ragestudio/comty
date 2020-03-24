@@ -3,7 +3,7 @@
 body {
   height: 100%;
   overflow-y: hidden;
-  background-color:  transparent; // rgb(249, 249, 249);
+  background-color: transparent; // rgb(249, 249, 249);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -17,9 +17,9 @@ body {
 }
 
 :global {
-  
+
   .ant-breadcrumb {
-    & > span {
+    &>span {
       &:last-child {
         color: #999;
         font-weight: normal;
@@ -28,32 +28,32 @@ body {
   }
 
   .ant-breadcrumb-link {
-    .anticon + span {
+    .anticon+span {
       margin-left: 4px;
     }
   }
 
   .ant-table {
-    .ant-table-thead > tr > th {
+    .ant-table-thead>tr>th {
       text-align: center;
     }
 
-    .ant-table-tbody > tr > td {
+    .ant-table-tbody>tr>td {
       text-align: center;
     }
 
     &.ant-table-small {
-      .ant-table-thead > tr > th {
+      .ant-table-thead>tr>th {
         background: #f7f7f7;
       }
 
-      .ant-table-body > table {
+      .ant-table-body>table {
         padding: 0;
       }
     }
   }
 
- 
+
   .ant-table-pagination {
     float: none !important;
     display: table;
@@ -94,6 +94,7 @@ body {
     table-layout: auto;
   }
 }
+
 @media (min-width: 1600px) {
   :global {
     .ant-col-xl-48 {
@@ -105,8 +106,10 @@ body {
     }
   }
 }
+
 @media (max-width: 767px) {
   :global {
+
     .ant-pagination-item,
     .ant-pagination-next,
     .ant-pagination-options,

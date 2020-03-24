@@ -1,4 +1,4 @@
-import { keyframes } from 'styled-components';
+import { keyframes } from 'styled-components'
 
 export default {
   moveToLeft: {
@@ -8,7 +8,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromLeft: {
     keyframes: keyframes`
@@ -16,7 +16,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToRight: {
     keyframes: keyframes`
@@ -25,7 +25,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromRight: {
     keyframes: keyframes`
@@ -33,7 +33,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToTop: {
     keyframes: keyframes`
@@ -42,7 +42,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromTop: {
     keyframes: keyframes`
@@ -50,7 +50,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToBottom: {
     keyframes: keyframes`
@@ -59,7 +59,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromBottom: {
     keyframes: keyframes`
@@ -67,7 +67,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   fade: {
     keyframes: keyframes`
@@ -76,7 +76,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToLeftFade: {
     keyframes: keyframes`
@@ -85,7 +85,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromLeftFade: {
     keyframes: keyframes`
@@ -93,7 +93,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToRightFade: {
     keyframes: keyframes`
@@ -102,7 +102,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromRightFade: {
     keyframes: keyframes`
@@ -110,7 +110,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToTopFade: {
     keyframes: keyframes`
@@ -119,7 +119,7 @@ export default {
     `,
     duration: 600,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromTopFade: {
     keyframes: keyframes`
@@ -127,7 +127,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveToBottomFade: {
     keyframes: keyframes`
@@ -136,7 +136,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   moveFromBottomFade: {
     keyframes: keyframes`
@@ -144,7 +144,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleDown: {
     keyframes: keyframes`
@@ -153,7 +153,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleUp: {
     keyframes: keyframes`
@@ -161,7 +161,7 @@ export default {
     `,
     duration: 700,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleUpDown: {
     keyframes: keyframes`
@@ -169,7 +169,7 @@ export default {
     `,
     duration: 500,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleDownUp: {
     keyframes: keyframes`
@@ -178,7 +178,7 @@ export default {
     `,
     duration: 500,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleDownCenter: {
     keyframes: keyframes`
@@ -187,7 +187,7 @@ export default {
     `,
     duration: 400,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   scaleUpCenter: {
     keyframes: keyframes`
@@ -195,7 +195,7 @@ export default {
     `,
     duration: 400,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   rotateRightSideFirst: {
     keyframes: keyframes`
@@ -206,7 +206,7 @@ export default {
     duration: 800,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateLeftSideFirst: {
     keyframes: keyframes`
@@ -217,7 +217,7 @@ export default {
     duration: 800,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateTopSideFirst: {
     keyframes: keyframes`
@@ -228,7 +228,7 @@ export default {
     duration: 800,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateBottomSideFirst: {
     keyframes: keyframes`
@@ -239,7 +239,7 @@ export default {
     duration: 800,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   flipOutRight: {
     keyframes: keyframes`
@@ -249,7 +249,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipInLeft: {
     keyframes: keyframes`
@@ -258,7 +258,7 @@ export default {
     duration: 500,
     timing: 'ease-out',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipOutLeft: {
     keyframes: keyframes`
@@ -268,7 +268,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipInRight: {
     keyframes: keyframes`
@@ -277,7 +277,7 @@ export default {
     duration: 500,
     timing: 'ease-out',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipOutTop: {
     keyframes: keyframes`
@@ -287,7 +287,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipInBottom: {
     keyframes: keyframes`
@@ -296,7 +296,7 @@ export default {
     duration: 500,
     timing: 'ease-out',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipOutBottom: {
     keyframes: keyframes`
@@ -306,7 +306,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   flipInTop: {
     keyframes: keyframes`
@@ -315,7 +315,7 @@ export default {
     duration: 500,
     timing: 'ease-out',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   rotateFall: {
     keyframes: keyframes`
@@ -328,7 +328,7 @@ export default {
     duration: 1000,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 0%'
+    origin: '0% 0%',
   },
   rotateOutNewspaper: {
     keyframes: keyframes`
@@ -338,7 +338,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   rotateInNewspaper: {
     keyframes: keyframes`
@@ -347,7 +347,7 @@ export default {
     duration: 500,
     timing: 'ease-out',
     fill: 'both',
-    origin: '50% 50%'
+    origin: '50% 50%',
   },
   rotatePushLeft: {
     keyframes: keyframes`
@@ -357,7 +357,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotatePushRight: {
     keyframes: keyframes`
@@ -367,7 +367,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotatePushTop: {
     keyframes: keyframes`
@@ -377,7 +377,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotatePushBottom: {
     keyframes: keyframes`
@@ -387,7 +387,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotatePullRight: {
     keyframes: keyframes`
@@ -396,7 +396,7 @@ export default {
     duration: 500,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotatePullLeft: {
     keyframes: keyframes`
@@ -405,7 +405,7 @@ export default {
     duration: 500,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotatePullTop: {
     keyframes: keyframes`
@@ -414,7 +414,7 @@ export default {
     duration: 500,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotatePullBottom: {
     keyframes: keyframes`
@@ -423,7 +423,7 @@ export default {
     duration: 500,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateFoldRight: {
     keyframes: keyframes`
@@ -433,7 +433,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateFoldLeft: {
     keyframes: keyframes`
@@ -443,7 +443,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateFoldTop: {
     keyframes: keyframes`
@@ -453,7 +453,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateFoldBottom: {
     keyframes: keyframes`
@@ -463,7 +463,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateUnfoldLeft: {
     keyframes: keyframes`
@@ -472,7 +472,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateUnfoldRight: {
     keyframes: keyframes`
@@ -481,7 +481,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateUnfoldTop: {
     keyframes: keyframes`
@@ -490,7 +490,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateUnfoldBottom: {
     keyframes: keyframes`
@@ -499,7 +499,7 @@ export default {
     duration: 700,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateRoomLeftOut: {
     keyframes: keyframes`
@@ -509,7 +509,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateRoomLeftIn: {
     keyframes: keyframes`
@@ -518,7 +518,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateRoomRightOut: {
     keyframes: keyframes`
@@ -528,7 +528,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateRoomRightIn: {
     keyframes: keyframes`
@@ -537,7 +537,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateRoomTopOut: {
     keyframes: keyframes`
@@ -547,7 +547,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateRoomTopIn: {
     keyframes: keyframes`
@@ -556,7 +556,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateRoomBottomOut: {
     keyframes: keyframes`
@@ -566,7 +566,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateRoomBottomIn: {
     keyframes: keyframes`
@@ -575,7 +575,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateCubeLeftOut: {
     keyframes: keyframes`
@@ -586,7 +586,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateCubeLeftIn: {
     keyframes: keyframes`
@@ -596,7 +596,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateCubeRightOut: {
     keyframes: keyframes`
@@ -607,7 +607,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateCubeRightIn: {
     keyframes: keyframes`
@@ -617,7 +617,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateCubeTopOut: {
     keyframes: keyframes`
@@ -628,7 +628,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateCubeTopIn: {
     keyframes: keyframes`
@@ -638,7 +638,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateCubeBottomOut: {
     keyframes: keyframes`
@@ -649,7 +649,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateCubeBottomIn: {
     keyframes: keyframes`
@@ -659,7 +659,7 @@ export default {
     duration: 600,
     timing: 'ease-in',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateCarouselLeftOut: {
     keyframes: keyframes`
@@ -669,7 +669,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateCarouselLeftIn: {
     keyframes: keyframes`
@@ -678,7 +678,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateCarouselRightOut: {
     keyframes: keyframes`
@@ -688,7 +688,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '0% 50%'
+    origin: '0% 50%',
   },
   rotateCarouselRightIn: {
     keyframes: keyframes`
@@ -697,7 +697,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '100% 50%'
+    origin: '100% 50%',
   },
   rotateCarouselTopOut: {
     keyframes: keyframes`
@@ -707,7 +707,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateCarouselTopIn: {
     keyframes: keyframes`
@@ -716,7 +716,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateCarouselBottomOut: {
     keyframes: keyframes`
@@ -726,7 +726,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 0%'
+    origin: '50% 0%',
   },
   rotateCarouselBottomIn: {
     keyframes: keyframes`
@@ -735,7 +735,7 @@ export default {
     duration: 800,
     timing: 'ease',
     fill: 'both',
-    origin: '50% 100%'
+    origin: '50% 100%',
   },
   rotateSidesOut: {
     keyframes: keyframes`
@@ -745,7 +745,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '-50% 50%'
+    origin: '-50% 50%',
   },
   rotateSidesIn: {
     keyframes: keyframes`
@@ -754,7 +754,7 @@ export default {
     duration: 500,
     timing: 'ease-in',
     fill: 'both',
-    origin: '150% 50%'
+    origin: '150% 50%',
   },
   rotateSlideOut: {
     keyframes: keyframes`
@@ -765,7 +765,7 @@ export default {
     `,
     duration: 1000,
     timing: 'ease',
-    fill: 'both'
+    fill: 'both',
   },
   rotateSlideIn: {
     keyframes: keyframes`
@@ -775,6 +775,6 @@ export default {
     `,
     duration: 1000,
     timing: 'ease',
-    fill: 'both'
-  }
-};
+    fill: 'both',
+  },
+}

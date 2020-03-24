@@ -1,552 +1,552 @@
 export default {
-    moveToLeftFromRight: {
-      exit: {
-        name: 'moveToLeft'
-      },
-      enter: {
-        name: 'moveFromRight'
-      }
+  moveToLeftFromRight: {
+    exit: {
+      name: 'moveToLeft',
     },
-    moveToRightFromLeft: {
-      exit: {
-        name: 'moveToRight'
-      },
-      enter: {
-        name: 'moveFromLeft'
-      }
+    enter: {
+      name: 'moveFromRight',
     },
-    moveToTopFromBottom: {
-      exit: {
-        name: 'moveToTop'
-      },
-      enter: {
-        name: 'moveFromBottom'
-      }
+  },
+  moveToRightFromLeft: {
+    exit: {
+      name: 'moveToRight',
     },
-    moveToBottomFromTop: {
-      exit: {
-        name: 'moveToBottom'
-      },
-      enter: {
-        name: 'moveFromTop'
-      }
+    enter: {
+      name: 'moveFromLeft',
     },
-    fadeFromRight: {
-      exit: {
-        name: 'fade'
-      },
-      enter: {
-        name: 'moveFromRight',
-        onTop: true
-      }
+  },
+  moveToTopFromBottom: {
+    exit: {
+      name: 'moveToTop',
     },
-    fadeFromLeft: {
-      exit: {
-        name: 'fade'
-      },
-      enter: {
-        name: 'moveFromLeft',
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromBottom',
     },
-    fadeFromBottom: {
-      exit: {
-        name: 'fade'
-      },
-      enter: {
-        name: 'moveFromBottom',
-        onTop: true
-      }
+  },
+  moveToBottomFromTop: {
+    exit: {
+      name: 'moveToBottom',
     },
-    fadeFromTop: {
-      exit: {
-        name: 'fade'
-      },
-      enter: {
-        name: 'moveFromTop',
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromTop',
     },
-    fadeLeftFadeRight: {
-      exit: {
-        name: 'moveToLeftFade'
-      },
-      enter: {
-        name: 'moveFromRightFade'
-      }
+  },
+  fadeFromRight: {
+    exit: {
+      name: 'fade',
     },
-    fadeRightFadeLeft: {
-      exit: {
-        name: 'moveToRightFade'
-      },
-      enter: {
-        name: 'moveFromLeftFade'
-      }
+    enter: {
+      name: 'moveFromRight',
+      onTop: true,
     },
-    fadeTopFadeBottom: {
-      exit: {
-        name: 'moveToTopFade'
-      },
-      enter: {
-        name: 'moveFromBottomFade'
-      }
+  },
+  fadeFromLeft: {
+    exit: {
+      name: 'fade',
     },
-    fadeBottomFadeTop: {
-      exit: {
-        name: 'moveToBottomFade'
-      },
-      enter: {
-        name: 'moveFromTopFade'
-      }
+    enter: {
+      name: 'moveFromLeft',
+      onTop: true,
     },
-    scaleDownFromRight: {
-      exit: {
-        name: 'scaleDown'
-      },
-      enter: {
-        name: 'moveFromRight',
-        onTop: true
-      }
+  },
+  fadeFromBottom: {
+    exit: {
+      name: 'fade',
     },
-    scaleDownFromLeft: {
-      exit: {
-        name: 'scaleDown'
-      },
-      enter: {
-        name: 'moveFromLeft',
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromBottom',
+      onTop: true,
     },
-    scaleDownFromBottom: {
-      exit: {
-        name: 'scaleDown'
-      },
-      enter: {
-        name: 'moveFromBottom',
-        onTop: true
-      }
+  },
+  fadeFromTop: {
+    exit: {
+      name: 'fade',
     },
-    scaleDownFromTop: {
-      exit: {
-        name: 'scaleDown'
-      },
-      enter: {
-        name: 'moveFromTop',
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromTop',
+      onTop: true,
     },
-    scaleDownScaleDown: {
-      exit: {
-        name: 'scaleDown'
-      },
-      enter: {
-        name: 'scaleUpDown',
-        delay: 300
-      }
+  },
+  fadeLeftFadeRight: {
+    exit: {
+      name: 'moveToLeftFade',
     },
-    scaleUpScaleUp: {
-      exit: {
-        name: 'scaleDownUp'
-      },
-      enter: {
-        name: 'scaleUp',
-        delay: 300
-      }
+    enter: {
+      name: 'moveFromRightFade',
     },
-    moveToLeftScaleUp: {
-      exit: {
-        name: 'moveToLeft',
-        onTop: true
-      },
-      enter: {
-        name: 'scaleUp'
-      }
+  },
+  fadeRightFadeLeft: {
+    exit: {
+      name: 'moveToRightFade',
     },
-    moveToRightScaleUp: {
-      exit: {
-        name: 'moveToRight',
-        onTop: true
-      },
-      enter: {
-        name: 'scaleUp'
-      }
+    enter: {
+      name: 'moveFromLeftFade',
     },
-    moveToTopScaleUp: {
-      exit: {
-        name: 'moveToTop',
-        onTop: true
-      },
-      enter: {
-        name: 'scaleUp'
-      }
+  },
+  fadeTopFadeBottom: {
+    exit: {
+      name: 'moveToTopFade',
     },
-    moveToBottomScaleUp: {
-      exit: {
-        name: 'moveToBottom',
-        onTop: true
-      },
-      enter: {
-        name: 'scaleUp'
-      }
+    enter: {
+      name: 'moveFromBottomFade',
     },
-    scaleDownScaleUp: {
-      exit: {
-        name: 'scaleDownCenter'
-      },
-      enter: {
-        name: 'scaleUpCenter',
-        delay: 400
-      }
+  },
+  fadeBottomFadeTop: {
+    exit: {
+      name: 'moveToBottomFade',
     },
-    glueLeftFromRight: {
-      exit: {
-        name: 'rotateRightSideFirst'
-      },
-      enter: {
-        name: 'moveFromRight',
-        delay: 200,
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromTopFade',
     },
-    glueRightFromLeft: {
-      exit: {
-        name: 'rotateLeftSideFirst'
-      },
-      enter: {
-        name: 'moveFromLeft',
-        delay: 200,
-        onTop: true
-      }
+  },
+  scaleDownFromRight: {
+    exit: {
+      name: 'scaleDown',
     },
-    glueBottomFromTop: {
-      exit: {
-        name: 'rotateTopSideFirst'
-      },
-      enter: {
-        name: 'moveFromTop',
-        delay: 200,
-        onTop: true
-      }
+    enter: {
+      name: 'moveFromRight',
+      onTop: true,
     },
-    glueTopFromBottom: {
-      exit: {
-        name: 'rotateBottomSideFirst'
-      },
-      enter: {
-        name: 'moveFromBottom',
-        delay: 200,
-        onTop: true
-      }
+  },
+  scaleDownFromLeft: {
+    exit: {
+      name: 'scaleDown',
     },
-    flipRight: {
-      exit: {
-        name: 'flipOutRight'
-      },
-      enter: {
-        name: 'flipInLeft',
-        delay: 500
-      }
+    enter: {
+      name: 'moveFromLeft',
+      onTop: true,
     },
-    flipLeft: {
-      exit: {
-        name: 'flipOutLeft'
-      },
-      enter: {
-        name: 'flipInRight',
-        delay: 500
-      }
+  },
+  scaleDownFromBottom: {
+    exit: {
+      name: 'scaleDown',
     },
-    flipTop: {
-      exit: {
-        name: 'flipOutTop'
-      },
-      enter: {
-        name: 'flipInBottom',
-        delay: 500
-      }
+    enter: {
+      name: 'moveFromBottom',
+      onTop: true,
     },
-    flipBottom: {
-      exit: {
-        name: 'flipOutBottom'
-      },
-      enter: {
-        name: 'flipInTop',
-        delay: 500
-      }
+  },
+  scaleDownFromTop: {
+    exit: {
+      name: 'scaleDown',
     },
-    fall: {
-      exit: {
-        name: 'rotateFall',
-        onTop: true
-      },
-      enter: {
-        name: 'scaleUp'
-      }
+    enter: {
+      name: 'moveFromTop',
+      onTop: true,
     },
-    newspaper: {
-      exit: {
-        name: 'rotateOutNewspaper'
-      },
-      enter: {
-        name: 'rotateInNewspaper',
-        delay: 500
-      }
+  },
+  scaleDownScaleDown: {
+    exit: {
+      name: 'scaleDown',
     },
-    pushLeftFromRight: {
-      exit: {
-        name: 'rotatePushLeft'
-      },
-      enter: {
-        name: 'moveFromRight'
-      }
+    enter: {
+      name: 'scaleUpDown',
+      delay: 300,
     },
-    pushRightFromLeft: {
-      exit: {
-        name: 'rotatePushRight'
-      },
-      enter: {
-        name: 'moveFromLeft'
-      }
+  },
+  scaleUpScaleUp: {
+    exit: {
+      name: 'scaleDownUp',
     },
-    pushTopFromBottom: {
-      exit: {
-        name: 'rotatePushTop'
-      },
-      enter: {
-        name: 'moveFromBottom'
-      }
+    enter: {
+      name: 'scaleUp',
+      delay: 300,
     },
-    pushBottomFromTop: {
-      exit: {
-        name: 'rotatePushBottom'
-      },
-      enter: {
-        name: 'moveFromTop'
-      }
+  },
+  moveToLeftScaleUp: {
+    exit: {
+      name: 'moveToLeft',
+      onTop: true,
     },
-    pushLeftPullRight: {
-      exit: {
-        name: 'rotatePushLeft'
-      },
-      enter: {
-        name: 'rotatePullRight',
-        delay: 180
-      }
+    enter: {
+      name: 'scaleUp',
     },
-    pushRightPullLeft: {
-      exit: {
-        name: 'rotatePushRight'
-      },
-      enter: {
-        name: 'rotatePullLeft',
-        delay: 180
-      }
+  },
+  moveToRightScaleUp: {
+    exit: {
+      name: 'moveToRight',
+      onTop: true,
     },
-    pushTopPullBottom: {
-      exit: {
-        name: 'rotatePushTop'
-      },
-      enter: {
-        name: 'rotatePullBottom',
-        delay: 180
-      }
+    enter: {
+      name: 'scaleUp',
     },
-    pushBottomPullTop: {
-      exit: {
-        name: 'rotatePushBottom'
-      },
-      enter: {
-        name: 'rotatePullTop',
-        delay: 180
-      }
+  },
+  moveToTopScaleUp: {
+    exit: {
+      name: 'moveToTop',
+      onTop: true,
     },
-    foldLeftFromRight: {
-      exit: {
-        name: 'rotateFoldLeft'
-      },
-      enter: {
-        name: 'moveFromRightFade'
-      }
+    enter: {
+      name: 'scaleUp',
     },
-    foldRightFromLeft: {
-      exit: {
-        name: 'rotateFoldRight'
-      },
-      enter: {
-        name: 'moveFromLeftFade'
-      }
+  },
+  moveToBottomScaleUp: {
+    exit: {
+      name: 'moveToBottom',
+      onTop: true,
     },
-    foldTopFromBottom: {
-      exit: {
-        name: 'rotateFoldTop'
-      },
-      enter: {
-        name: 'moveFromBottomFade'
-      }
+    enter: {
+      name: 'scaleUp',
     },
-    foldBottomFromTop: {
-      exit: {
-        name: 'rotateFoldBottom'
-      },
-      enter: {
-        name: 'moveFromTopFade'
-      }
+  },
+  scaleDownScaleUp: {
+    exit: {
+      name: 'scaleDownCenter',
     },
-    moveToRightUnfoldLeft: {
-      exit: {
-        name: 'moveToRightFade'
-      },
-      enter: {
-        name: 'rotateUnfoldLeft'
-      }
+    enter: {
+      name: 'scaleUpCenter',
+      delay: 400,
     },
-    moveToLeftUnfoldRight: {
-      exit: {
-        name: 'moveToLeftFade'
-      },
-      enter: {
-        name: 'rotateUnfoldRight'
-      }
+  },
+  glueLeftFromRight: {
+    exit: {
+      name: 'rotateRightSideFirst',
     },
-    moveToBottomUnfoldTop: {
-      exit: {
-        name: 'moveToBottomFade'
-      },
-      enter: {
-        name: 'rotateUnfoldTop'
-      }
+    enter: {
+      name: 'moveFromRight',
+      delay: 200,
+      onTop: true,
     },
-    moveToTopUnfoldBottom: {
-      exit: {
-        name: 'moveToTopFade'
-      },
-      enter: {
-        name: 'rotateUnfoldBottom'
-      }
+  },
+  glueRightFromLeft: {
+    exit: {
+      name: 'rotateLeftSideFirst',
     },
-    roomToLeft: {
-      exit: {
-        name: 'rotateRoomLeftOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateRoomLeftIn'
-      }
+    enter: {
+      name: 'moveFromLeft',
+      delay: 200,
+      onTop: true,
     },
-    roomToRight: {
-      exit: {
-        name: 'rotateRoomRightOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateRoomRightIn'
-      }
+  },
+  glueBottomFromTop: {
+    exit: {
+      name: 'rotateTopSideFirst',
     },
-    roomToTop: {
-      exit: {
-        name: 'rotateRoomTopOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateRoomTopIn'
-      }
+    enter: {
+      name: 'moveFromTop',
+      delay: 200,
+      onTop: true,
     },
-    roomToBottom: {
-      exit: {
-        name: 'rotateRoomBottomOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateRoomBottomIn'
-      }
+  },
+  glueTopFromBottom: {
+    exit: {
+      name: 'rotateBottomSideFirst',
     },
-    cubeToLeft: {
-      exit: {
-        name: 'rotateCubeLeftOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCubeLeftIn'
-      }
+    enter: {
+      name: 'moveFromBottom',
+      delay: 200,
+      onTop: true,
     },
-    cubeToRight: {
-      exit: {
-        name: 'rotateCubeRightOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCubeRightIn'
-      }
+  },
+  flipRight: {
+    exit: {
+      name: 'flipOutRight',
     },
-    cubeToTop: {
-      exit: {
-        name: 'rotateCubeTopOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCubeTopIn'
-      }
+    enter: {
+      name: 'flipInLeft',
+      delay: 500,
     },
-    cubeToBottom: {
-      exit: {
-        name: 'rotateCubeBottomOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCubeBottomIn'
-      }
+  },
+  flipLeft: {
+    exit: {
+      name: 'flipOutLeft',
     },
-    carouselToLeft: {
-      exit: {
-        name: 'rotateCarouselLeftOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCarouselLeftIn'
-      }
+    enter: {
+      name: 'flipInRight',
+      delay: 500,
     },
-    carouselToRight: {
-      exit: {
-        name: 'rotateCarouselRightOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCarouselRightIn'
-      }
+  },
+  flipTop: {
+    exit: {
+      name: 'flipOutTop',
     },
-    carouselToTop: {
-      exit: {
-        name: 'rotateCarouselTopOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCarouselTopIn'
-      }
+    enter: {
+      name: 'flipInBottom',
+      delay: 500,
     },
-    carouselToBottom: {
-      exit: {
-        name: 'rotateCarouselBottomOut',
-        onTop: true
-      },
-      enter: {
-        name: 'rotateCarouselBottomIn'
-      }
+  },
+  flipBottom: {
+    exit: {
+      name: 'flipOutBottom',
     },
-    slides: {
-      exit: {
-        name: 'rotateSidesOut'
-      },
-      enter: {
-        name: 'rotateSidesIn',
-        delay: 200
-      }
+    enter: {
+      name: 'flipInTop',
+      delay: 500,
     },
-    slide: {
-      exit: {
-        name: 'rotateSlideOut'
-      },
-      enter: {
-        name: 'rotateSlideIn'
-      }
-    }
-  };
+  },
+  fall: {
+    exit: {
+      name: 'rotateFall',
+      onTop: true,
+    },
+    enter: {
+      name: 'scaleUp',
+    },
+  },
+  newspaper: {
+    exit: {
+      name: 'rotateOutNewspaper',
+    },
+    enter: {
+      name: 'rotateInNewspaper',
+      delay: 500,
+    },
+  },
+  pushLeftFromRight: {
+    exit: {
+      name: 'rotatePushLeft',
+    },
+    enter: {
+      name: 'moveFromRight',
+    },
+  },
+  pushRightFromLeft: {
+    exit: {
+      name: 'rotatePushRight',
+    },
+    enter: {
+      name: 'moveFromLeft',
+    },
+  },
+  pushTopFromBottom: {
+    exit: {
+      name: 'rotatePushTop',
+    },
+    enter: {
+      name: 'moveFromBottom',
+    },
+  },
+  pushBottomFromTop: {
+    exit: {
+      name: 'rotatePushBottom',
+    },
+    enter: {
+      name: 'moveFromTop',
+    },
+  },
+  pushLeftPullRight: {
+    exit: {
+      name: 'rotatePushLeft',
+    },
+    enter: {
+      name: 'rotatePullRight',
+      delay: 180,
+    },
+  },
+  pushRightPullLeft: {
+    exit: {
+      name: 'rotatePushRight',
+    },
+    enter: {
+      name: 'rotatePullLeft',
+      delay: 180,
+    },
+  },
+  pushTopPullBottom: {
+    exit: {
+      name: 'rotatePushTop',
+    },
+    enter: {
+      name: 'rotatePullBottom',
+      delay: 180,
+    },
+  },
+  pushBottomPullTop: {
+    exit: {
+      name: 'rotatePushBottom',
+    },
+    enter: {
+      name: 'rotatePullTop',
+      delay: 180,
+    },
+  },
+  foldLeftFromRight: {
+    exit: {
+      name: 'rotateFoldLeft',
+    },
+    enter: {
+      name: 'moveFromRightFade',
+    },
+  },
+  foldRightFromLeft: {
+    exit: {
+      name: 'rotateFoldRight',
+    },
+    enter: {
+      name: 'moveFromLeftFade',
+    },
+  },
+  foldTopFromBottom: {
+    exit: {
+      name: 'rotateFoldTop',
+    },
+    enter: {
+      name: 'moveFromBottomFade',
+    },
+  },
+  foldBottomFromTop: {
+    exit: {
+      name: 'rotateFoldBottom',
+    },
+    enter: {
+      name: 'moveFromTopFade',
+    },
+  },
+  moveToRightUnfoldLeft: {
+    exit: {
+      name: 'moveToRightFade',
+    },
+    enter: {
+      name: 'rotateUnfoldLeft',
+    },
+  },
+  moveToLeftUnfoldRight: {
+    exit: {
+      name: 'moveToLeftFade',
+    },
+    enter: {
+      name: 'rotateUnfoldRight',
+    },
+  },
+  moveToBottomUnfoldTop: {
+    exit: {
+      name: 'moveToBottomFade',
+    },
+    enter: {
+      name: 'rotateUnfoldTop',
+    },
+  },
+  moveToTopUnfoldBottom: {
+    exit: {
+      name: 'moveToTopFade',
+    },
+    enter: {
+      name: 'rotateUnfoldBottom',
+    },
+  },
+  roomToLeft: {
+    exit: {
+      name: 'rotateRoomLeftOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateRoomLeftIn',
+    },
+  },
+  roomToRight: {
+    exit: {
+      name: 'rotateRoomRightOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateRoomRightIn',
+    },
+  },
+  roomToTop: {
+    exit: {
+      name: 'rotateRoomTopOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateRoomTopIn',
+    },
+  },
+  roomToBottom: {
+    exit: {
+      name: 'rotateRoomBottomOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateRoomBottomIn',
+    },
+  },
+  cubeToLeft: {
+    exit: {
+      name: 'rotateCubeLeftOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCubeLeftIn',
+    },
+  },
+  cubeToRight: {
+    exit: {
+      name: 'rotateCubeRightOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCubeRightIn',
+    },
+  },
+  cubeToTop: {
+    exit: {
+      name: 'rotateCubeTopOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCubeTopIn',
+    },
+  },
+  cubeToBottom: {
+    exit: {
+      name: 'rotateCubeBottomOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCubeBottomIn',
+    },
+  },
+  carouselToLeft: {
+    exit: {
+      name: 'rotateCarouselLeftOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCarouselLeftIn',
+    },
+  },
+  carouselToRight: {
+    exit: {
+      name: 'rotateCarouselRightOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCarouselRightIn',
+    },
+  },
+  carouselToTop: {
+    exit: {
+      name: 'rotateCarouselTopOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCarouselTopIn',
+    },
+  },
+  carouselToBottom: {
+    exit: {
+      name: 'rotateCarouselBottomOut',
+      onTop: true,
+    },
+    enter: {
+      name: 'rotateCarouselBottomIn',
+    },
+  },
+  slides: {
+    exit: {
+      name: 'rotateSidesOut',
+    },
+    enter: {
+      name: 'rotateSidesIn',
+      delay: 200,
+    },
+  },
+  slide: {
+    exit: {
+      name: 'rotateSlideOut',
+    },
+    enter: {
+      name: 'rotateSlideIn',
+    },
+  },
+}

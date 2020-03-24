@@ -8,28 +8,28 @@ const { CancelToken } = axios
 window.cancelRequest = new Map()
 
 export default function request(options) {
-  let { data, url, method = 'get' } = options;
-  const cloneData = cloneDeep(data);
+  let { data, url, method = 'get' } = options
+  const cloneData = cloneDeep(data)
 
   try {
     let domain = ''
     const urlMatch = url.match(/[a-zA-z]+:\/\/[^/]*/)
     if (urlMatch) {
       ;[domain] = urlMatch
-      url = url.slice(domain.length);
+      url = url.slice(domain.length)
     }
 
-    const match = pathToRegexp.parse(url);
-    url = pathToRegexp.compile(url)(data);
+    const match = pathToRegexp.parse(url)
+    url = pathToRegexp.compile(url)(data)
 
     for (const item of match) {
       if (item instanceof Object && item.name in cloneData) {
-        delete cloneData[item.name];
+        delete cloneData[item.name]
       }
     }
-    url = domain + url;
+    url = domain + url
   } catch (e) {
-    message.error(e.message);
+    message.error(e.message)
   }
 
   options.url =
@@ -50,12 +50,12 @@ export default function request(options) {
 
       let result = {}
       if (typeof data === 'object') {
-        result = data;
+        result = data
         if (Array.isArray(data)) {
-          result.list = data;
+          result.list = data
         }
       } else {
-        result.data = data;
+        result.data = data
       }
 
       return Promise.resolve({
@@ -74,8 +74,8 @@ export default function request(options) {
         }
       }
 
-      let msg;
-      let statusCode;
+      let msg
+      let statusCode
 
       if (response && response instanceof Object) {
         const { data, statusText } = response
@@ -91,6 +91,6 @@ export default function request(options) {
         success: false,
         statusCode,
         message: msg,
-      });
+      })
     })
 }

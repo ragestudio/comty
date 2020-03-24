@@ -2,99 +2,115 @@
 
 /* Animation */
 
-.parallax > use {
-	animation: move-forever 25s cubic-bezier(.55,.5,.45,.5)     infinite;
-  }
-  .parallax > use:nth-child(1) {
-	animation-delay: -2s;
-	animation-duration: 7s;
-  }
-  .parallax > use:nth-child(2) {
-	animation-delay: -3s;
-	animation-duration: 10s;
-  }
-  .parallax > use:nth-child(3) {
-	animation-delay: -4s;
-	animation-duration: 13s;
-  }
-  .parallax > use:nth-child(4) {
-	animation-delay: -5s;
-	animation-duration: 20s;
-  }
-  @keyframes move-forever {
-	0% {
-	 transform: translate3d(-90px,0,0);
-	}
-	100% { 
-	  transform: translate3d(85px,0,0);
-	}
-  }
-  
-.backgroud{
-	position: absolute;
-	height: 100%;
-	width: 100%;
-	z-index: 0;
-	top: 0;
-	left: 0;
+.parallax>use {
+  animation: move-forever 25s cubic-bezier(.55, .5, .45, .5) infinite;
 }
-.version{
-	display: flex;
-	z-index: 2;
-	font-family: "Poppins", sans-serif;
-	font-size: 11px;
-	bottom: 0;
-	position: absolute;
-	padding: 0 0 5px 3%;
-	color:  #F9F9F9;
-	h2{
-		margin: 0 14px 0 0;
-		color:  #F9F9F9;
-	}
-	:global{
-		.ant-tag {
-			border-radius: 4px;
-		}
-	}
+
+.parallax>use:nth-child(1) {
+  animation-delay: -2s;
+  animation-duration: 7s;
 }
-.loginLandingWrapper{
-	background-color: #F9F9F9;
-	width: 100%;
-	height: 100%;
-	font-family: "Nunito", sans-serif;
-	padding: 15px 30px 15px 35px;
+
+.parallax>use:nth-child(2) {
+  animation-delay: -3s;
+  animation-duration: 10s;
 }
-.brand{
-	width: 100%;
-	top: 0;
-	float: left;
-    vertical-align: middle;
-    position: relative;
-    img{
-		max-width: 250px;
-		width: 11vw;
+
+.parallax>use:nth-child(3) {
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+
+.parallax>use:nth-child(4) {
+  animation-delay: -5s;
+  animation-duration: 20s;
+}
+
+@keyframes move-forever {
+  0% {
+    transform: translate3d(-90px, 0, 0);
+  }
+
+  100% {
+    transform: translate3d(85px, 0, 0);
+  }
+}
+
+.backgroud {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+
+.version {
+  display: flex;
+  z-index: 2;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  bottom: 0;
+  position: absolute;
+  padding: 0 0 5px 3%;
+  color: #F9F9F9;
+
+  h2 {
+    margin: 0 14px 0 0;
+    color: #F9F9F9;
+  }
+
+  :global {
+    .ant-tag {
+      border-radius: 4px;
     }
+  }
 }
-.prest{
-	z-index: 2;
-	position: relative;
-	font-family: "Source Sans Pro", sans-serif;
-	padding: 25px;
-	margin: auto;
-	vertical-align: bottom;
-	img{
-		width: 100%;
-		max-height: 60vh;
-	}
-	.loginbtn{
-		margin: auto;
-		position: relative;
-		display: flex;
-		width: 100%;
-		:global{
-			.ant-btn {
-				margin: auto;
-			}
-		}
-	}
+
+.loginLandingWrapper {
+  background-color: #F9F9F9;
+  width: 100%;
+  height: 100%;
+  font-family: "Nunito", sans-serif;
+  padding: 15px 30px 15px 35px;
+}
+
+.brand {
+  width: 100%;
+  top: 0;
+  float: left;
+  vertical-align: middle;
+  position: relative;
+
+  img {
+    max-width: 250px;
+    width: 11vw;
+  }
+}
+
+.prest {
+  z-index: 2;
+  position: relative;
+  font-family: "Source Sans Pro", sans-serif;
+  padding: 25px;
+  margin: auto;
+  vertical-align: bottom;
+
+  img {
+    width: 100%;
+    max-height: 60vh;
+  }
+
+  .loginbtn {
+    margin: auto;
+    position: relative;
+    display: flex;
+    width: 100%;
+
+    :global {
+      .ant-btn {
+        margin: auto;
+      }
+    }
+  }
 }

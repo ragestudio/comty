@@ -1,10 +1,7 @@
-
 /* global window */
 import { router } from 'utils'
-import { stringify } from 'qs'
 import store from 'store'
-import { queryLayout, pathMatchRegexp } from 'utils'
-import api from 'api'
+import { pathMatchRegexp } from 'utils'
 import config from 'config'
 import * as ycore from 'ycore'
 
@@ -44,28 +41,24 @@ export default {
     },
   },
   effects: {
-   *query({payload}, { call, put, select }) {
-      const validBackup = ycore.ValidBackup();
-      if (ycore.ValidLoginSession() == true) {
-          if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-            router.push({pathname: '/main',})
-          }
-          ycore.MakeBackup()
-          ycore.QueryRuntime()
-          return true
-      } 
-      else if(!pathMatchRegexp(['','/login'], window.location.pathname)) {
-          if (validBackup == true) {
-            ycore.LogoutCall()
-          } 
-          else{
-            router.push({pathname: '/login',})
-          }
+    *query({ payload }, { call, put, select }) {
+      const validBackup = ycore.validate.backup()
+      if (ycore.validate.session() == true) {
+        if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
+          router.push({ pathname: '/main' })
+        }
+        ycore.QueryRuntime()
+        return true
+      } else if (!pathMatchRegexp(['', '/login'], window.location.pathname)) {
+        if (validBackup == true) {
+          ycore.app_session.logout()
+        } else {
+          router.push({ pathname: '/login' })
+        }
       }
-      if(pathMatchRegexp([''], window.location.pathname)){
-        router.push({pathname: '/login',})
+      if (pathMatchRegexp([''], window.location.pathname)) {
+        router.push({ pathname: '/login' })
       }
-
     },
   },
   reducers: {

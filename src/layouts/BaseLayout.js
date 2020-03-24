@@ -41,7 +41,7 @@ class BaseLayout extends PureComponent {
         <Helmet>
           <title>{config.siteName}</title>
         </Helmet>
-           <Container>{children}</Container>
+        <Container>{children}</Container>
       </Fragment>
     )
   }

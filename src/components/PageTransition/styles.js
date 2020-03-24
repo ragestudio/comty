@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled, { css } from 'styled-components'
 
 const createAnimationStyles = ({
   keyframes,
@@ -7,7 +7,7 @@ const createAnimationStyles = ({
   timing,
   fill,
   origin,
-  onTop
+  onTop,
 }) => css`
   animation-name: ${keyframes};
   animation-delay: ${delay};
@@ -19,27 +19,27 @@ const createAnimationStyles = ({
     css`
       z-index: 1;
     `}
-`;
+`
 
 const stateMap = {
   entering: ({ enterAnimation }) => {
     return css`
       ${createAnimationStyles(enterAnimation)};
-    `;
+    `
   },
   exiting: ({ exitAnimation }) => {
     return css`
       ${createAnimationStyles(exitAnimation)};
-    `;
-  }
-};
+    `
+  },
+}
 
 export const PageTransitionGroup = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
   perspective: 1200px;
-`;
+`
 
 export const PageTransition = styled.div`
   backface-visibility: hidden;
@@ -51,4 +51,4 @@ export const PageTransition = styled.div`
   transform: translate3d(0, 0, 0);
   width: 100%;
   ${({ state }) => stateMap[state]};
-`;
+`

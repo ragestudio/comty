@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
-import { Transition, TransitionGroup } from 'react-transition-group';
-import animations from './animations';
-import presets from './presets';
-import * as Styles from './styles';
+import React, { memo } from 'react'
+import { Transition, TransitionGroup } from 'react-transition-group'
+import animations from './animations'
+import presets from './presets'
+import * as Styles from './styles'
 
 function PageTransition({
   children,
@@ -15,48 +15,48 @@ function PageTransition({
   const selectEnterAnimation = () => {
     if (enterAnimationOverride) {
       if (typeof enterAnimationOverride === 'string') {
-        return animations[enterAnimationOverride];
+        return animations[enterAnimationOverride]
       }
       return {
         ...animations[enterAnimationOverride.name],
         delay: enterAnimationOverride.delay,
-        onTop: enterAnimationOverride.onTop
-      };
+        onTop: enterAnimationOverride.onTop,
+      }
     }
     if (preset) {
       return {
         ...animations[presets[preset].enter.name],
         delay: presets[preset].enter.delay,
-        onTop: presets[preset].enter.onTop
-      };
+        onTop: presets[preset].enter.onTop,
+      }
     }
-    return 'rotateSlideIn';
-  };
+    return 'rotateSlideIn'
+  }
 
   const selectExitAnimation = () => {
     if (exitAnimationOverride) {
       if (typeof exitAnimationOverride === 'string') {
-        return animations[exitAnimationOverride];
+        return animations[exitAnimationOverride]
       }
       return {
         ...animations[exitAnimationOverride.name],
         delay: exitAnimationOverride.delay,
-        onTop: exitAnimationOverride.onTop
-      };
+        onTop: exitAnimationOverride.onTop,
+      }
     }
     if (preset) {
       return {
         ...animations[presets[preset].exit.name],
         delay: presets[preset].exit.delay,
-        onTop: presets[preset].exit.onTop
-      };
+        onTop: presets[preset].exit.onTop,
+      }
     }
-    return 'rotateSlideIn';
-  };
+    return 'rotateSlideIn'
+  }
 
-  const enterAnimation = selectEnterAnimation();
-  const exitAnimation = selectExitAnimation();
-  const timeout = Math.max(enterAnimation.duration, exitAnimation.duration);
+  const enterAnimation = selectEnterAnimation()
+  const exitAnimation = selectExitAnimation()
+  const timeout = Math.max(enterAnimation.duration, exitAnimation.duration)
 
   return (
     <Styles.PageTransitionGroup {...rest}>
@@ -74,7 +74,7 @@ function PageTransition({
         </Transition>
       </TransitionGroup>
     </Styles.PageTransitionGroup>
-  );
+  )
 }
 
-export default memo(PageTransition);
+export default memo(PageTransition)
