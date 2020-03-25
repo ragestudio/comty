@@ -1,9 +1,9 @@
-import { yConfig, yconsole, endpoints, token_data } from 'ycore'
+import { __server, yconsole, endpoints, token_data } from 'ycore'
 
 export const get_app_session = {
   get_id: callback => {
     let formdata = new FormData()
-    formdata.append('server_key', yConfig.server_key)
+    formdata.append('server_key', __server.getKey())
     formdata.append('type', 'get')
     const requestOptions = {
       method: 'POST',
@@ -24,7 +24,7 @@ export const get_app_session = {
   },
   raw: callback => {
     const formdata = new FormData()
-    formdata.append('server_key', yConfig.server_key)
+    formdata.append('server_key', __server.getKey())
     formdata.append('type', 'get')
     const requestOptions = {
       method: 'POST',

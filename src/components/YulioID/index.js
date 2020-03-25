@@ -4,6 +4,7 @@ import { Form, Icon as LegacyIcon } from '@ant-design/compatible'
 
 import { Button, Input, Drawer } from 'antd'
 import * as ycore from 'ycore'
+import * as Icons from '@ant-design/icons'
 
 import styles from './index.less'
 
@@ -19,6 +20,7 @@ class YulioID extends Component {
       MainLoginVisible: true,
       ShowLoading: false,
       Answered: false,
+      transition: false,
     }
   }
   // Handlers & others
@@ -62,11 +64,13 @@ class YulioID extends Component {
 
   handleResponse = response => {
     if (response == '200') {
+      ycore.LoginPage.transitionToogle()
       this.setState({
         StateIcon: 'login',
         StateMessage: 'Wait a sec...',
         StateException: false,
       })
+      
     }
     if (response == '400') {
       this.setState({
@@ -139,10 +143,6 @@ class YulioID extends Component {
                       <br />
                       <div className={styles.resultbox}>
                         <h6> {StateMessage} </h6>
-                        <Button onClick={() => ycore.RefreshONCE()}>
-                          {' '}
-                          Reload{' '}
-                        </Button>
                         {StateException ? (
                           <div className={styles.retryBTN}>
                             <Button
@@ -221,10 +221,10 @@ class YulioID extends Component {
                   </h2>
                   <div className={styles.moreActions}>
                     <Button type="dashed">
-                      <LegacyIcon type="question-circle" /> Forgotten password{' '}
+                      <Icons.QuestionCircleOutlined /> Forgotten password
                     </Button>
                     <Button type="dashed">
-                      <LegacyIcon type="user-add" /> Create an account{' '}
+                      <Icons.UserAddOutlined /> Create an account
                     </Button>
                   </div>
                 </div>

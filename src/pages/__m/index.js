@@ -92,7 +92,7 @@ export default class __m extends React.Component {
             <h2>
               <Icons.CloudServerOutlined /> Server UID
             </h2>
-            <span> {ycore.yConfig.server_key} </span>
+            <span> {ycore.__server.getKey()} </span>
           </antd.Card>
           <antd.Card>
             <h2>

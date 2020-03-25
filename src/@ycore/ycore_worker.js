@@ -21,12 +21,20 @@ export * from '../../config/app.settings.js'
 export * from './libs.js'
 
 export var { router } = require('utils')
-export var yConfig = config.yConfig
 export var endpoints = Endpoints
 
-var package_json = require('../../package.json')
+export const package_json = require('../../package.json')
 
 export const UUAID = `${package_json.name}==${package_json.UUID}`
+
+export const AppInfo = {
+  apid: package_json.name,
+  stage: package_json.stage,
+  name: package_json.title,
+  version: package_json.version,
+  logo: config.FullLogoPath,
+  logo_dark: config.DarkFullLogoPath,
+}
 
 localforage.config({
   name: UUAID,
@@ -34,14 +42,6 @@ localforage.config({
   size: 4980736,
   storeName: package_json.name,
 })
-
-export const AppInfo = {
-  apid: package_json.name,
-  name: package_json.title,
-  version: package_json.version,
-  logo: config.FullLogoPath,
-  logo_dark: config.DarkFullLogoPath,
-}
 
 /**
  * Convert a base64 string in a Blob according to the data and contentType.
@@ -115,21 +115,6 @@ export function uploadFile(file) {
 }
 
 /**
- * (HELPER) Convert the localStorage values (AppSettings) parsed
- *
- * @param e {String} String of SettingID for search
- * @return {string} Boolean value
- */
-export function SettingStoragedValue(e) {
-  try {
-    const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
-    ycore.ReturnValueFromMap({ data: fromStorage, key: e })
-  } catch (error) {
-    return null
-  }
-}
-
-/**
  * Return the value of an object from array
  *
  * @param payload {object} data: (array) | key: (string for return the value)
@@ -147,6 +132,25 @@ export function ReturnValueFromMap(payload) {
     return fr.toString()
   } catch (error) {
     return false
+  }
+}
+
+/**
+ * (HELPER) Convert the localStorage values (AppSettings) parsed
+ *
+ * @param e {String} String of SettingID for search
+ * @return {string} Boolean value
+ */
+export function SettingStoragedValue(e) {
+  try {
+    const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
+    const Ite = fromStorage.map(item => {
+      return item.SettingID === e ? item.value : null
+    })
+    const fr = Ite.filter(Boolean)
+    return fr.toString()
+  } catch (error) {
+    return null
   }
 }
 
@@ -246,7 +250,37 @@ export const crouter = {
  * Framework functionality for show with interface an notification
  *
  */
+const {FieldTimeOutlined} = require('@ant-design/icons')
 export const notify = {
+  expire: (...res) => {
+    antd.notification.error({
+      message: 'Hey ',
+      icon: <FieldTimeOutlined />,
+      description: res,
+      placement: 'bottomLeft',
+    })
+  },
+  info: (...res) => {
+    antd.notification.info({
+      message: 'Well',
+      description: res.toString(),
+      placement: 'bottomLeft',
+    })
+  },
+  exception: (...res) => {
+    antd.notification.error({
+      message: 'WoW!',
+      description: res.toString(),
+      placement: 'bottomLeft',
+    })
+  },
+  warn: (...res) => {
+    antd.notification.warn({
+      message: 'Hey!',
+      description: res.toString(),
+      placement: 'bottomLeft',
+    })
+  },
   success: (...res) => {
     antd.notification.success({
       message: 'Well',

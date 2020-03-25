@@ -1,5 +1,20 @@
 @import '~themes/vars.less';
 
+
+.login_wrapper{
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  &.goOut{
+    clip:rect();
+    animation: go-out 1.5s linear;
+  }
+}
+
 /* Animation */
 
 .parallax>use {
@@ -36,7 +51,18 @@
   }
 }
 
+@keyframes go-out {
+  0% {
+    filter: blur(0px)
+  }
+
+  100% {
+    filter: blur(15px)
+  }
+}
+
 .backgroud {
+  background-color: #2d2d2d;
   position: absolute;
   height: 100%;
   width: 100%;

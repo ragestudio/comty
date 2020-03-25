@@ -8,7 +8,7 @@ export function API_Call(callback, endpoint, payload, options, __token) {
     ycore.yconsole.log(prefix, 'Calling api without Payload!!!')
   }
   let payloadContainer = payload ? payload : new FormData()
-  payloadContainer.append('server_key', ycore.yConfig.server_key)
+  payloadContainer.append('server_key', ycore.__server.getKey())
 
   let fendpoint = `${endpoint}${ycore.token_data.__token()}`
   let method
@@ -64,6 +64,15 @@ export function API_Call(callback, endpoint, payload, options, __token) {
   jquery
     .ajax(requestOptions)
     .done(response => {
+      try {
+        const a = JSON.parse(response)['api_status']
+        if (a == '404') {
+          ycore.Alive_API.tokenError(response)
+        }
+      } catch (error) {
+        ycore.yconsole.log('[VIOLATION] The status of the request has not been identified!')
+        ycore.Alive_API.violation()
+      }
       ycore.yconsole.log(response)
       return callback(false, response)
     })

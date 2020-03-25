@@ -1,6 +1,10 @@
+import { transitionToogle } from '../../../pages/login'
 import { SetControls, CloseControls } from '../../../components/Layout/Control'
 import { SwapMode } from '../../../components/Layout/Secondary'
 import * as ycore from 'ycore'
+import * as antd from 'antd'
+import * as Icons from '@ant-design/icons'
+import React from 'react'
 
 export function QueryRuntime() {
   const validBackup = ycore.validate.backup()
@@ -10,11 +14,14 @@ export function QueryRuntime() {
 
 export function SetupApp() {
   // TODO: Default sets
-  ycore.notify.success('Authorised, please reload the app for login!')
+  ycore.notify.success('Authorised, please wait...')
   const resourceLoad = localStorage.getItem('resource_bundle')
   if (!resourceLoad) {
     localStorage.setItem('resource_bundle', 'light_ng')
   }
+  setTimeout(() => {
+    ycore.crouter.native('main')
+  }, 500)
 }
 
 export const CheckThisApp = {
@@ -45,33 +52,14 @@ export const ControlBar = {
   },
 }
 
-export function RefreshONCE() {
-  window.location = '/'
+export const LoginPage = {
+  transitionToogle: () => {
+    transitionToogle()
+  },
 }
 
-export function DetectNoNStableBuild(e1) {
-  switch (e1) {
-    case 'TagComponent':
-      if (package_json.DevBuild == true) {
-        return React.createElement(antd.Tag, { color: 'orange' }, ' No Stable')
-      }
-      if (package_json.DevBuild == false) {
-        return React.createElement(antd.Tag, { color: 'blue' }, ' Stable')
-      } else {
-        return 'No Stable'
-      }
-      break
-    default:
-      if (package_json.DevBuild == true) {
-        return 'No Stable'
-      }
-      if (package_json.DevBuild == false) {
-        return 'Stable'
-      } else {
-        return 'No Stable'
-      }
-      break
-  }
+export function RefreshONCE() {
+  window.location = '/'
 }
 
 export const app_session = {

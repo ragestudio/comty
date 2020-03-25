@@ -77,11 +77,13 @@ class MainFeed extends React.Component {
           this.setState({ invalid: true })
           return
         }
-        const parsed = JSON.parse(res)['data']
-
-        const isEnd =
-          parsed.length < ycore.AppSettings.limit_post_catch ? true : false
-        this.setState({ isEnd: isEnd, data: parsed, loading: false })
+        try {
+          const parsed = JSON.parse(res)['data']
+          const isEnd =parsed.length < ycore.AppSettings.limit_post_catch ? true : false
+          this.setState({ isEnd: isEnd, data: parsed, loading: false })
+        } catch (error) {
+          ycore.yconsole.log(error)
+        }
       }, payload)
     } catch (err) {
       ycore.notify.error('err')

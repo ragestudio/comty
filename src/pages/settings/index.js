@@ -1,16 +1,14 @@
 import React from 'react'
-import { GridContent } from '@ant-design/pro-layout'
-import { Menu, Typography } from 'antd'
-import * as antd from 'antd'
-import * as ycore from 'ycore'
+import { Menu } from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from './style.less'
 
-import NotificationView from './components/notification.js'
-import SecurityView from './components/security.js'
+import NotificationView from './components/notification/index.js'
+import SecurityView from './components/security/index.js'
+import Earnings from './components/earnings/index.js'
+
 import Base from './components/base.js'
 import AppAbout from './components/about.js'
-import Earnings from './components/earnings.js'
 
 const { Item } = Menu
 const menuMap = {

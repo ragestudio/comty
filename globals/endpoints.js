@@ -9,6 +9,7 @@ module.exports = {
         get_posts: "https://api.ragestudio.net/RSA-COMTY/r/posts?access_token=",
         find_user: "https://api.ragestudio.net/RSA-COMTY/r/find_user?access_token=",
         search_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/search?access_token=",
+        all_sessions: "https://api.ragestudio.net/RSA-COMTY/r/sessions?access_token=",
         get_sessions: "https://api.ragestudio.net/RSA-COMTY/r/session_id?access_token=",
         auth_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/auth",
         new_post: "https://comty.julioworld.club/api/new_post?access_token=",

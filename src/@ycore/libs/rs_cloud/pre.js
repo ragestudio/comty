@@ -1,5 +1,6 @@
 import * as ycore from 'ycore'
 export * from './api_call.js'
+import keys from '../../../../config/keys.js'
 
 export const Alive_API = {
   fail: a => {
@@ -7,6 +8,23 @@ export const Alive_API = {
       ycore.yconsole.log(a)
       ycore.notify.error(a)
     }
+  },
+  tokenError: a => {
+    ycore.notify.expire(
+      'It seems that your token has expired or no longer exists'
+    )
+    ycore.crouter.native('login')
+  },
+  violation: a => {
+    ycore.notify.expire(
+      'It seems that there has been a problem with your token, we need you to log in again.'
+    )
+    ycore.crouter.native('login')
+  },
+}
+export const __server = {
+  getKey: () => {
+    return keys.server_key
   },
 }
 export const __rscloud = {

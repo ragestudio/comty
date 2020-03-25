@@ -1,9 +1,9 @@
 import React from 'react'
 import * as ycore from 'ycore'
 import * as Icons from '@ant-design/icons'
-import styles from './notification.less'
+import styles from './index.less'
 
-class NotificationView extends React.Component {
+export default class NotificationView extends React.Component {
   render() {
     return (
       <div className={styles.main}>
@@ -15,4 +15,3 @@ class NotificationView extends React.Component {
   }
 }
 
-export default NotificationView
