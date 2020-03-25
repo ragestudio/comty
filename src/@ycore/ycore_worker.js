@@ -121,15 +121,14 @@ export function uploadFile(file) {
  * @return {string} Boolean value
  */
 export function ReturnValueFromMap(payload) {
-  if (!payload) {
-    return false
-  }
+  if (!payload) return false
+  const { data, key } = payload
   try {
-    const Ite = payload.data.map(item => {
-      return item.key === payload.key ? item.value : null
+    const a = data.map(item => {
+      return item.key === key ? item.value : null
     })
-    const fr = Ite.filter(Boolean)
-    return fr.toString()
+    const b = a.filter(Boolean)
+    return b.toString()
   } catch (error) {
     return false
   }

@@ -172,7 +172,13 @@ class PostCreator extends React.PureComponent {
         return false
       }
       const id_temp_parse = JSON.parse(res)['data'].id
-      if (ycore.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })) {
+      
+      const pro_boost_val = ycore.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
+      const allow_comments_val = ycore.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
+     
+      ycore.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
+
+      if (pro_boost_val) {
         ycore.yconsole.log(`Boosting post with ID => ${id_temp_parse}`)
         ycore.comty_post.__boost(
           (err, res) => {
@@ -182,7 +188,7 @@ class PostCreator extends React.PureComponent {
         )
       }
       if (
-        ycore.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
+        !allow_comments_val
       ) {
         ycore.yconsole.log(`Disabling comments with ID => ${id_temp_parse}`)
         ycore.comty_post.__disableComments(
