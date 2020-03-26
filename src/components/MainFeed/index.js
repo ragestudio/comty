@@ -18,6 +18,9 @@ export const RenderFeed = {
     window.MainFeedComponent.addToRend(payload)
     return
   },
+  disableMenu: () => {
+
+  },
 }
 class MainFeed extends React.Component {
   constructor(props) {

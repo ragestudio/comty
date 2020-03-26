@@ -1,3 +1,4 @@
+import { RenderFeed } from '../../../components/MainFeed'
 import { transitionToogle } from '../../../pages/login'
 import { SetControls, CloseControls } from '../../../components/Layout/Control'
 import { SwapMode } from '../../../components/Layout/Secondary'
@@ -20,7 +21,7 @@ export function SetupApp() {
     localStorage.setItem('resource_bundle', 'light_ng')
   }
   setTimeout(() => {
-    ycore.crouter.native('main')
+    ycore.router.go('main')
   }, 500)
 }
 
@@ -41,6 +42,9 @@ export const SecondarySwap = {
   openPost: e => {
     SwapMode.openPost(e)
   },
+  openSearch: e => {
+    SwapMode.openSearch(e)
+  }
 }
 
 export const ControlBar = {

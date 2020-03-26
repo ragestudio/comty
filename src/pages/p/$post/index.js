@@ -41,7 +41,7 @@ export default class Indexer_Post extends React.Component {
   }
 
   render() {
-    ycore.crouter.native('main')
+    ycore.router.go('main')
     return null
   }
 }

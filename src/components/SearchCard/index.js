@@ -52,7 +52,7 @@ class SearchCard extends React.PureComponent {
             title={
               <div className={styles.titleWrapper}>
                 <h4
-                  onClick={() => ycore.crouter.native(`@${username}`)}
+                  onClick={() => ycore.router.go(`@${username}`)}
                   className={styles.titleUser}
                 >
                   {DataStrip.title()}

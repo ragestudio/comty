@@ -1,4 +1,4 @@
-import { API_Call, endpoints, AppSettings } from 'ycore'
+import { API_Call, endpoints, AppSettings, yconsole } from 'ycore'
 
 export const comty_post = {
   getFeed: (callback, payload) => {
@@ -124,6 +124,29 @@ export const comty_post = {
         return callback(err, res)
       },
       endpoints.action_post,
+      formdata
+    )
+  },
+  getSaved: (callback, payload) => {
+    if (!payload) {
+      yconsole.log(
+        'Calling api without Payload!!! | Limmit & OffsetKey = default |'
+      )
+    }
+    if (payload) {
+      const { limit, fkey } = payload
+    }
+
+    let formdata = new FormData()
+    formdata.append('type', 'saved')
+    formdata.append('limit', payload? limit : AppSettings.limit_post_catch || 20)
+    formdata.append('after_post_id', payload? fkey : 0)
+
+    API_Call(
+      (err, res) => {
+        return callback(err, res)
+      },
+      endpoints.get_posts,
       formdata
     )
   },

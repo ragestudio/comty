@@ -13,13 +13,13 @@ export const Alive_API = {
     ycore.notify.expire(
       'It seems that your token has expired or no longer exists'
     )
-    ycore.crouter.native('login')
+    ycore.router.go('login')
   },
   violation: a => {
     ycore.notify.expire(
       'It seems that there has been a problem with your token, we need you to log in again.'
     )
-    ycore.crouter.native('login')
+    ycore.router.go('login')
   },
 }
 export const __server = {

@@ -1,0 +1,182 @@
+
+// FOR LAYOUTS
+@__Global_general_font_family: "Poppins", sans-serif;
+@__Global_layout_backgroud: #F8F6F8;
+@__Global_layout_color: #2d2d2d;
+@__Global_layout_border-rd: 27px 0 0 0;
+@__Global_layout_transitions-dur: 200ms; 
+@__Global_Components_transitions_dur: 150ms;
+
+@mamamia: #85858570;
+// FOR SECONDARY
+@__Global_SwapAnimDuration: 170ms;
+
+@transition-ease-in: all 0.3s ease-out;
+@transition-ease-out: all 0.3s ease-out;
+@ease-in: ease-in;
+
+::-webkit-scrollbar {
+    width: 14px;
+    height: 18px;
+  }
+::-webkit-scrollbar-thumb {
+    height: 6px;
+    border: 4px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    margin: 0 10px 0 0;
+    -webkit-border-radius: 7px;
+    background-color: rgba(0, 0, 0, 0.15);
+    -webkit-box-shadow: inset -1px -1px 0px rgba(0, 0, 0, 0.05), inset 1px 1px 0px rgba(0, 0, 0, 0.05);
+}
+::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+// Global Documents
+body {
+  height: 100%;
+  overflow-y: hidden;
+  background-color: transparent; // rgb(249, 249, 249);
+}
+
+@media (min-width: 1600px) {
+  :global {
+    .ant-col-xl-48 {
+      width: 20%;
+    }
+
+    .ant-col-xl-96 {
+      width: 40%;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  :global {
+    .ant-card {
+      .ant-card-head {
+        padding: 0 12px;
+      }
+
+      .ant-card-body {
+        padding: 12px;
+      }
+    }
+  }
+}
+
+// PrimaryLayout 
+@media (max-width: 767px) {
+    .primary_layout_content {
+      padding: 12px;
+    }
+  
+    .primary_layout {
+      height: 100vh;
+      flex: 1;
+    }
+}
+
+// .primary_layout_*
+@primary_layout_backgroud: #2d2d2d;
+
+@primary_layout_container_backgroud: @__Global_layout_backgroud;
+@primary_layout_container_border-rd: @__Global_layout_border-rd;
+
+@primary_layout_content_padding: 35px 25px 15px 40px;
+
+// .secondary_*
+@__secondary_colider_width: 31.2vw;
+@secondary_wrapper_hidden_width: 22vw;
+@secondary_wrapper_showFull_width: 94.2vw;
+@secondary_wrapper_showHalf_width: 35vw;
+@secondary_container_bg_background: #201F23;
+@secondary_container_1_color: #fff;
+@secondary_container_2_color: #201F23;
+@secondary_container_2_backgroud: #fff;
+@secondary_container_1_btn_backgroud: #4c4c4c;
+@secondary_container_1_btn_color: #fff;
+@secondary_container_1_btn_shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.205);
+
+@secondary_container_1_padding: 30px 70px 30px 75px;
+@secondaty_container_2_padding: 20px 15px 15px 15px;
+
+// .left_sider*
+@left_sider_backgroud: #2d2d2d;
+@left_sider_color: #fff;
+@left_sider_sizeIcons: 19px;
+@left_sider_menu__onhover_backgroud: rgb(80, 80, 80);
+@left_sider_menu__onhover_color: #fff;
+
+// .post_card*
+@post_card_general_border-rd: 7px;
+@post_card_wrapper_shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+@post_card_wrapper_actions_backgroud: rgba(235, 235, 235, 0.815);
+@post_card_wrapper_actions_icon_backgroud: #fff;
+
+@post_card_wrapper_tags_color_default: rgb(249, 179, 64);
+@post_card_wrapper_tags_color_nsfw: #111;
+@post_card_wrapper_tags_color_flag: #111;
+
+@post_card_wrapper_post_content_color: #555555;
+@post_card_wrapper_post_content_weight: 400;
+@post_card_wrapper_post_content_fontSize: 15px;
+@post_card_wrapper_post_content_letterSpacing: -0.3px;
+
+@post_card_flaggedWarning_backgroud: #ffffff60;
+@post_card_flaggedWarning_padding: 20px 15px 25px 15px;
+@post_card_flaggedWarning_iconSize: 40px;
+
+// YulioID
+@canvasColor: #f9f9f9;
+@backgroundColor: #fff;
+@foregroundColor: #111;
+@primaryColor: #373F51;
+@primaryShade1: #ffe2d1;
+@primaryShade2: #ffceb2;
+@primaryShade3: #ffb184;
+@primaryShade4: #e88850;
+@primaryShade5: #d17a48;
+@secondaryColor: #ffcc67;
+@secondaryShade1: #fff1d5;
+@secondaryShade2: #ffde9e;
+@secondaryShade3: #ffd074;
+@secondaryShade4: #e8ba5e;
+@secondaryShade5: #ba954b;
+@accentColor: #4e5166;
+@accentShade1: #cecfd5;
+@accentShade2: #aeafb9;
+@accentShade3: #8e909d;
+@accentShade4: #6e7081;
+@accentShade5: #404354;
+@accent2Color: #588b8b;
+@accent2Shade1: #c2d4d4;
+@accent2Shade2: #a3bfbf;
+@accent2Shade3: #85aaaa;
+@accent2Shade4: #507f7f;
+@accent2Shade5: #497272;
+@accent3Color: #fe5f55;
+@accent3Shade1: #fec4c1;
+@accent3Shade2: #fea7a2;
+@accent3Shade3: #fe7c73;
+@accent3Shade4: #e7574e;
+@accent3Shade5: #b9463e;
+
+@neutralShade0: #f8f8f8;
+@neutralShade1: #f2f2f2;
+@neutralShade2: #e8e9e9;
+@neutralShade3: #d1d3d4;
+@neutralShade4: #babdbf;
+@neutralShade5: #808488;
+@neutralShade6: #666a6d;
+@neutralShade7: #4d5052;
+@neutralShade8: #212122;
+@grayColor: #999;
+@lightGrayColor: #ddd;
+@borderRadius: 6px;
+@boxShadow: 0 2px 5px rgba(#333, 0.2);

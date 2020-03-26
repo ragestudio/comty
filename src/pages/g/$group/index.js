@@ -55,7 +55,6 @@ class GroupIndexer extends PureComponent {
         </div>
       )
     } catch (error) {
-      console.log(error)
       return (
         <center>
           <h2>Render Error</h2>

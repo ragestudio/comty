@@ -30,10 +30,16 @@ export default class HeaderSearch extends Component {
     }
   }
 
+  openSearcher = () => {
+    const { value } = this.state
+    ycore.SecondarySwap.openSearch(value);
+  }
+
   sendToSearch = () => {
     const { value } = this.state
-    ycore.crouter.native(`s/${value}`)
+    ycore.router.go(`s/${value}`)
   }
+  
   onChange = e => {
     const { value } = e.target
     this.setState({ value: value })
@@ -41,6 +47,7 @@ export default class HeaderSearch extends Component {
       this.autosend()
     }
   }
+
   autosend = () => {
     let timeout = null
     let input = document.getElementById('search_input')
@@ -48,7 +55,7 @@ export default class HeaderSearch extends Component {
       clearTimeout(timeout)
       timeout = setTimeout(() => {
         const { value } = this.state
-        ycore.crouter.native(`s/${value}`)
+        ycore.router.go(`s/${value}`)
       }, 500)
     })
   }
@@ -67,7 +74,7 @@ export default class HeaderSearch extends Component {
             prefix={<Icons.SearchOutlined />}
             placeholder=" Search on Comty..."
             onChange={this.onChange}
-            onPressEnter={this.sendToSearch}
+            onPressEnter={this.openSearcher}
           />
         </span>
       </div>

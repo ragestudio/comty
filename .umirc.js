@@ -3,9 +3,8 @@ import { resolve } from 'path'
 import { i18n } from './config/ycore.config.js'
 export default {
   ignoreMomentLocale: true,
-  targets: {
-    ie: 9,
-  },
+  hash: true,
+  targets: { ie: 9,},
   treeShaking: true,
   plugins: [
     [
@@ -13,7 +12,6 @@ export default {
       {
         dva: {
           immer: true,
-          hmr: true,
         },
         antd: true,
         dynamicImport: {
@@ -52,13 +50,12 @@ export default {
             return routes
           },
         },
-        dll: false,
+        dll:false,
         pwa: {
           manifestOptions: {
             srcPath: 'manifest.json',
           },
         },
-        hd: false,
       },
     ],
   ],
@@ -68,13 +65,11 @@ export default {
   // Webpack Configuration
   alias: {
     ycore: resolve(__dirname, './src/@ycore/ycore_worker.js'),
-    api: resolve(__dirname, './src/services/'),
     globals: resolve(__dirname, './globals'),
     components: resolve(__dirname, './src/components'),
     config: resolve(__dirname, './config/ycore.config.js'),
     models: resolve(__dirname, './src/models'),
     routes: resolve(__dirname, './src/routes'),
-    services: resolve(__dirname, './src/services'),
     themes: resolve(__dirname, './src/themes'),
     utils: resolve(__dirname, './src/utils'),
   },
@@ -90,4 +85,7 @@ export default {
       'lodash',
     ],
   ],
+
+  
+
 }

@@ -53,7 +53,7 @@ class UserProfile extends React.Component {
           ycore.yconsole.log('Bad response / User not found')
           const val = { id: null, username: 'User not found!' }
           this.setState({ invalid: true, RenderValue: val, loading: false })
-          ycore.crouter.native(`main`)
+          ycore.router.go(`main`)
           antd.message.warning(`Its seams like @${string} not exist`)
           return
         }
@@ -61,7 +61,7 @@ class UserProfile extends React.Component {
         const c2 = string.toLowerCase()
         if (c1 !== c2) {
           ycore.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
-          ycore.crouter.native(`@${c1}`)
+          ycore.router.go(`@${c1}`)
         }
 
         const payload = { id: rp['0'].user_id }

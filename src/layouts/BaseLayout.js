@@ -7,6 +7,7 @@ import { queryLayout } from 'utils'
 import NProgress from 'nprogress'
 import config from 'config'
 import withRouter from 'umi/withRouter'
+import {AppSettings} from 'ycore'
 
 import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'
@@ -41,6 +42,8 @@ class BaseLayout extends PureComponent {
         <Helmet>
           <title>{config.siteName}</title>
         </Helmet>
+        {Loader( AppSettings.InfiniteLoading? {spinning: true} : loading )}
+  
         <Container>{children}</Container>
       </Fragment>
     )

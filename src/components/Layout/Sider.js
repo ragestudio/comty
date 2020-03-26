@@ -6,135 +6,119 @@ import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 
 import { withI18n, Trans } from '@lingui/react'
-import ScrollBar from '../ScrollBar'
 import { config } from 'utils'
 import styles from './Sider.less'
 import * as ycore from 'ycore'
 import router from 'umi/router'
-import { CustomIcons } from 'components'
+import CustomIcons from '../CustomIcons'
 
 @withI18n()
 class Sider extends PureComponent {
   constructor(props) {
     super(props)
     this.state = {
+      selectedKey: '',
       isHover: false,
-      collapsedWidth: '30',
+      collapsedWidth: '70',
     }
   }
 
-  StrictMode = () => {
-    const { theme } = this.props
-    if (ycore.AppSettings.StrictLightMode == false) {
-      return 'dark'
-    }
-    return theme
-  }
-
-  handleClickMenu = e => {
-    e.key === 'SignOut' && ycore.app_session.logout()
-    e.key === 'general_settings' && ycore.crouter.native('settings')
-    e.key === 'accountpage' && router.push('/account')
-    e.key === 'explore' && router.push('main')
-    e.key === 'admin_area' && router.push('__m')
-  }
-
-  isDarkMode() {
-    const { theme } = this.props
-    if (theme == 'dark') {
+  isSelected(key){
+    if (this.state.selectedKey == (key)) {
       return true
     }
     return false
   }
+  
+  onClickFunctions = {
+    saves: (e) => {
+      this.setState({selectedKey: e})
+      ycore.router.go('saves')  
+    },
+    events: (e) => {
+     this.setState({selectedKey: e})
+     ycore.router.go('events')
+    },
+    marketplace: (e) => {
+      this.setState({selectedKey: e})
+      ycore.router.go('marketplace') 
+    },
+    explore: (e) => {
+      this.setState({selectedKey: e})
+      ycore.router.go('main') 
+    },
+  }
+
+  handleClickMenu = e => {
+    e.key === 'SignOut' && ycore.app_session.logout()
+    e.key === 'general_settings' && ycore.router.go('settings')
+    e.key === 'saves' && this.onClickFunctions.saves(e.key)
+    e.key === 'events' && this.onClickFunctions.events(e.key)
+    e.key === 'marketplace' && this.onClickFunctions.marketplace(e.key)
+    e.key === 'explore' && this.onClickFunctions.explore(e.key)
+    e.key === 'debug_area' && ycore.router.go('__m')
+  }
 
   render() {
-    const {
-      theme,
-      userData,
-      collapsed,
-      onThemeChange,
-      onCollapseChange,
-    } = this.props
     return (
-      <div className={styles.siderwrapper}>
+      <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
-          breakpoint="lg"
           trigger={null}
-          collapsible
-          defaultCollapsed="true"
-          collapsedWidth={this.state.collapsedWidth}
-          theme={this.StrictMode()}
-          width="180"
-          collapsed={collapsed}
-          className={classnames(styles.sider, {
-            [styles.darkmd]: this.isDarkMode(),
-            [styles.desktop_mode]: this.props.desktop_mode,
-          })}
-          onMouseEnter={() => this.setState({ collapsedWidth: '90' })}
-          onMouseLeave={() => this.setState({ collapsedWidth: '35' })}
+          collapsed
+          width="90"
+          className={styles.left_sider_container}
         >
-          <div className={styles.brand}>
+          <div className={styles.left_sider_brandholder}>
             <img
-              onClick={() => ycore.crouter.native('main')}
-              src={collapsed ? config.LogoPath : config.FullLogoPath}
+              onClick={() => ycore.router.go('main')}
+              src={config.LogoPath}
             />
           </div>
-          <div
-            className={
-              this.StrictMode()
-                ? styles.CollapserWrapperLight
-                : styles.CollapserWrapperDark
-            }
-          >
-            <antd.Button
-              width={'20px'}
-              onClick={() => onCollapseChange(!collapsed)}
-              icon={
-                collapsed ? (
-                  <Icons.RightOutlined />
-                ) : (
-                  <Icons.DoubleLeftOutlined />
-                )
-              }
-            />
-          </div>
-          <div className={styles.menuContainer}>
-            <ScrollBar options={{ suppressScrollX: true }}>
+         
+          <div className={styles.left_sider_menuContainer}>
+           
               <antd.Menu
-                className={
-                  collapsed ? styles.menuItemsCollapsed : styles.menuItems
-                }
+                selectable={false}
+                className={styles.left_sider_menuItems}
                 mode="vertical"
                 onClick={this.handleClickMenu}
               >
                 <antd.Menu.Item key="explore">
-                  <Icons.CompassOutlined />
+                  <Icons.CompassTwoTone twoToneColor={this.isSelected('explore')? "#28c35d" : "#85858570"} />
                   <Trans>
                     <span>Explore</span>
                   </Trans>
                 </antd.Menu.Item>
 
-                <antd.Menu.Item key="journal_page">
-                  <Icons.ReadOutlined />
+                <antd.Menu.Item key="saves">
+                  <Icon component={this.isSelected('saves')? CustomIcons.SavedPostColor : CustomIcons.SavedPostGrey} />
                   <Trans>
-                    <span>Journal</span>
+                    <span>Saves</span>
                   </Trans>
                 </antd.Menu.Item>
 
-                <antd.Menu.Item key="marketplace_page">
-                  <Icons.ReconciliationOutlined />
+               
+                <antd.Menu.Item key="marketplace">
+                  <Icons.ShoppingTwoTone twoToneColor={this.isSelected('marketplace')? "#ff7a45" : "#85858570" }/>
                   <Trans>
                     <span>Marketplace</span>
                   </Trans>
                 </antd.Menu.Item>
+         
+
+              <antd.Menu.Item key="events">
+                  <Icons.CarryOutTwoTone twoToneColor={this.isSelected('events')? "#ff4d4f" : "#85858570"}/>
+                  <Trans>
+                    <span>Events</span>
+                  </Trans>
+              </antd.Menu.Item>
+
               </antd.Menu>
 
               <div className={styles.something_thats_pulling_me_down}>
                 <antd.Menu
                   selectable={false}
-                  className={
-                    collapsed ? styles.menuItemsCollapsed : styles.menuItems
-                  }
+                  className={styles.left_sider_menuItems}
                   mode="vertical"
                   onClick={this.handleClickMenu}
                 >
@@ -144,52 +128,25 @@ class Sider extends PureComponent {
                       <span>Settings</span>
                     </Trans>
                   </antd.Menu.Item>
-                  {ycore.booleanFix(userData.admin) ? (
-                    <antd.Menu.Item key="admin_area">
+                  {ycore.IsThisUser.dev() ? (
+                    <antd.Menu.Item key="debug_area">
                       <Icons.ThunderboltOutlined />
-                      <Trans>
-                        <span>{userData.username}</span>
-                      </Trans>
+                      <span>Debug</span>
                     </antd.Menu.Item>
                   ) : (
                     undefined
                   )}
-                  <antd.Menu.Item
-                    style={{ fontSize: '15px' }}
-                    key="LightMode"
-                    disabled={false}
-                  >
-                    {collapsed ? (
-                      <Icons.BulbOutlined />
-                    ) : (
-                      <div className={styles.themeSwitcher}>
-                        <antd.Switch
-                          onChange={onThemeChange.bind(
-                            this,
-                            theme === 'light' ? 'dark' : 'light'
-                          )}
-                          checkedChildren={
-                            <CustomIcons.MoonSVG
-                              style={{ vertialAlign: 'middle' }}
-                            />
-                          }
-                          unCheckedChildren={
-                            <CustomIcons.SunSVG
-                              style={{ vertialAlign: 'middle' }}
-                            />
-                          }
-                          defaultChecked={theme === 'dark'}
-                        />
-                      </div>
-                    )}
-                  </antd.Menu.Item>
+
                   <antd.Menu.Item key="SignOut">
                     <Icons.LogoutOutlined style={{ color: 'red' }} />
-                    {collapsed ? null : <Trans>Logout</Trans>}
+                     <Trans>
+                       <span>Logout</span>
+                     </Trans>
                   </antd.Menu.Item>
+
                 </antd.Menu>
               </div>
-            </ScrollBar>
+   
           </div>
         </antd.Layout.Sider>
       </div>

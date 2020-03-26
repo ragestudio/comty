@@ -21,15 +21,12 @@ export default class __m extends React.Component {
   }
 
   componentDidMount() {
-    if (ycore.IsThisUser.dev() == false || ycore.IsThisUser.admin() == false) {
-      return ycore.crouter.native('main')
-    }
     this.handleSID()
     this.handleToken()
   }
 
   handleSID() {
-    ycore.get_app_session.get_id((err, response) => {
+    ycore.comty_get.session_id((err, response) => {
       if (err) {
         return ycore.notify.error(err)
       }

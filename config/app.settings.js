@@ -23,13 +23,10 @@ export var AppSettings = {
   DisablePasswordRecover: true,
   // Activating this, the logs must be trowed
   force_showDevLogs: fromStorage? SettingStoragedValue('force_showDevLogs') : false,
-  StrictLightMode: fromStorage? SettingStoragedValue('strict_lightMode') : false,
   SignForNotExpire: fromStorage? SettingStoragedValue('sessions_noexpire') : false,
   auto_search_ontype: fromStorage? SettingStoragedValue('auto_search_ontype') : false,
   auto_feedrefresh: fromStorage? SettingStoragedValue('auto_feedrefresh') : false,
-  default_showpostcreator: fromStorage? SettingStoragedValue('default_showpostcreator') : false,
-  default_collapse_sider: fromStorage? SettingStoragedValue('default_collapse_sider') : true,
-  force_show_postactions: fromStorage? SettingStoragedValue('force_show_postactions') : false,
+  auto_hide_postbar: fromStorage? SettingStoragedValue('auto_hide_postbar') : true,
   MaxLengthPosts: '512',
   CurrentBundle: 'light_ng',
   // In KB

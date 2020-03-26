@@ -59,19 +59,19 @@ class SearchPageIndexer extends PureComponent {
 
       const users = () => {
         if (usersParsed.length >= 1) {
-          console.log('Users => ', usersParsed)
+          ycore.yconsole.log('Users => ', usersParsed)
           return this.EntryComponent('Users', usersParsed)
         }
       }
       const groups = () => {
         if (groupsParsed.length >= 1) {
-          console.log('Groups => ', groupsParsed)
+          ycore.yconsole.log('Groups => ', groupsParsed)
           return this.EntryComponent('Groups', groupsParsed)
         }
       }
       const pages = () => {
         if (pagesParsed.length >= 1) {
-          console.log('Pages => ', pagesParsed)
+          ycore.yconsole.log('Pages => ', pagesParsed)
           return this.EntryComponent('Pages', pagesParsed)
         }
       }
@@ -86,7 +86,6 @@ class SearchPageIndexer extends PureComponent {
 
       return [users(), groups(), pages()]
     } catch (error) {
-      console.log(error)
       return (
         <center>
           <h2>Render Error</h2>
@@ -119,7 +118,6 @@ class SearchPageIndexer extends PureComponent {
         </div>
       )
     } catch (error) {
-      console.log(error)
       return (
         <center>
           <h2>Render Error</h2>
@@ -137,7 +135,7 @@ class SearchPageIndexer extends PureComponent {
     const string = raw.replace('/s/', '')
 
     if (matchSearch) {
-      console.log(`Search matched!  ${location.pathname}`)
+      ycore.yconsole.log(`Search matched!  ${location.pathname}`)
       return (
         <div>
           <h1 className={styles.searchHeader}>

@@ -1,4 +1,4 @@
-@import '~themes/vars.less';
+@import '~themes/index.less';
 
 .SecondaryBody {
   width: 100%;
@@ -130,6 +130,7 @@
 }
 
 .comments_body {
+  height: 100%;
   font-family: "Poppins", sans-serif;
   padding: 75px 10px 10px 20px;
 
@@ -145,7 +146,7 @@
   .comments_cards_wrapper {
     z-index: 50;
     overflow: scroll;
-
+    height: 84%;
     :global {
       overflow: scroll;
     }
@@ -218,6 +219,54 @@
         }
       }
     }
+  }
+
+}
+
+.search_wrapper{
+  color: #ffffff;
+  height: 100%;
+  width: 82%;
+  margin: auto;
+  :global{
+    .ant-list-items{
+      height: 82vh;
+      overflow: scroll;
+    }
+  }
+}
+
+.search_card {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.034);
+  margin: 10px 0 10px 0;
+  border-radius: 8px;
+  padding: 10px;
+  word-break: break-all;
+  color: #ffffff;
+  cursor: pointer;
+
+  .search_title {
+    display: flex;
+
+    img {
+      float: left;
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+    }
+
+    .search_user_username {
+      margin: 0 5px 0 8px;
+      vertical-align: middle;
+      height: 100%;
+      color: #ffffff;      
+      line-height: 25px;
+    }
+  }
+
+  .search_text {
+    margin: 10px 0 0 0;
   }
 
 }

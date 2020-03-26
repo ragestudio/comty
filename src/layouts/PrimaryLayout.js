@@ -94,41 +94,27 @@ class PrimaryLayout extends React.Component {
     }
 
     const SecondaryProps = {
-      desktop_mode: desktop_mode,
       userData,
       isMobile,
-      theme,
     }
 
     return (
       <React.Fragment>
-        <div
-          className={classnames(styles.AppWrapper, {
-            [styles.desktop_mode]: desktop_mode,
-          })}
-        >
           {isMobile ? <MobileWarning /> : null}
-          <div className={styles.BarControlWrapper}>
+          <div className={styles.__ControlBar}>
             <Control />
           </div>
-          <antd.Layout
-            className={classnames(styles.layout, {
-              [styles.md_dark]: this.isDarkMode(),
-              [styles.desktop_mode]: desktop_mode,
-            })}
-          >
+          <antd.Layout id="primaryLayout" className={styles.primary_layout}>
             <Sider {...SiderProps} />
 
-            <div id="primaryLayout" className={styles.leftContainer}>
+            <div className={styles.primary_layout_container}>
               <PageTransition
                 preset="moveToRightScaleUp"
-                id="scroller"
                 transitionKey={location.pathname}
               >
                 <Content
-                  className={classnames(styles.content, {
-                    [styles.collapsed]: !collapsed,
-                  })}
+                  id="primaryContent"
+                  className={styles.primary_layout_content}
                 >
                   <HeaderSearch />
                   {children}
@@ -138,7 +124,6 @@ class PrimaryLayout extends React.Component {
 
             <Secondary {...SecondaryProps} />
           </antd.Layout>
-        </div>
       </React.Fragment>
     )
   }

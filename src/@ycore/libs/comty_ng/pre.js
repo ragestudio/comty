@@ -5,7 +5,6 @@ import { RenderFeed } from 'components/MainFeed'
 export * from './comty_post.js'
 export * from './comty_user.js'
 export * from './comty_post_comment.js'
-export * from './get_app_session.js'
 export * from './comty_search.js'
 export * from './comty_get.js'
 
@@ -30,6 +29,9 @@ export const IsThisPost = {
     return false
   },
   boosted: () => {
+
+  },
+  saved: () => {
 
   },
   pinned: () => {

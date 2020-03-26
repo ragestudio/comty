@@ -78,7 +78,7 @@ class PostCard extends React.PureComponent {
 
   render() {
     const { payload, customActions } = this.props
-    const ActShowMode = ycore.AppSettings.force_show_postactions
+    const ActShowMode = ycore.AppSettings.auto_hide_postbar
     const {
       id,
       post_time,
@@ -196,15 +196,15 @@ class PostCard extends React.PureComponent {
     )
 
     return (
-      <div className={styles.cardWrapper}>
+      <div className={styles.post_card_wrapper}>
         <antd.Card
           onDoubleClick={() => this.goToPost(id)}
           hoverable
-          className={ActShowMode ? styles.showMode : null}
+          className={ActShowMode ? null : styles.showMode}
           actions={actions}
         >
           {this.state.ReportIgnore ? null : this.state.postReported ? (
-            <div className={styles.flaggedWarning}>
+            <div className={styles.post_card_flaggedWarning}>
               <Icons.FlagOutlined />
               <h3>It seems that this post has been reported</h3>
               <p>The content may be inappropriate or compromising</p>
@@ -235,14 +235,14 @@ class PostCard extends React.PureComponent {
                 </div>
               }
               title={
-                <div className={styles.titleWrapper}>
+                <div className={styles.post_card_title}>
                   <h4
                     onClick={() =>
-                      ycore.crouter.native(`@${publisher.username}`)
+                      ycore.router.go(`@${publisher.username}`)
                     }
                     className={styles.titleUser}
                   >
-                    @{publisher.username}{' '}
+                    @{publisher.username}
                     {ycore.booleanFix(publisher.verified) ? (
                       <Icon
                         style={{ color: 'blue' }}
@@ -274,13 +274,13 @@ class PostCard extends React.PureComponent {
               bordered="false"
             />
             {postText ? (
-              <div className={styles.postContent}>
+              <div className={styles.post_card_content}>
                 {' '}
                 <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
               </div>
             ) : null}
             {postFile ? (
-              <div className={styles.postContentFILE}>
+              <div className={styles.post_card_file}>
                 {this.renderPostPlayer(postFile)}
               </div>
             ) : null}

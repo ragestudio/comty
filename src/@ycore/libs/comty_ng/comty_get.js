@@ -13,8 +13,33 @@ export const comty_get = {
       formdata
     )
   },
-  session_data: () => {},
-  general_data: () => {
+  session_id: callback => {
+    let formdata = new FormData()
+    formdata.append('type', 'get')
+
+    API_Call((err,res) => {
+      if (err) return false
+      try {
+        const a = JSON.parse(res)['data']
+        return callback(err, a.session_id)
+      } catch (error) {
+        return callback(err, '0x0000')
+      }
+    },
+    endpoints.get_sessions,
+    formdata)
+  },
+  session: (callback) => {
+    let formdata = new FormData()
+    formdata.append('type', 'get')
+
+    API_Call((err,res) => {
+      return callback(err, res)
+    },
+    endpoints.get_sessions,
+    formdata)
+  },
+  general_data: (callback, payload) => {
     if (!payload) return false
     const { id } = payload
 

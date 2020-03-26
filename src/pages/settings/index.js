@@ -17,6 +17,11 @@ const menuMap = {
       <Icons.ControlOutlined /> General
     </span>
   ),
+  sync: (
+    <span>
+      <Icons.SyncOutlined /> Sync™
+    </span>
+  ),
   security: (
     <span>
       <Icons.SafetyCertificateOutlined /> Security & Privacity

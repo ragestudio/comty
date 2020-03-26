@@ -3,7 +3,7 @@ import * as ycore from 'ycore'
 
 class Index extends PureComponent {
   render() {
-    ycore.crouter.native(`login`)
+    ycore.router.go(`login`)
   }
 }
 

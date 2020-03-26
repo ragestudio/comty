@@ -20,7 +20,6 @@ import './libs.js'
 export * from '../../config/app.settings.js'
 export * from './libs.js'
 
-export var { router } = require('utils')
 export var endpoints = Endpoints
 
 export const package_json = require('../../package.json')
@@ -201,6 +200,17 @@ export function gotoBottom(id) {
 }
 
 /**
+ * Go to top of an element by id
+ *
+ * @param id {string}
+ * @return null
+ */
+export function gotoTop(id) {  
+  const element = document.getElementById(id)
+  element.scrollTop = element.scrollHeight + element.clientHeight
+}
+
+/**
  * Go to position of an element by id
  *
  * @param element {array}
@@ -233,15 +243,13 @@ export const time = {
  * Framework functionality for navigate between pages (Router)
  *
  */
-export const crouter = {
-  native: e => {
+export const router = {
+  go: e => {
+    gotoElement('primaryContent')
     umiRouter.push({
       pathname: `/${e}`,
       search: window.location.search,
     })
-  },
-  default: e => {
-    router.push(e)
   },
 }
 

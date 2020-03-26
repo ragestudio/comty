@@ -15,20 +15,11 @@ function SettingStoragedValue(e) {
 
 export var ListSettings = [
   {
-    SettingID: 'strict_lightMode',
+    SettingID: 'sessions_noexpire',
     type: 'switch',
-    title: 'Strict Light Mode',
-    description:
-      'Force the app to apply full light mode theme when the light mode is activated... (Experimental)',
-    value: fromStorage ? SettingStoragedValue('strict_lightMode') : false,
-  },
-  {
-    SettingID: 'default_collapse_sider',
-    type: 'switch',
-    title: 'Default Collapse Sider',
-    description:
-      'Force the app to apply collapsed mode theme when the app is mounted...',
-    value: fromStorage ? SettingStoragedValue('default_collapse_sider') : true,
+    title: 'No expire session',
+    description: 'Force the app to not expire any session... [Developer]',
+    value: fromStorage ? SettingStoragedValue('sessions_noexpire') : false,
   },
   {
     SettingID: 'auto_feedrefresh',
@@ -39,43 +30,26 @@ export var ListSettings = [
     value: fromStorage ? SettingStoragedValue('auto_feedrefresh') : false,
   },
   {
-    SettingID: 'force_showDevLogs',
-    type: 'switch',
-    title: 'Show Functions Logs',
-    description: 'Show all console logs... [Developer]',
-    value: fromStorage ? SettingStoragedValue('force_showDevLogs') : false,
-  },
-  {
-    SettingID: 'sessions_noexpire',
-    type: 'switch',
-    title: 'No expire session',
-    description: 'Force the app to not expire any session... [Developer]',
-    value: fromStorage ? SettingStoragedValue('sessions_noexpire') : false,
-  },
-  {
     SettingID: 'auto_search_ontype',
     type: 'switch',
-    title: 'Auto search',
+    title: 'Detect input on search bar',
     description:
       'Force the app to automaticly search when a type input is detected... [Developer]',
     value: fromStorage ? SettingStoragedValue('auto_search_ontype') : false,
   },
   {
-    SettingID: 'default_showpostcreator',
+    SettingID: 'auto_hide_postbar',
     type: 'switch',
-    title: 'Show default Post Creator',
-    description:
-      'Force the app to automaticly search when a type input is detected... [Developer]',
-    value: fromStorage
-      ? SettingStoragedValue('default_showpostcreator')
-      : false,
-  },
-  {
-    SettingID: 'force_show_postactions',
-    type: 'switch',
-    title: 'Not auto hide Posts Actions',
+    title: 'Auto hide postbar',
     description:
       'Force the app to dont hide the post actions (likes, comments ...etc) automaticly... [Developer]',
-    value: fromStorage ? SettingStoragedValue('force_show_postactions') : false,
+    value: fromStorage ? SettingStoragedValue('auto_hide_postbar') : true,
+  },
+  {
+    SettingID: 'force_showDevLogs',
+    type: 'switch',
+    title: 'Show Functions Logs',
+    description: 'Show all console logs... [Developer]',
+    value: fromStorage ? SettingStoragedValue('force_showDevLogs') : false,
   },
 ]

@@ -26,7 +26,7 @@ export default class Post_options extends React.Component {
   }
 
   onChangeOption(checked, id) {
-    console.log(`${id} to ${checked}`)
+    ycore.yconsole.log(`${id} to ${checked}`)
   }
 
   handleToggleToolbox = () => {

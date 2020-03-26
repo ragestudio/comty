@@ -7,7 +7,7 @@ export default class Sessions_Manager extends React.Component {
     sessions_data: '',
   }
   componentDidMount() {
-    ycore.get_app_session.get_id((err, res) => {
+    ycore.comty_get.session_id((err, res) => {
       this.setState({ sid: res })
     })
     ycore.comty_get.sessions((err, res) => {
