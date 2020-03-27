@@ -15,7 +15,7 @@ export const comty_search = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.search_endpoint,
+      endpoints.comty_endpoints.search_endpoint,
       formdata,
       callOptions
     )

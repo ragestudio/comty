@@ -42,7 +42,7 @@ export const __rscloud = {
         (err, res) => {
           return callback(err, res)
         },
-        ycore.endpoints.auth_endpoint,
+        ycore.endpoints.comty_endpoints.auth_endpoint,
         formdata,
         callOptions
       )
@@ -53,7 +53,7 @@ export const __rscloud = {
         (err, res) => {
           return callback(err, res)
         },
-        ycore.endpoints.removeToken,
+        ycore.endpoints.comty_endpoints.removeToken,
         null,
         callOptions
       )
@@ -80,7 +80,7 @@ export const __rscloud = {
             return callback(true, error)
           }
         },
-        ycore.endpoints.get_userData_endpoint,
+        ycore.endpoints.comty_endpoints.get_userData_endpoint,
         formdata,
         optionCall,
         user_token

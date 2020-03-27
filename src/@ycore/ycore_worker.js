@@ -5,7 +5,7 @@
  * @licensed Pending...
  */
 
-import { Endpoints } from 'globals/endpoints.js'
+import * as Endpoints from 'globals/endpoints/index.js'
 import * as Icons from '@ant-design/icons'
 import localforage from 'localforage'
 import { format } from 'timeago.js'

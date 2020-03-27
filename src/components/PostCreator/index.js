@@ -151,9 +151,9 @@ class PostCreator extends React.PureComponent {
   }
 
   handlePublishPost = e => {
-    const { rawtext, shareWith, file } = this.state
-    if (!rawtext) {
-      return null
+    const { rawtext, shareWith, file, fileURL} = this.state
+    if (!rawtext && !fileURL) {
+      return false
     }
     this.setState({
       posting: true,

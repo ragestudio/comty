@@ -26,7 +26,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.get_posts,
+      endpoints.comty_endpoints.get_posts,
       formdata
     )
   },
@@ -47,7 +47,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.get_post_data,
+      endpoints.comty_endpoints.get_post_data,
       formdata
     )
   },
@@ -68,7 +68,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.new_post,
+      endpoints.comty_endpoints.new_post,
       formdata,
       callOptions
     )
@@ -87,7 +87,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },
@@ -105,7 +105,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },
@@ -123,7 +123,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },
@@ -146,7 +146,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.get_posts,
+      endpoints.comty_endpoints.get_posts,
       formdata
     )
   },
@@ -166,7 +166,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },
@@ -184,7 +184,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },
@@ -202,7 +202,7 @@ export const comty_post = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },

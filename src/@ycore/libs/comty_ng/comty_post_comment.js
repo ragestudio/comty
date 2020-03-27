@@ -15,7 +15,7 @@ export const comty_post_comment = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.comments_actions,
+      endpoints.comty_endpoints.comments_actions,
       formdata
     )
   },
@@ -34,7 +34,7 @@ export const comty_post_comment = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.action_post,
+      endpoints.comty_endpoints.action_post,
       formdata
     )
   },

@@ -9,7 +9,7 @@ export const comty_get = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.all_sessions,
+      endpoints.comty_endpoints.all_sessions,
       formdata
     )
   },
@@ -26,7 +26,7 @@ export const comty_get = {
         return callback(err, '0x0000')
       }
     },
-    endpoints.get_sessions,
+    endpoints.comty_endpoints.get_sessions,
     formdata)
   },
   session: (callback) => {
@@ -36,7 +36,7 @@ export const comty_get = {
     API_Call((err,res) => {
       return callback(err, res)
     },
-    endpoints.get_sessions,
+    endpoints.comty_endpoints.get_sessions,
     formdata)
   },
   general_data: (callback, payload) => {
@@ -50,7 +50,7 @@ export const comty_get = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.get_general_data,
+      endpoints.comty_endpoints.get_general_data,
       formdata
     )
   },

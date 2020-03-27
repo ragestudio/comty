@@ -15,7 +15,7 @@ export const comty_user = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.follow_user,
+      endpoints.comty_endpoints.follow_user,
       formdata
     )
   },
@@ -37,7 +37,7 @@ export const comty_user = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.find_user,
+      endpoints.comty_endpoints.find_user,
       formdata,
       callOptions
     )
@@ -55,7 +55,7 @@ export const comty_user = {
       (err, res) => {
         return callback(err, res)
       },
-      endpoints.get_user_tags,
+      endpoints.comty_endpoints.get_user_tags,
       formdata
     )
   },
