@@ -21,7 +21,7 @@ export var AppSettings = {
   DisableLogin: false,
   DisableRegister: true,
   DisablePasswordRecover: true,
-  // Activating this, the logs must be trowed
+  disable_pro_tool: fromStorage? SettingStoragedValue('disable_pro_tool') : false,
   force_showDevLogs: fromStorage? SettingStoragedValue('force_showDevLogs') : false,
   SignForNotExpire: fromStorage? SettingStoragedValue('sessions_noexpire') : false,
   auto_search_ontype: fromStorage? SettingStoragedValue('auto_search_ontype') : false,

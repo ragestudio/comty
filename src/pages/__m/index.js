@@ -157,6 +157,10 @@ export default class __m extends React.Component {
             {' '}
             Switch to Desktop_mode{' '}
           </antd.Button>
+
+          <antd.Button onClick={() => ycore.app_modals.report_post()}>
+            Open report_post modal
+          </antd.Button>
         </div>
 
         <div className={styles.titleHeader}>

@@ -1,6 +1,5 @@
 import { token_data } from 'ycore'
 import * as Icons from '@ant-design/icons'
-import { RenderFeed } from 'components/MainFeed'
 
 export * from './comty_post.js'
 export * from './comty_user.js'
@@ -8,17 +7,7 @@ export * from './comty_post_comment.js'
 export * from './comty_search.js'
 export * from './comty_get.js'
 
-export const FeedHandler = {
-  refresh: () => {
-    RenderFeed.RefreshFeed()
-  },
-  killByID: (post_id) => {
-    RenderFeed.killByID(post_id)
-  },
-  addToRend: (payload) => {
-    RenderFeed.addToRend(payload)
-  }
-}
+
 
 export const IsThisPost = {
   owner: (post_uid) => {

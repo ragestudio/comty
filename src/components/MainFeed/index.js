@@ -18,8 +18,13 @@ export const RenderFeed = {
     window.MainFeedComponent.addToRend(payload)
     return
   },
+  goToElement: post_id => {
+    ycore.goTo.element(post_id)
+  },
   disableMenu: () => {
-
+    window.MainFeedComponent.setState({
+      disableMenu: true,
+    })
   },
 }
 class MainFeed extends React.Component {
@@ -29,6 +34,7 @@ class MainFeed extends React.Component {
     this.state = {
       invalid: false,
       loading: false,
+      disableMenu: false,
       data: [],
       fkey: 0,
     }
@@ -120,7 +126,7 @@ class MainFeed extends React.Component {
         const isEnd =
           parsed.length < ycore.AppSettings.limit_post_catch ? true : false
         this.setState({ isEnd: isEnd, data: mix, loading: false }, () =>
-          ycore.gotoElement(getLastPost.id)
+          ycore.goTo.element(getLastPost.id)
         )
         return true
       }, payload)

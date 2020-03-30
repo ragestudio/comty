@@ -61,7 +61,7 @@ export const comty_post = {
     formdata.append('type', 'new_post')
     formdata.append('postPrivacy', privacy)
     formdata.append('postText', text)
-    file ? formdata.append('postPhoto', file) : null
+    file ? formdata.append('uploadFile', file) : null
 
     const callOptions = { includeUserID: true }
     API_Call(

@@ -295,3 +295,38 @@ export class __priSearch extends React.Component {
     )
   }
 }
+
+export class __trendings extends React.PureComponent {
+  render(){
+    if (!this.props.data) return false
+    return(
+      <div className={styles.secondary_hastags}>
+        <div className={styles.secondary_hastags_title}> <h2>Trending now</h2> </div>
+        <div className={styles.secondary_hastags_body}>
+          <antd.List
+            dataSource={this.props.data}
+            renderItem={item=>(
+            <div className={styles.hash}>
+              <p>#{item.tag}</p>
+              <p style={{ color: "white", fontSize: "9px" }}> {item.trend_use_num} Posts</p>
+            </div>)}
+          />
+        </div>
+      </div>
+    )
+  }
+}
+
+export class __pro extends React.PureComponent {
+  render(){
+    return(
+      <div className={styles.secondary_adv_pro}>
+        <h1>
+          Go Pro!
+        </h1>
+        <p>Sabias que la frase de kintxi, se hace la que no me conoze se hizo mientras estaba borracho</p>
+        <antd.Button>Start now <Icons.RightOutlined /></antd.Button>
+      </div>
+    )
+  }
+}

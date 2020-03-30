@@ -15,7 +15,7 @@ const emptyPayload = {
   user: 'Post Empty',
   ago: 'This Post is empty',
   avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-  content: 'Test Test',
+  content: 'Empty',
 }
 
 class PostCard extends React.PureComponent {
@@ -111,19 +111,13 @@ class PostCard extends React.PureComponent {
             this.setState({ postSaved: true })
             return
           } else {
-            ycore.notify.success('Removed from Saved')
+            ycore.notify.info('Removed from Saved')
             this.setState({ postSaved: false })
           }
         }, payload)
       },
       report: post_id => {
-        const payload = { post_id: post_id }
-        ycore.comty_post.__report((err, res) => {
-          if (err) {
-            return false
-          }
-          ycore.notify.success('Post Reported')
-        }, payload)
+        ycore.app_modals.report_post(post_id)
       },
       boost: post_id => {
         const payload = { post_id: post_id }
@@ -136,7 +130,7 @@ class PostCard extends React.PureComponent {
             this.setState({ postBoosted: true })
             return
           } else {
-            ycore.notify.success('Post Unboosted')
+            ycore.notify.info('Post Unboosted')
             this.setState({ postBoosted: false })
           }
         }, payload)
@@ -186,12 +180,14 @@ class PostCard extends React.PureComponent {
           <Icons.SaveOutlined />{' '}
           {this.state.postSaved ? 'Unsave post' : 'Save Post'}
         </antd.Menu.Item>
+        {this.state.postReported? null: 
         <antd.Menu.Item
           onClick={() => handlePostActions.report(id)}
           key="report_post"
         >
           <Icons.FlagOutlined /> Report post
         </antd.Menu.Item>
+        }
       </antd.Menu>
     )
 

@@ -39,8 +39,9 @@ class PostCreator extends React.PureComponent {
 
   renderPostPlayer(payload) {
     const { file, fileURL } = this.state
-    const videofilter = file.type === 'video/mp4'
-    const imagefilter = file.type === 'image/jpeg' || file.type === 'image/png'
+    const videofilter = file.type.includes('video')
+    const imagefilter = file.type.includes('image')
+    const audiofilter = file.type.includes('audio')
     if (imagefilter) {
       return (
         <div className={styles.imagePreviewWrapper}>
@@ -77,6 +78,11 @@ class PostCreator extends React.PureComponent {
         </div>
       )
     }
+    if (audiofilter) {
+      return (
+        <audio controls src={fileURL} preload="auto" />
+      )
+    }
     return null
   }
   ToogleVisibility() {
@@ -104,6 +110,9 @@ class PostCreator extends React.PureComponent {
   beforeUpload = file => {
     const filter =
       file.type === 'image/jpeg' ||
+      file.type === 'audio/mp3' ||
+      file.type === 'audio/wav' ||
+      file.type === 'audio/ogg' ||
       file.type === 'image/png' ||
       file.type === 'image/jpg' ||
       file.type === 'image/gif' ||

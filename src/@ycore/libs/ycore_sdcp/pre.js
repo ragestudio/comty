@@ -1,29 +1,41 @@
 import * as ycore from 'ycore'
 import localforage from 'localforage'
 
-export const asyncSDCP = {
-  setSDCP: function(value) {
-    return Promise.resolve().then(function() {
-      localforage.setItem('SDCP', value)
-    })
+export const sdcp = {
+  isset: (value) => {
+    if (!value) return false
+    ycore.sdcp.localforage.getItem(value)? true : false
   },
-  getRaw: () => {
+  set: (operator)  => {
+      if (!operator) return false
+      try {
+        let a;
+        let b; 
+
+        let { callback, model } = operator
+        const {key, value} = model
+        if (!typeof key === 'string' || ! a instanceof String) return false
+      
+        a = ycore.sdcp.get(key)
+        if (!a.isArray()) return false
+        
+        b = JSON.parse(a).concat(value)
+
+        localforage.setItem(key, b)
+
+      } catch (err) {
+        console.log(err)
+        return false
+      }
+  },
+  get: (key) => {
     try {
-      return localforage.getItem('SDCP')
+      return localforage.getItem(key)
     } catch (err) {
       return false
     }
   },
-  get: callback => {
-    try {
-      const a = ycore.asyncSDCP.getRaw((err, value) => {
-        const b = ycore.cryptSDCP.atob_parse(value)
-        return callback(null, b)
-      })
-    } catch (err) {
-      return false
-    }
-  },
+
 }
 
 export const cryptSDCP = {
@@ -33,9 +45,7 @@ export const cryptSDCP = {
         atob(e)
       } catch (err) {
         ycore.notify.error(err)
-        ycore.router.push({
-          pathname: '/login',
-        })
+        ycore.router.go('login')
         return false
       }
       try {
@@ -44,9 +54,7 @@ export const cryptSDCP = {
         return parsedSDCP
       } catch (err) {
         ycore.notify.error(err)
-        ycore.router.push({
-          pathname: '/login',
-        })
+        ycore.router.go('login')
         return false
       }
     }

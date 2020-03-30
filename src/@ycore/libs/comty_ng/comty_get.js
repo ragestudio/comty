@@ -1,4 +1,4 @@
-import { API_Call, endpoints } from 'ycore'
+import { API_Call, endpoints, sdcp } from 'ycore'
 
 export const comty_get = {
   sessions: (callback) => {
@@ -40,18 +40,26 @@ export const comty_get = {
     formdata)
   },
   general_data: (callback, payload) => {
-    if (!payload) return false
-    const { id } = payload
+    let formdata = new FormData();
+    let callOptions = { includeUserID: false };
 
-    let formdata = new FormData()
-    formdata.append('user_id', id)
+    if (!payload) {
+      callOptions = {  includeUserID: true }
+      formdata.append('fetch', 'notifications,friend_requests,pro_users,promoted_pages,trending_hashtag,count_new_messages')
+    }
 
+    if (payload) { 
+      payload.user_id? formdata.append('user_id', payload.user_id) : null
+      payload.fetch? formdata.append('fetch', payload.fetch) : null
+    }
+  
     API_Call(
       (err, res) => {
         return callback(err, res)
       },
       endpoints.comty_endpoints.get_general_data,
-      formdata
+      formdata, callOptions
     )
+    
   },
 }

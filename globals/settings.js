@@ -15,6 +15,13 @@ function SettingStoragedValue(e) {
 
 export var ListSettings = [
   {
+    SettingID: 'disable_pro_tool',
+    type: 'switch',
+    title: 'Hide Pro Tools',
+    description: 'Hide right sidebar utils of comty pro',
+    value: fromStorage ? SettingStoragedValue('disable_pro_tool') : false,
+  },
+  {
     SettingID: 'sessions_noexpire',
     type: 'switch',
     title: 'No expire session',

@@ -9,7 +9,6 @@ import * as Endpoints from 'globals/endpoints/index.js'
 import * as Icons from '@ant-design/icons'
 import localforage from 'localforage'
 import { format } from 'timeago.js'
-import umiRouter from 'umi/router'
 import * as antd from 'antd'
 import moment from 'moment'
 import React from 'react'
@@ -188,37 +187,6 @@ export function booleanFix(e) {
   return false
 }
 
-/**
- * Go to bottom of an element by id
- *
- * @param id {string}
- * @return null
- */
-export function gotoBottom(id) {
-  const element = document.getElementById(id)
-  element.scrollTop = element.scrollHeight - element.clientHeight
-}
-
-/**
- * Go to top of an element by id
- *
- * @param id {string}
- * @return null
- */
-export function gotoTop(id) {  
-  const element = document.getElementById(id)
-  element.scrollTop = element.scrollHeight + element.clientHeight
-}
-
-/**
- * Go to position of an element by id
- *
- * @param element {array}
- * @return object
- */
-export function gotoElement(element) {
-  document.getElementById(element).scrollIntoView()
-}
 
 /**
  * Handle time basic functions
@@ -239,19 +207,6 @@ export const time = {
   },
 }
 
-/**
- * Framework functionality for navigate between pages (Router)
- *
- */
-export const router = {
-  go: e => {
-    gotoElement('primaryContent')
-    umiRouter.push({
-      pathname: `/${e}`,
-      search: window.location.search,
-    })
-  },
-}
 
 /**
  * Framework functionality for show with interface an notification

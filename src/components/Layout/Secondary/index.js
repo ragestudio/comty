@@ -5,11 +5,12 @@ import * as Icons from '@ant-design/icons'
 import styles from './index.less'
 import classnames from 'classnames'
 
-import { __priPost, __secComments, __priSearch } from './renders.js'
+import { __priPost, __secComments, __priSearch, __trendings, __pro } from './renders.js'
+import { FormatListNumbered } from '@material-ui/icons'
 
 export const SwapMode = {
   close: () => {
-    SecondaryLayoutComponent.closeSwap()
+    SecondaryLayoutComponent.Swapper.close()
   },
   openPost: (a, b) => {
     SecondaryLayoutComponent.setState({
@@ -20,22 +21,29 @@ export const SwapMode = {
   },
   openSearch: a => {
     SecondaryLayoutComponent.setState({
-      halfSwap: true,
-      loading: true,
       mode: 'search',
       pri_raw: a,
     })
     SecondaryLayoutComponent.Swapper.half()
   },
+  openFragment: fragment => {
+    SecondaryLayoutComponent.setState({
+      mode: 'fragment',
+      global_raw: fragment,
+    })
+    SecondaryLayoutComponent.Swapper.unique()
+  }
 }
 
 export default class Secondary extends React.PureComponent {
   constructor(props) {
     super(props), (window.SecondaryLayoutComponent = this)
     this.state = {
+      loading: true,
       half: false,
       swap: false,
       mode: '',
+      gen_data: '',
       global_raw: '',
       pri_raw: '',
       sec_raw: '',
@@ -47,6 +55,7 @@ export default class Secondary extends React.PureComponent {
       this.setState({
         swap: false,
         half: false,
+        unique: false,
         pri_raw: null,
         sec_raw: null,
         global_raw: null,
@@ -57,12 +66,21 @@ export default class Secondary extends React.PureComponent {
       this.setState({
         swap: true,
         half: false,
+        unique: false,
       })
     },
     half : () => {
       this.setState({
         swap: false,
         half: true,
+        unique: false,
+      })
+    },
+    unique: ()=>{
+      this.setState({
+        swap: false,
+        half: false,
+        unique: true,
       })
     }
   }
@@ -89,8 +107,11 @@ export default class Secondary extends React.PureComponent {
       case 'search': {
         return this.renderSearch(dtraw)
       }
+      case 'fragment': {
+        return this.renderFragment()
+      }
       default:
-        return null
+        return this.renderMain()
     }
   }
   __sec() {
@@ -137,20 +158,56 @@ export default class Secondary extends React.PureComponent {
       return null
     }
   }
+  renderMain = payload => {
+    try {
+      const trending_data = JSON.parse(this.state.gen_data)['trending_hashtag']
+      return(
+        <div className={styles.secondary_main}>
+
+          {ycore.IsThisUser.pro()? <__pro /> : <__pro /> } 
+          <__trendings data={trending_data} />
+        
+  
+        </div>
+      )
+    } catch (error) {
+      return null
+    }
+    
+  }
+  renderFragment = () => {
+    try {
+      const fragment = this.state.global_raw
+      return <React.Fragment>{fragment}</React.Fragment>
+    } catch (error) {
+      return null
+    }
+  }
+  componentDidMount(){
+    ycore.comty_get.general_data((err,res)=> {
+      if (err) return false
+      const notification_data = JSON.parse(res)['notifications']
+      this.setState({ loading: false, gen_data: res, notification_data: notification_data })
+
+    })
+  }
 
   render() {
     const { userData } = this.props
-    return (
+    if (!this.state.loading) return (
       <>
       <div className={styles.__secondary_colider}></div>
       <div
         className={classnames(styles.secondary_wrapper, {
           [styles.active]: this.state.swap,
           [styles.half]: this.state.half,
+          [styles.unique]: this.state.unique,
         })}
       >
         <div className={styles.secondary_userholder}>
-          <div className={styles.notif_box}></div>
+          <div className={styles.notif_box}>
+            <h1>{this.state.notification_data.length}</h1>    
+          </div>
           <img
             onClick={() => ycore.router.go(`@${userData.username}`)}
             src={userData.avatar}
@@ -162,7 +219,7 @@ export default class Secondary extends React.PureComponent {
         >
           
           <div className={styles.secondary_container_1}>
-            {this.state.swap || this.state.half ? (
+            {this.state.swap || this.state.half || this.state.unique ? (
               <antd.Button
                 type="ghost"
                 icon={<Icons.LeftOutlined />}
@@ -187,5 +244,7 @@ export default class Secondary extends React.PureComponent {
       </div>
       </>
     )
+    return null
+
   }
 }

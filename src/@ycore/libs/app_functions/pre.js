@@ -1,11 +1,16 @@
-import { RenderFeed } from '../../../components/MainFeed'
+import { RenderFeed } from 'components/MainFeed'
 import { transitionToogle } from '../../../pages/login'
 import { SetControls, CloseControls } from '../../../components/Layout/Control'
 import { SwapMode } from '../../../components/Layout/Secondary'
+import umiRouter from 'umi/router'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import React from 'react'
+
+export * from './modals.js'
+
+
 
 export function QueryRuntime() {
   const validBackup = ycore.validate.backup()
@@ -21,7 +26,7 @@ export function SetupApp() {
     localStorage.setItem('resource_bundle', 'light_ng')
   }
   setTimeout(() => {
-    ycore.router.go('main')
+    ycore.router.push('main')
   }, 500)
 }
 
@@ -44,6 +49,9 @@ export const SecondarySwap = {
   },
   openSearch: e => {
     SwapMode.openSearch(e)
+  },
+  openFragment: e =>{
+    SwapMode.openFragment(e)
   }
 }
 
@@ -56,10 +64,60 @@ export const ControlBar = {
   },
 }
 
+export const FeedHandler = {
+  refresh: () => {
+    RenderFeed.RefreshFeed()
+  },
+  killByID: (post_id) => {
+    RenderFeed.killByID(post_id)
+  },
+  addToRend: (payload) => {
+    RenderFeed.addToRend(payload)
+  },
+  goToElement: post_id => {
+    RenderFeed.goToElement(post_id)
+  },
+}
+
 export const LoginPage = {
   transitionToogle: () => {
     transitionToogle()
   },
+}
+
+export const router = {
+  go: e => {
+    goTo.element('primaryContent')
+    umiRouter.push({
+      pathname: `/${e}`,
+      search: window.location.search,
+    })
+  },
+  push: e => {
+    umiRouter.push({
+      pathname: `/${e}`,
+      search: window.location.search,
+    })
+  }
+}
+
+export const goTo = {
+  top: (id)=> {
+    const element = document.getElementById(id)
+    element.scrollTop = element.scrollHeight + element.clientHeight
+  },
+  bottom: (id) => {
+    const element = document.getElementById(id)
+    element.scrollTop = element.scrollHeight - element.clientHeight
+  },
+  element: (element) => {
+    try {
+      document.getElementById(element).scrollIntoView()
+    } catch (error) {
+      return false
+    }
+  }
+
 }
 
 export function RefreshONCE() {
@@ -140,7 +198,7 @@ export const app_session = {
       }
       // Runtime after dispatch API
       ycore.token_data.remove()
-      ycore.router.push({ pathname: '/login' })
+      ycore.router.push('login')
     })
   },
 }
