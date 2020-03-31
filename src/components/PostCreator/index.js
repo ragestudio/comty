@@ -9,6 +9,8 @@ import * as MICONS from '@material-ui/icons'
 
 import Post_options from './local_components/post_options'
 import { optionBox } from './local_components/post_options'
+import io from 'socket.io-client'
+var socket = io('http://localhost:5500');
 
 function getBase64(img, callback) {
   const reader = new FileReader()
@@ -18,12 +20,12 @@ function getBase64(img, callback) {
 
 export function HandleVisibility() {
   window.PostCreatorComponent.ToogleVisibility()
-  return
 }
 
 class PostCreator extends React.PureComponent {
   constructor(props) {
-    super(props), (window.PostCreatorComponent = this)
+    super(props), 
+    window.PostCreatorComponent = this,
     this.state = {
       visible: true,
       FadeIN: true,
@@ -180,11 +182,13 @@ class PostCreator extends React.PureComponent {
         ycore.notify.error(err)
         return false
       }
+      const status_temp_error = JSON.parse(res)['data'].error
+      status_temp_error? ycore.notify.error('It seems that a processing error has occurred, your publication has not been published.') : null
       const id_temp_parse = JSON.parse(res)['data'].id
       
       const pro_boost_val = ycore.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
       const allow_comments_val = ycore.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
-     
+      socket.emit('push_post');
       ycore.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
 
       if (pro_boost_val) {
@@ -239,8 +243,8 @@ class PostCreator extends React.PureComponent {
         ycore.yconsole.log('Item: ' + item.type)
         if (item.type.indexOf('image') != -1) {
           //item.
-          let a = item.getAsFile()
-          a
+          let a;
+          a = item.getAsFile()
           _this.setState({ file: a })
           ycore.ReadFileAsB64(a, res => {
             _this.setState({ fileURL: res })

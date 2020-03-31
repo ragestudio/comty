@@ -18,7 +18,8 @@ export const optionBox = {
 
 export default class Post_options extends React.Component {
   constructor(props) {
-    super(props), (window.postoptions_box_class = this)
+    super(props), 
+    window.postoptions_box_class = this,
     this.state = {
       options_repo: Post_Options,
       options_box: false,
@@ -59,7 +60,7 @@ export default class Post_options extends React.Component {
         }
       } catch (err) {
         ycore.notify.error(err)
-        return true
+        return false
       }
     }
     return false

@@ -1,4 +1,5 @@
 import { API_Call, endpoints } from 'ycore'
+import { comty_rsa } from '../rs_cloud/pre'
 
 export const comty_user = {
   setData: () => {},
@@ -20,8 +21,20 @@ export const comty_user = {
     )
   },
   block: (callback, payload) => {
-    // TO DO
-    return false
+    if (!payload) {
+      return false
+    }
+    const { user_id, block_action } = payload
+    let formdata = new FormData()
+    formdata.append('user_id', user_id)
+    formdata.append('block_action', block_action)
+
+    API_Call((err,res)=>{
+      return callback(err,res)
+    },
+    comty_rsa.endpoint('block-user'),
+    formdata
+    )
   },
   find: (callback, payload) => {
     if (!payload) {

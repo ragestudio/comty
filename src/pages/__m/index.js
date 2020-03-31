@@ -46,7 +46,7 @@ export default class __m extends React.Component {
   handleDesktop() {
     const a = localStorage.getItem('desktop_src')
     let to
-    if (a == 'false') {
+    if ( a == 'false') {
       to = true
     } else {
       to = false
@@ -160,6 +160,10 @@ export default class __m extends React.Component {
 
           <antd.Button onClick={() => ycore.app_modals.report_post()}>
             Open report_post modal
+          </antd.Button>
+            
+          <antd.Button onClick={() => ycore.sync.emmitPost()}>
+            Emmit Post feed
           </antd.Button>
         </div>
 

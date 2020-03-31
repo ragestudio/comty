@@ -18,16 +18,16 @@ export const make_data = {
 
 export const IsThisUser = {
   admin: () => {
-    const a = ycore.userData()
-    return ycore.booleanFix(a.admin) ? true : false
+    return ycore.booleanFix(ycore.userData().admin) ? true : false
   },
   dev: () => {
-    const a = ycore.userData()
-    return ycore.booleanFix(a.dev) ? true : false
+    return ycore.booleanFix(ycore.userData().dev) ? true : false
   },
   pro: () => {
-    const a = ycore.userData()
-    return ycore.booleanFix(a.is_pro) ? true : false
+    return ycore.booleanFix(ycore.userData().is_pro) ? true : false
+  },
+  nsfw: () => {
+    return ycore.booleanFix(ycore.userData().nsfw) ? true : false
   },
   same: a => {
     if (a == ycore.userData().UserID) {

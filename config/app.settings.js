@@ -14,6 +14,7 @@ function SettingStoragedValue(e){
 const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
 
 export var AppSettings = {
+  __global_server_prexif: 'https://api.ragestudio.net/RSA-COMTY/r/',
   // Global Behaviors 
   InfiniteLoading: false,
   InfiniteLogin: false,

@@ -61,7 +61,7 @@ export const cryptSDCP = {
     return false
   },
   valid: () => {
-    const a = ycore.asyncSDCP.get()
+    const a = ycore.sdcp.get()
     return a ? true : false
   },
 }

@@ -6,7 +6,6 @@ import styles from './index.less'
 import classnames from 'classnames'
 
 import { __priPost, __secComments, __priSearch, __trendings, __pro } from './renders.js'
-import { FormatListNumbered } from '@material-ui/icons'
 
 export const SwapMode = {
   close: () => {
@@ -37,7 +36,8 @@ export const SwapMode = {
 
 export default class Secondary extends React.PureComponent {
   constructor(props) {
-    super(props), (window.SecondaryLayoutComponent = this)
+    super(props),
+    window.SecondaryLayoutComponent = this,
     this.state = {
       loading: true,
       half: false,

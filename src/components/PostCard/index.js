@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
-import { CustomIcons, Like_button } from 'components'
+import { CustomIcons, Like_button, MediaPlayer } from 'components'
 import * as ycore from 'ycore'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
@@ -21,48 +21,21 @@ const emptyPayload = {
 class PostCard extends React.PureComponent {
   constructor(props) {
     super(props),
-      (this.state = {
-        FadeIN: true,
-        postPinned: this.props.payload.is_post_pinned,
-        postSaved: this.props.payload.is_post_saved,
-        postReported: this.props.payload.is_post_reported,
-        postBoosted: this.props.payload.is_post_boosted,
-        ReportIgnore: false,
-      })
-  }
+    this.state = {
+      visibleMoreMenu: false,
+      postPinned: this.props.payload.is_post_pinned,
+      postSaved: this.props.payload.is_post_saved,
+      postReported: this.props.payload.is_post_reported,
+      postBoosted: this.props.payload.is_post_boosted,
+      ReportIgnore: false,
+    }
+  }  
+  handleVisibleChange = flag => {
+    this.setState({ visibleMoreMenu: flag });
+  };
 
-  renderPostPlayer(payload) {
-    const ident = payload
-    if (ident.includes('.mp4')) {
-      return (
-        <video id="player" playsInline controls>
-          <source src={`${payload}`} type="video/mp4" />
-        </video>
-      )
-    }
-    if (ident.includes('.webm')) {
-      return (
-        <video id="player" playsInline controls>
-          <source src={payload} type="video/webm" />
-        </video>
-      )
-    }
-    if (ident.includes('.mp3')) {
-      return (
-        <audio id="player" controls>
-          <source src={payload} type="audio/mp3" />
-        </audio>
-      )
-    }
-    if (ident.includes('.ogg')) {
-      return (
-        <audio id="player" controls>
-          <source src={payload} type="audio/ogg" />
-        </audio>
-      )
-    } else {
-      return <img src={payload} />
-    }
+  toogleMoreMenu(){
+    this.setState({visibleMoreMenu: !this.state.visibleMoreMenu})
   }
 
   goToPost(postID) {
@@ -152,19 +125,26 @@ class PostCard extends React.PureComponent {
     const actions = customActions || defaultActions
 
     const MoreMenu = (
-      <antd.Menu>
+      <antd.Menu >
         {ycore.IsThisPost.owner(publisher.id) ? (
           <antd.Menu.Item
-            onClick={() => handlePostActions.delete(id)}
             key="remove_post"
-          >
-            <Icons.DeleteOutlined /> Remove post
+          > 
+            <antd.Popconfirm
+              title="Are you sure delete this post?"
+              onConfirm={() => handlePostActions.delete(id) & this.toogleMoreMenu()}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Icons.DeleteOutlined /> Remove post
+            </antd.Popconfirm>
+            
           </antd.Menu.Item>
         ) : null}
         {ycore.IsThisPost.owner(publisher.id) ? (
           ycore.IsThisUser.pro(publisher.id) ? (
             <antd.Menu.Item
-              onClick={() => handlePostActions.boost(id)}
+              onClick={() => handlePostActions.boost(id) & this.toogleMoreMenu()}
               key="boost_post"
             >
               <Icons.RocketOutlined />{' '}
@@ -174,7 +154,7 @@ class PostCard extends React.PureComponent {
         ) : null}
         {ycore.IsThisPost.owner(publisher.id) ? <hr /> : null}
         <antd.Menu.Item
-          onClick={() => handlePostActions.save(id)}
+          onClick={() => handlePostActions.save(id) & this.toogleMoreMenu()}
           key="save_post"
         >
           <Icons.SaveOutlined />{' '}
@@ -182,7 +162,7 @@ class PostCard extends React.PureComponent {
         </antd.Menu.Item>
         {this.state.postReported? null: 
         <antd.Menu.Item
-          onClick={() => handlePostActions.report(id)}
+          onClick={() => handlePostActions.report(id) & this.toogleMoreMenu() }
           key="report_post"
         >
           <Icons.FlagOutlined /> Report post
@@ -256,7 +236,7 @@ class PostCard extends React.PureComponent {
                   </h4>
                   <div className={styles.PostTags}>
                     <div className={styles.MoreMenu}>
-                      <antd.Dropdown overlay={MoreMenu} trigger={['click']}>
+                      <antd.Dropdown onVisibleChange={this.handleVisibleChange} visible={this.state.visibleMoreMenu} overlay={MoreMenu} trigger={['click']}>
                         <Icons.MoreOutlined key="actionMenu" />
                       </antd.Dropdown>
                     </div>
@@ -277,7 +257,7 @@ class PostCard extends React.PureComponent {
             ) : null}
             {postFile ? (
               <div className={styles.post_card_file}>
-                {this.renderPostPlayer(postFile)}
+                <MediaPlayer file={postFile} />
               </div>
             ) : null}
             <div className={styles.ellipsisIcon}>

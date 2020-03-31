@@ -2,6 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
 import * as Icons from '@ant-design/icons'
+import styles from './index.less'
 
 import { PostCard } from 'components'
 
@@ -176,7 +177,7 @@ class MainFeed extends React.Component {
   render() {
     const { loading, invalid } = this.state
     return (
-      <div id="mainfeed">
+      <div className={styles.main_feed_wrapper} id="mainfeed">
         {invalid ? (
           <antd.Card
             style={{

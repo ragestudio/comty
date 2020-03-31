@@ -6,12 +6,12 @@ import classnames from 'classnames'
 class Like_button extends React.PureComponent {
   constructor(props) {
     super(props),
-      (this.state = {
-        liked: this.props.liked,
-        likes: this.props.count,
-        type: this.props.liked ? 'dislike' : 'like',
-        clicked: false,
-      })
+    this.state = {
+      liked: this.props.liked,
+      likes: this.props.count,
+      type: this.props.liked ? 'dislike' : 'like',
+      clicked: false,
+    }
   }
 
   SumLike() {

@@ -8,8 +8,9 @@ import { SetHeaderSearchType } from 'components/HeaderSearch'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import Follow_btn from './components/Follow_btn.js'
+import {BadgesType} from 'globals/badges_list'
 
-class UserProfile extends React.Component {
+class UserProfile extends React.PureComponent {
   constructor(props) {
     super(props),
       (this.state = {
@@ -18,7 +19,27 @@ class UserProfile extends React.Component {
         RenderValue: {},
         loading: true,
         Followed: '',
+        UserTags: [],
       })
+  }
+
+  require(i) {
+    if (i) {
+      try {
+        switch (i) {
+          case 'pro':
+            return ycore.booleanFix(this.state.RenderValue.is_pro)
+          case 'dev':
+            return ycore.booleanFix(this.state.RenderValue.dev)
+          case 'nsfw':
+            return ycore.booleanFix(this.state.RenderValue.nsfw_flag)
+        }
+      } catch (err) {
+        ycore.notify.error(err)
+        return false
+      }
+    }
+    return false
   }
 
   handleFollowUser = () => {
@@ -33,8 +54,7 @@ class UserProfile extends React.Component {
   }
 
   componentDidMount() {
-    const { regx } = this.props
-    this.initUser(regx)
+    this.initUser(this.props.regx)
     SetHeaderSearchType.disable()
   }
 
@@ -64,101 +84,108 @@ class UserProfile extends React.Component {
           ycore.router.go(`@${c1}`)
         }
 
-        const payload = { id: rp['0'].user_id }
-        ycore.comty_user.__tags((err, res) => {
-          if (err) {
-            ycore.notify.error(err)
-            return
-          }
-        }, payload)
-
         this.setState({
           UUID: rp['0'].user_id,
           RenderValue: rp['0'],
           loading: false,
           Followed: ycore.booleanFix(rp['0'].is_following),
         })
+
+        ycore.comty_user.__tags((err, res) => {
+          if (err) return false
+          let fn = [];
+          const a = JSON.parse(res)['tags']
+          const b =  Object.entries(Object.assign({}, a[0]))
+          const objectArray = b.slice(1,b.length)
+
+          objectArray.forEach(([key, value]) => {
+            if (value == 'true') {
+               BadgesType.map(item => {
+                  item.id === key ?  (item? fn.push(item) : null) : null
+              })
+            }
+          })
+          BadgesType.map(item => {
+            this.require(item.require)? fn.push(item) : null
+          })
+          this.setState({ UserTags: fn })
+        }, { id: this.state.UUID })
+
       } catch (err) {
         ycore.notify.error(err)
       }
     }, payload)
   }
 
-  UserHeader = values => {
-    return (
-      <div className={styles.userWrapper}>
-        <div className={styles.UserCover}>
-          <img src={values.cover} />
-        </div>
+  
 
-        <PageHeaderWrapper
-          content={
-            <div className={styles.pageHeaderContent}>
-              <div className={styles.avatar}>
-                <antd.Avatar shape="square" src={values.avatar} />
-              </div>
-              <div className={styles.content}>
-                <div className={styles.TagWrappers}>
-                  {ycore.booleanFix(values.nsfw_flag) ? (
-                    <antd.Tag color="volcano">NSFW</antd.Tag>
-                  ) : null}
-                  {ycore.booleanFix(values.is_pro) ? (
-                    <antd.Tag color="purple">
-                      CPRO™ <Icons.RocketOutlined />
-                    </antd.Tag>
-                  ) : null}
-                  {ycore.booleanFix(values.dev) ? (
-                    <antd.Tag color="default">
-                      DEVELOPER <Icons.CodeOutlined />
-                    </antd.Tag>
-                  ) : null}
-                </div>
-                {ycore.IsThisUser.same(values.id) ? null : (
-                  <div
-                    className={styles.follow_wrapper}
-                    onClick={() => this.handleFollowUser()}
-                  >
-                    <Follow_btn followed={this.state.Followed ? true : false} />
-                  </div>
-                )}
-                <div className={styles.contentTitle}>
-                  <h1 style={{ marginBottom: '0px' }}>
-                    {values.username}
-                    <antd.Tooltip title="User Verified">
-                      {ycore.booleanFix(values.verified) ? (
-                        <Icon
-                          style={{ color: 'blue', verticalAlign: 'top' }}
-                          component={CustomIcons.VerifiedBadge}
-                        />
-                      ) : null}
-                    </antd.Tooltip>
-                  </h1>
-                  <span
-                    style={{
-                      fontSize: '14px',
-                      fontWeight: '100',
-                      lineHeight: '0',
-                      marginBottom: '5px',
-                    }}
-                    dangerouslySetInnerHTML={{ __html: values.about }}
-                  />
-                </div>
-              </div>
-            </div>
-          }
-        />
-      </div>
-    )
-  }
   render() {
-    const { loading, UUID, invalid } = this.state
+    const { loading, UUID, invalid, RenderValue } = this.state
     return (
       <div>
         {loading ? (
           <antd.Skeleton active />
         ) : (
           <div>
-            {invalid ? null : this.UserHeader(this.state.RenderValue)}
+            {invalid ? null :
+              <div className={styles.userWrapper}>
+                <div className={styles.UserCover}>
+                  <img src={RenderValue.cover} />
+                </div>
+
+                <PageHeaderWrapper
+                  content={
+                    <div className={styles.pageHeaderContent}>
+                      <div className={styles.avatar}>
+                        <antd.Avatar shape="square" src={RenderValue.avatar} />
+                      </div>
+                      <div className={styles.content}>
+                        <div className={styles.TagWrappers}>
+                        {this.state.UserTags.length>0? <antd.List 
+                         dataSource={this.state.UserTags}
+                         renderItem={item=>(  
+                          <antd.Tooltip title={item.tip}>
+                             <antd.Tag id={item.id} color={item.color}>
+                               {item.title} {item.icon}
+                             </antd.Tag>
+                          </antd.Tooltip>
+                        )} /> : null}
+                        </div>
+                        {ycore.IsThisUser.same(RenderValue.id) ? null : (
+                          <div
+                            className={styles.follow_wrapper}
+                            onClick={() => this.handleFollowUser()}
+                          >
+                            <Follow_btn followed={this.state.Followed ? true : false} />
+                          </div>
+                        )}
+                        <div className={styles.contentTitle}>
+                          <h1 style={{ marginBottom: '0px' }}>
+                            {RenderValue.username}
+                            <antd.Tooltip title="User Verified">
+                              {ycore.booleanFix(RenderValue.verified) ? (
+                                <Icon
+                                  style={{ color: 'blue', verticalAlign: 'top' }}
+                                  component={CustomIcons.VerifiedBadge}
+                                />
+                              ) : null}
+                            </antd.Tooltip>
+                          </h1>
+                          <span
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: '100',
+                              lineHeight: '0',
+                              marginBottom: '5px',
+                            }}
+                            dangerouslySetInnerHTML={{ __html: RenderValue.about }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  }
+                />
+            </div>}
             {ycore.IsThisUser.same(UUID) ? (
               <PostCreator userData={ycore.userData()} />
             ) : null}

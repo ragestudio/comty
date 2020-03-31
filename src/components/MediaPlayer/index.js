@@ -1,46 +1,53 @@
 import React from 'react'
-import styles from './index.less'
+import * as Icons from '@ant-design/icons'
 
 export default class MediaPlayer extends React.PureComponent {
-  renderPostPlayer(payload) {
-    const ident = payload
-    if (ident.includes('.mp4')) {
-      return (
-        <video id="player" playsInline controls>
-          <source src={`${payload}`} type="video/mp4" />
-        </video>
-      )
-    }
-    if (ident.includes('.webm')) {
-      return (
-        <video id="player" playsInline controls>
-          <source src={payload} type="video/webm" />
-        </video>
-      )
-    }
-    if (ident.includes('.mp3')) {
-      return (
-        <audio id="player" controls>
-          <source src={payload} type="audio/mp3" />
-        </audio>
-      )
-    }
-    if (ident.includes('.ogg')) {
-      return (
-        <audio id="player" controls>
-          <source src={payload} type="audio/ogg" />
-        </audio>
-      )
-    } else {
-      return <img src={payload} />
-    }
-  }
   render() {
     const { file } = this.props
-    return (
-      <div className={styles.PlayerContainer}>
-        {this.renderPostPlayer(file)}
-      </div>
-    )
+    let type;
+  
+    const ImageExtensions = ['.png', '.jpg', '.jpeg', '.gif']
+    const VideoExtensions = ['.mp4', '.mov', '.avi']
+    const AudioExtensions = ['.mp3', '.ogg', '.wav']
+
+    const FilesAllowed = ImageExtensions.concat(VideoExtensions, AudioExtensions)
+    
+    for (const prop in FilesAllowed) {
+     if(file.includes(`${ImageExtensions[prop]}`)){
+      type = 'image'
+     }
+     if(file.includes(`${VideoExtensions[prop]}`)){
+      type = 'video'
+     }
+     if(file.includes(`${AudioExtensions[prop]}`)){
+      type = 'audio'
+     }
+    } 
+
+    if (type == 'video') {
+      //  const payload = {type: 'video', sources: [{src: file,}]}
+      //  return (
+      //    <PlyrComponent styles={{ width: '100%' }} sources={payload} />
+      //  )
+      return (
+        <video id="player" playsInline controls>
+          <source src={file} />
+        </video>
+      )
+    }
+    if (type == 'audio') {
+      return (
+        <audio id="player" controls>
+          <source src={file} />
+        </audio>
+      )
+    }
+    if (type == 'image') {
+      if (file.includes('gif')) {
+        return <div><Icons.GifOutlined /> <img src={file} /></div>
+      }
+     return <img src={file} />
+    } 
+    return null
   }
 }

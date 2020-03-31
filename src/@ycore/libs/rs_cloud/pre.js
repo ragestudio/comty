@@ -89,3 +89,13 @@ export const __rscloud = {
     set: () => {},
   },
 }
+
+export const comty_rsa = {
+  endpoint: (endpoint, options) => {
+    let join_token = true;
+    if (options) {
+      join_token = options.join_token
+    }
+    return `${ycore.AppSettings.__global_server_prexif}${endpoint}${join_token? `?access_token=` : ``}`   
+  }
+}
