@@ -36,3 +36,24 @@ export const IsThisUser = {
     return false
   },
 }
+
+export const get_early = {
+  user: (callback, payload)=>{
+    if (!payload) {
+      return false
+    }
+    const { username } = payload
+    let formdata = new FormData()
+    formdata.append('username', username)
+
+    const callOptions = { timeout: 10000 }
+    ycore.API_Call(
+      (err, res) => {
+        return callback(err, res)
+      },
+      ycore.comty_rsa.endpoint('early_user', {join_token: false}),
+      formdata,
+      callOptions
+    )
+  }
+}

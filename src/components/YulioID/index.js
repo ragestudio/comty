@@ -106,6 +106,7 @@ class YulioID extends Component {
           width="100%"
           mask={false}
           getContainer={false}
+
           closable={false}
           visible={visible}
           className={styles.loginWrapper}
@@ -114,7 +115,6 @@ class YulioID extends Component {
             <h6>
               <img src={'https://api.ragestudio.net/id.svg'} /> YulioID&trade;
             </h6>
-            <h1>Login</h1>
           </div>
           <main className={styles.mainlp}>
             <form className={styles.formlogin}>

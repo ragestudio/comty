@@ -10,28 +10,44 @@ export function API_Call(callback, endpoint, payload, options, __token) {
   let payloadContainer = payload ? payload : new FormData()
   payloadContainer.append('server_key', ycore.__server.getKey())
 
-  let fendpoint = `${endpoint}${ycore.token_data.__token()}`
-  let method
-  let timeout
-  let processData
-  let includeUserID
-  let override__token
-  let disabledToken
+  const autoIncludeToken = endpoint.includes('?access_token=')
+  if (autoIncludeToken) {
+    console.log(`Uri Endpoint parsed '?access_token= ' | Auto including token!`)
+  }
+
+  const defaultOptions = {
+    method: 'POST',
+    timeout: 0,
+    processData: false,
+    includeUserID: false,
+    override__token: false,
+    disabledToken: autoIncludeToken ? false : true,
+  }
+
+  let fendpoint
+  let method = defaultOptions.method
+  let timeout = defaultOptions.timeout
+  let processData = defaultOptions.processData
+  let includeUserID = defaultOptions.includeUserID
+  let override__token = defaultOptions.override__token
+  let disabledToken = defaultOptions.disabledToken
 
   if (options) {
-    method = options.method ? options.method : 'POST'
-    timeout = options.timeout ? options.timeout : 0
-    processData = options.processData ? options.processData : false
-    includeUserID = options.includeUserID ? options.includeUserID : false
-    override__token = options.override__token ? options.override__token : false
-    disabledToken = options.disabledToken ? options.disabledToken : false
-  } else {
-    method = 'POST'
-    timeout = 0
-    processData = false
-    includeUserID = false
-    override__token = false
-    disabledToken = false
+    options.method ? (method = options.method) : null
+    options.timeout ? (timeout = options.timeout) : null
+    options.processData ? (processData = true) : null
+    options.includeUserID ? (includeUserID = true) : null
+    options.override__token ? (override__token = true) : null
+    options.disabledToken ? (disabledToken = true) : null
+  }
+
+  if (disabledToken) {
+    ycore.yconsole.log(`${prefix} Dimmissing the token generation`)
+    fendpoint = `${endpoint}`
+  }
+
+  if (!disabledToken && !override__token) {
+    fendpoint = `${endpoint}${ycore.token_data.__token()}`
   }
 
   if (override__token || __token) {
@@ -43,14 +59,10 @@ export function API_Call(callback, endpoint, payload, options, __token) {
     fendpoint = `${endpoint}${__token}`
   }
 
-  if (disabledToken) {
-    ycore.yconsole.log('${prefix} Dimmissing the token generation')
-    fendpoint = `${endpoint}`
-  }
-
   if (includeUserID) {
     payloadContainer.append('user_id', ycore.token_data.__id())
   }
+
   const requestOptions = {
     url: fendpoint,
     method: method,
@@ -70,7 +82,9 @@ export function API_Call(callback, endpoint, payload, options, __token) {
           ycore.Alive_API.tokenError(response)
         }
       } catch (error) {
-        ycore.yconsole.log('[VIOLATION] The status of the request has not been identified!')
+        ycore.yconsole.log(
+          '[VIOLATION] The status of the request has not been identified!'
+        )
         ycore.Alive_API.violation()
       }
       ycore.yconsole.log(response)

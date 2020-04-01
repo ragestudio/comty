@@ -152,6 +152,7 @@ export const app_session = {
           const UserID = JSON.parse(res)['user_id']
           const UserToken = JSON.parse(res)['access_token']
 
+          const preframepayload = { user_token: UserToken, user_id: UserID}
           ycore.__rscloud.sdcp_cloud.get(
             (err, res) => {
               if (err) {
@@ -170,7 +171,7 @@ export const app_session = {
                 callback(null, '200')
               }, framepayload)
             },
-            { user_token: UserToken, user_id: UserID }
+            preframepayload
           )
         }
         if (identState == 400) {

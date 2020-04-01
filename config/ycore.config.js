@@ -11,6 +11,9 @@ module.exports = {
   resource_bundle: 'light_ng',
   sync_server: 'http://eu653-node.ragestudio.net:5500',
 
+  g_recaptcha_key: '6Lc55uUUAAAAAEIACMVf3BUzAJSNCmI3RrjEirZ6',
+  g_recaptcha_secret: '6Lc55uUUAAAAAOP4OgUa5DpqJC-70t53AmW0lyYf',
+
   /* Layout configuration, specify which layout to use for route. */
   layouts: [
     {
