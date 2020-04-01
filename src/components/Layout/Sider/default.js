@@ -1,77 +1,29 @@
-import React, { PureComponent } from 'react'
-import PropTypes from 'prop-types'
-import classnames from 'classnames'
+import React from 'react'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 
 import { withI18n, Trans } from '@lingui/react'
-import { config } from 'utils'
-import styles from './Sider.less'
+import styles from './default.less'
 import * as ycore from 'ycore'
-import router from 'umi/router'
-import CustomIcons from '../CustomIcons'
+import CustomIcons from '../../CustomIcons'
 
 @withI18n()
-class Sider extends PureComponent {
-  constructor(props) {
-    super(props)
-    this.state = {
-      selectedKey: '',
-      isHover: false,
-      collapsedWidth: '70',
-    }
-  }
-
-  isSelected(key){
-    if (this.state.selectedKey == (key)) {
-      return true
-    }
-    return false
-  }
-  
-  onClickFunctions = {
-    saves: (e) => {
-      this.setState({selectedKey: e})
-      ycore.router.go('saves')  
-    },
-    events: (e) => {
-     this.setState({selectedKey: e})
-     ycore.router.go('events')
-    },
-    marketplace: (e) => {
-      this.setState({selectedKey: e})
-      ycore.router.go('marketplace') 
-    },
-    explore: (e) => {
-      this.setState({selectedKey: e})
-      ycore.router.go('main') 
-    },
-  }
-
-  handleClickMenu = e => {
-    e.key === 'SignOut' && ycore.app_session.logout()
-    e.key === 'general_settings' && ycore.router.go('settings')
-    e.key === 'saves' && this.onClickFunctions.saves(e.key)
-    e.key === 'events' && this.onClickFunctions.events(e.key)
-    e.key === 'marketplace' && this.onClickFunctions.marketplace(e.key)
-    e.key === 'explore' && this.onClickFunctions.explore(e.key)
-    e.key === 'debug_area' && ycore.router.go('__m')
-  }
-
+export default class Sider_Default extends React.PureComponent {
   render() {
+    const { handleClickMenu, logo } = this.props 
     return (
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
           trigger={null}
           collapsed
-          width="90"
+          collapsedWidth='80'
           className={styles.left_sider_container}
         >
           <div className={styles.left_sider_brandholder}>
             <img
               onClick={() => ycore.router.go('main')}
-              src={config.LogoPath}
+              src={logo}
             />
           </div>
          
@@ -81,17 +33,17 @@ class Sider extends PureComponent {
                 selectable={false}
                 className={styles.left_sider_menuItems}
                 mode="vertical"
-                onClick={this.handleClickMenu}
+                onClick={handleClickMenu}
               >
                 <antd.Menu.Item key="explore">
-                  <Icons.CompassTwoTone twoToneColor={this.isSelected('explore')? "#28c35d" : "#85858570"} />
+                  <Icons.CompassTwoTone twoToneColor={"#28c35d"} />
                   <Trans>
                     <span>Explore</span>
                   </Trans>
                 </antd.Menu.Item>
 
                 <antd.Menu.Item key="saves">
-                  <Icon component={this.isSelected('saves')? CustomIcons.SavedPostColor : CustomIcons.SavedPostGrey} />
+                  <Icon component={CustomIcons.SavedPostColor} />
                   <Trans>
                     <span>Saves</span>
                   </Trans>
@@ -99,7 +51,7 @@ class Sider extends PureComponent {
 
                
                 <antd.Menu.Item key="marketplace">
-                  <Icons.ShoppingTwoTone twoToneColor={this.isSelected('marketplace')? "#ff7a45" : "#85858570" }/>
+                  <Icons.ShoppingTwoTone twoToneColor={"#ff7a45"}/>
                   <Trans>
                     <span>Marketplace</span>
                   </Trans>
@@ -107,7 +59,7 @@ class Sider extends PureComponent {
          
 
               <antd.Menu.Item key="events">
-                  <Icons.CarryOutTwoTone twoToneColor={this.isSelected('events')? "#ff4d4f" : "#85858570"}/>
+                  <Icons.CarryOutTwoTone twoToneColor={"#ff4d4f"}/>
                   <Trans>
                     <span>Events</span>
                   </Trans>
@@ -119,8 +71,8 @@ class Sider extends PureComponent {
                 <antd.Menu
                   selectable={false}
                   className={styles.left_sider_menuItems}
-                  mode="vertical"
-                  onClick={this.handleClickMenu}
+                  mode="horizontal"
+                  onClick={handleClickMenu}
                 >
                   <antd.Menu.Item key="general_settings">
                     <Icons.SettingOutlined />
@@ -153,14 +105,3 @@ class Sider extends PureComponent {
     )
   }
 }
-
-Sider.propTypes = {
-  menus: PropTypes.array,
-  theme: PropTypes.string,
-  isMobile: PropTypes.bool,
-  collapsed: PropTypes.bool,
-  onThemeChange: PropTypes.func,
-  onCollapseChange: PropTypes.func,
-}
-
-export default Sider

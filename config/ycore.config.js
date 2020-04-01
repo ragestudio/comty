@@ -9,6 +9,7 @@ module.exports = {
   DarkLogoPath: '/dark_logo.svg',
 
   resource_bundle: 'light_ng',
+  sync_server: 'http://eu653-node.ragestudio.net:5500',
 
   /* Layout configuration, specify which layout to use for route. */
   layouts: [

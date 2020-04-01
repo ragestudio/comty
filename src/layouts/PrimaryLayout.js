@@ -40,7 +40,6 @@ class PrimaryLayout extends React.Component {
   componentDidMount() {
     this.setState({
       userData: ycore.userData(),
-      desktop_mode: ycore.CheckThisApp.desktop_mode(),
     })
 
     this.enquireHandler = enquireScreen(mobile => {
@@ -63,23 +62,13 @@ class PrimaryLayout extends React.Component {
     store.set('collapsed', !fromStore)
   }
 
-  isDarkMode = () => {
-    const { app } = this.props
-    const { theme } = app
-    if (theme == 'light') {
-      return false
-    }
-    return true
-  }
-
   render() {
     const { app, location, dispatch, children } = this.props
-    const { userData, collapsed, isMobile, desktop_mode } = this.state
+    const { userData, collapsed, isMobile } = this.state
     const { onCollapseChange } = this
     const { theme } = app
 
     const SiderProps = {
-      desktop_mode: desktop_mode,
       theme,
       userData,
       isMobile,
@@ -100,11 +89,11 @@ class PrimaryLayout extends React.Component {
 
     return (
       <React.Fragment>
-          {isMobile ? <MobileWarning /> : null}
+          {/* {isMobile ? <MobileWarning /> : null} */}
           <div className={styles.__ControlBar}>
             <Control />
           </div>
-          <antd.Layout id="primaryLayout" className={styles.primary_layout}>
+          <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
             <Sider {...SiderProps} />
 
             <div className={styles.primary_layout_container}>

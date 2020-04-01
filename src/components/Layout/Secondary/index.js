@@ -144,7 +144,7 @@ export default class Secondary extends React.PureComponent {
 
   renderPost = payload => {
     const post_data = JSON.parse(payload)['post_data']
-    return <__priPost payload={post_data} />
+    return <__priPost isMobile={this.props.isMobile} payload={post_data} />
   }
 
   renderComments = payload => {
@@ -193,26 +193,29 @@ export default class Secondary extends React.PureComponent {
   }
 
   render() {
-    const { userData } = this.props
+    const { userData, isMobile } = this.props
     if (!this.state.loading) return (
       <>
-      <div className={styles.__secondary_colider}></div>
+      {isMobile? null : <div className={styles.__secondary_colider}></div>} 
       <div
+        id="secondary_layout"
         className={classnames(styles.secondary_wrapper, {
+          [styles.mobile]: isMobile,
           [styles.active]: this.state.swap,
           [styles.half]: this.state.half,
           [styles.unique]: this.state.unique,
         })}
       >
+       {isMobile? null :
         <div className={styles.secondary_userholder}>
-          <div className={styles.notif_box}>
-            <h1>{this.state.notification_data.length}</h1>    
-          </div>
-          <img
-            onClick={() => ycore.router.go(`@${userData.username}`)}
-            src={userData.avatar}
-          />
+        <div className={styles.notif_box}>
+          <h1>{this.state.notification_data.length}</h1>    
         </div>
+        <img
+          onClick={() => ycore.router.go(`@${userData.username}`)}
+          src={userData.avatar}
+        />
+      </div>}
 
         <div
           className={styles.secondary_layout_bg}
@@ -234,6 +237,7 @@ export default class Secondary extends React.PureComponent {
 
           <div
             className={classnames(styles.secondary_container_2, {
+              [styles.mobile]: isMobile,
               [styles.active]: this.state.swap,
             })}
           >

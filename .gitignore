@@ -21,4 +21,4 @@ package-lock.json
 # jslingui
 src/locales/_build
 src/locales/**/*.js
-recover/
+android/

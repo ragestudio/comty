@@ -12,6 +12,16 @@
     overflow-y: hidden!important;
     background-color: @primary_layout_backgroud;
     margin: auto;
+    &.mobile{
+      >.primary_layout_container {
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+      }
+      >.primary_layout_content{
+        padding: 0;
+      }
+    }
 }
 
 // PRIMARY LAYOUT 

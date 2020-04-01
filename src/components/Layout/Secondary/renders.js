@@ -24,19 +24,23 @@ const VerifiedBadge = () => (
 export class __priPost extends React.Component {
   renderContent(payload) {
     const { id, postText, postFile_full, post_time, publisher } = payload
+    const {isMobile}= this.props
     if (!postFile_full) {
       return (
-        <div className={styles.postContent_OnlyText}>
-          <PostCard payload={payload} />
-        </div>
+        <div className={styles.contentWrapper}>
+        {postText ? (
+          <div className={styles.postContent}>
+            <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
+          </div>
+        ) : null}
+      </div>
       )
     }
     return (
       <div className={styles.contentWrapper}>
-        {postFile_full ? <MediaPlayer file={postFile_full} /> : null}
+        {postFile_full ? <MediaPlayer isMobile={isMobile} entire={true} file={postFile_full} /> : null}
         {postText ? (
           <div className={styles.postContent}>
-            {' '}
             <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
           </div>
         ) : null}
@@ -45,7 +49,7 @@ export class __priPost extends React.Component {
   }
 
   render() {
-    const payload = this.props.payload
+    const {payload} = this.props
     if (!payload) {
       return <h1>This post not exists!!!</h1>
     }

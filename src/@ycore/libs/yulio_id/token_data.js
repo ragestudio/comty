@@ -1,12 +1,12 @@
 import * as ycore from 'ycore'
 
 import Cookies from 'ts-cookies'
-import keys from '../../../../config/keys.js'
+import {server_key} from '../../../../config/keys.js'
 var jwt = require('jsonwebtoken')
 
 export const token_data = {
   set: (value, callback) => {
-    jwt.sign(value, keys.secretOrKey, (err, token) => {
+    jwt.sign(value, server_key, (err, token) => {
       err ? null : Cookies.set('cid', token)
       return callback(true)
     })

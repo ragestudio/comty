@@ -3,7 +3,7 @@
   "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
   "title": "Comty™",
   "DevBuild": true,
-  "version": "0.2.30",
+  "version": "0.2.32",
   "stage": "A1",
   "description": "",
   "main": "app/main.js",
@@ -18,6 +18,9 @@
   "dependencies": {
     "@ant-design/compatible": "^1.0.1",
     "@ant-design/pro-layout": "^5.0.6",
+    "@capacitor/android": "^1.5.2",
+    "@capacitor/cli": "^1.5.2",
+    "@capacitor/core": "^1.5.2",
     "@lingui/react": "^2.9.1",
     "@material-ui/core": "^4.9.3",
     "@material-ui/icons": "^4.9.1",

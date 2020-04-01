@@ -48,6 +48,7 @@ export default {
           router.push({ pathname: '/main' })
         }
         ycore.QueryRuntime()
+        
         return true
       } else if (!pathMatchRegexp(['', '/login'], window.location.pathname)) {
         if (validBackup == true) {

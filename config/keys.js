@@ -3,5 +3,4 @@ module.exports = {
 
   server_key:
     'f706b0a535b6c2d36545c4137a0a3a26853ea8b5-1223c9ba7923152cae28e5a2e7501b2b-50600768',
-  secretOrKey: 'secret',
 }

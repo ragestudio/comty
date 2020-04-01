@@ -42,11 +42,7 @@ localforage.config({
   storeName: package_json.name,
 })
 
-var socket = io('http://localhost:5500');
 
-socket.on('post_feed', function (data) {
-    console.log('SOCKET => ',data)
-});
 
 /**
  * Convert a base64 string in a Blob according to the data and contentType.

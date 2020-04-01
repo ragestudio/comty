@@ -1,0 +1,49 @@
+@import '~themes/index.less';
+
+
+.left_sider_wrapper {
+    position: fixed;
+    z-index: 500;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    height: 50px;
+    width: 100%;
+
+    border-color: transparent;
+    font-size: 13px;
+    font-family: @__Global_general_font_family;
+    padding: 0 27px;
+
+    :global {
+        .ant-layout-sider {
+            background-color: transparent;
+            height: 100%;
+
+            .ant-menu-item {color: @left_sider_color;}
+            .anticon {font-size: @left_sider_sizeIcons;}
+            .ant-menu-item{margin: auto; padding: 0;}
+
+            .ant-menu {
+                background-color: #2d2d2d;
+                height: 100%;
+                border-radius: 27px 27px 0 0;
+                padding: 0 27px;
+                display: flex;
+            }
+           
+            .ant-menu-horizontal {
+                line-height: 46px;
+                white-space: nowrap;
+                border: 0;
+                border-bottom: 0;
+                box-shadow: none;
+            }
+        }
+      }
+
+
+
+}
+

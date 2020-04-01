@@ -9,8 +9,6 @@ import * as MICONS from '@material-ui/icons'
 
 import Post_options from './local_components/post_options'
 import { optionBox } from './local_components/post_options'
-import io from 'socket.io-client'
-var socket = io('http://localhost:5500');
 
 function getBase64(img, callback) {
   const reader = new FileReader()
@@ -188,7 +186,8 @@ class PostCreator extends React.PureComponent {
       
       const pro_boost_val = ycore.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
       const allow_comments_val = ycore.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
-      socket.emit('push_post');
+      console.log(id_temp_parse)
+      ycore.sync.emmitPost(id_temp_parse)
       ycore.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
 
       if (pro_boost_val) {

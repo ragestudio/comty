@@ -1,0 +1,8 @@
+{
+  "appId": "com.ragestudio.comty",
+  "appName": "comty-development",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "dist",
+  "cordova": {}
+}

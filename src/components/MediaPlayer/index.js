@@ -1,28 +1,32 @@
 import React from 'react'
-import * as Icons from '@ant-design/icons'
+import classnames from 'classnames'
+import styles from './index.less'
 
 export default class MediaPlayer extends React.PureComponent {
-  render() {
+  player() {
     const { file } = this.props
-    let type;
-  
+    let type
+
     const ImageExtensions = ['.png', '.jpg', '.jpeg', '.gif']
     const VideoExtensions = ['.mp4', '.mov', '.avi']
     const AudioExtensions = ['.mp3', '.ogg', '.wav']
 
-    const FilesAllowed = ImageExtensions.concat(VideoExtensions, AudioExtensions)
-    
+    const FilesAllowed = ImageExtensions.concat(
+      VideoExtensions,
+      AudioExtensions
+    )
+
     for (const prop in FilesAllowed) {
-     if(file.includes(`${ImageExtensions[prop]}`)){
-      type = 'image'
-     }
-     if(file.includes(`${VideoExtensions[prop]}`)){
-      type = 'video'
-     }
-     if(file.includes(`${AudioExtensions[prop]}`)){
-      type = 'audio'
-     }
-    } 
+      if (file.includes(`${ImageExtensions[prop]}`)) {
+        type = 'image'
+      }
+      if (file.includes(`${VideoExtensions[prop]}`)) {
+        type = 'video'
+      }
+      if (file.includes(`${AudioExtensions[prop]}`)) {
+        type = 'audio'
+      }
+    }
 
     if (type == 'video') {
       //  const payload = {type: 'video', sources: [{src: file,}]}
@@ -43,11 +47,19 @@ export default class MediaPlayer extends React.PureComponent {
       )
     }
     if (type == 'image') {
-      if (file.includes('gif')) {
-        return <div><Icons.GifOutlined /> <img src={file} /></div>
-      }
-     return <img src={file} />
-    } 
-    return null
+      return <img src={file} />
+    }
+  }
+  render() {
+    return (
+      <div
+        className={classnames(styles.PlayerContainer, {
+          [styles.mobile]: this.props.isMobile,
+          [styles.entire]: this.props.entire,
+        })}
+      >
+        {this.player()}
+      </div>
+    )
   }
 }

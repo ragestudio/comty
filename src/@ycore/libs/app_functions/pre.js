@@ -16,6 +16,10 @@ export function QueryRuntime() {
   const validBackup = ycore.validate.backup()
 
   if (!validBackup) ycore.make_data.backup()
+  ycore.sync.listen((data) => {
+    
+  })
+
 }
 
 export function SetupApp() {
@@ -77,6 +81,9 @@ export const FeedHandler = {
   goToElement: post_id => {
     RenderFeed.goToElement(post_id)
   },
+  sync: data => {
+    RenderFeed.sync(data)
+  }
 }
 
 export const LoginPage = {
