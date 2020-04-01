@@ -11,9 +11,6 @@ export function API_Call(callback, endpoint, payload, options, __token) {
   payloadContainer.append('server_key', ycore.__server.getKey())
 
   const autoIncludeToken = endpoint.includes('?access_token=')
-  if (autoIncludeToken) {
-    console.log(`Uri Endpoint parsed '?access_token= ' | Auto including token!`)
-  }
 
   const defaultOptions = {
     method: 'POST',
