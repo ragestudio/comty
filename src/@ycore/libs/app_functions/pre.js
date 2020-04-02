@@ -105,6 +105,13 @@ export const router = {
       pathname: `/${e}`,
       search: window.location.search,
     })
+  },
+  goprofile: () => {
+    goTo.element('primaryContent')
+    umiRouter.push({
+      pathname: `/@${ycore.userData().username}`,
+      search: window.location.search,
+    })
   }
 }
 

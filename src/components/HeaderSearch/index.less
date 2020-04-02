@@ -5,7 +5,10 @@
   top: 0;
   display: flex;
   margin: auto;
-  width: 100%;
+  max-width: 510px;
+  min-width: 265px;
+  width: auto;
+  height: 50px;
 
   &.hidden {
     display: none;
@@ -13,23 +16,19 @@
 }
 
 .headerSearch {
-  margin: auto;
+  width: 100%;
+  height: 100%;
 
   :global {
     .ant-input-affix-wrapper {
-      box-sizing: border-box;
+      height: 100%;
+      width: 100%;
+      display: flex;
+
+     
       margin: 0;
       padding: 0;
-      color: rgba(0, 0, 0, .65);
-      font-size: 14px;
-      font-variant: tabular-nums;
-      line-height: 1.5;
-      list-style: none;
-      font-feature-settings: 'tnum';
-      position: relative;
-      display: inline-block;
-      width: 100%;
-      text-align: start;
+    
     }
 
     .ant-input-affix-wrapper .ant-input-prefix {

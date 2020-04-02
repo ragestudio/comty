@@ -3,7 +3,9 @@ import * as ycore from 'ycore'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from './modals.less';
+import classnames from 'classnames'
 
+const isMobile = localStorage.getItem('mobile_src')
 
 class __Model_postreport extends React.PureComponent {
     state = {
@@ -92,7 +94,7 @@ class __Model_postreport extends React.PureComponent {
 
     render(){
         return(
-            <div className={styles.post_report_main}>
+            <div className={classnames(styles.post_report_main, {[styles.mobile]: isMobile})}>
                 <div>
                     <antd.Steps>
                        <antd.Steps.Step status={this.status(1)} title="Summary" icon={<Icons.SolutionOutlined />} />

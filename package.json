@@ -3,7 +3,7 @@
   "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
   "title": "Comty™",
   "DevBuild": true,
-  "version": "0.3.01",
+  "version": "0.3.02",
   "stage": "dev-pre",
   "description": "",
   "main": "app/main.js",

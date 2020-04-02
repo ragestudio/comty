@@ -29,6 +29,7 @@ class Sider extends React.PureComponent {
   handleClickMenu = e => {
     e.key === 'SignOut' && ycore.app_session.logout()
     e.key === 'general_settings' && ycore.router.go('settings')
+    e.key === 'profile' && ycore.router.goprofile()
     e.key === 'saves' && this.onClickFunctions.saves(e.key)
     e.key === 'events' && this.onClickFunctions.events(e.key)
     e.key === 'marketplace' && this.onClickFunctions.marketplace(e.key)
@@ -38,7 +39,7 @@ class Sider extends React.PureComponent {
 
   render() {
     const { isMobile } = this.props
-    const sider_props = {handleClickMenu: this.handleClickMenu ,logo: config.LogoPath, menulist: null}
+    const sider_props = {handleClickMenu: this.handleClickMenu ,logo: config.LogoPath, menulist: null, userData: this.props.userData}
 
     if (isMobile) {
       return <Sider_Mobile {...sider_props} />

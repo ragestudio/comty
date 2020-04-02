@@ -17,6 +17,7 @@
 @ease-in: ease-in;
 
 ::-webkit-scrollbar {
+    position: absolute;
     width: 14px;
     height: 18px;
   }
@@ -45,13 +46,15 @@ body {
   //  min-width: 430px;
   background-color: transparent;
 
-  // overflow-y: hidden;
-  // overflow-x: hidden;
-  // overflow: hidden;
+  overflow: hidden;
 
   font-size: @base-font-size;
   line-height: @base-line-height;
 
+}
+
+#root {
+  overflow: hidden;
 }
 
 @media (min-width: @bp-medium) {

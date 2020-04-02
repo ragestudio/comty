@@ -29,7 +29,12 @@
 .userWrapper {
   padding: 0 68px 15px 68px;
   margin: auto;
-
+  &.mobile{
+    max-width: 510px;
+    min-width: 265px;
+    width: auto;
+    padding: 0 15px 0 15px;
+  }
   :global {
     .ant-page-header-content {
       padding-top: 0;
@@ -75,7 +80,9 @@
 
 .avatar {
   transform: translate(-25px, -45px);
-
+  max-height: 200px;
+  max-width: 120px;
+  
   &>span {
     position: relative;
     z-index: 10;

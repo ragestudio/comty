@@ -33,21 +33,61 @@
   }
 
   &.mobile {
-    height: 45px;
     width: 100%;
-    bottom: -70px;
+    height: 0;
+    bottom: 0;
+    opacity: 0;
+
     top: unset;
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
     >.secondary_layout_bg{
-      border-radius: 27px 27px 0 0;
-      overflow-y: hidden;
-      overflow-x: scroll;
+      border-radius: 12px 12px 0 0;
+      flex-direction: column;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      width: 100%;
     }
+    .secondary_container_1{
+      height: 85vh;
+      width: 100%;
+    }
+    .secondary_container_2{
+      width: 100%;
+      padding: 10px 10px 60px 10px;
+      border-radius: 12px 12px 0 0;
+    }
+    :global{
+      .comments_body {
+        padding: 30px 10px 10px 10px;
+      }
+    }
+
     &.active {
+      opacity: 1;
       bottom: 0;
-      height: 100vh;
-    
+      height: 100%;
+      width: 100%;
+    }
+    &.half{
+      opacity: 1;
+      bottom: 0;
+      height: 60%;
+      width: 100%;
+    }
+    &.unique {
+      opacity: 1;
+      bottom: 0;
+      height: 100%;
+      width: 100%;
+      >.secondary_layout_bg  {
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 12px 12px 0 0;
+        flex-direction: column;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        width: 100%;
+      }
     }
   }
 
@@ -126,7 +166,7 @@
   padding: 30px 30px 30px 35px;
 
   color: @secondary_container_1_color;
-
+  
   :global {
     .ant-btn {
       color: @secondary_container_1_btn_color;
@@ -161,17 +201,6 @@
     right: 0;
     @media (min-width: 1000px) {
       width: 600px
-    }
-  }
-
-  &.mobile{
-    overflow-x: hidden;
-    &.active {
-      width: 400px;
-      right: -120px;
-      opacity: 1;
-   
-      
     }
   }
   

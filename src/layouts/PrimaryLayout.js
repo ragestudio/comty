@@ -48,6 +48,7 @@ class PrimaryLayout extends React.Component {
         this.setState({
           isMobile: mobile,
         })
+        store.set('mobile_src', mobile)
       }
     })
   }

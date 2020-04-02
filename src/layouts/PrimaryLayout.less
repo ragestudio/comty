@@ -8,8 +8,7 @@
 }
 
 .primary_layout {
-    overflow-x: hidden!important;
-    overflow-y: hidden!important;
+    overflow: hidden;
     background-color: @primary_layout_backgroud;
     margin: auto;
     &.mobile{
@@ -17,9 +16,11 @@
         border-radius: 0;
         margin: 0;
         padding: 0;
+        overflow-y: overlay;
+        overflow-x: hidden;
       }
-      >.primary_layout_content{
-        padding: 0;
+      .primary_layout_content{
+        padding: 35px 15px 15px 15px;
       }
     }
 }

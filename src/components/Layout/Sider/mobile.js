@@ -11,7 +11,7 @@ import CustomIcons from '../../CustomIcons'
 @withI18n()
 export default class Sider_Mobile extends React.PureComponent {
   render() {
-    const { handleClickMenu, logo } = this.props 
+    const { handleClickMenu, userData } = this.props
     return (
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
@@ -27,33 +27,23 @@ export default class Sider_Mobile extends React.PureComponent {
                 </antd.Menu.Item>
 
                 <antd.Menu.Item key="saves">
-                  <Icon component={CustomIcons.SavedPostColor} />
+                  <Icons.HeartTwoTone twoToneColor={"#ff4d4f"} />
                 </antd.Menu.Item>
-
-               
-                <antd.Menu.Item key="marketplace">
-                  <Icons.ShoppingTwoTone twoToneColor={"#ff7a45"}/>
-                </antd.Menu.Item>
-         
-
-              <antd.Menu.Item key="events">
-                  <Icons.CarryOutTwoTone twoToneColor={"#ff4d4f"}/>
-              </antd.Menu.Item>
 
                 <antd.Menu.Item key="general_settings">
                     <Icons.SettingOutlined />
                 </antd.Menu.Item>
 
-                <antd.Menu.Item key="SignOut">
-                    <Icons.LogoutOutlined style={{ color: 'red' }} />
+                <antd.Menu.Item key="profile">
+                   <antd.Avatar size={20} shape="square" src={userData.avatar} />
                 </antd.Menu.Item>
 
 
               </antd.Menu>
 
-              
-   
-        
+
+
+
         </antd.Layout.Sider>
       </div>
     )
