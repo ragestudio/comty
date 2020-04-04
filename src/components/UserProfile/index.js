@@ -123,6 +123,14 @@ class UserProfile extends React.PureComponent {
   }
 
   render() {
+    
+const moreMenu = (
+  <antd.Menu>
+    <antd.Menu.Item>1st antd.Menu item</antd.Menu.Item>
+    <antd.Menu.Item>2nd antd.Menu item</antd.Menu.Item>
+  </antd.Menu>
+);
+
     const { loading, UUID, invalid, RenderValue } = this.state
     return (
       <div>
@@ -185,6 +193,13 @@ class UserProfile extends React.PureComponent {
                                 />
                               ) : null}
                             </antd.Tooltip>
+                            
+                            { ycore.IsThisUser.same(UUID)? 
+                            <antd.Dropdown overlay={moreMenu}>
+                              <Icons.MoreOutlined className={styles.user_more_menu} />
+                            </antd.Dropdown> 
+                            : null }
+
                           </h1>
                           <span
                             style={{
