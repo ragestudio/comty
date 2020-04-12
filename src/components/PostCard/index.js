@@ -38,20 +38,11 @@ class PostCard extends React.PureComponent {
     this.setState({visibleMoreMenu: !this.state.visibleMoreMenu})
   }
 
-  goToPost(postID) {
-    localStorage.setItem('p_back_uid', postID)
-    const payload = { post_id: postID }
-    ycore.comty_post.get((err, res) => {
-      if (err) {
-        return false
-      }
-      ycore.SecondarySwap.openPost(res)
-    }, payload)
-  }
-
   render() {
     const { payload, customActions } = this.props
     const ActShowMode = ycore.AppSettings.auto_hide_postbar
+
+    const post_data = payload || emptyPayload;
     const {
       id,
       post_time,
@@ -62,7 +53,17 @@ class PostCard extends React.PureComponent {
       is_post_pinned,
       is_liked,
       post_comments,
-    } = payload || emptyPayload
+      get_post_comments
+    } = post_data
+
+    const SwapThisPost = () => {
+      localStorage.setItem('p_back_uid', id)
+      if (postFile){
+        ycore.SwapMode.openPost(id, post_data)
+      }
+      ycore.SwapMode.openComments(id, get_post_comments)
+    }
+
     const handlePostActions = {
       delete: post_id => {
         const payload = { post_id: post_id }
@@ -119,7 +120,7 @@ class PostCard extends React.PureComponent {
         />
       </div>,
       <antd.Badge dot={post_comments > 0 ? true : false}>
-        <MICON.InsertComment key="comments" onClick={() => this.goToPost(id)} />
+        <MICON.InsertComment key="comments" onClick={() => SwapThisPost()} />
       </antd.Badge>,
     ]
     const actions = customActions || defaultActions
@@ -174,7 +175,7 @@ class PostCard extends React.PureComponent {
     return (
       <div className={styles.post_card_wrapper}>
         <antd.Card
-          onDoubleClick={() => this.goToPost(id)}
+          onDoubleClick={() => SwapThisPost()}
           hoverable
           className={ActShowMode ? null : styles.showMode}
           actions={actions}

@@ -127,6 +127,12 @@ export const comty_post = {
       formdata
     )
   },
+  hashtag: (callback, payload) => {
+    if (!payload) return false
+    const { hashtag } = payload
+    // DOING
+    
+  },
   getSaved: (callback, payload) => {
     if (!payload) {
       yconsole.log(

@@ -42,8 +42,6 @@ localforage.config({
   storeName: package_json.name,
 })
 
-
-
 /**
  * Convert a base64 string in a Blob according to the data and contentType.
  *

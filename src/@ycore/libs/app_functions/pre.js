@@ -10,7 +10,7 @@ import React from 'react'
 
 export * from './modals.js'
 
-
+export {SwapMode} 
 
 export function QueryRuntime() {
   const validBackup = ycore.validate.backup()

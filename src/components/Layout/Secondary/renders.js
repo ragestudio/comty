@@ -21,7 +21,7 @@ const VerifiedBadge = () => (
   </svg>
 )
 
-export class __priPost extends React.Component {
+export class __priPost extends React.PureComponent {
   renderContent(payload) {
     const { id, postText, postFile_full, post_time, publisher } = payload
     const {isMobile}= this.props
@@ -175,7 +175,7 @@ export class __secComments extends React.Component {
     return (
       <div className={styles.comments_body}>
         <div className={styles.comments_body_title}>
-          <h1>Comments ({comment_data.length})</h1>
+          {/* <h1>Comments ({comment_data.length})</h1> */}
         </div>
         <div className={styles.comments_cards_wrapper}>
           {loading ? (

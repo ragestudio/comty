@@ -8,7 +8,7 @@ export default class Main extends React.Component {
     return (
       <div className={styles.mainWrapper}>
         <PostCreator userData={ycore.userData()} />
-        <MainFeed get="feed" />
+        <MainFeed auto={true} get="feed" />
       </div>
     )
   }

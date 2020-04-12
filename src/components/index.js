@@ -11,7 +11,6 @@ import App_about from './App_about'
 import * as MyLayout from './Layout/index.js'
 import HeaderSearch from './HeaderSearch'
 import PageTransition from './PageTransition'
-import YulioID from './YulioID'
 
 // User Components
 import UserBadges from './UserBadges'
@@ -34,7 +33,6 @@ export {
   PageTransition,
   SearchCard,
   HeaderSearch,
-  YulioID,
   UserProfile,
   MyLayout,
   Loader,

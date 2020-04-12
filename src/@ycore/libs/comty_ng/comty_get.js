@@ -62,4 +62,26 @@ export const comty_get = {
     )
     
   },
+  get_user_data: (callback, payload) => {
+    let formdata = new FormData();
+    let callOptions = { includeUserID: false };
+
+    if (!payload) {
+      callOptions = {  includeUserID: true }
+      formdata.append('fetch', 'user_data')
+    }
+
+    if (payload) { 
+      payload.user_id? formdata.append('user_id', payload.user_id) : null
+      payload.fetch? formdata.append('fetch', payload.fetch) : null
+    }
+  
+    API_Call(
+      (err, res) => {
+        return callback(err, res)
+      },
+      endpoints.comty_endpoints.get_userData,
+      formdata, callOptions
+    )
+  }
 }

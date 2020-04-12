@@ -32,6 +32,8 @@ export default class HeaderSearch extends Component {
 
   openSearcher = () => {
     const { value } = this.state
+    if (value.length < 1) return false
+    if (value == /\s/) return false
     ycore.SecondarySwap.openSearch(value);
   }
 

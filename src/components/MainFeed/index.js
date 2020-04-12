@@ -36,6 +36,7 @@ class MainFeed extends React.PureComponent {
     super(props)
     window.MainFeedComponent = this
     this.state = {
+      AutoFeed: this.props.auto? true:false,
       NewAV: false,
       invalid: false,
       loading: false,
@@ -51,7 +52,7 @@ class MainFeed extends React.PureComponent {
       this.syncService(data)
     })
   }
-
+ 
   toogleLoader() {
     this.setState({ loading: !this.state.loading })
   }
@@ -160,7 +161,7 @@ class MainFeed extends React.PureComponent {
   
 
   render() {
-    const { data, loading, isEnd, invalid, NewAV } = this.state
+    const { data, loading, isEnd, invalid, NewAV, AutoFeed } = this.state
     const renderFeedPosts_payload = {data: data, loading: loading, isEnd: isEnd, feedGet: this.feedGet}
     
     if (invalid){
@@ -176,7 +177,7 @@ class MainFeed extends React.PureComponent {
     if (!loading) {
       return (
         <div className={styles.main_feed_wrapper} id="mainfeed">
-          {NewAV? ComponentNewAV(() => this.feedGet.first()) : null}
+          {AutoFeed? NewAV? ComponentNewAV(() => this.feedGet.first()) : null : null}
           {renderFeedPosts(renderFeedPosts_payload)}
         </div>
       )

@@ -2,7 +2,6 @@ import React from 'react'
 import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
-import { PageHeaderWrapper } from '@ant-design/pro-layout'
 import { CustomIcons, MainFeed, PostCreator } from 'components'
 import { SetHeaderSearchType } from 'components/HeaderSearch'
 import * as Icons from '@ant-design/icons'
@@ -148,8 +147,8 @@ const moreMenu = (
                   <img src={RenderValue.cover} />
                 </div>
 
-                <PageHeaderWrapper
-                  content={
+                <div>
+                  
                     <div className={styles.pageHeaderContent}>
                       <div className={styles.avatar}>
                         <antd.Avatar shape="square" src={RenderValue.avatar} />
@@ -215,8 +214,7 @@ const moreMenu = (
                         </div>
                       </div>
                     </div>
-                  }
-                />
+                </div>
               </div>
             )}
             {ycore.IsThisUser.same(UUID) ? (

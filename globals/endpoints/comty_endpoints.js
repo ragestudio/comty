@@ -14,7 +14,7 @@ module.exports={
         auth_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/auth",
         new_post: "https://comty.julioworld.club/api/new_post?access_token=",
         get_config_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/get-site-settings?access_token=",
-        get_userData_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/get-user-data?access_token=",
+        get_userData: "https://api.ragestudio.net/RSA-COMTY/r/get-user-data?access_token=",
         update_userData_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/update-user-data?access_token=",
         removeToken: "https://api.ragestudio.net/RSA-COMTY/r/delete-access-token?access_token=",
         register_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/create-account",

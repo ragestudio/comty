@@ -80,7 +80,7 @@ export const __rscloud = {
             return callback(true, error)
           }
         },
-        ycore.endpoints.comty_endpoints.get_userData_endpoint,
+        ycore.endpoints.comty_endpoints.get_userData,
         formdata,
         optionCall,
         user_token

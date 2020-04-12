@@ -5,18 +5,86 @@ import * as Icons from '@ant-design/icons'
 import styles from './index.less'
 import classnames from 'classnames'
 
-import { __priPost, __secComments, __priSearch, __trendings, __pro } from './renders.js'
+import {
+  __priPost,
+  __secComments,
+  __priSearch,
+  __trendings,
+  __pro,
+} from './renders.js'
 
 export const SwapMode = {
   close: () => {
     SecondaryLayoutComponent.Swapper.close()
   },
-  openPost: (a, b) => {
-    SecondaryLayoutComponent.setState({
-      mode: 'post',
-      global_raw: a,
-    })
-    SecondaryLayoutComponent.Swapper.open()
+  openPost: (id, content) => {
+    if (!id) return false
+    let d
+
+    if (content) {
+      d = content
+    } else {
+      const payload = { post_id: id }
+      ycore.comty_post.get((err, res) => {
+        if (err) {
+          return false
+        }
+        const post_data = JSON.parse(res)['post_data']
+        d = post_data
+      }, payload)
+    }
+
+    console.log(d)
+
+    if (d) {
+      try {
+        const pdata = (
+          <__priPost
+            isMobile={SecondaryLayoutComponent.props.isMobile}
+            payload={d}
+          />
+        )
+        SecondaryLayoutComponent.setState({ rd__pri: pdata, __pri_full: true })
+
+        return true
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    }
+    return false
+  },
+  openComments: (id, content) => {
+    if (!id) return false
+    let d
+
+    if (content) {
+      d = content
+    } else {
+      console.debug('Missing Payload [content]!')
+      localStorage.setItem('p_back_uid', postID)
+      const payload = { post_id: id }
+      ycore.comty_post.get((err, res) => {
+        if (err) {
+          return false
+        }
+        const post_comments = JSON.parse(res)['get_post_comments']
+        d = post_comments
+      }, payload)
+    }
+    if (d) {
+      try {
+        const pdata = <__secComments post_id={id} payload={d} />
+        SecondaryLayoutComponent.setState({
+          rd__sec: pdata,
+          __sec_active: true,
+        })
+        return true
+      } catch (error) {
+        console.log(error)
+        return null
+      }
+    }
   },
   openSearch: a => {
     SecondaryLayoutComponent.setState({
@@ -31,98 +99,37 @@ export const SwapMode = {
       global_raw: fragment,
     })
     SecondaryLayoutComponent.Swapper.unique()
-  }
+  },
 }
 
 export default class Secondary extends React.PureComponent {
   constructor(props) {
     super(props),
-    window.SecondaryLayoutComponent = this,
-    this.state = {
-      loading: true,
-      half: false,
-      swap: false,
-      mode: '',
-      gen_data: '',
-      global_raw: '',
-      pri_raw: '',
-      sec_raw: '',
-    }
+      (window.SecondaryLayoutComponent = this),
+      (this.state = {
+        loading: true,
+        gen_data: null,
+        // Lays
+        rd__pri: null,
+        rd__sec: null,
+        __pri_full: false,
+        __pri_half: false,
+        __sec_active: false,
+        __sec_full: false,
+      })
   }
 
   Swapper = {
     close: () => {
       this.setState({
-        swap: false,
-        half: false,
-        unique: false,
-        pri_raw: null,
-        sec_raw: null,
-        global_raw: null,
-        mode: null,
+        rd__pri: null,
+        rd__sec: null,
+        __pri_full: false,
+        __pri_half: false,
+        __sec_active: false,
+        __sec_full: false,
       })
     },
-    open: () => {
-      this.setState({
-        swap: true,
-        half: false,
-        unique: false,
-      })
-    },
-    half : () => {
-      this.setState({
-        swap: false,
-        half: true,
-        unique: false,
-      })
-    },
-    unique: ()=>{
-      this.setState({
-        swap: false,
-        half: false,
-        unique: true,
-      })
-    }
-  }
-
-  SwapBalanceContent(container) {
-    switch (container) {
-      case '__pri': {
-        return this.__pri()
-      }
-      case '__sec': {
-        return this.__sec()
-      }
-      default:
-        return null
-    }
-  }
-
-  __pri() {
-    const dtraw = this.state.pri_raw
-    switch (this.state.mode) {
-      case 'post': {
-        return this.renderPost(this.state.global_raw)
-      }
-      case 'search': {
-        return this.renderSearch(dtraw)
-      }
-      case 'fragment': {
-        return this.renderFragment()
-      }
-      default:
-        return this.renderMain()
-    }
-  }
-  __sec() {
-    const dtraw = this.state.sec_raw
-    switch (this.state.mode) {
-      case 'post': {
-        return this.renderComments(this.state.global_raw)
-      }
-      default:
-        return null
-    }
   }
 
   renderSearch = key => {
@@ -136,44 +143,26 @@ export default class Secondary extends React.PureComponent {
     }, payload)
     return (
       <div className={styles.renderSearch_wrapper}>
-        <h2><Icons.SearchOutlined /> Results of {key || '... nothing ?'}</h2>
+        <h2>
+          <Icons.SearchOutlined /> Results of {key || '... nothing ?'}
+        </h2>
         <__priSearch payload={this.state.global_raw} />
       </div>
     )
   }
 
-  renderPost = payload => {
-    const post_data = JSON.parse(payload)['post_data']
-    return <__priPost isMobile={this.props.isMobile} payload={post_data} />
-  }
-
-  renderComments = payload => {
-    try {
-      const post_comments = JSON.parse(payload)['post_comments']
-      const post_data = JSON.parse(payload)['post_data']
-      return (
-        <__secComments post_id={post_data.post_id} payload={post_comments} />
-      )
-    } catch (error) {
-      return null
-    }
-  }
   renderMain = payload => {
     try {
       const trending_data = JSON.parse(this.state.gen_data)['trending_hashtag']
-      return(
+      return (
         <div className={styles.secondary_main}>
-
-          {ycore.IsThisUser.pro()? <__pro /> : <__pro /> } 
+          {ycore.IsThisUser.pro() ? <__pro /> : <__pro />}
           <__trendings data={trending_data} />
-        
-  
         </div>
       )
     } catch (error) {
       return null
     }
-    
   }
   renderFragment = () => {
     try {
@@ -183,46 +172,93 @@ export default class Secondary extends React.PureComponent {
       return null
     }
   }
-  componentDidMount(){
-    ycore.comty_get.general_data((err,res)=> {
+
+  isOpen() {
+    if (
+      this.state.__pri_full ||
+      this.state.__pri_half ||
+      this.state.__sec_active ||
+      this.state.__sec_full
+    )
+      return true
+    return false
+  }
+
+  componentDidUpdate() {
+    if (this.isOpen()) {
+      document.addEventListener('keydown', this.escFunction, false)
+    } else {
+      document.removeEventListener('keydown', this.escFunction, false)
+    }
+  }
+
+  componentDidMount() {
+    ycore.comty_get.general_data((err, res) => {
       if (err) return false
       const notification_data = JSON.parse(res)['notifications']
-      this.setState({ loading: false, gen_data: res, notification_data: notification_data })
-
+      this.setState({
+        loading: false,
+        gen_data: res,
+        notification_data: notification_data,
+      })
     })
+  }
+
+  escFunction(event) {
+    if (event.keyCode === 27) {
+      SwapMode.close()
+    }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.escFunction, false)
+  }
+
+  renderTarget(target) {
+    try {
+      switch (target) {
+        case '__pri': {
+          const fragment = this.state.rd__pri
+          return <React.Fragment>{fragment}</React.Fragment>
+        }
+        case '__sec': {
+          const fragment = this.state.rd__sec
+          return <React.Fragment>{fragment}</React.Fragment>
+        }
+        default:
+          return <h3>Invalid Render Target</h3>
+      }
+    } catch (error) {
+      console.log(error)
+      return null
+    }
   }
 
   render() {
     const { userData, isMobile } = this.props
-    if (!this.state.loading) return (
-      <>
-      {isMobile? null : <div className={styles.__secondary_colider}></div>} 
-      <div
-        id="secondary_layout"
-        className={classnames(styles.secondary_wrapper, {
-          [styles.mobile]: isMobile,
-          [styles.active]: this.state.swap,
-          [styles.half]: this.state.half,
-          [styles.unique]: this.state.unique,
-        })}
-      >
-       {isMobile? null :
-        <div className={styles.secondary_userholder}>
-        <div className={styles.notif_box}>
-          <h1>{this.state.notification_data.length}</h1>    
-        </div>
-        <img
-          onClick={() => ycore.router.go(`@${userData.username}`)}
-          src={userData.avatar}
-        />
-      </div>}
+    if (!this.state.loading)
+      return (
+        <>
+          {isMobile ? null : <div className={styles.__secondary_colider}></div>}
+          <div
+            id="secondary_layout__wrapper"
+            className={classnames(styles.secondary_wrapper, {
+              [styles.mobile]: isMobile,
+            })}
+          >
+            {isMobile ? null : (
+              <div className={styles.secondary_userholder}>
+                <div className={styles.notif_box}>
+                  <h1>{this.state.notification_data.length}</h1>
+                </div>
+                <img
+                  onClick={() => ycore.router.go(`@${userData.username}`)}
+                  src={userData.avatar}
+                />
+              </div>
+            )}
 
-        <div
-          className={styles.secondary_layout_bg}
-        >
-          
-          <div className={styles.secondary_container_1}>
-            {this.state.swap || this.state.half || this.state.unique ? (
+            {this.isOpen() ? (
               <antd.Button
                 type="ghost"
                 icon={<Icons.LeftOutlined />}
@@ -231,24 +267,33 @@ export default class Secondary extends React.PureComponent {
                 Back
               </antd.Button>
             ) : null}
-            {this.SwapBalanceContent('__pri')}
-          </div>
-        
 
-          <div
-            className={classnames(styles.secondary_container_2, {
-              [styles.mobile]: isMobile,
-              [styles.active]: this.state.swap,
-            })}
-          >
-            {this.SwapBalanceContent('__sec')}
-          </div>
+      <div className={styles.secondary_layout_bg}>
+            <div
+              id="secondary_layout_pri"
+              className={classnames(styles.secondary_container_1, {
+                [styles.full_open]: this.state.__pri_full,
+                [styles.half]: this.state.__pri_half,
+              })}
+            >
+              {this.renderTarget('__pri')}
+            </div>
 
+            <div
+              id="secondary_layout__sec"
+              className={classnames(styles.secondary_container_2, {
+                [styles.mobile]: isMobile,
+                [styles.active]: this.state.__sec_active,
+                [styles.full_open]: this.state.__sec_full,
+              })}
+            >
+              {this.renderTarget('__sec')}
+            </div>
         </div>
-      </div>
-      </>
-    )
-    return null
 
+          </div>
+        </>
+      )
+    return null
   }
 }

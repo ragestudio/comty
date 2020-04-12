@@ -9,7 +9,7 @@
 }
 
 .secondary_wrapper {
-  width: @secondary_wrapper_hidden_width;
+  width: auto;
   height: 100vh;
 
   z-index: 50;
@@ -19,18 +19,7 @@
   overflow-x: hidden;
 
   display: flex;
-
- 
-
-  &.active {
-    width: @secondary_wrapper_showFull_width;
-    >.secondary_container_1 {
-      padding: @secondary_container_1_padding;
-    }
-    //@media (min-width: 1000px) {
-    //  width: 95.4%
-    //}
-  }
+  
 
   &.mobile {
     width: 100%;
@@ -153,20 +142,28 @@
   overflow: hidden;
 
   transition: all @__Global_SwapAnimDuration ease-in-out;
-  background-color: @secondary_container_bg_background;
+  background-color: transparent;
 
   border-radius: @__Global_layout_border-rd;
 }
 
 .secondary_container_1 {
-  width: 100%;
+  width: @secondary_wrapper_hidden_width;
   height: 100%;
 
   position: relative;
   padding: 30px 30px 30px 35px;
 
   color: @secondary_container_1_color;
-  
+
+  &.full_opent {
+    width: @secondary_wrapper_showFull_width;
+    padding: @secondary_container_1_padding;
+  }
+  &.half {
+
+  }
+
   :global {
     .ant-btn {
       color: @secondary_container_1_btn_color;
