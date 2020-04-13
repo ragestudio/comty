@@ -1,5 +1,5 @@
 import React from 'react'
-import { config } from 'utils'
+import config from 'config'
 import * as ycore from 'ycore'
 
 import Sider_Mobile from './mobile.js'

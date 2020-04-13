@@ -3,11 +3,6 @@ import umiRouter from 'umi/router'
 import pathToRegexp from 'path-to-regexp'
 import { i18n } from 'config'
 
-export classnames from 'classnames'
-export config from 'config'
-export request from './request'
-export { Color } from './theme'
-
 export const { defaultLanguage } = i18n
 export const languages = i18n.languages.map(item => item.key)
 
@@ -244,4 +239,20 @@ export function setLocale(language) {
       search: window.location.search,
     })
   }
+}
+
+export const _app = {
+  setup: () => {
+
+  },
+  query: () => {
+
+  },
+  logout: () => {
+
+  },
+  login: (data) => {
+
+  },
+
 }

@@ -32,5 +32,6 @@ export var AppSettings = {
   CurrentBundle: 'light_ng',
   // In KB
   MaximunAPIPayload: '101376',
-  limit_post_catch: '20'
+  limit_post_catch: '20',
+  Maximun_tick_overrun: 10,
 }
