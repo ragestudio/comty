@@ -15,7 +15,7 @@ export default class __m extends React.Component {
       (this.state = {
         s_id: '',
         coninfo: 'Getting info...',
-        s_token: '',
+        s_swtoken: '',
         s_ses: '',
       })
   }
@@ -33,6 +33,7 @@ export default class __m extends React.Component {
       this.setState({ s_id: response })
     })
   }
+  
   handleToken() {
     const a = ycore.token_data.getRaw()
     const b = jwt.decode(a)
@@ -43,30 +44,9 @@ export default class __m extends React.Component {
       })
     }
   }
-  handleDesktop() {
-    const a = localStorage.getItem('desktop_src')
-    let to
-    if ( a == 'false') {
-      to = true
-    } else {
-      to = false
-    }
-    ycore.notify.proccess('Switching to ', to ? 'Desktop Mode' : 'Normal Mode')
-    localStorage.setItem('desktop_src', to)
-    setTimeout(() => ycore.RefreshONCE(), 2000)
-  }
-  DescompileSDCP() {
-    let result = {}
-    for (var i = 0; i < UserData.length; i++) {
-      result[UserData[i].key] = UserData[i].value
-    }
-    console.log([result])
-  }
 
   render() {
-    const arrayOfSDCP = Object.entries(UserData).map(e => ({ [e[0]]: e[1] }))
     const { UserID, UserToken, expiresIn } = this.state.s_token
-    const { ValidSDCP, ValidCookiesToken, final } = this.state.s_ses
 
     const AddDummy = {
       id: '3',
@@ -102,61 +82,26 @@ export default class __m extends React.Component {
               <Icons.UserOutlined /> Current Session
             </h2>
             <p> Raw => {JSON.stringify(this.state.s_token)} </p>
+            <br />
             <p> UID => {UserID} </p>
             <p> Session Token => {UserToken} </p>
             <p> expiresIn => {expiresIn} </p>
-            <hr />
-            <p> ValidSDCP => {JSON.stringify(ValidSDCP)} </p>
-            <p> ValidCookiesToken => {JSON.stringify(ValidCookiesToken)} </p>
-            <p> Valid? => {JSON.stringify(final)} </p>
           </antd.Card>
           <antd.Card>
             <span>
-              {' '}
               Using v{ycore.AppInfo.version} | User @{UserData.username}#
-              {UserData.id} |{' '}
+              {UserData.id} |
             </span>
           </antd.Card>
         </div>
 
         <div className={styles.titleHeader}>
           <h1>
-            <Icons.DeploymentUnitOutlined /> Test yCore™{' '}
+            <Icons.DeploymentUnitOutlined /> Test yCore™
           </h1>
         </div>
         <div className={styles.sectionWrapper}>
-          <antd.Button
-            onClick={() => ycore.notify.error('Yep, its not empty, jeje funny')}
-          >
-            {' '}
-            Send empty notify.error(){' '}
-          </antd.Button>
-          <antd.Button
-            onClick={() =>
-              ycore.notify.error(`
-            ycore.GetPosts(uid, get, '0', (err, result) => {
-              const parsed = JSON.parse(result)['data']
-              const isEnd = parsed.length < ycore.AppSettings.limit_post_catch? true : false
-              this.setState({ isEnd: isEnd, data: parsed, loading: false })
-            })`)
-            }
-          >
-            {' '}
-            Send mock notify.error(){' '}
-          </antd.Button>
-
-          <antd.Button onClick={() => ycore.notify.error('Error Mock 1')}>
-            {' '}
-            notify.error{' '}
-          </antd.Button>
-          <antd.Button onClick={() => ycore.notify.proccess('Proccess Mock 1')}>
-            {' '}
-            notify.proccess{' '}
-          </antd.Button>
-          <antd.Button onClick={() => this.handleDesktop()}>
-            {' '}
-            Switch to Desktop_mode{' '}
-          </antd.Button>
+         
 
           <antd.Button onClick={() => ycore.app_modals.report_post()}>
             Open report_post modal
@@ -165,27 +110,10 @@ export default class __m extends React.Component {
           <antd.Button onClick={() => ycore.sync.emmitPost()}>
             Emmit Post feed
           </antd.Button>
-        </div>
 
-        <div className={styles.titleHeader}>
-          <h1>
-            <Icons.DatabaseOutlined /> SDCP™
-          </h1>
-        </div>
-        <div className={styles.sectionWrapper}>
-          <antd.Card>
-            <h2>
-              <Icons.CloudServerOutlined /> UserData
-            </h2>
-            <antd.Collapse>
-              <antd.Collapse.Panel
-                header="WARNING: High Heap when descompile data! "
-                key="1"
-              >
-                {JSON.stringify(arrayOfSDCP)}
-              </antd.Collapse.Panel>
-            </antd.Collapse>
-          </antd.Card>
+          <antd.Button onClick={() => ycore.SwapMode.openComment('1020')}>
+            Open Comment
+          </antd.Button>
         </div>
 
         <div className={styles.titleHeader}>
@@ -196,12 +124,12 @@ export default class __m extends React.Component {
         <div className={styles.sectionWrapper}>
           <antd.Card>
             <antd.Button onClick={() => ycore.FeedHandler.addToRend(AddDummy)}>
-              {' '}
-              ADD DUMMY{' '}
+              
+              ADD DUMMY
             </antd.Button>
             <antd.Button onClick={() => ycore.FeedHandler.killByID(3)}>
-              {' '}
-              KillByID (3){' '}
+              
+              KillByID (3)
             </antd.Button>
             <hr />
             <MainFeed

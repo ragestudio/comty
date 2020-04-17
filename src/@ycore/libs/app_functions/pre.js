@@ -12,16 +12,6 @@ export * from './modals.js'
 
 export {SwapMode} 
 
-export function QueryRuntime() {
-  const validBackup = ycore.validate.backup()
-
-  if (!validBackup) ycore.make_data.backup()
-  ycore.sync.listen((data) => {
-    
-  })
-
-}
-
 export function SetupApp() {
   // TODO: Default sets
   ycore.notify.success('Authorised, please wait...')
@@ -134,10 +124,6 @@ export const goTo = {
 
 }
 
-export function RefreshONCE() {
-  window.location = '/'
-}
-
 export const app_session = {
   login: (callback, payload) => {
     if (!payload) {
@@ -174,7 +160,7 @@ export const app_session = {
                   ycore.notify.error('Critical error, token declined!')
                   return false
                 }
-                ycore.SetupApp()
+                ycore._app.setup()
                 callback(null, '200')
               }, framepayload)
             },

@@ -61,7 +61,7 @@ class PostCard extends React.PureComponent {
       if (postFile){
         ycore.SwapMode.openPost(id, post_data)
       }
-      ycore.SwapMode.openComments(id, get_post_comments)
+      ycore.SwapMode.openComments(id)
     }
 
     const handlePostActions = {
@@ -148,7 +148,7 @@ class PostCard extends React.PureComponent {
               onClick={() => handlePostActions.boost(id) & this.toogleMoreMenu()}
               key="boost_post"
             >
-              <Icons.RocketOutlined />{' '}
+              <Icons.RocketOutlined />
               {this.state.postBoosted ? 'Unboost' : 'Boost'}
             </antd.Menu.Item>
           ) : null
@@ -158,7 +158,7 @@ class PostCard extends React.PureComponent {
           onClick={() => handlePostActions.save(id) & this.toogleMoreMenu()}
           key="save_post"
         >
-          <Icons.SaveOutlined />{' '}
+          <Icons.SaveOutlined />
           {this.state.postSaved ? 'Unsave post' : 'Save Post'}
         </antd.Menu.Item>
         {this.state.postReported? null: 
@@ -233,7 +233,7 @@ class PostCard extends React.PureComponent {
                       >
                         NSFW
                       </antd.Tag>
-                    ) : null}{' '}
+                    ) : null}
                   </h4>
                   <div className={styles.PostTags}>
                     <div className={styles.MoreMenu}>
@@ -252,8 +252,8 @@ class PostCard extends React.PureComponent {
             />
             {postText ? (
               <div className={styles.post_card_content}>
-                {' '}
-                <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
+                
+                <h3 dangerouslySetInnerHTML={{ __html: postText }} />
               </div>
             ) : null}
             {postFile ? (

@@ -96,7 +96,7 @@ class Base extends Component {
       description:
         'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
     })
-    setTimeout(ycore.RefreshONCE(), 1000)
+    setTimeout(ycore._app.refresh(), 1000)
     ControlBar.close()
   }
 

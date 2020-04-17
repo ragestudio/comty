@@ -92,7 +92,7 @@ class PrimaryLayout extends React.Component {
       <React.Fragment>
           {/* {isMobile ? <MobileWarning /> : null} */}
           <div className={styles.__ControlBar}>
-            <Control />
+            <Control mobile={isMobile} />
           </div>
           <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
             <Sider {...SiderProps} />

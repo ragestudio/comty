@@ -1,0 +1,80 @@
+.PlayerContainer {
+  width: 100%;
+
+  img {
+    width: 100%;
+    overflow: hidden;
+    margin: auto;
+  }
+
+  video {
+    max-height: 600px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  audio {
+    width: 100%;
+  }
+
+
+  &.entire {
+    max-width: 52vw;
+    max-height: 80vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-70%, -50%);
+
+    img {
+      object-fit: contain;
+      height: 100%;
+      width: 100%;
+      max-width: 52vw;
+      max-height: 80vh;
+    }
+
+    audio {
+      height: 100%;
+      width: 100%;
+    }
+
+    video {
+      object-fit: contain;
+      height: 100%;
+      width: 100%;
+      max-width: 52vw;
+      max-height: 80vh;
+    }
+  }
+
+  &.mobile {
+    max-width: 52vw;
+    max-height: 80vh;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    img {
+      object-fit: contain;
+      height: 100%;
+      width: 100%;
+      max-width: 52vw;
+      max-height: 80vh;
+    }
+
+    audio {
+      height: 100%;
+      width: 100%;
+    }
+
+    video {
+      object-fit: contain;
+      height: 100%;
+      width: 100%;
+      max-width: 52vw;
+      max-height: 80vh;
+    }
+  }
+}

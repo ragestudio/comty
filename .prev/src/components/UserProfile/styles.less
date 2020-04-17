@@ -1,0 +1,166 @@
+@import '~themes/index.less';
+
+.textOverflow() {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+// mixins for clearfix
+// ------------------------
+.clearfix() {
+  zoom: 1;
+
+  &::before,
+  &::after {
+    display: table;
+    content: ' ';
+  }
+
+  &::after {
+    clear: both;
+    height: 0;
+    font-size: 0;
+    visibility: hidden;
+  }
+}
+
+.userWrapper {
+  padding: 0 68px 15px 68px;
+  margin: auto;
+  &.mobile{
+    max-width: 510px;
+    min-width: 265px;
+    width: auto;
+    padding: 0 15px 0 15px;
+  }
+  :global {
+    .ant-page-header-content {
+      padding-top: 0;
+      overflow: initial !important;
+    }
+
+    .ant-page-header {
+      padding: 20px 0 3px 0;
+    }
+
+    .ant-pro-page-header-wrap-page-header-warp {
+      border-radius: 0 0 20px 20px;
+    }
+  }
+}
+
+.TagWrappers {
+  width: 100%;
+  float: right;
+  position: relative;
+  margin: 0 0 7px 0 !important;
+}
+
+.UserCover {
+  border-radius: 15px 15px 0 0;
+  position: relative;
+  margin: -32px auto auto auto;
+  max-height: 400px;
+  overflow: hidden;
+
+  img {
+    width: calc(100% + 30px);
+    overflow: hidden;
+    margin: auto;
+  }
+}
+
+.follow_wrapper {
+  margin: 0 7px 0 7px;
+  position: relative;
+  float: right;
+}
+
+.avatar {
+  transform: translate(-25px, -45px);
+  max-height: 200px;
+  max-width: 120px;
+  
+  &>span {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global {
+    .ant-avatar {
+      box-shadow: 13px 13px 17px 4px rgba(69, 69, 69, 0.151);
+      border-radius: 7px;
+
+      img {
+        width: 120px;
+      }
+    }
+  }
+}
+
+.pageHeaderContent {
+  vertical-align: top;
+  display: flex;
+
+  .content {
+    font-family: "Poppins", sans-serif;
+    color: @text-color-secondary;
+    width: 100%;
+
+    .contentTitle {
+      padding: 0 10px 10px 0;
+      color: @heading-color;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 28px;
+    }
+  }
+}
+
+.user_more_menu{
+  float: right;
+  font-size: 18px;
+}
+
+
+@media screen and (max-width: @screen-md) {
+  .extraContent {
+    margin-left: -16px;
+  }
+
+  .projectList {
+    .projectGrid {
+      width: 50%;
+    }
+  }
+}
+
+@media screen and (max-width: @screen-sm) {
+  .pageHeaderContent {
+    display: block;
+    margin: 10px;
+
+    .content {
+      margin-left: 0;
+    }
+  }
+
+  .extraContent {
+    .statItem {
+      float: none;
+    }
+  }
+}
+
+@media screen and (max-width: @screen-xs) {
+  .projectList {
+    .projectGrid {
+      width: 100%;
+    }
+  }
+}
+

@@ -47,12 +47,11 @@ export default {
         if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
           router.push({ pathname: '/main' })
         }
-        ycore.QueryRuntime()
-        
+        ycore._app.query()        
         return true
       } else if (!pathMatchRegexp(['', '/login'], window.location.pathname)) {
         if (validBackup == true) {
-          ycore.app_session.logout()
+          ycore._app.logout()
         } else {
           router.push({ pathname: '/login' })
         }

@@ -1,0 +1,23 @@
+[
+    {
+        "id": "1", 
+        "title": "PINS", 
+        "avatar": "https://dl.ragestudio.net/statics/icons/nxkuOJlFJuAUhzlMTCEe.png", 
+        "description": "Debug pins functions, create, modify, delete...",
+        "component": "PINS_debugger"
+    },
+    {
+        "id": "2",
+        "title": "SDCP™",
+        "avatar":"https://dl.ragestudio.net/statics/icons/nxkuOJlFJuAUhzlMTCEe.png",
+        "description": "Debug SDCP Controller and data proccess",
+        "component": "SDCP_debugger"
+    },
+    {
+        "id": "3",
+        "title": "API",
+        "avatar": "https://dl.ragestudio.net/statics/icons/nxkuOJlFJuAUhzlMTCEe.png",
+        "description": "Debug API Controller and data proccess",
+        "component": "API_debugger"
+    }
+]

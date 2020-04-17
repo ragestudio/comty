@@ -2,6 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import * as ycore from 'ycore'
 import styles from './Control.less'
+import classnames from 'classnames'
 
 import Radium, { StyleRoot } from 'radium'
 import { fadeInUp, bounceOutDown } from 'react-animations'
@@ -25,7 +26,7 @@ export function CloseControls() {
   return
 }
 
-class Control extends React.Component {
+class Control extends React.PureComponent {
   constructor(props) {
     super(props)
     window.ControlComponent = this
@@ -49,6 +50,7 @@ class Control extends React.Component {
 
   render() {
     const { RenderFragment, Show, FadeIN } = this.state
+    const isMobile = this.props.mobile? this.props.mobile : false
     return Show ? (
       <StyleRoot>
         <div
@@ -56,7 +58,7 @@ class Control extends React.Component {
             FadeIN ? animationStyles.fadeInUp : animationStyles.bounceOutDown
           }
         >
-          <antd.Card bordered={false} className={styles.ControlCard}>
+          <antd.Card bordered={false} className={classnames(styles.ControlCard, {[styles.mobile]: isMobile})} >
             <React.Fragment>{RenderFragment}</React.Fragment>
           </antd.Card>
         </div>

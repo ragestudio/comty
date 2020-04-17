@@ -12,12 +12,6 @@ export const SetHeaderSearchType = {
   enable: () => {
     window.HeaderSearchComponent.setState({ searchidden: false })
   },
-  toPrimary: () => {
-    window.HeaderSearchComponent.setState({ framelocation: 'primary' })
-  },
-  toSecondary: () => {
-    window.HeaderSearchComponent.setState({ framelocation: 'secondary' })
-  },
 }
 export default class HeaderSearch extends Component {
   constructor(props) {
@@ -34,7 +28,7 @@ export default class HeaderSearch extends Component {
     const { value } = this.state
     if (value.length < 1) return false
     if (value == /\s/) return false
-    ycore.SecondarySwap.openSearch(value);
+    ycore.SwapMode.openSearch(value);
   }
 
   sendToSearch = () => {

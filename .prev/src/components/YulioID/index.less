@@ -1,0 +1,485 @@
+  @import '~themes/index.less';
+
+  .loginWrapper {
+    :global {
+      .ant-drawer-right.ant-drawer-open.no-mask {
+        right: 1px;
+        -ms-transform: translateX(1px);
+        transform: translateX(1px);
+        width: 100%;
+      }
+
+      .ant-drawer-right.ant-drawer-open .ant-drawer-content-wrapper {
+        width: 100%;
+        border-radius: 20px 0 0 20px;
+      }
+
+      .ant-drawer-body {
+        height: 100%;
+      }
+
+      .ant-drawer {
+        box-shadow: none;
+        border-radius: 20px 0 0 20px;
+        max-width: 512px;
+        width: 100%;
+      }
+
+      .ant-drawer-content {
+        background: #ffffff9f;
+        border-radius: 20px 0 0 20px;
+      }
+    }
+  }
+
+  .StateIcon {
+    font-size: 24px;
+    margin: 13px;
+  }
+
+  .StateIcon_exception {
+    font-size: 24px;
+    margin: 13px;
+    color: red !important;
+
+    :global {
+      i {
+        color: red !important;
+
+      }
+    }
+  }
+
+  .mainlp {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 100%;
+    word-break: keep-all;
+
+    color: @foregroundColor;
+    text-align: left;
+  }
+
+  .mainlp .sectionlp {
+    border: 1px solid @accentColor;
+    position: relative;
+    padding: 40px 40px 50px;
+  }
+
+  .mainlp .sectionlp>h6 {
+    color: @accentColor;
+    background: @canvasColor;
+    position: absolute;
+    top: -10px;
+    left: 20px;
+    padding: 0 10px;
+  }
+
+  .mainlp .sectionlp .h6lp.subheader {
+    color: @grayColor;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+  }
+
+  @media (max-width: 992px) {
+    section:not(:last-child) {
+      border-width: 0 0 1px;
+    }
+
+    section:last-child {
+      border-width: 0;
+    }
+  }
+
+
+
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .buttons>* {
+    flex: 1 1 calc(50% - 20px);
+    margin-top: 20px;
+  }
+
+  .buttons>*:nth-child(odd) {
+    margin-right: 20px;
+  }
+
+  a.buttonlp,
+  input.buttonlp,
+  .buttonlp {
+    outline: none;
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+    border: none;
+    font: 500 16px/1 "Poppins", sans-serif;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: @borderRadius;
+    background: @primaryColor;
+    color: @backgroundColor;
+    position: relative;
+    top: 0;
+    transition: 0.2s ease;
+  }
+
+  a.buttonlp:hover,
+  a.buttonlp.hover,
+  input.buttonlp:hover,
+  input.buttonlp.hover,
+  .buttonlp:hover,
+  .buttonlp.hover {
+    top: -3px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  }
+
+  a.buttonlp:active,
+  a.buttonlp.active,
+  input.buttonlp:active,
+  .input.buttonlp.active,
+  .buttonlp:active,
+  .buttonlp.active {
+    background: @primaryShade4;
+    outline: none;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    top: 0;
+  }
+
+  a.buttonlp.disabled,
+  input.buttonlp.disabled,
+  .buttonlp.disabled {
+    opacity: 0.4;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  a.buttonlp.medium,
+  input.buttonlp.medium,
+  .buttonlp.medium {
+    padding: 15px 18px;
+    width: auto;
+  }
+
+  a.buttonlp.small,
+  input.buttonlp.small,
+  .buttonlp.small {
+    padding: 10px 12px;
+    width: auto;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  a.buttonlp.secondary,
+  input.buttonlp.secondary,
+  .buttonlp.secondary {
+    background: @secondaryColor;
+  }
+
+  a.buttonlp.secondary:active,
+  a.buttonlp.secondary:focus,
+  a.buttonlp.secondary.active,
+  input.buttonlp.secondary:active,
+  input.buttonlp.secondary:focus,
+  input.buttonlp.secondary.active,
+  .buttonlp.secondary:active,
+  .buttonlp.secondary:focus,
+  .buttonlp.secondary.active {
+    background: @secondaryShade4;
+    outline: none;
+  }
+
+  a.buttonlp.accent,
+  input.buttonlp.accent,
+  .buttonlp.accent {
+    background: @accentColor;
+  }
+
+  a.buttonlp.accent:active,
+  a.buttonlp.accent:focus,
+  a.buttonlp.accent.active,
+  input.buttonlp.accent:active,
+  input.buttonlp.accent:focus,
+  input.buttonlp.accent.active,
+  .buttonlp.accent:active,
+  .buttonlp.accent:focus,
+  .buttonlp.accent.active {
+    background: @accentShade4;
+  }
+
+  a.buttonlp.accent2,
+  input.buttonlp.accent2,
+  .buttonlp.accent2 {
+    background: @accent2Color;
+  }
+
+  a.buttonlp.accent2:active,
+  a.buttonlp.accent2:focus,
+  a.buttonlp.accent2.active,
+  input.buttonlp.accent2:active,
+  input.buttonlp.accent2:focus,
+  input.buttonlp.accent2.active,
+  .buttonlp.accent2:active,
+  .buttonlp.accent2:focus,
+  .buttonlp.accent2.active {
+    background: @accent2Shade4;
+  }
+
+  a.buttonlp.accent3,
+  input.buttonlp.accent3,
+  .buttonlp.accent3 {
+    background: @accent3Color;
+  }
+
+  a.buttonlp.accent3:active,
+  a.buttonlp.accent3:focus,
+  a.buttonlp.accent3.active,
+  input.buttonlp.accent3:active,
+  input.buttonlp.accent3:focus,
+  input.buttonlp.accent3.active,
+  .buttonlp.accent3:active,
+  .buttonlp.accent3:focus,
+  .buttonlp.accent3.active {
+    background: @accent3Shade4;
+  }
+
+  /*inputs*/
+  .input__wrapper {
+    margin-bottom: 10px;
+
+    :global {
+      .ant-col {
+        width: 100%;
+      }
+    }
+  }
+
+  .inputRG__wrapper {
+    margin-bottom: 0px;
+  }
+
+  .labelform {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .inputform,
+  select,
+  textarea {
+    height: 50px;
+    font-size: 16px;
+    border: 2px solid @neutralShade3;
+    width: 100%;
+    padding: 12px;
+    font-family: "Poppins";
+    border-radius: @borderRadius;
+    color: @foregroundColor;
+    background: @backgroundColor;
+  }
+
+  .inputform:focus,
+  .inputform.active,
+  select:focus,
+  select.active,
+  textarea:focus,
+  textarea.active {
+    outline: none;
+    border-color: @primaryColor;
+  }
+
+  .inputform:disabled,
+  select:disabled,
+  textarea:disabled {
+    cursor: not-allowed;
+    background: @neutralShade1;
+    opacity: 0.6;
+  }
+
+  Input .inputPasswordform {
+    height: 50px;
+    font-size: 16px;
+    border: 2px solid @neutralShade3;
+    width: 100%;
+    padding: 12px;
+    font-family: "Poppins";
+    border-radius: @borderRadius;
+    color: @foregroundColor;
+    background: @backgroundColor;
+  }
+
+  Input .inputPasswordform:focus {
+    outline: none;
+    border-color: @primaryColor;
+  }
+
+  .inputform.input {
+    height: 56px;
+    font-size: 18px;
+    padding: 15px;
+  }
+
+
+  /*spinner*/
+  .spinner+.labellp {
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 8px;
+    display: inline-block;
+    text-transform: uppercase;
+    color: @primaryShade4;
+  }
+
+  .spinner1 .spinner {
+    max-width: 50px;
+    margin: auto;
+    height: 20px;
+    position: relative;
+  }
+
+  .spinner1 .spinner:after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: -10%;
+    background: @primaryColor;
+    animation: spinnerLeftRight 1s infinite;
+  }
+
+  .spinner1 .spinner:before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: -10%;
+    background: @primaryShade2;
+    opacity: 1;
+    animation: spinnerLeftRight 1s infinite 0.06s;
+  }
+
+  @keyframes spinnerLeftRight {
+    0% {
+      left: 85%;
+    }
+
+    50% {
+      left: -10%;
+    }
+
+    100% {
+      left: 85%;
+    }
+  }
+
+
+
+  .formlogin {
+    width: 95%;
+    height: auto;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 3px 15px rgba(51, 51, 51, 0.2);
+    background: #ffffff44;
+    margin: 20px 10px 20px 10px;
+    position: relative;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+
+  .formlogin .checkbox {
+    margin-bottom: 30px;
+  }
+
+  .formlogin .spinner__wrapper {
+    place-items: center;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: rgba(255, 255, 255, 0.85);
+
+  }
+
+
+  .preheader {
+    position: relative;
+    top: 0;
+
+    h1 {
+      font: 700 48px "Nunito", sans-serif;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    h6 {
+      padding: 3em 0 0 0;
+      line-height: 1px;
+      display: flex;
+      font: 500 16px/1 "Poppins", sans-serif;
+      text-transform: uppercase;
+
+      img {
+        vertical-align: middle;
+        height: 17px;
+      }
+    }
+  }
+
+  .moreActions {
+    display: flex;
+    margin: auto;
+    align-content: center;
+    position: relative;
+    width: 100%;
+
+    :global {
+      .ant-btn {
+        margin: auto;
+      }
+    }
+  }
+
+  @media (max-width: 472px) {
+    .moreActions {
+      display: grid;
+      align-content: center;
+      position: relative;
+      width: 100%;
+
+      :global {
+        .ant-btn {
+          margin: 5px;
+        }
+      }
+    }
+  }
+
+  .resultbox {
+    h6 {
+      font-family: "Poppins", sans-serif;
+      text-align: center;
+      font-size: 16px;
+      margin: auto;
+      vertical-align: middle;
+    }
+
+    .retryBTN {
+      text-align: center;
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      margin: auto;
+      vertical-align: bottom;
+    }
+
+    margin: auto;
+  }

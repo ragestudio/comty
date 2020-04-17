@@ -175,7 +175,7 @@ export class __secComments extends React.Component {
     return (
       <div className={styles.comments_body}>
         <div className={styles.comments_body_title}>
-          {/* <h1>Comments ({comment_data.length})</h1> */}
+           <h1>Comments ({comment_data.length})</h1>
         </div>
         <div className={styles.comments_cards_wrapper}>
           {loading ? (
@@ -204,7 +204,7 @@ export class __secComments extends React.Component {
   }
 }
 
-export class __priSearch extends React.Component {
+export class __priSearch extends React.PureComponent {
   renderResult = source => {
     try {
       const Empty = (

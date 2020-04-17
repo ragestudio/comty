@@ -2,7 +2,7 @@
  *    @yCore_Worker
  *
  * @author rStudio© 2020
- * @licensed Pending...
+ * @license Pending...
  */
 
 import * as Endpoints from 'globals/endpoints/index.js'
@@ -19,6 +19,7 @@ import './libs.js'
 
 export * from '../../config/app.settings.js'
 export * from './libs.js'
+export * from 'utils'
 
 export var endpoints = Endpoints
 
