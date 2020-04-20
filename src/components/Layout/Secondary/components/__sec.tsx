@@ -23,9 +23,6 @@ const isOpen = (props: __sec_props) => {
     }
     return false
 }
-const isMobile = (props: __sec_props) => {
-    props.isMobile? true : false
-} 
 
 const renderExit = (props: __sec_props) => {
     const {functs} = props
@@ -38,9 +35,9 @@ const renderExit = (props: __sec_props) => {
 }
 
 const __sec = (props: __sec_props) => {
-    const { render, getRef, y, type } = props
-    const t_full = type === 'full_open'? true : false
-    const t_def = type === 'active'? true: false 
+    const { render, getRef, y, type, isMobile } = props
+    const t_full = type == 'full_open'? true : false
+    const t_def = type == 'active'? true: false 
     return (
         <div
             id="secondary_layout__sec"
@@ -50,7 +47,6 @@ const __sec = (props: __sec_props) => {
                 [styles.full_open]: t_full,
             })}
             style={{
-                position: 'relative',
                 top: y,
             }}
             ref={getRef}

@@ -93,7 +93,7 @@
   position: absolute;
   vertical-align: bottom;
   border-radius: 7px;
-  bottom: 0;
+  top: 0;
   max-width: 50vw;
 
   background-color: #2d2d2d4b;
@@ -145,13 +145,14 @@
 
   .comments_cards_wrapper {
     z-index: 50;
-    overflow: scroll;
+    overflow-y: scroll!important;
     height: 84%;
     :global {
-      overflow: scroll;
+      overflow-y: scroll!important;
     }
 
     .comment_card {
+      overflow-y: scroll!important;
       position: relative;
       width: 100%;
       background-color: #ffffff;
@@ -353,4 +354,14 @@
       font-weight: 600;
     }
   }
+}
+
+.__footer{
+  position: absolute;
+  bottom: 0;
+  font-size: 11px;
+  margin-bottom: 10px;
+  color: #f3f3f3;
+  letter-spacing: 2px;
+  width: 100%;
 }

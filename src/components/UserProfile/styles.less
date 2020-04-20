@@ -29,26 +29,20 @@
 .userWrapper {
   padding: 0 68px 15px 68px;
   margin: auto;
+  background-color: #ffffff;
+  border-radius: 0 0 20px 20px;
+  padding: 20px 0 3px 0;
+ 
+  padding-top: 0;
+  overflow: initial !important;
+  
   &.mobile{
     max-width: 510px;
     min-width: 265px;
     width: auto;
-    padding: 0 15px 0 15px;
-  }
-  :global {
-    .ant-page-header-content {
-      padding-top: 0;
-      overflow: initial !important;
-    }
 
-    .ant-page-header {
-      padding: 20px 0 3px 0;
-    }
-
-    .ant-pro-page-header-wrap-page-header-warp {
-      border-radius: 0 0 20px 20px;
-    }
   }
+
 }
 
 .TagWrappers {
@@ -56,6 +50,19 @@
   float: right;
   position: relative;
   margin: 0 0 7px 0 !important;
+}
+
+.followers_count{
+  float: right;
+  font-size: 14px;
+  width: auto;
+  max-width: 200px;
+  padding: 0 20px;
+  background-color: #f3f3f3;
+  text-align: center;
+  border-radius: 8px;
+  transform: translate(90px, -64px);
+  
 }
 
 .UserCover {
@@ -90,6 +97,11 @@
     height: 100%;
   }
 
+  &.mobile{
+    transform: translate(0,-90px);
+    margin: auto;
+  }
+
   :global {
     .ant-avatar {
       box-shadow: 13px 13px 17px 4px rgba(69, 69, 69, 0.151);
@@ -105,6 +117,7 @@
 .pageHeaderContent {
   vertical-align: top;
   display: flex;
+  padding: 20px;
 
   .content {
     font-family: "Poppins", sans-serif;

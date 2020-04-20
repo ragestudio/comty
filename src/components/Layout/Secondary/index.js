@@ -13,6 +13,7 @@ import {
   __priSearch,
   __trendings,
   __pro,
+  __footer
 } from './renders.js'
 
 export const SwapMode = {
@@ -185,9 +186,17 @@ export default class Secondary extends React.PureComponent {
 
   componentDidMount() {
     this.handle_genData()
+    if(this.props.isMobile){
+      window.addEventListener('popstate', function(event) {
+        SwapMode.close()
+      }, false);
+    }
   }
 
   componentWillUnmount() {
+    if(this.props.isMobile){
+      document.removeEventListener('popstate', null)
+    }
     document.removeEventListener('keydown', this.handle_Exit, false)
   }
 
@@ -203,10 +212,15 @@ export default class Secondary extends React.PureComponent {
     try {
       const trending_data = JSON.parse(this.state.gen_data)['trending_hashtag']
       return (
+        <>
         <div className={styles.secondary_main}>
           {ycore.IsThisUser.pro() ? <__pro /> : <__pro />}
           <__trendings data={trending_data} />
+          
+          {__footer()}
         </div>
+         
+        </>
       )
     } catch (error) {
       return null
@@ -271,6 +285,7 @@ export default class Secondary extends React.PureComponent {
   render() {
     const { userData, isMobile } = this.props
     const __sec_functs = (this.Swapper)
+    
     if (!this.state.loading)
       return (
         <>
@@ -307,7 +322,7 @@ export default class Secondary extends React.PureComponent {
                 {this.renderTarget('__pri')}
               </div>
             </div>
-            <__sec render={this.renderTarget('__sec')} isMobile={this.state.isMobile} functs={__sec_functs} type={this.state.__sec_full? "full_open" : this.state.__sec_active? "active" : null} />
+            <__sec render={this.renderTarget('__sec')} isMobile={isMobile} functs={__sec_functs} type={this.state.__sec_full? "full_open" : this.state.__sec_active? "active" : null} />
             
       
 

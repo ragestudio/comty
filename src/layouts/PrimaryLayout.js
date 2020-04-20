@@ -91,7 +91,7 @@ class PrimaryLayout extends React.Component {
     return (
       <React.Fragment>
           {/* {isMobile ? <MobileWarning /> : null} */}
-          <div className={styles.__ControlBar}>
+          <div className={classnames(styles.__ControlBar, {[styles.mobile]: isMobile})}>
             <Control mobile={isMobile} />
           </div>
           <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>

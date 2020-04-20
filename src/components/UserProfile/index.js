@@ -10,7 +10,7 @@ import Follow_btn from './components/Follow_btn.js'
 import { BadgesType } from 'globals/badges_list'
 import classnames from 'classnames'
 
-const isMobile = localStorage.getItem('mobile_src')
+import * as reducers from './reducers.js'
 
 class UserProfile extends React.PureComponent {
   constructor(props) {
@@ -93,6 +93,15 @@ class UserProfile extends React.PureComponent {
           Followed: ycore.booleanFix(rp['0'].is_following),
         })
 
+        reducers.get.followers((res)=>{
+          try {
+            this.setState({followers_data: res, followers: res.length})
+          } catch (error) {
+            return false
+          }
+
+        },rp['0'].user_id)
+
         ycore.comty_user.__tags(
           (err, res) => {
             if (err) return false
@@ -125,104 +134,100 @@ class UserProfile extends React.PureComponent {
     
 const moreMenu = (
   <antd.Menu>
-    <antd.Menu.Item>1st antd.Menu item</antd.Menu.Item>
-    <antd.Menu.Item>2nd antd.Menu item</antd.Menu.Item>
+    <antd.Menu.Item>__</antd.Menu.Item>
+    <antd.Menu.Item>__set2</antd.Menu.Item>
   </antd.Menu>
 );
 
-    const { loading, UUID, invalid, RenderValue } = this.state
+    const { loading, UUID, invalid, RenderValue, followers } = this.state
+    const { isMobile } = this.props
+    if(loading) return <antd.Skeleton active />
+    if(invalid) return null
     return (
       <div>
-        {loading ? (
-          <antd.Skeleton active />
-        ) : (
-          <div>
-            {invalid ? null : (
-              <div
-                className={classnames(styles.userWrapper, {
-                  [styles.mobile]: isMobile,
-                })}
-              >
-                <div className={styles.UserCover}>
-                  <img src={RenderValue.cover} />
-                </div>
+            <div
+className={classnames(styles.userWrapper, {
+  [styles.mobile]: isMobile,
+})}
+>
 
-                <div>
-                  
-                    <div className={styles.pageHeaderContent}>
-                      <div className={styles.avatar}>
-                        <antd.Avatar shape="square" src={RenderValue.avatar} />
-                      </div>
-                      <div className={styles.content}>
-                        <div className={styles.TagWrappers}>
-                          {this.state.UserTags.length > 0 ? (
-                            <antd.List
-                              dataSource={this.state.UserTags}
-                              renderItem={item => (
-                                <antd.Tooltip title={item.tip}>
-                                  <antd.Tag id={item.id} color={item.color}>
-                                    {item.title} {item.icon}
-                                  </antd.Tag>
-                                </antd.Tooltip>
-                              )}
-                            />
-                          ) : null}
-                        </div>
-                        {ycore.IsThisUser.same(RenderValue.id) ? null : (
-                          <div
-                            className={styles.follow_wrapper}
-                            onClick={() => this.handleFollowUser()}
-                          >
-                            <Follow_btn
-                              followed={this.state.Followed ? true : false}
-                            />
-                          </div>
-                        )}
-                        <div className={styles.contentTitle}>
-                          <h1 style={{ marginBottom: '0px' }}>
-                            {RenderValue.username}
-                            <antd.Tooltip title="User Verified">
-                              {ycore.booleanFix(RenderValue.verified) ? (
-                                <Icon
-                                  style={{
-                                    color: 'blue',
-                                    verticalAlign: 'top',
-                                  }}
-                                  component={CustomIcons.VerifiedBadge}
-                                />
-                              ) : null}
-                            </antd.Tooltip>
-                            
-                            { ycore.IsThisUser.same(UUID)? 
-                            <antd.Dropdown overlay={moreMenu}>
-                              <Icons.MoreOutlined className={styles.user_more_menu} />
-                            </antd.Dropdown> 
-                            : null }
+<div className={styles.UserCover}>
+  <img src={RenderValue.cover} />
+</div>
 
-                          </h1>
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              fontWeight: '100',
-                              lineHeight: '0',
-                              marginBottom: '5px',
-                            }}
-                            dangerouslySetInnerHTML={{
-                              __html: RenderValue.about,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
-            )}
-            {ycore.IsThisUser.same(UUID) ? (
-              <PostCreator userData={ycore.userData()} />
-            ) : null}
-            <MainFeed get="user" uid={UUID} />
+  
+    <div className={styles.pageHeaderContent}>
+      <div className={classnames(styles.avatar, {[styles.mobile]: isMobile})}>
+        <antd.Avatar shape="square" src={RenderValue.avatar} />
+      </div>
+      <div className={styles.content}>
+        <div className={styles.TagWrappers}>
+          {this.state.UserTags.length > 0 ? (
+            <antd.List
+              dataSource={this.state.UserTags}
+              renderItem={item => (
+                <antd.Tooltip title={item.tip}>
+                  <antd.Tag id={item.id} color={item.color}>
+                    {item.title} {item.icon}
+                  </antd.Tag>
+                </antd.Tooltip>
+              )}
+            />
+          ) : null}
+        </div>
+        {ycore.IsThisUser.same(RenderValue.id) ? null : (
+          <div
+            className={styles.follow_wrapper}
+            onClick={() => this.handleFollowUser()}
+          >
+            <Follow_btn
+              followed={this.state.Followed ? true : false}
+            />
           </div>
         )}
+      
+        <div className={styles.contentTitle}>
+          <h1 style={{ marginBottom: '0px' }}>
+            
+            <antd.Tooltip title={`${this.state.followers} Followers`}>
+              {RenderValue.username}
+            </antd.Tooltip>
+
+            <antd.Tooltip title="User Verified">
+              {ycore.booleanFix(RenderValue.verified) ? (
+                <Icon
+                  style={{
+                    color: 'blue',
+                    verticalAlign: 'top',
+                  }}
+                  component={CustomIcons.VerifiedBadge}
+                />
+              ) : null}
+            </antd.Tooltip>
+          
+            { ycore.IsThisUser.same(UUID)? 
+            <antd.Dropdown overlay={moreMenu}>
+              <Icons.MoreOutlined className={styles.user_more_menu} />
+            </antd.Dropdown> 
+            : null }
+          </h1>
+          <span
+            style={{
+              fontSize: '14px',
+              fontWeight: '100',
+              lineHeight: '0',
+              marginBottom: '5px',
+            }}
+            dangerouslySetInnerHTML={{
+              __html: RenderValue.about,
+            }}
+          />
+        </div>
+      </div>
+    </div>
+</div>
+            {ycore.IsThisUser.same(UUID) ? (<PostCreator userData={ycore.userData()} />) : null}
+            <MainFeed get="user" uid={UUID} />
       </div>
     )
   }

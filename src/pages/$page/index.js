@@ -15,7 +15,7 @@ class PageIndexer extends PureComponent {
       ycore.yconsole.log(`User matched!  ${location.pathname}`)
       return (
         <div>
-          <UserProfile regx={matchUser} />
+          <UserProfile {...this.props} regx={matchUser} />
         </div>
       )
     }

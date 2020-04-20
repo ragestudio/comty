@@ -19,8 +19,8 @@
 
 
   &.entire {
-    max-width: 52vw;
-    max-height: 80vh;
+    max-width: 52%;
+    max-height: 80%;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -49,19 +49,23 @@
   }
 
   &.mobile {
-    max-width: 52vw;
-    max-height: 80vh;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    max-width: unset;
+    max-height: unset;
+    top: unset;
+    left: unset;
+    transform: unset;
     
+    width: 100%;
+    position: relative;
+    height: 60vh;
+    display: flex;
+
     img {
       object-fit: contain;
-      height: 100%;
+      height: auto;
       width: 100%;
-      max-width: 52vw;
-      max-height: 80vh;
+      max-width: unset;
+      max-height: unset;
     }
 
     audio {
@@ -71,10 +75,10 @@
 
     video {
       object-fit: contain;
-      height: 100%;
+      height: auto;
       width: 100%;
-      max-width: 52vw;
-      max-height: 80vh;
+      max-width: unset;
+      max-height: unset;
     }
   }
 }

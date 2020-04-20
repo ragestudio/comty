@@ -25,25 +25,10 @@ export class __priPost extends React.PureComponent {
   renderContent(payload) {
     const { id, postText, postFile_full, post_time, publisher } = payload
     const {isMobile}= this.props
-    if (!postFile_full) {
-      return (
-        <div className={styles.contentWrapper}>
-        {postText ? (
-          <div className={styles.postContent}>
-            <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
-          </div>
-        ) : null}
-      </div>
-      )
-    }
+
     return (
       <div className={styles.contentWrapper}>
         {postFile_full ? <MediaPlayer isMobile={isMobile} entire={true} file={postFile_full} /> : null}
-        {postText ? (
-          <div className={styles.postContent}>
-            <h3 dangerouslySetInnerHTML={{ __html: postText }} />{' '}
-          </div>
-        ) : null}
       </div>
     )
   }
@@ -333,4 +318,12 @@ export class __pro extends React.PureComponent {
       </div>
     )
   }
+}
+
+const _info = ycore.AppInfo
+
+export const __footer = () =>{
+  return <div className={styles.__footer}>
+    v{ycore.AppInfo.version}  |  About  |  Legal  |  Help
+  </div>
 }

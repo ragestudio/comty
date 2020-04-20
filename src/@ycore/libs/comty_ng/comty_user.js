@@ -3,6 +3,22 @@ import { comty_rsa } from '../rs_cloud/pre'
 
 export const comty_user = {
   setData: () => {},
+  getFollowers: (callback, payload) => {
+    if (!payload)return false
+    const { user_id } = payload
+
+    let formdata = new FormData()
+    formdata.append('user_id', user_id)
+    formdata.append('fetch', 'followers')
+
+    API_Call(
+      (err,res) => {
+        return callback(err,res)
+      },
+      comty_rsa.endpoint('get-user-data'),
+      formdata
+    )
+  },
   follow: (callback, payload) => {
     if (!payload) {
       return false

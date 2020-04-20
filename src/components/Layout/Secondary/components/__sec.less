@@ -26,11 +26,12 @@
       opacity: 0;
   
       top: unset;
-      overflow: hidden;
      
+      transform: translate(0, 86%);
       border-radius: 12px 12px 0 0;
       flex-direction: column;
-      overflow-y: scroll;
+
+      overflow-y: overlay;
       overflow-x: hidden;
   
       touch-action: none;
@@ -56,7 +57,6 @@
       &.active {
         opacity: 1;
         height: 100%;
-        transform: translate(0, 86%);
       }
   
       &.full_open {
