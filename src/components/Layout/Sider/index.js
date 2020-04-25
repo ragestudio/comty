@@ -24,9 +24,14 @@ class Sider extends React.PureComponent {
       this.setState({selectedKey: e})
       ycore.router.go('main') 
     },
+    chats: (e) => {
+      this.setState({selectedKey: e})
+      ycore.router.go('chats')
+    }
   }
 
   handleClickMenu = e => {
+    e.key === 'chats' && this.onClickFunctions.chats(e.key)
     e.key === 'SignOut' && ycore.app_session.logout()
     e.key === 'general_settings' && ycore.router.go('settings')
     e.key === 'profile' && ycore.router.goprofile()

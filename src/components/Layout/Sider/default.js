@@ -58,12 +58,12 @@ export default class Sider_Default extends React.PureComponent {
                 </antd.Menu.Item>
          
 
-              <antd.Menu.Item key="events">
-                  <Icons.CarryOutTwoTone twoToneColor={"#ff4d4f"}/>
-                  <Trans>
-                    <span>Events</span>
-                  </Trans>
-              </antd.Menu.Item>
+                <antd.Menu.Item key="chats">
+                    <Icons.MessageTwoTone twoToneColor={"#ff4d4f"}/>
+                    <Trans>
+                      <span>Chats</span>
+                    </Trans>
+                </antd.Menu.Item>
 
               </antd.Menu>
 

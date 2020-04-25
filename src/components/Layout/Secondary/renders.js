@@ -21,6 +21,15 @@ const VerifiedBadge = () => (
   </svg>
 )
 
+export class __chats extends React.PureComponent{
+  render(){
+    return(
+      <div className={styles.SecondaryBody}> <h2>Chats</h2> </div>
+
+    )
+  }
+}
+
 export class __priPost extends React.PureComponent {
   renderContent(payload) {
     const { id, postText, postFile_full, post_time, publisher } = payload

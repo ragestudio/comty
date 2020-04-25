@@ -13,7 +13,8 @@ import {
   __priSearch,
   __trendings,
   __pro,
-  __footer
+  __footer,
+  __chats
 } from './renders.js'
 
 export const SwapMode = {
@@ -216,7 +217,7 @@ export default class Secondary extends React.PureComponent {
         <div className={styles.secondary_main}>
           {ycore.IsThisUser.pro() ? <__pro /> : <__pro />}
           <__trendings data={trending_data} />
-          
+          <__chats />
           {__footer()}
         </div>
          
