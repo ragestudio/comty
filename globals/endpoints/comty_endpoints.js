@@ -12,7 +12,7 @@ module.exports={
         all_sessions: "https://api.ragestudio.net/RSA-COMTY/r/sessions?access_token=",
         get_sessions: "https://api.ragestudio.net/RSA-COMTY/r/session_id?access_token=",
         auth_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/auth",
-        new_post: "https://comty.julioworld.club/api/new_post?access_token=",
+        new_post: "https://comty.pw/api/new_post?access_token=",
         get_config_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/get-site-settings?access_token=",
         get_userData: "https://api.ragestudio.net/RSA-COMTY/r/get-user-data?access_token=",
         update_userData_endpoint: "https://api.ragestudio.net/RSA-COMTY/r/update-user-data?access_token=",

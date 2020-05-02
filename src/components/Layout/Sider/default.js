@@ -16,8 +16,6 @@ export default class Sider_Default extends React.PureComponent {
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
           trigger={null}
-          collapsed
-          collapsedWidth='80'
           className={styles.left_sider_container}
         >
           <div className={styles.left_sider_brandholder}>

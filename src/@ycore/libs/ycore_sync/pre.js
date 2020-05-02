@@ -43,13 +43,15 @@ export const sync = {
 
     },
     FeedListen: (callback) => {
-        const socket = io(endpoint);
+        const socket = io(`${endpoint}/feed`);
+        
         socket.on('pull_event', function (data) {
+            console.log(data)
             callback(data)
         });
     },
     emmitPost: (last_id) => {
-        const socket = io(endpoint);
+        const socket = io(`${endpoint}/feed`);
         socket.emit('push_event', last_id);
     }
 }
