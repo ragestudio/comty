@@ -106,7 +106,6 @@ class PrimaryLayout extends React.Component {
                   id="primaryContent"
                   className={styles.primary_layout_content}
                 >
-                  <HeaderSearch />
                   {children}
                 </Content>
               </PageTransition>

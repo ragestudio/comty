@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import SideBar from './SideBar'
 import { MESSAGE_SENT, MESSAGE_RECIEVED, TYPING, PRIVATE_MESSAGE } from '../Events'
-import ChatHeading from './ChatHeading'
+
 import Messages from '../messages/Messages'
 import MessageInput from '../messages/MessageInput'
+
 import * as ycore from 'ycore'
+import * as antd from 'antd'
+import * as Icons from '@ant-design/icons'
+import styles from '../styles.less'
+import classnames from 'classnames'
 
 const userData = ycore.userData();
 
@@ -134,10 +139,10 @@ export default class ChatContainer extends Component {
 		this.setState({activeChat})
 	}
 	render() {
-		const { user, logout } = this.props
+		const { user } = this.props
 		const { chats, activeChat } = this.state
 		return (
-			<div className="container">
+			<div className={styles.chats_wrapper}>
 				<SideBar
 					chats={chats}
 					user={user}
@@ -145,39 +150,48 @@ export default class ChatContainer extends Component {
 					setActiveChat={this.setActiveChat}
 					onSendPrivateMessage={this.sendOpenPrivateMessage}
 					/>
-				<div className="chat-room-container">
 					{
 						activeChat !== null ? (
+							<div className={styles.app}>
+            				 <div className={styles.wrapper}>
+            				  <div className={styles.hat_area}>
+            				   <div className={styles.chat_area_main}>
 
-							<div className="chat-room">
-								<ChatHeading name={activeChat.name} />
-								<Messages 
+							   	<Messages 
 									messages={activeChat.messages}
 									user={user}
 									typingUsers={activeChat.typingUsers}
-									/>
-								<MessageInput 
-									sendMessage={
-										(message)=>{
-											this.sendMessage(activeChat.id, message)
-										}
-									}
-									sendTyping={
-										(isTyping)=>{
-											this.sendTyping(activeChat.id, isTyping)
-										}
-									}
-									/>
+								/> 
 
-							</div>
+            				   </div>
+					
+            				   
+							   <MessageInput 
+										sendMessage={
+											(message)=>{
+												this.sendMessage(activeChat.id, message)
+											}
+										}
+										sendTyping={
+											(isTyping)=>{
+												this.sendTyping(activeChat.id, isTyping)
+											}
+										}
+									/>
+            				  </div>
+            				 </div>
+            				</div>
+							
 						):
 						<div className="chat-room choose">
-							<h3>Choose a chat!</h3>
+							 <antd.Result
+   			 					icon={<Icons.SmileOutlined />}
+    							title="Hey, you still haven't started chatting with anyone"
+  							/>
 						</div>
 					}
 				</div>
 
-			</div>
 		);
 	}
 }

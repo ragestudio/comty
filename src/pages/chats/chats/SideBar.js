@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import * as ycore from 'ycore'
 import * as antd from 'antd'
+import styles from '../styles.less'
 
 const userData = ycore.userData()
 
@@ -25,7 +26,7 @@ export default class SideBar extends React.PureComponent{
 		const { reciever } = this.state
 	
 		return (
-			<div id="side-bar">
+			<div className={styles.chat_sider}>
 
 					<form onSubmit={this.handleSubmit} className="search">
 						<input 

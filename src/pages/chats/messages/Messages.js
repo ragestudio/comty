@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import styles from '../styles.less'
+import classnames from 'classnames'
 
 export default class Messages extends Component {
 	constructor(props) {
@@ -23,22 +25,19 @@ export default class Messages extends Component {
 	render() {
 		const { messages, user, typingUsers } = this.props
 		return (
-			<div ref='container'
-				className="thread-container">
-				<div className="thread">
+			<div ref='container' style={{ width: '100%' }}>
 					{
 						messages.map((mes)=>{
 							return (
-								<div
-									key={mes.id}
-									className={`message-container ${mes.sender === user.name && 'right'}`}
-								>
-									<div className="time">{mes.time}</div>
-									<div className="data">
-										<div className="message">{mes.message}</div>
-										<div className="name">{mes.sender}</div>
-									</div>
+								<div className={classnames(styles.chat_msg, {[styles.owner]: mes.sender == user.name? true : false })} key={mes.id}>
+								<div className={styles.chat_msg_profile}>
+								 <img className={styles.chat_msg_img} src={mes.avatar} />
+								 <div className={styles.chat_msg_date}>{mes.time}</div>
 								</div>
+								<div className={styles.chat_msg_content}>
+								 <div className={styles.chat_msg_text}>{mes.message}</div>
+								</div>
+							   </div>
 
 								)
 						})
@@ -52,7 +51,6 @@ export default class Messages extends Component {
 							)
 						})
 					}
-				</div>
 
 
 			</div>

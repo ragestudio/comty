@@ -38,9 +38,9 @@ export default class Chats extends React.Component{
     if(!this.state.conn){
       await socket.on('connect', ()=>{
         console.log(prefix, "Connected");
-        this.setState({ conn: true })
         const payload = { id: userData.UserID, name: userData.username, avatar: userData.avatar }
-        this.setUser(payload)
+        socket.emit(USER_CONNECTED, payload);
+        this.setState({user: payload, conn: true})
       })
     }
 
@@ -53,16 +53,6 @@ export default class Chats extends React.Component{
     socket.on('reconnecting', () =>{
       console.log(prefix, 'Trying to reconnect')
     })
-	}
-
-	/*
-	* 	Sets the user property in state 
-	*	@param user {id:number, name:string}
-	*/	
-	setUser = (user)=>{
-		const { socket } = this.state
-		socket.emit(USER_CONNECTED, user);
-		this.setState({user})
 	}
 
 	render() {
