@@ -4,9 +4,9 @@
   width: 100%;
   height: 100%;
   font-family: @__Global_general_font_family;
-  color: #ffffff;
+  color: #201F23;
   font-size: 12px;
-  h1,h2,h3,h4,h5{color:#ffffff}
+  h1,h2,h3,h4,h5{color:#201F23}
 }
 
 .UserContainer {
@@ -45,7 +45,7 @@
   display: flex;
   font-family: 'Poppins', sans-serif;
   margin: 0 0 0 50px;
-  color: #ffffff !important;
+  color: #201F23 !important;
 }
 
 .textAgo {
@@ -81,7 +81,7 @@
     cursor: pointer;
   }
 
-  color: #ffffff !important;
+  color: #201F23 !important;
 
 }
 
@@ -105,7 +105,7 @@
 
   h3 {
     font-family: "Poppins", sans-serif;
-    color: #ffffff;
+    color: #201F23;
     font-weight: 400;
     font-size: 15px;
     letter-spacing: -0.3px;
@@ -159,7 +159,7 @@
       overflow-y: scroll!important;
       position: relative;
       width: 100%;
-      background-color: #ffffff;
+      background-color: #201F23;
       word-break: break-all;
 
       .comment_title {
@@ -202,7 +202,7 @@
     right: 0;
     position: absolute;
     z-index: 100;
-    background-color: #ffffffd7;
+    background-color: #201F23d7;
     padding-top: 20px;
     padding-bottom: 60px;
     border-radius: 0 0 0 32px;
@@ -229,7 +229,7 @@
 }
 
 .search_wrapper{
-  color: #ffffff;
+  color: #201F23;
   height: 100%;
   width: 82%;
   margin: auto;
@@ -255,7 +255,7 @@
   border-radius: 8px;
   padding: 10px;
   word-break: break-all;
-  color: #ffffff;
+  color: #201F23;
   cursor: pointer;
 
   .search_title {
@@ -272,7 +272,7 @@
       margin: 0 5px 0 8px;
       vertical-align: middle;
       height: 100%;
-      color: #ffffff;      
+      color: #201F23;      
       line-height: 25px;
     }
   }
@@ -285,12 +285,12 @@
 
 .secondary_hastags {
   font-family: @__Global_general_font_family;
-  color: #ffffff;
+  color: #201F23;
   font-size: 12px;
 
  
  .secondary_hastags_title{
-  h2{color: #ffffff;}
+  h2{color: #201F23;}
   }
 
   .secondary_hastags_body{
@@ -336,7 +336,7 @@
   height: 140px;
 
   h1{
-    color: #ffffff;
+    color: #201F23;
     font-family: "Poppins", sans-serif;
     font-size: 18px;
     margin-bottom: 0;
@@ -369,3 +369,30 @@
   letter-spacing: 2px;
   width: 100%;
 }
+
+
+.search_bar {
+  height: 80px;
+  position: relative;
+ 
+  input {
+   height: 100%;
+   width: 100%;
+   display: block;
+   background-color: transparent;
+   border: none;
+   color: @body-color;
+   padding: 0 54px;
+   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56.966 56.966' fill='%23c1c7cd'%3e%3cpath d='M55.146 51.887L41.588 37.786A22.926 22.926 0 0046.984 23c0-12.682-10.318-23-23-23s-23 10.318-23 23 10.318 23 23 23c4.761 0 9.298-1.436 13.177-4.162l13.661 14.208c.571.593 1.339.92 2.162.92.779 0 1.518-.297 2.079-.837a3.004 3.004 0 00.083-4.242zM23.984 6c9.374 0 17 7.626 17 17s-7.626 17-17 17-17-7.626-17-17 7.626-17 17-17z'/%3e%3c/svg%3e");
+   background-repeat: no-repeat;
+   background-size: 16px;
+   background-position: 25px 48%;
+   font-family: @body-font;
+   font-weight: 600;
+   font-size: 15px;
+   &::placeholder {
+    color: @input-chat-color;
+   }
+  }
+ }
+ 

@@ -14,7 +14,8 @@ import {
   __trendings,
   __pro,
   __footer,
-  __chats
+  __chats,
+  __searchBar
 } from './renders.js'
 
 export const SwapMode = {
@@ -215,7 +216,8 @@ export default class Secondary extends React.PureComponent {
       return (
         <>
         <div className={styles.secondary_main}>
-          {ycore.IsThisUser.pro() ? <__pro /> : <__pro />}
+          <__searchBar />
+          {/* {ycore.IsThisUser.pro() ? <__pro /> : <__pro />} */}
           <__trendings data={trending_data} />
           <__chats />
           {__footer()}

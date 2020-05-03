@@ -1,8 +1,27 @@
-import { API_Call, endpoints } from 'ycore'
+import { API_Call, endpoints, get_early } from 'ycore'
 import { comty_rsa } from '../rs_cloud/pre'
 
 export const comty_user = {
   setData: () => {},
+  data: {
+    avatar: (callback,key) => {
+      if(!key) return false
+
+      try {
+        const payload = {username: key}
+        get_early.user((err,res) => {
+          const d = JSON.parse(res)['data']        
+          return callback(d.avatar)
+        },payload)
+      
+      } catch (error) {
+        return false
+      }
+
+    
+    },
+
+  },
   getFollowers: (callback, payload) => {
     if (!payload)return false
     const { user_id } = payload

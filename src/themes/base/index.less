@@ -2,6 +2,7 @@
 
 // FOR LAYOUTS
 @__Global_general_font_family: "Poppins", sans-serif;
+
 @__Global_layout_backgroud: #F8F6F8;
 @__Global_layout_color: #2d2d2d;
 @__Global_layout_border-rd: 27px 0 0 0;
@@ -128,7 +129,7 @@ body {
 // }
 
 // .primary_layout_*
-@primary_layout_backgroud: #2d2d2d;
+@primary_layout_backgroud: #F8F6F8; // #2d2d2d;
 
 @primary_layout_container_backgroud: @__Global_layout_backgroud;
 @primary_layout_container_border-rd: @__Global_layout_border-rd;
@@ -140,8 +141,8 @@ body {
 @secondary_wrapper_hidden_width: 22vw;
 @secondary_wrapper_showFull_width: 94.2%;
 @secondary_wrapper_showHalf_width: 35vw;
-@secondary_container_bg_background: #201F23;
-@secondary_container_1_color: #fff;
+@secondary_container_bg_background: #F8F6F8;
+@secondary_container_1_color: #201F23;
 @secondary_container_2_color: #201F23;
 @secondary_container_2_backgroud: #fff;
 @secondary_container_1_btn_backgroud: #4c4c4c;
@@ -152,7 +153,7 @@ body {
 @secondaty_container_2_padding: 20px 15px 15px 15px;
 
 // .left_sider*
-@left_sider_backgroud: #2d2d2d;
+@left_sider_backgroud: #F8F6F8;
 @left_sider_color: #fff;
 @left_sider_sizeIcons: 19px;
 @left_sider_menu__onhover_backgroud: rgb(80, 80, 80);
@@ -226,3 +227,41 @@ body {
 @borderRadius: 6px;
 @boxShadow: 0 2px 5px rgba(#333, 0.2);
 
+// DSP2
+@chat_footer_height: 67px;
+@body-bg-color: #e5ecef;
+@theme-bg-color: #fff;
+@settings-icon-hover: #9fa7ac;
+@developer-color: #f9fafb;
+@input-bg: #f8f8fa;
+@input-chat-color: #a2a2a2;
+@border-color: #eef2f4;
+@body-font: "Manrope", sans-serif;
+@body-color: #273346;
+@settings-icon-color: #c1c7cd;
+@msg-message: #969eaa;
+@chat-text-bg: #f1f2f6;
+@chat-text-color: rgb(39, 51, 70);
+@theme-color: #0086ff;
+@msg-date: #c0c7d2;
+@button-bg-color: #f0f7ff;
+@button-color: var(@theme-color);
+@detail-font-color: #919ca2;
+@msg-hover-bg: rgba(238, 242, 244, 0.4);
+@active-conversation-bg: linear-gradient(
+ to right,
+ rgba(238, 242, 244, 0.4) 0%,
+ rgba(238, 242, 244, 0) 100%
+);
+@overlay-bg: linear-gradient(
+ to bottom,
+ rgba(255, 255, 255, 0) 0%,
+ rgba(255, 255, 255, 1) 65%,
+ rgba(255, 255, 255, 1) 100%
+);
+@chat-header-bg: linear-gradient(
+ to bottom,
+ rgba(255, 255, 255, 1) 0%,
+ rgba(255, 255, 255, 1) 78%,
+ rgba(255, 255, 255, 0) 100%
+);

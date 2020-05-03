@@ -3,7 +3,6 @@ import styles from './styles.less'
 import * as ycore from 'ycore'
 import * as antd from 'antd'
 import { CustomIcons, MainFeed, PostCreator } from 'components'
-import { SetHeaderSearchType } from 'components/HeaderSearch'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import Follow_btn from './components/Follow_btn.js'
@@ -57,7 +56,7 @@ class UserProfile extends React.PureComponent {
 
   componentDidMount() {
     this.initUser(this.props.regx)
-    SetHeaderSearchType.disable()
+   
   }
 
   initUser = e => {
