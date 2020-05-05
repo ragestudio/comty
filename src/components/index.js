@@ -6,6 +6,7 @@ import CustomIcons from './CustomIcons'
 import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
 import App_about from './App_about'
+import * as Feather from './FeatherIcons'
 
 // App Layout Components
 import * as MyLayout from './Layout/index.js'
@@ -26,6 +27,7 @@ import PostCreator from './PostCreator'
 
 // Mix & Export all
 export {
+  Feather,
   App_about,
   MediaPlayer,
   UserBadges,

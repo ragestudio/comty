@@ -1,5 +1,25 @@
 @import '~themes/index.less';
 
+.render_component {
+  width: 100%;
+  height: 100%;
+  // box-shadow: 0px 24px 64px rgba(45, 48, 58, 0.06);
+
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+
+
+  h2,h3,h4{
+    color: #9597A1;
+    font-family: Netflix Sans;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 15px;
+  }
+}
+
 .__secondary_colider{
   position: relative;
   float: right;
@@ -191,11 +211,88 @@
 
 
 .secondary_main{
-  margin-top: 45px;
   width: 100%;
 }
 
 
 
+.secondary_container_2 {
+    position: absolute;
+    z-index: 51;
+    height: 100vh;
+    width: 0;
+    right: -500px;
+    padding: @secondaty_container_2_padding;
+    
+    opacity: 0;
+    color: @secondary_container_2_color!important;
+    background-color: @secondary_container_2_backgroud;
+  
+    border-radius: 32px 0 0 32px;
+  
+    &.active {
+      width: 25%;
+      opacity: 1;
+      right: 0;
+    }
+     
+    &.mobile {
+      width: 100%;
+      height: 0;
+      bottom: 0;
+      opacity: 0;
+  
+      top: unset;
+     
+      transform: translate(0, 86%);
+      border-radius: 12px 12px 0 0;
+      flex-direction: column;
+
+      overflow-y: overlay;
+      overflow-x: hidden;
+  
+      touch-action: none;
+      user-select: none;
+      cursor: default;
+  
+      -webkit-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+           -o-user-select: none;
+              user-select: none;
+  
+      -webkit-touch-action: none;
+         -moz-touch-action: none;
+          -ms-touch-action: none;
+              touch-action: none;
+      :global{
+        .comments_body {
+          padding: 30px 10px 10px 10px;
+        }
+      }
+  
+      &.active {
+        opacity: 1;
+        height: 100%;
+      }
+  
+      &.full_open {
+        opacity: 1;
+        height: 100vh;
+      }
+    }
+  
+    .sec_body{
+  
+    }
+  
+    transition: all @__Global_SwapAnimDuration ease-in-out;
+    
+  }
 
 
+
+  .secondary_body_component{
+    // Spacing between components
+    margin-bottom: 35px;
+  }

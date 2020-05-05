@@ -56,17 +56,10 @@ export default class Chats extends React.Component{
 	}
 
 	render() {
-		const { socket, user } = this.state
-		return (
-			<div className="container">
-				{
-					!user ?	
-					<h2>initializes....</h2>
-					:
-          <ChatContainer socket={socket} user={user} />
-				}
-			</div>
-		);
+    const { socket, user } = this.state
+    if(!user) return <div ><h1>Loading</h1></div>
+		return <ChatContainer socket={socket} user={user} />
+		
 	}
   
 }

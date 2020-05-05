@@ -4,19 +4,18 @@ import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from './index.less'
 import classnames from 'classnames'
-import { __sec } from './components'
 import reactable from 'reactablejs'
 
-import {
+import { 
+  __sec,
+  __pri,
+  __trendings,
+  __searchBar, 
+  __suggestions,
   __priPost,
   __secComments,
   __priSearch,
-  __trendings,
-  __pro,
-  __footer,
-  __chats,
-  __searchBar
-} from './renders.js'
+} from './components'
 
 export const SwapMode = {
   close: () => {
@@ -162,10 +161,12 @@ export default class Secondary extends React.PureComponent {
       if (err) return false
       try {
         const notification_data = JSON.parse(res)['notifications']
+        const trending_hashtag = JSON.parse(res)['trending_hashtag']
         this.setState({
           loading: false,
           gen_data: res,
           notification_data: notification_data,
+          trending_hashtag: trending_hashtag,
         })
       } catch (error) {
         console.log(error)
@@ -210,33 +211,13 @@ export default class Secondary extends React.PureComponent {
     }
   }
 
-  renderMain = payload => {
-    try {
-      const trending_data = JSON.parse(this.state.gen_data)['trending_hashtag']
-      return (
-        <>
-        <div className={styles.secondary_main}>
-          <__searchBar />
-          {/* {ycore.IsThisUser.pro() ? <__pro /> : <__pro />} */}
-          <__trendings data={trending_data} />
-          <__chats />
-          {__footer()}
-        </div>
-         
-        </>
-      )
-    } catch (error) {
-      return null
-    }
-  }
-
   renderTarget(target) {
     try {
       switch (target) {
         case '__pri': {
           const fragment = this.state.rd__pri
           if (!fragment && !this.props.isMobile) {
-            return <React.Fragment>{this.renderMain()}</React.Fragment>
+            return <React.Fragment>{this.__main()}</React.Fragment>
           }
           return <React.Fragment>{fragment}</React.Fragment>
         }
@@ -285,26 +266,30 @@ export default class Secondary extends React.PureComponent {
     }
     return null
   }
+  __main(){
+    const fragment = this.state.rd__pr
+    if (!fragment && !this.props.isMobile) {
+      return (
+        <React.Fragment>
+     
+            <div className={styles.secondary_body_component}> <__searchBar /> </div>
+            <div className={styles.secondary_body_component}> <__trendings data={this.state.trending_hashtag} /> </div>
+            <div className={styles.secondary_body_component}> <__suggestions /> </div>
+      
+        </React.Fragment>
+      )
+    }
+ 
+
+    
+  }
   render() {
     const { userData, isMobile } = this.props
     const __sec_functs = (this.Swapper)
-    
     if (!this.state.loading)
       return (
         <>
           {isMobile ? null : <div className={styles.__secondary_colider}></div>}
-          {isMobile ? null : (
-              <div className={styles.secondary_userholder}>
-                <div className={styles.notif_box}>
-                  <h1>{this.state.notification_data.length}</h1>
-                </div>
-                <img
-                  onClick={() => ycore.router.go(`@${userData.username}`)}
-                  src={userData.avatar}
-                />
-              </div>
-            )}
-            
           <div
             id="secondary_layout__wrapper"
             className={classnames(styles.secondary_wrapper, {
@@ -312,19 +297,9 @@ export default class Secondary extends React.PureComponent {
               [styles.active]: this.isOpen()
             })}
           >
-            <div
-              id="secondary_layout_pri"
-              className={classnames(styles.secondary_container_1, {
-                [styles.mobile]: isMobile,
-                [styles.full_open]: this.state.__pri_full,
-                [styles.half]: this.state.__pri_half,
-              })}
-            >
-              <div className={styles.pri_body}>
-                {this.renderExit('__pri')}
-                {this.renderTarget('__pri')}
-              </div>
-            </div>
+        
+
+            <__pri render={this.renderTarget('__pri')} isMobile={isMobile} functs={__sec_functs} type={this.state.__pri_full? "full_open" : this.state.__pri_half? "half" : null} />
             <__sec render={this.renderTarget('__sec')} isMobile={isMobile} functs={__sec_functs} type={this.state.__sec_full? "full_open" : this.state.__sec_active? "active" : null} />
             
       
