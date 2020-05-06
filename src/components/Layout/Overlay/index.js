@@ -18,6 +18,9 @@ import {
 } from './components'
 
 export const SwapMode = {
+  loose_focus: () => {
+    OverlayLayoutComponent.loose_focus()
+  },
   close: () => {
     OverlayLayoutComponent.Swapper.close()
   },
@@ -108,7 +111,7 @@ export const SwapMode = {
       <h2>
         <Icons.SearchOutlined /> Results of {id || '... nothing ?'}
       </h2>
-      <__priSearch payload={tmp} />
+      <__priSearch lost_focus={() => SwapMode.close()} payload={tmp} />
     </div>
 
     return OverlayLayoutComponent.setState({
@@ -135,6 +138,8 @@ export default class Overlay extends React.PureComponent {
         __sec_active: false,
         __sec_full: false,
       })
+      this.setWrapperRef = this.setWrapperRef.bind(this);
+      this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   Swapper = {
@@ -155,6 +160,12 @@ export default class Overlay extends React.PureComponent {
       SwapMode.close()
     }
   }
+
+  loose_focus(){
+    if (this.isOpen()) {
+      SwapMode.close()
+    }
+  }  
 
   handle_genData() {
     app.comty_data.general_data((err, res) => {
@@ -206,8 +217,25 @@ export default class Overlay extends React.PureComponent {
   componentDidUpdate() {
     if (this.isOpen()) {
       document.addEventListener('keydown', this.handle_Exit, false)
+      document.addEventListener('mousedown', this.handleClickOutside);
+
     } else {
-      document.removeEventListener('keydown', this.handle_Exit, false)
+      document.removeEventListener('mousedown', this.handleClickOutside);
+    }
+  }
+   /**
+   * Set the wrapper ref
+   */
+  setWrapperRef(node) {
+    this.wrapperRef = node;
+  }
+
+  /**
+   * Alert if clicked on outside of element
+   */
+  handleClickOutside(event) {
+    if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
+     SwapMode.close()
     }
   }
 
@@ -279,8 +307,6 @@ export default class Overlay extends React.PureComponent {
         </React.Fragment>
       )
     }
- 
-
     
   }
   render() {
@@ -289,12 +315,14 @@ export default class Overlay extends React.PureComponent {
     if (!this.state.loading)
       return (
         <>
-          {isMobile ? null : <div className={styles.__Overlay_colider}></div>}
           <div
-            id="Overlay_layout__wrapper"
+            id="Overlay_layout"
+            ref={this.setWrapperRef}
             className={classnames(styles.Overlay_wrapper, {
               [styles.mobile]: isMobile,
-              [styles.active]: this.isOpen()
+              [styles.active]: this.isOpen(),
+              [styles.expand]: this.state.__pri_half
+          
             })}
           >
         

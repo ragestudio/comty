@@ -56,7 +56,7 @@ class UserProfile extends React.PureComponent {
 
   componentDidMount() {
     this.initUser(this.props.regx)
-   
+    app.SwapMode.loose_focus()
   }
 
   initUser = e => {

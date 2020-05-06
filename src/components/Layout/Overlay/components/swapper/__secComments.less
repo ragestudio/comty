@@ -2,9 +2,9 @@
 
 .comments_body {
     height: 100%;
-    font-family: "Poppins", sans-serif;
     padding: 50px 10px 10px 20px;
-  
+    font-family: @__Global_general_font_family;
+
     .comments_body_title {
       font-size: 12px;
   
@@ -17,21 +17,18 @@
     .comments_cards_wrapper {
       z-index: 50;
       overflow-y: scroll!important;
-      height: 84%;
-      :global {
-        overflow-y: scroll!important;
-      }
+      height: 70vh; //84%;
   
       .comment_card {
         overflow-y: scroll!important;
         position: relative;
         width: 100%;
-        background-color: #201F23;
+        max-height: 100px;
         word-break: break-all;
-  
+        margin: 0 0 10px 0;
+        
         .comment_title {
           display: flex;
-  
           img {
             float: left;
             width: 30px;
@@ -56,9 +53,7 @@
           }
         }
   
-        .comment_text {
-          margin: 10px 0 0 0;
-        }
+   
   
       }
     }
@@ -69,7 +64,6 @@
       right: 0;
       position: absolute;
       z-index: 100;
-      background-color: #201F23d7;
       padding-top: 20px;
       padding-bottom: 60px;
       border-radius: 0 0 0 32px;

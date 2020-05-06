@@ -72,12 +72,16 @@ export default class __priSearch extends React.PureComponent {
       }
     }
     EntryComponent = (t, source) => {
+      function onclick(e){
+        if(!e) return false
+        app.router.go(`@${e}`)
+      }
       try {
         return (
               <antd.List
                 dataSource={source}
                 renderItem={item => 
-                  <div id={item.id} className={styles.search_card} onClick={() => {app.router.go(`@${item.username}`)}}>
+                  <div id={item.id} className={styles.search_card} onClick={() => onclick(item.username) }>
                     <div className={styles.search_title}>
                       <img src={item.avatar} />
                       <p className={styles.search_user_username}>
