@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { pathMatchRegexp } from 'utils'
 import { SearchCard } from 'components'
 import styles from './styles.less'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
@@ -27,16 +27,16 @@ class SearchPageIndexer extends PureComponent {
       const string = raw.replace('/s/', '')
 
       const payload = { key: string }
-      ycore.comty_search.keywords((err, res) => {
+      app.comty_search.keywords((err, res) => {
         if (err) {
-          ycore.notify.error(err)
+          app.notify.error(err)
         }
-        ycore.yconsole.log('Founded entries => ', JSON.parse(res))
+        app.yconsole.log('Founded entries => ', JSON.parse(res))
         this.setState({ SearchResult: res })
         this.toogleLoading()
       }, payload)
     } catch (err) {
-      ycore.notify.error(err)
+      app.notify.error(err)
     }
   }
 
@@ -59,19 +59,19 @@ class SearchPageIndexer extends PureComponent {
 
       const users = () => {
         if (usersParsed.length >= 1) {
-          ycore.yconsole.log('Users => ', usersParsed)
+          app.yconsole.log('Users => ', usersParsed)
           return this.EntryComponent('Users', usersParsed)
         }
       }
       const groups = () => {
         if (groupsParsed.length >= 1) {
-          ycore.yconsole.log('Groups => ', groupsParsed)
+          app.yconsole.log('Groups => ', groupsParsed)
           return this.EntryComponent('Groups', groupsParsed)
         }
       }
       const pages = () => {
         if (pagesParsed.length >= 1) {
-          ycore.yconsole.log('Pages => ', pagesParsed)
+          app.yconsole.log('Pages => ', pagesParsed)
           return this.EntryComponent('Pages', pagesParsed)
         }
       }
@@ -135,7 +135,7 @@ class SearchPageIndexer extends PureComponent {
     const string = raw.replace('/s/', '')
 
     if (matchSearch) {
-      ycore.yconsole.log(`Search matched!  ${location.pathname}`)
+      app.yconsole.log(`Search matched!  ${location.pathname}`)
       return (
         <div>
           <h1 className={styles.searchHeader}>

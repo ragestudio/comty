@@ -2,7 +2,7 @@ import { cloneDeep, isString, flow, curry } from 'lodash'
 import umiRouter from 'umi/router'
 import pathToRegexp from 'path-to-regexp'
 import { i18n } from 'config'
-import * as ycore from 'ycore'
+import * as app from 'app'
 
 export const { defaultLanguage } = i18n
 export const languages = i18n.languages.map(item => item.key)
@@ -244,25 +244,25 @@ export function setLocale(language) {
 
 export const _app = {
   setup: () => {
-    ycore.notify.success('Authorised, please wait...')
+    app.notify.success('Authorised, please wait...')
     const resourceLoad = localStorage.getItem('resource_bundle')
     if (!resourceLoad) {
       localStorage.setItem('resource_bundle', 'light_ng')
     }
-    ycore.router.push('main')
+    app.router.push('main')
   },
   query: () => {
-    const validBackup = ycore.validate.backup()
-    if (!validBackup) ycore.make_data.backup()
+    const validBackup = app.validate.backup()
+    if (!validBackup) app.cid_backup.set()
   },
   refresh: () => {
     return window.location = '/'
   },
   logout: () => {
-    return ycore.app_session.logout()
+    return app.app_session.logout()
   },
   login: (callback, data) => {
-    return ycore.app_session.login(callback, data)
+    return app.app_session.login(callback, data)
   },
 
 }

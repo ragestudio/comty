@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import styles from './index.less'
 import classnames from 'classnames'
 import * as Icons from '@ant-design/icons'
@@ -28,18 +28,18 @@ export default class HeaderSearch extends Component {
     const { value } = this.state
     if (value.length < 1) return false
     if (value == /\s/) return false
-    ycore.SwapMode.openSearch(value);
+    app.SwapMode.openSearch(value);
   }
 
   sendToSearch = () => {
     const { value } = this.state
-    ycore.router.go(`s/${value}`)
+    app.router.go(`s/${value}`)
   }
   
   onChange = e => {
     const { value } = e.target
     this.setState({ value: value })
-    if (ycore.AppSettings.auto_search_ontype == 'true') {
+    if (app.AppSettings.auto_search_ontype == 'true') {
       this.autosend()
     }
   }
@@ -51,7 +51,7 @@ export default class HeaderSearch extends Component {
       clearTimeout(timeout)
       timeout = setTimeout(() => {
         const { value } = this.state
-        ycore.router.go(`s/${value}`)
+        app.router.go(`s/${value}`)
       }, 500)
     })
   }

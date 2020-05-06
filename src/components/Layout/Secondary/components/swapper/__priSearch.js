@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './__priSearch.less'
 
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import Icon from '@ant-design/icons'
 
 const VerifiedBadge = () => (
@@ -37,19 +37,19 @@ export default class __priSearch extends React.PureComponent {
   
         const users = () => {
           if (usersParsed.length >= 1) {
-            ycore.yconsole.log('Users => ', usersParsed)
+            app.yconsole.log('Users => ', usersParsed)
             return this.EntryComponent('Users', usersParsed)
           }
         }
         const groups = () => {
           if (groupsParsed.length >= 1) {
-            ycore.yconsole.log('Groups => ', groupsParsed)
+            app.yconsole.log('Groups => ', groupsParsed)
             return this.EntryComponent('Groups', groupsParsed)
           }
         }
         const pages = () => {
           if (pagesParsed.length >= 1) {
-            ycore.yconsole.log('Pages => ', pagesParsed)
+            app.yconsole.log('Pages => ', pagesParsed)
             return this.EntryComponent('Pages', pagesParsed)
           }
         }
@@ -77,12 +77,12 @@ export default class __priSearch extends React.PureComponent {
               <antd.List
                 dataSource={source}
                 renderItem={item => 
-                  <div id={item.id} className={styles.search_card} onClick={() => {ycore.router.go(`@${item.username}`)}}>
+                  <div id={item.id} className={styles.search_card} onClick={() => {app.router.go(`@${item.username}`)}}>
                     <div className={styles.search_title}>
                       <img src={item.avatar} />
                       <p className={styles.search_user_username}>
                         @{item.username}
-                        {ycore.booleanFix(item.verified) ? (
+                        {app.booleanFix(item.verified) ? (
                           <Icon component={VerifiedBadge} />
                         ) : null}
                       </p>

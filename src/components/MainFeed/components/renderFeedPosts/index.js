@@ -1,6 +1,6 @@
 import React from 'react'
 import { PostCard } from 'components'
-import { yconsole } from 'ycore'
+import { yconsole } from 'app'
 import { Button, List } from 'antd'
 import { DownSquareOutlined } from '@ant-design/icons'
 const renderFeedPosts = payload => {

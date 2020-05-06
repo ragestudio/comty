@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 
 export default class Sessions_Manager extends React.Component {
@@ -7,10 +7,10 @@ export default class Sessions_Manager extends React.Component {
     sessions_data: '',
   }
   componentDidMount() {
-    ycore.comty_get.session_id((err, res) => {
+    app.comty_data.session_id((err, res) => {
       this.setState({ sid: res })
     })
-    ycore.comty_get.sessions((err, res) => {
+    app.comty_data.sessions((err, res) => {
       const a = JSON.parse(res)['data']
       this.setState({ sessions_data: a })
     })

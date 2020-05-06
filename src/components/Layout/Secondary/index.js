@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from './index.less'
@@ -34,7 +34,7 @@ export const SwapMode = {
 
     let promise = new Promise((res, rej) => {
       const payload = { post_id: id }
-      ycore.comty_post.get((err, response) => {
+      app.comty_post.get((err, response) => {
         try {
           res(JSON.parse(response)['post_data'])
         } catch (error) {
@@ -64,7 +64,7 @@ export const SwapMode = {
 
     let promise = new Promise((res, rej) => {
       const payload = { post_id: id }
-      ycore.comty_post.get((err, response) => {
+      app.comty_post.get((err, response) => {
        try {
           res(JSON.parse(response)['post_comments'])
        }catch (error) {
@@ -92,7 +92,7 @@ export const SwapMode = {
     let tmp;
     let promise = new Promise((res, rej) => {
       const payload = { key: id }
-      ycore.comty_search.keywords((err, response) => {
+      app.comty_search.keywords((err, response) => {
         res(response)
       }, payload)
     });
@@ -157,7 +157,7 @@ export default class Secondary extends React.PureComponent {
   }
 
   handle_genData() {
-    ycore.comty_get.general_data((err, res) => {
+    app.comty_data.general_data((err, res) => {
       if (err) return false
       try {
         const notification_data = JSON.parse(res)['notifications']

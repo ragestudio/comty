@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
 import { CustomIcons, Like_button, MediaPlayer } from 'components'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import classnames from 'classnames'
@@ -40,7 +40,7 @@ class PostCard extends React.PureComponent {
 
   render() {
     const { payload, customActions } = this.props
-    const ActShowMode = ycore.AppSettings.auto_hide_postbar
+    const ActShowMode = app.AppSettings.auto_hide_postbar
 
     const post_data = payload || emptyPayload;
     const {
@@ -59,52 +59,52 @@ class PostCard extends React.PureComponent {
     const SwapThisPost = () => {
       localStorage.setItem('p_back_uid', id)
       if (postFile){
-        ycore.SwapMode.openPost(id, post_data)
+        app.SwapMode.openPost(id, post_data)
       }
-      ycore.SwapMode.openComments(id)
+      app.SwapMode.openComments(id)
     }
 
     const handlePostActions = {
       delete: post_id => {
         const payload = { post_id: post_id }
-        ycore.comty_post.delete((err, res) => {
+        app.comty_post.delete((err, res) => {
           if (err) {
             return false
           }
-          ycore.FeedHandler.killByID(post_id)
+          app.FeedHandler.killByID(post_id)
         }, payload)
       },
       save: post_id => {
         const payload = { post_id: post_id }
-        ycore.comty_post.save((err, res) => {
+        app.comty_post.save((err, res) => {
           if (err) {
             return false
           }
           if (this.state.postSaved == false) {
-            ycore.notify.success('Post Saved')
+            app.notify.success('Post Saved')
             this.setState({ postSaved: true })
             return
           } else {
-            ycore.notify.info('Removed from Saved')
+            app.notify.info('Removed from Saved')
             this.setState({ postSaved: false })
           }
         }, payload)
       },
       report: post_id => {
-        ycore.app_modals.report_post(post_id)
+        app.app_modals.report_post(post_id)
       },
       boost: post_id => {
         const payload = { post_id: post_id }
-        ycore.comty_post.__boost((err, res) => {
+        app.comty_post.__boost((err, res) => {
           if (err) {
             return false
           }
           if (this.state.postBoosted == false) {
-            ycore.notify.success('Post Boosted')
+            app.notify.success('Post Boosted')
             this.setState({ postBoosted: true })
             return
           } else {
-            ycore.notify.info('Post Unboosted')
+            app.notify.info('Post Unboosted')
             this.setState({ postBoosted: false })
           }
         }, payload)
@@ -115,7 +115,7 @@ class PostCard extends React.PureComponent {
         <Like_button
           count={post_likes}
           id={id}
-          liked={ycore.booleanFix(is_liked) ? true : false}
+          liked={app.booleanFix(is_liked) ? true : false}
           key="like"
         />
       </div>,
@@ -127,7 +127,7 @@ class PostCard extends React.PureComponent {
 
     const MoreMenu = (
       <antd.Menu >
-        {ycore.IsThisPost.owner(publisher.id) ? (
+        {app.IsThisPost.owner(publisher.id) ? (
           <antd.Menu.Item
             key="remove_post"
           > 
@@ -142,8 +142,8 @@ class PostCard extends React.PureComponent {
             
           </antd.Menu.Item>
         ) : null}
-        {ycore.IsThisPost.owner(publisher.id) ? (
-          ycore.IsThisUser.pro(publisher.id) ? (
+        {app.IsThisPost.owner(publisher.id) ? (
+          app.IsThisUser.pro(publisher.id) ? (
             <antd.Menu.Item
               onClick={() => handlePostActions.boost(id) & this.toogleMoreMenu()}
               key="boost_post"
@@ -153,7 +153,7 @@ class PostCard extends React.PureComponent {
             </antd.Menu.Item>
           ) : null
         ) : null}
-        {ycore.IsThisPost.owner(publisher.id) ? <hr /> : null}
+        {app.IsThisPost.owner(publisher.id) ? <hr /> : null}
         <antd.Menu.Item
           onClick={() => handlePostActions.save(id) & this.toogleMoreMenu()}
           key="save_post"
@@ -215,18 +215,18 @@ class PostCard extends React.PureComponent {
                 <div className={styles.post_card_title}>
                   <h4
                     onClick={() =>
-                      ycore.router.go(`@${publisher.username}`)
+                      app.router.go(`@${publisher.username}`)
                     }
                     className={styles.titleUser}
                   >
                     @{publisher.username}
-                    {ycore.booleanFix(publisher.verified) ? (
+                    {app.booleanFix(publisher.verified) ? (
                       <Icon
                         style={{ color: 'blue' }}
                         component={CustomIcons.VerifiedBadge}
                       />
                     ) : null}
-                    {ycore.booleanFix(publisher.nsfw_flag) ? (
+                    {app.booleanFix(publisher.nsfw_flag) ? (
                       <antd.Tag
                         style={{ margin: '0 0 0 13px' }}
                         color="volcano"
@@ -241,7 +241,7 @@ class PostCard extends React.PureComponent {
                         <Icons.MoreOutlined key="actionMenu" />
                       </antd.Dropdown>
                     </div>
-                    {ycore.booleanFix(is_post_pinned) ? (
+                    {app.booleanFix(is_post_pinned) ? (
                       <Icons.PushpinFilled />
                     ) : null}
                   </div>

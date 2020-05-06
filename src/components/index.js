@@ -1,12 +1,11 @@
 // @alias from 'components'
 
 // Helpers & Misc
-import MobileWarning from './MobileWarning'
 import CustomIcons from './CustomIcons'
 import Loader from './Loader/Loader.js'
 import ScrollBar from './ScrollBar'
 import App_about from './App_about'
-import * as Feather from './FeatherIcons'
+import * as Feather from 'feather-reactjs'
 
 // App Layout Components
 import * as MyLayout from './Layout/index.js'
@@ -31,7 +30,6 @@ export {
   App_about,
   MediaPlayer,
   UserBadges,
-  MobileWarning,
   PageTransition,
   SearchCard,
   HeaderSearch,

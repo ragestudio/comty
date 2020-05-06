@@ -5,7 +5,7 @@ import Icon from '@ant-design/icons'
 
 import { withI18n, Trans } from '@lingui/react'
 import styles from './mobile.less'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import CustomIcons from '../../CustomIcons'
 
 @withI18n()

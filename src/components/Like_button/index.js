@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.scss'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import classnames from 'classnames'
 
 class Like_button extends React.PureComponent {
@@ -35,15 +35,15 @@ class Like_button extends React.PureComponent {
 
   dispatchLike(e) {
     const { type } = this.state
-    ycore.yconsole.log(`Dispatch ${type} to post id => ${e}`)
+    app.yconsole.log(`Dispatch ${type} to post id => ${e}`)
     this.setState({ clicked: true })
     setTimeout(() => {
       this.setState({ clicked: false })
     }, 500)
     const payload = { post_id: e }
-    ycore.comty_post.like((err, res) => {
+    app.comty_post.like((err, res) => {
       if (err) {
-        ycore.notify.error(res)
+        app.notify.error(res)
         return
       }
       if (type == 'like') {
@@ -58,7 +58,7 @@ class Like_button extends React.PureComponent {
     const { id } = this.props
     const { likes, liked, clicked } = this.state
     if (!id) {
-      ycore.yconsole.error('[LikeBTN] No post id provided!')
+      app.yconsole.error('[LikeBTN] No post id provided!')
       return null
     }
     return (

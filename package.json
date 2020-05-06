@@ -3,7 +3,7 @@
   "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
   "title": "Comty™",
   "DevBuild": true,
-  "version": "0.4.03",
+  "version": "0.4.06",
   "stage": "dev-pre",
   "description": "",
   "author": "RageStudio",
@@ -20,7 +20,7 @@
     "dva-model-extend": "^0.1.2",
     "enquire-js": "^0.2.1",
     "express": "^4.17.1",
-    "interact.js": "^1.2.8",
+    "feather-reactjs": "^2.0.9",
     "interactjs": "^1.9.9",
     "jquery": "^3.4.1",
     "jsonwebtoken": "^8.5.1",
@@ -53,7 +53,8 @@
     "ts-cookies": "^1.0.0",
     "umi": "^2.13.12",
     "umi-plugin-react": "^1.15.7",
-    "validator": "^12.2.0"
+    "validator": "^12.2.0",
+    "ycorejs": "^0.1.1"
   },
   "devDependencies": {
     "@capacitor/android": "^1.5.2",

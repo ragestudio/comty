@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import { Post_Options } from 'globals/post_options.js'
@@ -27,7 +27,7 @@ export default class Post_options extends React.Component {
   }
 
   onChangeOption(checked, id) {
-    ycore.yconsole.log(`${id} to ${checked}`)
+    app.yconsole.log(`${id} to ${checked}`)
   }
 
   handleToggleToolbox = () => {
@@ -41,7 +41,7 @@ export default class Post_options extends React.Component {
         ita === item ? Object.assign(ita, { value: to }) : ita
       )
       this.setState({ options_repo: updatedValue, forSave: true })
-      ycore.yconsole.log(`Changing ${item.key} to value ${to}`)
+      app.yconsole.log(`Changing ${item.key} to value ${to}`)
     } catch (err) {
       console.log(err)
     }
@@ -52,14 +52,14 @@ export default class Post_options extends React.Component {
       try {
         switch (i) {
           case 'pro':
-            return ycore.IsThisUser.pro() ? false : true
+            return app.IsThisUser.pro() ? false : true
           case 'dev':
-            return ycore.IsThisUser.dev() ? false : true
+            return app.IsThisUser.dev() ? false : true
           default:
             break
         }
       } catch (err) {
-        ycore.notify.error(err)
+        app.notify.error(err)
         return false
       }
     }

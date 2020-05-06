@@ -1,6 +1,6 @@
 import React from 'react'
 import { pathMatchRegexp } from 'utils'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 
@@ -16,11 +16,11 @@ export default class Indexer_Post extends React.Component {
 
   toSwap(id) {
     const payload = { post_id: id }
-    ycore.comty_post.get((err, res) => {
+    app.comty_post.get((err, res) => {
       if (err) {
         return false
       }
-      ycore.SecondarySwap.openPost(res)
+      app.SecondarySwap.openPost(res)
     }, payload)
   }
 
@@ -36,12 +36,12 @@ export default class Indexer_Post extends React.Component {
         this.toSwap(string)
       }
     } catch (err) {
-      ycore.notify.error(err)
+      app.notify.error(err)
     }
   }
 
   render() {
-    ycore.router.go('main')
+    app.router.go('main')
     return null
   }
 }

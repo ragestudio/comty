@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import * as antd from 'antd'
 import styles from './index.less'

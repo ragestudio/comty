@@ -6,6 +6,6 @@ const RobotOutlined = () => (<svg viewBox="64 64 896 896" focusable="false"  dat
 const SavedPost = () => (<svg viewBox="0 0 24 24" focusable="false" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M4 3h16a2 2 0 0 1 2 2v6a10 10 0 0 1-10 10A10 10 0 0 1 2 11V5a2 2 0 0 1 2-2z"></path><polyline points="8 10 12 14 16 10"></polyline></svg>)
 const SavedPostColor = () => (<svg viewBox="0 0 24 24" focusable="false" width="1em" height="1em" fill="rgb(230, 247, 255)" stroke="rgb(24, 144, 255)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M4 3h16a2 2 0 0 1 2 2v6a10 10 0 0 1-10 10A10 10 0 0 1 2 11V5a2 2 0 0 1 2-2z"></path><polyline points="8 10 12 14 16 10"></polyline></svg>)
 const SavedPostGrey = () => (<svg viewBox="0 0 24 24" focusable="false" width="1em" height="1em" fill="rgb(196, 196, 196)" stroke="rgba(133, 133, 133, 1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" ><path d="M4 3h16a2 2 0 0 1 2 2v6a10 10 0 0 1-10 10A10 10 0 0 1 2 11V5a2 2 0 0 1 2-2z"></path><polyline points="8 10 12 14 16 10"></polyline></svg>)
-const TrendBlue = () => (<svg  width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z"></path></svg>)
+
 const CustomIcons = {SavedPostGrey, SavedPostColor, VerifiedBadge, CommonThings, SunSVG, MoonSVG, RobotOutlined, SavedPost}
 export default CustomIcons

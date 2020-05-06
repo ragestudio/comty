@@ -5,7 +5,7 @@ import Icon from '@ant-design/icons'
 
 import { withI18n, Trans } from '@lingui/react'
 import styles from './default.less'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import CustomIcons from '../../CustomIcons'
 
 @withI18n()
@@ -20,7 +20,7 @@ export default class Sider_Default extends React.PureComponent {
         >
           <div className={styles.left_sider_brandholder}>
             <img
-              onClick={() => ycore.router.go('main')}
+              onClick={() => app.router.go('main')}
               src={logo}
             />
           </div>
@@ -78,7 +78,7 @@ export default class Sider_Default extends React.PureComponent {
                       <span>Settings</span>
                     </Trans>
                   </antd.Menu.Item>
-                  {ycore.IsThisUser.dev() ? (
+                  {app.IsThisUser.dev() ? (
                     <antd.Menu.Item key="debug_area">
                       <Icons.ThunderboltOutlined />
                       <span>Debug</span>

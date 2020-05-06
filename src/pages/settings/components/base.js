@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
 import { ListSettings } from '../../../../globals/settings.js'
-import { ControlBar } from 'ycore'
-import * as ycore from 'ycore'
+import { ControlBar } from 'app'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import { CustomIcons } from 'components'
@@ -18,7 +18,7 @@ class Base extends Component {
 
   componentDidMount() {
     if (!localStorage.getItem('app_settings')) {
-      ycore.yconsole.warn(
+      app.yconsole.warn(
         'The settings for this app in your Account isnt set yet, Using stock settings...'
       )
     }
@@ -70,7 +70,7 @@ class Base extends Component {
         </div>
       )
     } catch (err) {
-      return ycore.yconsole.log(err)
+      return app.yconsole.log(err)
     }
   }
   handleControlBar() {
@@ -96,7 +96,7 @@ class Base extends Component {
       description:
         'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
     })
-    setTimeout(ycore._app.refresh(), 1000)
+    setTimeout(app._app.refresh(), 1000)
     ControlBar.close()
   }
 
@@ -108,7 +108,7 @@ class Base extends Component {
         ita === item ? Object.assign(ita, { value: to }) : ita
       )
       this.setState({ SettingRepo: updatedValue, forSave: true })
-      ycore.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }
@@ -124,7 +124,7 @@ class Base extends Component {
         ita === item ? Object.assign(ita, { value: value }) : ita
       )
       this.setState({ SettingRepo: updatedValue, forSave: true })
-      ycore.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }

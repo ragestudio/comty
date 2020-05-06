@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import styles from './index.less'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
@@ -27,7 +27,7 @@ class PostCreator extends React.PureComponent {
     this.state = {
       visible: true,
       FadeIN: true,
-      keys_remaining: ycore.AppSettings.MaxLengthPosts,
+      keys_remaining: app.AppSettings.MaxLengthPosts,
       rawtext: '',
       posting: false,
       posting_ok: false,
@@ -121,10 +121,10 @@ class PostCreator extends React.PureComponent {
       antd.message.error(`${file.type} This file is not valid!`)
     }
     const maxsize =
-      file.size / 1024 / 1024 < ycore.AppSettings.MaximunAPIPayload
+      file.size / 1024 / 1024 < app.AppSettings.MaximunAPIPayload
     if (!maxsize) {
       antd.message.error(
-        `Image must smaller than ${ycore.AppSettings.MaximunAPIPayload} KB!`
+        `Image must smaller than ${app.AppSettings.MaximunAPIPayload} KB!`
       )
     }
     return filter && maxsize
@@ -133,13 +133,13 @@ class PostCreator extends React.PureComponent {
   handleChanges = ({ target: { value } }) => {
     this.setState({
       rawtext: value,
-      keys_remaining: ycore.AppSettings.MaxLengthPosts - value.length,
+      keys_remaining: app.AppSettings.MaxLengthPosts - value.length,
     })
   }
 
   handleKeysProgressBar() {
     const { keys_remaining } = this.state
-    if (keys_remaining <= (ycore.AppSettings.MaxLengthPosts / 100) * 30) {
+    if (keys_remaining <= (app.AppSettings.MaxLengthPosts / 100) * 30) {
       return 'exception'
     } else return 'active'
   }
@@ -155,7 +155,7 @@ class PostCreator extends React.PureComponent {
     setTimeout(() => {
       this.setState({ posting_ok: false })
     }, 1000)
-    ycore.FeedHandler.refresh()
+    app.FeedHandler.refresh()
     return true
   }
 
@@ -166,33 +166,42 @@ class PostCreator extends React.PureComponent {
     }
     this.setState({
       posting: true,
-      keys_remaining: ycore.AppSettings.MaxLengthPosts,
+      keys_remaining: app.AppSettings.MaxLengthPosts,
     })
     const post_options = optionBox.get()
 
     const payload = {
-      privacy: ycore.GetPostPrivacy.bool(shareWith),
+      privacy: app.GetPostPrivacy.bool(shareWith),
       text: rawtext,
       file: file,
     }
-    ycore.comty_post.new((err, res) => {
+    app.comty_post.new((err, res) => {
       if (err) {
-        ycore.notify.error(err)
+        app.notify.error(err)
         return false
       }
-      const status_temp_error = JSON.parse(res)['data'].error
-      status_temp_error? ycore.notify.error('It seems that a processing error has occurred, your publication has not been published.') : null
+
+      let status_temp_error;
+
+      try {
+        status_temp_error = JSON.parse(res)['data'].error
+      } catch (error) {
+        app.notify.error('It seems that a processing error has occurred, your publication has not been published and the application stopped working due to a critical error')
+        return false
+      }
+
+      status_temp_error? app.notify.error('It seems that a processing error has occurred, your publication has not been published.') : null
       const id_temp_parse = JSON.parse(res)['data'].id
       
-      const pro_boost_val = ycore.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
-      const allow_comments_val = ycore.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
+      const pro_boost_val = app.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
+      const allow_comments_val = app.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
       console.log(id_temp_parse)
-      ycore.sync.emmitPost(id_temp_parse)
-      ycore.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
+      app.sync.emmitPost(id_temp_parse)
+      app.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
 
       if (pro_boost_val) {
-        ycore.yconsole.log(`Boosting post with ID => ${id_temp_parse}`)
-        ycore.comty_post.__boost(
+        app.yconsole.log(`Boosting post with ID => ${id_temp_parse}`)
+        app.comty_post.__boost(
           (err, res) => {
             return true
           },
@@ -202,8 +211,8 @@ class PostCreator extends React.PureComponent {
       if (
         !allow_comments_val
       ) {
-        ycore.yconsole.log(`Disabling comments with ID => ${id_temp_parse}`)
-        ycore.comty_post.__disableComments(
+        app.yconsole.log(`Disabling comments with ID => ${id_temp_parse}`)
+        app.comty_post.__disableComments(
           (err, res) => {
             return true
           },
@@ -211,7 +220,7 @@ class PostCreator extends React.PureComponent {
         )
       }
       this.FlushPostState()
-      // ycore.FeedHandler.addToRend(JSON.parse(res)['data'])
+      // app.FeedHandler.addToRend(JSON.parse(res)['data'])
     }, payload)
   }
   dropRef = React.createRef()
@@ -239,18 +248,18 @@ class PostCreator extends React.PureComponent {
       var e = je.originalEvent
       for (var i = 0; i < e.clipboardData.items.length; i++) {
         var item = e.clipboardData.items[i]
-        ycore.yconsole.log('Item: ' + item.type)
+        app.yconsole.log('Item: ' + item.type)
         if (item.type.indexOf('image') != -1) {
           //item.
           let a;
           a = item.getAsFile()
           _this.setState({ file: a })
-          ycore.ReadFileAsB64(a, res => {
+          app.ReadFileAsB64(a, res => {
             _this.setState({ fileURL: res })
           })
         } else {
           // ignore not images
-          ycore.yconsole.log('Discarding not image paste data')
+          app.yconsole.log('Discarding not image paste data')
         }
       }
     })
@@ -267,7 +276,7 @@ class PostCreator extends React.PureComponent {
   canPost() {
     const { fileURL, keys_remaining } = this.state
 
-    const isTypedSomething = keys_remaining < ycore.AppSettings.MaxLengthPosts
+    const isTypedSomething = keys_remaining < app.AppSettings.MaxLengthPosts
     const isUploadedFile = fileURL ? true : false
 
     return isUploadedFile || isTypedSomething
@@ -277,7 +286,7 @@ class PostCreator extends React.PureComponent {
     const { userData } = this.props
     const { keys_remaining, visible, fileURL } = this.state
     const percent = (
-      (keys_remaining / ycore.AppSettings.MaxLengthPosts) *
+      (keys_remaining / app.AppSettings.MaxLengthPosts) *
       100
     ).toFixed(2)
     const changeShare = ({ key }) => {
@@ -287,16 +296,16 @@ class PostCreator extends React.PureComponent {
     const shareOptionsMenu = (
       <antd.Menu onClick={changeShare}>
         <antd.Menu.Item key="any">
-          {ycore.GetPostPrivacy.decorator('any')}
+          {app.GetPostPrivacy.decorator('any')}
         </antd.Menu.Item>
         <antd.Menu.Item key="only_follow">
-          {ycore.GetPostPrivacy.decorator('only_follow')}
+          {app.GetPostPrivacy.decorator('only_follow')}
         </antd.Menu.Item>
         <antd.Menu.Item key="only_followers">
-          {ycore.GetPostPrivacy.decorator('only_followers')}
+          {app.GetPostPrivacy.decorator('only_followers')}
         </antd.Menu.Item>
         <antd.Menu.Item key="private">
-          {ycore.GetPostPrivacy.decorator('private')}
+          {app.GetPostPrivacy.decorator('private')}
         </antd.Menu.Item>
       </antd.Menu>
     )
@@ -333,7 +342,7 @@ class PostCreator extends React.PureComponent {
                     placeholder="What are you thinking?"
                     onChange={this.handleChanges}
                     allowClear
-                    maxLength={ycore.AppSettings.MaxLengthPosts}
+                    maxLength={app.AppSettings.MaxLengthPosts}
                     rows={8}
                   />
                   <div>
@@ -392,7 +401,7 @@ class PostCreator extends React.PureComponent {
                   className={styles.shareWith}
                   onClick={e => e.preventDefault()}
                 >
-                  {ycore.GetPostPrivacy.decorator(this.state.shareWith)}
+                  {app.GetPostPrivacy.decorator(this.state.shareWith)}
                 </a>
               </antd.Dropdown>
             </div>

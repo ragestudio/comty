@@ -5,13 +5,13 @@ import { MESSAGE_SENT, MESSAGE_RECIEVED, TYPING, PRIVATE_MESSAGE } from '../Even
 import Messages from '../messages/Messages'
 import MessageInput from '../messages/MessageInput'
 
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from '../styles.less'
 import classnames from 'classnames'
 
-const userData = ycore.userData();
+const userData = app.userData();
 
 export default class ChatContainer extends Component {
 	constructor(props) {

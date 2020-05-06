@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import io from 'socket.io-client'
@@ -9,7 +9,7 @@ import { USER_CONNECTED, LOGOUT } from './Events'
 import ChatContainer from './chats/ChatContainer'
 
 
-const userData = ycore.userData()
+const userData = app.userData()
 
 const prefix = '[Messaging Socket] '
 const socketUrl = io(`${config.sync_server}/messaging_socket`);

@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './__priPost.less'
 
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 
@@ -44,12 +44,12 @@ export default class __priPost extends React.PureComponent {
             <div className={styles.UserContainer_text}>
               <h4 className={styles.titleUser}>
                 {publisher.username}{' '}
-                {ycore.booleanFix(publisher.verified) ? (
+                {app.booleanFix(publisher.verified) ? (
                   <Icon style={{ color: 'blue' }} component={VerifiedBadge} />
                 ) : null}
               </h4>
               <p>
-                {post_time} {ycore.IsThisUser.dev() ? `| #${id}` : null}{' '}
+                {post_time} {app.IsThisUser.dev() ? `| #${id}` : null}{' '}
               </p>
             </div>
             <antd.Avatar shape="square" size={50} src={publisher.avatar} />

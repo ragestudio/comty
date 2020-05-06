@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { pathMatchRegexp } from 'utils'
 import { SearchCard } from 'components'
 import styles from './styles.less'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
@@ -26,7 +26,7 @@ class GroupIndexer extends PureComponent {
       const raw = parsed.toString()
       const string = raw.replace('/s/', '')
     } catch (err) {
-      ycore.notify.error(err)
+      app.notify.error(err)
     }
   }
 

@@ -3,7 +3,7 @@ import styles from './__secComments.less'
 import { SearchCard, Feather } from 'components'
 
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 
@@ -26,8 +26,8 @@ export default class __secComments extends React.Component {
       loading: false,
     }
     handleDeleteComment(id) {
-      ycore.yconsole.log(`Removing Comment with id => ${id}`)
-      ycore.comty_post_comment.delete(
+      app.yconsole.log(`Removing Comment with id => ${id}`)
+      app.comty_post_comment.delete(
         (err, res) => {
           if (err) {
             return false
@@ -42,9 +42,9 @@ export default class __secComments extends React.Component {
       const { post_id } = this.props
       if (raw_comment) {
         const payload = { post_id: post_id, raw_text: raw_comment }
-        ycore.comty_post_comment.new((err, res) => {
+        app.comty_post_comment.new((err, res) => {
           if (err) {
-            ycore.notify.error('This action could not be performed.', err)
+            app.notify.error('This action could not be performed.', err)
           }
           this.setState({ raw_comment: '' })
           return this.reloadComments()
@@ -71,12 +71,12 @@ export default class __secComments extends React.Component {
             <img src={publisher.avatar} />
             <p className={styles.comment_user_username}>
               @{publisher.username}{' '}
-              {ycore.booleanFix(publisher.verified) ? (
+              {app.booleanFix(publisher.verified) ? (
                 <Icon style={{ color: 'black' }} component={VerifiedBadge} />
               ) : null}
             </p>
             <antd.Dropdown
-              disabled={ycore.IsThisPost.owner(publisher.id) ? false : true}
+              disabled={app.IsThisPost.owner(publisher.id) ? false : true}
               overlay={CommentMenu}
               trigger={['click']}
             >
@@ -84,7 +84,7 @@ export default class __secComments extends React.Component {
                 onClick={e => e.preventDefault()}
                 className={styles.comment_user_ago}
               >
-                {ycore.time.stmToAgo(time)}
+                {app.time.stmToAgo(time)}
               </p>
             </antd.Dropdown>
           </div>
@@ -102,7 +102,7 @@ export default class __secComments extends React.Component {
       try {
         this.setState({ loading: true })
         const payload = { post_id: this.props.post_id }
-        ycore.comty_post.get((err, res) => {
+        app.comty_post.get((err, res) => {
           const post_comments = JSON.parse(res)['post_comments']
           this.setState({ comment_data: post_comments, loading: false })
         }, payload)

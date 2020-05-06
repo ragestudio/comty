@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import styles from '../styles.less'
 
-const userData = ycore.userData()
+const userData = app.userData()
 
 export default class SideBar extends React.PureComponent{
 	constructor(props){

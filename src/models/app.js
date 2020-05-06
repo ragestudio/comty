@@ -3,7 +3,7 @@ import { router } from 'utils'
 import store from 'store'
 import { pathMatchRegexp } from 'utils'
 import config from 'config'
-import * as ycore from 'ycore'
+import * as app from 'app'
 
 export default {
   namespace: 'app',
@@ -42,16 +42,16 @@ export default {
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-      const validBackup = ycore.validate.backup()
-      if (ycore.validate.session() == true) {
+      const validBackup = app.validate.backup()
+      if (app.validate.session() == true) {
         if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
           router.push({ pathname: '/main' })
         }
-        ycore._app.query()        
+        app._app.query()        
         return true
       } else if (!pathMatchRegexp(['', '/login'], window.location.pathname)) {
         if (validBackup == true) {
-          ycore._app.logout()
+          app._app.logout()
         } else {
           router.push({ pathname: '/login' })
         }

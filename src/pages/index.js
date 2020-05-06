@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 
 class Index extends PureComponent {
   render() {
-    ycore.router.go(`login`)
+    app.router.go(`login`)
   }
 }
 

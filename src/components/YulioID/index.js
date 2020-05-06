@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { Form, Icon as LegacyIcon } from '@ant-design/compatible'
 
 import { Button, Input, Drawer } from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as Icons from '@ant-design/icons'
 
 import styles from './index.less'
@@ -45,17 +45,17 @@ class YulioID extends Component {
 
     if (!EncUsername || !EncPassword) {
       var message = 'Incomplete information!'
-      ycore.yconsole.log(prefix, message)
+      app.yconsole.log(prefix, message)
     }
 
     if (EncUsername && EncPassword) {
       this.setState({ ShowLoading: true, StateMessage: 'Wait a sec...' })
-      if (ycore.AppSettings.InfiniteLogin == true) {
-        ycore.yconsole.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
+      if (app.AppSettings.InfiniteLogin == true) {
+        app.yconsole.log(prefix, 'InfiniteLogin is enabled! Disabled getAuth')
       } else {
-        ycore.yconsole.log(prefix, 'Initialising login process...')
+        app.yconsole.log(prefix, 'Initialising login process...')
         const payload = { EncUsername, EncPassword }
-        ycore.app_session.login((err, res) => {
+        app.app_session.login((err, res) => {
           this.handleResponse(res)
         }, payload)
       }
@@ -64,7 +64,7 @@ class YulioID extends Component {
 
   handleResponse = response => {
     if (response == '200') {
-      ycore.LoginPage.transitionToogle()
+      app.LoginPage.transitionToogle()
       this.setState({
         StateIcon: 'login',
         StateMessage: 'Wait a sec...',

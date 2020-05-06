@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppInfo } from 'ycore'
+import { AppInfo } from 'app'
 import styles from './index.less'
 import classnames from 'classnames'
 

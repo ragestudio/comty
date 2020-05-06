@@ -5,7 +5,7 @@ import Fade from 'react-reveal/Fade'
 import HeadShake from 'react-reveal/HeadShake';
 
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 
 import { Form, Input, Button, Checkbox } from 'antd'
 import {
@@ -31,7 +31,7 @@ export class NormalLoginForm extends React.PureComponent {
     switch (a) {
       case 1:
         const payload = { username: Object.values(values).toString() }
-        ycore.get_early.user((err, res) => {
+        app.get_early.user((err, res) => {
           if (err || !res) return false
           try {
             const res_data = JSON.parse(res)
@@ -90,11 +90,11 @@ export class NormalLoginForm extends React.PureComponent {
     const frame = { EncUsername: form_rawd_1, EncPassword: form_rawd_2 }
 
     this.setState({ step_error: false, validating: true })
-    ycore.app_session.login((err, res) => {
+    app.app_session.login((err, res) => {
         switch (res) {
             case '200': {
               this.anim_transition(300)
-              ycore.LoginPage.transitionToogle()
+              app.LoginPage.transitionToogle()
               return
             }
             case '400': {

@@ -7,7 +7,7 @@ import { queryLayout } from 'utils'
 import NProgress from 'nprogress'
 import config from 'config'
 import withRouter from 'umi/withRouter'
-import {AppSettings} from 'ycore'
+import {AppSettings} from 'app'
 
 import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'

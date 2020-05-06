@@ -64,7 +64,7 @@ export default {
   theme: './config/theme.config.js',
   // Webpack Configuration
   alias: {
-    ycore: resolve(__dirname, './src/@ycore/ycore_worker.js'),
+    app: resolve(__dirname, './src/@app/app.js'),
     globals: resolve(__dirname, './globals'),
     components: resolve(__dirname, './src/components'),
     config: resolve(__dirname, './config/ycore.config.js'),

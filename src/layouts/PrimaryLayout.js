@@ -8,13 +8,12 @@ import {
   MyLayout,
   PageTransition,
   HeaderSearch,
-  MobileWarning,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
 import classnames from 'classnames'
 
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 
@@ -30,7 +29,7 @@ class PrimaryLayout extends React.Component {
     super(props)
     window.PrimaryComponent = this
     this.state = {
-      collapsed: ycore.AppSettings.default_collapse_sider ? true : false,
+      collapsed: app.AppSettings.default_collapse_sider ? true : false,
       isMobile: false,
       desktop_mode: false,
       userData: '',
@@ -39,7 +38,7 @@ class PrimaryLayout extends React.Component {
 
   componentDidMount() {
     this.setState({
-      userData: ycore.userData(),
+      userData: app.userData(),
     })
 
     this.enquireHandler = enquireScreen(mobile => {
@@ -90,7 +89,6 @@ class PrimaryLayout extends React.Component {
 
     return (
       <React.Fragment>
-          {/* {isMobile ? <MobileWarning /> : null} */}
           <div className={classnames(styles.__ControlBar, {[styles.mobile]: isMobile})}>
             <Control mobile={isMobile} />
           </div>
@@ -106,7 +104,7 @@ class PrimaryLayout extends React.Component {
                   id="primaryContent"
                   className={styles.primary_layout_content}
                 >
-                  {children}
+                  {children? children : null}
                 </Content>
               </PageTransition>
             </div>

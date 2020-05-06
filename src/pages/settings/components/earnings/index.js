@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 
@@ -10,7 +10,7 @@ export default class Earnings extends React.Component {
 
   }
   componentDidMount(){
-    ycore.comty_get.get_user_data((err,res)=>{
+    app.comty_data.get_user_data((err,res)=>{
       if (err) return false
       try {
         const a = JSON.parse(res)['user_data']

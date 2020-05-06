@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import { MainFeed } from 'components'
@@ -11,13 +11,13 @@ export default class PostSaved extends React.PureComponent{
         data: null,
     }
     componentDidMount(){
-        ycore.comty_post.getSaved((err,res) => {
+        app.comty_post.getSaved((err,res) => {
             if (err) return false
             try {
             const a = JSON.parse(res)['data']
             this.setState({ data: a, loading: false })
             } catch (error) {
-                ycore.notify.exception('Error cathing saved posts... ', error)
+                app.notify.exception('Error cathing saved posts... ', error)
             }
         })
     }

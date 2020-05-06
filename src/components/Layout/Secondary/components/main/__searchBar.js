@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import styles from './__searchBar.less'
 
 export default class __searchBar extends React.Component{
@@ -10,12 +10,12 @@ export default class __searchBar extends React.Component{
       const { value } = this.state
       if (value.length < 1) return false
       if (value == /\s/) return false
-      ycore.SwapMode.openSearch(value);
+      app.SwapMode.openSearch(value);
     }
     onChange = e => {
       const { value } = e.target
       this.setState({ value: value })
-      if (ycore.AppSettings.auto_search_ontype == 'true') {
+      if (app.AppSettings.auto_search_ontype == 'true') {
         this.autosend()
       }
     }

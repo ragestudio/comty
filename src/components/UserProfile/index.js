@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './styles.less'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import * as antd from 'antd'
 import { CustomIcons, MainFeed, PostCreator } from 'components'
 import * as Icons from '@ant-design/icons'
@@ -29,14 +29,14 @@ class UserProfile extends React.PureComponent {
       try {
         switch (i) {
           case 'pro':
-            return ycore.booleanFix(this.state.RenderValue.is_pro)
+            return app.booleanFix(this.state.RenderValue.is_pro)
           case 'dev':
-            return ycore.booleanFix(this.state.RenderValue.dev)
+            return app.booleanFix(this.state.RenderValue.dev)
           case 'nsfw':
-            return ycore.booleanFix(this.state.RenderValue.nsfw_flag)
+            return app.booleanFix(this.state.RenderValue.nsfw_flag)
         }
       } catch (err) {
-        ycore.notify.error(err)
+        app.notify.error(err)
         return false
       }
     }
@@ -45,7 +45,7 @@ class UserProfile extends React.PureComponent {
 
   handleFollowUser = () => {
     const payload = { user_id: this.state.UUID }
-    ycore.comty_user.follow((err, res) => {
+    app.comty_user.follow((err, res) => {
       if (err) {
         return false
       }
@@ -65,31 +65,31 @@ class UserProfile extends React.PureComponent {
     const string = raw.replace('/@', '')
 
     const payload = { key: string }
-    ycore.comty_user.find((err, res) => {
-      err ? ycore.notify.error(err) : null
+    app.comty_user.find((err, res) => {
+      err ? app.notify.error(err) : null
       try {
         const rp = JSON.parse(res)
-        ycore.yconsole.log(rp)
+        app.yconsole.log(rp)
         if (!rp['0']) {
-          ycore.yconsole.log('Bad response / User not found')
+          app.yconsole.log('Bad response / User not found')
           const val = { id: null, username: 'User not found!' }
           this.setState({ invalid: true, RenderValue: val, loading: false })
-          ycore.router.go(`main`)
+          app.router.go(`main`)
           antd.message.warning(`Its seams like @${string} not exist`)
           return
         }
         const c1 = rp['0'].username.toLowerCase()
         const c2 = string.toLowerCase()
         if (c1 !== c2) {
-          ycore.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
-          ycore.router.go(`@${c1}`)
+          app.yconsole.log(`Using aproximate user! => ${c1}  /  ${c2}`)
+          app.router.go(`@${c1}`)
         }
 
         this.setState({
           UUID: rp['0'].user_id,
           RenderValue: rp['0'],
           loading: false,
-          Followed: ycore.booleanFix(rp['0'].is_following),
+          Followed: app.booleanFix(rp['0'].is_following),
         })
 
         reducers.get.followers((res)=>{
@@ -101,7 +101,7 @@ class UserProfile extends React.PureComponent {
 
         },rp['0'].user_id)
 
-        ycore.comty_user.__tags(
+        app.comty_user.__tags(
           (err, res) => {
             if (err) return false
             let fn = []
@@ -124,7 +124,7 @@ class UserProfile extends React.PureComponent {
           { id: this.state.UUID }
         )
       } catch (err) {
-        ycore.notify.error(err)
+        app.notify.error(err)
       }
     }, payload)
   }
@@ -174,7 +174,7 @@ className={classnames(styles.userWrapper, {
             />
           ) : null}
         </div>
-        {ycore.IsThisUser.same(RenderValue.id) ? null : (
+        {app.IsThisUser.same(RenderValue.id) ? null : (
           <div
             className={styles.follow_wrapper}
             onClick={() => this.handleFollowUser()}
@@ -193,7 +193,7 @@ className={classnames(styles.userWrapper, {
             </antd.Tooltip>
 
             <antd.Tooltip title="User Verified">
-              {ycore.booleanFix(RenderValue.verified) ? (
+              {app.booleanFix(RenderValue.verified) ? (
                 <Icon
                   style={{
                     color: 'blue',
@@ -204,7 +204,7 @@ className={classnames(styles.userWrapper, {
               ) : null}
             </antd.Tooltip>
           
-            { ycore.IsThisUser.same(UUID)? 
+            { app.IsThisUser.same(UUID)? 
             <antd.Dropdown overlay={moreMenu}>
               <Icons.MoreOutlined className={styles.user_more_menu} />
             </antd.Dropdown> 
@@ -225,7 +225,7 @@ className={classnames(styles.userWrapper, {
       </div>
     </div>
 </div>
-            {ycore.IsThisUser.same(UUID) ? (<PostCreator userData={ycore.userData()} />) : null}
+            {app.IsThisUser.same(UUID) ? (<PostCreator userData={app.userData()} />) : null}
             <MainFeed get="user" uid={UUID} />
       </div>
     )

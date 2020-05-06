@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import styles from './index.less'
 
 import { ComponentNewAV, ComponentInvalid, renderFeedPosts } from './components/index.js'
@@ -19,7 +19,7 @@ export const RenderFeed = {
     return
   },
   goToElement: post_id => {
-    ycore.goTo.element(post_id)
+    app.goTo.element(post_id)
   },
   disableMenu: () => {
     window.MainFeedComponent.setState({
@@ -48,7 +48,7 @@ class MainFeed extends React.PureComponent {
 
   componentDidMount() {
     this.feedGet.first()
-    ycore.sync.FeedListen((data) => {
+    app.sync.FeedListen((data) => {
       this.syncService(data)
     })
   }
@@ -72,7 +72,7 @@ class MainFeed extends React.PureComponent {
 
   killByID(post_id) {
     const a = this.state.data
-    const b = ycore.arrayRemoveByID(a, post_id)
+    const b = app.arrayRemoveByID(a, post_id)
     this.setState({ data: b })
   }
 
@@ -96,14 +96,14 @@ class MainFeed extends React.PureComponent {
           return
         }
         if (!get) {
-          ycore.yconsole.error('Please, fill params with an catch type...')
+          app.yconsole.error('Please, fill params with an catch type...')
           return
         }
         this.toogleLoader()
         const payload = { fkey: 0, type: get, id: uid }
-        ycore.comty_post.getFeed((err, res) => {
+        app.comty_post.getFeed((err, res) => {
           if (err) {
-            ycore.notify.error('Error when get data from this input')
+            app.notify.error('Error when get data from this input')
             return
           }
           if (JSON.parse(res).api_status == '400') {
@@ -112,34 +112,34 @@ class MainFeed extends React.PureComponent {
           }
           try {
             const parsed = JSON.parse(res)['data']
-            const isEnd =parsed.length < ycore.AppSettings.limit_post_catch ? true : false
+            const isEnd =parsed.length < app.AppSettings.limit_post_catch ? true : false
             this.setState({ NewAV: false, isEnd: isEnd, data: parsed, loading: false })
           } catch (error) {
-            ycore.yconsole.log(error)
+            app.yconsole.log(error)
           }
         }, payload)
       } catch (err) {
-        ycore.notify.error('err')
+        app.notify.error('err')
       }
     },
     more(fkey){
       try {
         const { get, uid, filters } = this.props
         if (!get) {
-          ycore.yconsole.error('Please, fill params with an catch type...')
+          app.yconsole.error('Please, fill params with an catch type...')
           return
         }
         if (!fkey) {
-          ycore.yconsole.warn(
+          app.yconsole.warn(
             'Please, provide a fkey for offset the feed, default using => 0'
           )
         }
         this.toogleLoader()
-        const getLastPost = ycore.objectLast(this.state.data)
-        ycore.yconsole.log('LAST POST ID =>', getLastPost.id)
+        const getLastPost = app.objectLast(this.state.data)
+        app.yconsole.log('LAST POST ID =>', getLastPost.id)
   
         const payload = { fkey: getLastPost.id, type: get, id: uid }
-        ycore.comty_post.getFeed((err, res) => {
+        app.comty_post.getFeed((err, res) => {
           if (err) {
             return false
           }
@@ -147,14 +147,14 @@ class MainFeed extends React.PureComponent {
           const parsed = JSON.parse(res)['data']
           const mix = oldData.concat(parsed)
           const isEnd =
-            parsed.length < ycore.AppSettings.limit_post_catch ? true : false
+            parsed.length < app.AppSettings.limit_post_catch ? true : false
           this.setState({ isEnd: isEnd, data: mix, loading: false }, () =>
-            ycore.goTo.element(getLastPost.id)
+            app.goTo.element(getLastPost.id)
           )
           return true
         }, payload)
       } catch (err) {
-        ycore.notify.error(err)
+        app.notify.error(err)
       }
     }
   }

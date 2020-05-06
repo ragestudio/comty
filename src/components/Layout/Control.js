@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as ycore from 'ycore'
+import * as app from 'app'
 import styles from './Control.less'
 import classnames from 'classnames'
 
@@ -36,14 +36,14 @@ class Control extends React.PureComponent {
     }
   }
   DummySetControls = e => {
-    ycore.yconsole.log('Controls recived => ', e)
+    app.yconsole.log('Controls recived => ', e)
     if (this.state.Show == false) {
       this.setState({ FadeIN: true })
     }
     this.setState({ Show: true, RenderFragment: e })
   }
   DummyCloseControls() {
-    ycore.yconsole.log('Closing Control Bar...')
+    app.yconsole.log('Closing Control Bar...')
     this.setState({ FadeIN: false })
     setTimeout(() => this.setState({ Show: false, RenderFragment: null }), 1000)
   }
