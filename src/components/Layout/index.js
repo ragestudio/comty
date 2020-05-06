@@ -1,4 +1,4 @@
-import Sider from './Sider/index.js'
-import Control from './Control'
-import Secondary from './Secondary/index.js'
-export { Sider, Control, Secondary }
+import Sider from './Sider'
+import Control from './ControlBar'
+import Overlay from './Overlay'
+export { Sider, Control, Overlay }

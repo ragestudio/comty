@@ -43,8 +43,8 @@ const __pri = (props: __pri_props) => {
     
     return (
         <div
-            id="secondary_layout_pri"
-            className={classnames(styles.secondary_container_1, {
+            id="Overlay_layout_pri"
+            className={classnames(styles.Overlay_container_1, {
                 [styles.mobile]: isMobile,
                 [styles.full_open]: t_full,
                 [styles.half]: t_half,

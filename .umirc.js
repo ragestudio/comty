@@ -85,7 +85,4 @@ export default {
       'lodash',
     ],
   ],
-
-  
-
 }

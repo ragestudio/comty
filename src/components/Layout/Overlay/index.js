@@ -19,11 +19,11 @@ import {
 
 export const SwapMode = {
   close: () => {
-    SecondaryLayoutComponent.Swapper.close()
+    OverlayLayoutComponent.Swapper.close()
   },
   openFragment: (fragment)=>{
     if (!fragment) return false
-    return SecondaryLayoutComponent.setState({ 
+    return OverlayLayoutComponent.setState({ 
       rd__sec: fragment, 
       __sec_active: true,
     })
@@ -50,9 +50,9 @@ export const SwapMode = {
       tmp = content
     }
   
-    const pdata = <__priPost isMobile={SecondaryLayoutComponent.props.isMobile} payload={tmp}/>
+    const pdata = <__priPost isMobile={OverlayLayoutComponent.props.isMobile} payload={tmp}/>
     
-    return SecondaryLayoutComponent.setState({ 
+    return OverlayLayoutComponent.setState({ 
       rd__pri: pdata, 
       __pri_full: true 
     })
@@ -81,7 +81,7 @@ export const SwapMode = {
     }
     
     const pdata = <__secComments post_id={id} payload={tmp} />
-    return SecondaryLayoutComponent.setState({
+    return OverlayLayoutComponent.setState({
       rd__sec: pdata,
       __sec_active: true,
     })
@@ -111,7 +111,7 @@ export const SwapMode = {
       <__priSearch payload={tmp} />
     </div>
 
-    return SecondaryLayoutComponent.setState({
+    return OverlayLayoutComponent.setState({
       rd__pri: pdata,
       __pri_half: true,
     })
@@ -120,10 +120,10 @@ export const SwapMode = {
 
 }
 
-export default class Secondary extends React.PureComponent {
+export default class Overlay extends React.PureComponent {
   constructor(props) {
     super(props),
-      (window.SecondaryLayoutComponent = this),
+      (window.OverlayLayoutComponent = this),
       (this.state = {
         loading: true,
         gen_data: null,
@@ -272,9 +272,9 @@ export default class Secondary extends React.PureComponent {
       return (
         <React.Fragment>
      
-            <div className={styles.secondary_body_component}> <__searchBar /> </div>
-            <div className={styles.secondary_body_component}> <__trendings data={this.state.trending_hashtag} /> </div>
-            <div className={styles.secondary_body_component}> <__suggestions /> </div>
+            <div className={styles.Overlay_body_component}> <__searchBar /> </div>
+            <div className={styles.Overlay_body_component}> <__trendings data={this.state.trending_hashtag} /> </div>
+            <div className={styles.Overlay_body_component}> <__suggestions /> </div>
       
         </React.Fragment>
       )
@@ -289,10 +289,10 @@ export default class Secondary extends React.PureComponent {
     if (!this.state.loading)
       return (
         <>
-          {isMobile ? null : <div className={styles.__secondary_colider}></div>}
+          {isMobile ? null : <div className={styles.__Overlay_colider}></div>}
           <div
-            id="secondary_layout__wrapper"
-            className={classnames(styles.secondary_wrapper, {
+            id="Overlay_layout__wrapper"
+            className={classnames(styles.Overlay_wrapper, {
               [styles.mobile]: isMobile,
               [styles.active]: this.isOpen()
             })}

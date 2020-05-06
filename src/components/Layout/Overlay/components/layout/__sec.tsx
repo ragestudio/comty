@@ -40,8 +40,8 @@ const __sec = (props: __sec_props) => {
     const t_def = type == 'active'? true: false 
     return (
         <div
-            id="secondary_layout__sec"
-            className={classnames(styles.secondary_container_2, {
+            id="Overlay_layout__sec"
+            className={classnames(styles.Overlay_container_2, {
                 [styles.mobile]: isMobile,
                 [styles.active]: t_def,
                 [styles.full_open]: t_full,

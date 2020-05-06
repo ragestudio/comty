@@ -20,7 +20,7 @@ export default class Indexer_Post extends React.Component {
       if (err) {
         return false
       }
-      app.SecondarySwap.openPost(res)
+      app.OverlaySwap.openPost(res)
     }, payload)
   }
 

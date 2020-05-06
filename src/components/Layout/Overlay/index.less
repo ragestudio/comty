@@ -20,10 +20,10 @@
   }
 }
 
-.__secondary_colider{
+.__Overlay_colider{
   position: relative;
   float: right;
-  width: @__secondary_colider_width;
+  width: @__Overlay_colider_width;
   height: 100vh;
   background-color: @__Global_layout_backgroud;
 }
@@ -39,7 +39,7 @@
   }
 }
 
-.secondary_userholder {
+.Overlay_userholder {
   right: 20px;
   top: 25px;
   display: flex;
@@ -91,7 +91,7 @@
   }
 }
 
-.secondary_wrapper {
+.Overlay_wrapper {
   right: 0;
   top: 0;
 
@@ -113,8 +113,8 @@
   transition: all @__Global_SwapAnimDuration ease-in-out;
 }
 
-.secondary_container_1 {
-  width: @secondary_wrapper_hidden_width;
+.Overlay_container_1 {
+  width: @Overlay_wrapper_hidden_width;
   height: 100%;
   z-index: 50;
   position: absolute;
@@ -124,12 +124,12 @@
   right: 0;
   padding: 30px 30px 30px 35px;
   
-  color: @secondary_container_1_color;
+  color: @Overlay_container_1_color;
   background-color: #F8F6F8;
   
 
   &.full_open {
-    width: @secondary_wrapper_showFull_width;
+    width: @Overlay_wrapper_showFull_width;
     .pri_body{
       width: calc(100% - 25% - 5%);
       // margin: 30px 0 25px 0;
@@ -137,7 +137,7 @@
   }
 
   &.half {
-    width: calc(@secondary_wrapper_hidden_width + 150px);
+    width: calc(@Overlay_wrapper_hidden_width + 150px);
   }
 
   &.mobile {
@@ -176,14 +176,14 @@
 
   :global {
     .ant-btn {
-      color: @secondary_container_1_btn_color;
-      background-color: @secondary_container_1_btn_backgroud;
+      color: @Overlay_container_1_btn_color;
+      background-color: @Overlay_container_1_btn_backgroud;
       border-color: transparent;
       border-radius: 12px;
     }
 
     .ant-btn:hover {
-      box-shadow: @secondary_container_1_btn_shadow;
+      box-shadow: @Overlay_container_1_btn_shadow;
       transition: all @__Global_Components_transitions_dur linear;
     }
   }
@@ -210,13 +210,13 @@
 }
 
 
-.secondary_main{
+.Overlay_main{
   width: 100%;
 }
 
 
 
-.secondary_container_2 {
+.Overlay_container_2 {
     position: absolute;
     z-index: 51;
     height: 100vh;
@@ -225,8 +225,8 @@
     padding: @secondaty_container_2_padding;
     
     opacity: 0;
-    color: @secondary_container_2_color!important;
-    background-color: @secondary_container_2_backgroud;
+    color: @Overlay_container_2_color!important;
+    background-color: @Overlay_container_2_backgroud;
   
     border-radius: 32px 0 0 32px;
   
@@ -292,7 +292,7 @@
 
 
 
-  .secondary_body_component{
+  .Overlay_body_component{
     // Spacing between components
     margin-bottom: 35px;
   }

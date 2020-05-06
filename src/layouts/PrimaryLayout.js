@@ -15,12 +15,11 @@ import classnames from 'classnames'
 
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
 
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Control, Secondary, WindowAppBar } = MyLayout
+const { Sider, Control, Overlay, WindowAppBar } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -82,7 +81,7 @@ class PrimaryLayout extends React.Component {
       },
     }
 
-    const SecondaryProps = {
+    const OverlayProps = {
       userData,
       isMobile,
     }
@@ -109,7 +108,7 @@ class PrimaryLayout extends React.Component {
               </PageTransition>
             </div>
 
-            <Secondary {...SecondaryProps} />
+            <Overlay {...OverlayProps} />
           </antd.Layout>
       </React.Fragment>
     )

@@ -1,5 +1,5 @@
 import React from 'react'
-import * as ycore from 'app'
+import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from '@ant-design/icons'
 import styles from './modals.less';
@@ -24,7 +24,7 @@ class __Model_postreport extends React.PureComponent {
             }, payload)
         }
         setTimeout(() => {
-            app.SecondarySwap.close()
+            app.OverlaySwap.close()
         }, 500)
 
     }
@@ -116,7 +116,7 @@ export const app_modals = {
             icon: <Icons.FrownOutlined />,
             content: 'It seems that you want to report this post, first of all it is necessary that you take into account that this tool is only intended for serious cases and we need you to comply with some questions to be able to report this post and to guarantee the quality of service ...',
             onOk() {
-                return app.SecondarySwap.openFragment(<__Model_postreport id={post_id} />)
+                return app.OverlaySwap.openFragment(<__Model_postreport id={post_id} />)
             },
             onCancel() {
                 return false

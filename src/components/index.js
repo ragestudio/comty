@@ -3,7 +3,6 @@
 // Helpers & Misc
 import CustomIcons from './CustomIcons'
 import Loader from './Loader/Loader.js'
-import ScrollBar from './ScrollBar'
 import App_about from './App_about'
 import * as Feather from 'feather-reactjs'
 
@@ -15,7 +14,6 @@ import PageTransition from './PageTransition'
 // User Components
 import UserBadges from './UserBadges'
 import UserProfile from './UserProfile'
-import SearchCard from './SearchCard'
 
 // Post Components
 import MediaPlayer from './MediaPlayer'
@@ -31,12 +29,10 @@ export {
   MediaPlayer,
   UserBadges,
   PageTransition,
-  SearchCard,
   HeaderSearch,
   UserProfile,
   MyLayout,
   Loader,
-  ScrollBar,
   PostCard,
   PostCreator,
   CustomIcons,

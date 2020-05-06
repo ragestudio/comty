@@ -1,7 +1,7 @@
 import { RenderFeed } from 'components/MainFeed'
 import { transitionToogle } from '../../../pages/login'
-import { SetControls, CloseControls } from '../../../components/Layout/Control'
-import { SwapMode } from '../../../components/Layout/Secondary'
+import { SetControls, CloseControls } from 'components/Layout/ControlBar'
+import { SwapMode } from 'components/Layout/Overlay'
 import umiRouter from 'umi/router'
 import * as app from 'app'
 import * as antd from 'antd'
@@ -34,7 +34,7 @@ export const CheckThisApp = {
   },
 }
 
-export const SecondarySwap = {
+export const OverlaySwap = {
   close: () => {
     SwapMode.close()
   },
