@@ -1,7 +1,7 @@
 import React from 'react'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import styles from './index.less'
 import classnames from 'classnames'
 import reactable from 'reactablejs'
@@ -111,7 +111,7 @@ export const SwapMode = {
       <h2>
         <Icons.SearchOutlined /> Results of {id || '... nothing ?'}
       </h2>
-      <__priSearch lost_focus={() => SwapMode.close()} payload={tmp} />
+      <__priSearch payload={tmp} />
     </div>
 
     return OverlayLayoutComponent.setState({

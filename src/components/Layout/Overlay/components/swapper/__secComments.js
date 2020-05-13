@@ -4,7 +4,7 @@ import { SearchCard, Feather } from 'components'
 
 import * as antd from 'antd'
 import * as app from 'app'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import Icon from '@ant-design/icons'
 
 const VerifiedBadge = () => (

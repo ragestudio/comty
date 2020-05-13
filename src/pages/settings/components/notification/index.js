@@ -1,6 +1,6 @@
 import React from 'react'
 import * as app from 'app'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import styles from './index.less'
 
 export default class NotificationView extends React.Component {

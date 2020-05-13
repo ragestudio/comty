@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import * as app from 'app'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import Icon from '@ant-design/icons'
 import { Post_Options } from 'globals/post_options.js'
 import styles from './post_options.less'

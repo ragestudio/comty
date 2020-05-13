@@ -1,13 +1,12 @@
 import * as Icons from '@ant-design/icons'
 
-
 export var BadgesType = [
   {
     id: 'alpha_test',
     title: 'Alpha Tester',
     color: 'green',
     require: '',
-    icon: (<Icons.BugOutlined />),
+    icon: (<Icons.BugOutlined  />),
     tip: 'Oh yeah!'
   },
   {
@@ -41,5 +40,13 @@ export var BadgesType = [
     require: '',
     icon: (<Icons.SmileOutlined />),
     tip: 'hump....',
+  },
+  {
+    id: 'el_walter_pro',
+    title: 'Pro Chikito',
+    color: '#a0d911',
+    require: '',
+    icon: (<Icons.AndroidOutlined />),
+    tip: 'Chikito',
   }
 ]

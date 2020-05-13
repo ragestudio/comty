@@ -3,7 +3,7 @@ import * as antd from 'antd'
 import * as app from 'app'
 import styles from './index.less'
 import classnames from 'classnames'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 
 export const SetHeaderSearchType = {
   disable: () => {

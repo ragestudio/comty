@@ -12,16 +12,24 @@
 }
 
 .primary_layout {
+    background-repeat: repeat-x;
+    background-size: cover;
+    background-position-y: center;
+
     overflow: hidden;
-    background-color: @primary_layout_backgroud;
+    background-color: transparent;
     margin: auto;
+    height: 100vh;
+    width: 100vw;
+
+    transition: all @__Global_Components_transitions_dur linear;
+  
     &.mobile{
       >.primary_layout_container {
-        border-radius: 0;
-        margin: 0;
         padding: 0;
         overflow-y: overlay;
         overflow-x: hidden;
+        min-width: unset;
       }
       .primary_layout_content{
         padding: 35px 15px 15px 15px;
@@ -31,25 +39,40 @@
 
 // PRIMARY LAYOUT 
 .primary_layout_container {
-  transition: background-color @__Global_layout_transitions-dur linear;
-  background-color: @primary_layout_container_backgroud;
-  border-radius: @primary_layout_container_border-rd;
+  background-color: transparent;
+  transition: all @__Global_Components_transitions_dur linear;
 
   overflow-x: hidden;
-  margin: 0 0 0 10px;
-  width: 100vw;
+  // overflow-y: overlay;
+
+  width: auto;
   height: 100vh;
   
   position: relative;
   bottom: 0;
+  display: flex;
   align-self: center;
-  float: left;
+ 
+  max-width: 750px;
+  
+  min-width: 570px;
+
+  @media (min-width: @bp-medium) {
+    min-width: 650px; 
+  }
+  @media (min-width: @bp-large) {
+    min-width: 850px;
+  }
+
 }
 
 .primary_layout_content {
   vertical-align: middle;
   width: 100%;
-  float: right;
   padding: @primary_layout_content_padding;
   transition: all @__Global_layout_transitions-dur ease;
+
+  @media (max-width: @bp-medium) {
+    padding: 0;
+  }
 }

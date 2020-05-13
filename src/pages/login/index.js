@@ -4,7 +4,7 @@ import styles from './index.less'
 import classnames from 'classnames'
 
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 
 import { RegistrationForm } from './register.js'
 import { NormalLoginForm } from './login.js'

@@ -1,6 +1,8 @@
 import React from 'react'
 import { Menu } from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
+import * as Feather from 'feather-reactjs'
+
 import styles from './style.less'
 
 import NotificationView from './components/notification/index.js'
@@ -9,12 +11,18 @@ import Earnings from './components/earnings/index.js'
 
 import Base from './components/base.js'
 import AppAbout from './components/about.js'
+import Theme from './components/theme'
 
 const { Item } = Menu
 const menuMap = {
   base: (
     <span>
       <Icons.ControlOutlined /> General
+    </span>
+  ),
+  theme: (
+    <span>
+      <Feather.Layers /> Theme
     </span>
   ),
   sync: (
@@ -24,12 +32,12 @@ const menuMap = {
   ),
   security: (
     <span>
-      <Icons.SafetyCertificateOutlined /> Security & Privacity
+      <Feather.Lock /> Security & Privacity
     </span>
   ),
   notification: (
     <span>
-      <Icons.MailOutlined /> Notification
+      <Feather.Bell /> Notification
     </span>
   ),
   earnings: (
@@ -37,9 +45,14 @@ const menuMap = {
       <Icons.DollarCircleOutlined /> Earnings
     </span>
   ),
+  help: (
+    <span>
+      <Icons.LifeBuoy /> Help
+    </span>
+  ),
   about: (
     <span>
-      <Icons.ContainerOutlined /> About
+      <Feather.Info /> About
     </span>
   ),
 }
@@ -71,6 +84,8 @@ class GeneralSettings extends React.Component {
         return <Base />
       case 'security':
         return <SecurityView />
+      case 'theme':
+        return <Theme />
       case 'notification':
         return <NotificationView />
       case 'about':
@@ -89,7 +104,7 @@ class GeneralSettings extends React.Component {
       <div className={styles.main}>
         <div className={styles.leftMenu}>
           <h2>
-            <Icons.SettingOutlined /> Settings{' '}
+            <Icons.SettingOutlined /> Settings
           </h2>
           <Menu
             mode="inline"

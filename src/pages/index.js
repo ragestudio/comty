@@ -3,7 +3,9 @@ import * as app from 'app'
 
 class Index extends PureComponent {
   render() {
-    app.router.go(`login`)
+    return(
+      <div></div>
+    )
   }
 }
 

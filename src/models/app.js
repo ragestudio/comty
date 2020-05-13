@@ -1,7 +1,7 @@
 /* global window */
 import { router } from 'utils'
 import store from 'store'
-import { pathMatchRegexp } from 'utils'
+import { pathMatchRegexp, queryLayout } from 'utils'
 import config from 'config'
 import * as app from 'app'
 
@@ -42,22 +42,22 @@ export default {
   },
   effects: {
     *query({ payload }, { call, put, select }) {
+      // if (queryLayout(config.layouts, window.location.pathname) == 'public') {
+      //   return true
+      // }
       const validBackup = app.validate.backup()
       if (app.validate.session() == true) {
         if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-          router.push({ pathname: '/main' })
+          router.push({ pathname: `${config.MainPath}` })
         }
         app._app.query()        
         return true
-      } else if (!pathMatchRegexp(['', '/login'], window.location.pathname)) {
+      } else if (!pathMatchRegexp(['', '/login'], window.location.pathname) && queryLayout(config.layouts, window.location.pathname) !== 'public') {
         if (validBackup == true) {
           app._app.logout()
         } else {
           router.push({ pathname: '/login' })
         }
-      }
-      if (pathMatchRegexp([''], window.location.pathname)) {
-        router.push({ pathname: '/login' })
       }
     },
   },

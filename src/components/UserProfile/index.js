@@ -2,8 +2,7 @@ import React from 'react'
 import styles from './styles.less'
 import * as app from 'app'
 import * as antd from 'antd'
-import { CustomIcons, MainFeed, PostCreator } from 'components'
-import * as Icons from '@ant-design/icons'
+import { Icons, MainFeed, PostCreator } from 'components'
 import Icon from '@ant-design/icons'
 import Follow_btn from './components/Follow_btn.js'
 import { BadgesType } from 'globals/badges_list'
@@ -199,7 +198,7 @@ className={classnames(styles.userWrapper, {
                     color: 'blue',
                     verticalAlign: 'top',
                   }}
-                  component={CustomIcons.VerifiedBadge}
+                  component={Icons.VerifiedBadge}
                 />
               ) : null}
             </antd.Tooltip>

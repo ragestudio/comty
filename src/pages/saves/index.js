@@ -1,7 +1,7 @@
 import React from 'react'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import { MainFeed } from 'components'
 import styles from './index.less'
 

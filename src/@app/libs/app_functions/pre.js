@@ -1,53 +1,21 @@
-import { RenderFeed } from 'components/MainFeed'
 import { transitionToogle } from '../../../pages/login'
 import { SetControls, CloseControls } from 'components/Layout/ControlBar'
-import { SwapMode } from 'components/Layout/Overlay'
+
 import umiRouter from 'umi/router'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import React from 'react'
 
+import { SwapMode } from 'components/Layout/Overlay'
+import { RenderFeed } from 'components/MainFeed'
+import { updateTheme } from '../../../layouts/PrimaryLayout'
+
 export * from './modals.js'
+export * from './notify.js'
 
 export {SwapMode} 
-
-export function SetupApp() {
-  // TODO: Default sets
-  app.notify.success('Authorised, please wait...')
-  const resourceLoad = localStorage.getItem('resource_bundle')
-  if (!resourceLoad) {
-    localStorage.setItem('resource_bundle', 'light_ng')
-  }
-  setTimeout(() => {
-    app.router.push('main')
-  }, 500)
-}
-
-export const CheckThisApp = {
-  desktop_mode: () => {
-    const a = localStorage.getItem('desktop_src')
-    if (a == 'true') {
-      return true
-    }
-    return false
-  },
-}
-
-export const OverlaySwap = {
-  close: () => {
-    SwapMode.close()
-  },
-  openPost: e => {
-    SwapMode.openPost(e)
-  },
-  openSearch: e => {
-    SwapMode.openSearch(e)
-  },
-  openFragment: e =>{
-    SwapMode.openFragment(e)
-  }
-}
+export {RenderFeed}
 
 export const ControlBar = {
   set: e => {
@@ -55,30 +23,6 @@ export const ControlBar = {
   },
   close: () => {
     CloseControls()
-  },
-}
-
-export const FeedHandler = {
-  refresh: () => {
-    RenderFeed.RefreshFeed()
-  },
-  killByID: (post_id) => {
-    RenderFeed.killByID(post_id)
-  },
-  addToRend: (payload) => {
-    RenderFeed.addToRend(payload)
-  },
-  goToElement: post_id => {
-    RenderFeed.goToElement(post_id)
-  },
-  sync: data => {
-    RenderFeed.sync(data)
-  }
-}
-
-export const LoginPage = {
-  transitionToogle: () => {
-    transitionToogle()
   },
 }
 
@@ -118,6 +62,7 @@ export const goTo = {
     try {
       document.getElementById(element).scrollIntoView()
     } catch (error) {
+      console.debug(error)
       return false
     }
   }
@@ -204,3 +149,52 @@ export const app_session = {
   },
 }
 
+export const app_theme = {
+  getString: () => {
+    return localStorage.getItem('theme_style')
+  },
+  set: (data, process) => {
+    if (!data){
+      return false
+    }
+    let newdata = []
+    if(process){
+      let style = data
+      let mix = []
+      try {
+        style[key] = value
+        const obj = Object.entries(style)
+        obj.forEach((e) => {
+            mix.push({key: e[0], value: e[1]})
+        })
+        newdata = JSON.stringify(mix)
+      } catch (error) {
+        console.log(error)
+        return false
+      }
+    }else{
+      newdata = data
+    }
+    
+    localStorage.setItem('theme_style', newdata)
+    app_theme.update()
+  },
+  getStyle: () => {
+    let final = {}
+    const storaged = localStorage.getItem('theme_style')
+    if (storaged) {
+      try {
+        let scheme = JSON.parse(storaged)
+        scheme.forEach((e)=>{
+          final[e.key] = e.value
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    return final
+  },
+  update: () => {
+    return updateTheme(app_theme.getStyle())
+  }
+}

@@ -247,9 +247,11 @@ export const _app = {
     app.notify.success('Authorised, please wait...')
     const resourceLoad = localStorage.getItem('resource_bundle')
     if (!resourceLoad) {
-      localStorage.setItem('resource_bundle', 'light_ng')
+      localStorage.setItem('resource_bundle', 'comtyng_default')
     }
-    app.router.push('main')
+    setTimeout(() => {
+      app.router.push('main')
+    }, 420)
   },
   query: () => {
     const validBackup = app.validate.backup()

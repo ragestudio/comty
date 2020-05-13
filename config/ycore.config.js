@@ -8,19 +8,21 @@ module.exports = {
   DarkLogoPath: '/dark_logo.svg',
 
   resource_bundle: 'light_ng',
-  sync_server: 'http://localhost:5500',
-  server_endpoint: 'https://comty.pw',
 
-  g_recaptcha_key: '6Lc55uUUAAAAAEIACMVf3BUzAJSNCmI3RrjEirZ6',
-  g_recaptcha_secret: '6Lc55uUUAAAAAOP4OgUa5DpqJC-70t53AmW0lyYf',
+  sync_server: 'http://85.251.59.39:6050',
+  rest_server: 'https://comty.pw',
 
   /* Layout configuration, specify which layout to use for route. */
   layouts: [
     {
       name: 'primary',
-      include: [/.*/],
-      exclude: [/\/login/, /\/socket\/(.*)/, /\/publics/, /\/authorize/],
+      include: [/\/main/, /\/settings/, /\/saves/, /\/pro/, /\/chats/, /\//],
+      exclude: [/\/publics/, /\/login/ ],
     },
+    {
+      name: 'public',
+      include: [/.*/]
+    }
   ],
 
   i18n: {

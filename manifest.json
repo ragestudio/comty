@@ -2,8 +2,7 @@
   "name": "Comty",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "white",
-  "description": "RageStudio users dashboard",
+  "description": "An client prototype of universal social network.",
   "icons": [
     {
       "src": "logo.svg"

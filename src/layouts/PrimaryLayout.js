@@ -21,13 +21,21 @@ import styles from './PrimaryLayout.less'
 const { Content } = antd.Layout
 const { Sider, Control, Overlay, WindowAppBar } = MyLayout
 
+export function updateTheme(data){
+  if (!data) return false
+  console.log(data)
+  return PrimaryComponent.setState({theme: data})
+}
+
+
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
-class PrimaryLayout extends React.Component {
+class PrimaryLayout extends React.PureComponent {
   constructor(props) {
     super(props)
     window.PrimaryComponent = this
     this.state = {
+      theme: app.app_theme.getStyle(),
       collapsed: app.AppSettings.default_collapse_sider ? true : false,
       isMobile: false,
       desktop_mode: false,
@@ -36,6 +44,7 @@ class PrimaryLayout extends React.Component {
   }
 
   componentDidMount() {
+   
     this.setState({
       userData: app.userData(),
     })
@@ -62,12 +71,22 @@ class PrimaryLayout extends React.Component {
   }
 
   render() {
-    const { app, location, dispatch, children } = this.props
-    const { userData, collapsed, isMobile } = this.state
+    const { location, dispatch, children } = this.props
+    const { userData, collapsed, isMobile, theme, predominantColor } = this.state
     const { onCollapseChange } = this
-    const { theme } = app
+
+    
 
     const SiderProps = {
+      breakpoint:{
+        xs: '480px',
+        sm: '576px',
+        md: '768px',
+        lg: '992px',
+        xl: '1200px',
+        xxl: '1600px',
+      },
+      predominantColor,
       theme,
       userData,
       isMobile,
@@ -85,13 +104,13 @@ class PrimaryLayout extends React.Component {
       userData,
       isMobile,
     }
-
+    console.log(theme)
     return (
       <React.Fragment>
           <div className={classnames(styles.__ControlBar, {[styles.mobile]: isMobile})}>
             <Control mobile={isMobile} />
           </div>
-          <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
+          <antd.Layout style={theme} id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
             <Sider {...SiderProps} />
 
             <div className={styles.primary_layout_container}>

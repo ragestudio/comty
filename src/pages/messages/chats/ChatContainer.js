@@ -7,7 +7,7 @@ import MessageInput from '../messages/MessageInput'
 
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import styles from '../styles.less'
 import classnames from 'classnames'
 

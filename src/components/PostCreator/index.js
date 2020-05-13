@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import * as app from 'app'
 import styles from './index.less'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import Icon from '@ant-design/icons'
 import $ from 'jquery'
 import * as MICONS from '@material-ui/icons'
@@ -155,7 +155,7 @@ class PostCreator extends React.PureComponent {
     setTimeout(() => {
       this.setState({ posting_ok: false })
     }, 1000)
-    app.FeedHandler.refresh()
+    app.RenderFeed.RefreshFeed()
     return true
   }
 
@@ -220,7 +220,7 @@ class PostCreator extends React.PureComponent {
         )
       }
       this.FlushPostState()
-      // app.FeedHandler.addToRend(JSON.parse(res)['data'])
+      // app.RenderFeed.addToRend(JSON.parse(res)['data'])
     }, payload)
   }
   dropRef = React.createRef()

@@ -2,7 +2,7 @@ import React from 'react'
 import { pathMatchRegexp } from 'utils'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 
 export default class Indexer_Post extends React.Component {
   constructor(props) {
@@ -20,7 +20,7 @@ export default class Indexer_Post extends React.Component {
       if (err) {
         return false
       }
-      app.OverlaySwap.openPost(res)
+      app.SwapMode.openPost(res)
     }, payload)
   }
 

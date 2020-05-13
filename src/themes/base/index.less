@@ -8,6 +8,8 @@
 @import './components/PostCard.less';
 
 
+@__Global_backgroud_image: "";
+
 @__Global_general_font_family: "Poppins", sans-serif;
 @__Global_texted_font: "Manrope", sans-serif;
 @__Global_alternative_font: "Netflix Sans";
@@ -20,10 +22,14 @@
 
 
 @__Global_SwapAnimDuration: 170ms;
+@__Global_backdrop_backgroud: rgba(158, 158, 158, 0.5);
 
 @transition-ease-in: all 0.3s ease-out;
 @transition-ease-out: all 0.3s ease-out;
-@ease-in: ease-in;
+@transition-ease-inout: all 150ms ease-in-out;
+
+
+
 
 
 @Overlay_wrapper_hidden_width: 22vw;
@@ -75,8 +81,11 @@ body {
   line-height: @base-line-height;
 
   font-family: @__Global_texted_font;
-}
+ 
+  background-color: @primary_layout_backgroud;
+ 
 
+}
 
 @media (max-width: @bp-small){
   ::-webkit-scrollbar{
@@ -85,7 +94,7 @@ body {
 }
 
 @media (min-width: @bp-medium) {
-  
+
 }
 
 @media (min-width: @bp-large) {
@@ -93,15 +102,11 @@ body {
 }
 
 @media (min-width: @bp-xlarge) {
-  body{
-    zoom: 1.4;
-  }
+
 }
 
 @media (min-width: @bp-xxlarge) {
-  body{
-    zoom: 1.6;
-  }
+ 
 }
 
 

@@ -3,9 +3,8 @@ import { List, Switch, Button, notification, InputNumber } from 'antd'
 import { ListSettings } from '../../../../globals/settings.js'
 import { ControlBar } from 'app'
 import * as app from 'app'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import Icon from '@ant-design/icons'
-import { CustomIcons } from 'components'
 
 class Base extends Component {
   constructor(props) {

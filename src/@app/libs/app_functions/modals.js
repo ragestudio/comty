@@ -1,7 +1,7 @@
 import React from 'react'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import styles from './modals.less';
 import classnames from 'classnames'
 
@@ -19,12 +19,12 @@ class __Model_postreport extends React.PureComponent {
                 return false
               }
               app.notify.info('This post has been reported successfully, our team will review it and inform you about problem resolution ...')
-              app.FeedHandler.refresh()
-              app.FeedHandler.goToElement(this.props.id)
+              app.RenderFeed.RefreshFeed()
+              app.RenderFeed.goToElement(this.props.id)
             }, payload)
         }
         setTimeout(() => {
-            app.OverlaySwap.close()
+            app.SwapMode.close()
         }, 500)
 
     }
@@ -116,7 +116,7 @@ export const app_modals = {
             icon: <Icons.FrownOutlined />,
             content: 'It seems that you want to report this post, first of all it is necessary that you take into account that this tool is only intended for serious cases and we need you to comply with some questions to be able to report this post and to guarantee the quality of service ...',
             onOk() {
-                return app.OverlaySwap.openFragment(<__Model_postreport id={post_id} />)
+                return app.SwapMode.openFragment(<__Model_postreport id={post_id} />)
             },
             onCancel() {
                 return false

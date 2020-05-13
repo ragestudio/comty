@@ -94,7 +94,6 @@ export class NormalLoginForm extends React.PureComponent {
         switch (res) {
             case '200': {
               this.anim_transition(300)
-              app.LoginPage.transitionToogle()
               return
             }
             case '400': {

@@ -1,5 +1,5 @@
 import { token_data } from 'app'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 
 export * from './comty_post.js'
 export * from './comty_user.js'

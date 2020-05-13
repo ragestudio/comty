@@ -3,7 +3,10 @@ import { resolve } from 'path'
 import { i18n } from './config/ycore.config.js'
 export default {
   ignoreMomentLocale: true,
-  hash: true,
+  hash: false,
+  
+  ssr: false,
+
   targets: { ie: 9,},
   treeShaking: true,
   plugins: [
@@ -65,6 +68,7 @@ export default {
   // Webpack Configuration
   alias: {
     app: resolve(__dirname, './src/@app/app.js'),
+    keys: resolve(__dirname, './config/keys.js'),
     globals: resolve(__dirname, './globals'),
     components: resolve(__dirname, './src/components'),
     config: resolve(__dirname, './config/ycore.config.js'),

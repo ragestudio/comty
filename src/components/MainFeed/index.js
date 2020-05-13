@@ -125,6 +125,7 @@ class MainFeed extends React.PureComponent {
     more(fkey){
       try {
         const { get, uid, filters } = this.props
+        console.log(get)
         if (!get) {
           app.yconsole.error('Please, fill params with an catch type...')
           return
@@ -154,7 +155,7 @@ class MainFeed extends React.PureComponent {
           return true
         }, payload)
       } catch (err) {
-        app.notify.error(err)
+        app.notify.error('[ MainFeed ]', err)
       }
     }
   }

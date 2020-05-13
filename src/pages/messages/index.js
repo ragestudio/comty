@@ -1,7 +1,7 @@
 import React from 'react'
 import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 import io from 'socket.io-client'
 import config from 'config'
 import ReactEmoji from 'react-emoji';
@@ -19,6 +19,7 @@ export default class Chats extends React.Component{
 	  super(props);
 	
 	  this.state = {
+      err_tick: 0,
 	  	socket:null,
       user:null,
       conn: false
@@ -40,7 +41,7 @@ export default class Chats extends React.Component{
         console.log(prefix, "Connected");
         const payload = { id: userData.UserID, name: userData.username, avatar: userData.avatar }
         socket.emit(USER_CONNECTED, payload);
-        this.setState({user: payload, conn: true})
+        this.setState({user: payload, conn: true, err_tick: 0})
       })
     }
 
@@ -51,13 +52,19 @@ export default class Chats extends React.Component{
     })
 
     socket.on('reconnecting', () =>{
-      console.log(prefix, 'Trying to reconnect')
+      this.setState({ err_tick: (this.state.err_tick+1) })
+      console.log(prefix, 'Trying to reconnect', this.state.err_tick)
     })
 	}
 
 	render() {
     const { socket, user } = this.state
-    if(!user) return <div ><h1>Loading</h1></div>
+    if( this.state.err_tick > 2) return <antd.Result
+    status="500"
+    title="You're offline"
+    subTitle="It seems that you are disconnected and could not connect to the server."
+  />
+    if(!user) return <div style={{ backgroundColor: '#fff', borderRadius: '10px', padding: '20px', marginTop: '50px' }}><h1> <Icons.LoadingOutlined spin /> Connecting to server...</h1><antd.Skeleton active /></div>
 		return <ChatContainer socket={socket} user={user} />
 		
 	}

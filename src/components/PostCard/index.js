@@ -1,9 +1,9 @@
 import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
-import { CustomIcons, Like_button, MediaPlayer } from 'components'
+import { Like_button, MediaPlayer } from 'components'
+import * as Icons from 'components/Icons'
 import * as app from 'app'
-import * as Icons from '@ant-design/icons'
 import Icon from '@ant-design/icons'
 import classnames from 'classnames'
 import * as MICON from '@material-ui/icons'
@@ -11,11 +11,21 @@ import * as MICON from '@material-ui/icons'
 const { Meta } = antd.Card
 
 // Set default by configuration
-const emptyPayload = {
-  user: 'Post Empty',
-  ago: 'This Post is empty',
-  avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-  content: 'Empty',
+const defaultPayload = {
+  id: null,
+  post_time: null,
+  postText: null,
+  postFile: null,
+  publisher: null,
+  post_likes: null,
+  is_post_pinned: null,
+  is_liked: null,
+  post_comments: null,
+  get_post_comments: null,
+  postPinned: false,
+  postReported: false,
+  postBoosted: false,
+  ReportIgnore: false,
 }
 
 class PostCard extends React.PureComponent {
@@ -23,13 +33,36 @@ class PostCard extends React.PureComponent {
     super(props),
     this.state = {
       visibleMoreMenu: false,
-      postPinned: this.props.payload.is_post_pinned,
-      postSaved: this.props.payload.is_post_saved,
-      postReported: this.props.payload.is_post_reported,
-      postBoosted: this.props.payload.is_post_boosted,
-      ReportIgnore: false,
+      payload: this.props.payload,
     }
   }  
+
+  componentDidMount(){
+    const a = this.props.payload
+    const b = defaultPayload
+    try {
+      if(a){
+        let tmp;
+        const propsArray = Object.keys(a)
+        const defaultArray = Object.keys(b)
+        propsArray.forEach(e => {
+          if (defaultArray.includes(e)){
+            tmp[e] = "something"
+          }
+          
+        })
+        console.log(tmp)
+      }
+    
+      else{
+        console.warn('Empty payload, setting default...')
+        this.setState({ payload: b})
+      }
+    } catch (error) {
+      
+    }
+  }
+
   handleVisibleChange = flag => {
     this.setState({ visibleMoreMenu: flag });
   };
@@ -39,10 +72,9 @@ class PostCard extends React.PureComponent {
   }
 
   render() {
-    const { payload, customActions } = this.props
+    const { payload } = this.state
     const ActShowMode = app.AppSettings.auto_hide_postbar
 
-    const post_data = payload || emptyPayload;
     const {
       id,
       post_time,
@@ -54,14 +86,17 @@ class PostCard extends React.PureComponent {
       is_liked,
       post_comments,
       get_post_comments
-    } = post_data
+    } = payload || defaultPayload
+
+    if(!id, !postText, !postFile, !publisher) return null
+
 
     const SwapThisPost = () => {
       localStorage.setItem('p_back_uid', id)
-      if (postFile){
-        app.SwapMode.openPost(id, post_data)
-      }
+      
+      app.SwapMode.openPost(id, payload)
       app.SwapMode.openComments(id)
+
     }
 
     const handlePostActions = {
@@ -71,7 +106,7 @@ class PostCard extends React.PureComponent {
           if (err) {
             return false
           }
-          app.FeedHandler.killByID(post_id)
+          app.RenderFeed.killByID(post_id)
         }, payload)
       },
       save: post_id => {
@@ -110,7 +145,7 @@ class PostCard extends React.PureComponent {
         }, payload)
       },
     }
-    const defaultActions = [
+    const actions = [
       <div>
         <Like_button
           count={post_likes}
@@ -123,7 +158,6 @@ class PostCard extends React.PureComponent {
         <MICON.InsertComment key="comments" onClick={() => SwapThisPost()} />
       </antd.Badge>,
     ]
-    const actions = customActions || defaultActions
 
     const MoreMenu = (
       <antd.Menu >
@@ -223,7 +257,7 @@ class PostCard extends React.PureComponent {
                     {app.booleanFix(publisher.verified) ? (
                       <Icon
                         style={{ color: 'blue' }}
-                        component={CustomIcons.VerifiedBadge}
+                        component={Icons.VerifiedBadge}
                       />
                     ) : null}
                     {app.booleanFix(publisher.nsfw_flag) ? (

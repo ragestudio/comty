@@ -1,7 +1,7 @@
 // @alias from 'components'
 
 // Helpers & Misc
-import CustomIcons from './CustomIcons'
+export * as Icons from './Icons'
 import Loader from './Loader/Loader.js'
 import App_about from './App_about'
 import * as Feather from 'feather-reactjs'
@@ -35,7 +35,6 @@ export {
   Loader,
   PostCard,
   PostCreator,
-  CustomIcons,
   Like_button,
   MainFeed,
 }
