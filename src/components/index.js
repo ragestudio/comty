@@ -1,6 +1,7 @@
 // @alias from 'components'
 
 // Helpers & Misc
+import Players from './Players'
 export * as Icons from './Icons'
 import Loader from './Loader/Loader.js'
 import App_about from './App_about'
@@ -25,6 +26,7 @@ import PostCreator from './PostCreator'
 // Mix & Export all
 export {
   Feather,
+  Players,
   App_about,
   MediaPlayer,
   UserBadges,

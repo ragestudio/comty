@@ -146,16 +146,10 @@ class PostCard extends React.PureComponent {
       },
     }
     const actions = [
-      <div>
-        <Like_button
-          count={post_likes}
-          id={id}
-          liked={app.booleanFix(is_liked) ? true : false}
-          key="like"
-        />
-      </div>,
+      <Like_button key="like" count={post_likes} id={id} liked={app.booleanFix(is_liked) ? true : false} />,
+      <Icons.Share2 />,
       <antd.Badge dot={post_comments > 0 ? true : false}>
-        <MICON.InsertComment key="comments" onClick={() => SwapThisPost()} />
+        <Icons.MessageSquare key="comments" onClick={() => SwapThisPost()} />
       </antd.Badge>,
     ]
 

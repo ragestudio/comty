@@ -1,4 +1,4 @@
-import * as Icons from '@ant-design/icons'
+import * as Icons from 'components/Icons'
 
 export var BadgesType = [
   {
@@ -30,7 +30,7 @@ export var BadgesType = [
     title: 'DEVELOPER',
     color: 'default',
     require: 'dev',
-    icon: (<Icons.RocketOutlined />),
+    icon: (<Icons.GitBranch style={{marginRight: 'unset', verticalAlign: "-0.125em"}} />), // 
     tip: 'DEVELOPER',
   },
   {
@@ -46,7 +46,15 @@ export var BadgesType = [
     title: 'Pro Chikito',
     color: '#a0d911',
     require: '',
-    icon: (<Icons.AndroidOutlined />),
+    icon: ("🐱‍🐉🧜‍♀️"),
     tip: 'Chikito',
+  },
+  {
+    id: 'patreon',
+    title: 'Patreon Member',
+    color: '',
+    require: '',
+    icon: (<Icons.Patreon />),
+    tip: 'Nigas',
   }
 ]

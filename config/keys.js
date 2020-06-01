@@ -1,4 +1,6 @@
 module.exports = {
+  spotify_client: '609f59064dfd470c8c2abffbd9044843',
+  spotify_secret: 'b7efd276bf2e41039dedb2a514f35951',
   unsplash_key: "slrHmuo9FEJajV4xvWl38TUhbib6BhhGI4VIZ1-cqnw",
   unsplash_secret: "dh3UlgLTdunO7a_l_iKjotXbz0xB7w5EuDIBU8Pa8pA",
   g_recaptcha_key: '6Lc55uUUAAAAAEIACMVf3BUzAJSNCmI3RrjEirZ6',
