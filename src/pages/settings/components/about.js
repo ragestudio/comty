@@ -1,5 +1,5 @@
 import React from 'react'
-import { App_about } from 'components'
+import { About } from 'components'
 import l from 'globals/links'
 import * as Icons from 'components/Icons'
 import * as antd from 'antd'
@@ -9,7 +9,7 @@ import * as antd from 'antd'
 export default class AppAbout extends React.Component {
   render() {
     return <>
-    <App_about />
+    <About />
     <antd.Card>
       <div>
         <h4>🎉✨ It's completely free and open source !</h4>

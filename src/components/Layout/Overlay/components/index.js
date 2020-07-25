@@ -1,26 +1,16 @@
+import Primary from './layout/Primary.tsx'
+import Secondary from './layout/Secondary.tsx'
+import Card_Component from './Card_Component.tsx'
 
-
-import Card_Component from './component.tsx'
-
-import __sec from './layout/__sec.tsx'
-import __pri from './layout/__pri.tsx'
-
-import __searchBar from './main/__searchBar'
-import __trendings from './main/__trendings'
-import __suggestions from './main/__suggestions'
-
-import __priPost from './swapper/__priPost'
-import __secComments from './swapper/__secComments'
-import __priSearch from './swapper/__priSearch'
+import __searchBar from './cards/__searchBar'
+import __trendings from './cards/__trendings'
+import __suggestions from './cards/__suggestions'
 
 export { 
     Card_Component,
-    __sec,
-    __pri,
-    __trendings,
+    Secondary,
+    Primary,
     __searchBar,
+    __trendings,
     __suggestions,
-    __priPost,
-    __secComments,
-    __priSearch
 }

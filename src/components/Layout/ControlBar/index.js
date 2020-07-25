@@ -1,7 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as app from 'app'
-import styles from './Control.less'
+import styles from './index.less'
 import classnames from 'classnames'
 
 import Radium, { StyleRoot } from 'radium'
@@ -35,15 +34,13 @@ class Control extends React.PureComponent {
       FadeIN: true,
     }
   }
-  DummySetControls = e => {
-    app.yconsole.log('Controls recived => ', e)
+  set = e => {
     if (this.state.Show == false) {
       this.setState({ FadeIN: true })
     }
     this.setState({ Show: true, RenderFragment: e })
   }
-  DummyCloseControls() {
-    app.yconsole.log('Closing Control Bar...')
+  close() {
     this.setState({ FadeIN: false })
     setTimeout(() => this.setState({ Show: false, RenderFragment: null }), 1000)
   }

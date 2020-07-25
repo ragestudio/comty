@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
-import { ListSettings } from '../../../../globals/settings.js'
-import { ControlBar } from 'app'
-import * as app from 'app'
+import ListSettings from 'globals/settings'
+import ControlBar from 'components/layout/ControlBar'
+
+import verbosity from 'core/libs/verbosity'
 import * as Icons from 'components/Icons'
-import Icon from '@ant-design/icons'
 
 class Base extends Component {
   constructor(props) {
@@ -13,14 +13,6 @@ class Base extends Component {
         SettingRepo: ListSettings,
         forSave: false,
       })
-  }
-
-  componentDidMount() {
-    if (!localStorage.getItem('app_settings')) {
-      app.yconsole.warn(
-        'The settings for this app in your Account isnt set yet, Using stock settings...'
-      )
-    }
   }
 
   rendersets = item => {
@@ -69,7 +61,7 @@ class Base extends Component {
         </div>
       )
     } catch (err) {
-      return app.yconsole.log(err)
+      return verbosity.log(err)
     }
   }
   handleControlBar() {
@@ -107,7 +99,7 @@ class Base extends Component {
         ita === item ? Object.assign(ita, { value: to }) : ita
       )
       this.setState({ SettingRepo: updatedValue, forSave: true })
-      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      verbosity.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }
@@ -123,7 +115,7 @@ class Base extends Component {
         ita === item ? Object.assign(ita, { value: value }) : ita
       )
       this.setState({ SettingRepo: updatedValue, forSave: true })
-      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      verbosity.log(`Changing ${item.SettingID} to value ${to}`)
     } catch (err) {
       console.log(err)
     }

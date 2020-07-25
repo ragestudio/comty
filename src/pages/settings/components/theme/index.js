@@ -1,6 +1,5 @@
 import React from 'react'
 import * as Feather from 'feather-reactjs'
-import * as app from 'app'
 import * as antd from 'antd'
 
 import { SketchPicker } from 'react-color';

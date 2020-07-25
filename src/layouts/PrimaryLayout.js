@@ -2,31 +2,22 @@
 /* global document */
 import React from 'react'
 import PropTypes from 'prop-types'
-import withRouter from 'umi/withRouter'
-import { connect } from 'dva'
+import {withRouter, connect} from 'umi'
 import {
   MyLayout,
   PageTransition,
-  HeaderSearch,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
 import classnames from 'classnames'
 
-import * as app from 'app'
+import { app_config } from 'config'
 import * as antd from 'antd'
 
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Control, Overlay, WindowAppBar } = MyLayout
-
-export function updateTheme(data){
-  if (!data) return false
-  console.log(data)
-  return PrimaryComponent.setState({theme: data})
-}
-
+const { Sider, Control, Overlay } = MyLayout
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
@@ -35,27 +26,18 @@ class PrimaryLayout extends React.PureComponent {
     super(props)
     window.PrimaryComponent = this
     this.state = {
-      theme: app.app_theme.getStyle(),
-      collapsed: app.AppSettings.default_collapse_sider ? true : false,
+      collapsed: app_config.default_collapse_sider ? true : false,
       isMobile: false,
-      desktop_mode: false,
-      userData: '',
     }
   }
 
   componentDidMount() {
-   
-    this.setState({
-      userData: app.userData(),
-    })
-
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
         this.setState({
           isMobile: mobile,
         })
-        store.set('mobile_src', mobile)
       }
     })
   }
@@ -70,12 +52,14 @@ class PrimaryLayout extends React.PureComponent {
     store.set('collapsed', !fromStore)
   }
 
+  Swapper = {
+    
+  }
+
   render() {
     const { location, dispatch, children } = this.props
-    const { userData, collapsed, isMobile, theme, predominantColor } = this.state
+    const { collapsed, isMobile } = this.state
     const { onCollapseChange } = this
-
-    
 
     const SiderProps = {
       breakpoint:{
@@ -86,33 +70,15 @@ class PrimaryLayout extends React.PureComponent {
         xl: '1200px',
         xxl: '1600px',
       },
-      predominantColor,
-      theme,
-      userData,
       isMobile,
       collapsed,
-      onCollapseChange,
-      onThemeChange(theme) {
-        dispatch({
-          type: 'app/handleThemeChange',
-          payload: theme,
-        })
-      },
+      onCollapseChange
     }
 
-    const OverlayProps = {
-      userData,
-      isMobile,
-    }
-    console.log(theme)
     return (
       <React.Fragment>
-          <div className={classnames(styles.__ControlBar, {[styles.mobile]: isMobile})}>
-            <Control mobile={isMobile} />
-          </div>
-          <antd.Layout style={theme} id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
+          <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
             <Sider {...SiderProps} />
-
             <div className={styles.primary_layout_container}>
               <PageTransition
                 preset="moveToRightScaleUp"
@@ -126,8 +92,7 @@ class PrimaryLayout extends React.PureComponent {
                 </Content>
               </PageTransition>
             </div>
-
-            <Overlay {...OverlayProps} />
+            <Overlay />
           </antd.Layout>
       </React.Fragment>
     )

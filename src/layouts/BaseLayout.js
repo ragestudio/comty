@@ -1,21 +1,18 @@
 import React, { PureComponent, Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'dva'
 import { Helmet } from 'react-helmet'
 import { Loader } from 'components'
-import { queryLayout } from 'utils'
 import NProgress from 'nprogress'
+import { withRouter, connect } from 'umi'
+import { queryLayout } from 'core'
 import config from 'config'
-import withRouter from 'umi/withRouter'
-import {AppSettings} from 'app'
 
-import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'
 import './BaseLayout.less'
 
 const LayoutMap = {
-  primary: PrimaryLayout,
-  public: PublicLayout,
+  primary: PrimaryLayout
+  // public: PublicLayout,
 }
 
 @withRouter
@@ -40,10 +37,9 @@ class BaseLayout extends PureComponent {
     return (
       <Fragment>
         <Helmet>
-          <title>{config.siteName}</title>
+          <title>{config.app_config.siteName}</title>
         </Helmet>
-        {Loader( AppSettings.InfiniteLoading? {spinning: true} : loading )}
-  
+        {Loader(loading)}
         <Container>{children}</Container>
       </Fragment>
     )

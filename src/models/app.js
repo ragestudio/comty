@@ -1,18 +1,40 @@
 /* global window */
-import { router } from 'utils'
-import store from 'store'
-import { pathMatchRegexp, queryLayout } from 'utils'
-import config from 'config'
-import * as app from 'app'
+import store from 'store';
+import { pathMatchRegexp, queryLayout } from 'core';
+import { app_config } from 'config';
+import keys from 'config/app_keys';
+import * as core from 'core';
+import { session } from 'core/cores';
+import verbosity from 'core/libs/verbosity'
 
 export default {
   namespace: 'app',
   state: {
-    AppSettings: store.get('app_settings') || config.defaultSettings,
-    theme: store.get('theme') || 'light',
+    server_key: keys.server_key,
+
+    service_valid: false,
+    ng_services: false,
+    session_valid: false,
+
+    session_token: null,
+    session_data: null,
+    session_uuid: null,
+
+    overlayActive: false,
+    overlayElement: null,
+
+    controlActive: false,
+    feedOutdated: false,
+
+    app_settings: store.get('app_settings'),
+    notifications: [],
     locationQuery: {},
+    
   },
   subscriptions: {
+    setup({ dispatch }) {
+      dispatch({ type: 'query' });
+    },
     setupHistory({ dispatch, history }) {
       history.listen(location => {
         dispatch({
@@ -21,44 +43,75 @@ export default {
             locationPathname: location.pathname,
             locationQuery: location.query,
           },
-        })
-      })
+        });
+      });
     },
-
     setupRequestCancel({ history }) {
       history.listen(() => {
-        const { cancelRequest = new Map() } = window
+        const { cancelRequest = new Map() } = window;
+
         cancelRequest.forEach((value, key) => {
           if (value.pathname !== window.location.pathname) {
-            value.cancel('Canceling...')
-            cancelRequest.delete(key)
+            value.cancel(CANCEL_REQUEST_MESSAGE);
+            cancelRequest.delete(key);
           }
-        })
-      })
-    },
-    setup({ dispatch }) {
-      dispatch({ type: 'query' })
+        });
+      });
     },
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-      // if (queryLayout(config.layouts, window.location.pathname) == 'public') {
-      //   return true
-      // }
-      const validBackup = app.validate.backup()
-      if (app.validate.session() == true) {
+      const service = yield select(state => state.app.service_valid);
+      if (!service) {
+        console.error('❌ Cannot connect with validate session service!');
+        return yield put({
+          type: 'updateState',
+          payload: { service_valid: false },
+        });
+      }
+
+      if (session) {
         if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-          router.push({ pathname: `${config.MainPath}` })
+          app.router.push({ pathname: `${app_config.MainPath}` });
         }
-        app._app.query()        
-        return true
-      } else if (!pathMatchRegexp(['', '/login'], window.location.pathname) && queryLayout(config.layouts, window.location.pathname) !== 'public') {
+
+        return true;
+      } else if (
+        !pathMatchRegexp(['', '/login'], window.location.pathname) &&
+        queryLayout(config.layouts, window.location.pathname) !== 'public'
+      ) {
         if (validBackup == true) {
-          app._app.logout()
+          // logout normal
         } else {
-          router.push({ pathname: '/login' })
+          core.router.push({ pathname: '/login' });
         }
       }
+    },
+    *update({ payload }, { call, put, select }) {
+      const session = yield select(state => state.app.session_valid);
+      const session_uuid = yield select(state => state.app.session_uuid);
+
+      console.log(payload);
+      if (session) {
+        // request getData
+      } else {
+        // invalid update token (session not valid)
+      }
+    },
+    *logout({ payload }, { call, put, select }) {
+      // call logout api
+      return yield put({ type: 'disconnectServices' });
+    },
+    *login({ payload }, { call, put, select }) {
+      if (!payload) return false;
+      const serverKey = yield select(state => state.app.server_key);
+      const requestPayload = { username: payload.username, password: payload.password, server_key: serverKey }
+      session.auth(requestPayload, (err, res) => {
+        if (err) {
+          const { status, message } = err;
+          return console.log(status, message);
+        }
+      });
     },
   },
   reducers: {
@@ -66,16 +119,23 @@ export default {
       return {
         ...state,
         ...payload,
-      }
+      };
     },
 
     handleThemeChange(state, { payload }) {
-      store.set('theme', payload)
-      state.theme = payload
+      store.set('theme', payload);
+      state.theme = payload;
     },
 
     allNotificationsRead(state) {
-      state.notifications = []
+      state.notifications = [];
+    },
+
+    disconnectServices(state) {
+      state.service_valid = false;
+      state.session_valid = false;
+      state.session_data = null;
+      state.session_token = null;
     },
   },
-}
+};
