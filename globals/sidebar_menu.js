@@ -7,7 +7,8 @@ let MenuList = [
         path: '/main',
         require: 'login',
         icon: <Icons.Home />,
-        mobile: 'true'
+        mobile: true,
+        desktop: false
     },
     {
         id: 'explore',
@@ -15,7 +16,8 @@ let MenuList = [
         path: '/explore',
         require: 'login',
         icon: <Icons.Compass />,
-        mobile: 'true'
+        mobile: true,
+        desktop: true
     },
     {
         id: 'saves',
@@ -23,7 +25,8 @@ let MenuList = [
         path: '/saves',
         require: 'login',
         icon: <Icons.Bookmark />,
-        mobile: 'false'
+        mobile: false,
+        desktop: true
     },
     {
         id: 'messages',
@@ -31,7 +34,8 @@ let MenuList = [
         path: '/messages',
         require: 'login',
         icon: <Icons.MessageSquare />,
-        mobile: 'false'
+        mobile: true,
+        desktop: true
     },
     {
         id: 'notifications',
@@ -39,7 +43,8 @@ let MenuList = [
         path: '/notifications',
         require: 'login',
         icon: <Icons.Inbox/>,
-        mobile: 'false'
+        mobile: true,
+        desktop: true
     },
 ]
 

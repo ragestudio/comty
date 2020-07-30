@@ -15,12 +15,12 @@ export default class Sider_Default extends React.PureComponent {
 
   renderMenus(data){
     return data.map(e => {
-      return(
+      return e.desktop? (
         <antd.Menu.Item key={e.id}>
         {e.icon}
         <span>{e.title}</span>
       </antd.Menu.Item>
-      )
+      ) : null
     })
   }
 
@@ -35,7 +35,7 @@ export default class Sider_Default extends React.PureComponent {
         >
           <div className={styles.left_sider_brandholder}>
             <img
-              onClick={() => handleClickMenu({key: '/'})}
+              onClick={() => handleClickMenu({key: ''})}
               src={logo}
             />
           </div>

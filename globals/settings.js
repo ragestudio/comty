@@ -30,4 +30,5 @@ module.exports = [
     title: 'Overlay loose focus',
     description: 'Close the overlay when loose focus',
   },
+
 ]

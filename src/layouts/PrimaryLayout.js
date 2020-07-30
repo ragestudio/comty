@@ -12,6 +12,7 @@ import store from 'store'
 import classnames from 'classnames'
 
 import { app_config } from 'config'
+import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 
 import styles from './PrimaryLayout.less'
@@ -23,12 +24,13 @@ const { Sider, Control, Overlay } = MyLayout
 @connect(({ app, loading }) => ({ app, loading }))
 class PrimaryLayout extends React.PureComponent {
   constructor(props) {
-    super(props)
-    window.PrimaryComponent = this
+    super(props);
     this.state = {
       collapsed: app_config.default_collapse_sider ? true : false,
       isMobile: false,
-    }
+    },
+    window.PrimaryComponent = this;
+
   }
 
   componentDidMount() {
@@ -52,10 +54,25 @@ class PrimaryLayout extends React.PureComponent {
     store.set('collapsed', !fromStore)
   }
 
-  Swapper = {
-    
-  }
+  renderThemeComponents() {
+    const currentTheme = theme.get()
+    if (!currentTheme) return false
+    if (currentTheme.backgroundImage) {
+      return currentTheme.backgroundImage.active? <div style={{ 
+        backgroundImage: `url(${currentTheme.backgroundImage.src})`,
+        transition: "all 150ms linear",
+        position: 'absolute',  
+        width: '100vw', 
+        height: '100vh', 
+        backgroundRepeat: "repeat-x",
+        backgroundSize: "cover",
+        backgroundPositionY: "center",
+        overflow: "hidden", 
+        opacity: currentTheme.backgroundImage.opacity
+      }} /> : null
+    }
 
+  }
   render() {
     const { location, dispatch, children } = this.props
     const { collapsed, isMobile } = this.state
@@ -77,6 +94,8 @@ class PrimaryLayout extends React.PureComponent {
 
     return (
       <React.Fragment>
+        <Control />
+          {this.renderThemeComponents()}
           <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
             <Sider {...SiderProps} />
             <div className={styles.primary_layout_container}>

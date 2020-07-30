@@ -14,7 +14,6 @@ import {
 import classnames from 'classnames';
 import { CloseOutlined } from '@ant-design/icons';
 import endpoints_list from 'config/endpoints';
-import { Page } from 'components';
 
 import styles from './index.less';
 
@@ -171,7 +170,7 @@ class RequestPage extends React.Component {
     const { result, url, method, ParamsKeys, BodyKeys, visible } = this.state;
 
     return (
-      <Page inner>
+      <div>
         <Row>
           <Col lg={8} md={24}>
             <List
@@ -343,7 +342,7 @@ class RequestPage extends React.Component {
             <div className={styles.result}>{result}</div>
           </Col>
         </Row>
-      </Page>
+      </div>
     );
   }
 }

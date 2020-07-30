@@ -272,11 +272,11 @@ export function setLocale(language) {
 export function get_value(source,key){
   if( !key || !source ) return false
     try {
-        const map = source.map(item => {
-          return item.id === key? item.value : null
+        const find = source.find(item => {
+          return item.id === key
         })
-        const fr = map.filter(Boolean)
-        return fr.toString()
+        return find.value
+      
     } 
     catch (error) {
         return false

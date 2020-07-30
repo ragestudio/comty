@@ -26,7 +26,8 @@ export default {
     controlActive: false,
     feedOutdated: false,
 
-    app_settings: store.get('app_settings'),
+    app_settings: store.get(app_config.app_settings_storage),
+    app_theme: store.get(app_config.appTheme_container),
     notifications: [],
     locationQuery: {},
     
@@ -52,7 +53,7 @@ export default {
 
         cancelRequest.forEach((value, key) => {
           if (value.pathname !== window.location.pathname) {
-            value.cancel(CANCEL_REQUEST_MESSAGE);
+            value.cancel('cancel request');
             cancelRequest.delete(key);
           }
         });
@@ -113,6 +114,25 @@ export default {
         }
       });
     },
+    *updateTheme({payload}, {call, put, select}){
+      if (!payload) return false;
+      let tmp = []
+
+      const keys = Object.keys(payload)
+      const values = Object.values(payload)
+      const lenght = keys.length
+  
+      for (let i = 0; i < lenght; i++) {
+        let obj = {}
+        obj.key = keys[i]
+        obj.value = values[i]
+  
+        tmp[i] = obj
+      }
+
+      return yield put({ type: 'handleUpdateTheme', payload: tmp });
+
+    },
   },
   reducers: {
     updateState(state, { payload }) {
@@ -129,6 +149,12 @@ export default {
 
     allNotificationsRead(state) {
       state.notifications = [];
+    },
+
+    handleUpdateTheme(state, { payload }) {
+      verbosity.debug(payload)
+      store.set(app_config.appTheme_container, payload);
+      state.app_theme = payload
     },
 
     disconnectServices(state) {

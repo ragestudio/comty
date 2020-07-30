@@ -117,7 +117,7 @@ export default class Overlay extends React.PureComponent {
       }
 
       return(
-        <Primary id="main" fragment={<>  <div><__searchBar /></div> <div><Card_Component> yeah </Card_Component></div>   </>}  />
+        <Primary id="main" fragment={<>  <div><__searchBar /></div> <div></div>   </>}  />
       )
 
     }

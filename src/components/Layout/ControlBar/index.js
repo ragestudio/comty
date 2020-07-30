@@ -16,51 +16,45 @@ const animationStyles = {
   },
 }
 
-export function SetControls(e) {
-  window.ControlComponent.DummySetControls(e)
-  return
-}
-export function CloseControls() {
-  window.ControlComponent.DummyCloseControls()
-  return
+export const control = {
+  set: (e) => {
+    if (!window.ControlComponent.state.active) {
+      window.ControlComponent.setState({ fadein: true })
+    }
+    window.ControlComponent.setState({ active: true, render: e })
+  },
+  close: () => {
+    window.ControlComponent.setState({ fadein: false })
+    setTimeout(() => window.ControlComponent.setState({ active: false, render: null }), 1000)
+  }
 }
 
-class Control extends React.PureComponent {
+export default class Control extends React.PureComponent {
   constructor(props) {
-    super(props)
-    window.ControlComponent = this
+    super(props);
     this.state = {
-      Show: false,
-      FadeIN: true,
-    }
+      active: false,
+      fadein: true,
+    };
+    window.ControlComponent = this;
   }
-  set = e => {
-    if (this.state.Show == false) {
-      this.setState({ FadeIN: true })
-    }
-    this.setState({ Show: true, RenderFragment: e })
-  }
-  close() {
-    this.setState({ FadeIN: false })
-    setTimeout(() => this.setState({ Show: false, RenderFragment: null }), 1000)
-  }
+
 
   render() {
-    const { RenderFragment, Show, FadeIN } = this.state
+    const { render, active, fadein } = this.state
     const isMobile = this.props.mobile? this.props.mobile : false
-    return Show ? (
+    return active ? (
       <StyleRoot>
         <div
           style={
-            FadeIN ? animationStyles.fadeInUp : animationStyles.bounceOutDown
+            fadein ? animationStyles.fadeInUp : animationStyles.bounceOutDown
           }
         >
           <antd.Card bordered={false} className={classnames(styles.ControlCard, {[styles.mobile]: isMobile})} >
-            <React.Fragment>{RenderFragment}</React.Fragment>
+            <React.Fragment>{render}</React.Fragment>
           </antd.Card>
         </div>
       </StyleRoot>
     ) : null
   }
 }
-export default Control

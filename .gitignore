@@ -9,7 +9,7 @@
 
 # production
 /dist
-
+/.debug
 # misc
 .DS_Store
 
@@ -18,3 +18,4 @@
 /src/.umi-production
 /src/.umi-test
 /.env.local
+.debug/4.11/.editorconfig

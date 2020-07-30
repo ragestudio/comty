@@ -3,9 +3,10 @@
 
 .left_sider_wrapper {
   border-color: transparent;
-  font-size: 13px;
-  font-family: @__Global_general_font_family;
-  
+  font-size: 15px;
+  font-family: @__Global_texted_font;
+  font-weight: 600;
+
   width: 100%;
   height: 100vh;
   
@@ -15,19 +16,13 @@
   background-color: transparent;
   backdrop-filter: blur(2px);
 
-  &.matchColor{
-    h1,h2,h3,h4,h5,span,p,svg {
-      color: unset;
-      filter: invert(1);
-    }
-  }
- 
-
   :global {
     .ant-layout-sider {
       background-color: transparent;
       float: right;
       .ant-menu {
+        font-weight: 700;
+        color: @AppTheme_global_color;
         vertical-align: middle;
         // margin: 0 0 0 5px;
       }
@@ -45,9 +40,10 @@
         border-radius: 8px 8px 8px 8px;
         transform: translate(10px,0);
         
-       // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
+        // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
         backdrop-filter: blur(2px);
-        border-left: 10px #FFCC00 solid;
+        // border-left: 10px @app_accent_gradient solid;
+        box-shadow: -2px 2px 1px 0 rgba(51, 51, 51, 0.13);
         color: rgb(102, 102, 102);
       }
 
@@ -76,7 +72,7 @@
   cursor: pointer;
 
   img{
-    margin: 15px 0 0 0;
+    margin: 15px 0 0 22px;
     max-height: 70px;
     height: 5vh;
     width: 5vh;
@@ -137,7 +133,7 @@
     }
 
     .ant-menu-dark .ant-menu-item a {
-      color: rgb(197, 197, 197);
+      color: @AppTheme_global_color;
     }
   }
 }

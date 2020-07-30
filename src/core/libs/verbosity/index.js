@@ -1,7 +1,7 @@
-import { storage } from 'core/libs/settings'
+import settings from 'core/libs/settings'
 import stackTrace from 'stack-trace'
 // import path from 'path'
-const verbosity_enabled = storage.get('verbosity')
+const verbosity_enabled = settings('verbosity')
 
 const verbosity = {
   log: (...cont) => {

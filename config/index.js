@@ -10,7 +10,13 @@ module.exports = {
     DarkLogoPath: '/dark_logo.svg',
 
     api_prefix: 'ycorejs_apiv3',
-    app_settings_storage: 'app_settings' 
+    app_settings_storage: 'app_settings', 
+ 
+    appTheme_container: 'app_theme',
+    appTheme_desiredContrast: 4.5,
+    // Contrast level AA = 4.5, Level AAA = 7
+    // Reference: https://www.w3.org/WAI/WCAG21/quickref/?versions=2.0&showtechniques=143#qr-visual-audio-contrast-contrast
+
   },
 
   i18n: {

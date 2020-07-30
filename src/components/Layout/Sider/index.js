@@ -9,7 +9,7 @@ import Sider_Default from './default'
 class Sider extends React.PureComponent {
 
   handleClickMenu = e => {
-    router.go(e.key)
+    router.go(`/${e.key}`)
   }
 
   render() {
