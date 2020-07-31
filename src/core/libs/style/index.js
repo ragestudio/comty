@@ -2,22 +2,23 @@ import store from 'store';
 import { app_config } from 'config';
 import verbosity from 'core/libs/verbosity'
 import * as errorHandlers from 'core/libs/errorhandler'
-import { negate } from 'lodash';
+import * as core from 'core'
 
 const { appTheme_desiredContrast, appTheme_container } = app_config
 
 export const theme = {
   get: (key) => {
-    if(!localStorage.getItem(appTheme_container)) return false
     const raw = store.get(appTheme_container)
+    if(!raw) return false
     let container = []
-    if (raw) {
-      raw.forEach((e)=>{
-        container[e.key] = e.value
-      })
-      return container
+    try {
+      raw.forEach((e)=>{container[e.key] = e.value})
+    } catch (error) {
+      return errorHandlers.onError.invalid_data(error, "ThemeScheme")
     }
-    return null
+    return container
+    
+  
   },
   set: (data) => {
     if (!data || data.length > 2) return false

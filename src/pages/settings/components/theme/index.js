@@ -4,32 +4,11 @@ import * as antd from 'antd'
 import themeSettings from 'globals/theme_settings'
 import {connect} from 'umi'
 import styles from './index.less'
-import json_prune from 'core/libs/json_prune'
-
 
 import { SketchPicker } from 'react-color';
 import { theme, getOptimalOpacityFromIMG, get_style_rule_value } from 'core/libs/style' 
-
-
-function getBase64(img, callback) {
-    const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result))
-    reader.readAsDataURL(img)
-}
-
-function toDataUrl(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        var reader = new FileReader();
-        reader.onloadend = function() {
-            callback(reader.result);
-        }
-        reader.readAsDataURL(xhr.response);
-    };
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
-}
+import { urlToBase64, imageToBase64, arrayToObject } from 'core'
+import exportDataAsFile from 'core/libs/interface/export_data'
 
 class BackgroundColor extends React.Component{
     state = {
@@ -53,6 +32,25 @@ class BackgroundColor extends React.Component{
 }
 
 @connect(({ app }) => ({ app }))
+class DarkMode extends React.Component{
+    state = {
+        model: { active: false, autoTime: '' }
+    }
+    render(){
+        return <>
+            <div>
+                <h2><Icons.Moon /> Dark Mode</h2>
+            </div>
+            <div>
+                
+            </div>
+
+         </>
+    }
+}
+
+
+@connect(({ app }) => ({ app }))
 class BackgroundImage extends React.Component{
     state = {
         customURL: '',
@@ -67,7 +65,7 @@ class BackgroundImage extends React.Component{
       }
       if (info.file.status === 'done') {
         this.setState({ processing: true })
-          getBase64(info.file.originFileObj, fileURL => {
+          imageToBase64(info.file.originFileObj, fileURL => {
             this.setState({ fileURL: fileURL })
             this.proccessBackground(fileURL)
           })
@@ -75,10 +73,8 @@ class BackgroundImage extends React.Component{
     }
 
     handleCustomURL(url){
-        this.setState({ processing: true })
-        this.setState({ fileURL: url })
-
-        toDataUrl(url, fileURL => {
+        this.setState({ processing: true, fileURL: url })
+        urlToBase64(url, fileURL => {
             this.proccessBackground(fileURL)
         })
     }
@@ -90,43 +86,19 @@ class BackgroundImage extends React.Component{
         this.setState({ model: payload, processing: false })
         this.props.dispatch({
             type: 'app/updateTheme',
-            payload: { backgroundImage: payload }
+            payload: { 
+                key: 'backgroundImage',
+                value: payload
+            }
         });
     }
 
     handleErase(){
-        this.handleUpdate({})
+       this.handleUpdate({})
     }
 
     handleExport(){
-        const string = JSON.stringify(this.state.model)
-        const exportCodeRender = () => {
-            if(string.length > 500){
-                return <div style={{ textAlign: 'center', width: '100%', padding: '30px 0 30px 0' }}>
-                    <Icons.HardDrive style={{ fontSize: '45px', margin: '0' }} />
-                    <h4>Hey, this file is too much large!</h4>
-                    <span>So it couldn't be displayed.</span>
-                </div>
-            }
-            return <div>
-                {string}
-            </div>
-        }
-        antd.Modal.confirm({
-            title: <div><Icons.Code /> Your export <antd.Tag> JSON </antd.Tag></div>,
-            icon: null,
-            onOk: () => {
-                let tmp = document.createElement('a')
-                tmp.href = `data:text/json;charset=utf-8,${encodeURIComponent(string)}`
-                tmp.download="export.json"
-                tmp.click()
-            },
-            okText: <><Icons.Download />Download as File</> ,
-            cancelText: "Done",
-            content: exportCodeRender(),
-        });
- 
-     
+        exportDataAsFile({data: JSON.stringify(this.state.model), type: 'text/json'})
     }
 
     proccessBackground(data){
@@ -149,9 +121,10 @@ class BackgroundImage extends React.Component{
     }
     
     componentDidMount(){
-        const storaged = theme.get()["backgroundImage"]
+        const storaged = theme.get()
+
         if(storaged){
-            this.setState({ model: storaged })
+            this.setState({ model: storaged["backgroundImage"] })
         }
 
         let textColor =  this.rgbToScheme(get_style_rule_value('#root', 'color'))
@@ -200,29 +173,22 @@ class BackgroundImage extends React.Component{
                         checkedChildren="Enabled"
                         unCheckedChildren="Disabled"
                         loading={this.state.processing}
-                        onChange={(e) => {
-                            promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())
-                        }}
+                        onChange={(e) => {promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
                         checked={this.state.model.active}
                     />
                 </div>
                 <div>
        
                     <h4><Icons.Layers />Opacity</h4>
-                    <antd.Slider disabled={!this.state.model.src} onChange={(e) => {
-                        this.setState(
-                            prevState => ({
-                                model: {                  
-                                    ...prevState.model,
-                                    opacity: e/100
-                                }
-                            })
-                        )
-                    }} onAfterChange={() => this.handleUpdate()} value={this.state.model.opacity*100} />
+                    <antd.Slider disabled={!this.state.model.src} onChange={(e) => {this.setState(prevState => ({model: {...prevState.model, opacity: e/100}}))}} onAfterChange={() => this.handleUpdate()} value={this.state.model.opacity*100} />
                 </div>
                 <div>
                     <h4><Icons.Code />Export Code</h4>
                     <antd.Button disabled={!this.state.model.src}  size="small" onClick={() => this.handleExport()}> Export </antd.Button>
+                </div>
+                <div>
+                    <h4><Icons.Copy />Import Code</h4>
+                    <antd.Button size="small" onClick={() => null}> Import </antd.Button>
                 </div>
                 <div>
                     <h4><Icons.Trash />Erase</h4>
@@ -270,31 +236,11 @@ class BackgroundImage extends React.Component{
     }
 }
 
-export default class ThemeSettings extends React.PureComponent{
+@connect(({ app }) => ({ app }))
+export default class ThemeSettings extends React.Component{
     state = {
         helper_visible: false,
         helper_fragment: null,
-        style: theme.get(),
-    }
-
-
-    handleRemove(key){
-        try {
-            const storaged = JSON.parse(app.app_theme.getString())
-            let mix = {};
-            storaged.forEach((e)=>{
-                return e.key !== key? mix[e.key] = e.value : null
-            })
-            console.log(mix)
-            this.encode(mix, (res)=> {
-                app.app_theme.set(res)
-                this.decodeData()
-            })
-        } catch (error) {
-            console.log(error)
-            return false
-        }
-
     }
 
     helper = {
@@ -303,18 +249,20 @@ export default class ThemeSettings extends React.PureComponent{
         },
         close: () => {
             this.setState({ helper_visible: false, helper_fragment: null })
-        },
-        backgroundImage: () => {
-            this.helper.open(<BackgroundImage />)
-        },
-        backgroundColor: () => {
-            this.helper.open(<BackgroundColor />)
         }
     }
 
 
     render(){
-        const settingClick = { backgroundImage: () => this.helper.backgroundImage(), backgroundColor: () => this.helper.backgroundColor() }
+        const settingClick = { 
+            backgroundImage: () => this.helper.open(<BackgroundImage />), 
+            overlay: () => this.helper.open(<BackgroundColor />) ,
+            darkmode: () => this.helper.open(<DarkMode />)
+        }
+    
+        const isActive = (key) => {
+            return key? key.active : false
+        }
         return(
             <div>
                 <h2><Icons.Layers/> Theme</h2>
@@ -322,16 +270,18 @@ export default class ThemeSettings extends React.PureComponent{
                   itemLayout="horizontal"
                   dataSource={themeSettings}
                   renderItem={item => (
-                        <antd.Card size="small" bodyStyle={{ width: '100%' }} style={{ display: "flex", flexDirection: "row", margin: 'auto' }} hoverable onClick={settingClick[item.id]}>
-                            <h3>{item.icon}{item.title} <div style={{ float: "right" }}><antd.Tag color={this.state.style[item.id]? "green" : "default"} > {this.state.style[item.id]? "Enabled" : "Disabled"} </antd.Tag></div></h3>
+                     <div style={{ margin: '10px 0 10px 0' }} >
+                        <antd.Card size="small" bodyStyle={{ width: '100%' }} style={{ display: "flex", flexDirection: "row", margin: 'auto', borderRadius: '12px' }} hoverable onClick={settingClick[item.id]}>
+                            <h3>{item.icon}{item.title} <div style={{ float: "right" }}><antd.Tag color={isActive(arrayToObject(this.props.app.app_theme)[item.id])? "green" : "default"} > {isActive(arrayToObject(this.props.app.app_theme)[item.id])? "Enabled" : "Disabled"} </antd.Tag></div></h3>
                             <p>{item.description}</p>
                         </antd.Card>
+                     </div>
                   )}
                 />
                 
                 <antd.Drawer
                     placement="right"
-                    width="600px"
+                    width="700px"
                     closable={true}
                     onClose={this.helper.close}
                     visible={this.state.helper_visible}

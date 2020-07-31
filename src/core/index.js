@@ -3,6 +3,7 @@ import { format } from 'timeago.js';
 import { cloneDeep } from 'lodash';
 import store from 'store';
 import { i18n, app_config } from 'config';
+import * as errorHandlers from 'core/libs/errorhandler'
 
 const { pathToRegexp } = require('path-to-regexp');
 
@@ -24,6 +25,53 @@ export const app_info = {
   logo_dark: app_config.DarkFullLogoPath,
 };
 
+export function imageToBase64(img, callback){
+  const reader = new FileReader()
+  reader.addEventListener('load', () => callback(reader.result))
+  reader.readAsDataURL(img)
+}
+
+export function urlToBase64(url, callback){
+  let xhr = new XMLHttpRequest();
+  xhr.onload = function() {
+      let reader = new FileReader();
+      reader.onloadend = function() {
+          callback(reader.result);
+      }
+      reader.readAsDataURL(xhr.response);
+  };
+  xhr.open('GET', url);
+  xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+  xhr.responseType = 'blob';
+  xhr.send();
+}
+
+/**
+ * Generate a download with encoded uri
+ * 
+ * @param {object} payload - Generation Data
+ */
+export function downloadEncodedURI(payload){
+  if(!payload) return false
+  let { data, type, charset, filename } = payload
+  /**
+    * 
+    * @param {object} payload - Generation Data
+    */
+  if (!data || !type) return false
+  try {
+    if (!filename) {
+      filename = `export_${time.now()}.${type.split("/")[1]}`
+    }
+    let tmp = document.createElement('a')
+    tmp.href = `data:${type};charset=${charset},${encodeURIComponent(data)}`
+    tmp.download=filename
+    tmp.click()
+  } catch (error) {
+    errorHandlers.onError.internal_proccess(error)
+  }
+}
+
 /**
  * Return the last object from array
  *
@@ -37,27 +85,95 @@ export function objectLast(array, n) {
 }
 
 /**
+ * Object to array scheme RSA-YCORE-ARRAYPROTO.2
+ *
+ * @param object {object}
+ * @return array
+ */
+export function objectToArray(object) {
+  if(!object) return false
+  let tmp = []
+
+  const keys = Object.keys(object)
+  const values = Object.values(object)
+  const lenght = keys.length
+
+  for (let i = 0; i < lenght; i++) {
+    let obj = {}
+    obj.key = keys[i]
+    obj.value = values[i]
+
+    tmp[i] = obj
+  }
+  return tmp
+}
+
+/**
+ * Object to array scheme RSA-YCORE-ARRAYPROTO.2
+ *
+ * @param object {object}
+ * @return array
+ */
+export function arrayToObject(array) {
+  if(!array) return false
+  let tmp = []
+  
+  array.forEach((e) => {
+    tmp[e.key] = e.value
+  })
+
+  return tmp
+}
+
+/**
+ * Remove an element by id from an object array
+ *
+ * @param object {object}
+ * @param id {string}
+ * @return array
+ */
+export function objectRemoveByID(object, id) {
+  let arr = objectToArray(object)
+  return arr.filter((e) => {
+    return e.id != id;
+  });
+}
+/**
+ * Remove an element by key from an object array
+ *
+ * @param object {object}
+ * @param key {string}
+ * @return array
+ */
+export function objectRemoveByKEY(object, key) {
+  let arr = objectToArray(object)
+  return arr.filter((e) => {
+    return e.key != key;
+  });
+}
+
+/**
  * Remove an element by id from an array
  *
  * @param array {array}
- * @param value {string}
- * @return object
+ * @param id {string}
+ * @return array
  */
-export function arrayRemoveByID(arr, value) {
+export function arrayRemoveByID(arr, id) {
   return arr.filter(function(ele) {
-    return ele.id != value;
+    return ele.id != id;
   });
 }
 /**
  * Remove an element by key from an array
  *
  * @param array {array}
- * @param value {string}
- * @return object
+ * @param key {string}
+ * @return array
  */
-export function arrayRemoveByKEY(arr, value) {
+export function arrayRemoveByKEY(arr, key) {
   return arr.filter(function(ele) {
-    return ele.key != value;
+    return ele.key != key;
   });
 }
 
@@ -65,7 +181,7 @@ export function arrayRemoveByKEY(arr, value) {
  * Global fix for convert '1, 0' to string boolean 'true, false'
  *
  * @param e {int} Numeric boolean reference
- * @return {bool} Boolean value
+ * @return bool
  */
 export function booleanFix(e) {
   if (e == 1) return true;
@@ -109,6 +225,9 @@ export const time = {
   relativeToNow: (a, b) => {
     return moment(a, b || 'DDMMYYYY').fromNow();
   },
+  now: () => {
+    return new Date().toLocaleString();
+  }
 };
 
 export function pathMatchRegexp(regexp, pathname) {

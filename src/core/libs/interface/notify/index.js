@@ -1,4 +1,4 @@
-import { notification } from 'antd'
+import { notification, message } from 'antd'
 import * as Icons from 'components/Icons'
 
 export const notify = {
@@ -79,4 +79,14 @@ export const notify = {
         placement: 'bottomLeft',
       })
     },
+    open: (props) => {
+      notification.open({
+        placement: props.placement? props.placement : 'bottomLeft',
+        duration: props.duration? props.placement : 15,
+        icon: props.icon? props.icon : <Icons.Triangle style={{ color: '#fa8c16' }} />,
+        message: props.message? props.message : '',
+        description: props.description? props.description : ''
+      })
+    },
+   
   }

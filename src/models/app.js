@@ -6,6 +6,7 @@ import keys from 'config/app_keys';
 import * as core from 'core';
 import { session } from 'core/cores';
 import verbosity from 'core/libs/verbosity'
+import { theme } from 'core/libs/style'
 
 export default {
   namespace: 'app',
@@ -27,7 +28,7 @@ export default {
     feedOutdated: false,
 
     app_settings: store.get(app_config.app_settings_storage),
-    app_theme: store.get(app_config.appTheme_container),
+    app_theme: store.get(app_config.appTheme_container) || [],
     notifications: [],
     locationQuery: {},
     
@@ -114,24 +115,24 @@ export default {
         }
       });
     },
-    *updateTheme({payload}, {call, put, select}){
+    *updateTheme({payload}, {put, select}){
       if (!payload) return false;
-      let tmp = []
+      let container = yield select(state => state.app.app_theme);
+      let container_2 = []
 
-      const keys = Object.keys(payload)
-      const values = Object.values(payload)
-      const lenght = keys.length
-  
-      for (let i = 0; i < lenght; i++) {
-        let obj = {}
-        obj.key = keys[i]
-        obj.value = values[i]
-  
-        tmp[i] = obj
+      const containerlength = Object.entries(container).length
+
+      if (container && containerlength > 1) {
+        container.forEach(e =>{
+          let tmp = {key: e.key}
+          e.key === payload.key? (tmp.value = payload.value) : (tmp.value = e.value)
+          container_2.push(tmp)
+        })
+      }else{
+        container_2 = [payload]
       }
 
-      return yield put({ type: 'handleUpdateTheme', payload: tmp });
-
+      return container_2? yield put({ type: 'handleUpdateTheme', payload: container_2 }) : null
     },
   },
   reducers: {
