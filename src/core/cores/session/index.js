@@ -1,6 +1,18 @@
+/**
+* 
+* @param {HTMLTableElement} session - Callback / Credentials
+* @returns {callback} make an API call to verify credentials
+* @throws {NotFoundError} show error when credentials were not correctly put
+* @async
+* 
+* 
+*/
+
 import endpoints from 'config/endpoints';
 import { v3_model } from 'core/libs';
 
+
+// @param {Array} payload callback - check the information and if it is correct give access
 function auth(payload, callback) {
   if (!payload) return false;
   const { username, password, server_key } = payload;
@@ -25,6 +37,7 @@ function auth(payload, callback) {
 
 async function deauth() {}
 
+// check the information and if it is correct give access
 const backup = {
   get: () => {},
   set: () => {},
