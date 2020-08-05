@@ -7,6 +7,8 @@
 
 # production
 /dist
+/out
+/api
 
 # umi
 /src/.umi
