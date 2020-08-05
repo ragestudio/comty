@@ -17,7 +17,7 @@ export default defineConfig({
     type: 'none',
   },
   alias: {
-    api: resolve(__dirname, './api'),
+    api: resolve(__dirname, './node_modules/@ragestudio/ycorejs-lib'),
     globals: resolve(__dirname, './globals'),
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),

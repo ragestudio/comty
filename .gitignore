@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /npm-debug.log*
@@ -9,13 +7,9 @@
 
 # production
 /dist
-/.debug
-# misc
-.DS_Store
 
 # umi
 /src/.umi
 /src/.umi-production
 /src/.umi-test
 /.env.local
-.debug/4.11/.editorconfig

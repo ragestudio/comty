@@ -36,13 +36,40 @@ class DarkMode extends React.Component{
     state = {
         model: { active: false, autoTime: '' }
     }
+    
+    handleUpdate(payload){
+        if (!payload) {
+            payload = this.state.model
+        }
+        this.setState({ model: payload, processing: false })
+        this.props.dispatch({
+            type: 'app/updateTheme',
+            payload: { 
+                key: 'darkmode',
+                value: payload
+            }
+        });
+    }
     render(){
+        const promiseState = async state => new Promise(resolve => this.setState(state, resolve));
         return <>
             <div>
                 <h2><Icons.Moon /> Dark Mode</h2>
             </div>
             <div>
-                
+            <div className={styles.background_image_controls} >
+                <div>
+                    <h4><Icons.Eye />Enabled</h4>
+                    <antd.Switch 
+                        checkedChildren="Enabled"
+                        unCheckedChildren="Disabled"
+                        loading={this.state.processing}
+                        onChange={(e) => {promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
+                        checked={this.state.model.active}
+                    />
+                </div>
+            </div>
+
             </div>
 
          </>
