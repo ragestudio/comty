@@ -13,3 +13,4 @@
 /src/.umi-production
 /src/.umi-test
 /.env.local
+api/
