@@ -5,11 +5,19 @@ import verbosity from 'core/libs/verbosity'
 export const OVERLAY_BADPOSITION = `Invalid overlay position! Was expected "primary" or "secondary"`
 export const INTERNAL_PROCESS_FAILED = `An internal error has occurred! `
 export const INVALID_DATA = `A function has been executed with invalid data and has caused an error!`
+export const INVALID_PROPS = `Some props failed!`
 // HANDLERS
 export const onError = {
     internal_proccess: (...rest) => {
         verbosity.error(...rest)
-        notify.warn(INTERNAL_PROCESS_FAILED, ...rest)
+        notify.open({
+            message: INTERNAL_PROCESS_FAILED,
+            description:
+            <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto' }}>
+                <div style={{ margin: '10px 0' }}> {JSON.stringify(...rest)} </div>
+            </div>,
+           
+          })
         return false
     },
     invalid_data: (error, expecting) => {

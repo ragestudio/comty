@@ -16,7 +16,7 @@ const LayoutMap = {
 }
 
 @withRouter
-@connect(({ loading }) => ({ loading }))
+@connect(({ app, loading }) => ({ app, loading }))
 class BaseLayout extends PureComponent {
   previousPath = ''
 
@@ -33,14 +33,13 @@ class BaseLayout extends PureComponent {
       NProgress.done()
       this.previousPath = currentPath
     }
-
     return (
       <Fragment>
         <Helmet>
           <title>{config.app_config.siteName}</title>
         </Helmet>
-        {Loader(loading)}
-        <Container>{children}</Container>
+          {Loader(loading)}
+          <Container>{children}</Container>
       </Fragment>
     )
   }

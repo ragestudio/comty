@@ -5,39 +5,30 @@ import themeSettings from 'globals/theme_settings'
 import {connect} from 'umi'
 import styles from './index.less'
 
-import { SketchPicker } from 'react-color';
+import { onError } from 'core/libs/errorhandler'
 import { theme, getOptimalOpacityFromIMG, get_style_rule_value } from 'core/libs/style' 
 import { urlToBase64, imageToBase64, arrayToObject } from 'core'
 import exportDataAsFile from 'core/libs/interface/export_data'
 
-class BackgroundColor extends React.Component{
-    state = {
-        selected: "#fff"
-    }
-    sendChanges(){
-        this.props.changeColor(this.state.selected)
-    }
-    selectColor = (color) =>{
-        this.setState({selected: color.hex})
-    }
-    render(){
-        return <>
-            <SketchPicker
-              color={this.state.selected}
-              onChangeComplete={this.selectColor}
-            />
-            <antd.Button onClick={() => this.sendChanges()}> Change </antd.Button>
-        </>
-    }
-}
-
-@connect(({ app }) => ({ app }))
-class DarkMode extends React.Component{
-    state = {
-        model: { active: false, autoTime: '' }
+class ThemeConfigurator extends React.Component{
+       
+    componentDidMount(){
+        this.applyStoraged()
     }
     
+    applyStoraged(){
+        const storaged = theme.get()
+        if(storaged && this.state){
+            storaged[this.state.key]? this.setState({ model: storaged[this.state.key]}) : onError.internal_proccess(`"Config key" or "Dispatcher" is missing`)
+        }
+    }
+
+    promiseState = async state => new Promise(resolve => this.setState(state, resolve));
+
     handleUpdate(payload){
+        if(!this.state.key || !this.props.dispatch) {
+            return onError.internal_proccess(`"Config key" or "Dispatcher" is missing`)
+        }
         if (!payload) {
             payload = this.state.model
         }
@@ -45,13 +36,33 @@ class DarkMode extends React.Component{
         this.props.dispatch({
             type: 'app/updateTheme',
             payload: { 
-                key: 'darkmode',
+                key: this.state.key,
                 value: payload
             }
         });
     }
+
+    handleErase(){
+       this.handleUpdate({})
+    }
+
+    handleExport(){
+        exportDataAsFile({data: JSON.stringify(this.state.model), type: 'text/json'})
+    }
+    
+}
+
+@connect(({ app }) => ({ app }))
+class DarkMode extends ThemeConfigurator{
+    constructor(props){
+        super(props),
+        this.state = {
+            key: "darkmode",
+            model: { active: false }
+        }
+
+    }
     render(){
-        const promiseState = async state => new Promise(resolve => this.setState(state, resolve));
         return <>
             <div>
                 <h2><Icons.Moon /> Dark Mode</h2>
@@ -63,8 +74,7 @@ class DarkMode extends React.Component{
                     <antd.Switch 
                         checkedChildren="Enabled"
                         unCheckedChildren="Disabled"
-                        loading={this.state.processing}
-                        onChange={(e) => {promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
+                        onChange={(e) => {this.promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
                         checked={this.state.model.active}
                     />
                 </div>
@@ -76,14 +86,55 @@ class DarkMode extends React.Component{
     }
 }
 
+@connect(({ app }) => ({ app }))
+class Colors extends ThemeConfigurator{
+    constructor(props){
+        super(props),
+        this.state = {
+            key: "darkmode",
+            model: { active: false }
+        }
+
+    }
+    render(){
+        return <>
+            <div>
+                <h2><Icons.Moon /> Dark Mode</h2>
+            </div>
+            <div>
+            <div className={styles.background_image_controls} >
+                <div>
+                    <h4><Icons.Eye />Enabled</h4>
+                    <antd.Switch 
+                        checkedChildren="Enabled"
+                        unCheckedChildren="Disabled"
+                        onChange={(e) => {this.promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
+                        checked={this.state.model.active}
+                    />
+                </div>
+            </div>
+
+            </div>
+
+         </>
+    }
+}
 
 @connect(({ app }) => ({ app }))
-class BackgroundImage extends React.Component{
-    state = {
-        customURL: '',
-        fileURL: null,
-        processing: null,
-        model: { active: false, opacity: null, src: null }
+class BackgroundImage extends ThemeConfigurator{
+    constructor(props){
+        super(props),
+        this.state = {
+            key: "backgroundImage",
+            model: { active: false, opacity: null, src: null },
+    
+            textColor: this.rgbToScheme(getComputedStyle(document.getElementById("app")).color),
+            overlayColor: this.rgbToScheme(getComputedStyle(document.getElementById("app")).backgroundColor),
+    
+            processing: null,
+            customURL: '',
+            fileURL: null,
+        }
     }
 
     handleFileUpload = info => {
@@ -106,28 +157,6 @@ class BackgroundImage extends React.Component{
         })
     }
 
-    handleUpdate(payload){
-        if (!payload) {
-            payload = this.state.model
-        }
-        this.setState({ model: payload, processing: false })
-        this.props.dispatch({
-            type: 'app/updateTheme',
-            payload: { 
-                key: 'backgroundImage',
-                value: payload
-            }
-        });
-    }
-
-    handleErase(){
-       this.handleUpdate({})
-    }
-
-    handleExport(){
-        exportDataAsFile({data: JSON.stringify(this.state.model), type: 'text/json'})
-    }
-
     proccessBackground(data){
         getOptimalOpacityFromIMG({textColor: this.state.textColor, overlayColor: this.state.overlayColor, img: data}, (res) => {
             this.handleUpdate({active: true, src: this.state.fileURL, opacity: res})
@@ -135,7 +164,7 @@ class BackgroundImage extends React.Component{
     }
 
     schemeToRGB(values){
-        const scheme = values || { r: '0', g: '0', b: '0' }
+        const scheme = values? values : { r: '0', g: '0', b: '0' }
         const r = scheme.r || '0'
         const g = scheme.g || '0'
         const b = scheme.b || '0'
@@ -146,27 +175,8 @@ class BackgroundImage extends React.Component{
         const values = rgb.replace(/[^\d,]/g, '').split(',');
         return {r: values[0], g: values[1], b: values[2]}
     }
-    
-    componentDidMount(){
-        const storaged = theme.get()
-
-        if(storaged){
-            this.setState({ model: storaged["backgroundImage"] })
-        }
-
-        let textColor =  this.rgbToScheme(get_style_rule_value('#root', 'color'))
-        let overlayColor = this.rgbToScheme(get_style_rule_value('#root', 'backgroundColor'))
-
-        this.setState({
-            textColor: textColor, 
-            overlayColor: overlayColor
-        })
-    }
-
 
     render(){
-        const promiseState = async state => new Promise(resolve => this.setState(state, resolve));
-
         const PreviewModel = () => {
           return(
             <div>
@@ -200,7 +210,7 @@ class BackgroundImage extends React.Component{
                         checkedChildren="Enabled"
                         unCheckedChildren="Disabled"
                         loading={this.state.processing}
-                        onChange={(e) => {promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
+                        onChange={(e) => {this.promiseState(prevState => ({ model: { ...prevState.model, active: e }})).then(() => this.handleUpdate())}}
                         checked={this.state.model.active}
                     />
                 </div>
@@ -266,30 +276,17 @@ class BackgroundImage extends React.Component{
 @connect(({ app }) => ({ app }))
 export default class ThemeSettings extends React.Component{
     state = {
-        helper_visible: false,
-        helper_fragment: null,
+        helper_fragment: null
     }
-
-    helper = {
-        open: (e) => {
-            this.setState({ helper_visible: true, helper_fragment: e })
-        },
-        close: () => {
-            this.setState({ helper_visible: false, helper_fragment: null })
-        }
-    }
-
 
     render(){
-        const settingClick = { 
-            backgroundImage: () => this.helper.open(<BackgroundImage />), 
-            overlay: () => this.helper.open(<BackgroundColor />) ,
-            darkmode: () => this.helper.open(<DarkMode />)
+        const idToComponent = {
+            backgroundImage: <BackgroundImage />,
+            darkmode: <DarkMode />,
+            color: <Colors />,
         }
-    
-        const isActive = (key) => {
-            return key? key.active : false
-        }
+        const handleClick = (key) => key? this.setState({helper_fragment: idToComponent[key]}) : null
+        const isActive = (key) => { return key? key.active : false }
         return(
             <div>
                 <h2><Icons.Layers/> Theme</h2>
@@ -298,7 +295,7 @@ export default class ThemeSettings extends React.Component{
                   dataSource={themeSettings}
                   renderItem={item => (
                      <div style={{ margin: '10px 0 10px 0' }} >
-                        <antd.Card size="small" bodyStyle={{ width: '100%' }} style={{ display: "flex", flexDirection: "row", margin: 'auto', borderRadius: '12px' }} hoverable onClick={settingClick[item.id]}>
+                        <antd.Card size="small" bodyStyle={{ width: '100%' }} style={{ display: "flex", flexDirection: "row", margin: 'auto', borderRadius: '12px' }} hoverable onClick={() => handleClick(item.id)}>
                             <h3>{item.icon}{item.title} <div style={{ float: "right" }}><antd.Tag color={isActive(arrayToObject(this.props.app.app_theme)[item.id])? "green" : "default"} > {isActive(arrayToObject(this.props.app.app_theme)[item.id])? "Enabled" : "Disabled"} </antd.Tag></div></h3>
                             <p>{item.description}</p>
                         </antd.Card>
@@ -310,8 +307,8 @@ export default class ThemeSettings extends React.Component{
                     placement="right"
                     width="700px"
                     closable={true}
-                    onClose={this.helper.close}
-                    visible={this.state.helper_visible}
+                    onClose={() => this.setState({ helper_fragment: null })}
+                    visible={this.state.helper_fragment? true : false}
                 >
                     <React.Fragment> 
                         {this.state.helper_fragment}

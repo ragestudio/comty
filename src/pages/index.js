@@ -4,6 +4,9 @@ import * as antd from 'antd'
 
 @connect(({ app }) => ({ app }))
 class PageIndex extends React.PureComponent {
+  constructor(props){
+    super(props)
+  }
   state = {
     app_state: null
   }
@@ -39,9 +42,10 @@ class PageIndex extends React.PureComponent {
 
       return map
     }
+  
     return (
       <div>
-        <antd.Card title="APP STATE">
+        <antd.Card theme={window.DarkMode? "dark" : null} title="APP STATE">
           {AppState()}
         </antd.Card>
         

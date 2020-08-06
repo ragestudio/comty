@@ -25,7 +25,6 @@ export let Swapper = {
   }
 }
 
-
 @connect(({ app }) => ({ app }))
 export default class Overlay extends React.PureComponent {
   constructor(props) {

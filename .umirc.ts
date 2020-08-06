@@ -13,6 +13,7 @@ export default defineConfig({
     loading: 'components/Loader/Loader.js',
   },
   dva: { immer: true },
+  antd: {},
   nodeModulesTransform: {
     type: 'none',
   },

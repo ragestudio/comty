@@ -1,31 +1,5 @@
 @import '~theme/index.less';
 
-.primary_layout {
-    background-repeat: repeat-x;
-    background-size: cover;
-    background-position-y: center;
-
-    overflow: hidden;
-    background-color: transparent;
-    margin: auto;
-    height: 100vh;
-    width: 100vw;
-
-    transition: all @__Global_Components_transitions_dur linear;
-  
-    &.mobile{
-      >.primary_layout_container {
-        padding: 0;
-        overflow-y: overlay;
-        overflow-x: hidden;
-        min-width: unset;
-      }
-      .primary_layout_content{
-        padding: 35px 15px 15px 15px;
-      }
-    }
-}
-
 // PRIMARY LAYOUT 
 .primary_layout_container {
   background-color: transparent;

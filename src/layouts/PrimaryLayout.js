@@ -19,10 +19,11 @@ import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
 const { Sider, Control, Overlay } = MyLayout
+const isActive = (key) => { return key? key.active : false }
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
-class PrimaryLayout extends React.PureComponent {
+class PrimaryLayout extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,7 +31,6 @@ class PrimaryLayout extends React.PureComponent {
       isMobile: false,
     },
     window.PrimaryComponent = this;
-
   }
 
   componentDidMount() {
@@ -54,49 +54,53 @@ class PrimaryLayout extends React.PureComponent {
     store.set('collapsed', !fromStore)
   }
 
-  renderThemeComponents() {
-    const currentTheme = theme.get()
-    if (!currentTheme) return false
-    if (currentTheme.backgroundImage) {
-      return currentTheme.backgroundImage.active? <div style={{ 
-        backgroundImage: `url(${currentTheme.backgroundImage.src})`,
-        transition: "all 150ms linear",
-        position: 'absolute',  
-        width: '100vw', 
-        height: '100vh', 
-        backgroundRepeat: "repeat-x",
-        backgroundSize: "cover",
-        backgroundPositionY: "center",
-        overflow: "hidden", 
-        opacity: currentTheme.backgroundImage.opacity
-      }} /> : null
-    }
 
-  }
   render() {
     const { location, dispatch, children } = this.props
     const { collapsed, isMobile } = this.state
     const { onCollapseChange } = this
+    const currentTheme = theme.get()
+    const breakpoint = {
+      xs: '480px',
+      sm: '576px',
+      md: '768px',
+      lg: '992px',
+      xl: '1200px',
+      xxl: '1600px',
+    }
 
     const SiderProps = {
-      breakpoint:{
-        xs: '480px',
-        sm: '576px',
-        md: '768px',
-        lg: '992px',
-        xl: '1200px',
-        xxl: '1600px',
-      },
+      breakpoint,
       isMobile,
       collapsed,
-      onCollapseChange
+      onCollapseChange,
+      theme: isActive(currentTheme["darkmode"])? "dark" : null
     }
+
+    const OverlayProps = {
+      breakpoint,
+      isMobile,
+      theme: isActive(currentTheme["darkmode"])? "dark" : null
+    }
+   
+    window.DarkMode = isActive(currentTheme["darkmode"])? true : false
 
     return (
       <React.Fragment>
         <Control />
-          {this.renderThemeComponents()}
-          <antd.Layout id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
+          {isActive(currentTheme['backgroundImage'])? <div style={{ 
+                  backgroundImage: `url(${currentTheme.backgroundImage.src})`,
+                  transition: "all 150ms linear",
+                  position: 'absolute',  
+                  width: '100vw', 
+                  height: '100vh', 
+                  backgroundRepeat: "repeat-x",
+                  backgroundSize: "cover",
+                  backgroundPositionY: "center",
+                  overflow: "hidden", 
+                  opacity: currentTheme.backgroundImage.opacity
+                }} /> : null}
+          <antd.Layout id="app" className={isActive(currentTheme['darkmode'])? "dark_mode" : null }>
             <Sider {...SiderProps} />
             <div className={styles.primary_layout_container}>
               <PageTransition
@@ -111,7 +115,7 @@ class PrimaryLayout extends React.PureComponent {
                 </Content>
               </PageTransition>
             </div>
-            <Overlay />
+            <Overlay {...OverlayProps} />
           </antd.Layout>
       </React.Fragment>
     )

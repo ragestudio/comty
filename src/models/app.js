@@ -31,7 +31,6 @@ export default {
     app_theme: store.get(app_config.appTheme_container) || [],
     notifications: [],
     locationQuery: {},
-    
   },
   subscriptions: {
     setup({ dispatch }) {
@@ -116,24 +115,28 @@ export default {
       });
     },
     *updateTheme({payload}, {put, select}){
-      if (!payload) return false;
-      let container = yield select(state => state.app.app_theme);
-      let container_2 = []
+      if (!payload) return false
+      let container = yield select(state => state.app.app_theme)
+      let style_keys = []
+      let tmp = []
+  
+      container.forEach((e)=>{style_keys[e.key] = e.value})
 
-      const containerlength = Object.entries(container).length
-
-      if (container && containerlength > 1) {
-        container.forEach(e =>{
-          let tmp = {key: e.key}
-          e.key === payload.key? (tmp.value = payload.value) : (tmp.value = e.value)
-          container_2.push(tmp)
-        })
-    
-      }else{
-        container_2 = [payload]
+      if(!style_keys[payload.key]){
+        tmp.push({key: payload.key, value: payload.value})
       }
+      container.forEach((e) => {
+        let obj = {}
+        if(e.key === payload.key){
+          obj = { key: payload.key, value: payload.value }
+        }else{
+          obj = { key: e.key, value: e.value }
+        }
+        tmp.push(obj)
+      })
 
-      return container_2? yield put({ type: 'handleUpdateTheme', payload: container_2 }) : null
+
+      return tmp? yield put({ type: 'handleUpdateTheme', payload: tmp }) : null
     },
   },
   reducers: {

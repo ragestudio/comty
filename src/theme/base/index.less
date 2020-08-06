@@ -11,8 +11,9 @@
 @import './components/Menssaging.less';
 @import './components/PostCard.less';
 
-@AppTheme_global_color: rgb(51, 51, 51);
 @AppTheme_global_color_accent: rgb(162, 162, 162);
+
+@AppTheme_global_color: rgb(51, 51, 51);
 @AppTheme_global_background: rgb(248, 246, 248);
 
 @AppTheme_global_color_dark: rgb(162, 162, 162);
@@ -71,11 +72,45 @@
     background-color: transparent;
 }
 
-#root {
+#app {
   overflow: hidden;
   color: @AppTheme_global_color!important;
   background-color: @AppTheme_global_background!important;
-  --accent_color: @AppTheme_global_color_accent;
+  background-repeat: repeat-x;
+  background-size: cover;
+  background-position-y: center;
+
+  overflow: hidden;
+  background-color: transparent;
+  margin: auto;
+  height: 100vh;
+  width: 100vw;
+
+  transition: all @__Global_Components_transitions_dur linear;
+  
+  &.dark_mode{
+    color: @AppTheme_global_color_dark!important;
+    background-color: @AppTheme_global_background_dark!important;
+    
+    :global{
+      .ant-card{
+        background: @AppTheme_global_background_dark!important;
+      }
+    }
+  }
+
+  &.mobile{
+    >.primary_layout_container {
+      padding: 0;
+      overflow-y: overlay;
+      overflow-x: hidden;
+      min-width: unset;
+    }
+    .primary_layout_content{
+      padding: 35px 15px 15px 15px;
+    }
+  }
+
 }
 
 body {
@@ -88,8 +123,6 @@ body {
   line-height: @base-line-height;
 
   font-family: @__Global_texted_font;
- 
-
  
 }
 
