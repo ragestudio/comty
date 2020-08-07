@@ -70,7 +70,7 @@ export default class themedebug extends React.PureComponent {
                         <h2 style={{ position: 'absolute', zIndex: '10', color: this.schemeToRGB(this.state.textColor) }}>Sample text</h2>
                         <img style={{ position: 'absolute',opacity: this.state.optimal,  zIndex: '9', width: '500px' }} src={this.state.fileURL} />
                     </div>
-            
+              
 
                
             </div>

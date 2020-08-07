@@ -1,4 +1,7 @@
-@import './antd-design.less';
+// @import '../../../node_modules/antd/lib/style/themes/dark.less';
+// @import '../../../node_modules/antd/dist/antd.dark.css';
+@import '../../../node_modules/antd/lib/style/themes/dark.less';
+
 @import './vars.less';
 @import './fonts-import.css';
 
@@ -10,44 +13,6 @@
 
 @import './components/Menssaging.less';
 @import './components/PostCard.less';
-
-@AppTheme_global_color_accent: rgb(162, 162, 162);
-
-@AppTheme_global_color: rgb(51, 51, 51);
-@AppTheme_global_background: rgb(248, 246, 248);
-
-@AppTheme_global_color_dark: rgb(162, 162, 162);
-@AppTheme_global_background_dark: rgb(51, 51, 51);
-
-@__Global_general_font_family: "Poppins", sans-serif;
-@__Global_texted_font: "Manrope", sans-serif;
-@__Global_alternative_font: "Netflix Sans", sans-serif;
-
-@__Global_layout_backgroud: #F8F6F8;
-@__Global_layout_color: #2d2d2d;
-@__Global_layout_border-rd: 27px 0 0 0;
-@__Global_layout_transitions-dur: 200ms; 
-@__Global_Components_transitions_dur: 150ms;
-
-@__Global_SwapAnimDuration: 170ms;
-@__Global_backdrop_backgroud: rgba(158, 158, 158, 0.5);
-
-@app_accent_gradient: linear-gradient(90deg, rgba(237,111,86,1) 0%, rgba(234,89,89,1) 100%);
-
-@transition-ease-in: all 0.3s ease-out;
-@transition-ease-out: all 0.3s ease-out;
-@transition-ease-inout: all 150ms ease-in-out;
-
-
-@Overlay_wrapper_hidden_width: 22vw;
-@Overlay_wrapper_showFull_width: 94.2%;
-@Overlay_wrapper_showHalf_width: 35vw;
-
-
-@Overlay_container_1_btn_backgroud: #4c4c4c;
-@Overlay_container_1_btn_color: #fff;
-@Overlay_container_1_btn_shadow: 0px 0px 10px 0px rgba(255, 255, 255, 0.205);
-
 
 ::-webkit-scrollbar {
     position: absolute;
@@ -87,11 +52,11 @@
   width: 100vw;
 
   transition: all @__Global_Components_transitions_dur linear;
-  
+
   &.dark_mode{
     color: @AppTheme_global_color_dark!important;
     background-color: @AppTheme_global_background_dark!important;
-    
+
     :global{
       .ant-card{
         background: @AppTheme_global_background_dark!important;
@@ -123,7 +88,7 @@ body {
   line-height: @base-line-height;
 
   font-family: @__Global_texted_font;
- 
+
 }
 
 @media (max-width: @bp-small){
@@ -145,10 +110,35 @@ body {
 }
 
 @media (min-width: @bp-xxlarge) {
- 
+
 }
 
 
 
 
 
+.text-overflow {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.text-gradient {
+  background-image: -webkit-gradient(
+    linear,
+    37.219838% 34.532506%,
+    36.425669% 93.178216%,
+    from(#29cdff),
+    to(#0a60ff),
+    color-stop(0.37, #148eff)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.background-hover {
+  transition: @transition-ease-in;
+  &:hover {
+    background-color: @hover-color;
+  }
+}
