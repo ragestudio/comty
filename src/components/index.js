@@ -2,7 +2,6 @@
 
 // Helpers & Misc
 import Players from './Players'
-export * as Icons from './Icons'
 import Loader from './Loader/Loader.js'
 import App_about from './App_about'
 import * as Feather from 'feather-reactjs'
@@ -22,6 +21,7 @@ import PostCard from './PostCard'
 import Like_button from './Like_button'
 import MainFeed from './MainFeed'
 import PostCreator from './PostCreator'
+export * as Icons from './Icons'
 
 // Mix & Export all
 export {

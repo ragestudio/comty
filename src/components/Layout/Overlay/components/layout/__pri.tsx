@@ -11,12 +11,12 @@ export interface __pri_props {
     isMobile: boolean;
     functs: any;
     render: any;
-    type: any; 
+    type: any;
 }
 
 const isOpen = (props: __pri_props) => {
     const t_full = props.type === 'full_open'? true : false
-    const t_half = props.type === 'half'? true: false 
+    const t_half = props.type === 'half'? true: false
     if (t_full || t_half ) {
         return true
     }
@@ -37,7 +37,7 @@ const renderExit = (props: __pri_props) => {
 const __pri = (props: __pri_props) => {
     const { render, type, isMobile } = props
     const t_full = type == 'full_open'? true : false
-    const t_half = type == 'half'? true : false 
+    const t_half = type == 'half'? true : false
 
     
     return (

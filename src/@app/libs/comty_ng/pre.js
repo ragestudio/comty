@@ -1,6 +1,11 @@
 import { token_data } from 'app'
 import * as Icons from 'components/Icons'
 
+import * as app from 'app'
+import * as antd from 'antd'
+import io from 'socket.io-client'
+import config from 'config'
+
 export * from './comty_post.js'
 export * from './comty_user.js'
 export * from './comty_post_comment.js'
@@ -60,11 +65,6 @@ export const GetPostPrivacy = {
   },
 
 }
-
-import * as app from 'app'
-import * as antd from 'antd'
-import io from 'socket.io-client'
-import config from 'config'
 
 const prefix = '[Yulio Sync]'
 var endpoint = config.sync_server;
