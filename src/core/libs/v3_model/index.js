@@ -1,12 +1,9 @@
 import { lib, v3_request } from 'api';
 import endpoints_list from 'config/endpoints';
 import { app_config } from 'config';
-import * as core from 'core'
-import { connect } from 'dva';
 
 const { api_prefix } = app_config;
 const { uri_resolver } = lib;
-
 
 async function compileURI(e, callback) {
   const resolvers = await uri_resolver();
@@ -15,7 +12,6 @@ async function compileURI(e, callback) {
   let final = null;
   let url;
   let method;
-
   const endpointSplit = e.split(' ');
   if (endpointSplit.length === 2) {
     method = endpointSplit[0];

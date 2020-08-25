@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 import {withRouter, connect} from 'umi'
 import {
   MyLayout,
-  PageTransition,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
@@ -103,17 +102,13 @@ class PrimaryLayout extends React.Component {
           <antd.Layout id="app" className={isActive(currentTheme['darkmode'])? "dark_mode" : null }>
             <Sider {...SiderProps} />
             <div className={styles.primary_layout_container}>
-              <PageTransition
-                preset="moveToRightScaleUp"
-                transitionKey={location.pathname}
-              >
+           
                 <Content
                   id="primaryContent"
                   className={styles.primary_layout_content}
                 >
                   {children? children : null}
                 </Content>
-              </PageTransition>
             </div>
             <Overlay {...OverlayProps} />
           </antd.Layout>

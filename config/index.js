@@ -40,7 +40,7 @@ module.exports = {
       include: [/.*/]
     }
   ],
-
+  
   // Default Behaviors 
   defaults: {
         verbosity: false,
@@ -50,14 +50,16 @@ module.exports = {
         render_pagetransition_preset: 'moveToRightScaleUp',
 
         feed_autorefresh: false,
+  },
 
-        post_maxlenght: '512',
-        post_catchlimit: '20',
-        post_hidebar: true,
+  stricts: {
+    post_maxlenght: '512',
+    post_catchlimit: '20',
+    post_hidebar: true,
 
-        // In KB
-        api_maxpayload: '101376',
-        api_maxovertick: 10,
+    // In KB
+    api_maxpayload: '101376',
+    api_maxovertick: 10,
   }
   
 };

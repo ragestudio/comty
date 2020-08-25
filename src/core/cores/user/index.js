@@ -7,21 +7,28 @@ const set = {
   },
 };
 
-const get = {
-  data: parms => {
+export const get = {
+  data: (parms, callback) => {
     if (!parms) return false;
-    const { id, type } = parms;
+    const { id, access_token, serverKey, fetch } = parms;
 
-    if (!id) {
+    let req = {
+      fetch: fetch? fetch : 'user_data'
+    }
+
+    if (!id || !access_token) {
       // core get id data from current session
     }
     v3_model.api_request(
       {
+        body: {user_id: id, fetch: req.fetch},
+        serverKey: serverKey,
+        userToken: access_token,
         endpoint: endpoints.get_data,
         verbose: true,
       },
       (err, res) => {
-        console.log(err, res);
+       return callback(err, res)
       },
     );
   },
@@ -33,17 +40,32 @@ const get = {
       // core get id data from current session
     }
   },
-  profileData: parms => {
-    if (!parms) return false;
-    const { id } = parms;
+  profileData: (parms, callback) => {
+    if (!parms) return false
 
-    if (!id) {
-      // core get id data from current session
+    const { username } = parms
+  
+    if (username) {
+      v3_model.api_request(
+        {
+          body: { username },
+          endpoint: endpoints.profileData,
+          verbose: true,
+        },
+        (err, res) => {
+          err? console.error(err) : null
+          return callback(false, res);
+        },
+      );
+  
+    } else {
+      const res = { status: 105, message: 'Invalid Username!' };
+      return callback(res, false);
     }
   },
 };
 
-const actions = {
+export const actions = {
   block: parms => {
     if (!parms) return false;
     const { id, toID } = parms;
@@ -58,8 +80,3 @@ const actions = {
   },
 };
 
-export {
-  //set
-  get,
-  actions,
-};

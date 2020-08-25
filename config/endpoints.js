@@ -4,4 +4,5 @@ export default {
   logout: 'POST /logout',
 
   get_data: 'POST /get-user-data',
+  profileData: 'POST /early_user'
 };

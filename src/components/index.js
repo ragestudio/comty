@@ -15,6 +15,7 @@ import UserBadges from './UserBadges'
 
 // Post Components
 import MediaPlayer from './MediaPlayer'
+import PostCreator from './PostCreator'
 
 // Mix & Export all
 export {
@@ -25,5 +26,6 @@ export {
   UserBadges,
   PageTransition,
   MyLayout,
-  Loader
+  Loader,
+  PostCreator
 }

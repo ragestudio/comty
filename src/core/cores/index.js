@@ -1,3 +1,6 @@
-export * from './session';
-export * from './user';
 export * from './router'
+
+import * as user from './user'
+import * as session from './session'
+
+export { user, session }

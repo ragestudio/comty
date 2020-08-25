@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'umi';
 import * as antd from 'antd'
+import * as Icons from 'components/Icons'
 
 @connect(({ app }) => ({ app }))
 class PageIndex extends React.PureComponent {
@@ -37,7 +38,13 @@ class PageIndex extends React.PureComponent {
       }
      
       const map = tmp.map(e => {
-      return(<div style={{ margin: '20px 50px 20px 10px' }} key={e.key} > <h4>{e.key}</h4><span>{JSON.stringify(e.value)}</span> </div>)
+        const v = JSON.stringify(e.value)
+        return(
+          <div style={{ margin: '20px 50px 20px 10px' }} key={e.key} > 
+            <h4>{e.key}</h4>
+            {v.length < 500? <span>{v}</span> : <antd.Collapse ><antd.Collapse.Panel header={`Hidden text ( ${v.length} Characters )`}><span>{v}</span></antd.Collapse.Panel></antd.Collapse>}
+          </div>
+        )
       })
 
       return map
@@ -45,7 +52,7 @@ class PageIndex extends React.PureComponent {
   
     return (
       <div>
-        <antd.Card theme={window.DarkMode? "dark" : null} title="APP STATE">
+        <antd.Card style={{ wordBreak: 'break-all' }} title={<><Icons.Redux style={{ height: '19px', marginRight: '7px' }} /> Redux state</>}>
           {AppState()}
         </antd.Card>
         

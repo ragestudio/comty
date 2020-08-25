@@ -11,18 +11,18 @@ import { history } from 'umi';
  * Specify the paths of the files, in this case it is pointing to the root
  */
 export const router = {
-  go: e => {
-    goTo.element('primaryContent');
-    router.push(e);
-  },
   push: e => {
     history.push({
       pathname: `${e}`,
     });
   },
-  goprofile: () => {
+  go: e => {
+    router.push(e);
     goTo.element('primaryContent');
+  },
+  goprofile: () => {
     router.push(`/@${e}`);
+    goTo.element('primaryContent');
   },
 };
 

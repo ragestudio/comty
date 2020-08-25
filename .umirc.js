@@ -1,25 +1,7 @@
 import { defineConfig } from 'umi';
 
-const Path = require('path');
 const { resolve } = require('path');
-const themePth = require('./src/theme/index.js')
-const lessToJs = require('less-vars-to-js');
-const fs = require('fs');
 
-const AntDesignThemePlugin = require('antd-theme-webpack-plugin');
- 
-const options = {
-  antDir: Path.join(__dirname, './node_modules/antd'),
-  stylesDir: Path.join(__dirname, './src/styles'),
-  varFile: Path.join(__dirname, './src/styles/variables.less'),
-  themeVariables: ['@primary-color'],
-  indexFileName: 'index.html'
-}
- 
-const themePlugin = new AntDesignThemePlugin(options);
-
-
-const convToVars = file => lessToJs(fs.readFileSync(Path.join(__dirname, file), 'utf8'))
 export default defineConfig({
   hash: false,
   ignoreMomentLocale: true,
@@ -33,7 +15,7 @@ export default defineConfig({
   },
   alias: {
     antd: resolve(__dirname, './node_modules/antd'),
-    api: resolve(__dirname, './node_modules/@ragestudio/ycorejs-lib'),
+    api: resolve(__dirname, './node_modules/@ragestudio/ycorejs-lib'), // ./api
     globals: resolve(__dirname, './globals'),
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),

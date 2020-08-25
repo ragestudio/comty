@@ -1,5 +1,5 @@
 import React from 'react';
-import { request } from '@ragestudio/ycorejs-lib';
+import { request } from 'api';
 import {
   Row,
   Col,

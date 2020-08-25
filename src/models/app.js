@@ -3,10 +3,9 @@ import store from 'store';
 import { pathMatchRegexp, queryLayout } from 'core';
 import { app_config } from 'config';
 import keys from 'config/app_keys';
-import * as core from 'core';
-import { session } from 'core/cores';
+import { router } from 'core/cores';
 import verbosity from 'core/libs/verbosity'
-import { theme } from 'core/libs/style'
+import { notify } from 'core/libs/interface/notify'
 
 export default {
   namespace: 'app',
@@ -17,7 +16,7 @@ export default {
     ng_services: false,
     session_valid: false,
 
-    session_token: null,
+    session_token: sessionStorage.getItem('session'),
     session_data: null,
     session_uuid: null,
 
@@ -63,30 +62,31 @@ export default {
   effects: {
     *query({ payload }, { call, put, select }) {
       const service = yield select(state => state.app.service_valid);
+      const session = yield select(state => state.app.session_valid);
+
+      yield put({ type: 'updateFrames' })
+
       if (!service) {
         console.error('❌ Cannot connect with validate session service!');
-        return yield put({
-          type: 'updateState',
-          payload: { service_valid: false },
-        });
       }
 
-      if (session) {
-        if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-          app.router.push({ pathname: `${app_config.MainPath}` });
-        }
 
-        return true;
-      } else if (
-        !pathMatchRegexp(['', '/login'], window.location.pathname) &&
-        queryLayout(config.layouts, window.location.pathname) !== 'public'
-      ) {
-        if (validBackup == true) {
-          // logout normal
-        } else {
-          core.router.push({ pathname: '/login' });
-        }
-      }
+      // if (session) {
+      //   if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
+      //     app.router.push({ pathname: `${app_config.MainPath}` });
+      //   }
+
+      //   return true;
+      // } else if (
+      //   !pathMatchRegexp(['', '/login'], window.location.pathname) &&
+      //   queryLayout(config.layouts, window.location.pathname) !== 'public'
+      // ) {
+      //   if (validBackup == true) {
+      //     // logout normal
+      //   } else {
+      //     core.router.push({ pathname: '/login' });
+      //   }
+      // }
     },
     *update({ payload }, { call, put, select }) {
       const session = yield select(state => state.app.session_valid);
@@ -105,14 +105,10 @@ export default {
     },
     *login({ payload }, { call, put, select }) {
       if (!payload) return false;
-      const serverKey = yield select(state => state.app.server_key);
-      const requestPayload = { username: payload.username, password: payload.password, server_key: serverKey }
-      session.auth(requestPayload, (err, res) => {
-        if (err) {
-          const { status, message } = err;
-          return console.log(status, message);
-        }
-      });
+      
+      const { user_id, access_token } = payload.authFrame
+  
+      return yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
     },
     *updateTheme({payload}, {put, select}){
       if (!payload) return false
@@ -145,6 +141,40 @@ export default {
         ...state,
         ...payload,
       };
+    },
+    updateFrames(state) {
+      let sessionAuthframe = sessionStorage.getItem('session')
+      let sessionDataframe = sessionStorage.getItem('data')
+      
+      try {
+        if (sessionAuthframe) {
+          sessionAuthframe = JSON.parse(atob(sessionAuthframe))
+        }  
+        if (sessionDataframe) {
+          sessionDataframe = JSON.parse(atob(sessionDataframe))
+        } 
+
+        state.session_token = sessionAuthframe.session_token,
+        state.session_uuid = sessionAuthframe.session_uuid
+        state.session_data = sessionDataframe
+      } catch (error) {
+        verbosity.error(error)
+      }
+    },
+    handleLogin(state, { payload }){
+      if (!payload) return false
+
+      state.session_token = payload.access_token
+      state.session_uuid = payload.user_id
+      state.session_data = payload.user_data
+
+      const sessionAuthframe = btoa(JSON.stringify({session_token: payload.access_token, session_uuid: payload.user_id}))
+      const sessionDataframe = btoa(payload.user_data)
+
+      sessionStorage.setItem('session', sessionAuthframe)
+      sessionStorage.setItem('data', sessionDataframe)
+      notify.success('Login done!')
+      router.push('/')
     },
 
     handleThemeChange(state, { payload }) {
