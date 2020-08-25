@@ -15,7 +15,7 @@ export interface overlay_primary_props {
 }
 
 
-const renderExit = ( 
+const renderExit = (
     <div className={styles.exit_button}>
     <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
     </div>
