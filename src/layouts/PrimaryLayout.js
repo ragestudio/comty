@@ -53,7 +53,6 @@ class PrimaryLayout extends React.Component {
     store.set('collapsed', !fromStore)
   }
 
-
   render() {
     const { location, dispatch, children } = this.props
     const { collapsed, isMobile } = this.state
@@ -85,7 +84,7 @@ class PrimaryLayout extends React.Component {
     window.DarkMode = isActive(currentTheme["darkmode"])? true : false
 
     return (
-      <React.Fragment>
+      <React.Fragment >
         <Control />
           {isActive(currentTheme['backgroundImage'])? <div style={{ 
                   backgroundImage: `url(${currentTheme.backgroundImage.src})`,
@@ -99,10 +98,9 @@ class PrimaryLayout extends React.Component {
                   overflow: "hidden", 
                   opacity: currentTheme.backgroundImage.opacity
                 }} /> : null}
-          <antd.Layout id="app" className={isActive(currentTheme['darkmode'])? "dark_mode" : null }>
+          <antd.Layout id="app" style={this.props.app.electron? { paddingTop: "35px", marginBottom: "12px", borderRadius: "12px" } : null} className={isActive(currentTheme['darkmode'])? "dark_mode" : null }>
             <Sider {...SiderProps} />
             <div className={styles.primary_layout_container}>
-           
                 <Content
                   id="primaryContent"
                   className={styles.primary_layout_content}

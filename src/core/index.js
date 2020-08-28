@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash';
 import store from 'store';
 import { i18n, app_config } from 'config';
 import * as errorHandlers from 'core/libs/errorhandler'
+import platform from 'platform'
 
 const { pathToRegexp } = require('path-to-regexp');
 
@@ -23,6 +24,8 @@ export const app_info = {
   version: package_json.version,
   logo: app_config.FullLogoPath,
   logo_dark: app_config.DarkFullLogoPath,
+  os: platform.os,
+  layout: platform.layout
 };
 
 export function imageToBase64(img, callback){

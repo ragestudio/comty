@@ -1,15 +1,19 @@
 import { defineConfig } from 'umi';
+import slash from 'slash';
 
-const { resolve } = require('path');
+const { resolve, join } = require('path');
 
 export default defineConfig({
   hash: false,
-  ignoreMomentLocale: true,
+   dynamicImport: {
+     loading: 'components/Loader/Loader.js',
+   },
+  // dynamicImport: false,
+  // history: { type: "hash" },
+
   targets: { ie: 9 },
-  dynamicImport: {
-    loading: 'components/Loader/Loader.js',
-  },
   dva: { immer: true },
+  ignoreMomentLocale: true,
   nodeModulesTransform: {
     type: 'none',
   },
@@ -23,6 +27,7 @@ export default defineConfig({
     components: resolve(__dirname, './src/components'),
     models: resolve(__dirname, './src/models'),
     routes: resolve(__dirname, './src/routes'),
+    node_modules: resolve(__dirname, './node_modules')
   },
   extraBabelPlugins: [
     [
@@ -35,6 +40,28 @@ export default defineConfig({
       'lodash',
     ],
   ],
+  // externals(context, request, callback) {
+  //   const isDev = process.env.NODE_ENV === 'development';
+  //   let isExternal = false;
+  //   const load = [
+  //     'electron',
+  //     'fs',
+  //     'path',
+  //     'os',
+  //     'child_process'
+  //   ];
+  //   if (load.includes(request)) {
+  //     isExternal = `require("${request}")`;
+  //   }
+  //   const appDeps = Object.keys(require('./package.json').dependencies);
+  //   if (appDeps.includes(request)) {
+  //     const orininalPath = slash(join(__dirname, 'node_modules', request));
+  //     const requireAbsolute = `require('${orininalPath}')`;
+  //     console.log(isDev)
+  //     isExternal = isDev ? requireAbsolute : `require('${request}')`;
+  //   }
+  //   callback(null, isExternal);
+  // },
   // plugins: [themePlugin],
   // chainWebpack: function(config, { webpack }) {
   //   config.module

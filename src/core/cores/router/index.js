@@ -18,11 +18,11 @@ export const router = {
   },
   go: e => {
     router.push(e);
-    goTo.element('primaryContent');
+    // goTo.element('primaryContent');
   },
   goprofile: () => {
     router.push(`/@${e}`);
-    goTo.element('primaryContent');
+    // goTo.element('primaryContent');
   },
 };
 

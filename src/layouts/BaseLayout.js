@@ -5,6 +5,7 @@ import { Loader } from 'components'
 import NProgress from 'nprogress'
 import { withRouter, connect } from 'umi'
 import { queryLayout } from 'core'
+import WindowNavbar from 'components/Layout/WindowNavbar'
 import config from 'config'
 
 import PrimaryLayout from './PrimaryLayout'
@@ -43,6 +44,7 @@ class BaseLayout extends React.Component {
         <Helmet>
           <title>{config.app_config.siteName}</title>
         </Helmet>
+        {this.props.app.electron? <WindowNavbar /> : null}
         {Loader(this.renderLoading)}
         <Container>{children}</Container>
       </React.Fragment>

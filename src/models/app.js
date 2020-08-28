@@ -26,13 +26,20 @@ export default {
     controlActive: false,
     feedOutdated: false,
 
+    electron: null,
     app_settings: store.get(app_config.app_settings_storage),
     app_theme: store.get(app_config.appTheme_container) || [],
     notifications: [],
-    locationQuery: {},
   },
   subscriptions: {
     setup({ dispatch }) {
+      try {
+        const electron = window.require("electron")
+        dispatch({ type: 'updateState', payload: { electron: electron } });
+        console.log('ELECTRON INTERFACED')
+      } catch (error) {
+        console.log('Normal interface')
+      }
       dispatch({ type: 'query' });
     },
     setupHistory({ dispatch, history }) {
@@ -143,10 +150,10 @@ export default {
       };
     },
     updateFrames(state) {
-      let sessionAuthframe = sessionStorage.getItem('session')
-      let sessionDataframe = sessionStorage.getItem('data')
-      
       try {
+        let sessionAuthframe = sessionStorage.getItem('session')
+        let sessionDataframe = sessionStorage.getItem('data')
+        
         if (sessionAuthframe) {
           sessionAuthframe = JSON.parse(atob(sessionAuthframe))
         }  

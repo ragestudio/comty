@@ -38,7 +38,10 @@
 }
 
 #app {
+  -webkit-app-region: no-drag;
   overflow: hidden;
+  border-radius: 12px;
+
   color: @AppTheme_global_color!important;
   background-color: @AppTheme_global_background!important;
   background-repeat: repeat-x;
@@ -48,7 +51,7 @@
   overflow: hidden;
   background-color: transparent;
   margin: auto;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
 
   transition: all @__Global_Components_transitions_dur linear;
@@ -79,6 +82,8 @@
 }
 
 body {
+  -webkit-app-region: no-drag;
+
   scroll-behavior: smooth;
   height: 100%;
 
@@ -88,7 +93,7 @@ body {
   line-height: @base-line-height;
 
   font-family: @__Global_texted_font;
-
+  border-radius: 12px;
 }
 
 @media (max-width: @bp-small){
@@ -112,10 +117,6 @@ body {
 @media (min-width: @bp-xxlarge) {
 
 }
-
-
-
-
 
 .text-overflow {
   white-space: nowrap;

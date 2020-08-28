@@ -1,0 +1,97 @@
+body {
+    background-color: transparent;
+    border-radius: 12px;
+    resize: none;
+    font-family: 'Alata', sans-serif;
+}
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    flex-direction: column;
+    background-color: #222222;
+    color: #efefef;
+    border-radius: 12px;
+    text-align: center;
+    padding: 20px;
+}
+.bouncy-logo {
+    width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .bouncy-logo .ball img {
+    position: absolute;
+    height: 200px;
+    width: 200px;
+    top: 0;
+    left: 43%;
+    transform: translate(-50%, 0);
+    -webkit-animation-direction: alternate;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-name: my-bounce;
+    -webkit-animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 1s;
+    animation-name: my-bounce;
+    animation-iteration-count: infinite;
+  }
+  .bouncy-logo .ball-shadow {
+    background: radial-gradient(50% 50%, #ccc 0%, transparent 100%);
+    height: 50px;
+    width: 200px;
+    position: absolute;
+    top: 230px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    -webkit-animation-direction: alternate;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-name: my-grow;
+    -webkit-animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 1s;
+    animation-name: my-grow;
+    animation-iteration-count: infinite;
+  }
+  
+  @-webkit-keyframes my-grow {
+    from {
+      width: 200px;
+      height: 50px;
+      top: 230px;
+    }
+    to {
+      width: 150px;
+      height: 10px;
+      top: 240px;
+    }
+  }
+  @keyframes my-grow {
+    from {
+      width: 200px;
+      height: 50px;
+      top: 230px;
+    }
+    to {
+      width: 150px;
+      height: 10px;
+      top: 240px;
+    }
+  }
+  @-webkit-keyframes my-bounce {
+    from {
+      top: 0;
+    }
+    to {
+      top: 10%;
+    }
+  }
+  @keyframes my-bounce {
+    from {
+      top: 0;
+    }
+    to {
+      top: 10%;
+    }
+  }
