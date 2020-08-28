@@ -11,12 +11,12 @@ export interface __sec_props {
     isMobile: boolean;
     functs: any;
     render: any;
-    type: any; 
+    type: any;
 }
 
 const isOpen = (props: __sec_props) => {
     const t_full = props.type === 'full_open'? true : false
-    const t_def = props.type === 'active'? true: false 
+    const t_def = props.type === 'active'? true: false
     if (t_full || t_def ) {
         return true
     }
@@ -36,7 +36,7 @@ const renderExit = (props: __sec_props) => {
 const __sec = (props: __sec_props) => {
     const { render, getRef, y, type, isMobile } = props
     const t_full = type == 'full_open'? true : false
-    const t_def = type == 'active'? true: false 
+    const t_def = type == 'active'? true: false
     return (
         <div
             id="Overlay_layout__sec"
