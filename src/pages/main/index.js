@@ -1,15 +1,13 @@
-import React from 'react'
-import * as app from 'app'
-import { PostCreator, MainFeed } from 'components'
-import styles from './index.less'
+import React from 'react';
+import { PostCreator, MainFeed } from 'components';
 
 export default class Main extends React.Component {
   render() {
     return (
       <>
-        <PostCreator userData={app.userData()} />
+        <PostCreator />
         <MainFeed auto={true} get="feed" />
       </>
-    )
+    );
   }
 }

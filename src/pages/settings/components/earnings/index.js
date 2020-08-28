@@ -1,5 +1,4 @@
 import React from 'react'
-import * as app from 'app'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 
@@ -7,18 +6,18 @@ import * as Icons from 'components/Icons'
 export default class Earnings extends React.Component {
   state = {
     loading: true,
-
+    pro_points: 0
   }
   componentDidMount(){
-    app.comty_data.get_user_data((err,res)=>{
-      if (err) return false
-      try {
-        const a = JSON.parse(res)['user_data']
-        this.setState({ loading: false, pro_points: a.points })
-      } catch (error) {
+    // app.comty_data.get_user_data((err,res)=>{
+    //   if (err) return false
+    //   try {
+    //     const a = JSON.parse(res)['user_data']
+    //     this.setState({ loading: false, pro_points: a.points })
+    //   } catch (error) {
         
-      }
-    })
+    //   }
+    // })
     
   }
   render() {

@@ -1,5 +1,4 @@
 import React from 'react'
-import * as app from 'app'
 import * as antd from 'antd'
 
 export default class Sessions_Manager extends React.Component {
@@ -7,13 +6,13 @@ export default class Sessions_Manager extends React.Component {
     sessions_data: '',
   }
   componentDidMount() {
-    app.comty_data.session_id((err, res) => {
-      this.setState({ sid: res })
-    })
-    app.comty_data.sessions((err, res) => {
-      const a = JSON.parse(res)['data']
-      this.setState({ sessions_data: a })
-    })
+    // app.comty_data.session_id((err, res) => {
+    //   this.setState({ sid: res })
+    // })
+    // app.comty_data.sessions((err, res) => {
+    //   const a = JSON.parse(res)['data']
+    //   this.setState({ sessions_data: a })
+    // })
   }
   render() {
     return (

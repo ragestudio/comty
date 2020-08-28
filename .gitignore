@@ -1,25 +1,16 @@
-coverage
-dist
-node_modules
-npm-debug.log
-yarn-error.log
-yarn.lock
-package-lock.json
+# dependencies
+/node_modules
+/npm-debug.log*
+/yarn-error.log
+/yarn.lock
+/package-lock.json
 
-# ide
-.idea
-
-# Mac General
-.DS_Store
-.AppleDouble
-.LSOverride
+# production
+/dist
 
 # umi
-.umi
-.umi-production
+/src/.umi
+/src/.umi-production
+/src/.umi-test
+/.env.local
 
-# jslingui
-src/locales/_build
-src/locales/**/*.js
-android/
-auxCord

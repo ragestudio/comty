@@ -1,4 +1,4 @@
-@import '~themes/index.less';
+@import '~theme/index.less';
 
 .render_component {
   width: 100%;
@@ -19,19 +19,6 @@
     line-height: 15px;
   }
 }
-
-.mobile_drag{
-  width: 100%;
-  height: auto;
-  .inner_drag{
-    height: 6px;
-    margin: auto;
-    width: 20%;
-    background-color: #2d2d2d;
-    border-radius: 12px;
-  }
-}
-
 
 .exit_button{
   position: relative;
@@ -74,12 +61,11 @@
   &.expand{
     max-width: calc(100% + 150px);
   }
-  
 
   transition: all @__Global_SwapAnimDuration ease-in-out;
 }
 
-.Overlay_container_1 {
+.overlay_primary_wrapper {
   height: 100%;
   width: 100%;
 
@@ -99,56 +85,26 @@
 
   color: @Overlay_container1_def_color;
 
+  .renderBody{
+    height: 100%;
+    width: 100%;
+    > div {
+      margin-bottom: 35px;
+    }
+  }
+
   &.half {
     background-color: #2d2d2d;
     color: @Overlay_container1_active_color;
     max-width: calc(100% + 150px);
   }
 
-  &.full_open {
+  &.full{
     max-width: none;
     background-color: transparent;
     position: absolute;
     width: 100vw;
     height: 100vh;
-  }
-
-  &.mobile {
-    min-width: unset;
-    max-width: unset;
-
-    width: 100%;
-    height: 0;
-    bottom: 0;
-    opacity: 0;
-
-    top: unset;
-    overflow: hidden;
-   
-    border-radius: 12px 12px 0 0;
-    flex-direction: column;
- 
-    :global{
-      .comments_body {
-        padding: 30px 10px 10px 10px;
-      }
-    }
-
-    &.full_open {
-      opacity: 1;
-      height: 100vh;
-      .pri_body{
-        width: 100%;
-       
-      }
-    }
-
-    &.half {
-      opacity: 1;
-      height: 95vh;
-    }
-
-    transition: all @__Global_Components_transitions_dur linear;
   }
 
   :global {
@@ -165,17 +121,12 @@
     }
   }
 
-  .pri_body{
-    height: 100%;
-    width: 100%;
-  }
-
   transition: all @__Global_SwapAnimDuration ease-in-out;
   border-radius: @__Global_layout_border-rd;
 }
 
 
-.Overlay_container_2 {
+.overlay_secondary_wrapper {
     position: absolute;
     z-index: 55;
     height: 100vh;
@@ -193,53 +144,6 @@
     &.active {
       width: @Overlay_container2_active_width;
       opacity: 1;
- 
-    }
-     
-    &.mobile {
-      width: 100%;
-      height: 0;
-      bottom: 0;
-      opacity: 0;
-  
-      top: unset;
-     
-      transform: translate(0, 86%);
-      border-radius: 12px 12px 0 0;
-      flex-direction: column;
-
-      overflow-y: overlay;
-      overflow-x: hidden;
-  
-      touch-action: none;
-      user-select: none;
-      cursor: default;
-  
-      -webkit-user-select: none;
-         -moz-user-select: none;
-          -ms-user-select: none;
-           -o-user-select: none;
-              user-select: none;
-  
-      -webkit-touch-action: none;
-         -moz-touch-action: none;
-          -ms-touch-action: none;
-              touch-action: none;
-      :global{
-        .comments_body {
-          padding: 30px 10px 10px 10px;
-        }
-      }
-  
-      &.active {
-        opacity: 1;
-        height: 100%;
-      }
-  
-      &.full_open {
-        opacity: 1;
-        height: 100vh;
-      }
     }
   
   
@@ -247,10 +151,6 @@
     
   }
 
-  .Overlay_body_component{
-    // Spacing between components
-    margin-bottom: 35px;
-  }
 
   .renderSearch_wrapper {
     height: 87vh;

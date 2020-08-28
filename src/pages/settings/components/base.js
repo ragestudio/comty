@@ -1,38 +1,29 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
-import { ListSettings } from '../../../../globals/settings.js'
-import { ControlBar } from 'app'
-import * as app from 'app'
+import ListSettings from 'globals/settings'
+import { control } from 'components/layout/ControlBar'
+
+import verbosity from 'core/libs/verbosity'
 import * as Icons from 'components/Icons'
-import Icon from '@ant-design/icons'
+import { settings, newSetting } from 'core/libs/settings'
 
 class Base extends Component {
   constructor(props) {
-    super(props),
-      (this.state = {
-        SettingRepo: ListSettings,
-        forSave: false,
-      })
+    super(props);
+    this.state = {
+      list: ListSettings,
+    };
   }
 
-  componentDidMount() {
-    if (!localStorage.getItem('app_settings')) {
-      app.yconsole.warn(
-        'The settings for this app in your Account isnt set yet, Using stock settings...'
-      )
-    }
-  }
-
-  rendersets = item => {
-    let e = item.type
-    switch (e) {
+  renderSetting = item => {
+    switch (item.type) {
       case 'switch':
         return (
           <Switch
             checkedChildren={'Enabled'}
             unCheckedChildren={'Disabled'}
-            checked={item.value ? true : false}
-            onChange={() => this.onChangeSwitch(item)}
+            checked={settings.get(item.id)}
+            onChange={() => this.onChange(item)}
           />
         )
       case 'numeric':
@@ -49,29 +40,6 @@ class Base extends Component {
     }
   }
 
-  SettingRender = data => {
-    try {
-      return (
-        <div>
-          <List
-            itemLayout="horizontal"
-            dataSource={data}
-            renderItem={item => (
-              <List.Item actions={item.actions} key={item.SettingID}>
-                <List.Item.Meta
-                  title={item.title}
-                  description={item.description}
-                />
-                {this.rendersets(item)}
-              </List.Item>
-            )}
-          />
-        </div>
-      )
-    } catch (err) {
-      return app.yconsole.log(err)
-    }
-  }
   handleControlBar() {
     const ListControls = [
       <div key={Math.random()}>
@@ -84,7 +52,7 @@ class Base extends Component {
         </Button>
       </div>,
     ]
-    ControlBar.set(ListControls)
+    control.set(ListControls)
   }
 
   saveChanges() {
@@ -95,39 +63,44 @@ class Base extends Component {
       description:
         'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
     })
-    setTimeout(app._app.refresh(), 1000)
-    ControlBar.close()
+    control.close()
   }
 
-  onChangeSwitch(item) {
+  onChange(item) {
     try {
-      this.handleControlBar()
-      const to = !item.value
-      const updatedValue = [...this.state.SettingRepo].map(ita =>
-        ita === item ? Object.assign(ita, { value: to }) : ita
-      )
-      this.setState({ SettingRepo: updatedValue, forSave: true })
-      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      switch (item.type) {
+        case 'switch': {
+          item.to = !settings.get(item.id)
+          verbosity.debug(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
+          settings.set(item.id, item.to)
+          this.handleChange(item)
+
+        }
+        case 'numeric': {
+
+        }
+        default: {
+          return null
+        }
+      }
     } catch (err) {
       console.log(err)
     }
   }
-  onChangeNumeric(value, item) {
-    this.HandleChangeNumeric(value)
-  }
-  HandleChangeNumeric(item, value) {
+
+
+  handleChange(item) {
     try {
-      this.handleControlBar()
-      console.log(item.SettingID, value)
-      const updatedValue = [...this.state.SettingRepo].map(ita =>
-        ita === item ? Object.assign(ita, { value: value }) : ita
+      const updatedValue = this.state.list.map(element =>
+        element.id === item.id ? Object.assign(element, { value: item.to }) : element
       )
-      this.setState({ SettingRepo: updatedValue, forSave: true })
-      app.yconsole.log(`Changing ${item.SettingID} to value ${to}`)
+      this.setState({ list: updatedValue})
     } catch (err) {
       console.log(err)
     }
   }
+  
+
   render() {
     return (
       <Fragment>
@@ -135,7 +108,19 @@ class Base extends Component {
           <h1>
             <Icons.PullRequestOutlined /> Behaviors
           </h1>
-          {this.SettingRender(this.state.SettingRepo)}
+          <List
+            itemLayout="horizontal"
+            dataSource={this.state.list}
+            renderItem={item => (
+              <List.Item actions={item.actions} key={item.id}>
+                <List.Item.Meta
+                  title={item.title}
+                  description={item.description}
+                />
+                {this.renderSetting(item)}
+              </List.Item>
+            )}
+          />
         </div>
       </Fragment>
     )

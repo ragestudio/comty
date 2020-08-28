@@ -5,7 +5,10 @@ import Fade from 'react-reveal/Fade'
 import HeadShake from 'react-reveal/HeadShake';
 
 import * as antd from 'antd'
-import * as app from 'app'
+
+import { session, user } from 'core/cores'
+
+import verbosity from 'core/libs/verbosity'
 
 import { Form, Input, Button, Checkbox } from 'antd'
 import {
@@ -13,10 +16,13 @@ import {
   LockOutlined,
   BulbOutlined,
   SwapLeftOutlined
-} from '@ant-design/icons'
+} from 'components/Icons'
+import { connect } from 'umi'
 
+@connect(({ app }) => ({ app }))
 export class NormalLoginForm extends React.PureComponent {
   state = {
+    activeForm: true,
     step: 1,
     validating: false,
     error_count: 0,
@@ -24,14 +30,14 @@ export class NormalLoginForm extends React.PureComponent {
     step_show: true,
     swpass: false,
   }
-
+  
   next = values => {
     let a = this.state.step
     const b = btoa(Object.values(values).toString())
     switch (a) {
       case 1:
         const payload = { username: Object.values(values).toString() }
-        app.get_early.user((err, res) => {
+        user.get.profileData(payload, (err, res) => {
           if (err || !res) return false
           try {
             const res_data = JSON.parse(res)
@@ -52,7 +58,7 @@ export class NormalLoginForm extends React.PureComponent {
           } catch (error) {
             return false
           }
-        }, payload)
+        })
 
         return true
       case 2:
@@ -80,40 +86,91 @@ export class NormalLoginForm extends React.PureComponent {
       this.setState({ step_show: true })
     }, duration || 1000)
   }
+
   anim_error() {
     this.setState({ step_error: true, error_count: (this.state.error_count + 1) })
   }
 
-  auth() {
+  anim_close() {
+    this.setState({ step_show: false })
+  }
+
+
+  getAuthFrame(payload) {
+    return new Promise(resolve => {
+        session.auth(payload, (err, res) => {
+            if (err) {
+                
+            }
+            if (res) {
+                try {
+                    res = JSON.parse(res)
+                    verbosity.log(res)
+                } catch (error) {
+                    console.log('Invalid response!')
+                }
+
+                switch (res.api_status.toString()) {
+                    case "200": {
+                        try {
+                            return resolve(res)
+                        } catch (error) {
+                            verbosity.error(error)
+                        }
+                        break;
+                    }
+                    case "400": {
+                        console.log('Credentials error')
+                        this.setState({ validating: false })
+                        return this.anim_error()
+                    }
+                    case "500": {
+                        console.log('Server error')
+                        this.setState({ validating: false })
+                        return this.back()
+                    }
+                    default: {
+                        console.log('Unknown error')
+                        this.setState({ validating: false })
+                        return this.back()
+                    }
+                }
+                
+            }
+        })
+    });
+  }
+
+  getDataFrame(payload) {
+    return new Promise(resolve => {
+        user.get.data(payload, (err, res) => {
+            if(err) {
+    
+            }
+            if (res) {
+                try {
+                    return resolve(JSON.stringify(JSON.parse(res)['user_data']))
+                } catch (error) {
+                    verbosity.error(error)
+                }
+            }
+        })
+    
+    })
+  }
+
+  async auth() {
     const { form_rawd_1, form_rawd_2 } = this.state
     if (!form_rawd_1 || !form_rawd_2) return false
-    const frame = { EncUsername: form_rawd_1, EncPassword: form_rawd_2 }
-
     this.setState({ step_error: false, validating: true })
-    app.app_session.login((err, res) => {
-        switch (res) {
-            case '200': {
-              this.anim_transition(300)
-              return
-            }
-            case '400': {
-              console.log('Credentials error')
-              this.setState({ validating: false })
-              this.anim_error()
-              return
-            }
-            case '500': {
-              console.log('Server error')
-              this.setState({ validating: false })
-              this.back()
-              return
-            }
-            default:
-              this.back()
-              this.setState({ validating: false })
-              return false
-          }
-    }, frame)
+    
+    const authFrame = await this.getAuthFrame({username: form_rawd_1, password: form_rawd_2, server_key: this.props.app.server_key})
+    const dataFrame = await this.getDataFrame({id: authFrame.user_id, access_token: authFrame.access_token, serverKey: this.props.app.server_key})
+
+    return this.props.dispatch({
+        type: 'app/login',
+        payload: {authFrame, dataFrame}
+    });
   }
 
   renderState = () => {
@@ -212,7 +269,7 @@ export class NormalLoginForm extends React.PureComponent {
     return (
       <div className={styles.login_form}>
         <Fade left opposite when={this.state.step_show}>
-          {this.renderState()}
+          {this.state.activeForm? this.renderState() : <div><h4>Mmm, this is taking longer than it should...</h4></div>}
         </Fade>
       </div>
     )

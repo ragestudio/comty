@@ -1,5 +1,5 @@
 import React from 'react'
-import { AppInfo } from 'app'
+import { app_info } from 'core'
 import styles from './index.less'
 import classnames from 'classnames'
 
@@ -9,7 +9,7 @@ import * as Icons from 'components/Icons'
 import { RegistrationForm } from './register.js'
 import { NormalLoginForm } from './login.js'
 
-import { siteName } from 'config'
+import { app_config } from 'config'
 
 export function transitionToogle() {
   window.LoginComponent.setState({
@@ -47,7 +47,7 @@ class Login extends React.PureComponent {
     if (t) {
       switch (a) {
         case 1:
-          return `Sign in ${siteName}`
+          return `Sign in ${app_config.siteName}`
         case 2:
           return 'Register'
         case 3:
@@ -108,7 +108,7 @@ class Login extends React.PureComponent {
             left: '12px',
           }}
         >
-        ⚠ Using v{AppInfo.version} {AppInfo.stage}
+        ⚠ Using v{app_info.version} {app_info.stage}
         </div>
 
         <div className={styles.login_wrapper}>
