@@ -1,62 +1,34 @@
-const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
-
-function SettingStoragedValue(e) {
-  try {
-    const fromStorage = JSON.parse(localStorage.getItem('app_settings'))
-    const Ite = fromStorage.map(item => {
-      return item.SettingID === e ? item.value : null
-    })
-    const fr = Ite.filter(Boolean)
-    return fr.toString()
-  } catch (error) {
-    return null
-  }
-}
-
-export var ListSettings = [
+module.exports = [
   {
-    SettingID: 'disable_pro_tool',
-    type: 'switch',
-    title: 'Hide Pro Tools',
-    description: 'Hide right sidebar utils of comty pro',
-    value: fromStorage ? SettingStoragedValue('disable_pro_tool') : false,
-  },
-  {
-    SettingID: 'sessions_noexpire',
+    id: 'session_noexpire',
     type: 'switch',
     title: 'No expire session',
     description: 'Force the app to not expire any session... [Developer]',
-    value: fromStorage ? SettingStoragedValue('sessions_noexpire') : false,
   },
   {
-    SettingID: 'auto_feedrefresh',
-    type: 'switch',
-    title: 'Auto Feed Refresh',
-    description:
-      'Force the app to auto refresh the posts feed when exist news posts for update',
-    value: fromStorage ? SettingStoragedValue('auto_feedrefresh') : false,
-  },
-  {
-    SettingID: 'auto_search_ontype',
+    id: 'search_ontype',
     type: 'switch',
     title: 'Detect input on search bar',
     description:
       'Force the app to automaticly search when a type input is detected... [Developer]',
-    value: fromStorage ? SettingStoragedValue('auto_search_ontype') : false,
   },
   {
-    SettingID: 'auto_hide_postbar',
+    id: 'post_hidebar',
     type: 'switch',
     title: 'Auto hide postbar',
-    description:
-      'Force the app to dont hide the post actions (likes, comments ...etc) automaticly... [Developer]',
-    value: fromStorage ? SettingStoragedValue('auto_hide_postbar') : true,
+    description: 'Force the app to dont hide the post actions (likes, comments ...etc) automaticly... [Developer]',
   },
   {
-    SettingID: 'force_showDevLogs',
+    id: 'verbosity',
     type: 'switch',
-    title: 'Show Functions Logs',
+    title: 'Enable core verbosity',
     description: 'Show all console logs... [Developer]',
-    value: fromStorage ? SettingStoragedValue('force_showDevLogs') : false,
   },
+  {
+    id: 'overlay_loosefocus',
+    type: 'switch',
+    title: 'Overlay loose focus',
+    description: 'Close the overlay when loose focus',
+  },
+
 ]

@@ -1,0 +1,26 @@
+@import '~theme/index.less';
+
+.navbar{
+    -webkit-app-region: drag;
+    text-align: right;
+    
+    height: @AppTheme_global_winavbar_height;
+    width: 100%;
+    position: absolute;
+    z-index: 5000;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.controls{
+    -webkit-app-region: no-drag;
+    display: flex;
+    text-align: right;
+    float: right;
+    width: auto;
+    margin: auto;
+    > div{
+        padding: 0 6px;
+    }
+}

@@ -1,112 +1,58 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as app from 'app'
-import styles from './index.less'
+import * as core from 'core'
 import * as Icons from 'components/Icons'
-import Icon from '@ant-design/icons'
+import styles from './index.less'
+import { connect } from 'umi'
+import { stricts } from 'config'
+import { settings, newSetting } from 'core/libs/settings'
 import $ from 'jquery'
-import * as MICONS from '@material-ui/icons'
 
-import Post_options from './local_components/post_options'
-import { optionBox } from './local_components/post_options'
-
-function getBase64(img, callback) {
-  const reader = new FileReader()
-  reader.addEventListener('load', () => callback(reader.result))
-  reader.readAsDataURL(img)
-}
-
-export function HandleVisibility() {
-  window.PostCreatorComponent.ToogleVisibility()
-}
-
+@connect(({ app }) => ({ app }))
 class PostCreator extends React.PureComponent {
   constructor(props) {
     super(props), 
-    window.PostCreatorComponent = this,
     this.state = {
-      visible: true,
-      FadeIN: true,
-      keys_remaining: app.AppSettings.MaxLengthPosts,
-      rawtext: '',
+      maxFileSize: stricts.api_maxpayload,
+      maxTextLenght: stricts.post_maxlenght,
+
+      renderValid: false,
+      loading: false,
+
+      textLenght: stricts.post_maxlenght,
+      rawText: '',
       posting: false,
-      posting_ok: false,
+      postingResult: false,
       shareWith: 'any',
+
       uploader: false,
-      Schedule: false,
-    }
+      uploaderFile: null,
+      uploaderFileOrigin: null,
+    },
+    window.PostCreatorComponent = this
   }
 
-  renderPostPlayer(payload) {
-    const { file, fileURL } = this.state
-    const videofilter = file.type.includes('video')
-    const imagefilter = file.type.includes('image')
-    const audiofilter = file.type.includes('audio')
-    if (imagefilter) {
-      return (
-        <div className={styles.imagePreviewWrapper}>
-          <div className={styles.imageOverlay}>
-            <antd.Button
-              onClick={() => this.handleDeleteFile()}
-              icon={<Icons.DeleteOutlined />}
-            />
-          </div>
-          <div className={styles.imagePreview}>
-            <img className={styles.imagePreview} src={fileURL} />
-          </div>
-        </div>
-      )
-    }
-    if (videofilter) {
-      return (
-        <div className={styles.imagePreviewWrapper}>
-          <div className={styles.imageOverlay}>
-            <antd.Button
-              onClick={() => this.handleDeleteFile()}
-              icon={<Icons.DeleteOutlined />}
-            />
-          </div>
-          <div className={styles.imagePreview}>
-            <video id="player" playsInline controls>
-              <source
-                className={styles.imagePreview}
-                src={fileURL}
-                type={file.type}
-              />
-            </video>
-          </div>
-        </div>
-      )
-    }
-    if (audiofilter) {
-      return (
-        <audio controls src={fileURL} preload="auto" />
-      )
-    }
-    return null
-  }
-  ToogleVisibility() {
-    this.setState({ visible: !this.state.visible })
-  }
-  ToogleUpload() {
+  dropRef = React.createRef()
+
+  ToogleUploader() {
     this.setState({ uploader: !this.state.uploader })
   }
   handleDeleteFile = () => {
-    this.setState({ fileURL: null })
+    this.setState({ uploaderFile: null })
   }
   handleFileUpload = info => {
     if (info.file.status === 'uploading') {
       this.setState({ loading: true })
-      return
     }
     if (info.file.status === 'done') {
-      this.setState({ file: info.file.originFileObj, uploader: false })
-      getBase64(info.file.originFileObj, fileURL => {
-        this.setState({ fileURL, loading: false })
+      this.setState({ uploaderFileOrigin: info.file.originFileObj, uploader: false })
+
+      core.getBase64(info.file.originFileObj, fileURL => {
+        this.setState({ uploaderFile: fileURL, loading: false })
       })
     }
   }
-
+  
   beforeUpload = file => {
     const filter =
       file.type === 'image/jpeg' ||
@@ -120,11 +66,10 @@ class PostCreator extends React.PureComponent {
     if (!filter) {
       antd.message.error(`${file.type} This file is not valid!`)
     }
-    const maxsize =
-      file.size / 1024 / 1024 < app.AppSettings.MaximunAPIPayload
+    const maxsize = file.size / 1024 / 1024 < stricts.api_maxpayload
     if (!maxsize) {
       antd.message.error(
-        `Image must smaller than ${app.AppSettings.MaximunAPIPayload} KB!`
+        `Image must smaller than ${stricts.api_maxpayload} KB!`
       )
     }
     return filter && maxsize
@@ -132,285 +77,246 @@ class PostCreator extends React.PureComponent {
 
   handleChanges = ({ target: { value } }) => {
     this.setState({
-      rawtext: value,
-      keys_remaining: app.AppSettings.MaxLengthPosts - value.length,
+      rawText: value,
+      textLenght: this.state.maxTextLenght - value.length,
     })
   }
 
   handleKeysProgressBar() {
-    const { keys_remaining } = this.state
-    if (keys_remaining <= (app.AppSettings.MaxLengthPosts / 100) * 30) {
-      return 'exception'
-    } else return 'active'
+    return this.state.textLenght <= (this.state.maxTextLenght / 100) * 30? 'exception' : 'active'
   }
-
-  FlushPostState() {
-    this.setState({
-      posting_ok: true,
-      posting: false,
-      rawtext: '',
-      fileURL: '',
-      file: '',
-    })
-    setTimeout(() => {
-      this.setState({ posting_ok: false })
-    }, 1000)
-    app.RenderFeed.RefreshFeed()
-    return true
-  }
-
-  handlePublishPost = e => {
-    const { rawtext, shareWith, file, fileURL} = this.state
-    if (!rawtext && !fileURL) {
-      return false
-    }
-    this.setState({
-      posting: true,
-      keys_remaining: app.AppSettings.MaxLengthPosts,
-    })
-    const post_options = optionBox.get()
-
-    const payload = {
-      privacy: app.GetPostPrivacy.bool(shareWith),
-      text: rawtext,
-      file: file,
-    }
-    app.comty_post.new((err, res) => {
-      if (err) {
-        app.notify.error(err)
-        return false
-      }
-
-      let status_temp_error;
-
-      try {
-        status_temp_error = JSON.parse(res)['data'].error
-      } catch (error) {
-        app.notify.error('It seems that a processing error has occurred, your publication has not been published and the application stopped working due to a critical error')
-        return false
-      }
-
-      status_temp_error? app.notify.error('It seems that a processing error has occurred, your publication has not been published.') : null
-      const id_temp_parse = JSON.parse(res)['data'].id
-      
-      const pro_boost_val = app.ReturnValueFromMap({ data: post_options, key: 'pro_boost' })
-      const allow_comments_val = app.ReturnValueFromMap({ data: post_options, key: 'allow_comments' })
-      console.log(id_temp_parse)
-      app.sync.emmitPost(id_temp_parse)
-      app.yconsole.log(`pro_boost => ${pro_boost_val} | allow_comments => ${allow_comments_val}`)
-
-      if (pro_boost_val) {
-        app.yconsole.log(`Boosting post with ID => ${id_temp_parse}`)
-        app.comty_post.__boost(
-          (err, res) => {
-            return true
-          },
-          { post_id: id_temp_parse }
-        )
-      }
-      if (
-        !allow_comments_val
-      ) {
-        app.yconsole.log(`Disabling comments with ID => ${id_temp_parse}`)
-        app.comty_post.__disableComments(
-          (err, res) => {
-            return true
-          },
-          { post_id: id_temp_parse }
-        )
-      }
-      this.FlushPostState()
-      // app.RenderFeed.addToRend(JSON.parse(res)['data'])
-    }, payload)
-  }
-  dropRef = React.createRef()
-
+ 
   handleDragIn = e => {
     e.preventDefault()
     e.stopPropagation()
-    if (this.state.uploader == true) {
-      return
-    }
-    this.setState({ uploader: true })
+
+    this.state.uploader? this.setState({ uploader: true }) : null
   }
+
   handleDragOut = e => {
     e.preventDefault()
     e.stopPropagation()
-    if (this.state.uploader == false) {
-      return
-    }
-    this.setState({ uploader: false })
+
+    this.state.uploader? null : this.setState({ uploader: false })
   }
 
   componentDidMount() {
-    const _this = this
-    $('body').bind('paste', function(je) {
-      var e = je.originalEvent
-      for (var i = 0; i < e.clipboardData.items.length; i++) {
-        var item = e.clipboardData.items[i]
-        app.yconsole.log('Item: ' + item.type)
-        if (item.type.indexOf('image') != -1) {
-          //item.
-          let a;
-          a = item.getAsFile()
-          _this.setState({ file: a })
-          app.ReadFileAsB64(a, res => {
-            _this.setState({ fileURL: res })
-          })
-        } else {
-          // ignore not images
-          app.yconsole.log('Discarding not image paste data')
-        }
-      }
-    })
-    let div = this.dropRef.current
-    div.addEventListener('dragenter', this.handleDragIn)
-    div.addEventListener('dragleave', this.handleDragOut)
+    // Validate for render
+    if (this.props.app.userData) {
+      this.setState({renderValid: true})
+    }
+
+    // const _this = this
+    // $('body').bind('paste', function(je) {
+    //   var e = je.originalEvent
+    //   for (var i = 0; i < e.clipboardData.items.length; i++) {
+    //     var item = e.clipboardData.items[i]
+    //     if (item.type.indexOf('image') != -1) {
+    //       //item.
+    //       let a;
+    //       a = item.getAsFile()
+    //       _this.setState({ uploaderFileOrigin: a })
+    //       core.ReadFileAsB64(a, res => {
+    //         _this.setState({ uploaderFile: res })
+    //       })
+    //     } else {
+    //       // ignore not images
+    //     }
+    //   }
+    // })
+    // let div = this.dropRef.current
+    // div.addEventListener('dragenter', this.handleDragIn)
+    // div.addEventListener('dragleave', this.handleDragOut)
   }
+
   componentWillUnmount() {
-    let div = this.dropRef.current
-    div.removeEventListener('dragenter', this.handleDragIn)
-    div.removeEventListener('dragleave', this.handleDragOut)
+    // let div = this.dropRef.current
+    // div.removeEventListener('dragenter', this.handleDragIn)
+    // div.removeEventListener('dragleave', this.handleDragOut)
   }
 
   canPost() {
-    const { fileURL, keys_remaining } = this.state
-
-    const isTypedSomething = keys_remaining < app.AppSettings.MaxLengthPosts
-    const isUploadedFile = fileURL ? true : false
+    const isTypedSomething = this.state.textLenght < this.state.maxTextLenght
+    const isUploadedFile = this.state.uploaderFile ? true : false
 
     return isUploadedFile || isTypedSomething
   }
 
   render() {
-    const { userData } = this.props
-    const { keys_remaining, visible, fileURL } = this.state
-    const percent = (
-      (keys_remaining / app.AppSettings.MaxLengthPosts) *
-      100
-    ).toFixed(2)
-    const changeShare = ({ key }) => {
-      this.setState({ shareWith: key })
+    const { userData } = this.props.app
+    const { textLenght, uploaderFile } = this.state
+
+    const GetPostPrivacy = {
+      bool: (e) => {
+        switch (e) {
+          case 'any':
+              return '0'
+          case 'only_followers':
+              return '1'
+          case 'only_follow':
+              return '2'
+          case 'private':
+              return '3'
+          default:
+              return '0'
+        }
+      },
+      decorator: (e) => {
+          switch (e) {
+              case 'any':
+                  return  <span><Icons.GlobalOutlined /> Share with everyone</span>
+              case 'only_follow':
+                  return <span><Icons.TeamOutlined /> Share with people I follow</span>
+              case 'only_followers':
+                  return <span><Icons.UsergroupAddOutlined /> Share with people follow me</span> 
+              case 'private':
+                  return <span><Icons.EyeInvisibleOutlined /> Dont share, only me</span>
+              default:
+                  return <span>Unknown</span>
+          }
+      },
     }
 
     const shareOptionsMenu = (
-      <antd.Menu onClick={changeShare}>
+      <antd.Menu onClick={key => this.setState({ shareWith: key })}>
         <antd.Menu.Item key="any">
-          {app.GetPostPrivacy.decorator('any')}
+          {GetPostPrivacy.decorator('any')}
         </antd.Menu.Item>
         <antd.Menu.Item key="only_follow">
-          {app.GetPostPrivacy.decorator('only_follow')}
+          {GetPostPrivacy.decorator('only_follow')}
         </antd.Menu.Item>
         <antd.Menu.Item key="only_followers">
-          {app.GetPostPrivacy.decorator('only_followers')}
+          {GetPostPrivacy.decorator('only_followers')}
         </antd.Menu.Item>
         <antd.Menu.Item key="private">
-          {app.GetPostPrivacy.decorator('private')}
+          {GetPostPrivacy.decorator('private')}
         </antd.Menu.Item>
       </antd.Menu>
     )
 
-    if (visible) {
-      return (
-        <div className={styles.cardWrapper}>
-          <antd.Card bordered="false">
-            <div ref={this.dropRef} className={styles.inputWrapper}>
-              {this.state.uploader ? (
-                <div className={styles.uploader}>
-                  <antd.Upload.Dragger
-                    multiple={false}
-                    listType="picture"
-                    showUploadList={false}
-                    beforeUpload={this.beforeUpload}
-                    onChange={this.handleFileUpload}
-                  >
-                    <Icons.CloudUploadOutlined />
-                    <span>Drop your file here o click for upload</span>
-                  </antd.Upload.Dragger>
-                </div>
-              ) : (
-                <>
-                  <div className={styles.titleAvatar}>
-                    <img src={userData.avatar} />
-                  </div>
-                  <antd.Input.TextArea
-                    disabled={this.state.posting ? true : false}
-                    onPressEnter={this.handlePublishPost}
-                    value={this.state.rawtext}
-                    autoSize={{ minRows: 3, maxRows: 5 }}
-                    dragable="false"
-                    placeholder="What are you thinking?"
-                    onChange={this.handleChanges}
-                    allowClear
-                    maxLength={app.AppSettings.MaxLengthPosts}
-                    rows={8}
-                  />
-                  <div>
-                    <antd.Button
-                      disabled={this.state.posting ? true : !this.canPost()}
-                      onClick={this.handlePublishPost}
-                      type="primary"
-                      icon={
-                        this.state.posting_ok ? (
-                          <Icons.CheckCircleOutlined />
-                        ) : this.state.posting ? (
-                          <Icons.LoadingOutlined />
-                        ) : (
-                          <Icons.ExportOutlined />
-                        )
-                      }
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            <div className={styles.progressHandler}>
-              <antd.Progress
-                strokeWidth="4px"
-                className={
-                  this.state.posting
-                    ? styles.proccessUnset
-                    : keys_remaining < 512
-                    ? styles.proccessSet
-                    : styles.proccessUnset
-                }
-                status={this.handleKeysProgressBar()}
-                showInfo={false}
-                percent={percent}
-              />
-            </div>
-            {fileURL ? this.renderPostPlayer(this.state.fileURL) : null}
-            <div className={styles.postExtra}>
-              <antd.Button
-                styles={this.state.uploader ? { fontSize: '20px' } : null}
-                type="ghost"
-                onClick={() => this.ToogleUpload()}
-              >
-                {' '}
-                {this.state.uploader ? (
-                  <MICONS.Cancel />
-                ) : (
-                  <MICONS.AddCircle />
-                )}{' '}
-              </antd.Button>
-              <antd.Button type="ghost" onClick={() => optionBox.toogle()}>
-                <MICONS.Tune />
-              </antd.Button>
-              <antd.Dropdown overlay={shareOptionsMenu}>
-                <a
-                  className={styles.shareWith}
-                  onClick={e => e.preventDefault()}
-                >
-                  {app.GetPostPrivacy.decorator(this.state.shareWith)}
-                </a>
-              </antd.Dropdown>
-            </div>
-          </antd.Card>
-          <Post_options visible={this.state.toolbox_open} />
+    const PostCreator_Uploader = () => {
+      return(
+        <div className={styles.uploader}>
+          <antd.Upload.Dragger
+            multiple={false}
+            listType="picture"
+            showUploadList={false}
+            beforeUpload={this.beforeUpload}
+            onChange={this.handleFileUpload}
+          >
+            <Icons.CloudUploadOutlined />
+            <span>Drop your file here o click for upload</span>
+          </antd.Upload.Dragger>
         </div>
       )
     }
-    return null
+
+    const PostCreator_InputText = () => {
+      return(
+        <>
+          <div className={styles.titleAvatar}>
+            <img src={userData.avatar} />
+          </div>
+          <antd.Input.TextArea
+            disabled={this.state.posting ? true : false}
+            onPressEnter={this.handlePublishPost}
+            value={this.state.rawText}
+            autoSize={{ minRows: 3, maxRows: 5 }}
+            dragable="false"
+            placeholder="What are you thinking?"
+            onChange={this.handleChanges}
+            allowClear
+            maxLength={this.state.maxTextLenght}
+            rows={8}
+          />
+          <div>
+            <antd.Button
+              disabled={this.state.posting ? true : !this.canPost()}
+              onClick={this.handlePublishPost}
+              type="primary"
+              icon={
+                this.state.postingResult ? (
+                  <Icons.CheckCircleOutlined />
+                ) : this.state.posting ? (
+                  <Icons.LoadingOutlined />
+                ) : (
+                  <Icons.ExportOutlined />
+                )
+              }
+            />
+          </div>
+        </>
+      )
+    }
+
+
+    const PostCreatorComponent = () => {
+     return(
+      <>
+        <div ref={this.dropRef} className={styles.inputWrapper}>
+          {this.state.uploader ? <PostCreator_Uploader /> : <PostCreator_InputText /> }
+        </div>
+        <div className={styles.progressHandler}>
+          <antd.Progress
+            className={
+              this.state.posting
+                ? styles.proccessUnset
+                : textLenght < 512
+                ? styles.proccessSet
+                : styles.proccessUnset
+            }
+            percent={((textLenght / this.state.maxTextLenght) * 100).toFixed(2)}
+            status={this.handleKeysProgressBar()}
+            strokeWidth="4px"
+            showInfo={false}
+          />
+        </div>
+        {uploaderFile ? this.renderPostPlayer(uploaderFile) : null}
+        <div className={styles.postExtra}>
+          <antd.Button
+            styles={this.state.uploader ? { fontSize: '20px' } : null}
+            type="ghost"
+            onClick={() => this.ToogleUpload()}
+          >
+
+            {this.state.uploader ? (
+              <Icons.Cancel />
+            ) : (
+              <Icons.AddCircle />
+            )}
+          </antd.Button>
+          <antd.Button type="ghost" onClick={() => null}>
+            <Icons.Tune />
+          </antd.Button>
+          <antd.Dropdown overlay={shareOptionsMenu}>
+            <a
+              className={styles.shareWith}
+              onClick={e => e.preventDefault()}
+            >
+              {GetPostPrivacy.decorator(this.state.shareWith)}
+            </a>
+          </antd.Dropdown>
+        </div>
+      </>
+     )
+    }
+
+    const PostCreator_Invalid = () => {
+      return(
+        <div>
+          <h3>This component cant be displayed!</h3>
+          <antd.Skeleton active />
+        </div>
+      )
+    }
+
+    return (
+        <div className={styles.cardWrapper}>
+          <antd.Card bordered="false">
+            { this.state.renderValid? <PostCreatorComponent /> : <PostCreator_Invalid /> }
+          </antd.Card>
+        </div>
+      )
   }
 }
 export default PostCreator

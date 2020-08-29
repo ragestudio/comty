@@ -1,16 +1,15 @@
-import React, { PureComponent, Fragment } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'dva'
 import { Helmet } from 'react-helmet'
 import { Loader } from 'components'
-import { queryLayout } from 'utils'
 import NProgress from 'nprogress'
+import { withRouter, connect } from 'umi'
+import { queryLayout } from 'core'
+import WindowNavbar from 'components/Layout/WindowNavbar'
 import config from 'config'
-import withRouter from 'umi/withRouter'
-import {AppSettings} from 'app'
 
-import PublicLayout from './PublicLayout'
 import PrimaryLayout from './PrimaryLayout'
+import PublicLayout from './PublicLayout'
 import './BaseLayout.less'
 
 const LayoutMap = {
@@ -19,33 +18,35 @@ const LayoutMap = {
 }
 
 @withRouter
-@connect(({ loading }) => ({ loading }))
-class BaseLayout extends PureComponent {
+@connect(({ app, loading }) => ({ app, loading }))
+class BaseLayout extends React.Component {
   previousPath = ''
+  renderLoading = true
 
   render() {
     const { loading, children, location } = this.props
     const Container = LayoutMap[queryLayout(config.layouts, location.pathname)]
-
     const currentPath = location.pathname + location.search
+
     if (currentPath !== this.previousPath) {
       NProgress.start()
+      this.renderLoading = true
     }
 
     if (!loading.global) {
       NProgress.done()
       this.previousPath = currentPath
+      this.renderLoading = false
     }
-
     return (
-      <Fragment>
+      <React.Fragment>
         <Helmet>
-          <title>{config.siteName}</title>
+          <title>{config.app_config.siteName}</title>
         </Helmet>
-        {Loader( AppSettings.InfiniteLoading? {spinning: true} : loading )}
-  
+        {this.props.app.electron? <WindowNavbar /> : null}
+        {Loader(this.renderLoading)}
         <Container>{children}</Container>
-      </Fragment>
+      </React.Fragment>
     )
   }
 }

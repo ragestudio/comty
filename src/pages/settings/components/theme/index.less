@@ -1,0 +1,50 @@
+.background_image_controls{
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+
+    > div {
+        width: 100%;
+        margin: 0 10px;
+    }
+}
+
+.background_image_uploader{
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+
+    > div {
+        width: 100%;
+        margin: 0 10px;
+    }
+}
+
+.background_image_preview{
+    position: relative;
+    height: 50%;
+
+    img{
+        z-index: 9;
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .text_wrapper{
+        position: absolute;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+
+        h1{
+            font-size: 68px;
+        }
+    }
+}

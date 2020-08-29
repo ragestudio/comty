@@ -1,5 +1,4 @@
 import React from 'react'
-import * as app from 'app'
 import * as Icons from 'components/Icons'
 import * as antd from 'antd'
 import styles from './index.less'

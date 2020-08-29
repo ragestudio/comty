@@ -2,60 +2,43 @@
 /* global document */
 import React from 'react'
 import PropTypes from 'prop-types'
-import withRouter from 'umi/withRouter'
-import { connect } from 'dva'
+import {withRouter, connect} from 'umi'
 import {
   MyLayout,
-  PageTransition,
-  HeaderSearch,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
 import classnames from 'classnames'
 
-import * as app from 'app'
+import { app_config } from 'config'
+import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Control, Overlay, WindowAppBar } = MyLayout
-
-export function updateTheme(data){
-  if (!data) return false
-  console.log(data)
-  return PrimaryComponent.setState({theme: data})
-}
-
+const { Sider, Control, Overlay } = MyLayout
+const isActive = (key) => { return key? key.active : false }
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
-class PrimaryLayout extends React.PureComponent {
+class PrimaryLayout extends React.Component {
   constructor(props) {
-    super(props)
-    window.PrimaryComponent = this
+    super(props);
     this.state = {
-      theme: app.app_theme.getStyle(),
-      collapsed: app.AppSettings.default_collapse_sider ? true : false,
+      collapsed: app_config.default_collapse_sider ? true : false,
       isMobile: false,
-      desktop_mode: false,
-      userData: '',
-    }
+    },
+    window.PrimaryComponent = this;
   }
 
   componentDidMount() {
-   
-    this.setState({
-      userData: app.userData(),
-    })
-
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
         this.setState({
           isMobile: mobile,
         })
-        store.set('mobile_src', mobile)
       }
     })
   }
@@ -72,61 +55,59 @@ class PrimaryLayout extends React.PureComponent {
 
   render() {
     const { location, dispatch, children } = this.props
-    const { userData, collapsed, isMobile, theme, predominantColor } = this.state
+    const { collapsed, isMobile } = this.state
     const { onCollapseChange } = this
-
-    
+    const currentTheme = theme.get()
+    const breakpoint = {
+      xs: '480px',
+      sm: '576px',
+      md: '768px',
+      lg: '992px',
+      xl: '1200px',
+      xxl: '1600px',
+    }
 
     const SiderProps = {
-      breakpoint:{
-        xs: '480px',
-        sm: '576px',
-        md: '768px',
-        lg: '992px',
-        xl: '1200px',
-        xxl: '1600px',
-      },
-      predominantColor,
-      theme,
-      userData,
+      breakpoint,
       isMobile,
       collapsed,
       onCollapseChange,
-      onThemeChange(theme) {
-        dispatch({
-          type: 'app/handleThemeChange',
-          payload: theme,
-        })
-      },
+      theme: isActive(currentTheme["darkmode"])? "dark" : null
     }
 
     const OverlayProps = {
-      userData,
+      breakpoint,
       isMobile,
+      theme: isActive(currentTheme["darkmode"])? "dark" : null
     }
-    console.log(theme)
+   
+    window.DarkMode = isActive(currentTheme["darkmode"])? true : false
+    console.log('USING PRIMARY')
     return (
-      <React.Fragment>
-          <div className={classnames(styles.__ControlBar, {[styles.mobile]: isMobile})}>
-            <Control mobile={isMobile} />
-          </div>
-          <antd.Layout style={theme} id="primaryLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
+      <React.Fragment >
+        <Control />
+          {isActive(currentTheme['backgroundImage'])? <div style={{ 
+                  backgroundImage: `url(${currentTheme.backgroundImage.src})`,
+                  transition: "all 150ms linear",
+                  position: 'absolute',  
+                  width: '100vw', 
+                  height: '100vh', 
+                  backgroundRepeat: "repeat-x",
+                  backgroundSize: "cover",
+                  backgroundPositionY: "center",
+                  overflow: "hidden", 
+                  opacity: currentTheme.backgroundImage.opacity
+                }} /> : null}
+          <antd.Layout id="app" className={classnames(styles.app, { [styles.interfaced]: this.props.app.electron, [styles.dark_mode]: isActive(currentTheme['darkmode'])  } )}>
             <Sider {...SiderProps} />
-
             <div className={styles.primary_layout_container}>
-              <PageTransition
-                preset="moveToRightScaleUp"
-                transitionKey={location.pathname}
-              >
                 <Content
                   id="primaryContent"
                   className={styles.primary_layout_content}
                 >
                   {children? children : null}
                 </Content>
-              </PageTransition>
             </div>
-
             <Overlay {...OverlayProps} />
           </antd.Layout>
       </React.Fragment>

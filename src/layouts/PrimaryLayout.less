@@ -1,41 +1,4 @@
-@import '~themes/index.less';
-
-.__ControlBar {
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  z-index: 30;
-  &.mobile{
-    top: 0;
-    bottom: unset;
-  }
-}
-
-.primary_layout {
-    background-repeat: repeat-x;
-    background-size: cover;
-    background-position-y: center;
-
-    overflow: hidden;
-    background-color: transparent;
-    margin: auto;
-    height: 100vh;
-    width: 100vw;
-
-    transition: all @__Global_Components_transitions_dur linear;
-  
-    &.mobile{
-      >.primary_layout_container {
-        padding: 0;
-        overflow-y: overlay;
-        overflow-x: hidden;
-        min-width: unset;
-      }
-      .primary_layout_content{
-        padding: 35px 15px 15px 15px;
-      }
-    }
-}
+@import '~theme/index.less';
 
 // PRIMARY LAYOUT 
 .primary_layout_container {
@@ -46,7 +9,7 @@
   // overflow-y: overlay;
 
   width: auto;
-  height: 100vh;
+  height: 100%;
   
   position: relative;
   bottom: 0;
@@ -54,7 +17,6 @@
   align-self: center;
  
   max-width: 750px;
-  
   min-width: 570px;
 
   @media (min-width: @bp-medium) {
@@ -62,6 +24,10 @@
   }
   @media (min-width: @bp-large) {
     min-width: 850px;
+  }
+
+  &.interfaced{
+    height: calc(100% - @AppTheme_global_winavbar_height);
   }
 
 }
