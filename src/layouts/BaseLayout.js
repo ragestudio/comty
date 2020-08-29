@@ -38,7 +38,6 @@ class BaseLayout extends React.Component {
       this.previousPath = currentPath
       this.renderLoading = false
     }
-
     return (
       <React.Fragment>
         <Helmet>

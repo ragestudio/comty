@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import styles from './index.less'
 import * as errorhandler from 'core/libs/errorhandler'
 
-import { 
+import {
   Primary,
   Secondary,
   Card_Component,
@@ -46,8 +46,8 @@ export default class Overlay extends React.PureComponent {
     closeAll: () => {
       this.props.dispatch({
         type: 'app/updateState',
-        payload: { 
-          overlayActive: false, 
+        payload: {
+          overlayActive: false,
           overlayElement: null
         },
       });
@@ -57,8 +57,8 @@ export default class Overlay extends React.PureComponent {
       verbosity.debug('Dispatching fragment =>', payload)
       this.props.dispatch({
         type: 'app/updateState',
-        payload: { 
-          overlayActive: true, 
+        payload: {
+          overlayActive: true,
           overlayElement: payload
         },
       });

@@ -36,11 +36,12 @@
 }
 
 .Overlay_wrapper {
+  user-select: none;
   right: 0;
   top: 0;
   z-index: 50;
   
-  height: 100vh;
+  height: 100%;
   // 150px extra for left-sider
   width: calc( 100% + 150px );
   backdrop-filter: blur(2px);
@@ -80,7 +81,7 @@
 
   
   @media (max-width: @bp-medium) {
-    padding: 30px 5px 30px 5px;
+    padding: 30px 5px;
   }
 
   color: @Overlay_container1_def_color;
@@ -155,7 +156,7 @@
   .renderSearch_wrapper {
     height: 87vh;
     overflow: hidden;
-    margin: 20px 0 0 0;
+    margin: 20px 0 0;
     font-family: @__Global_general_font_family;
     h2 {
       color: #ffffff;

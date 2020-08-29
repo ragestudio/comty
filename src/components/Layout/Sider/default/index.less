@@ -2,13 +2,14 @@
 
 
 .left_sider_wrapper {
+  user-select: none;
   border-color: transparent;
   font-size: 15px;
   font-family: @__Global_texted_font;
   font-weight: 600;
 
   width: 100%;
-  height: 100vh;
+  height: 100%;
 
   z-index: 40;
   float: left;
@@ -33,11 +34,11 @@
         border-radius: 4px 8px 8px 4px;
         padding: 2px 0 2px 24px;
         
-        text-align: left;        
-      } 
+        text-align: left;
+      }
 
       .ant-menu-item:hover {
-        border-radius: 8px 8px 8px 8px;
+        border-radius: 8px;
         transform: translate(10px,0);
         
         // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
@@ -80,7 +81,7 @@
 }
 
 .something_thats_pulling_me_down {
-  margin: 0 0 12px 0;
+  margin: 0 0 12px;
   :global {
     text-align: center;
     bottom: 0;
@@ -105,7 +106,7 @@
 
 .left_sider_menuContainer {
   height: 100%;
-  margin: 18px 0 8px 0;
+  margin: 18px 0 8px;
   flex: 1;
 
   :global {

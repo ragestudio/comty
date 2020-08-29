@@ -9,7 +9,7 @@
   // overflow-y: overlay;
 
   width: auto;
-  height: 100vh;
+  height: 100%;
   
   position: relative;
   bottom: 0;
@@ -17,7 +17,6 @@
   align-self: center;
  
   max-width: 750px;
-  
   min-width: 570px;
 
   @media (min-width: @bp-medium) {
@@ -25,6 +24,10 @@
   }
   @media (min-width: @bp-large) {
     min-width: 850px;
+  }
+
+  &.interfaced{
+    height: calc(100% - @AppTheme_global_winavbar_height);
   }
 
 }
