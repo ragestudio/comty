@@ -82,7 +82,7 @@ class PrimaryLayout extends React.Component {
     }
    
     window.DarkMode = isActive(currentTheme["darkmode"])? true : false
-
+    console.log('USING PRIMARY')
     return (
       <React.Fragment >
         <Control />
@@ -98,7 +98,7 @@ class PrimaryLayout extends React.Component {
                   overflow: "hidden", 
                   opacity: currentTheme.backgroundImage.opacity
                 }} /> : null}
-          <antd.Layout id="app" style={this.props.app.electron? { paddingTop: "35px", marginBottom: "12px", borderRadius: "12px" } : null} className={isActive(currentTheme['darkmode'])? "dark_mode" : null }>
+          <antd.Layout id="app" className={classnames(styles.app, { [styles.interfaced]: this.props.app.electron, [styles.dark_mode]: isActive(currentTheme['darkmode'])  } )}>
             <Sider {...SiderProps} />
             <div className={styles.primary_layout_container}>
                 <Content

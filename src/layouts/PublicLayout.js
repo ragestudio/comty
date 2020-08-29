@@ -2,7 +2,6 @@ import React from 'react'
 import store from 'store'
 
 import {
-  MyLayout,
   PageTransition,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
@@ -11,7 +10,7 @@ import classnames from 'classnames'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 
-import styles from './PrimaryLayout.less'
+import styles from './PublicLayout.less'
 
 const { Content } = antd.Layout
 
@@ -46,19 +45,14 @@ export default class PublicLayout extends React.Component {
     const { isMobile } = this.state
     return (
       <React.Fragment>
-          <antd.Layout id="publicLayout" className={classnames(styles.primary_layout, {[styles.mobile]: isMobile})}>
+          <antd.Layout>
             <div className={styles.primary_layout_container}>
-              <PageTransition
-                preset="moveToRightScaleUp"
-                transitionKey={window.location.pathname}
-              >
                 <Content
                   id="publicContent"
                   className={styles.primary_layout_content}
                 >
                   {children}
                 </Content>
-              </PageTransition>
             </div>
           </antd.Layout>
       </React.Fragment>

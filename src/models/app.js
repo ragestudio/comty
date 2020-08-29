@@ -38,7 +38,7 @@ export default {
         dispatch({ type: 'updateState', payload: { electron: electron } });
         console.log('ELECTRON INTERFACED')
       } catch (error) {
-        console.log('Normal interface')
+        // nothing
       }
       dispatch({ type: 'query' });
     },
@@ -95,17 +95,6 @@ export default {
       //   }
       // }
     },
-    *update({ payload }, { call, put, select }) {
-      const session = yield select(state => state.app.session_valid);
-      const session_uuid = yield select(state => state.app.session_uuid);
-
-      console.log(payload);
-      if (session) {
-        // request getData
-      } else {
-        // invalid update token (session not valid)
-      }
-    },
     *logout({ payload }, { call, put, select }) {
       // call logout api
       return yield put({ type: 'disconnectServices' });
@@ -137,8 +126,6 @@ export default {
         }
         tmp.push(obj)
       })
-
-
       return tmp? yield put({ type: 'handleUpdateTheme', payload: tmp }) : null
     },
   },
@@ -187,6 +174,30 @@ export default {
     handleThemeChange(state, { payload }) {
       store.set('theme', payload);
       state.theme = payload;
+    },
+
+    appControl(state, {payload}){
+      if (!payload) return false
+      const ipc = state.electron.ipcRenderer
+      ipc.invoke(payload)
+      
+      // Specials behaviors
+      // switch (payload) {
+      //   case "hide-window":{
+      //     return ipc.invoke('hide-window')
+      //   }
+      //   case "close":{
+      //     return ipc.invoke('close-window')
+      //   }
+      //   case "quit":{
+      //     return ipc.invoke('quit-app')
+      //   }
+      //   case "minimize-window":{
+      //     return ipc.invoke('minimize-window')
+      //   }
+      //   default:
+      //     break;
+      // }
     },
 
     allNotificationsRead(state) {

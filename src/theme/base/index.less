@@ -37,24 +37,14 @@
     background-color: transparent;
 }
 
-#app {
-  -webkit-app-region: no-drag;
-  overflow: hidden;
-  border-radius: 12px;
-
-  color: @AppTheme_global_color!important;
+#root{
   background-color: @AppTheme_global_background!important;
-  background-repeat: repeat-x;
-  background-size: cover;
-  background-position-y: center;
+}
 
-  overflow: hidden;
-  background-color: transparent;
-  margin: auto;
-  height: 100%;
-  width: 100vw;
-
-  transition: all @__Global_Components_transitions_dur linear;
+.app{
+  &.interfaced{
+    height: calc(100% - @AppTheme_global_winavbar_height)!important;
+  }
 
   &.dark_mode{
     color: @AppTheme_global_color_dark!important;
@@ -66,6 +56,26 @@
       }
     }
   }
+
+}
+
+#app {
+  -webkit-app-region: no-drag;
+  overflow: hidden;
+  border-radius: 12px;
+  position: absolute;
+  bottom: 0;
+
+  color: @AppTheme_global_color!important;
+  background-repeat: repeat-x;
+  background-size: cover;
+  background-position-y: center;
+  background-color: transparent;
+  margin: auto;
+  height: 100vh;
+  width: 100vw;
+
+  transition: all @__Global_Components_transitions_dur linear;
 
   &.mobile{
     >.primary_layout_container {
@@ -85,7 +95,7 @@ body {
   -webkit-app-region: no-drag;
 
   scroll-behavior: smooth;
-  height: 100%;
+  height: 100vh;
 
   overflow: hidden;
 
