@@ -11,7 +11,10 @@ module.exports = {
 
     api_prefix: 'ycorejs_apiv3',
     app_settings_storage: 'app_settings', 
- 
+
+    session_token_storage: 'cid',
+    session_data_storage: 'data',
+    
     appTheme_container: 'app_theme',
     appTheme_desiredContrast: 4.5,
     // Contrast level AA = 4.5, Level AAA = 7

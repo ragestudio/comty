@@ -60,12 +60,18 @@ class PageIndex extends React.PureComponent {
       }
       return null
     }
+    const handleUpdateData = () => {
+      this.props.dispatch({
+        type: "app/handleUpdateData"
+      })
+    }
+
     return (
       <div>
         <antd.Card style={{ wordBreak: 'break-all' }} title={<><Icons.Redux style={{ height: '19px', marginRight: '7px' }} /> Redux state</>}>
           {AppState()}
         </antd.Card>
-        
+        <antd.Button onClick={() => handleUpdateData()} > updateData </antd.Button>
       
       </div>
     );

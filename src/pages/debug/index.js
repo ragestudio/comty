@@ -1,5 +1,6 @@
 import React from 'react';
-import { request } from 'api';
+import {v3_request} from 'api';
+import { api_request } from 'core/libs/v3_model'
 import {
   Row,
   Col,
@@ -99,12 +100,18 @@ class RequestPage extends React.Component {
       .catch(errorInfo => {
         console.log(errorInfo);
       });
-
-    request({ method, url, params, body }).then(data => {
-      this.setState({
-        result: JSON.stringify(data),
-      });
-    });
+      const frame = {
+        method,
+        endpoint: `${method} ${url}`,
+        body,
+        verbose: true
+      }
+      console.log(frame)
+      api_request(frame, (err, res) => {
+        this.setState({
+          result: res,
+        });
+      })
   };
 
   handleClickListItem = ({ method, url }) => {

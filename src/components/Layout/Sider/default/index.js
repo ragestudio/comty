@@ -13,14 +13,17 @@ export default class Sider_Default extends React.PureComponent {
     this.setState({ menus: this.props.menus, loading: false })
   }
 
-  renderMenus(data){
+  renderMenus(data, position){
+    if(!position) return null
     return data.map(e => {
-      return e.desktop? (
-        <antd.Menu.Item key={e.id}>
-        {e.icon}
-        <span>{e.title}</span>
-      </antd.Menu.Item>
-      ) : null
+      if (!e.attributes) e.attributes = {}
+      let componentPosition = e.attributes.position || "top" 
+     
+      return componentPosition == position
+        ? (<antd.Menu.Item key={e.id}>
+        {e.icon} <span>{e.title}</span>
+        </antd.Menu.Item>)
+        : null
     })
   }
 
@@ -42,14 +45,12 @@ export default class Sider_Default extends React.PureComponent {
          
           <div className={styles.left_sider_menuContainer}>
               <antd.Menu
-                // style={{color: predominantColor}}
-                //className={classnames(styles.left_sider_menuItems, {[styles.matchColor]: theme.predominantColor? true : false})}
                 selectable={true}
                 className={styles.left_sider_menuItems}
                 mode="vertical"
                 onClick={handleClickMenu}
               >
-                {this.renderMenus(this.state.menus)}
+                {this.renderMenus(this.state.menus, "top")}
               </antd.Menu>
 
               <div className={styles.something_thats_pulling_me_down}>
@@ -59,15 +60,7 @@ export default class Sider_Default extends React.PureComponent {
                   mode="vertical"
                   onClick={handleClickMenu}
                 >
-                  <antd.Menu.Item key="settings">
-                    <Icons.SettingOutlined />
-                      <span>Settings</span>
-                  </antd.Menu.Item>
-
-                  <antd.Menu.Item key="logout">
-                    <Icons.LogoutOutlined style={{ color: 'red' }} />
-                       <span>Logout</span>
-                  </antd.Menu.Item>
+                  {this.renderMenus(this.state.menus, "bottom")}
                 </antd.Menu>
               </div>
           </div>

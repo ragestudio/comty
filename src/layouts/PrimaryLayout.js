@@ -82,7 +82,6 @@ class PrimaryLayout extends React.Component {
     }
    
     window.DarkMode = isActive(currentTheme["darkmode"])? true : false
-    console.log('USING PRIMARY')
     return (
       <React.Fragment >
         <Control />

@@ -7,9 +7,7 @@ export default class Sider_Mobile extends React.PureComponent {
 
   renderMenus(data){
     return data.map(e => {
-      return e.mobile? (
-        <antd.Menu.Item key={e.id} style={{ color: '#ffffff', fontSize: '18px' }} >{e.icon}</antd.Menu.Item>
-      ) : null
+      return <antd.Menu.Item key={e.id} style={{ color: '#ffffff', fontSize: '18px' }} >{e.icon}</antd.Menu.Item>
     })
   }
   

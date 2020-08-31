@@ -24,8 +24,21 @@ function auth(payload, callback) {
   }
 }
 
-function deauth() {
-
+function deauth(payload, callback) {
+  if (!payload) return false;
+  const frame = { id: payload.id, type: "delete"}
+  v3_model.api_request(
+    {
+      body: frame,
+      endpoint: endpoints.sessions,
+      serverKey: payload.server_key,
+      userToken: payload.userToken,
+      verbose: true,
+    },
+    (err, res) => {
+      return callback(err, res);
+    },
+  );
 }
 
 const backup = {

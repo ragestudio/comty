@@ -44,7 +44,8 @@ function createWindow() {
     minHeight: 700,
     show: true,
     frame: false,
-    transparent: true,
+    transparent: false,
+    visualEffectState: "followWindow",
     backgroundColor: '#00ffffff',
     webPreferences: {
       experimentalFeatures: true,
@@ -76,7 +77,7 @@ function createWindow() {
       if (details.url.includes('www.google-analytics.com')) {
         // eslint-disable-next-line
         details.responseHeaders['Access-Control-Allow-Origin'] = [
-          'http://localhost:3000'
+          'http://localhost:8000'
         ];
       } else {
         // eslint-disable-next-line

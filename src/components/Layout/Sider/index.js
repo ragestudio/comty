@@ -5,18 +5,72 @@ import MenuList from 'globals/sidebar_menu'
 
 import Sider_Mobile from './mobile'
 import Sider_Default from './default'
+import { connect } from 'umi'
 
+@connect(({ app }) => ({ app }))
 class Sider extends React.PureComponent {
+  state = {
+    loading: true,
+    menus: []
+  }
 
   handleClickMenu = e => {
     router.go(`/${e.key}`)
   }
 
+  requireQuery(require){
+    return new Promise(resolve => {
+      this.props.dispatch({
+        type: 'app/isUser',
+        payload: require,
+        callback: (e) => {
+          resolve(e)
+        }
+      })
+    })
+  }
+
+  async menuQuery(data){
+    if (!data) return false
+    this.setState({ loading: true })
+
+    const filterArray = (data) =>{
+      return new Promise(resolve => {
+        let menuMap = {
+          desktop: [],
+          mobile: []
+        }
+        data.forEach(async (element) => {
+          if(!element.attributes){
+            element.attributes = {}
+          }
+          let validRequire = typeof(element.attributes.require) !== 'undefined'? await this.requireQuery(element.attributes.require) : true
+          let onDekstopMode = typeof(element.attributes.desktop) !== 'undefined'? element.attributes.desktop : true
+          let onMobileMode = typeof(element.attributes.mobile) !== 'undefined'? element.attributes.mobile : true
+    
+          if (validRequire) {
+            onDekstopMode? menuMap.desktop.push(element) : null
+            onMobileMode? menuMap.mobile.push(element) : null
+          }
+        })
+        resolve(menuMap)
+      })
+    }
+
+    this.setState({ menus: await filterArray(data), loading: false })
+  }
+
+  componentDidMount(){
+    this.menuQuery(MenuList)
+  }
+
+
   render() {
     const { isMobile } = this.props
-    const sider_props = { menus: MenuList, handleClickMenu: this.handleClickMenu, logo: app_config.LogoPath }
-
-    return isMobile? <Sider_Mobile {...sider_props} /> : <Sider_Default {...sider_props} />
+    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app_config.LogoPath }
+  
+    if(this.state.loading) return null
+    return isMobile? <Sider_Mobile menus={this.state.menus.mobile} {...sider_props} /> : <Sider_Default menus={this.state.menus.desktop} {...sider_props} />
   }
 }
 
