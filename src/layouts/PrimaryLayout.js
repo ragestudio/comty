@@ -88,7 +88,7 @@ class PrimaryLayout extends React.Component {
           {isActive(currentTheme['backgroundImage'])? <div style={{ 
                   backgroundImage: `url(${currentTheme.backgroundImage.src})`,
                   transition: "all 150ms linear",
-                  position: 'absolute',  
+                  position: 'absolute',
                   width: '100vw', 
                   height: '100vh', 
                   backgroundRepeat: "repeat-x",

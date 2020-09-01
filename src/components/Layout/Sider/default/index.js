@@ -34,7 +34,8 @@ export default class Sider_Default extends React.PureComponent {
         <antd.Layout.Sider
           trigger={null}
           className={styles.left_sider_container}
-          style={{ flex:'unset', maxWidth: 'unset', minWidth: '200px', width: '100%'}}
+          width="175px"
+          style={{ flex:'unset', maxWidth: 'unset', minWidth: '175px', width: '100%'}}
         >
           <div className={styles.left_sider_brandholder}>
             <img

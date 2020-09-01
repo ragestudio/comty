@@ -1,7 +1,7 @@
 import React from 'react'
 import themeStyle from 'theme/base/vars.less'
 
-class AntdDebug extends React.Component{
+export default class AntdDebug extends React.Component{
     state = {
         styleLink: document.getElementById('theme-style'),
         body: document.getElementsByTagName('body')[0]
@@ -14,4 +14,3 @@ class AntdDebug extends React.Component{
         )
     }
 }
-export default AntdDebug

@@ -4,6 +4,7 @@ import * as Icons from 'components/Icons'
 import styles from '../index.less'
 
 export interface Card_Component_props {
+    style: object;
     type: string;
     children: any;
 }
@@ -18,13 +19,14 @@ const Card_Component = (props: Card_Component_props) => {
     if (!props.type) frag = (props.children)
   
     return(
-      <div className={styles.render_component}>
+      <div style={props.style} className={styles.render_component}>
         {frag}
       </div>
     )
 }
 
 Card_Component.defaultProps = {
+    style: null,
     type: null,
     children: <h2>Empty</h2>
 }

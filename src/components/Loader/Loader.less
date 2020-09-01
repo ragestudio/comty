@@ -1,26 +1,17 @@
 @import '~theme/index.less';
 
 .wrapper {
-  font-family: @__Global_general_font_family;
-  color: white;
-  line-height: 55px;
-  span{
-    margin: 0 10px 0 auto;
-  }
-
+  user-select: none;
   position: absolute;
   z-index: 1000;
   right: 0;
   bottom: 0;
-  width: 140px;
-  height: 55px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  width: auto;
+  height: 29px;
+
+  margin: 30px;
   background-color: #2d2d2dc2;
   border-radius: 28px;
-  margin: 10px;
-
   
   &.end {
     animation: unshow 0.8s linear;
@@ -32,11 +23,9 @@
   }
 
   .newloader {
-    transform: translate(21px,27px) scale(0.3);
-    width: 0px;
-    height: 0px;
-    margin: 0 45px 0 0;
-    position: relative;  
+    transform: scale(0.28);
+    width: 54px;
+    height: 23px; 
   }
   
   .newloader>div {

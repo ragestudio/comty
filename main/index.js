@@ -7,6 +7,7 @@ const {
   dialog,
   shell,
   screen,
+  BrowserView,
   globalShortcut
 } = require('electron');
 const path = require('path');
@@ -37,17 +38,22 @@ if (!gotTheLock) {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
+    title: packagejson.title,
     icon: path.join(__dirname, './icon.png'),
     width: 1100,
     height: 700,
-    minWidth: 1100,
-    minHeight: 700,
+    minWidth: 1256,
+    minHeight: 755,
     show: true,
     frame: false,
     transparent: false,
+    hasShadow: true,
+    //webgl: true,
     visualEffectState: "followWindow",
     backgroundColor: '#00ffffff',
     webPreferences: {
+      //enableRemoteModule: true,
+      enableBlinkFeatures: true,
       experimentalFeatures: true,
       nodeIntegration: true,
       // Disable in dev since I think hot reload is messing with it
@@ -103,7 +109,10 @@ function createWindow() {
     },
     {
       label: 'Reload',
-      click: () => ipcMain.invoke("appRestart")
+      click: () => {
+        app.relaunch();
+        mainWindow.close();
+      }
     },
     {
       label: 'Close app',
@@ -117,7 +126,6 @@ function createWindow() {
   tray.on('double-click', () => mainWindow.show());
 
   mainWindow.loadURL(app_path);
-
   if (is.dev()) {
     mainWindow.webContents.openDevTools();
   }
@@ -137,7 +145,7 @@ app.on('ready', () => {
   if (is.dev()) {
     loadWindow = new BrowserWindow({ 
       width: 700, 
-      height: 600,
+      height: 500,
       frame: false,
       resizable: false,
       center: true,

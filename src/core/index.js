@@ -408,3 +408,26 @@ export function get_value(source,key){
 export function iatToString(iat){
   return  new Date(iat * 1000).toLocaleString()
 }
+
+export function extendIDCode(id){
+  num.toString().padStart(4, "0");
+
+}
+
+export function generateUUID( lenght = 6 ){
+  let text = ""
+  const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+  for ( let i = 0; i < 6; i++ )
+    text += possibleChars.charAt ( Math.floor ( Math.random () * possibleChars.length ) )
+
+  return text
+}
+
+	/**
+	 * Generate a random string
+	 * @returns {string}
+	 */
+export function generateRandomId( length = 15 ){
+	return Math.random ().toString ( 36 ).substring ( 0, length );
+}

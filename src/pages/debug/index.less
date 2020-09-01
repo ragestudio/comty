@@ -1,39 +1,47 @@
 @import '~theme/index.less';
 
-.result {
-  height: 600px;
+.main {
+  font-family: "Nunito", sans-serif;
+  margin: 20px 0 0;
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  background: @hover-color;
-  border-color: #ddd;
-  padding: 16px;
-  margin-top: 16px;
-  word-break: break-word;
-  line-height: 2;
-  overflow: scroll;
-}
-
-.requestList {
-  padding-right: 24px;
-  margin-bottom: 24px;
-  .listItem {
-    cursor: pointer;
-    padding-left: 8px;
-    &.lstItemActive {
-      background-color: @hover-color;
-    }
-    .background-hover();
-  }
-}
-
-.paramsBlock {
-  overflow: visible;
-  opacity: 1;
   height: auto;
-  transition: opacity 0.3s;
-  &.hideParams {
-    width: 0;
-    height: 0;
-    opacity: 0;
-    overflow: hidden;
+  overflow: auto;
+  color: @__Global_layout_color;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+
+  :global {
+    .ant-menu-inline {
+      color: @__Global_layout_color;
+      background-color: transparent;
+      border: none;
+    }
+
+    .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+      font-weight: bold;
+    }
+  }
+
+  .debuggerComponent {
+    padding: 15px;
+  }
+
+  :global {
+    .ant-list-item {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    .ant-list-split .ant-list-item {
+      border-bottom: 0;
+    }
+
+    .ant-list-item-meta-title {
+      color: rgba(0, 0, 0, 0.733);
+      font-size: 14px;
+    }
   }
 }

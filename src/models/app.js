@@ -292,7 +292,13 @@ export default {
           break;
         }
         case 'dev':{
-          callback(state.session_data.dev? true : false)
+          if(state.session_data){
+            return callback(state.session_data.dev? true : false)
+          }
+          return callback(false)
+        }
+        case 'embedded':{
+          callback(state.electron? true : false)
           break;
         }
         default:{

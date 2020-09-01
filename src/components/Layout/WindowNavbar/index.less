@@ -10,7 +10,12 @@
     z-index: 5000;
     top: 0;
     right: 0;
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(54, 54, 54, 0);
+    transition: all 150ms ease-in-out;
+}
+
+.navbar:hover{
+    background-color: rgba(54, 54, 54, 0.658); 
 }
 
 .controls{
@@ -21,6 +26,19 @@
     width: auto;
     margin: auto;
     > div{
-        padding: 0 6px;
+        padding: 0 14px;
+        svg{
+            margin: 0!important;
+            padding: 0;
+        }
     }
+    > div:hover{
+        background-color: rgba(54, 54, 54, 0.808); 
+        color: #fdfdfd;
+    }
+    transition: all 150ms ease-in-out;
+}
+
+.controls:hover{
+    background-color: rgba(54, 54, 54, 0.705);
 }

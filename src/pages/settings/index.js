@@ -1,7 +1,6 @@
 import React from 'react'
 import { Menu } from 'antd'
 import * as Icons from 'components/Icons'
-import * as Feather from 'feather-reactjs'
 
 import styles from './style.less'
 
@@ -13,49 +12,56 @@ import Base from './components/base.js'
 import AppAbout from './components/about.js'
 import Theme from './components/theme'
 
-const { Item } = Menu
-const menuMap = {
-  base: (
-    <span>
-      <Icons.ControlOutlined /> General
-    </span>
-  ),
-  theme: (
-    <span>
-      <Feather.Layers /> Theme
-    </span>
-  ),
-  sync: (
-    <span>
-      <Icons.SyncOutlined /> Sync™
-    </span>
-  ),
-  security: (
-    <span>
-      <Feather.Lock /> Security & Privacity
-    </span>
-  ),
-  notification: (
-    <span>
-      <Feather.Bell /> Notification
-    </span>
-  ),
-  earnings: (
-    <span>
-      <Icons.DollarCircleOutlined /> Earnings
-    </span>
-  ),
-  help: (
-    <span>
-      <Icons.LifeBuoy /> Help
-    </span>
-  ),
-  about: (
-    <span>
-      <Feather.Info /> About
-    </span>
-  ),
+const Settings = {
+  base: <Base />,
+  about: <AppAbout />,
+  theme: <Theme />,
+  earnings: <Earnings />,
+  security: <SecurityView />,
+  notification: <NotificationView />
 }
+
+
+const { Item } = Menu
+
+const menuList = [
+  {
+    key: "base",
+    title: "General",
+    icons: <Icons.ControlOutlined />,
+  },
+  {
+    key: "app",
+    title: "Application",
+    icons: <Icons.Command />,
+    require: "embedded"
+  },
+  {
+    key: "theme",
+    title: "Customization",
+    icons: <Icons.Layers />,
+  },
+  {
+    key: "security",
+    title: "Security & Privacity",
+    icons: <Icons.ControlOutlined />,
+  },
+  {
+    key: "notification",
+    title: "Notification",
+    icons: <Icons.Bell />,
+  },
+  {
+    key: "help",
+    title: "Help",
+    icons: <Icons.LifeBuoy />,
+  },
+  {
+    key: "about",
+    title: "About",
+    icons: <Icons.Info />,
+  },
+]
 
 class GeneralSettings extends React.Component {
   constructor(props) {
@@ -66,8 +72,10 @@ class GeneralSettings extends React.Component {
   }
 
   getMenu = () => {
-    return Object.keys(menuMap).map(item => (
-      <Item key={item}>{menuMap[item]}</Item>
+    return menuList.map(item => (
+      <Item key={item.key}>
+        <span>{item.icons} {item.title}</span>
+      </Item>
     ))
   }
 
@@ -78,24 +86,11 @@ class GeneralSettings extends React.Component {
   }
 
   renderChildren = () => {
-    const { selectKey } = this.state
-    switch (selectKey) {
-      case 'base':
-        return <Base />
-      case 'security':
-        return <SecurityView />
-      case 'theme':
-        return <Theme />
-      case 'notification':
-        return <NotificationView />
-      case 'about':
-        return <AppAbout />
-      case 'earnings':
-        return <Earnings />
-      default:
-        break
+    if(this.state.selectKey){
+      return Settings[this.state.selectKey]
+    }else{
+      <div> Select an setting </div>
     }
-    return null
   }
 
   render() {

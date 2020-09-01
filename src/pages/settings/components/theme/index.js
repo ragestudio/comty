@@ -27,7 +27,7 @@ class ThemeConfigurator extends React.Component{
 
     handleUpdate(payload){
         if(!this.state.key || !this.props.dispatch) {
-            return onError.internal_proccess(`"Config key" or "Dispatcher" is missing`)
+            return onError.internal_proccess(`"Config key" or "App/Dispatcher" is missing`)
         }
         if (!payload) {
             payload = this.state.model
@@ -128,8 +128,8 @@ class BackgroundImage extends ThemeConfigurator{
             key: "backgroundImage",
             model: { active: false, opacity: null, src: null },
     
-            textColor: this.rgbToScheme(getComputedStyle(document.getElementById("app")).color),
-            overlayColor: this.rgbToScheme(getComputedStyle(document.getElementById("app")).backgroundColor),
+            textColor: this.rgbToScheme(getComputedStyle(document.getElementById("root")).color),
+            overlayColor: this.rgbToScheme(getComputedStyle(document.getElementById("root")).backgroundColor),
     
             processing: null,
             customURL: '',

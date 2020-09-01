@@ -46,11 +46,36 @@ export default [
         }
     },
     {
-        id: 'notifications',
-        title: 'Notifications',       
-        icon: <Icons.Inbox/>,
+        id: 'rooms',
+        title: 'Rooms',       
+        icon: <Icons.Box />,
         attributes: {
             require: 'login'
+        }
+    },
+    {
+        id: 'workshop',
+        title: 'Workshop',       
+        icon: <Icons.Package />,
+        attributes: {
+            require: 'login'
+        }
+    },
+    {
+        id: 'streams',
+        title: 'Streams',       
+        icon: <Icons.Tv />,
+        attributes: {
+            require: 'login'
+        }
+    },
+    {
+        id: 'debug',
+        title: 'Debug',
+        icon: <Icons.Tool />,
+        attributes: {
+            position: "bottom",
+            require: "dev"
         }
     },
     {

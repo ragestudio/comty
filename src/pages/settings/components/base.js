@@ -114,7 +114,7 @@ class Base extends Component {
             renderItem={item => (
               <List.Item actions={item.actions} key={item.id}>
                 <List.Item.Meta
-                  title={item.title}
+                  title={<>{item.icon}{item.title}</>}
                   description={item.description}
                 />
                 {this.renderSetting(item)}
