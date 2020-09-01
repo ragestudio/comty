@@ -99,7 +99,7 @@ export default class Overlay extends React.PureComponent {
     const { overlayElement, overlayActive, session_data, session_valid, session_uuid } = this.props.app
     const mainElement = (
       <div>
-        <div><__searchBar /></div> 
+        <div><__searchBar /></div>
         <div className={styles.mainElement}>
           <Card_Component>Banana</Card_Component>
           {session_valid? <Card_Component style={{ display: 'flex', lineHeight: '30px', wordBreak: 'break-all' }} ><antd.Avatar src={session_data.avatar} shape="square" /> <div style={{ marginLeft: '10px' }}> @{session_data.username}<span style={{ fontSize: "11px" }}>#{session_uuid}</span></div></Card_Component> : null }
