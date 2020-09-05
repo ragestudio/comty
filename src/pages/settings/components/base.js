@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
 import ListSettings from 'globals/settings'
-import { control } from 'components/layout/ControlBar'
+import { ControlController } from 'components/Layout/ControlBar'
 
 import verbosity from 'core/libs/verbosity'
 import * as Icons from 'components/Icons'
@@ -52,7 +52,7 @@ class Base extends Component {
         </Button>
       </div>,
     ]
-    control.set(ListControls)
+    ControlController.set(ListControls)
   }
 
   saveChanges() {
@@ -63,7 +63,7 @@ class Base extends Component {
       description:
         'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
     })
-    control.close()
+    ControlController.close()
   }
 
   onChange(item) {
