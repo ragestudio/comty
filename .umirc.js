@@ -1,5 +1,4 @@
 import { defineConfig } from 'umi';
-import slash from 'slash';
 
 const { resolve, join } = require('path');
 

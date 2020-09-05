@@ -28,6 +28,14 @@ export const app_info = {
   layout: platform.layout
 };
 
+export function isOs(os){
+  if(process){
+    return process.platform === os? true : false
+  }else{
+    return false
+  }
+}
+
 export function imageToBase64(img, callback){
   const reader = new FileReader()
   reader.addEventListener('load', () => callback(reader.result))

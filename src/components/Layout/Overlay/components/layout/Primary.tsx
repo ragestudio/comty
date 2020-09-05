@@ -3,7 +3,7 @@ import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import styles from '../../index.less'
 import classnames from 'classnames'
-import { Swapper } from '../../index.tsx'
+import { Swapper } from '../../index.js'
 
 export interface overlay_primary_props {
     y?: number;
