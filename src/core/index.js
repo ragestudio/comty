@@ -30,6 +30,7 @@ export const app_info = {
   layout: platform.layout
 };
 
+<<<<<<< HEAD
 export function getGlobals(params, callback) {
   if (!params || !params.server) return false
   let tmpResponse = []
@@ -49,6 +50,14 @@ export function getGlobals(params, callback) {
     callback(tmpResponse)
   })
   
+=======
+export function isOs(os){
+  if(process){
+    return process.platform === os? true : false
+  }else{
+    return false
+  }
+>>>>>>> ae74b15c21725c335151bc48ca4ba7ad301474cd
 }
 
 export function imageToBase64(img, callback){

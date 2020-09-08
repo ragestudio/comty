@@ -16,7 +16,7 @@ const animationStyles = {
   },
 }
 
-export const control = {
+export const ControlController = {
   set: (e) => {
     if (!window.ControlComponent.state.active) {
       window.ControlComponent.setState({ fadein: true })

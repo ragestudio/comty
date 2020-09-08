@@ -22,7 +22,7 @@
   "scripts": {
     "start": "umi dev",
     "postinstall": "electron-builder install-app-deps",
-    "electronDev": "concurrently \"electron --enable-transparent-visuals .\" \"umi dev\"",
+    "electronDev": "concurrently \"electron .\" \"umi dev\"",
     "build": "npm run build:main && npm run build:renderer",
     "build:main": "ESLINT=none roadhog build",
     "build:renderer": "ESLINT=none umi build",

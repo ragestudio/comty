@@ -14,7 +14,7 @@
 */
 
 // Reducers & helpers
-import { Swapper } from 'components/layout/Overlay/index.tsx'
+import { Swapper } from 'components/Layout/Overlay'
 import { useSelector } from 'umi';
 import { connect } from 'dva';
 
