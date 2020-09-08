@@ -20,7 +20,7 @@ export const router = {
     router.push(e);
     // goTo.element('primaryContent');
   },
-  goprofile: () => {
+  goProfile: e => {
     router.push(`/@${e}`);
     // goTo.element('primaryContent');
   },

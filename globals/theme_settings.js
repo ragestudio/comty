@@ -38,4 +38,3 @@ export default [
       description: 'Yeaah, no more daying',
     }
 ]
-  

@@ -11,6 +11,7 @@ import Earnings from './components/earnings/index.js'
 import Base from './components/base.js'
 import AppAbout from './components/about.js'
 import Theme from './components/theme'
+import ElectronApp from './components/electron'
 
 const Settings = {
   base: <Base />,
@@ -18,7 +19,8 @@ const Settings = {
   theme: <Theme />,
   earnings: <Earnings />,
   security: <SecurityView />,
-  notification: <NotificationView />
+  notification: <NotificationView />,
+  app: <ElectronApp />
 }
 
 
@@ -63,22 +65,59 @@ const menuList = [
   },
 ]
 
-class GeneralSettings extends React.Component {
+import { connect } from 'umi';
+
+@connect(({ app }) => ({ app }))
+class GeneralSettings extends React.PureComponent {
   constructor(props) {
     super(props)
     this.state = {
+      loading: true,
       selectKey: 'base',
+      menus: []
     }
   }
 
-  getMenu = () => {
-    return menuList.map(item => (
+  requireQuery(require){
+    return new Promise(resolve => {
+      this.props.dispatch({
+        type: 'app/isUser',
+        payload: require,
+        callback: (e) => {
+          resolve(e)
+        }
+      })
+    })
+  }
+
+  async queryMenu() {
+    this.setState({ loading: true })
+
+    const filterArray = (data) =>{
+      let tmp = []
+      return new Promise(resolve => {
+        data.forEach(async (element) => {
+          if (typeof(element.require) !== 'undefined') {
+            const validRequire = await this.requireQuery(element.require)
+            validRequire? tmp.push(element) : null
+          }else{
+            tmp.push(element)
+          }
+        })
+        resolve(tmp)
+      })
+    }
+
+    this.setState({ menus: await filterArray(menuList), loading: false })
+  }
+
+  getMenu() {
+    return this.state.menus.map(item => (
       <Item key={item.key}>
         <span>{item.icons} {item.title}</span>
       </Item>
     ))
   }
-
   selectKey = key => {
     this.setState({
       selectKey: key,
@@ -93,8 +132,15 @@ class GeneralSettings extends React.Component {
     }
   }
 
+  componentDidMount(){
+    this.queryMenu()
+  }
+
   render() {
-    const { selectKey } = this.state
+    const { selectKey, loading } = this.state
+    if(loading){
+      return <></>
+    }
     return (
       <div className={styles.main}>
         <div className={styles.leftMenu}>

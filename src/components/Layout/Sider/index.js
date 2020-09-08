@@ -1,11 +1,11 @@
 import React from 'react'
 import { app_config } from 'config'
 import { router } from 'core/cores'
-import MenuList from 'globals/sidebar_menu'
 
 import Sider_Mobile from './mobile'
 import Sider_Default from './default'
 import { connect } from 'umi'
+import MenuList from 'globals/sidebar_menu.js'
 
 @connect(({ app }) => ({ app }))
 class Sider extends React.PureComponent {
@@ -61,7 +61,7 @@ class Sider extends React.PureComponent {
   }
 
   componentDidMount(){
-    this.menuQuery(MenuList)
+     this.menuQuery(MenuList)
   }
 
 

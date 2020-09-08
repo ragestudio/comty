@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import styles from './index.less'
 import * as errorhandler from 'core/libs/errorhandler'
 import * as antd from 'antd'
-
+import { router } from 'core/cores'
 import {
   Primary,
   Secondary,
@@ -101,8 +101,7 @@ export default class Overlay extends React.PureComponent {
       <div>
         <div><__searchBar /></div>
         <div className={styles.mainElement}>
-          <Card_Component>Banana</Card_Component>
-          {session_valid? <Card_Component style={{ display: 'flex', lineHeight: '30px', wordBreak: 'break-all' }} ><antd.Avatar src={session_data.avatar} shape="square" /> <div style={{ marginLeft: '10px' }}> @{session_data.username}<span style={{ fontSize: "11px" }}>#{session_uuid}</span></div></Card_Component> : null }
+          {session_valid? <Card_Component onClick={() => router.goProfile(session_data["username"])} style={{ display: 'flex', lineHeight: '30px', wordBreak: 'break-all' }} ><antd.Avatar src={session_data.avatar} shape="square" /> <div style={{ marginLeft: '10px' }}> @{session_data.username}<span style={{ fontSize: "11px" }}>#{session_uuid}</span></div></Card_Component> : null }
         </div>
       </div>
     )

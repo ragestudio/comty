@@ -11,7 +11,6 @@ import * as MyLayout from './Layout/index.js'
 import PageTransition from './PageTransition'
 
 // User Components
-import UserBadges from './UserBadges'
 
 // Post Components
 import MediaPlayer from './MediaPlayer'
@@ -23,7 +22,6 @@ export {
   Feather,
   About,
   MediaPlayer,
-  UserBadges,
   PageTransition,
   MyLayout,
   Loader,

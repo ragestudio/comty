@@ -1,7 +1,6 @@
 import React from 'react'
 import * as Icons from 'components/Icons'
 import * as antd from 'antd'
-import themeSettings from 'globals/theme_settings'
 import {connect} from 'umi'
 import styles from './index.less'
 
@@ -9,6 +8,7 @@ import { onError } from 'core/libs/errorhandler'
 import { theme, getOptimalOpacityFromIMG, get_style_rule_value } from 'core/libs/style' 
 import { urlToBase64, imageToBase64, arrayToObject } from 'core'
 import exportDataAsFile from 'core/libs/interface/export_data'
+import ThemeSettingsList from 'globals/theme_settings.js'
 
 class ThemeConfigurator extends React.Component{
        
@@ -292,7 +292,7 @@ export default class ThemeSettings extends React.Component{
                 <h2><Icons.Layers/> Theme</h2>
                 <antd.List
                   itemLayout="horizontal"
-                  dataSource={themeSettings}
+                  dataSource={ThemeSettingsList}
                   renderItem={item => (
                      <div style={{ margin: '10px 0 10px 0' }} >
                         <antd.Card size="small" bodyStyle={{ width: '100%' }} style={{ display: "flex", flexDirection: "row", margin: 'auto', borderRadius: '12px' }} hoverable onClick={() => handleClick(item.id)}>

@@ -19,7 +19,7 @@ const Card_Component = (props: Card_Component_props) => {
     if (!props.type) frag = (props.children)
   
     return(
-      <div style={props.style} className={styles.render_component}>
+      <div {...props} style={props.style} className={styles.render_component}>
         {frag}
       </div>
     )

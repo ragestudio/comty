@@ -5,6 +5,8 @@ import store from 'store';
 import { i18n, app_config } from 'config';
 import * as errorHandlers from 'core/libs/errorhandler'
 import platform from 'platform'
+import { uri_resolver } from 'api/lib';
+import request from 'request'
 
 const { pathToRegexp } = require('path-to-regexp');
 
@@ -27,6 +29,27 @@ export const app_info = {
   os: platform.os,
   layout: platform.layout
 };
+
+export function getGlobals(params, callback) {
+  if (!params || !params.server) return false
+  let tmpResponse = []
+
+  let req = {
+    global: "__globals",
+    url: params.server
+  }
+
+  params.global? req.global = params.global : null
+
+  let urlString = `${req.url}/${req.global}.json`
+  console.log(urlString)
+  
+  request(urlString, (error, response, body) => {
+    tmpResponse = body
+    callback(tmpResponse)
+  })
+  
+}
 
 export function imageToBase64(img, callback){
   const reader = new FileReader()
@@ -234,7 +257,8 @@ export const time = {
 };
 
 export function pathMatchRegexp(regexp, pathname) {
-  return pathToRegexp(regexp).exec(deLangPrefix(pathname));
+  console.log('Regex => ', pathname)
+  return pathToRegexp(regexp).exec(pathname)
 }
 
 /**

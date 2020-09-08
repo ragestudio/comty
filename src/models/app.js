@@ -1,12 +1,13 @@
 /* global window */
 import store from 'store';
-import { pathMatchRegexp, queryLayout } from 'core';
+import { pathMatchRegexp, queryLayout } from '../pages/[page]/node_modules/core';
 import { app_config } from 'config';
 import keys from 'config/app_keys';
 import { router, user, session } from 'core/cores';
 import verbosity from 'core/libs/verbosity'
 import { notify } from 'core/libs/interface/notify'
 import settings from 'core/libs/settings'
+import { uri_resolver } from 'api/lib';
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -15,6 +16,7 @@ export default {
   namespace: 'app',
   state: {
     server_key: keys.server_key,
+    resolvers: null,
 
     service_valid: false,
     ng_services: false,
@@ -40,10 +42,13 @@ export default {
     setup({ dispatch }) {
       try {
         const electron = window.require("electron")
-        dispatch({ type: 'updateState', payload: { electron: electron } });
+        dispatch({ type: 'updateState', payload: { electron: electron } })
       } catch (error) {
         // nothing
       }
+      uri_resolver().then(res => {
+        dispatch({ type: 'handleUpdateResolvers', payload: res })
+      })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
       dispatch({ type: 'query' });
@@ -170,10 +175,12 @@ export default {
             sessionStorage.clear()
           }
         } 
+    
       } catch (error) {
         verbosity.error(error)
       }
-    },
+
+    }
   },
   reducers: {
     updateState(state, { payload }) {
@@ -181,6 +188,9 @@ export default {
         ...state,
         ...payload,
       };
+    },
+    handleUpdateResolvers(state, { payload }) {
+      state.resolvers = payload
     },
     handleUpdateAuthFrames(state, { payload }) {
       state.session_authframe = payload
@@ -251,7 +261,7 @@ export default {
         notify.success('Login done!')
         router.push('/')
         state.session_valid = true
-
+        location.reload()
     },
     handleUpdateData(state){
       const frame = {

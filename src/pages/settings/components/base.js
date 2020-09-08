@@ -1,17 +1,20 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
-import ListSettings from 'globals/settings'
 import { control } from 'components/layout/ControlBar'
 
 import verbosity from 'core/libs/verbosity'
 import * as Icons from 'components/Icons'
 import { settings, newSetting } from 'core/libs/settings'
+import SettingList from 'globals/settings.js'
 
+import {connect} from 'umi'
+
+@connect(({ app }) => ({ app }))
 class Base extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      list: ListSettings,
+      list: SettingList,
     };
   }
 

@@ -5,9 +5,9 @@ const { resolve, join } = require('path');
 
 export default defineConfig({
   hash: false,
-   dynamicImport: {
-     loading: 'components/Loader/Loader.js',
-   },
+  dynamicImport: {
+    loading: 'components/Loader/Loader.js',
+  },
   // dynamicImport: false,
   // history: { type: "hash" },
 
@@ -20,13 +20,13 @@ export default defineConfig({
   alias: {
     antd: resolve(__dirname, './node_modules/antd'),
     api: resolve(__dirname, './node_modules/@ragestudio/ycorejs-lib'), // ./api
+    plugins: resolve(__dirname, './plugins'),
     globals: resolve(__dirname, './globals'),
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),
     config: resolve(__dirname, './config'),
     components: resolve(__dirname, './src/components'),
     models: resolve(__dirname, './src/models'),
-    routes: resolve(__dirname, './src/routes'),
     node_modules: resolve(__dirname, './node_modules')
   },
   extraBabelPlugins: [
