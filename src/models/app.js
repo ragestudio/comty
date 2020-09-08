@@ -1,6 +1,6 @@
 /* global window */
 import store from 'store';
-import { pathMatchRegexp, queryLayout } from '../pages/[page]/node_modules/core';
+import { pathMatchRegexp, queryLayout } from 'core';
 import { app_config } from 'config';
 import keys from 'config/app_keys';
 import { router, user, session } from 'core/cores';

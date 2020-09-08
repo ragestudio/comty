@@ -1,5 +1,5 @@
 import { defaults, app_config } from 'config'
-import { get_value } from '../../../pages/[page]/node_modules/core'
+import { get_value } from 'core'
 
 export function parseLocalStorage(){
     const a = localStorage.getItem(app_config.app_settings_storage)
