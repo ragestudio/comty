@@ -46,6 +46,7 @@
     "electron-config": "^2.0.0",
     "electron-is": "^3.0.0",
     "electron-log": "^4.2.4",
+    "electron-notification-state": "^1.0.4",
     "electron-updater": "^4.3.4",
     "enquire-js": "^0.2.1",
     "feather-reactjs": "^2.0.13",

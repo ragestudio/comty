@@ -18,7 +18,7 @@ const log = require('electron-log');
 const packagejson = require('../package.json')
 const is = require('electron-is')
 const waitOn = require('wait-on');
-const { title } = require('process');
+const { getDoNotDisturb } = require('electron-notification-state')
 
 let app_path = is.dev()? 'http://127.0.0.1:8000/' : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
 let mainWindow;
@@ -33,6 +33,7 @@ app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
 const gotTheLock = app.requestSingleInstanceLock()
 const notifySupport = Notification.isSupported()
+const isNotDisturb = getDoNotDisturb()
 
 // Prevent multiple instances
 if (!gotTheLock) {
@@ -41,7 +42,6 @@ if (!gotTheLock) {
 
 function notify(params) {
   if(!notifySupport || !params) return false
-
   let options = {
     title: "",
     body: "",
@@ -52,14 +52,9 @@ function notify(params) {
   const keys = Object.keys(params)
   const values = Object.values(params)
 
-  for (let index = 0; index < keys.length; index++) {
-    const element = array[index];
-    
+  for (let i = 0; i < keys.length; i++) {
+    options[keys[i]] = values[i]
   }
-
-  params.forEach(element => {
-    options[element] = element
-  })
 
   new Notification(options).show()
 }
@@ -251,6 +246,6 @@ ipcMain.handle('appRestart', () => {
   mainWindow.close();
 });
 
-ipcMain.handle('app_notify', () => {
-  notify({ title: "Bruh" })
+ipcMain.handle('app_notify', (payload) => {
+  notify(payload)
 })
