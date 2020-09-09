@@ -1,9 +1,10 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { pathMatchRegexp } from 'core'
 import Error404 from './404.js'
 // <UserProfile {...this.props} regx={matchUser} />
+import { Invalid } from 'components'
 
-class PageIndexer extends PureComponent {
+class PageIndexer extends React.Component {
   render() {
     const { location } = this.props
     const matchUser = pathMatchRegexp('/@:id', location.pathname)
@@ -12,14 +13,14 @@ class PageIndexer extends PureComponent {
     if (matchUser) {
       return (
         <div>
-          User, matched => {matchUser}
+          {matchUser}
         </div>
       )
     }
     if (matchSetting) {
         return(
           <div>
-              Bruh, matched => {matchSetting}
+           <Invalid type="skeleton" />
           </div>
         )
     }

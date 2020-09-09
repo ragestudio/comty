@@ -8,15 +8,17 @@ const {
   shell,
   screen,
   BrowserView,
+  Notification,
   globalShortcut
-} = require('electron');
-const path = require('path');
-// const { spawn, exec } = require('child_process');
-// const { autoUpdater } = require('electron-updater');
+} = require('electron')
+const path = require('path')
+// const { spawn, exec } = require('child_process')
+// const { autoUpdater } = require('electron-updater')
 const log = require('electron-log');
 const packagejson = require('../package.json')
 const is = require('electron-is')
 const waitOn = require('wait-on');
+const { title } = require('process');
 
 let app_path = is.dev()? 'http://127.0.0.1:8000/' : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
 let mainWindow;
@@ -24,16 +26,47 @@ let tray;
 let watcher;
 
 // This gets rid of this: https://github.com/electron/electron/issues/13186
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
-// app.commandLine.appendSwitch("disable-web-security");
-app.commandLine.appendSwitch('disable-gpu-vsync=gpu');
-app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
+// app.commandLine.appendSwitch("disable-web-security")
+app.commandLine.appendSwitch('disable-gpu-vsync=gpu')
+app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
-const gotTheLock = app.requestSingleInstanceLock();
+const gotTheLock = app.requestSingleInstanceLock()
+const notifySupport = Notification.isSupported()
 
 // Prevent multiple instances
 if (!gotTheLock) {
   app.quit();
+}
+
+function notify(params) {
+  if(!notifySupport || !params) return false
+
+  let options = {
+    title: "",
+    body: "",
+    icon: null,
+    timeoutType: "default"
+  }
+
+  const keys = Object.keys(params)
+  const values = Object.values(params)
+
+  for (let index = 0; index < keys.length; index++) {
+    const element = array[index];
+    
+  }
+
+  params.forEach(element => {
+    options[element] = element
+  })
+
+  new Notification(options).show()
+}
+
+async function __init() {
+  log.log('Notify support => ', notifySupport)
+  createWindow()
 }
 
 function createWindow() {
@@ -104,29 +137,29 @@ function createWindow() {
 
   const trayMenuTemplate = [
     {
-      label: 'Dev Tools',
+      label: '🧰 DevTools',
       click: () => mainWindow.webContents.openDevTools()
     },
     {
-      label: 'Reload',
+      label: '🔄 Reload',
       click: () => {
         app.relaunch();
         mainWindow.close();
       }
     },
     {
-      label: 'Close app',
+      label: '🛑 Quit',
       click: () => mainWindow.close()
     }
   ];
 
-  const trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
-  tray.setContextMenu(trayMenu);
+  tray.setContextMenu(Menu.buildFromTemplate(trayMenuTemplate));
   tray.setToolTip(packagejson.title);
   tray.on('double-click', () => mainWindow.show());
 
   mainWindow.loadURL(app_path);
   if (is.dev()) {
+    
     mainWindow.webContents.openDevTools();
   }
 
@@ -153,15 +186,16 @@ app.on('ready', () => {
       backgroundColor: "#00000000",
     });
     loadWindow.loadURL(`file://${__dirname}/statics/loading_dev.html`)
+    notify({title: "Starting development server..."})
     waitOn({ resources: [app_path] }, function (err) {
       if (err) {
         return log.log(err, ' | electron Aborted create window')
       }
-      createWindow()
+      __init()
       loadWindow.close()
     });
   }else{
-    createWindow()
+    __init()
   }
 });
 
@@ -216,3 +250,7 @@ ipcMain.handle('appRestart', () => {
   app.relaunch();
   mainWindow.close();
 });
+
+ipcMain.handle('app_notify', () => {
+  notify({ title: "Bruh" })
+})

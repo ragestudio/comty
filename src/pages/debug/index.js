@@ -37,7 +37,7 @@ const menuMap = {
     <span>
       <Icons.Image /> Theme
     </span>
-  ),
+  )
 }
 
 export default class Debug extends React.Component {

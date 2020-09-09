@@ -5,7 +5,6 @@ import store from 'store';
 import { i18n, app_config } from 'config';
 import * as errorHandlers from 'core/libs/errorhandler'
 import platform from 'platform'
-import { uri_resolver } from 'api/lib';
 import request from 'request'
 
 const { pathToRegexp } = require('path-to-regexp');
@@ -30,6 +29,7 @@ export const app_info = {
   layout: platform.layout
 };
 
+// [Experimental], not in use
 export function getGlobals(params, callback) {
   if (!params || !params.server) return false
   let tmpResponse = []

@@ -5,6 +5,7 @@ import * as Icons from './Icons'
 import Loader from './Loader/Loader.js'
 import About from './About'
 import * as Feather from 'feather-reactjs'
+import Invalid from './Invalid'
 
 // App Layout Components
 import * as MyLayout from './Layout/index.js'
@@ -18,6 +19,7 @@ import PostCreator from './PostCreator'
 
 // Mix & Export all
 export {
+  Invalid,
   Icons,
   Feather,
   About,
