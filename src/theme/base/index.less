@@ -11,8 +11,6 @@
 @import './layout/Primary_Layout.less';
 @import './layout/LeftSider.less';
 
-@import './components/Menssaging.less';
-@import './components/PostCard.less';
 
 ::-webkit-scrollbar {
     position: absolute;
@@ -23,7 +21,7 @@
     height: 6px;
     border: 4px solid rgba(0, 0, 0, 0);
     background-clip: padding-box;
-    margin: 0 10px 0 0;
+    margin: 5px 10px 5px 5px;
     -webkit-border-radius: 7px;
     background-color: rgba(0, 0, 0, 0.15);
     -webkit-box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.05), inset 1px 1px 0 rgba(0, 0, 0, 0.05);
@@ -48,9 +46,8 @@
   }
 
   &.dark_mode{
-    color: @AppTheme_global_color_dark!important;
-    background-color: @AppTheme_global_background_dark!important;
-
+    filter: invert(100%);
+    
     :global{
       .ant-card{
         background: @AppTheme_global_background_dark!important;

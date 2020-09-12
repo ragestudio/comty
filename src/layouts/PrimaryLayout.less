@@ -4,12 +4,14 @@
 .primary_layout_container {
   background-color: transparent;
   transition: all 150ms ease-in-out;
+  backdrop-filter: blur(2px);
 
   overflow-x: hidden;
   // overflow-y: overlay;
 
   width: auto;
-  height: 97%;
+  height: 98%;
+  align-self: baseline;
 
   position: relative;
   bottom: 0;
@@ -25,11 +27,6 @@
   @media (min-width: @bp-xlarge) {
     min-width: 1112px;
   }
-
-  &.interfaced{
-    height: calc(100% - @AppTheme_global_winavbar_height);
-  }
-
 }
 
 .primary_layout_content {

@@ -84,8 +84,9 @@ class PrimaryLayout extends React.Component {
     window.DarkMode = isActive(currentTheme["darkmode"])? true : false
     return (
       <React.Fragment >
-        <Control />
-          {isActive(currentTheme['backgroundImage'])? <div style={{ 
+          <Control />
+          {isActive(currentTheme['backgroundImage'])
+          ?<div style={{ 
                   backgroundImage: `url(${currentTheme.backgroundImage.src})`,
                   transition: "all 150ms linear",
                   position: 'absolute',
