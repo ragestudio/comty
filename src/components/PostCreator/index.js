@@ -1,12 +1,44 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as core from 'core'
+import { imageToBase64 } from 'core'
 import * as Icons from 'components/Icons'
 import styles from './index.less'
 import { connect } from 'umi'
 import { stricts } from 'config'
 import { settings, newSetting } from 'core/libs/settings'
-import $ from 'jquery'
+
+const PrivacyList = [
+  {
+    id: 0,
+    type: "any",
+    icon: "Globe",
+    decoratorText: "Share with everyone"
+  },
+  {
+    id: 1,
+    type: "only_followers",
+    icon: "UserCheck",
+    decoratorText: "Share with people I follow"
+  },
+  {
+    id: 2,
+    type: "only_follow",
+    icon: "Users",
+    decoratorText: "Share with people follow me"
+  },
+  {
+    id: 3,
+    type: "private",
+    icon: "Shield",
+    decoratorText: "Dont share, only me"
+  },
+  {
+    id: 4,
+    type: "anon",
+    icon: "EyeOff",
+    decoratorText: "Anonymous"
+  }
+]
 
 @connect(({ app }) => ({ app }))
 class PostCreator extends React.PureComponent {
@@ -23,7 +55,7 @@ class PostCreator extends React.PureComponent {
       rawText: '',
       posting: false,
       postingResult: false,
-      shareWith: 'any',
+      privacity: 0,
 
       uploader: false,
       uploaderFile: null,
@@ -47,7 +79,7 @@ class PostCreator extends React.PureComponent {
     if (info.file.status === 'done') {
       this.setState({ uploaderFileOrigin: info.file.originFileObj, uploader: false })
 
-      core.getBase64(info.file.originFileObj, fileURL => {
+      imageToBase64(info.file.originFileObj, fileURL => {
         this.setState({ uploaderFile: fileURL, loading: false })
       })
     }
@@ -102,7 +134,7 @@ class PostCreator extends React.PureComponent {
 
   componentDidMount() {
     // Validate for render
-    if (this.props.app.userData) {
+    if (this.props.app.session_data) {
       this.setState({renderValid: true})
     }
 
@@ -116,7 +148,7 @@ class PostCreator extends React.PureComponent {
     //       let a;
     //       a = item.getAsFile()
     //       _this.setState({ uploaderFileOrigin: a })
-    //       core.ReadFileAsB64(a, res => {
+    //       ReadFileAsB64(a, res => {
     //         _this.setState({ uploaderFile: res })
     //       })
     //     } else {
@@ -142,57 +174,28 @@ class PostCreator extends React.PureComponent {
     return isUploadedFile || isTypedSomething
   }
 
+  renderShareOptions = () => {
+    return PrivacyList.map(e => {
+      if (!e) return null
+      return(
+        <antd.Menu.Item key={e.id}>
+          {e.icon? React.createElement(Icons[e.icon]) : null} {e.decoratorText? e.decoratorText : "Bruh"}
+        </antd.Menu.Item>
+      )
+    })
+  }
+  
   render() {
-    const { userData } = this.props.app
+    const userData = this.props.app.session_data
     const { textLenght, uploaderFile } = this.state
 
-    const GetPostPrivacy = {
-      bool: (e) => {
-        switch (e) {
-          case 'any':
-              return '0'
-          case 'only_followers':
-              return '1'
-          case 'only_follow':
-              return '2'
-          case 'private':
-              return '3'
-          default:
-              return '0'
-        }
-      },
-      decorator: (e) => {
-          switch (e) {
-              case 'any':
-                  return  <span><Icons.GlobalOutlined /> Share with everyone</span>
-              case 'only_follow':
-                  return <span><Icons.TeamOutlined /> Share with people I follow</span>
-              case 'only_followers':
-                  return <span><Icons.UsergroupAddOutlined /> Share with people follow me</span> 
-              case 'private':
-                  return <span><Icons.EyeInvisibleOutlined /> Dont share, only me</span>
-              default:
-                  return <span>Unknown</span>
-          }
-      },
+    const ShareOptionsMenu = () => {
+      return(
+        <antd.Menu onClick={e => this.setState({ privacity: e.key })}>
+          {this.renderShareOptions()}
+        </antd.Menu>
+      )
     }
-
-    const shareOptionsMenu = (
-      <antd.Menu onClick={key => this.setState({ shareWith: key })}>
-        <antd.Menu.Item key="any">
-          {GetPostPrivacy.decorator('any')}
-        </antd.Menu.Item>
-        <antd.Menu.Item key="only_follow">
-          {GetPostPrivacy.decorator('only_follow')}
-        </antd.Menu.Item>
-        <antd.Menu.Item key="only_followers">
-          {GetPostPrivacy.decorator('only_followers')}
-        </antd.Menu.Item>
-        <antd.Menu.Item key="private">
-          {GetPostPrivacy.decorator('private')}
-        </antd.Menu.Item>
-      </antd.Menu>
-    )
 
     const PostCreator_Uploader = () => {
       return(
@@ -280,20 +283,18 @@ class PostCreator extends React.PureComponent {
           >
 
             {this.state.uploader ? (
-              <Icons.Cancel />
+              <Icons.xCicle style={{ margin: 0 }} />
             ) : (
-              <Icons.AddCircle />
+              <Icons.Plus style={{ margin: 0 }} />
             )}
           </antd.Button>
           <antd.Button type="ghost" onClick={() => null}>
-            <Icons.Tune />
+            <Icons.Sliders style={{ margin: 0 }} />
           </antd.Button>
-          <antd.Dropdown overlay={shareOptionsMenu}>
-            <a
-              className={styles.shareWith}
-              onClick={e => e.preventDefault()}
-            >
-              {GetPostPrivacy.decorator(this.state.shareWith)}
+          <antd.Dropdown overlay={ShareOptionsMenu}>
+            <a className={styles.shareWith} onClick={e => e.preventDefault()}>
+              {PrivacyList[this.state.privacity].icon? React.createElement(Icons[PrivacyList[this.state.privacity].icon]) : null}
+              {PrivacyList[this.state.privacity].decoratorText? PrivacyList[this.state.privacity].decoratorText : "Bruh"}
             </a>
           </antd.Dropdown>
         </div>
@@ -301,19 +302,11 @@ class PostCreator extends React.PureComponent {
      )
     }
 
-    const PostCreator_Invalid = () => {
-      return(
-        <div>
-          <h3>This component cant be displayed!</h3>
-          <antd.Skeleton active />
-        </div>
-      )
-    }
-
+    if(!this.state.renderValid) return null
     return (
         <div className={styles.cardWrapper}>
           <antd.Card bordered="false">
-            { this.state.renderValid? <PostCreatorComponent /> : <PostCreator_Invalid /> }
+            <PostCreatorComponent />
           </antd.Card>
         </div>
       )

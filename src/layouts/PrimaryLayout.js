@@ -4,7 +4,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter, connect} from 'umi'
 import {
-  MyLayout,
+  AppLayout,
 } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
@@ -17,7 +17,7 @@ import * as antd from 'antd'
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Control, Overlay } = MyLayout
+const { Sider, Overlay } = AppLayout
 const isActive = (key) => { return key? key.active : false }
 
 @withRouter
@@ -58,6 +58,8 @@ class PrimaryLayout extends React.Component {
     const { collapsed, isMobile } = this.state
     const { onCollapseChange } = this
     const currentTheme = theme.get()
+    const app_theme = isActive(currentTheme["darkmode"])? "dark" : null
+
     const breakpoint = {
       xs: '480px',
       sm: '576px',
@@ -72,19 +74,18 @@ class PrimaryLayout extends React.Component {
       isMobile,
       collapsed,
       onCollapseChange,
-      theme: isActive(currentTheme["darkmode"])? "dark" : null
+      app_theme
     }
 
     const OverlayProps = {
       breakpoint,
       isMobile,
-      theme: isActive(currentTheme["darkmode"])? "dark" : null
+      app_theme
     }
    
     window.DarkMode = isActive(currentTheme["darkmode"])? true : false
     return (
       <React.Fragment >
-          <Control />
           {isActive(currentTheme['backgroundImage'])
           ?<div style={{ 
                   backgroundImage: `url(${currentTheme.backgroundImage.src})`,

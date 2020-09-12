@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
-import { control } from 'components/layout/ControlBar'
 
 import verbosity from 'core/libs/verbosity'
 import * as Icons from 'components/Icons'

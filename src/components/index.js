@@ -8,7 +8,7 @@ import * as Feather from 'feather-reactjs'
 import Invalid from './Invalid'
 
 // App Layout Components
-import * as MyLayout from './Layout/index.js'
+import * as AppLayout from './Layout/index.js'
 import PageTransition from './PageTransition'
 
 // User Components
@@ -19,13 +19,13 @@ import PostCreator from './PostCreator'
 
 // Mix & Export all
 export {
+  AppLayout,
   Invalid,
   Icons,
   Feather,
   About,
   MediaPlayer,
   PageTransition,
-  MyLayout,
   Loader,
   PostCreator
 }
