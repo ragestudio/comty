@@ -4,6 +4,7 @@ const {
   ipcMain,
   Tray,
   Menu,
+  MenuItem,
   dialog,
   shell,
   screen,
@@ -18,7 +19,7 @@ const log = require('electron-log');
 const packagejson = require('../package.json')
 const is = require('electron-is')
 const waitOn = require('wait-on');
-const { getDoNotDisturb } = require('electron-notification-state')
+const { getDoNotDisturb } = require('electron-notification-state');
 
 let app_path = is.dev()? 'http://127.0.0.1:8000/' : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
 let mainWindow;
@@ -28,7 +29,7 @@ let watcher;
 // This gets rid of this: https://github.com/electron/electron/issues/13186
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true
 // app.commandLine.appendSwitch("disable-web-security")
-app.commandLine.appendSwitch('disable-gpu-vsync=gpu')
+//app.commandLine.appendSwitch('disable-gpu-vsync=gpu')
 app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors')
 
 const gotTheLock = app.requestSingleInstanceLock()
@@ -38,6 +39,23 @@ const isNotDisturb = getDoNotDisturb()
 // Prevent multiple instances
 if (!gotTheLock) {
   app.quit();
+}
+
+function contextualMenu(cords){
+  if (!cords) {
+    return false
+  }
+  log.log(cords)
+
+  const menu = new Menu()
+  const menuItem = new MenuItem({
+    label: 'Inspect Element',
+    click: () => {
+      mainWindow.inspectElement(cords.x, cords.y)
+    }
+  })
+  menu.append(menuItem)
+  menu.popup(mainWindow)
 }
 
 function notify(params) {
@@ -248,4 +266,9 @@ ipcMain.handle('appRestart', () => {
 
 ipcMain.handle('app_notify', (payload) => {
   notify(payload)
+})
+
+ipcMain.handle('contextualMenu', (payload) => {
+  log.log(payload)
+  contextualMenu(payload)
 })

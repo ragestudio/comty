@@ -16,10 +16,12 @@ import PageTransition from './PageTransition'
 // Post Components
 import MediaPlayer from './MediaPlayer'
 import PostCreator from './PostCreator'
+import PostCard from './PostCard'
 
 // Mix & Export all
 export {
   AppLayout,
+  PostCard,
   Invalid,
   Icons,
   Feather,

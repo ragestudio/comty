@@ -2,7 +2,10 @@ import React from 'react'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import styles from './index.less'
+import classnames from 'classnames'
+import { connect } from 'umi'
 
+@connect(({ app }) => ({ app }))
 export default class Sider_Default extends React.PureComponent {
   state = {
     loading: true,
@@ -27,8 +30,20 @@ export default class Sider_Default extends React.PureComponent {
     })
   }
 
+  HeaderIconRender = () => {
+    if(this.props.app.session_valid){
+      return(
+        <antd.Avatar shape="circle" size="large" src={this.props.app.session_data.avatar} />
+      )
+    }else{
+      return(
+        <img className={styles.logotype} src={this.props.logo} />
+      )
+    }
+  }
+
   render() {
-    const { handleClickMenu, logo } = this.props
+    const { handleClickMenu } = this.props
     return this.state.loading? null : (
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
@@ -37,11 +52,8 @@ export default class Sider_Default extends React.PureComponent {
           width="175px"
           style={{ flex:'unset', maxWidth: 'unset', minWidth: '175px', width: '100%'}}
         >
-          <div className={styles.left_sider_header}>
-            <img
-              onClick={() => handleClickMenu({key: ''})}
-              src={logo}
-            />
+          <div onClick={() => {handleClickMenu({key: ''})}} className={classnames(styles.left_sider_header, {[styles.emb]: this.props.app.embedded})}>
+            <img className={styles.logotype} src={this.props.logo} />
           </div>
          
           <div className={styles.left_sider_menuContainer}>

@@ -42,26 +42,22 @@ const PrivacyList = [
 
 @connect(({ app }) => ({ app }))
 class PostCreator extends React.PureComponent {
-  constructor(props) {
-    super(props), 
-    this.state = {
-      maxFileSize: stricts.api_maxpayload,
-      maxTextLenght: stricts.post_maxlenght,
+  state = {
+    maxFileSize: stricts.api_maxpayload,
+    maxTextLenght: stricts.post_maxlenght,
 
-      renderValid: false,
-      loading: false,
+    renderValid: false,
+    loading: false,
 
-      textLenght: stricts.post_maxlenght,
-      rawText: '',
-      posting: false,
-      postingResult: false,
-      privacity: 0,
+    textLenght: stricts.post_maxlenght,
+    rawText: '',
+    posting: false,
+    postingResult: false,
+    privacity: 0,
 
-      uploader: false,
-      uploaderFile: null,
-      uploaderFileOrigin: null,
-    },
-    window.PostCreatorComponent = this
+    uploader: false,
+    uploaderFile: null,
+    uploaderFileOrigin: null,
   }
 
   dropRef = React.createRef()
@@ -69,9 +65,11 @@ class PostCreator extends React.PureComponent {
   ToogleUploader() {
     this.setState({ uploader: !this.state.uploader })
   }
+
   handleDeleteFile = () => {
     this.setState({ uploaderFile: null })
   }
+
   handleFileUpload = info => {
     if (info.file.status === 'uploading') {
       this.setState({ loading: true })
@@ -133,7 +131,6 @@ class PostCreator extends React.PureComponent {
   }
 
   componentDidMount() {
-    // Validate for render
     if (this.props.app.session_data) {
       this.setState({renderValid: true})
     }
@@ -253,10 +250,11 @@ class PostCreator extends React.PureComponent {
     }
 
 
-    const PostCreatorComponent = () => {
-     return(
-      <>
-        <div ref={this.dropRef} className={styles.inputWrapper}>
+    if(!this.state.renderValid) return null
+    return (
+        <div className={styles.cardWrapper}>
+          <antd.Card bordered="false">
+          <div ref={this.dropRef} className={styles.inputWrapper}>
           {this.state.uploader ? <PostCreator_Uploader /> : <PostCreator_InputText /> }
         </div>
         <div className={styles.progressHandler}>
@@ -285,7 +283,7 @@ class PostCreator extends React.PureComponent {
             {this.state.uploader ? (
               <Icons.xCicle style={{ margin: 0 }} />
             ) : (
-              <Icons.Plus style={{ margin: 0 }} />
+              <Icons.Plus style={{ margin: 0, fontSize: '14px' }} />
             )}
           </antd.Button>
           <antd.Button type="ghost" onClick={() => null}>
@@ -298,15 +296,6 @@ class PostCreator extends React.PureComponent {
             </a>
           </antd.Dropdown>
         </div>
-      </>
-     )
-    }
-
-    if(!this.state.renderValid) return null
-    return (
-        <div className={styles.cardWrapper}>
-          <antd.Card bordered="false">
-            <PostCreatorComponent />
           </antd.Card>
         </div>
       )

@@ -51,15 +51,14 @@ module.exports = {
         search_ontype: false,
         overlay_loosefocus: true,
         render_pagetransition_preset: 'moveToRightScaleUp',
+        post_catchlimit: '20',
+        post_hidebar: true,
 
         feed_autorefresh: false,
   },
 
   stricts: {
     post_maxlenght: '512',
-    post_catchlimit: '20',
-    post_hidebar: true,
-
     // In KB
     api_maxpayload: '101376',
     api_maxovertick: 10,

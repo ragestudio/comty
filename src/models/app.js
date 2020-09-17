@@ -29,6 +29,7 @@ export default {
 
     overlayActive: false,
     overlayElement: null,
+    embedded: false,
 
     controlActive: false,
     feedOutdated: false,
@@ -42,8 +43,10 @@ export default {
     setup({ dispatch }) {
       try {
         const electron = window.require("electron")
-        dispatch({ type: 'updateState', payload: { electron: electron } })
+
+        dispatch({ type: 'updateState', payload: { electron, embedded: true } })
       } catch (error) {
+        console.log(error)
         // nothing
       }
       uri_resolver().then(res => {
@@ -92,6 +95,7 @@ export default {
         yield put({ type: 'handleUpdateData' })
       }
 
+
       // if (session) {
       //   if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
       //     app.router.push({ pathname: `${app_config.MainPath}` });
@@ -123,7 +127,7 @@ export default {
     *login({ payload }, { call, put, select }) {
       if (!payload) return false;
       const { user_id, access_token } = payload.authFrame
-      return yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
+      yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
     },
     *guestLogin({ payload }, { put, select }) {
 
@@ -316,31 +320,19 @@ export default {
         }
       }
     },
-
     appControl(state, {payload}){
       if (!payload) return false
       const ipc = state.electron.ipcRenderer
       ipc.invoke(payload)
-      
-      // Specials behaviors
-      // switch (payload) {
-      //   case "hide-window":{
-      //     return ipc.invoke('hide-window')
-      //   }
-      //   case "close":{
-      //     return ipc.invoke('close-window')
-      //   }
-      //   case "quit":{
-      //     return ipc.invoke('quit-app')
-      //   }
-      //   case "minimize-window":{
-      //     return ipc.invoke('minimize-window')
-      //   }
-      //   default:
-      //     break;
-      // }
     },
-
+    ipcInvoke(state, {payload}){
+      if (!payload || !state.embedded) {
+        return false
+      }
+      console.log('INVOKING => ', payload)
+      const ipc = state.electron.ipcRenderer
+      ipc.invoke(payload.key, payload.payload)
+    },
     allNotificationsRead(state) {
       state.notifications = [];
     },
