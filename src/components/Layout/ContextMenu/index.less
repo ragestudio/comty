@@ -1,0 +1,29 @@
+.contextualMenu {
+    position: absolute;
+    background-color: rgba(36, 36, 36, 0.7);
+    border-radius: 4px;
+    padding: 10px 5px;
+    z-index: 1000;
+    width: 250px;
+    height: auto;
+    color: #e3e3e3;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+
+    > div{
+        cursor: pointer;
+        display: flex;
+  
+        align-items: center;
+        border-radius: 4px;
+        padding: 0 0 0 10px;
+        color: #e3e3e3;
+        width: 100%;
+        height: 35px;
+    }
+    > div:hover{
+        background-color: #e3e3e3;
+        color: rgba(36, 36, 36, 0.7);
+    }
+}

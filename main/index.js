@@ -41,17 +41,16 @@ if (!gotTheLock) {
   app.quit();
 }
 
-function contextualMenu(cords){
-  if (!cords) {
+function contextualMenu(payload){
+  if (!payload) {
     return false
   }
-  log.log(cords)
 
   const menu = new Menu()
   const menuItem = new MenuItem({
     label: 'Inspect Element',
     click: () => {
-      mainWindow.inspectElement(cords.x, cords.y)
+      mainWindow.inspectElement(payload.x, payload.y)
     }
   })
   menu.append(menuItem)
@@ -156,8 +155,8 @@ function createWindow() {
     {
       label: '🔄 Reload',
       click: () => {
-        app.relaunch();
-        mainWindow.close();
+        mainWindow.close()
+        app.relaunch()
       }
     },
     {
@@ -264,11 +263,15 @@ ipcMain.handle('appRestart', () => {
   mainWindow.close();
 });
 
-ipcMain.handle('app_notify', (payload) => {
+ipcMain.handle('app_notify', (event, payload) => {
   notify(payload)
 })
 
-ipcMain.handle('contextualMenu', (payload) => {
-  log.log(payload)
+ipcMain.handle('contextualMenu', (event, payload) => {
   contextualMenu(payload)
+})
+
+ipcMain.handle('inspectElement', (event, payload) => {
+  log.log(payload)
+  mainWindow.inspectElement(payload.x, payload.y)
 })

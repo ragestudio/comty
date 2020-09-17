@@ -27,6 +27,12 @@ export default {
     session_data: null,
     session_uuid: null,
 
+    contextMenu: {
+      visible: false,
+      fragment: "WooW, whats happening here!",
+      yPos: 0,
+      xPos: 0
+    },
     overlayActive: false,
     overlayElement: null,
     embedded: false,
@@ -43,7 +49,6 @@ export default {
     setup({ dispatch }) {
       try {
         const electron = window.require("electron")
-
         dispatch({ type: 'updateState', payload: { electron, embedded: true } })
       } catch (error) {
         console.log(error)
@@ -94,7 +99,6 @@ export default {
         console.log('Updating dataframe!')
         yield put({ type: 'handleUpdateData' })
       }
-
 
       // if (session) {
       //   if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
@@ -331,7 +335,16 @@ export default {
       }
       console.log('INVOKING => ', payload)
       const ipc = state.electron.ipcRenderer
+
       ipc.invoke(payload.key, payload.payload)
+    },
+    ipcSend(state, {payload}){
+      if (!payload || !state.embedded) {
+        return false
+      }
+      console.log('send INVOKING => ', payload)
+      const ipc = state.electron.ipcRenderer
+      ipc.send(payload.key, payload.payload)
     },
     allNotificationsRead(state) {
       state.notifications = [];

@@ -9,8 +9,10 @@ import classnames from 'classnames'
 
 import settings from 'core/libs/settings'
 import { router } from 'core/cores'
+import { notify } from 'core/libs/interface'
 import LikeBtn from './components/like'
 import { connect } from 'umi'
+import config from 'config'
 
 const { Meta } = antd.Card
 
@@ -45,12 +47,36 @@ export default class PostCard extends React.Component {
         })
     }
 
+    generatePostURI(id){
+      if(config.app_config.endpoint_global && id){
+        return `${config.app_config.endpoint_global}/post/${id}`
+      }
+      return null
+    }
+
+    goElementById(id){
+      document.getElementById(id).scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center"
+      })
+    }
+
     toogleMoreMenu(){
       this.setState({ visibleMoreMenu: !this.state.visibleMoreMenu })
     }
 
     handleActions(){
 
+    }
+
+    writeToClipboard(text){
+      navigator.clipboard.writeText(text)
+      .then(() => {
+        notify.info('Copy to clipboard')
+      }, () => {
+        /* failure */
+      })
     }
 
     renderReportedPost(){
@@ -134,28 +160,27 @@ export default class PostCard extends React.Component {
     }
 
     render() {
-        const handleContextMenu = e => this.handleDispatchInvoke("contextualMenu", {cords: {x: e.clientX, y: e.clientY} })
-      const actions = [
-        <LikeBtn count={this.state.payload.post_likes} liked={core.booleanFix(this.state.payload.is_liked)} />,
-        <Icons.Share2 />,
-        <antd.Badge dot={this.state.payload.post_comments > 0 ? true : false}>
-          <Icons.MessageSquare key="comments" />
-        </antd.Badge>,
-      ]
+        const actions = [
+          <LikeBtn count={this.state.payload.post_likes} liked={core.booleanFix(this.state.payload.is_liked)} />,
+          <Icons.Share2 />,
+          <antd.Badge dot={this.state.payload.post_comments > 0 ? true : false}>
+            <Icons.MessageSquare key="comments" />
+          </antd.Badge>,
+        ]
 
-      return (
-        <div className={styles.post_card_wrapper}>
-          <antd.Card
-            className={settings("post_hidebar") ? null : styles.showMode}
-            onDoubleClick={() => null}
-            onClick={this.handleClick}
-            onContextMenu={handleContextMenu}
-            actions={actions}
-            hoverable
-          >
-              {this.renderPost(this.state.payload)}
-          </antd.Card>
-        </div>
-      )
+        return (
+          <div className={styles.post_card_wrapper}>
+            <antd.Card
+              className={settings("post_hidebar") ? null : styles.showMode}
+              onDoubleClick={() => null}
+              onClick={() => this.goElementById(this.state.payload.id)}
+              onContextMenu={() => this.writeToClipboard(this.generatePostURI(this.state.payload.id))}
+              actions={actions}
+              hoverable
+            >
+                {this.renderPost(this.state.payload)}
+            </antd.Card>
+          </div>
+        )
     }
 }

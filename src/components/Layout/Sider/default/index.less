@@ -2,6 +2,7 @@
 
 
 .left_sider_wrapper {
+  -webkit-app-region: no-drag;
   user-select: none;
   border-color: transparent;
   font-size: 15px;
@@ -29,6 +30,7 @@
       }
 
       .ant-menu-item {
+        -webkit-app-region: no-drag;
         transition: @transition-ease-inout;
 
         border-radius: 4px 8px 8px 4px;
@@ -72,8 +74,9 @@
 .left_sider_header {
   cursor: pointer;
   margin: 15px 0 0 22px;
-
+  -webkit-user-drag: none;
   .logotype{
+    -webkit-app-region: no-drag;
     max-height: 70px;
     height: 35px;
   }

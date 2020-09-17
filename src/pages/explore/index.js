@@ -37,38 +37,35 @@ export default class Explore extends React.Component {
     if (this.props.app.session_valid) {
         this.request()
     }
-    window.addEventListener('contextmenu', (e) => {
-        this.props.dispatch({
-            type: "app/ipcInvoke",
-            payload: { key: "contextualMenu", payload: {x: e.clientX, y: e.clientY} } 
-        })
-    },false)
   }
+  
 
   render() {
+ 
+    if(!this.props.app.session_valid){
+      return (<antd.Result status="403" title="You need to login for view this!" />)
+    }
+
     if (!this.state.feed){
         return (
             <antd.Card bordered="false" >
               <antd.Skeleton active />
             </antd.Card>
-          )
+        )
     }
 
     return(
-        <>
-        <PostCreator />
-  
+      <div>
         <List
-        //loadMore={loadMore}
-        dataSource={this.state.feed}
-        renderItem={item => (
-            <div id={item.id}>
-                <PostCard payload={item} key={item.id} />
-            </div>
-        )}
-      />
-            </>
+            //loadMore={loadMore}
+            dataSource={this.state.feed}
+            renderItem={item => (
+                <div id={item.id}>
+                    <PostCard payload={item} key={item.id} />
+                </div>
+            )}
+        />
+      </div> 
     )
-
   }
 }

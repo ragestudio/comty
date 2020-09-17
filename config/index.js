@@ -11,6 +11,7 @@ module.exports = {
 
     api_prefix: 'ycorejs_apiv3',
     app_settings_storage: 'app_settings', 
+    endpoint_global: 'https://comty.pw',
 
     session_token_storage: 'cid',
     session_data_storage: 'data',

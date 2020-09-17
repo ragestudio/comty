@@ -1,5 +1,4 @@
 import { defineConfig } from 'umi';
-
 const { resolve, join } = require('path');
 
 export default defineConfig({
