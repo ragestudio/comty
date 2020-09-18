@@ -10,8 +10,10 @@
     display: flex;
     flex-direction: column;
     font-size: 14px;
+    user-select: none;
 
     > div{
+        transition: all 100ms linear;
         cursor: pointer;
         display: flex;
   
@@ -25,5 +27,9 @@
     > div:hover{
         background-color: #e3e3e3;
         color: rgba(36, 36, 36, 0.7);
+    }
+    > div:active{
+        transform: scale(0.98);
+        filter: brightness(110%);
     }
 }

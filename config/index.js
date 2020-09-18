@@ -1,5 +1,6 @@
 module.exports = {
   app_config: {
+    id: "comty",
     siteName: 'Comty',
     copyright: 'RageStudio©',
     MainPath: '/',
@@ -12,6 +13,7 @@ module.exports = {
     api_prefix: 'ycorejs_apiv3',
     app_settings_storage: 'app_settings', 
     endpoint_global: 'https://comty.pw',
+    proxy_local: 'http://localhost:8000',
 
     session_token_storage: 'cid',
     session_data_storage: 'data',

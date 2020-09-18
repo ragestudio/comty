@@ -8,6 +8,9 @@ import * as Icons from 'components/Icons'
 export default class Logout extends React.Component{
 
     componentDidMount(){
+        if (!this.props.app.session_valid) {
+            return false
+        }
         const dispatchLogout = () => this.props.dispatch({ type: "app/logout" })
 
         antd.Modal.confirm({

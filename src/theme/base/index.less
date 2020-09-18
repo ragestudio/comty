@@ -36,26 +36,20 @@
     background-color: transparent;
 }
 
-#root{
-  background-color: @AppTheme_global_background!important;
-  color: @AppTheme_global_color!important;
-}
-
 .app{
   &.interfaced{
     height: calc(100% - @AppTheme_global_winavbar_height)!important;
   }
-
   &.dark_mode{
-    filter: invert(100%);
-    
+   
     :global{
-      .ant-card{
-        background: @AppTheme_global_background_dark!important;
+      filter: invert(100%);
+      img, svg, video {
+        filter: invert(100%);
+        color: @AppTheme_global_background;
       }
     }
   }
-
 }
 
 #app {
@@ -64,7 +58,6 @@
   position: absolute;
   bottom: 0;
 
-  color: @AppTheme_global_color!important;
   background-repeat: repeat-x;
   background-size: cover;
   background-position-y: center;
@@ -89,6 +82,8 @@
 
 }
 
+
+
 body {
   -webkit-app-region: no-drag;
 
@@ -101,7 +96,12 @@ body {
   line-height: @base-line-height;
 
   font-family: @__Global_texted_font;
-  background-color: @AppTheme_global_background!important;
+  color: @AppTheme_global_color!important;
+  background-color: @AppTheme_global_background;
+
+  &.dark{
+    background-color: @AppTheme_global_color;
+  }
 }
 
 @media (max-width: @bp-small){

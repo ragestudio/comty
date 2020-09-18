@@ -18,27 +18,26 @@ export default class ContextMenu extends React.Component<ContextMenu_props>{
         this.setWrapperRef = this.setWrapperRef.bind(this)
         this.handleClickOutside = this.handleClickOutside.bind(this)
 
-        this.eventListener = document.addEventListener('click', this.handleClickOutside, false)
+        this.eventListener = () => {
+            document.addEventListener('click', this.handleClickOutside, false) 
+            this.listening = true
+        }
     }
-
 
     setWrapperRef(node){
         this.wrapperRef = node
     }
 
     handleClickOutside(event) {
-        if ( this.props.visible || this.wrapperRef && !this.wrapperRef.contains(event.target)) {
-            window.contextMenu.toogle()
+        if ( this.props.visible && this.wrapperRef && !this.wrapperRef.contains(event.target)) {
             this.listening = false
+            window.contextMenu.toogle()
             document.removeEventListener('click', this.eventListener, false)
         }
     }
 
     componentDidUpdate(){
-        if (!this.listening) {
-            this.listening = true
-            this.eventListener
-        }
+        !this.listening ? this.eventListener() : null
     }
 
     render(){

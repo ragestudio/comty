@@ -128,8 +128,8 @@ class BackgroundImage extends ThemeConfigurator{
             key: "backgroundImage",
             model: { active: false, opacity: null, src: null },
     
-            textColor: this.rgbToScheme(getComputedStyle(document.getElementById("root")).color),
-            overlayColor: this.rgbToScheme(getComputedStyle(document.getElementById("root")).backgroundColor),
+            textColor: this.rgbToScheme(getComputedStyle(document.getElementById("appWrapper")).color),
+            overlayColor: this.rgbToScheme(getComputedStyle(document.getElementById("appWrapper")).backgroundColor),
     
             processing: null,
             customURL: '',

@@ -9,10 +9,8 @@ import classnames from 'classnames'
 
 import settings from 'core/libs/settings'
 import { router } from 'core/cores'
-import { notify } from 'core/libs/interface'
 import LikeBtn from './components/like'
 import { connect } from 'umi'
-import config from 'config'
 
 const { Meta } = antd.Card
 
@@ -33,6 +31,44 @@ const defaultPayload = {
   ReportIgnore: false,
 }
 
+const contextMenuPost = [
+  {
+    key: "inspect_element",
+    title: "Copy URL",
+    icon: <Icons.Clipboard />,
+    params: {
+      onClick: (e) => {
+        core.writeToClipboard(core.generatePostURI(e.id))
+      }
+    }
+  },
+  {
+    key: "screenshot",
+    title: "Save screenshot",
+    icon: <Icons.Aperture />,
+    params: {
+      itemProps: { 
+        style: { color: "#40a9ff" }
+      },
+      onClick: (e) => {
+        core.createScreenshotFromElement(document.getElementById(e.id))
+      }
+    }
+  },
+  {
+    key: "require_test",
+    title: "Require Test => DEV",
+    icon: <Icons.Cloud />,
+    params: {
+      onClick: (e) => {
+        console.log('Heeeey you developeeer')
+      },
+      keepOnClick: true,
+      require: "dev"
+    }
+  }
+ ]
+
 @connect(({ app }) => ({ app }))
 export default class PostCard extends React.Component {
     state = {
@@ -47,13 +83,6 @@ export default class PostCard extends React.Component {
         })
     }
 
-    generatePostURI(id){
-      if(config.app_config.endpoint_global && id){
-        return `${config.app_config.endpoint_global}/post/${id}`
-      }
-      return null
-    }
-
     goElementById(id){
       document.getElementById(id).scrollIntoView({
         behavior: "smooth",
@@ -64,19 +93,6 @@ export default class PostCard extends React.Component {
 
     toogleMoreMenu(){
       this.setState({ visibleMoreMenu: !this.state.visibleMoreMenu })
-    }
-
-    handleActions(){
-
-    }
-
-    writeToClipboard(text){
-      navigator.clipboard.writeText(text)
-      .then(() => {
-        notify.info('Copy to clipboard')
-      }, () => {
-        /* failure */
-      })
     }
 
     renderReportedPost(){
@@ -160,6 +176,8 @@ export default class PostCard extends React.Component {
     }
 
     render() {
+      // 
+
         const actions = [
           <LikeBtn count={this.state.payload.post_likes} liked={core.booleanFix(this.state.payload.is_liked)} />,
           <Icons.Share2 />,
@@ -169,12 +187,12 @@ export default class PostCard extends React.Component {
         ]
 
         return (
-          <div className={styles.post_card_wrapper}>
+          <div key={this.state.payload.id} id={this.state.payload.id} className={styles.post_card_wrapper}>
             <antd.Card
               className={settings("post_hidebar") ? null : styles.showMode}
               onDoubleClick={() => null}
               onClick={() => this.goElementById(this.state.payload.id)}
-              onContextMenu={() => this.writeToClipboard(this.generatePostURI(this.state.payload.id))}
+              onContextMenu={(e) => { window.contextMenu.open({ xPos: e.clientX, yPos: e.clientY, fragment: window.contextMenu.generate(contextMenuPost, this.state.payload)  }) }}
               actions={actions}
               hoverable
             >

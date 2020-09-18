@@ -20,8 +20,9 @@ const packagejson = require('../package.json')
 const is = require('electron-is')
 const waitOn = require('wait-on');
 const { getDoNotDisturb } = require('electron-notification-state');
+const { app_config } = require("../config");
 
-let app_path = is.dev()? 'http://127.0.0.1:8000/' : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
+let app_path = is.dev()? app_config.proxy_local : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
 let mainWindow;
 let tray;
 let watcher;
@@ -272,6 +273,5 @@ ipcMain.handle('contextualMenu', (event, payload) => {
 })
 
 ipcMain.handle('inspectElement', (event, payload) => {
-  log.log(payload)
   mainWindow.inspectElement(payload.x, payload.y)
 })

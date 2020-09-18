@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
-import { downloadEncodedURI } from 'core'
+import { downloadDecodedURI } from 'core'
 
 export interface exportData_props {
     data: string;
@@ -25,7 +25,7 @@ const exportData_render = (props: exportData_props) => {
     antd.Modal.confirm({
         title: <div><Icons.Code /> Your export <antd.Tag> {`${props.type.split("/")[1]}`} </antd.Tag></div>,
         icon: null,
-        onOk: () => downloadEncodedURI({data: props.data, type: props.type}),
+        onOk: () => downloadDecodedURI({data: props.data, type: props.type}),
         okText: <><Icons.Download />Download as File</> ,
         cancelText: "Done",
         content: exportCodeRender(props.data),

@@ -87,14 +87,14 @@ export default {
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-      const service = yield select(state => state.app.service_valid);
-      const session = yield select(state => state.app.session_valid);
+      const service = yield select(state => state.app.service_valid)
+      const session = yield select(state => state.app.session_valid)
       const sessionDataframe = yield select(state => state.app.session_data)
 
       if (!service) {
-        console.error('❌ Cannot connect with validate session service!');
+        console.error('❌ Cannot connect with validate session service!')
       }
-      
+
       if (!sessionDataframe && session ) {
         console.log('Updating dataframe!')
         yield put({ type: 'handleUpdateData' })
@@ -141,7 +141,7 @@ export default {
       let container = yield select(state => state.app.app_theme)
       let style_keys = []
       let tmp = []
-  
+
       container.forEach((e)=>{style_keys[e.key] = e.value})
 
       if(!style_keys[payload.key]){
@@ -163,7 +163,7 @@ export default {
         const session = yield select(state => state.app.session_valid);
         let sessionAuthframe = cookie.get(app_config.session_token_storage)
         let sessionDataframe = sessionStorage.getItem(app_config.session_data_storage)
-        
+
         if (sessionAuthframe) {
           try {
             sessionAuthframe = jwt.decode(sessionAuthframe)
@@ -172,18 +172,18 @@ export default {
             verbosity.error('Invalid AUTHFRAME !', error)
             cookie.remove(app_config.session_token_storage)
           }
-        }  
+        }
         if (sessionDataframe) {
           try {
             sessionDataframe = JSON.parse(atob(sessionDataframe))
             yield put({ type: 'handleUpdateDataFrames', payload: sessionDataframe })
           } catch (error) {
-            verbosity.error('Invalid DATAFRAME !', error, session)  
-            sessionDataframe = null   
+            verbosity.error('Invalid DATAFRAME !', error, session)
+            sessionDataframe = null
             sessionStorage.clear()
           }
-        } 
-    
+        }
+
       } catch (error) {
         verbosity.error(error)
       }
@@ -212,7 +212,7 @@ export default {
       if (state.session_authframe) {
         if (settings("session_noexpire")) {
           state.session_valid = true
-          return 
+          return
         }
         const tokenExp = state.session_authframe.exp * 1000
         const tokenExpLocale = new Date(tokenExp).toLocaleString()
@@ -223,7 +223,7 @@ export default {
             settings("session_noexpire") ? '( Infinite )' : `( ${tokenExpLocale} )`
           } || NOW => ${now}`
         )
-     
+
         if (tokenExp < now) {
           verbosity.debug('This token is expired !!!')
           state.session_valid = false
@@ -251,11 +251,9 @@ export default {
           isDev: sessionData.dev,
           isPro: sessionData.is_pro
         },
-        exp: settings("session_noexpire")
-          ? 0
-          : Math.floor(Date.now() / 1000) + 60 * 60,
-        }
-    
+        exp: Math.floor(Date.now() / 1000) * 120
+      }
+
         jwt.sign(frame, state.server_key, (err, token) => {
           if (err) {
             verbosity.error(err)
@@ -273,7 +271,7 @@ export default {
     },
     handleUpdateData(state){
       const frame = {
-        id: state.session_uuid, 
+        id: state.session_uuid,
         access_token: state.session_token,
         serverKey: state.server_key
       }
@@ -285,7 +283,7 @@ export default {
               try {
                 const session_data = JSON.stringify(JSON.parse(res)["user_data"])
                 sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
-                state.session_data = session_data
+                location.reload()
               } catch (error) {
                 verbosity.error(error)
               }
@@ -364,6 +362,8 @@ export default {
       state.session_authframe = null;
       cookie.remove(app_config.session_token_storage)
       sessionStorage.clear()
+      router.push('/')
+      location.reload()
     },
   },
 };

@@ -6,14 +6,14 @@ import { i18n, app_config } from 'config';
 import * as errorHandlers from 'core/libs/errorhandler'
 import platform from 'platform'
 import request from 'request'
+import html2canvas from 'html2canvas'
 
 const { pathToRegexp } = require('path-to-regexp');
 
 export const languages = i18n ? i18n.languages.map(item => item.key) : [];
 export const defaultLanguage = i18n ? i18n.defaultLanguage : '';
 
-import './libs'
-import './cores'
+import * as libs from './libs'
 
 export const package_json = require('../../package.json');
 export const UUAID = `${package_json.name}==${package_json.UUID}`;
@@ -28,6 +28,35 @@ export const app_info = {
   os: platform.os,
   layout: platform.layout
 };
+
+export function createScreenshotFromElement(element){
+  if (!element) return false
+  html2canvas(element, {
+    useCORS: true,
+    proxy: app_config.proxy_local,
+    scale: 4,
+    backgroundColor: "transparent"
+  }).then(canvas => {
+    downloadEncodedURI({ data: canvas.toDataURL() })
+  })
+}
+
+
+export function generatePostURI(id){
+  if(app_config.endpoint_global && id){
+    return `${app_config.endpoint_global}/post/${id}`
+  }
+  return null
+}
+
+export function writeToClipboard(text){
+  navigator.clipboard.writeText(text)
+  .then(() => {
+    libs.Interface.notify.info('Copy to clipboard')
+  }, () => {
+    /* failure */
+  })
+}
 
 // [Experimental], not in use
 export function getGlobals(params, callback) {
@@ -79,12 +108,32 @@ export function urlToBase64(url, callback){
   xhr.send();
 }
 
+export function b64toBlob(b64Data, contentType='', sliceSize=512){
+  const byteCharacters = atob(b64Data);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  const blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
+
 /**
  * Generate a download with encoded uri
  * 
  * @param {object} payload - Generation Data
  */
-export function downloadEncodedURI(payload){
+export function downloadDecodedURI(payload){
   if(!payload) return false
   let { data, type, charset, filename } = payload
   /**
@@ -94,17 +143,37 @@ export function downloadEncodedURI(payload){
   if (!data || !type) return false
   try {
     if (!filename) {
-      filename = `export_${time.now()}.${type.split("/")[1]}`
+      filename = `${app_config.id}_${time.now()}.${type.split("/")[1]}`
     }
     let tmp = document.createElement('a')
     tmp.href = `data:${type};charset=${charset},${encodeURIComponent(data)}`
-    tmp.download=filename
+    tmp.download= filename
     tmp.click()
   } catch (error) {
     errorHandlers.onError.internal_proccess(error)
   }
 }
 
+export function downloadEncodedURI(payload){
+  if(!payload) return false
+  let { data, filename } = payload
+  /**
+    * 
+    * @param {object} payload - Generation Data
+    */
+  if (!data) return false
+  try {
+    if (!filename) {
+      filename = `${app_config.id}_${time.now()}.${data.split("/")[1].split(";")[0]}`
+    }
+    let tmp = document.createElement('a')
+    tmp.href = data
+    tmp.download= filename
+    tmp.click()
+  } catch (error) {
+    errorHandlers.onError.internal_proccess(error)
+  }
+}
 /**
  * Return the last object from array
  *

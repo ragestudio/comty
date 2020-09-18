@@ -1,9 +1,14 @@
-import React, { Component } from 'react'
+import React from 'react'
 import BaseLayout from './BaseLayout'
 import { withRouter } from 'umi'
+const appBody = document.getElementsByTagName("body")[0]
 
 @withRouter
-class Layout extends Component {
+class Layout extends React.Component {
+  componentDidMount(){
+    const appBody = document.getElementsByTagName("body")[0]
+    appBody.setAttribute("id", "appWrapper")
+  }
   render() {
     const { children } = this.props
     return (

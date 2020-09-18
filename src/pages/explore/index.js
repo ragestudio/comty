@@ -6,6 +6,7 @@ import { connect } from 'umi'
 import settings from 'core/libs/settings'
 import { PostCard, PostCreator } from 'components'
 import * as antd from 'antd'
+import styles from './index.less'
 
 @connect(({ app }) => ({ app }))
 export default class Explore extends React.Component {
@@ -55,14 +56,12 @@ export default class Explore extends React.Component {
     }
 
     return(
-      <div>
+      <div className={styles.exploreWrapper}>
         <List
             //loadMore={loadMore}
             dataSource={this.state.feed}
             renderItem={item => (
-                <div id={item.id}>
-                    <PostCard payload={item} key={item.id} />
-                </div>
+              <PostCard payload={item}/>
             )}
         />
       </div> 
