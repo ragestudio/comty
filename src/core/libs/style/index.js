@@ -2,7 +2,6 @@ import store from 'store';
 import { app_config } from 'config';
 import verbosity from 'core/libs/verbosity'
 import * as errorHandlers from 'core/libs/errorhandler'
-import * as core from 'core'
 
 const { appTheme_desiredContrast, appTheme_container } = app_config
 
@@ -17,8 +16,6 @@ export const theme = {
       return errorHandlers.onError.invalid_data(error, "ThemeScheme")
     }
     return container
-    
-  
   },
   set: (data) => {
     if (!data || data.length > 2) return false

@@ -107,9 +107,6 @@ class Base extends Component {
     return (
       <Fragment>
         <div>
-          <h1>
-            <Icons.PullRequestOutlined /> Behaviors
-          </h1>
           <List
             itemLayout="horizontal"
             dataSource={this.state.list}

@@ -35,8 +35,6 @@ export default class SecurityView extends React.Component {
   render() {
     return (
       <div className={styles.main}>
-        <h2>
-          <Icons.LockOutlined /> Your Security & Privacy
           <Menu
             onClick={this.handleClick}
             selectedKeys={[this.state.current]}
@@ -56,7 +54,6 @@ export default class SecurityView extends React.Component {
             </Menu.Item>
           </Menu>
           <div>{this.renderChildren()}</div>
-        </h2>
       </div>
     )
   }

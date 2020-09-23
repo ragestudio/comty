@@ -3,79 +3,84 @@ import { Menu } from 'antd'
 import * as Icons from 'components/Icons'
 
 import styles from './style.less'
+import { connect } from 'umi';
 
 import NotificationView from './components/notification/index.js'
 import SecurityView from './components/security/index.js'
-import Earnings from './components/earnings/index.js'
 
 import Base from './components/base.js'
 import AppAbout from './components/about.js'
 import Theme from './components/theme'
 import ElectronApp from './components/electron'
+import Keybinds from './components/keybinds'
+import Plugins from './components/plugins'
 
 const Settings = {
   base: <Base />,
   about: <AppAbout />,
+  keybinds: <Keybinds />,
   theme: <Theme />,
-  earnings: <Earnings />,
+  plugins: <Plugins />,
   security: <SecurityView />,
   notification: <NotificationView />,
   app: <ElectronApp />
 }
 
-
-const { Item } = Menu
-
 const menuList = [
   {
     key: "base",
     title: "General",
-    icons: <Icons.ControlOutlined />,
+    icon: <Icons.template />,
   },
   {
     key: "app",
     title: "Application",
-    icons: <Icons.Command />,
+    icon: <Icons.Command />,
     require: "embedded"
+  },
+  {
+    key: "keybinds",
+    title: "Keybinds",
+    icon: <Icons.lightningBolt />
   },
   {
     key: "theme",
     title: "Customization",
-    icons: <Icons.Layers />,
+    icon: <Icons.sparkles />,
+  },
+  {
+    key: "plugins",
+    title: "Plugins",
+    icon: <Icons.cubeTransparent />,
   },
   {
     key: "security",
     title: "Security & Privacity",
-    icons: <Icons.ControlOutlined />,
+    icon: <Icons.keyRound />,
   },
   {
     key: "notification",
     title: "Notification",
-    icons: <Icons.Bell />,
+    icon: <Icons.Bell />,
   },
   {
     key: "help",
     title: "Help",
-    icons: <Icons.LifeBuoy />,
+    icon: <Icons.LifeBuoy />,
   },
   {
     key: "about",
     title: "About",
-    icons: <Icons.Info />,
-  },
+    icon: <Icons.Info />,
+  }
 ]
-
-import { connect } from 'umi';
 
 @connect(({ app }) => ({ app }))
 class GeneralSettings extends React.PureComponent {
-  constructor(props) {
-    super(props)
-    this.state = {
-      loading: true,
-      selectKey: 'base',
-      menus: []
-    }
+  state = {
+    loading: true,
+    selectKey: 'base',
+    menus: []
   }
 
   requireQuery(require){
@@ -113,9 +118,9 @@ class GeneralSettings extends React.PureComponent {
 
   getMenu() {
     return this.state.menus.map(item => (
-      <Item key={item.key}>
-        <span>{item.icons} {item.title}</span>
-      </Item>
+      <Menu.Item key={item.key}>
+        <span>{item.icon} {item.title}</span>
+      </Menu.Item>
     ))
   }
   selectKey = key => {
@@ -125,8 +130,17 @@ class GeneralSettings extends React.PureComponent {
   }
 
   renderChildren = () => {
+    let titlesArray = []
+    this.state.menus.forEach(e => {
+      titlesArray[e.key] = e
+    })
     if(this.state.selectKey){
-      return Settings[this.state.selectKey]
+      return <>
+        <div>
+          <h2>{titlesArray[this.state.selectKey].icon || null}{titlesArray[this.state.selectKey].title || null}</h2>
+        </div>
+        {Settings[this.state.selectKey]}
+      </>
     }else{
       <div> Select an setting </div>
     }
@@ -150,7 +164,7 @@ class GeneralSettings extends React.PureComponent {
           <Menu
             mode="inline"
             selectedKeys={[selectKey]}
-            onClick={({ key }) => this.selectKey(key)}
+            onClick={({key}) => this.selectKey(key)}
           >
             {this.getMenu()}
           </Menu>

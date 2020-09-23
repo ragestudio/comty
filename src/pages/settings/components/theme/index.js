@@ -289,7 +289,6 @@ export default class ThemeSettings extends React.Component{
         const isActive = (key) => { return key? key.active : false }
         return(
             <div>
-                <h2><Icons.Layers/> Theme</h2>
                 <antd.List
                   itemLayout="horizontal"
                   dataSource={ThemeSettingsList}

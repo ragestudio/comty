@@ -198,9 +198,9 @@ export function objectToArray(object) {
 
   const keys = Object.keys(object)
   const values = Object.values(object)
-  const lenght = keys.length
+  const sourceLength = keys.length
 
-  for (let i = 0; i < lenght; i++) {
+  for (let i = 0; i < sourceLength; i++) {
     let obj = {}
     obj.key = keys[i]
     obj.value = values[i]

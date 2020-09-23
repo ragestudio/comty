@@ -29,7 +29,7 @@ export default {
 
     contextMenu: {
       visible: false,
-      fragment: "WooW, whats happening here!",
+      fragment: null,
       yPos: 0,
       xPos: 0
     },

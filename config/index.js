@@ -19,7 +19,7 @@ module.exports = {
     session_data_storage: 'data',
     
     appTheme_container: 'app_theme',
-    appTheme_desiredContrast: 4.5,
+    appTheme_desiredContrast: 7,
     // Contrast level AA = 4.5, Level AAA = 7
     // Reference: https://www.w3.org/WAI/WCAG21/quickref/?versions=2.0&showtechniques=143#qr-visual-audio-contrast-contrast
 
@@ -58,6 +58,11 @@ module.exports = {
         post_hidebar: true,
 
         feed_autorefresh: false,
+        keybinds: {
+          nextElement: "J",
+          prevElement: "U",
+          createNew: "N"
+        }
   },
 
   stricts: {
