@@ -19,7 +19,7 @@ export default class ContextMenu extends React.Component<ContextMenu_props>{
         this.handleClickOutside = this.handleClickOutside.bind(this)
 
         this.eventListener = () => {
-            document.addEventListener('click', this.handleClickOutside, false) 
+            document.addEventListener('click', this.handleClickOutside, false)
             this.listening = true
         }
     }
@@ -44,12 +44,12 @@ export default class ContextMenu extends React.Component<ContextMenu_props>{
         if (this.props.visible) {
             return(
                 <div
-                  id="contextualMenu" 
-                  ref={this.setWrapperRef} 
+                  id="contextualMenu"
+                  ref={this.setWrapperRef}
                   className={styles.contextualMenu}
-                  style={{ 
-                      top: this.props.yPos, 
-                      left: this.props.xPos, 
+                  style={{
+                      top: this.props.yPos,
+                      left: this.props.xPos,
                   }}>
                     {this.props.fragment}
                 </div>
