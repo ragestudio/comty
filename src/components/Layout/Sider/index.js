@@ -7,7 +7,7 @@ import Sider_Default from './default'
 import { connect } from 'umi'
 import MenuList from 'globals/sidebar_menu.js'
 
-@connect(({ app }) => ({ app }))
+@connect(({ app, extended }) => ({ app, extended }))
 class Sider extends React.PureComponent {
   state = {
     loading: true,
@@ -61,7 +61,12 @@ class Sider extends React.PureComponent {
   }
 
   componentDidMount(){
-     this.menuQuery(MenuList)
+    const extended = this.props.extended.sidebar
+    if(extended){
+      console.log("Extending state with => ", extended)
+      this.setState({ ...this.state, extended })
+    }
+    this.menuQuery(MenuList)
   }
 
 

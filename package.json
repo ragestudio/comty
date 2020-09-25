@@ -40,6 +40,7 @@
     "axios": "^0.19.2",
     "babel-core": "^6.26.3",
     "classnames": "^2.2.6",
+    "concat-stream": "^2.0.0",
     "cookie_js": "^1.4.0",
     "dotenv": "^8.2.0",
     "electron-config": "^2.0.0",
@@ -80,12 +81,14 @@
     "redux-socket.io": "^1.4.0",
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
+    "requirejs": "^2.3.6",
     "simple-icons": "^3.8.0",
     "socket.io-client": "^2.3.0",
     "stack-trace": "0.0.10",
     "store": "^2.0.12",
     "styled-components": "^5.2.0",
     "timeago.js": "^4.0.2",
+    "vm": "^0.1.0",
     "wait-on": "^5.2.0"
   },
   "devDependencies": {

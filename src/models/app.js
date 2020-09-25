@@ -5,9 +5,11 @@ import { user, session } from 'core/helpers'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { uri_resolver } from 'api/lib'
+import { connect } from 'umi'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
+import { usePlugins } from 'plugins'
 
 export default {
   namespace: 'app',
@@ -57,7 +59,7 @@ export default {
       })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
-      dispatch({ type: 'query' });
+      dispatch({ type: 'query', payload: { dispatcher: dispatch } });
     },
     setupHistory({ dispatch, history }) {
       history.listen(location => {
@@ -88,6 +90,8 @@ export default {
       const service = yield select(state => state.app.service_valid)
       const session = yield select(state => state.app.session_valid)
       const sessionDataframe = yield select(state => state.app.session_data)
+
+      window.PluginGlobals = []
 
       if (!service) {
         console.error('❌ Cannot connect with validate session service!')
@@ -124,7 +128,6 @@ export default {
         verbosity.debug(res)
       })
       yield put({ type: 'sessionErase' })
-
     },
     *login({ payload }, { call, put, select }) {
       if (!payload) return false;
@@ -133,6 +136,55 @@ export default {
     },
     *guestLogin({ payload }, { put, select }) {
 
+    },
+    *initializePlugins({ payload }, { select }){
+        const extended = yield select(state => state.extended)
+
+        if(!payload.array){
+          verbosity.error("Only array map for initialize plugins","Please read SDK documentation for more info.")
+          return false
+        }
+        try {
+            usePlugins([payload.array], (err, results) => {
+              if (err) {
+                verbosity.error("Init error!", err)
+                appInterface.notify.error("Plugin initialize error!", err)
+                return false
+              }
+              const rootInit = results[0]
+        
+              if (!rootInit.uuid) {
+                verbosity.error("Cannot initialize a plugin without UUID.","Please read SDK documentation for more info.")
+                appInterface.notify.error("Cannot initialize a plugin without UUID.")
+                return false
+              }
+
+              let plugin = {
+                uuid: null,
+                version: "n/a",
+                title: "Blank"
+              }
+              plugin = {...plugin, ...rootInit}
+
+              const rootClass = plugin.payload
+              
+              class extendedPlugin extends rootClass{
+                constructor(props){
+                  super(props)
+                }
+              }
+            
+              window.PluginGlobals[plugin.uuid] = new extendedPlugin(extended)
+
+              appInterface.notify.open({
+                message: `${plugin.title} v${plugin.version}`,
+                description: `New plugin is now installed !`
+              })
+            })
+        } catch (error) {
+          verbosity.error("Unexpected catched exception! ", error)
+
+        }
     },
     *updateTheme({payload}, {put, select}){
       if (!payload) return false

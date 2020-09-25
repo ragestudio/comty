@@ -3,5 +3,6 @@ import * as appInterface from './appInterface'
 export * from './settings'
 export * from './router'
 export * from './verbosity'
+export * from './extension'
 
 export { v3_model, appInterface }
