@@ -1,5 +1,7 @@
-import * as v3_model from './v3_model';
-import * as Interface from './interface'
+import * as v3_model from './v3_model'
+import * as appInterface from './appInterface'
 export * from './settings'
+export * from './router'
+export * from './verbosity'
 
-export { v3_model, Interface };
+export { v3_model, appInterface }

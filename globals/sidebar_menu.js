@@ -89,7 +89,7 @@ export default [
     {
         id: 'logout',
         title: 'Logout',
-        icon: <Icons.LogOut style={{ color: 'red', marginRight: '10px' }} />,
+        icon: <Icons.LogOut style={{ color: '#ef233c', marginRight: '10px' }} />,
         attributes: {
             position: "bottom",
             require: 'login'
@@ -98,7 +98,7 @@ export default [
     {
         id: 'login',
         title: 'Signin',
-        icon: <Icons.LogIn style={{ color: 'blue', marginRight: '10px' }} />,
+        icon: <Icons.LogIn style={{ color: '#5390d9', marginRight: '10px' }} />,
         attributes: {
             position: "bottom",
             require: "guest"

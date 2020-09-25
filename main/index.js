@@ -9,6 +9,7 @@ const {
   shell,
   screen,
   BrowserView,
+  systemPreferences, 
   Notification,
   globalShortcut
 } = require('electron')
@@ -39,7 +40,21 @@ const isNotDisturb = getDoNotDisturb()
 
 // Prevent multiple instances
 if (!gotTheLock) {
-  app.quit();
+  app.quit()
+}
+
+function relaunchApp(){
+  mainWindow.close()
+  app.relaunch()
+}
+
+function resumeApp(){
+  if (mainWindow) {
+    mainWindow.show()
+    mainWindow.focus()
+  }else{
+    createWindow()
+  }
 }
 
 function contextualMenu(payload){
@@ -78,7 +93,6 @@ function notify(params) {
 }
 
 async function __init() {
-  log.log('Notify support => ', notifySupport)
   createWindow()
 }
 
@@ -105,16 +119,16 @@ function createWindow() {
       // Disable in dev since I think hot reload is messing with it
       webSecurity: !is.dev()
     }
-  });
+  })
 
   if (is.dev()) {
     globalShortcut.register('CommandOrControl+R', () => {
-      mainWindow.reload();
-    });
+      mainWindow.reload()
+    })
 
     globalShortcut.register('F5', () => {
-      mainWindow.reload();
-    });
+      mainWindow.reload()
+    })
   }
 
   mainWindow.webContents.session.webRequest.onHeadersReceived(
@@ -122,18 +136,12 @@ function createWindow() {
       urls: ['http://*/*', 'https://*/*']
     },
     (details, callback) => {
-      // eslint-disable-next-line
-      delete details.responseHeaders['Access-Control-Allow-Origin'];
-      // eslint-disable-next-line
-      delete details.responseHeaders['access-control-allow-origin'];
+      delete details.responseHeaders['Access-Control-Allow-Origin']
+      delete details.responseHeaders['access-control-allow-origin']
       if (details.url.includes('www.google-analytics.com')) {
-        // eslint-disable-next-line
-        details.responseHeaders['Access-Control-Allow-Origin'] = [
-          'http://localhost:8000'
-        ];
+        details.responseHeaders['Access-Control-Allow-Origin'] = [ app_path ]
       } else {
-        // eslint-disable-next-line
-        details.responseHeaders['Access-Control-Allow-Origin'] = ['*'];
+        details.responseHeaders['Access-Control-Allow-Origin'] = ['*']
       }
       callback({
         cancel: false,
@@ -150,41 +158,41 @@ function createWindow() {
 
   const trayMenuTemplate = [
     {
-      label: '🧰 DevTools',
+      label: '🧰 Open DevTools',
       click: () => mainWindow.webContents.openDevTools()
     },
     {
-      label: '🔄 Reload',
+      label: '🔄 Relaunch',
       click: () => {
-        mainWindow.close()
-        app.relaunch()
+        relaunchApp()
       }
     },
     {
       label: '🛑 Quit',
-      click: () => mainWindow.close()
+      click: () => app.quit()
     }
   ];
 
-  tray.setContextMenu(Menu.buildFromTemplate(trayMenuTemplate));
-  tray.setToolTip(packagejson.title);
-  tray.on('double-click', () => mainWindow.show());
+  tray.setContextMenu(Menu.buildFromTemplate(trayMenuTemplate))
+  tray.setToolTip(packagejson.title)
+  tray.on('double-click', () => resumeApp())
 
-  mainWindow.loadURL(app_path);
+  mainWindow.loadURL(app_path)
+  mainWindow.focus()
+
   if (is.dev()) {
-    
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools()
   }
 
   // const handleRedirect = (e, url) => {
   //   if (url !== mainWindow.webContents.getURL()) {
-  //     e.preventDefault();
-  //     shell.openExternal(url);
+  //     e.preventDefault()
+  //     shell.openExternal(url)
   //   }
   // };
 
-  // mainWindow.webContents.on('will-navigate', handleRedirect);
-  // mainWindow.webContents.on('new-window', handleRedirect);
+  // mainWindow.webContents.on('will-navigate', handleRedirect)
+  // mainWindow.webContents.on('new-window', handleRedirect)
 }
 
 app.on('ready', () => {
@@ -202,41 +210,41 @@ app.on('ready', () => {
     notify({title: "Starting development server..."})
     waitOn({ resources: [app_path] }, function (err) {
       if (err) {
-        return log.log(err, ' | electron Aborted create window')
+        return log.log(err)
       }
       __init()
       loadWindow.close()
-    });
+    })
   }else{
     __init()
   }
-});
+})
 
 app.on('window-all-closed', () => {
-  app.quit();
-});
+  mainWindow = null;
+})
 
 app.on('before-quit', async () => {
   mainWindow.removeAllListeners('close');
   mainWindow = null;
-});
+})
 
 ipcMain.handle('update-progress-bar', (event, p) => {
   mainWindow.setProgressBar(p);
-});
+})
 
 ipcMain.handle('hide-window', () => {
   if (mainWindow) {
     mainWindow.hide();
   }
-});
+})
 
 ipcMain.handle('show-window', () => {
   if (mainWindow) {
     mainWindow.show();
     mainWindow.focus();
   }
-});
+})
 
 ipcMain.handle('min-max-window', () => {
   if (mainWindow.isMaximized()) {
@@ -244,25 +252,27 @@ ipcMain.handle('min-max-window', () => {
   } else if (mainWindow.maximizable) {
     mainWindow.maximize();
   }
-});
+})
+
+ipcMain.handle('getSystemPreferences', () => {
+  return systemPreferences
+})
 
 ipcMain.handle('minimize-window', () => {
   mainWindow.minimize();
-});
+})
 
 ipcMain.handle('quit-app', () => {
-  mainWindow.close();
-});
+  app.quit();
+})
 
 ipcMain.handle('open-devtools', () => {
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
-});
+})
 
-ipcMain.handle('appRestart', () => {
-  log.log('Restarting app');
-  app.relaunch();
-  mainWindow.close();
-});
+ipcMain.handle('appRelaunch', () => {
+  relaunchApp()
+})
 
 ipcMain.handle('app_notify', (event, payload) => {
   notify(payload)

@@ -1,4 +1,4 @@
-import { notify } from 'core/libs/interface/notify'
+import { appInterface } from 'core/libs'
 import verbosity from 'core/libs/verbosity'
 
 // STRINGS
@@ -10,7 +10,7 @@ export const INVALID_PROPS = `Some props failed!`
 export const onError = {
     internal_proccess: (...rest) => {
         verbosity.error(...rest)
-        notify.open({
+        appInterface.notify.open({
             message: INTERNAL_PROCESS_FAILED,
             description:
             <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto' }}>
@@ -22,7 +22,7 @@ export const onError = {
     },
     invalid_data: (error, expecting) => {
         verbosity.error(error)
-        notify.open({
+        appInterface.notify.open({
             message: 'Invalid Data',
             description:
             <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto' }}>

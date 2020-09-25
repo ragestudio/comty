@@ -1,7 +1,7 @@
 import React from 'react'
 import * as antd from 'antd'
 import { connect } from 'umi'
-import { router, user, session } from 'core/cores';
+import { router } from 'core/libs';
 import * as Icons from 'components/Icons'
 
 @connect(({ app }) => ({ app }))

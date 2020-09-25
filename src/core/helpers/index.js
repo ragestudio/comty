@@ -1,5 +1,3 @@
-export * from './router'
-
 import * as user from './user'
 import * as session from './session'
 

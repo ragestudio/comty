@@ -8,7 +8,7 @@ import Icon from '@ant-design/icons'
 import classnames from 'classnames'
 
 import settings from 'core/libs/settings'
-import { router } from 'core/cores'
+import { router } from 'core/libs'
 import LikeBtn from './components/like'
 import { connect } from 'umi'
 

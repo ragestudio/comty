@@ -53,7 +53,12 @@ class PrimaryLayout extends React.Component {
          payload: { x: e.clientX, y: e.clientY }
       }
     }) 
-
+    window.toogleSidebarCollapse = () => {
+      this.props.dispatch({
+        type: "app/handleCollapseSidebar",
+        payload: !this.props.app.sidebar_collapsed
+      })
+    }
     window.contextMenu = this.props.app.contextMenu
     window.contextMenu.open = (payload) => {
       if (!payload) return false

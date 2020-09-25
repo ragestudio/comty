@@ -7,7 +7,7 @@ import styles from './index.less'
 import { onError } from 'core/libs/errorhandler'
 import { theme, getOptimalOpacityFromIMG, get_style_rule_value } from 'core/libs/style' 
 import { urlToBase64, imageToBase64, arrayToObject } from 'core'
-import exportDataAsFile from 'core/libs/interface/export_data'
+import exportDataAsFile from 'core/libs/appInterface/export_data'
 import ThemeSettingsList from 'globals/theme_settings.js'
 
 class ThemeConfigurator extends React.Component{

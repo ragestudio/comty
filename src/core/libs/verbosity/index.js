@@ -3,7 +3,7 @@ import stackTrace from 'stack-trace'
 // import path from 'path'
 const verbosity_enabled = settings('verbosity')
 
-const verbosity = {
+export const verbosity = {
   log: (...cont) => {
     return verbosity_enabled ? console.log(...cont) : null
   },

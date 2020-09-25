@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import styles from './index.less'
 import * as errorhandler from 'core/libs/errorhandler'
 import * as antd from 'antd'
-import { router } from 'core/cores'
+import { router } from 'core/libs'
 import {
   Primary,
   Secondary,

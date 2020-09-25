@@ -1,6 +1,6 @@
 import React from 'react'
 import { app_config } from 'config'
-import { router } from 'core/cores'
+import { router } from 'core/libs'
 
 import Sider_Mobile from './mobile'
 import Sider_Default from './default'

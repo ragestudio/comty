@@ -12,9 +12,13 @@ export default defineConfig({
   targets: { ie: 9 },
   dva: { immer: true },
   ignoreMomentLocale: true,
+  mountElementId: "root",
   nodeModulesTransform: {
     type: 'none',
   },
+  // ssr: {
+  //   devServerRender: true,
+  // },
   alias: {
     antd: resolve(__dirname, './node_modules/antd'),
     api: resolve(__dirname, './node_modules/@ragestudio/ycorejs-lib'), // ./api

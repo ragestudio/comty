@@ -6,7 +6,7 @@ import HeadShake from 'react-reveal/HeadShake';
 
 import * as antd from 'antd'
 
-import { session, user } from 'core/cores'
+import { session, user } from 'core/helpers'
 
 import verbosity from 'core/libs/verbosity'
 
@@ -199,6 +199,7 @@ export class NormalLoginForm extends React.PureComponent {
               ]}
             >
               <Input
+                autoFocus
                 prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder="Username or Email"
               />
@@ -233,6 +234,7 @@ export class NormalLoginForm extends React.PureComponent {
               ]}
             >
               <Input.Password
+                autoFocus
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type={this.state.swpass ? 'text' : 'password'}
                 placeholder="Password"

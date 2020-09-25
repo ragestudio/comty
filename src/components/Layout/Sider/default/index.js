@@ -6,10 +6,14 @@ import classnames from 'classnames'
 import { connect } from 'umi'
 
 @connect(({ app }) => ({ app }))
-export default class Sider_Default extends React.PureComponent {
+export default class Sider_Default extends React.Component {
   state = {
     loading: true,
     menus: null
+  }
+
+  toogleCollapse(){
+    window.toogleSidebarCollapse()
   }
 
   componentDidMount(){
@@ -23,9 +27,11 @@ export default class Sider_Default extends React.PureComponent {
       let componentPosition = e.attributes.position || "top" 
      
       return componentPosition == position
-        ? (<antd.Menu.Item key={e.id}>
-        {e.icon} <span>{e.title}</span>
-        </antd.Menu.Item>)
+        ? (
+          <antd.Menu.Item icon={e.icon} key={e.id}>
+            <span>{e.title}</span>
+          </antd.Menu.Item>
+        )
         : null
     })
   }
@@ -44,23 +50,25 @@ export default class Sider_Default extends React.PureComponent {
 
   render() {
     const { handleClickMenu } = this.props
-    return this.state.loading? null : (
+    if (this.state.loading) {
+      return null
+    }
+    return (
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
+          collapsed={this.props.app.sidebar_collapsed || false}
           trigger={null}
           className={styles.left_sider_container}
           width="175px"
-          style={{ flex:'unset', maxWidth: 'unset', minWidth: '175px', width: '100%'}}
+          style={{ flex:'unset' }}
         >
           <div onClick={() => {handleClickMenu({key: ''})}} className={classnames(styles.left_sider_header, {[styles.emb]: this.props.app.embedded})}>
             <img className={styles.logotype} src={this.props.logo} />
-          </div>
-         
+          </div>         
           <div className={styles.left_sider_menuContainer}>
               <antd.Menu
-                selectable={true}
+                selectable={false}
                 className={styles.left_sider_menuItems}
-                mode="vertical"
                 onClick={handleClickMenu}
               >
                 {this.renderMenus(this.state.menus, "top")}
@@ -70,7 +78,6 @@ export default class Sider_Default extends React.PureComponent {
                 <antd.Menu
                   selectable={false}
                   className={styles.left_sider_menuItems}
-                  mode="vertical"
                   onClick={handleClickMenu}
                 >
                   {this.renderMenus(this.state.menus, "bottom")}

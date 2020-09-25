@@ -22,49 +22,13 @@
     .ant-layout-sider {
       background-color: transparent;
       float: right;
+
       .ant-menu {
         font-weight: 700;
         color: unset;
         vertical-align: middle;
         // margin: 0 0 0 5px;
-      }
-
-      .ant-menu-item {
-        -webkit-app-region: no-drag;
-        transition: @transition-ease-inout;
-
-        border-radius: 4px 8px 8px 4px;
-        padding: 2px 0 2px 24px;
-        
-        text-align: left;
-      }
-
-      .ant-menu-item:hover {
-        border-radius: 8px;
-        transform: translate(10px,0);
-        
-        // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
-        backdrop-filter: blur(2px);
-        // border-left: 10px @app_accent_gradient solid;
-        box-shadow: -2px 2px 1px 0 rgba(51, 51, 51, 0.13);
-        color: rgb(102, 102, 102);
-      }
-
-      .ant-menu-item-selected {
-        background-color: unset;
-        // background: linear-gradient(90deg, rgb(255, 230, 0) 2%, rgba(255,255,255,0.5) 10%);
-    
-      }
-
-      .anticon {
-        font-size: @left_sider_sizeIcons;
-      }
-
-     
-      .ant-menu-inline-collapsed,
-      .antd-menu-vertical-left,
-      .ant-menu-vertical {
-        border-right: 0 solid transparent;
+        // border-right: 0!important;
       }
     }
   }
@@ -117,7 +81,6 @@
 .left_sider_menuContainer {
   height: 100%;
   margin: 18px 0 8px;
-  flex: 1;
 
   :global {
     .ant-layout-sider-children {
@@ -126,24 +89,50 @@
       justify-content: space-between;
     }
 
-    .ant-layout-sider-collapsed {
+    .ant-menu-item {
+      -webkit-app-region: no-drag;
+      transition: @transition-ease-inout;
+
+      border-radius: 4px 8px 8px 4px;
+      padding: 2px 0 2px 24px;
+      border-right: 0!important;
+
+      text-align: left;
+    }
+
+    .ant-menu-item:hover {
+      border-radius: 8px;
+      transform: translate(10px,0);
+      
+      // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
+      backdrop-filter: blur(2px);
+      // border-left: 10px @app_accent_gradient solid;
+      box-shadow: -2px 2px 1px 0 rgba(51, 51, 51, 0.13);
+      color: rgb(102, 102, 102);
+    }
+
+    .ant-menu-item-selected {
+      background-color: unset;
+      // background: linear-gradient(90deg, rgb(255, 230, 0) 2%, rgba(255,255,255,0.5) 10%);
+    }
+
+    .anticon {
+      font-size: @left_sider_sizeIcons;
+    }
+   
+    .ant-layout-sider-collapsed, .ant-menu-inline-collapsed {
       .ant-menu-item {
-        left: 0;
-        margin: 0;
-        padding: 0;
+        > span{
+          visibility: hidden;
+        }
+      } 
+      .ant-menu-item:hover {
+        box-shadow: unset;
       }
-
-      .ant-menu-inline-collapsed>.ant-menu-item {
-        padding: 0;
-        left: 0;
-      }
+      
     }
 
-    .ant-menu-inline .ant-menu-item {
-      font-family: @__Global_general_font_family;
-    }
-
-    .ant-menu-dark .ant-menu-item a {
+    .ant-menu-item a {
       color: @AppTheme_global_color;
     }
   }
@@ -152,7 +141,7 @@
 .left_sider_menuItems {
   background-color: transparent;
   margin-bottom: 8px;
-  width: 100%;
+  //width: 100%;
   font-weight: 500;
 
   animation: fadein 0.5s;

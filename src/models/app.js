@@ -1,13 +1,10 @@
-/* global window */
-import store from 'store';
-import { pathMatchRegexp, queryLayout } from 'core';
-import { app_config } from 'config';
-import keys from 'config/app_keys';
-import { router, user, session } from 'core/cores';
-import verbosity from 'core/libs/verbosity'
-import { notify } from 'core/libs/interface/notify'
+import store from 'store'
+import { app_config } from 'config'
+import keys from 'config/app_keys'
+import { user, session } from 'core/helpers'
+import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
-import { uri_resolver } from 'api/lib';
+import { uri_resolver } from 'api/lib'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -33,6 +30,7 @@ export default {
       yPos: 0,
       xPos: 0
     },
+    sidebar_collapsed: store.get("sidebar_collapse"),
     overlayActive: false,
     overlayElement: null,
     embedded: false,
@@ -250,8 +248,8 @@ export default {
           isAdmin: sessionData.admin,
           isDev: sessionData.dev,
           isPro: sessionData.is_pro
-        },
-        exp: Math.floor(Date.now() / 1000) * 120
+        }
+       
       }
 
         jwt.sign(frame, state.server_key, (err, token) => {
@@ -264,7 +262,7 @@ export default {
           state.session_authframe = token
         })
 
-        notify.success('Login done!')
+        appInterface.notify.success('Login done!')
         router.push('/')
         state.session_valid = true
         location.reload()
@@ -295,7 +293,10 @@ export default {
       store.set('theme', payload);
       state.theme = payload;
     },
-
+    handleCollapseSidebar(state, { payload }){
+      store.set('sidebar_collapse', payload);
+      state.sidebar_collapsed = payload
+    },
     isUser(state, { payload, callback }){
       if(!payload || !callback) return false
       switch (payload) {
