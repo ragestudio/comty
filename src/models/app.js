@@ -167,14 +167,42 @@ export default {
               plugin = {...plugin, ...rootInit}
 
               const rootClass = plugin.payload
-              
+              let extendedRequire = null
+
               class extendedPlugin extends rootClass{
                 constructor(props){
                   super(props)
                 }
               }
             
-              window.PluginGlobals[plugin.uuid] = new extendedPlugin(extended)
+              if( typeof(plugin.requireExtends) !== "undefined" ) {
+                console.log("Extending class with => ", plugin.requireExtends)
+        
+                plugin.requireExtends.forEach((e) => {
+                  const RequireFrom = e.from
+                  const RequireImport = e.import
+
+                  const existScheme = typeof(RequireImport) !== "undefined" && typeof(RequireFrom) !== "undefined"
+                  if(!existScheme){
+                    verbosity.error("Invalid require extension!")
+                    return false
+                  }
+
+                  if (Array.isArray(RequireImport)) {
+                    console.log("Require array")
+                    RequireImport.forEach((e) => {
+                      console.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
+                      extendedRequire[e] = require(RequireFrom)
+                    })
+                  }else{
+                    console.log("Require default")
+
+                  }
+
+                })
+              }
+
+              window.PluginGlobals[plugin.uuid] = new extendedPlugin({ extended, extendedRequire })
 
               appInterface.notify.open({
                 message: `${plugin.title} v${plugin.version}`,
@@ -304,20 +332,20 @@ export default {
        
       }
 
-        jwt.sign(frame, state.server_key, (err, token) => {
-          if (err) {
-            verbosity.error(err)
-            return false
-          }
-          cookie.set(app_config.session_token_storage, token)
-          sessionStorage.setItem(app_config.session_data_storage, btoa(payload.user_data))
-          state.session_authframe = token
-        })
+      jwt.sign(frame, state.server_key, (err, token) => {
+        if (err) {
+          verbosity.error(err)
+          return false
+        }
+        cookie.set(app_config.session_token_storage, token)
+        sessionStorage.setItem(app_config.session_data_storage, btoa(payload.user_data))
+        state.session_authframe = token
+      })
 
-        appInterface.notify.success('Login done!')
-        router.push('/')
-        state.session_valid = true
-        location.reload()
+      appInterface.notify.success('Login done!')
+      router.push('/')
+      state.session_valid = true
+      location.reload()
     },
     handleUpdateData(state){
       const frame = {

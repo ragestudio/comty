@@ -98,7 +98,7 @@ export default [
     {
         id: 'login',
         title: 'Signin',
-        icon: <Icons.LogIn style={{ color: '#5390d9', marginRight: '10px' }} />,
+        icon: <Icons.LogIn style={{ color: '#3a86ff', marginRight: '10px' }} />,
         attributes: {
             position: "bottom",
             require: "guest"
