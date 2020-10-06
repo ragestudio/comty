@@ -8,12 +8,14 @@ import ApiDebug from './api.js'
 import AntdDebug from './antd.js'
 import CoreDebug from './core.js'
 import ThemeDebug from './theme.js'
+import SocketDebug from './socket.js'
 
 const debbugers = {
   apiDebug: <ApiDebug />,
   antdDebug: <AntdDebug />,
   coreDebug: <CoreDebug />,
-  themeDebug: <ThemeDebug />
+  themeDebug: <ThemeDebug />,
+  socketDebug: <SocketDebug />
 }
 
 const { Item } = Menu
@@ -37,6 +39,11 @@ const menuMap = {
     <span>
       <Icons.Image /> Theme
     </span>
+  ),
+  socketDebug: (
+    <span>
+      <Icons.Box /> Socket
+    </span>
   )
 }
 
@@ -44,7 +51,7 @@ export default class Debug extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      selectKey: '',
+      selectKey: 'socketDebug',
     }
   }
 

@@ -4,13 +4,15 @@ module.exports = {
     siteName: 'Comty',
     copyright: 'RageStudio©',
     MainPath: '/',
-
+    
     LogoPath: '/logo.svg',
     FullLogoPath: '/full_logo.svg',
     DarkFullLogoPath: '/dark_full_logo.svg',
     DarkLogoPath: '/dark_logo.svg',
 
+    api_interface: 'https://api.ragestudio.net',
     api_prefix: 'ycorejs_apiv3',
+    
     app_settings_storage: 'app_settings', 
     endpoint_global: 'https://comty.pw',
     proxy_local: 'http://localhost:8000',
@@ -49,6 +51,7 @@ module.exports = {
   
   // Default Behaviors 
   defaults: {
+        app_model: "app",
         verbosity: false,
         session_noexpire: false,
         search_ontype: false,

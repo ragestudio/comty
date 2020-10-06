@@ -5,7 +5,6 @@ import { user, session } from 'core/helpers'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { uri_resolver } from 'api/lib'
-import { connect } from 'umi'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -51,7 +50,6 @@ export default {
         const electron = window.require("electron")
         dispatch({ type: 'updateState', payload: { electron, embedded: true } })
       } catch (error) {
-        console.log(error)
         // nothing
       }
       uri_resolver().then(res => {

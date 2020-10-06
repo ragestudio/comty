@@ -122,6 +122,7 @@ function createWindow() {
   })
 
   if (is.dev()) {
+    app.commandLine.appendSwitch('remote-debugging-port', '9222')
     globalShortcut.register('CommandOrControl+R', () => {
       mainWindow.reload()
     })

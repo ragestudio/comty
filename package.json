@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "umi dev",
+    "debug": "node --inspect-brk ./node_modules/.bin/umi dev",
     "postinstall": "electron-builder install-app-deps",
     "electronDev": "concurrently \"electron .\" \"npm start\"",
     "build": "npm run build:main && npm run build:renderer",

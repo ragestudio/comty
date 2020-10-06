@@ -16,7 +16,6 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "mock/**/*",
     "src/**/*",
     "config/**/*",
     ".umirc.js",
