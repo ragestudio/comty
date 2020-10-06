@@ -81,7 +81,7 @@ export class SocketConnection{
             this.ioConn.disconnect()
         },
         close: () => {
-            verbosity("Connection closed!")
+            verbosityConsole("Connection closed!")
             this.ioConn.close()
         },
         destroy: () => {
