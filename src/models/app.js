@@ -9,10 +9,13 @@ import { uri_resolver } from 'api/lib'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
 import { usePlugins } from 'plugins'
+import { SocketConnection } from 'core/libs/socket/index.ts'
 
 export default {
   namespace: 'app',
   state: {
+    env_proccess: process.env,
+    socket_conn: null,
     server_key: keys.server_key,
     resolvers: null,
 
@@ -76,7 +79,6 @@ export default {
 
         cancelRequest.forEach((value, key) => {
           if (value.pathname !== window.location.pathname) {
-            value.cancel('cancel request');
             cancelRequest.delete(key);
           }
         });
@@ -92,11 +94,9 @@ export default {
       window.PluginGlobals = []
 
       if (!service) {
-        console.error('❌ Cannot connect with validate session service!')
       }
 
       if (!sessionDataframe && session ) {
-        console.log('Updating dataframe!')
         yield put({ type: 'handleUpdateData' })
       }
 
@@ -134,6 +134,12 @@ export default {
     },
     *guestLogin({ payload }, { put, select }) {
 
+    },
+    *initializeSocket({payload}, {select}){
+      if(!payload) return false
+
+      new SocketConnection(payload)
+      
     },
     *initializePlugins({ payload }, { select }){
         const extended = yield select(state => state.extended)
@@ -187,13 +193,11 @@ export default {
                   }
 
                   if (Array.isArray(RequireImport)) {
-                    console.log("Require array")
                     RequireImport.forEach((e) => {
                       console.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
                       extendedRequire[e] = require(RequireFrom)
                     })
                   }else{
-                    console.log("Require default")
 
                   }
 
@@ -245,7 +249,6 @@ export default {
             sessionAuthframe = jwt.decode(sessionAuthframe)
             yield put({ type: 'handleUpdateAuthFrames', payload: sessionAuthframe })
           } catch (error) {
-            verbosity.error('Invalid AUTHFRAME !', error)
             cookie.remove(app_config.session_token_storage)
           }
         }
@@ -254,7 +257,6 @@ export default {
             sessionDataframe = JSON.parse(atob(sessionDataframe))
             yield put({ type: 'handleUpdateDataFrames', payload: sessionDataframe })
           } catch (error) {
-            verbosity.error('Invalid DATAFRAME !', error, session)
             sessionDataframe = null
             sessionStorage.clear()
           }
@@ -301,7 +303,6 @@ export default {
         )
 
         if (tokenExp < now) {
-          verbosity.debug('This token is expired !!!')
           state.session_valid = false
         }else{
           state.session_valid = true
@@ -340,8 +341,6 @@ export default {
         state.session_authframe = token
       })
 
-      appInterface.notify.success('Login done!')
-      router.push('/')
       state.session_valid = true
       location.reload()
     },
@@ -368,11 +367,9 @@ export default {
 
     },
     handleThemeChange(state, { payload }) {
-      store.set('theme', payload);
       state.theme = payload;
     },
     handleCollapseSidebar(state, { payload }){
-      store.set('sidebar_collapse', payload);
       state.sidebar_collapsed = payload
     },
     isUser(state, { payload, callback }){
@@ -410,7 +407,6 @@ export default {
       if (!payload || !state.embedded) {
         return false
       }
-      console.log('INVOKING => ', payload)
       const ipc = state.electron.ipcRenderer
 
       ipc.invoke(payload.key, payload.payload)
@@ -419,7 +415,6 @@ export default {
       if (!payload || !state.embedded) {
         return false
       }
-      console.log('send INVOKING => ', payload)
       const ipc = state.electron.ipcRenderer
       ipc.send(payload.key, payload.payload)
     },
@@ -441,7 +436,6 @@ export default {
       state.session_authframe = null;
       cookie.remove(app_config.session_token_storage)
       sessionStorage.clear()
-      router.push('/')
       location.reload()
     },
   },

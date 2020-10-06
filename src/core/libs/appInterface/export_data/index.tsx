@@ -13,7 +13,7 @@ const exportCodeRender = (data) => {
         return <div style={{ textAlign: 'center', width: '100%', padding: '30px 0 30px 0' }}>
             <Icons.HardDrive style={{ fontSize: '45px', margin: '0' }} />
             <h4>Hey, this file is too much large!</h4>
-            <span>So it couldn't be displayed.</span>
+            <h3>So it couldn't be displayed.</h3>
         </div>
     }
     return <div>
