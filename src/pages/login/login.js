@@ -105,7 +105,7 @@ export class NormalLoginForm extends React.PureComponent {
             if (res) {
                 try {
                     res = JSON.parse(res)
-                    verbosity.log(res)
+                    verbosity(res)
                 } catch (error) {
                     console.log('Invalid response!')
                 }
@@ -115,7 +115,7 @@ export class NormalLoginForm extends React.PureComponent {
                         try {
                             return resolve(res)
                         } catch (error) {
-                            verbosity.error(error)
+                            verbosity(error)
                         }
                         break;
                     }
@@ -151,7 +151,7 @@ export class NormalLoginForm extends React.PureComponent {
                 try {
                     return resolve(JSON.stringify(JSON.parse(res)['user_data']))
                 } catch (error) {
-                    verbosity.error(error)
+                    verbosity(error)
                 }
             }
         })
