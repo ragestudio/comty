@@ -1,0 +1,30 @@
+{
+	"[schema-21] New api v3 based functions": {
+		"scope": "javascript",
+		"prefix": "newApiFunctional21",
+		"description": "Create a new functional core module with default schema for ycore-schema21",
+		"body": [
+			"import verbosity from 'core/libs/verbosity'",
+			"import { onError } from 'core/libs/errorhandler'",
+			"import { notify } from 'core/libs/appInterface'",
+			"import settings from 'core/libs/settings'",
+			"import endpoints from 'config/endpoints'",
+			"import { v3_model } from 'core/libs'",
+			"",
+			"export function ${1:NewFunction}(payload, callback){",
+			"\tif (!payload) return false",
+			"\tconst { data } = payload",
+			"\t\t",
+			"\treturn callback(false, null)",
+			"}",
+			"",
+			"export const ${2:ObjectFunction} = {",
+			"\tsomething: (payload, callback) => {",
+			"\t\treturn callback(false, null)",
+			"\t}",
+			"}",
+			"",
+			"export default ${1:NewFunction}",
+		]
+	}
+}
