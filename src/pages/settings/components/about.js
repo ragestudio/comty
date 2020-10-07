@@ -6,24 +6,25 @@ import l from 'globals/links'
 
 export default class AppAbout extends React.Component {
   render() {
+    const handleClickLinks = (e) => {
+      const link = l[e]
+      link? window.openLink(link) : console.log("Link not available")
+    }
     return <>
     <About />
     <antd.Card>
       <div>
         <h4>🎉✨ It's completely free and open source !</h4>
         <h5>It is an impressive amount of work and effort, help us to continue offering quality services, you can support us from our patreon campaign.</h5>
-        <a href={l.patreon}><Icons.Patreon/> Support us with Patreon!</a>
+        <a onClick={() => handleClickLinks("patreon")}><Icons.Patreon/> Support us with Patreon!</a>
       </div>
       <antd.Divider dashed />
       <div>
         <h4>👨‍💻 You are developer? You can help us by joining our team!</h4>
-        <a href={l.gitlab}><Icons.Gitlab />Official Repository</a><br />
-        <a href={l.github}><Icons.GitHub />Mirror Repository</a><br />
-        <a href={l.trellojoin}><Icons.Trello />Join our Trello</a>
+        <a onClick={() => handleClickLinks("github")}><Icons.GitHub />Official Repository</a><br />
+        <a onClick={() => handleClickLinks("trello")}><Icons.Trello />Join our Trello</a>
       </div>
     </antd.Card>
-
-
     </>
   }
 }
