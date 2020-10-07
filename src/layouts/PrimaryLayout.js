@@ -35,6 +35,13 @@ class PrimaryLayout extends React.Component {
     }, false)
 
     // include API extensions
+    window.openLink = (e) => {
+      if(this.props.app.embedded){
+        this.props.app.electron.shell.openExternal(e)
+      }else{
+        window.open(e)
+      }
+    }
     window.requireQuery = (require) =>{
       return new Promise(resolve => {
         this.props.dispatch({
