@@ -3,64 +3,71 @@ import { Menu } from 'antd'
 import * as Icons from 'components/Icons'
 
 import styles from './index.less'
+import ApiDebug from './debuggers/api'
+import AntdDebug from './debuggers/antd'
+import CoreDebug from './debuggers/core'
+import ThemeDebug from './debuggers/theme'
+import SocketDebug from './debuggers/socket'
+import VerbosityDebug from './debuggers/verbosity'
 
-import ApiDebug from './api.js'
-import AntdDebug from './antd.js'
-import CoreDebug from './core.js'
-import ThemeDebug from './theme.js'
-import SocketDebug from './socket.js'
-
-const debbugers = {
-  apiDebug: <ApiDebug />,
-  antdDebug: <AntdDebug />,
-  coreDebug: <CoreDebug />,
-  themeDebug: <ThemeDebug />,
-  socketDebug: <SocketDebug />
+const Debuggers = {
+  api: <ApiDebug />,
+  antd: <AntdDebug />,
+  core: <CoreDebug />,
+  theme: <ThemeDebug />,
+  socket: <SocketDebug />,
+  verbosity: <VerbosityDebug />
 }
 
-const { Item } = Menu
-const menuMap = {
-  apiDebug: (
-    <span>
-      <Icons.Globe /> V3 Api
-    </span>
-  ),
-  antdDebug: (
-    <span>
-      <Icons.AntDesignOutlined /> Antd
-    </span>
-  ),
-  coreDebug: (
-    <span>
-      <Icons.Box /> Core
-    </span>
-  ),
-  themeDebug: (
-    <span>
-      <Icons.Image /> Theme
-    </span>
-  ),
-  socketDebug: (
-    <span>
-      <Icons.Box /> Socket
-    </span>
-  )
-}
+const menuList = [
+  {
+    key: "api",
+    title: "API V3 Requester",
+    icon: <Icons.Globe />,
+  },
+  {
+    key: "antd",
+    title: "Antd",
+    icon: <Icons.AntDesignOutlined />,
+    require: "embedded"
+  },
+  {
+    key: "core",
+    title: "Core",
+    icon: <Icons.Box />
+  },
+  {
+    key: "theme",
+    title: "Theme",
+    icon: <Icons.Image />
+  },
+  {
+    key: "socket",
+    title: "Socket",
+    icon: <Icons.Box />
+  },
+  {
+    key: "verbosity",
+    title: "Verbosity",
+    icon: <Icons.Edit3 />
+  }
+]
 
 export default class Debug extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      selectKey: 'socketDebug',
-    }
+  state = {
+    loading: true,
+    selectKey: '',
+    menus: []
   }
 
-  getMenu = () => {
-    return Object.keys(menuMap).map(item => (
-      <Item key={item}>{menuMap[item]}</Item>
+  getMenu() {
+    return this.state.menus.map(item => (
+      <Menu.Item key={item.key}>
+        <span>{item.icon} {item.title}</span>
+      </Menu.Item>
     ))
   }
-
+  
   selectKey = key => {
     this.setState({
       selectKey: key,
@@ -68,17 +75,23 @@ export default class Debug extends React.Component {
   }
 
   renderChildren = () => {
-    try {
-      if (!this.state.selectKey) {
-        return <div>Select an debugger</div>
-      }
-      return debbugers[this.state.selectKey]
-    } catch (error) {
-      return <div>Select an debugger</div>
+    let titlesArray = []
+    this.state.menus.forEach(e => {
+      titlesArray[e.key] = e
+    })
+    if(this.state.selectKey){
+      return Debuggers[this.state.selectKey]
+    }else{
+      <div> Select an Option </div>
     }
   }
 
+  componentDidMount(){
+    this.setState({ menus: menuList, loading: false })
+  }
+
   render() {
+  
     const { selectKey } = this.state
     return (
       <div className={styles.main}>
