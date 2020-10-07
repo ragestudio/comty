@@ -73,7 +73,7 @@ class Base extends Component {
       switch (item.type) {
         case 'switch': {
           item.to = !settings.get(item.id)
-          verbosity.debug(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
+          verbosity(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
           settings.set(item.id, item.to)
           this.handleChange(item)
 

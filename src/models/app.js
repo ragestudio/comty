@@ -123,7 +123,7 @@ export default {
       const sk = yield select(state => state.app.server_key)
 
       session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) =>{
-        verbosity.debug(res)
+        verbosity(res)
       })
       yield put({ type: 'sessionErase' })
     },
@@ -145,20 +145,20 @@ export default {
         const extended = yield select(state => state.extended)
 
         if(!payload.array){
-          verbosity.error("Only array map for initialize plugins","Please read SDK documentation for more info.")
+          verbosity("Only array map for initialize plugins","Please read SDK documentation for more info.")
           return false
         }
         try {
             usePlugins([payload.array], (err, results) => {
               if (err) {
-                verbosity.error("Init error!", err)
+                verbosity("Init error!", err)
                 appInterface.notify.error("Plugin initialize error!", err)
                 return false
               }
               const rootInit = results[0]
         
               if (!rootInit.uuid) {
-                verbosity.error("Cannot initialize a plugin without UUID.","Please read SDK documentation for more info.")
+                verbosity("Cannot initialize a plugin without UUID.","Please read SDK documentation for more info.")
                 appInterface.notify.error("Cannot initialize a plugin without UUID.")
                 return false
               }
@@ -188,7 +188,7 @@ export default {
 
                   const existScheme = typeof(RequireImport) !== "undefined" && typeof(RequireFrom) !== "undefined"
                   if(!existScheme){
-                    verbosity.error("Invalid require extension!")
+                    verbosity("Invalid require extension!")
                     return false
                   }
 
@@ -212,7 +212,7 @@ export default {
               })
             })
         } catch (error) {
-          verbosity.error("Unexpected catched exception! ", error)
+          verbosity("Unexpected catched exception! ", error)
 
         }
     },
@@ -263,7 +263,7 @@ export default {
         }
 
       } catch (error) {
-        verbosity.error(error)
+        verbosity(error)
       }
 
     }
@@ -296,7 +296,7 @@ export default {
         const tokenExpLocale = new Date(tokenExp).toLocaleString()
         const now = new Date().getTime()
 
-        verbosity.log(
+        verbosity(
           `TOKEN EXP => ${tokenExp} ${
             settings("session_noexpire") ? '( Infinite )' : `( ${tokenExpLocale} )`
           } || NOW => ${now}`
@@ -333,7 +333,7 @@ export default {
 
       jwt.sign(frame, state.server_key, (err, token) => {
         if (err) {
-          verbosity.error(err)
+          verbosity(err)
           return false
         }
         cookie.set(app_config.session_token_storage, token)
@@ -352,7 +352,7 @@ export default {
       }
       user.get.data(frame, (err, res) => {
           if(err) {
-            verbosity.error(err)
+            verbosity(err)
           }
           if (res) {
               try {
@@ -360,7 +360,7 @@ export default {
                 sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
                 location.reload()
               } catch (error) {
-                verbosity.error(error)
+                verbosity(error)
               }
           }
       })
@@ -423,7 +423,7 @@ export default {
     },
 
     handleUpdateTheme(state, { payload }) {
-      verbosity.debug(payload)
+      verbosity(payload)
       store.set(app_config.appTheme_container, payload);
       state.app_theme = payload
     },

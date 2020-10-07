@@ -55,7 +55,7 @@ export default class Overlay extends React.PureComponent {
     },
     openFragment: (payload) => {
       if (!payload) return false;
-      verbosity.debug('Dispatching fragment =>', payload)
+      verbosity(['Dispatching fragment =>', payload])
       this.props.dispatch({
         type: 'app/updateState',
         payload: {
@@ -117,7 +117,7 @@ export default class Overlay extends React.PureComponent {
             return <Secondary {...renderProps} />
           }
           default:{
-            verbosity.error(errorhandler.OVERLAY_BADPOSITION)
+            verbosity(errorhandler.OVERLAY_BADPOSITION)
             return null
           }
         }

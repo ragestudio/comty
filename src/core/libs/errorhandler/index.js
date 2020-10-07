@@ -9,7 +9,7 @@ export const INVALID_PROPS = `Some props failed!`
 // HANDLERS
 export const onError = {
     internal_proccess: (...rest) => {
-        verbosity.error(...rest)
+        verbosity({...rest})
         appInterface.notify.open({
             message: INTERNAL_PROCESS_FAILED,
             description:
@@ -21,7 +21,9 @@ export const onError = {
         return false
     },
     invalid_data: (error, expecting) => {
-        verbosity.error(error)
+        verbosity({error}, {
+            type: "error"
+        })
         appInterface.notify.open({
             message: 'Invalid Data',
             description:
