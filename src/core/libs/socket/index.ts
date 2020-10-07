@@ -1,5 +1,5 @@
 import io from 'socket.io-client'
-import { verbosityConsole } from 'core/libs/verbosity'
+import { verbosity } from 'core/libs/verbosity'
 import { connect } from 'umi'
 import settings from 'core/libs/settings'
 
@@ -63,11 +63,11 @@ export class SocketConnection{
         this.conn.open()
         this.ioConn.on("connect_error", () => {
             if (this.state.connAttemps >= maxDeep_Attemp) {
-                verbosityConsole('Maximun nº of attemps reached => max', maxDeep_Attemp + 1)
+                verbosity(['Maximun nº of attemps reached => max', maxDeep_Attemp + 1])
                 this.conn.close()
                 return false
             }
-            verbosityConsole(`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`)
+            verbosity([`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`])
             this.state.connAttemps = this.state.connAttemps + 1 
             
         })
@@ -81,7 +81,7 @@ export class SocketConnection{
             this.ioConn.disconnect()
         },
         close: () => {
-            verbosityConsole("Connection closed!")
+            verbosity("Connection closed!")
             this.ioConn.close()
         },
         destroy: () => {

@@ -141,7 +141,7 @@ export default class PostCard extends React.Component {
                   <div className={styles.post_card_title}>
                     <h4 onClick={() => router.go(`@${publisher.username}`)} className={styles.titleUser}>
                       @{publisher.username}
-                      {core.booleanFix(publisher.verified)? (<Icon style={{ color: 'blue' }} component={Icons.VerifiedBadge} />) : null}
+                      {core.booleanFix(publisher.verified)? (<Icon style={{ color: 'blue' }} component={Icons.verifiedBadge} />) : null}
                       {core.booleanFix(publisher.nsfw_flag)? (<antd.Tag style={{ margin: '0 0 0 13px' }} color="volcano" > NSFW </antd.Tag> ) : null}
                     </h4>
                     <div className={styles.PostTags}>

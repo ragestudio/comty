@@ -7,13 +7,13 @@ import { connect } from 'umi';
 export default class WindowNavbar extends React.Component{
     handleMinimize(){
         this.props.dispatch({
-            type: "app/appControl",
+            type: "app/ipcInvoke",
             payload: "minimize-window"
         })
     }
     handleClose(){
         this.props.dispatch({
-            type: "app/appControl",
+            type: "app/ipcInvoke",
             payload: "hide-window"
         })
     }

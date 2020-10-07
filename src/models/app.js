@@ -94,28 +94,13 @@ export default {
       window.PluginGlobals = []
 
       if (!service) {
+
       }
 
       if (!sessionDataframe && session ) {
         yield put({ type: 'handleUpdateData' })
       }
 
-      // if (session) {
-      //   if (pathMatchRegexp(['/', '/login'], window.location.pathname)) {
-      //     app.router.push({ pathname: `${app_config.MainPath}` });
-      //   }
-
-      //   return true;
-      // } else if (
-      //   !pathMatchRegexp(['', '/login'], window.location.pathname) &&
-      //   queryLayout(config.layouts, window.location.pathname) !== 'public'
-      // ) {
-      //   if (validBackup == true) {
-      //     // logout normal
-      //   } else {
-      //     core.router.push({ pathname: '/login' });
-      //   }
-      // }
     },
     *logout({ payload }, { call, put, select }) {
       const uuid = yield select(state => state.app.session_uuid)
@@ -131,9 +116,6 @@ export default {
       if (!payload) return false;
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
-    },
-    *guestLogin({ payload }, { put, select }) {
-
     },
     *initializeSocket({payload}, {select}){
       if(!payload) return false
@@ -364,13 +346,14 @@ export default {
               }
           }
       })
-
-    },
-    handleThemeChange(state, { payload }) {
-      state.theme = payload;
     },
     handleCollapseSidebar(state, { payload }){
       state.sidebar_collapsed = payload
+    },
+    handleUpdateTheme(state, { payload }) {
+      verbosity(payload)
+      store.set(app_config.appTheme_container, payload);
+      state.app_theme = payload
     },
     isUser(state, { payload, callback }){
       if(!payload || !callback) return false
@@ -398,11 +381,6 @@ export default {
         }
       }
     },
-    appControl(state, {payload}){
-      if (!payload) return false
-      const ipc = state.electron.ipcRenderer
-      ipc.invoke(payload)
-    },
     ipcInvoke(state, {payload}){
       if (!payload || !state.embedded) {
         return false
@@ -418,16 +396,6 @@ export default {
       const ipc = state.electron.ipcRenderer
       ipc.send(payload.key, payload.payload)
     },
-    allNotificationsRead(state) {
-      state.notifications = [];
-    },
-
-    handleUpdateTheme(state, { payload }) {
-      verbosity(payload)
-      store.set(app_config.appTheme_container, payload);
-      state.app_theme = payload
-    },
-
     sessionErase(state) {
       state.service_valid = false;
       state.session_valid = false;
