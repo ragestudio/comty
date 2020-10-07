@@ -123,6 +123,7 @@ class GeneralSettings extends React.PureComponent {
       </Menu.Item>
     ))
   }
+  
   selectKey = key => {
     this.setState({
       selectKey: key,
