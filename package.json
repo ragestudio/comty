@@ -41,6 +41,7 @@
     "axios": "^0.20.0",
     "babel-core": "^6.26.3",
     "classnames": "^2.2.6",
+    "colors": "^1.4.0",
     "concat-stream": "^2.0.0",
     "cookie_js": "^1.4.0",
     "dotenv": "^8.2.0",
