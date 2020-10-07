@@ -12,7 +12,7 @@ export class SocketConnection{
 
     constructor(props:any){
         if (!props) {
-            throw new Error("Mmm some props are not defined")         
+            throw new Error("Mmm some props are not defined")
         }
         this.state = {
             address: props.address,
