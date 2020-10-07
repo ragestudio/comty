@@ -174,6 +174,14 @@ export function downloadEncodedURI(payload){
     errorHandlers.onError.internal_proccess(error)
   }
 }
+
+export function GetPropertyValue(object, dataToRetrieve) {
+  dataToRetrieve.split('.').forEach(function(token) {
+    if (object) object = object[token];
+  })
+  return object;
+}
+
 /**
  * Return the last object from array
  *
