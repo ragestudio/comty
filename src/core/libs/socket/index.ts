@@ -2,6 +2,7 @@ import io from 'socket.io-client'
 import { verbosity } from 'core/libs/verbosity'
 import { connect } from 'umi'
 import settings from 'core/libs/settings'
+import { notify } from 'core/libs/appInterface'
 
 const maxDeep_Attemp = Number(2)
 export class SocketConnection{
@@ -22,7 +23,7 @@ export class SocketConnection{
         this.props = props
         this.opts = {
             reconnection: true,
-            reconnectionAttempts: Infinity,
+            reconnectionAttempts: maxDeep_Attemp,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             randomizationFactor: 0.5,
@@ -61,6 +62,7 @@ export class SocketConnection{
         }
         this.ioConn = io(this.state.address, this.opts)
         this.conn.open()
+
         this.ioConn.on("connect_error", () => {
             if (this.state.connAttemps >= maxDeep_Attemp) {
                 verbosity(['Maximun nº of attemps reached => max', maxDeep_Attemp + 1])
@@ -69,7 +71,20 @@ export class SocketConnection{
             }
             verbosity([`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`])
             this.state.connAttemps = this.state.connAttemps + 1
-            
+        })
+
+        this.ioConn.on('disconnect', () => {
+            verbosity("Connection disconnect!")
+        })
+        this.ioConn.on('reconnect', (attemptNumber:number) => {
+            verbosity(["Connection reconected with (", attemptNumber , ") tries"])
+        })
+        this.ioConn.on('connect', () => {
+            notify.success("You are now online")
+            verbosity("Successfully connect")
+        })
+        this.ioConn.on('close', () => {
+            verbosity("Connection closed!")
         })
     }
     
@@ -81,7 +96,6 @@ export class SocketConnection{
             this.ioConn.disconnect()
         },
         close: () => {
-            verbosity("Connection closed!")
             this.ioConn.close()
         },
         destroy: () => {

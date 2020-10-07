@@ -16,6 +16,7 @@ export default {
   state: {
     env_proccess: process.env,
     socket_conn: null,
+    socket_opt: null,
     server_key: keys.server_key,
     resolvers: null,
 
@@ -117,11 +118,10 @@ export default {
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
     },
-    *initializeSocket({payload}, {select}){
+    *initializeSocket({payload}, {select, put}){
       if(!payload) return false
-
-      new SocketConnection(payload)
-      
+      const { type, address } = payload
+      yield put({ type: "handleSocket", payload: new SocketConnection(payload) })
     },
     *initializePlugins({ payload }, { select }){
         const extended = yield select(state => state.extended)
@@ -259,6 +259,10 @@ export default {
     },
     handleUpdateResolvers(state, { payload }) {
       state.resolvers = payload
+    },
+    handleSocket(state, { payload }) {
+      state.socket_conn = payload
+      state.socket_opt = payload.opts
     },
     handleUpdateAuthFrames(state, { payload }) {
       state.session_authframe = payload
