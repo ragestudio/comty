@@ -281,7 +281,7 @@ class PostCreator extends React.PureComponent {
           >
 
             {this.state.uploader ? (
-              <Icons.xCicle style={{ margin: 0 }} />
+              <Icons.XCircle style={{ margin: 0 }} />
             ) : (
               <Icons.Plus style={{ margin: 0, fontSize: '14px' }} />
             )}

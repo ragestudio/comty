@@ -56,7 +56,7 @@ const menuList = [
 export default class Debug extends React.Component {
   state = {
     loading: true,
-    selectKey: '',
+    selectKey: 'verbosity',
     menus: []
   }
 
