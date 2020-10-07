@@ -12,7 +12,7 @@ export class SocketConnection{
 
     constructor(props:any){
         if (!props) {
-            throw new Error("Mmm some props are not defined")         
+            throw new Error("Mmm some props are not defined")
         }
         this.state = {
             address: props.address,
@@ -68,7 +68,7 @@ export class SocketConnection{
                 return false
             }
             verbosityConsole(`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`)
-            this.state.connAttemps = this.state.connAttemps + 1 
+            this.state.connAttemps = this.state.connAttemps + 1
             
         })
     }
