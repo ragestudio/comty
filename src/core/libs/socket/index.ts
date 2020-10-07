@@ -68,7 +68,7 @@ export class SocketConnection{
                 return false
             }
             verbosity([`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`])
-            this.state.connAttemps = this.state.connAttemps + 1 
+            this.state.connAttemps = this.state.connAttemps + 1
             
         })
     }
