@@ -1,0 +1,23 @@
+{
+	"[schema-31] New Connected Component with decorators": {
+		"scope": "javascript",
+		"prefix": "newConnectedComponent",
+		"description": "Create a new react component with default schema for ycore-schema31",
+		"body": [
+			"import React from 'react'",
+			"import * as antd from 'antd'",
+			"import { connect } from 'umi'",
+			"",
+			"@connect(({ app }) => ({ app }))",
+			"export default class ${1:NewComponent} extends React.Component{",
+			"\trender(){",
+			"\t\treturn(",
+			"\t\t\t<div>",
+			"\t\t\t\t",
+			"\t\t\t</div>",
+			"\t\t)",
+			"\t}",
+			"}",
+		]
+	}
+}
