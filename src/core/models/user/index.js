@@ -40,7 +40,7 @@ export const get = {
       // core get id data from current session
     }
   },
-  profileData: (parms, callback) => {
+  basicData: (parms, callback) => {
     if (!parms) return false
 
     const { username } = parms
@@ -49,8 +49,33 @@ export const get = {
       v3_model.api_request(
         {
           body: { username },
-          endpoint: endpoints.profileData,
+          endpoint: endpoints.basicData,
           verbose: true,
+        },
+        (err, res) => {
+          err? console.error(err) : null
+          return callback(false, res);
+        },
+      );
+  
+    } else {
+      const res = { status: 105, message: 'Invalid Username!' };
+      return callback(res, false);
+    }
+  },
+  profileData: (parms, callback) => {
+    if (!parms) return false
+
+    const { username, server_key, access_token } = parms
+
+    if (username) {
+      v3_model.api_request(
+        {
+          body: { username, fetch: "user_data" },
+          endpoint: endpoints.profileData,
+          userToken: access_token,
+          verbose: true,
+          serverKey: server_key
         },
         (err, res) => {
           err? console.error(err) : null
