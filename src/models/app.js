@@ -5,6 +5,7 @@ import { user, session } from 'core/helpers'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { uri_resolver } from 'api/lib'
+import { queryIndexer } from 'core'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -93,6 +94,28 @@ export default {
       const sessionDataframe = yield select(state => state.app.session_data)
 
       window.PluginGlobals = []
+
+      queryIndexer([
+        {
+          match: '/s;:id',
+          to: `/settings?key=:id`,
+        },
+        {
+          match: '/h;:id',
+          to: `/hashtag?key=:id`,
+        },
+        {
+          match: '/p;:id',
+          to: `/post?key=:id`,
+        },
+        {
+          match: '/@:id',
+          to: `/@/:id`,
+        }
+      ], (callback) => {
+        window.location = callback
+      })
+   
 
       if (!service) {
 

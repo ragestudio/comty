@@ -29,6 +29,29 @@ export const app_info = {
   layout: platform.layout
 };
 
+export function queryIndexer(array, callback, params) {
+    if(!array) return false
+    
+    if (Array.isArray(array)) {
+      let opt = {
+        regex: /:id/gi
+      }
+
+      if (params) {
+        opt = { ...opt, ...params }
+      }
+
+      array.forEach((e) =>{
+        if (e.match != null && e.to != null) {
+          const pathMatch = pathMatchRegexp(e.match, window.location.pathname)
+          if (pathMatch != null) {
+            return callback(e.to.replace(opt.regex, pathMatch[1]))
+          }
+        }
+      })
+    }
+}
+
 export function createScreenshotFromElement(element){
   if (!element) return false
   html2canvas(element, {
@@ -341,7 +364,6 @@ export const time = {
 };
 
 export function pathMatchRegexp(regexp, pathname) {
-  console.log('Regex => ', pathname)
   return pathToRegexp(regexp).exec(pathname)
 }
 
