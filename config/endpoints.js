@@ -6,5 +6,6 @@ export default {
   post_actions: 'POST /post-actions',
   
   get_data: 'POST /get-user-data',
-  profileData: 'POST /early_user'
+  basicData: 'POST /early_user',
+  profileData: 'POST /get-user-data-username'
 };
