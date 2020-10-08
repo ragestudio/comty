@@ -1,16 +1,13 @@
 .UserLayout_wrapper{
     display: flex;
     height: 100%;
+    width: 100%;
+    
     flex-direction: column;
-    align-content: center;
-
-    padding: 0 68px 15px 68px;
+    align-items: center;
+    
     margin: auto;
-    border-radius: 0 0 20px 20px;
-    padding: 20px 0 3px 0;
-   
-    padding-top: 0;
-    overflow: initial !important;
+    overflow: overlay !important;
 }
 
 .UserLayout_header{
@@ -21,67 +18,91 @@
     display: flex;
     padding: 20px;
 
-    height: 24vh; 
+    height: auto;
+    width: 100%;
+
+    max-width: 600px;
+    max-height: 200px;
+
     background-color: #ffffff;
-    border-radius: 8px;
+    border-radius: 0 0 20px 20px;
+    transform: translate(0, -5px);
 }
 
 .UserLayout_cover{
     display: flex;
-    position: relative;
-    width: 100%;
+    align-content: center;
+
+    max-height: 400px;
+    max-width: 600px;
+
+    overflow: hidden;
+    border-radius: 15px 15px 0 0;
+    border-radius: 8px;
+
     img {
-        height: min-content;
-        width: min-content;
-        
+        width: 100%;
+        margin: auto;
     }
 }
 
-.follow_wrapper {
-    margin: 0 7px 0 7px;
-    position: relative;
-    float: right;
-  }
-  
-
 .UserLayout_title{
-    padding: 54px;
-    padding: 0 10px 10px 0;
-    color: #242424;
+    color: #2d2d2d;
     font-weight: 500;
     font-size: 20px;
     line-height: 28px;
+    width: 100%;
+    height: 100%;
+    word-break: break-all;
+
+    h1 {
+        margin: 0;
+    }
+    
+    span{
+      word-break: break-all;
+    }
 }
 
-.avatar {
-    transform: translate(-25px, -45px);
-    max-height: 200px;
-    max-width: 120px;
-    
-    &>span {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      height: 100%;
-    }
+.UserLayout_avatar {
+  transform: translate(-35px, -45px);
+  max-height: 200px;
+  max-width: 120px;
   
-    &.mobile{
-      transform: translate(0,-90px);
-      margin: auto;
-    }
-  
-    :global {
-      .ant-avatar {
-        box-shadow: 13px 13px 17px 4px rgba(69, 69, 69, 0.151);
-        border-radius: 7px;
-  
-        img {
-          width: 120px;
-        }
+  &>span {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+  }
+
+  &.mobile{
+    transform: translate(0,-90px);
+    margin: auto;
+  }
+
+  :global {
+    .ant-avatar {
+      box-shadow: 13px 13px 17px 4px rgba(69, 69, 69, 0.151);
+      border-radius: 7px;
+
+      img {
+        width: 120px;
       }
     }
   }
+}
   
+.UserLayout_options{
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    
+    > div {
+        text-align: left;
+        margin-bottom: 15px;
+    }
+}
 
 
 
