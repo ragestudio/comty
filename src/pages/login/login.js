@@ -6,7 +6,7 @@ import HeadShake from 'react-reveal/HeadShake';
 
 import * as antd from 'antd'
 
-import { session, user } from 'core/helpers'
+import { session, user } from 'core/models'
 
 import verbosity from 'core/libs/verbosity'
 

@@ -1,7 +1,7 @@
 import store from 'store'
 import { app_config } from 'config'
 import keys from 'config/app_keys'
-import { user, session } from 'core/helpers'
+import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { uri_resolver } from 'api/lib'
