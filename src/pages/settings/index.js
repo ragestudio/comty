@@ -1,5 +1,5 @@
 import React from 'react'
-import { Menu } from 'antd'
+import { Menu, Result } from 'antd'
 import * as Icons from 'components/Icons'
 
 import styles from './style.less'
@@ -76,7 +76,7 @@ const menuList = [
 ]
 
 @connect(({ app }) => ({ app }))
-class GeneralSettings extends React.PureComponent {
+class GeneralSettings extends React.Component {
   state = {
     loading: true,
     selectKey: 'base',
@@ -103,7 +103,7 @@ class GeneralSettings extends React.PureComponent {
       return new Promise(resolve => {
         data.forEach(async (element) => {
           if (typeof(element.require) !== 'undefined') {
-            const validRequire = await this.requireQuery(element.require)
+            const validRequire = await window.requireQuery(element.require)
             validRequire? tmp.push(element) : null
           }else{
             tmp.push(element)
@@ -132,22 +132,27 @@ class GeneralSettings extends React.PureComponent {
 
   renderChildren = () => {
     let titlesArray = []
-    this.state.menus.forEach(e => {
-      titlesArray[e.key] = e
-    })
-    if(this.state.selectKey){
+    this.state.menus.forEach(e => { titlesArray[e.key] = e })
+
+    if(this.state.selectKey && titlesArray[this.state.selectKey]){
       return <>
         <div>
           <h2>{titlesArray[this.state.selectKey].icon || null}{titlesArray[this.state.selectKey].title || null}</h2>
         </div>
         {Settings[this.state.selectKey]}
       </>
-    }else{
-      <div> Select an setting </div>
+    }else {
+      return(
+        <Result title="Select an Option" state="info" />
+      )
     }
   }
 
   componentDidMount(){
+    const keyIndex = new URLSearchParams(location.search).get('key')
+    if(keyIndex && typeof(Settings[keyIndex]) !== "undefined"){
+      this.setState({selectKey: keyIndex})
+    }
     this.queryMenu()
   }
 
