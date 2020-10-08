@@ -15,10 +15,10 @@ export default class ListedMenu extends React.Component{
         mode: this.props.mode ?? "inline"
     }
 
-    filterArray(data) {
-        let tmp = []
+    filterArray(data: any[]) {
+        let tmp: any = []
         return new Promise(resolve => {
-          data.forEach(async (element) => {
+          data.forEach(async (element: { require: string; }) => {
             if (typeof(element.require) !== 'undefined') {
               const validRequire = await window.requireQuery(element.require)
               validRequire? tmp.push(element) : null
@@ -43,14 +43,14 @@ export default class ListedMenu extends React.Component{
       ))
     }
     
-    selectKey = key => {
+    selectKey = (key: any) => {
       this.setState({
         selectKey: key,
       })
     }
 
     renderChildren = () => {
-        let titlesArray = []
+        let titlesArray: never[] = []
         this.state.menus.forEach(e => { titlesArray[e.key] = e })
 
         const OptionTitle = () => {
@@ -95,7 +95,7 @@ export default class ListedMenu extends React.Component{
 
     render() {
         const { selectKey, loading } = this.state
-        const isMode = (e) => {
+        const isMode = (e: string) => {
             return this.state.mode === `${e}`
         }
 
@@ -103,7 +103,7 @@ export default class ListedMenu extends React.Component{
           return <></>
         }
         return (
-          <div className={classnames(styles.main, {[styles.horizontal]: isMode("horizontal") })}>
+          <div style={this.props.wrapperStyle ?? null} className={classnames(styles.main, {[styles.horizontal]: isMode("horizontal") })}>
             <div className={styles.menuList}>
               <h2>
                 {this.props.icon ?? null} {this.props.title ?? "Menu"}
