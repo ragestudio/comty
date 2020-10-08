@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './__searchBar.less'
-import {newSearch} from "core/helpers/overlay"
+import {newSearch} from "core/models/overlay"
 
 export default class __searchBar extends React.Component{
     state = {
