@@ -13,7 +13,7 @@ const InvalidSkeleton = (props) => {
                 height: "100%", 
                 padding: "12px 24px"
             }}>
-                Bruh fail?
+                Sorry but, something did not work as it should...
             </antd.Result>
         </antd.Card>
     )
