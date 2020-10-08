@@ -1,0 +1,90 @@
+.UserLayout_wrapper{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-content: center;
+
+    padding: 0 68px 15px 68px;
+    margin: auto;
+    border-radius: 0 0 20px 20px;
+    padding: 20px 0 3px 0;
+   
+    padding-top: 0;
+    overflow: initial !important;
+}
+
+.UserLayout_header{
+    font-family: "Poppins", sans-serif;
+    color: #242424;
+
+    vertical-align: top;
+    display: flex;
+    padding: 20px;
+
+    height: 24vh; 
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+
+.UserLayout_cover{
+    display: flex;
+    position: relative;
+    width: 100%;
+    img {
+        height: min-content;
+        width: min-content;
+        
+    }
+}
+
+.follow_wrapper {
+    margin: 0 7px 0 7px;
+    position: relative;
+    float: right;
+  }
+  
+
+.UserLayout_title{
+    padding: 54px;
+    padding: 0 10px 10px 0;
+    color: #242424;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+}
+
+.avatar {
+    transform: translate(-25px, -45px);
+    max-height: 200px;
+    max-width: 120px;
+    
+    &>span {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+    }
+  
+    &.mobile{
+      transform: translate(0,-90px);
+      margin: auto;
+    }
+  
+    :global {
+      .ant-avatar {
+        box-shadow: 13px 13px 17px 4px rgba(69, 69, 69, 0.151);
+        border-radius: 7px;
+  
+        img {
+          width: 120px;
+        }
+      }
+    }
+  }
+  
+
+
+
+.UserLayout_content{
+    
+}
