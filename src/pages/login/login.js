@@ -37,7 +37,7 @@ export class NormalLoginForm extends React.PureComponent {
     switch (a) {
       case 1:
         const payload = { username: Object.values(values).toString() }
-        user.get.profileData(payload, (err, res) => {
+        user.get.basicData(payload, (err, res) => {
           if (err || !res) return false
           try {
             const res_data = JSON.parse(res)

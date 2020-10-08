@@ -1,0 +1,32 @@
+.button {
+    user-select: none;
+    width: 100px;
+    height: 30px;
+    padding: 5px 15px 5px 15px;
+    text-decoration: none;
+    text-align: center;
+    vertical-align: middle;
+    letter-spacing: 1px;
+
+    &:hover {
+        color: #7e7e7e;
+    }
+
+    &.disabled{
+        &:hover {
+            border: none;
+            content: '';
+            color: white;
+            border-radius: 8px;
+            background: linear-gradient(120deg, #6559ae, #ff7159, #6559ae);
+            background-size: 400% 400%;
+            animation: gradient 15s ease-in-out infinite, border 1s forwards ease-in-out reverse;
+          }
+    }
+}
+
+@keyframes gradient { 
+    0%   { background-position: 14% 0%; }
+    50%  { background-position: 87% 100%; }
+    100% { background-position: 14% 0%; }
+}
