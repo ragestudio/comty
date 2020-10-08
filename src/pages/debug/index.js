@@ -8,6 +8,8 @@ import CoreDebug from './debuggers/core'
 import ThemeDebug from './debuggers/theme'
 import SocketDebug from './debuggers/socket'
 import VerbosityDebug from './debuggers/verbosity'
+import InternalDebug from './debuggers/internals'
+
 
 const Debuggers = {
   api: <ApiDebug />,
@@ -15,7 +17,8 @@ const Debuggers = {
   core: <CoreDebug />,
   theme: <ThemeDebug />,
   socket: <SocketDebug />,
-  verbosity: <VerbosityDebug />
+  verbosity: <VerbosityDebug />,
+  internals: <InternalDebug />
 }
 
 const menuList = [
@@ -49,6 +52,11 @@ const menuList = [
     key: "verbosity",
     title: "Verbosity",
     icon: <Icons.Edit3 />
+  },
+  {
+    key: "internals",
+    title: "Internals",
+    icon: <Icons.Box />
   }
 ]
 

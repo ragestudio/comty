@@ -42,7 +42,6 @@ export function verbosity(data, params, stackTraceParams){
   if (typeof(stackTraceParams) !== "undefined" || stackTraceParams != null) {
     objectToArray(stackTraceParams).forEach((e) => {
       if(typeof(e.value) !== "undefined"){
-        console.log(e.key,e.value)
         optStackTrace[e.key] = e.value
       }
     })
@@ -83,6 +82,7 @@ export function verbosity(data, params, stackTraceParams){
   if (Array.isArray(initData)) {
     return console[opt.type](...data)
   }
+  
   return console[opt.type](data)
 }
 

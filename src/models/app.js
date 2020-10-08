@@ -5,6 +5,7 @@ import { user, session } from 'core/helpers'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { uri_resolver } from 'api/lib'
+import { queryIndexer } from 'core'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -93,6 +94,29 @@ export default {
       const sessionDataframe = yield select(state => state.app.session_data)
 
       window.PluginGlobals = []
+      window.Internal = []
+
+      queryIndexer([
+        {
+          match: '/s;:id',
+          to: `/settings?key=:id`,
+        },
+        {
+          match: '/h;:id',
+          to: `/hashtag?key=:id`,
+        },
+        {
+          match: '/p;:id',
+          to: `/post?key=:id`,
+        },
+        {
+          match: '/@:id',
+          to: `/@/:id`,
+        }
+      ], (callback) => {
+        window.location = callback
+      })
+   
 
       if (!service) {
 
@@ -117,6 +141,10 @@ export default {
       if (!payload) return false;
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
+    },
+    *initializeInternal({payload}, {select, put}){
+      if(!payload) return false
+      yield put({ type: "handleInternal", payload })
     },
     *initializeSocket({payload}, {select, put}){
       if(!payload) return false
@@ -256,6 +284,14 @@ export default {
         ...state,
         ...payload,
       };
+    },
+    handleInternal(state, { payload }){
+      verbosity(payload)
+      if (Array.isArray(payload)) {
+        payload.forEach((e) => {
+          window.Internal[e.id] = e.payload
+        })        
+      }
     },
     handleUpdateResolvers(state, { payload }) {
       state.resolvers = payload
