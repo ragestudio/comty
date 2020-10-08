@@ -19,15 +19,32 @@ const InvalidSkeleton = (props) => {
     )
 }
 
+const InvalidIndex = (props) => {
+    return(
+        <div className={styles.floatCardWrapper} bordered="false">
+            <antd.Result>
+                Sorry but, We could not index this <antd.Tag style={{ marginLeft: "12px", lineHeight: "24px"}}>{props.messageProp1}</antd.Tag>
+            </antd.Result>
+        </div>
+    )
+}
+
+const Custom = (props) => {
+    return(
+        <div className={styles.floatCardWrapper} style={props.style ?? null} >
+            <antd.Result status={props.status ?? "info"} title={props.title ?? ""}>
+                {props.message}
+            </antd.Result>
+        </div>
+    )
+}
 
 export default class Invalid extends React.Component{
-    constructor(props){
-        super(props)
-    }
-
     render(){
         const Components = {
-            skeleton: <InvalidSkeleton />
+            skeleton: <InvalidSkeleton {...this.props} />,
+            index: <InvalidIndex {...this.props} />,
+            custom: <Custom {...this.props} />
         }
         const type = this.props.type
         if (!type) {
