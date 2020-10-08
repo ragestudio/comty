@@ -1,8 +1,7 @@
 import React from 'react'
-import { Menu } from 'antd'
 import * as Icons from 'components/Icons'
+import { ListedMenu } from 'components'
 
-import styles from './index.less'
 import ApiDebug from './debuggers/api'
 import AntdDebug from './debuggers/antd'
 import CoreDebug from './debuggers/core'
@@ -54,60 +53,7 @@ const menuList = [
 ]
 
 export default class Debug extends React.Component {
-  state = {
-    loading: true,
-    selectKey: 'verbosity',
-    menus: []
-  }
-
-  getMenu() {
-    return this.state.menus.map(item => (
-      <Menu.Item key={item.key}>
-        <span>{item.icon} {item.title}</span>
-      </Menu.Item>
-    ))
-  }
-  
-  selectKey = key => {
-    this.setState({
-      selectKey: key,
-    })
-  }
-
-  renderChildren = () => {
-    let titlesArray = []
-    this.state.menus.forEach(e => {
-      titlesArray[e.key] = e
-    })
-    if(this.state.selectKey){
-      return Debuggers[this.state.selectKey]
-    }else{
-      <div> Select an Option </div>
-    }
-  }
-
-  componentDidMount(){
-    this.setState({ menus: menuList, loading: false })
-  }
-
   render() {
-  
-    const { selectKey } = this.state
-    return (
-      <div className={styles.main}>
-          <h2>
-            <Icons.SettingOutlined /> Debuggers
-          </h2>
-          <Menu
-            mode="horizontal"
-            selectedKeys={[selectKey]}
-            onClick={({ key }) => this.selectKey(key)}
-          >
-            {this.getMenu()}
-          </Menu>
-     
-        <div className={styles.debuggerComponent}>{this.renderChildren()}</div>
-      </div>
-    )
+    return <ListedMenu wrapperStyle={{ padding: "4px" }} mode="horizontal" renderOptionTitle={false} icon={<Icons.Activity />} title="Debug" childrens={Debuggers} menuArray={menuList} />
   }
 }
