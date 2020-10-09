@@ -1,0 +1,13 @@
+
+name: Create Changelogs
+on:
+  push:
+    branches: [ master ]
+jobs:
+  create_changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Create Changelogs
+        uses: heineiuo/create-changelogs@v0.2.8
