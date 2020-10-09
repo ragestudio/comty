@@ -4,7 +4,7 @@ import keys from 'config/app_keys'
 import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
-import { uri_resolver } from 'api/lib'
+import uri_resolver from 'api/lib/uri_resolver'
 import { queryIndexer } from 'core'
 
 import jwt from 'jsonwebtoken'
@@ -161,6 +161,7 @@ export default {
       session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) =>{
         verbosity(res)
       })
+
       yield put({ type: 'sessionErase' })
     },
     *login({ payload }, { call, put, select }) {
@@ -404,7 +405,7 @@ export default {
           }
           if (res) {
               try {
-                const session_data = JSON.stringify(JSON.parse(res)["user_data"])
+                const session_data = JSON.stringify(res.user_data)
                 sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
                 location.reload()
               } catch (error) {
