@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
 jobs:
-  Create Changelogs:
+  create_changelog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
