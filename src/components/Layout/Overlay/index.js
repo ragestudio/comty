@@ -3,7 +3,7 @@ import verbosity from 'core/libs/verbosity'
 import { connect } from 'umi'
 import classnames from 'classnames'
 import styles from './index.less'
-import * as errorhandler from 'core/libs/errorhandler'
+import ErrorHandler from 'core/libs/errorhandler'
 import * as antd from 'antd'
 import { router } from 'core/libs'
 import {
@@ -117,8 +117,7 @@ export default class Overlay extends React.PureComponent {
             return <Secondary {...renderProps} />
           }
           default:{
-            verbosity(errorhandler.OVERLAY_BADPOSITION)
-            return null
+            return ErrorHandler({ code: 210 })
           }
         }
       }
