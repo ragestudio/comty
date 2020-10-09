@@ -44,7 +44,7 @@ export default class Explore extends React.Component {
   render() {
  
     if(!this.props.app.session_valid){
-      return <Invalid type="SESSION_INVALIsssD" />
+      return <Invalid type="SESSION_INVALID" />
     }
 
     if (!this.state.feed){
