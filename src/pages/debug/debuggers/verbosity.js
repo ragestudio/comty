@@ -52,7 +52,7 @@ export default class Verbosity extends React.Component{
                     <antd.Input id="raw1" onChange={handleRawChange} placeholder="Data 2 (string)" />    
                     <div style={{ display: "flex", marginTop: "20px" }}>
                         <antd.Button type="primary" onClick={() => this.handleSend()}> send </antd.Button>
-                        <antd.Select style={{ width: "200px" }} defaultValue={this.state.type} onChange={(e) => {this.setState({ type: e})}} >
+                        <antd.Select style={{ width: "200px" }} onChange={(e) => {this.setState({ type: e})}} >
                             <antd.Select.Option value="log"> log </antd.Select.Option>
                             <antd.Select.Option value="debug"> debug </antd.Select.Option>
                             <antd.Select.Option value="error"> error </antd.Select.Option>
@@ -62,7 +62,6 @@ export default class Verbosity extends React.Component{
                         <antd.Checkbox id="line" onChange={handleCheckChange}> line </antd.Checkbox>
                         <antd.Checkbox id="file" onChange={handleCheckChange}> file </antd.Checkbox>
                         <antd.Checkbox id="time" onChange={handleCheckChange}> time </antd.Checkbox>
-
                     </div>
                 </antd.Card> 
             </div>
