@@ -44,8 +44,9 @@ export function ErrorHandler(payload, callback){
         out = outFlag
     }
 
+    verbosity(msg?? "unhandled message", {type: "error"})
+
     if (out && typeof(errStrings[out]) !== "undefined") {
-        verbosity(msg, {type: "error"})
         flag = errFlags[out]
     }else{
         console.log("(Aborted) no out key | or invalid flag => ", out)
