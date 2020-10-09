@@ -36,18 +36,6 @@ export default class Sider_Default extends React.Component {
     })
   }
 
-  HeaderIconRender = () => {
-    if(this.props.app.session_valid){
-      return(
-        <antd.Avatar shape="circle" size="large" src={this.props.app.session_data.avatar} />
-      )
-    }else{
-      return(
-        <img className={styles.logotype} src={this.props.logo} />
-      )
-    }
-  }
-
   render() {
     const { handleClickMenu } = this.props
     if (this.state.loading) {

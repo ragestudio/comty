@@ -9,7 +9,6 @@ import Invalid from './Invalid'
 
 // App Layout Components
 import * as AppLayout from './Layout/index.js'
-import PageTransition from './PageTransition'
 import ListedMenu from './ListedMenu/index.tsx'
 
 // User Components
@@ -29,7 +28,6 @@ export {
   Feather,
   About,
   MediaPlayer,
-  PageTransition,
   Loader,
   PostCreator
 }
