@@ -4,9 +4,9 @@ import { cloneDeep } from 'lodash';
 import store from 'store';
 import { i18n, app_config } from 'config';
 import handle from 'core/libs/errorhandler'
-import platform from 'platform'
 import request from 'request'
 import html2canvas from 'html2canvas'
+import platform from 'platform'
 
 const { pathToRegexp } = require('path-to-regexp');
 
