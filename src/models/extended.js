@@ -1,15 +1,7 @@
-import store from 'store'
-import { app_config } from 'config'
-import keys from 'config/app_keys'
-import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
-import { uri_resolver } from 'api/lib'
-import { DynamicSDCP } from 'core/libs/extension'
+import { DynamicSDCP } from 'core/libs/dynamicsdcp'
 import * as core from 'core'
-
-import jwt from 'jsonwebtoken'
-import cookie from 'cookie_js'
 
 
 export default {

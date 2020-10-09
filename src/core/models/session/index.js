@@ -11,8 +11,7 @@ function auth(payload, callback) {
       {
         body: frame,
         endpoint: endpoints.auth,
-        serverKey: server_key,
-        verbose: true,
+        serverKey: server_key
       },
       (err, res) => {
         return callback(err, res);
@@ -32,8 +31,7 @@ function deauth(payload, callback) {
       body: frame,
       endpoint: endpoints.sessions,
       serverKey: payload.server_key,
-      userToken: payload.userToken,
-      verbose: true,
+      userToken: payload.userToken
     },
     (err, res) => {
       return callback(err, res);

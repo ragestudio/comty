@@ -1,6 +1,5 @@
 import React from 'react'
 import jwt from 'jsonwebtoken'
-import { uri_resolver } from 'api/lib'
 import io from 'socket.io-client'
 import { connect } from 'umi'
 import * as antd from 'antd'

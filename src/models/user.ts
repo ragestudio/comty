@@ -5,7 +5,7 @@ import keys from 'config/app_keys'
 import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
-import { DynamicSDCP } from 'core/libs/extension'
+import { DynamicSDCP } from 'core/libs/dynamicsdcp'
 import * as core from 'core'
 
 import jwt from 'jsonwebtoken'
@@ -39,7 +39,7 @@ export default {
           if (err) {
             return console.log(err)
           }
-          const data = JSON.parse(res)["user_data"]
+          const data = res.user_data
           const frame = {
             avatar: data.avatar,
             can_follow: data.can_follow,

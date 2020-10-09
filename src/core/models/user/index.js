@@ -24,8 +24,7 @@ export const get = {
         body: {user_id: id, fetch: req.fetch},
         serverKey: serverKey,
         userToken: access_token,
-        endpoint: endpoints.get_data,
-        verbose: true,
+        endpoint: endpoints.get_data
       },
       (err, res) => {
        return callback(err, res)
@@ -49,8 +48,7 @@ export const get = {
       v3_model.api_request(
         {
           body: { username },
-          endpoint: endpoints.basicData,
-          verbose: true,
+          endpoint: endpoints.basicData
         },
         (err, res) => {
           err? console.error(err) : null
@@ -74,7 +72,6 @@ export const get = {
           body: { username, fetch: "user_data" },
           endpoint: endpoints.profileData,
           userToken: access_token,
-          verbose: true,
           serverKey: server_key
         },
         (err, res) => {
