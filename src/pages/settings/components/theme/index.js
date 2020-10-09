@@ -4,7 +4,7 @@ import * as antd from 'antd'
 import {connect} from 'umi'
 import styles from './index.less'
 
-import { onError } from 'core/libs/errorhandler'
+import ErrorHandler from 'core/libs/errorhandler'
 import { theme, getOptimalOpacityFromIMG, get_style_rule_value } from 'core/libs/style' 
 import { urlToBase64, imageToBase64, arrayToObject } from 'core'
 import exportDataAsFile from 'core/libs/appInterface/export_data'
@@ -19,7 +19,7 @@ class ThemeConfigurator extends React.Component{
     applyStoraged(){
         const storaged = theme.get()
         if(storaged && this.state){
-            storaged[this.state.key]? this.setState({ model: storaged[this.state.key]}) : onError.internal_proccess(`"Config key" or "Dispatcher" is missing`)
+            storaged[this.state.key]? this.setState({ model: storaged[this.state.key]}) : ErrorHandler({ msg: `"Config key" or "Dispatcher" is missing`, code: 140 })
         }
     }
 
@@ -27,7 +27,7 @@ class ThemeConfigurator extends React.Component{
 
     handleUpdate(payload){
         if(!this.state.key || !this.props.dispatch) {
-            return onError.internal_proccess(`"Config key" or "App/Dispatcher" is missing`)
+            return ErrorHandler({ msg: `"Config key" or "App/Dispatcher" is missing`, code: 140 })
         }
         if (!payload) {
             payload = this.state.model
