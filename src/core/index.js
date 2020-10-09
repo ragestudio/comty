@@ -3,7 +3,7 @@ import { format } from 'timeago.js';
 import { cloneDeep } from 'lodash';
 import store from 'store';
 import { i18n, app_config } from 'config';
-import * as errorHandlers from 'core/libs/errorhandler'
+import handle from 'core/libs/errorhandler'
 import platform from 'platform'
 import request from 'request'
 import html2canvas from 'html2canvas'
@@ -173,7 +173,7 @@ export function downloadDecodedURI(payload){
     tmp.download= filename
     tmp.click()
   } catch (error) {
-    errorHandlers.onError.internal_proccess(error)
+      handle({ msg: error, code: 120 })
   }
 }
 
@@ -194,7 +194,7 @@ export function downloadEncodedURI(payload){
     tmp.download= filename
     tmp.click()
   } catch (error) {
-    errorHandlers.onError.internal_proccess(error)
+      handle({ msg: error, code: 120 })
   }
 }
 

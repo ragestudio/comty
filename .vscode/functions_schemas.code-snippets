@@ -5,7 +5,7 @@
 		"description": "Create a new functional core module with default schema for ycore-schema21",
 		"body": [
 			"import verbosity from 'core/libs/verbosity'",
-			"import { onError } from 'core/libs/errorhandler'",
+			"import handle from 'core/libs/errorhandler'",
 			"import { notify } from 'core/libs/appInterface'",
 			"import settings from 'core/libs/settings'",
 			"import endpoints from 'config/endpoints'",
