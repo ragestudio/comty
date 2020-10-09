@@ -1,6 +1,8 @@
 import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
+import errNumbers from 'config/handlers/numToError.js'
+import { Icons } from 'components'
 
 const InvalidSkeleton = (props) => {
     return(
@@ -19,6 +21,14 @@ const InvalidSkeleton = (props) => {
     )
 }
 
+const InvalidSession = (props) => {
+    return(
+        <div className={styles.floatCardWrapper} bordered="false">
+            <antd.Result status="403" title="You need to login for view this!" />
+        </div>
+    )
+}
+
 const InvalidIndex = (props) => {
     return(
         <div className={styles.floatCardWrapper} bordered="false">
@@ -32,7 +42,7 @@ const InvalidIndex = (props) => {
 const Custom = (props) => {
     return(
         <div className={styles.floatCardWrapper} style={props.style ?? null} >
-            <antd.Result status={props.status ?? "info"} title={props.title ?? ""}>
+            <antd.Result icon={props.icon ?? null} status={props.status ?? "info"} title={props.title ?? ""}>
                 {props.message}
             </antd.Result>
         </div>
@@ -42,14 +52,27 @@ const Custom = (props) => {
 export default class Invalid extends React.Component{
     render(){
         const Components = {
+            SESSION_INVALID: <InvalidSession />,
+            INVALID_INDEX: <InvalidIndex {...this.props} />,
             skeleton: <InvalidSkeleton {...this.props} />,
-            index: <InvalidIndex {...this.props} />,
             custom: <Custom {...this.props} />
         }
-        const type = this.props.type
-        if (!type) {
-            return null
+        const { type, typeByCode } = this.props
+        if (type != null || typeByCode != null) {
+            let tmpType = null
+
+            type? tmpType = type : null
+            typeByCode? tmpType = errNumbers[typeByCode] : null
+
+            if (Components[tmpType] != null) {
+                return Components[tmpType]
+            }
+
         }
-        return Components[type]
+        return <Custom
+            icon={<Icons.Meh style={{ fontSize: "100px" }} />} 
+            title="A function called this component due to an error, but apparently it also caused an error when configuring these parameters."
+            message="it seems that someone is not having a good day"
+        />
     }
 }

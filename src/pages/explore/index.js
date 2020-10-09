@@ -4,7 +4,7 @@ import endpoints from 'config/endpoints'
 import { v3_model } from 'core/libs'
 import { connect } from 'umi'
 import settings from 'core/libs/settings'
-import { PostCard, PostCreator } from 'components'
+import { PostCard, PostCreator, Invalid } from 'components'
 import * as antd from 'antd'
 import styles from './index.less'
 
@@ -44,7 +44,7 @@ export default class Explore extends React.Component {
   render() {
  
     if(!this.props.app.session_valid){
-      return (<antd.Result status="403" title="You need to login for view this!" />)
+      return <Invalid type="SESSION_INVALIsssD" />
     }
 
     if (!this.state.feed){
