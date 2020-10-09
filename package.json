@@ -45,6 +45,7 @@
     "concat-stream": "^2.0.0",
     "cookie_js": "^1.4.0",
     "dotenv": "^8.2.0",
+    "dva-model-enhance": "^1.2.13",
     "electron-config": "^2.0.0",
     "electron-context-menu": "^2.3.0",
     "electron-is": "^3.0.0",

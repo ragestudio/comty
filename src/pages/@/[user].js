@@ -1,9 +1,8 @@
 import React from 'react'
 import { pathMatchRegexp } from 'core'
-import { router } from 'core/libs/router'
+import HandleError from 'core/libs/errorhandler'
 import { Invalid } from 'components'
 import styles from './index.less'
-import { user } from 'core/models'
 
 import FollowButton from './components/follow'
 import Menu from './components/menu'
@@ -11,12 +10,6 @@ import Menu from './components/menu'
 import * as antd from 'antd'
 import { connect } from 'umi'
 const matchRegexp = pathMatchRegexp('/@/:id', location.pathname)
-
-const __Avatar = "https://comty.pw/upload/photos/2020/09/MEmX2WskbYdqxxIfG1Ci_12_bf9ae629707074e3dde5b6ff4ccb1caf_avatar.jpeg?cache=1599917094"
-const __Cover = "https://comty.pw/upload/photos/2020/09/ontbBGwvDruPxxHxzd7K_12_b36cb70f20df86ea77cd04005786bad7_cover.png?cache=1599917132" 
-const __About = "Cum cum cum me gusta damme"
-const __Followed = false
-const __Followers = 150
 
 class UserLayout extends React.Component{
   state = {
@@ -35,7 +28,6 @@ class UserLayout extends React.Component{
     const { layoutData } = this.props
     if (layoutData) {
       this.setState({ layoutData: {...this.state.layoutData, ...layoutData} })
-      console.log(this.state.layoutData)
     }
   }
 
@@ -89,6 +81,7 @@ class UserLayout extends React.Component{
 @connect(({ app }) => ({ app }))
 export default class UserIndexer extends React.Component {
   state = {
+    ErrorCode: null,
     loading: true,
     response: null,
     layoutData: null
@@ -98,48 +91,32 @@ export default class UserIndexer extends React.Component {
 
   componentDidMount(){
     if (matchRegexp) {
-      user.get.profileData({username: matchRegexp[1], server_key: this.props.app.server_key, access_token: this.props.app.session_token}, (err, res) => {
-        if (err) {
-          return false
-        }
-        try {
-          const data = JSON.parse(res)["user_data"]
-          const frame = {
-            avatar: data.avatar,
-            can_follow: data.can_follow,
-            country_id: data.contry_id,
-            about: data.about,
-            cover: data.cover,
-            is_pro: data.is_pro,
-            lastseen: data.lastseen,
-            points: data.points, 
-            registered:data.registered, 
-            user_id: data.user_id, 
-            verified: data.verified, 
-            birthday: data.birthday, 
-            details: data.details
+      this.props.dispatch({
+        type: "user/get",
+        req: {
+          fetch: "profileData",
+          username: matchRegexp[1]
+        },
+        callback: (err, res) => {
+          if(err){
+            this.setState({ ErrorCode: err })
+            return HandleError({ code: err, msg: res })
           }
-         
-          this.setState({ layoutData: frame, loading: false })
-          console.log(frame)
-          
-        } catch (error) {
-          console.log(error)
-          return false
+          this.setState({ loading: false, layoutData: res })
         }
       })
     }else{
-      this.setState({ loading: false })
+      this.setState({ ErrorCode: 140 })
     }
   }
   render() {
+    if (this.state.ErrorCode) {
+      return <Invalid typeByCode={this.state.ErrorCode} messageProp1={location.pathname} />
+    }
     if (this.state.loading) {
       return <div style={{ display: "flex", width: "100%", justifyContent: "center", alignContent: "center" }}><antd.Card style={{ width: "100%" }} ><antd.Skeleton active /></antd.Card></div>
     }
-    if (matchRegexp) {
-      return <UserLayout layoutData={this.state.layoutData} /> 
-    }
-    return <Invalid type="index" messageProp1={location.pathname} />
+    return <UserLayout layoutData={this.state.layoutData} /> 
   }
 }
 
