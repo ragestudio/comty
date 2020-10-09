@@ -149,6 +149,10 @@ export default {
       }
 
     },
+    *getStateConnector({payload}, { select }){
+        const state = yield select(state => state.app)
+        payload(state)
+    },
     *logout({ payload }, { call, put, select }) {
       const uuid = yield select(state => state.app.session_uuid)
       const token = yield select(state => state.app.session_token)
