@@ -40,19 +40,17 @@ export class NormalLoginForm extends React.PureComponent {
         user.get.basicData(payload, (err, res) => {
           if (err || !res) return false
           try {
-            const res_data = JSON.parse(res)
-
-            if (res_data.api_status == 200) {
+            if (res.api_status == 200) {
               a++
               this.anim_transition(300)
               this.setState({
                 step_error: false,
-                early_data: res_data.data,
+                early_data: res.data,
                 form_rawd_1: b,
                 step: a,
               })
             }
-            if (res_data.api_status == 400) {
+            if (res.api_status == 400) {
                this.anim_error()
             }
           } catch (error) {
@@ -103,12 +101,7 @@ export class NormalLoginForm extends React.PureComponent {
                 
             }
             if (res) {
-                try {
-                    res = JSON.parse(res)
-                    verbosity(res)
-                } catch (error) {
-                    console.log('Invalid response!')
-                }
+                verbosity(res)
 
                 switch (res.api_status.toString()) {
                     case "200": {
@@ -149,7 +142,7 @@ export class NormalLoginForm extends React.PureComponent {
             }
             if (res) {
                 try {
-                    return resolve(JSON.stringify(JSON.parse(res)['user_data']))
+                    return resolve(JSON.stringify(res.user_data))
                 } catch (error) {
                     verbosity(error)
                 }

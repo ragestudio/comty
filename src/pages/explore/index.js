@@ -21,12 +21,11 @@ export default class Explore extends React.Component {
         body: {limit: settings("post_catchlimit"), type: "get_news_feed"},
         serverKey: this.props.app.server_key,
         userToken: this.props.app.session_token,
-        endpoint: endpoints.posts,
-        verbose: true,
+        endpoint: endpoints.posts
       },
       (err, res) => {
         try {
-            this.setState({ feed: JSON.parse(res)['data'] })
+            this.setState({ feed: res.data })
         } catch (error) {
           // terrible (⓿_⓿)
         }
