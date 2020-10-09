@@ -48,11 +48,11 @@ export default {
             cover: data.cover,
             is_pro: data.is_pro,
             lastseen: data.lastseen,
-            points: data.points, 
-            registered:data.registered, 
-            user_id: data.user_id, 
-            verified: data.verified, 
-            birthday: data.birthday, 
+            points: data.points,
+            registered:data.registered,
+            user_id: data.user_id,
+            verified: data.verified,
+            birthday: data.birthday,
             details: data.details
           }
           return callback(false, frame)
