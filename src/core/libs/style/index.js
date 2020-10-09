@@ -1,7 +1,7 @@
 import store from 'store';
 import { app_config } from 'config';
 import verbosity from 'core/libs/verbosity'
-import * as errorHandlers from 'core/libs/errorhandler'
+import ErrorHandler from 'core/libs/errorhandler'
 
 const { appTheme_desiredContrast, appTheme_container } = app_config
 
@@ -13,7 +13,7 @@ export const theme = {
     try {
       raw.forEach((e)=>{container[e.key] = e.value})
     } catch (error) {
-      return errorHandlers.onError.invalid_data(error, "ThemeScheme")
+      return ErrorHandler({ msg: error, code: 120 })
     }
     return container
   },
@@ -104,7 +104,7 @@ export function getImagePixelColorsUsingCanvas(canvas, image) {
   try {
     imagePixelColors = ctx.getImageData(...destinationCanvasCoordinates);
   } catch (error) {
-    return errorHandlers.onError.internal_proccess(error)
+    return ErrorHandler({ msg: error, code: 120 })
   }
 
   if (imagePixelColors) {
