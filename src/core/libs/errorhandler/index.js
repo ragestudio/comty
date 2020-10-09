@@ -1,43 +1,66 @@
 import { appInterface } from 'core/libs'
 import verbosity from 'core/libs/verbosity'
+import errStrings from 'config/handlers/errToStrings.js'
+import errNumbers from 'config/handlers/numToError.js'
+import errFlags from  'config/handlers/errToFlag.js'
 
-// STRINGS
-export const OVERLAY_BADPOSITION = `Invalid overlay position! Was expected "primary" or "secondary"`
-export const INTERNAL_PROCESS_FAILED = `An internal error has occurred! `
-export const INVALID_DATA = `A function has been executed with invalid data and has caused an error!`
-export const INVALID_PROPS = `Some props failed!`
-// HANDLERS
-export const onError = {
-    internal_proccess: (...rest) => {
-        verbosity({...rest}, {
-            type: "error"
-        })
-        appInterface.notify.open({
-            message: INTERNAL_PROCESS_FAILED,
-            description:
-            <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto' }}>
-                <div style={{ margin: '10px 0' }}> {JSON.stringify(...rest)} </div>
-            </div>,
-           
-          })
-        return false
-    },
-    invalid_data: (error, expecting) => {
-        verbosity({error}, {
-            type: "error"
-        })
-        appInterface.notify.open({
-            message: 'Invalid Data',
-            description:
-            <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto' }}>
-                <div style={{ margin: '10px 0' }}> {INVALID_DATA} </div>
-                <div style={{ margin: '10px 0', color: '#333' }}>
-                     <h4>Expected: {expecting}</h4>
-                     <h4 style={{ backgroundColor: 'rgba(221, 42, 42, 0.8)' }} >{`${error}`} </h4>
-                </div>
-            </div>,
-           
-          })
+export function ErrorHandler(payload, callback){
+    if (!payload) {
         return false
     }
+
+    const flagToString = {
+        CRITICAL: "An critical exception",
+        DISRUPT: "An wild error appears!",
+        IGNORE: "Warning"
+    }
+
+    const flags = ["CRITICAL", "DISRUPT", "IGNORE"]
+    let flag = null
+    let out = null
+
+    const { msg, outFlag, code } = payload
+    
+    if (!out && code != null) { // This give priority to resolve with `code` than `outFlag` 
+        out = errNumbers[code]
+    }
+
+    if (!out && outFlag != null ) {
+        out = outFlag
+    }
+
+    if (out && typeof(errStrings[out]) !== "undefined") {
+        verbosity(msg, {type: "error"})
+        flag = errFlags[out]
+    }else{
+        console.log("(Aborted) no out key | or invalid flag => ", out)
+        return false
+    }
+
+    appInterface.notify.open({
+      message: flagToString[flag] ?? "Unexpected Error",
+      description:
+      <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto', height: "auto" }}>
+          <div style={{ margin: '10px 0' }}> {msg ?? "No exception message"} </div>
+          <div> => {errStrings[out] ?? "Unhandled Exception"} | { out?? "UNDEFINED_KEY" } </div>
+      </div>,
+    })
+
+    switch (flag) {
+        case flags[0]:
+            console.log("FLAG => ", flags[0])
+            return false
+        case flags[1]:
+            console.log("FLAG => ", flags[1])
+            return false
+        case flags[2]:
+            console.log("FLAG => ", flags[2])
+            return false
+        default:
+            console.log('Invalid FLAG')
+            break;
+    }
 }
+
+
+export default ErrorHandler
