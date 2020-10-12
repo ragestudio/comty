@@ -1,6 +1,6 @@
 import { router, verbosity, appInterface } from 'core/libs'
-import settings from 'core/libs/settings'
 import { DynamicSDCP } from 'core/libs/dynamicsdcp'
+import settings from 'core/libs/settings'
 import * as core from 'core'
 
 
