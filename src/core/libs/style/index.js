@@ -64,7 +64,7 @@ export function get_style_rule_value(selector, style)
 export function getOptimalOpacityFromIMG(payload, callback) {
   const { textColor, overlayColor, img } = payload;
 
-  verbosity(payload)
+  verbosity([payload])
   let canvas = document.createElement('canvas');
   let image = new Image();
 

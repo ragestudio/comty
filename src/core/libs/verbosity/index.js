@@ -79,10 +79,10 @@ export function verbosity(data, params, stackTraceParams){
     }
   }
 
-  if (Array.isArray(initData)) {
+  if (Array.isArray(data)) {
     return console[opt.type](...data)
   }
-  
+
   return console[opt.type](data)
 }
 
