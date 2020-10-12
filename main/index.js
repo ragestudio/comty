@@ -57,22 +57,6 @@ function resumeApp(){
   }
 }
 
-function contextualMenu(payload){
-  if (!payload) {
-    return false
-  }
-
-  const menu = new Menu()
-  const menuItem = new MenuItem({
-    label: 'Inspect Element',
-    click: () => {
-      mainWindow.inspectElement(payload.x, payload.y)
-    }
-  })
-  menu.append(menuItem)
-  menu.popup(mainWindow)
-}
-
 function notify(params) {
   if(!notifySupport || !params) return false
   let options = {
