@@ -28,7 +28,6 @@ export default {
             }
 
             document.getElementById("root").addEventListener("contextmenu", (e) => {
-              e.preventDefault()
               dispatch({ type: "handleEvents", payload: e })
             }, false)
 
@@ -61,6 +60,7 @@ export default {
           const prioritaryEvent = byIndex[prioritys[0]]
     
           if (prioritaryEvent != null && typeof(prioritaryEvent.onEventRender) !== "undefined") {
+            payload.preventDefault()
             window.contextMenu.open({
               renderList: prioritaryEvent.onEventRender, 
               ...prioritaryEvent.props, 
@@ -69,6 +69,7 @@ export default {
               event: payload
             })
           }else{
+            yield put({ type: "close" })
             verbosity('not valid events detected')
           }
 
@@ -99,7 +100,7 @@ export default {
         state = {...state, ...payload}
       },
       close(state){
-        state = {...state, ...payload}
+        state = defaultState
         DestroyContextMenu()
       }
     },
