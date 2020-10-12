@@ -106,7 +106,7 @@ export class ContextMenuComponent extends React.PureComponent<ContextMenuCompone
         if (this.state.loading) {
             return null
         }
-        return ( 
+        return (
             <div
               id="contextualMenu"
               ref={this.setWrapperRef}
