@@ -18,18 +18,6 @@ class Sider extends React.PureComponent {
     router.go(`/${e.key}`)
   }
 
-  requireQuery(require){
-    return new Promise(resolve => {
-      this.props.dispatch({
-        type: 'app/isUser',
-        payload: require,
-        callback: (e) => {
-          resolve(e)
-        }
-      })
-    })
-  }
-
   async menuQuery(data){
     if (!data) return false
     this.setState({ loading: true })
@@ -44,7 +32,7 @@ class Sider extends React.PureComponent {
           if(!element.attributes){
             element.attributes = {}
           }
-          let validRequire = typeof(element.attributes.require) !== 'undefined'? await this.requireQuery(element.attributes.require) : true
+          let validRequire = typeof(element.attributes.require) !== 'undefined'? await window.requireQuery(element.attributes.require) : true
           let onDekstopMode = typeof(element.attributes.desktop) !== 'undefined'? element.attributes.desktop : true
           let onMobileMode = typeof(element.attributes.mobile) !== 'undefined'? element.attributes.mobile : true
     
