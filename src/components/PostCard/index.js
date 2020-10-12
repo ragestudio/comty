@@ -31,7 +31,7 @@ const defaultPayload = {
   ReportIgnore: false,
 }
 
-const contextMenuPost = [
+const contextMenuList = [
   {
     key: "inspect_element",
     title: "Copy URL",
@@ -71,10 +71,12 @@ const contextMenuPost = [
 
 @connect(({ app }) => ({ app }))
 export default class PostCard extends React.Component {
-    state = {
-      visibleMoreMenu: false,
-      payload: this.props.payload,
-    }
+  state = {
+    visibleMoreMenu: false,
+    payload: this.props.payload,
+  }
+
+  elementRef = React.createRef()
     
     handleDispatchInvoke(key, payload) {
         this.props.dispatch({
@@ -175,6 +177,17 @@ export default class PostCard extends React.Component {
         )
     }
 
+    componentDidMount(){
+      window.contextMenu.addEventListener(
+        { 
+          priority: 100, 
+          onEventRender: contextMenuList, 
+          ref: this.elementRef.current, 
+          props: { id: this.state.payload.id }
+        }
+      )
+    }
+
     render() {
       // 
 
@@ -187,12 +200,16 @@ export default class PostCard extends React.Component {
         ]
 
         return (
-          <div key={this.state.payload.id} id={this.state.payload.id} className={styles.post_card_wrapper}>
+          <div ref={this.elementRef} key={this.state.payload.id} id={this.state.payload.id} className={styles.post_card_wrapper}>
             <antd.Card
               className={settings("post_hidebar") ? null : styles.showMode}
               onDoubleClick={() => null}
               onClick={() => this.goElementById(this.state.payload.id)}
-              onContextMenu={(e) => { window.contextMenu.open({ xPos: e.clientX, yPos: e.clientY, fragment: window.contextMenu.generate(contextMenuPost, this.state.payload)  }) }}
+              // onContextMenu={(e) => { 
+              //   e.stopPropagation()
+              //   e.preventDefault()
+              //   window.contextMenu.open({ xPos: e.clientX, yPos: e.clientY, renderList: contextMenuList, id: this.state.payload.id  }) 
+              // }}
               actions={actions}
               hoverable
             >

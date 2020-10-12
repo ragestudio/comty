@@ -8,7 +8,7 @@ import ThemeDebug from './debuggers/theme'
 import SocketDebug from './debuggers/socket'
 import VerbosityDebug from './debuggers/verbosity'
 import InternalDebug from './debuggers/internals'
-
+import ContextMenuDebug from './debuggers/contextmenu.js'
 
 const Debuggers = {
   api: <ApiDebug />,
@@ -16,7 +16,8 @@ const Debuggers = {
   theme: <ThemeDebug />,
   socket: <SocketDebug />,
   verbosity: <VerbosityDebug />,
-  internals: <InternalDebug />
+  internals: <InternalDebug />,
+  contextMenu: <ContextMenuDebug />,
 }
 
 const menuList = [
@@ -39,6 +40,11 @@ const menuList = [
     key: "socket",
     title: "Socket",
     icon: <Icons.Box />
+  },
+  {
+    key: "contextMenu",
+    title: "contextMenu",
+    icon: <Icons.Menu />
   },
   {
     key: "verbosity",

@@ -17,23 +17,19 @@ import contextMenuList from 'globals/contextMenu'
 import styles from './PrimaryLayout.less'
 
 const { Content } = antd.Layout
-const { Sider, Overlay, ContextMenu } = AppLayout
+const { Sider, Overlay } = AppLayout
 const isActive = (key) => { return key? key.active : false }
 
 @withRouter
-@connect(({ app, loading }) => ({ app, loading }))
+@connect(({ app, contextMenu, loading }) => ({ app, contextMenu, loading }))
 class PrimaryLayout extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       collapsed: app_config.default_collapse_sider ? true : false,
       isMobile: false
-    },
-    this.handleContextMenu = document.getElementById("root").addEventListener("contextmenu", (e) => {
-      e.preventDefault()
-      window.contextMenu.open({ xPos: e.clientX, yPos: e.clientY, fragment: window.contextMenu.generate(contextMenuList, e) })
-    }, false)
-
+    }
+    
     // include API extensions
     window.openLink = (e) => {
       if(this.props.app.embedded){
@@ -42,10 +38,11 @@ class PrimaryLayout extends React.Component {
         window.open(e)
       }
     }
+
     window.requireQuery = (require) =>{
       return new Promise(resolve => {
         this.props.dispatch({
-          type: 'app/isUser',
+          type: 'app/requireQuery',
           payload: require,
           callback: (e) => {
             resolve(e)
@@ -53,82 +50,35 @@ class PrimaryLayout extends React.Component {
         })
       })
     }
+
     window.inspectElement = (e) => this.props.dispatch({
       type: "app/ipcInvoke",
       payload: {
         key: "inspectElement",
-         payload: { x: e.clientX, y: e.clientY }
+        payload: { x: e.xPos, y: e.yPos }
       }
     }) 
+
     window.toogleSidebarCollapse = () => {
       this.props.dispatch({
         type: "app/handleCollapseSidebar",
         payload: !this.props.app.sidebar_collapsed
       })
     }
-    window.contextMenu = this.props.app.contextMenu
-    window.contextMenu.open = (payload) => {
-      if (!payload) return false
-      this.props.dispatch({
-        type: "app/updateState",
-        payload: {contextMenu: {
-          ...this.props.app.contextMenu, 
-          xPos: payload.xPos, 
-          yPos: payload.yPos, 
-          fragment: payload.fragment, 
-          visible: true
-        }}
-      })
-    }
-
-    window.contextMenu.handle = (e, ...rest) => {
-      if(!e || typeof(e) == 'undefined') {
-        return false
-      }
-    
-      typeof(e.onClick) !== 'undefined' && e.onClick ? e.onClick(...rest) : null
-      typeof(e.keepOnClick) !== 'undefined' && e.keepOnClick ? null : window.contextMenu.toogle()
-    }
-
-    window.contextMenu.generate = (payload, ...rest) => {
-      if(!payload) return false
-      let tmp = []
-
-      payload.forEach(async(e) => {
-        if (typeof(e.params.require) !== 'undefined') {
-          if(await window.requireQuery(e.params.require)){
-            e.valid = true
-            tmp.push(e)
-          }else{
-            // bruh
-          }
-        
-        }else{
-          tmp.push(e)
-        }
-      })
-      return tmp.map((e) => {
-        return(
-          <div {...e.params.itemProps} onClick={() => window.contextMenu.handle(e.params, ...rest)} key={e.key}>
-             {e.icon}{e.title}
-          </div>
-        )
-      })
-    }
-
-    window.contextMenu.toogle = () => {
-      this.props.dispatch({
-        type: "app/updateState",
-        payload: {contextMenu: {...this.props.app.contextMenu, visible: !this.props.app.contextMenu.visible}  }
-      })
-    }
   }
 
-  
-
   componentDidMount() {
-    this.handleContextMenu
-    
+    if (this.props.app.embedded) {
+      window.contextMenu.addEventListener(
+        { 
+          priority: 1, 
+          onEventRender: contextMenuList, 
+          ref: document.getElementById("root")
+        }
+      )
+    }
+
+
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
@@ -140,8 +90,10 @@ class PrimaryLayout extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("contextmenu", this.handleContextMenu)
     unenquireScreen(this.enquireHandler)
+    if (this.props.contextMenu) {
+      window.contextMenu.destroy()
+    }
   }
 
   onCollapseChange = () => {
@@ -154,7 +106,6 @@ class PrimaryLayout extends React.Component {
     const { location, dispatch, children, app } = this.props
     const { collapsed, isMobile } = this.state
     const { onCollapseChange } = this
-    const { contextMenu } = app
     const currentTheme = theme.get()
   
     const SiderProps = { isMobile, collapsed, onCollapseChange }
@@ -165,13 +116,6 @@ class PrimaryLayout extends React.Component {
 
     return (
       <React.Fragment>
-          <ContextMenu 
-            visible={contextMenu.visible}
-            fragment={contextMenu.fragment} 
-            xPos={contextMenu.xPos} 
-            yPos={contextMenu.yPos}
-            onClose={this.handleCloseContextMenu}
-          />
           {isActive(currentTheme['backgroundImage'])
           ?<div style={{ 
                   backgroundImage: `url(${currentTheme.backgroundImage.src})`,
