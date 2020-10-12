@@ -8,13 +8,17 @@ export default class WindowNavbar extends React.Component{
     handleMinimize(){
         this.props.dispatch({
             type: "app/ipcInvoke",
-            payload: "minimize-window"
+            payload: {
+                key: "minimize-window"
+            }
         })
     }
     handleClose(){
         this.props.dispatch({
             type: "app/ipcInvoke",
-            payload: "hide-window"
+            payload: {
+                key: "hide-window"
+            }
         })
     }
     render(){

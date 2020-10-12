@@ -95,7 +95,7 @@ export default {
 
       window.PluginGlobals = []
       window.Internal = []
-
+   
       queryIndexer([
         {
           match: '/s;:id',
@@ -117,29 +117,6 @@ export default {
         window.location = callback
       })
    
-
-      queryIndexer([
-        {
-          match: '/s;:id',
-          to: `/settings?key=:id`,
-        },
-        {
-          match: '/h;:id',
-          to: `/hashtag?key=:id`,
-        },
-        {
-          match: '/p;:id',
-          to: `/post?key=:id`,
-        },
-        {
-          match: '/@:id',
-          to: `/@/:id`,
-        }
-      ], (callback) => {
-        window.location = callback
-      })
-   
-
       if (!service) {
 
       }
