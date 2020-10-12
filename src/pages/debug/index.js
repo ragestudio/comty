@@ -3,7 +3,6 @@ import * as Icons from 'components/Icons'
 import { ListedMenu } from 'components'
 
 import ApiDebug from './debuggers/api'
-import AntdDebug from './debuggers/antd'
 import CoreDebug from './debuggers/core'
 import ThemeDebug from './debuggers/theme'
 import SocketDebug from './debuggers/socket'
@@ -13,7 +12,6 @@ import InternalDebug from './debuggers/internals'
 
 const Debuggers = {
   api: <ApiDebug />,
-  antd: <AntdDebug />,
   core: <CoreDebug />,
   theme: <ThemeDebug />,
   socket: <SocketDebug />,
@@ -26,12 +24,6 @@ const menuList = [
     key: "api",
     title: "API V3 Requester",
     icon: <Icons.Globe />,
-  },
-  {
-    key: "antd",
-    title: "Antd",
-    icon: <Icons.AntDesignOutlined />,
-    require: "embedded"
   },
   {
     key: "core",

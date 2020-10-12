@@ -1,6 +1,5 @@
 import React from 'react';
-import {v3_request} from 'api';
-import { api_request } from 'core/libs/v3_model'
+import {api_request} from 'core/libs/v3_model'
 import {
   Row,
   Col,
@@ -49,17 +48,14 @@ export default class RequestPage extends React.Component {
   paramsForm = React.createRef();
   bodyDataForm = React.createRef();
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      // Default sets
-      method: 'GET',
-      url: '',
-      ParamsKeys: [1],
-      BodyKeys: [1],
-      result: null,
-      visible: true,
-    };
+  state = {
+    // Default sets
+    method: 'GET',
+    url: '',
+    ParamsKeys: [1],
+    BodyKeys: [1],
+    result: null,
+    visible: true,
   }
 
   handleRequest = () => {
@@ -103,8 +99,7 @@ export default class RequestPage extends React.Component {
       const frame = {
         method,
         endpoint: `${method} ${url}`,
-        body,
-        verbose: true
+        body
       }
       console.log(frame)
       api_request(frame, (err, res) => {
@@ -346,7 +341,7 @@ export default class RequestPage extends React.Component {
               </Col>
             </Row>
 
-            <div className={styles.result}>{result}</div>
+            <div className={styles.result}>{JSON.stringify(result)}</div>
           </Col>
         </Row>
       </div>
