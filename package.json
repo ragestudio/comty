@@ -24,6 +24,7 @@
     "debug": "node --inspect-brk ./node_modules/.bin/umi dev",
     "postinstall": "electron-builder install-app-deps",
     "electronDev": "concurrently \"electron .\" \"npm start\"",
+    "electron": "electron .",
     "build": "npm run build:main && npm run build:renderer",
     "build:main": "ESLINT=none roadhog build",
     "build:renderer": "ESLINT=none umi build",
