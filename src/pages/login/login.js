@@ -101,14 +101,14 @@ export class NormalLoginForm extends React.PureComponent {
                 
             }
             if (res) {
-                verbosity(res)
+                verbosity([res])
 
                 switch (res.api_status.toString()) {
                     case "200": {
                         try {
                             return resolve(res)
                         } catch (error) {
-                            verbosity(error)
+                            verbosity([error])
                         }
                         break;
                     }
@@ -144,7 +144,7 @@ export class NormalLoginForm extends React.PureComponent {
                 try {
                     return resolve(JSON.stringify(res.user_data))
                 } catch (error) {
-                    verbosity(error)
+                    verbosity([error])
                 }
             }
         })
