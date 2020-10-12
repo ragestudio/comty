@@ -14,5 +14,5 @@ jobs:
       - name: Runs trello manage
         uses: sisodiya2421/trello-manage@master
         with:
-          repo-name: ${{ github.repository }}
+          repo-name: comty-development
           trello-username: ${{ secrets.TRELLO_USERNAME }}
