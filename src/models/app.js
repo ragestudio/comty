@@ -30,12 +30,6 @@ export default {
     session_data: null,
     session_uuid: null,
 
-    contextMenu: {
-      visible: false,
-      fragment: null,
-      yPos: 0,
-      xPos: 0
-    },
     sidebar_collapsed: store.get("sidebar_collapse"),
     overlayActive: false,
     overlayElement: null,
@@ -58,7 +52,7 @@ export default {
         // nothing
       }
       uri_resolver().then(res => {
-        dispatch({ type: 'handleUpdateResolvers', payload: res })
+        dispatch({ type: 'updateState', payload: { resolvers: res } })
       })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
@@ -122,13 +116,9 @@ export default {
       }
 
       if (!sessionDataframe && session ) {
-        yield put({ type: 'handleUpdateData' })
+        yield put({ type: 'handleGetUserData' })
       }
 
-    },
-    *getStateConnector({payload}, { select }){
-        const state = yield select(state => state.app)
-        payload(state)
     },
     *logout({ payload }, { call, put, select }) {
       const uuid = yield select(state => state.app.session_uuid)
@@ -136,7 +126,7 @@ export default {
       const sk = yield select(state => state.app.server_key)
 
       session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) =>{
-        verbosity(res)
+        verbosity([res])
       })
 
       yield put({ type: 'sessionErase' })
@@ -145,10 +135,6 @@ export default {
       if (!payload) return false;
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
-    },
-    *initializeInternal({payload}, {select, put}){
-      if(!payload) return false
-      yield put({ type: "handleInternal", payload })
     },
     *initializeSocket({payload}, {select, put}){
       if(!payload) return false
@@ -165,7 +151,7 @@ export default {
         try {
             usePlugins([payload.array], (err, results) => {
               if (err) {
-                verbosity("Init error!", err)
+                verbosity(["Init error!", err])
                 appInterface.notify.error("Plugin initialize error!", err)
                 return false
               }
@@ -277,7 +263,7 @@ export default {
         }
 
       } catch (error) {
-        verbosity(error)
+        verbosity([error])
       }
 
     }
@@ -289,17 +275,7 @@ export default {
         ...payload,
       };
     },
-    handleInternal(state, { payload }){
-      verbosity(payload)
-      if (Array.isArray(payload)) {
-        payload.forEach((e) => {
-          window.Internal[e.id] = e.payload
-        })        
-      }
-    },
-    handleUpdateResolvers(state, { payload }) {
-      state.resolvers = payload
-    },
+
     handleSocket(state, { payload }) {
       state.socket_conn = payload
       state.socket_opt = payload.opts
@@ -359,7 +335,7 @@ export default {
 
       jwt.sign(frame, state.server_key, (err, token) => {
         if (err) {
-          verbosity(err)
+          verbosity([err])
           return false
         }
         cookie.set(app_config.session_token_storage, token)
@@ -370,7 +346,7 @@ export default {
       state.session_valid = true
       location.reload()
     },
-    handleUpdateData(state){
+    handleGetUserData(state){
       const frame = {
         id: state.session_uuid,
         access_token: state.session_token,
@@ -378,15 +354,14 @@ export default {
       }
       user.get.data(frame, (err, res) => {
           if(err) {
-            verbosity(err)
+            verbosity([err])
           }
           if (res) {
               try {
                 const session_data = JSON.stringify(res.user_data)
                 sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
-                location.reload()
               } catch (error) {
-                verbosity(error)
+                verbosity([error])
               }
           }
       })
@@ -395,11 +370,11 @@ export default {
       state.sidebar_collapsed = payload
     },
     handleUpdateTheme(state, { payload }) {
-      verbosity(payload)
+      verbosity([payload])
       store.set(app_config.appTheme_container, payload);
       state.app_theme = payload
     },
-    isUser(state, { payload, callback }){
+    requireQuery(state, { payload, callback }){
       if(!payload || !callback) return false
       switch (payload) {
         case 'login':{
@@ -430,7 +405,6 @@ export default {
         return false
       }
       const ipc = state.electron.ipcRenderer
-
       ipc.invoke(payload.key, payload.payload)
     },
     ipcSend(state, {payload}){
@@ -451,4 +425,4 @@ export default {
       location.reload()
     },
   },
-};
+}
