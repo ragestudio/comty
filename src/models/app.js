@@ -358,7 +358,7 @@ export default {
           }
           if (res) {
               try {
-                const session_data = JSON.stringify(res.user_data)
+                const session_data = JSON.stringify(res.response)
                 sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
               } catch (error) {
                 verbosity([error])

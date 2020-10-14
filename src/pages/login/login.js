@@ -39,25 +39,20 @@ export class NormalLoginForm extends React.PureComponent {
         const payload = { username: Object.values(values).toString() }
         user.get.basicData(payload, (err, res) => {
           if (err || !res) return false
-          try {
-            if (res.api_status == 200) {
+            if (res.code == 200) {
               a++
               this.anim_transition(300)
               this.setState({
                 step_error: false,
-                early_data: res.data,
+                early_data: res.response,
                 form_rawd_1: b,
                 step: a,
               })
             }
-            if (res.api_status == 400) {
+            if (res.code == 400) {
                this.anim_error()
             }
-          } catch (error) {
-            return false
-          }
         })
-
         return true
       case 2:
         this.setState({ form_rawd_2: b, step: a })
@@ -103,21 +98,21 @@ export class NormalLoginForm extends React.PureComponent {
             if (res) {
                 verbosity([res])
 
-                switch (res.api_status.toString()) {
-                    case "200": {
+                switch (res.code) {
+                    case 200: {
                         try {
-                            return resolve(res)
+                            return resolve(res.response)
                         } catch (error) {
                             verbosity([error])
                         }
                         break;
                     }
-                    case "400": {
+                    case 400: {
                         console.log('Credentials error')
                         this.setState({ validating: false })
                         return this.anim_error()
                     }
-                    case "500": {
+                    case 500: {
                         console.log('Server error')
                         this.setState({ validating: false })
                         return this.back()
@@ -142,9 +137,9 @@ export class NormalLoginForm extends React.PureComponent {
             }
             if (res) {
                 try {
-                    return resolve(JSON.stringify(res.user_data))
+                  return resolve(JSON.stringify(res.response))
                 } catch (error) {
-                    verbosity([error])
+                  verbosity([error])
                 }
             }
         })
@@ -158,7 +153,7 @@ export class NormalLoginForm extends React.PureComponent {
     this.setState({ step_error: false, validating: true })
     
     const authFrame = await this.getAuthFrame({username: form_rawd_1, password: form_rawd_2, server_key: this.props.app.server_key})
-    const dataFrame = await this.getDataFrame({id: authFrame.user_id, access_token: authFrame.access_token, serverKey: this.props.app.server_key})
+    const dataFrame = await this.getDataFrame({user_id: authFrame.user_id, access_token: authFrame.access_token, serverKey: this.props.app.server_key})
 
     return this.props.dispatch({
         type: 'app/login',

@@ -10,18 +10,15 @@ const set = {
 export const get = {
   data: (parms, callback) => {
     if (!parms) return false;
-    const { id, access_token, serverKey, fetch } = parms;
+    const { user_id, access_token, serverKey, fetch } = parms;
 
     let req = {
       fetch: fetch? fetch : 'user_data'
     }
 
-    if (!id || !access_token) {
-      // core get id data from current session
-    }
     v3_model.api_request(
       {
-        body: {user_id: id, fetch: req.fetch},
+        body: {user_id: user_id, fetch: req.fetch},
         serverKey: serverKey,
         userToken: access_token,
         endpoint: endpoints.get_data
