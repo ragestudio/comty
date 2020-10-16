@@ -2,7 +2,7 @@
 
 // Helpers & Misc
 import * as Icons from './Icons'
-import Loader from './Loader/Loader.js'
+import Loader from './Loader'
 import About from './About'
 import * as Feather from 'feather-reactjs'
 import Invalid from './Invalid'

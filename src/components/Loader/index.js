@@ -1,6 +1,6 @@
 import React from 'react'
 import classNames from 'classnames'
-import styles from './Loader.less'
+import styles from './index.less'
 
 const Loader = (loading) => {
   return (

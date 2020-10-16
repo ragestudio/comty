@@ -4,7 +4,7 @@ const { resolve, join } = require('path');
 export default defineConfig({
   hash: false,
   dynamicImport: {
-    loading: 'components/Loader/Loader.js',
+    loading: 'components/Loader',
   },
   // dynamicImport: false,
   // history: { type: "hash" },
