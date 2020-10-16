@@ -7,6 +7,9 @@ import handle from 'core/libs/errorhandler'
 import request from 'request'
 import html2canvas from 'html2canvas'
 import platform from 'platform'
+import path from 'path'
+import fs from 'fs'
+import * as utils from '@ragestudio/nodecore-utils'
 
 const { pathToRegexp } = require('path-to-regexp');
 
@@ -15,19 +18,42 @@ export const defaultLanguage = i18n ? i18n.defaultLanguage : '';
 
 import * as libs from './libs'
 
+export * from '@ragestudio/nodecore-utils'
 export const package_json = require('../../package.json');
-export const UUAID = `${package_json.name}==${package_json.UUID}`;
+export const GUID = app_config.guid;
 
-export const app_info = {
-  appid: package_json.name,
-  stage: package_json.stage,
-  name: package_json.title,
+export const clientInfo = {
+  buildStable: getBuild()["stable"],
+  packageName: package_json.name,
+  packageStage: package_json.stage,
+  siteName: app_config.siteName,
   version: package_json.version,
   logo: app_config.FullLogoPath,
   logo_dark: app_config.DarkFullLogoPath,
   os: platform.os,
   layout: platform.layout
 };
+
+export function getBuild() {
+  let build = {
+    stable: false
+  }
+  try {
+    if (!window.__build) {
+      return false
+    }
+    const buildPath = path.resolve(__dirname, "./dist")
+    const data = JSON.parse(fs.readFileSync(`${buildPath}/build.json`))
+    if (typeof(data) !== "undefined" && Array.isArray(data)) {
+      utils.__legacy____legacy__objectToArray(data).forEach((e) => {
+        build[e.key] = e.value
+      })
+    }
+  } catch (error) {
+    // tf this is not a build sorry
+  }
+  return build
+}
 
 export function queryIndexer(array, callback, params) {
     if(!array) return false
@@ -223,30 +249,6 @@ export function objectLast(array, n) {
  * @param object {object}
  * @return array
  */
-export function objectToArray(object) {
-  if(!object) return false
-  let tmp = []
-
-  const keys = Object.keys(object)
-  const values = Object.values(object)
-  const sourceLength = keys.length
-
-  for (let i = 0; i < sourceLength; i++) {
-    let obj = {}
-    obj.key = keys[i]
-    obj.value = values[i]
-
-    tmp[i] = obj
-  }
-  return tmp
-}
-
-/**
- * Object to array scheme RSA-YCORE-ARRAYPROTO.2
- *
- * @param object {object}
- * @return array
- */
 export function arrayToObject(array) {
   if(!array) return false
   let tmp = []
@@ -265,8 +267,8 @@ export function arrayToObject(array) {
  * @param id {string}
  * @return array
  */
-export function objectRemoveByID(object, id) {
-  let arr = objectToArray(object)
+export function objectRemoveId(object, id) {
+  let arr = __legacy__objectToArray(object)
   return arr.filter((e) => {
     return e.id != id;
   });
@@ -278,37 +280,13 @@ export function objectRemoveByID(object, id) {
  * @param key {string}
  * @return array
  */
-export function objectRemoveByKEY(object, key) {
-  let arr = objectToArray(object)
+export function objectRemoveKey(object, key) {
+  let arr = __legacy__objectToArray(object)
   return arr.filter((e) => {
     return e.key != key;
   });
 }
 
-/**
- * Remove an element by id from an array
- *
- * @param array {array}
- * @param id {string}
- * @return array
- */
-export function arrayRemoveByID(arr, id) {
-  return arr.filter(function(ele) {
-    return ele.id != id;
-  });
-}
-/**
- * Remove an element by key from an array
- *
- * @param array {array}
- * @param key {string}
- * @return array
- */
-export function arrayRemoveByKEY(arr, key) {
-  return arr.filter(function(ele) {
-    return ele.key != key;
-  });
-}
 
 /**
  * Global fix for convert '1, 0' to string boolean 'true, false'
@@ -441,31 +419,6 @@ export function queryPathKeys(array, current, parentId, id = 'id') {
 }
 
 /**
- * In an array of objects, specify an object that traverses the objects whose parent ID matches.
- * @param   {array}     array     The Array need to Converted.
- * @param   {string}    current   Specify the object that needs to be queried.
- * @param   {string}    parentId  The alias of the parent ID of the object in the array.
- * @param   {string}    id        The alias of the unique ID of the object in the array.
- * @return  {array}    Return a key array.
- */
-export function queryAncestors(array, current, parentId, id = 'id') {
-  const result = [current];
-  const hashMap = new Map();
-  array.forEach(item => hashMap.set(item[id], item));
-
-  const getPath = current => {
-    const currentParentId = hashMap.get(current[id])[parentId];
-    if (currentParentId) {
-      result.push(hashMap.get(currentParentId));
-      getPath(hashMap.get(currentParentId));
-    }
-  };
-
-  getPath(current);
-  return result;
-}
-
-/**
  * Query which layout should be used for the current path based on the configuration.
  * @param   {layouts}     layouts   Layout configuration.
  * @param   {pathname}    pathname  Path name to be queried.
@@ -539,12 +492,7 @@ export function iatToString(iat){
   return  new Date(iat * 1000).toLocaleString()
 }
 
-export function extendIDCode(id){
-  num.toString().padStart(4, "0");
-
-}
-
-export function generateUUID( lenght = 6 ){
+export function generateGUID( lenght = 6 ){
   let text = ""
   const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789"
 
@@ -554,10 +502,6 @@ export function generateUUID( lenght = 6 ){
   return text
 }
 
-	/**
-	 * Generate a random string
-	 * @returns {string}
-	 */
 export function generateRandomId( length = 15 ){
 	return Math.random ().toString ( 36 ).substring ( 0, length );
 }

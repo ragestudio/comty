@@ -1,15 +1,13 @@
 {
   "name": "comty-development",
   "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
-  "title": "Comty™",
-  "DevBuild": true,
-  "version": "0.10.12",
-  "stage": "dev",
-  "description": "",
+  "version": "0.10.16",
+  "stage": "alpha",
+  "description": "An prototype of a social network",
   "author": "RageStudio",
   "license": "LGPL-2.1",
-  "private": true,
   "main": "main/index.js",
+  "types": "index.d.ts",
   "build": {
     "files": [
       "./dist/**/*",
@@ -21,6 +19,7 @@
   },
   "scripts": {
     "start": "umi dev",
+    "test": "jest --no-cache",
     "debug": "node --inspect-brk ./node_modules/.bin/umi dev",
     "postinstall": "electron-builder install-app-deps",
     "electronDev": "concurrently \"electron .\" \"npm start\"",
@@ -36,6 +35,9 @@
     "@icons-pack/react-simple-icons": "^3.8.0",
     "@lingui/react": "^2.9.2",
     "@ragestudio/nodecore-api-lib": "^0.2.6",
+    "@ragestudio/nodecore-utils": "^0.1.18",
+    "@types/jest": "^26.0.14",
+    "@types/lodash": "^4.14.162",
     "antd": "^4.6.6",
     "axios": "^0.20.0",
     "babel-core": "^6.26.3",
@@ -60,14 +62,15 @@
     "localforage": "^1.7.4",
     "lodash": "^4.17.19",
     "moment": "^2.28.0",
+    "npm": "^6.14.8",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.1.0",
     "platform": "^1.3.6",
-    "react": "^16.13.1",
+    "react": "^16.14.0",
     "react-animations": "^1.0.0",
     "react-color": "^2.18.1",
     "react-dazzle": "^1.4.0",
-    "react-dom": "^16.12.0",
+    "react-dom": "^16.14.0",
     "react-emoji": "^0.5.0",
     "react-google-recaptcha": "^2.0.1",
     "react-helmet": "^5.2.1",
@@ -85,6 +88,7 @@
     "store": "^2.0.12",
     "styled-components": "^5.2.0",
     "timeago.js": "^4.0.2",
+    "ts-jest": "^26.4.1",
     "wait-on": "^5.2.0"
   },
   "devDependencies": {
@@ -94,7 +98,7 @@
     "@lingui/loader": "^2.9.2",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/node": "^12.12.59",
-    "@umijs/preset-react": "^1.6.5",
+    "@umijs/preset-react": "^1.6.11",
     "babel-eslint": "^10.0.1",
     "babel-plugin-dev-expression": "^0.2.1",
     "babel-plugin-module-resolver": "^4.0.0",
@@ -112,7 +116,7 @@
     "less": "^3.12.2",
     "less-loader": "^7.0.1",
     "style-loader": "^1.2.1",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.7",
     "umi": "^3.2.23"
   }
 }
