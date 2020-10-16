@@ -1,7 +1,7 @@
 module.exports = {
   app_config: {
-    id: "comty",
-    siteName: 'Comty',
+    guid: "7d6b74b5-1b3b-432f-97df-2c5fc2c2b6ae",
+    siteName: 'Comty™',
     copyright: 'RageStudio©',
     MainPath: '/',
     
