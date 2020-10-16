@@ -39,7 +39,8 @@ export default {
           if (err) {
             return console.log(err)
           }
-          const data = res.user_data
+          console.log(res)
+          const data = res.response
           const frame = {
             avatar: data.avatar,
             can_follow: data.can_follow,

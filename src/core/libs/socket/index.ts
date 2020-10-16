@@ -73,19 +73,36 @@ export class SocketConnection{
             this.state.connAttemps = this.state.connAttemps + 1
         })
 
-        this.ioConn.on('disconnect', () => {
-            verbosity("Connection disconnect!")
-        })
         this.ioConn.on('reconnect', (attemptNumber:number) => {
             verbosity(["Connection reconected with (", attemptNumber , ") tries"])
+            notify.success("You are now online")
         })
+        
+        this.ioConn.on('disconnected', () => {
+            notify.warn("You are offline")
+        })
+
+        this.ioConn.on('error', (event:any) => {
+            notify.error(event)
+        })
+
         this.ioConn.on('connect', () => {
             notify.success("You are now online")
             verbosity("Successfully connect")
         })
+
         this.ioConn.on('close', () => {
             verbosity("Connection closed!")
         })
+        
+        this.ioConn.on('pingPong', (e:any) => {
+            // woops
+            const n = e + 1
+            const fart = new Audio("https://dl.ragestudio.net/pedo_cum.mp3")
+            fart.play()
+			setTimeout(() => { this.ioConn.emit("pingPong", n) }, n)
+		})
+        
     }
     
     conn = {

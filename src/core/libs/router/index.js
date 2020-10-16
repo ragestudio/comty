@@ -11,7 +11,7 @@ export const router = {
     // goTo.element('primaryContent');
   },
   goProfile: e => {
-    router.push(`/@${e}`);
+    router.push(`/@/${e}`);
     // goTo.element('primaryContent');
   },
 };
