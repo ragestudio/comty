@@ -18,14 +18,15 @@ export default class Explore extends React.Component {
   request(){
     v3_model.api_request(
       {
-        body: {limit: settings("post_catchlimit"), type: "get_news_feed"},
+        body: {limit: settings("post_catchlimit"), fetch: "get_news_feed"},
         serverKey: this.props.app.server_key,
         userToken: this.props.app.session_token,
         endpoint: endpoints.posts
       },
       (err, res) => {
         try {
-            this.setState({ feed: res.data })
+          console.log(res)
+            this.setState({ feed: res.response })
         } catch (error) {
           // terrible (⓿_⓿)
         }

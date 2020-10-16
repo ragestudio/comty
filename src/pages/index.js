@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'umi';
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
-import { objectToArray } from 'core'
+import { __legacy__objectToArray } from 'core'
 
 @connect(({ app, contextMenu }) => ({ app, contextMenu }))
 class PageIndex extends React.PureComponent {
@@ -25,7 +25,7 @@ class PageIndex extends React.PureComponent {
   render() {
     const modelToMap = (data) => {
         if(!data) return false
-        return objectToArray(data).map(e => {
+        return __legacy__objectToArray(data).map(e => {
           try {
            const v = JSON.stringify(e.value)
            if(!v) return false

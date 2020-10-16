@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import io from 'socket.io-client'
 import { connect } from 'umi'
 import * as antd from 'antd'
-import { objectToArray } from 'core'
+import { __legacy__objectToArray } from 'core'
 import settings from 'core/libs/settings'
 
 const defaultSocketAddress = "localhost:7000"
@@ -11,7 +11,7 @@ const defaultSocketAddress = "localhost:7000"
 @connect(({ app }) => ({ app }))
 export default class SocketDebug extends React.Component{
     state = {
-        resolvers: objectToArray(this.props.app.resolvers),
+        resolvers: __legacy__objectToArray(this.props.app.resolvers),
         InputRaw: defaultSocketAddress
     }
 
@@ -55,7 +55,7 @@ export default class SocketDebug extends React.Component{
                            gutter: 5,
                            xxl: 3,
                          }}
-                         dataSource={objectToArray(socket_opt)}
+                         dataSource={__legacy__objectToArray(socket_opt)}
                          renderItem={(e) => {
                              return(
                                  <div style={{ border: "0.1px rgb(217, 217, 217) solid" ,backgroundColor: "rgb(250, 250, 250)", borderRadius: "4px", width: "fit-content", paddingRight: "12px" }}>
