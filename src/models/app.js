@@ -10,7 +10,7 @@ import { queryIndexer } from 'core'
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
 import { usePlugins } from 'plugins'
-import { SocketConnection } from 'core/libs/socket/index.ts'
+import { SocketConnection, SocketModel } from 'core/libs/socket/index.ts'
 
 export default {
   namespace: 'app',
@@ -136,11 +136,6 @@ export default {
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
     },
-    *initializeSocket({payload}, {select, put}){
-      if(!payload) return false
-      const { type, address } = payload
-      yield put({ type: "handleSocket", payload: new SocketConnection(payload) })
-    },
     *initializePlugins({ payload }, { select }){
         const extended = yield select(state => state.extended)
 
@@ -194,7 +189,7 @@ export default {
 
                   if (Array.isArray(RequireImport)) {
                     RequireImport.forEach((e) => {
-                      console.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
+                      `console`.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
                       extendedRequire[e] = require(RequireFrom)
                     })
                   }else{
@@ -274,11 +269,6 @@ export default {
         ...state,
         ...payload,
       };
-    },
-
-    handleSocket(state, { payload }) {
-      state.socket_conn = payload
-      state.socket_opt = payload.opts
     },
     handleUpdateAuthFrames(state, { payload }) {
       state.session_authframe = payload
