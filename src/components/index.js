@@ -10,7 +10,7 @@ import Invalid from './Invalid'
 // App Layout Components
 import * as AppLayout from './Layout/index.js'
 import ListedMenu from './ListedMenu/index.tsx'
-
+import FloatComponent from './FloatComponent'
 // User Components
 
 // Post Components
@@ -20,6 +20,7 @@ import PostCard from './PostCard'
 
 // Mix & Export all
 export {
+  FloatComponent,
   ListedMenu,
   AppLayout,
   PostCard,
