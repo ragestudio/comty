@@ -2,13 +2,13 @@ import React from 'react'
 import * as Icons from 'components/Icons'
 import { ListedMenu } from 'components'
 
-import ApiDebug from './debuggers/api'
-import CoreDebug from './debuggers/core'
-import ThemeDebug from './debuggers/theme'
-import SocketDebug from './debuggers/socket'
-import VerbosityDebug from './debuggers/verbosity'
-import InternalDebug from './debuggers/internals'
-import ContextMenuDebug from './debuggers/contextmenu.js'
+import ApiDebug from 'debuggers/api'
+import CoreDebug from 'debuggers/core'
+import ThemeDebug from 'debuggers/theme'
+import SocketDebug from 'debuggers/socket'
+import VerbosityDebug from 'debuggers/verbosity'
+import InternalDebug from 'debuggers/internals'
+import ContextMenuDebug from 'debuggers/contextmenu.js'
 
 const Debuggers = {
   api: <ApiDebug />,

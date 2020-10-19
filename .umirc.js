@@ -24,6 +24,7 @@ export default defineConfig({
     api: resolve(__dirname, './node_modules/@ragestudio/nodecore-api-lib/src'),
     plugins: resolve(__dirname, './plugins'),
     globals: resolve(__dirname, './globals'),
+    debuggers: resolve(__dirname, './src/debuggers'),
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),
     config: resolve(__dirname, './config'),
