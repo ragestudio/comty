@@ -1,13 +1,14 @@
 import io from 'socket.io-client'
-import { verbosity } from 'core/libs/verbosity'
+import verbosity from 'core/libs/verbosity'
 import { connect } from 'umi'
 import settings from 'core/libs/settings'
 import { notify } from 'core/libs/appInterface'
 
 const maxDeep_Attemp = Number(2)
+
 export class SocketConnection{
     ioConn: any
-    state: { address: any; connAttemps: number }
+    state: { address: any; connAttemps: number; registeredNamespaces: any; }
     props: any
     opts: any
 
@@ -15,9 +16,11 @@ export class SocketConnection{
         if (!props) {
             throw new Error("Mmm some props are not defined")
         }
+
         this.state = {
-            address: props.address,
-            connAttemps: Number(0)
+            address: props.payload.address,
+            connAttemps: Number(0),
+            registeredNamespaces: []
         }
 
         this.props = props
@@ -60,9 +63,15 @@ export class SocketConnection{
             // options for Node.js / React Native
             extraHeaders: {},
         }
+
         this.ioConn = io(this.state.address, this.opts)
         this.conn.open()
-
+        
+        this.ioConn.on('connect', (event:any) => {
+            notify.success("You are now online")
+            verbosity("Successfully connect")
+        })
+        
         this.ioConn.on("connect_error", () => {
             if (this.state.connAttemps >= maxDeep_Attemp) {
                 verbosity(['Maximun nº of attemps reached => max', maxDeep_Attemp + 1])
@@ -86,15 +95,15 @@ export class SocketConnection{
             notify.error(event)
         })
 
-        this.ioConn.on('connect', () => {
-            notify.success("You are now online")
-            verbosity("Successfully connect")
-        })
-
         this.ioConn.on('close', () => {
             verbosity("Connection closed!")
         })
         
+        this.ioConn.on('updateState', (event:any) => {
+            verbosity(["updating state > ", event])
+            this.props.connector.dispatcher({ type: "updateState", payload: event })
+        })
+
         this.ioConn.on('pingPong', (e:any) => {
             // woops
             const n = e + 1
