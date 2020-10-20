@@ -1,14 +1,11 @@
 import io from 'socket.io-client'
 import verbosity from 'core/libs/verbosity'
-import { connect } from 'umi'
 import settings from 'core/libs/settings'
 import { notify } from 'core/libs/appInterface'
 
-const maxDeep_Attemp = Number(2)
-
-export class SocketConnection{
+export default class SocketConnection{
     ioConn: any
-    state: { address: any; connAttemps: number; registeredNamespaces: any; }
+    state: { connAttemps: number; registeredNamespaces: any; }
     props: any
     opts: any
 
@@ -16,22 +13,23 @@ export class SocketConnection{
         if (!props) {
             throw new Error("Mmm some props are not defined")
         }
+        this.props = props.payload
+        this.dispatcher = props.connector
 
         this.state = {
-            address: props.payload.address,
             connAttemps: Number(0),
             registeredNamespaces: []
         }
 
-        this.props = props
         this.opts = {
+            hostname: "localhost:5000",
             reconnection: true,
-            reconnectionAttempts: maxDeep_Attemp,
+            reconnectionAttempts: Number(2),
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             randomizationFactor: 0.5,
             timeout: 20000,
-            autoConnect: false,
+            autoConnect: true,
             query: {},
             // options of the Engine.IO client
             upgrade: true,
@@ -64,21 +62,27 @@ export class SocketConnection{
             extraHeaders: {},
         }
 
-        this.ioConn = io(this.state.address, this.opts)
-        this.conn.open()
+        if (typeof(this.props) !== "undefined") {
+            this.opts = { ...this.opts, ...this.props}
+        }
+
+        verbosity([`New socket connection, with parameters =>`, this.opts], { color: "blue" })
+        this.ioConn = io(this.opts.hostname, this.opts)
+
         
         this.ioConn.on('connect', (event:any) => {
             notify.success("You are now online")
             verbosity("Successfully connect")
+            props.then(true) // this send an signal when the socket its successfully connected
         })
         
-        this.ioConn.on("connect_error", () => {
-            if (this.state.connAttemps >= maxDeep_Attemp) {
-                verbosity(['Maximun nº of attemps reached => max', maxDeep_Attemp + 1])
-                this.conn.close()
+        this.ioConn.on("connect_error", (event:any) => {
+            if (this.state.connAttemps >= this.opts.reconnectionAttempts) {
+                verbosity(['Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1])
+                this.ioConn.close()
                 return false
             }
-            verbosity([`Strike [${this.state.connAttemps + 1}] / ${maxDeep_Attemp + 1} !`])
+            verbosity([`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event])
             this.state.connAttemps = this.state.connAttemps + 1
         })
 
@@ -101,7 +105,7 @@ export class SocketConnection{
         
         this.ioConn.on('updateState', (event:any) => {
             verbosity(["updating state > ", event])
-            this.props.connector.dispatcher({ type: "updateState", payload: event })
+            this.dispatcher({ type: "socket/updateState", payload: event })
         })
 
         this.ioConn.on('pingPong', (e:any) => {
@@ -110,23 +114,7 @@ export class SocketConnection{
             const fart = new Audio("https://dl.ragestudio.net/pedo_cum.mp3")
             fart.play()
 			setTimeout(() => { this.ioConn.emit("pingPong", n) }, n)
-		})
-        
-    }
-    
-    conn = {
-        open: () => {
-            this.ioConn.open()
-        },
-        disconnect: () => {
-            this.ioConn.disconnect()
-        },
-        close: () => {
-            this.ioConn.close()
-        },
-        destroy: () => {
-            
-        }
+        })
     }
 
 }

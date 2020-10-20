@@ -16,8 +16,7 @@ export default {
   namespace: 'app',
   state: {
     env_proccess: process.env,
-    socket_conn: null,
-    socket_opt: null,
+    socket_address: "localhost:7000", //set by default
     server_key: keys.server_key,
     resolvers: null,
 
@@ -34,6 +33,7 @@ export default {
     overlayActive: false,
     overlayElement: null,
     embedded: false,
+    dispatcher: null,
 
     controlActive: false,
     feedOutdated: false,
@@ -45,6 +45,7 @@ export default {
   },
   subscriptions: {
     setup({ dispatch }) {
+      dispatch({ type: 'updateState', payload: { dispatcher: dispatch } })
       try {
         const electron = window.require("electron")
         dispatch({ type: 'updateState', payload: { electron, embedded: true } })
@@ -56,7 +57,8 @@ export default {
       })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
-      dispatch({ type: 'query', payload: { dispatcher: dispatch } });
+      dispatch({ type: 'queryAuth' })
+      dispatch({ type: 'query', payload: { dispatcher: dispatch } })
     },
     setupHistory({ dispatch, history }) {
       history.listen(location => {
@@ -115,9 +117,26 @@ export default {
 
       }
 
+
       if (!sessionDataframe && session ) {
         yield put({ type: 'handleGetUserData' })
       }
+
+    },
+    *queryAuth({ payload }, { call, put, select }) {
+      const socket = yield select(state => state.socket)
+      const state = yield select(state => state)
+
+      verbosity([`Starting Auth process`])
+      yield put({ type: 'socket/initializeSocket', payload: { 
+        hostname: state.app.socket_address,
+        reconnectionAttempts: 10
+      }, then: () => {
+        //socket.socket_conn.emit("pingPong")
+      }})
+
+   
+
 
     },
     *logout({ payload }, { call, put, select }) {
