@@ -40,8 +40,8 @@ export default {
           }
         }
 
-        yield put({ 
-          type: "handleSocket", 
+        yield put({
+          type: "handleSocket",
           payload: new SocketConnection({payload, connector: state.app.dispatcher, then: handleThen })
         })
     },
