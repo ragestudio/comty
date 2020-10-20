@@ -6,7 +6,7 @@ import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { __legacy__objectToArray } from 'core'
 
-import { SocketConnection, SocketModel } from 'core/libs/socket/index.ts'
+import SocketConnection from 'core/libs/socket/index.ts'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
@@ -16,28 +16,34 @@ const defaultSocketAddress = "localhost:7000"
 export default {
   namespace: 'socket',
   state: {
-    dispatcher: null,
     resolvers: null,
-    socket_conn: null
+    ioConn: null
   },
   subscriptions: {
     setup({ dispatch }) {
-        dispatch({ type: 'updateState', payload: { dispatcher: dispatch } })
         dispatch({ type: 'query' })
     },
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-        const stateConnector = yield select(state => state)
+        const state = yield select(state => state)
         
-        yield put({ type: "updateState", payload: { resolvers: stateConnector.app.resolvers } })
+        yield put({ type: "updateState", payload: { resolvers: state.app.resolvers } })
 
     },
-    *initializeSocket({payload}, {select, put}){
+    *initializeSocket({payload, then}, {select, put}){
         if(!payload) return false
-        const stateConnector = yield select(state => state)
+        const state = yield select(state => state)
+        const handleThen = () => {
+          if (typeof(then) !== "undefined") {
+            then(true)
+          }
+        }
 
-        yield put({ type: "handleSocket", payload: new SocketConnection({payload, connector: stateConnector.socket}) })
+        yield put({ 
+          type: "handleSocket", 
+          payload: new SocketConnection({payload, connector: state.app.dispatcher, then: handleThen })
+        })
     },
   },
   reducers: {
@@ -48,8 +54,14 @@ export default {
       };
     },
     handleSocket(state, { payload }) {
-        state.socket_conn = payload
-        state.socket_opt = payload.opts
+        console.log(payload.ioConn)
+        state.ioConn = payload.ioConn
+
+        state.ioConn.json = null // avoiding circular...
+        state.ioConn.nsps = null
+        state.ioConn.io.nsps = null
+        state.ioConn.io.connecting = null
+        //state.ioConn.io.opts.engine.transport = null
     },
   },
 };
