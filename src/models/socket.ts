@@ -42,7 +42,6 @@ export default {
   },
   reducers: {
     updateState(state, { payload }) {
-        console.log(payload)
       return {
         ...state,
         ...payload,

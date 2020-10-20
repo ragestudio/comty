@@ -28,6 +28,7 @@ export default defineConfig({
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),
     config: resolve(__dirname, './config'),
+    pages: resolve(__dirname, './src/pages'),
     components: resolve(__dirname, './src/components'),
     models: resolve(__dirname, './src/models'),
     node_modules: resolve(__dirname, './node_modules')
