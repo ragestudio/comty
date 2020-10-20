@@ -11,6 +11,8 @@ import Invalid from './Invalid'
 import * as AppLayout from './Layout/index.js'
 import ListedMenu from './ListedMenu/index.tsx'
 import FloatComponent from './FloatComponent'
+import ParamsList from './ParamsList'
+
 // User Components
 
 // Post Components
@@ -20,6 +22,7 @@ import PostCard from './PostCard'
 
 // Mix & Export all
 export {
+  ParamsList,
   FloatComponent,
   ListedMenu,
   AppLayout,

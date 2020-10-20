@@ -10,7 +10,7 @@ export default defineConfig({
   // history: { type: "hash" },
 
   targets: { ie: 11 },
-  dva: { immer: true },
+  dva: { immer: true, hmr: true },
   ignoreMomentLocale: true,
   mountElementId: "root",
   nodeModulesTransform: {
