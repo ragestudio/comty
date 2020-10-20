@@ -4,6 +4,9 @@ import ReactDOM from 'react-dom'
 import * as antd from 'antd'
 import React from 'react'
 import { Rnd } from 'react-rnd'
+import { getDvaApp } from 'umi'
+import { Provider } from 'react-redux'
+
 
 const renderDiv = document.createElement('div')
 class FloatComponent extends React.Component {
@@ -48,17 +51,18 @@ export function Destroy() {
 
 
 export function Open(props) {
+    const dvaApp = getDvaApp()
     const divId = props.id ?? "floatComponent"
-    const mountParent = document.getElementById("appWrapper")
+    const MountParent = document.getElementById("root")
     const thisChild = document.getElementById(divId)
 
     verbosity([props])
 
     if (thisChild) {
-        mountParent.removeChild(thisChild)
+        MountParent.removeChild(thisChild)
     }
-    document.body.appendChild(renderDiv).setAttribute('id', divId)
-    ReactDOM.render(<FloatComponent />, renderDiv)
+    MountParent.appendChild(renderDiv).setAttribute('id', divId)
+    ReactDOM.render(<Provider store={dvaApp._store}><FloatComponent {...props} /></Provider>, renderDiv)
 }
 
 export default Open

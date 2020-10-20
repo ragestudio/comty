@@ -3,9 +3,7 @@ import { Menu, Result } from 'antd'
 import classnames from 'classnames'
 
 import styles from './index.less'
-import { connect } from 'umi';
 
-@connect(({ app }) => ({ app }))
 export default class ListedMenu extends React.Component{
     state = {
         renderOptionTitle: true,
