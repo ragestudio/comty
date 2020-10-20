@@ -6,7 +6,6 @@ import React from 'react'
 import { Rnd } from 'react-rnd'
 import { getDvaApp } from 'umi'
 import { Provider } from 'react-redux'
-const { resolve, join } = require('path')
 
 const renderDiv = document.createElement('div')
 class FloatComponent extends React.Component {
