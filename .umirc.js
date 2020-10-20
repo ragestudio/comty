@@ -9,7 +9,7 @@ export default defineConfig({
   // dynamicImport: false,
   // history: { type: "hash" },
 
-  targets: { ie: 9 },
+  targets: { ie: 11 },
   dva: { immer: true },
   ignoreMomentLocale: true,
   mountElementId: "root",
