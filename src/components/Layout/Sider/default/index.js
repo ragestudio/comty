@@ -4,10 +4,12 @@ import * as Icons from 'components/Icons'
 import styles from './index.less'
 import classnames from 'classnames'
 import { connect } from 'umi'
+import { __legacy__objectToArray, queryObjectToString} from 'core'
 
 @connect(({ app }) => ({ app }))
 export default class Sider_Default extends React.Component {
   state = {
+    type: "desktop",
     loading: true,
     menus: null
   }

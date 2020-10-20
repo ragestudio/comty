@@ -1,9 +1,8 @@
 import React from 'react'
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
 import styles from './index.less'
 
-export default class Sider_Mobile extends React.PureComponent {
+export default class Sider_Mobile extends React.Component {
 
   renderMenus(data){
     return data.map(e => {

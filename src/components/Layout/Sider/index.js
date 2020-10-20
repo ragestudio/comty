@@ -1,21 +1,33 @@
 import React from 'react'
 import { app_config } from 'config'
 import { router } from 'core/libs'
-
+import { __legacy__objectToArray } from 'core'
 import Sider_Mobile from './mobile'
 import Sider_Default from './default'
 import { connect } from 'umi'
 import MenuList from 'globals/sidebar_menu.js'
+import { FloatComponent } from 'components'
 
 @connect(({ app, extended }) => ({ app, extended }))
-class Sider extends React.PureComponent {
+class Sider extends React.Component {
   state = {
     loading: true,
+    menuAtrributes: [],
     menus: []
   }
 
   handleClickMenu = e => {
-    router.go(`/${e.key}`)
+    const elementAtrributes = this.state.menuAtrributes[e.key]
+
+    if (typeof(this.state.menuAtrributes[e.key]) !== "undefined") {
+
+      if (typeof(elementAtrributes.onClick) == "function") {
+        elementAtrributes.onClick()
+      }
+      
+    }
+
+    router.go(`/${e.key}`) // by default push to router
   }
 
   async menuQuery(data){
@@ -24,23 +36,20 @@ class Sider extends React.PureComponent {
 
     const filterArray = (data) =>{
       return new Promise(resolve => {
-        let menuMap = {
-          desktop: [],
-          mobile: []
-        }
+        let menuMap = []
+        let menuAtrributes = []
         data.forEach(async (element) => {
           if(!element.attributes){
             element.attributes = {}
           }
           let validRequire = typeof(element.attributes.require) !== 'undefined'? await window.requireQuery(element.attributes.require) : true
-          let onDekstopMode = typeof(element.attributes.desktop) !== 'undefined'? element.attributes.desktop : true
-          let onMobileMode = typeof(element.attributes.mobile) !== 'undefined'? element.attributes.mobile : true
-    
+   
           if (validRequire) {
-            onDekstopMode? menuMap.desktop.push(element) : null
-            onMobileMode? menuMap.mobile.push(element) : null
+            menuAtrributes[element.id] = element.attributes
+            menuMap.push(element)
           }
         })
+        this.setState({menuAtrributes})
         resolve(menuMap)
       })
     }
@@ -57,13 +66,40 @@ class Sider extends React.PureComponent {
     this.menuQuery(MenuList)
   }
 
+  filterMenusByType(type) {
+    let arrayResults = []
+    this.state.menus.forEach((e) => {
+      if (typeof (e.attributes) !== "undefined") {
+        const isType = typeof (e.attributes[type]) !== "undefined" ? e.attributes[type] : true // Returns as valid by default if is not set
+        if (isType) {
+          arrayResults.push(e)
+        }
+      }
+    })
+    return arrayResults
+  }
+
+  renderByType(type){
+    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app_config.LogoPath }
+    const filteredMenus = this.filterMenusByType(type)
+    switch (type) {
+      case "desktop":{
+        return <Sider_Default menus={filteredMenus} {...sider_props} />
+      }
+      case "mobile":{
+        return <Sider_Mobile menus={filteredMenus} {...sider_props} />
+      }
+      default:{
+        return null // include invalid default
+      }
+    }
+  }
+
 
   render() {
     const { isMobile } = this.props
-    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app_config.LogoPath }
-  
     if(this.state.loading) return null
-    return isMobile? <Sider_Mobile menus={this.state.menus.mobile} {...sider_props} /> : <Sider_Default menus={this.state.menus.desktop} {...sider_props} />
+    return this.renderByType(isMobile? "mobile" : "desktop")
   }
 }
 
