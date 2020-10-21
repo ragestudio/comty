@@ -91,7 +91,7 @@ export default {
 
       window.PluginGlobals = []
       window.Internal = []
-   
+
       queryIndexer([
         {
           match: '/s;:id',
@@ -112,13 +112,13 @@ export default {
       ], (callback) => {
         window.location = callback
       })
-   
+
       if (!service) {
 
       }
 
 
-      if (!sessionDataframe && session ) {
+      if (!sessionDataframe && session) {
         yield put({ type: 'handleGetUserData' })
       }
 
@@ -128,14 +128,17 @@ export default {
       const state = yield select(state => state)
 
       verbosity([`Starting Auth process`])
-      yield put({ type: 'socket/initializeSocket', payload: { 
-        hostname: state.app.socket_address,
-        reconnectionAttempts: 10
-      }, then: () => {
-        //socket.socket_conn.emit("pingPong")
-      }})
+      yield put({
+        type: 'socket/initializeSocket',
+        payload: {
+          hostname: state.app.socket_address,
+          reconnectionAttempts: 10
+        },
+        then: () => {
+          return console.log("recived")
+        }
+      })
 
-   
 
 
     },
@@ -144,7 +147,7 @@ export default {
       const token = yield select(state => state.app.session_token)
       const sk = yield select(state => state.app.server_key)
 
-      session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) =>{
+      session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) => {
         verbosity([res])
       })
 
@@ -155,104 +158,104 @@ export default {
       const { user_id, access_token } = payload.authFrame
       yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
     },
-    *initializePlugins({ payload }, { select }){
-        const extended = yield select(state => state.extended)
+    *initializePlugins({ payload }, { select }) {
+      const extended = yield select(state => state.extended)
 
-        if(!payload.array){
-          verbosity("Only array map for initialize plugins","Please read SDK documentation for more info.")
-          return false
-        }
-        try {
-            usePlugins([payload.array], (err, results) => {
-              if (err) {
-                verbosity(["Init error!", err])
-                appInterface.notify.error("Plugin initialize error!", err)
+      if (!payload.array) {
+        verbosity("Only array map for initialize plugins", "Please read SDK documentation for more info.")
+        return false
+      }
+      try {
+        usePlugins([payload.array], (err, results) => {
+          if (err) {
+            verbosity(["Init error!", err])
+            appInterface.notify.error("Plugin initialize error!", err)
+            return false
+          }
+          const rootInit = results[0]
+
+          if (!rootInit.uuid) {
+            verbosity("Cannot initialize a plugin without UUID.", "Please read SDK documentation for more info.")
+            appInterface.notify.error("Cannot initialize a plugin without UUID.")
+            return false
+          }
+
+          let plugin = {
+            uuid: null,
+            version: "n/a",
+            title: "Blank"
+          }
+          plugin = { ...plugin, ...rootInit }
+
+          const rootClass = plugin.payload
+          let extendedRequire = null
+
+          class extendedPlugin extends rootClass {
+            constructor(props) {
+              super(props)
+            }
+          }
+
+          if (typeof (plugin.requireExtends) !== "undefined") {
+            console.log("Extending class with => ", plugin.requireExtends)
+
+            plugin.requireExtends.forEach((e) => {
+              const RequireFrom = e.from
+              const RequireImport = e.import
+
+              const existScheme = typeof (RequireImport) !== "undefined" && typeof (RequireFrom) !== "undefined"
+              if (!existScheme) {
+                verbosity("Invalid require extension!")
                 return false
               }
-              const rootInit = results[0]
-        
-              if (!rootInit.uuid) {
-                verbosity("Cannot initialize a plugin without UUID.","Please read SDK documentation for more info.")
-                appInterface.notify.error("Cannot initialize a plugin without UUID.")
-                return false
-              }
 
-              let plugin = {
-                uuid: null,
-                version: "n/a",
-                title: "Blank"
-              }
-              plugin = {...plugin, ...rootInit}
-
-              const rootClass = plugin.payload
-              let extendedRequire = null
-
-              class extendedPlugin extends rootClass{
-                constructor(props){
-                  super(props)
-                }
-              }
-            
-              if( typeof(plugin.requireExtends) !== "undefined" ) {
-                console.log("Extending class with => ", plugin.requireExtends)
-        
-                plugin.requireExtends.forEach((e) => {
-                  const RequireFrom = e.from
-                  const RequireImport = e.import
-
-                  const existScheme = typeof(RequireImport) !== "undefined" && typeof(RequireFrom) !== "undefined"
-                  if(!existScheme){
-                    verbosity("Invalid require extension!")
-                    return false
-                  }
-
-                  if (Array.isArray(RequireImport)) {
-                    RequireImport.forEach((e) => {
-                      `console`.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
-                      extendedRequire[e] = require(RequireFrom)
-                    })
-                  }else{
-
-                  }
-
+              if (Array.isArray(RequireImport)) {
+                RequireImport.forEach((e) => {
+                  `console`.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
+                  extendedRequire[e] = require(RequireFrom)
                 })
+              } else {
+
               }
 
-              window.PluginGlobals[plugin.uuid] = new extendedPlugin({ extended, extendedRequire })
-
-              appInterface.notify.open({
-                message: `${plugin.title} v${plugin.version}`,
-                description: `New plugin is now installed !`
-              })
             })
-        } catch (error) {
-          verbosity("Unexpected catched exception! ", error)
+          }
 
-        }
+          window.PluginGlobals[plugin.uuid] = new extendedPlugin({ extended, extendedRequire })
+
+          appInterface.notify.open({
+            message: `${plugin.title} v${plugin.version}`,
+            description: `New plugin is now installed !`
+          })
+        })
+      } catch (error) {
+        verbosity("Unexpected catched exception! ", error)
+
+      }
     },
-    *updateTheme({payload}, {put, select}){
+    *updateTheme({ payload }, { put, select }) {
       if (!payload) return false
       let container = yield select(state => state.app.app_theme)
       let style_keys = []
       let tmp = []
 
-      container.forEach((e)=>{style_keys[e.key] = e.value})
+      container.forEach((e) => { style_keys[e.key] = e.value })
 
-      if(!style_keys[payload.key]){
-        tmp.push({key: payload.key, value: payload.value})
+      if (!style_keys[payload.key]) {
+        tmp.push({ key: payload.key, value: payload.value })
       }
       container.forEach((e) => {
         let obj = {}
-        if(e.key === payload.key){
+        if (e.key === payload.key) {
           obj = { key: payload.key, value: payload.value }
-        }else{
+        } else {
           obj = { key: e.key, value: e.value }
         }
         tmp.push(obj)
       })
-      return tmp? yield put({ type: 'handleUpdateTheme', payload: tmp }) : null
+      return tmp ? yield put({ type: 'handleUpdateTheme', payload: tmp }) : null
     },
-    *updateFrames({payload}, { select, put }) {
+    *updateFrames({ payload }, { select, put }) {
       try {
         const session = yield select(state => state.app.session_valid);
         let sessionAuthframe = cookie.get(app_config.session_token_storage)
@@ -292,12 +295,12 @@ export default {
     handleUpdateAuthFrames(state, { payload }) {
       state.session_authframe = payload
       state.session_token = payload.session_token,
-      state.session_uuid = payload.session_uuid
+        state.session_uuid = payload.session_uuid
     },
     handleUpdateDataFrames(state, { payload }) {
       state.session_data = payload
     },
-    handleValidate(state){
+    handleValidate(state) {
       if (state.session_authframe) {
         if (settings("session_noexpire")) {
           state.session_valid = true
@@ -308,19 +311,18 @@ export default {
         const now = new Date().getTime()
 
         verbosity(
-          `TOKEN EXP => ${tokenExp} ${
-            settings("session_noexpire") ? '( Infinite )' : `( ${tokenExpLocale} )`
+          `TOKEN EXP => ${tokenExp} ${settings("session_noexpire") ? '( Infinite )' : `( ${tokenExpLocale} )`
           } || NOW => ${now}`
         )
 
         if (tokenExp < now) {
           state.session_valid = false
-        }else{
+        } else {
           state.session_valid = true
         }
       }
     },
-    handleLogin(state, { payload }){
+    handleLogin(state, { payload }) {
       if (!payload) return false
 
       state.session_token = payload.access_token
@@ -339,7 +341,7 @@ export default {
           isDev: sessionData.dev,
           isPro: sessionData.is_pro
         }
-       
+
       }
 
       jwt.sign(frame, state.server_key, (err, token) => {
@@ -355,27 +357,27 @@ export default {
       state.session_valid = true
       location.reload()
     },
-    handleGetUserData(state){
+    handleGetUserData(state) {
       const frame = {
         id: state.session_uuid,
         access_token: state.session_token,
         serverKey: state.server_key
       }
       user.get.data(frame, (err, res) => {
-          if(err) {
-            verbosity([err])
+        if (err) {
+          verbosity([err])
+        }
+        if (res) {
+          try {
+            const session_data = JSON.stringify(res.response)
+            sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
+          } catch (error) {
+            verbosity([error])
           }
-          if (res) {
-              try {
-                const session_data = JSON.stringify(res.response)
-                sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
-              } catch (error) {
-                verbosity([error])
-              }
-          }
+        }
       })
     },
-    handleCollapseSidebar(state, { payload }){
+    handleCollapseSidebar(state, { payload }) {
       state.sidebar_collapsed = payload
     },
     handleUpdateTheme(state, { payload }) {
@@ -383,40 +385,40 @@ export default {
       store.set(app_config.appTheme_container, payload);
       state.app_theme = payload
     },
-    requireQuery(state, { payload, callback }){
-      if(!payload || !callback) return false
+    requireQuery(state, { payload, callback }) {
+      if (!payload || !callback) return false
       switch (payload) {
-        case 'login':{
+        case 'login': {
           callback(state.session_valid)
           break;
         }
-        case 'guest':{
+        case 'guest': {
           callback(!state.session_valid)
           break;
         }
-        case 'dev':{
-          if(state.session_data){
-            return callback(state.session_data.dev? true : false)
+        case 'dev': {
+          if (state.session_data) {
+            return callback(state.session_data.dev ? true : false)
           }
           return callback(false)
         }
-        case 'embedded':{
-          callback(state.electron? true : false)
+        case 'embedded': {
+          callback(state.electron ? true : false)
           break;
         }
-        default:{
+        default: {
           break;
         }
       }
     },
-    ipcInvoke(state, {payload}){
+    ipcInvoke(state, { payload }) {
       if (!payload || !state.embedded) {
         return false
       }
       const ipc = state.electron.ipcRenderer
       ipc.invoke(payload.key, payload.payload)
     },
-    ipcSend(state, {payload}){
+    ipcSend(state, { payload }) {
       if (!payload || !state.embedded) {
         return false
       }

@@ -159,7 +159,7 @@ function createWindow() {
   ];
 
   tray.setContextMenu(Menu.buildFromTemplate(trayMenuTemplate))
-  tray.setToolTip(packagejson.title)
+  tray.setToolTip(app_config.siteName)
   tray.on('double-click', () => resumeApp())
 
   mainWindow.loadURL(app_path)
