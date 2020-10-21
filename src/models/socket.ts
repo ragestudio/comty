@@ -5,45 +5,99 @@ import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import { __legacy__objectToArray } from 'core'
+import { Howl, Howler } from 'howler'
 
 import SocketConnection from 'core/libs/socket/index.ts'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
 
-const defaultSocketAddress = "localhost:7000"
 
 export default {
   namespace: 'socket',
   state: {
     resolvers: null,
-    ioConn: null
+    ioConn: null,
+    listeners: {}
   },
   subscriptions: {
     setup({ dispatch }) {
-        dispatch({ type: 'query' })
+      dispatch({ type: 'query' })
     },
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-        const state = yield select(state => state)
-        
-        yield put({ type: "updateState", payload: { resolvers: state.app.resolvers } })
+      const state = yield select(state => state)
+
+      yield put({ type: "updateState", payload: { resolvers: state.app.resolvers } })
 
     },
-    *initializeSocket({payload, then}, {select, put}){
-        if(!payload) return false
-        const state = yield select(state => state)
-        const handleThen = () => {
-          if (typeof(then) !== "undefined") {
-            then(true)
-          }
-        }
+    *initializeSocket({ payload, then }, { select, put }) {
+      if (!payload) return false
+      const state = yield select(state => state)
 
-        yield put({
-          type: "handleSocket",
-          payload: new SocketConnection({payload, connector: state.app.dispatcher, then: handleThen })
-        })
+      const handleThen = () => {
+        if (typeof (then) !== "undefined") {
+          console.log("then callback activated")
+          return then(true)
+        }
+      }
+
+      yield put({
+        type: "handleSocket",
+        payload: new SocketConnection({ payload, connector: state.app.dispatcher, then: handleThen })
+      })
+    },
+    *break({ listener }, { select, put }) {
+      const state = yield select(state => state.socket)
+      state.ioConn.handleUpdateListener(listener, false)
+    },
+    *resume({ listener }, { select, put }) {
+      const state = yield select(state => state.socket)
+      state.ioConn.handleUpdateListener(listener, true)
+    },
+    *toogleListener({ listener }, { select, put }) {
+      const state = yield select(state => state.socket)
+      state.ioConn.handleUpdateListener(listener)
+    },
+    *floodTest({ ticks, offset }, { call, put, select }) {
+      const state = yield select(state => state)
+
+      if (ticks == null) {
+        ticks = 300
+      }
+
+      const tickSound = new Howl({
+        preload: true,
+        html5: true,
+        src: ["https://dl.ragestudio.net/tick.wav"]
+      })
+
+      const endSound = new Howl({
+        preload: true,
+        html5: true,
+        src: ["https://dl.ragestudio.net/tickUp.wav"]
+      })
+
+      state.socket.ioConn._emit("floodTest", offset ?? Number(0)) // start flood
+
+      state.socket.ioConn.on('floodTest', (e: any) => {
+        const n = e + 1
+        const canTick = n < (ticks + 1)
+
+        verbosity([`floodTest (recived)=> ${e} | sending => ${n}`])
+        if (canTick) {
+          setTimeout(() => {
+            state.socket.ioConn._emit("floodTest", n)
+            tickSound.play()
+          }, n)
+        }else{
+          endSound.play()
+        }
+      })
+
+
+
     },
   },
   reducers: {
@@ -54,8 +108,7 @@ export default {
       };
     },
     handleSocket(state, { payload }) {
-        console.log(payload.ioConn)
-        state.ioConn = payload.ioConn
+      state.ioConn = payload.ioConn
     },
   },
 };
