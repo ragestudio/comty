@@ -83,7 +83,7 @@
     "react-resizable": "^1.11.0",
     "react-reveal": "^1.2.2",
     "react-rnd": "^10.2.3",
-    "react-scripts": "^3.4.1",
+    "react-scripts": "^3.4.4",
     "react-virtualized": "^9.21.2",
     "redux-socket.io": "^1.4.0",
     "redux-thunk": "^2.3.0",
