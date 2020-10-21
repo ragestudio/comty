@@ -16,7 +16,6 @@ export default {
   namespace: 'app',
   state: {
     env_proccess: process.env,
-    socket_address: "localhost:7000", //set by default
     server_key: keys.server_key,
     resolvers: null,
 
@@ -57,6 +56,7 @@ export default {
       })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
+      dispatch({ type: 'socket/initializeSocket' })
       dispatch({ type: 'queryAuth' })
       dispatch({ type: 'query', payload: { dispatcher: dispatch } })
     },
@@ -127,17 +127,8 @@ export default {
       const socket = yield select(state => state.socket)
       const state = yield select(state => state)
 
-      verbosity([`Starting Auth process`])
-      yield put({
-        type: 'socket/initializeSocket',
-        payload: {
-          hostname: state.app.socket_address,
-          reconnectionAttempts: 10
-        },
-        then: () => {
-          return console.log("recived")
-        }
-      })
+      
+
 
 
 
