@@ -56,12 +56,6 @@ export default {
     handleSocket(state, { payload }) {
         console.log(payload.ioConn)
         state.ioConn = payload.ioConn
-
-        state.ioConn.json = null // avoiding circular...
-        state.ioConn.nsps = null
-        state.ioConn.io.nsps = null
-        state.ioConn.io.connecting = null
-        //state.ioConn.io.opts.engine.transport = null
     },
   },
 };

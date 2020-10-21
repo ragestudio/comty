@@ -3,13 +3,23 @@ import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import { __legacy__objectToArray } from 'core'
 
+
 export default function DebugPanel(data) {
-    const getCircularReplacer = () => {
+
+    const serializeFlags = {
+        __cycle_flag: true // with id 0
+    }
+
+    function isFlagId(e, id) {
+        return serializeFlags[Object.keys(e)[id ?? 0]]
+    }
+
+    function getCircularReplacer() {
         const seen = new WeakSet();
         return (key, value) => {
             if (typeof value === "object" && value !== null) {
                 if (seen.has(value)) {
-                    return
+                    return { __cycle_flag: true }
                 }
                 seen.add(value)
             }
@@ -17,12 +27,29 @@ export default function DebugPanel(data) {
         }
     }
 
+    function decycle(obj, stack = []) {
+        if (!obj || typeof obj !== 'object')
+            return obj;
+
+        if (stack.includes(obj)) {
+            return { __cycle_flag: true }
+        }
+
+        let s = stack.concat([obj]);
+
+        return Array.isArray(obj)
+            ? obj.map(x => decycle(x, s))
+            : Object.fromEntries(
+                Object.entries(obj)
+                    .map(([k, v]) => [k, decycle(v, s)]));
+    }
+
     const getErrorRender = (e, error) => {
         return (
-            <div>
+            <div key={e.key} >
                 <div style={{ display: "flex", alignItems: "center", padding: "12px 16px", height: "47px", backgroundColor: "#d9d9d9" }} key={e.key} >
                     This could not be rendered > ({e.key}) [{typeof (e.value)}]
-            </div>
+                </div>
                 <div>
                     <antd.Collapse>
                         <antd.Collapse.Panel header="See error" >
@@ -45,6 +72,9 @@ export default function DebugPanel(data) {
                 case "object": {
                     if (e.value == null) {
                         return `Empty (null/undefined)`
+                    }
+                    if (isFlagId(e.value, 0)) {
+                        return <span><Icons.RefreshCw /> Cylic </span>
                     }
                     if (typeof (e.value.length) !== "undefined") {
                         return `Lenght (${e.value.length})`
@@ -71,7 +101,7 @@ export default function DebugPanel(data) {
         }
     }
 
-    const getStr = (e) => {
+    const getContent = (e) => {
         try {
             switch (typeof (e.value)) {
                 case "string": {
@@ -80,6 +110,11 @@ export default function DebugPanel(data) {
                 case "object": {
                     if (e.value == null) {
                         return `${e.value}`
+                    }
+                    if (isFlagId(e.value, 0)) {
+                        return <div key={e.key} style={{ display: "flex", alignItems: "center", padding: "12px 16px", height: "47px", backgroundColor: "#d9d9d9" }} >
+                            <Icons.RefreshCw /> This cannot be rendered because a cylic has been detected
+                        </div>
                     }
                     if (Object.keys(e.value).length > 1) { // trying create nested
                         return <div>
@@ -104,14 +139,21 @@ export default function DebugPanel(data) {
 
     const modelToMap = (data) => {
         if (!data) return false
-        return __legacy__objectToArray(data).map(e => {
+        const getType = (e) => {
+            if (e !== null && isFlagId(e, 0)) {
+                return `[loop]`
+            }
+            return `[${typeof (e)}]`
+        }
+
+        return __legacy__objectToArray(decycle(data)).map(e => {
             try {
-                const str = getStr(e)
+                const content = getContent(e)
                 return (
                     <antd.Collapse style={{ border: '0px' }} key={e.key}>
-                        <antd.Collapse.Panel key={e.key} header={<div>[{typeof (e.value)}] <strong>{e.key}</strong> | {getDecoratorStr(e, str)} </div>} >
+                        <antd.Collapse.Panel key={e.key} header={<div>{getType(e.value)} <strong>{e.key}</strong> | {getDecoratorStr(e, content)} </div>} >
                             <div style={{ margin: '0 5px 15px 5px', wordBreak: "break-all" }} >
-                                <span>{str}</span>
+                                <span>{content}</span>
                             </div>
                         </antd.Collapse.Panel>
                     </antd.Collapse>

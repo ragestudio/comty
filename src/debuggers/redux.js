@@ -4,10 +4,12 @@ import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import { ParamsList } from 'components'
 import { __legacy__objectToArray } from 'core'
+import store from 'store'
 
+const storeKey = "dbg_redux_selecteKeys"
 class ReduxDebugger extends React.Component {
     state = {
-        selectedKeys: []
+        selectedKeys: store.get(storeKey) ?? []
     }
     renderAllStore() {
         return __legacy__objectToArray(this.props).map(element => {
@@ -24,8 +26,8 @@ class ReduxDebugger extends React.Component {
             let resultKeys = this.state.selectedKeys
             resultKeys[key] = event.target.checked
 
+            store.set(storeKey, resultKeys)
             this.setState({ selectedKeys: resultKeys })
-            console.log(this.state.selectedKeys)
         }
 
         return keys.map((e) => {
@@ -50,7 +52,15 @@ class ReduxDebugger extends React.Component {
                     return null
                 }
                 return (
-                    <antd.Collapse.Panel key={e.key} style={{ wordBreak: 'break-all' }} header={<><Icons.Redux style={{ height: '19px', marginRight: '7px' }} /> {e.key}</>}>
+                    <antd.Collapse.Panel
+                        key={e.key}
+                        style={{ wordBreak: 'break-all' }}
+                        header={
+                            <div style={{ display: "flex", alignItems: "center", marginLeft: '10px' }} >
+                                <Icons.Database />
+                                <strong>{e.key}</strong>
+                            </div>
+                        }>
                         {ParamsList(e.value)}
                     </antd.Collapse.Panel>
                 )
@@ -59,8 +69,7 @@ class ReduxDebugger extends React.Component {
         return (
             <div style={{ background: "#fff", borderRadius: "8px", padding: "25px 15px" }}>
                 <div style={{ marginBottom: "35px" }}>
-                    <h1 style={{ fontSize: '24px' }}><Icons.Redux /> Redux Store</h1>
-                    <span><Icons.AlertTriangle />Warning, the use of this debugger is not recommended due to its high resource usage</span>
+                    <h1 style={{ fontSize: '24px' }}><Icons.Redux /> Redux Store <span style={{ fontSize: '14px', float: "right" }}><Icons.AlertTriangle />Dangerously experimental debugger</span></h1>
                     <antd.Card>{this.renderCheckboxes()}</antd.Card>
                 </div>
                 <hr />
