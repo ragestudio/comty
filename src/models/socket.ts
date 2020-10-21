@@ -17,6 +17,7 @@ export default {
   namespace: 'socket',
   state: {
     resolvers: null,
+    socket_address: "localhost:7000", //set by default
     ioConn: null,
     listeners: {}
   },
@@ -33,15 +34,20 @@ export default {
 
     },
     *initializeSocket({ payload, then }, { select, put }) {
-      if (!payload) return false
       const state = yield select(state => state)
+      if (payload == null){
+        payload = {
+          hostname: state.socket.socket_address,
+          reconnectionAttempts: 10
+        }
+      }
 
       const handleThen = () => {
         if (typeof (then) !== "undefined") {
-          console.log("then callback activated")
           return then(true)
         }
       }
+      appInterface.notify.proccess("Connecting to server")
 
       yield put({
         type: "handleSocket",
