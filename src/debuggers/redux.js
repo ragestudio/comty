@@ -8,9 +8,13 @@ import store from 'store'
 
 const storeKey = "dbg_redux_selecteKeys"
 class ReduxDebugger extends React.Component {
-    state = {
-        selectedKeys: store.get(storeKey) ?? []
+    constructor(props){
+        super(props)
+        this.state = {
+            selectedKeys: this.storagedKeys.get() ?? []
+        }
     }
+   
     renderAllStore() {
         return __legacy__objectToArray(this.props).map(element => {
             return (
@@ -20,23 +24,44 @@ class ReduxDebugger extends React.Component {
             )
         })
     }
+    
+    storagedKeys = {
+        get: () => {
+            try {
+                const storaged = store.get(storeKey)
+                if (typeof(storaged) == "object" && storaged !== null) {
+                    let mix = []
+                    storaged.forEach(e => {
+                        mix[e.key] = e.value
+                    })
+                    return mix
+                }
+                return []
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        set: (data) => {
+            store.set(storeKey, __legacy__objectToArray(data))
+        }
+    }
+
     renderCheckboxes() {
         const keys = Object.keys(this.props)
         const onChange = (event, key) => {
             let resultKeys = this.state.selectedKeys
             resultKeys[key] = event.target.checked
 
-            store.set(storeKey, resultKeys)
+    
+            this.storagedKeys.set(resultKeys)
             this.setState({ selectedKeys: resultKeys })
         }
-
         return keys.map((e) => {
             return (
-                <antd.Checkbox key={e} onChange={(event) => onChange(event, e)}>{e}</antd.Checkbox>
+                <antd.Checkbox defaultChecked={this.state.selectedKeys[e] ?? false} key={e} onChange={(event) => onChange(event, e)}>{e}</antd.Checkbox>
             )
         })
     }
-
     render() {
         const returnSelectedKeys = () => {
             // const getStores = () => {
