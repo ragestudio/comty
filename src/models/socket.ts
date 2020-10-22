@@ -17,7 +17,7 @@ export default {
   namespace: 'socket',
   state: {
     resolvers: null,
-    socket_address: "localhost:7000", //set by default
+    socket_address: "85.251.59.39:7000", //set by default
     ioConn: null,
     listeners: {}
   },
@@ -65,6 +65,15 @@ export default {
     *toogleListener({ listener }, { select, put }) {
       const state = yield select(state => state.socket)
       state.ioConn.handleUpdateListener(listener)
+    },
+    *getLatency({ payload }, { select, put }) {
+      const state = yield select(state => state.socket)
+
+      state.ioConn.emit('latency', Date.now(), (startTime) => {
+        const latency = Date.now() - startTime
+        console.log(latency)
+      })
+    
     },
     *floodTest({ ticks, offset }, { call, put, select }) {
       const state = yield select(state => state)
