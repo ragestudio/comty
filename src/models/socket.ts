@@ -56,15 +56,15 @@ export default {
     },
     *break({ listener }, { select, put }) {
       const state = yield select(state => state.socket)
-      state.ioConn.handleUpdateListener(listener, false)
+      state.ioConn.updateListener(listener, false)
     },
     *resume({ listener }, { select, put }) {
       const state = yield select(state => state.socket)
-      state.ioConn.handleUpdateListener(listener, true)
+      state.ioConn.updateListener(listener, true)
     },
     *toogleListener({ listener }, { select, put }) {
       const state = yield select(state => state.socket)
-      state.ioConn.handleUpdateListener(listener)
+      state.ioConn.updateListener(listener)
     },
     *getLatency({ payload }, { select, put }) {
       const state = yield select(state => state.socket)
