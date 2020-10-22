@@ -28,7 +28,7 @@ const Card_Component = (props: Card_Component_props) => {
 Card_Component.defaultProps = {
     style: null,
     type: null,
-    children: <h2>Empty</h2>
+    children: <h3>Empty</h3>
 }
 
 export default Card_Component

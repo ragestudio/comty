@@ -12,10 +12,11 @@ const stateCodes = {
 
 export default class SocketConnection {
     ioConn: any
-    state: { connAttemps: number; registeredNamespaces: any; connectionState: any; listeners: any; latency: any; }
+    state: { connAttemps: number; registeredNamespaces: any; connectionState: any; listeners: any; latency: any; namespace: any; }
     props: any
     opts: any
     dispatcher: any;
+    namespaceConnector: (namespace: any) => void
 
     constructor(props: any) {
         if (!props) {
@@ -25,6 +26,7 @@ export default class SocketConnection {
         this.dispatcher = props.connector
 
         this.state = {
+            namespace: "/",
             latency: 0,
             listeners: {},
             connectionState: "init",
@@ -34,6 +36,7 @@ export default class SocketConnection {
 
         this.opts = {
             hostname: "localhost:5000",
+            port: "5000",
             reconnection: true,
             reconnectionAttempts: Number(2),
             reconnectionDelay: 1000,
@@ -80,73 +83,23 @@ export default class SocketConnection {
 
         this.createConnection().then((e) => {
             this.ioConn.updateConnectionState(2)
+            this.setConnectionListeners()
         })
-
-        this.ioConn.on('connect', (event: any) => {
-            notify.success("You are now online")
-            verbosity("Connected to socket", event)
-            this.ioConn.updateConnectionState(1)
-            props.then(true) // this send an signal when the socket its successfully connected
-        })
-
-        this.ioConn.on("connect_error", (event: any) => {
-            if (this.state.connectionState !== "connecting") {
-                this.ioConn.updateConnectionState(2)
-            }
-            if (this.state.connAttemps >= this.opts.reconnectionAttempts) {
-                verbosity(['Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1])
-                this.ioConn.updateConnectionState(0)
-                return false
-            }
-            verbosity([`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event])
-            this.state.connAttemps = this.state.connAttemps + 1
-        })
-
-        this.ioConn.on('reconnect', (attemptNumber: number) => {
-            verbosity(["Connection reconected with (", attemptNumber, ") tries"])
-            notify.success("You are now online")
-            this.ioConn.updateConnectionState(1)
-        })
-
-        this.ioConn.on('disconnected', () => {
-            notify.warn("You are offline")
-            this.ioConn.updateConnectionState(3)
-        })
-        
-        this.ioConn.on('connect_timeout', () => {
-            notify.warn("Connection timeout")
-            this.ioConn.updateConnectionState(3)
-        })
-
-        this.ioConn.on('close', () => {
-            verbosity("Connection closed!")
-            this.ioConn.updateConnectionState(0)
-        })
-
-        this.ioConn.on('error', (event: any) => {
-            notify.error(event)
-        })
-
-        this.ioConn.on('updateState', (event: any) => {
-            this.ioConn.updateState(event)
-        })
-
-        if (typeof (this.ioConn.io.opts.pingInterval) !== "undefined") {
-            if (typeof (this.ioConn.io.opts.pingInterval) == "number") {
-                setInterval(() => {
-                    this.ioConn.emit('latency', Date.now(), (startTime) => {
-                        const latency = Date.now() - startTime
-                        this.ioConn.updateState({ latency })
-                    })
-                }, this.ioConn.io.opts.pingInterval)
-            }
-        }
 
     }
 
-    createConnection() {
+    createConnection(namespace) {
+        const getNamespace = () => {
+            console.log(this.opts.hostname)
+
+            if (typeof (namespace) !== "undefined") {
+                return namespace
+            }
+            return this.opts.hostname
+        }
         return new Promise((resolve) => {
-            this.ioConn = io(this.opts.hostname, this.opts)
+            console.log(getNamespace())
+            this.ioConn = io(getNamespace(), this.opts)
 
             this.ioConn.updateState = (payload) => {
                 this.state = { ...this.state, ...payload }
@@ -200,6 +153,63 @@ export default class SocketConnection {
 
             resolve(true)
         })
+    }
+
+    setConnectionListeners() {
+        this.ioConn.on('connect', (event: any) => {
+            notify.success("You are now online")
+            verbosity("Connected to socket", event)
+            this.ioConn.updateConnectionState(1)
+        })
+
+        this.ioConn.on("connect_error", (event: any) => {
+            if (this.state.connectionState !== "connecting") {
+                this.ioConn.updateConnectionState(2)
+            }
+            if (this.state.connAttemps >= this.opts.reconnectionAttempts) {
+                verbosity(['Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1])
+                this.ioConn.updateConnectionState(0)
+                return false
+            }
+            verbosity([`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event])
+            this.state.connAttemps = this.state.connAttemps + 1
+        })
+
+        this.ioConn.on('reconnect', (attemptNumber: number) => {
+            verbosity(["Connection reconected with (", attemptNumber, ") tries"])
+            notify.success("You are now online")
+            this.ioConn.updateConnectionState(1)
+        })
+
+        this.ioConn.on('disconnect', (event) => {
+            verbosity([`Disconnected from socket >`, event])
+            notify.warn("You are offline")
+            this.ioConn.updateConnectionState(3)
+        })
+
+        this.ioConn.on('connect_timeout', () => {
+            notify.warn("Connection timeout")
+            this.ioConn.updateConnectionState(3)
+        })
+
+        this.ioConn.on('error', (event: any) => {
+            verbosity([`New error from socket >`, event])
+        })
+
+        this.ioConn.on('updateState', (event: any) => {
+            this.ioConn.updateState(event)
+        })
+
+        if (typeof (this.ioConn.io.opts.pingInterval) !== "undefined") {
+            if (typeof (this.ioConn.io.opts.pingInterval) == "number") {
+                setInterval(() => {
+                    this.ioConn.emit('latency', Date.now(), (startTime) => {
+                        const latency = Date.now() - startTime
+                        this.ioConn.updateState({ latency })
+                    })
+                }, this.ioConn.io.opts.pingInterval)
+            }
+        }
     }
 
 }

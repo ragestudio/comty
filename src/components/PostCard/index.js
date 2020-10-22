@@ -54,18 +54,6 @@ const contextMenuList = [
         core.createScreenshotFromElement(document.getElementById(e.id))
       }
     }
-  },
-  {
-    key: "require_test",
-    title: "Require Test => DEV",
-    icon: <Icons.Cloud />,
-    params: {
-      onClick: (e) => {
-        console.log('Heeeey you developeeer')
-      },
-      keepOnClick: true,
-      require: "dev"
-    }
   }
  ]
 
