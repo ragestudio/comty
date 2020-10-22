@@ -17,7 +17,8 @@ export default {
   namespace: 'socket',
   state: {
     resolvers: null,
-    socket_address: "85.251.59.39:7000", //set by default
+    socket_address: "85.251.59.39", //set by default
+    socket_port: "7000",
     ioConn: null,
     listeners: {}
   },
@@ -35,11 +36,14 @@ export default {
     },
     *initializeSocket({ payload, then }, { select, put }) {
       const state = yield select(state => state)
-      if (payload == null){
-        payload = {
-          hostname: state.socket.socket_address,
-          reconnectionAttempts: 10
-        }
+      let opt = {
+        hostname: `${state.socket.socket_address}:${state.socket.socket_port}`, // set stated data
+        port: state.socket.socket_port,
+        reconnectionAttempts: 10
+      }
+
+      if (typeof (payload) !== "undefined") {
+        opt = { ...opt, ...payload }
       }
 
       const handleThen = () => {
@@ -51,8 +55,15 @@ export default {
 
       yield put({
         type: "handleSocket",
-        payload: new SocketConnection({ payload, connector: state.app.dispatcher, then: handleThen })
+        payload: new SocketConnection({ payload: opt, connector: state.app.dispatcher, then: handleThen })
       })
+    },
+    *namespaceConnector({ namespace, then }, { select, put }) {
+      const state = yield select(state => state.socket)
+      const hostname = `${state.socket_address}:${state.socket_port}/${namespace}`
+
+      state.ioConn.disconnect()
+      yield put({ type: "initializeSocket", payload: { hostname } })
     },
     *break({ listener }, { select, put }) {
       const state = yield select(state => state.socket)
@@ -71,9 +82,8 @@ export default {
 
       state.ioConn.emit('latency', Date.now(), (startTime) => {
         const latency = Date.now() - startTime
-        console.log(latency)
+        verbosity(latency)
       })
-    
     },
     *floodTest({ ticks, offset }, { call, put, select }) {
       const state = yield select(state => state)
@@ -106,7 +116,7 @@ export default {
             state.socket.ioConn._emit("floodTest", n)
             tickSound.play()
           }, n)
-        }else{
+        } else {
           endSound.play()
         }
       })

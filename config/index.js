@@ -46,7 +46,11 @@ module.exports = {
     {
       name: 'public',
       include: [/.*/]
-    }
+    },
+    {
+      name: 'splash',
+      include: [/\/splash/]
+    },
   ],
   
   // Default Behaviors 

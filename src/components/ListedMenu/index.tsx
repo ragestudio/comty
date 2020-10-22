@@ -54,7 +54,7 @@ export default class ListedMenu extends React.Component{
         const OptionTitle = () => {
             if (this.state.renderOptionTitle) {
                 return <div>
-                    <h2>{titlesArray[this.state.selectKey].icon || null}{titlesArray[this.state.selectKey].title || null}</h2>
+                    <h3>{titlesArray[this.state.selectKey].icon || null}{titlesArray[this.state.selectKey].title || null}</h3>
                 </div>
             }
             return null
@@ -103,9 +103,9 @@ export default class ListedMenu extends React.Component{
         return (
           <div style={this.props.wrapperStyle ?? null} className={classnames(styles.main, {[styles.horizontal]: isMode("horizontal") })}>
             <div className={styles.menuList}>
-              <h2>
+              <h3>
                 {this.props.icon ?? null} {this.props.title ?? "Menu"}
-              </h2>
+              </h3>
               <Menu
                 mode={this.state.mode}
                 selectedKeys={[selectKey]}

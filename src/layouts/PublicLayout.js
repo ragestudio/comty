@@ -1,14 +1,9 @@
 import React from 'react'
 import store from 'store'
 
-import {
-  PageTransition,
-} from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
-import classnames from 'classnames'
 
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
 
 import styles from './PublicLayout.less'
 
@@ -42,7 +37,6 @@ export default class PublicLayout extends React.Component {
 
   render() {
     const { children } = this.props
-    const { isMobile } = this.state
     return (
       <React.Fragment>
           <antd.Layout>

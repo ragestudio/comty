@@ -129,9 +129,6 @@ export default {
 
       
 
-
-
-
     },
     *logout({ payload }, { call, put, select }) {
       const uuid = yield select(state => state.app.session_uuid)
