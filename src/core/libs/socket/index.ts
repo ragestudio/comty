@@ -3,9 +3,16 @@ import verbosity from 'core/libs/verbosity'
 import settings from 'core/libs/settings'
 import { notify } from 'core/libs/appInterface'
 
+const stateCodes = {
+    0: "closed",
+    1: "connected",
+    2: "connecting",
+    3: "disconnected"
+}
+
 export default class SocketConnection {
     ioConn: any
-    state: { connAttemps: number; registeredNamespaces: any; connectionState: any; listeners: any; }
+    state: { connAttemps: number; registeredNamespaces: any; connectionState: any; listeners: any; latency: any; }
     props: any
     opts: any
     dispatcher: any;
@@ -18,6 +25,7 @@ export default class SocketConnection {
         this.dispatcher = props.connector
 
         this.state = {
+            latency: 0,
             listeners: {},
             connectionState: "init",
             connAttemps: Number(0),
@@ -32,6 +40,7 @@ export default class SocketConnection {
             reconnectionDelayMax: 5000,
             randomizationFactor: 0.5,
             timeout: 20000,
+            pingInterval: 5000,
             autoConnect: true,
             query: {},
             // options of the Engine.IO client
@@ -69,59 +78,24 @@ export default class SocketConnection {
             this.opts = { ...this.opts, ...this.props }
         }
 
-        this.ioConn = io(this.opts.hostname, this.opts)
-
-        this.ioConn.handleUpdateState = (payload) => {
-            this.state = { ...this.state, ...payload }
-            this.dispatcher({ type: "socket/updateState", payload: this.state })
-        }
-        this.ioConn.handleUpdateListener = (listenerKey, toState) => {
-            if (!listenerKey)
-                return false
-
-            const getInvert = () => {
-                if (this.state.listeners[listenerKey] != null) {
-                    return !this.state.listeners[listenerKey]
-                } else {
-                    return true // this set activated listener by default if not exist any entries
-                }
-            }
-            let updatedObj = []
-            updatedObj[listenerKey] = toState ?? getInvert()
-
-            let updatedState = this.state.listeners
-            updatedState = { ...updatedState, ...updatedObj }
-
-            this.ioConn.handleUpdateState({ listeners: updatedState })
-        }
-        this.ioConn._emit = (...context) => {
-            const listenerKey = context[0]
-            if (typeof (this.state.listeners[listenerKey]) == "undefined") {
-                this.ioConn.handleUpdateListener(listenerKey, true)
-            }
-            if (this.state.listeners[listenerKey] != null && !this.state.listeners[listenerKey]) {
-                verbosity([`Listener [${listenerKey}] is broked!`])
-                // setTimeout(() => {
-                //     this.ioConn.handleUpdateListener(listenerKey)
-                // }, 1000)
-                return false
-            }
-
-            return this.ioConn.emit(...context)
-        }
-
+        this.createConnection().then((e) => {
+            this.ioConn.updateConnectionState(2)
+        })
 
         this.ioConn.on('connect', (event: any) => {
             notify.success("You are now online")
-            verbosity("Successfully connect")
-            this.ioConn.handleUpdateState({ connectionState: "connected" })
+            verbosity("Connected to socket", event)
+            this.ioConn.updateConnectionState(1)
             props.then(true) // this send an signal when the socket its successfully connected
         })
 
         this.ioConn.on("connect_error", (event: any) => {
+            if (this.state.connectionState !== "connecting") {
+                this.ioConn.updateConnectionState(2)
+            }
             if (this.state.connAttemps >= this.opts.reconnectionAttempts) {
                 verbosity(['Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1])
-                this.ioConn.close()
+                this.ioConn.updateConnectionState(0)
                 return false
             }
             verbosity([`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event])
@@ -131,25 +105,100 @@ export default class SocketConnection {
         this.ioConn.on('reconnect', (attemptNumber: number) => {
             verbosity(["Connection reconected with (", attemptNumber, ") tries"])
             notify.success("You are now online")
-            this.ioConn.handleUpdateState({ connectionState: "connected" })
+            this.ioConn.updateConnectionState(1)
         })
 
         this.ioConn.on('disconnected', () => {
             notify.warn("You are offline")
-            this.ioConn.handleUpdateState({ connectionState: "disconnected" })
+            this.ioConn.updateConnectionState(3)
+        })
+        
+        this.ioConn.on('connect_timeout', () => {
+            notify.warn("Connection timeout")
+            this.ioConn.updateConnectionState(3)
+        })
+
+        this.ioConn.on('close', () => {
+            verbosity("Connection closed!")
+            this.ioConn.updateConnectionState(0)
         })
 
         this.ioConn.on('error', (event: any) => {
             notify.error(event)
         })
 
-        this.ioConn.on('close', () => {
-            verbosity("Connection closed!")
-            this.ioConn.handleUpdateState({ connectionState: "closed" })
+        this.ioConn.on('updateState', (event: any) => {
+            this.ioConn.updateState(event)
         })
 
-        this.ioConn.on('updateState', (event: any) => {
-            this.ioConn.handleUpdateState(event)
+        if (typeof (this.ioConn.io.opts.pingInterval) !== "undefined") {
+            if (typeof (this.ioConn.io.opts.pingInterval) == "number") {
+                setInterval(() => {
+                    this.ioConn.emit('latency', Date.now(), (startTime) => {
+                        const latency = Date.now() - startTime
+                        this.ioConn.updateState({ latency })
+                    })
+                }, this.ioConn.io.opts.pingInterval)
+            }
+        }
+
+    }
+
+    createConnection() {
+        return new Promise((resolve) => {
+            this.ioConn = io(this.opts.hostname, this.opts)
+
+            this.ioConn.updateState = (payload) => {
+                this.state = { ...this.state, ...payload }
+                this.dispatcher({ type: "socket/updateState", payload: this.state })
+            }
+
+            this.ioConn.updateListener = (listenerKey, toState) => {
+                if (!listenerKey)
+                    return false
+
+                const getInvert = () => {
+                    if (this.state.listeners[listenerKey] != null) {
+                        return !this.state.listeners[listenerKey]
+                    } else {
+                        return true // this set activated listener by default if not exist any entries
+                    }
+                }
+                let updatedObj = []
+                updatedObj[listenerKey] = toState ?? getInvert()
+
+                let updatedState = this.state.listeners
+                updatedState = { ...updatedState, ...updatedObj }
+
+                this.ioConn.updateState({ listeners: updatedState })
+            }
+
+            this.ioConn.updateConnectionState = (code) => {
+                if (code != null && typeof (code) == "number") {
+                    // @ts-ignore
+                    if (this.state.connectionState !== stateCodes[code]) {  // avoiding update innecesary
+                        this.ioConn.updateState({ connectionState: stateCodes[code] })
+                    }
+                }
+            }
+
+            this.ioConn._emit = (...context) => {
+                const listenerKey = context[0]
+                if (typeof (this.state.listeners[listenerKey]) == "undefined") {
+                    this.ioConn.updateListener(listenerKey, true)
+                }
+                if (this.state.listeners[listenerKey] != null && !this.state.listeners[listenerKey]) {
+                    verbosity([`Listener [${listenerKey}] is broked!`], { color: "red" })
+                    // setTimeout(() => {
+                    //     this.ioConn.updateListener(listenerKey)
+                    // }, 1000)
+                    return false
+                }
+
+                return this.ioConn.emit(...context)
+            }
+
+            resolve(true)
         })
     }
 

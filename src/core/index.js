@@ -90,7 +90,6 @@ export function createScreenshotFromElement(element){
   })
 }
 
-
 export function generatePostURI(id){
   if(app_config.endpoint_global && id){
     return `${app_config.endpoint_global}/post/${id}`
