@@ -19,12 +19,12 @@ interface ioConnTypes {
 }
 export default class SocketConnection {
     ioConn: any
-    state: { 
-        connAttemps: number; 
-        registeredNamespaces: any; 
-        connectionState: any; 
-        listeners: any; 
-        latency: any; 
+    state: {
+        connAttemps: number;
+        registeredNamespaces: any;
+        connectionState: any;
+        listeners: any;
+        latency: any;
     }
     props: any
     opts: any
