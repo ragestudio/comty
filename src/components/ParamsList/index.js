@@ -116,7 +116,7 @@ export default function DebugPanel(data) {
                             <Icons.RefreshCw /> This cannot be rendered because a cylic has been detected
                         </div>
                     }
-                    if (Object.keys(e.value).length > 1) { // trying create nested
+                    if (Object.keys(e.value).length > 0) { // trying create nested
                         return <div>
                             {DebugPanel(e.value)}
                         </div>
