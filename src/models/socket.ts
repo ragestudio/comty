@@ -16,25 +16,12 @@ import cookie from 'cookie_js'
 export default {
   namespace: 'socket',
   state: {
-    resolvers: null,
-    socket_address: "85.251.59.39", //set by default
+    nodes: {},
+    socket_address: app_config.endpoint_websocket, //set by default
     socket_port: "7000",
-    ioConn: null,
-    listeners: {}
-  },
-  subscriptions: {
-    setup({ dispatch }) {
-      dispatch({ type: 'query' })
-    },
   },
   effects: {
-    *query({ payload }, { call, put, select }) {
-      const state = yield select(state => state)
-
-      yield put({ type: "updateState", payload: { resolvers: state.app.resolvers } })
-
-    },
-    *initializeSocket({ payload, then }, { select, put }) {
+    *createNodeSocket({ payload, then }, { select, put }) {
       const state = yield select(state => state)
       let opt = {
         hostname: `${state.socket.socket_address}:${state.socket.socket_port}`, // set stated data
@@ -46,84 +33,50 @@ export default {
         opt = { ...opt, ...payload }
       }
 
-      const handleThen = () => {
-        if (typeof (then) !== "undefined") {
-          return then(true)
-        }
+      try {
+        new SocketConnection({
+          payload: opt, connector: state.app.dispatcher, then: (data) => {
+            if (typeof (then) !== "undefined") {
+              return then(true)
+            }
+          }
+        })
+      } catch (error) {
+        verbosity([error])
       }
-      appInterface.notify.proccess("Connecting to server")
-
-      yield put({
-        type: "handleSocket",
-        payload: new SocketConnection({ payload: opt, connector: state.app.dispatcher, then: handleThen })
-      })
     },
-    *namespaceConnector({ namespace, then }, { select, put }) {
-      const state = yield select(state => state.socket)
-      const hostname = `${state.socket_address}:${state.socket_port}/${namespace}`
-
-      state.ioConn.disconnect()
-      yield put({ type: "initializeSocket", payload: { hostname } })
-    },
-    *break({ listener }, { select, put }) {
-      const state = yield select(state => state.socket)
-      state.ioConn.updateListener(listener, false)
-    },
-    *resume({ listener }, { select, put }) {
-      const state = yield select(state => state.socket)
-      state.ioConn.updateListener(listener, true)
-    },
-    *toogleListener({ listener }, { select, put }) {
-      const state = yield select(state => state.socket)
-      state.ioConn.updateListener(listener)
-    },
-    *getLatency({ payload }, { select, put }) {
-      const state = yield select(state => state.socket)
-
-      state.ioConn.emit('latency', Date.now(), (startTime) => {
-        const latency = Date.now() - startTime
-        verbosity(latency)
-      })
-    },
-    *floodTest({ ticks, offset }, { call, put, select }) {
-      const state = yield select(state => state)
-
-      if (ticks == null) {
-        ticks = 300
+    *namespaceConnector({ namespace, node }, { select, put }) {
+      if (!node || !namespace) {
+        verbosity(`cannot connect to a namespace without declaring the namespace/node`)
+        return false
       }
-
-      const tickSound = new Howl({
-        preload: true,
-        html5: true,
-        src: ["https://dl.ragestudio.net/tick.wav"]
-      })
-
-      const endSound = new Howl({
-        preload: true,
-        html5: true,
-        src: ["https://dl.ragestudio.net/tickUp.wav"]
-      })
-
-      state.socket.ioConn._emit("floodTest", offset ?? Number(0)) // start flood
-
-      state.socket.ioConn.on('floodTest', (e: any) => {
-        const n = e + 1
-        const canTick = n < (ticks + 1)
-
-        verbosity([`floodTest (recived)=> ${e} | sending => ${n}`])
-        if (canTick) {
-          setTimeout(() => {
-            state.socket.ioConn._emit("floodTest", n)
-            tickSound.play()
-          }, n)
-        } else {
-          endSound.play()
-        }
-      })
-
-
-
+      const state = yield select(state => state.socket)
+      state.nodes[node].namespaceConnector(`/${namespace}`)
     },
+    *break({ listener, node }, { select, put }) {
+      if (!node || !listener) {
+        verbosity(`cannot change a listener without declaring the node/listener`)
+        return false
+      }
+      const state = yield select(state => state.socket)
+      state.nodes[node].ioConn.updateListener(listener, false)
+    },
+    *resume({ listener, node }, { select, put }) {
+      if (!node || !listener) {
+        verbosity(`cannot change a listener without declaring the node/listener`)
+        return false
+      }
+      const state = yield select(state => state.socket)
+      state.nodes[node].ioConn.updateListener(listener, true)
+    },
+    *toogleListener({ listener, node }, { select, put }) {
+      if (!node || !listener) {
+        verbosity(`cannot change a listener without declaring the node/listener`)
+        return false
+      }
+      const state = yield select(state => state.socket)
+      state.nodes[node].ioConn.updateListener(listener)
+    }
   },
   reducers: {
     updateState(state, { payload }) {
@@ -132,8 +85,8 @@ export default {
         ...payload,
       };
     },
-    handleSocket(state, { payload }) {
-      state.ioConn = payload.ioConn
+    updateStateFromSocket(state, { payload, node }) {
+      state.nodes[node] = payload
     },
   },
 };

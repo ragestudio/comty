@@ -56,7 +56,7 @@ export default {
       })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'handleValidate' })
-      dispatch({ type: 'socket/initializeSocket' })
+      dispatch({ type: 'socket/createNodeSocket' })
       dispatch({ type: 'queryAuth' })
       dispatch({ type: 'query', payload: { dispatcher: dispatch } })
     },
@@ -127,7 +127,7 @@ export default {
       const socket = yield select(state => state.socket)
       const state = yield select(state => state)
 
-      
+
 
     },
     *logout({ payload }, { call, put, select }) {

@@ -15,6 +15,7 @@ module.exports = {
     
     app_settings_storage: 'app_settings', 
     endpoint_global: 'https://comty.pw',
+    endpoint_websocket: 'eu_es01.ragestudio.net',
     proxy_local: 'http://localhost:8000',
 
     session_token_storage: 'cid',

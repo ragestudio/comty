@@ -17,7 +17,7 @@ export default class SocketDebug extends React.Component {
 
     dispatchSocket(value) {
         this.props.dispatch({
-            type: `socket/initializeSocket`,
+            type: `socket/createNodeSocket`,
             payload: {
                 address: value
             }
