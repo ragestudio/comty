@@ -8,22 +8,18 @@ import { __legacy__objectToArray } from 'core'
 
 @connect((store) => (store))
 export default class Index extends React.Component {
-    state = {
-        mainNode: "/"
-    }
-
     handleDispatchNamespace(key) {
         console.log(`Dispatching socket namespace (${key})`)
         this.props.dispatch({
             type: "socket/namespaceConnector",
-            node: this.state.mainNode,
+            node: this.props.socket.headerNode,
             namespace: key
         })
     }
-
+    
     render() {
         const dispatch = this.props.dispatch
-        const { connectionState, latency } = this.props.socket.nodes[this.state.mainNode]
+        const headerNode = this.props.socket.nodes[this.props.socket.headerNode] ?? null
 
         const getListenersList = (data) => {
             if (typeof (data) == "undefined" && data == null) {
@@ -63,32 +59,32 @@ export default class Index extends React.Component {
                 <antd.Card>
                     <h1><Icons.ClusterOutlined style={{ marginRight: "7px" }} /> Socket </h1>
                     <antd.Card>
-                        <h3> Main Node </h3>
+                        <h3> Header Node </h3>
                         <antd.Card>
                             <antd.Tag>{this.props.socket.socket_address}</antd.Tag>
-                            <antd.Tag> {this.props.socket.nodes[this.state.mainNode].ioConn.nsp} </antd.Tag>
-                            <antd.Tag color={connectionState == "connected" ? "green" : "volcano"} > {connectionState} </antd.Tag>
-                            <antd.Tag color={latency > 60 ? "red" : "green"} > ~{latency}ms </antd.Tag>
+                            <antd.Tag> {headerNode.ioConn.nsp ?? ""} </antd.Tag>
+                            <antd.Tag color={headerNode.connectionState ?? false == "connected" ? "green" : "volcano"} > {headerNode.connectionState ?? "destroyed"} </antd.Tag>
+                            <antd.Tag color={(headerNode.latency ?? 0 ) > 60 ? "red" : "green"} > ~{headerNode.latency ?? "not exist"}ms </antd.Tag>
                         </antd.Card>
                     </antd.Card>
                     <antd.Card>
                         <h3> Listener manager </h3>
                         <antd.Card>
-                            {getListenersList(this.props.socket.nodes[this.state.mainNode].listeners)}
+                            {getListenersList(headerNode.listeners ?? null)}
                         </antd.Card>
                     </antd.Card>
                     <antd.Card>
                         <h3> Registered Namespaces </h3>
                         <antd.Card>
                             <div style={{ display: "flex", flexDirection: "row", backgroundColor: "#fefefe", overflow: "scroll", textAlign: "center" }}>
-                                {getNamespacesMonitor(this.props.socket.nodes[this.state.mainNode].registeredNamespaces)}
+                                {getNamespacesMonitor(headerNode.registeredNamespaces ?? null)}
                             </div>
                         </antd.Card>
                     </antd.Card>
                     <antd.Card>
                         <h3> Misc </h3>
                         <antd.Card>
-
+                            <antd.Button onClick={() => { dispatch({ type: "socket/resetHeader" }) }} > Reset HeaderSocket </antd.Button>
                         </antd.Card>
                     </antd.Card>
                 </antd.Card>

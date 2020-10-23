@@ -19,7 +19,13 @@ interface ioConnTypes {
 }
 export default class SocketConnection {
     ioConn: any
-    state: { connAttemps: number; registeredNamespaces: any; connectionState: any; listeners: any; latency: any; namespace: any; }
+    state: { 
+        connAttemps: number; 
+        registeredNamespaces: any; 
+        connectionState: any; 
+        listeners: any; 
+        latency: any; 
+    }
     props: any
     opts: any
     dispatcher: any;
@@ -35,7 +41,6 @@ export default class SocketConnection {
         this.dispatcher = props.connector
 
         this.state = {
-            namespaceOrigin: this.props.node ?? "/",
             latency: 0,
             listeners: {},
             connectionState: "init",
@@ -44,6 +49,7 @@ export default class SocketConnection {
         }
 
         this.opts = {
+            namespaceOrigin: "/",
             hostname: "localhost:5000",
             port: "5000",
             reconnection: true,
@@ -103,7 +109,7 @@ export default class SocketConnection {
 
     createConnection(namespace: void) {
         const getNode = () => {
-            const defaultNode = `${this.opts.hostname}${this.state.namespaceOrigin}`
+            const defaultNode = `${this.opts.hostname}${this.opts.namespaceOrigin}`
             if (typeof (namespace) !== "undefined") {
                 return `${this.opts.hostname}:${this.opts.port}${namespace}`
             }
@@ -115,7 +121,7 @@ export default class SocketConnection {
             this.ioConn.updateState = (payload: ioConnTypes) => {
                 this.state = { ...this.state, ...payload }
                 const sendBackPayload = { ...this.state, ioConn: this.ioConn, namespaceConnector: this.namespaceConnector }
-                this.dispatcher({ type: "socket/updateStateFromSocket", node: this.state.namespaceOrigin, payload: sendBackPayload })
+                this.dispatcher({ type: "socket/updateStateFromSocket", node: this.opts.namespaceOrigin, payload: sendBackPayload })
             }
 
             this.ioConn.updateListener = (listenerKey: ioConnTypes, toState: ioConnTypes) => {
@@ -162,6 +168,15 @@ export default class SocketConnection {
                 }
 
                 return this.ioConn.emit(...context)
+            }
+
+            this.ioConn._close = () => {
+                this.ioConn.disconnect()
+                this.ioConn.updateConnectionState(0)
+            }
+
+            this.ioConn.destroy = () => {
+                this.dispatcher({ type: "socket/destroyNode", node: this.opts.namespaceOrigin })
             }
 
             resolve(true)
