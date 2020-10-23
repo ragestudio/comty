@@ -19,11 +19,13 @@ export default {
     nodes: {},
     socket_address: app_config.endpoint_websocket, //set by default
     socket_port: "7000",
+    headerNode: "/"
   },
   effects: {
     *createNodeSocket({ payload, then }, { select, put }) {
       const state = yield select(state => state)
       let opt = {
+        namespaceOrigin: state.socket.headerNode,
         hostname: `${state.socket.socket_address}:${state.socket.socket_port}`, // set stated data
         port: state.socket.socket_port,
         reconnectionAttempts: 10
@@ -35,7 +37,10 @@ export default {
 
       try {
         new SocketConnection({
-          payload: opt, connector: state.app.dispatcher, then: (data) => {
+          namespaceOrigin: opt.namespaceOrigin,
+          connector: state.app.dispatcher,
+          payload: opt,
+          then: () => {
             if (typeof (then) !== "undefined") {
               return then(true)
             }
@@ -52,6 +57,9 @@ export default {
       }
       const state = yield select(state => state.socket)
       state.nodes[node].namespaceConnector(`/${namespace}`)
+    },
+    *resetHeader({  }, { put }) {
+      yield put({ type: "createNodeSocket" })
     },
     *break({ listener, node }, { select, put }) {
       if (!node || !listener) {
@@ -76,7 +84,28 @@ export default {
       }
       const state = yield select(state => state.socket)
       state.nodes[node].ioConn.updateListener(listener)
-    }
+    },
+    *destroyNode({ node }, { select, put }) {
+      if (!node) {
+        verbosity(`cannot destroy a node without declaring it`)
+        return false
+      }
+      const state = yield select(state => state.socket)
+      if (state.nodes[node].connectionState !== "closed") {
+        console.log("The node is not closed!, closing before destroying")
+        state.nodes[node].ioConn._close()
+      }
+      let updated = {}
+
+      __legacy__objectToArray(state.nodes).forEach(e => {
+        if (e.key !== node) {
+          updated[e.key] = e.value
+        }
+      })
+  
+      yield put({ type: "updateState", payload: { nodes: updated }  })
+    },
+
   },
   reducers: {
     updateState(state, { payload }) {
