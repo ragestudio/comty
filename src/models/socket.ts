@@ -61,6 +61,33 @@ export default {
     *resetHeader({  }, { put }) {
       yield put({ type: "createNodeSocket" })
     },
+    *use({ scope, invoke, query }, { put, select }) {
+      const state = yield select(state => state)
+      if (!scope || !invoke || !query) {
+        verbosity(`some params is missing`)
+        return false
+      }
+      if (!state.socket.nodes[scope] && scope !== state.socket.headerNode) {
+        let opt = {
+          namespaceOrigin: `/${scope}`,
+          hostname: `${state.socket.socket_address}:${state.socket.socket_port}`,
+          port: state.socket.socket_port,
+          reconnectionAttempts: 10
+        }
+
+        new SocketConnection({
+          namespaceOrigin: opt.namespaceOrigin,
+          connector: state.app.dispatcher,
+          payload: opt,
+          then: (socket) => {
+           socket._emit(invoke, query.payload, query.callback)
+          }
+        })
+      }else{
+        state.socket.nodes[scope].ioConn._emit(invoke, query.payload, query.callback)
+      }
+     
+    },
     *break({ listener, node }, { select, put }) {
       if (!node || !listener) {
         verbosity(`cannot change a listener without declaring the node/listener`)

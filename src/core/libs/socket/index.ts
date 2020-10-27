@@ -25,6 +25,7 @@ export default class SocketConnection {
         connectionState: any;
         listeners: any;
         latency: any;
+        locked: boolean;
     }
     props: any
     opts: any
@@ -39,8 +40,9 @@ export default class SocketConnection {
         this.then = props.then
         this.props = props.payload
         this.dispatcher = props.connector
-
+        
         this.state = {
+            locked: this.props.locked ?? false,
             latency: 0,
             listeners: {},
             connectionState: "init",
@@ -99,10 +101,14 @@ export default class SocketConnection {
         })
 
         this.namespaceConnector = (namespace: string) => {
-            this.createConnection(namespace).then(() => {
-                this.ioConn.updateConnectionState(2)
-                this.setConnectionListeners()
-            })
+            if (!this.state.locked) {
+                this.createConnection(namespace).then(() => {
+                    this.ioConn.updateConnectionState(2)
+                    this.setConnectionListeners()
+                })
+            }else{
+                verbosity(`[${this.ioConn.namespaceOrigin}] node is locked, cannot switch the namespace`)
+            } 
         }
     }
 
@@ -168,6 +174,14 @@ export default class SocketConnection {
                 }
 
                 return this.ioConn.emit(...context)
+            }
+
+            this.ioConn.lock = () => {
+                this.ioConn.updateState({ locked: true })
+            }
+
+            this.ioConn.unlock = () => {
+                this.ioConn.updateState({ locked: false })
             }
 
             this.ioConn._close = () => {
