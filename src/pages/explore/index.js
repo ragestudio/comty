@@ -8,7 +8,7 @@ import { PostCard, PostCreator, Invalid } from 'components'
 import * as antd from 'antd'
 import styles from './index.less'
 
-@connect(({ app }) => ({ app }))
+@connect(({ app, socket }) => ({ app, socket }))
 export default class Explore extends React.Component {
 
   state = {
@@ -16,33 +16,29 @@ export default class Explore extends React.Component {
   }
 
   request(){
-    v3_model.api_request(
-      {
-        body: {limit: settings("post_catchlimit"), fetch: "get_news_feed"},
-        serverKey: this.props.app.server_key,
-        userToken: this.props.app.session_token,
-        endpoint: endpoints.posts
-      },
-      (err, res) => {
-        try {
-          console.log(res)
-            this.setState({ feed: res.response })
-        } catch (error) {
-          // terrible (⓿_⓿)
+    this.props.dispatch({
+      type: "socket/use",
+      scope: "posts",
+      invoke: "get",
+      query: {
+        payload: {
+          from: "feed",
+          userToken: this.props.app.session_token
+        },
+        callback: (data) => {
+          this.setState({ feed: data.response })
         }
       }
-    )
+    })
   }
 
   componentDidMount(){
-    if (this.props.app.session_valid) {
-        this.request()
+    if(this.props.app.session_valid){
+      this.request()
     }
   }
-  
 
   render() {
- 
     if(!this.props.app.session_valid){
       return <Invalid type="SESSION_INVALID" />
     }
