@@ -16,7 +16,7 @@ export default class Index extends React.Component {
             namespace: key
         })
     }
-    
+
     render() {
         const dispatch = this.props.dispatch
         const headerNode = this.props.socket.nodes[this.props.socket.headerNode] ?? null
@@ -63,8 +63,8 @@ export default class Index extends React.Component {
                         <antd.Card>
                             <antd.Tag>{this.props.socket.socket_address}</antd.Tag>
                             <antd.Tag> {headerNode.ioConn.nsp ?? ""} </antd.Tag>
-                            <antd.Tag color={headerNode.connectionState ?? false == "connected" ? "green" : "volcano"} > {headerNode.connectionState ?? "destroyed"} </antd.Tag>
-                            <antd.Tag color={(headerNode.latency ?? 0 ) > 60 ? "red" : "green"} > ~{headerNode.latency ?? "not exist"}ms </antd.Tag>
+                            <antd.Tag color={headerNode.connectionState ?? "failed" === "connected" ? "green" : "volcano"} > {headerNode.connectionState ?? "destroyed"} </antd.Tag>
+                            <antd.Tag color={(headerNode.latency ?? 0) > 60 ? "red" : "green"} > ~{headerNode.latency ?? "not exist"}ms </antd.Tag>
                         </antd.Card>
                     </antd.Card>
                     <antd.Card>
