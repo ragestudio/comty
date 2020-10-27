@@ -108,7 +108,7 @@ export default class SocketConnection {
                 })
             }else{
                 verbosity(`[${this.ioConn.namespaceOrigin}] node is locked, cannot switch the namespace`)
-            } 
+            }
         }
     }
 
