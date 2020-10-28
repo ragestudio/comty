@@ -3,6 +3,7 @@ import { Menu, Result } from 'antd'
 import classnames from 'classnames'
 
 import styles from './index.less'
+import { __proto__filterSchematizedArray } from 'core'
 
 export default class ListedMenu extends React.Component{
     state = {
@@ -12,25 +13,11 @@ export default class ListedMenu extends React.Component{
         menus: [],
         mode: this.props.mode ?? "inline"
     }
-
-    filterArray(data: any[]) {
-        let tmp: any = []
-        return new Promise(resolve => {
-          data.forEach(async (element: { require: string; }) => {
-            if (typeof(element.require) !== 'undefined') {
-              const validRequire = await window.requireQuery(element.require)
-              validRequire? tmp.push(element) : null
-            }else{
-              tmp.push(element)
-            }
-          })
-          resolve(tmp)
-        })
-    }
+    
 
     async queryMenu() {
       this.setState({ loading: true })
-      this.setState({ menus: await this.filterArray(this.props.menuArray), loading: false })
+      this.setState({ menus: await __proto__filterSchematizedArray(this.props.menuArray), loading: false })
     }
 
     getMenu() {
