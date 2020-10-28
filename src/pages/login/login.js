@@ -19,7 +19,7 @@ import {
 } from 'components/Icons'
 import { connect } from 'umi'
 
-@connect(({ app }) => ({ app }))
+@connect(({ app, socket }) => ({ app, socket }))
 export class NormalLoginForm extends React.PureComponent {
   state = {
     activeForm: true,
@@ -30,28 +30,28 @@ export class NormalLoginForm extends React.PureComponent {
     step_show: true,
     swpass: false,
   }
-  
+
   next = values => {
     let a = this.state.step
-    const b = btoa(Object.values(values).toString())
+    const b = Object.values(values).toString()
     switch (a) {
       case 1:
         const payload = { username: Object.values(values).toString() }
         user.get.basicData(payload, (err, res) => {
           if (err || !res) return false
-            if (res.code == 200) {
-              a++
-              this.anim_transition(300)
-              this.setState({
-                step_error: false,
-                early_data: res.response,
-                form_rawd_1: b,
-                step: a,
-              })
-            }
-            if (res.code == 400) {
-               this.anim_error()
-            }
+          if (res.code == 200) {
+            a++
+            this.anim_transition(300)
+            this.setState({
+              step_error: false,
+              early_data: res.response,
+              form_rawd_1: b,
+              step: a,
+            })
+          }
+          if (res.code == 400) {
+            this.anim_error()
+          }
         })
         return true
       case 2:
@@ -88,77 +88,36 @@ export class NormalLoginForm extends React.PureComponent {
     this.setState({ step_show: false })
   }
 
-
-  getAuthFrame(payload) {
-    return new Promise(resolve => {
-        session.auth(payload, (err, res) => {
-            if (err) {
-                
-            }
-            if (res) {
-                verbosity([res])
-
-                switch (res.code) {
-                    case 200: {
-                        try {
-                            return resolve(res.response)
-                        } catch (error) {
-                            verbosity([error])
-                        }
-                        break;
-                    }
-                    case 400: {
-                        console.log('Credentials error')
-                        this.setState({ validating: false })
-                        return this.anim_error()
-                    }
-                    case 500: {
-                        console.log('Server error')
-                        this.setState({ validating: false })
-                        return this.back()
-                    }
-                    default: {
-                        console.log('Unknown error')
-                        this.setState({ validating: false })
-                        return this.back()
-                    }
-                }
-                
-            }
-        })
-    });
-  }
-
-  getDataFrame(payload) {
-    return new Promise(resolve => {
-        user.get.data(payload, (err, res) => {
-            if(err) {
-    
-            }
-            if (res) {
-                try {
-                  return resolve(JSON.stringify(res.response))
-                } catch (error) {
-                  verbosity([error])
-                }
-            }
-        })
-    
-    })
-  }
-
-  async auth() {
+  auth() {
     const { form_rawd_1, form_rawd_2 } = this.state
     if (!form_rawd_1 || !form_rawd_2) return false
     this.setState({ step_error: false, validating: true })
-    
-    const authFrame = await this.getAuthFrame({username: form_rawd_1, password: form_rawd_2, server_key: this.props.app.server_key})
-    const dataFrame = await this.getDataFrame({user_id: authFrame.user_id, access_token: authFrame.access_token, serverKey: this.props.app.server_key})
 
-    return this.props.dispatch({
-        type: 'app/login',
-        payload: {authFrame, dataFrame}
-    });
+    this.props.dispatch({
+      type: 'app/login',
+      payload: { username: form_rawd_1, password: form_rawd_2 },
+      callback: (callbackResponse) => {
+        console.log(callbackResponse)
+        this.setState({ validating: false })
+        switch (callbackResponse) {
+          case 100: {
+            return console.log("login done!")
+          }
+          case 400: {
+            console.log('Credentials error')
+            return this.anim_error()
+          }
+          case 500: {
+            console.log('Server error')
+            return this.back()
+          }
+          default: {
+            console.log('Unknown error')
+            return this.back()
+          }
+        }
+      }
+    })
   }
 
   renderState = () => {
@@ -174,24 +133,24 @@ export class NormalLoginForm extends React.PureComponent {
               <BulbOutlined /> You can use your YulioID account to login
             </h5>
             <HeadShake spy={this.state.error_count}>
-            <Form.Item
-              name="username"
-              hasFeedback
-              help={this.state.step_error? "It seems that this user does not exist" : null}
-              validateStatus={this.state.step_error? 'error' : this.state.validating? 'validating' : null}
-              rules={[
-                {
-                  required: true,
-                  message: 'Please use your Username or Email!',
-                },
-              ]}
-            >
-              <Input
-                autoFocus
-                prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username or Email"
-              />
-            </Form.Item>
+              <Form.Item
+                name="username"
+                hasFeedback
+                help={this.state.step_error ? "It seems that this user does not exist" : null}
+                validateStatus={this.state.step_error ? 'error' : this.state.validating ? 'validating' : null}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please use your Username or Email!',
+                  },
+                ]}
+              >
+                <Input
+                  autoFocus
+                  prefix={<UserOutlined className="site-form-item-icon" />}
+                  placeholder="Username or Email"
+                />
+              </Form.Item>
             </HeadShake>
             <Button
               type="primary"
@@ -212,22 +171,22 @@ export class NormalLoginForm extends React.PureComponent {
 
             <h4><antd.Avatar shape='square' src={this.state.early_data.avatar} /> Welcome Back @{this.state.early_data.username}</h4>
             <HeadShake spy={this.state.error_count}>
-            <Form.Item
-              name="password"
-              hasFeedback
-              help={this.state.step_error? "Incorrect password" : null}
-              validateStatus={this.state.step_error? 'error' : this.state.validating? 'validating' : null}
-              rules={[
-                { required: true, message: 'Please input your Password!' },
-              ]}
-            >
-              <Input.Password
-                autoFocus
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                type={this.state.swpass ? 'text' : 'password'}
-                placeholder="Password"
-              />
-            </Form.Item>
+              <Form.Item
+                name="password"
+                hasFeedback
+                help={this.state.step_error ? "Incorrect password" : null}
+                validateStatus={this.state.step_error ? 'error' : this.state.validating ? 'validating' : null}
+                rules={[
+                  { required: true, message: 'Please input your Password!' },
+                ]}
+              >
+                <Input.Password
+                  autoFocus
+                  prefix={<LockOutlined className="site-form-item-icon" />}
+                  type={this.state.swpass ? 'text' : 'password'}
+                  placeholder="Password"
+                />
+              </Form.Item>
             </HeadShake>
             <div className={styles.helper_login_btn}>
               <antd.Button
@@ -259,7 +218,7 @@ export class NormalLoginForm extends React.PureComponent {
     return (
       <div className={styles.login_form}>
         <Fade left opposite when={this.state.step_show}>
-          {this.state.activeForm? this.renderState() : <div><h4>Mmm, this is taking longer than it should...</h4></div>}
+          {this.state.activeForm ? this.renderState() : <div><h4>Mmm, this is taking longer than it should...</h4></div>}
         </Fade>
       </div>
     )

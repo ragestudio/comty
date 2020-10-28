@@ -45,6 +45,7 @@
     "colors": "^1.4.0",
     "concat-stream": "^2.0.0",
     "cookie_js": "^1.4.0",
+    "cryptr": "^6.0.2",
     "dotenv": "^8.2.0",
     "dutier": "^1.1.4",
     "dva-model-enhance": "^1.2.13",

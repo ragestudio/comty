@@ -14,56 +14,36 @@ import cookie from 'cookie_js'
 export default {
   namespace: 'user',
   state: {
-    
-  },
-  subscriptions: {
-    setup({ dispatch }) {
-        dispatch({ type: 'query' })
-    },
   },
   effects: {
-    *query({ payload }, { call, put, select }) {
-        const stateConnector = yield select(state => state)
-        const { server_key, session_token, session_data, session_uuid, session_valid } = stateConnector.app
-    
-        yield put({ type: "updateState", payload: { server_key, session_uuid, session_token, session_data, session_valid } })
-    },
-    *get({ callback, req }, { call, put, select }) {
-      const state = yield select(state => state.user)
-  
-      if (state.session_valid) {
-        if (!req) {
-          callback(120, "req params not valid data")
-        }
-        user.get[req.fetch]({username: req.username, server_key: state.server_key, access_token: state.session_token }, (err, res) => {
-          if (err) {
-            return console.log(err)
-          }
-          console.log(res)
-          const data = res.response
-          const frame = {
-            avatar: data.avatar,
-            can_follow: data.can_follow,
-            country_id: data.contry_id,
-            about: data.about,
-            cover: data.cover,
-            is_pro: data.is_pro,
-            lastseen: data.lastseen,
-            points: data.points,
-            registered:data.registered,
-            user_id: data.user_id,
-            verified: data.verified,
-            birthday: data.birthday,
-            details: data.details
-          }
-          return callback(false, frame)
-        })
-      }else{
-        callback(403, "You need to be logged in to get this data")
+    *get({ callback, payload }, { call, put, select }) {
+      const dispatch = yield select(state => state.app.dispatcher)
+      const state = yield select(state => state)
+
+      if (!payload) {
+        return callback({code: 115, response: "payload is missing/invalid"})
       }
+      dispatch({
+        type: "socket/use",
+        scope: "users",
+        invoke: "get",
+        query: {
+          payload: {
+            from: payload.from,
+            user_id: payload.user_id ?? state.app.session_uuid,
+            username: payload.username ?? state.app.session_authframe["username"],
+            userToken: state.app.session_token
+          },
+          callback: (callbackResponse) => {
+            return callback(callbackResponse)
+          }
+        }
+      })
+
+
     },
     *set({ payload }, { call, put, select }) {
-      
+
     },
   },
   reducers: {

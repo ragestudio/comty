@@ -6,11 +6,10 @@ import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
 import uri_resolver from 'api/lib/uri_resolver'
 import { queryIndexer } from 'core'
+import Cryptr from 'cryptr'
 
 import jwt from 'jsonwebtoken'
 import cookie from 'cookie_js'
-import { usePlugins } from 'plugins'
-import { SocketConnection, SocketModel } from 'core/libs/socket/index.ts'
 
 export default {
   namespace: 'app',
@@ -34,6 +33,7 @@ export default {
     embedded: false,
     dispatcher: null,
 
+    abortRender: null,
     controlActive: false,
     feedOutdated: false,
 
@@ -55,9 +55,8 @@ export default {
         dispatch({ type: 'updateState', payload: { resolvers: res } })
       })
       dispatch({ type: 'updateFrames' })
-      dispatch({ type: 'handleValidate' })
+      dispatch({ type: 'validateSession' })
       dispatch({ type: 'socket/createNodeSocket' })
-      dispatch({ type: 'queryAuth' })
       dispatch({ type: 'query', payload: { dispatcher: dispatch } })
     },
     setupHistory({ dispatch, history }) {
@@ -68,26 +67,23 @@ export default {
             locationPathname: location.pathname,
             locationQuery: location.query,
           },
-        });
-      });
+        })
+      })
     },
     setupRequestCancel({ history }) {
       history.listen(() => {
-        const { cancelRequest = new Map() } = window;
-
+        const { cancelRequest = new Map() } = window
         cancelRequest.forEach((value, key) => {
           if (value.pathname !== window.location.pathname) {
             cancelRequest.delete(key);
           }
-        });
-      });
+        })
+      })
     },
   },
   effects: {
     *query({ payload }, { call, put, select }) {
-      const service = yield select(state => state.app.service_valid)
-      const session = yield select(state => state.app.session_valid)
-      const sessionDataframe = yield select(state => state.app.session_data)
+      const state = yield select(state => state.app)
 
       window.PluginGlobals = []
       window.Internal = []
@@ -113,113 +109,140 @@ export default {
         window.location = callback
       })
 
-      if (!service) {
+      if (!state.service_valid) {
 
       }
-
-
-      if (!sessionDataframe && session) {
-        yield put({ type: 'handleGetUserData' })
-      }
-
     },
-    *queryAuth({ payload }, { call, put, select }) {
-      const socket = yield select(state => state.socket)
-      const state = yield select(state => state)
-
-
-
-    },
-    *logout({ payload }, { call, put, select }) {
-      const uuid = yield select(state => state.app.session_uuid)
-      const token = yield select(state => state.app.session_token)
-      const sk = yield select(state => state.app.server_key)
-
-      session.deauth({ id: uuid, userToken: token, server_key: sk }, (err, res) => {
-        verbosity([res])
-      })
-
-      yield put({ type: 'sessionErase' })
-    },
-    *login({ payload }, { call, put, select }) {
-      if (!payload) return false;
-      const { user_id, access_token } = payload.authFrame
-      yield put({ type: 'handleLogin', payload: { user_id, access_token, user_data: payload.dataFrame } })
-    },
-    *initializePlugins({ payload }, { select }) {
-      const extended = yield select(state => state.extended)
-
-      if (!payload.array) {
-        verbosity("Only array map for initialize plugins", "Please read SDK documentation for more info.")
-        return false
-      }
-      try {
-        usePlugins([payload.array], (err, results) => {
-          if (err) {
-            verbosity(["Init error!", err])
-            appInterface.notify.error("Plugin initialize error!", err)
-            return false
-          }
-          const rootInit = results[0]
-
-          if (!rootInit.uuid) {
-            verbosity("Cannot initialize a plugin without UUID.", "Please read SDK documentation for more info.")
-            appInterface.notify.error("Cannot initialize a plugin without UUID.")
-            return false
-          }
-
-          let plugin = {
-            uuid: null,
-            version: "n/a",
-            title: "Blank"
-          }
-          plugin = { ...plugin, ...rootInit }
-
-          const rootClass = plugin.payload
-          let extendedRequire = null
-
-          class extendedPlugin extends rootClass {
-            constructor(props) {
-              super(props)
+    *refreshToken({ callback }, { call, put, select }) {
+      const state = yield select(state => state.app)
+      if (state.session_authframe) {
+        return state.dispatcher({
+          type: "socket/use",
+          scope: "auth",
+          invoke: "token",
+          query: {
+            payload: {
+              token: state.session_authframe
+            },
+            callback: (callbackResponse) => {
+              if (typeof (callback) !== "undefined") {
+                callback(callbackResponse)
+              }
+              if (callbackResponse.code == 100) {
+                verbosity(`updating authframe`)
+                state.dispatcher({
+                  type: "setAuth", payload: {
+                    token: callbackResponse.response.token,
+                    authFrame: jwt.decode(callbackResponse.response.token),
+                    dataFrame: state.session_data
+                  }
+                })
+                state.dispatcher({ type: "updateState", payload: { session_valid: true } })
+              } else {
+                verbosity(`this session is no valid, erasing data`)
+                state.dispatcher({ type: "sessionErase" }) // remove without calling api, its already logged out/invalid
+              }
             }
           }
-
-          if (typeof (plugin.requireExtends) !== "undefined") {
-            console.log("Extending class with => ", plugin.requireExtends)
-
-            plugin.requireExtends.forEach((e) => {
-              const RequireFrom = e.from
-              const RequireImport = e.import
-
-              const existScheme = typeof (RequireImport) !== "undefined" && typeof (RequireFrom) !== "undefined"
-              if (!existScheme) {
-                verbosity("Invalid require extension!")
-                return false
-              }
-
-              if (Array.isArray(RequireImport)) {
-                RequireImport.forEach((e) => {
-                  `console`.log(`Importing " ${e} " from [ ${RequireFrom} ]`)
-                  extendedRequire[e] = require(RequireFrom)
-                })
-              } else {
-
-              }
-
-            })
-          }
-
-          window.PluginGlobals[plugin.uuid] = new extendedPlugin({ extended, extendedRequire })
-
-          appInterface.notify.open({
-            message: `${plugin.title} v${plugin.version}`,
-            description: `New plugin is now installed !`
-          })
         })
-      } catch (error) {
-        verbosity("Unexpected catched exception! ", error)
-
+      }else{
+        verbosity(`no session_authframe found/valid`)
+        return false
       }
+    },
+    *logout({ payload }, { put, select }) {
+      const state = yield select(state => state.app)
+
+      session.deauth({
+        id: state.session_uuid,
+        userToken: state.session_token,
+        server_key: state.server_key
+      }, (err, res) => {
+        verbosity([res])
+        state.dispatcher({ type: "sessionErase" })
+      })
+
+    },
+    *login({ payload, callback }, { call, put, select }) {
+      const state = yield select(state => state.app)
+      if (!payload) return false
+      const cryptr = new Cryptr(keys.server_key)
+
+      state.dispatcher({
+        type: "socket/use",
+        scope: "auth",
+        invoke: "authentication",
+        query: {
+          payload: {
+            username: btoa(payload.username),
+            password: cryptr.encrypt(payload.password)
+          },
+          callback: (callbackResponse) => {
+            const { authFrame, dataFrame, token } = callbackResponse.response
+            if (typeof (callback) !== "undefined") {
+              callback(callbackResponse.code)
+            }
+            if (callbackResponse.code == 100) {
+              state.dispatcher({ type: "setAuth", payload: { authFrame, dataFrame, token } })
+            }
+          }
+        }
+      })
+    },
+    *validateSession({ payload }, { put, select }) {
+      const state = yield select(state => state.app)
+      if (state.session_authframe) {
+        if (typeof (state.session_authframe.exp) == "undefined") {
+          return false // no support refresh token when is invalid by ws
+        }
+
+        const now = new Date()
+        const createdIat = state.session_authframe.iat * 1000
+        const expirationTime = (state.session_authframe.iat + state.session_authframe.exp) * 1000
+
+        const isExpired = expirationTime < now.getTime()
+
+        verbosity([`TOKEN EXPIRES => (${new Date(expirationTime).toLocaleString()})`, `NOW => (${now.toLocaleString()})`])
+
+        if (isExpired) {
+          verbosity(`🕒 This session_token is expired`, { color: "red" })
+          if (settings("session_noexpire")) {
+            verbosity(`(session_noexpire) is enabled, refreshing token`)
+            return state.dispatcher({ type: "refreshToken" })
+          } else {
+            return state.dispatcher({ type: "sessionErase" }) // remove session
+          }
+       
+        }
+
+        if (!state.session_data) {
+          verbosity(`session_data is not valid but the session is valid, updating from ws`)
+          state.dispatcher({ type: "updateUserData" })
+        }
+
+        state.dispatcher({ type: "updateState", payload: { session_valid: true } })
+      }
+    },
+    *updateUserData({ payload }, { put, select }) {
+      const state = yield select(state => state.app)
+      state.dispatcher({
+        type: "user/get",
+        payload: {
+          from: "data"
+        },
+        callback: (callbackResponse) => {
+          if (callbackResponse.code == 115) {
+            verbosity(`Cannot update userdata due an data is missing`)
+            return false
+          }
+          try {
+            sessionStorage.setItem(app_config.session_data_storage, btoa(JSON.stringify(callbackResponse.response)))
+            state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
+          } catch (error) {
+            verbosity([error])
+          }
+        }
+      })
     },
     *updateTheme({ payload }, { put, select }) {
       if (!payload) return false
@@ -245,28 +268,38 @@ export default {
     },
     *updateFrames({ payload }, { select, put }) {
       try {
-        const session = yield select(state => state.app.session_valid);
         let sessionAuthframe = cookie.get(app_config.session_token_storage)
-        let sessionDataframe = sessionStorage.getItem(app_config.session_data_storage)
+        let sessionDataframe = atob(sessionStorage.getItem(app_config.session_data_storage))
 
         if (sessionAuthframe) {
           try {
             sessionAuthframe = jwt.decode(sessionAuthframe)
-            yield put({ type: 'handleUpdateAuthFrames', payload: sessionAuthframe })
+            yield put({
+              type: "updateState",
+              payload: {
+                session_authframe: sessionAuthframe,
+                session_token: sessionAuthframe.access_token,
+                session_uuid: sessionAuthframe.user_id
+              }
+            })
           } catch (error) {
             cookie.remove(app_config.session_token_storage)
           }
         }
         if (sessionDataframe) {
           try {
-            sessionDataframe = JSON.parse(atob(sessionDataframe))
-            yield put({ type: 'handleUpdateDataFrames', payload: sessionDataframe })
+            sessionDataframe = JSON.parse(sessionDataframe)
+            yield put({
+              type: "updateState",
+              payload: {
+                session_data: sessionDataframe
+              }
+            })
           } catch (error) {
             sessionDataframe = null
             sessionStorage.clear()
           }
         }
-
       } catch (error) {
         verbosity([error])
       }
@@ -280,90 +313,18 @@ export default {
         ...payload,
       };
     },
-    handleUpdateAuthFrames(state, { payload }) {
-      state.session_authframe = payload
-      state.session_token = payload.session_token,
-        state.session_uuid = payload.session_uuid
-    },
-    handleUpdateDataFrames(state, { payload }) {
-      state.session_data = payload
-    },
-    handleValidate(state) {
-      if (state.session_authframe) {
-        if (settings("session_noexpire")) {
-          state.session_valid = true
-          return
-        }
-        const tokenExp = state.session_authframe.exp * 1000
-        const tokenExpLocale = new Date(tokenExp).toLocaleString()
-        const now = new Date().getTime()
-
-        verbosity(
-          `TOKEN EXP => ${tokenExp} ${settings("session_noexpire") ? '( Infinite )' : `( ${tokenExpLocale} )`
-          } || NOW => ${now}`
-        )
-
-        if (tokenExp < now) {
-          state.session_valid = false
-        } else {
-          state.session_valid = true
-        }
-      }
-    },
-    handleLogin(state, { payload }) {
+    setAuth(state, { payload }) {
       if (!payload) return false
+      state.session_token = payload.authFrame.access_token
+      state.session_uuid = payload.authFrame.user_id
+      state.session_data = payload.dataFrame
+      state.session_authframe = jwt.decode(payload.token)
 
-      state.session_token = payload.access_token
-      state.session_uuid = payload.user_id
-      state.session_data = payload.user_data
 
-      const sessionData = JSON.parse(payload.user_data)
-
-      const frame = {
-        session_uuid: payload.user_id,
-        session_token: payload.access_token,
-        avatar: sessionData.avatar,
-        username: sessionData.username,
-        attributes: {
-          isAdmin: sessionData.admin,
-          isDev: sessionData.dev,
-          isPro: sessionData.is_pro
-        }
-
-      }
-
-      jwt.sign(frame, state.server_key, (err, token) => {
-        if (err) {
-          verbosity([err])
-          return false
-        }
-        cookie.set(app_config.session_token_storage, token)
-        sessionStorage.setItem(app_config.session_data_storage, btoa(payload.user_data))
-        state.session_authframe = token
-      })
+      cookie.set(app_config.session_token_storage, payload.token)
+      sessionStorage.setItem(app_config.session_data_storage, btoa(JSON.stringify(payload.dataFrame)))
 
       state.session_valid = true
-      location.reload()
-    },
-    handleGetUserData(state) {
-      const frame = {
-        id: state.session_uuid,
-        access_token: state.session_token,
-        serverKey: state.server_key
-      }
-      user.get.data(frame, (err, res) => {
-        if (err) {
-          verbosity([err])
-        }
-        if (res) {
-          try {
-            const session_data = JSON.stringify(res.response)
-            sessionStorage.setItem(app_config.session_data_storage, btoa(session_data))
-          } catch (error) {
-            verbosity([error])
-          }
-        }
-      })
     },
     handleCollapseSidebar(state, { payload }) {
       state.sidebar_collapsed = payload
