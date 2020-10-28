@@ -29,10 +29,30 @@ export default class ThemeSettings extends React.Component {
         })
         this.setState({ keys: mix })
     }
-    
-    render() {
+
+    renderSelectedKey() {
         const selectedKeyItem = this.state.keys[this.state.selectedKey] ?? { icon: null, title: null }
-        const handleClick = (key) => key ? this.setState({ selectedKey: key }) : null
+        return (
+            <antd.Drawer
+                placement="right"
+                width="50%"
+                closable
+                onClose={() => this.setState({ selectedKey: null })}
+                visible={this.state.selectedKey ? true : false}
+            >
+                <React.Fragment>
+                    <div>
+                        <h2>{selectedKeyItem.icon} {selectedKeyItem.title}</h2>
+                    </div>
+                    <antd.Divider type="horizontal" dashed />
+                    {componentsMap[this.state.selectedKey]}
+                </React.Fragment>
+            </antd.Drawer>
+        )
+    }
+
+    render() {
+        const handleClick = (key) => this.setState({ selectedKey: key })
         const isActive = (key) => { return key ? key.active : false }
         return (
             <div>
@@ -48,23 +68,7 @@ export default class ThemeSettings extends React.Component {
                         </div>
                     )}
                 />
-
-                <antd.Drawer
-                    placement="right"
-                    width="50%"
-                    closable
-                    onClose={() => this.setState({ selectedKey: null })}
-                    visible={this.state.selectedKey ? true : false}
-                >
-                    <React.Fragment>
-                        <div>
-                            <h2>{selectedKeyItem.icon} {selectedKeyItem.title}</h2>
-                        </div>
-                        <antd.Divider type="horizontal" dashed />
-                        {componentsMap[this.state.selectedKey]}
-                    </React.Fragment>
-                </antd.Drawer>
-
+                {this.renderSelectedKey()}
             </div>
         )
     }
