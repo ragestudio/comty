@@ -37,24 +37,24 @@ export const clientInfo = {
 export function getCircularReplacer() {
   const seen = new WeakSet();
   return (key, value) => {
-      if (typeof value === "object" && value !== null) {
-          if (seen.has(value)) {
-              return { __cycle_flag: true }
-          }
-          seen.add(value)
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return { __cycle_flag: true }
       }
-      return value
+      seen.add(value)
+    }
+    return value
   }
 }
 
- export function __proto__filterSchematizedArray(data) {
+export function __proto__filterSchematizedArray(data) {
   let tmp = []
   return new Promise(resolve => {
-    data.forEach(async (element: { require }) => {
-      if (typeof(element.require) !== 'undefined') {
+    data.forEach(async (element) => {
+      if (typeof (element.require) !== 'undefined') {
         const validRequire = await window.requireQuery(element.require)
-        validRequire? tmp.push(element) : null
-      }else{
+        validRequire ? tmp.push(element) : null
+      } else {
         tmp.push(element)
       }
     })
@@ -64,19 +64,19 @@ export function getCircularReplacer() {
 
 export function decycle(obj, stack = []) {
   if (!obj || typeof obj !== 'object')
-      return obj;
+    return obj;
 
   if (stack.includes(obj)) {
-      return { __cycle_flag: true }
+    return { __cycle_flag: true }
   }
 
   let s = stack.concat([obj]);
 
   return Array.isArray(obj)
-      ? obj.map(x => decycle(x, s))
-      : Object.fromEntries(
-          Object.entries(obj)
-              .map(([k, v]) => [k, decycle(v, s)]));
+    ? obj.map(x => decycle(x, s))
+    : Object.fromEntries(
+      Object.entries(obj)
+        .map(([k, v]) => [k, decycle(v, s)]));
 }
 
 export function getBuild() {
@@ -89,7 +89,7 @@ export function getBuild() {
     }
     const buildPath = path.resolve(__dirname, "./dist")
     const data = JSON.parse(fs.readFileSync(`${buildPath}/build.json`))
-    if (typeof(data) !== "undefined" && Array.isArray(data)) {
+    if (typeof (data) !== "undefined" && Array.isArray(data)) {
       utils.__legacy____legacy__objectToArray(data).forEach((e) => {
         build[e.key] = e.value
       })
@@ -101,29 +101,29 @@ export function getBuild() {
 }
 
 export function queryIndexer(array, callback, params) {
-    if(!array) return false
-    
-    if (Array.isArray(array)) {
-      let opt = {
-        regex: /:id/gi
-      }
+  if (!array) return false
 
-      if (params) {
-        opt = { ...opt, ...params }
-      }
-
-      array.forEach((e) =>{
-        if (e.match != null && e.to != null) {
-          const pathMatch = pathMatchRegexp(e.match, window.location.pathname)
-          if (pathMatch != null) {
-            return callback(e.to.replace(opt.regex, pathMatch[1]))
-          }
-        }
-      })
+  if (Array.isArray(array)) {
+    let opt = {
+      regex: /:id/gi
     }
+
+    if (params) {
+      opt = { ...opt, ...params }
+    }
+
+    array.forEach((e) => {
+      if (e.match != null && e.to != null) {
+        const pathMatch = pathMatchRegexp(e.match, window.location.pathname)
+        if (pathMatch != null) {
+          return callback(e.to.replace(opt.regex, pathMatch[1]))
+        }
+      }
+    })
+  }
 }
 
-export function createScreenshotFromElement(element){
+export function createScreenshotFromElement(element) {
   if (!element) return false
   html2canvas(element, {
     useCORS: true,
@@ -135,20 +135,20 @@ export function createScreenshotFromElement(element){
   })
 }
 
-export function generatePostURI(id){
-  if(window.location.origin && id){
+export function generatePostURI(id) {
+  if (window.location.origin && id) {
     return `${window.location.origin}/post/${id}`
   }
   return null
 }
 
-export function writeToClipboard(text){
+export function writeToClipboard(text) {
   navigator.clipboard.writeText(text)
-  .then(() => {
-    libs.appInterface.notify.info('Copy to clipboard')
-  }, () => {
-    /* failure */
-  })
+    .then(() => {
+      libs.appInterface.notify.info('Copy to clipboard')
+    }, () => {
+      /* failure */
+    })
 }
 
 // [Experimental], not in use
@@ -161,39 +161,39 @@ export function getGlobals(params, callback) {
     url: params.server
   }
 
-  params.global? req.global = params.global : null
+  params.global ? req.global = params.global : null
 
   let urlString = `${req.url}/${req.global}.json`
   console.log(urlString)
-  
+
   request(urlString, (error, response, body) => {
     tmpResponse = body
     callback(tmpResponse)
   })
 }
 
-export function isOs(os){
-  if(process){
-    return process.platform === os? true : false
-  }else{
+export function isOs(os) {
+  if (process) {
+    return process.platform === os ? true : false
+  } else {
     return false
   }
 }
 
-export function imageToBase64(img, callback){
+export function imageToBase64(img, callback) {
   const reader = new FileReader()
   reader.addEventListener('load', () => callback(reader.result))
   reader.readAsDataURL(img)
 }
 
-export function urlToBase64(url, callback){
+export function urlToBase64(url, callback) {
   let xhr = new XMLHttpRequest();
-  xhr.onload = function() {
-      let reader = new FileReader();
-      reader.onloadend = function() {
-          callback(reader.result);
-      }
-      reader.readAsDataURL(xhr.response);
+  xhr.onload = function () {
+    let reader = new FileReader();
+    reader.onloadend = function () {
+      callback(reader.result);
+    }
+    reader.readAsDataURL(xhr.response);
   };
   xhr.open('GET', url);
   xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
@@ -201,7 +201,7 @@ export function urlToBase64(url, callback){
   xhr.send();
 }
 
-export function b64toBlob(b64Data, contentType='', sliceSize=512){
+export function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
 
@@ -217,7 +217,7 @@ export function b64toBlob(b64Data, contentType='', sliceSize=512){
     byteArrays.push(byteArray);
   }
 
-  const blob = new Blob(byteArrays, {type: contentType});
+  const blob = new Blob(byteArrays, { type: contentType });
   return blob;
 }
 
@@ -226,8 +226,8 @@ export function b64toBlob(b64Data, contentType='', sliceSize=512){
  * 
  * @param {object} payload - Generation Data
  */
-export function downloadDecodedURI(payload){
-  if(!payload) return false
+export function downloadDecodedURI(payload) {
+  if (!payload) return false
   let { data, type, charset, filename } = payload
   /**
     * 
@@ -240,15 +240,15 @@ export function downloadDecodedURI(payload){
     }
     let tmp = document.createElement('a')
     tmp.href = `data:${type};charset=${charset},${encodeURIComponent(data)}`
-    tmp.download= filename
+    tmp.download = filename
     tmp.click()
   } catch (error) {
-      handle({ msg: error, code: 120 })
+    handle({ msg: error, code: 120 })
   }
 }
 
-export function downloadEncodedURI(payload){
-  if(!payload) return false
+export function downloadEncodedURI(payload) {
+  if (!payload) return false
   let { data, filename } = payload
   /**
     * 
@@ -261,15 +261,15 @@ export function downloadEncodedURI(payload){
     }
     let tmp = document.createElement('a')
     tmp.href = data
-    tmp.download= filename
+    tmp.download = filename
     tmp.click()
   } catch (error) {
-      handle({ msg: error, code: 120 })
+    handle({ msg: error, code: 120 })
   }
 }
 
 export function GetPropertyValue(object, dataToRetrieve) {
-  dataToRetrieve.split('.').forEach(function(token) {
+  dataToRetrieve.split('.').forEach(function (token) {
     if (object) object = object[token];
   })
   return object;
@@ -294,9 +294,9 @@ export function objectLast(array, n) {
  * @return array
  */
 export function arrayToObject(array) {
-  if(!array) return false
+  if (!array) return false
   let tmp = []
-  
+
   array.forEach((e) => {
     tmp[e.key] = e.value
   })
@@ -518,34 +518,34 @@ export function setLocale(language) {
   }
 }
 
-export function get_value(source,key){
-  if( !key || !source ) return false
-    try {
-        const find = source.find(item => {
-          return item.id === key
-        })
-        return find.value
-      
-    } 
-    catch (error) {
-        return false
-    }
+export function get_value(source, key) {
+  if (!key || !source) return false
+  try {
+    const find = source.find(item => {
+      return item.id === key
+    })
+    return find.value
+
+  }
+  catch (error) {
+    return false
+  }
 }
 
-export function iatToString(iat){
-  return  new Date(iat * 1000).toLocaleString()
+export function iatToString(iat) {
+  return new Date(iat * 1000).toLocaleString()
 }
 
-export function generateGUID( lenght = 6 ){
+export function generateGUID(lenght = 6) {
   let text = ""
   const possibleChars = "abcdefghijklmnopqrstuvwxyz0123456789"
 
-  for ( let i = 0; i < 6; i++ )
-    text += possibleChars.charAt ( Math.floor ( Math.random () * possibleChars.length ) )
+  for (let i = 0; i < 6; i++)
+    text += possibleChars.charAt(Math.floor(Math.random() * possibleChars.length))
 
   return text
 }
 
-export function generateRandomId( length = 15 ){
-	return Math.random ().toString ( 36 ).substring ( 0, length );
+export function generateRandomId(length = 15) {
+  return Math.random().toString(36).substring(0, length);
 }
