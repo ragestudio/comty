@@ -47,6 +47,21 @@ export function getCircularReplacer() {
   }
 }
 
+ export function __proto__filterSchematizedArray(data) {
+  let tmp = []
+  return new Promise(resolve => {
+    data.forEach(async (element: { require }) => {
+      if (typeof(element.require) !== 'undefined') {
+        const validRequire = await window.requireQuery(element.require)
+        validRequire? tmp.push(element) : null
+      }else{
+        tmp.push(element)
+      }
+    })
+    resolve(tmp)
+  })
+}
+
 export function decycle(obj, stack = []) {
   if (!obj || typeof obj !== 'object')
       return obj;
