@@ -2,14 +2,14 @@ import v3_request from 'api/lib/v3_request'
 import endpointList from 'config/endpoints'
 import { app_config } from 'config'
 
-const { api_prefix } = app_config;
+const { endpoint_v3prefix } = app_config;
 
 export async function api_request(payload, callback) {
   if (!payload) return false;
   const { endpoint, body, serverKey, userToken  } = payload;
   
   let petition = {
-    prefix: api_prefix,
+    prefix: endpoint_v3prefix,
     endpointList,
     endpoint
   }

@@ -3,11 +3,11 @@ import { app_config } from 'config';
 import verbosity from 'core/libs/verbosity'
 import ErrorHandler from 'core/libs/errorhandler'
 
-const { appTheme_desiredContrast, appTheme_container } = app_config
+const { appTheme_desiredContrast, storage_theme } = app_config
 
 export const theme = {
   get: (key) => {
-    const raw = store.get(appTheme_container)
+    const raw = store.get(storage_theme)
     if(!raw) return false
     let container = []
     try {
@@ -25,14 +25,14 @@ export const theme = {
         obj.forEach((e) => {
             mix.push({key: e[0], value: e[1]})
         })
-        return store.set(appTheme_container, mix)
+        return store.set(storage_theme, mix)
     } catch (error) {
         console.log(error)
         return false
     }
   },
   raw: () =>  {
-    return store.get(appTheme_container)
+    return store.get(storage_theme)
   }
 } 
 
