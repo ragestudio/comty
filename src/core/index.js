@@ -34,6 +34,36 @@ export const clientInfo = {
   layout: platform.layout
 };
 
+export function getCircularReplacer() {
+  const seen = new WeakSet();
+  return (key, value) => {
+      if (typeof value === "object" && value !== null) {
+          if (seen.has(value)) {
+              return { __cycle_flag: true }
+          }
+          seen.add(value)
+      }
+      return value
+  }
+}
+
+export function decycle(obj, stack = []) {
+  if (!obj || typeof obj !== 'object')
+      return obj;
+
+  if (stack.includes(obj)) {
+      return { __cycle_flag: true }
+  }
+
+  let s = stack.concat([obj]);
+
+  return Array.isArray(obj)
+      ? obj.map(x => decycle(x, s))
+      : Object.fromEntries(
+          Object.entries(obj)
+              .map(([k, v]) => [k, decycle(v, s)]));
+}
+
 export function getBuild() {
   let build = {
     stable: false
