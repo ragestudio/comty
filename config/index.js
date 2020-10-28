@@ -10,18 +10,14 @@ module.exports = {
     DarkFullLogoPath: '/dark_full_logo.svg',
     DarkLogoPath: '/dark_logo.svg',
 
-    api_interface: 'https://api.ragestudio.net',
-    api_prefix: 'ycorejs_apiv3',
-    
-    app_settings_storage: 'app_settings', 
-    endpoint_global: 'https://comty.pw',
+    endpoint_v3prefix: 'ycorejs_apiv3',
     endpoint_websocket: 'eu_es01.ragestudio.net',
-    proxy_local: 'http://localhost:8000',
-
-    session_token_storage: 'cid',
-    session_data_storage: 'data',
     
-    appTheme_container: 'app_theme',
+    storage_appSettings: 'app_settings', 
+    storage_authFrame: 'cid',
+    storage_dataFrame: 'data',
+    storage_theme: 'app_theme',
+    
     appTheme_desiredContrast: 7,
     // Contrast level AA = 4.5, Level AAA = 7
     // Reference: https://www.w3.org/WAI/WCAG21/quickref/?versions=2.0&showtechniques=143#qr-visual-audio-contrast-contrast

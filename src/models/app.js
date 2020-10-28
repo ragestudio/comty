@@ -38,8 +38,8 @@ export default {
     feedOutdated: false,
 
     electron: null,
-    app_settings: store.get(app_config.app_settings_storage),
-    app_theme: store.get(app_config.appTheme_container) || [],
+    app_settings: store.get(app_config.storage_appSettings),
+    app_theme: store.get(app_config.storage_theme) || [],
     notifications: [],
   },
   subscriptions: {
@@ -236,7 +236,7 @@ export default {
             return false
           }
           try {
-            sessionStorage.setItem(app_config.session_data_storage, btoa(JSON.stringify(callbackResponse.response)))
+            sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
             state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
           } catch (error) {
             verbosity([error])
@@ -268,8 +268,8 @@ export default {
     },
     *updateFrames({ payload }, { select, put }) {
       try {
-        let sessionAuthframe = cookie.get(app_config.session_token_storage)
-        let sessionDataframe = atob(sessionStorage.getItem(app_config.session_data_storage))
+        let sessionAuthframe = cookie.get(app_config.storage_authFrame)
+        let sessionDataframe = atob(sessionStorage.getItem(app_config.storage_dataFrame))
 
         if (sessionAuthframe) {
           try {
@@ -283,7 +283,7 @@ export default {
               }
             })
           } catch (error) {
-            cookie.remove(app_config.session_token_storage)
+            cookie.remove(app_config.storage_authFrame)
           }
         }
         if (sessionDataframe) {
@@ -321,8 +321,8 @@ export default {
       state.session_authframe = jwt.decode(payload.token)
 
 
-      cookie.set(app_config.session_token_storage, payload.token)
-      sessionStorage.setItem(app_config.session_data_storage, btoa(JSON.stringify(payload.dataFrame)))
+      cookie.set(app_config.storage_authFrame, payload.token)
+      sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
 
       state.session_valid = true
     },
@@ -331,7 +331,7 @@ export default {
     },
     handleUpdateTheme(state, { payload }) {
       verbosity([payload])
-      store.set(app_config.appTheme_container, payload);
+      store.set(app_config.storage_theme, payload);
       state.app_theme = payload
     },
     requireQuery(state, { payload, callback }) {
@@ -380,7 +380,7 @@ export default {
       state.session_data = null;
       state.session_token = null;
       state.session_authframe = null;
-      cookie.remove(app_config.session_token_storage)
+      cookie.remove(app_config.storage_authFrame)
       sessionStorage.clear()
       location.reload()
     },

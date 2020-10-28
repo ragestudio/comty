@@ -24,9 +24,10 @@
     "postinstall": "electron-builder install-app-deps",
     "electronDev": "concurrently \"electron .\" \"npm start\"",
     "electron": "electron .",
+    "umibuild": "umi build",
     "build": "npm run build:main && npm run build:renderer",
-    "build:main": "ESLINT=none roadhog build",
-    "build:renderer": "ESLINT=none umi build",
+    "build:main": "roadhog build",
+    "build:renderer": "umi build",
     "pack": "npm run build && npm run rebuild && build",
     "pack:dir": "npm run build && npm run rebuild && build --dir",
     "pack:dirOnly": "build --dir"
@@ -123,6 +124,6 @@
     "less-loader": "^7.0.1",
     "style-loader": "^1.2.1",
     "typescript": "^3.9.7",
-    "umi": "^3.2.23"
+    "umi": "^3.2.24"
   }
 }

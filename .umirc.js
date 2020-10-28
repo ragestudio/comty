@@ -2,19 +2,19 @@ import { defineConfig } from 'umi';
 const { resolve, join } = require('path');
 
 export default defineConfig({
-  hash: false,
+  hash: true,
   dynamicImport: {
     loading: 'components/Loader',
   },
-  // dynamicImport: false,
-  // history: { type: "hash" },
-
   targets: { ie: 11 },
   dva: { immer: true, hmr: true },
   ignoreMomentLocale: true,
   mountElementId: "root",
   nodeModulesTransform: {
     type: 'none',
+  },
+  exportStatic: {
+    dynamicRoot: false,
   },
   // ssr: {
   //   devServerRender: true,
@@ -45,47 +45,4 @@ export default defineConfig({
     ],
   ],
 
-  // chainWebpack: function(config, { webpack }) {
-  //   config.module
-  //     .rule('js-in-node_modules')
-  //     .exclude.add(/node_modules/)
-  //     .end()
-  //   config.module
-  //     .rule('ts-in-node_modules')
-  //     .exclude.add(/node_modules/)
-  //     .end()
-    // config.merge({
-    //   optimization: {
-    //     minimize: true,
-    //     splitChunks: {
-    //       chunks: 'all',
-    //       minSize: 30000,
-    //       minChunks: 3,
-    //       automaticNameDelimiter: '.',
-    //       cacheGroups: {
-    //         react: {
-    //           name: 'react',
-    //           priority: 20,>
-    //           test: /[\\/]node_modules[\\/](react|react-dom|react-dom-router)[\\/]/,
-    //         },
-    //         antd: {
-    //           name: 'antd',
-    //           priority: 20,
-    //           test: /[\\/]node_modules[\\/](antd|@ant-design\/icons)[\\/]/,
-    //         },
-    //         async: {
-    //           chunks: 'async',
-    //           minChunks: 2,
-    //           name: 'async',
-    //           maxInitialRequests: 1,
-    //           minSize: 0,
-    //           priority: 5,
-    //           reuseExistingChunk: true,
-    //         },
-    //       },
-    //     },
-    //   },
-    // })
-  // },
-  
 })

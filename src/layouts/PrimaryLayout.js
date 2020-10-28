@@ -33,6 +33,7 @@ class PrimaryLayout extends React.Component {
     }
 
     // include API extensions
+    window.dispatcher = this.props.dispatch
     window.openLink = (e) => {
       if (this.props.app.embedded) {
         this.props.app.electron.shell.openExternal(e)

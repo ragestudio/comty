@@ -82,7 +82,7 @@ export function createScreenshotFromElement(element){
   if (!element) return false
   html2canvas(element, {
     useCORS: true,
-    proxy: app_config.proxy_local,
+    proxy: "localhost:8000",
     scale: 4,
     backgroundColor: "transparent"
   }).then(canvas => {
@@ -91,8 +91,8 @@ export function createScreenshotFromElement(element){
 }
 
 export function generatePostURI(id){
-  if(app_config.endpoint_global && id){
-    return `${app_config.endpoint_global}/post/${id}`
+  if(window.location.origin && id){
+    return `${window.location.origin}/post/${id}`
   }
   return null
 }
