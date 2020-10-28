@@ -8,7 +8,7 @@ import classnames from 'classnames'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 
-import { RegistrationForm } from './register.js'
+import RegistrationForm from './register.js'
 import { NormalLoginForm } from './login.js'
 import GuestSession from './guest.js'
 
@@ -60,7 +60,7 @@ class Login extends React.Component {
   renderHelperButtons = () => {
     return types.map((e) => {
       return(
-        <antd.Button type="link" onClick={() => this.setState({ key: e.key })}>
+        <antd.Button key={e.key} type="link" onClick={() => this.setState({ key: e.key })}>
           {e.renderText || "Invalid"}
         </antd.Button>
       )
