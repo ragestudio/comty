@@ -85,6 +85,7 @@ export default class Index extends React.Component {
                         <h3> Misc </h3>
                         <antd.Card>
                             <antd.Button onClick={() => { dispatch({ type: "socket/resetHeader" }) }} > Reset HeaderSocket </antd.Button>
+                            <antd.Button onClick={() => { dispatch({ type: "app/refreshToken" }) }} > force refreshToken </antd.Button>
                         </antd.Card>
                     </antd.Card>
                 </antd.Card>

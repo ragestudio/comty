@@ -22,19 +22,12 @@ export const get = {
         serverKey: serverKey,
         userToken: access_token,
         endpoint: endpoints.get_data
+        
       },
       (err, res) => {
        return callback(err, res)
       },
     );
-  },
-  posts: parms => {
-    if (!parms) return false;
-    const { id } = parms;
-
-    if (!id) {
-      // core get id data from current session
-    }
   },
   basicData: (parms, callback) => {
     if (!parms) return false

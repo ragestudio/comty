@@ -24,7 +24,7 @@ class BaseLayout extends React.Component {
   renderLoading = true
 
   render() {
-    const { loading, children, location } = this.props
+    const { loading, children, location, app } = this.props
     const Container = LayoutMap[queryLayout(config.layouts, location.pathname)]
     const currentPath = location.pathname + location.search
 
@@ -38,6 +38,15 @@ class BaseLayout extends React.Component {
       this.previousPath = currentPath
       this.renderLoading = false
     }
+
+    if (app.abortRender) {
+      return(
+        <div>
+         {app.abortRender}
+        </div>
+      )
+    }
+
     return (
       <React.Fragment>
         <Helmet>
