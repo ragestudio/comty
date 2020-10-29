@@ -1,7 +1,6 @@
 import React from 'react'
 import BaseLayout from './BaseLayout'
 import { withRouter } from 'umi'
-const appBody = document.getElementsByTagName("body")[0]
 
 @withRouter
 class Layout extends React.Component {
