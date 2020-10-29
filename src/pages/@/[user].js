@@ -90,7 +90,7 @@ export default class UserIndexer extends React.Component {
   promiseState = async state => new Promise(resolve => this.setState(state, resolve));
 
   componentDidMount(){
-    if (matchRegexp) {
+    if (matchRegexp && this.props.app.session_valid) {
       this.props.dispatch({
         type: "user/get",
         payload: {

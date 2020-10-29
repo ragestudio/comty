@@ -13,7 +13,7 @@ import cookie from 'cookie_js'
 export default {
   namespace: 'app',
   state: {
-    fadeclock: 1000,
+    fadeclock: 500,
     splash: {
       render: true,
       fadeout: false
@@ -109,9 +109,21 @@ export default {
         window.location = callback
       })
 
-      state.dispatcher({ type: "updateState", payload: { queryDone: true, splash: { render: true, fadeout: state.fadeclock }  } })
+      if (state.session_valid) {
+        if (state.session_authframe && state.session_data) {
+          state.dispatcher({ type: "closeSplash" })
+        } else {
+          setTimeout(() => location.reload(), 5000)
+        }
+      } else {
+        state.dispatcher({ type: "closeSplash" })
+      }
+    },
+    *closeSplash({ }, { select }) {
+      const state = yield select(state => state.app)
+      state.dispatcher({ type: "updateState", payload: { queryDone: true, splash: { render: true, fadeout: state.fadeclock } } })
       setTimeout(() => {
-        state.dispatcher({ type: "updateState", payload: { splash: { render: false, fadeout: false }  } })
+        state.dispatcher({ type: "updateState", payload: { splash: { render: false, fadeout: false } } })
       }, state.fadeclock)
     },
     *initHeaderSocket({ callback }, { call, put, select }) {
@@ -245,6 +257,7 @@ export default {
           from: "data"
         },
         callback: (callbackResponse) => {
+          verbosity([callbackResponse])
           if (callbackResponse.code == 115) {
             verbosity(`Cannot update userdata due an data is missing`)
             return false
