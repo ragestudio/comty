@@ -93,16 +93,18 @@ export default class UserIndexer extends React.Component {
     if (matchRegexp) {
       this.props.dispatch({
         type: "user/get",
-        req: {
-          fetch: "profileData",
+        payload: {
+          from: "profileData",
           username: matchRegexp[1]
         },
-        callback: (err, res) => {
-          if(err){
-            this.setState({ ErrorCode: err })
-            return HandleError({ code: err, msg: res })
+        callback: (callbackResponse) => {
+          if(callbackResponse.code == 200){
+            this.setState({ loading: false, layoutData: callbackResponse.response })
+          }else{
+            this.setState({ ErrorCode: callbackResponse.code })
+            return HandleError({ code: callbackResponse.code, msg: "no message provided" })
           }
-          this.setState({ loading: false, layoutData: res })
+       
         }
       })
     }else{

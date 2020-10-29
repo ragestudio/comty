@@ -92,6 +92,7 @@
     "redux-thunk": "^2.3.0",
     "request": "^2.88.2",
     "socket.io-client": "^2.3.0",
+    "socket.io-promise": "^1.1.2",
     "stack-trace": "0.0.10",
     "store": "^2.0.12",
     "styled-components": "^5.2.0",

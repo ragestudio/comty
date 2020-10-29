@@ -30,7 +30,6 @@ export default {
         query: {
           payload: {
             from: payload.from,
-            user_id: payload.user_id ?? state.app.session_uuid,
             username: payload.username ?? state.app.session_authframe["username"],
             userToken: state.app.session_token
           },

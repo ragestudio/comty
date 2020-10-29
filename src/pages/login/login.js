@@ -8,8 +8,6 @@ import * as antd from 'antd'
 
 import { session, user } from 'core/models'
 
-import verbosity from 'core/libs/verbosity'
-
 import { Form, Input, Button, Checkbox } from 'antd'
 import {
   UserOutlined,
@@ -20,7 +18,7 @@ import {
 import { connect } from 'umi'
 
 @connect(({ app, socket }) => ({ app, socket }))
-export class NormalLoginForm extends React.Component {
+export default class NormalLoginForm extends React.Component {
   state = {
     usernameRaw: null,
     passwordRaw: null,
@@ -42,7 +40,7 @@ export class NormalLoginForm extends React.Component {
           user.get.basicData(payload, (err, res) => {
             if (res.code == 200) {
               step++
-              this.anim_transition(300)
+              this.anim_transition(50)
               return this.setState({
                 validating: false,
                 early_data: res.response,
@@ -61,33 +59,39 @@ export class NormalLoginForm extends React.Component {
       case 2: {
         return this.auth()
       }
-
       default:
         return false
     }
   }
 
   back() {
-    let a = this.state.step
-    if (a > 1) {
-      a--
+    if (this.state.step > 1) {
+      this.state.step--
       this.anim_transition(150)
     }
-
-    this.setState({ step: a })
+    this.setState({ step: this.state.step })
   }
 
   anim_transition(duration) {
     this.setState({ step_show: false })
     setTimeout(() => {
       this.setState({ step_show: true })
-    }, duration || 1000)
+    }, duration || 150)
   }
 
   anim_error() {
     this.setState({ step_error: true, error_count: (this.state.error_count + 1), validating: false })
   }
 
+  onChangeField(event) {
+    if(!this.state) {
+      return false
+    }
+    let updated = this.state
+    updated[event.target.id] = event.target.value
+    this.setState(updated)
+  }
+  
   auth() {
     const { usernameRaw, passwordRaw } = this.state
     if (!usernameRaw || !passwordRaw) return false
@@ -97,6 +101,7 @@ export class NormalLoginForm extends React.Component {
       type: 'app/login',
       payload: { username: usernameRaw, password: passwordRaw },
       callback: (callbackResponse) => {
+        console.log(callbackResponse)
         this.setState({ validating: false })
         switch (callbackResponse) {
           case 100: {
@@ -138,7 +143,8 @@ export class NormalLoginForm extends React.Component {
             autoFocus
             disabled={this.state.validating}
             onPressEnter={() => this.next()}
-            onChange={(e) => { this.setState({ usernameRaw: e.target.value }) }}
+            id="usernameRaw"
+            onChange={(e) => this.onChangeField(e)}
             prefix={<UserOutlined className="site-form-item-icon" />}
             placeholder="Username or Email"
           />
@@ -162,28 +168,15 @@ export class NormalLoginForm extends React.Component {
               autoFocus
               onPressEnter={() => this.next()}
               disabled={this.state.validating}
+              id="passwordRaw"
               prefix={<LockOutlined className="site-form-item-icon" />}
-              onChange={(e) => { this.setState({ passwordRaw: e.target.value }) }}
+              onChange={(e) => this.onChangeField(e)}
               placeholder="Password"
             />
           </Form.Item>
         </>
       )
     }
-  }
-
-  renderAuthForm() {
-    return (
-      <Form
-        name="signin"
-        className="login-form"
-      >
-        <HeadShake spy={this.state.error_count}>
-          {this.renderFormItems[this.state.step == 1 ? "username" : "password"]()}
-        </HeadShake>
-
-      </Form>
-    )
   }
 
   renderButtons() {
@@ -207,6 +200,7 @@ export class NormalLoginForm extends React.Component {
           className="login-form-button"
           onClick={() => this.back()}
         >
+          <SwapLeftOutlined />
           Back
         </Button>
       )
@@ -221,7 +215,14 @@ export class NormalLoginForm extends React.Component {
     return (
       <div className={styles.login_form}>
         <Fade left opposite when={this.state.step_show}>
-          {this.renderAuthForm()}
+          <Form
+            name="signin"
+            className="login-form"
+          >
+            <HeadShake spy={this.state.error_count}>
+              {this.renderFormItems[this.state.step == 1 ? "username" : "password"]()}
+            </HeadShake>
+          </Form>
         </Fade>
         {this.renderButtons()}
       </div>
