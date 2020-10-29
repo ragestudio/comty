@@ -82,8 +82,8 @@
   border-radius: 12px 0 0 12px;
   box-shadow: 0 10px 20px 0 rgba(51,51,51,0.52);
   transition: all 300ms ease-in-out;
-
 }
+
 .right_body{
   z-index: 51;
   float: right;
@@ -97,6 +97,7 @@
   box-shadow: 0 10px 20px 0 rgba(51,51,51,0.52);
   transition: all 300ms ease-in-out;
 }
+
 .third_body{
   z-index: 50;
   transform: translate(0, -24px);
@@ -116,18 +117,16 @@
 
   }
 }
+
 .third_body:hover{
   background-color: rgba(255, 255, 255, 0.3);
   box-shadow: 0 10px 20px 0 rgba(51, 51, 51, 0.8);
   transform: translate(0, -16px);
-
-
 }
 
 .helper_login_btn{
   transform: translate(-20px, -14px);
 }
-
 
 .login_helper_footer{
   width: 100%;
@@ -159,15 +158,6 @@
   }
 }
 
-// // Full format
-// @media (min-width: 486px){
-//   .login_wrapper {
-//     min-height: 580px;
-//   }
-//   .auth_box {
-//     width: 784px;
-//   }
-// }
 
 // Medium format  max-width: 830px
 @media (min-width: 486px){
@@ -200,9 +190,8 @@
   .auth_box {
     position: absolute;
     top: 0;
-    right: 0;
-    bottom: 0;
     left: 0;
+    transition: all 150ms ease-in-out;
     padding: 70px 16px 40px;
     width: 100%;
     height: 100%;
@@ -228,10 +217,6 @@
     float: none;
     padding: 20px;
   }
-}
-
-.register_form{
-  
 }
 
 @-webkit-keyframes fadeOutLeft {

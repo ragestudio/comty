@@ -4,7 +4,6 @@ import keys from 'config/app_keys'
 import { user, session } from 'core/models'
 import { router, verbosity, appInterface } from 'core/libs'
 import settings from 'core/libs/settings'
-import uri_resolver from 'api/lib/uri_resolver'
 import { queryIndexer } from 'core'
 import Cryptr from 'cryptr'
 
@@ -16,10 +15,8 @@ export default {
   state: {
     env_proccess: process.env,
     server_key: keys.server_key,
-    resolvers: null,
 
     service_valid: false,
-    ng_services: false,
     session_valid: false,
 
     session_authframe: null,
@@ -51,13 +48,10 @@ export default {
       } catch (error) {
         // nothing
       }
-      uri_resolver().then(res => {
-        dispatch({ type: 'updateState', payload: { resolvers: res } })
-      })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'validateSession' })
-      dispatch({ type: 'socket/createNodeSocket' })
-      dispatch({ type: 'query', payload: { dispatcher: dispatch } })
+      dispatch({ type: 'initHeaderSocket' })
+      dispatch({ type: 'query' })
     },
     setupHistory({ dispatch, history }) {
       history.listen(location => {
@@ -108,10 +102,19 @@ export default {
       ], (callback) => {
         window.location = callback
       })
+    },
+    *initHeaderSocket({ callback }, { call, put, select }) {
+      const state = yield select(state => state.app)
 
-      if (!state.service_valid) {
-
-      }
+      state.dispatcher({
+        type: 'socket/createNodeSocket', payload: {
+          locked: true,
+          isHeader: true
+        },
+        then: () => {
+          state.dispatcher({ type: "updateState", payload: { service_valid: true } })
+        }
+      })
     },
     *refreshToken({ callback }, { call, put, select }) {
       const state = yield select(state => state.app)
@@ -175,12 +178,14 @@ export default {
             password: cryptr.encrypt(payload.password)
           },
           callback: (callbackResponse) => {
+            console.log(callbackResponse)
             const { authFrame, dataFrame, token } = callbackResponse.response
             if (typeof (callback) !== "undefined") {
               callback(callbackResponse.code)
             }
             if (callbackResponse.code == 100) {
-              state.dispatcher({ type: "setAuth", payload: { authFrame, dataFrame, token } })
+              state.dispatcher({ type: "setAuth", payload: { token, authFrame, dataFrame } })
+              location.reload()
             }
           }
         }
@@ -317,11 +322,10 @@ export default {
       state.session_uuid = payload.authFrame.session_uuid
       state.session_data = payload.dataFrame
       state.session_authframe = jwt.decode(payload.token)
+      state.session_valid = true
 
       cookie.set(app_config.storage_authFrame, payload.token)
       sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
-
-      state.session_valid = true
     },
     handleCollapseSidebar(state, { payload }) {
       state.sidebar_collapsed = payload

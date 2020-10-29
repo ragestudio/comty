@@ -11,7 +11,6 @@ const defaultSocketAddress = "localhost:7000"
 @connect(({ app, socket }) => ({ app, socket }))
 export default class SocketDebug extends React.Component {
     state = {
-        resolvers: __legacy__objectToArray(this.props.app.resolvers),
         InputRaw: defaultSocketAddress
     }
 

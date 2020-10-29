@@ -1,13 +1,7 @@
 import React from 'react'
 import * as Icons from 'components/Icons'
-
-import {
-  MailOutlined,
-  TagOutlined,
-  LockOutlined,
-} from '@ant-design/icons'
-
 import styles from './index.less'
+
 import {
   Form,
   Input,
@@ -26,14 +20,34 @@ import { g_recaptcha_key } from 'config/app_keys'
 
 export default class RegistrationForm extends React.Component {
   state = {
+    usernameRaw: null,
+    passwordRaw: null,
+    emailRaw: null,
+
     captchaValue: null
   }
+  
+  handleRegister() {
+
+  }
+
   onFinish(values) {
     console.log('Received values of form: ', values)
   }
+
   onCaptcha(values) {
     this.setState({ captchaValue: values })
   }
+
+  onChangeField(event) {
+    if(!this.state) {
+      return false
+    }
+    let updated = this.state
+    updated[event.target.id] = event.target.value
+    this.setState(updated)
+  }
+
   renderForm() {
     return (
       <Form
@@ -52,7 +66,7 @@ export default class RegistrationForm extends React.Component {
             },
           ]}
         >
-          <Input placeholder="ramdomuser" prefix={<TagOutlined />} />
+          <Input id="usernameRaw" onChange={(e) => this.onChangeField(e)} placeholder="randomuser" prefix={<Icons.TagOutlined />} />
         </Form.Item>
         <Form.Item
           name="email"
@@ -67,7 +81,7 @@ export default class RegistrationForm extends React.Component {
             },
           ]}
         >
-          <Input placeholder="example@no-real.com" prefix={<MailOutlined />} />
+          <Input id="emailRaw" onChange={(e) => this.onChangeField(e)} placeholder="example@no-real.com" prefix={<Icons.Mail />} />
         </Form.Item>
 
         <Form.Item
@@ -80,33 +94,7 @@ export default class RegistrationForm extends React.Component {
           ]}
           hasFeedback
         >
-          <Input.Password placeholder="example@no-real.com" prefix={<Icons.Lock />} />
-        </Form.Item>
-
-        <Form.Item
-          name="confirm"
-          dependencies={['password']}
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: 'Please confirm your password!',
-            },
-            ({ getFieldValue }) => ({
-              validator(rule, value) {
-                if (!value || getFieldValue('password') === value) {
-                  return Promise.resolve()
-                }
-
-                return Promise.reject(
-                  'The two passwords that you entered do not match!'
-                )
-              },
-            }),
-          ]}
-        >
-          <Input.Password prefix={<LockOutlined />}
-            placeholder="example@no-real.com" />
+          <Input.Password id="passwordRaw" onChange={(e) => this.onChangeField(e)} placeholder="mysupersecretpassword" prefix={<Icons.Lock />} />
         </Form.Item>
 
         <Form.Item extra="We must make sure that your are a human.">
@@ -142,13 +130,11 @@ export default class RegistrationForm extends React.Component {
           ]}
         >
           <Checkbox>
-            I have read the <a href="">agreement</a>
+            I have read the <a>agreement</a>
           </Checkbox>
         </Form.Item>
         <Form.Item >
-          <Button type="primary" htmlType="submit">
-            Register
-    </Button>
+          <Button type="primary"> Register </Button>
         </Form.Item>
       </Form>
     )

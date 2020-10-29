@@ -72,7 +72,8 @@ export default {
           namespaceOrigin: `/${scope}`,
           hostname: `${state.socket.socket_address}:${state.socket.socket_port}`,
           port: state.socket.socket_port,
-          reconnectionAttempts: 10
+          reconnectionAttempts: 10,
+          forceNew: true
         }
 
         new SocketConnection({
@@ -80,13 +81,19 @@ export default {
           connector: state.app.dispatcher,
           payload: opt,
           then: (socket) => {
-           socket._emit(invoke, query.payload, query.callback)
+            socket._emit(invoke, query.payload, (callback) =>{
+              new Promise((resolve, reject) => resolve(query.callback(callback))).then(() => {
+                socket.remove()
+              })
+            })
           }
         })
       }else{
-        state.socket.nodes[scope].ioConn._emit(invoke, query.payload, query.callback)
+        state.socket.nodes[scope].ioConn._emit(invoke, query.payload, (callback) =>{
+          query.callback(callback)
+          state.socket.nodes[scope].ioConn.remove()
+        })
       }
-     
     },
     *break({ listener, node }, { select, put }) {
       if (!node || !listener) {
@@ -119,7 +126,7 @@ export default {
       }
       const state = yield select(state => state.socket)
       if (state.nodes[node].connectionState !== "closed") {
-        console.log("The node is not closed!, closing before destroying")
+        verbosity("The node is not closed!, closing before destroying")
         state.nodes[node].ioConn._close()
       }
       let updated = {}

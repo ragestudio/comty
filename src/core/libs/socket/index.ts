@@ -51,6 +51,7 @@ export default class SocketConnection {
         }
 
         this.opts = {
+            isHeader: false,
             namespaceOrigin: "/",
             hostname: "localhost:5000",
             port: "5000",
@@ -107,11 +108,10 @@ export default class SocketConnection {
                     this.setConnectionListeners()
                 })
             }else{
-                verbosity(`[${this.ioConn.namespaceOrigin}] node is locked, cannot switch the namespace`)
+                verbosity(`[${this.opts.namespaceOrigin}] node is locked, cannot switch the namespace`)
             }
         }
     }
-
 
     createConnection(namespace: void) {
         const getNode = () => {
@@ -189,7 +189,7 @@ export default class SocketConnection {
                 this.ioConn.updateConnectionState(0)
             }
 
-            this.ioConn.destroy = () => {
+            this.ioConn.remove = () => {
                 this.dispatcher({ type: "socket/destroyNode", node: this.opts.namespaceOrigin })
             }
 
@@ -200,7 +200,7 @@ export default class SocketConnection {
     setConnectionListeners() {
         this.ioConn.on('connect', () => {
             this.ioConn.updateConnectionState(1)
-            verbosity(["🔌 Connected to socket"])
+            verbosity([`🌐 Connected to socket (${this.opts.namespaceOrigin})`])
             this.then(this.ioConn) // sending init data
         })
 
@@ -218,23 +218,25 @@ export default class SocketConnection {
         })
 
         this.ioConn.on('reconnect', (attemptNumber: ioConnTypes) => {
-            verbosity([`[socket_event] reconnect > Connection reconected with (${attemptNumber}) tries`])
+            verbosity([`✅ Connection reconected with (${attemptNumber}) tries > [socket_event]`])
             this.ioConn.updateConnectionState(1)
         })
 
         this.ioConn.on('disconnect', (event: ioConnTypes) => {
-            verbosity([`[socket_event] disconnect >`, event])
-            notify.warn("You are offline")
+            if (this.opts.isHeader) {
+                notify.warn("You are offline")
+            }
+            verbosity([`🔌 Disconnect from socket (${this.opts.namespaceOrigin}) > [socket_event] >`, event])
             this.ioConn.updateConnectionState(3)
         })
 
         this.ioConn.on('connect_timeout', () => {
-            verbosity([`[socket_event] connect_timeout >`])
+            verbosity([`🕘 Socket timeout (${this.opts.namespaceOrigin}) > [socket_event]`])
             this.ioConn.updateConnectionState(3)
         })
 
         this.ioConn.on('error', (event: ioConnTypes) => {
-            verbosity([`[socket_event] error >`, event])
+            verbosity([`❌ Socket throw error (${this.opts.namespaceOrigin}) > [socket_event] >`, event])
         })
 
         this.ioConn.on('updateState', (event: ioConnTypes) => {
