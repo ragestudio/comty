@@ -12,38 +12,6 @@
     box-sizing: border-box;
   }
 
-  .btnWrapper {
-    display: flex;
-  }
-
-  .likeCounter {
-    font-family: "Poppins", sans-serif;
-    line-height: 70px;
-    margin: 0 0 0 10px;
-
-    opacity: 0;
-    transform: perspective(100px) translateZ(10px);
-    filter: blur(10px);
-    letter-spacing: 0.1em;
-
-    &.active {
-      opacity: 1;
-      transform: perspective(100px) translateZ(0px);
-      filter: blur(0px);
-      letter-spacing: 0.15em;
-      transition: opacity 1000ms linear, transform 1000ms linear, filter 400ms linear, letter-spacing 1000ms linear;
-    }
-
-    &.past {
-      opacity: 0;
-      transform: perspective(100px) translateZ(-10px);
-      filter: blur(10px);
-      letter-spacing: 0.2em;
-      transition: opacity 1000ms linear, transform 1000ms linear, filter 400ms linear, letter-spacing 1000ms linear;
-    }
-
-  }
-
   .like_button {
     --color-heart: #EA442B;
     --easing: cubic-bezier(.7, 0, .3, 1);
@@ -115,10 +83,10 @@
   }
 
   .like_wrapper {
-    display: grid;
+    display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1;
+    z-index: 5;
 
     >* {
       margin: auto;
@@ -127,10 +95,9 @@
   }
 
   .heart {
-    width: .5em;
-    height: .5em;
+    width: 100%;
+    height: 100%;
     display: block;
-    transform-origin: center 80%;
 
     >path {
       stroke: var(--color-heart);
@@ -168,8 +135,9 @@
   }
 
   .ripple {
-    height: 1em;
-    width: 1em;
+    position: absolute;
+    height: 100%;
+    width: 100%;
     border-radius: 50%;
     overflow: hidden;
     z-index: 1;

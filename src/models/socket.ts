@@ -61,11 +61,14 @@ export default {
     *resetHeader({  }, { put }) {
       yield put({ type: "createNodeSocket" })
     },
-    *use({ scope, invoke, query }, { put, select }) {
+    *use({ scope, invoke, query, persistent, then }, { put, select }) {
       const state = yield select(state => state)
-      if (!scope || !invoke || !query) {
+      if (!scope) {
         verbosity(`some params is missing`)
         return false
+      }
+      if (typeof(persistent) == "undefined" ) {
+        persistent = false
       }
       if (!state.socket.nodes[scope] && scope !== state.socket.headerNode) {
         let opt = {
@@ -81,11 +84,18 @@ export default {
           connector: state.app.dispatcher,
           payload: opt,
           then: (socket) => {
-            socket._emit(invoke, query.payload, (callback) =>{
-              new Promise((resolve, reject) => resolve(query.callback(callback))).then(() => {
-                socket.remove()
+            if (typeof(then) !== "undefined") {
+              then(socket)
+            }
+            if (typeof(query) !== "undefined") {
+              socket._emit(invoke, query.payload, (callback) =>{
+                new Promise((resolve, reject) => resolve(query.callback(callback))).then(() => {
+                  if (!persistent) {
+                    socket.remove()
+                  }
+                })
               })
-            })
+            }
           }
         })
       }else{

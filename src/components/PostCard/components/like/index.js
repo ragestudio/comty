@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from './like.less'
+import styles from './index.less'
 import * as core from 'core'
 import classnames from 'classnames'
 
@@ -9,15 +9,22 @@ export default class LikeBtn extends React.Component {
     count: this.props.count,
     clicked: false,
   }
+  handleClick(){
+    if (typeof(this.props.handleClick) !== "undefined") {
+      this.props.handleClick()
+      this.setState({ clicked: true })
+      setTimeout(() => {
+        this.setState({ clicked: false, liked: !this.state.liked })
+      }, 500)
+    }else{
+      return false
+    }
+  }
 
- 
   render() {
-    const { id } = this.props
-    const { count, liked, clicked } = this.state
-   
+    const { liked, clicked } = this.state
     return (
-      <div className={styles.btnWrapper}>
-        <button className={classnames(styles.like_button, {[styles.clickanim]: clicked })} >
+        <button onClick={() => { this.handleClick() }} className={classnames(styles.like_button, {[styles.clickanim]: clicked })} >
           <div className={styles.like_wrapper}>
             <div
               className={classnames(
@@ -39,15 +46,6 @@ export default class LikeBtn extends React.Component {
             </svg>
           </div>
         </button>
-        <p
-          className={classnames(styles.likeCounter, {
-            [styles.active]: !clicked,
-            [styles.past]: clicked,
-          })}
-        >
-          {count}
-        </p>
-      </div>
     )
   }
 }
