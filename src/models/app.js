@@ -115,40 +115,37 @@ export default {
     },
     *refreshToken({ callback }, { call, put, select }) {
       const state = yield select(state => state.app)
-      if (state.session_authframe) {
-        return state.dispatcher({
-          type: "socket/use",
-          scope: "auth",
-          invoke: "token",
-          query: {
-            payload: {
-              token: state.session_authframe
-            },
-            callback: (callbackResponse) => {
-              if (typeof (callback) !== "undefined") {
-                callback(callbackResponse)
-              }
-              if (callbackResponse.code == 100) {
-                verbosity(`updating authframe`)
-                state.dispatcher({
-                  type: "setAuth", payload: {
-                    token: callbackResponse.response.token,
-                    authFrame: jwt.decode(callbackResponse.response.token),
-                    dataFrame: state.session_data
-                  }
-                })
-                state.dispatcher({ type: "updateState", payload: { session_valid: true } })
-              } else {
-                verbosity(`this session is no valid, erasing data`)
-                state.dispatcher({ type: "sessionErase" }) // remove without calling api, its already logged out/invalid
-              }
+      state.dispatcher({
+        type: "socket/use",
+        scope: "auth",
+        invoke: "token",
+        query: {
+          payload: {
+            token: state.session_authframe
+          },
+          callback: (callbackResponse) => {
+            if (typeof (callback) !== "undefined") {
+              callback(callbackResponse)
+            }
+            verbosity([callbackResponse])
+            if (callbackResponse.code == 100) {
+              state.dispatcher({
+                type: "setAuth", payload: {
+                  token: callbackResponse.response.token,
+                  authFrame: jwt.decode(callbackResponse.response.token),
+                  dataFrame: state.session_data
+                }
+              })
+              state.dispatcher({ type: "updateState", payload: { session_valid: true } })
+            }
+            if (callbackResponse.code == 110) {
+              verbosity(`this session is no valid, erasing data`)
+              state.dispatcher({ type: "sessionErase" }) // remove without calling api, its already logged out/invalid
             }
           }
-        })
-      }else{
-        verbosity(`no session_authframe found/valid`)
-        return false
-      }
+        }
+      })
+
     },
     *logout({ payload }, { put, select }) {
       const state = yield select(state => state.app)
@@ -208,12 +205,13 @@ export default {
           verbosity(`🕒 This session_token is expired`, { color: "red" })
           if (settings("session_noexpire")) {
             verbosity(`(session_noexpire) is enabled, refreshing token`)
-            return state.dispatcher({ type: "refreshToken" })
+            state.dispatcher({ type: "refreshToken" })
           } else {
             return state.dispatcher({ type: "sessionErase" }) // remove session
           }
-       
         }
+
+
 
         if (!state.session_data) {
           verbosity(`session_data is not valid but the session is valid, updating from ws`)
@@ -278,8 +276,8 @@ export default {
               type: "updateState",
               payload: {
                 session_authframe: sessionAuthframe,
-                session_token: sessionAuthframe.access_token,
-                session_uuid: sessionAuthframe.user_id
+                session_token: sessionAuthframe.session_token,
+                session_uuid: sessionAuthframe.session_uuid
               }
             })
           } catch (error) {
@@ -315,11 +313,10 @@ export default {
     },
     setAuth(state, { payload }) {
       if (!payload) return false
-      state.session_token = payload.authFrame.access_token
-      state.session_uuid = payload.authFrame.user_id
+      state.session_token = payload.authFrame.session_token
+      state.session_uuid = payload.authFrame.session_uuid
       state.session_data = payload.dataFrame
       state.session_authframe = jwt.decode(payload.token)
-
 
       cookie.set(app_config.storage_authFrame, payload.token)
       sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
