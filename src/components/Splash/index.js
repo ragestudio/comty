@@ -5,7 +5,6 @@ import styles from './index.less'
 
 export default class AppSplash extends React.Component {
     render() {
-        console.log(this.props.fadeout)
         return (
             <div className={classnames(styles.wrapper, {[styles.fadeout]: this.props.fadeout})} style={this.props.fadeout? { animationDuration: `${this.props.fadeout}ms` } : null} >
                 <div className="bouncy-logo">
