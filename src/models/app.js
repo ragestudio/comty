@@ -111,7 +111,6 @@ export default {
 
       state.dispatcher({ type: "updateState", payload: { queryDone: true, splash: { render: true, fadeout: state.fadeclock }  } })
       setTimeout(() => {
-        console.log("closing splash")
         state.dispatcher({ type: "updateState", payload: { splash: { render: false, fadeout: false }  } })
       }, state.fadeclock)
     },
