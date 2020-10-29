@@ -13,6 +13,12 @@ import cookie from 'cookie_js'
 export default {
   namespace: 'app',
   state: {
+    fadeclock: 1000,
+    splash: {
+      render: true,
+      fadeout: false
+    },
+    queryDone: false,
     env_proccess: process.env,
     server_key: keys.server_key,
 
@@ -102,6 +108,12 @@ export default {
       ], (callback) => {
         window.location = callback
       })
+
+      state.dispatcher({ type: "updateState", payload: { queryDone: true, splash: { render: true, fadeout: state.fadeclock }  } })
+      setTimeout(() => {
+        console.log("closing splash")
+        state.dispatcher({ type: "updateState", payload: { splash: { render: false, fadeout: false }  } })
+      }, state.fadeclock)
     },
     *initHeaderSocket({ callback }, { call, put, select }) {
       const state = yield select(state => state.app)

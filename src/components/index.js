@@ -8,6 +8,7 @@ import * as Feather from 'feather-reactjs'
 import Invalid from './Invalid'
 
 // App Layout Components
+import Splash from './Splash'
 import * as AppLayout from './Layout/index.js'
 import ListedMenu from './ListedMenu/index.tsx'
 import FloatComponent from './FloatComponent'
@@ -22,6 +23,7 @@ import PostCard from './PostCard'
 
 // Mix & Export all
 export {
+  Splash,
   ParamsList,
   FloatComponent,
   ListedMenu,

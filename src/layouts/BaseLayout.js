@@ -7,6 +7,7 @@ import { withRouter, connect } from 'umi'
 import { queryLayout } from 'core'
 import WindowNavbar from 'components/Layout/WindowNavbar'
 import config from 'config'
+import { Splash } from 'components'
 
 import PrimaryLayout from './PrimaryLayout'
 import PublicLayout from './PublicLayout'
@@ -39,12 +40,8 @@ class BaseLayout extends React.Component {
       this.renderLoading = false
     }
 
-    if (app.abortRender) {
-      return(
-        <div>
-         {app.abortRender}
-        </div>
-      )
+    if (app.splash.render) {
+      return <Splash fadeout={app.splash.fadeout} />
     }
 
     return (
