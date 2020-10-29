@@ -196,6 +196,7 @@ export function urlToBase64(url, callback) {
     reader.readAsDataURL(xhr.response);
   };
   xhr.open('GET', url);
+  xhr.setRequestHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Origin');
   xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
   xhr.responseType = 'blob';
   xhr.send();

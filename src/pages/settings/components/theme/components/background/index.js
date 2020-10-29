@@ -73,7 +73,6 @@ export default class BackgroundImage extends ThemeConfigurator {
                         <h4 style={{ color: this.schemeToRGB(this.state.accentColor) }}>Sample text</h4>
                         <p style={{ color: this.schemeToRGB(this.state.textColor) }}>Some text here</p>
                         <p style={{ color: this.schemeToRGB(this.state.accentColor) }}>Some text here</p>
-
                     </div>
                     <img style={{ opacity: this.state.model.opacity }} src={this.state.model.src} />
                 </div> : <h3 style={{ textAlign: 'center' }} > No Background </h3>}

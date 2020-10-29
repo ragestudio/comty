@@ -13,67 +13,95 @@ import styles from './index.less'
 export default class Explore extends React.Component {
 
   state = {
+    socket: null,
     feed: null,
     renderError: false
   }
 
-  request(){
-    this.props.dispatch({
-      type: "socket/use",
-      scope: "posts",
-      invoke: "get",
-      query: {
-        payload: {
-          from: "feed",
-          userToken: this.props.app.session_token
-        },
-        callback: (data) => {
-          if (Array.isArray(data.response)) {
-            this.setState({ feed: data.response })
-          }else{
-            verbosity([`error gathering posts >`, data])
-            this.setState({ renderError: true })
-          }
+  fetchFeed() {
+    const { socket } = this.state
+    if (socket) {
+      const requestPayload = {
+        from: "feed",
+        userToken: this.props.app.session_token
+      }
+
+      const requestCallback = (data) => {
+        if (Array.isArray(data.response)) {
+          this.setState({ feed: data.response })
+        } else {
+          verbosity([`error gathering posts >`, data])
+          this.setState({ renderError: true })
         }
       }
-    })
+
+      socket._emit("get", requestPayload, requestCallback)
+    }
   }
 
-  componentDidMount(){
-    if(this.props.app.session_valid){
-      this.request()
+  handlePostActions(action, post_id, callback) {
+    const { socket } = this.state
+    if (socket) {
+      const requestPayload = {
+        userToken: this.props.app.session_token,
+        post_id,
+        action
+      }
+
+      socket._emit("actions", requestPayload, (res) => callback(res))
+    }
+  }
+
+  componentDidMount() {
+    if (this.props.app.session_valid) {
+      this.props.dispatch({
+        type: "socket/use",
+        persistent: true,
+        scope: "posts",
+        then: (data) => {
+          this.setState({ socket: data })
+          this.fetchFeed()
+        }
+      })
+    }
+
+  }
+
+  componentWillUnmount() {
+    if (this.state.socket) {
+      this.state.socket.remove()
     }
   }
 
   render() {
-    if(!this.props.app.session_valid){
+    if (!this.props.app.session_valid) {
       return <Invalid type="SESSION_INVALID" />
     }
 
-    if (!this.state.feed){
-        return (
-            <antd.Card bordered="false" >
-              <antd.Skeleton active />
-            </antd.Card>
-        )
+    if (!this.state.feed) {
+      return (
+        <antd.Card bordered="false" >
+          <antd.Skeleton active />
+        </antd.Card>
+      )
     }
 
-    if (this.state.renderError){
+    if (this.state.renderError) {
       return (
         <Invalid type="SESSION_INVALID" />
       )
     }
 
-    return(
+    return (
       <div className={styles.exploreWrapper}>
         <List
-            //loadMore={loadMore}
-            dataSource={this.state.feed}
-            renderItem={item => (
-              <PostCard payload={item}/>
-            )}
+          //loadMore={loadMore}
+          dataSource={this.state.feed}
+          renderItem={item => (
+            <PostCard handleActions={(...context) => this.handlePostActions(...context)} payload={item} />
+          )}
         />
-      </div> 
+      </div>
     )
   }
 }
