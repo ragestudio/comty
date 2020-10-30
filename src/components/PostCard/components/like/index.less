@@ -41,7 +41,7 @@
 
     &.active {
       opacity: 1;
-      transform: perspective(100px) translateZ(0px);
+      //transform: perspective(100px) translateZ(0px);
       filter: blur(0px);
       letter-spacing: 0.15em;
       transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
@@ -49,8 +49,8 @@
 
     &.past {
       opacity: 0;
-      transform: perspective(100px) translateZ(-10px);
-      filter: blur(10px);
+      //transform: perspective(100px) translateZ(-10px);
+      filter: blur(1px);
       letter-spacing: 0.2em;
       transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
     }

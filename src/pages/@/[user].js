@@ -34,6 +34,7 @@ class UserLayout extends React.Component {
   render() {
     const { styleComponent } = this.state
     const toStyles = e => styles[`${styleComponent}_${e}`]
+    const { followers_count } = this.state.layoutData.details ?? {  }
 
     return (
       <div className={toStyles("wrapper")} >
@@ -47,7 +48,7 @@ class UserLayout extends React.Component {
           </div>
 
           <div className={toStyles("title")}>
-            <antd.Tooltip title={`${this.state.layoutData.followers ?? "Non-existent"} Followers`}>
+            <antd.Tooltip title={`${followers_count ?? "Non-existent"} Followers`}>
               <h1>{this.state.userString}</h1>
             </antd.Tooltip>
 
