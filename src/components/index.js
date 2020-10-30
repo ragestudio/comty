@@ -13,6 +13,7 @@ import * as AppLayout from './Layout/index.js'
 import ListedMenu from './ListedMenu/index.tsx'
 import FloatComponent from './FloatComponent'
 import ParamsList from './ParamsList'
+import PostsFeed from './PostFeed'
 
 // User Components
 
@@ -23,6 +24,7 @@ import PostCard from './PostCard'
 
 // Mix & Export all
 export {
+  PostsFeed,
   Splash,
   ParamsList,
   FloatComponent,

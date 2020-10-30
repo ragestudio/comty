@@ -4,7 +4,7 @@ import * as Icons from 'components/Icons'
 import styles from './index.less'
 import classnames from 'classnames'
 import { connect } from 'umi'
-import { __legacy__objectToArray, queryObjectToString} from 'core'
+import { __legacy__objectToArray, queryObjectToString } from 'core'
 
 @connect(({ app }) => ({ app }))
 export default class Sider_Default extends React.Component {
@@ -14,20 +14,20 @@ export default class Sider_Default extends React.Component {
     menus: null
   }
 
-  toogleCollapse(){
+  toogleCollapse() {
     window.toogleSidebarCollapse()
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.setState({ menus: this.props.menus, loading: false })
   }
 
-  renderMenus(data, position){
-    if(!position) return null
+  renderMenus(data, position) {
+    if (!position) return null
     return data.map(e => {
       if (!e.attributes) e.attributes = {}
-      let componentPosition = e.attributes.position || "top" 
-     
+      let componentPosition = e.attributes.position || "top"
+
       return componentPosition == position
         ? (
           <antd.Menu.Item icon={e.icon} key={e.id}>
@@ -46,33 +46,34 @@ export default class Sider_Default extends React.Component {
     return (
       <div className={styles.left_sider_wrapper}>
         <antd.Layout.Sider
+          onDoubleClick={() => { window.toogleSidebarCollapse() }}
           collapsed={this.props.app.sidebar_collapsed || false}
           trigger={null}
           className={styles.left_sider_container}
           width="175px"
-          style={{ flex:'unset' }}
+          style={{ flex: 'unset' }}
         >
-          <div onClick={() => {handleClickMenu({key: ''})}} className={classnames(styles.left_sider_header, {[styles.emb]: this.props.app.embedded})}>
+          <div onClick={() => { handleClickMenu({ key: '' }) }} className={classnames(styles.left_sider_header, { [styles.emb]: this.props.app.embedded })}>
             <img className={styles.logotype} src={this.props.logo} />
-          </div>         
+          </div>
           <div className={styles.left_sider_menuContainer}>
+            <antd.Menu
+              selectable={false}
+              className={styles.left_sider_menuItems}
+              onClick={handleClickMenu}
+            >
+              {this.renderMenus(this.state.menus, "top")}
+            </antd.Menu>
+
+            <div className={styles.left_sider_footer}>
               <antd.Menu
                 selectable={false}
                 className={styles.left_sider_menuItems}
                 onClick={handleClickMenu}
               >
-                {this.renderMenus(this.state.menus, "top")}
+                {this.renderMenus(this.state.menus, "bottom")}
               </antd.Menu>
-
-              <div className={styles.left_sider_footer}>
-                <antd.Menu
-                  selectable={false}
-                  className={styles.left_sider_menuItems}
-                  onClick={handleClickMenu}
-                >
-                  {this.renderMenus(this.state.menus, "bottom")}
-                </antd.Menu>
-              </div>
+            </div>
           </div>
         </antd.Layout.Sider>
       </div>
