@@ -11,11 +11,37 @@ import styles from './index.less'
 
 @connect(({ app, socket }) => ({ app, socket }))
 export default class Explore extends React.Component {
-
   state = {
     socket: null,
     feed: null,
     renderError: false
+  }
+
+  addPostToRender(payload) {
+    let postSchema = {
+      id: this.state.feed[0].id + 1,
+      post_time: "who knows",
+      postText: "empty",
+      publisher: "me",
+      post_likes: 2500
+    }
+
+    if (typeof(payload) !== "undefined") {
+      postSchema = { ...postSchema, ...payload }
+    }
+
+    let updated = this.state.feed
+    updated.push(postSchema)
+    this.setState({ feed: updated })
+    this.goPostById(postSchema.id)
+  }
+
+  goPostById(id) {
+    document.getElementById(id).scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center"
+    })
   }
 
   fetchFeed() {
@@ -53,6 +79,8 @@ export default class Explore extends React.Component {
   }
 
   componentDidMount() {
+    window.addPostToRender = (...context) => this.addPostToRender(...context)
+
     if (this.props.app.session_valid) {
       this.props.dispatch({
         type: "socket/use",

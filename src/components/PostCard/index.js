@@ -6,6 +6,7 @@ import * as Icons from 'components/Icons'
 import * as core from 'core'
 import Icon from '@ant-design/icons'
 import classnames from 'classnames'
+import verbosity from 'core/libs/verbosity'
 
 import settings from 'core/libs/settings'
 import { router } from 'core/libs'
@@ -74,11 +75,13 @@ export default class PostCard extends React.PureComponent {
   }
 
   goElementById(id) {
-    document.getElementById(id).scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-      inline: "center"
-    })
+    if (settings("post_autoposition")) {
+      document.getElementById(id).scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center"
+      })
+    }
   }
 
   toogleMoreMenu() {
@@ -131,16 +134,22 @@ export default class PostCard extends React.PureComponent {
     )
   }
 
-  handleLikeClick = (id) => {
+  handleLikeClick = (id, callback) => {
     if (typeof (this.props.handleActions)) {
-      this.props.handleActions("like", id, (callback) => {
+      this.props.handleActions("like", id, (callbackResponse) => {
         let updated = this.state.payload
-        if (callback.code == 200) {
+        if (callbackResponse.code == 200) {
+          
           updated.is_liked = !this.state.payload.is_liked
-          updated.post_likes = callback.response.count ?? 0
+          updated.post_likes = callbackResponse.response.count ?? 0
           this.setState({ payload: updated })
+
+          if (typeof(callback) !== "undefined") {
+            callback(callbackResponse.response.count)
+          }
+
         } else {
-          verbosity(`Api error response ${callback.code}`)
+          verbosity(`Api error response ${callbackResponse.code}`)
         }
       })
     } else {
@@ -163,7 +172,7 @@ export default class PostCard extends React.PureComponent {
     } = this.state.payload || defaultPayload
 
     const actions = [
-      <LikeBtn handleClick={() => { this.handleLikeClick(id) }} count={post_likes} liked={core.booleanFix(is_liked)} />,
+      <LikeBtn handleClick={(callback) => { this.handleLikeClick(id, (response) => { callback(response) }) }} count={post_likes} liked={core.booleanFix(is_liked)} />,
       <antd.Badge dot={this.state.payload.post_comments > 0 ? true : false}>
         <Icons.MessageSquare key="comments" />
       </antd.Badge>,
@@ -173,7 +182,7 @@ export default class PostCard extends React.PureComponent {
       <div ref={this.elementRef} key={this.state.payload.id} id={this.state.payload.id} className={styles.post_card_wrapper}>
         <antd.Card
           className={settings("post_hidebar") ? null : styles.showMode}
-          onClick={() => this.goElementById(this.state.payload.id)}
+          onClick={() => { this.goElementById(this.state.payload.id) }}
           actions={actions}
           hoverable
         >
@@ -208,9 +217,6 @@ export default class PostCard extends React.PureComponent {
             {this.renderContent(this.state.payload)}
             <div className={styles.ellipsisIcon}>
               <Icons.EllipsisOutlined />
-            </div>
-            <div className={styles.likesIndicator} >
-              {post_likes} likes
             </div>
           </div>
         </antd.Card>

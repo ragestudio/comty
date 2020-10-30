@@ -180,6 +180,28 @@ export function isOs(os) {
   }
 }
 
+export function abbreviateCount(value) {
+  let updated = value
+  if (value >= 1000) {
+    const suffix = ["", "k", "m"]
+    let numberToSuffix = Math.floor(("" + value).length / 3)
+    let divider = ""
+
+    for (const offset = 2; offset >= 1; offset--) {
+      divider = parseFloat((numberToSuffix != 0 ? (value / Math.pow(1000, numberToSuffix)) : value).toPrecision(offset))
+      let firstDot = (divider + "").replace(/[^a-zA-Z 0-9]+/g, '')
+      if (firstDot.length <= 2) {
+        break
+      }
+    }
+    if (divider % 1 != 0) {
+      divider = divider.toFixed(1)
+    }
+    updated = divider + suffix[numberToSuffix]
+  }
+  return updated
+}
+
 export function imageToBase64(img, callback) {
   const reader = new FileReader()
   reader.addEventListener('load', () => callback(reader.result))

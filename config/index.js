@@ -56,6 +56,7 @@ module.exports = {
         verbosity: false,
         session_noexpire: false,
         search_ontype: false,
+        post_autoposition: true,
         overlay_loosefocus: true,
         render_pagetransition_preset: 'moveToRightScaleUp',
         post_catchlimit: '20',
