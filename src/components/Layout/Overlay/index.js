@@ -134,7 +134,7 @@ export default class Overlay extends React.PureComponent {
         <div
           id="Overlay_layout"
           ref={this.setWrapperRef}
-          className={classnames(styles.Overlay_wrapper)}
+          className={classnames(styles.Overlay_wrapper, {[styles.undocked]: window.isMobile})}
         >
             {renderElement()}
         </div>
