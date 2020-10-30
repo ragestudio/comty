@@ -38,8 +38,25 @@
 
 .app{
   &.interfaced{
-    height: calc(100% - @AppTheme_global_winavbar_height)!important;
+    .primary_layout_container{
+      height: 98%;
+      //height: calc(100% - @AppTheme_global_winavbar_height)!important;
+    }
   }
+
+  &.mobile{
+    .primary_layout_container {
+      width: 100%;
+      padding: 0;
+      overflow-y: overlay;
+      overflow-x: hidden;
+      min-width: unset;
+    }
+    .primary_layout_content{
+      padding: 35px 15px 15px;
+    }
+  }
+
   &.dark_mode{
    
     :global{
@@ -67,19 +84,6 @@
   width: 100vw;
 
   transition: all @__Global_Components_transitions_dur linear;
-
-  &.mobile{
-    >.primary_layout_container {
-      padding: 0;
-      overflow-y: overlay;
-      overflow-x: hidden;
-      min-width: unset;
-    }
-    .primary_layout_content{
-      padding: 35px 15px 15px;
-    }
-  }
-
 }
 
 

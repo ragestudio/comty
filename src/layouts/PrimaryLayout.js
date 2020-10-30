@@ -85,11 +85,13 @@ class PrimaryLayout extends React.Component {
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
+        window.isMobile = mobile
         this.setState({
           isMobile: mobile,
         })
       }
     })
+    
   }
 
   componentWillUnmount() {
@@ -133,8 +135,9 @@ class PrimaryLayout extends React.Component {
             opacity: currentTheme.backgroundImage.opacity
           }} /> : null}
         <antd.Layout id="app" className={classnames(styles.app, {
-          [styles.interfaced]: this.props.app.electron,
-          [styles.dark_mode]: window.darkMode
+          [styles.interfaced]: this.props.app.embedded,
+          [styles.dark_mode]: window.darkMode,
+          [styles.mobile]: isMobile
         })}>
           <Sider {...SiderProps} />
           <div className={styles.primary_layout_container}>
