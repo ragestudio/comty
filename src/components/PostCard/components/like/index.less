@@ -1,3 +1,6 @@
+@blur-transition-duration: 150ms;
+@blurFilter-transition-duration: 150ms;
+
 .like_button,
   .like_button:before,
   .like_button:after {
@@ -11,6 +14,48 @@
     position: relative;
     box-sizing: border-box;
   }
+
+  .likesIndicator{
+    margin: auto;
+    position: absolute;
+    z-index: 12;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    border-radius: 0 12px 12px 0;
+    color: #333;
+    width: fit-content;
+    height: fit-content;
+    transition: all 150ms ease-in-out;
+    transform: translate(30px, -4px);
+    padding: 5px 14px;
+  }
+  
+  .likeCounter {
+    font-family: "Poppins", sans-serif;
+
+    opacity: 0;
+    transform: perspective(100px) translateZ(10px);
+    filter: blur(10px);
+    letter-spacing: 0.1em;
+
+    &.active {
+      opacity: 1;
+      transform: perspective(100px) translateZ(0px);
+      filter: blur(0px);
+      letter-spacing: 0.15em;
+      transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
+    }
+
+    &.past {
+      opacity: 0;
+      transform: perspective(100px) translateZ(-10px);
+      filter: blur(10px);
+      letter-spacing: 0.2em;
+      transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
+    }
+  }
+  
 
   .like_button {
     --color-heart: #EA442B;
@@ -26,7 +71,7 @@
     padding: 0;
     margin: 0;
     outline: none;
-    z-index: 2;
+    z-index: 13;
     transition: transform var(--duration) var(--easing);
     cursor: pointer;
 

@@ -23,6 +23,13 @@ export default [
     description: 'Force the app to hide the post actions (likes, comments ...etc) automaticly... [Developer]',
   },
   {
+    id: 'post_autoposition',
+    icon: <Icons.AlignCenter />,
+    type: 'switch',
+    title: 'Auto center on click',
+    description: '',
+  },
+  {
     id: 'verbosity',
     icon: <Icons.Terminal />,
     type: 'switch',

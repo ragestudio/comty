@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './index.less'
 import * as core from 'core'
 import classnames from 'classnames'
+import verbosity from 'core/libs/verbosity'
 
 export default class LikeBtn extends React.Component {
   state = {
@@ -9,22 +10,46 @@ export default class LikeBtn extends React.Component {
     count: this.props.count,
     clicked: false,
   }
-  handleClick(){
-    if (typeof(this.props.handleClick) !== "undefined") {
-      this.props.handleClick()
+
+  handleClick() {
+    let done = false
+    if (typeof (this.props.handleClick) !== "undefined") {
       this.setState({ clicked: true })
-      setTimeout(() => {
-        this.setState({ clicked: false, liked: !this.state.liked })
-      }, 500)
-    }else{
+
+      this.props.handleClick((callback) => {
+        if (typeof (callback) !== "object") {
+          this.setState({ count: callback })
+        } else {
+          verbosity(`Invalid response`)
+          this.setState({ clicked: false, liked: false })
+        }
+        setTimeout(() => {
+          this.setState({ clicked: false, liked: !this.state.liked })
+        }, 150)
+        done = true
+      }, setTimeout(() => {
+        if (!done) {
+          verbosity(`like click timeout!`)
+          this.setState({ clicked: false })
+        }
+      }, 3000))
+
+
+
+    } else {
       return false
     }
   }
 
+  getDecoratorCount(count) {
+    return `${core.abbreviateCount(new Number(count).toString())}`
+  }
+
   render() {
-    const { liked, clicked } = this.state
+    const { liked, clicked, count } = this.state
     return (
-        <button onClick={() => { this.handleClick() }} className={classnames(styles.like_button, {[styles.clickanim]: clicked })} >
+      <div>
+        <button onClick={() => { this.handleClick() }} className={classnames(styles.like_button, { [styles.clickanim]: clicked })} >
           <div className={styles.like_wrapper}>
             <div
               className={classnames(
@@ -46,6 +71,15 @@ export default class LikeBtn extends React.Component {
             </svg>
           </div>
         </button>
+        <div className={styles.likesIndicator} >
+          <span className={classnames(styles.likeCounter, {
+            [styles.active]: !clicked,
+            [styles.past]: clicked,
+          })} >
+            {this.getDecoratorCount(count)}
+          </span>
+        </div>
+      </div>
     )
   }
 }
