@@ -1,8 +1,10 @@
 import React from 'react'
-import { pathMatchRegexp } from 'core'
+import { pathMatchRegexp, booleanFix, __legacy__objectToArray } from 'core'
 import HandleError from 'core/libs/errorhandler'
 import { Invalid } from 'components'
 import styles from './index.less'
+import GlobalBadges from 'globals/badges_list.json'
+import * as Icons from 'components/Icons'
 
 import FollowButton from './components/follow'
 import Menu from './components/menu'
@@ -10,8 +12,9 @@ import { PostsFeed } from 'components'
 
 import * as antd from 'antd'
 import { connect } from 'umi'
+import { verbosity } from '../../core/libs'
 
-class UserLayout extends React.Component {
+export class UserLayout extends React.Component {
   state = {
     styleComponent: "UserLayout",
     userString: pathMatchRegexp('/@/:id', location.pathname)[1],
@@ -24,6 +27,22 @@ class UserLayout extends React.Component {
     }
   }
 
+  handleClickFollow(user_id) {
+    if (typeof (this.props.onFollow) !== "undefined") {
+      this.updateFollow(!booleanFix(this.state.layoutData.is_following))
+
+      this.props.onFollow(user_id, (callback) => {
+        this.updateFollow(callback)
+      })
+    }
+  }
+
+  updateFollow(to) {
+    let updated = this.state.layoutData
+    updated.is_following = to
+    this.setState({ layoutData: updated })
+  }
+
   componentDidMount() {
     const { layoutData } = this.props
     if (layoutData) {
@@ -31,11 +50,61 @@ class UserLayout extends React.Component {
     }
   }
 
+  renderUserBadges() {
+    let { layoutData } = this.state
+    if (typeof(layoutData.user_tags) == "undefined") {
+      return null
+    }
+    let userTags = __legacy__objectToArray(layoutData.user_tags)
+    let renderTags = []
+
+    if (!userTags) {
+      return null
+    }
+
+    try {
+      userTags = JSON.parse(userTags[0].value.badges)
+    } catch (error) {
+      console.log(error)
+    }
+    
+    if (!userTags) {
+      return null
+    }
+
+    __legacy__objectToArray(GlobalBadges).forEach(e => {
+      if(userTags.includes(e.value.id)) {
+        renderTags.push(e.value)
+      }
+    })
+
+    try {
+      if (Array.isArray(userTags)) {
+        return renderTags.map((element) => {
+          return(
+            <antd.Tooltip key={element.key ?? Math.random()} title={element.tip} >
+              <antd.Tag icon={React.createElement(Icons[element.icon]) ?? null} key={element.key ?? Math.random()} color={element.color ?? "default"} >
+                {element.title ?? "maybe"}
+              </antd.Tag>
+            </antd.Tooltip>
+          )
+        })
+      }
+    } catch (error) {
+      return null
+    }
+    return null
+  }
+
   render() {
     const { styleComponent } = this.state
     const toStyles = e => styles[`${styleComponent}_${e}`]
-    const { followers_count } = this.state.layoutData.details ?? {  }
+    const { followers_count } = this.state.layoutData.details ?? {}
+    const isFollowed = booleanFix(this.state.layoutData.is_following)
 
+    if (!this.state.layoutData) {
+      return null
+    }
     return (
       <div className={toStyles("wrapper")} >
         <div className={toStyles("cover")}>
@@ -46,8 +115,10 @@ class UserLayout extends React.Component {
           <div className={toStyles("avatar")}>
             <antd.Avatar shape="square" src={this.state.layoutData.avatar} />
           </div>
-
           <div className={toStyles("title")}>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "7px" }} >
+              {/* {this.renderUserBadges()} */}
+            </div>
             <antd.Tooltip title={`${followers_count ?? "Non-existent"} Followers`}>
               <h1>{this.state.userString}</h1>
             </antd.Tooltip>
@@ -60,19 +131,19 @@ class UserLayout extends React.Component {
                 marginBottom: '5px',
               }}
               dangerouslySetInnerHTML={{
-                __html: this.state.layoutData.about,
+                __html: typeof(this.state.layoutData.about) == "string"? this.state.layoutData.about : null,
               }}
             />
           </div>
 
           <div className={toStyles("options")}>
-            <div><FollowButton followed={this.state.layoutData.follow} /></div>
+            <div><FollowButton onClick={() => { this.handleClickFollow(this.state.layoutData.user_id) }} followed={isFollowed} /></div>
           </div>
 
         </div>
 
         <div className={toStyles("content")}>
-
+              
         </div>
       </div>
     )
@@ -89,6 +160,41 @@ export default class UserIndexer extends React.Component {
   }
 
   promiseState = async state => new Promise(resolve => this.setState(state, resolve));
+
+  handleClickFollow(user_id, callback) {
+    if (this.props.app.session_valid) {
+      const requestCallback = (callbackResponse) => {
+        if (callbackResponse.code == 200) {
+          const response = callbackResponse.response
+          const result =( response.follow ?? false) == "followed" ? true : false
+          if (typeof(response) !== "undefined") {
+            return callback(result)
+          }else{
+            return false
+          }
+        }else{
+          return callback(null)
+        }
+      }
+
+      this.props.dispatch({
+        type: "socket/use",
+        scope: "users",
+        invoke: "actions",
+        query: {
+          payload: {
+            userToken: this.props.app.session_token,
+            action: "follow",
+            user_id,
+          },
+          callback: requestCallback
+        }
+      })
+    }else{
+      verbosity(`Need auth`)
+    }
+    
+  }
 
   componentDidMount() {
     const matchRegexp = pathMatchRegexp('/@/:id', location.pathname)
@@ -123,7 +229,7 @@ export default class UserIndexer extends React.Component {
     }
     return (
       <div>
-        <UserLayout layoutData={this.state.layoutData} />
+        <UserLayout onFollow={(...context) => {this.handleClickFollow(...context)}} layoutData={this.state.layoutData} />
         <PostsFeed from="user" fromID={this.state.layoutData.user_id} />
       </div>
 
