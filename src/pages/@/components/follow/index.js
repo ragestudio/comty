@@ -4,7 +4,7 @@ import classnames from 'classnames'
 
 const FollowButton = (props) => {
   return (
-    <a className={classnames(styles.button, {[styles.disabled]: !props.followed })}>
+    <a onClick={props.onClick} className={classnames(styles.button, {[styles.disabled]: !props.followed })}>
       <span>{props.followed ? 'Following' : 'Follow'}</span>
     </a>
   )

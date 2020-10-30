@@ -88,8 +88,8 @@ export default {
               then(socket)
             }
             if (typeof(query) !== "undefined") {
-              socket._emit(invoke, query.payload, (callback) =>{
-                new Promise((resolve, reject) => resolve(query.callback(callback))).then(() => {
+              socket._emit(invoke, query.payload, (...callbacks) =>{
+                new Promise((resolve, reject) => resolve(query.callback(...callbacks)) ).then(() => {
                   if (!persistent) {
                     socket.remove()
                   }

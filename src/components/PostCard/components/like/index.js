@@ -6,6 +6,7 @@ import verbosity from 'core/libs/verbosity'
 
 export default class LikeBtn extends React.Component {
   state = {
+    hoveringCounter: false,
     liked: this.props.liked,
     count: this.props.count,
     clicked: false,
@@ -34,21 +35,31 @@ export default class LikeBtn extends React.Component {
         }
       }, 3000))
 
-
-
     } else {
       return false
     }
   }
 
+  handleLeave() {
+    if (this.state.hoveringCounter) {
+      this.setState({hoveringCounter: false })
+    }
+  }
+
+  handleOver() {
+    if (!this.state.hoveringCounter) {
+      this.setState({hoveringCounter: true })
+    }
+  }
+
   getDecoratorCount(count) {
-    return `${core.abbreviateCount(new Number(count).toString())}`
+    return <span>{this.state.hoveringCounter? `${count}` : core.abbreviateCount(new Number(count).toString())}</span>
   }
 
   render() {
     const { liked, clicked, count } = this.state
     return (
-      <div>
+      <div onMouseLeave={() => this.handleLeave()} onMouseOver={() => this.handleOver()}>
         <button onClick={() => { this.handleClick() }} className={classnames(styles.like_button, { [styles.clickanim]: clicked })} >
           <div className={styles.like_wrapper}>
             <div
@@ -71,7 +82,7 @@ export default class LikeBtn extends React.Component {
             </svg>
           </div>
         </button>
-        <div className={styles.likesIndicator} >
+        <div className={classnames(styles.likesIndicator, {[styles.hover]: this.state.hoveringCounter})} >
           <span className={classnames(styles.likeCounter, {
             [styles.active]: !clicked,
             [styles.past]: clicked,

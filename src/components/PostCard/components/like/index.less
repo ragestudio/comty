@@ -16,6 +16,7 @@
   }
 
   .likesIndicator{
+    cursor: default;
     margin: auto;
     position: absolute;
     z-index: 12;
@@ -24,26 +25,32 @@
     background-color: #fff;
     border-radius: 0 12px 12px 0;
     color: #333;
-    width: fit-content;
+    width: 52px;
     height: fit-content;
     transition: all 150ms ease-in-out;
     transform: translate(30px, -4px);
     padding: 5px 14px;
+
+    &.hover{
+      width: 90px;
+    }
+    text-align: center;
   }
-  
+
+
   .likeCounter {
     font-family: "Poppins", sans-serif;
 
     opacity: 0;
     transform: perspective(100px) translateZ(10px);
     filter: blur(10px);
-    letter-spacing: 0.1em;
+    letter-spacing: 0;
 
     &.active {
       opacity: 1;
       //transform: perspective(100px) translateZ(0px);
       filter: blur(0px);
-      letter-spacing: 0.15em;
+      
       transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
     }
 
@@ -51,7 +58,7 @@
       opacity: 0;
       //transform: perspective(100px) translateZ(-10px);
       filter: blur(1px);
-      letter-spacing: 0.2em;
+      letter-spacing: 0.15em;
       transition: opacity @blur-transition-duration linear, transform @blur-transition-duration linear, filter @blurFilter-transition-duration linear, letter-spacing @blur-transition-duration linear;
     }
   }
