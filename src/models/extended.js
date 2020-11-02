@@ -1,4 +1,4 @@
-import { router, verbosity, appInterface } from 'core/libs'
+import { router, verbosity, ui } from 'core/libs'
 import { DynamicSDCP } from 'core/libs/dynamicsdcp'
 import settings from 'core/libs/settings'
 import * as core from 'core'
@@ -31,14 +31,14 @@ export default {
         usePlugins([payload.array], (err, results) => {
           if (err) {
             verbosity(["Init error!", err])
-            appInterface.notify.error("Plugin initialize error!", err)
+            ui.notify.error("Plugin initialize error!", err)
             return false
           }
           const rootInit = results[0]
 
           if (!rootInit.uuid) {
             verbosity("Cannot initialize a plugin without UUID.", "Please read SDK documentation for more info.")
-            appInterface.notify.error("Cannot initialize a plugin without UUID.")
+            ui.notify.error("Cannot initialize a plugin without UUID.")
             return false
           }
 
@@ -85,7 +85,7 @@ export default {
 
           window.PluginGlobals[plugin.uuid] = new extendedPlugin({ extended, extendedRequire })
 
-          appInterface.notify.open({
+          ui.notify.open({
             message: `${plugin.title} v${plugin.version}`,
             description: `New plugin is now installed !`
           })

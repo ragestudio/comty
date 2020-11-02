@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './index.less'
 import { clientInfo, GUID, package_json } from 'core'
-import * as Icons from 'components/Icons'
+import { Monitor, Package, Radio, Layers } from 'components/Icons'
 import * as antd from 'antd'
 
 export default class App_About extends React.Component {
@@ -16,10 +16,10 @@ export default class App_About extends React.Component {
           <h1 className={styles.appName}> {clientInfo.siteName} </h1>
           {GUID}
           <br />
-          <antd.Tag color="green"><Icons.Monitor />{clientInfo.os.toString()}</antd.Tag>
-          <antd.Tag color="geekblue"><Icons.Package />v{clientInfo.version}</antd.Tag>
-          <antd.Tag color="red"><Icons.Radio />{clientInfo.packageStage}</antd.Tag>
-          <antd.Tag color="magenta"><Icons.Layers />Render with {clientInfo.layout}</antd.Tag>
+          <antd.Tag color="green"><Monitor />{clientInfo.os.toString()}</antd.Tag>
+          <antd.Tag color="geekblue"><Package />v{clientInfo.version}</antd.Tag>
+          <antd.Tag color="red"><Radio />{clientInfo.packageStage}</antd.Tag>
+          <antd.Tag color="magenta"><Layers />Render with {clientInfo.layout}</antd.Tag>
           {this.renderStableTag()}
 
         </antd.Card>

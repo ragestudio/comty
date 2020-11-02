@@ -1,39 +1,39 @@
-import * as Icons from 'components/Icons'
+import { Image, Sidebar, Droplet, FontColorsOutlined, Volume2, Moon } from 'components/Icons'
 
 export default [
     {
       id: 'backgroundImage',
-      icon: <Icons.Image />,
+      icon: <Image />,
       title: 'Background',
       description: 'Change the background of the app',
     },
     {
       id: 'overlay',
-      icon: <Icons.Sidebar />,
+      icon: <Sidebar />,
       title: 'Overlay',
       description: 'Description blah blah',
     },
     {
       id: 'color',
-      icon: <Icons.Droplet />,
+      icon: <Droplet />,
       title: 'Colors',
       description: 'Texts, Buttons, Sliders ...etc',
     },
     {
       id: 'text',
-      icon: <Icons.FontColorsOutlined style={{ marginRight: '10px' }} />,
+      icon: <FontColorsOutlined style={{ marginRight: '10px' }} />,
       title: 'Text',
       description: 'Sizes, Fonts',
     },
     {
       id: 'sounds',
-      icon: <Icons.Volume2 />,
+      icon: <Volume2 />,
       title: 'Sounds',
       description: 'BlipBlopBLup',
     },
     {
       id: 'darkmode',
-      icon: <Icons.Moon />,
+      icon: <Moon />,
       title: 'Dark Mode',
       description: 'Yeaah, no more daying',
     }

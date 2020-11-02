@@ -1,6 +1,6 @@
 import React from 'react'
 import { iatToString } from 'core'
-import { router, appInterface } from 'core/libs'
+import { router, ui } from 'core/libs'
 
 import styles from './index.less'
 import classnames from 'classnames'
@@ -63,7 +63,7 @@ class Login extends React.Component {
 
   componentDidMount() {
     if (this.props.app.session_valid) {
-      appInterface.notify.info('You have already logged into an account, you can change your account by logging in again')
+      ui.notify.info('You have already logged into an account, you can change your account by logging in again')
     }
   }
 

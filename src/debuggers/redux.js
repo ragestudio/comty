@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'umi';
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
+import { Database, Redux, AlertTriangle } from 'components/Icons'
 import { ParamsList } from 'components'
 import { __legacy__objectToArray } from 'core'
 import store from 'store'
@@ -82,7 +82,7 @@ class ReduxDebugger extends React.Component {
                         style={{ wordBreak: 'break-all' }}
                         header={
                             <div style={{ display: "flex", alignItems: "center", marginLeft: '10px' }} >
-                                <Icons.Database />
+                                <Database />
                                 <strong>{e.key}</strong>
                             </div>
                         }>
@@ -94,7 +94,7 @@ class ReduxDebugger extends React.Component {
         return (
             <div style={{ background: "#fff", borderRadius: "8px", padding: "25px 15px" }}>
                 <div style={{ marginBottom: "35px" }}>
-                    <h1 style={{ fontSize: '24px' }}><Icons.Redux /> Redux Store <span style={{ fontSize: '14px', float: "right" }}><Icons.AlertTriangle />Dangerously experimental debugger</span></h1>
+                    <h1 style={{ fontSize: '24px' }}><Redux /> Redux Store <span style={{ fontSize: '14px', float: "right" }}><AlertTriangle />Dangerously experimental debugger</span></h1>
                     <antd.Card>{this.renderCheckboxes()}</antd.Card>
                 </div>
                 <hr />

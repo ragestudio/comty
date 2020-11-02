@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
 import errNumbers from 'config/handlers/numToError.js'
-import { Icons } from 'components'
+import { Meh } from 'components/Icons'
 
 const InvalidSkeleton = (props) => {
     return(
@@ -70,7 +70,7 @@ export default class Invalid extends React.Component{
 
         }
         return <Custom
-            icon={<Icons.Meh style={{ fontSize: "100px" }} />} 
+            icon={<Meh style={{ fontSize: "100px" }} />} 
             title="A function called this component due to an error, but apparently it also caused an error when configuring these parameters."
             message="it seems that someone is not having a good day"
         />

@@ -2,7 +2,7 @@ import React, { useLayoutEffect } from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
 import { MediaPlayer } from 'components'
-import * as Icons from 'components/Icons'
+import { Clipboard, Aperture, FlagOutlined, MessageSquare, MoreOutlined, PushpinFilled, EllipsisOutlined, verifiedBadge } from 'components/Icons'
 import * as core from 'core'
 import Icon from '@ant-design/icons'
 import classnames from 'classnames'
@@ -12,6 +12,7 @@ import settings from 'core/libs/settings'
 import { router } from 'core/libs'
 import LikeBtn from './components/like/index.js'
 import { connect } from 'umi'
+import { clipboard } from 'core/libs/browser'
 
 const { Meta } = antd.Card
 
@@ -36,17 +37,17 @@ const contextMenuList = [
   {
     key: "inspect_element",
     title: "Copy URL",
-    icon: <Icons.Clipboard />,
+    icon: <Clipboard />,
     params: {
       onClick: (e) => {
-        core.writeToClipboard(core.generatePostURI(e.id))
+        clipboard.copyText(core.generatePostURI(e.id))
       }
     }
   },
   {
     key: "screenshot",
     title: "Save screenshot",
-    icon: <Icons.Aperture />,
+    icon: <Aperture />,
     params: {
       itemProps: {
         style: { color: "#40a9ff" }
@@ -92,7 +93,7 @@ export default class PostCard extends React.PureComponent {
     if (this.state.ReportIgnore) return null
     return (
       <div className={styles.post_card_flaggedWarning}>
-        <Icons.FlagOutlined />
+        <FlagOutlined />
         <h3>It seems that this post has been reported</h3>
         <p>The content may be inappropriate or compromising</p>
         <antd.Button
@@ -174,7 +175,7 @@ export default class PostCard extends React.PureComponent {
     const actions = [
       <LikeBtn handleClick={(callback) => { this.handleLikeClick(id, (response) => { callback(response) }) }} count={post_likes} liked={core.booleanFix(is_liked)} />,
       <antd.Badge dot={this.state.payload.post_comments > 0 ? true : false}>
-        <Icons.MessageSquare key="comments" />
+        <MessageSquare key="comments" />
       </antd.Badge>,
     ]
 
@@ -198,16 +199,16 @@ export default class PostCard extends React.PureComponent {
                 <div className={styles.post_card_title}>
                   <h4 onClick={() => router.goProfile(publisher.username)} className={styles.titleUser}>
                     @{publisher.username}
-                    {core.booleanFix(publisher.verified) ? (<Icon style={{ color: 'blue' }} component={Icons.verifiedBadge} />) : null}
+                    {core.booleanFix(publisher.verified) ? (<Icon style={{ color: 'blue' }} component={verifiedBadge} />) : null}
                     {core.booleanFix(publisher.nsfw_flag) ? (<antd.Tag style={{ margin: '0 0 0 13px' }} color="volcano" > NSFW </antd.Tag>) : null}
                   </h4>
                   <div className={styles.PostTags}>
                     <div className={styles.MoreMenu}>
                       <antd.Dropdown onVisibleChange={this.handleVisibleChange} visible={this.state.visibleMoreMenu} trigger={['click']}>
-                        <Icons.MoreOutlined key="actionMenu" />
+                        <MoreOutlined key="actionMenu" />
                       </antd.Dropdown>
                     </div>
-                    {core.booleanFix(is_post_pinned) ? (<Icons.PushpinFilled />) : null}
+                    {core.booleanFix(is_post_pinned) ? (<PushpinFilled />) : null}
                   </div>
                 </div>
               }
@@ -216,7 +217,7 @@ export default class PostCard extends React.PureComponent {
             />
             {this.renderContent(this.state.payload)}
             <div className={styles.ellipsisIcon}>
-              <Icons.EllipsisOutlined />
+              <EllipsisOutlined />
             </div>
           </div>
         </antd.Card>

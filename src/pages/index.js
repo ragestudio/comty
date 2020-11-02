@@ -3,7 +3,7 @@ import ReduxDebugger from 'debuggers/redux'
 import * as antd from 'antd'
 import { FloatComponent } from 'components'
 import { connect } from 'umi'
-import * as Icons from 'components/Icons'
+import { ClusterOutlined } from 'components/Icons'
 import { __legacy__objectToArray } from 'core'
 
 @connect((store) => (store))
@@ -57,7 +57,7 @@ export default class Index extends React.Component {
                 <ReduxDebugger />
 
                 <antd.Card>
-                    <h1><Icons.ClusterOutlined style={{ marginRight: "7px" }} /> Socket </h1>
+                    <h1><ClusterOutlined style={{ marginRight: "7px" }} /> Socket </h1>
                     <antd.Card>
                         <h3> Header Node </h3>
                         <antd.Card>

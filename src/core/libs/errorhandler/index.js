@@ -1,4 +1,4 @@
-import { appInterface } from 'core/libs'
+import { ui } from 'core/libs'
 import verbosity from 'core/libs/verbosity'
 import errStrings from 'config/handlers/errToStrings.js'
 import errNumbers from 'config/handlers/numToError.js'
@@ -15,7 +15,7 @@ export function notifyErrorHandler(params) {
     if (!params) {
         return false
     }
-    appInterface.notify.open({
+    ui.notify.open({
       message: flagToString[params.flag] ?? "Unexpected Error",
       description:
       <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto', height: "auto" }}>

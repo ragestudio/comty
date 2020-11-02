@@ -1,8 +1,6 @@
 import verbosity from 'core/libs/verbosity'
-import * as Icons from 'components/Icons'
 import styles from './index.less'
 import ReactDOM from 'react-dom'
-import * as antd from 'antd'
 import React from 'react'
 
 let onRend = false
