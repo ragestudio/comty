@@ -1,4 +1,4 @@
-import * as Icons from 'components/Icons'
+import { Home, Compass, Bookmark, MessageSquare, Box, Package, Tv, Tool, Settings, LogIn, LogOut } from 'components/Icons'
 
 /**
  * Sidebar Menu scheme
@@ -16,7 +16,7 @@ import * as Icons from 'components/Icons'
 export default [
     {
         id: 'main',
-        icon: <Icons.Home />,
+        icon: "Home",
         title: 'Main',
         attributes: {
             require: 'login',
@@ -26,12 +26,12 @@ export default [
     {
         id: 'explore',
         title: 'Explore',
-        icon: <Icons.Compass />,
+        icon: "Compass",
     },
     {
         id: 'saves',
         title: 'Saves',
-        icon: <Icons.Bookmark />,
+        icon: "Bookmark",
         attributes: {
             require: 'login',
             mobile: false
@@ -40,7 +40,7 @@ export default [
     {
         id: 'messages',
         title: 'Messages',
-        icon: <Icons.MessageSquare />,
+        icon: "MessageSquare",
         attributes: {
             require: 'login'
         }
@@ -48,7 +48,7 @@ export default [
     {
         id: 'rooms',
         title: 'Rooms',       
-        icon: <Icons.Box />,
+        icon: "Box",
         attributes: {
             require: 'login'
         }
@@ -56,7 +56,7 @@ export default [
     {
         id: 'workshop',
         title: 'Workshop',       
-        icon: <Icons.Package />,
+        icon: "Package",
         attributes: {
             require: 'login'
         }
@@ -64,7 +64,7 @@ export default [
     {
         id: 'streams',
         title: 'Streams',       
-        icon: <Icons.Tv />,
+        icon: "Tv",
         attributes: {
             require: 'login'
         }
@@ -72,7 +72,7 @@ export default [
     {
         id: 'debug',
         title: 'Debug',
-        icon: <Icons.Tool />,
+        icon: "Tool",
         attributes: {
             position: "bottom",
             require: "dev"
@@ -81,7 +81,7 @@ export default [
     {
         id: 'settings',
         title: 'Settings',
-        icon: <Icons.Settings />,
+        icon: "Settings",
         attributes: {
             position: "bottom"
         }
@@ -89,7 +89,7 @@ export default [
     {
         id: 'logout',
         title: 'Logout',
-        icon: <Icons.LogOut style={{ color: '#ef233c', marginRight: '10px' }} />,
+        icon: "LogOut",
         attributes: {
             position: "bottom",
             require: 'login'
@@ -98,7 +98,7 @@ export default [
     {
         id: 'login',
         title: 'Signin',
-        icon: <Icons.LogIn style={{ color: '#3a86ff', marginRight: '10px' }} />,
+        icon: "LogIn",
         attributes: {
             position: "bottom",
             require: "guest"

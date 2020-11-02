@@ -2,8 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import { connect } from 'umi'
 import { router } from 'core/libs';
-import * as Icons from 'components/Icons'
-
+import { Home, Trash } from 'components/Icons'
 @connect(({ app }) => ({ app }))
 export default class Logout extends React.Component{
 
@@ -23,8 +22,8 @@ export default class Logout extends React.Component{
             onCancel() {
                 dispatchLogout()
             },
-            okText: <><Icons.Home/>Resume</>,
-            cancelText: <><Icons.Trash/>Logout</>
+            okText: <><Home/>Resume</>,
+            cancelText: <><Trash/>Logout</>
           });
     }
     

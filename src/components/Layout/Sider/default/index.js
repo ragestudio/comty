@@ -30,7 +30,7 @@ export default class Sider_Default extends React.Component {
 
       return componentPosition == position
         ? (
-          <antd.Menu.Item icon={e.icon} key={e.id}>
+          <antd.Menu.Item icon={React.createElement(Icons[e.icon])} key={e.id}>
             <span>{e.title}</span>
           </antd.Menu.Item>
         )

@@ -1,7 +1,6 @@
 import * as React from 'react'
-import * as app from 'app'
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
+import { LeftOutlined } from 'components/Icons'
 import styles from '../../index.less'
 import classnames from 'classnames'
 
@@ -27,7 +26,7 @@ const renderExit = (props: __sec_props) => {
     const {functs} = props
     if (isOpen) {
         return <div className={styles.exit_button}>
-            <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => functs.Swapper.close()}> Back </antd.Button>
+            <antd.Button type="ghost" icon={<LeftOutlined />} onClick={() => functs.Swapper.close()}> Back </antd.Button>
             </div>
     }
     return null

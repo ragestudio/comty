@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
+import { LeftOutlined  } from 'components/Icons'
 import styles from '../../index.less'
 import classnames from 'classnames'
 import { Swapper } from '../../index.js'
@@ -17,7 +17,7 @@ export interface overlay_primary_props {
 
 const renderExit = (
     <div className={styles.exit_button}>
-    <antd.Button type="ghost" icon={<Icons.LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
+    <antd.Button type="ghost" icon={<LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
     </div>
 )
 

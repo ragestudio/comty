@@ -1,34 +1,34 @@
 import { notification, message } from 'antd'
-import * as Icons from 'components/Icons'
+import { FieldTimeOutlined } from 'components/Icons'
 import errStrings from 'config/handlers/errToStrings.js'
 import errNumbers from 'config/handlers/numToError.js'
-import errFlags from  'config/handlers/errToFlag.js'
+import errFlags from 'config/handlers/errToFlag.js'
 
 export default {
-    SESSION_INVALID: (payload) => {
-        notification.error({
-          message: payload.msg ?? 'Hey',
-          icon: <Icons.FieldTimeOutlined />,
-          description: errStrings[payload.out] ?? "This session is not valid",
-          placement: 'bottomLeft',
-        })
-    },
-    OVERLAY_BADPOSITION: () => {
-        
-    },
-    INTERNAL_PROCESS_FAILED: () =>{
+  SESSION_INVALID: (payload) => {
+    notification.error({
+      message: payload.msg ?? 'Hey',
+      icon: <FieldTimeOutlined />,
+      description: errStrings[payload.out] ?? "This session is not valid",
+      placement: 'bottomLeft',
+    })
+  },
+  OVERLAY_BADPOSITION: () => {
 
-    },
-    INVALID_DATA: () => {
+  },
+  INTERNAL_PROCESS_FAILED: () => {
 
-    },
-    INVALID_PROPS: () => {
+  },
+  INVALID_DATA: () => {
 
-    },
-    MISSING_REQUIRED_PAYLOAD: () => {
+  },
+  INVALID_PROPS: () => {
 
-    },
-    INVALID_INDEX: () => {
+  },
+  MISSING_REQUIRED_PAYLOAD: () => {
 
-    }
+  },
+  INVALID_INDEX: () => {
+
+  }
 }

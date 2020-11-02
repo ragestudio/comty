@@ -1,6 +1,6 @@
 import React from 'react';
 import * as antd from 'antd'
-import * as Icons from 'components/Icons'
+import { RefreshCw } from 'components/Icons'
 import { __legacy__objectToArray, getCircularReplacer, decycle } from 'core'
 
 const serializeFlags = {
@@ -41,7 +41,7 @@ const getDecoratorStr = (e, json) => {
                     return `Empty (null/undefined)`
                 }
                 if (isFlagId(e.value, 0)) {
-                    return <span><Icons.RefreshCw /> Cylic </span>
+                    return <span><RefreshCw /> Cylic </span>
                 }
                 if (typeof (e.value.length) !== "undefined") {
                     return `Lenght (${e.value.length})`
@@ -80,7 +80,7 @@ const getContent = (e) => {
                 }
                 if (isFlagId(e.value, 0)) {
                     return <div key={e.key} style={{ display: "flex", alignItems: "center", padding: "12px 16px", height: "47px", backgroundColor: "#d9d9d9" }} >
-                        <Icons.RefreshCw /> This cannot be rendered because a cylic has been detected
+                        <RefreshCw /> This cannot be rendered because a cylic has been detected
                     </div>
                 }
                 if (Object.keys(e.value).length > 0) { // trying create nested

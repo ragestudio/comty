@@ -1,7 +1,7 @@
 import React from 'react'
 import ErrorHandler from 'core/libs/errorhandler'
 import { theme } from 'core/libs/style'
-import exportDataAsFile from 'core/libs/appInterface/export_data'
+import exportDataAsFile from 'core/libs/ui/export_data'
 import verbosity from 'core/libs/verbosity'
 
 export default class ThemeConfigurator extends React.Component {

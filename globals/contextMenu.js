@@ -1,10 +1,9 @@
-import * as Icons from 'components/Icons'
-
+import { Command } from 'components/Icons'
 export default [
  {
    key: "inspect_element",
    title: "Inspect",
-   icon: <Icons.Command />,
+   icon: <Command />,
    require: "embedded",
    params: {
      onClick: (e) => {

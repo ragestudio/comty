@@ -1,7 +1,6 @@
 // @alias from 'components'
 
 // Helpers & Misc
-import * as Icons from './Icons'
 import Loader from './Loader'
 import About from './About'
 import * as Feather from 'feather-reactjs'
@@ -32,7 +31,6 @@ export {
   AppLayout,
   PostCard,
   Invalid,
-  Icons,
   Feather,
   About,
   MediaPlayer,

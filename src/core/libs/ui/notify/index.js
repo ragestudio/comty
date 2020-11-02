@@ -1,11 +1,11 @@
 import { notification, message } from 'antd'
-import * as Icons from 'components/Icons'
+import { Triangle, FieldTimeOutlined, LoadingOutlined } from 'components/Icons'
 
 export const notify = {
     fatal: (...res) => {
       notification.error({
         message: 'Fatal Error',
-        icon: <Icons.Triangle style={{ color: '#fa8c16' }} />,
+        icon: <Triangle style={{ color: '#fa8c16' }} />,
         description: res,
         placement: 'bottomLeft'
       })
@@ -13,7 +13,7 @@ export const notify = {
     expire: (...res) => {
       notification.error({
         message: 'Hey ',
-        icon: <Icons.FieldTimeOutlined />,
+        icon: <FieldTimeOutlined />,
         description: res,
         placement: 'bottomLeft',
       })
@@ -73,7 +73,7 @@ export const notify = {
     },
     proccess: (...res) => {
       notification.open({
-        icon: <Icons.LoadingOutlined style={{ color: '#108ee9' }} />,
+        icon: <LoadingOutlined style={{ color: '#108ee9' }} />,
         message: 'Please wait',
         description: <div>{res}</div>,
         placement: 'bottomLeft',
@@ -83,7 +83,7 @@ export const notify = {
       notification.open({
         placement: props.placement? props.placement : 'bottomLeft',
         duration: props.duration? props.placement : 15,
-        icon: props.icon? props.icon : <Icons.Triangle style={{ color: '#fa8c16' }} />,
+        icon: props.icon? props.icon : <Triangle style={{ color: '#fa8c16' }} />,
         message: props.message? props.message : '',
         description: props.description? props.description : ''
       })

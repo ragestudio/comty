@@ -145,7 +145,7 @@ export function generatePostURI(id) {
 export function writeToClipboard(text) {
   navigator.clipboard.writeText(text)
     .then(() => {
-      libs.appInterface.notify.info('Copy to clipboard')
+      libs.ui.notify.info('Copy to clipboard')
     }, () => {
       /* failure */
     })

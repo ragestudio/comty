@@ -1,5 +1,5 @@
 import verbosity from 'core/libs/verbosity'
-import * as Icons from 'components/Icons'
+import { XCircle } from 'components/Icons'
 import ReactDOM from 'react-dom'
 import * as antd from 'antd'
 import React from 'react'
@@ -31,7 +31,7 @@ class FloatComponent extends React.Component {
             >
                 <div style={{ top: 0, position: "sticky", borderRadius: "8px 8px 0 0", background: "rgba(0, 0, 0, 0.4)", width: "100%", height: "35px", display: "flex", alignItems: "center", color: "#fff" }}>
                     <div style={{ fontSize: "15px", color: "#fff", display: "flex", height: "100%", padding: "0 10px", alignItems: "center", marginRight: "5px" }}>
-                        <Icons.XCircle onClick={this.handleClose} style={{ cursor: "pointer" }} />
+                        <XCircle onClick={this.handleClose} style={{ cursor: "pointer" }} />
                     </div>
                     <div style={{ fontSize: "12px" }}>
                         {this.props.title ?? null}

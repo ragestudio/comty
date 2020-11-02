@@ -1,7 +1,7 @@
 import io from 'socket.io-client'
 import verbosity from 'core/libs/verbosity'
 import settings from 'core/libs/settings'
-import { notify } from 'core/libs/appInterface'
+import { notify } from 'core/libs/ui'
 
 const stateCodes = {
     0: "closed",
