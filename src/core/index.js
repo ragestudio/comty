@@ -187,7 +187,7 @@ export function abbreviateCount(value) {
     let numberToSuffix = Math.floor(("" + value).length / 3)
     let divider = ""
 
-    for (const offset = 2; offset >= 1; offset--) {
+    for (let offset = 2; offset >= 1; offset--) {
       divider = parseFloat((numberToSuffix != 0 ? (value / Math.pow(1000, numberToSuffix)) : value).toPrecision(offset))
       let firstDot = (divider + "").replace(/[^a-zA-Z 0-9]+/g, '')
       if (firstDot.length <= 2) {

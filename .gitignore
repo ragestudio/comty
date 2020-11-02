@@ -5,6 +5,7 @@
 /yarn.lock
 
 # production
+/build
 /dist
 /out
 
