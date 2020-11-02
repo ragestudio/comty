@@ -10,10 +10,11 @@
   "types": "index.d.ts",
   "build": {
     "files": [
-      "./dist/**/*",
-      "./pages/**/*",
-      "./node_modules/**/*"
+      "./dist/**/*"
     ],
+    "directories": {
+      "output": "./build" 
+    },
     "appId": "com.rstudio.comty",
     "asar": false
   },
@@ -23,12 +24,13 @@
     "debug": "node --inspect-brk ./node_modules/.bin/umi dev",
     "postinstall": "electron-builder install-app-deps",
     "electronDev": "concurrently \"electron .\" \"npm start\"",
+    "electronDist": "electron-builder",
     "electron": "electron .",
     "umibuild": "umi build",
     "build": "npm run build:main && npm run build:renderer",
     "build:main": "roadhog build",
     "build:renderer": "umi build",
-    "pack": "npm run build && npm run rebuild && build",
+    "pack": "umi build && electron-builder -w nsis:x64",
     "pack:dir": "npm run build && npm run rebuild && build --dir",
     "pack:dirOnly": "build --dir"
   },
