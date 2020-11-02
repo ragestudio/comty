@@ -1,5 +1,5 @@
-import { defineConfig } from 'umi';
-const { resolve, join } = require('path');
+import { defineConfig, chainWebpack } from 'umi'
+import { resolve } from 'path'
 
 export default defineConfig({
   hash: true,
