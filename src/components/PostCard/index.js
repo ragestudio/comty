@@ -115,9 +115,9 @@ export default class PostCard extends React.PureComponent {
             <h3 dangerouslySetInnerHTML={{ __html: payload.postText }} />
           </div>
         ) : null}
-        {payload.postFile ? (
+        {payload.postFile_full ? (
           <div className={styles.post_card_file}>
-            <MediaPlayer file={payload.postFile} />
+            <MediaPlayer file={payload.postFile_full} />
           </div>
         ) : null}
       </div>
