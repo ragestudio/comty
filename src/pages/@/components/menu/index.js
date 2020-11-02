@@ -1,6 +1,6 @@
 import React from 'react'
 import * as antd from 'antd'
-import { Icons } from 'components'
+import { MoreOutlined } from 'components/Icons'
 
 const moreMenu = (
     <antd.Menu>
@@ -12,7 +12,7 @@ const moreMenu = (
 const Menu = (props) => {
   return (
     <antd.Dropdown overlay={moreMenu}>
-        <Icons.MoreOutlined />
+        <MoreOutlined />
     </antd.Dropdown> 
   )
 }

@@ -1,7 +1,9 @@
-import React, { useLayoutEffect } from 'react'
+import React from 'react'
 import * as antd from 'antd'
 import styles from './index.less'
 import { MediaPlayer } from 'components'
+import * as Icons from 'components/Icons'
+
 import { Clipboard, Aperture, FlagOutlined, MessageSquare, MoreOutlined, PushpinFilled, EllipsisOutlined, verifiedBadge } from 'components/Icons'
 import * as core from 'core'
 import Icon from '@ant-design/icons'
@@ -32,6 +34,20 @@ const defaultPayload = {
   postBoosted: false,
   ReportIgnore: false,
 }
+
+const moreMenuList = [
+  {
+    key: "save_post",
+    icon: "Save",
+    textEnable: "Save post",
+    textDisable: "Unsave post"
+  },
+  {
+    key: "report_post",
+    icon: "AlertCircle",
+    text: "Report"
+  }
+]
 
 const contextMenuList = [
   {
@@ -140,12 +156,12 @@ export default class PostCard extends React.PureComponent {
       this.props.handleActions("like", id, (callbackResponse) => {
         let updated = this.state.payload
         if (callbackResponse.code == 200) {
-          
+
           updated.is_liked = !this.state.payload.is_liked
           updated.post_likes = callbackResponse.response.count ?? 0
           this.setState({ payload: updated })
 
-          if (typeof(callback) !== "undefined") {
+          if (typeof (callback) !== "undefined") {
             callback(callbackResponse.response.count)
           }
 
@@ -156,6 +172,22 @@ export default class PostCard extends React.PureComponent {
     } else {
       verbosity(`socket connection not available`)
     }
+  }
+
+  getMenuValue(id) {
+    return true // fetch from local state
+  }
+
+  handleMenuClick(id) {
+    return true // mapToFunction
+  }
+
+  renderMoreMenu() {
+    return moreMenuList.map((e) => {
+      return (<antd.Menu.Item onClick={() => this.handleMenuClick(e.id)} key={e.id ?? ""}>
+        {React.createElement(Icons[e.icon])}{e.textDisable && e.textEnable? (this.getMenuValue(e.id) ? e.textEnable : e.textDisable) : e.title?? e.text ?? "Who knows"}
+      </antd.Menu.Item>)
+    })
   }
 
   render() {
@@ -171,6 +203,12 @@ export default class PostCard extends React.PureComponent {
       post_comments,
       get_post_comments
     } = this.state.payload || defaultPayload
+
+    const menuMore = (
+      <antd.Menu>
+        {this.renderMoreMenu()}
+      </antd.Menu>
+    )
 
     const actions = [
       <LikeBtn handleClick={(callback) => { this.handleLikeClick(id, (response) => { callback(response) }) }} count={post_likes} liked={core.booleanFix(is_liked)} />,
@@ -204,7 +242,7 @@ export default class PostCard extends React.PureComponent {
                   </h4>
                   <div className={styles.PostTags}>
                     <div className={styles.MoreMenu}>
-                      <antd.Dropdown onVisibleChange={this.handleVisibleChange} visible={this.state.visibleMoreMenu} trigger={['click']}>
+                      <antd.Dropdown overlay={menuMore} trigger={['click']}>
                         <MoreOutlined key="actionMenu" />
                       </antd.Dropdown>
                     </div>
