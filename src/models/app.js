@@ -98,7 +98,7 @@ export default {
           to: `/hashtag?key=:id`,
         },
         {
-          match: '/p;:id',
+          match: '/post/:id',
           to: `/post?key=:id`,
         },
         {

@@ -54,11 +54,13 @@ export default class PostsFeed extends React.Component {
     if (socket) {
       const requestPayload = {
         from: this.props.from ?? "feed",
+        post_id: this.props.fromID ?? 0,
         userToken: this.props.app.session_token,
         id: this.getUserIdByProps(this.props.fromID) ?? this.props.app.session_uuid
       }
 
       const requestCallback = (data) => {
+        console.log(data)
         if (Array.isArray(data.response)) {
           this.setState({ feed: data.response })
         } else {
