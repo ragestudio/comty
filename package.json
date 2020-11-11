@@ -39,7 +39,7 @@
     "@lingui/react": "^2.9.2",
     "@ragestudio/nodecore-api-lib": "^0.2.6",
     "@ragestudio/nodecore-utils": "^0.1.18",
-    "@types/jest": "^26.0.14",
+    "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.162",
     "antd": "^4.8.0",
     "axios": "^0.20.0",
