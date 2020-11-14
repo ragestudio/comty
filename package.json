@@ -94,7 +94,7 @@
     "stack-trace": "0.0.10",
     "store": "^2.0.12",
     "timeago.js": "^4.0.2",
-    "ts-jest": "^26.4.1",
+    "ts-jest": "^26.4.2",
     "wait-on": "^5.2.0"
   },
   "devDependencies": {
