@@ -1,17 +1,38 @@
 import store from 'store';
-import { app_config } from 'config';
+import { app } from 'config';
 import verbosity from 'core/libs/verbosity'
 import ErrorHandler from 'core/libs/errorhandler'
 
-const { appTheme_desiredContrast, storage_theme } = app_config
+const { appTheme_desiredContrast, storage_theme } = app
+
+export const updateRootStyles = (styles) => {
+  const rootContainer = document.getElementById(runtime.mountElementId ?? "root")
+  if (rootContainer) {
+    if (typeof (styles) !== "undefined" && Array.isArray(styles)) {
+      try {
+        __legacy__objectToArray(styles).forEach((e) => {
+          rootContainer.style[e.key] = e.value
+        })
+      } catch (error) {
+        verbosity([error])
+        return false
+      }
+    }
+    return false
+  }
+}
+
+export const appendStyles = (style) => {
+
+}
 
 export const theme = {
   get: (key) => {
     const raw = store.get(storage_theme)
-    if(!raw) return false
+    if (!raw) return false
     let container = []
     try {
-      raw.forEach((e)=>{container[e.key] = e.value})
+      raw.forEach((e) => { container[e.key] = e.value })
     } catch (error) {
       return ErrorHandler({ msg: error, code: 120 })
     }
@@ -20,46 +41,41 @@ export const theme = {
   set: (data) => {
     if (!data || data.length > 2) return false
     try {
-        let mix = []
-        const obj = Object.entries(data)
-        obj.forEach((e) => {
-            mix.push({key: e[0], value: e[1]})
-        })
-        return store.set(storage_theme, mix)
+      let mix = []
+      const obj = Object.entries(data)
+      obj.forEach((e) => {
+        mix.push({ key: e[0], value: e[1] })
+      })
+      return store.set(storage_theme, mix)
     } catch (error) {
-        console.log(error)
-        return false
+      console.log(error)
+      return false
     }
   },
-  raw: () =>  {
+  raw: () => {
     return store.get(storage_theme)
   }
-} 
+}
 
-export function get_style_rule_value(selector, style)
-{
- const selector_lowercase = selector.toLowerCase();
- const selector_parsed = selector_lowercase.substr(0,1)==='.' ?  selector_lowercase.substr(1) : '.'+selector_lowercase;
+export function get_style_rule_value(selector, style) {
+  const selector_lowercase = selector.toLowerCase();
+  const selector_parsed = selector_lowercase.substr(0, 1) === '.' ? selector_lowercase.substr(1) : '.' + selector_lowercase;
 
- for (let i = 0; i < document.styleSheets.length; i++)
- {
-  let styleSheet = document.styleSheets[i];
-  let rules = styleSheet.cssRules ? styleSheet.cssRules : styleSheet.rules;
- 
-  for (var j = 0; j < rules.length; j++)
-  {
-    if (rules[j].selectorText)
-    {
-     var check = rules[j].selectorText.toLowerCase();
-     switch (check)
-     {
-      case selector_lowercase  :
-      case selector_parsed : return rules[j].style[style];
-     }
+  for (let i = 0; i < document.styleSheets.length; i++) {
+    let styleSheet = document.styleSheets[i];
+    let rules = styleSheet.cssRules ? styleSheet.cssRules : styleSheet.rules;
+
+    for (var j = 0; j < rules.length; j++) {
+      if (rules[j].selectorText) {
+        var check = rules[j].selectorText.toLowerCase();
+        switch (check) {
+          case selector_lowercase:
+          case selector_parsed: return rules[j].style[style];
+        }
+      }
     }
-   }
   }
- }
+}
 
 export function getOptimalOpacityFromIMG(payload, callback) {
   const { textColor, overlayColor, img } = payload;
@@ -70,18 +86,16 @@ export function getOptimalOpacityFromIMG(payload, callback) {
 
   image.src = img
   image.setAttribute('crossOrigin', '');
-  image.onload = () =>{
+  image.onload = () => {
     const imagePixelColors = getImagePixelColorsUsingCanvas(canvas, image);
-    if(imagePixelColors){
+    if (imagePixelColors) {
       const worstContrastColorInImage = getWorstContrastColorInImage(textColor, imagePixelColors);
       const optimalOpacity = findOptimalOverlayOpacity(textColor, overlayColor, worstContrastColorInImage, appTheme_desiredContrast);
       return callback(optimalOpacity)
-    }else{
+    } else {
       return false
     }
-
   }
-  
 }
 
 export function getImagePixelColorsUsingCanvas(canvas, image) {
@@ -128,7 +142,7 @@ export function getWorstContrastColorInImage(textColor, imagePixelColors) {
     };
 
     let contrast = getContrast(textColor, pixelColor);
-    if(contrast < worstContrast) {
+    if (contrast < worstContrast) {
       worstContrast = contrast;
       worstContrastColorInImage = pixelColor;
     }
@@ -147,7 +161,7 @@ export function getContrast(color1, color2) {
   return contrast;
 }
 
-export function getLuminance({r,g,b}) {
+export function getLuminance({ r, g, b }) {
   return (0.2126 * getLinearRGB(r) + 0.7152 * getLinearRGB(g) + 0.0722 * getLinearRGB(b));
 }
 
@@ -167,12 +181,12 @@ export function convert_8bit_RGB_to_standard_RGB(primaryColor_8bit) {
 
 export function convert_standard_RGB_to_linear_RGB(primaryColor_sRGB) {
   const primaryColor_linear = primaryColor_sRGB < 0.03928 ?
-    primaryColor_sRGB/12.92 :
+    primaryColor_sRGB / 12.92 :
     Math.pow((primaryColor_sRGB + 0.055) / 1.055, 2.4);
   return primaryColor_linear;
 }
 
-export function getTextContrastWithImagePlusOverlay({textColor, overlayColor, imagePixelColor, overlayOpacity}) {
+export function getTextContrastWithImagePlusOverlay({ textColor, overlayColor, imagePixelColor, overlayOpacity }) {
   const colorOfImagePixelPlusOverlay = mixColors(imagePixelColor, overlayColor, overlayOpacity);
   const contrast = getContrast(textColor, colorOfImagePixelPlusOverlay);
   return contrast;
@@ -232,4 +246,3 @@ export function findOptimalOverlayOpacity(textColor, overlayColor, worstContrast
   return optimalOpacity;
 }
 
-  

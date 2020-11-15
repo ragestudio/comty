@@ -1,5 +1,5 @@
 import React from 'react'
-import { app_config } from 'config'
+import { app } from 'config'
 import { router } from 'core/libs'
 import { __legacy__objectToArray } from 'core'
 import Sider_Mobile from './mobile'
@@ -80,7 +80,7 @@ class Sider extends React.Component {
   }
 
   renderByType(type){
-    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app_config.LogoPath }
+    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app.LogoPath }
     const filteredMenus = this.filterMenusByType(type)
     switch (type) {
       case "desktop":{

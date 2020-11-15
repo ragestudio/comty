@@ -1,9 +1,9 @@
-import { defaults, app_config } from 'config'
+import { defaults, app } from 'config'
 
 export function parseLocalStorage(){
-    const a = localStorage.getItem(app_config.storage_appSettings)
+    const fromStorage = localStorage.getItem(app.storage_appSettings)
     try {
-        return JSON.parse(a)
+        return JSON.parse(fromStorage)
     } catch (error) {
         console.log(error)
     }
@@ -67,7 +67,7 @@ export const settings = {
         }
         data = tmp
         try {
-            localStorage.setItem( app_config.storage_appSettings, JSON.stringify(data) )
+            localStorage.setItem( app.storage_appSettings, JSON.stringify(data) )
         } catch (error) {
             console.log(error)
             return false

@@ -47,7 +47,7 @@ class BaseLayout extends React.Component {
     return (
       <React.Fragment>
         <Helmet>
-          <title>{config.app_config.siteName}</title>
+          <title>{config.app.siteName}</title>
         </Helmet>
         {this.props.app.electron? <WindowNavbar /> : null}
         {Loader(this.renderLoading)}

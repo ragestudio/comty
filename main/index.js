@@ -21,7 +21,7 @@ const packagejson = require('../package.json')
 const is = require('electron-is')
 const waitOn = require('wait-on');
 const { getDoNotDisturb } = require('electron-notification-state');
-const { app_config } = require("../config");
+const { app } = require("../config");
 
 let app_path = is.dev()? "localhost:8000" : `file://${path.join(__dirname, '..', 'renderer')}/index.html`;
 let mainWindow;
@@ -159,7 +159,7 @@ function createWindow() {
   ];
 
   tray.setContextMenu(Menu.buildFromTemplate(trayMenuTemplate))
-  tray.setToolTip(app_config.siteName)
+  tray.setToolTip(app.siteName)
   tray.on('double-click', () => resumeApp())
 
   mainWindow.loadURL(app_path)

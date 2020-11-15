@@ -1,8 +1,10 @@
+import config from './config/index.js'
 import { defineConfig, chainWebpack } from 'umi'
 import { resolve } from 'path'
 
-export default defineConfig({
+let configs = {
   hash: true,
+  title: config.app.siteName ?? null,
   dynamicImport: {
     loading: 'components/Loader',
   },
@@ -44,5 +46,10 @@ export default defineConfig({
       'lodash',
     ],
   ],
+}
+  
+if (typeof(config.runtime) !== "undefined") {
+  configs = { ...configs, ...config.runtime }
+}
 
-})
+export default defineConfig(configs)
