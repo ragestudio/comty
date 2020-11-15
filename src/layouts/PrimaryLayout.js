@@ -10,7 +10,7 @@ import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
 import classnames from 'classnames'
 
-import { app_config } from 'config'
+import { app } from 'config'
 import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 import contextMenuList from 'globals/contextMenu'
@@ -28,7 +28,7 @@ class PrimaryLayout extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      collapsed: app_config.default_collapse_sider ? true : false,
+      collapsed: app.default_collapse_sider ? true : false,
       isMobile: false
     }
 

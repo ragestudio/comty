@@ -1,7 +1,7 @@
 import store from 'store'
-import { app_config } from 'config'
+import { app } from 'config'
 import keys from 'config/app_keys'
-import { user, session } from 'core/models'
+import { session } from 'core/models'
 import { router, verbosity, ui } from 'core/libs'
 import settings from 'core/libs/settings'
 import { queryIndexer } from 'core'
@@ -30,19 +30,15 @@ export default {
     session_data: null,
     session_uuid: null,
 
-    sidebar_collapsed: store.get("sidebar_collapse"),
+    sidebar_collapsed: store.get("sidebar_collapse") ?? false,
     overlayActive: false,
     overlayElement: null,
     embedded: false,
     dispatcher: null,
 
-    abortRender: null,
-    controlActive: false,
-    feedOutdated: false,
-
     electron: null,
-    app_settings: store.get(app_config.storage_appSettings),
-    app_theme: store.get(app_config.storage_theme) || [],
+    app_settings: store.get(app.storage_appSettings) || [],
+    app_theme: store.get(app.storage_theme) || [],
     notifications: [],
   },
   subscriptions: {
@@ -251,25 +247,28 @@ export default {
     },
     *updateUserData({ payload }, { put, select }) {
       const state = yield select(state => state.app)
-      state.dispatcher({
-        type: "user/get",
-        payload: {
-          from: "data"
-        },
-        callback: (callbackResponse) => {
-          verbosity([callbackResponse])
-          if (callbackResponse.code == 115) {
-            verbosity(`Cannot update userdata due an data is missing`)
-            return false
-          }
-          try {
-            sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
-            state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
-          } catch (error) {
-            verbosity([error])
+
+      state.dispatch({
+        type: "socket/use",
+        scope: "users",
+        invoke: "get",
+        query: {
+          payload: {
+            from: "data",
+            user_id: state.app.session_uuid,
+            userToken: state.app.session_token
+          },
+          callback: (callbackResponse) => {
+            try {
+              sessionStorage.setItem(app.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
+              return state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
+            } catch (error) {
+              verbosity([error])
+            }
           }
         }
       })
+      
     },
     *updateTheme({ payload }, { put, select }) {
       if (!payload) return false
@@ -295,8 +294,8 @@ export default {
     },
     *updateFrames({ payload }, { select, put }) {
       try {
-        let sessionAuthframe = cookie.get(app_config.storage_authFrame)
-        let sessionDataframe = atob(sessionStorage.getItem(app_config.storage_dataFrame))
+        let sessionAuthframe = cookie.get(app.storage_authFrame)
+        let sessionDataframe = atob(sessionStorage.getItem(app.storage_dataFrame))
 
         if (sessionAuthframe) {
           try {
@@ -310,7 +309,7 @@ export default {
               }
             })
           } catch (error) {
-            cookie.remove(app_config.storage_authFrame)
+            cookie.remove(app.storage_authFrame)
           }
         }
         if (sessionDataframe) {
@@ -348,15 +347,12 @@ export default {
       state.session_authframe = jwt.decode(payload.token)
       state.session_valid = true
 
-      cookie.set(app_config.storage_authFrame, payload.token)
-      sessionStorage.setItem(app_config.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
-    },
-    handleCollapseSidebar(state, { payload }) {
-      state.sidebar_collapsed = payload
+      cookie.set(app.storage_authFrame, payload.token)
+      sessionStorage.setItem(app.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
     },
     handleUpdateTheme(state, { payload }) {
       verbosity([payload])
-      store.set(app_config.storage_theme, payload);
+      store.set(app.storage_theme, payload)
       state.app_theme = payload
     },
     requireQuery(state, { payload, callback }) {
@@ -405,7 +401,7 @@ export default {
       state.session_data = null;
       state.session_token = null;
       state.session_authframe = null;
-      cookie.remove(app_config.storage_authFrame)
+      cookie.remove(app.storage_authFrame)
       sessionStorage.clear()
       location.reload()
     },

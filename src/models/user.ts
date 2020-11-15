@@ -1,6 +1,6 @@
 import { effect, reducer, dvaModel, subscription, path, BaseModel } from 'dva-model-enhance'
 import store from 'store'
-import { app_config } from 'config'
+import { app } from 'config'
 import keys from 'config/app_keys'
 import { user, session } from 'core/models'
 import { router, verbosity, ui } from 'core/libs'

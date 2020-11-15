@@ -2,7 +2,7 @@ import moment from 'moment';
 import { format } from 'timeago.js';
 import { cloneDeep } from 'lodash';
 import store from 'store';
-import { i18n, app_config } from 'config';
+import { i18n, app } from 'config';
 import handle from 'core/libs/errorhandler'
 import request from 'request'
 import html2canvas from 'html2canvas'
@@ -20,16 +20,16 @@ import * as libs from './libs'
 
 export * from '@ragestudio/nodecore-utils'
 export const package_json = require('../../package.json');
-export const GUID = app_config.guid;
+export const GUID = app.guid;
 
 export const clientInfo = {
   buildStable: getBuild()["stable"],
   packageName: package_json.name,
   packageStage: package_json.stage,
-  siteName: app_config.siteName,
+  siteName: app.siteName,
   version: package_json.version,
-  logo: app_config.FullLogoPath,
-  logo_dark: app_config.DarkFullLogoPath,
+  logo: app.FullLogoPath,
+  logo_dark: app.DarkFullLogoPath,
   os: platform.os,
   layout: platform.layout
 };
@@ -259,7 +259,7 @@ export function downloadDecodedURI(payload) {
   if (!data || !type) return false
   try {
     if (!filename) {
-      filename = `${app_config.id}_${time.now()}.${type.split("/")[1]}`
+      filename = `${app.id}_${time.now()}.${type.split("/")[1]}`
     }
     let tmp = document.createElement('a')
     tmp.href = `data:${type};charset=${charset},${encodeURIComponent(data)}`
@@ -280,7 +280,7 @@ export function downloadEncodedURI(payload) {
   if (!data) return false
   try {
     if (!filename) {
-      filename = `${app_config.id}_${time.now()}.${data.split("/")[1].split(";")[0]}`
+      filename = `${app.id}_${time.now()}.${data.split("/")[1].split(";")[0]}`
     }
     let tmp = document.createElement('a')
     tmp.href = data

@@ -1,5 +1,5 @@
 import store from 'store'
-import { app_config } from 'config'
+import { app } from 'config'
 import keys from 'config/app_keys'
 import { user, session } from 'core/models'
 import { router, verbosity, ui } from 'core/libs'
@@ -17,7 +17,7 @@ export default {
   namespace: 'socket',
   state: {
     nodes: {},
-    socket_address: app_config.endpoint_websocket, //set by default
+    socket_address: app.endpoint_websocket, //set by default
     socket_port: "7000",
     headerNode: "/"
   },
