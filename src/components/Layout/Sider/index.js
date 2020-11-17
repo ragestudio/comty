@@ -2,11 +2,11 @@ import React from 'react'
 import { app } from 'config'
 import { router } from 'core/libs'
 import { __legacy__objectToArray } from 'core'
-import Sider_Mobile from './mobile'
-import Sider_Default from './default'
 import { connect } from 'umi'
 import MenuList from 'globals/sidebar_menu.js'
-import { FloatComponent } from 'components'
+
+import Sider_Mobile from './mobile'
+import Sider_Default from './default'
 
 @connect(({ app, extended }) => ({ app, extended }))
 class Sider extends React.Component {

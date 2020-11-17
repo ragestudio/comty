@@ -1,7 +1,6 @@
 import React from 'react'
 import ReduxDebugger from 'debuggers/redux'
 import * as antd from 'antd'
-import { FloatComponent } from 'components'
 import { connect } from 'umi'
 import { ClusterOutlined } from 'components/Icons'
 import { __legacy__objectToArray } from 'core'
