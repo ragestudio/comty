@@ -1,5 +1,3 @@
-/* global window */
-/* global document */
 import React from 'react'
 import PropTypes from 'prop-types'
 import { withRouter, connect } from 'umi'
@@ -14,9 +12,8 @@ import { app } from 'config'
 import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 import contextMenuList from 'globals/contextMenu'
-import styles from './PrimaryLayout.less'
 
-import ReduxDebugger from 'debuggers/redux'
+import styles from 'theme'
 
 const { Content } = antd.Layout
 const { Sider, Overlay } = AppLayout
@@ -140,10 +137,10 @@ class PrimaryLayout extends React.Component {
           [styles.mobile]: isMobile
         })}>
           <Sider {...SiderProps} />
-          <div className={styles.primary_layout_container}>
+          <div className={window.classToStyle("layout_container")}>
             <Content
               id="primaryContent"
-              className={styles.primary_layout_content}
+              className={window.classToStyle("layout_container")}
             >
               {children ? children : null}
             </Content>

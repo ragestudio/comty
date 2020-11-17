@@ -8,6 +8,7 @@ export function parseLocalStorage(){
         console.log(error)
     }
 }
+
 export function newSetting(key, value) {
     let setting = {}
     setting.id = key

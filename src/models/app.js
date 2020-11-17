@@ -1,5 +1,5 @@
 import store from 'store'
-import { app } from 'config'
+import config from 'config'
 import keys from 'config/app_keys'
 import { session } from 'core/models'
 import { router, verbosity, ui } from 'core/libs'
@@ -19,6 +19,7 @@ export default {
       fadeout: false
     },
     queryDone: false,
+    style_prefix: config.app.defaultStyleClass ?? "app_",
     env_proccess: process.env,
     server_key: keys.server_key,
 
@@ -37,8 +38,8 @@ export default {
     dispatcher: null,
 
     electron: null,
-    app_settings: store.get(app.storage_appSettings) || [],
-    app_theme: store.get(app.storage_theme) || [],
+    app_settings: store.get(config.app.storage_appSettings) || [],
+    app_theme: store.get(config.app.storage_theme) || [],
     notifications: [],
   },
   subscriptions: {
@@ -83,6 +84,26 @@ export default {
 
       window.PluginGlobals = []
       window.Internal = []
+
+      window.classToStyle = (key) => {
+        if (typeof (key) !== "string") {
+          try {
+            const toString = JSON.stringify(key)
+            console.log(toString)
+            if (toString) {
+              return toString
+            } else {
+              return null
+            }
+          } catch (error) {
+            return null
+          }
+        }
+        if (typeof (state.style_prefix) !== "undefined") {
+          return `${state.style_prefix}${key}`
+        }
+        return key
+      }
 
       queryIndexer([
         {
@@ -260,7 +281,7 @@ export default {
           },
           callback: (callbackResponse) => {
             try {
-              sessionStorage.setItem(app.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
+              sessionStorage.setItem(config.app.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
               return state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
             } catch (error) {
               verbosity([error])
@@ -294,8 +315,8 @@ export default {
     },
     *updateFrames({ payload }, { select, put }) {
       try {
-        let sessionAuthframe = cookie.get(app.storage_authFrame)
-        let sessionDataframe = atob(sessionStorage.getItem(app.storage_dataFrame))
+        let sessionAuthframe = cookie.get(config.app.storage_authFrame)
+        let sessionDataframe = atob(sessionStorage.getItem(config.app.storage_dataFrame))
 
         if (sessionAuthframe) {
           try {
@@ -309,7 +330,7 @@ export default {
               }
             })
           } catch (error) {
-            cookie.remove(app.storage_authFrame)
+            cookie.remove(config.app.storage_authFrame)
           }
         }
         if (sessionDataframe) {
@@ -347,12 +368,12 @@ export default {
       state.session_authframe = jwt.decode(payload.token)
       state.session_valid = true
 
-      cookie.set(app.storage_authFrame, payload.token)
-      sessionStorage.setItem(app.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
+      cookie.set(config.app.storage_authFrame, payload.token)
+      sessionStorage.setItem(config.app.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
     },
     handleUpdateTheme(state, { payload }) {
       verbosity([payload])
-      store.set(app.storage_theme, payload)
+      store.set(config.app.storage_theme, payload)
       state.app_theme = payload
     },
     requireQuery(state, { payload, callback }) {
@@ -401,7 +422,7 @@ export default {
       state.session_data = null;
       state.session_token = null;
       state.session_authframe = null;
-      cookie.remove(app.storage_authFrame)
+      cookie.remove(config.app.storage_authFrame)
       sessionStorage.clear()
       location.reload()
     },

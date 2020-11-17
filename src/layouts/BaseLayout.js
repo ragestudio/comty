@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Loader } from 'components'
-import NProgress from 'nprogress'
 import { withRouter, connect } from 'umi'
 import { queryLayout } from 'core'
 import WindowNavbar from 'components/Layout/WindowNavbar'
@@ -11,7 +10,8 @@ import { Splash } from 'components'
 
 import PrimaryLayout from './PrimaryLayout'
 import PublicLayout from './PublicLayout'
-import './BaseLayout.less'
+
+import 'theme'
 
 const LayoutMap = {
   primary: PrimaryLayout,
@@ -30,12 +30,10 @@ class BaseLayout extends React.Component {
     const currentPath = location.pathname + location.search
 
     if (currentPath !== this.previousPath) {
-      NProgress.start()
       this.renderLoading = true
     }
 
     if (!loading.global) {
-      NProgress.done()
       this.previousPath = currentPath
       this.renderLoading = false
     }

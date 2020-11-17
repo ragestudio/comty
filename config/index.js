@@ -7,6 +7,7 @@ module.exports = {
     siteName: 'Comty™',
     copyright: 'RageStudio©',
     MainPath: '/',
+    defaultStyleClass: "app_",
 
     LogoPath: '/logo.svg',
     FullLogoPath: '/full_logo.svg',
