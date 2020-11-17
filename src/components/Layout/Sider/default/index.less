@@ -6,11 +6,11 @@
   user-select: none;
   border-color: transparent;
   font-size: 15px;
-  font-family: @__Global_texted_font;
+  font-family: @__app_secondaryFont;
   font-weight: 600;
 
   width: 65%;
-  height: 100%;
+  height: 100vh;
 
   z-index: 40;
   float: left;
@@ -33,7 +33,6 @@
     }
   }
 }
-
 
 .left_sider_header {
   cursor: pointer;
@@ -104,9 +103,7 @@
       border-radius: 8px;
       transform: translate(10px,0);
       
-      // background: linear-gradient(49deg, rgba(255,255,255,1) 32%, rgba(255, 255, 255, 0) 100%);
       backdrop-filter: blur(2px);
-      // border-left: 10px @app_accent_gradient solid;
       box-shadow: -2px 2px 1px 0 rgba(51, 51, 51, 0.13);
       color: rgb(102, 102, 102);
     }
@@ -133,7 +130,7 @@
     }
 
     .ant-menu-item a {
-      color: @AppTheme_global_color;
+      color: @__app_color;
     }
   }
 }

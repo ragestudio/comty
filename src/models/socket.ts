@@ -5,7 +5,6 @@ import { user, session } from 'core/models'
 import { router, verbosity, ui } from 'core/libs'
 import settings from 'core/libs/settings'
 import { __legacy__objectToArray } from 'core'
-import { Howl, Howler } from 'howler'
 
 import SocketConnection from 'core/libs/socket/index.ts'
 

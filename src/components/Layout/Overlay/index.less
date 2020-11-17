@@ -3,7 +3,6 @@
 .render_component {
   width: 100%;
   height: 100%;
-  // box-shadow: 0px 24px 64px rgba(45, 48, 58, 0.06);
 
   background-color: #fff;
   border-radius: 8px;
@@ -67,7 +66,7 @@
     max-width: calc(100% + 150px);
   }
 
-  transition: all @__Global_SwapAnimDuration ease-in-out;
+  transition: all @__app_SwapDuration ease-in-out;
 }
 
 .overlay_primary_wrapper {
@@ -84,7 +83,7 @@
   padding: 30px 30px 30px 35px;
 
   
-  @media (max-width: @bp-medium) {
+  @media (max-width: @screen-md) {
     padding: 30px 5px;
   }
 
@@ -126,7 +125,7 @@
     }
   }
 
-  transition: all @__Global_SwapAnimDuration ease-in-out;
+  transition: all @__app_SwapDuration ease-in-out;
   border-radius: @__Global_layout_border-rd;
 }
 
@@ -152,7 +151,7 @@
     }
   
   
-    transition: all @__Global_SwapAnimDuration ease-in-out;
+    transition: all @__app_SwapDuration ease-in-out;
     
   }
 
@@ -161,7 +160,7 @@
     height: 87vh;
     overflow: hidden;
     margin: 20px 0 0;
-    font-family: @__Global_general_font_family;
+    font-family: @__app_generalFont;
     h2 {
       color: #ffffff;
     }
