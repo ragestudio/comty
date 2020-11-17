@@ -1,8 +1,6 @@
 import * as React from 'react'
 import * as antd from 'antd'
-import { LeftOutlined  } from 'components/Icons'
-import styles from '../../index.less'
-import classnames from 'classnames'
+import { LeftOutlined } from 'components/Icons'
 import { Swapper } from '../../index.js'
 
 export interface overlay_primary_props {
@@ -14,28 +12,14 @@ export interface overlay_primary_props {
     closable: boolean;
 }
 
-
-const renderExit = (
-    <div className={styles.exit_button}>
-    <antd.Button type="ghost" icon={<LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
-    </div>
-)
-
+const renderExit = <antd.Button className={window.classToStyle("overlay_backButton")}type="ghost" icon={<LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
 
 const overlay_primary = (props: overlay_primary_props) => {
     const { fragment, mode, isMobile } = props
     return (
-        <div
-            id="overlay_primary"
-            className={classnames(styles.overlay_primary_wrapper, {
-                [styles.full]: mode === 'full'? true : false,
-                [styles.half]: mode === 'half'? true : false,
-            })}
-        >
-            <div className={styles.renderBody}>
-                {props.mode === 'full' || props.mode === 'half'? renderExit : null}
-                <React.Fragment>{fragment}</React.Fragment>
-            </div>
+        <div focus="no_loose" className={window.classToStyle("overlay_content_body")}>
+            {props.mode === 'full' || props.mode === 'half' ? renderExit : null}
+            <React.Fragment>{fragment}</React.Fragment>
         </div>
     )
 }

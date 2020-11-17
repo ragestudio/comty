@@ -5,6 +5,7 @@ import Loader from './Loader'
 import About from './About'
 import * as Feather from 'feather-reactjs'
 import Invalid from './Invalid'
+import CardComponent from './CardComponent'
 
 // App Layout Components
 import Splash from './Splash'
@@ -23,6 +24,7 @@ import PostCard from './PostCard'
 
 // Mix & Export all
 export {
+  CardComponent,
   PostsFeed,
   Splash,
   ParamsList,

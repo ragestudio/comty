@@ -8,11 +8,9 @@ export const router = {
   },
   go: e => {
     router.push(e);
-    // goTo.element('primaryContent');
   },
   goProfile: e => {
     router.push(`/@/${e}`);
-    // goTo.element('primaryContent');
   },
 };
 

@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { withRouter, connect } from 'umi'
 import {
   AppLayout
@@ -13,15 +12,14 @@ import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 import contextMenuList from 'globals/contextMenu'
 
-import styles from 'theme'
 
 const { Content } = antd.Layout
-const { Sider, Overlay } = AppLayout
+const { Sider, Overlay, RightSider } = AppLayout
 const isActive = (key) => { return key ? key.active : false }
 
 @withRouter
 @connect(({ app, contextMenu, loading }) => ({ app, contextMenu, loading }))
-class PrimaryLayout extends React.Component {
+export default class PrimaryLayout extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -78,14 +76,11 @@ class PrimaryLayout extends React.Component {
       )
     }
 
-
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
         window.isMobile = mobile
-        this.setState({
-          isMobile: mobile,
-        })
+        this.setState({isMobile: mobile})
       }
     })
     
@@ -131,33 +126,22 @@ class PrimaryLayout extends React.Component {
             overflow: "hidden",
             opacity: currentTheme.backgroundImage.opacity
           }} /> : null}
-        <antd.Layout id="app" className={classnames(styles.app, {
-          [styles.interfaced]: this.props.app.embedded,
-          [styles.dark_mode]: window.darkMode,
-          [styles.mobile]: isMobile
+        <antd.Layout id="app" className={classnames("app", {
+          ["interfaced"]: this.props.app.embedded,
+          ["dark_mode"]: window.darkMode,
+          ["mobile"]: isMobile,
+          ["overlayActive"]: this.props.app.overlayActive
         })}>
           <Sider {...SiderProps} />
           <div className={window.classToStyle("layout_container")}>
-            <Content
-              id="primaryContent"
-              className={window.classToStyle("layout_container")}
-            >
+            <Content className={window.classToStyle("layout_content")}>
               {children ? children : null}
             </Content>
           </div>
+          <RightSider />
           <Overlay {...OverlayProps} />
         </antd.Layout>
       </React.Fragment>
     )
   }
 }
-
-PrimaryLayout.propTypes = {
-  children: PropTypes.element.isRequired,
-  location: PropTypes.object,
-  dispatch: PropTypes.func,
-  app: PropTypes.object,
-  loading: PropTypes.object,
-}
-
-export default PrimaryLayout

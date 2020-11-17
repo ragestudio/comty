@@ -2,17 +2,10 @@ import React from 'react'
 import verbosity from 'core/libs/verbosity'
 import { connect } from 'umi'
 import classnames from 'classnames'
-import styles from './index.less'
-import ErrorHandler from 'core/libs/errorhandler'
-import * as antd from 'antd'
-import { router } from 'core/libs'
-import {
-  Primary,
-  Secondary,
-  Card_Component,
-  __searchBar
-} from './components'
 
+import {
+  Primary
+} from './components'
 
 export let Swapper = {
   isOpen: (...props) => {
@@ -27,17 +20,16 @@ export let Swapper = {
 }
 
 @connect(({ app }) => ({ app }))
-export default class Overlay extends React.PureComponent {
+export default class Overlay extends React.Component {
   constructor(props) {
-      super(props);
-      this.state = {
-        loading: true,
-      };
-      this.setWrapperRef = this.setWrapperRef.bind(this);
-      this.handleClickOutside = this.handleClickOutside.bind(this);
-      this.keydownFilter = this.keydownFilter.bind(this);
-      window.OverlayComponent = this;
-  
+    super(props);
+    this.state = {
+      loading: true,
+    };
+    this.setWrapperRef = this.setWrapperRef.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.keydownFilter = this.keydownFilter.bind(this);
+    window.OverlayComponent = this;
   }
 
   swap = {
@@ -61,8 +53,8 @@ export default class Overlay extends React.PureComponent {
         payload: {
           overlayActive: true,
           overlayElement: payload
-        },
-      });
+        }
+      })
     }
   }
 
@@ -87,58 +79,45 @@ export default class Overlay extends React.PureComponent {
       document.removeEventListener('mousedown', this.handleClickOutside);
     }
   }
-   /**
-   * Set the wrapper ref
-   */
+  /**
+  * Set the wrapper ref
+  */
   setWrapperRef(node) {
     this.wrapperRef = node;
   }
 
-  
-  render() {
-    const { overlayElement, overlayActive, session_data, session_valid, session_uuid } = this.props.app
-    const mainElement = (
-      <div>
-        <div><__searchBar /></div>
-        <div className={styles.mainElement}>
-          {session_valid? <Card_Component onClick={() => router.goProfile(session_data["username"])} style={{ display: 'flex', lineHeight: '30px', wordBreak: 'break-all' }} ><antd.Avatar src={session_data.avatar} shape="square" /> <div style={{ marginLeft: '10px' }}> @{session_data.username}<span style={{ fontSize: "11px" }}>#{session_uuid}</span></div></Card_Component> : null }
-        </div>
-      </div>
-    )
-    const renderElement = () => {
 
+  render() {
+    const { overlayElement, overlayActive } = this.props.app
+
+    const isOnMode = (mode) => {
+      if (!overlayActive || typeof (overlayElement.mode) == "undefined") {
+        return false
+      }
+      return overlayElement.mode === mode ? true : false
+    }
+
+    const renderElement = () => {
       if (overlayElement && overlayActive) {
-        const renderProps = {id: overlayElement.id, mode: overlayElement.mode, fragment: overlayElement.element}
-        switch (overlayElement.position) {
-          case 'primary':{
-            return <Primary {...renderProps} />
-          }
-          case 'secondary':{
-            return <Secondary {...renderProps} />
-          }
-          default:{
-            return ErrorHandler({ code: 210 })
-          }
-        }
+        const renderProps = { id: overlayElement.id, mode: overlayElement.mode, fragment: overlayElement.element }
+        return <Primary {...renderProps} />
       }
 
-      return(
-        <Primary id="main" fragment={mainElement}  />
-      )
-
+      return null
     }
-    
 
     return (
-      <>
-        <div
-          id="Overlay_layout"
-          ref={this.setWrapperRef}
-          className={classnames(styles.Overlay_wrapper, {[styles.undocked]: window.isMobile})}
-        >
-            {renderElement()}
-        </div>
-      </>
+      <div
+        id="overlay"
+        ref={this.setWrapperRef}
+        focus="no_loose"
+        className={classnames(window.classToStyle("overlay_wrapper"), {
+          ["full"]: isOnMode("full"),
+          ["half"]: isOnMode("half"),
+        })}
+      >
+        {renderElement()}
+      </div>
     )
   }
 }

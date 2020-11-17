@@ -1,5 +1,3 @@
-@import '../../../node_modules/antd/lib/style/themes/default.less';
-
 @import './vars.less';
 @import './fonts-import.css';
 
@@ -7,6 +5,14 @@
 @import './layout/LeftSider.less';
 
 @import './components/PostCard.less';
+
+
+// Resolutions variables
+@screen-sm: 48em; // 768px	
+@screen-md: 64em; // 1024px	
+@screen-lg: 85.375em; // 1366px	
+@screen-xl: 120em; // 1920px	
+@screen-xxl: 160em; // 2560px
 
 ::-webkit-scrollbar {
     position: absolute;
@@ -33,21 +39,28 @@
 }
 
 .app{
+  &.overlayActive {
+    .app_layout_container{
+      filter: saturate(10%);
+      transform: translate(-150px, 0);// to do: get from overlay direction variable
+    }
+  }
+
   &.interfaced{
-    .primary_layout_container{
+    .app_layout_container{
       height: 98%;
     }
   }
 
   &.mobile{
-    .primary_layout_container {
+    .app_layout_container {
       width: 100%;
       padding: 0;
       overflow-y: overlay;
       overflow-x: hidden;
       min-width: unset;
     }
-    .primary_layout_content{
+    .app_layout_content{
       padding: 35px 15px 15px;
     }
   }
@@ -101,36 +114,7 @@ body {
   }
 }
 
-@media (max-width: @screen-sm){
-  ::-webkit-scrollbar{
-    display: none;
-  }
-}
-
-@media (min-width: @screen-md) {
-  .app_layout_container{
-    min-width: 750px;
-  }
-  .app_layout_content{
-    padding: 0;
-  }
-}
-
-@media (min-width: @screen-lg) {
-  .app_layout_container´{
-    min-width: 1112px;
-  }
-}
-
-@media (min-width: @screen-xl) {
-
-}
-
-// @media (min-width: @screen-xxl) {
-
-// }
-
-
+// Layout
 .app_layout_container {
   background-color: transparent;
   transition: all 150ms ease-in-out;
@@ -159,3 +143,165 @@ body {
   padding: @__app_layout_content_padding;
   transition: all 150ms ease-in-out;
 }
+
+
+// Right Sidebar
+@__app_overlay_padding: 30px 30px 30px 35px; 
+.app_right_sidebar_wrapper {
+  height: 100%;
+  width: 100%;
+
+  max-width: @Overlay_wrapper_maxwidth;
+  min-width: 200px;
+
+  display: flex;
+  z-index: 50;
+
+  padding: @__app_overlay_padding;
+
+  @media (max-width: @screen-md) {
+    padding: 30px 5px;
+  }
+
+  transition: all @__app_SwapDuration ease-in-out;
+
+  &.swapped {
+    transform: translate(100%, 0);
+  }
+}
+
+.app_right_sidebar_content{
+  height: 100%;
+  width: 100%;
+  > div {
+    margin-bottom: 35px;
+  }
+}
+
+// Overlay
+.app_overlay_wrapper {
+  user-select: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 50;
+  
+  height: 100%;
+  width: 0;
+  backdrop-filter: blur(2px);
+
+  &.half {
+    padding: @__app_overlay_padding;
+    background-color: #2d2d2d;
+    color: @Overlay_container1_active_color;
+    width: 26vw;
+  }
+
+  &.full{
+    padding: @__app_overlay_padding;
+    max-width: none;
+    background-color: transparent;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  transition: all @__app_SwapDuration ease-in-out;
+  border-radius: @__Global_layout_border-rd;
+}
+
+.app_overlay_content {
+  height: 100%;
+  width: 100%;
+
+  max-width: @Overlay_wrapper_maxwidth;
+  min-width: 200px;
+
+  display: flex;
+  z-index: 50;
+
+  right: 0;
+  padding: @__app_overlay_padding;
+
+  color: @Overlay_container1_def_color;
+  
+  
+
+  transition: all @__app_SwapDuration ease-in-out;
+}
+
+.app_overlay_content_body{
+  height: 100%;
+  width: 100%;
+  > div {
+    margin-bottom: 35px;
+  }
+}
+
+.app_overlay_backButton{
+  margin: 0 0 15px 0;
+  background-color: #fff;
+  border-radius: 8px;
+  color: @Overlay_container_1_btn_color;
+  background-color: @Overlay_container_1_btn_backgroud;
+  border-color: transparent;
+  border-radius: 12px;
+}
+
+.app_overlay_backButton:hover {
+  box-shadow: @Overlay_container_1_btn_shadow;
+  transition: all @__Global_Components_transitions_dur linear;
+}
+
+
+// CardComponent (External Module)
+.cardComponent_wrapper {
+  width: 100%;
+  height: 100%;
+
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+
+
+  h2,h3,h4{
+    color: #9597A1;
+    font-family: Netflix Sans;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 12px;
+    line-height: 15px;
+  }
+}
+
+
+
+// Media queries
+@media (min-width: @screen-sm){
+  ::-webkit-scrollbar{
+    display: none;
+  }
+}
+
+@media (min-width: @screen-md) {
+  .app_layout_container{
+    min-width: 750px;
+  }
+  .app_layout_content{
+    padding: 0;
+  }
+}
+
+@media (min-width: @screen-lg) {
+  .app_layout_container{
+    min-width: 1112px;
+  }
+}
+
+// @media (min-width: @screen-xl) {
+
+// }
+
+// @media (min-width: @screen-xxl) {
+
+// }

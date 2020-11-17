@@ -45,12 +45,7 @@ export default {
   subscriptions: {
     setup({ dispatch }) {
       dispatch({ type: 'updateState', payload: { dispatcher: dispatch } })
-      try {
-        const electron = window.require("electron")
-        dispatch({ type: 'updateState', payload: { electron, embedded: true } })
-      } catch (error) {
-        // nothing
-      }
+      dispatch({ type: 'earlyInit' })
       dispatch({ type: 'updateFrames' })
       dispatch({ type: 'validateSession' })
       dispatch({ type: 'initHeaderSocket' })
@@ -79,17 +74,13 @@ export default {
     },
   },
   effects: {
-    *query({ payload }, { call, put, select }) {
+    *earlyInit({ dispatcher }, { call, put, select }) {
       const state = yield select(state => state.app)
-
-      window.PluginGlobals = []
-      window.Internal = []
 
       window.classToStyle = (key) => {
         if (typeof (key) !== "string") {
           try {
             const toString = JSON.stringify(key)
-            console.log(toString)
             if (toString) {
               return toString
             } else {
@@ -104,6 +95,20 @@ export default {
         }
         return key
       }
+
+      try {
+        const electron = window.require("electron")
+        state.dispatcher({ type: 'updateState', payload: { electron, embedded: true } })
+      } catch (error) {
+        // nothing
+      }
+
+    },
+    *query({ payload }, { call, put, select }) {
+      const state = yield select(state => state.app)
+
+      window.PluginGlobals = []
+      window.Internal = []
 
       queryIndexer([
         {
@@ -289,7 +294,7 @@ export default {
           }
         }
       })
-      
+
     },
     *updateTheme({ payload }, { put, select }) {
       if (!payload) return false

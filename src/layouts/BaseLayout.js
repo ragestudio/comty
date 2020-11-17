@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Loader } from 'components'
 import { withRouter, connect } from 'umi'
@@ -11,7 +10,7 @@ import { Splash } from 'components'
 import PrimaryLayout from './PrimaryLayout'
 import PublicLayout from './PublicLayout'
 
-import 'theme'
+import 'theme/index.less'
 
 const LayoutMap = {
   primary: PrimaryLayout,
@@ -20,7 +19,7 @@ const LayoutMap = {
 
 @withRouter
 @connect(({ app, loading }) => ({ app, loading }))
-class BaseLayout extends React.Component {
+export default class BaseLayout extends React.Component {
   previousPath = ''
   renderLoading = true
 
@@ -54,9 +53,3 @@ class BaseLayout extends React.Component {
     )
   }
 }
-
-BaseLayout.propTypes = {
-  loading: PropTypes.object,
-}
-
-export default BaseLayout
