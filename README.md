@@ -3,6 +3,8 @@
 ![CodeQL](https://github.com/srgooglo/comty/workflows/CodeQL/badge.svg?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/srgooglo/comty/badge)](https://www.codefactor.io/repository/github/srgooglo/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
+[![Code Alerts](https://img.shields.io/lgtm/alerts/g/srgooglo/comty.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/srgooglo/comty/alerts/)
+[![Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/srgooglo/comty.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/srgooglo/comty/context:javascript)
 [![Trello](https://img.shields.io/badge/Trello-Join%20dashboard-blue)](https://trello.com/invite/b/UbwvlG1I/2bc02725b9b210d2e9e9a82c5040b895/comty-development)
 [![Discord](https://img.shields.io/badge/dynamic/json?color=blue&label=Discord&query=name&url=https%3A%2F%2Fdiscord.com%2Fapi%2Fguilds%2F769176303978938389%2Fwidget.json)](https://discord.gg/NmnJexe)
 
@@ -35,5 +37,5 @@ Anyway, anyone interested, we are **looking for you**. As at the moment it is ve
 ## Made with
 > We use these technologies and many more to make it work
 
-![enter image description here](https://dl.ragestudio.net/persistent/CbEWXaE3cB35Rm2TFhY4Hnezr2P7qbtGDG86MPWUa6.png)
+![tech](https://dl.ragestudio.net/persistent/CbEWXaE3cB35Rm2TFhY4Hnezr2P7qbtGDG86MPWUa6.png)
 *Using the best technologies makes all this a reality and take advantage of the maximum performance*
