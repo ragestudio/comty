@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as antd from 'antd'
 import { LeftOutlined } from 'components/Icons'
-import { Swapper } from '../../index.js'
 
 export interface overlay_primary_props {
     y?: number;
@@ -12,7 +11,12 @@ export interface overlay_primary_props {
     closable: boolean;
 }
 
-const renderExit = <antd.Button className={window.classToStyle("overlay_backButton")}type="ghost" icon={<LeftOutlined />} onClick={() => Swapper.closeAll()}> Back </antd.Button>
+const renderExit = <antd.Button
+    className={window.classToStyle("overlay_backButton")}
+    type="ghost"
+    icon={<LeftOutlined />}
+    onClick={() => window.overlaySwap.close()}
+> Back </antd.Button>
 
 const overlay_primary = (props: overlay_primary_props) => {
     const { fragment, mode, isMobile } = props

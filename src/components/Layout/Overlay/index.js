@@ -7,36 +7,25 @@ import {
   Primary
 } from './components'
 
-export let Swapper = {
-  isOpen: (...props) => {
-    window.OverlayComponent.swap.isOpen(...props)
-  },
-  closeAll: (...props) => {
-    window.OverlayComponent.swap.closeAll(...props)
-  },
-  openFragment: (...props) => {
-    window.OverlayComponent.swap.openFragment(...props)
-  }
-}
-
 @connect(({ app }) => ({ app }))
 export default class Overlay extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       loading: true,
-    };
-    this.setWrapperRef = this.setWrapperRef.bind(this);
-    this.handleClickOutside = this.handleClickOutside.bind(this);
-    this.keydownFilter = this.keydownFilter.bind(this);
-    window.OverlayComponent = this;
+    }
+    this.setWrapperRef = this.setWrapperRef.bind(this)
+    this.handleClickOutside = this.handleClickOutside.bind(this)
+    this.keydownFilter = this.keydownFilter.bind(this)
+
+    window.overlaySwap = this.swap
   }
 
   swap = {
     isOpen: () => {
       return this.props.app.overlayActive
     },
-    closeAll: () => {
+    close: () => {
       this.props.dispatch({
         type: 'app/updateState',
         payload: {
@@ -45,7 +34,7 @@ export default class Overlay extends React.Component {
         },
       });
     },
-    openFragment: (payload) => {
+    open: (payload) => {
       if (!payload) return false;
       verbosity(['Dispatching fragment =>', payload])
       this.props.dispatch({
@@ -60,16 +49,15 @@ export default class Overlay extends React.Component {
 
   keydownFilter(event) {
     if (event.keyCode === 27) {
-      this.swap.closeAll()
+      this.swap.close()
     }
   }
 
   handleClickOutside(event) {
     if (this.wrapperRef && !this.wrapperRef.contains(event.target)) {
-      this.swap.closeAll()
+      this.swap.close()
     }
   }
-
 
   componentDidUpdate() {
     if (this.props.app.overlayElement) {
@@ -79,13 +67,10 @@ export default class Overlay extends React.Component {
       document.removeEventListener('mousedown', this.handleClickOutside);
     }
   }
-  /**
-  * Set the wrapper ref
-  */
+
   setWrapperRef(node) {
     this.wrapperRef = node;
   }
-
 
   render() {
     const { overlayElement, overlayActive } = this.props.app
