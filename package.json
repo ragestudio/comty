@@ -78,6 +78,7 @@
     "react-helmet": "^5.2.1",
     "react-linkify": "^1.0.0-alpha",
     "react-perfect-scrollbar": "^1.5.8",
+    "react-redux": "^7.2.1",
     "react-resizable": "^1.11.0",
     "react-reveal": "^1.2.2",
     "react-rnd": "^10.2.3",
