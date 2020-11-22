@@ -19,19 +19,18 @@ const renderExit = <antd.Button
 > Back </antd.Button>
 
 const overlay_primary = (props: overlay_primary_props) => {
-    const { fragment, mode, isMobile } = props
+    const { element, mode, isMobile } = props
     return (
         <div focus="no_loose" className={window.classToStyle("overlay_content_body")}>
             {props.mode === 'full' || props.mode === 'half' ? renderExit : null}
-            <React.Fragment>{fragment}</React.Fragment>
+            <React.Fragment>{element}</React.Fragment>
         </div>
     )
 }
 
-
 overlay_primary.defaultProps = {
     mode: false,
-    fragment: null,
+    element: null,
     isMobile: false,
     closable: true,
     y: 0,
