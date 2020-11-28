@@ -39,7 +39,7 @@
     "@lingui/react": "^2.9.2",
     "@nodecorejs/dot-runtime": "^0.3.1",
     "@ragestudio/nodecore-api-lib": "^0.2.6",
-    "@ragestudio/nodecore-utils": "^0.1.18",
+    "@ragestudio/nodecore-utils": "^0.1.19",
     "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.165",
     "antd": "^4.8.2",
