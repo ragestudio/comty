@@ -1,7 +1,7 @@
 {
   "name": "comty",
   "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
-  "version": "0.11.15",
+  "version": "0.11.22",
   "stage": "alpha",
   "description": "An prototype of a social network",
   "author": "RageStudio",
@@ -44,6 +44,7 @@
     "antd": "^4.8.2",
     "axios": "^0.21.0",
     "babel-core": "^6.26.3",
+    "chart.js": "^2.9.4",
     "classnames": "^2.2.6",
     "colors": "^1.4.0",
     "concat-stream": "^2.0.0",

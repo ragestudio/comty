@@ -148,6 +148,7 @@ body {
 // Right Sidebar
 @__app_overlay_padding: 30px 30px 30px 35px;
 .app_right_sidebar_wrapper {
+  opacity: 1;
   height: 100%;
   width: 100%;
 
@@ -166,6 +167,7 @@ body {
   transition: all @__app_SwapDuration ease-in-out;
 
   &.swapped {
+    opacity: 0;
     transform: translate(100%, 0);
   }
 }
@@ -225,8 +227,6 @@ body {
 
   color: @Overlay_container1_def_color;
   
-  
-
   transition: all @__app_SwapDuration ease-in-out;
 }
 
@@ -255,6 +255,82 @@ body {
   transition: all @__Global_Components_transitions_dur linear;
 }
 
+// Streaming Drawer
+.app_streamingPanel_wrapper {
+  h1 {
+    color: #fff;
+  }
+
+}
+
+.app_streamingPanel_content {
+  h1 {
+    color: #333;
+  }
+
+  display: inline-block;
+  align-items: center;
+  margin: auto;
+  color: #333;
+  border-radius: 14px;
+  background-color: #fff;
+  width: 100%;
+  padding: 40px;
+}
+
+.app_streamingPanel_onlivetag {
+  color: #9597A1;
+  background-color: #cecece;
+  padding: 5px;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 14;
+
+  transition: all 150ms ease-in-out;
+  
+  &.active {
+    color: #fff;
+    background-color: red;
+  }
+}
+
+
+.app_streamingPanel_connectionIndicator {
+  background-color: #cecece;
+  width: 1em;
+  height: 1em;
+
+  border-radius: 24px;
+  transition: all 150ms ease-in-out;
+  margin-right: 12px;
+
+  &.active {
+    background-color: #38b000;
+  }
+}
+
+.app_streamingPanel_cardBody {
+  > div {
+    margin-bottom: 15px;
+  }
+}
+
+.app_streamingPanel_hiddenkey {
+  text-align: center;
+  background-color: #cecece;
+  border-radius: 7px;
+  padding: 12px 0;
+  filter: blur(4px);
+  transition: all 150ms ease-in-out;
+
+  user-select: all;
+
+
+}
+
+.app_streamingPanel_hiddenkey:hover {
+  filter: none;
+}
 
 // CardComponent (External Module)
 .cardComponent_wrapper {
@@ -266,7 +342,7 @@ body {
   padding: 10px;
 
 
-  h2,h3,h4{
+  h1,h2,h3,h4{
     color: #9597A1;
     font-family: Netflix Sans;
     font-style: normal;
