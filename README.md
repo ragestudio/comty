@@ -1,8 +1,7 @@
 
 # Comty - An prototype of an social network
 ![CodeQL](https://github.com/srgooglo/comty/workflows/CodeQL/badge.svg?branch=master)
-[![CodeFactor](https://www.codefactor.io/repository/github/srgooglo/comty/badge)](https://www.codefactor.io/repository/github/srgooglo/comty)
-[![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
+[![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)[![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
 [![Code Alerts](https://img.shields.io/lgtm/alerts/g/srgooglo/comty.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/srgooglo/comty/alerts/)
 [![Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/srgooglo/comty.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/srgooglo/comty/context:javascript)
 [![Trello](https://img.shields.io/badge/Trello-Join%20dashboard-blue)](https://trello.com/invite/b/UbwvlG1I/2bc02725b9b210d2e9e9a82c5040b895/comty-development)
