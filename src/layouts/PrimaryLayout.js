@@ -59,8 +59,8 @@ export default class PrimaryLayout extends React.Component {
 
     window.toogleSidebarCollapse = () => {
       this.props.dispatch({
-        type: "app/handleCollapseSidebar",
-        payload: !this.props.app.sidebar_collapsed
+        type: "app/updateState",
+        payload: { sidebar_collapsed: !this.props.app.sidebar_collapsed }
       })
     }
   }

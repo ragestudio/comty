@@ -1,9 +1,10 @@
+import StreamingOverlay from 'components/StreamingOverlay'
+
 export function goLive(payload) {
     window.overlaySwap.open({
         id: 'search',
-        mode: 'full',
-        element: <div>
-            SomeSomeSomeSomeSomeSomeSomeSomeSomeSome
-        </div>
+        mode: 'half',
+        size: "50%",
+        element: <StreamingOverlay />
     })
 }

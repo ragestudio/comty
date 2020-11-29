@@ -3,9 +3,10 @@ import verbosity from 'core/libs/verbosity'
 import { connect } from 'umi'
 import classnames from 'classnames'
 
-import {
-  Primary
-} from './components'
+import { Primary } from './components'
+import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+
+const includeAllowedProps = [ "size" ]
 
 @connect(({ app }) => ({ app }))
 export default class Overlay extends React.Component {
@@ -62,9 +63,9 @@ export default class Overlay extends React.Component {
   componentDidUpdate() {
     if (this.props.app.overlayElement) {
       document.addEventListener('keydown', this.keydownFilter, false)
-      document.addEventListener('mousedown', this.handleClickOutside);
+      document.addEventListener('mousedown', this.handleClickOutside)
     } else {
-      document.removeEventListener('mousedown', this.handleClickOutside);
+      document.removeEventListener('mousedown', this.handleClickOutside)
     }
   }
 
@@ -73,6 +74,7 @@ export default class Overlay extends React.Component {
   }
 
   render() {
+    let props = {}
     const { overlayElement, overlayActive } = this.props.app
 
     const isOnMode = (mode) => {
@@ -84,15 +86,24 @@ export default class Overlay extends React.Component {
 
     const renderElement = () => {
       if (overlayElement && overlayActive) {
-        const renderProps = { id: overlayElement.id, mode: overlayElement.mode, fragment: overlayElement.element }
-        return <Primary {...renderProps} />
+        return <Primary {...overlayElement} />
       }
-
       return null
     }
 
+    try {
+      __legacy__objectToArray(overlayElement).forEach((e) => {
+        if (includeAllowedProps.includes(e.key)) {
+          props[e.key] = e.value
+        }
+      })
+    } catch (error) {
+      // terrible (⓿_⓿)
+    }
+    
     return (
       <div
+        style={props.size? { width: props.size } : null}
         id="overlay"
         ref={this.setWrapperRef}
         focus="no_loose"

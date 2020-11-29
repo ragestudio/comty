@@ -261,8 +261,6 @@ export default {
           }
         }
 
-
-
         if (!state.session_data) {
           verbosity(`session_data is not valid but the session is valid, updating from ws`)
           state.dispatcher({ type: "updateUserData" })
