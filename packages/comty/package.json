@@ -1,19 +1,10 @@
 {
   "name": "comty",
-  "UUID": "C8mVSr-4nmPp2-pr5Vrz-CU4kg4",
   "version": "0.12.8",
-  "stage": "alpha",
   "description": "An prototype of a social network",
   "author": "RageStudio",
   "license": "LGPL-2.1",
-  "main": "main/index.js",
   "types": "index.d.ts",
-  "scripts": {
-    "start": "umi dev",
-    "update:deps": "yarn upgrade-interactive --latest",
-    "debug": "node --inspect-brk ./node_modules/.bin/umi dev",
-    "build": "umi build"
-  },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^3.8.0",
     "@lingui/react": "^2.9.2",
