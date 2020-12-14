@@ -15,3 +15,5 @@
 /src/.umi-test
 /.env.local
 
+/packages/*/node_modules
+/packages/**/node_modules
