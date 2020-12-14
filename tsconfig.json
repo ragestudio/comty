@@ -17,8 +17,8 @@
   },
   "include": [
     "src/**/*",
-    "config/**/*",
-    ".umirc.js",
-    "typings.d.ts"
+    "packages/comty/config/**/*",
+    "packages/comty/.umirc.js",
+    "packages/comty/typings.d.ts"
   ]
 }
