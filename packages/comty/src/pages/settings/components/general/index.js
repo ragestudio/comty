@@ -1,127 +1,83 @@
-import React, { Component, Fragment } from 'react'
-import { List, Switch, Button, notification, InputNumber } from 'antd'
+import React from 'react'
+import { List, Button, Switch, Checkbox, InputNumber, Input } from 'antd'
+import * as Icons from 'components/Icons'
 
 import { verbosity } from '@nodecorejs/utils'
-import * as Icons from 'components/Icons'
 import { settings, newSetting } from 'core/libs/settings'
-import SettingList from 'schemas/settings.json'
+import listSettings from 'schemas/settings_general.json'
 
-import {connect} from 'umi'
-
-@connect(({ app }) => ({ app }))
-export default class GeneralSettings extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      list: SettingList,
-    };
+const AntdComponents = { Button, Switch, Checkbox, InputNumber, Input }
+export default class GeneralSettings extends React.Component {
+  state = {
+    list: listSettings,
   }
 
-  renderSetting = item => {
+  renderSetting = (item) => {
+    if (!item.type || !item.id) {
+      verbosity.log("Invalid component >", item)
+      return null
+    }
+    if (typeof(AntdComponents[item.type]) == "undefined") {
+      verbosity.log(`Invalid component, '${item.type}' not exists >`, item)
+      return null
+    }
+
+    let itemProps = {
+      onChange: (e) => this.onChange(item, e),
+      checked: settings.get(item.id)
+    }
+
     switch (item.type) {
-      case 'switch':
-        return (
-          <Switch
-            checkedChildren={'Enabled'}
-            unCheckedChildren={'Disabled'}
-            checked={settings.get(item.id)}
-            onChange={() => this.onChange(item)}
-          />
-        )
-      case 'numeric':
-        return (
-          <InputNumber
-            min={1}
-            max={50}
-            defaultValue={item.value}
-            onChange={() => this.onChangeNumeric(item, value)}
-          />
-        )
+      case 'Switch': {
+        itemProps = { ...itemProps } // checkedChildren: "Enabled", unCheckedChildren: "Disabled"
+        break
+      }
       default:
         break
     }
+
+    return React.createElement(AntdComponents[item.type], itemProps)
   }
 
-  handleControlBar() {
-    const ListControls = [
-      <div key={Math.random()}>
-        <Button
-          type="done"
-          icon={<Icons.SaveOutlined />}
-          onClick={() => this.saveChanges()}
-        >
-          Save
-        </Button>
-      </div>,
-    ]
-    ControlController.set(ListControls)
-  }
-
-  saveChanges() {
-    localStorage.setItem('app_settings', JSON.stringify(this.state.SettingRepo))
-    this.setState({ forSave: false })
-    notification.success({
-      message: 'Settings saved',
-      description:
-        'The configuration has been saved, it may for some configuration to make changes you need to reload the application',
-    })
-    ControlController.close()
-  }
-
-  onChange(item) {
+  onChange(item, event) {
     try {
-      switch (item.type) {
-        case 'switch': {
-          item.to = !settings.get(item.id)
-          verbosity.log(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
-          settings.set(item.id, item.to)
-          this.handleChange(item)
+      let to = event
 
-        }
-        case 'numeric': {
+      verbosity.colors({ log: { textColor: "blue" } }).log(`Updating setting (${item.id}) > ${to}`)
+      settings.set(item.id, to)
 
-        }
-        default: {
-          return null
-        }
-      }
-    } catch (err) {
-      console.log(err)
-    }
-  }
-
-
-  handleChange(item) {
-    try {
-      const updatedValue = this.state.list.map(element =>
-        element.id === item.id ? Object.assign(element, { value: item.to }) : element
+      const updatedValues = this.state.list.map(element =>
+        element.id === item.id ? Object.assign(element, { value: to }) : element
       )
-      this.setState({ list: updatedValue})
+      this.setState({ list: updatedValues })
     } catch (err) {
       console.log(err)
     }
   }
-  
+
+  renderIcon(icon, props) {
+    if (!Icons[icon]) {
+      verbosity.log(`${icon} not exist!`)
+      return null
+    }
+    return React.createElement(Icons[icon], props ?? null) 
+  }
 
   render() {
     return (
-      <Fragment>
-        <div>
-          <List
-            itemLayout="horizontal"
-            dataSource={this.state.list}
-            renderItem={item => (
-              <List.Item actions={item.actions} key={item.id}>
-                <List.Item.Meta
-                  title={<>{item.icon}{item.title}</>}
-                  description={item.description}
-                />
-                {this.renderSetting(item)}
-              </List.Item>
-            )}
-          />
-        </div>
-      </Fragment>
+      <List
+        itemLayout="horizontal"
+        dataSource={this.state.list}
+        renderItem={(item) => (
+          <List.Item actions={item.actions} key={item.id}>
+            <List.Item.Meta
+              title={<>{this.renderIcon(item.icon)}{item.title}</>}
+              description={item.description}
+            />
+            {this.renderSetting(item)}
+          </List.Item>
+        )}
+      />
     )
   }
 }
