@@ -1,5 +1,5 @@
 import React from 'react'
-import { app } from 'config'
+import config from 'config'
 import { router } from 'core/libs'
 import { connect } from 'umi'
 import MenuList from 'schemas/sidebar_menu.json'
@@ -72,7 +72,7 @@ class Sider extends React.Component {
   }
 
   renderByType(type) {
-    const sider_props = { handleClickMenu: this.handleClickMenu, logo: app.LogoPath }
+    const sider_props = { handleClickMenu: this.handleClickMenu, logo: config.app.LogoPath }
     const filteredMenus = this.filterMenusByType(type)
     switch (type) {
       case "desktop": {

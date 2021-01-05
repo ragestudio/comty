@@ -4,7 +4,7 @@ import { imageToBase64 } from 'core'
 import * as Icons from 'components/Icons'
 import styles from './index.less'
 import { connect } from 'umi'
-import { stricts } from 'config'
+import config from 'config'
 import { settings, newSetting } from 'core/libs/settings'
 
 const PrivacyList = [
@@ -43,13 +43,13 @@ const PrivacyList = [
 @connect(({ app }) => ({ app }))
 class PostCreator extends React.PureComponent {
   state = {
-    maxFileSize: stricts.api_maxpayload,
-    maxTextLenght: stricts.post_maxlenght,
+    maxFileSize: config.stricts.api_maxpayload,
+    maxTextLenght: config.stricts.post_maxlenght,
 
     renderValid: false,
     loading: false,
 
-    textLenght: stricts.post_maxlenght,
+    textLenght: config.stricts.post_maxlenght,
     rawText: '',
     posting: false,
     postingResult: false,

@@ -2,7 +2,7 @@ import moment from 'moment';
 import { format } from 'timeago.js';
 import { cloneDeep } from 'lodash';
 import store from 'store';
-import { i18n, app } from 'config';
+import config from 'config';
 import handle from 'core/libs/errorhandler'
 import request from 'request'
 import html2canvas from 'html2canvas'
@@ -13,29 +13,28 @@ import * as utils from '@nodecorejs/utils'
 
 const { pathToRegexp } = require('path-to-regexp');
 
-export const languages = i18n ? i18n.languages.map(item => item.key) : [];
-export const defaultLanguage = i18n ? i18n.defaultLanguage : '';
+export const languages = config.i18n ? config.i18n.languages.map(item => item.key) : [];
+export const defaultLanguage = config.i18n ? config.i18n.defaultLanguage : '';
 
 import * as libs from './libs'
 
-export * from '@nodecorejs/utils'
 export const package_json = require('../../package.json');
-export const GUID = app.guid;
+export const GUID = config.app.guid;
 
 export const clientInfo = {
   buildStable: getBuild()["stable"],
   packageName: package_json.name,
   packageStage: package_json.stage,
-  siteName: app.siteName,
+  siteName: config.app.siteName,
   version: package_json.version,
-  logo: app.FullLogoPath,
-  logo_dark: app.DarkFullLogoPath,
+  logo: config.app.FullLogoPath,
+  logo_dark: config.app.DarkFullLogoPath,
   os: platform.os,
   layout: platform.layout
-};
+}
 
 export function getCircularReplacer() {
-  const seen = new WeakSet();
+  const seen = new WeakSet()
   return (key, value) => {
     if (typeof value === "object" && value !== null) {
       if (seen.has(value)) {
@@ -250,40 +249,16 @@ export function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
  * @param {object} payload - Generation Data
  */
 export function downloadDecodedURI(payload) {
+  // TODO: Support encoded
   if (!payload) return false
   let { data, type, charset, filename } = payload
-  /**
-    * 
-    * @param {object} payload - Generation Data
-    */
   if (!data || !type) return false
   try {
     if (!filename) {
-      filename = `${app.id}_${time.now()}.${type.split("/")[1]}`
+      filename = `${"download"}_${time.now()}.${type.split("/")[1]}` // TODO: Add package name to title generation
     }
     let tmp = document.createElement('a')
     tmp.href = `data:${type};charset=${charset},${encodeURIComponent(data)}`
-    tmp.download = filename
-    tmp.click()
-  } catch (error) {
-    handle({ msg: error, code: 120 })
-  }
-}
-
-export function downloadEncodedURI(payload) {
-  if (!payload) return false
-  let { data, filename } = payload
-  /**
-    * 
-    * @param {object} payload - Generation Data
-    */
-  if (!data) return false
-  try {
-    if (!filename) {
-      filename = `${app.id}_${time.now()}.${data.split("/")[1].split(";")[0]}`
-    }
-    let tmp = document.createElement('a')
-    tmp.href = data
     tmp.download = filename
     tmp.click()
   } catch (error) {

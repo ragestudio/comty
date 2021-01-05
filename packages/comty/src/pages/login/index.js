@@ -12,14 +12,14 @@ import RegistrationForm from './register.js'
 import NormalLoginForm from './login.js'
 import GuestSession from './guest.js'
 
-import { app } from 'config'
+import config from 'config'
 import { connect } from 'umi'
 
 const types = [
   {
     id: "login",
     key: 0,
-    renderText: `Sign in ${app.siteName}`
+    renderText: `Sign in ${config.app.siteName}`
   },
   {
     id: "register",

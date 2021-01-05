@@ -14,7 +14,13 @@ module.exports = {
     endpoint_v3prefix: 'ycorejs_apiv3',
     endpoint_websocket: 'eu_es01.ragestudio.net',
 
-    storage_appSettings: 'app_settings',
+    storage: {
+      theme: "app_theme",
+      settings: "app_settings",
+      token: "cid",
+      data: "data"
+    },
+
     storage_authFrame: 'cid',
     storage_dataFrame: 'data',
     storage_theme: 'app_theme',
@@ -43,17 +49,14 @@ module.exports = {
     {
       name: 'public',
       include: [/.*/]
-    },
-    {
-      name: 'splash',
-      include: [/\/splash/]
-    },
+    }
   ],
 
   // Default Behaviors 
   defaults: {
     app_model: "app",
     verbosity: false,
+    sidebarCollaped: false,
     session_noexpire: false,
     search_ontype: false,
     post_autoposition: true,
@@ -76,5 +79,4 @@ module.exports = {
     api_maxpayload: '101376',
     api_maxovertick: 10,
   }
-
-};
+}

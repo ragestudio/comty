@@ -1,9 +1,9 @@
 import store from 'store';
-import { app } from 'config';
+import config from 'config';
 import { verbosity } from '@nodecorejs/utils'
 import ErrorHandler from 'core/libs/errorhandler'
 
-const { appTheme_desiredContrast, storage_theme } = app
+const { appTheme_desiredContrast, storage_theme } = config.app
 
 export const updateRootStyles = (styles) => {
   const rootContainer = document.getElementById(runtime.mountElementId ?? "root")

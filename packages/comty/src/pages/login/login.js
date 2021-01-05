@@ -6,8 +6,6 @@ import HeadShake from 'react-reveal/HeadShake';
 
 import * as antd from 'antd'
 
-import { session, user } from 'core/models'
-
 import { Form, Input, Button, Checkbox } from 'antd'
 import {
   UserOutlined,
