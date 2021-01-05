@@ -1,17 +1,14 @@
 import React from 'react'
 import { withRouter, connect } from 'umi'
-import {
-  AppLayout
-} from 'components'
+import { AppLayout } from 'components'
 import { enquireScreen, unenquireScreen } from 'enquire-js'
 import store from 'store'
 import classnames from 'classnames'
 
-import { app } from 'config'
+import config from 'config'
 import { theme } from 'core/libs/style'
 import * as antd from 'antd'
 import contextMenuList from 'schemas/contextMenu'
-
 
 const { Content } = antd.Layout
 const { Sider, Overlay, RightSider } = AppLayout
@@ -23,7 +20,7 @@ export default class PrimaryLayout extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      collapsed: app.default_collapse_sider ? true : false,
+      collapsed: config.defaults.sidebarCollaped ? true : false,
       isMobile: false
     }
 
@@ -80,10 +77,10 @@ export default class PrimaryLayout extends React.Component {
       const { isMobile } = this.state
       if (isMobile !== mobile) {
         window.isMobile = mobile
-        this.setState({isMobile: mobile})
+        this.setState({ isMobile: mobile })
       }
     })
-    
+
   }
 
   componentWillUnmount() {

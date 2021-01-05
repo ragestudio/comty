@@ -1,18 +1,16 @@
 import React from 'react'
-import { pathMatchRegexp, booleanFix, objectToArrayMap } from 'core'
-import HandleError from 'core/libs/errorhandler'
-import { Invalid } from 'components'
-import styles from './index.less'
-import GlobalBadges from 'schemas/badges_list.json'
-import * as Icons from 'components/Icons'
-
-import FollowButton from './components/follow'
-import Menu from './components/menu'
-import { PostsFeed } from 'components'
-
 import * as antd from 'antd'
+import { verbosity, objectToArrayMap } from '@nodecorejs/utils'
+import * as Icons from 'components/Icons'
 import { connect } from 'umi'
-import { verbosity } from '@nodecorejs/utils'
+
+import { pathMatchRegexp, booleanFix } from 'core'
+import HandleError from 'core/libs/errorhandler'
+import GlobalBadges from 'schemas/badges_list.json'
+import { Invalid, PostsFeed} from 'components'
+import FollowButton from './components/follow'
+
+import styles from './index.less'
 
 export class UserLayout extends React.Component {
   state = {

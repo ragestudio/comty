@@ -3,7 +3,8 @@ import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import styles from './index.less'
 import { connect } from 'umi';
-import { package_json, objectToArrayMap } from 'core'
+import { package_json } from 'core'
+import { objectToArrayMap } from '@nodecorejs/utils'
 
 const AppTech = (info) => {
     if (!info) return null

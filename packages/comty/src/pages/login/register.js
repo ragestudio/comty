@@ -16,7 +16,7 @@ import {
 } from 'antd'
 
 import ReCAPTCHA from 'react-google-recaptcha'
-import { g_recaptcha_key } from 'config/app_keys'
+import { g_recaptcha_key } from 'config/keys'
 
 export default class RegistrationForm extends React.Component {
   state = {

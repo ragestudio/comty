@@ -1,6 +1,6 @@
 import store from 'store'
 import config from 'config'
-import keys from 'config/app_keys'
+import keys from 'config/keys'
 import { session } from 'core/models'
 import { verbosity } from '@nodecorejs/utils'
 import settings from 'core/libs/settings'
@@ -38,8 +38,8 @@ export default {
     dispatcher: null,
 
     electron: null,
-    app_settings: store.get(config.app.storage_appSettings) || [],
-    app_theme: store.get(config.app.storage_theme) || [],
+    app_settings: store.get(config.app.storage.settings) || [],
+    app_theme: store.get(config.app.storage.theme) || [],
     notifications: [],
   },
   subscriptions: {

@@ -1,6 +1,5 @@
-import { app } from 'config'
-import { verbosity } from '@nodecorejs/utils'
-import { objectToArrayMap } from 'core'
+import config from 'config'
+import { verbosity, objectToArrayMap } from '@nodecorejs/utils'
 
 import SocketConnection from 'core/libs/socket/index.ts'
 
@@ -8,7 +7,7 @@ export default {
   namespace: 'socket',
   state: {
     nodes: {},
-    socket_address: app.endpoint_websocket, //set by default
+    socket_address: config.app.endpoint_websocket, //set by default
     socket_port: "7000",
     headerNode: "/"
   },

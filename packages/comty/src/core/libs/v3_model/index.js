@@ -1,8 +1,8 @@
 import v3_request from 'api/lib/v3_request'
 import endpointList from 'config/endpoints'
-import { app } from 'config'
+import config from 'config'
 
-const { endpoint_v3prefix } = app;
+const { endpoint_v3prefix } = config.app;
 
 export async function api_request(payload, callback) {
   if (!payload) return false;
