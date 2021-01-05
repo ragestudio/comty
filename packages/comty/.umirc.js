@@ -1,5 +1,5 @@
 import config from './config/index.js'
-import { defineConfig, chainWebpack } from 'umi'
+import { defineConfig } from 'umi'
 import { resolve } from 'path'
 
 let configs = {
@@ -25,7 +25,7 @@ let configs = {
     antd: resolve(__dirname, './node_modules/antd'),
     api: resolve(__dirname, './node_modules/@ragestudio/nodecore-api-lib/src'),
     plugins: resolve(__dirname, './plugins'),
-    globals: resolve(__dirname, './globals'),
+    schemas: resolve(__dirname, './schemas'),
     debuggers: resolve(__dirname, './src/debuggers'),
     core: resolve(__dirname, './src/core'),
     theme: resolve(__dirname, './src/theme'),

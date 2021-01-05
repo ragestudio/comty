@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { createBrowserHistory } from 'F:/Development/comty/node_modules/@umijs/runtime';
+import { createBrowserHistory } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/runtime';
 
 let options = {
   "basename": "/"

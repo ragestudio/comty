@@ -1,5 +1,5 @@
 import settings from 'core/libs/settings'
-import { __legacy__objectToArray } from 'core'
+import { objectToArrayMap } from 'core'
 import stackTrace from 'stack-trace'
 import path from 'path'
 import colors from 'colors'
@@ -32,7 +32,7 @@ export function verbosity(data, params, stackTraceParams){
   }
 
   if (typeof(params) !== "undefined" || params != null) {
-    __legacy__objectToArray(params).forEach((e) => {
+    objectToArrayMap(params).forEach((e) => {
       if(typeof(e.value) !== "undefined"){
         opt[e.key] = e.value
       }
@@ -40,7 +40,7 @@ export function verbosity(data, params, stackTraceParams){
   }
 
   if (typeof(stackTraceParams) !== "undefined" || stackTraceParams != null) {
-    __legacy__objectToArray(stackTraceParams).forEach((e) => {
+    objectToArrayMap(stackTraceParams).forEach((e) => {
       if(typeof(e.value) !== "undefined"){
         optStackTrace[e.key] = e.value
       }

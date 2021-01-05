@@ -3,14 +3,13 @@ import { Component } from 'react';
 import { ApplyPluginsType } from 'umi';
 import dva from 'dva';
 // @ts-ignore
-import createLoading from 'F:/Development/comty/node_modules/dva-loading/dist/index.esm.js';
+import createLoading from '/Users/srgooglo/repos/comty/packages/comty/node_modules/dva-loading/dist/index.esm.js';
 import { plugin, history } from '../core/umiExports';
-import ModelApp0 from 'F:/Development/comty/src/models/app.js';
-import ModelContextMenu1 from 'F:/Development/comty/src/models/contextMenu.js';
-import ModelExtended2 from 'F:/Development/comty/src/models/extended.js';
-import ModelSocket3 from 'F:/Development/comty/src/models/socket.ts';
-import ModelStreaming4 from 'F:/Development/comty/src/models/streaming.js';
-import ModelUser5 from 'F:/Development/comty/src/models/user.ts';
+import ModelApp0 from '/Users/srgooglo/repos/comty/packages/comty/src/models/app.js';
+import ModelContextMenu1 from '/Users/srgooglo/repos/comty/packages/comty/src/models/contextMenu.js';
+import ModelSocket2 from '/Users/srgooglo/repos/comty/packages/comty/src/models/socket.ts';
+import ModelStreaming3 from '/Users/srgooglo/repos/comty/packages/comty/src/models/streaming.js';
+import ModelUser4 from '/Users/srgooglo/repos/comty/packages/comty/src/models/user.ts';
 
 let app:any = null;
 
@@ -30,16 +29,15 @@ export function _onCreate(options = {}) {
   });
   
   app.use(createLoading());
-  app.use(require('F:/Development/comty/node_modules/dva-immer/dist/index.js')());
+  app.use(require('/Users/srgooglo/repos/comty/packages/comty/node_modules/dva-immer/dist/index.js')());
   (runtimeDva.plugins || []).forEach((plugin:any) => {
     app.use(plugin);
   });
   app.model({ namespace: 'app', ...ModelApp0 });
 app.model({ namespace: 'contextMenu', ...ModelContextMenu1 });
-app.model({ namespace: 'extended', ...ModelExtended2 });
-app.model({ namespace: 'socket', ...ModelSocket3 });
-app.model({ namespace: 'streaming', ...ModelStreaming4 });
-app.model({ namespace: 'user', ...ModelUser5 });
+app.model({ namespace: 'socket', ...ModelSocket2 });
+app.model({ namespace: 'streaming', ...ModelStreaming3 });
+app.model({ namespace: 'user', ...ModelUser4 });
   return app;
 }
 

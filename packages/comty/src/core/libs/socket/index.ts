@@ -1,5 +1,5 @@
 import io from 'socket.io-client'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import settings from 'core/libs/settings'
 import { notify } from 'core/libs/ui'
 
@@ -108,7 +108,7 @@ export default class SocketConnection {
                     this.setConnectionListeners()
                 })
             }else{
-                verbosity(`[${this.opts.namespaceOrigin}] node is locked, cannot switch the namespace`)
+                verbosity.log(`[${this.opts.namespaceOrigin}] node is locked, cannot switch the namespace`)
             }
         }
     }
@@ -169,7 +169,7 @@ export default class SocketConnection {
                     this.ioConn.updateListener(listenerKey, true)
                 }
                 if (this.state.listeners[listenerKey] != null && !this.state.listeners[listenerKey]) {
-                    verbosity([`Listener [${listenerKey}] is broked!`], { color: "red" })
+                    verbosity.log(`Listener [${listenerKey}] is broked!`) // TODO: Add verbosity color
                     return false
                 }
 
@@ -200,7 +200,7 @@ export default class SocketConnection {
     setConnectionListeners() {
         this.ioConn.on('connect', () => {
             this.ioConn.updateConnectionState(1)
-            verbosity([`🌐 Connected to socket (${this.opts.namespaceOrigin})`])
+            verbosity.log(`🌐 Connected to socket (${this.opts.namespaceOrigin})`)
             this.then(this.ioConn) // sending init data
         })
 
@@ -209,16 +209,16 @@ export default class SocketConnection {
                 this.ioConn.updateConnectionState(2)
             }
             if (this.state.connAttemps >= this.opts.reconnectionAttempts) {
-                verbosity(['Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1])
+                verbosity.log('Maximun nº of attemps reached => max', this.opts.reconnectionAttempts + 1)
                 this.ioConn.updateConnectionState(0)
                 return false
             }
-            verbosity([`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event])
+            verbosity.log(`Strike [${this.state.connAttemps + 1}] / ${this.opts.reconnectionAttempts + 1} !`, event)
             this.state.connAttemps = this.state.connAttemps + 1
         })
 
         this.ioConn.on('reconnect', (attemptNumber: ioConnTypes) => {
-            verbosity([`✅ Connection reconected with (${attemptNumber}) tries > [socket_event]`])
+            verbosity.log(`✅ Connection reconected with (${attemptNumber}) tries > [socket_event]`)
             this.ioConn.updateConnectionState(1)
         })
 
@@ -226,17 +226,17 @@ export default class SocketConnection {
             if (this.opts.isHeader) {
                 notify.warn("You are offline")
             }
-            verbosity([`🔌 Disconnect from socket (${this.opts.namespaceOrigin}) > [socket_event] >`, event])
+            verbosity.log(`🔌 Disconnect from socket (${this.opts.namespaceOrigin}) > [socket_event] >`, event)
             this.ioConn.updateConnectionState(3)
         })
 
         this.ioConn.on('connect_timeout', () => {
-            verbosity([`🕘 Socket timeout (${this.opts.namespaceOrigin}) > [socket_event]`])
+            verbosity.log(`🕘 Socket timeout (${this.opts.namespaceOrigin}) > [socket_event]`)
             this.ioConn.updateConnectionState(3)
         })
 
         this.ioConn.on('error', (event: ioConnTypes) => {
-            verbosity([`❌ Socket throw error (${this.opts.namespaceOrigin}) > [socket_event] >`, event])
+            verbosity.log(`❌ Socket throw error (${this.opts.namespaceOrigin}) > [socket_event] >`, event)
         })
 
         this.ioConn.on('updateState', (event: ioConnTypes) => {

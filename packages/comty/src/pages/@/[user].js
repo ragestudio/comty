@@ -1,9 +1,9 @@
 import React from 'react'
-import { pathMatchRegexp, booleanFix, __legacy__objectToArray } from 'core'
+import { pathMatchRegexp, booleanFix, objectToArrayMap } from 'core'
 import HandleError from 'core/libs/errorhandler'
 import { Invalid } from 'components'
 import styles from './index.less'
-import GlobalBadges from 'globals/badges_list.json'
+import GlobalBadges from 'schemas/badges_list.json'
 import * as Icons from 'components/Icons'
 
 import FollowButton from './components/follow'
@@ -12,7 +12,7 @@ import { PostsFeed } from 'components'
 
 import * as antd from 'antd'
 import { connect } from 'umi'
-import { verbosity } from '../../core/libs'
+import { verbosity } from '@nodecorejs/utils'
 
 export class UserLayout extends React.Component {
   state = {
@@ -55,7 +55,7 @@ export class UserLayout extends React.Component {
     if (typeof(layoutData.user_tags) == "undefined") {
       return null
     }
-    let userTags = __legacy__objectToArray(layoutData.user_tags)
+    let userTags = objectToArrayMap(layoutData.user_tags)
     let renderTags = []
 
     if (!userTags) {
@@ -72,7 +72,7 @@ export class UserLayout extends React.Component {
       return null
     }
 
-    __legacy__objectToArray(GlobalBadges).forEach(e => {
+    objectToArrayMap(GlobalBadges).forEach(e => {
       if(userTags.includes(e.value.id)) {
         renderTags.push(e.value)
       }
@@ -191,7 +191,7 @@ export default class UserIndexer extends React.Component {
         }
       })
     }else{
-      verbosity(`Need auth`)
+      verbosity.log(`Needs auth to dispatch 'actions' event`)
     }
     
   }

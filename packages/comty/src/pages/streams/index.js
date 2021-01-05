@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import { connect } from 'umi'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 
 import { goLive } from 'core/models/helpers'
 
@@ -17,7 +17,7 @@ export default class Streams extends React.Component {
         try {
 
         } catch (error) {
-            verbosity([error])
+            verbosity.log(error)
         }
     }
 

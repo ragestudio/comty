@@ -1,5 +1,5 @@
 import { ui } from 'core/libs'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import errStrings from 'config/handlers/errToStrings.js'
 import errNumbers from 'config/handlers/numToError.js'
 import errFlags from  'config/handlers/errToFlag.js'
@@ -20,7 +20,7 @@ export function notifyErrorHandler(params) {
       description:
       <div style={{ display: 'flex', flexDirection: 'column', margin: 'auto', height: "auto" }}>
           <div style={{ margin: '10px 0' }}> {params.msg ?? "No exception message"} </div>
-          <div> => {errStrings[params.out] ?? "Unhandled Exception"} | { params.out?? "UNDEFINED_KEY" } </div>
+          <div> {errStrings[params.out] ?? "Unhandled Exception"} | { params.out?? "UNDEFINED_KEY" } </div>
       </div>,
     })
 }
@@ -44,7 +44,7 @@ export function ErrorHandler(payload, callback){
         out = outFlag
     }
 
-    verbosity(msg?? "unhandled message", {type: "error"})
+    verbosity.log(msg?? "unhandled message", {type: "error"})
 
     if (out && typeof(errStrings[out]) !== "undefined") {
         flag = errFlags[out]

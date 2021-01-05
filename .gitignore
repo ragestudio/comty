@@ -10,9 +10,16 @@
 /out
 
 # umi
-/src/.umi
-/src/.umi-production
-/src/.umi-test
+/packages/**/src/.umi
+/packages/**/src/.umi-production
+/packages/**/src/.umi-test
+/packages/**/.env.local
+
+/packages/*/src/.umi
+/packages/*/src/.umi-production
+/packages/*/src/.umi-test
+/packages/*/.env.local
+
 /.env.local
 
 /packages/*/node_modules

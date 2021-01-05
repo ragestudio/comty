@@ -4,8 +4,8 @@ import '@@/core/devScripts';
 import { plugin } from './core/plugin';
 import './core/pluginRegister';
 import { createHistory } from './core/history';
-import { ApplyPluginsType } from 'F:/Development/comty/node_modules/@umijs/runtime';
-import { renderClient } from 'F:/Development/comty/node_modules/@umijs/renderer-react/dist/index.js';
+import { ApplyPluginsType } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/runtime';
+import { renderClient } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/renderer-react/dist/index.js';
 import { getRoutes } from './core/routes';
 
 
@@ -38,7 +38,7 @@ export default clientRender();
 
 
     window.g_umi = {
-      version: '3.2.24',
+      version: '3.3.2',
     };
   
 

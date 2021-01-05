@@ -1,5 +1,4 @@
 {
-  "version": "0.12.8",
   "author": "RageStudio",
   "license": "LGPL-2.1",
   "types": "index.d.ts",
@@ -16,23 +15,18 @@
     ]
   },
   "scripts": {
-    "bootstrap": "node ./scripts/bootstrap.js",
-    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "release": "node ./scripts/release.js",
-    "start": "cd ./packages/comty && umi dev",
-    "debug": "cd ./packages/comty && node --inspect-brk ./node_modules/.bin/umi dev",
-    "build": "cd ./packages/comty && umi build",
+    "postinstall": "cd ./packages/comty && npm i",
+    "start": "cd ./packages/comty && npm start",
     "update:deps": "yarn upgrade-interactive --latest"
   },
   "devDependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@nodecorejs/dot-runtime": "^0.4.3",
-    "@nodecorejs/libs": "^0.4.4",
-    "@ragestudio/nodecore-utils": "^0.1.19",
     "@types/node": "^12.12.59",
     "concurrently": "^3.5.1",
     "cross-env": "^6.0.0",
-    "jest": "^26.5.3",
     "jsdoc": "^3.6.5"
+  },
+  "dependencies": {
+    "@ragestudio/nodecorejs": "^0.14.7"
   }
 }

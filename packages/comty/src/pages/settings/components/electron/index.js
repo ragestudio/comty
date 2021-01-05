@@ -3,7 +3,7 @@ import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import styles from './index.less'
 import { connect } from 'umi';
-import { package_json, __legacy__objectToArray } from 'core'
+import { package_json, objectToArrayMap } from 'core'
 
 const AppTech = (info) => {
     if (!info) return null
@@ -40,7 +40,7 @@ export default class ElectronSettings extends React.PureComponent{
                 g_umi: window.g_umi, 
                 process: window.process,
                 react_version: React.version,
-                deps: __legacy__objectToArray(package_json.dependencies)
+                deps: objectToArrayMap(package_json.dependencies)
             } 
         })
     }

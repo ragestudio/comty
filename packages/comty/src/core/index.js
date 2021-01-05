@@ -9,7 +9,7 @@ import html2canvas from 'html2canvas'
 import platform from 'platform'
 import path from 'path'
 import fs from 'fs'
-import * as utils from '@ragestudio/nodecore-utils'
+import * as utils from '@nodecorejs/utils'
 
 const { pathToRegexp } = require('path-to-regexp');
 
@@ -18,7 +18,7 @@ export const defaultLanguage = i18n ? i18n.defaultLanguage : '';
 
 import * as libs from './libs'
 
-export * from '@ragestudio/nodecore-utils'
+export * from '@nodecorejs/utils'
 export const package_json = require('../../package.json');
 export const GUID = app.guid;
 
@@ -90,7 +90,7 @@ export function getBuild() {
     const buildPath = path.resolve(__dirname, "./dist")
     const data = JSON.parse(fs.readFileSync(`${buildPath}/build.json`))
     if (typeof (data) !== "undefined" && Array.isArray(data)) {
-      utils.__legacy____legacy__objectToArray(data).forEach((e) => {
+      utils.__legacy__objectToArrayMap(data).forEach((e) => {
         build[e.key] = e.value
       })
     }
@@ -152,12 +152,12 @@ export function writeToClipboard(text) {
 }
 
 // [Experimental], not in use
-export function getGlobals(params, callback) {
+export function getglobal(params, callback) {
   if (!params || !params.server) return false
   let tmpResponse = []
 
   let req = {
-    global: "__globals",
+    global: "__global",
     url: params.server
   }
 
@@ -335,7 +335,7 @@ export function arrayToObject(array) {
  * @return array
  */
 export function objectRemoveId(object, id) {
-  let arr = __legacy__objectToArray(object)
+  let arr = objectToArrayMap(object)
   return arr.filter((e) => {
     return e.id != id;
   });
@@ -348,7 +348,7 @@ export function objectRemoveId(object, id) {
  * @return array
  */
 export function objectRemoveKey(object, key) {
-  let arr = __legacy__objectToArray(object)
+  let arr = objectToArrayMap(object)
   return arr.filter((e) => {
     return e.key != key;
   });

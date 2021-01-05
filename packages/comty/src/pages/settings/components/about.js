@@ -2,7 +2,7 @@ import React from 'react'
 import { About } from 'components'
 import * as Icons from 'components/Icons'
 import * as antd from 'antd'
-import l from 'globals/links'
+import l from 'schemas/links'
 
 export default class AppAbout extends React.Component {
   render() {

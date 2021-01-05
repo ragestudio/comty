@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * Base on https://github.com/umijs/F:/Development/comty/node_modules/umi-request
+ * Base on https://github.com/umijs//Users/srgooglo/repos/comty/packages/comty/node_modules/umi-request
  */
 import {
   extend,
@@ -13,14 +13,16 @@ import {
   RequestResponse,
   RequestInterceptor,
   ResponseInterceptor,
-} from 'F:/Development/comty/node_modules/umi-request';
+} from '/Users/srgooglo/repos/comty/packages/comty/node_modules/umi-request';
 // @ts-ignore
 
 import { ApplyPluginsType } from 'umi';
 import { history, plugin } from '../core/umiExports';
             
-import { message, notification } from 'antd';
-import useUmiRequest, { UseRequestProvider } from 'F:/Development/comty/node_modules/@ahooksjs/use-request';
+// decoupling with antd UI library, you can using `alias` modify the ui methods
+// @ts-ignore
+import { message, notification } from '@umijs/plugin-request/lib/ui';
+import useUmiRequest, { UseRequestProvider } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@ahooksjs/use-request';
 import {
   BaseOptions,
   BasePaginatedOptions,
@@ -36,7 +38,7 @@ import {
   PaginatedOptionsWithFormat,
   PaginatedParams,
   PaginatedResult,
-} from 'F:/Development/comty/node_modules/@ahooksjs/use-request/lib/types';
+} from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@ahooksjs/use-request/lib/types';
 
 type ResultWithData<T = any> = { data?: T; [key: string]: any };
 

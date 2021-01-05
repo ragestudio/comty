@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react'
 import { List, Switch, Button, notification, InputNumber } from 'antd'
 
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import * as Icons from 'components/Icons'
 import { settings, newSetting } from 'core/libs/settings'
-import SettingList from 'globals/settings.js'
+import SettingList from 'schemas/settings.json'
 
 import {connect} from 'umi'
 
@@ -73,7 +73,7 @@ class Base extends Component {
       switch (item.type) {
         case 'switch': {
           item.to = !settings.get(item.id)
-          verbosity(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
+          verbosity.log(`Changing setting (${item.id}: ${settings.get(item.id)}) => ${item.to}`)
           settings.set(item.id, item.to)
           this.handleChange(item)
 

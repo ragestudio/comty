@@ -10,7 +10,7 @@ import classnames from 'classnames'
 import { app } from 'config'
 import { theme } from 'core/libs/style'
 import * as antd from 'antd'
-import contextMenuList from 'globals/contextMenu'
+import contextMenuList from 'schemas/contextMenu'
 
 
 const { Content } = antd.Layout

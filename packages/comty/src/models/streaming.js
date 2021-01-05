@@ -1,5 +1,3 @@
-import verbosity from 'core/libs/verbosity'
-
 export default {
     namespace: 'streaming',
     state: {

@@ -5,17 +5,19 @@
   "author": "RageStudio",
   "license": "LGPL-2.1",
   "types": "index.d.ts",
+  "scripts": {
+    "start": "umi dev",
+    "build": "umi build",
+    "update:deps": "yarn upgrade-interactive --latest"
+  },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^3.8.0",
     "@lingui/react": "^2.9.2",
-    "@nodecorejs/dot-runtime": "^0.3.1",
     "@ragestudio/nodecore-api-lib": "^0.2.6",
-    "@ragestudio/nodecore-utils": "^0.1.19",
     "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.165",
     "antd": "^4.8.2",
     "axios": "^0.21.0",
-    "babel-core": "^6.26.3",
     "chart.js": "^2.9.4",
     "classnames": "^2.2.6",
     "colors": "^1.4.0",
@@ -34,7 +36,6 @@
     "moment": "^2.28.0",
     "path-to-regexp": "^6.1.0",
     "platform": "^1.3.6",
-    "react": "^16.14.0",
     "react-animations": "^1.0.0",
     "react-color": "^2.19.3",
     "react-dazzle": "^1.4.0",
@@ -58,19 +59,13 @@
     "timeago.js": "^4.0.2"
   },
   "devDependencies": {
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@lingui/babel-preset-react": "^2.9.2",
     "@lingui/cli": "^2.9.2",
     "@lingui/loader": "^2.9.2",
     "@types/node": "^12.12.59",
     "@umijs/preset-react": "^1.6.11",
-    "babel-plugin-dev-expression": "^0.2.1",
-    "babel-plugin-module-resolver": "^4.0.0",
     "concurrently": "^3.5.1",
     "cross-env": "^6.0.0",
-    "jest": "^26.5.3",
-    "jsdoc": "^3.6.5",
-    "typescript": "^3.9.7",
     "umi": "^3.2.24"
   }
 }

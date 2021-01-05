@@ -1,6 +1,6 @@
 import store from 'store';
 import { app } from 'config';
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import ErrorHandler from 'core/libs/errorhandler'
 
 const { appTheme_desiredContrast, storage_theme } = app
@@ -10,11 +10,11 @@ export const updateRootStyles = (styles) => {
   if (rootContainer) {
     if (typeof (styles) !== "undefined" && Array.isArray(styles)) {
       try {
-        __legacy__objectToArray(styles).forEach((e) => {
+        objectToArrayMap(styles).forEach((e) => {
           rootContainer.style[e.key] = e.value
         })
       } catch (error) {
-        verbosity([error])
+        verbosity.log(error)
         return false
       }
     }
@@ -80,7 +80,7 @@ export function get_style_rule_value(selector, style) {
 export function getOptimalOpacityFromIMG(payload, callback) {
   const { textColor, overlayColor, img } = payload;
 
-  verbosity([payload])
+  verbosity.log(payload)
   let canvas = document.createElement('canvas');
   let image = new Image();
 

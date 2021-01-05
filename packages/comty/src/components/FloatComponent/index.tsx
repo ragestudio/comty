@@ -1,4 +1,4 @@
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import { XCircle } from 'components/Icons'
 import ReactDOM from 'react-dom'
 import * as antd from 'antd'
@@ -45,7 +45,7 @@ class FloatComponent extends React.Component {
 }
 
 export function Destroy() {
-    verbosity('destroying')
+    verbosity.log('destroying')
     const unmountResult = ReactDOM.unmountComponentAtNode(renderDiv)
     if (unmountResult && renderDiv.parentNode) {
         renderDiv.parentNode.removeChild(renderDiv)
@@ -59,7 +59,7 @@ export function Open(props) {
     const MountParent = document.getElementById("root")
     const thisChild = document.getElementById(divId)
   
-    verbosity([props])
+    verbosity.log(props)
 
     if (thisChild) {
         MountParent.removeChild(thisChild)
