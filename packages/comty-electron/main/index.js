@@ -11,7 +11,7 @@ const {
   BrowserView,
   systemPreferences, 
   Notification,
-  globalShortcut
+  globalhortcut
 } = require('electron')
 const path = require('path')
 // const { spawn, exec } = require('child_process')
@@ -107,11 +107,11 @@ function createWindow() {
 
   if (is.dev()) {
     app.commandLine.appendSwitch('remote-debugging-port', '9222')
-    globalShortcut.register('CommandOrControl+R', () => {
+    globalhortcut.register('CommandOrControl+R', () => {
       mainWindow.reload()
     })
 
-    globalShortcut.register('F5', () => {
+    globalhortcut.register('F5', () => {
       mainWindow.reload()
     })
   }

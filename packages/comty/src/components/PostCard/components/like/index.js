@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './index.less'
 import * as core from 'core'
 import classnames from 'classnames'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 
 export default class LikeBtn extends React.Component {
   state = {
@@ -21,7 +21,7 @@ export default class LikeBtn extends React.Component {
         if (typeof (callback) !== "object") {
           this.setState({ count: callback })
         } else {
-          verbosity(`Invalid response`)
+          verbosity.log(`Invalid response`)
           this.setState({ clicked: false, liked: false })
         }
         setTimeout(() => {
@@ -30,7 +30,7 @@ export default class LikeBtn extends React.Component {
         done = true
       }, setTimeout(() => {
         if (!done) {
-          verbosity(`like click timeout!`)
+          verbosity.log(`like click timeout!`)
           this.setState({ clicked: false })
         }
       }, 3000))

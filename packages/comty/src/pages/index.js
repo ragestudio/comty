@@ -3,7 +3,7 @@ import ReduxDebugger from 'debuggers/redux'
 import * as antd from 'antd'
 import { connect } from 'umi'
 import { ClusterOutlined } from 'components/Icons'
-import { __legacy__objectToArray } from 'core'
+import { objectToArrayMap } from 'core'
 
 @connect((store) => (store))
 export default class Index extends React.Component {
@@ -25,7 +25,7 @@ export default class Index extends React.Component {
                 return null
             }
             return (
-                __legacy__objectToArray(data).map(e => {
+                objectToArrayMap(data).map(e => {
                     return (
                         <div key={e.key}>
                             <antd.Tag>{e.key} > <antd.Tag color={e.value ? "geekblue" : "orange"} >{e.value ? "Enabled" : "Disable"}</antd.Tag></antd.Tag>
@@ -40,7 +40,7 @@ export default class Index extends React.Component {
                 return null
             }
             return (
-                __legacy__objectToArray(data).map(e => {
+                objectToArrayMap(data).map(e => {
                     return (
                         <div key={e.key} style={{ display: "flex", flexDirection: "column", justifyContent: "center", margin: "0 10px", width: "100%", height: "100%" }}>
                             <h4>{e.value}</h4>

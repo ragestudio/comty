@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { useState, useEffect, useContext, useRef } from 'react';
 // @ts-ignore
-import isEqual from 'F:/Development/comty/node_modules/@umijs/plugin-model/node_modules/fast-deep-equal/index.js';
+import isEqual from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/plugin-model/node_modules/fast-deep-equal/index.js';
 // @ts-ignore
-import { UmiContext } from 'F:/Development/comty/node_modules/@umijs/plugin-model/lib/helpers/constant';
+import { UmiContext } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/plugin-model/lib/helpers/constant';
 import { Model, models } from './Provider';
 
 export type Models<T extends keyof typeof models> = Model<T>[T]
@@ -56,15 +56,14 @@ export function useModel<T extends keyof Model<T>, U>(
     }
     try {
       dispatcher.callbacks![namespace]!.add(handler);
+      dispatcher.update(namespace);
     } catch (e) {
       dispatcher.callbacks![namespace] = new Set();
       dispatcher.callbacks![namespace]!.add(handler);
+      dispatcher.update(namespace);
     }
     return () => {
-      // 保证组件卸载前，还能最后一次触发 handler
-      setTimeout(() => {
-        dispatcher.callbacks![namespace]!.delete(handler);
-      })
+      dispatcher.callbacks![namespace]!.delete(handler);
     }
   }, [namespace]);
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import { ApplyPluginsType, dynamic } from 'F:/Development/comty/node_modules/@umijs/runtime';
+import { ApplyPluginsType, dynamic } from '/Users/srgooglo/repos/comty/packages/comty/node_modules/@umijs/runtime';
 import * as umiExports from './umiExports';
 import { plugin } from './plugin';
 import LoadingComponent from 'components/Loader';

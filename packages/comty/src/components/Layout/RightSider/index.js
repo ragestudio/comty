@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import withConnector from 'core/libs/withConnector'
-import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+import { objectToArrayMap } from '@nodecorejs/utils'
 
 import InvalidComponent from './components/invalid'
 import ProfileCard from './components/profileCard'

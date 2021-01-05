@@ -3,7 +3,7 @@ import { connect } from 'umi';
 import * as antd from 'antd'
 import { Database, Redux, AlertTriangle } from 'components/Icons'
 import { ParamsList } from 'components'
-import { __legacy__objectToArray } from 'core'
+import { objectToArrayMap } from 'core'
 import store from 'store'
 
 const storeKey = "dbg_redux_selecteKeys"
@@ -16,7 +16,7 @@ class ReduxDebugger extends React.Component {
     }
    
     renderAllStore() {
-        return __legacy__objectToArray(this.props).map(element => {
+        return objectToArrayMap(this.props).map(element => {
             return (
                 <antd.Collapse.Panel key={element.key} style={{ wordBreak: 'break-all' }} header={`${element.key}`}>
                     {ParamsList(element.value)}
@@ -42,7 +42,7 @@ class ReduxDebugger extends React.Component {
             }
         },
         set: (data) => {
-            store.set(storeKey, __legacy__objectToArray(data))
+            store.set(storeKey, objectToArrayMap(data))
         }
     }
 
@@ -66,13 +66,13 @@ class ReduxDebugger extends React.Component {
         const returnSelectedKeys = () => {
             // const getStores = () => {
             //     let stores = []
-            //     __legacy__objectToArray(this.state.selectedKeys).forEach((e) => {
+            //     objectToArrayMap(this.state.selectedKeys).forEach((e) => {
             //         if (this.props[e.key] && e.value) {
             //             stores[e.key] = this.props[e.key]
             //         }
             //     })
             // }
-            return __legacy__objectToArray(this.props).map(e => {
+            return objectToArrayMap(this.props).map(e => {
                 if (!this.state.selectedKeys[e.key]) {
                     return null
                 }

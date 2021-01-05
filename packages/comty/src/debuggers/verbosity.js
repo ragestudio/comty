@@ -1,6 +1,6 @@
 import React from 'react'
 import settings from 'core/libs/settings'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import * as antd from 'antd'
 
 const verbosity_enabled = settings('verbosity')

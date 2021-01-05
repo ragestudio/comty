@@ -2,7 +2,7 @@ import React from 'react'
 import * as antd from 'antd'
 import * as Icons from 'components/Icons'
 import { connect } from 'umi'
-import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+import { objectToArrayMap } from '@nodecorejs/utils'
 import classnames from 'classnames'
 
 import StatisticConnection from './statistics/connection'
@@ -102,7 +102,7 @@ export default class StreamingPanel extends React.Component {
         }
 
         const renderCharts = () => {
-            return __legacy__objectToArray(this.state.activeStatistics).map((e) => {
+            return objectToArrayMap(this.state.activeStatistics).map((e) => {
                 if (e.value) {
                     return statisticsComponents[e.key]
                 }

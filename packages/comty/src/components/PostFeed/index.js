@@ -2,7 +2,7 @@ import React from 'react'
 import { List } from 'antd'
 import { connect } from 'umi'
 import settings from 'core/libs/settings'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import { PostCard, PostCreator, Invalid } from 'components'
 import * as antd from 'antd'
 import styles from './index.less'
@@ -64,7 +64,7 @@ export default class PostsFeed extends React.Component {
         if (Array.isArray(data.response)) {
           this.setState({ feed: data.response })
         } else {
-          verbosity([`error gathering posts >`, data])
+          verbosity.log(`error gathering posts >`, data)
           this.setState({ renderError: true })
         }
       }

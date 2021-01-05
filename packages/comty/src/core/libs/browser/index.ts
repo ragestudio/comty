@@ -1,6 +1,3 @@
-import { runtime } from 'config'
-import { __legacy__objectToArray, verbosity } from '@ragestudio/nodecore-utils'
-
 const zeroStyles = (element: HTMLElement, ...properties: string[]): void => {
   for (const property of properties) {
     element.style.setProperty(property, '0')

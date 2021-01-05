@@ -2,7 +2,7 @@ import store from 'store'
 import config from 'config'
 import keys from 'config/app_keys'
 import { session } from 'core/models'
-import { router, verbosity, ui } from 'core/libs'
+import { verbosity } from '@nodecorejs/utils'
 import settings from 'core/libs/settings'
 import { queryIndexer } from 'core'
 import Cryptr from 'cryptr'
@@ -107,7 +107,7 @@ export default {
     *query({ payload }, { call, put, select }) {
       const state = yield select(state => state.app)
 
-      window.PluginGlobals = []
+      window.Plugins = []
       window.Internal = []
 
       queryIndexer([
@@ -175,7 +175,7 @@ export default {
             if (typeof (callback) !== "undefined") {
               callback(callbackResponse)
             }
-            verbosity([callbackResponse])
+            verbosity.log(callbackResponse)
             if (callbackResponse.code == 100) {
               state.dispatcher({
                 type: "setAuth", payload: {
@@ -187,7 +187,7 @@ export default {
               state.dispatcher({ type: "updateState", payload: { session_valid: true } })
             }
             if (callbackResponse.code == 110) {
-              verbosity(`this session is no valid, erasing data`)
+              verbosity.log(`this session is no valid, erasing data`)
               state.dispatcher({ type: "sessionErase" }) // remove without calling api, its already logged out/invalid
             }
           }
@@ -203,7 +203,7 @@ export default {
         userToken: state.session_token,
         server_key: state.server_key
       }, (err, res) => {
-        verbosity([res])
+        verbosity.log(res)
         state.dispatcher({ type: "sessionErase" })
       })
 
@@ -249,12 +249,12 @@ export default {
 
         const isExpired = expirationTime < now.getTime()
 
-        verbosity([`TOKEN EXPIRES => (${new Date(expirationTime).toLocaleString()})`, `NOW => (${now.toLocaleString()})`])
+        verbosity.log(`TOKEN EXPIRES => (${new Date(expirationTime).toLocaleString()})`, `NOW => (${now.toLocaleString()})`)
 
         if (isExpired) {
-          verbosity(`🕒 This session_token is expired`, { color: "red" })
+          verbosity.log(`This session_token is expired`) // TODO: Add verbosity color
           if (settings("session_noexpire")) {
-            verbosity(`(session_noexpire) is enabled, refreshing token`)
+            verbosity.log(`(session_noexpire) is enabled, refreshing token`)
             state.dispatcher({ type: "refreshToken" })
           } else {
             return state.dispatcher({ type: "sessionErase" }) // remove session
@@ -262,7 +262,7 @@ export default {
         }
 
         if (!state.session_data) {
-          verbosity(`session_data is not valid but the session is valid, updating from ws`)
+          verbosity.log(`session_data is not valid but the session is valid, updating from ws`)
           state.dispatcher({ type: "updateUserData" })
         }
 
@@ -287,7 +287,7 @@ export default {
               sessionStorage.setItem(config.app.storage_dataFrame, btoa(JSON.stringify(callbackResponse.response)))
               return state.dispatcher({ type: "updateState", payload: { session_data: callbackResponse.response } })
             } catch (error) {
-              verbosity([error])
+              verbosity.log(error)
             }
           }
         }
@@ -351,7 +351,7 @@ export default {
           }
         }
       } catch (error) {
-        verbosity([error])
+        verbosity.log(error)
       }
 
     }
@@ -375,7 +375,7 @@ export default {
       sessionStorage.setItem(config.app.storage_dataFrame, btoa(JSON.stringify(payload.dataFrame)))
     },
     handleUpdateTheme(state, { payload }) {
-      verbosity([payload])
+      verbosity.log(payload)
       store.set(config.app.storage_theme, payload)
       state.app_theme = payload
     },

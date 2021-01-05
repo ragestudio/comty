@@ -1,20 +1,6 @@
-import { effect, reducer, dvaModel, subscription, path, BaseModel } from 'dva-model-enhance'
-import store from 'store'
-import { app } from 'config'
-import keys from 'config/app_keys'
-import { user, session } from 'core/models'
-import { router, verbosity, ui } from 'core/libs'
-import settings from 'core/libs/settings'
-import { DynamicSDCP } from 'core/libs/dynamicsdcp'
-import * as core from 'core'
-
-import jwt from 'jsonwebtoken'
-import cookie from 'cookie_js'
-
 export default {
   namespace: 'user',
-  state: {
-  },
+  state: {},
   effects: {
     *actions({callback, payload}, { call, select }) {
       dispatch({

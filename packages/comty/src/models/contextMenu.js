@@ -1,5 +1,5 @@
 import { OpenContextMenu, DestroyContextMenu } from 'components/Layout/ContextMenu'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 
 const defaultState = {
     xPos: 0,
@@ -41,7 +41,7 @@ export default {
       },
       *handleEvents({payload}, { select, put }){
         const eventHandlers = yield select(state => state.contextMenu.eventHandlers)
-        verbosity(["New event recived =>", payload], { color: "magenta"})
+        verbosity.log("New event recived =>", payload) // TODO: Add verbosity color > { color: "magenta"}
 
         if (Array.isArray(eventHandlers)) {
           let byIndex = []
@@ -70,11 +70,11 @@ export default {
             })
           }else{
             yield put({ type: "close" })
-            verbosity('not valid events detected')
+            verbosity.log('not valid events detected')
           }
 
         }else{
-          verbosity('eventHandlers is not an array, exiting')
+          verbosity.log('eventHandlers is not an array, exiting')
         }
         
       },

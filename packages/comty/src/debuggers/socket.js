@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import io from 'socket.io-client'
 import { connect } from 'umi'
 import * as antd from 'antd'
-import { __legacy__objectToArray } from 'core'
+import { objectToArrayMap } from 'core'
 import settings from 'core/libs/settings'
 
 const defaultSocketAddress = "localhost:7000"
@@ -38,7 +38,7 @@ export default class SocketDebug extends React.Component {
                 <antd.Card>
                     <h2>socket state</h2>
                     <antd.List
-                        dataSource={__legacy__objectToArray(this.props.socket)}
+                        dataSource={objectToArrayMap(this.props.socket)}
                         renderItem={(e) => {
                             try {
                                 const v = JSON.stringify(e.value)
@@ -70,7 +70,7 @@ export default class SocketDebug extends React.Component {
                                 gutter: 5,
                                 xxl: 3,
                             }}
-                            dataSource={__legacy__objectToArray(socket_opt)}
+                            dataSource={objectToArrayMap(socket_opt)}
                             renderItem={(e) => {
                                 return (
                                     <div style={{ border: "0.1px rgb(217, 217, 217) solid", backgroundColor: "rgb(250, 250, 250)", borderRadius: "4px", width: "fit-content", paddingRight: "12px" }}>

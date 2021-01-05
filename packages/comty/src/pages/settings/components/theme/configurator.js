@@ -2,7 +2,7 @@ import React from 'react'
 import ErrorHandler from 'core/libs/errorhandler'
 import { theme } from 'core/libs/style'
 import exportDataAsFile from 'core/libs/ui/export_data'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 
 export default class ThemeConfigurator extends React.Component {
     componentDidMount() {
@@ -15,7 +15,7 @@ export default class ThemeConfigurator extends React.Component {
             if (storaged[this.state.configKey]) {
                 return this.setState({ model: storaged[this.state.configKey] })
             } else {
-                return verbosity(`cannot get storagedSetting for ${this.state.configKey}`)
+                return verbosity.log(`cannot get storagedSetting for ${this.state.configKey}`)
             }
         }
     }

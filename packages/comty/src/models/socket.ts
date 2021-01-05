@@ -1,16 +1,8 @@
-import store from 'store'
 import { app } from 'config'
-import keys from 'config/app_keys'
-import { user, session } from 'core/models'
-import { router, verbosity, ui } from 'core/libs'
-import settings from 'core/libs/settings'
-import { __legacy__objectToArray } from 'core'
+import { verbosity } from '@nodecorejs/utils'
+import { objectToArrayMap } from 'core'
 
 import SocketConnection from 'core/libs/socket/index.ts'
-
-import jwt from 'jsonwebtoken'
-import cookie from 'cookie_js'
-
 
 export default {
   namespace: 'socket',
@@ -46,12 +38,12 @@ export default {
           }
         })
       } catch (error) {
-        verbosity([error])
+        verbosity.log(error)
       }
     },
     *namespaceConnector({ namespace, node }, { select, put }) {
       if (!node || !namespace) {
-        verbosity(`cannot connect to a namespace without declaring the namespace/node`)
+        verbosity.log(`cannot connect to a namespace without declaring the namespace/node`)
         return false
       }
       const state = yield select(state => state.socket)
@@ -63,7 +55,7 @@ export default {
     *use({ scope, invoke, query, persistent, then }, { put, select }) {
       const state = yield select(state => state)
       if (!scope) {
-        verbosity(`some params is missing`)
+        verbosity.log(`scope is missing`)
         return false
       }
       if (typeof(persistent) == "undefined" ) {
@@ -106,7 +98,7 @@ export default {
     },
     *break({ listener, node }, { select, put }) {
       if (!node || !listener) {
-        verbosity(`cannot change a listener without declaring the node/listener`)
+        verbosity.log(`cannot change a listener without declaring the node/listener`)
         return false
       }
       const state = yield select(state => state.socket)
@@ -114,7 +106,7 @@ export default {
     },
     *resume({ listener, node }, { select, put }) {
       if (!node || !listener) {
-        verbosity(`cannot change a listener without declaring the node/listener`)
+        verbosity.log(`cannot change a listener without declaring the node/listener`)
         return false
       }
       const state = yield select(state => state.socket)
@@ -122,7 +114,7 @@ export default {
     },
     *toogleListener({ listener, node }, { select, put }) {
       if (!node || !listener) {
-        verbosity(`cannot change a listener without declaring the node/listener`)
+        verbosity.log(`cannot change a listener without declaring the node/listener`)
         return false
       }
       const state = yield select(state => state.socket)
@@ -130,17 +122,17 @@ export default {
     },
     *destroyNode({ node }, { select, put }) {
       if (!node) {
-        verbosity(`cannot destroy a node without declaring it`)
+        verbosity.log(`cannot destroy a node without declaring it`)
         return false
       }
       const state = yield select(state => state.socket)
       if (state.nodes[node].connectionState !== "closed") {
-        verbosity("The node is not closed!, closing before destroying")
+        verbosity.log("The node is not closed!, closing before destroying")
         state.nodes[node].ioConn._close()
       }
       let updated = {}
 
-      __legacy__objectToArray(state.nodes).forEach(e => {
+      objectToArrayMap(state.nodes).forEach(e => {
         if (e.key !== node) {
           updated[e.key] = e.value
         }

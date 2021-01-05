@@ -1,10 +1,5 @@
 import React from 'react'
-
 import * as antd from 'antd'
-
-import verbosity from 'core/libs/verbosity'
-
-import * as Icons from 'components/Icons'
 import { connect } from 'umi'
 
 @connect(({ app }) => ({ app }))

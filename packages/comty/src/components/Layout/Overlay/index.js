@@ -1,10 +1,10 @@
 import React from 'react'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import { connect } from 'umi'
 import classnames from 'classnames'
 
 import { Primary } from './components'
-import { __legacy__objectToArray } from '@ragestudio/nodecore-utils'
+import { objectToArrayMap } from '@nodecorejs/utils'
 
 const includeAllowedProps = [ "size" ]
 
@@ -37,7 +37,7 @@ export default class Overlay extends React.Component {
     },
     open: (payload) => {
       if (!payload) return false;
-      verbosity(['Dispatching fragment =>', payload])
+      verbosity.log('Dispatching fragment =>', payload)
       this.props.dispatch({
         type: 'app/updateState',
         payload: {
@@ -92,7 +92,7 @@ export default class Overlay extends React.Component {
     }
 
     try {
-      __legacy__objectToArray(overlayElement).forEach((e) => {
+      objectToArrayMap(overlayElement).forEach((e) => {
         if (includeAllowedProps.includes(e.key)) {
           props[e.key] = e.value
         }

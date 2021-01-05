@@ -8,7 +8,7 @@ import { Clipboard, Aperture, FlagOutlined, MessageSquare, MoreOutlined, Pushpin
 import * as core from 'core'
 import Icon from '@ant-design/icons'
 import classnames from 'classnames'
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 
 import settings from 'core/libs/settings'
 import { router } from 'core/libs'
@@ -166,11 +166,11 @@ export default class PostCard extends React.PureComponent {
           }
 
         } else {
-          verbosity(`Api error response ${callbackResponse.code}`)
+          verbosity.log(`Api error response ${callbackResponse.code}`)
         }
       })
     } else {
-      verbosity(`socket connection not available`)
+      verbosity.log(`socket connection not available`)
     }
   }
 

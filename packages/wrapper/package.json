@@ -1,0 +1,33 @@
+{
+  "private": true,
+  "globalGit": "https://github.com/srgooglo/comty",
+  "gitRepo": "srgooglo/comty",
+  "scripts": {
+    "start": "umi dev",
+    "build": "umi build"
+  },
+  "dependencies": {
+    "@nodecorejs/utils": "^0.14.7",
+    "@ragestudio/nodecorejs": "^0.14.7",
+    "@umijs/preset-react": "^1.7.9",
+    "antd": "^4.7.0",
+    "axios": "^0.20.0",
+    "classnames": "^2.2.6",
+    "feather-reactjs": "^2.0.13",
+    "hosted-git-info": "^3.0.5",
+    "lint-staged": "^10.0.7",
+    "moment": "^2.29.0",
+    "prettier": "^1.19.1",
+    "radium": "^0.26.1",
+    "react-animation": "^1.2.2",
+    "react-dom": "^16.13.1",
+    "react-google-recaptcha": "^2.1.0",
+    "react-helmet": "^6.1.0",
+    "react-perfect-scrollbar": "^1.5.8",
+    "react-reveal": "^1.2.2",
+    "store": "^2.0.12",
+    "styled-components": "^5.2.0",
+    "umi": "^3.3.3",
+    "yorkie": "^2.0.0"
+  }
+}

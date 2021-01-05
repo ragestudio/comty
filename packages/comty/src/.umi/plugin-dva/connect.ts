@@ -6,12 +6,11 @@ import { EffectsCommandMap, SubscriptionAPI } from 'dva';
 import { match } from 'react-router-dom';
 import { Location, LocationState, History } from 'history';
 
-export * from 'F:/Development/comty/src/models/app';
-export * from 'F:/Development/comty/src/models/contextMenu';
-export * from 'F:/Development/comty/src/models/extended';
-export * from 'F:/Development/comty/src/models/socket';
-export * from 'F:/Development/comty/src/models/streaming';
-export * from 'F:/Development/comty/src/models/user';
+export * from '/Users/srgooglo/repos/comty/packages/comty/src/models/app';
+export * from '/Users/srgooglo/repos/comty/packages/comty/src/models/contextMenu';
+export * from '/Users/srgooglo/repos/comty/packages/comty/src/models/socket';
+export * from '/Users/srgooglo/repos/comty/packages/comty/src/models/streaming';
+export * from '/Users/srgooglo/repos/comty/packages/comty/src/models/user';
 
 export interface Action<T = any> {
   type: T

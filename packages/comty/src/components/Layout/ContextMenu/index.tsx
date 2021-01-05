@@ -1,4 +1,4 @@
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import styles from './index.less'
 import ReactDOM from 'react-dom'
 import React from 'react'
@@ -120,7 +120,7 @@ export class ContextMenuComponent extends React.PureComponent<ContextMenuCompone
 }
 
 export function DestroyContextMenu(){
-    verbosity('destroying')
+    verbosity.log('destroying')
     const unmountResult = ReactDOM.unmountComponentAtNode(renderDiv)
     if (unmountResult && renderDiv.parentNode) {
         renderDiv.parentNode.removeChild(renderDiv)
@@ -129,7 +129,7 @@ export function DestroyContextMenu(){
 }
 
 export function OpenContextMenu(props){
-    verbosity([props])
+    verbosity.log(props)
     const renderComponent = React.createElement(ContextMenuComponent, props)
     if (onRend) {
         DestroyContextMenu()

@@ -1,4 +1,4 @@
-import verbosity from 'core/libs/verbosity'
+import { verbosity } from '@nodecorejs/utils'
 import handle from 'core/libs/errorhandler'
 import { notify } from 'core/libs/ui'
 import settings from 'core/libs/settings'

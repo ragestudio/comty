@@ -122,6 +122,7 @@ export interface IConfigFromPlugins {
     logger?: {};
     [k: string]: any;
   };
+  fastRefresh?: {};
   hash?: boolean;
   ignoreMomentLocale?: boolean;
   inlineLimit?: number;
