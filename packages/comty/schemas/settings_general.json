@@ -1,0 +1,37 @@
+[
+  {
+    "id": "session_noexpire",
+    "icon": "Watch",
+    "type": "Switch",
+    "title": "No expire session",
+    "description": "Force the app to not expire any session"
+  },
+  {
+    "id": "search_ontype",
+    "icon": "CornerDownRight",
+    "type": "Switch",
+    "title": "Auto search on input",
+    "description": "Search automaticly when type something"
+  },
+  {
+    "id": "post_hidebar",
+    "icon": "Menu",
+    "type": "Switch",
+    "title": "Auto hide postbar",
+    "description": "Hide post actions bar when loose focus"
+  },
+  {
+    "id": "post_autoposition",
+    "icon": "AlignCenter",
+    "type": "Switch",
+    "title": "Center on click",
+    "description": "Center posts element when then is clicked"
+  },
+  {
+    "id": "verbosity",
+    "icon": "Terminal",
+    "type": "Switch",
+    "title": "Verbosity",
+    "description": "Show all development logs of the application"
+  }
+]
