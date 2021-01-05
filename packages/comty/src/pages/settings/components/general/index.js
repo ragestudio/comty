@@ -9,7 +9,7 @@ import SettingList from 'schemas/settings.json'
 import {connect} from 'umi'
 
 @connect(({ app }) => ({ app }))
-class Base extends Component {
+export default class GeneralSettings extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -125,5 +125,3 @@ class Base extends Component {
     )
   }
 }
-
-export default Base
