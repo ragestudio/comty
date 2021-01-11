@@ -27,6 +27,6 @@
     "jsdoc": "^3.6.5"
   },
   "dependencies": {
-    "@ragestudio/nodecorejs": "^0.14.7"
+    "@ragestudio/nodecorejs": "^0.15.1"
   }
 }
