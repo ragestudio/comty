@@ -1,172 +1,179 @@
-.wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
+.splash-wrapper {
+	background-color: #252525;
+	position: absolute;
+	z-index: 0;
 
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-    flex-direction: column;
-    background-color: #efefef;
-    color: #2d2d2d;
-    border-radius: 12px;
-    text-align: center;
-
-    width: 100%;
-    height: 100%;
-    animation-duration: 1500ms;
-
-    &.fadeout{
-      opacity: 0;
-      animation-name: out;
-      animation-delay: 0s;
-    }
+	top: 0;
+	right: 0;
+	width: 100vw;
+	height: 100vh;
+	animation: background-fade 5.1s linear 0.5s;
+	animation-fill-mode: forwards;
 }
 
-.bouncy-logo{
-  width: 100%;
-  height: auto;
-  margin: auto;
+.glow {
+	width: 100vw;
+	height: 100vh;
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	right: 0;
+	opacity: 0;
+
+	animation: glow-splash 4.1s ease-out 0.5s;
+	animation-fill-mode: forwards;
+
+	filter: blur(160px);
+	backface-visibility: hidden;
+	transform: translate3d(0, 0, 0);
+	will-change: contents;
+	background: conic-gradient(
+		from 230.29deg at 51.63% 52.16%,
+		#2400ff 0deg,
+		#0087ff 67.5deg,
+		#ff1d7a 198.75deg,
+		#f5381b 251.25deg,
+		#ff5335 301.88deg,
+		#691eff 360deg
+	);
+}
+
+.bouncy-logo {
+	will-change: transition, opacity, z-index;
+	position: absolute;
+	z-index: 3;
+
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	align-items: center;
+
+	justify-content: center;
 }
 
 .bouncy-logo .ball {
-  height: auto;
-  width: 100%;
-  transform: translate(-10px, 0);
+	animation: logo-bounce 0.5s alternate infinite forwards;
 }
 
 .bouncy-logo .ball svg {
-  width: 200px;
-  height: 200px;
-  margin: auto;
+	opacity: 1;
+	width: 200px;
+	height: 200px;
+	margin: auto;
 
-  -webkit-animation-direction: alternate;
-  -webkit-animation-duration: 1s;
-  -webkit-animation-name: my-bounce;
-  -webkit-animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-duration: 1s;
-  animation-name: my-bounce;
-  animation-iteration-count: infinite;
+	stroke-width: 1.5;
+	stroke-opacity: 1;
+
+	stroke-dasharray: 1000;
+	stroke-dashoffset: 1000;
+
+	fill: transparent;
+
+	animation: logo-reveal 5.1s ease-out 0.5s forwards, logo-stroke 2.1s ease-out 0s forwards,
+		logo-transform 5.1s ease-out 0s forwards;
 }
 
-.shadow{
-  width: 100%;
-  height: auto;
+@keyframes glow-splash {
+	0% {
+		opacity: 0;
+		-webkit-animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+		animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+	}
+
+	15% {
+		opacity: 1;
+		-webkit-animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+		animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+	}
+	97% {
+		z-index: 4;
+	}
+	100% {
+		z-index: 4;
+		opacity: 0.28;
+	}
 }
 
-.bouncy-logo .ball-shadow {
-  margin: auto;
-  background: radial-gradient(50% 50%, rgba(204, 204, 204, 0.45) 0%, transparent 100%);
-  height: 50px;
-  width: 200px;
-  -webkit-animation-direction: alternate;
-  -webkit-animation-duration: 1s;
-  -webkit-animation-name: my-grow;
-  -webkit-animation-iteration-count: infinite;
-  animation-direction: alternate;
-  animation-duration: 1s;
-  animation-name: my-grow;
-  animation-iteration-count: infinite;
+@keyframes background-fade {
+	0% {
+		-webkit-animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+		animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+	}
+
+	15% {
+		-webkit-animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+		animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+	}
+
+	60% {
+		background-color: #f0f2f5;
+	}
+
+	100% {
+		background-color: #f0f2f5;
+	}
 }
 
-@-webkit-keyframes my-grow {
-  from {
-    width: 200px;
-    height: 50px;
-  }
-  to {
-    width: 150px;
-    height: 10px;
-  }
-}
-@keyframes my-grow {
-  from {
-    width: 200px;
-    height: 50px;
-  }
-  to {
-    width: 150px;
-    height: 10px;
-  }
-}
-@-webkit-keyframes my-bounce {
-  from {
-    top: 0;
-  }
-  to {
-    top: 10%;
-  }
-}
-@keyframes my-bounce {
-  from {
-    top: 0;
-  }
-  to {
-    top: 10%;
-  }
+@keyframes logo-bounce {
+	from {
+		transform: translate(0, -10px);
+	}
+	to {
+		transform: translate(0, 10px);
+	}
 }
 
-.c-logo{
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100vw;
-    height: 100vh;
-
-    &__svg{
-        width: 280px;
-        display: block;
-        max-width: 100%;
-        margin: 0px;
-        position: relative;
-        height: auto;
-    }
-
-   &__svg-item{
-		fill: #242424;
-        transition: all 0.3s ease-in-out 0s;
-		   
-		 &--text{
-       		transition: all 0.2s ease-in-out 0.2s;
-            opacity: 1;
-            visibility: visible;
-        }
-
-        &--arrow{
-            transition: all 0.36s ease-in-out 0s;
-            animation-name: Load;
-            animation-duration: 2s;
-            animation-iteration-count: infinite;
-        }
-
-    }
-
+@keyframes logo-transform {
+	0% {
+		animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
+		transform: scale(5) rotate(65deg);
+		filter: blur(10px);
+	}
+	17% {
+		filter: unset;
+	}
+	18% {
+		filter: drop-shadow(0 0 80px rgba(255, 255, 255, 1));
+	}
+	19% {
+		transform: rotate(5deg);
+	}
+	100% {
+		transform: scale(0.8) rotate(0deg);
+	}
 }
 
-@keyframes Load {
-    0% {
-        transform: translateX(0px);
-        transition-delay: 0s; 
-    }
-    50%{
-        transform: translateX(-171px);
-        transition-delay: 0s; 
-    }
-    100% {
-        transform: translateX(0px);
-        transition-delay: 0s; 
-    }
+@keyframes logo-reveal {
+	0% {
+		-webkit-animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
+		animation-timing-function: cubic-bezier(0, 0, 0.3rem, 1);
+	}
+	7% {
+		fill: transparent;
+	}
+	10% {
+		fill: rgba(225, 225, 225, 0.8);
+	}
+	40% {
+		fill: rgba(225, 225, 225, 0.8);
+	}
+	100% {
+		fill: rgba(51, 51, 51, 0.8);
+	}
 }
 
-@keyframes out {
-  0% {
-    opacity: 100%;
-  }
-  100% {
-    opacity: 0;
-  }
+@keyframes logo-stroke {
+	0% {
+		stroke-opacity: 0;
+	}
+	10% {
+		stroke-opacity: 1;
+	}
+	100% {
+		stroke-dashoffset: 0;
+		stroke-opacity: 0;
+	}
 }
