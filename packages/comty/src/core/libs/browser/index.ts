@@ -36,7 +36,7 @@ const createTextArea = (): HTMLTextAreaElement => {
 }
 
 export const clipboard = {
-  copyText: (data:String) => {
+  copyText: (data: String) => {
     if (typeof (data) !== "string") {
       return false
     }
@@ -49,7 +49,7 @@ export const clipboard = {
       return false
     }
   },
-  readText: (data:String) => {
+  readText: (data: String) => {
     if (typeof (data) !== "string") {
       return false
     }
