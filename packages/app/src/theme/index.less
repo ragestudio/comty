@@ -1,0 +1,236 @@
+@import "antd/dist/antd.less";
+@import "theme/vars.less";
+@import "theme/fonts.css";
+
+.ant-layout {
+	background: @app_layout_backgroundColor!important;
+	background-color: @app_layout_backgroundColor!important;
+
+	width: 100%;
+	height: 100%;
+	max-height: 100%;
+
+	overflow: hidden;
+}
+
+.app_layout {
+	background: @app_layout_backgroundColor!important;
+	background-color: @app_layout_backgroundColor!important;
+
+	position: relative;
+	-webkit-overflow-scrolling: touch;
+
+	width: 100%;
+	height: 100%;
+	max-height: 100%;
+
+	overflow: hidden;
+}
+
+.app_wrapper {
+	position: relative;
+
+	height: 100%;
+	max-height: 100%;
+
+	margin: 10px 10px 30px 16px;
+	
+	overflow-x: hidden;
+	overflow-y: overlay;
+}
+
+::-webkit-scrollbar {
+	position: absolute;
+	
+	width: 14px;
+	height: 18px;
+	z-index: 200;
+	transition: all 200ms ease-in-out;
+}
+
+::-webkit-scrollbar-thumb {
+	position: absolute;
+	z-index: 200;
+
+	height: 6px;
+	margin: 5px 10px 5px 5px;
+	transition: all 200ms ease-in-out;
+
+	border: 4px solid rgba(0, 0, 0, 0);
+	background-color: rgba(0, 0, 0, 0.15);
+	background-clip: padding-box;
+
+	-webkit-border-radius: 7px;
+}
+
+::-webkit-scrollbar-button {
+	width: 0;
+	height: 0;
+	display: none;
+}
+
+::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+
+html {
+	position: fixed;
+	overflow: hidden;
+	-webkit-overflow-scrolling: touch;
+	background-color: @app_layout_backgroundColor!important;
+
+	height: 100vh;
+	max-height: 100vh;
+	min-height: 100vh;
+}
+
+body {
+	text-rendering: optimizeLegibility !important;
+	-webkit-app-region: no-drag;
+
+	user-select: none;
+	background-color: @app_layout_backgroundColor!important;
+	font-family: "Varela Round", sans-serif;
+
+	scroll-behavior: smooth;
+	height: 100%;
+
+	overflow: hidden;
+}
+
+#root {
+	position: fixed;
+	-webkit-overflow-scrolling: touch;
+	overflow: hidden;
+	//position: absolute;
+	width: 100%;
+	height: 100%;
+
+	height: 100vh;
+
+	overflow-x: hidden;
+	overflow-y: hidden;
+	background-color: @app_layout_backgroundColor!important;
+}
+
+#nprogress {
+	position: absolute;
+	top: 0;
+	width: 100vw;
+
+	.bar {
+		height: 2px;
+		background: #48acf0;
+	}
+}
+
+// @media (min-width: @screen-xs) {
+
+// }
+
+// @media (min-width: @screen-md) {
+
+// }
+
+// @media (min-width: @screen-lg) {
+
+// }
+
+// @media (min-width: @screen-xl) {
+
+// }
+
+// @media (min-width: @screen-xxl) {
+
+// }
+
+.horizontal_actions_cascade {
+	> div:first-child {
+		transform: unset;
+	}
+
+	> div {
+		transform: translate(0, -10px);
+	}
+}
+
+.horizontal_actions {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	> div {
+		padding: 0 10px;
+	}
+
+	padding: 20px 0;
+
+	border-bottom: #424242 solid 1px;
+	border-left: #424242 solid 1px;
+	border-right: #424242 solid 1px;
+
+	border-radius: 0 0 12px 12px;
+}
+
+.component_bottom_centered {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.fade-transverse-active {
+	transition: all 250ms;
+	height: 100%;
+	width: 100%;
+}
+
+.fade-transverse-enter {
+	opacity: 0;
+	transform: translateX(-30px);
+}
+.fade-transverse-leave {
+	opacity: 0;
+	transform: translateX(30px);
+}
+
+.fade-scale-leave-active,
+.fade-scale-enter-active {
+	transition: all 0.3s;
+}
+.fade-scale-enter {
+	opacity: 0;
+	transform: scale(1.2);
+}
+.fade-scale-leave {
+	opacity: 0;
+	transform: scale(0.8);
+}
+
+.app_crash {
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	
+	justify-content: center;
+	align-items: center;
+
+	.header {
+		display: flex;
+		text-align: center;
+		flex-direction: column;
+		justify-content: center;
+		svg {
+			width: 100px;
+			height: 100px;
+		}
+	}
+}
