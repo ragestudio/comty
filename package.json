@@ -6,27 +6,8 @@
   "workspaces": [
     "packages"
   ],
-  "lint-staged": {
-    "*.{js,jsx,less,md,json}": [
-      "prettier --write"
-    ],
-    "*.ts?(x)": [
-      "prettier --parser=typescript --write"
-    ]
-  },
-  "scripts": {
-    "postinstall": "cd ./packages/comty && npm i",
-    "start": "cd ./packages/comty && npm start",
-    "update:deps": "yarn upgrade-interactive --latest"
-  },
-  "devDependencies": {
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@types/node": "^14.14.20",
-    "concurrently": "^5.3.0",
-    "cross-env": "^7.0.3",
-    "jsdoc": "^3.6.5"
-  },
   "dependencies": {
-    "@ragestudio/nodecorejs": "^0.15.1"
-  }
+    "corenode": "^0.28.26"
+  },
+  "version": "0.13.0"
 }

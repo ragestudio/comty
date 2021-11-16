@@ -28,5 +28,6 @@
     "styled-components": "^5.2.0",
     "umi": "^3.4.20",
     "yorkie": "^2.0.0"
-  }
+  },
+  "version": "0.13.0"
 }
