@@ -1,0 +1,14 @@
+[
+    {
+        "id": "main",
+        "title": "Dashboard",
+        "icon": "Home",
+        "locked": true
+    },
+    {
+        "id": "posts",
+        "title": "Posts",
+        "icon": "Home",
+        "locked": true
+    }
+]

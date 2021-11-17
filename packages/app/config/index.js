@@ -1,35 +1,22 @@
-module.exports = {
+export default {
+  logo: {
+    alt: "https://dl.ragestudio.net/branding/comty/alt/SVG/t3t3.svg"
+  },
+  api: {
+    address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
+  },
+  theme: {
+    "primary-color": "#32b7bb",
+  },
   app: {
-    guid: "7d6b74b5-1b3b-432f-97df-2c5fc2c2b6ae",
     siteName: 'Comty™',
     copyright: 'RageStudio©',
-    MainPath: '/',
-    defaultStyleClass: "app_",
-
-    LogoPath: '/logo.svg',
-    FullLogoPath: '/full_logo.svg',
-    DarkFullLogoPath: '/dark_full_logo.svg',
-    DarkLogoPath: '/dark_logo.svg',
-
-    endpoint_v3prefix: 'ycorejs_apiv3',
-    endpoint_websocket: 'eu_es01.ragestudio.net',
-
-    storage: {
-      theme: "app_theme",
-      settings: "app_settings",
-      token: "cid",
-      data: "data"
-    },
-
-    storage_authFrame: 'cid',
-    storage_dataFrame: 'data',
-    storage_theme: 'app_theme',
+    mainPath: '/main',
 
     appTheme_desiredContrast: 7,
     // Contrast level AA = 4.5, Level AAA = 7
     // Reference: https://www.w3.org/WAI/WCAG21/quickref/?versions=2.0&showtechniques=143#qr-visual-audio-contrast-contrast
   },
-
   i18n: {
     languages: [
       {
@@ -39,40 +26,6 @@ module.exports = {
     ],
     defaultLanguage: 'en',
   },
-
-  layouts: [
-    {
-      name: 'primary',
-      include: [/\/main/, /\/settings/, /\/saves/, /\/pro/, /\/chats/, /\//],
-      exclude: [/\/publics/, /\/login/],
-    },
-    {
-      name: 'public',
-      include: [/.*/]
-    }
-  ],
-
-  // Default Behaviors 
-  defaults: {
-    app_model: "app",
-    verbosity: false,
-    sidebarCollaped: false,
-    session_noexpire: false,
-    search_ontype: false,
-    post_autoposition: true,
-    overlay_loosefocus: true,
-    render_pagetransition_preset: 'moveToRightScaleUp',
-    post_catchlimit: '20',
-    post_hidebar: true,
-
-    feed_autorefresh: false,
-    keybinds: {
-      nextElement: "J",
-      prevElement: "U",
-      createNew: "N"
-    }
-  },
-
   stricts: {
     post_maxlenght: '512',
     // In KB

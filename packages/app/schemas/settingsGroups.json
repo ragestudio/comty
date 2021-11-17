@@ -1,0 +1,14 @@
+{
+    "general": {
+        "title": "General",
+        "icon": "Settings"
+    },
+    "sidebar": {
+        "title": "Sidebar",
+        "icon": "Layout"
+    },
+    "aspect": {
+        "title": "Aspect",
+        "icon": "Eye"
+    }
+}

@@ -1,0 +1,33 @@
+@import "theme/index.less";
+
+.search_bar {
+	user-select: none;
+
+	height: fit-content;
+	border: 0;
+	border-radius: 7px !important;
+	vertical-align: middle !important;
+
+	.ant-input {
+		background-color: @app_background_accent!important;
+		border-color: @app_background_accent!important;
+		color: @app_background_contrast!important;
+	}
+
+	.ant-input-group {
+		display: flex;
+        align-items: center;
+        justify-content: center;
+        height: fit-content;
+	}
+
+	.ant-input-group-addon {
+		width: fit-content;
+		background-color: transparent;
+	}
+
+	.ant-btn {
+		background-color: #eeeeee!important;
+		border: 0 !important;
+	}
+}
