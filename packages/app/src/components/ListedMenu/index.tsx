@@ -1,9 +1,10 @@
 import React from 'react'
 import { Menu, Result } from 'antd'
 import classnames from 'classnames'
+import { Icons } from 'components/Icons'
 
 import styles from './index.less'
-import { __proto__filterSchematizedArray } from 'core'
+import { objectToArrayMap } from '@corenode/utils'
 
 export default class ListedMenu extends React.Component {
   state = {
@@ -16,7 +17,7 @@ export default class ListedMenu extends React.Component {
 
   async queryMenu() {
     this.setState({ loading: true })
-    this.setState({ menus: await __proto__filterSchematizedArray(this.props.menuArray), loading: false })
+    this.setState({ menus: objectToArrayMap(this.props.menuArray), loading: false })
   }
 
   getMenu() {
@@ -27,20 +28,20 @@ export default class ListedMenu extends React.Component {
     ))
   }
 
-  selectKey = (key: any) => {
+  selectKey = (key) => {
     this.setState({
       selectKey: key,
     })
   }
 
   renderChildren = () => {
-    let titlesArray: never[] = []
+    let titlesArray = []
     this.state.menus.forEach(e => { titlesArray[e.key] = e })
 
     const OptionTitle = () => {
       if (this.state.renderOptionTitle) {
         return <div>
-          <h3>{titlesArray[this.state.selectKey].icon || null}{titlesArray[this.state.selectKey].title || null}</h3>
+          <h3>{React.createElement(Icons[titlesArray[this.state.selectKey].icon]) || null}{titlesArray[this.state.selectKey].title || null}</h3>
         </div>
       }
       return null
@@ -79,7 +80,7 @@ export default class ListedMenu extends React.Component {
 
   render() {
     const { selectKey, loading } = this.state
-    const isMode = (e: string) => {
+    const isMode = (e) => {
       return this.state.mode === `${e}`
     }
 
@@ -90,7 +91,7 @@ export default class ListedMenu extends React.Component {
       <div style={this.props.wrapperStyle ?? null} className={classnames(styles.main, { [styles.horizontal]: isMode("horizontal") })}>
         <div className={styles.menuList}>
           <h3>
-            {this.props.icon ?? null} {this.props.title ?? "Menu"}
+            {React.createElement(Icons[this.props.icon]) ?? null} {this.props.title ?? "Menu"}
           </h3>
           <Menu
             mode={this.state.mode}

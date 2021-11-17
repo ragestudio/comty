@@ -1,0 +1,59 @@
+@selectableList_item_borderColor_active: rgba(51,51,51,1);
+@selectableList_item_borderColor_normal: rgba(51,51,51,0.3);
+
+.selectableList_item {
+    user-select: none;
+    width: 100%;
+
+    border: @selectableList_item_borderColor_normal 1px solid;
+    border-radius: 8px;
+
+    transition: all 150ms ease-in-out;
+
+    margin-bottom: 12px;
+    padding: 10px;
+
+    > div {
+        margin: 7px;
+    }
+
+    &.selection{
+        cursor: pointer;
+        background-color: #f5f5f5;
+        
+        h1 {
+            user-select: none;
+        } 
+        h3 {
+            user-select: none;
+        }
+    }
+
+    &.selected {
+        background-color: #dadada;
+        transform: translate(10px, 0);
+    }
+}
+
+.selectableList_item:hover {
+    // transform: translate(2px, 2px);
+     box-shadow: 2px 2px 8px 0px rgba(51,51,51,0.5);
+     border: @selectableList_item_borderColor_active 1px solid;
+ }
+ 
+.bottomActions_wrapper{
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+    width: 100%;
+
+    left: 0;
+    right: 0;
+
+    border-radius: 0;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}

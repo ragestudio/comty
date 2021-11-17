@@ -4,19 +4,16 @@ import progressBar from "nprogress"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
-import { NotFound, RenderError } from "components"
 import { Icons } from "components/Icons"
+import { CreateEviteApp, BindPropsProvider } from "evite"
 
 import config from "config"
 import { Session, User } from "models"
+import { NotFound, RenderError } from "components"
+import { SettingsController, SidebarController } from "controllers"
+import { API, Render, Debug, Sound } from "extensions"
 
-import SidebarController from "core/models/sidebar"
-import SettingsController from "core/models/settings"
-
-import { CreateEviteApp, BindPropsProvider } from "evite"
-import { API, Render, Splash, Debug, theme, Sound } from "extensions"
-
+import { Sidebar, Header, Drawer, Sidedrawer } from "./layout"
 import "theme/index.less"
 
 // append method to array prototype
@@ -24,20 +21,6 @@ Array.prototype.move = function (from, to) {
 	this.splice(to, 0, this.splice(from, 1)[0])
 	return this
 }
-
-const SplashExtension = Splash.extension({
-	logo: config.logo.alt,
-	preset: "fadeOut",
-	velocity: 1000,
-	props: {
-		logo: {
-			style: {
-				marginBottom: "10%",
-				stroke: "black",
-			},
-		},
-	},
-})
 
 class ThrowCrash {
 	constructor(message, description) {
@@ -156,14 +139,14 @@ class App {
 	}
 
 	static staticRenders = {
-		on404: (props) => {
+		NotFound: (props) => {
 			return <NotFound />
 		},
-		onRenderError: (props) => {
+		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
 		initialization: () => {
-			return <Splash.SplashComponent logo={config.logo.alt} />
+			return <h1>Initializing...</h1>
 		}
 	}
 
@@ -264,7 +247,7 @@ class App {
 									user={this.state.user}
 									session={this.state.session}
 								>
-									<Render.RenderController staticRenders={App.staticRenders} />
+									<Render.RenderRouter staticRenders={App.staticRenders} />
 								</BindPropsProvider>
 							</div>
 						</antd.Layout.Content>
@@ -277,5 +260,5 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, theme, API, SplashExtension, Debug],
+	extensions: [Sound.extension, Render.extension, API, Debug],
 })

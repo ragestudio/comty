@@ -1,4 +1,4 @@
-@import '~theme/index.less';
+@import "~theme/index.less";
 
 .main {
   font-family: "Nunito", sans-serif;
@@ -7,21 +7,21 @@
   width: 100%;
   height: auto;
   overflow: auto;
-  color: @__Global_layout_color;
-  background-color: #ffffff;
+  color: @__global_color;
+  background-color: @__global_background;
   padding: 15px;
   border-radius: 10px;
-  
+
   :global {
     .ant-list-item {
       padding-top: 7px;
       padding-bottom: 7px;
     }
-  
+
     .ant-list-split .ant-list-item {
       border-bottom: 0;
     }
-  
+
     .ant-list-item-meta-title {
       color: rgba(0, 0, 0, 0.733);
       font-size: 14px;
@@ -33,7 +33,7 @@
     width: 224px;
     :global {
       .ant-menu-inline {
-        color: @__Global_layout_color;
+        color: @__global_color;
         background-color: transparent;
         border: none;
       }
@@ -52,31 +52,21 @@
 
     .title {
       margin-bottom: 12px;
-      color: @__Global_layout_color;
+      color: @__global_color;
       font-weight: 500;
       font-size: 20px;
       line-height: 28px;
     }
   }
 
-  &.inline{
-
-  }
-  
-  &.horizontal{
+  &.horizontal {
     flex-direction: column;
-    .menuList{
+    .menuList {
       padding: 15px;
       width: 100%;
     }
   }
-  
-  &.vertical{
-    
-  }
-
 }
-
 
 @media screen and (max-width: @screen-md) {
   .main {

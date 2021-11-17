@@ -1,0 +1,49 @@
+[
+  {
+    "id": "expire_session",
+    "icon": "Key",
+    "title": "Expire Session",
+    "group": "general",
+    "type": "Switch"
+  },
+  {
+    "id": "post_autoposition",
+    "icon": "AlignCenter",
+    "type": "Switch",
+    "title": "Center on click",
+    "description": "Center posts element when then is clicked"
+  },
+  {
+    "id": "search_ontype",
+    "icon": "CornerDownRight",
+    "type": "Switch",
+    "title": "Auto search on input",
+    "description": "Search automaticly when type something"
+  },
+  {
+    "id": "post_hidebar",
+    "icon": "Menu",
+    "type": "Switch",
+    "title": "Auto hide postbar",
+    "description": "Hide post actions bar when loose focus"
+  },
+  {
+    "id": "edit_sidebar",
+    "group": "sidebar",
+    "icon": "Edit",
+    "title": "Edit Sidebar",
+    "type": "Button"
+  },
+  {
+    "id": "collapseOnLooseFocus",
+    "group": "sidebar",
+    "title": "Collapse when loose focus",
+    "type": "Switch"
+  },
+  {
+    "id": "reduceAnimations",
+    "group": "aspect",
+    "title": "Reduce animations",
+    "type": "Switch"
+  }
+]
