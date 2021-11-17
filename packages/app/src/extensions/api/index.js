@@ -1,7 +1,6 @@
 import config from 'config'
 import { Bridge } from "linebridge/client"
 import { Session } from "models"
-import io from "socket.io-client"
 
 export default {
     key: "apiBridge",
@@ -10,15 +9,6 @@ export default {
             mutateContext: {
                 async initializeDefaultBridge() {
                     this.apiBridge = await this.createBridge()
-                    this.ws = io("http://localhost:9001/main", { transports: ["websocket"] })
-
-                    this.ws.on("connect", () => {
-                        console.log(this.ws.id)
-                    })
-
-                    this.ws.on("connect_error", (...context) => {
-                        console.log(...context)
-                    })
 
                     window.app.apiBridge = this.apiBridge
                 },
