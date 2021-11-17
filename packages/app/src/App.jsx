@@ -145,9 +145,6 @@ class App {
 		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
-		initialization: () => {
-			return <h1>Initializing...</h1>
-		}
 	}
 
 	state = {
