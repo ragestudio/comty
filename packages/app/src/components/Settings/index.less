@@ -1,44 +1,81 @@
-.settings_groupItems{ 
-    > div {
-        padding: 12px 30px;
-    }    
-}
+.settings {
+	display: flex;
+	flex-direction: column;
 
-.settings_about_app{
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
+	> div {
+		margin-bottom: 25px;
+	}
 
-    display: flex;
-    flex-direction: row;
+	.group {
+		display: flex;
+		flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+		.content {
+			> div {
+				margin-bottom: 25px;
+			}
+		}
+	}
 
-    .ant-tag{
-        height: 18px;
-        line-height: 18px;
-        font-size: 10px;
-    }
+	.settingItem {
+		padding: 0 20px;
 
-    > div {
-        padding: 0 7px;
-    }
-}
+		> div {
+			margin-bottom: 10px;
+		}
 
-.settings_bottom_items {
-    position: relative;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    padding-bottom: 20px;
+		.header {
+			display: flex;
+			align-items: center;
 
-    display: flex;
-    flex-direction: column;
+			h5{
+				margin: 0;
+			}
 
-    justify-content: center;
-    align-items: center;
+			> div {
+				margin-right: 10px;
+			}
+		}
 
-    > div {
-        padding: 10px 0;
-    }
+		.component {
+			padding: 0 20px;
+		}
+	}
+
+	.footer {
+		position: relative;
+		width: 100%;
+
+		padding-top: 20px;
+		padding-bottom: 20px;
+
+		display: flex;
+		flex-direction: column;
+
+		justify-content: center;
+		align-items: center;
+
+		> div {
+			margin-bottom: 10px;
+
+			font-family: "Space Mono", monospace;
+			font-size: 10px;
+
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: center;
+
+			.ant-tag {
+				height: 18px;
+				line-height: 18px;
+				font-size: 10px;
+			}
+
+			> div {
+				padding: 0 7px;
+			}
+		}
+	}
 }

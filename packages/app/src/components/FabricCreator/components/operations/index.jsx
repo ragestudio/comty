@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import "./index.less"
 
-const api = window.app.apiBridge
+const api = window.app.request
 
 export default class Operations extends React.Component {
     state = {

@@ -2,18 +2,26 @@ import React from 'react'
 import * as antd from 'antd'
 import { Icons as FIcons, createIconRender } from "components/Icons"
 import * as MDIcons from "react-icons/md"
+import loadable from "@loadable/component"
+
+import "./index.less"
 
 const Icons = {
     ...FIcons,
     ...MDIcons
 }
 
-import "./index.less"
-
 const FormComponents = {
     "input": antd.Input,
     "textarea": antd.Input.TextArea,
     "select": antd.Select,
+    "datepicker": antd.DatePicker,
+}
+
+const requestModifyByType = {
+    "vaultItem": {
+        "additions": ["essc"]
+    }
 }
 
 // FIELDS
@@ -40,25 +48,74 @@ const FieldsForms = {
             return update.target.value
         },
     },
+    location: {
+        label: "Location",
+        component: "select",
+        updateEvent: "onChange",
+        children: async () => {
+            const api = window.app.request
+            const regions = await api.get.regions()
+
+            return regions.map(region => {
+                return <antd.Select.Option value={region.name}>{region.name}</antd.Select.Option>
+            })
+        },
+        props: {
+            placeholder: "Select a location",
+        }
+    },
     vaultItemTypeSelector: {
         label: "Type",
         component: "select",
         updateEvent: "onChange",
+        children: async () => {
+            let types = await import("schemas/vaultItemsTypes.json")
+
+            types = types.default || types
+
+            return Object.keys(types).map((group) => {
+                return <antd.Select.OptGroup key={group} label={String(group).toTitleCase()}>
+                    {types[group].map((type) => {
+                        return <antd.Select.Option key={type} value={`${group}-${type}`}>{String(type).toTitleCase()}</antd.Select.Option>
+                    })}
+                </antd.Select.OptGroup>
+            })
+        },
         props: {
             placeholder: "Select a type",
-            children: [
-                <antd.Select.OptGroup label="Computers">
-                    <antd.Select.Option value="computers-desktop">Desktop</antd.Select.Option>
-                    <antd.Select.Option value="computers-laptop">Laptop</antd.Select.Option>
-                    <antd.Select.Option value="computers-phone">Phone</antd.Select.Option>
-                    <antd.Select.Option value="computers-tablet">Tablet</antd.Select.Option>
-                    <antd.Select.Option value="computers-other">Other</antd.Select.Option>
-                </antd.Select.OptGroup>,
-                <antd.Select.OptGroup label="Peripherals">
-                    <antd.Select.Option value="peripherals-monitor">Monitor</antd.Select.Option>
-                    <antd.Select.Option value="peripherals-printer">Printer</antd.Select.Option>
-                </antd.Select.OptGroup>,
-            ]
+        }
+    },
+    vaultItemSerial: {
+        label: "Serial number",
+        component: "input",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
+        props: {
+            placeholder: "S/N 00000000X",
+        }
+    },
+    vaultItemManufacturer: {
+        label: "Manufacturer",
+        component: "input",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.target.value
+        },
+        props: {
+            placeholder: "e.g. Hewlett Packard",
+        }
+    },
+    vaultItemManufacturedYear: {
+        label: "Manufactured Year",
+        component: "datepicker",
+        updateEvent: "onChange",
+        onUpdate: (update) => {
+            return update.year()
+        },
+        props: {
+            picker: "year"
         }
     },
 }
@@ -94,7 +151,12 @@ const TaskFormula = {
 
 const VaultItemFormula = {
     defaultFields: [
+        // TODO: include location
         "vaultItemTypeSelector",
+        "vaultItemSerial",
+        "vaultItemManufacturer",
+        "vaultItemManufacturedYear",
+        "location",
     ]
 }
 
@@ -120,18 +182,32 @@ const FabricItemTypes = ["product", "operation", "phase", "task", "vaultItem"]
 export default class FabricCreator extends React.Component {
     state = {
         loading: true,
-        values: {},
-
-        fields: [],
+        submitting: false,
+        error: null,
 
         name: null,
         type: null,
-        uuid: null,
+        fields: [],
+        values: {},
     }
 
     componentDidMount = async () => {
-        await this.setItemType("product")
+        await this.setItemType(this.props.defaultType ?? "product")
         this.setState({ loading: false })
+    }
+
+    toogleLoading = (to) => {
+        this.setState({ loading: to ?? !this.state.loading })
+    }
+
+    toogleSubmitting = (to) => {
+        this.setState({ submitting: to ?? !this.state.submitting })
+    }
+
+    clearError = () => {
+        if (this.state.error != null) {
+            this.setState({ error: null })
+        }
     }
 
     clearValues = async () => {
@@ -155,24 +231,42 @@ export default class FabricCreator extends React.Component {
                 this.appendFieldByType(field)
             })
 
-            this.setState({ type: type, name: "New item" })
+            await this.setState({ type: type, name: "New item" })
         } else {
             console.error(`Cannot load default fields from formula with type ${type}`)
         }
     }
 
     appendFieldByType = (fieldType) => {
-        const form = FieldsForms[fieldType]
+        const field = FieldsForms[fieldType]
 
-        if (typeof form === "undefined") {
+        if (typeof field === "undefined") {
             console.error(`No form available for field [${fieldType}]`)
             return null
         }
 
         const fields = this.state.fields
-        fields.push(this.generateFieldRender({ type: fieldType, ...form }))
+
+        if (this.fieldsHasTypeKey(fieldType) && !field.allowMultiple) {
+            console.error(`Field [${fieldType}] already exists, and only can exists 1`)
+            return false
+        }
+
+        fields.push(this.generateFieldRender({ type: fieldType, ...field }))
 
         this.setState({ fields: fields })
+    }
+
+    fieldsHasTypeKey = (key) => {
+        let isOnFields = false
+
+        const fields = this.state.fields
+
+        fields.forEach(field => {
+            field.props.type === key ? isOnFields = true : null
+        })
+
+        return isOnFields
     }
 
     renderFieldSelectorMenu = () => {
@@ -181,13 +275,14 @@ export default class FabricCreator extends React.Component {
                 this.appendFieldByType(e.key)
             }}
         >
-            {Object.keys(FieldsForms).map((field) => {
-                const form = FieldsForms[field]
-                const icon = form.icon && createIconRender(form.icon)
+            {Object.keys(FieldsForms).map((key) => {
+                const field = FieldsForms[key]
+                const icon = field.icon && createIconRender(field.icon)
+                const disabled = this.fieldsHasTypeKey(key) && !field.allowMultiple
 
-                return <antd.Menu.Item key={field}>
+                return <antd.Menu.Item disabled={disabled} key={key}>
                     {icon ?? null}
-                    {field.charAt(0).toUpperCase() + field.slice(1)}
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
                 </antd.Menu.Item>
             })}
         </antd.Menu>
@@ -210,8 +305,50 @@ export default class FabricCreator extends React.Component {
         </antd.Menu>
     }
 
-    onDone = () => {
-        console.log(this.getValues())
+    onDone = async () => {
+        this.clearError()
+        this.toogleSubmitting(true)
+
+        const api = window.app.request
+        let properties = {}
+
+        this.getProperties().forEach((property) => {
+            if (typeof properties[property.type] !== "undefined") {
+                return properties[property.id] = property.value
+            }
+
+            return properties[property.type] = property.value
+        })
+
+        let payload = {
+            type: this.state.type,
+            name: this.state.name,
+            properties: properties,
+        }
+
+        if (typeof requestModifyByType[this.state.type] !== "undefined") {
+            payload = {
+                ...payload,
+                ...requestModifyByType[this.state.type],
+            }
+        }
+
+        await api.put.fabric(payload).catch((response) => {
+            console.error(response)
+            this.setState({ error: response })
+
+            return null
+        })
+
+        this.toogleSubmitting(false)
+
+        if (!this.state.error && typeof this.props.close === "function") {
+            this.props.close()
+        }
+    }
+
+    onChangeName = (event) => {
+        this.setState({ name: event.target.value })
     }
 
     onUpdateValue = (event, value) => {
@@ -224,46 +361,86 @@ export default class FabricCreator extends React.Component {
     }
 
     removeField = (key) => {
-        this.setState({ fields: this.state.fields.filter(field => field.key != key) })
+        let values = this.state.values
+        let fields = this.state.fields.filter(field => field.key != key)
+
+        delete values[key]
+
+        this.setState({ fields: fields, values: values })
     }
 
-    getValues = () => {
+    getProperties = () => {
         return this.state.fields.map((field) => {
             return {
                 type: field.props.type,
+                id: field.props.id,
                 value: this.state.values[field.key],
             }
         })
     }
 
-    generateFieldRender = (field) => {
-        let { key, style, type, icon, component, label, updateEvent, props, onUpdate } = field
+    getKeyFromLatestFieldType = (type) => {
+        let latestByType = 0
 
-        if (!key) {
-            key = this.state.fields.length
+        this.state.fields.forEach((field) => {
+            field.props.type === type ? latestByType++ : null
+        })
+
+        return `${type}-${latestByType}`
+    }
+
+    generateFieldRender = (field) => {
+        if (!field.key) {
+            field.key = this.getKeyFromLatestFieldType(field.type)
         }
 
-        if (typeof FormComponents[component] === "undefined") {
-            console.error(`No component type available for field [${key}]`)
+        if (typeof FormComponents[field.component] === "undefined") {
+            console.error(`No component type available for field [${field.key}]`)
             return null
         }
 
-        return <div key={key} id={`${type}-${key}`} type={type} className="field" style={style}>
-            <div className="close" onClick={() => { this.removeField(key) }}><Icons.X /></div>
-            <h4>{icon && createIconRender(icon)}{label}</h4>
-            <div className="fieldContent">
-                {React.createElement(FormComponents[component], {
-                    ...props,
-                    value: this.state.values[key],
-                    [updateEvent]: (...args) => {
-                        if (typeof onUpdate === "function") {
-                            return this.onUpdateValue({ updateEvent, key }, onUpdate(...args))
-                        }
-                        return this.onUpdateValue({ updateEvent, key }, ...args)
-                    },
-                })}
-            </div>
+        const getSubmittingState = () => {
+            return this.state.submitting
+        }
 
+        let fieldComponentProps = {
+            ...field.props,
+            value: this.state.values[field.key],
+            disabled: getSubmittingState(),
+            [field.updateEvent]: (...args) => {
+                if (typeof field.onUpdate === "function") {
+                    return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, field.onUpdate(...args))
+                }
+                return this.onUpdateValue({ updateEvent: field.updateEvent, key: field.key }, ...args)
+            },
+        }
+
+        let RenderComponent = null
+
+        if (typeof field.children === "function") {
+            RenderComponent = loadable(async () => {
+                try {
+                    const children = await field.children()
+                    return () => React.createElement(FormComponents[field.component], fieldComponentProps, children)
+                } catch (error) {
+                    console.log(error)
+                    return ()=> <div>
+                        <Icons.XCircle /> Load Error
+                    </div>
+                }
+            }, {
+                fallback: <div>Loading...</div>,
+            })
+        } else {
+            RenderComponent = () => React.createElement(FormComponents[field.component], fieldComponentProps)
+        }
+
+        return <div key={field.key} id={`${field.type}-${field.key}`} type={field.type} className="field" style={field.style}>
+            <div className="close" onClick={() => { this.removeField(field.key) }}><Icons.X /></div>
+            <h4>{field.icon && createIconRender(field.icon)}{field.label}</h4>
+            <div className="fieldContent">
+                <RenderComponent />
+            </div>
         </div>
     }
 
@@ -271,7 +448,6 @@ export default class FabricCreator extends React.Component {
         if (this.state.loading) {
             return <antd.Skeleton active />
         }
-
         const TypeIcon = FabricItemTypesIcons[this.state.type] && createIconRender(FabricItemTypesIcons[this.state.type])
 
         return <div className="fabric_creator">
@@ -281,18 +457,23 @@ export default class FabricCreator extends React.Component {
                         {TypeIcon ?? <Icons.HelpCircle />}
                     </antd.Dropdown>
                 </div>
-                <antd.Input defaultValue={this.state.name} />
+                <antd.Input defaultValue={this.state.name} onChange={this.onChangeName} />
             </div>
+
             <div className="fields">
                 <div className="wrap">
-                    {this.state.fields}
+                    {this.state.submitting ? <antd.Skeleton active /> : this.state.fields}
                 </div>
                 <div className="bottom_actions">
                     <antd.Dropdown trigger={['click']} placement="topCenter" overlay={this.renderFieldSelectorMenu}>
                         <Icons.Plus />
                     </antd.Dropdown>
-                    <antd.Button onClick={this.onDone}>Done</antd.Button>
+
+                    <antd.Button loading={this.state.submitting} onClick={this.onDone}>Done</antd.Button>
                 </div>
+                {this.state.error && <div className="error">
+                    {this.state.error}
+                </div>}
             </div>
         </div>
     }

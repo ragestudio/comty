@@ -1,7 +1,7 @@
 import React from "react"
 import { Button } from "antd"
 import { ActionsBar } from "components"
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "components/icons"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 
 import Selector from "../selector"

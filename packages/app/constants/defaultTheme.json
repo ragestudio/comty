@@ -1,0 +1,30 @@
+{
+    "staticVars": {
+        "primaryColor": "#32B7BB"
+    },
+    "defaultVariant": "light",
+    "variants": {
+        "light": {
+            "background-color-primary": "#ffffff",
+            "background-color-accent": "#f0f2f5",
+            "background-color-contrast": "#4b4b4b",
+            "border-color": "var(--background-color-contrast)",
+            "sidebar-background-color": "var(--background-color-accent)",
+            "sidedrawer-background-color": "var(--background-color-accent)"
+        },
+        "dark": {
+            "text-color": "#d2d2d2",
+            "svg-color": "var(--text-color)",
+            "background-color-primary": "#262626",
+            "background-color-accent": "#353535",
+            "background_disabled": "#0A0A0A",
+            "background-color-contrast": "#ffffff",
+            "border-color": "var(--background-color-contrast)",
+            "header-text-color": "#d2d2d2",
+            "button-background-color": "var(--primaryColor)",
+            "button-text-color": "var(--background-color-contrast)",
+            "sidebar-background-color": "var(--background-color-accent)",
+            "sidedrawer-background-color": "var(--background-color-accent)"
+        }
+    }
+}

@@ -2,6 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import EventEmitter from "@foxify/events"
 
+import "./index.less"
+
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 	events = new EventEmitter()
@@ -82,14 +84,18 @@ export class Drawer extends React.Component {
 		}
 
 		return (
-			<antd.Drawer {...drawerProps}>
-				<antd.PageHeader
-					onBack={this.onClose}
-					title={this.props.title ?? "Close"}
-					backIcon={this.props.backIcon}
-					subTitle={this.props.subtitle}
-				/>
-				<div style={{ padding: "10px 30px" }}>{React.createElement(this.props.children, componentProps)}</div>
+			<antd.Drawer className="drawer" {...drawerProps}>
+				<div className="header">
+					<antd.PageHeader
+						onBack={this.onClose}
+						title={this.props.title ?? "Close"}
+						backIcon={this.props.backIcon}
+						subTitle={this.props.subtitle}
+					/>
+				</div>
+				<div className="body">
+					{React.createElement(this.props.children, componentProps)}
+				</div>
 			</antd.Drawer>
 		)
 	}

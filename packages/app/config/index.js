@@ -1,13 +1,15 @@
+import defaultTheme from "../constants/defaultTheme.json"
+
 export default {
+  defaultTheme: defaultTheme,
+
   logo: {
     alt: "https://dl.ragestudio.net/branding/comty/alt/SVG/t3t3.svg"
   },
   api: {
     address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
   },
-  theme: {
-    "primary-color": "#32b7bb",
-  },
+
   app: {
     siteName: 'Comty™',
     copyright: 'RageStudio©',

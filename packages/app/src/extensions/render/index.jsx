@@ -1,5 +1,6 @@
 import React from "react"
 import loadable from "@loadable/component"
+import resolve from "pages"
 
 export const ConnectWithApp = (component) => {
 	return window.app.bindContexts(component)
@@ -15,9 +16,17 @@ export function GetRoutesMap() {
 export const LazyRouteRender = (props) => {
 	const component = loadable(async () => {
 		const location = window.location
-		const path = props.path ?? location.pathname
+		let path = props.path ?? location.pathname
 
-		let module = await import(`/src/pages/${path}`).catch(() => {
+		if (path.startsWith("/")) {
+			path = path.substring(1)
+		}
+
+		const src = resolve(path)
+		console.log(src)
+
+		let module = await import(src).catch((err) => {
+			console.error(err)
 			return props.staticRenders?.NotFound ?? import("./statics/404")
 		})
 		module = module.default || module
@@ -53,7 +62,11 @@ export class RenderRouter extends React.Component {
 	lastHistoryState = null
 
 	shouldComponentUpdate() {
-		return window.location.pathname !== this.lastPathname || this.lastHistoryState !== window.app.history.location.state
+		if (this.lastPathname !== window.location.pathname || this.lastHistoryState !== window.app.history.location.state) {
+			return true
+		}
+
+		return false
 	}
 
 	render() {
@@ -117,8 +130,9 @@ export const extension = {
 					})
 
 					main.history.setLocation = (to, state) => {
-						if (typeof to !== "string") {
-							console.warn(`Invalid location`)
+						const lastLocation = main.history.lastLocation
+
+						if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
 							return false
 						}
 
@@ -128,6 +142,7 @@ export const extension = {
 							main.history.push({
 								pathname: to,
 							}, state)
+							main.history.lastLocation = main.history.location
 						}, defaultTransitionDelay)
 					}
 

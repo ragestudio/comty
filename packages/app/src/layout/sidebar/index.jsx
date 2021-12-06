@@ -1,8 +1,7 @@
 import React from "react"
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "components/icons"
 import { Layout, Menu, Avatar } from "antd"
 
-import { Settings } from "components"
 import { SidebarEditor } from "./components"
 
 import config from "config"
@@ -16,7 +15,7 @@ const { Sider } = Layout
 
 const onClickHandlers = {
 	settings: (event) => {
-		Settings.open()
+		window.app.openSettings()
 	},
 }
 
@@ -48,6 +47,7 @@ export default class Sidebar extends React.Component {
 		}
 
 		window.app["SidebarController"] = this.SidebarController
+		window.app.eventBus.on("edit_sidebar", () => this.toogleEditMode())
 	}
 
 	collapseDebounce = null
@@ -214,9 +214,9 @@ export default class Sidebar extends React.Component {
 	}
 
 	toogleCollapse = (to) => {
-		if(window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode ){
+		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
 			this.setState({ collapsed: to ?? !this.state.collapsed })
-		}else {
+		} else {
 			this.setState({ collapsed: false })
 		}
 	}
@@ -232,8 +232,8 @@ export default class Sidebar extends React.Component {
 
 	handleMouseLeave = () => {
 		if (!this.state.collapsed) {
-			this.collapseDebounce = setTimeout(() => {this.toogleCollapse(true)}, 500)
-		}		
+			this.collapseDebounce = setTimeout(() => { this.toogleCollapse(true) }, 500)
+		}
 	}
 
 	renderExtraItems = (position) => {
@@ -261,7 +261,7 @@ export default class Sidebar extends React.Component {
 				onMouseLeave={this.handleMouseLeave}
 				theme={this.props.theme}
 				width={this.state.editMode ? 400 : 200}
-				collapsed={this.state.editMode? false : this.state.collapsed}
+				collapsed={this.state.editMode ? false : this.state.collapsed}
 				onCollapse={() => this.props.onCollapse()}
 				className={classnames("sidebar", { ["edit_mode"]: this.state.editMode, ["hidden"]: !this.state.visible })}
 			>

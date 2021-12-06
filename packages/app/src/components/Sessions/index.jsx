@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
+import { Icons } from "components/icons"
 
 import "./index.less"
 

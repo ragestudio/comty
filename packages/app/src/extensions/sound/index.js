@@ -10,18 +10,20 @@ export class SoundEngine {
     }
 
     getSounds = async () => {
-        const soundPack = await import(`http://${window.location.host}/src/assets/sounds`)
-        let sounds = soundPack.default
+        const origin = process.env.NODE_ENV === "development" ? `${window.location.origin}/src/assets/sounds/index.js` : `${window.location.origin}/assets/sounds/index.js`
 
-        Object.keys(soundPack.default).forEach((key) => {
-            const src = `http://${window.location.host}${sounds[key]}`
+        let soundPack = await import(origin)
+        soundPack = soundPack.default || soundPack
 
-            sounds[key] = new Howl({
+        Object.keys(soundPack).forEach((key) => {
+            const src = soundPack[key]
+
+            soundPack[key] = new Howl({
                 src: [src]
             })
         })
 
-        return sounds
+        return soundPack
     }
 
     play = (name) => {

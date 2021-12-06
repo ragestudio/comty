@@ -1,27 +1,17 @@
 import store from 'store'
-import EventEmitter from "@foxify/events"
 import { objectToArrayMap } from '@corenode/utils'
-import handlers from 'core/handlers'
-
-const defaultKeys = import('schemas/defaultSettings.json')
+import defaultKeys from "schemas/defaultSettings.json"
 
 class SettingsController {
     constructor() {
-        this.storeKey = "settings"
+        this.storeKey = "app_settings"
         this.defaultSettings = defaultKeys
 
-        this.events = new EventEmitter()
         this.settings = store.get(this.storeKey) ?? {}
 
         objectToArrayMap(this.defaultSettings).forEach((entry) => {
             if (typeof this.settings[entry.key] === "undefined") {
                 this.settings[entry.key] = entry.value
-            }
-        })
-
-        this.events.on('changeSetting', (payload) => {
-            if (typeof handlers[payload.id] === "function") {
-                handlers[payload.id](payload)
             }
         })
 
@@ -47,7 +37,7 @@ class SettingsController {
         let value = to ?? !this.settings[key] ?? true
 
         this.set(key, value)
-        this.events.emit("changeSetting", { key, value, to })
+        window.app.eventBus.emit("changeSetting", { key, value, to })
 
         return this.settings
     }

@@ -1,0 +1,59 @@
+[
+    {
+        "id": "expire_session",
+        "group": "general",
+        "type": "Switch",
+        "icon": "Key",
+        "title": "Expire Session"
+    },
+    {
+        "id": "edit_sidebar",
+        "group": "sidebar",
+        "type": "Button",
+        "icon": "Edit",
+        "title": "Edit Sidebar",
+        "emitEvent": "edit_sidebar",
+        "noStorage": true
+    },
+    {
+        "id": "collapseOnLooseFocus",
+        "group": "sidebar",
+        "type": "Switch",
+        "title": "Collapse when loose focus"
+    },
+    {
+        "id": "reduceAnimations",
+        "group": "aspect",
+        "type": "Switch",
+        "icon": "MdOutlineAnimation",
+        "title": "Reduce animation"
+    },
+    {
+        "id": "darkMode",
+        "group": "aspect",
+        "type": "Switch",
+        "icon": "Moon",
+        "title": "Dark Mode",
+        "emitEvent": "darkMode",
+        "experimental": true
+    },
+    {
+        "id": "primaryColor",
+        "group": "aspect",
+        "type": "SliderColorPicker",
+        "title": "Primary color",
+        "emitEvent": "modifyTheme",
+        "updateValueKey": "primaryColor"
+    },
+    {
+        "id": "resetTheme",
+        "group": "aspect",
+        "type": "Button",
+        "title": "Reset theme",
+        "props": {
+            "children": "Default Theme"
+        },
+        "emitEvent": "resetTheme",
+        "noStorage": true
+    }
+]

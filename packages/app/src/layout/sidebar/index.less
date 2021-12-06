@@ -2,12 +2,14 @@
 
 //  SIDEBAR
 .ant-layout-sider {
-	background: @app_sidebar_backgroundColor!important;
-	background-color: @app_sidebar_backgroundColor!important;
+	background: var(--sidebar-background-color)!important;
+	background-color: var(--sidebar-background-color)!important;
 
 	border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
 	overflow: hidden;
-	border: 1px solid @app_sidebar_backgroundColor!important;
+	border: 1px solid var(--sidebar-background-color)!important;
+
+	transition: all 150ms ease-in-out;
 
     &.hidden{
         flex: 0!important;
