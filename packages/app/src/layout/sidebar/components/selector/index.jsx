@@ -1,7 +1,7 @@
 import React from "react"
 import { Icons, createIconRender } from "components/Icons"
-import { LoadingSpinner, SelectableList } from "components"
-import { Button, List, Checkbox, InputNumber } from "antd"
+import { SelectableList } from "components"
+import { List } from "antd"
 
 import sidebarItems from "schemas/sidebar.json"
 

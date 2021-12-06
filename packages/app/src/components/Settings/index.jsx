@@ -1,9 +1,13 @@
 import React from "react"
-import { Icons } from "components/Icons"
+import { Icons } from "components/icons"
+import { SliderPicker } from "react-color"
 import * as antd from "antd"
-import { SketchPicker } from "react-color"
-import { AboutApp } from ".."
 import config from "config"
+
+import settingList from "schemas/settingsList.json"
+import groupsDecorator from "schemas/settingsGroupsDecorator.json"
+
+import { AboutApp } from ".."
 
 import "./index.less"
 
@@ -15,221 +19,165 @@ const ItemTypes = {
 	Input: antd.Input,
 	InputNumber: antd.InputNumber,
 	Select: antd.Select,
-	ColorPicker: SketchPicker,
+	SliderColorPicker: SliderPicker,
 }
 
-import settingList from "schemas/settings.json"
-import groupsDecorator from "schemas/settingsGroups.json"
-import { Session } from "models"
-
-export class SettingsMenu extends React.Component {
+export default class SettingsMenu extends React.Component {
 	state = {
 		settings: window.app.configuration.settings.get() ?? {},
 	}
 
-	_set(key, value) {
-		this.setState({ settings: window.app.configuration.settings.change(key, value) })
+	handleEvent = (event, item, to) => {
+		const id = item.id
+
+		if (typeof id === "undefined") {
+			console.error("SettingsMenu: Cannot update, item has no id")
+			return false
+		}
+
+		const currentValue = window.app.configuration.settings.get(id) ?? null
+
+		// by default we set the opposite value to the current value
+		if (typeof to === "undefined") {
+			to = !currentValue
+		}
+
+		if (typeof item.updateValueKey === "string") {
+			to = { [item.updateValueKey]: to }
+		}
+
+		if (typeof item.emitEvent === "string") {
+			window.app.eventBus.emit(item.emitEvent, { event, to })
+		}
+
+		if (!item.noStorage) {
+			window.app.configuration.settings.change(id, to)
+		}
+
+		this.setState({ settings: { ...this.state.settings, [id]: to } })
 	}
 
-	handleEvent(event, id, type) {
-		if (typeof id === "undefined") {
-			console.error(`No setting id provided!`)
-			return false
+	renderItem = (item) => {
+		if (!item.type) {
+			console.error(`Item [${item.id}] has no an type!`)
+			return null
 		}
-		if (typeof type !== "string") {
-			console.error(`Invalid eventType data-type, expecting string!`)
-			return false
+		if (typeof ItemTypes[item.type] === "undefined") {
+			console.error(`Item [${item.id}] has an invalid type: ${item.type}`)
+			return null
 		}
 
-		const value = window.app.configuration.settings.get(id) ?? false
-		let to = !value
+		if (typeof item.props === "undefined") {
+			item.props = {}
+		}
 
-		switch (type.toLowerCase()) {
-			case "button": {
-				window.app.configuration.settings.events.emit("changeSetting", { event, id, value, to })
+		// fix handlers
+		switch (item.type.toLowerCase()) {
+			case "slidercolorpicker": {
+				item.props.onChange = (color) => {
+					item.props.color = color.hex
+				}
+				item.props.onChangeComplete = (color, event) => {
+					this.handleEvent(event, item, color.hex)
+				}
+				break
+			}
+			case "switch": {
+				item.props.checked = this.state.settings[item.id]
+				item.props.onClick = (event) => this.handleEvent(event, item)
 				break
 			}
 			default: {
-				this._set(id, to)
+				if (!item.props.children) {
+					item.props.children = item.title ?? item.id
+				}
+				item.props.value = this.state.settings[item.id]
+				item.props.onClick = (event) => this.handleEvent(event, item)
 				break
 			}
 		}
-	}
 
-	generateMenu(data) {
-		let items = {}
-
-		const renderGroupItems = (group) => {
-			return items[group].map((item) => {
-				if (!item.type) {
-					console.error(`Item [${item.id}] has no an type!`)
-					return null
-				}
-				if (typeof ItemTypes[item.type] === "undefined") {
-					console.error(`Item [${item.id}] has an invalid type: ${item.type}`)
-					return null
-				}
-
-				if (typeof item.props === "undefined") {
-					item.props = {}
-				}
-
-				// fix handlers
-				switch (item.type.toLowerCase()) {
-					case "colorpicker": {
-						item.props.onChange = (value) => {
-							item.props.color = value.hex
-						}
-						item.props.onChangeComplete = (color, event) => {
-							window.app.configuration.settings.events.emit("changeSetting", { id: item.id, event, value: color })
-							this._set(item.id, color.hex)
-						}
-						break
-					}
-					case "switch": {
-						item.props.children = item.title ?? item.id
-						item.props.checked = this.state.settings[item.id]
-						item.props.onClick = (e) => this.handleEvent(e, item.id ?? "anon", item.type)
-						break
-					}
-
-					default: {
-						item.props.children = item.title ?? item.id
-						item.props.value = this.state.settings[item.id]
-						item.props.onClick = (e) => this.handleEvent(e, item.id ?? "anon", item.type)
-						break
-					}
-				}
-
-				return (
-					<div key={item.id}>
+		return (
+			<div key={item.id} className="settingItem">
+				<div className="header">
+					<div>
 						<h5>
 							{item.icon ? React.createElement(Icons[item.icon]) : null}
 							{item.title ?? item.id}
 						</h5>
-						{item.render ??
-							React.createElement(ItemTypes[item.type], {
-								...item.props,
-							})}
 					</div>
-				)
-			})
-		}
-
-		const renderGroupDecorator = (group) => {
-			if (group === "none") {
-				return null
-			}
-			const fromDecoratorIcon = groupsDecorator[group]?.icon
-			const fromDecoratorTitle = groupsDecorator[group]?.title
-
-			return (
-				<div>
-					<h1>
-						{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}{" "}
-						{fromDecoratorTitle ?? group}
-					</h1>
-				</div>
-			)
-		}
-
-		if (Array.isArray(data)) {
-			data.forEach((item) => {
-				if (typeof item.group == "undefined") {
-					item.group = "none"
-				}
-
-				if (!items[item.group]) {
-					items[item.group] = []
-				}
-
-				items[item.group].push(item)
-			})
-		}
-
-		return Object.keys(items).map((group) => {
-			return (
-				<div key={group} style={{ marginBottom: "30px" }}>
-					{renderGroupDecorator(group)}
-					<div key={group} className="settings_groupItems">
-						{renderGroupItems(group)}
+					<div>
+						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
 					</div>
 				</div>
-			)
-		})
-	}
-
-	renderAboutApp() {
-		const appConfig = config.app
-		const eviteNamespace = window.__evite
-		const isDevMode = eviteNamespace.env.NODE_ENV !== "production"
-
-		return (
-			<div className="settings_about_app">
-				<div>{appConfig.siteName}</div>
-				<div>
-					<antd.Tag>
-						<Icons.Tag />v{eviteNamespace.projectVersion}
-					</antd.Tag>
-				</div>
-				<div>
-					<antd.Tag color={isDevMode ? "magenta" : "green"}>
-						{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-						{isDevMode ? "development" : "stable"}
-					</antd.Tag>
+				<div className="component">
+					{React.createElement(ItemTypes[item.type], item.props)}
 				</div>
 			</div>
 		)
 	}
 
-	renderLogout() {
-		if (window.app.isValidSession()) {
-			return (
-				<div>
-					<antd.Button
-						onClick={() => {
-							Session.logout()
-						}}
-						type="danger"
-					>
-						Logout
-					</antd.Button>
-				</div>
-			)
-		}
+	renderGroup = (key, group) => {
+		const fromDecoratorIcon = groupsDecorator[key]?.icon
+		const fromDecoratorTitle = groupsDecorator[key]?.title
 
-		return <div></div>
+		return (
+			<div key={key} className="group">
+				<h1>
+					{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
+					{fromDecoratorTitle ?? key}
+				</h1>
+				<div className="content">
+					{group.map((item) => this.renderItem(item))}
+				</div>
+			</div>
+		)
+	}
+
+	generateSettings = (data) => {
+		let groups = {}
+
+		data.forEach((item) => {
+			if (!groups[item.group]) {
+				groups[item.group] = []
+			}
+
+			groups[item.group].push(item)
+		})
+
+		return Object.keys(groups).map((groupKey) => {
+			return this.renderGroup(groupKey, groups[groupKey])
+		})
 	}
 
 	render() {
+		const isDevMode = window.__evite.env.NODE_ENV !== "production"
+
 		return (
-			<div>
-				{this.generateMenu(settingList)}
-				<div className="settings_bottom_items">
-					{this.renderLogout()}
-					{this.renderAboutApp()}
-					<antd.Button type="link" onClick={() => AboutApp.openModal()}>
-						About
-					</antd.Button>
+			<div className="settings">
+				{this.generateSettings(settingList)}
+				<div className="footer">
+					<div>
+						<div>{config.app?.siteName}</div>
+						<div>
+							<antd.Tag>
+								<Icons.Tag />v{window.__evite.projectVersion}
+							</antd.Tag>
+						</div>
+						<div>
+							<antd.Tag color={isDevMode ? "magenta" : "green"}>
+								{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
+								{isDevMode ? "development" : "stable"}
+							</antd.Tag>
+						</div>
+					</div>
+					<div>
+						<antd.Button type="link" onClick={() => AboutApp.openModal()}>
+							About
+						</antd.Button>
+					</div>
 				</div>
 			</div>
 		)
 	}
 }
-
-const controller = {
-	open: (key) => {
-		// TODO: Scroll to content
-		window.app.DrawerController.open("settings", SettingsMenu, {
-			props: {
-				width: "45%",
-			},
-		})
-	},
-
-	close: () => {
-		window.app.DrawerController.close("settings")
-	},
-}
-
-export default controller

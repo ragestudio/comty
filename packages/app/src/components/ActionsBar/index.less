@@ -1,15 +1,30 @@
 .actionsBar_card {
-  border-radius: 8px;
-  transition: all 200ms ease-in-out;
+	border: 1px solid #e0e0e0;
+	padding: 15px;
+	border-radius: 8px;
+	transition: all 200ms ease-in-out;
+	background-color: #0c0c0c15;
+	backdrop-filter: blur(10px);
+
+	&.float {
+		z-index: 1000;
+		position: sticky;
+		top: 0;
+		right: 0;
+		width: 100%;
+	}
 }
 
-.actionsBar_flexWrapper{
-    transition: all 200ms ease-in-out;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  
-    > div {
-      margin-right: 10px;
-    }
-  }
+.actionsBar_flexWrapper {
+	transition: all 200ms ease-in-out;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	> div {
+		margin-right: 10px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+}

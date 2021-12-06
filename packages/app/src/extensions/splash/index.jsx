@@ -32,18 +32,21 @@ export const extension = (params = {}) => {
                             height: 100vh;
                         `
 
-						document.body.appendChild(splashElement)
-						ReactDOM.render(<SplashComponent logo={params.logo} props={params.props} />, splashElement)
+						const show = () => {
+							document.body.appendChild(splashElement)
+							ReactDOM.render(<SplashComponent logo={params.logo} props={params.props} />, splashElement)
+						}
 
 						const removeSplash = () => {
-							splashElement.style.animation = `${params.preset ?? "fadeOut"} ${fadeOutVelocity ?? 1000}ms`
+							splashElement.style.animation = `${params.preset ?? "fadeOut"} ${fadeOutVelocity}ms`
 
 							setTimeout(() => {
 								splashElement.remove()
-							}, fadeOutVelocity ?? 1000)
+							}, fadeOutVelocity)
 						}
 
-						main.eventBus.on("initialization_done", removeSplash)
+						main.eventBus.on("splash_show", show)
+						main.eventBus.on("splash_close", removeSplash)
 					},
 				],
 			},

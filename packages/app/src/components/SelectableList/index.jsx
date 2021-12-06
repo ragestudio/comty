@@ -19,21 +19,23 @@ export default class SelectableList extends React.Component {
 		}
 	}
 
-	onClickKey = (key) => {
-		if (typeof this.props.selectionEnabled !== "undefined") {
-			if (!Boolean(this.props.selectionEnabled)) {
-				return false
-			}
+	selectAll = () => {
+		if (this.props.items.length > 0) {
+			this.setState({
+				selectedKeys: [...this.props.items.map((item) => item.key ?? item.id ?? item._id)],
+			})
 		}
+	}
 
+	selectKey = (key) => {
 		let list = this.state.selectedKeys ?? []
+		list.push(key)
+		return this.setState({ selectedKeys: list })
+	}
 
-		if (!list.includes(key)) {
-			list.push(key)
-		} else {
-			list = list.filter((_key) => key !== _key)
-		}
-
+	unselectKey = (key) => {
+		let list = this.state.selectedKeys ?? []
+		list = list.filter((_key) => key !== _key)
 		return this.setState({ selectedKeys: list })
 	}
 
@@ -41,7 +43,7 @@ export default class SelectableList extends React.Component {
 		if (typeof this.props.onDone === "function") {
 			this.props.onDone(this.state.selectedKeys)
 		}
-		
+
 		this.setState({
 			selectedKeys: [],
 		})
@@ -57,6 +59,16 @@ export default class SelectableList extends React.Component {
 		})
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		if (typeof this.props.selectionEnabled !== "undefined") {
+			if (!Boolean(this.props.selectionEnabled) && this.state.selectedKeys.length > 0) {
+				this.setState({
+					selectedKeys: [],
+				})
+			}
+		}
+	}
+
 	renderActions = () => {
 		if (typeof this.props.renderActions !== "undefined" && !this.props.renderActions) {
 			return false
@@ -65,7 +77,7 @@ export default class SelectableList extends React.Component {
 			return false
 		}
 
-		const renderExtraActions = () => {
+		const renderProvidedActions = () => {
 			if (Array.isArray(this.props.actions)) {
 				return this.props.actions.map((action) => {
 					return (
@@ -113,45 +125,64 @@ export default class SelectableList extends React.Component {
 				<ActionsBar style={{ borderRadius: "8px 8px 0 0", width: "fit-content" }}>
 					<div key="discard">
 						<Button
-							style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-							shape="circle"
+							shape="round"
 							onClick={this.onDiscard}
 							{...this.props.onDiscardProps}
 						>
-							{this.props.onDiscardRender ?? <Icons.X style={{ margin: 0, padding: 0 }} />}
+							{this.props.onDiscardRender ?? <Icons.X />}
+							Discard
 						</Button>
 					</div>
-					<div key="done">
-						<Button type="primary" onClick={this.onDone} {...this.props.onDoneProps}>
-							{this.props.onDoneRender ?? (
-								<>
-									<Icons.Check /> Done
-								</>
-							)}
-						</Button>
-					</div>
-
-					{renderExtraActions()}
+					{renderProvidedActions()}
 				</ActionsBar>
 			</div>
 		)
 	}
 
 	render() {
+		const validSelectionMethods = ["onClick", "onDoubleClick"]
+
 		const renderMethod = (item) => {
+			const selectionMethod = validSelectionMethods.includes(this.props.selectionMethod) ? this.props.selectionMethod : "onClick"
+
 			if (typeof this.props.renderItem === "function") {
 				const _key = item.key ?? item.id ?? item._id
+				const list = this.state.selectedKeys
+				const isSelected = list.includes(_key)
+
+				let props = {
+					key: _key,
+					id: _key,
+					className: classnames("selectableList_item", this.props.itemClassName, {
+						selected: this.state.selectedKeys.includes(_key),
+					}),
+					[selectionMethod]: () => {
+						if (typeof this.props.selectionEnabled !== "undefined") {
+							if (!Boolean(this.props.selectionEnabled)) {
+								return false
+							}
+						}
+
+						if (isSelected) {
+							this.unselectKey(_key)
+						} else {
+							this.selectKey(_key)
+						}
+					}
+				}
+
+				if (selectionMethod == "onDoubleClick") {
+					props.onClick = () => {
+						if (list.length > 0) {
+							if (isSelected) {
+								this.unselectKey(_key)
+							}
+						}
+					}
+				}
 
 				return (
-					<div
-						key={_key}
-						id={_key}
-						onClick={() => this.onClickKey(_key)}
-						className={classnames("selectableList_item", this.props.itemClassName, {
-							selection: this.state.selectionEnabled,
-							selected: this.state.selectedKeys.includes(_key),
-						})}
-					>
+					<div {...props}>
 						{this.props.renderItem(item)}
 					</div>
 				)
@@ -178,8 +209,7 @@ export default class SelectableList extends React.Component {
 		}
 
 		return (
-			<div>
-				{this.renderActions()}
+			<div className={classnames("selectableList", { ["selectionEnabled"]: this.props.selectionEnabled })}>
 				<List
 					{...listProps}
 					dataSource={[
@@ -188,6 +218,7 @@ export default class SelectableList extends React.Component {
 					]}
 					renderItem={renderMethod}
 				/>
+				{this.renderActions()}
 			</div>
 		)
 	}

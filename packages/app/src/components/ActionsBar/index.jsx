@@ -1,14 +1,13 @@
-import React from 'react'
-import { Card } from 'antd'
-
-import './index.less'
+import React from "react"
+import classnames from "classnames"
+import "./index.less"
 
 export default (props) => {
-    const { children } = props
+    const { children, float } = props
 
-    return <Card style={props.style} className="actionsBar_card">
+    return <div style={props.style} className={classnames("actionsBar_card", { ["float"]: float })}>
         <div style={props.wrapperStyle} className="actionsBar_flexWrapper">
             {children}
         </div>
-    </Card>
+    </div>
 }

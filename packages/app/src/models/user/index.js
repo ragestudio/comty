@@ -2,7 +2,7 @@ import Session from '../session'
 
 export default class User {
     static get bridge() {
-        return window.app?.apiBridge
+        return window.app?.request
     }
 
     static get data() {
@@ -35,5 +35,15 @@ export default class User {
         }
 
         return request.response.data
+    }
+
+    hasAdmin = async () => {
+        const roles = await User.roles
+
+        if (!roles) {
+            return false
+        }
+    
+        return Array.isArray(roles) && roles.includes("admin")
     }
 }

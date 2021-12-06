@@ -7,7 +7,7 @@ import config from "config"
 
 import "./index.less"
 
-export class AboutApp extends React.Component {
+export class AboutCard extends React.Component {
 	state = {
 		visible: true,
 	}
@@ -68,5 +68,5 @@ export function openModal() {
 	const component = document.createElement("div")
 	document.body.appendChild(component)
 
-	ReactDOM.render(<AboutApp />, component)
+	ReactDOM.render(<AboutCard />, component)
 }

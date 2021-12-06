@@ -1,0 +1,15 @@
+{
+    "computers": [
+        "desktop",
+        "laptop",
+        "phone",
+        "tablet"
+    ],
+    "peripherals": [
+        "keyboard",
+        "mouse",
+        "monitor",
+        "printer",
+        "scanner"
+    ]
+}
