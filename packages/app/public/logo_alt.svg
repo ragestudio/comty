@@ -1,0 +1,22 @@
+<svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 443.92 234.17">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #00fea1;
+      }
+
+      .cls-2 {
+        fill: #454545;
+      }
+
+      .cls-3 {
+        fill: #76b89e;
+      }
+    </style>
+  </defs>
+  <title>RDVSeries-T1 </title>
+  <path id="RLayer" class="cls-1" d="M664.53,480.3c-1.79-11.1-9.16-47.71-42.06-77.06a144,144,0,0,0-39.93-25.5C567,371.55,545.3,369,540,369c-88.56,0-173.41-.11-262-.17L381.87,480h-154l267,123H585c7.28-.46,27.63,0,45-18,9.86-10.21,12.63-15.37,19.17-25.65h0A119.92,119.92,0,0,0,664.53,480.3Z" transform="translate(-222 -368.83)"/>
+  <polygon id="T4" class="cls-2" points="0 111.17 273 234.17 160 111.17 0 111.17"/>
+  <path class="cls-3" d="M585,603H495L278,369C494.24,500.25,590,603,585,603Z" transform="translate(-222 -368.83)"/>
+  <path class="cls-1" d="M227.92,480" transform="translate(-222 -368.83)"/>
+</svg>
