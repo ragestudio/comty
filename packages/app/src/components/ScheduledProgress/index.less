@@ -1,0 +1,68 @@
+.scheduled_progress {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+
+	.point {
+		height: 40px;
+		text-align: center;
+		align-items: end;
+		white-space: nowrap;
+		display: flex;
+		width: 72px;
+		justify-content: center;
+
+		&.right {
+			transform: translate(-50%, 0);
+		}
+
+		&.left {
+			transform: translate(50%, 0);
+		}
+
+		&.reached {
+			color: rgba(0, 0, 0, 0.45);
+		}
+	}
+
+	.ant-progress::before {
+		content: "";
+		width: 8px;
+		height: 8px;
+		border-radius: 24px;
+		transform: translateX(-10px);
+		background-color: rgb(128, 128, 128);
+	}
+
+	.ant-progress::after {
+		content: "";
+		width: 8px;
+		height: 8px;
+		border-radius: 24px;
+		transform: translateX(10px);
+		background-color: rgb(128, 128, 128);
+	}
+
+	.ant-progress {
+		font-size: 0;
+		display: flex;
+		align-items: center;
+		height: fit-content;
+
+		&.startReached {
+			&::before {
+				background-color: var(--primaryColor) !important;
+			}
+		}
+
+		&.finishReached {
+			&::after {
+				background-color: var(--primaryColor) !important;
+			}
+		}
+	}
+
+	.ant-progress-bg {
+		background-color: var(--primaryColor);
+	}
+}

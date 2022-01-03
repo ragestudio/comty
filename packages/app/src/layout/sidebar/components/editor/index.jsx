@@ -6,8 +6,8 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 
 import Selector from "../selector"
 
+import sidebarItems from "schemas/routes.json"
 import defaultSidebarKeys from "schemas/defaultSidebar.json"
-import sidebarItems from "schemas/sidebar.json"
 
 import "./index.less"
 

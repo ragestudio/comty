@@ -8,7 +8,6 @@ import { Session } from "models"
 
 import "./index.less"
 
-const api = window.app.apiBridge
 
 const SelfViewComponents = {
 	sessionsView: SessionsView,
@@ -68,6 +67,8 @@ export default class Account extends React.Component {
 		sessions: null
 	}
 
+	api = window.app.request
+
 	componentDidMount = async () => {
 		const token = Session.decodedToken
 		const location = window.app.history.location
@@ -90,13 +91,14 @@ export default class Account extends React.Component {
 
 	handleUpdateUserData = async (changes, callback) => {
 		const update = {}
+
 		if (Array.isArray(changes)) {
 			changes.forEach((change) => {
 				update[change.id] = change.value
 			})
 		}
 
-		await api.put
+		await this.api.put
 			.selfUser(update)
 			.then((data) => {
 				callback(false, data)
@@ -105,7 +107,11 @@ export default class Account extends React.Component {
 				callback(true, err)
 			})
 
-		window.app.eventBus.emit("forceReloadUser")
+		window.app.eventBus.emit("reinitializeUser")
+	}
+
+	handleSignOutAll = () => {
+		return this.props.contexts.app.sessionController.destroyAllSessions()
 	}
 
 	openUserEdit = () => {
@@ -159,9 +165,6 @@ export default class Account extends React.Component {
 							</>
 						}
 					</div>
-					<div key="roles">
-
-					</div>
 					{this.state.isSelf && this.renderSelfActions()}
 				</div>
 
@@ -173,6 +176,7 @@ export default class Account extends React.Component {
 							sessions: this.state.sessions,
 							user: this.state.user,
 							decodedToken: Session.decodedToken,
+							handleSignOutAll: this.handleSignOutAll,
 						}}
 					/>
 				)}

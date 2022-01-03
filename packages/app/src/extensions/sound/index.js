@@ -1,4 +1,5 @@
 import { Howl } from "howler"
+import config from "config"
 
 export class SoundEngine {
     constructor() {
@@ -10,10 +11,8 @@ export class SoundEngine {
     }
 
     getSounds = async () => {
-        const origin = process.env.NODE_ENV === "development" ? `${window.location.origin}/src/assets/sounds/index.js` : `${window.location.origin}/assets/sounds/index.js`
-
-        let soundPack = await import(origin)
-        soundPack = soundPack.default || soundPack
+        // TODO: Load custom soundpacks manifests
+        let soundPack = config.defaultSoundPack ?? {}
 
         Object.keys(soundPack).forEach((key) => {
             const src = soundPack[key]
@@ -29,6 +28,8 @@ export class SoundEngine {
     play = (name) => {
         if (this.sounds[name]) {
             this.sounds[name].play()
+        } else {
+            console.error(`Sound ${name} not found.`)
         }
     }
 }

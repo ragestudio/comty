@@ -1,8 +1,104 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 import EventEmitter from "@foxify/events"
+import { Icons } from "components/Icons"
 
 import "./index.less"
+
+export default class DrawerController extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = {
+			addresses: {},
+			refs: {},
+			drawers: [],
+		}
+
+		this.DrawerController = {
+			open: this.open,
+			close: this.close,
+			closeAll: this.closeAll,
+		}
+
+		window.app["DrawerController"] = this.DrawerController
+	}
+
+	sendEvent = (id, ...context) => {
+		const ref = this.state.refs[id]?.current
+		return ref.events.emit(...context)
+	}
+
+	open = (id, component, options) => {
+		const refs = this.state.refs ?? {}
+		const drawers = this.state.drawers ?? []
+		const addresses = this.state.addresses ?? {}
+
+		const instance = {
+			id,
+			key: id,
+			ref: React.createRef(),
+			children: component,
+			options,
+			controller: this,
+		}
+
+		if (typeof addresses[id] === "undefined") {
+			drawers.push(<Drawer {...instance} />)
+			addresses[id] = drawers.length - 1
+			refs[id] = instance.ref
+		} else {
+			const ref = refs[id].current
+			const isLocked = ref.state.locked
+
+			if (!isLocked) {
+				drawers[addresses[id]] = <Drawer {...instance} />
+				refs[id] = instance.ref
+			} else {
+				console.warn("Cannot update an locked drawer.")
+			}
+		}
+
+		this.setState({ refs, addresses, drawers })
+	}
+
+	destroy = (id) => {
+		let { addresses, drawers, refs } = this.state
+		const index = addresses[id]
+
+		if (typeof drawers[index] !== "undefined") {
+			drawers = drawers.filter((value, i) => i !== index)
+		}
+		delete addresses[id]
+		delete refs[id]
+
+		this.setState({ addresses, drawers })
+	}
+
+	close = (id) => {
+		const ref = this.state.refs[id]?.current
+
+		if (typeof ref !== "undefined") {
+			if (ref.state.locked && ref.state.visible) {
+				return console.warn("This drawer is locked and cannot be closed")
+			} else {
+				return ref.close()
+			}
+		} else {
+			return console.warn("This drawer not exists")
+		}
+	}
+
+	closeAll = () => {
+		this.state.drawers.forEach((drawer) => {
+			drawer.ref.current.close()
+		})
+	}
+
+	render() {
+		return this.state.drawers
+	}
+}
 
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
@@ -83,113 +179,25 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
+		if (window.isMobile) {
+			drawerProps.height = "100%"
+			drawerProps.placement = "bottom"
+		}
+
 		return (
-			<antd.Drawer className="drawer" {...drawerProps}>
-				<div className="header">
+			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
+				{!this.props.headerDisabled && <div className="pageTitle">
 					<antd.PageHeader
 						onBack={this.onClose}
 						title={this.props.title ?? "Close"}
-						backIcon={this.props.backIcon}
+						backIcon={this.props.backIcon ?? <Icons.X />}
 						subTitle={this.props.subtitle}
 					/>
-				</div>
+				</div>}
 				<div className="body">
 					{React.createElement(this.props.children, componentProps)}
 				</div>
 			</antd.Drawer>
 		)
-	}
-}
-
-export default class DrawerController extends React.Component {
-	constructor(props) {
-		super(props)
-		this.state = {
-			addresses: {},
-			refs: {},
-			drawers: [],
-		}
-
-		this.DrawerController = {
-			open: this.open,
-			close: this.close,
-			closeAll: this.closeAll,
-		}
-
-		window.app["DrawerController"] = this.DrawerController
-	}
-
-	sendEvent = (id, ...context) => {
-		const ref = this.state.refs[id]?.current
-		return ref.events.emit(...context)
-	}
-
-	open = (id, component, options) => {
-		const refs = this.state.refs ?? {}
-		const drawers = this.state.drawers ?? []
-		const addresses = this.state.addresses ?? {}
-
-		const instance = {
-			id,
-			ref: React.createRef(),
-			children: component,
-			options,
-			controller: this,
-		}
-
-		if (typeof addresses[id] === "undefined") {
-			drawers.push(<Drawer {...instance} />)
-			addresses[id] = drawers.length - 1
-			refs[id] = instance.ref
-		} else {
-			const ref = refs[id].current
-			const isLocked = ref.state.locked
-
-			if (!isLocked) {
-				drawers[addresses[id]] = <Drawer {...instance} />
-				refs[id] = instance.ref
-			} else {
-				console.warn("Cannot update an locked drawer.")
-			}
-		}
-
-		this.setState({ refs, addresses, drawers })
-	}
-
-	destroy = (id) => {
-		let { addresses, drawers, refs } = this.state
-		const index = addresses[id]
-
-		if (typeof drawers[index] !== "undefined") {
-			drawers = drawers.filter((value, i) => i !== index)
-		}
-		delete addresses[id]
-		delete refs[id]
-
-		this.setState({ addresses, drawers })
-	}
-
-	close = (id) => {
-		const ref = this.state.refs[id]?.current
-
-		if (typeof ref !== "undefined") {
-			if (ref.state.locked && ref.state.visible) {
-				return console.warn("This drawer is locked and cannot be closed")
-			} else {
-				return ref.close()
-			}
-		} else {
-			return console.warn("This drawer not exists")
-		}
-	}
-
-	closeAll = () => {
-		this.state.drawers.forEach((drawer) => {
-			drawer.ref.current.close()
-		})
-	}
-
-	render() {
-		return this.state.drawers
 	}
 }

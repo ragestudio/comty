@@ -3,7 +3,7 @@ import { Icons, createIconRender } from "components/Icons"
 import { SelectableList } from "components"
 import { List } from "antd"
 
-import sidebarItems from "schemas/sidebar.json"
+import sidebarItems from "schemas/routes.json"
 
 import "./index.less"
 

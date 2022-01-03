@@ -1,0 +1,53 @@
+@bottomBar_height: 80px;
+
+.bottomBar {
+	position: sticky;
+	z-index: 9999;
+	
+	left: 0;
+	bottom: 0;
+
+	width: 100vw;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	background-color: var(--background-color-accent);
+	border-radius: 12px 12px 0 0;
+
+	height: @bottomBar_height;
+
+	padding: 10px;
+
+	.items {
+		display: inline-block;
+		white-space: nowrap;
+		overflow-x: overlay;
+
+		height: 100%;
+
+		> div {
+			display: inline-block;
+
+			height: 100%;
+			margin: 0 17px;
+		}
+
+		.item {
+			.icon {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+
+				align-items: center;
+				justify-content: center;
+
+				color: var(--background-color-contrast);
+				font-size: 2rem;
+			}
+		}
+	}
+}

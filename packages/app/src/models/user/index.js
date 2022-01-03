@@ -25,6 +25,16 @@ export default class User {
         return User.bridge.get.roles({ username: token.username })
     }
 
+    getAssignedWorkloads = async () => {
+        const token = Session.decodedToken
+
+        if (!token || !User.bridge) {
+            return false
+        }
+
+        return User.bridge.get.workloads({ username: token.username })
+    }
+
     getData = async (payload, callback) => {
         const request = await User.bridge.get.user(undefined, { username: payload.username, _id: payload.user_id }, {
             parseData: false

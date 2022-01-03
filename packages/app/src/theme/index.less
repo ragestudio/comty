@@ -3,12 +3,11 @@
 @import "theme/fonts.css";
 
 ::-webkit-scrollbar {
-	position: absolute;
+	display: none;
 
-	width: 14px;
-	height: 18px;
-	z-index: 200;
-	transition: all 200ms ease-in-out;
+	width: 0;
+	height: 0;
+	z-index: 0;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -111,6 +110,27 @@ body {
 
 	overflow: hidden;
 	transition: all 150ms ease-in-out;
+
+	::-webkit-scrollbar {
+		display: block;
+		position: absolute;
+
+		width: 14px;
+		height: 18px;
+		z-index: 200;
+		transition: all 200ms ease-in-out;
+	}
+
+	&.mobile {
+		padding-top: 20px;
+
+		::-webkit-scrollbar {
+			display: none !important;
+			width: 0;
+			height: 0;
+			z-index: 0;
+		}
+	}
 }
 
 .layout_page {
@@ -125,25 +145,11 @@ body {
 	overflow-y: overlay;
 }
 
-// @media (min-width: @screen-xs) {
-
-// }
-
-// @media (min-width: @screen-md) {
-
-// }
-
-// @media (min-width: @screen-lg) {
-
-// }
-
-// @media (min-width: @screen-xl) {
-
-// }
-
-// @media (min-width: @screen-xxl) {
-
-// }
+@media (max-width: 768px) {
+	.layout_page  {
+		margin: 10px;
+	}
+}
 
 .fade-transverse-active {
 	transition: all 250ms;
@@ -208,8 +214,25 @@ body {
 	justify-content: center;
 }
 
-.ant-result-extra  {
+.ant-result-extra {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.ant-modal-confirm-btns {
+	display: flex;
+}
+
+.__render_box_test {
+	position: absolute;
+	z-index: 9999;
+
+	width: 40vw;
+	height: 40vw;
+
+	background: red;
+	transition: all 50ms ease-out;
+
+	filter: drop-shadow(20px 20px 3px rgba(0, 0, 0, 1));
 }

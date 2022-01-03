@@ -87,6 +87,10 @@ export default class SettingsMenu extends React.Component {
 				item.props.onClick = (event) => this.handleEvent(event, item)
 				break
 			}
+			case "select": {
+				item.props.onChange = (event) => this.handleEvent(event, item)
+				break
+			}
 			default: {
 				if (!item.props.children) {
 					item.props.children = item.title ?? item.id
@@ -101,10 +105,11 @@ export default class SettingsMenu extends React.Component {
 			<div key={item.id} className="settingItem">
 				<div className="header">
 					<div>
-						<h5>
-							{item.icon ? React.createElement(Icons[item.icon]) : null}
+						<h4>
+							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
 							{item.title ?? item.id}
-						</h5>
+						</h4>
+						<p>{item.description}</p>
 					</div>
 					<div>
 						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
@@ -151,7 +156,7 @@ export default class SettingsMenu extends React.Component {
 	}
 
 	render() {
-		const isDevMode = window.__evite.env.NODE_ENV !== "production"
+		const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
 		return (
 			<div className="settings">
@@ -161,7 +166,7 @@ export default class SettingsMenu extends React.Component {
 						<div>{config.app?.siteName}</div>
 						<div>
 							<antd.Tag>
-								<Icons.Tag />v{window.__evite.projectVersion}
+								<Icons.Tag />v{window.__evite?.projectVersion}
 							</antd.Tag>
 						</div>
 						<div>
