@@ -16,6 +16,10 @@ export default class Header extends React.Component {
 
 		this.HeaderController = {
 			toogleVisible: (to) => {
+				if (window.isMobile) {
+					to = true
+				}
+
 				this.setState({ visible: to ?? !this.state.visible })
 			},
 			isVisible: () => this.state.visible,
@@ -28,15 +32,33 @@ export default class Header extends React.Component {
 		window.app.openFabric()
 	}
 
+	onClickHome = () => {
+		window.app.goMain()
+	}
+
 	render() {
 		return (
-			<antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: !this.state.visible })}>
+			<antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: !window.isMobile && !this.state.visible })}>
+				{window.isMobile && <div>
+					<antd.Button
+						onClick={this.onClickHome}
+						type="primary"
+						shape="circle"
+						icon={<Icons.Home style={{ margin: 0 }} />}
+					/>
+				</div>}
 				<div>
-					<AppSearcher />
+					<antd.Button
+						onClick={this.onClickCreate}
+						type="primary"
+						shape="circle"
+						icon={<Icons.Plus style={{ margin: 0 }} />}
+					/>
 				</div>
-				<div>
-					<antd.Button onClick={this.onClickCreate} type="primary" shape="circle" icon={<Icons.Plus style={{ margin: 0 }} />} style={{ display: "flex", alignItems: "center", justifyContent: "center" }} />
-				</div>
+				{!window.isMobile &&
+					<div>
+						<AppSearcher />
+					</div>}
 			</antd.Layout.Header>
 		)
 	}

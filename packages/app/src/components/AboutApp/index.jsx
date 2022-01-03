@@ -21,9 +21,9 @@ export class AboutCard extends React.Component {
 	}
 
 	render() {
-		const eviteNamespace = window.__evite
+		const eviteNamespace = window.__evite ?? {}
 		const appConfig = config.app ?? {}
-		const isDevMode = eviteNamespace.env.NODE_ENV !== "production"
+		const isDevMode = eviteNamespace?.env?.NODE_ENV !== "production"
 
 		return (
 			<antd.Modal
@@ -43,13 +43,13 @@ export class AboutCard extends React.Component {
 							<h1>{appConfig.siteName}</h1>
 							<div>
 								<antd.Tag>
-									<Icons.Tag />v{eviteNamespace.projectVersion}
+									<Icons.Tag />v{eviteNamespace?.projectVersion ?? " experimental"}
 								</antd.Tag>
-								<antd.Tag color="geekblue">eVite v{eviteNamespace.eviteVersion}</antd.Tag>
-								<antd.Tag color="green">
-									<Icons.Hexagon /> v{eviteNamespace.versions.node}
-								</antd.Tag>
-
+								{eviteNamespace.eviteVersion &&
+									<antd.Tag color="geekblue">eVite v{eviteNamespace?.eviteVersion}</antd.Tag>}
+								{eviteNamespace.version?.node && <antd.Tag color="green">
+									<Icons.Hexagon /> v{eviteNamespace?.versions?.node}
+								</antd.Tag>}
 								<antd.Tag color={isDevMode ? "magenta" : "green"}>
 									{isDevMode ? <Icons.Triangle /> : <Icons.CheckCircle />}
 									{isDevMode ? "development" : "stable"}

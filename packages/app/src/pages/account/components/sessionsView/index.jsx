@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
 import { Sessions } from "components"
 
 export default class SessionsView extends React.Component {
@@ -9,8 +8,12 @@ export default class SessionsView extends React.Component {
 			title: "Caution",
 			content: "This action will cause all sessions to be closed, you will have to log in again.",
 			onOk: () => {
-				//this.setState({ sessions: null })
-				window.app.eventBus.emit("destroyAllSessions")
+				if (typeof this.props.handleSignOutAll === "function") {
+					this.props.handleSignOutAll()
+				} else {
+					antd.message.error("Sign out all sessions failed")
+					console.error("handleSignOutAll is not a function")
+				}
 			},
 			okCancel: true,
 		})

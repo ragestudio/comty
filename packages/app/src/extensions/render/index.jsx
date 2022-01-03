@@ -1,80 +1,99 @@
 import React from "react"
 import loadable from "@loadable/component"
-import resolve from "pages"
+import routes from "virtual:generated-pages"
+import progressBar from "nprogress"
+
+import NotFound from "./statics/404"
 
 export const ConnectWithApp = (component) => {
 	return window.app.bindContexts(component)
 }
 
 export function GetRoutesMap() {
-	const jsxFiles = import.meta.glob('/src/pages/**/**.jsx')
-	const tsxFiles = import.meta.glob('/src/pages/**/**.tsx')
+	return routes.map((route) => {
+		const { path } = route
+		route.name =
+			path
+				.replace(/^\//, "")
+				.replace(/:/, "")
+				.replace(/\//, "-")
+				.replace("all(.*)", "not-found") || "home"
 
-	return { ...jsxFiles, ...tsxFiles }
+		route.path = route.path.includes("*") ? "*" : route.path
+
+		return route
+	})
+}
+
+export function GetRoutesComponentMap() {
+	return routes.reduce((acc, route) => {
+		const { path, component } = route
+
+		acc[path] = component
+
+		return acc
+	}, {})
+}
+
+export class RouteRender extends React.Component {
+	state = {
+		routes: GetRoutesComponentMap() ?? {},
+		error: null,
+	}
+
+	lastLocation = null
+
+	componentDidMount() {
+		window.app.eventBus.on("locationChange", (event) => {
+			console.debug("[App] LocationChange, forcing update render...")
+
+			// render controller needs an better method for update render, this is a temporary solution
+			// FIXME: this event is called multiple times. we need to debug them methods
+			if (typeof this.forceUpdate === "function") {
+				this.forceUpdate()
+			}
+		})
+	}
+
+	componentDidCatch(info, stack) {
+		this.setState({ error: { info, stack } })
+	}
+
+	// shouldComponentUpdate(nextProps, nextState) {
+	// 	if (this.lastLocation.pathname !== window.location.pathname) {
+	// 		return true
+	// 	}
+	// 	return false
+	// }
+
+	render() {
+		this.lastLocation = window.location
+
+		let path = this.props.path ?? window.location.pathname
+		let componentModule = this.state.routes[path] ?? this.props.staticRenders.NotFound ?? NotFound
+
+		console.debug(`[RouteRender] Rendering ${path}`)
+
+		if (this.state.error) {
+			if (this.props.staticRenders?.RenderError) {
+				return React.createElement(this.props.staticRenders?.RenderError, { error: this.state.error })
+			}
+
+			return JSON.stringify(this.state.error)
+		}
+
+		return React.createElement(ConnectWithApp(componentModule), this.props)
+	}
 }
 
 export const LazyRouteRender = (props) => {
 	const component = loadable(async () => {
-		const location = window.location
-		let path = props.path ?? location.pathname
+		// TODO: Support evite async component initializations
 
-		if (path.startsWith("/")) {
-			path = path.substring(1)
-		}
-
-		const src = resolve(path)
-		console.log(src)
-
-		let module = await import(src).catch((err) => {
-			console.error(err)
-			return props.staticRenders?.NotFound ?? import("./statics/404")
-		})
-		module = module.default || module
-
-		return class extends React.PureComponent {
-			state = {
-				error: null
-			}
-
-			componentDidCatch(info, stack) {
-				this.setState({ error: { info, stack } })
-			}
-
-			render() {
-				if (this.state.error) {
-					if (props.staticRenders?.RenderError) {
-						return React.createElement(props.staticRenders?.RenderError, { error: this.state.error })
-					}
-
-					return JSON.stringify(this.state.error)
-				}
-
-				return React.createElement(ConnectWithApp(module), props)
-			}
-		}
+		return RouteRender
 	})
 
 	return React.createElement(component)
-}
-
-export class RenderRouter extends React.Component {
-	lastPathname = null
-	lastHistoryState = null
-
-	shouldComponentUpdate() {
-		if (this.lastPathname !== window.location.pathname || this.lastHistoryState !== window.app.history.location.state) {
-			return true
-		}
-
-		return false
-	}
-
-	render() {
-		this.lastPathname = window.location.pathname
-		this.lastHistoryState = window.app.history.location.state
-
-		return LazyRouteRender({ ...this.props, path: this.lastPathname })
-	}
 }
 
 export const extension = {
@@ -125,25 +144,30 @@ export const extension = {
 				async (app, main) => {
 					const defaultTransitionDelay = 150
 
+					main.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
+
 					main.history.listen((event) => {
-						main.eventBus.emit("setLocationDone")
+						main.eventBus.emit("transitionDone", event)
+						main.eventBus.emit("locationChange", event)
+						main.progressBar.done()
 					})
 
-					main.history.setLocation = (to, state) => {
+					main.history.setLocation = (to, state, delay) => {
 						const lastLocation = main.history.lastLocation
 
 						if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
 							return false
 						}
 
-						main.eventBus.emit("setLocation")
+						main.progressBar.start()
+						main.eventBus.emit("transitionStart", delay)
 
 						setTimeout(() => {
 							main.history.push({
 								pathname: to,
 							}, state)
 							main.history.lastLocation = main.history.location
-						}, defaultTransitionDelay)
+						}, delay ?? defaultTransitionDelay)
 					}
 
 					main.setToWindowContext("setLocation", main.history.setLocation)
