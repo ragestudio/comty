@@ -4,7 +4,6 @@ import mongoose from 'mongoose'
 import passport from 'passport'
 import { User } from './models'
 import socketIo from 'socket.io'
-import http from "http"
 
 const b64Decode = global.b64Decode = (data) => {
     return Buffer.from(data, 'base64').toString('utf-8')
@@ -37,8 +36,7 @@ class Server {
         })
 
         this.server = this.instance.httpServer
-        this.ioHttp = http.createServer()
-        this.io = new socketIo.Server(this.ioHttp, {
+        this.io = new socketIo.Server(3001, {
             maxHttpBufferSize: 100000000,
             connectTimeout: 5000,
             transports: ['websocket', 'polling'],
@@ -78,8 +76,6 @@ class Server {
             console.log(socket.id)
         })
 
-        this.ioHttp.listen(9001)
-
         await this.instance.init()
     }
 
@@ -92,7 +88,7 @@ class Server {
         return new Promise((resolve, reject) => {
             try {
                 console.log("🌐 Trying to connect to DB...")
-                mongoose.connect(this.getDBConnectionString(), { useNewUrlParser: true, useUnifiedTopology: true })
+                mongoose.connect(this.getDBConnectionString(), { useNewUrlParser: true, useFindAndModify: false })
                     .then((res) => { return resolve(true) })
                     .catch((err) => { return reject(err) })
             } catch (err) {
