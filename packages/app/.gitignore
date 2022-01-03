@@ -1,16 +1,8 @@
-# dependencies
-/node_modules
-/npm-debug.log*
-/yarn-error.log
-/yarn.lock
-
-# production
-/build
-/dist
-/out
-
-# umi
-src/.umi
-src/.umi-production
-src/.umi-test
-.env.local
+node_modules
+.DS_Store
+dist
+dist-ssr
+*.local
+.vscode
+yarn-error.log
+ios/**/**
