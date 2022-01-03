@@ -3,27 +3,83 @@ import bcrypt from 'bcrypt'
 
 import { User } from '../../models'
 import SessionController from '../SessionController'
-import { Token, selectValues } from '../../lib'
+import { Token, Schematized } from '../../lib'
 import AvatarController from 'dicebar_lib'
 
-export const UserController = {
+import _ from 'lodash'
+
+export default {
     isAuth: (req, res) => {
         return res.json(`You look nice today 😎`)
     },
     getSelf: (req, res) => {
         return res.json(req.user)
     },
-    get: selectValues(["_id", "username"], async (req, res) => {
-        const user = await User.find(req.selectedValues, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
+    get: Schematized({
+        select: ["_id", "username"],
+    }, async (req, res) => {
+        let result = []
+        let selectQueryKeys = []
 
-        if (!user) {
-            return res.status(404).json({ error: "User not exists" })
+        if (Array.isArray(req.selection._id)) {
+            for await (let _id of req.selection._id) {
+                const user = await User.findById(_id).catch(err => {
+                    return false
+                })
+                if (user) {
+                    result.push(user)
+                }
+            }
+        } else {
+            result = await User.find(req.selection, { username: 1, fullName: 1, _id: 1, roles: 1, avatar: 1 })
         }
 
-        return res.json(user)
+        if (req.query.select) {
+            try {
+                req.query.select = JSON.parse(req.query.select)
+            } catch (error) {
+                req.query.select = {}
+            }
+
+            selectQueryKeys = Object.keys(req.query.select)
+        }
+
+        if (selectQueryKeys.length > 0) {
+            result = result.filter(user => {
+                let pass = false
+                const selectFilter = req.query.select
+
+                selectQueryKeys.forEach(key => {
+                    if (Array.isArray(selectFilter[key]) && Array.isArray(user[key])) {
+                        // check if arrays includes any of the values
+                        pass = selectFilter[key].some(val => user[key].includes(val))
+                    } else if (typeof selectFilter[key] === 'object' && typeof user[key] === 'object') {
+                        // check if objects includes any of the values
+                        Object.keys(selectFilter[key]).forEach(objKey => {
+                            pass = user[key][objKey] === selectFilter[key][objKey]
+                        })
+                    }
+
+                    // check if strings includes any of the values
+                    if (typeof selectFilter[key] === 'string' && typeof user[key] === 'string') {
+                        pass = selectFilter[key].split(',').some(val => user[key].includes(val))
+                    }
+                })
+
+                return pass
+            })
+        }
+
+        if (!result) {
+            return res.status(404).json({ error: "Users not found" })
+        }
+
+        return res.json(result)
     }),
-    getOne: selectValues(["_id", "username"], async (req, res) => {
-        const user = await User.findOne(req.selectedValues)
+    getOne: Schematized({
+        select: ["_id", "username"],
+    }, async (req, res) => {
+        const user = await User.findOne(req.selection)
 
         if (!user) {
             return res.status(404).json({ error: "User not exists" })
@@ -205,5 +261,3 @@ export const UserController = {
         return SessionController.delete(req, res, next)
     },
 }
-
-export default UserController

@@ -1,12 +1,14 @@
 import { Role, User } from '../../models'
-import { selectValues } from "../../lib"
+import { Schematized } from "../../lib"
 
-export const RolesController = {
-    get: selectValues(["user_id", "username"], async (req, res) => {
-        const { user_id, username } = req.selectedValues
+export default {
+    get: Schematized({
+        select: ["user_id", "username"],
+    }, async (req, res) => {
+        const { user_id, username } = req.selection
 
         if (typeof user_id !== "undefined" || typeof username !== "undefined") {
-            const user = await User.findOne(req.selectedValues)
+            const user = await User.findOne(req.selection)
             if (!user) {
                 return res.status(404).json({ error: "No user founded" })
             }
@@ -32,5 +34,3 @@ export const RolesController = {
         })
     }
 }
-
-export default RolesController

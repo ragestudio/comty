@@ -2,7 +2,7 @@ import { Session } from '../../models'
 import jwt from 'jsonwebtoken'
 import { Token } from '../../lib'
 
-export const SessionController = {
+export default {
     regenerate: async (req, res) => {
         jwt.verify(req.jwtToken, req.jwtStrategy.secretOrKey, async (err, decoded) => {
             if (err && !decoded?.allowRegenerate) {
@@ -100,5 +100,3 @@ export const SessionController = {
         return res.json(sessions)
     },
 }
-
-export default SessionController
