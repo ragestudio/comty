@@ -1,14 +1,14 @@
 import React from "react"
-import { Icons, createIconRender } from "components/Icons"
 import { Layout, Menu, Avatar } from "antd"
-
-import { SidebarEditor } from "./components"
-
-import config from "config"
-import sidebarItems from "schemas/routes.json"
-import defaultSidebarItems from "schemas/defaultSidebar.json"
 import classnames from "classnames"
 
+import config from "config"
+import { Icons, createIconRender } from "components/Icons"
+import { sidebarKeys as defaultSidebarItems } from "schemas/defaultSettings"
+import sidebarItems from "schemas/routes.json"
+import { Translation } from "react-i18next"
+
+import { SidebarEditor } from "./components"
 import "./index.less"
 
 const { Sider } = Layout
@@ -27,7 +27,7 @@ export default class Sidebar extends React.Component {
 			editMode: false,
 			visible: true,
 			loading: true,
-			collapsed: window.app.configuration.settings.get("collapseOnLooseFocus") ?? false,
+			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
 			pathResolve: {},
 			menus: {},
 			extraItems: {
@@ -57,7 +57,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	getStoragedKeys = () => {
-		return window.app.configuration?.sidebar.get()
+		return window.app.settings.get("sidebarKeys")
 	}
 
 	appendItem = (item = {}) => {
@@ -108,7 +108,7 @@ export default class Sidebar extends React.Component {
 					keys = keys.move(index, item.index)
 
 					//update index
-					window.app.configuration.sidebar._push(keys)
+					window.app.settings.set("sidebarKeys", keys)
 				}
 			}
 		})
@@ -165,7 +165,11 @@ export default class Sidebar extends React.Component {
 					<Menu.SubMenu
 						key={item.id}
 						icon={handleRenderIcon(item.icon)}
-						title={<span>{item.title}</span>}
+						title={<span>
+							<Translation>
+								{t => t(item.title)}
+							</Translation>
+						</span>}
 						{...item.props}
 					>
 						{this.renderMenuItems(item.children)}
@@ -175,7 +179,9 @@ export default class Sidebar extends React.Component {
 
 			return (
 				<Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
-					{item.title ?? item.id}
+					<Translation>
+						{t => t(item.title ?? item.id)}
+					</Translation>
 				</Menu.Item>
 			)
 		})
@@ -203,7 +209,7 @@ export default class Sidebar extends React.Component {
 		}
 
 		if (to) {
-			window.app.eventBus.emit("cleanAll")
+			window.app.eventBus.emit("clearAllOverlays")
 		} else {
 			if (this.itemsMap !== this.getStoragedKeys()) {
 				this.loadSidebarItems()
@@ -214,7 +220,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	toogleCollapse = (to) => {
-		if (window.app.configuration?.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		if (window.app.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
 			this.setState({ collapsed: to ?? !this.state.collapsed })
 		} else {
 			this.setState({ collapsed: false })
@@ -290,7 +296,9 @@ export default class Sidebar extends React.Component {
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
 							<Menu.Item key="settings" icon={<Icons.Settings />}>
-								Settings
+								<Translation>
+									{t => t("Settings")}
+								</Translation>
 							</Menu.Item>
 
 							<Menu.Item key="account">

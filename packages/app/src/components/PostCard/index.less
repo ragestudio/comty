@@ -1,0 +1,45 @@
+.postCard {
+    display: inline-flex;
+    flex-direction: column;
+    
+    width: 100%;
+    max-width: 40vw;
+    padding: 17px;
+
+    background-color: var(--background-color-accent);
+    border-radius: 8px;
+
+    .userInfo {
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+
+        margin-bottom: 15px;
+
+        h1 {
+            margin: 0;
+            font-family: "DM Mono", monospace;
+        }
+
+        > div {
+            margin-right: 10px;
+        }
+
+    }
+
+    .content {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        background-color: var(--background-color-primary);
+        padding: 10px;
+        border-radius: 8px;
+
+        font-size: 14px;
+        font-family: "Poppins", sans-serif;
+
+        overflow: hidden;
+        word-break: break-all;
+    }
+}

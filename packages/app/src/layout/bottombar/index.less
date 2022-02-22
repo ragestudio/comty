@@ -1,4 +1,5 @@
 @bottomBar_height: 80px;
+@bottomBar_iconSize: 24px;
 
 .bottomBar {
 	position: sticky;
@@ -8,6 +9,10 @@
 	bottom: 0;
 
 	width: 100vw;
+	min-width: 100vw;
+	max-width: 100vw;
+	
+	overflow: hidden;
 
 	display: flex;
 	flex-direction: row;
@@ -23,22 +28,33 @@
 	padding: 10px;
 
 	.items {
-		display: inline-block;
-		white-space: nowrap;
-		overflow-x: overlay;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		//white-space: nowrap;
+		//overflow-x: overlay;
 
 		height: 100%;
-
-		> div {
-			display: inline-block;
-
-			height: 100%;
-			margin: 0 17px;
-		}
+		width: 100vw;
 
 		.item {
+			display: inline-flex;
+
+			height: 100%;
+			align-items: center;
+			justify-content: center;
+
+			transition: all 150ms ease-in;
+			
+			width: 20vw;
+			min-width: 20vw;
+			max-width: 20vw;
+
 			.icon {
+				border-radius: 360px;
 				height: 100%;
+				width: fit-content;
+
 				display: flex;
 				flex-direction: column;
 
@@ -47,6 +63,28 @@
 
 				color: var(--background-color-contrast);
 				font-size: 2rem;
+				
+				padding: 12px;
+				transition: all 70ms ease-in-out;
+
+				svg{
+					margin: 0!important;
+				}
+			}
+
+			&.primary {
+				.icon {
+					color: var(--background-color-primary);
+					background-color: var(--primaryColor);
+				}
+			}
+		}
+
+		.item:active {
+			.icon {
+				background-color: var(--background-color-primary);
+				color: var(--background-color-contrast);
+				transform: scale(0.9);
 			}
 		}
 	}

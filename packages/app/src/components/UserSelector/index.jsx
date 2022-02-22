@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { SelectableList } from "components"
+import { Translation } from "react-i18next"
+import { SelectableList, Skeleton } from "components"
 import { debounce } from "lodash"
 import fuse from "fuse.js"
 
@@ -43,13 +43,9 @@ export default class UserSelector extends React.Component {
     }
 
     renderItem = (item) => {
-        return <div disabled={this.isExcludedId(item._id)} className="users_selector item">
-            <div>
-                <antd.Avatar shape="square" src={item.avatar} />
-            </div>
-            <div>
-                <h1>{item.fullName ?? item.username}</h1>
-            </div>
+        return <div disabled={this.isExcludedId(item._id)} className="user" >
+            <div><antd.Avatar shape="square" src={item.avatar} /></div>
+            <div><h1>{item.fullName ?? item.username}</h1></div>
         </div>
     }
 
@@ -90,7 +86,7 @@ export default class UserSelector extends React.Component {
 
     render() {
         if (this.state.loading) {
-            return <antd.Skeleton active />
+            return <Skeleton />
         }
 
         return <div className="users_selector">
@@ -105,15 +101,21 @@ export default class UserSelector extends React.Component {
                 </div>
             </div>
             <SelectableList
-                ignoreMobileActions
+                onlyClickSelection
+                overrideSelectionEnabled
+                bulkSelectionAction
                 items={this.state.searchValue ?? this.state.data}
                 renderItem={this.renderItem}
                 actions={[
-                    <div call="onDone" key="done">
-                        Done
+                    <div type="primary" call="onDone" key="done">
+                        <Translation>
+                            {t => t("Done")}
+                        </Translation>
                     </div>
                 ]}
-                onDone={(keys) => this.props.handleDone(keys)}
+                events={{
+                    onDone: (ctx, keys) => this.props.handleDone(keys),
+                }}
             />
         </div>
     }

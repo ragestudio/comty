@@ -1,8 +1,6 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
+import { DraggableDrawer } from "components"
 import EventEmitter from "@foxify/events"
-import { Icons } from "components/Icons"
 
 import "./index.less"
 
@@ -104,12 +102,8 @@ export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 	events = new EventEmitter()
 	state = {
-		locked: this.options.locked ?? false,
-		visible: false,
+		visible: true,
 	}
-
-	unlock = () => this.setState({ locked: false })
-	lock = () => this.setState({ locked: true })
 
 	componentDidMount = async () => {
 		if (typeof this.props.controller === "undefined") {
@@ -118,30 +112,23 @@ export class Drawer extends React.Component {
 		if (typeof this.props.children === "undefined") {
 			throw new Error(`Empty component`)
 		}
-
-		if (this.props.children) {
-			this.setState({ visible: true })
-		}
 	}
 
-	onClose = () => {
-		if (typeof this.options.props?.closable !== "undefined" && !this.options.props?.closable) {
-			return false
-		}
-		this.close()
+	toogleVisibility = (to) => {
+		this.setState({ visible: to ?? !this.state.visible })
 	}
 
-	close = (context) => {
-		if (typeof this.options.onClose === "function") {
-			this.options.onClose(...context)
-		}
-
-		this.setState({ visible: false })
-		this.unlock()
+	close = () => {
+		this.toogleVisibility(false)
+		this.events.emit("beforeClose")
 
 		setTimeout(() => {
+			if (typeof this.options.onClose === "function") {
+				this.options.onClose()
+			}
+
 			this.props.controller.destroy(this.props.id)
-		}, 400)
+		}, 500)
 	}
 
 	sendEvent = (...context) => {
@@ -162,14 +149,13 @@ export class Drawer extends React.Component {
 
 	render() {
 		const drawerProps = {
-			destroyOnClose: true,
-			bodyStyle: { padding: 0 },
 			...this.options.props,
 			ref: this.props.ref,
-			closable: false,
 			key: this.props.id,
-			onClose: this.onClose,
-			visible: this.state.visible,
+			onRequestClose: this.close,
+			open: this.state.visible,
+			containerElementClass: "drawer",
+			modalElementClass: "body",
 		}
 		const componentProps = {
 			...this.options.componentProps,
@@ -179,25 +165,8 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
-		if (window.isMobile) {
-			drawerProps.height = "100%"
-			drawerProps.placement = "bottom"
-		}
-
-		return (
-			<antd.Drawer className={classnames("drawer", { ["mobile"]: window.isMobile })} {...drawerProps}>
-				{!this.props.headerDisabled && <div className="pageTitle">
-					<antd.PageHeader
-						onBack={this.onClose}
-						title={this.props.title ?? "Close"}
-						backIcon={this.props.backIcon ?? <Icons.X />}
-						subTitle={this.props.subtitle}
-					/>
-				</div>}
-				<div className="body">
-					{React.createElement(this.props.children, componentProps)}
-				</div>
-			</antd.Drawer>
-		)
+		return <DraggableDrawer {...drawerProps}>
+			{React.createElement(this.props.children, componentProps)}
+		</DraggableDrawer>
 	}
 }

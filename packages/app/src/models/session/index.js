@@ -1,32 +1,44 @@
-import cookies from 'js-cookie'
+import cookies from "js-cookie"
 import jwt_decode from "jwt-decode"
-import config from 'config'
+import config from "config"
+import { Storage } from '@capacitor/storage'
 
 export default class Session {
     static get bridge() {
         return window.app?.request
     }
 
+    static capStorage = async (method, value) => {
+        const res = await Storage[method]({ key: this.tokenKey, value })
+        return res.value
+    }
+
     static tokenKey = config.app?.storage?.token ?? "token"
 
     static get token() {
-        if (navigator.userAgent === "capacitor") {
-            // FIXME: sorry about that 
-            return sessionStorage.getItem(this.tokenKey)
+        if (window.app.isAppCapacitor()) {
+            return this.capStorage("get")
         }
         return cookies.get(this.tokenKey)
     }
 
     static set token(token) {
-        if (navigator.userAgent === "capacitor") {
-            // FIXME: sorry about that 
-            return sessionStorage.setItem(this.tokenKey, token)
+        if (window.app.isAppCapacitor()) {
+            return this.capStorage("set", token)
         }
         return cookies.set(this.tokenKey, token)
     }
 
-    static get decodedToken() {
-        return this.token && jwt_decode(this.token)
+    static async delToken() {
+        if (window.app.isAppCapacitor()) {
+            return this.capStorage("remove")
+        }
+        return cookies.remove(Session.tokenKey)
+    }
+
+    static async decodedToken() {
+        const token = await this.token
+        return token && jwt_decode(token)
     }
 
     //* BASIC HANDLERS
@@ -34,18 +46,17 @@ export default class Session {
         const body = {
             username: window.btoa(payload.username),
             password: window.btoa(payload.password),
-            allowRegenerate: payload.allowRegenerate
         }
 
         return this.generateNewToken(body, (err, res) => {
-            if (typeof callback === 'function') {
+            if (typeof callback === "function") {
                 callback(err, res)
             }
 
             if (!err || res.status === 200) {
                 let token = res.data
 
-                if (typeof token === 'object') {
+                if (typeof token === "object") {
                     token = token.token
                 }
 
@@ -66,15 +77,11 @@ export default class Session {
             parseData: false
         })
 
-        if (typeof callback === 'function') {
+        if (typeof callback === "function") {
             callback(request.error, request.response)
         }
 
         return request
-    }
-
-    regenerateToken = async () => {
-        return await Session.bridge.post.regenerate()
     }
 
     //* GETTERS
@@ -83,9 +90,13 @@ export default class Session {
     }
 
     getTokenInfo = async () => {
-        const session = Session.token
+        const session = await Session.token
 
         return await Session.bridge.post.validateSession({ session })
+    }
+
+    getCurrentSession = async () => {
+        return await Session.bridge.get.currentSession()
     }
 
     isCurrentTokenValid = async () => {
@@ -95,15 +106,11 @@ export default class Session {
     }
 
     forgetLocalSession = () => {
-        if (navigator.userAgent === "capacitor") {
-            // FIXME: sorry about that 
-            return sessionStorage.removeItem(Session.tokenKey)
-        }
-        return cookies.remove(Session.tokenKey)
+        return Session.delToken()
     }
 
     destroyAllSessions = async () => {
-        const session = Session.decodedToken
+        const session = await Session.decodedToken()
 
         if (!session) {
             return false
@@ -117,8 +124,8 @@ export default class Session {
     }
 
     destroyCurrentSession = async () => {
-        const token = Session.token
-        const session = Session.decodedToken
+        const token = await Session.token
+        const session = await Session.decodedToken()
 
         if (!session || !token) {
             return false

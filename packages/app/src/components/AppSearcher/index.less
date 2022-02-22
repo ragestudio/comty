@@ -2,6 +2,7 @@
 
 .search_bar {
 	user-select: none;
+	--webkit-user-select: none;
 
 	height: fit-content;
 	border: 0;
@@ -9,16 +10,16 @@
 	vertical-align: middle !important;
 
 	.ant-input {
-		background-color: var(--background-color-accent)!important;
-		border-color: var(--background-color-accent)!important;
-		color: var(--background-color-contrast)!important;
+		background-color: var(--background-color-accent) !important;
+		border-color: var(--background-color-accent) !important;
+		color: var(--background-color-contrast) !important;
 	}
 
 	.ant-input-group {
 		display: flex;
-        align-items: center;
-        justify-content: center;
-        height: fit-content;
+		align-items: center;
+		justify-content: center;
+		height: fit-content;
 	}
 
 	.ant-input-group-addon {
@@ -27,7 +28,7 @@
 	}
 
 	.ant-btn {
-		background-color: var(--background-color-primary)!important;
+		background-color: var(--background-color-primary) !important;
 		border: 0 !important;
 	}
 }

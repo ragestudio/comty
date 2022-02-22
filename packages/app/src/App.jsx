@@ -1,4 +1,13 @@
 // Patch global prototypes
+Array.prototype.findAndUpdateObject = function (discriminator, obj) {
+	let index = this.findIndex(item => item[discriminator] === obj[discriminator])
+	if (index !== -1) {
+		this[index] = obj
+	}
+
+	return index
+}
+
 Array.prototype.move = function (from, to) {
 	this.splice(to, 0, this.splice(from, 1)[0])
 	return this
@@ -10,19 +19,45 @@ String.prototype.toTitleCase = function () {
 	})
 }
 
+Promise.tasked = function (promises) {
+	return new Promise(async (resolve, reject) => {
+		let rejected = false
+
+		for await (let promise of promises) {
+			if (rejected) {
+				return
+			}
+
+			try {
+				await promise()
+			} catch (error) {
+				rejected = true
+				return reject(error)
+			}
+		}
+
+		if (!rejected) {
+			return resolve()
+		}
+	})
+}
+
 import React from "react"
-import { CreateEviteApp, BindPropsProvider } from "evite-react-lib"
+import { CreateEviteApp, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
+import { ActionSheet, Toast } from "antd-mobile"
+import { StatusBar, Style } from "@capacitor/status-bar"
+import { Translation } from "react-i18next"
 
-import { Session, User, SidebarController, SettingsController } from "models"
-import { API, Render, Splash, Theme, Sound } from "extensions"
+import { Session, User } from "models"
+import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n } from "extensions"
 import config from "config"
 
-import { NotFound, RenderError, Settings } from "components"
-import Layout from "./layout"
+import { NotFound, RenderError, Crash, Settings, Navigation } from "components"
 import { Icons } from "components/Icons"
 
+import Layout from "./layout"
 import "theme/index.less"
 
 const SplashExtension = Splash.extension({
@@ -39,118 +74,115 @@ const SplashExtension = Splash.extension({
 	},
 })
 
-class ThrowCrash {
-	constructor(message, description) {
-		this.message = message
-		this.description = description
-
-		antd.notification.error({
-			message: "Fatal error",
-			description: message,
-		})
-
-		window.app.eventBus.emit("crash", this.message, this.description)
-	}
-}
-
-const __renderTest = () => {
-	const [position, setPosition] = React.useState(0)
-
-	// create a 300ms interval to move randomly inside window screen
-	React.useEffect(() => {
-		setInterval(() => {
-			const x = Math.random() * window.innerWidth
-			const y = Math.random() * window.innerHeight
-
-			setPosition({ x, y })
-		}, 50)
-	}, [])
-
-	// clear interval when component unmount
-	React.useEffect(() => {
-		return () => {
-			clearInterval()
-		}
-	}, [])
-
-	return <div style={{ top: position.y, left: position.x }} className="__render_box_test" />
-}
-
 class App {
 	static initialize() {
-		this.configuration = {
-			settings: new SettingsController(),
-			sidebar: new SidebarController(),
-		}
+		window.app.version = config.package.version
 
-		this.eventBus = this.contexts.main.eventBus
+		this.mainSocket = this.contexts.app.WSInterface.sockets.main
+		this.loadingMessage = false
+		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
+	}
 
-		this.eventBus.on("app_loading", async () => {
-			await this.setState({ initialized: false })
-			this.eventBus.emit("splash_show")
-		})
-
-		this.eventBus.on("app_ready", async () => {
-			await this.setState({ initialized: true })
-			this.eventBus.emit("splash_close")
-		})
-
-		this.eventBus.on("reinitializeSession", async () => {
-			await this.__SessionInit()
-		})
-		this.eventBus.on("reinitializeUser", async () => {
-			await this.__UserInit()
-		})
-
-		this.eventBus.on("forceToLogin", () => {
-			if (window.location.pathname !== "/login") {
-				this.beforeLoginLocation = window.location.pathname
-			}
-
-			window.app.setLocation("/login")
-		})
-
-		this.eventBus.on("new_session", async () => {
+	static eventsHandlers = {
+		"new_session": async function () {
+			await this.flushState()
 			await this.initialization()
 
 			if (window.location.pathname == "/login") {
 				window.app.setLocation(this.beforeLoginLocation ?? "/main")
 				this.beforeLoginLocation = null
 			}
-		})
-		this.eventBus.on("destroyed_session", async () => {
+		},
+		"destroyed_session": async function () {
 			await this.flushState()
 			this.eventBus.emit("forceToLogin")
-		})
-
-		this.eventBus.on("invalid_session", (error) => {
+		},
+		"forceToLogin": function () {
 			if (window.location.pathname !== "/login") {
-				this.sessionController.forgetLocalSession()
+				this.beforeLoginLocation = window.location.pathname
+			}
+
+			window.app.setLocation("/login")
+		},
+		"invalid_session": async function (error) {
+			await this.sessionController.forgetLocalSession()
+			await this.flushState()
+
+			if (window.location.pathname !== "/login") {
+				this.eventBus.emit("forceToLogin")
 
 				antd.notification.open({
-					message: "Invalid Session",
-					description: error,
+					message: <Translation>
+						{(t) => t("Invalid Session")}
+					</Translation>,
+					description: <Translation>
+						{(t) => t(error)}
+					</Translation>,
 					icon: <Icons.MdOutlineAccessTimeFilled />,
 				})
-
-				this.eventBus.emit("forceToLogin")
 			}
-		})
-
-		this.eventBus.on("cleanAll", () => {
+		},
+		"clearAllOverlays": function () {
 			window.app.DrawerController.closeAll()
-		})
+		},
+		"websocket_connected": function () {
+			if (this.wsReconnecting) {
+				this.wsReconnectingTry = 0
+				this.wsReconnecting = false
+				this.initialization()
 
-		this.eventBus.on("crash", (message, error) => {
-			console.debug("[App] crash detecting, returning crash...")
+				setTimeout(() => {
+					Toast.show({
+						icon: "success",
+						content: "Connected",
+					})
+				}, 500)
+			}
+		},
+		"websocket_connection_error": function () {
+			if (!this.wsReconnecting) {
+				this.latencyWarning = null
+				this.wsReconnectingTry = 0
+				this.wsReconnecting = true
 
-			this.setState({ crash: { message, error } })
-			this.contexts.app.SoundEngine.play("crash")
-		})
+				Toast.show({
+					icon: "loading",
+					content: "Connecting...",
+					duration: 0,
+				})
+			}
+
+			this.wsReconnectingTry = this.wsReconnectingTry + 1
+
+			if (this.wsReconnectingTry > 3) {
+				window.location.reload()
+			}
+		},
+		"websocket_latency_too_high": function () {
+			if (!this.latencyWarning) {
+				this.latencyWarning = true
+				Toast.show({
+					icon: "loading",
+					content: "Slow connection...",
+					duration: 0,
+				})
+			}
+		},
+		"websocket_latency_normal": function () {
+			if (this.latencyWarning) {
+				this.latencyWarning = null
+				Toast.show({
+					icon: "success",
+					content: "Connection restored",
+				})
+			}
+		}
 	}
 
 	static windowContext() {
 		return {
+			// TODO: Open with popup controller instead drawer controller
+			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
 			openSettings: (goTo) => {
 				window.app.DrawerController.open("settings", Settings, {
 					props: {
@@ -167,8 +199,35 @@ class App {
 			goToAccount: (username) => {
 				return window.app.setLocation(`/account`, { username })
 			},
-			configuration: this.configuration,
-			getSettings: (...args) => this.contexts.app.configuration?.settings?.get(...args),
+			setStatusBarStyleDark: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Dark })
+			},
+			setStatusBarStyleLight: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Light })
+			},
+			hideStatusBar: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] hideStatusBar is not supported on this platform")
+					return false
+				}
+				return await StatusBar.hide()
+			},
+			showStatusBar: async () => {
+				if (!this.isAppCapacitor()) {
+					console.warn("[App] showStatusBar is not supported on this platform")
+					return false
+				}
+				return await StatusBar.show()
+			},
+			isAppCapacitor: this.isAppCapacitor,
 		}
 	}
 
@@ -177,7 +236,6 @@ class App {
 			renderRef: this.renderRef,
 			sessionController: this.sessionController,
 			userController: this.userController,
-			configuration: this.configuration,
 		}
 	}
 
@@ -188,100 +246,129 @@ class App {
 		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
+		Crash: Crash,
 		initialization: () => {
 			return <Splash.SplashComponent logo={config.logo.alt} />
 		}
 	}
 
 	sessionController = new Session()
-
 	userController = new User()
-
 	state = {
-		// app
-		initialized: false,
-		crash: false,
-
-		// app session
 		session: null,
-		data: null,
+		user: null,
 	}
 
 	flushState = async () => {
-		await this.setState({ session: null, data: null })
+		await this.setState({ session: null, user: null })
 	}
 
 	componentDidMount = async () => {
-		this.eventBus.emit("app_loading")
+		if (this.isAppCapacitor()) {
+			window.addEventListener("statusTap", () => {
+				this.eventBus.emit("statusTap")
+			})
 
-		await this.contexts.app.initializeDefaultBridge()
+			StatusBar.setOverlaysWebView({ overlay: true })
+			window.app.hideStatusBar()
+		}
+
+		this.eventBus.emit("render_initialization")
+
 		await this.initialization()
 
-		this.eventBus.emit("app_ready")
+		this.eventBus.emit("render_initialization_done")
 	}
 
 	initialization = async () => {
-		try {
-			await this.__SessionInit()
-			await this.__UserInit()
-		} catch (error) {
-			throw new ThrowCrash(error.message, error.description)
-		}
+		console.debug(`[App] Initializing app`)
+
+		const initializationTasks = [
+			async () => {
+				try {
+					await this.contexts.app.attachAPIConnection()
+				} catch (error) {
+					throw {
+						cause: "Cannot connect to API",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					await this.__SessionInit()
+				} catch (error) {
+					throw {
+						cause: "Cannot initialize session",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					await this.__UserInit()
+				} catch (error) {
+					throw {
+						cause: "Cannot initialize user data",
+						details: error.message,
+					}
+				}
+			},
+			async () => {
+				try {
+					await this.__WSInit()
+				} catch (error) {
+					throw {
+						cause: "Cannot connect to WebSocket",
+						details: error.message,
+					}
+				}
+			},
+		]
+
+		await Promise.tasked(initializationTasks).catch((reason) => {
+			console.error(`[App] Initialization failed: ${reason.cause}`)
+			window.app.eventBus.emit("crash", reason.cause, reason.details)
+		})
 	}
 
 	__SessionInit = async () => {
-		if (typeof Session.token === "undefined") {
+		const token = await Session.token
+
+		if (!token || token == null) {
 			window.app.eventBus.emit("forceToLogin")
-		} else {
-			this.session = await this.sessionController.getTokenInfo().catch((error) => {
-				window.app.eventBus.emit("invalid_session", error)
-			})
-
-			if (!this.session.valid) {
-				// try to regenerate
-				//const regeneration = await this.sessionController.regenerateToken()
-				//console.log(regeneration)
-
-				window.app.eventBus.emit("invalid_session", this.session.error)
-			}
-		}
-
-		this.setState({ session: this.session })
-	}
-
-	__UserInit = async () => {
-		if (!this.session || !this.session.valid) {
 			return false
 		}
 
-		try {
-			this.user = await User.data
-			this.setState({ user: this.user })
-		} catch (error) {
-			console.error(error)
-			this.eventBus.emit("crash", "Cannot initialize user data", error)
+		const session = await this.sessionController.getCurrentSession().catch((error) => {
+			console.error(`[App] Cannot get current session: ${error.message}`)
+			return false
+		})
+
+		await this.setState({ session })
+	}
+
+	__WSInit = async () => {
+		if (!this.state.session) {
+			return false
 		}
+
+		const token = await Session.token
+		await this.contexts.app.attachWSConnection()
+
+		this.mainSocket.emit("authenticate", token)
+	}
+
+	__UserInit = async () => {
+		if (!this.state.session) {
+			return false
+		}
+
+		const user = await User.data()
+		await this.setState({ user })
 	}
 
 	render() {
-		if (!this.state.initialized) {
-			return null
-		}
-
-		if (this.state.crash) {
-			return <div className="app_crash">
-				<div className="header">
-					<Icons.MdOutlineError />
-					<h1>Crash</h1>
-				</div>
-				<h2>{this.state.crash.message}</h2>
-				<pre>{this.state.crash.error}</pre>
-				<div className="actions">
-					<antd.Button onClick={() => window.location.reload()}>Reload</antd.Button>
-				</div>
-			</div>
-		}
-
 		return (
 			<React.Fragment>
 				<Helmet>
@@ -303,5 +390,14 @@ class App {
 }
 
 export default CreateEviteApp(App, {
-	extensions: [Sound.extension, Render.extension, Theme.extension, API, SplashExtension],
+	extensions: [
+		SettingsController,
+		i18n.extension,
+		Sound.extension,
+		Notifications.extension,
+		API,
+		Render.extension,
+		Theme.extension,
+		SplashExtension,
+	],
 })

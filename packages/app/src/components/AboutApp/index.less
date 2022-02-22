@@ -1,36 +1,75 @@
-.about_app_wrapper {
+.aboutApp_wrapper {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
+    width: 100vw;
+    height: 100vh;
 }
 
-.about_app_header {
-    width: 100%;
+.aboutApp_card {
+    height: fit-content;
+    width: 80vw;
 
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-
-    margin: 20px 20px 80px 20px;
-
-    img {
-        height: fit-content;
-        width: 200px;
-
-        max-height: 200px;
-        max-width: 200px;
+    svg {
+        margin: 0;
     }
 
-    h1 {
-        font-size: 55px;
+    .ant-tag {
+        display: inline-flex;
+        align-items: center;
     }
-
-    > div {
-        padding-right: 50px;
-    }
-
-}
-
-.about_app_info {
     
+    .group {
+        width: 100%;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        
+        > div {
+            display: inline-flex;
+            margin-left: 10px;
+        }
+
+        margin-bottom: 10px;
+    }
+
+  
+}
+
+.aboutApp_card_header {
+    .adm-card-header-title {
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        h1,h2,h3 {
+            margin: 0;
+        }
+
+        .branding {
+            display: flex;
+            flex-direction: column;
+
+            h1,h2,h3 {
+                height: fit-content;
+                line-height: 24px;
+            }
+
+            span {
+                height: fit-content;
+                color: var(--background-color-contrast);
+                font-size: 10px;
+            }
+        }
+        
+    }
 }

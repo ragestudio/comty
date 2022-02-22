@@ -44,7 +44,7 @@ export default (props) => {
 			<Result
 				status="error"
 				title="Render Error"
-				subTitle="It seems that the application is having problems displaying this page, we have detected some unrecoverable errors due to a bug. (This error will be automatically reported to the developers to find a solution as soon as possible)"
+				subTitle="It seems that the application is having problems displaying this page, we have detected some unrecoverable errors due to a bug. (This error should be automatically reported to the developers to find a solution as soon as possible)"
 				extra={[
 					<Button type="primary" key="gomain" onClick={onClickGoMain}>
 						Go Main
