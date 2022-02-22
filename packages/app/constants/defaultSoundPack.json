@@ -1,3 +1,5 @@
 {
-    "crash": "/sounds/crash.wav"
+    "crash": "/sounds/crash.wav",
+    "error": "/sounds/error.wav",
+    "notification": "/sounds/notification.wav"
 }

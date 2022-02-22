@@ -6,23 +6,9 @@
         "locked": true
     },
     {
-        "id": "users",
-        "title": "Users",
-        "icon": "Users"
-    },
-    {
-        "id": "server_manager",
-        "title": "Server",
-        "icon": "Database"
-    },
-    {
-        "id": "launchpad",
-        "title": "Launchpad",
-        "icon": "Command"
-    },
-    {
-        "id": "statistics",
-        "title": "Statistics",
-        "icon": "BarChart"
+        "id": "explore",
+        "title": "Explore",
+        "icon": "Compass",
+        "locked": true
     }
 ]
