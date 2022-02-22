@@ -1,3 +1,15 @@
 {
-    "collapseOnLooseFocus": true
+    "forceMobileMode": false,
+    "notifications_sound": true,
+    "notifications_vibrate": true,
+    "notifications_sound_volume": 50,
+    "selection_longPress_timeout": 600,
+    "haptic_feedback": false,
+    "collapseOnLooseFocus": true,
+    "language": "es",
+    "sidebarKeys": [
+        "main",
+        "explore",
+        "users"
+    ]
 }

@@ -10,13 +10,5 @@
     "users": {
         "icon": "Users",
         "title": "Users"
-    },
-    "regions": {
-        "icon": "Globe",
-        "title": "Locations"
-    },
-    "vault": {
-        "icon": "Archive",
-        "title": "Vault"
     }
 }

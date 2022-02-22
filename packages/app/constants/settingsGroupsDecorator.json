@@ -3,6 +3,10 @@
         "title": "General",
         "icon": "Settings"
     },
+    "notifications": {
+        "title": "Notifications",
+        "icon": "Bell"
+    },
     "sidebar": {
         "title": "Sidebar",
         "icon": "Layout"
