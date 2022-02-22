@@ -1,11 +1,10 @@
-import mongoose from 'mongoose'
-import { Schema } from 'mongoose'
+import mongoose, { Schema } from "mongoose"
 
 function getSchemas() {
     const obj = Object()
-    
+
     const _schemas = require("../schemas")
-    Object.keys(_schemas).forEach(key => {
+    Object.keys(_schemas).forEach((key) => {
         obj[key] = Schema(_schemas[key])
     })
 
@@ -14,6 +13,7 @@ function getSchemas() {
 
 const schemas = getSchemas()
 
-export const Role = mongoose.model('Role', schemas.Role, 'roles')
-export const User = mongoose.model('User', schemas.User, "accounts")
-export const Session = mongoose.model('Session', schemas.Session, "sessions")
+export const Config = mongoose.model("Config", schemas.Config, "config")
+export const User = mongoose.model("User", schemas.User, "accounts")
+export const Session = mongoose.model("Session", schemas.Session, "sessions")
+export const Role = mongoose.model("Role", schemas.Role, "roles")

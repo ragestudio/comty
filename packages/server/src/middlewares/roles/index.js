@@ -7,5 +7,13 @@ export default (req, res, next) => {
         return false
     }
 
+    req.hasRole = (role) => {
+        if (req.user.roles.includes(role)) {
+            return true
+        }
+
+        return false
+    }
+
     next()
 }

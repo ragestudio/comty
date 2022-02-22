@@ -1,29 +1,54 @@
-import jwt from 'jsonwebtoken'
-import { nanoid } from 'nanoid'
-import { Session } from '../../models'
+import jwt from "jsonwebtoken"
+import { nanoid } from "nanoid"
+import { Session, User } from "../../models"
 
-export function signNew(payload, options) {
-    const data = {
-        uuid: nanoid(),
-        allowRegenerate: false,
-        ...payload
+export async function createNewAuthToken(user, options = {}) {
+    const payload = {
+        user_id: user._id,
+        username: user.username,
+        email: user.email,
+        refreshToken: nanoid(),
+        signLocation: global.signLocation,
     }
 
-    const token = jwt.sign(data, options.secretOrKey, {
+    await User.findByIdAndUpdate(user._id, { refreshToken: payload.refreshToken })
+
+    return await signNew(payload, options)
+}
+
+export async function signNew(payload, options = {}) {
+    if (options.updateSession) {
+        const sessionData = await Session.findById(options.updateSession)
+        payload.session_uuid = sessionData.session_uuid
+    } else {
+        payload.session_uuid = nanoid()
+    }
+
+    const token = jwt.sign(payload, options.secretOrKey, {
         expiresIn: options.expiresIn ?? "1h",
         algorithm: options.algorithm ?? "HS256"
     })
 
-    let newSession = new Session({
-        uuid: data.uuid,
-        user_id: data.user_id,
-        allowRegenerate: data.allowRegenerate,
+    const session = {
         token: token,
+        session_uuid: payload.session_uuid,
+        username: payload.username,
+        user_id: payload.user_id,
         date: new Date().getTime(),
-        location: options.sessionLocationSign
-    })
+        location: payload.signLocation ?? "rs-auth",
+    }
 
-    newSession.save()
+    if (options.updateSession) {
+        await Session.findByIdAndUpdate(options.updateSession, {
+            token: session.token,
+            date: session.date,
+            location: session.location,
+        })
+    } else {
+        let newSession = new Session(session)
+
+        newSession.save()
+    }
 
     return token
 }
