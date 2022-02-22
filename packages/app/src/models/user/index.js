@@ -1,12 +1,12 @@
-import Session from '../session'
+import Session from "../session"
 
 export default class User {
     static get bridge() {
         return window.app?.request
     }
 
-    static get data() {
-        const token = Session.decodedToken
+    static async data() {
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
@@ -15,24 +15,44 @@ export default class User {
         return User.bridge.get.user(undefined, { username: token.username, _id: token.user_id })
     }
 
-    static get roles() {
-        const token = Session.decodedToken
+    static async roles() {
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
         }
 
-        return User.bridge.get.roles({ username: token.username })
+        return User.bridge.get.userRoles(undefined, { username: token.username })
     }
 
-    getAssignedWorkloads = async () => {
-        const token = Session.decodedToken
+    static async hasRole(role) {
+        const roles = await User.roles()
+
+        if (!roles) {
+            return false
+        }
+
+        return Array.isArray(roles) && roles.includes(role)
+    }
+
+    static async selfUserId() {
+        const token = await Session.decodedToken()
+
+        if (!token) {
+            return false
+        }
+
+        return token.user_id
+    }
+
+    getAssignedWorkorders = async () => {
+        const token = await Session.decodedToken()
 
         if (!token || !User.bridge) {
             return false
         }
 
-        return User.bridge.get.workloads({ username: token.username })
+        return User.bridge.get.workorders({ username: token.username })
     }
 
     getData = async (payload, callback) => {
@@ -48,12 +68,12 @@ export default class User {
     }
 
     hasAdmin = async () => {
-        const roles = await User.roles
+        const roles = await User.roles()
 
         if (!roles) {
             return false
         }
-    
+
         return Array.isArray(roles) && roles.includes("admin")
     }
 }

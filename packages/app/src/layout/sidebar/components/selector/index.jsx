@@ -8,7 +8,7 @@ import sidebarItems from "schemas/routes.json"
 import "./index.less"
 
 const getStoragedKeys = () => {
-	return window.app.configuration.sidebar.get()
+	return window.app.settings.get("sidebarKeys") ?? []
 }
 
 const getAllItems = () => {

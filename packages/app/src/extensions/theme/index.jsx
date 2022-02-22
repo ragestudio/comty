@@ -138,21 +138,16 @@ export const extension = {
 				async (app, main) => {
 					app.ThemeController = new ThemeController()
 
-					main.eventBus.on("darkMode", (payload) => {
-						if (payload.to) {
+					main.eventBus.on("darkMode", (value) => {
+						if (value) {
 							app.ThemeController.applyVariant("dark")
 						} else {
 							app.ThemeController.applyVariant("light")
 						}
 					})
-					main.eventBus.on("modifyTheme", (payload) => {
-						if (payload.to) {
-							app.ThemeController.update(payload.to)
-							app.ThemeController.setModifications(app.ThemeController.mutation)
-						} else {
-							app.ThemeController.update(payload)
-							app.ThemeController.setModifications(app.ThemeController.mutation)
-						}
+					main.eventBus.on("modifyTheme", (value) => {
+						app.ThemeController.update(value)
+						app.ThemeController.setModifications(app.ThemeController.mutation)
 					})
 					main.eventBus.on("resetTheme", () => {
 						app.ThemeController.resetDefault()

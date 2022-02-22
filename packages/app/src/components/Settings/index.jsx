@@ -1,10 +1,11 @@
 import React from "react"
-import { Icons } from "components/icons"
-import { SliderPicker } from "react-color"
 import * as antd from "antd"
-import config from "config"
+import { SliderPicker } from "react-color"
+import { Translation } from "react-i18next"
 
-import settingList from "schemas/settingsList.json"
+import config from "config"
+import { Icons } from "components/Icons"
+import settingList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
 import { AboutApp } from ".."
@@ -24,37 +25,36 @@ const ItemTypes = {
 
 export default class SettingsMenu extends React.Component {
 	state = {
-		settings: window.app.configuration.settings.get() ?? {},
+		settings: window.app.settings.get() ?? {},
 	}
 
-	handleEvent = (event, item, to) => {
-		const id = item.id
-
-		if (typeof id === "undefined") {
-			console.error("SettingsMenu: Cannot update, item has no id")
+	handleUpdate = (item, update) => {
+		if (typeof item.id === "undefined") {
+			console.error("[Settings] Cannot handle update, item has no id")
 			return false
 		}
 
-		const currentValue = window.app.configuration.settings.get(id) ?? null
+		const currentValue = window.app.settings.get(item.id)
 
-		// by default we set the opposite value to the current value
-		if (typeof to === "undefined") {
-			to = !currentValue
-		}
-
-		if (typeof item.updateValueKey === "string") {
-			to = { [item.updateValueKey]: to }
+		if (typeof update === "undefined") {
+			update = !currentValue
 		}
 
 		if (typeof item.emitEvent === "string") {
-			window.app.eventBus.emit(item.emitEvent, { event, to })
+			let emissionPayload = update
+
+			if (typeof item.emissionValueUpdate === "function") {
+				emissionPayload = item.emissionValueUpdate(emissionPayload)
+			}
+
+			window.app.eventBus.emit(item.emitEvent, emissionPayload)
 		}
 
 		if (!item.noStorage) {
-			window.app.configuration.settings.change(id, to)
+			window.app.settings.set(item.id, update)
 		}
 
-		this.setState({ settings: { ...this.state.settings, [id]: to } })
+		this.setState({ settings: { ...this.state.settings, [item.id]: update } })
 	}
 
 	renderItem = (item) => {
@@ -77,18 +77,24 @@ export default class SettingsMenu extends React.Component {
 				item.props.onChange = (color) => {
 					item.props.color = color.hex
 				}
-				item.props.onChangeComplete = (color, event) => {
-					this.handleEvent(event, item, color.hex)
+				item.props.onChangeComplete = (color) => {
+					this.handleUpdate(item, color.hex)
 				}
 				break
 			}
 			case "switch": {
 				item.props.checked = this.state.settings[item.id]
-				item.props.onClick = (event) => this.handleEvent(event, item)
+				item.props.onClick = (event) => this.handleUpdate(item, event)
 				break
 			}
 			case "select": {
-				item.props.onChange = (event) => this.handleEvent(event, item)
+				item.props.onChange = (value) => this.handleUpdate(item, value)
+				item.props.defaultValue = this.state.settings[item.id]
+				break
+			}
+			case "slider":{
+				item.props.defaultValue = this.state.settings[item.id]
+				item.props.onAfterChange = (value) => this.handleUpdate(item, value)
 				break
 			}
 			default: {
@@ -96,10 +102,15 @@ export default class SettingsMenu extends React.Component {
 					item.props.children = item.title ?? item.id
 				}
 				item.props.value = this.state.settings[item.id]
-				item.props.onClick = (event) => this.handleEvent(event, item)
+				item.props.onClick = (event) => this.handleUpdate(item, event)
 				break
 			}
 		}
+
+		// TODO: Support async children
+		// if (typeof item.children === "function") {
+
+		// }
 
 		return (
 			<div key={item.id} className="settingItem">
@@ -107,9 +118,13 @@ export default class SettingsMenu extends React.Component {
 					<div>
 						<h4>
 							{Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
-							{item.title ?? item.id}
+							<Translation>{
+								t => t(item.title ?? item.id)
+							}</Translation>
 						</h4>
-						<p>{item.description}</p>
+						<p>	<Translation>{
+							t => t(item.description)
+						}</Translation></p>
 					</div>
 					<div>
 						{item.experimental && <antd.Tag> Experimental </antd.Tag>}
@@ -130,7 +145,9 @@ export default class SettingsMenu extends React.Component {
 			<div key={key} className="group">
 				<h1>
 					{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
-					{fromDecoratorTitle ?? key}
+					<Translation>{
+						t => t(fromDecoratorTitle ?? key)
+					}</Translation>
 				</h1>
 				<div className="content">
 					{group.map((item) => this.renderItem(item))}
@@ -166,7 +183,7 @@ export default class SettingsMenu extends React.Component {
 						<div>{config.app?.siteName}</div>
 						<div>
 							<antd.Tag>
-								<Icons.Tag />v{window.__evite?.projectVersion}
+								<Icons.Tag />v{window.app.version}
 							</antd.Tag>
 						</div>
 						<div>
@@ -178,7 +195,9 @@ export default class SettingsMenu extends React.Component {
 					</div>
 					<div>
 						<antd.Button type="link" onClick={() => AboutApp.openModal()}>
-							About
+							<Translation>
+								{t => t("about")}
+							</Translation>
 						</antd.Button>
 					</div>
 				</div>

@@ -1,14 +1,13 @@
 import React from "react"
 import { Button } from "antd"
-import { ActionsBar } from "components"
-import { Icons, createIconRender } from "components/icons"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 
-import Selector from "../selector"
-
+import { ActionsBar } from "components"
+import { Icons, createIconRender } from "components/Icons"
 import sidebarItems from "schemas/routes.json"
-import defaultSidebarKeys from "schemas/defaultSidebar.json"
+import { sidebarKeys as defaultSidebarKeys } from "schemas/defaultSettings"
 
+import Selector from "../selector"
 import "./index.less"
 
 const allItemsMap = [...sidebarItems].map((item, index) => {
@@ -47,7 +46,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	loadItems = () => {
-		const storagedKeys = window.app.configuration.sidebar.get() ?? defaultSidebarKeys
+		const storagedKeys = window.app.settings.get("sidebarKeys") ?? defaultSidebarKeys
 		const active = []
 		const lockedIndex = []
 
@@ -65,7 +64,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	onSave = () => {
-		window.app.configuration.sidebar._push(this.state.items)
+		window.app.settings.set("sidebarKeys", this.state.items)
 		window.app.SidebarController.toogleEdit(false)
 	}
 
@@ -74,7 +73,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	onSetDefaults = () => {
-		window.app.configuration.sidebar._push(defaultSidebarKeys)
+		window.app.settings.set("sidebarKeys", defaultSidebarKeys)
 		this.loadItems()
 	}
 
@@ -136,7 +135,7 @@ export default class SidebarEditor extends React.Component {
 						if (update.includes(key)) {
 							return false
 						}
-						
+
 						update.push(key)
 					})
 
@@ -164,8 +163,8 @@ export default class SidebarEditor extends React.Component {
 			background: component.locked
 				? "rgba(145, 145, 145, 0.2)"
 				: isDragging
-				? "rgba(145, 145, 145, 0.5)"
-				: "transparent",
+					? "rgba(145, 145, 145, 0.5)"
+					: "transparent",
 			...draggableStyle,
 		})
 
@@ -244,7 +243,7 @@ export default class SidebarEditor extends React.Component {
 							Done
 						</Button>
 					</div>
-					
+
 					<div>
 						<Button onClick={this.onDiscard} icon={<Icons.XCircle />} >Cancel</Button>
 					</div>

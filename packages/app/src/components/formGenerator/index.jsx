@@ -296,7 +296,7 @@ export default class FormGenerator extends React.Component {
 							if (typeof element.options !== "undefined" && !element.renderItem) {
 								if (!Array.isArray(element.options)) {
 									console.warn(
-										`Invalid options data type, expecting Array > recived ${typeof element.options}`,
+										`Invalid options data type, expecting Array > received ${typeof element.options}`,
 									)
 									return null
 								}

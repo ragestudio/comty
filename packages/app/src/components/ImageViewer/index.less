@@ -1,0 +1,31 @@
+.ImageViewer {
+	--ignore-dragger: true;
+	width: 100%;
+
+	.image-wrapper {
+		width: 100%;
+
+		img {
+			border-radius: 8px;
+			--ignore-dragger: true;
+			width: 100%;
+			max-height: 25vh;
+			object-fit: cover;
+			border-radius: 5px;
+		}
+	}
+
+	&.extended {
+		height: 100%;
+		display: inline-flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		img {
+			max-height: 100vh;
+			height: 100%;
+			object-fit: fill;
+		}
+	}
+}

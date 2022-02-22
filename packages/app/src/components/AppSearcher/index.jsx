@@ -32,7 +32,6 @@ export default class AppSearcher extends React.Component {
         let results = []
 
         // get results
-        console.log(value)
         results.push({ id: value, title: value })
 
         // storage results

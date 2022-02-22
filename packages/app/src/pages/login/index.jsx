@@ -1,8 +1,9 @@
-import React from 'react'
-import config from "config"
+import React from "react"
 import * as antd from "antd"
-import { FormGenerator } from 'components'
-import { Icons } from 'components/Icons'
+import { FormGenerator } from "components"
+import { Icons } from "components/Icons"
+
+import config from "config"
 
 import "./index.less"
 
@@ -13,7 +14,11 @@ const formInstance = [
             component: "Input",
             icon: "User",
             placeholder: "Username",
-            props: null
+            props: {
+                autocorrect: "off",
+                autocapitalize: "none",
+                className: "login-form-username",
+            },
         },
         item: {
             hasFeedback: true,
@@ -23,7 +28,6 @@ const formInstance = [
                     message: 'Please input your Username!',
                 },
             ],
-            props: null
         }
     },
     {
@@ -59,21 +63,14 @@ const formInstance = [
             }
         }
     },
-    {
-        id: "allowRegenerate",
-        withValidation: false,
-        element: {
-            component: "Checkbox",
-            props: {
-                children: "Not expire",
-                defaultChecked: false,
-            }
-        }
-    }
 ]
 
 export default class Login extends React.Component {
     static bindApp = ["sessionController"]
+
+    static pageStatement = {
+        bottomBarAllowed: false
+    }
 
     handleFinish = async (values, ctx) => {
         ctx.toogleValidation(true)
@@ -111,11 +108,14 @@ export default class Login extends React.Component {
     }
 
     componentDidMount() {
-        if (window.app.SidebarController.isVisible()) {
+        const sidebarVisible = window.app.SidebarController.isVisible()
+        const headerVisible = window.app.HeaderController.isVisible()
+
+        if (sidebarVisible) {
             window.app.SidebarController.toogleVisible(false)
         }
 
-        if (window.app.HeaderController.isVisible()) {
+        if (headerVisible) {
             window.app.HeaderController.toogleVisible(false)
         }
     }
@@ -123,7 +123,7 @@ export default class Login extends React.Component {
     render() {
         return (
             <div className="app_login">
-                {this.props.session?.valid && <div className="session_available">
+                {this.props.session && <div className="session_available">
                     <h3><Icons.AlertCircle /> You already have a valid session.</h3>
                     <div className="session_card">
                         @{this.props.session.username}

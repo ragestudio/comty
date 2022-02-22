@@ -1,52 +1,26 @@
-@import "theme/vars.less";
-
 .drawer {
-	height: 100vh;
-	max-height: 100vh;
-
-	.pageTitle {
-		position: sticky;
-		background-color: var(--background-color-primary);
-		top: 0;
-		z-index: 100;
-		height: @app_header_height;
-
-		padding: 10px 20px;
-
-		.ant-page-header{
-			height: 100%;
-			padding: 0;
-		}
-		.ant-page-header-heading{
-			height: 100%;
-			margin: 0!important;
-		}
-		.ant-page-header-heading-left {
-			height: 100%;
-			margin: 0!important;
-		}
-	}
-
 	.body {
-		z-index: 99;
+		position: absolute;
+		top: 50px;
 
-		position: relative;
-
-		padding: 20px 30px;
-		height: 100vh - @app_header_height;
+		padding: 30px 10px 10px 10px;
+		background-color: var(--background-color-primary);
 		width: 100%;
+		max-width: 700px;
+		min-height: 100%;
+		border-top-left-radius: 8px;
+		border-top-right-radius: 8px;
 	}
 
-	&.mobile {
-		.body {
-			padding: 20px 15px;
-		}
+	.body::before{
+		content: "";
+		background-color: var(--background-color-contrast);
+		width: 100px;
+		height: 8px;
+		position: absolute;
+		top: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		border-radius: 8px;
 	}
-}
-
-.ant-drawer-content,
-.ant-drawer-wrapper-body,
-.ant-drawer-body {
-	height: 100vh;
-	max-height: 100vh;
 }

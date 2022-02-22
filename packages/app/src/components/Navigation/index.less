@@ -1,0 +1,81 @@
+@buttonSize: 26vw;
+@buttonBorderRadius: 8px;
+
+.navigation {
+    display: inline-flex;
+    flex-direction: column;
+
+    width: 100%;
+    overflow: hidden;
+
+    .group {
+        display: inline-flex;
+        flex-direction: column;
+
+        .items {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+
+            .item {
+                --ignore-dragger: true;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                padding: 10px;
+                margin: 10px 0;
+                
+                width: @buttonSize;
+                min-width: @buttonSize;
+                height: @buttonSize;
+                min-height: @buttonSize;
+                
+                border-radius: @buttonBorderRadius;
+                
+                background-color: var(--background-color-accent);
+                transition: all 80ms ease-in-out;
+                
+                .icon {
+                    svg {
+                        margin: 0 !important;
+                        font-size: 2rem;
+                    }
+                }
+                
+                .name {
+                    width: 100%;
+                    
+                    word-break: break-all;
+                    text-overflow: ellipsis;
+                    text-align: center;
+                    
+                    color: var(--background-color-contrast);
+                    padding-top: 10px;
+
+                    h1 {
+                        word-break: break-all;
+                        width: 100%;
+                        
+                        font-size: 1.1rem;
+                        margin: 0!important;
+                    }
+                }
+            }
+    
+            .item:active {
+                background-color: var(--background-color-primary);
+                color: var(--background-color-contrast);
+                transform: scale(0.9);
+            }
+        }
+
+        > div {
+            margin-bottom: 20px;
+        }
+    }
+}
