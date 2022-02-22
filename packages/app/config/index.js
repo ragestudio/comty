@@ -1,24 +1,26 @@
 import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
 import defaultSoundPack from "../constants/defaultSoundPack.json"
+import defaultRemotesOrigins from "../constants/defaultRemotesOrigins.json"
 
 export default {
     package: packagejson,
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
+    author: "RageStudio© 2022",
     logo: {
         alt: "/logo_alt.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== 'production' ? `http://${window.location.hostname}:3000` : "https://api.amimet.es",
+        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.http_api,
     },
     ws: {
-        address: process.env.NODE_ENV !== 'production' ? `ws://${window.location.hostname}:3001` : "https://ws.amimet.es",
+        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : defaultRemotesOrigins.ws_api,
     },
     app: {
         title: packagejson.name,
         siteName: "Comty",
-        mainPath: '/main',
+        mainPath: "/main",
         storage: {
             basics: "user",
             token: "token",
@@ -30,14 +32,14 @@ export default {
     i18n: {
         languages: [
             {
-                key: 'en',
-                title: 'English',
+                locale: "en",
+                name: "English"
             },
             {
-                key: 'es',
-                title: 'Español',
+                locale: "es",
+                name: "Español"
             }
         ],
-        defaultLanguage: 'en',
+        defaultLocale: "es",
     }
 }
