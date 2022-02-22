@@ -1,9 +1,12 @@
 export default (schema = {}, fn) => {
     return async (req, res, next) => {
-        // if is nullish
-        req.body = req.body ?? {}
-        req.query = req.query ?? {}
-        
+        if (typeof req.body === "undefined") {
+            req.body = {}
+        }
+        if (typeof req.query === "undefined") {
+            req.query = {}
+        }
+
         if (schema.required) {
             if (Array.isArray(schema.required)) {
                 const missingKeys = []
