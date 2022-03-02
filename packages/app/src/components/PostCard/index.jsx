@@ -80,9 +80,9 @@ function PostActions(props) {
                 <Icons.MessageSquare className="icon" />
             </div>
         </div>
-        <div className="action" id="share" onClick={props.onClickShare}>
+        <div className="action" id="save" onClick={props.onClickSave}>
             <div className="icon">
-                <Icons.Share />
+                <Icons.Bookmark />
             </div>
         </div>
         {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
