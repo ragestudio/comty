@@ -45,12 +45,18 @@ function PostHeader(props) {
                 </div>
             </div>
         </div>
-        <div className="postHeaderActions">
-            <div className="item" onClick={props.onClickLike}>
-                {props.isLiked && <Icons.Heart id="likeIndicator" />}
+        <div className="postStadistics">
+            <div className="item">
+                <Icons.Heart className={classnames("icon", { ["filled"]: props.isLiked })} />
+                <div className="value">
+                    {props.likes}
+                </div>
             </div>
-            <div className="item" onClick={props.onClickSave}>
-                <Icons.Bookmark />
+            <div className="item">
+                <Icons.MessageSquare />
+                <div className="value">
+                    {props.comments}
+                </div>
             </div>
         </div>
     </div>
@@ -58,8 +64,8 @@ function PostHeader(props) {
 
 function PostContent({ message }) {
     return <div className="content">
-    {message}
-</div>
+        {message}
+    </div>
 }
 
 function PostActions(props) {
@@ -68,16 +74,10 @@ function PostActions(props) {
             <div className="icon">
                 <LikeButton defaultLiked={props.defaultLiked} onClick={props.onClickLike} />
             </div>
-            <div className="value">
-                {String(props.likes)}
-            </div>
         </div>
         <div className="action" id="comments" onClick={props.onClickComments}>
             <div className="icon">
                 <Icons.MessageSquare className="icon" />
-            </div>
-            <div className="value">
-                {String(props.comments)}
             </div>
         </div>
         <div className="action" id="share" onClick={props.onClickShare}>
@@ -162,6 +162,8 @@ export default class PostCard extends React.Component {
                     isLiked={hasLiked}
                     onClickLike={() => this.onClickLike(false)}
                     onClickSave={this.onClickSave}
+                    likes={this.state.data.likes.length}
+                    comments={this.state.data.comments.length}
                 />
                 <PostContent
                     message={this.props.data.message}
@@ -175,8 +177,6 @@ export default class PostCard extends React.Component {
                     onClickLike={this.onClickLike}
                     defaultLiked={hasLiked}
                     isSelf={this.isSelf()}
-                    likes={this.state.data.likes.length}
-                    comments={this.state.data.comments.length}
                 />
             </div>
         </div>
