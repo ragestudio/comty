@@ -1,45 +1,193 @@
 .postCard {
-    display: inline-flex;
+    display       : inline-flex;
     flex-direction: column;
-    
-    width: 100%;
+
+    width    : 100%;
     max-width: 40vw;
-    padding: 17px;
+
+    filter: drop-shadow(3px 3px 2px #c5c5c5);
 
     background-color: var(--background-color-accent);
-    border-radius: 8px;
+    border-radius   : 8px;
 
-    .userInfo {
-        display: inline-flex;
-        flex-direction: row;
-        align-items: center;
+    transition: all 0.2s ease-in-out;
 
-        margin-bottom: 15px;
+    .wrapper {
+        display       : inline-flex;
+        flex-direction: column;
+        align-items   : center;
 
-        h1 {
-            margin: 0;
-            font-family: "DM Mono", monospace;
+        width  : 100%;
+        padding: 17px;
+
+        transition: all 0.2s ease-in-out;
+
+        .userInfo {
+            display       : inline-flex;
+            flex-direction: row;
+            align-items   : center;
+
+            margin-bottom: 15px;
+
+            >div {
+                margin-right: 10px;
+            }
+
+            .info {
+                display        : inline-flex;
+                flex-direction : column;
+                align-items    : center;
+                justify-content: start;
+
+                text-align: start;
+
+                width: fit-content;
+
+                h1 {
+                    margin     : 0;
+                    font-family: "DM Mono", monospace;
+                    align-self : start;
+                }
+
+                >div {
+                    align-self: start;
+                }
+            }
         }
 
-        > div {
-            margin-right: 10px;
+        .content {
+            display       : inline-flex;
+            flex-direction: column;
+            align-items   : flex-start;
+
+            background-color: var(--background-color-primary);
+            padding         : 10px;
+            border-radius   : 8px;
+
+            font-size  : 14px;
+            font-family: "Poppins", sans-serif;
+
+            overflow   : hidden;
+            word-break : break-all;
+            user-select: text;
         }
 
+        >div {
+            width: 100%;
+        }
     }
 
-    .content {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: flex-start;
+    .actionsWrapper {
+        display        : flex;
+        flex-direction : row;
+        align-items    : center;
+        justify-content: center;
+
+        position: absolute;
+        bottom  : 0;
+        left    : 0;
+
+        opacity: 0;
+
+        width : 100%;
+        height: 50px;
+
+        margin-top: 15px;
+        padding   : 10px;
+
+        border-radius: 8px;
+        transition   : all 0.2s ease-in-out;
 
         background-color: var(--background-color-primary);
-        padding: 10px;
-        border-radius: 8px;
+        filter          : drop-shadow(3px 3px 2px #c5c5c5);
+    }
 
-        font-size: 14px;
-        font-family: "Poppins", sans-serif;
+    .actions {
+        display        : inline-flex;
+        flex-direction : row;
+        align-items    : center;
+        justify-content: space-between;
 
-        overflow: hidden;
-        word-break: break-all;
+        width: 80%;
+
+        transition: all 0.2s ease-in-out;
+
+        #likes {
+            transition: all 0.2s ease-in-out;
+
+            color: var(--primaryColor) !important;
+
+            svg {
+                transition: all 0.2s ease-in-out;
+                color     : var(--background-color-contrast) !important;
+            }
+        }
+
+        #likes:hover {
+            svg {
+                color: var(--primaryColor) !important;
+            }
+        }
+
+        .action {
+            cursor    : pointer;
+            transition: all 0.2s ease-in-out;
+
+            .value {
+                transition: all 0.2s ease-in-out;
+                width     : 0;
+                opacity   : 0;
+            }
+        }
+
+        .action:hover {
+            .value {
+                margin-left: 3px;
+                width      : 20px;
+                opacity    : 1;
+            }
+        }
+
+        svg {
+            margin: 0 !important;
+        }
+
+        >div {
+            display        : flex;
+            flex-direction : row;
+            align-items    : center;
+            justify-content: center;
+
+            border-radius: 360px;
+            width        : 55px;
+            height       : 55px;
+
+            font-size: 20px;
+            padding  : 2px;
+
+            background-color: var(--background-color-primary);
+
+            transform: translate(0, -15px);
+        }
+    }
+}
+
+.postCard:hover {
+    .wrapper {
+        margin-bottom: 55px;
+    }
+
+    .actionsWrapper {
+        animation: fadeActionsIn 0.2s 0.2s linear forwards;
+    }
+}
+
+@keyframes fadeActionsIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }
