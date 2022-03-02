@@ -21,19 +21,6 @@
         outline-color: var(--primaryColor);
     }
 
-    .actionsIndicator {
-        display        : flex;
-        flex-direction : row;
-        align-items    : center;
-        justify-content: center;
-
-        width        : 100%;
-        margin-bottom: 5px;
-
-        font-size: 18px;
-        color    : var(--background-color-contrast);
-    }
-
     .wrapper {
         display       : inline-flex;
         flex-direction: column;
@@ -126,6 +113,21 @@
         >div {
             width: 100%;
         }
+    }
+
+    .actionsIndicator {
+        display        : flex;
+        flex-direction : row;
+        align-items    : center;
+        justify-content: center;
+
+        width        : 100%;
+        margin-bottom: 5px;
+
+        font-size: 18px;
+        color    : var(--background-color-contrast);
+        
+        transition   : all 0.2s ease-in-out;
     }
 
     .actionsWrapper {
@@ -231,6 +233,10 @@
 
     .actionsWrapper {
         animation: fadeActionsIn 0.2s 0.2s linear forwards;
+    }
+
+    .actionsIndicator {
+        opacity: 0;
     }
 }
 
