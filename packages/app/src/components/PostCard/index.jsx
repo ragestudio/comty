@@ -169,8 +169,10 @@ export default class PostCard extends React.Component {
                     message={this.props.data.message}
                 />
             </div>
-            <div className="actionsIndicator">
-                <Icons.MoreHorizontal />
+            <div className="actionsIndicatorWrapper">
+                <div className="actionsIndicator">
+                    <Icons.MoreHorizontal />
+                </div>
             </div>
             <div className="actionsWrapper">
                 <PostActions
