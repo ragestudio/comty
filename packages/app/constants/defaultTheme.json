@@ -6,6 +6,7 @@
     "variants": {
         "light": {
             "background-color-primary": "#ffffff",
+            "shadow-color": "#4b4b4b59",
             "background-color-accent": "#f0f2f5",
             "background-color-contrast": "#4b4b4b",
             "border-color": "var(--background-color-contrast)",
@@ -15,6 +16,7 @@
         "dark": {
             "text-color": "#d2d2d2",
             "svg-color": "var(--text-color)",
+            "shadow-color": "#35353559",
             "background-color-primary": "#262626",
             "background-color-accent": "#353535",
             "background_disabled": "#0A0A0A",
