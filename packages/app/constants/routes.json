@@ -2,13 +2,21 @@
     {
         "id": "main",
         "title": "Dashboard",
-        "icon": "Home",
-        "locked": true
+        "icon": "Home"
     },
     {
         "id": "explore",
         "title": "Explore",
-        "icon": "Compass",
-        "locked": true
+        "icon": "Compass"
+    },
+    {
+        "id": "saved",
+        "title": "Saved",
+        "icon": "Heart"
+    },
+    {
+        "id": "marketplace",
+        "title": "Marketplace",
+        "icon": "ShoppingBag"
     }
 ]
