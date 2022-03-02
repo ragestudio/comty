@@ -5,7 +5,7 @@
     width    : 100%;
     max-width: 600px;
 
-    filter: drop-shadow(3px 3px 2px #c5c5c5);
+    filter: drop-shadow(3px 3px 2px var(--shadow-color));
 
     background-color: var(--background-color-accent);
     border-radius   : 8px;
@@ -18,8 +18,7 @@
 
     &.liked {
         filter: drop-shadow(0px 0px 2px var(--primaryColor));
-
-        //outline-color: ;
+        outline-color: var(--primaryColor);
     }
 
     .actionsIndicator {
@@ -71,7 +70,10 @@
 
                     width: fit-content;
 
+                    color: var(--background-color-contrast);
+
                     h1 {
+                        color      : var(--background-color-contrast);
                         margin     : 0;
                         font-family: "DM Mono", monospace;
                         align-self : start;
@@ -87,6 +89,8 @@
                 display       : inline-flex;
                 flex-direction: row;
                 font-size     : 16px;
+
+                color: var(--background-color-contrast);
 
                 .item {
                     cursor: pointer;
@@ -111,6 +115,8 @@
 
             font-size  : 14px;
             font-family: "Poppins", sans-serif;
+
+            color: var(--background-color-contrast);
 
             overflow   : hidden;
             word-break : break-all;
@@ -144,7 +150,7 @@
         transition   : all 0.2s ease-in-out;
 
         background-color: var(--background-color-primary);
-        filter          : drop-shadow(3px 3px 2px #c5c5c5);
+        filter          : drop-shadow(3px 3px 2px var(--shadow-color));
     }
 
     .actions {
@@ -156,6 +162,8 @@
         width: 80%;
 
         transition: all 0.2s ease-in-out;
+
+        color: var(--background-color-contrast);
 
         .action {
             display       : inline-flex;
