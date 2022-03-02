@@ -112,6 +112,18 @@ export default class SettingsMenu extends React.Component {
 
 		// }
 
+		if (typeof item.dependsOn === "object") {
+			const dependsOptionsKeys = Object.keys(item.dependsOn)
+
+			item.props.disabled = !Boolean(dependsOptionsKeys.every((key) => {
+				if (typeof item.dependsOn[key] === "function") {
+					return item.dependsOn[key](this.state.settings[key])
+				}
+
+				return this.state.settings[key] === item.dependsOn[key]
+			}))
+		}
+
 		return (
 			<div key={item.id} className="settingItem">
 				<div className="header">
