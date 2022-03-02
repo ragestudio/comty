@@ -10,9 +10,12 @@ import "./index.less"
 
 function LikeButton(props) {
     const [liked, setLiked] = React.useState(props.defaultLiked ?? false)
+    const [clicked, setCliked] = React.useState(false)
 
     const handleClick = async () => {
         let to = !liked
+
+        setCliked(to)
 
         if (typeof props.onClick === "function") {
             const result = await props.onClick(to)
@@ -31,14 +34,14 @@ function LikeButton(props) {
         <div
             className={classnames(
                 "ripple",
-                { ["clicked"]: liked }
+                { ["clicked"]: clicked }
             )}
         ></div>
         <svg
             className={classnames(
                 "heart",
                 { ["empty"]: !liked },
-                { ["clicked"]: liked },
+                { ["clicked"]: clicked },
             )}
             width="24"
             height="24"
@@ -174,7 +177,7 @@ export default class PostCard extends React.Component {
             return <antd.Skeleton active />
         }
 
-        return <div className="postCard">
+        return <div id={this.props.data._id} key={this.props.data._id} className="postCard">
             <div className="wrapper">
                 <PostHeader
                     postData={this.props.data}
