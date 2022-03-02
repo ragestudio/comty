@@ -72,20 +72,34 @@
                 }
             }
 
-            .postHeaderActions {
+            .postStadistics {
                 display       : inline-flex;
-                flex-direction: row;
+                flex-direction: column;
                 font-size     : 16px;
 
                 color: var(--background-color-contrast);
+                height: fit-content;
 
                 .item {
-                    cursor: pointer;
-                }
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: fit-content;
 
-                #likeIndicator {
-                    color: var(--primaryColor);
-                    fill : var(--primaryColor);
+                    margin-left: 20px;
+                    margin-bottom: 5px;
+
+                    .icon {
+                        &.filled {
+                            color: var(--primaryColor);
+                            fill : var(--primaryColor);
+                        }
+                    }
+
+                    .value {
+                        font-family: "DM Mono", monospace;
+                        font-size: 14px;
+                    }
                 }
             }
         }
@@ -143,7 +157,7 @@
         opacity: 0;
 
         width : 100%;
-        height: 50px;
+        height: 40px;
 
         margin-top: 15px;
         padding   : 10px;
@@ -152,7 +166,6 @@
         transition   : all 0.2s ease-in-out;
 
         background-color: var(--background-color-primary);
-        filter          : drop-shadow(3px 3px 2px var(--shadow-color));
     }
 
     .actions {
@@ -228,11 +241,11 @@
 
 .postCard:hover {
     .wrapper {
-        margin-bottom: 55px;
+        margin-bottom: 25px;
     }
 
     .actionsWrapper {
-        animation: fadeActionsIn 0.2s 0.2s linear forwards;
+        animation: fadeActionsIn 0.1s 0.1s linear forwards;
     }
 
     .actionsIndicator {
