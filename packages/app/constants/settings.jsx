@@ -98,8 +98,33 @@ export default [
         "id": "collapseOnLooseFocus",
         "group": "sidebar",
         "type": "Switch",
+        "icon": "Columns",
         "title": "Auto Collapse",
         "description": "Collapse the sidebar when loose focus",
+        "emitEvent": "settingChanged.sidebar_collapse",
+    },
+    {
+        "id": "autoCollapseDelay",
+        "group": "sidebar",
+        "type": "Slider",
+        "icon": "Wh",
+        "dependsOn": {
+            "collapseOnLooseFocus": true
+        },
+        "title": "Auto Collapse timeout",
+        "description": "Set the delay before the sidebar is collapsed",
+        "props": {
+            min: 0,
+            max: 2000,
+            step: 100,
+            marks: {
+                0: "No delay",
+                600: "0.6s",
+                1000: "1s",
+                1500: "1.5s",
+                2000: "2s",
+            }
+        }
     },
     {
         "id": "reduceAnimations",
