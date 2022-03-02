@@ -1,12 +1,17 @@
 import React from "react"
 import * as antd from "antd"
-import { PostCard } from "components"
+import { PostCard, PostCreator } from "components"
+import { InfiniteScroll } from "antd-mobile"
 
 import "./index.less"
+
+const ContainerHeight = 700;
 
 export default class PostsExplorer extends React.Component {
     state = {
         loading: true,
+        skipStep: 0,
+        lastLength: 0,
         posts: [],
     }
 
@@ -35,7 +40,9 @@ export default class PostsExplorer extends React.Component {
     }
 
     fetchPosts = async () => {
-        const posts = await this.api.get.feed().catch(error => {
+        const posts = await this.api.get.feed(undefined, {
+            feedSkip: this.state.skipStep,
+        }).catch(error => {
             console.error(error)
             antd.message.error(error)
 
@@ -44,25 +51,40 @@ export default class PostsExplorer extends React.Component {
 
         if (posts) {
             console.log(posts)
-            this.setState({ posts })
+            this.setState({ posts: [...posts, ...this.state.posts,], lastLength: posts.length })
         }
-
     }
 
-    renderPosts = (posts) => {
-        if (!Array.isArray(posts)) {
-            antd.message.error("Failed to render posts")
-            return null
-        }
+    hasMore = () => {
+        return this.state.posts.length < this.state.lastLength
+    }
 
-        return posts.map((post) => {
-            return <PostCard data={post} />
-        })
+    loadMore = async () => {
+        await this.setState({ skipStep: this.state.skipStep + 1 })
+        await this.fetchPosts()
     }
 
     render() {
+        if (this.state.loading) {
+            return <antd.Skeleton active />
+        }
+
         return <div className="explore">
-            {this.state.loading ? <antd.Skeleton active /> : this.renderPosts(this.state.posts)}
+            <div className="wrapper">
+                <div className="header">
+                    <PostCreator />
+                </div>
+
+                {
+                    this.state.posts.map(post => {
+                        return <PostCard data={post} />
+                    })
+                }
+
+                <InfiniteScroll loadMore={this.loadMore} hasMore={this.hasMore} >
+                    <div>Loading more...</div>
+                </InfiniteScroll>
+            </div>
         </div>
     }
 }
