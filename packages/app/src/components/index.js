@@ -23,6 +23,7 @@ export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 
 export { default as PostCard } from "./PostCard"
+export { default as PostCreator } from "./PostCreator"
 
 export * as AdminTools from "./AdminTools"
 export * as AboutApp from "./AboutApp"
