@@ -3,7 +3,7 @@
     flex-direction: column;
 
     width    : 100%;
-    max-width: 40vw;
+    max-width: 600px;
 
     filter: drop-shadow(3px 3px 2px #c5c5c5);
 
@@ -11,6 +11,29 @@
     border-radius   : 8px;
 
     transition: all 0.2s ease-in-out;
+
+    outline-width: 1px;
+    outline-style: solid;
+    outline-color: transparent;
+
+    &.liked {
+        filter: drop-shadow(0px 0px 2px var(--primaryColor));
+
+        //outline-color: ;
+    }
+
+    .actionsIndicator {
+        display        : flex;
+        flex-direction : row;
+        align-items    : center;
+        justify-content: center;
+
+        width        : 100%;
+        margin-bottom: 5px;
+
+        font-size: 18px;
+        color    : var(--background-color-contrast);
+    }
 
     .wrapper {
         display       : inline-flex;
@@ -22,35 +45,56 @@
 
         transition: all 0.2s ease-in-out;
 
-        .userInfo {
-            display       : inline-flex;
-            flex-direction: row;
-            align-items   : center;
+        .postHeader {
+            display        : inline-flex;
+            flex-direction : row;
+            justify-content: space-between;
 
-            margin-bottom: 15px;
+            .userInfo {
+                display       : inline-flex;
+                flex-direction: row;
+                align-items   : center;
 
-            >div {
-                margin-right: 10px;
-            }
-
-            .info {
-                display        : inline-flex;
-                flex-direction : column;
-                align-items    : center;
-                justify-content: start;
-
-                text-align: start;
-
-                width: fit-content;
-
-                h1 {
-                    margin     : 0;
-                    font-family: "DM Mono", monospace;
-                    align-self : start;
-                }
+                margin-bottom: 15px;
 
                 >div {
-                    align-self: start;
+                    margin-right: 10px;
+                }
+
+                .info {
+                    display        : inline-flex;
+                    flex-direction : column;
+                    align-items    : center;
+                    justify-content: start;
+
+                    text-align: start;
+
+                    width: fit-content;
+
+                    h1 {
+                        margin     : 0;
+                        font-family: "DM Mono", monospace;
+                        align-self : start;
+                    }
+
+                    >div {
+                        align-self: start;
+                    }
+                }
+            }
+
+            .postHeaderActions {
+                display       : inline-flex;
+                flex-direction: row;
+                font-size     : 16px;
+
+                .item {
+                    cursor: pointer;
+                }
+
+                #likeIndicator {
+                    color: var(--primaryColor);
+                    fill : var(--primaryColor);
                 }
             }
         }
@@ -60,9 +104,10 @@
             flex-direction: column;
             align-items   : flex-start;
 
-            background-color: var(--background-color-primary);
-            padding         : 10px;
-            border-radius   : 8px;
+            //background-color: var(--background-color-primary);
+
+            padding      : 0 10px 10px 10px;
+            border-radius: 8px;
 
             font-size  : 14px;
             font-family: "Poppins", sans-serif;
@@ -112,39 +157,38 @@
 
         transition: all 0.2s ease-in-out;
 
-        #likes {
-            transition: all 0.2s ease-in-out;
-
-            color: var(--primaryColor) !important;
-
-            svg {
-                transition: all 0.2s ease-in-out;
-                color     : var(--background-color-contrast) !important;
-            }
-        }
-
-        #likes:hover {
-            svg {
-                color: var(--primaryColor) !important;
-            }
-        }
-
         .action {
-            cursor    : pointer;
+            display       : inline-flex;
+            flex-direction: column;
+
             transition: all 0.2s ease-in-out;
+
+            .icon {
+                cursor    : pointer;
+                transition: all 0.2s ease-in-out;
+
+                svg {
+                    transition: all 0.2s ease-in-out;
+                }
+            }
 
             .value {
+                position: absolute;
+                bottom  : 0;
+
+                font-size  : 14px;
+                font-family: "DM Mono", monospace;
+
+                transform : translate(0, 50%);
                 transition: all 0.2s ease-in-out;
-                width     : 0;
-                opacity   : 0;
             }
         }
 
         .action:hover {
-            .value {
-                margin-left: 3px;
-                width      : 20px;
-                opacity    : 1;
+            .icon {
+                svg {
+                    color: var(--primaryColor) !important;
+                }
             }
         }
 
@@ -189,158 +233,5 @@
 
     to {
         opacity: 1;
-    }
-}
-
-
-
-@color-heart           : #EA442B;
-@likeAnimationDuration : .5s;
-@likeAnimationEasing   : cubic-bezier(.7, 0, .3, 1);
-
-.likeButton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .ripple,
-    .ripple:before,
-    .ripple:after {
-        position  : relative;
-        box-sizing: border-box;
-    }
-
-    font-size    : 40px;
-    border       : none;
-    border-radius: 50%;
-    width        : 1em;
-    height       : 1em;
-    padding      : 0;
-    margin       : 0;
-    outline      : none;
-    z-index      : 2;
-    transition   : transform @likeAnimationDuration @likeAnimationEasing;
-    cursor       : pointer;
-
-    background-color: transparent;
-
-    &:before {
-        z-index      : -1;
-        content      : '';
-        position     : absolute;
-        top          : 0;
-        left         : 0;
-        width        : 100%;
-        height       : 100%;
-        border-radius: inherit;
-        transition   : inherit;
-    }
-
-    &:after {
-        content         : '';
-        position        : absolute;
-        top             : 0;
-        left            : 0;
-        width           : 100%;
-        height          : 100%;
-        border-radius   : inherit;
-        z-index         : -1;
-    }
-
-    .heart {
-        position: relative;
-        >path {
-            stroke      : var(--primaryColor);
-            stroke-width: 2;
-            transition  : fill @likeAnimationDuration @likeAnimationEasing;
-            fill        : var(--primaryColor);
-        }
-
-        &.empty {
-            >path {
-                stroke      : var(--primaryColor);
-                stroke-width: 2;
-                transition  : fill @likeAnimationDuration @likeAnimationEasing;
-                fill        : transparent;
-            }
-        }
-
-        &.clicked {
-            animation: heart-bounce @likeAnimationDuration @likeAnimationEasing;
-
-            @keyframes heart-bounce {
-                40% {
-                    transform: scale(0.7);
-                }
-
-                0%,
-                80%,
-                100% {
-                    transform: scale(1);
-                }
-            }
-        }
-
-        animation: none;
-    }
-
-    .ripple {
-        position: absolute;
-        height       : 1em;
-        width        : 1em;
-        border-radius: 50%;
-        overflow     : hidden;
-        z-index      : 1;
-
-        &:before {
-            content      : '';
-            position     : absolute;
-            top          : 0;
-            left         : 0;
-            width        : 100%;
-            height       : 100%;
-            border       : .4em solid var(--primaryColor);
-            border-radius: inherit;
-            transform    : scale(0);
-        }
-
-        &.clicked {
-            &:before {
-                animation: ripple-out @likeAnimationDuration @likeAnimationEasing;
-            }
-        }
-       
-    }
-}
-
-@keyframes ripple-out {
-    from {
-        transform: scale(0);
-    }
-
-    to {
-        transform: scale(5);
-    }
-}
-@keyframes depress {
-
-    from,
-    to {
-        transform: none;
-    }
-
-    50% {
-        transform: translateY(5%) scale(0.9);
-    }
-}
-
-@keyframes depress-shadow {
-
-    from,
-    to {
-        transform: none;
-    }
-
-    50% {
-        transform: scale(0.5);
     }
 }
