@@ -22,6 +22,7 @@ export { default as Navigation } from "./Navigation"
 export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 
+export { default as LikeButton } from "./LikeButton"
 export { default as PostCard } from "./PostCard"
 export { default as PostCreator } from "./PostCreator"
 
