@@ -1,8 +1,8 @@
 import React from "react"
 import { notification as Notf } from "antd"
-import { Icons } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 import { Translation } from "react-i18next"
-import { Haptics, ImpactStyle } from "@capacitor/haptics"
+import { Haptics } from "@capacitor/haptics"
 
 class NotificationController {
     getSoundVolume = () => {
@@ -31,7 +31,7 @@ class NotificationController {
                 {(t) => t(notification.description)}
             </Translation>,
             duration: notification.duration ?? 4,
-            icon: React.isValidElement(notification.icon) ? notification.icon : (Icons[notification.icon] ?? <Icons.Bell />),
+            icon: React.isValidElement(notification.icon) ? notification.icon : (createIconRender(notification.icon) ?? <Icons.Bell />),
         })
     }
 
