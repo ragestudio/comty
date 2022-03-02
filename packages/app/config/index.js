@@ -9,7 +9,8 @@ export default {
     defaultSoundPack: defaultSoundPack,
     author: "RageStudio© 2022",
     logo: {
-        alt: "/logo_alt.svg"
+        alt: "/logo_alt.svg",
+        full: "/logo_full.svg",
     },
     api: {
         address: defaultRemotesOrigins.http_api,//process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.http_api,
