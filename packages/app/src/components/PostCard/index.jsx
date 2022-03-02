@@ -1,62 +1,19 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import classnames from "classnames"
+import { LikeButton } from "components"
 import moment from "moment"
+import classnames from "classnames"
 
 import { User } from "models"
 
 import "./index.less"
 
-function LikeButton(props) {
-    const [liked, setLiked] = React.useState(props.defaultLiked ?? false)
-    const [clicked, setCliked] = React.useState(false)
-
-    const handleClick = async () => {
-        let to = !liked
-
-        setCliked(to)
-
-        if (typeof props.onClick === "function") {
-            const result = await props.onClick(to)
-            if (typeof result === "boolean") {
-                to = result
-            }
-        }
-
-        setLiked(to)
-    }
-
-    return <button
-        className={classnames("likeButton", { ["clicked"]: liked })}
-        onClick={handleClick}
-    >
-        <div
-            className={classnames(
-                "ripple",
-                { ["clicked"]: clicked }
-            )}
-        ></div>
-        <svg
-            className={classnames(
-                "heart",
-                { ["empty"]: !liked },
-                { ["clicked"]: clicked },
-            )}
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-        >
-            <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"></path>
-        </svg>
-    </button>
-}
-
-function PostHeader({ postData }) {
+function PostHeader(props) {
     const [timeAgo, setTimeAgo] = React.useState(0)
 
     const updateTimeAgo = () => {
-        setTimeAgo(moment(postData.created_at ?? "").fromNow())
+        setTimeAgo(moment(props.postData.created_at ?? "").fromNow())
     }
 
     React.useEffect(() => {
@@ -69,21 +26,31 @@ function PostHeader({ postData }) {
         return () => {
             clearInterval(interval)
         }
-    }, [postData.created_at])
+    }, [props.postData.created_at])
 
-    return <div className="userInfo">
-        <div className="avatar">
-            <antd.Avatar src={postData.user?.avatar} />
-        </div>
-        <div className="info">
-            <div>
-                <h1>
-                    {postData.user?.fullName ?? `@${postData.user?.username}`}
-                </h1>
+    return <div className="postHeader">
+        <div className="userInfo">
+            <div className="avatar">
+                <antd.Avatar src={props.postData.user?.avatar} />
             </div>
+            <div className="info">
+                <div>
+                    <h1>
+                        {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
+                    </h1>
+                </div>
 
-            <div>
-                {timeAgo}
+                <div>
+                    {timeAgo}
+                </div>
+            </div>
+        </div>
+        <div className="postHeaderActions">
+            <div className="item" onClick={props.onClickLike}>
+                {props.isLiked && <Icons.Heart id="likeIndicator" />}
+            </div>
+            <div className="item" onClick={props.onClickSave}>
+                <Icons.Bookmark />
             </div>
         </div>
     </div>
@@ -91,8 +58,8 @@ function PostHeader({ postData }) {
 
 function PostContent({ message }) {
     return <div className="content">
-        {message}
-    </div>
+    {message}
+</div>
 }
 
 function PostActions(props) {
@@ -147,7 +114,6 @@ export default class PostCard extends React.Component {
 
         await this.setState({
             selfId,
-            likes: this.props.data.likes,
             loading: false
         })
     }
@@ -166,30 +132,49 @@ export default class PostCard extends React.Component {
         return result
     }
 
+    onClickSave = async () => {
+        // TODO: save post
+    }
+
     hasLiked = () => {
-        return this.props.data.likes.some(user_id => user_id === this.state.selfId)
+        return this.state.data.likes.some(user_id => user_id === this.state.selfId)
+    }
+
+    isSelf = () => {
+        return this.state.selfId === this.state.data.user._id
     }
 
     render() {
-        const defaultLiked = this.hasLiked()
+        const hasLiked = this.hasLiked()
 
         if (this.state.loading) {
             return <antd.Skeleton active />
         }
 
-        return <div id={this.props.data._id} key={this.props.data._id} className="postCard">
+        return <div
+            id={this.props.data._id}
+            key={this.props.data._id}
+            className={classnames("postCard", { ["liked"]: hasLiked })}
+        >
             <div className="wrapper">
                 <PostHeader
                     postData={this.props.data}
+                    isLiked={hasLiked}
+                    onClickLike={() => this.onClickLike(false)}
+                    onClickSave={this.onClickSave}
                 />
                 <PostContent
                     message={this.props.data.message}
                 />
             </div>
+            <div className="actionsIndicator">
+                <Icons.MoreHorizontal />
+            </div>
             <div className="actionsWrapper">
                 <PostActions
                     onClickLike={this.onClickLike}
-                    defaultLiked={defaultLiked}
+                    defaultLiked={hasLiked}
+                    isSelf={this.isSelf()}
                     likes={this.state.data.likes.length}
                     comments={this.state.data.comments.length}
                 />
