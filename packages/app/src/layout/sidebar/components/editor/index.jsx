@@ -105,6 +105,12 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	deleteItem = (key) => {
+		// check if item is locked
+		if (allItems[key].locked) {
+			console.warn("Cannot delete an locked item")
+			return false
+		}
+
 		this.setState({ items: this.state.items.filter((item) => item !== key) })
 	}
 
@@ -207,10 +213,13 @@ export default class SidebarEditor extends React.Component {
 														droppableSnapshot.isDraggingOver,
 													)}
 												>
-													<Icons.Trash
-														onClick={() => this.deleteItem(key)}
-														className="sidebar_editor_deleteBtn"
-													/>
+													{!allItems[key].locked &&
+														<Icons.Trash
+															onClick={() => this.deleteItem(key)}
+															className="sidebar_editor_deleteBtn"
+														/>
+													}
+													{itemComponent.icon && createIconRender(itemComponent.icon)}
 													{itemComponent.title ?? itemComponent.id}
 												</div>
 											)}
