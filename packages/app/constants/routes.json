@@ -12,11 +12,11 @@
     {
         "id": "saved",
         "title": "Saved",
-        "icon": "Heart"
+        "icon": "Archive"
     },
     {
         "id": "marketplace",
         "title": "Marketplace",
-        "icon": "ShoppingBag"
+        "icon": "Package"
     }
 ]
