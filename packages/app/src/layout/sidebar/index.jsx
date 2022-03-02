@@ -48,6 +48,9 @@ export default class Sidebar extends React.Component {
 
 		window.app["SidebarController"] = this.SidebarController
 		window.app.eventBus.on("edit_sidebar", () => this.toogleEditMode())
+		window.app.eventBus.on("settingChanged.sidebar_collapse", (value) => {
+			this.toogleCollapse(value)
+		})
 	}
 
 	collapseDebounce = null
@@ -216,18 +219,20 @@ export default class Sidebar extends React.Component {
 			}
 		}
 
-		this.setState({ editMode: to })
+		this.setState({ editMode: to, collapsed: false })
 	}
 
 	toogleCollapse = (to) => {
-		if (window.app.settings.is("collapseOnLooseFocus", true) && !this.state.editMode) {
+		if (!this.state.editMode) {
 			this.setState({ collapsed: to ?? !this.state.collapsed })
-		} else {
-			this.setState({ collapsed: false })
 		}
 	}
 
 	onMouseEnter = () => {
+		if (window.app.settings.is("collapseOnLooseFocus", false)) {
+			return false
+		}
+
 		clearTimeout(this.collapseDebounce)
 		this.collapseDebounce = null
 
@@ -237,8 +242,12 @@ export default class Sidebar extends React.Component {
 	}
 
 	handleMouseLeave = () => {
+		if (window.app.settings.is("collapseOnLooseFocus", false)) {
+			return false
+		}
+
 		if (!this.state.collapsed) {
-			this.collapseDebounce = setTimeout(() => { this.toogleCollapse(true) }, 500)
+			this.collapseDebounce = setTimeout(() => { this.toogleCollapse(true) }, window.app.settings.get("autoCollapseDelay") ?? 500)
 		}
 	}
 
@@ -272,8 +281,8 @@ export default class Sidebar extends React.Component {
 				className={classnames("sidebar", { ["edit_mode"]: this.state.editMode, ["hidden"]: !this.state.visible })}
 			>
 				<div className="app_sidebar_header">
-					<div className="app_sidebar_header_logo">
-						<img src={config.logo?.alt ?? null} />
+					<div className={classnames("app_sidebar_header_logo", { ["collapsed"]: this.state.collapsed })}>
+						<img src={this.state.collapsed ? config.logo?.alt : config.logo?.full} />
 					</div>
 				</div>
 
