@@ -12,10 +12,10 @@ export default {
         alt: "/logo_alt.svg"
     },
     api: {
-        address: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.http_api,
+        address: defaultRemotesOrigins.http_api,//process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.http_api,
     },
     ws: {
-        address: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : defaultRemotesOrigins.ws_api,
+        address: defaultRemotesOrigins.ws_api, //process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : defaultRemotesOrigins.ws_api,
     },
     app: {
         title: packagejson.name,
