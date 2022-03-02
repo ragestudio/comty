@@ -14,6 +14,7 @@ export default class PostsController extends ComplexController {
             const post = new Post({
                 user_id: typeof user_id === "object" ? user_id.toString() : user_id,
                 message: String(message).toString(),
+                created_at: new Date().getTime(),
             })
 
             await post.save()
@@ -29,14 +30,46 @@ export default class PostsController extends ComplexController {
 
             return post
         },
+        likePost: async (payload) => {
+            const { user_id, post_id } = payload
+            const userData = await User.findById(user_id)
+            const postData = await Post.findById(post_id)
+
+            postData.likes.push(user_id)
+            await postData.save()
+
+            global.wsInterface.io.emit(`like.post`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
+            global.wsInterface.io.emit(`like.post.${postData.user_id}`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
+
+            return postData
+        }
     }
 
     get = {
         "/feed": Schematized({
             select: ["user_id"]
         }, async (req, res) => {
-            let posts = await Post.find(req.selection)
+            const feedLength = req.query?.feedLength ?? 25
+            const feedSkip = req.query?.feedSkip ?? 0
 
+            let leghtOffset = feedLength * feedSkip
+
+            console.log(leghtOffset, feedSkip)
+
+            // fetch posts from later of lenghtOffset with a maximum of feedLength
+            // make sort by date descending
+            let posts = await Post.find(req.selection)
+                .sort({ created_at: -1 })
+                .skip(leghtOffset)
+                .limit(feedLength)
+
+            // fetch and add user data to each post
             posts = posts.map(async (post) => {
                 const user = await User.findById(post.user_id)
 
@@ -63,6 +96,17 @@ export default class PostsController extends ComplexController {
             })
 
             return res.json(post)
-        })
+        }),
+        "/like": Schematized({
+            required: ["post_id"],
+            select: ["post_id"],
+        }, async (req, res) => {
+            const post = await this.methods.likePost({
+                user_id: req.user.id,
+                post_id: req.selection.post_id,
+            })
+
+            return res.json(post)
+        }),
     }
 }
