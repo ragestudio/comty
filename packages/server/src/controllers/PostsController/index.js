@@ -35,6 +35,13 @@ export default class PostsController extends ComplexController {
             const userData = await User.findById(user_id)
             const postData = await Post.findById(post_id)
 
+            if (postData.likes.includes(user_id)) {
+                postData.likes = postData.likes.filter(id => id !== user_id)
+                await postData.save()
+
+                return false
+            }
+
             postData.likes.push(user_id)
             await postData.save()
 
@@ -46,9 +53,36 @@ export default class PostsController extends ComplexController {
                 ...postData.toObject(),
                 user: userData.toObject(),
             })
+            global.wsInterface.io.emit(`like.post.${post_id}`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
 
             return postData
-        }
+        },
+        unlikePost: async (payload) => {
+            const { user_id, post_id } = payload
+            const userData = await User.findById(user_id)
+            const postData = await Post.findById(post_id)
+
+            postData.likes = postData.likes.filter(id => id !== user_id)
+            await postData.save()
+
+            global.wsInterface.io.emit(`unlike.post`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
+            global.wsInterface.io.emit(`unlike.post.${postData.user_id}`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
+            global.wsInterface.io.emit(`unlike.post.${post_id}`, {
+                ...postData.toObject(),
+                user: userData.toObject(),
+            })
+
+            return postData
+        },
     }
 
     get = {
@@ -102,11 +136,42 @@ export default class PostsController extends ComplexController {
             select: ["post_id"],
         }, async (req, res) => {
             const post = await this.methods.likePost({
-                user_id: req.user.id,
+                user_id: req.user._id.toString(),
                 post_id: req.selection.post_id,
+            }).catch((err) => {
+                return false
             })
 
-            return res.json(post)
+            if (!post) {
+                return res.json({
+                    sucess: false,
+                })
+            }
+
+            return res.json({
+                sucess: true,
+            })
+        }),
+        "/unlike": Schematized({
+            required: ["post_id"],
+            select: ["post_id"],
+        }, async (req, res) => {
+            const post = await this.methods.unlikePost({
+                user_id: req.user._id.toString(),
+                post_id: req.selection.post_id,
+            }).catch((err) => {
+                return false
+            })
+
+            if (!post) {
+                return res.json({
+                    sucess: false,
+                })
+            }
+
+            return res.json({
+                sucess: true,
+            })
         }),
     }
 }
