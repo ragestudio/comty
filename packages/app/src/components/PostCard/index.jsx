@@ -87,7 +87,7 @@ function PostActions(props) {
         </div>
         {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
             <div className="icon">
-                <Icons.MoreHorizontal />
+                <Icons.MoreVertical />
             </div>
         </div>}
     </div>
