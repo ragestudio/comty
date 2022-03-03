@@ -36,7 +36,8 @@ class SettingsController {
         this.settings[key] = value
         store.set(this.storeKey, this.settings)
 
-        window.app.eventBus.emit("setting_update", { key, value })
+        window.app.eventBus.emit("setting.update", { key, value })
+        window.app.eventBus.emit(`setting.update.${key}`, value)
 
         return this.settings
     }
