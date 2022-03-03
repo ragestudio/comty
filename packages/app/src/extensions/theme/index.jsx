@@ -95,6 +95,8 @@ export class ThemeController {
 		store.remove(this.themeManifestStorageKey)
 		store.remove(this.modificationStorageKey)
 
+		window.app.settings.set("primaryColor", this.theme.staticVars.primaryColor)
+
 		return this.init()
 	}
 
