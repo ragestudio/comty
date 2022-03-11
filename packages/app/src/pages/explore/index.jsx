@@ -5,8 +5,6 @@ import { InfiniteScroll } from "antd-mobile"
 
 import "./index.less"
 
-const ContainerHeight = 700;
-
 export default class PostsExplorer extends React.Component {
     state = {
         loading: true,
