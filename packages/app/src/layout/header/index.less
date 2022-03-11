@@ -1,31 +1,31 @@
 @import "theme/index.less";
 
 .app_header {
-	user-select: none;
+	user-select         : none;
 	--webkit-user-select: none;
-	
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	z-index: 100;
 
-	height: @app_header_height!important;
+	display       : flex;
+	flex-direction: row;
+	align-items   : center;
+	z-index       : 100;
+
+	height : @app_header_height !important;
 	padding: 10px;
 
 	transition: all ease-in-out 150ms;
 
-	background: var(--background-color-primary)!important;
-	background-color: var(--background-color-primary)!important;
+	background      : var(--background-color-primary) !important;
+	background-color: var(--background-color-primary) !important;
 
-	border-bottom: 1px var(--background-color-accent) solid;
+	border-bottom: 1px var(--border-color) solid;
 
-	> div {
+	>div {
 		margin-right: 16px;
 	}
 
 	&.hidden {
 		opacity: 0;
-		height: 0 !important;
+		height : 0 !important;
 		padding: 0 !important;
 	}
 }
