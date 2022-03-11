@@ -12,6 +12,10 @@ import "./index.less"
 function PostHeader(props) {
     const [timeAgo, setTimeAgo] = React.useState(0)
 
+    const goToProfile = () => {
+        window.app.goToAccount(props.postData.user?.username)
+    }
+
     const updateTimeAgo = () => {
         setTimeAgo(moment(props.postData.created_at ?? "").fromNow())
     }
@@ -35,8 +39,9 @@ function PostHeader(props) {
             </div>
             <div className="info">
                 <div>
-                    <h1>
+                    <h1 onClick={goToProfile}>
                         {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
+                        {props.postData.user?.verified && <Icons.verifiedBadge />}
                     </h1>
                 </div>
 
