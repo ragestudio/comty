@@ -51,7 +51,7 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
-import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n } from "extensions"
+import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n, Debug } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Navigation } from "components"
@@ -176,7 +176,10 @@ class App {
 					content: "Connection restored",
 				})
 			}
-		}
+		},
+		"appLoadError": function (error) {
+
+		},
 	}
 
 	static windowContext() {
@@ -328,7 +331,7 @@ class App {
 
 		await Promise.tasked(initializationTasks).catch((reason) => {
 			console.error(`[App] Initialization failed: ${reason.cause}`)
-			window.app.eventBus.emit("crash", reason.cause, reason.details)
+			window.app.eventBus.emit("appLoadError", reason.cause, reason.details)
 		})
 	}
 
@@ -399,5 +402,6 @@ export default CreateEviteApp(App, {
 		Render.extension,
 		Theme.extension,
 		SplashExtension,
+		Debug,
 	],
 })
