@@ -27,7 +27,7 @@
     "@emotion/css": "11.0.0",
     "@foxify/events": "2.0.1",
     "@loadable/component": "5.15.2",
-    "antd": "4.18.6",
+    "antd": "^4.19.1",
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
     "classnames": "2.3.1",
@@ -68,7 +68,7 @@
     "react-reveal": "1.2.2",
     "react-rnd": "10.3.5",
     "react-router": "6.2.1",
-    "react-router-config": "5.1.1",
+    "react-router-config": "^5.1.1",
     "react-router-dom": "6.2.1",
     "store": "^2.0.12",
     "styled-components": "^5.3.3",
@@ -92,6 +92,7 @@
     "express": "^4.17.1",
     "typescript": "^4.3.5",
     "vite": "2.7.13",
+    "vite-plugin-next-react-router": "^0.6.2",
     "vite-plugin-pages": "0.12.x"
   }
 }
