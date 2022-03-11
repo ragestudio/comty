@@ -7,3 +7,4 @@ export * as Notifications from "./notifications"
 
 export { default as SettingsController } from "./settings"
 export { default as API } from "./api"
+export { default as Debug } from "./debug"
