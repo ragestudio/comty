@@ -14,5 +14,9 @@
     "aspect": {
         "title": "Aspect",
         "icon": "Eye"
+    },
+    "account.basicInfo": {
+        "title": "Basic Information",
+        "icon": "Info"
     }
 }

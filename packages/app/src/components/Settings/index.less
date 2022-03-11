@@ -35,37 +35,61 @@
 		}
 
 		.header {
-			display    : flex;
-			align-items: center;
-			color      : var(--background-color-contrast);
+			display       : inline-flex;
+			flex-direction: row;
+			align-items   : center;
+			justify-content: space-between;
+			width: 100%;
 
-			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6 {
-				margin: 0;
-				color : var(--background-color-contrast);
+			.title {
+				display    : flex;
+				align-items: center;
+				color      : var(--background-color-contrast);
+
+				h1,
+				h2,
+				h3,
+				h4,
+				h5,
+				h6 {
+					margin: 0;
+					color : var(--background-color-contrast);
+				}
+
+				p {
+					font-size: 11px;
+					color    : var(--background-color-contrast);
+					margin   : 0;
+				}
+
+				>div {
+					margin-right: 10px;
+				}
 			}
 
-			p {
-				font-size: 11px;
-				color    : var(--background-color-contrast);
-				margin   : 0;
-			}
+			.extraActions {
+				display: inline-flex;
+				align-items: center;
 
-			>div {
-				margin-right: 10px;
+				> div {
+					margin-right: 10px;
+				}
 			}
 		}
 
 		.component {
+			display       : flex;
+			flex-direction: column;
+
 			--ignore-dragger: true;
 			padding         : 0 20px;
 
 			span {
 				color: var(--background-color-contrast);
+			}
+
+			> div {
+				margin-bottom: 10px;
 			}
 		}
 	}
@@ -105,5 +129,10 @@
 				padding: 0 7px;
 			}
 		}
+	}
+
+	.ant-tabs-nav-list {
+		width          : 100%;
+		justify-content: space-evenly;
 	}
 }

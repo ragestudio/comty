@@ -5,6 +5,7 @@ import { Select } from "antd"
 export default [
     {
         "id": "language",
+        "storaged": true,
         "group": "general",
         "type": "Select",
         "icon": "MdTranslate",
@@ -19,6 +20,7 @@ export default [
     },
     {
         "id": "forceMobileMode",
+        "storaged": true,
         "group": "general",
         "type": "Switch",
         "icon": "MdSmartphone",
@@ -28,6 +30,7 @@ export default [
     },
     {
         "id": "haptic_feedback",
+        "storaged": true,
         "group": "general",
         "type": "Switch",
         "icon": "MdVibration",
@@ -36,6 +39,7 @@ export default [
     },
     {
         "id": "selection_longPress_timeout",
+        "storaged": true,
         "group": "general",
         "type": "Slider",
         "icon": "MdTimer",
@@ -56,6 +60,7 @@ export default [
     },
     {
         "id": "notifications_sound",
+        "storaged": true,
         "group": "notifications",
         "type": "Switch",
         "icon": "MdVolumeUp",
@@ -64,6 +69,7 @@ export default [
     },
     {
         "id": "notifications_vibrate",
+        "storaged": true,
         "group": "notifications",
         "type": "Switch",
         "icon": "MdVibration",
@@ -73,6 +79,7 @@ export default [
     },
     {
         "id": "notifications_sound_volume",
+        "storaged": true,
         "group": "notifications",
         "type": "Slider",
         "icon": "MdVolumeUp",
@@ -87,6 +94,7 @@ export default [
     },
     {
         "id": "edit_sidebar",
+        "storaged": true,
         "group": "sidebar",
         "type": "Button",
         "icon": "Edit",
@@ -96,6 +104,7 @@ export default [
     },
     {
         "id": "collapseOnLooseFocus",
+        "storaged": true,
         "group": "sidebar",
         "type": "Switch",
         "icon": "Columns",
@@ -105,6 +114,7 @@ export default [
     },
     {
         "id": "autoCollapseDelay",
+        "storaged": true,
         "group": "sidebar",
         "type": "Slider",
         "icon": "Wh",
@@ -128,6 +138,7 @@ export default [
     },
     {
         "id": "reduceAnimations",
+        "storaged": true,
         "group": "aspect",
         "type": "Switch",
         "icon": "MdOutlineAnimation",
@@ -136,6 +147,7 @@ export default [
     },
     {
         "id": "darkMode",
+        "storaged": true,
         "group": "aspect",
         "type": "Switch",
         "icon": "Moon",
@@ -145,11 +157,13 @@ export default [
     },
     {
         "id": "primaryColor",
+        "storaged": true,
         "group": "aspect",
         "type": "SliderColorPicker",
         "title": "Primary color",
         "description": "Change primary color of the application.",
         "emitEvent": "modifyTheme",
+        "reloadValueOnUpdateEvent": "resetTheme",
         "emissionValueUpdate": (value) => {
             return {
                 primaryColor: value
@@ -158,6 +172,7 @@ export default [
     },
     {
         "id": "resetTheme",
+        "storaged": true,
         "group": "aspect",
         "type": "Button",
         "title": "Reset theme",
@@ -165,6 +180,6 @@ export default [
             "children": "Default Theme"
         },
         "emitEvent": "resetTheme",
-        "noStorage": true
+        "noUpdate": true,
     }
 ]
