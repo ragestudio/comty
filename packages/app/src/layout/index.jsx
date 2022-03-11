@@ -1,11 +1,11 @@
 import React from "react"
 import classnames from "classnames"
-import * as antd from 'antd'
+import * as antd from "antd"
 
-import Sidebar from './sidebar'
-import Header from './header'
-import Drawer from './drawer'
-import Sidedrawer from './sidedrawer'
+import Sidebar from "./sidebar"
+import Header from "./header"
+import Drawer from "./drawer"
+import Sidedrawer from "./sidedrawer"
 import BottomBar from "./bottomBar"
 
 const LayoutRenders = {
