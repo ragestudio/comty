@@ -9,13 +9,53 @@ import AvatarController from "dicebar_lib"
 import _ from "lodash"
 
 const AllowedUserUpdateKeys = [
+    "avatar",
     "username",
     "email",
     "fullName",
+    "verified",
 ]
 
 export default class UserController extends ComplexController {
     static refName = "UserController"
+
+    methods = {
+        update: async (payload) => {
+            if (typeof payload.user_id === "undefined") {
+                throw new Error("No user_id provided")
+            }
+            if (typeof payload.update === "undefined") {
+                throw new Error("No update provided")
+            }
+
+            let user = await User.findById(payload.user_id)
+
+            if (!user) {
+                throw new Error("User not found")
+            }
+
+            const updateKeys = Object.keys(payload.update)
+
+            updateKeys.forEach((key) => {
+                if (!AllowedUserUpdateKeys.includes(key)) {
+                    return false
+                }
+
+                user[key] = payload.update[key]
+            })
+
+            await user.save()
+
+            global.wsInterface.io.emit(`user.update`, {
+                ...user.toObject(),
+            })
+            global.wsInterface.io.emit(`user.update.${payload.user_id}`, {
+                ...user.toObject(),
+            })
+
+            return user.toObject()
+        }
+    }
 
     get = {
         "/self": {
@@ -164,32 +204,58 @@ export default class UserController extends ComplexController {
                 required: ["_id", "update"],
                 select: ["_id", "update"],
             }, async (req, res) => {
-                let user = await User.findById(req.selection._id).catch(() => {
-                    return false
-                })
-
-                if (!user) {
-                    return res.status(404).json({ error: "User not exists" })
+                if (!req.selection.user_id) {
+                    req.selection.user_id = req.user._id.toString()
                 }
 
-                if ((user._id.toString() !== req.user._id.toString()) && (req.hasRole("admin") === false)) {
+                if ((req.selection.user_id !== req.user._id.toString()) && (req.hasRole("admin") === false)) {
                     return res.status(403).json({ error: "You are not allowed to update this user" })
                 }
 
-                AllowedUserUpdateKeys.forEach((key) => {
-                    if (typeof req.selection.update[key] !== "undefined") {
-                        user[key] = req.selection.update[key]
-                    }
-                })
-
-                user.save()
-                    .then(() => {
-                        return res.send(user)
+                this.methods.update({
+                    user_id: req.selection.user_id,
+                    update: req.selection.update,
+                }).then((user) => {
+                    return res.json({
+                        ...user
                     })
+                })
                     .catch((err) => {
-                        return res.send(500).send(err)
+                        return res.send(500).json({
+                            error: err.message
+                        })
                     })
             }),
         },
+        "/unset_public_name": {
+            middlewares: ["withAuthentication"],
+            fn: Schematized({
+                select: ["user_id", "roles"],
+            }, async (req, res) => {
+                if (!req.selection.user_id) {
+                    req.selection.user_id = req.user._id.toString()
+                }
+
+                if ((req.selection.user_id !== req.user._id.toString()) && (req.hasRole("admin") === false)) {
+                    return res.status(403).json({ error: "You are not allowed to update this user" })
+                }
+
+                this.methods.update({
+                    user_id: req.selection.user_id,
+                    update: {
+                        fullName: undefined
+                    }
+                }).then((user) => {
+                    return res.json({
+                        ...user
+                    })
+                })
+                    .catch((err) => {
+                        return res.send(500).json({
+                            error: err.message
+                        })
+                    })
+            })
+        }
     }
 }
