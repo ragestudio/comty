@@ -62,7 +62,7 @@ body {
 	text-rendering : optimizeLegibility !important;
 
 	background-color: var(--background-color-primary) !important;
-	font-family     : "Varela Round", sans-serif;
+	font-family     : var(--fontFamily);
 }
 
 #root {
@@ -159,7 +159,7 @@ body {
 
 .fade-transverse-active {
 	transition: all 250ms;
-	height    : 100%;
+	height    : fit-content;
 	width     : 100%;
 }
 
@@ -186,6 +186,19 @@ body {
 .fade-scale-leave {
 	opacity  : 0;
 	transform: scale(0.8);
+}
+
+.fade-opacity-active {
+	transition: all 250ms;
+	opacity   : 1;
+}
+
+.fade-opacity-leave {
+	opacity: 0;
+}
+
+.fade-opacity-enter {
+	opacity: 1;
 }
 
 .app_initialization {
