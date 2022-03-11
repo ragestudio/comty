@@ -6,4 +6,7 @@ export default {
     avatar: { type: String },
     email: String,
     roles: { type: Array, default: [] },
+    verified: { type: Boolean, default: false },
+    createdAt: { type: Date },
+    badges: { type: Array, default: [] },
 }
