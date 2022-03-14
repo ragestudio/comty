@@ -1,7 +1,7 @@
 import { ComplexController } from "linebridge/dist/classes"
 import passport from "passport"
 
-import { User } from "../../models"
+import { User, Follow } from "../../models"
 import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
 import _ from "lodash"
@@ -59,6 +59,43 @@ export default class UserController extends ComplexController {
             })
 
             return user.toObject()
+        },
+        follow: async (payload) => {
+            if (typeof payload.user_id === "undefined") {
+                throw new Error("No user_id provided")
+            }
+            if (typeof payload.to === "undefined") {
+                throw new Error("No to provided")
+            }
+
+            const user = await User.findById(payload.user_id)
+
+            if (!user) {
+                throw new Error("User not found")
+            }
+
+            const follow = await Follow.findOne({
+                user_id: payload.user_id,
+                to: payload.to,
+            })
+
+            if (follow) {
+                throw new Error("Already following")
+            }
+
+            await Follow.create({
+                user_id: payload.user_id,
+                to: payload.to,
+            })
+
+            global.wsInterface.io.emit(`user.follow`, {
+                ...user.toObject(),
+            })
+            global.wsInterface.io.emit(`user.follow.${payload.user_id}`, {
+                ...user.toObject(),
+            })
+
+            return "ok"
         }
     }
 
@@ -147,6 +184,27 @@ export default class UserController extends ComplexController {
                 return res.json(result)
             })
         },
+    }
+
+    put = {
+        "/follow_user": {
+            middlewares: ["withAuthentication"],
+            fn: Schematized({
+                required: ["to"],
+                select: ["to"],
+            }, async (req, res) => {
+                const selfUserId = req.user._id.toString()
+
+                const result = this.methods.follow({
+                    user_id: selfUserId,
+                    to: req.selection.to,
+                }).catch((error) => {
+                    return res.status(500).json({ error: error.message })
+                })
+
+                return res.json(result)
+            })
+        }
     }
 
     post = {
