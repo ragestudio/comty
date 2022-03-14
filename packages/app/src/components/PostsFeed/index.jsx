@@ -1,85 +1,100 @@
 import React from "react"
 import * as antd from "antd"
-import { PostCard, PostCreator } from "components"
-import { InfiniteScroll } from "antd-mobile"
+import { PostCard } from "components"
+
+import List from "rc-virtual-list"
 
 import "./index.less"
 
+
 export default class PostsFeed extends React.Component {
     state = {
-        loading: true,
-        skipStep: 0,
-        lastLength: 0,
-        posts: [],
+        initialLoading: true,
+        list: [],
+        animating: false,
     }
 
     api = window.app.request
+    listRef = React.createRef()
 
     componentDidMount = async () => {
-        this.toogleLoading(true)
+        await this.loadPosts()
 
-        await this.fetchPosts()
-
-        window.app.ws.listen(`new.post`, (data) => {
-            this.addPost(data)
+        window.app.ws.listen(`new.post`, async (data) => {
+            this.onInsert(data)
         })
 
-        this.toogleLoading(false)
-    }
-
-    toogleLoading = (to) => {
-        this.setState({ loading: to ?? !this.state.loading })
-    }
-
-    addPost = (post) => {
-        this.setState({
-            posts: [post, ...this.state.posts],
+        await this.setState({
+            initialLoading: false,
         })
     }
 
-    fetchPosts = async () => {
-        const posts = await this.api.get.feed(undefined, {
+    loadPosts = async ({
+        startIndex,
+        stopIndex,
+    } = {}) => {
+        const result = await this.api.get.feed(undefined, {
+            startIndex,
+            stopIndex,
+            feedLength: this.props.feedLength,
             user_id: this.props.fromUserId,
-            feedSkip: this.state.skipStep,
-        }).catch(error => {
-            console.error(error)
-            antd.message.error(error)
-
-            return false
         })
 
-        if (posts) {
-            console.log(posts)
-            this.setState({ posts: [...posts, ...this.state.posts,], lastLength: posts.length })
+        console.log(result)
+
+        if (result) {
+            this.setState({ list: result })
         }
     }
 
-    hasMore = () => {
-        return this.state.posts.length < this.state.lastLength
+    onAppear = (...args) => {
+        console.log('Appear:', args)
+        this.setState({ animating: false })
     }
 
-    loadMore = async () => {
-        await this.setState({ skipStep: this.state.skipStep + 1 })
-        await this.fetchPosts()
+    lockForAnimation = () => {
+        this.setState({ animating: true })
+    }
+
+    onInsert = async (data) => {
+        const updatedList = this.state.list
+
+        updatedList.unshift(data)
+
+        await this.setState({
+            list: updatedList,
+        })
+
+        this.lockForAnimation()
     }
 
     render() {
-        if (this.state.loading) {
+        if (this.state.initialLoading) {
             return <antd.Skeleton active />
         }
+        
+        if (this.state.list.length === 0) {
+            return <antd.Empty />
+        }
 
-        return <div className="postsFeed">
-            <div className="wrapper">
-                {
-                    this.state.posts.map(post => {
-                        return <PostCard data={post} />
-                    })
-                }
-
-                <InfiniteScroll loadMore={this.loadMore} hasMore={this.hasMore} >
-                    <div>Loading more...</div>
-                </InfiniteScroll>
-            </div>
+        return <div
+            className="postsFeed"
+        >
+            <List
+                ref={this.listRef}
+                data={this.state.list}
+                height="80vh"
+                itemHeight="100%"
+                className="content"
+            >
+                {(item, index) => (
+                    <PostCard
+                        data={item}
+                        motionAppear={this.state.animating && index === 0}
+                        onAppear={this.onAppear}
+                    />
+                )}
+            </List>
         </div>
     }
 }
