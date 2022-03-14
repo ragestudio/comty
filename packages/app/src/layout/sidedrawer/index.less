@@ -1,0 +1,21 @@
+@import "theme/vars.less";
+
+.sidedrawer {
+    width: 30vw; // by default
+
+    background-color: var(--sidedrawer-background-color);
+    border-radius: @app_sidebar_borderRadius 0 0 @app_sidebar_borderRadius;
+
+    word-break: break-all;
+
+    transition: all 150ms ease-out;
+
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: overlay;
+
+    &.hided {
+        width: 0;
+        padding: 0;
+    }
+}

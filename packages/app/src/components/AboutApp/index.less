@@ -1,0 +1,75 @@
+.aboutApp_wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+}
+
+.aboutApp_card {
+    height: fit-content;
+    width: 80vw;
+
+    svg {
+        margin: 0;
+    }
+
+    .ant-tag {
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .group {
+        width: 100%;
+        display: inline-flex;
+        flex-direction: column;
+        justify-content: center;
+        
+        > div {
+            display: inline-flex;
+            margin-left: 10px;
+        }
+
+        margin-bottom: 10px;
+    }
+
+  
+}
+
+.aboutApp_card_header {
+    .adm-card-header-title {
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        h1,h2,h3 {
+            margin: 0;
+        }
+
+        .branding {
+            display: flex;
+            flex-direction: column;
+
+            h1,h2,h3 {
+                height: fit-content;
+                line-height: 24px;
+            }
+
+            span {
+                height: fit-content;
+                color: var(--background-color-contrast);
+                font-size: 10px;
+            }
+        }
+        
+    }
+}

@@ -1,0 +1,22 @@
+[
+    {
+        "id": "main",
+        "title": "Dashboard",
+        "icon": "Home"
+    },
+    {
+        "id": "explore",
+        "title": "Explore",
+        "icon": "Compass"
+    },
+    {
+        "id": "saved",
+        "title": "Saved",
+        "icon": "Archive"
+    },
+    {
+        "id": "marketplace",
+        "title": "Marketplace",
+        "icon": "Package"
+    }
+]

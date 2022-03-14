@@ -1,26 +1,29 @@
-# dependencies
-/node_modules
-/npm-debug.log*
-/yarn-error.log
-/yarn.lock
+# Secrets
+/**/**/.env
+/**/**/origin.server
+/**/**/server.manifest
+/**/**/server.registry
 
-# production
-/build
-/dist
-/out
+# Trash
+/**/**/.crash.log
+/**/**/.tmp
+/**/**/.cache
+/**/**/out
+/**/**/.out
+/**/**/dist
+/**/**/node_modules
+/**/**/corenode_modules
+/**/**/.DS_Store
+/**/**/package-lock.json
+/**/**/yarn.lock
+/**/**/.evite
+/**/**/d_data
 
-# umi
-/packages/**/src/.umi
-/packages/**/src/.umi-production
-/packages/**/src/.umi-test
-/packages/**/.env.local
+# Logs
+/**/**/npm-debug.log*
+/**/**/yarn-error.log
+/**/**/dumps.log
+/**/**/corenode.log
 
-/packages/*/src/.umi
-/packages/*/src/.umi-production
-/packages/*/src/.umi-test
-/packages/*/.env.local
-
-/.env.local
-
-/packages/*/node_modules
-/packages/**/node_modules
+# Temporal configurations
+/**/**/.aliaser

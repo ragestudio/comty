@@ -1,0 +1,7 @@
+{
+    "appId": "com.ragestudio.comty",
+    "appName": "Comty",
+    "bundledWebRuntime": true,
+    "overrideUserAgent": "capacitor",
+    "webDir": "dist"
+}
