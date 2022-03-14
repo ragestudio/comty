@@ -13,8 +13,7 @@ import LinebridgeServer from "linebridge/dist/server"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
 import passport from "passport"
-import { User, Session } from "./models"
-import socketIo from "socket.io"
+import { User, Session, Config } from "./models"
 import jwt from "jsonwebtoken"
 
 const { Buffer } = require("buffer")
@@ -30,7 +29,7 @@ const LocalStrategy = require("passport-local").Strategy
 
 function parseConnectionString(obj) {
     const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
-    return `${db_driver}://${db_user}:${db_pwd}@${db_hostname}:${db_port}/${db_name}`
+    return `${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? ""}/${db_name ?? ""}`
 }
 
 class Server {
@@ -91,6 +90,8 @@ class Server {
 
     async initialize() {
         await this.connectToDB()
+        await this.initializeConfigDB()
+        await this.checkSetup()
         await this.initPassport()
         await this.initWebsockets()
 
@@ -101,7 +102,12 @@ class Server {
         return new Promise((resolve, reject) => {
             try {
                 console.log("🌐 Trying to connect to DB...")
-                mongoose.connect(parseConnectionString(this.env), { useNewUrlParser: true, useUnifiedTopology: true })
+                const dbUri = parseConnectionString(this.env)
+                //console.log(dbUri)
+                mongoose.connect(dbUri, {
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true
+                })
                     .then((res) => { return resolve(true) })
                     .catch((err) => { return reject(err) })
             } catch (err) {
@@ -115,6 +121,55 @@ class Server {
             setTimeout(() => {
                 this.connectToDB()
             }, 1000)
+        })
+    }
+
+    initializeConfigDB = async () => {
+        let serverConfig = await Config.findOne({ key: "server" }).catch(() => {
+            return false
+        })
+
+        if (!serverConfig) {
+            serverConfig = new Config({
+                key: "server",
+                value: {
+                    setup: false,
+                },
+            })
+
+
+            await serverConfig.save()
+        }
+    }
+
+    checkSetup = async () => {
+        return new Promise(async (resolve, reject) => {
+            let setupOk = (await Config.findOne({ key: "server" })).value?.setup ?? false
+
+            if (!setupOk) {
+                console.log("⚠️  Server setup is not complete, running setup proccess.")
+                let setupScript = await import("./setup")
+
+                setupScript = setupScript.default ?? setupScript
+
+                try {
+                    for await (let script of setupScript) {
+                        await script()
+                    }
+
+                    console.log("✅  Server setup complete.")
+
+                    await Config.updateOne({ key: "server" }, { value: { setup: true } })
+
+                    return resolve()
+                } catch (error) {
+                    console.log("❌  Server setup failed.")
+                    console.error(error)
+                    process.exit(1)
+                }
+            }
+
+            return resolve()
         })
     }
 
