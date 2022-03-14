@@ -90,17 +90,11 @@ export default class PostsController extends ComplexController {
             select: ["user_id"]
         }, async (req, res) => {
             const feedLength = req.query?.feedLength ?? 25
-            const feedSkip = req.query?.feedSkip ?? 0
-
-            let leghtOffset = feedLength * feedSkip
-
-            console.log(leghtOffset, feedSkip)
 
             // fetch posts from later of lenghtOffset with a maximum of feedLength
             // make sort by date descending
             let posts = await Post.find(req.selection)
                 .sort({ created_at: -1 })
-                .skip(leghtOffset)
                 .limit(feedLength)
 
             // fetch and add user data to each post
