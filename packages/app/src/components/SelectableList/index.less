@@ -1,0 +1,82 @@
+@selectableList_item_borderColor_active: rgba(51, 51, 51, 1);
+@selectableList_item_borderColor_normal: rgba(51, 51, 51, 0.3);
+
+.selectableList {
+	.selectableList_content {
+		.selectableList_item {
+			--ignore-dragger: true;
+			display: inline-flex;
+			overflow-x: overlay;
+
+			align-items: center;
+
+			user-select: none;
+			--webkit-user-select: none;
+
+			width: 100%;
+			height: fit-content;
+
+			border: @selectableList_item_borderColor_normal 1px solid;
+			border-radius: 4px;
+
+			margin-bottom: 6px;
+			padding: 7px;
+
+			transition: all 150ms ease-in-out;
+
+			&.selected {
+				background-color: #f5f5f5;
+				transform: scale(0.98);
+				margin-bottom: 3px;
+			}
+
+			&.disabled {
+				opacity: 0.5;
+				pointer-events: none;
+			}
+
+			::-webkit-scrollbar {
+				position: absolute;
+				display: none;
+
+				width: 0;
+				height: 0;
+				z-index: 0;
+			}
+		}
+
+		.selectableList_item:active {
+			background-color: #f5f5f5;
+			transform: scale(0.98);
+			margin-bottom: 3px;
+		}
+	}
+
+	&.selectionEnabled {
+		.selectableList_content {
+			.selectableList_item {
+				cursor: pointer;
+
+				border: rgba(51, 51, 51, 0.3) 1px solid;
+				border-radius: 8px;
+				margin-bottom: 12px;
+
+				h1, h3 {
+					user-select: none;
+					--webkit-user-select: none;
+				}
+			}
+		}
+	}
+}
+
+.selectableList_group {
+	display: flex;
+	flex-direction: column;
+
+	.selectableList_subItems {
+		margin-left: 10px;
+	}
+
+	margin-bottom: 10px;
+}

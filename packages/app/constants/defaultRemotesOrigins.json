@@ -1,0 +1,4 @@
+{
+    "http_api": "https://indev_api.comty.pw",
+    "ws_api": "wss://indev_ws.comty.pw"
+}

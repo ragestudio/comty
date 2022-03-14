@@ -1,0 +1,18 @@
+{
+    "forceMobileMode": false,
+    "notifications_sound": true,
+    "notifications_vibrate": true,
+    "notifications_sound_volume": 50,
+    "selection_longPress_timeout": 600,
+    "autoCollapseDelay": 500,
+    "autoCollapseDelayEnabled": true,
+    "haptic_feedback": false,
+    "collapseOnLooseFocus": true,
+    "language": "en",
+    "sidebarKeys": [
+        "main",
+        "explore",
+        "saved",
+        "marketplace"
+    ]
+}

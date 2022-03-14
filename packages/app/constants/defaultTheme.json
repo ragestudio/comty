@@ -1,0 +1,37 @@
+{
+    "staticVars": {
+        "primaryColor": "#ff6064",
+        "fontFamily": "'Varela Round', sans-serif"
+    },
+    "defaultVariant": "light",
+    "variants": {
+        "light": {
+            "appColor": "#ff6064",
+            "background-color-primary": "#ffffff",
+            "background-color-primary2": "#f0f0f0",
+            "shadow-color": "#4b4b4b7c",
+            "background-color-accent": "#f0f2f5",
+            "background-color-contrast": "#4b4b4b",
+            "border-color": "#4b4b4b2a",
+            "sidebar-background-color": "var(--background-color-accent)",
+            "sidedrawer-background-color": "var(--background-color-accent)"
+        },
+        "dark": {
+            "appColor": "#ff6064",
+            "text-color": "#d2d2d2",
+            "svg-color": "var(--text-color)",
+            "shadow-color": "#3535357c",
+            "background-color-primary": "#262626",
+            "background-color-primary2": "#2c2c2c",
+            "background-color-accent": "#353535",
+            "background_disabled": "#0A0A0A",
+            "background-color-contrast": "#ffffff",
+            "border-color": "#4b4b4b2a",
+            "header-text-color": "#d2d2d2",
+            "button-background-color": "var(--primaryColor)",
+            "button-text-color": "var(--background-color-contrast)",
+            "sidebar-background-color": "var(--background-color-accent)",
+            "sidedrawer-background-color": "var(--background-color-accent)"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "general": {
+        "title": "General",
+        "icon": "Settings"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "icon": "Bell"
+    },
+    "sidebar": {
+        "title": "Sidebar",
+        "icon": "Layout"
+    },
+    "aspect": {
+        "title": "Aspect",
+        "icon": "Eye"
+    },
+    "account.basicInfo": {
+        "title": "Basic Information",
+        "icon": "Info"
+    }
+}

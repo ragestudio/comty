@@ -1,4 +1,0 @@
-[
-  {"key":"pro_boost","icon":"RocketOutlined","type":"switch","title":"CPRO™ Boost","description":"","require":"pro","value":false},
-  {"key":"allow_comments","icon":"CommentOutlined","type":"switch","title":"Allow Comments","description":"","require":"","value":true}
-]

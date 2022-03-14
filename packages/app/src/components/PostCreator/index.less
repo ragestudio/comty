@@ -1,0 +1,81 @@
+.postCreator {
+    width           : 100%;
+    padding         : 15px;
+    background-color: var(--background-color-accent);
+
+    max-width    : 600px;
+    border-radius: 7px;
+
+    .textInput {
+        display         : flex;
+        width           : 100%;
+        transition      : height 150ms ease-in-out;
+        background-color: var(--background-color-accent);
+
+        svg {
+            margin: 0 !important;
+        }
+
+        .avatar {
+            width : fit-content;
+            height: 45px;
+
+            display: flex;
+
+            img {
+                width        : 45px;
+                height       : 45px;
+                border-radius: 12px;
+            }
+        }
+
+        .ant-input {
+            color: var(--background-color-contrast);
+        }
+
+        .textArea {
+            border-radius: 8px !important;
+            transition   : all 150ms ease-in-out !important;
+
+            &.active {
+                background-color: var(--background-color-primary);
+            }
+        }
+
+        .ant-btn-primary {
+            z-index       : 10;
+            position      : relative;
+            border-radius : 0 10px 10px 0;
+            height        : 100%;
+            vertical-align: bottom;
+            border        : none;
+            box-shadow    : none;
+        }
+
+        .ant-input {
+            background-color: var(--background-color-accent);
+
+            z-index      : 10;
+            position     : relative;
+            border-color : transparent !important;
+            box-shadow   : none;
+            border-radius: 3px 0 0;
+            height       : 100%;
+            padding      : 5px 10px;
+            transition   : height 150ms linear;
+            width        : 100%;
+        }
+
+        .ant-btn-primary[disabled] {
+            background-color: var(--background-color-accent);
+        }
+
+        .ant-input:hover {
+            border-color: #1890ff;
+        }
+
+        .ant-input-affix-wrapper {
+            height: 100%;
+        }
+    }
+}

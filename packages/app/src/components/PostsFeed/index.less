@@ -1,0 +1,41 @@
+.postsFeed {
+    display        : flex;
+    flex-direction : column;
+    align-items    : center;
+    justify-content: center;
+
+    width: 100%;
+
+    .content {
+        overflow: visible;
+
+        display        : flex;
+        flex-direction : column;
+        align-items    : center;
+        justify-content: center;
+
+        width    : 100%;
+        max-width: 40vw;
+
+        .rc-virtual-list-holder {
+            overflow-y: visible !important;
+            width     : 100%;
+
+        }
+
+        .rc-virtual-list-holder-inner {
+            width   : 100%;
+            overflow: visible;
+
+            display        : flex;
+            flex-direction : column;
+            align-items    : center;
+            justify-content: center;
+
+            >div {
+                width        : 100%;
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

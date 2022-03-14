@@ -1,0 +1,15 @@
+{
+  "name": "comty-desktop",
+  "version": "0.0.1",
+  "main": "main/index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "17.1.2",
+    "electron-log": "^3.0.0",
+    "electron-is": "^1.0.0",
+    "wait-on": "^2.0.0"
+  }
+}
