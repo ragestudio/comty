@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  db:
+    image: "mongo:5.0"
+    ports:
+      - "27017:27017"
+    volumes:
+      - "./d_data/db:/data/db"
