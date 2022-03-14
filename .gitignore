@@ -17,6 +17,7 @@
 /**/**/package-lock.json
 /**/**/yarn.lock
 /**/**/.evite
+/**/**/d_data
 
 # Logs
 /**/**/npm-debug.log*
