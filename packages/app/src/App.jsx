@@ -51,7 +51,7 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
-import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n, Debug } from "extensions"
+import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n, Debug, Shortcuts } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Navigation } from "components"
@@ -186,16 +186,7 @@ class App {
 		return {
 			// TODO: Open with popup controller instead drawer controller
 			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
-			openSettings: (goTo) => {
-				window.app.DrawerController.open("settings", Settings, {
-					props: {
-						width: "fit-content",
-					},
-					componentProps: {
-						goTo,
-					}
-				})
-			},
+			openSettings: App.publicMethods.openSettings,
 			goMain: () => {
 				return window.app.setLocation(config.app.mainPath)
 			},
@@ -255,6 +246,19 @@ class App {
 		}
 	}
 
+	static publicMethods = {
+		"openSettings": (goTo) => {
+			window.app.DrawerController.open("settings", Settings, {
+				props: {
+					width: "fit-content",
+				},
+				componentProps: {
+					goTo,
+				}
+			})
+		}
+	}
+	
 	sessionController = new Session()
 	userController = new User()
 	state = {
@@ -275,6 +279,13 @@ class App {
 			StatusBar.setOverlaysWebView({ overlay: true })
 			window.app.hideStatusBar()
 		}
+
+		window.app.ShortcutsController.register({
+			key: ",",
+			meta: true,
+		}, (...args) => {
+			App.publicMethods.openSettings(...args)
+		})
 
 		this.eventBus.emit("render_initialization")
 
@@ -394,6 +405,7 @@ class App {
 
 export default CreateEviteApp(App, {
 	extensions: [
+		Shortcuts,
 		SettingsController,
 		i18n.extension,
 		Sound.extension,
