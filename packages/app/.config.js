@@ -1,4 +1,6 @@
 const path = require("path")
+const { builtinModules } = require("module")
+const { node } = require("../desktop/.electron-vendors.cache.json")
 
 const aliases = {
     "~/": `${path.resolve(__dirname, "src")}/`,
@@ -37,6 +39,30 @@ module.exports = (config = {}) => {
                 javascriptEnabled: true,
             }
         }
+    }
+
+    config.build = {
+        sourcemap: "inline",
+        target: `node${node}`,
+        outDir: "dist",
+        assetsDir: ".",
+        minify: process.env.MODE !== "development",
+        lib: {
+            entry: "src/index.ts",
+            formats: ["cjs"],
+        },
+        rollupOptions: {
+            external: [
+                "electron",
+                "electron-devtools-installer",
+                ...builtinModules.flatMap(p => [p, `node:${p}`]),
+            ],
+            output: {
+                entryFileNames: "[name].cjs",
+            },
+        },
+        emptyOutDir: true,
+        brotliSize: false,
     }
 
     return config
