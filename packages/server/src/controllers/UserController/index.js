@@ -1,11 +1,9 @@
 import { ComplexController } from "linebridge/dist/classes"
 import passport from "passport"
-import bcrypt from "bcrypt"
 
 import { User } from "../../models"
+import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
-import { Token, Schematized } from "../../lib"
-import AvatarController from "dicebar_lib"
 import _ from "lodash"
 
 const AllowedUserUpdateKeys = [
@@ -20,6 +18,13 @@ export default class UserController extends ComplexController {
     static refName = "UserController"
 
     methods = {
+        createNew: async (payload) => {
+            const user = await createUser(payload)
+
+            // maybe for the future can implement a event listener for this
+
+            return user
+        },
         update: async (payload) => {
             if (typeof payload.user_id === "undefined") {
                 throw new Error("No user_id provided")
@@ -171,33 +176,16 @@ export default class UserController extends ComplexController {
                 return SessionController.delete(req, res, next)
             },
         },
-        "/register": async (req, res) => {
-            User.findOne({ username: req.body.username })
-                .then((data) => {
-                    if (data) {
-                        return res.status(409).json("Username is already exists")
-                    }
+        "/register": Schematized({
+            required: ["username", "email", "password"],
+            select: ["username", "email", "password", "fullName"],
+        }, async (req, res) => {
+            const result = await this.methods.createNew(req.selection).catch((err) => {
+                return res.status(500).json(err.message)
+            })
 
-                    const avatar = AvatarController.generate({ seed: req.body.username, type: "initials" })
-                    const hash = bcrypt.hashSync(req.body.password, parseInt(process.env.BCRYPT_ROUNDS))
-
-                    let document = new User({
-                        username: req.body.username,
-                        fullName: req.body.fullName,
-                        avatar: avatar.uri,
-                        email: req.body.email,
-                        password: hash
-                    })
-
-                    return document.save()
-                })
-                .then(data => {
-                    return res.send(data)
-                })
-                .catch(err => {
-                    return res.json(err)
-                })
-        },
+            return res.json(result)
+        }),
         "/update_user": {
             middlewares: ["withAuthentication", "roles"],
             fn: Schematized({
