@@ -1,4 +1,4 @@
 {
-    "http_api": "http://es01.ragestudio.net:3000",
-    "ws_api": "ws://es01.ragestudio.net:3001"
+    "http_api": "https://indev_api.comty.pw",
+    "ws_api": "wss://indev_ws.comty.pw"
 }
