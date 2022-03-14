@@ -7,7 +7,18 @@ import classnames from "classnames"
 
 import { User } from "models"
 
+import CSSMotion from "rc-animate/lib/CSSMotion"
+import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect"
+
 import "./index.less"
+
+const getCurrentHeight = (node) => ({ height: node.offsetHeight })
+
+const getMaxHeight = (node) => {
+    return { height: node.scrollHeight }
+}
+
+const getCollapsedHeight = () => ({ height: 0, opacity: 0 })
 
 function PostHeader(props) {
     const [timeAgo, setTimeAgo] = React.useState(0)
@@ -98,7 +109,7 @@ function PostActions(props) {
     </div>
 }
 
-export default class PostCard extends React.Component {
+export class PostCard extends React.Component {
     state = {
         loading: true,
         selfId: null,
@@ -189,3 +200,47 @@ export default class PostCard extends React.Component {
         </div>
     }
 }
+
+export const PostCardAnimated = ({
+    data,
+    onAppear,
+    motionAppear,
+}, ref,) => {
+    const motionRef = React.useRef(false)
+
+    useLayoutEffect(() => {
+        return () => {
+            if (motionRef.current) {
+                onAppear()
+            }
+        }
+    }, [])
+
+    return <CSSMotion
+        ref={ref}
+        motionName="motion"
+        motionAppear={motionAppear}
+        onAppearStart={getCollapsedHeight}
+        onAppearActive={node => {
+            motionRef.current = true;
+            return getMaxHeight(node);
+        }}
+        onAppearEnd={onAppear}
+        onLeaveStart={getCurrentHeight}
+        onLeaveActive={getCollapsedHeight}
+        onLeaveEnd={() => {
+            onLeave(id)
+        }}
+    >
+        {(props, passedMotionRef) => {
+            return <PostCard
+                ref={passedMotionRef}
+                data={data}
+            />
+        }}
+    </CSSMotion>
+}
+
+export const ForwardedPostCardAnimated = React.forwardRef(PostCardAnimated)
+
+export default ForwardedPostCardAnimated
