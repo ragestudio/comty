@@ -258,7 +258,7 @@ class App {
 			})
 		}
 	}
-	
+
 	sessionController = new Session()
 	userController = new User()
 	state = {
@@ -280,12 +280,23 @@ class App {
 			window.app.hideStatusBar()
 		}
 
-		window.app.ShortcutsController.register({
-			key: ",",
-			meta: true,
-		}, (...args) => {
-			App.publicMethods.openSettings(...args)
-		})
+		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
+
+		if (userAgentPlatform.includes("mac")) {
+			window.app.ShortcutsController.register({
+				key: ",",
+				meta: true,
+			}, (...args) => {
+				App.publicMethods.openSettings(...args)
+			})
+		} else {
+			window.app.ShortcutsController.register({
+				key: ",",
+				ctrl: true,
+			}, (...args) => {
+				App.publicMethods.openSettings(...args)
+			})
+		}
 
 		this.eventBus.emit("render_initialization")
 
