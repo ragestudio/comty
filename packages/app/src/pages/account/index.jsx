@@ -76,9 +76,9 @@ export default class Account extends React.Component {
 				</div>
 
 				<div className="posts">
-				  <PostsFeed 
-				  	fromUserId={user._id}
-				  />
+					<PostsFeed
+						fromUserId={user._id}
+					/>
 				</div>
 			</div>
 		)
