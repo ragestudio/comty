@@ -247,6 +247,25 @@ export default class SettingsMenu extends React.PureComponent {
 		activeKey: "app"
 	}
 
+	componentDidMount() {
+		if (typeof this.props.close === "function") {
+			// register escape key to close settings menu
+			window.addEventListener("keydown", this.handleKeyDown)
+		}
+	}
+
+	componentWillUnmount() {
+		if (typeof this.props.close === "function") {
+			window.removeEventListener("keydown", this.handleKeyDown)
+		}
+	}
+
+	handleKeyDown = (event) => {
+		if (event.key === "Escape") {
+			this.props.close()
+		}
+	}
+
 	handlePageTransition = (key) => {
 		this.setState({
 			transitionActive: true,
