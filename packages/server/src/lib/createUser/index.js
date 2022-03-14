@@ -22,7 +22,7 @@ export default async function (payload) {
         roles: roles,
     })
 
-    user.save()
+    await user.save()
 
     return user
 }
