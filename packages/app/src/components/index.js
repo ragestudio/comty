@@ -1,3 +1,4 @@
+// COMPLEX COMPONENTS
 export { default as FormGenerator } from "./FormGenerator"
 export { default as Settings } from "./Settings"
 export { default as NotFound } from "./NotFound"
@@ -22,11 +23,16 @@ export { default as Navigation } from "./Navigation"
 export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 
-export { default as PostsFeed } from "./PostsFeed"
+// BUTTONS
 export { default as LikeButton } from "./LikeButton"
+export { default as FollowButton } from "./FollowButton"
+
+// POSTS
+export { default as PostsFeed } from "./PostsFeed"
 export { default as PostCard } from "./PostCard"
 export { default as PostCreator } from "./PostCreator"
 
+// OTHERS
 export * as AdminTools from "./AdminTools"
 export * as AboutApp from "./AboutApp"
 export * as Window from "./RenderWindow"
