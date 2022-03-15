@@ -13,10 +13,20 @@ function getSchemas() {
 
 const schemas = getSchemas()
 
+// server
 export const Config = mongoose.model("Config", schemas.Config, "config")
+
+// users
 export const User = mongoose.model("User", schemas.User, "accounts")
+export const UserFollow = mongoose.model("UserFollow", schemas.UserFollow, "follows")
 export const Session = mongoose.model("Session", schemas.Session, "sessions")
 export const Role = mongoose.model("Role", schemas.Role, "roles")
+export const Badge = mongoose.model("Badge", schemas.Badge, "badges")
+
+// posts
 export const Post = mongoose.model("Post", schemas.Post, "posts")
 export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
-//export const Tag = mongoose.model("Tag", schemas.Tag, "tags")
+
+// streamings
+
+// marketplace
