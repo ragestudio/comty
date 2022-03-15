@@ -18,5 +18,9 @@
     "account.basicInfo": {
         "title": "Basic Information",
         "icon": "Info"
+    },
+    "account.profile": {
+        "title": "Profile",
+        "icon": "Book"
     }
 }
