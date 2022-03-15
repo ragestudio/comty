@@ -1,0 +1,33 @@
+@borderRadius: 12px;
+
+.ant-result {
+    display       : flex;
+    flex-direction: column;
+    align-items   : center;
+}
+
+.ant-result-icon {
+    background-color: var(--background-color-accent);
+    border-radius   : @borderRadius;
+    width           : fit-content;
+    padding         : 20px;
+
+    svg {
+        margin: 0;
+        color : var(--background-color-contrast);
+    }
+}
+
+.ant-result-content {
+    background-color: var(--background-color-accent);
+    border-radius   : @borderRadius;
+
+    h2 {
+        color: var(--background-color-contrast);
+    }
+
+    h3 {
+        color      : var(--background-color-contrast);
+        font-weight: 100;
+    }
+}

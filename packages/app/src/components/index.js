@@ -32,6 +32,9 @@ export { default as PostsFeed } from "./PostsFeed"
 export { default as PostCard } from "./PostCard"
 export { default as PostCreator } from "./PostCreator"
 
+// USERS
+export { default as FollowersList } from "./FollowersList"
+
 // OTHERS
 export * as AdminTools from "./AdminTools"
 export * as AboutApp from "./AboutApp"
