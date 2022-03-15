@@ -20,6 +20,7 @@ export default async function (payload) {
         fullName: fullName,
         avatar: avatar ?? Avatars.generate({ seed: username, type: "initials" }).uri,
         roles: roles,
+        createdAt: new Date().getTime(),
     })
 
     await user.save()
