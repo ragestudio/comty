@@ -286,6 +286,7 @@ class App {
 			window.app.ShortcutsController.register({
 				key: ",",
 				meta: true,
+				preventDefault: true,
 			}, (...args) => {
 				App.publicMethods.openSettings(...args)
 			})
@@ -293,6 +294,7 @@ class App {
 			window.app.ShortcutsController.register({
 				key: ",",
 				ctrl: true,
+				preventDefault: true,
 			}, (...args) => {
 				App.publicMethods.openSettings(...args)
 			})

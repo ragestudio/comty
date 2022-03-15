@@ -8,8 +8,6 @@ export class ShortcutsController {
             const shortcut = this.shortcuts[key]
 
             if (shortcut) {
-                event.preventDefault()
-
                 if (typeof shortcut.ctrl === "boolean" && event.ctrlKey !== shortcut.ctrl) {
                     return
                 }
@@ -17,13 +15,17 @@ export class ShortcutsController {
                 if (typeof shortcut.shift === "boolean" && event.shiftKey !== shortcut.shift) {
                     return
                 }
-
+                
                 if (typeof shortcut.alt === "boolean" && event.altKey !== shortcut.alt) {
                     return
                 }
-
+                
                 if (typeof shortcut.meta === "boolean" && event.metaKey !== shortcut.meta) {
                     return
+                }
+                
+                if (shortcut.preventDefault) {
+                    event.preventDefault()
                 }
 
                 if (typeof shortcut.fn === "function") {
