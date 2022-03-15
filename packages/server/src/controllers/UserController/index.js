@@ -6,12 +6,11 @@ import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
 import _ from "lodash"
 
-const AllowedUserUpdateKeys = [
-    "avatar",
-    "username",
-    "email",
+const AllowedPublicUpdateFields = [
     "fullName",
-    "verified",
+    "avatar",
+    "email",
+    "description",
 ]
 
 export default class UserController extends ComplexController {
@@ -42,10 +41,6 @@ export default class UserController extends ComplexController {
             const updateKeys = Object.keys(payload.update)
 
             updateKeys.forEach((key) => {
-                if (!AllowedUserUpdateKeys.includes(key)) {
-                    return false
-                }
-
                 user[key] = payload.update[key]
             })
 
@@ -97,8 +92,13 @@ export default class UserController extends ComplexController {
                 ...user.toObject(),
             })
 
+            const followers = await UserFollow.find({
+                to: payload.to,
+            })
+
             return {
                 following: true,
+                followers: followers,
             }
         },
         unfollow: async (payload) => {
@@ -133,13 +133,39 @@ export default class UserController extends ComplexController {
                 ...user.toObject(),
             })
 
+            const followers = await UserFollow.find({
+                to: payload.to,
+            })
+
             return {
                 following: false,
+                followers: followers,
             }
         },
     }
 
     get = {
+        "/followers": Schematized({
+            required: ["user_id"],
+            select: ["user_id"],
+        }, async (req, res) => {
+            let followers = []
+            const follows = await UserFollow.find({
+                to: req.selection.user_id,
+            })
+
+            for await (const follow of follows) {
+                const user = await User.findById(follow.user_id)
+
+                if (!user) {
+                    continue
+                }
+
+                followers.push(user.toObject())
+            }
+
+            return res.json(followers)
+        }),
         "/is_followed": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
@@ -291,9 +317,7 @@ export default class UserController extends ComplexController {
                     })
                 }
 
-                return res.json({
-                    following: result.following
-                })
+                return res.json(result)
             })
         }
     }
@@ -349,9 +373,17 @@ export default class UserController extends ComplexController {
                     return res.status(403).json({ error: "You are not allowed to update this user" })
                 }
 
+                let update = {}
+
+                AllowedPublicUpdateFields.forEach((key) => {
+                    if (typeof req.selection.update[key] !== "undefined") {
+                        update[key] = req.selection.update[key]
+                    }
+                })
+
                 this.methods.update({
                     user_id: req.selection.user_id,
-                    update: req.selection.update,
+                    update: update,
                 }).then((user) => {
                     return res.json({
                         ...user
