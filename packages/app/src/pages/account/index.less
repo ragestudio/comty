@@ -1,67 +1,89 @@
-@borderColor : #dddddd;
 @borderRadius: 12px;
 
 .accountProfile {
-	.card {
+	padding: 0 20px;
+
+	.cover {
+		z-index      : 50;
+		position     : relative;
+		border-radius: @borderRadius @borderRadius 0 0;
+
+		outline: 1px solid var(--border-color);
+		content: "";
+
+		width: 100%;
+
+		background-position: center;
+		background-size    : cover;
+
+		height: 18vh;
+
+		transform: translate(0, 10px);
+	}
+
+	.profileCard {
+		z-index : 51;
+		position: relative;
+
 		display       : flex;
 		flex-direction: column;
-		color         : var(--background-color-contrast);
 
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6,
-		span {
-			color: var(--background-color-contrast);
-		}
+		color           : var(--background-color-contrast);
+		background-color: var(--background-color-primary);
 
-		.header {
-			position: relative;
-			display : inline-flex;
+		border       : 1px solid var(--border-color);
+		border-radius: @borderRadius;
 
-			align-items    : center;
+		padding: 20px 15px;
+
+		.basicData {
+			display        : inline-flex;
+			flex-direction : row;
 			justify-content: space-between;
 
-			z-index: 15;
-			width  : 100%;
-			padding: 12px 24px;
+			margin-bottom: 15px;
 
-			font-family: "Roboto Mono", monospace;
-
-			color        : var(--background-color-contrast);
-			border       : 1px solid var(--border-color);
-			border-radius: @borderRadius;
-
-			word-break: break-all;
-
-			.user {
-				display: inline-flex;
-				flex-direction: row;
-				
-				> div {
-					align-self: flex-start;
-					margin-right: 15px;
-
-					> div {
-						margin-bottom: 5px;
-					}
-				}
-
+			.avatar {
 				img {
-					width : 70px;
-					height: 70px;
+					width        : 70px;
+					height       : 70px;
 					border-radius: 4px;
 				}
-	
-				h1 {
-					margin   : 0;
+			}
 
-					font-size: 35px;
+			svg {
+				fill: var(--appColor);
+			}
+
+			.title {
+				display       : inline-flex;
+				flex-direction: row;
+				align-items   : center;
+			}
+
+			.field {
+				display       : inline-flex;
+				flex-direction: column;
+
+				margin-right: 15px;
+
+				h1 {
+					margin: 0;
+
+					font-size  : 35px;
 					line-height: 37px;
 				}
-				
+
+				>div {
+					display: inline-flex;
+				}
+			}
+		}
+
+		.description {
+			p {
+				word-break: break-all;
+				margin    : 0;
 			}
 		}
 
@@ -84,9 +106,41 @@
 
 			border-radius: 0 0 @borderRadius @borderRadius;
 		}
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		span,
+		p {
+			user-select: text;
+		}
 	}
 
-	>div {
-		margin-bottom: 10px;
+	.tabs {
+		.ant-tabs-nav {
+			margin: 0 30px 20px 30px;
+		}
+
+		.ant-tabs-nav::before {
+			border: none !important;
+		}
+
+		.ant-tabs-tab {
+			padding         : 8px 20px !important;
+			border-color    : var(--border-color) !important;
+			margin-right    : 20px !important;
+			background-color: var(--background-color-primary) !important;
+			border-top      : 0 !important;
+			border-radius   : 0 0 4px 4px !important;
+
+
+			svg {
+				font-size: 1rem;
+				margin   : 0 !important;
+			}
+		}
 	}
 }
