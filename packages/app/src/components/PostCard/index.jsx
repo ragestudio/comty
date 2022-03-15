@@ -46,7 +46,7 @@ function PostHeader(props) {
     return <div className="postHeader">
         <div className="userInfo">
             <div className="avatar">
-                <antd.Avatar src={props.postData.user?.avatar} />
+                <antd.Avatar shape="square" src={props.postData.user?.avatar} />
             </div>
             <div className="info">
                 <div>
