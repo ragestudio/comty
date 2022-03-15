@@ -1,10 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import { Translation } from "react-i18next"
+import classnames from "classnames"
 import moment from "moment"
 
 import { Icons } from "components/Icons"
-import { Skeleton, PostsFeed, FollowButton } from "components"
+import { Skeleton, PostsFeed, FollowButton, FollowersList } from "components"
 import { Session, User } from "models"
 
 import "./index.less"
@@ -13,6 +13,9 @@ export default class Account extends React.Component {
 	static bindApp = ["userController", "sessionController"]
 
 	state = {
+		transitionActive: false,
+		activeKey: "posts",
+
 		isSelf: false,
 		isFollowed: false,
 		user: null,
@@ -44,15 +47,16 @@ export default class Account extends React.Component {
 
 			if (!isSelf) {
 				const followedResult = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
-				const followersResult = await this.api.get.followers(undefined, { user_id: user._id }).catch(() => false)
 
 				if (followedResult) {
 					isFollowed = followedResult.isFollowed
 				}
+			}
 
-				if (followersResult) {
-					followers = followersResult
-				}
+			const followersResult = await this.api.get.followers(undefined, { user_id: user._id }).catch(() => false)
+
+			if (followersResult) {
+				followers = followersResult
 			}
 		}
 
@@ -92,6 +96,28 @@ export default class Account extends React.Component {
 		})
 	}
 
+	handlePageTransition = (key) => {
+		if (this.state.activeKey === key) {
+			return false
+		}
+
+		this.setState({
+			transitionActive: true,
+		})
+
+		setTimeout(() => {
+			this.setState({
+				activeKey: key
+			})
+
+			setTimeout(() => {
+				this.setState({
+					transitionActive: false,
+				})
+			}, 100)
+		}, 100)
+	}
+
 	render() {
 		const user = this.state.user
 
@@ -99,58 +125,82 @@ export default class Account extends React.Component {
 			return <Skeleton />
 		}
 
-		const createdAtYear = moment(new Date(Number(user.createdAt))).format("YYYY")
-
 		return (
 			<div className="accountProfile">
-				<div className="card">
-					<div className="header">
-						<div className="user">
-							<div>
-								<img src={user.avatar} />
+				{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
+				<div className="profileCard">
+					<div className="basicData">
+						<div className="title">
+							<div className="field">
+								<div className="avatar">
+									<img src={user.avatar} />
+								</div>
 							</div>
-							<div>
+
+							<div className="field">
 								<div>
 									<h1>{user.fullName ?? user.username}</h1>
-									<span>@{user.username}</span>
+									{user.verified && <Icons.verifiedBadge />}
 								</div>
 
-								<div id="statistics" className="statistics">
-									<div>
-										<span><Icons.Users /> {this.state.followers.length} Followers</span>
-									</div>
-									<div>
-										<span><Icons.FileText /> 0 Posts</span>
-									</div>
-									<div>
-										<span>Joined at {createdAtYear}</span>
-									</div>
-								</div>
+								<span>@{user.username}</span>
 							</div>
 						</div>
 
 						{!this.state.isSelf && <div>
 							<FollowButton
+								count={this.state.followers.length}
 								onClick={this.onClickFollow}
 								followed={this.state.isFollowed}
 							/>
 						</div>}
 					</div>
 
-					<div className="extension">
-						<div className="badgesList">
-							{user.badges.map((role, index) => {
-								return <antd.Tag>{role}</antd.Tag>
-							})}
-						</div>
+					<div className="description">
+						<p>
+							{user.description}
+						</p>
 					</div>
 				</div>
-
-				<div className="posts">
-					<PostsFeed
-						fromUserId={user._id}
-					/>
-				</div>
+				<antd.Tabs
+					className="tabs"
+					type="card"
+					activeKey={this.state.activeKey}
+					onTabClick={this.handlePageTransition}
+					destroyInactiveTabPane
+				>
+					<antd.Tabs.TabPane tab={<Icons.Inbox />} key="posts">
+						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
+							<div className="posts">
+								<PostsFeed
+									fromUserId={user._id}
+								/>
+							</div>
+						</div>
+					</antd.Tabs.TabPane>
+					<antd.Tabs.TabPane tab={<Icons.Users />} key="followers">
+						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
+							<FollowersList
+								followers={this.state.followers}
+							/>
+						</div>
+					</antd.Tabs.TabPane>
+					<antd.Tabs.TabPane tab={<Icons.Info />} key="details">
+						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
+							<div id="statistics" className="statistics">
+								<div>
+									<span><Icons.Users /> {this.state.followers.length} Followers</span>
+								</div>
+								<div>
+									<span><Icons.FileText /> 0 Posts</span>
+								</div>
+								<div>
+									<span>Joined at {moment(new Date(Number(user.createdAt))).format("YYYY")}</span>
+								</div>
+							</div>
+						</div>
+					</antd.Tabs.TabPane>
+				</antd.Tabs>
 			</div>
 		)
 	}
