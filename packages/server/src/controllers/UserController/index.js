@@ -1,7 +1,7 @@
 import { ComplexController } from "linebridge/dist/classes"
 import passport from "passport"
 
-import { User, Follow } from "../../models"
+import { User, UserFollow } from "../../models"
 import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
 import _ from "lodash"
@@ -74,7 +74,7 @@ export default class UserController extends ComplexController {
                 throw new Error("User not found")
             }
 
-            const follow = await Follow.findOne({
+            const follow = await UserFollow.findOne({
                 user_id: payload.user_id,
                 to: payload.to,
             })
@@ -83,10 +83,12 @@ export default class UserController extends ComplexController {
                 throw new Error("Already following")
             }
 
-            await Follow.create({
+            const newFollow = await UserFollow.create({
                 user_id: payload.user_id,
                 to: payload.to,
             })
+
+            await newFollow.save()
 
             global.wsInterface.io.emit(`user.follow`, {
                 ...user.toObject(),
@@ -95,11 +97,65 @@ export default class UserController extends ComplexController {
                 ...user.toObject(),
             })
 
-            return "ok"
-        }
+            return {
+                following: true,
+            }
+        },
+        unfollow: async (payload) => {
+            if (typeof payload.user_id === "undefined") {
+                throw new Error("No user_id provided")
+            }
+            if (typeof payload.to === "undefined") {
+                throw new Error("No to provided")
+            }
+
+            const user = await User.findById(payload.user_id)
+
+            if (!user) {
+                throw new Error("User not found")
+            }
+
+            const follow = await UserFollow.findOne({
+                user_id: payload.user_id,
+                to: payload.to,
+            })
+
+            if (!follow) {
+                throw new Error("Not following")
+            }
+
+            await follow.remove()
+
+            global.wsInterface.io.emit(`user.unfollow`, {
+                ...user.toObject(),
+            })
+            global.wsInterface.io.emit(`user.unfollow.${payload.user_id}`, {
+                ...user.toObject(),
+            })
+
+            return {
+                following: false,
+            }
+        },
     }
 
     get = {
+        "/is_followed": {
+            middlewares: ["withAuthentication"],
+            fn: Schematized({
+                required: ["user_id"],
+                select: ["user_id"]
+            }, async (req, res) => {
+                const isFollowed = await UserFollow.findOne({
+                    user_id: req.user._id.toString(),
+                    to: req.selection.user_id,
+                }).catch(() => false)
+
+                return res.json({
+                    isFollowed: Boolean(isFollowed),
+                })
+            }),
+        },
         "/self": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
@@ -111,7 +167,7 @@ export default class UserController extends ComplexController {
             fn: Schematized({
                 select: ["_id", "username"],
             }, async (req, res) => {
-                const user = await User.findOne(req.selection)
+                let user = await User.findOne(req.selection)
 
                 if (!user) {
                     return res.status(404).json({ error: "User not exists" })
@@ -190,19 +246,54 @@ export default class UserController extends ComplexController {
         "/follow_user": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
-                required: ["to"],
-                select: ["to"],
+                select: ["user_id", "username"],
             }, async (req, res) => {
                 const selfUserId = req.user._id.toString()
+                let targetUserId = null
+                let result = null
 
-                const result = this.methods.follow({
+                if (typeof req.selection.user_id === "undefined" && typeof req.selection.username === "undefined") {
+                    return res.status(400).json({ message: "No user_id or username provided" })
+                }
+
+                if (typeof req.selection.user_id !== "undefined") {
+                    targetUserId = req.selection.user_id
+                } else {
+                    const user = await User.findOne({ username: req.selection.username })
+
+                    if (!user) {
+                        return res.status(404).json({ message: "User not found" })
+                    }
+
+                    targetUserId = user._id.toString()
+                }
+
+                // check if already following
+                const isFollowed = await UserFollow.findOne({
                     user_id: selfUserId,
-                    to: req.selection.to,
-                }).catch((error) => {
-                    return res.status(500).json({ error: error.message })
+                    to: targetUserId,
                 })
 
-                return res.json(result)
+                // if already following, delete
+                if (isFollowed) {
+                    result = await this.methods.unfollow({
+                        user_id: selfUserId,
+                        to: targetUserId,
+                    }).catch((error) => {
+                        return res.status(500).json({ message: error.message })
+                    })
+                } else {
+                    result = await this.methods.follow({
+                        user_id: selfUserId,
+                        to: targetUserId,
+                    }).catch((error) => {
+                        return res.status(500).json({ message: error.message })
+                    })
+                }
+
+                return res.json({
+                    following: result.following
+                })
             })
         }
     }
