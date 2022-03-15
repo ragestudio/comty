@@ -1,7 +1,7 @@
 @borderColor : #dddddd;
 @borderRadius: 12px;
 
-.account_wrapper {
+.accountProfile {
 	.card {
 		display       : flex;
 		flex-direction: column;
@@ -18,13 +18,15 @@
 		}
 
 		.header {
-			position   : relative;
-			display    : inline-flex;
-			align-items: center;
+			position: relative;
+			display : inline-flex;
+
+			align-items    : center;
+			justify-content: space-between;
 
 			z-index: 15;
 			width  : 100%;
-			padding: 12px;
+			padding: 12px 24px;
 
 			font-family: "Roboto Mono", monospace;
 
@@ -46,6 +48,11 @@
 				span {
 					font-size: 12px;
 				}
+			}
+
+			>div {
+				display    : inline-flex;
+				align-items: center;
 			}
 		}
 
