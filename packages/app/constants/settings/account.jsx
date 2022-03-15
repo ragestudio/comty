@@ -100,4 +100,34 @@ export default [
         "title": "Primary badge",
         "description": "Change your primary badge",
     },
+    {
+        "id": "description",
+        "group": "account.basicInfo",
+        "type": "TextArea",
+        "icon": "Edit3",
+        "title": "Description",
+        "description": "Change your description for your profile",
+        "props": {
+            "placeholder": "Enter here a description for your profile",
+        },
+        "defaultValue": async () => {
+            const userData = await User.data()
+            return userData.description
+        },
+        "onUpdate": async (value) => {
+            const selfId = await User.selfUserId()
+
+            const result = window.app.request.post.updateUser({
+                _id: selfId,
+                update: {
+                    description: value
+                }
+            })
+
+            if (result) {
+                return result
+            }
+        },
+        "debounced": true,
+    }
 ]
