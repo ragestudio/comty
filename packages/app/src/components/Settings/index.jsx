@@ -22,6 +22,7 @@ const ItemTypes = {
 	Slider: antd.Slider,
 	Checkbox: antd.Checkbox,
 	Input: antd.Input,
+	TextArea: antd.Input.TextArea,
 	InputNumber: antd.InputNumber,
 	Select: antd.Select,
 	SliderColorPicker: SliderPicker,
@@ -154,6 +155,12 @@ const SettingItem = (props) => {
 
 			item.props.color = value
 
+			break
+		}
+		case "textarea": {
+			item.props.defaultValue = value
+			item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
+			item.props.onChange = (event) => onUpdateItem(event.target.value)
 			break
 		}
 		case "input": {
