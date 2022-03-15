@@ -36,23 +36,32 @@
 
 			word-break: break-all;
 
-			img {
-				width : 70px;
-				height: 70px;
-			}
+			.user {
+				display: inline-flex;
+				flex-direction: row;
+				
+				> div {
+					align-self: flex-start;
+					margin-right: 15px;
 
-			h1 {
-				margin   : 0;
-				font-size: 35px;
-
-				span {
-					font-size: 12px;
+					> div {
+						margin-bottom: 5px;
+					}
 				}
-			}
 
-			>div {
-				display    : inline-flex;
-				align-items: center;
+				img {
+					width : 70px;
+					height: 70px;
+					border-radius: 4px;
+				}
+	
+				h1 {
+					margin   : 0;
+
+					font-size: 35px;
+					line-height: 37px;
+				}
+				
 			}
 		}
 
