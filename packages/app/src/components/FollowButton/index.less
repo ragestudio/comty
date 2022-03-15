@@ -1,0 +1,59 @@
+.followButton {
+    user-select: none;
+
+    width  : fit-content;
+    height : 30px;
+    padding: 5px 15px;
+
+    text-decoration: none;
+    text-align     : center;
+    vertical-align : middle;
+    letter-spacing : 1px;
+
+    transition: all 150ms ease-in-out;
+
+    border-radius: 8px;
+
+    span {
+        transition: all 150ms ease-in-out;
+        color     : #ffffff85 !important;
+    }
+
+    opacity: 0.9;
+
+    background         : linear-gradient(120deg, #6559ae, #ff7159, #6559ae);
+    background-size    : 400% 400%;
+    background-position: 14% 0%;
+
+    &:hover {
+        opacity: 1;
+
+        span {
+            color: white !important;
+        }
+
+        animation : gradientMove 2s forwards ease-in-out infinite;
+    }
+
+    &.followed {
+        background: none;
+
+        span {
+            color: #7e7e7e !important;
+        }
+    }
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 14% 0%;
+    }
+
+    50% {
+        background-position: 87% 100%;
+    }
+
+    100% {
+        background-position: 14% 0%;
+    }
+}
