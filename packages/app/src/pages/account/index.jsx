@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
+import moment from "moment"
 
 import { Icons } from "components/Icons"
 import { Skeleton, PostsFeed, FollowButton } from "components"
@@ -16,6 +17,7 @@ export default class Account extends React.Component {
 		isFollowed: false,
 		user: null,
 		requestedUser: null,
+		followers: [],
 	}
 
 	api = window.app.request
@@ -31,6 +33,7 @@ export default class Account extends React.Component {
 		let isSelf = false
 		let user = null
 		let isFollowed = false
+		let followers = []
 
 		if (requestedUser != null) {
 			if (token.username === requestedUser) {
@@ -40,11 +43,15 @@ export default class Account extends React.Component {
 			user = await this.fetchData(requestedUser)
 
 			if (!isSelf) {
-				const result = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
-				console.log(result)
+				const followedResult = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
+				const followersResult = await this.api.get.followers(undefined, { user_id: user._id }).catch(() => false)
 
-				if (result) {
-					isFollowed = result.isFollowed
+				if (followedResult) {
+					isFollowed = followedResult.isFollowed
+				}
+
+				if (followersResult) {
+					followers = followersResult
 				}
 			}
 		}
@@ -55,6 +62,7 @@ export default class Account extends React.Component {
 			hasAdmin,
 			requestedUser,
 			isFollowed,
+			followers,
 		})
 	}
 
@@ -78,10 +86,9 @@ export default class Account extends React.Component {
 				return false
 			})
 
-		console.log(result)
-
 		await this.setState({
 			isFollowed: result.following,
+			followers: result.followers,
 		})
 	}
 
@@ -92,23 +99,33 @@ export default class Account extends React.Component {
 			return <Skeleton />
 		}
 
+		const createdAtYear = moment(new Date(Number(user.createdAt))).format("YYYY")
+
 		return (
 			<div className="accountProfile">
 				<div className="card">
 					<div className="header">
 						<div className="user">
-							<img src={user.avatar} />
-							<div style={{ margin: "0 15px" }}>
-								{Boolean(user.fullName) ?
-									<>
-										<h1>{user.fullName}</h1>
-										<span>@{user.username}#{user._id}</span>
-									</> :
-									<>
-										<h1>@{user.username}</h1>
-										<span>#{user._id}</span>
-									</>
-								}
+							<div>
+								<img src={user.avatar} />
+							</div>
+							<div>
+								<div>
+									<h1>{user.fullName ?? user.username}</h1>
+									<span>@{user.username}</span>
+								</div>
+
+								<div id="statistics" className="statistics">
+									<div>
+										<span><Icons.Users /> {this.state.followers.length} Followers</span>
+									</div>
+									<div>
+										<span><Icons.FileText /> 0 Posts</span>
+									</div>
+									<div>
+										<span>Joined at {createdAtYear}</span>
+									</div>
+								</div>
 							</div>
 						</div>
 
