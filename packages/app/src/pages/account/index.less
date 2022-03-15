@@ -120,8 +120,13 @@
 	}
 
 	.tabs {
+		transform: translate(0, -20px);
+		position: relative;
+		z-index: 55;
+
 		.ant-tabs-nav {
-			margin: 0 30px 20px 30px;
+			margin: 0 20px 20px 0;
+			justify-content: flex-end;
 		}
 
 		.ant-tabs-nav::before {
@@ -129,13 +134,13 @@
 		}
 
 		.ant-tabs-tab {
-			padding         : 8px 20px !important;
-			border-color    : var(--border-color) !important;
 			margin-right    : 20px !important;
-			background-color: var(--background-color-primary) !important;
-			border-top      : 0 !important;
-			border-radius   : 0 0 4px 4px !important;
+			padding         : 8px 20px !important;
 
+			border-color    : var(--border-color) !important;
+			background-color: var(--background-color-primary) !important;
+			
+			border-radius   : 4px !important;
 
 			svg {
 				font-size: 1rem;
