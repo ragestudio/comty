@@ -3,7 +3,7 @@ import * as antd from "antd"
 import { Translation } from "react-i18next"
 
 import { Icons } from "components/Icons"
-import { Skeleton, PostsFeed } from "components"
+import { Skeleton, PostsFeed, FollowButton } from "components"
 import { Session, User } from "models"
 
 import "./index.less"
@@ -13,8 +13,9 @@ export default class Account extends React.Component {
 
 	state = {
 		isSelf: false,
+		isFollowed: false,
 		user: null,
-		sessions: null
+		requestedUser: null,
 	}
 
 	api = window.app.request
@@ -25,20 +26,63 @@ export default class Account extends React.Component {
 		const query = new URLSearchParams(location.search)
 
 		const requestedUser = location.state?.username ?? query.get("username") ?? token?.username
-		let state = this.state
+		const hasAdmin = await User.hasRole("admin")
+
+		let isSelf = false
+		let user = null
+		let isFollowed = false
 
 		if (requestedUser != null) {
 			if (token.username === requestedUser) {
-				state.isSelf = true
-				state.sessions = await this.props.contexts.app.sessionController.getAllSessions()
+				isSelf = true
 			}
 
-			state.user = await this.props.contexts.app.userController.getData({ username: requestedUser })
+			user = await this.fetchData(requestedUser)
+
+			if (!isSelf) {
+				const result = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
+				console.log(result)
+
+				if (result) {
+					isFollowed = result.isFollowed
+				}
+			}
 		}
 
-		state.hasAdmin = await User.hasRole("admin")
+		await this.setState({
+			isSelf,
+			user,
+			hasAdmin,
+			requestedUser,
+			isFollowed,
+		})
+	}
 
-		this.setState(state)
+	fetchData = async (username) => {
+		return await this.api.get.user(undefined, {
+			username: username
+		}).catch((error) => {
+			console.error(error)
+			antd.message.error(error.message)
+			return false
+		})
+	}
+
+	onClickFollow = async () => {
+		const result = await this.api.put.followUser({
+			username: this.state.requestedUser,
+		})
+			.catch((error) => {
+				console.error(error)
+				antd.message.error(error.message)
+				return false
+			})
+
+		console.log(result)
+
+		await this.setState({
+			isFollowed: result.following,
+		})
 	}
 
 	render() {
@@ -49,23 +93,33 @@ export default class Account extends React.Component {
 		}
 
 		return (
-			<div className="account_wrapper">
+			<div className="accountProfile">
 				<div className="card">
 					<div className="header">
-						<img src={user.avatar} />
-						<div style={{ margin: "0 15px" }}>
-							{Boolean(user.fullName) ?
-								<>
-									<h1>{user.fullName}</h1>
-									<span>@{user.username}#{user._id}</span>
-								</> :
-								<>
-									<h1>@{user.username}</h1>
-									<span>#{user._id}</span>
-								</>
-							}
+						<div className="user">
+							<img src={user.avatar} />
+							<div style={{ margin: "0 15px" }}>
+								{Boolean(user.fullName) ?
+									<>
+										<h1>{user.fullName}</h1>
+										<span>@{user.username}#{user._id}</span>
+									</> :
+									<>
+										<h1>@{user.username}</h1>
+										<span>#{user._id}</span>
+									</>
+								}
+							</div>
 						</div>
+
+						{!this.state.isSelf && <div>
+							<FollowButton
+								onClick={this.onClickFollow}
+								followed={this.state.isFollowed}
+							/>
+						</div>}
 					</div>
+
 					<div className="extension">
 						<div className="badgesList">
 							{user.badges.map((role, index) => {
