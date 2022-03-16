@@ -51,36 +51,23 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
-import { API, SettingsController, Render, Splash, Theme, Sound, Notifications, i18n, Debug, Shortcuts } from "extensions"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Navigation } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
+import * as Render from "extensions/render.extension.jsx"
+
 import "theme/index.less"
 
-const SplashExtension = Splash.extension({
-	logo: config.logo.alt,
-	preset: "fadeOut",
-	velocity: 1000,
-	props: {
-		logo: {
-			style: {
-				marginBottom: "10%",
-				stroke: "black",
-			},
-		},
-	},
-})
+class App extends React.Component {
+	//static debugMode = true
 
-class App {
-	static initialize() {
-		window.app.version = config.package.version
+	loadingMessage = false
 
-		this.mainSocket = this.contexts.app.WSInterface.sockets.main
-		this.loadingMessage = false
-		this.isAppCapacitor = () => navigator.userAgent === "capacitor"
+	async initialize() {
+		console.log("[App] initialize")
 	}
 
 	static eventsHandlers = {
@@ -177,9 +164,6 @@ class App {
 				})
 			}
 		},
-		"appLoadError": function (error) {
-
-		},
 	}
 
 	static windowContext() {
@@ -194,34 +178,33 @@ class App {
 				return window.app.setLocation(`/account`, { username })
 			},
 			setStatusBarStyleDark: async () => {
-				if (!this.isAppCapacitor()) {
+				if (!window.app.isAppCapacitor()) {
 					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
 					return false
 				}
 				return await StatusBar.setStyle({ style: Style.Dark })
 			},
 			setStatusBarStyleLight: async () => {
-				if (!this.isAppCapacitor()) {
+				if (!window.app.isAppCapacitor()) {
 					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
 					return false
 				}
 				return await StatusBar.setStyle({ style: Style.Light })
 			},
 			hideStatusBar: async () => {
-				if (!this.isAppCapacitor()) {
+				if (!window.app.isAppCapacitor()) {
 					console.warn("[App] hideStatusBar is not supported on this platform")
 					return false
 				}
 				return await StatusBar.hide()
 			},
 			showStatusBar: async () => {
-				if (!this.isAppCapacitor()) {
+				if (!window.app.isAppCapacitor()) {
 					console.warn("[App] showStatusBar is not supported on this platform")
 					return false
 				}
 				return await StatusBar.show()
 			},
-			isAppCapacitor: this.isAppCapacitor,
 		}
 	}
 
@@ -242,7 +225,11 @@ class App {
 		},
 		Crash: Crash,
 		initialization: () => {
-			return <Splash.SplashComponent logo={config.logo.alt} />
+			return <div className="splash_wrapper">
+				<div className="splash_logo">
+					<img src={config.logo.alt} />
+				</div>
+			</div>
 		}
 	}
 
@@ -271,7 +258,7 @@ class App {
 	}
 
 	componentDidMount = async () => {
-		if (this.isAppCapacitor()) {
+		if (window.app.isAppCapacitor()) {
 			window.addEventListener("statusTap", () => {
 				this.eventBus.emit("statusTap")
 			})
@@ -313,7 +300,7 @@ class App {
 		const initializationTasks = [
 			async () => {
 				try {
-					await this.contexts.app.attachAPIConnection()
+					await app.ApiController.attachAPIConnection()
 				} catch (error) {
 					throw {
 						cause: "Cannot connect to API",
@@ -380,10 +367,7 @@ class App {
 			return false
 		}
 
-		const token = await Session.token
-		await this.contexts.app.attachWSConnection()
-
-		this.mainSocket.emit("authenticate", token)
+		await app.ApiController.attachWSConnection()
 	}
 
 	__UserInit = async () => {
@@ -406,6 +390,8 @@ class App {
 						<BindPropsProvider
 							user={this.state.user}
 							session={this.state.session}
+							sessionController={this.sessionController}
+							userController={this.userController}
 						>
 							<Render.RouteRender staticRenders={App.staticRenders} />
 						</BindPropsProvider>
@@ -416,17 +402,4 @@ class App {
 	}
 }
 
-export default CreateEviteApp(App, {
-	extensions: [
-		Shortcuts,
-		SettingsController,
-		i18n.extension,
-		Sound.extension,
-		Notifications.extension,
-		API,
-		Render.extension,
-		Theme.extension,
-		SplashExtension,
-		Debug,
-	],
-})
+export default CreateEviteApp(App)
