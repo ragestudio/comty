@@ -1,8 +1,10 @@
+import { Extension } from "evite"
 import store from "store"
 import defaultSettings from "schemas/defaultSettings.json"
 
-class SettingsController {
-    constructor() {
+export default class SettingsExtension extends Extension {
+    constructor(app, main) {
+        super(app, main)
         this.storeKey = "app_settings"
         this.settings = store.get(this.storeKey) ?? {}
 
@@ -49,18 +51,8 @@ class SettingsController {
 
         return this.settings[key]
     }
-}
 
-export default {
-    key: "settings",
-    expose: [
-        {
-            initialization: [
-                (app, main) => {
-                    app.settingsController = new SettingsController()
-                    window.app.settings = app.settingsController
-                }
-            ]
-        },
-    ]
+    window = {
+        "settings": this
+    }
 }
