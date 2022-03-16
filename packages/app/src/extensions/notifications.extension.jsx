@@ -1,10 +1,11 @@
+import { Extension } from "evite"
 import React from "react"
 import { notification as Notf } from "antd"
 import { Icons, createIconRender } from "components/Icons"
 import { Translation } from "react-i18next"
 import { Haptics } from "@capacitor/haptics"
 
-class NotificationController {
+export default class NotificationController extends Extension {
     getSoundVolume = () => {
         return (window.app.settings.get("notifications_sound_volume") ?? 50) / 100
     }
@@ -53,34 +54,21 @@ class NotificationController {
             })
         }
     }
+
+    initializers = [
+        function () {
+            this.eventBus.on("changeNotificationsSoundVolume", (value) => {
+                app.notifications.playAudio({ soundVolume: value })
+            })
+            this.eventBus.on("changeNotificationsVibrate", (value) => {
+                app.notifications.playHaptic({
+                    vibrationEnabled: value,
+                })
+            })
+        }
+    ]
+
+    window = {
+        notifications: this
+    }
 }
-
-const extension = {
-    key: "notification",
-    expose: [
-        {
-            initialization: [
-                async (app, main) => {
-                    app.NotificationController = new NotificationController()
-
-                    main.eventBus.on("changeNotificationsSoundVolume", (value) => {
-                        app.NotificationController.playAudio({ soundVolume: value })
-                    })
-                    main.eventBus.on("changeNotificationsVibrate", (value) => {
-                        app.NotificationController.playHaptic({
-                            vibrationEnabled: value,
-                        })
-                    })
-                    main.setToWindowContext("notifications", app.NotificationController)
-                },
-            ],
-        },
-    ],
-}
-
-export {
-    extension,
-    NotificationController,
-}
-
-export default extension

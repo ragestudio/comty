@@ -1,10 +1,11 @@
+import { Extension } from "evite"
 import config from "config"
 import store from "store"
 import { ConfigProvider } from "antd"
 
-export class ThemeController {
-	constructor(params) {
-		this.params = { ...params }
+export default class ThemeExtension extends Extension {
+	constructor(app, main) {
+		super(app, main)
 
 		this.themeManifestStorageKey = "theme"
 		this.modificationStorageKey = "themeModifications"
@@ -14,43 +15,57 @@ export class ThemeController {
 
 		this.mutation = null
 		this.currentVariant = null
-
-		this.init()
-
-		return this
 	}
+
+	initializers = [
+		async () => {
+			this.mainContext.eventBus.on("darkMode", (value) => {
+				if (value) {
+					this.applyVariant("dark")
+				} else {
+					this.applyVariant("light")
+				}
+			})
+			this.mainContext.eventBus.on("modifyTheme", (value) => {
+				this.update(value)
+				this.setModifications(this.mutation)
+			})
+
+			this.mainContext.eventBus.on("resetTheme", () => {
+				this.resetDefault()
+			})
+
+			let theme = this.getStoragedTheme()
+			const modifications = this.getStoragedModifications()
+			const variantKey = this.getStoragedVariant()
+
+			if (!theme) {
+				// load default theme
+				theme = this.getDefaultTheme()
+			} else {
+				// load URL and initialize theme
+			}
+
+			// set global theme
+			this.theme = theme
+
+			// override with static vars
+			if (theme.staticVars) {
+				this.update(theme.staticVars)
+			}
+
+			// override theme with modifications
+			if (modifications) {
+				this.update(modifications)
+			}
+
+			// apply variation
+			this.applyVariant(variantKey)
+		},
+	]
 
 	static get currentVariant() {
 		return document.documentElement.style.getPropertyValue("--themeVariant")
-	}
-
-	init = () => {
-		let theme = this.getStoragedTheme()
-		const modifications = this.getStoragedModifications()
-		const variantKey = this.getStoragedVariant()
-
-		if (!theme) {
-			// load default theme
-			theme = this.getDefaultTheme()
-		} else {
-			// load URL and initialize theme
-		}
-
-		// set global theme
-		this.theme = theme
-
-		// override with static vars
-		if (theme.staticVars) {
-			this.update(theme.staticVars)
-		}
-
-		// override theme with modifications
-		if (modifications) {
-			this.update(modifications)
-		}
-
-		// apply variation
-		this.applyVariant(variantKey)
 	}
 
 	getRootVariables = () => {
@@ -130,36 +145,8 @@ export class ThemeController {
 			this.setVariant(variant)
 		}
 	}
+
+	window = {
+		ThemeController: this
+	}
 }
-
-export const extension = {
-	key: "theme",
-	expose: [
-		{
-			initialization: [
-				async (app, main) => {
-					app.ThemeController = new ThemeController()
-
-					main.eventBus.on("darkMode", (value) => {
-						if (value) {
-							app.ThemeController.applyVariant("dark")
-						} else {
-							app.ThemeController.applyVariant("light")
-						}
-					})
-					main.eventBus.on("modifyTheme", (value) => {
-						app.ThemeController.update(value)
-						app.ThemeController.setModifications(app.ThemeController.mutation)
-					})
-					main.eventBus.on("resetTheme", () => {
-						app.ThemeController.resetDefault()
-					})
-
-					main.setToWindowContext("ThemeController", app.ThemeController)
-				},
-			],
-		},
-	],
-}
-
-export default extension

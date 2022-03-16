@@ -1,14 +1,9 @@
+import { Extension } from "evite"
 import { Howl } from "howler"
 import config from "config"
 
-export class SoundEngine {
-    constructor() {
-        this.sounds = {}
-    }
-
-    initialize = async () => {
-        this.sounds = await this.getSounds()
-    }
+export default class SoundEngineExtension extends Extension {
+    sounds = {}
 
     getSounds = async () => {
         // TODO: Load custom soundpacks manifests
@@ -35,19 +30,14 @@ export class SoundEngine {
             return false
         }
     }
-}
 
-export const extension = {
-    key: "soundEngine",
-    expose: [
-        {
-            initialization: [
-                async (app, main) => {
-                    app.SoundEngine = new SoundEngine()
-                    main.setToWindowContext("SoundEngine", app.SoundEngine)
-                    await app.SoundEngine.initialize()
-                }
-            ]
+    initializers = [
+        async () => {
+            this.sounds = await this.getSounds()
         }
     ]
+
+    window = {
+        SoundEngine: this
+    }
 }

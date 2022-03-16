@@ -1,3 +1,4 @@
+import { Extension } from "evite"
 import React from "react"
 import { Window } from "components"
 import { Skeleton, Tabs } from "antd"
@@ -121,15 +122,8 @@ class Debugger {
     }
 }
 
-export default {
-    key: "visualDebugger",
-    expose: [
-        {
-            initialization: [
-                async (app, main) => {
-                    main.setToWindowContext("debug", new Debugger(main))
-                },
-            ],
-        },
-    ],
+export default class VisualDebugger extends Extension {
+    window = {
+        debug: new Debugger(this.mainContext)
+    }
 }
