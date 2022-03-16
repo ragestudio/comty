@@ -66,8 +66,6 @@ const formInstance = [
 ]
 
 export default class Login extends React.Component {
-    static bindApp = ["sessionController"]
-
     static pageStatement = {
         bottomBarAllowed: false
     }
@@ -81,7 +79,7 @@ export default class Login extends React.Component {
             allowRegenerate: values.allowRegenerate,
         }
 
-        this.props.contexts.app.sessionController.login(payload, (error, response) => {
+        this.props.sessionController.login(payload, (error, response) => {
             ctx.toogleValidation(false)
             ctx.clearErrors()
 
