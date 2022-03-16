@@ -2,8 +2,6 @@ import React from "react"
 import * as antd from "antd"
 import ReactJSON from "react-json-view"
 
-import { Theme } from "extensions"
-
 import "./index.less"
 
 export default class ThemeDebug extends React.Component {
