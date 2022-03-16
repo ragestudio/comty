@@ -273,3 +273,49 @@ body {
 	-webkit-touch-callout: none;
 	/* disable the IOS popup when long-press on a link */
 }
+
+.splash_wrapper {
+	overflow: hidden;
+
+	//background-color: rgba(240, 242, 245, 0.8);
+	backdrop-filter         : blur(10px);
+	--webkit-backdrop-filter: blur(10px);
+
+	width  : 100%;
+	height : 100%;
+	z-index: 1000;
+
+	display       : flex;
+	flex-direction: column;
+
+	align-items    : center;
+	justify-content: center;
+}
+
+.splash_logo {
+	width : 100%;
+	height: 100%;
+
+	display       : flex;
+	flex-direction: column;
+
+	align-items    : center;
+	justify-content: center;
+
+	img {
+		width     : fit-content;
+		max-width : 50%;
+		max-height: 50%;
+		filter    : drop-shadow(14px 10px 10px rgba(128, 128, 128, 0.5));
+	}
+}
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
