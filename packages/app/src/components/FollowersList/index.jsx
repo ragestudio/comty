@@ -18,9 +18,26 @@ export default (props) => {
         </antd.Result>
     }
 
-    return props.followers.map((follower) => {
-        return <div>
-            {follower.username}
-        </div>
-    })
+    return <div className="followersList">
+        {props.followers.map((follower) => {
+            return <div className="follower">
+                <div className="avatar">
+                    <antd.Avatar shape="square" src={follower.avatar} />
+                </div>
+                <div className="names">
+                    <div>
+                        <h2>
+                            {follower.fullName ?? follower.username}
+                        </h2>
+
+                    </div>
+                    <div>
+                        <span>
+                            @{follower.username}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        })}
+    </div>
 }
