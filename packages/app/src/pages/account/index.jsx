@@ -169,7 +169,7 @@ export default class Account extends React.Component {
 					onTabClick={this.handlePageTransition}
 					destroyInactiveTabPane
 				>
-					<antd.Tabs.TabPane tab={<Icons.Inbox />} key="posts">
+					<antd.Tabs.TabPane tab={<><Icons.Inbox /> Posts</>} key="posts">
 						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
 							<div className="posts">
 								<PostsFeed
@@ -178,14 +178,14 @@ export default class Account extends React.Component {
 							</div>
 						</div>
 					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane tab={<Icons.Users />} key="followers">
+					<antd.Tabs.TabPane tab={<><Icons.Users /> Followers</>} key="followers">
 						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
 							<FollowersList
 								followers={this.state.followers}
 							/>
 						</div>
 					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane tab={<Icons.Info />} key="details">
+					<antd.Tabs.TabPane tab={<><Icons.Info /> Details</>} key="details">
 						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
 							<div id="statistics" className="statistics">
 								<div>
