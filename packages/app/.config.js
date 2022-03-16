@@ -47,7 +47,7 @@ module.exports = (config = {}) => {
         assetsDir: ".",
         minify: process.env.MODE !== "development",
         lib: {
-            entry: "src/index.ts",
+            entry: "src/App.jsx",
             formats: ["cjs"],
         },
         rollupOptions: {
