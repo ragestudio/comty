@@ -40,29 +40,29 @@ module.exports = (config = {}) => {
         }
     }
 
-    config.build = {
-        sourcemap: "inline",
-        target: `node16`,
-        outDir: "dist",
-        assetsDir: ".",
-        minify: process.env.MODE !== "development",
-        lib: {
-            entry: "src/App.jsx",
-            formats: ["cjs"],
-        },
-        rollupOptions: {
-            external: [
-                "electron",
-                "electron-devtools-installer",
-                ...builtinModules.flatMap(p => [p, `node:16`]),
-            ],
-            output: {
-                entryFileNames: "[name].cjs",
-            },
-        },
-        emptyOutDir: true,
-        brotliSize: false,
-    }
+    // config.build = {
+    //     sourcemap: "inline",
+    //     target: `node16`,
+    //     outDir: "dist",
+    //     assetsDir: ".",
+    //     minify: process.env.MODE !== "development",
+    //     lib: {
+    //         entry: "src/App.jsx",
+    //         formats: ["cjs"],
+    //     },
+    //     rollupOptions: {
+    //         external: [
+    //             "electron",
+    //             "electron-devtools-installer",
+    //             ...builtinModules.flatMap(p => [p, `node:16`]),
+    //         ],
+    //         output: {
+    //             entryFileNames: "[name].cjs",
+    //         },
+    //     },
+    //     emptyOutDir: true,
+    //     brotliSize: false,
+    // }
 
     return config
 }
