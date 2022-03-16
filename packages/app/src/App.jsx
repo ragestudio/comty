@@ -66,8 +66,8 @@ class App extends React.Component {
 
 	loadingMessage = false
 
-	async initialize() {
-		console.log("[App] initialize")
+	static initialize() {
+		window.app.version = config.package.version
 	}
 
 	static eventsHandlers = {

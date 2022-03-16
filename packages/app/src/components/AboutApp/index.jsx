@@ -58,7 +58,7 @@ export const AboutCard = (props) => {
 				<div className="group">
 					<h3><Icons.GitMerge />Versions</h3>
 					<div>
-						<antd.Tag color="#ffec3d">eVite v{window.__eviteVersion ?? "experimental"}</antd.Tag>
+						<antd.Tag color="#ffec3d">eVite v{window.app.__eviteVersion ?? "experimental"}</antd.Tag>
 						<antd.Tag color="#61DBFB"><DiReact /> v{React.version ?? "experimental"}</antd.Tag>
 					</div>
 				</div>
