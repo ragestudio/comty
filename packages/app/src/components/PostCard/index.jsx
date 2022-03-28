@@ -61,7 +61,7 @@ function PostHeader(props) {
                 </div>
             </div>
         </div>
-        <div className="postStadistics">
+        <div className="postStatistics">
             <div className="item">
                 <Icons.Heart className={classnames("icon", { ["filled"]: props.isLiked })} />
                 <div className="value">
@@ -222,8 +222,8 @@ export const PostCardAnimated = ({
         motionAppear={motionAppear}
         onAppearStart={getCollapsedHeight}
         onAppearActive={node => {
-            motionRef.current = true;
-            return getMaxHeight(node);
+            motionRef.current = true
+            return getMaxHeight(node)
         }}
         onAppearEnd={onAppear}
         onLeaveStart={getCurrentHeight}
