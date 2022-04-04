@@ -1,16 +1,22 @@
 import React from "react"
 import * as antd from "antd"
+import { Swiper } from "antd-mobile"
 import { Icons } from "components/Icons"
 import { LikeButton } from "components"
 import moment from "moment"
 import classnames from "classnames"
-
-import { User } from "models"
+import loadable from "@loadable/component"
 
 import CSSMotion from "rc-animate/lib/CSSMotion"
 import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect"
 
 import "./index.less"
+
+const ContentFailed = () => {
+    return <div className="contentFailed">
+        <Icons.MdCloudOff />
+    </div>
+}
 
 const getCurrentHeight = (node) => ({ height: node.offsetHeight })
 
@@ -78,13 +84,104 @@ function PostHeader(props) {
     </div>
 }
 
-function PostContent({ message }) {
+const PostContent = React.memo((props) => {
+    let { message, additions } = props.data
+
+    // first filter if is an string
+    additions = additions.filter(file => typeof file === "string")
+
+    // then filter if is an uri
+    additions = additions.filter(file => /^(http|https):\/\//.test(file))
+
+    additions = additions.map((uri, index) => {
+        const MediaRender = loadable(async () => {
+            // create a basic http request for fetching the file media type
+            const request = new Request(uri, {
+                method: "HEAD",
+            })
+
+            // fetch the file media type
+            const mediaType = await fetch(request)
+                .then(response => response.headers.get("content-type"))
+                .catch((error) => {
+                    console.error(error)
+                    return null
+                })
+
+            if (!mediaType) {
+                return () => <ContentFailed />
+            }
+
+            switch (mediaType.split("/")[0]) {
+                case "image": {
+                    return () => <img src={uri} />
+                }
+                case "video": {
+                    return () => <video controls>
+                        <source src={uri} type={mediaType} />
+                    </video>
+                }
+                case "audio": {
+                    return () => <audio controls>
+                        <source src={uri} type={mediaType} />
+                    </audio>
+                }
+
+                default: {
+                    return () => <h4>
+                        Unsupported media type [{mediaType}]
+                    </h4>
+                }
+            }
+        })
+
+        return <Swiper.Item
+            key={index}
+        >
+            <div className="addition">
+                <React.Suspense fallback={<div>Loading</div>} >
+                    <MediaRender />
+                </React.Suspense>
+            </div>
+        </Swiper.Item>
+    })
+
+
     return <div className="content">
         {message}
-    </div>
-}
 
-function PostActions(props) {
+        {additions &&
+            <div className="additions">
+                <Swiper
+                    direction="vertical"
+                    indicatorProps={{
+                        style: {
+                            '--dot-color': 'rgba(0, 0, 0, 0.4)',
+                            '--active-dot-color': '#ffc0cb',
+                            '--dot-size': '50px',
+                            '--active-dot-size': '30px',
+                            '--dot-border-radius': '50%',
+                            '--active-dot-border-radius': '15px',
+                            '--dot-spacing': '8px',
+                        }
+                    }}
+                >
+                    {additions}
+                </Swiper>
+            </div>
+        }
+    </div>
+})
+
+const PostActions = (props) => {
+    const handleSelfMenuAction = async (event) => {
+        const fn = props.actions[event.key]
+
+        if (typeof fn === "function") {
+            await fn()
+        }
+    }
+
     return <div className="actions">
         <div className="action" id="likes">
             <div className="icon">
@@ -101,10 +198,25 @@ function PostActions(props) {
                 <Icons.Bookmark />
             </div>
         </div>
-        {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
-            <div className="icon">
-                <Icons.MoreVertical />
-            </div>
+        {props.self && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
+            <antd.Dropdown
+                overlay={<antd.Menu
+                    onClick={handleSelfMenuAction}
+                >
+                    <antd.Menu.Item icon={<Icons.Edit />} key="edit">
+                        Edit
+                    </antd.Menu.Item>
+                    <antd.Menu.Divider />
+                    <antd.Menu.Item icon={<Icons.Trash />} key="delete">
+                        Delete
+                    </antd.Menu.Item>
+                </antd.Menu>}
+                trigger={['click']}
+            >
+                <div className="icon">
+                    <Icons.MoreVertical />
+                </div>
+            </antd.Dropdown>
         </div>}
     </div>
 }
@@ -112,36 +224,59 @@ function PostActions(props) {
 export class PostCard extends React.Component {
     state = {
         loading: true,
-        selfId: null,
-        data: this.props.data,
+        likes: this.props.data.likes,
+        comments: this.props.data.comments,
     }
 
     api = window.app.request
 
     componentDidMount = async () => {
-        const selfId = await User.selfUserId()
-
-        window.app.ws.listen(`like.post.${this.props.data._id}`, async (data) => {
-            await this.setState({ data })
+        window.app.ws.listen(`post.like.${this.props.data._id}`, async (data) => {
+            await this.setState({ likes: data })
         })
-        window.app.ws.listen(`unlike.post.${this.props.data._id}`, async (data) => {
-            await this.setState({ data })
+        window.app.ws.listen(`post.unlike.${this.props.data._id}`, async (data) => {
+            await this.setState({ likes: data })
+        })
+
+        window.app.ws.listen(`post.comment.${this.props.data._id}`, async (data) => {
+            await this.setState({ comments: data })
+        })
+        window.app.ws.listen(`post.uncomment.${this.props.data._id}`, async (data) => {
+            await this.setState({ comments: data })
         })
 
         await this.setState({
-            selfId,
             loading: false
         })
+    }
+
+    onClickDelete = async () => {
+        const result = await this.api.delete.post({
+            post_id: this.props.data._id,
+        }).catch(error => {
+            console.error(error)
+            antd.message.error(error.message)
+
+            return {
+                success: false,
+            }
+        })
+
+        if (result.success) {
+            if (typeof this.props.close === "function") {
+                this.props.close()
+            }
+        }
     }
 
     onClickLike = async (to) => {
         let result = false
 
         if (to) {
-            const apiResult = await await this.api.put.like({ post_id: this.props.data._id })
+            const apiResult = await this.api.put.like({ post_id: this.props.data._id })
             result = apiResult.success
         } else {
-            const apiResult = await await this.api.put.unlike({ post_id: this.props.data._id })
+            const apiResult = await this.api.put.unlike({ post_id: this.props.data._id })
             result = apiResult.success
         }
 
@@ -149,15 +284,15 @@ export class PostCard extends React.Component {
     }
 
     onClickSave = async () => {
-        // TODO: save post
+        // TODO
+    }
+
+    onClickEdit = async () => {
+        // TODO
     }
 
     hasLiked = () => {
-        return this.state.data.likes.some(user_id => user_id === this.state.selfId)
-    }
-
-    isSelf = () => {
-        return this.state.selfId === this.state.data.user._id
+        return this.state.likes.some((user_id) => user_id === this.props.selfId)
     }
 
     render() {
@@ -176,13 +311,11 @@ export class PostCard extends React.Component {
                 <PostHeader
                     postData={this.props.data}
                     isLiked={hasLiked}
-                    onClickLike={() => this.onClickLike(false)}
-                    onClickSave={this.onClickSave}
-                    likes={this.state.data.likes.length}
-                    comments={this.state.data.comments.length}
+                    likes={this.state.likes.length}
+                    comments={this.state.comments.length}
                 />
                 <PostContent
-                    message={this.props.data.message}
+                    data={this.props.data}
                 />
             </div>
             <div className="actionsIndicatorWrapper">
@@ -192,26 +325,26 @@ export class PostCard extends React.Component {
             </div>
             <div className="actionsWrapper">
                 <PostActions
+                    self={this.props.self}
                     onClickLike={this.onClickLike}
                     defaultLiked={hasLiked}
-                    isSelf={this.isSelf()}
+                    actions={{
+                        edit: this.onClickEdit,
+                        delete: this.onClickDelete,
+                    }}
                 />
             </div>
         </div>
     }
 }
 
-export const PostCardAnimated = ({
-    data,
-    onAppear,
-    motionAppear,
-}, ref,) => {
+export const PostCardAnimated = (props, ref,) => {
     const motionRef = React.useRef(false)
 
     useLayoutEffect(() => {
         return () => {
             if (motionRef.current) {
-                onAppear()
+                props.onAppear()
             }
         }
     }, [])
@@ -219,23 +352,23 @@ export const PostCardAnimated = ({
     return <CSSMotion
         ref={ref}
         motionName="motion"
-        motionAppear={motionAppear}
+        motionAppear={props.motionAppear}
         onAppearStart={getCollapsedHeight}
         onAppearActive={node => {
             motionRef.current = true
             return getMaxHeight(node)
         }}
-        onAppearEnd={onAppear}
+        onAppearEnd={props.onAppear}
         onLeaveStart={getCurrentHeight}
         onLeaveActive={getCollapsedHeight}
         onLeaveEnd={() => {
-            onLeave(id)
+            props.onLeave(id)
         }}
     >
-        {(props, passedMotionRef) => {
+        {(_args, passedMotionRef) => {
             return <PostCard
                 ref={passedMotionRef}
-                data={data}
+                {...props}
             />
         }}
     </CSSMotion>
