@@ -1,14 +1,15 @@
 import React from "react"
 import * as antd from "antd"
+import { User } from "models"
 import { PostCard } from "components"
 
 import List from "rc-virtual-list"
 
 import "./index.less"
 
-
 export default class PostsFeed extends React.Component {
     state = {
+        selfId: null,
         initialLoading: true,
         list: [],
         animating: false,
@@ -18,14 +19,20 @@ export default class PostsFeed extends React.Component {
     listRef = React.createRef()
 
     componentDidMount = async () => {
+        const selfId = await User.selfUserId()
+
+        await this.registerWSEvents()
         await this.loadPosts()
 
-        window.app.ws.listen(`new.post`, async (data) => {
-            this.onInsert(data)
-        })
-
         await this.setState({
+            selfId: selfId,
             initialLoading: false,
+        })
+    }
+
+    registerWSEvents = async () => {
+        window.app.ws.listen(`post.new`, async (data) => {
+            this.onInsert(data)
         })
     }
 
@@ -68,11 +75,15 @@ export default class PostsFeed extends React.Component {
         this.lockForAnimation()
     }
 
+    isSelf = (id) => {
+        return this.state.selfId === id
+    }
+
     render() {
         if (this.state.initialLoading) {
             return <antd.Skeleton active />
         }
-        
+
         if (this.state.list.length === 0) {
             return <antd.Empty />
         }
@@ -87,13 +98,15 @@ export default class PostsFeed extends React.Component {
                 itemHeight="100%"
                 className="content"
             >
-                {(item, index) => (
-                    <PostCard
+                {(item, index) => {
+                    return <PostCard
                         data={item}
                         motionAppear={this.state.animating && index === 0}
                         onAppear={this.onAppear}
+                        self={this.isSelf(item.user_id)}
+                        selfId={this.state.selfId}
                     />
-                )}
+                }}
             </List>
         </div>
     }
