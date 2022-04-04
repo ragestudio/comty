@@ -19,11 +19,11 @@ export default class PostsController extends ComplexController {
 
             await post.save()
 
-            global.wsInterface.io.emit(`new.post`, {
+            global.wsInterface.io.emit(`post.new`, {
                 ...post.toObject(),
                 user: userData.toObject(),
             })
-            global.wsInterface.io.emit(`new.post.${post.user_id}`, {
+            global.wsInterface.io.emit(`post.new.${post.user_id}`, {
                 ...post.toObject(),
                 user: userData.toObject(),
             })
@@ -45,18 +45,15 @@ export default class PostsController extends ComplexController {
             postData.likes.push(user_id)
             await postData.save()
 
-            global.wsInterface.io.emit(`like.post`, {
+            global.wsInterface.io.emit(`post.like`, {
                 ...postData.toObject(),
                 user: userData.toObject(),
             })
-            global.wsInterface.io.emit(`like.post.${postData.user_id}`, {
+            global.wsInterface.io.emit(`post.like.${postData.user_id}`, {
                 ...postData.toObject(),
                 user: userData.toObject(),
             })
-            global.wsInterface.io.emit(`like.post.${post_id}`, {
-                ...postData.toObject(),
-                user: userData.toObject(),
-            })
+            global.wsInterface.io.emit(`post.like.${post_id}`, postData.toObject().likes)
 
             return postData
         },
@@ -68,21 +65,56 @@ export default class PostsController extends ComplexController {
             postData.likes = postData.likes.filter(id => id !== user_id)
             await postData.save()
 
-            global.wsInterface.io.emit(`unlike.post`, {
+            global.wsInterface.io.emit(`post.unlike`, {
                 ...postData.toObject(),
                 user: userData.toObject(),
             })
-            global.wsInterface.io.emit(`unlike.post.${postData.user_id}`, {
+            global.wsInterface.io.emit(`post.unlike.${postData.user_id}`, {
                 ...postData.toObject(),
                 user: userData.toObject(),
             })
-            global.wsInterface.io.emit(`unlike.post.${post_id}`, {
-                ...postData.toObject(),
-                user: userData.toObject(),
-            })
+            global.wsInterface.io.emit(`post.unlike.${post_id}`, postData.toObject().likes)
 
             return postData
         },
+        deletePost: async (payload) => {
+            const { post_id, user_id } = payload
+
+            if (!user_id) {
+                throw new Error("user_id not provided")
+            }
+
+            const postData = await Post.findById(post_id)
+
+            if (!postData) {
+                throw new Error("Post not found")
+            }
+
+            const hasAdmin = await this.methods.hasAdmin({ user_id })
+
+            // check if user is the owner of the post
+            if (postData.user_id !== user_id && !hasAdmin) {
+                throw new Error("You are not allowed to delete this post")
+            }
+
+            await postData.remove()
+            global.wsInterface.io.emit(`post.delete`, post_id)
+        },
+        hasAdmin: async (payload) => {
+            const { user_id } = payload
+
+            if (!user_id) {
+                return false
+            }
+
+            const userData = await User.findById(user_id)
+
+            if (!userData) {
+                return false
+            }
+
+            return userData.roles.includes("admin")
+        }
     }
 
     get = {
@@ -166,6 +198,28 @@ export default class PostsController extends ComplexController {
             return res.json({
                 sucess: true,
             })
+        }),
+    }
+
+    delete = {
+        "/post": Schematized({
+            required: ["post_id"],
+            select: ["post_id"],
+        }, async (req, res) => {
+            await this.methods.deletePost({
+                post_id: req.selection.post_id,
+                user_id: req.user._id.toString(),
+            })
+                .then(() => {
+                    return res.json({
+                        success: true,
+                    })
+                })
+                .catch((err) => {
+                    return res.status(500).json({
+                        message: err.message,
+                    })
+                })
         }),
     }
 }
