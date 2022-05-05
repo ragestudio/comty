@@ -11,24 +11,28 @@ export default class FilesController extends ComplexController {
     static refName = "FilesController"
 
     get = {
-        "/uploads/:id": (req, res) => {
-            const filePath = path.join(global.uploadPath, req.params?.id)
+        "/uploads/:id": {
+            enabled: false,
+            fn: (req, res) => {
+                const filePath = path.join(global.uploadPath, req.params?.id)
 
-            const readStream = fs.createReadStream(filePath)
-            const passTrough = new stream.PassThrough()
+                const readStream = fs.createReadStream(filePath)
+                const passTrough = new stream.PassThrough()
 
-            stream.pipeline(readStream, passTrough, (err) => {
-                if (err) {
-                    return res.status(400)
-                }
-            })
+                stream.pipeline(readStream, passTrough, (err) => {
+                    if (err) {
+                        return res.status(400)
+                    }
+                })
 
-            return passTrough.pipe(res)
+                return passTrough.pipe(res)
+            },
         }
     }
 
     post = {
         "/upload": {
+            enabled: false,
             middlewares: ["withAuthentication", "fileUpload"],
             fn: async (req, res) => {
                 const urls = []
