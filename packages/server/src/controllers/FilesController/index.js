@@ -8,7 +8,7 @@ function resolveToUrl(filepath) {
 }
 
 export default class FilesController extends ComplexController {
-    static refName = "FilesController"
+    static disabled = true
 
     get = {
         "/uploads/:id": {

@@ -75,18 +75,18 @@ export default class SessionController extends ComplexController {
                 const { token, user_id } = req.body
 
                 if (typeof user_id === "undefined") {
-                    return res.status(400).send("No user_id provided")
+                    return res.status(400).json("No user_id provided")
                 }
                 if (typeof token === "undefined") {
-                    return res.status(400).send("No token provided")
+                    return res.status(400).json("No token provided")
                 }
 
                 const session = await Session.findOneAndDelete({ user_id, token })
                 if (session) {
-                    return res.send("done")
+                    return res.json("done")
                 }
 
-                return res.status(404).send("not found")
+                return res.status(404).json("not found")
             },
         },
         "/sessions": {
@@ -95,15 +95,15 @@ export default class SessionController extends ComplexController {
                 const { user_id } = req.body
 
                 if (typeof user_id === "undefined") {
-                    return res.status(400).send("No user_id provided")
+                    return res.status(400).json("No user_id provided")
                 }
 
                 const allSessions = await Session.deleteMany({ user_id })
                 if (allSessions) {
-                    return res.send("done")
+                    return res.json("done")
                 }
 
-                return res.status(404).send("not found")
+                return res.status(404).json("not found")
             }
         },
     }

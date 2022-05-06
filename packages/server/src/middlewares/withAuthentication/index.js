@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 export default (req, res, next) => {
     function reject(description) {
-        return res.status(401).send({ error: `${description ?? "Invalid session"}` })
+        return res.status(401).json({ error: `${description ?? "Invalid session"}` })
     }
 
     const authHeader = req.headers?.authorization?.split(" ")
@@ -34,7 +34,7 @@ export default (req, res, next) => {
             const userData = await User.findOne({ _id: currentSession.user_id }).select("+refreshToken")
 
             if (!userData) {
-                return res.status(404).send({ error: "No user data found" })
+                return res.status(404).json({ error: "No user data found" })
             }
 
             if (err) {
