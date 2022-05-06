@@ -324,7 +324,6 @@ export default class UserController extends Controller {
     post = {
         "/login": async (req, res) => {
             passport.authenticate("local", { session: false }, async (error, user, options) => {
-                console.log(error, user, options)
                 if (error) {
                     return res.status(500).json(`Error validating user > ${error.message}`)
                 }
