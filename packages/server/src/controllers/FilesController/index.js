@@ -1,4 +1,4 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import path from "path"
 import fs from "fs"
 import stream from "stream"
@@ -7,7 +7,7 @@ function resolveToUrl(filepath) {
     return `${global.globalPublicURI}/uploads/${filepath}`
 }
 
-export default class FilesController extends ComplexController {
+export default class FilesController extends Controller {
     static disabled = true
 
     get = {

@@ -1,6 +1,6 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 
-export default class ConfigController extends ComplexController {
+export default class ConfigController extends Controller {
     static refName = "ConfigController"
     static useMiddlewares = ["withAuthentication", "onlyAdmin"]
 
