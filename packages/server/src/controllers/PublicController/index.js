@@ -1,6 +1,6 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 
-export default class PublicController extends ComplexController {
+export default class PublicController extends Controller {
     static refName = "PublicController"
 
     post = {

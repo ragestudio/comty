@@ -1,8 +1,8 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import { Role, User } from "../../models"
 import { Schematized } from "../../lib"
 
-export default class RolesController extends ComplexController {
+export default class RolesController extends Controller {
     static refName = "RolesController"
     static useMiddlewares = ["roles"]
 
@@ -61,11 +61,11 @@ export default class RolesController extends ComplexController {
             }, async (req, res) => {
                 // check if issuer user is admin
                 if (!req.isAdmin()) {
-                    return res.status(403).send("You do not have administrator permission")
+                    return res.status(403).json("You do not have administrator permission")
                 }
 
                 if (!Array.isArray(req.selection.update)) {
-                    return res.status(400).send("Invalid update request")
+                    return res.status(400).json("Invalid update request")
                 }
 
                 req.selection.update.forEach(async (update) => {
@@ -82,7 +82,7 @@ export default class RolesController extends ComplexController {
                     }
                 })
 
-                return res.send("done")
+                return res.json("done")
             }),
         },
     }

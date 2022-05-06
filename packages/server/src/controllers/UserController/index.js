@@ -1,6 +1,5 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import passport from "passport"
-
 import { User, UserFollow } from "../../models"
 import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
@@ -13,7 +12,7 @@ const AllowedPublicUpdateFields = [
     "description",
 ]
 
-export default class UserController extends ComplexController {
+export default class UserController extends Controller {
     static refName = "UserController"
 
     methods = {
@@ -390,7 +389,7 @@ export default class UserController extends ComplexController {
                     })
                 })
                     .catch((err) => {
-                        return res.send(500).json({
+                        return res.json(500).json({
                             error: err.message
                         })
                     })
@@ -420,7 +419,7 @@ export default class UserController extends ComplexController {
                     })
                 })
                     .catch((err) => {
-                        return res.send(500).json({
+                        return res.json(500).json({
                             error: err.message
                         })
                     })
