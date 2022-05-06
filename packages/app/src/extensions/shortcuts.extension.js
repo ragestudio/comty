@@ -7,6 +7,7 @@ export default class ShortcutsExtension extends Extension {
         this.shortcuts = {}
 
         document.addEventListener("keydown", (event) => {
+            // FIXME: event.key sometimes is not defined
             const key = event.key.toLowerCase()
 
             const shortcut = this.shortcuts[key]

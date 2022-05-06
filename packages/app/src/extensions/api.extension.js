@@ -63,11 +63,13 @@ export default class ApiExtension extends Extension {
         }
 
         const handleResponse = async (data) => {
+            // handle token regeneration
             if (data.headers?.regenerated_token) {
                 Session.token = data.headers.regenerated_token
                 console.debug("[REGENERATION] New token generated")
             }
 
+            // handle 401 responses
             if (data instanceof Error) {
                 if (data.response.status === 401) {
                     window.app.eventBus.emit("invalid_session")

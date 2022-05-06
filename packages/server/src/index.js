@@ -1,3 +1,13 @@
+// patches
+const { Buffer } = require("buffer")
+
+global.b64Decode = (data) => {
+    return Buffer.from(data, "base64").toString("utf-8")
+}
+global.b64Encode = (data) => {
+    return Buffer.from(data, "utf-8").toString("base64")
+}
+
 Array.prototype.updateFromObjectKeys = function (obj) {
     this.forEach((value, index) => {
         if (obj[value] !== undefined) {
@@ -9,20 +19,12 @@ Array.prototype.updateFromObjectKeys = function (obj) {
 }
 
 import path from "path"
-import LinebridgeServer from "linebridge/dist/server"
+import { Server as LinebridgeServer } from "linebridge/dist/server"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
 import passport from "passport"
 import { User, Session, Config } from "./models"
 import jwt from "jsonwebtoken"
-
-const { Buffer } = require("buffer")
-const b64Decode = global.b64Decode = (data) => {
-    return Buffer.from(data, "base64").toString("utf-8")
-}
-const b64Encode = global.b64Encode = (data) => {
-    return Buffer.from(data, "utf-8").toString("base64")
-}
 
 const ExtractJwt = require("passport-jwt").ExtractJwt
 const LocalStrategy = require("passport-local").Strategy
@@ -188,11 +190,11 @@ class Server {
             passwordField: "password",
             session: false
         }, (username, password, done) => {
-            User.findOne({ username: b64Decode(username) }).select("+password")
+            User.findOne({ username }).select("+password")
                 .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
-                    } else if (!bcrypt.compareSync(b64Decode(password), data.password)) {
+                    } else if (!bcrypt.compareSync(password, data.password)) {
                         return done(null, false, this.options.jwtStrategy)
                     }
 

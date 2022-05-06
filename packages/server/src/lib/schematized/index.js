@@ -1,11 +1,12 @@
 export default (schema = {}, fn) => {
     return async (req, res, next) => {
-        if (typeof req.body === "undefined") {
-            req.body = {}
-        }
-        if (typeof req.query === "undefined") {
-            req.query = {}
-        }
+        // not necessary since linebridge lib will do this for you
+        // if (typeof req.body === "undefined") {
+        //     req.body = {}
+        // }
+        // if (typeof req.query === "undefined") {
+        //     req.query = {}
+        // }
 
         if (schema.required) {
             if (Array.isArray(schema.required)) {

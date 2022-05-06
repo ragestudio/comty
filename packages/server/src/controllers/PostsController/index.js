@@ -1,8 +1,8 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import { Schematized } from "../../lib"
 import { Post, User } from "../../models"
 
-export default class PostsController extends ComplexController {
+export default class PostsController extends Controller {
     static refName = "PostsController"
     static useMiddlewares = ["withAuthentication"]
 

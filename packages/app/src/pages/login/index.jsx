@@ -15,8 +15,8 @@ const formInstance = [
             icon: "User",
             placeholder: "Username",
             props: {
-                autocorrect: "off",
-                autocapitalize: "none",
+                autoCorrect: "off",
+                autoCapitalize: "none",
                 className: "login-form-username",
             },
         },
