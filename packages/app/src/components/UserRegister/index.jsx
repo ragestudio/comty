@@ -14,8 +14,8 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input
-                    autocorrect="off" 
-                    autocapitalize="none"
+                    autoCorrect="off" 
+                    autoCapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="@newuser"
                     onChange={(e) => {
@@ -34,8 +34,8 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input.Password
-                    autocorrect="off" 
-                    autocapitalize="none"
+                    autoCorrect="off" 
+                    autoCapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="Password"
                     onChange={(e) => {
