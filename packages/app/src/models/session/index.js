@@ -44,8 +44,8 @@ export default class Session {
     //* BASIC HANDLERS
     login = (payload, callback) => {
         const body = {
-            username: window.btoa(payload.username),
-            password: window.btoa(payload.password),
+            username: payload.username, //window.btoa(payload.username),
+            password: payload.password, //window.btoa(payload.password),
         }
 
         return this.generateNewToken(body, (err, res) => {
