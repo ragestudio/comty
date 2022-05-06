@@ -390,7 +390,7 @@ export default class UserController extends ComplexController {
                     })
                 })
                     .catch((err) => {
-                        return res.send(500).json({
+                        return res.json(500).json({
                             error: err.message
                         })
                     })
@@ -420,7 +420,7 @@ export default class UserController extends ComplexController {
                     })
                 })
                     .catch((err) => {
-                        return res.send(500).json({
+                        return res.json(500).json({
                             error: err.message
                         })
                     })
