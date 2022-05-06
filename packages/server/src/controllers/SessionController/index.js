@@ -1,8 +1,8 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import { Session } from "../../models"
 import jwt from "jsonwebtoken"
 
-export default class SessionController extends ComplexController {
+export default class SessionController extends Controller {
     static refName = "SessionController"
 
     get = {

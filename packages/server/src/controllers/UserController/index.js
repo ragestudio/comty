@@ -1,6 +1,5 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import passport from "passport"
-
 import { User, UserFollow } from "../../models"
 import { Token, Schematized, createUser } from "../../lib"
 import SessionController from "../SessionController"
@@ -13,7 +12,7 @@ const AllowedPublicUpdateFields = [
     "description",
 ]
 
-export default class UserController extends ComplexController {
+export default class UserController extends Controller {
     static refName = "UserController"
 
     methods = {
@@ -325,6 +324,7 @@ export default class UserController extends ComplexController {
     post = {
         "/login": async (req, res) => {
             passport.authenticate("local", { session: false }, async (error, user, options) => {
+                console.log(error, user, options)
                 if (error) {
                     return res.status(500).json(`Error validating user > ${error.message}`)
                 }

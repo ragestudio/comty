@@ -19,7 +19,7 @@ Array.prototype.updateFromObjectKeys = function (obj) {
 }
 
 import path from "path"
-import LinebridgeServer from "linebridge/dist/server"
+import { Server as LinebridgeServer } from "linebridge/dist/server"
 import bcrypt from "bcrypt"
 import mongoose from "mongoose"
 import passport from "passport"

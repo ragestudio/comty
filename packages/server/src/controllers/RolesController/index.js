@@ -1,8 +1,8 @@
-import { ComplexController } from "linebridge/dist/classes"
+import { Controller } from "linebridge/dist/server"
 import { Role, User } from "../../models"
 import { Schematized } from "../../lib"
 
-export default class RolesController extends ComplexController {
+export default class RolesController extends Controller {
     static refName = "RolesController"
     static useMiddlewares = ["roles"]
 
