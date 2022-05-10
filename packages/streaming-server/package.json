@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "linebridge": "^0.11.13",
+    "mongoose": "^6.3.3",
     "node-media-server": "^2.3.9"
   },
   "devDependencies": {
