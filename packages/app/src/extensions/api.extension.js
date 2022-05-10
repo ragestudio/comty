@@ -4,8 +4,12 @@ import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 
 export default class ApiExtension extends Extension {
+    depends = ["SettingsExtension"]
+
     constructor(app, main) {
         super(app, main)
+
+        //this.config = this.getServerOrigins()
 
         this.apiBridge = this.createBridge()
         this.WSInterface = this.apiBridge.wsInterface
@@ -13,6 +17,11 @@ export default class ApiExtension extends Extension {
         this.WSInterface.listen = this.handleWSListener
         this.WSSockets = this.WSInterface.sockets
         this.WSInterface.mainSocketConnected = false
+    }
+
+    getServerOrigins = () => {
+        // TODO: try to get origins from settings
+        // const storagedOrigins = window.app.settings.get("serverOrigins")
     }
 
     initializers = [
