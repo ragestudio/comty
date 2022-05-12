@@ -40,6 +40,6 @@ export default {
                 name: "Español"
             }
         ],
-        defaultLocale: "es",
+        defaultLocale: "en",
     }
 }
