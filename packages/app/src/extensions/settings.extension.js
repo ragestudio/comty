@@ -1,6 +1,7 @@
 import { Extension } from "evite"
 import store from "store"
 import defaultSettings from "schemas/defaultSettings.json"
+import { Observable } from "rxjs"
 
 export default class SettingsExtension extends Extension {
     constructor(app, main) {
@@ -50,6 +51,23 @@ export default class SettingsExtension extends Extension {
         }
 
         return this.settings[key]
+    }
+
+    withEvent = (listenEvent, defaultValue) => {
+        let value = defaultValue ?? this.settings[key] ?? false
+
+        const observable = new Observable((subscriber) => {
+            subscriber.next(value)
+
+            window.app.eventBus.on(listenEvent, (to) => {
+                value = to
+                subscriber.next(value)
+            })
+        })
+
+        return observable.subscribe((value) => {
+            return value
+        })
     }
 
     window = {

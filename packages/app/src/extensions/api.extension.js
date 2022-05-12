@@ -87,8 +87,8 @@ export default class ApiExtension extends Extension {
         }
 
         return new Bridge({
-            origin: config.api.address,
-            wsOrigin: config.ws.address,
+            origin: config.remotes.mainApi,
+            wsOrigin: config.remotes.websocketApi,
             wsOptions: {
                 autoConnect: false,
             },
