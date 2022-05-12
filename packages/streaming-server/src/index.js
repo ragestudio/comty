@@ -37,24 +37,41 @@ class StreamingServer {
     IHTTPServer = new Server(HTTPServerConfig)
 
     IMediaServer = new MediaServer(MediaServerConfig)
-    
-    Db = new DbManager()
-    
-    Sessions = new SessionsManager()
 
-    PublicStreamings = []
+    Db = new DbManager()
+
+    Sessions = new SessionsManager()
 
     constructor() {
         this.registerMediaServerEvents()
+        this.registerHTTPServerEndpoints()
 
         // fire initization
         this.initialize()
     }
 
     registerMediaServerEvents = () => {
-        Object.keys(this.mediaServerEvents).forEach(eventName => {
+        Object.keys(this.mediaServerEvents).forEach((eventName) => {
             this.IMediaServer.on(eventName, this.mediaServerEvents[eventName])
         })
+    }
+
+    registerHTTPServerEndpoints = () => {
+        Object.keys(this.httpServerEndpoints).forEach((route) => {
+            this.IHTTPServer.registerHTTPEndpoint({
+                route: route,
+                ...this.httpServerEndpoints[route]
+            })
+        })
+    }
+
+    httpServerEndpoints = {
+        "/streams": {
+            method: "get",
+            fn: async (req, res) => {
+                return res.json(this.Sessions.publicStreams)
+            }
+        }
     }
 
     mediaServerEvents = {
@@ -64,7 +81,7 @@ class StreamingServer {
 
             // get session
             const session = this.IMediaServer.getSession(id)
-            
+
             // create a userspaced session for the client with containing session
             this.Sessions.newSession(id, session)
         },
@@ -74,9 +91,11 @@ class StreamingServer {
         },
         doneConnect: async (id, args) => {
             // this event is fired when client has ended the connection
-            
+
             // stop the session
             this.Sessions.removeSession(id)
+
+            this.Sessions.unpublishStream(id)
         },
         prePublish: async (id, StreamPath, args) => {
             // this event is fired before client is published
@@ -87,20 +106,22 @@ class StreamingServer {
                 key: streamingKey
             })
 
-            console.log(streamingUserspace)
-
             if (!streamingUserspace) {
                 this.Sessions.removeSession(id)
                 return false
             }
 
-            PublicStreamings.push(id)
+            this.Sessions.publishStream({
+                id,
+                user_id: streamingUserspace.user_id,
+            })
         }
     }
 
     initialize = async () => {
         await this.Db.connect()
         this.IMediaServer.run()
+        this.IHTTPServer.initialize()
     }
 }
 
