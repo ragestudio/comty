@@ -136,13 +136,13 @@ class StreamingServer {
         "/streams": {
             method: "get",
             fn: async (req, res) => {
-                if (req.query?.user_id) {
-                    const streams = await this.Sessions.getStreamsByUserId(req.query.user_id)
+                let streams = []
 
-                    return res.json(streams)
+                if (req.query?.username) {
+                    streams = await this.Sessions.getStreamsByUsername(req.query?.username)
+                } else {
+                    streams = this.Sessions.getPublicStreams()
                 }
-
-                let streams = this.Sessions.getPublicStreams()
 
                 // retrieve streams details from internal media server api
                 let streamsListDetails = await axios.get(`${internalMediaServerURI}/api/streams`)
@@ -171,6 +171,12 @@ class StreamingServer {
                         ...streamsListDetails[stream.id]
                     }
                 })
+
+                // if username is provided, return only streams for that user
+                // is supposed to be allowed only one stream per user
+                if (req.query?.username) {
+                    return res.json(streams[0])
+                }
 
                 return res.json(streams)
             }
