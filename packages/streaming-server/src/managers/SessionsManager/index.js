@@ -12,6 +12,8 @@ export default class SessionsManager {
     }
 
     removeSession = (id) => {
+        this.sessions[id].reject()
+        
         delete this.sessions[id]
     }
 }
