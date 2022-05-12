@@ -12,7 +12,7 @@ const LayoutRenders = {
 	mobile: (props) => {
 		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
 			<antd.Layout className="content_layout">
-				<antd.Layout.Content className="layout_page">
+				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
 						{props.children}
 					</div>
@@ -28,7 +28,7 @@ const LayoutRenders = {
 			<Sidebar user={props.user} />
 			<antd.Layout className="content_layout">
 				<Header />
-				<antd.Layout.Content className="layout_page">
+				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
 						{props.children}
 					</div>
@@ -43,6 +43,7 @@ export default class Layout extends React.Component {
 	state = {
 		layoutType: "default",
 		isOnTransition: false,
+		compactMode: false,
 	}
 
 	setLayout = (layout) => {
@@ -61,6 +62,11 @@ export default class Layout extends React.Component {
 		})
 		window.app.eventBus.on("transitionDone", () => {
 			this.setState({ isOnTransition: false })
+		})
+		window.app.eventBus.on("toogleCompactMode", (to) => {
+			this.setState({
+				compactMode: to ?? !this.state.compactMode,
+			})
 		})
 
 		if (window.app.settings.get("forceMobileMode") || window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
@@ -85,6 +91,9 @@ export default class Layout extends React.Component {
 		const layoutComponentProps = {
 			...this.props,
 			...this.state,
+			layoutPageModesClassnames: [{
+				["noMargin"]: this.state.compactMode,
+			}]
 		}
 
 		if (LayoutRenders[this.state.layoutType]) {
