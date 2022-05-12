@@ -1,4 +1,5 @@
 {
-    "http_api": "https://indev_api.comty.pw",
-    "ws_api": "wss://indev_ws.comty.pw"
+    "main_api": "http://indev_api.comty.pw",
+    "streaming_api": "http://media.ragestudio.net:3002",
+    "websocket_api": "ws://indev_ws.comty.pw"
 }
