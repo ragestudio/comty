@@ -28,5 +28,6 @@ export const Post = mongoose.model("Post", schemas.Post, "posts")
 export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
 
 // streamings
+export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey, "streamingKeys")
 
 // marketplace
