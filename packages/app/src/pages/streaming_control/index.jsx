@@ -56,6 +56,25 @@ export default (props) => {
         }
     }
 
+    const regenerateStreamingKey = async () => {
+        antd.Modal.confirm({
+            title: "Regenerate streaming key",
+            content: "Are you sure you want to regenerate the streaming key? After this, all other generated keys will be deleted.",
+            onOk: async () => {
+                const result = await app.request.post.regenerateStreamingKey().catch((error) => {
+                    console.error(error)
+                    antd.message.error(error.message)
+
+                    return null
+                })
+
+                if (result) {
+                    setStreamingKey(result.key)
+                }
+            }
+        })
+    }
+
     React.useEffect(() => {
         checkStreamingKey()
         checkTagetServer()
@@ -97,6 +116,12 @@ export default (props) => {
                 </div>
                 <div className="value">
                     <StreamingKeyView streamingKey={streamingKey} />
+                </div>
+                <div>
+                    <antd.Button onClick={() => regenerateStreamingKey()}>
+                        <Icons.RefreshCw />
+                        Regenerate
+                    </antd.Button>
                 </div>
             </div>
             <div className="info">
