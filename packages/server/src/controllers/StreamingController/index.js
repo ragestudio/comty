@@ -4,10 +4,11 @@ import { nanoid } from "nanoid"
 
 import axios from "axios"
 
-const streamingServerAddress = process.env.mediaServerAddress ?? "media.ragestudio.net"
-const streamingServerAPIPort = process.env.mediaServerAPIPort ?? 3002
-const streamingServerAPIProtocol = process.env.mediaServerAPIProtocol ?? "http"
-const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAddress}:${streamingServerAPIPort}`
+const streamingMediaServer = process.env.streamingMediaServer ?? "media.ragestudio.net"
+const streamingServerAPIAddress = process.env.streamingServerAPIAddress ?? "media.ragestudio.net"
+const streamingServerAPIPort = process.env.streamingServerAPIPort ?? 3002
+const streamingServerAPIProtocol = process.env.streamingServerAPIProtocol ?? "http"
+const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress}:${streamingServerAPIPort}`
 
 export default class StreamingController extends Controller {
     static useMiddlewares = ["withAuthentication"]
@@ -33,7 +34,7 @@ export default class StreamingController extends Controller {
             // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
             const { data } = await axios.get(`${streamingServerAPIUri}/streams`).catch((error) => {
                 res.status(500).json({
-                    error: `Failed to fetch streams from [${streamingServerAddress}]: ${error.message}`
+                    error: `Failed to fetch streams from [${streamingServerAPIAddress}]: ${error.message}`
                 })
                 return false
             })
@@ -49,7 +50,7 @@ export default class StreamingController extends Controller {
                 protocol: "rtmp",
                 port: "1935",
                 space: "live",
-                address: streamingServerAddress,
+                address: streamingMediaServer,
             })
         },
         "/streaming_key": async (req, res) => {
