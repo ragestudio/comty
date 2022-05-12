@@ -1,4 +1,5 @@
 const ffmpeg = require("@ffmpeg-installer/ffmpeg")
+import lodash from "lodash"
 
 import { Server } from "linebridge/dist/server"
 import MediaServer from "node-media-server"
@@ -26,17 +27,19 @@ const MediaServerConfig = {
         port: 1000,
         allow_origin: '*'
     },
-    // trans: {
-    //     ffmpeg: ffmpeg.path,
-    //     tasks: [
-    //         {
-    //             app: "live",
-    //             hls: true,
-    //             hlsFlags: "[hls_time=2:hls_list_size=3:hls_flags=delete_segments]",
-    //         }
-    //     ]
-    // }
+    trans: {
+        ffmpeg: ffmpeg.path,
+        tasks: [
+            {
+                app: "live",
+                hls: true,
+                hlsFlags: "[hls_time=2:hls_list_size=3:hls_flags=delete_segments]",
+            }
+        ]
+    }
 }
+
+const internalMediaServerURI = `http://127.0.0.1:${MediaServerConfig.http.port}`
 
 class StreamingServer {
     IHTTPServer = new Server(HTTPServerConfig)
@@ -139,7 +142,37 @@ class StreamingServer {
                     return res.json(streams)
                 }
 
-                return res.json(this.Sessions.getPublicStreams())
+                let streams = this.Sessions.getPublicStreams()
+
+                // retrieve streams details from internal media server api
+                let streamsListDetails = await axios.get(`${internalMediaServerURI}/api/streams`)
+
+                streamsListDetails = streamsListDetails.data.live ?? {}
+
+                // return only publisher details
+                streamsListDetails = Object.keys(streamsListDetails).map((streamKey) => {
+                    return {
+                        // filter unwanted properties
+                        ...lodash.omit(streamsListDetails[streamKey].publisher, ["stream", "ip"])
+                    }
+                })
+
+                // reduce as an object
+                streamsListDetails = streamsListDetails.reduce((acc, cur) => {
+                    acc[cur.clientId] = cur
+
+                    return acc
+                }, {})
+
+                // merge with public streams
+                streams = streams.map((stream) => {
+                    return {
+                        ...stream,
+                        ...streamsListDetails[stream.id]
+                    }
+                })
+
+                return res.json(streams)
             }
         },
         "/stream/:mode/:username": {
@@ -163,7 +196,7 @@ class StreamingServer {
 
                 switch (mode) {
                     case "flv": {
-                        const streamingFLVUri = `http://localhost:${MediaServerConfig.http.port}/live/${streamKey}.flv`
+                        const streamingFLVUri = `${internalMediaServerURI}/live/${streamKey}.flv`
 
                         // create a stream pipe response using media server api with axios
                         const request = await axios.get(streamingFLVUri, {
@@ -185,7 +218,7 @@ class StreamingServer {
                     }
 
                     case "hls": {
-                        const streamingHLSUri = `http://localhost:${MediaServerConfig.http.port}/live/${streamKey}.m3u8`
+                        const streamingHLSUri = `${internalMediaServerURI}/live/${streamKey}.m3u8`
 
                         // create a stream pipe response using media server api with axios
                         const request = await axios.get(streamingHLSUri, {
