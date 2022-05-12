@@ -34,6 +34,31 @@ export default class StreamingController extends Controller {
     }
 
     get = {
+        "/stream_info_from_username": async (req, res) => {
+            const { username } = req.query
+
+            const userspace = await StreamingKey.findOne({ username })
+
+            if (!userspace) {
+                return res.status(403).json({
+                    error: "This username has not a streaming key"
+                })
+            }
+
+            // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
+            const { data } = await axios.get(`${streamingServerAPIUri}/streams`, {
+                params: {
+                    username: userspace.username
+                }
+            }).catch((error) => {
+                res.status(500).json({
+                    error: `Failed to fetch streams from [${streamingServerAPIAddress}]: ${error.message}`
+                })
+                return false
+            })
+
+            return res.json(data)
+        },
         "/streams": async (req, res) => {
             // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
             const { data } = await axios.get(`${streamingServerAPIUri}/streams`).catch((error) => {
