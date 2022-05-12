@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
-import { SelectableList, ActionsBar } from "components"
+import { Icons } from "components/Icons"
+import { ActionsBar } from "components"
 
 import "./index.less"
 
@@ -62,9 +63,9 @@ export default class Streams extends React.Component {
             <div className="details">
                 <div className="title">
                     <h1>@{stream.userData.username}</h1>
-                    <span>
-                        #{stream.id}
-                    </span>
+                </div>
+                <div>
+                    <span> #{stream.id}</span>
                 </div>
             </div>
         </div>
@@ -74,16 +75,28 @@ export default class Streams extends React.Component {
         return <div className="streams">
             <ActionsBar mode="float">
                 <div>
-                    <antd.Button onClick={this.updateStreamsList}>Refresh</antd.Button>
+                    <antd.Button
+                        shape="round"
+                        icon={<Icons.RefreshCw style={{ margin: 0 }} />}
+                        onClick={this.updateStreamsList}
+                    />
+                </div>
+                <div>
+                    <antd.Button
+                        shape="round"
+                        icon={<Icons.Sliders />}
+                        onClick={() => window.app.setLocation("/streaming_control")}
+                    >
+                        Control Panel
+                    </antd.Button>
                 </div>
             </ActionsBar>
-            <div>
-                <SelectableList
-                    selectionEnabled={false}
-                    renderItem={this.renderListItem}
-                    items={this.state.list}
-                />
-            </div>
+            {
+                this.state.list.length > 0 &&
+                <div className="streams-list">
+                    {this.state.list.map(this.renderListItem)}
+                </div>
+            }
         </div>
     }
 }
