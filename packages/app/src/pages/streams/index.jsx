@@ -26,7 +26,7 @@ export default class Streams extends React.Component {
         if (streams && Array.isArray(streams)) {
             // resolve user_id with user basic data
             streams = streams.map(async (stream) => {
-                const userData = await this.api.get.user(undefined, { user_id: stream.user_id }).catch((error) => {
+                const userData = await this.api.get.user(undefined, { _id: stream.user_id }).catch((error) => {
                     console.error(error)
                     antd.message.error(error)
 
