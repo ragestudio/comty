@@ -1,0 +1,49 @@
+.streams {
+    .selectableList_content {
+        display: flex;
+        flex-wrap: wrap;
+
+        .selectableList_item {
+            max-width: 20vw;
+        }
+
+        .streaming-item {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 10px;
+
+            .thumbnail {
+                width: 15vw;
+                height: 100px;
+                background-size: cover;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+
+            .details {
+                .title {
+                    display: inline-flex;
+                    align-items: center;
+
+                    h1{
+                        font-size: 1.5em;
+                        font-weight: bold;
+                        margin-right: 10px;
+                        margin-bottom: 0;
+                    }
+
+                    span {
+                        font-size: 0.8em;
+                    }
+                }
+            }
+        }
+    }
+}

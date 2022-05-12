@@ -5,6 +5,7 @@ import { default as UserController } from "./UserController"
 import { default as FilesController } from "./FilesController"
 import { default as PublicController } from "./PublicController"
 import { default as PostsController } from "./PostsController"
+import { default as StreamingController } from "./StreamingController"
 
 export default [
     PostsController,
@@ -14,4 +15,5 @@ export default [
     SessionController,
     UserController,
     FilesController,
+    StreamingController,
 ]

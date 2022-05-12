@@ -1,4 +1,5 @@
 {
+    "themeVariant": "light",
     "forceMobileMode": false,
     "notifications_sound": true,
     "notifications_vibrate": true,
@@ -13,6 +14,7 @@
         "main",
         "explore",
         "saved",
-        "marketplace"
+        "marketplace",
+        "streams",
     ]
 }

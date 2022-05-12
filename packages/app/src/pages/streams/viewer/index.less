@@ -1,0 +1,92 @@
+.plyr__controls {
+    width: 100%;
+    display: inline-flex;
+    //justify-content: space-between;
+}
+
+.stream {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 100vh;
+    width: 100vw;
+
+    color: var(--background-color-contrast);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    span,
+    p {
+        color: var(--background-color-contrast);
+    }
+
+    .panel {
+        display: flex;
+        flex-direction: column;
+
+        height: 100vh;
+        width: 20vw;
+
+        .info {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+
+            width: 100%;
+            height: 10vh;
+
+            padding: 10px;
+
+            backdrop-filter: 20px;
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5 {
+                margin: 0;
+            }
+
+            >div {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                height: fit-content;
+                margin-bottom: 8px;
+
+                >div {
+                    margin-right: 8px;
+                }
+            }
+        }
+
+        .chatbox {
+            width: 20vw;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        #spectatorCount {
+            font-size: 0.8em;
+        }
+
+        #timeCount {
+            font-size: 0.8em;
+        }
+    }
+
+    .plyr {
+        border-radius: 0 4px 4px 0;
+        width: 80vw;
+        height: 100vh;
+    }
+}

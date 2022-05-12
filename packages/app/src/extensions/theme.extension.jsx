@@ -9,7 +9,6 @@ export default class ThemeExtension extends Extension {
 
 		this.themeManifestStorageKey = "theme"
 		this.modificationStorageKey = "themeModifications"
-		this.variantStorageKey = "themeVariation"
 
 		this.theme = null
 
@@ -19,12 +18,9 @@ export default class ThemeExtension extends Extension {
 
 	initializers = [
 		async () => {
-			this.mainContext.eventBus.on("darkMode", (value) => {
-				if (value) {
-					this.applyVariant("dark")
-				} else {
-					this.applyVariant("light")
-				}
+			this.mainContext.eventBus.on("theme.applyVariant", (value) => {
+				this.applyVariant(value)
+				this.setVariant(value)
 			})
 			this.mainContext.eventBus.on("modifyTheme", (value) => {
 				this.update(value)
@@ -95,11 +91,11 @@ export default class ThemeExtension extends Extension {
 	}
 
 	getStoragedVariant = () => {
-		return store.get(this.variantStorageKey)
+		return app.settings.get("themeVariant")
 	}
 
 	setVariant = (variationKey) => {
-		return store.set(this.variantStorageKey, variationKey)
+		return app.settings.set("themeVariant", variationKey)
 	}
 
 	setModifications = (modifications) => {
@@ -142,7 +138,6 @@ export default class ThemeExtension extends Extension {
 		if (values) {
 			this.currentVariant = variant
 			this.update(values)
-			this.setVariant(variant)
 		}
 	}
 
