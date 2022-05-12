@@ -146,14 +146,17 @@ export default [
         "experimental": true
     },
     {
+        "experimental": true,
         "id": "darkMode",
         "storaged": true,
         "group": "aspect",
         "type": "Switch",
         "icon": "Moon",
         "title": "Dark mode",
-        "emitEvent": "darkMode",
-        "experimental": true
+        "emitEvent": "theme.applyVariant",
+        "emissionValueUpdate": (value) => {
+            return value ? "dark" : "light"
+        },
     },
     {
         "id": "primaryColor",
