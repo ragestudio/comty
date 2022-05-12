@@ -29,17 +29,29 @@ export default class SessionsManager {
     }
 
     unpublishStream = (stream_key) => {
-        this.publicStreams = this.publicStreams.filter(stream => stream.stream_key !== stream_key)
+        this.publicStreams = this.publicStreams.filter((stream) => stream.stream_key !== stream_key)
     }
 
     getPublicStreams = () => {
         // return this.publicStreams but without stream_key property
-        return lodash.map(this.publicStreams, stream => {
+        return lodash.map(this.publicStreams, (stream) => {
             return lodash.omit(stream, "stream_key")
         })
     }
 
     getStreamsByUserId = (user_id) => {
-        return lodash.filter(this.publicStreams, stream => stream.user_id === user_id)
+        const streams = lodash.filter(this.publicStreams, (stream) => stream.user_id === user_id)
+
+        return lodash.map(streams, (stream) => {
+            return lodash.omit(stream, "stream_key")
+        })
+    }
+
+    getStreamsByUsername = (username) => {
+        const streams = lodash.filter(this.publicStreams, (stream) => stream.username === username)
+
+        return lodash.map(streams, (stream) => {
+            return lodash.omit(stream, "stream_key")
+        })
     }
 }
