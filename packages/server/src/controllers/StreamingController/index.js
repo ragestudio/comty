@@ -19,7 +19,7 @@ export default class StreamingController extends Controller {
             // if the user already has a key, it will be regenerated
 
             // get username from user_id
-            const userData = await User.findOne({ user_id: user_id })
+            const userData = await User.findById(user_id)
 
             const streamingKey = new StreamingKey({
                 user_id,
