@@ -74,6 +74,7 @@
     "react-router-config": "^5.1.1",
     "react-router-dom": "6.2.1",
     "react-virtualized": "^9.22.3",
+    "rxjs": "^7.5.5",
     "store": "^2.0.12",
     "styled-components": "^5.3.3",
     "vite-ssr": "0.15.0"
