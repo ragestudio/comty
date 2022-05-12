@@ -1,0 +1,36 @@
+.streamingControlPanel {
+    display: inline-flex;
+    flex-direction: column;
+
+    .info {
+        display: flex;
+        flex-direction: column;
+
+        margin-bottom: 10px;
+
+        .label {
+
+        }
+
+        .value {
+            margin-left: 10px;
+            font-family: "DM Mono", monospace;
+
+            h4 {
+                // select all text
+                user-select: all;
+                margin: 0;
+            }
+        }
+    }
+
+    > div {
+        margin-bottom: 20px;
+    }
+}
+
+.streamingKeyString {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
