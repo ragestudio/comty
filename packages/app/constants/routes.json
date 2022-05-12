@@ -18,5 +18,15 @@
         "id": "marketplace",
         "title": "Marketplace",
         "icon": "Package"
+    },
+    {
+        "id": "streams",
+        "title": "Streams",
+        "icon": "Tv"
+    },
+    {
+        "id": "streaming_control",
+        "title": "Streaming Control",
+        "icon": "Video"
     }
 ]
