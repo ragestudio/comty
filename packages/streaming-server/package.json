@@ -9,6 +9,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "linebridge": "^0.11.13",
+    "lodash": "^4.17.21",
     "mongoose": "^6.3.3",
     "node-media-server": "^2.3.9"
   },
