@@ -18,8 +18,12 @@ export default class StreamingController extends Controller {
             // this will generate a new key for the user
             // if the user already has a key, it will be regenerated
 
+            // get username from user_id
+            const userData = await User.findOne({ user_id: user_id })
+
             const streamingKey = new StreamingKey({
                 user_id,
+                username: userData.username,
                 key: nanoid()
             })
 
@@ -55,7 +59,7 @@ export default class StreamingController extends Controller {
         },
         "/streaming_key": async (req, res) => {
             let streamingKey = await StreamingKey.findOne({
-                userId: req.user._id.toString()
+                user_id: req.user._id.toString()
             })
 
             if (!streamingKey) {
@@ -75,6 +79,36 @@ export default class StreamingController extends Controller {
             } else {
                 return res.json(streamingKey)
             }
-        },
+        }
+    }
+
+    post = {
+        "/regenerate_streaming_key": async (req, res) => {
+            // check if the user already has a key
+            let streamingKey = await StreamingKey.findOne({
+                user_id: req.user._id.toString()
+            })
+
+            // if exists, delete it
+
+            if (streamingKey) {
+                await streamingKey.remove()
+            }
+
+            // generate a new key
+            const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
+                res.status(500).json({
+                    error: `Cannot generate a new key: ${err.message}`,
+                })
+
+                return false
+            })
+
+            if (!newKey) {
+                return false
+            }
+
+            return res.json(newKey)
+        }
     }
 }
