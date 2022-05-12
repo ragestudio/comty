@@ -1,5 +1,5 @@
 export default {
-    userId: {
+    user_id: {
         type: String,
         required: true,
     },

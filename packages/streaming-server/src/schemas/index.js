@@ -1,1 +1,1 @@
-export { default as StreamingKey } from "./StreamingKey"
+export { default as streamingKey } from "./streamingKey"
