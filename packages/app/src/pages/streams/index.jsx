@@ -92,10 +92,15 @@ export default class Streams extends React.Component {
                 </div>
             </ActionsBar>
             {
-                this.state.list.length > 0 &&
-                <div className="streams-list">
-                    {this.state.list.map(this.renderListItem)}
-                </div>
+                this.state.list.length > 0 ?
+                    <div className="streams-list">
+                        {this.state.list.map(this.renderListItem)}
+                    </div> :
+                    <div className="streams-list">
+                        <div className="empty">
+                            <antd.Empty description="No streams found" />
+                        </div>
+                    </div>
             }
         </div>
     }
