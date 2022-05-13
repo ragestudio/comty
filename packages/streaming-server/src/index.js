@@ -12,8 +12,8 @@ import { Server } from "linebridge/dist/server"
 import { SessionsManager, DbManager } from "./managers"
 import { getStreamingKeyFromStreamPath, cpu } from "./lib"
 
-import MediaServer from "./nms"
-import FlvSession from "./nms/sessionsModels/flv_session"
+import MediaServer from "./internal-nms"
+import FlvSession from "./internal-nms/sessionsModels/flv_session"
 
 import { StreamingKey } from "./models"
 
