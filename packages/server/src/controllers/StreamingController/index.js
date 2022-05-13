@@ -57,7 +57,9 @@ export default class StreamingController extends Controller {
                 return false
             })
 
-            return res.json(data)
+            if (data) {
+                return res.json(data)
+            }
         },
         "/streams": async (req, res) => {
             // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
