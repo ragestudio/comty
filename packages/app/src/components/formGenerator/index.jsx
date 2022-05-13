@@ -16,6 +16,8 @@ import {
 } from "antd"
 import HeadShake from "react-reveal/HeadShake"
 
+import "./index.less"
+
 const allComponents = {
 	Input,
 	Button,
@@ -169,8 +171,9 @@ export default class FormGenerator extends React.Component {
 
 	renderValidationIcon() {
 		if (this.props.renderLoadingIcon && this.state.validating) {
-			return <Icons.LoadingOutlined spin style={{ marginTop: "7px" }} />
+			return <Icons.LoadingOutlined spin style={{ margin: 0 }} />
 		}
+
 		return null
 	}
 
@@ -376,20 +379,22 @@ export default class FormGenerator extends React.Component {
 			return null
 		}
 
-		return (
-			<div>
-				<Form
-					hideRequiredMark={this.props.hideRequiredMark ?? false}
-					name={this.props.name ?? "new_form"}
-					onFinish={(e) => this.handleFinish(e)}
-					ref={this.ref}
-					{...this.props.formProps}
-				>
-					{this.renderItems(this.props.items)}
-					<Form.Item key="result" help={helpStatus} validateStatus={validateStatus} />
-				</Form>
-				{this.renderValidationIcon()}
-			</div>
-		)
+		return <div
+			key={this.props.id}
+			id={this.props.id}
+			className="formWrapper"
+		>
+			<Form
+				hideRequiredMark={this.props.hideRequiredMark ?? false}
+				name={this.props.name ?? "new_form"}
+				onFinish={(e) => this.handleFinish(e)}
+				ref={this.ref}
+				{...this.props.formProps}
+			>
+				{this.renderItems(this.props.items)}
+				<Form.Item key="result" help={helpStatus} validateStatus={validateStatus} />
+			</Form>
+			{this.renderValidationIcon()}
+		</div>
 	}
 }
