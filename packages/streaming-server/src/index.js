@@ -1,18 +1,25 @@
 const ffmpeg = require("@ffmpeg-installer/ffmpeg")
+
+import express from "express"
+import fs from "fs"
+import path from "path"
+
+import os from "os"
 import lodash from "lodash"
+import { EventEmitter } from "events"
 
 import { Server } from "linebridge/dist/server"
-import MediaServer from "node-media-server"
 import { SessionsManager, DbManager } from "./managers"
-import { getStreamingKeyFromStreamPath } from "./lib"
+import { getStreamingKeyFromStreamPath, cpu } from "./lib"
 
-import axios from "axios"
-import stream from "stream"
+import MediaServer from "./nms"
+import FlvSession from "./nms/sessionsModels/flv_session"
 
 import { StreamingKey } from "./models"
 
 const HTTPServerConfig = {
     port: 3002,
+    httpEngine: "express"
 }
 
 const MediaServerConfig = {
@@ -23,10 +30,8 @@ const MediaServerConfig = {
         ping: 30,
         ping_timeout: 60
     },
-    http: {
-        port: 1000,
-        allow_origin: "*"
-    },
+    //logType: 0,
+    mediaroot: path.resolve(process.cwd(), "./cache"),
     trans: {
         ffmpeg: ffmpeg.path,
         tasks: [
@@ -34,12 +39,52 @@ const MediaServerConfig = {
                 app: "live",
                 hls: true,
                 hlsFlags: "[hls_time=2:hls_list_size=3:hls_flags=delete_segments]",
+                dash: true,
+                dashFlags: "[f=dash:window_size=3:extra_window_size=5]"
             }
+        ]
+    },
+    fission: {
+        ffmpeg: ffmpeg.path,
+        tasks: [
+            {
+                rule: "app/*",
+                model: [
+                    {
+                        ab: "320k",
+                        vb: "10500k",
+                        vs: "1920x1080",
+                        vf: "60",
+                    },
+                    {
+                        ab: "320k",
+                        vb: "4500k",
+                        vs: "1920x1080",
+                        vf: "30",
+                    },
+                    {
+                        ab: "320k",
+                        vb: "1500k",
+                        vs: "1280x720",
+                        vf: "30",
+                    },
+                    {
+                        ab: "96k",
+                        vb: "1000k",
+                        vs: "854x480",
+                        vf: "24",
+                    },
+                    {
+                        ab: "96k",
+                        vb: "600k",
+                        vs: "640x360",
+                        vf: "20",
+                    },
+                ]
+            },
         ]
     }
 }
-
-const internalMediaServerURI = `http://127.0.0.1:${MediaServerConfig.http.port}`
 
 class StreamingServer {
     IHTTPServer = new Server(HTTPServerConfig)
@@ -50,9 +95,17 @@ class StreamingServer {
 
     Sessions = new SessionsManager()
 
+    Stats = {}
+
+    InternalEvents = new EventEmitter()
+
     constructor() {
         this.registerMediaServerEvents()
         this.registerHTTPServerEndpoints()
+
+        global.resolveUserspaceOfStreamingKey = this.resolveUserspaceOfStreamingKey.bind(this)
+
+        this.IHTTPServer.httpInterface.use("/media", express.static(path.resolve(process.cwd(), "./cache/live")))
 
         // fire initization
         this.initialize()
@@ -133,6 +186,35 @@ class StreamingServer {
                 return res.send("OK")
             }
         },
+        "/status": {
+            method: "get",
+            fn: async (req, res) => {
+                const cpuPercentageUsage = await cpu.percentageUsage()
+
+                return res.json({
+                    os: {
+                        arch: os.arch(),
+                        platform: os.platform(),
+                        release: os.release(),
+                    },
+                    cpu: {
+                        num: os.cpus().length,
+                        load: cpuPercentageUsage,
+                        model: os.cpus()[0].model,
+                        speed: os.cpus()[0].speed,
+                    },
+                    mem: {
+                        totle: os.totalmem(),
+                        free: os.freemem()
+                    },
+                    nodejs: {
+                        uptime: Math.floor(process.uptime()),
+                        version: process.version,
+                        mem: process.memoryUsage()
+                    },
+                })
+            }
+        },
         "/streams": {
             method: "get",
             fn: async (req, res) => {
@@ -145,9 +227,9 @@ class StreamingServer {
                 }
 
                 // retrieve streams details from internal media server api
-                let streamsListDetails = await axios.get(`${internalMediaServerURI}/api/streams`)
+                let streamsListDetails = this.IMediaServer.getSessions()//await axios.get(`${internalMediaServerURI}/api/streams`)
 
-                streamsListDetails = streamsListDetails.data.live ?? {}
+                streamsListDetails = streamsListDetails?.live ?? {}
 
                 // return only publisher details
                 streamsListDetails = Object.keys(streamsListDetails).map((streamKey) => {
@@ -202,49 +284,20 @@ class StreamingServer {
 
                 switch (mode) {
                     case "flv": {
-                        const streamingFLVUri = `${internalMediaServerURI}/live/${streamKey}.flv`
+                        // fix streamKey
+                        req.url = `/live/${streamKey}.flv`
 
-                        // create a stream pipe response using media server api with axios
-                        const request = await axios.get(streamingFLVUri, {
-                            responseType: "stream"
-                        })
+                        req.nmsConnectionType = "http"
 
-                        // create a buffer stream from the request
-                        const bufferStream = request.data.pipe(new stream.PassThrough())
+                        let session = new FlvSession(req, res)
 
-                        res.writeHead(200, {
-                            "Cache-Control": "no-cache",
-                            "Connection": "keep-alive"
-                        })
-
-                        // pipe the buffer stream to the response
-                        bufferStream.on("data", (chunk) => {
-                            res.write(chunk)
-                        })
+                        session.run()
 
                         break;
                     }
 
                     case "hls": {
-                        const streamingHLSUri = `${internalMediaServerURI}/live/${streamKey}.m3u8`
-
-                        // create a stream pipe response using media server api with axios
-                        const request = await axios.get(streamingHLSUri, {
-                            responseType: "stream"
-                        })
-
-                        // create a buffer stream from the request
-                        const bufferStream = request.data.pipe(new stream.PassThrough())
-
-                        // set header for stream response
-                        //res.setHeader("Content-Type", "application/x-mpegURL")
-
-                        // pipe the buffer stream to the response
-                        bufferStream.on("data", (chunk) => {
-                            res.write(chunk)
-                        })
-
-                        break;
+                        return res.status(501).send("Not implemented")
                     }
 
                     default: {
@@ -296,6 +349,18 @@ class StreamingServer {
 
             this.Sessions.unpublishStream(streamingKey)
         }
+    }
+
+    resolveUserspaceOfStreamingKey = async (streamingKey) => {
+        const streamingUserspace = await StreamingKey.findOne({
+            key: streamingKey
+        })
+
+        if (!streamingUserspace) {
+            return false
+        }
+
+        return streamingUserspace
     }
 
     initialize = async () => {
