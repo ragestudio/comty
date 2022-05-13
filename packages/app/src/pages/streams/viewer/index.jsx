@@ -31,6 +31,11 @@ export default class StreamViewer extends React.Component {
     videoPlayerRef = React.createRef()
 
     componentDidMount = async () => {
+        window.StreamViewer = {
+            updateQuality: this.updateQuality,
+            switchProtocol: this.switchProtocol,
+        }
+
         const query = new URLSearchParams(window.location.search)
         const requestedUsername = query.get("key")
 
