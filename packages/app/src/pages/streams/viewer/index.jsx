@@ -25,7 +25,7 @@ export default class StreamViewer extends React.Component {
         streamSource: null,
         loadedProtocol: "flv",
         protocolInstance: null,
-        defaultOptions: undefined,
+        plyrOptions: {},
     }
 
     videoPlayerRef = React.createRef()
@@ -43,6 +43,7 @@ export default class StreamViewer extends React.Component {
         const player = new Plyr("#player", {
             autoplay: true,
             controls: ["play", "mute", "volume", "fullscreen", "options", "settings"],
+            ...this.state.plyrOptions,
         })
 
         await this.setState({
@@ -158,11 +159,38 @@ export default class StreamViewer extends React.Component {
 
     loadWithProtocol = {
         hls: () => {
-            const source = `${streamsSource}/stream/hls/${this.state.streamKey}`
+            const source = `${streamsSource}/media/${this.state.streamKey}/index.m3u8`
             const hls = new Hls()
 
             hls.loadSource(source)
             hls.attachMedia(this.videoPlayerRef.current)
+
+            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                const levels = hls.levels
+
+                const quality = {
+                    default: levels[levels.length - 1].height,
+                    options: levels.map((level) => level.height),
+                    forced: true,
+                    onChange: (newQuality) => {
+                        console.log('changes', newQuality)
+
+                        levels.forEach((level, levelIndex) => {
+                            if (level.height === newQuality) {
+                                hls.currentLevel = levelIndex
+                            }
+                        })
+
+                    },
+                }
+
+                this.setState({
+                    plyrOptions: {
+                        quality,
+                        ...this.state.plyrOptions
+                    }
+                })
+            })
 
             this.setState({ protocolInstance: hls, loadedProtocol: "hls" })
         },
