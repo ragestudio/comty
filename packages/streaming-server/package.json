@@ -8,10 +8,15 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "linebridge": "^0.11.13",
-    "lodash": "^4.17.21",
+    "linebridge": "0.11.14",
+    "lodash": "4.17.21",
     "mongoose": "^6.3.3",
-    "node-media-server": "^2.3.9"
+    "node-media-server": "^2.3.9",
+    "chalk": "^2.4.2",
+    "dateformat": "^3.0.3",
+    "minimist": "^1.2.5",
+    "mkdirp": "1.0.3",
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
