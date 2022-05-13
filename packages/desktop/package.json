@@ -1,6 +1,6 @@
 {
   "name": "comty-desktop",
-  "version": "0.17.1",
+  "version": "0.17.2",
   "main": "main/index.js",
   "license": "MIT",
   "scripts": {
