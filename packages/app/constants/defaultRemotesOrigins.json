@@ -1,5 +1,5 @@
 {
-    "main_api": "https://indev_api.comty.pw",
-    "streaming_api": "http://media.ragestudio.net:3002",
-    "websocket_api": "wss://indev_ws.comty.pw"
+    "main_api": "http://localhost:3000",
+    "streaming_api": "http://localhost:3002",
+    "websocket_api": "ws://localhost:3001"
 }
