@@ -212,9 +212,6 @@ class StreamingServer {
                         // create a buffer stream from the request
                         const bufferStream = request.data.pipe(new stream.PassThrough())
 
-                        // set header for stream response
-                        res.setHeader("Content-Type", "video/x-flv")
-
                         // pipe the buffer stream to the response
                         bufferStream.on("data", (chunk) => {
                             res.write(chunk)
@@ -235,7 +232,7 @@ class StreamingServer {
                         const bufferStream = request.data.pipe(new stream.PassThrough())
 
                         // set header for stream response
-                        res.setHeader("Content-Type", "application/x-mpegURL")
+                        //res.setHeader("Content-Type", "application/x-mpegURL")
 
                         // pipe the buffer stream to the response
                         bufferStream.on("data", (chunk) => {
