@@ -1,16 +1,13 @@
 const ffmpeg = require("@ffmpeg-installer/ffmpeg")
 
 import express from "express"
-import fs from "fs"
 import path from "path"
-
-import os from "os"
 import lodash from "lodash"
 import { EventEmitter } from "events"
 
 import { Server } from "linebridge/dist/server"
 import { SessionsManager, DbManager } from "./managers"
-import { getStreamingKeyFromStreamPath, cpu } from "./lib"
+import { getStreamingKeyFromStreamPath } from "./lib"
 
 import MediaServer from "./internal-nms"
 import FlvSession from "./internal-nms/sessionsModels/flv_session"
