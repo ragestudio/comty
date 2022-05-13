@@ -189,30 +189,9 @@ class StreamingServer {
         "/status": {
             method: "get",
             fn: async (req, res) => {
-                const cpuPercentageUsage = await cpu.percentageUsage()
+                const serverStatus = await this.IMediaServer.getServerStatus()
 
-                return res.json({
-                    os: {
-                        arch: os.arch(),
-                        platform: os.platform(),
-                        release: os.release(),
-                    },
-                    cpu: {
-                        num: os.cpus().length,
-                        load: cpuPercentageUsage,
-                        model: os.cpus()[0].model,
-                        speed: os.cpus()[0].speed,
-                    },
-                    mem: {
-                        totle: os.totalmem(),
-                        free: os.freemem()
-                    },
-                    nodejs: {
-                        uptime: Math.floor(process.uptime()),
-                        version: process.version,
-                        mem: process.memoryUsage()
-                    },
-                })
+                return res.json(serverStatus)
             }
         },
         "/streams": {
