@@ -144,6 +144,6 @@ export default [
         "type": "Button",
         "icon": "LogOut",
         "title": "Logout",
-        "emitEvent": "logout",
+        "emitEvent": "session.logout",
     }
 ]
