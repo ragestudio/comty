@@ -15,6 +15,10 @@ const streamsSource = config.remotes.streamingApi
 
 export default class StreamViewer extends React.Component {
     state = {
+        isEnded: false,
+        isLoading: true,
+        endResult: false,
+
         userData: null,
         streamInfo: null,
         spectators: 0,
@@ -67,10 +71,10 @@ export default class StreamViewer extends React.Component {
         // await for it
         await this.gatherStreamInfo()
 
-        // create timer
-        if (this.state.streamInfo.connectCreated) {
-            this.createTimerCounter()
-        }
+        // // create timer
+        // if (this.state.streamInfo.connectCreated) {
+        //     this.createTimerCounter()
+        // }
     }
 
     componentWillUnmount = () => {
@@ -106,7 +110,7 @@ export default class StreamViewer extends React.Component {
             username: this.state.streamKey,
         }).catch((error) => {
             console.error(error)
-            antd.message.error(error.message)
+            antd.message.error(error)
             return false
         })
 
@@ -136,8 +140,8 @@ export default class StreamViewer extends React.Component {
         if (loadedProtocol === "hls") {
             this.state.protocolInstance.levels.forEach((level, levelIndex) => {
                 if (level.height === newQuality) {
-                    console.log("Found quality match with " + newQuality);
-                    this.state.protocolInstance.currentLevel = levelIndex;
+                    console.log("Found quality match with " + newQuality)
+                    this.state.protocolInstance.currentLevel = levelIndex
                 }
             })
         }
@@ -198,8 +202,10 @@ export default class StreamViewer extends React.Component {
             const source = `${streamsSource}/stream/flv/${this.state.streamKey}`
 
             const instance = mpegts.createPlayer({
+                enableWorker: true,
                 type: "flv",
                 url: source,
+                cors: true,
                 isLive: true
             })
 
@@ -207,12 +213,50 @@ export default class StreamViewer extends React.Component {
             instance.load()
             instance.play()
 
+            instance.on("error", (error) => {
+                console.error(error)
+                antd.message.error(error.toString())
+
+                //this.onSourceEnded(error)
+            })
+
+            // instance.on("onSourceOpen", this.onSourceLoading)
+            // instance.on(mpegts.Events["LOADING_COMPLETE"], this.onSourceLoadingDone)
+            // instance.on("onSourceEnded", this.onSourceEnded)
+
             this.setState({ protocolInstance: instance, loadedProtocol: "flv" })
         },
     }
 
+    onSourceLoading = () => {
+        this.setState({
+            isLoading: true,
+        })
+    }
+
+    onSourceLoadingDone = () => {
+        console.log(`loaded ${this.state.loadedProtocol}`)
+        this.setState({
+            isLoading: false,
+        })
+    }
+
+    onSourceEnded = () => {
+        console.log("Source ended")
+        this.setState({ isEnded: true })
+    }
+
     render() {
         return <div className="stream">
+            {
+                this.state.isEnded && <div className="stream_end">
+                    <antd.Result>
+                        <h1>
+                            This stream is ended
+                        </h1>
+                    </antd.Result>
+                </div>
+            }
             <video ref={this.videoPlayerRef} id="player" />
             <div className="panel">
                 <div className="info">
@@ -230,10 +274,6 @@ export default class StreamViewer extends React.Component {
                     <div id="spectatorCount">
                         <Icons.Eye />
                         {this.state.spectators}
-                    </div>
-                    <div id="timeCount">
-                        <Icons.Clock />
-                        {this.state.timeFromNow}
                     </div>
                 </div>
                 <div className="chatbox">
