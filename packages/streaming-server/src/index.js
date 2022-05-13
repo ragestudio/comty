@@ -30,15 +30,8 @@ const MediaServerConfig = {
         ping: 30,
         ping_timeout: 60
     },
-<<<<<<< HEAD
     //logType: 0,
     mediaroot: path.resolve(process.cwd(), "./cache"),
-=======
-    http: {
-        port: 1000,
-        allow_origin: "*"
-    },
->>>>>>> c11505bacf345ac8b0e7799a04f90daa6922556a
     trans: {
         ffmpeg: ffmpeg.path,
         tasks: [
