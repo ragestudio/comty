@@ -137,5 +137,13 @@ export default [
             }
         },
         "debounced": true,
+    },
+    {
+        "id": "logout",
+        "footer": true,
+        "type": "Button",
+        "icon": "LogOut",
+        "title": "Logout",
+        "emitEvent": "logout",
     }
 ]
