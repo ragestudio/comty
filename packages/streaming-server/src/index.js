@@ -25,7 +25,7 @@ const MediaServerConfig = {
     },
     http: {
         port: 1000,
-        allow_origin: '*'
+        allow_origin: "*"
     },
     trans: {
         ffmpeg: ffmpeg.path,
@@ -211,6 +211,11 @@ class StreamingServer {
 
                         // create a buffer stream from the request
                         const bufferStream = request.data.pipe(new stream.PassThrough())
+
+                        res.writeHead(200, {
+                            "Cache-Control": "no-cache",
+                            "Connection": "keep-alive"
+                        })
 
                         // pipe the buffer stream to the response
                         bufferStream.on("data", (chunk) => {
