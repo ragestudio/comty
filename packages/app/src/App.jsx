@@ -53,7 +53,7 @@ import { Translation } from "react-i18next"
 import { Session, User } from "models"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Navigation } from "components"
+import { NotFound, RenderError, Crash, Settings, Navigation, Login } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -62,7 +62,16 @@ import * as Render from "extensions/render.extension.jsx"
 import "theme/index.less"
 
 class App extends React.Component {
-	//static debugMode = true
+	//static debugMode = true // this will enable debug mode of evite app (dah...)
+
+	sessionController = new Session()
+
+	userController = new User()
+
+	state = {
+		session: null,
+		user: null,
+	}
 
 	loadingMessage = false
 
@@ -71,6 +80,16 @@ class App extends React.Component {
 	}
 
 	static eventsHandlers = {
+		"app.createLogin": async function () {
+			app.DrawerController.open("login", Login, {
+				componentProps: {
+					sessionController: this.sessionController
+				}
+			})
+		},
+		"session.logout": async function () {
+			await this.sessionController.logout()
+		},
 		"new_session": async function () {
 			await this.flushState()
 			await this.initialization()
@@ -85,11 +104,12 @@ class App extends React.Component {
 			this.eventBus.emit("forceToLogin")
 		},
 		"forceToLogin": function () {
-			if (window.location.pathname !== "/login") {
-				this.beforeLoginLocation = window.location.pathname
-			}
+			// if (window.location.pathname !== "/login") {
+			// 	this.beforeLoginLocation = window.location.pathname
+			// }
 
-			window.app.setLocation("/login")
+			// window.app.setLocation("/login")
+			app.eventBus.emit("app.createLogin")
 		},
 		"invalid_session": async function (error) {
 			await this.sessionController.forgetLocalSession()
@@ -244,13 +264,6 @@ class App extends React.Component {
 				}
 			})
 		}
-	}
-
-	sessionController = new Session()
-	userController = new User()
-	state = {
-		session: null,
-		user: null,
 	}
 
 	flushState = async () => {
