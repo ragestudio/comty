@@ -7,9 +7,7 @@ import classnames from "classnames"
 import config from "config"
 import { Icons, createIconRender } from "components/Icons"
 
-import AppSettings from "schemas/settings/app"
-import AccountSettings from "schemas/settings/account"
-
+import SettingsList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
 import { AboutApp } from ".."
@@ -326,6 +324,22 @@ export default class SettingsMenu extends React.PureComponent {
 		})
 	}
 
+	generateSettingsTabs = () => {
+		return Object.keys(SettingsList).map((key) => {
+			return <antd.Tabs.TabPane
+				key={key}
+				tab={
+					<span>
+						{createIconRender(SettingsList[key].icon)}
+						{SettingsList[key].label}
+					</span>
+				}
+			>
+				{this.generateSettingsGroups(SettingsList[key].settings)}
+			</antd.Tabs.TabPane>
+		})
+	}
+
 	render() {
 		const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
@@ -337,72 +351,31 @@ export default class SettingsMenu extends React.PureComponent {
 					destroyInactiveTabPane
 					onTabClick={this.handlePageTransition}
 				>
-					<antd.Tabs.TabPane
-						key="app"
-						tab={
-							<span>
-								<Icons.Command />
-								App
-							</span>
-						}
-					>
-						{this.generateSettingsGroups(AppSettings)}
-						<div className="footer">
-							<div>
-								<div>{config.app?.siteName}</div>
-								<div>
-									<antd.Tag>
-										<Icons.Tag />v{window.app.version}
-									</antd.Tag>
-								</div>
-								<div>
-									<antd.Tag color={isDevMode ? "magenta" : "green"}>
-										{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-										{isDevMode ? "development" : "stable"}
-									</antd.Tag>
-								</div>
-							</div>
-							<div>
-								<antd.Button type="link" onClick={() => AboutApp.openModal()}>
-									<Translation>
-										{t => t("about")}
-									</Translation>
-								</antd.Button>
-							</div>
-						</div>
-					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane
-						key="account"
-						tab={
-							<span>
-								<Icons.User />
-								Account
-							</span>
-						}
-					>
-						{this.generateSettingsGroups(AccountSettings)}
-					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane
-						key="security"
-						tab={
-							<span>
-								<Icons.Shield />
-								Security
-							</span>
-						}
-					>
-					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane
-						key="privacy"
-						tab={
-							<span>
-								<Icons.Eye />
-								Privacy
-							</span>
-						}
-					>
-					</antd.Tabs.TabPane>
+					{this.generateSettingsTabs()}
 				</antd.Tabs>
+				<div className="footer">
+					<div>
+						<div>{config.app?.siteName}</div>
+						<div>
+							<antd.Tag>
+								<Icons.Tag />v{window.app.version}
+							</antd.Tag>
+						</div>
+						<div>
+							<antd.Tag color={isDevMode ? "magenta" : "green"}>
+								{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
+								{isDevMode ? "development" : "stable"}
+							</antd.Tag>
+						</div>
+					</div>
+					<div>
+						<antd.Button type="link" onClick={() => AboutApp.openModal()}>
+							<Translation>
+								{t => t("about")}
+							</Translation>
+						</antd.Button>
+					</div>
+				</div>
 			</div>
 		)
 	}
