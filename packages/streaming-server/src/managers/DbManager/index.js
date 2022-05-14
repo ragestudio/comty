@@ -1,8 +1,13 @@
 import mongoose from "mongoose"
 
-function parseConnectionString(obj) {
+function getConnectionConfig(obj) {
     const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
-    return `${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? ""}/${db_name ?? ""}`
+
+    return [`${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? "27017"}/?authMechanism=DEFAULT`, {
+        dbName: db_name,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    }]
 }
 
 export default class DBManager {
@@ -14,14 +19,9 @@ export default class DBManager {
         return new Promise((resolve, reject) => {
             try {
                 console.log("🌐 Trying to connect to DB...")
-                const dbUri = parseConnectionString(this.env)
+                const dbConfig = getConnectionConfig(this.env)
 
-                //console.log(dbUri)
-
-                mongoose.connect(dbUri, {
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true
-                })
+                mongoose.connect(...dbConfig)
                     .then((res) => { return resolve(true) })
                     .catch((err) => { return reject(err) })
             } catch (err) {
