@@ -105,28 +105,26 @@ export default class Login extends React.Component {
     }
 
     render() {
-        return (
-            <div className="login">
-                <div className="header">
-                    <div className="logo">
-                        <img src={config.logo?.full} />
-                    </div>
+        return <div className="login">
+            <div className="header">
+                <div className="logo">
+                    <img src={config.logo?.full} />
                 </div>
-                {this.props.session && <div className="session_available">
-                    <h3><Icons.AlertCircle /> You already have a valid session.</h3>
-                    <div className="session_card">
-                        @{this.props.session.username}
-                    </div>
-                    <antd.Button type="primary" onClick={() => window.app.setLocation(config.app?.mainPath ?? "/main")} >Go to main</antd.Button>
-                </div>}
-                <FormGenerator
-                    name="normal_login"
-                    renderLoadingIcon
-                    className="login-form"
-                    items={formInstance}
-                    onFinish={this.handleFinish}
-                />
             </div>
-        )
+            {this.props.session && <div className="session_available">
+                <h3><Icons.AlertCircle /> You already have a valid session.</h3>
+                <div className="session_card">
+                    @{this.props.session.username}
+                </div>
+                <antd.Button type="primary" onClick={() => window.app.setLocation(config.app?.mainPath ?? "/main")} >Go to main</antd.Button>
+            </div>}
+            <FormGenerator
+                name="normal_login"
+                renderLoadingIcon
+                className="login-form"
+                items={formInstance}
+                onFinish={this.handleFinish}
+            />
+        </div>
     }
 }
