@@ -21,71 +21,64 @@ Array.prototype.updateFromObjectKeys = function (obj) {
 import path from "path"
 import { Server as LinebridgeServer } from "linebridge/dist/server"
 import bcrypt from "bcrypt"
-import mongoose from "mongoose"
 import passport from "passport"
-import { User, Session, Config } from "./models"
+
 import jwt from "jsonwebtoken"
+
+import { User, Session, Config } from "./models"
+import DbManager from "./classes/DbManager"
 
 const ExtractJwt = require("passport-jwt").ExtractJwt
 const LocalStrategy = require("passport-local").Strategy
 
-function getConnectionConfig(obj) {
-    const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
-
-    return [`${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? "27017"}/?authMechanism=DEFAULT`, {
-        dbName: db_name,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    }]
-}
-
 class Server {
+    env = process.env
+
+    DB = new DbManager()
+
+    httpListenPort = this.env.listenPort ?? 3000
+    wsListenPort = this.env.wsListenPort ?? 3001
+
+    controllers = require("./controllers").default
+    middlewares = require("./middlewares")
+
+    httpInstance = new LinebridgeServer({
+        port: this.httpListenPort,
+        wsPort: this.wsListenPort,
+        headers: {
+            "Access-Control-Expose-Headers": "regenerated_token",
+        },
+        onWSClientConnection: this.onWSClientConnection,
+        onWSClientDisconnection: this.onWSClientDisconnection,
+    }, this.controllers, this.middlewares)
+
+    options = {
+        jwtStrategy: {
+            sessionLocationSign: this.httpInstance.id,
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: this.httpInstance.oskid,
+            algorithms: ["sha1", "RS256", "HS256"],
+            expiresIn: this.env.signLifetime ?? "1h",
+        }
+    }
+
     constructor() {
-        this.env = process.env
-        this.listenPort = this.env.listenPort ?? 3000
-        this.wsListenPort = this.env.wsListenPort ?? 3001
-
-        this.controllers = require("./controllers").default
-        this.middlewares = require("./middlewares")
-
-        this.instance = new LinebridgeServer({
-            port: this.listenPort,
-            wsPort: this.wsListenPort,
-            headers: {
-                "Access-Control-Expose-Headers": "regenerated_token",
-            },
-            onWSClientConnection: this.onWSClientConnection,
-            onWSClientDisconnection: this.onWSClientDisconnection,
-        }, this.controllers, this.middlewares)
-
-        this.server = this.instance.httpInterface
-
-        this.options = {
-            jwtStrategy: {
-                sessionLocationSign: this.instance.id,
-                jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-                secretOrKey: this.instance.oskid,
-                algorithms: ["sha1", "RS256", "HS256"],
-                expiresIn: this.env.signLifetime ?? "1h",
-            }
+        this.httpInstance.wsInterface["clients"] = []
+        this.httpInstance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
+            return this.httpInstance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
         }
-
-        this.instance.wsInterface["clients"] = []
-        this.instance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
-            return this.instance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
-        }
-        this.instance.wsInterface["getClientSockets"] = (userId) => {
-            return this.instance.wsInterface.clients.filter(client => client.userId === userId).map((client) => {
+        this.httpInstance.wsInterface["getClientSockets"] = (userId) => {
+            return this.httpInstance.wsInterface.clients.filter(client => client.userId === userId).map((client) => {
                 return client?.socket
             })
         }
-        this.instance.wsInterface["broadcast"] = async (channel, ...args) => {
-            for await (const client of this.instance.wsInterface.clients) {
+        this.httpInstance.wsInterface["broadcast"] = async (channel, ...args) => {
+            for await (const client of this.httpInstance.wsInterface.clients) {
                 client.socket.emit(channel, ...args)
             }
         }
 
-        global.wsInterface = this.instance.wsInterface
+        global.wsInterface = this.httpInstance.wsInterface
         global.httpListenPort = this.listenPort
         global.globalPublicURI = this.env.globalPublicURI
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
@@ -96,36 +89,14 @@ class Server {
     }
 
     async initialize() {
-        await this.connectToDB()
+        await this.DB.connect()
         await this.initializeConfigDB()
+
         await this.checkSetup()
         await this.initPassport()
         await this.initWebsockets()
 
-        await this.instance.initialize()
-    }
-
-    connectToDB = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                console.log("🌐 Trying to connect to DB...")
-                const dbConfig = getConnectionConfig(this.env)
-                console.log(dbConfig)
-                mongoose.connect(...dbConfig)
-                    .then((res) => { return resolve(true) })
-                    .catch((err) => { return reject(err) })
-            } catch (err) {
-                return reject(err)
-            }
-        }).then(done => {
-            console.log(`✅ Connected to DB`)
-        }).catch((error) => {
-            console.log(`❌ Failed to connect to DB, retrying...\n`)
-            console.log(error)
-            setTimeout(() => {
-                this.connectToDB()
-            }, 1000)
-        })
+        await this.httpInstance.initialize()
     }
 
     initializeConfigDB = async () => {
@@ -178,11 +149,11 @@ class Server {
     }
 
     initPassport() {
-        this.instance.middlewares["useJwtStrategy"] = (req, res, next) => {
+        this.httpInstance.middlewares["useJwtStrategy"] = (req, res, next) => {
             req.jwtStrategy = this.options.jwtStrategy
             next()
         }
-        this.instance.middlewares["useWS"] = (req, res, next) => {
+        this.httpInstance.middlewares["useWS"] = (req, res, next) => {
             req.ws = global.wsInterface
             next()
         }
@@ -206,7 +177,7 @@ class Server {
                 .catch(err => done(err, null, this.options.jwtStrategy))
         }))
 
-        this.server.use(passport.initialize())
+        this.httpInstance.httpInterface.use(passport.initialize())
     }
 
     initWebsockets() {
@@ -222,7 +193,7 @@ class Server {
             })
         }
 
-        this.instance.wsInterface.eventsChannels.push(["/main", "authenticate", async (socket, token) => {
+        this.httpInstance.wsInterface.eventsChannels.push(["/main", "authenticate", async (socket, token) => {
             const session = await Session.findOne({ token }).catch(err => {
                 return false
             })
@@ -259,7 +230,7 @@ class Server {
     }
 
     attachClientSocket = async (client, userData) => {
-        const socket = this.instance.wsInterface.clients.find(c => c.id === client.id)
+        const socket = this.httpInstance.wsInterface.clients.find(c => c.id === client.id)
 
         if (socket) {
             socket.socket.disconnect()
@@ -272,20 +243,20 @@ class Server {
             user: userData,
         }
 
-        this.instance.wsInterface.clients.push(clientObj)
+        this.httpInstance.wsInterface.clients.push(clientObj)
 
-        this.instance.wsInterface.io.emit("userConnected", userData)
+        this.httpInstance.wsInterface.io.emit("userConnected", userData)
     }
 
     detachClientSocket = async (client) => {
-        const socket = this.instance.wsInterface.clients.find(c => c.id === client.id)
+        const socket = this.httpInstance.wsInterface.clients.find(c => c.id === client.id)
 
         if (socket) {
             socket.socket.disconnect()
-            this.instance.wsInterface.clients = this.instance.wsInterface.clients.filter(c => c.id !== client.id)
+            this.httpInstance.wsInterface.clients = this.httpInstance.wsInterface.clients.filter(c => c.id !== client.id)
         }
 
-        this.instance.wsInterface.io.emit("userDisconnect", client.id)
+        this.httpInstance.wsInterface.io.emit("userDisconnect", client.id)
     }
 
     verifyJwt = (token, callback) => {
