@@ -31,37 +31,42 @@ export default class ThemeExtension extends Extension {
 				this.resetDefault()
 			})
 
-			let theme = this.getStoragedTheme()
-			const modifications = this.getStoragedModifications()
-			const variantKey = this.getStoragedVariant()
-
-			if (!theme) {
-				// load default theme
-				theme = this.getDefaultTheme()
-			} else {
-				// load URL and initialize theme
-			}
-
-			// set global theme
-			this.theme = theme
-
-			// override with static vars
-			if (theme.staticVars) {
-				this.update(theme.staticVars)
-			}
-
-			// override theme with modifications
-			if (modifications) {
-				this.update(modifications)
-			}
-
-			// apply variation
-			this.applyVariant(variantKey)
+			await this.initialize()
 		},
 	]
 
 	static get currentVariant() {
 		return document.documentElement.style.getPropertyValue("--themeVariant")
+	}
+
+	initialize = async () => {
+		let theme = this.getStoragedTheme()
+
+		const modifications = this.getStoragedModifications()
+		const variantKey = this.getStoragedVariant()
+
+		if (!theme) {
+			// load default theme
+			theme = this.getDefaultTheme()
+		} else {
+			// load URL and initialize theme
+		}
+
+		// set global theme
+		this.theme = theme
+
+		// override with static vars
+		if (theme.staticVars) {
+			this.update(theme.staticVars)
+		}
+
+		// override theme with modifications
+		if (modifications) {
+			this.update(modifications)
+		}
+
+		// apply variation
+		this.applyVariant(variantKey)
 	}
 
 	getRootVariables = () => {
@@ -108,7 +113,7 @@ export default class ThemeExtension extends Extension {
 
 		window.app.settings.set("primaryColor", this.theme.staticVars.primaryColor)
 
-		return this.init()
+		this.initialize()
 	}
 
 	update = (update) => {
