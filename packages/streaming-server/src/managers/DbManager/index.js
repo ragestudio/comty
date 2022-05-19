@@ -3,7 +3,7 @@ import mongoose from "mongoose"
 function getConnectionConfig(obj) {
     const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
 
-    return [`${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? "27017"}/?authMechanism=DEFAULT`, {
+    return [`${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? "27017"}${db_user ? "/?authMechanism=DEFAULT" : ""}`, {
         dbName: db_name,
         useNewUrlParser: true,
         useUnifiedTopology: true,
