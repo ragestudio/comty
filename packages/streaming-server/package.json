@@ -16,7 +16,8 @@
     "dateformat": "^3.0.3",
     "minimist": "^1.2.5",
     "mkdirp": "1.0.3",
-    "ws": "^7.4.6"
+    "ws": "^7.4.6",
+    "dotenv": "16.0.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
