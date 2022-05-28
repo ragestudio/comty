@@ -11,6 +11,8 @@ EXPOSE 3010
 COPY package.json ./
 COPY --chown=node:node . .
 
-RUN chmod -R 777 /home/node/app && npm install
+RUN chmod -R 777 /home/node/app
+RUN npm install
+RUN npm run build
 
-CMD ["/home/node/app/node_modules/corenode/bin/corenode-node", "/home/node/app/src/index.js"]
+CMD ["node", "/home/node/app/dist/index.js"]
