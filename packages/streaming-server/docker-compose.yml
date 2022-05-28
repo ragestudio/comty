@@ -4,6 +4,7 @@ services:
   node:
     build: "."
     ports:
-      - "3010:3010"
+      - "1935:1935"
+      - "3002:3002"
     volumes:
       - "./.env:/home/node/app/.env"
