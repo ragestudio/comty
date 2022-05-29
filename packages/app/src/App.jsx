@@ -315,6 +315,8 @@ class App extends React.Component {
 				try {
 					await app.ApiController.attachAPIConnection()
 				} catch (error) {
+					app.eventBus.emit("app.initialization.api_error", error)
+
 					throw {
 						cause: "Cannot connect to API",
 						details: error.message,
@@ -325,6 +327,8 @@ class App extends React.Component {
 				try {
 					await this.__SessionInit()
 				} catch (error) {
+					app.eventBus.emit("app.initialization.session_error", error)
+
 					throw {
 						cause: "Cannot initialize session",
 						details: error.message,
@@ -335,6 +339,8 @@ class App extends React.Component {
 				try {
 					await this.__UserInit()
 				} catch (error) {
+					app.eventBus.emit("app.initialization.user_error", error)
+
 					throw {
 						cause: "Cannot initialize user data",
 						details: error.message,
@@ -345,6 +351,8 @@ class App extends React.Component {
 				try {
 					await this.__WSInit()
 				} catch (error) {
+					app.eventBus.emit("app.initialization.ws_error", error)
+
 					throw {
 						cause: "Cannot connect to WebSocket",
 						details: error.message,
