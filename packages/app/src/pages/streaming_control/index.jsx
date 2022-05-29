@@ -86,6 +86,7 @@ export default (props) => {
     return <div className="streamingControlPanel">
         <div>
             <h2><Icons.MdSettingsInputAntenna /> Connection Status</h2>
+
             <div>
                 <antd.Tag
                     color={isConnected ? "Blue" : "Red"}
@@ -97,7 +98,40 @@ export default (props) => {
         </div>
 
         <div>
+            <h2><Icons.MdInfoOutline /> Stream information</h2>
+
+            <div className="info">
+                <div className="label">
+                    <Icons.Tag />
+                    Title
+                </div>
+                <div className="value">
+                    <antd.Input
+                        placeholder="Stream Title"
+                        disabled
+                    />
+                </div>
+            </div>
+            
+            <div className="info">
+                <div className="label">
+                    <Icons.Grid />
+                    Category
+                </div>
+
+                <div className="value">
+                    <antd.Select
+                        disabled
+                    >
+
+                    </antd.Select>
+                </div>
+            </div>
+        </div>
+
+        <div>
             <h2><Icons.Info /> Server info</h2>
+
             <div className="info">
                 <div className="label">
                     <Icons.Server />
@@ -109,6 +143,7 @@ export default (props) => {
                     </h4>
                 </div>
             </div>
+
             <div className="info">
                 <div className="label">
                     <Icons.Key />
@@ -124,6 +159,7 @@ export default (props) => {
                     </antd.Button>
                 </div>
             </div>
+
             <div className="info">
                 <div className="label">
                     <Icons.MdSettingsInputSvideo />
