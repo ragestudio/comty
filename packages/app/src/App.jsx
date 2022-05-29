@@ -314,6 +314,8 @@ class App extends React.Component {
 			async () => {
 				try {
 					await app.ApiController.attachAPIConnection()
+
+					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.api_error", error)
 
@@ -326,6 +328,8 @@ class App extends React.Component {
 			async () => {
 				try {
 					await this.__SessionInit()
+
+					app.eventBus.emit("app.initialization.session_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.session_error", error)
 
@@ -338,6 +342,8 @@ class App extends React.Component {
 			async () => {
 				try {
 					await this.__UserInit()
+
+					app.eventBus.emit("app.initialization.user_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.user_error", error)
 
@@ -350,6 +356,8 @@ class App extends React.Component {
 			async () => {
 				try {
 					await this.__WSInit()
+
+					app.eventBus.emit("app.initialization.ws_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.ws_error", error)
 
