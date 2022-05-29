@@ -1,4 +1,5 @@
 import React from "react"
+import { Button } from "antd"
 import classnames from "classnames"
 
 import "./index.less"
@@ -8,13 +9,15 @@ export default (props) => {
         <div className="counter">
             {props.count}
         </div>
-        <div
+        <Button
+            type="ghost"
             onClick={props.onClick}
             className={classnames(
                 "btn",
                 { ["followed"]: props.followed }
-            )}>
+            )}
+        >
             <span>{props.followed ? "Following" : "Follow"}</span>
-        </div>
+        </Button>
     </div>
 }
