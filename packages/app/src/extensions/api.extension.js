@@ -13,8 +13,10 @@ export default class ApiExtension extends Extension {
 
         this.apiBridge = this.createBridge()
         this.WSInterface = this.apiBridge.wsInterface
+
         this.WSInterface.request = this.WSRequest
         this.WSInterface.listen = this.handleWSListener
+        
         this.WSSockets = this.WSInterface.sockets
         this.WSInterface.mainSocketConnected = false
     }
