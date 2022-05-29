@@ -1,3 +1,4 @@
+require("dotenv").config()
 const ffmpeg = require("@ffmpeg-installer/ffmpeg")
 
 import express from "express"
