@@ -28,16 +28,16 @@ const ItemTypes = {
 
 const SettingItem = (props) => {
 	let { item } = props
+
 	const [loading, setLoading] = React.useState(true)
 	const [value, setValue] = React.useState(item.defaultValue ?? false)
 	const [delayedValue, setDelayedValue] = React.useState(null)
+	const [disabled, setDisabled] = React.useState(false)
 
-	if (!item.type) {
-		console.error(`Item [${item.id}] has no an type!`)
-		return null
-	}
-	if (typeof ItemTypes[item.type] === "undefined") {
-		console.error(`Item [${item.id}] has an invalid type: ${item.type}`)
+	let SettingComponent = item.component
+
+	if (!SettingComponent) {
+		console.error(`Item [${item.id}] has no an component!`)
 		return null
 	}
 
@@ -100,6 +100,29 @@ const SettingItem = (props) => {
 		}
 	}
 
+	const onUnmount = () => {
+		// unsubscribe eventBus events
+		if (typeof item.dependsOn === "object") {
+			for (let key in item.dependsOn) {
+				window.app.eventBus.off(`setting.update.${key}`, onUpdateItem)
+			}
+		}
+	}
+
+	const checkDependsValidation = () => {
+		return !Boolean(Object.keys(item.dependsOn).every((key) => {
+			const storagedValue = window.app.settings.get(key)
+
+			console.debug(`Checking validation for [${key}] with now value [${storagedValue}]`)
+
+			if (typeof item.dependsOn[key] === "function") {
+				return item.dependsOn[key](storagedValue)
+			}
+
+			return storagedValue === item.dependsOn[key]
+		}))
+	}
+
 	const settingInitialization = async () => {
 		if (item.storaged) {
 			const storagedValue = window.app.settings.get(item.id)
@@ -111,17 +134,15 @@ const SettingItem = (props) => {
 		}
 
 		if (typeof item.dependsOn === "object") {
-			const dependsOptionsKeys = Object.keys(item.dependsOn)
+			// create a event handler to watch changes
+			Object.keys(item.dependsOn).forEach((key) => {
+				window.app.eventBus.on(`setting.update.${key}`, () => {
+					setDisabled(checkDependsValidation())
+				})
+			})
 
-			item.props.disabled = !Boolean(dependsOptionsKeys.every((key) => {
-				const storagedValue = window.app.settings.get(key)
-
-				if (typeof item.dependsOn[key] === "function") {
-					return item.dependsOn[key](storagedValue)
-				}
-
-				return storagedValue === item.dependsOn[key]
-			}))
+			// by default check depends validation
+			setDisabled(checkDependsValidation())
 		}
 
 		if (typeof item.listenUpdateValue === "string") {
@@ -140,57 +161,75 @@ const SettingItem = (props) => {
 
 	React.useEffect(() => {
 		settingInitialization()
+
+		return onUnmount
 	}, [])
 
-	switch (item.type.toLowerCase()) {
-		case "slidercolorpicker": {
-			item.props.onChange = (color) => {
-				item.props.color = color.hex
-			}
-			item.props.onChangeComplete = (color) => {
-				onUpdateItem(color.hex)
-			}
+	if (typeof SettingComponent === "string") {
+		if (typeof ItemTypes[SettingComponent] === "undefined") {
+			console.error(`Item [${item.id}] has an invalid component: ${item.component}`)
+			return null
+		}
 
-			item.props.color = value
+		// fix props
 
-			break
-		}
-		case "textarea": {
-			item.props.defaultValue = value
-			item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
-			item.props.onChange = (event) => onUpdateItem(event.target.value)
-			break
-		}
-		case "input": {
-			item.props.defaultValue = value
-			item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
-			item.props.onChange = (event) => onUpdateItem(event.target.value)
-			break
-		}
-		case "switch": {
-			item.props.checked = value
-			item.props.onClick = (event) => onUpdateItem(event)
-			break
-		}
-		case "select": {
-			item.props.onChange = (value) => onUpdateItem(value)
-			item.props.defaultValue = value
-			break
-		}
-		case "slider": {
-			item.props.defaultValue = value
-			item.props.onAfterChange = (value) => onUpdateItem(value)
-			break
-		}
-		default: {
-			if (!item.props.children) {
-				item.props.children = item.title ?? item.id
+		switch (SettingComponent.toLowerCase()) {
+			case "slidercolorpicker": {
+				item.props.onChange = (color) => {
+					item.props.color = color.hex
+				}
+				item.props.onChangeComplete = (color) => {
+					onUpdateItem(color.hex)
+				}
+
+				item.props.color = value
+
+				break
 			}
-			item.props.value = item.defaultValue
-			item.props.onClick = (event) => onUpdateItem(event)
-			break
+			case "textarea": {
+				item.props.defaultValue = value
+				item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
+				item.props.onChange = (event) => onUpdateItem(event.target.value)
+				break
+			}
+			case "input": {
+				item.props.defaultValue = value
+				item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
+				item.props.onChange = (event) => onUpdateItem(event.target.value)
+				break
+			}
+			case "switch": {
+				item.props.checked = value
+				item.props.onClick = (event) => onUpdateItem(event)
+				break
+			}
+			case "select": {
+				item.props.onChange = (value) => onUpdateItem(value)
+				item.props.defaultValue = value
+				break
+			}
+			case "slider": {
+				item.props.defaultValue = value
+				item.props.onAfterChange = (value) => onUpdateItem(value)
+				break
+			}
+			default: {
+				if (!item.props.children) {
+					item.props.children = item.title ?? item.id
+				}
+
+				item.props.value = item.defaultValue
+				item.props.onClick = (event) => onUpdateItem(event)
+
+				break
+			}
 		}
+
+		// override with default item component
+		SettingComponent = ItemTypes[SettingComponent]
 	}
+
+	item.props["disabled"] = disabled
 
 	return <div key={item.id} className="settingItem">
 		<div className="header">
@@ -230,7 +269,7 @@ const SettingItem = (props) => {
 		</div>
 		<div className="component">
 			<div>
-				{loading ? <div> Loading... </div> : React.createElement(ItemTypes[item.type], item.props)}
+				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, item.props)}
 			</div>
 
 			{delayedValue && <div>

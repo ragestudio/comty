@@ -5,17 +5,33 @@ export default [
         "id": "reduceAnimations",
         "storaged": true,
         "group": "aspect",
-        "type": "Switch",
+        "component": "Switch",
         "icon": "MdOutlineAnimation",
         "title": "Reduce animation",
         "experimental": true
     },
     {
+        "id": "auto_darkMode",
+        "dependsOn": {
+            "darkMode": false
+        },
         "experimental": true,
+        "storaged": true,
+        "group": "aspect",
+        "component": "Switch",
+        "icon": "Moon",
+        "title": "Auto dark mode",
+        "emitEvent": "app.autoDarkModeToogle",
+    },
+    {
+        "experimental": true,
+        "dependsOn": {
+            "auto_darkMode": false
+        },
         "id": "darkMode",
         "storaged": true,
         "group": "aspect",
-        "type": "Switch",
+        "component": "Switch",
         "icon": "Moon",
         "title": "Dark mode",
         "emitEvent": "theme.applyVariant",
@@ -27,7 +43,7 @@ export default [
         "id": "primaryColor",
         "storaged": true,
         "group": "aspect",
-        "type": "SliderColorPicker",
+        "component": "SliderColorPicker",
         "title": "Primary color",
         "description": "Change primary color of the application.",
         "emitEvent": "modifyTheme",
@@ -42,7 +58,7 @@ export default [
         "id": "resetTheme",
         "storaged": true,
         "group": "aspect",
-        "type": "Button",
+        "component": "Button",
         "title": "Reset theme",
         "props": {
             "children": "Default Theme"
