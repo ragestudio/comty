@@ -306,7 +306,7 @@ class App extends React.Component {
 
 					throw {
 						cause: "Cannot connect to API",
-						details: error.message,
+						details: error.stack,
 					}
 				}
 			},
