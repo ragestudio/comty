@@ -12,9 +12,11 @@ export default class StyleCore extends Core {
 	currentVariant = null
 
 	events = {
-		"app.autoDarkMode": (value) => {
+		"app.autoDarkModeToogle": (value) => {
 			if (value === true) {
 				this.handleAutoColorScheme()
+			}else {
+				this.applyVariant(this.getStoragedVariant())
 			}
 		},
 		"theme.applyVariant": (value) => {
@@ -33,7 +35,7 @@ export default class StyleCore extends Core {
 	publicMethods = {
 		style: this
 	}
-	
+
 	static get currentVariant() {
 		return document.documentElement.style.getPropertyValue("--themeVariant")
 	}
@@ -41,10 +43,10 @@ export default class StyleCore extends Core {
 	handleAutoColorScheme() {
 		const prefered = window.matchMedia("(prefers-color-scheme: light)")
 
-		if (window.app.settings.get("app.auto_darkMode") && !prefered.matches) {
+		if (!prefered.matches) {
 			this.applyVariant("dark")
-		}else {
-			this.applyVariant("false")
+		} else {
+			this.applyVariant("light")
 		}
 	}
 
@@ -78,8 +80,16 @@ export default class StyleCore extends Core {
 		this.applyVariant(variantKey)
 
 		// handle auto prefered color scheme
-		if (window.app.settings.get("app.auto_darkMode")) {
-			window.matchMedia("(prefers-color-scheme: light)").addListener(this.handleAutoColorScheme)
+		window.matchMedia("(prefers-color-scheme: light)").addListener(() => {
+			console.log(`[THEME] Auto color scheme changed`)
+			
+			if (window.app.settings.get("auto_darkMode")) {
+				this.handleAutoColorScheme()
+			}
+		})
+
+		if (window.app.settings.get("auto_darkMode")) {
+			this.handleAutoColorScheme()
 		}
 	}
 
