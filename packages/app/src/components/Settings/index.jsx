@@ -28,16 +28,15 @@ const ItemTypes = {
 
 const SettingItem = (props) => {
 	let { item } = props
+
 	const [loading, setLoading] = React.useState(true)
 	const [value, setValue] = React.useState(item.defaultValue ?? false)
 	const [delayedValue, setDelayedValue] = React.useState(null)
 
-	if (!item.type) {
-		console.error(`Item [${item.id}] has no an type!`)
-		return null
-	}
-	if (typeof ItemTypes[item.type] === "undefined") {
-		console.error(`Item [${item.id}] has an invalid type: ${item.type}`)
+	let SettingComponent = item.component
+
+	if (!SettingComponent) {
+		console.error(`Item [${item.id}] has no an component!`)
 		return null
 	}
 
@@ -142,54 +141,67 @@ const SettingItem = (props) => {
 		settingInitialization()
 	}, [])
 
-	switch (item.type.toLowerCase()) {
-		case "slidercolorpicker": {
-			item.props.onChange = (color) => {
-				item.props.color = color.hex
-			}
-			item.props.onChangeComplete = (color) => {
-				onUpdateItem(color.hex)
-			}
 
-			item.props.color = value
+	if (typeof SettingComponent === "string") {
+		if (typeof ItemTypes[SettingComponent] === "undefined") {
+			console.error(`Item [${item.id}] has an invalid component: ${item.component}`)
+			return null
+		}
 
-			break
-		}
-		case "textarea": {
-			item.props.defaultValue = value
-			item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
-			item.props.onChange = (event) => onUpdateItem(event.target.value)
-			break
-		}
-		case "input": {
-			item.props.defaultValue = value
-			item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
-			item.props.onChange = (event) => onUpdateItem(event.target.value)
-			break
-		}
-		case "switch": {
-			item.props.checked = value
-			item.props.onClick = (event) => onUpdateItem(event)
-			break
-		}
-		case "select": {
-			item.props.onChange = (value) => onUpdateItem(value)
-			item.props.defaultValue = value
-			break
-		}
-		case "slider": {
-			item.props.defaultValue = value
-			item.props.onAfterChange = (value) => onUpdateItem(value)
-			break
-		}
-		default: {
-			if (!item.props.children) {
-				item.props.children = item.title ?? item.id
+		// fix props
+
+		switch (SettingComponent.toLowerCase()) {
+			case "slidercolorpicker": {
+				item.props.onChange = (color) => {
+					item.props.color = color.hex
+				}
+				item.props.onChangeComplete = (color) => {
+					onUpdateItem(color.hex)
+				}
+
+				item.props.color = value
+
+				break
 			}
-			item.props.value = item.defaultValue
-			item.props.onClick = (event) => onUpdateItem(event)
-			break
+			case "textarea": {
+				item.props.defaultValue = value
+				item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
+				item.props.onChange = (event) => onUpdateItem(event.target.value)
+				break
+			}
+			case "input": {
+				item.props.defaultValue = value
+				item.props.onPressEnter = (event) => dispatchUpdate(event.target.value)
+				item.props.onChange = (event) => onUpdateItem(event.target.value)
+				break
+			}
+			case "switch": {
+				item.props.checked = value
+				item.props.onClick = (event) => onUpdateItem(event)
+				break
+			}
+			case "select": {
+				item.props.onChange = (value) => onUpdateItem(value)
+				item.props.defaultValue = value
+				break
+			}
+			case "slider": {
+				item.props.defaultValue = value
+				item.props.onAfterChange = (value) => onUpdateItem(value)
+				break
+			}
+			default: {
+				if (!item.props.children) {
+					item.props.children = item.title ?? item.id
+				}
+				item.props.value = item.defaultValue
+				item.props.onClick = (event) => onUpdateItem(event)
+				break
+			}
 		}
+
+		// override with default item component
+		SettingComponent = ItemTypes[SettingComponent]
 	}
 
 	return <div key={item.id} className="settingItem">
@@ -230,7 +242,7 @@ const SettingItem = (props) => {
 		</div>
 		<div className="component">
 			<div>
-				{loading ? <div> Loading... </div> : React.createElement(ItemTypes[item.type], item.props)}
+				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, item.props)}
 			</div>
 
 			{delayedValue && <div>

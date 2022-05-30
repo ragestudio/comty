@@ -5,7 +5,7 @@ export default [
     {
         "id": "username",
         "group": "account.basicInfo",
-        "type": "Button",
+        "component": "Button",
         "icon": "AtSign",
         "title": "Username",
         "description": "Your username is the name you use to log in to your account.",
@@ -17,7 +17,7 @@ export default [
     {
         "id": "fullName",
         "group": "account.basicInfo",
-        "type": "Input",
+        "component": "Input",
         "icon": "Edit3",
         "title": "Name",
         "description": "Change your public name",
@@ -57,7 +57,7 @@ export default [
     {
         "id": "email",
         "group": "account.basicInfo",
-        "type": "Input",
+        "component": "Input",
         "icon": "Mail",
         "title": "Email",
         "description": "Change your email address",
@@ -87,7 +87,7 @@ export default [
     {
         "id": "avatar",
         "group": "account.profile",
-        "type": "ImageUpload",
+        "component": "ImageUpload",
         "icon": "Image",
         "title": "Avatar",
         "description": "Change your avatar",
@@ -95,7 +95,7 @@ export default [
     {
         "id": "cover",
         "group": "account.profile",
-        "type": "ImageUpload",
+        "component": "ImageUpload",
         "icon": "Image",
         "title": "Cover",
         "description": "Change your cover",
@@ -103,7 +103,7 @@ export default [
     {
         "id": "primaryBadge",
         "group": "account.profile",
-        "type": "Select",
+        "component": "Select",
         "icon": "Tag",
         "title": "Primary badge",
         "description": "Change your primary badge",
@@ -111,7 +111,7 @@ export default [
     {
         "id": "description",
         "group": "account.profile",
-        "type": "TextArea",
+        "component": "TextArea",
         "icon": "Edit3",
         "title": "Description",
         "description": "Change your description for your profile",
@@ -141,7 +141,7 @@ export default [
     {
         "id": "logout",
         "footer": true,
-        "type": "Button",
+        "component": "Button",
         "icon": "LogOut",
         "title": "Logout",
         "emitEvent": "session.logout",
