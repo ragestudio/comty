@@ -11,7 +11,23 @@ export default [
         "experimental": true
     },
     {
+        "id": "auto_darkMode",
+        "dependsOn": {
+            "darkMode": false
+        },
         "experimental": true,
+        "storaged": true,
+        "group": "aspect",
+        "component": "Switch",
+        "icon": "Moon",
+        "title": "Auto dark mode",
+        "emitEvent": "app.autoDarkModeToogle",
+    },
+    {
+        "experimental": true,
+        "dependsOn": {
+            "auto_darkMode": false
+        },
         "id": "darkMode",
         "storaged": true,
         "group": "aspect",
