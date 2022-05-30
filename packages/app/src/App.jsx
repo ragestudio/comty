@@ -161,13 +161,14 @@ class App extends React.Component {
 
 			this.wsReconnectingTry = this.wsReconnectingTry + 1
 
-			if (this.wsReconnectingTry > 3) {
+			if (this.wsReconnectingTry > 3 && app.settings.get("app.reloadOnWSConnectionError")) {
 				window.location.reload()
 			}
 		},
 		"websocket_latency_too_high": function () {
 			if (!this.latencyWarning) {
 				this.latencyWarning = true
+
 				Toast.show({
 					icon: "loading",
 					content: "Slow connection...",
@@ -178,6 +179,7 @@ class App extends React.Component {
 		"websocket_latency_normal": function () {
 			if (this.latencyWarning) {
 				this.latencyWarning = null
+
 				Toast.show({
 					icon: "success",
 					content: "Connection restored",
@@ -243,7 +245,7 @@ class App extends React.Component {
 		RenderError: (props) => {
 			return <RenderError {...props} />
 		},
-		Crash: Crash,
+		Crash: Crash.CrashWrapper,
 		initialization: () => {
 			return <div className="splash_wrapper">
 				<div className="splash_logo">
@@ -300,11 +302,11 @@ class App extends React.Component {
 			})
 		}
 
-		this.eventBus.emit("render_initialization")
+		this.eventBus.emit("app.render_initialization")
 
 		await this.initialization()
 
-		this.eventBus.emit("render_initialization_done")
+		this.eventBus.emit("app.render_initialization_done")
 	}
 
 	initialization = async () => {
@@ -371,7 +373,7 @@ class App extends React.Component {
 
 		await Promise.tasked(initializationTasks).catch((reason) => {
 			console.error(`[App] Initialization failed: ${reason.cause}`)
-			window.app.eventBus.emit("appLoadError", reason.cause, reason.details)
+			app.eventBus.emit("app.crash", reason)
 		})
 	}
 
