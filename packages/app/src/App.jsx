@@ -76,18 +76,24 @@ class App extends React.Component {
 		window.app.version = config.package.version
 	}
 
-	static eventsHandlers = {
-		"app.createLogin": async function () {
+	publicEvents = {
+		"clearAllOverlays": function () {
+			window.app.DrawerController.closeAll()
+		},
+	}
+
+	eventsHandlers = {
+		"app.createLogin": async () => {
 			app.DrawerController.open("login", Login, {
 				componentProps: {
 					sessionController: this.sessionController
 				}
 			})
 		},
-		"session.logout": async function () {
+		"session.logout": async () => {
 			await this.sessionController.logout()
 		},
-		"new_session": async function () {
+		"new_session": async () => {
 			await this.flushState()
 			await this.initialization()
 
@@ -96,43 +102,39 @@ class App extends React.Component {
 				this.beforeLoginLocation = null
 			}
 		},
-		"destroyed_session": async function () {
+		"destroyed_session": async () => {
 			await this.flushState()
 			app.eventBus.emit("forceToLogin")
 		},
-		"forceToLogin": function () {
-			// if (window.location.pathname !== "/login") {
-			// 	this.beforeLoginLocation = window.location.pathname
-			// }
-
-			// window.app.setLocation("/login")
+		"forceToLogin": () => {
+			app.setLocation("/main")
 			app.eventBus.emit("app.createLogin")
 		},
-		"invalid_session": async function (error) {
+		"invalid_session": async (error) => {
+			if (!this.state.session) {
+				return false
+			}
+
 			await this.sessionController.forgetLocalSession()
 			await this.flushState()
 
-			if (window.location.pathname !== "/login") {
-				app.eventBus.emit("forceToLogin")
+			app.eventBus.emit("forceToLogin")
 
-				antd.notification.open({
-					message: <Translation>
-						{(t) => t("Invalid Session")}
-					</Translation>,
-					description: <Translation>
-						{(t) => t(error)}
-					</Translation>,
-					icon: <Icons.MdOutlineAccessTimeFilled />,
-				})
-			}
+			antd.notification.open({
+				message: <Translation>
+					{(t) => t("Invalid Session")}
+				</Translation>,
+				description: <Translation>
+					{(t) => t(error)}
+				</Translation>,
+				icon: <Icons.MdOutlineAccessTimeFilled />,
+			})
 		},
-		"clearAllOverlays": function () {
-			window.app.DrawerController.closeAll()
-		},
-		"websocket_connected": function () {
+		"websocket_connected": () => {
 			if (this.wsReconnecting) {
 				this.wsReconnectingTry = 0
 				this.wsReconnecting = false
+
 				this.initialization()
 
 				setTimeout(() => {
@@ -143,7 +145,7 @@ class App extends React.Component {
 				}, 500)
 			}
 		},
-		"websocket_connection_error": function () {
+		"websocket_connection_error": () => {
 			if (!this.wsReconnecting) {
 				this.latencyWarning = null
 				this.wsReconnectingTry = 0
@@ -162,7 +164,7 @@ class App extends React.Component {
 				window.location.reload()
 			}
 		},
-		"websocket_latency_too_high": function () {
+		"websocket_latency_too_high": () => {
 			if (!this.latencyWarning) {
 				this.latencyWarning = true
 
@@ -173,7 +175,7 @@ class App extends React.Component {
 				})
 			}
 		},
-		"websocket_latency_normal": function () {
+		"websocket_latency_normal": () => {
 			if (this.latencyWarning) {
 				this.latencyWarning = null
 
@@ -249,6 +251,14 @@ class App extends React.Component {
 			}
 			return await StatusBar.show()
 		},
+	}
+
+	constructor(props) {
+		super(props)
+
+		Object.keys(this.eventsHandlers).forEach((event) => {
+			app.eventBus.on(event, this.eventsHandlers[event])
+		})
 	}
 
 	flushState = async () => {
