@@ -31,7 +31,7 @@
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
     "classnames": "2.3.1",
-    "evite": "0.11.0",
+    "evite": "0.11.1",
     "faye": "1.4.0",
     "feather-reactjs": "2.0.13",
     "fuse.js": "6.5.3",
