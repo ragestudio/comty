@@ -16,9 +16,10 @@ export const CrashComponent = (props) => {
             </Button>
         ]}
     >
-        <div>
-            <code>{crash.details}</code>
-        </div>
+        {crash.details &&
+            <div>
+                <code>{crash.details}</code>
+            </div>}
     </Result>
 }
 
