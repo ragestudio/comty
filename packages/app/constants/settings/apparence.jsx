@@ -12,9 +12,6 @@ export default [
     },
     {
         "id": "auto_darkMode",
-        "dependsOn": {
-            "darkMode": false
-        },
         "experimental": true,
         "storaged": true,
         "group": "aspect",
