@@ -43,7 +43,7 @@ Promise.tasked = function (promises) {
 }
 
 import React from "react"
-import { CreateEviteApp, BindPropsProvider } from "evite"
+import { EviteRuntime, BindPropsProvider } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { ActionSheet, Toast } from "antd-mobile"
@@ -57,13 +57,12 @@ import { NotFound, RenderError, Crash, Settings, Navigation, Login } from "compo
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
-import * as Render from "extensions/render.extension.jsx"
+
+import * as Render from "cores/render"
 
 import "theme/index.less"
 
 class App extends React.Component {
-	//static debugMode = true // this will enable debug mode of evite app (dah...)
-
 	sessionController = new Session()
 
 	userController = new User()
@@ -72,8 +71,6 @@ class App extends React.Component {
 		session: null,
 		user: null,
 	}
-
-	loadingMessage = false
 
 	static initialize() {
 		window.app.version = config.package.version
@@ -101,7 +98,7 @@ class App extends React.Component {
 		},
 		"destroyed_session": async function () {
 			await this.flushState()
-			this.eventBus.emit("forceToLogin")
+			app.eventBus.emit("forceToLogin")
 		},
 		"forceToLogin": function () {
 			// if (window.location.pathname !== "/login") {
@@ -116,7 +113,7 @@ class App extends React.Component {
 			await this.flushState()
 
 			if (window.location.pathname !== "/login") {
-				this.eventBus.emit("forceToLogin")
+				app.eventBus.emit("forceToLogin")
 
 				antd.notification.open({
 					message: <Translation>
@@ -188,56 +185,6 @@ class App extends React.Component {
 		},
 	}
 
-	static windowContext() {
-		return {
-			// TODO: Open with popup controller instead drawer controller
-			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
-			openSettings: App.publicMethods.openSettings,
-			goMain: () => {
-				return window.app.setLocation(config.app.mainPath)
-			},
-			goToAccount: (username) => {
-				return window.app.setLocation(`/account`, { username })
-			},
-			setStatusBarStyleDark: async () => {
-				if (!window.app.isAppCapacitor()) {
-					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
-					return false
-				}
-				return await StatusBar.setStyle({ style: Style.Dark })
-			},
-			setStatusBarStyleLight: async () => {
-				if (!window.app.isAppCapacitor()) {
-					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
-					return false
-				}
-				return await StatusBar.setStyle({ style: Style.Light })
-			},
-			hideStatusBar: async () => {
-				if (!window.app.isAppCapacitor()) {
-					console.warn("[App] hideStatusBar is not supported on this platform")
-					return false
-				}
-				return await StatusBar.hide()
-			},
-			showStatusBar: async () => {
-				if (!window.app.isAppCapacitor()) {
-					console.warn("[App] showStatusBar is not supported on this platform")
-					return false
-				}
-				return await StatusBar.show()
-			},
-		}
-	}
-
-	static appContext() {
-		return {
-			renderRef: this.renderRef,
-			sessionController: this.sessionController,
-			userController: this.userController,
-		}
-	}
-
 	static staticRenders = {
 		NotFound: (props) => {
 			return <NotFound />
@@ -246,7 +193,7 @@ class App extends React.Component {
 			return <RenderError {...props} />
 		},
 		Crash: Crash.CrashWrapper,
-		initialization: () => {
+		Initialization: () => {
 			return <div className="splash_wrapper">
 				<div className="splash_logo">
 					<img src={config.logo.alt} />
@@ -256,7 +203,7 @@ class App extends React.Component {
 	}
 
 	static publicMethods = {
-		"openSettings": (goTo) => {
+		openSettings: (goTo) => {
 			window.app.DrawerController.open("settings", Settings, {
 				props: {
 					width: "fit-content",
@@ -265,7 +212,43 @@ class App extends React.Component {
 					goTo,
 				}
 			})
-		}
+		},
+		openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
+		goMain: () => {
+			return window.app.setLocation(config.app.mainPath)
+		},
+		goToAccount: (username) => {
+			return window.app.setLocation(`/account`, { username })
+		},
+		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
+		setStatusBarStyleDark: async () => {
+			if (!window.app.isAppCapacitor()) {
+				console.warn("[App] setStatusBarStyleDark is only available on capacitor")
+				return false
+			}
+			return await StatusBar.setStyle({ style: Style.Dark })
+		},
+		setStatusBarStyleLight: async () => {
+			if (!window.app.isAppCapacitor()) {
+				console.warn("[App] setStatusBarStyleLight is not supported on this platform")
+				return false
+			}
+			return await StatusBar.setStyle({ style: Style.Light })
+		},
+		hideStatusBar: async () => {
+			if (!window.app.isAppCapacitor()) {
+				console.warn("[App] hideStatusBar is not supported on this platform")
+				return false
+			}
+			return await StatusBar.hide()
+		},
+		showStatusBar: async () => {
+			if (!window.app.isAppCapacitor()) {
+				console.warn("[App] showStatusBar is not supported on this platform")
+				return false
+			}
+			return await StatusBar.show()
+		},
 	}
 
 	flushState = async () => {
@@ -275,7 +258,7 @@ class App extends React.Component {
 	componentDidMount = async () => {
 		if (window.app.isAppCapacitor()) {
 			window.addEventListener("statusTap", () => {
-				this.eventBus.emit("statusTap")
+				app.eventBus.emit("statusTap")
 			})
 
 			StatusBar.setOverlaysWebView({ overlay: true })
@@ -285,7 +268,7 @@ class App extends React.Component {
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
 
 		if (userAgentPlatform.includes("mac")) {
-			window.app.ShortcutsController.register({
+			this.props.cores.ShortcutsCore.register({
 				key: ",",
 				meta: true,
 				preventDefault: true,
@@ -293,7 +276,7 @@ class App extends React.Component {
 				App.publicMethods.openSettings(...args)
 			})
 		} else {
-			window.app.ShortcutsController.register({
+			this.props.cores.ShortcutsCore.register({
 				key: ",",
 				ctrl: true,
 				preventDefault: true,
@@ -302,11 +285,11 @@ class App extends React.Component {
 			})
 		}
 
-		this.eventBus.emit("app.render_initialization")
+		app.eventBus.emit("app.render_initialization")
 
 		await this.initialization()
 
-		this.eventBus.emit("app.render_initialization_done")
+		app.eventBus.emit("app.render_initialization_done")
 	}
 
 	initialization = async () => {
@@ -373,7 +356,10 @@ class App extends React.Component {
 
 		await Promise.tasked(initializationTasks).catch((reason) => {
 			console.error(`[App] Initialization failed: ${reason.cause}`)
-			app.eventBus.emit("app.crash", reason)
+			app.eventBus.emit("runtime.crash", {
+				message: `App initialization failed`,
+				details: reason.cause,
+			})
 		})
 	}
 
@@ -433,4 +419,4 @@ class App extends React.Component {
 	}
 }
 
-export default CreateEviteApp(App)
+export default new EviteRuntime(App)
