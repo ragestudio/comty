@@ -106,7 +106,11 @@ export class RouteRender extends EvitePureComponent {
 
 export class RenderCore extends Core {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
-
+  
+	publicMethods = {
+		bindContexts: RenderCore.bindContexts,
+	}
+  
 	initialize = () => {
 		const defaultTransitionDelay = 150
 
