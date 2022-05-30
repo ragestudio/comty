@@ -9,6 +9,7 @@
     "autoCollapseDelayEnabled": true,
     "haptic_feedback": false,
     "collapseOnLooseFocus": true,
+    "auto_darkMode": false,
     "language": "en",
     "sidebarKeys": [
         "main",
