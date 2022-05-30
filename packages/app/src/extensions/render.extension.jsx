@@ -31,13 +31,13 @@ export class RouteRender extends EvitePureComponent {
 	}
 
 	handleBusEvents = {
-		"render_initialization": () => {
+		"app.render_initialization": () => {
 			this.setState({ renderInitialization: true })
 		},
-		"render_initialization_done": () => {
+		"app.render_initialization_done": () => {
 			this.setState({ renderInitialization: false })
 		},
-		"crash": (message, error) => {
+		"app.crash": (message, error) => {
 			this.setState({ crash: { message, error } })
 		},
 		"locationChange": (event) => {
