@@ -4,45 +4,46 @@ import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 
 export default class ApiCore extends Core {
-    apiBridge = this.createBridge()
+    constructor(props) {
+        super(props)
 
-    WSInterface = {
-        ...this.apiBridge.wsInterface,
-        request: this.WSRequest,
-        listen: this.handleWSListener,
-        mainSocketConnected: false
+        this.apiBridge = this.createBridge()
+
+        this.WSInterface = {
+            ...this.apiBridge.wsInterface,
+            request: this.WSRequest,
+            listen: this.handleWSListener,
+            mainSocketConnected: false
+        }
+
+        this.ctx.registerPublicMethod("api", this.apiBridge)
+        this.ctx.registerPublicMethod("ws", this.WSInterface)
+        this.ctx.registerPublicMethod("request", this.apiBridge.endpoints)
+        this.ctx.registerPublicMethod("WSRequest", this.WSInterface.wsEndpoints)
     }
 
-    WSSockets = this.WSInterface.sockets
-
-    publicMethods = {
-        api: this.apiBridge,
-        ws: this.WSInterface,
-        request: this.apiBridge.endpoints,
-        WSRequest: this.WSInterface.wsEndpoints,
-    }
-    
-    async initialize() {
-        this.WSSockets.main.on("authenticated", () => {
+    async intialize() {
+        console.log(this.apiBridge)
+        this.WSInterface.sockets.main.on("authenticated", () => {
             console.debug("[WS] Authenticated")
         })
-        this.WSSockets.main.on("authenticateFailed", (error) => {
+        this.WSInterface.sockets.main.on("authenticateFailed", (error) => {
             console.error("[WS] Authenticate Failed", error)
         })
 
-        this.WSSockets.main.on("connect", () => {
+        this.WSInterface.sockets.main.on("connect", () => {
             this.ctx.eventBus.emit("websocket_connected")
 
             this.WSInterface.mainSocketConnected = true
         })
 
-        this.WSSockets.main.on("disconnect", (...context) => {
+        this.WSInterface.sockets.main.on("disconnect", (...context) => {
             this.ctx.eventBus.emit("websocket_disconnected", ...context)
 
             this.WSInterface.mainSocketConnected = false
         })
 
-        this.WSSockets.main.on("connect_error", (...context) => {
+        this.WSInterface.sockets.main.on("connect_error", (...context) => {
             this.ctx.eventBus.emit("websocket_connection_error", ...context)
 
             this.WSInterface.mainSocketConnected = false
