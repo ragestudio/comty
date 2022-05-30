@@ -2,10 +2,11 @@ const path = require("path")
 const { builtinModules } = require("module")
 
 const aliases = {
-    "~/": `${path.resolve(__dirname, "src")}/`,
     "__": __dirname,
-    "@src": path.resolve(__dirname, "src"),
-    schemas: path.resolve(__dirname, "constants"),
+    "~/": `${path.resolve(__dirname, "src")}/`,
+    "@src": path.join(__dirname, "src"),
+    cores: path.join(__dirname, "src/cores"),
+    schemas: path.join(__dirname, "constants"),
     config: path.join(__dirname, "config"),
     extensions: path.resolve(__dirname, "src/extensions"),
     pages: path.join(__dirname, "src/pages"),

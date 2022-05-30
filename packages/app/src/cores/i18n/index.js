@@ -1,4 +1,4 @@
-import { Extension } from "evite"
+import Core from "evite/src/core"
 import config from "config"
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
@@ -14,8 +14,36 @@ export function extractLocaleFromPath(path = "") {
 
 const messageImports = import.meta.glob("./translations/*.json")
 
-export default class I18nExtension extends Extension {
-    depends = ["SettingsExtension"]
+export default class I18nCore extends Core {
+    events = {
+        "changeLanguage": (locale) => {
+            this.loadAsyncLanguage(locale)
+        }
+    }
+
+    initialize = async () => {
+        let locale = app.settings.get("language") ?? DEFAULT_LOCALE
+
+        if (!SUPPORTED_LOCALES.includes(locale)) {
+            locale = DEFAULT_LOCALE
+        }
+
+        const messages = await this.importLocale(locale)
+
+        i18n
+            .use(initReactI18next) // passes i18n down to react-i18next
+            .init({
+                // debug: true,
+                resources: {
+                    [locale]: { translation: messages.default || messages },
+                },
+                lng: locale,
+                //fallbackLng: DEFAULT_LOCALE,
+                interpolation: {
+                    escapeValue: false, // react already safes from xss
+                },
+            })
+    }
 
     importLocale = async (locale) => {
         const [, importLocale] =
@@ -40,34 +68,4 @@ export default class I18nExtension extends Extension {
             console.error(error)
         }
     }
-
-    initializers = [
-        async () => {
-            let locale = app.settings.get("language") ?? DEFAULT_LOCALE
-
-            if (!SUPPORTED_LOCALES.includes(locale)) {
-                locale = DEFAULT_LOCALE
-            }
-
-            const messages = await this.importLocale(locale)
-
-            i18n
-                .use(initReactI18next) // passes i18n down to react-i18next
-                .init({
-                    // debug: true,
-                    resources: {
-                        [locale]: { translation: messages.default || messages },
-                    },
-                    lng: locale,
-                    //fallbackLng: DEFAULT_LOCALE,
-                    interpolation: {
-                        escapeValue: false, // react already safes from xss
-                    },
-                })
-
-            this.mainContext.eventBus.on("changeLanguage", (locale) => {
-                this.loadAsyncLanguage(locale)
-            })
-        },
-    ]
 }

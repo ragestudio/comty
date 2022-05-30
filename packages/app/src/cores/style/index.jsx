@@ -1,39 +1,33 @@
-import { Extension } from "evite"
+import Core from "evite/src/core"
 import config from "config"
 import store from "store"
 import { ConfigProvider } from "antd"
 
-export default class ThemeExtension extends Extension {
-	constructor(app, main) {
-		super(app, main)
+export default class StyleCore extends Core {
+	themeManifestStorageKey = "theme"
+	modificationStorageKey = "themeModifications"
 
-		this.themeManifestStorageKey = "theme"
-		this.modificationStorageKey = "themeModifications"
+	theme = null
+	mutation = null
+	currentVariant = null
 
-		this.theme = null
-
-		this.mutation = null
-		this.currentVariant = null
+	events = {
+		"theme.applyVariant": (value) => {
+			this.applyVariant(value)
+			this.setVariant(value)
+		},
+		"modifyTheme": (value) => {
+			this.update(value)
+			this.setModifications(this.mutation)
+		},
+		"resetTheme": () => {
+			this.resetDefault()
+		}
 	}
 
-	initializers = [
-		async () => {
-			this.mainContext.eventBus.on("theme.applyVariant", (value) => {
-				this.applyVariant(value)
-				this.setVariant(value)
-			})
-			this.mainContext.eventBus.on("modifyTheme", (value) => {
-				this.update(value)
-				this.setModifications(this.mutation)
-			})
-
-			this.mainContext.eventBus.on("resetTheme", () => {
-				this.resetDefault()
-			})
-
-			await this.initialize()
-		},
-	]
+	publicMethods = {
+		style: this
+	}
 
 	static get currentVariant() {
 		return document.documentElement.style.getPropertyValue("--themeVariant")
@@ -144,9 +138,5 @@ export default class ThemeExtension extends Extension {
 			this.currentVariant = variant
 			this.update(values)
 		}
-	}
-
-	window = {
-		ThemeController: this
 	}
 }

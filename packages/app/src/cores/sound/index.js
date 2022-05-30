@@ -1,9 +1,17 @@
-import { Extension } from "evite"
+import Core from "evite/src/core"
 import { Howl } from "howler"
 import config from "config"
 
-export default class SoundEngineExtension extends Extension {
+export default class SoundCore extends Core {
     sounds = {}
+
+    publicMethods = {
+        sound: this,
+    }
+
+    async initialize() {
+        this.sounds = await this.getSounds()
+    }
 
     getSounds = async () => {
         // TODO: Load custom soundpacks manifests
@@ -26,18 +34,8 @@ export default class SoundEngineExtension extends Extension {
         if (this.sounds[name]) {
             return this.sounds[name](options).play()
         } else {
-            console.error(`Sound ${name} not found.`)
+            console.error(`Sound [${name}] not found or is not available.`)
             return false
         }
-    }
-
-    initializers = [
-        async () => {
-            this.sounds = await this.getSounds()
-        }
-    ]
-
-    window = {
-        SoundEngine: this
     }
 }

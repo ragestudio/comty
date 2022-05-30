@@ -8,7 +8,7 @@ export const CrashComponent = (props) => {
 
     return <Result
         status="error"
-        title="Crash"
+        title="Well, we're sorry! The application has a fatal crash."
         subTitle={crash.message}
         extra={[
             <Button type="primary" key="reload" onClick={() => window.location.reload()}>
@@ -16,9 +16,10 @@ export const CrashComponent = (props) => {
             </Button>
         ]}
     >
-        <div>
-            <code>{crash.error}</code>
-        </div>
+        {crash.details &&
+            <div>
+                <code>{crash.details}</code>
+            </div>}
     </Result>
 }
 
@@ -29,6 +30,5 @@ export const CrashWrapper = (props) => {
         <CrashComponent crash={crash} />
     </div>
 }
-
 
 export default CrashComponent

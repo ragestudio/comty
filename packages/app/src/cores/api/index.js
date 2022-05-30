@@ -1,62 +1,53 @@
-import { Extension } from "evite"
+import Core from "evite/src/core"
 import config from "config"
 import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 
-export default class ApiExtension extends Extension {
-    depends = ["SettingsExtension"]
+export default class ApiCore extends Core {
+    apiBridge = this.createBridge()
 
-    constructor(app, main) {
-        super(app, main)
-
-        //this.config = this.getServerOrigins()
-
-        this.apiBridge = this.createBridge()
-        this.WSInterface = this.apiBridge.wsInterface
-
-        this.WSInterface.request = this.WSRequest
-        this.WSInterface.listen = this.handleWSListener
-        
-        this.WSSockets = this.WSInterface.sockets
-        this.WSInterface.mainSocketConnected = false
+    WSInterface = {
+        ...this.apiBridge.wsInterface,
+        request: this.WSRequest,
+        listen: this.handleWSListener,
+        mainSocketConnected: false
     }
 
-    getServerOrigins = () => {
-        // TODO: try to get origins from settings
-        // const storagedOrigins = window.app.settings.get("serverOrigins")
+    WSSockets = this.WSInterface.sockets
+
+    publicMethods = {
+        api: this.apiBridge,
+        ws: this.WSInterface,
+        request: this.apiBridge.endpoints,
+        WSRequest: this.WSInterface.wsEndpoints,
     }
+    
+    async initialize() {
+        this.WSSockets.main.on("authenticated", () => {
+            console.debug("[WS] Authenticated")
+        })
+        this.WSSockets.main.on("authenticateFailed", (error) => {
+            console.error("[WS] Authenticate Failed", error)
+        })
 
-    initializers = [
-        async () => {
-            this.WSSockets.main.on("authenticated", () => {
-                console.debug("[WS] Authenticated")
-            })
-            this.WSSockets.main.on("authenticateFailed", (error) => {
-                console.error("[WS] Authenticate Failed", error)
-            })
+        this.WSSockets.main.on("connect", () => {
+            this.ctx.eventBus.emit("websocket_connected")
 
-            this.WSSockets.main.on("connect", () => {
-                window.app.eventBus.emit("websocket_connected")
-                this.WSInterface.mainSocketConnected = true
-            })
+            this.WSInterface.mainSocketConnected = true
+        })
 
-            this.WSSockets.main.on("disconnect", (...context) => {
-                window.app.eventBus.emit("websocket_disconnected", ...context)
-                this.WSInterface.mainSocketConnected = false
-            })
+        this.WSSockets.main.on("disconnect", (...context) => {
+            this.ctx.eventBus.emit("websocket_disconnected", ...context)
 
-            this.WSSockets.main.on("connect_error", (...context) => {
-                window.app.eventBus.emit("websocket_connection_error", ...context)
-                this.WSInterface.mainSocketConnected = false
-            })
+            this.WSInterface.mainSocketConnected = false
+        })
 
-            this.mainContext.setToWindowContext("api", this.apiBridge)
-            this.mainContext.setToWindowContext("ws", this.WSInterface)
+        this.WSSockets.main.on("connect_error", (...context) => {
+            this.ctx.eventBus.emit("websocket_connection_error", ...context)
 
-            this.mainContext.setToWindowContext("request", this.apiBridge.endpoints)
-            this.mainContext.setToWindowContext("WSRequest", this.WSInterface.wsEndpoints)
-        }
-    ]
+            this.WSInterface.mainSocketConnected = false
+        })
+    }
 
     createBridge() {
         const getSessionContext = async () => {
@@ -171,9 +162,5 @@ export default class ApiExtension extends Extension {
                 return resolve(...responses)
             })
         })
-    }
-
-    window = {
-        ApiController: this
     }
 }
