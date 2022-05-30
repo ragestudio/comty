@@ -1,18 +1,22 @@
-import { Extension } from "evite"
+import Core from "evite/src/core"
 import store from "store"
 import defaultSettings from "schemas/defaultSettings.json"
 import { Observable } from "rxjs"
 
-export default class SettingsExtension extends Extension {
-    constructor(app, main) {
-        super(app, main)
-        this.storeKey = "app_settings"
-        this.settings = store.get(this.storeKey) ?? {}
+export default class SettingsCore extends Core {
+    storeKey = "app_settings"
 
-        this._setDefaultUndefined()
+    settings = store.get(this.storeKey) ?? {}
+
+    publicMethods = {
+        settings: this
     }
 
-    _setDefaultUndefined = () => {
+    initialize() {
+        this.fulfillUndefinedWithDefaults()
+    }
+
+    fulfillUndefinedWithDefaults = () => {
         Object.keys(defaultSettings).forEach((key) => {
             const value = defaultSettings[key]
 
@@ -21,14 +25,6 @@ export default class SettingsExtension extends Extension {
                 this.settings[key] = value
             }
         })
-    }
-
-    defaults = (key) => {
-        if (typeof key === "undefined") {
-            return defaultSettings
-        }
-
-        return defaultSettings[key]
     }
 
     is = (key, value) => {
@@ -53,6 +49,14 @@ export default class SettingsExtension extends Extension {
         return this.settings[key]
     }
 
+    getDefaults = (key) => {
+        if (typeof key === "undefined") {
+            return defaultSettings
+        }
+
+        return defaultSettings[key]
+    }
+
     withEvent = (listenEvent, defaultValue) => {
         let value = defaultValue ?? this.settings[key] ?? false
 
@@ -68,9 +72,5 @@ export default class SettingsExtension extends Extension {
         return observable.subscribe((value) => {
             return value
         })
-    }
-
-    window = {
-        "settings": this
     }
 }

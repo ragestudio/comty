@@ -1,5 +1,6 @@
+import Core from "evite/src/core"
 import React from "react"
-import { EvitePureComponent, Extension } from "evite"
+import { EvitePureComponent } from "evite"
 import progressBar from "nprogress"
 import routes from "virtual:generated-pages"
 
@@ -89,8 +90,8 @@ export class RouteRender extends EvitePureComponent {
 			return JSON.stringify(this.state.renderError)
 		}
 
-		if (this.state.renderInitialization) {
-			const StaticInitializationRender = this.props.staticRenders?.initialization ?? null
+		if (this.state.renderInitialization && this.props.staticRenders?.Initialization) {
+			const StaticInitializationRender = this.props.staticRenders?.Initialization ?? <div>Loading...</div>
 
 			return <StaticInitializationRender />
 		}
@@ -103,92 +104,88 @@ export class RouteRender extends EvitePureComponent {
 	}
 }
 
-export class RenderExtension extends Extension {
-	initializers = [
-		async function () {
-			const defaultTransitionDelay = 150
+export class RenderCore extends Core {
+	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
-			this.progressBar = progressBar.configure({ parent: "html", showSpinner: false })
-
-			this.history.listen((event) => {
-				this.eventBus.emit("transitionDone", event)
-				this.eventBus.emit("locationChange", event)
-				this.progressBar.done()
-			})
-
-			this.history.setLocation = (to, state, delay) => {
-				const lastLocation = this.history.lastLocation
-
-				if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
-					return false
-				}
-
-				this.progressBar.start()
-				this.eventBus.emit("transitionStart", delay)
-
-				setTimeout(() => {
-					this.history.push({
-						pathname: to,
-					}, state)
-					this.history.lastLocation = this.history.location
-				}, delay ?? defaultTransitionDelay)
-			}
-
-			this.setToWindowContext("setLocation", this.history.setLocation)
-		},
-	]
-
-	expose = {
-		validateLocationSlash: (location) => {
-			let key = location ?? window.location.pathname
-
-			while (key[0] === "/") {
-				key = key.slice(1, key.length)
-			}
-
-			return key
-		},
+	publicMethods = {
+		setLocation: this.ctx.history.setLocation,
 	}
 
-	window = {
-		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
-		bindContexts: (component) => {
-			let contexts = {
-				main: {},
-				app: {},
+	initialize = () => {
+		const defaultTransitionDelay = 150
+
+		this.ctx.history.listen((event) => {
+			this.ctx.eventBus.emit("transitionDone", event)
+			this.ctx.eventBus.emit("locationChange", event)
+
+			this.progressBar.done()
+		})
+
+		this.ctx.history.setLocation = (to, state, delay) => {
+			const lastLocation = this.ctx.history.lastLocation
+
+			if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
+				return false
 			}
 
-			if (typeof component.bindApp === "string") {
-				if (component.bindApp === "all") {
-					Object.keys(app).forEach((key) => {
-						contexts.app[key] = app[key]
-					})
-				}
-			} else {
-				if (Array.isArray(component.bindApp)) {
-					component.bindApp.forEach((key) => {
-						contexts.app[key] = app[key]
-					})
-				}
-			}
+			this.progressBar.start()
+			this.ctx.eventBus.emit("transitionStart", delay)
 
-			if (typeof component.bindMain === "string") {
-				if (component.bindMain === "all") {
-					Object.keys(main).forEach((key) => {
-						contexts.main[key] = main[key]
-					})
-				}
-			} else {
-				if (Array.isArray(component.bindMain)) {
-					component.bindMain.forEach((key) => {
-						contexts.main[key] = main[key]
-					})
-				}
-			}
+			setTimeout(() => {
+				this.ctx.history.push({
+					pathname: to,
+				}, state)
+				this.ctx.history.lastLocation = this.history.location
+			}, delay ?? defaultTransitionDelay)
+		}
+	}
 
-			return (props) => React.createElement(component, { ...props, contexts })
-		},
+	validateLocationSlash = (location) => {
+		let key = location ?? window.location.pathname
+
+		while (key[0] === "/") {
+			key = key.slice(1, key.length)
+		}
+
+		return key
+	}
+
+	bindContexts = (component) => {
+		let contexts = {
+			main: {},
+			app: {},
+		}
+
+		if (typeof component.bindApp === "string") {
+			if (component.bindApp === "all") {
+				Object.keys(app).forEach((key) => {
+					contexts.app[key] = app[key]
+				})
+			}
+		} else {
+			if (Array.isArray(component.bindApp)) {
+				component.bindApp.forEach((key) => {
+					contexts.app[key] = app[key]
+				})
+			}
+		}
+
+		if (typeof component.bindMain === "string") {
+			if (component.bindMain === "all") {
+				Object.keys(main).forEach((key) => {
+					contexts.main[key] = main[key]
+				})
+			}
+		} else {
+			if (Array.isArray(component.bindMain)) {
+				component.bindMain.forEach((key) => {
+					contexts.main[key] = main[key]
+				})
+			}
+		}
+
+		return (props) => React.createElement(component, { ...props, contexts })
 	}
 }
 
-export default RenderExtension
+export default RenderCore
