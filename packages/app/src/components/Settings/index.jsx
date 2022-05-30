@@ -32,6 +32,7 @@ const SettingItem = (props) => {
 	const [loading, setLoading] = React.useState(true)
 	const [value, setValue] = React.useState(item.defaultValue ?? false)
 	const [delayedValue, setDelayedValue] = React.useState(null)
+	const [disabled, setDisabled] = React.useState(false)
 
 	let SettingComponent = item.component
 
@@ -99,6 +100,20 @@ const SettingItem = (props) => {
 		}
 	}
 
+	const checkDependsValidation = () => {
+		return !Boolean(Object.keys(item.dependsOn).every((key) => {
+			const storagedValue = window.app.settings.get(key)
+
+			console.debug(`Checking validation for [${key}] with now value [${storagedValue}]`)
+
+			if (typeof item.dependsOn[key] === "function") {
+				return item.dependsOn[key](storagedValue)
+			}
+
+			return storagedValue === item.dependsOn[key]
+		}))
+	}
+
 	const settingInitialization = async () => {
 		if (item.storaged) {
 			const storagedValue = window.app.settings.get(item.id)
@@ -110,17 +125,15 @@ const SettingItem = (props) => {
 		}
 
 		if (typeof item.dependsOn === "object") {
-			const dependsOptionsKeys = Object.keys(item.dependsOn)
+			// create a event handler to watch changes
+			Object.keys(item.dependsOn).forEach((key) => {
+				window.app.eventBus.on(`setting.update.${key}`, () => {
+					setDisabled(checkDependsValidation())
+				})
+			})
 
-			item.props.disabled = !Boolean(dependsOptionsKeys.every((key) => {
-				const storagedValue = window.app.settings.get(key)
-
-				if (typeof item.dependsOn[key] === "function") {
-					return item.dependsOn[key](storagedValue)
-				}
-
-				return storagedValue === item.dependsOn[key]
-			}))
+			// by default check depends validation
+			item.props.disabled = checkDependsValidation()
 		}
 
 		if (typeof item.listenUpdateValue === "string") {
@@ -140,7 +153,6 @@ const SettingItem = (props) => {
 	React.useEffect(() => {
 		settingInitialization()
 	}, [])
-
 
 	if (typeof SettingComponent === "string") {
 		if (typeof ItemTypes[SettingComponent] === "undefined") {
@@ -194,8 +206,10 @@ const SettingItem = (props) => {
 				if (!item.props.children) {
 					item.props.children = item.title ?? item.id
 				}
+
 				item.props.value = item.defaultValue
 				item.props.onClick = (event) => onUpdateItem(event)
+
 				break
 			}
 		}
@@ -203,6 +217,8 @@ const SettingItem = (props) => {
 		// override with default item component
 		SettingComponent = ItemTypes[SettingComponent]
 	}
+
+	item.props["disabled"] = disabled
 
 	return <div key={item.id} className="settingItem">
 		<div className="header">
