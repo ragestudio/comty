@@ -8,7 +8,7 @@ import NotFoundRender from "./staticsRenders/404"
 import CrashRender from "./staticsRenders/crash"
 
 export const ConnectWithApp = (component) => {
-	return window.app.bindContexts(component)
+	return RenderCore.bindContexts(component)
 }
 
 export function GetRoutesComponentMap() {
@@ -107,10 +107,6 @@ export class RouteRender extends EvitePureComponent {
 export class RenderCore extends Core {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
-	publicMethods = {
-		setLocation: this.ctx.history.setLocation,
-	}
-
 	initialize = () => {
 		const defaultTransitionDelay = 150
 
@@ -138,6 +134,8 @@ export class RenderCore extends Core {
 				this.ctx.history.lastLocation = this.history.location
 			}, delay ?? defaultTransitionDelay)
 		}
+
+		this.ctx.registerPublicMethod("setLocation", this.ctx.history.setLocation)
 	}
 
 	validateLocationSlash = (location) => {
@@ -150,7 +148,7 @@ export class RenderCore extends Core {
 		return key
 	}
 
-	bindContexts = (component) => {
+	static bindContexts = (component) => {
 		let contexts = {
 			main: {},
 			app: {},
