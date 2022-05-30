@@ -12,6 +12,11 @@ export default class StyleCore extends Core {
 	currentVariant = null
 
 	events = {
+		"app.autoDarkMode": (value) => {
+			if (value === true) {
+				this.handleAutoColorScheme()
+			}
+		},
 		"theme.applyVariant": (value) => {
 			this.applyVariant(value)
 			this.setVariant(value)
@@ -28,9 +33,19 @@ export default class StyleCore extends Core {
 	publicMethods = {
 		style: this
 	}
-
+	
 	static get currentVariant() {
 		return document.documentElement.style.getPropertyValue("--themeVariant")
+	}
+
+	handleAutoColorScheme() {
+		const prefered = window.matchMedia("(prefers-color-scheme: light)")
+
+		if (window.app.settings.get("app.auto_darkMode") && !prefered.matches) {
+			this.applyVariant("dark")
+		}else {
+			this.applyVariant("false")
+		}
 	}
 
 	initialize = async () => {
@@ -61,6 +76,11 @@ export default class StyleCore extends Core {
 
 		// apply variation
 		this.applyVariant(variantKey)
+
+		// handle auto prefered color scheme
+		if (window.app.settings.get("app.auto_darkMode")) {
+			window.matchMedia("(prefers-color-scheme: light)").addListener(this.handleAutoColorScheme)
+		}
 	}
 
 	getRootVariables = () => {
