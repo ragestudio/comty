@@ -298,7 +298,7 @@ class App extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
-					await app.ApiController.attachAPIConnection()
+					await this.props.cores.ApiCore.attachAPIConnection()
 
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
@@ -357,8 +357,8 @@ class App extends React.Component {
 		await Promise.tasked(initializationTasks).catch((reason) => {
 			console.error(`[App] Initialization failed: ${reason.cause}`)
 			app.eventBus.emit("runtime.crash", {
-				message: `App initialization failed`,
-				details: reason.cause,
+				message: `App initialization failed (${reason.cause})`,
+				details: reason.details,
 			})
 		})
 	}
@@ -384,7 +384,7 @@ class App extends React.Component {
 			return false
 		}
 
-		await app.ApiController.attachWSConnection()
+		await this.props.cores.ApiCore.attachWSConnection()
 	}
 
 	__UserInit = async () => {
