@@ -1,5 +1,5 @@
 {
-    "main_api": "http://localhost:3000",
-    "streaming_api": "http://localhost:3002",
-    "websocket_api": "ws://localhost:3001"
+    "main_api": "https://api.comty.pw",
+    "streaming_api": "https://media_api.comty.pw",
+    "websocket_api": "wss://api.comty.pw"
 }
