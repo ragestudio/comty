@@ -139,7 +139,7 @@ export class RenderCore extends Core {
 			}, delay ?? defaultTransitionDelay)
 		}
 
-		this.ctx.registerPublicMethod("setLocation", this.publicMethods.setLocation)
+		this.ctx.registerPublicMethod("setLocation", this.ctx.history.setLocation)
 	}
 
 	validateLocationSlash = (location) => {
