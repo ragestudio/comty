@@ -100,6 +100,15 @@ const SettingItem = (props) => {
 		}
 	}
 
+	const onUnmount = () => {
+		// unsubscribe eventBus events
+		if (typeof item.dependsOn === "object") {
+			for (let key in item.dependsOn) {
+				window.app.eventBus.off(`setting.update.${key}`, onUpdateItem)
+			}
+		}
+	}
+
 	const checkDependsValidation = () => {
 		return !Boolean(Object.keys(item.dependsOn).every((key) => {
 			const storagedValue = window.app.settings.get(key)
@@ -133,7 +142,7 @@ const SettingItem = (props) => {
 			})
 
 			// by default check depends validation
-			item.props.disabled = checkDependsValidation()
+			setDisabled(checkDependsValidation())
 		}
 
 		if (typeof item.listenUpdateValue === "string") {
@@ -152,6 +161,8 @@ const SettingItem = (props) => {
 
 	React.useEffect(() => {
 		settingInitialization()
+
+		return onUnmount
 	}, [])
 
 	if (typeof SettingComponent === "string") {
