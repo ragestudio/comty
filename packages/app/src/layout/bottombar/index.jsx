@@ -18,15 +18,15 @@ export default class BottomBar extends EviteComponent {
     }
 
     handleBusEvents = {
-        "render_initialization": () => {
+        "app.render_initialization": () => {
             this.toogle(false)
         },
-        "render_initialization_done": () => {
+        "app.render_initialization_done": () => {
             if (this.isAllowed()) {
                 this.toogle(true)
             }
         },
-        "crash": () => {
+        "app.crash": () => {
             this.toogle(false)
         },
         "locationChange": () => {
