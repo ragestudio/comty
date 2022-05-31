@@ -62,7 +62,7 @@ export default class StreamViewer extends React.Component {
         app.ThemeController.applyVariant("dark")
         app.eventBus.emit("toogleCompactMode", true)
         app.SidebarController.tooggleVisibility(false)
-        app.HeaderController.toogleVisible(false)
+        app.HeaderController.toggleVisibility(false)
 
         // fetch user info in the background
         this.gatherUserInfo()
@@ -81,8 +81,8 @@ export default class StreamViewer extends React.Component {
         app.ThemeController.applyVariant(app.settings.get("themeVariant"))
         app.eventBus.emit("toogleCompactMode", false)
         app.SidebarController.toggleVisibility(true)
-        app.HeaderController.toogleVisible(true)
-        app.HeaderController.toogleVisible(true)
+        app.HeaderController.toggleVisibility(true)
+        app.HeaderController.toggleVisibility(true)
 
         if (this.timerCounterInterval) {
             this.timerCounterInterval = clearInterval(this.timerCounterInterval)
