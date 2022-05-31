@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 // patches
 const { Buffer } = require("buffer")
 
