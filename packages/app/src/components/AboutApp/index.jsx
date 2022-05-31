@@ -65,11 +65,11 @@ export const ModalCard = (props) => {
 		}, 150)
 	}
 
-	return <Mask visible={visible} onMaskClick={() => close()}>
+	return <AMask visible={visible} onMaskClick={() => close()}>
 		<div className="aboutApp_wrapper">
 			<Card />
 		</div>
-	</Mask >
+	</AMask >
 }
 
 export function openModal() {
