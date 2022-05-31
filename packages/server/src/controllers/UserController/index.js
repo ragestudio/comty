@@ -386,7 +386,8 @@ export default class UserController extends Controller {
                         // check maximung strings length
                         if (typeof req.selection.update[key] === "string" && MaxStringsLengths[key]) {
                             if (req.selection.update[key].length > MaxStringsLengths[key]) {
-                                return res.status(400).json({ error: `${key} is too long` })
+                                // create a substring
+                                req.selection.update[key] = req.selection.update[key].substring(0, MaxStringsLengths[key])
                             }
                         }
 
