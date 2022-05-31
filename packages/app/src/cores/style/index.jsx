@@ -15,7 +15,7 @@ export default class StyleCore extends Core {
 		"app.autoDarkModeToogle": (value) => {
 			if (value === true) {
 				this.handleAutoColorScheme()
-			}else {
+			} else {
 				this.applyVariant(this.getStoragedVariant())
 			}
 		},
@@ -82,7 +82,7 @@ export default class StyleCore extends Core {
 		// handle auto prefered color scheme
 		window.matchMedia("(prefers-color-scheme: light)").addListener(() => {
 			console.log(`[THEME] Auto color scheme changed`)
-			
+
 			if (window.app.settings.get("auto_darkMode")) {
 				this.handleAutoColorScheme()
 			}
