@@ -3,6 +3,7 @@
   "version": "0.18.0",
   "main": "dist/index.js",
   "scripts": {
+    "build": "corenode-cli build",
     "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js"
   },
   "license": "MIT",
