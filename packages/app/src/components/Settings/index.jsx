@@ -379,6 +379,14 @@ export default class SettingsMenu extends React.PureComponent {
 		})
 	}
 
+	onClickAppAbout = () => {
+		window.app.setLocation("/about")
+		
+		if (typeof this.props.close === "function") {
+			this.props.close()
+		}
+	}
+
 	render() {
 		const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
@@ -408,7 +416,7 @@ export default class SettingsMenu extends React.PureComponent {
 						</div>
 					</div>
 					<div>
-						<antd.Button type="link" onClick={() => window.app.setLocation("/about")}>
+						<antd.Button type="link" onClick={this.onClickAppAbout}>
 							<Translation>
 								{t => t("about")}
 							</Translation>
