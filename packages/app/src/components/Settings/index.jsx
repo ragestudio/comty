@@ -408,7 +408,7 @@ export default class SettingsMenu extends React.PureComponent {
 						</div>
 					</div>
 					<div>
-						<antd.Button type="link" onClick={() => AboutApp.openModal()}>
+						<antd.Button type="link" onClick={() => window.app.setLocation("/about")}>
 							<Translation>
 								{t => t("about")}
 							</Translation>
