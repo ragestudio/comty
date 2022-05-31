@@ -298,11 +298,11 @@ class App extends React.Component {
 			})
 		}
 
-		app.eventBus.emit("app.render_initialization")
+		app.eventBus.emit("app.initialization.start")
 
 		await this.initialization()
 
-		app.eventBus.emit("app.render_initialization_done")
+		app.eventBus.emit("app.initialization.finish")
 	}
 
 	initialization = async () => {

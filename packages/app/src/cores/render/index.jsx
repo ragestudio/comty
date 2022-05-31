@@ -32,10 +32,10 @@ export class RouteRender extends EvitePureComponent {
 	}
 
 	handleBusEvents = {
-		"app.render_initialization": () => {
+		"app.initialization.start": () => {
 			this.setState({ renderInitialization: true })
 		},
-		"app.render_initialization_done": () => {
+		"app.initialization.finish": () => {
 			this.setState({ renderInitialization: false })
 		},
 		"app.crash": (message, error) => {
@@ -106,11 +106,11 @@ export class RouteRender extends EvitePureComponent {
 
 export class RenderCore extends Core {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
-  
+
 	publicMethods = {
 		bindContexts: RenderCore.bindContexts,
 	}
-  
+
 	initialize = () => {
 		const defaultTransitionDelay = 150
 
