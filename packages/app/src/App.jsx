@@ -76,7 +76,7 @@ class App extends React.Component {
 		window.app.version = config.package.version
 	}
 
-	publicEvents = {
+	static publicEvents = {
 		"clearAllOverlays": function () {
 			window.app.DrawerController.closeAll()
 		},
@@ -111,13 +111,15 @@ class App extends React.Component {
 			app.eventBus.emit("app.createLogin")
 		},
 		"invalid_session": async (error) => {
-			if (!this.state.session) {
+			const token = await Session.token
+
+			if (!this.state.session && !token) {
 				return false
 			}
-
+			
 			await this.sessionController.forgetLocalSession()
 			await this.flushState()
-
+			
 			app.eventBus.emit("forceToLogin")
 
 			antd.notification.open({
@@ -129,6 +131,9 @@ class App extends React.Component {
 				</Translation>,
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
+		},
+		"no_session": async () => {
+			app.eventBus.emit("forceToLogin")
 		},
 		"websocket_connected": () => {
 			if (this.wsReconnecting) {
@@ -380,7 +385,7 @@ class App extends React.Component {
 		const token = await Session.token
 
 		if (!token || token == null) {
-			window.app.eventBus.emit("forceToLogin")
+			window.app.eventBus.emit("no_session")
 			return false
 		}
 
