@@ -65,11 +65,11 @@ export default class SidebarEditor extends React.Component {
 
 	onSave = () => {
 		window.app.settings.set("sidebarKeys", this.state.items)
-		window.app.SidebarController.toogleEdit(false)
+		window.app.SidebarController.toggleEdit(false)
 	}
 
 	onDiscard = () => {
-		window.app.SidebarController.toogleEdit(false)
+		window.app.SidebarController.toggleEdit(false)
 	}
 
 	onSetDefaults = () => {

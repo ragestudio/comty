@@ -25,7 +25,7 @@ export default class Sidebar extends React.Component {
 
 		this.state = {
 			editMode: false,
-			visible: true,
+			visible: false,
 			loading: true,
 			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
 			pathResolve: {},
@@ -37,26 +37,31 @@ export default class Sidebar extends React.Component {
 		}
 
 		this.SidebarController = {
-			toogleVisible: (to) => {
-				this.setState({ visible: to ?? !this.state.visible })
-			},
-			toogleEdit: this.toogleEditMode,
+			toggleVisibility: this.toggleVisibility,
+			toggleEdit: this.toggleEditMode,
 			isVisible: () => this.state.visible,
 			isEditMode: () => this.state.visible,
 			isCollapsed: () => this.state.collapsed,
 		}
 
 		window.app["SidebarController"] = this.SidebarController
-		window.app.eventBus.on("edit_sidebar", () => this.toogleEditMode())
+
+		window.app.eventBus.on("edit_sidebar", () => this.toggleEditMode())
+
 		window.app.eventBus.on("settingChanged.sidebar_collapse", (value) => {
-			this.toogleCollapse(value)
+			this.toggleCollapse(value)
 		})
 	}
 
 	collapseDebounce = null
 
-	componentDidMount = () => {
-		this.loadSidebarItems()
+	componentDidMount = async () => {
+		await this.loadSidebarItems()
+
+		// create a cool debounced animation
+		setTimeout(() => {
+			this.toggleVisibility(true)
+		}, 400)
 	}
 
 	getStoragedKeys = () => {
@@ -206,7 +211,7 @@ export default class Sidebar extends React.Component {
 		return window.app.setLocation(`/${e.key}`, 150)
 	}
 
-	toogleEditMode = (to) => {
+	toggleEditMode = (to) => {
 		if (typeof to === "undefined") {
 			to = !this.state.editMode
 		}
@@ -222,10 +227,14 @@ export default class Sidebar extends React.Component {
 		this.setState({ editMode: to, collapsed: false })
 	}
 
-	toogleCollapse = (to) => {
+	toggleCollapse = (to) => {
 		if (!this.state.editMode) {
 			this.setState({ collapsed: to ?? !this.state.collapsed })
 		}
+	}
+
+	toggleVisibility = (to) => {
+		this.setState({ visible: to ?? !this.state.visible })
 	}
 
 	onMouseEnter = () => {
@@ -237,7 +246,7 @@ export default class Sidebar extends React.Component {
 		this.collapseDebounce = null
 
 		if (this.state.collapsed) {
-			this.toogleCollapse(false)
+			this.toggleCollapse(false)
 		}
 	}
 
@@ -247,7 +256,7 @@ export default class Sidebar extends React.Component {
 		}
 
 		if (!this.state.collapsed) {
-			this.collapseDebounce = setTimeout(() => { this.toogleCollapse(true) }, window.app.settings.get("autoCollapseDelay") ?? 500)
+			this.collapseDebounce = setTimeout(() => { this.toggleCollapse(true) }, window.app.settings.get("autoCollapseDelay") ?? 500)
 		}
 	}
 
