@@ -19,18 +19,18 @@ export default class BottomBar extends EviteComponent {
 
     handleBusEvents = {
         "app.render_initialization": () => {
-            this.toogle(false)
+            this.toggle(false)
         },
         "app.render_initialization_done": () => {
             if (this.isAllowed()) {
-                this.toogle(true)
+                this.toggle(true)
             }
         },
         "app.crash": () => {
-            this.toogle(false)
+            this.toggle(false)
         },
         "locationChange": () => {
-            this.toogle(this.isAllowed())
+            this.toggle(this.isAllowed())
         }
     }
 
@@ -38,7 +38,7 @@ export default class BottomBar extends EviteComponent {
         this._loadBusEvents()
 
         window.app.BottomBarController = {
-            toogleVisible: this.toogle,
+            toogleVisible: this.toggle,
             isVisible: () => this.state.visible,
             render: (fragment) => {
                 this.setState({ render: fragment })
@@ -58,7 +58,7 @@ export default class BottomBar extends EviteComponent {
         return app.pageStatement?.bottomBarAllowed !== "undefined" && app.pageStatement?.bottomBarAllowed !== false
     }
 
-    toogle = (to) => {
+    toggle = (to) => {
         if (!window.isMobile) {
             to = false
         } else {

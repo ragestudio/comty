@@ -61,7 +61,7 @@ export default class StreamViewer extends React.Component {
         // make the interface a bit confortable for a video player
         app.ThemeController.applyVariant("dark")
         app.eventBus.emit("toogleCompactMode", true)
-        app.SidebarController.toogleVisible(false)
+        app.SidebarController.tooggleVisibility(false)
         app.HeaderController.toogleVisible(false)
 
         // fetch user info in the background
@@ -80,7 +80,7 @@ export default class StreamViewer extends React.Component {
     componentWillUnmount = () => {
         app.ThemeController.applyVariant(app.settings.get("themeVariant"))
         app.eventBus.emit("toogleCompactMode", false)
-        app.SidebarController.toogleVisible(true)
+        app.SidebarController.toggleVisibility(true)
         app.HeaderController.toogleVisible(true)
         app.HeaderController.toogleVisible(true)
 
