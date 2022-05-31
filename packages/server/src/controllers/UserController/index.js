@@ -12,6 +12,12 @@ const AllowedPublicUpdateFields = [
     "description",
 ]
 
+const MaxStringsLengths = {
+    fullName: 120,
+    email: 320,
+    description: 2000,
+}
+
 export default class UserController extends Controller {
     static refName = "UserController"
 
@@ -376,6 +382,14 @@ export default class UserController extends Controller {
 
                 AllowedPublicUpdateFields.forEach((key) => {
                     if (typeof req.selection.update[key] !== "undefined") {
+                        // sanitize update
+                        // check maximung strings length
+                        if (typeof req.selection.update[key] === "string" && MaxStringsLengths[key]) {
+                            if (req.selection.update[key].length > MaxStringsLengths[key]) {
+                                return res.status(400).json({ error: `${key} is too long` })
+                            }
+                        }
+
                         update[key] = req.selection.update[key]
                     }
                 })
