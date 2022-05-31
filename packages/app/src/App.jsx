@@ -200,6 +200,9 @@ class App extends React.Component {
 				<div className="splash_logo">
 					<img src={config.logo.alt} />
 				</div>
+				<div className="splash_label">
+					<Icons.LoadingOutlined />
+				</div>
 			</div>
 		}
 	}
