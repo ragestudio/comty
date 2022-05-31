@@ -1,5 +1,5 @@
 {
-    "main_api": "https://api.comty.pw",
+    "main_api": "https://indev_api.comty.pw",
     "streaming_api": "https://media_api.comty.pw",
-    "websocket_api": "wss://api.comty.pw"
+    "websocket_api": "wss://indev_ws.comty.pw"
 }
