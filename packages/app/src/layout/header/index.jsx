@@ -7,25 +7,29 @@ import classnames from "classnames"
 import "./index.less"
 
 export default class Header extends React.Component {
-	constructor(props) {
-		super(props)
+	controller = window.app["HeaderController"] = {
+		toggleVisibility: (to) => {
+			if (window.isMobile) {
+				to = true
+			}
 
-		this.state = {
-			visible: true,
-		}
+			this.setState({ visible: to ?? !this.state.visible })
+		},
+		isVisible: () => this.state.visible,
+	}
 
-		this.HeaderController = {
-			toogleVisible: (to) => {
-				if (window.isMobile) {
-					to = true
-				}
+	state = {
+		visible: false, // set by default to create an animation
+	}
 
-				this.setState({ visible: to ?? !this.state.visible })
-			},
-			isVisible: () => this.state.visible,
-		}
-
-		window.app["HeaderController"] = this.HeaderController
+	componentDidMount = async () => {
+		// wait to app finish of load
+		app.eventBus.on(`app.initialization.finish`, () => {
+			// create an fade in animation
+			setTimeout(() => {
+				this.controller.toggleVisibility(true)
+			}, 400)
+		})
 	}
 
 	render() {

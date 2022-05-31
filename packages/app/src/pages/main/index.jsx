@@ -11,13 +11,13 @@ import "./index.less"
 export default class Main extends React.Component {
 	componentDidMount = async () => {
 		if (!window.isMobile && window.app?.HeaderController?.isVisible()) {
-			window.app.HeaderController.toogleVisible(false)
+			window.app.HeaderController.toggleVisibility(false)
 		}
 	}
 
 	componentWillUnmount() {
 		if (!window.isMobile && !window.app?.HeaderController?.isVisible()) {
-			window.app.HeaderController.toogleVisible(true)
+			window.app.HeaderController.toggleVisibility(true)
 		}
 	}
 

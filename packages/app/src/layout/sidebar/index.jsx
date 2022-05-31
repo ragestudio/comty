@@ -23,6 +23,14 @@ export default class Sidebar extends React.Component {
 	constructor(props) {
 		super(props)
 
+		this.controller = window.app["SidebarController"] = {
+			toggleVisibility: this.toggleVisibility,
+			toggleEdit: this.toggleEditMode,
+			isVisible: () => this.state.visible,
+			isEditMode: () => this.state.visible,
+			isCollapsed: () => this.state.collapsed,
+		}
+
 		this.state = {
 			editMode: false,
 			visible: false,
@@ -36,16 +44,6 @@ export default class Sidebar extends React.Component {
 			},
 		}
 
-		this.SidebarController = {
-			toggleVisibility: this.toggleVisibility,
-			toggleEdit: this.toggleEditMode,
-			isVisible: () => this.state.visible,
-			isEditMode: () => this.state.visible,
-			isCollapsed: () => this.state.collapsed,
-		}
-
-		window.app["SidebarController"] = this.SidebarController
-
 		window.app.eventBus.on("edit_sidebar", () => this.toggleEditMode())
 
 		window.app.eventBus.on("settingChanged.sidebar_collapse", (value) => {
@@ -58,10 +56,13 @@ export default class Sidebar extends React.Component {
 	componentDidMount = async () => {
 		await this.loadSidebarItems()
 
-		// create a cool debounced animation
-		setTimeout(() => {
-			this.toggleVisibility(true)
-		}, 400)
+		// wait to app finish of load
+		app.eventBus.on(`app.initialization.finish`, () => {
+			// create an fade in animation
+			setTimeout(() => {
+				this.controller.toggleVisibility(true)
+			}, 400)
+		})
 	}
 
 	getStoragedKeys = () => {
