@@ -4,7 +4,11 @@ import { Result, Button } from "antd"
 import "./index.less"
 
 export const CrashComponent = (props) => {
-    const { crash } = props
+    const {
+        crash = {
+            details: "Unknown error",
+        }
+    } = props
 
     return <Result
         status="error"
