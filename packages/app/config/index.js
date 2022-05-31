@@ -14,7 +14,7 @@ export default {
     },
     remotes: {
         mainApi: process.env.NODE_ENV !== "production" ? `http://${window.location.hostname}:3000` : defaultRemotesOrigins.main_api,
-        websocketApi: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3000` : defaultRemotesOrigins.websocket_api,
+        websocketApi: process.env.NODE_ENV !== "production" ? `ws://${window.location.hostname}:3001` : defaultRemotesOrigins.websocket_api,
         streamingApi: process.env.NODE_ENV !== "production" ? `https://${window.location.hostname}:3002` : defaultRemotesOrigins.streaming_api, 
     },
     app: {
