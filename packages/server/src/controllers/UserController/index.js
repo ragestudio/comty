@@ -9,6 +9,7 @@ const AllowedPublicUpdateFields = [
     "fullName",
     "avatar",
     "email",
+    "cover",
     "description",
 ]
 
