@@ -10,8 +10,6 @@ import { Icons, createIconRender } from "components/Icons"
 import SettingsList from "schemas/settings"
 import groupsDecorator from "schemas/settingsGroupsDecorator.json"
 
-import { AboutApp } from ".."
-
 import "./index.less"
 
 const ItemTypes = {
@@ -269,7 +267,13 @@ const SettingItem = (props) => {
 		</div>
 		<div className="component">
 			<div>
-				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, item.props)}
+				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, {
+					...item.props,
+					ctx: {
+						dispatchUpdate,
+						onUpdateItem,
+					}
+				})}
 			</div>
 
 			{delayedValue && <div>
@@ -381,7 +385,7 @@ export default class SettingsMenu extends React.PureComponent {
 
 	onClickAppAbout = () => {
 		window.app.setLocation("/about")
-		
+
 		if (typeof this.props.close === "function") {
 			this.props.close()
 		}
