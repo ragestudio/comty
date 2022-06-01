@@ -116,10 +116,10 @@ class App extends React.Component {
 			if (!this.state.session && !token) {
 				return false
 			}
-			
+
 			await this.sessionController.forgetLocalSession()
 			await this.flushState()
-			
+
 			app.eventBus.emit("forceToLogin")
 
 			antd.notification.open({
@@ -214,13 +214,13 @@ class App extends React.Component {
 
 	static publicMethods = {
 		openSettings: (goTo) => {
-			window.app.DrawerController.open("settings", Settings, {
+			window.app.SidedrawerController.open("Settings", Settings, {
 				props: {
 					width: "fit-content",
-				},
-				componentProps: {
 					goTo,
-				}
+				},
+				allowMultiples: false,
+				escClosable: true,
 			})
 		},
 		openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
