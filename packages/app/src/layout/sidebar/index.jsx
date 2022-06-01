@@ -26,6 +26,7 @@ export default class Sidebar extends React.Component {
 		this.controller = window.app["SidebarController"] = {
 			toggleVisibility: this.toggleVisibility,
 			toggleEdit: this.toggleEditMode,
+			toggleElevation: this.toggleElevation,
 			isVisible: () => this.state.visible,
 			isEditMode: () => this.state.visible,
 			isCollapsed: () => this.state.collapsed,
@@ -42,12 +43,21 @@ export default class Sidebar extends React.Component {
 				bottom: [],
 				top: [],
 			},
+			elevated: false,
 		}
 
 		window.app.eventBus.on("edit_sidebar", () => this.toggleEditMode())
 
 		window.app.eventBus.on("settingChanged.sidebar_collapse", (value) => {
 			this.toggleCollapse(value)
+		})
+
+		// handle sidedrawer open/close
+		window.app.eventBus.on("sidedrawer.hasDrawers", () => {
+			this.toggleElevation(true)
+		})
+		window.app.eventBus.on("sidedrawer.noDrawers", () => {
+			this.toggleElevation(false)
 		})
 	}
 
@@ -238,6 +248,10 @@ export default class Sidebar extends React.Component {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
+	toggleElevation = (to) => {
+		this.setState({ elevated: to ?? !this.state.elevated })
+	}
+
 	onMouseEnter = () => {
 		if (window.app.settings.is("collapseOnLooseFocus", false)) {
 			return false
@@ -288,7 +302,16 @@ export default class Sidebar extends React.Component {
 				width={this.state.editMode ? 400 : 200}
 				collapsed={this.state.editMode ? false : this.state.collapsed}
 				onCollapse={() => this.props.onCollapse()}
-				className={classnames("sidebar", { ["edit_mode"]: this.state.editMode, ["hidden"]: !this.state.visible })}
+				className={
+					classnames(
+						"sidebar",
+						{
+							["edit_mode"]: this.state.editMode,
+							["hidden"]: !this.state.visible,
+							["elevated"]: this.state.elevated
+						}
+					)
+				}
 			>
 				<div className="app_sidebar_header">
 					<div className={classnames("app_sidebar_header_logo", { ["collapsed"]: this.state.collapsed })}>

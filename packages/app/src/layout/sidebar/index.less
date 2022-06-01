@@ -2,12 +2,14 @@
 
 //  SIDEBAR
 .ant-layout-sider {
+	z-index       : 50;
+
 	background      : var(--sidebar-background-color) !important;
 	background-color: var(--sidebar-background-color) !important;
 
 	border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
 	overflow     : hidden;
-	border       : 1px solid var(--sidebar-background-color) !important;
+	border       : 1px solid var(--sidebar-background-color);
 
 	transition: all 150ms ease-in-out;
 
@@ -16,6 +18,10 @@
 		min-width       : 0 !important;
 		background-color: transparent !important;
 		width           : 0 !important;
+	}
+
+	&.elevated {
+		box-shadow   : 0 0 5px 4px rgba(0, 0, 0, 0.1) !important;
 	}
 }
 
