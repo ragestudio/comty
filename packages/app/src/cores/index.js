@@ -1,7 +1,6 @@
 import SettingsCore from "./settings"
 import APICore from "./api"
 import StyleCore from "./style"
-import Render from "./render"
 
 import I18nCore from "./i18n"
 import NotificationsCore from "./notifications"
@@ -17,5 +16,4 @@ export default [
     SoundCore,
     NotificationsCore,
     ShortcutsCore,
-    Render,
 ]
