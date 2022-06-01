@@ -1,0 +1,160 @@
+import React from "react"
+import * as antd from "antd"
+
+import { UnsplashBrowser } from "./components"
+
+import "./index.less"
+
+export default [
+    {
+        "id": "reduceAnimations",
+        "storaged": true,
+        "group": "aspect",
+        "component": "Switch",
+        "icon": "MdOutlineAnimation",
+        "title": "Reduce animation",
+        "experimental": true
+    },
+    {
+        "id": "auto_darkMode",
+        "experimental": true,
+        "storaged": true,
+        "group": "aspect",
+        "component": "Switch",
+        "icon": "Moon",
+        "title": "Auto dark mode",
+        "emitEvent": "app.autoDarkModeToogle",
+    },
+    {
+        "experimental": true,
+        "dependsOn": {
+            "auto_darkMode": false
+        },
+        "id": "darkMode",
+        "storaged": true,
+        "group": "aspect",
+        "component": "Switch",
+        "icon": "Moon",
+        "title": "Dark mode",
+        "emitEvent": "theme.applyVariant",
+        "emissionValueUpdate": (value) => {
+            return value ? "dark" : "light"
+        },
+    },
+    {
+        "id": "primaryColor",
+        "storaged": true,
+        "group": "aspect",
+        "component": "SliderColorPicker",
+        "title": "Primary color",
+        "description": "Change primary color of the application.",
+        "emitEvent": "modifyTheme",
+        "reloadValueOnUpdateEvent": "resetTheme",
+        "emissionValueUpdate": (value) => {
+            return {
+                primaryColor: value
+            }
+        }
+    },
+    {
+        "id": "backgroundImage",
+        "storaged": true,
+        "group": "aspect",
+        "title": "Background image",
+        "description": "Change background image of the application. You can use a local image or a remote image (URL).",
+        "component": (props) => {
+            const [validUrl, setValidUrl] = React.useState(true)
+
+            const submitUrl = (e) => {
+                const url = e.target.value
+
+                // validate if value recived is url
+                if (!url.match(/^(http(s)?:\/\/)?(www\.)?[a-zA-Z0-9]+\.[a-zA-Z]+(\.[a-zA-Z]+)?(\/.*)?$/)) {
+                    setValidUrl(false)
+                    antd.message.error("Invalid URL")
+                    return
+                }
+
+                props.ctx.dispatchUpdate(url)
+            }
+
+            const onClickSearchUnsplash = () => {
+                antd.message.warn("This feature is not implemented yet.")
+                return false
+                window.app.SidedrawerController.open("unsplashBrowser", UnsplashBrowser)
+            }
+
+            return <div className="backgroundImageSetting">
+                <antd.Input
+                    placeholder="https://example.com/image.png"
+                    onPressEnter={submitUrl}
+                    status={validUrl ? "default" : "error"}
+                />
+                or
+                <antd.Button
+                    onClick={onClickSearchUnsplash}
+                >
+                    Search on Unsplash
+                </antd.Button>
+            </div>
+        },
+        "emitEvent": "modifyTheme",
+        "emissionValueUpdate": (value) => {
+            return {
+                backgroundImage: `url(${value})`
+            }
+        },
+    },
+    {
+        "id": "backgroundBlur",
+        "storaged": true,
+        "group": "aspect",
+        "component": "Slider",
+        "icon": "Eye",
+        "title": "Background blur",
+        "description": "Create a blur effect on the background.",
+        "props": {
+            min: 0,
+            max: 50,
+            step: 5
+        },
+        "emitEvent": "modifyTheme",
+        "emissionValueUpdate": (value) => {
+            return {
+                backgroundBlur: `${value}px`,
+            }
+        },
+    },
+    {
+        "id": "backgroundColorTransparency",
+        "storaged": true,
+        "group": "aspect",
+        "component": "Slider",
+        "icon": "Eye",
+        "title": "Background color transparency",
+        "description": "Adjust the transparency of the background color.",
+        "props": {
+            min: 0,
+            max: 1,
+            step: 0.1
+        },
+        "emitEvent": "modifyTheme",
+        "emissionValueUpdate": (value) => {
+            return {
+                backgroundColorTransparency: value,
+            }
+        },
+    },
+    {
+        "id": "resetTheme",
+        "storaged": true,
+        "group": "aspect",
+        "component": "Button",
+        "title": "Reset theme",
+        "props": {
+            "children": "Default Theme"
+        },
+        "emitEvent": "resetTheme",
+        "noUpdate": true,
+    }
+]
