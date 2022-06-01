@@ -187,6 +187,9 @@ class App extends React.Component {
 	}
 
 	static staticRenders = {
+		PageLoad: () => {
+			return <antd.Skeleton active />
+		},
 		NotFound: (props) => {
 			return <NotFound />
 		},
