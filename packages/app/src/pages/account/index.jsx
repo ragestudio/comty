@@ -51,6 +51,8 @@ export default class Account extends React.Component {
 				this.setState({
 					isNotExistent: true,
 				})
+
+				return false
 			}
 
 			if (!isSelf) {
