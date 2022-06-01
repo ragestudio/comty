@@ -23,6 +23,7 @@ export { default as Navigation } from "./Navigation"
 export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 export { default as Login } from "./Login"
+export { default as Image } from "./Image"
 
 // BUTTONS
 export { default as LikeButton } from "./LikeButton"
