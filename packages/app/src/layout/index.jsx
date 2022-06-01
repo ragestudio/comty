@@ -104,13 +104,17 @@ export default class Layout extends React.Component {
 	onTransitionStart = () => {
 		progressBar.start()
 
-		this.setState({ isOnTransition: true })
+		if (!app.settings.get("reduceAnimations")) {
+			this.setState({ isOnTransition: true })
+		}
 	}
 
 	onTransitionFinish = () => {
 		progressBar.done()
 
-		this.setState({ isOnTransition: false })
+		if (!app.settings.get("reduceAnimations")) {
+			this.setState({ isOnTransition: false })
+		}
 	}
 
 	componentDidCatch(info, stack) {
