@@ -94,10 +94,56 @@ export default [
     {
         "id": "avatar",
         "group": "account.profile",
-        "component": "ImageUpload",
+        "component": "Input",
         "icon": "Image",
         "title": "Avatar",
-        "description": "Change your avatar",
+        "description": "Change your avatar (Upload an image or use an URL)",
+        "defaultValue": async () => {
+            const userData = await User.data()
+            return userData.avatar
+        },
+        "onUpdate": async (value) => {
+            const selfId = await User.selfUserId()
+
+            const result = window.app.request.post.updateUser({
+                _id: selfId,
+                update: {
+                    avatar: value
+                }
+            })
+
+            if (result) {
+                return result
+            }
+        },
+        "debounced": true,
+    },
+    {
+        "id": "cover",
+        "group": "account.profile",
+        "component": "Input",
+        "icon": "Image",
+        "title": "Cover",
+        "description": "Change your profile cover (Upload an image or use an URL)",
+        "defaultValue": async () => {
+            const userData = await User.data()
+            return userData.cover
+        },
+        "onUpdate": async (value) => {
+            const selfId = await User.selfUserId()
+
+            const result = window.app.request.post.updateUser({
+                _id: selfId,
+                update: {
+                    cover: value
+                }
+            })
+
+            if (result) {
+                return result
+            }
+        },
+        "debounced": true,
     },
     {
         "id": "cover",
@@ -106,14 +152,6 @@ export default [
         "icon": "Image",
         "title": "Cover",
         "description": "Change your cover",
-    },
-    {
-        "id": "primaryBadge",
-        "group": "account.profile",
-        "component": "Select",
-        "icon": "Tag",
-        "title": "Primary badge",
-        "description": "Change your primary badge",
     },
     {
         "id": "description",
@@ -147,6 +185,14 @@ export default [
             }
         },
         "debounced": true,
+    },
+    {
+        "id": "primaryBadge",
+        "group": "account.profile",
+        "component": "Select",
+        "icon": "Tag",
+        "title": "Primary badge",
+        "description": "Change your primary badge",
     },
     {
         "id": "logout",
