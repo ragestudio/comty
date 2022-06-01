@@ -131,7 +131,6 @@ export default class Layout extends React.Component {
 		const layoutComponentProps = {
 			...this.props.bindProps,
 			...this.state,
-			children: this.state.RenderChildren,
 			layoutPageModesClassnames: [{
 				["noMargin"]: this.state.compactMode,
 			}],
