@@ -10,17 +10,19 @@ import { Session, User } from "models"
 import "./index.less"
 
 export default class Account extends React.Component {
-	static bindApp = ["userController", "sessionController"]
-
 	state = {
-		transitionActive: false,
-		activeKey: "posts",
+		requestedUser: null,
+
+		user: null,
+		followers: [],
 
 		isSelf: false,
 		isFollowed: false,
-		user: null,
-		requestedUser: null,
-		followers: [],
+
+		transitionActive: false,
+		activeKey: "posts",
+
+		isNotExistent: false,
 	}
 
 	api = window.app.request
@@ -30,7 +32,7 @@ export default class Account extends React.Component {
 		const location = window.app.history.location
 		const query = new URLSearchParams(location.search)
 
-		const requestedUser = location.state?.username ?? query.get("username") ?? token?.username
+		const requestedUser = this.props.username ?? location.state?.username ?? query.get("username") ?? token?.username
 		const hasAdmin = await User.hasRole("admin")
 
 		let isSelf = false
@@ -44,6 +46,12 @@ export default class Account extends React.Component {
 			}
 
 			user = await this.fetchData(requestedUser)
+
+			if (!user) {
+				this.setState({
+					isNotExistent: true,
+				})
+			}
 
 			if (!isSelf) {
 				const followedResult = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
@@ -75,7 +83,7 @@ export default class Account extends React.Component {
 			username: username
 		}).catch((error) => {
 			console.error(error)
-			antd.message.error(error.message)
+
 			return false
 		})
 	}
@@ -87,6 +95,7 @@ export default class Account extends React.Component {
 			.catch((error) => {
 				console.error(error)
 				antd.message.error(error.message)
+
 				return false
 			})
 
@@ -121,6 +130,15 @@ export default class Account extends React.Component {
 	render() {
 		const user = this.state.user
 
+		if (this.state.isNotExistent) {
+			return <antd.Result
+				status="404"
+				title="This user does not exist, yet..."
+			>
+
+			</antd.Result>
+		}
+
 		if (!user) {
 			return <Skeleton />
 		}
@@ -128,6 +146,7 @@ export default class Account extends React.Component {
 		return (
 			<div className="accountProfile">
 				{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
+
 				<div className="profileCard">
 					<div className="basicData">
 						<div className="title">
