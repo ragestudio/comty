@@ -225,7 +225,7 @@ class App extends React.Component {
 			return window.app.setLocation(config.app.mainPath)
 		},
 		goToAccount: (username) => {
-			return window.app.setLocation(`/account`, { username })
+			return window.app.setLocation(`/@${username}`)
 		},
 		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
 		setStatusBarStyleDark: async () => {
