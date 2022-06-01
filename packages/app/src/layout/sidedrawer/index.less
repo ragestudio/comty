@@ -4,6 +4,10 @@
     display: flex;
     flex-direction: row;
 
+    > div {
+        transform: translate(-50px, 0);
+    }
+
     .sidedrawer {
         position: relative;
 
@@ -27,6 +31,9 @@
 
         word-break: break-all;
         transition: all 150ms ease-in-out;
+
+        // create shadow on the right side
+        box-shadow   : 0 0 5px 4px rgba(0, 0, 0, 0.1) !important;
 
         &.hided {
             width: 0;

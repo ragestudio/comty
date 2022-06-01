@@ -417,6 +417,7 @@ class App extends React.Component {
 				<title>{config.app.siteName}</title>
 			</Helmet>
 			<antd.ConfigProvider>
+				<div className="backgroundDecorator" />
 				<Layout
 					user={this.state.user}
 					staticRenders={App.staticRenders}
