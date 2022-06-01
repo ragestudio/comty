@@ -4,7 +4,7 @@ import classnames from "classnames"
 import moment from "moment"
 
 import { Icons } from "components/Icons"
-import { Skeleton, PostsFeed, FollowButton, FollowersList } from "components"
+import { Image, Skeleton, PostsFeed, FollowButton, FollowersList } from "components"
 import { Session, User } from "models"
 
 import "./index.less"
@@ -154,7 +154,10 @@ export default class Account extends React.Component {
 						<div className="title">
 							<div className="field">
 								<div className="avatar">
-									<img src={user.avatar} />
+									<Image
+										alt="ProfileImage"
+										src={user.avatar}
+									/>
 								</div>
 							</div>
 
