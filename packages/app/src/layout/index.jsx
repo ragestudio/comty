@@ -4,7 +4,6 @@ import * as antd from "antd"
 import progressBar from "nprogress"
 
 import Sidebar from "./sidebar"
-import Header from "./header"
 import Drawer from "./drawer"
 import Sidedrawer from "./sidedrawer"
 import BottomBar from "./bottomBar"
@@ -29,7 +28,6 @@ const LayoutRenders = {
 			<Sidebar user={props.user} />
 			<Sidedrawer />
 			<antd.Layout className="content_layout">
-				<Header />
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
 						{React.cloneElement(props.children, props)}
