@@ -22,6 +22,10 @@ export default [
         "title": "Name",
         "description": "Change your public name",
         "props": {
+            // set max length
+            "maxLength": 120,
+            "showCount": true,
+            "allowClear": true,
             "placeholder": "Enter your name. e.g. John Doe",
         },
         "defaultValue": async () => {
