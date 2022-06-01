@@ -2,7 +2,7 @@ const path = require("path")
 const { builtinModules } = require("module")
 
 const aliases = {
-    "__": __dirname,
+    "~": __dirname,
     "~/": `${path.resolve(__dirname, "src")}/`,
     "@src": path.join(__dirname, "src"),
     cores: path.join(__dirname, "src/cores"),
