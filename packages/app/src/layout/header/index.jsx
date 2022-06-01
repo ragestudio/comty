@@ -23,13 +23,9 @@ export default class Header extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		// wait to app finish of load
-		app.eventBus.on(`app.initialization.finish`, () => {
-			// create an fade in animation
-			setTimeout(() => {
-				this.controller.toggleVisibility(true)
-			}, 400)
-		})
+		setTimeout(() => {
+			this.controller.toggleVisibility(true)
+		}, 100)
 	}
 
 	render() {

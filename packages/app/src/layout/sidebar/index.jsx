@@ -66,13 +66,9 @@ export default class Sidebar extends React.Component {
 	componentDidMount = async () => {
 		await this.loadSidebarItems()
 
-		// wait to app finish of load
-		app.eventBus.on(`app.initialization.finish`, () => {
-			// create an fade in animation
-			setTimeout(() => {
-				this.controller.toggleVisibility(true)
-			}, 400)
-		})
+		setTimeout(() => {
+			this.controller.toggleVisibility(true)
+		}, 100)
 	}
 
 	getStoragedKeys = () => {
