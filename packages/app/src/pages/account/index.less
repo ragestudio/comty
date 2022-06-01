@@ -4,8 +4,8 @@
 	padding: 0 20px;
 
 	.cover {
-		z-index      : 50;
-		position     : relative;
+		z-index: 50;
+		position: relative;
 		border-radius: @borderRadius @borderRadius 0 0;
 
 		outline: 1px solid var(--border-color);
@@ -14,7 +14,7 @@
 		width: 100%;
 
 		background-position: center;
-		background-size    : cover;
+		background-size: cover;
 
 		height: 18vh;
 
@@ -22,32 +22,35 @@
 	}
 
 	.profileCard {
-		z-index : 51;
+		z-index: 51;
 		position: relative;
 
-		display       : flex;
+		display: flex;
 		flex-direction: column;
 
-		color           : var(--background-color-contrast);
+		color: var(--background-color-contrast);
 		background-color: var(--background-color-primary);
 
-		border       : 1px solid var(--border-color);
+		border: 1px solid var(--border-color);
 		border-radius: @borderRadius;
 
 		padding: 20px 15px;
 
 		.basicData {
-			display        : inline-flex;
-			flex-direction : row;
+			display: inline-flex;
+			flex-direction: row;
 			justify-content: space-between;
 
 			margin-bottom: 15px;
 
 			.avatar {
+				width: 100px;
+				height: 100px;
+
 				img {
-					width        : 70px;
-					height       : 70px;
-					border-radius: 4px;
+					width: 100%;
+					height: 100%;
+					border-radius: 8px;
 				}
 			}
 
@@ -56,13 +59,13 @@
 			}
 
 			.title {
-				display       : inline-flex;
+				display: inline-flex;
 				flex-direction: row;
-				align-items   : center;
+				align-items: center;
 			}
 
 			.field {
-				display       : inline-flex;
+				display: inline-flex;
 				flex-direction: column;
 
 				margin-right: 15px;
@@ -70,7 +73,7 @@
 				h1 {
 					margin: 0;
 
-					font-size  : 35px;
+					font-size: 35px;
 					line-height: 37px;
 				}
 
@@ -83,25 +86,25 @@
 		.description {
 			p {
 				word-break: break-all;
-				margin    : 0;
+				margin: 0;
 			}
 		}
 
 		.extension {
 			position: relative;
-			display : inline-flex;
+			display: inline-flex;
 
-			top    : -10px;
-			width  : 100%;
+			top: -10px;
+			width: 100%;
 			padding: 19px 10px 10px 10px;
 
-			border-top  : 0;
+			border-top: 0;
 			border-right: 0;
 
 			border-style: solid;
 			border-width: 1px;
 
-			border-color    : var(--border-color);
+			border-color: var(--border-color);
 			border-top-color: transparent;
 
 			border-radius: 0 0 @borderRadius @borderRadius;
@@ -127,7 +130,7 @@
 		.ant-tabs-nav-wrap {
 			justify-content: flex-end;
 		}
-		
+
 		.ant-tabs-nav {
 			margin: 0 20px 20px 0;
 		}
@@ -137,17 +140,17 @@
 		}
 
 		.ant-tabs-tab {
-			margin-right    : 20px !important;
-			padding         : 8px 20px !important;
+			margin-right: 20px !important;
+			padding: 8px 20px !important;
 
-			border-color    : var(--border-color) !important;
+			border-color: var(--border-color) !important;
 			background-color: var(--background-color-primary) !important;
-			
-			border-radius   : 4px !important;
+
+			border-radius: 4px !important;
 
 			svg {
 				font-size: 1rem;
-				margin   : 0 !important;
+				margin: 0 !important;
 			}
 		}
 	}
