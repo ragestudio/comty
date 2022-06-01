@@ -26,6 +26,7 @@ const LayoutRenders = {
 		return <antd.Layout className="app_layout" style={{ height: "100%" }}>
 			<Drawer />
 			<Sidebar user={props.user} />
+			<Sidedrawer />
 			<antd.Layout className="content_layout">
 				<Header />
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
@@ -34,7 +35,6 @@ const LayoutRenders = {
 					</div>
 				</antd.Layout.Content>
 			</antd.Layout>
-			<Sidedrawer />
 		</antd.Layout>
 	}
 }
