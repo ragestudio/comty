@@ -43,10 +43,10 @@ Promise.tasked = function (promises) {
 }
 
 import React from "react"
-import { EviteRuntime, BindPropsProvider } from "evite"
+import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-import { ActionSheet, Toast } from "antd-mobile"
+import { Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { Translation } from "react-i18next"
 
@@ -57,8 +57,7 @@ import { NotFound, RenderError, Crash, Settings, Navigation, Login } from "compo
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
-
-import * as Render from "cores/render"
+import Router from "./router"
 
 import "theme/index.less"
 
@@ -415,25 +414,26 @@ class App extends React.Component {
 	}
 
 	render() {
-		return (
-			<React.Fragment>
-				<Helmet>
-					<title>{config.app.siteName}</title>
-				</Helmet>
-				<antd.ConfigProvider>
-					<Layout user={this.state.user} >
-						<BindPropsProvider
-							user={this.state.user}
-							session={this.state.session}
-							sessionController={this.sessionController}
-							userController={this.userController}
-						>
-							<Render.RouteRender staticRenders={App.staticRenders} />
-						</BindPropsProvider>
-					</Layout>
-				</antd.ConfigProvider>
-			</React.Fragment>
-		)
+		return <React.Fragment>
+			<Helmet>
+				<title>{config.app.siteName}</title>
+			</Helmet>
+			<antd.ConfigProvider>
+				<Layout
+					user={this.state.user}
+					staticRenders={App.staticRenders}
+					bindProps={{
+						staticRenders: App.staticRenders,
+						user: this.state.user,
+						session: this.state.session,
+						sessionController: this.sessionController,
+						userController: this.userController,
+					}}
+				>
+					<Router />
+				</Layout>
+			</antd.ConfigProvider>
+		</React.Fragment>
 	}
 }
 
