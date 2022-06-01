@@ -16,6 +16,7 @@ export default class PostsFeed extends React.Component {
     }
 
     api = window.app.request
+
     listRef = React.createRef()
 
     componentDidMount = async () => {
@@ -32,7 +33,7 @@ export default class PostsFeed extends React.Component {
 
     registerWSEvents = async () => {
         window.app.ws.listen(`post.new`, async (data) => {
-            this.onInsert(data)
+            this.insert(data)
         })
     }
 
@@ -63,7 +64,7 @@ export default class PostsFeed extends React.Component {
         this.setState({ animating: true })
     }
 
-    onInsert = async (data) => {
+    insert = async (data) => {
         const updatedList = this.state.list
 
         updatedList.unshift(data)
@@ -85,7 +86,10 @@ export default class PostsFeed extends React.Component {
         }
 
         if (this.state.list.length === 0) {
-            return <antd.Empty />
+            return <div>
+            <antd.Empty />
+                <h1>Whoa, nothing on here...</h1>
+            </div>
         }
 
         return <div
