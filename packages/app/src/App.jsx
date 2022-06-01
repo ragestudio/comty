@@ -95,18 +95,13 @@ class App extends React.Component {
 		"new_session": async () => {
 			await this.flushState()
 			await this.initialization()
-
-			if (window.location.pathname == "/login") {
-				window.app.setLocation(this.beforeLoginLocation ?? "/main")
-				this.beforeLoginLocation = null
-			}
 		},
 		"destroyed_session": async () => {
 			await this.flushState()
 			app.eventBus.emit("forceToLogin")
 		},
 		"forceToLogin": () => {
-			app.setLocation("/main")
+			window.app.setLocation("/main")
 			app.eventBus.emit("app.createLogin")
 		},
 		"invalid_session": async (error) => {
