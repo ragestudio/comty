@@ -1,21 +1,37 @@
 @import "theme/vars.less";
 
-.sidedrawer {
-    width: 30vw; // by default
+.sidedrawers-wrapper {
+    display: flex;
+    flex-direction: row;
 
-    background-color: var(--sidedrawer-background-color);
-    border-radius: @app_sidebar_borderRadius 0 0 @app_sidebar_borderRadius;
+    .sidedrawer {
+        position: relative;
 
-    word-break: break-all;
+        width: 30vw; // by default
+        height: 100vh;
 
-    transition: all 150ms ease-out;
+        min-width: 700px;
 
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: overlay;
+        z-index: 20;
 
-    &.hided {
-        width: 0;
-        padding: 0;
+        background-color: var(--sidedrawer-background-color);
+        border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
+
+        padding: 20px;
+        padding-left: 70px;
+
+        transform: translate(-50px, 0);
+
+        overflow-x: hidden;
+        overflow-y: overlay;
+
+        word-break: break-all;
+        transition: all 250ms ease-in-out;
+
+        &.hided {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+        }
     }
 }
