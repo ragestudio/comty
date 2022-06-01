@@ -12,6 +12,9 @@
     "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
     "preview": "vite preview"
   },
+  "peerDependencies":  {
+    "react": "^16.8.6"
+  },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
     "@capacitor/android": "^3.4.0",
