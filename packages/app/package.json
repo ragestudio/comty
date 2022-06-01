@@ -5,13 +5,12 @@
   "scripts": {
     "dev": "vite",
     "dev:ssr": "vite-ssr",
-    "sync": "capacitor sync ios && capacitor sync android",
+    "sync": "capacitor sync ios",
     "build": "cross-env NODE_ENV=production vite build && yarn sync",
     "build:dist": "cross-env NODE_ENV=production vite build",
     "build:preview": "cross-env NODE_ENV=preview vite build && yarn sync",
     "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
-    "preview": "vite preview",
-    "capacitor": "capacitor"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
@@ -72,10 +71,6 @@
     "vite-ssr": "0.15.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "3.2.2",
-    "@capacitor/core": "3.2.2",
-    "@capacitor/ios": "3.0.2",
-    "@capacitor/project": "1.0.28",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.4.10",
     "@types/react": "^17.0.15",
