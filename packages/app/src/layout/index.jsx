@@ -1,6 +1,7 @@
 import React from "react"
 import classnames from "classnames"
 import * as antd from "antd"
+import progressBar from "nprogress"
 
 import Sidebar from "./sidebar"
 import Header from "./header"
@@ -14,7 +15,7 @@ const LayoutRenders = {
 			<antd.Layout className="content_layout">
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
-						{props.children}
+						{React.cloneElement(props.children, props)}
 					</div>
 				</antd.Layout.Content>
 			</antd.Layout>
@@ -31,7 +32,7 @@ const LayoutRenders = {
 				<Header />
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
 					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
-						{props.children}
+						{React.cloneElement(props.children, props)}
 					</div>
 				</antd.Layout.Content>
 			</antd.Layout>
@@ -40,10 +41,14 @@ const LayoutRenders = {
 }
 
 export default class Layout extends React.Component {
+	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
+
 	state = {
 		layoutType: "default",
 		isOnTransition: false,
 		compactMode: false,
+		renderLock: true,
+		renderError: null,
 	}
 
 	setLayout = (layout) => {
@@ -57,12 +62,17 @@ export default class Layout extends React.Component {
 	}
 
 	componentDidMount() {
-		window.app.eventBus.on("transitionStart", () => {
-			this.setState({ isOnTransition: true })
+		window.app.eventBus.on("app.initialization.start", () => {
+			this.setState({
+				renderLock: true,
+			})
 		})
-		window.app.eventBus.on("transitionDone", () => {
-			this.setState({ isOnTransition: false })
+		window.app.eventBus.on("app.initialization.finish", () => {
+			this.setState({
+				renderLock: false,
+			})
 		})
+
 		window.app.eventBus.on("toogleCompactMode", (to) => {
 			this.setState({
 				compactMode: to ?? !this.state.compactMode,
@@ -87,13 +97,48 @@ export default class Layout extends React.Component {
 		})
 	}
 
+	onTransitionStart = () => {
+		progressBar.start()
+
+		this.setState({ isOnTransition: true })
+	}
+
+	onTransitionFinish = () => {
+		progressBar.done()
+
+		this.setState({ isOnTransition: false })
+	}
+
+	componentDidCatch(info, stack) {
+		this.setState({ renderError: { info, stack } })
+	}
+
 	render() {
+		if (this.state.renderLock) {
+			if (this.props.staticRenders?.Initialization) {
+				return React.createElement(this.props.staticRenders.Initialization)
+			}
+
+			return null
+		}
+
+		if (this.state.renderError) {
+			if (this.props.staticRenders?.RenderError) {
+				return React.createElement(this.props.staticRenders?.RenderError, { error: this.state.renderError })
+			}
+
+			return JSON.stringify(this.state.renderError)
+		}
+
 		const layoutComponentProps = {
-			...this.props,
+			...this.props.bindProps,
 			...this.state,
+			children: this.props.children,
 			layoutPageModesClassnames: [{
 				["noMargin"]: this.state.compactMode,
-			}]
+			}],
+			onTransitionStart: this.onTransitionStart,
+			onTransitionFinish: this.onTransitionFinish,
 		}
 
 		if (LayoutRenders[this.state.layoutType]) {
