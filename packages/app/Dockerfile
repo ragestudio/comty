@@ -12,6 +12,6 @@ COPY --chown=node:node package.json ./
 COPY --chown=node:node . .
 
 RUN chmod -R 777 /home/node/app
-RUN npm install -D
+RUN npm install -D --force
 
 CMD ["node", "/home/node/app/server.js"]
