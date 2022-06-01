@@ -9,7 +9,7 @@ USER node
 EXPOSE 9000
 
 COPY --chown=node:node package.json ./
-COPY --chown=node:node ./dist .
+COPY --chown=node:node . .
 
 RUN chmod -R 777 /home/node/app
 
