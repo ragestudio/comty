@@ -67,6 +67,9 @@ export default [
         "description": "Change your email address",
         "props": {
             "placeholder": "Enter your email address",
+            "allowClear": true,
+            "showCount": true,
+            "maxLength": 320,
         },
         "defaultValue": async () => {
             const userData = await User.data()
@@ -121,6 +124,9 @@ export default [
         "description": "Change your description for your profile",
         "props": {
             "placeholder": "Enter here a description for your profile",
+            "maxLength": 1000,
+            "showCount": true,
+            "allowClear": true
         },
         "defaultValue": async () => {
             const userData = await User.data()
