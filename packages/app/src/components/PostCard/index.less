@@ -1,14 +1,14 @@
 .postCard {
-    display       : inline-flex;
+    display: inline-flex;
     flex-direction: column;
 
-    width    : 100%;
+    width: 100%;
     max-width: 600px;
 
     filter: drop-shadow(3px 3px 2px var(--shadow-color));
 
     background-color: var(--background-color-accent);
-    border-radius   : 8px;
+    border-radius: 8px;
 
     transition: all 0.2s ease-in-out;
 
@@ -17,29 +17,29 @@
     outline-color: transparent;
 
     &.liked {
-        filter       : drop-shadow(0px 0px 2px var(--primaryColor));
+        filter: drop-shadow(0px 0px 2px var(--primaryColor));
         outline-color: var(--primaryColor);
     }
 
     .wrapper {
-        display       : inline-flex;
+        display: inline-flex;
         flex-direction: column;
-        align-items   : center;
+        align-items: center;
 
-        width  : 100%;
+        width: 100%;
         padding: 17px;
 
         transition: all 0.2s ease-in-out;
 
         .postHeader {
-            display        : inline-flex;
-            flex-direction : row;
+            display: inline-flex;
+            flex-direction: row;
             justify-content: space-between;
 
             .userInfo {
-                display       : inline-flex;
+                display: inline-flex;
                 flex-direction: row;
-                align-items   : center;
+                align-items: center;
 
                 margin-bottom: 15px;
 
@@ -48,14 +48,27 @@
                 }
 
                 svg {
-                    fill       : var(--appColor);
+                    fill: var(--appColor);
                     margin-left: 6px;
                 }
 
+                .avatar {
+                    width: 40px;
+                    height: 40px;
+
+                    img {
+                        object-fit: cover;
+
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 8px;
+                    }
+                }
+
                 .info {
-                    display        : inline-flex;
-                    flex-direction : column;
-                    align-items    : center;
+                    display: inline-flex;
+                    flex-direction: column;
+                    align-items: center;
                     justify-content: start;
 
                     text-align: start;
@@ -65,11 +78,11 @@
                     color: var(--background-color-contrast);
 
                     h1 {
-                        color      : var(--background-color-contrast);
-                        margin     : 0;
+                        color: var(--background-color-contrast);
+                        margin: 0;
                         font-family: "DM Mono", monospace;
-                        align-self : start;
-                        cursor     : pointer;
+                        align-self: start;
+                        cursor: pointer;
                     }
 
                     >div {
@@ -79,71 +92,71 @@
             }
 
             .postStatistics {
-                display       : inline-flex;
+                display: inline-flex;
                 flex-direction: column;
-                font-size     : 16px;
+                font-size: 16px;
 
-                color : var(--background-color-contrast);
+                color: var(--background-color-contrast);
                 height: fit-content;
 
                 .item {
-                    display        : inline-flex;
-                    align-items    : center;
+                    display: inline-flex;
+                    align-items: center;
                     justify-content: flex-end;
-                    height         : fit-content;
+                    height: fit-content;
 
-                    margin-left  : 20px;
+                    margin-left: 20px;
                     margin-bottom: 5px;
 
                     .icon {
                         &.filled {
                             color: var(--primaryColor);
-                            fill : var(--primaryColor);
+                            fill: var(--primaryColor);
                         }
                     }
 
                     .value {
                         font-family: "DM Mono", monospace;
-                        font-size  : 14px;
+                        font-size: 14px;
                     }
                 }
             }
         }
 
         .content {
-            display       : inline-flex;
+            display: inline-flex;
             flex-direction: column;
-            align-items   : flex-start;
+            align-items: flex-start;
 
             //background-color: var(--background-color-primary);
 
-            padding      : 0 10px 10px 10px;
+            padding: 0 10px 10px 10px;
             border-radius: 8px;
 
-            font-size  : 14px;
+            font-size: 14px;
             font-family: "Poppins", sans-serif;
 
             color: var(--background-color-contrast);
 
-            overflow   : hidden;
-            word-break : break-all;
+            overflow: hidden;
+            word-break: break-all;
             user-select: text;
 
             .additions {
-              width: 100%;
+                width: 100%;
 
                 .addition {
                     width: 100%;
 
                     // fixtures for media content
                     img {
-                        width        : 100%;
+                        width: 100%;
                         border-radius: 12px;
                     }
 
                     video {
                         border-radius: 12px;
-                        width        : 100%;
+                        width: 100%;
                     }
 
                     audio {
@@ -159,26 +172,26 @@
     }
 
     .actionsIndicatorWrapper {
-        display        : flex;
-        flex-direction : row;
-        align-items    : center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         justify-content: center;
 
         transition: all 0.2s ease-in-out;
     }
 
     .actionsIndicator {
-        display        : flex;
-        flex-direction : row;
-        align-items    : center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         justify-content: center;
 
-        width  : 10vw;
+        width: 10vw;
         padding: 2px;
 
-        border-radius   : 8px 8px 0 0;
+        border-radius: 8px 8px 0 0;
         background-color: var(--background-color-primary);
-        color           : var(--background-color-contrast);
+        color: var(--background-color-contrast);
 
         font-size: 18px;
 
@@ -190,33 +203,33 @@
     }
 
     .actionsWrapper {
-        display        : flex;
-        flex-direction : row;
-        align-items    : center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         justify-content: center;
 
         position: absolute;
-        bottom  : 0;
-        left    : 0;
+        bottom: 0;
+        left: 0;
 
         opacity: 0;
 
-        width : 100%;
+        width: 100%;
         height: 40px;
 
         margin-top: 15px;
-        padding   : 10px;
+        padding: 10px;
 
         border-radius: 8px;
-        transition   : all 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
 
         background-color: var(--background-color-primary);
     }
 
     .actions {
-        display        : inline-flex;
-        flex-direction : row;
-        align-items    : center;
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
         justify-content: space-between;
 
         width: 80%;
@@ -226,13 +239,13 @@
         color: var(--background-color-contrast);
 
         .action {
-            display       : inline-flex;
+            display: inline-flex;
             flex-direction: column;
 
             transition: all 0.2s ease-in-out;
 
             .icon {
-                cursor    : pointer;
+                cursor: pointer;
                 transition: all 0.2s ease-in-out;
 
                 svg {
@@ -242,12 +255,12 @@
 
             .value {
                 position: absolute;
-                bottom  : 0;
+                bottom: 0;
 
-                font-size  : 14px;
+                font-size: 14px;
                 font-family: "DM Mono", monospace;
 
-                transform : translate(0, 50%);
+                transform: translate(0, 50%);
                 transition: all 0.2s ease-in-out;
             }
         }
@@ -265,20 +278,20 @@
         }
 
         >div {
-            display        : flex;
-            flex-direction : row;
-            align-items    : center;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
             justify-content: center;
 
             border-radius: 360px;
-            width        : 55px;
-            height       : 55px;
+            width: 55px;
+            height: 55px;
 
             font-size: 20px;
-            padding  : 2px;
+            padding: 2px;
 
             background-color: var(--background-color-primary);
-            transform       : translate(0, -15px);
+            transform: translate(0, -15px);
         }
     }
 }

@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Swiper } from "antd-mobile"
 import { Icons } from "components/Icons"
-import { LikeButton } from "components"
+import { Image, LikeButton } from "components"
 import moment from "moment"
 import classnames from "classnames"
 import loadable from "@loadable/component"
@@ -52,7 +52,10 @@ function PostHeader(props) {
     return <div className="postHeader">
         <div className="userInfo">
             <div className="avatar">
-                <antd.Avatar shape="square" src={props.postData.user?.avatar} />
+                <Image
+                    alt="Avatar"
+                    src={props.postData.user?.avatar}
+                />
             </div>
             <div className="info">
                 <div>
