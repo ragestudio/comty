@@ -1,12 +1,16 @@
 {
     "staticVars": {
+        "backgroundBlur": "10px",
         "primaryColor": "#ff6064",
+        "backgroundColorTransparency": "0.8",
+        "backgroundImage": "none",
         "fontFamily": "'Varela Round', sans-serif"
     },
     "defaultVariant": "light",
     "variants": {
         "light": {
             "appColor": "#ff6064",
+            "layoutBackgroundColor": "255, 255, 255",
             "background-color-primary": "#ffffff",
             "background-color-primary2": "#f0f0f0",
             "shadow-color": "#4b4b4b7c",
@@ -21,6 +25,7 @@
             "text-color": "#d2d2d2",
             "svg-color": "var(--text-color)",
             "shadow-color": "#3535357c",
+            "layoutBackgroundColor": "38, 38, 38",
             "background-color-primary": "#262626",
             "background-color-primary2": "#2c2c2c",
             "background-color-accent": "#353535",
