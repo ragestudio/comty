@@ -95,6 +95,10 @@ export default class Layout extends React.Component {
 				this.setLayout("default")
 			}
 		})
+
+		window.app.setLocation = (location) => {
+			return window.history.pushState(null, null, location)
+		}
 	}
 
 	onTransitionStart = () => {
@@ -114,13 +118,7 @@ export default class Layout extends React.Component {
 	}
 
 	render() {
-		if (this.state.renderLock) {
-			if (this.props.staticRenders?.Initialization) {
-				return React.createElement(this.props.staticRenders.Initialization)
-			}
-
-			return null
-		}
+		const InitializationComponent = this.props.staticRenders?.Initialization ? React.createElement(this.props.staticRenders.Initialization) : null
 
 		if (this.state.renderError) {
 			if (this.props.staticRenders?.RenderError) {
@@ -133,7 +131,7 @@ export default class Layout extends React.Component {
 		const layoutComponentProps = {
 			...this.props.bindProps,
 			...this.state,
-			children: this.props.children,
+			children: this.state.RenderChildren,
 			layoutPageModesClassnames: [{
 				["noMargin"]: this.state.compactMode,
 			}],
@@ -141,10 +139,10 @@ export default class Layout extends React.Component {
 			onTransitionFinish: this.onTransitionFinish,
 		}
 
-		if (LayoutRenders[this.state.layoutType]) {
-			return LayoutRenders[this.state.layoutType](layoutComponentProps)
-		}
+		const Layout = LayoutRenders[this.state.layoutType]
 
-		return LayoutRenders.default(layoutComponentProps)
+		return <Layout {...layoutComponentProps}>
+			{this.state.renderLock ? InitializationComponent : this.props.children}
+		</Layout>
 	}
 }
