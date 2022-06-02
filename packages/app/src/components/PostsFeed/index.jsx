@@ -87,7 +87,7 @@ export default class PostsFeed extends React.Component {
 
         if (this.state.list.length === 0) {
             return <div>
-            <antd.Empty />
+                <antd.Empty />
                 <h1>Whoa, nothing on here...</h1>
             </div>
         }
