@@ -35,6 +35,9 @@ export default class PostsFeed extends React.Component {
         window.app.ws.listen(`post.new`, async (data) => {
             this.insert(data)
         })
+        window.app.ws.listen(`post.delete`, async (post_id) => {
+            this.remove(post_id)
+        })
     }
 
     loadPosts = async ({
@@ -56,7 +59,7 @@ export default class PostsFeed extends React.Component {
     }
 
     onAppear = (...args) => {
-        console.log('Appear:', args)
+        console.log("Appear:", args)
         this.setState({ animating: false })
     }
 
@@ -68,6 +71,18 @@ export default class PostsFeed extends React.Component {
         const updatedList = this.state.list
 
         updatedList.unshift(data)
+
+        await this.setState({
+            list: updatedList,
+        })
+
+        this.lockForAnimation()
+    }
+
+    remove = async (post_id) => {
+        const updatedList = this.state.list
+
+        updatedList.splice(updatedList.findIndex((item) => item._id === post_id), 1)
 
         await this.setState({
             list: updatedList,
