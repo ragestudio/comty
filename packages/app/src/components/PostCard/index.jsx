@@ -266,8 +266,8 @@ export class PostCard extends React.Component {
         })
 
         if (result.success) {
-            if (typeof this.props.close === "function") {
-                this.props.close()
+            if (typeof this.props.onDelete === "function") {
+                this.props.onDelete()
             }
         }
     }
