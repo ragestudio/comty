@@ -287,10 +287,12 @@ export class PostCard extends React.Component {
     }
 
     onClickSave = async () => {
+        antd.message.warn("Not implemented yet")
         // TODO
     }
 
     onClickEdit = async () => {
+        antd.message.warn("Not implemented yet")
         // TODO
     }
 
