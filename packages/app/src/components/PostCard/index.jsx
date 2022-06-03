@@ -282,7 +282,7 @@ export const PostCard = React.memo(({ selfId, data = {}, events = {} }) => {
     }
 
     return <div
-        key={data._id}
+        key={data.key ?? data._id}
         id={data._id}
         className={classnames("postCard", { ["liked"]: hasLiked })}
     >
