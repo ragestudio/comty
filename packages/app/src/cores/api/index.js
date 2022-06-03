@@ -12,7 +12,8 @@ export default class ApiCore extends Core {
         this.WSInterface = {
             ...this.apiBridge.wsInterface,
             request: this.WSRequest,
-            listen: this.handleWSListener,
+            listen: this.listenEvent,
+            unlisten: this.unlistenEvent,
             mainSocketConnected: false
         }
 
@@ -23,7 +24,6 @@ export default class ApiCore extends Core {
     }
 
     async intialize() {
-        console.log(this.apiBridge)
         this.WSInterface.sockets.main.on("authenticated", () => {
             console.debug("[WS] Authenticated")
         })
@@ -127,7 +127,7 @@ export default class ApiCore extends Core {
         await this.apiBridge.initialize()
     }
 
-    handleWSListener = (to, fn) => {
+    listenEvent = (to, fn) => {
         if (typeof to === "undefined") {
             console.error("handleWSListener: to must be defined")
             return false
@@ -150,6 +150,29 @@ export default class ApiCore extends Core {
         return window.app.ws.sockets[ns].on(event, async (...context) => {
             return await fn(...context)
         })
+    }
+
+    unlistenEvent = (to, fn) => {
+        if (typeof to === "undefined") {
+            console.error("handleWSListener: to must be defined")
+            return false
+        }
+        if (typeof fn !== "function") {
+            console.error("handleWSListener: fn must be function")
+            return false
+        }
+
+        let ns = "main"
+        let event = null
+
+        if (typeof to === "string") {
+            event = to
+        } else if (typeof to === "object") {
+            ns = to.ns
+            event = to.event
+        }
+
+        return window.app.ws.sockets[ns].removeListener(event, fn)
     }
 
     WSRequest = (socket = "main", channel, ...args) => {
