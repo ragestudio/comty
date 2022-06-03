@@ -144,23 +144,34 @@
 
             .additions {
                 width: 100%;
+                height: 28vh;
 
                 .addition {
                     width: 100%;
+                    height: 100%;
 
                     // fixtures for media content
                     img {
                         width: 100%;
                         border-radius: 12px;
+
+                        user-select: none;
+                        -webkit-user-drag: none;
                     }
 
                     video {
-                        border-radius: 12px;
                         width: 100%;
+                        border-radius: 12px;
+
+                        user-select: none;
+                        -webkit-user-drag: none;
                     }
 
                     audio {
                         width: 100%;
+
+                        user-select: none;
+                        -webkit-user-drag: none;
                     }
                 }
             }
@@ -308,4 +319,34 @@
     // .actionsIndicator {
     //     opacity: 0;
     // }
+}
+
+.adm-swiper-track-inner {
+    display: flex;
+    align-items: center;
+
+    height: 100%;
+    width: 100%;
+
+    user-select: none;
+    -webkit-user-drag: none;
+
+    .adm-swiper-slide {
+        display: flex;
+        align-items: center;
+
+        user-select: none;
+        -webkit-user-drag: none;
+
+        .adm-swiper-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: fit-content;
+
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+    }
 }
