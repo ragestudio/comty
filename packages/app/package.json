@@ -9,7 +9,7 @@
     "build:dist": "cross-env NODE_ENV=production vite build",
     "build:preview": "cross-env NODE_ENV=preview vite build && yarn sync",
     "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
-    "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d",
+    "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
     "preview": "vite preview"
   },
   "peerDependencies": {
