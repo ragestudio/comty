@@ -68,7 +68,6 @@
     "react-motion": "0.5.2",
     "react-reveal": "1.2.2",
     "react-rnd": "10.3.5",
-    "react-virtualized": "^9.22.3",
     "rxjs": "^7.5.5",
     "store": "^2.0.12",
     "styled-components": "^5.3.3",
