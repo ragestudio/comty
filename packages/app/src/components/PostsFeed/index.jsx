@@ -3,40 +3,53 @@ import * as antd from "antd"
 import { User } from "models"
 import { PostCard } from "components"
 
-import List from "rc-virtual-list"
-
 import "./index.less"
 
 export default class PostsFeed extends React.Component {
     state = {
         selfId: null,
         initialLoading: true,
-        list: [],
-        animating: false,
+        renderList: [],
     }
 
     api = window.app.request
 
     listRef = React.createRef()
 
-    componentDidMount = async () => {
-        const selfId = await User.selfUserId()
+    wsEvents = {
+        "post.new": async (data) => {
+            this.insert(data)
+        },
+        "post.delete": async (data) => {
+            this.remove(data)
+        }
+    }
 
-        await this.registerWSEvents()
+    componentDidMount = async () => {
+        await this.loadSelfId()
+
+        // load ws events
+        Object.keys(this.wsEvents).forEach((event) => {
+            window.app.ws.listen(event, this.wsEvents[event])
+        })
+
         await this.loadPosts()
 
-        await this.setState({
-            selfId: selfId,
-            initialLoading: false,
+        await this.setState({ initialLoading: false })
+    }
+
+    componentWillUnmount = async () => {
+        // unload ws events
+        Object.keys(this.wsEvents).forEach((event) => {
+            window.app.ws.unlisten(event, this.wsEvents[event])
         })
     }
 
-    registerWSEvents = async () => {
-        window.app.ws.listen(`post.new`, async (data) => {
-            this.insert(data)
-        })
-        window.app.ws.listen(`post.delete`, async (post_id) => {
-            this.remove(post_id)
+    loadSelfId = async () => {
+        const selfId = await User.selfUserId()
+
+        this.setState({
+            selfId: selfId,
         })
     }
 
@@ -54,45 +67,60 @@ export default class PostsFeed extends React.Component {
         console.log(result)
 
         if (result) {
-            this.setState({ list: result })
+            this.setState({
+                renderList: result.map((item, index) => this.getPostRender(item, index))
+            })
         }
     }
 
-    onAppear = (...args) => {
-        console.log("Appear:", args)
-        this.setState({ animating: false })
+    onLikePost = async (data) => {
+        let result = await this.api.put.toogleLike({ post_id: data._id }).catch(() => {
+            antd.message.error("Failed to like post")
+
+            return false
+        })
+
+        return result
     }
 
-    lockForAnimation = () => {
-        this.setState({ animating: true })
+    onDeletePost = async (data) => {
+        let result = await this.api.delete.post({ post_id: data._id }).catch(() => {
+            antd.message.error("Failed to delete post")
+
+            return false
+        })
+
+        return result
     }
 
     insert = async (data) => {
-        const updatedList = this.state.list
-
-        updatedList.unshift(data)
-
+        // insert at the top, but without firing react lifecycle
         await this.setState({
-            list: updatedList,
+            renderList: [this.getPostRender(data), ...this.state.renderList],
         })
-
-        this.lockForAnimation()
     }
 
     remove = async (post_id) => {
-        const updatedList = this.state.list
+        const updatedList = this.state.renderList
 
-        updatedList.splice(updatedList.findIndex((item) => item._id === post_id), 1)
+        const postIndex = updatedList.findIndex((item) => item.props.data._id === post_id)
+        updatedList.splice(postIndex, 1)
 
         await this.setState({
-            list: updatedList,
+            renderList: updatedList,
         })
-
-        this.lockForAnimation()
     }
 
-    isSelf = (id) => {
-        return this.state.selfId === id
+    getPostRender = (item, index) => {
+        return <PostCard
+            key={index ?? this.state.renderList.findIndex((i) => i._id === item._id)}
+            data={item}
+            selfId={this.state.selfId}
+            events={{
+                onClickLike: this.onLikePost,
+                onClickDelete: this.onDeletePost,
+            }}
+        />
     }
 
     render() {
@@ -100,33 +128,15 @@ export default class PostsFeed extends React.Component {
             return <antd.Skeleton active />
         }
 
-        if (this.state.list.length === 0) {
+        if (this.state.renderList.length === 0) {
             return <div>
                 <antd.Empty />
                 <h1>Whoa, nothing on here...</h1>
             </div>
         }
 
-        return <div
-            className="postsFeed"
-        >
-            <List
-                ref={this.listRef}
-                data={this.state.list}
-                height="80vh"
-                itemHeight="100%"
-                className="content"
-            >
-                {(item, index) => {
-                    return <PostCard
-                        data={item}
-                        motionAppear={this.state.animating && index === 0}
-                        onAppear={this.onAppear}
-                        self={this.isSelf(item.user_id)}
-                        selfId={this.state.selfId}
-                    />
-                }}
-            </List>
+        return <div className="postsFeed" ref={this.listRef}>
+            {this.state.renderList}
         </div>
     }
 }
