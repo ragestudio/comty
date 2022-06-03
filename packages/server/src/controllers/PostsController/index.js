@@ -9,6 +9,7 @@ export default class PostsController extends Controller {
     methods = {
         createPost: async (payload) => {
             const { user_id, message } = payload
+
             const userData = await User.findById(user_id)
 
             const post = new Post({
@@ -30,8 +31,20 @@ export default class PostsController extends Controller {
 
             return post
         },
+        toogleLike: async (payload) => {
+            const { post_id, user_id } = payload
+
+            const post = await Post.findById(post_id)
+
+            if (post.likes.includes(user_id)) {
+                return this.methods.unlikePost({ post_id, user_id })
+            } else {
+                return this.methods.likePost({ post_id, user_id })
+            }
+        },
         likePost: async (payload) => {
             const { user_id, post_id } = payload
+
             const userData = await User.findById(user_id)
             const postData = await Post.findById(post_id)
 
@@ -59,6 +72,7 @@ export default class PostsController extends Controller {
         },
         unlikePost: async (payload) => {
             const { user_id, post_id } = payload
+
             const userData = await User.findById(user_id)
             const postData = await Post.findById(post_id)
 
@@ -157,6 +171,29 @@ export default class PostsController extends Controller {
 
             return res.json(post)
         }),
+        "/toogle_like": Schematized({
+            required: ["post_id"],
+            select: ["post_id"],
+        }, async (req, res) => {
+            const post = await this.methods.toogleLike({
+                user_id: req.user._id.toString(),
+                post_id: req.selection.post_id,
+            }).catch((err) => {
+                return false
+            })
+
+            if (!post) {
+                return res.json({
+                    error: err.message,
+                    success: false
+                })
+            }
+
+            return res.json({
+                success: true,
+                post
+            })
+        }),
         "/like": Schematized({
             required: ["post_id"],
             select: ["post_id"],
@@ -170,12 +207,12 @@ export default class PostsController extends Controller {
 
             if (!post) {
                 return res.json({
-                    sucess: false,
+                    success: false,
                 })
             }
 
             return res.json({
-                sucess: true,
+                success: true,
             })
         }),
         "/unlike": Schematized({
@@ -191,12 +228,12 @@ export default class PostsController extends Controller {
 
             if (!post) {
                 return res.json({
-                    sucess: false,
+                    success: false,
                 })
             }
 
             return res.json({
-                sucess: true,
+                success: true,
             })
         }),
     }
