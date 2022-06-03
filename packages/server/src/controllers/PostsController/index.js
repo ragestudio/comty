@@ -56,7 +56,8 @@ export default class PostsController extends Controller {
             }
 
             postData.likes.push(user_id)
-            await postData.save()
+
+            await this.savePostData(postData)
 
             global.wsInterface.io.emit(`post.like`, {
                 ...postData.toObject(),
@@ -77,7 +78,8 @@ export default class PostsController extends Controller {
             const postData = await Post.findById(post_id)
 
             postData.likes = postData.likes.filter(id => id !== user_id)
-            await postData.save()
+            
+            await this.savePostData(postData)
 
             global.wsInterface.io.emit(`post.unlike`, {
                 ...postData.toObject(),
@@ -129,6 +131,13 @@ export default class PostsController extends Controller {
 
             return userData.roles.includes("admin")
         }
+    }
+
+    savePostData = async (post) => {
+        await post.save()
+
+        global.wsInterface.io.emit(`post.dataUpdate`, post.toObject())
+        global.wsInterface.io.emit(`post.dataUpdate.${post._id}`, post.toObject())
     }
 
     get = {
