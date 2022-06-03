@@ -12,6 +12,25 @@ import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect"
 
 import "./index.less"
 
+const mediaTypes = {
+    "jpg": "image",
+    "jpeg": "image",
+    "png": "image",
+    "gif": "image",
+    "mp4": "video",
+    "webm": "video",
+    "ogv": "video",
+    "mov": "video",
+    "avi": "video",
+    "mkv": "video",
+    "ogg": "audio",
+    "mp3": "audio",
+    "wav": "audio",
+    "flac": "audio",
+    "aac": "audio",
+    "m4a": "audio",
+}
+
 const ContentFailed = () => {
     return <div className="contentFailed">
         <Icons.MdCloudOff />
@@ -98,43 +117,53 @@ const PostContent = React.memo((props) => {
 
     additions = additions.map((uri, index) => {
         const MediaRender = loadable(async () => {
-            // create a basic http request for fetching the file media type
-            const request = new Request(uri, {
-                method: "HEAD",
-            })
+            let extension = null
 
-            // fetch the file media type
-            const mediaType = await fetch(request)
-                .then(response => response.headers.get("content-type"))
-                .catch((error) => {
-                    console.error(error)
-                    return null
-                })
+            try {
+                // get media type by parsing the uri
+                const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(uri)
 
-            if (!mediaType) {
+                if (mediaTypeExt) {
+                    extension = mediaTypeExt[1]
+                } else {
+                    // try to get media by creating requesting the uri
+                    const response = await fetch(uri, {
+                        method: "HEAD",
+                    })
+
+                    extension = response.headers.get("content-type").split("/")[1]
+                }
+
+                const mediaType = mediaTypes[extension]
+
+                if (!mediaType) {
+                    return () => <ContentFailed />
+                }
+
+                switch (mediaType.split("/")[0]) {
+                    case "image": {
+                        return () => <img src={uri} />
+                    }
+                    case "video": {
+                        return () => <video controls>
+                            <source src={uri} type={mediaType} />
+                        </video>
+                    }
+                    case "audio": {
+                        return () => <audio controls>
+                            <source src={uri} type={mediaType} />
+                        </audio>
+                    }
+
+                    default: {
+                        return () => <h4>
+                            Unsupported media type [{mediaType}/{mediaTypeExt}]
+                        </h4>
+                    }
+                }
+            } catch (error) {
+                console.error(error)
                 return () => <ContentFailed />
-            }
-
-            switch (mediaType.split("/")[0]) {
-                case "image": {
-                    return () => <img src={uri} />
-                }
-                case "video": {
-                    return () => <video controls>
-                        <source src={uri} type={mediaType} />
-                    </video>
-                }
-                case "audio": {
-                    return () => <audio controls>
-                        <source src={uri} type={mediaType} />
-                    </audio>
-                }
-
-                default: {
-                    return () => <h4>
-                        Unsupported media type [{mediaType}]
-                    </h4>
-                }
             }
         })
 
@@ -149,23 +178,22 @@ const PostContent = React.memo((props) => {
         </Swiper.Item>
     })
 
-
     return <div className="content">
         {message}
 
-        {additions &&
+        {additions.length > 0 &&
             <div className="additions">
                 <Swiper
-                    direction="vertical"
+                    //direction="vertical"
                     indicatorProps={{
                         style: {
-                            '--dot-color': 'rgba(0, 0, 0, 0.4)',
-                            '--active-dot-color': '#ffc0cb',
-                            '--dot-size': '50px',
-                            '--active-dot-size': '30px',
-                            '--dot-border-radius': '50%',
-                            '--active-dot-border-radius': '15px',
-                            '--dot-spacing': '8px',
+                            "--dot-color": "rgba(0, 0, 0, 0.4)",
+                            "--active-dot-color": "var(--primaryColor)",
+                            "--dot-size": "10px",
+                            "--active-dot-size": "30px",
+                            "--dot-border-radius": "50%",
+                            "--active-dot-border-radius": "15px",
+                            "--dot-spacing": "8px",
                         }
                     }}
                 >
@@ -214,7 +242,7 @@ const PostActions = (props) => {
                         Delete
                     </antd.Menu.Item>
                 </antd.Menu>}
-                trigger={['click']}
+                trigger={["click"]}
             >
                 <div className="icon">
                     <Icons.MoreVertical />
