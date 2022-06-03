@@ -97,7 +97,7 @@ export const InternalRouter = withRouter((props) => {
         window.app.setLocation = props.history.setLocation
     }, [])
 
-    return <React.Suspense fallback={props.staticRenders?.PageLoad ?? "Loading..."}>
+    return <React.Suspense fallback={props.staticRenders?.PageLoad ? React.createElement(props.staticRenders?.PageLoad) : "Loading..."}>
         <Switch>
             {routes.map(({ path, component: Component = React.Fragment }) => (
                 <Route
