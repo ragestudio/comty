@@ -201,7 +201,7 @@ const PostActions = (props) => {
                 <Icons.Bookmark />
             </div>
         </div>
-        {props.self && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
+        {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
             <antd.Dropdown
                 overlay={<antd.Menu
                     onClick={handleSelfMenuAction}
@@ -224,124 +224,96 @@ const PostActions = (props) => {
     </div>
 }
 
-export class PostCard extends React.Component {
-    state = {
-        loading: true,
-        likes: this.props.data.likes,
-        comments: this.props.data.comments,
-    }
+export const PostCard = React.memo(({ selfId, data = {}, events = {} }) => {
+    const [loading, setLoading] = React.useState(true)
+    const [likes, setLikes] = React.useState(data.likes ?? [])
+    const [comments, setComments] = React.useState(data.comments ?? [])
+    const [hasLiked, setHasLiked] = React.useState(false)
 
-    api = window.app.request
-
-    componentDidMount = async () => {
-        window.app.ws.listen(`post.like.${this.props.data._id}`, async (data) => {
-            await this.setState({ likes: data })
-        })
-        window.app.ws.listen(`post.unlike.${this.props.data._id}`, async (data) => {
-            await this.setState({ likes: data })
-        })
-
-        window.app.ws.listen(`post.comment.${this.props.data._id}`, async (data) => {
-            await this.setState({ comments: data })
-        })
-        window.app.ws.listen(`post.uncomment.${this.props.data._id}`, async (data) => {
-            await this.setState({ comments: data })
-        })
-
-        await this.setState({
-            loading: false
-        })
-    }
-
-    onClickDelete = async () => {
-        const result = await this.api.delete.post({
-            post_id: this.props.data._id,
-        }).catch(error => {
-            console.error(error)
-            antd.message.error(error.message)
-
-            return {
-                success: false,
-            }
-        })
-
-        if (result.success) {
-            if (typeof this.props.onDelete === "function") {
-                this.props.onDelete()
-            }
-        }
-    }
-
-    onClickLike = async (to) => {
-        let result = false
-
-        if (to) {
-            const apiResult = await this.api.put.like({ post_id: this.props.data._id })
-            result = apiResult.success
-        } else {
-            const apiResult = await this.api.put.unlike({ post_id: this.props.data._id })
-            result = apiResult.success
+    const onClickDelete = async () => {
+        if (typeof events.onClickDelete !== "function") {
+            console.warn("onClickDelete event is not a function")
+            return
         }
 
-        return result
+        return await events.onClickDelete(data)
     }
 
-    onClickSave = async () => {
-        antd.message.warn("Not implemented yet")
-        // TODO
-    }
-
-    onClickEdit = async () => {
-        antd.message.warn("Not implemented yet")
-        // TODO
-    }
-
-    hasLiked = () => {
-        return this.state.likes.some((user_id) => user_id === this.props.selfId)
-    }
-
-    render() {
-        const hasLiked = this.hasLiked()
-
-        if (this.state.loading) {
-            return <antd.Skeleton active />
+    const onClickLike = async () => {
+        if (typeof events.onClickLike !== "function") {
+            console.warn("onClickLike event is not a function")
+            return
         }
 
-        return <div
-            id={this.props.data._id}
-            key={this.props.data._id}
-            className={classnames("postCard", { ["liked"]: hasLiked })}
-        >
-            <div className="wrapper">
-                <PostHeader
-                    postData={this.props.data}
-                    isLiked={hasLiked}
-                    likes={this.state.likes.length}
-                    comments={this.state.comments.length}
-                />
-                <PostContent
-                    data={this.props.data}
-                />
-            </div>
-            <div className="actionsIndicatorWrapper">
-                <div className="actionsIndicator">
-                    <Icons.MoreHorizontal />
-                </div>
-            </div>
-            <div className="actionsWrapper">
-                <PostActions
-                    self={this.props.self}
-                    onClickLike={this.onClickLike}
-                    defaultLiked={hasLiked}
-                    actions={{
-                        edit: this.onClickEdit,
-                        delete: this.onClickDelete,
-                    }}
-                />
+        return await events.onClickLike(data)
+    }
+
+    const onDataUpdate = (data) => {
+        setLikes(data.likes)
+        setComments(data.comments)
+    }
+
+    React.useEffect(() => {
+        // first listen to post changes
+        window.app.ws.listen(`post.dataUpdate.${data._id}`, onDataUpdate)
+
+        // proccess post info
+        // {...}
+
+        // then load
+        setLoading(false)
+
+        return () => {
+            // remove the listener
+            window.app.ws.unlisten(`post.dataUpdate.${data._id}`, onDataUpdate)
+        }
+    }, [])
+
+    React.useEffect(() => {
+        // check if the post has liked by you
+        const hasLiked = likes.includes(selfId)
+        //console.log(`[${data._id}] CHECKING LIKE OF USER ${selfId} > ${hasLiked}`)
+
+        setHasLiked(hasLiked)
+    })
+
+    if (loading) {
+        return <antd.Skeleton active />
+    }
+
+    return <div
+        key={data._id}
+        id={data._id}
+        className={classnames("postCard", { ["liked"]: hasLiked })}
+    >
+        <div className="wrapper">
+            <PostHeader
+                postData={data}
+                isLiked={hasLiked}
+                likes={likes.length}
+                comments={comments.length}
+            />
+            <PostContent
+                data={data}
+            />
+        </div>
+        <div className="actionsIndicatorWrapper">
+            <div className="actionsIndicator">
+                <Icons.MoreHorizontal />
             </div>
         </div>
-    }
-}
+        <div className="actionsWrapper">
+            <PostActions
+                isSelf={selfId === data.user_id}
+                defaultLiked={hasLiked}
+                onClickLike={onClickLike}
+                actions={{
+                    delete: onClickDelete,
+                }}
+            />
+        </div>
+    </div>
+})
 
 export const PostCardAnimated = (props, ref,) => {
     const motionRef = React.useRef(false)
@@ -381,4 +353,4 @@ export const PostCardAnimated = (props, ref,) => {
 
 export const ForwardedPostCardAnimated = React.forwardRef(PostCardAnimated)
 
-export default ForwardedPostCardAnimated
+export default PostCard
