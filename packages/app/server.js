@@ -1,9 +1,13 @@
 const express = require("express")
 const path = require("path")
+const cors = require("cors")
+
 const app = express()
 
 const portFromArgs = process.argv[2]
 let portListen = portFromArgs ? portFromArgs : 9000
+
+app.use(cors())
 
 app.use(express.static(path.join(__dirname, "dist")))
 
