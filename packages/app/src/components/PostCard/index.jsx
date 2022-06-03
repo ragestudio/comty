@@ -7,6 +7,8 @@ import moment from "moment"
 import classnames from "classnames"
 import loadable from "@loadable/component"
 
+import { processString } from "utils"
+
 import CSSMotion from "rc-animate/lib/CSSMotion"
 import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect"
 
@@ -178,8 +180,28 @@ const PostContent = React.memo((props) => {
         </Swiper.Item>
     })
 
+    // parse message
+    const regexs = [
+        {
+            regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
+            fn: (key, result) => {
+                return <a key={key} href={result[1]} target="_blank" rel="noopener noreferrer">{result[1]}</a>
+            }
+        },
+        {
+            regex: /(@[a-zA-Z0-9_]+)/gi,
+            fn: (key, result) => {
+                return <a key={key} onClick={() => window.app.setLocation(`/@${result[1].substr(1)}`)}>{result[1]}</a>
+            }
+        },
+    ]
+
+    message = processString(regexs)(message)
+
     return <div className="content">
-        {message}
+        <div className="message">
+            {message}
+        </div>
 
         {additions.length > 0 &&
             <div className="additions">
