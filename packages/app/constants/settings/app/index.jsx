@@ -136,4 +136,13 @@ export default [
             }
         }
     },
+    {
+        "id": "postCard_carrusel_auto",
+        "title": "Auto show post media",
+        "description": "Automatically show the post medias when the post has multiple medias",
+        "component": "Switch",
+        "icon": "MdPhotoCameraBack",
+        "group": "posts",
+        "storaged": true,
+    }
 ]
