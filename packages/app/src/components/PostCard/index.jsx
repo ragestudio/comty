@@ -113,22 +113,6 @@ const PostContent = React.memo((props) => {
 
     let carruselRef = React.useRef(null)
 
-    const onClickController = (direction) => {
-        if (carruselRef.current) {
-            switch (direction) {
-                case "left": {
-                    return carruselRef.current.prev()
-                }
-                case "right": {
-                    return carruselRef.current.next()
-                }
-                default: {
-                    return null
-                }
-            }
-        }
-    }
-
     // first filter if is an string
     additions = additions.filter(file => typeof file === "string")
 
@@ -191,7 +175,7 @@ const PostContent = React.memo((props) => {
             key={index}
         >
             <div className="addition">
-                <React.Suspense ref={carruselRef} fallback={<div>Loading</div>} >
+                <React.Suspense fallback={<div>Loading</div>} >
                     <MediaRender />
                 </React.Suspense>
             </div>
@@ -228,7 +212,7 @@ const PostContent = React.memo((props) => {
                     arrows={true}
                     nextArrow={<Icons.ChevronRight />}
                     prevArrow={<Icons.ChevronLeft />}
-                    autoplay
+                    autoplay={props.autoCarrousel}
                 >
                     {additions}
                 </antd.Carousel>
@@ -285,7 +269,13 @@ const PostActions = (props) => {
     </div>
 }
 
-export const PostCard = React.memo(({ selfId, data = {}, events = {} }) => {
+export const PostCard = React.memo(({
+    selfId,
+    expansibleActions = window.app.settings.get("postCard_expansible_actions"),
+    autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
+    data = {},
+    events = {}
+}) => {
     const [loading, setLoading] = React.useState(true)
     const [likes, setLikes] = React.useState(data.likes ?? [])
     const [comments, setComments] = React.useState(data.comments ?? [])
@@ -345,7 +335,11 @@ export const PostCard = React.memo(({ selfId, data = {}, events = {} }) => {
     return <div
         key={data.key ?? data._id}
         id={data._id}
-        className={classnames("postCard", { ["liked"]: hasLiked })}
+        className={classnames(
+            "postCard",
+            { ["liked"]: hasLiked },
+            { ["noHide"]: !expansibleActions }
+        )}
     >
         <div className="wrapper">
             <PostHeader
@@ -356,6 +350,7 @@ export const PostCard = React.memo(({ selfId, data = {}, events = {} }) => {
             />
             <PostContent
                 data={data}
+                autoCarrousel={autoCarrousel}
             />
         </div>
         <div className="actionsIndicatorWrapper">
