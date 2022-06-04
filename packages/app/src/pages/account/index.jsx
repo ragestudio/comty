@@ -148,7 +148,6 @@ export default class Account extends React.Component {
 		return (
 			<div className="accountProfile">
 				{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
-
 				<div className="profileCard">
 					<div className="basicData">
 						<div className="title">
