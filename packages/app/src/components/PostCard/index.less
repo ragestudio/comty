@@ -151,7 +151,7 @@
                 .slick-slider {
                     .slick-prev {
                         display: inline !important;
-                        color: rgba(var(--background-color-contrast), 0.5);
+                        color: #ffffff;
 
                         z-index: 100;
 
@@ -166,14 +166,18 @@
                         transition: all 150ms ease-in-out;
 
                         &:hover {
-                            opacity: 1;
+                            opacity: 0.6;
                             width: 7vw;
+                        }
+
+                        &:active {
+                            transform: scale(0.5);
                         }
                     }
 
                     .slick-next {
                         display: inline !important;
-                        color: rgba(var(--background-color-contrast), 0.5);
+                        color: #ffffff;
 
                         z-index: 100;
 
@@ -188,8 +192,12 @@
                         transition: all 150ms ease-in-out;
 
                         &:hover {
-                            opacity: 1;
+                            opacity: 0.6;
                             width: 7vw;
+                        }
+
+                        &:active {
+                            transform: scale(0.5);
                         }
                     }
                 }
