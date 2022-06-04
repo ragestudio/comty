@@ -26,5 +26,9 @@
     "layout": {
         "title": "Layout",
         "icon": "Layers"
+    },
+    "posts": {
+        "title": "Posts",
+        "icon": "MdOutlineFeed"
     }
 }
