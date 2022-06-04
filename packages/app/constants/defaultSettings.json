@@ -11,6 +11,8 @@
     "collapseOnLooseFocus": true,
     "auto_darkMode": false,
     "compactWidth": false,
+    "postCard_carrusel_auto": true,
+    "postCard_expansible_actions": true,
     "language": "en",
     "sidebarKeys": [
         "main",
