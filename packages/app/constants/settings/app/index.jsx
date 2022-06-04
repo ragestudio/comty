@@ -144,5 +144,16 @@ export default [
         "icon": "MdPhotoCameraBack",
         "group": "posts",
         "storaged": true,
-    }
+        "emitEvent": "router.forceUpdate"
+    },
+    {
+        "id": "postCard_expansible_actions",
+        "title": "Expansible actions",
+        "description": "Automatically show or hide the actions bar",
+        "component": "Switch",
+        "icon": "MdCallToAction",
+        "group": "posts",
+        "storaged": true,
+        "emitEvent": "router.forceUpdate"
+    },
 ]
