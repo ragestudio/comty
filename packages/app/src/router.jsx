@@ -61,6 +61,7 @@ export function BindContexts(component) {
 
 export const InternalRouter = withRouter((props) => {
     const defaultTransitionDelay = 150
+    const forceUpdate = React.useReducer(() => ({}))[1]
 
     React.useEffect(() => {
         props.history.listen((event) => {
@@ -93,6 +94,10 @@ export const InternalRouter = withRouter((props) => {
 
             }, delay ?? defaultTransitionDelay)
         }
+
+        window.app.eventBus.on(`router.forceUpdate`, forceUpdate)
+
+        props.history.lastLocation = window.location
 
         window.app.setLocation = props.history.setLocation
     }, [])
