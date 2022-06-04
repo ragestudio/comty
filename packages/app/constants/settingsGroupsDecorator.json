@@ -22,5 +22,9 @@
     "account.profile": {
         "title": "Profile",
         "icon": "Book"
+    },
+    "layout": {
+        "title": "Layout",
+        "icon": "Layers"
     }
 }

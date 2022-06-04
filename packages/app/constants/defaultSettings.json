@@ -10,6 +10,7 @@
     "haptic_feedback": false,
     "collapseOnLooseFocus": true,
     "auto_darkMode": false,
+    "compactWidth": false,
     "language": "en",
     "sidebarKeys": [
         "main",

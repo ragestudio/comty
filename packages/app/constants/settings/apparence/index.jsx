@@ -7,6 +7,16 @@ import "./index.less"
 
 export default [
     {
+        "id": "compactWidth",
+        "title": "Compact Width",
+        "description": "Sets the width of the app to a compact width to facilitate the vision of components.",
+        "component": "Switch",
+        "icon": "MdCompress",
+        "group": "layout",
+        "experimental": true,
+        "storaged": true
+    },
+    {
         "id": "reduceAnimations",
         "storaged": true,
         "group": "aspect",
