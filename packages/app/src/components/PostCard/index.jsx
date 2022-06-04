@@ -226,8 +226,8 @@ const PostContent = React.memo((props) => {
                 <antd.Carousel
                     ref={carruselRef}
                     arrows={true}
-                    nextArrow={<Icons.ArrowRight />}
-                    prevArrow={<Icons.ArrowLeft />}
+                    nextArrow={<Icons.ChevronRight />}
+                    prevArrow={<Icons.ChevronLeft />}
                     autoplay
                 >
                     {additions}
