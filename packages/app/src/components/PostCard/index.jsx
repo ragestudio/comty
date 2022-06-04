@@ -111,6 +111,24 @@ function PostHeader(props) {
 const PostContent = React.memo((props) => {
     let { message, additions } = props.data
 
+    let carruselRef = React.useRef(null)
+
+    const onClickController = (direction) => {
+        if (carruselRef.current) {
+            switch (direction) {
+                case "left": {
+                    return carruselRef.current.prev()
+                }
+                case "right": {
+                    return carruselRef.current.next()
+                }
+                default: {
+                    return null
+                }
+            }
+        }
+    }
+
     // first filter if is an string
     additions = additions.filter(file => typeof file === "string")
 
@@ -173,7 +191,7 @@ const PostContent = React.memo((props) => {
             key={index}
         >
             <div className="addition">
-                <React.Suspense fallback={<div>Loading</div>} >
+                <React.Suspense ref={carruselRef} fallback={<div>Loading</div>} >
                     <MediaRender />
                 </React.Suspense>
             </div>
@@ -205,22 +223,15 @@ const PostContent = React.memo((props) => {
 
         {additions.length > 0 &&
             <div className="additions">
-                <Swiper
-                    //direction="vertical"
-                    indicatorProps={{
-                        style: {
-                            "--dot-color": "rgba(0, 0, 0, 0.4)",
-                            "--active-dot-color": "var(--primaryColor)",
-                            "--dot-size": "10px",
-                            "--active-dot-size": "30px",
-                            "--dot-border-radius": "50%",
-                            "--active-dot-border-radius": "15px",
-                            "--dot-spacing": "8px",
-                        }
-                    }}
+                <antd.Carousel
+                    ref={carruselRef}
+                    arrows={true}
+                    nextArrow={<Icons.ArrowRight />}
+                    prevArrow={<Icons.ArrowLeft />}
+                    autoplay
                 >
                     {additions}
-                </Swiper>
+                </antd.Carousel>
             </div>
         }
     </div>
