@@ -94,7 +94,6 @@ export default class PostsFeed extends React.Component {
     }
 
     insert = async (data) => {
-        // insert at the top, but without firing react lifecycle
         await this.setState({
             renderList: [this.getPostRender(data), ...this.state.renderList],
         })
