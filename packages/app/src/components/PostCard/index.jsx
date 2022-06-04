@@ -171,15 +171,11 @@ const PostContent = React.memo((props) => {
             }
         })
 
-        return <Swiper.Item
-            key={index}
-        >
-            <div className="addition">
-                <React.Suspense fallback={<div>Loading</div>} >
-                    <MediaRender />
-                </React.Suspense>
-            </div>
-        </Swiper.Item>
+        return <div key={index} className="addition">
+            <React.Suspense fallback={<div>Loading</div>} >
+                <MediaRender />
+            </React.Suspense>
+        </div>
     })
 
     // parse message
