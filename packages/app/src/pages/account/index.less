@@ -1,7 +1,11 @@
 @borderRadius: 12px;
 
 .accountProfile {
-	padding: 0 20px;
+	width: 100%;
+	height: 100%;
+
+	// max-width: 70vw;
+	// min-width: 900px;
 
 	.cover {
 		z-index: 50;
@@ -16,14 +20,16 @@
 		background-position: center;
 		background-size: cover;
 
-		height: 18vh;
+		height: 25vh;
 
 		transform: translate(0, 10px);
 	}
 
 	.profileCard {
-		z-index: 51;
-		position: relative;
+		position: sticky;
+		top: 0;
+
+		z-index: 151;
 
 		display: flex;
 		flex-direction: column;
@@ -32,7 +38,7 @@
 		background-color: var(--background-color-primary);
 
 		border: 1px solid var(--border-color);
-		border-radius: @borderRadius;
+		border-radius: @borderRadius @borderRadius 0 @borderRadius;
 
 		padding: 20px 15px;
 
@@ -110,6 +116,27 @@
 			border-radius: 0 0 @borderRadius @borderRadius;
 		}
 
+		.switchTab {
+			position: absolute;
+			bottom: 0;
+			right: -1px;
+
+			border: 1px solid var(--border-color);
+			border-top: none;
+
+			transform: translate(0, 33px);
+			background-color: var(--background-color-primary);
+			border-radius: 0 0 8px 8px;
+
+			// .ant-segmented {
+			// 	background-color: transparent;
+			// }
+
+			// .ant-segmented-item-selected {
+			// 	background-color: var(--background-color-accent)!important;
+			// }
+		}
+
 		h1,
 		h2,
 		h3,
@@ -120,6 +147,10 @@
 		p {
 			user-select: text;
 		}
+	}
+
+	.tabContent {
+		margin-top: 45px;
 	}
 
 	.tabs {
@@ -133,6 +164,11 @@
 
 		.ant-tabs-nav {
 			margin: 0 20px 20px 0;
+
+			z-index: 152;
+
+			position: sticky;
+			top: 0;
 		}
 
 		.ant-tabs-nav::before {
