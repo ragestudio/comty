@@ -304,6 +304,24 @@ body {
 	/* disable the IOS popup when long-press on a link */
 }
 
+.renderError {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	justify-content: center;
+	align-items: center;
+
+	width: 100vw;
+	height: 100vh;
+
+	.ant-result {
+		background-color: var(--background-color-primary);
+		border-radius: 8px;
+	}
+}
+
 .splash_wrapper {
 	position: absolute;
 
@@ -312,7 +330,6 @@ body {
 
 	overflow: hidden;
 
-	//background-color: rgba(240, 242, 245, 0.8);
 	backdrop-filter: blur(10px);
 	--webkit-backdrop-filter: blur(10px);
 
