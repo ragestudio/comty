@@ -9,6 +9,63 @@ import { Session, User } from "models"
 
 import "./index.less"
 
+const TabsComponent = {
+	"posts": React.memo((props) => {
+		return <div className="posts">
+			<PostsFeed
+				fromUserId={props.state.user._id}
+			/>
+		</div>
+	}),
+	"followers": React.memo((props) => {
+		return <FollowersList
+			followers={props.state.followers}
+		/>
+	}),
+	"details": React.memo((props) => {
+		return <div id="statistics" className="statistics">
+			<div>
+				<span><Icons.Users /> {props.state.followers.length} Followers</span>
+			</div>
+			<div>
+				<span><Icons.FileText /> 0 Posts</span>
+			</div>
+			<div>
+				<span>Joined at {moment(new Date(Number(props.state.user.createdAt))).format("YYYY")}</span>
+			</div>
+		</div>
+	})
+}
+
+const TabRender = React.memo((props) => {
+	const [transitionActive, setTransitionActive] = React.useState(false)
+	const [activeKey, setActiveKey] = React.useState(props.renderKey)
+
+	React.useEffect(() => {
+		setTransitionActive(true)
+
+		setTimeout(() => {
+			setActiveKey(props.renderKey)
+
+			setTimeout(() => {
+				setTransitionActive(false)
+			}, 100)
+		}, 100)
+	}, [props.renderKey])
+
+	const Tab = TabsComponent[activeKey]
+
+	if (!Tab) {
+		return <h1>Nothing to see here...</h1>
+	}
+
+	return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": transitionActive })}>
+		<Tab {...props} />
+	</div>
+})
+
+// TODO: profileCard scroll effect (Hide description and wrap with entire body when cover image is not visible)
+
 export default class Account extends React.Component {
 	state = {
 		requestedUser: null,
@@ -20,7 +77,7 @@ export default class Account extends React.Component {
 		isFollowed: false,
 
 		transitionActive: false,
-		activeKey: "posts",
+		tabActiveKey: "posts",
 
 		isNotExistent: false,
 	}
@@ -93,13 +150,12 @@ export default class Account extends React.Component {
 	onClickFollow = async () => {
 		const result = await this.api.put.followUser({
 			username: this.state.requestedUser,
-		})
-			.catch((error) => {
-				console.error(error)
-				antd.message.error(error.message)
+		}).catch((error) => {
+			console.error(error)
+			antd.message.error(error.message)
 
-				return false
-			})
+			return false
+		})
 
 		await this.setState({
 			isFollowed: result.following,
@@ -108,25 +164,20 @@ export default class Account extends React.Component {
 	}
 
 	handlePageTransition = (key) => {
-		if (this.state.activeKey === key) {
+		if (typeof key !== "string") {
+			console.error("Cannot handle page transition. Invalid key, only valid passing string", key)
+			return
+		}
+
+		key = key.toLowerCase()
+
+		if (this.state.tabActiveKey === key) {
 			return false
 		}
 
 		this.setState({
-			transitionActive: true,
+			tabActiveKey: key
 		})
-
-		setTimeout(() => {
-			this.setState({
-				activeKey: key
-			})
-
-			setTimeout(() => {
-				this.setState({
-					transitionActive: false,
-				})
-			}, 100)
-		}, 100)
 	}
 
 	render() {
@@ -145,86 +196,61 @@ export default class Account extends React.Component {
 			return <Skeleton />
 		}
 
-		return (
-			<div className="accountProfile">
-				{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
-				<div className="profileCard">
-					<div className="basicData">
-						<div className="title">
-							<div className="field">
-								<div className="avatar">
-									<Image
-										alt="ProfileImage"
-										src={user.avatar}
-									/>
-								</div>
-							</div>
-
-							<div className="field">
-								<div>
-									<h1>{user.fullName ?? user.username}</h1>
-									{user.verified && <Icons.verifiedBadge />}
-								</div>
-
-								<span>@{user.username}</span>
-							</div>
-						</div>
-
-						{!this.state.isSelf && <div>
-							<FollowButton
-								count={this.state.followers.length}
-								onClick={this.onClickFollow}
-								followed={this.state.isFollowed}
-							/>
-						</div>}
-					</div>
-
-					<div className="description">
-						<p>
-							{user.description}
-						</p>
-					</div>
-				</div>
-				<antd.Tabs
-					className="tabs"
-					type="card"
-					activeKey={this.state.activeKey}
-					onTabClick={this.handlePageTransition}
-					destroyInactiveTabPane
-				>
-					<antd.Tabs.TabPane tab={<><Icons.Inbox /> Posts</>} key="posts">
-						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
-							<div className="posts">
-								<PostsFeed
-									fromUserId={user._id}
+		return <div className="accountProfile">
+			{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
+			<div className="profileCard">
+				<div className="basicData">
+					<div className="title">
+						<div className="field">
+							<div className="avatar">
+								<Image
+									alt="ProfileImage"
+									src={user.avatar}
 								/>
 							</div>
 						</div>
-					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane tab={<><Icons.Users /> Followers</>} key="followers">
-						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
-							<FollowersList
-								followers={this.state.followers}
-							/>
-						</div>
-					</antd.Tabs.TabPane>
-					<antd.Tabs.TabPane tab={<><Icons.Info /> Details</>} key="details">
-						<div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
-							<div id="statistics" className="statistics">
-								<div>
-									<span><Icons.Users /> {this.state.followers.length} Followers</span>
-								</div>
-								<div>
-									<span><Icons.FileText /> 0 Posts</span>
-								</div>
-								<div>
-									<span>Joined at {moment(new Date(Number(user.createdAt))).format("YYYY")}</span>
-								</div>
+
+						<div className="field">
+							<div>
+								<h1>{user.fullName ?? user.username}</h1>
+								{user.verified && <Icons.verifiedBadge />}
 							</div>
+
+							<span>@{user.username}</span>
 						</div>
-					</antd.Tabs.TabPane>
-				</antd.Tabs>
+					</div>
+
+					{!this.state.isSelf && <div>
+						<FollowButton
+							count={this.state.followers.length}
+							onClick={this.onClickFollow}
+							followed={this.state.isFollowed}
+						/>
+					</div>}
+				</div>
+
+				<div className="description">
+					<p>
+						{user.description}
+					</p>
+				</div>
+
+				<div className="switchTab">
+					<antd.Segmented
+						//block
+						options={Object.keys(TabsComponent).map((key) => key.toTitleCase())}
+						value={this.state.tabActiveKey.toTitleCase()}
+						onChange={this.handlePageTransition}
+					/>
+				</div>
 			</div>
-		)
+
+			<div className="tabContent">
+				<TabRender
+					renderKey={this.state.tabActiveKey}
+					state={this.state}
+				/>
+			</div>
+		</div>
 	}
 }
