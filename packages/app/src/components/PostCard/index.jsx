@@ -138,7 +138,10 @@ const PostContent = React.memo((props) => {
                     extension = response.headers.get("content-type").split("/")[1]
                 }
 
+                extension = extension.toLowerCase()
+
                 const mediaType = mediaTypes[extension]
+                const mimeType = `${mediaType}/${extension}`
 
                 if (!mediaType) {
                     return () => <ContentFailed />
@@ -150,12 +153,12 @@ const PostContent = React.memo((props) => {
                     }
                     case "video": {
                         return () => <video controls>
-                            <source src={uri} type={mediaType} />
+                            <source src={uri} type={mimeType} />
                         </video>
                     }
                     case "audio": {
                         return () => <audio controls>
-                            <source src={uri} type={mediaType} />
+                            <source src={uri} type={mimeType} />
                         </audio>
                     }
 
