@@ -1,15 +1,199 @@
 .postCreator {
-    width           : 100%;
-    padding         : 15px;
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    padding: 15px;
     background-color: var(--background-color-accent);
 
-    max-width    : 600px;
+    max-width: 600px;
     border-radius: 7px;
 
+    .additions {
+        margin: 10px 0;
+        width: 100%;
+        height: 28vh;
+
+        .slick-slider {
+            .slick-prev {
+                display: inline !important;
+                color: #ffffff;
+
+                z-index: 100;
+
+                top: 0;
+                left: 0;
+
+                height: 100%;
+                width: 5vw;
+
+                opacity: 0;
+
+                transition: all 150ms ease-in-out;
+
+                &:hover {
+                    opacity: 0.6;
+                    width: 7vw;
+                }
+
+                &:active {
+                    transform: scale(0.5);
+                }
+            }
+
+            .slick-next {
+                display: inline !important;
+                color: #ffffff;
+
+                z-index: 100;
+
+                top: 0;
+                right: 0;
+
+                height: 100%;
+                width: 5vw;
+
+                opacity: 0;
+
+                transition: all 150ms ease-in-out;
+
+                &:hover {
+                    opacity: 0.6;
+                    width: 7vw;
+                }
+
+                &:active {
+                    transform: scale(0.5);
+                }
+            }
+        }
+
+        .slick-track {
+            display: flex;
+            align-items: center;
+        }
+
+        .slick-slide {
+            height: 100%;
+
+            div {
+                height: 100%;
+            }
+        }
+
+        .slick-list {
+            border-radius: 8px;
+        }
+
+        .ant-carousel,
+        .slick-slider,
+        .slick-list,
+        .slick-track {
+            height: 100%;
+        }
+
+        .addition {
+            width: 100%;
+            height: 100%;
+
+            // fixtures for media content
+            img {
+                width: 100%;
+                height: 100%;
+
+                user-select: none;
+                -webkit-user-drag: none;
+
+                object-fit: cover;
+            }
+
+            video {
+                width: 100%;
+                height: 100%;
+
+                user-select: none;
+                -webkit-user-drag: none;
+
+                object-fit: cover;
+            }
+
+            audio {
+                width: 100%;
+                height: 100%;
+
+                user-select: none;
+                -webkit-user-drag: none;
+            }
+
+            >div {
+                height: 100%;
+            }
+        }
+    }
+
+    .actions {
+        display: inline-flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        height: 40px;
+
+        overflow: hidden;
+
+        transition: all 150ms ease-in-out;
+
+        >div {
+            margin-left: 10px;
+            font-size: 1rem;
+
+            svg {
+                margin: 0 !important;
+            }
+        }
+
+        &.hided {
+            height: 0;
+        }
+    }
+
+    .uploader {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+
+        height: 5vh;
+        width: 100%;
+
+        overflow: hidden;
+
+        transition: all 150ms ease-in-out;
+
+        >div {
+            margin-left: 10px;
+            font-size: 1rem;
+
+            svg {
+                margin: 0 !important;
+            }
+        }
+
+        &.hided {
+            height: 0;
+        }
+
+        span {
+            width: 100%;
+        }
+
+        .ant-upload {
+            width: 100%;
+        }
+    }
+
     .textInput {
-        display         : flex;
-        width           : 100%;
-        transition      : height 150ms ease-in-out;
+        display: flex;
+        width: 100%;
+        transition: height 150ms ease-in-out;
         background-color: var(--background-color-accent);
 
         svg {
@@ -17,14 +201,14 @@
         }
 
         .avatar {
-            width : fit-content;
+            width: fit-content;
             height: 45px;
 
             display: flex;
 
             img {
-                width        : 45px;
-                height       : 45px;
+                width: 45px;
+                height: 45px;
                 border-radius: 12px;
             }
         }
@@ -35,7 +219,7 @@
 
         .textArea {
             border-radius: 8px !important;
-            transition   : all 150ms ease-in-out !important;
+            transition: all 150ms ease-in-out !important;
 
             &.active {
                 background-color: var(--background-color-primary);
@@ -43,27 +227,27 @@
         }
 
         .ant-btn-primary {
-            z-index       : 10;
-            position      : relative;
-            border-radius : 0 10px 10px 0;
-            height        : 100%;
+            z-index: 10;
+            position: relative;
+            border-radius: 0 10px 10px 0;
+            height: 100%;
             vertical-align: bottom;
-            border        : none;
-            box-shadow    : none;
+            border: none;
+            box-shadow: none;
         }
 
         .ant-input {
             background-color: var(--background-color-accent);
 
-            z-index      : 10;
-            position     : relative;
-            border-color : transparent !important;
-            box-shadow   : none;
+            z-index: 10;
+            position: relative;
+            border-color: transparent !important;
+            box-shadow: none;
             border-radius: 3px 0 0;
-            height       : 100%;
-            padding      : 5px 10px;
-            transition   : height 150ms linear;
-            width        : 100%;
+            height: 100%;
+            padding: 5px 10px;
+            transition: height 150ms linear;
+            width: 100%;
         }
 
         .ant-btn-primary[disabled] {
