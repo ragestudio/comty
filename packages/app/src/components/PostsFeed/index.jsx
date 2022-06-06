@@ -1,15 +1,29 @@
 import React from "react"
 import * as antd from "antd"
 import { User } from "models"
-import { PostCard } from "components"
+import { PostCard, LoadMore } from "components"
 
 import "./index.less"
+
+const LoadingComponent = () => {
+    return <antd.Skeleton active />
+}
+
+const NoResultComponent = () => {
+    return <antd.Result
+        status="info"
+        title="This is the end"
+        subTitle="We dont have more posts for you"
+    />
+}
 
 export default class PostsFeed extends React.Component {
     state = {
         selfId: null,
         initialLoading: true,
         renderList: [],
+        fetchingData: false,
+        hasMorePosts: true,
     }
 
     api = window.app.request
@@ -54,23 +68,52 @@ export default class PostsFeed extends React.Component {
     }
 
     loadPosts = async ({
-        startIndex,
-        stopIndex,
+        trim,
+        replace = false
     } = {}) => {
+        // toogle fetching flag
+        await this.setState({
+            fetchingData: true,
+        })
+
+        // get posts from api
         const result = await this.api.get.feed(undefined, {
-            startIndex,
-            stopIndex,
-            feedLength: this.props.feedLength,
+            trim: trim ?? this.state.renderList.length,
+            limit: this.props.feedLength ?? window.app.settings.get("feed_max_fetch"),
             user_id: this.props.fromUserId,
         })
 
         console.log(result)
 
         if (result) {
-            this.setState({
-                renderList: result.map((item, index) => this.getPostRender(item, index))
-            })
+            // if result is empty, its mean there is no more posts, so set hasMorePosts to false
+            if (result.length === 0) {
+                await this.setState({
+                    hasMorePosts: false,
+                })
+                return false
+            }
+
+            if (replace) {
+                // replace all posts render list
+                await this.setState({
+                    renderList: result.map((item) => this.getPostRender(item, item.key))
+                })
+            } else {
+                // else append posts to render list
+                await this.setState({
+                    renderList: [
+                        ...this.state.renderList,
+                        ...result.map((item) => this.getPostRender(item, item.key))
+                    ]
+                })
+            }
         }
+
+        // toogle fetching flag
+        await this.setState({
+            fetchingData: false,
+        })
     }
 
     onLikePost = async (data) => {
@@ -110,9 +153,9 @@ export default class PostsFeed extends React.Component {
         })
     }
 
-    getPostRender = (item, index) => {
+    getPostRender = (item, index = this.state.renderList.length) => {
         return <PostCard
-            key={index ?? this.state.renderList.findIndex((i) => i._id === item._id)}
+            key={index}
             data={item}
             selfId={this.state.selfId}
             events={{
@@ -134,8 +177,19 @@ export default class PostsFeed extends React.Component {
             </div>
         }
 
-        return <div className="postsFeed" ref={this.listRef}>
-            {this.state.renderList}
+        return <div id="postsFeed" className="postsFeed" ref={this.listRef}>
+            <LoadMore
+                onBottom={() => {
+                    this.loadPosts()
+                }}
+                loadingComponent={LoadingComponent}
+                noResultComponent={NoResultComponent}
+                fetching={this.state.fetchingData}
+                hasMore={this.state.hasMorePosts}
+                className="posts"
+            >
+                {this.state.renderList}
+            </LoadMore>
         </div>
     }
 }
