@@ -70,6 +70,8 @@ class Server {
         this.httpInstance.httpInterface.use(express.json())
         this.httpInstance.httpInterface.use(express.urlencoded({ extended: true }))
 
+        this.httpInstance.httpInterface.use("/storage", express.static(path.join(__dirname, "../uploads")))
+
         this.httpInstance.wsInterface["clients"] = []
         this.httpInstance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
             return this.httpInstance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
