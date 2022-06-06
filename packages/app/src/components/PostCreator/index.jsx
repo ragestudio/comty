@@ -3,96 +3,196 @@ import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { User } from "models"
 import classnames from "classnames"
+import { PostAdditions } from "components/PostCard"
 
 import "./index.less"
 
+// TODO: Fetch `maxMessageLength` value from server API
 const maxMessageLength = 512
 
-const PostCreatorInput = (props) => {
-    const [value, setValue] = React.useState("")
+export default (props) => {
+    const api = window.app.request
 
-    const canPublish = () => {
-        return value.length !== 0 && value.length < maxMessageLength
-    }
+    const [loading, setLoading] = React.useState(false)
+    const [uploaderVisible, setUploaderVisible] = React.useState(false)
+    const [focused, setFocused] = React.useState(false)
 
-    const onChange = (e) => {
-        setValue(e.target.value)
-    }
+    const [userData, setUserData] = React.useState(null)
+    const [postData, setPostData] = React.useState({
+        message: "",
+        additions: []
+    })
 
-    const handleSubmit = () => {
-        if (canPublish()) {
-            if (typeof props.onSubmit === "function") {
-                props.onSubmit(value)
-            }
-
-            setValue("")
-        }
-    }
-
-    return <div className="textInput">
-        <div className="avatar">
-            <img src={props.user?.avatar} />
-        </div>
-        <antd.Input.TextArea
-            //className={classnames("textArea", { ["active"]: canPublish() })}
-            disabled={props.loading}
-            value={value}
-            onPressEnter={handleSubmit}
-            autoSize={{ minRows: 3, maxRows: 6 }}
-            dragable="false"
-            placeholder="What are you thinking?"
-            onChange={onChange}
-            allowClear
-            rows={8}
-            maxLength={maxMessageLength}
-        />
-        <div>
-            <antd.Button
-                type="primary"
-                disabled={props.loading || !canPublish()}
-                onClick={handleSubmit}
-                icon={props.loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
-            />
-        </div>
-    </div>
-}
-
-export default class PostCreator extends React.Component {
-    state = {
-        loading: false,
-    }
-    api = window.app.request
-
-    componentDidMount = async () => {
-        const userData = await User.data()
-
-        this.setState({
-            userData
+    const updatePostData = (update) => {
+        setPostData({
+            ...postData,
+            ...update
         })
     }
 
-    onSubmit = async (value) => {
-        await this.setState({ loading: true })
+    const cleanPostData = () => {
+        setPostData({
+            message: "",
+            additions: []
+        })
+    }
 
-        const result = this.api.put.post({
-            message: value,
-        }).catch(error => {
+    const submit = () => {
+        setLoading(true)
+
+        const response = api.put.post({ ...postData }).catch(error => {
             console.error(error)
             antd.message.error(error)
 
             return false
         })
 
-        this.setState({ loading: false })
+        setLoading(false)
+
+        if (response) {
+            cleanPostData()
+        }
     }
 
-    render() {
-        return <div className="postCreator">
-            <PostCreatorInput
-                user={this.state.userData}
-                loading={this.state.loading}
-                onSubmit={this.onSubmit}
-            />
-        </div>
+    const onUploadFile = async (req) => {
+        // get file data
+        const file = req.file
+
+        // append to form data
+        const formData = new FormData()
+        formData.append("files", file)
+
+        setLoading(true)
+
+        // send request
+        const request = await api.post.upload(formData, undefined).catch((error) => {
+            console.error(error)
+            antd.message.error(error)
+
+            req.onError(error)
+
+            return false
+        })
+
+        setLoading(false)
+
+        if (request) {
+            return req.onSuccess(request)
+        }
     }
+
+    const canPublish = () => {
+        const messageLengthValid = postData.message.length !== 0 && postData.message.length < maxMessageLength
+
+        return Boolean(messageLengthValid)
+    }
+
+    const onDraggerChange = (change) => {
+        console.log(change)
+
+        switch (change.file.status) {
+            case "done": {
+                let additions = postData.additions ?? []
+
+                additions.push(...change.file.response)
+
+                return updatePostData({ additions })
+            }
+
+            default: {
+                break
+            }
+        }
+    }
+
+    const onChangeMessageInput = (event) => {
+        console.log(event.target.value)
+
+        updatePostData({
+            message: event.target.value
+        })
+    }
+
+    const toggleUploader = (to) => {
+        setUploaderVisible(to ?? !uploaderVisible)
+    }
+
+    const toggleFocus = (to) => {
+        setFocused(to ?? !focused)
+    }
+
+    React.useEffect(() => {
+        User.data().then(user => {
+            setUserData(user)
+        })
+    }, [])
+
+    return <div
+        className="postCreator"
+        onDragOver={(e) => {
+            e.preventDefault()
+            toggleUploader(true)
+        }}
+        onDragLeave={(e) => {
+            e.preventDefault()
+            toggleUploader(false)
+        }}
+        onMouseEnter={() => {
+            toggleFocus(true)
+        }}
+        onMouseLeave={() => {
+            toggleFocus(false)
+        }}
+    >
+        <div className="textInput">
+            <div className="avatar">
+                <img src={userData?.avatar} />
+            </div>
+            <antd.Input.TextArea
+                disabled={loading}
+                value={postData.message}
+                onPressEnter={submit}
+                autoSize={{ minRows: 3, maxRows: 6 }}
+                dragable="false"
+                placeholder="What are you thinking?"
+                onChange={onChangeMessageInput}
+                allowClear
+                rows={8}
+                maxLength={maxMessageLength}
+            />
+            <div>
+                <antd.Button
+                    type="primary"
+                    disabled={loading || !canPublish()}
+                    onClick={submit}
+                    icon={loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
+                />
+            </div>
+        </div>
+
+        {postData.additions.length > 0 && <PostAdditions additions={postData.additions} />}
+
+        <div className={classnames("actions", { ["hided"]: !focused && !uploaderVisible })}>
+            <div>
+                <antd.Button
+                    type={uploaderVisible ? "default" : "primary"}
+                    disabled={loading}
+                    onClick={() => {
+                        toggleUploader()
+                    }}
+                    icon={<Icons.Upload />}
+                />
+            </div>
+        </div>
+
+        <div className={classnames("uploader", { ["hided"]: !uploaderVisible })}>
+            <antd.Upload.Dragger
+                multiple={true}
+                onChange={onDraggerChange}
+                customRequest={onUploadFile}
+            >
+                <p >Click or drag file to this area to upload</p>
+            </antd.Upload.Dragger>
+        </div>
+    </div>
 }
