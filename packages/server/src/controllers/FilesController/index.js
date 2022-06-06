@@ -3,16 +3,60 @@ import path from "path"
 import fs from "fs"
 import stream from "stream"
 
-function resolveToUrl(filepath) {
-    return `${global.globalPublicURI}/uploads/${filepath}`
+const formidable = require("formidable")
+
+function resolveToUrl(filepath, req) {
+    const host = req ? (req.protocol + "://" + req.get("host")) : global.globalPublicURI
+
+    return `${host}/upload/${filepath}`
+}
+
+// TODO: Get maximunFileSize by type of user subscription (free, premium, etc) when `PermissionsAPI` is ready
+const maximumFileSize = 80 * 1024 * 1024 // max file size in bytes (80MB) By default, the maximum file size is 80MB.
+const maximunFilesPerRequest = 10
+const acceptedMimeTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "video/mp4",
+    "video/webm",
+    "video/quicktime",
+    "video/x-msvideo",
+    "video/x-ms-wmv",
+]
+
+function transcodeVideoToWebM(originalFilePath, outputPath) {
+    return new Promise((resolve, reject) => {
+        const ffmpeg = require("fluent-ffmpeg")
+
+        const filename = path.basename(originalFilePath)
+        const outputFilepath = `${outputPath}/${filename.split(".")[0]}.webm`
+
+        console.log(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath}`)
+
+        ffmpeg(originalFilePath)
+            .audioBitrate(128)
+            .videoBitrate(1024)
+            .videoCodec("libvpx")
+            .audioCodec("libvorbis")
+            .format("webm")
+            .output(outputFilepath)
+            .on("error", (err) => {
+                console.log("Error: " + err.message)
+
+                return reject(err)
+            })
+            .on("end", () => {
+                console.log("[Transcoding finished]")
+                return resolve(outputFilepath)
+            })
+            .run()
+    })
 }
 
 export default class FilesController extends Controller {
-    static disabled = true
-
     get = {
-        "/uploads/:id": {
-            enabled: false,
+        "/upload/:id": {
             fn: (req, res) => {
                 const filePath = path.join(global.uploadPath, req.params?.id)
 
@@ -32,37 +76,86 @@ export default class FilesController extends Controller {
 
     post = {
         "/upload": {
-            enabled: false,
-            middlewares: ["withAuthentication", "fileUpload"],
+            middlewares: ["withAuthentication"],
             fn: async (req, res) => {
-                const urls = []
-                const failed = []
+                // check directories exist
+                if (!fs.existsSync(global.uploadCachePath)) {
+                    await fs.promises.mkdir(global.uploadCachePath, { recursive: true })
+                }
 
                 if (!fs.existsSync(global.uploadPath)) {
                     await fs.promises.mkdir(global.uploadPath, { recursive: true })
                 }
 
-                if (req.files) {
-                    for await (let file of req.files) {
-                        try {
-                            const filename = `${req.decodedToken.user_id}-${new Date().getTime()}-${file.filename}`
+                // decode body form-data
+                const form = formidable({
+                    multiples: true,
+                    keepExtensions: true,
+                    uploadDir: global.uploadCachePath,
+                    maxFileSize: maximumFileSize,
+                    maxFields: maximunFilesPerRequest,
+                    filter: (stream) => {
+                        // check if is allowed mime type
+                        if (!acceptedMimeTypes.includes(stream.mimetype)) {
+                            failed.push({
+                                fileName: file.originalFilename,
+                                mimetype: file.mimetype,
+                                error: "mimetype not allowed",
+                            })
 
-                            const diskPath = path.join(global.uploadPath, filename)
-
-                            await fs.promises.writeFile(diskPath, file.data)
-
-                            urls.push(resolveToUrl(filename))
-                        } catch (error) {
-                            console.log(error)
-                            failed.push(file.filename)
+                            return false
                         }
-                    }
-                }
 
-                return res.json({
-                    urls: urls,
-                    failed: failed,
+                        return true
+                    }
                 })
+
+                const results = await new Promise((resolve, reject) => {
+                    const processedFiles = []
+
+                    form.parse(req, async (err, fields, data) => {
+                        if (err) {
+                            return reject(err)
+                        }
+
+                        for await (let file of data.files) {
+                            // check if is video need to transcode
+                            switch (file.mimetype) {
+                                case "video/quicktime": {
+                                    file.filepath = await transcodeVideoToWebM(file.filepath, global.uploadCachePath)
+                                    file.newFilename = path.basename(file.filepath)
+                                    break
+                                }
+
+                                default: {
+                                    // do nothing
+                                }
+                            }
+
+                            // move file to upload path
+                            await fs.promises.rename(file.filepath, path.join(global.uploadPath, file.newFilename))
+
+                            // push final filepath to urls
+                            processedFiles.push({
+                                name: file.originalFilename,
+                                id: file.newFilename,
+                                url: resolveToUrl(file.newFilename, req),
+                            })
+                        }
+
+                        return resolve(processedFiles)
+                    })
+                }).catch((err) => {
+                    res.status(400).json({
+                        error: err.message,
+                    })
+
+                    return false
+                })
+
+                if (results) {
+                    return res.json(results)
+                }
             }
         }
     }
