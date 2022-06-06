@@ -1,7 +1,7 @@
 import { Controller } from "linebridge/dist/server"
 import path from "path"
 import fs from "fs"
-import stream from "stream"
+//import stream from "stream"
 import pmap from "../../utils/pMap"
 
 const formidable = require("formidable")
@@ -9,7 +9,7 @@ const formidable = require("formidable")
 function resolveToUrl(filepath, req) {
     const host = req ? (req.protocol + "://" + req.get("host")) : global.globalPublicURI
 
-    return `${host}/upload/${filepath}`
+    return `${host}/storage/${filepath}`
 }
 
 // TODO: Get maximunFileSize by type of user subscription (free, premium, etc) when `PermissionsAPI` is ready
@@ -64,31 +64,31 @@ function videoTranscode(originalFilePath, outputPath, options = {}) {
 }
 
 export default class FilesController extends Controller {
-    get = {
-        "/upload/:id": {
-            fn: (req, res) => {
-                const filePath = path.join(global.uploadPath, req.params?.id)
+    // get = {
+    //     "/upload/:id": {
+    //         fn: (req, res) => {
+    //             const filePath = path.join(global.uploadPath, req.params?.id)
 
-                const readStream = fs.createReadStream(filePath)
-                const passTrough = new stream.PassThrough()
+    //             const readStream = fs.createReadStream(filePath)
+    //             const passTrough = new stream.PassThrough()
 
-                stream.pipeline(readStream, passTrough, (err) => {
-                    if (err) {
-                        return res.status(400)
-                    }
-                })
+    //             stream.pipeline(readStream, passTrough, (err) => {
+    //                 if (err) {
+    //                     return res.status(400)
+    //                 }
+    //             })
 
-                return passTrough.pipe(res)
-            },
-        }
-    }
+    //             return passTrough.pipe(res)
+    //         },
+    //     }
+    // }
 
     post = {
         "/upload": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
                 let failed = []
-                
+
                 // check directories exist
                 if (!fs.existsSync(global.uploadCachePath)) {
                     await fs.promises.mkdir(global.uploadCachePath, { recursive: true })
