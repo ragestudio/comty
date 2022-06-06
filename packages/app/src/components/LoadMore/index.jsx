@@ -1,39 +1,22 @@
 import React from "react"
-import PropTypes from "prop-types"
 import classnames from "classnames"
 import IntersectionObserver from "intersection-observer-polyfill"
 
 import "./index.less"
 
-export default class LoadMore extends React.Component {
-    constructor() {
-        super(...arguments)
-        this.insideViewportCb = this.insideViewportCb.bind(this)
-    }
+export default React.forwardRef((props, ref) => {
+    const {
+        className,
+        children,
+        hasMore,
+        loadingComponent,
+        noResultComponent,
+    } = props
 
-    static propTypes = {
-        onBottom: PropTypes.func,
-        fetching: PropTypes.bool,
-        hasMore: PropTypes.bool,
-        NoResult: PropTypes.func,
-        Footer: PropTypes.func
-    }
+    let observer = null
 
-    componentDidMount() {
-        try {
-            const node = document.getElementById("bottom")
-
-            this.observer = new IntersectionObserver(this.insideViewportCb)
-            this.observer.observe(node)
-        } catch (err) {
-            console.log("err in finding node", err)
-        }
-
-        window.addEventListener("scroll", this.handleOnScroll)
-    }
-
-    insideViewportCb(entries) {
-        const { fetching, onBottom } = this.props
+    const insideViewportCb = (entries) => {
+        const { fetching, onBottom } = props
 
         entries.forEach(element => {
             if (element.intersectionRatio > 0 && !fetching) {
@@ -42,41 +25,43 @@ export default class LoadMore extends React.Component {
         })
     }
 
-    componentWillUnmount() {
-        if (this.observer) {
-            this.observer = null
+    React.useEffect(() => {
+        try {
+            const node = document.getElementById("bottom")
+
+            observer = new IntersectionObserver(insideViewportCb)
+            observer.observe(node)
+        } catch (err) {
+            console.log("err in finding node", err)
         }
-    }
 
-    render() {
-        const {
-            className,
-            children,
-            hasMore,
-            loadingComponent,
-            noResultComponent,
-        } = this.props
+        return () => {
+            observer = null
+        }
+    }, [])
 
-        return <div className="infinite-scroll">
-            <div className={classnames(className)}>
-                {children}
-            </div>
-
-            <div style={{ clear: "both" }} />
-
-            <div
-                id="bottom"
-                style={{ display: hasMore ? "block" : "none" }}
-            >
-                {loadingComponent && React.createElement(loadingComponent)}
-            </div>
-
-            <div
-                className="no-result"
-                style={{ display: hasMore ? "none" : "block" }}
-            >
-                {noResultComponent ? React.createElement(noResultComponent) : "No more result"}
-            </div>
+    return <div className="infinite-scroll">
+        <div
+            className={classnames(className)}
+            ref={ref}
+        >
+            {children}
         </div>
-    }
-}
+
+        <div style={{ clear: "both" }} />
+
+        <div
+            id="bottom"
+            style={{ display: hasMore ? "block" : "none" }}
+        >
+            {loadingComponent && React.createElement(loadingComponent)}
+        </div>
+
+        <div
+            className="no-result"
+            style={{ display: hasMore ? "none" : "block" }}
+        >
+            {noResultComponent ? React.createElement(noResultComponent) : "No more result"}
+        </div>
+    </div>
+})
