@@ -13,9 +13,9 @@ export default class ShortcutsCore extends Core {
 
     handleEvent = (event) => {
         // FIXME: event.key sometimes is not defined
-        const key = event.key.toLowerCase()
+        //event.key = event.key.toLowerCase()
 
-        const shortcut = this.shortcuts[key]
+        const shortcut = this.shortcuts[event.key]
 
         if (shortcut) {
             if (typeof shortcut.ctrl === "boolean" && event.ctrlKey !== shortcut.ctrl) {
