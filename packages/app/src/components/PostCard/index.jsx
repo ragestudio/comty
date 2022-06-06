@@ -123,7 +123,7 @@ export const PostAdditions = React.memo((props) => {
         return addition
     })
 
-    // then filter if has an valid uri
+    // then filter if has an valid url
     additions = additions.filter(addition => /^(http|https):\/\//.test(addition.url))
     
     additions = additions.map((addition, index) => {
@@ -162,12 +162,12 @@ export const PostAdditions = React.memo((props) => {
                     }
                     case "video": {
                         return () => <video controls>
-                            <source src={uri} type={mimeType} />
+                            <source src={url} type={mimeType} />
                         </video>
                     }
                     case "audio": {
                         return () => <audio controls>
-                            <source src={uri} type={mimeType} />
+                            <source src={url} type={mimeType} />
                         </audio>
                     }
 
