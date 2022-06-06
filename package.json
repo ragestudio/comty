@@ -9,5 +9,5 @@
   "dependencies": {
     "corenode": "^0.28.26"
   },
-  "version": "0.18.7"
+  "version": "0.18.8"
 }
