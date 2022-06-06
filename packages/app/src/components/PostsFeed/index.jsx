@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { User } from "models"
+import { Icons } from "components/Icons"
 import { PostCard, LoadMore } from "components"
 
 import "./index.less"
@@ -9,7 +10,7 @@ const LoadingComponent = () => {
     // FIXME: Im not sure why but, using <antd.Skeleton> will cause a memory leak of DOM Nodes when using IntersectionObserver
     //return <antd.Skeleton active />
 
-    return <p>Loading more ...</p>
+    return <p><Icons.LoadingOutlined spin className="loadingIcon" /> Loading more ...</p>
 }
 
 const NoResultComponent = () => {
