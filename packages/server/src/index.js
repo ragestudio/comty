@@ -159,10 +159,6 @@ class Server {
             req.jwtStrategy = this.options.jwtStrategy
             next()
         }
-        this.httpInstance.middlewares["useWS"] = (req, res, next) => {
-            req.ws = global.wsInterface
-            next()
-        }
 
         passport.use(new LocalStrategy({
             usernameField: "username",
@@ -187,6 +183,11 @@ class Server {
     }
 
     initWebsockets() {
+        this.httpInstance.middlewares["useWS"] = (req, res, next) => {
+            req.ws = global.wsInterface
+            next()
+        }
+
         const onAuthenticated = (socket, user_id) => {
             this.attachClientSocket(socket, user_id)
             socket.emit("authenticated")
