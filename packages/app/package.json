@@ -40,7 +40,6 @@
     "hls.js": "^1.1.5",
     "howler": "2.2.3",
     "i18next": "21.6.6",
-    "intersection-observer-polyfill": "^0.1.0",
     "js-cookie": "3.0.1",
     "jwt-decode": "3.1.2",
     "less": "4.1.2",
