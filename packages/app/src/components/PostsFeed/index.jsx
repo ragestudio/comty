@@ -6,7 +6,10 @@ import { PostCard, LoadMore } from "components"
 import "./index.less"
 
 const LoadingComponent = () => {
-    return <antd.Skeleton active />
+    // FIXME: Im not sure why but, using <antd.Skeleton> will cause a memory leak of DOM Nodes when using IntersectionObserver
+    //return <antd.Skeleton active />
+
+    return <p>Loading more ...</p>
 }
 
 const NoResultComponent = () => {
