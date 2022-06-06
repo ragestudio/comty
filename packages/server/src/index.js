@@ -22,6 +22,7 @@ Array.prototype.updateFromObjectKeys = function (obj) {
 
 import path from "path"
 import { Server as LinebridgeServer } from "linebridge/dist/server"
+import express from "express"
 import bcrypt from "bcrypt"
 import passport from "passport"
 
@@ -45,6 +46,7 @@ class Server {
     middlewares = require("./middlewares")
 
     httpInstance = new LinebridgeServer({
+        httpEngine: "express",
         port: this.httpListenPort,
         wsPort: this.wsListenPort,
         headers: {
@@ -65,6 +67,9 @@ class Server {
     }
 
     constructor() {
+        this.httpInstance.httpInterface.use(express.json())
+        this.httpInstance.httpInterface.use(express.urlencoded({ extended: true }))
+
         this.httpInstance.wsInterface["clients"] = []
         this.httpInstance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
             return this.httpInstance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
@@ -83,7 +88,10 @@ class Server {
         global.wsInterface = this.httpInstance.wsInterface
         global.httpListenPort = this.listenPort
         global.globalPublicURI = this.env.globalPublicURI
+
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
+        global.uploadCachePath = this.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
+
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
 
@@ -155,10 +163,6 @@ class Server {
             req.jwtStrategy = this.options.jwtStrategy
             next()
         }
-        this.httpInstance.middlewares["useWS"] = (req, res, next) => {
-            req.ws = global.wsInterface
-            next()
-        }
 
         passport.use(new LocalStrategy({
             usernameField: "username",
@@ -183,6 +187,11 @@ class Server {
     }
 
     initWebsockets() {
+        this.httpInstance.middlewares["useWS"] = (req, res, next) => {
+            req.ws = global.wsInterface
+            next()
+        }
+
         const onAuthenticated = (socket, user_id) => {
             this.attachClientSocket(socket, user_id)
             socket.emit("authenticated")
