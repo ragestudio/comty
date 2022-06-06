@@ -46,7 +46,7 @@ const getMaxHeight = (node) => {
 
 const getCollapsedHeight = () => ({ height: 0, opacity: 0 })
 
-function PostHeader(props) {
+export function PostHeader(props) {
     const [timeAgo, setTimeAgo] = React.useState(0)
 
     const goToProfile = () => {
@@ -107,30 +107,40 @@ function PostHeader(props) {
     </div>
 }
 
-const PostContent = React.memo((props) => {
-    let { message, additions } = props.data
+export const PostAdditions = React.memo((props) => {
+    let { additions } = props
 
     let carruselRef = React.useRef(null)
 
-    // first filter if is an string
-    additions = additions.filter(file => typeof file === "string")
+    // fullfil url string additions
+    additions = additions.map((addition) => {
+        if (typeof addition === "string") {
+            addition = { 
+                url: addition,
+            }
+        }
 
-    // then filter if is an uri
-    additions = additions.filter(file => /^(http|https):\/\//.test(file))
+        return addition
+    })
 
-    additions = additions.map((uri, index) => {
+    // then filter if has an valid uri
+    additions = additions.filter(addition => /^(http|https):\/\//.test(addition.url))
+    
+    additions = additions.map((addition, index) => {
+        const { url, id, name } = addition
+
         const MediaRender = loadable(async () => {
             let extension = null
 
             try {
-                // get media type by parsing the uri
-                const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(uri)
+                // get media type by parsing the url
+                const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
 
                 if (mediaTypeExt) {
                     extension = mediaTypeExt[1]
                 } else {
-                    // try to get media by creating requesting the uri
-                    const response = await fetch(uri, {
+                    // try to get media by creating requesting the url
+                    const response = await fetch(url, {
                         method: "HEAD",
                     })
 
@@ -148,7 +158,7 @@ const PostContent = React.memo((props) => {
 
                 switch (mediaType.split("/")[0]) {
                     case "image": {
-                        return () => <img src={uri} />
+                        return () => <img src={url} />
                     }
                     case "video": {
                         return () => <video controls>
@@ -180,6 +190,22 @@ const PostContent = React.memo((props) => {
         </div>
     })
 
+    return <div className="additions">
+        <antd.Carousel
+            ref={carruselRef}
+            arrows={true}
+            nextArrow={<Icons.ChevronRight />}
+            prevArrow={<Icons.ChevronLeft />}
+            autoplay={props.autoCarrousel}
+        >
+            {additions}
+        </antd.Carousel>
+    </div>
+})
+
+export const PostContent = React.memo((props) => {
+    let { message, additions } = props.data
+
     // parse message
     const regexs = [
         {
@@ -203,23 +229,11 @@ const PostContent = React.memo((props) => {
             {message}
         </div>
 
-        {additions.length > 0 &&
-            <div className="additions">
-                <antd.Carousel
-                    ref={carruselRef}
-                    arrows={true}
-                    nextArrow={<Icons.ChevronRight />}
-                    prevArrow={<Icons.ChevronLeft />}
-                    autoplay={props.autoCarrousel}
-                >
-                    {additions}
-                </antd.Carousel>
-            </div>
-        }
+        {additions.length > 0 && <PostAdditions additions={additions} />}
     </div>
 })
 
-const PostActions = (props) => {
+export const PostActions = (props) => {
     const handleSelfMenuAction = async (event) => {
         const fn = props.actions[event.key]
 
