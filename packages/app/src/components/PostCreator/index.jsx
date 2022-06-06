@@ -7,6 +7,7 @@ import { PostAdditions } from "components/PostCard"
 
 import "./index.less"
 
+// TODO: Handle `cntr+v` to paste data from the clipboard to the post additions
 // TODO: Fetch `maxMessageLength` value from server API
 const maxMessageLength = 512
 
