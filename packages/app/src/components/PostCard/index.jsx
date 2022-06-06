@@ -107,101 +107,92 @@ export function PostHeader(props) {
     </div>
 }
 
-export const PostAdditions = React.memo((props) => {
-    let { additions } = props
-
-    let carruselRef = React.useRef(null)
-
-    // fullfil url string additions
-    additions = additions.map((addition) => {
-        if (typeof addition === "string") {
-            addition = { 
-                url: addition,
-            }
-        }
-
-        return addition
-    })
-
-    // then filter if has an valid url
-    additions = additions.filter(addition => /^(http|https):\/\//.test(addition.url))
-    
-    additions = additions.map((addition, index) => {
-        const { url, id, name } = addition
-
-        const MediaRender = loadable(async () => {
-            let extension = null
-
-            try {
-                // get media type by parsing the url
-                const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
-
-                if (mediaTypeExt) {
-                    extension = mediaTypeExt[1]
-                } else {
-                    // try to get media by creating requesting the url
-                    const response = await fetch(url, {
-                        method: "HEAD",
-                    })
-
-                    extension = response.headers.get("content-type").split("/")[1]
+export class PostAdditions extends React.PureComponent {
+    getAdditions = (data) => {
+        return data.map((addition, index) => {
+            if (typeof addition === "string") {
+                addition = {
+                    url: addition,
                 }
+            }
 
-                extension = extension.toLowerCase()
+            const { url, id, name } = addition
 
-                const mediaType = mediaTypes[extension]
-                const mimeType = `${mediaType}/${extension}`
+            const MediaRender = loadable(async () => {
+                let extension = null
 
-                if (!mediaType) {
+                try {
+                    // get media type by parsing the url
+                    const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
+
+                    if (mediaTypeExt) {
+                        extension = mediaTypeExt[1]
+                    } else {
+                        // try to get media by creating requesting the url
+                        const response = await fetch(url, {
+                            method: "HEAD",
+                        })
+
+                        extension = response.headers.get("content-type").split("/")[1]
+                    }
+
+                    extension = extension.toLowerCase()
+
+                    const mediaType = mediaTypes[extension]
+                    const mimeType = `${mediaType}/${extension}`
+
+                    if (!mediaType) {
+                        return () => <ContentFailed />
+                    }
+
+                    switch (mediaType.split("/")[0]) {
+                        case "image": {
+                            return () => <img src={url} />
+                        }
+                        case "video": {
+                            return () => <video controls>
+                                <source src={url} type={mimeType} />
+                            </video>
+                        }
+                        case "audio": {
+                            return () => <audio controls>
+                                <source src={url} type={mimeType} />
+                            </audio>
+                        }
+
+                        default: {
+                            return () => <h4>
+                                Unsupported media type [{mediaType}/{mediaTypeExt}]
+                            </h4>
+                        }
+                    }
+                } catch (error) {
+                    console.error(error)
                     return () => <ContentFailed />
                 }
+            })
 
-                switch (mediaType.split("/")[0]) {
-                    case "image": {
-                        return () => <img src={url} />
-                    }
-                    case "video": {
-                        return () => <video controls>
-                            <source src={url} type={mimeType} />
-                        </video>
-                    }
-                    case "audio": {
-                        return () => <audio controls>
-                            <source src={url} type={mimeType} />
-                        </audio>
-                    }
-
-                    default: {
-                        return () => <h4>
-                            Unsupported media type [{mediaType}/{mediaTypeExt}]
-                        </h4>
-                    }
-                }
-            } catch (error) {
-                console.error(error)
-                return () => <ContentFailed />
-            }
+            return <div key={index} className="addition">
+                <React.Suspense fallback={<div>Loading</div>} >
+                    <MediaRender />
+                </React.Suspense>
+            </div>
         })
+    }
 
-        return <div key={index} className="addition">
-            <React.Suspense fallback={<div>Loading</div>} >
-                <MediaRender />
-            </React.Suspense>
+    render() {
+        return <div className="additions">
+            <antd.Carousel
+                arrows={true}
+                nextArrow={<Icons.ChevronRight />}
+                prevArrow={<Icons.ChevronLeft />}
+                autoplay={this.props.autoCarrousel}
+            >
+                {this.getAdditions(this.props.additions)}
+            </antd.Carousel>
         </div>
-    })
-
-    return <div className="additions">
-        <antd.Carousel
-            ref={carruselRef}
-            arrows={true}
-            nextArrow={<Icons.ChevronRight />}
-            prevArrow={<Icons.ChevronLeft />}
-            autoplay={props.autoCarrousel}
-        >
-            {additions}
-        </antd.Carousel>
-    </div>
-})
+    }
+}
 
 export const PostContent = React.memo((props) => {
     let { message, additions } = props.data
