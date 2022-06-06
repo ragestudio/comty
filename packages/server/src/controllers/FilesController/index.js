@@ -2,6 +2,8 @@ import { Controller } from "linebridge/dist/server"
 import path from "path"
 import fs from "fs"
 import stream from "stream"
+import pmap from "../../utils/pMap"
+
 const formidable = require("formidable")
 
 function resolveToUrl(filepath, req) {
@@ -119,6 +121,7 @@ export default class FilesController extends Controller {
 
                 const results = await new Promise((resolve, reject) => {
                     const processedFiles = []
+                    let queuePromieses = []
 
                     // create a new thread for each file
                     form.parse(req, async (err, fields, data) => {
@@ -130,30 +133,51 @@ export default class FilesController extends Controller {
                             data.files = [data.files]
                         }
 
-                        for await (let file of data.files) {
-                            // check if is video need to transcode
-                            switch (file.mimetype) {
-                                case "video/quicktime": {
-                                    file.filepath = await videoTranscode(file.filepath, global.uploadCachePath)
-                                    file.newFilename = path.basename(file.filepath)
-                                    break
+                        for (let file of data.files) {
+                            // create process queue
+                            queuePromieses.push(async () => {
+                                // check if is video need to transcode
+                                switch (file.mimetype) {
+                                    case "video/quicktime": {
+                                        file.filepath = await videoTranscode(file.filepath, global.uploadCachePath)
+                                        file.newFilename = path.basename(file.filepath)
+                                        break
+                                    }
+
+                                    default: {
+                                        // do nothing
+                                    }
                                 }
 
-                                default: {
-                                    // do nothing
+                                // move file to upload path
+                                await fs.promises.rename(file.filepath, path.join(global.uploadPath, file.newFilename))
+
+                                // push final filepath to urls
+                                return {
+                                    name: file.originalFilename,
+                                    id: file.newFilename,
+                                    url: resolveToUrl(file.newFilename, req),
                                 }
-                            }
-
-                            // move file to upload path
-                            await fs.promises.rename(file.filepath, path.join(global.uploadPath, file.newFilename))
-
-                            // push final filepath to urls
-                            processedFiles.push({
-                                name: file.originalFilename,
-                                id: file.newFilename,
-                                url: resolveToUrl(file.newFilename, req),
                             })
                         }
+
+                        // wait for all files to be processed
+                        await pmap(queuePromieses,
+                            async (fn) => {
+                                const result = await fn().catch((err) => {
+                                    console.error(err)
+
+                                    return null
+                                })
+
+                                if (result) {
+                                    processedFiles.push(result)
+                                }
+                            },
+                            {
+                                concurrency: 5
+                            }
+                        )
 
                         return resolve(processedFiles)
                     })
