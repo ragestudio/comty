@@ -24,6 +24,7 @@ export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 export { default as Login } from "./Login"
 export { default as Image } from "./Image"
+export { default as LoadMore } from "./LoadMore"
 
 // BUTTONS
 export { default as LikeButton } from "./LikeButton"
