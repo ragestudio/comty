@@ -13,6 +13,7 @@
     "compactWidth": false,
     "postCard_carrusel_auto": true,
     "postCard_expansible_actions": true,
+    "feed_max_fetch": 20,
     "language": "en",
     "sidebarKeys": [
         "main",

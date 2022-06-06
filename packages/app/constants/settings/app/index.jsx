@@ -117,7 +117,7 @@ export default [
         "storaged": true,
         "group": "sidebar",
         "component": "Slider",
-        "icon": "Wh",
+        "icon": "MdTimer",
         "dependsOn": {
             "collapseOnLooseFocus": true
         },
@@ -135,6 +135,19 @@ export default [
                 2000: "2s",
             }
         }
+    },
+    {
+        "id": "feed_max_fetch",
+        "title": "Fetch max items",
+        "description": "Set the maximum number of items to load per fetch in the feed list",
+        "component": "Slider",
+        "icon": "MdFormatListNumbered",
+        "group": "posts",
+        "props": {
+            min: 5,
+            max: 50,
+        },
+        "storaged": true,
     },
     {
         "id": "postCard_carrusel_auto",
