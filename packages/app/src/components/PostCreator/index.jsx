@@ -13,6 +13,8 @@ const maxMessageLength = 512
 export default (props) => {
     const api = window.app.request
 
+    const additionsRef = React.useRef(null)
+    const [pending, setPending] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [uploaderVisible, setUploaderVisible] = React.useState(false)
     const [focused, setFocused] = React.useState(false)
@@ -57,14 +59,15 @@ export default (props) => {
     }
 
     const onUploadFile = async (req) => {
+        // hide uploader
+        setUploaderVisible(false)
+
         // get file data
         const file = req.file
 
         // append to form data
         const formData = new FormData()
         formData.append("files", file)
-
-        setLoading(true)
 
         // send request
         const request = await api.post.upload(formData, undefined).catch((error) => {
@@ -76,8 +79,6 @@ export default (props) => {
             return false
         })
 
-        setLoading(false)
-
         if (request) {
             return req.onSuccess(request)
         }
@@ -86,19 +87,34 @@ export default (props) => {
     const canPublish = () => {
         const messageLengthValid = postData.message.length !== 0 && postData.message.length < maxMessageLength
 
-        return Boolean(messageLengthValid)
+        return Boolean(messageLengthValid) && Boolean(pending.length === 0)
     }
 
     const onDraggerChange = (change) => {
         console.log(change)
 
         switch (change.file.status) {
+            case "uploading": {
+                setPending([...pending, change.file.uid])
+                break
+            }
             case "done": {
                 let additions = postData.additions ?? []
 
                 additions.push(...change.file.response)
 
-                return updatePostData({ additions })
+                // remove pending file
+                setPending(pending.filter(uid => uid !== change.file.uid))
+
+                // update post data
+                updatePostData({ additions })
+
+                // force update additions
+                if (additionsRef.current) {
+                    additionsRef.current.forceUpdate()
+                }
+
+                break
             }
 
             default: {
@@ -126,6 +142,12 @@ export default (props) => {
             setUserData(user)
         })
     }, [])
+
+    // set loading to true menwhile pending is not empty
+    React.useEffect(() => {
+        console.log(pending)
+        setLoading(pending.length !== 0)
+    }, [pending])
 
     return <div
         className="postCreator"
@@ -170,7 +192,7 @@ export default (props) => {
             </div>
         </div>
 
-        {postData.additions.length > 0 && <PostAdditions additions={postData.additions} />}
+        {postData.additions.length > 0 && <PostAdditions ref={additionsRef} additions={postData.additions} />}
 
         <div className={classnames("actions", { ["hided"]: !focused && !uploaderVisible })}>
             <div>
@@ -187,6 +209,7 @@ export default (props) => {
 
         <div className={classnames("uploader", { ["hided"]: !uploaderVisible })}>
             <antd.Upload.Dragger
+                maxCount={20}
                 multiple={true}
                 onChange={onDraggerChange}
                 customRequest={onUploadFile}
