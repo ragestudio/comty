@@ -12,7 +12,7 @@ function resolveToUrl(filepath, req) {
 
 // TODO: Get maximunFileSize by type of user subscription (free, premium, etc) when `PermissionsAPI` is ready
 const maximumFileSize = 80 * 1024 * 1024 // max file size in bytes (80MB) By default, the maximum file size is 80MB.
-const maximunFilesPerRequest = 10
+const maximunFilesPerRequest = 20
 const acceptedMimeTypes = [
     "image/jpeg",
     "image/png",
@@ -120,9 +120,14 @@ export default class FilesController extends Controller {
                 const results = await new Promise((resolve, reject) => {
                     const processedFiles = []
 
+                    // create a new thread for each file
                     form.parse(req, async (err, fields, data) => {
                         if (err) {
                             return reject(err)
+                        }
+
+                        if (!Array.isArray(data.files)) {
+                            data.files = [data.files]
                         }
 
                         for await (let file of data.files) {
