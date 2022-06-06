@@ -8,13 +8,14 @@ export default class PostsController extends Controller {
 
     methods = {
         createPost: async (payload) => {
-            const { user_id, message } = payload
+            const { user_id, message, additions } = payload
 
             const userData = await User.findById(user_id)
 
             const post = new Post({
                 user_id: typeof user_id === "object" ? user_id.toString() : user_id,
                 message: String(message).toString(),
+                additions: additions ?? [],
                 created_at: new Date().getTime(),
             })
 
@@ -178,11 +179,12 @@ export default class PostsController extends Controller {
     put = {
         "/post": Schematized({
             required: ["message"],
-            select: ["message"],
+            select: ["message", "additions"],
         }, async (req, res) => {
             const post = await this.methods.createPost({
                 user_id: req.user.id,
                 message: req.selection.message,
+                additions: req.selection.additions,
             })
 
             return res.json(post)
