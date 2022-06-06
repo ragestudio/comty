@@ -41,7 +41,7 @@ export default (props) => {
         setLoading(true)
         setUploaderVisible(false)
         setFocused(false)
-        
+
         const response = api.put.post({ ...postData }).catch(error => {
             console.error(error)
             antd.message.error(error)
@@ -108,8 +108,6 @@ export default (props) => {
     }
 
     const onChangeMessageInput = (event) => {
-        console.log(event.target.value)
-
         updatePostData({
             message: event.target.value
         })
