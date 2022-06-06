@@ -87,6 +87,8 @@ export default class FilesController extends Controller {
         "/upload": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
+                let failed = []
+                
                 // check directories exist
                 if (!fs.existsSync(global.uploadCachePath)) {
                     await fs.promises.mkdir(global.uploadCachePath, { recursive: true })
