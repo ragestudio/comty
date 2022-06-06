@@ -84,7 +84,10 @@ class Server {
         global.wsInterface = this.httpInstance.wsInterface
         global.httpListenPort = this.listenPort
         global.globalPublicURI = this.env.globalPublicURI
+
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
+        global.uploadCachePath = this.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
+
         global.jwtStrategy = this.options.jwtStrategy
         global.signLocation = this.env.signLocation
 
