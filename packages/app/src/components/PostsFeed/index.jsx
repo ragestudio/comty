@@ -47,6 +47,14 @@ export default class PostsFeed extends React.Component {
             window.app.ws.listen(event, this.wsEvents[event])
         })
 
+        // TODO: register keybindings to handle directions key scrolling to posts (use app.shortcuts)
+        // window.app.shortcuts.register("ArrowUp", () => {
+        //    // {...}
+        // })
+        // window.app.shortcuts.register("ArrowDown", () => {
+        //     // {...}
+        // })
+
         await this.loadPosts()
 
         await this.setState({ initialLoading: false })
@@ -177,7 +185,7 @@ export default class PostsFeed extends React.Component {
             </div>
         }
 
-        return <div id="postsFeed" className="postsFeed" ref={this.listRef}>
+        return <div id="postsFeed" className="postsFeed">
             <LoadMore
                 onBottom={() => {
                     this.loadPosts()
@@ -187,6 +195,7 @@ export default class PostsFeed extends React.Component {
                 fetching={this.state.fetchingData}
                 hasMore={this.state.hasMorePosts}
                 className="posts"
+                ref={this.listRef}
             >
                 {this.state.renderList}
             </LoadMore>
