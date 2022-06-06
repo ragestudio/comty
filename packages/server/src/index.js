@@ -45,6 +45,7 @@ class Server {
     middlewares = require("./middlewares")
 
     httpInstance = new LinebridgeServer({
+        httpEngine: "express",
         port: this.httpListenPort,
         wsPort: this.wsListenPort,
         headers: {
