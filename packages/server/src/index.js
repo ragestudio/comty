@@ -22,6 +22,7 @@ Array.prototype.updateFromObjectKeys = function (obj) {
 
 import path from "path"
 import { Server as LinebridgeServer } from "linebridge/dist/server"
+import express from "express"
 import bcrypt from "bcrypt"
 import passport from "passport"
 
@@ -66,6 +67,9 @@ class Server {
     }
 
     constructor() {
+        this.httpInstance.httpInterface.use(express.json())
+        this.httpInstance.httpInterface.use(express.urlencoded({ extended: true }))
+
         this.httpInstance.wsInterface["clients"] = []
         this.httpInstance.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
             return this.httpInstance.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
