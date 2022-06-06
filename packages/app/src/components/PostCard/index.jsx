@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { Swiper } from "antd-mobile"
 import { Icons } from "components/Icons"
 import { Image, LikeButton } from "components"
 import moment from "moment"
