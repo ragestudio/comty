@@ -1,6 +1,5 @@
 import React from "react"
 import classnames from "classnames"
-import IntersectionObserver from "intersection-observer-polyfill"
 
 import "./index.less"
 
@@ -36,6 +35,7 @@ export default React.forwardRef((props, ref) => {
         }
 
         return () => {
+            observer.disconnect()
             observer = null
         }
     }, [])
