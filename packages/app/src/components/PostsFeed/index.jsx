@@ -25,9 +25,9 @@ export default class PostsFeed extends React.Component {
     state = {
         selfId: null,
         initialLoading: true,
-        renderList: [],
-        fetchingData: false,
+        fetchingData: true,
         hasMorePosts: true,
+        renderList: [],
     }
 
     api = window.app.request
