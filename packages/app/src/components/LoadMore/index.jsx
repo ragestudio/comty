@@ -52,6 +52,7 @@ export default React.forwardRef((props, ref) => {
 
         <div
             id="bottom"
+            className="bottom"
             style={{ display: hasMore ? "block" : "none" }}
         >
             {loadingComponent && React.createElement(loadingComponent)}
