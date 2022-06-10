@@ -7,7 +7,7 @@ import pmap from "../../utils/pMap"
 const formidable = require("formidable")
 
 export function resolveToUrl(filepath, req) {
-    const host = req ? (req.protocol + "://" + req.get("host")) : global.globalPublicURI
+    const host = req ? (req.protocol + "://" + req.get("host")) : global.globalPublicUri
 
     return `${host}/storage/${filepath}`
 }
