@@ -89,7 +89,10 @@ class Server {
 
         global.wsInterface = this.httpInstance.wsInterface
         global.httpListenPort = this.listenPort
-        global.globalPublicURI = this.env.globalPublicURI
+        
+        global.publicHostname = this.env.publicHostname
+        global.publicProtocol = this.env.publicProtocol
+        global.globalPublicUri = `${this.env.publicProtocol}://${this.env.publicHost}`
 
         global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
         global.uploadCachePath = this.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
