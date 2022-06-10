@@ -256,6 +256,52 @@ export default class PostsController extends Controller {
         }),
     }
 
+    post = {
+        "/fix_posts_data": {
+            public: false, // This will be functional with next versions of linebridge (Will exclude this endpoint from the server endpoint map)
+            middlewares: ["withAuthentication", "onlyAdmin"],
+            fn: async (req, res) => {
+                const posts = await Post.find()
+
+                for await (let post of posts) {
+                    if (Array.isArray(post.additions) && post.additions.length > 0) {
+                        post.additions = post.additions.map((addition) => {
+                            // fix strings additions
+                            if (typeof addition === "string") {
+                                addition = {
+                                    url: addition,
+                                }
+                            }
+
+                            // replace insecure http urls with https
+                            if (addition.url.startsWith("http://")) {
+                                addition.url = addition.url.replace("http://", "https://")
+                            }
+
+                            // fix old local path resolve (${host}/upload/id => ${host}/storage/id)
+                            const hostnamePath = addition.url.replace(/^https?:\/\//, "")
+                            if (hostnamePath.startsWith(`${global.publicHostname}/upload`)) {
+                                addition.url = addition.url.replace(`${global.publicHostname}/upload`, `${global.publicHostname}/storage`)
+                            }
+
+                            console.log(`Processed addition >`, addition)
+
+                            return addition
+                        })
+                    }
+
+                    await Post.findByIdAndUpdate(post._id, {
+                        additions: post.additions,
+                    })
+                }
+
+                return res.json({
+                    success: true
+                })
+            }
+        },
+    }
+
     delete = {
         "/post": Schematized({
             required: ["post_id"],
