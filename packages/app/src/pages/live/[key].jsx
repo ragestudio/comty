@@ -40,8 +40,7 @@ export default class StreamViewer extends React.Component {
             switchProtocol: this.switchProtocol,
         }
 
-        const query = new URLSearchParams(window.location.search)
-        const requestedUsername = query.get("key")
+        const requestedUsername = this.props.match.params.key
 
         const source = `${streamsSource}/${requestedUsername}`
         const player = new Plyr("#player", {
@@ -59,7 +58,7 @@ export default class StreamViewer extends React.Component {
         await this.loadWithProtocol[this.state.loadedProtocol]()
 
         // make the interface a bit confortable for a video player
-        app.style.applyVariant("dark")
+        //app.style.applyVariant("dark")
 
         app.eventBus.emit("toogleCompactMode", true)
 

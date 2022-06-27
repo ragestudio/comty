@@ -48,7 +48,7 @@ export default class Streams extends React.Component {
     }
 
     onClickItem = (item) => {
-        window.app.setLocation(`/streams/viewer?key=${item}`)
+        window.app.setLocation(`/live/${item}`)
     }
 
     renderListItem = (stream) => {
