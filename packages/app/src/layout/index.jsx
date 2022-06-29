@@ -38,13 +38,12 @@ const LayoutRenders = {
 	}
 }
 
-export default class Layout extends React.Component {
+export default class Layout extends React.PureComponent {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 	state = {
 		layoutType: "default",
 		isOnTransition: false,
-		compactMode: false,
 		renderLock: true,
 		renderError: null,
 	}
@@ -68,12 +67,6 @@ export default class Layout extends React.Component {
 		window.app.eventBus.on("app.initialization.finish", () => {
 			this.setState({
 				renderLock: false,
-			})
-		})
-
-		window.app.eventBus.on("toogleCompactMode", (to) => {
-			this.setState({
-				compactMode: to ?? !this.state.compactMode,
 			})
 		})
 
@@ -133,9 +126,6 @@ export default class Layout extends React.Component {
 		const layoutComponentProps = {
 			...this.props.bindProps,
 			...this.state,
-			layoutPageModesClassnames: [{
-				["noMargin"]: this.state.compactMode,
-			}],
 			onTransitionStart: this.onTransitionStart,
 			onTransitionFinish: this.onTransitionFinish,
 		}
