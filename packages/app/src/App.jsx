@@ -321,7 +321,7 @@ class App extends React.Component {
 
 					throw {
 						cause: "Cannot connect to API",
-						details: error.stack,
+						details: `Sorry but we cannot connect to the API. Please try again later. [${config.remotes.mainApi}]`,
 					}
 				}
 			},
