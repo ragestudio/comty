@@ -4,7 +4,9 @@
         "primaryColor": "#ff6064",
         "backgroundColorTransparency": "0.8",
         "backgroundImage": "none",
-        "fontFamily": "'Varela Round', sans-serif"
+        "fontFamily": "'Varela Round', sans-serif",
+        "layoutMargin": "unset",
+        "layoutPadding": "10px"
     },
     "defaultVariant": "light",
     "variants": {
