@@ -123,6 +123,20 @@ export default class StyleCore extends Core {
 		return app.settings.get("themeVariant")
 	}
 
+	getValue = (key) => {
+		if (typeof key === "undefined") {
+			return {
+				...staticValues,
+				...storagedModifications
+			}
+		}
+
+		const storagedModifications = this.getStoragedModifications()
+		const staticValues = this.theme.staticVars
+
+		return storagedModifications[key] || staticValues[key]
+	}
+
 	setVariant = (variationKey) => {
 		return app.settings.set("themeVariant", variationKey)
 	}
