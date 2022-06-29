@@ -25,7 +25,7 @@ export default class StyleCore extends Core {
 				layoutPadding: this.getValue("layoutPadding"),
 			})
 		},
-		"app.autoDarkModeToogle": (value) => {
+		"style.autoDarkModeToogle": (value) => {
 			if (value === true) {
 				this.handleAutoColorScheme()
 			} else {

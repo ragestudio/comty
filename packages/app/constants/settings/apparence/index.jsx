@@ -33,7 +33,7 @@ export default [
         "component": "Switch",
         "icon": "Moon",
         "title": "Auto dark mode",
-        "emitEvent": "app.autoDarkModeToogle",
+        "emitEvent": "style.autoDarkModeToogle",
     },
     {
         "experimental": true,
