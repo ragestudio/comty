@@ -58,9 +58,9 @@ export default class StreamViewer extends React.Component {
         await this.loadWithProtocol[this.state.loadedProtocol]()
 
         // make the interface a bit confortable for a video player
-        //app.style.applyVariant("dark")
+        app.style.applyVariant("dark")
 
-        app.eventBus.emit("toogleCompactMode", true)
+        app.eventBus.emit("style.compactMode", true)
 
         app.SidebarController.toggleVisibility(false)
 
@@ -80,7 +80,7 @@ export default class StreamViewer extends React.Component {
     componentWillUnmount = () => {
         app.style.applyVariant(app.settings.get("themeVariant"))
 
-        app.eventBus.emit("toogleCompactMode", false)
+        app.eventBus.emit("style.compactMode", false)
 
         app.SidebarController.toggleVisibility(true)
 
