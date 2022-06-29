@@ -12,6 +12,19 @@ export default class StyleCore extends Core {
 	currentVariant = null
 
 	events = {
+		"style.compactMode": (value = !window.app.settings.get("style.compactMode")) => {
+			if (value) {
+				return this.update({
+					layoutMargin: 0,
+					layoutPadding: 0,
+				})
+			}
+
+			return this.update({
+				layoutMargin: this.getValue("layoutMargin"),
+				layoutPadding: this.getValue("layoutPadding"),
+			})
+		},
 		"app.autoDarkModeToogle": (value) => {
 			if (value === true) {
 				this.handleAutoColorScheme()
