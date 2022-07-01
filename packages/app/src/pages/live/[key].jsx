@@ -2,47 +2,92 @@ import React from "react"
 import config from "config"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import moment from "moment"
 
 import Plyr from "plyr"
 import Hls from "hls.js"
-import mpegts from "mpegts.js"
 
 import "plyr/dist/plyr.css"
 import "./index.less"
 
-const streamsSource = config.remotes.streamingApi
-
 export default class StreamViewer extends React.Component {
     state = {
         isEnded: false,
-        isLoading: true,
+        sourceLoading: true,
         endResult: false,
 
         userData: null,
         streamInfo: null,
         spectators: 0,
-        timeFromNow: "00:00:00",
 
         player: null,
         streamKey: null,
-        streamSource: null,
-        loadedProtocol: "flv",
-        protocolInstance: null,
+        loadedDecoder: "hls",
+        decoderInstance: null,
         plyrOptions: {},
     }
 
     videoPlayerRef = React.createRef()
 
-    componentDidMount = async () => {
-        window.StreamViewer = {
-            updateQuality: this.updateQuality,
-            switchProtocol: this.switchProtocol,
-        }
+    playerDecoderEvents = {
+        [Hls.Events.FPS_DROP]: (event, data) => {
+            console.log("FPS_DROP Detected", data)
+        },
+    }
 
+    attachDecoder = {
+        hls: (source) => {
+            if (!source) {
+                console.error("Stream source is not defined")
+                return false
+            }
+
+            this.toogleSourceLoading(true)
+
+            const hlsInstance = new Hls({
+                autoStartLoad: true,
+            })
+
+            hlsInstance.attachMedia(this.videoPlayerRef.current)
+
+            hlsInstance.on(Hls.Events.MEDIA_ATTACHED, () => {
+                hlsInstance.loadSource(source)
+
+                hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+                    console.log(`${data.levels.length} quality levels found`)
+
+                    this.toogleSourceLoading(false)
+
+                    // try auto play
+                    this.videoPlayerRef.current.play()
+                })
+            })
+
+            hlsInstance.on(Hls.Events.ERROR, function (event, data) {
+                console.error(event, data)
+
+                switch (data.details) {
+                    case Hls.ErrorDetails.FRAG_LOAD_ERROR: {
+                        console.error(`Error loading fragment ${data.frag.url}`)
+                        return
+                    }
+                    default: {
+                        return
+                    }
+                }
+            })
+
+            // register player decoder events
+            Object.keys(this.playerDecoderEvents).forEach(event => {
+                hlsInstance.on(event, this.playerDecoderEvents[event])
+            })
+
+            this.setState({ decoderInstance: hlsInstance, loadedDecoder: "hls" })
+        }
+    }
+
+    componentDidMount = async () => {
         const requestedUsername = this.props.match.params.key
 
-        const source = `${streamsSource}/${requestedUsername}`
         const player = new Plyr("#player", {
             autoplay: true,
             controls: ["play", "mute", "volume", "fullscreen", "options", "settings"],
@@ -52,41 +97,42 @@ export default class StreamViewer extends React.Component {
         await this.setState({
             player,
             streamKey: requestedUsername,
-            streamSource: source,
         })
 
-        await this.loadWithProtocol[this.state.loadedProtocol]()
+        // TODO: Get sourceUri from server
+        const sourceUri = `${config.remotes.streamingApi}/${this.state.streamKey}/index.m3u8`
 
+        await this.loadDecoder("hls", sourceUri)
+
+        // enter player
+        this.enterPlayerAnimation()
+
+        // fetch user info in the background
+        this.gatherUserInfo()
+
+        // fetch stream info in the background
+        //await this.gatherStreamInfo()
+    }
+
+    componentWillUnmount = () => {
+        this.exitPlayerAnimation()
+    }
+
+    enterPlayerAnimation = () => {
         // make the interface a bit confortable for a video player
         app.style.applyVariant("dark")
 
         app.eventBus.emit("style.compactMode", true)
 
         app.SidebarController.toggleVisibility(false)
-
-        // fetch user info in the background
-        this.gatherUserInfo()
-
-        // fetch stream info in the background
-        // await for it
-        await this.gatherStreamInfo()
-
-        // // create timer
-        // if (this.state.streamInfo.connectCreated) {
-        //     this.createTimerCounter()
-        // }
     }
 
-    componentWillUnmount = () => {
+    exitPlayerAnimation = () => {
         app.style.applyVariant(app.settings.get("themeVariant"))
 
         app.eventBus.emit("style.compactMode", false)
 
         app.SidebarController.toggleVisibility(true)
-
-        if (this.timerCounterInterval) {
-            this.timerCounterInterval = clearInterval(this.timerCounterInterval)
-        }
     }
 
     gatherStreamInfo = async () => {
@@ -121,21 +167,6 @@ export default class StreamViewer extends React.Component {
         }
     }
 
-    createTimerCounter = () => {
-        this.timerCounterInterval = setInterval(() => {
-            const secondsFromNow = moment().diff(moment(this.state.streamInfo.connectCreated), "seconds")
-
-            // calculate hours minutes and seconds
-            const hours = Math.floor(secondsFromNow / 3600)
-            const minutes = Math.floor((secondsFromNow - hours * 3600) / 60)
-            const seconds = secondsFromNow - hours * 3600 - minutes * 60
-
-            this.setState({
-                timeFromNow: `${hours}:${minutes}:${seconds}`,
-            })
-        }, 1000)
-    }
-
     updateQuality = (newQuality) => {
         if (loadedProtocol === "hls") {
             this.state.protocolInstance.levels.forEach((level, levelIndex) => {
@@ -150,99 +181,33 @@ export default class StreamViewer extends React.Component {
         }
     }
 
-    switchProtocol = (protocol) => {
-        if (typeof this.state.protocolInstance.destroy === "function") {
-            this.state.protocolInstance.destroy()
+    loadDecoder = async (decoder, ...args) => {
+        if (typeof this.attachDecoder[decoder] === "undefined") {
+            console.error("Protocol not supported")
+            return false
         }
 
-        this.setState({ protocolInstance: null })
+        // check if decoder is already loaded
+        if (this.state.decoderInstance) {
+            if (typeof this.state.decoderInstance.destroy === "function") {
+                this.state.decoderInstance.destroy()
+            }
 
-        console.log("Switching to " + protocol)
-        this.loadWithProtocol[protocol]()
+            this.setState({ decoderInstance: null })
+        }
+
+        console.log("Switching to " + decoder)
+
+        return await this.attachDecoder[decoder](...args)
     }
 
-    loadWithProtocol = {
-        hls: () => {
-            const source = `${streamsSource}/media/${this.state.streamKey}/index.m3u8`
-            const hls = new Hls()
-
-            hls.loadSource(source)
-            hls.attachMedia(this.videoPlayerRef.current)
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                const levels = hls.levels
-
-                const quality = {
-                    default: levels[levels.length - 1].height,
-                    options: levels.map((level) => level.height),
-                    forced: true,
-                    onChange: (newQuality) => {
-                        console.log('changes', newQuality)
-
-                        levels.forEach((level, levelIndex) => {
-                            if (level.height === newQuality) {
-                                hls.currentLevel = levelIndex
-                            }
-                        })
-
-                    },
-                }
-
-                this.setState({
-                    plyrOptions: {
-                        quality,
-                        ...this.state.plyrOptions
-                    }
-                })
-            })
-
-            this.setState({ protocolInstance: hls, loadedProtocol: "hls" })
-        },
-        flv: () => {
-            const source = `${streamsSource}/stream/flv/${this.state.streamKey}`
-
-            const instance = mpegts.createPlayer({
-                enableWorker: true,
-                type: "flv",
-                url: source,
-                cors: true,
-                isLive: true
-            })
-
-            instance.attachMediaElement(this.videoPlayerRef.current)
-            instance.load()
-            instance.play()
-
-            instance.on("error", (error) => {
-                console.error(error)
-                antd.message.error(error.toString())
-
-                //this.onSourceEnded(error)
-            })
-
-            // instance.on("onSourceOpen", this.onSourceLoading)
-            // instance.on(mpegts.Events["LOADING_COMPLETE"], this.onSourceLoadingDone)
-            // instance.on("onSourceEnded", this.onSourceEnded)
-
-            this.setState({ protocolInstance: instance, loadedProtocol: "flv" })
-        },
-    }
-
-    onSourceLoading = () => {
-        this.setState({
-            isLoading: true,
-        })
-    }
-
-    onSourceLoadingDone = () => {
-        console.log(`loaded ${this.state.loadedProtocol}`)
-        this.setState({
-            isLoading: false,
-        })
+    toogleSourceLoading = (to) => {
+        this.setState({ sourceLoading: to ?? !this.state.sourceLoading })
     }
 
     onSourceEnded = () => {
         console.log("Source ended")
+
         this.setState({ isEnded: true })
     }
 
