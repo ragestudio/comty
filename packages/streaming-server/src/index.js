@@ -343,6 +343,11 @@ class StreamingServer {
     initialize = async () => {
         await this.Db.connect()
 
+        // fix cors
+        this.IHTTPServer.httpInterface.options("*", require("cors")({
+            origin: "localhost"
+        }))
+
         await this.IHTTPServer.initialize()
         await this.IMediaServer.run()
     }
