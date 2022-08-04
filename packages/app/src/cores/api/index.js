@@ -82,7 +82,6 @@ export default class ApiCore extends Core {
             onResponse: handleResponse,
             ...params,
             origin: params.httpAddress ?? config.remotes.mainApi,
-            wsOrigin: params.wsAddress ?? config.remotes.websocketApi,
         }
 
         const bridge = new Bridge(bridgeOptions)
