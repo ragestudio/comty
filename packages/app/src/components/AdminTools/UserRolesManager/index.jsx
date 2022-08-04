@@ -12,7 +12,7 @@ export default class UserRolesManager extends React.Component {
         roles: null,
     }
 
-    api = window.app.request
+    api = window.app.api.withEndpoints("main")
 
     componentDidMount = async () => {
         await this.fetchRoles()

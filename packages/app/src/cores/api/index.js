@@ -7,50 +7,40 @@ export default class ApiCore extends Core {
     constructor(props) {
         super(props)
 
-        this.apiBridge = this.createBridge()
+        this.namespaces = Object()
 
-        this.WSInterface = {
-            ...this.apiBridge.wsInterface,
-            request: this.WSRequest,
-            listen: this.listenEvent,
-            unlisten: this.unlistenEvent,
-            mainSocketConnected: false
+        this.ctx.registerPublicMethod("api", this)
+    }
+
+    request = (namespace = "main", method, endpoint, ...args) => {
+        if (!this.namespaces[namespace]) {
+            throw new Error(`Namespace ${namespace} not found`)
         }
 
-        this.ctx.registerPublicMethod("api", this.apiBridge)
-        this.ctx.registerPublicMethod("ws", this.WSInterface)
-        this.ctx.registerPublicMethod("request", this.apiBridge.endpoints)
-        this.ctx.registerPublicMethod("WSRequest", this.WSInterface.wsEndpoints)
+        if (!this.namespaces[namespace].endpoints[method]) {
+            throw new Error(`Method ${method} not found`)
+        }
+
+        if (!this.namespaces[namespace].endpoints[method][endpoint]) {
+            throw new Error(`Endpoint ${endpoint} not found`)
+        }
+
+        return this.namespaces[namespace].endpoints[method][endpoint](...args)
     }
 
-    async intialize() {
-        this.WSInterface.sockets.main.on("authenticated", () => {
-            console.debug("[WS] Authenticated")
-        })
-        this.WSInterface.sockets.main.on("authenticateFailed", (error) => {
-            console.error("[WS] Authenticate Failed", error)
-        })
+    withEndpoints = (namespace = "main") => {
+        if (!this.namespaces[namespace]) {
+            throw new Error(`Namespace ${namespace} not found`)
+        }
 
-        this.WSInterface.sockets.main.on("connect", () => {
-            this.ctx.eventBus.emit("websocket_connected")
-
-            this.WSInterface.mainSocketConnected = true
-        })
-
-        this.WSInterface.sockets.main.on("disconnect", (...context) => {
-            this.ctx.eventBus.emit("websocket_disconnected", ...context)
-
-            this.WSInterface.mainSocketConnected = false
-        })
-
-        this.WSInterface.sockets.main.on("connect_error", (...context) => {
-            this.ctx.eventBus.emit("websocket_connection_error", ...context)
-
-            this.WSInterface.mainSocketConnected = false
-        })
+        return this.namespaces[namespace].endpoints
     }
 
-    createBridge() {
+    connectBridge = (key, params) => {
+        this.namespaces[key] = this.createBridge(params)
+    }
+
+    createBridge(params = {}) {
         const getSessionContext = async () => {
             const obj = {}
             const token = await Session.token
@@ -80,111 +70,103 @@ export default class ApiCore extends Core {
             }
         }
 
-        return new Bridge({
-            origin: config.remotes.mainApi,
-            wsOrigin: config.remotes.websocketApi,
+        if (typeof params !== "object") {
+            throw new Error("Params must be an object")
+        }
+
+        const bridgeOptions = {
             wsOptions: {
                 autoConnect: false,
             },
             onRequest: getSessionContext,
             onResponse: handleResponse,
-        })
-    }
-
-    async attachWSConnection() {
-        if (!this.WSInterface.sockets.main.connected) {
-            await this.WSInterface.sockets.main.connect()
+            ...params,
+            origin: params.httpAddress ?? config.remotes.mainApi,
+            wsOrigin: params.wsAddress ?? config.remotes.websocketApi,
         }
 
-        let startTime = null
-        let latency = null
-        let latencyWarning = false
+        const bridge = new Bridge(bridgeOptions)
 
-        let pingInterval = setInterval(() => {
-            if (!this.WSInterface.mainSocketConnected) {
-                return clearTimeout(pingInterval)
+        // handle main ws events
+        const mainWSSocket = bridge.wsInterface.sockets["main"]
+
+        mainWSSocket.on("authenticated", () => {
+            console.debug("[WS] Authenticated")
+        })
+
+        mainWSSocket.on("authenticateFailed", (error) => {
+            console.error("[WS] Authenticate Failed", error)
+        })
+
+        mainWSSocket.on("connect", () => {
+            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.connect`)
+        })
+
+        mainWSSocket.on("disconnect", (...context) => {
+            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.disconnect`, ...context)
+        })
+
+        mainWSSocket.on("connect_error", (...context) => {
+            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.connect_error`, ...context)
+        })
+
+        // generate functions
+        bridge.listenEvent = this.generateMainWSEventListener(bridge.wsInterface)
+        bridge.unlistenEvent = this.generateMainWSEventUnlistener(bridge.wsInterface)
+
+        // return bridge
+        return bridge
+    }
+
+    generateMainWSEventListener(obj) {
+        return (to, fn) => {
+            if (typeof to === "undefined") {
+                console.error("handleWSListener: to must be defined")
+                return false
+            }
+            if (typeof fn !== "function") {
+                console.error("handleWSListener: fn must be function")
+                return false
             }
 
-            startTime = Date.now()
-            this.WSInterface.sockets.main.emit("ping")
-        }, 2000)
+            let ns = "main"
+            let event = null
 
-        this.WSInterface.sockets.main.on("pong", () => {
-            latency = Date.now() - startTime
-
-            if (latency > 800 && this.WSInterface.mainSocketConnected) {
-                latencyWarning = true
-                console.error("[WS] Latency is too high > 800ms", latency)
-                window.app.eventBus.emit("websocket_latency_too_high", latency)
-            } else if (latencyWarning && this.WSInterface.mainSocketConnected) {
-                latencyWarning = false
-                window.app.eventBus.emit("websocket_latency_normal", latency)
+            if (typeof to === "string") {
+                event = to
+            } else if (typeof to === "object") {
+                ns = to.ns
+                event = to.event
             }
-        })
-    }
 
-    async attachAPIConnection() {
-        await this.apiBridge.initialize()
-    }
-
-    listenEvent = (to, fn) => {
-        if (typeof to === "undefined") {
-            console.error("handleWSListener: to must be defined")
-            return false
-        }
-        if (typeof fn !== "function") {
-            console.error("handleWSListener: fn must be function")
-            return false
-        }
-
-        let ns = "main"
-        let event = null
-
-        if (typeof to === "string") {
-            event = to
-        } else if (typeof to === "object") {
-            ns = to.ns
-            event = to.event
-        }
-
-        return window.app.ws.sockets[ns].on(event, async (...context) => {
-            return await fn(...context)
-        })
-    }
-
-    unlistenEvent = (to, fn) => {
-        if (typeof to === "undefined") {
-            console.error("handleWSListener: to must be defined")
-            return false
-        }
-        if (typeof fn !== "function") {
-            console.error("handleWSListener: fn must be function")
-            return false
-        }
-
-        let ns = "main"
-        let event = null
-
-        if (typeof to === "string") {
-            event = to
-        } else if (typeof to === "object") {
-            ns = to.ns
-            event = to.event
-        }
-
-        return window.app.ws.sockets[ns].removeListener(event, fn)
-    }
-
-    WSRequest = (socket = "main", channel, ...args) => {
-        return new Promise(async (resolve, reject) => {
-            const request = await window.app.ws.sockets[socket].emit(channel, ...args)
-
-            request.on("responseError", (...errors) => {
-                return reject(...errors)
+            return obj.sockets[ns].on(event, async (...context) => {
+                return await fn(...context)
             })
-            request.on("response", (...responses) => {
-                return resolve(...responses)
-            })
-        })
+        }
+    }
+
+    generateMainWSEventUnlistener(obj) {
+        return (to, fn) => {
+            if (typeof to === "undefined") {
+                console.error("handleWSListener: to must be defined")
+                return false
+            }
+            if (typeof fn !== "function") {
+                console.error("handleWSListener: fn must be function")
+                return false
+            }
+
+            let ns = "main"
+            let event = null
+
+            if (typeof to === "string") {
+                event = to
+            } else if (typeof to === "object") {
+                ns = to.ns
+                event = to.event
+            }
+
+            return obj.sockets[ns].removeListener(event, fn)
+        }
     }
 }

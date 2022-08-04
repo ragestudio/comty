@@ -11,7 +11,7 @@ export default class Users extends React.Component {
 		selectionEnabled: false,
 	}
 
-	api = window.app.request
+	api = window.app.api.withEndpoints("main")
 
 	componentDidMount = async () => {
 		await this.loadData()

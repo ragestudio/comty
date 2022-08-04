@@ -35,7 +35,7 @@ export default [
         "onUpdate": async (value) => {
             const selfId = await User.selfUserId()
 
-            const result = window.app.request.post.updateUser({
+            const result = window.app.api.withEndpoints("main").post.updateUser({
                 _id: selfId,
                 update: {
                     fullName: value
@@ -52,7 +52,7 @@ export default [
                 "icon": "Delete",
                 "title": "Unset",
                 "onClick": async () => {
-                    window.app.request.post.unsetPublicName()
+                    window.app.api.withEndpoints("main").post.unsetPublicName()
                 }
             }
         ],
@@ -78,7 +78,7 @@ export default [
         "onUpdate": async (value) => {
             const selfId = await User.selfUserId()
 
-            const result = window.app.request.post.updateUser({
+            const result = window.app.api.withEndpoints("main").post.updateUser({
                 _id: selfId,
                 update: {
                     email: value
@@ -105,7 +105,7 @@ export default [
         "onUpdate": async (value) => {
             const selfId = await User.selfUserId()
 
-            const result = window.app.request.post.updateUser({
+            const result = window.app.api.withEndpoints("main").post.updateUser({
                 _id: selfId,
                 update: {
                     avatar: value
@@ -132,7 +132,7 @@ export default [
         "onUpdate": async (value) => {
             const selfId = await User.selfUserId()
 
-            const result = window.app.request.post.updateUser({
+            const result = window.app.api.withEndpoints("main").post.updateUser({
                 _id: selfId,
                 update: {
                     cover: value
@@ -173,7 +173,7 @@ export default [
         "onUpdate": async (value) => {
             const selfId = await User.selfUserId()
 
-            const result = window.app.request.post.updateUser({
+            const result = window.app.api.withEndpoints("main").post.updateUser({
                 _id: selfId,
                 update: {
                     description: value

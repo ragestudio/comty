@@ -2,7 +2,7 @@ import Session from "../session"
 
 export default class User {
     static get bridge() {
-        return window.app?.request
+        return window.app?.api.withEndpoints("main")
     }
 
     static async data() {
