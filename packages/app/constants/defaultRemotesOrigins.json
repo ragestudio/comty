@@ -1,6 +1,5 @@
 {
     "main_api": "https://api.comty.pw",
     "auth_api": "https://auth.ragestudio.net",
-    "streaming_api": "https://live.comty.pw",
-    "websocket_api": "wss://ws.comty.pw"
+    "streaming_api": "https://live.comty.pw"
 }

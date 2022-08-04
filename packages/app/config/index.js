@@ -7,19 +7,16 @@ const envOrigins = {
     "development": {
         mainApi: `http://${window.location.hostname}:3000`,
         authApi: `http://${window.location.hostname}:4000`,
-        websocketApi: `ws://${window.location.hostname}:3001`,
         streamingApi: `http://${window.location.hostname}:3002`,
     },
     "indev": {
         mainApi: "https://indev_api.comty.pw",
         authApi: `http://indev_auth.comty.pw`,
-        websocketApi: "wss://indev_ws.comty.pw",
         streamingApi: "https://indev_live.comty.pw",
     },
     "nightly": {
         mainApi: "https://nightly_api.comty.pw",
         authApi: `https://nightly_auth.comty.pw`,
-        websocketApi: "wss://nightly_ws.comty.pw",
         streamingApi: "https://nightly_live.comty.pw"
     }
 }
@@ -38,7 +35,6 @@ export default {
     remotes: {
         mainApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].mainApi : defaultRemotesOrigins.main_api,
         authApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].authApi : defaultRemotesOrigins.auth_api,
-        websocketApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].websocketApi : defaultRemotesOrigins.websocket_api,
         streamingApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].streamingApi : defaultRemotesOrigins.streaming_api,
     },
     app: {
