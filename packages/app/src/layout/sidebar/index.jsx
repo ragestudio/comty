@@ -27,6 +27,7 @@ export default class Sidebar extends React.Component {
 			toggleVisibility: this.toggleVisibility,
 			toggleEdit: this.toggleEditMode,
 			toggleElevation: this.toggleElevation,
+			attachElement: this.attachElement,
 			isVisible: () => this.state.visible,
 			isEditMode: () => this.state.visible,
 			isCollapsed: () => this.state.collapsed,
@@ -44,6 +45,7 @@ export default class Sidebar extends React.Component {
 				top: [],
 			},
 			elevated: false,
+			additionalElements: [],
 		}
 
 		window.app.eventBus.on("edit_sidebar", () => this.toggleEditMode())
@@ -73,6 +75,12 @@ export default class Sidebar extends React.Component {
 
 	getStoragedKeys = () => {
 		return window.app.settings.get("sidebarKeys")
+	}
+
+	attachElement = (element) => {
+		this.setState({
+			additionalElements: [...this.state.additionalElements, element],
+		})
 	}
 
 	appendItem = (item = {}) => {
@@ -329,6 +337,10 @@ export default class Sidebar extends React.Component {
 						</Menu>
 					</div>
 				)}
+
+				{!this.state.editMode && <div key="additionalElements" className="additionalElements">
+					{this.state.additionalElements}
+				</div>}
 
 				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
