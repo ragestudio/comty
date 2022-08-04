@@ -35,8 +35,10 @@ class DOMWindow {
 		}
 
 		this.element = document.createElement("div")
+
 		this.element.setAttribute("id", this.id)
 		this.element.setAttribute("key", this.key)
+		this.element.setAttribute("classname", this.props.className)
 
 		this.root.appendChild(this.element)
 	}
