@@ -25,6 +25,7 @@ export { default as ImageViewer } from "./ImageViewer"
 export { default as Login } from "./Login"
 export { default as Image } from "./Image"
 export { default as LoadMore } from "./LoadMore"
+export { default as EmbbededMediaPlayer } from "./EmbbededMediaPlayer"
 
 // BUTTONS
 export { default as LikeButton } from "./LikeButton"
