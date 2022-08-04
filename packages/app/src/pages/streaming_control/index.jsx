@@ -35,7 +35,7 @@ export default (props) => {
     const [serverTier, setServerTier] = React.useState(null)
 
     const checkStreamingKey = async () => {
-        const result = await app.request.get.streamingKey().catch((error) => {
+        const result = await app.api.withEndpoints("main").get.streamingKey().catch((error) => {
             console.error(error)
             antd.message.error(error.message)
 
@@ -48,7 +48,7 @@ export default (props) => {
     }
 
     const checkTagetServer = async () => {
-        const result = await app.request.get.targetStreamingServer()
+        const result = await app.api.withEndpoints("main").get.targetStreamingServer()
 
         if (result) {
             const targetServer = `${result.protocol}://${result.address}:${result.port}/${result.space}`
@@ -61,7 +61,7 @@ export default (props) => {
             title: "Regenerate streaming key",
             content: "Are you sure you want to regenerate the streaming key? After this, all other generated keys will be deleted.",
             onOk: async () => {
-                const result = await app.request.post.regenerateStreamingKey().catch((error) => {
+                const result = await app.api.withEndpoints("main").post.regenerateStreamingKey().catch((error) => {
                     console.error(error)
                     antd.message.error(error.message)
 

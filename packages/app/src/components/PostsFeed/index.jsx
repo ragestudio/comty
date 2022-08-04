@@ -30,7 +30,7 @@ export default class PostsFeed extends React.Component {
         renderList: [],
     }
 
-    api = window.app.request
+    api = window.app.api.withEndpoints()
 
     listRef = React.createRef()
 
@@ -48,7 +48,7 @@ export default class PostsFeed extends React.Component {
 
         // load ws events
         Object.keys(this.wsEvents).forEach((event) => {
-            window.app.ws.listen(event, this.wsEvents[event])
+            window.app.api.namespaces["main"].listenEvent(event, this.wsEvents[event])
         })
 
         // TODO: register keybindings to handle directions key scrolling to posts (use app.shortcuts)
@@ -67,7 +67,7 @@ export default class PostsFeed extends React.Component {
     componentWillUnmount = async () => {
         // unload ws events
         Object.keys(this.wsEvents).forEach((event) => {
-            window.app.ws.unlisten(event, this.wsEvents[event])
+            window.app.api.namespaces["main"].unlistenEvent(event, this.wsEvents[event])
         })
     }
 

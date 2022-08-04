@@ -12,7 +12,7 @@ export default class ImageUploader extends React.Component {
         urlList: [],
     }
 
-    api = window.app.request
+    api = window.app.api.withEndpoints("main")
 
     handleChange = ({ fileList }) => {
         this.setState({ fileList })
