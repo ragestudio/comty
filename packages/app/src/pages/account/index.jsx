@@ -82,7 +82,7 @@ export default class Account extends React.Component {
 		isNotExistent: false,
 	}
 
-	api = window.app.request
+	api = window.app.api.withEndpoints("main")
 
 	componentDidMount = async () => {
 		const token = await Session.decodedToken()

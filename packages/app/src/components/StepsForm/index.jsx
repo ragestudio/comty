@@ -18,7 +18,7 @@ export default class StepsForm extends React.Component {
         renderStep: null,
     }
 
-    api = window.app.request
+    api = window.app.api.withEndpoints("main")
 
     componentDidMount = async () => {
         if (this.props.defaultValues) {

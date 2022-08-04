@@ -136,7 +136,7 @@ export default class StreamViewer extends React.Component {
     }
 
     gatherStreamInfo = async () => {
-        const result = await app.request.get.streamInfoFromUsername(undefined, {
+        const result = await app.api.withEndpoints("main").get.streamInfoFromUsername(undefined, {
             username: this.state.streamKey,
         }).catch((error) => {
             console.error(error)
@@ -152,7 +152,7 @@ export default class StreamViewer extends React.Component {
     }
 
     gatherUserInfo = async () => {
-        const result = await app.request.get.user(undefined, {
+        const result = await app.api.withEndpoints("main").get.user(undefined, {
             username: this.state.streamKey,
         }).catch((error) => {
             console.error(error)

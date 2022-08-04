@@ -309,7 +309,7 @@ export const PostCard = React.memo(({
 
     React.useEffect(() => {
         // first listen to post changes
-        window.app.ws.listen(`post.dataUpdate.${data._id}`, onDataUpdate)
+        window.app.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
 
         // proccess post info
         // {...}
@@ -319,7 +319,7 @@ export const PostCard = React.memo(({
 
         return () => {
             // remove the listener
-            window.app.ws.unlisten(`post.dataUpdate.${data._id}`, onDataUpdate)
+            window.app.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
         }
     }, [])
 

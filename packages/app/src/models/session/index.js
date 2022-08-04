@@ -5,7 +5,7 @@ import { Storage } from '@capacitor/storage'
 
 export default class Session {
     static get bridge() {
-        return window.app?.request
+        return window.app?.api.withEndpoints("main")
     }
 
     static capStorage = async (method, value) => {

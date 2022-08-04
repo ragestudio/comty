@@ -313,12 +313,19 @@ class App extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
-					await this.props.cores.ApiCore.attachAPIConnection()
+					// mount main api bridge
+					await this.props.cores.ApiCore.connectBridge("main", {
+						locked: true
+					})
+
+					// and initialize it
+					await this.props.cores.ApiCore.namespaces["main"].initialize()
 
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.api_error", error)
-
+					console.error(`[App] Error while initializing api`, error)
+					
 					throw {
 						cause: "Cannot connect to API",
 						details: `Sorry but we cannot connect to the API. Please try again later. [${config.remotes.mainApi}]`,
@@ -353,20 +360,6 @@ class App extends React.Component {
 					}
 				}
 			},
-			async () => {
-				try {
-					await this.__WSInit()
-
-					app.eventBus.emit("app.initialization.ws_success")
-				} catch (error) {
-					app.eventBus.emit("app.initialization.ws_error", error)
-
-					throw {
-						cause: "Cannot connect to WebSocket",
-						details: error.message,
-					}
-				}
-			},
 		]
 
 		await Promise.tasked(initializationTasks).catch((reason) => {
@@ -392,14 +385,6 @@ class App extends React.Component {
 		})
 
 		await this.setState({ session })
-	}
-
-	__WSInit = async () => {
-		if (!this.state.session) {
-			return false
-		}
-
-		await this.props.cores.ApiCore.attachWSConnection()
 	}
 
 	__UserInit = async () => {

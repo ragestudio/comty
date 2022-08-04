@@ -71,7 +71,7 @@ export default class UserDataManager extends React.Component {
         loading: false,
     }
 
-    api = window.app.request
+    api = window.app.api.withEndpoints("main")
 
     componentDidMount = async () => {
         if (!this.props.user && this.props.userId) {
