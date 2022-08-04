@@ -313,19 +313,35 @@ class App extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
+					// get remotes origins from config
+					const defaultRemotes = config.remotes
+
+					// get storaged	remotes origins
+					const storedRemotes = await app.settings.get("remotes") ?? {}
+
 					// mount main api bridge
 					await this.props.cores.ApiCore.connectBridge("main", {
-						locked: true
+						origin: storedRemotes.mainApi ?? defaultRemotes.mainApi,
+						locked: true,
 					})
 
 					// and initialize it
 					await this.props.cores.ApiCore.namespaces["main"].initialize()
 
+					// now attach the auth server
+					await this.props.cores.ApiCore.connectBridge("auth", {
+						origin: storedRemotes.authApi ?? defaultRemotes.authApi,
+						locked: true,
+					})
+
+					// and initialize it
+					await this.props.cores.ApiCore.namespaces["auth"].initialize()
+
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.api_error", error)
 					console.error(`[App] Error while initializing api`, error)
-					
+
 					throw {
 						cause: "Cannot connect to API",
 						details: `Sorry but we cannot connect to the API. Please try again later. [${config.remotes.mainApi}]`,

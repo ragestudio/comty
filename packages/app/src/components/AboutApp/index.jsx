@@ -12,8 +12,6 @@ import "./index.less"
 
 export const Card = (props) => {
 	const isProduction = import.meta.env.PROD
-	const isWSMainConnected = window.app.ws.mainSocketConnected
-	const WSMainOrigin = app.ws.sockets.main.io.uri
 
 	return <ACard
 		bodyClassName="aboutApp_card"
@@ -35,12 +33,6 @@ export const Card = (props) => {
 			</div>
 		}
 	>
-		<div className="group">
-			<h3><Icons.Globe />Server information</h3>
-			<div>
-				<antd.Tag color={isWSMainConnected ? "green" : "red"}><Icons.Cpu />{WSMainOrigin}</antd.Tag>
-			</div>
-		</div>
 		<div className="group">
 			<h3><Icons.GitMerge />Versions</h3>
 			<div>
