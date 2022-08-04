@@ -12,7 +12,7 @@ import "./index.less"
 const maxMessageLength = 512
 
 export default (props) => {
-    const api = window.app.request
+    const api = window.app.api.withEndpoints("main")
 
     const additionsRef = React.useRef(null)
     const [pending, setPending] = React.useState([])

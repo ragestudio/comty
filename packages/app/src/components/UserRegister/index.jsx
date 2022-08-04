@@ -66,7 +66,7 @@ const steps = [
 ]
 
 export default (props) => {
-    const api = window.app.request
+    const api = window.app.api.withEndpoints("main")
 
     const onSubmit = async (values) => {
         const result = await api.post.register(values).catch((err) => {
