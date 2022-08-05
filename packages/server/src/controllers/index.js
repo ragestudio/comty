@@ -1,19 +1,8 @@
-import { default as ConfigController } from "./ConfigController"
-import { default as RolesController } from "./RolesController"
-import { default as SessionController } from "./SessionController"
-import { default as UserController } from "./UserController"
-import { default as FilesController } from "./FilesController"
-import { default as PublicController } from "./PublicController"
-import { default as PostsController } from "./PostsController"
-import { default as StreamingController } from "./StreamingController"
-
-export default [
-    PostsController,
-    ConfigController,
-    PublicController,
-    RolesController,
-    SessionController,
-    UserController,
-    FilesController,
-    StreamingController,
-]
+export { default as ConfigController } from "./ConfigController"
+export { default as RolesController } from "./RolesController"
+export { default as SessionController } from "./SessionController"
+export { default as UserController } from "./UserController"
+export { default as FilesController } from "./FilesController"
+export { default as PublicController } from "./PublicController"
+export { default as PostsController } from "./PostsController"
+export { default as StreamingController } from "./StreamingController"
