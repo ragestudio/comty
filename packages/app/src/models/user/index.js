@@ -45,14 +45,8 @@ export default class User {
         return token.user_id
     }
 
-    getAssignedWorkorders = async () => {
-        const token = await Session.decodedToken()
-
-        if (!token || !User.bridge) {
-            return false
-        }
-
-        return User.bridge.get.workorders({ username: token.username })
+    static async hasAdmin() {
+        return User.hasRole("admin")
     }
 
     getData = async (payload, callback) => {
@@ -65,15 +59,5 @@ export default class User {
         }
 
         return request.response.data
-    }
-
-    hasAdmin = async () => {
-        const roles = await User.roles()
-
-        if (!roles) {
-            return false
-        }
-
-        return Array.isArray(roles) && roles.includes("admin")
     }
 }
