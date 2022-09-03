@@ -8,6 +8,8 @@ import Drawer from "./drawer"
 import Sidedrawer from "./sidedrawer"
 import BottomBar from "./bottomBar"
 
+import routes from "schemas/routes"
+
 const LayoutRenders = {
 	mobile: (props) => {
 		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
@@ -87,8 +89,13 @@ export default class Layout extends React.PureComponent {
 			}
 		})
 
+		// this is a hacky one to fix app.setLocation not working on when app not render a router
 		window.app.setLocation = (location) => {
-			return window.history.pushState(null, null, location)
+			// update history
+			window.history.pushState(null, null, location)
+
+			// reload page
+			window.location.reload()
 		}
 	}
 
@@ -121,6 +128,26 @@ export default class Layout extends React.PureComponent {
 			}
 
 			return JSON.stringify(this.state.renderError)
+		}
+
+		console.debug(`Rendering layout [${this.state.layoutType}] for current route [${window.location.pathname}]`)
+
+		// check with the current route if it's a protected route or requires some permissions
+		const routeDeclaration = routes.find((route) => route.path === window.location.pathname)
+
+		if (routeDeclaration) {
+			if (typeof routeDeclaration.requiredRoles !== "undefined") {
+				const isAdmin = this.props.user?.roles?.includes("admin") ?? false
+
+				if (!isAdmin && !routeDeclaration.requiredRoles.some((role) => this.props.user?.roles?.includes(role))) {
+					return <antd.Result
+						status="403"
+						title="403"
+						subTitle="Sorry, you are not authorized to access this page."
+						extra={<antd.Button type="primary" onClick={() => window.app.setLocation("/")}>Back Home</antd.Button>}
+					/>
+				}
+			}
 		}
 
 		const layoutComponentProps = {
