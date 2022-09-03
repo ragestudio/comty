@@ -354,6 +354,11 @@ export default class SettingsMenu extends React.PureComponent {
 	generateSettingsGroups = (data) => {
 		let groups = {}
 
+		if (!Array.isArray(data)) {
+			console.error("Cannot generate settings groups from non-array data")
+			return groups
+		}
+
 		data.forEach((item) => {
 			if (!groups[item.group]) {
 				groups[item.group] = []
