@@ -1,38 +1,23 @@
 import cookies from "js-cookie"
 import jwt_decode from "jwt-decode"
 import config from "config"
-import { Storage } from '@capacitor/storage'
 
 export default class Session {
     static get bridge() {
         return window.app?.api.withEndpoints("main")
     }
 
-    static capStorage = async (method, value) => {
-        const res = await Storage[method]({ key: this.tokenKey, value })
-        return res.value
-    }
-
     static tokenKey = config.app?.storage?.token ?? "token"
 
     static get token() {
-        if (window.app.isAppCapacitor()) {
-            return this.capStorage("get")
-        }
         return cookies.get(this.tokenKey)
     }
 
     static set token(token) {
-        if (window.app.isAppCapacitor()) {
-            return this.capStorage("set", token)
-        }
         return cookies.set(this.tokenKey, token)
     }
 
     static async delToken() {
-        if (window.app.isAppCapacitor()) {
-            return this.capStorage("remove")
-        }
         return cookies.remove(Session.tokenKey)
     }
 
