@@ -1,27 +1,53 @@
 [
     {
+        "id": "login",
+        "path": "/login",
+        "title": "Login",
+        "icon": "Login",
+        "useLayout": "login"
+    },
+    {
         "id": "home",
+        "path": "/home",
         "title": "Home",
-        "icon": "Home"
+        "icon": "Home",
+        "reachable": true
     },
     {
         "id": "saved",
+        "path": "/saved",
         "title": "Saved",
-        "icon": "Archive"
+        "icon": "Archive",
+        "reachable": true
     },
     {
         "id": "marketplace",
+        "path": "/marketplace",
         "title": "Marketplace",
-        "icon": "Package"
+        "icon": "Package",
+        "reachable": true
     },
     {
         "id": "streams",
+        "path": "/streams",
         "title": "Streams",
-        "icon": "Tv"
+        "icon": "Tv",
+        "reachable": true
     },
     {
         "id": "streaming_control",
+        "path": "/streaming_control",
         "title": "Streaming Control",
         "icon": "Video"
+    },
+    {
+        "id": "administration",
+        "path": "/administration",
+        "title": "Administration",
+        "icon": "MdOutlineAdminPanelSettings",
+        "webTitleAddition": "Administration Mode",
+        "requiredRoles": [
+            "admin"
+        ]
     }
 ]
