@@ -101,7 +101,7 @@ class App extends React.Component {
 			app.eventBus.emit("forceToLogin")
 		},
 		"forceToLogin": () => {
-			window.app.setLocation("/main")
+			window.app.setLocation("/login")
 			app.eventBus.emit("app.createLogin")
 		},
 		"invalid_session": async (error) => {
@@ -325,7 +325,6 @@ class App extends React.Component {
 						locked: true,
 					})
 
-					// and initialize it
 					await this.props.cores.ApiCore.namespaces["main"].initialize()
 
 					// now attach the auth server
@@ -334,8 +333,13 @@ class App extends React.Component {
 						locked: true,
 					})
 
-					// and initialize it
 					await this.props.cores.ApiCore.namespaces["auth"].initialize()
+
+					// now attach the content server
+					await this.props.cores.ApiCore.connectBridge("content", {
+						origin: storedRemotes.contentApi ?? defaultRemotes.contentApi,
+						locked: true,
+					})
 
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
