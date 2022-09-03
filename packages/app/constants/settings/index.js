@@ -1,6 +1,7 @@
 import AppSettings from "./app"
 import AccountSettings from "./account"
 import ApparenceSettings from "./apparence"
+import ExtensionsSettings from "./extensions"
 
 export default {
     app: {
@@ -18,4 +19,9 @@ export default {
         label: "Apparence",
         settings: ApparenceSettings
     },
+    extensions: {
+        icon: "MdOutlineWidgets",
+        label: "Extensions",
+        settings: ExtensionsSettings
+    }
 }
