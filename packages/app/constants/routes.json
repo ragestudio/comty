@@ -1,13 +1,8 @@
 [
     {
-        "id": "main",
-        "title": "Dashboard",
+        "id": "home",
+        "title": "Home",
         "icon": "Home"
-    },
-    {
-        "id": "explore",
-        "title": "Explore",
-        "icon": "Compass"
     },
     {
         "id": "saved",
