@@ -1,6 +1,7 @@
 import SettingsCore from "./settings"
 import APICore from "./api"
 import StyleCore from "./style"
+import PermissionsCore from "./permissions"
 
 import I18nCore from "./i18n"
 import NotificationsCore from "./notifications"
@@ -13,6 +14,7 @@ import mediaPlayer from "./mediaPlayer"
 export default [
     SettingsCore,
     APICore,
+    PermissionsCore,
     StyleCore,
     I18nCore,
     SoundCore,
