@@ -116,7 +116,7 @@ export default class Login extends React.Component {
                 <div className="session_card">
                     @{this.props.session.username}
                 </div>
-                <antd.Button type="primary" onClick={() => window.app.setLocation(config.app?.mainPath ?? "/main")} >Go to main</antd.Button>
+                <antd.Button type="primary" onClick={() => window.app.setLocation(config.app?.mainPath ?? "/home")} >Go to main</antd.Button>
             </div>}
             <FormGenerator
                 name="normal_login"

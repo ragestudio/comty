@@ -7,16 +7,19 @@ const envOrigins = {
     "development": {
         mainApi: `http://${window.location.hostname}:3000`,
         authApi: `http://${window.location.hostname}:4000`,
+        contentApi: `http://${window.location.hostname}:3050`,
         streamingApi: `http://${window.location.hostname}:3002`,
     },
     "indev": {
         mainApi: "https://indev_api.comty.pw",
         authApi: `http://indev_auth.comty.pw`,
+        contentApi: `http://indev_content.comty.pw`,
         streamingApi: "https://indev_live.comty.pw",
     },
     "nightly": {
         mainApi: "https://nightly_api.comty.pw",
         authApi: `https://nightly_auth.comty.pw`,
+        contentApi: `https://nightly_content.comty.pw`,
         streamingApi: "https://nightly_live.comty.pw"
     }
 }
@@ -40,7 +43,7 @@ export default {
     app: {
         title: packagejson.name,
         siteName: "Comty",
-        mainPath: "/main",
+        mainPath: "/home",
         storage: {
             basics: "user",
             token: "token",
