@@ -32,7 +32,7 @@ export default class Users extends React.Component {
 			return false
 		}
 
-		window.app.setLocation(`/account`, { username })
+		window.app.setLocation(`/@${username}`)
 	}
 
 	renderRoles(roles) {
