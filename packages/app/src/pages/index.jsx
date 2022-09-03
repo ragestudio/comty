@@ -1,5 +1,7 @@
 import React from "react"
+import config from "config"
 
 export default (props) => {
-    return window.app.setLocation("/main")
+    window.app.setLocation(config.app?.mainPath ?? "/home")
+    return <div />
 }
