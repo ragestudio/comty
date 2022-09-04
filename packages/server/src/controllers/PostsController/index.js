@@ -4,7 +4,7 @@ import { Post, User } from "../../models"
 
 export default class PostsController extends Controller {
     static refName = "PostsController"
-    static useMiddlewares = ["withAuthentication"]
+    //static useMiddlewares = ["withAuthentication"]
 
     methods = {
         createPost: async (payload) => {
@@ -142,118 +142,159 @@ export default class PostsController extends Controller {
     }
 
     get = {
-        "/feed": Schematized({
-            select: ["user_id"]
-        }, async (req, res) => {
-            const feedLimit = req.query?.limit ?? 20
-            const feedTrimIndex = req.query?.trim ?? 0
+        "/feed": {
+            fn: Schematized({
+                select: ["user_id"]
+            }, async (req, res) => {
+                const feedLimit = req.query?.limit ?? 20
+                const feedTrimIndex = req.query?.trim ?? 0
 
-            // make sure that sort by date descending
-            // trim index is used to get the last n posts
-            let posts = await Post.find(req.selection)
-                .sort({ created_at: -1 })
-                .skip(feedTrimIndex)
-                .limit(feedLimit)
+                // make sure that sort by date descending
+                // trim index is used to get the last n posts
+                let posts = await Post.find(req.selection)
+                    .sort({ created_at: -1 })
+                    .skip(feedTrimIndex)
+                    .limit(feedLimit)
 
-            // fetch and add user data to each post
-            posts = posts.map(async (post, index) => {
+                // fetch and add user data to each post
+                posts = posts.map(async (post, index) => {
+                    const user = await User.findById(post.user_id)
+
+                    if (feedTrimIndex > 0) {
+                        index = Number(feedTrimIndex) + Number(index)
+                    }
+
+                    return {
+                        ...post.toObject(),
+                        user: user.toObject(),
+                        key: index,
+                    }
+                })
+
+                posts = await Promise.all(posts)
+
+                return res.json(posts)
+            })
+        },
+        "/post": {
+            fn: Schematized({
+                select: ["post_id"],
+                required: ["post_id"]
+            }, async (req, res) => {
+                if (typeof req.selection.post_id !== "string") {
+                    return res.status(400).json({
+                        error: "post_id must be a string"
+                    })
+                }
+
+                const post = await Post.findById(req.selection.post_id).catch(() => null)
+
+                if (!post) {
+                    return res.status(404).json({
+                        error: "Post not found"
+                    })
+                }
+
                 const user = await User.findById(post.user_id)
 
-                if (feedTrimIndex > 0) {
-                    index = Number(feedTrimIndex) + Number(index)
-                }
-
-                return {
+                return res.json({
                     ...post.toObject(),
                     user: user.toObject(),
-                    key: index,
-                }
+                })
             })
-
-            posts = await Promise.all(posts)
-
-            return res.json(posts)
-        }),
+        }
     }
 
     put = {
-        "/post": Schematized({
-            required: ["message"],
-            select: ["message", "additions"],
-        }, async (req, res) => {
-            const post = await this.methods.createPost({
-                user_id: req.user.id,
-                message: req.selection.message,
-                additions: req.selection.additions,
-            })
-
-            return res.json(post)
-        }),
-        "/toogle_like": Schematized({
-            required: ["post_id"],
-            select: ["post_id"],
-        }, async (req, res) => {
-            const post = await this.methods.toogleLike({
-                user_id: req.user._id.toString(),
-                post_id: req.selection.post_id,
-            }).catch((err) => {
-                return false
-            })
-
-            if (!post) {
-                return res.json({
-                    error: err.message,
-                    success: false
+        "/post": {
+            middlewares: ["withAuthentification"],
+            fn: Schematized({
+                required: ["message"],
+                select: ["message", "additions"],
+            }, async (req, res) => {
+                const post = await this.methods.createPost({
+                    user_id: req.user.id,
+                    message: req.selection.message,
+                    additions: req.selection.additions,
                 })
-            }
 
-            return res.json({
-                success: true,
-                post
+                return res.json(post)
             })
-        }),
-        "/like": Schematized({
-            required: ["post_id"],
-            select: ["post_id"],
-        }, async (req, res) => {
-            const post = await this.methods.likePost({
-                user_id: req.user._id.toString(),
-                post_id: req.selection.post_id,
-            }).catch((err) => {
-                return false
-            })
-
-            if (!post) {
-                return res.json({
-                    success: false,
+        },
+        "/toogle_like": {
+            middlewares: ["withAuthentification"],
+            fn: Schematized({
+                required: ["post_id"],
+                select: ["post_id"],
+            }, async (req, res) => {
+                const post = await this.methods.toogleLike({
+                    user_id: req.user._id.toString(),
+                    post_id: req.selection.post_id,
+                }).catch((err) => {
+                    return false
                 })
-            }
 
-            return res.json({
-                success: true,
-            })
-        }),
-        "/unlike": Schematized({
-            required: ["post_id"],
-            select: ["post_id"],
-        }, async (req, res) => {
-            const post = await this.methods.unlikePost({
-                user_id: req.user._id.toString(),
-                post_id: req.selection.post_id,
-            }).catch((err) => {
-                return false
-            })
+                if (!post) {
+                    return res.json({
+                        error: err.message,
+                        success: false
+                    })
+                }
 
-            if (!post) {
                 return res.json({
-                    success: false,
+                    success: true,
+                    post
                 })
-            }
-
-            return res.json({
-                success: true,
             })
-        }),
+        },
+        "/like": {
+            middlewares: ["withAuthentification"],
+            fn: Schematized({
+                required: ["post_id"],
+                select: ["post_id"],
+            }, async (req, res) => {
+                const post = await this.methods.likePost({
+                    user_id: req.user._id.toString(),
+                    post_id: req.selection.post_id,
+                }).catch((err) => {
+                    return false
+                })
+
+                if (!post) {
+                    return res.json({
+                        success: false,
+                    })
+                }
+
+                return res.json({
+                    success: true,
+                })
+            })
+        },
+        "/unlike": {
+            middlewares: ["withAuthentification"],
+            fn: Schematized({
+                required: ["post_id"],
+                select: ["post_id"],
+            }, async (req, res) => {
+                const post = await this.methods.unlikePost({
+                    user_id: req.user._id.toString(),
+                    post_id: req.selection.post_id,
+                }).catch((err) => {
+                    return false
+                })
+
+                if (!post) {
+                    return res.json({
+                        success: false,
+                    })
+                }
+
+                return res.json({
+                    success: true,
+                })
+            })
+        },
     }
 
     post = {
@@ -303,24 +344,27 @@ export default class PostsController extends Controller {
     }
 
     delete = {
-        "/post": Schematized({
-            required: ["post_id"],
-            select: ["post_id"],
-        }, async (req, res) => {
-            await this.methods.deletePost({
-                post_id: req.selection.post_id,
-                user_id: req.user._id.toString(),
+        "/post": {
+            middlewares: ["withAuthentification"],
+            fn: Schematized({
+                required: ["post_id"],
+                select: ["post_id"],
+            }, async (req, res) => {
+                await this.methods.deletePost({
+                    post_id: req.selection.post_id,
+                    user_id: req.user._id.toString(),
+                })
+                    .then(() => {
+                        return res.json({
+                            success: true,
+                        })
+                    })
+                    .catch((err) => {
+                        return res.status(500).json({
+                            message: err.message,
+                        })
+                    })
             })
-                .then(() => {
-                    return res.json({
-                        success: true,
-                    })
-                })
-                .catch((err) => {
-                    return res.status(500).json({
-                        message: err.message,
-                    })
-                })
-        }),
+        },
     }
 }
