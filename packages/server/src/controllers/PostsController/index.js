@@ -6,7 +6,7 @@ export default class PostsController extends Controller {
     static refName = "PostsController"
     //static useMiddlewares = ["withAuthentication"]
 
-    methods = {
+methods = {
         createPost: async (payload) => {
             const { user_id, message, additions } = payload
 
@@ -207,7 +207,7 @@ export default class PostsController extends Controller {
 
     put = {
         "/post": {
-            middlewares: ["withAuthentification"],
+            middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["message"],
                 select: ["message", "additions"],
@@ -222,7 +222,7 @@ export default class PostsController extends Controller {
             })
         },
         "/toogle_like": {
-            middlewares: ["withAuthentification"],
+            middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["post_id"],
                 select: ["post_id"],
@@ -248,7 +248,7 @@ export default class PostsController extends Controller {
             })
         },
         "/like": {
-            middlewares: ["withAuthentification"],
+            middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["post_id"],
                 select: ["post_id"],
@@ -272,7 +272,7 @@ export default class PostsController extends Controller {
             })
         },
         "/unlike": {
-            middlewares: ["withAuthentification"],
+            middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["post_id"],
                 select: ["post_id"],
