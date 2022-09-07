@@ -31,6 +31,28 @@ export default {
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
     author: "RageStudio© 2022",
+    footerLinks: [
+        {
+            label: "Terms of Service",
+            location: "/terms"
+        },
+        {
+            label: "Privacy Policy",
+            location: "/privacy"
+        },
+        {
+            label: "Contact",
+            location: "/contact"
+        },
+        {
+            label: "Github",
+            url: "https://github.com/ragestudio/comty"
+        },
+        {
+            label: "Support this project",
+            url: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76"
+        }
+    ],
     logo: {
         alt: "/logo_alt.svg",
         full: "/logo_full.svg",
