@@ -92,7 +92,7 @@ class App extends React.Component {
 		"session.logout": async () => {
 			await this.sessionController.logout()
 		},
-		"new_session": async () => {
+		"session.created": async () => {
 			await this.flushState()
 			await this.initialization()
 		},
@@ -378,6 +378,12 @@ class App extends React.Component {
 						cause: "Cannot initialize user data",
 						details: error.message,
 					}
+				}
+			},
+			() => {
+				// if is `/login` move to `/`
+				if (window.location.pathname === "/login") {
+					app.setLocation("/")
 				}
 			},
 		]
