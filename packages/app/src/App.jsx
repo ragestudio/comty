@@ -95,6 +95,11 @@ class App extends React.Component {
 		"session.created": async () => {
 			await this.flushState()
 			await this.initialization()
+
+			// if is `/login` move to `/`
+			if (window.location.pathname === "/login") {
+				app.setLocation("/")
+			}
 		},
 		"destroyed_session": async () => {
 			await this.flushState()
@@ -327,20 +332,6 @@ class App extends React.Component {
 
 					await this.props.cores.ApiCore.namespaces["main"].initialize()
 
-					// now attach the auth server
-					await this.props.cores.ApiCore.connectBridge("auth", {
-						origin: storedRemotes.authApi ?? defaultRemotes.authApi,
-						locked: true,
-					})
-
-					await this.props.cores.ApiCore.namespaces["auth"].initialize()
-
-					// now attach the content server
-					await this.props.cores.ApiCore.connectBridge("content", {
-						origin: storedRemotes.contentApi ?? defaultRemotes.contentApi,
-						locked: true,
-					})
-
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {
 					app.eventBus.emit("app.initialization.api_error", error)
@@ -378,12 +369,6 @@ class App extends React.Component {
 						cause: "Cannot initialize user data",
 						details: error.message,
 					}
-				}
-			},
-			() => {
-				// if is `/login` move to `/`
-				if (window.location.pathname === "/login") {
-					app.setLocation("/")
 				}
 			},
 		]
