@@ -46,7 +46,7 @@ export default class Session {
                 }
 
                 Session.token = token
-                window.app.eventBus.emit("new_session")
+                window.app.eventBus.emit("session.created")
             }
         })
     }
