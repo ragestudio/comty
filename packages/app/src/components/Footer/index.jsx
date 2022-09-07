@@ -24,6 +24,6 @@ export default (props) => {
         })
     }
     return <div className="footer">
-        {config.app.siteName} - {config.author} {config.footerLinks ? renderLinks() : null}
+        {config.app.copyright} {config.footerLinks ? renderLinks() : null}
     </div>
 }
