@@ -36,16 +36,19 @@ export default class PublicController extends Controller {
         "/new_featured_wallpaper": {
             middlewares: ["withAuthentication", "onlyAdmin"],
             fn: Schematized({
-                select: ["url", "date"],
+                select: ["url", "date", "author"],
                 required: ["url"],
             }, async (req, res) => {
                 const newFeaturedWallpaper = new FeaturedWallpaper(req.selection)
 
-                await newFeaturedWallpaper.save().catch((err) => {
-                    return res.status(400).json({ message: err.message })
+                const result = await newFeaturedWallpaper.save().catch((err) => {
+                    res.status(400).json({ message: err.message })
+                    return null
                 })
 
-                return res.json(newFeaturedWallpaper)
+                if (result) {
+                    return res.json(newFeaturedWallpaper)
+                }
             })
         }
     }
