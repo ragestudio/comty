@@ -30,7 +30,7 @@ export default {
     package: packagejson,
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
-    author: "RageStudio© 2022",
+    author: "RageStudio©",
     footerLinks: [
         {
             label: "Terms of Service",
@@ -66,6 +66,7 @@ export default {
         title: packagejson.name,
         siteName: "Comty",
         mainPath: "/home",
+        copyright: "Comty - RageStudio© 2022",
         storage: {
             basics: "user",
             token: "token",
