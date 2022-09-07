@@ -121,15 +121,12 @@ export const Router = withRouter((props) => {
 })
 
 export const InternalRouter = (props) => {
-    console.log(props)
     return <BrowserRouter>
         <Router {...props} />
     </BrowserRouter>
 }
 
 export const PageRender = (props) => {
-    console.log(props)
-
     return <React.Suspense fallback={props.staticRenders?.PageLoad ? React.createElement(props.staticRenders?.PageLoad) : "Loading..."}>
         <Switch>
             {routes.map(({ path, component: Component = React.Fragment }) => (
