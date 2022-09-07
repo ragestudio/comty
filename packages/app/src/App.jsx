@@ -413,7 +413,6 @@ class App extends React.Component {
 				<title>{config.app.siteName}</title>
 			</Helmet>
 			<antd.ConfigProvider>
-				<div className="backgroundDecorator" />
 				<Router.InternalRouter>
 					<Layout
 						user={this.state.user}
