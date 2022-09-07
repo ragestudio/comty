@@ -33,7 +33,14 @@ export default class Layout extends React.Component {
 
 			if (!app.settings.get("reduceAnimations")) {
 				// add "fade-transverse-leave" class to `transitionLayer`
-				document.getElementById("transitionLayer").classList.add("fade-transverse-leave")
+				const transitionLayer = document.getElementById("transitionLayer")
+
+				if (!transitionLayer) {
+					console.warn("transitionLayer not found, no animation will be played")
+					return
+				}
+
+				transitionLayer.classList.add("fade-transverse-leave")
 			}
 		},
 		"router.transitionFinish": () => {
@@ -41,7 +48,14 @@ export default class Layout extends React.Component {
 
 			if (!app.settings.get("reduceAnimations")) {
 				// remove "fade-transverse-leave" class to `transitionLayer`
-				document.getElementById("transitionLayer").classList.remove("fade-transverse-leave")
+				const transitionLayer = document.getElementById("transitionLayer")
+
+				if (!transitionLayer) {
+					console.warn("transitionLayer not found, no animation will be played")
+					return
+				}
+
+				transitionLayer.classList.remove("fade-transverse-leave")
 			}
 		},
 	}
