@@ -1,4 +1,5 @@
 import * as Layout from "./Layout"
+export { default as Footer } from "./Footer"
 
 // COMPLEX COMPONENTS
 export { default as FormGenerator } from "./FormGenerator"
