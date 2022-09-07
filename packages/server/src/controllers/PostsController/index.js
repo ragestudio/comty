@@ -345,7 +345,7 @@ methods = {
 
     delete = {
         "/post": {
-            middlewares: ["withAuthentification"],
+            middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["post_id"],
                 select: ["post_id"],
