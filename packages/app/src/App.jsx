@@ -57,7 +57,7 @@ import { NotFound, RenderError, Crash, Settings, Navigation, Login } from "compo
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
-import Router from "./router"
+import * as Router from "./router"
 
 import "theme/index.less"
 
@@ -423,19 +423,21 @@ class App extends React.Component {
 			</Helmet>
 			<antd.ConfigProvider>
 				<div className="backgroundDecorator" />
-				<Layout
-					user={this.state.user}
-					staticRenders={App.staticRenders}
-					bindProps={{
-						staticRenders: App.staticRenders,
-						user: this.state.user,
-						session: this.state.session,
-						sessionController: this.sessionController,
-						userController: this.userController,
-					}}
-				>
-					<Router />
-				</Layout>
+				<Router.InternalRouter>
+					<Layout
+						user={this.state.user}
+						staticRenders={App.staticRenders}
+						bindProps={{
+							staticRenders: App.staticRenders,
+							user: this.state.user,
+							session: this.state.session,
+							sessionController: this.sessionController,
+							userController: this.userController,
+						}}
+					>
+						<Router.PageRender />
+					</Layout>
+				</Router.InternalRouter>
 			</antd.ConfigProvider>
 		</React.Fragment>
 	}
