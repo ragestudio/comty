@@ -10,13 +10,13 @@ export default class PublicController extends Controller {
         "/featured_wallpapers": {
             fn: async (req, res) => {
                 const featuredWallpapers = await FeaturedWallpaper.find({})
-                .sort({ date: -1 })
-                .limit(10)
-                .catch(err => {
-                    return res.status(500).json({
-                        error: err.message
-                    }).end()
-                })
+                    .sort({ date: -1 })
+                    .limit(10)
+                    .catch(err => {
+                        return res.status(500).json({
+                            error: err.message
+                        }).end()
+                    })
 
                 return res.json(featuredWallpapers)
             }
