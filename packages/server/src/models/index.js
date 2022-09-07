@@ -30,4 +30,7 @@ export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
 // streamings
 export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey, "streamingKeys")
 
+// others
+export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")
+
 // marketplace
