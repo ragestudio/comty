@@ -19,8 +19,6 @@ export default (props) => {
         // get random wallpaper from array
         const randomWallpaper = featuredWallpapers[Math.floor(Math.random() * featuredWallpapers.length)]
 
-        console.log(randomWallpaper)
-
         setWallpaperData(randomWallpaper)
     }
 
