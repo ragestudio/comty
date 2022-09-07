@@ -1,0 +1,107 @@
+.loginPage {
+    display: flex;
+
+    width: 100vw;
+    height: 100vh;
+
+    align-items: right;
+    justify-content: right;
+
+    .wallpaper {
+        position: absolute;
+        display: flex;
+        z-index: 10;
+
+        backdrop-filter: blur(20px);
+
+        top: 0;
+        left: 0;
+
+        width: 56vw;
+        height: 100vh;
+
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+
+        //filter: blur(4px);
+
+        font-size: 15px;
+
+        align-items: self-end;
+        justify-content: left;
+
+        padding: 20px;
+
+        p {
+            font-weight: bold;
+            text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff,
+                1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
+        }
+    }
+
+    .wrapper {
+        z-index: 20;
+
+        display: flex;
+        flex-direction: column;
+
+        width: 45vw;
+        height: 100vh;
+
+        padding: 30px 50px;
+
+        border-radius: 20px 0 0 20px;
+
+        background-color: var(--background-color-accent);
+
+        border-left: 1px solid var(--border-color);
+
+        .logo {
+            height: 150px;
+            width: fit-content;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+
+            padding-top: 10px;
+            padding-left: 40px;
+
+            .title {
+                h1 {
+                    font-family: 'Space Grotesk', sans-serif;
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                }
+            }
+
+            .buttonsBox {
+                width: fit-content;
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+
+                padding: 20px 50px;
+
+                .register {
+                    p {
+                        margin-top: 10px;
+                        word-wrap: break-word;
+                        max-width: 300px;
+
+                        font-size: 11px;
+
+                        color: var(--background-color-contrast);
+                    }
+
+                    margin-bottom: 50px;
+                }
+            }
+
+            >div {
+                margin-bottom: 40px;
+            }
+        }
+    }
+}
