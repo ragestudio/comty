@@ -14,6 +14,7 @@ const aliases = {
     components: path.join(__dirname, "src/components"),
     models: path.join(__dirname, "src/models"),
     utils: path.join(__dirname, "src/utils"),
+    layouts: path.join(__dirname, "src/layouts"),
 }
 
 module.exports = (config = {}) => {

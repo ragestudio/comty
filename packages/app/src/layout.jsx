@@ -1,46 +1,12 @@
 import React from "react"
-import classnames from "classnames"
 import * as antd from "antd"
 import progressBar from "nprogress"
-
-import Sidebar from "./sidebar"
-import Drawer from "./drawer"
-import Sidedrawer from "./sidedrawer"
-import BottomBar from "./bottomBar"
 
 import config from "config"
 
 import routes from "schemas/routes"
 
-const LayoutRenders = {
-	mobile: (props) => {
-		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
-			<antd.Layout className="content_layout">
-				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
-					<div id="transitionLayer" className="fade-transverse-active">
-						{React.cloneElement(props.children, props)}
-					</div>
-				</antd.Layout.Content>
-			</antd.Layout>
-			<BottomBar user={props.user} />
-			<Drawer />
-		</antd.Layout>
-	},
-	default: (props) => {
-		return <antd.Layout className="app_layout" style={{ height: "100%" }}>
-			<Drawer />
-			<Sidebar user={props.user} />
-			<Sidedrawer />
-			<antd.Layout className="content_layout">
-				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
-					<div id="transitionLayer" className="fade-transverse-active">
-						{React.cloneElement(props.children, props)}
-					</div>
-				</antd.Layout.Content>
-			</antd.Layout>
-		</antd.Layout>
-	}
-}
+import Layouts from "layouts"
 
 export default class Layout extends React.Component {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
@@ -163,7 +129,11 @@ export default class Layout extends React.Component {
 			...this.state,
 		}
 
-		const Layout = LayoutRenders[layoutType]
+		const Layout = Layouts[layoutType]
+
+		if (!Layout) {
+			return app.eventBus.emit("runtime.crash", new Error(`Layout type [${layoutType}] not found`))
+		}
 
 		return <Layout {...layoutComponentProps}>
 			{this.state.renderLock ? InitializationComponent : this.props.children}

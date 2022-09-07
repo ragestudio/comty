@@ -1,3 +1,5 @@
+import * as Layout from "./Layout"
+
 // COMPLEX COMPONENTS
 export { default as FormGenerator } from "./FormGenerator"
 export { default as Settings } from "./Settings"
@@ -42,3 +44,5 @@ export { default as FollowersList } from "./FollowersList"
 export * as AdminTools from "./AdminTools"
 export * as AboutApp from "./AboutApp"
 export * as Window from "./RenderWindow"
+
+export { Layout }
