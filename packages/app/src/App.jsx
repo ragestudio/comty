@@ -131,9 +131,6 @@ class App extends React.Component {
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
 		},
-		"no_session": async () => {
-			app.eventBus.emit("forceToLogin")
-		},
 		"websocket_connected": () => {
 			if (this.wsReconnecting) {
 				this.wsReconnectingTry = 0
@@ -386,7 +383,7 @@ class App extends React.Component {
 		const token = await Session.token
 
 		if (!token || token == null) {
-			window.app.eventBus.emit("no_session")
+			//window.app.eventBus.emit("no_session")
 			return false
 		}
 
