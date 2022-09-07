@@ -59,7 +59,7 @@ export function BindContexts(component) {
     return (props) => React.createElement(component, { ...props, contexts })
 }
 
-export const InternalRouter = withRouter((props) => {
+export const Router = withRouter((props) => {
     const defaultTransitionDelay = 150
     const forceUpdate = React.useReducer(() => ({}))[1]
 
@@ -69,7 +69,7 @@ export const InternalRouter = withRouter((props) => {
                 props.onTransitionFinish(event)
             }
 
-            window.app.eventBus.emit("transitionDone", event)
+            window.app.eventBus.emit("router.transitionFinish", event)
         })
 
         props.history.setLocation = (to, state = {}, delay = 150) => {
@@ -92,7 +92,7 @@ export const InternalRouter = withRouter((props) => {
                 props.onTransitionStart(delay)
             }
 
-            window.app.eventBus.emit("transitionStart", delay)
+            window.app.eventBus.emit("router.transitionStart", delay)
 
             setTimeout(() => {
                 props.history.push({
@@ -109,6 +109,26 @@ export const InternalRouter = withRouter((props) => {
 
         window.app.setLocation = props.history.setLocation
     }, [])
+
+    const router = {
+        history: props.history,
+        lastLocation: props.history.lastLocation,
+        forceUpdate,
+    }
+
+    // return children with router in props
+    return React.cloneElement(props.children, { router })
+})
+
+export const InternalRouter = (props) => {
+    console.log(props)
+    return <BrowserRouter>
+        <Router {...props} />
+    </BrowserRouter>
+}
+
+export const PageRender = (props) => {
+    console.log(props)
 
     return <React.Suspense fallback={props.staticRenders?.PageLoad ? React.createElement(props.staticRenders?.PageLoad) : "Loading..."}>
         <Switch>
@@ -127,14 +147,11 @@ export const InternalRouter = withRouter((props) => {
             <Route path="*" component={props.staticRenders?.NotFound ?? NotFoundRender} />
         </Switch>
     </React.Suspense>
-})
-
-export const Router = (props) => {
-    return <BrowserRouter>
-        <InternalRouter
-            {...props}
-        />
-    </BrowserRouter>
 }
 
-export default Router
+export default {
+    routes,
+    BindContexts,
+    InternalRouter,
+    PageRender,
+}

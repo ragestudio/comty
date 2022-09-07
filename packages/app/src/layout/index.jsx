@@ -8,6 +8,8 @@ import Drawer from "./drawer"
 import Sidedrawer from "./sidedrawer"
 import BottomBar from "./bottomBar"
 
+import config from "config"
+
 import routes from "schemas/routes"
 
 const LayoutRenders = {
@@ -15,7 +17,7 @@ const LayoutRenders = {
 		return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
 			<antd.Layout className="content_layout">
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
-					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
+					<div id="transitionLayer" className="fade-transverse-active">
 						{React.cloneElement(props.children, props)}
 					</div>
 				</antd.Layout.Content>
@@ -31,7 +33,7 @@ const LayoutRenders = {
 			<Sidedrawer />
 			<antd.Layout className="content_layout">
 				<antd.Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
-					<div className={classnames("fade-transverse-active", { "fade-transverse-leave": props.isOnTransition })}>
+					<div id="transitionLayer" className="fade-transverse-active">
 						{React.cloneElement(props.children, props)}
 					</div>
 				</antd.Layout.Content>
@@ -40,14 +42,68 @@ const LayoutRenders = {
 	}
 }
 
-export default class Layout extends React.PureComponent {
+export default class Layout extends React.Component {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 	state = {
 		layoutType: "default",
-		isOnTransition: false,
 		renderLock: true,
 		renderError: null,
+	}
+
+	events = {
+		"app.initialization.start": () => {
+			this.setState({
+				renderLock: true,
+			})
+		},
+		"app.initialization.finish": () => {
+			this.setState({
+				renderLock: false,
+			})
+		},
+		"router.transitionStart": () => {
+			this.progressBar.start()
+
+			if (!app.settings.get("reduceAnimations")) {
+				// add "fade-transverse-leave" class to `transitionLayer`
+				document.getElementById("transitionLayer").classList.add("fade-transverse-leave")
+			}
+		},
+		"router.transitionFinish": () => {
+			this.progressBar.done()
+
+			if (!app.settings.get("reduceAnimations")) {
+				// remove "fade-transverse-leave" class to `transitionLayer`
+				document.getElementById("transitionLayer").classList.remove("fade-transverse-leave")
+			}
+		},
+	}
+
+	componentDidMount() {
+		if (window.app.settings.get("forceMobileMode") || window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
+			window.isMobile = true
+
+			this.setLayout("mobile")
+		} else {
+			window.isMobile = false
+		}
+
+		// register events
+		Object.keys(this.events).forEach((event) => {
+			window.app.eventBus.on(event, this.events[event])
+		})
+	}
+
+	componentWillUnmount() {
+		// unregister events
+		Object.keys(this.events).forEach((event) => {
+			window.app.eventBus.off(event, this.events[event])
+		})
+	}
+
+	componentDidCatch(info, stack) {
+		this.setState({ renderError: { info, stack } })
 	}
 
 	setLayout = (layout) => {
@@ -60,66 +116,8 @@ export default class Layout extends React.PureComponent {
 		return console.error("Layout type not found")
 	}
 
-	componentDidMount() {
-		window.app.eventBus.on("app.initialization.start", () => {
-			this.setState({
-				renderLock: true,
-			})
-		})
-		window.app.eventBus.on("app.initialization.finish", () => {
-			this.setState({
-				renderLock: false,
-			})
-		})
-
-		if (window.app.settings.get("forceMobileMode") || window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
-			window.isMobile = true
-			this.setLayout("mobile")
-		} else {
-			window.isMobile = false
-		}
-
-		window.app.eventBus.on("forceMobileMode", (to) => {
-			if (to) {
-				window.isMobile = true
-				this.setLayout("mobile")
-			} else {
-				window.isMobile = false
-				this.setLayout("default")
-			}
-		})
-
-		// this is a hacky one to fix app.setLocation not working on when app not render a router
-		window.app.setLocation = (location) => {
-			// update history
-			window.history.pushState(null, null, location)
-
-			// reload page
-			window.location.reload()
-		}
-	}
-
-	onTransitionStart = () => {
-		progressBar.start()
-
-		if (!app.settings.get("reduceAnimations")) {
-			this.setState({ isOnTransition: true })
-		}
-	}
-
-	onTransitionFinish = () => {
-		progressBar.done()
-
-		if (!app.settings.get("reduceAnimations")) {
-			this.setState({ isOnTransition: false })
-		}
-	}
-
-	componentDidCatch(info, stack) {
-		this.setState({ renderError: { info, stack } })
-	}
-
 	render() {
+		let layoutType = this.state.layoutType
 		const InitializationComponent = this.props.staticRenders?.Initialization ? React.createElement(this.props.staticRenders.Initialization) : null
 
 		if (this.state.renderError) {
@@ -148,16 +146,24 @@ export default class Layout extends React.PureComponent {
 					/>
 				}
 			}
+
+			if (typeof routeDeclaration.useLayout !== "undefined") {
+				layoutType = routeDeclaration.useLayout
+			}
+
+			if (typeof routeDeclaration.webTitleAddition !== "undefined") {
+				document.title = `${routeDeclaration.webTitleAddition} - ${config.app.siteName}`
+			} else {
+				document.title = config.app.siteName
+			}
 		}
 
 		const layoutComponentProps = {
 			...this.props.bindProps,
 			...this.state,
-			onTransitionStart: this.onTransitionStart,
-			onTransitionFinish: this.onTransitionFinish,
 		}
 
-		const Layout = LayoutRenders[this.state.layoutType]
+		const Layout = LayoutRenders[layoutType]
 
 		return <Layout {...layoutComponentProps}>
 			{this.state.renderLock ? InitializationComponent : this.props.children}
