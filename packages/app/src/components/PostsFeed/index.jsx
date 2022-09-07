@@ -148,6 +148,11 @@ export default class PostsFeed extends React.Component {
         return result
     }
 
+    onDoubleClickPost = (data) => {
+        // open post
+        app.setLocation(`/post/${data._id}`)
+    }
+
     insert = async (data) => {
         await this.setState({
             renderList: [this.getPostRender(data), ...this.state.renderList],
@@ -173,6 +178,7 @@ export default class PostsFeed extends React.Component {
             events={{
                 onClickLike: this.onLikePost,
                 onClickDelete: this.onDeletePost,
+                onDoubleClick: this.onDoubleClickPost,
             }}
         />
     }
