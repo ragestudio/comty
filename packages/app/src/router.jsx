@@ -72,7 +72,16 @@ export const InternalRouter = withRouter((props) => {
             window.app.eventBus.emit("transitionDone", event)
         })
 
-        props.history.setLocation = (to, state, delay) => {
+        props.history.setLocation = (to, state = {}, delay = 150) => {
+            // clean double slashes
+            to = to.replace(/\/{2,}/g, "/")
+
+            // if state is a number, it's a delay
+            if (typeof state !== "object") {
+                delay = state
+                state = {}
+            }
+
             const lastLocation = props.history.lastLocation
 
             if (typeof lastLocation !== "undefined" && lastLocation?.pathname === to && lastLocation?.state === state) {
@@ -91,7 +100,6 @@ export const InternalRouter = withRouter((props) => {
                 }, state)
 
                 props.history.lastLocation = window.location
-
             }, delay ?? defaultTransitionDelay)
         }
 
