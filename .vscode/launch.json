@@ -12,7 +12,7 @@
     },
     {
       "name": "Attach to Chrome",
-      "port": 9222,
+      "port": 8000,
       "request": "attach",
       "type": "pwa-chrome",
       "webRoot": "${workspaceFolder}"
@@ -39,10 +39,22 @@
     {
       "name": "Launch via NPM",
       "request": "launch",
-      "runtimeArgs": ["run-script", "debug"],
+      "runtimeArgs": [
+        "run-script",
+        "debug"
+      ],
       "runtimeExecutable": "npm",
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "type": "pwa-node"
+    },
+    {
+      "name": "Launch WEB APP",
+      "type": "pwa-chrome",
+      "name": "http://192.168.0.2:8000",
+      "request": "launch",
+      "url": "http://192.168.0.2:8000"
     }
   ]
 }
