@@ -277,7 +277,8 @@ export const PostCard = React.memo(({
     expansibleActions = window.app.settings.get("postCard_expansible_actions"),
     autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
     data = {},
-    events = {}
+    events = {},
+    fullmode
 }) => {
     const [loading, setLoading] = React.useState(true)
     const [likes, setLikes] = React.useState(data.likes ?? [])
@@ -305,6 +306,15 @@ export const PostCard = React.memo(({
     const onDataUpdate = (data) => {
         setLikes(data.likes)
         setComments(data.comments)
+    }
+
+    const onDoubleClick = () => {
+        if (typeof events.onDoubleClick !== "function") {
+            console.warn("onDoubleClick event is not a function")
+            return
+        }
+
+        return events.onDoubleClick(data)
     }
 
     React.useEffect(() => {
@@ -341,8 +351,10 @@ export const PostCard = React.memo(({
         className={classnames(
             "postCard",
             { ["liked"]: hasLiked },
-            { ["noHide"]: !expansibleActions }
+            { ["noHide"]: !expansibleActions },
+            { ["fullmode"]: fullmode },
         )}
+        onDoubleClick={onDoubleClick}
     >
         <div className="wrapper">
             <PostHeader
