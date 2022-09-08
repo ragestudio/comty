@@ -90,6 +90,8 @@ export default class Account extends React.Component {
 		isNotExistent: false,
 	}
 
+	contentRef = React.createRef()
+
 	coverComponent = React.createRef()
 
 	api = window.app.api.withEndpoints("main")
@@ -201,8 +203,10 @@ export default class Account extends React.Component {
 		// if component scrolled foward set cover height to 0
 		if (e.target.scrollTop > 0) {
 			this.coverComponent.current.style.height = "0px"
+			this.contentRef.current.style.height = "100vh"
 		} else {
 			this.coverComponent.current.style.height = ""
+			this.contentRef.current.style.height = ""
 		}
 	}
 
@@ -271,7 +275,7 @@ export default class Account extends React.Component {
 				</div>
 			</div>
 
-			<div className="contents" onScroll={this.handleScroll}>
+			<div ref={this.contentRef} className="contents" onScroll={this.handleScroll}>
 				<div className="tabMenuWrapper">
 					<antd.Menu
 						className="tabMenu"

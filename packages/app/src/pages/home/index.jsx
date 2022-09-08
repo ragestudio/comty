@@ -103,10 +103,8 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 <div className="card" id="trendings">
-                    <div>
-                        <h2><Icons.TrendingUp /> Trendings</h2>
-                        <HashtagTrendings />
-                    </div>
+                    <h2><Icons.TrendingUp /> Trendings</h2>
+                    <HashtagTrendings />
                 </div>
             </div>
         </div>
