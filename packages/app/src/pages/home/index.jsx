@@ -4,7 +4,7 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import { PostCreator, PostsFeed, LivestreamsBrowser } from "components"
+import { PostCreator, PostsFeed, LivestreamsBrowser, HashtagTrendings } from "components"
 
 import "./index.less"
 
@@ -81,28 +81,32 @@ export default class Dashboard extends React.Component {
             </div>
 
             <div className="panel">
-                <div className="card">
+                <div className="card" id="browserType">
+                    <h2><Icons.Compass /> Browse</h2>
+                    <antd.Menu
+                        mode="inline"
+                        selectedKeys={[this.state.activeTab]}
+                        activeKey={this.state.activeTab}
+                        onClick={({ key }) => this.handleTabChange(key)}
+                    >
+                        {Object.keys(Tabs).map((key) => {
+                            const tab = Tabs[key]
+
+                            return <antd.Menu.Item
+                                key={key}
+                                icon={createIconRender(tab.icon)}
+                            >
+                                {tab.title}
+                            </antd.Menu.Item>
+                        })}
+                    </antd.Menu>
+                </div>
+
+                <div className="card" id="trendings">
                     <div>
-                        <h2><Icons.Compass /> Browse</h2>
-                        <antd.Menu
-                            mode="inline"
-                            selectedKeys={[this.state.activeTab]}
-                            activeKey={this.state.activeTab}
-                            onClick={({ key }) => this.handleTabChange(key)}
-                        >
-                            {Object.keys(Tabs).map((key) => {
-                                const tab = Tabs[key]
-
-                                return <antd.Menu.Item
-                                    key={key}
-                                    icon={createIconRender(tab.icon)}
-                                >
-                                    {tab.title}
-                                </antd.Menu.Item>
-                            })}
-                        </antd.Menu>
+                        <h2><Icons.TrendingUp /> Trendings</h2>
+                        <HashtagTrendings />
                     </div>
-
                 </div>
             </div>
         </div>
