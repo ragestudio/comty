@@ -28,6 +28,7 @@ export { default as Login } from "./Login"
 export { default as Image } from "./Image"
 export { default as LoadMore } from "./LoadMore"
 export { default as EmbbededMediaPlayer } from "./EmbbededMediaPlayer"
+export { default as LivestreamsBrowser } from "./LivestreamsBrowser"
 
 // BUTTONS
 export { default as LikeButton } from "./LikeButton"
