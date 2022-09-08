@@ -2,10 +2,16 @@
 
 .accountProfile {
 	width: 100%;
-	height: 100%;
+	height: 100vh;
+
+	overflow: hidden;
+
+	padding: 10px 20px;
 
 	// max-width: 70vw;
 	// min-width: 900px;
+
+	transition: all 0.3s ease-in-out;
 
 	.cover {
 		z-index: 50;
@@ -23,13 +29,18 @@
 		height: 25vh;
 
 		transform: translate(0, 10px);
+		transition: all 0.3s ease-in-out;
+	}
+
+	.profileCardWrapper {
+		position: sticky;
+		top: 0;
+		z-index: 150;
 	}
 
 	.profileCard {
-		position: sticky;
-		top: 0;
-
-		z-index: 151;
+		position: relative;
+		z-index: 150;
 
 		display: flex;
 		flex-direction: column;
@@ -41,6 +52,8 @@
 		border-radius: @borderRadius @borderRadius 0 @borderRadius;
 
 		padding: 20px 15px;
+
+		height: 15vh;
 
 		.basicData {
 			display: inline-flex;
@@ -90,51 +103,19 @@
 		}
 
 		.description {
+			max-height: 5vh;
+			overflow: hidden;
+			
 			p {
-				word-break: break-all;
+				height: 100%;
+				overflow: hidden;
+
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+				
 				margin: 0;
 			}
-		}
-
-		.extension {
-			position: relative;
-			display: inline-flex;
-
-			top: -10px;
-			width: 100%;
-			padding: 19px 10px 10px 10px;
-
-			border-top: 0;
-			border-right: 0;
-
-			border-style: solid;
-			border-width: 1px;
-
-			border-color: var(--border-color);
-			border-top-color: transparent;
-
-			border-radius: 0 0 @borderRadius @borderRadius;
-		}
-
-		.switchTab {
-			position: absolute;
-			bottom: 0;
-			right: -1px;
-
-			border: 1px solid var(--border-color);
-			border-top: none;
-
-			transform: translate(0, 33px);
-			background-color: var(--background-color-primary);
-			border-radius: 0 0 8px 8px;
-
-			// .ant-segmented {
-			// 	background-color: transparent;
-			// }
-
-			// .ant-segmented-item-selected {
-			// 	background-color: var(--background-color-accent)!important;
-			// }
 		}
 
 		h1,
@@ -149,45 +130,79 @@
 		}
 	}
 
-	.tabContent {
-		margin-top: 45px;
+	.badgesTab {
+		position: relative;
+		z-index: 140;
+
+		height: 5vh;
+
+		display: flex;
+		flex-direction: row;
+
+		padding: 30px 10px 10px 10px;
+
+		background-color: var(--background-color-accent);
+
+		border-radius: 0 0 @borderRadius @borderRadius;
+		transform: translate(0, -20px);
+
+		border: 1px solid var(--border-color);
+
+		.badge {
+			margin-left: 10px;
+			height: fit-content;
+		}
 	}
 
-	.tabs {
-		transform: translate(0, -20px);
-		position: relative;
-		z-index: 55;
+	.tabMenuWrapper {
+		position: sticky!important;
+		top: 20px;
 
-		.ant-tabs-nav-wrap {
-			justify-content: flex-end;
+		height: fit-content;
+
+		.tabMenu {
+			width: fit-content;
+			min-width: 10vw;
+
+			padding: 10px;
+			background-color: var(--background-color-accent) !important;
+			border-radius: @borderRadius;
 		}
+	}
 
-		.ant-tabs-nav {
-			margin: 0 20px 20px 0;
+	.contents {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-template-rows: 1fr;
+		grid-column-gap: 10px;
+		grid-row-gap: 0px;
 
-			z-index: 152;
+		width: 100%;
+		height: 100vh;
+	
+		overflow: hidden;
+		overflow-y: overlay;
 
+		margin-top: -1.5vh;
+		
+		.tabContent {
 			position: sticky;
-			top: 0;
+			border-radius: @borderRadius;
+
+			top: -20vh;
+			padding: 20px 10px 20vh 10px;
 		}
+	}
 
-		.ant-tabs-nav::before {
-			border: none !important;
-		}
+	.details {
+		background-color: var(--background-color-accent);
+		padding: 20px;
+		border-radius: @borderRadius;
 
-		.ant-tabs-tab {
-			margin-right: 20px !important;
-			padding: 8px 20px !important;
+		font-family: "DM Mono", monospace;
 
-			border-color: var(--border-color) !important;
-			background-color: var(--background-color-primary) !important;
-
-			border-radius: 4px !important;
-
-			svg {
-				font-size: 1rem;
-				margin: 0 !important;
-			}
+		h1,h2,h3,h4,h5,h6,p,span {
+			user-select: text;
 		}
 	}
 }
