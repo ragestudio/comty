@@ -6,7 +6,7 @@ export default class PostsController extends Controller {
     static refName = "PostsController"
     //static useMiddlewares = ["withAuthentication"]
 
-methods = {
+    methods = {
         createPost: async (payload) => {
             const { user_id, message, additions } = payload
 
