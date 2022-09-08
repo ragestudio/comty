@@ -18,8 +18,6 @@
     "language": "en",
     "sidebarKeys": [
         "home",
-        "saved",
-        "marketplace",
-        "streams"
+        "marketplace"
     ]
 }
