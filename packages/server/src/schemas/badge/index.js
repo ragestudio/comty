@@ -1,7 +1,7 @@
 export default {
     name: { type: String, required: true },
-    color: { type: String },
-    description: { type: String },
     label: { type: String },
+    description: { type: String },
     icon: { type: String },
+    color: { type: String },
 }
