@@ -345,6 +345,11 @@ export default class Sidebar extends React.Component {
 				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
+							<Menu.Item key="notifications" icon={<Icons.Bell />}>
+								<Translation>
+									{t => t("Notifications")}
+								</Translation>
+							</Menu.Item>
 							<Menu.Item key="settings" icon={<Icons.Settings />}>
 								<Translation>
 									{t => t("Settings")}
