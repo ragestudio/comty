@@ -1,40 +1,22 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import moment from "moment"
+import Loadable from "react-loadable"
 
 import { Icons } from "components/Icons"
-import { Image, Skeleton, PostsFeed, FollowButton, FollowersList } from "components"
+import { Image, Skeleton, FollowButton } from "components"
 import { Session, User } from "models"
+
+import DetailsTab from "./tabs/details"
+import PostsTab from "./tabs/posts"
+import FollowersTab from "./tabs/followers"
 
 import "./index.less"
 
 const TabsComponent = {
-	"posts": React.memo((props) => {
-		return <div className="posts">
-			<PostsFeed
-				fromUserId={props.state.user._id}
-			/>
-		</div>
-	}),
-	"followers": React.memo((props) => {
-		return <FollowersList
-			followers={props.state.followers}
-		/>
-	}),
-	"details": React.memo((props) => {
-		return <div id="statistics" className="statistics">
-			<div>
-				<span><Icons.Users /> {props.state.followers.length} Followers</span>
-			</div>
-			<div>
-				<span><Icons.FileText /> 0 Posts</span>
-			</div>
-			<div>
-				<span>Joined at {moment(new Date(Number(props.state.user.createdAt))).format("YYYY")}</span>
-			</div>
-		</div>
-	})
+	"posts": PostsTab,
+	"followers": FollowersTab,
+	"details": DetailsTab
 }
 
 const TabRender = React.memo((props) => {
@@ -56,7 +38,7 @@ const TabRender = React.memo((props) => {
 	const Tab = TabsComponent[activeKey]
 
 	if (!Tab) {
-		return <h1>Nothing to see here...</h1>
+		return null
 	}
 
 	return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": transitionActive })}>
@@ -64,7 +46,33 @@ const TabRender = React.memo((props) => {
 	</div>
 })
 
-// TODO: profileCard scroll effect (Hide description and wrap with entire body when cover image is not visible)
+const UserBadges = React.memo((props) => {
+	return React.createElement(Loadable({
+		loader: async () => {
+			let { badges } = props
+
+			if (!badges || Array.isArray(badges) === false || badges.length === 0) {
+				return null
+			}
+
+			// fetch badges datam from api
+			const badgesData = await app.api.request("main", "get", "badges", {
+				_id: badges
+			}).catch(() => false)
+
+			if (!badgesData) {
+				return null
+			}
+
+			return () => badgesData.map((badge, index) => {
+				return <antd.Tag color={badge.color ?? "default"} key={index} id={badge.name} className="badge">
+					<span>{badge.label}</span>
+				</antd.Tag>
+			})
+		},
+		loading: antd.Skeleton,
+	}))
+})
 
 export default class Account extends React.Component {
 	state = {
@@ -81,6 +89,8 @@ export default class Account extends React.Component {
 
 		isNotExistent: false,
 	}
+
+	coverComponent = React.createRef()
 
 	api = window.app.api.withEndpoints("main")
 
@@ -135,6 +145,13 @@ export default class Account extends React.Component {
 			isFollowed,
 			followers,
 		})
+
+		// 
+		app.eventBus.emit("style.compactMode", true)
+	}
+
+	componentWillUnmount = () => {
+		app.eventBus.emit("style.compactMode", false)
 	}
 
 	fetchData = async (username) => {
@@ -180,6 +197,15 @@ export default class Account extends React.Component {
 		})
 	}
 
+	handleScroll = (e) => {
+		// if component scrolled foward set cover height to 0
+		if (e.target.scrollTop > 0) {
+			this.coverComponent.current.style.height = "0px"
+		} else {
+			this.coverComponent.current.style.height = ""
+		}
+	}
+
 	render() {
 		const user = this.state.user
 
@@ -197,59 +223,82 @@ export default class Account extends React.Component {
 		}
 
 		return <div className="accountProfile">
-			{user.cover && <div className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
-			<div className="profileCard">
-				<div className="basicData">
-					<div className="title">
-						<div className="field">
-							<div className="avatar">
-								<Image
-									alt="ProfileImage"
-									src={user.avatar}
-								/>
+			{user.cover && <div ref={this.coverComponent} className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
+			<div className="profileCardWrapper">
+				<div className="profileCard">
+					<div className="basicData">
+						<div className="title">
+							<div className="field">
+								<div className="avatar">
+									<Image
+										alt="ProfileImage"
+										src={user.avatar}
+									/>
+								</div>
+							</div>
+
+							<div className="field">
+								<div>
+									<h1>{user.fullName ?? user.username}</h1>
+									{user.verified && <Icons.verifiedBadge />}
+								</div>
+
+								<span>@{user.username}</span>
 							</div>
 						</div>
 
-						<div className="field">
-							<div>
-								<h1>{user.fullName ?? user.username}</h1>
-								{user.verified && <Icons.verifiedBadge />}
-							</div>
-
-							<span>@{user.username}</span>
-						</div>
+						{!this.state.isSelf && <div>
+							<FollowButton
+								count={this.state.followers.length}
+								onClick={this.onClickFollow}
+								followed={this.state.isFollowed}
+							/>
+						</div>}
 					</div>
 
-					{!this.state.isSelf && <div>
-						<FollowButton
-							count={this.state.followers.length}
-							onClick={this.onClickFollow}
-							followed={this.state.isFollowed}
-						/>
-					</div>}
+					<div className="description">
+						<p>
+							{user.description}
+						</p>
+					</div>
+
 				</div>
 
-				<div className="description">
-					<p>
-						{user.description}
-					</p>
-				</div>
-
-				<div className="switchTab">
-					<antd.Segmented
-						//block
-						options={Object.keys(TabsComponent).map((key) => key.toTitleCase())}
-						value={this.state.tabActiveKey.toTitleCase()}
-						onChange={this.handlePageTransition}
-					/>
+				<div className="badgesTab">
+					<React.Suspense fallback={<antd.Skeleton />}>
+						<UserBadges badges={user.badges} />
+					</React.Suspense>
 				</div>
 			</div>
 
-			<div className="tabContent">
-				<TabRender
-					renderKey={this.state.tabActiveKey}
-					state={this.state}
-				/>
+			<div className="contents" onScroll={this.handleScroll}>
+				<div className="tabMenuWrapper">
+					<antd.Menu
+						className="tabMenu"
+						mode="vertical"
+						selectedKeys={[this.state.tabActiveKey]}
+						onClick={(e) => this.handlePageTransition(e.key)}
+					>
+						<antd.Menu.Item key="posts">
+							Posts
+						</antd.Menu.Item>
+
+						<antd.Menu.Item key="followers">
+							Followers
+						</antd.Menu.Item>
+
+						<antd.Menu.Item key="details">
+							Details
+						</antd.Menu.Item>
+					</antd.Menu>
+				</div>
+
+				<div className="tabContent">
+					<TabRender
+						renderKey={this.state.tabActiveKey}
+						state={this.state}
+					/>
+				</div>
 			</div>
 		</div>
 	}
