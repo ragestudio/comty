@@ -51,7 +51,8 @@ export default class Server {
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: this.server.oskid,
             algorithms: ["sha1", "RS256", "HS256"],
-            expiresIn: this.env.signLifetime ?? "1h",
+            expiresIn: this.env.signLifetime ?? "10s",
+            enforceRegenerationTokenExpiration: false,
         }
     }
 

@@ -1,6 +1,8 @@
 import { Controller } from "linebridge/dist/server"
-import { Session } from "../../models"
 import jwt from "jsonwebtoken"
+
+import { Session } from "../../models"
+import { Token } from "../../lib"
 
 export default class SessionController extends Controller {
     static refName = "SessionController"
@@ -66,6 +68,22 @@ export default class SessionController extends Controller {
                 return res.json(result)
             },
         },
+        "/regenerate_session_token": {
+            middlewares: ["useJwtStrategy"],
+            fn: async (req, res) => {
+                const { expiredToken, refreshToken } = req.body
+
+                const token = await Token.regenerateSession(expiredToken, refreshToken).catch((error) => {
+                    res.status(400).json({ error: error.message })
+
+                    return null
+                })
+
+                if (!token) return
+
+                return res.json({ token })
+            },
+        }
     }
 
     delete = {

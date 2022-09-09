@@ -16,10 +16,13 @@ const schemas = getSchemas()
 // server
 export const Config = mongoose.model("Config", schemas.Config, "config")
 
+// sessions
+export const Session = mongoose.model("Session", schemas.Session, "sessions")
+export const RegenerationToken = mongoose.model("RegenerationToken", schemas.RegenerationToken, "regenerationTokens")
+
 // users
 export const User = mongoose.model("User", schemas.User, "accounts")
 export const UserFollow = mongoose.model("UserFollow", schemas.UserFollow, "follows")
-export const Session = mongoose.model("Session", schemas.Session, "sessions")
 export const Role = mongoose.model("Role", schemas.Role, "roles")
 export const Badge = mongoose.model("Badge", schemas.Badge, "badges")
 
