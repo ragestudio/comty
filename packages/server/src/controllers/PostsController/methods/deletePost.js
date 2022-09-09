@@ -1,19 +1,5 @@
 import { Post, User } from "../../../models"
 
-async function hasAdmin(user_id) {
-    if (!user_id) {
-        return false
-    }
-
-    const userData = await User.findById(user_id)
-
-    if (!userData) {
-        return false
-    }
-
-    return userData.roles.includes("admin")
-}
-
 export default async (payload) => {
     const { post_id, by_user_id } = payload
 
@@ -27,7 +13,13 @@ export default async (payload) => {
         throw new Error("Post not found")
     }
 
-    const hasAdmin = await hasAdmin(by_user_id)
+    const userData = await User.findById(by_user_id)
+
+    if (!userData) {
+        throw new Error("User not found")
+    }
+
+    const hasAdmin = userData.roles.includes("admin")
 
     // check if user is the owner of the post
     if (post.user_id !== by_user_id && !hasAdmin) {
