@@ -103,7 +103,7 @@ export default class Session {
 
         const result = await Session.bridge.delete.sessions({ user_id: session.user_id })
         this.forgetLocalSession()
-        window.app.eventBus.emit("destroyed_session")
+        window.app.eventBus.emit("session.destroyed")
 
         return result
     }
@@ -118,7 +118,7 @@ export default class Session {
 
         const result = await Session.bridge.delete.session({ user_id: session.user_id, token: token })
         this.forgetLocalSession()
-        window.app.eventBus.emit("destroyed_session")
+        window.app.eventBus.emit("session.destroyed")
 
         return result
     }

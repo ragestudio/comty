@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 
 export default (req, res, next) => {
     function reject(description) {
-        return res.status(401).json({ error: `${description ?? "Invalid session"}` })
+        return res.status(403).json({ error: `${description ?? "Invalid session"}` })
     }
 
     const authHeader = req.headers?.authorization?.split(" ")
@@ -37,17 +37,37 @@ export default (req, res, next) => {
                 return res.status(404).json({ error: "No user data found" })
             }
 
+            // if cannot verify token, start regeneration process
             if (err) {
-                if (decoded.refreshToken === userData.refreshToken) {
-                    const regeneratedToken = await Token.createNewAuthToken(userData, {
-                        ...global.jwtStrategy,
-                        updateSession: currentSession._id,
-                    })
-
-                    res.setHeader("regenerated_token", regeneratedToken)
-                } else {
-                    return reject("Token expired, cannot refresh token either")
+                // first check if token is only expired, if is corrupted, reject
+                if (err.name !== "TokenExpiredError") {
+                    return reject("Invalid token, cannot regenerate")
                 }
+
+                let regenerationToken = null
+
+                // check if this expired token has a regeneration token associated
+                const associatedRegenerationToken = await Token.getRegenerationToken(token)
+
+                if (associatedRegenerationToken) {
+                    regenerationToken = associatedRegenerationToken.refreshToken
+                } else {
+                    // create a new regeneration token with the expired token
+                    regenerationToken = await Token.createNewRegenerationToken(token).catch((error) => {
+                        // in case of error, reject
+                        reject(error.message)
+
+                        return null
+                    })
+                }
+
+                if (!regenerationToken) return
+
+                // now send the regeneration token to the client (start Expired Exception Event [EEE])
+                return res.status(401).json({
+                    error: "Token expired",
+                    refreshToken: regenerationToken.refreshToken,
+                })
             }
 
             req.user = userData

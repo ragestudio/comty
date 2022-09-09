@@ -9,6 +9,9 @@ export default class ApiCore extends Core {
 
         this.namespaces = Object()
 
+        this.onExpiredExceptionEvent = false
+        this.excludedExpiredExceptionURL = ["/regenerate_session_token"]
+
         this.ctx.registerPublicMethod("api", this)
     }
 
@@ -36,6 +39,52 @@ export default class ApiCore extends Core {
         return this.namespaces[namespace].endpoints
     }
 
+    handleBeforeRequest = async (request) => {
+        if (this.onExpiredExceptionEvent) {
+            if (this.excludedExpiredExceptionURL.includes(request.url)) return
+
+            await new Promise((resolve) => {
+                app.eventBus.once("session.regenerated", () => {
+                    console.log(`Session has been regenerated, retrying request`)
+                    resolve()
+                })
+            })
+        }
+    }
+
+    handleRegenerationEvent = async (refreshToken, makeRequest) => {
+        window.app.eventBus.emit("session.expiredExceptionEvent", refreshToken)
+
+        this.onExpiredExceptionEvent = true
+
+        const expiredToken = await Session.token
+
+        // exclude regeneration endpoint
+
+        // send request to regenerate token
+        const response = await this.request("main", "post", "regenerateSessionToken", {
+            expiredToken: expiredToken,
+            refreshToken,
+        }).catch((error) => {
+            console.error(`Failed to regenerate token: ${error.message}`)
+            return false
+        })
+
+        if (!response) {
+            return window.app.eventBus.emit("session.invalid", "Failed to regenerate token")
+        }
+
+        // set new token
+        Session.token = response.token
+
+        //this.namespaces["main"].internalAbortController.abort()
+
+        this.onExpiredExceptionEvent = false
+
+        // emit event
+        window.app.eventBus.emit("session.regenerated")
+    }
+
     connectBridge = (key, params) => {
         this.namespaces[key] = this.createBridge(params)
     }
@@ -55,17 +104,21 @@ export default class ApiCore extends Core {
             return obj
         }
 
-        const handleResponse = async (data) => {
-            // handle token regeneration
-            if (data.headers?.regenerated_token) {
-                Session.token = data.headers.regenerated_token
-                console.debug("[REGENERATION] New token generated")
-            }
-
+        const handleResponse = async (data, makeRequest) => {
             // handle 401 responses
             if (data instanceof Error) {
                 if (data.response.status === 401) {
-                    window.app.eventBus.emit("invalid_session")
+                    // check if the server issue a refresh token on data
+                    if (data.response.data.refreshToken) {
+                        // handle regeneration event
+                        await this.handleRegenerationEvent(data.response.data.refreshToken, makeRequest)
+                        return await makeRequest()
+                    } else {
+                        return window.app.eventBus.emit("session.invalid", "Session expired, but the server did not issue a refresh token")
+                    }
+                }
+                if (data.response.status === 403) {
+                    return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
                 }
             }
         }
@@ -78,6 +131,7 @@ export default class ApiCore extends Core {
             wsOptions: {
                 autoConnect: false,
             },
+            onBeforeRequest: this.handleBeforeRequest,
             onRequest: getSessionContext,
             onResponse: handleResponse,
             ...params,

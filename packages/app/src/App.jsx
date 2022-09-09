@@ -101,15 +101,15 @@ class App extends React.Component {
 				app.setLocation("/")
 			}
 		},
-		"destroyed_session": async () => {
+		"session.destroyed": async () => {
 			await this.flushState()
-			app.eventBus.emit("forceToLogin")
+			app.eventBus.emit("app.forceToLogin")
 		},
-		"forceToLogin": () => {
-			window.app.setLocation("/login")
-			app.eventBus.emit("app.createLogin")
+		"session.regenerated": async () => {
+			//await this.flushState()
+			//await this.initialization()
 		},
-		"invalid_session": async (error) => {
+		"session.invalid": async (error) => {
 			const token = await Session.token
 
 			if (!this.state.session && !token) {
@@ -119,7 +119,7 @@ class App extends React.Component {
 			await this.sessionController.forgetLocalSession()
 			await this.flushState()
 
-			app.eventBus.emit("forceToLogin")
+			app.eventBus.emit("app.forceToLogin")
 
 			antd.notification.open({
 				message: <Translation>
@@ -130,6 +130,10 @@ class App extends React.Component {
 				</Translation>,
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
+		},
+		"app.forceToLogin": () => {
+			window.app.setLocation("/login")
+			app.eventBus.emit("app.createLogin")
 		},
 		"websocket_connected": () => {
 			if (this.wsReconnecting) {
@@ -383,7 +387,7 @@ class App extends React.Component {
 		const token = await Session.token
 
 		if (!token || token == null) {
-			//window.app.eventBus.emit("no_session")
+			app.eventBus.emit("app.forceToLogin")
 			return false
 		}
 
