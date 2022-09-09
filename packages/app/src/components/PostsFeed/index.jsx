@@ -129,7 +129,7 @@ export default class PostsFeed extends React.Component {
     }
 
     onLikePost = async (data) => {
-        let result = await this.api.put.toogleLike({ post_id: data._id }).catch(() => {
+        let result = await this.api.post.toogleLike({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to like post")
 
             return false
