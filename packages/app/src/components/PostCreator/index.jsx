@@ -45,7 +45,7 @@ export default (props) => {
         setUploaderVisible(false)
         setFocused(false)
 
-        const response = api.put.post({ ...postData }).catch(error => {
+        const response = api.post.post({ ...postData }).catch(error => {
             console.error(error)
             antd.message.error(error)
 
