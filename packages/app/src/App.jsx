@@ -133,7 +133,6 @@ class App extends React.Component {
 		},
 		"app.forceToLogin": () => {
 			window.app.setLocation("/login")
-			app.eventBus.emit("app.createLogin")
 		},
 		"websocket_connected": () => {
 			if (this.wsReconnecting) {
