@@ -1,7 +1,7 @@
 import { Controller } from "linebridge/dist/server"
 import { Schematized } from "../../lib"
 
-import { CreatePost, ToogleLike, GetPostsFeed, GetPostData } from "./methods"
+import { CreatePost, ToogleLike, GetPostsFeed, GetPostData, DeletePost } from "./methods"
 
 export default class PostsController extends Controller {
     static refName = "PostsController"
