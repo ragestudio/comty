@@ -454,3 +454,19 @@
         }
     }
 }
+
+.saveButton {
+    border: 0 !important;
+
+    transition: all 150ms ease-in-out;
+
+    &.active {
+        color: var(--appColor);
+    }
+
+    svg {
+        background-color: transparent;
+        width: 20px;
+        height: 20px;
+    }
+}

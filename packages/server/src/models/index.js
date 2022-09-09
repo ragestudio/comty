@@ -29,6 +29,7 @@ export const Badge = mongoose.model("Badge", schemas.Badge, "badges")
 // posts
 export const Post = mongoose.model("Post", schemas.Post, "posts")
 export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
+export const SavedPost = mongoose.model("SavedPost", schemas.SavedPost, "savedPosts")
 
 // streamings
 export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey, "streamingKeys")

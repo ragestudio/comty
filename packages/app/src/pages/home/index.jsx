@@ -28,6 +28,15 @@ const Tabs = {
             </>
         }
     },
+    "savedPosts": {
+        title: "Saved posts",
+        icon: "Bookmark",
+        component: (props) => {
+            return <>
+                <PostsFeed savedOnly />
+            </>
+        }
+    }
 }
 
 export default class Dashboard extends React.Component {

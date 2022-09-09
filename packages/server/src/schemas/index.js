@@ -4,8 +4,11 @@ export { default as RegenerationToken } from "./regenerationToken"
 export { default as User } from "./user"
 export { default as Role } from "./role"
 export { default as Config } from "./config"
+
 export { default as Post } from "./post"
 export { default as Comment } from "./comment"
+export { default as SavedPost } from "./savedPost"
+
 export { default as UserFollow } from "./userFollow"
 export { default as Badge } from "./badge"
 export { default as streamingKey } from "./streamingKey"
