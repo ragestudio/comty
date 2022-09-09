@@ -18,7 +18,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "formidable": "^2.0.1",
     "jsonwebtoken": "8.5.1",
-    "linebridge": "0.12.2",
+    "linebridge": "0.12.8",
     "moment": "2.29.1",
     "mongoose": "6.1.9",
     "nanoid": "3.2.0",
