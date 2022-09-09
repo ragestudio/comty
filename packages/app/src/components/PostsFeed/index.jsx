@@ -93,9 +93,10 @@ export default class PostsFeed extends React.Component {
             trim: trim ?? this.state.renderList.length,
             limit: this.props.feedLength ?? window.app.settings.get("feed_max_fetch"),
             user_id: this.props.fromUserId,
+            savedOnly: this.props.savedOnly,
         })
 
-        console.log(result)
+        console.log("Loaded Posts => \n", result)
 
         if (result) {
             // if result is empty, its mean there is no more posts, so set hasMorePosts to false
@@ -131,6 +132,16 @@ export default class PostsFeed extends React.Component {
     onLikePost = async (data) => {
         let result = await this.api.post.toogleLike({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to like post")
+
+            return false
+        })
+
+        return result
+    }
+
+    onSavePost = async (data) => {
+        let result = await this.api.post.postToogleSave({ post_id: data._id }).catch(() => {
+            antd.message.error("Failed to save post")
 
             return false
         })
@@ -178,6 +189,7 @@ export default class PostsFeed extends React.Component {
             events={{
                 onClickLike: this.onLikePost,
                 onClickDelete: this.onDeletePost,
+                onClickSave: this.onSavePost,
                 onDoubleClick: this.onDoubleClickPost,
             }}
         />

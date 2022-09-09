@@ -32,6 +32,27 @@ const mediaTypes = {
     "m4a": "audio",
 }
 
+const SaveButton = (props) => {
+    const [saved, setSaved] = React.useState(props.defaultActive)
+
+    const onClick = async () => {
+        props.onClick({
+            to: !saved,
+        })
+        setSaved(!saved)
+    }
+
+    return <antd.Button
+        className={classnames("saveButton", {
+            ["active"]: saved
+        })}
+        shape="circle"
+        onClick={onClick}
+        icon={saved ? <Icons.MdBookmark /> : <Icons.MdBookmarkBorder />}
+        size="large"
+    />
+}
+
 const ContentFailed = () => {
     return <div className="contentFailed">
         <Icons.MdCloudOff />
@@ -244,9 +265,9 @@ export const PostActions = (props) => {
                 <Icons.MessageSquare className="icon" />
             </div>
         </div>
-        <div className="action" id="save" onClick={props.onClickSave}>
+        <div className={"action"} id="save">
             <div className="icon">
-                <Icons.Bookmark />
+                <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
             </div>
         </div>
         {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
@@ -283,7 +304,9 @@ export const PostCard = React.memo(({
     const [loading, setLoading] = React.useState(true)
     const [likes, setLikes] = React.useState(data.likes ?? [])
     const [comments, setComments] = React.useState(data.comments ?? [])
+
     const [hasLiked, setHasLiked] = React.useState(false)
+    const [hasSaved, setHasSaved] = React.useState(false)
 
     const onClickDelete = async () => {
         if (typeof events.onClickDelete !== "function") {
@@ -301,6 +324,15 @@ export const PostCard = React.memo(({
         }
 
         return await events.onClickLike(data)
+    }
+
+    const onClickSave = async () => {
+        if (typeof events.onClickSave !== "function") {
+            console.warn("onClickSave event is not a function")
+            return
+        }
+
+        return await events.onClickSave(data)
     }
 
     const onDataUpdate = (data) => {
@@ -336,9 +368,12 @@ export const PostCard = React.memo(({
     React.useEffect(() => {
         // check if the post has liked by you
         const hasLiked = likes.includes(selfId)
+        const hasSaved = data.isSaved
+
         //console.log(`[${data._id}] CHECKING LIKE OF USER ${selfId} > ${hasLiked}`)
 
         setHasLiked(hasLiked)
+        setHasSaved(hasSaved)
     })
 
     if (loading) {
@@ -377,7 +412,9 @@ export const PostCard = React.memo(({
             <PostActions
                 isSelf={selfId === data.user_id}
                 defaultLiked={hasLiked}
+                defaultSaved={hasSaved}
                 onClickLike={onClickLike}
+                onClickSave={onClickSave}
                 actions={{
                     delete: onClickDelete,
                 }}
