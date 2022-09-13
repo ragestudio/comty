@@ -15,6 +15,43 @@ export default class ApiCore extends Core {
         this.ctx.registerPublicMethod("api", this)
     }
 
+    async customRequest(
+        namepace = undefined,
+        payload = {
+            method: "GET",
+        },
+        ...args
+    ) {
+        if (typeof namepace === "undefined") {
+            throw new Error("Namespace must be defined")
+        }
+
+        if (typeof this.namespaces[namepace] === "undefined") {
+            throw new Error("Namespace not found")
+        }
+
+        if (typeof payload === "string") {
+            payload = {
+                url: payload,
+            }
+        }
+
+        if (typeof payload.headers !== "object") {
+            payload.headers = {}
+        }
+
+        const sessionToken = await Session.token
+
+        if (sessionToken) {
+            payload.headers["Authorization"] = `Bearer ${sessionToken}`
+
+        } else {
+            console.warn("Making a request with no session token")
+        }
+
+        return await this.namespaces[namepace].httpInterface(payload, ...args)
+    }
+
     request = (namespace = "main", method, endpoint, ...args) => {
         if (!this.namespaces[namespace]) {
             throw new Error(`Namespace ${namespace} not found`)
