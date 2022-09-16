@@ -12,6 +12,7 @@
     "variants": {
         "light": {
             "appColor": "#ff6064",
+            "text-color": "#000000",
             "layoutBackgroundColor": "255, 255, 255",
             "background-color-primary": "#ffffff",
             "background-color-primary2": "#f0f0f0",
