@@ -33,6 +33,51 @@
 
     &.fullmode {
         max-width: none;
+        height: 100%;
+
+        background-color: transparent;
+
+        filter: none;
+
+        .actionsIndicatorWrapper {
+            opacity: 0;
+        }
+
+        .actionsWrapper {
+            opacity: 1;
+        }
+
+        .wrapper {
+            height: 100%;
+
+            .content {
+                height: 100%;
+
+                .additions {
+                    height: fit-content;
+                    max-height: 80vh;
+
+                    .addition {
+                        display: flex !important;
+                        flex-direction: column;
+
+                        align-items: center;
+                        justify-content: center;
+
+                        img,
+                        video {
+                            width: fit-content;
+                            height: 100%;
+
+                            align-self: center;
+
+                            object-fit: contain;
+                            border-radius: 8px;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     .wrapper {
