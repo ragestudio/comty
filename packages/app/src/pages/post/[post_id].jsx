@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { PostCard } from "components"
+import { PostCard, CommentsCard } from "components"
 
 import "./index.less"
 
@@ -28,6 +28,11 @@ export default (props) => {
     }
 
     return <div className="fullPost">
-        <PostCard data={data} fullmode />
+        <div className="postWrapper">
+            <PostCard data={data} fullmode />
+        </div>
+        <div className="commentsWrapper">
+            <CommentsCard post_id={data._id} />
+        </div>
     </div>
 }
