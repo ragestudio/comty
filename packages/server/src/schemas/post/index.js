@@ -5,4 +5,6 @@ export default {
     likes: { type: Array, default: [] },
     comments: { type: Array, default: [] },
     additions: { type: Array, default: [] },
+    type: { type: String, default: "text" },
+    data: { type: Object, default: {} },
 }
