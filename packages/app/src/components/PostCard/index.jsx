@@ -216,7 +216,17 @@ export class PostAdditions extends React.PureComponent {
 }
 
 export const PostContent = React.memo((props) => {
-    let { message, additions } = props.data
+    let { message, additions, type, data } = props.data
+
+    if (data) {
+        data = JSON.parse(data)
+    }
+
+    const onClickPlaylist = () => {
+        if (data.playlist) {
+            app.AudioPlayer.startPlaylist(data.playlist)
+        }
+    }
 
     // parse message
     const regexs = [
@@ -236,13 +246,46 @@ export const PostContent = React.memo((props) => {
 
     message = processString(regexs)(message)
 
-    return <div className="content">
-        <div className="message">
-            {message}
-        </div>
+    switch (type) {
+        case "playlist": {
+            return <div className="content">
+                <div
+                    className="playlistCover"
+                    onClick={onClickPlaylist}
+                    style={{
+                        backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
+                    }}
+                />
 
-        {additions.length > 0 && <PostAdditions additions={additions} />}
-    </div>
+                <div className="playlistTitle">
+                    <div>
+                        <h1>
+                            {data.title ?? "Untitled Playlist"}
+                        </h1>
+                        <h3>
+                            {data.artist}
+                        </h3>
+                    </div>
+
+                    <div className="actions">
+                        <antd.Button onClick={onClickPlaylist}>
+                            <Icons.PlayCircle />
+                            Play
+                        </antd.Button>
+                    </div>
+                </div>
+            </div>
+        }
+        default: {
+            return <div className="content">
+                <div className="message">
+                    {message}
+                </div>
+
+                {additions.length > 0 && <PostAdditions additions={additions} />}
+            </div>
+        }
+    }
 })
 
 export const PostActions = (props) => {
@@ -395,6 +438,7 @@ export const PostCard = React.memo(({
         id={data._id}
         className={classnames(
             "postCard",
+            data.type,
             { ["liked"]: hasLiked },
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
