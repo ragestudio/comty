@@ -8,7 +8,7 @@ import NotificationsCore from "./notifications"
 import ShortcutsCore from "./shortcuts"
 import SoundCore from "./sound"
 
-import mediaPlayer from "./mediaPlayer"
+import AudioPlayer from "./audioPlayer"
 
 // DEFINE LOAD ORDER HERE
 export default [
@@ -21,5 +21,5 @@ export default [
     NotificationsCore,
     ShortcutsCore,
     
-    mediaPlayer,
+    AudioPlayer,
 ]
