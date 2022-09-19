@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import moment from "moment"
 
+import { Icons } from "components/Icons"
 import { CommentCreator } from "components"
 
 import "./index.less"
@@ -53,6 +54,14 @@ export default (props) => {
     }, [])
 
     const renderComments = () => {
+        if (!comments) {
+            return <antd.Skeleton active />
+        }
+
+        if (comments.length === 0) {
+            return <antd.Empty />
+        }
+
         return comments.map((comment) => {
             return <div className="comment" id={comment._id}>
                 <div className="header">
@@ -78,6 +87,11 @@ export default (props) => {
     }
 
     return <div className="comments">
+        <div className="header">
+            <h1>
+               <Icons.MessageSquare /> Comments
+            </h1>
+        </div>
         {renderComments()}
         <div className="commentCreatorWrapper">
             <CommentCreator />
