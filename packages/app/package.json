@@ -27,7 +27,7 @@
     "@emotion/css": "11.0.0",
     "@foxify/events": "2.0.1",
     "@loadable/component": "5.15.2",
-    "antd": "4.20.7",
+    "antd": "4.23.2",
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
     "classnames": "2.3.1",
