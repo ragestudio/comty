@@ -1,16 +1,11 @@
 import { Controller } from "linebridge/dist/server"
 import path from "path"
 import fs from "fs"
-//import stream from "stream"
+
 import pmap from "../../utils/pMap"
+import { videoTranscode } from "../../lib/videoTranscode"
 
 const formidable = require("formidable")
-
-export function resolveToUrl(filepath, req) {
-    const host = req ? (req.protocol + "://" + req.get("host")) : global.globalPublicUri
-
-    return `${host}/storage/${filepath}`
-}
 
 // TODO: Get maximunFileSize by type of user subscription (free, premium, etc) when `PermissionsAPI` is ready
 const maximumFileSize = 80 * 1024 * 1024 // max file size in bytes (80MB) By default, the maximum file size is 80MB.
@@ -19,6 +14,11 @@ const acceptedMimeTypes = [
     "image/jpeg",
     "image/png",
     "image/gif",
+    "audio/mp3",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/wav",
+    "audio/flac",
     "video/mp4",
     "video/webm",
     "video/quicktime",
@@ -26,63 +26,7 @@ const acceptedMimeTypes = [
     "video/x-ms-wmv",
 ]
 
-function videoTranscode(originalFilePath, outputPath, options = {}) {
-    return new Promise((resolve, reject) => {
-        const ffmpeg = require("fluent-ffmpeg")
-
-        const filename = path.basename(originalFilePath)
-        const outputFilepath = `${outputPath}/${filename.split(".")[0]}.${options.format ?? "webm"}`
-
-        console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath}`)
-
-        const onEnd = async () => {
-            // remove
-            await fs.promises.unlink(originalFilePath)
-
-            console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath} finished`)
-
-            return resolve(outputFilepath)
-        }
-
-        const onError = (err) => {
-            console.error(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath} failed`, err)
-
-            return reject(err)
-        }
-
-        ffmpeg(originalFilePath)
-            .audioBitrate(options.audioBitrate ?? 128)
-            .videoBitrate(options.videoBitrate ?? 1024)
-            .videoCodec(options.videoCodec ?? "libvpx")
-            .audioCodec(options.audioCodec ?? "libvorbis")
-            .format(options.format ?? "webm")
-            .output(outputFilepath)
-            .on("error", onError)
-            .on("end", onEnd)
-            .run()
-    })
-}
-
 export default class FilesController extends Controller {
-    // get = {
-    //     "/upload/:id": {
-    //         fn: (req, res) => {
-    //             const filePath = path.join(global.uploadPath, req.params?.id)
-
-    //             const readStream = fs.createReadStream(filePath)
-    //             const passTrough = new stream.PassThrough()
-
-    //             stream.pipeline(readStream, passTrough, (err) => {
-    //                 if (err) {
-    //                     return res.status(400)
-    //                 }
-    //             })
-
-    //             return passTrough.pipe(res)
-    //         },
-    //     }
-    // }
-
     post = {
         "/upload": {
             middlewares: ["withAuthentication"],
@@ -92,10 +36,6 @@ export default class FilesController extends Controller {
                 // check directories exist
                 if (!fs.existsSync(global.uploadCachePath)) {
                     await fs.promises.mkdir(global.uploadCachePath, { recursive: true })
-                }
-
-                if (!fs.existsSync(global.uploadPath)) {
-                    await fs.promises.mkdir(global.uploadPath, { recursive: true })
                 }
 
                 // decode body form-data
@@ -123,6 +63,8 @@ export default class FilesController extends Controller {
 
                 const results = await new Promise((resolve, reject) => {
                     const processedFiles = []
+                    const failedFiles = []
+
                     let queuePromieses = []
 
                     // create a new thread for each file
@@ -136,6 +78,8 @@ export default class FilesController extends Controller {
                         }
 
                         for (let file of data.files) {
+                            if (!file) continue
+
                             // create process queue
                             queuePromieses.push(async () => {
                                 // check if is video need to transcode
@@ -151,23 +95,49 @@ export default class FilesController extends Controller {
                                     }
                                 }
 
-                                // move file to upload path
-                                await fs.promises.rename(file.filepath, path.join(global.uploadPath, file.newFilename))
+                                const metadata = {
+                                    originalFilename: file.originalFilename,
+                                    mimetype: file.mimetype,
+                                    size: file.size,
+                                    filepath: file.filepath,
+                                    newFilename: file.newFilename,
+                                }
+
+                                // upload to s3
+                                await new Promise((_resolve, _reject) => {
+                                    global.storage.fPutObject(global.storage.defaultBucket, file.newFilename, file.filepath, metadata, (err, etag) => {
+                                        if (err) {
+                                            return _reject("Failed to upload file to storage server")
+                                        }
+
+                                        return _resolve()
+                                    })
+                                }).catch((err) => {
+                                    return reject(err)
+                                })
+
+                                // remove file from cache
+                                await fs.promises.unlink(file.filepath)
+
+                                // get url location
+                                const remoteUrlObj = global.storage.composeRemoteURL(file.newFilename)
 
                                 // push final filepath to urls
                                 return {
                                     name: file.originalFilename,
                                     id: file.newFilename,
-                                    url: resolveToUrl(file.newFilename, req),
+                                    url: remoteUrlObj,
                                 }
                             })
                         }
 
                         // wait for all files to be processed
-                        await pmap(queuePromieses,
+                        await pmap(
+                            queuePromieses,
                             async (fn) => {
                                 const result = await fn().catch((err) => {
                                     console.error(err)
+                                    failedFiles.push(err)
 
                                     return null
                                 })
@@ -176,9 +146,7 @@ export default class FilesController extends Controller {
                                     processedFiles.push(result)
                                 }
                             },
-                            {
-                                concurrency: 5
-                            }
+                            { concurrency: 5 }
                         )
 
                         return resolve(processedFiles)
