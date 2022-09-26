@@ -1,0 +1,43 @@
+.appModalWrapper {
+    .closeButton {
+        background-color: var(--background-color-primary);
+
+        pointer-events: all;
+
+        font-size: 1.2rem;
+
+        transform: translate(-25px, -10px);
+
+        svg {
+            margin: 0 !important;
+
+            color: var(--text-color);
+        }
+
+        &:hover {
+            background-color: var(--background-color-primary);
+        }
+    }
+
+    .appModal {
+        pointer-events: all;
+
+        display: flex;
+        flex-direction: column;
+
+        align-self: center;
+
+        border-radius: 8px;
+
+        width: fit-content;
+        height: fit-content;
+
+        min-height: 500px;
+        min-width: 600px;
+
+        padding: 30px;
+
+        background-color: var(--background-color-accent);
+        color: var(--text-color);
+    }
+}

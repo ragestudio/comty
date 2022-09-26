@@ -129,7 +129,7 @@ export default class StyleCore extends Core {
 	}
 
 	getStoragedModifications = () => {
-		return store.get(this.modificationStorageKey)
+		return store.get(this.modificationStorageKey) ?? {}
 	}
 
 	getStoragedVariant = () => {

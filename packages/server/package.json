@@ -1,6 +1,6 @@
 {
   "name": "@comty/server",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "corenode-cli build",
@@ -19,6 +19,7 @@
     "formidable": "^2.0.1",
     "jsonwebtoken": "8.5.1",
     "linebridge": "0.12.8",
+    "minio": "^7.0.32",
     "moment": "2.29.1",
     "mongoose": "6.1.9",
     "nanoid": "3.2.0",

@@ -216,7 +216,17 @@ export class PostAdditions extends React.PureComponent {
 }
 
 export const PostContent = React.memo((props) => {
-    let { message, additions } = props.data
+    let { message, additions, type, data } = props.data
+
+    if (data) {
+        data = JSON.parse(data)
+    }
+
+    const onClickPlaylist = () => {
+        if (data.playlist) {
+            app.AudioPlayer.startPlaylist(data.playlist)
+        }
+    }
 
     // parse message
     const regexs = [
@@ -236,13 +246,46 @@ export const PostContent = React.memo((props) => {
 
     message = processString(regexs)(message)
 
-    return <div className="content">
-        <div className="message">
-            {message}
-        </div>
+    switch (type) {
+        case "playlist": {
+            return <div className="content">
+                <div
+                    className="playlistCover"
+                    onClick={onClickPlaylist}
+                    style={{
+                        backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
+                    }}
+                />
 
-        {additions.length > 0 && <PostAdditions additions={additions} />}
-    </div>
+                <div className="playlistTitle">
+                    <div>
+                        <h1>
+                            {data.title ?? "Untitled Playlist"}
+                        </h1>
+                        <h3>
+                            {data.artist}
+                        </h3>
+                    </div>
+
+                    <div className="actions">
+                        <antd.Button onClick={onClickPlaylist}>
+                            <Icons.PlayCircle />
+                            Play
+                        </antd.Button>
+                    </div>
+                </div>
+            </div>
+        }
+        default: {
+            return <div className="content">
+                <div className="message">
+                    {message}
+                </div>
+
+                {additions.length > 0 && <PostAdditions additions={additions} />}
+            </div>
+        }
+    }
 })
 
 export const PostActions = (props) => {
@@ -350,6 +393,16 @@ export const PostCard = React.memo(({
     }
 
     React.useEffect(() => {
+        if (fullmode) {
+            app.eventBus.emit("style.compactMode", true)
+        }
+
+        return () => {
+            app.eventBus.emit("style.compactMode", false)
+        }
+    }, [])
+
+    React.useEffect(() => {
         // first listen to post changes
         window.app.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
 
@@ -385,6 +438,7 @@ export const PostCard = React.memo(({
         id={data._id}
         className={classnames(
             "postCard",
+            data.type,
             { ["liked"]: hasLiked },
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
@@ -397,29 +451,36 @@ export const PostCard = React.memo(({
                 isLiked={hasLiked}
                 likes={likes.length}
                 comments={comments.length}
+                fullmode={fullmode}
             />
             <PostContent
                 data={data}
                 autoCarrousel={autoCarrousel}
+                fullmode={fullmode}
             />
         </div>
-        <div className="actionsIndicatorWrapper">
-            <div className="actionsIndicator">
-                <Icons.MoreHorizontal />
+        {!fullmode &&
+            <div className="actionsIndicatorWrapper">
+                <div className="actionsIndicator">
+                    <Icons.MoreHorizontal />
+                </div>
             </div>
-        </div>
-        <div className="actionsWrapper">
-            <PostActions
-                isSelf={selfId === data.user_id}
-                defaultLiked={hasLiked}
-                defaultSaved={hasSaved}
-                onClickLike={onClickLike}
-                onClickSave={onClickSave}
-                actions={{
-                    delete: onClickDelete,
-                }}
-            />
-        </div>
+        }
+        {!fullmode &&
+            <div className="actionsWrapper">
+                <PostActions
+                    isSelf={selfId === data.user_id}
+                    defaultLiked={hasLiked}
+                    defaultSaved={hasSaved}
+                    onClickLike={onClickLike}
+                    onClickSave={onClickSave}
+                    actions={{
+                        delete: onClickDelete,
+                    }}
+                    fullmode={fullmode}
+                />
+            </div>
+        }
     </div>
 })
 

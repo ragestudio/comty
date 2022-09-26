@@ -56,6 +56,10 @@ export default (props) => {
 
         if (response) {
             cleanPostData()
+
+            if (typeof props.onPost === "function") {
+                props.onPost()
+            }
         }
     }
 

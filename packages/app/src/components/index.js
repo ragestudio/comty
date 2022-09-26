@@ -43,6 +43,10 @@ export { default as PostsFeed } from "./PostsFeed"
 export { default as PostCard } from "./PostCard"
 export { default as PostCreator } from "./PostCreator"
 
+// COMMENTS
+export { default as CommentsCard } from "./CommentsCard"
+export { default as CommentCreator } from "./CommentCreator"
+
 // USERS
 export { default as FollowersList } from "./FollowersList"
 
