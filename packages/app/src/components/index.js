@@ -31,6 +31,9 @@ export { default as EmbbededMediaPlayer } from "./EmbbededMediaPlayer"
 export { default as LivestreamsBrowser } from "./LivestreamsBrowser"
 export { default as HashtagTrendings } from "./HashtagTrendings"
 
+// CREATOR
+export { default as Creator } from "./Creator"
+
 // BUTTONS
 export { default as LikeButton } from "./LikeButton"
 export { default as FollowButton } from "./FollowButton"
