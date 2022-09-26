@@ -30,6 +30,16 @@
 
 		transform: translate(0, 10px);
 		transition: all 0.3s ease-in-out;
+
+		&.expanded {
+			height: 70vh;
+			transform: translate(0, 0);
+
+			background-size: cover;
+			background-repeat: no-repeat;
+			border-radius: @borderRadius;
+			margin-bottom: 10px;
+		}
 	}
 
 	.profileCardWrapper {

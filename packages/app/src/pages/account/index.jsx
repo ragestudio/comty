@@ -182,6 +182,12 @@ export default class Account extends React.Component {
 		})
 	}
 
+	toogleCoverExpanded = async (to) => {
+		this.setState({
+			coverExpanded: to ?? !this.state.coverExpanded,
+		})
+	}
+
 	handlePageTransition = (key) => {
 		if (typeof key !== "string") {
 			console.error("Cannot handle page transition. Invalid key, only valid passing string", key)
@@ -227,7 +233,14 @@ export default class Account extends React.Component {
 		}
 
 		return <div className="accountProfile">
-			{user.cover && <div ref={this.coverComponent} className="cover" style={{ backgroundImage: `url("${user.cover}")` }} />}
+			{user.cover && <div
+				className={classnames("cover", {
+					["expanded"]: this.state.coverExpanded
+				})}
+				ref={this.coverComponent}
+				style={{ backgroundImage: `url("${user.cover}")` }}
+				onClick={() => this.toogleCoverExpanded()}
+			/>}
 			<div className="profileCardWrapper">
 				<div className="profileCard">
 					<div className="basicData">
