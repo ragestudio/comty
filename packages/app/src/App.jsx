@@ -53,7 +53,7 @@ import { Translation } from "react-i18next"
 import { Session, User } from "models"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Navigation, Login } from "components"
+import { NotFound, RenderError, Crash, Settings, Navigation, Login, Creator } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -82,6 +82,9 @@ class App extends React.Component {
 	}
 
 	eventsHandlers = {
+		"app.openCreator": (...args) => {
+			return App.publicMethods.openCreator(...args)
+		},
 		"app.createLogin": async () => {
 			app.DrawerController.open("login", Login, {
 				componentProps: {
@@ -215,6 +218,9 @@ class App extends React.Component {
 	}
 
 	static publicMethods = {
+		openCreator: () => {
+			window.app.ModalController.open((props) => <Creator {...props} />)
+		},
 		openSettings: (goTo) => {
 			window.app.SidedrawerController.open("Settings", Settings, {
 				props: {
