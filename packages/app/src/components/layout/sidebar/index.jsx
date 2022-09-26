@@ -211,6 +211,10 @@ export default class Sidebar extends React.Component {
 	}
 
 	handleClick = (e) => {
+		if (e.item.props.overrideEvent) {
+			return app.eventBus.emit(e.item.props.overrideEvent, e.item.props.overrideEventProps)
+		}
+
 		if (typeof e.key === "undefined") {
 			window.app.eventBus.emit("invalidSidebarKey", e)
 			return false
@@ -345,6 +349,11 @@ export default class Sidebar extends React.Component {
 				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
+							<Menu.Item key="create" icon={<Icons.PlusCircle />} overrideEvent="app.openCreator" >
+								<Translation>
+									{(t) => t("Create")}
+								</Translation>
+							</Menu.Item>
 							<Menu.Item key="notifications" icon={<Icons.Bell />}>
 								<Translation>
 									{t => t("Notifications")}
