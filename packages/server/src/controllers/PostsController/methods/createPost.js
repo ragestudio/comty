@@ -1,7 +1,7 @@
 import { Post, User } from "../../../models"
 
 export default async (payload) => {
-    const { user_id, message, additions } = payload
+    const { user_id, message, additions, type, data } = payload
 
     const userData = await User.findById(user_id)
 
@@ -10,6 +10,8 @@ export default async (payload) => {
         message: String(message).toString(),
         additions: additions ?? [],
         created_at: new Date().getTime(),
+        type: type,
+        data: data,
     })
 
     await post.save()

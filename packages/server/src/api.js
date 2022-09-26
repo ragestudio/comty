@@ -7,7 +7,9 @@ import passport from "passport"
 import jwt from "jsonwebtoken"
 
 import { User, Session, Config } from "./models"
+
 import DbManager from "./classes/DbManager"
+import { createStorageClientInstance } from "./classes/StorageClient"
 
 const ExtractJwt = require("passport-jwt").ExtractJwt
 const LocalStrategy = require("passport-local").Strategy
@@ -18,6 +20,7 @@ const middlewares = require("./middlewares")
 export default class Server {
     env = process.env
 
+    storage = global.storage = createStorageClientInstance()
     DB = new DbManager()
 
     httpListenPort = this.env.listenPort ?? 3000
@@ -61,8 +64,6 @@ export default class Server {
         this.server.engineInstance.use(express.json())
         this.server.engineInstance.use(express.urlencoded({ extended: true }))
 
-        this.server.engineInstance.use("/storage", express.static(path.join(__dirname, "../uploads")))
-
         this.server.wsInterface["clients"] = []
         this.server.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
             return this.server.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
@@ -85,7 +86,6 @@ export default class Server {
         global.publicProtocol = this.env.publicProtocol
         global.globalPublicUri = `${this.env.publicProtocol}://${this.env.publicHost}`
 
-        global.uploadPath = this.env.uploadPath ?? path.resolve(process.cwd(), "uploads")
         global.uploadCachePath = this.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
 
         global.jwtStrategy = this.options.jwtStrategy
@@ -96,6 +96,7 @@ export default class Server {
         await this.DB.connect()
         await this.initializeConfigDB()
 
+        await this.storage.initialize()
         await this.checkSetup()
         await this.initPassport()
         await this.initWebsockets()
