@@ -1,6 +1,7 @@
 @import "antd/dist/antd.variable.less";
 @import "theme/vars.less";
 @import "theme/fonts.css";
+@import "theme/animations.less";
 
 ::-webkit-scrollbar {
 	display: none;
@@ -46,23 +47,41 @@ html {
 		margin-right: 10px;
 		vertical-align: -0.125em;
 	}
-}
 
-body {
-	overflow: hidden;
-	-webkit-overflow-scrolling: touch;
-	-webkit-app-region: no-drag;
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span {
+		color: var(--text-color);
+	}
 
-	height: 100%;
+	body {
+		overflow: hidden;
+		-webkit-overflow-scrolling: touch;
+		-webkit-app-region: no-drag;
 
-	user-select: none;
-	--webkit-user-select: none;
+		height: 100%;
 
-	scroll-behavior: smooth;
-	text-rendering: optimizeLegibility !important;
+		user-select: none;
+		--webkit-user-select: none;
 
-	background-color: var(--background-color-primary) !important;
-	font-family: var(--fontFamily);
+		scroll-behavior: smooth;
+		text-rendering: optimizeLegibility !important;
+
+		background-color: var(--background-color-primary) !important;
+		font-family: var(--fontFamily);
+	}
+
+	*:not(input):not(textarea) {
+		-webkit-user-select: none;
+		/* disable selection/Copy of UIWebView */
+		-webkit-touch-callout: none;
+		/* disable the IOS popup when long-press on a link */
+	}
 }
 
 #root {
@@ -133,23 +152,6 @@ body {
 	}
 }
 
-.backgroundDecorator {
-	background-image: var(--backgroundImage);
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	width: 100vw;
-	height: 100vh;
-
-	transition: all 150ms ease-in-out;
-}
-
 .layout_page {
 	position: relative;
 	-webkit-overflow-scrolling: touch;
@@ -165,6 +167,74 @@ body {
 
 	margin: var(--layoutMargin);
 	padding: var(--layoutPadding);
+}
+
+.renderError {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	justify-content: center;
+	align-items: center;
+
+	width: 100vw;
+	height: 100vh;
+
+	.ant-result {
+		background-color: var(--background-color-primary);
+		border-radius: 8px;
+	}
+}
+
+.splash_wrapper {
+	position: absolute;
+
+	top: 0;
+	left: 0;
+
+	overflow: hidden;
+
+	backdrop-filter: blur(10px);
+	--webkit-backdrop-filter: blur(10px);
+
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+	justify-content: center;
+
+	>div {
+		margin-bottom: 40px;
+	}
+
+	.splash_logo {
+		width: 200px;
+		height: 200px;
+
+		display: flex;
+		flex-direction: column;
+
+		align-items: center;
+		justify-content: center;
+
+		img {
+			width: 100%;
+			filter: drop-shadow(14px 10px 10px rgba(128, 128, 128, 0.5));
+		}
+	}
+
+	.splash_label {
+		font-size: 2rem;
+
+		svg {
+			margin: 0 !important;
+		}
+	}
 }
 
 @media (max-width: 768px) {
@@ -232,6 +302,23 @@ body {
 
 .fade-opacity-enter {
 	opacity: 1;
+}
+
+.backgroundDecorator {
+	background-image: var(--backgroundImage);
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	width: 100vw;
+	height: 100vh;
+
+	transition: all 150ms ease-in-out;
 }
 
 .app_initialization {
@@ -308,91 +395,7 @@ body {
 	border-radius: 12px;
 }
 
-*:not(input):not(textarea) {
-	-webkit-user-select: none;
-	/* disable selection/Copy of UIWebView */
-	-webkit-touch-callout: none;
-	/* disable the IOS popup when long-press on a link */
-}
-
-.renderError {
-	position: relative;
-
-	display: flex;
-	flex-direction: column;
-
-	justify-content: center;
-	align-items: center;
-
-	width: 100vw;
-	height: 100vh;
-
-	.ant-result {
-		background-color: var(--background-color-primary);
-		border-radius: 8px;
-	}
-}
-
-.splash_wrapper {
-	position: absolute;
-
-	top: 0;
-	left: 0;
-
-	overflow: hidden;
-
-	backdrop-filter: blur(10px);
-	--webkit-backdrop-filter: blur(10px);
-
-	width: 100%;
-	height: 100%;
-	z-index: 1000;
-
-	display: flex;
-	flex-direction: column;
-
-	align-items: center;
-	justify-content: center;
-
-	>div {
-		margin-bottom: 40px;
-	}
-
-	.splash_logo {
-		width: 200px;
-		height: 200px;
-
-		display: flex;
-		flex-direction: column;
-
-		align-items: center;
-		justify-content: center;
-
-		img {
-			width: 100%;
-			filter: drop-shadow(14px 10px 10px rgba(128, 128, 128, 0.5));
-		}
-	}
-
-	.splash_label {
-		font-size: 2rem;
-
-		svg {
-			margin: 0 !important;
-		}
-	}
-}
-
-@keyframes fadeOut {
-	from {
-		opacity: 1;
-	}
-
-	to {
-		opacity: 0;
-	}
-}
-
+// fix results
 .ant-result {
 	.ant-result-content {
 		display: inline-flex;
@@ -417,4 +420,72 @@ body {
 			margin: 0;
 		}
 	}
+}
+
+// fix colors for select & dropdown
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+	background-color: var(--background-color-primary);
+}
+
+.ant-select-dropdown {
+	background-color: var(--background-color-primary) !important;
+	color: var(--text-color) !important;
+
+	.ant-select-item-option:not(.ant-select-item-option-disabled) {
+		background-color: var(--background-color-primary) !important;
+		color: var(--text-color) !important;
+	}
+
+	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+		background-color: var(--background-color-primary2) !important;
+		color: var(--text-color) !important;
+	}
+}
+
+// fix colors for buttons
+.ant-btn-default {
+	color: var(--text-color);
+	background: var(--background-color-primary);
+	border-color: var(--background-color-primary2) !important;
+
+	&:hover {
+		color: var(--text-color);
+		background: var(--background-color-primary2);
+		border-color: var(--background-color-primary2) !important;
+	}
+
+	&:active {
+		color: var(--text-color);
+		background: var(--background-color-primary2);
+		border-color: var(--background-color-primary2) !important;
+	}
+
+	&:focus {
+		color: var(--text-color);
+		background: var(--background-color-primary2);
+		border-color: var(--background-color-contrast) !important;
+	}
+}
+
+// fix sliders colors
+.ant-slider-rail {
+	background-color: var(--background-color-primary2);
+
+	&:hover {
+		background-color: var(--background-color-primary);
+	}
+}
+
+// fix menu colors
+.ant-menu-item {
+	color: var(--text-color);
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+	color: var(--text-color);
+	background-color: var(--background-color-primary) !important;
+}
+
+.ant-menu-item:active {
+	background-color: var(--background-color-primary2) !important;
 }
