@@ -84,7 +84,7 @@ class App extends React.Component {
 		// if is electron app, append frame to body as first child
 		if (window.isElectron) {
 			const frame = document.createElement("div")
-			const systemBarComponent = await import("components/layout/systemBar")
+			const systemBarComponent = await import("components/Layout/systemBar")
 
 			frame.id = "systemBar"
 

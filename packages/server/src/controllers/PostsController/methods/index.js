@@ -1,6 +1,6 @@
 export { default as CreatePost } from "./createPost"
 export { default as ToogleLike } from "./toogleLike"
-export { default as ToogleSavePost } from "./tooglepostSave"
+export { default as ToogleSavePost } from "./tooglePostSave"
 
 export { default as GetPostsFeed } from "./getPostsFeed"
 export { default as GetPostData } from "./getPostData"

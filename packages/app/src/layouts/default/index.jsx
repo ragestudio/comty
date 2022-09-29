@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
-import { Sidebar, Drawer, Sidedrawer, Modal } from "components/layout"
+import { Sidebar, Drawer, Sidedrawer, Modal } from "components/Layout"
 
 export default (props) => {
     return <>
