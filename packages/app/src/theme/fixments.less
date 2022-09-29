@@ -75,8 +75,27 @@
     }
 }
 
-// fix colors for buttons
+// fix buttons
+.ant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        margin: 0 10px 0 0 !important;
+    }
+
+    span {
+        margin: 0;
+        line-height: 1rem;
+    }
+}
+
 .ant-btn-primary {
+    svg {
+        color: var(--background-color-primary) !important;
+    }
+
     span {
         color: var(--background-color-primary) !important;
         margin: 0;
@@ -84,8 +103,12 @@
 }
 
 .ant-btn-primary[disabled] {
+    svg {
+        color: unset !important;
+    }
+
     span {
-        color: unset!important;
+        color: unset !important;
         margin: 0;
     }
 }
