@@ -40,7 +40,7 @@ export default (props) => {
 	}
 
 	return (
-		<div className="renderError">
+		<div className="app_render_error">
 			<Result
 				status="error"
 				title="Render Error"

@@ -206,7 +206,7 @@ class App extends React.Component {
 		},
 		Crash: Crash.CrashWrapper,
 		Initialization: () => {
-			return <div className="splash_wrapper">
+			return <div className="app_splash_wrapper">
 				<div className="splash_logo">
 					<img src={config.logo.alt} />
 				</div>
