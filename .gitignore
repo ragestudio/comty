@@ -5,6 +5,7 @@
 /**/**/server.registry
 
 # Trash
+/**/**/*.log
 /**/**/dumps.log
 /**/**/.crash.log
 /**/**/.tmp
