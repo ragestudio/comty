@@ -52,7 +52,7 @@
     "js-cookie": "3.0.1",
     "jwt-decode": "3.1.2",
     "less": "4.1.2",
-    "linebridge": "0.12.8",
+    "linebridge": "0.13.0",
     "moment": "2.29.1",
     "mpegts.js": "^1.6.10",
     "nprogress": "^0.2.0",
