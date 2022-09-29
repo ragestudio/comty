@@ -87,7 +87,7 @@ export default class Layout extends React.Component {
 	}
 
 	setLayout = (layout) => {
-		if (typeof LayoutRenders[layout] === "function") {
+		if (typeof Layouts[layout] === "function") {
 			return this.setState({
 				layoutType: layout,
 			})
