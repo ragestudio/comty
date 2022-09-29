@@ -23,6 +23,8 @@
 /**/**/uploads
 /**/**/d_data
 /**/**/*.tar
+/**/**/*.7z
+/**/**/*.zip
 
 # Logs
 /**/**/npm-debug.log*
