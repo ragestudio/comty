@@ -72,6 +72,7 @@ export default {
         title: packagejson.name,
         siteName: "Comty",
         mainPath: "/home",
+        authPath: "/login",
         copyright: "Comty - RageStudio© 2022",
         storage: {
             basics: "user",
