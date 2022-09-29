@@ -22,7 +22,8 @@ const CreatorsTypes = {
     video: {
         label: "Video",
         icon: "Video",
-        component: VideoCreator
+        component: VideoCreator,
+        disabled: true
     }
 }
 
@@ -43,9 +44,10 @@ export default class Creator extends React.Component {
 
                     return <Button
                         key={type}
+                        className="typeButton"
+                        disabled={CreatorsTypes[type].disabled}
                         icon={createIconRender(icon)}
                         onClick={() => this.handleCreatorType(type)}
-                        className="typeButton"
                     >
                         {label}
                     </Button>
