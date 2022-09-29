@@ -4,6 +4,7 @@
   "license": "MIT",
   "main": "electron/main",
   "author": "RageStudio",
+  "description": "A prototype of a social network.",
   "scripts": {
     "start": "electron-forge start",
     "build": "vite build",
