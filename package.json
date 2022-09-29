@@ -3,11 +3,17 @@
   "license": "LGPL-2.1",
   "types": "index.d.ts",
   "private": true,
+  "scripts": {
+    "release": "node ./scripts/release.js"
+  },
   "workspaces": [
     "packages"
   ],
   "dependencies": {
-    "corenode": "^0.28.26"
+    "corenode": "^0.28.26",
+    "@octokit/rest": "19.0.4",
+    "dotenv": "16.0.3",
+    "axios": "0.21.1"
   },
   "version": "0.20.0"
 }
