@@ -218,8 +218,13 @@ export class PostAdditions extends React.PureComponent {
 export const PostContent = React.memo((props) => {
     let { message, additions, type, data } = props.data
 
-    if (data) {
-        data = JSON.parse(data)
+    if (typeof data === "string") {
+        try {
+            data = JSON.parse(data)
+        } catch (error) {
+            console.error(error)
+            data = {}
+        }
     }
 
     const onClickPlaylist = () => {
@@ -266,6 +271,10 @@ export const PostContent = React.memo((props) => {
                             {data.artist}
                         </h3>
                     </div>
+
+                    <h4>
+                        {message}
+                    </h4>
 
                     <div className="actions">
                         <antd.Button onClick={onClickPlaylist}>
