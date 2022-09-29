@@ -13,6 +13,7 @@
     "corenode": "^0.28.26",
     "@octokit/rest": "19.0.4",
     "dotenv": "16.0.3",
+    "7zip-min": "1.4.3",
     "axios": "0.21.1"
   },
   "version": "0.20.1"
