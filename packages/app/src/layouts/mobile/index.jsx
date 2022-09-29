@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import * as antd from "antd"
 
-import { Drawer, BottomBar } from "components/layout"
+import { Drawer, BottomBar } from "components/Layout"
 
 export default (props) => {
     return <antd.Layout className={classnames("app_layout", ["mobile"])} style={{ height: "100%" }}>
