@@ -1,11 +1,14 @@
+import path from "path"
 import getConfig from "./.config.js"
 
 import { defineConfig } from "vite"
-import reactRefresh from "@vitejs/plugin-react-refresh"
+import react from "@vitejs/plugin-react"
+
+//import electron, { onstart } from "vite-plugin-electron"
 
 export default defineConfig({
     plugins: [
-        reactRefresh(),
+        react(),
     ],
     ...getConfig(),
 })

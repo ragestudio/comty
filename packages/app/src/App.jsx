@@ -43,6 +43,8 @@ Promise.tasked = function (promises) {
 }
 
 import React from "react"
+import ReactDOM from "react-dom"
+
 import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
@@ -71,8 +73,28 @@ class App extends React.Component {
 		user: null,
 	}
 
-	static initialize() {
+	static async initialize() {
 		window.app.version = config.package.version
+
+		// check if electron library is available
+		if (typeof window.electron !== "undefined") {
+			window.isElectron = true
+		}
+
+		// if is electron app, append frame to body as first child
+		if (window.isElectron) {
+			const frame = document.createElement("div")
+			const systemBarComponent = await import("components/layout/systemBar")
+
+			frame.id = "systemBar"
+
+			ReactDOM.render(<systemBarComponent.default />, frame)
+
+			document.body.insertBefore(frame, document.body.firstChild)
+
+			// append var to #root
+			document.getElementById("root").classList.add("electron")
+		}
 	}
 
 	static publicEvents = {
@@ -82,6 +104,16 @@ class App extends React.Component {
 	}
 
 	eventsHandlers = {
+		"app.close": () => {
+			if (window.isElectron) {
+				window.electron.ipcRenderer.invoke("app.close")
+			}
+		},
+		"app.minimize": () => {
+			if (window.isElectron) {
+				window.electron.ipcRenderer.invoke("app.minimize")
+			}
+		},
 		"app.openCreator": (...args) => {
 			return App.publicMethods.openCreator(...args)
 		},

@@ -10,6 +10,12 @@ const envOrigins = {
         contentApi: `http://${window.location.hostname}:3050`,
         streamingApi: `http://${window.location.hostname}:3002`,
     },
+    "production": {
+        mainApi: "http://api.comty.pw",
+        authApi: "http://auth.comty.pw",
+        contentApi: "http://content.comty.pw",
+        streamingApi: "http://streaming.comty.pw",
+    },
     "indev": {
         mainApi: "https://indev_api.comty.pw",
         authApi: `http://indev_auth.comty.pw`,
