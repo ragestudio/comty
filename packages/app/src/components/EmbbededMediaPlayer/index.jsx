@@ -5,6 +5,13 @@ import { Icons } from "components/Icons"
 
 import "./index.less"
 
+// FIXME: JS events are not working properly, the methods cause a memory leak
+// FIXME: Use a better way to preload audios
+// TODO: Check AUDIO quality and show a quality indicator
+// TODO: Add close button
+// TODO: Add repeat & shuffle mode
+// TODO: Queue view
+
 const AudioVolume = (props) => {
     return <div className="volumeSlider">
         <antd.Slider
