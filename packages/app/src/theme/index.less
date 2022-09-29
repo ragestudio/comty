@@ -95,6 +95,16 @@ html {
 		height: 100%;
 
 		background-color: var(--layoutBackgroundColor) !important;
+
+		&.electron {
+			.layout_page {
+				padding-top: 35px;
+			}
+
+			.ant-layout-sider {
+				padding-top: 0px;
+			}
+		}
 	}
 
 	#nprogress {
@@ -229,6 +239,10 @@ html {
 
 	>div {
 		margin-bottom: 40px;
+	}
+
+	svg {
+		color: var(--text-color) !important;
 	}
 
 	.splash_logo {

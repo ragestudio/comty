@@ -1,0 +1,112 @@
+  body {
+      background-color: transparent;
+      border-radius: 12px;
+      font-family: 'Alata', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: drag;
+  }
+
+  .wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center; 
+      flex-direction: column;
+      background-color: #efefef;
+      color: #2d2d2d;
+      border-radius: 12px;
+      text-align: center;
+
+      width: 100%;
+      height: 100%;
+  }
+
+  .bouncy-logo{
+    width: 100%;
+    height: auto;
+    margin: auto;
+  }
+
+  .bouncy-logo .ball {
+    height: auto;
+    width: 100%;
+    transform: translate(-10px, 0);
+  }
+
+  .bouncy-logo .ball svg {
+    width: 200px;
+    height: 200px;
+    margin: auto;
+
+    -webkit-animation-direction: alternate;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-name: my-bounce;
+    -webkit-animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 1s;
+    animation-name: my-bounce;
+    animation-iteration-count: infinite;
+  }
+
+  .shadow{
+    width: 100%;
+    height: auto;
+  }
+
+  .bouncy-logo .ball-shadow {
+    margin: auto;
+    background: radial-gradient(50% 50%, rgba(204, 204, 204, 0.45) 0%, transparent 100%);
+    height: 50px;
+    width: 200px;
+    -webkit-animation-direction: alternate;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-name: my-grow;
+    -webkit-animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-duration: 1s;
+    animation-name: my-grow;
+    animation-iteration-count: infinite;
+  }
+  
+  @-webkit-keyframes my-grow {
+    from {
+      width: 200px;
+      height: 50px;
+    }
+    to {
+      width: 150px;
+      height: 10px;
+    }
+  }
+  @keyframes my-grow {
+    from {
+      width: 200px;
+      height: 50px;
+    }
+    to {
+      width: 150px;
+      height: 10px;
+    }
+  }
+  @-webkit-keyframes my-bounce {
+    from {
+      top: 0;
+    }
+    to {
+      top: 10%;
+    }
+  }
+  @keyframes my-bounce {
+    from {
+      top: 0;
+    }
+    to {
+      top: 10%;
+    }
+  }

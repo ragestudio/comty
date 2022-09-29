@@ -2,15 +2,20 @@
   "name": "comty",
   "version": "0.20.0",
   "license": "MIT",
+  "main": "electron/main",
+  "author": "RageStudio",
   "scripts": {
+    "start": "electron-forge start",
+    "build": "vite build",
     "dev": "vite",
-    "dev:ssr": "vite-ssr",
-    "build": "yarn build:dist",
-    "build:dist": "cross-env NODE_ENV=production vite build",
-    "build:preview": "cross-env NODE_ENV=preview vite build && yarn sync",
-    "build:ssr": "cross-env NODE_ENV=production vite-ssr build && ./scripts/move-dist.sh",
+    "dev:electron": "concurrently -k \"yarn dev\" \"yarn electron:dev\"",
+    "electron:dev": "cross-env IS_DEV=true electron-forge start",
+    "electron:build": "electron-forge make",
+    "electron:package": "electron-forge package",
     "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "peerDependencies": {
     "react": "^16.8.6"
@@ -27,10 +32,14 @@
     "@emotion/css": "11.0.0",
     "@foxify/events": "2.0.1",
     "@loadable/component": "5.15.2",
+    "@vitejs/plugin-react": "^2.1.0",
     "antd": "4.23.2",
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
     "classnames": "2.3.1",
+    "electron-is": "^3.0.0",
+    "electron-log": "^4.4.8",
+    "electron-squirrel-startup": "^1.0.0",
     "evite": "0.12.3",
     "faye": "1.4.0",
     "feather-reactjs": "2.0.13",
@@ -72,9 +81,14 @@
     "rxjs": "^7.5.5",
     "store": "^2.0.12",
     "styled-components": "^5.3.3",
-    "vite-ssr": "0.15.0"
+    "wait-on": "^6.0.1"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.66",
+    "@electron-forge/maker-deb": "^6.0.0-beta.66",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.66",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
+    "@electron-forge/maker-zip": "^6.0.0-beta.66",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.4.10",
     "@types/react": "^17.0.15",
@@ -82,12 +96,40 @@
     "@types/react-router-config": "^5.0.3",
     "@types/react-router-dom": "^5.1.8",
     "@typescript-eslint/eslint-plugin": "^4.29.0",
-    "@vitejs/plugin-react-refresh": "^1.3.6",
+    "concurrently": "^7.4.0",
     "corenode": "0.28.26",
     "cors": "2.8.5",
     "cross-env": "^7.0.3",
+    "electron": "^21.0.1",
     "express": "^4.17.1",
     "typescript": "^4.3.5",
-    "vite": "2.9.9"
+    "vite": "3.1.4"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "comty"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
   }
 }
