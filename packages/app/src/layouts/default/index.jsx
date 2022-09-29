@@ -6,7 +6,7 @@ import { Sidebar, Drawer, Sidedrawer, Modal } from "components/layout"
 
 export default (props) => {
     return <>
-        <div className="backgroundDecorator" />
+        <div className="app_background_decorator" />
         <Layout className="app_layout" style={{ height: "100%" }}>
             <Modal />
             <Drawer />
