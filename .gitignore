@@ -22,6 +22,7 @@
 /**/**/.evite
 /**/**/uploads
 /**/**/d_data
+/**/**/*.tar
 
 # Logs
 /**/**/npm-debug.log*
