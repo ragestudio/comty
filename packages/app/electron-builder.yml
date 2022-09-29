@@ -1,0 +1,11 @@
+appId: com.ragestudio.comty
+productName: Comty
+copyright: Copyright © RageStudio
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+publish: null
