@@ -51,7 +51,7 @@ export default (props) => {
 
             <div className="content">
                 <div className="title">
-                    <h1>A prototype of an social network</h1>
+                    <h1>A prototype of a social network</h1>
                 </div>
 
                 {props.session && <div className="session_available">
