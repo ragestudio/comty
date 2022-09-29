@@ -63,8 +63,6 @@ export default class Creator extends React.Component {
     }
 
     render() {
-        console.log(this.props)
-
         return <div className="creator">
             <div className="header">
                 <h1><Icons.Box /> Creator</h1>
