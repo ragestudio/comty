@@ -30,6 +30,7 @@
     }
 
     .comment {
+        position: relative;
         display: flex;
         flex-direction: column;
 
@@ -72,6 +73,19 @@
             font-size: 14px;
             color: var(--text-color);
             margin-left: 20px;
+        }
+
+        .deleteBtn {
+            position: absolute;
+
+            top: 0;
+            right: 0;
+
+            margin: 10px;
+
+            svg {
+                font-size: 0.8rem;
+            }
         }
     }
 
