@@ -55,7 +55,7 @@ import { Translation } from "react-i18next"
 import { Session, User } from "models"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Navigation, Login, Creator } from "components"
+import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -122,6 +122,12 @@ class App extends React.Component {
 				componentProps: {
 					sessionController: this.sessionController
 				}
+			})
+		},
+		"app.createRegister": async () => {
+			app.DrawerController.open("Register", UserRegister, {
+				allowMultiples: false,
+				panel: true,
 			})
 		},
 		"session.logout": async () => {
