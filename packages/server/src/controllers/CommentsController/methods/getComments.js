@@ -1,11 +1,25 @@
-import { User, Post, Comment } from "../../../models"
+import { User, Comment } from "../../../models"
 
-export default (payload) => {
-    const { parent_id, _id } = payload
+export default async (payload = {}) => {
+    const { parent_id } = payload
 
-    if (typeof _id !== "undefined") {
-        return Comment.findById(_id)
+    if (!parent_id) {
+        throw new Error("Missing parent_id")
     }
 
-    return Comment.find({ parent_id })
+    // get comments by descending order
+    let comments = await Comment.find({ parent_id: parent_id })
+        .sort({ created_at: -1 })
+
+    // fullfill comments with user data
+    comments = await Promise.all(comments.map(async comment => {
+        const user = await User.findById(comment.user_id)
+
+        return {
+            ...comment.toObject(),
+            user: user.toObject(),
+        }
+    }))
+
+    return comments
 }
