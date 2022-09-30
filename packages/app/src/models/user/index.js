@@ -49,6 +49,30 @@ export default class User {
         return User.hasRole("admin")
     }
 
+    static async register(payload) {
+        if (!User.bridge) {
+            return false
+        }
+
+        const { username, password, email } = payload
+
+        const response = await User.bridge.post.register(undefined, {
+            username,
+            password,
+            email,
+        }).catch((error) => {
+            console.error(error)
+
+            return false
+        })
+
+        if (!response) {
+            throw new Error("Unable to register user")
+        }
+
+        return response
+    }
+
     getData = async (payload, callback) => {
         const request = await User.bridge.get.user(undefined, { username: payload.username, _id: payload.user_id }, {
             parseData: false
