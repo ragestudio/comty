@@ -5,30 +5,51 @@ import moment from "moment"
 import { Icons } from "components/Icons"
 import { CommentCreator } from "components"
 
+import PostModel from "models/post"
+
 import "./index.less"
 
+const CommentCard = (props) => {
+    const { data, onClickDelete } = props
+
+    const handleClickDelete = () => {
+        if (typeof onClickDelete !== "function") {
+            console.warn("onClickDelete is not a function")
+            return
+        }
+
+        return onClickDelete(data._id)
+    }
+
+    return <div className="comment" id={data._id}>
+        <div className="header">
+            <div className="avatar">
+                <antd.Avatar src={data.user.avatar} />
+            </div>
+            <div className="username">
+                {data.user.username}
+            </div>
+            <div className="timeAgo">
+                {moment(data.created_at).fromNow()}
+            </div>
+            <antd.Button
+                className="deleteBtn"
+                type="link"
+                icon={<Icons.Trash />}
+                onClick={handleClickDelete}
+            />
+        </div>
+        <div className="content">
+            {data.message}
+        </div>
+    </div>
+}
+
 export default (props) => {
-    const [postData, setPostData] = React.useState(null)
     const [comments, setComments] = React.useState(null)
 
     const fetchData = async () => {
-        setPostData(null)
         setComments(null)
-
-        // fetch post data
-        const postDataResult = await window.app.api.request("main", "get", `post`, undefined, {
-            post_id: props.post_id
-        }).catch((err) => {
-            console.log(err)
-
-            antd.message.error("Failed to fetch post data")
-
-            return null
-        })
-
-        if (!postDataResult) return
-
-        setPostData(postDataResult)
 
         // fetch comments
         const commentsResult = await window.app.api.customRequest("main", {
@@ -42,15 +63,69 @@ export default (props) => {
             return null
         })
 
-        console.log(commentsResult)
-
         if (!commentsResult) return
 
         setComments(commentsResult.data)
     }
 
+    const handleCommentSubmit = async (comment) => {
+        const result = await PostModel.sendComment({
+            post_id: props.post_id,
+            comment
+        }).catch((err) => {
+            console.log(err)
+
+            antd.message.error("Failed to send comment")
+
+            return null
+        })
+
+        if (!result) return
+    }
+
+    const handleCommentDelete = async (comment_id) => {
+        antd.Modal.confirm({
+            title: "Are you sure you want to delete this comment?",
+            onOk: async () => {
+                const result = await PostModel.deleteComment({
+                    post_id: props.post_id,
+                    comment_id: comment_id
+                }).catch((err) => {
+                    console.log(err)
+
+                    antd.message.error("Failed to delete comment")
+                })
+
+                if (!result) return
+            },
+        })
+    }
+
+    const listenEvents = () => {
+        window.app.api.namespaces["main"].listenEvent(`post.new.comment.${props.post_id}`, (comment) => {
+            setComments((comments) => {
+                return [comment, ...comments]
+            })
+        })
+        window.app.api.namespaces["main"].listenEvent(`post.delete.comment.${props.post_id}`, (comment_id) => {
+            setComments((comments) => {
+                return comments.filter((comment) => comment._id !== comment_id)
+            })
+        })
+    }
+
+    const unlistenEvents = () => {
+        window.app.api.namespaces["main"].unlistenEvent(`post.new.comment.${props.post_id}`)
+        window.app.api.namespaces["main"].unlistenEvent(`post.delete.comment.${props.post_id}`)
+    }
+
     React.useEffect(() => {
         fetchData()
+        listenEvents()
+
+        return () => {
+            unlistenEvents()
+        }
     }, [])
 
     const renderComments = () => {
@@ -63,22 +138,10 @@ export default (props) => {
         }
 
         return comments.map((comment) => {
-            return <div className="comment" id={comment._id}>
-                <div className="header">
-                    <div className="avatar">
-                        <antd.Avatar src={comment.user.avatar} />
-                    </div>
-                    <div className="username">
-                        {comment.user.username}
-                    </div>
-                    <div className="timeAgo">
-                        {moment(comment.createdAt).fromNow()}
-                    </div>
-                </div>
-                <div className="content">
-                    {comment.message}
-                </div>
-            </div>
+            return <CommentCard
+                data={comment}
+                onClickDelete={handleCommentDelete}
+            />
         })
     }
 
@@ -89,12 +152,15 @@ export default (props) => {
     return <div className="comments">
         <div className="header">
             <h1>
-               <Icons.MessageSquare /> Comments
+                <Icons.MessageSquare /> Comments
             </h1>
         </div>
         {renderComments()}
         <div className="commentCreatorWrapper">
-            <CommentCreator />
+            <CommentCreator
+                onSubmit={handleCommentSubmit}
+                maxLength={PostModel.maxCommentLength}
+            />
         </div>
     </div>
 }
