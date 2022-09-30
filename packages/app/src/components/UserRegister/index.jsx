@@ -2,6 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import { StepsForm } from "components"
 
+import UserModel from "models/user"
+
 import "./index.less"
 
 const steps = [
@@ -14,7 +16,7 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input
-                    autoCorrect="off" 
+                    autoCorrect="off"
                     autoCapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="@newuser"
@@ -34,7 +36,7 @@ const steps = [
         content: (props) => {
             return <div className="workorder_creator steps step content">
                 <antd.Input.Password
-                    autoCorrect="off" 
+                    autoCorrect="off"
                     autoCapitalize="none"
                     onPressEnter={props.onPressEnter}
                     placeholder="Password"
@@ -66,15 +68,16 @@ const steps = [
 ]
 
 export default (props) => {
-    const api = window.app.api.withEndpoints("main")
-
     const onSubmit = async (values) => {
-        const result = await api.post.register(values).catch((err) => {
-            console.log(err)
-            return false
+        const result = await UserModel.register(values).catch((error) => {
+            throw new Error(`Failed to register user: ${error.message}`)
         })
 
         if (result) {
+            antd.message.success("User registered successfully.")
+        }
+
+        if (typeof props.close === "function") {
             props.close()
         }
     }
