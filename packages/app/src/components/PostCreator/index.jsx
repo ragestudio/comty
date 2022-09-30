@@ -41,6 +41,8 @@ export default (props) => {
     }
 
     const submit = () => {
+        if (!canSubmit()) return
+
         setLoading(true)
         setUploaderVisible(false)
         setFocused(false)
@@ -89,7 +91,7 @@ export default (props) => {
         }
     }
 
-    const canPublish = () => {
+    const canSubmit = () => {
         const messageLengthValid = postData.message.length !== 0 && postData.message.length < maxMessageLength
 
         return Boolean(messageLengthValid) && Boolean(pending.length === 0)
@@ -142,6 +144,16 @@ export default (props) => {
         setFocused(to ?? !focused)
     }
 
+    const handleKeyDown = (e) => {
+        // detect if the user pressed `enter` key and submit the form, but only if the `shift` key is not pressed
+        if (e.keyCode === 13 && !e.shiftKey) {
+            e.preventDefault()
+            e.stopPropagation()
+
+            submit()
+        }
+    }
+
     React.useEffect(() => {
         User.data().then(user => {
             setUserData(user)
@@ -176,21 +188,20 @@ export default (props) => {
                 <img src={userData?.avatar} />
             </div>
             <antd.Input.TextArea
-                disabled={loading}
-                value={postData.message}
-                onPressEnter={submit}
-                autoSize={{ minRows: 3, maxRows: 6 }}
-                dragable="false"
                 placeholder="What are you thinking?"
+                disabled={loading}
+                onKeyDown={handleKeyDown}
                 onChange={onChangeMessageInput}
-                allowClear
-                rows={8}
+                autoSize={{ minRows: 3, maxRows: 6 }}
                 maxLength={maxMessageLength}
+                dragable={false}
+                value={postData.message}
+                allowClear
             />
             <div>
                 <antd.Button
                     type="primary"
-                    disabled={loading || !canPublish()}
+                    disabled={loading || !canSubmit()}
                     onClick={submit}
                     icon={loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
                 />
