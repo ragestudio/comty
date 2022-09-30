@@ -349,6 +349,11 @@ export default class Sidebar extends React.Component {
 				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
+							<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearch" >
+								<Translation>
+									{(t) => t("Search")}
+								</Translation>
+							</Menu.Item>
 							<Menu.Item key="create" icon={<Icons.PlusCircle />} overrideEvent="app.openCreator" >
 								<Translation>
 									{(t) => t("Create")}
@@ -365,11 +370,21 @@ export default class Sidebar extends React.Component {
 								</Translation>
 							</Menu.Item>
 
-							<Menu.Item key="account">
-								<div className="user_avatar">
-									<Avatar shape="square" src={user?.avatar} />
-								</div>
-							</Menu.Item>
+							{
+								user && <Menu.Item key="account">
+									<div className="user_avatar">
+										<Avatar shape="square" src={user?.avatar} />
+									</div>
+								</Menu.Item>
+							}
+
+							{
+								!user && <Menu.Item key="login" icon={<Icons.LogIn />}>
+									<Translation>
+										{t => t("Login")}
+									</Translation>
+								</Menu.Item>
+							}
 
 							{this.renderExtraItems("bottom")}
 						</Menu>
