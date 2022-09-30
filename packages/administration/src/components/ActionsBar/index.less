@@ -1,0 +1,100 @@
+@actionsBar_height: fit-content;
+
+.actionsBar {
+	--ignore-dragger: true;
+	display: inline-block;
+	white-space: nowrap;
+
+	overflow-x: overlay;
+
+	padding: 15px;
+
+	width: 100%;
+	height: @actionsBar_height;
+
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+
+	background-color: #0c0c0c15;
+
+	backdrop-filter: blur(10px);
+	--webkit-backdrop-filter: blur(10px);
+
+	transition: all 200ms ease-in-out;
+
+	::-webkit-scrollbar {
+		position: absolute;
+		display: none;
+
+		width: 0;
+		height: 0;
+		z-index: 0;
+	}
+
+	.wrapper {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		height: 100%;
+		transition: all 200ms ease-in-out;
+
+		> div {
+			margin: 0 5px;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			--ignore-dragger: true;
+
+			span {
+				height: fit-content;
+			}
+		}
+	}
+
+	&.float {
+		z-index: 1000;
+		position: sticky;
+		bottom: 0;
+		top: 0;
+		right: 0;
+		width: 100%;
+	}
+
+	&.fixedBottom {
+		z-index: 1000;
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	&.fixedTop {
+		z-index: 1000;
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		width: 100%;
+		margin-bottom: 10px;
+	}
+
+	&.transparent {
+		background-color: transparent;
+		border: none;
+		backdrop-filter: none;
+		--webkit-backdrop-filter: none;
+	}
+
+	&.spaced {
+		.wrapper {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+		}
+	}
+}

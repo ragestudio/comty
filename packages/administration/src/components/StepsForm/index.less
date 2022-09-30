@@ -1,0 +1,91 @@
+.steps_form {
+	.ant-steps-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		height: 100%;
+
+		svg {
+			margin: 0;
+		}
+	}
+
+	.steps {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+
+		.header {
+			//position: fixed;
+			width: 100%;
+			height: fit-content;
+			flex-direction: row;
+		}
+
+		.ant-select {
+			width: 100%;
+		}
+
+		.step {
+			padding: 0 10px;
+			display: inline-flex;
+			flex-direction: column;
+
+			width: 100%;
+			height: 100%;
+
+			align-items: flex-start;
+
+			h1 {
+				margin: 0;
+			}
+
+			.title {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+			}
+
+			.description {
+				color: var(--background-color-contrast);
+			}
+
+			.content {
+				padding: 10px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
+				width: 100%;
+
+				.ant-list {
+					width: 100%;
+				}
+			}
+
+			.actions {
+				display: inline-flex;
+				flex-direction: row;
+
+				align-items: center;
+				justify-content: center;
+
+				> div {
+					margin-right: 10px;
+				}
+			}
+
+			> div {
+				margin-bottom: 0;
+			}
+		}
+
+		> div {
+			margin-bottom: 20px;
+		}
+	}
+}
