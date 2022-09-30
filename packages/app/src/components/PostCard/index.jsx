@@ -90,7 +90,7 @@ export function PostHeader(props) {
         }
     }, [props.postData.created_at])
 
-    return <div className="postHeader">
+    return <div className="postHeader" onDoubleClick={props.onDoubleClick}>
         <div className="userInfo">
             <div className="avatar">
                 <Image
@@ -251,50 +251,59 @@ export const PostContent = React.memo((props) => {
 
     message = processString(regexs)(message)
 
-    switch (type) {
-        case "playlist": {
-            return <div className="content">
-                <div
-                    className="playlistCover"
-                    onClick={onClickPlaylist}
-                    style={{
-                        backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
-                    }}
-                />
+    const renderContent = () => {
+        switch (type) {
+            case "playlist": {
+                return <>
+                    <div
+                        className="playlistCover"
+                        onClick={onClickPlaylist}
+                        style={{
+                            backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
+                        }}
+                    />
 
-                <div className="playlistTitle">
-                    <div>
-                        <h1>
-                            {data.title ?? "Untitled Playlist"}
-                        </h1>
-                        <h3>
-                            {data.artist}
-                        </h3>
+                    <div className="playlistTitle">
+                        <div>
+                            <h1>
+                                {data.title ?? "Untitled Playlist"}
+                            </h1>
+                            <h3>
+                                {data.artist}
+                            </h3>
+                        </div>
+
+                        <h4>
+                            {message}
+                        </h4>
+
+                        <div className="actions">
+                            <antd.Button onClick={onClickPlaylist}>
+                                <Icons.PlayCircle />
+                                Play
+                            </antd.Button>
+                        </div>
                     </div>
-
-                    <h4>
+                </>
+            }
+            default: {
+                return <>
+                    <div className="message">
                         {message}
-                    </h4>
-
-                    <div className="actions">
-                        <antd.Button onClick={onClickPlaylist}>
-                            <Icons.PlayCircle />
-                            Play
-                        </antd.Button>
                     </div>
-                </div>
-            </div>
-        }
-        default: {
-            return <div className="content">
-                <div className="message">
-                    {message}
-                </div>
 
-                {additions.length > 0 && <PostAdditions additions={additions} />}
-            </div>
+                    {additions.length > 0 && <PostAdditions additions={additions} />}
+                </>
+            }
         }
     }
+
+    return <div
+        className="content"
+        onDoubleClick={props.onDoubleClick}
+    >
+        {renderContent()}
+    </div>
 })
 
 export const PostActions = (props) => {
@@ -452,7 +461,6 @@ export const PostCard = React.memo(({
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
         )}
-        onDoubleClick={onDoubleClick}
     >
         <div className="wrapper">
             <PostHeader
@@ -461,11 +469,13 @@ export const PostCard = React.memo(({
                 likes={likes.length}
                 comments={comments.length}
                 fullmode={fullmode}
+                onDoubleClick={onDoubleClick}
             />
             <PostContent
                 data={data}
                 autoCarrousel={autoCarrousel}
                 fullmode={fullmode}
+                onDoubleClick={onDoubleClick}
             />
         </div>
         {!fullmode &&
