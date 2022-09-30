@@ -20,7 +20,7 @@ const Tabs = {
         }
     },
     "livestrems": {
-        title: "Livestrems",
+        title: "Livestreams",
         icon: "Tv",
         component: (props) => {
             return <>
