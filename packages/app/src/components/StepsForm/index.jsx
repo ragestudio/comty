@@ -41,6 +41,10 @@ export default class StepsForm extends React.Component {
     handleNext = (to) => {
         const index = to ?? (this.state.step + 1)
 
+        if (index >= this.state.steps.length) {
+            return this.onSubmit()
+        }
+
         this.setState({ step: index, renderStep: this.renderStep(index) })
     }
 
