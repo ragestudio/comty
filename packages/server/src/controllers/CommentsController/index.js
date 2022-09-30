@@ -3,42 +3,28 @@ import { User, Post, Comment } from "../../models"
 import { Schematized } from "../../lib"
 
 import getComments from "./methods/getComments"
+import newComment from "./methods/newComment"
+import deleteComment from "./methods/deleteComment"
 
 export default class CommentsController extends Controller {
     static refName = "CommentsController"
 
     get = {
-        "/comments": {
-            fn: Schematized({
-                required: ["targetId"],
-                select: ["targetId"],
-            }, async (req, res) => {
-
-            })
-        },
         "/post/:post_id/comments": {
             fn: async (req, res) => {
                 const { post_id } = req.params
 
-                let comments = await Comment.find({ parent_id: post_id }).catch(err => {
-                    res.status(500).json({ message: err.message })
+                const comments = await getComments({ parent_id: post_id }).catch((err) => {
+                    res.status(400).json({
+                        error: err.message,
+                    })
 
                     return false
                 })
 
-                if (comments) {
-                    // fullfill comments with user data
-                    comments = await Promise.all(comments.map(async comment => {
-                        const user = await User.findById(comment.user_id)
+                if (!comments) return
 
-                        return {
-                            ...comment.toObject(),
-                            user: user.toObject(),
-                        }
-                    }))
-
-                    return res.json(comments)
-                }
+                return res.json(comments)
             }
         }
     }
@@ -53,26 +39,39 @@ export default class CommentsController extends Controller {
                 const { post_id } = req.params
                 const { message } = req.selection
 
-                const comment = new Comment({
-                    user_id: req.user._id.toString(),
-                    parent_id: post_id,
-                    message: message,
-                })
+                try {
+                    const comment = newComment({
+                        user_id: req.user._id.toString(),
+                        parent_id: post_id,
+                        message: message,
+                    })
 
-                await comment.save()
-
-                if (comment) {
                     return res.json(comment)
+                } catch (error) {
+                    return res.status(400).json({
+                        error: error.message,
+                    })
                 }
             })
         }
     }
 
-    put = {
-
-    }
-
     delete = {
+        "/post/:post_id/comment/:comment_id": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                const result = await deleteComment({
+                    comment_id: req.params.comment_id,
+                }).catch((err) => {
+                    res.status(500).json({ message: err.message })
 
+                    return false
+                })
+
+                if (result) {
+                    return res.json(result)
+                }
+            }
+        }
     }
 }
