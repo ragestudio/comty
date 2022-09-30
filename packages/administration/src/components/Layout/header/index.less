@@ -1,0 +1,32 @@
+@import "theme/index.less";
+
+.app_header {
+	user-select: none;
+	--webkit-user-select: none;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	z-index: 100;
+
+	height: @app_header_height  !important;
+	padding: 10px;
+
+	transition: all ease-in-out 150ms;
+
+	background-color: transparent;
+	background: transparent !important;
+
+	border-bottom: 1px var(--border-color) solid;
+
+	>div {
+		margin-right: 16px;
+	}
+
+	&.hidden {
+		opacity: 0;
+		height: 0 !important;
+		padding: 0 !important;
+		border: 0 !important;
+	}
+}

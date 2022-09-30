@@ -1,0 +1,168 @@
+// Fixments
+.ant-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    user-select: none;
+    --webkit-user-select: none;
+}
+
+.ant-result-extra {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ant-modal-confirm-btns {
+    display: flex;
+}
+
+.ant-message {
+    svg {
+        margin: 0;
+    }
+}
+
+.ant-avatar-square {
+    border-radius: 12px;
+}
+
+// fix results
+.ant-result {
+    .ant-result-content {
+        display: inline-flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        text-align: center;
+
+        padding: 10px;
+        background-color: var(--background-color-accent);
+        color: var(--background-color-primary);
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        p,
+        span {
+            margin: 0;
+        }
+    }
+}
+
+// fix colors for select & dropdown
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    background-color: var(--background-color-primary);
+}
+
+.ant-select-dropdown {
+    background-color: var(--background-color-primary) !important;
+    color: var(--text-color) !important;
+
+    .ant-select-item-option:not(.ant-select-item-option-disabled) {
+        background-color: var(--background-color-primary) !important;
+        color: var(--text-color) !important;
+    }
+
+    .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+        background-color: var(--background-color-primary2) !important;
+        color: var(--text-color) !important;
+    }
+}
+
+// fix buttons
+.ant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        margin: 0 10px 0 0 !important;
+    }
+
+    span {
+        margin: 0;
+        line-height: 1rem;
+    }
+}
+
+.ant-btn-primary {
+    svg {
+        color: var(--background-color-primary) !important;
+    }
+
+    span {
+        color: var(--background-color-primary) !important;
+        margin: 0;
+    }
+}
+
+.ant-btn-primary[disabled] {
+    svg {
+        color: unset !important;
+    }
+
+    span {
+        color: unset !important;
+        margin: 0;
+    }
+}
+
+.ant-btn-default {
+    color: var(--text-color);
+    background: var(--background-color-primary);
+    border-color: var(--background-color-primary2) !important;
+
+    &:hover {
+        color: var(--text-color);
+        background: var(--background-color-primary2);
+        border-color: var(--background-color-primary2) !important;
+    }
+
+    &:active {
+        color: var(--text-color);
+        background: var(--background-color-primary2);
+        border-color: var(--background-color-primary2) !important;
+    }
+
+    &:focus {
+        color: var(--text-color);
+        background: var(--background-color-primary2);
+        border-color: var(--background-color-contrast) !important;
+    }
+}
+
+// fix sliders colors
+.ant-slider-rail {
+    background-color: var(--background-color-primary2);
+
+    &:hover {
+        background-color: var(--background-color-primary);
+    }
+}
+
+// fix menu colors
+.ant-menu-item {
+    color: var(--text-color);
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+    color: var(--text-color);
+    background-color: var(--background-color-primary) !important;
+}
+
+.ant-menu-item:active {
+    background-color: var(--background-color-primary2) !important;
+}
+
+// fix uploader drag
+.ant-upload-drag {
+    color: var(--text-color) !important;
+    background: var(--background-color-primary) !important;
+    border-color: var(--background-color-primary2) !important;
+}

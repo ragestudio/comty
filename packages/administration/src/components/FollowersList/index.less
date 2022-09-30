@@ -1,0 +1,65 @@
+@borderRadius: 12px;
+
+.ant-result {
+    display       : flex;
+    flex-direction: column;
+    align-items   : center;
+}
+
+.ant-result-icon {
+    background-color: var(--background-color-accent);
+    border-radius   : @borderRadius;
+    width           : fit-content;
+    padding         : 20px;
+
+    svg {
+        margin: 0;
+        color : var(--background-color-contrast);
+    }
+}
+
+.ant-result-content {
+    background-color: var(--background-color-accent);
+    border-radius   : @borderRadius;
+
+    h2 {
+        color: var(--background-color-contrast);
+    }
+
+    h3 {
+        color      : var(--background-color-contrast);
+        font-weight: 100;
+    }
+}
+
+.followersList {
+
+    .follower {
+        width      : 100%;
+        //max-width: 50vw;
+
+        padding      : 10px;
+        display      : inline-flex;
+        align-items  : center;
+        border-radius: 8px;
+        border       : 1px solid var(--border-color);
+
+        h2 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 26px;
+        }
+
+        >div {
+            margin-right: 10px;
+        }
+
+        .names {
+            
+        }
+    }
+
+    >div {
+        margin-bottom: 20px;
+    }
+}
