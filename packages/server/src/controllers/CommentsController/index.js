@@ -62,6 +62,7 @@ export default class CommentsController extends Controller {
             fn: async (req, res) => {
                 const result = await deleteComment({
                     comment_id: req.params.comment_id,
+                    issuer_id: req.user._id.toString(),
                 }).catch((err) => {
                     res.status(500).json({ message: err.message })
 
