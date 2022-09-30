@@ -41,13 +41,10 @@
         "icon": "Video"
     },
     {
-        "id": "administration",
-        "path": "/administration",
-        "title": "Administration",
-        "icon": "MdOutlineAdminPanelSettings",
-        "webTitleAddition": "Administration Mode",
-        "requiredRoles": [
-            "admin"
-        ]
+        "id": "groups",
+        "path": "/groups",
+        "title": "Groups",
+        "icon": "Users",
+        "reachable": true
     }
 ]
