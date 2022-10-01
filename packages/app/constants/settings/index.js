@@ -1,8 +1,9 @@
 import AppSettings from "./app"
 import AccountSettings from "./account"
 import SecuritySettings from "./security"
+import NotificationsSettings from "./notifications"
 import ApparenceSettings from "./apparence"
-import ExtensionsSettings from "./extensions"
+//import ExtensionsSettings from "./extensions"
 
 export default {
     app: {
@@ -12,22 +13,22 @@ export default {
     },
     account: {
         icon: "User",
-        label: "Account",
+        label: "Profile",
         settings: AccountSettings
-    },
-    security: {
-        icon: "Shield",
-        label: "Security",
-        settings: SecuritySettings
     },
     apparence: {
         icon: "Eye",
         label: "Apparence",
         settings: ApparenceSettings
     },
-    extensions: {
-        icon: "MdOutlineWidgets",
-        label: "Extensions",
-        settings: ExtensionsSettings
-    }
+    security: {
+        icon: "Shield",
+        label: "Security",
+        settings: SecuritySettings
+    },
+    notifications: {
+        icon: "Bell",
+        label: "Notifications",
+        settings: NotificationsSettings
+    },
 }
