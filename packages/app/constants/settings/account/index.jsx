@@ -187,15 +187,8 @@ export default [
         "debounced": true,
     },
     {
-        "id": "primaryBadge",
-        "group": "account.profile",
-        "component": "Select",
-        "icon": "Tag",
-        "title": "Primary badge",
-        "description": "Change your primary badge",
-    },
-    {
         "id": "logout",
+        "group": "account.security",
         "footer": true,
         "component": "Button",
         "icon": "LogOut",
