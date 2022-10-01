@@ -4,7 +4,6 @@ import * as antd from "antd"
 import { Card as ACard, Mask as AMask } from "antd-mobile"
 
 import { Icons } from "components/Icons"
-import { DiReact } from "react-icons/di"
 
 import config from "config"
 
@@ -12,6 +11,18 @@ import "./index.less"
 
 export const Card = (props) => {
 	const isProduction = import.meta.env.PROD
+
+	const [serverManifest, setServerManifest] = React.useState(null)
+
+	const checkServerVersion = async () => {
+		const serverManifest = await app.api.customRequest("main")
+
+		setServerManifest(serverManifest.data)
+	}
+
+	React.useEffect(() => {
+		checkServerVersion()
+	}, [])
 
 	return <ACard
 		bodyClassName="aboutApp_card"
@@ -36,8 +47,19 @@ export const Card = (props) => {
 		<div className="group">
 			<h3><Icons.GitMerge />Versions</h3>
 			<div>
+				<antd.Tag>Linebridge {serverManifest?.LINEBRIDGE_SERVER_VERSION ?? "Unknown"}</antd.Tag>
+				<antd.Tag color="blue">React {React.version}</antd.Tag>
 				<antd.Tag color="#ffec3d">eVite v{window.app.__eviteVersion ?? "experimental"}</antd.Tag>
-				<antd.Tag color="#61DBFB"><DiReact /> v{React.version ?? "experimental"}</antd.Tag>
+			</div>
+		</div>
+
+		<div className="group">
+			<h3><Icons.GitMerge />Server info</h3>
+			<div>
+				Server Time: {serverManifest?.requestTime ?? "Unknown"}
+			</div>
+			<div>
+				Origin: {app.api.namespaces.main.origin ?? "Unknown"}
 			</div>
 		</div>
 	</ACard>
