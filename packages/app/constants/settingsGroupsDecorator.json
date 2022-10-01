@@ -15,6 +15,14 @@
         "title": "Aspect",
         "icon": "Eye"
     },
+    "security.account": {
+        "title": "Account Security",
+        "icon": "Lock"
+    },
+    "security.other":{
+        "title": "Others",
+        "icon": "MoreHorizontal"
+    },
     "account.basicInfo": {
         "title": "Basic Information",
         "icon": "Info"
