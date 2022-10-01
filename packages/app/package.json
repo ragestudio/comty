@@ -31,9 +31,7 @@
     "@capacitor/storage": "1.2.4",
     "@corenode/utils": "0.28.26",
     "@emotion/css": "11.0.0",
-    "@foxify/events": "2.0.1",
     "@loadable/component": "5.15.2",
-    "@vitejs/plugin-react": "^2.1.0",
     "antd": "4.23.2",
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
@@ -41,7 +39,7 @@
     "electron-is": "^3.0.0",
     "electron-log": "^4.4.8",
     "electron-squirrel-startup": "^1.0.0",
-    "evite": "0.12.3",
+    "evite": "0.13.6",
     "faye": "1.4.0",
     "feather-reactjs": "2.0.13",
     "fuse.js": "6.5.3",
@@ -81,7 +79,6 @@
     "react-rnd": "10.3.5",
     "rxjs": "^7.5.5",
     "store": "^2.0.12",
-    "styled-components": "^5.3.3",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
