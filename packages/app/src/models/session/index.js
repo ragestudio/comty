@@ -17,12 +17,17 @@ export default class Session {
         return cookies.set(this.tokenKey, token)
     }
 
-    static async delToken() {
+    static get user_id() {
+        return this.decodedToken()?.user_id
+    }
+
+    static delToken() {
         return cookies.remove(Session.tokenKey)
     }
 
-    static async decodedToken() {
-        const token = await this.token
+    static decodedToken() {
+        const token = this.token
+
         return token && jwt_decode(token)
     }
 
