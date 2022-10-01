@@ -8,15 +8,15 @@ USER node
 
 EXPOSE 9000
 
-COPY --chown=node:node ./package.json .
-COPY --chown=node:node ./src .
-COPY --chown=node:node ./constants .
-COPY --chown=node:node ./config .
-COPY --chown=node:node ./public .
-COPY --chown=node:node ./.config.js .
-COPY --chown=node:node ./server.js .
-COPY --chown=node:node ./vite.config.js .
+COPY --chown=node:node ./src ./src
+COPY --chown=node:node ./constants ./constants
+COPY --chown=node:node ./config ./config
+COPY --chown=node:node ./public ./public
 COPY --chown=node:node ./index.html .
+COPY --chown=node:node ./.config.js .
+COPY --chown=node:node ./vite.config.js .
+COPY --chown=node:node ./server.js .
+COPY --chown=node:node ./package.json .
 
 RUN chmod -R 777 /home/node/app
 RUN npm install -D --force
