@@ -1,3 +1,31 @@
+.adm-card {
+    background-color: var(--background-color-accent);
+    color: var(--text-color);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    p {
+        color: var(--text-color);
+    }
+
+    .ant-tag {
+        color: #1f1f1f;
+
+        svg {
+            color: #1f1f1f;
+        }
+    }
+}
+
+.adm-card-header:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+}
+
 .aboutApp_wrapper {
     display: flex;
     flex-direction: column;
@@ -6,11 +34,25 @@
 
     width: 100vw;
     height: 100vh;
+
+    background-color: var(--background-color-primary);
+    color: var(--text-color);
 }
 
 .aboutApp_card {
     height: fit-content;
     width: 80vw;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    span,
+    p {
+        color: var(--text-color);
+    }
 
     svg {
         margin: 0;
@@ -20,22 +62,20 @@
         display: inline-flex;
         align-items: center;
     }
-    
+
     .group {
         width: 100%;
         display: inline-flex;
         flex-direction: column;
         justify-content: center;
-        
-        > div {
+
+        >div {
             display: inline-flex;
             margin-left: 10px;
         }
 
         margin-bottom: 10px;
     }
-
-  
 }
 
 .aboutApp_card_header {
@@ -51,7 +91,9 @@
         align-items: center;
         justify-content: space-between;
 
-        h1,h2,h3 {
+        h1,
+        h2,
+        h3 {
             margin: 0;
         }
 
@@ -59,7 +101,9 @@
             display: flex;
             flex-direction: column;
 
-            h1,h2,h3 {
+            h1,
+            h2,
+            h3 {
                 height: fit-content;
                 line-height: 24px;
             }
@@ -70,6 +114,5 @@
                 font-size: 10px;
             }
         }
-        
     }
 }
