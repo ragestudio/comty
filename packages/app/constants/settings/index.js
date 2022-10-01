@@ -1,5 +1,6 @@
 import AppSettings from "./app"
 import AccountSettings from "./account"
+import SecuritySettings from "./security"
 import ApparenceSettings from "./apparence"
 import ExtensionsSettings from "./extensions"
 
@@ -13,6 +14,11 @@ export default {
         icon: "User",
         label: "Account",
         settings: AccountSettings
+    },
+    security: {
+        icon: "Shield",
+        label: "Security",
+        settings: SecuritySettings
     },
     apparence: {
         icon: "Eye",
