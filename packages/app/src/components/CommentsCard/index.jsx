@@ -10,7 +10,7 @@ import PostModel from "models/post"
 import "./index.less"
 
 const CommentCard = (props) => {
-    const { data, onClickDelete } = props
+    const { data, onClickDelete, self = false } = props
 
     const handleClickDelete = () => {
         if (typeof onClickDelete !== "function") {
@@ -32,12 +32,14 @@ const CommentCard = (props) => {
             <div className="timeAgo">
                 {moment(data.created_at).fromNow()}
             </div>
-            <antd.Button
-                className="deleteBtn"
-                type="link"
-                icon={<Icons.Trash />}
-                onClick={handleClickDelete}
-            />
+            {
+                self && <antd.Button
+                    className="deleteBtn"
+                    type="link"
+                    icon={<Icons.Trash />}
+                    onClick={handleClickDelete}
+                />
+            }
         </div>
         <div className="content">
             {data.message}
@@ -141,6 +143,7 @@ export default (props) => {
             return <CommentCard
                 data={comment}
                 onClickDelete={handleCommentDelete}
+                self={app.permissions.checkUserIdIsSelf(comment.user._id)}
             />
         })
     }
