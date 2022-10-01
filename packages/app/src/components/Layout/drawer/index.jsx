@@ -1,6 +1,6 @@
 import React from "react"
 import { DraggableDrawer } from "components"
-import EventEmitter from "@foxify/events"
+import { EventBus } from "evite"
 
 import "./index.less"
 
@@ -100,7 +100,7 @@ export default class DrawerController extends React.Component {
 
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
-	events = new EventEmitter()
+	events = new EventBus()
 	state = {
 		visible: true,
 	}
