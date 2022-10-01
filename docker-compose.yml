@@ -7,7 +7,7 @@ services:
     ports:
       - "9000:9000"
   api:
-    build: packages/api
+    build: packages/server
     restart: unless-stopped
     ports:
       - "3000:3000"
