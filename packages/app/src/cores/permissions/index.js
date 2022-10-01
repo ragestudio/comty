@@ -1,20 +1,22 @@
 import Core from "evite/src/core"
+
 import UserModel from "models/user"
+import SessionModel from "models/session"
 
 export default class PermissionsCore extends Core {
-    publicMethods = {
-        permissions: this
-    }
+    static namespace = "permissions"
+    static dependencies = ["api"]
+    static public = ["hasAdmin", "checkUserIdIsSelf", "hasPermission"]
 
-    isUserAdmin = "unchecked"
-
-    // this will works with a newer version of evite
-    async initializeBeforeRuntimeInit() {
-        this.isUserAdmin = await UserModel.hasAdmin()
-    }
+    userData = null
+    isUserAdmin = null
 
     hasAdmin = async () => {
         return await UserModel.hasAdmin()
+    }
+
+    checkUserIdIsSelf = (userId) => {
+        return SessionModel.user_id === userId
     }
 
     hasPermission = async (permission) => {
