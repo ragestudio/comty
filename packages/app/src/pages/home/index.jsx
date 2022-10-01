@@ -115,6 +115,13 @@ export default class Dashboard extends React.Component {
                     <h2><Icons.TrendingUp /> Trendings</h2>
                     <HashtagTrendings />
                 </div>
+
+                <div className="card" id="onlineFriends">
+                    <h2><Icons.Rss /> Online Friends</h2>
+                    <div className="content">
+
+                    </div>
+                </div>
             </div>
         </div>
     }
