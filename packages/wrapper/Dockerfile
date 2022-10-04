@@ -13,6 +13,5 @@ COPY --chown=node:node ./src ./src
 
 RUN chmod -R 777 /home/node/app
 RUN npm install -D --force
-RUN npm run build
 
 CMD ["node", "/home/node/app/src/index.js"]
