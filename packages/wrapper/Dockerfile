@@ -1,4 +1,4 @@
-FROM node:16-debian-slim
+FROM node:16-bullseye-slim
 
 RUN apt install git
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
