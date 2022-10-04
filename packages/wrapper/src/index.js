@@ -2,11 +2,12 @@ require("dotenv").config()
 
 const packagejson = require("../package.json")
 
-import fs from "fs"
-import path from "path"
-import express from "express"
-import cors from "cors"
-import setupLatestRelease from "./lib/setupDist"
+const fs = require("fs")
+const path = require("path")
+const express = require("express")
+const cors = require("cors")
+
+const { setupLatestRelease } = require("./lib/setupDist")
 
 global.remoteRepo = "ragestudio/comty"
 global.cachePath = path.join(process.cwd(), "cache")
@@ -44,6 +45,7 @@ async function runServer() {
 
     app.listen(portListen)
 
+    console.log(`Running Wrapper v${packagejson.version}`)
     console.log(`🌐  Listening app in port [${portListen}]`)
 }
 

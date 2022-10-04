@@ -8,7 +8,7 @@ const octokit = new Octokit({
     // auth: process.env.GITHUB_TOKEN
 })
 
-export async function getLatestReleaseBundleFromGithub() {
+async function getLatestReleaseBundleFromGithub() {
     console.log("Getting latest release bundle from github...")
 
     const release = await octokit.repos.getLatestRelease({
@@ -21,7 +21,7 @@ export async function getLatestReleaseBundleFromGithub() {
     return bundle
 }
 
-export async function downloadBundle(bundle) {
+async function downloadBundle(bundle) {
     // check if bundle exists
     if (fs.existsSync(path.join(global.cachePath, "app_dist.7z"))) {
         fs.unlinkSync(path.join(global.cachePath, "app_dist.7z"))
@@ -43,7 +43,7 @@ export async function downloadBundle(bundle) {
     })
 }
 
-export async function extractBundle() {
+async function extractBundle() {
     return new Promise((resolve, reject) => {
         console.log("Extracting bundle...")
 
@@ -57,7 +57,7 @@ export async function extractBundle() {
     })
 }
 
-export async function setupLatestRelease() {
+async function setupLatestRelease() {
     // create cache folder
     if (!fs.existsSync(global.cachePath)) {
         fs.mkdirSync(global.cachePath)
@@ -84,4 +84,9 @@ export async function setupLatestRelease() {
     }
 }
 
-export default setupLatestRelease
+module.exports = {
+    getLatestReleaseBundleFromGithub,
+    downloadBundle,
+    extractBundle,
+    setupLatestRelease,
+}
