@@ -13,7 +13,7 @@ global.remoteRepo = "ragestudio/comty"
 global.cachePath = path.join(process.cwd(), "cache")
 global.distPath = path.join(process.cwd(), "dist")
 
-async function checkDistIntegrity() {
+function checkDistIntegrity() {
     // check if dist folder exists
     if (!fs.existsSync(global.distPath)) {
         return false
@@ -52,6 +52,7 @@ async function runServer() {
 async function main() {
     // check if dist is valid
     if (!checkDistIntegrity()) {
+        console.log("DistIntegrity is not valid, downloading latest release...")
         await setupLatestRelease()
     }
 
