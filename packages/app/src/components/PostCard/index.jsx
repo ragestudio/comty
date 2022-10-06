@@ -312,7 +312,7 @@ export const PostActions = (props) => {
                 <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
             </div>
         </div>
-        <div className="action" id="comments" onClick={props.onClickOpen}>
+        <div className="action" id="open" onClick={props.onClickOpen}>
             <div className="icon">
                 <Icons.MdOutlineOpenInNew className="icon" />
             </div>
