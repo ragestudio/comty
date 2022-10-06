@@ -552,13 +552,21 @@
 
     transition: all 150ms ease-in-out;
 
+    background: transparent !important;
+    background-color: transparent !important;
+
     &.active {
-        color: var(--appColor);
+        color: var(--primaryColor);
+
+        svg {
+            color: var(--primaryColor);
+        }
     }
 
     svg {
-        background-color: transparent;
         width: 20px;
         height: 20px;
+
+        transition: all 150ms ease-in-out;
     }
 }
