@@ -349,7 +349,7 @@ export default class Sidebar extends React.Component {
 				{!this.state.editMode && (
 					<div key="bottom" className="app_sidebar_bottom">
 						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
-							<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearch" >
+							<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearcher" >
 								<Translation>
 									{(t) => t("Search")}
 								</Translation>
