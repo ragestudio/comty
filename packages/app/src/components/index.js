@@ -28,6 +28,8 @@ export { default as LoadMore } from "./LoadMore"
 export { default as EmbbededMediaPlayer } from "./EmbbededMediaPlayer"
 export { default as LivestreamsBrowser } from "./LivestreamsBrowser"
 export { default as HashtagTrendings } from "./HashtagTrendings"
+export { default as Searcher } from "./Searcher"
+export { default as UserPreview } from "./UserPreview"
 
 // CREATOR
 export { default as Creator } from "./Creator"
