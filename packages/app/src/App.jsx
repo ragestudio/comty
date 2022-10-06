@@ -55,7 +55,7 @@ import { Translation } from "react-i18next"
 import { Session, User } from "models"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator } from "components"
+import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher } from "components"
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -113,6 +113,9 @@ class App extends React.Component {
 			if (window.isElectron) {
 				window.electron.ipcRenderer.invoke("app.minimize")
 			}
+		},
+		"app.openSearcher": () => {
+			return App.publicMethods.openSearcher()
 		},
 		"app.openCreator": (...args) => {
 			return App.publicMethods.openCreator(...args)
@@ -256,6 +259,9 @@ class App extends React.Component {
 	}
 
 	static publicMethods = {
+		openSearcher: (options) => {
+			window.app.ModalController.open((props) => <Searcher {...props} />)
+		},
 		openCreator: () => {
 			window.app.ModalController.open((props) => <Creator {...props} />)
 		},
@@ -278,6 +284,9 @@ class App extends React.Component {
 		},
 		goToAccount: (username) => {
 			return window.app.setLocation(`/@${username}`)
+		},
+		goToPost: (id) => {
+			return window.app.setLocation(`/post/${id}`)
 		},
 		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
 		setStatusBarStyleDark: async () => {
