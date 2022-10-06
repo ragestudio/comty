@@ -1,7 +1,7 @@
 import { Controller } from "linebridge/dist/server"
 import { Schematized } from "../../lib"
 
-import { CreatePost, ToogleLike, GetPostsFeed, GetPostData, DeletePost, ToogleSavePost } from "./methods"
+import { CreatePost, ToogleLike, GetPostData, DeletePost, ToogleSavePost } from "./methods"
 
 export default class PostsController extends Controller {
     static refName = "PostsController"
@@ -13,9 +13,9 @@ export default class PostsController extends Controller {
             fn: Schematized({
                 select: ["user_id"]
             }, async (req, res) => {
-                let posts = await GetPostsFeed({
-                    feedLimit: req.query?.limit,
-                    feedTrimIndex: req.query?.trim,
+                let posts = await GetPostData({
+                    limit: req.query?.limit,
+                    skip: req.query?.trim,
                     from_user_id: req.query?.user_id,
                     for_user_id: req.user?._id.toString(),
                     savedOnly: req.query?.savedOnly,
@@ -25,12 +25,14 @@ export default class PostsController extends Controller {
             })
         },
         "/post": {
+            middlewares: ["withOptionalAuthentication"],
             fn: Schematized({
                 select: ["post_id"],
                 required: ["post_id"]
             }, async (req, res) => {
                 let post = await GetPostData({
                     post_id: req.query?.post_id,
+                    for_user_id: req.user?._id.toString(),
                 }).catch((error) => {
                     res.status(404).json({ error: error.message })
 
