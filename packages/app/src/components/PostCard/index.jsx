@@ -287,10 +287,7 @@ export const PostContent = React.memo((props) => {
         }
     }
 
-    return <div
-        className="content"
-        onDoubleClick={props.onDoubleClick}
-    >
+    return <div className="content">
         {renderContent()}
     </div>
 })
@@ -310,14 +307,14 @@ export const PostActions = (props) => {
                 <LikeButton defaultLiked={props.defaultLiked} onClick={props.onClickLike} />
             </div>
         </div>
-        <div className="action" id="comments" onClick={props.onClickComments}>
-            <div className="icon">
-                <Icons.MessageSquare className="icon" />
-            </div>
-        </div>
-        <div className={"action"} id="save">
+        <div className="action" id="save">
             <div className="icon">
                 <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
+            </div>
+        </div>
+        <div className="action" id="comments" onClick={props.onClickOpen}>
+            <div className="icon">
+                <Icons.MdOutlineOpenInNew className="icon" />
             </div>
         </div>
         {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
@@ -383,6 +380,15 @@ export const PostCard = React.memo(({
         }
 
         return await events.onClickSave(data)
+    }
+
+    const onClickOpen = async () => {
+        if (typeof events.onClickOpen !== "function") {
+            console.warn("onClickOpen event is not a function, performing default action")
+            return window.app.goToPost(data._id)
+        }
+
+        return await events.onClickOpen(data)
     }
 
     const onDataUpdate = (data) => {
@@ -479,6 +485,7 @@ export const PostCard = React.memo(({
                     defaultSaved={hasSaved}
                     onClickLike={onClickLike}
                     onClickSave={onClickSave}
+                    onClickOpen={onClickOpen}
                     actions={{
                         delete: onClickDelete,
                     }}
