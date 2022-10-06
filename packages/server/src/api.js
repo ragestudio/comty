@@ -36,6 +36,7 @@ export default class Server {
         controllers.StreamingController,
         controllers.BadgesController,
         controllers.CommentsController,
+        controllers.SearchController,
     ]
 
     middlewares = middlewares
