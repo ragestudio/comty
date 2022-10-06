@@ -11,6 +11,18 @@ export default class Post {
         return 1200
     }
 
+    static async getPost({ post_id }) {
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const request = Post.bridge.get.post(undefined, {
+            post_id,
+        })
+
+        return request
+    }
+
     static async sendComment({ post_id, comment }) {
         if (!post_id || !comment) {
             throw new Error("Post ID and/or comment are required")
