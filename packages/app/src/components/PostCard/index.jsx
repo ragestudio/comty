@@ -8,9 +8,6 @@ import loadable from "@loadable/component"
 
 import { processString } from "utils"
 
-import CSSMotion from "rc-animate/lib/CSSMotion"
-import useLayoutEffect from "rc-util/lib/hooks/useLayoutEffect"
-
 import "./index.less"
 
 const mediaTypes = {
@@ -58,14 +55,6 @@ const ContentFailed = () => {
         <Icons.MdCloudOff />
     </div>
 }
-
-const getCurrentHeight = (node) => ({ height: node.offsetHeight })
-
-const getMaxHeight = (node) => {
-    return { height: node.scrollHeight }
-}
-
-const getCollapsedHeight = () => ({ height: 0, opacity: 0 })
 
 export function PostHeader(props) {
     const [timeAgo, setTimeAgo] = React.useState(0)
@@ -397,6 +386,8 @@ export const PostCard = React.memo(({
     }
 
     const onDataUpdate = (data) => {
+        console.log("onDataUpdate", data)
+
         setLikes(data.likes)
         setComments(data.comments)
     }
@@ -415,22 +406,17 @@ export const PostCard = React.memo(({
             app.eventBus.emit("style.compactMode", true)
         }
 
-        return () => {
-            app.eventBus.emit("style.compactMode", false)
-        }
-    }, [])
-
-    React.useEffect(() => {
         // first listen to post changes
         window.app.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
-
-        // proccess post info
-        // {...}
 
         // then load
         setLoading(false)
 
         return () => {
+            if (fullmode) {
+                app.eventBus.emit("style.compactMode", false)
+            }
+
             // remove the listener
             window.app.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
         }
@@ -502,43 +488,5 @@ export const PostCard = React.memo(({
         }
     </div>
 })
-
-export const PostCardAnimated = (props, ref,) => {
-    const motionRef = React.useRef(false)
-
-    useLayoutEffect(() => {
-        return () => {
-            if (motionRef.current) {
-                props.onAppear()
-            }
-        }
-    }, [])
-
-    return <CSSMotion
-        ref={ref}
-        motionName="motion"
-        motionAppear={props.motionAppear}
-        onAppearStart={getCollapsedHeight}
-        onAppearActive={node => {
-            motionRef.current = true
-            return getMaxHeight(node)
-        }}
-        onAppearEnd={props.onAppear}
-        onLeaveStart={getCurrentHeight}
-        onLeaveActive={getCollapsedHeight}
-        onLeaveEnd={() => {
-            props.onLeave(id)
-        }}
-    >
-        {(_args, passedMotionRef) => {
-            return <PostCard
-                ref={passedMotionRef}
-                {...props}
-            />
-        }}
-    </CSSMotion>
-}
-
-export const ForwardedPostCardAnimated = React.forwardRef(PostCardAnimated)
 
 export default PostCard
