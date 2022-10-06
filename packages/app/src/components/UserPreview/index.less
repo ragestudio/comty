@@ -1,0 +1,57 @@
+.userPreview {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+
+    svg {
+        fill: var(--appColor);
+        margin-left: 6px;
+    }
+
+    &.clickable {
+        cursor: pointer;
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+
+        margin-right: 10px;
+
+        img {
+            object-fit: cover;
+
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+    }
+
+    .info {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+
+        text-align: start;
+
+        width: fit-content;
+
+        color: var(--background-color-contrast);
+
+        h1 {
+            align-self: start;
+
+            color: var(--background-color-contrast);
+            font-family: "DM Mono", monospace;
+
+            font-size: 1rem;
+
+            margin: 0;
+        }
+
+        >div {
+            align-self: start;
+        }
+    }
+}
