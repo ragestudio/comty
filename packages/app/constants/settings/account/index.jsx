@@ -186,13 +186,4 @@ export default [
         },
         "debounced": true,
     },
-    {
-        "id": "logout",
-        "group": "account.security",
-        "footer": true,
-        "component": "Button",
-        "icon": "LogOut",
-        "title": "Logout",
-        "emitEvent": "session.logout",
-    }
 ]
