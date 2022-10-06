@@ -1,23 +1,31 @@
 import { Post } from "../../../models"
-import lodash from "lodash"
+import getPostData from "./getPostData"
 
-export default async (post, modification) => {
-    if (typeof post === "string") {
-        post = await Post.findById(post).catch(() => false)
+export default async (post_id, modification) => {
+    if (!post_id) {
+        throw new Error("Cannot modify post data: post not found")
     }
+
+    let post = await getPostData({ post_id: post_id })
 
     if (!post) {
         throw new Error("Cannot modify post data: post not found")
     }
 
     if (typeof modification === "object") {
-        post = lodash.merge(post, modification)
+        const result = await Post.findByIdAndUpdate(post_id, modification)
+
+        await result.save()
+
+        post = {
+            ...post,
+            ...result.toObject(),
+            ...modification,
+        }
     }
 
-    await post.save()
-
-    global.wsInterface.io.emit(`post.dataUpdate`, post.toObject())
-    global.wsInterface.io.emit(`post.dataUpdate.${post._id}`, post.toObject())
+    global.wsInterface.io.emit(`post.dataUpdate`, post)
+    global.wsInterface.io.emit(`post.dataUpdate.${post_id._id}`, post)
 
     return post
 }

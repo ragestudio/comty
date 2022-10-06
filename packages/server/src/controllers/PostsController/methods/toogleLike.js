@@ -1,18 +1,14 @@
-import { Post, User } from "../../../models"
+import { Post } from "../../../models"
+
 import modifyPostData from "./modifyPostData"
 
 export default async (payload) => {
     let { post_id, user_id, to } = payload
 
-    const post = await Post.findById(post_id).catch(() => false)
-    const userData = await User.findById(user_id).catch(() => false)
+    let post = await Post.findById(post_id).catch(() => false)
 
     if (!post) {
         throw new Error("Post not found")
-    }
-
-    if (!userData) {
-        throw new Error("User not found")
     }
 
     if (typeof to === "undefined") {
@@ -25,17 +21,11 @@ export default async (payload) => {
         post.likes = post.likes.filter((id) => id !== user_id)
     }
 
-    await modifyPostData(post, { likes: post.likes })
+    post = await modifyPostData(post._id, { likes: post.likes })
 
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}`, {
-        ...post.toObject(),
-        user: userData.toObject(),
-    })
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post.user_id}`, {
-        ...post.toObject(),
-        user: userData.toObject(),
-    })
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post_id}`, post.toObject().likes)
+    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}`, post)
+    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post.user_id}`, post)
+    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post_id}`, post)
 
-    return post.toObject()
+    return post
 }

@@ -1,9 +1,8 @@
-import { Post, User } from "../../../models"
+import { Post } from "../../../models"
+import getPostData from "./getPostData"
 
 export default async (payload) => {
     const { user_id, message, additions, type, data } = payload
-
-    const userData = await User.findById(user_id)
 
     const post = new Post({
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
@@ -16,14 +15,10 @@ export default async (payload) => {
 
     await post.save()
 
-    global.wsInterface.io.emit(`post.new`, {
-        ...post.toObject(),
-        user: userData.toObject(),
-    })
-    global.wsInterface.io.emit(`post.new.${post.user_id}`, {
-        ...post.toObject(),
-        user: userData.toObject(),
-    })
+    const resultPost = await getPostData({ post_id: post._id.toString() })
+
+    global.wsInterface.io.emit(`post.new`, resultPost)
+    global.wsInterface.io.emit(`post.new.${post.user_id}`, resultPost)
 
     return post
 }
