@@ -206,6 +206,10 @@ export default class Account extends React.Component {
 	}
 
 	handleScroll = (e) => {
+		if (!this.state.user?.cover) {
+			return false
+		}
+
 		// if component scrolled foward set cover height to 0
 		if (e.target.scrollTop > 0) {
 			this.coverComponent.current.style.height = "0px"
@@ -288,7 +292,13 @@ export default class Account extends React.Component {
 				</div>
 			</div>
 
-			<div ref={this.contentRef} className="contents" onScroll={this.handleScroll}>
+			<div
+				ref={this.contentRef}
+				className="contents"
+				onScroll={this.handleScroll}
+				style={{ height: !this.state.user?.cover ? "100vh" : undefined }}
+
+			>
 				<div className="tabMenuWrapper">
 					<antd.Menu
 						className="tabMenu"
