@@ -2,6 +2,7 @@ import SettingsCore from "./settings"
 import APICore from "./api"
 import StyleCore from "./style"
 import PermissionsCore from "./permissions"
+import SearchCore from "./search"
 
 import I18nCore from "./i18n"
 import NotificationsCore from "./notifications"
@@ -14,12 +15,13 @@ import AudioPlayer from "./audioPlayer"
 export default [
     SettingsCore,
     APICore,
+    SearchCore,
     PermissionsCore,
     StyleCore,
     I18nCore,
     SoundCore,
     NotificationsCore,
     ShortcutsCore,
-    
+
     AudioPlayer,
 ]
