@@ -194,6 +194,24 @@ export default class UserController extends Controller {
                 return res.json(req.user)
             },
         },
+        "/user/username-available": async (req, res) => {
+            const user = await User.findOne({
+                username: req.query.username,
+            })
+
+            return res.json({
+                available: !user,
+            })
+        },
+        "/user/email-available": async (req, res) => {
+            const user = await User.findOne({
+                email: req.query.email,
+            })
+
+            return res.json({
+                available: !user,
+            })
+        },
         "/user": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
