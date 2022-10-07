@@ -20,14 +20,24 @@ export default async function (payload) {
         throw new Error("Username can only contain letters, numbers, and underscores")
     }
 
+    // check if username is already taken
     const existentUser = await User.findOne({ username: username })
 
     if (existentUser) {
         throw new Error("User already exists")
     }
 
+    // check if the email is already in use
+    const existentEmail = await User.findOne({ email: email })
+
+    if (existentEmail) {
+        throw new Error("Email already in use")
+    }
+
+    // hash the password
     const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS ?? 3))
 
+    // create the doc
     let user = new User({
         username: username,
         password: hash,
