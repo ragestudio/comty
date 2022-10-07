@@ -200,9 +200,12 @@ export default class StepsForm extends React.Component {
                             </antd.Tag>
                         </div>
                         {current.description && <div className="description">
-                            <Translation>
-                                {t => t(current.description)}
-                            </Translation>
+                            {typeof current.description === "function" ?
+                                React.createElement(current.description) :
+                                <Translation>
+                                    {t => t(current.description)}
+                                </Translation>
+                            }
                         </div>}
                         {this.state.renderStep}
                     </div>
