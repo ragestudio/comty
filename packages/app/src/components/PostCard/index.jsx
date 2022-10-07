@@ -1,13 +1,16 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { Image, LikeButton } from "components"
 import moment from "moment"
 import classnames from "classnames"
 import loadable from "@loadable/component"
+import Plyr from "plyr-react"
+
+import { Image, LikeButton } from "components"
+import { Icons } from "components/Icons"
 
 import { processString } from "utils"
 
+import "plyr-react/dist/plyr.css"
 import "./index.less"
 
 const mediaTypes = {
@@ -224,6 +227,18 @@ export const PostContent = React.memo((props) => {
 
     // parse message
     const regexs = [
+        {
+            regex: /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&[a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*/g,
+            fn: (key, result) => {
+                return <Plyr source={{
+                    type: "video",
+                    sources: [{
+                        src: result[1],
+                        provider: "youtube",
+                    }],
+                }} />
+            }
+        },
         {
             regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
             fn: (key, result) => {
