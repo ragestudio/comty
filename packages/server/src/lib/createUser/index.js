@@ -5,6 +5,21 @@ import bcrypt from "bcrypt"
 export default async function (payload) {
     let { username, password, email, fullName, roles, avatar } = payload
 
+    // if username has capital letters, throw error
+    if (username !== username.toLowerCase()) {
+        throw new Error("Username must be lowercase")
+    }
+
+    // make sure the username has no spaces
+    if (username.includes(" ")) {
+        throw new Error("Username cannot contain spaces")
+    }
+
+    // make sure the username has no valid characters. Only letters, numbers, and underscores
+    if (!/^[a-z0-9_]+$/.test(username)) {
+        throw new Error("Username can only contain letters, numbers, and underscores")
+    }
+
     const existentUser = await User.findOne({ username: username })
 
     if (existentUser) {
