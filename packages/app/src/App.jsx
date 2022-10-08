@@ -133,6 +133,17 @@ class App extends React.Component {
 				panel: true,
 			})
 		},
+		"app.no_session": async () => {
+			const location = window.location.pathname
+
+			if (location !== "/login" && location !== "/register") {
+				antd.notification.info({
+					message: "You are not logged in, to use some features you will need to log in.",
+					btn: <antd.Button type="primary" onClick={() => app.goAuth()}>Login</antd.Button>,
+					duration: 15,
+				})
+			}
+		},
 		"session.logout": async () => {
 			await this.sessionController.logout()
 		},
@@ -366,21 +377,6 @@ class App extends React.Component {
 		await this.initialization()
 
 		app.eventBus.emit("app.initialization.finish")
-
-		// post initialization
-
-		// check if user is navigating outside login, advise to login
-		if (!this.state.user) {
-			const location = window.location.pathname
-
-			if (location !== "/login" && location !== "/register") {
-				antd.notification.info({
-					message: "You are not logged in, to use some features you will need to log in.",
-					btn: <antd.Button type="primary" onClick={() => app.goAuth()}>Login</antd.Button>,
-					duration: 15,
-				})
-			}
-		}
 	}
 
 	initialization = async () => {
@@ -457,7 +453,7 @@ class App extends React.Component {
 		const token = await Session.token
 
 		if (!token || token == null) {
-			app.eventBus.emit("app.forceToLogin")
+			app.eventBus.emit("app.no_session")
 			return false
 		}
 

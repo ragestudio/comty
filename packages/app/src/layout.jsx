@@ -5,6 +5,7 @@ import progressBar from "nprogress"
 import config from "config"
 
 import routes from "schemas/routes"
+import publicRoutes from "schemas/publicRoutes"
 
 import Layouts from "layouts"
 
@@ -99,6 +100,26 @@ export default class Layout extends React.Component {
 	render() {
 		let layoutType = this.state.layoutType
 		const InitializationComponent = this.props.staticRenders?.Initialization ? React.createElement(this.props.staticRenders.Initialization) : null
+
+		const currentRoute = window.location.pathname
+
+		if (!this.props.user && currentRoute !== config.app?.authPath && currentRoute !== "/") {
+			const isPublicRoute = publicRoutes.some((route) => {
+				const regex = new RegExp(route.replace("*", ".*"))
+				return regex.test(currentRoute)
+			})
+
+			if (!isPublicRoute) {
+				if (typeof window.app.setLocation === "function") {
+					window.app.setLocation(config.app?.authPath ?? "/login")
+					return <div />
+				}
+
+				window.location.href = config.app?.authPath ?? "/login"
+
+				return <div />
+			}
+		}
 
 		if (this.state.renderError) {
 			if (this.props.staticRenders?.RenderError) {
