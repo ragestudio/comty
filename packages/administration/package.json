@@ -1,6 +1,6 @@
 {
   "name": "@comty/console",
-  "version": "0.21.3",
+  "version": "0.21.4",
   "license": "MIT",
   "scripts": {
     "build": "vite build",
