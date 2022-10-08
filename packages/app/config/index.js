@@ -71,6 +71,7 @@ export default {
     app: {
         title: packagejson.name,
         siteName: "Comty",
+        siteDescription: "Comty, a prototype of social network.",
         mainPath: "/home",
         authPath: "/login",
         copyright: "Comty - RageStudio© 2022",
