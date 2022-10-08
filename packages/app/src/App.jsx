@@ -478,6 +478,9 @@ class App extends React.Component {
 		return <React.Fragment>
 			<Helmet>
 				<title>{config.app.siteName}</title>
+				<meta name="description" content={config.app.siteDescription} />
+				<meta property="og:title" content={config.app.siteName} />
+				<meta property="og:image" content={config.logo.alt} />
 			</Helmet>
 			<antd.ConfigProvider>
 				<Router.InternalRouter>
