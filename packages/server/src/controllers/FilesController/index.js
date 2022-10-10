@@ -30,12 +30,12 @@ const acceptedMimeTypes = [
 
 export default class FilesController extends Controller {
     get = {
-        "/upload/uploadPolicy": () => {
-            return {
+        "/upload/policy": (req, res) => {
+            return res.json({
                 acceptedMimeTypes,
                 maximumFileSize,
                 maximunFilesPerRequest,
-            }
+            })
         },
     }
 
