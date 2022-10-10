@@ -69,16 +69,6 @@ export default (props) => {
         }
     }
 
-    const fetchUploadPolicy = () => {
-        const policy = api.upload.policy().catch(error => {
-            return false
-        })
-
-        if (policy) {
-            setUploadPolicy(policy)
-        }
-    }
-
     const onUploadFile = async (req) => {
         // hide uploader
         setUploaderVisible(false)
@@ -180,7 +170,7 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        fetchUploadPolicy()
+        //fetchUploadPolicy()
     }, [])
 
     // set loading to true menwhile pending is not empty
