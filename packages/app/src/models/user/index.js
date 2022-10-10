@@ -15,6 +15,16 @@ export default class User {
         return User.bridge.get.user(undefined, { username: token.username, _id: token.user_id })
     }
 
+    static async publicData() {
+        const token = await Session.decodedToken()
+
+        if (!token) {
+            return false
+        }
+
+        return User.bridge.get.userPublicData({ username: token.username })
+    }
+
     static async roles() {
         const token = await Session.decodedToken()
 
