@@ -189,7 +189,7 @@ class App extends React.Component {
 		"app.forceToLogin": () => {
 			window.app.setLocation("/login")
 		},
-		"websocket_connected": () => {
+		"api.ws.main.connect": () => {
 			if (this.wsReconnecting) {
 				this.wsReconnectingTry = 0
 				this.wsReconnecting = false
@@ -204,7 +204,7 @@ class App extends React.Component {
 				}, 500)
 			}
 		},
-		"websocket_connection_error": () => {
+		"api.ws.main.connect_error": () => {
 			if (!this.wsReconnecting) {
 				this.latencyWarning = null
 				this.wsReconnectingTry = 0
@@ -223,27 +223,16 @@ class App extends React.Component {
 				window.location.reload()
 			}
 		},
-		"websocket_latency_too_high": () => {
-			if (!this.latencyWarning) {
-				this.latencyWarning = true
-
-				Toast.show({
-					icon: "loading",
-					content: "Slow connection...",
-					duration: 0,
-				})
-			}
-		},
-		"websocket_latency_normal": () => {
-			if (this.latencyWarning) {
-				this.latencyWarning = null
-
-				Toast.show({
-					icon: "success",
-					content: "Connection restored",
-				})
-			}
-		},
+		"api.ws.main.disconnect": () => {
+			antd.notification.open({
+				message: <Translation>
+					{(t) => t("Disconnected")}
+				</Translation>,
+				description: <Translation>
+					{(t) => t("You have been disconnected from the server, trying to reconnect.")}
+				</Translation>
+			})
+		}
 	}
 
 	static staticRenders = {
