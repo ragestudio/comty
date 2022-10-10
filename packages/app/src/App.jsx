@@ -194,8 +194,6 @@ class App extends React.Component {
 				this.wsReconnectingTry = 0
 				this.wsReconnecting = false
 
-				this.initialization()
-
 				setTimeout(() => {
 					Toast.show({
 						icon: "success",
@@ -206,7 +204,6 @@ class App extends React.Component {
 		},
 		"api.ws.main.connect_error": () => {
 			if (!this.wsReconnecting) {
-				this.latencyWarning = null
 				this.wsReconnectingTry = 0
 				this.wsReconnecting = true
 
