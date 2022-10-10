@@ -11,6 +11,7 @@ const formidable = require("formidable")
 const maximumFileSize = 80 * 1024 * 1024 // max file size in bytes (80MB) By default, the maximum file size is 80MB.
 const maximunFilesPerRequest = 20
 const acceptedMimeTypes = [
+    "image/jpg",
     "image/jpeg",
     "image/png",
     "image/gif",
@@ -20,6 +21,7 @@ const acceptedMimeTypes = [
     "audio/wav",
     "audio/flac",
     "video/mp4",
+    "video/mkv",
     "video/webm",
     "video/quicktime",
     "video/x-msvideo",
@@ -27,6 +29,16 @@ const acceptedMimeTypes = [
 ]
 
 export default class FilesController extends Controller {
+    get = {
+        "/upload/uploadPolicy": () => {
+            return {
+                acceptedMimeTypes,
+                maximumFileSize,
+                maximunFilesPerRequest,
+            }
+        },
+    }
+
     post = {
         "/upload": {
             middlewares: ["withAuthentication"],
@@ -45,6 +57,13 @@ export default class FilesController extends Controller {
                     uploadDir: global.uploadCachePath,
                     maxFileSize: maximumFileSize,
                     maxFields: maximunFilesPerRequest,
+                    filename: (name, ext) => {
+                        name = name.trim()
+                        name = name.replace(/ /g, "_")
+                        name = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+
+                        return name + ext
+                    },
                     filter: (stream) => {
                         // check if is allowed mime type
                         if (!acceptedMimeTypes.includes(stream.mimetype)) {
@@ -96,18 +115,17 @@ export default class FilesController extends Controller {
                                 }
 
                                 const metadata = {
-                                    originalFilename: file.originalFilename,
                                     mimetype: file.mimetype,
                                     size: file.size,
                                     filepath: file.filepath,
-                                    newFilename: file.newFilename,
+                                    filename: file.newFilename,
                                 }
 
                                 // upload to s3
                                 await new Promise((_resolve, _reject) => {
                                     global.storage.fPutObject(global.storage.defaultBucket, file.newFilename, file.filepath, metadata, (err, etag) => {
                                         if (err) {
-                                            return _reject("Failed to upload file to storage server")
+                                            return _reject(new Error(`Failed to upload file to storage server > ${err.message}`))
                                         }
 
                                         return _resolve()
