@@ -189,15 +189,15 @@ export default class ApiCore extends Core {
         })
 
         mainWSSocket.on("connect", () => {
-            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.connect`)
+            this.ctx.eventBus.emit(`api.ws.main.connect`)
         })
 
         mainWSSocket.on("disconnect", (...context) => {
-            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.disconnect`, ...context)
+            this.ctx.eventBus.emit(`api.ws.main.disconnect`, ...context)
         })
 
         mainWSSocket.on("connect_error", (...context) => {
-            this.ctx.eventBus.emit(`api.ws.${mainWSSocket.id}.connect_error`, ...context)
+            this.ctx.eventBus.emit(`api.ws.main.connect_error`, ...context)
         })
 
         // generate functions
