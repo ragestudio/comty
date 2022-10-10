@@ -1,7 +1,7 @@
 {
   "name": "@comty/streaming-server",
   "author": "RageStudio",
-  "version": "0.21.6",
+  "version": "0.21.7",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js",
