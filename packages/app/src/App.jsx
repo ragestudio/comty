@@ -457,7 +457,14 @@ class App extends React.Component {
 		}
 
 		const user = await User.data()
+
 		await this.setState({ user })
+
+		const publicData = await User.publicData()
+
+		app.userData = {
+			...publicData,
+		}
 	}
 
 	render() {

@@ -13,6 +13,13 @@ const AllowedPublicUpdateFields = [
     "description",
 ]
 
+const AllowedAnonPublicGetters = [
+    "username",
+    "fullName",
+    "avatar",
+    "roles"
+]
+
 const MaxStringsLengths = {
     fullName: 120,
     email: 320,
@@ -187,6 +194,32 @@ export default class UserController extends Controller {
                     isFollowed: Boolean(isFollowed),
                 })
             }),
+        },
+        "/user/public_data": {
+            middlewares: ["withOptionalAuthentication"],
+            fn: async (req, res) => {
+                let user = req.query?.username ?? req.user.username
+
+                if (!user) {
+                    return res.status(400).json({
+                        error: "No user provided",
+                    })
+                }
+
+                user = await User.findOne({
+                    username: user,
+                }).catch(() => null)
+
+                if (!user) {
+                    return res.json({
+                        user: null,
+                    })
+                }
+
+                user = _.pick(user, AllowedAnonPublicGetters)
+
+                return res.json(user)
+            }
         },
         "/self": {
             middlewares: ["withAuthentication"],
