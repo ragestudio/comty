@@ -35,7 +35,6 @@ export { default as UserPreview } from "./UserPreview"
 export { default as Creator } from "./Creator"
 
 // BUTTONS
-export { default as LikeButton } from "./LikeButton"
 export { default as FollowButton } from "./FollowButton"
 
 // POSTS

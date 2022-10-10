@@ -1,0 +1,152 @@
+.post_additions {
+    width: 100%;
+    height: 28vh;
+
+    transition: all 0.2s ease-in-out;
+
+    .slick-slider {
+        .slick-prev {
+            display: inline !important;
+            color: #ffffff;
+
+            z-index: 100;
+
+            top: 0;
+            left: 0;
+
+            height: 100%;
+            width: 5vw;
+
+            opacity: 0;
+
+            transition: all 150ms ease-in-out;
+
+            &:hover {
+                opacity: 0.6;
+                width: 7vw;
+            }
+
+            &:active {
+                transform: scale(0.5);
+            }
+        }
+
+        .slick-next {
+            display: inline !important;
+            color: #ffffff;
+
+            z-index: 100;
+
+            top: 0;
+            right: 0;
+
+            height: 100%;
+            width: 5vw;
+
+            opacity: 0;
+
+            transition: all 150ms ease-in-out;
+
+            &:hover {
+                opacity: 0.6;
+                width: 7vw;
+            }
+
+            &:active {
+                transform: scale(0.5);
+            }
+        }
+    }
+
+    .slick-track {
+        display: flex;
+        align-items: center;
+    }
+
+    .slick-slide {
+        height: 100%;
+
+        div {
+            height: 100%;
+        }
+    }
+
+    .slick-list {
+        border-radius: 8px;
+    }
+
+    .ant-carousel,
+    .slick-slider,
+    .slick-list,
+    .slick-track {
+        height: 100%;
+    }
+
+    .adm-swiper-track-inner {
+        display: flex;
+        align-items: center;
+
+        height: 100%;
+        width: 100%;
+
+        user-select: none;
+        -webkit-user-drag: none;
+
+        .adm-swiper-slide {
+            display: flex;
+            align-items: center;
+
+            user-select: none;
+            -webkit-user-drag: none;
+
+            .adm-swiper-item {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                height: fit-content;
+
+                user-select: none;
+                -webkit-user-drag: none;
+            }
+        }
+    }
+
+    .addition {
+        width: 100%;
+        height: 100%;
+
+        // fixtures for media content
+        img {
+            width: 100%;
+            height: 100%;
+
+            user-select: none;
+            -webkit-user-drag: none;
+
+            object-fit: cover;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+
+            user-select: none;
+            -webkit-user-drag: none;
+
+            object-fit: cover;
+        }
+
+        audio {
+            width: 100%;
+            height: 100%;
+
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        >div {
+            height: 100%;
+        }
+    }
+}
