@@ -2,10 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { User } from "models"
-
 import { Icons } from "components/Icons"
-import { PostAdditions } from "components/PostCard"
+import PostAdditions from "components/PostCard/components/additions"
 
 import "./index.less"
 

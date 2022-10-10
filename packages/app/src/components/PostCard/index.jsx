@@ -1,361 +1,16 @@
 import React from "react"
 import * as antd from "antd"
-import moment from "moment"
 import classnames from "classnames"
-import loadable from "@loadable/component"
-import Plyr from "plyr-react"
 
-import { Image, LikeButton } from "components"
 import { Icons } from "components/Icons"
 
-import { processString } from "utils"
+import PostHeader from "./components/header"
+import PostContent from "./components/content"
+import PostActions from "./components/actions"
 
-import "plyr-react/dist/plyr.css"
 import "./index.less"
 
-const mediaTypes = {
-    "jpg": "image",
-    "jpeg": "image",
-    "png": "image",
-    "gif": "image",
-    "mp4": "video",
-    "webm": "video",
-    "ogv": "video",
-    "mov": "video",
-    "avi": "video",
-    "mkv": "video",
-    "ogg": "audio",
-    "mp3": "audio",
-    "wav": "audio",
-    "flac": "audio",
-    "aac": "audio",
-    "m4a": "audio",
-}
-
-const SaveButton = (props) => {
-    const [saved, setSaved] = React.useState(props.defaultActive)
-
-    const onClick = async () => {
-        props.onClick({
-            to: !saved,
-        })
-        setSaved(!saved)
-    }
-
-    return <antd.Button
-        className={classnames("saveButton", {
-            ["active"]: saved
-        })}
-        shape="circle"
-        onClick={onClick}
-        icon={saved ? <Icons.MdBookmark /> : <Icons.MdBookmarkBorder />}
-        size="large"
-    />
-}
-
-const ContentFailed = () => {
-    return <div className="contentFailed">
-        <Icons.MdCloudOff />
-    </div>
-}
-
-export function PostHeader(props) {
-    const [timeAgo, setTimeAgo] = React.useState(0)
-
-    const goToProfile = () => {
-        window.app.goToAccount(props.postData.user?.username)
-    }
-
-    const updateTimeAgo = () => {
-        setTimeAgo(moment(props.postData.created_at ?? "").fromNow())
-    }
-
-    React.useEffect(() => {
-        updateTimeAgo()
-
-        const interval = setInterval(() => {
-            updateTimeAgo()
-        }, 10000)
-
-        return () => {
-            clearInterval(interval)
-        }
-    }, [props.postData.created_at])
-
-    return <div className="postHeader" onDoubleClick={props.onDoubleClick}>
-        <div className="userInfo">
-            <div className="avatar">
-                <Image
-                    alt="Avatar"
-                    src={props.postData.user?.avatar}
-                />
-            </div>
-            <div className="info">
-                <div>
-                    <h1 onClick={goToProfile}>
-                        {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
-                        {props.postData.user?.verified && <Icons.verifiedBadge />}
-                    </h1>
-                </div>
-
-                <div>
-                    {timeAgo}
-                </div>
-            </div>
-        </div>
-        <div className="postStatistics">
-            <div className="item">
-                <Icons.Heart className={classnames("icon", { ["filled"]: props.isLiked })} />
-                <div className="value">
-                    {props.likes}
-                </div>
-            </div>
-            <div className="item">
-                <Icons.MessageSquare />
-                <div className="value">
-                    {props.comments}
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-export class PostAdditions extends React.PureComponent {
-    getAdditions = (data) => {
-        return data.map((addition, index) => {
-            if (typeof addition === "string") {
-                addition = {
-                    url: addition,
-                }
-            }
-
-            const { url, id, name } = addition
-
-            const MediaRender = loadable(async () => {
-                let extension = null
-
-                try {
-                    // get media type by parsing the url
-                    const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
-
-                    if (mediaTypeExt) {
-                        extension = mediaTypeExt[1]
-                    } else {
-                        // try to get media by creating requesting the url
-                        const response = await fetch(url, {
-                            method: "HEAD",
-                        })
-
-                        extension = response.headers.get("content-type").split("/")[1]
-                    }
-
-                    extension = extension.toLowerCase()
-
-                    const mediaType = mediaTypes[extension]
-                    const mimeType = `${mediaType}/${extension}`
-
-                    if (!mediaType) {
-                        return () => <ContentFailed />
-                    }
-
-                    switch (mediaType.split("/")[0]) {
-                        case "image": {
-                            return () => <img src={url} />
-                        }
-                        case "video": {
-                            return () => <video controls>
-                                <source src={url} type={mimeType} />
-                            </video>
-                        }
-                        case "audio": {
-                            return () => <audio controls>
-                                <source src={url} type={mimeType} />
-                            </audio>
-                        }
-
-                        default: {
-                            return () => <h4>
-                                Unsupported media type [{mediaType}/{mediaTypeExt}]
-                            </h4>
-                        }
-                    }
-                } catch (error) {
-                    console.error(error)
-                    return () => <ContentFailed />
-                }
-            })
-
-            return <div key={index} className="addition">
-                <React.Suspense fallback={<div>Loading</div>} >
-                    <MediaRender />
-                </React.Suspense>
-            </div>
-        })
-    }
-
-    render() {
-        return <div className="additions">
-            <antd.Carousel
-                arrows={true}
-                nextArrow={<Icons.ChevronRight />}
-                prevArrow={<Icons.ChevronLeft />}
-                autoplay={this.props.autoCarrousel}
-            >
-                {this.getAdditions(this.props.additions)}
-            </antd.Carousel>
-        </div>
-    }
-}
-
-export const PostContent = React.memo((props) => {
-    let { message, additions, type, data } = props.data
-
-    if (typeof data === "string") {
-        try {
-            data = JSON.parse(data)
-        } catch (error) {
-            console.error(error)
-            data = {}
-        }
-    }
-
-    const onClickPlaylist = () => {
-        if (data.playlist) {
-            app.AudioPlayer.startPlaylist(data.playlist)
-        }
-    }
-
-    // parse message
-    const regexs = [
-        {
-            regex: /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&[a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*/g,
-            fn: (key, result) => {
-                return <Plyr source={{
-                    type: "video",
-                    sources: [{
-                        src: result[1],
-                        provider: "youtube",
-                    }],
-                }} />
-            }
-        },
-        {
-            regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
-            fn: (key, result) => {
-                return <a key={key} href={result[1]} target="_blank" rel="noopener noreferrer">{result[1]}</a>
-            }
-        },
-        {
-            regex: /(@[a-zA-Z0-9_]+)/gi,
-            fn: (key, result) => {
-                return <a key={key} onClick={() => window.app.setLocation(`/@${result[1].substr(1)}`)}>{result[1]}</a>
-            }
-        },
-    ]
-
-    message = processString(regexs)(message)
-
-    const renderContent = () => {
-        switch (type) {
-            case "playlist": {
-                return <>
-                    <div
-                        className="playlistCover"
-                        onClick={onClickPlaylist}
-                        style={{
-                            backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
-                        }}
-                    />
-
-                    <div className="playlistTitle">
-                        <div>
-                            <h1>
-                                {data.title ?? "Untitled Playlist"}
-                            </h1>
-                            <h3>
-                                {data.artist}
-                            </h3>
-                        </div>
-
-                        <h4>
-                            {message}
-                        </h4>
-
-                        <div className="actions">
-                            <antd.Button onClick={onClickPlaylist}>
-                                <Icons.PlayCircle />
-                                Play
-                            </antd.Button>
-                        </div>
-                    </div>
-                </>
-            }
-            default: {
-                return <>
-                    <div className="message">
-                        {message}
-                    </div>
-
-                    {additions.length > 0 && <PostAdditions additions={additions} />}
-                </>
-            }
-        }
-    }
-
-    return <div className="content">
-        {renderContent()}
-    </div>
-})
-
-export const PostActions = (props) => {
-    const handleSelfMenuAction = async (event) => {
-        const fn = props.actions[event.key]
-
-        if (typeof fn === "function") {
-            await fn()
-        }
-    }
-
-    return <div className="actions">
-        <div className="action" id="likes">
-            <div className="icon">
-                <LikeButton defaultLiked={props.defaultLiked} onClick={props.onClickLike} />
-            </div>
-        </div>
-        <div className="action" id="save">
-            <div className="icon">
-                <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
-            </div>
-        </div>
-        <div className="action" id="open" onClick={props.onClickOpen}>
-            <div className="icon">
-                <Icons.MdOutlineOpenInNew className="icon" />
-            </div>
-        </div>
-        {props.isSelf && <div className="action" id="selfMenu" onClick={props.onClickSelfMenu}>
-            <antd.Dropdown
-                overlay={<antd.Menu
-                    onClick={handleSelfMenuAction}
-                >
-                    <antd.Menu.Item icon={<Icons.Edit />} key="edit">
-                        Edit
-                    </antd.Menu.Item>
-                    <antd.Menu.Divider />
-                    <antd.Menu.Item icon={<Icons.Trash />} key="delete">
-                        Delete
-                    </antd.Menu.Item>
-                </antd.Menu>}
-                trigger={["click"]}
-            >
-                <div className="icon">
-                    <Icons.MoreVertical />
-                </div>
-            </antd.Dropdown>
-        </div>}
-    </div>
-}
-
-export const PostCard = React.memo(({
+export default React.memo(({
     selfId,
     expansibleActions = window.app.settings.get("postCard_expansible_actions"),
     autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
@@ -364,6 +19,8 @@ export const PostCard = React.memo(({
     fullmode
 }) => {
     const [loading, setLoading] = React.useState(true)
+    const [expanded, setExpanded] = React.useState(false)
+
     const [likes, setLikes] = React.useState(data.likes ?? [])
     const [comments, setComments] = React.useState(data.comments ?? [])
 
@@ -404,6 +61,20 @@ export const PostCard = React.memo(({
         }
 
         return await events.onClickOpen(data)
+    }
+
+    const toogleExpand = (to) => {
+        if (to === undefined) {
+            to = !expanded
+        }
+
+        setExpanded(to)
+    }
+
+    const handleExpand = () => {
+        if (!expanded) {
+            return toogleExpand(true)
+        }
     }
 
     const onDataUpdate = (data) => {
@@ -467,7 +138,9 @@ export const PostCard = React.memo(({
             { ["liked"]: hasLiked },
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
+            { ["expanded"]: expanded }
         )}
+        onClick={handleExpand}
     >
         <div className="wrapper">
             <PostHeader
@@ -486,29 +159,23 @@ export const PostCard = React.memo(({
             />
         </div>
         {!fullmode &&
-            <div className="actionsIndicatorWrapper">
-                <div className="actionsIndicator">
-                    <Icons.MoreHorizontal />
-                </div>
+            <div className="post_actionsIndicator">
+                <Icons.MoreHorizontal />
             </div>
         }
         {!fullmode &&
-            <div className="actionsWrapper">
-                <PostActions
-                    isSelf={selfId === data.user_id}
-                    defaultLiked={hasLiked}
-                    defaultSaved={hasSaved}
-                    onClickLike={onClickLike}
-                    onClickSave={onClickSave}
-                    onClickOpen={onClickOpen}
-                    actions={{
-                        delete: onClickDelete,
-                    }}
-                    fullmode={fullmode}
-                />
-            </div>
+            <PostActions
+                isSelf={selfId === data.user_id}
+                defaultLiked={hasLiked}
+                defaultSaved={hasSaved}
+                onClickLike={onClickLike}
+                onClickSave={onClickSave}
+                onClickOpen={onClickOpen}
+                actions={{
+                    delete: onClickDelete,
+                }}
+                fullmode={fullmode}
+            />
         }
     </div>
 })
-
-export default PostCard
