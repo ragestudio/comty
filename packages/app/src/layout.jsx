@@ -103,6 +103,12 @@ export default class Layout extends React.Component {
 
 		const currentRoute = window.location.pathname
 
+		if (this.state.renderLock) {
+			return <>
+				{InitializationComponent}
+			</>
+		}
+
 		if (!this.props.user && currentRoute !== config.app?.authPath && currentRoute !== "/") {
 			const isPublicRoute = publicRoutes.some((route) => {
 				const regex = new RegExp(route.replace("*", ".*"))
@@ -171,7 +177,7 @@ export default class Layout extends React.Component {
 		}
 
 		return <Layout {...layoutComponentProps}>
-			{this.state.renderLock ? InitializationComponent : this.props.children}
+			{this.props.children}
 		</Layout>
 	}
 }
