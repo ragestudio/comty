@@ -1,8 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { User } from "models"
 import classnames from "classnames"
+
+import { User } from "models"
+
+import { Icons } from "components/Icons"
 import { PostAdditions } from "components/PostCard"
 
 import "./index.less"
@@ -15,16 +17,18 @@ export default (props) => {
     const api = window.app.api.withEndpoints("main")
 
     const additionsRef = React.useRef(null)
+
     const [pending, setPending] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [uploaderVisible, setUploaderVisible] = React.useState(false)
     const [focused, setFocused] = React.useState(false)
 
-    const [userData, setUserData] = React.useState(null)
     const [postData, setPostData] = React.useState({
         message: "",
         additions: []
     })
+
+    const [uploadPolicy, setUploadPolicy] = React.useState(null)
 
     const updatePostData = (update) => {
         setPostData({
@@ -65,6 +69,16 @@ export default (props) => {
         }
     }
 
+    const fetchUploadPolicy = () => {
+        const policy = api.upload.policy().catch(error => {
+            return false
+        })
+
+        if (policy) {
+            setUploadPolicy(policy)
+        }
+    }
+
     const onUploadFile = async (req) => {
         // hide uploader
         setUploaderVisible(false)
@@ -97,6 +111,12 @@ export default (props) => {
         return Boolean(messageLengthValid) && Boolean(pending.length === 0)
     }
 
+    const removeAddition = (file_uid) => {
+        updatePostData({
+            additions: postData.additions.filter(addition => addition.file.uid !== file_uid)
+        })
+    }
+
     const onDraggerChange = (change) => {
         console.log(change)
 
@@ -107,6 +127,8 @@ export default (props) => {
             }
             case "done": {
                 let additions = postData.additions ?? []
+
+                console.log(change.file)
 
                 additions.push(...change.file.response)
 
@@ -123,7 +145,10 @@ export default (props) => {
 
                 break
             }
-
+            case "error": {
+                // remove pending file
+                setPending(pending.filter(uid => uid !== change.file.uid))
+            }
             default: {
                 break
             }
@@ -155,14 +180,11 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        User.data().then(user => {
-            setUserData(user)
-        })
+        fetchUploadPolicy()
     }, [])
 
     // set loading to true menwhile pending is not empty
     React.useEffect(() => {
-        console.log(pending)
         setLoading(pending.length !== 0)
     }, [pending])
 
@@ -185,7 +207,7 @@ export default (props) => {
     >
         <div className="textInput">
             <div className="avatar">
-                <img src={userData?.avatar} />
+                <img src={app.userData?.avatar} />
             </div>
             <antd.Input.TextArea
                 placeholder="What are you thinking?"
