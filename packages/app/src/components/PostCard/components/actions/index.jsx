@@ -29,6 +29,11 @@ export default (props) => {
                     <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
                 </div>
             </div>
+            <div className="action" id="share">
+                <div className="icon">
+                    <Icons.Share2 onClick={props.onClickShare} />
+                </div>
+            </div>
             <div className="action" id="open" onClick={props.onClickOpen}>
                 <div className="icon">
                     <Icons.MdOutlineOpenInNew className="icon" />
