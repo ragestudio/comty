@@ -10,6 +10,7 @@ export default React.forwardRef((props, ref) => {
         hasMore,
         loadingComponent,
         noResultComponent,
+        contentProps = {},
     } = props
 
     let observer = null
@@ -44,6 +45,7 @@ export default React.forwardRef((props, ref) => {
         <div
             className={classnames(className)}
             ref={ref}
+            {...contentProps}
         >
             {children}
         </div>
