@@ -348,6 +348,7 @@ class App extends React.Component {
 
 		if (userAgentPlatform.includes("mac")) {
 			this.props.cores.ShortcutsCore.register({
+				id: "app.openSearcher",
 				key: ",",
 				meta: true,
 				preventDefault: true,
@@ -356,6 +357,7 @@ class App extends React.Component {
 			})
 		} else {
 			this.props.cores.ShortcutsCore.register({
+				id: "app.openSearcher",
 				key: ",",
 				ctrl: true,
 				preventDefault: true,
