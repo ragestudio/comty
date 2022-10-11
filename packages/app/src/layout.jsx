@@ -9,7 +9,7 @@ import publicRoutes from "schemas/publicRoutes"
 
 import Layouts from "layouts"
 
-export default class Layout extends React.Component {
+export default class Layout extends React.PureComponent {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 	state = {
@@ -20,14 +20,36 @@ export default class Layout extends React.Component {
 
 	events = {
 		"app.initialization.start": () => {
+			app.eventBus.emit("layout.render.lock")
+		},
+		"app.initialization.finish": () => {
+			app.eventBus.emit("layout.render.unlock")
+		},
+		"layout.render.lock": () => {
 			this.setState({
 				renderLock: true,
 			})
 		},
-		"app.initialization.finish": () => {
+		"layout.render.unlock": () => {
 			this.setState({
 				renderLock: false,
 			})
+		},
+		"layout.animations.fadeIn": () => {
+			if (app.settings.get("reduceAnimations")) {
+				console.warn("Skipping fadeIn animation due to `reduceAnimations` setting")
+				return false
+			}
+
+			document.querySelector("#transitionLayer").classList.add("fade-opacity-enter")
+		},
+		"layout.animations.fadeOut": () => {
+			if (app.settings.get("reduceAnimations")) {
+				console.warn("Skipping fadeOut animation due to `reduceAnimations` setting")
+				return false
+			}
+
+			document.querySelector("#transitionLayer").classList.add("fade-opacity-leave")
 		},
 		"router.transitionStart": () => {
 			this.progressBar.start()
