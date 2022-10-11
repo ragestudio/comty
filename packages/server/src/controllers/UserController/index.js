@@ -14,6 +14,7 @@ const AllowedPublicUpdateFields = [
 ]
 
 const AllowedAnonPublicGetters = [
+    "_id",
     "username",
     "fullName",
     "avatar",
