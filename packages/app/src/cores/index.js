@@ -3,6 +3,7 @@ import APICore from "./api"
 import StyleCore from "./style"
 import PermissionsCore from "./permissions"
 import SearchCore from "./search"
+import ContextMenuCore from "./contextMenu"
 
 import I18nCore from "./i18n"
 import NotificationsCore from "./notifications"
@@ -24,4 +25,5 @@ export default [
     ShortcutsCore,
 
     AudioPlayer,
+    ContextMenuCore,
 ]
