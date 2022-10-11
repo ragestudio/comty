@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { User } from "models"
 import { Icons } from "components/Icons"
 import { PostCard, LoadMore } from "components"
 
@@ -21,13 +20,14 @@ const NoResultComponent = () => {
     />
 }
 
+// FIXME: Scroll behavior should scroll to next post or the previous one depending on the direction of the scroll
 export default class PostsFeed extends React.Component {
     state = {
-        selfId: null,
         initialLoading: true,
         fetchingData: true,
         hasMorePosts: true,
         renderList: [],
+        currentIndex: 0,
     }
 
     api = window.app.api.withEndpoints()
@@ -44,20 +44,26 @@ export default class PostsFeed extends React.Component {
     }
 
     componentDidMount = async () => {
-        await this.loadSelfId()
-
         // load ws events
         Object.keys(this.wsEvents).forEach((event) => {
             window.app.api.namespaces["main"].listenEvent(event, this.wsEvents[event])
         })
 
         // TODO: register keybindings to handle directions key scrolling to posts (use app.shortcuts)
-        // window.app.shortcuts.register("ArrowUp", () => {
-        //    // {...}
-        // })
-        // window.app.shortcuts.register("ArrowDown", () => {
-        //     // {...}
-        // })
+        window.app.shortcuts.register({
+            id: "postsFeed.scrollUp",
+            key: "ArrowUp",
+            preventDefault: true,
+        }, (event) => {
+            this.scrollUp()
+        })
+        window.app.shortcuts.register({
+            id: "postsFeed.scrollDown",
+            key: "ArrowDown",
+            preventDefault: true,
+        }, (event) => {
+            this.scrollDown()
+        })
 
         await this.loadPosts()
 
@@ -69,14 +75,42 @@ export default class PostsFeed extends React.Component {
         Object.keys(this.wsEvents).forEach((event) => {
             window.app.api.namespaces["main"].unlistenEvent(event, this.wsEvents[event])
         })
+
+        window.app.shortcuts.remove("postsFeed.scrollUp")
+        window.app.shortcuts.remove("postsFeed.scrollDown")
     }
 
-    loadSelfId = async () => {
-        const selfId = await User.selfUserId()
+    scrollUp = () => {
+        this.scrollToIndex(this.state.currentIndex - 1)
+    }
 
-        this.setState({
-            selfId: selfId,
-        })
+    scrollDown = () => {
+        this.scrollToIndex(this.state.currentIndex + 1)
+    }
+
+    scrollToIndex = (index) => {
+        const post = this.listRef.current.children[index]
+
+        if (post) {
+            post.scrollIntoView({ behavior: "smooth", block: "center" })
+            this.setState({ currentIndex: index })
+        }
+    }
+
+    handleScroll = (event) => {
+        event.preventDefault()
+
+        // check if is scrolling up or down
+        const isScrollingUp = event.deltaY < 0
+
+        // get current index
+        const currentIndex = this.state.currentIndex
+
+        // get next index
+        const nextIndex = isScrollingUp ? currentIndex - 1 : currentIndex + 1
+
+        // scroll to next index
+        this.scrollToIndex(nextIndex)
     }
 
     loadPosts = async ({
@@ -185,7 +219,6 @@ export default class PostsFeed extends React.Component {
         return <PostCard
             key={index}
             data={item}
-            selfId={this.state.selfId}
             events={{
                 onClickLike: this.onLikePost,
                 onClickDelete: this.onDeletePost,
@@ -207,7 +240,11 @@ export default class PostsFeed extends React.Component {
             </div>
         }
 
-        return <div id="postsFeed" className="postsFeed">
+        return <div
+            id="postsFeed"
+            className="postsFeed"
+            onScroll={this.handleScroll}
+        >
             <LoadMore
                 onBottom={() => {
                     this.loadPosts()
