@@ -11,7 +11,6 @@ import PostActions from "./components/actions"
 import "./index.less"
 
 export default React.memo(({
-    selfId,
     expansibleActions = window.app.settings.get("postCard_expansible_actions"),
     autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
     data = {},
@@ -100,11 +99,13 @@ export default React.memo(({
     }, [])
 
     React.useEffect(() => {
-        // check if the post has liked by you
-        const hasLiked = likes.includes(selfId)
-        const hasSaved = data.isSaved
+        if (!app.userData) {
+            return
+        }
 
-        //console.log(`[${data._id}] CHECKING LIKE OF USER ${selfId} > ${hasLiked}`)
+        // check if the post has liked by you
+        const hasLiked = likes.includes(app.userData._id)
+        const hasSaved = data.isSaved
 
         setHasLiked(hasLiked)
         setHasSaved(hasSaved)
@@ -148,7 +149,7 @@ export default React.memo(({
         }
         {!fullmode &&
             <PostActions
-                isSelf={selfId === data.user_id}
+                isSelf={app.permissions.checkUserIdIsSelf(data.user_id)}
                 defaultLiked={hasLiked}
                 defaultSaved={hasSaved}
                 onClickLike={onClickLike}
