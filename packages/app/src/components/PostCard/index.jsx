@@ -17,6 +17,8 @@ export default React.memo(({
     events = {},
     fullmode
 }) => {
+    const isSelf = app.permissions.checkUserIdIsSelf(data.user_id)
+
     const [loading, setLoading] = React.useState(true)
 
     const [likes, setLikes] = React.useState(data.likes ?? [])
@@ -61,6 +63,15 @@ export default React.memo(({
         return await events.onClickOpen(data)
     }
 
+    const onClickEdit = async () => {
+        if (typeof events.onClickEdit !== "function") {
+            console.warn("onClickEdit event is not a function")
+            return
+        }
+
+        return await events.onClickEdit(data)
+    }
+
     const onDataUpdate = (data) => {
         console.log("onDataUpdate", data)
 
@@ -82,6 +93,9 @@ export default React.memo(({
             app.eventBus.emit("style.compactMode", true)
         }
 
+        app.eventBus.on(`post.${data._id}.delete`, onClickDelete)
+        app.eventBus.on(`post.${data._id}.update`, onClickEdit)
+
         // first listen to post changes
         window.app.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
 
@@ -92,6 +106,9 @@ export default React.memo(({
             if (fullmode) {
                 app.eventBus.emit("style.compactMode", false)
             }
+
+            app.eventBus.off(`post.${data._id}.delete`, onClickDelete)
+            app.eventBus.off(`post.${data._id}.update`, onClickEdit)
 
             // remove the listener
             window.app.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
@@ -125,6 +142,9 @@ export default React.memo(({
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
         )}
+        context-menu={"postCard-context"}
+        user-id={data.user_id}
+        self-post={isSelf.toString()}
     >
         <div className="wrapper">
             <PostHeader
@@ -149,7 +169,7 @@ export default React.memo(({
         }
         {!fullmode &&
             <PostActions
-                isSelf={app.permissions.checkUserIdIsSelf(data.user_id)}
+                isSelf={isSelf}
                 defaultLiked={hasLiked}
                 defaultSaved={hasSaved}
                 onClickLike={onClickLike}
