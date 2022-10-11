@@ -91,7 +91,7 @@
     }
 }
 
-.ant-btn-primary {
+.ant-btn-primary:not(.ant-btn-dangerous) {
     svg {
         color: var(--background-color-primary) !important;
     }
@@ -113,7 +113,7 @@
     }
 }
 
-.ant-btn-default {
+.ant-btn-default:not(.ant-btn-dangerous) {
     color: var(--text-color);
     background: var(--background-color-primary);
     border-color: var(--background-color-primary2) !important;
@@ -165,4 +165,8 @@
     color: var(--text-color) !important;
     background: var(--background-color-primary) !important;
     border-color: var(--background-color-primary2) !important;
+}
+
+.ant-modal-content {
+    border-radius: 10px;
 }
