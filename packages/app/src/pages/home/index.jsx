@@ -19,7 +19,7 @@ const Tabs = {
             </>
         }
     },
-    "livestrems": {
+    "livestreams": {
         title: "Livestreams",
         icon: "Tv",
         component: (props) => {
