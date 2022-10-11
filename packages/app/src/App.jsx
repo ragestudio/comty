@@ -148,6 +148,9 @@ class App extends React.Component {
 			await this.sessionController.logout()
 		},
 		"session.created": async () => {
+			app.eventBus.emit("layout.animations.fadeOut")
+			app.eventBus.emit("layout.render.lock")
+
 			await this.flushState()
 			await this.initialization()
 
@@ -155,6 +158,9 @@ class App extends React.Component {
 			if (window.location.pathname === "/login") {
 				app.setLocation("/")
 			}
+
+			app.eventBus.emit("layout.render.unlock")
+			app.eventBus.emit("layout.animations.fadeIn")
 		},
 		"session.destroyed": async () => {
 			await this.flushState()
