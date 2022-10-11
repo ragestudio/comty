@@ -1,120 +1,85 @@
 .post_additions {
+    position: relative;
+
+    display: flex;
+
     width: 100%;
-    height: 28vh;
+
+    align-items: center;
+    justify-content: center;
 
     transition: all 0.2s ease-in-out;
 
-    .slick-slider {
-        .slick-prev {
-            display: inline !important;
-            color: #ffffff;
+    .carousel-root {
+        position: relative;
 
-            z-index: 100;
-
-            top: 0;
-            left: 0;
-
-            height: 100%;
-            width: 5vw;
-
-            opacity: 0;
-
-            transition: all 150ms ease-in-out;
-
-            &:hover {
-                opacity: 0.6;
-                width: 7vw;
-            }
-
-            &:active {
-                transform: scale(0.5);
-            }
-        }
-
-        .slick-next {
-            display: inline !important;
-            color: #ffffff;
-
-            z-index: 100;
-
-            top: 0;
-            right: 0;
-
-            height: 100%;
-            width: 5vw;
-
-            opacity: 0;
-
-            transition: all 150ms ease-in-out;
-
-            &:hover {
-                opacity: 0.6;
-                width: 7vw;
-            }
-
-            &:active {
-                transform: scale(0.5);
-            }
-        }
-    }
-
-    .slick-track {
-        display: flex;
-        align-items: center;
-    }
-
-    .slick-slide {
-        height: 100%;
-
-        div {
-            height: 100%;
-        }
-    }
-
-    .slick-list {
-        border-radius: 8px;
-    }
-
-    .ant-carousel,
-    .slick-slider,
-    .slick-list,
-    .slick-track {
-        height: 100%;
-    }
-
-    .adm-swiper-track-inner {
-        display: flex;
-        align-items: center;
+        font-family: "DM Mono", monospace;
 
         height: 100%;
         width: 100%;
 
-        user-select: none;
-        -webkit-user-drag: none;
+        .carousel {
+            border-radius: 8px;
+        }
 
-        .adm-swiper-slide {
-            display: flex;
-            align-items: center;
+        .control-prev,
+        .control-next {
+            color: #ffffff;
 
-            user-select: none;
-            -webkit-user-drag: none;
+            height: 100%;
+            width: 30px;
 
-            .adm-swiper-item {
-                display: flex;
-                align-items: center;
-                justify-content: center;
+            opacity: 0;
 
-                height: fit-content;
+            transition: all 150ms ease-in-out;
 
-                user-select: none;
-                -webkit-user-drag: none;
+            &:hover {
+                opacity: 1;
+                width: 50px;
             }
+
+            &:active {
+                transform: scale(0.5);
+                background-color: transparent;
+            }
+
+            ::before {
+                font-size: 20px;
+            }
+        }
+
+        .control-dots {
+            &:hover {
+                .dot {
+                    height: 8px;
+                    width: 20px;
+                }
+            }
+
+            .dot {
+                transition: all 100ms ease-in;
+
+                height: 3px;
+                width: 15px;
+
+                border-radius: 2px;
+
+                box-shadow: none;
+            }
+        }
+
+        .carousel-status {
+            padding: 10px;
         }
     }
 
     .addition {
         width: 100%;
         height: 100%;
+
+        max-height: 50vh;
+
+        background-color: black;
 
         // fixtures for media content
         img {
@@ -128,7 +93,6 @@
         }
 
         video {
-            width: 100%;
             height: 100%;
 
             user-select: none;
@@ -147,6 +111,27 @@
 
         >div {
             height: 100%;
+        }
+    }
+}
+
+.plyr__controls {
+    .plyr__control {
+        &:hover {
+            background-color: var(--primaryColor);
+        }
+
+        svg {
+            color: white;
+
+            margin: 0;
+        }
+    }
+
+    .plyr__progress,
+    .plyr__volume {
+        input {
+            color: var(--primaryColor);
         }
     }
 }
