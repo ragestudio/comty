@@ -33,7 +33,7 @@ export default (props) => {
         return <antd.Skeleton active />
     }
 
-    return <div className="fullPost">
+    return <div className="postPage">
         <div className="postWrapper">
             <PostCard data={data} fullmode />
         </div>
