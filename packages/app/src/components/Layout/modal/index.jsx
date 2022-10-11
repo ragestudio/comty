@@ -4,6 +4,9 @@ import { Icons } from "components/Icons"
 
 import "./index.less"
 
+// TODO: Implement translucid mode
+// TODO: Implement close on click mask (and Should remove the close button)
+
 export default class AppModal extends React.Component {
     constructor(props) {
         super(props)
