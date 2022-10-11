@@ -21,7 +21,7 @@ const NoResultComponent = () => {
 }
 
 // FIXME: Scroll behavior should scroll to next post or the previous one depending on the direction of the scroll
-export default class PostsFeed extends React.Component {
+export default class PostsFeed extends React.PureComponent {
     state = {
         initialLoading: true,
         fetchingData: true,
