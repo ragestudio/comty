@@ -19,6 +19,10 @@ String.prototype.toTitleCase = function () {
 	})
 }
 
+String.prototype.toBoolean = function () {
+	return this === "true"
+}
+
 Promise.tasked = function (promises) {
 	return new Promise(async (resolve, reject) => {
 		let rejected = false
@@ -75,6 +79,8 @@ class App extends React.Component {
 
 	static async initialize() {
 		window.app.version = config.package.version
+
+		window.app.message = antd.message
 
 		// check if electron library is available
 		if (typeof window.electron !== "undefined") {
