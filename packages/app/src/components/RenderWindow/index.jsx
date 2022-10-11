@@ -6,14 +6,24 @@ import { Icons } from "components/Icons"
 import "./index.less"
 
 class DOMWindow {
-	constructor(props) {
-		this.props = { ...props }
+	constructor(props = {}) {
+		this.props = props
 
 		this.id = this.props.id
 		this.key = 0
 
+		this.currentRender = null
 		this.root = document.getElementById("app_windows")
-		this.element = document.getElementById(this.id)
+		this.element = document.createElement("div")
+
+		this.element.setAttribute("id", this.id)
+		this.element.setAttribute("key", this.key)
+		this.element.setAttribute("classname", this.props.className)
+
+		// if props clickOutsideToClose is true, add event listener to close window
+		if (this.props.clickOutsideToClose) {
+			document.addEventListener("click", this.handleWrapperClick)
+		}
 
 		// handle root container
 		if (!this.root) {
@@ -33,39 +43,43 @@ class DOMWindow {
 
 			this.key = lastChildKey + 1
 		}
+	}
 
-		this.element = document.createElement("div")
+	handleWrapperClick = (event) => {
+		if (!this.currentRender) {
+			return
+		}
 
-		this.element.setAttribute("id", this.id)
-		this.element.setAttribute("key", this.key)
-		this.element.setAttribute("classname", this.props.className)
-
-		this.root.appendChild(this.element)
+		// if click in not renderer fragment, close window
+		if (!this.element.contains(event.target)) {
+			this.remove()
+		}
 	}
 
 	render = (fragment) => {
-		ReactDOM.render(
-			fragment,
-			this.element,
-		)
+		this.root.appendChild(this.element)
 
-		return this
+		this.currentRender = fragment
+
+		return ReactDOM.render(fragment, this.element)
 	}
 
-	create = () => {
-		// set render
-		this.render(<WindowRender {...this.props} id={this.id} key={this.key} destroy={this.destroy} />)
-
-		return this
+	remove = () => {
+		this.root.removeChild(this.element)
+		this.currentRender = null
 	}
 
 	destroy = () => {
 		this.element.remove()
-		return this
+		this.currentRender = null
+	}
+
+	createDefaultWindow = () => {
+		return this.render(<DefaultWindowRender {...this.props} id={this.id} key={this.key} destroy={this.destroy} />)
 	}
 }
 
-class WindowRender extends React.Component {
+class DefaultWindowRender extends React.Component {
 	state = {
 		actions: [],
 		dimensions: {
@@ -195,4 +209,4 @@ class WindowRender extends React.Component {
 	}
 }
 
-export { DOMWindow, WindowRender }
+export { DOMWindow, DefaultWindowRender }
