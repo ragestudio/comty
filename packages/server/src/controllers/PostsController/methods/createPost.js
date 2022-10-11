@@ -8,7 +8,7 @@ export default async (payload) => {
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
         message: String(message).toString(),
         additions: additions ?? [],
-        created_at: new Date().getTime(),
+        created_at: new Date().toISOString(),
         type: type,
         data: data,
     })
