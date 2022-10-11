@@ -184,13 +184,18 @@ export default class PostsFeed extends React.Component {
     }
 
     onDeletePost = async (data) => {
-        let result = await this.api.delete.post({ post_id: data._id }).catch(() => {
-            antd.message.error("Failed to delete post")
-
-            return false
+        antd.Modal.confirm({
+            title: "Are you sure you want to delete this post?",
+            content: "This action is irreversible",
+            okText: "Yes",
+            okType: "danger",
+            cancelText: "No",
+            onOk: async () => {
+                await this.api.delete.post({ post_id: data._id }).catch(() => {
+                    antd.message.error("Failed to delete post")
+                })
+            },
         })
-
-        return result
     }
 
     onDoubleClickPost = (data) => {
