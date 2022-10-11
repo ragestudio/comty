@@ -113,27 +113,45 @@
     }
 }
 
-.ant-btn-default:not(.ant-btn-dangerous) {
+.ant-btn-default {
+    &:not(.ant-btn-dangerous) {
+        border-color: var(--background-color-primary2) !important;
+
+        &:hover {
+            border-color: var(--background-color-primary) !important;
+        }
+
+        &:active {
+            border-color: var(--background-color-primary) !important;
+        }
+
+        &:focus {
+            border-color: var(--background-color-primary) !important;
+        }
+    }
+
     color: var(--text-color);
     background: var(--background-color-primary);
-    border-color: var(--background-color-primary2) !important;
 
     &:hover {
         color: var(--text-color);
         background: var(--background-color-primary2);
-        border-color: var(--background-color-primary2) !important;
     }
 
     &:active {
         color: var(--text-color);
         background: var(--background-color-primary2);
-        border-color: var(--background-color-primary2) !important;
     }
 
     &:focus {
         color: var(--text-color);
         background: var(--background-color-primary2);
-        border-color: var(--background-color-contrast) !important;
+    }
+}
+
+.ant-btn-dangerous {
+    span {
+        color: var(--ant-error-color);
     }
 }
 
@@ -168,5 +186,17 @@
 }
 
 .ant-modal-content {
+    background-color: var(--background-color-primary) !important;
+
+    p,
+    span,
+    svg {
+        color: var(--text-color) !important;
+    }
+
+    .ant-modal-confirm-content {
+        color: var(--text-color) !important;
+    }
+
     border-radius: 10px;
 }
