@@ -19,7 +19,6 @@ export default React.memo(({
     fullmode
 }) => {
     const [loading, setLoading] = React.useState(true)
-    const [expanded, setExpanded] = React.useState(false)
 
     const [likes, setLikes] = React.useState(data.likes ?? [])
     const [comments, setComments] = React.useState(data.comments ?? [])
@@ -61,20 +60,6 @@ export default React.memo(({
         }
 
         return await events.onClickOpen(data)
-    }
-
-    const toogleExpand = (to) => {
-        if (to === undefined) {
-            to = !expanded
-        }
-
-        setExpanded(to)
-    }
-
-    const handleExpand = () => {
-        if (!expanded) {
-            return toogleExpand(true)
-        }
     }
 
     const onDataUpdate = (data) => {
@@ -138,9 +123,7 @@ export default React.memo(({
             { ["liked"]: hasLiked },
             { ["noHide"]: !expansibleActions },
             { ["fullmode"]: fullmode },
-            { ["expanded"]: expanded }
         )}
-        onClick={handleExpand}
     >
         <div className="wrapper">
             <PostHeader
