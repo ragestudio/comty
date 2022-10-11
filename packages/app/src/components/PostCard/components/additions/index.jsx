@@ -1,8 +1,7 @@
 import React from "react"
-import * as antd from "antd"
 import loadable from "@loadable/component"
-
-import { Icons } from "components/Icons"
+import { Carousel } from "react-responsive-carousel"
+import Plyr from "plyr-react"
 
 import ContentFailed from "../contentFailed"
 
@@ -25,6 +24,7 @@ const mediaTypes = {
     "m4a": "audio",
 }
 
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
 
@@ -71,16 +71,23 @@ export default class PostAdditions extends React.PureComponent {
                             return () => <img src={url} />
                         }
                         case "video": {
-                            return () => <video controls>
-                                <source src={url} type={mimeType} />
-                            </video>
+                            return () => <Plyr
+                                source={{
+                                    type: "video",
+                                    sources: [{
+                                        src: url,
+                                    }],
+                                }}
+                                options={{
+                                    controls: ["play", "progress", "current-time", "mute", "volume"],
+                                }}
+                            />
                         }
                         case "audio": {
                             return () => <audio controls>
                                 <source src={url} type={mimeType} />
                             </audio>
                         }
-
                         default: {
                             return () => <h4>
                                 Unsupported media type [{mediaType}/{mediaTypeExt}]
@@ -103,14 +110,14 @@ export default class PostAdditions extends React.PureComponent {
 
     render() {
         return <div className="post_additions">
-            <antd.Carousel
-                arrows={true}
-                nextArrow={<Icons.ChevronRight />}
-                prevArrow={<Icons.ChevronLeft />}
-                autoplay={this.props.autoCarrousel}
+            <Carousel
+                showArrows={true}
+                showStatus={false}
+                showThumbs={false}
+                showIndicators={this.props.additions?.length > 1 ?? false}
             >
                 {this.getAdditions(this.props.additions)}
-            </antd.Carousel>
+            </Carousel>
         </div>
     }
 }
