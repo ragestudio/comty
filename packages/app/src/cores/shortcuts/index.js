@@ -82,8 +82,6 @@ export default class ShortcutsCore extends Core {
             return false
         }
 
-        console.log(register)
-
         // remove the event handler
         document.removeEventListener("keydown", register.handler)
 
