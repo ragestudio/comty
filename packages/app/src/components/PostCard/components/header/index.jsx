@@ -15,7 +15,12 @@ export default (props) => {
     }
 
     const updateTimeAgo = () => {
-        setTimeAgo(moment(props.postData.created_at ?? "").fromNow())
+        let createdAt = props.postData.created_at ?? ""
+
+        // calculate time ago (use UTC time)
+        let timeAgo = moment.utc(createdAt).fromNow()
+
+        setTimeAgo(timeAgo)
     }
 
     React.useEffect(() => {
