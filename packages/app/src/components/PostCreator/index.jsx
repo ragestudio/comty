@@ -144,6 +144,11 @@ export default (props) => {
     }
 
     const onChangeMessageInput = (event) => {
+        // if the fist character is a space or a whitespace remove it
+        if (event.target.value[0] === " " || event.target.value[0] === "\n") {
+            event.target.value = event.target.value.slice(1)
+        }
+
         updatePostData({
             message: event.target.value
         })
