@@ -1,6 +1,5 @@
 import { Post } from "../../../models"
 import getPostData from "./getPostData"
-import momentTimezone from "moment-timezone"
 
 export default async (payload) => {
     const { user_id, message, additions, type, data, date } = payload
