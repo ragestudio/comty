@@ -21,7 +21,7 @@ const NoResultComponent = () => {
 }
 
 // FIXME: Scroll behavior should scroll to next post or the previous one depending on the direction of the scroll
-export default class PostsFeed extends React.PureComponent {
+export default class PostsFeed extends React.Component {
     state = {
         initialLoading: true,
         fetchingData: true,
@@ -78,6 +78,11 @@ export default class PostsFeed extends React.PureComponent {
 
         window.app.shortcuts.remove("postsFeed.scrollUp")
         window.app.shortcuts.remove("postsFeed.scrollDown")
+    }
+
+    // avoid to re-render the whole list when props change
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.state !== nextState
     }
 
     scrollUp = () => {
