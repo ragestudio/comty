@@ -125,7 +125,7 @@ export default class Server {
 
             if (!setupOk) {
                 console.log("⚠️  Server setup is not complete, running setup proccess.")
-                let setupScript = await import("./mainAPI/setup")
+                let setupScript = await import("./setup")
 
                 setupScript = setupScript.default ?? setupScript
 
