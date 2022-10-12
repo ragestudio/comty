@@ -74,8 +74,10 @@ class DOMWindow {
 		this.currentRender = null
 	}
 
-	createDefaultWindow = () => {
-		return this.render(<DefaultWindowRender {...this.props} id={this.id} key={this.key} destroy={this.destroy} />)
+	createDefaultWindow = (children, props) => {
+		return this.render(<DefaultWindowRender {...this.props} {...props} id={this.id} key={this.key} destroy={this.destroy} >
+			{children}
+		</DefaultWindowRender>)
 	}
 }
 
