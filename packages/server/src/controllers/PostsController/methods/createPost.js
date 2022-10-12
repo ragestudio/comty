@@ -1,11 +1,12 @@
 import { Post } from "../../../models"
 import getPostData from "./getPostData"
+import momentTimezone from "moment-timezone"
 
 export default async (payload) => {
     const { user_id, message, additions, type, data } = payload
 
-    // set creation date (Must be in UTC)
-    const created_at = new Date().toISOString()
+    const current_timezone = momentTimezone.tz.guess()
+    const created_at = momentTimezone.tz(Date.now(), current_timezone).format()
 
     const post = new Post({
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
