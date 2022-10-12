@@ -7,7 +7,7 @@ function copyToClipboard(text) {
     }
 
     navigator.clipboard.writeText(text)
-    app.message.success("Copied ID to clipboard")
+    app.message.success("Copied to clipboard")
 }
 
 export default {
