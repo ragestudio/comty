@@ -5,10 +5,12 @@ const NotFoundRender = () => {
     return <div>Not found</div>
 }
 
+const DebugRoutes = import.meta.glob("/src/debug/components/**/[a-z[]*.jsx")
 const JSXRoutes = import.meta.glob("/src/pages/**/[a-z[]*.jsx")
 const TSXRoutes = import.meta.glob("/src/pages/**/[a-z[]*.tsx")
 
 const scriptRoutes = {
+    ...DebugRoutes,
     ...JSXRoutes,
     ...TSXRoutes,
 }
@@ -16,6 +18,7 @@ const scriptRoutes = {
 const routes = Object.keys(scriptRoutes).map((route) => {
     const path = route
         .replace(/\/src\/pages|index|\.jsx$/g, "")
+        .replace(/\/src\/debug\/components/g, "/debug")
         .replace(/\[\.{3}.+\]/, "*")
         .replace(/\[(.+)\]/, ":$1")
 
