@@ -169,7 +169,6 @@ export default React.memo(({
         }
         {!fullmode &&
             <PostActions
-                isSelf={isSelf}
                 defaultLiked={hasLiked}
                 defaultSaved={hasSaved}
                 onClickLike={onClickLike}
