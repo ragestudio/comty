@@ -60,6 +60,9 @@ import { Session, User } from "models"
 import config from "config"
 
 import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher } from "components"
+import { DOMWindow } from "components/RenderWindow"
+import loadable from "@loadable/component"
+
 import { Icons } from "components/Icons"
 
 import Layout from "./layout"
@@ -326,6 +329,15 @@ class App extends React.Component {
 			}
 			return await StatusBar.show()
 		},
+		openDebugger: () => {
+			// create a new dom window
+			const win = new DOMWindow({
+				id: "debug",
+				title: "Debug",
+			})
+
+			win.createDefaultWindow(loadable(() => import("./debug")))
+		}
 	}
 
 	constructor(props) {
