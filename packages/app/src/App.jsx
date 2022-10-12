@@ -351,26 +351,27 @@ class App extends React.Component {
 		}
 
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
+		const isMac = userAgentPlatform.indexOf("mac") !== -1
 
-		if (userAgentPlatform.includes("mac")) {
-			this.props.cores.ShortcutsCore.register({
-				id: "app.openSearcher",
-				key: ",",
-				meta: true,
-				preventDefault: true,
-			}, (...args) => {
-				App.publicMethods.openSettings(...args)
-			})
-		} else {
-			this.props.cores.ShortcutsCore.register({
-				id: "app.openSearcher",
-				key: ",",
-				ctrl: true,
-				preventDefault: true,
-			}, (...args) => {
-				App.publicMethods.openSettings(...args)
-			})
-		}
+		this.props.cores.ShortcutsCore.register({
+			id: "app.openSearcher",
+			key: ",",
+			meta: isMac,
+			ctrl: !isMac,
+			preventDefault: true,
+		}, (...args) => {
+			App.publicMethods.openSettings(...args)
+		})
+
+		this.props.cores.ShortcutsCore.register({
+			id: "app.openCreator",
+			key: "k",
+			meta: isMac,
+			ctrl: !isMac,
+			preventDefault: true,
+		}, () => {
+			App.publicMethods.openCreator()
+		})
 
 		app.eventBus.emit("app.initialization.start")
 
