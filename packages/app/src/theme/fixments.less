@@ -167,11 +167,29 @@
 // fix menu colors
 .ant-menu-item {
     color: var(--text-color);
+    border-radius: 8px;
 }
 
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
     color: var(--text-color);
     background-color: var(--background-color-primary) !important;
+
+    &::after {
+        opacity: 0;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        width: 10px;
+        height: 100%;
+
+        background-color: var(--primaryColor);
+    }
 }
 
 .ant-menu-item:active {
