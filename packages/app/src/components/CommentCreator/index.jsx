@@ -33,6 +33,11 @@ export default (props) => {
             return setValue(null)
         }
 
+        // if post only have whitespaces, dont allow to submit
+        if (e.target.value.trim() === "") {
+            return setValue("")
+        }
+
         return setValue(String(e.target.value))
     }
 
