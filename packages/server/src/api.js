@@ -83,10 +83,6 @@ export default class Server {
         global.wsInterface = this.server.wsInterface
         global.httpListenPort = this.listenPort
 
-        global.publicHostname = this.env.publicHostname
-        global.publicProtocol = this.env.publicProtocol
-        global.globalPublicUri = `${this.env.publicProtocol}://${this.env.publicHost}`
-
         global.uploadCachePath = this.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
 
         global.jwtStrategy = this.options.jwtStrategy
