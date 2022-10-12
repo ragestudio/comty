@@ -54,12 +54,13 @@ export default class PostsController extends Controller {
         "/post": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
-                required: ["message"],
-                select: ["message", "additions", "type", "data"],
+                required: ["message", "date"],
+                select: ["message", "additions", "type", "data", "date"],
             }, async (req, res) => {
                 const post = await CreatePost({
                     user_id: req.user.id,
                     message: req.selection.message,
+                    date: req.selection.date,
                     additions: req.selection.additions,
                     type: req.selection.type,
                     data: req.selection.data,
