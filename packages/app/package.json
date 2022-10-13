@@ -32,6 +32,7 @@
     "@corenode/utils": "0.28.26",
     "@emotion/css": "11.0.0",
     "@loadable/component": "5.15.2",
+    "@tsmx/human-readable": "^1.0.7",
     "antd": "4.23.2",
     "antd-mobile": "^5.0.0-rc.17",
     "chart.js": "3.7.0",
@@ -82,6 +83,7 @@
     "react-rnd": "10.3.5",
     "rxjs": "^7.5.5",
     "store": "^2.0.12",
+    "uuid": "^9.0.0",
     "wait-on": "^6.0.1"
   },
   "devDependencies": {
