@@ -38,6 +38,7 @@ export default (props) => {
     const cleanPostData = () => {
         setPostData({
             message: "",
+            date: new Date(),
             additions: []
         })
     }
