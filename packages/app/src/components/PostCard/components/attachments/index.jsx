@@ -28,8 +28,8 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
 
-export default class PostAdditions extends React.PureComponent {
-    getAdditions = (data) => {
+export default class PostAttachments extends React.PureComponent {
+    getAttachments = (data) => {
         return data.map((addition, index) => {
             if (typeof addition === "string") {
                 addition = {
@@ -109,14 +109,14 @@ export default class PostAdditions extends React.PureComponent {
     }
 
     render() {
-        return <div className="post_additions">
+        return <div className="post_attachments">
             <Carousel
                 showArrows={true}
                 showStatus={false}
                 showThumbs={false}
-                showIndicators={this.props.additions?.length > 1 ?? false}
+                showIndicators={this.props.attachments?.length > 1 ?? false}
             >
-                {this.getAdditions(this.props.additions)}
+                {this.getAttachments(this.props.attachments)}
             </Carousel>
         </div>
     }

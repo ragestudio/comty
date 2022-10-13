@@ -6,12 +6,12 @@ import { processString } from "utils"
 
 import { Icons } from "components/Icons"
 
-import PostAdditions from "../additions"
+import PostAttachments from "../attachments"
 
 import "./index.less"
 
 export default React.memo((props) => {
-    let { message, additions, type, data } = props.data
+    let { message, attachments, type, data } = props.data
 
     if (typeof data === "string") {
         try {
@@ -99,7 +99,7 @@ export default React.memo((props) => {
                         {message}
                     </div>
 
-                    {additions.length > 0 && <PostAdditions additions={additions} />}
+                    {attachments.length > 0 && <PostAttachments attachments={attachments} />}
                 </>
             }
         }
