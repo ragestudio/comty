@@ -40,14 +40,17 @@
     .uploader {
         display: flex;
         flex-direction: row;
-        justify-content: flex-start;
 
-        height: 5vh;
         width: 100%;
 
         overflow: hidden;
 
         transition: all 150ms ease-in-out;
+
+        border: 1px solid var(--border-color);
+        padding: 10px;
+
+        opacity: 1;
 
         >div {
             margin-left: 10px;
@@ -59,15 +62,168 @@
         }
 
         &.hided {
-            height: 0;
+            height: 0px;
+            opacity: 0;
         }
 
-        span {
-            width: 100%;
-        }
 
         .ant-upload {
+            span {
+                width: fit-content !important;
+            }
+
+            .ant-upload-select-picture-card {
+                background-color: transparent !important;
+            }
+        }
+
+        .ant-upload.ant-upload-select-picture-card {
+            display: flex;
+            align-self: center;
+            justify-content: center;
+
+            width: 10vw;
+            height: 10vw;
+
+            margin-bottom: 0;
+
+            border-color: var(--border-color);
+            background-color: transparent !important;
+
+        }
+
+        .ant-upload-list-picture-card .ant-upload-list-item-uploading.ant-upload-list-item {
+            background-color: transparent !important;
+        }
+
+        .ant-upload-list-item-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: 100%;
             width: 100%;
+
+            font-size: 2rem;
+        }
+
+        .ant-upload-list {
+            display: flex;
+            flex-direction: row;
+
+            width: 100%;
+            
+            overflow-x: auto;
+            overflow-y: hidden;
+
+            white-space: nowrap;
+
+            align-items: center;
+            justify-content: flex-start;
+
+            border-radius: 10px;
+        }
+
+        .ant-upload-list-picture-card-container {
+            width: 10vw;
+            height: 10vw;
+        }
+
+        .hint {
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+
+            width: 10vw;
+            height: 10vw;
+
+            text-align: center;
+
+            background-color: transparent;
+
+            font-size: 0.8rem;
+
+            padding: 10px;
+
+            svg {
+                font-size: 1.5rem;
+                margin-bottom: 6px;
+                margin-right: 0 !important;
+            }
+        }
+
+        .file {
+            position: relative;
+
+            width: 10vw;
+            height: 10vw;
+
+            font-size: 2rem;
+
+            transition: all 150ms ease-in-out;
+
+            border-radius: 10px;
+
+            &.uploading {
+                img {
+                    opacity: 0.5;
+                }
+
+                .actions {
+                    backdrop-filter: blur(5px);
+                    opacity: 1;
+                }
+            }
+
+            &:hover {
+                .actions {
+                    opacity: 1;
+                    backdrop-filter: blur(2px);
+                }
+
+                .preview {
+                    opacity: 0.5;
+                }
+            }
+
+            .preview {
+                position: absolute;
+                top: 0;
+                left: 0;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+
+                    transition: all 150ms ease-in-out;
+                    border-radius: 10px;
+                }
+            }
+
+            .actions {
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                width: 100%;
+                height: 100%;
+
+                transition: all 150ms ease-in-out;
+
+                backdrop-filter: blur(0);
+
+                opacity: 0;
+
+                svg {
+                    margin: 0;
+                }
+            }
         }
     }
 

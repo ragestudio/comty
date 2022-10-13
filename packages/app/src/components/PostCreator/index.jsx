@@ -1,46 +1,46 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
+import { DateTime } from "luxon"
+import humanSize from "@tsmx/human-readable"
 
 import { Icons } from "components/Icons"
-import PostAdditions from "components/PostCard/components/additions"
 
 import "./index.less"
 
-// TODO: Handle `cntr+v` to paste data from the clipboard to the post additions
-// TODO: Fetch `maxMessageLength` value from server API
-const maxMessageLength = 512
+const DEFAULT_POST_POLICY = {
+    maxMessageLength: 512,
+    acceptedMimeTypes: ["image/gif", "image/png", "image/jpeg", "image/bmp"],
+    maximumFileSize: 10 * 1024 * 1024,
+    maximunFilesPerRequest: 10
+}
 
 export default (props) => {
     const api = window.app.api.withEndpoints("main")
 
-    const additionsRef = React.useRef(null)
+    const creatorRef = React.useRef(null)
 
     const [pending, setPending] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [uploaderVisible, setUploaderVisible] = React.useState(false)
     const [focused, setFocused] = React.useState(false)
 
-    const [postData, setPostData] = React.useState({
-        message: "",
-        additions: []
-    })
+    const [postMessage, setPostMessage] = React.useState("")
+    const [postAttachments, setPostAttachments] = React.useState([])
+    const [fileList, setFileList] = React.useState([])
 
-    const [uploadPolicy, setUploadPolicy] = React.useState(null)
-
-    const updatePostData = (update) => {
-        setPostData({
-            ...postData,
-            ...update
-        })
-    }
+    const [postingPolicy, setPostingPolicy] = React.useState(DEFAULT_POST_POLICY)
 
     const cleanPostData = () => {
-        setPostData({
-            message: "",
-            date: new Date(),
-            additions: []
-        })
+        setPostMessage("")
+        setPostAttachments([])
+        setFileList([])
+    }
+
+    const fetchUploadPolicy = async () => {
+        const policy = await api.get.postingPolicy()
+
+        setPostingPolicy(policy)
     }
 
     const submit = () => {
@@ -50,7 +50,13 @@ export default (props) => {
         setUploaderVisible(false)
         setFocused(false)
 
-        const response = api.post.post({ ...postData }).catch(error => {
+        const payload = {
+            message: postMessage,
+            attachments: postAttachments,
+            timestamp: DateTime.local().toISO(),
+        }
+
+        const response = api.post.post(payload).catch(error => {
             console.error(error)
             antd.message.error(error)
 
@@ -70,13 +76,14 @@ export default (props) => {
 
     const onUploadFile = async (req) => {
         // hide uploader
-        setUploaderVisible(false)
+        //setUploaderVisible(false)
 
         // get file data
         const file = req.file
 
         // append to form data
         const formData = new FormData()
+
         formData.append("files", file)
 
         // send request
@@ -95,48 +102,75 @@ export default (props) => {
     }
 
     const canSubmit = () => {
-        const messageLengthValid = postData.message.length !== 0 && postData.message.length < maxMessageLength
+        const messageLengthValid = postMessage.length !== 0 && postMessage.length < postingPolicy.maxMessageLength
 
-        return Boolean(messageLengthValid) && Boolean(pending.length === 0)
+        if (pending.length !== 0) {
+            return false
+        }
+
+        if (!messageLengthValid && postAttachments.length === 0) {
+            return false
+        }
+
+        return true
     }
 
-    const removeAddition = (file_uid) => {
-        updatePostData({
-            additions: postData.additions.filter(addition => addition.file.uid !== file_uid)
-        })
+    const removeAttachment = (file_uid) => {
+        setPostAttachments(postAttachments.filter((file) => file.uid !== file_uid))
     }
 
-    const onDraggerChange = (change) => {
-        console.log(change)
+    const addAttachment = (file) => {
+        if (Array.isArray(file)) {
+            return setPostAttachments([...postAttachments, ...file])
+        }
+
+        return setPostAttachments([...postAttachments, file])
+    }
+
+    const uploaderScrollToEnd = () => {
+        // scroll to max right 
+        const element = document.querySelector(".ant-upload-list-picture-card")
+
+        // calculate the element's width and scroll to the end
+        const scrollToLeft = element.scrollWidth - element.clientWidth
+
+        if (element) {
+            element.scrollTo({
+                top: 0,
+                left: scrollToLeft,
+                behavior: "smooth",
+            })
+        }
+    }
+
+    const onUploaderChange = (change) => {
+        setFileList(change.fileList)
 
         switch (change.file.status) {
             case "uploading": {
                 setPending([...pending, change.file.uid])
+
+                uploaderScrollToEnd()
+
                 break
             }
+
             case "done": {
-                let additions = postData.additions ?? []
-
-                console.log(change.file)
-
-                additions.push(...change.file.response)
-
                 // remove pending file
                 setPending(pending.filter(uid => uid !== change.file.uid))
 
                 // update post data
-                updatePostData({ additions })
+                addAttachment(change.file.response)
 
-                // force update additions
-                if (additionsRef.current) {
-                    additionsRef.current.forceUpdate()
-                }
+                uploaderScrollToEnd()
 
                 break
             }
             case "error": {
                 // remove pending file
                 setPending(pending.filter(uid => uid !== change.file.uid))
+
+                removeAttachment(change.file.uid)
             }
             default: {
                 break
@@ -150,9 +184,7 @@ export default (props) => {
             event.target.value = event.target.value.slice(1)
         }
 
-        updatePostData({
-            message: event.target.value
-        })
+        setPostMessage(event.target.value)
     }
 
     const toggleUploader = (to) => {
@@ -173,8 +205,72 @@ export default (props) => {
         }
     }
 
+    const handlePaste = ({ clipboardData }) => {
+        if (clipboardData && clipboardData.items.length > 0) {
+            const isValidFormat = (fileType) => DEFAULT_ACCEPTED_FILES.includes(fileType)
+            toggleUploader(true)
+
+            for (let index = 0; index < clipboardData.items.length; index++) {
+                if (!isValidFormat(clipboardData.items[index].type)) {
+                    throw new Error(`Sorry, that's not a format we support ${clipboardData.items[index].type}`)
+                }
+
+                let file = clipboardData.items[index].getAsFile()
+
+                app.message.info("Uploading file...")
+
+                file.thumbUrl = URL.createObjectURL(file)
+
+                file.uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+
+                // upload file
+                onUploadFile({
+                    file,
+                    onSuccess: (response) => {
+                        setFileList([...fileList, file])
+                        addAttachment(response)
+                    }
+                })
+            }
+        }
+    }
+
+    const renderUploadPreviewItem = (item, file, list, actions) => {
+        const uploading = file.status === "uploading"
+
+        const onClickDelete = () => {
+            actions.remove()
+            removeAttachment(file.uid)
+        }
+
+        return <div className={classnames("file", { ["uploading"]: uploading })}>
+            <div className="preview">
+                <img src={file.thumbUrl ?? "/assets/new_file.png"} />
+            </div>
+
+            <div className="actions">
+                {
+                    uploading && <Icons.LoadingOutlined style={{ margin: "0 !important" }} />
+                }
+                {
+                    !uploading && <antd.Button
+                        type="link"
+                        icon={<Icons.Trash />}
+                        onClick={onClickDelete}
+                    />
+                }
+            </div>
+        </div>
+    }
+
     React.useEffect(() => {
-        //fetchUploadPolicy()
+        fetchUploadPolicy()
+
+        creatorRef.current.addEventListener("paste", handlePaste)
+
+        return () => {
+            creatorRef.current.removeEventListener("paste", handlePaste)
+        }
     }, [])
 
     // set loading to true menwhile pending is not empty
@@ -184,6 +280,7 @@ export default (props) => {
 
     return <div
         className="postCreator"
+        ref={creatorRef}
         onDragOver={(e) => {
             e.preventDefault()
             toggleUploader(true)
@@ -205,13 +302,13 @@ export default (props) => {
             </div>
             <antd.Input.TextArea
                 placeholder="What are you thinking?"
-                disabled={loading}
-                onKeyDown={handleKeyDown}
-                onChange={onChangeMessageInput}
+                value={postMessage}
                 autoSize={{ minRows: 3, maxRows: 6 }}
-                maxLength={maxMessageLength}
+                maxLength={postingPolicy.maxMessageLength}
+                onChange={onChangeMessageInput}
+                onKeyDown={handleKeyDown}
+                disabled={loading}
                 dragable={false}
-                value={postData.message}
                 allowClear
             />
             <div>
@@ -223,8 +320,6 @@ export default (props) => {
                 />
             </div>
         </div>
-
-        {postData.additions.length > 0 && <PostAdditions ref={additionsRef} additions={postData.additions} />}
 
         <div className={classnames("actions", { ["hided"]: !focused && !uploaderVisible })}>
             <div>
@@ -240,14 +335,22 @@ export default (props) => {
         </div>
 
         <div className={classnames("uploader", { ["hided"]: !uploaderVisible })}>
-            <antd.Upload.Dragger
-                maxCount={20}
-                multiple={true}
-                onChange={onDraggerChange}
+            <antd.Upload
+                maxCount={postingPolicy.maximunFilesPerRequest}
+                onChange={onUploaderChange}
                 customRequest={onUploadFile}
+                listType="picture-card"
+                accept={postingPolicy.acceptedMimeTypes}
+                itemRender={renderUploadPreviewItem}
+                fileList={fileList}
+                multiple
             >
-                <p >Click or drag file to this area to upload</p>
-            </antd.Upload.Dragger>
+                <div className="hint">
+                    <Icons.Plus />
+                    <span>Add attachment</span>
+                    <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
+                </div>
+            </antd.Upload>
         </div>
     </div>
 }
