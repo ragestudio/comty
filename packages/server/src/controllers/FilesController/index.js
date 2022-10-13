@@ -7,38 +7,7 @@ import { videoTranscode } from "../../lib/videoTranscode"
 
 const formidable = require("formidable")
 
-// TODO: Get maximunFileSize by type of user subscription (free, premium, etc) when `PermissionsAPI` is ready
-const maximumFileSize = 80 * 1024 * 1024 // max file size in bytes (80MB) By default, the maximum file size is 80MB.
-const maximunFilesPerRequest = 20
-const acceptedMimeTypes = [
-    "image/jpg",
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "audio/mp3",
-    "audio/mpeg",
-    "audio/ogg",
-    "audio/wav",
-    "audio/flac",
-    "video/mp4",
-    "video/mkv",
-    "video/webm",
-    "video/quicktime",
-    "video/x-msvideo",
-    "video/x-ms-wmv",
-]
-
 export default class FilesController extends Controller {
-    get = {
-        "/upload/policy": (req, res) => {
-            return res.json({
-                acceptedMimeTypes,
-                maximumFileSize,
-                maximunFilesPerRequest,
-            })
-        },
-    }
-
     post = {
         "/upload": {
             middlewares: ["withAuthentication"],
@@ -55,8 +24,8 @@ export default class FilesController extends Controller {
                     multiples: true,
                     keepExtensions: true,
                     uploadDir: global.uploadCachePath,
-                    maxFileSize: maximumFileSize,
-                    maxFields: maximunFilesPerRequest,
+                    maxFileSize: global.DEFAULT_POSTING_POLICY.maximumFileSize,
+                    maxFields: global.DEFAULT_POSTING_POLICY.maximunFilesPerRequest,
                     filename: (name, ext) => {
                         name = name.trim()
                         name = name.replace(/ /g, "_")
@@ -66,7 +35,7 @@ export default class FilesController extends Controller {
                     },
                     filter: (stream) => {
                         // check if is allowed mime type
-                        if (!acceptedMimeTypes.includes(stream.mimetype)) {
+                        if (!global.DEFAULT_POSTING_POLICY.acceptedMimeTypes.includes(stream.mimetype)) {
                             failed.push({
                                 fileName: file.originalFilename,
                                 mimetype: file.mimetype,
