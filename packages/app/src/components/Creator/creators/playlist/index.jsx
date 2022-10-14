@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import { DateTime } from "luxon"
 
 import { Icons } from "components/Icons"
 
@@ -160,6 +161,7 @@ export default (props) => {
         let RequestData = {
             type: "playlist",
             message: playlistDescription,
+            timestamp: DateTime.local().toISO(),
             data: {
                 title: playlistName,
                 cover: coverURL,
