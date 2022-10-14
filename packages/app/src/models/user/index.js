@@ -5,14 +5,18 @@ export default class User {
         return window.app?.api.withEndpoints("main")
     }
 
-    static async data() {
-        const token = await Session.decodedToken()
+    static async data(username) {
+        if (!username) {
+            const token = await Session.decodedToken()
 
-        if (!token || !User.bridge) {
-            return false
+            if (!token || !User.bridge) {
+                return false
+            }
+
+            username = token.username
         }
 
-        return User.bridge.get.user(undefined, { username: token.username, _id: token.user_id })
+        return User.bridge.get.user(undefined, { username })
     }
 
     static async publicData() {

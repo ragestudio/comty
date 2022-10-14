@@ -1,17 +1,17 @@
 import { Controller } from "linebridge/dist/server"
 import { User, StreamingKey } from "../../models"
 import { nanoid } from "nanoid"
-
+import lodash from "lodash"
 import axios from "axios"
 
-const streamingMediaServer = process.env.streamingMediaServer ?? "media.ragestudio.net"
-const streamingServerAPIAddress = process.env.streamingServerAPIAddress ?? "media.ragestudio.net"
-const streamingServerAPIPort = process.env.streamingServerAPIPort ?? 3002
+const streamingServerAPIAddress = process.env.streamingServerAPIAddress ?? "live.ragestudio.net"
 const streamingServerAPIProtocol = process.env.streamingServerAPIProtocol ?? "http"
-const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress}:${streamingServerAPIPort}`
+const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress}`
+
+const FILTER_KEYS = ["stream"]
 
 export default class StreamingController extends Controller {
-    static useMiddlewares = ["withAuthentication"]
+    streamings = []
 
     methods = {
         genereteKey: async (user_id) => {
@@ -30,66 +30,201 @@ export default class StreamingController extends Controller {
             await streamingKey.save()
 
             return streamingKey
+        },
+        regenerateStreamingList: async () => {
+            // fetch all streams from api
+            let streams = await axios.get(`${streamingServerAPIUri}/api/v1/streams`).catch((err) => {
+                console.log(err)
+                return false
+            })
+
+            if (streams) {
+                streams = streams.data.streams
+
+                // FIXME: this method is not totally async
+                streams.forEach((stream) => {
+                    // check if the stream is already in the list
+                    const streamInList = this.streamings.find((s) => s.stream === stream.name)
+
+                    if (!streamInList) {
+                        // if not, add it
+                        this.methods.pushToLocalList({
+                            stream: stream.name,
+                            app: stream.app,
+                        }).catch((err) => {
+                            // sorry for you
+                        })
+                    }
+                })
+            }
+        },
+        pushToLocalList: async (payload) => {
+            const { stream, app } = payload
+
+            const username = app.split("/")[1]
+
+            const streamingKey = await StreamingKey.findOne({
+                key: stream
+            })
+
+            if (!streamingKey) {
+                throw new Error("Invalid streaming key")
+            }
+
+            if (username !== streamingKey.username) {
+                throw new Error("Invalid streaming key for this username")
+            }
+
+            const streaming = {
+                stream,
+                username: streamingKey.username,
+                sources: {
+                    rtmp: `rtmp://${streamingServerAPIAddress}/live/${username}`,
+                    hls: `http://${streamingServerAPIAddress}/live/${username}/src.m3u8`,
+                    flv: `http://${streamingServerAPIAddress}/live/${username}/src.flv`,
+                }
+            }
+
+            this.streamings.push(streaming)
+
+            return streaming
+        },
+        removeFromLocalList: async (payload) => {
+            const { stream } = payload
+
+            // remove from streamings array
+            const streaming = this.streamings.find((streaming) => streaming.stream === stream)
+
+            if (!streaming) {
+                throw new Error("Stream not found")
+            }
+
+            this.streamings = this.streamings.filter((streaming) => streaming.stream !== stream)
+
+            return streaming
         }
     }
 
     get = {
-        "/stream_info_from_username": async (req, res) => {
-            const { username } = req.query
-
-            const userspace = await StreamingKey.findOne({ username })
-
-            if (!userspace) {
-                return res.status(403).json({
-                    error: "This username has not a streaming key"
-                })
-            }
-
-            // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
-            const { data } = await axios.get(`${streamingServerAPIUri}/streams`, {
-                params: {
-                    username: userspace.username
-                }
-            }).catch((error) => {
-                res.status(500).json({
-                    error: `Failed to fetch streams from [${streamingServerAPIAddress}]: ${error.message}`
-                })
-                return false
-            })
-
-            if (data) {
-                return res.json(data)
-            }
-        },
         "/streams": async (req, res) => {
-            // TODO: meanwhile linebridge remote linkers are in development we gonna use this methods to fetch
-            const { data } = await axios.get(`${streamingServerAPIUri}/streams`).catch((error) => {
-                res.status(500).json({
-                    error: `Failed to fetch streams from [${streamingServerAPIAddress}]: ${error.message}`
+            await this.methods.regenerateStreamingList()
+
+            const data = this.streamings.map((stream) => {
+                return lodash.omit(stream, FILTER_KEYS)
+            })
+
+            return res.json(data)
+        },
+        "/streaming/:username": async (req, res) => {
+            const { username } = req.params
+
+            // search on this.streamings
+            const streaming = this.streamings.find((streaming) => streaming.username === username)
+
+            if (streaming) {
+                return res.json(streaming)
+            }
+
+            return res.status(404).json({
+                error: "Stream not found"
+            })
+        },
+        "/streaming_key": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                let streamingKey = await StreamingKey.findOne({
+                    user_id: req.user._id.toString()
                 })
+
+                if (!streamingKey) {
+                    const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
+                        res.status(500).json({
+                            error: `Cannot generate a new key: ${err.message}`,
+                        })
+
+                        return false
+                    })
+
+                    if (!newKey) {
+                        return false
+                    }
+
+                    return res.json(newKey)
+                } else {
+                    return res.json(streamingKey)
+                }
+            }
+        },
+    }
+
+    post = {
+        "/streaming/publish": async (req, res) => {
+            const { app, stream, tcUrl } = req.body
+
+            const streaming = await this.methods.pushToLocalList({
+                app,
+                stream,
+                tcUrl
+            }).catch((err) => {
+                res.status(500).json({
+                    code: 1,
+                    error: err.message
+                })
+
                 return false
             })
 
-            if (data) {
-                return res.json(data)
+            if (streaming) {
+                global.wsInterface.io.emit(`streaming.new`, {
+                    username: streaming.username,
+                })
+
+                return res.json({
+                    code: 0,
+                    status: "ok"
+                })
             }
         },
-        "/target_streaming_server": async (req, res) => {
-            // TODO: resolve an available server
-            // for now we just return the only one should be online
-            return res.json({
-                protocol: "rtmp",
-                port: "1935",
-                space: "live",
-                address: streamingMediaServer,
-            })
-        },
-        "/streaming_key": async (req, res) => {
-            let streamingKey = await StreamingKey.findOne({
-                user_id: req.user._id.toString()
+        "/streaming/unpublish": async (req, res) => {
+            const { stream } = req.body
+
+            const streaming = this.methods.removeFromLocalList({
+                stream
+            }).catch((err) => {
+                res.status(500).json({
+                    code: 2,
+                    status: err.message
+                })
+
+                return false
             })
 
-            if (!streamingKey) {
+            if (streaming) {
+                global.wsInterface.io.emit(`streaming.end`, {
+                    username: streaming.username,
+                })
+
+                return res.json({
+                    code: 0,
+                    status: "ok"
+                })
+            }
+        },
+        "/regenerate_streaming_key": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                // check if the user already has a key
+                let streamingKey = await StreamingKey.findOne({
+                    user_id: req.user._id.toString()
+                })
+
+                // if exists, delete it
+
+                if (streamingKey) {
+                    await streamingKey.remove()
+                }
+
+                // generate a new key
                 const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
                     res.status(500).json({
                         error: `Cannot generate a new key: ${err.message}`,
@@ -103,45 +238,7 @@ export default class StreamingController extends Controller {
                 }
 
                 return res.json(newKey)
-            } else {
-                return res.json(streamingKey)
             }
-        },
-        "/streaming/:username": async (req, res) => {
-
-        },
-        "/streaming/auth": async (req, res) => {
-            
-        }
-    }
-
-    post = {
-        "/regenerate_streaming_key": async (req, res) => {
-            // check if the user already has a key
-            let streamingKey = await StreamingKey.findOne({
-                user_id: req.user._id.toString()
-            })
-
-            // if exists, delete it
-
-            if (streamingKey) {
-                await streamingKey.remove()
-            }
-
-            // generate a new key
-            const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
-                res.status(500).json({
-                    error: `Cannot generate a new key: ${err.message}`,
-                })
-
-                return false
-            })
-
-            if (!newKey) {
-                return false
-            }
-
-            return res.json(newKey)
         }
     }
 }
