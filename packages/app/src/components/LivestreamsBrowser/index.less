@@ -1,0 +1,72 @@
+@item_border_radius: 10px;
+
+.livestreamsBrowser {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    .header {
+        svg {
+            font-size: 2.5rem;
+        }
+
+        font-size: 2rem;
+    }
+
+    .livestream_list {
+        display: flex;
+        flex-direction: column;
+        padding: 0 50px;
+
+        .livestream_item {
+            display: flex;
+            flex-direction: row;
+
+            background-color: var(--background-color-primary2);
+
+            border: 1px solid var(--border-color);
+
+            padding: 10px;
+            margin-bottom: 20px;
+
+            border-radius: @item_border_radius;
+
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+
+            &:hover {
+                background-color: var(--background-color-accent);
+            }
+
+            .livestream_thumbnail {
+                width: 8vw;
+                height: 100%;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: @item_border_radius;
+                }
+            }
+
+            .livestream_info {
+                margin-left: 20px;
+                font-size: 1rem;
+                color: var(--text-color);
+
+                padding: 10px 0;
+
+                .userPreview {
+                    font-size: 1.5rem;
+                }
+
+                .livestream_description {
+                    margin-top: 20px;
+                    font-size: 1.5rem;
+                    color: var(--text-color);
+                }
+            }
+        }
+    }
+}

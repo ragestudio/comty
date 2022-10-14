@@ -1,6 +1,9 @@
 import React from "react"
-import config from "config"
 import * as antd from "antd"
+
+import Livestream from "../../models/livestream"
+
+import { UserPreview } from "components"
 import { Icons } from "components/Icons"
 
 import Plyr from "plyr"
@@ -20,7 +23,6 @@ export default class StreamViewer extends React.Component {
         spectators: 0,
 
         player: null,
-        streamKey: null,
         loadedDecoder: "hls",
         decoderInstance: null,
         plyrOptions: {},
@@ -85,33 +87,43 @@ export default class StreamViewer extends React.Component {
         }
     }
 
+    loadStreamInfo = async (username) => {
+        const streamInfo = await Livestream.getLivestream({ username })
+
+        if (!streamInfo) {
+            return false
+        }
+
+        this.setState({ streamInfo: streamInfo })
+    }
+
     componentDidMount = async () => {
         const requestedUsername = this.props.match.params.key
 
-        const player = new Plyr("#player", {
-            autoplay: true,
-            controls: ["play", "mute", "volume", "fullscreen", "options", "settings"],
-            ...this.state.plyrOptions,
-        })
+        // get stream info
+        await this.loadStreamInfo(requestedUsername)
 
-        await this.setState({
-            player,
-            streamKey: requestedUsername,
-        })
+        console.log("Stream info", this.state.streamInfo)
 
-        // TODO: Get sourceUri from server
-        const sourceUri = `${config.remotes.streamingApi}/${this.state.streamKey}/index.m3u8`
+        if (this.state.streamInfo) {
+            if (!this.state.streamInfo.sources) {
+                return false
+            }
 
-        await this.loadDecoder("hls", sourceUri)
+            this.enterPlayerAnimation()
 
-        // enter player
-        this.enterPlayerAnimation()
+            const player = new Plyr("#player", {
+                autoplay: true,
+                controls: ["play", "mute", "volume", "fullscreen", "options", "settings"],
+                ...this.state.plyrOptions,
+            })
 
-        // fetch user info in the background
-        this.gatherUserInfo()
+            await this.setState({
+                player,
+            })
 
-        // fetch stream info in the background
-        //await this.gatherStreamInfo()
+            await this.loadDecoder("hls", this.state.streamInfo.sources.hls)
+        }
     }
 
     componentWillUnmount = () => {
@@ -133,38 +145,6 @@ export default class StreamViewer extends React.Component {
         app.eventBus.emit("style.compactMode", false)
 
         app.SidebarController.toggleVisibility(true)
-    }
-
-    gatherStreamInfo = async () => {
-        const result = await app.api.withEndpoints("main").get.streamInfoFromUsername(undefined, {
-            username: this.state.streamKey,
-        }).catch((error) => {
-            console.error(error)
-            antd.message.error(error.message)
-            return false
-        })
-
-        if (result) {
-            this.setState({
-                streamInfo: result,
-            })
-        }
-    }
-
-    gatherUserInfo = async () => {
-        const result = await app.api.withEndpoints("main").get.user(undefined, {
-            username: this.state.streamKey,
-        }).catch((error) => {
-            console.error(error)
-            antd.message.error(error)
-            return false
-        })
-
-        if (result) {
-            this.setState({
-                userData: result,
-            })
-        }
     }
 
     updateQuality = (newQuality) => {
@@ -212,37 +192,29 @@ export default class StreamViewer extends React.Component {
     }
 
     render() {
+        if (!this.state.streamInfo || this.state.isEnded) {
+            return <div className="stream_end">
+                <antd.Result>
+                    <h1>
+                        This stream is ended
+                    </h1>
+                </antd.Result>
+            </div>
+        }
+
         return <div className="stream">
-            {
-                this.state.isEnded && <div className="stream_end">
-                    <antd.Result>
-                        <h1>
-                            This stream is ended
-                        </h1>
-                    </antd.Result>
-                </div>
-            }
             <video ref={this.videoPlayerRef} id="player" />
+
             <div className="panel">
                 <div className="info">
-                    <div className="title">
-                        <div>
-                            <antd.Avatar
-                                shape="square"
-                                src={this.state.userData?.avatar}
-                            />
-                        </div>
-                        <div>
-                            <h2>{this.state.userData?.username}</h2>
-                        </div>
-                    </div>
+                    <UserPreview username={this.state.streamInfo?.username} />
+
                     <div id="spectatorCount">
                         <Icons.Eye />
                         {this.state.spectators}
                     </div>
                 </div>
                 <div className="chatbox">
-                    {/* TODO: Use chatbox component and join to stream channel using username */}
                     <antd.Result>
                         <h1>
                             Cannot connect with chat server

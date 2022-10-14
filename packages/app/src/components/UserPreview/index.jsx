@@ -1,5 +1,8 @@
 import React from "react"
+import { Skeleton } from "antd"
 import classnames from "classnames"
+
+import User from "models/user"
 
 import { Image } from "components"
 import { Icons } from "components/Icons"
@@ -7,7 +10,20 @@ import { Icons } from "components/Icons"
 import "./index.less"
 
 export default (props) => {
-    const { user } = props
+    let [userData, setUserData] = React.useState(props.user)
+
+    const fetchUser = async () => {
+        if (!props.username) {
+            console.error("Username is not defined")
+            return false
+        }
+
+        const data = await User.data(props.username)
+
+        if (data) {
+            setUserData(data)
+        }
+    }
 
     const handleOnClick = async () => {
         if (typeof props.onClick !== "function") {
@@ -15,7 +31,19 @@ export default (props) => {
             return
         }
 
-        return await props.onClick(user)
+        return await props.onClick(userData)
+    }
+
+    React.useEffect(() => {
+        if (typeof userData === "undefined") {
+            fetchUser()
+        }
+    }, [])
+
+    if (!userData) {
+        return <div className="userPreview">
+            <Skeleton active />
+        </div>
     }
 
     return <div
@@ -25,13 +53,13 @@ export default (props) => {
         <div className="avatar">
             <Image
                 alt="Avatar"
-                src={user.avatar}
+                src={userData.avatar}
             />
         </div>
         <div className="info">
             <h1>
-                {user.fullName ?? `@${user.username}`}
-                {user.verified && <Icons.verifiedBadge />}
+                {userData.fullName ?? `@${userData.username}`}
+                {userData.verified && <Icons.verifiedBadge />}
             </h1>
         </div>
     </div>
