@@ -80,8 +80,8 @@ export default class StreamingController extends Controller {
                 username: streamingKey.username,
                 sources: {
                     rtmp: `rtmp://${streamingServerAPIAddress}/live/${username}`,
-                    hls: `http://${streamingServerAPIAddress}/live/${username}/src.m3u8`,
-                    flv: `http://${streamingServerAPIAddress}/live/${username}/src.flv`,
+                    hls: `${streamingServerAPIProtocol}://${streamingServerAPIAddress}/live/${username}/src.m3u8`,
+                    flv: `${streamingServerAPIProtocol}://${streamingServerAPIAddress}/live/${username}/src.flv`,
                 }
             }
 
