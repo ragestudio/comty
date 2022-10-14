@@ -106,6 +106,12 @@ export default class StreamingController extends Controller {
             } else {
                 return res.json(streamingKey)
             }
+        },
+        "/streaming/:username": async (req, res) => {
+
+        },
+        "/streaming/auth": async (req, res) => {
+            
         }
     }
 
