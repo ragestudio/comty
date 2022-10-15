@@ -133,8 +133,9 @@ export default class Layout extends React.PureComponent {
 
 		if (!this.props.user && currentRoute !== config.app?.authPath && currentRoute !== "/") {
 			const isPublicRoute = publicRoutes.some((route) => {
-				const regex = new RegExp(route.replace("*", ".*"))
-				return regex.test(currentRoute)
+				const routePath = route.replace(/\*/g, ".*").replace(/!/g, "^")
+
+				return new RegExp(routePath).test(currentRoute)
 			})
 
 			if (!isPublicRoute) {
