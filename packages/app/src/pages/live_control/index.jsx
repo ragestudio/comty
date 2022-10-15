@@ -183,10 +183,10 @@ export default (props) => {
                 <h2><Icons.Link /> URL Information</h2>
 
                 <div className="content">
-                    <span>API URL</span>
+                    <span>Live URL</span>
 
                     <code>
-                        {addresses.apiURL ?? "No API URL available"}
+                        {addresses.liveURL ?? "No Live URL available"}
                     </code>
                 </div>
 
