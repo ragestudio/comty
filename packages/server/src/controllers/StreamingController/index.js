@@ -143,7 +143,7 @@ export default class StreamingController extends Controller {
             const streaming = this.streamings.find((streaming) => streaming.username === username)
 
             if (streaming) {
-                return res.json(streaming)
+                return res.json(lodash.omit(streaming, FILTER_KEYS))
             }
 
             return res.status(404).json({
@@ -209,7 +209,7 @@ export default class StreamingController extends Controller {
         "/streaming/unpublish": async (req, res) => {
             const { stream } = req.body
 
-            const streaming = this.methods.removeFromLocalList({
+            const streaming = await this.methods.removeFromLocalList({
                 stream
             }).catch((err) => {
                 res.status(500).json({
