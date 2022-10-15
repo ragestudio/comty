@@ -4,7 +4,11 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import { PostCreator, PostsFeed, LivestreamsBrowser, HashtagTrendings } from "components"
+import { HashtagTrendings } from "components"
+
+import FeedBrowser from "./components/feed"
+import LivestreamsBrowser from "./components/livestreams"
+import SavedPostsBrowser from "./components/savedPosts"
 
 import "./index.less"
 
@@ -12,30 +16,17 @@ const Tabs = {
     "feed": {
         title: "Feed",
         icon: "Rss",
-        component: (props) => {
-            return <>
-                <PostCreator />
-                <PostsFeed />
-            </>
-        }
+        component: FeedBrowser
     },
     "livestreams": {
         title: "Livestreams",
         icon: "Tv",
-        component: (props) => {
-            return <>
-                <LivestreamsBrowser />
-            </>
-        }
+        component: LivestreamsBrowser
     },
     "savedPosts": {
         title: "Saved posts",
         icon: "Bookmark",
-        component: (props) => {
-            return <>
-                <PostsFeed savedOnly />
-            </>
-        }
+        component: SavedPostsBrowser
     }
 }
 

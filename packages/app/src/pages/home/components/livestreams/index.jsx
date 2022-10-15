@@ -4,7 +4,7 @@ import * as antd from "antd"
 import { UserPreview } from "components"
 import { Icons } from "components/Icons"
 
-import Livestream from "../../models/livestream"
+import Livestream from "../../../../models/livestream"
 
 import "./index.less"
 
@@ -51,13 +51,17 @@ export default (props) => {
                 console.error("Livestreams is not an array")
                 return false
             }
-            
+
             setList(livestreams)
         }
     }
 
-    const onClickItem = async (livestream) => {
+    const onClickItem = (livestream) => {
         app.setLocation(`/live/${livestream.username}`)
+    }
+
+    const onClickControlPanel = () => {
+        app.setLocation("/live_control")
     }
 
     const renderList = () => {
@@ -80,10 +84,21 @@ export default (props) => {
 
     return <div className="livestreamsBrowser">
         <div className="header">
-            <h1>
-                <Icons.Tv />
-                <span>Livestreams</span>
-            </h1>
+            <div className="title">
+                <h1>
+                    <Icons.Tv />
+                    <span>Livestreams</span>
+                </h1>
+            </div>
+
+            <div className="panel">
+                <antd.Button
+                    icon={<Icons.Settings />}
+                    onClick={onClickControlPanel}
+                >
+                    Control Panel
+                </antd.Button>
+            </div>
         </div>
 
         <div className="livestream_list">
