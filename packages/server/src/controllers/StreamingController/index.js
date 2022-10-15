@@ -4,8 +4,10 @@ import { nanoid } from "nanoid"
 import lodash from "lodash"
 import axios from "axios"
 
-const streamingServerAPIAddress = process.env.streamingServerAPIAddress ?? "live.ragestudio.net"
-const streamingServerAPIProtocol = process.env.streamingServerAPIProtocol ?? "http"
+const streamingIngestServer = process.env.STREAMING_INGEST_SERVER
+const streamingServerAPIAddress = process.env.STREAMING_API_SERVER
+const streamingServerAPIProtocol = streamingServerAPIAddress.startsWith("https") ? "https" : "http"
+
 const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress}`
 
 const FILTER_KEYS = ["stream"]
@@ -114,6 +116,25 @@ export default class StreamingController extends Controller {
             })
 
             return res.json(data)
+        },
+        "/streaming/addresses": {
+            middlewares: ["withOptionalAuthentication"],
+            fn: async (req, res) => {
+                const addresses = {
+                    api: streamingServerAPIAddress,
+                    ingest: streamingIngestServer,
+                }
+
+                if (req.user) {
+                    addresses.liveURL = `${addresses.api}/live/${req.user.username}`
+                    addresses.ingestURL = `${addresses.ingest}/${req.user.username}`
+
+                    addresses.hlsURL = `${addresses.liveURL}/src.m3u8`
+                    addresses.flvURL = `${addresses.liveURL}/src.flv`
+                }
+
+                return res.json(addresses)
+            }
         },
         "/streaming/:username": async (req, res) => {
             const { username } = req.params
