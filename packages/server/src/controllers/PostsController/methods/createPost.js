@@ -1,6 +1,8 @@
-import { Post } from "../../../models"
-import getPostData from "./getPostData"
 import momentTimezone from "moment-timezone"
+import { Post } from "../../../models"
+
+import getPostData from "./getPostData"
+import flagNsfwByAttachments from "./flagNsfwByAttachments"
 
 export default async (payload) => {
     let { user_id, message, attachments, type, data, timestamp } = payload
@@ -27,6 +29,7 @@ export default async (payload) => {
         attachments: attachments ?? [],
         timestamp: timestamp,
         data: data,
+        flags: [],
     })
 
     await post.save()
@@ -35,6 +38,9 @@ export default async (payload) => {
 
     global.wsInterface.io.emit(`post.new`, resultPost)
     global.wsInterface.io.emit(`post.new.${post.user_id}`, resultPost)
+
+    // push to background job to check if is NSFW
+    flagNsfwByAttachments(post._id.toString())
 
     return post
 }
