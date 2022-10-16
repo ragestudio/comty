@@ -7,4 +7,5 @@ export default {
     attachments: { type: Array, default: [] },
     type: { type: String, default: "text" },
     data: { type: Object, default: {} },
+    flags: { type: Array, default: [] },
 }
