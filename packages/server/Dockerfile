@@ -1,6 +1,5 @@
-FROM node:16-bullseye-slim
+FROM node:16-bullseye
 
-RUN apt install git -y
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
