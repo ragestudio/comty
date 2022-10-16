@@ -2,7 +2,7 @@ const tf = require("@tensorflow/tfjs-node")
 import * as nsfwjs from "nsfwjs/dist"
 
 import readImage from "../read-image"
-import imageByteArray from "../imageByteArray"
+import imageByteArray from "../image-byte-array"
 
 const imageToInput = (image, numChannels) => {
     const values = imageByteArray(image, numChannels)
