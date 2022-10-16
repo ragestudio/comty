@@ -3,10 +3,40 @@ import { Schematized } from "../../lib"
 
 import { FeaturedWallpaper } from "../../models"
 
+import IndecentPrediction from "../../utils/indecent-prediction"
+import downloadFile from "../../utils/download-file"
+
 export default class PublicController extends Controller {
     static refName = "PublicController"
 
     get = {
+        "/indecent_prediction": {
+            fn: Schematized({
+                select: ["url"],
+                required: ["url"],
+            }, async (req, res) => {
+                const { url } = req.selection
+
+                const download = await downloadFile({ url })
+
+                const predictions = await IndecentPrediction({
+                    image: download.destination,
+                }).catch((err) => {
+                    res.status(500).json({
+                        error: err.message,
+                    })
+
+                    return null
+                })
+
+                // delete cached file
+                await download.delete()
+
+                if (predictions) {
+                    return res.json(predictions)
+                }
+            })
+        },
         "/posting_policy": {
             middlewares: ["withOptionalAuthentication"],
             fn: async (req, res) => {
