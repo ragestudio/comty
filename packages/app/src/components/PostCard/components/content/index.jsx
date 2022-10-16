@@ -1,4 +1,5 @@
 import React from "react"
+import classnames from "classnames"
 import * as antd from "antd"
 import Plyr from "plyr-react"
 
@@ -11,7 +12,11 @@ import PostAttachments from "../attachments"
 import "./index.less"
 
 export default React.memo((props) => {
-    let { message, attachments, type, data } = props.data
+    let { message, attachments, type, data, flags } = props.data
+
+    const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
+
+    const isNSFW = flags?.includes("nsfw")
 
     if (typeof data === "string") {
         try {
@@ -105,7 +110,21 @@ export default React.memo((props) => {
         }
     }
 
-    return <div className="post_content">
+    return <div
+        className="post_content"
+    >
+        {isNSFW && !nsfwAccepted &&
+            <div className="nsfw_alert">
+                <h2>
+                    This post may contain sensitive content.
+                </h2>
+
+                <antd.Button onClick={() => setNsfwAccepted(true)}>
+                    Show anyways
+                </antd.Button>
+            </div>
+        }
+
         {renderContent()}
     </div>
 })
