@@ -1,6 +1,5 @@
 import React from "react"
 import classnames from "classnames"
-import momentTimezone from "moment-timezone"
 import { DateTime } from "luxon"
 
 import { Image } from "components"
@@ -18,11 +17,7 @@ export default (props) => {
     const updateTimeAgo = () => {
         let createdAt = props.postData.created_at ?? ""
 
-        const inputTimezone = momentTimezone.tz(createdAt).tz()
-
-        const inputTimeInLocalTimezone = momentTimezone.tz(createdAt, inputTimezone).tz(momentTimezone.tz.guess()).format()
-
-        const timeAgo = DateTime.fromISO(inputTimeInLocalTimezone).toRelative()
+        const timeAgo = DateTime.fromISO(createdAt).toRelative()
 
         setTimeAgo(timeAgo)
     }
