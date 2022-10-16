@@ -3,10 +3,34 @@ import { Schematized } from "../../lib"
 
 import { FeaturedWallpaper } from "../../models"
 
+import IndecentPrediction from "../../utils/indecent-prediction"
+
 export default class PublicController extends Controller {
     static refName = "PublicController"
 
     get = {
+        "/indecent_prediction": {
+            fn: Schematized({
+                select: ["url"],
+                required: ["url"],
+            }, async (req, res) => {
+                const { url } = req.selection
+
+                const predictions = await IndecentPrediction({
+                    url,
+                }).catch((err) => {
+                    res.status(500).json({
+                        error: err.message,
+                    })
+
+                    return null
+                })
+
+                if (predictions) {
+                    return res.json(predictions)
+                }
+            })
+        },
         "/posting_policy": {
             middlewares: ["withOptionalAuthentication"],
             fn: async (req, res) => {
