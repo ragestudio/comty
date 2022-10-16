@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "@corenode/utils": "0.28.26",
+    "@tensorflow/tfjs-node": "^4.0.0",
     "axios": "0.25.0",
     "bcrypt": "5.0.1",
     "connect-mongo": "4.6.0",
@@ -25,6 +26,7 @@
     "moment-timezone": "^0.5.37",
     "mongoose": "6.1.9",
     "nanoid": "3.2.0",
+    "nsfwjs": "^2.4.2",
     "passport": "0.5.2",
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
