@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 import Loadable from "react-loadable"
 
-import { Icons } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 import { Image, Skeleton, FollowButton } from "components"
 import { Session, User } from "models"
 
@@ -65,9 +65,11 @@ const UserBadges = React.memo((props) => {
 			}
 
 			return () => badgesData.map((badge, index) => {
-				return <antd.Tag color={badge.color ?? "default"} key={index} id={badge.name} className="badge">
-					<span>{badge.label}</span>
-				</antd.Tag>
+				return <antd.Tooltip placement="bottom" title={badge.description ?? "An badge"}>
+					<antd.Tag color={badge.color ?? "default"} key={index} id={badge.name} icon={createIconRender(badge.icon)} className="badge">
+						<span>{badge.label}</span>
+					</antd.Tag>
+				</antd.Tooltip>
 			})
 		},
 		loading: antd.Skeleton,
