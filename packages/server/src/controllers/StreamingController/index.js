@@ -8,7 +8,7 @@ const streamingIngestServer = process.env.STREAMING_INGEST_SERVER
 const streamingServerAPIAddress = process.env.STREAMING_API_SERVER
 const streamingServerAPIProtocol = streamingServerAPIAddress.startsWith("https") ? "https" : "http"
 
-const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress}`
+const streamingServerAPIUri = `${streamingServerAPIProtocol}://${streamingServerAPIAddress.split("://")[1]}`
 
 const FILTER_KEYS = ["stream"]
 
