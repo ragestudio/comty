@@ -1,9 +1,14 @@
 import { Controller } from "linebridge/dist/server"
 import passport from "passport"
-import { User, UserFollow } from "../../models"
-import { Token, Schematized, createUser } from "../../lib"
+import lodash from "lodash"
+
 import SessionController from "../SessionController"
-import _ from "lodash"
+
+import { User, UserFollow } from "../../models"
+import { Token, Schematized } from "../../lib"
+
+import createUser from "./methods/createUser"
+import updatePassword from "./methods/updatePassword"
 
 const AllowedPublicUpdateFields = [
     "fullName",
@@ -217,7 +222,7 @@ export default class UserController extends Controller {
                     })
                 }
 
-                user = _.pick(user, AllowedAnonPublicGetters)
+                user = lodash.pick(user, AllowedAnonPublicGetters)
 
                 return res.json(user)
             }
@@ -417,6 +422,39 @@ export default class UserController extends Controller {
 
             return res.json(result)
         }),
+        "/self/update_password": {
+            middlewares: ["withAuthentication"],
+            fn: Schematized({
+                required: ["currentPassword", "newPassword"],
+                select: ["currentPassword", "newPassword",]
+            }, async (req, res) => {
+                const user = await User.findById(req.user._id).select("+password")
+
+                if (!user) {
+                    return res.status(404).json({ message: "User not found" })
+                }
+
+                const currentPasswordHash = await bcrypt.hash(req.selection.currentPassword, parseInt(process.env.BCRYPT_ROUNDS ?? 3))
+
+                const isPasswordValid = await bcrypt.compareSync(currentPasswordHash, user.password)
+
+                if (!isPasswordValid) {
+                    return res.status(401).json({ message: "Invalid password" })
+                }
+
+                const result = await updatePassword({
+                    user_id: req.user._id,
+                    newPassword: req.selection.newPassword,
+                }).catch((error) => {
+                    res.status(500).json({ message: error.message })
+                    return null
+                })
+
+                if (result) {
+                    return res.json(result)
+                }
+            })
+        },
         "/update_user": {
             middlewares: ["withAuthentication", "roles"],
             fn: Schematized({
