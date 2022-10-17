@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import Plyr from "plyr-react"
+import classnames from "classnames"
 
 import { processString } from "utils"
 
@@ -110,7 +111,7 @@ export default React.memo((props) => {
     }
 
     return <div
-        className="post_content"
+        className={classnames("post_content", { ["nsfw"]: isNSFW && !nsfwAccepted })}
     >
         {isNSFW && !nsfwAccepted &&
             <div className="nsfw_alert">
