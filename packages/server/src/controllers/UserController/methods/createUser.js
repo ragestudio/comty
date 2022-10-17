@@ -1,4 +1,4 @@
-import { User } from "../../models"
+import { User } from "../../../models"
 import Avatars from "dicebar_lib"
 import bcrypt from "bcrypt"
 
