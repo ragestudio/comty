@@ -33,6 +33,7 @@ export const SavedPost = mongoose.model("SavedPost", schemas.SavedPost, "savedPo
 
 // streamings
 export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey, "streamingKeys")
+export const StreamingInfo = mongoose.model("StreamingInfo", schemas.StreamingInfo, "streamingInfos")
 
 // others
 export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")
