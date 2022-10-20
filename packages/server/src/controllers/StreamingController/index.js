@@ -65,6 +65,7 @@ export default class StreamingController extends Controller {
             const { stream, app } = payload
 
             const username = app.split("/")[1]
+            const user_id = await User.findOne({ username }).then((user) => user._id)
 
             const streamingKey = await StreamingKey.findOne({
                 key: stream
@@ -80,6 +81,7 @@ export default class StreamingController extends Controller {
 
             const streaming = {
                 stream,
+                user_id: user_id.toString(),
                 username: streamingKey.username,
                 sources: {
                     rtmp: `${streamingIngestServer}/live/${username}`,
@@ -127,7 +129,7 @@ export default class StreamingController extends Controller {
                     ...payloadValues
                 })
             }
-            
+
             // merge data
             info = lodash.merge(info, {
                 title: payload.title,
@@ -135,7 +137,7 @@ export default class StreamingController extends Controller {
                 category: payload.category,
                 thumbnail: payload.thumbnail,
             })
-            
+
             await info.save()
 
             global.wsInterface.io.emit(`streaming.info_update.${payload.user_id}`, info)
@@ -148,11 +150,46 @@ export default class StreamingController extends Controller {
         "/streams": async (req, res) => {
             await this.methods.regenerateStreamingList()
 
-            const data = this.streamings.map((stream) => {
+            let data = this.streamings.map((stream) => {
                 return lodash.omit(stream, FILTER_KEYS)
             })
 
+            data = data.map(async (stream) => {
+                let info = await StreamingInfo.findOne({
+                    user_id: stream.user_id
+                })
+
+                if (info) {
+                    stream.info = info.toObject()
+                }
+
+                return stream
+            })
+
+            data = await Promise.all(data)
+
             return res.json(data)
+        },
+        "/stream/info": {
+            middleware: ["withAuthentication"],
+            fn: async (req, res) => {
+                let user_id = req.user?._id
+
+                if (req.body.username || req.body.user_id) {
+                    user_id = await User.findOne({
+                        _id: req.body.user_id,
+                        username: req.body.username,
+                    }).then((user) => user._id)
+
+                    user_id = user_id.toString()
+                }
+
+                const info = await StreamingInfo.findOne({
+                    user_id,
+                })
+
+                return res.json(info)
+            }
         },
         "/streaming/addresses": {
             middlewares: ["withOptionalAuthentication"],
