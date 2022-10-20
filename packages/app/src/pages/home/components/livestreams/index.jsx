@@ -35,9 +35,12 @@ const LivestreamItem = (props) => {
 }
 
 export default (props) => {
+    const [loading, setLoading] = React.useState(true)
     const [list, setList] = React.useState([])
 
     const loadStreamings = async () => {
+        setLoading(true)
+
         const livestreams = await Livestream.getLivestreams().catch((err) => {
             console.error(err)
             app.message.error("Failed to load livestreams")
@@ -45,6 +48,8 @@ export default (props) => {
         })
 
         console.log("Livestreams", livestreams)
+
+        setLoading(false)
 
         if (livestreams) {
             if (!Array.isArray(livestreams)) {
@@ -65,6 +70,10 @@ export default (props) => {
     }
 
     const renderList = () => {
+        if (loading) {
+            return <antd.Skeleton active />
+        }
+
         if (list.length === 0) {
             return <antd.Result>
                 <h1>
