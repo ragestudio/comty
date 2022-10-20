@@ -1,0 +1,68 @@
+.featuredEvent {
+    position: relative;
+    z-index: 50;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    min-width: 300px;
+    max-width: 350px;
+
+    border-radius: 12px;
+
+    padding: 10px 20px;
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    cursor: pointer;
+
+    .indicator {
+        position: absolute;
+        z-index: 55;
+
+        font-size: 0.6rem;
+
+        bottom: 0;
+        right: 0;
+
+        padding: 10px;
+    }
+
+    .logo {
+        height: 100%;
+
+        width: fit-content;
+
+        max-width: 70px;
+
+        img {
+            height: 100%;
+            width: 100%;
+        }
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+
+        align-items: flex-start;
+        margin-left: 20px;
+        margin-bottom: 10px;
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        h3 {
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+    }
+}
