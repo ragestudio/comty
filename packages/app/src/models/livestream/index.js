@@ -15,6 +15,24 @@ export default class Livestream {
         return request
     }
 
+    static async getStreamInfo(payload) {
+        let { username } = payload ?? {}
+
+        if (!username) {
+            username = app.userData.username
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/stream/info`,
+            data: {
+                username,
+            }
+        })
+
+        return data
+    }
+
     static async getLivestream({ username }) {
         if (!username) {
             throw new Error("Username is required")
