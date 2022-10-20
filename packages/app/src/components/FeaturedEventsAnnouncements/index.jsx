@@ -1,6 +1,5 @@
 import React from "react"
 
-import { Icons } from "components/Icons"
 import Announcement from "../FeaturedEventAnnouncement"
 
 import "./index.less"
@@ -43,6 +42,6 @@ export default React.memo((props) => {
     }, [])
 
     return <div className="featuredEvents">
-        {featuredEvents.map((event, index) => <Announcement index={index} data={event.announcement} />)}
+        {featuredEvents.map((event, index) => <Announcement index={index} data={event} />)}
     </div>
 })
