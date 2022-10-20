@@ -40,6 +40,8 @@
             display: flex;
             flex-direction: row;
 
+            align-items: center;
+
             background-color: var(--background-color-primary2);
 
             border: 1px solid var(--border-color);
@@ -68,20 +70,48 @@
             }
 
             .livestream_info {
+                position: relative;
+
+                width: 100%;
+
                 margin-left: 20px;
                 font-size: 1rem;
-                color: var(--text-color);
 
                 padding: 10px 0;
+
+                color: var(--text-color);
 
                 .userPreview {
                     font-size: 1.5rem;
                 }
 
-                .livestream_description {
-                    margin-top: 20px;
-                    font-size: 1.5rem;
+                h1,
+                h2 {
+                    margin: 0;
+                    height: fit-content;
                     color: var(--text-color);
+                }
+
+                .livestream_title {
+                    margin-top: 10px;
+                    font-size: 1.5rem;
+                    height: fit-content;
+                    font-family: "Space Grotesk", sans-serif;
+                }
+
+                .livestream_description {
+                    font-size: 0.6rem;
+                    font-weight: 400;
+                    height: fit-content;
+                }
+
+                .livestream_category {
+                    position: absolute;
+
+                    top: 0;
+                    right: 0;
+
+                    padding: 10px;
                 }
             }
         }

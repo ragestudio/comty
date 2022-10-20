@@ -9,7 +9,7 @@ import Livestream from "../../../../models/livestream"
 import "./index.less"
 
 const LivestreamItem = (props) => {
-    const { livestream } = props
+    const { livestream = {} } = props
 
     const handleOnClick = async () => {
         if (typeof props.onClick !== "function") {
@@ -22,13 +22,19 @@ const LivestreamItem = (props) => {
 
     return <div className="livestream_item" onClick={handleOnClick}>
         <div className="livestream_thumbnail">
-            <img src={livestream.thumbnail ?? "/assets/new_file.png"} />
+            <img src={livestream.info?.thumbnail ?? "/assets/new_file.png"} />
         </div>
         <div className="livestream_info">
             <UserPreview username={livestream.username} />
 
+            <div className="livestream_title">
+                <h1>{livestream.info?.title}</h1>
+            </div>
             <div className="livestream_description">
-                {livestream.description ?? "No description"}
+                <h2>{livestream.info?.description ?? "No description"}</h2>
+            </div>
+            <div className="livestream_category">
+                {livestream.info?.catagory ?? "No category"}
             </div>
         </div>
     </div>
