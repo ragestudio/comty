@@ -32,7 +32,7 @@ export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
 export const SavedPost = mongoose.model("SavedPost", schemas.SavedPost, "savedPosts")
 
 // streamings
-export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey, "streamingKeys")
+export const StreamingKey = mongoose.model("StreamingKey", schemas.StreamingKey, "streamingKeys")
 export const StreamingInfo = mongoose.model("StreamingInfo", schemas.StreamingInfo, "streamingInfos")
 
 // others
