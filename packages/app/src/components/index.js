@@ -30,6 +30,9 @@ export { default as HashtagTrendings } from "./HashtagTrendings"
 export { default as Searcher } from "./Searcher"
 export { default as UserPreview } from "./UserPreview"
 
+export { default as FeaturedEventAnnouncement } from "./FeaturedEventAnnouncement"
+export { default as FeaturedEventsAnnouncements } from "./FeaturedEventsAnnouncements"
+
 // CREATOR
 export { default as Creator } from "./Creator"
 
