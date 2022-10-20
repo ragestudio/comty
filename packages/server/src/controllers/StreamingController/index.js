@@ -1,8 +1,9 @@
 import { Controller } from "linebridge/dist/server"
-import { User, StreamingKey } from "../../models"
 import { nanoid } from "nanoid"
 import lodash from "lodash"
 import axios from "axios"
+
+import { User, StreamingKey, StreamingInfo } from "../../models"
 
 const streamingIngestServer = process.env.STREAMING_INGEST_SERVER
 const streamingServerAPIAddress = process.env.STREAMING_API_SERVER
@@ -104,6 +105,42 @@ export default class StreamingController extends Controller {
             this.streamings = this.streamings.filter((streaming) => streaming.stream !== stream)
 
             return streaming
+        },
+        handleInfoUpdate: async (payload) => {
+            let info = await StreamingInfo.findOne({
+                user_id: payload.user_id
+            }).catch((err) => {
+                return false
+            })
+
+            const payloadValues = {
+                title: payload.title,
+                description: payload.description,
+                category: payload.category,
+                thumbnail: payload.thumbnail,
+            }
+
+            if (!info) {
+                // create new info
+                info = new StreamingInfo({
+                    user_id: payload.user_id,
+                    ...payloadValues
+                })
+            }
+            
+            // merge data
+            info = lodash.merge(info, {
+                title: payload.title,
+                description: payload.description,
+                category: payload.category,
+                thumbnail: payload.thumbnail,
+            })
+            
+            await info.save()
+
+            global.wsInterface.io.emit(`streaming.info_update.${payload.user_id}`, info)
+
+            return info
         }
     }
 
@@ -179,86 +216,112 @@ export default class StreamingController extends Controller {
     }
 
     post = {
-        "/streaming/publish": async (req, res) => {
-            const { app, stream, tcUrl } = req.body
-
-            const streaming = await this.methods.pushToLocalList({
-                app,
-                stream,
-                tcUrl
-            }).catch((err) => {
-                res.status(500).json({
-                    code: 1,
-                    error: err.message
-                })
-
-                return false
-            })
-
-            if (streaming) {
-                global.wsInterface.io.emit(`streaming.new`, {
-                    username: streaming.username,
-                })
-
-                return res.json({
-                    code: 0,
-                    status: "ok"
-                })
-            }
-        },
-        "/streaming/unpublish": async (req, res) => {
-            const { stream } = req.body
-
-            const streaming = await this.methods.removeFromLocalList({
-                stream
-            }).catch((err) => {
-                res.status(500).json({
-                    code: 2,
-                    status: err.message
-                })
-
-                return false
-            })
-
-            if (streaming) {
-                global.wsInterface.io.emit(`streaming.end`, {
-                    username: streaming.username,
-                })
-
-                return res.json({
-                    code: 0,
-                    status: "ok"
-                })
-            }
-        },
-        "/regenerate_streaming_key": {
+        "/streaming/update_info": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
-                // check if the user already has a key
-                let streamingKey = await StreamingKey.findOne({
-                    user_id: req.user._id.toString()
+                const { title, description, category, thumbnail } = req.body
+
+                const info = await this.methods.handleInfoUpdate({
+                    user_id: req.user._id.toString(),
+                    title,
+                    description,
+                    category,
+                    thumbnail
+                }).catch((err) => {
+                    console.error(err)
+
+                    res.status(500).json({
+                        error: `Cannot update info: ${err.message}`,
+                    })
+
+                    return null
                 })
 
-                // if exists, delete it
-
-                if (streamingKey) {
-                    await streamingKey.remove()
+                if (info) {
+                    return res.json(info)
                 }
+            },
+            "/streaming/publish": async (req, res) => {
+                const { app, stream, tcUrl } = req.body
 
-                // generate a new key
-                const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
+                const streaming = await this.methods.pushToLocalList({
+                    app,
+                    stream,
+                    tcUrl
+                }).catch((err) => {
                     res.status(500).json({
-                        error: `Cannot generate a new key: ${err.message}`,
+                        code: 1,
+                        error: err.message
                     })
 
                     return false
                 })
 
-                if (!newKey) {
-                    return false
-                }
+                if (streaming) {
+                    global.wsInterface.io.emit(`streaming.new`, {
+                        username: streaming.username,
+                    })
 
-                return res.json(newKey)
+                    return res.json({
+                        code: 0,
+                        status: "ok"
+                    })
+                }
+            },
+            "/streaming/unpublish": async (req, res) => {
+                const { stream } = req.body
+
+                const streaming = await this.methods.removeFromLocalList({
+                    stream
+                }).catch((err) => {
+                    res.status(500).json({
+                        code: 2,
+                        status: err.message
+                    })
+
+                    return false
+                })
+
+                if (streaming) {
+                    global.wsInterface.io.emit(`streaming.end`, {
+                        username: streaming.username,
+                    })
+
+                    return res.json({
+                        code: 0,
+                        status: "ok"
+                    })
+                }
+            },
+            "/regenerate_streaming_key": {
+                middlewares: ["withAuthentication"],
+                fn: async (req, res) => {
+                    // check if the user already has a key
+                    let streamingKey = await StreamingKey.findOne({
+                        user_id: req.user._id.toString()
+                    })
+
+                    // if exists, delete it
+
+                    if (streamingKey) {
+                        await streamingKey.remove()
+                    }
+
+                    // generate a new key
+                    const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
+                        res.status(500).json({
+                            error: `Cannot generate a new key: ${err.message}`,
+                        })
+
+                        return false
+                    })
+
+                    if (!newKey) {
+                        return false
+                    }
+
+                    return res.json(newKey)
+                }
             }
         }
     }
