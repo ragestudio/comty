@@ -4,7 +4,16 @@ import { Icons } from "components/Icons"
 import "./index.less"
 
 export default (props) => {
-    const { backgroundImg, backgroundStyle, logoImg, title, description } = props.data ?? {}
+    const { backgroundImg, backgroundStyle, logoImg, title, description } = props.data?.announcement ?? {}
+
+    const onClickEvent = () => {
+        if (!props.data?._id) {
+            console.error("No event ID provided")
+            return false
+        }
+
+        app.setLocation(`/featured-event/${props.data?._id}`)
+    }
 
     return <div
         key={props.index}
@@ -13,6 +22,7 @@ export default (props) => {
             backgroundImage: `url(${backgroundImg})`,
             ...backgroundStyle
         }}
+        onClick={onClickEvent}
     >
         <div className="indicator">
             <Icons.Target /> <span>Featured event</span>
