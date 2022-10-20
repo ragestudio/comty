@@ -82,8 +82,22 @@ export default (props) => {
         }
     }
 
+    const fetchStreamInfo = async () => {
+        const result = await Livestream.getStreamInfo().catch((err) => {
+            console.error(err)
+            return false
+        })
+
+        console.log("Stream info", result)
+
+        if (result) {
+            setStreamInfo(result)
+        }
+    }
+
     React.useEffect(() => {
         fetchAddresses()
+        fetchStreamInfo()
         fetchStreamingKey()
     }, [])
 
