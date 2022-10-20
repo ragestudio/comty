@@ -15,3 +15,5 @@ export { default as streamingKey } from "./streamingKey"
 
 export { default as FeaturedWallpaper } from "./featuredWallpaper"
 export { default as FeaturedEvent } from "./featuredEvent"
+
+export { default as StreamingInfo } from "./streamingInfo"
