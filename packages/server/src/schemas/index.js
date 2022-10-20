@@ -11,9 +11,9 @@ export { default as SavedPost } from "./savedPost"
 
 export { default as UserFollow } from "./userFollow"
 export { default as Badge } from "./badge"
-export { default as streamingKey } from "./streamingKey"
 
 export { default as FeaturedWallpaper } from "./featuredWallpaper"
 export { default as FeaturedEvent } from "./featuredEvent"
 
+export { default as StreamingKey } from "./streamingKey"
 export { default as StreamingInfo } from "./streamingInfo"
