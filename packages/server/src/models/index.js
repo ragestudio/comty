@@ -36,5 +36,4 @@ export const StreamingKey = mongoose.model("StreamingKey", schemas.streamingKey,
 
 // others
 export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")
-
-// marketplace
+export const FeaturedEvent = mongoose.model("FeaturedEvent", schemas.FeaturedEvent, "featuredEvents")
