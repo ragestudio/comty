@@ -7,7 +7,7 @@
     "release": "node ./scripts/release.js"
   },
   "workspaces": [
-    "packages"
+    "packages/**"
   ],
   "dependencies": {
     "corenode": "^0.28.26",
