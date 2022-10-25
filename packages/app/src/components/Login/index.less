@@ -1,16 +1,22 @@
-.login {
+.login_wrapper {
 	display: flex;
 	flex-direction: column;
+
 	align-items: center;
 	justify-content: center;
 
-	> div {
-		margin-bottom: 20px;
-	}
+	width: 100%;
 
 	.header {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+
 		.logo {
-			width: 15vw;
+			max-width: 200px;
+
+			margin-bottom: 40px;
 
 			img {
 				width: 100%;
@@ -18,21 +24,73 @@
 			}
 		}
 	}
-}
 
-.login-form {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-}
+	h1 {
+		font-family: "Space Grotesk", sans-serif;
+		margin: 0;
+	}
 
-.login-form-username {
-	font-size: 20px!important;
-	
-	input {
-		padding: 20px!important;
-		font-size: 20px!important;
+	h3 {
+		font-size: 0.8rem;
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+
+		width: 80%;
+
+		max-width: 600px;
+
+		margin: auto;
+
+		padding: 40px 0;
+
+		border-radius: 12px;
+
+		.fields {
+			display: flex;
+			flex-direction: column;
+
+			margin-top: 20px;
+
+			.field {
+				display: flex;
+				flex-direction: column;
+
+				margin-bottom: 20px;
+
+				.component {
+					margin-top: 5px;
+				}
+
+				.component-row {
+					display: inline-flex;
+					flex-direction: row;
+
+					justify-content: space-between;
+				}
+			}
+
+			.field-error {
+				color: red;
+				font-size: 0.8rem;
+			}
+		}
+	}
+
+	.ant-input {
+		padding: 5px;
+
+		border-radius: 8px;
+	}
+
+	.ant-input-affix-wrapper {
+		border-radius: 8px;
+
+		.ant-input {
+			border-radius: 0;
+		}
 	}
 }
 
@@ -55,7 +113,7 @@
 		height: fit-content;
 
 		margin: 10px;
-        padding: 5px 10px;
+		padding: 5px 10px;
 
 		border: 1px solid #e5e5e5;
 		border-radius: 8px;

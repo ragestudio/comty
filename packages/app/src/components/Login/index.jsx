@@ -7,85 +7,85 @@ import config from "config"
 
 import "./index.less"
 
-const formInstance = [
-    {
-        id: "username",
-        element: {
-            component: "Input",
-            icon: "User",
-            placeholder: "Username",
-            props: {
-                autoCorrect: "off",
-                autoCapitalize: "none",
-                className: "login-form-username",
-            },
-        },
-        item: {
-            hasFeedback: true,
-            rules: [
-                {
-                    required: true,
-                    message: 'Please input your Username!',
-                },
-            ],
+const LoginSteps = {
+    "username": (props) => {
+        const handleUpdate = (e) => {
+            props.onUpdate(e.target.value)
         }
+
+        return <div className="field">
+            <span><Icons.Mail /> Username or Email</span>
+
+            <div className="component">
+                <antd.Input
+                    name="username"
+                    defaultValue={props.defaultValue}
+                    placeholder="myusername / myemail@example.com"
+                    onChange={handleUpdate}
+                    onPressEnter={props.next}
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    autoComplete="on"
+                    autoFocus
+                />
+            </div>
+        </div>
     },
-    {
-        id: "password",
-        element: {
-            component: "Input",
-            icon: "Lock",
-            placeholder: "Password",
-            props: {
-                type: "password"
-            }
-        },
-        item: {
-            hasFeedback: true,
-            rules: [
-                {
-                    required: true,
-                    message: 'Please input your Password!',
-                },
-            ],
+    "password": (props) => {
+        const handleUpdate = (e) => {
+            props.onUpdate(e.target.value)
         }
-    },
-    {
-        id: "login_btn",
-        withValidation: true,
-        element: {
-            component: "Button",
-            props: {
-                icon: "User",
-                children: "Login",
-                type: "primary",
-                htmlType: "submit"
-            }
-        }
-    },
-]
+
+        return <div className="field">
+            <span><Icons.Lock /> Password</span>
+
+            <div className="component">
+                <antd.Input.Password
+                    name="password"
+                    defaultValue={props.defaultValue}
+                    onChange={handleUpdate}
+                    onPressEnter={props.next}
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    autoComplete="on"
+                    autoFocus
+                />
+            </div>
+        </div>
+    }
+}
+
+const phasesToSteps = {
+    0: "username",
+    1: "password",
+}
 
 export default class Login extends React.Component {
     static pageStatement = {
         bottomBarAllowed: false
     }
 
-    handleFinish = async (values, ctx) => {
-        ctx.toogleValidation(true)
+    state = {
+        loading: false,
+        loginInputs: {},
+        error: null,
+        phase: 0,
+    }
 
+    handleFinish = async () => {
         const payload = {
-            username: values.username,
-            password: values.password,
-            allowRegenerate: values.allowRegenerate,
+            username: this.state.loginInputs.username,
+            password: this.state.loginInputs.password,
         }
 
+        this.clearError()
+        this.toogleLoading(true)
+
         this.props.sessionController.login(payload, (error, response) => {
-            ctx.toogleValidation(false)
-            ctx.clearErrors()
+            this.toogleLoading(false)
 
             if (error) {
-                ctx.shake("all")
-                return ctx.error("result", error)
+                return this.onError(error)
             } else {
                 if (response.status === 200) {
                     this.onDone()
@@ -104,31 +104,129 @@ export default class Login extends React.Component {
         }
     }
 
+    toogleLoading = (to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.loading
+        }
+
+        this.setState({
+            loading: to
+        })
+    }
+
+    clearError = () => {
+        this.setState({
+            error: null
+        })
+    }
+
+    onError = (error) => {
+        this.setState({
+            error: error
+        })
+    }
+
+    onUpdateInput = (input, value) => {
+        this.setState({
+            loginInputs: {
+                ...this.state.loginInputs,
+                [input]: value
+            }
+        })
+    }
+
+    renderCurrentInput = () => {
+        const { phase } = this.state
+
+        const step = phasesToSteps[phase]
+
+        return React.createElement(LoginSteps[step], {
+            onUpdate: (...props) => this.onUpdateInput(step, ...props),
+            next: this.nextStep,
+            defaultValue: this.state.loginInputs[step],
+        })
+    }
+
+    nextStep = () => {
+        const to = this.state.phase + 1
+
+        if (!phasesToSteps[to]) {
+            return this.handleFinish()
+        }
+
+        this.setState({
+            phase: to
+        })
+    }
+
+    prevStep = () => {
+        const to = this.state.phase - 1
+
+        if (!phasesToSteps[to]) {
+            console.warn("No step found for phase", to)
+
+            return
+        }
+
+        this.setState({
+            phase: to
+        })
+    }
+
+    canNext = () => {
+        if (this.state.loading) {
+            return false
+        }
+
+        const { phase } = this.state
+
+        const step = phasesToSteps[phase]
+
+        return !!this.state.loginInputs[step]
+    }
+
     render() {
-        return <div className="login">
-            <div className="header">
-                <div className="logo">
-                    <img src={config.logo?.full} />
+        return <div className="login_wrapper">
+            <div className="content">
+                <h1>
+                    Sign in
+                </h1>
+                <h3>
+                    To continue to {config.app.siteName}
+                </h3>
+
+                <div className="fields">
+                    {this.renderCurrentInput()}
+
+                    <div className="field">
+                        <div className="component-row">
+                            {
+                                this.state.phase > 0 && <antd.Button
+                                    onClick={this.prevStep}
+                                    disabled={this.state.loading}
+                                >
+                                    Back
+                                </antd.Button>
+                            }
+                            <antd.Button
+                                onClick={this.nextStep}
+                                disabled={!this.canNext() || this.state.loading}
+                                loading={this.state.loading}
+                            >
+                                Continue
+                            </antd.Button>
+                        </div>
+                    </div>
+
+                    <div className="field-error">
+                        {this.state.error}
+                    </div>
+
+                    <div className="field">
+                        <a>You need a account?</a>
+                    </div>
                 </div>
             </div>
-            {this.props.session && <div className="session_available">
-                <h3><Icons.AlertCircle /> You already have a valid session.</h3>
-                <div className="session_card">
-                    @{this.props.session.username}
-                </div>
-                <antd.Button
-                    type="primary"
-                    onClick={() => window.app.setLocation(config.app?.mainPath ?? "/home")} >
-                    Go to home
-                </antd.Button>
-            </div>}
-            <FormGenerator
-                name="normal_login"
-                renderLoadingIcon
-                className="login-form"
-                items={formInstance}
-                onFinish={this.handleFinish}
-            />
         </div>
     }
 }
