@@ -24,7 +24,7 @@ const ItemTypes = {
 	SliderColorPicker: SliderPicker,
 }
 
-const SettingsFooter = () => {
+const SettingsFooter = (props) => {
 	const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
 	return <div className="footer" >
@@ -43,7 +43,7 @@ const SettingsFooter = () => {
 			</div>
 		</div>
 		<div>
-			<antd.Button type="link" onClick={this.onClickAppAbout}>
+			<antd.Button type="link" onClick={props.onClickAppAbout}>
 				<Translation>
 					{t => t("about")}
 				</Translation>
@@ -425,17 +425,19 @@ export default class SettingsMenu extends React.PureComponent {
 	}
 
 	render() {
-		return <div className="settings">
-			<antd.Tabs
-				activeKey={this.state.activeKey}
-				centered
-				destroyInactiveTabPane
-				onTabClick={this.handlePageTransition}
-			>
-				{this.generateSettingsTabs()}
-			</antd.Tabs>
+		return <div className="settings_wrapper">
+			<div className="settings">
+				<antd.Tabs
+					activeKey={this.state.activeKey}
+					centered
+					destroyInactiveTabPane
+					onTabClick={this.handlePageTransition}
+				>
+					{this.generateSettingsTabs()}
+				</antd.Tabs>
 
-			<SettingsFooter />
+				<SettingsFooter onClickAppAbout={this.onClickAppAbout} />
+			</div>
 		</div>
 	}
 }

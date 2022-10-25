@@ -1,138 +1,140 @@
-.settings {
-	display       : flex;
-	flex-direction: column;
-
-	>div {
-		margin-bottom: 25px;
-	}
-
-	.group {
-		display       : flex;
+.settings_wrapper {
+	.settings {
+		display: flex;
 		flex-direction: column;
-		color         : var(--background-color-contrast);
-
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6 {
-			color: var(--background-color-contrast);
-		}
-
-		.content {
-			>div {
-				margin-bottom: 25px;
-			}
-		}
-	}
-
-	.settingItem {
-		padding: 0 20px;
 
 		>div {
-			margin-bottom: 10px;
+			margin-bottom: 25px;
 		}
 
-		.header {
-			display       : inline-flex;
-			flex-direction: row;
-			align-items   : center;
-			justify-content: space-between;
-			width: 100%;
-
-			.title {
-				display    : flex;
-				align-items: center;
-				color      : var(--background-color-contrast);
-
-				h1,
-				h2,
-				h3,
-				h4,
-				h5,
-				h6 {
-					margin: 0;
-					color : var(--background-color-contrast);
-				}
-
-				p {
-					font-size: 11px;
-					color    : var(--background-color-contrast);
-					margin   : 0;
-				}
-
-				>div {
-					margin-right: 10px;
-				}
-			}
-
-			.extraActions {
-				display: inline-flex;
-				align-items: center;
-
-				> div {
-					margin-right: 10px;
-				}
-			}
-		}
-
-		.component {
-			display       : flex;
+		.group {
+			display: flex;
 			flex-direction: column;
+			color: var(--background-color-contrast);
 
-			--ignore-dragger: true;
-			padding         : 0 20px;
-
-			span {
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
 				color: var(--background-color-contrast);
 			}
 
-			> div {
-				margin-bottom: 10px;
+			.content {
+				>div {
+					margin-bottom: 25px;
+				}
 			}
 		}
-	}
 
-	.footer {
-		position: relative;
-		width   : 100%;
-
-		padding-top   : 20px;
-		padding-bottom: 20px;
-
-		display       : flex;
-		flex-direction: column;
-
-		justify-content: center;
-		align-items    : center;
-
-		>div {
-			margin-bottom: 10px;
-
-			font-family: "Space Mono", monospace;
-			font-size  : 10px;
-
-			display       : flex;
-			flex-direction: row;
-
-			align-items    : center;
-			justify-content: center;
-
-			.ant-tag {
-				height     : 18px;
-				line-height: 18px;
-				font-size  : 10px;
-			}
+		.settingItem {
+			padding: 0 20px;
 
 			>div {
-				padding: 0 7px;
+				margin-bottom: 10px;
+			}
+
+			.header {
+				display: inline-flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				width: 100%;
+
+				.title {
+					display: flex;
+					align-items: center;
+					color: var(--background-color-contrast);
+
+					h1,
+					h2,
+					h3,
+					h4,
+					h5,
+					h6 {
+						margin: 0;
+						color: var(--background-color-contrast);
+					}
+
+					p {
+						font-size: 11px;
+						color: var(--background-color-contrast);
+						margin: 0;
+					}
+
+					>div {
+						margin-right: 10px;
+					}
+				}
+
+				.extraActions {
+					display: inline-flex;
+					align-items: center;
+
+					>div {
+						margin-right: 10px;
+					}
+				}
+			}
+
+			.component {
+				display: flex;
+				flex-direction: column;
+
+				--ignore-dragger: true;
+				padding: 0 20px;
+
+				span {
+					color: var(--background-color-contrast);
+				}
+
+				>div {
+					margin-bottom: 10px;
+				}
 			}
 		}
-	}
 
-	.ant-tabs-nav-list {
-		width          : 100%;
-		justify-content: space-evenly;
+		.footer {
+			position: relative;
+			width: 100%;
+
+			padding-top: 20px;
+			padding-bottom: 20px;
+
+			display: flex;
+			flex-direction: column;
+
+			justify-content: center;
+			align-items: center;
+
+			>div {
+				margin-bottom: 10px;
+
+				font-family: "Space Mono", monospace;
+				font-size: 10px;
+
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+				justify-content: center;
+
+				.ant-tag {
+					height: 18px;
+					line-height: 18px;
+					font-size: 10px;
+				}
+
+				>div {
+					padding: 0 7px;
+				}
+			}
+		}
+
+		.ant-tabs-nav-list {
+			width: 100%;
+			justify-content: space-evenly;
+		}
 	}
 }
