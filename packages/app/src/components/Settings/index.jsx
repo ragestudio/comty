@@ -24,6 +24,34 @@ const ItemTypes = {
 	SliderColorPicker: SliderPicker,
 }
 
+const SettingsFooter = () => {
+	const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
+
+	return <div className="footer" >
+		<div>
+			<div>{config.app?.siteName}</div>
+			<div>
+				<antd.Tag>
+					<Icons.Tag />v{window.app.version}
+				</antd.Tag>
+			</div>
+			<div>
+				<antd.Tag color={isDevMode ? "magenta" : "green"}>
+					{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
+					{isDevMode ? "development" : "stable"}
+				</antd.Tag>
+			</div>
+		</div>
+		<div>
+			<antd.Button type="link" onClick={this.onClickAppAbout}>
+				<Translation>
+					{t => t("about")}
+				</Translation>
+			</antd.Button>
+		</div>
+	</div>
+}
+
 const SettingItem = (props) => {
 	let { item } = props
 
@@ -397,42 +425,17 @@ export default class SettingsMenu extends React.PureComponent {
 	}
 
 	render() {
-		const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
+		return <div className="settings">
+			<antd.Tabs
+				activeKey={this.state.activeKey}
+				centered
+				destroyInactiveTabPane
+				onTabClick={this.handlePageTransition}
+			>
+				{this.generateSettingsTabs()}
+			</antd.Tabs>
 
-		return (
-			<div className="settings">
-				<antd.Tabs
-					activeKey={this.state.activeKey}
-					centered
-					destroyInactiveTabPane
-					onTabClick={this.handlePageTransition}
-				>
-					{this.generateSettingsTabs()}
-				</antd.Tabs>
-				<div className="footer">
-					<div>
-						<div>{config.app?.siteName}</div>
-						<div>
-							<antd.Tag>
-								<Icons.Tag />v{window.app.version}
-							</antd.Tag>
-						</div>
-						<div>
-							<antd.Tag color={isDevMode ? "magenta" : "green"}>
-								{isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-								{isDevMode ? "development" : "stable"}
-							</antd.Tag>
-						</div>
-					</div>
-					<div>
-						<antd.Button type="link" onClick={this.onClickAppAbout}>
-							<Translation>
-								{t => t("about")}
-							</Translation>
-						</antd.Button>
-					</div>
-				</div>
-			</div>
-		)
+			<SettingsFooter />
+		</div>
 	}
 }
