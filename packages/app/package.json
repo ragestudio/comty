@@ -1,6 +1,6 @@
 {
   "name": "comty",
-  "version": "0.26.1",
+  "version": "0.27.0",
   "license": "LGPL-2.1",
   "main": "electron/main",
   "author": "RageStudio",
