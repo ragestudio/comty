@@ -185,7 +185,12 @@ export default class Server {
             passwordField: "password",
             session: false
         }, (username, password, done) => {
-            User.findOne({ username }).select("+password")
+            // check if username is a email with regex
+            let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+
+            let query = isEmail ? { email: username } : { username: username }
+
+            User.findOne(query).select("+password")
                 .then((data) => {
                     if (data === null) {
                         return done(null, false, this.options.jwtStrategy)
