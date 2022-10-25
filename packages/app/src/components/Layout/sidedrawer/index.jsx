@@ -9,9 +9,11 @@ export const Sidedrawer = (props) => {
 	return <div
 		key={sidedrawerId}
 		id={sidedrawerId}
+		style={props.style}
 		className={
 			classnames("sidedrawer", {
 				"hided": !props.defaultVisible,
+				"first": props.first
 			})
 		}
 	>
@@ -114,6 +116,10 @@ export default class SidedrawerController extends React.Component {
 			{
 				key: id,
 				id: id,
+				first: drawers.length === 0,
+				style: {
+					zIndex: 100 - drawers.length,
+				},
 				allowMultiples: options.allowMultiples ?? false,
 				...options.props,
 				close: this.close,
