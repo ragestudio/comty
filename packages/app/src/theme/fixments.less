@@ -155,6 +155,13 @@
     }
 }
 
+.ant-btn[disabled],
+.ant-btn[disabled]:hover,
+.ant-btn[disabled]:focus,
+.ant-btn[disabled]:active {
+    background-color: var(--background-color-accent);
+}
+
 // fix sliders colors
 .ant-slider-rail {
     background-color: var(--background-color-primary2);
@@ -364,6 +371,12 @@
 
 // fix input
 .ant-input {
+    background-color: var(--background-color-accent);
+
+    color: var(--text-color);
+}
+
+.ant-input-affix-wrapper {
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
