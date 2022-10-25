@@ -87,6 +87,25 @@ export default class User {
         return response
     }
 
+    static async changePassword(payload) {
+        if (!User.bridge) {
+            return false
+        }
+
+        const { currentPassword, newPassword } = payload
+
+        const { data } = await app.api.customRequest("main", {
+            method: "POST",
+            url: "/self/update_password",
+            data: {
+                currentPassword,
+                newPassword,
+            }
+        })
+
+        return data
+    }
+
     getData = async (payload, callback) => {
         const request = await User.bridge.get.user(undefined, { username: payload.username, _id: payload.user_id }, {
             parseData: false
