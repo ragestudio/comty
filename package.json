@@ -4,7 +4,10 @@
   "types": "index.d.ts",
   "private": true,
   "scripts": {
-    "release": "node ./scripts/release.js"
+    "release": "node ./scripts/release.js",
+    "dev": "concurrently -k -n Server,Client -c bgBlue,bgGreen \"yarn dev:server\" \"yarn dev:client\"",
+    "dev:server": "cd packages/server && yarn dev",
+    "dev:client": "cd packages/app && yarn dev"
   },
   "workspaces": [
     "packages/**"
@@ -15,6 +18,9 @@
     "dotenv": "16.0.3",
     "7zip-min": "1.4.3",
     "axios": "0.21.1"
+  },
+  "devDependencies": {
+    "concurrently": "^7.5.0"
   },
   "version": "0.27.1"
 }
