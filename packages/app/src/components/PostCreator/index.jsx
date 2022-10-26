@@ -143,6 +143,17 @@ export default (props) => {
         }
     }
 
+    const onDrop = (event) => {
+        event.preventDefault()
+        setUploaderVisible(true)
+
+        console.log(event)
+
+        const files = event.dataTransfer.files
+
+        console.log(files)
+    }
+
     const onUploaderChange = (change) => {
         setFileList(change.fileList)
 
@@ -281,14 +292,7 @@ export default (props) => {
     return <div
         className="postCreator"
         ref={creatorRef}
-        onDragOver={(e) => {
-            e.preventDefault()
-            toggleUploader(true)
-        }}
-        onDragLeave={(e) => {
-            e.preventDefault()
-            toggleUploader(false)
-        }}
+        onDrop={onDrop}
         onMouseEnter={() => {
             toggleFocus(true)
         }}
@@ -345,12 +349,12 @@ export default (props) => {
                 fileList={fileList}
                 multiple
             >
-                <div className="hint">
-                    <Icons.Plus />
-                    <span>Add attachment</span>
-                    <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
-                </div>
+                <Icons.Plus />
             </antd.Upload>
+
+            <div className="hint">
+                <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
+            </div>
         </div>
     </div>
 }
