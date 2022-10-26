@@ -277,88 +277,88 @@ export default class StreamingController extends Controller {
                 if (info) {
                     return res.json(info)
                 }
-            },
-            "/streaming/publish": async (req, res) => {
-                const { app, stream, tcUrl } = req.body
+            }
+        },
+        "/streaming/publish": async (req, res) => {
+            const { app, stream, tcUrl } = req.body
 
-                const streaming = await this.methods.pushToLocalList({
-                    app,
-                    stream,
-                    tcUrl
-                }).catch((err) => {
+            const streaming = await this.methods.pushToLocalList({
+                app,
+                stream,
+                tcUrl
+            }).catch((err) => {
+                res.status(500).json({
+                    code: 1,
+                    error: err.message
+                })
+
+                return false
+            })
+
+            if (streaming) {
+                global.wsInterface.io.emit(`streaming.new`, {
+                    username: streaming.username,
+                })
+
+                return res.json({
+                    code: 0,
+                    status: "ok"
+                })
+            }
+        },
+        "/streaming/unpublish": async (req, res) => {
+            const { stream } = req.body
+
+            const streaming = await this.methods.removeFromLocalList({
+                stream
+            }).catch((err) => {
+                res.status(500).json({
+                    code: 2,
+                    status: err.message
+                })
+
+                return false
+            })
+
+            if (streaming) {
+                global.wsInterface.io.emit(`streaming.end`, {
+                    username: streaming.username,
+                })
+
+                return res.json({
+                    code: 0,
+                    status: "ok"
+                })
+            }
+        },
+        "/regenerate_streaming_key": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                // check if the user already has a key
+                let streamingKey = await StreamingKey.findOne({
+                    user_id: req.user._id.toString()
+                })
+
+                // if exists, delete it
+
+                if (streamingKey) {
+                    await streamingKey.remove()
+                }
+
+                // generate a new key
+                const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
                     res.status(500).json({
-                        code: 1,
-                        error: err.message
+                        error: `Cannot generate a new key: ${err.message}`,
                     })
 
                     return false
                 })
 
-                if (streaming) {
-                    global.wsInterface.io.emit(`streaming.new`, {
-                        username: streaming.username,
-                    })
-
-                    return res.json({
-                        code: 0,
-                        status: "ok"
-                    })
-                }
-            },
-            "/streaming/unpublish": async (req, res) => {
-                const { stream } = req.body
-
-                const streaming = await this.methods.removeFromLocalList({
-                    stream
-                }).catch((err) => {
-                    res.status(500).json({
-                        code: 2,
-                        status: err.message
-                    })
-
+                if (!newKey) {
                     return false
-                })
-
-                if (streaming) {
-                    global.wsInterface.io.emit(`streaming.end`, {
-                        username: streaming.username,
-                    })
-
-                    return res.json({
-                        code: 0,
-                        status: "ok"
-                    })
                 }
-            },
-            "/regenerate_streaming_key": {
-                middlewares: ["withAuthentication"],
-                fn: async (req, res) => {
-                    // check if the user already has a key
-                    let streamingKey = await StreamingKey.findOne({
-                        user_id: req.user._id.toString()
-                    })
 
-                    // if exists, delete it
-
-                    if (streamingKey) {
-                        await streamingKey.remove()
-                    }
-
-                    // generate a new key
-                    const newKey = await this.methods.genereteKey(req.user._id.toString()).catch(err => {
-                        res.status(500).json({
-                            error: `Cannot generate a new key: ${err.message}`,
-                        })
-
-                        return false
-                    })
-
-                    if (!newKey) {
-                        return false
-                    }
-
-                    return res.json(newKey)
-                }
+                return res.json(newKey)
             }
         }
     }
