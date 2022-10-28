@@ -3,6 +3,49 @@ import config from "config"
 import { Bridge } from "linebridge/dist/client"
 import { Session } from "models"
 
+function generateWSFunctionHandler(socket, type = "listen") {
+    if (!socket) {
+        return null
+    }
+
+    return (to, fn) => {
+        if (typeof to === "undefined") {
+            console.error("handleWSListener: to must be defined")
+            return false
+        }
+        if (typeof fn !== "function") {
+            console.error("handleWSListener: fn must be function")
+            return false
+        }
+
+        let ns = "main"
+        let event = null
+
+        if (typeof to === "string") {
+            event = to
+        } else if (typeof to === "object") {
+            ns = to.ns
+            event = to.event
+        }
+
+        switch (type) {
+            case "listen": {
+                return socket.sockets[ns].on(event, async (...context) => {
+                    return await fn(...context)
+                })
+            }
+
+            case "unlisten": {
+                return socket.sockets[ns].removeListener(event)
+            }
+
+            default: {
+                return null
+            }
+        }
+    }
+}
+
 export default class ApiCore extends Core {
     constructor(props) {
         super(props)
@@ -190,6 +233,7 @@ export default class ApiCore extends Core {
 
         mainWSSocket.on("connect", () => {
             this.ctx.eventBus.emit(`api.ws.main.connect`)
+            this.autenticateWS(mainWSSocket)
         })
 
         mainWSSocket.on("disconnect", (...context) => {
@@ -201,62 +245,20 @@ export default class ApiCore extends Core {
         })
 
         // generate functions
-        bridge.listenEvent = this.generateMainWSEventListener(bridge.wsInterface)
-        bridge.unlistenEvent = this.generateMainWSEventUnlistener(bridge.wsInterface)
+        bridge.listenEvent = generateWSFunctionHandler(bridge.wsInterface, "listen")
+        bridge.unlistenEvent = generateWSFunctionHandler(bridge.wsInterface, "unlisten")
 
         // return bridge
         return bridge
     }
 
-    generateMainWSEventListener(obj) {
-        return (to, fn) => {
-            if (typeof to === "undefined") {
-                console.error("handleWSListener: to must be defined")
-                return false
-            }
-            if (typeof fn !== "function") {
-                console.error("handleWSListener: fn must be function")
-                return false
-            }
+    autenticateWS = async (socket) => {
+        const token = await Session.token
 
-            let ns = "main"
-            let event = null
-
-            if (typeof to === "string") {
-                event = to
-            } else if (typeof to === "object") {
-                ns = to.ns
-                event = to.event
-            }
-
-            return obj.sockets[ns].on(event, async (...context) => {
-                return await fn(...context)
+        if (token) {
+            socket.emit("authenticate", {
+                token,
             })
-        }
-    }
-
-    generateMainWSEventUnlistener(obj) {
-        return (to, fn) => {
-            if (typeof to === "undefined") {
-                console.error("handleWSListener: to must be defined")
-                return false
-            }
-            if (typeof fn !== "function") {
-                console.error("handleWSListener: fn must be function")
-                return false
-            }
-
-            let ns = "main"
-            let event = null
-
-            if (typeof to === "string") {
-                event = to
-            } else if (typeof to === "object") {
-                ns = to.ns
-                event = to.event
-            }
-
-            return obj.sockets[ns].removeListener(event, fn)
         }
     }
 }
