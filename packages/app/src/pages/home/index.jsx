@@ -4,7 +4,7 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import { HashtagTrendings, FeaturedEventsAnnouncements } from "components"
+import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
 
 import FeedBrowser from "./components/feed"
 import LivestreamsBrowser from "./components/livestreams"
@@ -110,7 +110,7 @@ export default class Dashboard extends React.Component {
                 <div className="card" id="onlineFriends">
                     <h2><Icons.Rss /> Online Friends</h2>
                     <div className="content">
-
+                        <ConnectedFriends />
                     </div>
                 </div>
 
