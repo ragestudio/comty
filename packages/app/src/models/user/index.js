@@ -5,18 +5,30 @@ export default class User {
         return window.app?.api.withEndpoints("main")
     }
 
-    static async data(username) {
+    static async data(payload) {
+        const token = await Session.decodedToken()
+
+        if (!token || !User.bridge) {
+            return false
+        }
+
+        return User.bridge.get.user(undefined, payload ?? { username: token.username })
+    }
+
+    static async dataByUsername(username) {
         if (!username) {
-            const token = await Session.decodedToken()
-
-            if (!token || !User.bridge) {
-                return false
-            }
-
-            username = token.username
+            throw new Error("username is required")
         }
 
         return User.bridge.get.user(undefined, { username })
+    }
+
+    static async dataById(user_id) {
+        if (!user_id) {
+            throw new Error("user_id is required")
+        }
+
+        return User.bridge.get.user(undefined, { _id: user_id })
     }
 
     static async publicData() {
@@ -101,6 +113,19 @@ export default class User {
                 currentPassword,
                 newPassword,
             }
+        })
+
+        return data
+    }
+
+    static async getConnectedUsersFollowing() {
+        if (!User.bridge) {
+            return false
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: "/connected_users_following",
         })
 
         return data
