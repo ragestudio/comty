@@ -13,12 +13,19 @@ export default (props) => {
     let [userData, setUserData] = React.useState(props.user)
 
     const fetchUser = async () => {
-        if (!props.username) {
-            console.error("Username is not defined")
+        if (!props.user_id || props.username) {
+            console.error("Cannot fetch user data without user_id or username")
             return false
         }
 
-        const data = await User.data(props.username)
+        const data = await User.data({
+            _id: props.user_id,
+            username: props.username
+        }).catch((err) => {
+            console.error(err)
+            app.message.error("Failed to fetch user data")
+            return null
+        })
 
         if (data) {
             setUserData(data)
