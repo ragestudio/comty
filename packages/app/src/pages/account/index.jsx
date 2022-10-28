@@ -169,7 +169,7 @@ export default class Account extends React.Component {
 	}
 
 	onClickFollow = async () => {
-		const result = await this.api.put.followUser({
+		const result = await this.api.post.followUser({
 			username: this.state.requestedUser,
 		}).catch((error) => {
 			console.error(error)
