@@ -5,11 +5,12 @@ import bcrypt from "bcrypt"
 
 import SessionController from "../SessionController"
 
-import { User, UserFollow } from "../../models"
+import { User } from "../../models"
 import { Token, Schematized } from "../../lib"
 
 import createUser from "./methods/createUser"
 import updatePassword from "./methods/updatePassword"
+import getConnectedUsersFollowing from "./methods/getConnectedUsersFollowing"
 
 const AllowedPublicUpdateFields = [
     "fullName",
@@ -109,6 +110,16 @@ export default class UserController extends Controller {
             fn: async (req, res) => {
                 return res.json(req.user)
             },
+        },
+        "/connected_users_following": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                const users = await getConnectedUsersFollowing({
+                    from_user_id: req.user._id.toString(),
+                })
+
+                return res.json(users)
+            }
         },
         "/user/username-available": async (req, res) => {
             const user = await User.findOne({
