@@ -50,6 +50,7 @@ export { default as CommentCreator } from "./CommentCreator"
 
 // USERS
 export { default as FollowersList } from "./FollowersList"
+export { default as ConnectedFriends } from "./ConnectedFriends"
 
 // OTHERS
 export * as AdminTools from "./AdminTools"
