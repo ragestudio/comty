@@ -33,6 +33,8 @@ export { default as UserPreview } from "./UserPreview"
 export { default as FeaturedEventAnnouncement } from "./FeaturedEventAnnouncement"
 export { default as FeaturedEventsAnnouncements } from "./FeaturedEventsAnnouncements"
 
+export { default as NotificationsCenter } from "./NotificationsCenter"
+
 // CREATOR
 export { default as Creator } from "./Creator"
 
