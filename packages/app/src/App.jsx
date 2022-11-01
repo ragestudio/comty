@@ -59,7 +59,7 @@ import { Translation } from "react-i18next"
 import { Session, User } from "models"
 import config from "config"
 
-import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher } from "components"
+import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher, NotificationsCenter } from "components"
 import { DOMWindow } from "components/RenderWindow"
 import loadable from "@loadable/component"
 
@@ -124,10 +124,13 @@ class App extends React.Component {
 			}
 		},
 		"app.openSearcher": () => {
-			return App.publicMethods.openSearcher()
+			App.publicMethods.openSearcher()
 		},
-		"app.openCreator": (...args) => {
-			return App.publicMethods.openCreator(...args)
+		"app.openCreator": () => {
+			App.publicMethods.openCreator()
+		},
+		"app.openNotifications": () => {
+			App.publicMethods.openNotifications()
 		},
 		"app.createLogin": async () => {
 			app.DrawerController.open("login", Login, {
@@ -271,6 +274,15 @@ class App extends React.Component {
 	}
 
 	static publicMethods = {
+		openNotifications: () => {
+			window.app.SidedrawerController.open("notifications", NotificationsCenter, {
+				props: {
+					width: "fit-content",
+				},
+				allowMultiples: false,
+				escClosable: true,
+			})
+		},
 		openSearcher: (options) => {
 			window.app.ModalController.open((props) => <Searcher {...props} />)
 		},
