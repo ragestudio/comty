@@ -359,7 +359,7 @@ export default class Sidebar extends React.Component {
 									{(t) => t("Create")}
 								</Translation>
 							</Menu.Item>
-							<Menu.Item key="notifications" icon={<Icons.Bell />}>
+							<Menu.Item key="notifications" icon={<Icons.Bell />} overrideEvent="app.openNotifications">
 								<Translation>
 									{t => t("Notifications")}
 								</Translation>
