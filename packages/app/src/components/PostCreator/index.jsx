@@ -160,7 +160,7 @@ export default (props) => {
                 setPending(pending.filter(uid => uid !== change.file.uid))
 
                 // update post data
-                addAttachment(change.file.response)
+                addAttachment(change.file.response.files)
 
                 uploaderScrollToEnd()
 
