@@ -11,6 +11,11 @@ export default class PlaylistsController extends Controller {
     }
 
     post = {
-        
+        "/playlist/publish": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                
+            }
+        }
     }
 }
