@@ -15,7 +15,7 @@ export default (props) => {
     }
 
     const updateTimeAgo = () => {
-        let createdAt = props.postData.created_at ?? ""
+        let createdAt = props.postData.timestamp ?? props.postData.created_at ?? ""
 
         const timeAgo = DateTime.fromISO(createdAt).toRelative()
 
