@@ -34,8 +34,8 @@ export default (props) => {
 
     const handleOnClick = async () => {
         if (typeof props.onClick !== "function") {
-            console.warn("UserPreview: onClick is not a function")
-            return
+            console.warn("UserPreview: onClick is not a function, executing default action")
+            return app.goToAccount(userData.username)
         }
 
         return await props.onClick(userData)
