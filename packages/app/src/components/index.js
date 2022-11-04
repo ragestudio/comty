@@ -56,7 +56,6 @@ export { default as ConnectedFriends } from "./ConnectedFriends"
 
 // OTHERS
 export * as AdminTools from "./AdminTools"
-export * as AboutApp from "./AboutApp"
 export * as Window from "./RenderWindow"
 
 export { Layout }
