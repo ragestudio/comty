@@ -172,6 +172,29 @@
 }
 
 // fix menu colors
+.ant-menu,
+.ant-menu ul {
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border-right: 0 !important;
+
+    .ant-menu-item {
+        color: var(--background-color-contrast);
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        span,
+        p {
+            color: var(--background-color-contrast);
+        }
+    }
+}
+
 .ant-menu-item {
     color: var(--text-color);
     border-radius: 8px;
@@ -391,6 +414,6 @@
 // fix adm cards
 .adm-card {
     background: var(--background-color-accent);
-    
+
     color: var(--text-color);
 }
