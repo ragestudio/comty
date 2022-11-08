@@ -1,22 +1,77 @@
 import React from "react"
-import { Layout, Menu, Avatar } from "antd"
+import { Menu, Avatar } from "antd"
+import { Translation } from "react-i18next"
 import classnames from "classnames"
 
 import config from "config"
 import { Icons, createIconRender } from "components/Icons"
 import { sidebarKeys as defaultSidebarItems } from "schemas/defaultSettings"
+
 import sidebarItems from "schemas/routes.json"
-import { Translation } from "react-i18next"
 
-import { SidebarEditor } from "./components"
 import "./index.less"
-
-const { Sider } = Layout
 
 const onClickHandlers = {
 	settings: (event) => {
 		window.app.openSettings()
 	},
+}
+
+const getSidebarComponents = () => {
+	const items = {}
+
+	sidebarItems.forEach((item, index) => {
+		items[item.id] = {
+			...item,
+			index,
+			content: (
+				<>
+					{createIconRender(item.icon)} {item.title}
+				</>
+			),
+		}
+	})
+
+	return items
+}
+
+const generateItems = () => {
+	const components = getSidebarComponents()
+	const itemsMap = []
+	const pathResolvers = {}
+
+	const keys = window.app?.settings.get("sidebarKeys") ?? defaultSidebarItems
+
+	// filter undefined components to avoid error
+	keys.filter((key) => {
+		if (typeof components[key] !== "undefined") {
+			return true
+		}
+	})
+
+	keys.forEach((key, index) => {
+		const component = components[key]
+
+		try {
+			// avoid if item is duplicated
+			if (itemsMap.includes(component)) {
+				return false
+			}
+
+			if (typeof component.path !== "undefined") {
+				pathResolvers[component.id] = component.path
+			}
+
+			itemsMap.push(component)
+		} catch (error) {
+			return console.log(error)
+		}
+	})
+
+	return {
+		itemsMap,
+		pathResolvers,
+	}
 }
 
 export default class Sidebar extends React.Component {
@@ -25,34 +80,19 @@ export default class Sidebar extends React.Component {
 
 		this.controller = window.app["SidebarController"] = {
 			toggleVisibility: this.toggleVisibility,
-			toggleEdit: this.toggleEditMode,
 			toggleElevation: this.toggleElevation,
-			attachElement: this.attachElement,
+			toggleCollapse: this.toggleCollapse,
 			isVisible: () => this.state.visible,
-			isEditMode: () => this.state.visible,
 			isCollapsed: () => this.state.collapsed,
 		}
 
 		this.state = {
-			editMode: false,
 			visible: false,
-			loading: true,
-			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
-			pathResolve: {},
-			menus: {},
-			extraItems: {
-				bottom: [],
-				top: [],
-			},
 			elevated: false,
-			additionalElements: [],
+			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
+			pathResolvers: null,
+			menus: null,
 		}
-
-		window.app.eventBus.on("edit_sidebar", () => this.toggleEditMode())
-
-		window.app.eventBus.on("settingChanged.sidebar_collapse", (value) => {
-			this.toggleCollapse(value)
-		})
 
 		// handle sidedrawer open/close
 		window.app.eventBus.on("sidedrawer.hasDrawers", () => {
@@ -66,112 +106,21 @@ export default class Sidebar extends React.Component {
 	collapseDebounce = null
 
 	componentDidMount = async () => {
-		await this.loadSidebarItems()
+		await this.loadItems()
 
 		setTimeout(() => {
 			this.controller.toggleVisibility(true)
 		}, 100)
 	}
 
-	getStoragedKeys = () => {
-		return window.app.settings.get("sidebarKeys")
-	}
-
-	attachElement = (element) => {
-		this.setState({
-			additionalElements: [...this.state.additionalElements, element],
-		})
-	}
-
-	appendItem = (item = {}) => {
-		const { position } = item
-
-		if (typeof position === "undefined" && typeof this.state.extraItems[position] === "undefined") {
-			console.error("Invalid position")
-			return false
-		}
-
-		const state = this.state.extraItems
-
-		state[position].push(item)
-
-		this.setState({ extraItems: state })
-	}
-
-	loadSidebarItems = () => {
-		const items = {}
-		const itemsMap = []
-
-		// parse all items from schema
-		sidebarItems.forEach((item, index) => {
-			items[item.id] = {
-				...item,
-				index,
-				content: (
-					<>
-						{createIconRender(item.icon)} {item.title}
-					</>
-				),
-			}
-		})
-
-		// filter undefined to avoid error
-		let keys = (this.getStoragedKeys() ?? defaultSidebarItems).filter((key) => {
-			if (typeof items[key] !== "undefined") {
-				return true
-			}
-		})
-
-		// short items
-		keys.forEach((id, index) => {
-			const item = items[id]
-
-			if (item.locked) {
-				if (item.index !== index) {
-					keys = keys.move(index, item.index)
-
-					//update index
-					window.app.settings.set("sidebarKeys", keys)
-				}
-			}
-		})
-
-		// set items from scoped keys
-		keys.forEach((key, index) => {
-			const item = items[key]
-
-			try {
-				// avoid if item is duplicated
-				if (itemsMap.includes(item)) {
-					return false
-				}
-
-				let valid = true
-
-				if (typeof item.requireState === "object") {
-					const { key, value } = item.requireState
-					//* TODO: check global state
-				}
-
-				// end validation
-				if (!valid) {
-					return false
-				}
-
-				if (typeof item.path !== "undefined") {
-					let resolvers = this.state.pathResolve ?? {}
-					resolvers[item.id] = item.path
-					this.setState({ pathResolve: resolvers })
-				}
-
-				itemsMap.push(item)
-			} catch (error) {
-				return console.log(error)
-			}
-		})
+	loadItems = async () => {
+		const generation = generateItems()
 
 		// update states
-		this.setState({ items, menus: itemsMap, loading: false })
+		await this.setState({
+			menus: generation.itemsMap,
+			pathResolvers: generation.pathResolvers,
+		})
 	}
 
 	renderMenuItems(items) {
@@ -184,29 +133,25 @@ export default class Sidebar extends React.Component {
 
 		return items.map((item) => {
 			if (Array.isArray(item.children)) {
-				return (
-					<Menu.SubMenu
-						key={item.id}
-						icon={handleRenderIcon(item.icon)}
-						title={<span>
-							<Translation>
-								{t => t(item.title)}
-							</Translation>
-						</span>}
-						{...item.props}
-					>
-						{this.renderMenuItems(item.children)}
-					</Menu.SubMenu>
-				)
+				return <Menu.SubMenu
+					key={item.id}
+					icon={handleRenderIcon(item.icon)}
+					title={<span>
+						<Translation>
+							{t => t(item.title)}
+						</Translation>
+					</span>}
+					{...item.props}
+				>
+					{this.renderMenuItems(item.children)}
+				</Menu.SubMenu>
 			}
 
-			return (
-				<Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
-					<Translation>
-						{t => t(item.title ?? item.id)}
-					</Translation>
-				</Menu.Item>
-			)
+			return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
+				<Translation>
+					{t => t(item.title ?? item.id)}
+				</Translation>
+			</Menu.Item>
 		})
 	}
 
@@ -223,27 +168,14 @@ export default class Sidebar extends React.Component {
 		if (typeof onClickHandlers[e.key] === "function") {
 			return onClickHandlers[e.key](e)
 		}
-		if (typeof this.state.pathResolve[e.key] !== "undefined") {
-			return window.app.setLocation(`/${this.state.pathResolve[e.key]}`, 150)
-		}
 
-		return window.app.setLocation(`/${e.key}`, 150)
-	}
-
-	toggleEditMode = (to) => {
-		if (typeof to === "undefined") {
-			to = !this.state.editMode
-		}
-
-		if (to) {
-			window.app.eventBus.emit("clearAllOverlays")
-		} else {
-			if (this.itemsMap !== this.getStoragedKeys()) {
-				this.loadSidebarItems()
+		if (typeof this.state.pathResolvers === "object") {
+			if (typeof this.state.pathResolvers[e.key] !== "undefined") {
+				return window.app.setLocation(`/${this.state.pathResolvers[e.key]}`, 150)
 			}
 		}
 
-		this.setState({ editMode: to, collapsed: false })
+		return window.app.setLocation(`/${e.key}`, 150)
 	}
 
 	toggleCollapse = (to) => {
@@ -261,11 +193,12 @@ export default class Sidebar extends React.Component {
 	}
 
 	onMouseEnter = () => {
-		if (window.app.settings.is("collapseOnLooseFocus", false)) {
-			return false
-		}
+		if (!this.state.visible) return
+
+		if (window.app.settings.is("collapseOnLooseFocus", false)) return
 
 		clearTimeout(this.collapseDebounce)
+
 		this.collapseDebounce = null
 
 		if (this.state.collapsed) {
@@ -274,49 +207,29 @@ export default class Sidebar extends React.Component {
 	}
 
 	handleMouseLeave = () => {
-		if (window.app.settings.is("collapseOnLooseFocus", false)) {
-			return false
-		}
+		if (!this.state.visible) return
+
+		if (window.app.settings.is("collapseOnLooseFocus", false)) return
 
 		if (!this.state.collapsed) {
 			this.collapseDebounce = setTimeout(() => { this.toggleCollapse(true) }, window.app.settings.get("autoCollapseDelay") ?? 500)
 		}
 	}
 
-	renderExtraItems = (position) => {
-		return this.state.extraItems[position].map((item = {}) => {
-			if (typeof item.icon !== "undefined") {
-				if (typeof item.props !== "object") {
-					item.props = Object()
-				}
-
-				item.props["icon"] = createIconRender(item.icon)
-			}
-
-			return <Menu.Item key={item.id} {...item.props}>{item.children}</Menu.Item>
-		})
-	}
-
 	render() {
-		if (this.state.loading) return null
-
-		const { user } = this.props
+		if (!this.state.menus) return null
 
 		return (
-			<Sider
+			<div
 				onMouseEnter={this.onMouseEnter}
 				onMouseLeave={this.handleMouseLeave}
-				theme={this.props.theme}
-				width={this.state.editMode ? 400 : 200}
-				collapsed={this.state.editMode ? false : this.state.collapsed}
-				onCollapse={() => this.props.onCollapse()}
 				className={
 					classnames(
-						"sidebar",
+						"app_sidebar",
 						{
-							["edit_mode"]: this.state.editMode,
+							["collapsed"]: this.state.visible && this.state.collapsed,
+							["elevated"]: this.state.visible && this.state.elevated,
 							["hidden"]: !this.state.visible,
-							["elevated"]: this.state.elevated
 						}
 					)
 				}
@@ -327,70 +240,49 @@ export default class Sidebar extends React.Component {
 					</div>
 				</div>
 
-				{this.state.editMode && (
-					<div style={{ height: "100%" }}>
-						<SidebarEditor />
-					</div>
-				)}
+				<div key="menu" className="app_sidebar_menu_wrapper">
+					<Menu selectable={true} mode="inline" onClick={this.handleClick}>
+						{this.renderMenuItems(this.state.menus)}
+					</Menu>
+				</div>
 
-				{!this.state.editMode && (
-					<div key="menu" className="app_sidebar_menu">
-						<Menu selectable={true} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
-							{this.renderMenuItems(this.state.menus)}
-							{this.renderExtraItems("top")}
-						</Menu>
-					</div>
-				)}
-
-				{!this.state.editMode && <div key="additionalElements" className="additionalElements">
-					{this.state.additionalElements}
-				</div>}
-
-				{!this.state.editMode && (
-					<div key="bottom" className="app_sidebar_bottom">
-						<Menu selectable={false} mode="inline" theme={this.props.theme} onClick={this.handleClick}>
-							<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearcher" >
+				<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
+					<Menu selectable={false} mode="inline" onClick={this.handleClick}>
+						<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearcher" >
+							<Translation>
+								{(t) => t("Search")}
+							</Translation>
+						</Menu.Item>
+						<Menu.Item key="create" icon={<Icons.PlusCircle />} overrideEvent="app.openCreator" >
+							<Translation>
+								{(t) => t("Create")}
+							</Translation>
+						</Menu.Item>
+						<Menu.Item key="notifications" icon={<Icons.Bell />} overrideEvent="app.openNotifications">
+							<Translation>
+								{t => t("Notifications")}
+							</Translation>
+						</Menu.Item>
+						<Menu.Item key="settings" icon={<Icons.Settings />}>
+							<Translation>
+								{t => t("Settings")}
+							</Translation>
+						</Menu.Item>
+						{
+							app.userData && <Menu.Item key="account" className="user_avatar">
+								<Avatar shape="square" src={app.userData?.avatar} />
+							</Menu.Item>
+						}
+						{
+							!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
 								<Translation>
-									{(t) => t("Search")}
+									{t => t("Login")}
 								</Translation>
 							</Menu.Item>
-							<Menu.Item key="create" icon={<Icons.PlusCircle />} overrideEvent="app.openCreator" >
-								<Translation>
-									{(t) => t("Create")}
-								</Translation>
-							</Menu.Item>
-							<Menu.Item key="notifications" icon={<Icons.Bell />} overrideEvent="app.openNotifications">
-								<Translation>
-									{t => t("Notifications")}
-								</Translation>
-							</Menu.Item>
-							<Menu.Item key="settings" icon={<Icons.Settings />}>
-								<Translation>
-									{t => t("Settings")}
-								</Translation>
-							</Menu.Item>
-
-							{
-								user && <Menu.Item key="account">
-									<div className="user_avatar">
-										<Avatar shape="square" src={user?.avatar} />
-									</div>
-								</Menu.Item>
-							}
-
-							{
-								!user && <Menu.Item key="login" icon={<Icons.LogIn />}>
-									<Translation>
-										{t => t("Login")}
-									</Translation>
-								</Menu.Item>
-							}
-
-							{this.renderExtraItems("bottom")}
-						</Menu>
-					</div>
-				)}
-			</Sider>
+						}
+					</Menu>
+				</div>
+			</div>
 		)
 	}
 }
