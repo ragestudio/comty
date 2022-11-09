@@ -86,7 +86,6 @@ export default class Account extends React.Component {
 		isSelf: false,
 		isFollowed: false,
 
-		transitionActive: false,
 		tabActiveKey: "posts",
 
 		isNotExistent: false,
@@ -104,7 +103,6 @@ export default class Account extends React.Component {
 		const query = new URLSearchParams(location.search)
 
 		const requestedUser = this.props.username ?? location.state?.username ?? query.get("username") ?? token?.username
-		const hasAdmin = await User.hasRole("admin")
 
 		let isSelf = false
 		let user = null
@@ -144,7 +142,6 @@ export default class Account extends React.Component {
 		await this.setState({
 			isSelf,
 			user,
-			hasAdmin,
 			requestedUser,
 			isFollowed,
 			followers,
