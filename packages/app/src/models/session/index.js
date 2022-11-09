@@ -127,6 +127,4 @@ export default class Session {
 
         return result
     }
-
-    logout = this.destroyCurrentSession
 }
