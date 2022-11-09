@@ -16,9 +16,7 @@ export default class StreamViewer extends React.Component {
     state = {
         isEnded: false,
         sourceLoading: true,
-        endResult: false,
 
-        userData: null,
         streamInfo: null,
         spectators: 0,
 
