@@ -75,6 +75,26 @@ export default class User {
         return User.hasRole("admin")
     }
 
+    static async getUserBadges(user_id) {
+        if (!User.bridge) {
+            return false
+        }
+
+        if (!user_id) {
+            user_id = await User.selfUserId()
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: "/user/badges",
+            params: {
+                user_id: user_id,
+            }
+        })
+
+        return data
+    }
+
     static async register(payload) {
         if (!User.bridge) {
             return false

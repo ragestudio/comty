@@ -28,6 +28,22 @@ export default class BadgesController extends Controller {
                 return res.json(badges)
             }
         }),
+        "/user/badges": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
+                const user = await User.findOne({ _id: req.query.user_id ?? req.user._id })
+
+                if (!user) {
+                    return res.status(404).json({ error: "User not found" })
+                }
+
+                const badges = await Badge.find({
+                    name: { $in: user.badges },
+                })
+
+                return res.json(badges)
+            }
+        }
     }
 
     post = {
