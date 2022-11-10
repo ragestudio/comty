@@ -49,16 +49,17 @@ const TabRender = React.memo((props) => {
 const UserBadges = React.memo((props) => {
 	return React.createElement(Loadable({
 		loader: async () => {
-			let { badges } = props
+			let { user_id } = props
 
-			if (!badges || Array.isArray(badges) === false || badges.length === 0) {
+			const badgesData = await User.getUserBadges(user_id).catch((err) => {
+				console.error(err)
+
+				app.message.error("Failed to fetch user badges")
+
 				return null
-			}
+			})
 
-			// fetch badges datam from api
-			const badgesData = await app.api.request("main", "get", "badges", {
-				_id: badges
-			}).catch(() => false)
+			console.log(badgesData)
 
 			if (!badgesData) {
 				return null
@@ -286,7 +287,7 @@ export default class Account extends React.Component {
 
 				<div className="badgesTab">
 					<React.Suspense fallback={<antd.Skeleton />}>
-						<UserBadges badges={user.badges} />
+						<UserBadges user_id={user._id} />
 					</React.Suspense>
 				</div>
 			</div>
