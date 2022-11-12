@@ -9,6 +9,8 @@ export { default as Post } from "./post"
 export { default as Comment } from "./comment"
 export { default as SavedPost } from "./savedPost"
 
+export { default as Playlist } from "./playlist"
+
 export { default as UserFollow } from "./userFollow"
 export { default as Badge } from "./badge"
 
