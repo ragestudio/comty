@@ -31,6 +31,9 @@ export const Post = mongoose.model("Post", schemas.Post, "posts")
 export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
 export const SavedPost = mongoose.model("SavedPost", schemas.SavedPost, "savedPosts")
 
+// playlists
+export const Playlist = mongoose.model("Playlist", schemas.Playlist, "playlists")
+
 // streamings
 export const StreamingKey = mongoose.model("StreamingKey", schemas.StreamingKey, "streamingKeys")
 export const StreamingInfo = mongoose.model("StreamingInfo", schemas.StreamingInfo, "streamingInfos")
