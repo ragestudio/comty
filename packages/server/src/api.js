@@ -25,7 +25,8 @@ global.signLocation = process.env.signLocation
 
 export default class Server {
     DB = new DbManager()
-    eventBus = new EventEmitter()
+
+    eventBus = global.eventBus = new EventEmitter()
 
     storage = global.storage = createStorageClientInstance()
 
@@ -43,6 +44,7 @@ export default class Server {
         controllers.CommentsController,
         controllers.SearchController,
         controllers.FeaturedEventsController,
+        controllers.PlaylistsController,
     ]
 
     middlewares = middlewares
