@@ -45,6 +45,7 @@ export default class Server {
         controllers.SearchController,
         controllers.FeaturedEventsController,
         controllers.PlaylistsController,
+        controllers.FeedController,
     ]
 
     middlewares = middlewares

@@ -16,8 +16,13 @@ export default async (payload) => {
 
     const followingUserIds = followingUsers.map((followingUser) => followingUser.to)
 
+    const fetchPostsFromIds = [
+        for_user_id,
+        ...followingUserIds,
+    ]
+
     let posts = await Post.find({
-        user_id: { $in: followingUserIds }
+        user_id: { $in: fetchPostsFromIds }
     })
         .sort({ created_at: -1 })
         .limit(limit)
