@@ -141,6 +141,10 @@ export default class PostsExplorer extends React.Component {
 
     render() {
         if (this.props.posts.length === 0) {
+            if (typeof this.props.emptyListRender === "function") {
+                return React.createElement(this.props.emptyListRender)
+            }
+
             return <div className="no_more_posts">
                 <antd.Empty />
                 <h1>Whoa, nothing on here...</h1>
