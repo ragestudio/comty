@@ -21,7 +21,7 @@ const NoResultComponent = () => {
 }
 
 // FIXME: Scroll behavior should scroll to next post or the previous one depending on the direction of the scroll
-export default class PostsExplorer extends React.Component {
+export default class PostsLists extends React.Component {
     state = {
         currentIndex: 0,
     }
@@ -126,19 +126,6 @@ export default class PostsExplorer extends React.Component {
         app.setLocation(`/post/${data._id}`)
     }
 
-    getPostRender = (item, index = this.props.posts.length) => {
-        return <PostCard
-            key={index}
-            data={item}
-            events={{
-                onClickLike: this.onLikePost,
-                onClickDelete: this.onDeletePost,
-                onClickSave: this.onSavePost,
-                onDoubleClick: this.onDoubleClickPost,
-            }}
-        />
-    }
-
     render() {
         if (this.props.posts.length === 0) {
             if (typeof this.props.emptyListRender === "function") {
@@ -167,7 +154,16 @@ export default class PostsExplorer extends React.Component {
             >
                 {
                     this.props.posts.map((post, index) => {
-                        return this.getPostRender(post, index)
+                        return <PostCard
+                            key={index}
+                            data={post}
+                            events={{
+                                onClickLike: this.onLikePost,
+                                onClickDelete: this.onDeletePost,
+                                onClickSave: this.onSavePost,
+                                onDoubleClick: this.onDoubleClickPost,
+                            }}
+                        />
                     })
                 }
             </LoadMore>
