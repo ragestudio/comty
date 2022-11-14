@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import Livestream from "../../models/livestream"
 
-import { UserPreview } from "components"
+import { UserPreview, LiveChat } from "components"
 import { Icons } from "components/Icons"
 
 import Plyr from "plyr"
@@ -235,11 +235,9 @@ export default class StreamViewer extends React.Component {
                     </div>
                 </div>
                 <div className="chatbox">
-                    <antd.Result>
-                        <h1>
-                            Cannot connect with chat server
-                        </h1>
-                    </antd.Result>
+                    <LiveChat
+                        roomId={`livestream/${this.state.streamInfo?.username}`}
+                    />
                 </div>
             </div>
         </div>
