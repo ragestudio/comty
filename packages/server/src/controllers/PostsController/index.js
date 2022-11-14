@@ -18,7 +18,21 @@ export default class PostsController extends Controller {
                     skip: req.query?.trim,
                     from_user_id: req.query?.user_id,
                     for_user_id: req.user?._id.toString(),
-                    savedOnly: req.query?.savedOnly,
+                })
+
+                return res.json(posts)
+            })
+        },
+        "/saved_posts": {
+            middlewares: ["withOptionalAuthentication"],
+            fn: Schematized({
+                select: ["user_id"]
+            }, async (req, res) => {
+                let posts = await GetPostData({
+                    limit: req.query?.limit,
+                    skip: req.query?.trim,
+                    for_user_id: req.user?._id.toString(),
+                    savedOnly: true,
                 })
 
                 return res.json(posts)
