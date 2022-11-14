@@ -35,6 +35,9 @@ export { default as FeaturedEventsAnnouncements } from "./FeaturedEventsAnnounce
 
 export { default as NotificationsCenter } from "./NotificationsCenter"
 
+// LiveChat
+export { default as LiveChat } from "./LiveChat"
+
 // CREATOR
 export { default as Creator } from "./Creator"
 
