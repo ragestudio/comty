@@ -32,9 +32,11 @@ export default class Feed extends React.Component {
                 posts: [data, ...this.state.posts],
             })
         },
-        "post.delete": async (data) => {
+        "post.delete": async (id) => {
             this.setState({
-                posts: this.state.posts.filter((post) => post.id !== data.id),
+                posts: this.state.posts.filter((post) => {
+                    return post._id !== id
+                }),
             })
         }
     }
