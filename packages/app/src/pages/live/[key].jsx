@@ -8,6 +8,7 @@ import { Icons } from "components/Icons"
 
 import Plyr from "plyr"
 import Hls from "hls.js"
+import mpegts from "mpegts.js"
 
 import "plyr/dist/plyr.css"
 import "./index.less"
@@ -21,8 +22,8 @@ export default class StreamViewer extends React.Component {
         spectators: 0,
 
         player: null,
-        loadedDecoder: "hls",
         decoderInstance: null,
+
         plyrOptions: {},
     }
 
@@ -35,13 +36,29 @@ export default class StreamViewer extends React.Component {
     }
 
     attachDecoder = {
-        hls: (source) => {
+        flv: (source) => {
             if (!source) {
                 console.error("Stream source is not defined")
                 return false
             }
 
-            this.toogleSourceLoading(true)
+            const decoderInstance = mpegts.createPlayer({
+                type: "flv",
+                isLive: true,
+                url: source
+            })
+
+            decoderInstance.attachMediaElement(this.videoPlayerRef.current)
+            decoderInstance.load()
+            decoderInstance.play()
+
+            return decoderInstance
+        },
+        hls: (source) => {
+            if (!source) {
+                console.error("Stream source is not defined")
+                return false
+            }
 
             const hlsInstance = new Hls({
                 autoStartLoad: true,
@@ -54,15 +71,10 @@ export default class StreamViewer extends React.Component {
 
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
                     console.log(`${data.levels.length} quality levels found`)
-
-                    this.toogleSourceLoading(false)
-
-                    // try auto play
-                    this.videoPlayerRef.current.play()
                 })
             })
 
-            hlsInstance.on(Hls.Events.ERROR, function (event, data) {
+            hlsInstance.on(Hls.Events.ERROR, (event, data) => {
                 console.error(event, data)
 
                 switch (data.details) {
@@ -81,7 +93,7 @@ export default class StreamViewer extends React.Component {
                 hlsInstance.on(event, this.playerDecoderEvents[event])
             })
 
-            this.setState({ decoderInstance: hlsInstance, loadedDecoder: "hls" })
+            return hlsInstance
         }
     }
 
@@ -92,6 +104,8 @@ export default class StreamViewer extends React.Component {
             return false
         }
 
+        console.log("Stream info", streamInfo)
+
         this.setState({ streamInfo: streamInfo })
     }
 
@@ -101,18 +115,20 @@ export default class StreamViewer extends React.Component {
         // get stream info
         await this.loadStreamInfo(requestedUsername)
 
-        console.log("Stream info", this.state.streamInfo)
-
         if (this.state.streamInfo) {
             if (!this.state.streamInfo.sources) {
+                console.error("Stream sources is not defined")
+
                 return false
             }
 
             this.enterPlayerAnimation()
 
             const player = new Plyr("#player", {
+                clickToPlay: false,
                 autoplay: true,
-                controls: ["play", "mute", "volume", "fullscreen", "options", "settings"],
+                controls: ["mute", "volume", "fullscreen", "airplay", "options", "settings",],
+                settings: ["quality"],
                 ...this.state.plyrOptions,
             })
 
@@ -120,7 +136,7 @@ export default class StreamViewer extends React.Component {
                 player,
             })
 
-            await this.loadDecoder("hls", this.state.streamInfo.sources.hls)
+            await this.loadDecoder("flv", this.state.streamInfo.sources.flv)
         }
     }
 
@@ -133,30 +149,26 @@ export default class StreamViewer extends React.Component {
         app.style.applyVariant("dark")
 
         app.eventBus.emit("style.compactMode", true)
-
-        app.SidebarController.toggleVisibility(false)
     }
 
     exitPlayerAnimation = () => {
         app.style.applyVariant(app.settings.get("themeVariant"))
 
         app.eventBus.emit("style.compactMode", false)
-
-        app.SidebarController.toggleVisibility(true)
     }
 
     updateQuality = (newQuality) => {
-        if (loadedProtocol === "hls") {
-            this.state.protocolInstance.levels.forEach((level, levelIndex) => {
-                if (level.height === newQuality) {
-                    console.log("Found quality match with " + newQuality)
-                    this.state.protocolInstance.currentLevel = levelIndex
-                }
-            })
-        }
-        else {
+        if (this.state.loadedProtocol !== "hls") {
             console.error("Unsupported protocol")
+            return false
         }
+
+        this.state.protocolInstance.levels.forEach((level, levelIndex) => {
+            if (level.height === newQuality) {
+                console.log("Found quality match with " + newQuality)
+                this.state.protocolInstance.currentLevel = levelIndex
+            }
+        })
     }
 
     loadDecoder = async (decoder, ...args) => {
@@ -174,9 +186,19 @@ export default class StreamViewer extends React.Component {
             this.setState({ decoderInstance: null })
         }
 
-        console.log("Switching to " + decoder)
+        this.toogleSourceLoading(true)
 
-        return await this.attachDecoder[decoder](...args)
+        console.log(`Switching decoder to: ${decoder}`)
+
+        const decoderInstance = await this.attachDecoder[decoder](...args)
+
+        await this.setState({
+            decoderInstance: decoderInstance
+        })
+
+        this.toogleSourceLoading(false)
+
+        return decoderInstance
     }
 
     toogleSourceLoading = (to) => {
