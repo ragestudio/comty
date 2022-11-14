@@ -38,6 +38,22 @@ export default class PostsController extends Controller {
                 return res.json(posts)
             })
         },
+        "/user_posts": {
+            middlewares: ["withOptionalAuthentication"],
+            fn: Schematized({
+                required: ["user_id"],
+                select: ["user_id"]
+            }, async (req, res) => {
+                let posts = await GetPostData({
+                    limit: req.query?.limit,
+                    skip: req.query?.trim,
+                    for_user_id: req.user?._id.toString(),
+                    from_user_id: req.query?.user_id,
+                })
+
+                return res.json(posts)
+            })
+        },
         "/post": {
             middlewares: ["withOptionalAuthentication"],
             fn: Schematized({

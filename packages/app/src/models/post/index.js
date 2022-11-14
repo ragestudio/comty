@@ -90,4 +90,23 @@ export default class Post {
 
         return request
     }
+
+    static async getUserPosts({ user_id, trim, limit }) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        if (!user_id) {
+            // use current user_id
+            user_id = app.userData?._id
+        }
+
+        const request = Post.bridge.get.userPosts(undefined, {
+            user_id,
+            trim: trim ?? 0,
+            limit: limit ?? window.app.settings.get("feed_max_fetch"),
+        })
+
+        return request
+    }
 }
