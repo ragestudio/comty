@@ -8,7 +8,7 @@ export default class PostsController extends Controller {
     //static useMiddlewares = ["withAuthentication"]
 
     get = {
-        "/feed": {
+        "/explore/posts": {
             middlewares: ["withOptionalAuthentication"],
             fn: Schematized({
                 select: ["user_id"]
