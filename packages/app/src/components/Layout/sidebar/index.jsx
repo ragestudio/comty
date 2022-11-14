@@ -156,8 +156,8 @@ export default class Sidebar extends React.Component {
 	}
 
 	handleClick = (e) => {
-		if (e.item.props.overrideEvent) {
-			return app.eventBus.emit(e.item.props.overrideEvent, e.item.props.overrideEventProps)
+		if (e.item.props.override_event) {
+			return app.eventBus.emit(e.item.props.override_event, e.item.props.override_event_props)
 		}
 
 		if (typeof e.key === "undefined") {
@@ -248,17 +248,17 @@ export default class Sidebar extends React.Component {
 
 				<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
 					<Menu selectable={false} mode="inline" onClick={this.handleClick}>
-						<Menu.Item key="search" icon={<Icons.Search />} overrideEvent="app.openSearcher" >
+						<Menu.Item key="search" icon={<Icons.Search />} override_event="app.openSearcher" >
 							<Translation>
 								{(t) => t("Search")}
 							</Translation>
 						</Menu.Item>
-						<Menu.Item key="create" icon={<Icons.PlusCircle />} overrideEvent="app.openCreator" >
+						<Menu.Item key="create" icon={<Icons.PlusCircle />} override_event="app.openCreator" >
 							<Translation>
 								{(t) => t("Create")}
 							</Translation>
 						</Menu.Item>
-						<Menu.Item key="notifications" icon={<Icons.Bell />} overrideEvent="app.openNotifications">
+						<Menu.Item key="notifications" icon={<Icons.Bell />} override_event="app.openNotifications">
 							<Translation>
 								{t => t("Notifications")}
 							</Translation>
