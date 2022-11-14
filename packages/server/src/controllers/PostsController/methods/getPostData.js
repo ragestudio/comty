@@ -1,4 +1,5 @@
 import { Post, User, Comment, SavedPost } from "../../../models"
+import fullfillPostsData from "../../../utils/fullfillPostsData"
 
 export default async (payload) => {
     let {
@@ -55,43 +56,11 @@ export default async (payload) => {
     }
 
     // fullfill data
-    posts = posts.map(async (post, index) => {
-        post = post.toObject()
-
-        post.key = Number(skip) + Number(index)
-
-        let user = await User.findById(post.user_id).catch(() => false)
-
-        if (!user) {
-            user = {
-                username: "Deleted user",
-            }
-        }
-
-        let comments = await Comment.find({ parent_id: post._id.toString() })
-            .select("_id")
-            .catch(() => false)
-
-        if (!comments) {
-            comments = []
-        }
-
-        post.comments = comments
-
-        if (for_user_id) {
-            post.isLiked = post.likes.includes(for_user_id)
-            post.isSaved = savedPostsIds.includes(post._id.toString())
-        }
-
-        return {
-            key: Number(skip) + Number(index),
-            ...post,
-            comments: comments.map((comment) => comment._id.toString()),
-            user,
-        }
+    posts = await fullfillPostsData({
+        posts,
+        for_user_id,
+        skip,
     })
-
-    posts = await Promise.all(posts)
 
     // if post_id is specified, return only one post
     if (post_id) {
