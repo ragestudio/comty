@@ -7,6 +7,7 @@ import { Icons, createIconRender } from "components/Icons"
 import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
 
 import FeedBrowser from "./components/feed"
+import ExploreBrowser from "./components/explore"
 import LivestreamsBrowser from "./components/livestreams"
 import SavedPostsBrowser from "./components/savedPosts"
 
@@ -17,6 +18,11 @@ const Tabs = {
         title: "Feed",
         icon: "Rss",
         component: FeedBrowser
+    },
+    "explore": {
+        title: "Explore",
+        icon: "Search",
+        component: ExploreBrowser
     },
     "livestreams": {
         title: "Livestreams",
