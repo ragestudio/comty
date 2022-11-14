@@ -77,4 +77,17 @@ export default class Post {
 
         return request
     }
+
+    static async getSavedPosts({ trim, limit }) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        const request = Post.bridge.get.savedPosts(undefined, {
+            trim: trim ?? 0,
+            limit: limit ?? window.app.settings.get("feed_max_fetch"),
+        })
+
+        return request
+    }
 }
