@@ -42,7 +42,7 @@ export { default as Creator } from "./Creator"
 export { default as FollowButton } from "./FollowButton"
 
 // POSTS
-export { default as PostsFeed } from "./PostsFeed"
+export { default as PostsList } from "./PostsList"
 export { default as PostCard } from "./PostCard"
 export { default as PostCreator } from "./PostCreator"
 
