@@ -24,16 +24,16 @@ const Tabs = {
         icon: "Search",
         component: ExploreBrowser
     },
+    "savedPosts": {
+        title: "Saved posts",
+        icon: "Bookmark",
+        component: SavedPostsBrowser
+    },
     "livestreams": {
         title: "Livestreams",
         icon: "Tv",
         component: LivestreamsBrowser
     },
-    "savedPosts": {
-        title: "Saved posts",
-        icon: "Bookmark",
-        component: SavedPostsBrowser
-    }
 }
 
 export default class Dashboard extends React.Component {
