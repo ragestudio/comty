@@ -13,7 +13,7 @@ export default (props) => {
     let [userData, setUserData] = React.useState(props.user)
 
     const fetchUser = async () => {
-        if (!props.user_id || props.username) {
+        if (!props.user_id && !props.username) {
             console.error("Cannot fetch user data without user_id or username")
             return false
         }
