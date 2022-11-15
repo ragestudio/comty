@@ -45,6 +45,7 @@ export default class StreamViewer extends React.Component {
             const decoderInstance = mpegts.createPlayer({
                 type: "flv",
                 isLive: true,
+                enableWorker: true,
                 url: source
             })
 
