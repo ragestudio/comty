@@ -1,6 +1,6 @@
 {
   "name": "@comty/server",
-  "version": "0.29.3",
+  "version": "0.30.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "corenode-cli build",
