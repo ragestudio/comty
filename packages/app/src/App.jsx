@@ -126,6 +126,12 @@ class App extends React.Component {
 		"app.reload": () => {
 			window.location.reload()
 		},
+		"app.softReload": () => {
+			this.forceUpdate()
+
+			app.eventBus.emit("layout.forceUpdate")
+			app.eventBus.emit("router.forceUpdate")
+		},
 		"app.openSearcher": () => {
 			App.publicMethods.openSearcher()
 		},
