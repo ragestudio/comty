@@ -123,6 +123,15 @@ class App extends React.Component {
 				window.electron.ipcRenderer.invoke("app.minimize")
 			}
 		},
+		"app.reload": () => {
+			window.location.reload()
+		},
+		"app.softReload": () => {
+			this.forceUpdate()
+
+			app.eventBus.emit("layout.forceUpdate")
+			app.eventBus.emit("router.forceUpdate")
+		},
 		"app.openSearcher": () => {
 			App.publicMethods.openSearcher()
 		},

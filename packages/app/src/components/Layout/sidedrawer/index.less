@@ -3,6 +3,12 @@
 .sidedrawers-wrapper {
     display: flex;
     flex-direction: row;
+
+    &.floating-sidebar {
+        z-index: 950;
+        position: absolute;
+        margin-left: @app_sidebar_collapsed_width;
+    }
     
     .sidedrawer {
         position: relative;

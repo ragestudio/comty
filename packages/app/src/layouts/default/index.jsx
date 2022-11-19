@@ -12,13 +12,18 @@ export default (props) => {
             <Drawer />
             <Sidebar user={props.user} />
             <Sidedrawer />
-            <Layout className="content_layout">
-                <Layout.Content className={classnames("layout_page", ...props.layoutPageModesClassnames ?? [])}>
-                    <div id="transitionLayer" className="fade-transverse-active">
-                        {React.cloneElement(props.children, props)}
-                    </div>
-                </Layout.Content>
-            </Layout>
+            <Layout.Content className={
+                classnames(
+                    "content_layout",
+                    ...props.contentClassnames ?? [],
+                    {
+                        ["floating-sidebar"]: window.app?.settings.get("sidebar.floating")
+                    }
+                )}>
+                <div id="transitionLayer" className="fade-transverse-active">
+                    {React.cloneElement(props.children, props)}
+                </div>
+            </Layout.Content>
         </Layout>
     </>
 }

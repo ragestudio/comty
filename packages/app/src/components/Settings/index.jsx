@@ -91,6 +91,10 @@ const SettingItem = (props) => {
 			}
 		}
 
+		if (item.storaged) {
+			await window.app.settings.set(item.id, updateValue)
+		}
+
 		if (typeof item.emitEvent === "string") {
 			let emissionPayload = updateValue
 
@@ -103,10 +107,6 @@ const SettingItem = (props) => {
 
 		if (item.noUpdate) {
 			return false
-		}
-
-		if (item.storaged) {
-			await window.app.settings.set(item.id, updateValue)
 		}
 
 		if (item.debounced) {

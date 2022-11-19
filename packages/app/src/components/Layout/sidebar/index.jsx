@@ -227,6 +227,7 @@ export default class Sidebar extends React.Component {
 					classnames(
 						"app_sidebar",
 						{
+							["floating"]: window.app?.settings.get("sidebar.floating"),
 							["collapsed"]: this.state.visible && this.state.collapsed,
 							["elevated"]: this.state.visible && this.state.elevated,
 							["hidden"]: !this.state.visible,
