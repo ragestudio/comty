@@ -25,6 +25,9 @@ export default class Layout extends React.PureComponent {
 		"app.initialization.finish": () => {
 			app.eventBus.emit("layout.render.unlock")
 		},
+		"layout.forceUpdate": () => {
+			this.forceUpdate()
+		},
 		"layout.render.lock": () => {
 			this.setState({
 				renderLock: true,
