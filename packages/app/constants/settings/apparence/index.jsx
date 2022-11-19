@@ -17,6 +17,16 @@ export default [
         "storaged": true
     },
     {
+        "id": "sidebar.floating",
+        "title": "Floating Sidebar",
+        "description": "Make the sidebar floats over layout content.",
+        "component": "Switch",
+        "icon": "MdOutlineLastPage",
+        "group": "layout",
+        "emitEvent": "layout.forceUpdate",
+        "storaged": true
+    },
+    {
         "id": "reduceAnimations",
         "storaged": true,
         "group": "aspect",

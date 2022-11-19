@@ -15,6 +15,7 @@
     "postCard_expansible_actions": true,
     "feed_max_fetch": 20,
     "style.compactMode": false,
+    "sidebar.floating": false,
     "language": "en",
     "sidebarKeys": [
         "home",
