@@ -23,7 +23,7 @@ export default [
         "component": "Switch",
         "icon": "MdOutlineLastPage",
         "group": "layout",
-        "emitEvent": "layout.forceUpdate",
+        "emitEvent": "app.softReload",
         "storaged": true
     },
     {
