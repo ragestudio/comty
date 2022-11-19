@@ -224,7 +224,12 @@ export default class SidedrawerController extends React.Component {
 
 	render() {
 		return <div
-			className="sidedrawers-wrapper"
+			className={classnames(
+				"sidedrawers-wrapper",
+					{
+						["floating-sidebar"]: window.app?.settings.get("sidebar.floating")
+					}
+				)}
 		>
 			{this.state.drawers}
 		</div>
