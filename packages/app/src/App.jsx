@@ -123,6 +123,9 @@ class App extends React.Component {
 				window.electron.ipcRenderer.invoke("app.minimize")
 			}
 		},
+		"app.reload": () => {
+			window.location.reload()
+		},
 		"app.openSearcher": () => {
 			App.publicMethods.openSearcher()
 		},
