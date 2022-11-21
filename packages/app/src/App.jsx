@@ -58,6 +58,7 @@ import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
 import config from "config"
+import * as Utils from "./utils"
 
 import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher, NotificationsCenter } from "components"
 import { DOMWindow } from "components/RenderWindow"
@@ -164,6 +165,15 @@ class App extends React.Component {
 					duration: 15,
 				})
 			}
+		},
+		"app.clearInternalStorage": async () => {
+			antd.Modal.confirm({
+				title: "Clear internal storage",
+				content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
+				onOk: async () => {
+					Utils.deleteInternalStorage()
+				}
+			})
 		},
 		"session.logout": async () => {
 			await this.sessionController.logout()
