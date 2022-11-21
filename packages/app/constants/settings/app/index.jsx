@@ -59,6 +59,16 @@ export default [
         }
     },
     {
+        "id": "clear_internal_storage",
+        "storaged": false,
+        "group": "general",
+        "component": "Button",
+        "icon": "MdDelete",
+        "title": "Clear internal storage",
+        "description": "Clear all the data stored in the internal storage, including your current session. It will not affect the data stored in the cloud.",
+        "emitEvent": "app.clearInternalStorage"
+    },
+    {
         "id": "notifications_sound",
         "storaged": true,
         "group": "notifications",
