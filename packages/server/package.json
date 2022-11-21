@@ -10,19 +10,19 @@
   "dependencies": {
     "@corenode/utils": "0.28.26",
     "@foxify/events": "^2.1.0",
-    "@tensorflow/tfjs-node": "^4.0.0",
+    "@tensorflow/tfjs-node": "4.0.0",
     "axios": "1.1.3",
     "bcrypt": "5.0.1",
     "connect-mongo": "4.6.0",
     "corenode": "0.28.26",
     "dicebar_lib": "1.0.1",
     "dotenv": "16.0.1",
-    "fluent-ffmpeg": "^2.1.2",
-    "formidable": "^2.0.1",
+    "fluent-ffmpeg": "2.1.2",
+    "formidable": "2.0.1",
     "jsonwebtoken": "8.5.1",
     "linebridge": "0.13.0",
     "luxon": "^3.0.4",
-    "minio": "^7.0.32",
+    "minio": "7.0.32",
     "moment": "2.29.4",
     "moment-timezone": "0.5.37",
     "mongoose": "6.6.5",
@@ -32,7 +32,7 @@
     "passport-jwt": "4.0.0",
     "passport-local": "1.0.0",
     "path-to-regexp": "6.2.0",
-    "sharp": "^0.31.1"
+    "sharp": "0.31.1"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
