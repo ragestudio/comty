@@ -1,4 +1,4 @@
-import { User } from "../../../models"
+import { User } from "../../models"
 import { createUser } from "../../../lib"
 
 export default async () => {
