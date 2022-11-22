@@ -142,8 +142,9 @@ class App extends React.Component {
 		"app.openNotifications": () => {
 			App.publicMethods.openNotifications()
 		},
-		"app.createLogin": async () => {
+		"app.createLogin": async (options = {}) => {
 			app.DrawerController.open("login", Login, {
+				defaultLocked: options.defaultLocked ?? false,
 				componentProps: {
 					sessionController: this.sessionController
 				}
