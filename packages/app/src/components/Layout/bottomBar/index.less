@@ -1,31 +1,30 @@
-@bottomBar_height: 80px;
+@bottomBar_height: 75px;
 @bottomBar_iconSize: 24px;
 
 .bottomBar {
-	position: sticky;
-	z-index: 9999;
-	
-	left: 0;
-	bottom: 0;
-
-	width: 100vw;
-	min-width: 100vw;
-	max-width: 100vw;
-	
-	overflow: hidden;
-
 	display: flex;
 	flex-direction: row;
 
 	align-items: center;
 	justify-content: center;
 
-	background-color: var(--background-color-accent);
-	border-radius: 12px 12px 0 0;
+	position: fixed;
+	z-index: 9999;
+
+	left: 0;
+	bottom: 0;
+
+	width: 100vw;
+	min-width: 100vw;
+	max-width: 100vw;
 
 	height: @bottomBar_height;
 
 	padding: 10px;
+	overflow: hidden;
+
+	background-color: var(--background-color-accent);
+	border-radius: 12px 12px 0 0;
 
 	.items {
 		display: inline-flex;
@@ -45,7 +44,7 @@
 			justify-content: center;
 
 			transition: all 150ms ease-in;
-			
+
 			width: 20vw;
 			min-width: 20vw;
 			max-width: 20vw;
@@ -63,12 +62,12 @@
 
 				color: var(--background-color-contrast);
 				font-size: 2rem;
-				
+
 				padding: 12px;
 				transition: all 70ms ease-in-out;
 
-				svg{
-					margin: 0!important;
+				svg {
+					margin: 0 !important;
 				}
 			}
 
