@@ -7,19 +7,18 @@ import "./index.less"
 export default class DrawerController extends React.Component {
 	constructor(props) {
 		super(props)
+
 		this.state = {
 			addresses: {},
 			refs: {},
 			drawers: [],
 		}
 
-		this.DrawerController = {
+		window.app["DrawerController"] = {
 			open: this.open,
 			close: this.close,
 			closeAll: this.closeAll,
 		}
-
-		window.app["DrawerController"] = this.DrawerController
 	}
 
 	sendEvent = (id, ...context) => {
@@ -60,31 +59,29 @@ export default class DrawerController extends React.Component {
 		this.setState({ refs, addresses, drawers })
 	}
 
-	destroy = (id) => {
+	close = (id) => {
 		let { addresses, drawers, refs } = this.state
+
 		const index = addresses[id]
+
+		const ref = this.state.refs[id]?.current
+
+		if (typeof ref === "undefined") {
+			return console.warn("This drawer not exists")
+		}
+
+		if (ref.state.locked && ref.state.visible) {
+			return console.warn("This drawer is locked and cannot be closed")
+		}
 
 		if (typeof drawers[index] !== "undefined") {
 			drawers = drawers.filter((value, i) => i !== index)
 		}
+
 		delete addresses[id]
 		delete refs[id]
 
 		this.setState({ addresses, drawers })
-	}
-
-	close = (id) => {
-		const ref = this.state.refs[id]?.current
-
-		if (typeof ref !== "undefined") {
-			if (ref.state.locked && ref.state.visible) {
-				return console.warn("This drawer is locked and cannot be closed")
-			} else {
-				return ref.close()
-			}
-		} else {
-			return console.warn("This drawer not exists")
-		}
 	}
 
 	closeAll = () => {
@@ -100,12 +97,19 @@ export default class DrawerController extends React.Component {
 
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
+
 	events = new EventBus()
+
 	state = {
 		visible: true,
+		locked: false,
 	}
 
 	componentDidMount = async () => {
+		if (this.options.defaultLocked) {
+			this.setState({ locked: true })
+		}
+
 		if (typeof this.props.controller === "undefined") {
 			throw new Error(`Cannot mount an drawer without an controller`)
 		}
@@ -118,8 +122,21 @@ export class Drawer extends React.Component {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
+	lock = async () => {
+		return await this.setState({ locked: true })
+	}
+
+	unlock = async () => {
+		return await this.setState({ locked: false })
+	}
+
 	close = () => {
+		if (this.state.locked) {
+			return console.warn("Cannot close a locked drawer")
+		}
+
 		this.toogleVisibility(false)
+
 		this.events.emit("beforeClose")
 
 		setTimeout(() => {
@@ -127,7 +144,7 @@ export class Drawer extends React.Component {
 				this.options.onClose()
 			}
 
-			this.props.controller.destroy(this.props.id)
+			this.props.controller.close(this.props.id)
 		}, 500)
 	}
 
