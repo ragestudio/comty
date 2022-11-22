@@ -437,7 +437,7 @@ class App extends React.Component {
 					const storedRemotes = await app.settings.get("remotes") ?? {}
 
 					// mount main api bridge
-					await this.props.cores.ApiCore.connectBridge("main", {
+					await this.props.cores.ApiCore.attachBridge("main", {
 						origin: storedRemotes.mainApi ?? defaultRemotes.mainApi,
 						locked: true,
 					})
