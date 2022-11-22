@@ -161,8 +161,6 @@ export default class Layout extends React.PureComponent {
 			return JSON.stringify(this.state.renderError)
 		}
 
-		console.debug(`Rendering layout [${this.state.layoutType}] for current route [${window.location.pathname}]`)
-
 		// check with the current route if it's a protected route or requires some permissions
 		const routeDeclaration = routes.find((route) => route.path === window.location.pathname)
 
@@ -195,6 +193,8 @@ export default class Layout extends React.PureComponent {
 			...this.props.bindProps,
 			...this.state,
 		}
+
+		console.debug(`Rendering layout [${this.state.layoutType}] for current route [${window.location.pathname}]`)
 
 		const Layout = Layouts[layoutType]
 
