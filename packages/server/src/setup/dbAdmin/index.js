@@ -1,5 +1,5 @@
 import { User } from "../../models"
-import { createUser } from "../../../lib"
+import { createUser } from "../../lib"
 
 export default async () => {
     // check if any user with includes admin role exists
