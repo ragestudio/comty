@@ -310,7 +310,14 @@ class App extends React.Component {
 			window.app.ModalController.open((props) => <Creator {...props} />)
 		},
 		openSettings: (goTo) => {
-			window.app.SidedrawerController.open("Settings", Settings, {
+			const controller = window.isMobile ? app.DrawerController : app.SidedrawerController
+
+			if (!controller) {
+				console.error("No controller found")
+				return false
+			}
+
+			controller.open("Settings", Settings, {
 				props: {
 					width: "fit-content",
 					goTo,
