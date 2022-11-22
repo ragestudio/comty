@@ -20,7 +20,6 @@ const LocalStrategy = require("passport-local").Strategy
 const controllers = require("./controllers")
 const middlewares = require("./middlewares")
 
-global.httpListenPort = process.env.PORT || 3000
 global.signLocation = process.env.signLocation
 
 export default class Server {
@@ -51,7 +50,7 @@ export default class Server {
     middlewares = middlewares
 
     server = new LinebridgeServer({
-        port: httpListenPort,
+        port: process.env.MAIN_LISTEN_PORT || 3000,
         headers: {
             "Access-Control-Expose-Headers": "regenerated_token",
         },
