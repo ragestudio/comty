@@ -47,7 +47,7 @@ export default (props) => {
         </div>
 
         <div className="wrapper">
-            <img src={config.logo.full} className="logo" />
+            <img src={window.isMobile ? config.logo.alt : config.logo.full} className="logo" />
 
             <div className="content">
                 <div className="title">
