@@ -5,25 +5,38 @@ const NotFoundRender = () => {
     return <div>Not found</div>
 }
 
-const DebugRoutes = import.meta.glob("/src/debug/components/**/[a-z[]*.jsx")
-const JSXRoutes = import.meta.glob("/src/pages/**/[a-z[]*.jsx")
-const TSXRoutes = import.meta.glob("/src/pages/**/[a-z[]*.tsx")
-
-const scriptRoutes = {
-    ...DebugRoutes,
-    ...JSXRoutes,
-    ...TSXRoutes,
+const paths = {
+    ...import.meta.glob("/src/debug/components/**/[a-z[]*.jsx"),
+    ...import.meta.glob("/src/pages/**/[a-z[]*.jsx"),
+    ...import.meta.glob("/src/pages/**/[a-z[]*.tsx"),
 }
 
-const routes = Object.keys(scriptRoutes).map((route) => {
+const pathsMobile = {
+    ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.jsx"),
+    ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.tsx"),
+}
+
+const routes = Object.keys(paths).map((route) => {
     const path = route
         .replace(/\/src\/pages|index|\.jsx$/g, "")
+        .replace(/\/src\/pages|index|\.tsx$/g, "")
         .replace(/\/src\/debug\/components/g, "/debug")
         .replace(/\[\.{3}.+\]/, "*")
         .replace(/\[(.+)\]/, ":$1")
 
-    return { path, component: React.lazy(scriptRoutes[route]) }
+    return { path, component: React.lazy(paths[route]) }
 })
+
+const mobileComponents = Object.fromEntries(Object.keys(pathsMobile).map((route) => {
+    const path = route
+        .replace(/\/src\/pages|index|\.mobile|\.jsx$/g, "")
+        .replace(/\/src\/pages|index|\.mobile|\.tsx$/g, "")
+        .replace(/\/src\/debug\/components/g, "/debug")
+        .replace(/\[\.{3}.+\]/, "*")
+        .replace(/\[(.+)\]/, ":$1")
+
+    return [path, React.lazy(pathsMobile[route])]
+}))
 
 export function BindContexts(component) {
     let contexts = {
@@ -132,18 +145,29 @@ export const InternalRouter = (props) => {
 export const PageRender = (props) => {
     return <React.Suspense fallback={props.staticRenders?.PageLoad ? React.createElement(props.staticRenders?.PageLoad) : "Loading..."}>
         <Switch>
-            {routes.map(({ path, component: Component = React.Fragment }) => (
-                <Route
+            {routes.map(({ path, component: Component = React.Fragment }) => {
+                if (window.isMobile) {
+                    if (mobileComponents[path]) {
+                        Component = mobileComponents[path]
+                    } else {
+                        console.warn(`No mobile component for ${path}, using default`)
+                    }
+                }
+
+                const generateRenderComponent = (props) => {
+                    return React.createElement(BindContexts(Component), {
+                        ...props,
+                        history: props.history,
+                    })
+                }
+
+                return <Route
                     key={path}
                     path={path}
-                    component={(_props) => React.createElement(BindContexts(Component), {
-                        ...props,
-                        ..._props,
-                        history: props.history,
-                    })}
+                    component={generateRenderComponent}
                     exact={true}
                 />
-            ))}
+            })}
             <Route path="*" component={props.staticRenders?.NotFound ?? NotFoundRender} />
         </Switch>
     </React.Suspense>
