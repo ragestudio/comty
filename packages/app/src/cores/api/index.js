@@ -165,8 +165,12 @@ export default class ApiCore extends Core {
         window.app.eventBus.emit("session.regenerated")
     }
 
-    connectBridge = (key, params) => {
-        this.namespaces[key] = this.createBridge(params)
+    attachBridge = (key, params) => {
+        return this.namespaces[key] = this.createBridge(params)
+    }
+
+    detachBridge = (key) => {
+        return delete this.namespaces[key]
     }
 
     createBridge(params = {}) {
