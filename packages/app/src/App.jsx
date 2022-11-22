@@ -334,6 +334,15 @@ class App extends React.Component {
 			return window.app.setLocation(config.app.mainPath ?? "/home")
 		},
 		goToAccount: (username) => {
+			if (!username) {
+				if (!app.userData) {
+					console.error("Cannot go to account, no username provided and no user logged in")
+					return false
+				}
+
+				username = app.userData.username
+			}
+
 			return window.app.setLocation(`/@${username}`)
 		},
 		goToPost: (id) => {
