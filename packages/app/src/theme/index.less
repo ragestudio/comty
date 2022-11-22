@@ -163,16 +163,16 @@ html {
 .content_layout {
 	position: relative;
 	-webkit-overflow-scrolling: touch;
-	
+
 	height: 100%;
 	width: 100%;
 	max-height: 100vh;
 
 	padding: 10px;
-	
+
 	overflow-x: hidden;
 	overflow-y: overlay;
-	
+
 	transition: all 150ms ease-in-out;
 
 	margin: var(--layoutMargin);
@@ -294,5 +294,29 @@ html {
 
 	.postCard {
 		min-width: 30px;
+	}
+}
+
+.app_layout {
+	&.mobile {
+		.loginPage {
+			flex-direction: column;
+
+			.wallpaper {
+				width: 100vw;
+			}
+		}
+
+		.postPage {
+			display: flex;
+			flex-direction: column;
+
+			.commentsWrapper {
+				position: absolute;
+
+				bottom: 0;
+				left: 0;
+			}
+		}
 	}
 }
