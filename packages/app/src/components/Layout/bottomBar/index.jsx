@@ -1,44 +1,29 @@
 import React from "react"
-import { Motion, spring } from "react-motion"
-import { EviteComponent } from "evite"
 import * as antd from "antd"
-import { createIconRender } from "components/Icons"
 import classnames from "classnames"
+import { Motion, spring } from "react-motion"
+
+import { createIconRender } from "components/Icons"
 
 import "./index.less"
 
-export default class BottomBar extends EviteComponent {
+export default class BottomBar extends React.Component {
     state = {
         allowed: true,
-        show: false,
-        visible: false,
-        creatorActionsVisible: false,
+        show: true,
+        visible: true,
         render: null,
-        isManager: false,
     }
 
-    handleBusEvents = {
-        "app.render_initialization": () => {
-            this.toggle(false)
-        },
-        "app.render_initialization_done": () => {
-            if (this.isAllowed()) {
-                this.toggle(true)
-            }
-        },
-        "app.crash": () => {
-            this.toggle(false)
-        },
-        "locationChange": () => {
-            this.toggle(this.isAllowed())
+    busEvents = {
+        "runtime.crash": () => {
+            this.toggleVisibility(false)
         }
     }
 
     componentDidMount = () => {
-        this._loadBusEvents()
-
-        window.app.BottomBarController = {
-            toogleVisible: this.toggle,
+        app.BottomBarController = {
+            toogleVisible: this.toggleVisibility,
             isVisible: () => this.state.visible,
             render: (fragment) => {
                 this.setState({ render: fragment })
@@ -47,18 +32,23 @@ export default class BottomBar extends EviteComponent {
                 this.setState({ render: null })
             },
         }
+
+        // Register bus events
+        Object.keys(this.busEvents).forEach((key) => {
+            app.eventBus.on(key, this.busEvents[key])
+        })
     }
 
     componentWillUnmount = () => {
-        this._unloadBusEvents()
         delete window.app.BottomBarController
+
+        // Unregister bus events
+        Object.keys(this.busEvents).forEach((key) => {
+            app.eventBus.off(key, this.busEvents[key])
+        })
     }
 
-    isAllowed() {
-        return app.pageStatement?.bottomBarAllowed !== "undefined" && app.pageStatement?.bottomBarAllowed !== false
-    }
-
-    toggle = (to) => {
+    toggleVisibility = (to) => {
         if (!window.isMobile) {
             to = false
         } else {
@@ -102,7 +92,6 @@ export default class BottomBar extends EviteComponent {
                 }}
             >
                 <div className="items">
-
                     <div
                         key="main"
                         id="main"
@@ -143,14 +132,14 @@ export default class BottomBar extends EviteComponent {
                             {createIconRender("Settings")}
                         </div>
                     </div>
-                    {this.props.user ? <div
+                    {app.userData ? <div
                         key="account"
                         id="account"
                         className="item"
                         onClick={() => window.app.goToAccount()}
                     >
                         <div className="icon">
-                            <antd.Avatar shape="square" src={this.props.user?.avatar} />
+                            <antd.Avatar shape="square" src={app.userData.avatar} />
                         </div>
                     </div> : <div
                         key="login"
