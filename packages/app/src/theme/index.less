@@ -299,6 +299,8 @@ html {
 
 .app_layout {
 	&.mobile {
+		padding: 10px;
+
 		.loginPage {
 			flex-direction: column;
 
@@ -316,6 +318,32 @@ html {
 
 				bottom: 0;
 				left: 0;
+			}
+		}
+
+		.accountProfile {
+			padding: 0;
+
+			.contents {
+				display: flex;
+				flex-direction: column;
+
+				padding: 0;
+
+				.tabMenuWrapper{
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+
+					width: 100%;
+
+					margin: 0;
+
+					.ant-menu {
+						margin: 0;
+					}
+				}
 			}
 		}
 	}
