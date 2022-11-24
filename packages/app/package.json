@@ -31,6 +31,7 @@
     "@capacitor/push-notifications": "1.0.9",
     "@capacitor/status-bar": "1.0.7",
     "@capacitor/storage": "1.2.4",
+    "@capgo/capacitor-updater": "^4.12.8",
     "@corenode/utils": "0.28.26",
     "@emotion/css": "11.0.0",
     "@loadable/component": "5.15.2",

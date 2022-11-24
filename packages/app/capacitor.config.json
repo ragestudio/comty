@@ -3,5 +3,10 @@
     "appName": "Comty",
     "bundledWebRuntime": true,
     "overrideUserAgent": "capacitor",
-    "webDir": "dist"
+    "webDir": "dist",
+    "plugins": {
+        "CapacitorUpdater": {
+            "updateUrl": "https://relic.ragestudio.net/comty/update_check"
+        }
+    }
 }
