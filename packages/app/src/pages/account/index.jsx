@@ -99,6 +99,8 @@ export default class Account extends React.Component {
 
 	coverComponent = React.createRef()
 
+	tabNavigatorRef = React.createRef()
+
 	api = window.app.api.withEndpoints("main")
 
 	componentDidMount = async () => {
@@ -215,8 +217,18 @@ export default class Account extends React.Component {
 		// if component scrolled foward set cover height to 0
 		if (e.target.scrollTop > 0) {
 			this.coverComponent.current.style.height = "0px"
+
+			if (window.isMobile) {
+				this.tabNavigatorRef.current.style.overflow = "hidden"
+				this.tabNavigatorRef.current.style.height = "0px"
+			}
 		} else {
 			this.coverComponent.current.style.height = ""
+
+			if (window.isMobile) {
+				this.tabNavigatorRef.current.style.overflow = ""
+				this.tabNavigatorRef.current.style.height = ""
+			}
 		}
 	}
 
@@ -293,7 +305,7 @@ export default class Account extends React.Component {
 			</div>
 
 			<div className="contents">
-				<div className="tabMenuWrapper">
+				<div className="tabMenuWrapper" ref={this.tabNavigatorRef}>
 					<antd.Menu
 						className="tabMenu"
 						mode={window.isMobile ? "horizontal" : "vertical"}
