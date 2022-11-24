@@ -1,7 +1,57 @@
+@frameDecorator_height: 20px;
+
 .app_layout {
 	&.mobile {
-		padding: 10px;
+		display: flex;
+		flex-direction: column;
 
+		padding: 0;
+
+		.content_wrapper {
+			height: 100%;
+			width: 100%;
+			overflow-y: scroll;
+			padding-top: 20px;
+		}
+
+		.content_layout {
+			display: flex;
+			flex-direction: column;
+
+			overflow: hidden;
+			align-items: center;
+			justify-content: center;
+
+			width: 100vw;
+			padding: 0 10px;
+		}
+
+		.frameDecorator {
+			position: absolute;
+			left: 0;
+
+			z-index: 8000;
+
+			width: 100vw;
+			height: @frameDecorator_height;
+
+			background-color: rgba(var(--layoutBackgroundColor), 0.8);
+
+			filter: blur(4px);
+			backdrop-filter: blur(10px);
+
+			&.top {
+				top: 0;
+				transform: translate(0, -6px);
+			}
+
+			&.bottom {
+				bottom: 0;
+				transform: translate(0, 6px);
+			}
+		}
+
+		// FIXMETS FOR MOBILE LAYOUT
 		.loginPage {
 			flex-direction: column;
 
