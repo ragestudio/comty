@@ -2,7 +2,7 @@ import React from "react"
 import { Skeleton } from "antd"
 import { Icons } from "components/Icons"
 
-import { PostsList } from "components"
+import { PostsList, Searcher } from "components"
 import Post from "models/post"
 
 import "./index.less"
@@ -13,6 +13,8 @@ export default class ExplorePosts extends React.Component {
         initialLoading: true,
         hasMorePosts: true,
         posts: [],
+        focusedSearcher: false,
+        filledSearcher: false,
     }
 
     wsEvents = {
@@ -70,6 +72,22 @@ export default class ExplorePosts extends React.Component {
         }
     }
 
+    toggleFocusSearcher = (to) => {
+        to = to ?? !this.state.focusedSearcher
+
+        this.setState({
+            focusedSearcher: to
+        })
+    }
+
+    toggleState = (key, to) => {
+        to = to ?? !this.state[key]
+
+        this.setState({
+            [key]: to
+        })
+    }
+
     componentDidMount = async () => {
         await this.loadPosts()
 
@@ -87,12 +105,16 @@ export default class ExplorePosts extends React.Component {
     render() {
         return <div className="postsExplore">
             <div className="postsExplore_header">
-                <h1>
-                    <Icons.Search /> Explore
-                </h1>
+                <Searcher
+                    autoFocus={false}
+                    onFocus={() => this.toggleState("focusedSearcher", true)}
+                    onUnfocus={() => this.toggleState("focusedSearcher", false)}
+                    onFilled={() => this.toggleState("filledSearcher", true)}
+                    onEmpty={() => this.toggleState("filledSearcher", false)}
+                />
             </div>
             {
-                this.state.initialLoading ? <Skeleton active /> : <PostsList
+                this.state.focusedSearcher || this.state.filledSearcher ? null : this.state.initialLoading ? <Skeleton active /> : <PostsList
                     loading={this.state.loading}
                     hasMorePosts={this.state.hasMorePosts}
                     onLoadMore={this.loadPosts}
