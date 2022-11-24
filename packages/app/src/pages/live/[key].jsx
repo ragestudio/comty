@@ -3,7 +3,7 @@ import React from "react"
 import * as antd from "antd"
 
 import Livestream from "../../models/livestream"
-
+import { FloatingPanel } from "antd-mobile"
 import { UserPreview, LiveChat } from "components"
 import { Icons } from "components/Icons"
 
@@ -13,6 +13,8 @@ import mpegts from "mpegts.js"
 
 import "plyr/dist/plyr.css"
 import "./index.less"
+
+const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default class StreamViewer extends React.Component {
     state = {
@@ -224,24 +226,30 @@ export default class StreamViewer extends React.Component {
             </div>
         }
 
-        return <div className="stream">
+        return <div className="liveStream">
             <video ref={this.videoPlayerRef} id="player" />
 
-            <div className="panel">
-                <div className="info">
-                    <UserPreview username={this.state.streamInfo?.username} />
+            {
+                window.isMobile ?
+                    <FloatingPanel anchors={floatingPanelAnchors}>
+                        <UserPreview username={this.state.streamInfo?.username} />
+                    </FloatingPanel> :
+                    <div className="panel">
+                        <div className="info">
+                            <UserPreview username={this.state.streamInfo?.username} />
 
-                    <div id="spectatorCount">
-                        <Icons.Eye />
-                        {this.state.spectators}
+                            <div id="spectatorCount">
+                                <Icons.Eye />
+                                {this.state.spectators}
+                            </div>
+                        </div>
+                        <div className="chatbox">
+                            <LiveChat
+                                roomId={`livestream/${this.state.streamInfo?.username}`}
+                            />
+                        </div>
                     </div>
-                </div>
-                <div className="chatbox">
-                    <LiveChat
-                        roomId={`livestream/${this.state.streamInfo?.username}`}
-                    />
-                </div>
-            </div>
+            }
         </div>
     }
 }
