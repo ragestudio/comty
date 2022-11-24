@@ -1,6 +1,6 @@
 {
   "name": "comty",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "license": "LGPL-2.1",
   "main": "electron/main",
   "author": "RageStudio",
@@ -23,9 +23,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",
-    "@capacitor/android": "3.5.1",
-    "@capacitor/core": "3.5.1",
+    "@capacitor/android": "^4.5.0",
+    "@capacitor/cli": "^4.5.0",
+    "@capacitor/core": "^4.5.0",
     "@capacitor/haptics": "1.1.4",
+    "@capacitor/ios": "^4.5.0",
     "@capacitor/push-notifications": "1.0.9",
     "@capacitor/status-bar": "1.0.7",
     "@capacitor/storage": "1.2.4",
