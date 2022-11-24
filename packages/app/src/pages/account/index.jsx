@@ -19,7 +19,7 @@ const TabsComponent = {
 	"details": DetailsTab
 }
 
-const TabRender = React.memo((props) => {
+const TabRender = React.memo((props, ref) => {
 	const [transitionActive, setTransitionActive] = React.useState(false)
 	const [activeKey, setActiveKey] = React.useState(props.renderKey)
 
@@ -41,8 +41,13 @@ const TabRender = React.memo((props) => {
 		return null
 	}
 
+	// forwards ref to the tab
 	return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": transitionActive })}>
-		<Tab {...props} />
+		{
+			React.createElement(Tab, {
+				...props,
+			})
+		}
 	</div>
 })
 
@@ -58,8 +63,6 @@ const UserBadges = React.memo((props) => {
 
 				return null
 			})
-
-			console.log(badgesData)
 
 			if (!badgesData) {
 				return null
@@ -148,7 +151,6 @@ export default class Account extends React.Component {
 			followers,
 		})
 
-		// 
 		app.eventBus.emit("style.compactMode", true)
 	}
 
@@ -213,10 +215,8 @@ export default class Account extends React.Component {
 		// if component scrolled foward set cover height to 0
 		if (e.target.scrollTop > 0) {
 			this.coverComponent.current.style.height = "0px"
-			this.contentRef.current.style.height = "100vh"
 		} else {
 			this.coverComponent.current.style.height = ""
-			this.contentRef.current.style.height = ""
 		}
 	}
 
@@ -292,17 +292,11 @@ export default class Account extends React.Component {
 				</div>
 			</div>
 
-			<div
-				ref={this.contentRef}
-				className="contents"
-				onScroll={this.handleScroll}
-				style={{ height: !this.state.user?.cover ? "100vh" : undefined }}
-
-			>
+			<div className="contents">
 				<div className="tabMenuWrapper">
 					<antd.Menu
 						className="tabMenu"
-						mode="vertical"
+						mode={window.isMobile ? "horizontal" : "vertical"}
 						selectedKeys={[this.state.tabActiveKey]}
 						onClick={(e) => this.handlePageTransition(e.key)}
 					>
@@ -320,7 +314,7 @@ export default class Account extends React.Component {
 					</antd.Menu>
 				</div>
 
-				<div className="tabContent">
+				<div className="tabContent" ref={this.contentRef} onScroll={this.handleScroll}>
 					<TabRender
 						renderKey={this.state.tabActiveKey}
 						state={this.state}
