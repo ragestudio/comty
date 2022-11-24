@@ -9,9 +9,11 @@ export default (props) => {
         <Modal />
 
         <antd.Layout.Content className={classnames("content_layout", ...props.layoutPageModesClassnames ?? [])}>
-            <div id="transitionLayer" className="fade-transverse-active">
+            <div className={classnames("frameDecorator", "top")} />
+            <div id="transitionLayer" className={classnames("content_wrapper", "fade-transverse-active")}>
                 {React.cloneElement(props.children, props)}
             </div>
+            <div className={classnames("frameDecorator", "bottom")} />
         </antd.Layout.Content>
 
         <BottomBar />
