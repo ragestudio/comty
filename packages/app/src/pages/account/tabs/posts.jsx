@@ -1,6 +1,5 @@
 import React from "react"
 import { Skeleton } from "antd"
-import { Icons } from "components/Icons"
 
 import { PostsList } from "components"
 import Post from "models/post"
@@ -20,6 +19,8 @@ export default class UserPosts extends React.Component {
         hasMorePosts: true,
         posts: [],
     }
+
+    contentsRef = React.createRef()
 
     loadData = async ({
         trim,
@@ -76,6 +77,7 @@ export default class UserPosts extends React.Component {
                     emptyListRender={emptyListRender}
                     onLoadMore={this.loadData}
                     posts={this.state.posts}
+                    ref={this.contentsRef}
                 />
             }
         </div>
