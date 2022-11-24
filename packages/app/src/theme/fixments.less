@@ -1,6 +1,10 @@
 @inputsBorderRadius: 9px;
 @buttonsBorderRadius: 9px;
 
+:root {
+    --adm-color-background: var(--background-color-primary);
+}
+
 // Fixments
 .ant-btn {
     display: flex;
@@ -435,4 +439,10 @@
     background: var(--background-color-accent);
 
     color: var(--text-color);
+}
+
+.adm-floating-panel {
+    .adm-floating-panel-header {
+        border-top: 1px solid var(--border-color);
+    }
 }
