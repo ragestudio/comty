@@ -49,7 +49,7 @@ const AccountButton = (props) => {
             actions: [
                 {
                     key: "settings",
-                    text: <><Icons.Settings /> Settings</>,
+                    text: <><Icons.Settings /> <span>Settings</span></>,
                     onClick: () => {
                         app.openSettings()
                         ActionSheetRef.current.close()
@@ -57,7 +57,7 @@ const AccountButton = (props) => {
                 },
                 {
                     key: "savedPosts",
-                    text: <><Icons.Bookmark /> Saved Posts</>,
+                    text: <><Icons.Bookmark /> <span>Saved Posts</span></>,
                     onClick: () => {
                         app.setLocation("/home/savedPosts")
                         ActionSheetRef.current.close()
@@ -65,7 +65,7 @@ const AccountButton = (props) => {
                 },
                 {
                     key: "about",
-                    text: <><Icons.Info /> About</>,
+                    text: <><Icons.Info /> <span>About</span></>,
                     onClick: () => {
                         app.setLocation("/about")
                         ActionSheetRef.current.close()
