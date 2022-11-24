@@ -66,6 +66,10 @@ export default class ContextMenuCore extends Core {
             }
         }
 
+        if (!items) {
+            return null
+        }
+
         // fullfill each item with a correspondent index if missing declared
         items = items.map((item, index) => {
             if (!item.index) {
@@ -104,13 +108,20 @@ export default class ContextMenuCore extends Core {
             return
         }
 
+        const items = this.generateItems(component)
+
+        if (!items) {
+            console.warn("No context menu items found, aborting")
+            return false
+        }
+
         this.show({
             cords: {
                 x,
                 y,
             },
             clickedComponent: component,
-            items: this.generateItems(component),
+            items: items,
         })
     }
 

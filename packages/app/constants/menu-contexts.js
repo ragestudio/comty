@@ -11,6 +11,9 @@ function copyToClipboard(text) {
 }
 
 export default {
+    "ignore": () => {
+        return false
+    },
     "postCard-context": (parent, element, control) => {
         const items = [
             {
