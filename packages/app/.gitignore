@@ -5,5 +5,4 @@ dist-ssr
 *.local
 .vscode
 yarn-error.log
-ios/**/**
 out/
