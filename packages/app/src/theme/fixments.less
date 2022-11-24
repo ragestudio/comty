@@ -1,3 +1,6 @@
+@inputsBorderRadius: 9px;
+@buttonsBorderRadius: 9px;
+
 // Fixments
 .ant-btn {
     display: flex;
@@ -6,6 +9,8 @@
 
     user-select: none;
     --webkit-user-select: none;
+
+    border-radius: @buttonsBorderRadius;
 }
 
 .ant-result-extra {
@@ -52,6 +57,16 @@
         span {
             margin: 0;
         }
+    }
+}
+
+.ant-select {
+    .ant-select-selector {
+        border-radius: @inputsBorderRadius !important;
+    }
+
+    .ant-select-arrow {
+        right: 0px;
     }
 }
 
@@ -397,12 +412,16 @@
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
+
+    border-radius: @inputsBorderRadius;
 }
 
 .ant-input-affix-wrapper {
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
+
+    border-radius: @inputsBorderRadius;
 }
 
 .ant-input-affix-wrapper-status-error {
