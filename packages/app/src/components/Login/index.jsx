@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { FormGenerator } from "components"
 import { Icons } from "components/Icons"
 
 import config from "config"
