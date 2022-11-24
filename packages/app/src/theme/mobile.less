@@ -19,11 +19,33 @@
 			display: flex;
 			flex-direction: column;
 
-			.commentsWrapper {
-				position: absolute;
+			height: 90vh;
 
-				bottom: 0;
-				left: 0;
+			.postCard {
+				&.fullmode {
+					.wrapper {
+						height: 76vh;
+
+						.post_content {
+							.post_attachments {
+								height: 60vh;
+								overflow: hidden;
+
+								.carousel-root {
+									.carousel {
+										min-height: 200px;
+
+										>div {
+											display: flex;
+											align-items: center;
+											height: 100%;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
