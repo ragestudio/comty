@@ -3,6 +3,7 @@
 @import "theme/vars.less";
 @import "theme/fonts.css";
 @import "theme/fixments.less";
+@import "theme/mobile.less";
 
 html {
 	overflow: hidden;
@@ -294,66 +295,5 @@ html {
 
 	.postCard {
 		min-width: 30px;
-	}
-}
-
-.app_layout {
-	&.mobile {
-		padding: 10px;
-
-		.loginPage {
-			flex-direction: column;
-
-			.wallpaper {
-				width: 100vw;
-			}
-		}
-
-		.postPage {
-			display: flex;
-			flex-direction: column;
-
-			.commentsWrapper {
-				position: absolute;
-
-				bottom: 0;
-				left: 0;
-			}
-		}
-
-		.accountProfile {
-			padding: 0;
-
-			.contents {
-				display: flex;
-				flex-direction: column;
-
-				padding: 0;
-
-				margin-top: -4.5vh;
-
-				padding: 0;
-
-				.tabContent {
-					padding: 0;
-					padding-top: 20px;
-				}
-
-				.tabMenuWrapper{
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
-
-					width: 100%;
-
-					margin: 0;
-
-					.ant-menu {
-						margin: 0;
-					}
-				}
-			}
-		}
 	}
 }
