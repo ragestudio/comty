@@ -146,7 +146,10 @@ class App extends React.Component {
 			app.DrawerController.open("login", Login, {
 				defaultLocked: options.defaultLocked ?? false,
 				componentProps: {
-					sessionController: this.sessionController
+					sessionController: this.sessionController,
+					onDone: () => {
+						app.goMain()
+					}
 				}
 			})
 		},
