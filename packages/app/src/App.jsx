@@ -378,6 +378,7 @@ class App extends React.Component {
 				console.warn("[App] hideStatusBar is not supported on this platform")
 				return false
 			}
+
 			return await StatusBar.hide()
 		},
 		showStatusBar: async () => {
@@ -417,7 +418,7 @@ class App extends React.Component {
 			})
 
 			StatusBar.setOverlaysWebView({ overlay: true })
-			window.app.hideStatusBar()
+			//window.app.hideStatusBar()
 		}
 
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
