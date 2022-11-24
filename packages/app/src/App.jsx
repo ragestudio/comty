@@ -310,7 +310,14 @@ class App extends React.Component {
 			window.app.ModalController.open((props) => <Searcher {...props} />)
 		},
 		openCreator: () => {
-			window.app.ModalController.open((props) => <Creator {...props} />)
+			if (window.isMobile) {
+				return app.DrawerController.open("creator", Creator, {
+					allowMultiples: false,
+					escClosable: true,
+				})
+			}
+			
+			return window.app.ModalController.open((props) => <Creator {...props} />)
 		},
 		openSettings: (goTo) => {
 			const controller = window.isMobile ? app.DrawerController : app.SidedrawerController
