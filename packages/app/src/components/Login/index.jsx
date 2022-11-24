@@ -103,6 +103,14 @@ export default class Login extends React.Component {
         }
     }
 
+    onClickRegister = () => {
+        if (typeof this.props.close === "function") {
+            this.props.close()
+        }
+
+        app.eventBus.emit("app.createRegister")
+    }
+
     toogleLoading = (to) => {
         if (typeof to === "undefined") {
             to = !this.state.loading
@@ -221,7 +229,7 @@ export default class Login extends React.Component {
                         {this.state.error}
                     </div>
 
-                    <div className="field">
+                    <div className="field" onClick={this.onClickRegister}>
                         <a>You need a account?</a>
                     </div>
                 </div>
