@@ -139,7 +139,7 @@ export default React.memo(({
             "postCard",
             data.type,
             { ["liked"]: hasLiked },
-            { ["noHide"]: !expansibleActions },
+            { ["noHide"]: window.isMobile || !expansibleActions },
             { ["fullmode"]: fullmode },
         )}
         context-menu={"postCard-context"}
