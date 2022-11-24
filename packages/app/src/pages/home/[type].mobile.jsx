@@ -84,7 +84,6 @@ export default class Dashboard extends React.Component {
             <div
                 ref={this.primaryPanelRef}
                 className={classnames("panel", "fade-opacity-active")}
-                style={{ width: "102%" }}
             >
                 {this.renderActiveTab()}
             </div>
