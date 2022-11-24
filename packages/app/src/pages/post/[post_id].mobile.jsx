@@ -3,8 +3,11 @@ import * as antd from "antd"
 
 import Post from "models/post"
 import { PostCard, CommentsCard } from "components"
+import { FloatingPanel } from "antd-mobile"
 
 import "./index.less"
+
+const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default (props) => {
     const post_id = props.match.params.post_id
@@ -35,5 +38,9 @@ export default (props) => {
 
     return <div className="postPage">
         <PostCard data={data} fullmode />
+
+        <FloatingPanel anchors={floatingPanelAnchors}>
+            <CommentsCard post_id={post_id} />
+        </FloatingPanel>
     </div>
 }
