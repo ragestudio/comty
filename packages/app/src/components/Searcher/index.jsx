@@ -131,6 +131,16 @@ export default (props) => {
             setLoading(false)
         }, 400)
 
+        if (searchValue === "") {
+            if (typeof props.onEmpty === "function") {
+                props.onEmpty()
+            }
+        } else {
+            if (typeof props.onFilled === "function") {
+                props.onFilled()
+            }
+        }
+
         return () => clearTimeout(timer)
     }, [searchValue])
 
@@ -142,7 +152,9 @@ export default (props) => {
             onChange={handleOnSearch}
             value={searchValue}
             prefix={<Icons.Search />}
-            autoFocus
+            autoFocus={props.autoFocus ?? false}
+            onFocus={props.onFocus}
+            onBlur={props.onUnfocus}
         />
 
         {searchResult && <div className="results">
