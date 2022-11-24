@@ -1,11 +1,95 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
+import { ActionSheet } from "antd-mobile"
 import { Motion, spring } from "react-motion"
 
-import { createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
+
+const items = [
+    {
+        id: "creator",
+        dispatchEvent: "app.openCreator",
+        icon: "PlusCircle",
+        classnames: [["primary"]]
+    },
+    {
+        id: "feed",
+        location: "/home/feed",
+        icon: "Home",
+    },
+    {
+        id: "explore",
+        location: "/home/explore",
+        icon: "Search",
+    },
+    {
+        id: "livestreams",
+        location: "/home/livestreams",
+        icon: "Tv",
+    }
+]
+
+const AccountButton = (props) => {
+    const user = app.userData
+    const ActionSheetRef = React.useRef()
+
+    const handleClick = () => {
+        if (!user) {
+            return app.eventBus.emit("app.forceLogin")
+        }
+
+        return app.goToAccount()
+    }
+
+    const handleHold = () => {
+        ActionSheetRef.current = ActionSheet.show({
+            actions: [
+                {
+                    key: "settings",
+                    text: <><Icons.Settings /> Settings</>,
+                    onClick: () => {
+                        app.openSettings()
+                        ActionSheetRef.current.close()
+                    }
+                },
+                {
+                    key: "savedPosts",
+                    text: <><Icons.Bookmark /> Saved Posts</>,
+                    onClick: () => {
+                        app.setLocation("/home/savedPosts")
+                        ActionSheetRef.current.close()
+                    }
+                },
+                {
+                    key: "about",
+                    text: <><Icons.Info /> About</>,
+                    onClick: () => {
+                        app.setLocation("/about")
+                        ActionSheetRef.current.close()
+                    }
+                }
+            ]
+        })
+    }
+
+    return <div
+        key="account"
+        id="account"
+        className="item"
+        onClick={handleClick}
+        onContextMenu={handleHold}
+        context-menu="ignore"
+    >
+        <div className="icon">
+            {
+                user ? <antd.Avatar shape="square" src={app.userData.avatar} /> : createIconRender("Login")
+            }
+        </div>
+    </div>
+}
 
 export default class BottomBar extends React.Component {
     state = {
@@ -68,8 +152,27 @@ export default class BottomBar extends React.Component {
         }
     }
 
-    onClickItemId = (id) => {
-        window.app.setLocation(`/${id}`)
+    handleItemClick = (item) => {
+        if (item.dispatchEvent) {
+            app.eventBus.emit(item.dispatchEvent)
+        } else if (item.location) {
+            app.setLocation(item.location)
+        }
+    }
+
+    renderItems = () => {
+        return items.map((item) => {
+            return <div
+                key={item.id}
+                id={item.id}
+                className={classnames("item", ...item.classnames ?? [])}
+                onClick={() => this.handleItemClick(item)}
+            >
+                <div className="icon">
+                    {createIconRender(item.icon)}
+                </div>
+            </div>
+        })
     }
 
     render() {
@@ -92,65 +195,8 @@ export default class BottomBar extends React.Component {
                 }}
             >
                 <div className="items">
-                    <div
-                        key="main"
-                        id="main"
-                        className="item"
-                        onClick={() => window.app.goMain()}
-                    >
-                        <div className="icon">
-                            {createIconRender("Home")}
-                        </div>
-                    </div>
-                    <div
-                        key="nav"
-                        id="nav"
-                        className="item"
-                        onClick={() => window.app.openNavigationMenu()}
-                    >
-                        <div className="icon">
-                            {createIconRender("Navigation")}
-                        </div>
-                    </div>
-                    <div
-                        key="createNew"
-                        id="createNew"
-                        className={classnames("item", ["primary"])}
-                        onClick={() => window.app.openCreateNew()}
-                    >
-                        <div className="icon">
-                            {createIconRender("PlusCircle")}
-                        </div>
-                    </div>
-                    <div
-                        key="settings"
-                        id="settings"
-                        className="item"
-                        onClick={() => window.app.openSettings()}
-                    >
-                        <div className="icon">
-                            {createIconRender("Settings")}
-                        </div>
-                    </div>
-                    {app.userData ? <div
-                        key="account"
-                        id="account"
-                        className="item"
-                        onClick={() => window.app.goToAccount()}
-                    >
-                        <div className="icon">
-                            <antd.Avatar shape="square" src={app.userData.avatar} />
-                        </div>
-                    </div> : <div
-                        key="login"
-                        id="login"
-                        onClick={() => this.onClickItemId("login")}
-                        className="item"
-                    >
-                        <div className="icon">
-                            {createIconRender("LogIn")}
-                        </div>
-                    </div>}
+                    {this.renderItems()}
+                    <AccountButton />
                 </div>
             </div>}
         </Motion>
