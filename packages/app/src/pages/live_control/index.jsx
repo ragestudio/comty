@@ -32,12 +32,150 @@ const StreamingKeyView = (props) => {
     </div>
 }
 
+const LivestreamsCategoriesSelector = (props) => {
+    const [categories, setCategories] = React.useState([])
+    const [loading, setLoading] = React.useState(true)
+
+    const loadData = async () => {
+        setLoading(true)
+
+        const categories = await Livestream.getCategories().catch((err) => {
+            console.error(err)
+
+            app.message.error("Failed to load categories")
+
+            return null
+        })
+
+        console.log(`Loaded categories >`, categories)
+
+        setLoading(false)
+
+        if (categories) {
+            setCategories(categories)
+        }
+    }
+
+    React.useEffect(() => {
+        loadData()
+    }, [])
+
+    if (loading) {
+        return <antd.Skeleton active />
+    }
+
+    return <antd.Select
+        placeholder="Select a category"
+        defaultValue={props.defaultValue}
+        onChange={(value) => props.updateStreamInfo("category", value)}
+    >
+        {
+            categories.map((category) => {
+                return <antd.Select.Option value={category.key}>{category.label}</antd.Select.Option>
+            })
+        }
+    </antd.Select>
+}
+
+const StreamInfoEditor = (props) => {
+    const [streamInfo, setStreamInfo] = React.useState(props.defaultStreamInfo ?? {})
+
+    const updateStreamInfo = (key, value) => {
+        setStreamInfo({
+            ...streamInfo,
+            [key]: value,
+        })
+    }
+
+    const saveStreamInfo = async () => {
+        if (typeof props.onSave === "function") {
+            return await props.onSave(streamInfo)
+        }
+
+        // peform default save
+        const result = await Livestream.updateLivestreamInfo(streamInfo).catch((err) => {
+            console.error(err)
+
+            app.message.error("Failed to update stream info")
+
+            return false
+        })
+
+        if (result) {
+            app.message.success("Stream info updated")
+        }
+
+        if (typeof props.onSaveComplete === "function") {
+            await props.onSaveComplete(result)
+        }
+
+        return result
+    }
+
+    return <div className="streamInfoEditor">
+        <div className="field">
+            <span>
+                <Icons.MdTitle />Title
+            </span>
+            <div className="value">
+                <antd.Input
+                    placeholder="Stream title"
+                    value={streamInfo.title}
+                    onChange={(e) => updateStreamInfo("title", e.target.value)}
+                />
+            </div>
+        </div>
+        <div className="field">
+            <span>
+                <Icons.MdTextFields /> Description
+            </span>
+            <div className="value">
+                <antd.Input
+                    placeholder="Stream description"
+                    value={streamInfo.description}
+                    onChange={(e) => updateStreamInfo("description", e.target.value)}
+                />
+            </div>
+        </div>
+        <div className="field">
+            <span>
+                <Icons.MdCategory /> Category
+            </span>
+            <div className="value">
+                <LivestreamsCategoriesSelector
+                    defaultValue={streamInfo.category.key}
+                    updateStreamInfo={updateStreamInfo}
+                />
+            </div>
+        </div>
+        <antd.Button
+            type="primary"
+            onClick={saveStreamInfo}
+        >
+            Save
+        </antd.Button>
+    </div>
+}
+
 export default (props) => {
     const [streamInfo, setStreamInfo] = React.useState({})
     const [addresses, setAddresses] = React.useState({})
 
     const [isConnected, setIsConnected] = React.useState(false)
     const [streamingKey, setStreamingKey] = React.useState(null)
+
+    const onClickEditInfo = () => {
+        app.ModalController.open(() => <StreamInfoEditor
+            defaultStreamInfo={streamInfo}
+            onSaveComplete={(result) => {
+                if (result) {
+                    app.ModalController.close()
+
+                    fetchStreamInfo()
+                }
+            }}
+        />)
+    }
 
     const regenerateStreamingKey = async () => {
         antd.Modal.confirm({
@@ -125,14 +263,34 @@ export default (props) => {
                     </h2>
                 </div>
 
+                <div className="description">
+                    <span>
+                        Description
+                    </span>
+
+                    <p>
+                        {streamInfo?.description ?? "No description"}
+                    </p>
+                </div>
+
                 <div className="category">
                     <span>
                         Category
                     </span>
                     <h4>
-                        {streamInfo?.category ?? "No category"}
+                        {streamInfo?.category?.label ?? "No category"}
                     </h4>
                 </div>
+            </div>
+
+            <div>
+                <antd.Button
+                    type="primary"
+                    icon={<Icons.Edit2 />}
+                    onClick={onClickEditInfo}
+                >
+                    Edit info
+                </antd.Button>
             </div>
         </div>
 
