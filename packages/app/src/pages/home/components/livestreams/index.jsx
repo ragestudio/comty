@@ -34,7 +34,7 @@ const LivestreamItem = (props) => {
                 <h2>{livestream.info?.description ?? "No description"}</h2>
             </div>
             <div className="livestream_category">
-                {livestream.info?.catagory ?? "No category"}
+                {livestream.info?.category?.label ?? "No category"}
             </div>
         </div>
     </div>
