@@ -161,15 +161,26 @@ export default class StreamingController extends Controller {
                     user_id,
                 })
 
+                if (!info) {
+                    info = new StreamingInfo({
+                        user_id,
+                    })
+
+                    await info.save()
+                }
+
                 const category = await StreamingCategory.findOne({
                     key: info.category
-                })
+                }).catch((err) => {
+                    console.error(err)
+                    return {}
+                }) ?? {}
 
                 return res.json({
                     ...info.toObject(),
                     ["category"]: {
-                        key: category.key,
-                        label: category.label,
+                        key: category?.key ?? "unknown",
+                        label: category?.label ?? "Unknown",
                     }
                 })
             }
