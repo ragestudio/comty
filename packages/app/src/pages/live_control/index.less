@@ -8,7 +8,7 @@
         display: flex;
         flex-direction: row;
 
-        height: 20vh;
+        height: fit-content;
 
         padding: 15px;
 
@@ -21,7 +21,7 @@
 
         .preview {
             height: 100%;
-            max-width: 400px;
+            width: 300px;
 
             img {
                 width: 100%;
@@ -38,6 +38,7 @@
             flex-direction: column;
 
             padding: 20px 0;
+            width: 100%;
 
             .status {
                 margin-bottom: 20px;
@@ -83,7 +84,7 @@
                 .title {
                     display: inline-flex;
                     flex-direction: row;
-                    
+
                     justify-content: space-between;
                     align-items: center;
 
@@ -114,8 +115,29 @@
     div {
         display: inline-flex;
         flex-direction: row;
-    
+
         align-items: center;
         justify-content: center;
+    }
+}
+
+.streamInfoEditor {
+    display: flex;
+    flex-direction: column;
+
+    .field {
+        display: flex;
+        flex-direction: column;
+
+        margin-bottom: 20px;
+
+        .value {
+            margin-top: 5px;
+            margin-left: 20px;
+
+            .ant-select {
+                min-width: 200px;
+            }
+        }
     }
 }
