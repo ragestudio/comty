@@ -25,7 +25,7 @@ export default class Livestream {
         const { data } = await app.api.customRequest("main", {
             method: "GET",
             url: `/stream/info`,
-            data: {
+            params: {
                 username,
             }
         })
