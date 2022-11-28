@@ -71,7 +71,7 @@ const LivestreamsCategoriesSelector = (props) => {
     >
         {
             categories.map((category) => {
-                return <antd.Select.Option value={category.key}>{category.label}</antd.Select.Option>
+                return <antd.Select.Option value={category?.key ?? "unknown"}>{category?.label ?? "No category"}</antd.Select.Option>
             })
         }
     </antd.Select>
