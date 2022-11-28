@@ -173,15 +173,20 @@ export default class StreamingController extends Controller {
         "/stream/info": {
             middleware: ["withAuthentication"],
             fn: async (req, res) => {
-                let user_id = req.user?._id
+                let user_id = req.query.user_id
 
-                if (req.body.username || req.body.user_id) {
+                if (!req.query.username && !req.query.user_id) {
+                    return res.status(400).json({
+                        error: "Invalid request, missing username"
+                    })
+                }
+
+                if (!user_id) {
                     user_id = await User.findOne({
-                        _id: req.body.user_id,
-                        username: req.body.username,
-                    }).then((user) => user._id)
+                        username: req.query.username,
+                    })
 
-                    user_id = user_id.toString()
+                    user_id = user_id["_id"].toString()
                 }
 
                 const info = await StreamingInfo.findOne({
