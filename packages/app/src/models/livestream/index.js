@@ -15,6 +15,18 @@ export default class Livestream {
         return request
     }
 
+    static async updateLivestreamInfo(payload) {
+        const { data } = await app.api.customRequest("main", {
+            method: "POST",
+            url: `/streaming/update_info`,
+            data: {
+                ...payload
+            },
+        })
+
+        return data
+    }
+
     static async getStreamInfo(payload) {
         let { username } = payload ?? {}
 
