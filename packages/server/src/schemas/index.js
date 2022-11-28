@@ -19,3 +19,4 @@ export { default as FeaturedEvent } from "./featuredEvent"
 
 export { default as StreamingKey } from "./streamingKey"
 export { default as StreamingInfo } from "./streamingInfo"
+export { default as StreamingCategory } from "./streamingCategory"
