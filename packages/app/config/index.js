@@ -70,7 +70,7 @@ export default {
     },
     app: {
         title: packagejson.name,
-        siteName: "Comty",
+        siteName: "Comty™",
         siteDescription: "Comty, a prototype of social network.",
         mainPath: "/home",
         authPath: "/login",
