@@ -3,7 +3,8 @@ import { nanoid } from "nanoid"
 import lodash from "lodash"
 import axios from "axios"
 
-import { User, StreamingKey, StreamingInfo } from "../../models"
+import { Schematized } from "../../lib"
+import { User, StreamingKey, StreamingInfo, StreamingCategory } from "../../models"
 
 const streamingIngestServer = process.env.STREAMING_INGEST_SERVER
 const streamingServerAPIAddress = process.env.STREAMING_API_SERVER
@@ -147,6 +148,11 @@ export default class StreamingController extends Controller {
     }
 
     get = {
+        "/streaming/categories": async (req, res) => {
+            const categories = await StreamingCategory.find()
+
+            return res.json(categories)
+        },
         "/streams": async (req, res) => {
             await this.methods.regenerateStreamingList()
 
@@ -161,6 +167,10 @@ export default class StreamingController extends Controller {
 
                 if (info) {
                     stream.info = info.toObject()
+
+                    stream.info.category = await StreamingCategory.findOne({
+                        key: stream.info.category
+                    })
                 }
 
                 return stream
@@ -189,11 +199,21 @@ export default class StreamingController extends Controller {
                     user_id = user_id["_id"].toString()
                 }
 
-                const info = await StreamingInfo.findOne({
+                let info = await StreamingInfo.findOne({
                     user_id,
                 })
 
-                return res.json(info)
+                const category = await StreamingCategory.findOne({
+                    key: info.category
+                })
+
+                return res.json({
+                    ...info.toObject(),
+                    ["category"]: {
+                        key: category.key,
+                        label: category.label,
+                    }
+                })
             }
         },
         "/streaming/addresses": {
@@ -255,6 +275,36 @@ export default class StreamingController extends Controller {
                 }
             }
         },
+    }
+
+    put = {
+        "/streaming/category": {
+            middlewares: ["withAuthentication", "onlyAdmin"],
+            fn: Schematized({
+                required: ["key", "label"]
+            }, async (req, res) => {
+                const { key, label } = req.selection
+
+                const existingCategory = await StreamingCategory.findOne({
+                    key
+                })
+
+                if (existingCategory) {
+                    return res.status(400).json({
+                        error: "Category already exists"
+                    })
+                }
+
+                const category = new StreamingCategory({
+                    key,
+                    label,
+                })
+
+                await category.save()
+
+                return res.json(category)
+            })
+        }
     }
 
     post = {
