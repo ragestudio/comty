@@ -14,10 +14,31 @@
         "reachable": true
     },
     {
-        "id": "saved",
-        "path": "/saved",
-        "title": "Saved",
-        "icon": "Archive",
+        "id": "events",
+        "path": "/events",
+        "title": "Events",
+        "icon": "MdLocalActivity",
+        "reachable": true
+    },
+    {
+        "id": "tv",
+        "path": "/tv",
+        "title": "Tv",
+        "icon": "Tv",
+        "reachable": true
+    },
+    {
+        "id": "music",
+        "path": "/music",
+        "title": "Music",
+        "icon": "MdMusicVideo",
+        "reachable": true
+    },
+    {
+        "id": "groups",
+        "path": "/groups",
+        "title": "Groups",
+        "icon": "Users",
         "reachable": true
     },
     {
@@ -28,23 +49,10 @@
         "reachable": true
     },
     {
-        "id": "streams",
-        "path": "/streams",
-        "title": "Streams",
-        "icon": "Tv",
-        "reachable": true
-    },
-    {
-        "id": "streaming_control",
-        "path": "/streaming_control",
-        "title": "Streaming Control",
-        "icon": "Video"
-    },
-    {
-        "id": "groups",
-        "path": "/groups",
-        "title": "Groups",
-        "icon": "Users",
+        "id": "dev",
+        "path": "/dev",
+        "title": "Development",
+        "icon": "MdOutlineCode",
         "reachable": true
     }
 ]
