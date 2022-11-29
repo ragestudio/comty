@@ -76,7 +76,7 @@ export default class Dashboard extends React.Component {
     }
 
     render() {
-        return <div className="dashboard">
+        return <div className="postingDashboard">
             <div
                 ref={this.primaryPanelRef}
                 className={classnames("panel", "fade-opacity-active")}
