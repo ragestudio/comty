@@ -1,10 +1,9 @@
 import React from "react"
+import Livestream from "models/livestream"
 import * as antd from "antd"
 
 import { UserPreview } from "components"
 import { Icons } from "components/Icons"
-
-import Livestream from "../../../../models/livestream"
 
 import "./index.less"
 
@@ -34,7 +33,7 @@ const LivestreamItem = (props) => {
                 <h2>{livestream.info?.description ?? "No description"}</h2>
             </div>
             <div className="livestream_category">
-                {livestream.info?.catagory ?? "No category"}
+                {livestream.info?.category?.label ?? "No category"}
             </div>
         </div>
     </div>
@@ -71,10 +70,6 @@ export default (props) => {
         app.setLocation(`/live/${livestream.username}`)
     }
 
-    const onClickControlPanel = () => {
-        app.setLocation("/live_control")
-    }
-
     const renderList = () => {
         if (loading) {
             return <antd.Skeleton active />
@@ -104,15 +99,6 @@ export default (props) => {
                     <Icons.Tv />
                     <span>Livestreams</span>
                 </h1>
-            </div>
-
-            <div className="panel">
-                <antd.Button
-                    icon={<Icons.Settings />}
-                    onClick={onClickControlPanel}
-                >
-                    Control Panel
-                </antd.Button>
             </div>
         </div>
 

@@ -27,6 +27,12 @@ export default class Livestream {
         return data
     }
 
+    static async getCategories() {
+        const request = await Livestream.bridge.get.streamingCategories()
+
+        return request
+    }
+
     static async getStreamInfo(payload) {
         let { username } = payload ?? {}
 
