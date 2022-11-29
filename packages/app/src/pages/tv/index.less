@@ -1,0 +1,47 @@
+.dashboard {
+    display: grid;
+
+    grid-template-columns: 3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-column-gap: 10px;
+    grid-row-gap: 0px;
+
+    width: 100%;
+
+    padding-left: 30px;
+
+    .panel {
+        position: sticky;
+        top: 0;
+
+        height: fit-content;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+
+        >div {
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background-color: var(--background-color-accent);
+            border-radius: 12px;
+            padding: 20px;
+
+            min-width: 20vw;
+
+            h1,
+            h2 {
+                font-family: "Space Grotesk", sans-serif;
+            }
+        }
+    }
+
+    .ant-menu {
+        svg {
+            margin-right: 0 !important;
+        }
+    }
+}
