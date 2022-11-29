@@ -6,10 +6,10 @@ import { Icons, createIconRender } from "components/Icons"
 
 import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
 
-import FeedBrowser from "./components/feed"
-import ExploreBrowser from "./components/explore"
-import LivestreamsBrowser from "./components/livestreams"
-import SavedPostsBrowser from "./components/savedPosts"
+import FeedTab from "./components/feed"
+import ExploreTab from "./components/explore"
+import TrendingsTab from "./components/trendings"
+import SavedPostsTab from "./components/savedPosts"
 
 import "./index.less"
 
@@ -17,23 +17,23 @@ const Tabs = {
     "feed": {
         title: "Feed",
         icon: "Rss",
-        component: FeedBrowser
+        component: FeedTab
+    },
+    "trendings": {
+        title: "Trendings",
+        icon: "TrendingUp",
+        component: TrendingsTab
     },
     "explore": {
         title: "Explore",
         icon: "Search",
-        component: ExploreBrowser
+        component: ExploreTab
     },
     "savedPosts": {
         title: "Saved posts",
         icon: "Bookmark",
-        component: SavedPostsBrowser
-    },
-    "livestreams": {
-        title: "Livestreams",
-        icon: "Tv",
-        component: LivestreamsBrowser
-    },
+        component: SavedPostsTab
+    }
 }
 
 export default class Dashboard extends React.Component {
