@@ -54,6 +54,7 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
+import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
@@ -104,6 +105,17 @@ class App extends React.Component {
 
 			// append var to #root
 			document.getElementById("root").classList.add("electron")
+		}
+
+		if (this.publicMethods.isAppCapacitor()) {
+			// prevent back button to close app
+			CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+				if (!canGoBack) {
+					CapacitorApp.exitApp();
+				} else {
+					window.history.back();
+				}
+			});
 		}
 	}
 
@@ -316,7 +328,7 @@ class App extends React.Component {
 					escClosable: true,
 				})
 			}
-			
+
 			return window.app.ModalController.open((props) => <Creator {...props} />)
 		},
 		openSettings: (goTo) => {
