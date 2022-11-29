@@ -5,6 +5,10 @@ import { Icons } from "components/Icons"
 import "./index.less"
 
 export default (props) => {
+    const goToProfile = (username) => {
+        window.app.goToAccount(username)
+    }
+
     if (props.followers.length === 0) {
         return <antd.Result
             icon={<Icons.UserX style={{ fontSize: "50px" }} />}
@@ -20,7 +24,7 @@ export default (props) => {
 
     return <div className="followersList">
         {props.followers.map((follower) => {
-            return <div className="follower">
+            return <div className="follower" onClick={() => goToProfile(follower.username)}>
                 <div className="avatar">
                     <antd.Avatar shape="square" src={follower.avatar} />
                 </div>
@@ -29,7 +33,6 @@ export default (props) => {
                         <h2>
                             {follower.fullName ?? follower.username}
                         </h2>
-
                     </div>
                     <div>
                         <span>
