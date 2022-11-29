@@ -1,23 +1,65 @@
 {
-    "discord.enabled": false,
-    "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#65c89b",
-        "activityBar.background": "#65c89b",
-        "activityBar.foreground": "#15202b",
-        "activityBar.inactiveForeground": "#15202b99",
-        "activityBarBadge.background": "#945bc4",
-        "activityBarBadge.foreground": "#e7e7e7",
-        "commandCenter.border": "#15202b99",
-        "sash.hoverBorder": "#65c89b",
-        "statusBar.background": "#42b883",
-        "statusBar.foreground": "#15202b",
-        "statusBarItem.hoverBackground": "#359268",
-        "statusBarItem.remoteBackground": "#42b883",
-        "statusBarItem.remoteForeground": "#15202b",
-        "titleBar.activeBackground": "#42b883",
-        "titleBar.activeForeground": "#15202b",
-        "titleBar.inactiveBackground": "#42b88399",
-        "titleBar.inactiveForeground": "#15202b99"
-    },
-    "peacock.remoteColor": "#42b883"
+  "discord.enabled": false,
+  "workbench.colorCustomizations": {
+    // activity bar
+    "activityBar.border": "#173a29",
+    "activityBar.foreground": "#65c89b",
+    "activityBar.background": "#15202b",
+    "activityBarBadge.background": "#296e4f",
+    "activityBarBadge.foreground": "#5dfab3",
+
+    // Statusbar
+    "statusBar.border": "#173a29",
+    "statusBar.foreground": "#42b883",
+    "statusBar.background": "#15202b",
+    "statusBarItem.hoverBackground": "#359268",
+    "statusBarItem.remoteBackground": "#1e5039",
+    "statusBarItem.remoteForeground": "#42b883",
+
+    // Title bar
+    "titleBar.border": "#173a29",
+    "titleBar.activeForeground": "#42b883",
+    "titleBar.activeBackground": "#15202b",
+    "editor.findMatchBackground": "#42b88357",
+    "titleBar.inactiveBackground": "#15202b",
+    "titleBar.inactiveForeground": "#42b88399",
+    "editor.findMatchHighlightBackground": "#42b88357",
+
+    // Editor
+    "editor.background": "#15202b",
+    "editor.foreground": "#42b883",
+    "editor.foldBackground": "#15202b",
+
+    // tabs
+    "tab.activeBackground": "#173a29",
+    "tab.activeForeground": "#42b883",
+    "tab.inactiveBackground": "#15202b",
+    "tab.inactiveForeground": "#42b88399",
+    "editorGroupHeader.tabsBackground": "#15202b",
+
+    // Panels & terminal
+    "panel.border": "#173a29",
+    "panel.background": "#15202b",
+    "panelTitle.activeBorder": "#42b883",
+    "panelTitle.activeForeground": "#42b883",
+
+    // Sidebar
+    "sideBar.border": "#173a29",
+    "sideBar.background": "#15202b",
+
+    // Menu
+    "menu.background": "#15202b",
+    "menu.separatorBackground": "#173a29",
+
+    // Quick actions
+    "quickInput.background": "#15202b",
+    "quickInput.foreground": "#42b88399",
+    "quickInputList.focusForeground": "#42b883",
+
+    // Others
+    "input.background": "#173a29",
+    "button.background": "#42b88399"
+  },
+  "peacock.remoteColor": "#42b883",
+  "window.autoDetectColorScheme": true
 }
