@@ -4,13 +4,11 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
-
 import Tabs from "./tabs"
 
 import "./index.less"
 
-export default class Dashboard extends React.Component {
+export default class TVDashboard extends React.Component {
     state = {
         activeTab: this.props.match.params.type ?? "feed"
     }
@@ -54,20 +52,17 @@ export default class Dashboard extends React.Component {
     }
 
     render() {
-        return <div className="postingDashboard">
-            <div></div>
-
+        return <div className="tvDashboard">
             <div
                 ref={this.primaryPanelRef}
                 className={classnames("panel", "fade-opacity-active")}
-                style={{ width: "102%" }}
             >
                 {this.renderActiveTab()}
             </div>
 
             <div className="panel">
                 <div className="card" id="browserType">
-                    <h2><Icons.Compass /> Browse</h2>
+                    <h2><Icons.Tv /> TV</h2>
                     <antd.Menu
                         mode="inline"
                         selectedKeys={[this.state.activeTab]}
@@ -86,20 +81,6 @@ export default class Dashboard extends React.Component {
                         })}
                     </antd.Menu>
                 </div>
-
-                <div className="card" id="trendings">
-                    <h2><Icons.TrendingUp /> Trendings</h2>
-                    <HashtagTrendings />
-                </div>
-
-                <div className="card" id="onlineFriends">
-                    <h2><Icons.Rss /> Online Friends</h2>
-                    <div className="content">
-                        <ConnectedFriends />
-                    </div>
-                </div>
-
-                <FeaturedEventsAnnouncements />
             </div>
         </div>
     }
