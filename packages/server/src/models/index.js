@@ -37,6 +37,7 @@ export const Playlist = mongoose.model("Playlist", schemas.Playlist, "playlists"
 // streamings
 export const StreamingKey = mongoose.model("StreamingKey", schemas.StreamingKey, "streamingKeys")
 export const StreamingInfo = mongoose.model("StreamingInfo", schemas.StreamingInfo, "streamingInfos")
+export const StreamingCategory = mongoose.model("StreamingCategory", schemas.StreamingCategory, "streamingCategories")
 
 // others
 export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")

@@ -85,7 +85,10 @@ const steps = [
                 setValidCharacters(hasValidCharacters(username))
 
                 const timer = setTimeout(async () => {
-                    if (!validCharacters) return
+                    if (!validCharacters) {
+                        setLoading(false)
+                        return
+                    }
 
                     const request = await app.api.customRequest("main", {
                         method: "GET",
@@ -120,7 +123,7 @@ const steps = [
                     autoCorrect="off"
                     autoCapitalize="none"
                     onPressEnter={submit}
-                    placeholder="@newuser"
+                    placeholder="newuser"
                     value={username}
                     onChange={handleUpdate}
                     status={username.length == 0 ? "default" : loading ? "default" : (isValid() ? "success" : "error")}

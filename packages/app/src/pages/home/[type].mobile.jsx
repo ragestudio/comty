@@ -2,39 +2,9 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { Icons, createIconRender } from "components/Icons"
-
-import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
-
-import FeedBrowser from "./components/feed"
-import ExploreBrowser from "./components/explore"
-import LivestreamsBrowser from "./components/livestreams"
-import SavedPostsBrowser from "./components/savedPosts"
+import Tabs from "./tabs"
 
 import "./index.less"
-
-const Tabs = {
-    "feed": {
-        title: "Feed",
-        icon: "Rss",
-        component: FeedBrowser
-    },
-    "explore": {
-        title: "Explore",
-        icon: "Search",
-        component: ExploreBrowser
-    },
-    "savedPosts": {
-        title: "Saved posts",
-        icon: "Bookmark",
-        component: SavedPostsBrowser
-    },
-    "livestreams": {
-        title: "Livestreams",
-        icon: "Tv",
-        component: LivestreamsBrowser
-    },
-}
 
 export default class Dashboard extends React.Component {
     state = {
@@ -80,7 +50,7 @@ export default class Dashboard extends React.Component {
     }
 
     render() {
-        return <div className="dashboard">
+        return <div className="postingDashboard">
             <div
                 ref={this.primaryPanelRef}
                 className={classnames("panel", "fade-opacity-active")}
