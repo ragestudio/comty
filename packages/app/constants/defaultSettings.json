@@ -19,7 +19,11 @@
     "language": "en",
     "sidebarKeys": [
         "home",
+        "tv",
+        "music",
+        "events",
+        "groups",
         "marketplace",
-        "groups"
+        "dev"
     ]
 }
