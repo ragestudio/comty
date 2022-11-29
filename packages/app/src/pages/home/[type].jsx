@@ -80,7 +80,7 @@ export default class Dashboard extends React.Component {
     }
 
     render() {
-        return <div className="dashboard">
+        return <div className="postingDashboard">
             <div></div>
 
             <div
