@@ -4,29 +4,9 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import FeedTab from "./components/feed"
-import ExploreTab from "./components/explore"
-import ControlPanelTab from "./components/controlPanel"
+import Tabs from "./tabs"
 
 import "./index.less"
-
-const Tabs = {
-    "feed": {
-        title: "Feed",
-        icon: "Rss",
-        component: FeedTab
-    },
-    "explore": {
-        title: "Explore",
-        icon: "Search",
-        component: ExploreTab
-    },
-    "controlPanel": {
-        title: "Control Panel",
-        icon: "Settings",
-        component: ControlPanelTab
-    }
-}
 
 export default class TVDashboard extends React.Component {
     state = {
