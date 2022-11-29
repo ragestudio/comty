@@ -72,7 +72,7 @@ export default class TVDashboard extends React.Component {
     }
 
     render() {
-        return <div className="dashboard">
+        return <div className="tvDashboard">
             <div
                 ref={this.primaryPanelRef}
                 className={classnames("panel", "fade-opacity-active")}
