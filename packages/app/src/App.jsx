@@ -106,17 +106,6 @@ class App extends React.Component {
 			// append var to #root
 			document.getElementById("root").classList.add("electron")
 		}
-
-		if (this.publicMethods.isAppCapacitor()) {
-			// prevent back button to close app
-			CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-				if (!canGoBack) {
-					CapacitorApp.exitApp();
-				} else {
-					window.history.back();
-				}
-			});
-		}
 	}
 
 	static publicEvents = {
@@ -431,6 +420,14 @@ class App extends React.Component {
 
 			StatusBar.setOverlaysWebView({ overlay: true })
 			//window.app.hideStatusBar()
+
+			CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+				if (!canGoBack) {
+					CapacitorApp.exitApp();
+				} else {
+					window.history.back();
+				}
+			});
 		}
 
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
