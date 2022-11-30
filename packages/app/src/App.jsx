@@ -54,6 +54,7 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
+import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
 
 import { Session, User } from "models"
@@ -316,7 +317,7 @@ class App extends React.Component {
 					escClosable: true,
 				})
 			}
-			
+
 			return window.app.ModalController.open((props) => <Creator {...props} />)
 		},
 		openSettings: (goTo) => {
@@ -419,6 +420,14 @@ class App extends React.Component {
 
 			StatusBar.setOverlaysWebView({ overlay: true })
 			//window.app.hideStatusBar()
+
+			CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+				if (!canGoBack) {
+					CapacitorApp.exitApp();
+				} else {
+					window.history.back();
+				}
+			});
 		}
 
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
