@@ -14,6 +14,8 @@ const streamingServerAPIUri = `${streamingServerAPIAddress.startsWith("https") ?
 const FILTER_KEYS = ["stream"]
 
 export default class StreamingController extends Controller {
+    static useRoute = "/tv"
+
     methods = {
         genereteKey: async (user_id) => {
             // this will generate a new key for the user
