@@ -5,7 +5,6 @@ import classnames from "classnames"
 
 import config from "config"
 import { Icons, createIconRender } from "components/Icons"
-import { sidebarKeys as defaultSidebarItems } from "schemas/defaultSettings"
 
 import sidebarItems from "schemas/routes.json"
 
@@ -21,6 +20,10 @@ const getSidebarComponents = () => {
 	const items = {}
 
 	sidebarItems.forEach((item, index) => {
+		if (!item.reachable) {
+			return
+		}
+
 		items[item.id] = {
 			...item,
 			index,
@@ -37,35 +40,18 @@ const getSidebarComponents = () => {
 
 const generateItems = () => {
 	const components = getSidebarComponents()
+
 	const itemsMap = []
 	const pathResolvers = {}
 
-	const keys = window.app?.settings.get("sidebarKeys") ?? defaultSidebarItems
-
-	// filter undefined components to avoid error
-	keys.filter((key) => {
-		if (typeof components[key] !== "undefined") {
-			return true
-		}
-	})
-
-	keys.forEach((key, index) => {
+	Object.keys(components).forEach((key, index) => {
 		const component = components[key]
 
-		try {
-			// avoid if item is duplicated
-			if (itemsMap.includes(component)) {
-				return false
-			}
-
-			if (typeof component.path !== "undefined") {
-				pathResolvers[component.id] = component.path
-			}
-
-			itemsMap.push(component)
-		} catch (error) {
-			return console.log(error)
+		if (typeof component.path !== "undefined") {
+			pathResolvers[component.id] = component.path
 		}
+
+		itemsMap.push(component)
 	})
 
 	return {
