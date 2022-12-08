@@ -271,6 +271,18 @@ class App extends React.Component {
 					{(t) => t("You have been disconnected from the server, trying to reconnect.")}
 				</Translation>
 			})
+		},
+		"devtool-opened": () => {
+			// show warning
+			antd.notification.open({
+				message: <Translation>
+					{(t) => t("Devtool opened")}
+				</Translation>,
+				description: <Translation>
+					{(t) => t("You have opened the devtool for the first time, please be aware that this is a security risk and you should close it as soon as possible.")}
+				</Translation>,
+				icon: <Icons.MdOutlineWarning />,
+			})
 		}
 	}
 
@@ -452,12 +464,14 @@ class App extends React.Component {
 		}, () => {
 			App.publicMethods.openCreator()
 		})
-
+		
 		app.eventBus.emit("app.initialization.start")
-
+		
 		await this.initialization()
-
+		
 		app.eventBus.emit("app.initialization.finish")
+
+		Utils.handleOpenDevTools()
 	}
 
 	initialization = async () => {
