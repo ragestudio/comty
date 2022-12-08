@@ -312,7 +312,7 @@ export default (props) => {
                 onChange={onChangeMessageInput}
                 onKeyDown={handleKeyDown}
                 disabled={loading}
-                dragable={false}
+                draggable={false}
                 allowClear
             />
             <div>
