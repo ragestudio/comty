@@ -19,7 +19,7 @@ export default [
     {
         "id": "sidebar.floating",
         "title": "Floating Sidebar",
-        "description": "Make the sidebar floats over layout content.",
+        "description": "Make the sidebar float over layout content.",
         "component": "Switch",
         "icon": "MdOutlineLastPage",
         "group": "layout",
