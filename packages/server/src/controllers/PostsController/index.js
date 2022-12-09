@@ -5,10 +5,10 @@ import { CreatePost, ToogleLike, GetPostData, DeletePost, ToogleSavePost } from 
 
 export default class PostsController extends Controller {
     static refName = "PostsController"
-    //static useMiddlewares = ["withAuthentication"]
+    static useRoute = "/posts"
 
     get = {
-        "/explore/posts": {
+        "/explore": {
             middlewares: ["withOptionalAuthentication"],
             fn: Schematized({
                 select: ["user_id"]
@@ -23,7 +23,7 @@ export default class PostsController extends Controller {
                 return res.json(posts)
             })
         },
-        "/saved_posts": {
+        "/saved": {
             middlewares: ["withOptionalAuthentication"],
             fn: Schematized({
                 select: ["user_id"]
@@ -38,30 +38,26 @@ export default class PostsController extends Controller {
                 return res.json(posts)
             })
         },
-        "/user_posts": {
+        "/user/:user_id": {
             middlewares: ["withOptionalAuthentication"],
-            fn: Schematized({
-                required: ["user_id"],
-                select: ["user_id"]
-            }, async (req, res) => {
+            fn: async (req, res) => {
                 let posts = await GetPostData({
                     limit: req.query?.limit,
                     skip: req.query?.trim,
                     for_user_id: req.user?._id.toString(),
-                    from_user_id: req.query?.user_id,
+                    from_user_id: req.params.user_id,
                 })
 
+                console.log(req.query)
+
                 return res.json(posts)
-            })
+            }
         },
-        "/post": {
+        "/:post_id": {
             middlewares: ["withOptionalAuthentication"],
-            fn: Schematized({
-                select: ["post_id"],
-                required: ["post_id"]
-            }, async (req, res) => {
+            fn: async (req, res) => {
                 let post = await GetPostData({
-                    post_id: req.query?.post_id,
+                    post_id: req.params.post_id,
                     for_user_id: req.user?._id.toString(),
                 }).catch((error) => {
                     res.status(404).json({ error: error.message })
@@ -72,16 +68,22 @@ export default class PostsController extends Controller {
                 if (!post) return
 
                 return res.json(post)
-            })
+            }
         },
     }
 
     put = {
-
+        "/:post_id": {
+            middlewares: ["withAuthentication"],
+            fn: (req, res) => {
+                // TODO: Implement Post update
+                return res.status(501).json({ error: "Not implemented" })
+            }
+        }
     }
 
     post = {
-        "/post": {
+        "/new": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["timestamp"],
@@ -99,32 +101,7 @@ export default class PostsController extends Controller {
                 return res.json(post)
             })
         },
-        "/toogle_like": {
-            middlewares: ["withAuthentication"],
-            fn: Schematized({
-                required: ["post_id"],
-                select: ["post_id", "to"],
-            }, async (req, res) => {
-                const post = await ToogleLike({
-                    user_id: req.user._id.toString(),
-                    post_id: req.selection.post_id,
-                    to: req.selection.to,
-                }).catch((err) => {
-                    res.status(400).json({
-                        error: err.message
-                    })
-                    return false
-                })
-
-                if (!post) return
-
-                return res.json({
-                    success: true,
-                    post
-                })
-            })
-        },
-        "/post/:post_id/toogle_like": {
+        "/:post_id/toogle_like": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
                 select: ["to"],
@@ -148,31 +125,7 @@ export default class PostsController extends Controller {
                 })
             })
         },
-        "/post/toogle_save": {
-            middlewares: ["withAuthentication"],
-            fn: Schematized({
-                required: ["post_id"],
-                select: ["post_id"],
-            }, async (req, res) => {
-                const post = await ToogleSavePost({
-                    user_id: req.user._id.toString(),
-                    post_id: req.selection.post_id,
-                }).catch((err) => {
-                    res.status(400).json({
-                        error: err.message
-                    })
-                    return false
-                })
-
-                if (!post) return
-
-                return res.json({
-                    success: true,
-                    post
-                })
-            })
-        },
-        "/post/:post_id/save": {
+        "/:post_id/toogle_save": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
                 const post = await ToogleSavePost({
@@ -196,14 +149,11 @@ export default class PostsController extends Controller {
     }
 
     delete = {
-        "/post": {
+        "/:post_id": {
             middlewares: ["withAuthentication"],
-            fn: Schematized({
-                required: ["post_id"],
-                select: ["post_id"],
-            }, async (req, res) => {
+            fn: async (req, res) => {
                 const post = await DeletePost({
-                    post_id: req.selection.post_id,
+                    post_id: req.params.post_id,
                     by_user_id: req.user._id.toString(),
                 }).catch((err) => {
                     res.status(400).json({
@@ -219,7 +169,7 @@ export default class PostsController extends Controller {
                     success: true,
                     post
                 })
-            })
+            }
         },
     }
 }

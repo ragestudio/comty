@@ -1,18 +1,22 @@
 import { Controller } from "linebridge/dist/server"
-import { Schematized } from "../../lib"
 
 import getPosts from "./methods/getPosts"
 
 export default class FeedController extends Controller {
     static refName = "FeedController"
+    static useRoute = "/feed"
 
     get = {
-        "/feed": {
-            middlewares: ["withOptionalAuthentication"],
-            fn: Schematized({
-                select: ["user_id"]
-            }, async (req, res) => {
+        "/posts": {
+            middlewares: ["withAuthentication"],
+            fn: async (req, res) => {
                 const for_user_id = req.user?._id.toString()
+
+                if (!for_user_id) {
+                    return res.status(400).json({
+                        error: "Invalid user id"
+                    })
+                }
 
                 let feed = []
 
@@ -26,7 +30,7 @@ export default class FeedController extends Controller {
                 feed = feed.concat(posts)
 
                 return res.json(feed)
-            })
+            }
         }
     }
 }
