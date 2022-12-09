@@ -33,46 +33,48 @@ export default class ContextMenuCore extends Core {
         // if not found, use default context
         const parentElement = element.closest("[context-menu]")
 
+        let contexts = []
+
         if (parentElement) {
-            let contexts = parentElement.getAttribute("context-menu") ?? []
+            contexts = parentElement.getAttribute("context-menu") ?? []
 
             if (typeof contexts === "string") {
                 contexts = contexts.split(",").map((context) => context.trim())
             }
+        }
 
-            // if context includes ignore, return null
-            if (contexts.includes("ignore")) {
-                return null
+        // if context includes ignore, return null
+        if (contexts.includes("ignore")) {
+            return null
+        }
+
+        // check if context includes no-default, if not, push default context and remove no-default
+        if (contexts.includes("no-default")) {
+            contexts = contexts.filter((context) => context !== "no-default")
+        } else {
+            contexts.push("default-context")
+        }
+
+        for await (const context of contexts) {
+            let contextObject = this.contexts[context] || InternalContexts[context]
+
+            if (typeof contextObject === "function") {
+                contextObject = await contextObject(parentElement, element, {
+                    close: this.hide,
+                })
             }
 
-            // check if context includes no-default, if not, push default context and remove no-default
-            if (contexts.includes("no-default")) {
-                contexts = contexts.filter((context) => context !== "no-default")
+            // push divider
+            if (items.length > 0) {
+                items.push({
+                    type: "separator"
+                })
+            }
+
+            if (Array.isArray(contextObject)) {
+                items.push(...contextObject)
             } else {
-                contexts.push("default-context")
-            }
-
-            for await (const context of contexts) {
-                let contextObject = this.contexts[context] || InternalContexts[context]
-
-                if (typeof contextObject === "function") {
-                    contextObject = await contextObject(parentElement, element, {
-                        close: this.hide,
-                    })
-                }
-
-                // push divider
-                if (items.length > 0) {
-                    items.push({
-                        type: "separator"
-                    })
-                }
-
-                if (Array.isArray(contextObject)) {
-                    items.push(...contextObject)
-                } else {
-                    items.push(contextObject)
-                }
+                items.push(contextObject)
             }
         }
 
