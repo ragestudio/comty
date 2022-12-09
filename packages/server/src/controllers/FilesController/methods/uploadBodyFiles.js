@@ -1,5 +1,6 @@
 import path from "path"
 import fs from "fs"
+import { nanoid } from 'nanoid'
 
 import pmap from "../../../utils/pMap"
 
@@ -41,9 +42,7 @@ export default async (payload) => {
         maxFileSize: params.maxFileSize,
         maxFields: params.maxFields,
         filename: (name, ext) => {
-            name = name.trim()
-            name = name.replace(/ /g, "_")
-            name = name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            name = nanoid()
 
             return name + ext
         },
