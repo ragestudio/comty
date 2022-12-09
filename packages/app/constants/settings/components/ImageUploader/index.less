@@ -1,0 +1,32 @@
+.imageUploader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .uploadPreview {
+        width: 100px;
+        margin-bottom: 10px;
+        
+        img {
+            width: 100%;
+            height: 100%;
+
+            border-radius: 8px;
+        }
+    }
+
+    .ant-input-group {
+        display: inline-flex;
+        flex-direction: row;
+        width: 100%;
+
+        .ant-btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            svg {
+                margin: 0!important;
+            }
+        }
+    }
+}

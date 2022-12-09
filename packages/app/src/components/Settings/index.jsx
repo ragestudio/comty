@@ -298,6 +298,7 @@ const SettingItem = (props) => {
 				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, {
 					...item.props,
 					ctx: {
+						currentValue: value,
 						dispatchUpdate,
 						onUpdateItem,
 					}
