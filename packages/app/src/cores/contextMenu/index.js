@@ -4,22 +4,37 @@ import Core from "evite/src/core"
 import { DOMWindow } from "components/RenderWindow"
 import ContextMenu from "./components/contextMenu"
 
-import Contexts from "schemas/menu-contexts"
+import InternalContexts from "schemas/menu-contexts"
+import { copyToClipboard } from "utils"
 
 export default class ContextMenuCore extends Core {
     static namespace = "ContextMenu"
     static public = ["show", "hide", "registerContext"]
 
     contexts = Object()
+
     defaultContext = [
+        {
+            label: "Copy",
+            icon: "Copy",
+            action: (clickedItem, ctx) => {
+                // get selected text
+                const selectedText = window.getSelection().toString()
+
+                copyToClipboard(selectedText)
+                
+                ctx.close()
+            }
+        },
         {
             label: "Report a bug",
             icon: "AlertTriangle",
-            action: (parent, element) => {
+            action: (clickedItem, ctx) => {
                 app.eventBus.emit("app.reportBug", {
-                    parent,
-                    element
+                    clickedItem,
                 })
+
+                ctx.close()
             }
         }
     ]
@@ -38,7 +53,7 @@ export default class ContextMenuCore extends Core {
         this.contexts[element] = context
     }
 
-    generateItems = (element) => {
+    generateItems = async (element) => {
         let items = []
 
         // find the closest context with attribute (context-menu)
@@ -46,28 +61,28 @@ export default class ContextMenuCore extends Core {
         const parentElement = element.closest("[context-menu]")
 
         if (parentElement) {
-            const context = parentElement.getAttribute("context-menu")
+            let contexts = parentElement.getAttribute("context-menu")
 
-            // if context is not registered, try to fetch it from the constants contexts object
-            if (!this.contexts[context]) {
-                items = Contexts[context] || []
-            } else {
-                items = this.contexts[context] ?? []
+            if (!contexts) {
+                return
             }
 
-            if (typeof items === "function") {
-                items = items(
-                    parentElement,
-                    element,
-                    {
-                        close: this.hide
-                    }
-                )
-            }
-        }
+            contexts = contexts.split(",").map((context) => context.trim())
 
-        if (!items) {
-            return null
+            // generate items
+            contexts.forEach(async (context) => {
+                let contextObject = this.contexts[context] || InternalContexts[context]
+
+                if (typeof contextObject === "function") {
+                    contextObject = await contextObject(element, parentElement, {
+                        close: this.hide()
+                    })
+                }
+
+                if (contextObject) {
+                    items.push(...contextObject)
+                }
+            })
         }
 
         // fullfill each item with a correspondent index if missing declared
@@ -82,6 +97,7 @@ export default class ContextMenuCore extends Core {
         // short items (if has declared index)
         items = items.sort((a, b) => a.index - b.index)
 
+        // push default items
         if (items.length > 0) {
             items.push({
                 type: "separator"
@@ -93,7 +109,7 @@ export default class ContextMenuCore extends Core {
         return items
     }
 
-    handleEvent = (event) => {
+    handleEvent = async (event) => {
         event.preventDefault()
 
         // get the cords of the mouse
@@ -108,7 +124,7 @@ export default class ContextMenuCore extends Core {
             return
         }
 
-        const items = this.generateItems(component)
+        const items = await this.generateItems(component)
 
         if (!items) {
             console.warn("No context menu items found, aborting")
@@ -122,6 +138,9 @@ export default class ContextMenuCore extends Core {
             },
             clickedComponent: component,
             items: items,
+            ctx: {
+                close: this.hide
+            }
         })
     }
 
