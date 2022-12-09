@@ -2,7 +2,8 @@ import React from "react"
 import { Skeleton } from "antd"
 
 import { PostsList, PostCreator } from "components"
-import Post from "models/post"
+
+import FeedModel from "models/feed"
 
 import "./index.less"
 
@@ -50,7 +51,7 @@ export default class Feed extends React.Component {
         })
 
         // get posts from api
-        const result = await Post.getFeed({
+        const result = await FeedModel.getPostsFeed({
             trim: trim ?? this.state.posts.length,
         })
 
