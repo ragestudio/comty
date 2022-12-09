@@ -1,10 +1,61 @@
 import path from "path"
 import fs from "fs"
-import { nanoid } from 'nanoid'
+import { videoTranscode } from "../../../lib/videoTranscode"
+import { nanoid } from "nanoid"
+import Jimp from "jimp"
 
 import pmap from "../../../utils/pMap"
 
 const formidable = require("formidable")
+
+const maximuns = {
+    imageResolution: {
+        width: 3840,
+        height: 2160,
+    },
+    imageQuality: 80,
+}
+
+const handleUploadVideo = async (file, params) => {
+    file.filepath = await videoTranscode(file.filepath, global.uploadCachePath)
+    file.newFilename = path.basename(file.filepath)
+
+    return file
+}
+
+const handleImage = async (file, params) => {
+    const { width, height } = await new Promise((resolve, reject) => {
+        Jimp.read(file.filepath)
+            .then((image) => {
+                resolve({
+                    width: image.bitmap.width,
+                    height: image.bitmap.height,
+                })
+            })
+            .catch((err) => {
+                reject(err)
+            })
+    })
+
+    if (width > maximuns.imageResolution.width || height > maximuns.imageResolution.height) {
+        await new Promise((resolve, reject) => {
+            Jimp.read(file.filepath)
+                .then((image) => {
+                    image
+                        .resize(maximuns.imageResolution.width, maximuns.imageResolution.height)
+                        .quality(maximuns.imageQuality)
+                        .write(file.filepath, resolve)
+                })
+                .catch((err) => {
+                    reject(err)
+                })
+        })
+    }
+
+    file.newFilename = path.basename(file.filepath)
+
+    return file
+}
 
 export default async (payload) => {
     if (!payload) {
@@ -86,11 +137,29 @@ export default async (payload) => {
                     // check if is video need to transcode
                     switch (file.mimetype) {
                         case "video/quicktime": {
-                            file.filepath = await videoTranscode(file.filepath, global.uploadCachePath)
-                            file.newFilename = path.basename(file.filepath)
+                            file = await handleUploadVideo(file, params)
                             break
                         }
-
+                        case "image/jpeg": {
+                            file = await handleImage(file, params)
+                            break
+                        }
+                        case "image/png": {
+                            file = await handleImage(file, params)
+                            break
+                        }
+                        case "image/gif": {
+                            file = await handleImage(file, params)
+                            break
+                        }
+                        case "image/bmp": {
+                            file = await handleImage(file, params)
+                            break
+                        }
+                        case "image/tiff": {
+                            file = await handleImage(file, params)
+                            break
+                        }
                         default: {
                             // do nothing
                         }
