@@ -4,13 +4,13 @@ export default class Livestream {
     }
 
     static async getStreamingKey() {
-        const request = await Livestream.bridge.get.streamingKey()
+        const request = await Livestream.bridge.get.tvStreamingKey()
 
         return request
     }
 
     static async regenerateStreamingKey() {
-        const request = await Livestream.bridge.post.regenerateStreamingKey()
+        const request = await Livestream.bridge.post.tvRegenerateStreamingKey()
 
         return request
     }
@@ -18,7 +18,7 @@ export default class Livestream {
     static async updateLivestreamInfo(payload) {
         const { data } = await app.api.customRequest("main", {
             method: "POST",
-            url: `/streaming/update_info`,
+            url: `/tv/streaming/update_info`,
             data: {
                 ...payload
             },
@@ -28,7 +28,7 @@ export default class Livestream {
     }
 
     static async getCategories() {
-        const request = await Livestream.bridge.get.streamingCategories()
+        const request = await Livestream.bridge.get.tvStreamingCategories()
 
         return request
     }
@@ -42,7 +42,7 @@ export default class Livestream {
 
         const { data } = await app.api.customRequest("main", {
             method: "GET",
-            url: `/stream/info`,
+            url: `/tv/stream/info`,
             params: {
                 username,
             }
@@ -58,7 +58,7 @@ export default class Livestream {
 
         let request = await app.api.customRequest("main", {
             method: "GET",
-            url: `/streaming/${username}`,
+            url: `/tv/streaming/${username}`,
         })
 
         request = request.data
@@ -67,13 +67,13 @@ export default class Livestream {
     }
 
     static async getAddresses() {
-        const request = await Livestream.bridge.get.streamingAddresses()
+        const request = await Livestream.bridge.get.tvStreamingAddresses()
 
         return request
     }
 
     static async getLivestreams() {
-        const request = await Livestream.bridge.get.streams()
+        const request = await Livestream.bridge.get.tvStreams()
 
         return request
     }
