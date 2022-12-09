@@ -1,5 +1,4 @@
 import { Controller } from "linebridge/dist/server"
-import { User, Post, Comment } from "../../models"
 import { Schematized } from "../../lib"
 
 import getComments from "./methods/getComments"
@@ -10,7 +9,7 @@ export default class CommentsController extends Controller {
     static refName = "CommentsController"
 
     get = {
-        "/post/:post_id/comments": {
+        "/posts/:post_id/comments": {
             fn: async (req, res) => {
                 const { post_id } = req.params
 
@@ -30,7 +29,7 @@ export default class CommentsController extends Controller {
     }
 
     post = {
-        "/post/:post_id/comment": {
+        "/posts/:post_id/comment": {
             middlewares: ["withAuthentication"],
             fn: Schematized({
                 required: ["message"],
@@ -57,7 +56,7 @@ export default class CommentsController extends Controller {
     }
 
     delete = {
-        "/post/:post_id/comment/:comment_id": {
+        "/posts/:post_id/comment/:comment_id": {
             middlewares: ["withAuthentication"],
             fn: async (req, res) => {
                 const result = await deleteComment({

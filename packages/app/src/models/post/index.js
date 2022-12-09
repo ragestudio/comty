@@ -16,11 +16,25 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const request = Post.bridge.get.post(undefined, {
-            post_id,
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/posts/${post_id}`,
         })
 
-        return request
+        return data
+    }
+
+    static async getPostComments({ post_id }) {
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/posts/${post_id}/comments`,
+        })
+
+        return data
     }
 
     static async sendComment({ post_id, comment }) {
@@ -30,7 +44,7 @@ export default class Post {
 
         const request = await app.api.customRequest("main", {
             method: "POST",
-            url: `/post/${post_id}/comment`,
+            url: `/posts/${post_id}/comment`,
             data: {
                 message: comment,
             },
@@ -46,7 +60,7 @@ export default class Post {
 
         const request = await app.api.customRequest("main", {
             method: "DELETE",
-            url: `/post/${post_id}/comment/${comment_id}`,
+            url: `/posts/${post_id}/comment/${comment_id}`,
         })
 
         return request
@@ -57,25 +71,16 @@ export default class Post {
             throw new Error("Bridge is not available")
         }
 
-        const request = Post.bridge.get.explorePosts(undefined, {
-            trim: trim ?? 0,
-            limit: limit ?? window.app.settings.get("feed_max_fetch"),
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/posts/explore`,
+            params: {
+                trim: trim ?? 0,
+                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+            }
         })
 
-        return request
-    }
-
-    static async getFeed({ trim, limit }) {
-        if (!Post.bridge) {
-            throw new Error("Bridge is not available")
-        }
-
-        const request = Post.bridge.get.feed(undefined, {
-            trim: trim ?? 0,
-            limit: limit ?? window.app.settings.get("feed_max_fetch"),
-        })
-
-        return request
+        return data
     }
 
     static async getSavedPosts({ trim, limit }) {
@@ -83,12 +88,16 @@ export default class Post {
             throw new Error("Bridge is not available")
         }
 
-        const request = Post.bridge.get.savedPosts(undefined, {
-            trim: trim ?? 0,
-            limit: limit ?? window.app.settings.get("feed_max_fetch"),
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/posts/saved`,
+            params: {
+                trim: trim ?? 0,
+                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+            }
         })
 
-        return request
+        return data
     }
 
     static async getUserPosts({ user_id, trim, limit }) {
@@ -101,12 +110,80 @@ export default class Post {
             user_id = app.userData?._id
         }
 
-        const request = Post.bridge.get.userPosts(undefined, {
-            user_id,
-            trim: trim ?? 0,
-            limit: limit ?? window.app.settings.get("feed_max_fetch"),
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/posts/user/${user_id}`,
+            params: {
+                trim: trim ?? 0,
+                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+            }
         })
 
-        return request
+        return data
+    }
+
+    static async toogleLike({ post_id }) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "POST",
+            url: `/posts/${post_id}/toogle_like`,
+        })
+
+        return data
+    }
+
+    static async toogleSave({ post_id }) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "POST",
+            url: `/posts/${post_id}/toogle_save`,
+        })
+
+        return data
+    }
+    
+    static async create(payload) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "POST",
+            url: `/posts/new`,
+            data: payload,
+        })
+
+        return data
+    }
+
+    static async deletePost({ post_id }) {
+        if (!Post.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "DELETE",
+            url: `/posts/${post_id}`,
+        })
+
+        return data
     }
 }
