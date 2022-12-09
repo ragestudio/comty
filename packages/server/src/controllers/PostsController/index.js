@@ -48,8 +48,6 @@ export default class PostsController extends Controller {
                     from_user_id: req.params.user_id,
                 })
 
-                console.log(req.query)
-
                 return res.json(posts)
             }
         },
