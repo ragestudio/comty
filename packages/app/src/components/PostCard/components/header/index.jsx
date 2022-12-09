@@ -27,12 +27,12 @@ export default (props) => {
 
         const interval = setInterval(() => {
             updateTimeAgo()
-        }, 10000)
+        }, 1000 * 60 * 5)
 
         return () => {
             clearInterval(interval)
         }
-    }, [props.postData.created_at])
+    }, [])
 
     return <div className="post_header" onDoubleClick={props.onDoubleClick}>
         <div className="user">
