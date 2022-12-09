@@ -5,11 +5,11 @@ import { createIconRender } from "components/Icons"
 import "./index.less"
 
 export default (props) => {
-    const { items = [], cords, clickedComponent } = props
+    const { items = [], cords, clickedComponent, ctx } = props
 
     const handleItemClick = async (item) => {
         if (typeof item.action === "function") {
-            await item.action(clickedComponent)
+            await item.action(clickedComponent, ctx)
         }
     }
 
