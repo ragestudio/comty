@@ -5,39 +5,12 @@ import { DOMWindow } from "components/RenderWindow"
 import ContextMenu from "./components/contextMenu"
 
 import InternalContexts from "schemas/menu-contexts"
-import { copyToClipboard } from "utils"
 
 export default class ContextMenuCore extends Core {
     static namespace = "ContextMenu"
     static public = ["show", "hide", "registerContext"]
 
     contexts = Object()
-
-    defaultContext = [
-        {
-            label: "Copy",
-            icon: "Copy",
-            action: (clickedItem, ctx) => {
-                // get selected text
-                const selectedText = window.getSelection().toString()
-
-                copyToClipboard(selectedText)
-                
-                ctx.close()
-            }
-        },
-        {
-            label: "Report a bug",
-            icon: "AlertTriangle",
-            action: (clickedItem, ctx) => {
-                app.eventBus.emit("app.reportBug", {
-                    clickedItem,
-                })
-
-                ctx.close()
-            }
-        }
-    ]
 
     DOMWindow = new DOMWindow({
         id: "contextMenu",
@@ -61,28 +34,46 @@ export default class ContextMenuCore extends Core {
         const parentElement = element.closest("[context-menu]")
 
         if (parentElement) {
-            let contexts = parentElement.getAttribute("context-menu")
+            let contexts = parentElement.getAttribute("context-menu") ?? []
 
-            if (!contexts) {
-                return
+            if (typeof contexts === "string") {
+                contexts = contexts.split(",").map((context) => context.trim())
             }
 
-            contexts = contexts.split(",").map((context) => context.trim())
+            // if context includes ignore, return null
+            if (contexts.includes("ignore")) {
+                return null
+            }
 
-            // generate items
-            contexts.forEach(async (context) => {
+            // check if context includes no-default, if not, push default context and remove no-default
+            if (contexts.includes("no-default")) {
+                contexts = contexts.filter((context) => context !== "no-default")
+            } else {
+                contexts.push("default-context")
+            }
+
+            for await (const context of contexts) {
                 let contextObject = this.contexts[context] || InternalContexts[context]
 
                 if (typeof contextObject === "function") {
-                    contextObject = await contextObject(element, parentElement, {
-                        close: this.hide()
+                    contextObject = await contextObject(parentElement, element, {
+                        close: this.hide,
                     })
                 }
 
-                if (contextObject) {
-                    items.push(...contextObject)
+                // push divider
+                if (items.length > 0) {
+                    items.push({
+                        type: "separator"
+                    })
                 }
-            })
+
+                if (Array.isArray(contextObject)) {
+                    items.push(...contextObject)
+                } else {
+                    items.push(contextObject)
+                }
+            }
         }
 
         // fullfill each item with a correspondent index if missing declared
@@ -97,14 +88,8 @@ export default class ContextMenuCore extends Core {
         // short items (if has declared index)
         items = items.sort((a, b) => a.index - b.index)
 
-        // push default items
-        if (items.length > 0) {
-            items.push({
-                type: "separator"
-            })
-        }
-
-        items.push(...this.defaultContext)
+        // remove undefined items
+        items = items.filter((item) => item !== undefined)
 
         return items
     }
