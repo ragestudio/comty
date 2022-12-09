@@ -3,6 +3,8 @@ import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { PostCard, LoadMore } from "components"
 
+import PostModel from "models/post"
+
 import "./index.less"
 
 const LoadingComponent = () => {
@@ -25,8 +27,6 @@ export default class PostsLists extends React.Component {
     state = {
         currentIndex: 0,
     }
-
-    api = window.app.api.withEndpoints()
 
     listRef = React.createRef()
 
@@ -87,7 +87,7 @@ export default class PostsLists extends React.Component {
     }
 
     onLikePost = async (data) => {
-        let result = await this.api.post.toogleLike({ post_id: data._id }).catch(() => {
+        let result = await PostModel.toogleLike({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to like post")
 
             return false
@@ -97,7 +97,7 @@ export default class PostsLists extends React.Component {
     }
 
     onSavePost = async (data) => {
-        let result = await this.api.post.postToogleSave({ post_id: data._id }).catch(() => {
+        let result = await PostModel.toogleSave({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to save post")
 
             return false
@@ -114,7 +114,7 @@ export default class PostsLists extends React.Component {
             okType: "danger",
             cancelText: "No",
             onOk: async () => {
-                await this.api.delete.post({ post_id: data._id }).catch(() => {
+                await PostModel.deletePost({ post_id: data._id }).catch(() => {
                     antd.message.error("Failed to delete post")
                 })
             },

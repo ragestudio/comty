@@ -6,6 +6,8 @@ import humanSize from "@tsmx/human-readable"
 
 import { Icons } from "components/Icons"
 
+import PostModel from "models/post"
+
 import "./index.less"
 
 const DEFAULT_POST_POLICY = {
@@ -43,7 +45,7 @@ export default (props) => {
         setPostingPolicy(policy)
     }
 
-    const submit = () => {
+    const submit = async () => {
         if (!canSubmit()) return
 
         setLoading(true)
@@ -56,7 +58,7 @@ export default (props) => {
             timestamp: DateTime.local().toISO(),
         }
 
-        const response = api.post.post(payload).catch(error => {
+        const response = await PostModel.create(payload).catch(error => {
             console.error(error)
             antd.message.error(error)
 
