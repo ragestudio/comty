@@ -1,7 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-
-import { UnsplashBrowser } from "./components"
+import loadable from "@loadable/component"
 
 import "./index.less"
 
@@ -82,41 +81,9 @@ export default [
         "group": "aspect",
         "title": "Background image",
         "description": "Change background image of the application. You can use a local image or a remote image (URL).",
-        "component": (props) => {
-            const [validUrl, setValidUrl] = React.useState(true)
-
-            const submitUrl = (e) => {
-                const url = e.target.value
-
-                // validate if value recived is url
-                if (!url.match(/^(http(s)?:\/\/)?(www\.)?[a-zA-Z0-9]+\.[a-zA-Z]+(\.[a-zA-Z]+)?(\/.*)?$/)) {
-                    setValidUrl(false)
-                    antd.message.error("Invalid URL")
-                    return
-                }
-
-                props.ctx.dispatchUpdate(url)
-            }
-
-            const onClickSearchUnsplash = () => {
-                antd.message.warn("This feature is not implemented yet.")
-                return false
-                window.app.SidedrawerController.open("unsplashBrowser", UnsplashBrowser)
-            }
-
-            return <div className="backgroundImageSetting">
-                <antd.Input
-                    placeholder="https://example.com/image.png"
-                    onPressEnter={submitUrl}
-                    status={validUrl ? "default" : "error"}
-                />
-                or
-                <antd.Button
-                    onClick={onClickSearchUnsplash}
-                >
-                    Search on Unsplash
-                </antd.Button>
-            </div>
+        "component": loadable(() => import("../components/ImageUploader")),
+        "props": {
+            "noPreview": true,
         },
         "emitEvent": "modifyTheme",
         "emissionValueUpdate": (value) => {

@@ -1,5 +1,5 @@
 import AppSettings from "./app"
-import AccountSettings from "./account"
+import ProfileSettings from "./profile"
 import SecuritySettings from "./security"
 import NotificationsSettings from "./notifications"
 import ApparenceSettings from "./apparence"
@@ -11,10 +11,10 @@ export default {
         label: "App",
         settings: AppSettings
     },
-    account: {
+    profile: {
         icon: "User",
         label: "Profile",
-        settings: AccountSettings
+        settings: ProfileSettings
     },
     apparence: {
         icon: "Eye",

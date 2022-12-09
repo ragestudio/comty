@@ -1,5 +1,6 @@
 import React from "react"
 import { User } from "models"
+import loadable from "@loadable/component"
 
 export default [
     {
@@ -94,10 +95,10 @@ export default [
     {
         "id": "avatar",
         "group": "account.profile",
-        "component": "Input",
         "icon": "Image",
         "title": "Avatar",
         "description": "Change your avatar (Upload an image or use an URL)",
+        "component": loadable(() => import("../components/ImageUploader")),
         "defaultValue": async () => {
             const userData = await User.data()
             return userData.avatar
@@ -113,6 +114,7 @@ export default [
             })
 
             if (result) {
+                app.message.success("Avatar updated")
                 return result
             }
         },
@@ -121,10 +123,10 @@ export default [
     {
         "id": "cover",
         "group": "account.profile",
-        "component": "Input",
         "icon": "Image",
         "title": "Cover",
         "description": "Change your profile cover (Upload an image or use an URL)",
+        "component": loadable(() => import("../components/ImageUploader")),
         "defaultValue": async () => {
             const userData = await User.data()
             return userData.cover
@@ -140,18 +142,11 @@ export default [
             })
 
             if (result) {
+                app.message.success("Cover updated")
                 return result
             }
         },
         "debounced": true,
-    },
-    {
-        "id": "cover",
-        "group": "account.profile",
-        "component": "ImageUpload",
-        "icon": "Image",
-        "title": "Cover",
-        "description": "Change your cover",
     },
     {
         "id": "description",

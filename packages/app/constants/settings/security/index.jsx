@@ -10,7 +10,7 @@ export default [
         "title": "Change Password",
         "description": "Change your password",
         "icon": "Lock",
-        "component": loadable(() => import("./components/changePassword")),
+        "component": loadable(() => import("../components/changePassword")),
     },
     {
         "id": "two-factor-authentication",
@@ -26,7 +26,7 @@ export default [
         "title": "Sessions",
         "description": "Manage your active sessions",
         "icon": "Monitor",
-        "component": loadable(() => import("./components/sessions")),
+        "component": loadable(() => import("../components/sessions")),
     },
     {
         "id": "logout",
