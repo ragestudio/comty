@@ -1,14 +1,5 @@
 import download from "utils/download"
-
-function copyToClipboard(text) {
-    if (!navigator.clipboard?.writeText) {
-        control.close()
-        return app.message.error("Clipboard API not supported")
-    }
-
-    navigator.clipboard.writeText(text)
-    app.message.success("Copied to clipboard")
-}
+import { copyToClipboard } from "utils"
 
 export default {
     "ignore": () => {
