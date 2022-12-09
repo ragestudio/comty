@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { DateTime } from "luxon"
+import PostModel from "models/post"
 
 import { Icons } from "components/Icons"
 
@@ -160,7 +161,7 @@ export default (props) => {
 
         let RequestData = {
             type: "playlist",
-            message: playlistDescription,
+            message: playlistDescription ?? "No description",
             timestamp: DateTime.local().toISO(),
             data: {
                 title: playlistName,
@@ -177,7 +178,7 @@ export default (props) => {
             }
         }
 
-        const response = api.post.post(RequestData).catch(error => {
+        const response = await PostModel.create(RequestData).catch(error => {
             console.error(error)
             antd.message.error(error)
 
