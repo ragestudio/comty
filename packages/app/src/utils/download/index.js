@@ -1,9 +1,8 @@
 export default (uri, filename) => {
+    app.message.info("Downloading media...")
+
     fetch(uri, {
         method: "GET",
-        headers: {
-            "Content-Type": "application/pdf",
-        },
     })
         .then((response) => response.blob())
         .then((blob) => {
@@ -28,5 +27,9 @@ export default (uri, filename) => {
 
             // Clean up and remove the link
             link.parentNode.removeChild(link)
+        })
+        .catch((error) => {
+            console.error(error)
+            app.message.error("Failed to download media")
         })
 }

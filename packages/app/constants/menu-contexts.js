@@ -98,7 +98,6 @@ export default {
                 label: "Download media",
                 icon: "Download",
                 action: () => {
-                    app.message.info("Downloading media...")
                     download(media.src)
                     control.close()
                 }
