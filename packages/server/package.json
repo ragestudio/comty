@@ -19,6 +19,7 @@
     "dotenv": "16.0.1",
     "fluent-ffmpeg": "2.1.2",
     "formidable": "2.0.1",
+    "jimp": "^0.16.2",
     "jsonwebtoken": "8.5.1",
     "linebridge": "0.14.0",
     "luxon": "^3.0.4",
