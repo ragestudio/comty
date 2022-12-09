@@ -54,20 +54,20 @@ export default (props) => {
         setComments(null)
 
         // fetch comments
-        const commentsResult = await window.app.api.customRequest("main", {
-            method: "get",
-            url: `/post/${props.post_id}/comments`,
-        }).catch((err) => {
-            console.log(err)
-
-            antd.message.error("Failed to fetch comments")
-
-            return null
+        const commentsResult = await PostModel.getPostComments({
+            post_id: props.post_id
         })
+            .catch((err) => {
+                console.log(err)
+
+                antd.message.error("Failed to fetch comments")
+
+                return null
+            })
 
         if (!commentsResult) return
 
-        setComments(commentsResult.data)
+        setComments(commentsResult)
     }
 
     const handleCommentSubmit = async (comment) => {
