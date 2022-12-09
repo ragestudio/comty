@@ -2,8 +2,36 @@ import download from "utils/download"
 import { copyToClipboard } from "utils"
 
 export default {
-    "ignore": () => {
-        return false
+    "default-context": () => {
+        const items = []
+
+        const text = window.getSelection().toString()
+
+        if (text) {
+            items.push({
+                label: "Copy",
+                icon: "Copy",
+                action: (clickedItem, ctx) => {
+                    copyToClipboard(text)
+
+                    ctx.close()
+                }
+            })
+        }
+
+        items.push({
+            label: "Report a bug",
+            icon: "AlertTriangle",
+            action: (clickedItem, ctx) => {
+                app.eventBus.emit("app.reportBug", {
+                    clickedItem,
+                })
+
+                ctx.close()
+            }
+        })
+
+        return items
     },
     "postCard-context": (parent, element, control) => {
         const items = [
