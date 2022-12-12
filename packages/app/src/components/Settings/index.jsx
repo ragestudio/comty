@@ -426,13 +426,18 @@ export default class SettingsMenu extends React.PureComponent {
 	}
 
 	render() {
-		return <div className="settings_wrapper">
+		return <div className={
+			classnames("settings_wrapper", {
+				["mobile"]: window.isMobile,
+			})
+		}>
 			<div className="settings">
 				<antd.Tabs
 					activeKey={this.state.activeKey}
-					centered
-					destroyInactiveTabPane
 					onTabClick={this.handlePageTransition}
+					tabPosition={window.isMobile ? "top" : "left"}
+					centered={window.isMobile}
+					destroyInactiveTabPane
 				>
 					{this.generateSettingsTabs()}
 				</antd.Tabs>

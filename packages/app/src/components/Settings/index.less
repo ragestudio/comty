@@ -1,12 +1,24 @@
 .settings_wrapper {
-	min-width: 30vw;
-
 	.settings {
 		display: flex;
 		flex-direction: column;
 
 		>div {
 			margin-bottom: 25px;
+		}
+
+		&.mobile {
+			.ant-tabs-nav-list {
+				width: 100%;
+				justify-content: space-evenly;
+			}
+		}
+
+		.ant-tabs-nav-list {
+			.ant-tabs-tab {
+				padding: 5px 0 !important;
+				margin-right: 10px !important;
+			}
 		}
 
 		.group {
@@ -132,11 +144,6 @@
 					padding: 0 7px;
 				}
 			}
-		}
-
-		.ant-tabs-nav-list {
-			width: 100%;
-			justify-content: space-evenly;
 		}
 	}
 }

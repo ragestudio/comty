@@ -333,20 +333,20 @@ class App extends React.Component {
 			return window.app.ModalController.open((props) => <Creator {...props} />)
 		},
 		openSettings: (goTo) => {
-			const controller = window.isMobile ? app.DrawerController : app.SidedrawerController
-
-			if (!controller) {
-				console.error("No controller found")
-				return false
+			if (window.isMobile) {
+				return app.DrawerController.open("Settings", Settings, {
+					props: {
+						width: "fit-content",
+						goTo,
+					},
+					allowMultiples: false,
+					escClosable: true,
+				})
 			}
 
-			controller.open("Settings", Settings, {
-				props: {
-					width: "fit-content",
-					goTo,
-				},
-				allowMultiples: false,
-				escClosable: true,
+			return app.SidebarController.setCustomRender(Settings, {
+				title: "Settings",
+				icon: "Settings"
 			})
 		},
 		openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
@@ -464,11 +464,11 @@ class App extends React.Component {
 		}, () => {
 			App.publicMethods.openCreator()
 		})
-		
+
 		app.eventBus.emit("app.initialization.start")
-		
+
 		await this.initialization()
-		
+
 		app.eventBus.emit("app.initialization.finish")
 
 		Utils.handleOpenDevTools()
