@@ -114,7 +114,7 @@
     "electron": "^21.0.1",
     "express": "^4.17.1",
     "typescript": "^4.3.5",
-    "vite": "4.0.0"
+    "vite": "3.2.5"
   },
   "config": {
     "forge": {
