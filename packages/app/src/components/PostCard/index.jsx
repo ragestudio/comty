@@ -7,10 +7,11 @@ import { Icons } from "components/Icons"
 import PostHeader from "./components/header"
 import PostContent from "./components/content"
 import PostActions from "./components/actions"
+import PostAttachments from "./components/attachments"
 
 import "./index.less"
 
-export default React.memo(({
+export default ({
     expansibleActions = window.app.settings.get("postCard_expansible_actions"),
     autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
     data = {},
@@ -160,7 +161,12 @@ export default React.memo(({
                 autoCarrousel={autoCarrousel}
                 fullmode={fullmode}
                 onDoubleClick={onDoubleClick}
-            />
+                nsfw={data.flags && data.flags.includes("nsfw")}
+            >
+                {data.attachments && data.attachments.length > 0 && <PostAttachments
+                    attachments={data.attachments}
+                />}
+            </PostContent>
         </div>
         {!fullmode &&
             <div className="post_actionsIndicator">
@@ -181,4 +187,4 @@ export default React.memo(({
             />
         }
     </div>
-})
+}
