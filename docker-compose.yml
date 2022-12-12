@@ -6,8 +6,6 @@ services:
     restart: unless-stopped
     ports:
       - "9000:9000"
-    volumes:
-      - wrapper_data:/home/node/app
   api:
     build: packages/server
     restart: unless-stopped
@@ -16,18 +14,4 @@ services:
     env_file:
       - .env
     volumes:
-      - api_data:/home/node/app
-
-volumes:
-  wrapper_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./d_data/wrapper
-      o: bind
-  api_data: 
-    driver: local
-    driver_opts:
-      type: none
-      device: ./d_data/api
-      o: bind
+      - ./d_data/api/cache:/home/node/app/cache:ro
