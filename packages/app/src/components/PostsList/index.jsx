@@ -11,7 +11,7 @@ const LoadingComponent = () => {
     // FIXME: Im not sure why but, using <antd.Skeleton> will cause a memory leak of DOM Nodes when using IntersectionObserver
     //return <antd.Skeleton active />
 
-    return <p><Icons.LoadingOutlined spin className="loadingIcon" /> Loading more ...</p>
+    return <p><Icons.LoadingOutlined spin className="loadingIcon" />Loading more ...</p>
 }
 
 const NoResultComponent = () => {
@@ -31,7 +31,6 @@ export default class PostsLists extends React.Component {
     listRef = React.createRef()
 
     componentDidMount = async () => {
-        // TODO: register keybindings to handle directions key scrolling to posts (use app.shortcuts)
         window.app.shortcuts.register({
             id: "postsFeed.scrollUp",
             key: "ArrowUp",
