@@ -133,58 +133,72 @@ export default ({
         return <antd.Skeleton active />
     }
 
-    return <div
-        key={data.key ?? data._id}
-        id={data._id}
-        className={classnames(
-            "postCard",
-            data.type,
-            { ["liked"]: hasLiked },
-            { ["noHide"]: window.isMobile || !expansibleActions },
-            { ["fullmode"]: fullmode },
-        )}
-        context-menu={"postCard-context"}
-        user-id={data.user_id}
-        self-post={isSelf.toString()}
-    >
-        <div className="wrapper">
-            <PostHeader
-                postData={data}
-                isLiked={hasLiked}
-                likes={likes.length}
-                comments={comments.length}
-                fullmode={fullmode}
-                onDoubleClick={onDoubleClick}
-            />
-            <PostContent
-                data={data}
-                autoCarrousel={autoCarrousel}
-                fullmode={fullmode}
-                onDoubleClick={onDoubleClick}
-                nsfw={data.flags && data.flags.includes("nsfw")}
-            >
-                {data.attachments && data.attachments.length > 0 && <PostAttachments
-                    attachments={data.attachments}
-                />}
-            </PostContent>
-        </div>
-        {!fullmode &&
-            <div className="post_actionsIndicator">
-                <Icons.MoreHorizontal />
+    try {
+        return <div
+            key={data.key ?? data._id}
+            id={data._id}
+            className={classnames(
+                "postCard",
+                data.type,
+                { ["liked"]: hasLiked },
+                { ["noHide"]: window.isMobile || !expansibleActions },
+                { ["fullmode"]: fullmode },
+            )}
+            context-menu={"postCard-context"}
+            user-id={data.user_id}
+            self-post={isSelf.toString()}
+        >
+            <div className="wrapper">
+                <PostHeader
+                    postData={data}
+                    isLiked={hasLiked}
+                    likes={likes.length}
+                    comments={comments.length}
+                    fullmode={fullmode}
+                    onDoubleClick={onDoubleClick}
+                />
+                <PostContent
+                    data={data}
+                    autoCarrousel={autoCarrousel}
+                    fullmode={fullmode}
+                    onDoubleClick={onDoubleClick}
+                    nsfw={data.flags && data.flags.includes("nsfw")}
+                >
+                    {data.attachments && data.attachments.length > 0 && <PostAttachments
+                        attachments={data.attachments}
+                    />}
+                </PostContent>
             </div>
-        }
-        {!fullmode &&
-            <PostActions
-                defaultLiked={hasLiked}
-                defaultSaved={hasSaved}
-                onClickLike={onClickLike}
-                onClickSave={onClickSave}
-                onClickOpen={onClickOpen}
-                actions={{
-                    delete: onClickDelete,
-                }}
-                fullmode={fullmode}
-            />
-        }
-    </div>
+            {!fullmode &&
+                <div className="post_actionsIndicator">
+                    <Icons.MoreHorizontal />
+                </div>
+            }
+            {!fullmode &&
+                <PostActions
+                    defaultLiked={hasLiked}
+                    defaultSaved={hasSaved}
+                    onClickLike={onClickLike}
+                    onClickSave={onClickSave}
+                    onClickOpen={onClickOpen}
+                    actions={{
+                        delete: onClickDelete,
+                    }}
+                    fullmode={fullmode}
+                />
+            }
+        </div>
+    } catch (error) {
+        console.error(error)
+
+        return <div className="postCard error">
+            <h1>
+                <Icons.AlertTriangle />
+                <span>Cannot render this post</span>
+                <span>
+                    Maybe this version of the app is outdated or is not supported yet
+                </span>
+            </h1>
+        </div>
+    }
 }

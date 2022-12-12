@@ -8,18 +8,9 @@ import { processString } from "utils"
 import "./index.less"
 
 export default (props) => {
-    let { message, data } = props.data
+    let { message } = props.data
 
     const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
-
-    if (typeof data === "string") {
-        try {
-            data = JSON.parse(data)
-        } catch (error) {
-            console.error(error)
-            data = {}
-        }
-    }
 
     // parse message
     const regexs = [

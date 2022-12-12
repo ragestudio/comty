@@ -30,7 +30,7 @@ import "plyr-react/dist/plyr.css"
 import "./index.less"
 
 const Attachment = React.memo((props) => {
-    const { url, id, name } = props.attachment
+    const { url, id } = props.attachment
 
     const [loaded, setLoaded] = React.useState(false)
 
@@ -108,9 +108,19 @@ const Attachment = React.memo((props) => {
         return <ContentFailed />
     }
 
-    return <div className="attachment" id={id}>
-        {renderMedia()}
-    </div>
+    try {
+        return <div
+            key={props.index}
+            id={id}
+            className="attachment"
+        >
+            {renderMedia()}
+        </div>
+    } catch (error) {
+        console.error(`Failed to render attachment ${props.attachment.name} (${props.attachment.id})`, error)
+
+        return <ContentFailed />
+    }
 })
 
 export default (props) => {
@@ -158,8 +168,8 @@ export default (props) => {
             stopOnHover={true}
         >
             {
-                props.attachments.map((attachment, index) => {
-                    return <Attachment key={index} attachment={attachment} />
+                props.attachments?.length > 0 && props.attachments.map((attachment, index) => {
+                    return <Attachment index={index} attachment={attachment} />
                 })
             }
         </Carousel>
