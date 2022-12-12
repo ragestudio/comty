@@ -60,6 +60,38 @@ const generateItems = () => {
 	}
 }
 
+const CustomRender = (props) => {
+	const handleClickOutside = (event) => {
+		if (props.sidebarRef.current && !props.sidebarRef.current.contains(event.target)) {
+			props.closeRender()
+		}
+	}
+
+	React.useEffect(() => {
+		document.addEventListener("mousedown", handleClickOutside)
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside)
+		}
+	}, [])
+
+	return <div className="render_content_wrapper">
+		<div className="render_content_header">
+			{
+				props.customRenderTitle ?? null
+			}
+			<Button
+				onClick={props.closeRender}
+			>
+				Close
+			</Button>
+		</div>
+		<div className="render_content">
+			{props.children}
+		</div>
+	</div>
+}
+
 export default class Sidebar extends React.Component {
 	constructor(props) {
 		super(props)
@@ -94,6 +126,8 @@ export default class Sidebar extends React.Component {
 		})
 	}
 
+	sidebarRef = React.createRef()
+
 	collapseDebounce = null
 
 	componentDidMount = async () => {
@@ -104,12 +138,12 @@ export default class Sidebar extends React.Component {
 		}, 100)
 	}
 
-	setRender = (render, options = {}) => {
+	setRender = async (render, options = {}) => {
 		if (!typeof render === "function") {
 			throw new Error("Render is required to be a function")
 		}
 
-		this.setState({
+		await this.setState({
 			customRenderTitle: <div className="render_content_header_title">
 				{
 					options.icon && createIconRender(options.icon)
@@ -258,25 +292,16 @@ export default class Sidebar extends React.Component {
 						}
 					)
 				}
+				ref={this.sidebarRef}
 			>
-
 				{
-					this.state.customRender &&
-					<div className="render_content_wrapper">
-						<div className="render_content_header">
-							{
-								this.state.customRenderTitle ?? null
-							}
-							<Button
-								onClick={this.closeRender}
-							>
-								Close
-							</Button>
-						</div>
-						<div className="render_content">
-							{this.state.customRender}
-						</div>
-					</div>
+					this.state.customRender && <CustomRender
+						customRenderTitle={this.state.customRenderTitle}
+						closeRender={this.closeRender}
+						sidebarRef={this.sidebarRef}
+					>
+						{this.state.customRender}
+					</CustomRender>
 				}
 
 				{
