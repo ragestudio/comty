@@ -56,6 +56,7 @@ import { Toast } from "antd-mobile"
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
+import { Lightbox } from "react-modal-image"
 
 import { Session, User } from "models"
 import config from "config"
@@ -350,6 +351,20 @@ class App extends React.Component {
 			})
 		},
 		openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
+		openFullImageViewer: (src) => {
+			const win = new DOMWindow({
+				id: "fullImageViewer",
+				className: "fullImageViewer",
+			})
+
+			win.render(<Lightbox
+				small={src}
+				large={src}
+				onClose={() => win.remove()}
+				hideDownload
+				showRotate
+			/>)
+		},
 		goAuth: () => {
 			return window.app.setLocation(config.app.authPath ?? "/auth")
 		},

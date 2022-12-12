@@ -1,8 +1,9 @@
 import React from "react"
 import { Skeleton } from "antd"
-import loadable from "@loadable/component"
 import { Carousel } from "react-responsive-carousel"
+import { ImageViewer } from "components"
 import Plyr from "plyr-react"
+import ModalImage from "react-modal-image"
 
 import ContentFailed from "../contentFailed"
 
@@ -37,6 +38,15 @@ const Attachment = React.memo((props) => {
     const [mediaType, setMediaType] = React.useState(null)
     const [mimeType, setMimeType] = React.useState(null)
 
+    const onDoubleClickAttachment = (e) => {
+        if (mediaType.split("/")[0] === "image") {
+            e.preventDefault()
+            e.stopPropagation()
+
+            app.openFullImageViewer(url)
+        }
+    }
+
     const getMediaType = async () => {
         let extension = null
 
@@ -68,7 +78,7 @@ const Attachment = React.memo((props) => {
     const renderMedia = () => {
         switch (mediaType.split("/")[0]) {
             case "image": {
-                return <img src={url} />
+                return <ImageViewer src={url} />
             }
             case "video": {
                 return <Plyr
@@ -113,6 +123,7 @@ const Attachment = React.memo((props) => {
             key={props.index}
             id={id}
             className="attachment"
+            onDoubleClick={onDoubleClickAttachment}
         >
             {renderMedia()}
         </div>
