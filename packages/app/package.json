@@ -83,6 +83,7 @@
     "react-lazy-load-image-component": "^1.5.4",
     "react-loadable": "^5.5.0",
     "react-markdown": "^8.0.3",
+    "react-modal-image": "^2.6.0",
     "react-motion": "0.5.2",
     "react-responsive-carousel": "^3.2.23",
     "react-reveal": "1.2.2",
