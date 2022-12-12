@@ -1,4 +1,5 @@
 import React from "react"
+import { Skeleton } from "antd"
 import loadable from "@loadable/component"
 import { Carousel } from "react-responsive-carousel"
 import Plyr from "plyr-react"
@@ -28,96 +29,139 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
 
-export default class PostAttachments extends React.PureComponent {
-    getAttachments = (data) => {
-        return data.map((addition, index) => {
-            if (typeof addition === "string") {
-                addition = {
-                    url: addition,
-                }
-            }
+const Attachment = React.memo((props) => {
+    const { url, id, name } = props.attachment
 
-            const { url, id, name } = addition
+    const [loaded, setLoaded] = React.useState(false)
 
-            const MediaRender = loadable(async () => {
-                let extension = null
+    const [mediaType, setMediaType] = React.useState(null)
+    const [mimeType, setMimeType] = React.useState(null)
 
-                try {
-                    // get media type by parsing the url
-                    const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
+    const getMediaType = async () => {
+        let extension = null
 
-                    if (mediaTypeExt) {
-                        extension = mediaTypeExt[1]
-                    } else {
-                        // try to get media by creating requesting the url
-                        const response = await fetch(url, {
-                            method: "HEAD",
-                        })
+        // get media type by parsing the url
+        const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
 
-                        extension = response.headers.get("content-type").split("/")[1]
-                    }
-
-                    extension = extension.toLowerCase()
-
-                    const mediaType = mediaTypes[extension]
-                    const mimeType = `${mediaType}/${extension}`
-
-                    if (!mediaType) {
-                        return () => <ContentFailed />
-                    }
-
-                    switch (mediaType.split("/")[0]) {
-                        case "image": {
-                            return () => <img src={url} />
-                        }
-                        case "video": {
-                            return () => <Plyr
-                                source={{
-                                    type: "video",
-                                    sources: [{
-                                        src: url,
-                                    }],
-                                }}
-                                options={{
-                                    controls: ["play", "progress", "current-time", "mute", "volume"],
-                                }}
-                            />
-                        }
-                        case "audio": {
-                            return () => <audio controls>
-                                <source src={url} type={mimeType} />
-                            </audio>
-                        }
-                        default: {
-                            return () => <h4>
-                                Unsupported media type [{mediaType}/{mediaTypeExt}]
-                            </h4>
-                        }
-                    }
-                } catch (error) {
-                    console.error(error)
-                    return () => <ContentFailed />
-                }
+        if (mediaTypeExt) {
+            extension = mediaTypeExt[1]
+        } else {
+            // try to get media by creating requesting the url
+            const response = await fetch(url, {
+                method: "HEAD",
             })
 
-            return <div key={index} className="addition">
-                <React.Suspense fallback={<div>Loading</div>} >
-                    <MediaRender />
-                </React.Suspense>
-            </div>
-        })
+            extension = response.headers.get("content-type").split("/")[1]
+        }
+
+        extension = extension.toLowerCase()
+
+        const mediaType = mediaTypes[extension]
+        const mimeType = `${mediaType}/${extension}`
+
+        setMediaType(mediaType)
+        setMimeType(mimeType)
+
+        setLoaded(true)
     }
 
-    render() {
-        return <div className="post_attachments">
-            <Carousel
-                showArrows={true}
-                showStatus={false}
-                showThumbs={false}
-                showIndicators={this.props.attachments?.length > 1 ?? false}
-            >
-                {this.getAttachments(this.props.attachments)}
-            </Carousel>
-        </div>
+    const renderMedia = () => {
+        switch (mediaType.split("/")[0]) {
+            case "image": {
+                return <img src={url} />
+            }
+            case "video": {
+                return <Plyr
+                    source={{
+                        type: "video",
+                        sources: [{
+                            src: url,
+                        }],
+                    }}
+                    options={{
+                        controls: ["play", "progress", "current-time", "mute", "volume"],
+                    }}
+                />
+            }
+            case "audio": {
+                return <audio controls>
+                    <source src={url} type={mimeType} />
+                </audio>
+            }
+            default: {
+                return <h4>
+                    Unsupported media type [{mediaType}/{mediaTypeExt}]
+                </h4>
+            }
+        }
     }
+
+    React.useEffect(() => {
+        getMediaType()
+    }, [])
+
+    if (!loaded) {
+        return <Skeleton active />
+    }
+
+    if (loaded && !mediaType && !mimeType) {
+        return <ContentFailed />
+    }
+
+    return <div className="attachment" id={id}>
+        {renderMedia()}
+    </div>
+})
+
+export default (props) => {
+    const carouselRef = React.useRef(null)
+    const [attachmentIndex, setAttachmentIndex] = React.useState(0)
+
+    const handleAttachmentChange = (index) => {
+        const currentAttachmentIndex = carouselRef.current.state.selectedItem
+        const currentAttachment = carouselRef.current.itemsRef[currentAttachmentIndex].querySelector("video, audio")
+
+        if (currentAttachmentIndex !== index) {
+            // if the attachment is a video, pause it
+            if (currentAttachment) {
+                currentAttachment.pause()
+            }
+        } else {
+            // else if the attachment is a video, play it
+            if (currentAttachment) {
+                currentAttachment.play()
+            }
+        }
+
+        setAttachmentIndex(index)
+    }
+
+    React.useEffect(() => {
+        // get attachment index from query string
+        const attachmentIndex = parseInt(new URLSearchParams(window.location.search).get("attachment"))
+
+        if (attachmentIndex) {
+            setAttachmentIndex(attachmentIndex)
+        }
+    }, [])
+
+    return <div className="post_attachments">
+        <Carousel
+            ref={carouselRef}
+            showArrows={true}
+            showStatus={false}
+            showThumbs={false}
+            showIndicators={props.attachments?.length > 1 ?? false}
+            selectedItem={attachmentIndex}
+            onChange={handleAttachmentChange}
+            transitionTime={150}
+            stopOnHover={true}
+        >
+            {
+                props.attachments.map((attachment, index) => {
+                    return <Attachment key={index} attachment={attachment} />
+                })
+            }
+        </Carousel>
+    </div>
 }

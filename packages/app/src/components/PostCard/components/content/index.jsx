@@ -5,18 +5,12 @@ import classnames from "classnames"
 
 import { processString } from "utils"
 
-import { Icons } from "components/Icons"
-
-import PostAttachments from "../attachments"
-
 import "./index.less"
 
-export default React.memo((props) => {
-    let { message, attachments, type, data, flags } = props.data
+export default (props) => {
+    let { message, data } = props.data
 
     const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
-
-    const isNSFW = flags?.includes("nsfw")
 
     if (typeof data === "string") {
         try {
@@ -24,12 +18,6 @@ export default React.memo((props) => {
         } catch (error) {
             console.error(error)
             data = {}
-        }
-    }
-
-    const onClickPlaylist = () => {
-        if (data.playlist) {
-            app.AudioPlayer.startPlaylist(data.playlist)
         }
     }
 
@@ -63,57 +51,17 @@ export default React.memo((props) => {
 
     message = processString(regexs)(message)
 
-    const renderContent = () => {
-        switch (type) {
-            case "playlist": {
-                return <>
-                    <div
-                        className="playlistCover"
-                        onClick={onClickPlaylist}
-                        style={{
-                            backgroundImage: `url(${data?.cover ?? "/assets/no_song.png"})`,
-                        }}
-                    />
-
-                    <div className="playlistTitle">
-                        <div>
-                            <h1>
-                                {data.title ?? "Untitled Playlist"}
-                            </h1>
-                            <h3>
-                                {data.artist}
-                            </h3>
-                        </div>
-
-                        <h4>
-                            {message}
-                        </h4>
-
-                        <div className="actions">
-                            <antd.Button onClick={onClickPlaylist}>
-                                <Icons.PlayCircle />
-                                Play
-                            </antd.Button>
-                        </div>
-                    </div>
-                </>
-            }
-            default: {
-                return <>
-                    <div className="message">
-                        {message}
-                    </div>
-
-                    {attachments.length > 0 && <PostAttachments attachments={attachments} />}
-                </>
-            }
-        }
-    }
-
     return <div
-        className={classnames("post_content", { ["nsfw"]: isNSFW && !nsfwAccepted })}
+        className={
+            classnames(
+                "post_content",
+                {
+                    ["nsfw"]: props.nsfw && !nsfwAccepted
+                }
+            )
+        }
     >
-        {isNSFW && !nsfwAccepted &&
+        {props.nsfw && !nsfwAccepted &&
             <div className="nsfw_alert">
                 <h2>
                     This post may contain sensitive content.
@@ -125,6 +73,12 @@ export default React.memo((props) => {
             </div>
         }
 
-        {renderContent()}
+        <div className="message">
+            {message}
+        </div>
+
+        {
+            props.children
+        }
     </div>
-})
+}
