@@ -31,14 +31,22 @@ export default class User {
         return User.bridge.get.user(undefined, { _id: user_id })
     }
 
-    static async publicData() {
-        const token = await Session.decodedToken()
-
-        if (!token) {
-            return false
+    static async publicData(payload = {}) {
+        if (!User.bridge) {
+            throw new Error("Bridge is not available")
         }
 
-        return User.bridge.get.userPublicData({ username: token.username })
+        if (!payload.username && !payload.user_id) {
+            const token = await Session.decodedToken()
+
+            if (token) {
+                payload.username = token.username
+            } else {
+                throw new Error("username or user_id is required")
+            }
+        }
+
+        return User.bridge.get.userPublicData({ username: payload.username, user_id: payload.user_id })
     }
 
     static async roles() {
