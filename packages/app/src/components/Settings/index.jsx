@@ -95,14 +95,18 @@ const SettingItem = (props) => {
 			await window.app.settings.set(item.id, updateValue)
 		}
 
-		if (typeof item.emitEvent === "string") {
+		if (typeof item.emitEvent !== "undefined") {
 			let emissionPayload = updateValue
 
 			if (typeof item.emissionValueUpdate === "function") {
 				emissionPayload = item.emissionValueUpdate(emissionPayload)
 			}
 
-			window.app.eventBus.emit(item.emitEvent, emissionPayload)
+			if (Array.isArray(item.emitEvent)) {
+				window.app.eventBus.emit(...item.emitEvent, emissionPayload)
+			} else if (typeof item.emitEvent === "string") {
+				window.app.eventBus.emit(item.emitEvent, emissionPayload)
+			}
 		}
 
 		if (item.noUpdate) {
@@ -200,8 +204,6 @@ const SettingItem = (props) => {
 			console.error(`Item [${item.id}] has an invalid component: ${item.component}`)
 			return null
 		}
-
-		// fix props
 
 		switch (SettingComponent.toLowerCase()) {
 			case "slidercolorpicker": {
@@ -305,6 +307,7 @@ const SettingItem = (props) => {
 						currentValue: value,
 						dispatchUpdate,
 						onUpdateItem,
+						...props.ctx,
 					}
 				})}
 			</div>
@@ -378,7 +381,12 @@ export default class SettingsMenu extends React.PureComponent {
 					}</Translation>
 				</h1>
 				<div className="content">
-					{group.map((item) => <SettingItem item={item} />)}
+					{group.map((item) => <SettingItem
+						item={item}
+						ctx={{
+							close: this.props.close
+						}}
+					/>)}
 				</div>
 			</div>
 		</div>
