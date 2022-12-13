@@ -19,16 +19,6 @@ export default [
         "emitEvent": "changeLanguage"
     },
     {
-        "id": "forceMobileMode",
-        "storaged": true,
-        "group": "general",
-        "component": "Switch",
-        "icon": "MdSmartphone",
-        "title": "Force Mobile Mode",
-        "description": "Force the application to run in mobile mode.",
-        "emitEvent": "forceMobileMode"
-    },
-    {
         "id": "haptic_feedback",
         "storaged": true,
         "group": "general",
@@ -103,16 +93,6 @@ export default [
         "emitEvent": "changeNotificationsSoundVolume"
     },
     {
-        "id": "edit_sidebar",
-        "storaged": true,
-        "group": "sidebar",
-        "component": "Button",
-        "icon": "Edit",
-        "title": "Edit Sidebar",
-        "emitEvent": "edit_sidebar",
-        "noStorage": true
-    },
-    {
         "id": "collapseOnLooseFocus",
         "storaged": true,
         "group": "sidebar",
@@ -167,7 +147,8 @@ export default [
         "icon": "MdPhotoCameraBack",
         "group": "posts",
         "storaged": true,
-        "emitEvent": "router.forceUpdate"
+        "emitEvent": "router.forceUpdate",
+        "disabled": true
     },
     {
         "id": "postCard_expansible_actions",
