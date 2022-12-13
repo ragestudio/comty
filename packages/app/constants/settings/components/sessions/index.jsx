@@ -1,10 +1,13 @@
 import React from "react"
-import * as antd from "antd"
+import { Button } from "antd"
 
 export default (props) => {
-    return <div>
-        <antd.Button>
-            Check activity
-        </antd.Button>
-    </div>
+    return <Button
+        onClick={() => {
+            app.setLocation("/security/sessions")
+            props.ctx.close()
+        }}
+    >
+        Check activity
+    </Button>
 }
