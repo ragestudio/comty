@@ -1,0 +1,63 @@
+.play {
+    display: grid;
+
+    grid-template-columns: 1fr 50vw;
+    grid-template-rows: 1fr;
+    grid-column-gap: 20px;
+    grid-row-gap: 0px;
+
+    .play_info_wrapper {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+
+        padding: 20px;
+
+        .play_info {
+            display: flex;
+            flex-direction: column;
+    
+            align-self: center;
+    
+            width: 30vw;
+            height: 100%;
+    
+            padding: 20px;
+    
+            background-color: var(--background-color-accent);
+            border-radius: 12px;
+
+            .play_info_cover {
+                display: flex;
+                flex-direction: column;
+    
+                align-items: center;
+                justify-content: center;
+    
+                width: 100%;
+                height: 100%;
+    
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 12px;
+                }
+            }
+
+            .play_info_details {
+                margin-top: 20px;
+                
+                .play_info_title {
+                    font-size: 1.5rem;
+                    font-family: "Space Grotesk", sans-serif;
+                }
+            }
+        }
+    }
+    
+}
