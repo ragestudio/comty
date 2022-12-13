@@ -159,6 +159,10 @@ const SettingItem = (props) => {
 			setValue(await item.defaultValue())
 		}
 
+		if (item.disabled === true) {
+			setDisabled(true)
+		}
+
 		if (typeof item.dependsOn === "object") {
 			// create a event handler to watch changes
 			Object.keys(item.dependsOn).forEach((key) => {
