@@ -423,7 +423,10 @@ class App extends React.Component {
 				title: "Debug",
 			})
 
-			win.createDefaultWindow(loadable(() => import("./debug")))
+			win.createDefaultWindow(loadable(() => import("./debug")), {
+				width: 700,
+				height: 500,
+			})
 		}
 	}
 
