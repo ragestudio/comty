@@ -2,13 +2,26 @@ import { Controller } from "linebridge/dist/server"
 import { Schematized } from "../../lib"
 
 import publishPlaylist from "./methods/publishPlaylist"
+import getPlaylist from "./methods/getPlaylist"
 
 export default class PlaylistsController extends Controller {
     //static useMiddlewares = ["withAuthentication"]
 
     get = {
         "/playlist/:id": async (req, res) => {
+            const result = await getPlaylist({
+                _id: req.params.id
+            }).catch((err) => {
+                res.status(500).json({
+                    error: err.message
+                })
 
+                return null
+            })
+
+            if (result) {
+                return res.json(result)
+            }
         }
     }
 
@@ -18,7 +31,7 @@ export default class PlaylistsController extends Controller {
             fn: Schematized({
                 required: ["title", "list"],
                 select: ["title", "description", "thumbnail", "list"],
-            },async (req, res) => {
+            }, async (req, res) => {
                 if (typeof req.body.list === "undefined") {
                     return res.status(400).json({
                         error: "list is required"
@@ -43,7 +56,6 @@ export default class PlaylistsController extends Controller {
                     return res.json(result)
                 }
             })
-            
         }
     }
 }
