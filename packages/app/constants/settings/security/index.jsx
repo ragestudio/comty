@@ -27,6 +27,7 @@ export default [
         "description": "Manage your active sessions",
         "icon": "Monitor",
         "component": loadable(() => import("../components/sessions")),
+        "storaged": false
     },
     {
         "id": "logout",
