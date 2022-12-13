@@ -116,6 +116,9 @@ class App extends React.Component {
 	}
 
 	eventsHandlers = {
+		"app.setLocation": (location) => {
+			app.setLocation(location)
+		},
 		"app.close": () => {
 			if (window.isElectron) {
 				window.electron.ipcRenderer.invoke("app.close")
