@@ -10,7 +10,7 @@ const envOrigins = {
     },
     "production": {
         mainApi: "http://api.comty.pw",
-        messagingApi: `http://api.comty.pw/messaging`,
+        messagingApi: `https://messaging_api.comty.pw`,
     },
     "indev": {
         mainApi: "https://indev_api.comty.pw",
