@@ -21,6 +21,10 @@ export default class Session {
         return this.decodedToken()?.user_id
     }
 
+    static get session_uuid() {
+        return this.decodedToken()?.session_uuid
+    }
+
     static delToken() {
         return cookies.remove(Session.tokenKey)
     }
@@ -29,6 +33,10 @@ export default class Session {
         const token = this.token
 
         return token && jwt_decode(token)
+    }
+
+    static async getAllSessions() {
+        return await Session.bridge.get.sessions()
     }
 
     //* BASIC HANDLERS
