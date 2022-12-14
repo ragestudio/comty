@@ -6,7 +6,7 @@ import defaultRemotesOrigins from "../constants/defaultRemotesOrigins.json"
 const envOrigins = {
     "development": {
         mainApi: `http://${window.location.hostname}:3000`,
-        messagingApi: `http://${window.location.hostname}:3020`,
+        messagingApi: `http://${window.location.hostname}:3001`,
     },
     "production": {
         mainApi: "http://api.comty.pw",
