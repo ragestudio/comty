@@ -1,4 +1,4 @@
 {
     "main_api": "https://api.comty.pw",
-    "messagingApi": "https://api.ragestudio.net/messaging"
+    "messagingApi": "https://messaging_api.comty.pw"
 }
