@@ -24,6 +24,7 @@ export default class StreamViewer extends React.Component {
 
         isEnded: false,
         loading: true,
+        cinemaMode: false,
 
         streamSources: null,
         streamInfo: null,
@@ -50,7 +51,7 @@ export default class StreamViewer extends React.Component {
                 return false
             }
 
-            this.toogleLoading(true)
+            this.toggleLoading(true)
 
             const decoderInstance = mpegts.createPlayer({
                 type: "flv",
@@ -66,7 +67,7 @@ export default class StreamViewer extends React.Component {
 
             await decoderInstance.play()
 
-            this.toogleLoading(false)
+            this.toggleLoading(false)
 
             return decoderInstance
         },
@@ -165,11 +166,7 @@ export default class StreamViewer extends React.Component {
         })
     }
 
-    componentDidMount = async () => {
-        this.enterPlayerAnimation()
-
-        const requestedUsername = this.props.match.params.key
-
+    attachPlayer = () => {
         const player = new Plyr("#player", {
             clickToPlay: false,
             autoplay: true,
@@ -178,10 +175,32 @@ export default class StreamViewer extends React.Component {
             ...this.state.plyrOptions,
         })
 
-        await this.setState({
-            requestedUsername,
+        // insert a button to enter to cinema mode
+        player.elements.buttons.fullscreen.insertAdjacentHTML("beforeBegin", `
+            <button class="plyr__controls__item plyr__control" type="button" data-plyr="cinema">
+                <span class="label">Cinema mode</span>
+            </button>
+        `)
+
+        player.elements.buttons.cinema = player.elements.container.querySelector("[data-plyr='cinema']")
+
+        player.elements.buttons.cinema.addEventListener("click", () => this.toggleCinemaMode())
+
+        this.setState({
             player,
         })
+    }
+
+    componentDidMount = async () => {
+        this.enterPlayerAnimation()
+
+        const requestedUsername = this.props.match.params.key
+
+        await this.setState({
+            requestedUsername,
+        })
+
+        this.attachPlayer()
 
         // get stream info
         this.loadStreamInfo(requestedUsername)
@@ -196,6 +215,8 @@ export default class StreamViewer extends React.Component {
 
             await this.loadDecoder("flv", this.state.streamSources.sources.flv)
         }
+
+        // TODO: Watch ws to get livestream:started event and load the decoder if it's not loaded
 
         // set a interval to update the stream info
         this.streamInfoInterval = setInterval(() => {
@@ -264,8 +285,18 @@ export default class StreamViewer extends React.Component {
         return decoderInstance
     }
 
-    toogleLoading = (to) => {
+    toggleLoading = (to) => {
         this.setState({ loading: to ?? !this.state.loading })
+    }
+
+    toggleCinemaMode = (to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.cinemaMode
+        }
+
+        app.SidebarController.toggleVisibility(!to)
+
+        this.setState({ cinemaMode: to })
     }
 
     render() {
