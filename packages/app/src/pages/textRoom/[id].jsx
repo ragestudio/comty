@@ -7,8 +7,6 @@ export default (props) => {
     const roomId = props.match.params.id
 
     return <div className="textRoom">
-        Connecting to room {roomId}
-
         <LiveChat
             roomId={roomId}
         />
