@@ -33,7 +33,7 @@ const SessionItem = (props) => {
     >
         <div className="sessionItem_info">
             <div className="sessionItem_info_title">
-                <Icons.Tag /> <h3>{session.session_uuid}</h3>
+                <h3><Icons.Tag /> {session.session_uuid}</h3>
                 {
                     isCurrent && <antd.Badge dot>
                         Current
