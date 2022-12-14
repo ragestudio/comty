@@ -2,10 +2,11 @@
 import React from "react"
 import * as antd from "antd"
 
-import Livestream from "../../models/livestream"
+import Livestream from "models/livestream"
 import { FloatingPanel } from "antd-mobile"
 import { UserPreview, LiveChat } from "components"
 import { Icons } from "components/Icons"
+import Ticker from "react-ticker"
 
 import Plyr from "plyr"
 import Hls from "hls.js"
@@ -110,7 +111,10 @@ export default class StreamViewer extends React.Component {
 
         console.log("Stream info", streamInfo)
 
-        this.setState({ streamInfo: streamInfo })
+        this.setState({
+            streamInfo: streamInfo,
+            spectators: streamInfo.connectedClients,
+        })
     }
 
     componentDidMount = async () => {
@@ -142,10 +146,19 @@ export default class StreamViewer extends React.Component {
 
             await this.loadDecoder("flv", this.state.streamInfo.sources.flv)
         }
+
+        // set a interval to update the stream info
+        this.streamInfoInterval = setInterval(() => {
+            this.loadStreamInfo(requestedUsername)
+        }, 1000 * 60 * 3)
     }
 
     componentWillUnmount = () => {
         this.exitPlayerAnimation()
+
+        if (this.streamInfoInterval) {
+            clearInterval(this.streamInfoInterval)
+        }
     }
 
     enterPlayerAnimation = () => {
@@ -226,24 +239,50 @@ export default class StreamViewer extends React.Component {
             </div>
         }
 
-        return <div className="liveStream">
-            <video ref={this.videoPlayerRef} id="player" />
+        return <div className="livestream">
+            <div className="livestream_player">
+                <div className="livestream_player_header">
+                    <div className="livestream_player_header_user">
+                        <UserPreview username={this.state.streamInfo?.username} />
+
+                        <div className="livestream_player_header_user_spectators">
+                            <antd.Tag
+                                icon={<Icons.Eye />}
+                            >
+                                {this.state.spectators}
+                            </antd.Tag>
+                        </div>
+                    </div>
+
+                    <div className="livestream_player_header_info">
+                        <div className="livestream_player_header_info_title">
+                            <h1>{this.state.streamInfo?.info.title}</h1>
+                        </div>
+                        <div className="livestream_player_header_info_description">
+                            <Ticker
+                                mode="smooth"
+                            >
+                                {({ index }) => {
+                                    return <h4>{this.state.streamInfo?.info.description}</h4>
+                                }}
+                            </Ticker>
+                        </div>
+                    </div>
+                </div>
+
+                <video ref={this.videoPlayerRef} id="player" />
+            </div>
 
             {
                 window.isMobile ?
                     <FloatingPanel anchors={floatingPanelAnchors}>
                         <UserPreview username={this.state.streamInfo?.username} />
                     </FloatingPanel> :
-                    <div className="panel">
-                        <div className="info">
-                            <UserPreview username={this.state.streamInfo?.username} />
-
-                            <div id="spectatorCount">
-                                <Icons.Eye />
-                                {this.state.spectators}
-                            </div>
-                        </div>
+                    <div className="livestream_panel">
                         <div className="chatbox">
+                            <div className="chatbox_header">
+                                <h4><Icons.MessageCircle /> Live chat</h4>
+                            </div>
                             <LiveChat
                                 roomId={`livestream/${this.state.streamInfo?.username}`}
                             />

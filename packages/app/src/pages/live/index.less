@@ -1,3 +1,6 @@
+@panel-width: 500px;
+@chatbox-header-height: 50px;
+
 .plyr__controls {
     width: 100%;
     display: inline-flex;
@@ -11,11 +14,11 @@
     top: 0;
     left: 0;
 
-    width: 100vw;
+    width: 100%;
     height: 100vh;
 }
 
-.liveStream {
+.livestream {
     display: flex;
     flex-direction: row;
 
@@ -23,7 +26,9 @@
     justify-content: center;
 
     height: 100vh;
-    width: 100vw;
+    width: 100%;
+
+    overflow: hidden;
 
     color: var(--background-color-contrast);
 
@@ -37,17 +42,104 @@
         color: var(--background-color-contrast);
     }
 
-    .panel {
+    .livestream_player {
+        display: flex;
+        position: relative;
+
+        width: calc(100% - @panel-width);
+
+        .livestream_player_header {
+            display: flex;
+            flex-direction: row;
+
+            position: absolute;
+            z-index: 100;
+
+            top: 0;
+            left: 0;
+
+            width: fit-content;
+            height: fit-content;
+
+            min-width: 20vw;
+            max-width: 50vw;
+
+            margin: 20px;
+            padding: 10px;
+
+            background-color: var(--background-color-accent);
+
+            border-radius: 12px;
+
+            h1,
+            h2,
+            h3,
+            h4,
+            span {
+                margin: 0;
+
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .livestream_player_header_user {
+                display: flex;
+                flex-direction: column;
+
+                .livestream_player_header_user_spectators {
+                    margin-top: 10px;
+
+                    .ant-tag {
+                        background-color: #eb0400;
+                        border-color: #eb0400;
+                        color: var(--background-color-contrast);
+                        font-size: 1rem;
+                    }
+                }
+            }
+
+            .livestream_player_header_info {
+                display: flex;
+                flex-direction: column;
+
+                overflow: hidden;
+
+                width: 100%;
+
+                .livestream_player_header_title {
+                    font-family: "Space Grotesk", sans-serif;
+                    font-size: 1rem;
+                    font-weight: 700;
+
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .livestream_player_header_description {
+                    font-size: 0.8rem;
+                    font-weight: 300;
+                    font-style: italic;
+
+                    h4 {
+                        margin-left: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    .livestream_panel {
         display: flex;
         flex-direction: column;
 
+        position: relative;
         height: 100vh;
 
-        width: 100%;
-        min-width: 400px;
-        max-width: 500px;
+        width: @panel-width;
 
-        .info {
+        .livestream_panel_info {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -66,24 +158,61 @@
             h5 {
                 margin: 0;
             }
-
-            .userPreview {
-                margin-bottom: 20px;
-            }
         }
 
         .chatbox {
-            width: 20vw;
+            position: relative;
+
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
             padding: 20px;
-            height: 100vh;
-        }
 
-        #spectatorCount {
-            font-size: 0.8em;
-        }
+            .chatbox_header {
+                position: absolute;
+                z-index: 100;
 
-        #timeCount {
-            font-size: 0.8em;
+                display: flex;
+                flex-direction: column;
+
+                justify-content: center;
+
+                z-index: 100;
+
+                top: 0;
+                left: 0;
+
+                width: 100%;
+                height: @chatbox-header-height;
+
+                padding: 20px;
+
+                backdrop-filter: blur(20px);
+            }
+
+            .liveChat {
+                .liveChat_timeline {
+                    &::after {
+                        position: absolute;
+                        z-index: 90;
+
+                        content: "";
+
+                        top: 0px;
+                        left: 0;
+
+                        width: 100%;
+                        height: @chatbox-header-height;
+
+                        filter: blur(7px);
+                        background-color: rgba(var(--layoutBackgroundColor), 0.7);
+                    }
+
+                    padding-top: @chatbox-header-height;
+                }
+            }
         }
     }
 
