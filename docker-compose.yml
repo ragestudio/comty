@@ -12,6 +12,13 @@ services:
     ports:
       - "3010:3000"
     env_file:
-      - .env
+      - api.env
     volumes:
       - ./d_data/api/cache:/home/node/app/cache:ro
+  message_server:
+    build: packages/message_server
+    restart: unless-stopped
+    ports:
+      - "3020:3020"
+    env_file:
+      - messaging.env
