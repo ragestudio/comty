@@ -7,18 +7,9 @@
     //justify-content: space-between;
 }
 
-.stream_end {
-    position: absolute;
-    z-index: 100;
-    background-color: rgba(0, 0, 0, 0.8);
-    top: 0;
-    left: 0;
-
-    width: 100%;
-    height: 100vh;
-}
-
 .livestream {
+    position: relative;
+
     display: flex;
     flex-direction: row;
 
@@ -46,7 +37,42 @@
         display: flex;
         position: relative;
 
+        align-items: center;
+        justify-content: center;
+
         width: calc(100% - @panel-width);
+        height: 100%;
+
+        overflow-y: hidden;
+
+        .livestream_player_loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            position: absolute;
+            z-index: 90;
+
+            width: 100%;
+            height: 100%;
+
+            backdrop-filter: blur(10px);
+
+            transition: all 0.3s ease-in-out;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            &.active {
+                opacity: 1;
+            }
+        }
+
+        video {
+            z-index: 80;
+        }
 
         .livestream_player_header {
             display: flex;
@@ -87,6 +113,8 @@
             .livestream_player_header_user {
                 display: flex;
                 flex-direction: column;
+                
+                margin-right: 20px;
 
                 .livestream_player_header_user_spectators {
                     margin-top: 10px;
