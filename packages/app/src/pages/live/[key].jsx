@@ -1,6 +1,7 @@
 
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 
 import Livestream from "models/livestream"
 import { FloatingPanel } from "antd-mobile"
@@ -19,9 +20,12 @@ const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default class StreamViewer extends React.Component {
     state = {
-        isEnded: false,
-        sourceLoading: true,
+        requestedUsername: null,
 
+        isEnded: false,
+        loading: true,
+
+        streamSources: null,
         streamInfo: null,
         spectators: 0,
 
@@ -40,11 +44,13 @@ export default class StreamViewer extends React.Component {
     }
 
     attachDecoder = {
-        flv: (source) => {
+        flv: async (source) => {
             if (!source) {
                 console.error("Stream source is not defined")
                 return false
             }
+
+            this.toogleLoading(true)
 
             const decoderInstance = mpegts.createPlayer({
                 type: "flv",
@@ -53,9 +59,14 @@ export default class StreamViewer extends React.Component {
                 url: source
             })
 
+            decoderInstance.on(mpegts.Events.ERROR, this.onSourceEnd)
+
             decoderInstance.attachMediaElement(this.videoPlayerRef.current)
             decoderInstance.load()
-            decoderInstance.play()
+
+            await decoderInstance.play()
+
+            this.toogleLoading(false)
 
             return decoderInstance
         },
@@ -102,8 +113,25 @@ export default class StreamViewer extends React.Component {
         }
     }
 
+    onSourceEnd = () => {
+        if (typeof this.state.decoderInstance?.destroy === "function") {
+            this.state.decoderInstance.destroy()
+        }
+
+        this.state.player.destroy()
+
+        this.setState({
+            isEnded: true,
+            loading: false,
+        })
+    }
+
     loadStreamInfo = async (username) => {
-        const streamInfo = await Livestream.getLivestream({ username })
+        const streamInfo = await Livestream.getStreamInfo({ username }).catch((error) => {
+            console.error(error)
+
+            return null
+        })
 
         if (!streamInfo) {
             return false
@@ -113,44 +141,66 @@ export default class StreamViewer extends React.Component {
 
         this.setState({
             streamInfo: streamInfo,
-            spectators: streamInfo.connectedClients,
+        })
+    }
+
+    loadStreamSources = async (username) => {
+        const streamSources = await Livestream.getLivestream({ username }).catch((error) => {
+            console.error(error)
+
+            this.onSourceEnd(error)
+
+            return null
+        })
+
+        if (!streamSources) {
+            return false
+        }
+
+        console.log("Stream sources", streamSources)
+
+        this.setState({
+            streamSources: streamSources,
+            spectators: streamSources.connectedClients,
         })
     }
 
     componentDidMount = async () => {
+        this.enterPlayerAnimation()
+
         const requestedUsername = this.props.match.params.key
 
-        // get stream info
-        await this.loadStreamInfo(requestedUsername)
+        const player = new Plyr("#player", {
+            clickToPlay: false,
+            autoplay: true,
+            controls: ["mute", "volume", "fullscreen", "airplay", "options", "settings",],
+            settings: ["quality"],
+            ...this.state.plyrOptions,
+        })
 
-        if (this.state.streamInfo) {
-            if (!this.state.streamInfo.sources) {
+        await this.setState({
+            requestedUsername,
+            player,
+        })
+
+        // get stream info
+        this.loadStreamInfo(requestedUsername)
+        await this.loadStreamSources(requestedUsername)
+
+        if (this.state.streamSources) {
+            if (!this.state.streamSources.sources) {
                 console.error("Stream sources is not defined")
 
                 return false
             }
 
-            this.enterPlayerAnimation()
-
-            const player = new Plyr("#player", {
-                clickToPlay: false,
-                autoplay: true,
-                controls: ["mute", "volume", "fullscreen", "airplay", "options", "settings",],
-                settings: ["quality"],
-                ...this.state.plyrOptions,
-            })
-
-            await this.setState({
-                player,
-            })
-
-            await this.loadDecoder("flv", this.state.streamInfo.sources.flv)
+            await this.loadDecoder("flv", this.state.streamSources.sources.flv)
         }
 
         // set a interval to update the stream info
         this.streamInfoInterval = setInterval(() => {
-            this.loadStreamInfo(requestedUsername)
-        }, 1000 * 60 * 3)
+            this.loadStreamSources(requestedUsername)
+        }, 1000 * 60)
     }
 
     componentWillUnmount = () => {
@@ -203,8 +253,6 @@ export default class StreamViewer extends React.Component {
             this.setState({ decoderInstance: null })
         }
 
-        this.toogleSourceLoading(true)
-
         console.log(`Switching decoder to: ${decoder}`)
 
         const decoderInstance = await this.attachDecoder[decoder](...args)
@@ -213,78 +261,93 @@ export default class StreamViewer extends React.Component {
             decoderInstance: decoderInstance
         })
 
-        this.toogleSourceLoading(false)
-
         return decoderInstance
     }
 
-    toogleSourceLoading = (to) => {
-        this.setState({ sourceLoading: to ?? !this.state.sourceLoading })
-    }
-
-    onSourceEnded = () => {
-        console.log("Source ended")
-
-        this.setState({ isEnded: true })
+    toogleLoading = (to) => {
+        this.setState({ loading: to ?? !this.state.loading })
     }
 
     render() {
-        if (!this.state.streamInfo || this.state.isEnded) {
-            return <div className="stream_end">
-                <antd.Result>
-                    <h1>
-                        This stream is ended
-                    </h1>
-                </antd.Result>
-            </div>
-        }
-
         return <div className="livestream">
             <div className="livestream_player">
                 <div className="livestream_player_header">
-                    <div className="livestream_player_header_user">
-                        <UserPreview username={this.state.streamInfo?.username} />
+                    {
+                        this.state.streamInfo
+                            ? <>
+                                <div className="livestream_player_header_user">
+                                    <UserPreview username={this.state.requestedUsername} />
 
-                        <div className="livestream_player_header_user_spectators">
-                            <antd.Tag
-                                icon={<Icons.Eye />}
-                            >
-                                {this.state.spectators}
-                            </antd.Tag>
-                        </div>
-                    </div>
+                                    {
+                                        !this.state.isEnded && <div className="livestream_player_header_user_spectators">
+                                            <antd.Tag
+                                                icon={<Icons.Eye />}
+                                            >
+                                                {this.state.spectators}
+                                            </antd.Tag>
+                                        </div>
+                                    }
+                                </div>
 
-                    <div className="livestream_player_header_info">
-                        <div className="livestream_player_header_info_title">
-                            <h1>{this.state.streamInfo?.info.title}</h1>
-                        </div>
-                        <div className="livestream_player_header_info_description">
-                            <Ticker
-                                mode="smooth"
-                            >
-                                {({ index }) => {
-                                    return <h4>{this.state.streamInfo?.info.description}</h4>
-                                }}
-                            </Ticker>
-                        </div>
-                    </div>
+                                <div className="livestream_player_header_info">
+                                    <div className="livestream_player_header_info_title">
+                                        <h1>{this.state.streamInfo?.title}</h1>
+                                    </div>
+                                    <div className="livestream_player_header_info_description">
+                                        <Ticker
+                                            mode="smooth"
+                                        >
+                                            {({ index }) => {
+                                                return <h4>{this.state.streamInfo?.description}</h4>
+                                            }}
+                                        </Ticker>
+                                    </div>
+                                </div>
+                            </>
+                            : <antd.Skeleton active />
+                    }
                 </div>
 
-                <video ref={this.videoPlayerRef} id="player" />
+                <video
+                    ref={this.videoPlayerRef}
+                    id="player"
+                    style={{
+                        display: this.state.isEnded ? "none" : "block",
+                    }}
+                />
+
+                {
+                    this.state.isEnded && <antd.Result>
+                        <h1>
+                            This stream is ended
+                        </h1>
+                    </antd.Result>
+                }
+
+                <div
+                    className={classnames(
+                        "livestream_player_loading",
+                        {
+                            ["active"]: this.state.loading,
+                        }
+                    )}
+                >
+                    <antd.Spin />
+                </div>
             </div>
 
             {
-                window.isMobile ?
-                    <FloatingPanel anchors={floatingPanelAnchors}>
-                        <UserPreview username={this.state.streamInfo?.username} />
-                    </FloatingPanel> :
-                    <div className="livestream_panel">
+                window.isMobile
+                    ? <FloatingPanel anchors={floatingPanelAnchors}>
+                        <UserPreview username={this.state.requestedUsername} />
+                    </FloatingPanel>
+                    : <div className="livestream_panel">
                         <div className="chatbox">
                             <div className="chatbox_header">
                                 <h4><Icons.MessageCircle /> Live chat</h4>
                             </div>
                             <LiveChat
-                                roomId={`livestream/${this.state.streamInfo?.username}`}
+                                roomId={`livestream:${this.state.requestedUsername}`}
                             />
                         </div>
                     </div>
