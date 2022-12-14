@@ -1,18 +1,82 @@
 .liveChat {
+    position: relative;
+
     display: flex;
     flex-direction: column;
 
     width: 100%;
     height: 100%;
 
-    position: relative;
+    overflow: hidden;
 
-    .textInput {
+    &.empty {
+        justify-content: center;
+        align-items: center;
+    }
+
+    .liveChat_timeline {
+        height: 100%;
+        overflow-y: scroll;
+
+        margin-bottom: 70px;
+    }
+
+    .liveChat_textInput {
         position: absolute;
         bottom: 0;
         left: 0;
 
+        margin-bottom: 20px;
+
         width: 100%;
         height: fit-content;
+
+        color: var(--text-color);
+
+        .ant-input-textarea-show-count::after {
+            color: var(--text-color);
+        }
+    }
+}
+
+.textRoom_line {
+    display: flex;
+    flex-direction: column;
+
+    padding: 5px 10px;
+    margin-bottom: 10px;
+
+    border-radius: 12px;
+
+    background-color: var(--background-color-accent);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    span {
+        margin: 0;
+        user-select: text;
+    }
+
+    .textRoom_line_user {
+        font-weight: bold;
+        font-size: 1rem;
+        color: var(--background-color-contrast);
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .textRoom_line_content {
+        font-size: 0.8rem;
+        color: var(--text-color);
+
+        padding: 0 10px;
+
+        word-break: break-all;
+        white-space: pre-wrap;
     }
 }
