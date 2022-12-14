@@ -48,6 +48,8 @@ export default class StreamingController extends Controller {
             streamings = data.streams
 
             streamings = streamings.map(async (stream) => {
+                const { video, audio, clients } = stream
+
                 stream = await this.methods.generateStreamFromStreamkey(stream.name)
 
                 let info = await StreamingInfo.findOne({
@@ -61,6 +63,10 @@ export default class StreamingController extends Controller {
                         key: stream.info.category
                     })
                 }
+
+                stream.video = video
+                stream.audio = audio
+                stream.connectedClients = clients ?? 0
 
                 return stream
             })
