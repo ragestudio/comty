@@ -6,27 +6,17 @@ import defaultRemotesOrigins from "../constants/defaultRemotesOrigins.json"
 const envOrigins = {
     "development": {
         mainApi: `http://${window.location.hostname}:3000`,
-        authApi: `http://${window.location.hostname}:4000`,
-        contentApi: `http://${window.location.hostname}:3050`,
-        streamingApi: `http://${window.location.hostname}:3002`,
+        messagingApi: `http://${window.location.hostname}:3020`,
     },
     "production": {
         mainApi: "http://api.comty.pw",
-        authApi: "http://auth.comty.pw",
-        contentApi: "http://content.comty.pw",
-        streamingApi: "http://streaming.comty.pw",
+        messagingApi: `http://api.comty.pw/messaging`,
     },
     "indev": {
         mainApi: "https://indev_api.comty.pw",
-        authApi: `http://indev_auth.comty.pw`,
-        contentApi: `http://indev_content.comty.pw`,
-        streamingApi: "https://indev_live.comty.pw",
     },
     "nightly": {
         mainApi: "https://nightly_api.comty.pw",
-        authApi: `https://nightly_auth.comty.pw`,
-        contentApi: `https://nightly_content.comty.pw`,
-        streamingApi: "https://nightly_live.comty.pw"
     }
 }
 
@@ -65,8 +55,7 @@ export default {
     },
     remotes: {
         mainApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].mainApi : defaultRemotesOrigins.main_api,
-        authApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].authApi : defaultRemotesOrigins.auth_api,
-        streamingApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].streamingApi : defaultRemotesOrigins.streaming_api,
+        messagingApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].messagingApi : defaultRemotesOrigins.messagingApi,
     },
     app: {
         title: packagejson.name,
