@@ -107,6 +107,10 @@ export default class LiveChat extends React.Component {
     }
 
     handleInputChange = (e) => {
+        if (e.target.value[0] === " " || e.target.value[0] === "\n") {
+            e.target.value = e.target.value.slice(1)
+        }
+
         this.setState({
             writtedMessage: e.target.value
         })
@@ -124,11 +128,12 @@ export default class LiveChat extends React.Component {
     }
 
     scrollTimelineToBottom = () => {
-        // scroll to bottom smoothly
-        this.timelineRef.current.scrollTo({
-            top: this.timelineRef.current.scrollHeight,
-            behavior: "smooth"
-        })
+        if (this.timelineRef.current) {
+            this.timelineRef.current.scrollTo({
+                top: this.timelineRef.current.scrollHeight,
+                behavior: "smooth"
+            })
+        }
     }
 
     componentDidMount = async () => {
