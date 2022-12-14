@@ -13,7 +13,9 @@ export default class SessionController extends Controller {
             fn: async (req, res) => {
                 // get current session _id
                 const { _id } = req.user
+
                 const sessions = await Session.find({ user_id: _id }, { token: 0 })
+                    .sort({ date: -1 })
 
                 return res.json(sessions)
             },
