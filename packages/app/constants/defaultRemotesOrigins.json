@@ -1,5 +1,4 @@
 {
     "main_api": "https://api.comty.pw",
-    "auth_api": "https://auth.ragestudio.net",
-    "streaming_api": "https://live.comty.pw"
+    "messagingApi": "https://api.ragestudio.net/messaging"
 }
