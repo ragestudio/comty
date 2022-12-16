@@ -37,7 +37,14 @@ export default (props) => {
 
         if (data) {
             try {
-                data.announcement = JSON.parse(data.announcement)
+                if (data.announcement) {
+                    data.announcement = JSON.parse(data.announcement)
+                }
+
+                if (data.customHeader) {
+                    data.customHeader = JSON.parse(data.customHeader)
+                }
+
                 setEventData(data)
             } catch (error) {
                 console.error(error)
@@ -75,17 +82,36 @@ export default (props) => {
     }
 
     return <div className="event">
-        <div className="header" style={eventData.announcement.backgroundStyle}>
-            {eventData.announcement.logoImg &&
-                <div className="logo">
-                    <img src={eventData.announcement.logoImg} />
-                </div>
-            }
-            <div className="title">
-                <h1>{eventData.name}</h1>
-                <h2>{eventData.announcement.description}</h2>
+        {
+            eventData.customHeader &&
+            <div className="header custom" style={eventData.customHeader.style}>
+                {
+                    eventData.customHeader.displayLogo && <div className="logo">
+                        <img src={eventData.announcement.logoImg} />
+                    </div>
+                }
+                {
+                    eventData.customHeader.displayTitle && <div className="title">
+                        <h1>{eventData.name}</h1>
+                        <h2>{eventData.announcement.description}</h2>
+                    </div>
+                }
             </div>
-        </div>
+        }
+
+        {
+            !eventData.customHeader && <div className="header" style={eventData.announcement.backgroundStyle}>
+                {eventData.announcement.logoImg &&
+                    <div className="logo">
+                        <img src={eventData.announcement.logoImg} />
+                    </div>
+                }
+                <div className="title">
+                    <h1>{eventData.name}</h1>
+                    <h2>{eventData.announcement.description}</h2>
+                </div>
+            </div>
+        }
 
         <div className="content">
             <div className="panel">
