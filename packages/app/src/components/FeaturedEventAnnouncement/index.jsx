@@ -24,17 +24,21 @@ export default (props) => {
         }}
         onClick={onClickEvent}
     >
+        <div className="featuredEvent_wrapper">
+            <div className="logo">
+                <img
+                    src={logoImg}
+                />
+            </div>
+
+            <div className="content">
+                <h1>{title}</h1>
+                <h3>{description}</h3>
+            </div>
+        </div>
+
         <div className="indicator">
             <Icons.Target /> <span>Featured event</span>
-        </div>
-        <div className="logo">
-            <img
-                src={logoImg}
-            />
-        </div>
-        <div className="content">
-            <h1>{title}</h1>
-            <h3>{description}</h3>
         </div>
     </div>
 }
