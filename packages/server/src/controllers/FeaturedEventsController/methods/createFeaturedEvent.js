@@ -8,6 +8,7 @@ export default async (payload) => {
         dates,
         location,
         announcement,
+        customHeader,
     } = payload
 
     const featuredEvent = new FeaturedEvent({
@@ -17,6 +18,7 @@ export default async (payload) => {
         dates,
         location,
         announcement,
+        customHeader,
     })
 
     await featuredEvent.save()
