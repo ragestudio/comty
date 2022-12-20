@@ -3,6 +3,7 @@ import { Skeleton } from "antd"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import ContrastYIQ from "utils/contrastYIQ"
 import ProcessString from "utils/processString"
 import { Icons } from "components/Icons"
 
@@ -77,6 +78,25 @@ export default (props) => {
         fetchEventData()
     }, [])
 
+    React.useEffect(() => {
+        // get average color of custom background image
+        if (eventData?.customHeader.style) {
+            let backgroundImage = eventData.customHeader.style.backgroundImage
+
+            if (backgroundImage) {
+                backgroundImage = backgroundImage.replace("url(", "").replace(")", "").replace(/\"/gi, "").replace(/\"/gi, "").replace(/\'/gi, "")
+
+                console.log(backgroundImage)
+
+                ContrastYIQ.fromUrl(backgroundImage).then((contrastColor) => {
+                    console.log(`YIQ returns [${contrastColor}] as contrast color`)
+                    document.getElementById("eventHeader").style.color = `var(--text-color-${contrastColor})`
+                })
+
+            }
+        }
+    }, [eventData])
+
     if (!eventData) {
         return <Skeleton active />
     }
@@ -84,7 +104,7 @@ export default (props) => {
     return <div className="event">
         {
             eventData.customHeader &&
-            <div className="header custom" style={eventData.customHeader.style}>
+            <div className="header custom" style={eventData.customHeader.style} id="eventHeader">
                 {
                     eventData.customHeader.displayLogo && <div className="logo">
                         <img src={eventData.announcement.logoImg} />
@@ -100,7 +120,7 @@ export default (props) => {
         }
 
         {
-            !eventData.customHeader && <div className="header" style={eventData.announcement.backgroundStyle}>
+            !eventData.customHeader && <div className="header" style={eventData.announcement.backgroundStyle} id="eventHeader">
                 {eventData.announcement.logoImg &&
                     <div className="logo">
                         <img src={eventData.announcement.logoImg} />
