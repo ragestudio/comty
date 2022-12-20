@@ -6,13 +6,15 @@
         "backgroundImage": "none",
         "fontFamily": "'Varela Round', sans-serif",
         "layoutMargin": "unset",
-        "layoutPadding": "10px"
+        "layoutPadding": "10px",
+        "text-color-white": "#d2d2d2",
+        "text-color-black": "#000000"
     },
     "defaultVariant": "light",
     "variants": {
         "light": {
             "appColor": "#ff6064",
-            "text-color": "#000000",
+            "text-color": "var(--text-color-black)",
             "layoutBackgroundColor": "255, 255, 255",
             "background-color-primary": "#ffffff",
             "background-color-primary2": "#f0f0f0",
@@ -25,7 +27,7 @@
         },
         "dark": {
             "appColor": "#ff6064",
-            "text-color": "#d2d2d2",
+            "text-color": "var(--text-color-white)",
             "svg-color": "var(--text-color)",
             "shadow-color": "#3535357c",
             "layoutBackgroundColor": "38, 38, 38",
