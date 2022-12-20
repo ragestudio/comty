@@ -46,6 +46,7 @@
     "electron-log": "^4.4.8",
     "electron-squirrel-startup": "^1.0.0",
     "evite": "0.13.7",
+    "fast-average-color": "^9.2.0",
     "faye": "1.4.0",
     "feather-reactjs": "2.0.13",
     "fuse.js": "6.5.3",
