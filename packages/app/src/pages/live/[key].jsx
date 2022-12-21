@@ -4,7 +4,6 @@ import * as antd from "antd"
 import classnames from "classnames"
 
 import Livestream from "models/livestream"
-import { FloatingPanel } from "antd-mobile"
 import { UserPreview, LiveChat } from "components"
 import { Icons } from "components/Icons"
 import Ticker from "react-ticker"
@@ -15,8 +14,6 @@ import mpegts from "mpegts.js"
 
 import "plyr/dist/plyr.css"
 import "./index.less"
-
-const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default class StreamViewer extends React.Component {
     state = {
@@ -124,6 +121,7 @@ export default class StreamViewer extends React.Component {
         this.setState({
             isEnded: true,
             loading: false,
+            cinemaMode: false,
         })
     }
 
@@ -300,7 +298,14 @@ export default class StreamViewer extends React.Component {
     }
 
     render() {
-        return <div className="livestream">
+        return <div
+            className={classnames(
+                "livestream",
+                {
+                    ["cinemaMode"]: this.state.cinemaMode,
+                }
+            )}
+        >
             <div className="livestream_player">
                 <div className="livestream_player_header">
                     {
@@ -367,22 +372,19 @@ export default class StreamViewer extends React.Component {
                 </div>
             </div>
 
-            {
-                window.isMobile
-                    ? <FloatingPanel anchors={floatingPanelAnchors}>
-                        <UserPreview username={this.state.requestedUsername} />
-                    </FloatingPanel>
-                    : <div className="livestream_panel">
-                        <div className="chatbox">
-                            <div className="chatbox_header">
-                                <h4><Icons.MessageCircle /> Live chat</h4>
-                            </div>
-                            <LiveChat
-                                roomId={`livestream:${this.state.requestedUsername}`}
-                            />
+            <div className="livestream_panel">
+                <div className="chatbox">
+                    {
+                        !this.state.cinemaMode && <div className="chatbox_header">
+                            <h4><Icons.MessageCircle /> Live chat</h4>
                         </div>
-                    </div>
-            }
+                    }
+                    <LiveChat
+                        roomId={`livestream:${this.state.requestedUsername}`}
+                        floatingMode={this.state.cinemaMode}
+                    />
+                </div>
+            </div>
         </div>
     }
 }

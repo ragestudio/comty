@@ -33,6 +33,57 @@
         color: var(--background-color-contrast);
     }
 
+    &.cinemaMode {
+        .livestream_player {
+            width: 100%;
+
+            video {
+                width: 100%;
+            }
+
+            .plyr {
+                width: 100%;
+            }
+
+            .livestream_player_header {
+                animation: disappear 0.3s ease-in-out forwards;
+            }
+        }
+
+        .livestream_panel {
+            position: absolute;
+            z-index: 99;
+
+            right: 0;
+            top: 0;
+
+            height: 60vh;
+            width: 20vw;
+
+            padding: 20px;
+
+            overflow-x: hidden;
+
+            .chatbox {
+                padding: 0;
+
+                overflow-x: hidden;
+                overflow-y: hidden;
+
+                .liveChat {
+                    .liveChat_timeline {
+                        padding-top: 0 !important;
+
+                        &::after {
+                            content: "";
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     .livestream_player {
         display: flex;
         position: relative;
@@ -44,6 +95,8 @@
         height: 100%;
 
         overflow-y: hidden;
+
+        transition: all 0.3s ease-in-out;
 
         .livestream_player_loading {
             display: flex;
@@ -113,7 +166,7 @@
             .livestream_player_header_user {
                 display: flex;
                 flex-direction: column;
-                
+
                 margin-right: 20px;
 
                 .livestream_player_header_user_spectators {
@@ -166,27 +219,6 @@
         height: 100vh;
 
         width: @panel-width;
-
-        .livestream_panel_info {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
-
-            width: 100%;
-
-            padding: 10px;
-
-            backdrop-filter: 20px;
-
-            h1,
-            h2,
-            h3,
-            h4,
-            h5 {
-                margin: 0;
-            }
-        }
 
         .chatbox {
             position: relative;
