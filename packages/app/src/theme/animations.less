@@ -42,6 +42,38 @@
 	opacity: 1;
 }
 
+.transverse-enter {
+	animation: transverse-enter 0.3s ease-in-out forwards;
+}
+
+.transverse-out {
+	animation: transverse-out 0.3s ease-in-out forwards;
+}
+
+@keyframes transverse-enter {
+	from {
+		opacity: 0;
+		transform: translateX(-30px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes transverse-out {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	to {
+		opacity: 0;
+		transform: translateX(30px);
+	}
+}
+
 @keyframes fadeOut {
 	from {
 		opacity: 1;
