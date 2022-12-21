@@ -2,6 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { io } from "socket.io-client"
+import { TransitionGroup, CSSTransition } from "react-transition-group"
+
 import config from "config"
 import SessionModel from "models/session"
 
@@ -26,8 +28,12 @@ export default class LiveChat extends React.Component {
         connectionEnd: false,
         roomInfo: null,
         timeline: [],
+        temporalTimeline: [],
         writtedMessage: "",
+        maxTemporalLines: this.props.maxTemporalLines ?? 10,
     }
+
+    debouncedIntervalTimelinePurge = null
 
     timelineRef = React.createRef()
 
@@ -75,7 +81,6 @@ export default class LiveChat extends React.Component {
 
         socket.on("message", (message) => {
             this.pushToTimeline(message)
-            this.scrollTimelineToBottom()
         })
 
         socket.connect()
@@ -90,8 +95,6 @@ export default class LiveChat extends React.Component {
             message
         })
 
-        this.scrollTimelineToBottom()
-
         // remove writted message
         this.setState({
             writtedMessage: ""
@@ -101,9 +104,63 @@ export default class LiveChat extends React.Component {
     pushToTimeline = (message) => {
         const { timeline } = this.state
 
+        if (typeof message.key === "undefined") {
+            message.key = this.state.timeline.length
+        }
+
         this.setState({
             timeline: [...timeline, message]
         })
+
+        if (this.props.floatingMode) {
+            if (this.state.temporalTimeline.length >= this.state.maxTemporalLines) {
+                this.setState({
+                    temporalTimeline: this.state.temporalTimeline.slice(1)
+                })
+            }
+
+            // calculate duration based on message length (Minimum 3 second, maximum 10 seconds)
+            const calculatedDuration = Math.min(Math.max(message.content.length * 0.1, 3), 10) * 1000
+
+            const temporalLine = {
+                expireTime: Date.now() + calculatedDuration,
+                duration: calculatedDuration,
+                messageKey: message.key
+            }
+
+            this.setState({
+                temporalTimeline: [...this.state.temporalTimeline, temporalLine]
+            })
+
+            if (this.debouncedIntervalTimelinePurge) {
+                clearInterval(this.debouncedIntervalTimelinePurge)
+            }
+
+            this.debouncedIntervalTimelinePurge = setInterval(this.purgeLastTemporalLine, 3000)
+        }
+
+        this.scrollTimelineToBottom()
+    }
+
+    purgeLastTemporalLine = () => {
+        if (!this.props.floatingMode) {
+            return false
+        }
+
+        const { temporalTimeline } = this.state
+
+        if (temporalTimeline.length === 0) {
+            clearInterval(this.debouncedIntervalTimelinePurge)
+            return false
+        }
+
+        const lastTemporalLine = temporalTimeline[0]
+
+        if (lastTemporalLine.expireTime < Date.now()) {
+            this.setState({
+                temporalTimeline: temporalTimeline.slice(1)
+            })
+        }
     }
 
     handleInputChange = (e) => {
@@ -128,9 +185,13 @@ export default class LiveChat extends React.Component {
     }
 
     scrollTimelineToBottom = () => {
-        if (this.timelineRef.current) {
-            this.timelineRef.current.scrollTo({
-                top: this.timelineRef.current.scrollHeight,
+        const scrollingElement = document.getElementById("liveChat_timeline")
+
+        console.log(`Scrolling to bottom`, scrollingElement)
+
+        if (scrollingElement) {
+            scrollingElement.scrollTo({
+                top: scrollingElement.scrollHeight,
                 behavior: "smooth"
             })
         }
@@ -138,10 +199,18 @@ export default class LiveChat extends React.Component {
 
     componentDidMount = async () => {
         await this.joinSocketRoom()
+
+        app.ctx = {
+            submit: this.submitMessage
+        }
     }
 
     componentWillUnmount() {
         this.state.socket.close()
+
+        if (this.debouncedIntervalTimelinePurge) {
+            clearInterval(this.debouncedIntervalTimelinePurge)
+        }
     }
 
     render() {
@@ -161,6 +230,31 @@ export default class LiveChat extends React.Component {
             </div>
         }
 
+        if (this.props.floatingMode) {
+            return <div className="liveChat floating">
+                <TransitionGroup
+                    ref={this.timelineRef}
+                    className="liveChat_timeline"
+                    id="liveChat_timeline"
+                >
+                    {
+                        this.state.temporalTimeline.map((line, index) => {
+                            return <CSSTransition
+                                key={index}
+                                timeout={300}
+                                classNames={{
+                                    enterActive: "transverse-enter",
+                                    exitActive: "transverse-out"
+                                }}
+                            >
+                                <Line {...this.state.timeline[line.messageKey]} />
+                            </CSSTransition>
+                        })
+                    }
+                </TransitionGroup>
+            </div>
+        }
+
         return <div
             className={classnames(
                 "liveChat",
@@ -173,6 +267,7 @@ export default class LiveChat extends React.Component {
                     <div
                         className="liveChat_timeline"
                         ref={this.timelineRef}
+                        id="liveChat_timeline"
                     >
                         {
                             this.state.timeline.map((line, index) => {
