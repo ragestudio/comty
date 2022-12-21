@@ -14,7 +14,7 @@ services:
     env_file:
       - api.env
     volumes:
-      - ./d_data/api/cache:/home/node/app/cache:ro
+      - ./d_data/api/cache:/home/node/app/cache
   message_server:
     build: packages/message_server
     restart: unless-stopped
