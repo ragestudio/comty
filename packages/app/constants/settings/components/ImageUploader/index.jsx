@@ -6,18 +6,23 @@ import "./index.less"
 
 export default (props) => {
     const [value, setValue] = React.useState(props.ctx.currentValue)
+    const [uploading, setUploading] = React.useState(false)
 
     const uploadImage = async (req) => {
+        setUploading(true)
+
         const formData = new FormData()
 
         formData.append("files", req.file)
 
         const request = await window.app.api.withEndpoints("main").post.upload(formData, undefined).catch((error) => {
             console.error(error)
-            antd.message.error(error)
+            app.message.error(error)
 
             return false
         })
+
+        setUploading(false)
 
         if (request) {
             setValue(request.files[0].url)
@@ -57,6 +62,7 @@ export default (props) => {
         >
             <Button
                 icon={<Icons.Upload />}
+                loading={uploading}
             >
                 Upload
             </Button>
