@@ -63,6 +63,10 @@ const generateItems = () => {
 const CustomRender = (props) => {
 	const handleClickOutside = (event) => {
 		if (props.sidebarRef.current && !props.sidebarRef.current.contains(event.target)) {
+			if (event.target.closest(".ant-select-item")) {
+				return
+			}
+
 			props.closeRender()
 		}
 	}
