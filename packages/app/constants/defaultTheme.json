@@ -1,6 +1,7 @@
 {
     "staticVars": {
         "backgroundBlur": "10px",
+        "appColor": "#ff6064",
         "primaryColor": "#ff6064",
         "backgroundColorTransparency": "0.8",
         "backgroundImage": "none",
@@ -13,7 +14,6 @@
     "defaultVariant": "light",
     "variants": {
         "light": {
-            "appColor": "#ff6064",
             "text-color": "var(--text-color-black)",
             "layoutBackgroundColor": "255, 255, 255",
             "background-color-primary": "#ffffff",
@@ -26,10 +26,9 @@
             "sidedrawer-background-color": "var(--background-color-accent)"
         },
         "dark": {
-            "appColor": "#ff6064",
             "text-color": "var(--text-color-white)",
             "svg-color": "var(--text-color)",
-            "shadow-color": "#3535357c",
+            "shadow-color": "#1010107c",
             "layoutBackgroundColor": "38, 38, 38",
             "background-color-primary": "#262626",
             "background-color-primary2": "#2c2c2c",
