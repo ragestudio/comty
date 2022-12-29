@@ -5,4 +5,5 @@ export default {
     dates: { type: Object },
     location: { type: String },
     announcement: { type: Object, required: true },
+    expired: { type: Boolean, default: false }
 }
