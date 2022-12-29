@@ -13,7 +13,15 @@ export default class FeaturedEventsController extends Controller {
             return res.json(featuredEvent)
         },
         "/featured_events": async (req, res) => {
-            const featuredEvents = await FeaturedEvent.find()
+            let query = {
+                expired: false
+            }
+
+            if (req.query.includeExpired) {
+                delete query.expired
+            }
+
+            const featuredEvents = await FeaturedEvent.find(query)
 
             return res.json(featuredEvents)
         }
