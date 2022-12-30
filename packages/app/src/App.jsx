@@ -309,6 +309,9 @@ class App extends React.Component {
 				<div className="splash_label">
 					<Icons.LoadingOutlined />
 				</div>
+				<div className="splash_footer">
+					<img src={config.logo.ragestudio_full} />
+				</div>
 			</div>
 		}
 	}
