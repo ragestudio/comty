@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
+import { Translation } from "react-i18next"
 
 import { Icons, createIconRender } from "components/Icons"
 
@@ -67,7 +68,10 @@ export default class Dashboard extends React.Component {
 
             <div className="panel">
                 <div className="card" id="browserType">
-                    <h2><Icons.Compass /> Browse</h2>
+                    <h2>
+                        <Icons.Compass />
+                        <Translation>{(t) => t("Browser")}</Translation>
+                    </h2>
                     <antd.Menu
                         mode="inline"
                         selectedKeys={[this.state.activeTab]}
@@ -88,12 +92,18 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 <div className="card" id="trendings">
-                    <h2><Icons.TrendingUp /> Trendings</h2>
+                    <h2>
+                        <Icons.TrendingUp />
+                        <Translation>{(t) => t("Trendings")}</Translation>
+                    </h2>
                     <HashtagTrendings />
                 </div>
 
                 <div className="card" id="onlineFriends">
-                    <h2><Icons.Rss /> Online Friends</h2>
+                    <h2>
+                        <Icons.Rss />
+                        <Translation>{(t) => t("Online Friends")}</Translation>
+                    </h2>
                     <div className="content">
                         <ConnectedFriends />
                     </div>
