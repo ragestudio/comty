@@ -12,7 +12,7 @@ export function extractLocaleFromPath(path = "") {
     return SUPPORTED_LOCALES.includes(maybeLocale) ? maybeLocale : DEFAULT_LOCALE
 }
 
-const messageImports = import.meta.glob("./translations/*.json")
+const messageImports = import.meta.glob("schemas/translations/*.json")
 
 export default class I18nCore extends Core {
     events = {
