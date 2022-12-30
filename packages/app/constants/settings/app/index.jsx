@@ -141,8 +141,8 @@ export default [
     },
     {
         "id": "postCard_carrusel_auto",
-        "title": "Auto show post media",
-        "description": "Automatically show the post medias when the post has multiple medias",
+        "title": "Post autoplay",
+        "description": "Automatically play the post medias when the post has multiple medias",
         "component": "Switch",
         "icon": "MdPhotoCameraBack",
         "group": "posts",
