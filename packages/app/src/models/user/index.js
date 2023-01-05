@@ -146,6 +146,44 @@ export default class User {
         return data
     }
 
+    static async getUserFollowers({
+        user_id,
+        username,
+        limit = 20,
+        offset = 0,
+    }) {
+        if (!User.bridge) {
+            return false
+        }
+
+        // if user_id or username is not provided, set with current user
+        if (!user_id && !username) {
+            const token = await Session.decodedToken()
+
+            if (token) {
+                username = token.username
+            } else {
+                throw new Error("username or user_id is required")
+            }
+        }
+
+        // TODO: if user_id is not provided, get it from username
+        if (!user_id) {
+            
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/user/${user_id}/followers`,
+            params: {
+                limit,
+                offset,
+            }
+        })
+
+        return data
+    }
+
     static async getConnectedUsersFollowing() {
         if (!User.bridge) {
             return false
