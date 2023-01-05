@@ -9,15 +9,17 @@ export default (props) => {
         <div className="counter">
             {props.count}
         </div>
-        <Button
-            type="ghost"
-            onClick={props.onClick}
-            className={classnames(
-                "btn",
-                { ["followed"]: props.followed }
-            )}
-        >
-            <span>{props.followed ? "Following" : "Follow"}</span>
-        </Button>
+        {
+            !props.self && <Button
+                type="ghost"
+                onClick={props.onClick}
+                className={classnames(
+                    "btn",
+                    { ["followed"]: props.followed }
+                )}
+            >
+                <span>{props.followed ? "Following" : "Follow"}</span>
+            </Button>
+        }
     </div>
 }
