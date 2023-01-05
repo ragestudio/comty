@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import Loadable from "react-loadable"
+import { Translation } from "react-i18next"
 
 import { Icons, createIconRender } from "components/Icons"
 import { Image, Skeleton, FollowButton } from "components"
@@ -280,13 +281,14 @@ export default class Account extends React.Component {
 							</div>
 						</div>
 
-						{!this.state.isSelf && <div>
+						<div>
 							<FollowButton
 								count={this.state.followers.length}
 								onClick={this.onClickFollow}
 								followed={this.state.isFollowed}
+								self={this.state.isSelf}
 							/>
-						</div>}
+						</div>
 					</div>
 
 					<div className="description">
@@ -312,16 +314,31 @@ export default class Account extends React.Component {
 						selectedKeys={[this.state.tabActiveKey]}
 						onClick={(e) => this.handlePageTransition(e.key)}
 					>
-						<antd.Menu.Item key="posts">
-							Posts
+						<antd.Menu.Item
+							key="posts"
+							icon={<Icons.BookOpen />}
+						>
+							<Translation>
+								{t => t("Posts")}
+							</Translation>
 						</antd.Menu.Item>
 
-						<antd.Menu.Item key="followers">
-							Followers
+						<antd.Menu.Item
+							key="followers"
+							icon={<Icons.Users />}
+						>
+							<Translation>
+								{t => t("Followers")}
+							</Translation>
 						</antd.Menu.Item>
 
-						<antd.Menu.Item key="details">
-							Details
+						<antd.Menu.Item
+							key="details"
+							icon={<Icons.Info />}
+						>
+							<Translation>
+								{t => t("Details")}
+							</Translation>
 						</antd.Menu.Item>
 					</antd.Menu>
 				</div>
