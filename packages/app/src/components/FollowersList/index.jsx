@@ -20,6 +20,7 @@ export default (props) => {
 
         const followers = await UserModel.getUserFollowers({
             user_id: props.user_id,
+            username: props.username,
         }).catch((err) => {
             console.error(err)
             app.message.error("Failed to fetch followers")
@@ -36,8 +37,10 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        if (props.username && !props.followers) {
-            loadFollowers()
+        if (!props.followers) {
+            if (props.user_id || props.username) {
+                loadFollowers()
+            }
         }
     }, [])
 
