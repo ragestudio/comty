@@ -1,12 +1,11 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import Loadable from "react-loadable"
 import { Translation } from "react-i18next"
 
-import { Icons, createIconRender } from "components/Icons"
-import { Image, Skeleton, FollowButton } from "components"
-import { Session, User } from "models"
+import { Icons } from "components/Icons"
+import { Skeleton, FollowButton, UserCard } from "components"
+import { Session } from "models"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
@@ -52,35 +51,6 @@ const TabRender = React.memo((props, ref) => {
 	</div>
 })
 
-const UserBadges = React.memo((props) => {
-	return React.createElement(Loadable({
-		loader: async () => {
-			let { user_id } = props
-
-			const badgesData = await User.getUserBadges(user_id).catch((err) => {
-				console.error(err)
-
-				app.message.error("Failed to fetch user badges")
-
-				return null
-			})
-
-			if (!badgesData) {
-				return null
-			}
-
-			return () => badgesData.map((badge, index) => {
-				return <antd.Tooltip placement="bottom" title={badge.description ?? "An badge"}>
-					<antd.Tag color={badge.color ?? "default"} key={index} id={badge.name} icon={createIconRender(badge.icon)} className="badge">
-						<span>{badge.label}</span>
-					</antd.Tag>
-				</antd.Tooltip>
-			})
-		},
-		loading: antd.Skeleton,
-	}))
-})
-
 export default class Account extends React.Component {
 	state = {
 		requestedUser: null,
@@ -100,7 +70,9 @@ export default class Account extends React.Component {
 
 	coverComponent = React.createRef()
 
-	tabNavigatorRef = React.createRef()
+	leftPanelRef = React.createRef()
+
+	actionsRef = React.createRef()
 
 	api = window.app.api.withEndpoints("main")
 
@@ -131,6 +103,8 @@ export default class Account extends React.Component {
 				return false
 			}
 
+			console.log(`Loaded User [${user.username}] >`, user)
+
 			if (!isSelf) {
 				const followedResult = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
 
@@ -154,11 +128,25 @@ export default class Account extends React.Component {
 			followers,
 		})
 
-		app.eventBus.emit("style.compactMode", true)
+		// create intersection observer for cover
+		this.coverIntersectionObserver = new IntersectionObserver((e) => {
+			if (e[0].intersectionRatio > 0) {
+				this.leftPanelRef.current.style.transform = "translate(0, -100px)"
+				this.actionsRef.current.style.opacity = "1"
+			} else {
+				this.leftPanelRef.current.style.transform = "translate(0, 0)"
+				this.actionsRef.current.style.opacity = "0"
+			}
+		}, {
+			root: document.querySelector("#root"),
+			threshold: 0
+		})
+
+		this.coverIntersectionObserver.observe(this.coverComponent.current)
 	}
 
 	componentWillUnmount = () => {
-		app.eventBus.emit("style.compactMode", false)
+		this.coverIntersectionObserver.disconnect()
 	}
 
 	fetchData = async (username) => {
@@ -210,29 +198,6 @@ export default class Account extends React.Component {
 		})
 	}
 
-	handleScroll = (e) => {
-		if (!this.state.user?.cover) {
-			return false
-		}
-
-		// if component scrolled foward set cover height to 0
-		if (e.target.scrollTop > 0) {
-			this.coverComponent.current.style.height = "0px"
-
-			if (window.isMobile) {
-				this.tabNavigatorRef.current.style.overflow = "hidden"
-				this.tabNavigatorRef.current.style.height = "0px"
-			}
-		} else {
-			this.coverComponent.current.style.height = ""
-
-			if (window.isMobile) {
-				this.tabNavigatorRef.current.style.overflow = ""
-				this.tabNavigatorRef.current.style.height = ""
-			}
-		}
-	}
-
 	render() {
 		const user = this.state.user
 
@@ -249,65 +214,55 @@ export default class Account extends React.Component {
 			return <Skeleton />
 		}
 
-		return <div className="accountProfile">
-			{user.cover && <div
-				className={classnames("cover", {
-					["expanded"]: this.state.coverExpanded
-				})}
-				ref={this.coverComponent}
-				style={{ backgroundImage: `url("${user.cover}")` }}
-				onClick={() => this.toogleCoverExpanded()}
-			/>}
-			<div className="profileCardWrapper">
-				<div className="profileCard">
-					<div className="basicData">
-						<div className="title">
-							<div className="field">
-								<div className="avatar">
-									<Image
-										alt="ProfileImage"
-										src={user.avatar}
-									/>
-								</div>
-							</div>
+		return <div
+			className="accountProfile"
+			id="profile"
+		>
+			{
+				user.cover && <div
+					className={classnames("cover", {
+						["expanded"]: this.state.coverExpanded
+					})}
+					ref={this.coverComponent}
+					style={{ backgroundImage: `url("${user.cover}")` }}
+					onClick={() => this.toogleCoverExpanded()}
+					id="profile-cover"
+				/>
+			}
 
-							<div className="field">
-								<div>
-									<h1>{user.fullName ?? user.username}</h1>
-									{user.verified && <Icons.verifiedBadge />}
-								</div>
+			<div className="panels">
+				<div 
+					className="leftPanel"
+					ref={this.leftPanelRef}
+				>
+					<UserCard
+						user={user}
+					/>
 
-								<span>@{user.username}</span>
-							</div>
-						</div>
-
-						<div>
-							<FollowButton
-								count={this.state.followers.length}
-								onClick={this.onClickFollow}
-								followed={this.state.isFollowed}
-								self={this.state.isSelf}
-							/>
-						</div>
+					<div 
+						className="actions"
+						ref={this.actionsRef}
+					>
+						<FollowButton
+							count={this.state.followers.length}
+							onClick={this.onClickFollow}
+							followed={this.state.isFollowed}
+							self={this.state.isSelf}
+						/>
 					</div>
-
-					<div className="description">
-						<p>
-							{user.description}
-						</p>
-					</div>
-
 				</div>
 
-				<div className="badgesTab">
-					<React.Suspense fallback={<antd.Skeleton />}>
-						<UserBadges user_id={user._id} />
-					</React.Suspense>
+				<div
+					className="content"
+					ref={this.contentRef}
+				>
+					<TabRender
+						renderKey={this.state.tabActiveKey}
+						state={this.state}
+					/>
 				</div>
-			</div>
 
-			<div className="contents">
-				<div className="tabMenuWrapper" ref={this.tabNavigatorRef}>
+				<div className="tabMenuWrapper">
 					<antd.Menu
 						className="tabMenu"
 						mode={window.isMobile ? "horizontal" : "vertical"}
@@ -341,13 +296,6 @@ export default class Account extends React.Component {
 							</Translation>
 						</antd.Menu.Item>
 					</antd.Menu>
-				</div>
-
-				<div className="tabContent" ref={this.contentRef} onScroll={this.handleScroll}>
-					<TabRender
-						renderKey={this.state.tabActiveKey}
-						state={this.state}
-					/>
 				</div>
 			</div>
 		</div>
