@@ -1,208 +1,107 @@
 @borderRadius: 12px;
 
 .accountProfile {
+	display: flex;
+
+	flex-direction: column;
+
 	width: 100%;
-	height: 100vh;
-
-	overflow: hidden;
-
-	padding: 10px 20px;
-
-	// max-width: 70vw;
-	// min-width: 900px;
-
-	transition: all 0.3s ease-in-out;
+	height: 100%;
 
 	.cover {
 		z-index: 50;
 		position: relative;
-		border-radius: @borderRadius @borderRadius 0 0;
 
 		outline: 1px solid var(--border-color);
+		border-radius: @borderRadius;
 		content: "";
 
 		width: 100%;
+		height: 25vh;
+
+		margin-bottom: 10px;
 
 		background-position: center;
 		background-size: cover;
 
-		height: 25vh;
-
-		transform: translate(0, 10px);
 		transition: all 0.3s ease-in-out;
 
 		&.expanded {
 			height: 70vh;
-			transform: translate(0, 0);
 
 			background-size: cover;
 			background-repeat: no-repeat;
-			border-radius: @borderRadius;
-			margin-bottom: 10px;
 		}
 	}
 
-	.profileCardWrapper {
-		position: sticky;
-		top: 0;
-		z-index: 150;
-	}
-
-	.profileCard {
+	.panels {
 		position: relative;
-		z-index: 150;
 
-		display: flex;
-		flex-direction: column;
-
-		color: var(--background-color-contrast);
-		background-color: var(--background-color-primary);
-
-		border: 1px solid var(--border-color);
-		border-radius: @borderRadius @borderRadius 0 @borderRadius;
-
-		padding: 20px 15px;
-
-		height: 15vh;
-		min-height: 175px;
-
-		.basicData {
-			display: inline-flex;
-			flex-direction: row;
-			justify-content: space-between;
-
-			margin-bottom: 15px;
-
-			.avatar {
-				width: 100px;
-				height: 100px;
-
-				img {
-					width: 100%;
-					height: 100%;
-					border-radius: 8px;
-				}
-			}
-
-			svg {
-				fill: var(--appColor);
-			}
-
-			.title {
-				display: inline-flex;
-				flex-direction: row;
-				align-items: center;
-			}
-
-			.field {
-				display: inline-flex;
-				flex-direction: column;
-
-				margin-right: 15px;
-
-				h1 {
-					margin: 0;
-
-					font-size: 35px;
-					line-height: 37px;
-				}
-
-				>div {
-					display: inline-flex;
-				}
-			}
-		}
-
-		.description {
-			max-height: 5vh;
-			overflow: hidden;
-
-			p {
-				height: 100%;
-				overflow: hidden;
-
-				text-overflow: ellipsis;
-				overflow: hidden;
-				white-space: nowrap;
-
-				margin: 0;
-			}
-		}
-
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6,
-		span,
-		p {
-			user-select: text;
-		}
-	}
-
-	.badgesTab {
-		position: relative;
-		z-index: 140;
-
-		display: flex;
-		flex-direction: row;
-
-		padding: 30px 10px 10px 10px;
-
-		background-color: var(--background-color-accent);
-
-		border-radius: 0 0 @borderRadius @borderRadius;
-		transform: translate(0, -20px);
-
-		border: 1px solid var(--border-color);
-
-		.badge {
-			margin-left: 10px;
-			height: fit-content;
-		}
-	}
-
-	.tabMenuWrapper {
-		position: sticky !important;
-		top: 20px;
-
-		height: fit-content;
-
-		.tabMenu {
-			width: fit-content;
-			min-width: 10vw;
-
-			padding: 10px;
-			background-color: var(--background-color-accent) !important;
-			border-radius: @borderRadius;
-		}
-	}
-
-	.contents {
 		display: grid;
-		grid-template-columns: 10vw 1fr 10vw;
+		grid-template-columns: repeat(3, 1fr);
 		grid-template-rows: 1fr;
-		grid-column-gap: 50px;
+		grid-column-gap: 20px;
 		grid-row-gap: 0px;
 
-		width: 100%;
-		height: 100%;
+		padding-top: 20px;
 
-		overflow: hidden;
-		overflow-y: hidden;
-
-		margin-top: -1.5vh;
-
-		transition: all 0.3s ease-in-out;
-
-		.tabContent {
+		.leftPanel {
 			position: sticky;
-			border-radius: @borderRadius;
+			top: 0;
 
-			padding: 20px 10px 20vh 10px;
+			z-index: 55;
 
-			overflow-y: overlay;
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+
+			transition: all 0.3s ease-in-out;
+
+			.userCard {
+				position: sticky;
+				top: 0;
+				z-index: 55;
+			}
+
+			.actions {
+				display: flex;
+				flex-direction: column;
+
+				height: fit-content;
+				width: 20vw;
+				min-width: 400px;
+
+				padding: 20px;
+				margin-top: 20px;
+
+				background-color: var(--background-color-accent);
+				border-radius: 12px;
+
+				transition: all 0.3s ease-in-out;
+
+				.followButton {
+					width: fit-content;
+				}
+			}
+		}
+
+		.tabMenuWrapper {
+			position: sticky;
+			top: 0;
+
+			display: flex;
+			flex-direction: column;
+
+			background-color: var(--background-color-accent);
+			border-radius: 12px;
+			padding: 20px;
+
+			height: fit-content;
+			width: 20vw;
+			min-width: 400px;
+
+			justify-self: center;
 		}
 	}
 
@@ -210,18 +109,11 @@
 		background-color: var(--background-color-accent);
 		padding: 20px;
 		border-radius: @borderRadius;
+	}
 
-		font-family: "DM Mono", monospace;
-
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6,
-		p,
-		span {
-			user-select: text;
-		}
+	.followersList {
+		background-color: var(--background-color-accent);
+		padding: 20px;
+		border-radius: @borderRadius;
 	}
 }
