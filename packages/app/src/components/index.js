@@ -54,6 +54,8 @@ export { default as CommentsCard } from "./CommentsCard"
 export { default as CommentCreator } from "./CommentCreator"
 
 // USERS
+export { default as UserBadges } from "./UserBadges"
+export { default as UserCard } from "./UserCard"
 export { default as FollowersList } from "./FollowersList"
 export { default as ConnectedFriends } from "./ConnectedFriends"
 
