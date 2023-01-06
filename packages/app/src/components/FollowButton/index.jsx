@@ -8,6 +8,7 @@ export default (props) => {
     return <div className="followButton">
         <div className="counter">
             {props.count}
+            {props.self && " Followers"}
         </div>
         {
             !props.self && <Button
