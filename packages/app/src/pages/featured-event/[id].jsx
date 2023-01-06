@@ -1,5 +1,5 @@
 import React from "react"
-import { Skeleton } from "antd"
+import { Skeleton, Button } from "antd"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -92,7 +92,6 @@ export default (props) => {
                     console.log(`YIQ returns [${contrastColor}] as contrast color`)
                     document.getElementById("eventHeader").style.color = `var(--text-color-${contrastColor})`
                 })
-
             }
         }
     }, [eventData])
@@ -135,20 +134,30 @@ export default (props) => {
 
         <div className="content">
             <div className="panel">
-                <div className="dates">
-                    <Icons.Calendar /> {Array.isArray(eventData.dates) && renderDates(eventData.dates)}
+                <div className="card">
+                    <div className="dates">
+                        <Icons.Calendar /> {Array.isArray(eventData.dates) && renderDates(eventData.dates)}
+                    </div>
+
+                    <div className="location">
+                        <Icons.MapPin /> {ProcessString(LocationProcessRegexs)(eventData.location)}
+                    </div>
                 </div>
 
-                <div className="location">
-                    <Icons.MapPin /> {ProcessString(LocationProcessRegexs)(eventData.location)}
+                <div className="card">
+                    <Button>
+                        <Icons.Calendar /> Add to Calendar
+                    </Button>
                 </div>
             </div>
 
             <div className="panel">
-                <div className="description">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {eventData.description}
-                    </ReactMarkdown>
+                <div className="card">
+                    <div className="description">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {eventData.description}
+                        </ReactMarkdown>
+                    </div>
                 </div>
             </div>
         </div>
