@@ -192,7 +192,7 @@ export default class StreamViewer extends React.Component {
     componentDidMount = async () => {
         this.enterPlayerAnimation()
 
-        const requestedUsername = this.props.match.params.key
+        const requestedUsername = this.props.params.key
 
         await this.setState({
             requestedUsername,

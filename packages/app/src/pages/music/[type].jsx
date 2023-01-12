@@ -10,7 +10,7 @@ import "./index.less"
 
 export default class MusicDashboard extends React.Component {
     state = {
-        activeTab: this.props.match.params.type ?? "feed"
+        activeTab: this.props.params.type ?? "feed"
     }
 
     primaryPanelRef = React.createRef()
