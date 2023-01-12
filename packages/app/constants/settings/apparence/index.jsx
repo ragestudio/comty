@@ -1,5 +1,4 @@
 import React from "react"
-import * as antd from "antd"
 import loadable from "@loadable/component"
 
 import "./index.less"
@@ -28,11 +27,34 @@ export default [
     {
         "id": "reduceAnimations",
         "storaged": true,
-        "group": "aspect",
+        "group": "animations",
         "component": "Switch",
-        "icon": "MdOutlineAnimation",
+        "icon": "MdOutlineSlowMotionVideo",
         "title": "Reduce animation",
         "experimental": true
+    },
+    {
+        "id": "pageTransitionDuration",
+        "storaged": true,
+        "group": "animations",
+        "component": "Slider",
+        "icon": "MdOutlineSpeed",
+        "title": "Page transition duration",
+        "description": "Change the duration of the page transition animation.",
+        "props": {
+            min: 0,
+            max: 1000,
+            step: 50,
+            tooltip: {
+                formatter: (value) => `${value / 1000}s`
+            }
+        },
+        "emitEvent": "modifyTheme",
+        "emissionValueUpdate": (value) => {
+            return {
+                "page-transition-duration": `${value}ms`
+            }
+        },
     },
     {
         "id": "auto_darkMode",

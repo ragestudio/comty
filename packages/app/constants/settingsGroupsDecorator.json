@@ -15,6 +15,10 @@
         "title": "Aspect",
         "icon": "Eye"
     },
+    "animations": {
+        "title": "Animations",
+        "icon": "MdOutlineAnimation"
+    },
     "security.account": {
         "title": "Account Security",
         "icon": "Lock"
