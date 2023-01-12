@@ -54,35 +54,8 @@ export default class Layout extends React.PureComponent {
 
 			document.querySelector("#transitionLayer").classList.add("fade-opacity-leave")
 		},
-		"router.transitionStart": () => {
-			this.progressBar.start()
-
-			if (!app.settings.get("reduceAnimations")) {
-				// add "fade-transverse-leave" class to `transitionLayer`
-				const transitionLayer = document.getElementById("transitionLayer")
-
-				if (!transitionLayer) {
-					console.warn("transitionLayer not found, no animation will be played")
-					return
-				}
-
-				transitionLayer.classList.add("fade-transverse-leave")
-			}
-		},
-		"router.transitionFinish": () => {
-			this.progressBar.done()
-
-			if (!app.settings.get("reduceAnimations")) {
-				// remove "fade-transverse-leave" class to `transitionLayer`
-				const transitionLayer = document.getElementById("transitionLayer")
-
-				if (!transitionLayer) {
-					console.warn("transitionLayer not found, no animation will be played")
-					return
-				}
-
-				transitionLayer.classList.remove("fade-transverse-leave")
-			}
+		"router.navigate": (path, options) => {
+			this.makePageTransition(path, options)
 		},
 	}
 
@@ -110,6 +83,31 @@ export default class Layout extends React.PureComponent {
 
 	componentDidCatch(info, stack) {
 		this.setState({ renderError: { info, stack } })
+	}
+
+	makePageTransition(path, options = {}) {
+		this.progressBar.start()
+
+		if (app.settings.get("reduceAnimations") || options.state.noTransition) {
+			this.progressBar.done()
+
+			return false
+		}
+
+		const transitionLayer = document.getElementById("transitionLayer")
+
+		if (!transitionLayer) {
+			console.warn("transitionLayer not found, no animation will be played")
+			return false
+		}
+
+		transitionLayer.classList.add("fade-transverse-leave")
+
+		setTimeout(() => {
+			this.progressBar.done()
+
+			transitionLayer.classList.remove("fade-transverse-leave")
+		}, options.state.transitionDelay ?? 250)
 	}
 
 	setLayout = (layout) => {

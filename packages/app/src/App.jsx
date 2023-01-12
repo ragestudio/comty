@@ -53,6 +53,7 @@ import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { Toast } from "antd-mobile"
+import { BrowserRouter } from "react-router-dom"
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
@@ -455,15 +456,14 @@ class App extends React.Component {
 			})
 
 			StatusBar.setOverlaysWebView({ overlay: true })
-			//window.app.hideStatusBar()
 
-			CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+			CapacitorApp.addListener("backButton", ({ canGoBack }) => {
 				if (!canGoBack) {
-					CapacitorApp.exitApp();
+					CapacitorApp.exitApp()
 				} else {
-					window.history.back();
+					window.history.back()
 				}
-			});
+			})
 		}
 
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
@@ -532,6 +532,7 @@ class App extends React.Component {
 			async () => {
 				try {
 					await this.__SessionInit()
+					await this.__UserInit()
 
 					app.eventBus.emit("app.initialization.session_success")
 				} catch (error) {
@@ -539,20 +540,6 @@ class App extends React.Component {
 
 					throw {
 						cause: "Cannot initialize session",
-						details: error.message,
-					}
-				}
-			},
-			async () => {
-				try {
-					await this.__UserInit()
-
-					app.eventBus.emit("app.initialization.user_success")
-				} catch (error) {
-					app.eventBus.emit("app.initialization.user_error", error)
-
-					throw {
-						cause: "Cannot initialize user data",
 						details: error.message,
 					}
 				}
@@ -607,8 +594,8 @@ class App extends React.Component {
 				<meta name="og:description" content={config.app.siteDescription} />
 				<meta property="og:title" content={config.app.siteName} />
 			</Helmet>
-			<antd.ConfigProvider>
-				<Router.InternalRouter>
+			<BrowserRouter>
+				<antd.ConfigProvider>
 					<Layout
 						user={this.state.user}
 						staticRenders={App.staticRenders}
@@ -622,8 +609,8 @@ class App extends React.Component {
 					>
 						<Router.PageRender />
 					</Layout>
-				</Router.InternalRouter>
-			</antd.ConfigProvider>
+				</antd.ConfigProvider>
+			</BrowserRouter>
 		</React.Fragment>
 	}
 }
