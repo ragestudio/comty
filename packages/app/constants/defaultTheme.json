@@ -9,7 +9,8 @@
         "layoutMargin": "unset",
         "layoutPadding": "10px",
         "text-color-white": "#d2d2d2",
-        "text-color-black": "#000000"
+        "text-color-black": "#000000",
+        "page-transition-duration": "150ms"
     },
     "defaultVariant": "light",
     "variants": {
