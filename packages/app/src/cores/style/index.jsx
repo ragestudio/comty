@@ -137,15 +137,15 @@ export default class StyleCore extends Core {
 	}
 
 	getValue = (key) => {
+		const storagedModifications = this.getStoragedModifications()
+		const staticValues = this.theme.staticVars
+
 		if (typeof key === "undefined") {
 			return {
 				...staticValues,
 				...storagedModifications
 			}
 		}
-
-		const storagedModifications = this.getStoragedModifications()
-		const staticValues = this.theme.staticVars
 
 		return storagedModifications[key] || staticValues[key]
 	}
