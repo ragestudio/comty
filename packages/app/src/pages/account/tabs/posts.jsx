@@ -1,15 +1,19 @@
 import React from "react"
-import { Skeleton } from "antd"
+import { Skeleton, Result } from "antd"
 
-import { PostsList } from "components"
 import Post from "models/post"
 
+import { PostsList } from "components"
+import { Icons } from "components/Icons"
+
 const emptyListRender = () => {
-    return <div className="emptyFeed">
+    return <Result
+        icon={<Icons.UserX style={{ fontSize: "50px" }} />}
+    >
         <h2>
-            This user has no posts yet.
+            It's seems this user has no public post, yet.
         </h2>
-    </div>
+    </Result>
 }
 
 export default class UserPosts extends React.Component {
