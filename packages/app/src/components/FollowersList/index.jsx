@@ -5,6 +5,34 @@ import UserModel from "models/user"
 
 import "./index.less"
 
+const FollowerItem = ({
+    follower,
+    onClick,
+    index
+}) => {
+    return <div
+        className="follower"
+        onClick={onClick}
+        key={index}
+    >
+        <div className="avatar">
+            <antd.Avatar shape="square" src={follower.avatar} />
+        </div>
+        <div className="names">
+            <div>
+                <h2>
+                    {follower.fullName ?? follower.username}
+                </h2>
+            </div>
+            <div>
+                <span>
+                    @{follower.username}
+                </span>
+            </div>
+        </div>
+    </div>
+}
+
 export default (props) => {
     const [loading, setLoading] = React.useState(false)
     const [followers, setFollowers] = React.useState(props.followers ?? [])
@@ -62,24 +90,14 @@ export default (props) => {
     }
 
     return <div className="followersList">
-        {followers.map((follower) => {
-            return <div className="follower" onClick={() => goToProfile(follower.username)}>
-                <div className="avatar">
-                    <antd.Avatar shape="square" src={follower.avatar} />
-                </div>
-                <div className="names">
-                    <div>
-                        <h2>
-                            {follower.fullName ?? follower.username}
-                        </h2>
-                    </div>
-                    <div>
-                        <span>
-                            @{follower.username}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        })}
+        {
+            followers.map((follower, index) => {
+                return <FollowerItem
+                    index={index}
+                    follower={follower}
+                    goToProfile={() => goToProfile(follower.username)}
+                />
+            })
+        }
     </div>
 }
