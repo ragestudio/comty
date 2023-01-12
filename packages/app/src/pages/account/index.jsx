@@ -146,7 +146,9 @@ export default class Account extends React.Component {
 	}
 
 	componentWillUnmount = () => {
-		this.coverIntersectionObserver.disconnect()
+		if (this.coverIntersectionObserver) {
+			this.coverIntersectionObserver.disconnect()
+		}
 	}
 
 	fetchData = async (username) => {
@@ -231,7 +233,7 @@ export default class Account extends React.Component {
 			}
 
 			<div className="panels">
-				<div 
+				<div
 					className="leftPanel"
 					ref={this.leftPanelRef}
 				>
@@ -239,7 +241,7 @@ export default class Account extends React.Component {
 						user={user}
 					/>
 
-					<div 
+					<div
 						className="actions"
 						ref={this.actionsRef}
 					>
