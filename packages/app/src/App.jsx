@@ -168,7 +168,7 @@ class App extends React.Component {
 		"app.no_session": async () => {
 			const location = window.location.pathname
 
-			if (location !== "/login" && location !== "/register") {
+			if (location !== "/" && location !== "/login" && location !== "/register") {
 				antd.notification.info({
 					message: "You are not logged in, to use some features you will need to log in.",
 					btn: <antd.Button type="primary" onClick={() => app.goAuth()}>Login</antd.Button>,
