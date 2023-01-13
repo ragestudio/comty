@@ -4,7 +4,7 @@ import { LiveChat } from "components"
 import "./index.less"
 
 export default (props) => {
-    const roomId = props.match.params.id
+    const roomId = props.params.id
 
     return <div className="textRoom">
         <LiveChat

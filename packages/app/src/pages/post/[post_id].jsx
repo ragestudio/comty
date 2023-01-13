@@ -7,7 +7,7 @@ import { PostCard, CommentsCard } from "components"
 import "./index.less"
 
 export default (props) => {
-    const post_id = props.match.params.post_id
+    const post_id = props.params.post_id
 
     const [data, setData] = React.useState(null)
 

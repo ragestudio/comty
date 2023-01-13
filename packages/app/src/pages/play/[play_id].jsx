@@ -20,7 +20,7 @@ const TrackItem = ({ track }) => {
 }
 
 export default (props) => {
-    const play_id = props.match.params.play_id
+    const play_id = props.params.play_id
 
     const [playlist, setPlaylist] = React.useState(null)
 
