@@ -56,7 +56,7 @@ const SettingItem = (props) => {
 	let { item } = props
 
 	const [loading, setLoading] = React.useState(true)
-	const [value, setValue] = React.useState(item.defaultValue ?? false)
+	const [value, setValue] = React.useState(null)
 	const [delayedValue, setDelayedValue] = React.useState(null)
 	const [disabled, setDisabled] = React.useState(false)
 
@@ -130,15 +130,6 @@ const SettingItem = (props) => {
 		}
 	}
 
-	const onUnmount = () => {
-		// unsubscribe eventBus events
-		if (typeof item.dependsOn === "object") {
-			for (let key in item.dependsOn) {
-				window.app.eventBus.off(`setting.update.${key}`, onUpdateItem)
-			}
-		}
-	}
-
 	const checkDependsValidation = () => {
 		return !Boolean(Object.keys(item.dependsOn).every((key) => {
 			const storagedValue = window.app.settings.get(key)
@@ -160,7 +151,11 @@ const SettingItem = (props) => {
 		}
 
 		if (typeof item.defaultValue === "function") {
-			setValue(await item.defaultValue())
+			setLoading(true)
+
+			setValue(await item.defaultValue(props.ctx))
+
+			setLoading(false)
 		}
 
 		if (item.disabled === true) {
@@ -196,7 +191,13 @@ const SettingItem = (props) => {
 	React.useEffect(() => {
 		settingInitialization()
 
-		return onUnmount
+		return () => {
+			if (typeof item.dependsOn === "object") {
+				for (let key in item.dependsOn) {
+					window.app.eventBus.off(`setting.update.${key}`, onUpdateItem)
+				}
+			}
+		}
 	}, [])
 
 	if (typeof SettingComponent === "string") {
@@ -301,37 +302,140 @@ const SettingItem = (props) => {
 		</div>
 		<div className="component">
 			<div>
-				{loading ? <div> Loading... </div> : React.createElement(SettingComponent, {
-					...item.props,
-					ctx: {
-						currentValue: value,
-						dispatchUpdate,
-						onUpdateItem,
-						...props.ctx,
-					}
-				})}
+				{
+					loading
+						? <div> Loading... </div>
+						: React.createElement(SettingComponent, {
+							...item.props,
+							ctx: {
+								currentValue: value,
+								dispatchUpdate,
+								onUpdateItem,
+								...props.ctx,
+							}
+						})}
 			</div>
 
-			{delayedValue && <div>
-				<antd.Button
-					type="round"
-					icon={<Icons.Save />}
-					onClick={async () => await dispatchUpdate(value)}
-				>
-					Save
-				</antd.Button>
-			</div>}
+			{
+				delayedValue && <div>
+					<antd.Button
+						type="round"
+						icon={<Icons.Save />}
+						onClick={async () => await dispatchUpdate(value)}
+					>
+						Save
+					</antd.Button>
+				</div>
+			}
 		</div>
 	</div>
 }
 
+const SettingGroup = React.memo((props) => {
+	const {
+		ctx,
+		groupKey,
+		settings,
+		loading,
+	} = props
+
+	const fromDecoratorIcon = groupsDecorator[groupKey]?.icon
+	const fromDecoratorTitle = groupsDecorator[groupKey]?.title
+
+	if (loading) {
+		return <antd.Skeleton active />
+	}
+
+	return <div index={groupKey} key={groupKey} className="group">
+		<h1>
+			{
+				fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
+			}
+			<Translation>
+				{
+					t => t(fromDecoratorTitle ?? groupKey)
+				}
+			</Translation>
+		</h1>
+		<div className="content">
+			{
+				settings.map((item) => <SettingItem
+					item={item}
+					ctx={ctx}
+				/>)
+			}
+		</div>
+	</div>
+})
+
+const SettingTab = React.memo((props) => {
+	const { tab } = props
+
+	const [loading, setLoading] = React.useState(true)
+	const [ctxData, setCtxData] = React.useState(null)
+
+	let groupsSettings = {}
+
+	if (!Array.isArray(tab.settings)) {
+		console.error("Cannot generate settings from non-array")
+		return groupsSettings
+	}
+
+	tab.settings.forEach((item) => {
+		if (!groupsSettings[item.group]) {
+			groupsSettings[item.group] = []
+		}
+
+		groupsSettings[item.group].push(item)
+	})
+
+	const processCtx = async () => {
+		setLoading(true)
+
+		if (typeof tab.ctxData === "function") {
+			const resultCtx = await tab.ctxData()
+
+			setCtxData(resultCtx)
+		}
+
+		setLoading(false)
+	}
+
+	React.useEffect(() => {
+		processCtx()
+	}, [])
+
+	return Object.keys(groupsSettings).map((groupKey) => {
+		return <SettingGroup
+			groupKey={groupKey}
+			settings={groupsSettings[groupKey]}
+			loading={loading}
+			ctx={ctxData}
+		/>
+	})
+})
+
+const SettingsTabs = Object.keys(SettingsList).map((settingsKey) => {
+	const tab = SettingsList[settingsKey]
+
+	return {
+		key: settingsKey,
+		label: <>
+			{createIconRender(tab.icon ?? "Settings")}
+			{tab.label}
+		</>,
+		children: <SettingTab
+			tab={tab}
+		/>
+	}
+})
+
 export default class SettingsMenu extends React.PureComponent {
 	state = {
-		transitionActive: false,
 		activeKey: "app"
 	}
 
-	componentDidMount() {
+	componentDidMount = async () => {
 		if (typeof this.props.close === "function") {
 			// register escape key to close settings menu
 			window.addEventListener("keydown", this.handleKeyDown)
@@ -350,85 +454,6 @@ export default class SettingsMenu extends React.PureComponent {
 		}
 	}
 
-	handlePageTransition = (key) => {
-		this.setState({
-			transitionActive: true,
-		})
-
-		setTimeout(() => {
-			this.setState({
-				activeKey: key
-			})
-
-			setTimeout(() => {
-				this.setState({
-					transitionActive: false,
-				})
-			}, 100)
-		}, 100)
-	}
-
-	renderSettings = (key, group) => {
-		const fromDecoratorIcon = groupsDecorator[key]?.icon
-		const fromDecoratorTitle = groupsDecorator[key]?.title
-
-		return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": this.state.transitionActive })}>
-			<div key={key} className="group">
-				<h1>
-					{fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null}
-					<Translation>{
-						t => t(fromDecoratorTitle ?? key)
-					}</Translation>
-				</h1>
-				<div className="content">
-					{group.map((item) => <SettingItem
-						item={item}
-						ctx={{
-							close: this.props.close
-						}}
-					/>)}
-				</div>
-			</div>
-		</div>
-	}
-
-	generateSettingsGroups = (data) => {
-		let groups = {}
-
-		if (!Array.isArray(data)) {
-			console.error("Cannot generate settings groups from non-array data")
-			return groups
-		}
-
-		data.forEach((item) => {
-			if (!groups[item.group]) {
-				groups[item.group] = []
-			}
-
-			groups[item.group].push(item)
-		})
-
-		return Object.keys(groups).map((groupKey) => {
-			return this.renderSettings(groupKey, groups[groupKey])
-		})
-	}
-
-	generateSettingsTabs = () => {
-		return Object.keys(SettingsList).map((key) => {
-			return <antd.Tabs.TabPane
-				key={key}
-				tab={
-					<span>
-						{createIconRender(SettingsList[key].icon)}
-						{SettingsList[key].label}
-					</span>
-				}
-			>
-				{this.generateSettingsGroups(SettingsList[key].settings)}
-			</antd.Tabs.TabPane>
-		})
-	}
-
 	onClickAppAbout = () => {
 		window.app.setLocation("/about")
 
@@ -437,22 +462,28 @@ export default class SettingsMenu extends React.PureComponent {
 		}
 	}
 
+	changeTab = (activeKey) => {
+		this.setState({ activeKey })
+	}
+
 	render() {
-		return <div className={
-			classnames("settings_wrapper", {
-				["mobile"]: window.isMobile,
-			})
-		}>
+		return <div
+			className={classnames(
+				"settings_wrapper",
+				{
+					["mobile"]: window.isMobile,
+				}
+			)}
+		>
 			<div className="settings">
 				<antd.Tabs
 					activeKey={this.state.activeKey}
-					onTabClick={this.handlePageTransition}
+					onTabClick={this.changeTab}
 					tabPosition={window.isMobile ? "top" : "left"}
 					centered={window.isMobile}
 					destroyInactiveTabPane
-				>
-					{this.generateSettingsTabs()}
-				</antd.Tabs>
+					items={SettingsTabs}
+				/>
 
 				<SettingsFooter onClickAppAbout={this.onClickAppAbout} />
 			</div>
