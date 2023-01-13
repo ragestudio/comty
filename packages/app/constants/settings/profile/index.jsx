@@ -40,8 +40,6 @@ export default {
                 "placeholder": "Enter your name. e.g. John Doe",
             },
             "defaultValue": (ctx) => {
-                console.log(ctx)
-
                 return ctx.userData.fullName
             },
             "onUpdate": async (value) => {
