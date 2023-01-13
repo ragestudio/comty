@@ -280,87 +280,85 @@ export default class Sidebar extends React.Component {
 	render() {
 		if (!this.state.menus) return null
 
-		return (
-			<div
-				onMouseEnter={this.onMouseEnter}
-				onMouseLeave={this.handleMouseLeave}
-				className={
-					classnames(
-						"app_sidebar",
-						{
-							["customRender"]: this.state.customRender,
-							["floating"]: window.app?.settings.get("sidebar.floating"),
-							["collapsed"]: !this.state.customRender && this.state.visible && this.state.collapsed,
-							["elevated"]: !this.state.visible && this.state.elevated,
-							["hidden"]: !this.state.visible,
-						}
-					)
-				}
-				ref={this.sidebarRef}
-			>
-				{
-					this.state.customRender && <CustomRender
-						customRenderTitle={this.state.customRenderTitle}
-						closeRender={this.closeRender}
-						sidebarRef={this.sidebarRef}
-					>
-						{this.state.customRender}
-					</CustomRender>
-				}
+		return <div
+			onMouseEnter={this.onMouseEnter}
+			onMouseLeave={this.handleMouseLeave}
+			className={
+				classnames(
+					"app_sidebar",
+					{
+						["customRender"]: this.state.customRender,
+						["floating"]: window.app?.settings.get("sidebar.floating"),
+						["elevated"]: this.state.visible && this.state.elevated,
+						["collapsed"]: this.state.visible && this.state.collapsed,
+						["hidden"]: !this.state.visible,
+					}
+				)
+			}
+			ref={this.sidebarRef}
+		>
+			{
+				this.state.customRender && <CustomRender
+					customRenderTitle={this.state.customRenderTitle}
+					closeRender={this.closeRender}
+					sidebarRef={this.sidebarRef}
+				>
+					{this.state.customRender}
+				</CustomRender>
+			}
 
-				{
-					!this.state.customRender && <>
-						<div className="app_sidebar_header">
-							<div className={classnames("app_sidebar_header_logo", { ["collapsed"]: this.state.collapsed })}>
-								<img src={this.state.collapsed ? config.logo?.alt : config.logo?.full} />
-							</div>
+			{
+				!this.state.customRender && <>
+					<div className="app_sidebar_header">
+						<div className={classnames("app_sidebar_header_logo", { ["collapsed"]: this.state.collapsed })}>
+							<img src={this.state.collapsed ? config.logo?.alt : config.logo?.full} />
 						</div>
+					</div>
 
-						<div key="menu" className="app_sidebar_menu_wrapper">
-							<Menu selectable={true} mode="inline" onClick={this.handleClick}>
-								{this.renderMenuItems(this.state.menus)}
-							</Menu>
-						</div>
+					<div key="menu" className="app_sidebar_menu_wrapper">
+						<Menu selectable={true} mode="inline" onClick={this.handleClick}>
+							{this.renderMenuItems(this.state.menus)}
+						</Menu>
+					</div>
 
-						<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
-							<Menu selectable={false} mode="inline" onClick={this.handleClick}>
-								<Menu.Item key="search" icon={<Icons.Search />} override_event="app.openSearcher" >
+					<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
+						<Menu selectable={false} mode="inline" onClick={this.handleClick}>
+							<Menu.Item key="search" icon={<Icons.Search />} override_event="app.openSearcher" >
+								<Translation>
+									{(t) => t("Search")}
+								</Translation>
+							</Menu.Item>
+							<Menu.Item key="create" icon={<Icons.PlusCircle />} override_event="app.openCreator" >
+								<Translation>
+									{(t) => t("Create")}
+								</Translation>
+							</Menu.Item>
+							<Menu.Item key="notifications" icon={<Icons.Bell />} override_event="app.openNotifications">
+								<Translation>
+									{t => t("Notifications")}
+								</Translation>
+							</Menu.Item>
+							<Menu.Item key="settings" icon={<Icons.Settings />}>
+								<Translation>
+									{t => t("Settings")}
+								</Translation>
+							</Menu.Item>
+							{
+								app.userData && <Menu.Item key="account" className="user_avatar">
+									<Avatar shape="square" src={app.userData?.avatar} />
+								</Menu.Item>
+							}
+							{
+								!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
 									<Translation>
-										{(t) => t("Search")}
+										{t => t("Login")}
 									</Translation>
 								</Menu.Item>
-								<Menu.Item key="create" icon={<Icons.PlusCircle />} override_event="app.openCreator" >
-									<Translation>
-										{(t) => t("Create")}
-									</Translation>
-								</Menu.Item>
-								<Menu.Item key="notifications" icon={<Icons.Bell />} override_event="app.openNotifications">
-									<Translation>
-										{t => t("Notifications")}
-									</Translation>
-								</Menu.Item>
-								<Menu.Item key="settings" icon={<Icons.Settings />}>
-									<Translation>
-										{t => t("Settings")}
-									</Translation>
-								</Menu.Item>
-								{
-									app.userData && <Menu.Item key="account" className="user_avatar">
-										<Avatar shape="square" src={app.userData?.avatar} />
-									</Menu.Item>
-								}
-								{
-									!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
-										<Translation>
-											{t => t("Login")}
-										</Translation>
-									</Menu.Item>
-								}
-							</Menu>
-						</div>
-					</>
-				}
-			</div>
-		)
+							}
+						</Menu>
+					</div>
+				</>
+			}
+		</div>
 	}
 }
