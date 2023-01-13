@@ -10,7 +10,7 @@ import "./index.less"
 const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default (props) => {
-    const post_id = props.match.params.post_id
+    const post_id = props.params.post_id
 
     const [data, setData] = React.useState(null)
 

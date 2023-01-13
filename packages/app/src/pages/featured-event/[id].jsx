@@ -19,7 +19,7 @@ const LocationProcessRegexs = [
 ]
 
 export default (props) => {
-    const eventId = props.match.params["id"]
+    const eventId = props.params["id"]
 
     const [eventData, setEventData] = React.useState(null)
 
