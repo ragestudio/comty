@@ -6,29 +6,9 @@ import ApparenceSettings from "./apparence"
 //import ExtensionsSettings from "./extensions"
 
 export default {
-    app: {
-        icon: "Command",
-        label: "App",
-        settings: AppSettings
-    },
-    profile: {
-        icon: "User",
-        label: "Profile",
-        settings: ProfileSettings
-    },
-    apparence: {
-        icon: "Eye",
-        label: "Apparence",
-        settings: ApparenceSettings
-    },
-    security: {
-        icon: "Shield",
-        label: "Security",
-        settings: SecuritySettings
-    },
-    notifications: {
-        icon: "Bell",
-        label: "Notifications",
-        settings: NotificationsSettings
-    },
+    app: AppSettings,
+    profile: ProfileSettings,
+    apparence: ApparenceSettings,
+    security: SecuritySettings,
+    notifications: NotificationsSettings,
 }

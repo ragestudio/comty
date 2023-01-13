@@ -1,5 +1,9 @@
 import React from "react"
 
-export default [
+export default {
+    icon: "Bell",
+    label: "Notifications",
+    settings: [
 
-]
+    ]
+}
