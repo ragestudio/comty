@@ -1,5 +1,5 @@
 import React from "react"
-import { Route, Routes, Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
+import { Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom"
 import { Skeleton } from "antd"
 import loadable from "@loadable/component"
 
