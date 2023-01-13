@@ -56,7 +56,7 @@ export default {
         let media = null
 
         // if element div has `addition` class, search inside it for video or image
-        if (element.classList.contains("addition")) {
+        if (element.classList.contains("addition") || element.classList.contains("image-wrapper")) {
             media = element.querySelector("video, img")
         }
 
