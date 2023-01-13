@@ -1,5 +1,13 @@
 [
     {
+        "id": "index",
+        "path": "/",
+        "title": "Index",
+        "icon": "Home",
+        "useLayout": "login",
+        "reachable": false
+    },
+    {
         "id": "login",
         "path": "/login",
         "title": "Login",
