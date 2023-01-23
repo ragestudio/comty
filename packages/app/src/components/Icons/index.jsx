@@ -4,6 +4,7 @@ import React from "react"
 import * as lib1 from "feather-reactjs"
 import * as lib2 from "react-icons/md"
 import * as lib3 from "@ant-design/icons"
+import * as lib4 from "react-icons/si"
 
 const marginedStyle = { width: "1em", height: "1em", marginRight: "10px", verticalAlign: "-0.125em" }
 
@@ -16,6 +17,7 @@ export const Icons = {
     ...lib1,
     ...lib2,
     ...lib3,
+    ...lib4,
 }
 
 export function createIconRender(icon, props) {
