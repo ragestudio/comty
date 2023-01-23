@@ -65,7 +65,7 @@ export default {
         siteDescription: "Comty, a prototype of social network.",
         mainPath: "/home",
         authPath: "/login",
-        copyright: "Comty - RageStudio© 2022",
+        copyright: "Comty - RageStudio© 2023",
         storage: {
             basics: "user",
             token: "token",
