@@ -1,4 +1,4 @@
-import SpotifySyncModel from "./spotify"
+import SpotifySyncModel from "./cores/spotifyCore"
 
 export default class SyncModel {
     static get bridge() {
