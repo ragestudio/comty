@@ -42,3 +42,5 @@ export const StreamingCategory = mongoose.model("StreamingCategory", schemas.Str
 // others
 export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")
 export const FeaturedEvent = mongoose.model("FeaturedEvent", schemas.FeaturedEvent, "featuredEvents")
+
+export const SyncEntry = mongoose.model("SyncEntry", schemas.SyncEntry, "syncEntries")
