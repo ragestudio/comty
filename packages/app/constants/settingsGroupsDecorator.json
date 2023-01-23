@@ -23,7 +23,7 @@
         "title": "Account Security",
         "icon": "Lock"
     },
-    "security.other":{
+    "security.other": {
         "title": "Others",
         "icon": "MoreHorizontal"
     },
@@ -42,5 +42,13 @@
     "posts": {
         "title": "Posts",
         "icon": "MdOutlineFeed"
+    },
+    "sync.settings": {
+        "title": "Sync Settings",
+        "icon": "MdSync"
+    },
+    "sync.accounts": {
+        "title": "Synced Accounts",
+        "icon": "MdLinearScale"
     }
 }
