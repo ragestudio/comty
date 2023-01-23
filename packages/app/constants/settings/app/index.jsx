@@ -62,6 +62,16 @@ export default {
             "emitEvent": "app.clearInternalStorage"
         },
         {
+            "id": "low_performance_mode",
+            "storaged": true,
+            "group": "general",
+            "component": "Switch",
+            "icon": "MdSlowMotionVideo",
+            "title": "Low performance mode",
+            "description": "Enable low performance mode to reduce the memory usage and improve the performance in low-end devices. This will disable some animations and other decorative features.",
+            "emitEvent": "app.lowPerformanceMode"
+        },
+        {
             "id": "notifications_sound",
             "storaged": true,
             "group": "notifications",
