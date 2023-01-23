@@ -10,7 +10,7 @@ services:
     build: packages/server
     restart: unless-stopped
     ports:
-      - "3010:3000"
+      - "5000:5000"
     env_file:
       - api.env
     volumes:
@@ -19,6 +19,6 @@ services:
     build: packages/message_server
     restart: unless-stopped
     ports:
-      - "3020:3020"
+      - "3005:3005"
     env_file:
       - messaging.env
