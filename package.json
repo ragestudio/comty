@@ -23,5 +23,5 @@
   "devDependencies": {
     "concurrently": "^7.5.0"
   },
-  "version": "0.39.1"
+  "version": "0.39.2"
 }
