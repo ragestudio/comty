@@ -11,4 +11,5 @@ export default {
     birthday: { type: Date },
     createdAt: { type: String },
     badges: { type: Array, default: [] },
+    early_supporter: { type: Boolean, default: false },
 }
