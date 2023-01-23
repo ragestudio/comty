@@ -1,5 +1,6 @@
 import path from "path"
 import { Server as LinebridgeServer } from "linebridge/dist/server"
+
 import express from "express"
 import bcrypt from "bcrypt"
 import passport from "passport"
@@ -45,11 +46,12 @@ export default class Server {
         controllers.FeaturedEventsController,
         controllers.PlaylistsController,
         controllers.FeedController,
+        controllers.SyncController,
     ]
 
     middlewares = middlewares
 
-    server = new LinebridgeServer({
+    server = global.server = new LinebridgeServer({
         port: process.env.MAIN_LISTEN_PORT || 3000,
         headers: {
             "Access-Control-Expose-Headers": "regenerated_token",
