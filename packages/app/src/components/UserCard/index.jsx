@@ -32,14 +32,20 @@ export default React.forwardRef((props, ref) => {
                 </span>
             </div>
 
-            {
-                user.roles.includes("admin") &&
-                <div className="indicators">
+            <div className="indicators">
+                {
+                    user.roles.includes("admin") &&
                     <antd.Tooltip title="Administrators Team">
                         <Icons.MdAdminPanelSettings />
                     </antd.Tooltip>
-                </div>
-            }
+                }
+                {
+                    user.early_supporter &&
+                    <antd.Tooltip title="Early supporter">
+                        <Icons.MdLoyalty />
+                    </antd.Tooltip>
+                }
+            </div>
         </div>
 
         <div className="description">
