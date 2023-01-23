@@ -1,0 +1,52 @@
+.spotifyAccount {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: var(--background-color-primary);
+
+    padding: 10px;
+
+    border-radius: 12px;
+
+    .spotifyAccount_info {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        img {
+            width: 40px;
+            height: 40px;
+
+            object-fit: cover;
+
+            border-radius: 12px;
+
+            margin-right: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin: 0;
+        }
+    }
+
+    .spotifyAccount_actions {
+        display: flex;
+
+        align-items: center;
+
+        .ant-btn {
+            margin-left: 10px;
+
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+    }
+}
