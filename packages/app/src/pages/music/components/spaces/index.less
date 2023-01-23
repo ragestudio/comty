@@ -1,0 +1,59 @@
+.spacesExplorer {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    .spacesExplorer_header {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+
+        .spacesExplorer_header_title {
+            display: inline-flex;
+            flex-direction: column;
+
+            justify-content: center;
+
+            font-family: "Space Grotesk", sans-serif;
+
+            h1 {
+                display: inline-flex;
+                align-items: center;
+
+
+                font-size: 2rem;
+                font-weight: 500;
+
+                .ant-tag {
+                    margin-left: 8px;
+                }
+            }
+
+            p {
+                font-size: 1rem;
+                font-weight: 400;
+                color: var(--background-color-contrast);
+            }
+        }
+
+        .spacesExplorer_header_actions {
+            display: flex;
+            align-items: center;
+
+            justify-content: flex-end;
+
+            .ant-btn {
+                margin-left: 8px;
+
+                &:first-child {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
