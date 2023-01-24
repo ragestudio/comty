@@ -100,20 +100,21 @@ export default class SyncController extends Controller {
                     })
                 }
 
-                const { data } = await axios.get("https://api.spotify.com/v1/me", {
+                const response = await axios.get("https://api.spotify.com/v1/me", {
                     headers: {
                         "Authorization": `Bearer ${authToken}`
                     },
                 }).catch((error) => {
-                    console.error(error.response.data)
+                        console.error(error.response.data)
 
-                    res.status(error.response.status).json(error.response.data)
+                        res.status(error.response.status).json(error.response.data)
 
-                    return null
-                })
+                        return null
+                    })
 
-
-                return res.json(data)
+                if (response) {
+                    return res.json(data)
+                }
             }
         },
         "/spotify/currently_playing": {
