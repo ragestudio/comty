@@ -113,7 +113,7 @@ export default class SyncController extends Controller {
                     })
 
                 if (response) {
-                    return res.json(data)
+                    return res.json(response.data)
                 }
             }
         },
