@@ -20,7 +20,10 @@ export default class SecureSyncEntry {
             throw new Error("Missing value")
         }
 
-        let entry = await SyncEntry.findOne({ key }).catch(() => null)
+        let entry = await SyncEntry.findOne({
+            user_id,
+            key,
+        }).catch(() => null)
 
         const encryptionKey = Buffer.from(process.env.SYNC_ENCRIPT_SECRET, "hex")
         const iv = crypto.randomBytes(16)
