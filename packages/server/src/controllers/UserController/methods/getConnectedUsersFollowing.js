@@ -1,4 +1,4 @@
-import { UserFollow } from "../../../models"
+import { UserFollow } from "@models"
 
 export default async (payload = {}) => {
     const { from_user_id } = payload

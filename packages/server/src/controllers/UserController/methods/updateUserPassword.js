@@ -1,5 +1,5 @@
+import { User } from "@models"
 import bcrypt from "bcrypt"
-import { User } from "../../../models"
 
 export default async function (payload) {
     const { user_id, password } = payload
