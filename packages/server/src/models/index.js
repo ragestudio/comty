@@ -1,46 +1,19 @@
 import mongoose, { Schema } from "mongoose"
+import fs from "fs"
+import path from "path"
 
-function getSchemas() {
-    const obj = Object()
+function generateModels() {
+    let models = {}
 
-    const _schemas = require("../schemas")
-    Object.keys(_schemas).forEach((key) => {
-        obj[key] = Schema(_schemas[key])
+    const dirs = fs.readdirSync(__dirname).filter(file => file !== "index.js")
+
+    dirs.forEach((file) => {
+        const model = require(path.join(__dirname, file)).default
+
+        models[model.name] = mongoose.model(model.name, new Schema(model.schema), model.collection)
     })
 
-    return obj
+    return models
 }
 
-const schemas = getSchemas()
-
-// server
-export const Config = mongoose.model("Config", schemas.Config, "config")
-
-// sessions
-export const Session = mongoose.model("Session", schemas.Session, "sessions")
-export const RegenerationToken = mongoose.model("RegenerationToken", schemas.RegenerationToken, "regenerationTokens")
-
-// users
-export const User = mongoose.model("User", schemas.User, "accounts")
-export const UserFollow = mongoose.model("UserFollow", schemas.UserFollow, "follows")
-export const Role = mongoose.model("Role", schemas.Role, "roles")
-export const Badge = mongoose.model("Badge", schemas.Badge, "badges")
-
-// posts
-export const Post = mongoose.model("Post", schemas.Post, "posts")
-export const Comment = mongoose.model("Comment", schemas.Comment, "comments")
-export const SavedPost = mongoose.model("SavedPost", schemas.SavedPost, "savedPosts")
-
-// playlists
-export const Playlist = mongoose.model("Playlist", schemas.Playlist, "playlists")
-
-// streamings
-export const StreamingKey = mongoose.model("StreamingKey", schemas.StreamingKey, "streamingKeys")
-export const StreamingInfo = mongoose.model("StreamingInfo", schemas.StreamingInfo, "streamingInfos")
-export const StreamingCategory = mongoose.model("StreamingCategory", schemas.StreamingCategory, "streamingCategories")
-
-// others
-export const FeaturedWallpaper = mongoose.model("FeaturedWallpaper", schemas.FeaturedWallpaper, "featuredWallpapers")
-export const FeaturedEvent = mongoose.model("FeaturedEvent", schemas.FeaturedEvent, "featuredEvents")
-
-export const SyncEntry = mongoose.model("SyncEntry", schemas.SyncEntry, "syncEntries")
+module.exports = generateModels()
