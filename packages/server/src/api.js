@@ -1,6 +1,8 @@
-import path from "path"
-import { Server as LinebridgeServer } from "linebridge/dist/server"
+import { Server, registerBaseAliases } from "linebridge/dist/server"
 
+registerBaseAliases()
+
+import path from "path"
 import express from "express"
 import bcrypt from "bcrypt"
 import passport from "passport"
@@ -8,54 +10,21 @@ import passport from "passport"
 import jwt from "jsonwebtoken"
 import EventEmitter from "@foxify/events"
 
-import { User, Session, Config } from "./models"
+import { User, Session, Config } from "@models"
 
-import DbManager from "./classes/DbManager"
-import { createStorageClientInstance } from "./classes/StorageClient"
+import DbManager from "@classes/DbManager"
+import { createStorageClientInstance } from "@classes/StorageClient"
 
 import internalEvents from "./events"
 
 const ExtractJwt = require("passport-jwt").ExtractJwt
 const LocalStrategy = require("passport-local").Strategy
 
-const controllers = require("./controllers")
-const middlewares = require("./middlewares")
-
 global.signLocation = process.env.signLocation
 
-export default class Server {
-    DB = new DbManager()
-
-    eventBus = global.eventBus = new EventEmitter()
-
-    storage = global.storage = createStorageClientInstance()
-
-    controllers = [
-        controllers.ConfigController,
-        controllers.RolesController,
-        controllers.FollowerController,
-        controllers.SessionController,
-        controllers.UserController,
-        controllers.FilesController,
-        controllers.PublicController,
-        controllers.PostsController,
-        controllers.StreamingController,
-        controllers.BadgesController,
-        controllers.CommentsController,
-        controllers.SearchController,
-        controllers.FeaturedEventsController,
-        controllers.PlaylistsController,
-        controllers.FeedController,
-        controllers.SyncController,
-    ]
-
-    middlewares = middlewares
-
-    server = global.server = new LinebridgeServer({
-        port: process.env.MAIN_LISTEN_PORT || 3000,
-        headers: {
-            "Access-Control-Expose-Headers": "regenerated_token",
-        },
+export default class API {
+    server = global.server = new Server({
+        listen_port: process.env.MAIN_LISTEN_PORT ?? 3000,
         onWSClientConnection: (...args) => {
             this.onWSClientConnection(...args)
         },
@@ -63,9 +32,18 @@ export default class Server {
             this.onWSClientDisconnect(...args)
         },
     },
-        this.controllers,
-        this.middlewares
+        require("@controllers"),
+        require("@middlewares"),
+        {
+            "Access-Control-Expose-Headers": "regenerated_token",
+        },
     )
+
+    DB = new DbManager()
+
+    eventBus = global.eventBus = new EventEmitter()
+
+    storage = global.storage = createStorageClientInstance()
 
     jwtStrategy = global.jwtStrategy = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -76,25 +54,25 @@ export default class Server {
     }
 
     constructor() {
-        this.server.engineInstance.use(express.json())
-        this.server.engineInstance.use(express.urlencoded({ extended: true }))
+        this.server.engine_instance.use(express.json())
+        this.server.engine_instance.use(express.urlencoded({ extended: true }))
 
-        this.server.wsInterface["clients"] = []
-        this.server.wsInterface["findUserIdFromClientID"] = (searchClientId) => {
-            return this.server.wsInterface.clients.find(client => client.id === searchClientId)?.userId ?? false
+        this.server.websocket_instance["clients"] = []
+        this.server.websocket_instance["findUserIdFromClientID"] = (searchClientId) => {
+            return this.server.websocket_instance.clients.find(client => client.id === searchClientId)?.userId ?? false
         }
-        this.server.wsInterface["getClientSockets"] = (userId) => {
-            return this.server.wsInterface.clients.filter(client => client.userId === userId).map((client) => {
+        this.server.websocket_instance["getClientSockets"] = (userId) => {
+            return this.server.websocket_instance.clients.filter(client => client.userId === userId).map((client) => {
                 return client?.socket
             })
         }
-        this.server.wsInterface["broadcast"] = async (channel, ...args) => {
-            for await (const client of this.server.wsInterface.clients) {
+        this.server.websocket_instance["broadcast"] = async (channel, ...args) => {
+            for await (const client of this.server.websocket_instance.clients) {
                 client.socket.emit(channel, ...args)
             }
         }
 
-        global.wsInterface = this.server.wsInterface
+        global.websocket_instance = this.server.websocket_instance
 
         global.uploadCachePath = process.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
 
@@ -220,7 +198,7 @@ export default class Server {
                 .catch(err => done(err, null, this.jwtStrategy))
         }))
 
-        this.server.engineInstance.use(passport.initialize())
+        this.server.engine_instance.use(passport.initialize())
     }
 
     initWebsockets() {
@@ -238,7 +216,7 @@ export default class Server {
             })
         }
 
-        this.server.wsInterface.eventsChannels.push(["/main", "authenticate", async (socket, authPayload) => {
+        this.server.websocket_instance.eventsChannels.push(["/main", "authenticate", async (socket, authPayload) => {
             if (!authPayload) {
                 return onAuthenticatedFailed(socket, "missing_auth_payload")
             }
@@ -279,7 +257,7 @@ export default class Server {
     }
 
     attachClientSocket = async (socket, userData) => {
-        const client = this.server.wsInterface.clients.find(c => c.id === socket.id)
+        const client = this.server.websocket_instance.clients.find(c => c.id === socket.id)
 
         if (client) {
             client.socket.disconnect()
@@ -291,7 +269,7 @@ export default class Server {
             user_id: userData._id.toString(),
         }
 
-        this.server.wsInterface.clients.push(clientObj)
+        this.server.websocket_instance.clients.push(clientObj)
 
         console.log(`📣 Client [${socket.id}] authenticated as ${userData.username}`)
 
@@ -299,10 +277,10 @@ export default class Server {
     }
 
     detachClientSocket = async (socket) => {
-        const client = this.server.wsInterface.clients.find(c => c.id === socket.id)
+        const client = this.server.websocket_instance.clients.find(c => c.id === socket.id)
 
         if (client) {
-            this.server.wsInterface.clients = this.server.wsInterface.clients.filter(c => c.id !== socket.id)
+            this.server.websocket_instance.clients = this.server.websocket_instance.clients.filter(c => c.id !== socket.id)
 
             console.log(`📣🔴 Client [${socket.id}] authenticated as ${client.user_id} disconnected`)
 
