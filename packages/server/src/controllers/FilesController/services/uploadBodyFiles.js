@@ -1,7 +1,6 @@
 import path from "path"
 import fs from "fs"
 import { videoTranscode } from "../../../lib/videoTranscode"
-import { nanoid } from "nanoid"
 import Jimp from "jimp"
 
 import pmap from "../../../utils/pMap"
@@ -93,7 +92,7 @@ export default async (payload) => {
         maxFileSize: params.maxFileSize,
         maxFields: params.maxFields,
         filename: (name, ext) => {
-            name = nanoid()
+            name = global.nanoid()
 
             return name + ext
         },

@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken"
-import { nanoid } from "nanoid"
 import { Session, RegenerationToken } from "../../models"
 
 export async function regenerateSession(expiredToken, refreshToken) {
@@ -139,7 +138,7 @@ export async function signNewAuthToken(payload, options = {}) {
 
         payload.session_uuid = sessionData.session_uuid
     } else {
-        payload.session_uuid = nanoid()
+        payload.session_uuid = global.nanoid()
     }
 
     const token = jwt.sign(payload, global.jwtStrategy.secretOrKey, {
