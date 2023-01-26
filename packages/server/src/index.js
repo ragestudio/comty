@@ -1,4 +1,5 @@
 require("dotenv").config()
+const crypto = require("node:crypto")
 
 // patches
 const { Buffer } = require("buffer")
@@ -9,6 +10,8 @@ global.b64Decode = (data) => {
 global.b64Encode = (data) => {
     return Buffer.from(data, "utf-8").toString("base64")
 }
+
+global.nanoid = (t = 21) => crypto.getRandomValues(new Uint8Array(t)).reduce(((t, e) => t += (e &= 63) < 36 ? e.toString(36) : e < 62 ? (e - 26).toString(36).toUpperCase() : e > 62 ? "-" : "_"), "");
 
 Array.prototype.updateFromObjectKeys = function (obj) {
     this.forEach((value, index) => {

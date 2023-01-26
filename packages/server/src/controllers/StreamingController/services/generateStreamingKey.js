@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid"
-
 import { StreamingKey, User } from "@models"
 
 export default async (user_id) => {
@@ -12,7 +10,7 @@ export default async (user_id) => {
     const streamingKey = new StreamingKey({
         user_id,
         username: userData.username,
-        key: nanoid()
+        key: global.nanoid()
     })
 
     await streamingKey.save()
