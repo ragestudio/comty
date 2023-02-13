@@ -3,136 +3,112 @@ import jwt_decode from "jwt-decode"
 import config from "config"
 
 export default class Session {
-    static get bridge() {
-        return window.app?.api.withEndpoints("main")
-    }
-
-    static tokenKey = config.app?.storage?.token ?? "token"
+    static storageTokenKey = config.app?.storage?.token ?? "token"
 
     static get token() {
-        return cookies.get(this.tokenKey)
+        return cookies.get(this.storageTokenKey)
     }
 
     static set token(token) {
-        return cookies.set(this.tokenKey, token)
+        return cookies.set(this.storageTokenKey, token)
     }
 
     static get user_id() {
-        return this.decodedToken()?.user_id
+        return this.getDecodedToken()?.user_id
     }
 
     static get session_uuid() {
-        return this.decodedToken()?.session_uuid
+        return this.getDecodedToken()?.session_uuid
     }
 
-    static delToken() {
-        return cookies.remove(Session.tokenKey)
-    }
-
-    static decodedToken() {
+    static getDecodedToken() {
         const token = this.token
 
         return token && jwt_decode(token)
     }
 
     static async getAllSessions() {
-        return await Session.bridge.get.sessions()
-    }
-
-    //* BASIC HANDLERS
-    login = (payload, callback) => {
-        const body = {
-            username: payload.username, //window.btoa(payload.username),
-            password: payload.password, //window.btoa(payload.password),
-        }
-
-        return this.generateNewToken(body, (err, res) => {
-            if (typeof callback === "function") {
-                callback(err, res)
-            }
-
-            if (!err || res.status === 200) {
-                let token = res.data
-
-                if (typeof token === "object") {
-                    token = token.token
-                }
-
-                Session.token = token
-                window.app.eventBus.emit("session.created")
-            }
-        })
-    }
-
-    logout = async () => {
-        await this.destroyCurrentSession()
-        this.forgetLocalSession()
-    }
-
-    //* GENERATORS
-    generateNewToken = async (payload, callback) => {
-        const request = await Session.bridge.post.login(payload, undefined, {
-            parseData: false
+        const response = await app.api.customRequest("main", {
+            method: "get",
+            url: "/session/all"
         })
 
-        if (typeof callback === "function") {
-            callback(request.error, request.response)
-        }
-
-        return request
+        return response.data
     }
 
-    //* GETTERS
-    getAllSessions = async () => {
-        return await Session.bridge.get.sessions()
+    static async getCurrentSession() {
+        const response = await app.api.customRequest("main", {
+            method: "get",
+            url: "/session/current"
+        })
+
+        return response.data
     }
 
-    getTokenInfo = async () => {
+    static async getTokenValidation() {
         const session = await Session.token
 
-        return await Session.bridge.post.validateSession({ session })
+        const response = await app.api.customRequest("main", {
+            method: "get",
+            url: "/session/validate",
+            data: {
+                session: session
+            }
+        })
+
+        return response.data
     }
 
-    getCurrentSession = async () => {
-        return await Session.bridge.get.currentSession()
+    static removeToken() {
+        return cookies.remove(Session.storageTokenKey)
     }
 
-    isCurrentTokenValid = async () => {
-        const health = await this.getTokenInfo()
-
-        return health.valid
-    }
-
-    forgetLocalSession = () => {
-        return Session.delToken()
-    }
-
-    destroyAllSessions = async () => {
-        const session = await Session.decodedToken()
-
-        if (!session) {
-            return false
-        }
-
-        const result = await Session.bridge.delete.sessions({ user_id: session.user_id })
-        this.forgetLocalSession()
-        window.app.eventBus.emit("session.destroyed")
-
-        return result
-    }
-
-    destroyCurrentSession = async () => {
+    static async destroyCurrentSession() {
         const token = await Session.token
-        const session = await Session.decodedToken()
+        const session = await Session.getDecodedToken()
 
         if (!session || !token) {
             return false
         }
 
-        const result = await Session.bridge.delete.session({ user_id: session.user_id, token: token })
-        this.forgetLocalSession()
+        const response = await app.api.customRequest("main", {
+            method: "delete",
+            url: "/session/current"
+        }).catch((error) => {
+            console.error(error)
+
+            return false
+        })
+
+        Session.removeToken()
+
         window.app.eventBus.emit("session.destroyed")
 
-        return result
+        return response.data
+    }
+
+    static async destroyAllSessions() {
+        const session = await Session.getDecodedToken()
+
+        if (!session) {
+            return false
+        }
+
+        const response = await app.api.customRequest("main", {
+            method: "delete",
+            url: "/session/all"
+        })
+
+        Session.removeToken()
+
+        window.app.eventBus.emit("session.destroyed")
+
+        return response.data
+    }
+
+    static async isCurrentTokenValid() {
+        const health = await Session.getTokenValidation()
+
+        return health.valid
     }
 }

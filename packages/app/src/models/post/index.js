@@ -18,7 +18,7 @@ export default class Post {
 
         const { data } = await app.api.customRequest("main", {
             method: "GET",
-            url: `/posts/${post_id}`,
+            url: `/posts/post/${post_id}`,
         })
 
         return data
@@ -31,7 +31,7 @@ export default class Post {
 
         const { data } = await app.api.customRequest("main", {
             method: "GET",
-            url: `/posts/${post_id}/comments`,
+            url: `/comments/post/${post_id}`,
         })
 
         return data
@@ -44,7 +44,7 @@ export default class Post {
 
         const request = await app.api.customRequest("main", {
             method: "POST",
-            url: `/posts/${post_id}/comment`,
+            url: `/comments/post/${post_id}`,
             data: {
                 message: comment,
             },
@@ -60,7 +60,7 @@ export default class Post {
 
         const request = await app.api.customRequest("main", {
             method: "DELETE",
-            url: `/posts/${post_id}/comment/${comment_id}`,
+            url: `/comments/post/${post_id}/${comment_id}`,
         })
 
         return request
@@ -155,7 +155,7 @@ export default class Post {
 
         return data
     }
-    
+
     static async create(payload) {
         if (!Post.bridge) {
             throw new Error("Bridge is not available")
