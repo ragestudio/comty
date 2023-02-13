@@ -8,7 +8,7 @@ export default async (user_id) => {
 
     // send event to ws clients (if are connected)
     followers.forEach((follow) => {
-        const connectedClient = global.wsInterface.clients.find((client) => {
+        const connectedClient = global.websocket_instance.clients.find((client) => {
             return client.user_id === follow.user_id
         })
 

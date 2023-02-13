@@ -1,7 +1,7 @@
 import axios from "axios"
 import lodash from "lodash"
 
-import { StreamingCategory } from "@models"
+import { StreamingCategory, StreamingInfo } from "@models"
 import generateStreamDataFromStreamingKey from "./generateStreamDataFromStreamingKey"
 
 const streamingServerAPIAddress = process.env.STREAMING_API_SERVER ?? ""

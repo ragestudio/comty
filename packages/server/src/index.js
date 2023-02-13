@@ -1,5 +1,5 @@
 require("dotenv").config()
-const crypto = require("node:crypto")
+import { webcrypto as crypto } from "crypto"
 
 // patches
 const { Buffer } = require("buffer")

@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { CreatePost } from "../methods"
+import { CreatePost } from "../services"
 
 export default {
     method: "POST",

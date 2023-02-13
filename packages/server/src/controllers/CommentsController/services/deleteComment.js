@@ -26,8 +26,8 @@ export default async (payload) => {
 
     await comment.delete()
 
-    global.wsInterface.io.emit(`comment.delete.${comment_id}`)
-    global.wsInterface.io.emit(`post.delete.comment.${comment.parent_id.toString()}`, comment_id)
+    global.websocket_instance.io.emit(`comment.delete.${comment_id}`)
+    global.websocket_instance.io.emit(`post.delete.comment.${comment.parent_id.toString()}`, comment_id)
 
     return comment
 }

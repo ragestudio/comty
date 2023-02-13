@@ -34,7 +34,7 @@ export default async (payload) => {
 
     await info.save()
 
-    global.wsInterface.io.emit(`streaming.info_update.${payload.user_id}`, info)
+    global.websocket_instance.io.emit(`streaming.info_update.${payload.user_id}`, info)
 
     return info
 }

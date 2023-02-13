@@ -1,4 +1,4 @@
-import { User, Comment, SavedPost } from "../../models"
+import { User, Comment, SavedPost } from "@models"
 
 export default async (payload) => {
     let {

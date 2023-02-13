@@ -1,8 +1,8 @@
-import getConnectedUsersFollowing from "../methods/getConnectedUsersFollowing"
+import getConnectedUsersFollowing from "../services/getConnectedUsersFollowing"
 
 export default {
     method: "GET",
-    route: "/connected_following_users",
+    route: "/connected/followers",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         const users = await getConnectedUsersFollowing({

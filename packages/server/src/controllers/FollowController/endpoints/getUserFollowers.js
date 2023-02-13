@@ -1,4 +1,4 @@
-import { User, UserFollow } from "@lib"
+import { User, UserFollow } from "@models"
 
 export default {
     method: "GET",

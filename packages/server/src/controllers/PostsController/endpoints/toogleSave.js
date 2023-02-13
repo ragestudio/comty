@@ -1,4 +1,4 @@
-import { ToogleSavePost } from "../methods"
+import { ToogleSavePost } from "../services"
 
 export default {
     method: "POST",

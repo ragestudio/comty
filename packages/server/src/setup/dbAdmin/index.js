@@ -1,5 +1,5 @@
-import { User } from "../../models"
-import createUser from "../../controllers/UserController/methods/createUser"
+import { User } from "@models"
+import createUser from "@controllers/UserController/services/createUser"
 
 export default async () => {
     // check if any user with includes admin role exists

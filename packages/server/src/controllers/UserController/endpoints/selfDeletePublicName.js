@@ -1,4 +1,4 @@
-import UpdateUserData from "../methods/updateUserData"
+import UpdateUserData from "../services/updateUserData"
 
 export default {
     method: "DELETE",
@@ -7,7 +7,7 @@ export default {
     fn: async (req, res) => {
         const user_id = req.user._id.toString()
 
-        UpdateUserData.update({
+        UpdateUserData({
             user_id: user_id,
             update: {
                 fullName: undefined

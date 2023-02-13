@@ -2,7 +2,7 @@ import { UserFollow } from "@models"
 
 export default {
     method: "GET",
-    route: "/user/:user_id/is_followed",
+    route: "/user/:user_id",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         const isFollowed = await UserFollow.findOne({

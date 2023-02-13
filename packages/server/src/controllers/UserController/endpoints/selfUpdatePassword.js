@@ -1,7 +1,7 @@
 import { Schematized } from "@lib"
 import { User } from "@models"
 
-import updateUserPassword from "../methods/updateUserPassword"
+import updateUserPassword from "../services/updateUserPassword"
 import bcrypt from "bcrypt"
 
 export default {

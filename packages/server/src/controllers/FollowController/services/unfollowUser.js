@@ -25,10 +25,10 @@ export default async (payload) => {
 
     await follow.remove()
 
-    global.wsInterface.io.emit(`user.unfollow`, {
+    global.websocket_instance.io.emit(`user.unfollow`, {
         ...user.toObject(),
     })
-    global.wsInterface.io.emit(`user.unfollow.${payload.user_id}`, {
+    global.websocket_instance.io.emit(`user.unfollow.${payload.user_id}`, {
         ...user.toObject(),
     })
 

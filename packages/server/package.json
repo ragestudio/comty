@@ -21,7 +21,7 @@
     "formidable": "^2.1.1",
     "jimp": "^0.16.2",
     "jsonwebtoken": "^9.0.0",
-    "linebridge": "0.15.2",
+    "linebridge": "0.15.4",
     "luxon": "^3.2.1",
     "minio": "^7.0.32",
     "moment": "^2.29.4",
