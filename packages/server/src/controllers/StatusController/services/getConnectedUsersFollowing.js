@@ -12,7 +12,7 @@ export default async (payload = {}) => {
     const connectedUsers = []
 
     following.forEach((follow) => {
-        const connectedClient = global.wsInterface.clients.find((client) => {
+        const connectedClient = global.websocket_instance.clients.find((client) => {
             return client.user_id === follow.to
         })
 

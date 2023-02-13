@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { GetPostData } from "../methods"
+import { GetPostData } from "../services"
 
 export default {
     method: "GET",

@@ -1,4 +1,4 @@
-import { DeletePost } from "../methods"
+import { DeletePost } from "../services"
 
 export default {
     method: "DELETE",

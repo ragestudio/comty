@@ -1,4 +1,4 @@
-import getComments from "../methods/getComments"
+import getComments from "../services/getComments"
 
 export default {
     method: "GET",

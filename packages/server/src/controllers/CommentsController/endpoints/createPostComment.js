@@ -1,9 +1,10 @@
 import { Schematized } from "@lib"
-import newComment from "../methods/newComment"
+import newComment from "../services/newComment"
 
 export default {
     method: "POST",
     route: "/post/:post_id",
+    middlewares: ["withAuthentication"],
     fn: Schematized({
         required: ["message"],
         select: ["message"],

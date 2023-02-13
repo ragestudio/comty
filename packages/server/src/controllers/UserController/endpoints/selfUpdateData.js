@@ -1,6 +1,6 @@
 import { Schematized } from "@lib"
-
-import UpdateUserData from "../methods/updateUserData"
+import { User } from "@models"
+import UpdateUserData from "../services/updateUserData"
 
 const AllowedPublicUpdateFields = [
     "fullName",
@@ -19,7 +19,7 @@ const MaxStringsLengths = {
 export default {
     method: "POST",
     route: "/self/update_data",
-    middlewares: ["withAuthentication", "roles"],
+    middlewares: ["withAuthentication"],
     fn: Schematized({
         required: ["update"],
         select: ["update"],
@@ -43,7 +43,20 @@ export default {
             }
         })
 
-        UpdateUserData.update({
+        // check if email is already in use
+        if (typeof update.email !== "undefined") {
+            const user = await User.findOne({
+                email: update.email,
+            })
+
+            if (user) {
+                return res.status(400).json({
+                    error: "Email is already in use",
+                })
+            }
+        }
+
+        UpdateUserData({
             user_id: user_id,
             update: update,
         }).then((user) => {

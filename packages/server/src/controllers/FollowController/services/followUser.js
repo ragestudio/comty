@@ -30,10 +30,10 @@ export default async (payload) => {
 
     await newFollow.save()
 
-    global.wsInterface.io.emit(`user.follow`, {
+    global.websocket_instance.io.emit(`user.follow`, {
         ...user.toObject(),
     })
-    global.wsInterface.io.emit(`user.follow.${payload.user_id}`, {
+    global.websocket_instance.io.emit(`user.follow.${payload.user_id}`, {
         ...user.toObject(),
     })
 

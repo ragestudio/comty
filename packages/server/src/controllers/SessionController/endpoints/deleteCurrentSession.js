@@ -2,14 +2,14 @@ import { Session } from "@models"
 
 export default {
     method: "DELETE",
-    route: "/",
+    route: "/current",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
-        const { token } = req.body
+        const token = req.jwtToken
         const user_id = req.user._id.toString()
 
         if (typeof token === "undefined") {
-            return res.status(400).json("No token provided")
+            return res.status(400).json("Cannot access to token")
         }
 
         const session = await Session.findOneAndDelete({ user_id, token })

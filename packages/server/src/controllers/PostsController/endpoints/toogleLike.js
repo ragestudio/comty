@@ -1,8 +1,8 @@
 import { Schematized } from "@lib"
-import { ToogleLike } from "../methods"
+import { ToogleLike } from "../services"
 
 export default {
-    method: "GET",
+    method: "POST",
     route: "/:post_id/toogle_like",
     middlewares: ["withAuthentication"],
     fn: Schematized({

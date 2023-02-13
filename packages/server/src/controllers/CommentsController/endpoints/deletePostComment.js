@@ -1,4 +1,4 @@
-import deleteComment from "../methods/deleteComment"
+import deleteComment from "../services/deleteComment"
 
 export default {
     method: "DELETE",

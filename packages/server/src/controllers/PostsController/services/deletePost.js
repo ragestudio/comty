@@ -27,7 +27,7 @@ export default async (payload) => {
     }
 
     await post.remove()
-    global.wsInterface.io.emit(`post.delete`, post_id)
+    global.websocket_instance.io.emit(`post.delete`, post_id)
 
     return post.toObject()
 }

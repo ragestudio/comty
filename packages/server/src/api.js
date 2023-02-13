@@ -47,7 +47,7 @@ export default class API {
 
     jwtStrategy = global.jwtStrategy = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: this.server.oskid,
+        secretOrKey: this.server.server_token,
         algorithms: ["sha1", "RS256", "HS256"],
         expiresIn: process.env.signLifetime ?? "1h",
         enforceRegenerationTokenExpiration: false,

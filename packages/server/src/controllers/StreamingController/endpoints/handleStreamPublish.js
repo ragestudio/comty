@@ -19,9 +19,9 @@ export default {
         })
 
         if (streaming) {
-            global.wsInterface.io.emit(`streaming.new`, streaming)
+            global.websocket_instance.io.emit(`streaming.new`, streaming)
 
-            global.wsInterface.io.emit(`streaming.new.${streaming.username}`, streaming)
+            global.websocket_instance.io.emit(`streaming.new.${streaming.username}`, streaming)
 
             return res.json({
                 code: 0,

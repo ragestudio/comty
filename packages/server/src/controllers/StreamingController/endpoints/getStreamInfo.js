@@ -14,11 +14,11 @@ export default {
         }
 
         if (!user_id) {
-            user_id = await User.findOne({
+            const user = await User.findOne({
                 username: req.query.username,
             })
 
-            user_id = user_id["_id"].toString()
+            user_id = user._id.toString()
         }
 
         let info = await StreamingInfo.findOne({
@@ -33,19 +33,6 @@ export default {
             await info.save()
         }
 
-        const category = await StreamingCategory.findOne({
-            key: info.category
-        }).catch((err) => {
-            console.error(err)
-            return {}
-        }) ?? {}
-
-        return res.json({
-            ...info.toObject(),
-            ["category"]: {
-                key: category?.key ?? "unknown",
-                label: category?.label ?? "Unknown",
-            }
-        })
+        return res.json(info.toObject())
     }
 }

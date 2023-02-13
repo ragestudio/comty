@@ -15,19 +15,19 @@ export default class RolesController extends Controller {
 
                 return res.json(roles)
             }),
-            "/user_roles": {
+            "/roles/self": {
                 middlewares: ["withAuthentication"],
-                fn: Schematized({
-                    select: ["username"],
-                }, async (req, res) => {
-                    const user = await User.findOne(req.selection)
+                fn: async (req, res) => {
+                    const user = await User.findOne({
+                        _id: req.user._id.toString(),
+                    })
 
                     if (!user) {
                         return res.status(404).json({ error: "No user founded" })
                     }
 
                     return res.json(user.roles)
-                })
+                }
             },
         },
 

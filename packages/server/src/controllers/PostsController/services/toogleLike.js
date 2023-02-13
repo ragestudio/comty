@@ -23,9 +23,9 @@ export default async (payload) => {
 
     post = await modifyPostData(post._id, { likes: post.likes })
 
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}`, post)
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post.user_id}`, post)
-    global.wsInterface.io.emit(`post.${to ? "like" : "unlike"}.${post_id}`, post)
+    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}`, post)
+    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}.${post.user_id}`, post)
+    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}.${post_id}`, post)
 
     return post
 }

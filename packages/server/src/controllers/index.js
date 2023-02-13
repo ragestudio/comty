@@ -4,6 +4,7 @@ export { default as UserController } from "./UserController"
 export { default as AuthController } from "./AuthController"
 export { default as SessionController } from "./SessionController"
 
+export { default as StatusController } from "./StatusController"
 export { default as FollowController } from "./FollowController"
 
 export { default as PostsController } from "./PostsController"

@@ -36,8 +36,8 @@ export default async (payload) => {
 
     const resultPost = await getPostData({ post_id: post._id.toString() })
 
-    global.wsInterface.io.emit(`post.new`, resultPost)
-    global.wsInterface.io.emit(`post.new.${post.user_id}`, resultPost)
+    global.websocket_instance.io.emit(`post.new`, resultPost)
+    global.websocket_instance.io.emit(`post.new.${post.user_id}`, resultPost)
 
     // push to background job to check if is NSFW
     flagNsfwByAttachments(post._id.toString())

@@ -1,8 +1,8 @@
-import { GetPostData } from "../methods"
+import { GetPostData } from "../services"
 
 export default {
     method: "GET",
-    route: "/:post_id",
+    route: "/post/:post_id",
     middlewares: ["withOptionalAuthentication"],
     fn: async (req, res) => {
         let post = await GetPostData({
