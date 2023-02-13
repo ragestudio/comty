@@ -36,4 +36,21 @@ export default class FeedModel {
 
         return data
     }
+
+    static async search(keywords, params = {}) {
+        if (!FeedModel.bridge) {
+            throw new Error("Bridge is not available")
+        }
+
+        const { data } = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/search`,
+            params: {
+                keywords: keywords,
+                params: params
+            }
+        })
+
+        return data
+    }
 }

@@ -1,36 +1,45 @@
 export default class Livestream {
-    static get bridge() {
-        return window.app?.api.withEndpoints("main")
-    }
-
     static async getStreamingKey() {
-        const request = await Livestream.bridge.get.tvStreamingKey()
+        const request = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/tv/streaming/key`,
+        })
 
-        return request
+        return request.data
     }
 
     static async regenerateStreamingKey() {
-        const request = await Livestream.bridge.post.tvRegenerateStreamingKey()
+        const request = await app.api.customRequest("main", {
+            method: "POST",
+            url: `/tv/streaming/key/regenerate`,
 
-        return request
+        })
+
+        return request.data
     }
 
     static async updateLivestreamInfo(payload) {
-        const { data } = await app.api.customRequest("main", {
+        const request = await app.api.customRequest("main", {
             method: "POST",
-            url: `/tv/streaming/update_info`,
+            url: `/tv/stream/info`,
             data: {
                 ...payload
             },
         })
 
-        return data
+        return request.data
     }
 
-    static async getCategories() {
-        const request = await Livestream.bridge.get.tvStreamingCategories()
+    static async getCategories(key) {
+        const request = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/tv/streaming/categories`,
+            params: {
+                key,
+            }
+        })
 
-        return request
+        return request.data
     }
 
     static async getStreamInfo(payload) {
@@ -40,7 +49,7 @@ export default class Livestream {
             username = app.userData.username
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const request = await app.api.customRequest("main", {
             method: "GET",
             url: `/tv/stream/info`,
             params: {
@@ -48,7 +57,7 @@ export default class Livestream {
             }
         })
 
-        return data
+        return request.data
     }
 
     static async getLivestream({ username }) {
@@ -58,23 +67,30 @@ export default class Livestream {
 
         let request = await app.api.customRequest("main", {
             method: "GET",
-            url: `/tv/streaming/${username}`,
+            url: `/tv/streams`,
+            params: {
+                username,
+            }
         })
 
-        request = request.data
-
-        return request
+        return request.data
     }
 
     static async getAddresses() {
-        const request = await Livestream.bridge.get.tvStreamingAddresses()
+        const request = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/tv/streaming/addresses`,
+        })
 
-        return request
+        return request.data
     }
 
     static async getLivestreams() {
-        const request = await Livestream.bridge.get.tvStreams()
+        const request = await app.api.customRequest("main", {
+            method: "GET",
+            url: `/tv/streams`,
+        })
 
-        return request
+        return request.data
     }
 }
