@@ -1,4 +1,3 @@
-@inputsBorderRadius: 9px;
 @buttonsBorderRadius: 9px;
 
 :root {
@@ -6,17 +5,6 @@
 }
 
 // Fixments
-.ant-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    user-select: none;
-    --webkit-user-select: none;
-
-    border-radius: @buttonsBorderRadius;
-}
-
 .ant-result-extra {
     display: flex;
     align-items: center;
@@ -65,10 +53,6 @@
 }
 
 .ant-select {
-    .ant-select-selector {
-        border-radius: @inputsBorderRadius !important;
-    }
-
     .ant-select-arrow {
         right: 0px;
     }
@@ -89,9 +73,13 @@
     }
 
     .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-        background-color: var(--background-color-primary2) !important;
+        background-color: var(--background-color-primary-2) !important;
         color: var(--text-color) !important;
     }
+}
+
+.ant-dropdown-menu {
+    background-color: var(--background-color-primary) !important;
 }
 
 // fix buttons
@@ -119,6 +107,12 @@
         color: var(--background-color-primary) !important;
         margin: 0;
     }
+
+    background-color: var(--colorPrimary);
+
+    &:hover {
+        background-color: var(--colorPrimary);
+    }
 }
 
 .ant-btn-primary[disabled] {
@@ -134,7 +128,7 @@
 
 .ant-btn-default {
     &:not(.ant-btn-dangerous) {
-        border-color: var(--background-color-primary2) !important;
+        border-color: var(--background-color-primary-2) !important;
 
         &:hover {
             border-color: var(--background-color-primary) !important;
@@ -154,17 +148,17 @@
 
     &:hover {
         color: var(--text-color);
-        background: var(--background-color-primary2);
+        background: var(--background-color-primary-2);
     }
 
     &:active {
         color: var(--text-color);
-        background: var(--background-color-primary2);
+        background: var(--background-color-primary-2);
     }
 
     &:focus {
         color: var(--text-color);
-        background: var(--background-color-primary2);
+        background: var(--background-color-primary-2);
     }
 }
 
@@ -183,7 +177,7 @@
 
 // fix sliders colors
 .ant-slider-rail {
-    background-color: var(--background-color-primary2);
+    background-color: var(--background-color-primary-2);
 
     &:hover {
         background-color: var(--background-color-primary);
@@ -199,6 +193,17 @@
     border-right: 0 !important;
 
     .ant-menu-item {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: flex-start;
+
+        width: 100%;
+
+        padding: 10px 10px 10px 25px !important;
+        margin: 3px 0;
+
         color: var(--background-color-contrast);
 
         h1,
@@ -216,12 +221,16 @@
 
 .ant-menu-item {
     color: var(--text-color);
-    border-radius: 8px;
+
+    &:hover {
+        color: var(--text-color);
+        background-color: var(--background-color-primary-2);
+    }
 }
 
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
     color: var(--text-color);
-    background-color: var(--background-color-primary) !important;
+    background-color: var(--background-color-accent) !important;
 
     &::after {
         opacity: 0;
@@ -229,14 +238,14 @@
 }
 
 .ant-menu-item:active {
-    background-color: var(--background-color-primary2) !important;
+    background-color: var(--background-color-primary-2) !important;
 }
 
 // fix uploader drag
 .ant-upload-drag {
     color: var(--text-color) !important;
     background: var(--background-color-primary) !important;
-    border-color: var(--background-color-primary2) !important;
+    border-color: var(--background-color-primary-2) !important;
 }
 
 .ant-modal-content {
@@ -251,8 +260,6 @@
     .ant-modal-confirm-content {
         color: var(--text-color) !important;
     }
-
-    border-radius: 10px;
 }
 
 .ant-notification-notice {
@@ -411,25 +418,17 @@
     }
 }
 
-.ant-tag {
-    border-radius: 8px;
-}
-
 // fix input
 .ant-input {
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
-
-    border-radius: @inputsBorderRadius;
 }
 
 .ant-input-affix-wrapper {
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
-
-    border-radius: @inputsBorderRadius;
 }
 
 .ant-input-affix-wrapper-status-error {
@@ -461,4 +460,13 @@
 
 .ant-typography {
     color: var(--text-color);
+}
+
+.ant-slider-dot {
+    background-color: transparent !important;
+    border-width: 4px !important;
+}
+
+.drawer {
+    z-index: 1000;
 }
