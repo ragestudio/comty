@@ -1,7 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
+
 import UserModel from "models/user"
+import FollowsModel from "models/follows"
 
 import "./index.less"
 
@@ -38,18 +40,15 @@ export default (props) => {
     const [followers, setFollowers] = React.useState(props.followers ?? [])
 
     const goToProfile = (username) => {
-        window.app.goToAccount(username)
+        app.navigation.goToAccount(username)
     }
 
     const loadFollowers = async () => {
         setLoading(true)
 
-        console.log(`Loading Followers for [${props.username ?? props.user_id}]...`)
+        console.log(`Loading Followers for [${props.user_id}]...`)
 
-        const followers = await UserModel.getUserFollowers({
-            user_id: props.user_id,
-            username: props.username,
-        }).catch((err) => {
+        const followers = await FollowsModel.getFollowers(props.user_id).catch((err) => {
             console.error(err)
             app.message.error("Failed to fetch followers")
 
@@ -66,7 +65,7 @@ export default (props) => {
 
     React.useEffect(() => {
         if (!props.followers) {
-            if (props.user_id || props.username) {
+            if (props.user_id) {
                 loadFollowers()
             }
         }
