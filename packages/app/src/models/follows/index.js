@@ -6,7 +6,7 @@ export default class FollowsModel {
             throw new Error("user_id is required")
         }
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/follow/user/${user_id}`,
         })
@@ -20,7 +20,7 @@ export default class FollowsModel {
             user_id = SessionModel.user_id
         }
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/follow/user/${user_id}/followers`,
         })
@@ -33,7 +33,7 @@ export default class FollowsModel {
             throw new Error("user_id or username is required")
         }
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "POST",
             url: "/follow/user/toogle",
             data: {

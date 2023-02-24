@@ -1,10 +1,10 @@
 export class MusicModel {
     static get bridge() {
-        return window.app?.api.withEndpoints("main")
+        return window.app?.cores.api.withEndpoints("main")
     }
 
     static async createSpaceRoom() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "post",
             url: `/music/create_space_room`,
         })
