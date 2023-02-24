@@ -4,52 +4,60 @@ import defaultSettings from "schemas/defaultSettings.json"
 import { Observable } from "rxjs"
 
 export default class SettingsCore extends Core {
-    storeKey = "app_settings"
+    static namespace = "settings"
 
-    settings = store.get(this.storeKey) ?? {}
+    static storeKey = "app_settings"
 
-    publicMethods = {
-        settings: this
+    public = {
+        is: this.is,
+        set: this.set,
+        get: this.get,
+        getDefaults: this.getDefaults,
+        withEvent: this.withEvent,
     }
 
-    initialize() {
-        this.fulfillUndefinedWithDefaults()
-    }
+    onInitialize() {
+        const settings = this.get()
 
-    fulfillUndefinedWithDefaults = () => {
+        // fulfillUndefinedWithDefaults
         Object.keys(defaultSettings).forEach((key) => {
             const value = defaultSettings[key]
 
             // Only set default if value is undefined
-            if (typeof this.settings[key] === "undefined") {
-                this.settings[key] = value
+            if (typeof settings[key] === "undefined") {
+                this.set(key, value)
             }
         })
     }
 
-    is = (key, value) => {
-        return this.settings[key] === value
+    is(key, value) {
+        return this.get(key) === value
     }
 
-    set = (key, value) => {
-        this.settings[key] = value
-        store.set(this.storeKey, this.settings)
+    set(key, value) {
+        const settings = this.get()
+
+        settings[key] = value
+
+        store.set(SettingsCore.storeKey, settings)
 
         window.app.eventBus.emit("setting.update", { key, value })
         window.app.eventBus.emit(`setting.update.${key}`, value)
 
-        return this.settings
+        return settings
     }
 
-    get = (key) => {
+    get(key) {
+        const settings = store.get(SettingsCore.storeKey) ?? {}
+
         if (typeof key === "undefined") {
-            return this.settings
+            return settings
         }
 
-        return this.settings[key]
+        return settings[key]
     }
 
-    getDefaults = (key) => {
+    getDefaults(key) {
         if (typeof key === "undefined") {
             return defaultSettings
         }
@@ -57,8 +65,8 @@ export default class SettingsCore extends Core {
         return defaultSettings[key]
     }
 
-    withEvent = (listenEvent, defaultValue) => {
-        let value = defaultValue ?? this.settings[key] ?? false
+    withEvent(listenEvent, defaultValue) {
+        let value = defaultValue ?? false
 
         const observable = new Observable((subscriber) => {
             subscriber.next(value)
