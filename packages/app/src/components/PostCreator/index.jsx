@@ -18,14 +18,13 @@ const DEFAULT_POST_POLICY = {
 }
 
 export default (props) => {
-    const api = window.app.api.withEndpoints("main")
+    const api = window.app.cores.api.withEndpoints("main")
 
     const creatorRef = React.useRef(null)
 
     const [pending, setPending] = React.useState([])
     const [loading, setLoading] = React.useState(false)
     const [uploaderVisible, setUploaderVisible] = React.useState(false)
-    const [focused, setFocused] = React.useState(false)
 
     const [postMessage, setPostMessage] = React.useState("")
     const [postAttachments, setPostAttachments] = React.useState([])
@@ -45,12 +44,25 @@ export default (props) => {
         setPostingPolicy(policy)
     }
 
+    const canSubmit = () => {
+        const messageLengthValid = postMessage.length !== 0 && postMessage.length < postingPolicy.maxMessageLength
+
+        if (pending.length !== 0) {
+            return false
+        }
+
+        if (!messageLengthValid && postAttachments.length === 0) {
+            return false
+        }
+
+        return true
+    }
+
     const submit = async () => {
         if (!canSubmit()) return
 
         setLoading(true)
         setUploaderVisible(false)
-        setFocused(false)
 
         const payload = {
             message: postMessage,
@@ -78,7 +90,7 @@ export default (props) => {
 
     const onUploadFile = async (req) => {
         // hide uploader
-        //setUploaderVisible(false)
+        toogleUploaderVisibility(false)
 
         // get file data
         const file = req.file
@@ -101,20 +113,6 @@ export default (props) => {
         if (request) {
             return req.onSuccess(request)
         }
-    }
-
-    const canSubmit = () => {
-        const messageLengthValid = postMessage.length !== 0 && postMessage.length < postingPolicy.maxMessageLength
-
-        if (pending.length !== 0) {
-            return false
-        }
-
-        if (!messageLengthValid && postAttachments.length === 0) {
-            return false
-        }
-
-        return true
     }
 
     const removeAttachment = (file_uid) => {
@@ -145,22 +143,13 @@ export default (props) => {
         }
     }
 
-    const onDrop = (event) => {
-        event.preventDefault()
-        setUploaderVisible(true)
-
-        console.log(event)
-
-        const files = event.dataTransfer.files
-
-        console.log(files)
-    }
-
     const onUploaderChange = (change) => {
         setFileList(change.fileList)
 
         switch (change.file.status) {
             case "uploading": {
+                toogleUploaderVisibility(false)
+
                 setPending([...pending, change.file.uid])
 
                 uploaderScrollToEnd()
@@ -175,6 +164,7 @@ export default (props) => {
                 // update post data
                 addAttachment(change.file.response.files)
 
+                // scroll to end
                 uploaderScrollToEnd()
 
                 break
@@ -200,12 +190,14 @@ export default (props) => {
         setPostMessage(event.target.value)
     }
 
-    const toggleUploader = (to) => {
-        setUploaderVisible(to ?? !uploaderVisible)
-    }
+    const toogleUploaderVisibility = (to) => {
+        to = to ?? !uploaderVisible
 
-    const toggleFocus = (to) => {
-        setFocused(to ?? !focused)
+        if (to === uploaderVisible) {
+            return
+        }
+
+        setUploaderVisible(to ?? !uploaderVisible)
     }
 
     const handleKeyDown = (e) => {
@@ -221,7 +213,6 @@ export default (props) => {
     const handlePaste = ({ clipboardData }) => {
         if (clipboardData && clipboardData.items.length > 0) {
             const isValidFormat = (fileType) => DEFAULT_ACCEPTED_FILES.includes(fileType)
-            toggleUploader(true)
 
             for (let index = 0; index < clipboardData.items.length; index++) {
                 if (!isValidFormat(clipboardData.items[index].type)) {
@@ -276,13 +267,50 @@ export default (props) => {
         </div>
     }
 
+    const handleDrag = (event) => {
+        event.preventDefault()
+        event.stopPropagation()
+
+        console.log(event)
+
+        if (event.type === "dragenter") {
+            toogleUploaderVisibility(true)
+        } else if (event.type === "dragleave") {
+            // check if mouse is over the uploader or outside the creatorRef
+            if (uploaderVisible && !creatorRef.current.contains(event.target)) {
+                toogleUploaderVisibility(false)
+            }
+        }
+    }
+
+    const handleUploadClick = () => {
+        // create a new dialog
+        const dialog = document.createElement("input")
+
+        // set the dialog type to file
+        dialog.type = "file"
+
+        // set the dialog accept to the accepted files
+        dialog.accept = postingPolicy.acceptedMimeTypes
+
+        dialog.multiple = true
+
+        // add a listener to the dialog
+        dialog.addEventListener("change", (event) => {
+            console.log(event)
+        })
+
+        // click the dialog
+        dialog.click()
+    }
+
     React.useEffect(() => {
         fetchUploadPolicy()
 
-        creatorRef.current.addEventListener("paste", handlePaste)
+        document.addEventListener("paste", handlePaste)
 
         return () => {
-            creatorRef.current.removeEventListener("paste", handlePaste)
+            document.removeEventListener("paste", handlePaste)
         }
     }, [])
 
@@ -292,15 +320,10 @@ export default (props) => {
     }, [pending])
 
     return <div
-        className="postCreator"
+        className={"postCreator"}
         ref={creatorRef}
-        onDrop={onDrop}
-        onMouseEnter={() => {
-            toggleFocus(true)
-        }}
-        onMouseLeave={() => {
-            toggleFocus(false)
-        }}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
     >
         <div className="textInput">
             <div className="avatar">
@@ -327,36 +350,46 @@ export default (props) => {
             </div>
         </div>
 
-        <div className={classnames("actions", { ["hided"]: !focused && !uploaderVisible })}>
-            <div>
-                <antd.Button
-                    type={uploaderVisible ? "default" : "primary"}
-                    disabled={loading}
-                    onClick={() => {
-                        toggleUploader()
-                    }}
-                    icon={<Icons.Upload />}
-                />
-            </div>
-        </div>
-
-        <div className={classnames("uploader", { ["hided"]: !uploaderVisible })}>
-            <antd.Upload
+        <div className={classnames("uploader", { ["visible"]: uploaderVisible })}>
+            <antd.Upload.Dragger
+                openFileDialogOnClick={false}
                 maxCount={postingPolicy.maximunFilesPerRequest}
                 onChange={onUploaderChange}
                 customRequest={onUploadFile}
-                listType="picture-card"
                 accept={postingPolicy.acceptedMimeTypes}
-                itemRender={renderUploadPreviewItem}
                 fileList={fileList}
+                listType="picture-card"
+                itemRender={renderUploadPreviewItem}
                 multiple
             >
-                <Icons.Plus />
-            </antd.Upload>
+                <div className="hint">
+                    <h3>Drag and drop files here</h3>
+                    <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
+                </div>
+            </antd.Upload.Dragger>
+        </div>
 
-            <div className="hint">
-                <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
-            </div>
+        <div className="actions">
+            <antd.Button
+                type="primary"
+                disabled={loading}
+                onClick={handleUploadClick}
+                icon={<Icons.Upload />}
+            />
+
+            <antd.Button
+                type="primary"
+                disabled={loading}
+                icon={<Icons.MdPoll />}
+            />
+
+            <antd.Button
+                type="primary"
+                disabled={loading}
+                icon={<Icons.MdPrivacyTip />}
+            />
         </div>
     </div>
 }
+
+
