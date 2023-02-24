@@ -33,7 +33,7 @@ export default (props) => {
     const [wallpaperData, setWallpaperData] = React.useState(null)
 
     const setRandomWallpaper = async () => {
-        const featuredWallpapers = await app.api.request("main", "get", "featuredWallpapers").catch((err) => {
+        const featuredWallpapers = await app.cores.api.request("main", "get", "featuredWallpapers").catch((err) => {
             console.error(err)
             return []
         })
@@ -45,11 +45,11 @@ export default (props) => {
     }
 
     const onClickRegister = () => {
-        app.eventBus.emit("app.createRegister")
+        app.controls.openRegisterForm()
     }
 
     const onClickLogin = () => {
-        app.eventBus.emit("app.createLogin")
+        app.controls.openLoginForm()
     }
 
     React.useEffect(() => {
@@ -74,6 +74,25 @@ export default (props) => {
                 <div className="content_header">
                     <img src={window.isMobile ? config.logo.alt : config.logo.full} className="logo" />
                 </div>
+
+                {
+                    props.user && <div
+                        className="actions"
+                        style={{
+                            marginBottom: "50px"
+                        }}
+                    >
+                        <antd.Button
+                            type="default"
+                            size="large"
+                            onClick={() => {
+                                app.navigation.goMain()
+                            }}
+                        >
+                            Continue as {props.user.username}
+                        </antd.Button>
+                    </div>
+                }
 
                 <div className="actions">
                     <antd.Button
