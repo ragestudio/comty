@@ -275,7 +275,7 @@ export default class SelectableList extends React.Component {
 	}
 
 	getLongPressDelay = () => {
-		return window.app.settings.get("selection_longPress_timeout")
+		return window.app.cores.settings.get("selection_longPress_timeout")
 	}
 
 	renderItems = (data) => {
