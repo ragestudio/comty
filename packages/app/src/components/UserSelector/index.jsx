@@ -14,7 +14,7 @@ export default class UserSelector extends React.Component {
         searchValue: null,
     }
 
-    api = window.app.api.withEndpoints("main")
+    api = window.app.cores.api.withEndpoints("main")
 
     componentDidMount = async () => {
         this.toogleLoading(true)
