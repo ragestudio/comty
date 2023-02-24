@@ -1,12 +1,15 @@
 import React from "react"
-import { User } from "models"
+import { UserModel } from "models"
 import loadable from "@loadable/component"
+import UploadButton from "../components/uploadButton"
 
 export default {
+    id: "profile",
     icon: "User",
     label: "Profile",
+    group: "basic",
     ctxData: async () => {
-        const userData = await User.data()
+        const userData = await UserModel.data()
 
         return {
             userData
@@ -26,47 +29,43 @@ export default {
             },
         },
         {
-            "id": "fullName",
-            "group": "account.basicInfo",
-            "component": "Input",
-            "icon": "Edit3",
-            "title": "Name",
-            "description": "Change your public name",
-            "props": {
+            id: "fullName",
+            group: "account.basicInfo",
+            component: "Input",
+            icon: "Edit3",
+            title: "Name",
+            description: "Change your public name",
+            props: {
                 // set max length
                 "maxLength": 120,
                 "showCount": true,
                 "allowClear": true,
                 "placeholder": "Enter your name. e.g. John Doe",
             },
-            "defaultValue": (ctx) => {
+            defaultValue: (ctx) => {
                 return ctx.userData.fullName
             },
-            "onUpdate": async (value) => {
-                const selfId = await User.selfUserId()
-
-                const result = window.app.api.withEndpoints("main").post.updateUser({
-                    _id: selfId,
-                    update: {
-                        fullName: value
-                    }
+            onUpdate: async (value) => {
+                const result = await UserModel.updateData({
+                    fullName: value
                 })
 
                 if (result) {
                     return result
                 }
             },
-            "extraActions": [
+            extraActions: [
                 {
                     "id": "unset",
                     "icon": "Delete",
                     "title": "Unset",
                     "onClick": async () => {
-                        window.app.api.withEndpoints("main").post.unsetPublicName()
+                        await UserModel.unsetFullName()
                     }
                 }
             ],
-            "debounced": true,
+            debounced: true,
+            storaged: false,
         },
         {
             "id": "email",
@@ -85,13 +84,8 @@ export default {
                 return ctx.userData.email
             },
             "onUpdate": async (value) => {
-                const selfId = await User.selfUserId()
-
-                const result = window.app.api.withEndpoints("main").post.updateUser({
-                    _id: selfId,
-                    update: {
-                        email: value
-                    }
+                const result = await UserModel.updateData({
+                    email: value
                 })
 
                 if (result) {
@@ -106,18 +100,16 @@ export default {
             "icon": "Image",
             "title": "Avatar",
             "description": "Change your avatar (Upload an image or use an URL)",
-            "component": loadable(() => import("../components/ImageUploader")),
+            "component": loadable(() => import("../components/urlInput")),
+            extraActions: [
+                UploadButton
+            ],
             "defaultValue": (ctx) => {
                 return ctx.userData.avatar
             },
             "onUpdate": async (value) => {
-                const selfId = await User.selfUserId()
-
-                const result = window.app.api.withEndpoints("main").post.updateUser({
-                    _id: selfId,
-                    update: {
-                        avatar: value
-                    }
+                const result = await UserModel.updateData({
+                    avatar: value
                 })
 
                 if (result) {
@@ -133,18 +125,16 @@ export default {
             "icon": "Image",
             "title": "Cover",
             "description": "Change your profile cover (Upload an image or use an URL)",
-            "component": loadable(() => import("../components/ImageUploader")),
+            "component": loadable(() => import("../components/urlInput")),
+            extraActions: [
+                UploadButton
+            ],
             "defaultValue": (ctx) => {
                 return ctx.userData.cover
             },
             "onUpdate": async (value) => {
-                const selfId = await User.selfUserId()
-
-                const result = window.app.api.withEndpoints("main").post.updateUser({
-                    _id: selfId,
-                    update: {
-                        cover: value
-                    }
+                const result = await UserModel.updateData({
+                    cover: value
                 })
 
                 if (result) {
@@ -171,13 +161,8 @@ export default {
                 return ctx.userData.description
             },
             "onUpdate": async (value) => {
-                const selfId = await User.selfUserId()
-
-                const result = window.app.api.withEndpoints("main").post.updateUser({
-                    _id: selfId,
-                    update: {
-                        description: value
-                    }
+                const result = await UserModel.updateData({
+                    description: value
                 })
 
                 if (result) {
@@ -185,6 +170,7 @@ export default {
                 }
             },
             "debounced": true,
+            storaged: false,
         },
     ]
 }

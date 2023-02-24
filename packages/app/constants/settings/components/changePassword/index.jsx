@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { User } from "models"
+import { UserModel } from "models"
 import { Icons } from "components/Icons"
 
 import "./index.less"
@@ -31,7 +31,7 @@ const ChangePasswordComponent = (props) => {
         setError(null)
         setLoading(true)
 
-        const result = await User.changePassword({ currentPassword, newPassword }).catch((err) => {
+        const result = await UserModel.changePassword({ currentPassword, newPassword }).catch((err) => {
             console.error(err)
             setError(err.response.data.message)
             return null

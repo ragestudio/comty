@@ -3,8 +3,10 @@ import config from "config"
 import { Select } from "antd"
 
 export default {
+    id: "general",
     icon: "Command",
-    label: "App",
+    label: "General",
+    group: "app",
     settings: [
         {
             "id": "language",
