@@ -19,7 +19,7 @@ export default (props) => {
         }
 
         const data = await User.data({
-            _id: props.user_id,
+            user_id: props.user_id,
             username: props.username
         }).catch((err) => {
             console.error(err)
@@ -35,7 +35,7 @@ export default (props) => {
     const handleOnClick = async () => {
         if (typeof props.onClick !== "function") {
             console.warn("UserPreview: onClick is not a function, executing default action")
-            return app.goToAccount(userData.username)
+            return app.navigation.goToAccount(userData.username)
         }
 
         return await props.onClick(userData)
