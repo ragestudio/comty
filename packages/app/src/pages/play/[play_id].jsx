@@ -2,20 +2,35 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { ImageViewer } from "components"
+import moment from "moment"
+
+import { Icons } from "components/Icons"
 
 import PlaylistsModel from "models/playlists"
 
 import "./index.less"
 
-const PlaylistItem = ({ playlist }) => {
-    return <div>
-        Playlist Tracks
-    </div>
-}
-
-const TrackItem = ({ track }) => {
-    return <div>
-        Track
+const TrackItem = (props) => {
+    return <div className="track_item">
+        <div className="track_item_actions">
+            <antd.Button
+                type="primary"
+                shape="circle"
+                icon={<Icons.Play />}
+                onClick={props.onClick}
+            />
+        </div>
+        <div className="track_item_cover">
+            <ImageViewer src={props.track.thumbnail} />
+        </div>
+        <div className="track_item_details">
+            <div className="track_item_title">
+                {props.track.title}
+            </div>
+            <div className="track_item_artist">
+                {props.track.artist}
+            </div>
+        </div>
     </div>
 }
 
@@ -38,26 +53,25 @@ export default (props) => {
         }
     }
 
+    const handleOnClickTrack = (track) => {
+        // search index of track
+        const index = playlist.list.findIndex((item) => {
+            return item._id === track._id
+        })
+
+        if (index === -1) {
+            return
+        }
+
+        app.cores.player.startPlaylist(playlist.list, index)
+    }
+
     React.useEffect(() => {
         loadData()
     }, [])
 
     if (!playlist) {
         return <antd.Skeleton active />
-    }
-
-    const renderComponent = () => {
-        switch (playlist.type) {
-            case "playlist": {
-                return <PlaylistItem playlist={playlist} />
-            }
-            case "track": {
-                return <TrackItem track={playlist} />
-            }
-            default: {
-                return <TrackItem track={playlist} />
-            }
-        }
     }
 
     return <div
@@ -68,20 +82,60 @@ export default (props) => {
         <div className="play_info_wrapper">
             <div className="play_info">
                 <div className="play_info_cover">
-                    <ImageViewer src={playlist?.cover ?? "/assets/no_song.png"} />
+                    <ImageViewer src={playlist?.thumbnail ?? "/assets/no_song.png"} />
                 </div>
 
                 <div className="play_info_details">
                     <div className="play_info_title">
                         <h1>{playlist.title}</h1>
                     </div>
-                    <div className="play_info_author">
-                        {playlist.user.username}
+
+                    <div className="play_info_description">
+                        <h3>
+                            {playlist.description}
+                        </h3>
+                    </div>
+
+                    <div className="play_info_statistics">
+                        <div className="play_info_statistics_item">
+                            <p
+                                onClick={() => {
+                                    app.navigation.goToAccount(playlist.user.username)
+                                }}
+                            >
+                                <Icons.MdPerson />
+
+                                Publised by <a>{playlist.user.username}</a>
+                            </p>
+                        </div>
+                        <div className="play_info_statistics_item">
+                            <p>
+                                <Icons.MdLibraryMusic /> {playlist.list.length} Tracks
+                            </p>
+                        </div>
+
+                        <div className="play_info_statistics_item">
+                            <p>
+                                <Icons.MdAccessTime /> Released on {moment(playlist.created_at).format("DD/MM/YYYY")}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {renderComponent()}
+        <div className="list">
+            <h1>
+                <Icons.MdPlaylistPlay /> Tracks
+            </h1>
+            {
+                playlist.list.map((item, index) => {
+                    return <TrackItem
+                        track={item}
+                        onClick={() => handleOnClickTrack(item)}
+                    />
+                })
+            }
+        </div>
     </div>
 }
