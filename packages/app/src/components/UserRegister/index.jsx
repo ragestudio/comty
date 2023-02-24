@@ -90,7 +90,7 @@ const steps = [
                         return
                     }
 
-                    const request = await app.api.customRequest("main", {
+                    const request = await app.cores.api.customRequest("main", {
                         method: "GET",
                         url: "/user/username-available",
                         params: {
@@ -308,7 +308,7 @@ const steps = [
                 const timer = setTimeout(async () => {
                     if (!validFormat) return
 
-                    const request = await app.api.customRequest("main", {
+                    const request = await app.cores.api.customRequest("main", {
                         method: "GET",
                         url: "/user/email-available",
                         params: {
