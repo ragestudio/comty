@@ -1,11 +1,5 @@
 import React from "react"
-import * as antd from "antd"
 import progressBar from "nprogress"
-
-import config from "config"
-
-import routes from "schemas/routes"
-import publicRoutes from "schemas/publicRoutes"
 
 import Layouts from "layouts"
 
@@ -14,45 +8,42 @@ export default class Layout extends React.PureComponent {
 
 	state = {
 		layoutType: "default",
-		renderLock: true,
 		renderError: null,
 	}
 
 	events = {
-		"app.initialization.start": () => {
-			app.eventBus.emit("layout.render.lock")
-		},
-		"app.initialization.finish": () => {
-			app.eventBus.emit("layout.render.unlock")
-		},
 		"layout.forceUpdate": () => {
 			this.forceUpdate()
 		},
-		"layout.render.lock": () => {
-			this.setState({
-				renderLock: true,
-			})
-		},
-		"layout.render.unlock": () => {
-			this.setState({
-				renderLock: false,
-			})
-		},
-		"layout.animations.fadeIn": () => {
-			if (app.settings.get("reduceAnimations")) {
+		"layout.animations.fadeOut": () => {
+			if (app.cores.settings.get("reduceAnimations")) {
 				console.warn("Skipping fadeIn animation due to `reduceAnimations` setting")
 				return false
 			}
 
-			document.querySelector("#transitionLayer").classList.add("fade-opacity-enter")
+			const transitionLayer = document.getElementById("transitionLayer")
+
+			if (!transitionLayer) {
+				console.warn("transitionLayer not found, no animation will be played")
+				return false
+			}
+
+			transitionLayer.classList.add("fade-opacity-leave")
 		},
-		"layout.animations.fadeOut": () => {
-			if (app.settings.get("reduceAnimations")) {
+		"layout.animations.fadeIn": () => {
+			if (app.cores.settings.get("reduceAnimations")) {
 				console.warn("Skipping fadeOut animation due to `reduceAnimations` setting")
 				return false
 			}
 
-			document.querySelector("#transitionLayer").classList.add("fade-opacity-leave")
+			const transitionLayer = document.getElementById("transitionLayer")
+
+			if (!transitionLayer) {
+				console.warn("transitionLayer not found, no animation will be played")
+				return false
+			}
+
+			transitionLayer.classList.remove("fade-opacity-leave")
 		},
 		"router.navigate": (path, options) => {
 			this.makePageTransition(path, options)
@@ -60,10 +51,10 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		if (window.app.settings.get("forceMobileMode") || window.app.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
+		if (window.app.cores.settings.get("forceMobileMode") || window.app.capacitor.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
 			window.isMobile = true
 
-			this.setLayout("mobile")
+			app.layout.set("mobile")
 		} else {
 			window.isMobile = false
 		}
@@ -88,7 +79,7 @@ export default class Layout extends React.PureComponent {
 	makePageTransition(path, options = {}) {
 		this.progressBar.start()
 
-		if (app.settings.get("reduceAnimations") || options.state.noTransition) {
+		if (app.cores.settings.get("reduceAnimations") || options.state?.noTransition) {
 			this.progressBar.done()
 
 			return false
@@ -107,48 +98,45 @@ export default class Layout extends React.PureComponent {
 			this.progressBar.done()
 
 			transitionLayer.classList.remove("fade-transverse-leave")
-		}, options.state.transitionDelay ?? 250)
+		}, options.state?.transitionDelay ?? 250)
 	}
 
-	setLayout = (layout) => {
-		if (typeof Layouts[layout] === "function") {
+	layoutInterface = window.app.layout = {
+		set: (layout) => {
+			if (typeof Layouts[layout] !== "function") {
+				return console.error("Layout not found")
+			}
+
+			console.log(`Setting layout to [${layout}]`)
+
 			return this.setState({
 				layoutType: layout,
 			})
-		}
+		},
+		toogleCenteredContent: (to) => {
+			const root = document.getElementById("root")
 
-		return console.error("Layout type not found")
+			if (!root) {
+				console.error("root not found")
+				return false
+			}
+
+			to = typeof to === "boolean" ? to : !root.classList.contains("centered-content")
+
+			if (to === true) {
+				root.classList.add("centered_content")
+			} else {
+				root.classList.remove("centered_content")
+			}
+		}
 	}
 
 	render() {
 		let layoutType = this.state.layoutType
-		const InitializationComponent = this.props.staticRenders?.Initialization ? React.createElement(this.props.staticRenders.Initialization) : null
 
-		const currentRoute = window.location.pathname
-
-		if (this.state.renderLock) {
-			return <>
-				{InitializationComponent}
-			</>
-		}
-
-		if (!this.props.user && currentRoute !== config.app?.authPath && currentRoute !== "/") {
-			const isPublicRoute = publicRoutes.some((route) => {
-				const routePath = route.replace(/\*/g, ".*").replace(/!/g, "^")
-
-				return new RegExp(routePath).test(currentRoute)
-			})
-
-			if (!isPublicRoute) {
-				if (typeof window.app.setLocation === "function") {
-					window.app.setLocation(config.app?.authPath ?? "/login")
-					return <div />
-				}
-
-				window.location.href = config.app?.authPath ?? "/login"
-
-				return <div />
-			}
+		const layoutComponentProps = {
+			...this.props.bindProps,
+			...this.state,
 		}
 
 		if (this.state.renderError) {
@@ -158,41 +146,6 @@ export default class Layout extends React.PureComponent {
 
 			return JSON.stringify(this.state.renderError)
 		}
-
-		// check with the current route if it's a protected route or requires some permissions
-		const routeDeclaration = routes.find((route) => route.path === window.location.pathname)
-
-		if (routeDeclaration) {
-			if (typeof routeDeclaration.requiredRoles !== "undefined") {
-				const isAdmin = this.props.user?.roles?.includes("admin") ?? false
-
-				if (!isAdmin && !routeDeclaration.requiredRoles.some((role) => this.props.user?.roles?.includes(role))) {
-					return <antd.Result
-						status="403"
-						title="403"
-						subTitle="Sorry, you are not authorized to access this page."
-						extra={<antd.Button type="primary" onClick={() => window.app.setLocation("/")}>Back Home</antd.Button>}
-					/>
-				}
-			}
-
-			if (typeof routeDeclaration.useLayout !== "undefined") {
-				layoutType = routeDeclaration.useLayout
-			}
-
-			if (typeof routeDeclaration.webTitleAddition !== "undefined") {
-				document.title = `${routeDeclaration.webTitleAddition} - ${config.app.siteName}`
-			} else {
-				document.title = config.app.siteName
-			}
-		}
-
-		const layoutComponentProps = {
-			...this.props.bindProps,
-			...this.state,
-		}
-
-		console.debug(`Rendering layout [${this.state.layoutType}] for current route [${window.location.pathname}]`)
 
 		const Layout = Layouts[layoutType]
 
