@@ -1,7 +1,7 @@
 import React from "react"
 import { Translation } from "react-i18next"
 
-import Items from "schemas/routes.json"
+import Items from "schemas/sidebar"
 import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
