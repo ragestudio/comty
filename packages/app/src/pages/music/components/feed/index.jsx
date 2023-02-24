@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
+import { Translation } from "react-i18next"
 
 import FeedModel from "models/feed"
 
@@ -18,6 +19,14 @@ const PlaylistItem = (props) => {
         return app.setLocation(`/play/${playlist._id}`)
     }
 
+    const onClickPlay = (e) => {
+        e.stopPropagation()
+
+        console.log(playlist.list)
+
+        app.cores.player.startPlaylist(playlist.list)
+    }
+
     return <div
         id={playlist._id}
         key={props.key}
@@ -25,7 +34,7 @@ const PlaylistItem = (props) => {
         onClick={onClick}
     >
         <div className="playlistItem_cover">
-            <ImageViewer src={playlist.cover ?? "/assets/no_song.png"} />
+            <ImageViewer src={playlist.thumbnail ?? "/assets/no_song.png"} />
         </div>
         <div className="playlistItem_info">
             <div className="playlistItem_info_title">
@@ -34,6 +43,14 @@ const PlaylistItem = (props) => {
             <div className="playlistItem_info_author">
                 {playlist.user.username}
             </div>
+        </div>
+        <div className="playlistItem_actions">
+            <antd.Button
+                icon={<Icons.Play />}
+                type="primary"
+                shape="circle"
+                onClick={onClickPlay}
+            />
         </div>
     </div>
 }
@@ -74,23 +91,12 @@ export default () => {
     return <div className="playlistExplorer">
         <div className="playlistExplorer_section">
             <div className="playlistExplorer_section_header">
-                <h1><Icons.Compass /> Releases from your artist</h1>
-            </div>
-            <div className="playlistExplorer_section_list">
-                {
-                    list.map((playlist, index) => {
-                        return <PlaylistItem
-                            key={index}
-                            playlist={playlist}
-                        />
-                    })
-                }
-            </div>
-        </div>
-
-        <div className="playlistExplorer_section">
-            <div className="playlistExplorer_section_header">
-                <h1><Icons.MdOutlineTrendingUp /> Discover new trends</h1>
+                <h1>
+                    <Icons.MdOutlineMarkunreadMailbox />
+                    <Translation>
+                        {(t) => t("Releases from your artists")}
+                    </Translation>
+                </h1>
             </div>
             <div className="playlistExplorer_section_list">
                 {

@@ -1,25 +1,28 @@
 import FeedTab from "./components/feed"
-import SpacesTabs from "./components/spaces"
+import SpacesTab from "./components/spaces"
+import DashboardTab from "./components/dashboard"
 
 export default {
+    "dashboard": {
+        label: "Dashboard",
+        icon: "MdOutlineDashboard",
+        component: DashboardTab,
+    },
     "feed": {
-        title: "Feed",
+        label: "Feed",
         icon: "Compass",
         component: FeedTab
     },
     "library": {
-        title: "Library",
+        label: "Library",
         icon: "MdLibraryMusic",
-        component: FeedTab
-    },
-    "dashboard": {
-        title: "Dashboard",
-        icon: "MdOutlineDashboard",
-        component: FeedTab
+        component: FeedTab,
+        disabled: true
     },
     "spaces": {
-        title: "Spaces",
+        label: "Spaces",
         icon: "MdDeck",
-        component: SpacesTabs
+        component: SpacesTab,
+        disabled: true
     },
 }
