@@ -1,5 +1,5 @@
 {
-    "themeVariant": "light",
+    "themeVariant": "dark",
     "forceMobileMode": false,
     "notifications_sound": true,
     "notifications_vibrate": true,
@@ -9,12 +9,12 @@
     "autoCollapseDelayEnabled": true,
     "haptic_feedback": false,
     "collapseOnLooseFocus": true,
-    "auto_darkMode": false,
+    "auto_darkMode": true,
     "compactWidth": false,
     "postCard_carrusel_auto": true,
     "postCard_expansible_actions": true,
     "feed_max_fetch": 20,
     "style.compactMode": false,
-    "sidebar.floating": false,
+    "sidebar.floating": true,
     "language": "en"
 }
