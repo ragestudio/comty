@@ -1,4 +1,4 @@
-import { User, Comment, SavedPost } from "@models"
+import { User, Comment, PostLike, SavedPost } from "@models"
 
 export default async (payload) => {
     let {
@@ -31,18 +31,19 @@ export default async (payload) => {
             }
         }
 
+        let likes = await PostLike.find({ post_id: post._id.toString() })
+            .catch(() => [])
+
+        post.countLikes = likes.length
+
         let comments = await Comment.find({ parent_id: post._id.toString() })
             .select("_id")
             .catch(() => false)
 
-        if (!comments) {
-            comments = []
-        }
-
-        post.comments = comments
+        post.countComments = comments.length
 
         if (for_user_id) {
-            post.isLiked = post.likes.includes(for_user_id)
+            post.isLiked = likes.some((like) => like.user_id.toString() === for_user_id)
             post.isSaved = savedPostsIds.includes(post._id.toString())
         }
 
