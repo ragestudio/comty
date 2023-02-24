@@ -1,12 +1,12 @@
 import React from "react"
 import * as antd from "antd"
+import Slider from "@mui/material/Slider"
+import classnames from "classnames"
 
-import { Icons } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
 
-// FIXME: JS events are not working properly, the methods cause a memory leak
-// FIXME: Use a better way to preload audios
 // TODO: Check AUDIO quality and show a quality indicator
 // TODO: Add close button
 // TODO: Add repeat & shuffle mode
@@ -31,14 +31,33 @@ const AudioVolume = (props) => {
     </div>
 }
 
-const PlayerStatus = React.memo((props) => {
-    const [playing, setPlaying] = React.useState(false)
-    const [time, setTime] = React.useState("00:00")
-    const [duration, setDuration] = React.useState("00:00")
-    const [progressBar, setProgressBar] = React.useState(0)
+class SeekBar extends React.Component {
+    state = {
+        timeText: "00:00",
+        durationText: "00:00",
+        sliderTime: 0,
+        sliderLock: false,
+    }
 
-    const updateDuration = () => {
-        const audioDuration = app.AudioPlayer.currentAudio.instance.duration()
+    handleSeek = (value) => {
+        if (value > 0) {
+            // calculate the duration of the audio
+            const duration = app.cores.player.duration()
+
+            // calculate the seek of the audio
+            const seek = (value / 100) * duration
+
+            app.cores.player.seek(seek)
+        } else {
+            app.cores.player.seek(0)
+        }
+    }
+
+    calculateDuration = () => {
+        // get current audio duration
+        const audioDuration = app.cores.player.duration()
+
+        console.log(`Audio duration: ${audioDuration}`)
 
         // convert duration to minutes and seconds
         const minutes = Math.floor(audioDuration / 60)
@@ -53,12 +72,14 @@ const PlayerStatus = React.memo((props) => {
         const secondsString = seconds < 10 ? `0${seconds}` : seconds
 
         // set duration
-        setDuration(`${minutesString}:${secondsString}`)
+        this.setState({
+            durationText: `${minutesString}:${secondsString}`
+        })
     }
 
-    const updateTimer = () => {
-        // get audio seek
-        const seek = app.AudioPlayer.currentAudio.instance.seek()
+    calculateTime = () => {
+        // get current audio seek
+        const seek = app.cores.player.seek()
 
         // convert seek to minutes and seconds
         const minutes = Math.floor(seek / 60)
@@ -73,272 +94,360 @@ const PlayerStatus = React.memo((props) => {
         const secondsString = seconds < 10 ? `0${seconds}` : seconds
 
         // set time
-        setTime(`${minutesString}:${secondsString}`)
+        this.setState({
+            timeText: `${minutesString}:${secondsString}`
+        })
     }
 
-    const updateProgressBar = () => {
-        const seek = app.AudioPlayer.currentAudio.instance.seek()
-        const duration = app.AudioPlayer.currentAudio.instance.duration()
+    updateProgressBar = () => {
+        if (this.state.sliderLock) {
+            return
+        }
+
+        const seek = app.cores.player.seek()
+        const duration = app.cores.player.duration()
 
         const percent = (seek / duration) * 100
 
-        setProgressBar(percent)
+        this.setState({
+            sliderTime: percent
+        })
     }
 
-    const onUpdateSeek = (value) => {
-        // calculate the duration of the audio
-        const duration = app.AudioPlayer.currentAudio.instance.duration()
-
-        // calculate the seek of the audio
-        const seek = (value / 100) * duration
-
-        // update the progress bar
-        setProgressBar(value)
-
-        // seek to the new value
-        app.AudioPlayer.currentAudio.instance.seek(seek)
+    updateAll = () => {
+        this.calculateTime()
+        this.updateProgressBar()
     }
 
-    const tooltipFormatter = (value) => {
-        if (!app.AudioPlayer.currentAudio) {
-            return "00:00"
-        }
+    events = {
+        "player.status.update": (status) => {
+            console.log(`Player status updated: ${status}`)
 
-        const duration = app.AudioPlayer.currentAudio.instance.duration()
+            switch (status) {
+                case "stopped":
+                    this.setState({
+                        timeText: "00:00",
+                        durationText: "00:00",
+                        sliderTime: 0,
+                    })
 
-        const seek = (value / 100) * duration
+                    break
+                case "playing":
+                    this.updateAll()
+                    this.calculateDuration()
 
-        // convert seek to minutes and seconds
-        const minutes = Math.floor(seek / 60)
-
-        // add leading zero if minutes is less than 10
-        const minutesString = minutes < 10 ? `0${minutes}` : minutes
-
-        // get seconds
-        const seconds = Math.floor(seek - minutes * 60)
-
-        // add leading zero if seconds is less than 10
-        const secondsString = seconds < 10 ? `0${seconds}` : seconds
-
-        return `${minutesString}:${secondsString}`
-    }
-
-    // create a interval when audio is playing, and destroy it when audio is paused
-    React.useEffect(() => {
-        const interval = setInterval(() => {
-            if (app.AudioPlayer.currentAudio) {
-                updateTimer()
-                updateProgressBar()
+                    break
+                default:
+                    break
             }
-        }, 1000)
+        },
+        "player.current.update": (currentAudioManifest) => {
+            console.log(`Player current audio updated:`, currentAudioManifest)
 
-        return () => {
-            clearInterval(interval)
-        }
-    }, [playing])
+            this.updateAll()
 
-    const events = {
-        "audioPlayer.seeked": () => {
-            updateTimer()
-            updateProgressBar()
+            this.setState({
+                timeText: "00:00",
+                sliderTime: 0,
+            })
+
+            this.calculateDuration()
         },
-        "audioPlayer.playing": () => {
-            updateDuration()
-            updateTimer()
-            updateProgressBar()
+        "player.duration.update": (duration) => {
+            console.log(`Player duration updated: ${duration}`)
+
+            this.calculateDuration()
         },
-        "audioPlayer.paused": () => {
-            setPlaying(false)
-        },
-        "audioPlayer.stopped": () => {
-            setPlaying(false)
+        "player.seek.update": (seek) => {
+            console.log(`Player seek updated: ${seek}`)
+
+            this.calculateTime()
+            this.updateAll()
         }
     }
 
-    React.useEffect(() => {
-        // listen events
-        for (const [event, callback] of Object.entries(events)) {
+    tick = () => {
+        if (this.props.playing) {
+            this.interval = setInterval(() => {
+                this.updateAll()
+            }, 1000)
+        } else {
+            clearInterval(this.interval)
+        }
+    }
+
+    componentDidMount = () => {
+        this.calculateDuration()
+        this.tick()
+
+        for (const [event, callback] of Object.entries(this.events)) {
             app.eventBus.on(event, callback)
         }
+    }
 
-        return () => {
-            // remove events
-            for (const [event, callback] of Object.entries(events)) {
-                app.eventBus.off(event, callback)
-            }
+    componentWillUnmount = () => {
+        for (const [event, callback] of Object.entries(this.events)) {
+            app.eventBus.off(event, callback)
         }
-    }, [])
+    }
 
-    return <div className="status">
-        <div className="progress">
-            <antd.Slider
-                value={progressBar}
-                onAfterChange={onUpdateSeek}
-                tooltip={{ formatter: tooltipFormatter }}
-                disabled={!app.AudioPlayer.currentAudio}
-            />
-        </div>
-        <div className="timers">
-            <div>
-                <span>{time}</span>
+    componentDidUpdate = (prevProps, prevState) => {
+        if (this.props.playing !== prevProps.playing) {
+            this.tick()
+        }
+    }
+
+    render() {
+        return <div className="status">
+            <div className="progress">
+                <Slider
+                    size="small"
+                    value={this.state.sliderTime}
+                    disabled={this.props.stopped}
+                    min={0}
+                    max={100}
+                    step={0.1}
+                    onChange={(_, value) => {
+                        this.setState({
+                            sliderTime: value,
+                            sliderLock: true
+                        })
+                    }}
+                    onChangeCommitted={() => {
+                        this.setState({
+                            sliderLock: false
+                        })
+
+                        this.handleSeek(this.state.sliderTime)
+
+                        if (!this.props.playing) {
+                            app.cores.player.playback.play()
+                        }
+                    }}
+                />
             </div>
-            <div>
-                <span>{duration}</span>
+            <div className="timers">
+                <div>
+                    <span>{this.state.timeText}</span>
+                </div>
+                <div>
+                    <span>{this.state.durationText}</span>
+                </div>
             </div>
         </div>
-    </div>
-})
+    }
+}
 
-export default (props) => {
-    const [mute, setMute] = React.useState(app.AudioPlayer.audioMuted)
-    const [volume, setVolume] = React.useState(app.AudioPlayer.audioVolume)
+const AudioPlayerChangeModeButton = (props) => {
+    const [mode, setMode] = React.useState(app.cores.player.playback.mode())
 
-    const [currentPlaying, setCurrentPlaying] = React.useState(null)
-    const [playing, setPlaying] = React.useState(false)
-    const [loading, setLoading] = React.useState(true)
-
-    const toogleMute = () => {
-        setMute(app.AudioPlayer.toogleMute())
+    const modeToIcon = {
+        "normal": "MdArrowForward",
+        "repeat": "MdRepeat",
+        "shuffle": "MdShuffle",
     }
 
-    const updateVolume = (value) => {
-        console.log("Updating volume", value)
+    const onClick = () => {
+        const modes = Object.keys(modeToIcon)
 
-        setVolume(app.AudioPlayer.setVolume(value))
+        const newMode = modes[(modes.indexOf(mode) + 1) % modes.length]
 
-        if (value > 0) {
-            setMute(false)
-        }
+        app.cores.player.playback.mode(newMode)
+
+        setMode(newMode)
     }
 
-    const onClickPlayButton = () => {
-        setPlaying(!playing)
+    return <antd.Button
+        icon={createIconRender(modeToIcon[mode])}
+        onClick={onClick}
+        type="ghost"
+    />
+}
 
-        if (playing) {
-            app.AudioPlayer.pauseAudioQueue()
-        } else {
-            app.AudioPlayer.playCurrentAudio()
-        }
+export default class AudioPlayer extends React.Component {
+    state = {
+        loading: app.cores.player.getState("loading") ?? false,
+        currentPlaying: app.cores.player.getState("currentAudioManifest"),
+        playbackStatus: app.cores.player.getState("playbackStatus") ?? "stopped",
+        audioMuted: app.cores.player.getState("audioMuted") ?? false,
+        audioVolume: app.cores.player.getState("audioVolume") ?? 0.3,
+        bpm: app.cores.player.getState("trackBPM") ?? 0,
+        showControls: false,
     }
 
-    const onClickNextButton = () => {
-        app.AudioPlayer.nextAudio()
-    }
-
-    const onClickPreviousButton = () => {
-        app.AudioPlayer.previousAudio()
-    }
-
-    const busEvents = {
-        "audioPlayer.playing": (data) => {
-            if (data) {
-                setCurrentPlaying(data)
-            }
-
-            setLoading(false)
-            setPlaying(true)
+    events = {
+        "player.bpm.update": (data) => {
+            this.setState({ bpm: data })
         },
-        "audioPlayer.pause": () => {
-            setPlaying(false)
+        "player.loading.update": (data) => {
+            this.setState({ loading: data })
         },
-        "audioPlayer.stopped": () => {
-            setPlaying(false)
+        "player.status.update": (data) => {
+            this.setState({ playbackStatus: data })
         },
-        "audioPlayer.loaded": () => {
-            setLoading(false)
+        "player.current.update": (data) => {
+            this.setState({ currentPlaying: data })
         },
-        "audioPlayer.loading": () => {
-            setLoading(true)
+        "player.mute.update": (data) => {
+            this.setState({ audioMuted: data })
+        },
+        "player.volume.update": (data) => {
+            this.setState({ audioVolume: data })
+        },
+    }
+
+    componentDidMount = async () => {
+        Object.entries(this.events).forEach(([event, callback]) => {
+            app.eventBus.on(event, callback)
+        })
+    }
+
+    componentWillUnmount() {
+        Object.entries(this.events).forEach(([event, callback]) => {
+            app.eventBus.off(event, callback)
+        })
+    }
+
+    onMouse = (event) => {
+        const { type } = event
+
+        if (type === "mouseenter") {
+            this.setState({ showControls: true })
+        } else if (type === "mouseleave") {
+            this.setState({ showControls: false })
         }
     }
 
-    // listen to events
-    React.useEffect(() => {
-        for (const event in busEvents) {
-            app.eventBus.on(event, busEvents[event])
-        }
+    minimize = () => {
 
-        return () => {
-            for (const event in busEvents) {
-                app.eventBus.off(event, busEvents[event])
-            }
-        }
-    }, [])
+    }
 
-    console.log(currentPlaying)
+    updateVolume = (value) => {
+        app.cores.player.volume(value)
+    }
 
-    return <div className="embbededMediaPlayerWrapper">
-        <div
-            className="cover"
-            style={{
-                backgroundImage: `url(${(currentPlaying?.cover) ?? "/assets/no_song.png"})`,
-            }}
-        />
+    toogleMute = (to) => {
+        app.cores.player.toogleMute(to)
+    }
 
-        <div className="player">
-            <div className="header">
-                <div className="info">
-                    <div className="title">
-                        <h2>
-                            {loading ? "Loading..." : (currentPlaying?.title ?? "Untitled")}
-                        </h2>
+    onClickPlayButton = () => {
+        app.cores.player.playback.toogle()
+    }
+
+    onClickPreviousButton = () => {
+        app.cores.player.playback.previous()
+    }
+
+    onClickNextButton = () => {
+        app.cores.player.playback.next()
+    }
+
+    render() {
+        const {
+            loading,
+            currentPlaying,
+            playbackStatus,
+            audioMuted,
+            audioVolume,
+        } = this.state
+
+        return <div
+            className={classnames(
+                "embbededMediaPlayerWrapper",
+                {
+                    ["hovering"]: this.state.showControls,
+                }
+            )}
+            onMouseEnter={this.onMouse}
+            onMouseLeave={this.onMouse}
+        >
+            <div className="player">
+                <div className="minimize_btn">
+                    <antd.Button
+                        icon={<Icons.MdFirstPage />}
+                        onClick={this.minimize}
+                        shape="circle"
+                    />
+                </div>
+                <div
+                    className="cover"
+                    style={{
+                        backgroundImage: `url(${(currentPlaying?.thumbnail) ?? "/assets/no_song.png"})`,
+                    }}
+                />
+                <div className="header">
+                    <div className="info">
+                        <div className="title">
+                            <h2>
+                                {
+                                    currentPlaying?.title
+                                        ? currentPlaying?.title
+                                        : (loading ? "Loading..." : (currentPlaying?.title ?? "Untitled"))
+                                }
+                            </h2>
+                        </div>
+                        <div>
+                            {
+                                currentPlaying?.artist && <div className="artist">
+                                    <h3>
+                                        {currentPlaying?.artist ?? "Unknown"}
+                                    </h3>
+                                </div>
+                            }
+                        </div>
                     </div>
-                    <div>
+                    <div className="indicators">
                         {
-                            !loading && <div className="artist">
-                                <h3>
-                                    {currentPlaying?.artist ?? "Unknown"}
-                                </h3>
-                            </div>
+                            loading && <antd.Spin />
                         }
                     </div>
                 </div>
-                <div className="indicators">
-                    {loading ?
-                        <antd.Spin /> :
-                        <>
-                            <Icons.MdOutlineExplicit />
-                            <Icons.MdOutlineHighQuality />
-                        </>}
-                </div>
-            </div>
 
-            <div className="controls">
-                <div>
+                <div className="controls">
+                    <AudioPlayerChangeModeButton />
                     <antd.Button
                         type="ghost"
                         shape="round"
-                        onClick={onClickPreviousButton}
                         icon={<Icons.ChevronLeft />}
+                        onClick={this.onClickPreviousButton}
                     />
-                </div>
-                <div className="playButton">
                     <antd.Button
                         type="primary"
                         shape="circle"
-                        icon={playing ? <Icons.Pause /> : <Icons.Play />}
-                        onClick={onClickPlayButton}
+                        icon={playbackStatus === "playing" ? <Icons.Pause /> : <Icons.Play />}
+                        onClick={this.onClickPlayButton}
                     />
-                </div>
-                <div>
                     <antd.Button
                         type="ghost"
                         shape="round"
-                        onClick={onClickNextButton}
                         icon={<Icons.ChevronRight />}
+                        onClick={this.onClickNextButton}
                     />
-                </div>
-                <antd.Popover content={React.createElement(AudioVolume, { onChange: updateVolume, defaultValue: volume })} trigger="hover">
-                    <div
-                        onClick={toogleMute}
-                        className="muteButton"
+                    <antd.Popover
+                        content={React.createElement(
+                            AudioVolume,
+                            { onChange: this.updateVolume, defaultValue: audioVolume }
+                        )}
+                        trigger="hover"
                     >
-                        {mute ? <Icons.VolumeX /> : <Icons.Volume2 />}
-                    </div>
-                </antd.Popover>
+                        <div
+                            className="muteButton"
+                            onClick={this.toogleMute}
+                        >
+                            {
+                                audioMuted
+                                    ? <Icons.VolumeX />
+                                    : <Icons.Volume2 />
+                            }
+                        </div>
+                    </antd.Popover>
+                </div>
+
+                <SeekBar
+                    stopped={playbackStatus === "stopped"}
+                    playing={playbackStatus === "playing"}
+                />
             </div>
         </div>
-
-        <PlayerStatus />
-    </div>
+    }
 }
