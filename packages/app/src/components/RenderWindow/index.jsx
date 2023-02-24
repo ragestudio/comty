@@ -188,24 +188,43 @@ class DefaultWindowRender extends React.Component {
 						position,
 					})
 				}}
-				dragHandleClassName="window_topbar"
-				minWidth={this.props.minWidth ?? "300px"}
-				minHeight={this.props.minHeight ?? "200px"}
+				minWidth={
+					this.props.minWidth
+				}
+				minHeight={
+					this.props.minHeight
+				}
+				enableResizing={
+					this.props.enableResizing ?? true
+				}
+				disableDragging={
+					this.props.disableDragging ?? false
+				}
+				dragHandleClassName={
+					this.props.dragHandleClassName ?? "window_topbar"
+				}
+				bounds={
+					this.props.bounds ?? "#root"
+				}
 			>
-				<div
-					style={{
-						height: dimensions.height,
-						width: dimensions.width,
-					}}
-					className="window_wrapper"
-				>
-					<div className="window_topbar">
-						<div className="title">{this.props.id}</div>
-						<div className="actions">{this.renderActions()}</div>
-					</div>
+				{
+					this.props.useWrapper
+						? <div
+							style={{
+								height: dimensions.height,
+								width: dimensions.width,
+							}}
+							className="window_wrapper"
+						>
+							<div className="window_topbar">
+								<div className="title">{this.props.id}</div>
+								<div className="actions">{this.renderActions()}</div>
+							</div>
 
-					<div className="window_body">{this.getComponentRender()}</div>
-				</div>
+							<div className="window_body">{this.getComponentRender()}</div>
+						</div>
+						: this.props.children
+				}
 			</Rnd>
 		)
 	}
