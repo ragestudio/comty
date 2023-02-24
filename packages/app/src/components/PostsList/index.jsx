@@ -26,6 +26,7 @@ const NoResultComponent = () => {
 export default class PostsLists extends React.Component {
     state = {
         currentIndex: 0,
+        openPost: null,
     }
 
     listRef = React.createRef()
@@ -120,9 +121,10 @@ export default class PostsLists extends React.Component {
         })
     }
 
-    onDoubleClickPost = (data) => {
-        // open post
-        app.setLocation(`/post/${data._id}`)
+    onToogleOpen = (to, data) => {
+        if (typeof this.props.onOpenPost === "function") {
+            this.props.onOpenPost(to, data)
+        }
     }
 
     render() {
@@ -157,10 +159,10 @@ export default class PostsLists extends React.Component {
                             key={index}
                             data={post}
                             events={{
+                                onToogleOpen: this.onToogleOpen,
                                 onClickLike: this.onLikePost,
                                 onClickDelete: this.onDeletePost,
                                 onClickSave: this.onSavePost,
-                                onDoubleClick: this.onDoubleClickPost,
                             }}
                         />
                     })
