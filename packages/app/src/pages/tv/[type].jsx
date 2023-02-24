@@ -16,7 +16,7 @@ export default class TVDashboard extends React.Component {
     primaryPanelRef = React.createRef()
 
     componentDidMount() {
-        app.eventBus.emit("style.compactMode", false)
+        app.cores.style.compactMode(false)
     }
 
     renderActiveTab() {

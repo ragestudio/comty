@@ -1,11 +1,48 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "components/Icons"
+import { Icons, createIconRender } from "components/Icons"
 
 import Livestream from "../../../../models/livestream"
 
 import "./index.less"
+
+const CategoryView = (props) => {
+    const category = props.category
+
+    const [categoryData, setCategoryData] = React.useState(null)
+
+    const loadData = async () => {
+        const categoryData = await Livestream.getCategories(category).catch((err) => {
+            console.error(err)
+
+            app.message.error("Failed to load category")
+
+            return null
+        })
+
+        setCategoryData(categoryData)
+    }
+
+    React.useEffect(() => {
+        if (props.category) {
+            loadData()
+        }
+    }, [props.category])
+
+    return <div className="category">
+        {
+            categoryData?.icon &&
+            <div className="icon">
+                {createIconRender(categoryData.icon)}
+            </div>
+        }
+
+        <div className="label">
+            {categoryData?.label ?? "No category"}
+        </div>
+    </div>
+}
 
 const StreamingKeyView = (props) => {
     const [streamingKeyVisibility, setStreamingKeyVisibility] = React.useState(false)
@@ -143,7 +180,7 @@ const StreamInfoEditor = (props) => {
             </span>
             <div className="value">
                 <LivestreamsCategoriesSelector
-                    defaultValue={streamInfo.category.key}
+                    defaultValue={streamInfo.category}
                     updateStreamInfo={updateStreamInfo}
                 />
             </div>
@@ -277,9 +314,7 @@ export default (props) => {
                     <span>
                         Category
                     </span>
-                    <h4>
-                        {streamInfo?.category?.label ?? "No category"}
-                    </h4>
+                    <CategoryView category={streamInfo?.category} />
                 </div>
             </div>
 
