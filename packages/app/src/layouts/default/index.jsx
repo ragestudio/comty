@@ -4,23 +4,33 @@ import { Layout } from "antd"
 
 import { Sidebar, Drawer, Sidedrawer, Modal } from "components/Layout"
 
+import BackgroundDecorator from "components/BackgroundDecorator"
+
 export default (props) => {
     return <>
-        <div className="app_background_decorator" />
+        <BackgroundDecorator />
+
         <Layout className="app_layout" style={{ height: "100%" }}>
             <Modal />
             <Drawer />
-            <Sidebar user={props.user} />
+            <Sidebar />
             <Sidedrawer />
-            <Layout.Content className={
-                classnames(
+            <Layout.Content
+                className={classnames(
                     "content_layout",
                     ...props.contentClassnames ?? [],
                     {
-                        ["floating-sidebar"]: window.app?.settings.get("sidebar.floating")
+                        ["floating-sidebar"]: window.app?.cores.settings.get("sidebar.floating")
                     }
-                )}>
-                <div id="transitionLayer" className="fade-transverse-active">
+                )}
+            >
+                <div
+                    id="transitionLayer"
+                    className={classnames(
+                        "page_layout",
+                        "fade-transverse-active",
+                    )}
+                >
                     {React.cloneElement(props.children, props)}
                 </div>
             </Layout.Content>
