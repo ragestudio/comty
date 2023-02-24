@@ -1,4 +1,5 @@
-import { User, Playlist } from "../../../models"
+import { User, Playlist } from "@models"
+import getTrackDataById from "../../TracksController/services/getTrackDataById"
 
 export default async (payload) => {
     const { _id } = payload
@@ -25,6 +26,12 @@ export default async (payload) => {
         username: user.username,
         avatar: user.avatar,
     }
+
+    playlist.list = await Promise.all(playlist.list.map(async (track_id) => {
+        return await getTrackDataById(track_id)
+    }))
+
+    playlist.artist = user.fullName ?? user.username
 
     return playlist
 }
