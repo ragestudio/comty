@@ -24,7 +24,7 @@ export default (props) => {
     const [eventData, setEventData] = React.useState(null)
 
     const fetchEventData = async () => {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/featured_event/${eventId}`
         }).catch((err) => {
