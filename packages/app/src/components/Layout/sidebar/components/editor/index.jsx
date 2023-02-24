@@ -4,7 +4,8 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 
 import { ActionsBar } from "components"
 import { Icons, createIconRender } from "components/Icons"
-import sidebarItems from "schemas/routes.json"
+
+import sidebarItems from "schemas/sidebar"
 import { sidebarKeys as defaultSidebarKeys } from "schemas/defaultSettings"
 
 import Selector from "../selector"
@@ -46,7 +47,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	loadItems = () => {
-		const storagedKeys = window.app.settings.get("sidebarKeys") ?? defaultSidebarKeys
+		const storagedKeys = window.app.cores.settings.get("sidebarKeys") ?? defaultSidebarKeys
 		const active = []
 		const lockedIndex = []
 
@@ -64,7 +65,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	onSave = () => {
-		window.app.settings.set("sidebarKeys", this.state.items)
+		window.app.cores.settings.set("sidebarKeys", this.state.items)
 		window.app.SidebarController.toggleEdit(false)
 	}
 
@@ -73,7 +74,7 @@ export default class SidebarEditor extends React.Component {
 	}
 
 	onSetDefaults = () => {
-		window.app.settings.set("sidebarKeys", defaultSidebarKeys)
+		window.app.cores.settings.set("sidebarKeys", defaultSidebarKeys)
 		this.loadItems()
 	}
 

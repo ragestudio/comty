@@ -38,10 +38,10 @@ const AccountButton = (props) => {
 
     const handleClick = () => {
         if (!user) {
-            return app.eventBus.emit("app.forceLogin")
+            return app.navigation.goAuth()
         }
 
-        return app.goToAccount()
+        return app.navigation.goToAccount()
     }
 
     const handleHold = () => {
