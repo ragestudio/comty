@@ -1,4 +1,8 @@
 // Patch global prototypes
+import { Buffer } from "buffer"
+
+window.Buffer = Buffer
+
 Array.prototype.findAndUpdateObject = function (discriminator, obj) {
 	let index = this.findIndex(item => item[discriminator] === obj[discriminator])
 	if (index !== -1) {
@@ -52,37 +56,92 @@ import ReactDOM from "react-dom"
 import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
+import classnames from "classnames"
 import { Toast } from "antd-mobile"
 import { BrowserRouter } from "react-router-dom"
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
 import { Lightbox } from "react-modal-image"
+import loadable from "@loadable/component"
 
-import { Session, User } from "models"
+import { SessionModel, UserModel } from "models"
 import config from "config"
 import * as Utils from "./utils"
 
-import { NotFound, RenderError, Crash, Settings, Navigation, Login, UserRegister, Creator, Searcher, NotificationsCenter } from "components"
+import {
+	NotFound,
+	RenderError,
+	Crash,
+	Navigation,
+	Login,
+	UserRegister,
+	Searcher,
+	NotificationsCenter,
+	PostViewer,
+	PostCreatorModal,
+} from "components"
 import { DOMWindow } from "components/RenderWindow"
-import loadable from "@loadable/component"
 
 import { Icons } from "components/Icons"
+
+import { ThemeProvider } from "cores/style"
 
 import Layout from "./layout"
 import * as Router from "./router"
 
 import "theme/index.less"
 
-class App extends React.Component {
-	sessionController = new Session()
+class Splash extends React.Component {
+	state = {
+		visible: true
+	}
 
-	userController = new User()
+	onUnmount = async () => {
+		this.setState({
+			visible: false
+		})
+
+		return await new Promise((resolve) => {
+			setTimeout(resolve, 1000)
+		})
+	}
+
+	render() {
+		return <div className={classnames("app_splash_wrapper", { ["fade-away"]: !this.state.visible })}>
+			<div className="splash_logo">
+				<img src={config.logo.alt} />
+			</div>
+			<div className="splash_label">
+				<Icons.LoadingOutlined />
+			</div>
+			<div className="splash_footer">
+				<object id="powered_by" data={config.logo.ragestudio_full} type="image/svg+xml" />
+			</div>
+		</div>
+	}
+}
+
+class ComtyApp extends React.Component {
+	constructor(props) {
+		super(props)
+
+		Object.keys(this.eventsHandlers).forEach((event) => {
+			app.eventBus.on(event, this.eventsHandlers[event])
+		})
+	}
+
+	sessionController = new SessionModel()
+
+	userController = new UserModel()
 
 	state = {
 		session: null,
 		user: null,
+		initialized: false,
 	}
+
+	static splashAwaitEvent = "app.initialization.finish"
 
 	static async initialize() {
 		window.app.version = config.package.version
@@ -116,54 +175,192 @@ class App extends React.Component {
 		},
 	}
 
+	static publicMethods = {
+		controls: {
+			openLoginForm: async (options = {}) => {
+				app.DrawerController.open("login", Login, {
+					defaultLocked: options.defaultLocked ?? false,
+					componentProps: {
+						sessionController: this.sessionController,
+					}
+				})
+			},
+			openRegisterForm: async () => {
+				app.DrawerController.open("Register", UserRegister, {
+					allowMultiples: false,
+					panel: true,
+				})
+			},
+			// Opens the notification window and sets up the UI for the notification to be displayed
+			openNotifications: () => {
+				window.app.SidedrawerController.open("notifications", NotificationsCenter, {
+					props: {
+						width: "fit-content",
+					},
+					allowMultiples: false,
+					escClosable: true,
+				})
+			},
+			openSearcher: (options) => {
+				window.app.ModalController.open((props) => <Searcher {...props} />)
+			},
+			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
+			openFullImageViewer: (src) => {
+				const win = new DOMWindow({
+					id: "fullImageViewer",
+					className: "fullImageViewer",
+				})
+
+				win.render(<Lightbox
+					small={src}
+					large={src}
+					onClose={() => win.remove()}
+					hideDownload
+					showRotate
+				/>)
+			},
+			openPostViewer: (post) => {
+				const win = new DOMWindow({
+					id: "postViewer",
+					className: "postViewer",
+				})
+
+				win.render(<PostViewer post={post} />)
+			},
+			openPostCreator: () => {
+				const win = new DOMWindow({
+					id: "postCreator",
+					className: "postCreator",
+				})
+
+				win.render(<PostCreatorModal
+					onClose={() => win.destroy()}
+				/>)
+			}
+		},
+		navigation: {
+			reload: () => {
+				window.location.reload()
+			},
+			softReload: () => {
+				app.eventBus.emit("app.softReload")
+			},
+			goAuth: () => {
+				return app.setLocation(config.app.authPath ?? "/auth")
+			},
+			goMain: () => {
+				return app.setLocation(config.app.mainPath ?? "/home")
+			},
+			goToSettings: (setting_id) => {
+				return app.setLocation(`/settings`, {
+					query: {
+						setting: setting_id
+					}
+				})
+			},
+			goToAccount: (username) => {
+				if (!username) {
+					if (!app.userData) {
+						console.error("Cannot go to account, no username provided and no user logged in")
+						return false
+					}
+
+					username = app.userData.username
+				}
+
+				return app.setLocation(`/account/${username}`)
+			},
+			goToPost: (post_id) => {
+				return app.setLocation(`/post/${post_id}`)
+			},
+		},
+		electron: {
+			closeApp: () => {
+				if (window.isElectron) {
+					window.electron.ipcRenderer.invoke("app.close")
+				}
+			},
+			minimizeApp: () => {
+				if (window.isElectron) {
+					window.electron.ipcRenderer.invoke("app.minimize")
+				}
+			},
+		},
+		capacitor: {
+			isAppCapacitor: () => window.navigator.userAgent === "capacitor",
+			setStatusBarStyleDark: async () => {
+				if (!window.app.capacitor.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Dark })
+			},
+			setStatusBarStyleLight: async () => {
+				if (!window.app.capacitor.isAppCapacitor()) {
+					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
+					return false
+				}
+				return await StatusBar.setStyle({ style: Style.Light })
+			},
+			hideStatusBar: async () => {
+				if (!window.app.capacitor.isAppCapacitor()) {
+					console.warn("[App] hideStatusBar is not supported on this platform")
+					return false
+				}
+
+				return await StatusBar.hide()
+			},
+			showStatusBar: async () => {
+				if (!window.app.capacitor.isAppCapacitor()) {
+					console.warn("[App] showStatusBar is not supported on this platform")
+					return false
+				}
+				return await StatusBar.show()
+			},
+		},
+		openDebugger: () => {
+			// create a new dom window
+			const win = new DOMWindow({
+				id: "debug",
+				title: "Debug",
+			})
+
+			win.createDefaultWindow(loadable(() => import("./debug")), {
+				width: 700,
+				height: 500,
+			})
+		},
+		clearInternalStorage: async () => {
+			antd.Modal.confirm({
+				title: "Clear internal storage",
+				content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
+				onOk: async () => {
+					Utils.deleteInternalStorage()
+				}
+			})
+		},
+	}
+
+	static staticRenders = {
+		PageLoad: () => {
+			return <antd.Skeleton active />
+		},
+		NotFound: (props) => {
+			return <NotFound />
+		},
+		RenderError: (props) => {
+			return <RenderError {...props} />
+		},
+		Crash: Crash.CrashWrapper,
+		Initialization: Splash,
+	}
+
 	eventsHandlers = {
-		"app.setLocation": (location) => {
-			app.setLocation(location)
-		},
-		"app.close": () => {
-			if (window.isElectron) {
-				window.electron.ipcRenderer.invoke("app.close")
-			}
-		},
-		"app.minimize": () => {
-			if (window.isElectron) {
-				window.electron.ipcRenderer.invoke("app.minimize")
-			}
-		},
-		"app.reload": () => {
-			window.location.reload()
-		},
 		"app.softReload": () => {
 			this.forceUpdate()
 
 			app.eventBus.emit("layout.forceUpdate")
 			app.eventBus.emit("router.forceUpdate")
-		},
-		"app.openSearcher": () => {
-			App.publicMethods.openSearcher()
-		},
-		"app.openCreator": () => {
-			App.publicMethods.openCreator()
-		},
-		"app.openNotifications": () => {
-			App.publicMethods.openNotifications()
-		},
-		"app.createLogin": async (options = {}) => {
-			app.DrawerController.open("login", Login, {
-				defaultLocked: options.defaultLocked ?? false,
-				componentProps: {
-					sessionController: this.sessionController,
-					onDone: () => {
-						app.goMain()
-					}
-				}
-			})
-		},
-		"app.createRegister": async () => {
-			app.DrawerController.open("Register", UserRegister, {
-				allowMultiples: false,
-				panel: true,
-			})
 		},
 		"app.no_session": async () => {
 			const location = window.location.pathname
@@ -176,52 +373,30 @@ class App extends React.Component {
 				})
 			}
 		},
-		"app.clearInternalStorage": async () => {
-			antd.Modal.confirm({
-				title: "Clear internal storage",
-				content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
-				onOk: async () => {
-					Utils.deleteInternalStorage()
-				}
-			})
-		},
-		"session.logout": async () => {
-			await this.sessionController.logout()
-		},
-		"session.created": async () => {
+		"auth:login_success": async () => {
 			app.eventBus.emit("layout.animations.fadeOut")
-			app.eventBus.emit("layout.render.lock")
 
-			await this.flushState()
 			await this.initialization()
 
-			// if is `/login` move to `/`
-			if (window.location.pathname === "/login") {
-				app.setLocation("/")
-			}
+			app.navigation.goMain()
 
-			app.eventBus.emit("layout.render.unlock")
 			app.eventBus.emit("layout.animations.fadeIn")
 		},
-		"session.destroyed": async () => {
+		"auth:logout_success": async () => {
+			app.navigation.goAuth()
 			await this.flushState()
-			app.eventBus.emit("app.forceToLogin")
-		},
-		"session.regenerated": async () => {
-			//await this.flushState()
-			//await this.initialization()
 		},
 		"session.invalid": async (error) => {
-			const token = await Session.token
+			const token = await SessionModel.token
 
 			if (!this.state.session && !token) {
 				return false
 			}
 
-			await this.sessionController.forgetLocalSession()
+			await SessionModel.destroyCurrentSession()
 			await this.flushState()
 
-			app.eventBus.emit("app.forceToLogin")
+			app.navigation.goAuth()
 
 			antd.notification.open({
 				message: <Translation>
@@ -232,9 +407,6 @@ class App extends React.Component {
 				</Translation>,
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
-		},
-		"app.forceToLogin": () => {
-			window.app.setLocation("/login")
 		},
 		"api.ws.main.connect": () => {
 			if (this.wsReconnecting) {
@@ -263,7 +435,7 @@ class App extends React.Component {
 
 			this.wsReconnectingTry = this.wsReconnectingTry + 1
 
-			if (this.wsReconnectingTry > 3 && app.settings.get("app.reloadOnWSConnectionError")) {
+			if (this.wsReconnectingTry > 3 && app.cores.settings.get("app.reloadOnWSConnectionError")) {
 				window.location.reload()
 			}
 		},
@@ -291,166 +463,12 @@ class App extends React.Component {
 		}
 	}
 
-	static staticRenders = {
-		PageLoad: () => {
-			return <antd.Skeleton active />
-		},
-		NotFound: (props) => {
-			return <NotFound />
-		},
-		RenderError: (props) => {
-			return <RenderError {...props} />
-		},
-		Crash: Crash.CrashWrapper,
-		Initialization: () => {
-			return <div className="app_splash_wrapper">
-				<div className="splash_logo">
-					<img src={config.logo.alt} />
-				</div>
-				<div className="splash_label">
-					<Icons.LoadingOutlined />
-				</div>
-				<div className="splash_footer">
-					<img src={config.logo.ragestudio_full} />
-				</div>
-			</div>
-		}
-	}
-
-	static publicMethods = {
-		openNotifications: () => {
-			window.app.SidedrawerController.open("notifications", NotificationsCenter, {
-				props: {
-					width: "fit-content",
-				},
-				allowMultiples: false,
-				escClosable: true,
-			})
-		},
-		openSearcher: (options) => {
-			window.app.ModalController.open((props) => <Searcher {...props} />)
-		},
-		openCreator: () => {
-			if (window.isMobile) {
-				return app.DrawerController.open("creator", Creator, {
-					allowMultiples: false,
-					escClosable: true,
-				})
-			}
-
-			return window.app.ModalController.open((props) => <Creator {...props} />)
-		},
-		openSettings: (goTo) => {
-			if (window.isMobile) {
-				return app.DrawerController.open("Settings", Settings, {
-					props: {
-						width: "fit-content",
-						goTo,
-					},
-					allowMultiples: false,
-					escClosable: true,
-				})
-			}
-
-			return app.SidebarController.setCustomRender(Settings, {
-				title: "Settings",
-				icon: "Settings"
-			})
-		},
-		openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
-		openFullImageViewer: (src) => {
-			const win = new DOMWindow({
-				id: "fullImageViewer",
-				className: "fullImageViewer",
-			})
-
-			win.render(<Lightbox
-				small={src}
-				large={src}
-				onClose={() => win.remove()}
-				hideDownload
-				showRotate
-			/>)
-		},
-		goAuth: () => {
-			return window.app.setLocation(config.app.authPath ?? "/auth")
-		},
-		goMain: () => {
-			return window.app.setLocation(config.app.mainPath ?? "/home")
-		},
-		goToAccount: (username) => {
-			if (!username) {
-				if (!app.userData) {
-					console.error("Cannot go to account, no username provided and no user logged in")
-					return false
-				}
-
-				username = app.userData.username
-			}
-
-			return window.app.setLocation(`/@${username}`)
-		},
-		goToPost: (id) => {
-			return window.app.setLocation(`/post/${id}`)
-		},
-		isAppCapacitor: () => window.navigator.userAgent === "capacitor",
-		setStatusBarStyleDark: async () => {
-			if (!window.app.isAppCapacitor()) {
-				console.warn("[App] setStatusBarStyleDark is only available on capacitor")
-				return false
-			}
-			return await StatusBar.setStyle({ style: Style.Dark })
-		},
-		setStatusBarStyleLight: async () => {
-			if (!window.app.isAppCapacitor()) {
-				console.warn("[App] setStatusBarStyleLight is not supported on this platform")
-				return false
-			}
-			return await StatusBar.setStyle({ style: Style.Light })
-		},
-		hideStatusBar: async () => {
-			if (!window.app.isAppCapacitor()) {
-				console.warn("[App] hideStatusBar is not supported on this platform")
-				return false
-			}
-
-			return await StatusBar.hide()
-		},
-		showStatusBar: async () => {
-			if (!window.app.isAppCapacitor()) {
-				console.warn("[App] showStatusBar is not supported on this platform")
-				return false
-			}
-			return await StatusBar.show()
-		},
-		openDebugger: () => {
-			// create a new dom window
-			const win = new DOMWindow({
-				id: "debug",
-				title: "Debug",
-			})
-
-			win.createDefaultWindow(loadable(() => import("./debug")), {
-				width: 700,
-				height: 500,
-			})
-		}
-	}
-
-	constructor(props) {
-		super(props)
-
-		Object.keys(this.eventsHandlers).forEach((event) => {
-			app.eventBus.on(event, this.eventsHandlers[event])
-		})
-	}
-
 	flushState = async () => {
 		await this.setState({ session: null, user: null })
 	}
 
 	componentDidMount = async () => {
-		if (window.app.isAppCapacitor()) {
+		if (app.capacitor.isAppCapacitor()) {
 			window.addEventListener("statusTap", () => {
 				app.eventBus.emit("statusTap")
 			})
@@ -476,17 +494,7 @@ class App extends React.Component {
 			ctrl: !isMac,
 			preventDefault: true,
 		}, (...args) => {
-			App.publicMethods.openSettings(...args)
-		})
-
-		this.props.cores.ShortcutsCore.register({
-			id: "app.openCreator",
-			key: "k",
-			meta: isMac,
-			ctrl: !isMac,
-			preventDefault: true,
-		}, () => {
-			App.publicMethods.openCreator()
+			ComtyApp.publicMethods.controls.openSettings(...args)
 		})
 
 		app.eventBus.emit("app.initialization.start")
@@ -495,7 +503,13 @@ class App extends React.Component {
 
 		app.eventBus.emit("app.initialization.finish")
 
+		this.setState({ initialized: true })
+
 		Utils.handleOpenDevTools()
+	}
+
+	onRuntimeStateUpdate = (state) => {
+		console.debug(`[App] Runtime state updated`, state)
 	}
 
 	initialization = async () => {
@@ -508,7 +522,7 @@ class App extends React.Component {
 					const defaultRemotes = config.remotes
 
 					// get storaged	remotes origins
-					const storedRemotes = await app.settings.get("remotes") ?? {}
+					const storedRemotes = await app.cores.settings.get("remotes") ?? {}
 
 					// mount main api bridge
 					await this.props.cores.ApiCore.attachBridge("main", {
@@ -538,6 +552,8 @@ class App extends React.Component {
 				} catch (error) {
 					app.eventBus.emit("app.initialization.session_error", error)
 
+					console.error(`[App] Error while initializing session`, error)
+
 					throw {
 						cause: "Cannot initialize session",
 						details: error.message,
@@ -548,6 +564,7 @@ class App extends React.Component {
 
 		await Promise.tasked(initializationTasks).catch((reason) => {
 			console.error(`[App] Initialization failed: ${reason.cause}`)
+
 			app.eventBus.emit("runtime.crash", {
 				message: `App initialization failed (${reason.cause})`,
 				details: reason.details,
@@ -556,14 +573,14 @@ class App extends React.Component {
 	}
 
 	__SessionInit = async () => {
-		const token = await Session.token
+		const token = await SessionModel.token
 
 		if (!token || token == null) {
 			app.eventBus.emit("app.no_session")
 			return false
 		}
 
-		const session = await this.sessionController.getCurrentSession().catch((error) => {
+		const session = await SessionModel.getCurrentSession().catch((error) => {
 			console.error(`[App] Cannot get current session: ${error.message}`)
 			return false
 		})
@@ -576,18 +593,22 @@ class App extends React.Component {
 			return false
 		}
 
-		const user = await User.data()
+		const user = await UserModel.data()
 
 		await this.setState({ user })
 
-		const publicData = await User.publicData()
-
-		app.userData = {
-			...publicData,
-		}
+		app.userData = user
 	}
 
 	render() {
+		if (!this.state.initialized) {
+			return <div>
+				<h1>
+					App is initializing...
+				</h1>
+			</div>
+		}
+
 		return <React.Fragment>
 			<Helmet>
 				<title>{config.app.siteName}</title>
@@ -595,12 +616,12 @@ class App extends React.Component {
 				<meta property="og:title" content={config.app.siteName} />
 			</Helmet>
 			<BrowserRouter>
-				<antd.ConfigProvider>
+				<ThemeProvider>
 					<Layout
 						user={this.state.user}
-						staticRenders={App.staticRenders}
+						staticRenders={ComtyApp.staticRenders}
 						bindProps={{
-							staticRenders: App.staticRenders,
+							staticRenders: ComtyApp.staticRenders,
 							user: this.state.user,
 							session: this.state.session,
 							sessionController: this.sessionController,
@@ -609,10 +630,10 @@ class App extends React.Component {
 					>
 						<Router.PageRender />
 					</Layout>
-				</antd.ConfigProvider>
+				</ThemeProvider>
 			</BrowserRouter>
 		</React.Fragment>
 	}
 }
 
-export default new EviteRuntime(App)
+export default new EviteRuntime(ComtyApp)
