@@ -88,6 +88,12 @@
     }
 
     .attachment {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
         width: 100%;
         height: 100%;
 
@@ -136,7 +142,7 @@
 
     .plyr__control {
         &:hover {
-            background-color: var(--primaryColor);
+            background-color: var(--colorPrimary);
         }
 
         svg {
@@ -149,7 +155,7 @@
     .plyr__progress,
     .plyr__volume {
         input {
-            color: var(--primaryColor);
+            color: var(--colorPrimary);
         }
     }
 }

@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
+import { CommentsCard } from "components"
 import { Icons } from "components/Icons"
 
 import PostHeader from "./components/header"
@@ -11,184 +12,116 @@ import PostAttachments from "./components/attachments"
 
 import "./index.less"
 
-export default ({
-    expansibleActions = window.app.settings.get("postCard_expansible_actions"),
-    autoCarrousel = window.app.settings.get("postCard_carrusel_auto"),
-    data = {},
-    events = {},
-    fullmode
-}) => {
-    const isSelf = app.permissions.checkUserIdIsSelf(data.user_id)
+export default class PostCard extends React.Component {
+    state = {
+        loading: true,
+        data: this.props.data ?? {},
 
-    const [loading, setLoading] = React.useState(true)
+        countLikes: this.props.data.countLikes ?? 0,
+        countComments: this.props.data.countComments ?? 0,
 
-    const [likes, setLikes] = React.useState(data.likes ?? [])
-    const [comments, setComments] = React.useState(data.comments ?? [])
+        hasLiked: this.props.data.isLiked ?? false,
+        hasSaved: this.props.data.isSaved ?? false,
 
-    const [hasLiked, setHasLiked] = React.useState(false)
-    const [hasSaved, setHasSaved] = React.useState(false)
+        open: this.props.defaultOpened ?? false,
+    }
 
-    const onClickDelete = async () => {
-        if (typeof events.onClickDelete !== "function") {
+    onClickDelete = async () => {
+        if (typeof this.props.events.onClickDelete !== "function") {
             console.warn("onClickDelete event is not a function")
             return
         }
 
-        return await events.onClickDelete(data)
+        return await this.props.events.onClickDelete(this.state.data)
     }
 
-    const onClickLike = async () => {
-        if (typeof events.onClickLike !== "function") {
+    onClickLike = async () => {
+        if (typeof this.props.events.onClickLike !== "function") {
             console.warn("onClickLike event is not a function")
             return
         }
 
-        return await events.onClickLike(data)
+        return await this.props.events.onClickLike(this.state.data)
     }
 
-    const onClickSave = async () => {
-        if (typeof events.onClickSave !== "function") {
+    onClickSave = async () => {
+        if (typeof this.props.events.onClickSave !== "function") {
             console.warn("onClickSave event is not a function")
             return
         }
 
-        return await events.onClickSave(data)
+        return await this.props.events.onClickSave(this.state.data)
     }
 
-    const onClickOpen = async () => {
-        if (typeof events.onClickOpen !== "function") {
-            console.warn("onClickOpen event is not a function, performing default action")
-            return window.app.goToPost(data._id)
-        }
-
-        return await events.onClickOpen(data)
-    }
-
-    const onClickEdit = async () => {
-        if (typeof events.onClickEdit !== "function") {
+    onClickEdit = async () => {
+        if (typeof this.props.events.onClickEdit !== "function") {
             console.warn("onClickEdit event is not a function")
             return
         }
 
-        return await events.onClickEdit(data)
+        return await this.props.events.onClickEdit(this.state.data)
     }
 
-    const onDataUpdate = (data) => {
-        console.log("onDataUpdate", data)
-
-        setLikes(data.likes)
-        setComments(data.comments)
+    onDoubleClick = async () => {
+        this.handleOpen()
     }
 
-    const onDoubleClick = () => {
-        if (typeof events.onDoubleClick !== "function") {
-            console.warn("onDoubleClick event is not a function")
-            return
+    onClickComments = async () => {
+        this.handleOpen()
+    }
+
+    handleOpen = (to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.open
         }
 
-        return events.onDoubleClick(data)
-    }
-
-    React.useEffect(() => {
-        if (fullmode) {
-            app.eventBus.emit("style.compactMode", true)
+        if (typeof this.props.events?.onToogleOpen === "function") {
+            this.props.events?.onToogleOpen(to, this.state.data)
         }
 
-        app.eventBus.on(`post.${data._id}.delete`, onClickDelete)
-        app.eventBus.on(`post.${data._id}.update`, onClickEdit)
+        this.setState({
+            open: to,
+        })
+
+        //app.controls.openPostViewer(this.state.data)
+    }
+
+    onLikesUpdate = (data) => {
+        if (data.to) {
+            this.setState({
+                countLikes: this.state.countLikes + 1,
+            })
+        } else {
+            this.setState({
+                countLikes: this.state.countLikes - 1,
+            })
+        }
+    }
+
+    componentDidMount = async () => {
+        app.eventBus.on(`post.${this.state.data._id}.delete`, this.onClickDelete)
+        app.eventBus.on(`post.${this.state.data._id}.update`, this.onClickEdit)
 
         // first listen to post changes
-        window.app.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
+        //window.app.cores.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
+        window.app.cores.api.namespaces["main"].listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
 
-        // then load
-        setLoading(false)
-
-        return () => {
-            if (fullmode) {
-                app.eventBus.emit("style.compactMode", false)
-            }
-
-            app.eventBus.off(`post.${data._id}.delete`, onClickDelete)
-            app.eventBus.off(`post.${data._id}.update`, onClickEdit)
-
-            // remove the listener
-            window.app.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
-        }
-    }, [])
-
-    React.useEffect(() => {
-        if (!app.userData) {
-            return
-        }
-
-        // check if the post has liked by you
-        const hasLiked = likes.includes(app.userData._id)
-        const hasSaved = data.isSaved
-
-        setHasLiked(hasLiked)
-        setHasSaved(hasSaved)
-    })
-
-    if (loading) {
-        return <antd.Skeleton active />
+        this.setState({
+            isSelf: app.cores.permissions.checkUserIdIsSelf(this.state.data.user_id),
+            loading: false,
+        })
     }
 
-    try {
-        return <div
-            key={data.key ?? data._id}
-            id={data._id}
-            className={classnames(
-                "postCard",
-                data.type,
-                { ["liked"]: hasLiked },
-                { ["noHide"]: window.isMobile || !expansibleActions },
-                { ["fullmode"]: fullmode },
-            )}
-            context-menu={"postCard-context"}
-            user-id={data.user_id}
-            self-post={isSelf.toString()}
-        >
-            <div className="wrapper">
-                <PostHeader
-                    postData={data}
-                    isLiked={hasLiked}
-                    likes={likes.length}
-                    comments={comments.length}
-                    fullmode={fullmode}
-                    onDoubleClick={onDoubleClick}
-                />
-                <PostContent
-                    data={data}
-                    autoCarrousel={autoCarrousel}
-                    fullmode={fullmode}
-                    onDoubleClick={onDoubleClick}
-                    nsfw={data.flags && data.flags.includes("nsfw")}
-                >
-                    {data.attachments && data.attachments.length > 0 && <PostAttachments
-                        attachments={data.attachments}
-                    />}
-                </PostContent>
-            </div>
-            {!fullmode &&
-                <div className="post_actionsIndicator">
-                    <Icons.MoreHorizontal />
-                </div>
-            }
-            {!fullmode &&
-                <PostActions
-                    defaultLiked={hasLiked}
-                    defaultSaved={hasSaved}
-                    onClickLike={onClickLike}
-                    onClickSave={onClickSave}
-                    onClickOpen={onClickOpen}
-                    actions={{
-                        delete: onClickDelete,
-                    }}
-                    fullmode={fullmode}
-                />
-            }
-        </div>
-    } catch (error) {
+    componentWillUnmount = () => {
+        app.eventBus.off(`post.${this.state.data._id}.delete`, this.onClickDelete)
+        app.eventBus.off(`post.${this.state.data._id}.update`, this.onClickEdit)
+
+        // remove the listener
+        //window.app.cores.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
+        window.app.cores.api.namespaces["main"].listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
+    }
+
+    componentDidCatch = (error, info) => {
         console.error(error)
 
         return <div className="postCard error">
@@ -199,6 +132,65 @@ export default ({
                     Maybe this version of the app is outdated or is not supported yet
                 </span>
             </h1>
+        </div>
+    }
+
+    render = () => {
+        if (this.state.loading) {
+            return <div
+                key={this.state.data.key ?? this.state.data._id}
+                id={this.state.data._id}
+                className="postCard"
+            >
+                <antd.Skeleton active avatar />
+            </div>
+        }
+
+        return <div
+            key={this.state.data.key ?? this.state.data._id}
+            id={this.state.data._id}
+            className={classnames(
+                "postCard",
+                {
+                    ["open"]: this.state.open,
+                }
+            )}
+            context-menu={"postCard-context"}
+            user-id={this.state.data.user_id}
+            self-post={this.state.isSelf.toString()}
+        >
+            <div className="wrapper">
+                <PostHeader
+                    postData={this.state.data}
+                    isLiked={this.state.hasLiked}
+                    onDoubleClick={this.onDoubleClick}
+                />
+                <PostContent
+                    data={this.state.data}
+                    nsfw={this.state.data.flags && this.state.data.flags.includes("nsfw")}
+                    onDoubleClick={this.onDoubleClick}
+                >
+                    {this.state.data.attachments && this.state.data.attachments.length > 0 && <PostAttachments
+                        attachments={this.state.data.attachments}
+                    />}
+                </PostContent>
+            </div>
+            <PostActions
+                likesCount={this.state.countLikes}
+                commentsCount={this.state.countComments}
+                defaultLiked={this.state.hasLiked}
+                defaultSaved={this.state.hasSaved}
+                onClickLike={this.onClickLike}
+                onClickSave={this.onClickSave}
+                onClickComments={this.onClickComments}
+                actions={{
+                    delete: this.onClickDelete,
+                }}
+            />
+
+            {
+                this.state.open && <CommentsCard post_id={this.state.data._id} />
+            }
         </div>
     }
 }

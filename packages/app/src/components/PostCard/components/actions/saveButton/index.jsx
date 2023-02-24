@@ -20,9 +20,9 @@ export default (props) => {
         className={classnames("saveButton", {
             ["active"]: saved
         })}
+        type="ghost"
         shape="circle"
         onClick={onClick}
         icon={saved ? <Icons.MdBookmark /> : <Icons.MdBookmarkBorder />}
-        size="large"
     />
 }

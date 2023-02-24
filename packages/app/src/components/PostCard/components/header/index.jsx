@@ -1,5 +1,4 @@
 import React from "react"
-import classnames from "classnames"
 import { DateTime } from "luxon"
 
 import { Image } from "components"
@@ -11,13 +10,13 @@ export default (props) => {
     const [timeAgo, setTimeAgo] = React.useState(0)
 
     const goToProfile = () => {
-        window.app.goToAccount(props.postData.user?.username)
+        app.navigation.goToAccount(props.postData.user?.username)
     }
 
     const updateTimeAgo = () => {
         let createdAt = props.postData.timestamp ?? props.postData.created_at ?? ""
 
-        const timeAgo = DateTime.fromISO(createdAt).toRelative()
+        const timeAgo = DateTime.fromISO(createdAt, { locale: app.cores.settings.get("language") }).toRelative()
 
         setTimeAgo(timeAgo)
     }
@@ -43,30 +42,14 @@ export default (props) => {
                 />
             </div>
             <div className="info">
-                <div>
-                    <h1 onClick={goToProfile}>
-                        {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
-                        {props.postData.user?.verified && <Icons.verifiedBadge />}
-                    </h1>
-                </div>
+                <h1 onClick={goToProfile}>
+                    {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
+                    {props.postData.user?.verified && <Icons.verifiedBadge />}
+                </h1>
 
-                <div>
+                <span className="timeago">
                     {timeAgo}
-                </div>
-            </div>
-        </div>
-        <div className="statistics">
-            <div className="item">
-                <Icons.Heart className={classnames("icon", { ["filled"]: props.isLiked })} />
-                <div className="value">
-                    {props.likes}
-                </div>
-            </div>
-            <div className="item">
-                <Icons.MessageSquare />
-                <div className="value">
-                    {props.comments}
-                </div>
+                </span>
             </div>
         </div>
     </div>
