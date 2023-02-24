@@ -1,4 +1,4 @@
-import { Playlist } from "../../../models"
+import { Playlist } from "@models"
 
 export default async (payload) => {
     const { user_id, title, description, thumbnail, list } = payload
