@@ -3,7 +3,6 @@ import { Skeleton } from "antd"
 import { Carousel } from "react-responsive-carousel"
 import { ImageViewer } from "components"
 import Plyr from "plyr-react"
-import ModalImage from "react-modal-image"
 
 import ContentFailed from "../contentFailed"
 
@@ -43,7 +42,7 @@ const Attachment = React.memo((props) => {
             e.preventDefault()
             e.stopPropagation()
 
-            app.openFullImageViewer(url)
+            app.controls.openFullImageViewer(url)
         }
     }
 

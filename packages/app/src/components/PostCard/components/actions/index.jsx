@@ -1,5 +1,5 @@
 import React from "react"
-
+import { Dropdown, Button } from "antd"
 import { Icons } from "components/Icons"
 
 import SaveButton from "./saveButton"
@@ -7,28 +7,68 @@ import LikeButton from "./likeButton"
 
 import "./index.less"
 
+const MoreActionsItems = [
+    {
+        key: "repost",
+        label: <>
+            <Icons.Repeat />
+            <span>Repost</span>
+        </>,
+    },
+    {
+        key: "share",
+        label: <>
+            <Icons.Share />
+            <span>Share</span>
+        </>,
+    },
+    {
+        type: "divider",
+    },
+    {
+        key: "report",
+        label: <>
+            <Icons.AlertTriangle />
+            <span>Report</span>
+        </>,
+    },
+]
+
 export default (props) => {
-    return <div className="post_actionsWrapper">
+    return <div className="post_actions_wrapper">
         <div className="actions">
             <div className="action" id="likes">
-                <div className="icon">
-                    <LikeButton defaultLiked={props.defaultLiked} onClick={props.onClickLike} />
-                </div>
+                <LikeButton
+                    defaultLiked={props.defaultLiked}
+                    onClick={props.onClickLike}
+                    count={props.likesCount}
+                />
             </div>
             <div className="action" id="save">
-                <div className="icon">
-                    <SaveButton defaultActive={props.defaultSaved} onClick={props.onClickSave} />
-                </div>
+                <SaveButton
+                    defaultActive={props.defaultSaved}
+                    onClick={props.onClickSave}
+                />
             </div>
-            <div className="action" id="share">
-                <div className="icon">
-                    <Icons.Share2 onClick={props.onClickShare} />
-                </div>
+            <div className="action" id="comments">
+                <Button
+                    type="ghost"
+                    shape="circle"
+                    onClick={props.onClickComments}
+                    icon={<Icons.MessageCircle />}
+                />
             </div>
-            <div className="action" id="open" onClick={props.onClickOpen}>
-                <div className="icon">
-                    <Icons.MdOutlineOpenInNew className="icon" />
-                </div>
+            <div className="action" id="more">
+                <Dropdown
+                    menu={{
+                        items: MoreActionsItems
+                    }}
+                    trigger={["click"]}
+                >
+                    <div className="icon">
+                        <Icons.MoreHorizontal />
+                    </div>
+                </Dropdown>
             </div>
         </div>
     </div>

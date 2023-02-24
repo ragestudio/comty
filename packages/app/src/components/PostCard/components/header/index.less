@@ -15,7 +15,7 @@
         }
 
         svg {
-            fill: var(--appColor);
+            fill: var(--app-color);
             margin-left: 6px;
         }
 
@@ -35,57 +35,33 @@
         .info {
             display: inline-flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: start;
 
-            text-align: start;
+            align-items: flex-start;
 
             width: fit-content;
 
-            color: var(--background-color-contrast);
-
             h1 {
-                color: var(--background-color-contrast);
-                margin: 0;
-                font-family: "DM Mono", monospace;
+                margin: 0 0 4px 0;
+
                 align-self: start;
+
+                font-weight: 500;
                 font-size: 1rem;
+
                 cursor: pointer;
+
+                color: var(--background-color-contrast);
+            }
+
+            .timeago {
+                font-weight: 400;
+                font-size: 0.7rem;
+
+                color: rgb(var(--bg_color_4));
             }
 
             >div {
                 align-self: start;
-            }
-        }
-    }
-
-    .statistics {
-        display: inline-flex;
-        flex-direction: column;
-        font-size: 16px;
-
-        color: var(--background-color-contrast);
-        height: fit-content;
-
-        .item {
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-end;
-            height: fit-content;
-
-            margin-left: 20px;
-            margin-bottom: 5px;
-
-            .icon {
-                &.filled {
-                    color: var(--primaryColor);
-                    fill: var(--primaryColor);
-                }
-            }
-
-            .value {
-                font-family: "DM Mono", monospace;
-                font-size: 14px;
             }
         }
     }

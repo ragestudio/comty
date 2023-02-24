@@ -5,127 +5,14 @@
     width: 100%;
     max-width: 600px;
 
-    filter: drop-shadow(3px 3px 2px var(--shadow-color));
-
     background-color: var(--background-color-accent);
-    border-radius: 8px;
 
     transition: all 0.2s ease-in-out;
 
-    outline-width: 1px;
-    outline-style: solid;
-    outline-color: transparent;
+    padding: 17px;
 
-    &.playlist {
-        .wrapper {
-            .post_content {
-                flex-direction: row;
-                background-color: var(--background-color-primary);
-                padding: 20px;
-
-                .playlistCover {
-                    width: 200px;
-                    height: 200px;
-                    background-position: center;
-                    background-size: cover;
-                    background-repeat: no-repeat;
-                    border-radius: 8px;
-
-                    margin-right: 25px;
-                }
-
-                .playlistTitle {
-                    h1 {
-                        font-size: 1.5rem;
-                        font-family: "Space Grotesk", sans-serif;
-                        margin: 0;
-                    }
-
-                    h3 {
-                        font-size: 0.9rem;
-                        // make italic
-                        font-style: italic;
-                    }
-
-                    .actions {
-                        width: 100%;
-
-                        margin-top: 20px;
-
-                        display: inline-flex;
-                        flex-direction: column;
-
-                        align-items: center;
-                        justify-content: center;
-                    }
-                }
-            }
-        }
-    }
-
-    &.liked {
-        filter: drop-shadow(0px 0px 2px var(--primaryColor));
-        outline-color: var(--primaryColor);
-    }
-
-    &.noHide {
-        .wrapper {
-            margin-bottom: 25px;
-        }
-
-        .post_actionsWrapper {
-            opacity: 1;
-        }
-    }
-
-    &.fullmode {
-        max-width: none;
+    &.open {
         height: 100%;
-
-        background-color: transparent;
-
-        filter: none!important;
-        outline: none!important;
-
-        .post_actionsIndicator {
-            opacity: 0;
-        }
-
-        .post_actionsWrapper {
-            opacity: 1;
-        }
-
-        .wrapper {
-            height: 100%;
-
-            .post_content {
-                height: 100%;
-
-                .post_attachments {
-                    .carousel-root {
-                        .carousel {
-                            height: 100%;
-                            min-height: 70vh;
-
-                            .addition {
-                                height: 100%;
-                                min-height: 70vh;
-
-                                .plyr {
-                                    height: 100%;
-                                }
-
-                                img,
-                                video {
-                                    height: 100%;
-                                    object-fit: contain;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     .wrapper {
@@ -134,7 +21,6 @@
         align-items: center;
 
         width: 100%;
-        padding: 17px;
 
         transition: all 0.2s ease-in-out;
 
@@ -143,13 +29,20 @@
         }
     }
 
-    &:hover {
-        .wrapper {
-            margin-bottom: 25px;
-        }
+    border-bottom: 2px solid var(--border-color);
 
-        .post_actionsWrapper {
-            opacity: 1;
-        }
+    padding-bottom: 10px;
+
+    &:first-child {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    &:last-child {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+
+        border-bottom: none;
+        padding-bottom: 0;
     }
 }
