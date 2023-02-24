@@ -5,7 +5,7 @@ import { Translation } from "react-i18next"
 
 import { Icons } from "components/Icons"
 import { Skeleton, FollowButton, UserCard } from "components"
-import { Session } from "models"
+import { SessionModel, UserModel, FollowsModel } from "models"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
@@ -74,10 +74,10 @@ export default class Account extends React.Component {
 
 	actionsRef = React.createRef()
 
-	api = window.app.api.withEndpoints("main")
+	api = window.app.cores.api.withEndpoints("main")
 
 	componentDidMount = async () => {
-		const token = await Session.decodedToken()
+		const token = await SessionModel.getDecodedToken()
 		const location = window.app.history.location
 		const query = new URLSearchParams(location.search)
 
@@ -93,7 +93,13 @@ export default class Account extends React.Component {
 				isSelf = true
 			}
 
-			user = await this.fetchData(requestedUser)
+			user = await UserModel.data({
+				username: requestedUser
+			}).catch((error) => {
+				console.error(error)
+
+				return false
+			})
 
 			if (!user) {
 				this.setState({
@@ -106,14 +112,14 @@ export default class Account extends React.Component {
 			console.log(`Loaded User [${user.username}] >`, user)
 
 			if (!isSelf) {
-				const followedResult = await this.api.get.isFollowed(undefined, { user_id: user._id }).catch(() => false)
+				const followedResult = await FollowsModel.imFollowing(user._id).catch(() => false)
 
 				if (followedResult) {
 					isFollowed = followedResult.isFollowed
 				}
 			}
 
-			const followersResult = await this.api.get.followers(undefined, { user_id: user._id }).catch(() => false)
+			const followersResult = await FollowsModel.getFollowers(user._id).catch(() => false)
 
 			if (followersResult) {
 				followers = followersResult
@@ -151,18 +157,8 @@ export default class Account extends React.Component {
 		}
 	}
 
-	fetchData = async (username) => {
-		return await this.api.get.user(undefined, {
-			username: username
-		}).catch((error) => {
-			console.error(error)
-
-			return false
-		})
-	}
-
 	onClickFollow = async () => {
-		const result = await this.api.post.followUser({
+		const result = await FollowsModel.toogleFollow({
 			username: this.state.requestedUser,
 		}).catch((error) => {
 			console.error(error)
