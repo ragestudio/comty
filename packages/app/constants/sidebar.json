@@ -1,0 +1,26 @@
+[
+    {
+        "id": "/posts",
+        "path": "/",
+        "title": "Posts",
+        "icon": "MdTag"
+    },
+    {
+        "id": "/tv",
+        "path": "/tv",
+        "title": "Tv",
+        "icon": "Tv"
+    },
+    {
+        "id": "/music",
+        "path": "/music",
+        "title": "Music",
+        "icon": "MdMusicVideo"
+    },
+    {
+        "id": "/groups",
+        "path": "/groups",
+        "title": "Groups",
+        "icon": "MdGroups"
+    }
+]
