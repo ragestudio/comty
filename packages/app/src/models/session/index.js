@@ -28,7 +28,7 @@ export default class Session {
     }
 
     static async getAllSessions() {
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "get",
             url: "/session/all"
         })
@@ -37,7 +37,7 @@ export default class Session {
     }
 
     static async getCurrentSession() {
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "get",
             url: "/session/current"
         })
@@ -48,7 +48,7 @@ export default class Session {
     static async getTokenValidation() {
         const session = await Session.token
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "get",
             url: "/session/validate",
             data: {
@@ -71,7 +71,7 @@ export default class Session {
             return false
         }
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "delete",
             url: "/session/current"
         }).catch((error) => {
@@ -94,7 +94,7 @@ export default class Session {
             return false
         }
 
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "delete",
             url: "/session/all"
         })

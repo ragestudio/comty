@@ -28,7 +28,7 @@ export default class SpotifySyncModel {
     }
 
     static async get_client_id() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/sync/spotify/client_id`,
         })
@@ -37,7 +37,7 @@ export default class SpotifySyncModel {
     }
 
     static async syncAuthCode(code) {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "POST",
             url: `/sync/spotify/auth`,
             data: {
@@ -50,7 +50,7 @@ export default class SpotifySyncModel {
     }
 
     static async unlinkAccount() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "POST",
             url: `/sync/spotify/unlink`,
         })
@@ -59,7 +59,7 @@ export default class SpotifySyncModel {
     }
 
     static async isAuthorized() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/sync/spotify/is_authorized`,
         })
@@ -68,7 +68,7 @@ export default class SpotifySyncModel {
     }
 
     static async getData() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/sync/spotify/data`,
         })
@@ -77,7 +77,7 @@ export default class SpotifySyncModel {
     }
 
     static async getCurrentPlaying() {
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/sync/spotify/currently_playing`,
         })

@@ -1,6 +1,6 @@
 export default class Post {
     static get bridge() {
-        return window.app?.api.withEndpoints("main")
+        return window.app?.cores.api.withEndpoints("main")
     }
 
     static get maxPostTextLength() {
@@ -16,7 +16,7 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/posts/post/${post_id}`,
         })
@@ -29,7 +29,7 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/comments/post/${post_id}`,
         })
@@ -42,7 +42,7 @@ export default class Post {
             throw new Error("Post ID and/or comment are required")
         }
 
-        const request = await app.api.customRequest("main", {
+        const request = await app.cores.apies.api.customRequest("main", {
             method: "POST",
             url: `/comments/post/${post_id}`,
             data: {
@@ -58,7 +58,7 @@ export default class Post {
             throw new Error("Post ID and/or comment ID are required")
         }
 
-        const request = await app.api.customRequest("main", {
+        const request = await app.cores.apies.api.customRequest("main", {
             method: "DELETE",
             url: `/comments/post/${post_id}/${comment_id}`,
         })
@@ -71,12 +71,12 @@ export default class Post {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/posts/explore`,
             params: {
                 trim: trim ?? 0,
-                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+                limit: limit ?? window.app.cores.settings.get("feed_max_fetch"),
             }
         })
 
@@ -88,12 +88,12 @@ export default class Post {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/posts/saved`,
             params: {
                 trim: trim ?? 0,
-                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+                limit: limit ?? window.app.cores.settings.get("feed_max_fetch"),
             }
         })
 
@@ -110,12 +110,12 @@ export default class Post {
             user_id = app.userData?._id
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "GET",
             url: `/posts/user/${user_id}`,
             params: {
                 trim: trim ?? 0,
-                limit: limit ?? window.app.settings.get("feed_max_fetch"),
+                limit: limit ?? window.app.cores.settings.get("feed_max_fetch"),
             }
         })
 
@@ -131,7 +131,7 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "POST",
             url: `/posts/${post_id}/toogle_like`,
         })
@@ -148,7 +148,7 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "POST",
             url: `/posts/${post_id}/toogle_save`,
         })
@@ -161,7 +161,7 @@ export default class Post {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "POST",
             url: `/posts/new`,
             data: payload,
@@ -179,7 +179,7 @@ export default class Post {
             throw new Error("Post ID is required")
         }
 
-        const { data } = await app.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest("main", {
             method: "DELETE",
             url: `/posts/${post_id}`,
         })

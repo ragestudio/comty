@@ -2,7 +2,7 @@ import SessionModel from "../session"
 
 export default class AuthModel {
     static login = async (payload) => {
-        const response = await app.api.customRequest("main", {
+        const response = await app.cores.api.customRequest("main", {
             method: "post",
             url: "/auth/login",
             data: {
