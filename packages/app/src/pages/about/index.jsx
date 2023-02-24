@@ -14,7 +14,7 @@ export default (props) => {
     const [serverManifest, setServerManifest] = React.useState(null)
 
     const checkServerVersion = async () => {
-        const serverManifest = await app.api.customRequest("main")
+        const serverManifest = await app.cores.api.customRequest("main")
 
         setServerManifest(serverManifest.data)
     }
@@ -63,7 +63,7 @@ export default (props) => {
                 </span>
 
                 <div className="value">
-                    {app.api?.namespaces.main.origin ?? "Unknown"}
+                    {app.cores.api?.namespaces.main.origin ?? "Unknown"}
                 </div>
             </div>
             <div className="field">
