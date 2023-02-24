@@ -3,9 +3,7 @@ export { default as Footer } from "./Footer"
 
 // COMPLEX COMPONENTS
 export { default as FormGenerator } from "./FormGenerator"
-export { default as Settings } from "./Settings"
 export { default as NotFound } from "./NotFound"
-export { default as AppSearcher } from "./AppSearcher"
 export { default as RenderError } from "./RenderError"
 export { default as ActionsBar } from "./ActionsBar"
 export { default as SelectableList } from "./SelectableList"
@@ -38,16 +36,15 @@ export { default as NotificationsCenter } from "./NotificationsCenter"
 // LiveChat
 export { default as LiveChat } from "./LiveChat"
 
-// CREATOR
-export { default as Creator } from "./Creator"
-
 // BUTTONS
 export { default as FollowButton } from "./FollowButton"
 
 // POSTS
 export { default as PostsList } from "./PostsList"
 export { default as PostCard } from "./PostCard"
+export { default as PostViewer } from "./PostViewer"
 export { default as PostCreator } from "./PostCreator"
+export { default as PostCreatorModal } from "./PostCreatorModal"
 
 // COMMENTS
 export { default as CommentsCard } from "./CommentsCard"
