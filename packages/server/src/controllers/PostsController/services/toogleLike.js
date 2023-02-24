@@ -1,31 +1,37 @@
-import { Post } from "../../../models"
-
-import modifyPostData from "./modifyPostData"
+import { PostLike } from "@models"
 
 export default async (payload) => {
     let { post_id, user_id, to } = payload
 
-    let post = await Post.findById(post_id).catch(() => false)
-
-    if (!post) {
-        throw new Error("Post not found")
-    }
+    let likeObj = await PostLike.findOne({
+        post_id,
+        user_id,
+    }).catch(() => false)
 
     if (typeof to === "undefined") {
-        to = !post.likes.includes(user_id)
+        if (likeObj) {
+            to = false
+        } else {
+            to = true
+        }
     }
 
     if (to) {
-        post.likes.push(user_id)
+        likeObj = new PostLike({
+            post_id,
+            user_id,
+        })
+
+        await likeObj.save()
     } else {
-        post.likes = post.likes.filter((id) => id !== user_id)
+        await PostLike.findByIdAndDelete(likeObj._id)
     }
 
-    post = await modifyPostData(post._id, { likes: post.likes })
+    global.websocket_instance.io.emit(`post.${post_id}.likes.update`, {
+        to,
+        post_id,
+        user_id,
+    })
 
-    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}`, post)
-    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}.${post.user_id}`, post)
-    global.websocket_instance.io.emit(`post.${to ? "like" : "unlike"}.${post_id}`, post)
-
-    return post
+    return likeObj
 }
