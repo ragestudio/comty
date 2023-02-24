@@ -15,10 +15,6 @@ export default class MusicDashboard extends React.Component {
 
     primaryPanelRef = React.createRef()
 
-    componentDidMount() {
-        app.eventBus.emit("style.compactMode", false)
-    }
-
     renderActiveTab() {
         const tab = Tabs[this.state.activeTab]
 
@@ -68,18 +64,17 @@ export default class MusicDashboard extends React.Component {
                         selectedKeys={[this.state.activeTab]}
                         activeKey={this.state.activeTab}
                         onClick={({ key }) => this.handleTabChange(key)}
-                    >
-                        {Object.keys(Tabs).map((key) => {
+                        items={Object.keys(Tabs).map((key) => {
                             const tab = Tabs[key]
 
-                            return <antd.Menu.Item
-                                key={key}
-                                icon={createIconRender(tab.icon)}
-                            >
-                                {tab.title}
-                            </antd.Menu.Item>
+                            return {
+                                key,
+                                icon: createIconRender(tab.icon),
+                                label: tab.label,
+                                disabled: tab.disabled
+                            }
                         })}
-                    </antd.Menu>
+                    />
                 </div>
             </div>
         </div>
