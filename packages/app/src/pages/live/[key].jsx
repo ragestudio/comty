@@ -234,13 +234,13 @@ export default class StreamViewer extends React.Component {
         // make the interface a bit confortable for a video player
         app.style.applyVariant("dark")
 
-        app.eventBus.emit("style.compactMode", true)
+        app.cores.style.compactMode(true)
     }
 
     exitPlayerAnimation = () => {
-        app.style.applyVariant(app.settings.get("themeVariant"))
+        app.style.applyVariant(app.cores.settings.get("themeVariant"))
 
-        app.eventBus.emit("style.compactMode", false)
+        app.cores.style.compactMode(false)
     }
 
     updateQuality = (newQuality) => {
