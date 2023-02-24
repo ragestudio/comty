@@ -8,7 +8,7 @@ export default class RemoteStorage extends Core {
 
     connection = null
 
-    async initialize() {
+    async onInitialize() {
 
     }
 

@@ -15,14 +15,14 @@ export function extractLocaleFromPath(path = "") {
 const messageImports = import.meta.glob("schemas/translations/*.json")
 
 export default class I18nCore extends Core {
-    events = {
+    onEvents = {
         "changeLanguage": (locale) => {
             this.loadAsyncLanguage(locale)
         }
     }
 
-    initialize = async () => {
-        let locale = app.settings.get("language") ?? DEFAULT_LOCALE
+    onInitialize = async () => {
+        let locale = app.cores.settings.get("language") ?? DEFAULT_LOCALE
 
         if (!SUPPORTED_LOCALES.includes(locale)) {
             locale = DEFAULT_LOCALE

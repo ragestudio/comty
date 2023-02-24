@@ -3,7 +3,7 @@ import Core from "evite/src/core"
 export default class ShortcutsCore extends Core {
     shortcutsRegister = []
 
-    publicMethods = {
+    registerToApp = {
         shortcuts: this
     }
 

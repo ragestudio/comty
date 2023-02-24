@@ -18,7 +18,7 @@ export default class ContextMenuCore extends Core {
         clickOutsideToClose: true,
     })
 
-    async initialize() {
+    async onInitialize() {
         document.addEventListener("contextmenu", this.handleEvent)
     }
 

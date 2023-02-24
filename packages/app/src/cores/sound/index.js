@@ -3,36 +3,29 @@ import { Howl } from "howler"
 import config from "config"
 
 export default class SoundCore extends Core {
-    sounds = {}
+    static namespace = "sound"
 
-    publicMethods = {
-        sound: this,
+    public = {
+        play: this.play,
+        getSounds: this.getSounds,
     }
 
-    async initialize() {
-        this.sounds = await this.getSounds()
-    }
-
-    getSounds = async () => {
+    async getSounds() {
         // TODO: Load custom soundpacks manifests
         let soundPack = config.defaultSoundPack ?? {}
-
-        Object.keys(soundPack).forEach((key) => {
-            const src = soundPack[key]
-
-            soundPack[key] = (options) => new Howl({
-                volume: window.app.settings.get("generalAudioVolume") ?? 0.5,
-                ...options,
-                src: [src],
-            })
-        })
 
         return soundPack
     }
 
-    play = (name, options) => {
-        if (this.sounds[name]) {
-            return this.sounds[name](options).play()
+    async play(name, options) {
+        let soundPack = await this.getSounds()
+
+        if (soundPack[name]) {
+            return new Howl({
+                volume: window.app.cores.settings.get("generalAudioVolume") ?? 0.5,
+                ...options,
+                src: [soundPack[name]],
+            }).play()
         } else {
             console.error(`Sound [${name}] not found or is not available.`)
             return false

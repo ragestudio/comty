@@ -1,7 +1,8 @@
 import Core from "evite/src/core"
-import config from "config"
 import { Bridge } from "linebridge/dist/client"
-import { Session } from "models"
+
+import config from "config"
+import { SessionModel } from "models"
 
 function generateWSFunctionHandler(socket, type = "listen") {
     if (!socket) {
@@ -47,15 +48,23 @@ function generateWSFunctionHandler(socket, type = "listen") {
 }
 
 export default class ApiCore extends Core {
-    constructor(props) {
-        super(props)
+    static namespace = "api"
 
-        this.namespaces = Object()
+    excludedExpiredExceptionURL = ["/session/regenerate"]
 
-        this.onExpiredExceptionEvent = false
-        this.excludedExpiredExceptionURL = ["/regenerate_session_token"]
+    onExpiredExceptionEvent = false
 
-        this.ctx.registerPublicMethod("api", this)
+    namespaces = Object()
+
+    public = {
+        namespaces: this.namespaces,
+        customRequest: this.customRequest,
+        request: this.request,
+        withEndpoints: this.withEndpoints,
+        attachBridge: this.attachBridge,
+        detachBridge: this.detachBridge,
+        createBridge: this.createBridge,
+        autenticateWS: this.autenticateWS,
     }
 
     async customRequest(
@@ -83,7 +92,7 @@ export default class ApiCore extends Core {
             payload.headers = {}
         }
 
-        const sessionToken = await Session.token
+        const sessionToken = await SessionModel.token
 
         if (sessionToken) {
             payload.headers["Authorization"] = `Bearer ${sessionToken}`
@@ -95,7 +104,7 @@ export default class ApiCore extends Core {
         return await this.namespaces[namepace].httpInterface(payload, ...args)
     }
 
-    request = (namespace = "main", method, endpoint, ...args) => {
+    request(namespace = "main", method, endpoint, ...args) {
         if (!this.namespaces[namespace]) {
             throw new Error(`Namespace ${namespace} not found`)
         }
@@ -111,7 +120,7 @@ export default class ApiCore extends Core {
         return this.namespaces[namespace].endpoints[method][endpoint](...args)
     }
 
-    withEndpoints = (namespace = "main") => {
+    withEndpoints(namespace = "main") {
         if (!this.namespaces[namespace]) {
             throw new Error(`Namespace ${namespace} not found`)
         }
@@ -119,7 +128,7 @@ export default class ApiCore extends Core {
         return this.namespaces[namespace].endpoints
     }
 
-    handleBeforeRequest = async (request) => {
+    async handleBeforeRequest(request) {
         if (this.onExpiredExceptionEvent) {
             if (this.excludedExpiredExceptionURL.includes(request.url)) return
 
@@ -132,19 +141,21 @@ export default class ApiCore extends Core {
         }
     }
 
-    handleRegenerationEvent = async (refreshToken, makeRequest) => {
+    async handleRegenerationEvent(refreshToken, makeRequest) {
         window.app.eventBus.emit("session.expiredExceptionEvent", refreshToken)
 
         this.onExpiredExceptionEvent = true
 
-        const expiredToken = await Session.token
-
-        // exclude regeneration endpoint
+        const expiredToken = await SessionModel.token
 
         // send request to regenerate token
-        const response = await this.request("main", "post", "regenerateSessionToken", {
-            expiredToken: expiredToken,
-            refreshToken,
+        const response = await this.customRequest("main", {
+            method: "POST",
+            url: "/session/regenerate",
+            data: {
+                expiredToken: expiredToken,
+                refreshToken,
+            }
         }).catch((error) => {
             console.error(`Failed to regenerate token: ${error.message}`)
             return false
@@ -155,7 +166,7 @@ export default class ApiCore extends Core {
         }
 
         // set new token
-        Session.token = response.token
+        SessionModel.token = response.token
 
         //this.namespaces["main"].internalAbortController.abort()
 
@@ -165,18 +176,18 @@ export default class ApiCore extends Core {
         window.app.eventBus.emit("session.regenerated")
     }
 
-    attachBridge = (key, params) => {
+    attachBridge(key, params) {
         return this.namespaces[key] = this.createBridge(params)
     }
 
-    detachBridge = (key) => {
+    detachBridge(key) {
         return delete this.namespaces[key]
     }
 
     createBridge(params = {}) {
         const getSessionContext = async () => {
             const obj = {}
-            const token = await Session.token
+            const token = await SessionModel.token
 
             if (token) {
                 // append token to context
@@ -224,7 +235,7 @@ export default class ApiCore extends Core {
 
         const bridge = new Bridge(bridgeOptions)
 
-        // handle main ws events
+        // handle main ws onEvents
         const mainWSSocket = bridge.wsInterface.sockets["main"]
 
         mainWSSocket.on("authenticated", () => {
@@ -236,16 +247,23 @@ export default class ApiCore extends Core {
         })
 
         mainWSSocket.on("connect", () => {
-            this.ctx.eventBus.emit(`api.ws.main.connect`)
+            if (this.ctx.eventBus) {
+                this.ctx.eventBus.emit(`api.ws.main.connect`)
+            }
+
             this.autenticateWS(mainWSSocket)
         })
 
         mainWSSocket.on("disconnect", (...context) => {
-            this.ctx.eventBus.emit(`api.ws.main.disconnect`, ...context)
+            if (this.ctx.eventBus) {
+                this.ctx.eventBus.emit(`api.ws.main.disconnect`, ...context)
+            }
         })
 
         mainWSSocket.on("connect_error", (...context) => {
-            this.ctx.eventBus.emit(`api.ws.main.connect_error`, ...context)
+            if (this.ctx.eventBus) {
+                this.ctx.eventBus.emit(`api.ws.main.connect_error`, ...context)
+            }
         })
 
         // generate functions
@@ -256,8 +274,8 @@ export default class ApiCore extends Core {
         return bridge
     }
 
-    autenticateWS = async (socket) => {
-        const token = await Session.token
+    async autenticateWS(socket) {
+        const token = await SessionModel.token
 
         if (token) {
             socket.emit("authenticate", {

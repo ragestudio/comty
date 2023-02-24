@@ -6,20 +6,22 @@ import SessionModel from "models/session"
 export default class PermissionsCore extends Core {
     static namespace = "permissions"
     static dependencies = ["api"]
-    static public = ["hasAdmin", "checkUserIdIsSelf", "hasPermission"]
 
-    userData = null
-    isUserAdmin = null
+    public = {
+        hasAdmin: this.hasAdmin,
+        checkUserIdIsSelf: this.checkUserIdIsSelf,
+        hasPermission: this.hasPermission,
+    }
 
-    hasAdmin = async () => {
+    async hasAdmin() {
         return await UserModel.hasAdmin()
     }
 
-    checkUserIdIsSelf = (userId) => {
-        return SessionModel.user_id === userId
+    checkUserIdIsSelf(user_id) {
+        return SessionModel.user_id === user_id
     }
 
-    hasPermission = async (permission) => {
+    async hasPermission(permission) {
         let query = []
 
         if (Array.isArray(permission)) {
