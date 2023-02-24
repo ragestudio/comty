@@ -16,19 +16,6 @@
         color: var(--text-color);
     }
 
-    .header {
-        display: inline-flex;
-        flex-direction: row;
-
-        align-items: center;
-
-        font-size: 20px;
-
-        svg {
-            margin: 0 !important;
-        }
-    }
-
     .comment {
         position: relative;
         display: flex;
@@ -59,12 +46,12 @@
             .username {
                 font-size: 14px;
                 font-weight: 600;
-                color: #000;
+                color: var(--text-color);
             }
 
             .timeAgo {
                 font-size: 12px;
-                color: #999;
+                color: rgb(var(--bg_color_4));
                 margin-left: 10px;
             }
         }
@@ -100,11 +87,5 @@
         right: 0;
 
         width: 100%;
-        padding: 30px 5px;
-
-        backdrop-filter: blur(10px);
-        border-radius: 10px;
-
-        background-color: rgba(var(--background-color-accent), 0.6);
     }
 }

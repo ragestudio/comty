@@ -104,12 +104,12 @@ export default (props) => {
     }
 
     const listenEvents = () => {
-        window.app.api.namespaces["main"].listenEvent(`post.new.comment.${props.post_id}`, (comment) => {
+        window.app.cores.api.namespaces["main"].listenEvent(`post.new.comment.${props.post_id}`, (comment) => {
             setComments((comments) => {
                 return [comment, ...comments]
             })
         })
-        window.app.api.namespaces["main"].listenEvent(`post.delete.comment.${props.post_id}`, (comment_id) => {
+        window.app.cores.api.namespaces["main"].listenEvent(`post.delete.comment.${props.post_id}`, (comment_id) => {
             setComments((comments) => {
                 return comments.filter((comment) => comment._id !== comment_id)
             })
@@ -117,8 +117,8 @@ export default (props) => {
     }
 
     const unlistenEvents = () => {
-        window.app.api.namespaces["main"].unlistenEvent(`post.new.comment.${props.post_id}`)
-        window.app.api.namespaces["main"].unlistenEvent(`post.delete.comment.${props.post_id}`)
+        window.app.cores.api.namespaces["main"].unlistenEvent(`post.new.comment.${props.post_id}`)
+        window.app.cores.api.namespaces["main"].unlistenEvent(`post.delete.comment.${props.post_id}`)
     }
 
     React.useEffect(() => {
@@ -143,7 +143,7 @@ export default (props) => {
             return <CommentCard
                 data={comment}
                 onClickDelete={handleCommentDelete}
-                self={app.permissions.checkUserIdIsSelf(comment.user._id)}
+                self={app.cores.permissions.checkUserIdIsSelf(comment.user._id)}
             />
         })
     }
@@ -154,9 +154,9 @@ export default (props) => {
 
     return <div className="comments">
         <div className="header">
-            <h1>
+            <h3>
                 <Icons.MessageSquare /> Comments
-            </h1>
+            </h3>
         </div>
         {renderComments()}
         <div className="commentCreatorWrapper">
