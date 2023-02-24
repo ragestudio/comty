@@ -63,7 +63,7 @@ const SettingItem = (props) => {
                 return false
             }
         } else {
-            const storagedValue = await window.app.settings.get(item.id)
+            const storagedValue = await window.app.cores.settings.get(item.id)
 
             if (typeof updateValue === "undefined") {
                 updateValue = !storagedValue
@@ -71,7 +71,7 @@ const SettingItem = (props) => {
         }
 
         if (item.storaged) {
-            await window.app.settings.set(item.id, updateValue)
+            await window.app.cores.settings.set(item.id, updateValue)
         }
 
         if (typeof item.emitEvent !== "undefined") {
@@ -111,7 +111,7 @@ const SettingItem = (props) => {
 
     const checkDependsValidation = () => {
         return !Boolean(Object.keys(item.dependsOn).every((key) => {
-            const storagedValue = window.app.settings.get(key)
+            const storagedValue = window.app.cores.settings.get(key)
 
             console.debug(`Checking validation for [${key}] with now value [${storagedValue}]`)
 
@@ -125,7 +125,7 @@ const SettingItem = (props) => {
 
     const settingInitialization = async () => {
         if (item.storaged) {
-            const storagedValue = window.app.settings.get(item.id)
+            const storagedValue = window.app.cores.settings.get(item.id)
             setValue(storagedValue)
         }
 
@@ -243,6 +243,13 @@ const SettingItem = (props) => {
 
     item.props["disabled"] = disabled
 
+    const elementsCtx = {
+        currentValue: value,
+        dispatchUpdate,
+        onUpdateItem,
+        ...props.ctx,
+    }
+
     return <div key={item.id} className="settingItem">
         <div className="header">
             <div className="title">
@@ -264,17 +271,27 @@ const SettingItem = (props) => {
             {item.extraActions &&
                 <div className="extraActions">
                     {item.extraActions.map((action, index) => {
-                        return <div>
-                            <antd.Button
-                                key={action.id}
-                                id={action.id}
-                                onClick={action.onClick}
-                                icon={action.icon && createIconRender(action.icon)}
-                                type={action.type ?? "round"}
-                            >
-                                {action.title}
-                            </antd.Button>
-                        </div>
+                        if (typeof action === "function") {
+                            return React.createElement(action, {
+                                ctx: elementsCtx,
+                            })
+                        }
+
+                        const handleOnClick = () => {
+                            if (action.onClick) {
+                                action.onClick(elementsCtx)
+                            }
+                        }
+
+                        return <antd.Button
+                            key={action.id}
+                            id={action.id}
+                            onClick={handleOnClick}
+                            icon={action.icon && createIconRender(action.icon)}
+                            type={action.type ?? "round"}
+                        >
+                            {action.title}
+                        </antd.Button>
                     })}
                 </div>
             }
@@ -286,12 +303,7 @@ const SettingItem = (props) => {
                         ? <div> Loading... </div>
                         : React.createElement(SettingComponent, {
                             ...item.props,
-                            ctx: {
-                                currentValue: value,
-                                dispatchUpdate,
-                                onUpdateItem,
-                                ...props.ctx,
-                            }
+                            ctx: elementsCtx
                         })}
             </div>
 
