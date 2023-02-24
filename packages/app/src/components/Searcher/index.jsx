@@ -5,6 +5,8 @@ import classnames from "classnames"
 import { UserPreview } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
+import FeedModel from "models/feed"
+
 import "./index.less"
 
 const ResultRenders = {
@@ -88,7 +90,7 @@ export default (props) => {
             return setSearchResult(null)
         }
 
-        const result = await app.searchEngine.search(value)
+        const result = await FeedModel.search(value)
 
         return setSearchResult(result)
     }
@@ -105,11 +107,11 @@ export default (props) => {
     const handleResultClick = (type, value) => {
         switch (type) {
             case "users": {
-                app.goToAccount(value.username)
+                app.navigation.goToAccount(value.username)
                 break
             }
             case "posts": {
-                app.goToPost(value)
+                app.navigation.goToPost(value)
                 break
             }
 
