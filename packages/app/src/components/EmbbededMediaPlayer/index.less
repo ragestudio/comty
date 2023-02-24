@@ -5,58 +5,162 @@
     right: 0;
     bottom: 0;
 
-    margin: 50px;
+    display: flex;
+    flex-direction: row;
 
-    .cover {
-        position: relative;
-        z-index: 310;
+    align-items: center;
+    justify-content: center;
 
-        width: 100%;
-        height: 200px;
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-        border-radius: 10px;
+    width: 270px;
+    height: fit-content;
 
-        transition: all 0.3s ease-in-out;
+    margin: 40px;
+
+    border-radius: 12px;
+
+    &.hovering {
+        .actions_wrapper {
+            .actions {
+                opacity: 1;
+                transform: translate(-90%, 0);
+            }
+        }
+
+        .minimize_btn {
+            opacity: 1;
+        }
+    }
+
+    .actions_wrapper {
+        display: flex;
+
+        flex-direction: column;
+        align-items: center;
+
+        z-index: 300;
+
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        height: 96%;
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: 60px;
+            height: fit-content;
+
+            padding: 10px 8px 10px 5px;
+
+            background-color: rgba(var(--bg_color_2), 0.3);
+
+            transform: translate(-25%, 0);
+
+            border-radius: 12px 0 0 12px;
+
+            opacity: 0.5;
+
+            transition: all 150ms ease-in-out;
+
+            .ant-btn {
+                margin-bottom: 20px;
+
+                svg {
+                    margin: 0 !important;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+
+    .minimize_btn {
+        position: absolute;
+
+        z-index: 330;
+
+        top: 0;
+        left: 0;
+        
+        opacity: 0;
+
+        transition: all 150ms ease-in-out;
+
+        transform: translate(60%, 60%);
+
+        .ant-btn {
+            background-color: var(--background-color-accent);
+            
+            svg {
+                margin: 0 !important;
+            }
+        }
     }
 
     .player {
         position: relative;
-        z-index: 320;
+        z-index: 310;
 
         display: inline-flex;
         flex-direction: column;
 
-        min-width: 250px;
-        max-width: 250px;
+        align-items: flex-start;
+        justify-content: center;
+
+        width: 100%;
+        height: 100%;
 
         padding: 10px;
-        padding-bottom: 40px;
 
         border-radius: 8px;
 
         background-color: var(--background-color-accent);
-
-        align-items: flex-start;
-        justify-content: center;
 
         // animate in from bottom to top
         animation: fadeIn 150ms ease-out forwards;
 
         transition: all 150ms ease-out;
 
-        transform: translate(0, 20px);
-
         box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+
+        .cover {
+            z-index: 320;
+
+            width: 100%;
+            height: 250px;
+            min-height: 250px;
+
+            border-radius: 10px;
+
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+
+            transition: all 0.3s ease-in-out;
+
+            img {
+                width: 100%;
+                height: 100%;
+
+                object-fit: cover;
+                object-position: center;
+            }
+        }
 
         .header {
             display: flex;
             flex-direction: row;
 
-            width: 100%;
+            margin: 15px 0;
 
-            margin-bottom: 15px;
+            width: 100%;
 
             .info {
                 display: flex;
@@ -115,7 +219,7 @@
             display: inline-flex;
 
             align-items: center;
-            justify-content: center;
+            justify-content: space-evenly;
 
             width: 100%;
 
@@ -124,9 +228,9 @@
                 margin: 0 !important;
             }
 
-            justify-content: space-evenly;
 
             .muteButton {
+                padding: 10px;
                 svg {
                     font-size: 1rem;
                 }
@@ -135,23 +239,23 @@
     }
 
     .status {
-        position: relative;
         z-index: 330;
 
         display: flex;
         flex-direction: column;
 
-        width: 100%;
+        align-items: center;
+        justify-content: center;
+
+        align-self: center;
+
+        width: 90%;
+
         height: fit-content;
 
-        padding: 10px;
-
-        background-color: var(--background-color-accent);
+        margin: 20px 0 10px 0;
 
         border-radius: 8px;
-
-        // create box shadow only top of the player
-        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
         .progress {
             width: 100%;
@@ -177,6 +281,47 @@
         span {
             color: var(--text-color);
         }
+    }
+
+    .bpmTicker {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        width: 30px;
+        height: 30px;
+
+        border-radius: 50%;
+
+        background-color: var(--background-color-contrast);
+
+        transform: translate(-50%, -50%);
+
+        &.pulse {
+            animation: pulseBPM;
+            animation-iteration-count: infinite;
+            animation-fill-mode: forwards;
+
+            animation-duration: 1s;
+        }
+    }
+}
+
+@keyframes pulseBPM {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
     }
 }
 
