@@ -107,7 +107,7 @@ export default () => {
     const [apiNamespacesKeys, setApiNamespacesKeys] = React.useState([])
 
     const loadData = () => {
-        const apiNamespaces = app.api.namespaces
+        const apiNamespaces = app.cores.api.namespaces
 
         setApiNamespacesKeys(Object.keys(apiNamespaces))
 
@@ -115,7 +115,7 @@ export default () => {
     }
 
     const generateEndpointsMapTabs = (apiNamespaceKey) => {
-        const endpoints = app.api.namespaces[apiNamespaceKey].endpoints
+        const endpoints = app.cores.api.namespaces[apiNamespaceKey].endpoints
 
         return Object.keys(endpoints).map((method, index) => {
             return <antd.Tabs
