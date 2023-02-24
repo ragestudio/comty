@@ -5,8 +5,10 @@ import SyncModel from "models/sync"
 // TODO: Make logout button require a valid session to be not disabled
 
 export default {
+    id: "sync",
     icon: "MdSync",
     label: "Sync",
+    group: "advanced",
     ctxData: async () => {
         const spotifyAccount = await SyncModel.spotifyCore.getData().catch((err) => {
             return null

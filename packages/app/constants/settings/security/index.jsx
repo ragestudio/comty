@@ -1,11 +1,14 @@
 import React from "react"
 import loadable from "@loadable/component"
+import AuthModel from "models/auth"
 
 // TODO: Make logout button require a valid session to be not disabled
 
 export default {
+    id: "security",
     icon: "Shield",
     label: "Security",
+    group: "basic",
     settings: [
         {
             "id": "change-password",
@@ -39,7 +42,9 @@ export default {
             "icon": "LogOut",
             "title": "Logout",
             "description": "Logout from your account",
-            "emitEvent": "session.logout",
+            onUpdate: async () => {
+                await AuthModel.logout()
+            }
         }
     ]
 }
