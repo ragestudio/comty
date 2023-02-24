@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 
+import AuthModel from "models/auth"
 import config from "config"
 
 import "./index.less"
@@ -80,17 +81,16 @@ export default class Login extends React.Component {
         this.clearError()
         this.toogleLoading(true)
 
-        this.props.sessionController.login(payload, (error, response) => {
+        const loginProcess = await AuthModel.login(payload).catch((error) => {
             this.toogleLoading(false)
+            this.onError(error)
 
-            if (error) {
-                return this.onError(error)
-            } else {
-                if (response.status === 200) {
-                    this.onDone()
-                }
-            }
+            return false
         })
+
+        if (loginProcess) {
+            this.onDone()
+        }
     }
 
     onDone = () => {
