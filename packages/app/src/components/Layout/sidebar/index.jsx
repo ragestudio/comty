@@ -1,29 +1,40 @@
 import React from "react"
-import { Menu, Avatar, Button } from "antd"
+import { Menu, Avatar, Button, Dropdown } from "antd"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 
 import config from "config"
 import { Icons, createIconRender } from "components/Icons"
 
-import sidebarItems from "schemas/routes.json"
+import sidebarItems from "schemas/sidebar"
 
 import "./index.less"
 
 const onClickHandlers = {
-	settings: (event) => {
-		window.app.openSettings()
+	settings: () => {
+		window.app.navigation.goToSettings()
 	},
+	notifications: () => {
+		window.app.controls.openNotifications()
+	},
+	search: () => {
+		window.app.controls.openSearcher()
+	},
+	create: () => {
+		window.app.controls.openCreator()
+	},
+	account: () => {
+		window.app.navigation.goToAccount()
+	},
+	login: () => {
+		window.app.navigation.goAuth()
+	}
 }
 
 const getSidebarComponents = () => {
 	const items = {}
 
 	sidebarItems.forEach((item, index) => {
-		if (!item.reachable) {
-			return
-		}
-
 		items[item.id] = {
 			...item,
 			index,
@@ -103,9 +114,9 @@ export default class Sidebar extends React.Component {
 		this.controller = window.app["SidebarController"] = {
 			toggleVisibility: this.toggleVisibility,
 			toggleElevation: this.toggleElevation,
-			toggleCollapse: this.toggleCollapse,
+			toggleCollapse: this.toggleExpanded,
 			isVisible: () => this.state.visible,
-			isCollapsed: () => this.state.collapsed,
+			isExpanded: () => this.state.expanded,
 			setCustomRender: this.setRender,
 			closeCustomRender: this.closeRender,
 		}
@@ -113,7 +124,7 @@ export default class Sidebar extends React.Component {
 		this.state = {
 			visible: false,
 			elevated: false,
-			collapsed: window.app.settings.get("collapseOnLooseFocus") ?? false,
+			expanded: false,
 			pathResolvers: null,
 			menus: null,
 
@@ -239,10 +250,8 @@ export default class Sidebar extends React.Component {
 		return window.app.setLocation(`/${e.key}`, 150)
 	}
 
-	toggleCollapse = (to) => {
-		if (!this.state.editMode) {
-			this.setState({ collapsed: to ?? !this.state.collapsed })
-		}
+	toggleExpanded = (to) => {
+		this.setState({ expanded: to ?? !this.state.expanded })
 	}
 
 	toggleVisibility = (to) => {
@@ -256,29 +265,33 @@ export default class Sidebar extends React.Component {
 	onMouseEnter = () => {
 		if (!this.state.visible) return
 
-		if (window.app.settings.is("collapseOnLooseFocus", false)) return
+		if (window.app.cores.settings.is("collapseOnLooseFocus", false)) return
 
 		clearTimeout(this.collapseDebounce)
 
 		this.collapseDebounce = null
 
-		if (this.state.collapsed) {
-			this.toggleCollapse(false)
+		if (!this.state.expanded) {
+			this.toggleExpanded(true)
 		}
 	}
 
 	handleMouseLeave = () => {
 		if (!this.state.visible) return
 
-		if (window.app.settings.is("collapseOnLooseFocus", false)) return
+		if (window.app.cores.settings.is("collapseOnLooseFocus", false)) return
 
-		if (!this.state.collapsed) {
-			this.collapseDebounce = setTimeout(() => { this.toggleCollapse(true) }, window.app.settings.get("autoCollapseDelay") ?? 500)
+		if (this.state.expanded) {
+			this.collapseDebounce = setTimeout(() => {
+				this.toggleExpanded(false)
+			}, window.app.cores.settings.get("autoCollapseDelay") ?? 500)
 		}
 	}
 
 	render() {
 		if (!this.state.menus) return null
+
+		const defaultSelectedKey = window.location.pathname.replace("/", "")
 
 		return <div
 			onMouseEnter={this.onMouseEnter}
@@ -288,9 +301,9 @@ export default class Sidebar extends React.Component {
 					"app_sidebar",
 					{
 						["customRender"]: this.state.customRender,
-						["floating"]: window.app?.settings.get("sidebar.floating"),
+						["floating"]: window.app?.cores.settings.get("sidebar.floating"),
 						["elevated"]: this.state.visible && this.state.elevated,
-						["collapsed"]: this.state.visible && this.state.collapsed,
+						["expanded"]: this.state.visible && this.state.expanded,
 						["hidden"]: !this.state.visible,
 					}
 				)
@@ -310,30 +323,30 @@ export default class Sidebar extends React.Component {
 			{
 				!this.state.customRender && <>
 					<div className="app_sidebar_header">
-						<div className={classnames("app_sidebar_header_logo", { ["collapsed"]: this.state.collapsed })}>
-							<img src={this.state.collapsed ? config.logo?.alt : config.logo?.full} />
+						<div className="app_sidebar_header_logo">
+							<img src={config.logo?.alt} />
 						</div>
 					</div>
 
 					<div key="menu" className="app_sidebar_menu_wrapper">
-						<Menu selectable={true} mode="inline" onClick={this.handleClick}>
+						<Menu
+							selectable={true}
+							mode="inline"
+							onClick={this.handleClick}
+							defaultSelectedKeys={[defaultSelectedKey]}
+						>
 							{this.renderMenuItems(this.state.menus)}
 						</Menu>
 					</div>
 
 					<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
 						<Menu selectable={false} mode="inline" onClick={this.handleClick}>
-							<Menu.Item key="search" icon={<Icons.Search />} override_event="app.openSearcher" >
+							<Menu.Item key="search" icon={<Icons.Search />} >
 								<Translation>
 									{(t) => t("Search")}
 								</Translation>
 							</Menu.Item>
-							<Menu.Item key="create" icon={<Icons.PlusCircle />} override_event="app.openCreator" >
-								<Translation>
-									{(t) => t("Create")}
-								</Translation>
-							</Menu.Item>
-							<Menu.Item key="notifications" icon={<Icons.Bell />} override_event="app.openNotifications">
+							<Menu.Item key="notifications" icon={<Icons.Bell />}>
 								<Translation>
 									{t => t("Notifications")}
 								</Translation>
@@ -344,9 +357,47 @@ export default class Sidebar extends React.Component {
 								</Translation>
 							</Menu.Item>
 							{
-								app.userData && <Menu.Item key="account" className="user_avatar">
-									<Avatar shape="square" src={app.userData?.avatar} />
-								</Menu.Item>
+								app.userData && <Dropdown
+									trigger={["click"]}
+									menu={{
+										items: [
+											{
+												id: "profile",
+												label: <>
+													<Icons.User />
+													<Translation>
+														{t => t("Profile")}
+													</Translation>
+												</>,
+												onClick: () => {
+													window.app.navigation.goToAccount()
+												}
+											},
+											{
+												type: "divider",
+											},
+											{
+												id: "logout",
+												label: <>
+													<Icons.LogOut />
+													<Translation>
+														{t => t("Logout")}
+													</Translation>
+												</>,
+											}
+										]
+									}}
+								>
+									<Menu.Item
+										key="account"
+										className="user_avatar"
+										onDoubleClick={() => {
+											window.app.navigation.goToAccount()
+										}}
+									>
+										<Avatar shape="square" src={app.userData?.avatar} />
+									</Menu.Item>
+								</Dropdown>
 							}
 							{
 								!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>

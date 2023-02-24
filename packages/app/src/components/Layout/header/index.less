@@ -1,32 +1,31 @@
-@import "theme/index.less";
+.page_header {
+    position: sticky;
 
-.app_header {
-	user-select: none;
-	--webkit-user-select: none;
+    z-index: 100;
 
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	z-index: 100;
+    top: 0;
+    left: 0;
 
-	height: @app_header_height  !important;
-	padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
 
-	transition: all ease-in-out 150ms;
+    overflow: hidden;
 
-	background-color: transparent;
-	background: transparent !important;
+    // hidden values
+    padding: 0;
+    opacity: 0;
+    height: 0px;
+    width: 100%;
 
-	border-bottom: 1px var(--border-color) solid;
+    transition: all 150ms ease-in-out;
 
-	>div {
-		margin-right: 16px;
-	}
+    backdrop-filter: blur(10px);
 
-	&.hidden {
-		opacity: 0;
-		height: 0 !important;
-		padding: 0 !important;
-		border: 0 !important;
-	}
+    &.visible {
+        opacity: 1;
+        height: 50px;
+        padding: 20px;
+    }
 }

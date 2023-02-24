@@ -1,49 +1,27 @@
 import React from "react"
-import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { AppSearcher } from "components"
 import classnames from "classnames"
 
 import "./index.less"
 
-export default class Header extends React.Component {
-	controller = window.app["HeaderController"] = {
-		toggleVisibility: (to) => {
-			if (window.isMobile) {
-				to = true
-			}
+export default (props) => {
+    const [visible, setVisible] = React.useState(false)
 
-			this.setState({ visible: to ?? !this.state.visible })
-		},
-		isVisible: () => this.state.visible,
-	}
+    const headerInterface = {
+        toggle: (to) => setVisible((prevValue) => to ?? !prevValue),
+    }
 
-	state = {
-		visible: false, // set by default to create an animation
-	}
+    React.useEffect(() => {
+        app.layout.header = headerInterface
+    }, [])
 
-	componentDidMount = async () => {
-		setTimeout(() => {
-			this.controller.toggleVisibility(true)
-		}, 100)
-	}
-
-	render() {
-		return (
-			<antd.Layout.Header className={classnames(`app_header`, { ["hidden"]: !window.isMobile && !this.state.visible })}>
-				<div>
-					<antd.Button
-						onClick={window.app.openCreateNew}
-						type="primary"
-						shape="circle"
-						icon={<Icons.Plus style={{ margin: 0 }} />}
-					/>
-				</div>
-				{!window.isMobile &&
-					<div>
-						<AppSearcher />
-					</div>}
-			</antd.Layout.Header>
-		)
-	}
+    return <div
+        className={classnames(
+            "page_header",
+            {
+                ["visible"]: visible,
+            }
+        )}
+    >
+        {String(window.location.pathname).toTitleCase()}
+    </div>
 }

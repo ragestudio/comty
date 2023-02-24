@@ -3,12 +3,12 @@ import { Icons, createIconRender } from "components/Icons"
 import { SelectableList } from "components"
 import { List } from "antd"
 
-import sidebarItems from "schemas/routes.json"
+import sidebarItems from "schemas/sidebar"
 
 import "./index.less"
 
 const getStoragedKeys = () => {
-	return window.app.settings.get("sidebarKeys") ?? []
+	return window.app.cores.settings.get("sidebarKeys") ?? []
 }
 
 const getAllItems = () => {

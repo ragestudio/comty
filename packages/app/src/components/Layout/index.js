@@ -1,6 +1,6 @@
 export { default as BottomBar } from "./bottomBar"
-export { default as Header } from "./header"
 export { default as Drawer } from "./drawer"
 export { default as Sidebar } from "./sidebar"
 export { default as Sidedrawer } from "./sidedrawer"
 export { default as Modal } from "./modal"
+export { default as Header } from "./header"
