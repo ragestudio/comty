@@ -2,6 +2,7 @@ const path = require("path")
 const { builtinModules } = require("module")
 
 const aliases = {
+    "node:buffer": "buffer",
     "~": __dirname,
     "~/": `${path.resolve(__dirname, "src")}/`,
     "@src": path.join(__dirname, "src"),
@@ -24,6 +25,11 @@ module.exports = (config = {}) => {
     if (!config.server) {
         config.server = {}
     }
+
+    // config.define = {
+    //     "global.Uint8Array": "Uint8Array",
+    //     "process.env.NODE_DEBUG": false,
+    // }
 
     config.resolve.alias = aliases
     config.server.port = process.env.listenPort ?? 8000
