@@ -1,4 +1,3 @@
-@import "antd/dist/antd.variable.less";
 @import "theme/animations.less";
 @import "theme/vars.less";
 @import "theme/fonts.css";
@@ -12,6 +11,53 @@ html {
 
 	background-color: var(--background-color-primary) !important;
 
+	padding: 0;
+	margin: 0;
+
+	::-webkit-scrollbar {
+		display: none;
+
+		width: 0;
+		height: 0;
+		z-index: 0;
+	}
+
+	::-webkit-scrollbar-thumb {
+		position: absolute;
+		z-index: 200;
+
+		height: 6px;
+		margin: 5px 10px 5px 5px;
+		transition: all 200ms ease-in-out;
+
+		border: 4px solid rgba(var(--background-color-contrast), 1);
+		background-color: rgba(var(--background-color-contrast), 1);
+		background-clip: padding-box;
+
+		-webkit-border-radius: 7px;
+	}
+
+	::-webkit-scrollbar-button {
+		width: 0;
+		height: 0;
+		display: none;
+	}
+
+	::-webkit-scrollbar-corner {
+		background-color: transparent;
+	}
+
+	-webkit-overflow-scrolling: touch;
+
+	a {
+		color: var(--colorPrimary);
+		text-decoration: none;
+
+		&:hover {
+			color: var(--colorPrimary);
+		}
+	}
+
 	h1,
 	h2,
 	h3,
@@ -21,6 +67,7 @@ html {
 	p,
 	span {
 		color: var(--text-color);
+		text-rendering: optimizeLegibility !important;
 	}
 
 	svg {
@@ -35,6 +82,9 @@ html {
 		-webkit-app-region: no-drag;
 
 		height: 100%;
+
+		padding: 0;
+		margin: 0;
 
 		user-select: none;
 		--webkit-user-select: none;
@@ -53,42 +103,7 @@ html {
 		/* disable the IOS popup when long-press on a link */
 	}
 
-	::-webkit-scrollbar {
-		display: none;
-
-		width: 0;
-		height: 0;
-		z-index: 0;
-	}
-
-	::-webkit-scrollbar-thumb {
-		position: absolute;
-		z-index: 200;
-
-		height: 6px;
-		margin: 5px 10px 5px 5px;
-		transition: all 200ms ease-in-out;
-
-		border: 4px solid rgba(0, 0, 0, 0);
-		background-color: rgba(0, 0, 0, 0.15);
-		background-clip: padding-box;
-
-		-webkit-border-radius: 7px;
-	}
-
-	::-webkit-scrollbar-button {
-		width: 0;
-		height: 0;
-		display: none;
-	}
-
-	::-webkit-scrollbar-corner {
-		background-color: transparent;
-	}
-
 	#root {
-		-webkit-overflow-scrolling: touch;
-
 		position: fixed;
 		overflow: hidden;
 
@@ -98,12 +113,26 @@ html {
 		background-color: var(--layoutBackgroundColor) !important;
 
 		&.electron {
-			.layout_page {
+			.page_layout {
 				padding-top: 35px;
 			}
 
 			.ant-layout-sider {
 				padding-top: 0px;
+			}
+		}
+
+		&.centered_content {
+			.content_layout {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+
+				.page_layout {
+					width: 60%;
+					height: 95vh;
+				}
 			}
 		}
 	}
@@ -115,7 +144,7 @@ html {
 
 		.bar {
 			height: 2px;
-			background: #48acf0;
+			background: var(--app-color);
 		}
 	}
 }
@@ -165,11 +194,15 @@ html {
 	position: relative;
 	-webkit-overflow-scrolling: touch;
 
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+
 	height: 100%;
 	width: 100%;
-	max-height: 100vh;
 
-	padding: 10px;
+	max-height: 100vh;
 
 	overflow-x: hidden;
 	overflow-y: overlay;
@@ -182,16 +215,23 @@ html {
 	background-color: transparent;
 
 	&.floating-sidebar {
-		margin-left: @app_sidebar_collapsed_width;
+		margin-left: @app_sidebar_width;
+	}
+
+	.page_layout {
+		width: 100%;
 	}
 }
 
-.app_background_decorator {
+.root_background {
+	mask-image: var(--backgroundSVG);
+	-webkit-mask-image: var(--backgroundSVG);
+
 	background-image: var(--backgroundImage);
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
+	background-size: var(--backgroundSize);
+	background-position: var(--backgroundPosition);
+	background-repeat: var(--backgroundRepeat);
+	background-attachment: var(--backgroundAttachment);
 
 	position: absolute;
 	top: 0;
@@ -200,7 +240,18 @@ html {
 	width: 100vw;
 	height: 100vh;
 
-	transition: all 150ms ease-in-out;
+	transition: background-image, background-size, background-position, background-repeat, background-attachment all 150ms ease-in-out;
+
+	pointer-events: none;
+
+	&.active {
+		background-color: var(--text-color);
+	}
+
+	svg {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 .app_render_error {
@@ -232,6 +283,9 @@ html {
 	backdrop-filter: blur(10px);
 	--webkit-backdrop-filter: blur(10px);
 
+	background-color: #252525;
+	color: #d7d7d7;
+
 	width: 100%;
 	height: 100%;
 	z-index: 1000;
@@ -247,12 +301,17 @@ html {
 	}
 
 	svg {
-		color: var(--text-color) !important;
+		color: rgb(215, 215, 215) !important;
+	}
+
+	&.fade-away {
+		opacity: 0;
+		transition: all 300ms ease-in-out;
 	}
 
 	.splash_logo {
-		width: 200px;
-		height: 200px;
+		width: 100px;
+		height: 100px;
 
 		display: flex;
 		flex-direction: column;
@@ -291,7 +350,7 @@ html {
 
 		height: 300px;
 
-		img {
+		#powered_by {
 			height: 40px;
 			margin-bottom: 10px;
 		}
@@ -305,7 +364,7 @@ html {
 }
 
 @media (max-width: 768px) {
-	.layout_page {
+	.page_layout {
 		padding: 10px;
 		margin: 0;
 	}
