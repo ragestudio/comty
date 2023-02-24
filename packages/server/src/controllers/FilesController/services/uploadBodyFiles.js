@@ -77,7 +77,10 @@ export default async (payload) => {
         }
     }
 
-    let failed = []
+    const processedFiles = []
+    const failedFiles = []
+
+    let queuePromieses = []
 
     // check directories exist
     if (!fs.existsSync(params.cacheUploadDir)) {
@@ -99,10 +102,10 @@ export default async (payload) => {
         filter: (stream) => {
             // check if is allowed mime type
             if (!params.acceptedMimeTypes.includes(stream.mimetype)) {
-                failed.push({
-                    fileName: file.originalFilename,
-                    mimetype: file.mimetype,
-                    error: "mimetype not allowed",
+                failedFiles.push({
+                    fileName: stream.originalFilename,
+                    mimetype: stream.mimetype,
+                    error: "File type not allowed",
                 })
 
                 return false
@@ -113,11 +116,6 @@ export default async (payload) => {
     })
 
     const results = await new Promise((resolve, reject) => {
-        const processedFiles = []
-        const failedFiles = []
-
-        let queuePromieses = []
-
         // create a new thread for each file
         form.parse(req, async (err, fields, data) => {
             if (err) {
@@ -205,7 +203,11 @@ export default async (payload) => {
                 async (fn) => {
                     const result = await fn().catch((err) => {
                         console.error(err)
-                        failedFiles.push(err)
+
+                        // FIXME: add fileNames
+                        failedFiles.push({
+                            error: err.message,
+                        })
 
                         return null
                     })
@@ -214,7 +216,7 @@ export default async (payload) => {
                         processedFiles.push(result)
                     }
                 },
-                { concurrency: 5 }
+                { concurrency: 10 }
             )
 
             return resolve({
