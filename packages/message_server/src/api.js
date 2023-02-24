@@ -12,7 +12,7 @@ import routes from "./routes"
 const mainAPI = axios.create({
     baseURL: process.env.MAIN_API_URL ?? "http://localhost:3000",
     headers: {
-        "server-token": process.env.SERVER_TOKEN,
+        "server_token": `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
     }
 })
 
@@ -57,53 +57,60 @@ class TextRoomServer {
 
     initializeSocketIO = () => {
         this.io.use(async (socket, next) => {
-            const token = socket.handshake.auth.token
-
-            if (!token) {
-                return next(new Error(`auth:token_missing`))
-            }
-
-            const session = await mainAPI.post("/validate_session", {
-                session: token
-            })
-                .then((res) => {
-                    return res.data
-                })
-                .catch((err) => {
-                    return false
-                })
-
-            if (!session || !session?.valid) {
-                return next(new Error(`auth:token_invalid`))
-            }
-
-            const { data: userData } = await mainAPI.get("/user/public_data", {
-                params: {
-                    username: session.username
-                }
-            }).catch((err) => {
-                return null
-            })
-
-            if (!userData) {
-                return next(new Error(`auth:user_failed`))
-            }
-
             try {
-                // try to decode the token and get the user's username
-                const decodedToken = jwt.decode(token)
+                const token = socket.handshake.auth.token
 
-                socket.userData = userData
-                socket.token = token
-                socket.decodedToken = decodedToken
+                if (!token) {
+                    return next(new Error(`auth:token_missing`))
+                }
+
+                const session = await mainAPI.post("/session/validate", {
+                    session: token
+                })
+                    .then((res) => {
+                        return res.data
+                    })
+                    .catch((err) => {
+                        return false
+                    })
+
+                if (!session || !session?.valid) {
+                    return next(new Error(`auth:token_invalid`))
+                }
+
+                const userData = await mainAPI.get(`/user/${session.user_id}/data`)
+                    .then((res) => {
+                        return res.data
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                        return null
+                    })
+
+                console.log(userData)
+
+                if (!userData) {
+                    return next(new Error(`auth:user_failed`))
+                }
+
+                try {
+                    // try to decode the token and get the user's username
+                    const decodedToken = jwt.decode(token)
+
+                    socket.userData = userData
+                    socket.token = token
+                    socket.decodedToken = decodedToken
+                }
+                catch (err) {
+                    return next(new Error(`auth:decode_failed`))
+                }
+
+                console.log(`[${socket.id}] connected`)
+
+                next()
+            } catch (error) {
+                next(new Error(`auth:authentification_failed`))
             }
-            catch (err) {
-                return next(new Error(`auth:decode_failed`))
-            }
-
-            console.log(`[${socket.id}] connected`)
-
-            next()
         })
 
         this.io.on("connection", (socket) => {
