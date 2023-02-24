@@ -1,13 +1,16 @@
 import React from "react"
 import { Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom"
-import { Skeleton } from "antd"
+import { Skeleton, Button, Result } from "antd"
+import config from "config"
 import loadable from "@loadable/component"
 
-const NotFoundRender = () => {
+import routesDeclaration from "schemas/routes"
+
+const DefaultNotFoundRender = () => {
     return <div>Not found</div>
 }
 
-const LoadingRender = () => {
+const DefaultLoadingRender = () => {
     return <Skeleton active />
 }
 
@@ -19,22 +22,6 @@ const paths = {
 const pathsMobile = {
     ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.jsx"),
     ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.tsx"),
-}
-
-function generateElementWrapper(route, element, bindProps) {
-    return React.createElement((props) => {
-        const params = useParams()
-
-        return React.createElement(
-            loadable(element, {
-                fallback: React.createElement(LoadingRender),
-            }),
-            {
-                ...props,
-                ...bindProps,
-                params: params,
-            })
-    })
 }
 
 const routes = Object.keys(paths).map((route) => {
@@ -63,6 +50,94 @@ const mobileRoutes = Object.keys(pathsMobile).map((route) => {
     }
 })
 
+function generatePageElementWrapper(route, element, bindProps) {
+    return React.createElement((props) => {
+        const params = useParams()
+        const url = new URL(window.location)
+        const query = new Proxy(url, {
+            get: (target, prop) => target.searchParams.get(prop),
+        })
+
+        const routeDeclaration = routesDeclaration.find((layout) => {
+            const routePath = layout.path.replace(/\*/g, ".*").replace(/!/g, "^")
+
+            return new RegExp(routePath).test(route)
+        }) ?? {
+            path: route,
+            useLayout: "default",
+        }
+
+        route = route.replace(/\?.+$/, "").replace(/\/{2,}/g, "/")
+        route = route.replace(/\/$/, "")
+
+        if (routeDeclaration) {
+            if (!bindProps.user && (window.location.pathname !== config.app?.authPath)) {
+                if (!routeDeclaration.public) {
+                    if (typeof window.app.setLocation === "function") {
+                        window.app.setLocation(config.app?.authPath ?? "/login")
+                        return <div />
+                    }
+
+                    window.location.href = config.app?.authPath ?? "/login"
+
+                    return <div />
+                }
+            }
+
+            if (typeof routeDeclaration.requiredRoles !== "undefined") {
+                const isAdmin = bindProps.user?.roles?.includes("admin") ?? false
+
+                if (!isAdmin && !routeDeclaration.requiredRoles.some((role) => bindProps.user?.roles?.includes(role))) {
+                    return <Result
+                        status="403"
+                        title="403"
+                        subTitle="Sorry, you are not authorized to access this page."
+                        extra={<Button type="primary" onClick={() => window.app.setLocation("/")}>Back Home</Button>}
+                    />
+                }
+            }
+
+            if (routeDeclaration.useLayout) {
+                app.layout.set(routeDeclaration.useLayout)
+            }
+
+            // if (routeDeclaration.useHeader === true) {
+            //     app.layout.header?.toggle(true)
+            // } else {
+            //     app.layout.header?.toggle(false)
+            // }
+
+            if (typeof routeDeclaration.useTitle !== "undefined") {
+                if (typeof routeDeclaration.useTitle === "function") {
+                    routeDeclaration.useTitle = routeDeclaration.useTitle(route, params)
+                }
+
+                document.title = `${routeDeclaration.useTitle} - ${config.app.siteName}`
+            } else {
+                document.title = config.app.siteName
+            }
+
+            if (routeDeclaration.centeredContent) {
+                app.layout.toogleCenteredContent(true)
+            } else {
+                app.layout.toogleCenteredContent(false)
+            }
+        }
+
+        return React.createElement(
+            loadable(element, {
+                fallback: React.createElement(bindProps.staticRenders?.PageLoad || DefaultLoadingRender),
+            }),
+            {
+                ...props,
+                ...bindProps,
+                url: url,
+                params: params,
+                query: query,
+            })
+    })
+}
+
 export const PageRender = React.memo((props) => {
     const navigate = useNavigate()
     app.location = useLocation()
@@ -77,7 +152,9 @@ export const PageRender = React.memo((props) => {
                 state = {}
             }
 
-            state.transitionDelay = Number((app.style.getValue("page-transition-duration") ?? "250ms").replace("ms", ""))
+            const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
+
+            state.transitionDelay = Number(transitionDuration.replace("ms", ""))
 
             app.eventBus.emit("router.navigate", to, {
                 state,
@@ -113,11 +190,14 @@ export const PageRender = React.memo((props) => {
                 return <Route
                     key={index}
                     path={route.path}
-                    element={generateElementWrapper(route.path, route.element, props)}
+                    element={generatePageElementWrapper(route.path, route.element, props)}
                     exact
                 />
             })
         }
-        <Route path="*" element={React.createElement(props.staticRenders?.NotFound) ?? <NotFoundRender />} />
+        <Route
+            path="*"
+            element={React.createElement(props.staticRenders?.NotFound || DefaultNotFoundRender)}
+        />
     </Routes>
 })
