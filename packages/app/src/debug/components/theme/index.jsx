@@ -16,7 +16,7 @@ export default class ThemeDebug extends React.Component {
 
     setValues = async () => {
         const currentVariant = document.documentElement.style.getPropertyValue("--themeVariant")
-        const rootVariables = window.app.ThemeController.getRootVariables()
+        const rootVariables = window.app.cores.style.getRootVariables()
 
         this.setState({ currentVariant, rootVariables })
     }
