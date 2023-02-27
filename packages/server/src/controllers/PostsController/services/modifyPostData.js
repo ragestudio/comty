@@ -1,4 +1,4 @@
-import { Post } from "../../../models"
+import { Post } from "@models"
 import getPostData from "./getPostData"
 
 export default async (post_id, modification) => {
@@ -25,7 +25,7 @@ export default async (post_id, modification) => {
     }
 
     global.websocket_instance.io.emit(`post.dataUpdate`, post)
-    global.websocket_instance.io.emit(`post.dataUpdate.${post_id._id}`, post)
+    global.websocket_instance.io.emit(`post.dataUpdate.${post_id}`, post)
 
     return post
 }
