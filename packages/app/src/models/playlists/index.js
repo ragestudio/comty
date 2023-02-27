@@ -1,6 +1,6 @@
 export default class PlaylistsModel {
     static get bridge() {
-        return window.app?.cores.api.withEndpoints("main")
+        return window.app?.cores.api.withEndpoints()
     }
 
     static async uploadTrack(file, payload) {
@@ -22,7 +22,7 @@ export default class PlaylistsModel {
         formData.append("files", file)
 
         // send the request
-        const uploadRequest = await app.cores.api.customRequest("main", {
+        const uploadRequest = await app.cores.api.customRequest( {
             method: "POST",
             url: "/upload",
             data: formData,
@@ -38,7 +38,7 @@ export default class PlaylistsModel {
         const source = uploadRequest.data.files[0].url
 
         // send the request for the track to be created
-        const trackRequest = await app.cores.api.customRequest("main", {
+        const trackRequest = await app.cores.api.customRequest( {
             method: "POST",
             url: "/tracks/publish",
             data: {
@@ -51,7 +51,7 @@ export default class PlaylistsModel {
     }
 
     static async publishTrack(payload) {
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "POST",
             url: "/tracks/publish",
             data: payload,
@@ -61,7 +61,7 @@ export default class PlaylistsModel {
     }
 
     static async publish(payload) {
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "POST",
             url: `/playlist/publish`,
             data: payload,
@@ -71,7 +71,7 @@ export default class PlaylistsModel {
     }
 
     static async getPlaylist(id) {
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "GET",
             url: `/playlist/data/${id}`,
         })
@@ -80,7 +80,7 @@ export default class PlaylistsModel {
     }
 
     static async getMyReleases() {
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "GET",
             url: `/playlist/self`,
         })
@@ -93,7 +93,7 @@ export default class PlaylistsModel {
             throw new Error("Payload is required")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "PUT",
             url: `/tracks/${payload._id}`,
             data: {
@@ -109,7 +109,7 @@ export default class PlaylistsModel {
             throw new Error("Payload is required")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "PUT",
             url: `/playlist/${payload._id}`,
             data: {
@@ -125,7 +125,7 @@ export default class PlaylistsModel {
             throw new Error("ID is required")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "DELETE",
             url: `/playlist/${id}`,
         })

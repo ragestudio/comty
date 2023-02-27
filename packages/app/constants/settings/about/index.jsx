@@ -40,7 +40,7 @@ export default {
         const [serverManifest, setServerManifest] = React.useState(null)
 
         const checkServerVersion = async () => {
-            const serverManifest = await app.cores.api.customRequest("main")
+            const serverManifest = await app.cores.api.customRequest()
 
             setServerManifest(serverManifest.data)
         }

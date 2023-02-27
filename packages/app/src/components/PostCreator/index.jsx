@@ -18,7 +18,7 @@ const DEFAULT_POST_POLICY = {
 }
 
 export default (props) => {
-    const api = window.app.cores.api.withEndpoints("main")
+    const api = window.app.cores.api.withEndpoints()
 
     const creatorRef = React.useRef(null)
 

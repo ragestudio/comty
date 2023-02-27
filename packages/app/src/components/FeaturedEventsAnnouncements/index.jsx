@@ -8,7 +8,7 @@ export default React.memo((props) => {
     const [featuredEvents, setFeaturedEvents] = React.useState([])
 
     const fetchFeaturedEvents = React.useCallback(async () => {
-        let { data } = await app.cores.api.customRequest("main", {
+        let { data } = await app.cores.api.customRequest({
             url: "/featured_events",
             method: "GET"
         }).catch((err) => {

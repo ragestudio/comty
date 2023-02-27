@@ -103,8 +103,7 @@ export default class PostCard extends React.Component {
         app.eventBus.on(`post.${this.state.data._id}.update`, this.onClickEdit)
 
         // first listen to post changes
-        //window.app.cores.api.namespaces["main"].listenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
-        window.app.cores.api.namespaces["main"].listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
+        app.cores.api.listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
 
         this.setState({
             isSelf: app.cores.permissions.checkUserIdIsSelf(this.state.data.user_id),
@@ -117,8 +116,7 @@ export default class PostCard extends React.Component {
         app.eventBus.off(`post.${this.state.data._id}.update`, this.onClickEdit)
 
         // remove the listener
-        //window.app.cores.api.namespaces["main"].unlistenEvent(`post.dataUpdate.${data._id}`, onDataUpdate)
-        window.app.cores.api.namespaces["main"].listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
+        app.cores.api.listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
     }
 
     componentDidCatch = (error, info) => {

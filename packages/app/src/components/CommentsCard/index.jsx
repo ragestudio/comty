@@ -104,12 +104,13 @@ export default (props) => {
     }
 
     const listenEvents = () => {
-        window.app.cores.api.namespaces["main"].listenEvent(`post.new.comment.${props.post_id}`, (comment) => {
+        app.cores.api.listenEvent(`post.new.comment.${props.post_id}`, (comment) => {
             setComments((comments) => {
                 return [comment, ...comments]
             })
         })
-        window.app.cores.api.namespaces["main"].listenEvent(`post.delete.comment.${props.post_id}`, (comment_id) => {
+
+        app.cores.api.listenEvent(`post.delete.comment.${props.post_id}`, (comment_id) => {
             setComments((comments) => {
                 return comments.filter((comment) => comment._id !== comment_id)
             })
@@ -117,8 +118,8 @@ export default (props) => {
     }
 
     const unlistenEvents = () => {
-        window.app.cores.api.namespaces["main"].unlistenEvent(`post.new.comment.${props.post_id}`)
-        window.app.cores.api.namespaces["main"].unlistenEvent(`post.delete.comment.${props.post_id}`)
+        app.cores.api.unlistenEvent(`post.new.comment.${props.post_id}`)
+        app.cores.api.unlistenEvent(`post.delete.comment.${props.post_id}`)
     }
 
     React.useEffect(() => {

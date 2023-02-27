@@ -518,19 +518,7 @@ class ComtyApp extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
-					// get remotes origins from config
-					const defaultRemotes = config.remotes
-
-					// get storaged	remotes origins
-					const storedRemotes = await app.cores.settings.get("remotes") ?? {}
-
-					// mount main api bridge
-					await this.props.cores.ApiCore.attachBridge("main", {
-						origin: storedRemotes.mainApi ?? defaultRemotes.mainApi,
-						locked: true,
-					})
-
-					await this.props.cores.ApiCore.namespaces["main"].initialize()
+					await this.props.cores.ApiCore.attach()
 
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {

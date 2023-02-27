@@ -1,6 +1,6 @@
 export default class FeedModel {
     static get bridge() {
-        return window.app?.cores.api.withEndpoints("main")
+        return window.app?.cores.api.withEndpoints()
     }
 
     static async getPostsFeed({ trim, limit }) {
@@ -8,7 +8,7 @@ export default class FeedModel {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "GET",
             url: `/feed/posts`,
             params: {
@@ -25,7 +25,7 @@ export default class FeedModel {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "GET",
             url: `/feed/playlists`,
             params: {
@@ -42,7 +42,7 @@ export default class FeedModel {
             throw new Error("Bridge is not available")
         }
 
-        const { data } = await app.cores.api.customRequest("main", {
+        const { data } = await app.cores.api.customRequest( {
             method: "GET",
             url: `/search`,
             params: {
