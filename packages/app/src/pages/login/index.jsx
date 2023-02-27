@@ -33,7 +33,7 @@ export default (props) => {
     const [wallpaperData, setWallpaperData] = React.useState(null)
 
     const setRandomWallpaper = async () => {
-        const featuredWallpapers = await app.cores.api.request("main", "get", "featuredWallpapers").catch((err) => {
+        const featuredWallpapers = await app.cores.api.request("get", "featuredWallpapers").catch((err) => {
             console.error(err)
             return []
         })

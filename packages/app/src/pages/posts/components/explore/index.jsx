@@ -92,13 +92,13 @@ export default class ExplorePosts extends React.Component {
         await this.loadPosts()
 
         Object.keys(this.wsEvents).forEach((event) => {
-            window.app.cores.api.namespaces["main"].listenEvent(event, this.wsEvents[event])
+            app.cores.api.listenEvent(event, this.wsEvents[event])
         })
     }
 
     componentWillUnmount = async () => {
         Object.keys(this.wsEvents).forEach((event) => {
-            window.app.cores.api.namespaces["main"].unlistenEvent(event, this.wsEvents[event])
+            app.cores.api.unlistenEvent(event, this.wsEvents[event])
         })
     }
 

@@ -35,12 +35,12 @@ export default (props) => {
         fetchConnectedFriends()
 
         for (const [event, callback] of Object.entries(wsEvents)) {
-            window.app.cores.api.namespaces["main"].listenEvent(event, callback)
+            app.cores.api.listenEvent(event, callback)
         }
 
         return () => {
             for (const [event, callback] of Object.entries(wsEvents)) {
-                window.app.cores.api.namespaces["main"].unlistenEvent(event, callback)
+                app.cores.api.unlistenEvent(event, callback)
             }
         }
     }, [])

@@ -12,7 +12,7 @@ export default class UploadModel {
         formData.append("files", file)
 
         // send the request
-        const uploadRequest = await app.cores.api.customRequest("main", {
+        const uploadRequest = await app.cores.api.customRequest( {
             method: "POST",
             url: "/upload",
             data: formData,

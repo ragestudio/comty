@@ -49,39 +49,54 @@ function generateWSFunctionHandler(socket, type = "listen") {
 
 export default class ApiCore extends Core {
     static namespace = "api"
+    static depends = ["settings"]
 
     excludedExpiredExceptionURL = ["/session/regenerate"]
 
     onExpiredExceptionEvent = false
 
-    namespaces = Object()
+    instance = null
 
     public = {
-        namespaces: this.namespaces,
-        customRequest: this.customRequest,
-        request: this.request,
-        withEndpoints: this.withEndpoints,
-        attachBridge: this.attachBridge,
-        detachBridge: this.detachBridge,
-        createBridge: this.createBridge,
-        autenticateWS: this.autenticateWS,
+        instance: function () {
+            return this.instance
+        }.bind(this),
+        customRequest: this.customRequest.bind(this),
+        request: this.request.bind(this),
+        withEndpoints: this.withEndpoints.bind(this),
+        attach: this.attach.bind(this),
+        createBridge: this.createBridge.bind(this),
+        autenticateWS: this.autenticateWS.bind(this),
+        listenEvent: this.listenEvent.bind(this),
+        unlistenEvent: this.unlistenEvent.bind(this),
+    }
+
+    async attach() {
+        // get remotes origins from config
+        const defaultRemotes = config.remotes
+
+        // get storaged	remotes origins
+        const storedRemotes = await app.cores.settings.get("remotes") ?? {}
+
+        const origin = storedRemotes.mainApi ?? defaultRemotes.mainApi
+
+        this.instance = this.createBridge({
+            origin,
+        })
+
+        await this.instance.initialize()
+
+        console.debug(`[API] Attached to ${origin}`, this.instance)
+
+        return this.instance
     }
 
     async customRequest(
-        namepace = undefined,
         payload = {
             method: "GET",
         },
         ...args
     ) {
-        if (typeof namepace === "undefined") {
-            throw new Error("Namespace must be defined")
-        }
-
-        if (typeof this.namespaces[namepace] === "undefined") {
-            throw new Error("Namespace not found")
-        }
-
         if (typeof payload === "string") {
             payload = {
                 url: payload,
@@ -101,31 +116,15 @@ export default class ApiCore extends Core {
             console.warn("Making a request with no session token")
         }
 
-        return await this.namespaces[namepace].httpInterface(payload, ...args)
+        return await this.instance.httpInterface(payload, ...args)
     }
 
-    request(namespace = "main", method, endpoint, ...args) {
-        if (!this.namespaces[namespace]) {
-            throw new Error(`Namespace ${namespace} not found`)
-        }
-
-        if (!this.namespaces[namespace].endpoints[method]) {
-            throw new Error(`Method ${method} not found`)
-        }
-
-        if (!this.namespaces[namespace].endpoints[method][endpoint]) {
-            throw new Error(`Endpoint ${endpoint} not found`)
-        }
-
-        return this.namespaces[namespace].endpoints[method][endpoint](...args)
+    request(method, endpoint, ...args) {
+        return this.instance.endpoints[method][endpoint](...args)
     }
 
-    withEndpoints(namespace = "main") {
-        if (!this.namespaces[namespace]) {
-            throw new Error(`Namespace ${namespace} not found`)
-        }
-
-        return this.namespaces[namespace].endpoints
+    withEndpoints() {
+        return this.instance.endpoints
     }
 
     async handleBeforeRequest(request) {
@@ -149,7 +148,7 @@ export default class ApiCore extends Core {
         const expiredToken = await SessionModel.token
 
         // send request to regenerate token
-        const response = await this.customRequest("main", {
+        const response = await this.customRequest({
             method: "POST",
             url: "/session/regenerate",
             data: {
@@ -174,14 +173,6 @@ export default class ApiCore extends Core {
 
         // emit event
         window.app.eventBus.emit("session.regenerated")
-    }
-
-    attachBridge(key, params) {
-        return this.namespaces[key] = this.createBridge(params)
-    }
-
-    detachBridge(key) {
-        return delete this.namespaces[key]
     }
 
     createBridge(params = {}) {
@@ -236,51 +227,74 @@ export default class ApiCore extends Core {
         const bridge = new Bridge(bridgeOptions)
 
         // handle main ws onEvents
-        const mainWSSocket = bridge.wsInterface.sockets["main"]
+        const mainSocket = bridge.wsInterface.sockets["main"]
 
-        mainWSSocket.on("authenticated", () => {
+        mainSocket.on("authenticated", () => {
             console.debug("[WS] Authenticated")
         })
 
-        mainWSSocket.on("authenticateFailed", (error) => {
+        mainSocket.on("authenticateFailed", (error) => {
             console.error("[WS] Authenticate Failed", error)
         })
 
-        mainWSSocket.on("connect", () => {
+        mainSocket.on("connect", () => {
             if (this.ctx.eventBus) {
                 this.ctx.eventBus.emit(`api.ws.main.connect`)
             }
 
-            this.autenticateWS(mainWSSocket)
+            console.debug("[WS] Connected, authenticating...")
+
+            this.autenticateWS(mainSocket)
         })
 
-        mainWSSocket.on("disconnect", (...context) => {
+        mainSocket.on("disconnect", (...context) => {
             if (this.ctx.eventBus) {
                 this.ctx.eventBus.emit(`api.ws.main.disconnect`, ...context)
             }
         })
 
-        mainWSSocket.on("connect_error", (...context) => {
+        mainSocket.on("connect_error", (...context) => {
             if (this.ctx.eventBus) {
                 this.ctx.eventBus.emit(`api.ws.main.connect_error`, ...context)
             }
         })
 
-        // generate functions
-        bridge.listenEvent = generateWSFunctionHandler(bridge.wsInterface, "listen")
-        bridge.unlistenEvent = generateWSFunctionHandler(bridge.wsInterface, "unlisten")
+        mainSocket.onAny((event, ...args) => {
+            console.debug(`[WS] Recived Event (${event})`, ...args)
+        })
 
-        // return bridge
+        // mainSocket.onAnyOutgoing((event, ...args) => {
+        //     console.debug(`[WS] Sent Event (${event})`, ...args)
+        // })
+
         return bridge
+    }
+
+    listenEvent(event, callback) {
+        if (!this.instance.wsInterface) {
+            throw new Error("API is not attached")
+        }
+
+        return this.instance.wsInterface.sockets["main"].on(event, callback)
+    }
+
+    unlistenEvent(event, callback) {
+        if (!this.instance.wsInterface) {
+            throw new Error("API is not attached")
+        }
+
+        return this.instance.wsInterface.sockets["main"].off(event, callback)
     }
 
     async autenticateWS(socket) {
         const token = await SessionModel.token
 
-        if (token) {
-            socket.emit("authenticate", {
-                token,
-            })
+        if (!token) {
+            return console.error("Failed to authenticate WS, no token found")
         }
+
+        socket.emit("authenticate", {
+            token,
+        })
     }
 }
