@@ -1,5 +1,5 @@
 import momentTimezone from "moment-timezone"
-import { Post } from "../../../models"
+import { Post } from "@models"
 
 import getPostData from "./getPostData"
 import flagNsfwByAttachments from "./flagNsfwByAttachments"
