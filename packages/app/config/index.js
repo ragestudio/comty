@@ -51,7 +51,7 @@ export default {
     ],
     logo: {
         alt: "/logo_alt.svg",
-        full: "/logo_full.svg",
+        full: "/comty_logo_full.svg",
         ragestudio_alt: "https://storage.ragestudio.net/rstudio/branding/ragestudio/iso/ragestudio.svg",
         ragestudio_full: "https://storage.ragestudio.net/rstudio/branding/ragestudio/labeled/ragestudio-labeled_white.svg",
     },

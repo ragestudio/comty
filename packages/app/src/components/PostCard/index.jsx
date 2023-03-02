@@ -12,7 +12,7 @@ import PostAttachments from "./components/attachments"
 
 import "./index.less"
 
-export default class PostCard extends React.Component {
+export default class PostCard extends React.PureComponent {
     state = {
         loading: true,
         data: this.props.data ?? {},
@@ -116,7 +116,7 @@ export default class PostCard extends React.Component {
         app.eventBus.off(`post.${this.state.data._id}.update`, this.onClickEdit)
 
         // remove the listener
-        app.cores.api.listenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
+        app.cores.api.unlistenEvent(`post.${this.state.data._id}.likes.update`, this.onLikesUpdate)
     }
 
     componentDidCatch = (error, info) => {
@@ -145,7 +145,7 @@ export default class PostCard extends React.Component {
         }
 
         return <div
-            key={this.state.data.key ?? this.state.data._id}
+            key={this.props.index ?? this.state.data._id}
             id={this.state.data._id}
             className={classnames(
                 "postCard",
