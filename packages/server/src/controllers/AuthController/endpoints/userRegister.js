@@ -10,7 +10,9 @@ export default {
         select: ["username", "email", "password", "fullName"],
     }, async (req, res) => {
         const result = await createUser(req.selection).catch((err) => {
-            return res.status(500).json(err.message)
+            return res.status(500).json({
+                message: `Error creating user > ${err.message}`,
+            })
         })
 
         return res.json(result)

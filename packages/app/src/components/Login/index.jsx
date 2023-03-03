@@ -82,8 +82,10 @@ export default class Login extends React.Component {
         this.toogleLoading(true)
 
         const loginProcess = await AuthModel.login(payload).catch((error) => {
+            console.error(error, error.response)
+
             this.toogleLoading(false)
-            this.onError(error)
+            this.onError(error.response.data.message)
 
             return false
         })

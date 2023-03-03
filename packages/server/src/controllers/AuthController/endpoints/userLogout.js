@@ -8,18 +8,26 @@ export default {
         const { token, user_id } = req.body
 
         if (typeof user_id === "undefined") {
-            return res.status(400).json("No user_id provided")
+            return res.status(400).json({
+                message: "No user_id provided",
+            })
         }
         if (typeof token === "undefined") {
-            return res.status(400).json("No token provided")
+            return res.status(400).json({
+                message: "No token provided",
+            })
         }
 
         const session = await Session.findOneAndDelete({ user_id, token })
 
         if (session) {
-            return res.json("done")
+            return res.json({
+                message: "Session deleted",
+            })
         }
 
-        return res.status(404).json("not found")
+        return res.status(404).json({
+            message: "Session not found",
+        })
     },
 }
