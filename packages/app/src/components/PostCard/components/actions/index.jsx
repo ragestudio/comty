@@ -4,6 +4,7 @@ import { Icons } from "components/Icons"
 
 import SaveButton from "./saveButton"
 import LikeButton from "./likeButton"
+import CommentsButton from "./commentsButton"
 
 import "./index.less"
 
@@ -51,11 +52,9 @@ export default (props) => {
                 />
             </div>
             <div className="action" id="comments">
-                <Button
-                    type="ghost"
-                    shape="circle"
-                    onClick={props.onClickComments}
-                    icon={<Icons.MessageCircle />}
+                <CommentsButton
+                    onClickComments={props.onClickComments}
+                    count={props.commentsCount}
                 />
             </div>
             <div className="action" id="more">
