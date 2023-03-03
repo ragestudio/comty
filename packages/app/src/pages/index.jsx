@@ -102,21 +102,25 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 <div className="card" id="trendings">
-                    <h2>
-                        <Icons.TrendingUp />
-                        <Translation>{(t) => t("Trendings")}</Translation>
-                    </h2>
+                    <div className="header">
+                        <h2>
+                            <Icons.TrendingUp />
+                            <Translation>{(t) => t("Trendings")}</Translation>
+                        </h2>
+                    </div>
+                    
                     <HashtagTrendings />
                 </div>
 
                 <div className="card" id="onlineFriends">
-                    <h2>
-                        <Icons.Rss />
-                        <Translation>{(t) => t("Online Friends")}</Translation>
-                    </h2>
-                    <div className="content">
-                        <ConnectedFriends />
+                    <div className="header">
+                        <h2>
+                            <Icons.Rss />
+                            <Translation>{(t) => t("Online Friends")}</Translation>
+                        </h2>
                     </div>
+
+                    <ConnectedFriends />
                 </div>
 
                 <FeaturedEventsAnnouncements />
