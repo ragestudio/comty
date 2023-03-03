@@ -22,7 +22,7 @@ const Footer = (props) => {
             <div>
                 <antd.Tag color={isDevMode ? "magenta" : "green"}>
                     {isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-                    {isDevMode ? "development" : "stable"}
+                    {isDevMode ? "development" : "production"}
                 </antd.Tag>
             </div>
         </div>
@@ -38,6 +38,7 @@ export default {
         const isProduction = import.meta.env.PROD
 
         const [serverManifest, setServerManifest] = React.useState(null)
+        const [serverOrigin, setServerOrigin] = React.useState(null)
 
         const checkServerVersion = async () => {
             const serverManifest = await app.cores.api.customRequest()
@@ -45,8 +46,17 @@ export default {
             setServerManifest(serverManifest.data)
         }
 
+        const checkServerOrigin = async () => {
+            const instance = app.cores.api.instance()
+
+            if (instance) {
+                setServerOrigin(instance.origin)
+            }
+        }
+
         React.useEffect(() => {
             checkServerVersion()
+            checkServerOrigin()
         }, [])
 
         return <div className="about_app">
@@ -83,22 +93,12 @@ export default {
                         <antd.Tag>v{serverManifest?.LINEBRIDGE_SERVER_VERSION ?? "Unknown"}</antd.Tag>
                     </div>
                 </div>
+
                 <div className="field">
-                    <span>
-                        <Icons.Globe /> Origin address
-                    </span>
+                    Server origin
 
                     <div className="value">
-                        {app.cores.api?.namespaces.main.origin ?? "Unknown"}
-                    </div>
-                </div>
-                <div className="field">
-                    <span>
-                        <Icons.Clock /> Server Time
-                    </span>
-
-                    <div className="value">
-                        {moment(serverManifest?.requestTime).format("YYYY-MM-DD HH:mm:ss")}
+                        <antd.Tag>{serverOrigin ?? "Unknown"}</antd.Tag>
                     </div>
                 </div>
             </div>
