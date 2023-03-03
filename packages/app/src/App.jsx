@@ -487,7 +487,7 @@ class ComtyApp extends React.Component {
 		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
 		const isMac = userAgentPlatform.indexOf("mac") !== -1
 
-		this.props.cores.ShortcutsCore.register({
+		this.props.cores.shortcuts.register({
 			id: "app.openSearcher",
 			key: ",",
 			meta: isMac,
@@ -518,7 +518,7 @@ class ComtyApp extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
-					await this.props.cores.ApiCore.attach()
+					await this.props.cores.api.attach()
 
 					app.eventBus.emit("app.initialization.api_success")
 				} catch (error) {

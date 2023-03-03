@@ -6,6 +6,8 @@ import { Translation } from "react-i18next"
 import { Haptics } from "@capacitor/haptics"
 
 export default class NotificationCore extends Core {
+    static refName = "notifications"
+    
     onEvents = {
         "changeNotificationsSoundVolume": (value) => {
             this.playAudio({ soundVolume: value })

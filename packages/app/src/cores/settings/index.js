@@ -4,6 +4,8 @@ import defaultSettings from "schemas/defaultSettings.json"
 import { Observable } from "rxjs"
 
 export default class SettingsCore extends Core {
+    static refName = "settings"
+    
     static namespace = "settings"
 
     static storeKey = "app_settings"

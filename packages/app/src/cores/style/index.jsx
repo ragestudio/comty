@@ -64,6 +64,8 @@ export class ThemeProvider extends React.Component {
 }
 
 export default class StyleCore extends Core {
+	static refName = "style"
+	
 	static namespace = "style"
 
 	static themeManifestStorageKey = "theme"

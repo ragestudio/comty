@@ -4,6 +4,7 @@ import UserModel from "models/user"
 import SessionModel from "models/session"
 
 export default class PermissionsCore extends Core {
+    static refName = "permissions"
     static namespace = "permissions"
     static dependencies = ["api"]
 

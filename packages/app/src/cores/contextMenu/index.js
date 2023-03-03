@@ -7,8 +7,14 @@ import ContextMenu from "./components/contextMenu"
 import InternalContexts from "schemas/menu-contexts"
 
 export default class ContextMenuCore extends Core {
-    static namespace = "ContextMenu"
-    static public = ["show", "hide", "registerContext"]
+    static refName = "contextMenu"
+    static namespace = "contextMenu"
+
+    public = {
+        show: this.show.bind(this),
+        hide: this.hide.bind(this),
+        registerContext: this.registerContext.bind(this),
+    }
 
     contexts = Object()
 
@@ -19,14 +25,14 @@ export default class ContextMenuCore extends Core {
     })
 
     async onInitialize() {
-        document.addEventListener("contextmenu", this.handleEvent)
+        document.addEventListener("contextmenu", this.handleEvent.bind(this))
     }
 
-    registerContext = (element, context) => {
+    registerContext(element, context) {
         this.contexts[element] = context
     }
 
-    generateItems = async (element) => {
+    async generateItems(element) {
         let items = []
 
         // find the closest context with attribute (context-menu)
@@ -96,7 +102,7 @@ export default class ContextMenuCore extends Core {
         return items
     }
 
-    handleEvent = async (event) => {
+    async handleEvent(event) {
         event.preventDefault()
 
         // get the cords of the mouse
@@ -131,11 +137,11 @@ export default class ContextMenuCore extends Core {
         })
     }
 
-    show = (payload) => {
+    show(payload) {
         this.DOMWindow.render(React.createElement(ContextMenu, payload))
     }
 
-    hide = () => {
+    hide() {
         this.DOMWindow.remove()
     }
 }

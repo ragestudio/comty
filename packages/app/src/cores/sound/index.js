@@ -3,6 +3,8 @@ import { Howl } from "howler"
 import config from "config"
 
 export default class SoundCore extends Core {
+    static refName = "sound"
+    
     static namespace = "sound"
 
     public = {

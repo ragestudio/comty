@@ -48,6 +48,7 @@ function generateWSFunctionHandler(socket, type = "listen") {
 }
 
 export default class ApiCore extends Core {
+    static refName = "api"
     static namespace = "api"
     static depends = ["settings"]
 
