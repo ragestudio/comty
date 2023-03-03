@@ -7,11 +7,15 @@ export default {
     fn: async (req, res) => {
         passport.authenticate("local", { session: false }, async (error, user, options) => {
             if (error) {
-                return res.status(500).json(`Error validating user > ${error.message}`)
+                return res.status(500).json({
+                    message: `Error validating user > ${error.message}`,
+                })
             }
 
             if (!user) {
-                return res.status(401).json("Invalid credentials")
+                return res.status(401).json({
+                    message: "Invalid credentials",
+                })
             }
 
             const token = await Token.createNewAuthToken(user, options)
