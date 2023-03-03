@@ -17,21 +17,6 @@ export default class ExplorePosts extends React.Component {
         filledSearcher: false,
     }
 
-    wsEvents = {
-        "post.new": async (data) => {
-            this.setState({
-                posts: [data, ...this.state.posts],
-            })
-        },
-        "post.delete": async (id) => {
-            this.setState({
-                posts: this.state.posts.filter((post) => {
-                    return post._id !== id
-                }),
-            })
-        }
-    }
-
     loadPosts = async ({
         trim,
         replace = false
@@ -90,16 +75,6 @@ export default class ExplorePosts extends React.Component {
 
     componentDidMount = async () => {
         await this.loadPosts()
-
-        Object.keys(this.wsEvents).forEach((event) => {
-            app.cores.api.listenEvent(event, this.wsEvents[event])
-        })
-    }
-
-    componentWillUnmount = async () => {
-        Object.keys(this.wsEvents).forEach((event) => {
-            app.cores.api.unlistenEvent(event, this.wsEvents[event])
-        })
     }
 
     render() {
@@ -118,7 +93,7 @@ export default class ExplorePosts extends React.Component {
                     loading={this.state.loading}
                     hasMorePosts={this.state.hasMorePosts}
                     onLoadMore={this.loadPosts}
-                    posts={this.state.posts}
+                    list={this.state.posts}
                 />
             }
         </div>

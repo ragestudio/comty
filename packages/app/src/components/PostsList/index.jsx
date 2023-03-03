@@ -27,9 +27,29 @@ export default class PostsLists extends React.Component {
     state = {
         currentIndex: 0,
         openPost: null,
+        list: this.props.list ?? [],
     }
 
     listRef = React.createRef()
+
+    timelineWsEvents = {
+        "post.new": (data) => {
+            console.log("New post => ", data)
+
+            this.setState({
+                list: [data, ...this.state.list],
+            })
+        },
+        "post.delete": (id) => {
+            console.log("Deleted post => ", id)
+
+            this.setState({
+                list: this.state.list.filter((post) => {
+                    return post._id !== id
+                }),
+            })
+        }
+    }
 
     componentDidMount = async () => {
         window.app.shortcuts.register({
@@ -46,11 +66,32 @@ export default class PostsLists extends React.Component {
         }, (event) => {
             this.scrollDown()
         })
+
+        if (this.props.watchTimeline) {
+            Object.entries(this.timelineWsEvents).forEach(([event, callback]) => {
+                app.cores.api.listenEvent(event, callback)
+            })
+        }
     }
 
     componentWillUnmount = async () => {
         window.app.shortcuts.remove("postsFeed.scrollUp")
         window.app.shortcuts.remove("postsFeed.scrollDown")
+
+        if (this.props.watchTimeline) {
+            Object.entries(this.timelineWsEvents).forEach(([event, callback]) => {
+                app.cores.api.unlistenEvent(event, callback)
+            })
+        }
+    }
+
+    // watch if props.list has changed and update state.list
+    componentDidUpdate = async (prevProps) => {
+        if (prevProps.list !== this.props.list) {
+            this.setState({
+                list: this.props.list,
+            })
+        }
     }
 
     scrollUp = () => {
@@ -128,7 +169,7 @@ export default class PostsLists extends React.Component {
     }
 
     render() {
-        if (this.props.posts.length === 0) {
+        if (this.state.list.length === 0) {
             if (typeof this.props.emptyListRender === "function") {
                 return React.createElement(this.props.emptyListRender)
             }
@@ -154,7 +195,9 @@ export default class PostsLists extends React.Component {
                 fetching={this.props.loading}
             >
                 {
-                    this.props.posts.map((post, index) => {
+                    this.state.list.map((post, index) => {
+                        console.log("Post => ", post, index)
+
                         return <PostCard
                             key={index}
                             data={post}
