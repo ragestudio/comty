@@ -27,21 +27,6 @@ export default class Feed extends React.Component {
         posts: [],
     }
 
-    wsEvents = {
-        "post.new": (data) => {
-            this.setState({
-                posts: [data, ...this.state.posts],
-            })
-        },
-        "post.delete": (id) => {
-            this.setState({
-                posts: this.state.posts.filter((post) => {
-                    return post._id !== id
-                }),
-            })
-        }
-    }
-
     loadData = async ({
         trim,
         replace = false
@@ -86,18 +71,6 @@ export default class Feed extends React.Component {
 
     componentDidMount = async () => {
         await this.loadData()
-
-        console.log(this.wsEvents)
-
-        Object.keys(this.wsEvents).forEach((event) => {
-            app.cores.api.listenEvent(event, this.wsEvents[event])
-        })
-    }
-
-    componentWillUnmount = async () => {
-        Object.keys(this.wsEvents).forEach((event) => {
-            app.cores.api.unlistenEvent(event, this.wsEvents[event])
-        })
     }
 
     render() {
@@ -108,10 +81,8 @@ export default class Feed extends React.Component {
                     hasMorePosts={this.state.hasMorePosts}
                     emptyListRender={emptyListRender}
                     onLoadMore={this.loadData}
-                    posts={this.state.posts}
-                    {
-                    ...this.props
-                    }
+                    list={this.state.posts}
+                    watchTimeline
                 />
             }
         </div>
