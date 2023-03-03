@@ -1,7 +1,6 @@
 import GeneralSettings from "./general"
 import ProfileSettings from "./profile"
 import SecuritySettings from "./security"
-import SubcriptionsSettings from "./subscriptions"
 import NotificationsSettings from "./notifications"
 import ApparenceSettings from "./apparence"
 import ExtensionsSettings from "./extensions"
@@ -19,6 +18,5 @@ export default {
     notifications: NotificationsSettings,
     extensions: ExtensionsSettings,
     sync: SyncSettings,
-    subscriptions: SubcriptionsSettings,
     about: AboutPage,
 }
