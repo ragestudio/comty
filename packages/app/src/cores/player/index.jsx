@@ -31,6 +31,8 @@ class AudioPlayerStorage {
 }
 
 export default class Player extends Core {
+    static refName = "player"
+    
     static namespace = "player"
 
     currentDomWindow = null

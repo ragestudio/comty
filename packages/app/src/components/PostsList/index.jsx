@@ -52,14 +52,14 @@ export default class PostsLists extends React.Component {
     }
 
     componentDidMount = async () => {
-        window.app.shortcuts.register({
+        window.app.cores.shortcuts.register({
             id: "postsFeed.scrollUp",
             key: "ArrowUp",
             preventDefault: true,
         }, (event) => {
             this.scrollUp()
         })
-        window.app.shortcuts.register({
+        window.app.cores.shortcuts.register({
             id: "postsFeed.scrollDown",
             key: "ArrowDown",
             preventDefault: true,

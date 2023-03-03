@@ -1,13 +1,16 @@
 import Core from "evite/src/core"
 
 export default class ShortcutsCore extends Core {
-    shortcutsRegister = []
+    static refName = "shortcuts"
+    static namespace = "shortcuts"
 
-    registerToApp = {
-        shortcuts: this
+    public = {
+        register: this.register.bind(this),
     }
 
-    handleEvent = (event, shortcut, fn) => {
+    shortcutsRegister = []
+
+    handleEvent(event, shortcut, fn) {
         if (typeof shortcut !== "object") {
             throw new Error("Shortcut must be an object")
         }
@@ -42,7 +45,7 @@ export default class ShortcutsCore extends Core {
         }
     }
 
-    register = (shortcut, fn) => {
+    register(shortcut, fn) {
         if (!shortcut) {
             throw new Error("`shortcut` is required")
         }
@@ -65,7 +68,7 @@ export default class ShortcutsCore extends Core {
         return document.addEventListener("keydown", handler)
     }
 
-    remove = (id) => {
+    remove(id) {
         if (!id) {
             throw new Error("`id` is required")
         }
@@ -87,9 +90,5 @@ export default class ShortcutsCore extends Core {
 
         // remove the event handler from the list
         this.shortcutsRegister = this.shortcutsRegister.filter((handler) => handler.id !== id)
-    }
-
-    window = {
-        ShortcutsController: this
     }
 }
