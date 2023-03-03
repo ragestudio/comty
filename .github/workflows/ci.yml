@@ -21,4 +21,4 @@ jobs:
           destination-github-username: 'ragestudio'
           destination-repository-name: 'comty-federated'
           user-email: srgooglo@ragestudio.net
-          target-branch: master
+          target-branch: private-master
