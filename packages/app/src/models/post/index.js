@@ -42,7 +42,7 @@ export default class Post {
             throw new Error("Post ID and/or comment are required")
         }
 
-        const request = await app.cores.apies.api.customRequest( {
+        const request = await app.cores.api.customRequest( {
             method: "POST",
             url: `/comments/post/${post_id}`,
             data: {
@@ -58,7 +58,7 @@ export default class Post {
             throw new Error("Post ID and/or comment ID are required")
         }
 
-        const request = await app.cores.apies.api.customRequest( {
+        const request = await app.cores.api.customRequest( {
             method: "DELETE",
             url: `/comments/post/${post_id}/${comment_id}`,
         })
