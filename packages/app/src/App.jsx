@@ -484,19 +484,6 @@ class ComtyApp extends React.Component {
 			})
 		}
 
-		const userAgentPlatform = window.navigator.userAgent.toLowerCase()
-		const isMac = userAgentPlatform.indexOf("mac") !== -1
-
-		this.props.cores.shortcuts.register({
-			id: "app.openSearcher",
-			key: ",",
-			meta: isMac,
-			ctrl: !isMac,
-			preventDefault: true,
-		}, (...args) => {
-			ComtyApp.publicMethods.controls.openSettings(...args)
-		})
-
 		app.eventBus.emit("app.initialization.start")
 
 		await this.initialization()
