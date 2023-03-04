@@ -1,22 +1,26 @@
-import GeneralSettings from "./general"
-import ProfileSettings from "./profile"
-import SecuritySettings from "./security"
-import NotificationsSettings from "./notifications"
-import ApparenceSettings from "./apparence"
-import ExtensionsSettings from "./extensions"
-import SyncSettings from "./sync"
-import PlayerSettings from "./player"
+const settingsPaths = import.meta.glob("/constants/settings/*/index.jsx")
 
-import AboutPage from "./about"
+export default async () => {
+    const settings = {}
 
-export default {
-    general: GeneralSettings,
-    profile: ProfileSettings,
-    apparence: ApparenceSettings,
-    player: PlayerSettings,
-    security: SecuritySettings,
-    notifications: NotificationsSettings,
-    extensions: ExtensionsSettings,
-    sync: SyncSettings,
-    about: AboutPage,
+    for (const [key, value] of Object.entries(settingsPaths)) {
+        const path = key.split("/").slice(-2)
+        const name = path[0]
+
+        if (name === "components" || name === "index") {
+            continue
+        }
+
+        if (!settings[name]) {
+            settings[name] = {}
+        }
+
+        let setting = await value()
+
+        setting = setting.default || setting
+
+        settings[name] = setting
+    }
+
+    return settings
 }
