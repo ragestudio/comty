@@ -6,9 +6,11 @@ import classnames from "classnames"
 
 import { Icons, createIconRender } from "components/Icons"
 
-import SettingsList from "schemas/settings"
+import getSettingsList from "schemas/settings"
 import menuGroupsDecorators from "schemas/settingsMenuGroupsDecorators"
 import groupsDecorators from "schemas/settingsGroupsDecorators"
+
+const SettingsList = await getSettingsList()
 
 import "./index.less"
 
@@ -477,7 +479,7 @@ const generateMenuItems = () => {
     })
 }
 
-export default React.memo(() => {
+export default () => {
     const [activeKey, setActiveKey] = React.useState("general")
     const [menuItems, setMenuItems] = React.useState([])
 
@@ -515,4 +517,4 @@ export default React.memo(() => {
             }
         </div>
     </div>
-})
+}
