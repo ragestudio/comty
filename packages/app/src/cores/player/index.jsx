@@ -32,7 +32,7 @@ class AudioPlayerStorage {
 
 export default class Player extends Core {
     static refName = "player"
-    
+
     static namespace = "player"
 
     currentDomWindow = null
@@ -464,6 +464,8 @@ export default class Player extends Core {
 
         if (params.volume >= 0) {
             this.currentAudioInstance.gainNode.gain.value = params.volume
+        } else {
+            this.currentAudioInstance.gainNode.gain.value = this.state.audioVolume
         }
 
         if (this.realtimeAnalyzerNode) {
@@ -553,13 +555,13 @@ export default class Player extends Core {
 
             // calculate the current audio context time with the current audio duration (subtracting time offset)
             const linearFadeoutTime = Number(
-                this.audioContext.currentTime + 
+                this.audioContext.currentTime +
                 Number(params.crossfading.toFixed(2))
             )
 
             console.log("linearFadeoutTime", this.audioContext.currentTime, linearFadeoutTime)
 
-            console.log("crossfading offset", ( this.currentAudioInstance.audioElement.duration - this.currentAudioInstance.audioElement.currentTime) - Number(params.crossfading.toFixed(2)))
+            console.log("crossfading offset", (this.currentAudioInstance.audioElement.duration - this.currentAudioInstance.audioElement.currentTime) - Number(params.crossfading.toFixed(2)))
 
             params.instance.gainNode.gain.linearRampToValueAtTime(0.00001, linearFadeoutTime)
 
