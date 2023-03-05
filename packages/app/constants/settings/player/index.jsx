@@ -6,14 +6,18 @@ export default {
     settings: [
         {
             id: "player.allowVolumeOver100",
-            label: "Allow volume over 100%",
+            title: "Allow volume over 100%",
+            group: "general",
+            icon: "MdVolumeUp",
             description: "Allow volume amplification over 100% (may cause distortion)",
             component: "Switch",
             storaged: true,
         },
         {
             id: "player.crossfade",
-            label: "Crossfade",
+            title: "Crossfade",
+            icon: "MdSwapHoriz",
+            group: "general",
             description: "Enable crossfade between tracks",
             component: "Slider",
             props: {
@@ -32,9 +36,10 @@ export default {
                     8: "8s",
                     9: "9s",
                     10: "10s",
-                },
+                }
             },
             storaged: true,
+            disabled: true,
         }
     ]
 }
