@@ -65,9 +65,12 @@ export default (props) => {
         </div>
         <div className="info">
             <h1>
-                {userData.fullName ?? `@${userData.username}`}
+                {userData.fullName ?? userData.username}
                 {userData.verified && <Icons.verifiedBadge />}
             </h1>
+            <span>
+                @{userData.username}
+            </span>
         </div>
     </div>
 }
