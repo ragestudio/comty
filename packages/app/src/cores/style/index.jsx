@@ -129,12 +129,12 @@ export default class StyleCore extends Core {
 		window.matchMedia("(prefers-color-scheme: light)").addListener(() => {
 			console.log(`[THEME] Auto color scheme changed`)
 
-			if (window.app.cores.settings.get("auto_darkMode")) {
+			if (window.app.cores.settings.get("style.auto_darkMode")) {
 				this.handleAutoColorScheme()
 			}
 		})
 
-		if (window.app.cores.settings.get("auto_darkMode")) {
+		if (window.app.cores.settings.get("style.auto_darkMode")) {
 			this.handleAutoColorScheme()
 		}
 	}
