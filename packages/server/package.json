@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.0",
     "linebridge": "0.15.7",
     "luxon": "^3.2.1",
+    "mime-types": "^2.1.35",
     "minio": "^7.0.32",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.40",
