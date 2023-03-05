@@ -445,7 +445,20 @@ const generateMenuItems = () => {
     })
 
     return groupsKeys.map((groupKey, index) => {
-        const children = groups[groupKey].map((item) => {
+        const ordererItems = groups[groupKey].sort((a, b) => {
+            if (typeof a.order === "undefined") {
+                a.order = groups[groupKey].indexOf(a)
+            }
+
+            if (typeof b.order === "undefined") {
+                b.order = groups[groupKey].indexOf(b)
+            }
+
+            // if value is close to 0, more to the top
+            return a.order - b.order
+        })
+
+        const children = ordererItems.map((item) => {
             return {
                 key: item.id,
                 label: <>

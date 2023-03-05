@@ -10,6 +10,7 @@ export default {
     icon: "Eye",
     label: "Apparence",
     group: "app",
+    order: 1,
     settings: [
         {
             id: "sidebar.floating",
