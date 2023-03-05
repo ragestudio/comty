@@ -9,7 +9,7 @@
     "autoCollapseDelayEnabled": true,
     "haptic_feedback": false,
     "collapseOnLooseFocus": true,
-    "auto_darkMode": true,
+    "style.auto_darkMode": true,
     "compactWidth": false,
     "postCard_carrusel_auto": true,
     "postCard_expansible_actions": true,
