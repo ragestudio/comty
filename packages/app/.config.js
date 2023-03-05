@@ -48,6 +48,10 @@ module.exports = (config = {}) => {
         }
     }
 
+    config.build = {
+        target: "esnext"
+    }
+
     // config.build = {
     //     sourcemap: "inline",
     //     target: `node16`,
