@@ -357,47 +357,15 @@ export default class Sidebar extends React.Component {
 								</Translation>
 							</Menu.Item>
 							{
-								app.userData && <Dropdown
-									trigger={["click"]}
-									menu={{
-										items: [
-											{
-												id: "profile",
-												label: <>
-													<Icons.User />
-													<Translation>
-														{t => t("Profile")}
-													</Translation>
-												</>,
-												onClick: () => {
-													window.app.navigation.goToAccount()
-												}
-											},
-											{
-												type: "divider",
-											},
-											{
-												id: "logout",
-												label: <>
-													<Icons.LogOut />
-													<Translation>
-														{t => t("Logout")}
-													</Translation>
-												</>,
-											}
-										]
+								app.userData && <Menu.Item
+									key="account"
+									className="user_avatar"
+									onClick={() => {
+										window.app.navigation.goToAccount()
 									}}
 								>
-									<Menu.Item
-										key="account"
-										className="user_avatar"
-										onDoubleClick={() => {
-											window.app.navigation.goToAccount()
-										}}
-									>
-										<Avatar shape="square" src={app.userData?.avatar} />
-									</Menu.Item>
-								</Dropdown>
+									<Avatar shape="square" src={app.userData?.avatar} />
+								</Menu.Item>
 							}
 							{
 								!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
