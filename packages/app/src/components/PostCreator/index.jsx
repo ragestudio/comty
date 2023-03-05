@@ -5,6 +5,7 @@ import { DateTime } from "luxon"
 import humanSize from "@tsmx/human-readable"
 
 import { Icons } from "components/Icons"
+import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 
 import PostModel from "models/post"
 
@@ -17,34 +18,54 @@ const DEFAULT_POST_POLICY = {
     maximunFilesPerRequest: 10
 }
 
-export default (props) => {
-    const api = window.app.cores.api.withEndpoints()
+export default class PostCreator extends React.Component {
+    state = {
+        pending: [],
+        loading: false,
+        uploaderVisible: false,
 
-    const creatorRef = React.useRef(null)
+        postMessage: "",
+        postAttachments: [],
 
-    const [pending, setPending] = React.useState([])
-    const [loading, setLoading] = React.useState(false)
-    const [uploaderVisible, setUploaderVisible] = React.useState(false)
-
-    const [postMessage, setPostMessage] = React.useState("")
-    const [postAttachments, setPostAttachments] = React.useState([])
-    const [fileList, setFileList] = React.useState([])
-
-    const [postingPolicy, setPostingPolicy] = React.useState(DEFAULT_POST_POLICY)
-
-    const cleanPostData = () => {
-        setPostMessage("")
-        setPostAttachments([])
-        setFileList([])
+        fileList: [],
+        postingPolicy: DEFAULT_POST_POLICY
     }
 
-    const fetchUploadPolicy = async () => {
-        const policy = await api.get.postingPolicy()
+    creatorRef = React.createRef()
 
-        setPostingPolicy(policy)
+    api = window.app.cores.api.withEndpoints()
+
+    cleanPostData = () => {
+        this.setState({
+            postMessage: "",
+            postAttachments: [],
+            fileList: []
+        })
     }
 
-    const canSubmit = () => {
+    toogleUploaderVisibility = (to) => {
+        to = to ?? !this.state.uploaderVisible
+
+        if (to === this.state.uploaderVisible) {
+            return
+        }
+
+        this.setState({
+            uploaderVisible: to
+        })
+    }
+
+    fetchUploadPolicy = async () => {
+        const policy = await this.api.get.postingPolicy()
+
+        this.setState({
+            postingPolicy: policy
+        })
+    }
+
+    canSubmit = () => {
+        const { postMessage, postAttachments, pending, postingPolicy } = this.state
+
         const messageLengthValid = postMessage.length !== 0 && postMessage.length < postingPolicy.maxMessageLength
 
         if (pending.length !== 0) {
@@ -58,11 +79,15 @@ export default (props) => {
         return true
     }
 
-    const submit = async () => {
-        if (!canSubmit()) return
+    submit = async () => {
+        if (!this.canSubmit()) return
 
-        setLoading(true)
-        setUploaderVisible(false)
+        this.setState({
+            loading: true,
+            uploaderVisible: false
+        })
+
+        const { postMessage, postAttachments } = this.state
 
         const payload = {
             message: postMessage,
@@ -77,23 +102,27 @@ export default (props) => {
             return false
         })
 
-        setLoading(false)
+        this.setState({
+            loading: false
+        })
 
         if (response) {
-            cleanPostData()
+            this.cleanPostData()
 
-            if (typeof props.onPost === "function") {
-                props.onPost()
+            if (typeof this.props.onPost === "function") {
+                this.props.onPost()
             }
         }
     }
 
-    const onUploadFile = async (req) => {
+    uploadFile = async (req) => {
         // hide uploader
-        toogleUploaderVisibility(false)
+        this.toogleUploaderVisibility(false)
 
         // get file data
         const file = req.file
+
+        console.log(`Uploading file >`, file)
 
         // append to form data
         const formData = new FormData()
@@ -101,7 +130,7 @@ export default (props) => {
         formData.append("files", file)
 
         // send request
-        const request = await api.post.upload(formData, undefined).catch((error) => {
+        const request = await this.api.post.upload(formData, undefined).catch((error) => {
             console.error(error)
             antd.message.error(error)
 
@@ -111,23 +140,31 @@ export default (props) => {
         })
 
         if (request) {
+            console.log(`Upload done >`, request)
+
             return req.onSuccess(request)
         }
     }
 
-    const removeAttachment = (file_uid) => {
-        setPostAttachments(postAttachments.filter((file) => file.uid !== file_uid))
+    removeAttachment = (file_uid) => {
+        this.setState({
+            postAttachments: this.state.postAttachments.filter((file) => file.uid !== file_uid)
+        })
     }
 
-    const addAttachment = (file) => {
+    addAttachment = (file) => {
         if (Array.isArray(file)) {
-            return setPostAttachments([...postAttachments, ...file])
+            return this.setState({
+                postAttachments: [...this.state.postAttachments, ...file]
+            })
         }
 
-        return setPostAttachments([...postAttachments, file])
+        return this.setState({
+            postAttachments: [...this.state.postAttachments, file]
+        })
     }
 
-    const uploaderScrollToEnd = () => {
+    uploaderScrollToEnd = () => {
         // scroll to max right 
         const element = document.querySelector(".ant-upload-list-picture-card")
 
@@ -143,37 +180,50 @@ export default (props) => {
         }
     }
 
-    const onUploaderChange = (change) => {
-        setFileList(change.fileList)
+    onUploaderChange = (change) => {
+        if (this.state.fileList !== change.fileList) {
+            this.setState({
+                fileList: change.fileList
+            })
+        }
+
+        console.log(change)
 
         switch (change.file.status) {
             case "uploading": {
-                toogleUploaderVisibility(false)
+                this.toogleUploaderVisibility(false)
 
-                setPending([...pending, change.file.uid])
+                this.setState({
+                    pending: [...this.state.pending, change.file.uid]
+                })
 
-                uploaderScrollToEnd()
+                this.uploaderScrollToEnd()
 
                 break
             }
 
             case "done": {
                 // remove pending file
-                setPending(pending.filter(uid => uid !== change.file.uid))
+                this.setState({
+                    pending: this.state.pending.filter(uid => uid !== change.file.uid)
+                })
 
                 // update post data
-                addAttachment(change.file.response.files)
+                this.addAttachment(change.file.response.files)
 
                 // scroll to end
-                uploaderScrollToEnd()
+                this.uploaderScrollToEnd()
 
                 break
             }
             case "error": {
                 // remove pending file
-                setPending(pending.filter(uid => uid !== change.file.uid))
+                this.setState({
+                    pending: this.state.pending.filter(uid => uid !== change.file.uid)
+                })
 
-                removeAttachment(change.file.uid)
+                // remove file from list
+                this.removeAttachment(change.file.uid)
             }
             default: {
                 break
@@ -181,70 +231,127 @@ export default (props) => {
         }
     }
 
-    const onChangeMessageInput = (event) => {
+    onChangeMessageInput = (event) => {
         // if the fist character is a space or a whitespace remove it
         if (event.target.value[0] === " " || event.target.value[0] === "\n") {
             event.target.value = event.target.value.slice(1)
         }
 
-        setPostMessage(event.target.value)
+        this.setState({
+            postMessage: event.target.value
+        })
     }
 
-    const toogleUploaderVisibility = (to) => {
-        to = to ?? !uploaderVisible
-
-        if (to === uploaderVisible) {
-            return
-        }
-
-        setUploaderVisible(to ?? !uploaderVisible)
-    }
-
-    const handleKeyDown = (e) => {
+    handleKeyDown = (e) => {
         // detect if the user pressed `enter` key and submit the form, but only if the `shift` key is not pressed
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault()
             e.stopPropagation()
 
-            submit()
+            this.submit()
         }
     }
 
-    const handlePaste = ({ clipboardData }) => {
+    updateFileList = (uid, newValue) => {
+        let updatedFileList = this.state.fileList
+
+        // find the file in the list
+        const index = updatedFileList.findIndex(file => file.uid === uid)
+
+        // update the file
+        updatedFileList[index] = newValue
+
+        // update the state
+        this.setState({
+            fileList: updatedFileList
+        })
+
+        return updatedFileList
+    }
+
+    handleManualUpload = async (file) => {
+        if (!file) {
+            throw new Error(`No file provided`)
+        }
+
+        const isValidFormat = (fileType) => {
+            return this.state.postingPolicy.acceptedMimeTypes.includes(fileType)
+        }
+
+        if (!isValidFormat(file.type)) {
+            throw new Error(`Invalid file format`)
+        }
+
+        file.thumbUrl = URL.createObjectURL(file)
+        file.uid = `${file.name}-${Math.random() * 1000}`
+
+        file.status = "uploading"
+
+        // add file to the uploader
+        this.onUploaderChange({
+            file,
+            fileList: [...this.state.fileList, file],
+        })
+
+        // upload the file
+        await this.uploadFile({
+            file,
+            onSuccess: (response) => {
+                file.status = "done"
+                file.response = response
+
+                this.onUploaderChange({
+                    file: file,
+                    fileList: this.updateFileList(file.uid, file)
+                })
+            },
+            onError: (error) => {
+                file.status = "error"
+                file.error = error
+
+                this.onUploaderChange({
+                    file: file,
+                    fileList: this.updateFileList(file.uid, file)
+                })
+            }
+        })
+
+        return file
+    }
+
+    handlePaste = async ({ clipboardData }) => {
         if (clipboardData && clipboardData.items.length > 0) {
-            const isValidFormat = (fileType) => DEFAULT_ACCEPTED_FILES.includes(fileType)
+            // check if the clipboard contains a file
+            const hasFile = Array.from(clipboardData.items).some(item => item.kind === "file")
+
+            if (!hasFile) {
+                return false
+            }
 
             for (let index = 0; index < clipboardData.items.length; index++) {
-                if (!isValidFormat(clipboardData.items[index].type)) {
-                    throw new Error(`Sorry, that's not a format we support ${clipboardData.items[index].type}`)
-                }
+                const item = clipboardData.items[index]
 
-                let file = clipboardData.items[index].getAsFile()
+                let file = await clipboardEventFileToFile(item).catch((error) => {
+                    console.error(error)
+                    app.message.error(`Failed to upload file:`, error.message)
 
-                app.message.info("Uploading file...")
+                    return false
+                })
 
-                file.thumbUrl = URL.createObjectURL(file)
-
-                file.uid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
-
-                // upload file
-                onUploadFile({
-                    file,
-                    onSuccess: (response) => {
-                        setFileList([...fileList, file])
-                        addAttachment(response)
-                    }
+                this.handleManualUpload(file).catch((error) => {
+                    console.error(error)
+                    return false
                 })
             }
         }
     }
 
-    const renderUploadPreviewItem = (item, file, list, actions) => {
+    renderUploadPreviewItem = (item, file, list, actions) => {
         const uploading = file.status === "uploading"
 
         const onClickDelete = () => {
             actions.remove()
-            removeAttachment(file.uid)
+            this.removeAttachment(file.uid)
         }
 
         return <div className={classnames("file", { ["uploading"]: uploading })}>
@@ -267,23 +374,23 @@ export default (props) => {
         </div>
     }
 
-    const handleDrag = (event) => {
+    handleDrag = (event) => {
         event.preventDefault()
         event.stopPropagation()
 
         console.log(event)
 
         if (event.type === "dragenter") {
-            toogleUploaderVisibility(true)
+            this.toogleUploaderVisibility(true)
         } else if (event.type === "dragleave") {
             // check if mouse is over the uploader or outside the creatorRef
-            if (uploaderVisible && !creatorRef.current.contains(event.target)) {
-                toogleUploaderVisibility(false)
+            if (this.state.uploaderVisible && !this.creatorRef.current.contains(event.target)) {
+                this.toogleUploaderVisibility(false)
             }
         }
     }
 
-    const handleUploadClick = () => {
+    handleUploadClick = () => {
         // create a new dialog
         const dialog = document.createElement("input")
 
@@ -291,105 +398,124 @@ export default (props) => {
         dialog.type = "file"
 
         // set the dialog accept to the accepted files
-        dialog.accept = postingPolicy.acceptedMimeTypes
+        dialog.accept = this.state.postingPolicy.acceptedMimeTypes
 
         dialog.multiple = true
 
         // add a listener to the dialog
         dialog.addEventListener("change", (event) => {
-            console.log(event)
+            // get the files
+            const files = event.target.files
+
+            // loop through the files
+            for (let index = 0; index < files.length; index++) {
+                const file = files[index]
+
+                this.handleManualUpload(file).catch((error) => {
+                    console.error(error)
+                    return false
+                })
+            }
         })
 
         // click the dialog
         dialog.click()
     }
 
-    React.useEffect(() => {
-        fetchUploadPolicy()
+    componentDidMount() {
+        // fetch the posting policy
+        this.fetchUploadPolicy()
 
-        document.addEventListener("paste", handlePaste)
+        // add a listener to the window
+        document.addEventListener("paste", this.handlePaste)
+    }
 
-        return () => {
-            document.removeEventListener("paste", handlePaste)
+    componentWillUnmount() {
+        document.removeEventListener("paste", this.handlePaste)
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        // if pending is not empty and is not loading
+        if (this.state.pending.length > 0 && !this.state.loading) {
+            this.setState({ loading: true })
+        } else if (this.state.pending.length === 0 && this.state.loading) {
+            this.setState({ loading: false })
         }
-    }, [])
+    }
 
-    // set loading to true menwhile pending is not empty
-    React.useEffect(() => {
-        setLoading(pending.length !== 0)
-    }, [pending])
+    render() {
+        const { postMessage, fileList, loading, uploaderVisible, postingPolicy } = this.state
 
-    return <div
-        className={"postCreator"}
-        ref={creatorRef}
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-    >
-        <div className="textInput">
-            <div className="avatar">
-                <img src={app.userData?.avatar} />
+        return <div
+            className={"postCreator"}
+            ref={this.creatorRef}
+            onDragEnter={this.handleDrag}
+            onDragLeave={this.handleDrag}
+        >
+            <div className="textInput">
+                <div className="avatar">
+                    <img src={app.userData?.avatar} />
+                </div>
+                <antd.Input.TextArea
+                    placeholder="What are you thinking?"
+                    value={postMessage}
+                    autoSize={{ minRows: 3, maxRows: 6 }}
+                    maxLength={postingPolicy.maxMessageLength}
+                    onChange={this.onChangeMessageInput}
+                    onKeyDown={this.handleKeyDown}
+                    disabled={loading}
+                    draggable={false}
+                    allowClear
+                />
+                <div>
+                    <antd.Button
+                        type="primary"
+                        disabled={loading || !this.canSubmit()}
+                        onClick={this.submit}
+                        icon={loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
+                    />
+                </div>
             </div>
-            <antd.Input.TextArea
-                placeholder="What are you thinking?"
-                value={postMessage}
-                autoSize={{ minRows: 3, maxRows: 6 }}
-                maxLength={postingPolicy.maxMessageLength}
-                onChange={onChangeMessageInput}
-                onKeyDown={handleKeyDown}
-                disabled={loading}
-                draggable={false}
-                allowClear
-            />
-            <div>
+
+            <div className={classnames("uploader", { ["visible"]: uploaderVisible })}>
+                <antd.Upload.Dragger
+                    openFileDialogOnClick={false}
+                    maxCount={postingPolicy.maximunFilesPerRequest}
+                    onChange={this.onUploaderChange}
+                    customRequest={this.uploadFile}
+                    accept={postingPolicy.acceptedMimeTypes}
+                    fileList={fileList}
+                    listType="picture-card"
+                    itemRender={this.renderUploadPreviewItem}
+                    multiple
+                >
+                    <div className="hint">
+                        <h3>Drag and drop files here</h3>
+                        <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
+                    </div>
+                </antd.Upload.Dragger>
+            </div>
+
+            <div className="actions">
                 <antd.Button
                     type="primary"
-                    disabled={loading || !canSubmit()}
-                    onClick={submit}
-                    icon={loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
+                    disabled={loading}
+                    onClick={this.handleUploadClick}
+                    icon={<Icons.Upload />}
+                />
+
+                <antd.Button
+                    type="primary"
+                    disabled={loading}
+                    icon={<Icons.MdPoll />}
+                />
+
+                <antd.Button
+                    type="primary"
+                    disabled={loading}
+                    icon={<Icons.MdPrivacyTip />}
                 />
             </div>
         </div>
-
-        <div className={classnames("uploader", { ["visible"]: uploaderVisible })}>
-            <antd.Upload.Dragger
-                openFileDialogOnClick={false}
-                maxCount={postingPolicy.maximunFilesPerRequest}
-                onChange={onUploaderChange}
-                customRequest={onUploadFile}
-                accept={postingPolicy.acceptedMimeTypes}
-                fileList={fileList}
-                listType="picture-card"
-                itemRender={renderUploadPreviewItem}
-                multiple
-            >
-                <div className="hint">
-                    <h3>Drag and drop files here</h3>
-                    <span>Max {humanSize.fromBytes(postingPolicy.maximumFileSize)}</span>
-                </div>
-            </antd.Upload.Dragger>
-        </div>
-
-        <div className="actions">
-            <antd.Button
-                type="primary"
-                disabled={loading}
-                onClick={handleUploadClick}
-                icon={<Icons.Upload />}
-            />
-
-            <antd.Button
-                type="primary"
-                disabled={loading}
-                icon={<Icons.MdPoll />}
-            />
-
-            <antd.Button
-                type="primary"
-                disabled={loading}
-                icon={<Icons.MdPrivacyTip />}
-            />
-        </div>
-    </div>
+    }
 }
-
-
