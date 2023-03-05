@@ -94,7 +94,7 @@ export default (props) => {
                 return <FollowerItem
                     index={index}
                     follower={follower}
-                    goToProfile={() => goToProfile(follower.username)}
+                    onClick={() => goToProfile(follower.username)}
                 />
             })
         }
