@@ -1,9 +1,10 @@
-
 import React from "react"
 import * as antd from "antd"
 import { SliderPicker } from "react-color"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
+
+import AuthModel from "models/auth"
 
 import { Icons, createIconRender } from "components/Icons"
 
@@ -14,6 +15,27 @@ import groupsDecorators from "schemas/settingsGroupsDecorators"
 const SettingsList = await getSettingsList()
 
 import "./index.less"
+
+const extraMenuItems = [
+    {
+        id: "logout",
+        label: "Logout",
+        icon: "MdOutlineLogout",
+        danger: true
+    }
+]
+
+const menuEvents = {
+    "logout": () => {
+        antd.Modal.confirm({
+            title: "Logout",
+            content: "Are you sure you want to logout?",
+            onOk: () => {
+                AuthModel.logout()
+            },
+        })
+    }
+}
 
 const ItemTypes = {
     Button: antd.Button,
@@ -430,6 +452,15 @@ const generateMenuItems = () => {
         groups[tab.group].push(tab)
     })
 
+    if (typeof groups["bottom"] === undefined) {
+        groups["bottom"] = []
+    }
+
+    // add extra menu items
+    extraMenuItems.forEach((item) => {
+        groups["bottom"].push(item)
+    })
+
     let groupsKeys = Object.keys(groups)
 
     //  make "bottom" group last
@@ -466,6 +497,8 @@ const generateMenuItems = () => {
                     {createIconRender(item.icon ?? "Settings")}
                     {item.label}
                 </>,
+                type: "item",
+                danger: item.danger,
             }
         })
 
@@ -498,6 +531,10 @@ export default () => {
     const [menuItems, setMenuItems] = React.useState([])
 
     const onChangeTab = (event) => {
+        if (typeof menuEvents[event.key] === "function") {
+            return menuEvents[event.key]()
+        }
+
         setActiveKey(event.key)
     }
 
