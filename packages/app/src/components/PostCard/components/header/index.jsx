@@ -43,7 +43,7 @@ export default (props) => {
             </div>
             <div className="info">
                 <h1 onClick={goToProfile}>
-                    {props.postData.user?.fullName ?? `@${props.postData.user?.username}`}
+                    {props.postData.user?.fullName ?? `${props.postData.user?.username}`}
                     {props.postData.user?.verified && <Icons.verifiedBadge />}
                 </h1>
 
