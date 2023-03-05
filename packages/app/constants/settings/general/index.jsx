@@ -7,6 +7,7 @@ export default {
     icon: "Command",
     label: "General",
     group: "app",
+    order: 0,
     settings: [
         {
             "id": "language",
