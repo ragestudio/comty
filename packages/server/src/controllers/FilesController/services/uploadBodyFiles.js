@@ -1,9 +1,10 @@
 import path from "path"
 import fs from "fs"
-import { videoTranscode } from "../../../lib/videoTranscode"
+import { videoTranscode } from "@lib/videoTranscode"
 import Jimp from "jimp"
+import mime from "mime-types"
 
-import pmap from "../../../utils/pMap"
+import pmap from "@utils/pMap"
 
 const formidable = require("formidable")
 
@@ -94,7 +95,11 @@ export default async (payload) => {
         uploadDir: params.cacheUploadDir,
         maxFileSize: params.maxFileSize,
         maxFields: params.maxFields,
-        filename: (name, ext) => {
+        filename: (name, ext, part, form) => {
+            if (!ext) {
+                ext = `.${mime.extension(part.mimetype)}`
+            }
+
             name = global.nanoid()
 
             return name + ext
@@ -157,6 +162,12 @@ export default async (payload) => {
                             file = await handleImage(file, params)
                             break
                         }
+                        case "image/webp": {
+                            file = await handleImage(file, params)
+                        }
+                        case "image/jfif": {
+                            file = await handleImage(file, params)
+                        }
                         default: {
                             // do nothing
                         }
@@ -169,9 +180,13 @@ export default async (payload) => {
                         filename: file.newFilename,
                     }
 
+
+                    // upload path must be user_id + file.newFilename
+                    const uploadPath = req.user?._id ? `${req.user?._id.toString()}/${file.newFilename}` : file.newFilename
+
                     // upload to s3
                     await new Promise((_resolve, _reject) => {
-                        global.storage.fPutObject(global.storage.defaultBucket, file.newFilename, file.filepath, metadata, (err, etag) => {
+                        global.storage.fPutObject(global.storage.defaultBucket, uploadPath, file.filepath, metadata, (err, etag) => {
                             if (err) {
                                 return _reject(new Error(`Failed to upload file to storage server > ${err.message}`))
                             }
@@ -186,12 +201,12 @@ export default async (payload) => {
                     await fs.promises.unlink(file.filepath)
 
                     // get url location
-                    const remoteUrlObj = global.storage.composeRemoteURL(file.newFilename)
+                    const remoteUrlObj = global.storage.composeRemoteURL(uploadPath)
 
                     // push final filepath to urls
                     return {
                         name: file.originalFilename,
-                        id: file.newFilename,
+                        id: uploadPath,
                         url: remoteUrlObj,
                     }
                 })
