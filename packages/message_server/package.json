@@ -1,6 +1,6 @@
 {
   "name": "@comty/message_server",
-  "version": "0.40.2",
+  "version": "0.40.3",
   "main": "dist/index.js",
   "scripts": {
     "build": "corenode-cli build",
