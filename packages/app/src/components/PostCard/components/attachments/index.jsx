@@ -3,121 +3,112 @@ import { Skeleton } from "antd"
 import { Carousel } from "react-responsive-carousel"
 import { ImageViewer } from "components"
 import Plyr from "plyr-react"
+import mimetypes from "mime"
 
 import ContentFailed from "../contentFailed"
-
-const mediaTypes = {
-    "jpg": "image",
-    "jpeg": "image",
-    "png": "image",
-    "gif": "image",
-    "mp4": "video",
-    "webm": "video",
-    "ogv": "video",
-    "mov": "video",
-    "avi": "video",
-    "mkv": "video",
-    "ogg": "audio",
-    "mp3": "audio",
-    "wav": "audio",
-    "flac": "audio",
-    "aac": "audio",
-    "m4a": "audio",
-}
 
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
 
 const Attachment = React.memo((props) => {
-    const { url, id } = props.attachment
-
     const [loaded, setLoaded] = React.useState(false)
 
-    const [mediaType, setMediaType] = React.useState(null)
     const [mimeType, setMimeType] = React.useState(null)
 
-    const onDoubleClickAttachment = (e) => {
-        if (mediaType.split("/")[0] === "image") {
-            e.preventDefault()
-            e.stopPropagation()
-
-            app.controls.openFullImageViewer(url)
-        }
-    }
-
-    const getMediaType = async () => {
-        let extension = null
-
-        // get media type by parsing the url
-        const mediaTypeExt = /\.([a-zA-Z0-9]+)$/.exec(url)
-
-        if (mediaTypeExt) {
-            extension = mediaTypeExt[1]
-        } else {
-            // try to get media by creating requesting the url
-            const response = await fetch(url, {
-                method: "HEAD",
-            })
-
-            extension = response.headers.get("content-type").split("/")[1]
-        }
-
-        extension = extension.toLowerCase()
-
-        const mediaType = mediaTypes[extension]
-        const mimeType = `${mediaType}/${extension}`
-
-        setMediaType(mediaType)
-        setMimeType(mimeType)
-
-        setLoaded(true)
-    }
-
-    const renderMedia = () => {
-        switch (mediaType.split("/")[0]) {
-            case "image": {
-                return <ImageViewer src={url} />
-            }
-            case "video": {
-                return <Plyr
-                    source={{
-                        type: "video",
-                        sources: [{
-                            src: url,
-                        }],
-                    }}
-                    options={{
-                        controls: ["play", "progress", "current-time", "mute", "volume"],
-                    }}
-                />
-            }
-            case "audio": {
-                return <audio controls>
-                    <source src={url} type={mimeType} />
-                </audio>
-            }
-            default: {
-                return <h4>
-                    Unsupported media type [{mediaType}/{mediaTypeExt}]
-                </h4>
-            }
-        }
-    }
-
-    React.useEffect(() => {
-        getMediaType()
-    }, [])
-
-    if (!loaded) {
-        return <Skeleton active />
-    }
-
-    if (loaded && !mediaType && !mimeType) {
-        return <ContentFailed />
-    }
-
     try {
+        const { url, id } = props.attachment
+
+        const onDoubleClickAttachment = (e) => {
+            if (mimeType.split("/")[0] === "image") {
+                e.preventDefault()
+                e.stopPropagation()
+
+                app.controls.openFullImageViewer(url)
+            }
+        }
+
+        const getMediaType = async () => {
+            let extension = null
+
+            // get media type by parsing the url
+            const mediaExtname = /\.([a-zA-Z0-9]+)$/.exec(url)
+
+            if (mediaExtname) {
+                extension = mediaExtname[1]
+            } else {
+                // try to get media by creating requesting the url
+                const response = await fetch(url, {
+                    method: "HEAD",
+                })
+
+                extension = response.headers.get("content-type").split("/")[1]
+            }
+
+            extension = extension.toLowerCase()
+
+            if (!extension) {
+                setLoaded(true)
+
+                console.error("Failed to get media type", url, extension)
+
+                return
+            }
+
+            const mimeType = mimetypes.getType(extension)
+
+            setMimeType(mimeType)
+
+            setLoaded(true)
+        }
+
+        const renderMedia = () => {
+            if (!mimeType) {
+                return null
+            }
+
+            switch (mimeType.split("/")[0]) {
+                case "image": {
+                    return <ImageViewer src={url} />
+                }
+                case "video": {
+                    return <Plyr
+                        source={{
+                            type: "video",
+                            sources: [{
+                                src: url,
+                            }],
+                        }}
+                        options={{
+                            controls: ["play", "progress", "current-time", "mute", "volume"],
+                        }}
+                    />
+                }
+                case "audio": {
+                    return <audio controls>
+                        <source src={url} type={mimeType} />
+                    </audio>
+                }
+                default: {
+                    return <h4>
+                        Unsupported media type [{mimeType}]
+                    </h4>
+                }
+            }
+        }
+
+        React.useEffect(() => {
+            getMediaType()
+        }, [])
+
+        if (!loaded) {
+            return <Skeleton active />
+        }
+
+        if (loaded && !mimeType) {
+            return <ContentFailed />
+        }
+
         return <div
             key={props.index}
             id={id}
@@ -127,7 +118,7 @@ const Attachment = React.memo((props) => {
             {renderMedia()}
         </div>
     } catch (error) {
-        console.error(`Failed to render attachment ${props.attachment.name} (${props.attachment.id})`, error)
+        console.error(error)
 
         return <ContentFailed />
     }
@@ -179,6 +170,10 @@ export default (props) => {
         >
             {
                 props.attachments?.length > 0 && props.attachments.map((attachment, index) => {
+                    if (typeof attachment !== "object") {
+                        return null
+                    }
+
                     return <Attachment index={index} attachment={attachment} />
                 })
             }

@@ -66,6 +66,7 @@
     "localforage": "^1.10.0",
     "luxon": "^3.0.4",
     "match-sorter": "^6.3.1",
+    "mime": "^3.0.0",
     "moment": "2.29.4",
     "moment-timezone": "^0.5.37",
     "mpegts.js": "^1.6.10",
