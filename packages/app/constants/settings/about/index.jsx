@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import moment from "moment"
 
 import { Icons } from "components/Icons"
 
@@ -8,7 +7,13 @@ import config from "config"
 
 import "./index.less"
 
-const Footer = (props) => {
+const connectionsTooltipStrings = {
+    secure: "This connection is secure",
+    insecure: "This connection is insecure, cause it's not using HTTPS protocol and the server cannot be verified on the trusted certificate authority.",
+    warning: "This connection is secure but the server cannot be verified on the trusted certificate authority.",
+}
+
+const Footer = () => {
     const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
 
     return <div className="footer">
@@ -39,6 +44,8 @@ export default {
 
         const [serverManifest, setServerManifest] = React.useState(null)
         const [serverOrigin, setServerOrigin] = React.useState(null)
+        const [serverHealth, setServerHealth] = React.useState(null)
+        const [secureConnection, setSecureConnection] = React.useState(false)
 
         const checkServerVersion = async () => {
             const serverManifest = await app.cores.api.customRequest()
@@ -51,12 +58,30 @@ export default {
 
             if (instance) {
                 setServerOrigin(instance.origin)
+
+                if (instance.origin.startsWith("https")) {
+                    setSecureConnection(true)
+                }
+            }
+        }
+
+        const featchServerHealth = async () => {
+            const response = await app.cores.api.customRequest({
+                method: "GET",
+                url: "/server/health",
+            }).catch(() => null)
+
+            console.log(response.data)
+
+            if (response) {
+                setServerHealth(response.data)
             }
         }
 
         React.useEffect(() => {
             checkServerVersion()
             checkServerOrigin()
+            featchServerHealth()
         }, [])
 
         return <div className="about_app">
@@ -83,23 +108,59 @@ export default {
                 </div>
             </div>
 
+            <h3><Icons.Info />Server information</h3>
             <div className="group">
-                <h3><Icons.Server />Server info</h3>
-
                 <div className="field">
-                    Powered by Linebridge™
+                    <div className="field_header">
+                        <h3><Icons.MdOutlineStream /> Origin</h3>
 
-                    <div className="value">
-                        <antd.Tag>v{serverManifest?.LINEBRIDGE_SERVER_VERSION ?? "Unknown"}</antd.Tag>
+                        <antd.Tooltip
+                            title={secureConnection ? connectionsTooltipStrings.secure : connectionsTooltipStrings.insecure}
+                        >
+                            <antd.Tag
+                                color={secureConnection ? "green" : "red"}
+                                icon={secureConnection ? <Icons.MdHttps /> : <Icons.MdWarning />}
+                            >
+                                {
+                                    secureConnection ? " Secure connection" : "Insecure connection"
+                                }
+                            </antd.Tag>
+                        </antd.Tooltip>
+                    </div>
+
+                    <div className="field_value">
+                        {serverOrigin ?? "Unknown"}
                     </div>
                 </div>
 
                 <div className="field">
-                    Server origin
-
-                    <div className="value">
-                        <antd.Tag>{serverOrigin ?? "Unknown"}</antd.Tag>
+                    <div className="field_header">
+                        <h3><Icons.MdBuild /> Version</h3>
                     </div>
+
+                    <div className="field_value">
+                        {serverManifest?.version ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="field">
+                    <div className="field_header">
+                        <h3><Icons.MdDataUsage /> Instance usage</h3>
+                    </div>
+
+                    <div className="field_value">
+                        <antd.Progress
+                            percent={serverHealth?.cpuUsage.percent ?? 0}
+                            status="active"
+                            showInfo={false}
+                        />
+                    </div>
+                </div>
+
+                <div className="group_footer">
+                    {
+                        serverManifest?.LINEBRIDGE_SERVER_VERSION && <h5>Powered by Linebridge™</h5>
+                    }
                 </div>
             </div>
 
