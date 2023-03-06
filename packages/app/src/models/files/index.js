@@ -1,5 +1,7 @@
-export default class UploadModel {
+export default class FilesModel {
     static async uploadFile(file) {
+        console.log("uploadFile", file)
+        
         // get the file from the payload
         if (!file) {
             throw new Error("File is required")
@@ -14,7 +16,7 @@ export default class UploadModel {
         // send the request
         const uploadRequest = await app.cores.api.customRequest( {
             method: "POST",
-            url: "/upload",
+            url: "/files/upload",
             data: formData,
         }).catch((err) => {
             throw new Error(err.response.data.message)
@@ -40,7 +42,7 @@ export default class UploadModel {
         const resultFiles = []
 
         for await (const file of files) {
-            const result = await UploadModel.uploadFile(file)
+            const result = await FilesModel.uploadFile(file)
             resultFiles.push(result)
         }
 

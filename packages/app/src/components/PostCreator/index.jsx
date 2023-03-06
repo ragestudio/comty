@@ -8,6 +8,7 @@ import { Icons } from "components/Icons"
 import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 
 import PostModel from "models/post"
+import FilesModel from "models/files"
 
 import "./index.less"
 
@@ -119,25 +120,13 @@ export default class PostCreator extends React.Component {
         // hide uploader
         this.toogleUploaderVisibility(false)
 
-        // get file data
-        const file = req.file
+        const request = await FilesModel.uploadFile(req.file)
+            .catch(error => {
+                console.error(error)
+                antd.message.error(error)
 
-        console.log(`Uploading file >`, file)
-
-        // append to form data
-        const formData = new FormData()
-
-        formData.append("files", file)
-
-        // send request
-        const request = await this.api.post.upload(formData, undefined).catch((error) => {
-            console.error(error)
-            antd.message.error(error)
-
-            req.onError(error)
-
-            return false
-        })
+                return false
+            })
 
         if (request) {
             console.log(`Upload done >`, request)
@@ -208,8 +197,13 @@ export default class PostCreator extends React.Component {
                     pending: this.state.pending.filter(uid => uid !== change.file.uid)
                 })
 
-                // update post data
-                this.addAttachment(change.file.response.files)
+                if (Array.isArray(change.file.response.files)) {
+                    change.file.response.files.forEach((file) => {
+                        this.addAttachment(file)
+                    })
+                } else {
+                    this.addAttachment(change.file.response)
+                }
 
                 // scroll to end
                 this.uploaderScrollToEnd()

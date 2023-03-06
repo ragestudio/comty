@@ -15,7 +15,7 @@ export default (props) => {
 
         formData.append("files", req.file)
 
-        const request = await window.app.cores.api.customRequest({
+        const { data } = await window.app.cores.api.customRequest({
             url: "/upload",
             method: "POST",
             data: formData
@@ -28,10 +28,10 @@ export default (props) => {
 
         setUploading(false)
 
-        if (request) {
+        if (data) {
             // check failed uploads
-            if (request.failed.length > 0) {
-                request.failed.forEach((file) => {
+            if (data.failed.length > 0) {
+                data.failed.forEach((file) => {
                     app.notification.error({
                         message: "Failed to upload file",
                         description: `Could not upload file ${file.fileName} cause > ${file.error}`
@@ -39,7 +39,7 @@ export default (props) => {
                 })
             }
 
-            props.ctx.dispatchUpdate(request.files[0].url)
+            props.ctx.dispatchUpdate(data.files[0].url)
         }
     }
 
