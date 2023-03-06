@@ -3,56 +3,58 @@ export default async (eventFile) => {
         throw new Error("Missing eventFile")
     }
 
-    if (eventFile.type === "text/html") {
-        eventFile.getAsString((data) => {
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(data, "text/html")
-            const img = doc.querySelector("img")
+    return await new Promise((resolve, reject) => {
+        if (eventFile.type === "text/html") {
+            eventFile.getAsString((data) => {
+                const parser = new DOMParser()
+                const doc = parser.parseFromString(data, "text/html")
+                const img = doc.querySelector("img")
 
-            // TODO: Support multiple mime types
+                // TODO: Support multiple mime types
 
-            if (!img) {
-                return reject(new Error("No image found in clipboard. Only images are supported."))
-            }
+                if (!img) {
+                    return reject(new Error("No image found in clipboard. Only images are supported."))
+                }
 
-            const image = new Image()
+                const image = new Image()
 
-            const finalExtension = "png" //img.src.split(".").pop()
+                const finalExtension = "png" //img.src.split(".").pop()
 
-            image.crossOrigin = "Anonymous"
+                image.crossOrigin = "Anonymous"
 
-            image.src = img.src
+                image.src = img.src
 
-            image.onload = () => {
-                const canvas = document.createElement("canvas")
+                image.onload = () => {
+                    const canvas = document.createElement("canvas")
 
-                canvas.width = image.width
-                canvas.height = image.height
+                    canvas.width = image.width
+                    canvas.height = image.height
 
-                const context = canvas.getContext("2d")
+                    const context = canvas.getContext("2d")
 
-                context.drawImage(image, 0, 0, image.width, image.height)
+                    context.drawImage(image, 0, 0, image.width, image.height)
 
-                canvas.toBlob((blob) => {
-                    blob.lastModifiedDate = new Date()
-                    blob.name = img.src.split("/").pop()
+                    canvas.toBlob((blob) => {
+                        blob.lastModifiedDate = new Date()
+                        blob.name = img.src.split("/").pop()
 
-                    // remove the extension
-                    blob.name = blob.name.split(".").slice(0, -1).join(".")
+                        // remove the extension
+                        blob.name = blob.name.split(".").slice(0, -1).join(".")
 
-                    // set in the name the extension
-                    blob.name = `${blob.name}.${finalExtension}`
+                        // set in the name the extension
+                        blob.name = `${blob.name}.${finalExtension}`
 
-                    blob.filename = blob.name
+                        blob.filename = blob.name
 
-                    return resolve(new File([blob], blob.name, {
-                        type: blob.type,
-                        lastModified: blob.lastModifiedDate
-                    }))
-                }, `image/${finalExtension}`)
-            }
-        })
-    } else {
-        return eventFile.getAsFile()
-    }
+                        return resolve(new File([blob], blob.name, {
+                            type: blob.type,
+                            lastModified: blob.lastModifiedDate
+                        }))
+                    }, `image/${finalExtension}`)
+                }
+            })
+        } else {
+            return resolve(eventFile.getAsFile())
+        }
+    })
 }
