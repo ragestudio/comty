@@ -83,24 +83,35 @@ export default class Dashboard extends React.Component {
                     </div>
 
                     <antd.Menu
-                        mode="inline"
+                        mode="vertical"
                         selectedKeys={[this.state.activeTab]}
                         activeKey={this.state.activeTab}
                         onClick={({ key }) => this.handleTabChange(key)}
                     >
-                        {Object.keys(Tabs).map((key) => {
-                            const tab = Tabs[key]
+                        {
+                            Object.keys(Tabs).map((key) => {
+                                const tab = Tabs[key]
 
-                            return <antd.Menu.Item
-                                key={key}
-                                icon={createIconRender(tab.icon)}
-                            >
-                                {tab.title}
-                            </antd.Menu.Item>
-                        })}
+                                return <antd.Menu.Item
+                                    key={key}
+                                    icon={createIconRender(tab.icon)}
+                                >
+                                    {tab.title}
+                                </antd.Menu.Item>
+                            })
+                        }
                     </antd.Menu>
                 </div>
+            </div>
 
+            <div
+                ref={this.primaryPanelRef}
+                className={classnames("panel", "fade-opacity-active")}
+            >
+                {this.renderActiveTab()}
+            </div>
+
+            <div className="panel right">
                 <div className="card" id="trendings">
                     <div className="header">
                         <h2>
@@ -108,7 +119,7 @@ export default class Dashboard extends React.Component {
                             <Translation>{(t) => t("Trendings")}</Translation>
                         </h2>
                     </div>
-                    
+
                     <HashtagTrendings />
                 </div>
 
@@ -124,17 +135,6 @@ export default class Dashboard extends React.Component {
                 </div>
 
                 <FeaturedEventsAnnouncements />
-            </div>
-
-            <div
-                ref={this.primaryPanelRef}
-                className={classnames("panel", "fade-opacity-active")}
-            >
-                {this.renderActiveTab()}
-            </div>
-
-            <div className="panel right">
-
             </div>
         </div>
     }
