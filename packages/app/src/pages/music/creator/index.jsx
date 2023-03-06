@@ -7,7 +7,7 @@ import UploadButton from "components/UploadButton"
 import { Icons } from "components/Icons"
 
 import PlaylistModel from "models/playlists"
-import UploadModel from "models/upload"
+import FilesModel from "models/files"
 
 import "./index.less"
 
@@ -179,7 +179,7 @@ export default class PlaylistCreator extends React.Component {
 
             if (file) {
                 // upload the file
-                UploadModel.uploadFile(file).then((response) => {
+                FilesModel.uploadFile(file).then((response) => {
                     // update the file url in the track info
                     const file = this.state.trackList.find((file) => file.uid === uid)
 
@@ -282,7 +282,7 @@ export default class PlaylistCreator extends React.Component {
     }
 
     handleUpload = async (req) => {
-        const response = await UploadModel.uploadFile(req.file).catch((error) => {
+        const response = await FilesModel.uploadFile(req.file).catch((error) => {
             console.error(error)
             antd.message.error(error)
 
