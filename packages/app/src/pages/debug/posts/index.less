@@ -1,0 +1,23 @@
+.list {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    align-items: center;
+
+    .postCard {
+        &:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+    
+        &:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+    
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+    }
+}
