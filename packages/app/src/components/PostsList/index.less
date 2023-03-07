@@ -1,26 +1,16 @@
-.postsFeed {
+.postList,
+.infinite-scroll {
     display: flex;
     flex-direction: column;
+
     align-items: center;
-    justify-content: center;
 
-    width: 100%;
+    width: fit-content;
 
-    .infinite-scroll {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        //justify-content: center;
+    // WARN: Only use if is a performance issue
+    //will-change: transform;
 
-        width: 100%;
-    }
+    overflow: hidden;
 
-    .posts {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-
-        width: 100%;
-    }
+    border-radius: 8px;
 }
