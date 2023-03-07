@@ -119,6 +119,7 @@ export class PagePanelWithNavMenu extends React.Component {
         }
 
         return <PagePanels
+            primaryPanelClassName={this.props.primaryPanelClassName}
             panels={panels}
         />
     }
@@ -163,6 +164,7 @@ export default class PagePanels extends React.Component {
             {
                 this.props.panels[1] && <Panel
                     {...this.props.panels[1]}
+                    className={this.props.primaryPanelClassName}
                     align="center"
                 />
             }
