@@ -19,6 +19,7 @@ export default class Dashboard extends React.Component {
         openPost: null,
     }
 
+    contentRef = React.createRef()
     primaryPanelRef = React.createRef()
 
     renderActiveTab = () => {
@@ -32,6 +33,7 @@ export default class Dashboard extends React.Component {
 
         return React.createElement(tab.component, {
             onOpenPost: this.onOpenPost,
+            ref: this.contentRef,
         })
     }
 
@@ -67,6 +69,40 @@ export default class Dashboard extends React.Component {
     render() {
         return <div className="postingDashboard">
             <div className="panel left">
+                <div className="card" id="trendings">
+                    <div className="header">
+                        <h2>
+                            <Icons.TrendingUp />
+                            <Translation>{(t) => t("Trendings")}</Translation>
+                        </h2>
+                    </div>
+
+                    <HashtagTrendings />
+                </div>
+
+                <div className="card" id="onlineFriends">
+                    <div className="header">
+                        <h2>
+                            <Icons.MdPeopleAlt />
+                            <Translation>{(t) => t("Online Friends")}</Translation>
+                        </h2>
+                    </div>
+
+                    <ConnectedFriends />
+                </div>
+
+                <FeaturedEventsAnnouncements />
+
+            </div>
+
+            <div
+                ref={this.primaryPanelRef}
+                className={classnames("panel", "full", "fade-opacity-active")}
+            >
+                {this.renderActiveTab()}
+            </div>
+
+            <div className="panel right">
                 <div className="card" id="browserType">
                     <div className="header">
                         <h1>
@@ -102,39 +138,6 @@ export default class Dashboard extends React.Component {
                         }
                     </antd.Menu>
                 </div>
-            </div>
-
-            <div
-                ref={this.primaryPanelRef}
-                className={classnames("panel", "fade-opacity-active")}
-            >
-                {this.renderActiveTab()}
-            </div>
-
-            <div className="panel right">
-                <div className="card" id="trendings">
-                    <div className="header">
-                        <h2>
-                            <Icons.TrendingUp />
-                            <Translation>{(t) => t("Trendings")}</Translation>
-                        </h2>
-                    </div>
-
-                    <HashtagTrendings />
-                </div>
-
-                <div className="card" id="onlineFriends">
-                    <div className="header">
-                        <h2>
-                            <Icons.Rss />
-                            <Translation>{(t) => t("Online Friends")}</Translation>
-                        </h2>
-                    </div>
-
-                    <ConnectedFriends />
-                </div>
-
-                <FeaturedEventsAnnouncements />
             </div>
         </div>
     }
