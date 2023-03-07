@@ -143,7 +143,7 @@ export default (props) => {
 
     const renderComments = () => {
         if (!comments) {
-            return <antd.Skeleton active />
+            return <antd.Skeleton />
         }
 
         if (comments.length === 0) {
