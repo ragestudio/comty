@@ -9,53 +9,10 @@ import "./index.less"
 
 export default class ExplorePosts extends React.Component {
     state = {
-        loading: true,
-        initialLoading: true,
-        hasMorePosts: true,
-        posts: [],
         focusedSearcher: false,
         filledSearcher: false,
     }
 
-    loadPosts = async ({
-        trim,
-        replace = false
-    } = {}) => {
-        await this.setState({
-            loading: true,
-        })
-
-        // get posts from api
-        const result = await Post.getExplorePosts({
-            trim: trim ?? this.state.posts.length,
-        })
-
-        console.log("Loaded posts => \n", result)
-
-        if (result) {
-            if (result.length === 0) {
-                await this.setState({
-                    hasMorePosts: false,
-                })
-
-                return false
-            }
-
-            await this.setState({
-                posts: replace ? result : [...this.state.posts, ...result],
-            })
-        }
-
-        await this.setState({
-            loading: false,
-        })
-
-        if (this.state.initialLoading) {
-            await this.setState({
-                initialLoading: false,
-            })
-        }
-    }
 
     toggleFocusSearcher = (to) => {
         to = to ?? !this.state.focusedSearcher
@@ -73,10 +30,6 @@ export default class ExplorePosts extends React.Component {
         })
     }
 
-    componentDidMount = async () => {
-        await this.loadPosts()
-    }
-
     render() {
         return <div className="postsExplore">
             <div className="postsExplore_header">
@@ -89,11 +42,13 @@ export default class ExplorePosts extends React.Component {
                 />
             </div>
             {
-                this.state.focusedSearcher || this.state.filledSearcher ? null : this.state.initialLoading ? <Skeleton active /> : <PostsList
-                    loading={this.state.loading}
-                    hasMorePosts={this.state.hasMorePosts}
-                    onLoadMore={this.loadPosts}
-                    list={this.state.posts}
+                this.state.focusedSearcher || this.state.filledSearcher ? null : <PostsList
+                    onLoadMore={Post.getExplorePosts}
+                    loadFromModel={Post.getExplorePosts}
+                    watchTimeline={[
+                        "post.new",
+                        "post.delete",
+                    ]}
                 />
             }
         </div>
