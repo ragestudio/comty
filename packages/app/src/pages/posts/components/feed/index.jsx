@@ -24,7 +24,10 @@ export class Feed extends React.Component {
             emptyListRender={emptyListRender}
             loadFromModel={FeedModel.getPostsFeed}
             onLoadMore={FeedModel.getPostsFeed}
-            watchTimeline
+            watchTimeline={[
+                "feed.new",
+                "post.delete",
+            ]}
         />
     }
 }
