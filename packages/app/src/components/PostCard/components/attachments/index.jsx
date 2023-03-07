@@ -124,7 +124,7 @@ const Attachment = React.memo((props) => {
     }
 })
 
-export default (props) => {
+export default React.memo((props) => {
     const carouselRef = React.useRef(null)
     const [attachmentIndex, setAttachmentIndex] = React.useState(0)
 
@@ -174,9 +174,11 @@ export default (props) => {
                         return null
                     }
 
-                    return <Attachment index={index} attachment={attachment} />
+                    return <React.Fragment key={index}>
+                        <Attachment index={index} attachment={attachment} />
+                    </React.Fragment>
                 })
             }
         </Carousel>
     </div>
-}
+})
