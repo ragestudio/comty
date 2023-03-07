@@ -34,6 +34,29 @@ const Footer = () => {
     </div>
 }
 
+const latencyToColor = (latency, type) => {
+    switch (type) {
+        case "http": {
+            if (latency < 100) {
+                return "green"
+            }
+            if (latency < 200) {
+                return "orange"
+            }
+            return "red"
+        }
+        case "ws": {
+            if (latency < 80) {
+                return "green"
+            }
+            if (latency < 120) {
+                return "orange"
+            }
+            return "red"
+        }
+    }
+}
+
 export default {
     id: "about",
     icon: "Info",
@@ -46,6 +69,7 @@ export default {
         const [serverOrigin, setServerOrigin] = React.useState(null)
         const [serverHealth, setServerHealth] = React.useState(null)
         const [secureConnection, setSecureConnection] = React.useState(false)
+        const [connectionPing, setConnectionPing] = React.useState({})
 
         const checkServerVersion = async () => {
             const serverManifest = await app.cores.api.customRequest()
@@ -65,7 +89,7 @@ export default {
             }
         }
 
-        const featchServerHealth = async () => {
+        const fetchServerHealth = async () => {
             const response = await app.cores.api.customRequest({
                 method: "GET",
                 url: "/server/health",
@@ -78,10 +102,29 @@ export default {
             }
         }
 
+        const measurePing = async () => {
+            const result = await app.cores.api.measurePing()
+
+            console.log(result)
+
+            setConnectionPing(result)
+        }
+
         React.useEffect(() => {
             checkServerVersion()
             checkServerOrigin()
-            featchServerHealth()
+
+            fetchServerHealth()
+            measurePing()
+
+            const measureInterval = setInterval(() => {
+                fetchServerHealth()
+                measurePing()
+            }, 3000)
+
+            return () => {
+                clearInterval(measureInterval)
+            }
         }, [])
 
         return <div className="about_app">
@@ -114,18 +157,55 @@ export default {
                     <div className="field_header">
                         <h3><Icons.MdOutlineStream /> Origin</h3>
 
-                        <antd.Tooltip
-                            title={secureConnection ? connectionsTooltipStrings.secure : connectionsTooltipStrings.insecure}
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                fontSize: "1.4rem",
+                            }}
                         >
-                            <antd.Tag
-                                color={secureConnection ? "green" : "red"}
-                                icon={secureConnection ? <Icons.MdHttps /> : <Icons.MdWarning />}
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
                             >
-                                {
-                                    secureConnection ? " Secure connection" : "Insecure connection"
-                                }
-                            </antd.Tag>
-                        </antd.Tooltip>
+                                <Icons.MdHttp />
+                                <antd.Tag
+                                    color={latencyToColor(connectionPing?.http, "http")}
+                                >
+                                    {connectionPing?.http}ms
+                                </antd.Tag>
+                            </div>
+
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Icons.MdSettingsEthernet />
+                                <antd.Tag
+                                    color={latencyToColor(connectionPing?.ws, "ws")}
+                                >
+                                    {connectionPing?.ws}ms
+                                </antd.Tag>
+                            </div>
+
+                            <antd.Tooltip
+                                title={secureConnection ? connectionsTooltipStrings.secure : connectionsTooltipStrings.insecure}
+                            >
+                                <antd.Tag
+                                    color={secureConnection ? "green" : "red"}
+                                    icon={secureConnection ? <Icons.MdHttps /> : <Icons.MdWarning />}
+                                >
+                                    {
+                                        secureConnection ? " Secure connection" : "Insecure connection"
+                                    }
+                                </antd.Tag>
+                            </antd.Tooltip>
+                        </div>
                     </div>
 
                     <div className="field_value">
