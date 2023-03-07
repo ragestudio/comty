@@ -1,6 +1,6 @@
 {
   "name": "wrapper",
-  "version": "0.40.3",
+  "version": "0.41.0",
   "main": "./src/index.js",
   "license": "MIT",
   "scripts": {
