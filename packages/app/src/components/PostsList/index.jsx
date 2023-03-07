@@ -66,9 +66,18 @@ export class PostsListsComponent extends React.Component {
             loading: true,
         })
 
-        const result = await fn({
+        let payload = {
             trim: this.state.list.length,
-        }).catch((err) => {
+        }
+
+        if (this.props.loadFromModelProps) {
+            payload = {
+                ...payload,
+                ...this.props.loadFromModelProps,
+            }
+        }
+
+        const result = await fn(payload).catch((err) => {
             console.error(err)
 
             app.message.error("Failed to load more posts")
