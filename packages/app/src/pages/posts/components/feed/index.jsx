@@ -1,5 +1,4 @@
 import React from "react"
-import { Skeleton } from "antd"
 
 import { PostsList } from "components"
 
@@ -19,72 +18,17 @@ const emptyListRender = () => {
     </div>
 }
 
-export default class Feed extends React.Component {
-    state = {
-        loading: true,
-        initialLoading: true,
-        hasMorePosts: true,
-        posts: [],
-    }
-
-    loadData = async ({
-        trim,
-        replace = false
-    } = {}) => {
-        await this.setState({
-            loading: true,
-        })
-
-        // get posts from api
-        const result = await FeedModel.getPostsFeed({
-            trim: trim ?? this.state.posts.length,
-        })
-
-        console.log("Loaded data => \n", result)
-
-        if (result) {
-            if (result.length === 0) {
-                await this.setState({
-                    hasMorePosts: false,
-                    loading: false,
-                    initialLoading: false,
-                })
-
-                return false
-            }
-
-            await this.setState({
-                posts: replace ? result : [...this.state.posts, ...result],
-            })
-        }
-
-        await this.setState({
-            loading: false,
-        })
-
-        if (this.state.initialLoading) {
-            await this.setState({
-                initialLoading: false,
-            })
-        }
-    }
-
-    componentDidMount = async () => {
-        await this.loadData()
-    }
-
+export class Feed extends React.Component {
     render() {
-        return <div className="feed">
-            {
-                this.state.initialLoading ? <Skeleton active /> : <PostsList
-                    loading={this.state.loading}
-                    hasMorePosts={this.state.hasMorePosts}
-                    emptyListRender={emptyListRender}
-                    onLoadMore={this.loadData}
-                    list={this.state.posts}
-                    watchTimeline
-                />
-            }
-        </div>
+        return <PostsList
+            emptyListRender={emptyListRender}
+            loadFromModel={FeedModel.getPostsFeed}
+            onLoadMore={FeedModel.getPostsFeed}
+            watchTimeline
+        />
     }
 }
+
+export default React.forwardRef((props, ref) => {
+    return <Feed {...props} innerRef={ref} />
+})
