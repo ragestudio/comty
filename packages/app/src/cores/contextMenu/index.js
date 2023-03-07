@@ -132,7 +132,7 @@ export default class ContextMenuCore extends Core {
             clickedComponent: component,
             items: items,
             ctx: {
-                close: this.hide
+                close: this.hide.bind(this),
             }
         })
     }
