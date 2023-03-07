@@ -1,7 +1,21 @@
 import React from "react"
 
-export default () => {
-    app.setLocation("/music/feed")
+import { Icons } from "components/Icons"
 
-    return <></>
+import { PagePanelWithNavMenu } from "components/PagePanels"
+
+import Tabs from "./tabs"
+
+const NavMenuHeader = <h2>
+    <Icons.MdLiveTv />
+    Music
+</h2>
+
+export default () => {
+    return <PagePanelWithNavMenu
+        tabs={Tabs}
+        navMenuHeader={NavMenuHeader}
+        useSetQueryType
+        transition
+    />
 }
