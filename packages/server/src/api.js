@@ -216,6 +216,10 @@ export default class API {
             })
         }
 
+        this.server.websocket_instance.eventsChannels.push(["/main", "ping", async (socket) => {
+            return socket.emit("pong")
+        }])
+
         this.server.websocket_instance.eventsChannels.push(["/main", "authenticate", async (socket, authPayload) => {
             if (!authPayload) {
                 return onAuthenticatedFailed(socket, "missing_auth_payload")
