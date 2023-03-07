@@ -70,6 +70,7 @@ export default class ApiCore extends Core {
         autenticateWS: this.autenticateWS.bind(this),
         listenEvent: this.listenEvent.bind(this),
         unlistenEvent: this.unlistenEvent.bind(this),
+        measurePing: this.measurePing.bind(this),
     }
 
     async attach() {
@@ -297,5 +298,57 @@ export default class ApiCore extends Core {
         socket.emit("authenticate", {
             token,
         })
+    }
+
+    async measurePing() {
+        const timings = {}
+
+        const promises = [
+            new Promise(async (resolve) => {
+                const start = Date.now()
+
+                this.customRequest({
+                    method: "GET",
+                    url: "/ping",
+                })
+                    .then(() => {
+                        // set http timing in ms
+                        timings.http = Date.now() - start
+
+                        resolve()
+                    })
+                    .catch(() => {
+                        timings.http = "failed"
+                        resolve()
+                    })
+
+                setTimeout(() => {
+                    timings.http = "failed"
+
+                    resolve()
+                }, 10000)
+            }),
+            new Promise((resolve) => {
+                const start = Date.now()
+
+                this.instance.wsInterface.sockets["main"].on("pong", () => {
+                    timings.ws = Date.now() - start
+
+                    resolve()
+                })
+
+                this.instance.wsInterface.sockets["main"].emit("ping")
+
+                setTimeout(() => {
+                    timings.ws = "failed"
+
+                    resolve()
+                }, 10000)
+            })
+        ]
+
+        await Promise.all(promises)
+
+        return timings
     }
 }
