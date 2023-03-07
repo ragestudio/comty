@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { PostCard, LoadMore } from "components"
+import { ViewportList } from "react-viewport-list"
 
 import PostModel from "models/post"
 
@@ -22,19 +23,28 @@ const NoResultComponent = () => {
     />
 }
 
-// FIXME: Scroll behavior should scroll to next post or the previous one depending on the direction of the scroll
-export default class PostsLists extends React.Component {
+export class PostsListsComponent extends React.Component {
     state = {
-        currentIndex: 0,
         openPost: null,
+
+        loading: false,
+        initialLoading: true,
+
+        realtimeUpdates: true,
+
+        hasMore: true,
         list: this.props.list ?? [],
     }
 
-    listRef = React.createRef()
+    viewRef = this.props.innerRef
 
     timelineWsEvents = {
         "post.new": (data) => {
             console.log("New post => ", data)
+
+            if (!this.state.realtimeUpdates) {
+                return
+            }
 
             this.setState({
                 list: [data, ...this.state.list],
@@ -51,20 +61,93 @@ export default class PostsLists extends React.Component {
         }
     }
 
-    componentDidMount = async () => {
-        window.app.cores.shortcuts.register({
-            id: "postsFeed.scrollUp",
-            key: "ArrowUp",
-            preventDefault: true,
-        }, (event) => {
-            this.scrollUp()
+    handleLoad = async (fn) => {
+        this.setState({
+            loading: true,
         })
-        window.app.cores.shortcuts.register({
-            id: "postsFeed.scrollDown",
-            key: "ArrowDown",
-            preventDefault: true,
-        }, (event) => {
-            this.scrollDown()
+
+        const result = await fn({
+            trim: this.state.list.length,
+        }).catch((err) => {
+            console.error(err)
+
+            app.message.error("Failed to load more posts")
+
+            return null
+        })
+
+        if (result) {
+            if (result.length === 0) {
+                return this.setState({
+                    hasMore: false,
+                })
+            }
+
+            this.setState({
+                list: [...this.state.list, ...result],
+            })
+        }
+
+        this.setState({
+            loading: false,
+        })
+    }
+
+    addPost = (post) => {
+        this.setState({
+            list: [post, ...this.state.list],
+        })
+    }
+
+    removePost = (id) => {
+        this.setState({
+            list: this.state.list.filter((post) => {
+                return post._id !== id
+            }),
+        })
+    }
+
+    _hacks = {
+        addPost: this.addPost,
+        removePost: this.removePost,
+        addRandomPost: () => {
+            this.addPost({
+                _id: Math.random().toString(36).substring(7),
+                message: `Random post ${Math.random().toString(36).substring(7)}`,
+                user: {
+                    _id: Math.random().toString(36).substring(7),
+                    username: "random user",
+                }
+            })
+        }
+    }
+
+    onResumeRealtimeUpdates = async () => {
+        // fetch new posts
+        await this.handleLoad(this.props.loadFromModel)
+
+        this.setState({
+            realtimeUpdates: true,
+        })
+    }
+
+    onScrollList = (e) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.target
+
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            this.setState({
+                realtimeUpdates: false,
+            })
+        }
+    }
+
+    componentDidMount = async () => {
+        if (typeof this.props.loadFromModel === "function") {
+            await this.handleLoad(this.props.loadFromModel)
+        }
+
+        this.setState({
+            initialLoading: false,
         })
 
         if (this.props.watchTimeline) {
@@ -72,59 +155,37 @@ export default class PostsLists extends React.Component {
                 app.cores.api.listenEvent(event, callback)
             })
         }
+
+        //console.log("PostsList mounted", this.viewRef)
+
+        if (this.viewRef) {
+            // handle when the user is scrolling a bit down, disable ws events
+            this.viewRef.current.addEventListener("scroll", this.onScrollList)
+        }
+
+        window._hacks = this._hacks
     }
 
     componentWillUnmount = async () => {
-        window.app.shortcuts.remove("postsFeed.scrollUp")
-        window.app.shortcuts.remove("postsFeed.scrollDown")
-
         if (this.props.watchTimeline) {
             Object.entries(this.timelineWsEvents).forEach(([event, callback]) => {
                 app.cores.api.unlistenEvent(event, callback)
             })
         }
+
+        if (this.viewRef) {
+            this.viewRef.current.removeEventListener("scroll", this.onScrollList)
+        }
+
+        window._hacks = null
     }
 
-    // watch if props.list has changed and update state.list
     componentDidUpdate = async (prevProps) => {
         if (prevProps.list !== this.props.list) {
             this.setState({
                 list: this.props.list,
             })
         }
-    }
-
-    scrollUp = () => {
-        this.scrollToIndex(this.state.currentIndex - 1)
-    }
-
-    scrollDown = () => {
-        this.scrollToIndex(this.state.currentIndex + 1)
-    }
-
-    scrollToIndex = (index) => {
-        const post = this.listRef.current.children[index]
-
-        if (post) {
-            post.scrollIntoView({ behavior: "smooth", block: "center" })
-            this.setState({ currentIndex: index })
-        }
-    }
-
-    handleScroll = (event) => {
-        event.preventDefault()
-
-        // check if is scrolling up or down
-        const isScrollingUp = event.deltaY < 0
-
-        // get current index
-        const currentIndex = this.state.currentIndex
-
-        // get next index
-        const nextIndex = isScrollingUp ? currentIndex - 1 : currentIndex + 1
-
-        // scroll to next index
-        this.scrollToIndex(nextIndex)
     }
 
     onLikePost = async (data) => {
@@ -168,7 +229,17 @@ export default class PostsLists extends React.Component {
         }
     }
 
+    onLoadMore = async () => {
+        if (typeof this.props.onLoadMore === "function") {
+            return this.handleLoad(this.props.onLoadMore)
+        }
+    }
+
     render() {
+        if (this.state.initialLoading) {
+            return <antd.Skeleton active />
+        }
+
         if (this.state.list.length === 0) {
             if (typeof this.props.emptyListRender === "function") {
                 return React.createElement(this.props.emptyListRender)
@@ -180,37 +251,43 @@ export default class PostsLists extends React.Component {
             </div>
         }
 
-        return <div
-            id="postsFeed"
-            className="postsFeed"
-            onScroll={this.handleScroll}
+        return <LoadMore
+            className="postList"
+            loadingComponent={LoadingComponent}
+            noResultComponent={NoResultComponent}
+            hasMore={this.state.hasMore}
+            fetching={this.state.loading}
+            onBottom={this.onLoadMore}
         >
-            <LoadMore
-                className="posts"
-                ref={this.listRef}
-                loadingComponent={LoadingComponent}
-                noResultComponent={NoResultComponent}
-                hasMore={this.props.hasMorePosts}
-                onBottom={this.props.onLoadMore}
-                fetching={this.props.loading}
+            {
+                !this.state.realtimeUpdates && <div className="realtime_updates_disabled">
+                    <antd.Alert
+                        message="Realtime updates disabled"
+                        description="You are scrolling down, realtime updates are disabled to improve performance"
+                        type="warning"
+                        showIcon
+                    />
+                </div>
+            }
+            <ViewportList
+                viewportRef={this.viewRef}
+                items={this.state.list}
             >
                 {
-                    this.state.list.map((post, index) => {
-                        console.log("Post => ", post, index)
-
-                        return <PostCard
-                            key={index}
-                            data={post}
-                            events={{
-                                onToogleOpen: this.onToogleOpen,
-                                onClickLike: this.onLikePost,
-                                onClickDelete: this.onDeletePost,
-                                onClickSave: this.onSavePost,
-                            }}
-                        />
-                    })
+                    (item) => <PostCard
+                        key={item._id}
+                        data={item}
+                        events={{
+                            onClickLike: this.onLikePost,
+                            onClickSave: this.onSavePost,
+                            onClickDelete: this.onDeletePost,
+                            onClickEdit: this.onEditPost,
+                        }}
+                    />
                 }
-            </LoadMore>
-        </div>
+            </ViewportList>
+        </LoadMore>
     }
 }
+
+export default React.forwardRef((props, ref) => <PostsListsComponent innerRef={ref} {...props} />)
