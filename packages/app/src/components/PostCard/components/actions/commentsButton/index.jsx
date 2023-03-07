@@ -11,7 +11,7 @@ export default (props) => {
         <Button
             type="ghost"
             shape="circle"
-            onClick={props.onClickComments}
+            onClick={props.onClick}
             icon={<Icons.MessageCircle />}
         />
         {

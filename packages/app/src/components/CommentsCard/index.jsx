@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 import moment from "moment"
 
 import { Icons } from "components/Icons"
@@ -48,11 +49,10 @@ const CommentCard = (props) => {
 }
 
 export default (props) => {
+    const [visible, setVisible] = React.useState(props.visible ?? true)
     const [comments, setComments] = React.useState(null)
 
     const fetchData = async () => {
-        setComments(null)
-
         // fetch comments
         const commentsResult = await PostModel.getPostComments({
             post_id: props.post_id
@@ -123,9 +123,19 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        fetchData()
-        listenEvents()
+        setVisible(props.visible)
+    }, [props.visible])
 
+    React.useEffect(() => {
+        if (visible) {
+            fetchData()
+            listenEvents()
+        } else {
+            unlistenEvents()
+        }
+    }, [visible])
+
+    React.useEffect(() => {
         return () => {
             unlistenEvents()
         }
@@ -149,17 +159,23 @@ export default (props) => {
         })
     }
 
-    if (!comments) {
-        return <antd.Skeleton active />
-    }
-
-    return <div className="comments">
+    return <div
+        id="comments"
+        className={classnames(
+            "comments",
+            {
+                "hidden": !visible
+            }
+        )}
+    >
         <div className="header">
             <h3>
                 <Icons.MessageSquare /> Comments
             </h3>
         </div>
+
         {renderComments()}
+
         <div className="commentCreatorWrapper">
             <CommentCreator
                 onSubmit={handleCommentSubmit}
