@@ -20,6 +20,16 @@ export default {
         }
 
         items.push({
+            label: "Paste",
+            icon: "Clipboard",
+            action: (clickedItem, ctx) => {
+                app.message.error("This action is not supported by your browser")
+
+                ctx.close()
+            }
+        })
+
+        items.push({
             label: "Report a bug",
             icon: "AlertTriangle",
             action: (clickedItem, ctx) => {
@@ -99,33 +109,6 @@ export default {
                 icon: "Download",
                 action: () => {
                     download(media.src)
-                    control.close()
-                }
-            })
-        }
-
-        // check if parent has `self-post` attribute
-        const isSelf = parent.getAttribute("self-post").toBoolean()
-
-        if (isSelf) {
-            items.push({
-                type: "separator"
-            })
-
-            items.push({
-                label: "Delete",
-                icon: "Trash",
-                action: () => {
-                    app.eventBus.emit(`post.${parent.id}.delete`)
-                    control.close()
-                }
-            })
-
-            items.push({
-                label: "Edit",
-                icon: "Edit2",
-                action: () => {
-                    app.eventBus.emit(`post.${parent.id}.edit`)
                     control.close()
                 }
             })
