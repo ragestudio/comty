@@ -39,6 +39,17 @@ export class PostsListsComponent extends React.Component {
     viewRef = this.props.innerRef
 
     timelineWsEvents = {
+        "feed.new": (data) => {
+            console.log("New feed => ", data)
+
+            if (!this.state.realtimeUpdates) {
+                return
+            }
+
+            this.setState({
+                list: [data, ...this.state.list],
+            })
+        },
         "post.new": (data) => {
             console.log("New post => ", data)
 
@@ -160,9 +171,17 @@ export class PostsListsComponent extends React.Component {
         })
 
         if (this.props.watchTimeline) {
-            Object.entries(this.timelineWsEvents).forEach(([event, callback]) => {
-                app.cores.api.listenEvent(event, callback)
-            })
+            if (!Array.isArray(this.props.watchTimeline)) {
+                console.error("watchTimeline prop must be an array")
+            } else {
+                this.props.watchTimeline.forEach((event) => {
+                    if (typeof this.timelineWsEvents[event] !== "function") {
+                        console.error(`The event "${event}" is not defined in the timelineWsEvents object`)
+                    }
+
+                    app.cores.api.listenEvent(event, this.timelineWsEvents[event])
+                })
+            }
         }
 
         //console.log("PostsList mounted", this.viewRef)
@@ -177,9 +196,17 @@ export class PostsListsComponent extends React.Component {
 
     componentWillUnmount = async () => {
         if (this.props.watchTimeline) {
-            Object.entries(this.timelineWsEvents).forEach(([event, callback]) => {
-                app.cores.api.unlistenEvent(event, callback)
-            })
+            if (!Array.isArray(this.props.watchTimeline)) {
+                console.error("watchTimeline prop must be an array")
+            } else {
+                this.props.watchTimeline.forEach((event) => {
+                    if (typeof this.timelineWsEvents[event] !== "function") {
+                        console.error(`The event "${event}" is not defined in the timelineWsEvents object`)
+                    }
+
+                    app.cores.api.unlistenEvent(event, this.timelineWsEvents[event])
+                })
+            }
         }
 
         if (this.viewRef) {
