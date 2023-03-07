@@ -4,17 +4,17 @@ import SavedPostsTab from "./components/savedPosts"
 
 export default {
     "feed": {
-        title: "Feed",
+        label: "Feed",
         icon: "Rss",
         component: FeedTab
     },
     "explore": {
-        title: "Explore",
+        label: "Explore",
         icon: "Search",
         component: ExploreTab
     },
     "savedPosts": {
-        title: "Saved posts",
+        label: "Saved posts",
         icon: "Bookmark",
         component: SavedPostsTab
     }

@@ -4,17 +4,17 @@ import ControlPanelTab from "./components/controlPanel"
 
 export default {
     "feed": {
-        title: "Feed",
+        label: "Feed",
         icon: "Rss",
         component: FeedTab
     },
     "explore": {
-        title: "Explore",
+        label: "Explore",
         icon: "Search",
         component: ExploreTab
     },
     "controlPanel": {
-        title: "Control Panel",
+        label: "Control Panel",
         icon: "Settings",
         component: ControlPanelTab
     }
