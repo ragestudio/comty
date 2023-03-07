@@ -48,7 +48,6 @@ export default async (payload) => {
         }
 
         return {
-            key: Number(skip) + Number(index),
             ...post,
             comments: comments.map((comment) => comment._id.toString()),
             user,
