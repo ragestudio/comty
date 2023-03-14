@@ -182,6 +182,30 @@
 		}
 	}
 
+	.background_item {
+		width: 100%;
+
+		opacity: 0;
+
+		transition: all 150ms ease-in-out;
+
+		padding-bottom: 10px;
+
+		background-color: transparent;
+
+		&:hover{
+			background-color: unset!important;
+		}
+
+		&:active{
+			background-color: unset!important;
+		}
+
+		&.active {
+			opacity: 1;
+		}
+	}
+
 	.render_content_wrapper {
 		display: flex;
 		flex-direction: column;

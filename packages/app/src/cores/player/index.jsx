@@ -1,9 +1,12 @@
+import React from "react"
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
 import store from "store"
 // import { createRealTimeBpmProcessor } from "realtime-bpm-analyzer"
 
-import { EmbbededMediaPlayer } from "components"
+import EmbbededMediaPlayer from "components/EmbbededMediaPlayer"
+import BackgroundMediaPlayer from "components/BackgroundMediaPlayer"
+
 import { DOMWindow } from "components/RenderWindow"
 
 class AudioPlayerStorage {
@@ -47,6 +50,7 @@ export default class Player extends Core {
 
     state = Observable.from({
         loading: false,
+        minimized: false,
         audioMuted: AudioPlayerStorage.get("mute") ?? false,
         playbackMode: AudioPlayerStorage.get("mode") ?? "repeat",
         audioVolume: AudioPlayerStorage.get("volume") ?? 0.3,
@@ -63,6 +67,7 @@ export default class Player extends Core {
         attachPlayerComponent: this.attachPlayerComponent.bind(this),
         detachPlayerComponent: this.detachPlayerComponent.bind(this),
         toogleMute: this.toogleMute.bind(this),
+        minimize: this.toogleMinimize.bind(this),
         volume: this.volume.bind(this),
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
@@ -197,6 +202,17 @@ export default class Player extends Core {
                         }
                         case "playbackStatus": {
                             app.eventBus.emit("player.status.update", change.object.playbackStatus)
+
+                            break
+                        }
+                        case "minimized": {
+                            if (change.object.minimized) {
+                                app.SidebarController.setBackgroundItem(React.createElement(BackgroundMediaPlayer))
+                            } else {
+                                app.SidebarController.setBackgroundItem(null)
+                            }
+
+                            app.eventBus.emit("player.minimized.update", change.object.minimized)
 
                             break
                         }
@@ -633,6 +649,12 @@ export default class Player extends Core {
         return this.state.audioMuted
     }
 
+    toogleMinimize(to) {
+        this.state.minimized = to ?? !this.state.minimized
+
+        return this.state.minimized
+    }
+
     volume(volume) {
         if (typeof volume !== "number") {
             return this.state.audioVolume
@@ -715,5 +737,16 @@ export default class Player extends Core {
         }
 
         return this.state.velocity
+    }
+
+    collapse(to) {
+        if (typeof to !== "boolean") {
+            console.warn("Collapse must be a boolean")
+            return false
+        }
+
+        this.state.collapsed = to ?? !this.state.collapsed
+
+        return this.state.collapsed
     }
 }

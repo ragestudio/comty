@@ -18,6 +18,15 @@
 
     border-radius: 12px;
 
+    pointer-events: initial;
+
+    transition: all 150ms ease-in-out;
+
+    &.minimized {
+        pointer-events: none;
+        opacity: 0;
+    }
+
     &.hovering {
         .actions_wrapper {
             .actions {
@@ -88,7 +97,7 @@
 
         top: 0;
         left: 0;
-        
+
         opacity: 0;
 
         transition: all 150ms ease-in-out;
@@ -97,7 +106,7 @@
 
         .ant-btn {
             background-color: var(--background-color-accent);
-            
+
             svg {
                 margin: 0 !important;
             }
@@ -231,6 +240,7 @@
 
             .muteButton {
                 padding: 10px;
+
                 svg {
                     font-size: 1rem;
                 }

@@ -1,0 +1,36 @@
+.background_media_player {
+    overflow: hidden;
+
+    width: 100%;
+
+    transition: all 150ms ease-in-out;
+
+    .background_media_player__title {
+        overflow: hidden;
+
+        white-space: nowrap;
+
+        width: 100%;
+
+        &.lightBackground {
+            h4 {
+                color: var(--text-color-black);
+            }
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            font-family: "Space Grotesk", sans-serif;
+
+            color: var(--text-color-white);
+        }
+
+    }
+}
