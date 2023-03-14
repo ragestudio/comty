@@ -4,6 +4,7 @@
   "types": "index.d.ts",
   "private": true,
   "scripts": {
+    "postinstall": "npm rebuild @tensorflow/tfjs-node --build-from-source",
     "release": "node ./scripts/release.js",
     "dev": "concurrently -k -n Server,MessageServer,Client -c bgCyan,bgBlue,bgGreen \"yarn dev:server\" \"yarn dev:message_server\" \"yarn dev:client\"",
     "dev:message_server": "cd packages/message_server && yarn dev",
