@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 
 import UserModel from "models/user"
+import AuthModel from "models/auth"
 
 import { StepsForm } from "components"
 import { Icons } from "components/Icons"
@@ -340,7 +341,7 @@ const steps = [
 
 export default (props) => {
     const onSubmit = async (values) => {
-        const result = await UserModel.register(values).catch((error) => {
+        const result = await AuthModel.register(values).catch((error) => {
             throw new Error(`Failed to register user: ${error.message}`)
         })
 
