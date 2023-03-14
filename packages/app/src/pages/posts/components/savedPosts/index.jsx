@@ -18,7 +18,6 @@ export class SavedPosts extends React.Component {
         return <PostsList
             emptyListRender={emptyListRender}
             loadFromModel={PostModel.getSavedPosts}
-            onLoadMore={PostModel.getSavedPosts}
         />
     }
 }

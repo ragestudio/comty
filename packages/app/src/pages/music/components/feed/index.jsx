@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { ImageViewer } from "components"
+import { ImageViewer, UserPreview } from "components"
 import { Icons } from "components/Icons"
 import { Translation } from "react-i18next"
 
@@ -38,11 +38,9 @@ const PlaylistItem = (props) => {
         </div>
         <div className="playlistItem_info">
             <div className="playlistItem_info_title">
-                {playlist.title}
+                <h1>{playlist.title}</h1>
             </div>
-            <div className="playlistItem_info_author">
-                {playlist.user.username}
-            </div>
+            <UserPreview username={playlist.user.username} />
         </div>
         <div className="playlistItem_actions">
             <antd.Button
