@@ -90,13 +90,7 @@ const steps = [
                         return
                     }
 
-                    const request = await app.cores.api.customRequest({
-                        method: "GET",
-                        url: "/user/username_available",
-                        params: {
-                            username: username,
-                        },
-                    }).catch((error) => {
+                    const request = await UserModel.checkUsernameAvailability(username).catch((error) => {
                         antd.message.error(`Cannot check username availability: ${error.message}`)
 
                         return false
@@ -308,13 +302,7 @@ const steps = [
                 const timer = setTimeout(async () => {
                     if (!validFormat) return
 
-                    const request = await app.cores.api.customRequest( {
-                        method: "GET",
-                        url: "/user/email-available",
-                        params: {
-                            email: email,
-                        },
-                    }).catch((error) => {
+                    const request = await UserModel.checkEmailAvailability(email).catch((error) => {
                         antd.message.error(`Cannot check email availability: ${error.message}`)
 
                         return false
