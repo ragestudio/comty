@@ -90,9 +90,9 @@ const steps = [
                         return
                     }
 
-                    const request = await app.cores.api.customRequest( {
+                    const request = await app.cores.api.customRequest({
                         method: "GET",
-                        url: "/user/username-available",
+                        url: "/user/username_available",
                         params: {
                             username: username,
                         },
