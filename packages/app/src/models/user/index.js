@@ -13,7 +13,7 @@ export default class User {
 
         if (username && !user_id) {
             // resolve user_id from username
-            const resolveResponse = await app.cores.api.customRequest( {
+            const resolveResponse = await app.cores.api.customRequest({
                 method: "GET",
                 url: `/user/user_id/${username}`,
             })
@@ -21,7 +21,7 @@ export default class User {
             user_id = resolveResponse.data.user_id
         }
 
-        const response = await app.cores.api.customRequest( {
+        const response = await app.cores.api.customRequest({
             method: "GET",
             url: `/user/${user_id}/data`,
         })
@@ -30,7 +30,7 @@ export default class User {
     }
 
     static async updateData(payload) {
-        const response = await app.cores.api.customRequest( {
+        const response = await app.cores.api.customRequest({
             method: "POST",
             url: "/user/self/update_data",
             data: {
@@ -42,7 +42,7 @@ export default class User {
     }
 
     static async unsetFullName() {
-        const response = await app.cores.api.customRequest( {
+        const response = await app.cores.api.customRequest({
             method: "DELETE",
             url: "/user/self/public_name",
         })
@@ -51,7 +51,7 @@ export default class User {
     }
 
     static async selfRoles() {
-        const response = await app.cores.api.customRequest( {
+        const response = await app.cores.api.customRequest({
             method: "GET",
             url: "/roles/self",
         })
@@ -78,7 +78,7 @@ export default class User {
             user_id = SessionModel.user_id
         }
 
-        const { data } = await app.cores.api.customRequest( {
+        const { data } = await app.cores.api.customRequest({
             method: "GET",
             url: `/badge/user/${user_id}`,
         })
@@ -89,7 +89,7 @@ export default class User {
     static async changePassword(payload) {
         const { currentPassword, newPassword } = payload
 
-        const { data } = await app.cores.api.customRequest( {
+        const { data } = await app.cores.api.customRequest({
             method: "POST",
             url: "/self/update_password",
             data: {
@@ -111,7 +111,7 @@ export default class User {
             user_id = SessionModel.user_id
         }
 
-        const { data } = await app.cores.api.customRequest( {
+        const { data } = await app.cores.api.customRequest({
             method: "GET",
             url: `/user/${user_id}/followers`,
             params: {
@@ -124,9 +124,33 @@ export default class User {
     }
 
     static async getConnectedUsersFollowing() {
-        const { data } = await app.cores.api.customRequest( {
+        const { data } = await app.cores.api.customRequest({
             method: "GET",
             url: "/status/connected/following",
+        })
+
+        return data
+    }
+
+    static async checkUsernameAvailability(username) {
+        const { data } = await app.cores.api.customRequest({
+            method: "GET",
+            url: `/user/username_available`,
+            params: {
+                username,
+            }
+        })
+
+        return data
+    }
+
+    static async checkEmailAvailability(email) {
+        const { data } = await app.cores.api.customRequest({
+            method: "GET",
+            url: `/user/email_available`,
+            params: {
+                email,
+            }
         })
 
         return data
