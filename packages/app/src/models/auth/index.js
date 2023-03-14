@@ -2,7 +2,7 @@ import SessionModel from "../session"
 
 export default class AuthModel {
     static login = async (payload) => {
-        const response = await app.cores.api.customRequest( {
+        const response = await app.cores.api.customRequest({
             method: "post",
             url: "/auth/login",
             data: {
@@ -29,10 +29,14 @@ export default class AuthModel {
     static async register(payload) {
         const { username, password, email } = payload
 
-        const response = await User.bridge.post.register(undefined, {
-            username,
-            password,
-            email,
+        const response = await app.cores.api.customRequest({
+            method: "post",
+            url: "/auth/register",
+            data: {
+                username,
+                password,
+                email,
+            }
         }).catch((error) => {
             console.error(error)
 
