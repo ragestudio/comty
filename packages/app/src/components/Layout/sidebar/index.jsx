@@ -119,6 +119,34 @@ export default class Sidebar extends React.Component {
 			isExpanded: () => this.state.expanded,
 			setCustomRender: this.setRender,
 			closeCustomRender: this.closeRender,
+			updateBackgroundItem: (children, props) => {
+				let updatedValue = this.state.backgroundItem
+
+				if (typeof children !== "undefined") {
+					updatedValue.children = children
+				}
+
+				if (typeof props !== "undefined") {
+					updatedValue.props = props
+				}
+
+				this.setState({
+					backgroundItem: updatedValue
+				})
+			},
+			setBackgroundItem: (children, props) => {
+				this.setState({
+					backgroundItem: {
+						children: children,
+						props: props,
+					},
+				})
+			},
+			clearBackgroundItem: () => {
+				this.setState({
+					backgroundItem: null,
+				})
+			}
 		}
 
 		this.state = {
@@ -130,6 +158,7 @@ export default class Sidebar extends React.Component {
 
 			customRenderTitle: null,
 			customRender: null,
+			backgroundItem: null,
 		}
 
 		// handle sidedrawer open/close
@@ -228,6 +257,10 @@ export default class Sidebar extends React.Component {
 	}
 
 	handleClick = (e) => {
+		if (e.item.props.ignoreClick) {
+			return
+		}
+
 		if (e.item.props.override_event) {
 			return app.eventBus.emit(e.item.props.override_event, e.item.props.override_event_props)
 		}
@@ -341,6 +374,16 @@ export default class Sidebar extends React.Component {
 
 					<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
 						<Menu selectable={false} mode="inline" onClick={this.handleClick}>
+							<Menu.Item
+								{...this.state.backgroundItem?.props ?? {}}
+								key="background_item"
+								className={classnames("background_item", { ["active"]: this.state.backgroundItem })}
+								ignoreClick
+							>
+								{
+									this.state.backgroundItem?.children
+								}
+							</Menu.Item>
 							<Menu.Item key="search" icon={<Icons.Search />} >
 								<Translation>
 									{(t) => t("Search")}

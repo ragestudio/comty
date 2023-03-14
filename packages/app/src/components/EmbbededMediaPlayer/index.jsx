@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import Slider from "@mui/material/Slider"
 import classnames from "classnames"
+import Ticker from "react-ticker"
 
 import { Icons, createIconRender } from "components/Icons"
 
@@ -163,7 +164,7 @@ class SeekBar extends React.Component {
 
             this.calculateTime()
             this.updateAll()
-        }
+        },
     }
 
     tick = () => {
@@ -273,6 +274,7 @@ export default class AudioPlayer extends React.Component {
         audioVolume: app.cores.player.getState("audioVolume") ?? 0.3,
         bpm: app.cores.player.getState("trackBPM") ?? 0,
         showControls: false,
+        minimized: false,
     }
 
     events = {
@@ -294,6 +296,13 @@ export default class AudioPlayer extends React.Component {
         "player.volume.update": (data) => {
             this.setState({ audioVolume: data })
         },
+        "player.minimized.update": (minimized) => {
+            console.log(`Player minimized updated: ${minimized}`)
+
+            this.setState({
+                minimized
+            })
+        }
     }
 
     componentDidMount = async () => {
@@ -319,7 +328,7 @@ export default class AudioPlayer extends React.Component {
     }
 
     minimize = () => {
-
+        app.cores.player.minimize()
     }
 
     updateVolume = (value) => {
@@ -356,6 +365,7 @@ export default class AudioPlayer extends React.Component {
                 "embbededMediaPlayerWrapper",
                 {
                     ["hovering"]: this.state.showControls,
+                    ["minimized"]: this.state.minimized,
                 }
             )}
             onMouseEnter={this.onMouse}
