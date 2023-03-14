@@ -27,10 +27,6 @@ export default class AuthModel {
     }
 
     static async register(payload) {
-        if (!User.bridge) {
-            return false
-        }
-
         const { username, password, email } = payload
 
         const response = await User.bridge.post.register(undefined, {
