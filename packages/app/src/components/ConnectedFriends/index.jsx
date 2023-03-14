@@ -49,8 +49,11 @@ export default (props) => {
         {
             connectedUsers.length === 0 ?
                 <span>No connected friends</span> :
-                connectedUsers.map((user_id) => {
-                    return <div className="item">
+                connectedUsers.map((user_id, index) => {
+                    return <div
+                        key={index}
+                        className="item"
+                    >
                         <UserPreview user_id={user_id} />
                     </div>
                 })
