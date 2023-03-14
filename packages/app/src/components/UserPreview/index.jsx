@@ -49,7 +49,7 @@ export default (props) => {
 
     if (!userData) {
         return <div className="userPreview">
-            <Skeleton active />
+            <Skeleton.Avatar active />
         </div>
     }
 
