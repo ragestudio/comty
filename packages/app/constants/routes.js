@@ -1,7 +1,7 @@
 export default [
     {
         path: "/login",
-        useLayout: "login",
+        useLayout: "none",
         public: true
     },
     {
@@ -43,5 +43,10 @@ export default [
         path: "/music/creator",
         useLayout: "default",
         centeredContent: true
+    },
+    {
+        path: "/landing/*",
+        useLayout: "blank",
+        public: true
     }
 ]
