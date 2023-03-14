@@ -92,14 +92,15 @@ const steps = [
 
                     const request = await UserModel.checkUsernameAvailability(username).catch((error) => {
                         antd.message.error(`Cannot check username availability: ${error.message}`)
+                        console.error(error)
 
                         return false
                     })
 
-                    if (request.data) {
-                        setUsernameAvailable(request.data.available)
+                    if (request) {
+                        setUsernameAvailable(request.available)
 
-                        if (!request.data.available) {
+                        if (!request.available) {
                             props.handleUpdate(null)
                         } else {
                             props.handleUpdate(username)
@@ -308,10 +309,10 @@ const steps = [
                         return false
                     })
 
-                    if (request.data) {
-                        setEmailAvailable(request.data.available)
+                    if (request) {
+                        setEmailAvailable(request.available)
 
-                        if (!request.data.available) {
+                        if (!request.available) {
                             antd.message.error("Email is already in use")
                             props.handleUpdate(null)
                         } else {
