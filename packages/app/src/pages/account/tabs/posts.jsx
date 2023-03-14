@@ -21,7 +21,6 @@ export default class UserPosts extends React.Component {
         return <div className="userPosts">
             <PostsList
                 emptyListRender={emptyListRender}
-                onLoadMore={PostModel.getUserPosts}
                 loadFromModel={PostModel.getUserPosts}
                 loadFromModelProps={{
                     user_id: this.props.state.user._id,

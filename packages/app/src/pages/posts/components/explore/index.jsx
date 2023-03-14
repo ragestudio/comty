@@ -43,7 +43,6 @@ export default class ExplorePosts extends React.Component {
             </div>
             {
                 this.state.focusedSearcher || this.state.filledSearcher ? null : <PostsList
-                    onLoadMore={Post.getExplorePosts}
                     loadFromModel={Post.getExplorePosts}
                     watchTimeline={[
                         "post.new",

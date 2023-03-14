@@ -58,6 +58,7 @@ export default class Dashboard extends React.Component {
             tabs={Tabs}
             navMenuHeader={navMenuHeader}
             extraPanel={extraPanel}
+            primaryPanelClassName="full"
             useSetQueryType
             transition
         />
