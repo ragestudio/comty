@@ -167,46 +167,45 @@ export default class PostCard extends React.PureComponent {
             context-menu={"postCard-context"}
             user-id={this.props.data.user_id}
         >
-            <div className="wrapper">
-                <PostHeader
-                    postData={this.props.data}
-                    onDoubleClick={this.onDoubleClick}
-                />
-                <div
-                    id="post_content"
-                    className={classnames(
-                        "post_content",
-                        {
-                            ["nsfw"]: this.state.isNsfw && !this.state.nsfwAccepted,
-                        }
-                    )}
-                >
+            <PostHeader
+                postData={this.props.data}
+                onDoubleClick={this.onDoubleClick}
+            />
+
+            <div
+                id="post_content"
+                className={classnames(
+                    "post_content",
                     {
-                        this.state.isNsfw && !this.state.nsfwAccepted &&
-                        <div className="nsfw_alert">
-                            <h2>
-                                This post may contain sensitive content.
-                            </h2>
-
-                            <antd.Button onClick={() => this.setState({ nsfwAccepted: true })}>
-                                Show anyways
-                            </antd.Button>
-                        </div>
+                        ["nsfw"]: this.state.isNsfw && !this.state.nsfwAccepted,
                     }
+                )}
+            >
+                {
+                    this.state.isNsfw && !this.state.nsfwAccepted &&
+                    <div className="nsfw_alert">
+                        <h2>
+                            This post may contain sensitive content.
+                        </h2>
 
-                    <div className="message">
-                        {
-                            processString(messageRegexs)(this.props.data.message ?? "")
-                        }
+                        <antd.Button onClick={() => this.setState({ nsfwAccepted: true })}>
+                            Show anyways
+                        </antd.Button>
                     </div>
+                }
 
+                <div className="message">
                     {
-                        this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
-                            attachments={this.props.data.attachments}
-                        />
+                        processString(messageRegexs)(this.props.data.message ?? "")
                     }
-
                 </div>
+
+                {
+                    this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
+                        attachments={this.props.data.attachments}
+                    />
+                }
+
             </div>
 
             <PostActions
