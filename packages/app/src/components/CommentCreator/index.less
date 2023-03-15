@@ -1,5 +1,5 @@
 .commentCreator {
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
 
     align-items: center;
@@ -14,8 +14,6 @@
         position: relative;
 
         height: 100%;
-        min-height: 4.5vh;
-
         width: 100%;
 
         padding: 5px 10px;
@@ -25,6 +23,8 @@
         box-shadow: none;
 
         transition: height 150ms linear;
+
+        border-radius: 8px 0 0 8px;
     }
 
     .ant-btn {
@@ -35,9 +35,8 @@
         justify-content: center;
 
         height: 100%;
-        min-height: 4.5vh;
 
-        border-radius: 0 10px 10px 0;
+        border-radius: 0 8px 8px 0;
         border: none;
         box-shadow: none;
 
