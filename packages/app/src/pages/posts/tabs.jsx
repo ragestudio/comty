@@ -1,5 +1,5 @@
 import FeedTab from "./components/feed"
-import ExploreTab from "./components/explore"
+import GlobalTab from "./components/global"
 import SavedPostsTab from "./components/savedPosts"
 
 export default {
@@ -8,10 +8,10 @@ export default {
         icon: "Rss",
         component: FeedTab
     },
-    "explore": {
-        label: "Explore",
-        icon: "Search",
-        component: ExploreTab
+    "global": {
+        label: "Global",
+        icon: "Globe",
+        component: GlobalTab
     },
     "savedPosts": {
         label: "Saved posts",
