@@ -15,7 +15,7 @@ export default async (payload) => {
     }
 
     if (message) {
-        message = String(message).toString()
+        message = String(message).toString().trim()
     }
 
     const current_timezone = momentTimezone.tz.guess()
