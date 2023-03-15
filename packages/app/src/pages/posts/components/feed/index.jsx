@@ -13,7 +13,7 @@ const emptyListRender = () => {
         </h2>
 
         <p>
-            Search for new people to follow on <a onClick={() => app.setLocation("/home/explore")}>explore</a> tab, to start view their posts.
+            Search for new people to follow on <a onClick={() => app.setLocation("/?type=global")}>global</a> tab, and start view their posts.
         </p>
     </div>
 }
@@ -21,12 +21,14 @@ const emptyListRender = () => {
 export class Feed extends React.Component {
     render() {
         return <PostsList
+            ref={this.props.innerRef}
             emptyListRender={emptyListRender}
             loadFromModel={FeedModel.getPostsFeed}
             watchTimeline={[
                 "feed.new",
                 "post.delete",
             ]}
+            realtime
         />
     }
 }
