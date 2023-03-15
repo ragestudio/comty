@@ -140,7 +140,7 @@ export default class PagePanels extends React.Component {
             }
             case 3: {
                 return {
-                    gridTemplateColumns: "1fr 1fr 1fr",
+                    gridTemplateColumns: "0.5fr 1fr 0.5fr",
                 }
             }
         }
