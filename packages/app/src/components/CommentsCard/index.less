@@ -2,8 +2,19 @@
     display: flex;
     flex-direction: column;
 
+    max-height: 30vh;
+    width: 100%;
+
     padding: 10px;
+
+    overflow-y: overlay;
+
+    border-radius: 12px;
+
     color: var(--text-color);
+    background-color: var(--background-color-primary);
+
+    transition: all 150ms ease-in-out;
 
     h1,
     h2,
@@ -21,19 +32,12 @@
         padding: 0px;
     }
 
-    overflow: hidden;
-
-    width: 100%;
-    //height: 100%;
-
-    transition: all 150ms ease-in-out;
+    gap: 10px;
 
     .comment {
         position: relative;
         display: flex;
         flex-direction: column;
-
-        margin-bottom: 10px;
 
         background-color: var(--background-color-accent);
 
@@ -72,6 +76,9 @@
             font-size: 14px;
             color: var(--text-color);
             margin-left: 20px;
+
+            word-break: break-all;
+            white-space: pre-wrap;
         }
 
         .deleteBtn {
@@ -86,18 +93,5 @@
                 font-size: 0.8rem;
             }
         }
-    }
-
-    .commentCreatorWrapper {
-        position: sticky;
-        display: flex;
-
-        flex-direction: column;
-        align-items: center;
-
-        bottom: 0;
-        right: 0;
-
-        width: 100%;
     }
 }

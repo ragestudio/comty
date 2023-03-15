@@ -150,13 +150,22 @@ export default (props) => {
             return <antd.Empty />
         }
 
-        return comments.map((comment) => {
-            return <CommentCard
-                data={comment}
-                onClickDelete={handleCommentDelete}
-                self={app.cores.permissions.checkUserIdIsSelf(comment.user._id)}
+        return <>
+            {
+                comments.map((comment) => {
+                    return <CommentCard
+                        data={comment}
+                        onClickDelete={handleCommentDelete}
+                        self={app.cores.permissions.checkUserIdIsSelf(comment.user._id)}
+                    />
+                })
+            }
+            <antd.Result
+                status="info"
+                title="This is the end"
+                subTitle="There are no more comments"
             />
-        })
+        </>
     }
 
     return <div
@@ -168,19 +177,13 @@ export default (props) => {
             }
         )}
     >
-        <div className="header">
-            <h3>
-                <Icons.MessageSquare /> Comments
-            </h3>
-        </div>
+        <CommentCreator
+            onSubmit={handleCommentSubmit}
+            maxLength={PostModel.maxCommentLength}
+        />
 
-        {renderComments()}
-
-        <div className="commentCreatorWrapper">
-            <CommentCreator
-                onSubmit={handleCommentSubmit}
-                maxLength={PostModel.maxCommentLength}
-            />
-        </div>
+        {
+            renderComments()
+        }
     </div>
 }
