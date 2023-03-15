@@ -2,17 +2,21 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 import { PostCard, LoadMore } from "components"
-import { ViewportList } from "react-viewport-list"
+//import { ViewportList } from "react-viewport-list"
+import AutoSizer from "react-virtualized-auto-sizer"
 
 import PostModel from "models/post"
 
 import "./index.less"
 
 const LoadingComponent = () => {
-    // FIXME: Im not sure why but, using <antd.Skeleton> will cause a memory leak of DOM Nodes when using IntersectionObserver
-    //return <antd.Skeleton active />
-
-    return <p><Icons.LoadingOutlined spin className="loadingIcon" />Loading more ...</p>
+    return <antd.Skeleton avatar
+        style={{
+            padding: "20px",
+            width: "35vw",
+            height: "160px",
+        }}
+    />
 }
 
 const NoResultComponent = () => {
@@ -28,6 +32,7 @@ export class PostsListsComponent extends React.Component {
         openPost: null,
 
         loading: false,
+        resumingLoading: false,
         initialLoading: true,
 
         realtimeUpdates: true,
@@ -36,7 +41,8 @@ export class PostsListsComponent extends React.Component {
         list: this.props.list ?? [],
     }
 
-    viewRef = this.props.innerRef
+    parentRef = this.props.innerRef
+    listRef = React.createRef()
 
     timelineWsEvents = {
         "feed.new": (data) => {
@@ -72,7 +78,7 @@ export class PostsListsComponent extends React.Component {
         }
     }
 
-    handleLoad = async (fn) => {
+    handleLoad = async (fn, params = {}) => {
         this.setState({
             loading: true,
         })
@@ -88,6 +94,10 @@ export class PostsListsComponent extends React.Component {
             }
         }
 
+        if (params.replace) {
+            payload.trim = 0
+        }
+
         const result = await fn(payload).catch((err) => {
             console.error(err)
 
@@ -96,6 +106,8 @@ export class PostsListsComponent extends React.Component {
             return null
         })
 
+        console.log("Loaded posts => ", result)
+
         if (result) {
             if (result.length === 0) {
                 return this.setState({
@@ -103,9 +115,15 @@ export class PostsListsComponent extends React.Component {
                 })
             }
 
-            this.setState({
-                list: [...this.state.list, ...result],
-            })
+            if (params.replace) {
+                this.setState({
+                    list: result,
+                })
+            } else {
+                this.setState({
+                    list: [...this.state.list, ...result],
+                })
+            }
         }
 
         this.setState({
@@ -143,21 +161,46 @@ export class PostsListsComponent extends React.Component {
     }
 
     onResumeRealtimeUpdates = async () => {
-        // fetch new posts
-        await this.handleLoad(this.props.loadFromModel)
+        console.log("Resuming realtime updates")
 
         this.setState({
+            resumingLoading: true,
+        })
+
+        // scroll to top
+        this.listRef.current.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        })
+
+        await this.handleLoad(this.props.loadFromModel, {
+            replace: true,
+        })
+
+        // fetch new posts
+        this.setState({
             realtimeUpdates: true,
+            resumingLoading: false,
         })
     }
 
     onScrollList = (e) => {
-        const { scrollTop, scrollHeight, clientHeight } = e.target
+        const { scrollTop } = e.target
 
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
+        if (this.state.resumingLoading) {
+            return null
+        }
+
+        console.log("Scrolling => ", scrollTop)
+
+        if (scrollTop > 200) {
             this.setState({
                 realtimeUpdates: false,
             })
+        } else {
+            if (!this.state.realtimeUpdates && !this.state.resumingLoading) {
+                this.onResumeRealtimeUpdates()
+            }
         }
     }
 
@@ -184,11 +227,10 @@ export class PostsListsComponent extends React.Component {
             }
         }
 
-        //console.log("PostsList mounted", this.viewRef)
-
-        if (this.viewRef) {
-            // handle when the user is scrolling a bit down, disable ws events
-            this.viewRef.current.addEventListener("scroll", this.onScrollList)
+        if (this.props.realtime) {
+            if (this.listRef && this.listRef.current) {
+                this.listRef.current.addEventListener("scroll", this.onScrollList)
+            }
         }
 
         window._hacks = this._hacks
@@ -209,8 +251,10 @@ export class PostsListsComponent extends React.Component {
             }
         }
 
-        if (this.viewRef) {
-            this.viewRef.current.removeEventListener("scroll", this.onScrollList)
+        if (this.props.realtime) {
+            if (this.listRef && this.listRef.current) {
+                this.listRef.current.removeEventListener("scroll", this.onScrollList)
+            }
         }
 
         window._hacks = null
@@ -268,6 +312,8 @@ export class PostsListsComponent extends React.Component {
     onLoadMore = async () => {
         if (typeof this.props.onLoadMore === "function") {
             return this.handleLoad(this.props.onLoadMore)
+        } else if (this.props.loadFromModel) {
+            return this.handleLoad(this.props.loadFromModel)
         }
     }
 
@@ -287,42 +333,56 @@ export class PostsListsComponent extends React.Component {
             </div>
         }
 
-        return <LoadMore
-            className="postList"
-            loadingComponent={LoadingComponent}
-            noResultComponent={NoResultComponent}
-            hasMore={this.state.hasMore}
-            fetching={this.state.loading}
-            onBottom={this.onLoadMore}
+        return <AutoSizer
+            style={{
+                width: "100%"
+            }}
         >
-            {
-                !this.state.realtimeUpdates && <div className="realtime_updates_disabled">
-                    <antd.Alert
-                        message="Realtime updates disabled"
-                        description="You are scrolling down, realtime updates are disabled to improve performance"
-                        type="warning"
-                        showIcon
-                    />
-                </div>
-            }
-            <ViewportList
-                viewportRef={this.viewRef}
-                items={this.state.list}
-            >
-                {
-                    (item) => <PostCard
-                        key={item._id}
-                        data={item}
-                        events={{
-                            onClickLike: this.onLikePost,
-                            onClickSave: this.onSavePost,
-                            onClickDelete: this.onDeletePost,
-                            onClickEdit: this.onEditPost,
-                        }}
-                    />
-                }
-            </ViewportList>
-        </LoadMore>
+            {({ height, width }) => {
+                console.log("AutoSizer => ", height, width)
+
+                return <LoadMore
+                    ref={this.listRef}
+                    contentProps={{
+                        style: { height }
+                    }}
+                    className="postList"
+                    loadingComponent={LoadingComponent}
+                    noResultComponent={NoResultComponent}
+                    hasMore={this.state.hasMore}
+                    fetching={this.state.loading}
+                    onBottom={this.onLoadMore}
+                >
+                    {
+                        !this.state.realtimeUpdates && <div className="resume_btn_wrapper">
+                            <antd.Button
+                                type="primary"
+                                shape="round"
+                                onClick={this.onResumeRealtimeUpdates}
+                                loading={this.state.resumingLoading}
+                                icon={<Icons.SyncOutlined />}
+                            >
+                                Resume
+                            </antd.Button>
+                        </div>
+                    }
+                    {
+                        this.state.list.map((post) => {
+                            return <PostCard
+                                key={post._id}
+                                data={post}
+                                events={{
+                                    onClickLike: this.onLikePost,
+                                    onClickSave: this.onSavePost,
+                                    onClickDelete: this.onDeletePost,
+                                    onClickEdit: this.onEditPost,
+                                }}
+                            />
+                        })
+                    }
+                </LoadMore>
+            }}
+        </AutoSizer>
     }
 }
 

@@ -18,6 +18,8 @@ export default React.forwardRef((props, ref) => {
     const insideViewportCb = (entries) => {
         const { fetching, onBottom } = props
 
+        console.log("entries", entries)
+
         entries.forEach(element => {
             if (element.intersectionRatio > 0 && !fetching) {
                 onBottom()
@@ -41,14 +43,12 @@ export default React.forwardRef((props, ref) => {
         }
     }, [])
 
-    return <div className="infinite-scroll">
-        <div
-            className={classnames(className)}
-            ref={ref}
-            {...contentProps}
-        >
-            {children}
-        </div>
+    return <div
+        ref={ref}
+        className={classnames(className)}
+        {...contentProps}
+    >
+        {children}
 
         <div style={{ clear: "both" }} />
 
