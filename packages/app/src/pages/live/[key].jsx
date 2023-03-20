@@ -238,7 +238,7 @@ export default class StreamViewer extends React.Component {
     }
 
     exitPlayerAnimation = () => {
-        app.style.applyVariant(app.cores.settings.get("themeVariant"))
+        app.cores.style.applyVariant(app.cores.settings.get("themeVariant"))
 
         app.cores.style.compactMode(false)
     }
