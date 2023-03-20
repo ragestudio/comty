@@ -232,7 +232,7 @@ export default class StreamViewer extends React.Component {
 
     enterPlayerAnimation = () => {
         // make the interface a bit confortable for a video player
-        app.style.applyVariant("dark")
+        app.cores.style.applyVariant("dark")
 
         app.cores.style.compactMode(true)
     }
