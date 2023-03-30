@@ -35,6 +35,8 @@ export class PostsListsComponent extends React.Component {
         resumingLoading: false,
         initialLoading: true,
 
+        topVisible: true,
+
         realtimeUpdates: true,
 
         hasMore: true,
@@ -187,18 +189,38 @@ export class PostsListsComponent extends React.Component {
     onScrollList = (e) => {
         const { scrollTop } = e.target
 
-        if (this.state.resumingLoading) {
-            return null
-        }
-
         console.log("Scrolling => ", scrollTop)
 
         if (scrollTop > 200) {
+            if (this.state.topVisible) {
+                this.setState({
+                    topVisible: false,
+                })
+
+                if (typeof this.props.onTopVisibility === "function") {
+                    this.props.onTopVisibility(false)
+                }
+            }
+
+            if (!this.props.realtime || this.state.resumingLoading) {
+                return null
+            }
+
             this.setState({
                 realtimeUpdates: false,
             })
         } else {
-            if (!this.state.realtimeUpdates && !this.state.resumingLoading) {
+            if (!this.state.topVisible) {
+                this.setState({
+                    topVisible: true,
+                })
+
+                if (typeof this.props.onTopVisibility === "function") {
+                    this.props.onTopVisibility(true)
+                }
+            }
+
+            if (this.props.realtime || !this.state.realtimeUpdates && !this.state.resumingLoading) {
                 this.onResumeRealtimeUpdates()
             }
         }
@@ -227,10 +249,8 @@ export class PostsListsComponent extends React.Component {
             }
         }
 
-        if (this.props.realtime) {
-            if (this.listRef && this.listRef.current) {
-                this.listRef.current.addEventListener("scroll", this.onScrollList)
-            }
+        if (this.listRef && this.listRef.current) {
+            this.listRef.current.addEventListener("scroll", this.onScrollList)
         }
 
         window._hacks = this._hacks
@@ -251,10 +271,8 @@ export class PostsListsComponent extends React.Component {
             }
         }
 
-        if (this.props.realtime) {
-            if (this.listRef && this.listRef.current) {
-                this.listRef.current.removeEventListener("scroll", this.onScrollList)
-            }
+        if (this.listRef && this.listRef.current) {
+            this.listRef.current.removeEventListener("scroll", this.onScrollList)
         }
 
         window._hacks = null

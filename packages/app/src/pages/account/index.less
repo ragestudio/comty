@@ -8,6 +8,27 @@
 	width: 100%;
 	height: 100%;
 
+	&.topHidden {
+		.cover {
+			height: 0;
+			min-height: 0;
+			margin-bottom: 0;
+			outline: none;
+		}
+
+		.panels {
+			padding-top: 0;
+
+			.leftPanel {
+				transform: translate(0, 0);
+
+				.actions {
+					opacity: 0;
+				}
+			}
+		}
+	}
+
 	.cover {
 		z-index: 50;
 		position: relative;
@@ -47,6 +68,8 @@
 
 		padding-top: 20px;
 
+		height: 100%;
+
 		.leftPanel {
 			position: sticky;
 			top: 0;
@@ -59,6 +82,8 @@
 			align-items: center;
 
 			transition: all 0.3s ease-in-out;
+
+			transform: translate(0, -100px);
 
 			.userCard {
 				position: sticky;
@@ -85,6 +110,14 @@
 				.followButton {
 					width: fit-content;
 				}
+			}
+		}
+
+		.content {
+			height: 100%;
+
+			.fade-opacity-active {
+				height: 100%;
 			}
 		}
 
