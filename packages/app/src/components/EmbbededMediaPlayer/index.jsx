@@ -2,7 +2,6 @@ import React from "react"
 import * as antd from "antd"
 import Slider from "@mui/material/Slider"
 import classnames from "classnames"
-import Ticker from "react-ticker"
 
 import { Icons, createIconRender } from "components/Icons"
 
@@ -38,6 +37,7 @@ class SeekBar extends React.Component {
         durationText: "00:00",
         sliderTime: 0,
         sliderLock: false,
+        streamMode: false,
     }
 
     handleSeek = (value) => {
@@ -57,6 +57,19 @@ class SeekBar extends React.Component {
     calculateDuration = () => {
         // get current audio duration
         const audioDuration = app.cores.player.duration()
+
+        // if duration is infinity, set stream mode
+        if (audioDuration === Infinity) {
+            this.setState({
+                streamMode: true,
+            })
+
+            return
+        }
+
+        if (isNaN(audioDuration)) {
+            return
+        }
 
         console.log(`Audio duration: ${audioDuration}`)
 
@@ -150,6 +163,7 @@ class SeekBar extends React.Component {
             this.setState({
                 timeText: "00:00",
                 sliderTime: 0,
+                streamMode: false,
             })
 
             this.calculateDuration()
@@ -168,12 +182,14 @@ class SeekBar extends React.Component {
     }
 
     tick = () => {
-        if (this.props.playing) {
+        if (this.props.playing || this.state.streamMode) {
             this.interval = setInterval(() => {
                 this.updateAll()
             }, 1000)
         } else {
-            clearInterval(this.interval)
+            if (this.interval) {
+                clearInterval(this.interval)
+            }
         }
     }
 
@@ -199,12 +215,26 @@ class SeekBar extends React.Component {
     }
 
     render() {
-        return <div className="status">
-            <div className="progress">
+        return <div
+            className={classnames(
+                "status",
+                {
+                    ["hidden"]: !this.props.initialLoad,
+                }
+            )}
+        >
+            <div
+                className={classnames(
+                    "progress",
+                    {
+                        ["hidden"]: this.state.streamMode,
+                    }
+                )}
+            >
                 <Slider
                     size="small"
                     value={this.state.sliderTime}
-                    disabled={this.props.stopped}
+                    disabled={this.props.stopped || this.state.streamMode}
                     min={0}
                     max={100}
                     step={0.1}
@@ -232,7 +262,9 @@ class SeekBar extends React.Component {
                     <span>{this.state.timeText}</span>
                 </div>
                 <div>
-                    <span>{this.state.durationText}</span>
+                    {
+                        this.state.streamMode ? <antd.Tag>Live</antd.Tag> : <span>{this.state.durationText}</span>
+                    }
                 </div>
             </div>
         </div>
@@ -275,6 +307,7 @@ export default class AudioPlayer extends React.Component {
         bpm: app.cores.player.getState("trackBPM") ?? 0,
         showControls: false,
         minimized: false,
+        initialLoad: false,
     }
 
     events = {
@@ -283,6 +316,12 @@ export default class AudioPlayer extends React.Component {
         },
         "player.loading.update": (data) => {
             this.setState({ loading: data })
+
+            if (!data && !this.state.initialLoad) {
+                this.setState({
+                    initialLoad: true
+                })
+            }
         },
         "player.status.update": (data) => {
             this.setState({ playbackStatus: data })
@@ -456,6 +495,7 @@ export default class AudioPlayer extends React.Component {
                 <SeekBar
                     stopped={playbackStatus === "stopped"}
                     playing={playbackStatus === "playing"}
+                    initialLoad={this.state.initialLoad}
                 />
             </div>
         </div>
