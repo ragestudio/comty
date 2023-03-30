@@ -33,6 +33,7 @@ class AudioPlayerStorage {
     }
 }
 
+// TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
     static refName = "player"
 
@@ -287,6 +288,7 @@ export default class Player extends Core {
         if (typeof manifest === "string") {
             manifest = {
                 src: manifest,
+                stream: false,
             }
         }
 
@@ -423,6 +425,13 @@ export default class Player extends Core {
         instanceObj.audioElement.addEventListener("seeked", () => {
             app.eventBus.emit("player.seek.update", instanceObj.audioElement.currentTime)
             createCrossfadeInterval()
+        })
+
+        // detect if the audio is a live stream
+        instanceObj.audioElement.addEventListener("loadedmetadata", () => {
+            if (instanceObj.audioElement.duration === Infinity) {
+                instanceObj.manifest.stream = true
+            }
         })
 
         //await this.instanciateRealtimeAnalyzerNode()
