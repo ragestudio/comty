@@ -204,7 +204,12 @@ export default class Account extends React.Component {
 
 		return <div
 			ref={this.profileRef}
-			className="accountProfile"
+			className={classnames(
+				"accountProfile",
+				{
+					["noCover"]: !user.cover,
+				}
+			)}
 			id="profile"
 		>
 			{
