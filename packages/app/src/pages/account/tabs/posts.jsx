@@ -18,14 +18,13 @@ const emptyListRender = () => {
 
 export default class UserPosts extends React.Component {
     render() {
-        return <div className="userPosts">
-            <PostsList
-                emptyListRender={emptyListRender}
-                loadFromModel={PostModel.getUserPosts}
-                loadFromModelProps={{
-                    user_id: this.props.state.user._id,
-                }}
-            />
-        </div>
+        return <PostsList
+            onTopVisibility={this.props.onTopVisibility}
+            emptyListRender={emptyListRender}
+            loadFromModel={PostModel.getUserPosts}
+            loadFromModelProps={{
+                user_id: this.props.state.user._id,
+            }}
+        />
     }
 }

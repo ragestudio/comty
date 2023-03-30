@@ -44,9 +44,7 @@ const TabRender = React.memo((props, ref) => {
 	// forwards ref to the tab
 	return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": transitionActive })}>
 		{
-			React.createElement(Tab, {
-				...props,
-			})
+			React.createElement(Tab, props)
 		}
 	</div>
 })
@@ -65,6 +63,8 @@ export default class Account extends React.Component {
 
 		isNotExistent: false,
 	}
+
+	profileRef = React.createRef()
 
 	contentRef = React.createRef()
 
@@ -133,27 +133,15 @@ export default class Account extends React.Component {
 			isFollowed,
 			followers,
 		})
-
-		// create intersection observer for cover
-		this.coverIntersectionObserver = new IntersectionObserver((e) => {
-			if (e[0].intersectionRatio > 0) {
-				this.leftPanelRef.current.style.transform = "translate(0, -100px)"
-				this.actionsRef.current.style.opacity = "1"
-			} else {
-				this.leftPanelRef.current.style.transform = "translate(0, 0)"
-				this.actionsRef.current.style.opacity = "0"
-			}
-		}, {
-			root: document.querySelector("#root"),
-			threshold: 0
-		})
-
-		this.coverIntersectionObserver.observe(this.coverComponent.current)
 	}
 
-	componentWillUnmount = () => {
-		if (this.coverIntersectionObserver) {
-			this.coverIntersectionObserver.disconnect()
+	onPostListTopVisibility = (to) => {
+		console.log("onPostListTopVisibility", to)
+
+		if (to) {
+			this.profileRef.current.classList.remove("topHidden")
+		} else {
+			this.profileRef.current.classList.add("topHidden")
 		}
 	}
 
@@ -185,6 +173,8 @@ export default class Account extends React.Component {
 			return
 		}
 
+		this.onPostListTopVisibility(true)
+
 		key = key.toLowerCase()
 
 		if (this.state.tabActiveKey === key) {
@@ -213,6 +203,7 @@ export default class Account extends React.Component {
 		}
 
 		return <div
+			ref={this.profileRef}
 			className="accountProfile"
 			id="profile"
 		>
@@ -257,6 +248,7 @@ export default class Account extends React.Component {
 					<TabRender
 						renderKey={this.state.tabActiveKey}
 						state={this.state}
+						onTopVisibility={this.onPostListTopVisibility}
 					/>
 				</div>
 
