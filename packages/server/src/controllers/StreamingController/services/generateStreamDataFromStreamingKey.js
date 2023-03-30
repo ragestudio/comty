@@ -17,6 +17,7 @@ export default async (key) => {
             rtmp: `${process.env.STREAMING_INGEST_SERVER}/live/${streamingKey.username}`,
             hls: `${streamingServerAPIUri}/live/${streamingKey.username}/src.m3u8`,
             flv: `${streamingServerAPIUri}/live/${streamingKey.username}/src.flv`,
+            aac: `${streamingServerAPIUri}/radio/${streamingKey.username}/src.aac`,
         }
     }
 
