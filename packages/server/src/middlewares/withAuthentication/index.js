@@ -40,6 +40,12 @@ export default async (req, res, next) => {
                 return reject("Missmatching server token")
             }
 
+            req.user = {
+                __server: true,
+                _id: client_id,
+                roles: ["server"],
+            }
+
             return next()
         }
 
