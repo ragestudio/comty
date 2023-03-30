@@ -180,9 +180,18 @@ export default class StreamViewer extends React.Component {
             </button>
         `)
 
+        // insert radio mode button
+        player.elements.buttons.fullscreen.insertAdjacentHTML("beforeBegin", `
+            <button class="plyr__controls__item plyr__control" type="button" data-plyr="radio">
+                <span class="label">Radio mode</span>
+            </button>
+        `)
+
         player.elements.buttons.cinema = player.elements.container.querySelector("[data-plyr='cinema']")
+        player.elements.buttons.radio = player.elements.container.querySelector("[data-plyr='radio']")
 
         player.elements.buttons.cinema.addEventListener("click", () => this.toggleCinemaMode())
+        player.elements.buttons.radio.addEventListener("click", () => this.toggleRadioMode())
 
         this.setState({
             player,
@@ -295,6 +304,23 @@ export default class StreamViewer extends React.Component {
         app.SidebarController.toggleVisibility(!to)
 
         this.setState({ cinemaMode: to })
+    }
+
+    toggleRadioMode = (to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.radioMode
+        }
+
+        if (to) {
+           app.cores.player.start({
+                src: this.state.streamSources.sources.aac,
+                title: this.state.streamInfo.title,
+                artist: this.state.streamInfo.username,
+           })
+
+           // setLocation to main page
+           app.navigation.goMain()
+        }
     }
 
     render() {
