@@ -8,14 +8,14 @@ import { Icons } from "components/Icons"
 
 import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
 
-import Tabs from "./posts/tabs"
+import Tabs from "./home/tabs"
 
-export default class Dashboard extends React.Component {
+export default class Home extends React.Component {
     render() {
         const navMenuHeader = <>
             <h1>
                 <Icons.MdTag />
-                <Translation>{(t) => t("Posts")}</Translation>
+                <Translation>{(t) => t("Timeline")}</Translation>
             </h1>
             <antd.Button
                 type="primary"
