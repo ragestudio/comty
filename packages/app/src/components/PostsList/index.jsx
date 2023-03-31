@@ -34,6 +34,7 @@ export class PostsListsComponent extends React.Component {
         loading: false,
         resumingLoading: false,
         initialLoading: true,
+        scrollingToTop: false,
 
         topVisible: true,
 
@@ -159,7 +160,8 @@ export class PostsListsComponent extends React.Component {
                     username: "random user",
                 }
             })
-        }
+        },
+        listRef: this.listRef,
     }
 
     onResumeRealtimeUpdates = async () => {
@@ -167,19 +169,19 @@ export class PostsListsComponent extends React.Component {
 
         this.setState({
             resumingLoading: true,
+            scrollingToTop: true,
         })
 
-        // scroll to top
         this.listRef.current.scrollTo({
             top: 0,
             behavior: "smooth",
         })
 
+        // reload posts
         await this.handleLoad(this.props.loadFromModel, {
             replace: true,
         })
 
-        // fetch new posts
         this.setState({
             realtimeUpdates: true,
             resumingLoading: false,
@@ -189,7 +191,11 @@ export class PostsListsComponent extends React.Component {
     onScrollList = (e) => {
         const { scrollTop } = e.target
 
-        console.log("Scrolling => ", scrollTop)
+        if (this.state.scrollingToTop && scrollTop === 0) {
+            this.setState({
+                scrollingToTop: false,
+            })
+        }
 
         if (scrollTop > 200) {
             if (this.state.topVisible) {
@@ -202,7 +208,7 @@ export class PostsListsComponent extends React.Component {
                 }
             }
 
-            if (!this.props.realtime || this.state.resumingLoading) {
+            if (!this.props.realtime || this.state.resumingLoading || this.state.scrollingToTop) {
                 return null
             }
 
@@ -218,10 +224,10 @@ export class PostsListsComponent extends React.Component {
                 if (typeof this.props.onTopVisibility === "function") {
                     this.props.onTopVisibility(true)
                 }
-            }
 
-            if (this.props.realtime || !this.state.realtimeUpdates && !this.state.resumingLoading) {
-                this.onResumeRealtimeUpdates()
+                // if (this.props.realtime || !this.state.realtimeUpdates && !this.state.resumingLoading && scrollTop < 5) {
+                //     this.onResumeRealtimeUpdates()
+                // }
             }
         }
     }
@@ -352,12 +358,10 @@ export class PostsListsComponent extends React.Component {
         }
 
         return <AutoSizer
-            style={{
-                width: "100%"
-            }}
+            disableWidth
         >
-            {({ height, width }) => {
-                console.log("AutoSizer => ", height, width)
+            {({ height }) => {
+                console.log("[PostList] AutoSizer height update => ", height)
 
                 return <LoadMore
                     ref={this.listRef}
