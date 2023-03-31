@@ -3,6 +3,7 @@ import * as antd from "antd"
 import { SliderPicker } from "react-color"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
+import config from "config"
 
 import AuthModel from "models/auth"
 
@@ -18,6 +19,16 @@ import "./index.less"
 
 const extraMenuItems = [
     {
+        id: "donate",
+        label: "Support us",
+        icon: "Heart",
+        props: {
+            style: {
+                color: "#f72585"
+            }
+        }
+    },
+    {
         id: "logout",
         label: "Logout",
         icon: "MdOutlineLogout",
@@ -26,6 +37,11 @@ const extraMenuItems = [
 ]
 
 const menuEvents = {
+    "donate": () => {
+        if (config.fundingLink) {
+            window.open(config.fundingLink, "_blank")
+        }
+    },
     "logout": () => {
         antd.Modal.confirm({
             title: "Logout",
@@ -493,10 +509,10 @@ const generateMenuItems = () => {
         const children = ordererItems.map((item) => {
             return {
                 key: item.id,
-                label: <>
+                label: <div {...item.props}>
                     {createIconRender(item.icon ?? "Settings")}
                     {item.label}
-                </>,
+                </div>,
                 type: "item",
                 danger: item.danger,
             }
