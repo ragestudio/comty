@@ -94,31 +94,54 @@ export default class ApiCore extends Core {
     }
 
     async customRequest(
-        payload = {
+        request = {
             method: "GET",
         },
         ...args
     ) {
-        if (typeof payload === "string") {
-            payload = {
-                url: payload,
+        // handle before request
+        await this.handleBeforeRequest(request)
+
+        if (typeof request === "string") {
+            request = {
+                url: request,
             }
         }
 
-        if (typeof payload.headers !== "object") {
-            payload.headers = {}
+        if (typeof request.headers !== "object") {
+            request.headers = {}
         }
 
-        const sessionToken = await SessionModel.token
+        let result = null
 
-        if (sessionToken) {
-            payload.headers["Authorization"] = `Bearer ${sessionToken}`
+        const makeRequest = async () => {
+            const sessionToken = await SessionModel.token
 
-        } else {
-            console.warn("Making a request with no session token")
+            if (sessionToken) {
+                request.headers["Authorization"] = `Bearer ${sessionToken}`
+            } else {
+                console.warn("Making a request with no session token")
+            }
+
+            const _result = await this.instance.httpInterface(request, ...args)
+                .catch((error) => {
+                    return error
+                })
+
+            result = _result
         }
 
-        return await this.instance.httpInterface(payload, ...args)
+        await makeRequest()
+
+        // handle after request
+        await this.handleAfterRequest(result, makeRequest)
+
+        // if error, throw it
+        if (result instanceof Error) {
+            throw result
+        }
+
+        return result
     }
 
     request(method, endpoint, ...args) {
@@ -129,7 +152,7 @@ export default class ApiCore extends Core {
         return this.instance.endpoints
     }
 
-    async handleBeforeRequest(request) {
+    handleBeforeRequest = async (request) => {
         if (this.onExpiredExceptionEvent) {
             if (this.excludedExpiredExceptionURL.includes(request.url)) return
 
@@ -142,7 +165,29 @@ export default class ApiCore extends Core {
         }
     }
 
-    async handleRegenerationEvent(refreshToken, makeRequest) {
+    handleAfterRequest = async (data, callback) => {
+        // handle 401 responses
+        if (data instanceof Error) {
+            if (data.response.status === 401) {
+                // check if the server issue a refresh token on data
+                if (data.response.data.refreshToken) {
+                    console.log(`Session expired, but the server issued a refresh token, handling regeneration event`)
+
+                    // handle regeneration event
+                    await this.handleRegenerationEvent(data.response.data.refreshToken)
+
+                    return await callback()
+                } else {
+                    return window.app.eventBus.emit("session.invalid", "Session expired, but the server did not issue a refresh token")
+                }
+            }
+            if (data.response.status === 403) {
+                return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
+            }
+        }
+    }
+
+    handleRegenerationEvent = async (refreshToken) => {
         window.app.eventBus.emit("session.expiredExceptionEvent", refreshToken)
 
         this.onExpiredExceptionEvent = true
@@ -166,8 +211,12 @@ export default class ApiCore extends Core {
             return window.app.eventBus.emit("session.invalid", "Failed to regenerate token")
         }
 
+        if (!response.data?.token) {
+            return window.app.eventBus.emit("session.invalid", "Failed to regenerate token, invalid server response.")
+        }
+
         // set new token
-        SessionModel.token = response.token
+        SessionModel.token = response.data.token
 
         //this.namespaces["main"].internalAbortController.abort()
 
@@ -192,25 +241,6 @@ export default class ApiCore extends Core {
             return obj
         }
 
-        const handleResponse = async (data, makeRequest) => {
-            // handle 401 responses
-            if (data instanceof Error) {
-                if (data.response.status === 401) {
-                    // check if the server issue a refresh token on data
-                    if (data.response.data.refreshToken) {
-                        // handle regeneration event
-                        await this.handleRegenerationEvent(data.response.data.refreshToken, makeRequest)
-                        return await makeRequest()
-                    } else {
-                        return window.app.eventBus.emit("session.invalid", "Session expired, but the server did not issue a refresh token")
-                    }
-                }
-                if (data.response.status === 403) {
-                    return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
-                }
-            }
-        }
-
         if (typeof params !== "object") {
             throw new Error("Params must be an object")
         }
@@ -221,7 +251,7 @@ export default class ApiCore extends Core {
             },
             onBeforeRequest: this.handleBeforeRequest,
             onRequest: getSessionContext,
-            onResponse: handleResponse,
+            onResponse: this.handleAfterRequest,
             ...params,
             origin: params.httpAddress ?? config.remotes.mainApi,
         }
