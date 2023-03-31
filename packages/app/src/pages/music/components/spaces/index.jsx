@@ -10,7 +10,7 @@ export default () => {
     const [loading, setLoading] = React.useState(true)
 
     const onClickCreate = () => {
-        
+
     }
 
     return <div className="spacesExplorer">
@@ -21,7 +21,8 @@ export default () => {
                     <antd.Tag color="blue">Beta</antd.Tag>
                 </h1>
                 <p>
-                    Join or create a space to start listening a synchronized music along the room            </p>
+                    Join or create a space to start listening a synchronized music along the room
+                </p>
             </div>
 
             <div className="spacesExplorer_header_actions">
