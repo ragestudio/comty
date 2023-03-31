@@ -5,11 +5,11 @@ import "./index.less"
 
 export default (props) => {
     const handleClose = () => {
-        app.eventBus.emit("app.close")
+        app.electron.closeApp()
     }
 
     const handleMinimize = () => {
-        app.eventBus.emit("app.minimize")
+        app.electron.minimizeApp()
     }
 
     return <div className="app_systemBar">
