@@ -1,0 +1,116 @@
+.playlistTimelineEntry {
+    display: flex;
+    flex-direction: column;
+
+    width: 35vw;
+    min-width: 300px;
+    max-width: 600px;
+
+    //min-height: 165px;
+    height: 100%;
+    max-width: 800px;
+
+    background-color: var(--background-color-accent);
+
+    transition: all 150ms ease-in-out;
+
+    padding: 17px;
+
+    border-bottom: 2px solid var(--border-color);
+
+    padding-bottom: 10px;
+
+    overflow: visible;
+
+    .playlistTimelineEntry_content {
+        display: flex;
+
+        flex-direction: row;
+
+        justify-items: center;
+
+        width: 100%;
+
+        gap: 20px;
+
+        .playlistTimelineEntry_thumbnail {
+            img {
+                width: 150px;
+                height: 150px;
+
+                object-fit: cover;
+
+                border-radius: 12px;
+            }
+        }
+
+        .playlistTimelineEntry_info {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            width: 100%;
+
+            .playlistTimelineEntry_title {
+                h1 {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+
+                    font-family: "Space Grotesk", sans-serif;
+
+                    margin-top: 0;
+                    margin-bottom: 5px;
+
+                    color: var(--text-color);
+                }
+            }
+
+            .playlistTimelineEntry_description {
+                p {
+                    font-size: 1rem;
+                    font-weight: 400;
+
+                    margin-top: 0;
+                    margin-bottom: 5px;
+
+                    color: var(--text-color);
+                }
+            }
+        }
+
+        .playlistTimelineEntry_actions {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 10px;
+
+            .playlistTimelineEntry_action {
+                display: flex;
+                flex-direction: row;
+
+                justify-content: center;
+
+                gap: 10px;
+            }
+        }
+    }
+
+    &:first-child {
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    &:last-child {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+}
