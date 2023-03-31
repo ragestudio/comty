@@ -27,6 +27,7 @@ export default {
     defaultTheme: defaultTheme,
     defaultSoundPack: defaultSoundPack,
     author: "RageStudio©",
+    fundingLink: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76",
     footerLinks: [
         {
             label: "Terms of Service",
