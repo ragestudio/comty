@@ -13,8 +13,8 @@ export default (props) => {
 
         formData.append("files", req.file)
 
-        const response = await window.app.cores.api.customRequest( {
-            url: "/upload",
+        const response = await window.app.cores.api.customRequest({
+            url: "/files/upload",
             method: "POST",
             data: formData
         }).catch((error) => {
