@@ -1,7 +1,11 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
-import { PostCard, LoadMore } from "components"
+
+import PostCard from "components/PostCard"
+import PlaylistTimelineEntry from "components/PlaylistTimelineEntry"
+import LoadMore from "components/LoadMore"
+
 //import { ViewportList } from "react-viewport-list"
 import AutoSizer from "react-virtualized-auto-sizer"
 
@@ -25,6 +29,11 @@ const NoResultComponent = () => {
         title="This is the end"
         subTitle="We dont have more posts for you"
     />
+}
+
+const typeToComponent = {
+    "post": (args) => <PostCard {...args} />,
+    "playlist": (args) => <PlaylistTimelineEntry {...args} />,
 }
 
 export class PostsListsComponent extends React.Component {
@@ -389,17 +398,17 @@ export class PostsListsComponent extends React.Component {
                         </div>
                     }
                     {
-                        this.state.list.map((post) => {
-                            return <PostCard
-                                key={post._id}
-                                data={post}
-                                events={{
+                        this.state.list.map((data) => {
+                            return React.createElement(typeToComponent[data.type ?? "post"], {
+                                key: data._id,
+                                data: data,
+                                events: {
                                     onClickLike: this.onLikePost,
                                     onClickSave: this.onSavePost,
                                     onClickDelete: this.onDeletePost,
                                     onClickEdit: this.onEditPost,
-                                }}
-                            />
+                                }
+                            })
                         })
                     }
                 </LoadMore>

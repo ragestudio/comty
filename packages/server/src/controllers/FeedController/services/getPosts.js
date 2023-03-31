@@ -1,6 +1,6 @@
-import { Post, UserFollow } from "../../../models"
+import { Post, UserFollow } from "@models"
 
-import fullfillPostsData from "../../../utils/fullfillPostsData"
+import fullfillPostsData from "@utils/fullfillPostsData"
 
 export default async (payload) => {
     const {
