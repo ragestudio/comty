@@ -274,6 +274,8 @@ export default class Sidebar extends React.Component {
 			return onClickHandlers[e.key](e)
 		}
 
+		window.app.cores.sound.useUIAudio("sidebar.switch_tab")
+
 		if (typeof this.state.pathResolvers === "object") {
 			if (typeof this.state.pathResolvers[e.key] !== "undefined") {
 				return window.app.setLocation(`/${this.state.pathResolvers[e.key]}`, 150)

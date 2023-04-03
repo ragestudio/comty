@@ -7,7 +7,7 @@ import { Haptics } from "@capacitor/haptics"
 
 export default class NotificationCore extends Core {
     static refName = "notifications"
-    
+
     onEvents = {
         "changeNotificationsSoundVolume": (value) => {
             this.playAudio({ soundVolume: value })
@@ -117,8 +117,8 @@ export default class NotificationCore extends Core {
         const soundVolume = options.soundVolume ? options.soundVolume / 100 : this.getSoundVolume()
 
         if (soundEnabled) {
-            if (typeof window.app.sound?.play === "function") {
-                window.app.sound.play("notification", {
+            if (typeof window.app.cores.sound?.play === "function") {
+                window.app.cores.sound.play("notification", {
                     volume: soundVolume,
                 })
             }

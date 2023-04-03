@@ -202,6 +202,8 @@ class ComtyApp extends React.Component {
 				})
 			},
 			openSearcher: (options) => {
+				app.cores.sound.useUIAudio("navigation.search")
+
 				window.app.ModalController.open((props) => <Searcher {...props} />)
 			},
 			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
@@ -252,6 +254,8 @@ class ComtyApp extends React.Component {
 				return app.setLocation(config.app.mainPath ?? "/home")
 			},
 			goToSettings: (setting_id) => {
+				app.cores.sound.useUIAudio("navigation.settings")
+
 				return app.setLocation(`/settings`, {
 					query: {
 						setting: setting_id
@@ -483,6 +487,8 @@ class ComtyApp extends React.Component {
 				}
 			})
 		}
+
+		//app.cores.sound.useUIAudio("splash_out")
 
 		app.eventBus.emit("app.initialization.start")
 
