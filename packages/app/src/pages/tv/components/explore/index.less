@@ -1,118 +1,89 @@
 @item_border_radius: 10px;
 
-.livestreamsBrowser {
+.livestream_list {
     display: flex;
     flex-direction: column;
 
     width: 100%;
 
-    .header {
-        display: inline-flex;
+    padding: 0 50px;
+
+    .livestream_item {
+        display: flex;
         flex-direction: row;
 
         align-items: center;
-        justify-content: space-between;
 
-        width: 100%;
+        background-color: var(--background-color-primary-2);
 
-        .panel {
-            display: inline-flex;
-            flex-direction: row;
+        border: 1px solid var(--border-color);
 
-            align-items: center;
+        padding: 10px;
+        margin-bottom: 20px;
+
+        border-radius: @item_border_radius;
+
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+
+        &:hover {
+            background-color: var(--background-color-accent);
         }
 
-        .title {
-            svg {
-                font-size: 2.5rem;
-            }
-        }
+        .livestream_thumbnail {
+            width: 8vw;
+            height: 100%;
 
-        font-size: 2rem;
-    }
-
-    .livestream_list {
-        display: flex;
-        flex-direction: column;
-        padding: 0 50px;
-
-        .livestream_item {
-            display: flex;
-            flex-direction: row;
-
-            align-items: center;
-
-            background-color: var(--background-color-primary-2);
-
-            border: 1px solid var(--border-color);
-
-            padding: 10px;
-            margin-bottom: 20px;
-
-            border-radius: @item_border_radius;
-
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-
-            &:hover {
-                background-color: var(--background-color-accent);
-            }
-
-            .livestream_thumbnail {
-                width: 8vw;
-                height: 100%;
-
-                img {
-                    width: 100%;
-                    height: 100%;
-                    border-radius: @item_border_radius;
-                }
-            }
-
-            .livestream_info {
-                position: relative;
-
+            img {
                 width: 100%;
+                height: 100%;
+                border-radius: @item_border_radius;
+            }
+        }
 
-                margin-left: 20px;
-                font-size: 1rem;
+        .livestream_info {
+            position: relative;
 
-                padding: 10px 0;
+            width: 100%;
 
+            margin-left: 20px;
+            font-size: 1rem;
+
+            padding: 10px 0;
+
+            color: var(--text-color);
+
+            .userPreview {
+                font-size: 1.5rem;
+            }
+
+            h1,
+            h2 {
+                margin: 0;
+                height: fit-content;
                 color: var(--text-color);
+            }
 
-                .userPreview {
-                    font-size: 1.5rem;
-                }
+            .livestream_title {
+                margin-top: 10px;
+                font-size: 1.5rem;
+                height: fit-content;
+                font-family: "Space Grotesk", sans-serif;
+            }
 
-                h1,
-                h2 {
-                    margin: 0;
-                    height: fit-content;
-                    color: var(--text-color);
-                }
+            .livestream_description {
+                font-size: 0.6rem;
+                font-weight: 400;
+                height: fit-content;
+            }
 
-                .livestream_title {
-                    margin-top: 10px;
-                    font-size: 1.5rem;
-                    height: fit-content;
-                    font-family: "Space Grotesk", sans-serif;
-                }
+            .livestream_category {
+                position: absolute;
 
-                .livestream_description {
-                    font-size: 0.6rem;
-                    font-weight: 400;
-                    height: fit-content;
-                }
+                top: 0;
+                right: 0;
 
-                .livestream_category {
-                    position: absolute;
-
-                    top: 0;
-                    right: 0;
-
-                    padding: 10px;
-                }
+                padding: 10px;
             }
         }
     }
