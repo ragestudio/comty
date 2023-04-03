@@ -92,18 +92,7 @@ export default (props) => {
         loadStreamings()
     }, [])
 
-    return <div className="livestreamsBrowser">
-        <div className="header">
-            <div className="title">
-                <h1>
-                    <Icons.Tv />
-                    <span>Livestreams</span>
-                </h1>
-            </div>
-        </div>
-
-        <div className="livestream_list">
-            {renderList()}
-        </div>
+    return <div className="livestream_list">
+        {renderList()}
     </div>
 }
