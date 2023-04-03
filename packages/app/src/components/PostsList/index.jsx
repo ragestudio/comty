@@ -399,7 +399,7 @@ export class PostsListsComponent extends React.Component {
                     }
                     {
                         this.state.list.map((data) => {
-                            return React.createElement(typeToComponent[data.type ?? "post"], {
+                            return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
                                 key: data._id,
                                 data: data,
                                 events: {
