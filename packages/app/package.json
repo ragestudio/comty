@@ -84,7 +84,7 @@
     "react-draggable": "4.4.4",
     "react-helmet": "6.1.0",
     "react-i18next": "11.15.3",
-    "react-icons": "4.3.1",
+    "react-icons": "^4.8.0",
     "react-infinite-scroller": "^1.2.6",
     "react-inlinesvg": "^3.0.1",
     "react-intersection-observer": "8.33.1",
