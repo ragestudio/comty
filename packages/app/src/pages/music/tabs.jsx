@@ -3,11 +3,6 @@ import SpacesTab from "./components/spaces"
 import DashboardTab from "./components/dashboard"
 
 export default {
-    "dashboard": {
-        label: "Dashboard",
-        icon: "MdOutlineDashboard",
-        component: DashboardTab,
-    },
     "feed": {
         label: "Feed",
         icon: "Compass",
@@ -24,5 +19,10 @@ export default {
         icon: "MdDeck",
         component: SpacesTab,
         disabled: true
+    },
+    "artistPanel": {
+        label: "Artist Panel",
+        icon: "MdOutlineDashboard",
+        component: DashboardTab,
     },
 }
