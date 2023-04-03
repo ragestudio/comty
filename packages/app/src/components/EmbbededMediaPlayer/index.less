@@ -140,6 +140,8 @@
         box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
 
         .cover {
+            position: relative;
+
             z-index: 320;
 
             width: 100%;
@@ -164,6 +166,8 @@
         }
 
         .header {
+            position: relative;
+
             display: flex;
             flex-direction: row;
 
@@ -203,25 +207,6 @@
                     color: var(--text-color);
                 }
             }
-
-            .indicators {
-                position: fixed;
-                right: 0;
-
-                display: inline-flex;
-                flex-direction: row;
-
-                padding: 10px;
-
-                justify-content: space-evenly;
-
-                svg {
-                    width: 20px;
-                    height: 20px;
-
-                    color: var(--text-color);
-                }
-            }
         }
 
         .controls {
@@ -237,6 +222,44 @@
                 margin: 0 !important;
             }
 
+            .playButton {
+                position: relative;
+
+                display: flex;
+
+                align-items: center;
+                justify-content: center;
+
+                .loadCircle {
+                    position: absolute;
+
+                    z-index: 330;
+
+                    top: 0;
+                    right: 0;
+                    left: 0;
+
+                    width: 100%;
+                    height: 100%;
+
+                    margin: auto;
+
+                    align-self: center;
+                    justify-self: center;
+
+                    transform: scale(1.5);
+
+                    svg {
+                        width: 100%;
+                        height: 100%;
+
+                        path {
+                            stroke: var(--text-color);
+                            stroke-width: 1;
+                        }
+                    }
+                }
+            }
 
             .muteButton {
                 padding: 10px;
