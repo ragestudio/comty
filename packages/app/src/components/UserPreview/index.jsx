@@ -55,15 +55,14 @@ export default (props) => {
 
     return <div
         className={classnames("userPreview", { ["clickable"]: typeof props.onClick === "function" })}
-        onClick={handleOnClick}
     >
-        <div className="avatar">
+        <div className="avatar" onClick={handleOnClick}>
             <Image
                 alt="Avatar"
                 src={userData.avatar}
             />
         </div>
-        <div className="info">
+        <div className="info" onClick={handleOnClick}>
             <h1>
                 {userData.fullName ?? userData.username}
                 {userData.verified && <Icons.verifiedBadge />}
