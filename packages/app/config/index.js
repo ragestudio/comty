@@ -9,14 +9,14 @@ const envOrigins = {
         messagingApi: `http://${window.location.hostname}:3020`,
     },
     "production": {
-        mainApi: "http://api.comty.pw",
-        messagingApi: `https://messaging_api.comty.pw`,
+        mainApi: "http://api.comty.app",
+        messagingApi: `https://messaging_api.comty.app`,
     },
     "indev": {
-        mainApi: "https://indev_api.comty.pw",
+        mainApi: "https://indev_api.comty.app",
     },
     "nightly": {
-        mainApi: "https://nightly_api.comty.pw",
+        mainApi: "https://nightly_api.comty.app",
     }
 }
 
