@@ -9,28 +9,47 @@ import "./index.less"
 export default (props) => {
     const { data } = props
 
+    const startPlaylist = () => {
+        app.cores.player.startPlaylist(data.list, 0)
+    }
+
+    const navigateToPlaylist = () => {
+        app.setLocation(`/play/${data._id}`)
+    }
+
     return <div className="playlistTimelineEntry">
         <div className="playlistTimelineEntry_content">
             <div className="playlistTimelineEntry_thumbnail">
-                <Image src={data.thumbnail} />
+                <Image
+                    src={data.thumbnail}
+                    onClick={navigateToPlaylist}
+                />
             </div>
 
             <div className="playlistTimelineEntry_info">
                 <div className="playlistTimelineEntry_title">
-                    <h1>
-                        {data.title ?? "Untitled"}
+                    <h1 onClick={navigateToPlaylist}>
+                        <Icons.MdAlbum /> {data.title ?? "Untitled"}
                     </h1>
-                </div>
 
-                <div className="playlistTimelineEntry_description">
                     <p>
-                        {data.description ?? "No description"}
+                        by <a onClick={() => app.navigation.goToAccount(data.user.username)}>@{data.user.username}</a>
                     </p>
                 </div>
 
-                <UserPreview
-                    user_id={data.user_id}
-                />
+                <div className="playlistTimelineEntry_statistics">
+                    <div className="playlistTimelineEntry_statistic">
+                        <Icons.MdFavoriteBorder /> {data.likes ?? 0}
+                    </div>
+
+                    <div className="playlistTimelineEntry_statistic">
+                        <Icons.MdHeadset /> {data.listenings ?? 0}
+                    </div>
+
+                    <div className="playlistTimelineEntry_statistic">
+                        <Icons.MdList /> {data.list?.length}
+                    </div>
+                </div>
             </div>
 
             <div className="playlistTimelineEntry_actions">
@@ -39,6 +58,7 @@ export default (props) => {
                         type="primary"
                         size="large"
                         icon={<Icons.Play />}
+                        onClick={startPlaylist}
                     />
                 </div>
             </div>

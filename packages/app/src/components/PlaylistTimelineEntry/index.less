@@ -41,10 +41,14 @@
                 object-fit: cover;
 
                 border-radius: 12px;
+
+                cursor: pointer;
             }
         }
 
         .playlistTimelineEntry_info {
+            position: relative;
+
             display: flex;
             flex-direction: column;
 
@@ -65,18 +69,41 @@
                     margin-bottom: 5px;
 
                     color: var(--text-color);
+
+                    text-decoration: underline 0.12em rgba(0, 0, 0, 0);
+
+                    transition: all 150ms ease-in-out;
+
+                    cursor: pointer;
+
+                    &:hover {
+                        color: var(--colorPrimary);
+
+                        text-decoration-color: var(--colorPrimary);
+                    }
                 }
             }
 
-            .playlistTimelineEntry_description {
-                p {
-                    font-size: 1rem;
-                    font-weight: 400;
+            .playlistTimelineEntry_statistics {
+                display: flex;
+                flex-direction: row;
 
-                    margin-top: 0;
-                    margin-bottom: 5px;
+                width: 100%;
 
-                    color: var(--text-color);
+                gap: 20px;
+
+                align-items: center;
+
+                align-self: flex-end;
+
+                font-size: 0.9rem;
+
+                .playlistTimelineEntry_statistic {
+                    display: flex;
+                    flex-direction: row;
+
+                    justify-content: center;
+                    align-items: center;
                 }
             }
         }
