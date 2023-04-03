@@ -153,8 +153,12 @@ export default class SidedrawerController extends React.Component {
 		const drawerClasses = drawer.classList
 
 		if (to) {
+			app.cores.sound.useUIAudio("sidebar.expand")
+
 			drawerClasses.remove("hided")
 		} else {
+			app.cores.sound.useUIAudio("sidebar.collapse")
+
 			drawerClasses.add("hided")
 		}
 	}
@@ -226,10 +230,10 @@ export default class SidedrawerController extends React.Component {
 		return <div
 			className={classnames(
 				"sidedrawers-wrapper",
-					{
-						["floating-sidebar"]: window.app?.cores.settings.get("sidebar.floating")
-					}
-				)}
+				{
+					["floating-sidebar"]: window.app?.cores.settings.get("sidebar.floating")
+				}
+			)}
 		>
 			{this.state.drawers}
 		</div>

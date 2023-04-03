@@ -1,6 +1,7 @@
 {
-    "themeVariant": "dark",
     "forceMobileMode": false,
+    "ui.effects": true,
+    "ui.general_volume": 50,
     "notifications_sound": true,
     "notifications_vibrate": true,
     "notifications_sound_volume": 50,
@@ -10,11 +11,8 @@
     "haptic_feedback": false,
     "collapseOnLooseFocus": true,
     "style.auto_darkMode": true,
-    "compactWidth": false,
-    "postCard_carrusel_auto": true,
-    "postCard_expansible_actions": true,
     "feed_max_fetch": 20,
     "style.compactMode": false,
-    "sidebar.floating": true,
+    "sidebar.floating": false,
     "language": "en"
 }

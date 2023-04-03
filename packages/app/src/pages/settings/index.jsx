@@ -551,6 +551,8 @@ export default () => {
             return menuEvents[event.key]()
         }
 
+        app.cores.sound.useUIAudio("navigation")
+
         setActiveKey(event.key)
     }
 

@@ -75,6 +75,33 @@ export default {
             "emitEvent": "app.lowPerformanceMode"
         },
         {
+            id: "ui.effects",
+            storaged: true,
+            group: "ui_sounds",
+            component: "Switch",
+            icon: "MdVolumeUp",
+            title: "UI effects",
+            description: "Enable the UI effects.",
+        },
+        {
+            id: "ui.general_volume",
+            storaged: true,
+            group: "ui_sounds",
+            component: "Slider",
+            icon: "MdVolumeUp",
+            title: "UI volume",
+            description: "Set the volume of the app sounds.",
+            props: {
+                tipFormatter: (value) => {
+                    return `${value}%`
+                },
+                min: 0,
+                max: 100,
+                step: 10,
+            },
+            emitEvent: "change:app.general_ui_volume"
+        },
+        {
             "id": "notifications_sound",
             "storaged": true,
             "group": "notifications",

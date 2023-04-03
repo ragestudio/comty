@@ -1,5 +1,11 @@
 {
-    "crash": "/sounds/crash.wav",
-    "error": "/sounds/error.wav",
-    "notification": "/sounds/notification.wav"
+    "id": "default",
+    "name": "Default Soundpack",
+    "author": "RageStudio",
+    "version": "1.0.0",
+    "sounds": {
+        "crash": "/sounds/crash.wav",
+        "error": "/sounds/error.wav",
+        "notification": "/sounds/notification.wav"
+    }
 }
