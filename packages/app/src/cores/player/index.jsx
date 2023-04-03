@@ -61,6 +61,7 @@ export default class Player extends Core {
         playbackStatus: "stopped",
         crossfading: false,
         trackBPM: 0,
+        livestream: false,
     })
 
     public = {
@@ -149,6 +150,11 @@ export default class Player extends Core {
             changes.forEach((change) => {
                 if (change.type === "update") {
                     switch (change.path[0]) {
+                        case "livestream": {
+                            app.eventBus.emit("player.livestream.update", change.object.livestream)
+
+                            break
+                        }
                         case "trackBPM": {
                             app.eventBus.emit("player.bpm.update", change.object.trackBPM)
 
@@ -477,6 +483,10 @@ export default class Player extends Core {
             this.audioContext.resume()
         }
 
+        if (!this.currentDomWindow) {
+            this.attachPlayerComponent()
+        }
+
         this.currentAudioInstance = instance
         this.state.currentAudioManifest = instance.manifest
 
@@ -503,12 +513,16 @@ export default class Player extends Core {
 
         instance.audioElement.play()
 
-        if (!this.currentDomWindow) {
-            // FIXME: i gonna attach the player component after 500ms to avoid error calculating the player position and duration on the first play
-            setTimeout(() => {
-                this.attachPlayerComponent()
-            }, 300)
-        }
+        // check if the audio is a live stream when metadata is loaded
+        instance.audioElement.addEventListener("loadedmetadata", () => {
+            console.log("loadedmetadata", instance.audioElement.duration)
+
+            if (instance.audioElement.duration === Infinity) {
+                instance.manifest.stream = true
+
+                this.state.livestream = true
+            }
+        }, { once: true })
     }
 
     async startPlaylist(playlist, startIndex = 0) {
@@ -644,6 +658,8 @@ export default class Player extends Core {
 
         this.state.playbackStatus = "stopped"
         this.state.currentAudioManifest = null
+
+        this.state.livestream = false
 
         this.audioQueue = []
     }

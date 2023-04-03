@@ -3,6 +3,9 @@ import * as antd from "antd"
 import Slider from "@mui/material/Slider"
 import classnames from "classnames"
 
+import UseAnimations from "react-useanimations"
+import LoadingAnimation from "react-useanimations/lib/loading"
+
 import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
@@ -37,7 +40,6 @@ class SeekBar extends React.Component {
         durationText: "00:00",
         sliderTime: 0,
         sliderLock: false,
-        streamMode: false,
     }
 
     handleSeek = (value) => {
@@ -58,36 +60,15 @@ class SeekBar extends React.Component {
         // get current audio duration
         const audioDuration = app.cores.player.duration()
 
-        // if duration is infinity, set stream mode
-        if (audioDuration === Infinity) {
-            this.setState({
-                streamMode: true,
-            })
-
-            return
-        }
-
         if (isNaN(audioDuration)) {
             return
         }
 
         console.log(`Audio duration: ${audioDuration}`)
 
-        // convert duration to minutes and seconds
-        const minutes = Math.floor(audioDuration / 60)
-
-        // add leading zero if minutes is less than 10
-        const minutesString = minutes < 10 ? `0${minutes}` : minutes
-
-        // get seconds
-        const seconds = Math.floor(audioDuration - minutes * 60)
-
-        // add leading zero if seconds is less than 10
-        const secondsString = seconds < 10 ? `0${seconds}` : seconds
-
         // set duration
         this.setState({
-            durationText: `${minutesString}:${secondsString}`
+            durationText: this.seekToTimeLabel(audioDuration)
         })
     }
 
@@ -95,22 +76,26 @@ class SeekBar extends React.Component {
         // get current audio seek
         const seek = app.cores.player.seek()
 
+        // set time
+        this.setState({
+            timeText: this.seekToTimeLabel(seek)
+        })
+    }
+
+    seekToTimeLabel = (value) => {
         // convert seek to minutes and seconds
-        const minutes = Math.floor(seek / 60)
+        const minutes = Math.floor(value / 60)
 
         // add leading zero if minutes is less than 10
         const minutesString = minutes < 10 ? `0${minutes}` : minutes
 
         // get seconds
-        const seconds = Math.floor(seek - minutes * 60)
+        const seconds = Math.floor(value - minutes * 60)
 
         // add leading zero if seconds is less than 10
         const secondsString = seconds < 10 ? `0${seconds}` : seconds
 
-        // set time
-        this.setState({
-            timeText: `${minutesString}:${secondsString}`
-        })
+        return `${minutesString}:${secondsString}`
     }
 
     updateProgressBar = () => {
@@ -163,7 +148,6 @@ class SeekBar extends React.Component {
             this.setState({
                 timeText: "00:00",
                 sliderTime: 0,
-                streamMode: false,
             })
 
             this.calculateDuration()
@@ -182,7 +166,7 @@ class SeekBar extends React.Component {
     }
 
     tick = () => {
-        if (this.props.playing || this.state.streamMode) {
+        if (this.props.playing || this.props.streamMode) {
             this.interval = setInterval(() => {
                 this.updateAll()
             }, 1000)
@@ -218,23 +202,20 @@ class SeekBar extends React.Component {
         return <div
             className={classnames(
                 "status",
-                {
-                    ["hidden"]: !this.props.initialLoad,
-                }
             )}
         >
             <div
                 className={classnames(
                     "progress",
                     {
-                        ["hidden"]: this.state.streamMode,
+                        ["hidden"]: this.props.streamMode,
                     }
                 )}
             >
                 <Slider
                     size="small"
                     value={this.state.sliderTime}
-                    disabled={this.props.stopped || this.state.streamMode}
+                    disabled={this.props.stopped || this.props.streamMode}
                     min={0}
                     max={100}
                     step={0.1}
@@ -255,6 +236,10 @@ class SeekBar extends React.Component {
                             app.cores.player.playback.play()
                         }
                     }}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(value) => {
+                        return this.seekToTimeLabel((value / 100) * app.cores.player.duration())
+                    }}
                 />
             </div>
             <div className="timers">
@@ -263,7 +248,7 @@ class SeekBar extends React.Component {
                 </div>
                 <div>
                     {
-                        this.state.streamMode ? <antd.Tag>Live</antd.Tag> : <span>{this.state.durationText}</span>
+                        this.props.streamMode ? <antd.Tag>Live</antd.Tag> : <span>{this.state.durationText}</span>
                     }
                 </div>
             </div>
@@ -307,21 +292,18 @@ export default class AudioPlayer extends React.Component {
         bpm: app.cores.player.getState("trackBPM") ?? 0,
         showControls: false,
         minimized: false,
-        initialLoad: false,
+        streamMode: false,
     }
 
     events = {
+        "player.livestream.update": (data) => {
+            this.setState({ streamMode: data })
+        },
         "player.bpm.update": (data) => {
             this.setState({ bpm: data })
         },
         "player.loading.update": (data) => {
             this.setState({ loading: data })
-
-            if (!data && !this.state.initialLoad) {
-                this.setState({
-                    initialLoad: true
-                })
-            }
         },
         "player.status.update": (data) => {
             this.setState({ playbackStatus: data })
@@ -374,11 +356,15 @@ export default class AudioPlayer extends React.Component {
         app.cores.player.volume(value)
     }
 
-    toogleMute = (to) => {
-        app.cores.player.toogleMute(to)
+    toogleMute = () => {
+        app.cores.player.toogleMute()
     }
 
     onClickPlayButton = () => {
+        if (this.state.streamMode) {
+            return app.cores.player.playback.stop()
+        }
+
         app.cores.player.playback.toogle()
     }
 
@@ -445,11 +431,6 @@ export default class AudioPlayer extends React.Component {
                             }
                         </div>
                     </div>
-                    <div className="indicators">
-                        {
-                            loading && <antd.Spin />
-                        }
-                    </div>
                 </div>
 
                 <div className="controls">
@@ -463,9 +444,19 @@ export default class AudioPlayer extends React.Component {
                     <antd.Button
                         type="primary"
                         shape="circle"
-                        icon={playbackStatus === "playing" ? <Icons.Pause /> : <Icons.Play />}
+                        icon={this.state.streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.Pause /> : <Icons.Play />}
                         onClick={this.onClickPlayButton}
-                    />
+                        className="playButton"
+                    >
+                        {
+                            loading && <div className="loadCircle">
+                                <UseAnimations
+                                    animation={LoadingAnimation}
+                                    size="100%"
+                                />
+                            </div>
+                        }
+                    </antd.Button>
                     <antd.Button
                         type="ghost"
                         shape="round"
@@ -495,7 +486,7 @@ export default class AudioPlayer extends React.Component {
                 <SeekBar
                     stopped={playbackStatus === "stopped"}
                     playing={playbackStatus === "playing"}
-                    initialLoad={this.state.initialLoad}
+                    streamMode={this.state.streamMode}
                 />
             </div>
         </div>
