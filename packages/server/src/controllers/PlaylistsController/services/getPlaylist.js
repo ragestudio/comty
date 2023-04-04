@@ -22,10 +22,7 @@ export default async (payload) => {
         throw new Error("User not found")
     }
 
-    playlist.user = {
-        username: user.username,
-        avatar: user.avatar,
-    }
+    playlist.user = user
 
     playlist.list = await Promise.all(playlist.list.map(async (track_id) => {
         return await getTrackDataById(track_id)

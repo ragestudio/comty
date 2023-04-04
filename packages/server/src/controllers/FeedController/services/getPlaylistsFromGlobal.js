@@ -24,10 +24,7 @@ export default async (payload) => {
 
         return {
             ...playlist.toObject(),
-            user: {
-                username: user.username,
-                avatar: user.avatar,
-            },
+            user: user.toObject(),
         }
     }))
 
