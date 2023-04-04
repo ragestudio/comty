@@ -35,6 +35,8 @@ export default class API {
         require("@controllers"),
         require("@middlewares"),
         {
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Content-Length, X-Requested-With, X-Access-Token, X-Refresh-Token, server_token",
             "Access-Control-Expose-Headers": "regenerated_token",
         },
     )
@@ -44,15 +46,15 @@ export default class API {
     eventBus = global.eventBus = new EventEmitter()
 
     storage = global.storage = createStorageClientInstance()
-
+    
     jwtStrategy = global.jwtStrategy = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: this.server.server_token,
+        secretOrKey: process.env.SERVER_TOKEN ?? "secret",
         algorithms: ["sha1", "RS256", "HS256"],
         expiresIn: process.env.signLifetime ?? "1h",
         enforceRegenerationTokenExpiration: false,
     }
-
+    
     constructor() {
         this.server.engine_instance.use(express.json())
         this.server.engine_instance.use(express.urlencoded({ extended: true }))

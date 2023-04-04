@@ -12,7 +12,7 @@ import routes from "./routes"
 const mainAPI = axios.create({
     baseURL: process.env.MAIN_API_URL ?? "http://localhost:3010",
     headers: {
-        "server_token": `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
+        server_token: `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
     }
 })
 
@@ -82,7 +82,7 @@ class TextRoomServer {
 
                 if (!session.valid) {
                     console.error(`[${socket.id}] failed to validate session caused by invalid token`, session)
-                    
+
                     return next(new Error(`auth:token_invalid`))
                 }
 
