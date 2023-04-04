@@ -8,7 +8,7 @@ export default {
             id: "player.allowVolumeOver100",
             title: "Allow volume over 100%",
             group: "general",
-            icon: "MdVolumeUp",
+            icon: "MdHearing",
             description: "Allow volume amplification over 100% (may cause distortion)",
             component: "Switch",
             storaged: true,
