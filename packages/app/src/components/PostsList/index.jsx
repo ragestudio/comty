@@ -368,6 +368,9 @@ export class PostsListsComponent extends React.Component {
 
         return <AutoSizer
             disableWidth
+            style={{
+                width: "100%",
+            }}
         >
             {({ height }) => {
                 console.log("[PostList] AutoSizer height update => ", height)
