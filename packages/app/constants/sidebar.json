@@ -1,26 +1,34 @@
 [
     {
-        "id": "/posts",
+        "id": "timeline",
         "path": "/",
-        "title": "Posts",
-        "icon": "MdTag"
+        "title": "Timeline",
+        "icon": "Home"
     },
     {
-        "id": "/tv",
+        "id": "tv",
         "path": "/tv",
         "title": "Tv",
         "icon": "Tv"
     },
     {
-        "id": "/music",
+        "id": "music",
         "path": "/music",
         "title": "Music",
         "icon": "MdMusicVideo"
     },
     {
-        "id": "/groups",
+        "id": "groups",
         "path": "/groups",
         "title": "Groups",
-        "icon": "MdGroups"
+        "icon": "MdGroups",
+        "disabled": true
+    },
+    {
+        "id": "Marketplace",
+        "path": "/marketplace",
+        "title": "Marketplace",
+        "icon": "Box",
+        "disabled": true
     }
 ]
