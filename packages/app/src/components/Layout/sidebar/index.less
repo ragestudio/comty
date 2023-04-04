@@ -35,6 +35,11 @@
 
 		.app_sidebar_menu_wrapper {
 			.ant-menu {
+				#sidebar_item_content {
+					opacity: 1;
+					width: 100%;
+				}
+
 				.ant-menu-item:not(.user_avatar) {
 					.ant-menu-title-content {
 						opacity: 1;
@@ -136,6 +141,11 @@
 
 			transition: all 150ms ease-in-out;
 
+			#sidebar_item_content {
+				opacity: 0;
+				width: 0;
+			}
+
 			.ant-menu-item {
 				display: inline-flex;
 
@@ -179,30 +189,6 @@
 			.ant-menu-item-selected {
 				background-color: var(--background-color-primary) !important;
 			}
-		}
-	}
-
-	.background_item {
-		width: 100%;
-
-		opacity: 0;
-
-		transition: all 150ms ease-in-out;
-
-		padding-bottom: 10px;
-
-		background-color: transparent;
-
-		&:hover{
-			background-color: unset!important;
-		}
-
-		&:active{
-			background-color: unset!important;
-		}
-
-		&.active {
-			opacity: 1;
 		}
 	}
 

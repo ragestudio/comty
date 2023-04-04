@@ -107,6 +107,13 @@ const CustomRender = (props) => {
 	</div>
 }
 
+const handleRenderIcon = (icon) => {
+	if (typeof icon === "undefined") {
+		return null
+	}
+	return createIconRender(icon)
+}
+
 export default class Sidebar extends React.Component {
 	constructor(props) {
 		super(props)
@@ -119,32 +126,54 @@ export default class Sidebar extends React.Component {
 			isExpanded: () => this.state.expanded,
 			setCustomRender: this.setRender,
 			closeCustomRender: this.closeRender,
-			updateBackgroundItem: (children, props) => {
-				let updatedValue = this.state.backgroundItem
+			updateBottomItemProps: (id, newProps) => {
+				let updatedValue = this.state.bottomItems
 
-				if (typeof children !== "undefined") {
-					updatedValue.children = children
-				}
-
-				if (typeof props !== "undefined") {
-					updatedValue.props = props
-				}
+				updatedValue = updatedValue.map((item) => {
+					if (item.id === id) {
+						item.props = {
+							...item.props,
+							...newProps,
+						}
+					}
+				})
 
 				this.setState({
-					backgroundItem: updatedValue
+					bottomItems: updatedValue
 				})
 			},
-			setBackgroundItem: (children, props) => {
+			attachBottomItem: (id, children, options) => {
+				if (!id) {
+					throw new Error("ID is required")
+				}
+
+				if (!children) {
+					throw new Error("Children is required")
+				}
+
+				if (this.state.bottomItems.find((item) => item.id === id)) {
+					throw new Error("Item already exists")
+				}
+
+				let updatedValue = this.state.bottomItems
+
+				updatedValue.push({
+					id,
+					children,
+					...options
+				})
+
 				this.setState({
-					backgroundItem: {
-						children: children,
-						props: props,
-					},
+					bottomItems: updatedValue
 				})
 			},
-			clearBackgroundItem: () => {
+			removeBottomItem: (id) => {
+				let updatedValue = this.state.bottomItems
+
+				updatedValue = updatedValue.filter((item) => item.id !== id)
+
 				this.setState({
-					backgroundItem: null,
+					bottomItems: updatedValue
 				})
 			}
 		}
@@ -158,7 +187,8 @@ export default class Sidebar extends React.Component {
 
 			customRenderTitle: null,
 			customRender: null,
-			backgroundItem: null,
+
+			bottomItems: [],
 		}
 
 		// handle sidedrawer open/close
@@ -225,13 +255,6 @@ export default class Sidebar extends React.Component {
 	}
 
 	renderMenuItems(items) {
-		const handleRenderIcon = (icon) => {
-			if (typeof icon === "undefined") {
-				return null
-			}
-			return createIconRender(icon)
-		}
-
 		return items.map((item) => {
 			if (Array.isArray(item.children)) {
 				return <Menu.SubMenu
@@ -293,6 +316,8 @@ export default class Sidebar extends React.Component {
 
 	toggleExpanded = (to) => {
 		this.setState({ expanded: to ?? !this.state.expanded })
+
+		app.eventBus.emit("sidebar.expanded", to ?? !this.state.expanded)
 	}
 
 	toggleVisibility = (to) => {
@@ -382,16 +407,25 @@ export default class Sidebar extends React.Component {
 
 					<div key="bottom" className={classnames("app_sidebar_menu_wrapper", "bottom")}>
 						<Menu selectable={false} mode="inline" onClick={this.handleClick}>
-							<Menu.Item
-								{...this.state.backgroundItem?.props ?? {}}
-								key="background_item"
-								className={classnames("background_item", { ["active"]: this.state.backgroundItem })}
-								ignoreClick
-							>
-								{
-									this.state.backgroundItem?.children
-								}
-							</Menu.Item>
+							{
+								this.state.bottomItems.map((item) => {
+									if (item.noContainer) {
+										return React.createElement(item.children, item.childrenProps)
+									}
+
+									return <Menu.Item
+										key={item.id}
+										className="extra_bottom_item"
+										icon={handleRenderIcon(item.icon)}
+										disabled={item.disabled ?? false}
+										{...item.containerProps}
+									>
+										{
+											React.createElement(item.children, item.childrenProps)
+										}
+									</Menu.Item>
+								})
+							}
 							<Menu.Item key="search" icon={<Icons.Search />} >
 								<Translation>
 									{(t) => t("Search")}
