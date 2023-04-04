@@ -40,7 +40,7 @@ const PlaylistItem = (props) => {
             <div className="playlistItem_info_title">
                 <h1>{playlist.title}</h1>
             </div>
-            <UserPreview username={playlist.user.username} />
+            <UserPreview user={playlist.user} />
         </div>
         <div className="playlistItem_actions">
             <antd.Button
