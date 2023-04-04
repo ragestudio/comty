@@ -12,7 +12,7 @@ import routes from "./routes"
 const mainAPI = axios.create({
     baseURL: process.env.MAIN_API_URL ?? "http://localhost:3010",
     headers: {
-        server_token: `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
+        Authorization: `Server ${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
     }
 })
 
