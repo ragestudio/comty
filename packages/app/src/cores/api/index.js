@@ -1,51 +1,9 @@
+import React from "react"
 import Core from "evite/src/core"
 import { Bridge } from "linebridge/dist/client"
 
 import config from "config"
 import { SessionModel } from "models"
-
-function generateWSFunctionHandler(socket, type = "listen") {
-    if (!socket) {
-        return null
-    }
-
-    return (to, fn) => {
-        if (typeof to === "undefined") {
-            console.error("handleWSListener: to must be defined")
-            return false
-        }
-        if (typeof fn !== "function") {
-            console.error("handleWSListener: fn must be function")
-            return false
-        }
-
-        let ns = "main"
-        let event = null
-
-        if (typeof to === "string") {
-            event = to
-        } else if (typeof to === "object") {
-            ns = to.ns
-            event = to.event
-        }
-
-        switch (type) {
-            case "listen": {
-                return socket.sockets[ns].on(event, async (...context) => {
-                    return await fn(...context)
-                })
-            }
-
-            case "unlisten": {
-                return socket.sockets[ns].removeListener(event)
-            }
-
-            default: {
-                return null
-            }
-        }
-    }
-}
 
 export default class ApiCore extends Core {
     static refName = "api"
@@ -62,6 +20,7 @@ export default class ApiCore extends Core {
         instance: function () {
             return this.instance
         }.bind(this),
+        useRequest: this.useRequest,
         customRequest: this.customRequest.bind(this),
         request: this.request.bind(this),
         withEndpoints: this.withEndpoints.bind(this),
@@ -91,6 +50,30 @@ export default class ApiCore extends Core {
         console.debug(`[API] Attached to ${origin}`, this.instance)
 
         return this.instance
+    }
+
+    useRequest(method, ...args) {
+        if (typeof method !== "function") {
+            throw new Error("useRequest: method must be a function")
+        }
+
+        const [loading, setLoading] = React.useState(true)
+        const [result, setResult] = React.useState(null)
+        const [error, setError] = React.useState(null)
+
+        React.useEffect(() => {
+            method(...args)
+                .then((data) => {
+                    setResult(data)
+                    setLoading(false)
+                })
+                .catch((err) => {
+                    setError(err)
+                    setLoading(false)
+                })
+        }, [])
+
+        return [loading, result, error]
     }
 
     async customRequest(
