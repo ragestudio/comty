@@ -7,7 +7,7 @@ import { PagePanelWithNavMenu } from "components/PagePanels"
 import Tabs from "./tabs"
 
 const NavMenuHeader = <h2>
-    <Icons.MdLiveTv />
+    <Icons.MdAlbum />
     Music
 </h2>
 

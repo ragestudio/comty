@@ -2,20 +2,23 @@ import FeedTab from "./components/feed"
 import GlobalTab from "./components/global"
 import SavedPostsTab from "./components/savedPosts"
 
-export default {
-    "feed": {
+export default [
+    {
+        key: "feed",
         label: "Feed",
-        icon: "Rss",
+        icon: "IoMdPaper",
         component: FeedTab
     },
-    "global": {
+    {
+        key: "global",
         label: "Global",
         icon: "Globe",
         component: GlobalTab
     },
-    "savedPosts": {
+    {
+        key: "savedPosts",
         label: "Saved posts",
         icon: "Bookmark",
         component: SavedPostsTab
     }
-}
+]

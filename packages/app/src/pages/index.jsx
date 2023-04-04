@@ -14,7 +14,7 @@ export default class Home extends React.Component {
     render() {
         const navMenuHeader = <>
             <h1>
-                <Icons.MdTag />
+                <Icons.Home />
                 <Translation>{(t) => t("Timeline")}</Translation>
             </h1>
             <antd.Button

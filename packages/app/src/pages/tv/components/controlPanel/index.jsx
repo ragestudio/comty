@@ -390,7 +390,7 @@ export default (props) => {
                 <h2><Icons.Link /> URL Information</h2>
 
                 <div className="content">
-                    <span>AAC URL</span>
+                    <span>AAC URL (Only Audio)</span>
 
                     <code>
                         {addresses.aacURL ?? "No AAC URL available"}
