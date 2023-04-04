@@ -42,8 +42,6 @@ export class PagePanelWithNavMenu extends React.Component {
             if (!tab) {
                 tab = this.props.tabs.find((children) => children.key === key)
             } else {
-                console.log(tab.children)
-
                 if (!tab.children) {
                     console.error("PagePanelWithNavMenu: tab.children is not defined")
 
