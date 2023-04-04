@@ -10,11 +10,8 @@ import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
 
-// TODO: Check AUDIO quality and show a quality indicator
 // TODO: Add close button
-// TODO: Add repeat & shuffle mode
 // TODO: Queue view
-
 const AudioVolume = (props) => {
     return <div className="volumeSlider">
         <antd.Slider
@@ -34,7 +31,7 @@ const AudioVolume = (props) => {
     </div>
 }
 
-class SeekBar extends React.Component {
+export class SeekBar extends React.Component {
     state = {
         timeText: "00:00",
         durationText: "00:00",
@@ -352,6 +349,10 @@ export default class AudioPlayer extends React.Component {
         app.cores.player.minimize()
     }
 
+    close = () => {
+        app.cores.player.close()
+    }
+
     updateVolume = (value) => {
         app.cores.player.volume(value)
     }
@@ -397,12 +398,19 @@ export default class AudioPlayer extends React.Component {
             onMouseLeave={this.onMouse}
         >
             <div className="player">
-                <div className="minimize_btn">
-                    <antd.Button
-                        icon={<Icons.MdFirstPage />}
-                        onClick={this.minimize}
-                        shape="circle"
-                    />
+                <div className="extra_btns_wrapper">
+                    <div className="extra_btns">
+                        <antd.Button
+                            icon={<Icons.MdFirstPage />}
+                            onClick={this.minimize}
+                            shape="circle"
+                        />
+                        <antd.Button
+                            icon={<Icons.X />}
+                            onClick={this.close}
+                            shape="circle"
+                        />
+                    </div>
                 </div>
                 <div
                     className="cover"
@@ -444,7 +452,7 @@ export default class AudioPlayer extends React.Component {
                     <antd.Button
                         type="primary"
                         shape="circle"
-                        icon={this.state.streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.Pause /> : <Icons.Play />}
+                        icon={this.state.streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
                         onClick={this.onClickPlayButton}
                         className="playButton"
                     >
