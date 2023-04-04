@@ -35,8 +35,11 @@
             }
         }
 
-        .minimize_btn {
-            opacity: 1;
+        .extra_btns_wrapper {
+            .extra_btns {
+                opacity: 1;
+                padding: 20px;
+            }
         }
     }
 
@@ -90,7 +93,7 @@
         }
     }
 
-    .minimize_btn {
+    .extra_btns_wrapper{
         position: absolute;
 
         z-index: 330;
@@ -98,17 +101,28 @@
         top: 0;
         left: 0;
 
-        opacity: 0;
+        width: 100%;
 
-        transition: all 150ms ease-in-out;
+        .extra_btns {
+            display: flex;
+    
+            flex-direction: row;
 
-        transform: translate(60%, 60%);
-
-        .ant-btn {
-            background-color: var(--background-color-accent);
-
-            svg {
-                margin: 0 !important;
+            align-items: center;
+            justify-content: space-between;
+           
+            opacity: 0;
+    
+            transition: all 150ms ease-in-out;
+    
+            //transform: translate(60%, 60%);
+    
+            .ant-btn {
+                background-color: var(--background-color-accent);
+    
+                svg {
+                    margin: 0 !important;
+                }
             }
         }
     }
