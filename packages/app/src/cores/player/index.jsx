@@ -2,6 +2,8 @@ import React from "react"
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
 import store from "store"
+import { FastAverageColor } from "fast-average-color"
+
 // import { createRealTimeBpmProcessor } from "realtime-bpm-analyzer"
 
 import EmbbededMediaPlayer from "components/EmbbededMediaPlayer"
@@ -49,6 +51,8 @@ export default class Player extends Core {
 
     currentAudioInstance = null
 
+    fac = new FastAverageColor()
+
     state = Observable.from({
         loading: false,
         minimized: false,
@@ -57,6 +61,7 @@ export default class Player extends Core {
         audioVolume: AudioPlayerStorage.get("volume") ?? 0.3,
         velocity: AudioPlayerStorage.get("velocity") ?? 1,
 
+        coverColorAnalysis: null,
         currentAudioManifest: null,
         playbackStatus: "stopped",
         crossfading: false,
@@ -143,6 +148,7 @@ export default class Player extends Core {
         seek: this.seek.bind(this),
         duration: this.duration.bind(this),
         velocity: this.velocity.bind(this),
+        close: this.close.bind(this),
     }
 
     async onInitialize() {
@@ -174,6 +180,25 @@ export default class Player extends Core {
                         }
                         case "currentAudioManifest": {
                             app.eventBus.emit("player.current.update", change.object.currentAudioManifest)
+
+                            if (change.object.currentAudioManifest) {
+                                // analyze cover color
+
+                                if (change.object.currentAudioManifest.thumbnail) {
+                                    this.fac.getColorAsync(change.object.currentAudioManifest.thumbnail)
+                                        .then((color) => {
+                                            this.state.coverColorAnalysis = color
+                                        })
+                                        .catch((err) => {
+                                            console.error(err)
+                                        })
+                                }
+                            }
+
+                            break
+                        }
+                        case "coverColorAnalysis": {
+                            app.eventBus.emit("player.coverColorAnalysis.update", change.object.coverColorAnalysis)
 
                             break
                         }
@@ -214,9 +239,11 @@ export default class Player extends Core {
                         }
                         case "minimized": {
                             if (change.object.minimized) {
-                                app.SidebarController.setBackgroundItem(React.createElement(BackgroundMediaPlayer))
+                                app.SidebarController.attachBottomItem("player", BackgroundMediaPlayer, {
+                                    noContainer: true
+                                })
                             } else {
-                                app.SidebarController.setBackgroundItem(null)
+                                app.SidebarController.removeBottomItem("player")
                             }
 
                             app.eventBus.emit("player.minimized.update", change.object.minimized)
@@ -268,7 +295,7 @@ export default class Player extends Core {
             return false
         }
 
-        this.currentDomWindow.close()
+        this.currentDomWindow.destroy()
         this.currentDomWindow = null
     }
 
@@ -514,6 +541,8 @@ export default class Player extends Core {
             this.currentAudioInstance.track.connect(filter).connect(this.realtimeAnalyzerNode)
         }
 
+        instance.audioElement.muted = this.state.audioMuted
+
         instance.audioElement.play()
 
         // check if the audio is a live stream when metadata is loaded
@@ -665,6 +694,11 @@ export default class Player extends Core {
         this.state.livestream = false
 
         this.audioQueue = []
+    }
+
+    close() {
+        this.stop()
+        this.detachPlayerComponent()
     }
 
     toogleMute(to) {
