@@ -10,7 +10,7 @@ import axios from "axios"
 import routes from "./routes"
 
 const mainAPI = axios.create({
-    baseURL: process.NODE_ENV === "production" ? (process.env.MAIN_API_URL) : (process.env.DEV_API_URL ?? "http://localhost:3010"),
+    baseURL: process.env.MAIN_API_URL ?? "http://localhost:3010",
     headers: {
         "server_token": `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
     }
