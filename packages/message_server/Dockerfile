@@ -1,4 +1,5 @@
 FROM node:16-bullseye
+ENV NODE_ENV=production
 
 RUN apt update
 RUN apt install python -y
@@ -16,4 +17,4 @@ RUN chmod -R 777 /home/node/app
 RUN npm install
 RUN npm run build
 
-CMD ["NODE_ENV=production", "node", "/home/node/app/dist/index.js"]
+CMD ["node", "/home/node/app/dist/index.js"]
