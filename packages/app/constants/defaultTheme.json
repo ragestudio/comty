@@ -5,7 +5,7 @@
         "app-color": "#ff6064",
         "backgroundColorTransparency": "0.8",
         "backgroundImage": "",
-        "fontFamily": "'Varela Round', sans-serif",
+        "fontFamily": "'Inter', sans-serif",
         "layoutMargin": "unset",
         "layoutPadding": "20px",
         "borderRadius": "8px",

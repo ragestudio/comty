@@ -125,12 +125,12 @@ export default {
                 },
                 options: [
                     {
-                        label: "Varela Round (Default)",
-                        value: "'Varela Round', sans-serif"
+                        label: "Inter (Default)",
+                        value: "'Inter', sans-serif"
                     },
                     {
-                        label: "Inter",
-                        value: "'Inter', sans-serif"
+                        label: "Varela Round",
+                        value: "'Varela Round', sans-serif"
                     },
                 ]
             },
