@@ -283,6 +283,9 @@ export default class Player extends Core {
         }
 
         this.currentAudioInstance = null
+
+        // reset livestream mode
+        this.state.livestream = false
     }
 
     async createInstance(manifest) {
