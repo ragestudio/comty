@@ -5,7 +5,6 @@ import { Session } from "@models"
 export default {
     method: "POST",
     route: "/validate",
-    middlewares: ["useJwtStrategy"],
     fn: async (req, res) => {
         const token = req.body.session
 
@@ -14,7 +13,7 @@ export default {
             valid: true
         }
 
-        await jwt.verify(token, req.jwtStrategy.secretOrKey, async (err, decoded) => {
+        await jwt.verify(token, global.jwtStrategy.secretOrKey, async (err, decoded) => {
             if (err) {
                 result.valid = false
                 result.error = err.message
@@ -22,6 +21,7 @@ export default {
                 if (err.message === "jwt expired") {
                     result.expired = true
                 }
+
                 return
             }
 
