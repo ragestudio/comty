@@ -10,7 +10,7 @@ import axios from "axios"
 import routes from "./routes"
 
 const mainAPI = axios.create({
-    baseURL: process.env.MAIN_API_URL ?? "http://localhost:3000",
+    baseURL: process.NODE_ENV === "production" ? (process.env.MAIN_API_URL) : (process.env.DEV_API_URL ?? "http://localhost:3010"),
     headers: {
         "server_token": `${process.env.MAIN_SERVER_ID}:${process.env.MAIN_SERVER_TOKEN}`,
     }
@@ -71,10 +71,16 @@ class TextRoomServer {
                         return res.data
                     })
                     .catch((err) => {
+                        console.error(`[${socket.id}] failed to validate session caused by server error`, err)
+
                         return false
                     })
 
-                if (!session || !session?.valid) {
+                if (!session) {
+                    return next(new Error(`auth:server_error`))
+                }
+
+                if (session.invalid) {
                     return next(new Error(`auth:token_invalid`))
                 }
 
@@ -86,8 +92,6 @@ class TextRoomServer {
                         console.log(err)
                         return null
                     })
-
-                console.log(userData)
 
                 if (!userData) {
                     return next(new Error(`auth:user_failed`))
