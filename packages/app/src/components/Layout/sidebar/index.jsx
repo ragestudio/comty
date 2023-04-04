@@ -1,5 +1,5 @@
 import React from "react"
-import { Menu, Avatar, Button, Dropdown } from "antd"
+import { Menu, Avatar, Button } from "antd"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 
@@ -243,12 +243,18 @@ export default class Sidebar extends React.Component {
 						</Translation>
 					</span>}
 					{...item.props}
+					disabled={item.disabled ?? false}
 				>
 					{this.renderMenuItems(item.children)}
 				</Menu.SubMenu>
 			}
 
-			return <Menu.Item key={item.id} icon={handleRenderIcon(item.icon)} {...item.props}>
+			return <Menu.Item
+				key={item.id}
+				icon={handleRenderIcon(item.icon)}
+				disabled={item.disabled ?? false}
+				{...item.props}
+			>
 				<Translation>
 					{t => t(item.title ?? item.id)}
 				</Translation>
