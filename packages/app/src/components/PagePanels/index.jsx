@@ -22,13 +22,37 @@ export const Panel = (props) => {
 export class PagePanelWithNavMenu extends React.Component {
     state = {
         // if defaultTab is not set, try to get it from query, if not, use the first tab
-        activeTab: this.props.defaultTab ?? new URLSearchParams(window.location.search).get("type") ?? Object.keys(this.props.tabs)[0],
+        activeTab: this.props.defaultTab ?? new URLSearchParams(window.location.search).get("type") ?? this.props.tabs[0].key,
     }
 
     primaryPanelRef = React.createRef()
 
     renderActiveTab() {
-        const tab = this.props.tabs[this.state.activeTab]
+        if (!Array.isArray(this.props.tabs)) {
+            console.error("PagePanelWithNavMenu: tabs must be an array")
+            return <></>
+        }
+
+        // slip the active tab by splitting on "."
+        const activeTabDirectory = this.state.activeTab.split(".")
+
+        let tab = null
+
+        activeTabDirectory.forEach((key, index) => {
+            if (!tab) {
+                tab = this.props.tabs.find((children) => children.key === key)
+            } else {
+                console.log(tab.children)
+
+                if (!tab.children) {
+                    console.error("PagePanelWithNavMenu: tab.children is not defined")
+
+                    return tab = null
+                }
+
+                tab = tab.children.find((children) => children.key === `${activeTabDirectory[index - 1]}.${key}`)
+            }
+        })
 
         if (!tab) {
             if (this.props.onNotFound) {
@@ -75,6 +99,23 @@ export class PagePanelWithNavMenu extends React.Component {
         }
     }
 
+    getItems = (items) => {
+        if (!Array.isArray(items)) {
+            console.error(`[items] is not an (array), received (${typeof items})`)
+            return []
+        }
+
+        return items.map((item) => {
+            return {
+                key: item.key,
+                icon: createIconRender(item.icon),
+                label: item.label,
+                children: item.children && this.getItems(item.children),
+                disabled: item.disabled,
+            }
+        })
+    }
+
     render() {
         const panels = [
             {
@@ -89,20 +130,8 @@ export class PagePanelWithNavMenu extends React.Component {
                         mode="inline"
                         selectedKeys={[this.state.activeTab]}
                         onClick={({ key }) => this.handleTabChange(key)}
-                    >
-                        {
-                            Object.entries(this.props.tabs ?? []).map(([key, tab]) => {
-                                return <antd.Menu.Item
-                                    key={key}
-                                    disabled={tab.disabled}
-                                    danger={tab.danger}
-                                >
-                                    {tab.icon && createIconRender(tab.icon)}
-                                    {tab.label}
-                                </antd.Menu.Item>
-                            })
-                        }
-                    </antd.Menu>
+                        items={this.getItems(this.props.tabs)}
+                    />
                 </div>
             },
             {
