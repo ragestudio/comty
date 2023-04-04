@@ -80,8 +80,16 @@ class TextRoomServer {
                     return next(new Error(`auth:server_error`))
                 }
 
-                if (session.invalid) {
+                if (!session.valid) {
+                    console.error(`[${socket.id}] failed to validate session caused by invalid token`, session)
+                    
                     return next(new Error(`auth:token_invalid`))
+                }
+
+                if(!session.user_id) {
+                    console.error(`[${socket.id}] failed to validate session caused by invalid session. (missing user_id)`, session)
+
+                    return next(new Error(`auth:invalid_session`))
                 }
 
                 const userData = await mainAPI.get(`/user/${session.user_id}/data`)
