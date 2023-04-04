@@ -16,4 +16,4 @@ RUN chmod -R 777 /home/node/app
 RUN npm install
 RUN npm run build
 
-CMD ["node", "/home/node/app/dist/index.js"]
+CMD ["NODE_ENV=production", "node", "/home/node/app/dist/index.js"]
