@@ -1,9 +1,11 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { ImageViewer } from "components"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import moment from "moment"
 
+import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
 
 import PlaylistsModel from "models/playlists"
@@ -91,9 +93,9 @@ export default (props) => {
                     </div>
 
                     <div className="play_info_description">
-                        <h3>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {playlist.description}
-                        </h3>
+                        </ReactMarkdown>
                     </div>
 
                     <div className="play_info_statistics">
