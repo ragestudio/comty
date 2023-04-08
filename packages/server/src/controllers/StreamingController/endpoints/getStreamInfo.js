@@ -1,4 +1,4 @@
-import { StreamingInfo, User, StreamingCategory } from "@models"
+import { StreamingInfo, User } from "@models"
 
 export default {
     method: "GET",
