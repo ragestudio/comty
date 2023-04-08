@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken } from "../../models"
+import { Session, RegenerationToken } from "@models"
 
-export async function regenerateSession(expiredToken, refreshToken) {
+export async function regenerateSession(expiredToken, refreshToken, aggregateData = {}) {
     // search for a regeneration token with the expired token (Should exist only one)
     const regenerationToken = await RegenerationToken.findOne({ refreshToken: refreshToken })
 
@@ -60,7 +60,12 @@ export async function regenerateSession(expiredToken, refreshToken) {
     }
 
     // generate a new token
-    const newToken = await createNewAuthToken(decodedExpiredToken, {
+    const newToken = await createNewAuthToken({
+        username: decodedExpiredToken.username,
+        session_uuid: session.session_uuid,
+        user_id: decodedExpiredToken.user_id,
+        ip_address: aggregateData.ip_address,
+    }, {
         updateSession: session._id,
     })
 
@@ -121,18 +126,7 @@ export async function createNewRegenerationToken(expiredToken) {
     return regenerationToken
 }
 
-export async function createNewAuthToken(user, options = {}) {
-    const payload = {
-        user_id: user._id ?? user.user_id,
-        username: user.username,
-        email: user.email,
-        signLocation: global.signLocation,
-    }
-
-    return await signNewAuthToken(payload, options)
-}
-
-export async function signNewAuthToken(payload, options = {}) {
+export async function createNewAuthToken(payload, options = {}) {
     if (options.updateSession) {
         const sessionData = await Session.findOne({ _id: options.updateSession })
 
@@ -141,7 +135,12 @@ export async function signNewAuthToken(payload, options = {}) {
         payload.session_uuid = global.nanoid()
     }
 
-    const token = jwt.sign(payload, global.jwtStrategy.secretOrKey, {
+    const token = jwt.sign({
+        session_uuid: payload.session_uuid,
+        username: payload.username,
+        user_id: payload.user_id,
+        signLocation: payload.signLocation,
+    }, global.jwtStrategy.secretOrKey, {
         expiresIn: global.jwtStrategy.expiresIn ?? "1h",
         algorithm: global.jwtStrategy.algorithm ?? "HS256"
     })
@@ -151,16 +150,14 @@ export async function signNewAuthToken(payload, options = {}) {
         session_uuid: payload.session_uuid,
         username: payload.username,
         user_id: payload.user_id,
+        location: payload.signLocation,
+        ip_address: payload.ip_address,
+        client: payload.client,
         date: new Date().getTime(),
-        location: payload.signLocation ?? "rs-auth",
     }
 
     if (options.updateSession) {
-        await Session.findByIdAndUpdate(options.updateSession, {
-            token: session.token,
-            date: session.date,
-            location: session.location,
-        })
+        await Session.findByIdAndUpdate(options.updateSession, session)
     } else {
         let newSession = new Session(session)
 

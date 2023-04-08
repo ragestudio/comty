@@ -8,5 +8,7 @@ export default {
         user_id: { type: String, required: true },
         date: { type: Number, default: 0 },
         location: { type: String, default: "Unknown" },
+        ip_address: { type: String, default: "Unknown" },
+        client: { type: String, default: "Unknown" },
     }
 }
