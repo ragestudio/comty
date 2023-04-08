@@ -24,3 +24,5 @@ export { default as SearchController } from "./SearchController" // Needs to mig
 export { default as ModerationController } from "./ModerationController"
 
 export { default as TracksController } from "./TracksController"
+
+export { default as AdminController } from "./AdminController"
