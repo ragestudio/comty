@@ -1,22 +1,19 @@
 import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
 import defaultSoundPack from "../constants/defaultSoundPack.json"
-import defaultRemotesOrigins from "../constants/defaultRemotesOrigins.json"
 
 const envOrigins = {
-    "development": {
+    "localhost": {
         mainApi: `http://${window.location.hostname}:3010`,
         messagingApi: `http://${window.location.hostname}:3020`,
     },
+    "development": {
+        mainApi: `https://indev_api.comty.app`,
+        messagingApi: `https://indev_messaging_api.comty.app`,
+    },
     "production": {
-        mainApi: "http://api.comty.app",
+        mainApi: "https://api.comty.app",
         messagingApi: `https://messaging_api.comty.app`,
-    },
-    "indev": {
-        mainApi: "https://indev_api.comty.app",
-    },
-    "nightly": {
-        mainApi: "https://nightly_api.comty.app",
     }
 }
 
@@ -56,9 +53,9 @@ export default {
         ragestudio_alt: "https://storage.ragestudio.net/rstudio/branding/ragestudio/iso/ragestudio.svg",
         ragestudio_full: "https://storage.ragestudio.net/rstudio/branding/ragestudio/labeled/ragestudio-labeled_white.svg",
     },
-    remotes: {
-        mainApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].mainApi : defaultRemotesOrigins.main_api,
-        messagingApi: process.env.NODE_ENV !== "production" ? envOrigins[process.env.NODE_ENV].messagingApi : defaultRemotesOrigins.messagingApi,
+    remotes:{
+        mainApi: window.location.hostname === "localhost" ? envOrigins["development"].mainApi : envOrigins[process.env.NODE_ENV].mainApi,
+        messagingApi: window.location.hostname === "localhost" ? envOrigins["development"].messagingApi : envOrigins[process.env.NODE_ENV].messagingApi,
     },
     app: {
         title: packagejson.name,
