@@ -1,5 +1,5 @@
-import FeedTab from "./components/feed"
-import ControlPanelTab from "./components/controlPanel"
+import FeedTab from "./tabs/feed"
+import ControlPanelTab from "./tabs/livestreamControlPanel"
 
 export default [
     {
