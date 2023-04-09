@@ -53,9 +53,9 @@ export default {
         ragestudio_alt: "https://storage.ragestudio.net/rstudio/branding/ragestudio/iso/ragestudio.svg",
         ragestudio_full: "https://storage.ragestudio.net/rstudio/branding/ragestudio/labeled/ragestudio-labeled_white.svg",
     },
-    remotes:{
-        mainApi: window.location.hostname === "localhost" ? envOrigins["development"].mainApi : envOrigins[process.env.NODE_ENV].mainApi,
-        messagingApi: window.location.hostname === "localhost" ? envOrigins["development"].messagingApi : envOrigins[process.env.NODE_ENV].messagingApi,
+    remotes: {
+        mainApi: window.location.hostname.includes("localhost") ? envOrigins["localhost"].mainApi : envOrigins[process.env.NODE_ENV].mainApi,
+        messagingApi: window.location.hostname.includes("localhost") ? envOrigins["localhost"].messagingApi : envOrigins[process.env.NODE_ENV].messagingApi,
     },
     app: {
         title: packagejson.name,
