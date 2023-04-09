@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken"
 
 export default async (req, res, next) => {
     function reject(description) {
-        return res.status(403).json({ error: `${description ?? "Invalid session"}` })
+        return res.status(401).json({ error: `${description ?? "Invalid session"}` })
     }
 
     try {
@@ -47,7 +47,7 @@ export default async (req, res, next) => {
                     const userData = await User.findOne({ _id: currentSession.user_id }).select("+refreshToken")
 
                     if (!userData) {
-                        return res.status(404).json({ error: "No user data found" })
+                        return reject("Cannot find user")
                     }
 
                     // if cannot verify token, start regeneration process
@@ -99,28 +99,28 @@ export default async (req, res, next) => {
                 if (client_id === "undefined" || token === "undefined") {
                     return reject("Invalid server token")
                 }
-    
+
                 const secureEntries = new SecureEntry(authorizedServerTokens)
-    
+
                 const serverTokenEntry = await secureEntries.get(client_id, undefined, {
                     keyName: "client_id",
                     valueName: "token",
                 })
-    
+
                 if (!serverTokenEntry) {
                     return reject("Invalid server token")
                 }
-    
+
                 if (serverTokenEntry !== token) {
                     return reject("Missmatching server token")
                 }
-    
+
                 req.user = {
                     __server: true,
                     _id: client_id,
                     roles: ["server"],
                 }
-    
+
                 return next()
             }
             default: {
