@@ -1,7 +1,7 @@
 import React from "react"
 import loadable from "@loadable/component"
 import { Modal } from "antd"
-import UploadButton from "../components/uploadButton"
+import UploadButton from "components/UploadButton"
 
 import "./index.less"
 
