@@ -1,0 +1,48 @@
+.profileEditor {
+    display: flex;
+    flex-direction: column;
+
+    .field {
+        display: flex;
+        flex-direction: column;
+
+        margin-bottom: 20px;
+
+        .value {
+            margin-top: 5px;
+            margin-left: 20px;
+
+            .ant-select {
+                min-width: 200px;
+            }
+
+            &.thumbnail {
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                width: 100%;
+
+                gap: 10px;
+
+                img {
+                    border-radius: 12px;
+
+                    max-width: 600px;
+                    max-height: 400px;
+
+                    object-fit: cover;
+                }
+
+                .controls {
+                    display: flex;
+                    flex-direction: row;
+
+                    gap: 10px;
+                }
+            }
+        }
+    }
+}
