@@ -61,7 +61,7 @@ export default class ApiCore extends Core {
         const [result, setResult] = React.useState(null)
         const [error, setError] = React.useState(null)
 
-        React.useEffect(() => {
+        const makeRequest = () => {
             method(...args)
                 .then((data) => {
                     setResult(data)
@@ -71,9 +71,13 @@ export default class ApiCore extends Core {
                     setError(err)
                     setLoading(false)
                 })
+        }
+
+        React.useEffect(() => {
+            makeRequest()
         }, [])
 
-        return [loading, result, error]
+        return [loading, result, error, makeRequest]
     }
 
     async customRequest(
