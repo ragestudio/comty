@@ -1,7 +1,7 @@
 import React from "react"
 import { UserModel } from "models"
 import loadable from "@loadable/component"
-import UploadButton from "../components/uploadButton"
+import UploadButton from "components/UploadButton"
 
 export default {
     id: "profile",

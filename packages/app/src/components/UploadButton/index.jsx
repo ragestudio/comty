@@ -46,6 +46,10 @@ export default (props) => {
             }
 
             if (response.data.files.length > 0) {
+                if (typeof props.ctx?.onUpdateItem === "function") {
+                    props.ctx.onUpdateItem(response.data.files[0].url)
+                }
+
                 if (typeof props.onUploadDone === "function") {
                     if (props.multiple) {
                         await props.onUploadDone(response.data.files)
