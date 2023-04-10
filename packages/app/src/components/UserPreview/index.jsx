@@ -54,7 +54,13 @@ export default (props) => {
     }
 
     return <div
-        className={classnames("userPreview", { ["clickable"]: typeof props.onClick === "function" })}
+        className={classnames(
+            "userPreview",
+            {
+                ["clickable"]: typeof props.onClick === "function",
+                ["small"]: props.small
+            }
+        )}
     >
         <div className="avatar" onClick={handleOnClick}>
             <Image
