@@ -50,5 +50,8 @@ export default async function (payload) {
 
     await user.save()
 
+    // dispatch event bus
+    global.eventBus.emit("user.create", user)
+
     return user
 }
