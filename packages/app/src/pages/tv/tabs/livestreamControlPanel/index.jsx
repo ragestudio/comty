@@ -16,26 +16,11 @@ export default (props) => {
 
     const [selectedProfileId, setSelectedProfileId] = React.useState(null)
 
-    const [addresses, setAddresses] = React.useState({})
-
     const [isConnected, setIsConnected] = React.useState(false)
-
-    const fetchAddresses = async () => {
-        const addresses = await Livestream.getAddresses().catch((error) => {
-            app.message.error(`Failed to fetch addresses`)
-            console.error(error)
-
-            return null
-        })
-
-        if (addresses) {
-            setAddresses(addresses)
-        }
-    }
 
     React.useEffect(() => {
         if (R_Profiles) {
-            fetchAddresses()
+            console.log("Profiles", R_Profiles)
 
             if (!selectedProfileId) {
                 setSelectedProfileId(R_Profiles[0]?._id)
@@ -251,7 +236,7 @@ export default (props) => {
                     <span>Ingestion URL</span>
 
                     <code>
-                        {addresses.ingestURL ?? "No ingest URL available"}
+                        {profileData?.addresses?.ingest ?? "No ingest URL available"}
                     </code>
                 </div>
 
@@ -307,7 +292,7 @@ export default (props) => {
                     <span>AAC URL (Only Audio)</span>
 
                     <code>
-                        {addresses.aacURL ?? "No AAC URL available"}
+                        {profileData?.addresses?.aac ?? "No AAC URL available"}
                     </code>
                 </div>
 
@@ -315,7 +300,7 @@ export default (props) => {
                     <span>HLS URL</span>
 
                     <code>
-                        {addresses.hlsURL ?? "No HLS URL available"}
+                        {profileData?.addresses?.hls ?? "No HLS URL available"}
                     </code>
                 </div>
 
@@ -323,7 +308,7 @@ export default (props) => {
                     <span>FLV URL</span>
 
                     <code>
-                        {addresses.flvURL ?? "No FLV URL available"}
+                        {profileData?.addresses?.flv ?? "No FLV URL available"}
                     </code>
                 </div>
             </div>
