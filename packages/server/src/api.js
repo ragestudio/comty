@@ -1,8 +1,10 @@
+import path from "path"
 import { Server, registerBaseAliases } from "linebridge/dist/server"
 
-registerBaseAliases()
+registerBaseAliases(undefined, {
+    "@services": path.resolve(process.cwd(), "src/services"),
+})
 
-import path from "path"
 import express from "express"
 import bcrypt from "bcrypt"
 import passport from "passport"
@@ -46,7 +48,7 @@ export default class API {
     eventBus = global.eventBus = new EventEmitter()
 
     storage = global.storage = createStorageClientInstance()
-    
+
     jwtStrategy = global.jwtStrategy = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         secretOrKey: process.env.SERVER_TOKEN ?? "secret",
@@ -54,7 +56,7 @@ export default class API {
         expiresIn: process.env.signLifetime ?? "1h",
         enforceRegenerationTokenExpiration: false,
     }
-    
+
     constructor() {
         this.server.engine_instance.use(express.json())
         this.server.engine_instance.use(express.urlencoded({ extended: true }))
