@@ -1,18 +1,20 @@
 import axios from "axios"
-import lodash from "lodash"
 
-import { StreamingCategory, StreamingInfo } from "@models"
-import generateStreamDataFromStreamingKey from "./generateStreamDataFromStreamingKey"
+import { StreamingCategory, StreamingProfile, User } from "@models"
 
 const streamingServerAPIAddress = process.env.STREAMING_API_SERVER ?? ""
 
 const streamingServerAPIUri = `${streamingServerAPIAddress.startsWith("https") ? "https" : "http"}://${streamingServerAPIAddress.split("://")[1]}`
 
-const FILTER_KEYS = ["stream"]
+export default async (stream_id) => {
+    let apiURI = `${streamingServerAPIUri}/api/v1/streams`
 
-export default async () => {
+    if (stream_id) {
+        apiURI = `${streamingServerAPIUri}/api/v1/streams/${stream_id}`
+    }
+
     // fetch all streams from api
-    let { data } = await axios.get(`${streamingServerAPIUri}/api/v1/streams`).catch((err) => {
+    let { data } = await axios.get(apiURI).catch((err) => {
         console.error(err)
         return false
     })
@@ -21,35 +23,61 @@ export default async () => {
 
     if (!data) return streamings
 
-    streamings = data.streams
+    if (data.stream && stream_id) {
+        streamings.push(data.stream)
+    }
+
+    if (data.streams) {
+        streamings = data.streams
+    }
 
     streamings = streamings.map(async (stream) => {
-        const { video, audio, clients } = stream
+        const { video, audio, clients, app } = stream
 
-        stream = await generateStreamDataFromStreamingKey(stream.name)
+        const profile_id = app.split(":")[1]
 
-        let info = await StreamingInfo.findOne({
-            user_id: stream.user_id
+        let profile = await StreamingProfile.findById(profile_id)
+
+        if (!profile) return null
+
+        profile = profile.toObject()
+
+        profile._id = profile._id.toString()
+
+        profile.info.category = await StreamingCategory.findOne({
+            key: profile.info.category
         })
 
-        if (info) {
-            stream.info = info.toObject()
+        let user = await User.findById(profile.user_id)
 
-            stream.info.category = await StreamingCategory.findOne({
-                key: stream.info.category
-            })
+        if (!user) return null
+
+        user = user.toObject()
+
+        return {
+            profile_id: profile._id,
+            info: profile.info,
+            stream: `${user.username}?profile=${profile._id}`,
+            user,
+            video,
+            audio,
+            connectedClients: clients ?? 0,
+            sources: {
+                hls: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.m3u8`,
+                flv: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.flv`,
+                dash: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.mpd`,
+                aac: `${streamingServerAPIUri}/radio/${user.username}:${profile._id}/src.aac`,
+            }
         }
-
-        stream.video = video
-        stream.audio = audio
-        stream.connectedClients = clients ?? 0
-
-        return stream
     })
 
     streamings = await Promise.all(streamings)
 
-    return streamings.map((stream) => {
-        return lodash.omit(stream, FILTER_KEYS)
-    })
+    streamings = streamings.filter((stream) => stream !== null)
+
+    if (stream_id) {
+        return streamings[0]
+    }
+
+    return streamings
 }

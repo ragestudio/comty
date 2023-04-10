@@ -1,35 +1,37 @@
-import { StreamingKey } from "@models"
-import generateStreamingKey from "../services/generateStreamingKey"
+import { StreamingProfile } from "@models"
 
 export default {
     method: "POST",
-    route: "/streaming/key/regenerate",
+    route: "/streaming/regenerate_key",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
-        // check if the user already has a key
-        let streamingKey = await StreamingKey.findOne({
-            user_id: req.user._id.toString()
-        })
+        const { profile_id } = req.body
 
-        // if exists, delete it
-
-        if (streamingKey) {
-            await streamingKey.remove()
-        }
-
-        // generate a new key
-        const newKey = await generateStreamingKey(req.user._id.toString()).catch(err => {
-            res.status(500).json({
-                error: `Cannot generate a new key: ${err.message}`,
+        if (!profile_id) {
+            return res.status(400).json({
+                message: "Missing profile_id"
             })
-
-            return false
-        })
-
-        if (!newKey) {
-            return false
         }
 
-        return res.json(newKey)
+        const profile = await StreamingProfile.findById(profile_id)
+
+        if (!profile) {
+            return res.status(404).json({
+                message: "Profile not found"
+            })
+        }
+
+        // check if profile user is the same as the user in the request
+        if (profile.user_id !== req.user._id.toString()) {
+            return res.status(403).json({
+                message: "You are not allowed to regenerate this key"
+            })
+        }
+
+        profile.stream_key = global.nanoid()
+
+        await profile.save()
+
+        return res.json(profile.toObject())
     }
 }

@@ -1,4 +1,4 @@
-import generateStreamDataFromStreamingKey from "../services/generateStreamDataFromStreamingKey"
+import { StreamingProfile } from "@models"
 
 export default {
     method: "POST",
@@ -6,21 +6,24 @@ export default {
     fn: async (req, res) => {
         const { stream } = req.body
 
-        const streaming = await generateStreamDataFromStreamingKey(stream).catch((err) => {
-            console.error(err)
-
-            return null
+        const streamingProfile = await StreamingProfile.findOne({
+            stream_key: stream
         })
 
-        if (streaming) {
-            global.websocket_instance.io.emit(`streaming.end`, streaming)
+        if (streamingProfile) {
+            global.websocket_instance.io.emit(`streaming.end`, streamingProfile)
 
-            global.websocket_instance.io.emit(`streaming.end.${streaming.username}`, streaming)
+            global.websocket_instance.io.emit(`streaming.end.${streamingProfile.user_id}`, streamingProfile)
 
             return res.json({
                 code: 0,
                 status: "ok"
             })
         }
+
+        return res.json({
+            code: 0,
+            status: "ok, but no streaming profile found"
+        })
     }
 }
