@@ -4,10 +4,8 @@ export default {
     method: "GET",
     route: "/streams",
     fn: async (req, res) => {
-        const remoteStreams = await fetchStreamsFromAPI()
-
         if (req.query.username) {
-            const stream = remoteStreams.find((stream) => stream.username === req.query.username)
+            const stream = await fetchStreamsFromAPI(`live/${req.query.username}${req.query.profile_id ? `:${req.query.profile_id}` : ""}`)
 
             if (!stream) {
                 return res.status(404).json({
@@ -16,8 +14,10 @@ export default {
             }
 
             return res.json(stream)
-        }
+        } else {
+            const streams = await fetchStreamsFromAPI()
 
-        return res.json(remoteStreams)
+            return res.json(streams)
+        }
     }
 }

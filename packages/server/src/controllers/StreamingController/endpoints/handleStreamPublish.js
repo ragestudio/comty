@@ -1,32 +1,53 @@
-import generateStreamDataFromStreamingKey from "../services/generateStreamDataFromStreamingKey"
-
-// This endpoint is used by the streaming server to check if a stream is valid and to notify the clients that a stream has started
+import { StreamingProfile, User } from "@models"
 
 export default {
     method: "POST",
     route: "/stream/publish",
     fn: async (req, res) => {
-        const { stream } = req.body
+        const { stream, app } = req.body
 
-        const streaming = await generateStreamDataFromStreamingKey(stream).catch((err) => {
-            console.error(err)
-
-            res.status(500).json({
-                error: `Cannot generate stream: ${err.message}`,
-            })
-
-            return null
+        const streamingProfile = await StreamingProfile.findOne({
+            stream_key: stream
         })
 
-        if (streaming) {
-            global.websocket_instance.io.emit(`streaming.new`, streaming)
-
-            global.websocket_instance.io.emit(`streaming.new.${streaming.username}`, streaming)
-
-            return res.json({
-                code: 0,
-                status: "ok"
+        if (!streamingProfile) {
+            return res.status(404).json({
+                error: "Streaming profile not found",
             })
         }
+
+        const user = await User.findById(streamingProfile.user_id)
+
+        if (!user) {
+            return res.status(404).json({
+                code: 1,
+                error: "User not found",
+            })
+        }
+
+        const [username, profile_id] = app.split("/")[1].split(":")
+
+        if (user.username !== username) {
+            return res.status(403).json({
+                code: 1,
+                error: "Invalid mount point, username does not match with the stream key",
+            })
+        }
+
+        if (streamingProfile._id.toString() !== profile_id) {
+            return res.status(403).json({
+                code: 1,
+                error: "Invalid mount point, profile id does not match with the stream key",
+            })
+        }
+
+        global.websocket_instance.io.emit(`streaming.new`, streamingProfile)
+
+        global.websocket_instance.io.emit(`streaming.new.${streamingProfile.user_id}`, streamingProfile)
+
+        return res.json({
+            code: 0,
+            status: "ok"
+        })
     }
 }
