@@ -169,14 +169,36 @@
 
                 margin-right: 20px;
 
-                .livestream_player_header_user_spectators {
+                .livestream_player_indicators {
+                    display: flex;
+                    flex-direction: row;
+
+                    align-items: center;
+                    justify-content: space-between;
+
+                    gap: 10px;
+
                     margin-top: 10px;
 
-                    .ant-tag {
-                        background-color: #eb0400;
-                        border-color: #eb0400;
-                        color: var(--background-color-contrast);
-                        font-size: 1rem;
+                    .livestream_player_header_user_spectators {
+                        height: fit-content;
+
+                        .ant-tag {
+                            background-color: #eb0400;
+                            border-color: #eb0400;
+                            color: var(--background-color-contrast);
+                            font-size: 1rem;
+                        }
+                    }
+
+                    .livestream_player_header_user_quality {
+                        font-size: 1.8rem;
+                        height: fit-content;
+
+                        svg {
+                            color: var(--text-color);
+                            margin: 0;
+                        }
                     }
                 }
             }
