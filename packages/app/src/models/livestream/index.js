@@ -42,18 +42,6 @@ export default class Livestream {
         return request.data
     }
 
-    static async updateLivestreamInfo(payload) {
-        const request = await app.cores.api.customRequest({
-            method: "POST",
-            url: `/tv/stream/info`,
-            data: {
-                ...payload
-            },
-        })
-
-        return request.data
-    }
-
     static async getCategories(key) {
         const request = await app.cores.api.customRequest({
             method: "GET",
@@ -66,26 +54,8 @@ export default class Livestream {
         return request.data
     }
 
-    static async getStreamInfo(payload) {
-        let { username } = payload ?? {}
-
-        if (!username) {
-            username = app.userData.username
-        }
-
-        const request = await app.cores.api.customRequest({
-            method: "GET",
-            url: `/tv/stream/info`,
-            params: {
-                username,
-            }
-        })
-
-        return request.data
-    }
-
-    static async getLivestream({ username }) {
-        if (!username) {
+    static async getLivestream(payload = {}) {
+        if (!payload.username) {
             throw new Error("Username is required")
         }
 
@@ -93,17 +63,9 @@ export default class Livestream {
             method: "GET",
             url: `/tv/streams`,
             params: {
-                username,
+                username: payload.username,
+                profile_id: payload.profile_id,
             }
-        })
-
-        return request.data
-    }
-
-    static async getAddresses() {
-        const request = await app.cores.api.customRequest({
-            method: "GET",
-            url: `/tv/streaming/addresses`,
         })
 
         return request.data
