@@ -1,14 +1,20 @@
 import React from "react"
 import Livestream from "models/livestream"
 import * as antd from "antd"
+import { FastAverageColor } from "fast-average-color"
 
 import { UserPreview } from "components"
 import { Icons } from "components/Icons"
 
 import "./index.less"
 
+const fac = new FastAverageColor()
+
 const LivestreamItem = (props) => {
     const { livestream = {} } = props
+
+    const itemRef = React.useRef()
+    const imageRef = React.useRef()
 
     const handleOnClick = async () => {
         if (typeof props.onClick !== "function") {
@@ -19,63 +25,88 @@ const LivestreamItem = (props) => {
         return await props.onClick(livestream)
     }
 
-    return <div className="livestream_item" onClick={handleOnClick}>
+    if (!livestream) {
+        return null
+    }
+
+    React.useEffect(() => {
+        if (livestream.info?.thumbnail) {
+            fac.getColorAsync(
+                livestream.info?.thumbnail,
+                {
+                    left: 0,
+                    top: 0,
+                }
+            ).then((color) => {
+                const colorEnd = [...color.value.slice(0, 3), 0].join(',')
+                const gradient = `linear-gradient(to top, rgba(${colorEnd}) 0%, ${color.rgba} 100%)`
+
+                if (color.isLight) {
+                    itemRef.current.classList.add("white_background")
+                }
+
+                itemRef.current.style.backgroundImage = gradient
+            })
+        }
+    }, [])
+
+    return <div
+        className="livestream_item"
+        onClick={handleOnClick}
+        ref={itemRef}
+    >
         <div className="livestream_thumbnail">
-            <img src={livestream.info?.thumbnail ?? "/assets/new_file.png"} />
+            <img
+                src={livestream.info?.thumbnail ?? "/assets/new_file.png"}
+                ref={imageRef}
+            />
         </div>
         <div className="livestream_info">
-            <UserPreview username={livestream.username} />
+            <UserPreview
+                user={livestream.user}
+                small
+            />
 
             <div className="livestream_title">
                 <h1>{livestream.info?.title}</h1>
             </div>
+
             <div className="livestream_description">
                 <h2>{livestream.info?.description ?? "No description"}</h2>
             </div>
+
             <div className="livestream_category">
-                {livestream.info?.category?.label ?? "No category"}
+                <span>
+                    {livestream.info?.category?.label ?? "No category"}
+                </span>
             </div>
         </div>
     </div>
 }
 
 export default (props) => {
-    const [loading, setLoading] = React.useState(true)
-    const [list, setList] = React.useState([])
-
-    const loadStreamings = async () => {
-        setLoading(true)
-
-        const livestreams = await Livestream.getLivestreams().catch((err) => {
-            console.error(err)
-            app.message.error("Failed to load livestreams")
-            return false
-        })
-
-        console.log("Livestreams", livestreams)
-
-        setLoading(false)
-
-        if (livestreams) {
-            if (!Array.isArray(livestreams)) {
-                console.error("Livestreams is not an array")
-                return false
-            }
-
-            setList(livestreams)
-        }
-    }
+    const [L_Streams, R_Streams, E_Streams] = app.cores.api.useRequest(Livestream.getLivestreams)
 
     const onClickItem = (livestream) => {
-        app.setLocation(`/live/${livestream.username}`)
+        app.setLocation(`/live/${livestream.stream}`)
+    }
+
+    if (E_Streams) {
+        console.error(E_Streams)
+
+        return <antd.Result
+            status="error"
+            title="Failed to load livestreams"
+            subTitle="Please try again later"
+        />
+    }
+
+    if (L_Streams || !R_Streams) {
+        return <antd.Skeleton active />
     }
 
     const renderList = () => {
-        if (loading) {
-            return <antd.Skeleton active />
-        }
-
-        if (list.length === 0) {
+        if (R_Streams.length === 0) {
             return <antd.Result>
                 <h1>
                     No livestreams found
@@ -83,14 +114,10 @@ export default (props) => {
             </antd.Result>
         }
 
-        return list.map((livestream) => {
+        return R_Streams.map((livestream) => {
             return <LivestreamItem livestream={livestream} onClick={onClickItem} />
         })
     }
-
-    React.useEffect(() => {
-        loadStreamings()
-    }, [])
 
     return <div className="livestream_list">
         {renderList()}
