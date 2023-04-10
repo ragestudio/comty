@@ -198,6 +198,14 @@ export default class LiveChat extends React.Component {
     }
 
     componentDidMount = async () => {
+        // check if user is logged in
+        if (!SessionModel.token) {
+            return this.setState({
+                connecting: false,
+                noAuthed: true
+            })
+        }
+
         await this.joinSocketRoom()
 
         app.ctx = {
@@ -252,6 +260,12 @@ export default class LiveChat extends React.Component {
                         })
                     }
                 </TransitionGroup>
+            </div>
+        }
+
+        if (this.state.noAuthed) {
+            return <div className="liveChat empty">
+                <antd.Empty description="You must be logged in to use this feature" />
             </div>
         }
 
