@@ -23,14 +23,12 @@ export default class StreamViewer extends React.Component {
         loading: true,
         cinemaMode: false,
 
-        streamSources: null,
-        streamInfo: null,
+        stream: null,
+
         spectators: 0,
 
         player: null,
         decoderInstance: null,
-
-        plyrOptions: {},
     }
 
     videoPlayerRef = React.createRef()
@@ -60,9 +58,12 @@ export default class StreamViewer extends React.Component {
             decoderInstance.on(mpegts.Events.ERROR, this.onSourceEnd)
 
             decoderInstance.attachMediaElement(this.videoPlayerRef.current)
+
             decoderInstance.load()
 
-            await decoderInstance.play()
+            await decoderInstance.play().catch((error) => {
+                console.error(error)
+            })
 
             this.toggleLoading(false)
 
@@ -125,53 +126,41 @@ export default class StreamViewer extends React.Component {
         })
     }
 
-    loadStreamInfo = async (username) => {
-        const streamInfo = await Livestream.getStreamInfo({ username }).catch((error) => {
+    loadStream = async (payload) => {
+        const stream = await Livestream.getLivestream({
+            username: payload.username,
+            profile_id: payload.profile,
+        }).catch((error) => {
             console.error(error)
 
             return null
         })
 
-        if (!streamInfo) {
+        if (!stream) {
             return false
         }
 
-        console.log("Stream info", streamInfo)
+        console.log("Stream data >", stream)
 
         this.setState({
-            streamInfo: streamInfo,
-        })
-    }
-
-    loadStreamSources = async (username) => {
-        const streamSources = await Livestream.getLivestream({ username }).catch((error) => {
-            console.error(error)
-
-            this.onSourceEnd(error)
-
-            return null
+            stream: stream,
+            spectators: stream.connectedClients,
         })
 
-        if (!streamSources) {
-            return false
-        }
-
-        console.log("Stream sources", streamSources)
-
-        this.setState({
-            streamSources: streamSources,
-            spectators: streamSources.connectedClients,
-        })
+        return stream
     }
 
     attachPlayer = () => {
+        // check if user has interacted with the page
         const player = new Plyr("#player", {
             clickToPlay: false,
             autoplay: true,
+            muted: true,
             controls: ["mute", "volume", "fullscreen", "airplay", "options", "settings",],
             settings: ["quality"],
-            ...this.state.plyrOptions,
         })
+
+        player.muted = true
 
         // insert a button to enter to cinema mode
         player.elements.buttons.fullscreen.insertAdjacentHTML("beforeBegin", `
@@ -202,6 +191,7 @@ export default class StreamViewer extends React.Component {
         this.enterPlayerAnimation()
 
         const requestedUsername = this.props.params.key
+        const profile = this.props.query.profile
 
         await this.setState({
             requestedUsername,
@@ -210,28 +200,45 @@ export default class StreamViewer extends React.Component {
         this.attachPlayer()
 
         // get stream info
-        this.loadStreamInfo(requestedUsername)
-        await this.loadStreamSources(requestedUsername)
+        const stream = await this.loadStream({
+            username: requestedUsername,
+            profile: profile,
+        })
 
-        if (this.state.streamSources) {
-            if (!this.state.streamSources.sources) {
-                console.error("Stream sources is not defined")
+        if (!stream) {
+            return this.onSourceEnd()
+        }
 
-                return false
+        // load the flv decoder (by default)
+        if (this.state.stream) {
+            if (!this.state.stream.sources) {
+                console.error("Stream sources not found")
+                return
             }
 
-            await this.loadDecoder("flv", this.state.streamSources.sources.flv)
+            await this.loadDecoder("flv", this.state.stream.sources.flv)
         }
 
         // TODO: Watch ws to get livestream:started event and load the decoder if it's not loaded
 
         // set a interval to update the stream info
         this.streamInfoInterval = setInterval(() => {
-            this.loadStreamSources(requestedUsername)
+            this.loadStream({
+                username: this.state.requestedUsername,
+                profile: profile,
+            })
         }, 1000 * 60)
     }
 
     componentWillUnmount = () => {
+        if (this.state.player) {
+            this.state.player.destroy()
+        }
+
+        if (typeof this.state.decoderInstance?.unload === "function") {
+            this.state.decoderInstance.unload()
+        }
+
         this.exitPlayerAnimation()
 
         if (this.streamInfoInterval) {
@@ -312,14 +319,14 @@ export default class StreamViewer extends React.Component {
         }
 
         if (to) {
-           app.cores.player.start({
-                src: this.state.streamSources.sources.aac,
-                title: this.state.streamInfo.title,
-                artist: this.state.streamInfo.username,
-           })
+            app.cores.player.start({
+                src: this.state.stream?.sources.aac,
+                title: this.state.stream?.info.title,
+                artist: this.state.stream?.info.username,
+            })
 
-           // setLocation to main page
-           app.navigation.goMain()
+            // setLocation to main page
+            app.navigation.goMain()
         }
     }
 
@@ -335,32 +342,34 @@ export default class StreamViewer extends React.Component {
             <div className="livestream_player">
                 <div className="livestream_player_header">
                     {
-                        this.state.streamInfo
+                        this.state.stream
                             ? <>
                                 <div className="livestream_player_header_user">
-                                    <UserPreview username={this.state.requestedUsername} />
+                                    <UserPreview user={this.state.stream.user} />
 
-                                    {
-                                        !this.state.isEnded && <div className="livestream_player_header_user_spectators">
-                                            <antd.Tag
-                                                icon={<Icons.Eye />}
-                                            >
-                                                {this.state.spectators}
-                                            </antd.Tag>
-                                        </div>
-                                    }
+                                    <div className="livestream_player_indicators">
+                                        {
+                                            !this.state.isEnded && <div className="livestream_player_header_user_spectators">
+                                                <antd.Tag
+                                                    icon={<Icons.Eye />}
+                                                >
+                                                    {this.state.spectators}
+                                                </antd.Tag>
+                                            </div>
+                                        }
+                                    </div>
                                 </div>
 
                                 <div className="livestream_player_header_info">
                                     <div className="livestream_player_header_info_title">
-                                        <h1>{this.state.streamInfo?.title}</h1>
+                                        <h1>{this.state.stream.info.title}</h1>
                                     </div>
                                     <div className="livestream_player_header_info_description">
                                         <Ticker
                                             mode="smooth"
                                         >
                                             {({ index }) => {
-                                                return <h4>{this.state.streamInfo?.description}</h4>
+                                                return <h4>{this.state.stream.info.description}</h4>
                                             }}
                                         </Ticker>
                                     </div>
@@ -406,7 +415,7 @@ export default class StreamViewer extends React.Component {
                         </div>
                     }
                     <LiveChat
-                        roomId={`livestream:${this.state.requestedUsername}`}
+                        roomId={`livestream:${this.state.requestedUsername}:${this.props.query.profile ?? "default"}`}
                         floatingMode={this.state.cinemaMode}
                     />
                 </div>
