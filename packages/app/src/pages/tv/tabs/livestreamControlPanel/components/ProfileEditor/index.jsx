@@ -105,7 +105,7 @@ export default (props) => {
             </span>
 
             <div className="value">
-                <antd.Input
+                <antd.Input.TextArea
                     placeholder="Stream description"
                     value={profileData.info.description}
                     onChange={(e) => updateStreamInfo("description", e.target.value)}
