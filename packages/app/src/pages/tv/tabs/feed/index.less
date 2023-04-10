@@ -14,30 +14,45 @@
 
         align-items: center;
 
-        background-color: var(--background-color-primary-2);
-
-        border: 1px solid var(--border-color);
-
+        max-height: 200px;
+        
         padding: 10px;
         margin-bottom: 20px;
+
+        outline: 1px solid var(--border-color);
+        
+        background-color: var(--background-color-primary-2);
 
         border-radius: @item_border_radius;
 
         cursor: pointer;
+
         transition: all 0.2s ease-in-out;
 
         &:hover {
             background-color: var(--background-color-accent);
         }
 
+        &.white_background {
+            h1,
+            h2,
+            span {
+                color: var(--text-color-black) !important;
+            }
+        }
+
         .livestream_thumbnail {
-            width: 8vw;
-            height: 100%;
+            width: 15vw;
+            height: 10vw;
+            max-height: 180px;
 
             img {
                 width: 100%;
                 height: 100%;
+
                 border-radius: @item_border_radius;
+
+                object-fit: cover;
             }
         }
 
@@ -52,10 +67,6 @@
             padding: 10px 0;
 
             color: var(--text-color);
-
-            .userPreview {
-                font-size: 1.5rem;
-            }
 
             h1,
             h2 {
