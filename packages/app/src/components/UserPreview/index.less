@@ -1,7 +1,10 @@
 .userPreview {
     display: inline-flex;
     flex-direction: row;
+
     align-items: center;
+
+    gap: 10px;
 
     svg {
         fill: var(--app-color);
@@ -12,13 +15,25 @@
         cursor: pointer;
     }
 
+    &.small {
+        font-size: 0.8em;
+
+        gap: 7px;
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
     .avatar {
         display: flex;
 
         align-items: center;
         justify-content: center;
 
-        margin-right: 10px;
+        align-self: center;
+        justify-self: center;
 
         width: 40px;
         height: 40px;
@@ -27,6 +42,8 @@
             width: 100%;
             height: 100%;
         }
+
+        transform: translate(0, 3px);
 
         img {
             object-fit: cover;
@@ -45,17 +62,21 @@
         align-items: flex-start;
         justify-content: center;
 
-        text-align: start;
-
         width: fit-content;
+        height: fit-content;
 
         color: var(--background-color-contrast);
 
         h1 {
-            align-self: start;
-
             color: var(--background-color-contrast);
-            font-size: 1.1rem;
+            font-size: 1em;
+
+            margin: 0;
+        }
+
+        span {
+            color: var(--text-color);
+            font-size: 0.8em;
 
             margin: 0;
         }
