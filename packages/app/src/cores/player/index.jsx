@@ -45,6 +45,9 @@ export default class Player extends Core {
 
     audioContext = new AudioContext()
 
+    bufferLoadQueue = []
+    bufferLoadQueueLoading = false
+
     audioQueueHistory = []
     audioQueue = []
     audioProcessors = []
@@ -315,6 +318,63 @@ export default class Player extends Core {
         this.state.livestream = false
     }
 
+    enqueueLoadBuffer(audioElement) {
+        if (!audioElement) {
+            console.error("Audio element is required")
+            return false
+        }
+
+        if (audioElement instanceof Audio) {
+            this.bufferLoadQueue.push(audioElement)
+        }
+
+        if (!this.bufferLoadQueueLoading) {
+            this.bufferLoadQueueLoading = true
+
+            this.loadNextQueueBuffer()
+        }
+    }
+
+    async loadNextQueueBuffer() {
+        if (!this.bufferLoadQueue.length) {
+            this.bufferLoadQueueLoading = false
+
+            return false
+        }
+
+        const audioElement = this.bufferLoadQueue.shift()
+
+        if (audioElement.signal.aborted) {
+            console.warn("Aborted audio element")
+
+            this.bufferLoadQueueLoading = false
+
+            this.loadNextQueueBuffer()
+
+            return false
+        }
+
+        this.bufferLoadQueueLoading = true
+
+        const preloadPromise = () => new Promise((resolve, reject) => {
+            audioElement.addEventListener("canplaythrough", () => {
+                resolve()
+            }, { once: true })
+
+            console.log("Preloading audio buffer", audioElement.src)
+
+            audioElement.load()
+        })
+
+        await preloadPromise()
+
+        this.bufferLoadQueueLoading = false
+
+        this.loadNextQueueBuffer()
+
+        return true
+    }
+
     async createInstance(manifest) {
         if (!manifest) {
             console.error("Manifest is required")
@@ -340,6 +400,7 @@ export default class Player extends Core {
         }
 
         let instanceObj = {
+            abortController: new AbortController(),
             audioElement: new Audio(audioSource),
             audioSource: audioSource,
             manifest: manifest,
@@ -349,9 +410,10 @@ export default class Player extends Core {
             crossfading: false
         }
 
+        instanceObj.audioElement.signal = instanceObj.abortController.signal
         instanceObj.audioElement.loop = this.state.playbackMode === "repeat"
         instanceObj.audioElement.crossOrigin = "anonymous"
-        instanceObj.audioElement.preload = "metadata"
+        instanceObj.audioElement.preload = "none"
 
         const createCrossfadeInterval = () => {
             console.warn("Crossfader is not supported yet")
@@ -470,6 +532,8 @@ export default class Player extends Core {
             }
         })
 
+        this.enqueueLoadBuffer(instanceObj.audioElement)
+
         //await this.instanciateRealtimeAnalyzerNode()
 
         instanceObj.track = this.audioContext.createMediaElementSource(instanceObj.audioElement)
@@ -563,6 +627,9 @@ export default class Player extends Core {
             throw new Error("Playlist is required")
         }
 
+        // !IMPORTANT: abort preloads before destroying current instance 
+        await this.abortPreloads()
+
         this.destroyCurrentInstance()
 
         // clear current queue
@@ -587,6 +654,9 @@ export default class Player extends Core {
     }
 
     async start(manifest) {
+        // !IMPORTANT: abort preloads before destroying current instance 
+        await this.abortPreloads()
+
         this.destroyCurrentInstance()
 
         const instance = await this.createInstance(manifest)
@@ -598,6 +668,7 @@ export default class Player extends Core {
         this.state.loading = true
 
         this.play(this.audioQueue[0])
+
     }
 
     next(params = {}) {
@@ -685,8 +756,18 @@ export default class Player extends Core {
         }
     }
 
+    async abortPreloads() {
+        for await (const instance of this.audioQueue) {
+            if (instance.abortController?.abort) {
+                instance.abortController.abort()
+            }
+        }
+    }
+
     stop() {
         this.destroyCurrentInstance()
+
+        this.abortPreloads()
 
         this.state.playbackStatus = "stopped"
         this.state.currentAudioManifest = null
