@@ -53,10 +53,12 @@ export default class AppModal extends React.Component {
             />
 
             <div className="appModal" ref={this.modalRef}>
-                {React.createElement(this.state.currentRender, {
-                    ...this.state.renderParams.props ?? {},
-                    close: this.close,
-                })}
+                {
+                    React.createElement(this.state.currentRender, {
+                        ...this.state.renderParams.props ?? {},
+                        close: this.close,
+                    })
+                }
             </div>
         </div>
     }
