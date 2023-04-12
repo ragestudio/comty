@@ -1,7 +1,13 @@
 export default class FilesModel {
-    static async uploadFile(file) {
+    static async uploadFile(file, ...args) {
+        const result = await app.cores.remoteStorage.uploadFile(file, ...args)
+
+        return result
+    }
+
+    static async deprecated_uploadFile(file) {
         console.log("uploadFile", file)
-        
+
         // get the file from the payload
         if (!file) {
             throw new Error("File is required")
@@ -14,7 +20,7 @@ export default class FilesModel {
         formData.append("files", file)
 
         // send the request
-        const uploadRequest = await app.cores.api.customRequest( {
+        const uploadRequest = await app.cores.api.customRequest({
             method: "POST",
             url: "/files/upload",
             data: formData,
