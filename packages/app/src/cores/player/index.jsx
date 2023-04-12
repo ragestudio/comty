@@ -45,6 +45,8 @@ export default class Player extends Core {
 
     audioContext = new AudioContext()
 
+    static maxBufferLoadQueue = 2
+
     bufferLoadQueue = []
     bufferLoadQueueLoading = false
 
@@ -342,6 +344,10 @@ export default class Player extends Core {
             return false
         }
 
+        if (this.bufferLoadQueueLoading >= Player.maxBufferLoadQueue) {
+            return false
+        }
+
         const audioElement = this.bufferLoadQueue.shift()
 
         if (audioElement.signal.aborted) {
@@ -532,7 +538,7 @@ export default class Player extends Core {
             }
         })
 
-        this.enqueueLoadBuffer(instanceObj.audioElement)
+        //this.enqueueLoadBuffer(instanceObj.audioElement)
 
         //await this.instanciateRealtimeAnalyzerNode()
 
@@ -618,6 +624,13 @@ export default class Player extends Core {
 
                 this.state.livestream = true
             }
+
+            // enqueue preload next audio
+            if (this.audioQueue.length > 1) {
+                const nextAudio = this.audioQueue[1]
+
+                this.enqueueLoadBuffer(nextAudio.audioElement)
+            }
         }, { once: true })
     }
 
@@ -668,7 +681,6 @@ export default class Player extends Core {
         this.state.loading = true
 
         this.play(this.audioQueue[0])
-
     }
 
     next(params = {}) {
@@ -762,6 +774,10 @@ export default class Player extends Core {
                 instance.abortController.abort()
             }
         }
+
+        // clear load buffer audio queue
+        this.loadBufferAudioQueue = []
+        this.bufferLoadQueueLoading = false
     }
 
     stop() {
