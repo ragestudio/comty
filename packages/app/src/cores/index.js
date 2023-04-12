@@ -10,6 +10,7 @@ import ShortcutsCore from "./shortcuts"
 import SoundCore from "./sound"
 
 import Player from "./player"
+import RemoteStorage from "./remoteStorage"
 
 // DEFINE LOAD ORDER HERE
 export default [
@@ -21,6 +22,7 @@ export default [
     SoundCore,
     NotificationsCore,
     ShortcutsCore,
+    RemoteStorage,
 
     Player,
     ContextMenuCore,
