@@ -23,7 +23,7 @@ const handleUploadVideo = async (file, params) => {
     return file
 }
 
-const handleImage = async (file, params) => {
+const handleImage = async (file) => {
     const { width, height } = await new Promise((resolve, reject) => {
         Jimp.read(file.filepath)
             .then((image) => {
@@ -164,9 +164,11 @@ export default async (payload) => {
                         }
                         case "image/webp": {
                             file = await handleImage(file, params)
+                            break
                         }
                         case "image/jfif": {
                             file = await handleImage(file, params)
+                            break
                         }
                         default: {
                             // do nothing
@@ -179,7 +181,6 @@ export default async (payload) => {
                         filepath: file.filepath,
                         filename: file.newFilename,
                     }
-
 
                     // upload path must be user_id + file.newFilename
                     const uploadPath = req.user?._id ? `${req.user?._id.toString()}/${file.newFilename}` : file.newFilename

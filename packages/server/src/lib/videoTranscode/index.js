@@ -1,22 +1,22 @@
 import path from "path"
-import fs from "fs"
 
 const ffmpeg = require("fluent-ffmpeg")
 
 function videoTranscode(originalFilePath, outputPath, options = {}) {
     return new Promise((resolve, reject) => {
         const filename = path.basename(originalFilePath)
-        const outputFilepath = `${outputPath}/${filename.split(".")[0]}.${options.format ?? "webm"}`
+        const outputFilename = `${filename.split(".")[0]}.${options.format ?? "webm"}`
+        const outputFilepath = `${outputPath}/${outputFilename}`
 
         console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath}`)
 
         const onEnd = async () => {
-            // remove
-            await fs.promises.unlink(originalFilePath)
+            console.debug(`[TRANSCODING] Finished transcode ${originalFilePath} to ${outputFilepath}`)
 
-            console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath} finished`)
-
-            return resolve(outputFilepath)
+            return resolve({
+                filepath: outputFilepath,
+                filename: outputFilename,
+            })
         }
 
         const onError = (err) => {
