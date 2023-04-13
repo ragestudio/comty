@@ -9,34 +9,14 @@
 
     transition: all 0.3s ease-in-out;
     
-    .header {
+    .actions {
         display: flex;
         flex-direction: row;
 
         align-items: center;
-        justify-content: space-between;
-                
-        font-size: 1rem;
+        justify-content: flex-end;
 
-        width: 100%;
-
-        margin-bottom: 10px;
-
-        .actions {
-            display: flex;
-            flex-direction: row;
-
-            align-items: center;
-            justify-content: flex-end;
-
-            .ant-btn {
-                margin-left: 10px;
-
-                &:first-child {
-                    margin-left: 0;
-                }
-            }
-        }
+        gap: 20px;
     }
 
     .inputField {
@@ -154,6 +134,8 @@
                         img {
                             filter: blur(3px);
                         }
+
+                        pointer-events: none;
                     }
                 }
 
@@ -196,6 +178,17 @@
                         height: 100px;
                         object-fit: cover;
                         border-radius: 12px;
+                    }
+
+                    .fileListItem_cover_mask {
+                        opacity: 0;
+                        backdrop-filter: blur(3px);
+                    }
+
+                    &:hover {
+                        .fileListItem_cover_mask {
+                            opacity: 1;
+                        }
                     }
                 }
 
