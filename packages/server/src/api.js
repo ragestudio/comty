@@ -83,6 +83,7 @@ export default class API {
         global.DEFAULT_POSTING_POLICY = {
             maxMessageLength: 512,
             acceptedMimeTypes: [
+                "application/octet-stream",
                 "image/jpg",
                 "image/jpeg",
                 "image/png",
