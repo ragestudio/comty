@@ -196,7 +196,7 @@ export class Drawer extends React.Component {
 				</AntdDrawer>
 			}
 
-			case "default": {
+			default: {
 				return <DraggableDrawer {...drawerProps}>
 					{
 						React.createElement(this.props.children, componentProps)
