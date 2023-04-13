@@ -44,10 +44,24 @@ async function processImage(file) {
 
     if (width > maximuns.imageResolution.width || height > maximuns.imageResolution.height) {
         await new Promise((resolve, reject) => {
+            // calculate max resolution respecting aspect ratio
+            const resizedResolution = {
+                width: maximuns.imageResolution.width,
+                height: maximuns.imageResolution.height,
+            }
+
+            if (width > height) {
+                resizedResolution.height = Math.floor((height / width) * maximuns.imageResolution.width)
+            }
+
+            if (height > width) {
+                resizedResolution.width = Math.floor((width / height) * maximuns.imageResolution.height)
+            }
+
             Jimp.read(file.filepath)
                 .then((image) => {
                     image
-                        .resize(maximuns.imageResolution.width, maximuns.imageResolution.height)
+                        .resize(resizedResolution.width, resizedResolution.height)
                         .quality(maximuns.imageQuality)
                         .write(file.filepath, resolve)
                 })

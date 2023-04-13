@@ -11,6 +11,7 @@
     "@aws-sdk/client-s3": "^3.310.0",
     "@corenode/utils": "0.28.26",
     "@foxify/events": "^2.1.0",
+    "@jimp/plugin-scale": "^0.22.7",
     "@tensorflow/tfjs-node": "4.0.0",
     "aws-sdk": "^2.1355.0",
     "axios": "^1.2.5",
