@@ -6,12 +6,17 @@ export default {
     fn: async (req, res) => {
         const { stream, app } = req.body
 
+        if (process.env.STREAMING__OUTPUT_PUBLISH_REQUESTS === "true") {
+            console.log("Publish request:", req.body)
+        }
+
         const streamingProfile = await StreamingProfile.findOne({
             stream_key: stream
         })
 
         if (!streamingProfile) {
             return res.status(404).json({
+                code: 1,
                 error: "Streaming profile not found",
             })
         }
