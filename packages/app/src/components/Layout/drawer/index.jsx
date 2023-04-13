@@ -1,4 +1,5 @@
 import React from "react"
+import { Drawer as AntdDrawer } from "antd"
 import { DraggableDrawer } from "components"
 import { EventBus } from "evite"
 
@@ -42,6 +43,7 @@ export default class DrawerController extends React.Component {
 
 		if (typeof addresses[id] === "undefined") {
 			drawers.push(<Drawer {...instance} />)
+
 			addresses[id] = drawers.length - 1
 			refs[id] = instance.ref
 		} else {
@@ -101,6 +103,7 @@ export class Drawer extends React.Component {
 	events = new EventBus()
 
 	state = {
+		type: this.options.type ?? "right",
 		visible: true,
 		locked: false,
 	}
@@ -170,9 +173,11 @@ export class Drawer extends React.Component {
 			ref: this.props.ref,
 			key: this.props.id,
 			onRequestClose: this.close,
+			onClose: this.close,
 			open: this.state.visible,
 			containerElementClass: "drawer",
 			modalElementClass: "body",
+			destroyOnClose: true,
 		}
 		const componentProps = {
 			...this.options.componentProps,
@@ -182,8 +187,22 @@ export class Drawer extends React.Component {
 			handleFail: this.handleFail,
 		}
 
-		return <DraggableDrawer {...drawerProps}>
-			{React.createElement(this.props.children, componentProps)}
-		</DraggableDrawer>
+		switch (this.options.type) {
+			case "drawer": {
+				return <AntdDrawer {...drawerProps}>
+					{
+						React.createElement(this.props.children, componentProps)
+					}
+				</AntdDrawer>
+			}
+
+			case "default": {
+				return <DraggableDrawer {...drawerProps}>
+					{
+						React.createElement(this.props.children, componentProps)
+					}
+				</DraggableDrawer>
+			}
+		}
 	}
 }
