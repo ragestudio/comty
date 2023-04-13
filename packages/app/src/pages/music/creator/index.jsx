@@ -20,8 +20,6 @@ const UploadHint = (props) => {
 }
 
 const FileListItem = React.memo((props) => {
-    console.log(props)
-
     const isUploading = props.track.status === "uploading"
 
     return <Draggable key={props.track.uid} draggableId={props.track.uid} index={props.index}>
@@ -46,6 +44,10 @@ const FileListItem = React.memo((props) => {
                 }
 
                 <div className="fileListItem_cover">
+                    <div className="fileListItem_cover_mask">
+                        <Icons.MdEdit />
+                    </div>
+
                     <img
                         src={props.track?.thumbnail}
                         alt="Track cover"
@@ -160,13 +162,6 @@ export default class PlaylistCreator extends React.Component {
         })
     }
 
-    handleTrackRemove = (uid) => {
-        this.setState({
-            fileList: this.state.fileList.filter((file) => file.uid !== uid),
-            trackList: this.state.trackList.filter((file) => file.uid !== uid)
-        })
-    }
-
     handleTrackCoverChange = (uid) => {
         // open a file dialog
         const fileInput = document.createElement("input")
@@ -201,7 +196,7 @@ export default class PlaylistCreator extends React.Component {
         this.setState({
             fileList: this.state.fileList.filter((file) => file.uid !== uid),
             trackList: this.state.trackList.filter((file) => file.uid !== uid),
-            pendingUploads: this.state.pendingUploads.filter((uid) => uid !== uid)
+            pendingUploads: this.state.pendingUploads.filter((file_uid) => file_uid !== uid)
         })
     }
 
@@ -252,9 +247,7 @@ export default class PlaylistCreator extends React.Component {
             }
             case "error": {
                 // remove pending file
-                this.setState({
-                    pendingUploads: this.state.pendingUploads.filter(uid => uid !== change.file.uid)
-                })
+                this.removeTrack(change.file.uid)
 
                 // open a dialog to show the error and ask user to retry
                 antd.Modal.error({
@@ -271,7 +264,6 @@ export default class PlaylistCreator extends React.Component {
                 })
             }
             case "removed": {
-                // remove from file list and if it's pending, remove from pending list
                 this.removeTrack(change.file.uid)
             }
 
@@ -282,7 +274,9 @@ export default class PlaylistCreator extends React.Component {
     }
 
     handleUpload = async (req) => {
-        const response = await FilesModel.uploadFile(req.file).catch((error) => {
+        const response = await FilesModel.uploadFile(req.file, {
+            timeout: 2000
+        }).catch((error) => {
             console.error(error)
             antd.message.error(error)
 
@@ -383,12 +377,12 @@ export default class PlaylistCreator extends React.Component {
 
         let playlistPublishResponse = null
 
-        if (this.props.query.playlist_id) {
-            console.log(`Playlist ${this.props.query.playlist_id} is already published. Updating...`)
+        if (this.props.playlist_id) {
+            console.log(`Playlist ${this.props.playlist_id} is already published. Updating...`)
 
             // update the playlist
             playlistPublishResponse = await PlaylistModel.updatePlaylist({
-                _id: this.props.query.playlist_id,
+                _id: this.props.playlist_id,
                 title: playlistName,
                 description: playlistDescription,
                 thumbnail: playlistThumbnail,
@@ -434,7 +428,7 @@ export default class PlaylistCreator extends React.Component {
                 loading: true
             })
 
-            const deleteResponse = await PlaylistModel.deletePlaylist(this.props.query.playlist_id).catch((error) => {
+            const deleteResponse = await PlaylistModel.deletePlaylist(this.props.playlist_id).catch((error) => {
                 console.error(error)
                 antd.message.error(error)
 
@@ -519,10 +513,10 @@ export default class PlaylistCreator extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.query.playlist_id)
+        console.log(this.props.playlist_id)
 
-        if (this.props.query.playlist_id) {
-            this.loadData(this.props.query.playlist_id)
+        if (this.props.playlist_id) {
+            this.loadData(this.props.playlist_id)
         }
 
         window._hacks = {
@@ -537,25 +531,6 @@ export default class PlaylistCreator extends React.Component {
 
     render() {
         return <div className="playlistCreator">
-            <div className="header">
-                <h1>
-                    <Icons.MdOutlineQueueMusic />
-                    Creator
-                </h1>
-
-                <div className="actions">
-                    {
-                        this.props.query.playlist_id && <antd.Button
-                            type="primary"
-                            onClick={this.handleDeletePlaylist}
-                            danger
-                        >
-                            Delete Playlist
-                        </antd.Button>
-                    }
-                </div>
-            </div>
-
             <div className="inputField">
                 <Icons.MdOutlineMusicNote />
                 <antd.Input
@@ -570,17 +545,20 @@ export default class PlaylistCreator extends React.Component {
             </div>
             <div className="inputField">
                 <Icons.MdOutlineDescription />
-                <antd.Input
+
+                <antd.Input.TextArea
                     className="inputText"
-                    placeholder="Description"
+                    placeholder="Description (Support Markdown)"
                     bordered={false}
+                    value={this.state.playlistDescription}
                     onChange={this.handleDescriptionOnChange}
                     maxLength={2500}
-                    value={this.state.playlistDescription}
+                    rows={4}
                 />
             </div>
             <div className="inputField">
                 <Icons.MdImage />
+
                 {
                     this.state.playlistThumbnail && <div className="coverPreview">
                         <img src={this.state.playlistThumbnail} alt="cover" />
@@ -598,6 +576,7 @@ export default class PlaylistCreator extends React.Component {
                         </antd.Button>
                     </div>
                 }
+
                 {
                     !this.state.playlistThumbnail && <UploadButton
                         onUploadDone={(file) => {
@@ -607,7 +586,6 @@ export default class PlaylistCreator extends React.Component {
                         }}
                         multiple={false}
                         accept="image/*"
-                        icon={<Icons.MdImage />}
                     >
                         Upload cover
                     </UploadButton>
@@ -651,7 +629,7 @@ export default class PlaylistCreator extends React.Component {
                                                 return this.handleTrackTitleOnChange(event, track.uid)
                                             }}
                                             onClickRemove={() => {
-                                                return this.handleTrackRemove(track.uid)
+                                                return this.removeTrack(track.uid)
                                             }}
                                         />
                                     })
@@ -676,7 +654,7 @@ export default class PlaylistCreator extends React.Component {
                 }
             </div>
 
-            <div>
+            <div className="actions">
                 <antd.Button
                     type="primary"
                     size="large"
@@ -687,6 +665,16 @@ export default class PlaylistCreator extends React.Component {
                 >
                     Publish
                 </antd.Button>
+
+                {
+                    this.props.playlist_id && <antd.Button
+                        type="link"
+                        onClick={this.handleDeletePlaylist}
+                        danger
+                    >
+                        Delete Playlist
+                    </antd.Button>
+                }
             </div>
 
             <div className="footer">
