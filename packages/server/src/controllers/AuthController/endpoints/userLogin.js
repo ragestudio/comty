@@ -21,7 +21,7 @@ export default {
             const token = await Token.createNewAuthToken({
                 username: user.username,
                 user_id: user._id.toString(),
-                ip_address: req.headers["x-forwarded-for"].split(",")[0] || req.socket.remoteAddress,
+                ip_address: req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket.remoteAddress,
                 client: req.headers["user-agent"],
                 signLocation: global.signLocation,
             }, options)
