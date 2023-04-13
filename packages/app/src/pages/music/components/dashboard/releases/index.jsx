@@ -1,9 +1,12 @@
 import React from "react"
+import * as antd from "antd"
+
 import { Icons } from "components/Icons"
 import { ImageViewer } from "components"
-import * as antd from "antd"
-import PlaylistsModel from "models/playlists"
 
+import PlaylistCreator from "../../../creator"
+
+import PlaylistsModel from "models/playlists"
 import "./index.less"
 
 const ReleaseItem = (props) => {
@@ -51,10 +54,26 @@ const ReleaseItem = (props) => {
 }
 
 export default (props) => {
-    const onClickEditTrack = (track_id) => {
-        console.log("Edit track", track_id)
+    const openPlaylistCreator = (playlist_id) => {
+        console.log("Opening playlist creator", playlist_id)
 
-        app.setLocation(`/music/creator?playlist_id=${track_id}`)
+        app.DrawerController.open("playlist_creator", PlaylistCreator, {
+            type: "drawer",
+            props: {
+                title: <h2
+                    style={{
+                        margin: 0,
+                    }}
+                >
+                    <Icons.MdOutlineQueueMusic />
+                    Creator
+                </h2>,
+                width: "50%",
+            },
+            componentProps: {
+                playlist_id: playlist_id,
+            }
+        })
     }
 
     const [L_Releases, R_Releases, E_Releases] = app.cores.api.useRequest(PlaylistsModel.getMyReleases)
@@ -84,7 +103,7 @@ export default (props) => {
 
             <div className="music_panel_releases_header_actions">
                 <antd.Button
-                    onClick={() => app.setLocation("/music/creator")}
+                    onClick={() => openPlaylistCreator()}
                     icon={<Icons.Plus />}
                     type="primary"
                 >
@@ -99,7 +118,7 @@ export default (props) => {
                     return <ReleaseItem
                         key={release._id}
                         release={release}
-                        onClickEditTrack={() => onClickEditTrack(release._id)}
+                        onClickEditTrack={() => openPlaylistCreator(release._id)}
                     />
                 })
             }
