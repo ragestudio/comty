@@ -1,6 +1,6 @@
 {
   "name": "@comty/music_spaces_server",
-  "version": "0.43.0",
+  "version": "0.43.1",
   "main": "dist/index.js",
   "scripts": {
     "build": "corenode-cli build",
