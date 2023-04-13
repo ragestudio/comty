@@ -2,7 +2,7 @@ import path from "path"
 import { Server, registerBaseAliases } from "linebridge/dist/server"
 
 registerBaseAliases(undefined, {
-    "@services": path.resolve(process.cwd(), "src/services"),
+    "@services": path.resolve(__dirname, "services"),
 })
 
 import express from "express"
