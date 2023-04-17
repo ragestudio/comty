@@ -1,222 +1,285 @@
 import React from "react"
 import * as antd from "antd"
-import classnames from "classnames"
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
-
-import UploadButton from "components/UploadButton"
-import { Icons } from "components/Icons"
+import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 
 import PlaylistModel from "models/playlists"
 import FilesModel from "models/files"
 
+import BasicInformation from "./components/BasicInformation"
+import TracksUploads from "./components/TracksUploads"
+
 import "./index.less"
 
-const UploadHint = (props) => {
-    return <div className="uploadHint">
-        <Icons.MdPlaylistAdd />
-        <p>Upload your tracks</p>
-        <p>Drag and drop your tracks here or click this box to start uploading files.</p>
-    </div>
-}
+const allowedTrackFieldChanges = [
+    "title",
+    "artist",
+    "thumbnail",
+    "album",
+    "year",
+    "genre",
+    "comment",
+    "explicit",
+]
 
-const FileListItem = React.memo((props) => {
-    const isUploading = props.track.status === "uploading"
-
-    return <Draggable key={props.track.uid} draggableId={props.track.uid} index={props.index}>
-        {(provided, snapshot) => {
-            return <div
-                className={classnames(
-                    "fileListItem",
-                    {
-                        ["uploading"]: isUploading,
-                    }
-                )}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-            >
-
-                {
-                    isUploading &&
-                    <Icons.LoadingOutlined
-                        spin
-                        className="fileListItem_loadingIcon"
-                    />
-                }
-
-                <div className="fileListItem_cover">
-                    <div className="fileListItem_cover_mask">
-                        <Icons.MdEdit />
-                    </div>
-
-                    <img
-                        src={props.track?.thumbnail}
-                        alt="Track cover"
-                        onClick={() => {
-                            if (typeof props.onClickChangeCover === "function") {
-                                if (!isUploading) {
-                                    props.onClickChangeCover(props.track.uid)
-                                }
-                            }
-                        }}
-                    />
-                </div>
-
-                <div className="fileListItem_details">
-                    <div className="fileListItem_title">
-                        <div className="fileListItem_title_label">
-                            <Icons.MdTitle />
-                            <h4>Track name</h4>
-                        </div>
-
-                        <antd.Input
-                            size="large"
-                            bordered={false}
-                            value={props.track?.title ?? "Track name"}
-                            onChange={props.onTitleChange}
-                            placeholder="Example: My track"
-                        />
-                    </div>
-
-                    <div className="fileListItem_actions">
-                        <antd.Popconfirm
-                            title="Delete this track?"
-                            description="Are you sure to delete this track?"
-                            onConfirm={props.onClickRemove}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <antd.Button
-                                type="primary"
-                                icon={<Icons.MdDelete />}
-                                danger
-                            />
-                        </antd.Popconfirm>
-                    </div>
-                </div>
-
-                <div
-                    {...provided.dragHandleProps}
-                    className="fileListItem_dragHandle"
-                >
-                    <Icons.MdDragIndicator />
-                </div>
-            </div>
-        }
-        }
-    </Draggable>
-})
-
-// TODO: Make cover preview style more beautiful (E.G. Use the entire div as background)
-// TODO: Make files list item can be dragged to change their order
-
-export default class PlaylistCreator extends React.Component {
+export default class PlaylistCreatorSteps extends React.Component {
     state = {
-        playlistName: null,
-        playlistDescription: null,
-        playlistThumbnail: null,
+        playlistData: {},
 
         fileList: [],
         trackList: [],
+        pendingTracksUpload: [],
 
-        pendingUploads: [],
-        loading: false,
+        loading: true,
+        submitting: false,
+
+        currentStep: 0,
     }
 
-    onDragEnd = (result) => {
+    updatePlaylistData = (key, data) => {
+        this.setState({
+            playlistData: {
+                ...this.state.playlistData,
+                [key]: data
+            }
+        })
+    }
+
+    updateTrackList = (trackList) => {
+        this.setState({
+            trackList
+        })
+    }
+
+    canSubmit = () => {
+        const { playlistData, trackList, pendingTracksUpload } = this.state
+
+        const hasValidTitle = playlistData.title && playlistData.title.length > 0
+        const hasTracks = trackList.length > 0
+        const hasPendingUploads = pendingTracksUpload.length > 0
+        const tracksHasValidData = trackList.every((track) => {
+            return track.title !== null && track.title?.length !== 0 && track.source !== null && track.source?.length !== 0
+        })
+
+        return hasValidTitle && hasTracks && !hasPendingUploads && tracksHasValidData
+    }
+
+    submit = async () => {
+        this.setState({
+            submitting: true
+        })
+
+        const { playlistData, trackList } = this.state
+
+        console.log(`Submitting playlist ${playlistData.title} with ${trackList.length} tracks`, playlistData, trackList)
+
+        const result = await PlaylistModel.putPlaylist({
+            ...playlistData,
+            list: trackList,
+        })
+
+        this.setState({
+            submitting: false
+        })
+
+        if (result) {
+            app.message.success("Playlist published")
+
+            if (typeof this.props.close === "function") {
+                this.props.close()
+            }
+        }
+    }
+
+    // TRACK UPLOADS METHODS
+    analyzeTrackMetadata = async (file) => {
+        return new Promise((resolve, reject) => {
+            jsmediatags.read(file, {
+                onSuccess: (data) => {
+                    return resolve(data)
+                },
+                onError: (error) => {
+                    return reject(error)
+                }
+            })
+        })
+    }
+
+    handleUploadTrack = async (req) => {
+        const response = await FilesModel.uploadFile(req.file, {
+            timeout: 2000
+        }).catch((error) => {
+            console.error(error)
+            antd.message.error(error)
+
+            req.onError(error)
+
+            return false
+        })
+
+        if (response) {
+            req.onSuccess(response)
+        }
+    }
+
+    handleTrackDragEnd = (result) => {
         if (!result.destination) {
             return
         }
 
         const trackList = this.state.trackList
 
-        const [removed] = trackList.splice(result.source.index, 1);
-        trackList.splice(result.destination.index, 0, removed);
+        const [removed] = trackList.splice(result.source.index, 1)
+
+        trackList.splice(result.destination.index, 0, removed)
 
         this.setState({
             trackList,
         })
     }
 
-    handleTitleOnChange = (event) => {
-        this.setState({
-            playlistName: event.target.value
-        })
-    }
-
-    handleDescriptionOnChange = (event) => {
-        this.setState({
-            playlistDescription: event.target.value
-        })
-    }
-
-    handleTrackTitleOnChange = (event, uid) => {
-        // find the file in the trackinfo
-        const file = this.state.trackList.find((file) => file.uid === uid)
-
-        if (file) {
-            file.title = event.target.value
-        }
-
-        this.setState({
-            trackList: this.state.trackList
-        })
-    }
-
-    handleTrackCoverChange = (uid) => {
-        // open a file dialog
-        const fileInput = document.createElement("input")
-
-        fileInput.type = "file"
-        fileInput.accept = "image/*"
-
-        fileInput.onchange = (event) => {
-            const file = event.target.files[0]
-
-            if (file) {
-                // upload the file
-                FilesModel.uploadFile(file).then((response) => {
-                    // update the file url in the track info
-                    const file = this.state.trackList.find((file) => file.uid === uid)
-
-                    if (file) {
-                        file.thumbnail = response.url
-                    }
-
-                    this.setState({
-                        trackList: this.state.trackList
-                    })
-                })
-            }
-        }
-
-        fileInput.click()
-    }
-
-    removeTrack = (uid) => {
+    handleTrackRemove = (uid) => {
         this.setState({
             fileList: this.state.fileList.filter((file) => file.uid !== uid),
             trackList: this.state.trackList.filter((file) => file.uid !== uid),
-            pendingUploads: this.state.pendingUploads.filter((file_uid) => file_uid !== uid)
+            pendingTracksUpload: this.state.pendingTracksUpload.filter((file_uid) => file_uid !== uid)
         })
     }
 
-    handleUploaderOnChange = (change) => {
-        console.log(change)
+    handleTrackInfoChange = (uid, key, value) => {
+        if (!uid) {
+            console.error(`Cannot update track withouth uid`)
+            return
+        }
 
+        let trackList = this.state.trackList
+
+        const track = trackList.find((track) => track.uid === uid)
+
+        if (typeof key === "object") {
+            allowedTrackFieldChanges.forEach((_key) => {
+                if (key[_key]) {
+                    track[_key] = key[_key]
+                }
+            })
+        } else {
+            if (!allowedTrackFieldChanges.includes(key)) {
+                console.error(`Cannot update track with key ${key}`)
+                return
+            }
+
+            track[key] = value
+        }
+
+        this.setState({
+            trackList: trackList
+        })
+
+        console.log(`New data for track ${uid}: `, this.state.trackList.find((track) => track.uid === uid))
+    }
+
+    handleTrackCoverChange = async (uid, file) => {
+        if (!uid) {
+            console.error(`Cannot update track withouth uid`)
+            return
+        }
+
+        // upload cover file
+        const result = await FilesModel.uploadFile(file, {
+            timeout: 2000
+        })
+
+        if (result) {
+            this.handleTrackInfoChange(uid, "thumbnail", result.url)
+        }
+    }
+
+    handleDeletePlaylist = async () => {
+        if (!this.props.playlist_id) {
+            console.error(`Cannot delete playlist without id`)
+            return
+        }
+
+        antd.Modal.confirm({
+            title: "Are you sure you want to delete this playlist?",
+            content: "This action cannot be undone",
+            okText: "Delete",
+            okType: "danger",
+            cancelText: "Cancel",
+            onOk: async () => {
+                const result = await PlaylistModel.deletePlaylist(this.props.playlist_id)
+
+                if (result) {
+                    app.message.success("Playlist deleted")
+
+                    if (typeof this.props.close === "function") {
+                        this.props.close()
+                    }
+                }
+            }
+        })
+    }
+
+    onTrackUploaderChange = async (change) => {
         switch (change.file.status) {
             case "uploading": {
-                const { pendingUploads } = this.state
+                const { pendingTracksUpload } = this.state
 
-                if (!pendingUploads.includes(change.file.uid)) {
-                    pendingUploads.push(change.file.uid)
+                if (!pendingTracksUpload.includes(change.file.uid)) {
+                    pendingTracksUpload.push(change.file.uid)
+                }
+
+                const trackMetadata = await this.analyzeTrackMetadata(change.file.originFileObj)
+                    .catch((error) => {
+                        console.error(`Failed to analyze track metadata: `, error)
+
+                        // return empty metadata
+                        return {
+                            tags: {}
+                        }
+                    })
+
+                console.log(trackMetadata)
+
+                if (trackMetadata.tags.picture) {
+                    const data = trackMetadata.tags.picture.data
+                    const format = trackMetadata.tags.picture.format
+
+                    if (data && format) {
+                        console.log(data, format)
+
+                        const filenameExt = format.split("/")[1]
+                        const filename = `cover.${filenameExt}`
+
+                        const byteArray = new Uint8Array(data)
+                        const blob = new Blob([byteArray], { type: data.type })
+
+                        // create a file object
+                        const file = new File([blob], filename, {
+                            type: format,
+                        })
+
+                        console.log(file)
+
+                        this.handleTrackCoverChange(change.file.uid, file)
+                    }
                 }
 
                 this.setState({
-                    pendingUploads: pendingUploads,
+                    pendingTracksUpload: pendingTracksUpload,
                     fileList: [...this.state.fileList, change.file],
                     trackList: [...this.state.trackList, {
                         uid: change.file.uid,
-                        title: change.file.name,
+                        title: trackMetadata.tags.title ?? change.file.name,
+                        artist: trackMetadata.tags.artist ?? null,
+                        album: trackMetadata.tags.album ?? null,
+                        metadata: {
+                            duration: undefined,
+                            bitrate: undefined,
+                            sampleRate: undefined,
+                            channels: undefined,
+                            codec: undefined,
+                            format: undefined,
+                        },
                         source: null,
                         status: "uploading",
                         thumbnail: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
@@ -228,7 +291,7 @@ export default class PlaylistCreator extends React.Component {
             case "done": {
                 // remove pending file
                 this.setState({
-                    pendingUploads: this.state.pendingUploads.filter(uid => uid !== change.file.uid)
+                    pendingTracksUpload: this.state.pendingTracksUpload.filter((uid) => uid !== change.file.uid)
                 })
 
                 // update file url in the track info
@@ -247,7 +310,7 @@ export default class PlaylistCreator extends React.Component {
             }
             case "error": {
                 // remove pending file
-                this.removeTrack(change.file.uid)
+                this.handleTrackRemove(change.file.uid)
 
                 // open a dialog to show the error and ask user to retry
                 antd.Modal.error({
@@ -259,12 +322,12 @@ export default class PlaylistCreator extends React.Component {
                         this.handleUpload(change)
                     },
                     onCancel: () => {
-                        this.removeTrack(change.file.uid)
+                        this.handleTrackRemove(change.file.uid)
                     }
                 })
             }
             case "removed": {
-                this.removeTrack(change.file.uid)
+                this.handleTrackRemove(change.file.uid)
             }
 
             default: {
@@ -273,232 +336,102 @@ export default class PlaylistCreator extends React.Component {
         }
     }
 
-    handleUpload = async (req) => {
-        const response = await FilesModel.uploadFile(req.file, {
-            timeout: 2000
-        }).catch((error) => {
-            console.error(error)
-            antd.message.error(error)
-
-            req.onError(error)
-
-            return false
-        })
-
-        if (response) {
-            req.onSuccess(response)
+    steps = [
+        {
+            title: "Information",
+            crender: BasicInformation,
+        },
+        {
+            title: "Tracks",
+            crender: TracksUploads,
         }
-    }
+    ]
 
-    checkCanSubmit = () => {
-        const { playlistName, fileList, pendingUploads, trackList } = this.state
+    onChangeStep = (toStep) => {
+        // check if can change step
+        if (toStep > this.state.currentStep) {
+            if (!this.canNextStep()) {
+                return
+            }
+        }
 
-        const nameValid = playlistName !== null && playlistName.length !== 0
-        const filesListValid = fileList.length !== 0
-        const isPending = pendingUploads.length !== 0
-        const isTrackListValid = trackList.every((track) => {
-            return track.title !== null && track.title?.length !== 0 && track.source !== null && track.source?.length !== 0
-        })
-
-        return nameValid && filesListValid && !isPending && isTrackListValid
-    }
-
-    handleSubmit = async () => {
         this.setState({
-            loading: true
+            currentStep: toStep
         })
+    }
 
-        const { playlistName, playlistDescription, playlistThumbnail, trackList } = this.state
-
-        let tracksIds = []
-
-        // first, publish the tracks
-        for await (const track of trackList) {
-            console.log(track)
-
-            let trackPublishResponse = null
-
-            if (typeof track._id === "undefined") {
-                console.log(`Track ${track.uid} is not published yet. Publishing it...`)
-
-                trackPublishResponse = await PlaylistModel.publishTrack({
-                    title: track.title,
-                    thumbnail: track.thumbnail,
-                    source: track.source
-                }).catch((error) => {
-                    console.error(error)
-                    app.message.error(error.response.data.message)
-
-                    return false
-                })
-            } else {
-                console.log(`Track ${track.uid} is already published. Updating...`)
-
-                trackPublishResponse = await PlaylistModel.updateTrack({
-                    _id: track._id,
-                    title: track.title,
-                    thumbnail: track.thumbnail,
-                    source: track.source
-                }).catch((error) => {
-                    console.error(error)
-                    app.message.error(error.response.data.message)
-
-                    return false
-                })
-            }
-
-            if (trackPublishResponse) {
-                tracksIds.push(trackPublishResponse._id)
-
-                // update the track id in the track list
-                const trackList = this.state.trackList
-
-                const trackIndex = trackList.findIndex((track) => track.uid === track.uid)
-
-                if (trackIndex !== -1) {
-                    trackList[trackIndex]._id = trackPublishResponse._id.toString()
-                }
-
-                this.setState({
-                    trackList: trackList
-                })
-            }
-        }
-
-        if (tracksIds.length === 0) {
-            antd.message.error("Failed to publish tracks")
-
-            this.setState({
-                loading: false
-            })
-
+    nextStep = () => {
+        if (!this.canNextStep()) {
             return
         }
 
-        let playlistPublishResponse = null
+        const nextStep = this.state.currentStep + 1
 
-        if (this.props.playlist_id) {
-            console.log(`Playlist ${this.props.playlist_id} is already published. Updating...`)
-
-            // update the playlist
-            playlistPublishResponse = await PlaylistModel.updatePlaylist({
-                _id: this.props.playlist_id,
-                title: playlistName,
-                description: playlistDescription,
-                thumbnail: playlistThumbnail,
-                list: tracksIds
-            }).catch((error) => {
-                console.error(error)
-                app.message.error(error.response.data.message)
-
-                return false
-            })
-        } else {
-            console.log(`Playlist is not published yet. Publishing it...`)
-
-            playlistPublishResponse = await PlaylistModel.publish({
-                title: playlistName,
-                description: playlistDescription,
-                thumbnail: playlistThumbnail,
-                list: tracksIds
-            }).catch((error) => {
-                console.error(error)
-                app.message.error(error.response.data.message)
-
-                return false
-            })
+        if (nextStep >= this.steps.length) {
+            return this.submit()
         }
 
         this.setState({
-            loading: false
+            currentStep: nextStep
         })
+    }
 
-        if (playlistPublishResponse) {
-            app.message.success("Playlist published")
+    previousStep = () => {
+        const previusStep = this.state.currentStep - 1
 
-            if (typeof this.props.close === "function") {
-                this.props.close()
-            }
+        if (previusStep < 0) {
+            return
+        }
+
+        this.setState({
+            currentStep: previusStep
+        })
+    }
+
+    canNextStep = () => {
+        // check current step
+        switch (this.state.currentStep) {
+            case 0:
+                return typeof this.state.playlistData.title === "string" && this.state.playlistData.title.length > 0
+            case 1:
+                return this.canSubmit()
+            default:
+                return true
         }
     }
 
-    handleDeletePlaylist = async () => {
-        const action = async () => {
-            this.setState({
-                loading: true
-            })
-
-            const deleteResponse = await PlaylistModel.deletePlaylist(this.props.playlist_id).catch((error) => {
-                console.error(error)
-                antd.message.error(error)
-
-                return false
-            })
-
+    componentDidMount() {
+        if (this.props.playlist_id) {
+            this.loadPlaylistData(this.props.playlist_id)
+        } else {
             this.setState({
                 loading: false
             })
-
-            if (deleteResponse) {
-                app.message.success("Playlist deleted")
-
-                if (typeof this.props.close === "function") {
-                    this.props.close()
-                }
-            }
         }
-
-        antd.Modal.confirm({
-            title: "Delete playlist",
-            content: "Are you sure you want to delete this playlist?",
-            onOk: action
-        })
     }
 
-    __removeExtensionsFromNames = () => {
-        this.setState({
-            trackList: this.state.trackList.map((track) => {
-                track.title = track.title.replace(/\.[^/.]+$/, "")
+    loadPlaylistData = async (playlist_id) => {
+        console.log(`Loading playlist data for playlist ${playlist_id}...`)
 
-                return track
-            })
-        })
-    }
-
-    __removeNumbersFromNames = () => {
-        // remove the order number from the track name ( 01 - trackname.ext => trackname.ext )
-        this.setState({
-            trackList: this.state.trackList.map((track) => {
-                track.title = track.title.replace(/^[0-9]{2} - /, "")
-
-                return track
-            })
-        })
-    }
-
-    loadData = async (playlist_id) => {
-        const playlist = await PlaylistModel.getPlaylist(playlist_id).catch((error) => {
+        const playlistData = await PlaylistModel.getPlaylist(playlist_id).catch((error) => {
             console.error(error)
             antd.message.error(error)
 
             return false
         })
 
-        if (playlist) {
-            const trackList = playlist.list.map((track) => {
+        if (playlistData) {
+            const trackList = playlistData.list.map((track) => {
                 return {
+                    ...track,
                     _id: track._id,
                     uid: track._id,
-                    title: track.title,
-                    source: track.source,
                     status: "done",
-                    thumbnail: track.thumbnail
                 }
             })
 
             this.setState({
-                playlistName: playlist.title,
-                playlistDescription: playlist.description,
+                playlistData: playlistData,
                 trackList: trackList,
                 fileList: trackList.map((track) => {
                     return {
@@ -510,177 +443,73 @@ export default class PlaylistCreator extends React.Component {
                 })
             })
         }
-    }
 
-    componentDidMount() {
-        console.log(this.props.playlist_id)
-
-        if (this.props.playlist_id) {
-            this.loadData(this.props.playlist_id)
-        }
-
-        window._hacks = {
-            removeExtensionsFromNames: this.__removeExtensionsFromNames,
-            removeNumbersFromNames: this.__removeNumbersFromNames
-        }
-    }
-
-    componentWillUnmount() {
-        window._hacks = null
+        this.setState({
+            loading: false
+        })
     }
 
     render() {
+        if (this.state.loading) {
+            return <antd.Skeleton active />
+        }
+
         return <div className="playlistCreator">
-            <div className="inputField">
-                <Icons.MdOutlineMusicNote />
-                <antd.Input
-                    className="inputText"
-                    placeholder="Playlist Title"
-                    size="large"
-                    bordered={false}
-                    onChange={this.handleTitleOnChange}
-                    maxLength={120}
-                    value={this.state.playlistName}
-                />
-            </div>
-            <div className="inputField">
-                <Icons.MdOutlineDescription />
+            <antd.Steps
+                direction="horizontal"
+                current={this.state.currentStep}
+                onChange={this.onChangeStep}
+                items={this.steps}
+            />
 
-                <antd.Input.TextArea
-                    className="inputText"
-                    placeholder="Description (Support Markdown)"
-                    bordered={false}
-                    value={this.state.playlistDescription}
-                    onChange={this.handleDescriptionOnChange}
-                    maxLength={2500}
-                    rows={4}
-                />
-            </div>
-            <div className="inputField">
-                <Icons.MdImage />
-
+            <div className="stepContent">
                 {
-                    this.state.playlistThumbnail && <div className="coverPreview">
-                        <img src={this.state.playlistThumbnail} alt="cover" />
+                    React.createElement(this.steps[this.state.currentStep].crender, {
+                        playlist: this.state.playlistData,
 
-                        <antd.Button
-                            onClick={() => {
-                                this.setState({
-                                    playlistThumbnail: null
-                                })
-                            }}
-                            icon={<Icons.MdClose />}
-                            shape="round"
-                        >
-                            Remove Cover
-                        </antd.Button>
-                    </div>
-                }
+                        trackList: this.state.trackList,
+                        fileList: this.state.fileList,
 
-                {
-                    !this.state.playlistThumbnail && <UploadButton
-                        onUploadDone={(file) => {
-                            this.setState({
-                                playlistThumbnail: file.url
-                            })
-                        }}
-                        multiple={false}
-                        accept="image/*"
-                    >
-                        Upload cover
-                    </UploadButton>
+                        onTitleChange: (title) => {
+                            this.updatePlaylistData("title", title)
+                        },
+                        onDescriptionChange: (description) => {
+                            this.updatePlaylistData("description", description)
+                        },
+                        onPlaylistCoverChange: (url) => {
+                            this.updatePlaylistData("thumbnail", url)
+                        },
+                        onVisibilityChange: (visibility) => {
+                            this.updatePlaylistData("visibility", visibility)
+                        },
+                        onDeletePlaylist: this.handleDeletePlaylist,
+
+                        handleUploadTrack: this.handleUploadTrack,
+                        handleTrackDragEnd: this.handleTrackDragEnd,
+                        handleTrackRemove: this.handleTrackRemove,
+                        handleTrackInfoChange: this.handleTrackInfoChange,
+                        onTrackUploaderChange: this.onTrackUploaderChange,
+                    })
                 }
             </div>
 
-            <div className="files">
-                <antd.Upload
-                    className="uploader"
-                    customRequest={this.handleUpload}
-                    onChange={this.handleUploaderOnChange}
-                    accept="audio/*"
-                    multiple
-                    showUploadList={false}
-                >
-                    {
-                        this.state.fileList.length === 0 ?
-                            <UploadHint /> : <antd.Button icon={<Icons.MdCloudUpload />}>
-                                Upload files
-                            </antd.Button>
-                    }
-                </antd.Upload>
-
-                <DragDropContext onDragEnd={this.onDragEnd}>
-                    <Droppable droppableId="droppable">
-                        {(provided, snapshot) => (
-                            <div
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                                className="fileList"
-                            >
-                                {
-                                    this.state.trackList.map((track, index) => {
-                                        return <FileListItem
-                                            index={index}
-                                            track={track}
-                                            onClickChangeCover={() => {
-                                                return this.handleTrackCoverChange(track.uid)
-                                            }}
-                                            onTitleChange={(event) => {
-                                                return this.handleTrackTitleOnChange(event, track.uid)
-                                            }}
-                                            onClickRemove={() => {
-                                                return this.removeTrack(track.uid)
-                                            }}
-                                        />
-                                    })
-                                }
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-            </div>
-
-            <div>
-                {
-                    this.state.pendingUploads.length !== 0 && <div className="pendingUploads">
-                        <p>
-                            <Icons.MdCloudUpload />
-                            <span>
-                                {this.state.pendingUploads.length} file(s) are being uploaded
-                            </span>
-                        </p>
-                    </div>
-                }
-            </div>
-
-            <div className="actions">
+            <div className="stepActions">
                 <antd.Button
-                    type="primary"
-                    size="large"
-                    disabled={!this.checkCanSubmit()}
-                    icon={<Icons.MdCampaign />}
-                    loading={this.state.loading}
-                    onClick={this.handleSubmit}
+                    onClick={this.previousStep}
+                    disabled={this.state.currentStep === 0}
                 >
-                    Publish
+                    Previous
                 </antd.Button>
 
-                {
-                    this.props.playlist_id && <antd.Button
-                        type="link"
-                        onClick={this.handleDeletePlaylist}
-                        danger
-                    >
-                        Delete Playlist
-                    </antd.Button>
-                }
-            </div>
-
-            <div className="footer">
-                <p>
-                    Uploading files that are not permitted by our <a onClick={() => app.setLocation("/terms")}>Terms of Service</a> may result in your account being suspended.
-                </p>
+                <antd.Button
+                    type="primary"
+                    onClick={this.nextStep}
+                    disabled={!this.canNextStep()}
+                >
+                    {
+                        this.state.currentStep === this.steps.length - 1 ? "Finish" : "Next"
+                    }
+                </antd.Button>
             </div>
         </div>
     }
