@@ -44,6 +44,12 @@ const ReleaseItem = (props) => {
             className="music_panel_releases_actions"
         >
             <antd.Button
+                onClick={props.onClickNavigate}
+            >
+                Open
+            </antd.Button>
+
+            <antd.Button
                 onClick={props.onClickEditTrack}
                 icon={<Icons.Edit />}
             >
@@ -68,12 +74,16 @@ export default (props) => {
                     <Icons.MdOutlineQueueMusic />
                     Creator
                 </h2>,
-                width: "50%",
+                width: "fit-content",
             },
             componentProps: {
                 playlist_id: playlist_id,
             }
         })
+    }
+
+    const navigateToPlaylist = (playlist_id) => {
+        return app.setLocation(`/play/${playlist_id}`)
     }
 
     const [L_Releases, R_Releases, E_Releases] = app.cores.api.useRequest(PlaylistsModel.getMyReleases)
@@ -119,6 +129,7 @@ export default (props) => {
                         key={release._id}
                         release={release}
                         onClickEditTrack={() => openPlaylistCreator(release._id)}
+                        onClickNavigate={() => navigateToPlaylist(release._id)}
                     />
                 })
             }
