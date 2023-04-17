@@ -1,0 +1,344 @@
+.tracksUploads {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    .uploadBox {
+        position: relative;
+
+        width: 100%;
+        //height: 100%;
+
+        padding: 10px;
+
+        overflow-y: hidden;
+
+        border: 1px solid var(--border-color);
+
+        border-radius: 8px;
+
+        .ant-upload {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+
+            .uploadMoreButton {
+                width: 100%;
+                height: 30px;
+
+                margin-bottom: 10px;
+
+                background-color: transparent;
+
+                outline: 1px solid var(--border-color);
+
+                box-shadow: none;
+
+                &:hover {
+                    height: 70px;
+                    background-color: var(--background-color-accent);
+                }
+            }
+        }
+
+        .ant-upload-wrapper {
+            margin-bottom: 10px;
+        }
+
+        .fileList_wrapper {
+            position: relative;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+            // add a blur effect on top and bottom to decorate overflown content
+            &::before,
+            &::after {
+                z-index: 50;
+                content: "";
+
+                position: absolute;
+
+                width: 100%;
+                height: 10px;
+            }
+
+            &::before {
+                top: 0;
+                left: 0;
+
+                background: linear-gradient(0deg,
+                        rgba(255, 255, 255, 0) 0%,
+                        var(--background-color-primary) 40%);
+            }
+
+            &::after {
+                bottom: 0;
+                left: 0;
+
+                background: linear-gradient(180deg,
+                        rgba(255, 255, 255, 0) 0%,
+                        var(--background-color-primary) 40%);
+            }
+        }
+
+        .fileList {
+            display: flex;
+            flex-direction: column;
+
+            max-height: 60vh;
+
+            overflow-y: scroll;
+
+            padding: 15px 0;
+
+            gap: 10px;
+
+            .fileListItem {
+                position: relative;
+
+                z-index: 49;
+
+                display: inline-flex;
+                flex-direction: row;
+
+                align-items: center;
+
+                padding: 10px;
+
+                border-radius: 8px;
+
+                background-color: var(--background-color-accent);
+                color: var(--text-color);
+
+                border: 1px solid var(--border-color);
+
+                gap: 10px;
+
+                &.uploading {
+                    .fileListItem_cover {
+                        img {
+                            filter: blur(3px);
+                        }
+
+                        pointer-events: none;
+                    }
+                }
+
+                .fileListItem_loadingIcon {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+
+                    padding: 10px;
+
+                    svg {
+                        margin: 0 !important;
+                    }
+                }
+
+                .ant-btn {
+                    svg {
+                        margin: 0 !important;
+                    }
+                }
+
+                .fileListItem_cover {
+                    display: flex;
+                    flex-direction: column;
+
+                    align-items: center;
+                    justify-content: center;
+
+                    transition: all 0.2s ease-in-out;
+
+                    img {
+                        width: 100px;
+                        height: 100px;
+
+                        object-fit: cover;
+
+                        border-radius: 12px;
+                    }
+                }
+
+                .fileListItem_details {
+                    display: flex;
+                    flex-direction: column;
+
+                    align-items: flex-start;
+                    justify-content: center;
+
+                    margin-left: 20px;
+
+                    width: 100%;
+
+                    .fileListItem_namings {
+                        width: 100%;
+
+                        p {
+                            font-size: 0.8rem;
+                        }
+                    }
+
+                    .fileListItem_artist {
+                        width: 100%;
+
+                        span {
+                            font-size: 0.8rem;
+
+                            margin-right: 10px;
+                        }
+                    }
+                }
+
+                .fileListItem_actions {
+                    display: flex;
+                    flex-direction: row;
+
+                    align-items: center;
+                    justify-content: center;
+
+                    .ant-btn {
+                        svg {
+                            margin: 0 !important;
+                        }
+
+                        margin-right: 10px;
+
+                        &:last-child {
+                            margin-right: 0;
+                        }
+                    }
+                }
+            }
+
+            .fileListItem_dragHandle {
+                color: var(--text-color);
+
+                svg {
+                    font-size: 1.5rem;
+                    margin: 0 !important;
+                }
+            }
+        }
+    }
+
+    .uploadHint {
+        display: flex;
+        flex-direction: column;
+
+        align-self: center;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        height: 100%;
+
+        svg {
+            font-size: 3rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+    }
+}
+
+.fileItemEditor {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 20px;
+
+    .fileItemEditor_actions {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: flex-end;
+
+        align-self: center;
+
+        gap: 10px;
+    }
+
+    .fileItemEditor_field {
+        display: flex;
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+
+        width: 100%;
+
+        .fileItemEditor_field_header {
+            display: inline-flex;
+            flex-direction: row;
+
+            justify-content: flex-start;
+
+            align-items: center;
+
+            width: 100%;
+
+            //margin-bottom: 10px;
+
+            h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        .fileItemEditor_field_actions {
+            display: flex;
+            flex-direction: row;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+
+            width: 100%;
+        }
+
+        .fileItemEditor_field_thumnail {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+
+            img {
+                width: 15vw;
+                height: 15vw;
+
+                max-width: 330px;
+                max-height: 330px;
+
+                object-fit: cover;
+
+                border-radius: 12px;
+
+                background-color: black;
+
+            }
+        }
+    }
+}
