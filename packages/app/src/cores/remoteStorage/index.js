@@ -2,82 +2,10 @@ import Core from "evite/src/core"
 
 export default class RemoteStorage extends Core {
     static namespace = "remoteStorage"
-    static depends = ["api"]
-
-    static maxRunningTasks = 3
+    static depends = ["api", "tasksQueue"]
 
     public = {
         uploadFile: this.uploadFile.bind(this),
-        appendToQueue: this.appendToQueue.bind(this),
-    }
-
-    runningTasksIds = []
-
-    taskQueue = []
-
-    processTasks() {
-        if (this.runningTasksIds.length >= RemoteStorage.maxRunningTasks) {
-            console.log("We are already running the maximum number of tasks")
-            return false
-        }
-
-        // check if there are new tasks in the queue and move them to the tasks array with the maximum number of tasks can be run
-        if (this.taskQueue.length === 0) {
-            console.log("No tasks in the queue")
-            return false
-        }
-
-        let tasks = this.taskQueue.splice(0, RemoteStorage.maxRunningTasks)
-
-        tasks = tasks.filter((task) => task)
-
-        const promises = tasks.map((task) => {
-            if (typeof task.fn !== "function") {
-                throw new Error("Task must be a function")
-            }
-
-            if (typeof task.index !== "number") {
-                throw new Error("Task index must be a number")
-            }
-
-            // add the task to the running tasks array
-            this.runningTasksIds.push(task.index)
-
-            return task.fn().then((result) => {
-                // delete the task from the running tasks array
-                this.runningTasksIds = this.runningTasksIds.filter((tIndex) => tIndex !== task.index)
-
-                return result
-            }).catch((error) => {
-                // delete the task from the running tasks array
-                this.runningTasksIds = this.runningTasksIds.filter((tIndex) => tIndex !== task.index)
-
-                // propagate the error through an exception
-                throw error
-            })
-        })
-
-        Promise.all(promises)
-            .then((res) => {
-                this.processTasks()
-            })
-            .catch((error) => {
-                console.error(error)
-                this.processTasks()
-            })
-    }
-
-    appendToQueue(task) {
-        if (Array.isArray(task)) {
-            throw new Error("Task must be a function")
-        }
-
-        this.taskQueue.unshift({
-            index: this.taskQueue.length,
-            fn: task,
-        })
-
-        this.processTasks()
     }
 
     async getFileHash(file) {
@@ -158,7 +86,7 @@ export default class RemoteStorage extends Core {
         }
 
         return new Promise((resolve, reject) => {
-            this.appendToQueue(async () => {
+            app.cores.tasksQueue.appendToQueue(fileHash, async () => {
                 try {
                     console.log(`Starting upload of file ${file.name}`)
                     console.log("fileHash", fileHash)
@@ -192,7 +120,7 @@ export default class RemoteStorage extends Core {
                         resolve()
                     }
                 }
-                this.appendToQueue(() => this.uploadFile(file, callback))
+                app.cores.tasksQueue.appendToQueue(() => this.uploadFile(file, callback))
             })
         })
 
