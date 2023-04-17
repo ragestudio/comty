@@ -7,7 +7,11 @@ export default async (payload) => {
         skip = 0,
     } = payload
 
-    let playlists = await Playlist.find()
+    let playlists = await Playlist.find({
+        $or: [
+            { public: true },
+        ]
+    })
         .sort({ created_at: -1 })
         .limit(limit)
         .skip(skip)

@@ -1,8 +1,8 @@
 import { Track } from "@models"
 
 export default {
-    route: "/:id",
     method: "GET",
+    route: "/:id",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         const track = await Track.findById(req.params.id).catch((err) => false)
