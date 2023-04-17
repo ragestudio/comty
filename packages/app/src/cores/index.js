@@ -1,4 +1,5 @@
 import SettingsCore from "./settings"
+import TasksQueue from "./tasksQueue"
 import APICore from "./api"
 import StyleCore from "./style"
 import PermissionsCore from "./permissions"
@@ -15,6 +16,8 @@ import RemoteStorage from "./remoteStorage"
 // DEFINE LOAD ORDER HERE
 export default [
     SettingsCore,
+    TasksQueue,
+
     APICore,
     PermissionsCore,
     StyleCore,
