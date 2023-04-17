@@ -613,6 +613,8 @@ export default class Player extends Core {
 
         instance.audioElement.muted = this.state.audioMuted
 
+        instance.audioElement.load()
+
         instance.audioElement.play()
 
         // check if the audio is a live stream when metadata is loaded
