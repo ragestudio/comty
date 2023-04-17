@@ -153,7 +153,7 @@ export default class ApiCore extends Core {
     }
 
     handleAfterRequest = async (data, callback) => {
-        // handle 401 responses
+        // handle 401, 403 responses
         if (data instanceof Error) {
             if (data.response.status === 401) {
                 // check if the server issue a refresh token on data
@@ -164,12 +164,17 @@ export default class ApiCore extends Core {
                     await this.handleRegenerationEvent(data.response.data.refreshToken)
 
                     return await callback()
-                } else {
+                }
+
+                // check if route is from "session" namespace
+                if (data.config.url.includes("/session")) {
                     return window.app.eventBus.emit("session.invalid", "Session expired, but the server did not issue a refresh token")
                 }
             }
             if (data.response.status === 403) {
-                return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
+                if (data.config.url.includes("/session")) {
+                    return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
+                }
             }
         }
     }
