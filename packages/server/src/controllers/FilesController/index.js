@@ -165,6 +165,8 @@ export default class FilesController extends Controller {
                         })
                     }
 
+                    console.log(req.fileResult)
+
                     try {
                         // check if mimetype has transformer
                         if (typeof this.fileTransformer[req.fileResult.mimetype] === "function") {
@@ -172,8 +174,9 @@ export default class FilesController extends Controller {
                         }
                     } catch (error) {
                         console.log(error)
+
                         return res.status(500).json({
-                            error: "File upload failed",
+                            error: "File upload failed on transformation",
                             reason: error.message,
                         })
                     }

@@ -19,7 +19,7 @@ export default async (_id) => {
 
     const userData = await User.findById(track.user_id).catch((err) => false)
 
-    track.artist = track.metadata?.artist ?? userData?.fullName ?? userData?.username ?? "Unknown artist"
+    track.artist = track.artist ?? userData?.fullName ?? userData?.username ?? "Unknown artist"
 
     return track
 }

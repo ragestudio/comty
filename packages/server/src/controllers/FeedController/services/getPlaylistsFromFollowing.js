@@ -20,8 +20,12 @@ export default async (payload) => {
         ...followingUserIds,
     ]
 
+    // firter out the playlists that are not public
     let playlists = await Playlist.find({
-        user_id: { $in: fetchFromUserIds }
+        user_id: { $in: fetchFromUserIds },
+        $or: [
+            { public: true },
+        ]
     })
         .sort({ created_at: -1 })
         .limit(limit)
