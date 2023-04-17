@@ -8,6 +8,98 @@ import FeedModel from "models/feed"
 
 import "./index.less"
 
+const PlaylistsList = (props) => {
+    const hopNumber = props.hopsPerPage ?? 6
+
+    const [offset, setOffset] = React.useState(0)
+    const [ended, setEnded] = React.useState(false)
+
+    const [loading, result, error, makeRequest] = app.cores.api.useRequest(props.fetchMethod, {
+        limit: hopNumber,
+        trim: offset
+    })
+
+    const onClickPrev = () => {
+        if (offset === 0) {
+            return
+        }
+
+        setOffset((value) => value - hopNumber)
+    }
+
+    const onClickNext = () => {
+        if (ended) {
+            return
+        }
+
+        setOffset((value) => value + hopNumber)
+    }
+
+    React.useEffect(() => {
+        if (typeof makeRequest === "function") {
+            makeRequest()
+        }
+    }, [offset])
+
+    React.useEffect(() => {
+        if (result) {
+            setEnded(result.length < hopNumber)
+        }
+    }, [result])
+
+    if (error) {
+        console.error(error)
+
+        return <div className="playlistExplorer_section">
+            <antd.Result
+                status="warning"
+                title="Failed to load"
+                subTitle="We are sorry, but we could not load this requests. Please try again later."
+            />
+        </div>
+    }
+
+    return <div className="playlistExplorer_section">
+        <div className="playlistExplorer_section_header">
+            <h1>
+                {
+                    props.headerIcon
+                }
+                <Translation>
+                    {(t) => t(props.headerTitle)}
+                </Translation>
+            </h1>
+
+            <div className="playlistExplorer_section_header_actions">
+                <antd.Button
+                    icon={<Icons.MdChevronLeft />}
+                    onClick={onClickPrev}
+                    disabled={offset === 0 || loading}
+                />
+
+                <antd.Button
+                    icon={<Icons.MdChevronRight />}
+                    onClick={onClickNext}
+                    disabled={ended || loading}
+                />
+            </div>
+        </div>
+        <div className="playlistExplorer_section_list">
+            {
+                loading && <antd.Skeleton active />
+            }
+            {
+                !loading && result.map((playlist, index) => {
+                    return <PlaylistItem
+                        key={index}
+                        playlist={playlist}
+                    />
+                })
+            }
+        </div>
+    </div>
+}
+
 const PlaylistItem = (props) => {
     const { playlist } = props
 
@@ -74,87 +166,6 @@ const RecentlyPlayed = (props) => {
     </div>
 }
 
-const FollowingArtists = (props) => {
-    const [L_MusicFeed, R_MusicFeed, E_MusicFeed] = app.cores.api.useRequest(FeedModel.getPlaylistsFeed)
-
-    if (E_MusicFeed) {
-        console.error(E_MusicFeed)
-
-        return <div className="playlistExplorer_section">
-            <antd.Result
-                status="warning"
-                title="Failed to load"
-                subTitle="We are sorry, but we could not load your playlists. Please try again later."
-            />
-        </div>
-    }
-
-    return <div className="playlistExplorer_section">
-        <div className="playlistExplorer_section_header">
-            <h1>
-                <Icons.MdPerson />
-                <Translation>
-                    {(t) => t("From following artists")}
-                </Translation>
-            </h1>
-        </div>
-        <div className="playlistExplorer_section_list">
-            {
-                L_MusicFeed && <antd.Skeleton active />
-            }
-            {
-                !L_MusicFeed && R_MusicFeed.map((playlist, index) => {
-                    return <PlaylistItem
-                        key={index}
-                        playlist={playlist}
-                    />
-                })
-            }
-        </div>
-    </div>
-}
-
-const PlaylistExplorer = (props) => {
-    const [L_MusicFeed, R_MusicFeed, E_MusicFeed] = app.cores.api.useRequest(FeedModel.getGlobalMusicFeed)
-
-    if (E_MusicFeed) {
-        console.error(E_MusicFeed)
-
-        return <div className="playlistExplorer_section">
-            <antd.Result
-                status="warning"
-                title="Failed to load"
-                subTitle="We are sorry, but we could not load your playlists. Please try again later."
-            />
-        </div>
-    }
-
-    return <div className="playlistExplorer_section">
-        <div className="playlistExplorer_section_header">
-            <h1>
-                <Icons.MdExplore />
-                <Translation>
-                    {(t) => t("Explore from global")}
-                </Translation>
-            </h1>
-        </div>
-
-        <div className="playlistExplorer_section_list">
-            {
-                L_MusicFeed && <antd.Skeleton active />
-            }
-            {
-                !L_MusicFeed && R_MusicFeed.map((playlist, index) => {
-                    return <PlaylistItem
-                        key={index}
-                        playlist={playlist}
-                    />
-                })
-            }
-        </div>
-    </div>
-}
-
 const MayLike = (props) => {
     return <div className="playlistExplorer_section">
         <div className="playlistExplorer_section_header">
@@ -180,9 +191,17 @@ export default () => {
     return <div className="playlistExplorer">
         <RecentlyPlayed />
 
-        <FollowingArtists />
+        <PlaylistsList
+            headerTitle="From your following artists"
+            headerIcon={<Icons.MdPerson />}
+            fetchMethod={FeedModel.getPlaylistsFeed}
+        />
 
-        <PlaylistExplorer />
+        <PlaylistsList
+            headerTitle="Explore from global"
+            headerIcon={<Icons.MdExplore />}
+            fetchMethod={FeedModel.getGlobalMusicFeed}
+        />
 
         <MayLike />
     </div>
