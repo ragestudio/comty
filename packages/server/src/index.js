@@ -35,6 +35,8 @@ global.toBoolean = (value) => {
     return false
 }
 
+global.isProduction = process.env.NODE_ENV === "production"
+
 import API from "./api"
 
 async function main() {
