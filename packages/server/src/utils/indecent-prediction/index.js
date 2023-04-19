@@ -1,4 +1,5 @@
 const tf = require("@tensorflow/tfjs-node")
+
 import * as nsfwjs from "nsfwjs/dist"
 import sharp from "sharp"
 
@@ -15,6 +16,10 @@ const imageToInput = (image, numChannels) => {
     const input = tf.tensor3d(values, outShape, "int32")
 
     return input
+}
+
+if (global.isProduction) {
+    tf.enableProdMode()
 }
 
 export default async (payload) => {
