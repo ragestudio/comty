@@ -1,5 +1,4 @@
 const minumunPredictions = {
-    "Drawing": 0.8,
     "Hentai": 0.8,
     "Porn": 0.7,
 }
