@@ -8,6 +8,8 @@ const AllowedPublicUpdateFields = [
     "email",
     "cover",
     "description",
+    "location",
+    "links",
 ]
 
 const MaxStringsLengths = {
