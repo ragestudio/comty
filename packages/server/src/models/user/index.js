@@ -15,5 +15,6 @@ export default {
         createdAt: { type: String },
         badges: { type: Array, default: [] },
         early_supporter: { type: Boolean, default: false },
+        links: { type: Array, default: [] },
     }
 }
