@@ -13,9 +13,9 @@ import getSettingsList from "schemas/settings"
 import menuGroupsDecorators from "schemas/settingsMenuGroupsDecorators"
 import groupsDecorators from "schemas/settingsGroupsDecorators"
 
-const SettingsList = await getSettingsList()
-
 import "./index.less"
+
+const SettingsList = await getSettingsList()
 
 const extraMenuItems = [
     {
@@ -72,6 +72,7 @@ const SettingItem = (props) => {
     const [value, setValue] = React.useState(null)
     const [delayedValue, setDelayedValue] = React.useState(null)
     const [disabled, setDisabled] = React.useState(false)
+    const componentRef = React.useRef(null)
 
     let SettingComponent = item.component
 
@@ -135,6 +136,12 @@ const SettingItem = (props) => {
 
         if (item.debounced) {
             setDelayedValue(null)
+        }
+
+        if (componentRef.current) {
+            if (typeof componentRef.current.onDebounceSave === "function") {
+                await componentRef.current.onDebounceSave(updateValue)
+            }
         }
 
         setValue(updateValue)
@@ -344,7 +351,8 @@ const SettingItem = (props) => {
                         ? <div> Loading... </div>
                         : React.createElement(SettingComponent, {
                             ...item.props,
-                            ctx: elementsCtx
+                            ctx: elementsCtx,
+                            ref: componentRef,
                         })}
             </div>
 
