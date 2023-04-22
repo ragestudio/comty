@@ -17,15 +17,15 @@ export default {
     },
     settings: [
         {
-            "id": "username",
-            "group": "account.basicInfo",
-            "component": "Button",
-            "icon": "AtSign",
-            "title": "Username",
-            "description": "Your username is the name you use to log in to your account.",
-            "props": {
-                "disabled": true,
-                "children": "Change username",
+            id: "username",
+            group: "account.basicInfo",
+            component: "Button",
+            icon: "AtSign",
+            title: "Username",
+            description: "Your username is the name you use to log in to your account.",
+            props: {
+                disabled: true,
+                children: "Change username",
             },
         },
         {
@@ -172,5 +172,32 @@ export default {
             "debounced": true,
             storaged: false,
         },
+        {
+            id: "Links",
+            group: "account.profile",
+            component: loadable(() => import("../components/profileLinks")),
+            icon: "MdLink",
+            title: "Links",
+            description: "Add links to your profile",
+            onUpdate: async (value) => {
+                // filter invalid links
+                value = value.filter((link) => {
+                    return link.key && link.value
+                })
+
+                const result = await UserModel.updateData({
+                    links: value
+                })
+
+                if (result) {
+                    return result.links
+                }
+            },
+            defaultValue: (ctx) => {
+                return ctx.userData.links ?? []
+            },
+            debounced: true,
+            storaged: false,
+        }
     ]
 }
