@@ -124,7 +124,9 @@ export default class BackgroundMediaPlayer extends React.Component {
                         >
                             <h4>
                                 {
-                                    this.state.plabackState === "stopped" ? "Nothing is playing" : (this.state.currentPlaying?.title ?? "Untitled")
+                                    this.state.plabackState === "stopped" ? "Nothing is playing" : <>
+                                        {`${this.state.currentPlaying?.title} - ${this.state.currentPlaying?.artist}` ?? "Untitled"}
+                                    </>
                                 }
                             </h4>
                         </Marquee>
@@ -134,10 +136,17 @@ export default class BackgroundMediaPlayer extends React.Component {
                             <Icons.MdAlbum />
 
                             {
-                                this.state.plabackState === "stopped" ? "Nothing is playing" : (this.state.currentPlaying?.title ?? "Untitled")
+                                this.state.plabackState === "stopped" ? "Nothing is playing" : <>
+                                    {this.state.currentPlaying?.title ?? "Untitled"}
+                                </>
                             }
                         </h4>
                     }
+                    {/* {
+                        this.state.expanded && <p>
+                            {this.state.currentPlaying?.artist ?? "Unknown artist"}
+                        </p>
+                    } */}
                 </div>
             </div>
             <div
