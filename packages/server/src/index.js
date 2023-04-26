@@ -1,5 +1,11 @@
 require("dotenv").config()
 import { webcrypto as crypto } from "crypto"
+import path from "path"
+import { registerBaseAliases } from "linebridge/dist/server"
+
+registerBaseAliases(undefined, {
+    "@services": path.resolve(__dirname, "services"),
+})
 
 // patches
 const { Buffer } = require("buffer")

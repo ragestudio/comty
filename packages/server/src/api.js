@@ -1,9 +1,5 @@
 import path from "path"
-import { Server, registerBaseAliases } from "linebridge/dist/server"
-
-registerBaseAliases(undefined, {
-    "@services": path.resolve(__dirname, "services"),
-})
+import { Server } from "linebridge/dist/server"
 
 import express from "express"
 import bcrypt from "bcrypt"
