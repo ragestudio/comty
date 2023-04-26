@@ -5,7 +5,7 @@ export default {
     route: "/streams",
     fn: async (req, res) => {
         if (req.query.username) {
-            const stream = await fetchRemoteStreams(`live/${req.query.username}${req.query.profile_id ? `:${req.query.profile_id}` : ""}`)
+            const stream = await fetchRemoteStreams(`${req.query.username}${req.query.profile_id ? `:${req.query.profile_id}` : ""}`)
 
             if (!stream) {
                 return res.status(404).json({

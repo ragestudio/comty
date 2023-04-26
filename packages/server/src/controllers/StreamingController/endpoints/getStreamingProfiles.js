@@ -33,15 +33,16 @@ export default {
 
             profile._id = profile._id.toString()
 
+            profile.stream_key = `${req.user.username}:${profile._id}?secret=${profile.stream_key}`
+
             return profile
         })
 
         profiles = profiles.map((profile) => {
             profile.addresses = {
-                ingest: `${process.env.STREAMING_INGEST_SERVER}/${req.user.username}:${profile._id}`,
+                ingest: process.env.STREAMING_INGEST_SERVER,
                 hls: `${process.env.STREAMING_API_SERVER}/live/${req.user.username}:${profile._id}/src.m3u8`,
                 flv: `${process.env.STREAMING_API_SERVER}/live/${req.user.username}:${profile._id}/src.flv`,
-                dash: `${process.env.STREAMING_API_SERVER}/live/${req.user.username}:${profile._id}/src.mpd`,
                 aac: `${process.env.STREAMING_API_SERVER}/radio/${req.user.username}:${profile._id}/src.aac`,
             }
 
