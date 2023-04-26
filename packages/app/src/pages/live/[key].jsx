@@ -1,4 +1,3 @@
-
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
@@ -133,6 +132,10 @@ export default class StreamViewer extends React.Component {
         }).catch((error) => {
             console.error(error)
 
+            if (this.streamInfoInterval) {
+                this.streamInfoInterval = clearInterval(this.streamInfoInterval)
+            }
+
             return null
         })
 
@@ -240,6 +243,8 @@ export default class StreamViewer extends React.Component {
         }
 
         this.exitPlayerAnimation()
+
+        this.toggleCinemaMode(false)
 
         if (this.streamInfoInterval) {
             clearInterval(this.streamInfoInterval)
@@ -360,20 +365,22 @@ export default class StreamViewer extends React.Component {
                                     </div>
                                 </div>
 
-                                <div className="livestream_player_header_info">
-                                    <div className="livestream_player_header_info_title">
-                                        <h1>{this.state.stream.info.title}</h1>
+                                {
+                                    this.state.stream.info && <div className="livestream_player_header_info">
+                                        <div className="livestream_player_header_info_title">
+                                            <h1>{this.state.stream.info?.title}</h1>
+                                        </div>
+                                        <div className="livestream_player_header_info_description">
+                                            <Ticker
+                                                mode="smooth"
+                                            >
+                                                {({ index }) => {
+                                                    return <h4>{this.state.stream.info?.description}</h4>
+                                                }}
+                                            </Ticker>
+                                        </div>
                                     </div>
-                                    <div className="livestream_player_header_info_description">
-                                        <Ticker
-                                            mode="smooth"
-                                        >
-                                            {({ index }) => {
-                                                return <h4>{this.state.stream.info.description}</h4>
-                                            }}
-                                        </Ticker>
-                                    </div>
-                                </div>
+                                }
                             </>
                             : <antd.Skeleton active />
                     }
