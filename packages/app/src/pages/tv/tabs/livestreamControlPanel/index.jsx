@@ -2,6 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 
+import LimitAlert from "components/LimitAlert"
+
 import ProfileSelector from "./components/ProfileSelector"
 import CategoryViewResolver from "./components/CategoryViewResolver"
 import StreamingKeyViewer from "./components/StreamingKeyViewer"
@@ -229,6 +231,10 @@ export default (props) => {
         </div>
 
         <div className="config">
+            <LimitAlert
+                limit_id="streaming_bandwidth"
+            />
+
             <div className="panel">
                 <h2><Icons.MdSettingsInputAntenna /> Emission</h2>
 
