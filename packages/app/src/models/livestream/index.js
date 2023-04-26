@@ -1,4 +1,11 @@
+import axios from "axios"
+import config from "config"
+
 export default class Livestream {
+    static instance = axios.create({
+        baseURL: config.remotes.livestreamingApi,
+    })
+
     static async deleteProfile(profile_id) {
         const request = await app.cores.api.customRequest({
             method: "DELETE",
