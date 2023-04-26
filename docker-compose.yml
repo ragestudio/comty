@@ -22,3 +22,8 @@ services:
       - "3005:3005"
     env_file:
       - messaging.env
+  redis:
+    image: redis/redis-stack-server:latest
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
