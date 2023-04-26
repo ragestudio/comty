@@ -6,15 +6,22 @@ const envOrigins = {
     "localhost": {
         mainApi: `http://${window.location.hostname}:3010`,
         messagingApi: `http://${window.location.hostname}:3020`,
+        livestreamingApi: `http://${window.location.hostname}:3030`,
     },
     "development": {
         mainApi: `https://indev_api.comty.app`,
         messagingApi: `https://indev_messaging_api.comty.app`,
+        livestreamingApi: `https://indev_livestreaming_api.comty.app`,
     },
     "production": {
         mainApi: "https://api.comty.app",
         messagingApi: `https://messaging_api.comty.app`,
+        livestreamingApi: `https://livestreaming_api.comty.app`,
     }
+}
+
+function composeRemote(path) {
+    return window.location.hostname.includes("localhost") ? envOrigins["localhost"][path] : envOrigins[process.env.NODE_ENV][path]
 }
 
 console.log(`Config loaded with mode: [${process.env.NODE_ENV}]`)
@@ -25,6 +32,7 @@ export default {
     defaultSoundPack: defaultSoundPack,
     author: "RageStudio©",
     fundingLink: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76",
+    githubRepoLink: "https://github.com/ragestudio/comty",
     footerLinks: [
         {
             label: "Terms of Service",
@@ -54,8 +62,9 @@ export default {
         ragestudio_full: "https://storage.ragestudio.net/rstudio/branding/ragestudio/labeled/ragestudio-labeled_white.svg",
     },
     remotes: {
-        mainApi: window.location.hostname.includes("localhost") ? envOrigins["localhost"].mainApi : envOrigins[process.env.NODE_ENV].mainApi,
-        messagingApi: window.location.hostname.includes("localhost") ? envOrigins["localhost"].messagingApi : envOrigins[process.env.NODE_ENV].messagingApi,
+        mainApi: composeRemote("mainApi"),
+        messagingApi: composeRemote("messagingApi"),
+        livestreamingApi: composeRemote("livestreamingApi"),
     },
     app: {
         title: packagejson.name,
