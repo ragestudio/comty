@@ -7,14 +7,17 @@ const streamingServerAPIAddress = process.env.STREAMING_API_SERVER ?? ""
 const streamingServerAPIUri = `${streamingServerAPIAddress.startsWith("https") ? "https" : "http"}://${streamingServerAPIAddress.split("://")[1]}`
 
 export default async (stream_id) => {
-    let apiURI = `${streamingServerAPIUri}/api/v1/streams`
-
-    if (stream_id) {
-        apiURI = `${streamingServerAPIUri}/api/v1/streams/${stream_id}`
-    }
+    let apiURI = `${streamingServerAPIUri}/streams`
 
     // fetch all streams from api
-    let { data } = await axios.get(apiURI).catch((err) => {
+    let { data } = await axios({
+        method: "GET",
+        url: apiURI,
+        params: {
+            stream: stream_id,
+            useFetch: true,
+        }
+    }).catch((err) => {
         console.error(err)
         return false
     })
@@ -23,18 +26,16 @@ export default async (stream_id) => {
 
     if (!data) return streamings
 
-    if (data.stream && stream_id) {
-        streamings.push(data.stream)
-    }
-
-    if (data.streams) {
-        streamings = data.streams
+    if (stream_id) {
+        streamings.push(data)
+    } else {
+        streamings = data
     }
 
     streamings = streamings.map(async (stream) => {
-        const { video, audio, clients, app } = stream
+        const { video, audio, clients, name } = stream
 
-        const profile_id = app.split(":")[1]
+        const profile_id = name.split(":")[1]
 
         let profile = await StreamingProfile.findById(profile_id)
 
@@ -57,16 +58,16 @@ export default async (stream_id) => {
         return {
             profile_id: profile._id,
             info: profile.info,
-            stream: `${user.username}?profile=${profile._id}`,
+            name: name,
+            streamUrl: `${user.username}?profile=${profile._id}`,
             user,
             video,
             audio,
             connectedClients: clients ?? 0,
             sources: {
-                hls: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.m3u8`,
-                flv: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.flv`,
-                dash: `${streamingServerAPIUri}/live/${user.username}:${profile._id}/src.mpd`,
-                aac: `${streamingServerAPIUri}/radio/${user.username}:${profile._id}/src.aac`,
+                hls: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.m3u8`,
+                flv: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.flv`,
+                aac: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.aac`,
             }
         }
     })
