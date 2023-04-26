@@ -1,0 +1,41 @@
+.changelogs {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    .changelog_entry {
+        display: flex;
+        flex-direction: column;
+
+        color: var(--text-color);
+
+        background-color: var(--background-color-accent);
+        padding: 20px;
+
+        border-radius: 8px;
+
+        gap: 20px;
+
+        .changelog_entry_header{
+            display: flex;
+            justify-content: space-between;
+
+            align-items: center;
+
+            h1,p {
+                margin-bottom: 0;
+            }
+
+            .changelog_entry_version {
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+
+            .changelog_entry_date {
+                font-size: 1rem;
+                font-weight: bold;
+            }
+        }
+    }
+}
