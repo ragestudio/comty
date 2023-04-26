@@ -86,6 +86,12 @@ export default class ApiCore extends Core {
         },
         ...args
     ) {
+        const instance = request.instance ?? this.instance.httpInterface
+
+        if (!instance) {
+            throw new Error("No instance provided")
+        }
+
         // handle before request
         await this.handleBeforeRequest(request)
 
@@ -110,7 +116,7 @@ export default class ApiCore extends Core {
                 console.warn("Making a request with no session token")
             }
 
-            const _result = await this.instance.httpInterface(request, ...args)
+            const _result = await instance(request, ...args)
                 .catch((error) => {
                     return error
                 })
@@ -155,6 +161,11 @@ export default class ApiCore extends Core {
     handleAfterRequest = async (data, callback) => {
         // handle 401, 403 responses
         if (data instanceof Error) {
+            if (data.code && (data.code === "ECONNABORTED" || data.code === "ERR_NETWORK")) {
+                console.error(`Request aborted or network error, ignoring`)
+                return false
+            }
+
             if (data.response.status === 401) {
                 // check if the server issue a refresh token on data
                 if (data.response.data.refreshToken) {
@@ -171,6 +182,7 @@ export default class ApiCore extends Core {
                     return window.app.eventBus.emit("session.invalid", "Session expired, but the server did not issue a refresh token")
                 }
             }
+
             if (data.response.status === 403) {
                 if (data.config.url.includes("/session")) {
                     return window.app.eventBus.emit("session.invalid", "Session not valid or not existent")
