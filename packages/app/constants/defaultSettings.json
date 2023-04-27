@@ -14,5 +14,6 @@
     "feed_max_fetch": 20,
     "style.compactMode": false,
     "sidebar.floating": false,
+    "player.compressor": false,
     "language": "en"
 }
