@@ -20,7 +20,9 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        setValues(props.ctx.currentValue)
+        if (props.ctx.currentValue) {
+            setValues(props.ctx.currentValue)
+        }
     }, [props.ctx.currentValue])
 
     return <div
@@ -39,7 +41,7 @@ export default (props) => {
             <Slider
                 onChangeCommitted={(e, value) => handleChangeCommitted("threshold", value)}
                 onChange={(e, value) => handleOnChange("threshold", value)}
-                value={values.threshold}
+                value={values?.threshold ?? 0}
                 orientation="vertical"
                 aria-label="Threshold"
                 valueLabelDisplay="auto"
@@ -51,7 +53,7 @@ export default (props) => {
 
             <div className="compresorValues_slider_value">
                 <span>
-                    {values.threshold} dB
+                    {values?.threshold ?? 0} dB
                 </span>
             </div>
         </div>
@@ -65,7 +67,7 @@ export default (props) => {
             <Slider
                 onChangeCommitted={(e, value) => handleChangeCommitted("knee", value)}
                 onChange={(e, value) => handleOnChange("knee", value)}
-                value={values.knee}
+                value={values?.knee ?? 0}
                 orientation="vertical"
                 aria-label="Knee"
                 valueLabelDisplay="auto"
@@ -77,7 +79,7 @@ export default (props) => {
 
             <div className="compresorValues_slider_value">
                 <span>
-                    {values.knee} dB
+                    {values?.knee ?? 0} dB
                 </span>
             </div>
         </div>
@@ -91,7 +93,7 @@ export default (props) => {
             <Slider
                 onChangeCommitted={(e, value) => handleChangeCommitted("ratio", value)}
                 onChange={(e, value) => handleOnChange("ratio", value)}
-                value={values.ratio}
+                value={values?.ratio ?? 0}
                 orientation="vertical"
                 aria-label="Ratio"
                 valueLabelDisplay="auto"
@@ -102,7 +104,7 @@ export default (props) => {
             />
             <div className="compresorValues_slider_value">
                 <span>
-                    {values.ratio} : 1
+                    {values?.ratio ?? 0} : 1
                 </span>
             </div>
         </div>
@@ -116,7 +118,7 @@ export default (props) => {
             <Slider
                 onChangeCommitted={(e, value) => handleChangeCommitted("attack", value)}
                 onChange={(e, value) => handleOnChange("attack", value)}
-                value={values.attack}
+                value={values?.attack ?? 0}
                 orientation="vertical"
                 aria-label="Attack"
                 valueLabelDisplay="auto"
@@ -128,7 +130,7 @@ export default (props) => {
 
             <div className="compresorValues_slider_value">
                 <span>
-                    {values.attack} s
+                    {values?.attack ?? 0} s
                 </span>
             </div>
         </div>
@@ -142,7 +144,7 @@ export default (props) => {
             <Slider
                 onChangeCommitted={(e, value) => handleChangeCommitted("release", value)}
                 onChange={(e, value) => handleOnChange("release", value)}
-                value={values.release}
+                value={values?.release ?? 0}
                 orientation="vertical"
                 aria-label="Release"
                 valueLabelDisplay="auto"
@@ -153,7 +155,7 @@ export default (props) => {
             />
             <div className="compresorValues_slider_value">
                 <span>
-                    {values.release} s
+                    {values?.release ?? 0} s
                 </span>
             </div>
         </div>
