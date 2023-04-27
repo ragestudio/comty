@@ -126,6 +126,22 @@ async function uploadAssets({ release, bundlePath }) {
 }
 
 async function main() {
+    // check if no GITHUB_TOKEN env
+    if (!process.env.GITHUB_TOKEN) {
+        console.error("🆘 Missing GITHUB_TOKEN env")
+        return false
+    }
+
+    // check if is any changes pending to commit
+    const gitStatus = child_process.execSync("git status --porcelain", {
+        cwd: process.cwd()
+    }).toString().trim()
+
+    if (gitStatus.length > 0) {
+        console.error("🆘 There are pending changes to commit, please commit first.")
+        return false
+    }
+
     let currentVersion = packagejson.version
 
     // check if currentVersion match with current latest release on github
@@ -141,8 +157,12 @@ async function main() {
         if (process.argv.includes("--bump")) {
             const bumpType = process.argv[process.argv.indexOf("--bump") + 1]
 
-            const newVersion = await bumpVersion(bumpType, 1).catch((err) => {
-                console.error(`🆘 Failed to bump version: ${err}`)
+            const newVersion = await bumpVersion({
+                root: process.cwd(),
+                type: bumpType,
+                count: 1
+            }).catch((error) => {
+                console.error(`🆘 Failed to bump version >`, error)
                 return false
             })
 

@@ -23,7 +23,7 @@ async function bumpVersion({
 
     let newVersion = rootPkgjson.version
 
-    newVersion = rootPkgjson.version.split(".")
+    newVersion = newVersion.split(".")
 
     switch (type) {
         case "patch":
@@ -39,7 +39,7 @@ async function bumpVersion({
             newVersion[2] = 0
             break
         default:
-            console.error("Invalid version type")
+            console.error("Cannot bump version, invalid type")
             return false
     }
 
@@ -101,7 +101,7 @@ async function bumpVersion({
             continue
         }
 
-        return await fs.writeFileSync(path.resolve(packagesPath, package, "package.json"), JSON.stringify(pkgjson, null, 4))
+        await fs.writeFileSync(path.resolve(packagesPath, package, "package.json"), JSON.stringify(pkgjson, null, 4))
     }
 
     // write root package.json
