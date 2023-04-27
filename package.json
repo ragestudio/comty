@@ -1,29 +1,29 @@
 {
-  "author": "RageStudio",
-  "license": "LGPL-2.1",
-  "types": "index.d.ts",
-  "private": true,
-  "scripts": {
-    "postinstall": "npm rebuild @tensorflow/tfjs-node --build-from-source",
-    "release": "node ./scripts/release.js",
-    "dev": "concurrently -k -n Server,MessageServer,Client -c bgCyan,bgBlue,bgGreen \"yarn dev:server\" \"yarn dev:message_server\" \"yarn dev:client\"",
-    "dev:message_server": "cd packages/message_server && yarn dev",
-    "dev:server": "cd packages/server && yarn dev",
-    "dev:client": "cd packages/app && yarn dev"
-  },
-  "workspaces": [
-    "packages/**"
-  ],
-  "dependencies": {
-    "corenode": "^0.28.26",
-    "@octokit/rest": "19.0.4",
-    "dotenv": "16.0.3",
-    "7zip-min": "1.4.3",
-    "axios": "0.21.1"
-  },
-  "devDependencies": {
-    "concurrently": "^7.5.0",
-    "pm2": "5.3.0"
-  },
-  "version": "0.44.1"
+    "author": "RageStudio",
+    "license": "LGPL-2.1",
+    "types": "index.d.ts",
+    "private": true,
+    "scripts": {
+        "postinstall": "npm rebuild @tensorflow/tfjs-node --build-from-source",
+        "release": "node ./scripts/release.js",
+        "dev": "concurrently -k -n Server,MessageServer,Client -c bgCyan,bgBlue,bgGreen \"yarn dev:server\" \"yarn dev:message_server\" \"yarn dev:client\"",
+        "dev:message_server": "cd packages/message_server && yarn dev",
+        "dev:server": "cd packages/server && yarn dev",
+        "dev:client": "cd packages/app && yarn dev"
+    },
+    "workspaces": [
+        "packages/**"
+    ],
+    "dependencies": {
+        "corenode": "^0.28.26",
+        "@octokit/rest": "19.0.4",
+        "dotenv": "16.0.3",
+        "7zip-min": "1.4.3",
+        "axios": "0.21.1"
+    },
+    "devDependencies": {
+        "concurrently": "^7.5.0",
+        "pm2": "5.3.0"
+    },
+    "version": "0.45.0"
 }
