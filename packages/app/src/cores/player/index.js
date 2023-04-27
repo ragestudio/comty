@@ -1,39 +1,16 @@
 import React from "react"
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
-import store from "store"
+import AudioPlayerStorage from "./storage"
 import { FastAverageColor } from "fast-average-color"
-
-// import { createRealTimeBpmProcessor } from "realtime-bpm-analyzer"
 
 import EmbbededMediaPlayer from "components/EmbbededMediaPlayer"
 import BackgroundMediaPlayer from "components/BackgroundMediaPlayer"
 
 import { DOMWindow } from "components/RenderWindow"
 
-class AudioPlayerStorage {
-    static storeKey = "audioPlayer"
-
-    static get(key) {
-        const data = store.get(AudioPlayerStorage.storeKey)
-
-        if (data) {
-            return data[key]
-        }
-
-        return null
-    }
-
-    static set(key, value) {
-        const data = store.get(AudioPlayerStorage.storeKey) ?? {}
-
-        data[key] = value
-
-        store.set(AudioPlayerStorage.storeKey, data)
-
-        return data
-    }
-}
+import GainProcessorNode from "./processors/gainNode"
+import CompressorProcessorNode from "./processors/compressorNode"
 
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
@@ -52,7 +29,10 @@ export default class Player extends Core {
 
     audioQueueHistory = []
     audioQueue = []
-    audioProcessors = []
+    audioProcessors = [
+        new GainProcessorNode(this),
+        new CompressorProcessorNode(this),
+    ]
 
     currentAudioInstance = null
 
@@ -83,6 +63,25 @@ export default class Player extends Core {
         volume: this.volume.bind(this),
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
+        attachProcessor: function (name) {
+
+        }.bind(this),
+        dettachProcessor: async function (name) {
+            // find the processor by refName
+            const processor = this.currentAudioInstance.attachedProcessors.find((_processor) => {
+                return _processor.constructor.refName === name
+            })
+
+            if (!processor) {
+                throw new Error("Processor not found")
+            }
+
+            if (typeof processor._detach !== "function") {
+                throw new Error("Processor does not support detach")
+            }
+
+            return this.currentAudioInstance = await processor._detach(this.currentAudioInstance)
+        }.bind(this),
         playback: {
             mode: function (mode) {
                 if (mode) {
@@ -157,6 +156,34 @@ export default class Player extends Core {
     }
 
     async onInitialize() {
+        // initialize all audio processors
+        for await (const processor of this.audioProcessors) {
+            console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
+
+            if (typeof processor._init === "function") {
+                try {
+                    await processor._init(this.audioContext)
+                } catch (error) {
+                    console.error(`Failed to initialize audio processor ${processor.constructor.name} >`, error)
+                    continue
+                }
+            }
+
+            // check if processor has exposed public methods
+            if (processor.exposeToPublic) {
+                Object.entries(processor.exposeToPublic).forEach(([key, value]) => {
+                    const refName = processor.constructor.refName
+
+                    if (typeof this.public[refName] === "undefined") {
+                        // by default create a empty object
+                        this.public[refName] = {}
+                    }
+
+                    this.public[refName][key] = value
+                })
+            }
+        }
+
         Observable.observe(this.state, (changes) => {
             changes.forEach((change) => {
                 if (change.type === "update") {
@@ -291,7 +318,7 @@ export default class Player extends Core {
             id: "mediaPlayer"
         })
 
-        this.currentDomWindow.render(<EmbbededMediaPlayer />)
+        this.currentDomWindow.render(React.createElement(EmbbededMediaPlayer))
     }
 
     detachPlayerComponent() {
@@ -413,7 +440,8 @@ export default class Player extends Core {
             track: null,
             gainNode: null,
             crossfadeInterval: null,
-            crossfading: false
+            crossfading: false,
+            attachedProcessors: [],
         }
 
         instanceObj.audioElement.signal = instanceObj.abortController.signal
@@ -540,37 +568,13 @@ export default class Player extends Core {
 
         //this.enqueueLoadBuffer(instanceObj.audioElement)
 
-        //await this.instanciateRealtimeAnalyzerNode()
-
+        // create media element source as first node
         instanceObj.track = this.audioContext.createMediaElementSource(instanceObj.audioElement)
-
-        instanceObj.gainNode = this.audioContext.createGain()
-
-        instanceObj.gainNode.gain.value = this.state.audioVolume
-
-        const processorsList = [
-            instanceObj.gainNode,
-            ...this.audioProcessors,
-        ]
-
-        let lastProcessor = null
-
-        processorsList.forEach((processor) => {
-            if (lastProcessor) {
-                lastProcessor.connect(processor)
-            } else {
-                instanceObj.track.connect(processor)
-            }
-
-            lastProcessor = processor
-        })
-
-        lastProcessor.connect(this.audioContext.destination)
 
         return instanceObj
     }
 
-    play(instance, params = {}) {
+    async play(instance, params = {}) {
         if (typeof instance === "number") {
             instance = this.audioQueue[instance]
         }
@@ -590,6 +594,16 @@ export default class Player extends Core {
         this.currentAudioInstance = instance
         this.state.currentAudioManifest = instance.manifest
 
+        for await (const [index, processor] of this.audioProcessors.entries()) {
+            if (typeof processor._attach !== "function") {
+                console.error(`Processor ${processor.constructor.refName} not support attach`)
+
+                continue
+            }
+
+            this.currentAudioInstance = await processor._attach(this.currentAudioInstance, index)
+        }
+
         // set time to 0
         this.currentAudioInstance.audioElement.currentTime = 0
 
@@ -601,14 +615,6 @@ export default class Player extends Core {
             this.currentAudioInstance.gainNode.gain.value = params.volume
         } else {
             this.currentAudioInstance.gainNode.gain.value = this.state.audioVolume
-        }
-
-        if (this.realtimeAnalyzerNode) {
-            const filter = this.audioContext.createBiquadFilter()
-
-            filter.type = "lowpass"
-
-            this.currentAudioInstance.track.connect(filter).connect(this.realtimeAnalyzerNode)
         }
 
         instance.audioElement.muted = this.state.audioMuted
