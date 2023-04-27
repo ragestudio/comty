@@ -151,11 +151,22 @@ async function main() {
             }
 
             currentVersion = newVersion
+
+            // create new commit
+            await child_process.execSync(`git add . && git commit -m "Bump version to ${newVersion}"`, {
+                cwd: process.cwd(),
+                stdio: "inherit"
+            })
+
+            // push to remote
+            await child_process.execSync(`git push`, {
+                cwd: process.cwd(),
+                stdio: "inherit"
+            })
         } else {
             console.log("🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --force to force release.")
+            return true
         }
-
-        return true
     }
 
     if (!latestRelease) return
@@ -167,7 +178,7 @@ async function main() {
     const changelog = await composeChangelog()
 
     console.log("📝 Writing changelog to file...")
-    
+
     // write changelog to file
     fs.writeFileSync(path.resolve(changelogsPath, `v${currentVersion.replace(".", "-")}.md`), changelog)
 
