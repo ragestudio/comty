@@ -153,7 +153,7 @@ async function main() {
             currentVersion = newVersion
 
             // create new commit
-            await child_process.execSync(`git add . && git commit -m "Bump version to ${newVersion}"`, {
+            await child_process.execSync(`git add . && git commit -m "Bump version to ${currentVersion}"`, {
                 cwd: process.cwd(),
                 stdio: "inherit"
             })
