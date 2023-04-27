@@ -1,5 +1,5 @@
 {
-  "name": "comty",
+  "name": "@comty/web-app",
   "version": "0.44.1",
   "license": "LGPL-2.1",
   "main": "electron/main",
