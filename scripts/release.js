@@ -12,40 +12,14 @@ const axios = require("axios")
 const repo = "ragestudio/comty"
 const appSrcPath = path.resolve(process.cwd(), "packages/app/src")
 const appDistPath = path.resolve(process.cwd(), "packages/app/dist")
+const changelogsPath = path.resolve(process.cwd(), "changelogs")
 
 const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN
 })
 
-async function getChangeLogString() {
-    // get latest tag
-    const latestTag = await octokit.repos.getLatestRelease({
-        owner: repo.split("/")[0],
-        repo: repo.split("/")[1]
-    })
-
-    // get commits since latest tag
-    const commits = await octokit.repos.listCommits({
-        owner: repo.split("/")[0],
-        repo: repo.split("/")[1],
-        since: latestTag.data.published_at
-    })
-
-    const changelog = commits.data.map((commit) => {
-        return {
-            message: commit.commit.message,
-            author: commit.commit.author.name,
-            url: commit.html_url,
-        }
-    })
-
-    // make a string from the changes with Markdown syntax
-    const changelogString = changelog.map((commit) => {
-        return `* [${commit.message}](${commit.url}) - ${commit.author}`
-    }).join("\n")
-
-    return changelogString
-}
+const composeChangelog = require("./utils/composeChangelog")
+const bumpVersion = require("./utils/bumpVersion")
 
 async function createGithubRelease(payload) {
     if (process.argv.includes("--noPublish")) {
@@ -93,8 +67,8 @@ async function createAppDistBundle() {
 }
 
 async function compressDistBundle() {
-    if (process.argv.includes("--noCompress")) {
-        console.log("🔥 Skipping build due to `noBuild` argument")
+    if (process.argv.includes("--noCompress") || process.argv.includes("--noBuild")) {
+        console.log("🔥 Skipping compress due to `noBuild` or `noCompress` argument")
         return true
     }
 
@@ -124,6 +98,12 @@ async function compressDistBundle() {
 }
 
 async function uploadAssets({ release, bundlePath }) {
+    // check if has `noPublish` argument, if true, skip uploading assets
+    if (process.argv.includes("--noPublish")) {
+        console.log("🔥 Skipping upload assets due to `noPublish` argument")
+        return true
+    }
+
     console.log("⚒  Uploading assets...")
 
     console.log(`ReleaseID: ${release.id}`)
@@ -146,13 +126,53 @@ async function uploadAssets({ release, bundlePath }) {
 }
 
 async function main() {
+    let currentVersion = packagejson.version
+
+    // check if currentVersion match with current latest release on github
+    const latestRelease = await octokit.repos.getLatestRelease({
+        owner: repo.split("/")[0],
+        repo: repo.split("/")[1]
+    }).catch((err) => {
+        console.error(`🆘 Failed to get latest release: ${err}`)
+        return false
+    })
+
+    if (latestRelease && latestRelease.data.tag_name === currentVersion && !process.argv.includes("--force")) {
+        if (process.argv.includes("--bump")) {
+            const bumpType = process.argv[process.argv.indexOf("--bump") + 1]
+
+            const newVersion = await bumpVersion(bumpType, 1).catch((err) => {
+                console.error(`🆘 Failed to bump version: ${err}`)
+                return false
+            })
+
+            if (!newVersion) {
+                throw new Error("Failed to bump version")
+            }
+
+            currentVersion = newVersion
+        } else {
+            console.log("🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --force to force release.")
+        }
+
+        return true
+    }
+
+    if (!latestRelease) return
+
     await createAppDistBundle()
+
     const bundlePath = await compressDistBundle()
 
-    const changelog = await getChangeLogString()
+    const changelog = await composeChangelog()
+
+    console.log("📝 Writing changelog to file...")
+    
+    // write changelog to file
+    fs.writeFileSync(path.resolve(changelogsPath, `v${currentVersion.replace(".", "-")}.md`), changelog)
 
     const release = await createGithubRelease({
-        version: packagejson.version,
+        version: currentVersion,
         changelog,
     }).catch((err) => {
         console.error(`🆘 Failed to create release: ${err}`)
