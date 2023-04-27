@@ -1,5 +1,5 @@
 {
-  "name": "wrapper",
+  "name": "@comty/web-wrapper",
   "version": "0.44.1",
   "main": "./src/index.js",
   "license": "MIT",
