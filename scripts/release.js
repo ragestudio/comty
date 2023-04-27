@@ -67,15 +67,15 @@ async function createAppDistBundle() {
 }
 
 async function compressDistBundle() {
+    const outPath = path.resolve(appDistPath, "../app_dist.7z")
+
     if (process.argv.includes("--noCompress") || process.argv.includes("--noBuild")) {
         console.log("🔥 Skipping compress due to `noBuild` or `noCompress` argument")
-        return true
+        return outPath
     }
 
     // compress with 7zip
     console.log("⚒  Compressing app...")
-
-    const outPath = path.resolve(appDistPath, "../app_dist.7z")
 
     // check if out file exists
     if (fs.existsSync(outPath)) {
@@ -208,7 +208,7 @@ async function main() {
     const bundlePath = await compressDistBundle()
 
     const changelog = await composeChangelog()
-    
+
     const changelogFilepath = path.resolve(changelogsPath, `v${currentVersion.split(".").join("-")}.md`)
 
     console.log(`📝 Writing changelog to file > ${changelogFilepath}`)
