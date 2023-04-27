@@ -97,7 +97,7 @@ async function compressDistBundle() {
     return outPath
 }
 
-async function uploadAssets({ release, bundlePath, changelogPath }) {
+async function uploadAssets({ release, bundlePath, changelogFilepath }) {
     // check if has `noPublish` argument, if true, skip uploading assets
     if (process.argv.includes("--noPublish")) {
         console.log("🔥 Skipping upload assets due to `noPublish` argument")
@@ -121,7 +121,7 @@ async function uploadAssets({ release, bundlePath, changelogPath }) {
         owner: repo.split("/")[0],
         repo: repo.split("/")[1],
         name: "changelog.md",
-        data: fs.readFileSync(changelogPath)
+        data: fs.readFileSync(changelogFilepath)
     })
 
     if (!appDistAsset) {
