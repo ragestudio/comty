@@ -4,6 +4,7 @@ import { SliderPicker } from "react-color"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 import config from "config"
+import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
 import AuthModel from "models/auth"
 
@@ -114,6 +115,10 @@ const SettingItem = (props) => {
 
         if (item.storaged) {
             await window.app.cores.settings.set(item.id, updateValue)
+        }
+
+        if (item.storaged && typeof item.beforeSave === "function") {
+            await item.beforeSave(updateValue)
         }
 
         if (typeof item.emitEvent !== "undefined") {
@@ -292,6 +297,7 @@ const SettingItem = (props) => {
     item.props["disabled"] = disabled
 
     const elementsCtx = {
+        updateCurrentValue: (value) => setValue(value),
         currentValue: value,
         dispatchUpdate,
         onUpdateItem,
@@ -337,6 +343,7 @@ const SettingItem = (props) => {
                             onClick={handleOnClick}
                             icon={action.icon && createIconRender(action.icon)}
                             type={action.type ?? "round"}
+                            disabled={item.props.disabled}
                         >
                             {action.title}
                         </antd.Button>
@@ -551,7 +558,11 @@ const generateMenuItems = () => {
 }
 
 export default () => {
-    const [activeKey, setActiveKey] = React.useState("general")
+    const [activeKey, setActiveKey] = useUrlQueryActiveKey({
+        defaultKey: "general",
+        queryKey: "tab"
+    })
+
     const [menuItems, setMenuItems] = React.useState([])
 
     const onChangeTab = (event) => {
