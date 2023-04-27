@@ -97,7 +97,7 @@ async function compressDistBundle() {
     return outPath
 }
 
-async function uploadAssets({ release, bundlePath }) {
+async function uploadAssets({ release, bundlePath, changelogPath }) {
     // check if has `noPublish` argument, if true, skip uploading assets
     if (process.argv.includes("--noPublish")) {
         console.log("🔥 Skipping upload assets due to `noPublish` argument")
@@ -116,7 +116,19 @@ async function uploadAssets({ release, bundlePath }) {
         data: fs.readFileSync(bundlePath)
     })
 
+    const changelogAsset = await octokit.repos.uploadReleaseAsset({
+        release_id: release.id,
+        owner: repo.split("/")[0],
+        repo: repo.split("/")[1],
+        name: "changelog.md",
+        data: fs.readFileSync(changelogPath)
+    })
+
     if (!appDistAsset) {
+        return false
+    }
+
+    if (!changelogAsset) {
         return false
     }
 
@@ -196,11 +208,13 @@ async function main() {
     const bundlePath = await compressDistBundle()
 
     const changelog = await composeChangelog()
+    
+    const changelogFilepath = path.resolve(changelogsPath, `v${currentVersion.split(".").join("-")}.md`)
 
-    console.log("📝 Writing changelog to file...")
+    console.log(`📝 Writing changelog to file > ${changelogFilepath}`)
 
     // write changelog to file
-    fs.writeFileSync(path.resolve(changelogsPath, `v${currentVersion.replace(".", "-")}.md`), changelog)
+    fs.writeFileSync(changelogFilepath, changelog)
 
     const release = await createGithubRelease({
         version: currentVersion,
@@ -212,7 +226,7 @@ async function main() {
 
     if (!release) return
 
-    const assets = await uploadAssets({ release, bundlePath }).catch((err) => {
+    const assets = await uploadAssets({ release, bundlePath, changelogFilepath }).catch((err) => {
         console.error(`🆘 Failed to upload asset: ${err}`, err.response)
         return false
     })
