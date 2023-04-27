@@ -1,5 +1,5 @@
 import React from "react"
-import { Menu, Avatar, Button } from "antd"
+import { Menu, Avatar, Button, Dropdown } from "antd"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 
@@ -182,6 +182,7 @@ export default class Sidebar extends React.Component {
 			visible: false,
 			elevated: false,
 			expanded: false,
+			dropdownOpen: false,
 			pathResolvers: null,
 			menus: null,
 
@@ -315,9 +316,31 @@ export default class Sidebar extends React.Component {
 	}
 
 	toggleExpanded = (to) => {
-		this.setState({ expanded: to ?? !this.state.expanded })
+		to = to ?? !this.state.expanded
 
-		app.eventBus.emit("sidebar.expanded", to ?? !this.state.expanded)
+		if (this.collapseDebounce) {
+			clearTimeout(this.collapseDebounce)
+			this.collapseDebounce = null
+		}
+
+		if (!to & this.state.dropdownOpen && !this.state._shouldCollapse) {
+			// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
+			// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
+			//this.setState({ dropdownOpen: false })
+
+			this.setState({ _shouldCollapse: true })
+			return false
+		}
+
+		if (!to) {
+			this.collapseDebounce = setTimeout(() => {
+				this.setState({ expanded: to })
+			}, window.app.cores.settings.get("autoCollapseDelay") ?? 500)
+		} else {
+			this.setState({ expanded: to })
+		}
+
+		app.eventBus.emit("sidebar.expanded", to)
 	}
 
 	toggleVisibility = (to) => {
@@ -333,13 +356,7 @@ export default class Sidebar extends React.Component {
 
 		if (window.app.cores.settings.is("collapseOnLooseFocus", false)) return
 
-		clearTimeout(this.collapseDebounce)
-
-		this.collapseDebounce = null
-
-		if (!this.state.expanded) {
-			this.toggleExpanded(true)
-		}
+		this.toggleExpanded(true)
 	}
 
 	handleMouseLeave = () => {
@@ -347,10 +364,60 @@ export default class Sidebar extends React.Component {
 
 		if (window.app.cores.settings.is("collapseOnLooseFocus", false)) return
 
-		if (this.state.expanded) {
-			this.collapseDebounce = setTimeout(() => {
-				this.toggleExpanded(false)
-			}, window.app.cores.settings.get("autoCollapseDelay") ?? 500)
+		this.toggleExpanded(false)
+	}
+
+	onDropdownOpenChange = (to) => {
+		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
+		if (this.state._shouldCollapse) {
+			this.setState({ _shouldCollapse: false })
+			this.toggleExpanded(false)
+		}
+
+		this.setState({ dropdownOpen: to })
+	}
+
+	generateDropdownItems = () => {
+		return [
+			{
+				key: "account",
+				label: <>
+					<Icons.User />
+					<Translation>
+						{t => t("Account")}
+					</Translation>
+				</>,
+			},
+			{
+				type: "divider"
+			},
+			{
+				key: "switch_account",
+				label: <>
+					<Icons.MdSwitchAccount />
+					<Translation>
+						{t => t("Switch account")}
+					</Translation>
+				</>,
+			},
+			{
+				key: "logout",
+				label: <>
+					<Icons.LogOut />
+					<Translation>
+						{t => t("Logout")}
+					</Translation>
+				</>,
+				danger: true
+			}
+		]
+	}
+
+	onClickDropdownItem = (item) => {
+		const handler = onClickHandlers[item.key]
+
+		if (typeof handler === "function") {
+			handler()
 		}
 	}
 
@@ -442,15 +509,24 @@ export default class Sidebar extends React.Component {
 								</Translation>
 							</Menu.Item>
 							{
-								app.userData && <Menu.Item
-									key="account"
-									className="user_avatar"
-									onClick={() => {
-										window.app.navigation.goToAccount()
+								app.userData && <Dropdown
+									menu={{
+										items: this.generateDropdownItems(),
+										onClick: this.onClickDropdownItem
 									}}
+									autoFocus
+									placement="top"
+									trigger={["click"]}
+									onOpenChange={this.onDropdownOpenChange}
 								>
-									<Avatar shape="square" src={app.userData?.avatar} />
-								</Menu.Item>
+									<Menu.Item
+										key="account"
+										className="user_avatar"
+										ignoreClick
+									>
+										<Avatar shape="square" src={app.userData?.avatar} />
+									</Menu.Item>
+								</Dropdown>
 							}
 							{
 								!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
