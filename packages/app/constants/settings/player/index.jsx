@@ -1,3 +1,5 @@
+import loadable from "@loadable/component"
+
 export default {
     id: "player",
     icon: "PlayCircleOutlined",
@@ -40,6 +42,56 @@ export default {
             },
             storaged: true,
             disabled: true,
+        },
+        {
+            id: "player.compressor",
+            title: "Compression",
+            icon: "MdGraphicEq",
+            group: "general",
+            description: "Enable compression for audio output",
+            component: "Switch",
+            experimental: true,
+            beforeSave: (value) => {
+                if (value) {
+                    app.cores.player.compressor.attach()
+                } else {
+                    app.cores.player.compressor.detach()
+                }
+            },
+            storaged: true,
+        },
+        {
+            id: "player.compressor.values",
+            title: "Compression adjustment",
+            icon: "Sliders",
+            group: "general",
+            description: "Adjust compression values (Warning: may cause distortion when changing values)",
+            experimental: true,
+            extraActions: [
+                {
+                    id: "reset",
+                    title: "Reset",
+                    icon: "MdRefresh",
+                    onClick: (ctx) => {
+                        const values = app.cores.player.compressor.resetDefaultValues()
+
+                        ctx.updateCurrentValue(values)
+                    }
+                }
+            ],
+            defaultValue: () => {
+                return app.cores.player.compressor.values
+            },
+            onUpdate: (value) => {
+                app.cores.player.compressor.modifyValues(value)
+
+                return value
+            },
+            component: loadable(() => import("../components/compressorValues")),
+            dependsOn: {
+                "player.compressor": true
+            },
+            storaged: false,
         }
     ]
 }
