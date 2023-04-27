@@ -80,7 +80,7 @@ async function getChangeLogString() {
         }).reduce((a, b) => a + b, 0)
 
         return `* [+${additions}/-${deletions}][${commit.packages.join(" | ")}] [${commit.message}](${commit.url}) - by [@${commit.author}](${commit.authorUrl})`
-    }).join("\n")
+    }).join("\n\n")
 
     changelogString = changelogString.trim()
 
