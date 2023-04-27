@@ -3,17 +3,47 @@ const fs = require("fs")
 
 const validTypes = ["patch", "minor", "major"]
 
-async function bumpVersion(type, count, noWrite = false) {
+async function bumpVersion({
+    type,
+    count = 1,
+    noWrite = false,
+    root = path.resolve(__dirname, "..", "..")
+}) {
     if (!validTypes.includes(type)) {
         console.error("Invalid version type")
         return false
     }
 
-    // read all directories from `./packages` and __dirname/..
-    // find `package.json` files
-    // and bump depending on the `type` argument (patch, minor, major)
-    // write into `package.json` files
-    // exclude gitignored
+    const rootPkgjson = require(path.resolve(root, "package.json"))
+
+    if (!rootPkgjson || !rootPkgjson.version) {
+        console.error("Invalid root package.json")
+        return false
+    }
+
+    let newVersion = rootPkgjson.version
+
+    newVersion = rootPkgjson.version.split(".")
+
+    switch (type) {
+        case "patch":
+            newVersion[2] = parseInt(newVersion[2]) + Number(count ?? 1)
+            break
+        case "minor":
+            newVersion[1] = parseInt(newVersion[1]) + Number(count ?? 1)
+            newVersion[2] = 0
+            break
+        case "major":
+            newVersion[0] = parseInt(newVersion[0]) + Number(count ?? 1)
+            newVersion[1] = 0
+            newVersion[2] = 0
+            break
+        default:
+            console.error("Invalid version type")
+            return false
+    }
+
+    newVersion = newVersion.join(".")
 
     const ignore = fs.readFileSync(path.resolve(process.cwd(), ".gitignore"), "utf8").split("\n").filter(line => line !== "").filter(line => !line.startsWith("#"))
 
@@ -31,7 +61,7 @@ async function bumpVersion(type, count, noWrite = false) {
         return regex
     })
 
-    const packagesPath = path.resolve(__dirname, "..", "..", "packages")
+    const packagesPath = path.resolve(root, "packages")
 
     let packages = fs.readdirSync(packagesPath)
 
@@ -56,44 +86,32 @@ async function bumpVersion(type, count, noWrite = false) {
     // filter out non-package.json
     packages = packages.filter((package) => fs.existsSync(path.resolve(packagesPath, package, "package.json")))
 
-    for (let package of packages) {
+    for await (let package of packages) {
         const pkgjson = require(path.resolve(packagesPath, package, "package.json"))
 
         if (!pkgjson || !pkgjson.version) {
             continue
         }
 
-        let version = pkgjson.version.split(".")
+        console.log(`⏩ Bumped [${pkgjson.name}] ${pkgjson.version} to ${newVersion}`)
 
-        switch (type) {
-            case "patch":
-                version[2] = parseInt(version[2]) + Number(count ?? 1)
-                break
-            case "minor":
-                version[1] = parseInt(version[1]) + Number(count ?? 1)
-                break
-            case "major":
-                version[0] = parseInt(version[0]) + Number(count ?? 1)
-                break
-            default:
-                console.error("Invalid version type")
-                return false
-        }
-
-        version = version.join(".")
-
-        console.log(`⏩ Bumped [${pkgjson.name}] ${pkgjson.version} to ${version}`)
-
-        pkgjson.version = version
+        pkgjson.version = newVersion
 
         if (noWrite) {
             continue
         }
 
-        fs.writeFileSync(path.resolve(packagesPath, package, "package.json"), JSON.stringify(pkgjson, null, 4))
+        return await fs.writeFileSync(path.resolve(packagesPath, package, "package.json"), JSON.stringify(pkgjson, null, 4))
     }
 
-    return true
+    // write root package.json
+    if (!noWrite) {
+        rootPkgjson.version = newVersion
+
+        await fs.writeFileSync(path.resolve(root, "package.json"), JSON.stringify(rootPkgjson, null, 4))
+    }
+
+    return newVersion
 }
 
 module.exports = bumpVersion
