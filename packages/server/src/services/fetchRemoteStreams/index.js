@@ -2,8 +2,10 @@ import axios from "axios"
 
 import { StreamingCategory, StreamingProfile, User } from "@models"
 
-const streamingServerAPIAddress = process.env.STREAMING_API_SERVER ?? ""
+import composeStreamingSources from "@utils/compose-streaming-sources"
+import lodash from "lodash"
 
+const streamingServerAPIAddress = process.env.STREAMING_API_SERVER ?? ""
 const streamingServerAPIUri = `${streamingServerAPIAddress.startsWith("https") ? "https" : "http"}://${streamingServerAPIAddress.split("://")[1]}`
 
 export default async (stream_id) => {
@@ -55,6 +57,8 @@ export default async (stream_id) => {
 
         user = user.toObject()
 
+        const sources = composeStreamingSources(user.username, profile._id)
+
         return {
             profile_id: profile._id,
             info: profile.info,
@@ -64,11 +68,7 @@ export default async (stream_id) => {
             video,
             audio,
             connectedClients: clients ?? 0,
-            sources: {
-                hls: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.m3u8`,
-                flv: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.flv`,
-                aac: `${streamingServerAPIUri}/stream/${user.username}:${profile._id}/src.aac`,
-            }
+            sources: lodash.pick(sources, ["rtmp", "hls", "flv", "aac"]),
         }
     })
 

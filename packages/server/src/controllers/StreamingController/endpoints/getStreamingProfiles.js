@@ -1,5 +1,6 @@
 import { StreamingProfile } from "@models"
 import NewStreamingProfile from "@services/newStreamingProfile"
+import composeStreamingSources from "@utils/compose-streaming-sources"
 
 export default {
     method: "GET",
@@ -39,12 +40,7 @@ export default {
         })
 
         profiles = profiles.map((profile) => {
-            profile.addresses = {
-                ingest: process.env.STREAMING_INGEST_SERVER,
-                hls: `${process.env.STREAMING_API_SERVER}/live/${req.user.username}:${profile._id}/src.m3u8`,
-                flv: `${process.env.STREAMING_API_SERVER}/live/${req.user.username}:${profile._id}/src.flv`,
-                aac: `${process.env.STREAMING_API_SERVER}/radio/${req.user.username}:${profile._id}/src.aac`,
-            }
+            profile.addresses = composeStreamingSources(req.user.username, profile._id)
 
             return profile
         })
