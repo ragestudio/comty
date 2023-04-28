@@ -1,13 +1,29 @@
+<img 
+    src="https://storage.ragestudio.net/rstudio/branding/comty/comty_banner_transparent.svg" 
+    width="100%" 
+    alt="Comty logo"
+/>
 
-# Comty - An prototype of a social network
+# Comty - A prototype of a social network
 ![CodeQL](https://github.com/srgooglo/comty/workflows/CodeQL/badge.svg?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
-[![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/2DTjxvnhXG)
+[![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
 
-A prototype of a platform inside of application focused on microservices, extensible and modular, in which the application adapts to your needs, where you will find tools and services allowing you to facilitate colaboration with other people in a social way.
+A prototype of a platform inside of application focused on services and creatives.
 
-## Local development
+## 🌟 Some of features
+🚀 Real-time updates are provided to users about various activities such as new followers, likes, posts, comments, and more, thanks to a bid event engine that uses websockets.
+
+📝 A microblogging system similar to Twitter allows users to post short messages with attachments and more.
+
+🎥 Comty TV is a live video streaming feature that allows users to stream their videos, events, or anything else in real-time to other users. It provides playback anywhere, including HLS, RTMP, FLV, and WebRTC, without vendor lock-in.
+
+🎶 Comty Music lets users publish their music masterpieces, share their playlists with other users, and synchronize their music with other platforms. A powerful music player is also included in the application.
+
+🧩 Modular and Extensible architecture allows developers to create and publish extensions for the platform using the powerful API provided by Comty.
+
+## 🚀 Development
 ### Prerequisites
 For local development you will need to have installed some tools:
 
@@ -17,6 +33,7 @@ For local development you will need to have installed some tools:
 
 - Install [Docker](https://docs.docker.com/get-docker/), used for building and deployment
 
+### Setup
 - Getting the repository
 ```shell
 git clone https://github.com/ragestudio/comty && cd comty
@@ -31,14 +48,13 @@ yarn
 - You can use the command `yarn dev` to start all development servers with the `nodemon` package, which will restart the server when a file is changed.
 
 ## Status
-This project is in a alpha design phase, there are still many phases to go through.
+😎 The project is in alpha design phase, and the development is slow but continuous, prioritizing quality to ensure the project base is preserved for a long time.
 
-At the moment the ***development is slow but without pause***, because being a very complicated and important phase, we are **prioritizing quality** so that the project base can be preserved for a **long time**.
+## 👥 The Comty team is looking for new members, and any contribution to the project is very welcome.
+> If you are interested in more depth in the project, you can join our [Discord server](https://discord.gg/yxQR6EXf2F) and talk to us.
 
-Now **we are looking** for a team too.
-Anyway, anyone interested, we are **looking for you**. 
+## Contributions 🤝
+Contributions to Comty are welcome. If you want to contribute, please follow the instructions mentioned in the CONTRIBUTING.md file.
 
-***Any contribution is very grateful, we need you more than ever!***
-
-## Tech
-![tech](https://dl.ragestudio.net/persistent/CbEWXaE3cB35Rm2TFhY4Hnezr2P7qbtGDG86MPWUa6.png)
+## License 📜
+Comty is licensed under the LGPL-2.1 license. See the LICENSE file for more details.
