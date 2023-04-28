@@ -12,6 +12,8 @@
 
 A prototype of a platform inside of application focused on services and creatives.
 
+> 👋 We have a open alpha preview version of the project, you can access it from [https://preview.comty.app](https://preview.comty.app)
+
 ## 🌟 Some of features
 🚀 Real-time updates are provided to users about various activities such as new followers, likes, posts, comments, and more, thanks to a bid event engine that uses websockets.
 
