@@ -1,4 +1,6 @@
 .searcher {
+    position: relative;
+
     display: flex;
     flex-direction: column;
 
@@ -6,6 +8,8 @@
     justify-content: center;
 
     transition: all 0.3s ease-in-out;
+
+    gap: 20px;
 
     .ant-input-affix-wrapper {
         border: 0;
@@ -34,6 +38,8 @@
     }
 
     .results {
+        position: relative;
+
         display: flex;
         flex-direction: column;
 
@@ -43,37 +49,33 @@
         width: 100%;
 
         padding: 10px;
-        margin-top: 20px;
 
         background-color: var(--background-color-primary);
 
         border-radius: 8px;
 
+        gap: 10px;
+
         .category {
+            h3 {
+                font-size: 1rem;
+                font-weight: 600;
+            }
+
             width: 100%;
 
-            margin-bottom: 20px;
-
-            h3 {
-                font-size: 2rem;
-                font-weight: 600;
-
-                margin-bottom: 10px;
-            }
+            gap: 10px;
 
             .suggestions {
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
 
-                width: 90%;
-
-                margin: auto;
+                gap: 10px;
 
                 .suggestion {
                     width: 100%;
 
-                    margin-bottom: 10px;
                     padding: 10px;
 
                     border-radius: 8px;
