@@ -68,8 +68,11 @@ const Results = (props) => {
         }
 
         return <div className="category" id={type}>
-            <h3>{createIconRender(decorator.icon)}{decorator.label}</h3>
             <div className="suggestions">
+                <span>
+                    <span className="icon">{createIconRender(decorator.icon)}</span>
+                    <span className="label">{decorator.label}</span>
+                </span>
                 {
                     results[type].map((item) => {
                         return React.createElement(ResultRenders[type], { item, onClick: (...props) => handleOnClick(type, ...props) })
