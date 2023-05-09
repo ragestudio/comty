@@ -47,30 +47,41 @@ export default class ProcessorNode {
         const prevNode = instance.attachedProcessors[index - 1]
         const nextNode = instance.attachedProcessors[index + 1]
 
-        // first check if has prevNode and if is connected to the destination
+        const currentIndex = this._findIndex(instance)
+
+        // check if is already attached
+        if (currentIndex !== false) {
+            console.warn(`[${this.constructor.refName ?? this.constructor.name}] node is already attached`)
+
+            return instance
+        }
+
+        // first check if has prevNode and if is connected to something
+        // if has, disconnect it
+        // if it not has, its means that is the first node, so connect to the media source
         if (prevNode && prevNode.processor.numberOfOutputs > 0) {
+            //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is already attached to the previous node, disconnecting...`)
             // if has outputs, disconnect from the next node
             prevNode.processor.disconnect()
-        }
 
-        if (prevNode) {
+            // now, connect to the processor
             prevNode.processor.connect(this.processor)
         } else {
-            // it means that this is the first node, so connect to the source
-            instance.track.connect(this.processor)
+            //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is the first node, connecting to the media source...`)
+            instance.media.connect(this.processor)
         }
 
-        // now, connect the processor to the next node
+        // now, check if it has a next node
+        // if has, connect to it
+        // if not, connect to the destination
         if (nextNode) {
             this.processor.connect(nextNode.processor)
-        } else {
-            // it means that this is the last node, so connect to the destination
-            this.processor.connect(this.audioContext.destination)
         }
 
         // add to the attachedProcessors
         instance.attachedProcessors.splice(index, 0, this)
 
+        // handle instance mutation
         if (typeof this.mutateInstance === "function") {
             instance = this.mutateInstance(instance)
         }
@@ -84,13 +95,9 @@ export default class ProcessorNode {
         }
 
         // find index of the node within the attachedProcessors serching for matching refName
-        const index = instance.attachedProcessors.findIndex((node) => {
-            return node.constructor.refName === this.constructor.refName
-        })
+        const index = this._findIndex(instance)
 
-        if (index === -1) {
-            console.warn(`Node [${this.constructor.refName ?? this.constructor.name}] is not attached to the given instance`)
-
+        if (!index) {
             return instance
         }
 
@@ -105,7 +112,7 @@ export default class ProcessorNode {
         }
 
         // disconnect 
-        this.processor.disconnect()
+        instance = this._destroy(instance)
 
         // now, connect the previous node to the next node
         if (prevNode && nextNode) {
@@ -115,9 +122,47 @@ export default class ProcessorNode {
             prevNode.processor.connect(this.audioContext.destination)
         }
 
-        // remove from the attachedProcessors
+        return instance
+    }
+
+    _destroy(instance) {
+        if (typeof instance !== "object") {
+            instance = this.PlayerCore.currentAudioInstance
+        }
+
+        const index = this._findIndex(instance)
+
+        if (!index) {
+            return instance
+        }
+
+        this.processor.disconnect()
+
         instance.attachedProcessors.splice(index, 1)
 
         return instance
+    }
+
+    _findIndex(instance) {
+        if (!instance) {
+            instance = this.PlayerCore.currentAudioInstance
+        }
+
+        if (!instance) {
+            console.warn(`Instance is not defined`)
+
+            return false
+        }
+
+        // find index of the node within the attachedProcessors serching for matching refName
+        const index = instance.attachedProcessors.findIndex((node) => {
+            return node.constructor.refName === this.constructor.refName
+        })
+
+        if (index === -1) {
+            return false
+        }
+
+        return index
     }
 }
