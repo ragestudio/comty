@@ -18,11 +18,11 @@ export default class Player extends Core {
 
     static namespace = "player"
 
+    static maxBufferLoadQueue = 2
+
     currentDomWindow = null
 
     audioContext = new AudioContext()
-
-    static maxBufferLoadQueue = 2
 
     bufferLoadQueue = []
     bufferLoadQueueLoading = false
@@ -49,8 +49,6 @@ export default class Player extends Core {
         coverColorAnalysis: null,
         currentAudioManifest: null,
         playbackStatus: "stopped",
-        crossfading: false,
-        trackBPM: 0,
         livestream: false,
     })
 
@@ -64,7 +62,23 @@ export default class Player extends Core {
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
         attachProcessor: function (name) {
+            // find the processor by refName
+            const processor = this.audioProcessors.find((_processor) => {
+                return _processor.constructor.refName === name
+            })
 
+            if (!processor) {
+                throw new Error("Processor not found")
+            }
+
+            if (typeof processor._attach !== "function") {
+                throw new Error("Processor does not support attach")
+            }
+
+            this.currentAudioInstance = processor._attach(this.currentAudioInstance)
+
+            // attach last one to the destination
+            //this.currentAudioInstance.attachedProcessors[this.currentAudioInstance.attachedProcessors.length - 1].processor.connect(this.audioContext.destination)
         }.bind(this),
         dettachProcessor: async function (name) {
             // find the processor by refName
@@ -155,8 +169,7 @@ export default class Player extends Core {
         close: this.close.bind(this),
     }
 
-    async onInitialize() {
-        // initialize all audio processors
+    async initializeAudioProcessors() {
         for await (const processor of this.audioProcessors) {
             console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
 
@@ -183,7 +196,9 @@ export default class Player extends Core {
                 })
             }
         }
+    }
 
+    observeStateChanges() {
         Observable.observe(this.state, (changes) => {
             changes.forEach((change) => {
                 if (change.type === "update") {
@@ -288,25 +303,14 @@ export default class Player extends Core {
         })
     }
 
-    // async instanciateRealtimeAnalyzerNode() {
-    //     if (this.realtimeAnalyzerNode) {
-    //         return false
-    //     }
+    async onInitialize() {
+        this.initializeAudioProcessors()
+        this.observeStateChanges()
+    }
 
-    //     this.realtimeAnalyzerNode = await createRealTimeBpmProcessor(this.audioContext)
-
-    //     this.realtimeAnalyzerNode.port.onmessage = (event) => {
-    //         if (event.data.result.bpm[0]) {
-    //             if (this.state.trackBPM != event.data.result.bpm[0].tempo) {
-    //                 this.state.trackBPM = event.data.result.bpm[0].tempo
-    //             }
-    //         }
-
-    //         if (event.data.message === "BPM_STABLE") {
-    //             console.log("BPM STABLE", event.data.result)
-    //         }
-    //     }
-    // }
+    //
+    // UI Methods
+    //
 
     attachPlayerComponent() {
         if (this.currentDomWindow) {
@@ -331,21 +335,9 @@ export default class Player extends Core {
         this.currentDomWindow = null
     }
 
-    destroyCurrentInstance() {
-        if (!this.currentAudioInstance) {
-            return false
-        }
-
-        // stop playback
-        if (this.currentAudioInstance.audioElement) {
-            this.currentAudioInstance.audioElement.pause()
-        }
-
-        this.currentAudioInstance = null
-
-        // reset livestream mode
-        this.state.livestream = false
-    }
+    //
+    // Buffer methods
+    //
 
     enqueueLoadBuffer(audioElement) {
         if (!audioElement) {
@@ -408,6 +400,38 @@ export default class Player extends Core {
         return true
     }
 
+    async abortPreloads() {
+        for await (const instance of this.audioQueue) {
+            if (instance.abortController?.abort) {
+                instance.abortController.abort()
+            }
+        }
+
+        // clear load buffer audio queue
+        this.loadBufferAudioQueue = []
+        this.bufferLoadQueueLoading = false
+    }
+
+    //
+    //  Instance managing methods
+    //
+
+    async destroyCurrentInstance() {
+        if (!this.currentAudioInstance) {
+            return false
+        }
+
+        // stop playback
+        if (this.currentAudioInstance.audioElement) {
+            this.currentAudioInstance.audioElement.pause()
+        }
+
+        this.currentAudioInstance = null
+
+        // reset livestream mode
+        this.state.livestream = false
+    }
+
     async createInstance(manifest) {
         if (!manifest) {
             console.error("Manifest is required")
@@ -426,21 +450,19 @@ export default class Player extends Core {
             return false
         }
 
-        const audioSource = manifest.src ?? manifest.source
+        const source = manifest.src ?? manifest.source
 
+        // if title is not set, use the audio source filename
         if (!manifest.title) {
-            manifest.title = audioSource.split("/").pop()
+            manifest.title = source.split("/").pop()
         }
 
         let instanceObj = {
             abortController: new AbortController(),
-            audioElement: new Audio(audioSource),
-            audioSource: audioSource,
+            audioElement: new Audio(source),
+            media: null,
+            source: source,
             manifest: manifest,
-            track: null,
-            gainNode: null,
-            crossfadeInterval: null,
-            crossfading: false,
             attachedProcessors: [],
         }
 
@@ -449,51 +471,9 @@ export default class Player extends Core {
         instanceObj.audioElement.crossOrigin = "anonymous"
         instanceObj.audioElement.preload = "none"
 
-        const createCrossfadeInterval = () => {
-            console.warn("Crossfader is not supported yet")
-            return false
-
-            const crossfadeDuration = app.cores.settings.get("player.crossfade")
-
-            if (crossfadeDuration === 0) {
-                return false
-            }
-
-            if (instanceObj.crossfadeInterval) {
-                clearInterval(instanceObj.crossfadeInterval)
-            }
-
-            // fix audioElement.duration to be the duration of the audio minus the crossfade time
-            const crossfadeTime = Number.parseFloat(instanceObj.audioElement.duration).toFixed(0) - crossfadeDuration
-
-            const crossfaderTick = () => {
-                // check the if current audio has reached the crossfade time
-                if (instanceObj.audioElement.currentTime >= crossfadeTime) {
-                    instanceObj.crossfading = true
-
-                    this.next({
-                        crossfading: crossfadeDuration,
-                        instance: instanceObj
-                    })
-
-                    clearInterval(instanceObj.crossfadeInterval)
-                }
-            }
-
-            crossfaderTick()
-
-            instanceObj.crossfadeInterval = setInterval(() => {
-                crossfaderTick()
-            }, 1000)
-        }
-
         // handle on end
         instanceObj.audioElement.addEventListener("ended", () => {
             // cancel if is crossfading
-            if (this.state.crossfading || instanceObj.crossfading) {
-                return false
-            }
-
             this.next()
         })
 
@@ -514,15 +494,9 @@ export default class Player extends Core {
                 clearTimeout(this.waitUpdateTimeout)
                 this.waitUpdateTimeout = null
             }
-
-            createCrossfadeInterval()
         })
 
         instanceObj.audioElement.addEventListener("pause", () => {
-            if (this.state.crossfading || instanceObj.crossfading) {
-                return false
-            }
-
             this.state.playbackStatus = "paused"
 
             if (instanceObj.crossfadeInterval) {
@@ -559,20 +533,44 @@ export default class Player extends Core {
             createCrossfadeInterval()
         })
 
-        // detect if the audio is a live stream
-        instanceObj.audioElement.addEventListener("loadedmetadata", () => {
-            if (instanceObj.audioElement.duration === Infinity) {
-                instanceObj.manifest.stream = true
-            }
-        })
+        // // detect if the audio is a live stream
+        // instanceObj.audioElement.addEventListener("loadedmetadata", () => {
+        //     if (instanceObj.audioElement.duration === Infinity) {
+        //         instanceObj.manifest.stream = true
+        //     }
+        // })
 
         //this.enqueueLoadBuffer(instanceObj.audioElement)
 
-        // create media element source as first node
-        instanceObj.track = this.audioContext.createMediaElementSource(instanceObj.audioElement)
+        instanceObj.media = this.audioContext.createMediaElementSource(instanceObj.audioElement)
 
         return instanceObj
     }
+
+    async attachProcessorsToInstance(instance) {
+        for await (const [index, processor] of this.audioProcessors.entries()) {
+            if (typeof processor._attach !== "function") {
+                console.error(`Processor ${processor.constructor.refName} not support attach`)
+
+                continue
+            }
+
+            instance = await processor._attach(instance, index)
+        }
+
+        const lastProcessor = instance.attachedProcessors[instance.attachedProcessors.length - 1].processor
+
+        console.log("Attached processors", instance.attachedProcessors)
+
+        // now attach to destination
+        lastProcessor.connect(this.audioContext.destination)
+
+        return instance
+    }
+
+    //
+    // Playback methods
+    //
 
     async play(instance, params = {}) {
         if (typeof instance === "number") {
@@ -591,18 +589,22 @@ export default class Player extends Core {
             this.attachPlayerComponent()
         }
 
-        this.currentAudioInstance = instance
-        this.state.currentAudioManifest = instance.manifest
+        // check if already exists a current instance
+        // if exists, destroy it
+        // but before, try to detach the last procesor attched to destination
+        if (this.currentAudioInstance) {
+            this.currentAudioInstance = this.currentAudioInstance.attachedProcessors[this.currentAudioInstance.attachedProcessors.length - 1]._destroy(this.currentAudioInstance)
 
-        for await (const [index, processor] of this.audioProcessors.entries()) {
-            if (typeof processor._attach !== "function") {
-                console.error(`Processor ${processor.constructor.refName} not support attach`)
-
-                continue
-            }
-
-            this.currentAudioInstance = await processor._attach(this.currentAudioInstance, index)
+            this.destroyCurrentInstance()
         }
+
+        // attach processors
+        instance = await this.attachProcessorsToInstance(instance)
+
+        // now set the current instance
+        this.currentAudioInstance = instance
+
+        this.state.currentAudioManifest = instance.manifest
 
         // set time to 0
         this.currentAudioInstance.audioElement.currentTime = 0
@@ -691,7 +693,7 @@ export default class Player extends Core {
         this.play(this.audioQueue[0])
     }
 
-    next(params = {}) {
+    next() {
         if (this.audioQueue.length > 0) {
             // move current audio instance to history
             this.audioQueueHistory.push(this.audioQueue.shift())
@@ -709,32 +711,7 @@ export default class Player extends Core {
             return false
         }
 
-        const nextParams = {}
         let nextIndex = 0
-
-        if (params.crossfading && params.crossfading > 0 && this.state.playbackStatus === "playing" && params.instance) {
-            this.state.crossfading = true
-
-            // calculate the current audio context time with the current audio duration (subtracting time offset)
-            const linearFadeoutTime = Number(
-                this.audioContext.currentTime +
-                Number(params.crossfading.toFixed(2))
-            )
-
-            console.log("linearFadeoutTime", this.audioContext.currentTime, linearFadeoutTime)
-
-            console.log("crossfading offset", (this.currentAudioInstance.audioElement.duration - this.currentAudioInstance.audioElement.currentTime) - Number(params.crossfading.toFixed(2)))
-
-            params.instance.gainNode.gain.linearRampToValueAtTime(0.00001, linearFadeoutTime)
-
-            nextParams.volume = 0
-
-            setTimeout(() => {
-                this.state.crossfading = false
-            }, params.crossfading)
-        } else {
-            this.destroyCurrentInstance()
-        }
 
         // if is in shuffle mode, play a random audio
         if (this.state.playbackMode === "shuffle") {
@@ -742,25 +719,10 @@ export default class Player extends Core {
         }
 
         // play next audio
-        this.play(this.audioQueue[nextIndex], nextParams)
-
-        if (this.state.crossfading) {
-            // calculate the current audio context time (fixing times) with the crossfading duration
-            const linearFadeinTime = Number(this.audioContext.currentTime + Number(params.crossfading.toFixed(2)))
-
-            console.log("linearFadeinTime", this.audioContext.currentTime, linearFadeinTime)
-
-            // set a linear ramp to 1
-            this.currentAudioInstance.gainNode.gain.linearRampToValueAtTime(
-                this.state.audioVolume,
-                linearFadeinTime
-            )
-        }
+        this.play(this.audioQueue[nextIndex])
     }
 
     previous() {
-        this.destroyCurrentInstance()
-
         if (this.audioQueueHistory.length > 0) {
             // move current audio instance to queue
             this.audioQueue.unshift(this.audioQueueHistory.pop())
@@ -774,18 +736,6 @@ export default class Player extends Core {
             // if there is no previous audio, start again from the first audio
             this.play(this.audioQueue[0])
         }
-    }
-
-    async abortPreloads() {
-        for await (const instance of this.audioQueue) {
-            if (instance.abortController?.abort) {
-                instance.abortController.abort()
-            }
-        }
-
-        // clear load buffer audio queue
-        this.loadBufferAudioQueue = []
-        this.bufferLoadQueueLoading = false
     }
 
     stop() {
