@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
+import WidgetsWrapper from "components/WidgetsWrapper"
 import { PagePanelWithNavMenu } from "components/PagePanels"
 
 import { Icons } from "components/Icons"
@@ -50,13 +51,16 @@ export default class Home extends React.Component {
                     <ConnectedFriends />
                 </div>
 
-                <FeaturedEventsAnnouncements />
+                <WidgetsWrapper />
             </>
         }
 
         return <PagePanelWithNavMenu
             tabs={Tabs}
             navMenuHeader={navMenuHeader}
+            extraMenuItems={[
+                <FeaturedEventsAnnouncements />
+            ]}
             extraPanel={extraPanel}
             primaryPanelClassName="full"
             useSetQueryType
