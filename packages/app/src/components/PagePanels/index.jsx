@@ -1,7 +1,6 @@
 import React from "react"
 import classnames from "classnames"
 import * as antd from "antd"
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
 import { createIconRender } from "components/Icons"
 
@@ -20,6 +19,29 @@ export const Panel = (props) => {
     </div>
 }
 
+const NavMenu = (props) => {
+    const handleOnClickItem = (event) => {
+        return props.onClickItem(event.key)
+    }
+
+    return <div className="navmenu_wrapper">
+        {
+            props.header && <div className="card header" id="navMenu">
+                {props.header}
+            </div>
+        }
+
+        <div className="card content" id="navMenu">
+            <antd.Menu
+                mode="inline"
+                selectedKeys={[props.activeKey]}
+                onClick={handleOnClickItem}
+                items={props.items}
+            />
+        </div>
+    </div>
+}
+
 export class PagePanelWithNavMenu extends React.Component {
     state = {
         // if defaultTab is not set, try to get it from query, if not, use the first tab
@@ -35,9 +57,14 @@ export class PagePanelWithNavMenu extends React.Component {
         }
 
         // slip the active tab by splitting on "."
-        const activeTabDirectory = this.state.activeTab.split(".")
+        if (!this.state.activeTab) {
+            console.error("PagePanelWithNavMenu: activeTab is not defined")
+            return <></>
+        }
 
         let tab = null
+
+        const activeTabDirectory = this.state.activeTab.split(".")
 
         activeTabDirectory.forEach((key, index) => {
             if (!tab) {
@@ -72,10 +99,32 @@ export class PagePanelWithNavMenu extends React.Component {
         app.history.replace(`${window.location.pathname}?type=${this.state.activeTab}`)
     }
 
+    tabChange = (key) => {
+        if (this.props.onTabChange) {
+            this.props.onTabChange(key)
+        }
+
+        this.setState({ activeTab: key })
+
+        if (this.props.useSetQueryType) {
+            this.replaceQueryTypeToCurrentTab()
+        }
+    }
+
     handleTabChange = async (key) => {
+        console.log(key)
+
         if (this.state.activeTab === key) return
 
         if (this.props.transition) {
+            if (document.startViewTransition) {
+                return document.startViewTransition(() => {
+                    this.tabChange(key)
+                })
+            }
+
+            console.warn("PagePanelWithNavMenu: transition is enabled but document.startViewTransition is not compatible with your browser")
+
             // set to primary panel fade-opacity-leave class
             this.primaryPanelRef.current.classList.add("fade-opacity-leave")
 
@@ -87,15 +136,7 @@ export class PagePanelWithNavMenu extends React.Component {
             await new Promise(resolve => setTimeout(resolve, 200))
         }
 
-        if (this.props.onTabChange) {
-            this.props.onTabChange(key)
-        }
-
-        this.setState({ activeTab: key })
-
-        if (this.props.useSetQueryType) {
-            this.replaceQueryTypeToCurrentTab()
-        }
+        return this.tabChange(key)
     }
 
     getItems = (items) => {
@@ -118,20 +159,18 @@ export class PagePanelWithNavMenu extends React.Component {
     render() {
         const panels = [
             {
-                children: <div className="card" id="navMenu">
-                    {
-                        this.props.navMenuHeader && <div className="header">
-                            {this.props.navMenuHeader}
-                        </div>
-                    }
-
-                    <antd.Menu
-                        mode="inline"
-                        selectedKeys={[this.state.activeTab]}
-                        onClick={({ key }) => this.handleTabChange(key)}
+                children: <>
+                    <NavMenu
+                        header={this.props.navMenuHeader}
+                        activeKey={this.state.activeTab}
                         items={this.getItems(this.props.tabs)}
+                        onClickItem={(key) => this.handleTabChange(key)}
                     />
-                </div>
+
+                    {
+                        Array.isArray(this.props.extraMenuItems) && this.props.extraMenuItems
+                    }
+                </>
             },
             {
                 props: {
