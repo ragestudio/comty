@@ -4,7 +4,15 @@
 @import "theme/fixments.less";
 @import "theme/mobile.less";
 
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
 html {
+	box-sizing: border-box;
+
 	overflow: hidden;
 	height: 100%;
 	-webkit-overflow-scrolling: touch;
