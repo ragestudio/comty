@@ -50,5 +50,9 @@
     "sync.accounts": {
         "title": "Synced Accounts",
         "icon": "MdLinearScale"
+    },
+    "ui.sounds": {
+        "title": "UI Sounds",
+        "icon": "Volume2"
     }
 }

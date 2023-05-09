@@ -72,12 +72,13 @@ export default {
             "icon": "MdSlowMotionVideo",
             "title": "Low performance mode",
             "description": "Enable low performance mode to reduce the memory usage and improve the performance in low-end devices. This will disable some animations and other decorative features.",
-            "emitEvent": "app.lowPerformanceMode"
+            "emitEvent": "app.lowPerformanceMode",
+            disabled: true,
         },
         {
             id: "ui.effects",
             storaged: true,
-            group: "ui_sounds",
+            group: "ui.sounds",
             component: "Switch",
             icon: "MdVolumeUp",
             title: "UI effects",
@@ -86,7 +87,7 @@ export default {
         {
             id: "ui.general_volume",
             storaged: true,
-            group: "ui_sounds",
+            group: "ui.sounds",
             component: "Slider",
             icon: "MdVolumeUp",
             title: "UI volume",
