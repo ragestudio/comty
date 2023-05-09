@@ -13,7 +13,6 @@ export { default as Login } from "./Login"
 // COMPLEX COMPONENTS
 export { default as FormGenerator } from "./FormGenerator"
 export { default as ActionsBar } from "./ActionsBar"
-export { default as SelectableList } from "./SelectableList"
 export { default as ObjectInspector } from "./ObjectInspector"
 export { default as ModifierTag } from "./ModifierTag"
 export { default as StepsForm } from "./StepsForm"
@@ -56,7 +55,6 @@ export { default as UserBadges } from "./UserBadges"
 export { default as UserCard } from "./UserCard"
 export { default as FollowersList } from "./FollowersList"
 export { default as ConnectedFriends } from "./ConnectedFriends"
-export { default as UserSelector } from "./UserSelector"
 export { default as UserPreview } from "./UserPreview"
 
 // OTHERS
