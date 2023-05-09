@@ -29,6 +29,7 @@ export default {
             icon: "MdOutlineSlowMotionVideo",
             title: "Reduce animations",
             experimental: true,
+            disabled: true,
             storaged: true,
         },
         {
@@ -162,15 +163,18 @@ export default {
             },
             storaged: false,
         },
-        {
-            id: "style.parallaxBackground",
-            group: "aspect",
-            component: "Switch",
-            icon: "MdOutline3DRotation",
-            title: "Parallax background",
-            description: "Create a parallax effect on the background.",
-            storaged: true,
-        },
+        // {
+        //     id: "style.parallaxBackground",
+        //     group: "aspect",
+        //     component: "Switch",
+        //     icon: "MdOutline3DRotation",
+        //     title: "Parallax background",
+        //     description: "Create a parallax effect on the background.",
+        //     dependsOn: {
+        //         "style.backgroundImage": true
+        //     },
+        //     storaged: true,
+        // },
         {
             id: "style.backgroundImage",
             group: "aspect",
