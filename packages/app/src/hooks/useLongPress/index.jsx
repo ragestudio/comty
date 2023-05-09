@@ -5,7 +5,7 @@ export default (
     onClick,
     {
         shouldPreventDefault = true,
-        delay = 300,
+        delay = app.cores.settings.get("longPressDelay") ?? 500,
         onTouchStart,
         onTouchEnd,
     } = {}
@@ -28,27 +28,35 @@ export default (
             }
 
             timeout.current = setTimeout(() => {
-                onLongPress(event)
+                if (typeof onLongPress === "function") {
+                    onLongPress(event)
+                }
+
                 setLongPressTriggered(true)
             }, delay)
         },
         [onLongPress, delay, shouldPreventDefault]
     )
 
-    const clear = useCallback(
-        (event, shouldTriggerClick = true) => {
-            timeout.current && clearTimeout(timeout.current)
-            shouldTriggerClick && !longPressTriggered && onClick()
-            setLongPressTriggered(false)
+    const clear = useCallback((event, shouldTriggerClick = true) => {
+        if (timeout.current) {
+            clearTimeout(timeout.current)
+        }
 
-            if (typeof onTouchEnd === "function") {
-                onTouchEnd()
-            }
+        if (shouldTriggerClick && !longPressTriggered && typeof onClick === "function") {
+            onClick()
+        }
 
-            if (shouldPreventDefault && target.current) {
-                target.current.removeEventListener("touchend", preventDefault)
-            }
-        },
+        setLongPressTriggered(false)
+
+        if (typeof onTouchEnd === "function") {
+            onTouchEnd()
+        }
+
+        if (shouldPreventDefault && target.current) {
+            target.current.removeEventListener("touchend", preventDefault)
+        }
+    },
         [shouldPreventDefault, onClick, longPressTriggered]
     )
 
