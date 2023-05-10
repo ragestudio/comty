@@ -77,6 +77,10 @@
     min-width: 400px;
     max-width: 800px;
 
+    //overflow: hidden;
+
+    box-sizing: border-box !important;
+
     border-radius: 12px;
 
     transition: all 0.2s ease-in-out;
@@ -84,7 +88,7 @@
     background-color: var(--background-color-accent);
     border-radius: 8px;
 
-    &:hover {
+    &.cover-hovering {
         .playlistItem_cover {
             transform: scale(1.1);
         }
@@ -129,15 +133,17 @@
         flex-direction: column;
 
         width: 100%;
-        max-width: 265px;
 
         padding: 10px;
+
+        max-width: calc(100% - 10vh);
 
         transition: all 0.2s ease-in-out;
 
         .playlistItem_info_title {
             font-size: 1rem;
             font-weight: 600;
+
             color: var(--background-color-contrast);
             font-family: "Space Grotesk", sans-serif;
 
@@ -148,8 +154,11 @@
                 overflow: hidden;
 
                 text-overflow: ellipsis;
-                white-space: nowrap;
+                //white-space: nowrap;
                 margin: 0;
+
+                //calculate the max height of the title using 10vh and 30px for the userPreview and padding
+                height: 5vh;
             }
         }
 
