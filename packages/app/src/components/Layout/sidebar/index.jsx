@@ -315,7 +315,7 @@ export default class Sidebar extends React.Component {
 		return window.app.setLocation(`/${e.key}`, 150)
 	}
 
-	toggleExpanded = (to) => {
+	toggleExpanded = (to, force) => {
 		to = to ?? !this.state.expanded
 
 		if (this.collapseDebounce) {
@@ -323,12 +323,11 @@ export default class Sidebar extends React.Component {
 			this.collapseDebounce = null
 		}
 
-		if (!to & this.state.dropdownOpen && !this.state._shouldCollapse) {
+		if (!to & this.state.dropdownOpen && !force) {
 			// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
 			// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
 			//this.setState({ dropdownOpen: false })
 
-			this.setState({ _shouldCollapse: true })
 			return false
 		}
 
@@ -369,9 +368,8 @@ export default class Sidebar extends React.Component {
 
 	onDropdownOpenChange = (to) => {
 		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
-		if (this.state._shouldCollapse) {
-			this.setState({ _shouldCollapse: false })
-			this.toggleExpanded(false)
+		if (!to && this.state.expanded) {
+			this.toggleExpanded(false, true)
 		}
 
 		this.setState({ dropdownOpen: to })
