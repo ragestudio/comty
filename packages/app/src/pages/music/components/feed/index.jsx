@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 import { ImageViewer, UserPreview } from "components"
 import { Icons } from "components/Icons"
 import { Translation } from "react-i18next"
@@ -101,6 +102,7 @@ const PlaylistsList = (props) => {
 }
 
 const PlaylistItem = (props) => {
+    const [coverHover, setCoverHover] = React.useState(false)
     const { playlist } = props
 
     const onClick = () => {
@@ -114,33 +116,35 @@ const PlaylistItem = (props) => {
     const onClickPlay = (e) => {
         e.stopPropagation()
 
-        console.log(playlist.list)
-
         app.cores.player.startPlaylist(playlist.list)
     }
 
     return <div
         id={playlist._id}
         key={props.key}
-        className="playlistItem"
-        onClick={onClick}
+        className={classnames(
+            "playlistItem",
+            {
+                "cover-hovering": coverHover
+            }
+        )}
     >
-        <div className="playlistItem_cover">
-            <ImageViewer src={playlist.thumbnail ?? "/assets/no_song.png"} />
+        <div
+            className="playlistItem_cover"
+            onMouseEnter={() => setCoverHover(true)}
+            onMouseLeave={() => setCoverHover(false)}
+            onClick={onClickPlay}
+        >
+            <ImageViewer
+                src={playlist.thumbnail ?? "/assets/no_song.png"}
+            />
         </div>
+
         <div className="playlistItem_info">
-            <div className="playlistItem_info_title">
+            <div className="playlistItem_info_title" onClick={onClick}>
                 <h1>{playlist.title}</h1>
             </div>
             <UserPreview user={playlist.user} />
-        </div>
-        <div className="playlistItem_actions">
-            <antd.Button
-                icon={<Icons.Play />}
-                type="primary"
-                shape="circle"
-                onClick={onClickPlay}
-            />
         </div>
     </div>
 }
