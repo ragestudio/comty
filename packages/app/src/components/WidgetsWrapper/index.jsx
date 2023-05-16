@@ -2,7 +2,9 @@ import React from "react"
 import lodable from "@loadable/component"
 import * as antd from "antd"
 
-import { SortableList, SortableItem, DragHandle } from "components/SortableList"
+import { SortableList, SortableItem } from "components/SortableList"
+
+import StoragedState from "utils/storagedState"
 
 import "./index.less"
 
@@ -57,10 +59,6 @@ class WidgetComponent extends React.Component {
     render() {
         const { RenderComponent, manifest } = this.props
 
-        const RenderComponentCTX = {
-
-        }
-
         if (this.state.renderError) {
             return <div className="widget_item">
                 <antd.Result
@@ -90,9 +88,7 @@ class WidgetComponent extends React.Component {
                 className="widget_item"
                 id={manifest.id}
             >
-                <RenderComponent
-                    ctx={RenderComponentCTX}
-                />
+                <RenderComponent />
             </div>
         } catch (error) {
             console.error(error)
@@ -100,6 +96,24 @@ class WidgetComponent extends React.Component {
             return <div className="widget_item">
                 Invalid widget
             </div>
+        }
+    }
+}
+
+function extendsWidgetClass(parentClass, ctx) {
+    return class extends parentClass {
+        constructor(...args) {
+            super(...args)
+
+            this.ctx = ctx
+
+            if (typeof this.__entry_init === "function") {
+                this.__entry_init()
+            }
+        }
+
+        __entry_init = async () => {
+
         }
     }
 }
@@ -121,14 +135,39 @@ const generateRemoteComponent = (props) => {
                 throw new Error("Widget has not valid render")
             }
 
-            console.log(`Generate widget ${virtualModule.manifest.id}`)
+            console.log(`🔄 Generating widget [${virtualModule.manifest.name}]`)
+
+            let ctx = Object()
+
+            // check if static storagedStateKey exists on RenderComponent
+            if (RenderComponent.storagedStateKey) {
+                const storagedStateEngine = new StoragedState()
+
+                const defaultValue = await storagedStateEngine.getState(RenderComponent.storagedStateKey)
+
+                ctx["storagedState"] = class {
+                    static get defaultValue() {
+                        return defaultValue
+                    }
+
+                    static setState = async (value) => {
+                        return await storagedStateEngine.setState(RenderComponent.storagedStateKey, value)
+                    }
+
+                    static getState = async () => {
+                        return await storagedStateEngine.getState(RenderComponent.storagedStateKey)
+                    }
+                }
+            }
+
+            RenderComponent = extendsWidgetClass(RenderComponent, ctx)
 
             return () => <WidgetComponent
                 RenderComponent={RenderComponent}
                 manifest={virtualModule.manifest}
                 key={props.index}
                 index={props.index}
-                id={`${virtualModule.manifest.id}-${props.index}`}
+                id={`${virtualModule.manifest.name}-${props.index}`}
             />
         } catch (error) {
             console.error(error)
@@ -142,18 +181,29 @@ const generateRemoteComponent = (props) => {
     })
 }
 
+function getWidgets() {
+    let installedWidgets = app.cores.widgets.getInstalled()
+
+    // filter widgets that are not visible
+    installedWidgets = installedWidgets.filter((widget) => {
+        return widget.visible
+    })
+
+    return installedWidgets.map((manifest, index) => {
+        return {
+            id: `${manifest.uri}_${index}`,
+            url: manifest.uri,
+            RenderItem: generateRemoteComponent({
+                url: manifest.uri,
+                index: index,
+            })
+        }
+    })
+}
+
 export default class WidgetsWrapper extends React.Component {
     state = {
-        widgetsRender: app.cores.settings.get("widgets.urls").map((url, index) => {
-            return {
-                id: `${url}_${index}`,
-                url,
-                RenderItem: generateRemoteComponent({
-                    url,
-                    index: index,
-                })
-            }
-        }),
+        widgetsRender: getWidgets(),
     }
 
     handleOnSortEnd = (widgetsRender) => {
@@ -183,11 +233,10 @@ export default class WidgetsWrapper extends React.Component {
                 useDragOverlay
                 activeDragActions={[
                     {
-                        id: "add",
-                        icon: "Plus",
-                        disabled: true,
+                        id: "settings",
+                        icon: "Settings",
                         onClick: () => {
-                            // TODO: Open widget browser
+                            app.setLocation("/settings?tab=widgets")
                         }
                     },
                 ]}
