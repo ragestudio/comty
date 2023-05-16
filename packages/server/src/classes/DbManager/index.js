@@ -1,38 +1,58 @@
 import mongoose from "mongoose"
 
 function getConnectionConfig(obj) {
-    const { db_user, db_driver, db_name, db_pwd, db_hostname, db_port } = obj
+    const { DB_USER, DB_DRIVER, DB_NAME, DB_PWD, DB_HOSTNAME, DB_PORT } = obj
 
-    return [`${db_driver ?? "mongodb"}://${db_user ? `${db_user}` : ""}${db_pwd ? `:${db_pwd}` : ""}${db_user ? "@" : ""}${db_hostname ?? "localhost"}:${db_port ?? "27017"}${db_user ? "/?authMechanism=DEFAULT" : ""}`, {
-        dbName: db_name,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    }]
+    let auth = [
+        DB_DRIVER ?? "mongodb",
+        "://",
+    ]
+
+    if (DB_USER && DB_PWD) {
+        auth.push(`${DB_USER}:${DB_PWD}@`)
+    }
+
+    auth.push(DB_HOSTNAME ?? "localhost")
+    auth.push(`:${DB_PORT ?? "27017"}`)
+
+    if (DB_USER) {
+        auth.push("/?authMechanism=DEFAULT")
+    }
+
+    auth = auth.join("")
+
+    return [
+        auth,
+        {
+            dbName: DB_NAME,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        }
+    ]
 }
 
 export default class DBManager {
-    env = process.env
+    initialize = async (config) => {
+        console.log("🔌 Connecting to DB...")
 
-    connect = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                console.log("🌐 Trying to connect to DB...")
-                const dbConfig = getConnectionConfig(this.env)
+        const dbConfig = getConnectionConfig(config ?? process.env)
 
-                mongoose.connect(...dbConfig)
-                    .then((res) => { return resolve(true) })
-                    .catch((err) => { return reject(err) })
-            } catch (err) {
-                return reject(err)
-            }
-        }).then(done => {
-            console.log(`✅ Connected to DB`)
-        }).catch((error) => {
-            console.log(`❌ Failed to connect to DB, retrying...\n`)
-            console.log(error)
-            setTimeout(() => {
-                this.connect()
-            }, 1000)
-        })
+        mongoose.set("strictQuery", false)
+
+        const connection = await mongoose.connect(...dbConfig)
+            .catch((err) => {
+                console.log(`❌ Failed to connect to DB, retrying...\n`)
+                console.log(error)
+
+                // setTimeout(() => {
+                //     this.initialize()
+                // }, 1000)
+
+                return false
+            })
+
+        if (connection) {
+            console.log(`✅ Connected to DB.`)
+        }
     }
 }

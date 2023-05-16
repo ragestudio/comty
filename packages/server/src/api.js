@@ -22,6 +22,8 @@ global.signLocation = process.env.signLocation
 
 export default class API {
     server = global.server = new Server({
+        name: "Main-API",
+        minimal: true,
         listen_port: process.env.MAIN_LISTEN_PORT ?? 3000,
         onWSClientConnection: (...args) => {
             this.onWSClientConnection(...args)
@@ -109,7 +111,7 @@ export default class API {
     events = internalEvents
 
     async initialize() {
-        await this.DB.connect()
+        await this.DB.initialize()
         await this.initializeConfigDB()
 
         await this.storage.initialize()

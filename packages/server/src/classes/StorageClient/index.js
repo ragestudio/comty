@@ -48,13 +48,15 @@ export class StorageClient extends Minio.Client {
     }
 
     initialize = async () => {
+        console.log("🔌 Checking if storage client have default bucket...")
+
         // check connection with s3
         const bucketExists = await this.bucketExists(this.defaultBucket).catch(() => {
             return false
         })
 
         if (!bucketExists) {
-            console.warn("Default bucket not exists! Creating new bucket...")
+            console.warn("🪣 Default bucket not exists! Creating new bucket...")
 
             await this.makeBucket(this.defaultBucket, "s3")
 
@@ -71,19 +73,21 @@ export class StorageClient extends Minio.Client {
             // set default bucket policy
             await this.setDefaultBucketPolicy(this.defaultBucket)
         }
+
+        console.log("✅ Storage client is ready.")
     }
 }
 
 export const createStorageClientInstance = (options) => {
     return new StorageClient({
         ...options,
-        endPoint: process.env.s3_endpoint,
-        port: Number(process.env.s3_port),
-        useSSL: toBoolean(process.env.s3_use_ssl),
-        accessKey: process.env.s3_access_key,
-        secretKey: process.env.s3_secret_key,
-        defaultBucket: process.env.s3_bucket_name,
-        defaultRegion: process.env.s3_region,
+        endPoint: process.env.S3_ENDPOINT,
+        port: Number(process.env.S3_PORT),
+        useSSL: toBoolean(process.env.S3_USE_SSL),
+        accessKey: process.env.S3_ACCESS_KEY,
+        secretKey: process.env.S3_SECRET_KEY,
+        defaultBucket: process.env.S3_BUCKET,
+        defaultRegion: process.env.S3_REGION,
     })
 }
 
