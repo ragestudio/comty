@@ -1,0 +1,14 @@
+{
+  "name": "comty.js",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "author": "RageStudio <support@ragestudio.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@foxify/events": "^2.1.0",
+    "axios": "^1.4.0",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^3.1.2",
+    "linebridge": "^0.15.12"
+  }
+}
