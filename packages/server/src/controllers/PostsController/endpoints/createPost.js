@@ -10,7 +10,7 @@ export default {
         select: ["message", "attachments", "type", "data", "timestamp"],
     }, async (req, res) => {
         const post = await CreatePost({
-            user_id: req.user.id,
+            user_id: req.user._id.toString(),
             message: req.selection.message,
             timestamp: req.selection.timestamp,
             attachments: req.selection.attachments,
