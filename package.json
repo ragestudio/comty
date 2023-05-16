@@ -15,11 +15,11 @@
         "packages/**"
     ],
     "dependencies": {
-        "corenode": "^0.28.26",
-        "@octokit/rest": "19.0.4",
-        "dotenv": "16.0.3",
         "7zip-min": "1.4.3",
-        "axios": "0.21.1"
+        "axios": "0.21.1",
+        "corenode": "^0.28.26",
+        "dotenv": "16.0.3",
+        "octokit": "^2.0.14"
     },
     "devDependencies": {
         "concurrently": "^7.5.0",
