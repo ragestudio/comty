@@ -2,30 +2,6 @@ import packagejson from "../package.json"
 import defaultTheme from "../constants/defaultTheme.json"
 import defaultSoundPack from "../constants/defaultSoundPack.json"
 
-const envOrigins = {
-    "localhost": {
-        mainApi: `http://${window.location.hostname}:3010`,
-        messagingApi: `http://${window.location.hostname}:3020`,
-        livestreamingApi: `http://${window.location.hostname}:3030`,
-    },
-    "development": {
-        mainApi: `https://indev_api.comty.app`,
-        messagingApi: `https://indev_messaging_api.comty.app`,
-        livestreamingApi: `https://indev_livestreaming_api.comty.app`,
-    },
-    "production": {
-        mainApi: "https://api.comty.app",
-        messagingApi: `https://messaging_api.comty.app`,
-        livestreamingApi: `https://livestreaming_api.comty.app`,
-    }
-}
-
-function composeRemote(path) {
-    return window.location.hostname.includes("localhost") ? envOrigins["localhost"][path] : envOrigins[process.env.NODE_ENV][path]
-}
-
-console.log(`Config loaded with mode: [${process.env.NODE_ENV}]`)
-
 export default {
     package: packagejson,
     defaultTheme: defaultTheme,
@@ -60,11 +36,6 @@ export default {
         full: "https://storage.ragestudio.net/rstudio/branding/comty/labeled/logo_full.svg",
         ragestudio_alt: "https://storage.ragestudio.net/rstudio/branding/ragestudio/iso/ragestudio.svg",
         ragestudio_full: "https://storage.ragestudio.net/rstudio/branding/ragestudio/labeled/ragestudio-labeled_white.svg",
-    },
-    remotes: {
-        mainApi: composeRemote("mainApi"),
-        messagingApi: composeRemote("messagingApi"),
-        livestreamingApi: composeRemote("livestreamingApi"),
     },
     app: {
         title: packagejson.name,

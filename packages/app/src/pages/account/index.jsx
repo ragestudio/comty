@@ -74,8 +74,6 @@ export default class Account extends React.Component {
 
 	actionsRef = React.createRef()
 
-	api = window.app.cores.api.withEndpoints()
-
 	componentDidMount = async () => {
 		const token = await SessionModel.getDecodedToken()
 		const location = window.app.history.location
