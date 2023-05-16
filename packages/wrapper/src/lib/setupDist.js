@@ -8,13 +8,27 @@ const octokit = new Octokit({
     // auth: process.env.GITHUB_TOKEN
 })
 
-async function getLatestReleaseBundleFromGithub() {
-    console.log("Getting latest release bundle from github...")
+async function getLatestReleaseFromGithub() {
+    console.log("Getting latest release from github...")
 
     const release = await octokit.repos.getLatestRelease({
         owner: global.remoteRepo.split("/")[0],
         repo: global.remoteRepo.split("/")[1]
     })
+
+    return release.data
+}
+
+async function getBundleFromRelease(release) {
+    const bundle = release.assets.find(asset => asset.name === "app_dist.7z")
+
+    return bundle
+}
+
+async function getLatestReleaseBundleFromGithub() {
+    console.log("Getting latest release bundle from github...")
+
+    const release = await getLatestReleaseFromGithub()
 
     const bundle = release.data.assets.find(asset => asset.name === "app_dist.7z")
 
@@ -68,7 +82,18 @@ async function setupLatestRelease() {
         fs.mkdirSync(global.distPath)
     }
 
-    const bundle = await getLatestReleaseBundleFromGithub()
+    const release = await getLatestReleaseFromGithub()
+
+    const bundle = await getBundleFromRelease(release)
+
+    // wirte a manifest file with bundle version and other info
+    fs.writeFileSync(path.join(global.distPath, "manifest.json"), JSON.stringify(
+        {
+            version: release.tag_name,
+            date: release.published_at,
+            stable: !release.prerelease,
+        }
+    ))
 
     await downloadBundle(bundle)
 
