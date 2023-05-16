@@ -4,7 +4,7 @@
     "main": "dist/index.js",
     "scripts": {
         "build": "corenode-cli build",
-        "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js"
+        "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js"
     },
     "license": "MIT",
     "dependencies": {
@@ -25,7 +25,7 @@
         "formidable": "^2.1.1",
         "jimp": "^0.16.2",
         "jsonwebtoken": "^9.0.0",
-        "linebridge": "0.15.9",
+        "linebridge": "0.15.13",
         "luxon": "^3.2.1",
         "merge-files": "^0.1.2",
         "mime-types": "^2.1.35",
