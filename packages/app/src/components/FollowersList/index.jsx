@@ -2,7 +2,6 @@ import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
 
-import UserModel from "models/user"
 import FollowsModel from "models/follows"
 
 import "./index.less"
