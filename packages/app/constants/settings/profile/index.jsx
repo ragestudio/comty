@@ -1,5 +1,5 @@
 import React from "react"
-import { UserModel } from "models"
+import UserModel from "models/user"
 import loadable from "@loadable/component"
 import UploadButton from "components/UploadButton"
 
