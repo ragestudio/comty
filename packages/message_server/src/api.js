@@ -1,7 +1,8 @@
+import fs from "fs"
+import path from "path"
+
 import express from "express"
 import http from "http"
-import cors from "cors"
-import morgan from "morgan"
 import socketio from "socket.io"
 import EventEmitter from "@foxify/events"
 import jwt from "jsonwebtoken"
@@ -86,7 +87,7 @@ class TextRoomServer {
                     return next(new Error(`auth:token_invalid`))
                 }
 
-                if(!session.user_id) {
+                if (!session.user_id) {
                     console.error(`[${socket.id}] failed to validate session caused by invalid session. (missing user_id)`, session)
 
                     return next(new Error(`auth:invalid_session`))
@@ -193,32 +194,27 @@ export default class Server {
         this.textRoomServer = new TextRoomServer(this.httpServer)
 
         this.options = {
-            listenPort: process.env.PORT || 3020,
+            listenHost: process.env.LISTEN_HOST || "0.0.0.0",
+            listenPort: process.env.LISTEN_PORT || 3020,
             ...options
         }
     }
 
     eventBus = global.eventBus = new EventEmitter()
 
-    initialize = async () => {
-        this.app.use(cors())
-        this.app.use(express.json({ extended: false }))
-        this.app.use(express.urlencoded({ extended: true }))
+    async __registerInternalMiddlewares() {
+        let middlewaresPath = fs.readdirSync(path.resolve(__dirname, "useMiddlewares"))
 
-        // Use logger if not in production
-        if (!process.env.NODE_ENV === "production") {
-            this.app.use(morgan("dev"))
-        }
+        for await (const middlewarePath of middlewaresPath) {
+            const middleware = require(path.resolve(__dirname, "useMiddlewares", middlewarePath)).default
 
-        await this.textRoomServer.initializeSocketIO()
+            if (!middleware) {
+                console.error(`Middleware ${middlewarePath} not found.`)
 
-        await this.registerBaseRoute()
-        await this.registerRoutes()
+                continue
+            }
 
-        await this.httpServer.listen(this.options.listenPort)
-
-        return {
-            listenPort: this.options.listenPort,
+            this.app.use(middleware)
         }
     }
 
@@ -244,5 +240,27 @@ export default class Server {
 
             this.app.use(route.use, ...order)
         })
+    }
+
+    initialize = async () => {
+        const startHrTime = process.hrtime()
+
+        await this.__registerInternalMiddlewares()
+        this.app.use(express.json({ extended: false }))
+        this.app.use(express.urlencoded({ extended: true }))
+
+        await this.textRoomServer.initializeSocketIO()
+
+        await this.registerBaseRoute()
+        await this.registerRoutes()
+
+        await this.httpServer.listen(this.options.listenPort, this.options.listenHost)
+
+        // calculate elapsed time
+        const elapsedHrTime = process.hrtime(startHrTime)
+        const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6
+
+        // log server started
+        console.log(`🚀 Server started ready on \n\t - http://${this.options.listenHost}:${this.options.listenPort} \n\t - Tooks ${elapsedTimeInMs}ms`)
     }
 }
