@@ -47,21 +47,21 @@ export default class NotificationCore extends Core {
             duration: notification.duration ?? 4,
         }
 
-        if (notification.message) {
-            switch (typeof notification.message) {
+        if (notification.title) {
+            switch (typeof notification.title) {
                 case "function": {
-                    notfObj.message = React.createElement(notification.message)
+                    notfObj.message = React.createElement(notification.title)
 
                     break
                 }
                 case "object": {
-                    notfObj.message = notification.message
+                    notfObj.message = notification.title
 
                     break
                 }
                 default: {
                     notfObj.message = <Translation>
-                        {(t) => t(notification.message)}
+                        {(t) => t(notification.title)}
                     </Translation>
 
                     break
