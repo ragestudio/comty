@@ -13,10 +13,11 @@ const aliases = {
     pages: path.join(__dirname, "src/pages"),
     theme: path.join(__dirname, "src/theme"),
     components: path.join(__dirname, "src/components"),
-    models: path.join(__dirname, "src/models"),
     utils: path.join(__dirname, "src/utils"),
     layouts: path.join(__dirname, "src/layouts"),
     hooks: path.join(__dirname, "src/hooks"),
+    "comty.js": path.join(__dirname, "../", "comty.js", "src"),
+    models: path.join(__dirname, "../comty.js/src/models"),
 }
 
 module.exports = (config = {}) => {
@@ -36,7 +37,7 @@ module.exports = (config = {}) => {
     config.server.port = process.env.listenPort ?? 8000
     config.server.host = "0.0.0.0"
     config.server.fs = {
-        allow: [".."]
+        allow: ["..", "../../"],
     }
 
     config.envDir = path.join(__dirname, "environments")

@@ -3,7 +3,6 @@ import * as antd from "antd"
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 
 import PlaylistModel from "models/playlists"
-import FilesModel from "models/files"
 
 import BasicInformation from "./components/BasicInformation"
 import TracksUploads from "./components/TracksUploads"
@@ -105,7 +104,7 @@ export default class PlaylistCreatorSteps extends React.Component {
     }
 
     handleUploadTrack = async (req) => {
-        const response = await FilesModel.uploadFile(req.file, {
+        const response = await app.cores.remoteStorage.uploadFile(req.file, {
             timeout: 2000
         }).catch((error) => {
             console.error(error)
@@ -184,7 +183,7 @@ export default class PlaylistCreatorSteps extends React.Component {
         }
 
         // upload cover file
-        const result = await FilesModel.uploadFile(file, {
+        const result = await app.cores.remoteStorage.uploadFile(file, {
             timeout: 2000
         })
 

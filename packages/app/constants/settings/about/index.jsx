@@ -81,9 +81,9 @@ export default {
             const instance = app.cores.api.instance()
 
             if (instance) {
-                setServerOrigin(instance.origin)
+                setServerOrigin(instance.mainOrigin)
 
-                if (instance.origin.startsWith("https")) {
+                if (instance.mainOrigin.startsWith("https")) {
                     setSecureConnection(true)
                 }
             }
