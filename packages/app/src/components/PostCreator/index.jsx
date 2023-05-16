@@ -8,7 +8,6 @@ import { Icons } from "components/Icons"
 import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 
 import PostModel from "models/post"
-import FilesModel from "models/files"
 
 import "./index.less"
 
@@ -34,8 +33,6 @@ export default class PostCreator extends React.Component {
 
     creatorRef = React.createRef()
 
-    api = window.app.cores.api.withEndpoints()
-
     cleanPostData = () => {
         this.setState({
             postMessage: "",
@@ -57,7 +54,7 @@ export default class PostCreator extends React.Component {
     }
 
     fetchUploadPolicy = async () => {
-        const policy = await this.api.get.postingPolicy()
+        const policy = await PostModel.getPostingPolicy()
 
         this.setState({
             postingPolicy: policy
@@ -120,7 +117,7 @@ export default class PostCreator extends React.Component {
         // hide uploader
         this.toogleUploaderVisibility(false)
 
-        const request = await FilesModel.uploadFile(req.file)
+        const request = await app.cores.remoteStorage.uploadFile(req.file)
             .catch(error => {
                 console.error(error)
                 antd.message.error(error)
