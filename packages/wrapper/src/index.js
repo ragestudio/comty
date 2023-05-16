@@ -24,6 +24,22 @@ function checkDistIntegrity() {
     return true
 }
 
+function fetchDistManifest() {
+    if (!fs.existsSync(global.distPath)) {
+        return null
+    }
+
+    const pkgPath = path.join(global.distPath, "manifest.json")
+
+    if (!fs.existsSync(pkgPath)) {
+        return null
+    }
+
+    const pkg = require(pkgPath)
+
+    return pkg
+}
+
 async function runServer() {
     const app = express()
 
@@ -38,6 +54,16 @@ async function runServer() {
     }))
 
     app.use(express.static(global.distPath))
+
+    app.get("/_dist_manifest", async (req, res) => {
+        const manifest = fetchDistManifest()
+
+        if (!manifest) {
+            return res.status(500).send("Dist not found")
+        }
+
+        return res.json(manifest)
+    })
 
     app.get("*", function (req, res) {
         res.sendFile(path.join(global.distPath, "index.html"))
