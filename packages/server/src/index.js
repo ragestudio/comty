@@ -48,7 +48,6 @@ import API from "./api"
 async function main() {
     const mainAPI = new API()
 
-    console.log("\n▶️ Initializing main API...\n")
     await mainAPI.initialize()
 }
 
