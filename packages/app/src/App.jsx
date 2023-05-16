@@ -53,10 +53,11 @@ Promise.tasked = function (promises) {
 import React from "react"
 import ReactDOM from "react-dom"
 
+import Splash from "./splash"
+
 import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-import classnames from "classnames"
 import { Toast } from "antd-mobile"
 import { BrowserRouter } from "react-router-dom"
 import { StatusBar, Style } from "@capacitor/status-bar"
@@ -65,7 +66,9 @@ import { Translation } from "react-i18next"
 import { Lightbox } from "react-modal-image"
 import loadable from "@loadable/component"
 
-import { SessionModel, UserModel } from "models"
+import SessionModel from "models/session"
+import UserModel from "models/user"
+
 import config from "config"
 import * as Utils from "./utils"
 
@@ -92,36 +95,6 @@ import * as Router from "./router"
 
 import "theme/index.less"
 
-class Splash extends React.Component {
-	state = {
-		visible: true
-	}
-
-	onUnmount = async () => {
-		this.setState({
-			visible: false
-		})
-
-		return await new Promise((resolve) => {
-			setTimeout(resolve, 1000)
-		})
-	}
-
-	render() {
-		return <div className={classnames("app_splash_wrapper", { ["fade-away"]: !this.state.visible })}>
-			<div className="splash_logo">
-				<img src={config.logo.alt} />
-			</div>
-			<div className="splash_label">
-				<Icons.LoadingOutlined />
-			</div>
-			<div className="splash_footer">
-				<object id="powered_by" data={config.logo.ragestudio_full} type="image/svg+xml" />
-			</div>
-		</div>
-	}
-}
-
 class ComtyApp extends React.Component {
 	constructor(props) {
 		super(props)
@@ -132,12 +105,10 @@ class ComtyApp extends React.Component {
 	}
 
 	sessionController = new SessionModel()
-
 	userController = new UserModel()
 
 	state = {
 		session: null,
-		user: null,
 		initialized: false,
 	}
 
@@ -511,21 +482,6 @@ class ComtyApp extends React.Component {
 		const initializationTasks = [
 			async () => {
 				try {
-					await this.props.cores.api.attach()
-
-					app.eventBus.emit("app.initialization.api_success")
-				} catch (error) {
-					app.eventBus.emit("app.initialization.api_error", error)
-					console.error(`[App] Error while initializing api`, error)
-
-					throw {
-						cause: "Cannot connect to API",
-						details: `Sorry but we cannot connect to the API. Please try again later. [${config.remotes.mainApi}]`,
-					}
-				}
-			},
-			async () => {
-				try {
 					await this.__SessionInit()
 					await this.__UserInit()
 
@@ -576,9 +532,9 @@ class ComtyApp extends React.Component {
 
 		const user = await UserModel.data()
 
-		await this.setState({ user })
-
 		app.userData = user
+
+		this.setState({ user })
 	}
 
 	render() {
