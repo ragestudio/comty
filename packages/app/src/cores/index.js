@@ -13,6 +13,8 @@ import SoundCore from "./sound"
 import Player from "./player"
 import RemoteStorage from "./remoteStorage"
 
+import WidgetsCore from "./widgets"
+
 // DEFINE LOAD ORDER HERE
 export default [
     SettingsCore,
@@ -29,4 +31,5 @@ export default [
 
     Player,
     ContextMenuCore,
+    WidgetsCore,
 ]
