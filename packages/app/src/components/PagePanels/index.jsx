@@ -112,8 +112,6 @@ export class PagePanelWithNavMenu extends React.Component {
     }
 
     handleTabChange = async (key) => {
-        console.log(key)
-
         if (this.state.activeTab === key) return
 
         if (this.props.transition) {
