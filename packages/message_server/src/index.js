@@ -32,16 +32,12 @@ global.toBoolean = (value) => {
     return false
 }
 
-import pkg from "../package.json"
 import API from "./api"
 
 async function main() {
     const api = new API()
 
-    console.log(`\n▶️ Initializing ${pkg.name} ...\n`)
-    const init = await api.initialize()
-
-    console.log(`\n🚀 ${pkg.name} v${pkg.version} is running on port ${init.listenPort}.\n`)
+    await api.initialize()
 }
 
 main().catch((error) => {
