@@ -191,7 +191,8 @@ function getWidgets() {
 
     return installedWidgets.map((manifest, index) => {
         return {
-            id: `${manifest.uri}_${index}`,
+            name: manifest.name,
+            id: manifest._id,
             url: manifest.uri,
             RenderItem: generateRemoteComponent({
                 url: manifest.uri,
@@ -211,11 +212,7 @@ export default class WidgetsWrapper extends React.Component {
             widgetsRender
         })
 
-        const urls = widgetsRender.map((widgetRender) => {
-            return widgetRender.url
-        })
-
-        app.cores.settings.set("widgets.urls", urls)
+        app.cores.widgets.sort(widgetsRender)
     }
 
     render() {
@@ -225,7 +222,6 @@ export default class WidgetsWrapper extends React.Component {
                 onChange={this.handleOnSortEnd}
                 renderItem={(item, index) => {
                     const RenderItem = item.RenderItem
-
                     return <SortableItem id={item.id}>
                         <RenderItem />
                     </SortableItem>
