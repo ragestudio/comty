@@ -19,6 +19,7 @@
         "content-range": "^2.0.2",
         "corenode": "0.28.26",
         "dotenv": "^16.0.3",
+        "form-data": "^4.0.0",
         "formidable": "^2.1.1",
         "hyper-express": "^6.5.9",
         "jsonwebtoken": "^9.0.0",
