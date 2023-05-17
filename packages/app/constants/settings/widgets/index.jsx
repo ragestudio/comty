@@ -9,6 +9,7 @@ export default {
         {
             id: "widgets.urls",
             title: "Widgets",
+            group: "general",
             icon: "List",
             component: loadable(() => import("../components/widgetsView")),
             defaultValue: () => {
