@@ -1,4 +1,5 @@
 const Minio = require("minio")
+import path from "path"
 
 export const generateDefaultBucketPolicy = (payload) => {
     const { bucketName } = payload
@@ -38,7 +39,9 @@ export class StorageClient extends Minio.Client {
     }
 
     composeRemoteURL = (key) => {
-        return `${this.protocol}//${this.host}:${this.port}/${this.defaultBucket}/${key}`
+        const _path = path.join(this.defaultBucket, key)
+
+        return `${this.protocol}//${this.host}:${this.port}/${_path}`
     }
 
     setDefaultBucketPolicy = async (bucketName) => {
