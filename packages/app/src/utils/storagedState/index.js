@@ -12,6 +12,10 @@ export default class StoragedState {
     getState = async (stateKey) => {
         const data = await this.db.table("states").get(stateKey)
 
+        if (!data) {
+            return null
+        }
+
         return data.value
     }
 
