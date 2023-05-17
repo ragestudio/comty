@@ -5,13 +5,13 @@ import { Icons } from "components/Icons"
 
 import "./index.less"
 
-export default (props) => {
+export default React.memo((props) => {
     const { manifest } = props
 
-    const isInstalled = app.cores.widgets.isInstalled(manifest._id)
-    const isVisible = app.cores.widgets.isVisible(manifest._id)
+    const [installed, setInstalled] = React.useState(app.cores.widgets.isInstalled(manifest._id))
+    const [visible, setVisible] = React.useState(app.cores.widgets.isVisible(manifest._id))
 
-    const removeItem = () => {
+    const handleItemRemove = () => {
         antd.Modal.confirm({
             title: "Are you sure?",
             content: "Do you want to remove this widget?",
@@ -19,9 +19,41 @@ export default (props) => {
             okType: "danger",
             cancelText: "No",
             onOk: () => {
-                props.onRemove()
+                onRemove()
             }
         })
+    }
+
+    const onRemove = async () => {
+        if (typeof props.onRemove !== "function") {
+            console.error("onRemove is not a function")
+            return false
+        }
+
+        await props.onRemove()
+
+        setInstalled(false)
+    }
+
+    const onUpdate = async () => {
+        if (typeof props.onUpdate !== "function") {
+            console.error("onUpdate is not a function")
+            return false
+        }
+
+        props.onUpdate()
+    }
+
+    const onInstall = async () => {
+        if (typeof props.onInstall !== "function") {
+            console.error("onInstall is not a function")
+            return false
+        }
+
+        await props.onInstall()
+
+        setVisible(true)
+        setInstalled(true)
     }
 
     if (!manifest) {
@@ -36,8 +68,8 @@ export default (props) => {
     return <div key={props.key ?? manifest._id} id={manifest._id} className="widget_preview_item">
         <div className="widget_preview_item_info">
             {
-                manifest.iconUrl && <div className="widget_preview_item_info_icon">
-                    <Image src={manifest.iconUrl} />
+                manifest.icon && <div className="widget_preview_item_info_icon">
+                    <Image src={manifest.icon} />
                 </div>
             }
 
@@ -61,32 +93,31 @@ export default (props) => {
 
         <div className="widget_preview_item_actions">
             {
-                isInstalled && <antd.Switch
+                installed && <antd.Switch
                     checkedChildren={<Icons.Eye />}
                     unCheckedChildren={<Icons.EyeOff />}
-                    defaultChecked={isVisible}
                     onChange={(checked) => {
                         props.onChangeVisible(checked)
+                        setVisible(checked)
                     }}
+                    checked={visible}
                 />
             }
 
             <antd.Button
-                icon={isInstalled ? <Icons.MdSync /> : <Icons.Plus />}
-                onClick={isInstalled ? props.onUpdate : props.onInstall}
-                type={isInstalled ? "default" : "primary"}
+                icon={installed ? <Icons.MdSync /> : <Icons.Plus />}
+                onClick={installed ? onUpdate : onInstall}
+                type={installed ? "default" : "primary"}
             />
 
             {
-                isInstalled && <antd.Button
+                installed && <antd.Button
                     type="primary"
                     icon={<Icons.Trash />}
-                    onClick={() => {
-                        removeItem()
-                    }}
+                    onClick={handleItemRemove}
                     danger
                 />
             }
         </div>
     </div>
-}
+})
