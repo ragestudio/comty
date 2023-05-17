@@ -132,7 +132,9 @@ export default (props) => {
     React.useEffect(() => {
         const timer = setTimeout(async () => {
             setLoading(true)
+
             await makeSearch(searchValue)
+
             setLoading(false)
         }, 400)
 
