@@ -4,12 +4,15 @@ import path from "path"
 import DbManager from "@classes/DbManager"
 import RedisClient from "@classes/RedisClient"
 import StorageClient from "@classes/StorageClient"
+import ComtyClient from "./classes/ComtyClient"
 
 import hyperexpress from "hyper-express"
 
 import pkg from "../package.json"
 
 export default class WidgetsAPI {
+    static useMiddlewaresOrder = ["useLogger", "useCors", "useAuth"]
+
     server = global.server = new hyperexpress.Server()
 
     listenIp = process.env.HTTP_LISTEN_IP ?? "0.0.0.0"
@@ -18,6 +21,10 @@ export default class WidgetsAPI {
     internalRouter = new hyperexpress.Router()
 
     db = new DbManager()
+
+    comty = global.comty = ComtyClient({
+        useWs: false,
+    })
 
     redis = global.redis = RedisClient()
 
@@ -51,6 +58,22 @@ export default class WidgetsAPI {
 
     async __registerInternalMiddlewares() {
         let middlewaresPath = fs.readdirSync(path.resolve(__dirname, "useMiddlewares"))
+
+        // sort middlewares
+        middlewaresPath = middlewaresPath.sort((a, b) => {
+            const aIndex = this.constructor.useMiddlewaresOrder.indexOf(a.replace(".js", ""))
+            const bIndex = this.constructor.useMiddlewaresOrder.indexOf(b.replace(".js", ""))
+
+            if (aIndex === -1) {
+                return 1
+            }
+
+            if (bIndex === -1) {
+                return -1
+            }
+
+            return aIndex - bIndex
+        })
 
         for await (const middlewarePath of middlewaresPath) {
             const middleware = require(path.resolve(__dirname, "useMiddlewares", middlewarePath)).default
