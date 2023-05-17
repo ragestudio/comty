@@ -6,7 +6,7 @@ export default {
     method: "POST",
     route: "/validate",
     fn: async (req, res) => {
-        const token = req.body.session
+        const token = req.body.token
 
         let result = {
             expired: false,
