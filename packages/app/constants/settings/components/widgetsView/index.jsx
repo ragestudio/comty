@@ -16,24 +16,26 @@ export default class WidgetsView extends React.Component {
         return <div className="widgets_load">
             <div className="widgets_load_list">
                 {
-                    this.state.loadedWidgets.map((manifest) => {
-                        return <WidgetItemPreview
-                            manifest={manifest}
-                            onRemove={() => {
-                                app.cores.widgets.uninstall(manifest._id)
-                            }}
-                            onInstall={() => {
-                                app.cores.widgets.install(manifest._id)
-                            }}
-                            onUpdate={() => {
-                                app.cores.widgets.install(manifest._id, {
-                                    update: true,
-                                })
-                            }}
-                            onChangeVisible={(visible) => {
-                                app.cores.widgets.toogleVisibility(manifest._id, visible)
-                            }}
-                        />
+                    Array.isArray(this.state.loadedWidgets) && this.state.loadedWidgets.map((manifest) => {
+                        return <React.Fragment>
+                            <WidgetItemPreview
+                                manifest={manifest}
+                                onRemove={() => {
+                                    app.cores.widgets.uninstall(manifest._id)
+                                }}
+                                onInstall={() => {
+                                    app.cores.widgets.install(manifest._id)
+                                }}
+                                onUpdate={() => {
+                                    app.cores.widgets.install(manifest._id, {
+                                        update: true,
+                                    })
+                                }}
+                                onChangeVisible={(visible) => {
+                                    app.cores.widgets.toogleVisibility(manifest._id, visible)
+                                }}
+                            />
+                        </React.Fragment>
                     })
                 }
 
