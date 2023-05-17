@@ -37,11 +37,11 @@ export default function createClient({
         mainOrigin: remotes.default.origin,
         instances: Object(),
         wsInstances: Object(),
-        curl: null,
+        rest: null,
     }
 
     if (globalThis.isServerMode) {
-        sharedState.curl = createHandlers()
+        sharedState.rest = createHandlers()
     }
 
     if (privateKey && accessKey && globalThis.isServerMode) {
