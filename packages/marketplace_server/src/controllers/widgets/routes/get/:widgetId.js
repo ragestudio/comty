@@ -3,6 +3,7 @@ import { Widget } from "@models"
 import { transform } from "sucrase"
 import UglifyJS from "uglify-js"
 
+import path from "path"
 import resolveUrl from "@utils/resolveUrl"
 import replaceImportsWithRemoteURL from "@utils/replaceImportsWithRemoteURL"
 
@@ -25,7 +26,7 @@ async function compileWidgetCode(widgetCode, manifest, rootURL) {
     // inject react with cdn
     widgetCode = `import React from "https://cdn.skypack.dev/react@17?dts" \n${widgetCode}`
 
-    widgetCode = await replaceImportsWithRemoteURL(widgetCode, resolveUrl(rootURL, manifest.entryFile))
+    widgetCode = await replaceImportsWithRemoteURL(widgetCode, resolveUrl(rootURL, manifest.main))
 
     // remove css imports and append to manifest (Only its used in the entry file)
     widgetCode = widgetCode.replace(/import\s+["'](.*)\.css["']/g, (match, p1) => {
@@ -53,14 +54,13 @@ async function compileWidgetCode(widgetCode, manifest, rootURL) {
     // remove export default keywords
     widgetCode = widgetCode.replace("export default", "")
 
-
     let manifestProcessed = {
         ...manifest,
     }
 
     manifestProcessed.cssFiles = cssFiles
-    manifestProcessed.entryFile = resolveUrl(rootURL, manifest.entryFile)
-    manifestProcessed.iconUrl = resolveUrl(rootURL, manifest.iconUrl)
+    manifestProcessed.main = resolveUrl(rootURL, manifest.main)
+    manifestProcessed.icon = resolveUrl(rootURL, manifest.icon)
 
     let result = `
         ${widgetCode}
@@ -85,8 +85,6 @@ export default async (req, res) => {
 
     const useCache = req.query["use-cache"] ? toBoolean(req.query["use-cache"]) : true
 
-    //console.log(`📦 Getting widget code [${widgetId}], using cache ${useCache}`)
-
     // try to find Widget
     const widget = await Widget.findOne({
         _id: widgetId,
@@ -100,22 +98,24 @@ export default async (req, res) => {
         })
     }
 
-    if (!widget.manifest.entryFile) {
+    if (!widget.manifest.main) {
         return res.status(404).json({
             error: "Widget entry file not defined",
         })
     }
 
+    const requestedVersion = widgetId.split("@")[1] ?? widget.manifest.version
+
     let widgetCode = null
 
     // get origin from request url
-    const origin = req.protocol + "://" + req.get("host")
-    const remotePath = `/static/${widgetId}/src`
+    const origin = `${req.protocol}://${req.get("host")}/static/widgets/${widgetId}@${requestedVersion}/`
+    const remotePath = `/widgets/${widgetId}@${requestedVersion}/`
 
-    const remoteEntyFilePath = resolveUrl(remotePath, widget.manifest.entryFile)
+    const remoteEntyFilePath = path.join(remotePath, widget.manifest.main)
 
     if (useCache) {
-        widgetCode = await global.redis.get(`widget:${widgetId}`)
+        widgetCode = await global.redis.get(`${origin}:widget:${widgetId}@${requestedVersion}}`)
     }
 
     if (!widgetCode) {
@@ -123,7 +123,7 @@ export default async (req, res) => {
             widgetCode = await new Promise(async (resolve, reject) => {
                 await global.storage.getObject(process.env.S3_BUCKET, remoteEntyFilePath, (error, dataStream) => {
                     if (error) {
-                        return false
+                        return reject(error)
                     }
 
                     let data = ""
@@ -135,32 +135,37 @@ export default async (req, res) => {
                     dataStream.on("end", () => {
                         resolve(data)
                     })
+
+                    dataStream.on("error", (error) => {
+                        reject(error)
+                    })
                 })
             })
         } catch (error) {
             return res.status(500).json({
-                error: error.message,
+                error: `Unable to get widget code from storage. ${error.message}`,
+                requestedFile: remoteEntyFilePath
             })
         }
 
         try {
-            console.log("🔌 Compiling widget code...")
+            console.log(`🔌 [widget:${widgetId}] Compiling widget code...`)
 
-            widgetCode = await compileWidgetCode(widgetCode, widget.manifest, resolveUrl(origin, remotePath))
+            widgetCode = await compileWidgetCode(widgetCode, widget.manifest, origin)
 
-            await global.redis.set(`widget:${widgetId}`, widgetCode)
+            await global.redis.set(`${origin}:widget:${widgetId}@${requestedVersion}}`, widgetCode)
         } catch (error) {
             return res.status(500).json({
                 message: "Unable to transform widget code.",
                 error: error.message,
             })
         }
-    }
 
-    if (!widgetCode) {
-        return res.status(404).json({
-            error: "Widget not found.",
-        })
+        if (!widgetCode) {
+            return res.status(404).json({
+                error: "Widget not found.",
+            })
+        }
     }
 
     res.setHeader("Content-Type", "application/javascript")
