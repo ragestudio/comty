@@ -82,7 +82,7 @@ export default class Session {
 
         Session.removeToken()
 
-        __comty_shared_state.emit("session.destroyed")
+        __comty_shared_state.eventBus.emit("session.destroyed")
 
         return response.data
     }
@@ -101,7 +101,19 @@ export default class Session {
 
         Session.removeToken()
 
-        __comty_shared_state.emit("session.destroyed")
+        __comty_shared_state.eventBus.emit("session.destroyed")
+
+        return response.data
+    }
+
+    static validSession = async (token) => {
+        const response = await request({
+            method: "POST",
+            url: "/session/validate",
+            data: {
+                token: token
+            }
+        })
 
         return response.data
     }
