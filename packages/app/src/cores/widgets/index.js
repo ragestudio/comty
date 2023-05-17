@@ -16,6 +16,7 @@ export default class WidgetsCore extends Core {
         uninstall: this.uninstall.bind(this),
         toogleVisibility: this.toogleVisibility.bind(this),
         isVisible: this.isVisible.bind(this),
+        sort: this.sort.bind(this),
     }
 
     async onInitialize() {
@@ -107,7 +108,7 @@ export default class WidgetsCore extends Core {
         store.set(WidgetsCore.storeKey, currentStore)
 
         app.notification.new({
-            title: "New widget installed",
+            title: params.update ? "Widget updated" : "Widget installed",
             description: `Widget [${manifest.name}] has been ${params.update ? "updated" : "installed"}. ${params.update ? `Using current version ${manifest.version}` : ""}`,
         }, {
             type: "success",
@@ -191,8 +192,6 @@ export default class WidgetsCore extends Core {
 
         // check if already installed
         if (!this.isInstalled(widget_id)) {
-            app.message.error("Widget not installed.")
-
             return false
         }
 
@@ -202,5 +201,24 @@ export default class WidgetsCore extends Core {
         const widget = currentStore.find((widget) => widget._id === widget_id)
 
         return widget.visible
+    }
+
+    sort(order) {
+        if (!Array.isArray(order)) {
+            throw new Error("Order must be an array.")
+        }
+
+        const currentStore = this.getInstalled()
+
+        const newStore = currentStore.sort((a, b) => {
+            return order.findIndex((_a) => _a.id === a._id) - order.findIndex((_b) => _b.id === b._id)
+        })
+
+        store.set(WidgetsCore.storeKey, newStore)
+
+        app.eventBus.emit("widgets:update", currentStore)
+        app.eventBus.emit("widgets:sort", order)
+
+        return true
     }
 }
