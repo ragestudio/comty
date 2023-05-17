@@ -14,6 +14,8 @@ export const WidgetBrowser = (props) => {
 
     const [searchValue, setSearchValue] = React.useState("")
 
+    let timer = null
+
     const handleOnSearch = (e) => {
         // not allow to input space as first character
         if (e.target.value[0] === " ") {
@@ -21,19 +23,19 @@ export const WidgetBrowser = (props) => {
         }
 
         setSearchValue(e.target.value)
-    }
 
-    React.useEffect(() => {
-        const timer = setTimeout(async () => {
+        timer = setTimeout(async () => {
+            if (timer) {
+                clearTimeout(timer)
+            }
+
             await M_Widgets({
                 keywords: {
-                    name: searchValue
+                    name: e.target.value
                 }
             })
         }, 400)
-
-        return () => clearTimeout(timer)
-    }, [searchValue])
+    }
 
     if (E_Widgets) {
         console.error(E_Widgets)
@@ -62,24 +64,26 @@ export const WidgetBrowser = (props) => {
 
         {
             !L_Widgets && R_Widgets.map((widget, index) => {
-                return <WidgetItemPreview
-                    index={index}
-                    manifest={widget.manifest}
-                    onRemove={() => {
-                        app.cores.widgets.uninstall(widget._id)
-                    }}
-                    onInstall={() => {
-                        app.cores.widgets.install(widget._id)
-                    }}
-                    onUpdate={() => {
-                        app.cores.widgets.install(widget._id, {
-                            update: true,
-                        })
-                    }}
-                    onChangeVisible={(visible) => {
-                        app.cores.widgets.toogleVisibility(widget._id, visible)
-                    }}
-                />
+                return <React.Fragment>
+                    <WidgetItemPreview
+                        index={index}
+                        manifest={widget.manifest}
+                        onRemove={() => {
+                            app.cores.widgets.uninstall(widget._id)
+                        }}
+                        onInstall={() => {
+                            app.cores.widgets.install(widget._id)
+                        }}
+                        onUpdate={() => {
+                            app.cores.widgets.install(widget._id, {
+                                update: true,
+                            })
+                        }}
+                        onChangeVisible={(visible) => {
+                            app.cores.widgets.toogleVisibility(widget._id, visible)
+                        }}
+                    />
+                </React.Fragment>
             })
         }
         {
