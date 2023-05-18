@@ -50,7 +50,7 @@ export default class Post {
             throw new Error("Post ID and/or comment are required")
         }
 
-        const request = await request({
+        const { data } = await request({
             method: "POST",
             url: `/comments/post/${post_id}`,
             data: {
@@ -58,7 +58,7 @@ export default class Post {
             },
         })
 
-        return request
+        return data
     }
 
     static deleteComment = async ({ post_id, comment_id }) => {
@@ -66,12 +66,12 @@ export default class Post {
             throw new Error("Post ID and/or comment ID are required")
         }
 
-        const request = await request({
+        const { data } = await request({
             method: "DELETE",
             url: `/comments/post/${post_id}/${comment_id}`,
         })
 
-        return request
+        return data
     }
 
     static getExplorePosts = async ({ trim, limit }) => {
