@@ -13,13 +13,13 @@ function getCurrentHostname() {
 const envOrigins = {
     "development": {
         default: `http://${getCurrentHostname()}:3010`,
-        messaging: `http://${getCurrentHostname()}:3020`,
+        chat: `http://${getCurrentHostname()}:3020`,
         livestreaming: `http://${getCurrentHostname()}:3030`,
         marketplace: `http://${getCurrentHostname()}:3040`,
     },
     "production": {
         default: "https://api.comty.app",
-        messaging: `https://messaging_api.comty.app`,
+        chat: `https://chat_api.comty.app`,
         livestreaming: `https://livestreaming_api.comty.app`,
         marketplace: `https://marketplace_api.comty.app`,
     }
@@ -29,12 +29,12 @@ export default {
     default: {
         origin: composeRemote("default"),
         hasWebsocket: true,
-        needsAuth: true,
+        useClassicAuth: true,
+        autoconnect: true,
     },
-    messaging: {
-        origin: composeRemote("messaging"),
+    chat: {
+        origin: composeRemote("chat"),
         hasWebsocket: true,
-        needsAuth: true,
     },
     livestreaming: {
         origin: composeRemote("livestreaming"),

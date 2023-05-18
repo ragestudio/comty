@@ -6,8 +6,8 @@
     "scripts": {
         "postinstall": "npm rebuild @tensorflow/tfjs-node --build-from-source",
         "release": "node ./scripts/release.js",
-        "dev": "concurrently -k -n Server,MarketplaceServer,MessageServer,Client -c bgCyan,bgCyan,bgCyan,bgGreen \"yarn dev:server\" \"yarn dev:marketplace_server\" \"yarn dev:message_server\" \"yarn dev:client\"",
-        "dev:message_server": "cd packages/message_server && yarn dev",
+        "dev": "concurrently -k -n Server,MarketplaceServer,ChatServer,Client -c bgCyan,bgCyan,bgCyan,bgGreen \"yarn dev:server\" \"yarn dev:marketplace_server\" \"yarn dev:chat_server\" \"yarn dev:client\"",
+        "dev:chat_server": "cd packages/chat_server && yarn dev",
         "dev:marketplace_server": "cd packages/marketplace_server && yarn dev",
         "dev:server": "cd packages/server && yarn dev",
         "dev:client": "cd packages/app && yarn dev"

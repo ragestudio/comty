@@ -1,5 +1,24 @@
 require("dotenv").config()
 
+if (typeof process.env.NODE_ENV === "undefined") {
+    process.env.NODE_ENV = "development"
+}
+
+global.isProduction = process.env.NODE_ENV === "production"
+
+import path from "path"
+import { registerBaseAliases } from "linebridge/dist/server"
+
+const customAliases = {
+    "@services": path.resolve(__dirname, "services"),
+}
+
+if (!global.isProduction) {
+    customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+}
+
+registerBaseAliases(undefined, customAliases)
+
 // patches
 const { Buffer } = require("buffer")
 

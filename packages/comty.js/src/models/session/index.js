@@ -106,9 +106,14 @@ export default class Session {
         return response.data
     }
 
+    // alias for validateToken method
     static validSession = async (token) => {
+        return await Session.validateToken(token)
+    }
+
+    static validateToken = async (token) => {
         const response = await request({
-            method: "POST",
+            method: "post",
             url: "/session/validate",
             data: {
                 token: token
