@@ -109,7 +109,7 @@ export default async (req, res) => {
     let widgetCode = null
 
     // get origin from request url
-    const origin = `${req.protocol}://${req.get("host")}/static/widgets/${widgetId}@${requestedVersion}/`
+    const origin = `${toBoolean(process.env.FORCE_CODE_SSL) ? "https" : req.protocol}://${req.get("host")}/static/widgets/${widgetId}@${requestedVersion}/`
     const remotePath = `/widgets/${widgetId}@${requestedVersion}/`
 
     const remoteEntyFilePath = path.join(remotePath, widget.manifest.main)
