@@ -7,16 +7,21 @@ RUN apt install --no-install-recommends curl python yarn build-essential -y
 
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
+# Copy comty.js to node_modules
 WORKDIR /home/node/app
 USER node
 
-EXPOSE 3010
+EXPOSE 3040
 
 COPY package.json ./
 COPY --chown=node:node . .
 
 RUN chmod -R 777 /home/node/app
-RUN yarn install
+
+RUN export NODE_ENV=production
+
+RUN yarn global add cross-env
+RUN yarn install --production
 RUN yarn build
 
-CMD ["node", "/home/node/app/dist/index.js"]
+CMD ["yarn", "run", "run:prod"]
