@@ -1,0 +1,40 @@
+{
+    "name": "@comty/file_server",
+    "version": "0.45.2",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "corenode-cli build",
+        "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@foxify/events": "^2.1.0",
+        "@octokit/rest": "^19.0.7",
+        "axios": "^1.4.0",
+        "bcrypt": "^5.1.0",
+        "busboy": "^1.6.0",
+        "content-range": "^2.0.2",
+        "corenode": "0.28.26",
+        "dotenv": "^16.0.3",
+        "hyper-express": "^6.5.9",
+        "jsonwebtoken": "^9.0.0",
+        "linebridge": "0.15.12",
+        "live-directory": "^3.0.3",
+        "merge-files": "^0.1.2",
+        "mime-types": "^2.1.35",
+        "minio": "^7.0.32",
+        "moment": "^2.29.4",
+        "moment-timezone": "^0.5.40",
+        "normalize-url": "^8.0.0",
+        "p-map": "^6.0.0",
+        "p-queue": "^7.3.4",
+        "redis": "^4.6.6",
+        "split-chunk-merge": "^1.0.0"
+    },
+    "devDependencies": {
+        "chai": "^4.3.7",
+        "cross-env": "^7.0.3",
+        "mocha": "^10.2.0",
+        "nodemon": "^2.0.15"
+    }
+}
