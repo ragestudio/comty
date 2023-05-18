@@ -1,10 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { io } from "socket.io-client"
 import { TransitionGroup, CSSTransition } from "react-transition-group"
 
-import config from "config"
 import SessionModel from "models/session"
 
 import "./index.less"
@@ -24,12 +22,18 @@ const Line = (props) => {
 export default class LiveChat extends React.Component {
     state = {
         socket: null,
+
         connecting: true,
         connectionEnd: false,
+
         roomInfo: null,
+
         timeline: [],
         temporalTimeline: [],
+
+        lastSentMessage: null,
         writtedMessage: "",
+
         maxTemporalLines: this.props.maxTemporalLines ?? 10,
     }
 
@@ -37,25 +41,36 @@ export default class LiveChat extends React.Component {
 
     timelineRef = React.createRef()
 
-    joinSocketRoom = async () => {
-        await this.setState({ connecting: true })
+    socket = app.cores.api.instance().wsInstances.chat
 
-        const { roomId } = this.props
+    roomEvents = {
+        "room:recive:message": (message) => {
+            if (message.content === this.state.lastSentMessage) {
+                console.timeEnd("[CHATROOM] SUBMIT:MESSAGE")
+            }
 
-        const socketNamespace = `/textRoom/${roomId}`
+            this.pushToTimeline(message)
+        },
+        "room:joined": (info) => {
+            console.log("[CHATROOM] Room joined", info)
 
-        console.log(`Joining socket room [${socketNamespace}]`)
+            this.setState({
+                connecting: false,
+                roomInfo: info,
+            })
+        },
+        "room:leave": (info) => {
+            console.log("[CHATROOM] Room left", info)
 
-        const socket = io(config.remotes.messagingApi, {
-            transports: ["websocket"],
-            autoConnect: false,
-        })
-
-        socket.auth = {
-            token: SessionModel.token,
+            this.setState({
+                connecting: false,
+                roomInfo: null,
+            })
         }
+    }
 
-        socket.on("connect_error", (err) => {
+    socketEvents = {
+        "connect_error": (err) => {
             console.error("Connection error", err)
 
             this.setState({ connectionEnd: true })
@@ -63,40 +78,73 @@ export default class LiveChat extends React.Component {
             if (err.message === "auth:token_invalid") {
                 console.error("Invalid token")
             }
-        })
+        },
+        "disconnect": (reason) => {
+            console.error("Disconnected", reason)
 
-        socket.on("connect", () => {
-            socket.emit("join", { room: socketNamespace }, (error, info) => {
-                if (error) {
-                    this.setState({ connectionEnd: true })
-                    return console.error("Error joining room", error)
-                }
+            this.setState({ connectionEnd: true })
+        },
+        "connect": () => {
+            this.setState({ connectionEnd: false })
 
-                this.setState({
-                    connecting: false,
-                    roomInfo: info,
-                })
+            this.joinSocketRoom()
+        }
+    }
+
+    initializeSocket = async () => {
+        if (!this.socket) {
+            console.error("Socket not initialized/avaliable")
+
+            this.setState({ connectionEnd: true })
+
+            return false
+        }
+
+        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
+            this.socket.on(eventName, eventHandler)
+        }
+
+        for (const [eventName, eventHandler] of Object.entries(this.socketEvents)) {
+            this.socket.on(eventName, eventHandler)
+        }
+    }
+
+    joinSocketRoom = async () => {
+        await this.setState({ connecting: true })
+
+        if (!this.socket.connected) {
+            this.socket.connect()
+        }
+
+        const { roomId } = this.props
+
+        const socketNamespace = `/textRoom/${roomId}`
+
+        console.log(`[CHATROOM] Joining socket room [${socketNamespace}]...`)
+
+        this.socket.emit("join:room", { room: socketNamespace }, (error, info) => {
+            if (error) {
+                this.setState({ connectionEnd: true })
+
+                return console.error("Error joining room", error)
+            }
+
+            this.setState({
+                connecting: true,
             })
         })
-
-        socket.on("message", (message) => {
-            this.pushToTimeline(message)
-        })
-
-        socket.connect()
-
-        this.setState({ socket })
     }
 
     submitMessage = (message) => {
-        const { socket } = this.state
+        console.time("[CHATROOM] SUBMIT:MESSAGE")
 
-        socket.emit("send:message", {
+        this.socket.emit("room:send:message", {
             message
         })
 
         // remove writted message
         this.setState({
+            lastSentMessage: message,
             writtedMessage: ""
         })
     }
@@ -187,8 +235,6 @@ export default class LiveChat extends React.Component {
     scrollTimelineToBottom = () => {
         const scrollingElement = document.getElementById("liveChat_timeline")
 
-        console.log(`Scrolling to bottom`, scrollingElement)
-
         if (scrollingElement) {
             scrollingElement.scrollTo({
                 top: scrollingElement.scrollHeight,
@@ -206,7 +252,15 @@ export default class LiveChat extends React.Component {
             })
         }
 
-        await this.joinSocketRoom()
+        await this.initializeSocket()
+
+        await this.joinSocketRoom().catch((err) => {
+            console.error("Error joining socket room", err)
+
+            this.setState({
+                connectionEnd: true
+            })
+        })
 
         app.ctx = {
             submit: this.submitMessage
@@ -214,7 +268,17 @@ export default class LiveChat extends React.Component {
     }
 
     componentWillUnmount() {
-        this.state.socket.close()
+        if (this.socket) {
+            this.socket.emit("leave:room")
+        }
+
+        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
+            this.socket.off(eventName, eventHandler)
+        }
+
+        for (const [eventName, eventHandler] of Object.entries(this.socketEvents)) {
+            this.socket.off(eventName, eventHandler)
+        }
 
         if (this.debouncedIntervalTimelinePurge) {
             clearInterval(this.debouncedIntervalTimelinePurge)

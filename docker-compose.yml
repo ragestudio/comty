@@ -15,13 +15,13 @@ services:
       - api.env
     volumes:
       - ./d_data/api/cache:/home/node/app/cache
-  message_server:
-    build: packages/message_server
+  chat_server:
+    build: packages/chat_server
     restart: unless-stopped
     ports:
       - "5001:3020"
     env_file:
-      - messaging.env
+      - chat.env
   marketplace_server:
     build: packages/marketplace_server
     restart: unless-stopped
