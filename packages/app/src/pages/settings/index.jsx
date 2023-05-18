@@ -384,6 +384,7 @@ const SettingGroup = React.memo((props) => {
         groupKey,
         settings,
         loading,
+        disabled
     } = props
 
     const fromDecoratorIcon = groupsDecorators[groupKey]?.icon
@@ -391,6 +392,10 @@ const SettingGroup = React.memo((props) => {
 
     if (loading) {
         return <antd.Skeleton active />
+    }
+
+    if (disabled) {
+        return null
     }
 
     return <div index={groupKey} key={groupKey} className="group">
@@ -530,6 +535,7 @@ const generateMenuItems = () => {
                 </div>,
                 type: "item",
                 danger: item.danger,
+                disabled: item.disabled,
             }
         })
 
@@ -552,7 +558,7 @@ const generateMenuItems = () => {
                 </Translation>
             </>,
             type: "group",
-            children: children
+            children: children,
         }
     })
 }
