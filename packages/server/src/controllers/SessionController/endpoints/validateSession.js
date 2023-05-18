@@ -10,7 +10,8 @@ export default {
 
         let result = {
             expired: false,
-            valid: true
+            valid: true,
+            session: null
         }
 
         await jwt.verify(token, global.jwtStrategy.secretOrKey, async (err, decoded) => {
@@ -41,6 +42,10 @@ export default {
                 result.valid = true
             }
         })
+
+        if (result.valid) {
+            result.session = await jwt.decode(token)
+        }
 
         return res.json(result)
     },
