@@ -79,6 +79,9 @@ class Room {
         // join room
         socket.join(this.roomName)
 
+        // add to connections
+        this.connections.push(socket)
+
         // emit to self
         socket.emit("room:joined", {
             room: this.roomName,
@@ -110,9 +113,6 @@ class Room {
             socket.on(event, handler)
         }
 
-        // add to connections
-        this.connections.push(socket)
-
         console.log(`[${socket.id}][@${socket.userData.username}] joined room ${this.roomName}`)
     }
 
@@ -128,6 +128,8 @@ class Room {
         }
 
         socket.leave(this.roomName)
+
+        this.connections.splice(this.connections.indexOf(socket), 1)
 
         socket.emit("room:left", {
             room: this.roomName,
@@ -145,8 +147,6 @@ class Room {
         for (const [event, handler] of socket.handlers) {
             socket.off(event, handler)
         }
-
-        this.connections.splice(this.connections.indexOf(socket), 1)
 
         console.log(`[${socket.id}][@${socket.userData.username}] left room ${this.roomName}`)
     }
