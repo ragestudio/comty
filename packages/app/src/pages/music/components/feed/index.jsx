@@ -191,22 +191,113 @@ const MayLike = (props) => {
     </div>
 }
 
-export default () => {
-    return <div className="playlistExplorer">
-        <RecentlyPlayed />
+const SearchResultItem = (props) => {
+    return <div>
+        <h1>SearchResultItem</h1>
+    </div>
+}
 
-        <PlaylistsList
-            headerTitle="From your following artists"
-            headerIcon={<Icons.MdPerson />}
-            fetchMethod={FeedModel.getPlaylistsFeed}
-        />
+export default (props) => {
+    const [searchLoading, setSearchLoading] = React.useState(false)
+    const [searchFocused, setSearchFocused] = React.useState(false)
+    const [searchValue, setSearchValue] = React.useState("")
+    const [searchResult, setSearchResult] = React.useState([])
 
-        <PlaylistsList
-            headerTitle="Explore from global"
-            headerIcon={<Icons.MdExplore />}
-            fetchMethod={FeedModel.getGlobalMusicFeed}
-        />
+    const handleSearchValueChange = (e) => {
+        // not allow to input space as first character
+        if (e.target.value[0] === " ") {
+            return
+        }
 
-        <MayLike />
+        setSearchValue(e.target.value)
+    }
+
+    const makeSearch = async (value) => {
+        setSearchResult([])
+
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
+        setSearchResult([
+            {
+                title: "test",
+                thumbnail: "/assets/no_song.png",
+            },
+            {
+                title: "test2",
+                thumbnail: "/assets/no_song.png",
+            }
+        ])
+    }
+
+    React.useEffect(() => {
+        const timer = setTimeout(async () => {
+            setSearchLoading(true)
+
+            await makeSearch(searchValue)
+            
+            setSearchLoading(false)
+        }, 400)
+
+        if (searchValue === "") {
+            if (typeof props.onEmpty === "function") {
+                //props.onEmpty()
+            }
+        } else {
+            if (typeof props.onFilled === "function") {
+                //props.onFilled()
+            }
+        }
+
+        return () => clearTimeout(timer)
+    }, [searchValue])
+
+    return <div
+        className={classnames(
+            "musicExplorer",
+            {
+                ["search-focused"]: searchFocused,
+            }
+        )}
+    >
+        <div className="searcher">
+            <antd.Input
+                placeholder="Search for music"
+                prefix={<Icons.Search />}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+                onChange={handleSearchValueChange}
+                value={searchValue}
+            />
+
+            <div className="searcher_result">
+                {
+                    searchLoading && <antd.Skeleton active />
+                }
+                {
+                    searchFocused && searchValue !== "" && searchResult.length > 0  && searchResult.map((result, index) => {
+                        return <SearchResultItem
+                            key={index}
+                            result={result}
+                        />
+                    })
+                }
+            </div>
+        </div>
+
+        <div className="feed_main">
+            <RecentlyPlayed />
+
+            <PlaylistsList
+                headerTitle="From your following artists"
+                headerIcon={<Icons.MdPerson />}
+                fetchMethod={FeedModel.getPlaylistsFeed}
+            />
+
+            <PlaylistsList
+                headerTitle="Explore from global"
+                headerIcon={<Icons.MdExplore />}
+                fetchMethod={FeedModel.getGlobalMusicFeed}
+            />
+        </div>
     </div>
 }
