@@ -86,8 +86,8 @@ class Room {
         socket.emit("room:joined", {
             room: this.roomName,
             limitations: this.limitations,
-            connectedUsers: this.connections.map((conn) => {
-                return conn.user_id
+            connectedUsers: this.connections.map((socket_conn) => {
+                return socket_conn.userData._id
             }),
         })
 
