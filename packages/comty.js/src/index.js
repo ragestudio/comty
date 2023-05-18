@@ -5,7 +5,7 @@ import { io } from "socket.io-client"
 
 import remotes from "./remotes"
 
-import request from "./handlers/request"
+//import request from "./handlers/request"
 import Storage from "./helpers/withStorage"
 
 import SessionModel from "./models/session"
@@ -25,10 +25,11 @@ if (globalThis.isServerMode) {
 }
 
 export default function createClient({
-    wsEvents = Object(),
-    useWs = false,
     accessKey = null,
     privateKey = null,
+    enableWs = false,
+    wsEvents = Object(),
+    wsParams = Object(),
 } = {}) {
     const sharedState = globalThis.__comty_shared_state = {
         onExpiredExceptionEvent: false,
@@ -54,12 +55,25 @@ export default function createClient({
             baseURL: remote.origin,
         })
 
-        if (useWs && remote.hasWebsocket) {
-            sharedState.wsInstances[key] = io(remote.wsOrigin ?? remote.origin, {
+        if (enableWs && remote.hasWebsocket) {
+            let opts = {
                 transports: ["websocket"],
-                autoConnect: true,
+                autoConnect: remote.autoConnect ?? true,
                 ...remote.wsParams ?? {},
-            })
+            }
+
+            if (wsParams[key]) {
+                if (typeof wsParams[key] === "function") {
+                    opts = wsParams[key](opts)
+                } else {
+                    opts = {
+                        ...opts,
+                        ...wsParams[key],
+                    }
+                }
+            }
+
+            sharedState.wsInstances[key] = io(remote.wsOrigin ?? remote.origin, opts)
         }
     }
 
@@ -68,9 +82,9 @@ export default function createClient({
         const ws = sharedState.wsInstances[key]
 
         ws.on("connect", () => {
-            console.log(`[WS-API][${key}] Connected`)
+            console.debug(`[WS-API][${key}] Connected`)
 
-            if (remotes[key].needsAuth) {
+            if (remotes[key].useClassicAuth) {
                 // try to auth
                 ws.emit("authenticate", {
                     token: SessionModel.token,
@@ -87,7 +101,7 @@ export default function createClient({
         })
 
         ws.onAny((event, ...args) => {
-            console.log(`[WS-API][${key}] Event recived`, event, ...args)
+            console.debug(`[WS-API][${key}] Event recived`, event, ...args)
         })
 
         const customEvents = wsEvents[key]
