@@ -1,12 +1,19 @@
 require("dotenv").config()
+global.isProduction = process.env.NODE_ENV === "production"
+
 import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
 
-registerBaseAliases(undefined, {
+const customAliases = {
     "@services": path.resolve(__dirname, "services"),
-    "comty.js": path.resolve(__dirname, "../../comty.js/src"),
-})
+}
+
+if (!global.isProduction) {
+    customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+}
+
+registerBaseAliases(undefined, customAliases)
 
 // patches
 const { Buffer } = require("buffer")
@@ -41,8 +48,6 @@ global.toBoolean = (value) => {
 
     return false
 }
-
-global.isProduction = process.env.NODE_ENV === "production"
 
 import API from "./api"
 
