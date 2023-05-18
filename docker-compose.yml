@@ -15,11 +15,18 @@ services:
       - api.env
     volumes:
       - ./d_data/api/cache:/home/node/app/cache
+  marketplace_server:
+    build: packages/marketplace_server
+    restart: unless-stopped
+    ports:
+      - "5001:3040"
+    env_file:
+      - marketplace.env
   message_server:
     build: packages/message_server
     restart: unless-stopped
     ports:
-      - "3005:3005"
+      - "5002:3005"
     env_file:
       - messaging.env
   redis:
