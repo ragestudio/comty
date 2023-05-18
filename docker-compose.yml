@@ -10,25 +10,25 @@ services:
     build: packages/server
     restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "5000:3010"
     env_file:
       - api.env
     volumes:
       - ./d_data/api/cache:/home/node/app/cache
-  marketplace_server:
-    build: packages/marketplace_server
-    restart: unless-stopped
-    ports:
-      - "5001:3040"
-    env_file:
-      - marketplace.env
   message_server:
     build: packages/message_server
     restart: unless-stopped
     ports:
-      - "5002:3005"
+      - "5001:3020"
     env_file:
       - messaging.env
+  marketplace_server:
+    build: packages/marketplace_server
+    restart: unless-stopped
+    ports:
+      - "5002:3040"
+    env_file:
+      - marketplace.env
   redis:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
