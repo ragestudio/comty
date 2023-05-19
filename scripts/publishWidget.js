@@ -97,7 +97,7 @@ async function main() {
         },
         data: formData,
     }).catch((error) => {
-        console.error("🛑 Error while publishing bundle \n\t", error.response.data)
+        console.error("🛑 Error while publishing bundle \n\t", error.response?.data ?? error)
 
         return false
     })
