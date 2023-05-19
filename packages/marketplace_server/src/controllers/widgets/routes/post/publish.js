@@ -17,6 +17,8 @@ function extractBundle(input, output) {
             } else {
                 await fs.promises.rm(input, { recursive: true, force: true })
 
+                console.log("Bundle extracted")
+
                 return resolve()
             }
         })
@@ -45,8 +47,6 @@ export default async function (req, res) {
     if (!auth) {
         return res.status(401).json({ error: "Unauthorized" })
     }
-
-    console.log("Auth data =>", auth)
 
     // get bundle file
     const bb = busboy({ headers: req.headers })
