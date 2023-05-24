@@ -6,7 +6,17 @@ import { Sidebar, Drawer, Sidedrawer, Modal } from "components/Layout"
 
 import BackgroundDecorator from "components/BackgroundDecorator"
 
+import { createWithDom as FloatingStack } from "../components/floatingStack"
+
 export default (props) => {
+    React.useEffect(() => {
+        const floatingStack = FloatingStack()
+
+        return () => {
+            floatingStack.remove()
+        }
+    }, [])
+
     return <>
         <BackgroundDecorator />
 
