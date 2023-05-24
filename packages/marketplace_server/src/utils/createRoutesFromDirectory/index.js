@@ -10,7 +10,7 @@ function createRoutesFromDirectory(startFrom, directoryPath, router) {
 
         if (stat.isDirectory()) {
             createRoutesFromDirectory(startFrom, filePath, router)
-        } else if (file.endsWith(".js")) {
+        } else if (file.endsWith(".js") || file.endsWith(".jsx") || file.endsWith(".ts") || file.endsWith(".tsx")) {
             let splitedFilePath = filePath.split("/")
 
             // slice the startFrom path
