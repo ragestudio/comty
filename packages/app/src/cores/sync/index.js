@@ -32,6 +32,10 @@ class MusicSyncSubCore {
             return this.currentRoomData
         }.bind(this),
         eventBus: this.eventBus,
+        moderation: {
+            kickUser: this.kickUser.bind(this),
+            transferOwner: this.transferOwner.bind(this),
+        },
     }
 
     hubEvents = {
@@ -110,6 +114,8 @@ class MusicSyncSubCore {
 
             app.cores.player.toogleSyncMode(true, !isSelf)
 
+            app.cores.player.playback.stop()
+
             this.eventBus.emit("room:owner:changed", data)
         },
         // Room Control
@@ -155,7 +161,25 @@ class MusicSyncSubCore {
                     break
                 }
             }
-        }
+        },
+        "room:moderation:kicked": (data) => {
+            console.log("room:moderation:kicked", data)
+
+            this.dettachCard()
+
+            this.currentRoomData = null
+
+            app.cores.player.toogleSyncMode(false, false)
+
+            app.notification.new({
+                title: "Kicked",
+                description: "You have been kicked from the sync room"
+            }, {
+                type: "error",
+            })
+
+            this.eventBus.emit("room:moderation:kicked", data)
+        },
     }
 
     async onInitialize() {
@@ -268,6 +292,32 @@ class MusicSyncSubCore {
             onFinished: (selected_ids) => {
                 console.log("selected_ids", selected_ids)
             }
+        })
+    }
+
+    kickUser(userId) {
+        if (!this.currentRoomData) {
+            console.warn(`Not joined any room`)
+
+            return false
+        }
+
+        this.musicWs.emit("room:moderation:kick", {
+            room_id: this.currentRoomData.roomId,
+            user_id: userId,
+        })
+    }
+
+    transferOwner(userId) {
+        if (!this.currentRoomData) {
+            console.warn(`Not joined any room`)
+
+            return false
+        }
+
+        this.musicWs.emit("room:moderation:transfer_ownership", {
+            room_id: this.currentRoomData.roomId,
+            user_id: userId,
         })
     }
 }
