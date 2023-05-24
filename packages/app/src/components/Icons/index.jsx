@@ -2,6 +2,7 @@ import React from "react"
 
 import VrChatIcon from "./customIcons/vrchat"
 import VerifiedBadge from "./customIcons/verifiedBadge"
+import Crown from "./customIcons/crown"
 
 // import icons lib
 import * as lib1 from "feather-reactjs"
@@ -25,6 +26,9 @@ const customs = {
     VrChat: () => <VrChatIcon
         style={marginedStyle}
     />,
+    Crown: () => <Crown
+        style={marginedStyle}
+    />
 }
 
 export const Icons = {
