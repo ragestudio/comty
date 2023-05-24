@@ -1,10 +1,19 @@
 import React from "react"
-import { Button, Tooltip, Badge } from "antd"
+import { Button, Tooltip, Badge, Dropdown } from "antd"
 import { Icons } from "components/Icons"
 import LiveChat from "components/LiveChat"
 import classnames from "classnames"
 
 import "./index.less"
+
+const eventsToDispatch = {
+    "kick": (user) => {
+        app.cores.sync.music.moderation.kickUser(user.user_id)
+    },
+    "transfer_owner": (user) => {
+        app.cores.sync.music.moderation.transferOwner(user.user_id)
+    }
+}
 
 export default class SyncRoomCard extends React.Component {
     state = {
@@ -59,7 +68,7 @@ export default class SyncRoomCard extends React.Component {
 
         // chat instance
         const chatInstance = app.cores.api.instance().wsInstances.chat
-       
+
         if (chatInstance) {
             Object.keys(this.chatEvents).forEach((event) => {
                 chatInstance.on(event, this.chatEvents[event])
@@ -112,6 +121,45 @@ export default class SyncRoomCard extends React.Component {
         }
     }
 
+    generateUserMenu = (user) => {
+        const isSelf = user.user_id === app.userData._id
+        const imOwner = app.userData._id === this.state.roomData.ownerUserId
+
+        const items = []
+
+        if (!isSelf && imOwner) {
+            items.push({
+                key: "kick",
+                label: <>
+                    <Icons.MdLogout /> Kick
+                </>,
+            })
+
+            items.push({
+                key: "transfer_owner",
+                label: <>
+                    <Icons.Crown /> Transfer owner
+                </>,
+            })
+        }
+
+        return [
+            {
+                type: "group",
+                label: `@${user.username}`,
+                children: items,
+            }
+        ]
+    }
+
+    handleUserMenuClick = (event, user) => {
+        const action = eventsToDispatch[event]
+
+        if (typeof action === "function") {
+            action(user)
+        }
+    }
+
     render() {
         return <>
             <div className="sync-room_subcard top">
@@ -144,9 +192,16 @@ export default class SyncRoomCard extends React.Component {
                 <div className="sync-room_users">
                     {
                         Array.isArray(this.state.roomData?.connectedUsers) && this.state.roomData?.connectedUsers.map((user, index) => {
-                            return <Tooltip
-                                title={user.username}
-                                key={index}
+                            return <Dropdown
+                                menu={{
+                                    items: this.generateUserMenu(user),
+                                    onClick: (event) => {
+                                        this.handleUserMenuClick(event.key, user)
+                                    }
+                                }}
+                                trigger={["click"]}
+                                placement="top"
+                                arrow
                             >
                                 <div className="sync-room_user" key={index}>
                                     {
@@ -158,7 +213,7 @@ export default class SyncRoomCard extends React.Component {
                                         <img src={user.avatar} alt={user.username} />
                                     </div>
                                 </div>
-                            </Tooltip>
+                            </Dropdown>
                         })
                     }
                 </div>
