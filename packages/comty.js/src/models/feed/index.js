@@ -66,17 +66,4 @@ export default class FeedModel {
 
         return data
     }
-
-    static search = async (keywords, params = {}) => {
-        const { data } = await request({
-            method: "GET",
-            url: `/search`,
-            params: {
-                keywords: keywords,
-                params: params
-            }
-        })
-
-        return data
-    }
 }
