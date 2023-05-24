@@ -15,6 +15,8 @@ import RemoteStorage from "./remoteStorage"
 
 import WidgetsCore from "./widgets"
 
+import SyncCore from "./sync"
+
 // DEFINE LOAD ORDER HERE
 export default [
     SettingsCore,
@@ -32,4 +34,5 @@ export default [
     Player,
     ContextMenuCore,
     WidgetsCore,
+    SyncCore,
 ]
