@@ -336,23 +336,34 @@ export default class LiveChat extends React.Component {
         return <div
             className={classnames(
                 "liveChat",
-                { ["empty"]: this.state.timeline.length === 0 }
+                {
+                    ["empty"]: this.state.timeline.length === 0,
+                    ["compact"]: this.props.compact
+                }
             )}
         >
             {
-                this.state.timeline.length === 0 ?
-                    <antd.Empty description="Welcome to the room" /> :
-                    <div
-                        className="liveChat_timeline"
-                        ref={this.timelineRef}
-                        id="liveChat_timeline"
-                    >
-                        {
-                            this.state.timeline.map((line, index) => {
-                                return <Line key={index} {...line} />
-                            })
-                        }
-                    </div>
+                !this.props.compact && this.state.timeline.length === 0 && <antd.Empty description="Welcome to the room" />
+            }
+
+            {
+                this.props.compact && this.state.timeline.length === 0 && <p>
+                    Welcome to the room
+                </p>
+            }
+
+            {
+                this.state.timeline.length !== 0 && <div
+                    className="liveChat_timeline"
+                    ref={this.timelineRef}
+                    id="liveChat_timeline"
+                >
+                    {
+                        this.state.timeline.map((line, index) => {
+                            return <Line key={index} {...line} />
+                        })
+                    }
+                </div>
             }
 
             <div className="liveChat_textInput">
