@@ -16,12 +16,14 @@ const envOrigins = {
         chat: `http://${getCurrentHostname()}:3020`,
         livestreaming: `http://${getCurrentHostname()}:3030`,
         marketplace: `http://${getCurrentHostname()}:3040`,
+        music: `http://${getCurrentHostname()}:3050`,
     },
     "production": {
         default: "https://api.comty.app",
         chat: `https://chat_api.comty.app`,
         livestreaming: `https://livestreaming_api.comty.app`,
         marketplace: `https://marketplace_api.comty.app`,
+        music: `https://music_api.comty.app`,
     }
 }
 
@@ -34,6 +36,10 @@ export default {
     },
     chat: {
         origin: composeRemote("chat"),
+        hasWebsocket: true,
+    },
+    music: {
+        origin: composeRemote("music"),
         hasWebsocket: true,
     },
     livestreaming: {
