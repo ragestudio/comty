@@ -88,12 +88,72 @@ class Room {
 
             this.io.to(this.roomId).emit("music:player:status", composePayloadData(socket, data))
         },
-        "music:owner:state_update": (socket, data) => {
+        // ROOM CONTROL
+        "room:moderation:kick": (socket, data) => {
             if (socket.userData._id !== this.ownerUserId) {
-                return false
+                return socket.emit("error", {
+                    message: "You are not the owner of this room, cannot kick this user",
+                })
             }
 
-            this.currentState = data
+            const { room_id, user_id } = data
+
+            if (this.roomId !== room_id) {
+                console.warn(`[${socket.id}][@${socket.userData.username}] not connected to room ${room_id}, cannot kick`)
+
+                return socket.emit("error", {
+                    message: "You are not connected to requested room, cannot kick this user",
+                })
+            }
+
+            const socket_conn = this.connections.find((socket_conn) => {
+                return socket_conn.userData._id === user_id
+            })
+
+            if (!socket_conn) {
+                console.warn(`[${socket.id}][@${socket.userData.username}] not found user ${user_id} in room ${room_id}, cannot kick`)
+
+                return socket.emit("error", {
+                    message: "User not found in room, cannot kick",
+                })
+            }
+
+            socket_conn.emit("room:moderation:kicked", {
+                room_id,
+            })
+
+            this.leave(socket_conn)
+        },
+        "room:moderation:transfer_ownership": (socket, data) => {
+            if (socket.userData._id !== this.ownerUserId) {
+                return socket.emit("error", {
+                    message: "You are not the owner of this room, cannot transfer ownership",
+                })
+            }
+
+            const { room_id, user_id } = data
+
+            if (this.roomId !== room_id) {
+                console.warn(`[${socket.id}][@${socket.userData.username}] not connected to room ${room_id}, cannot transfer ownership`)
+
+                return socket.emit("error", {
+                    message: "You are not connected to requested room, cannot transfer ownership",
+                })
+            }
+
+            const socket_conn = this.connections.find((socket_conn) => {
+                return socket_conn.userData._id === user_id
+            })
+
+            if (!socket_conn) {
+                console.warn(`[${socket.id}][@${socket.userData.username}] not found user ${user_id} in room ${room_id}, cannot transfer ownership`)
+
+                return socket.emit("error", {
+                    message: "User not found in room, cannot transfer ownership",
+                })
+            }
+
+            this.transferOwner(socket_conn)
         }
     }
 
@@ -224,6 +284,8 @@ class Room {
         this.io.to(this.roomId).emit("room:owner:changed", {
             ownerUserId: this.ownerUserId,
         })
+
+        this.sendRoomData()
     }
 
     destroy = () => {
@@ -359,34 +421,7 @@ export default class RoomsServer {
     connectionPool = []
 
     events = {
-        "connection": (socket) => {
-            console.log(`[${socket.id}][${socket.userData.username}] connected to hub.`)
 
-            this.connectionPool.push(socket)
-
-            socket.on("disconnect", () => this.events.disconnect)
-
-            // Rooms
-            socket.on("join:room", (data) => this.RoomsController.connectSocketToRoom(socket, data.room, data.options))
-            socket.on("leave:room", (data) => this.RoomsController.disconnectSocketFromRoom(socket, data?.room ?? socket.connectedRoomId, data?.options ?? {}))
-            socket.on("invite:user", generateFnHandler(this.inviteUserToRoom, socket))
-
-            socket.on("ping", (callback) => {
-                callback()
-            })
-
-            socket.on("disconnect", (_socket) => {
-                console.log(`[${socket.id}][@${socket.userData.username}] disconnected to hub.`)
-
-                if (socket.connectedRoomId) {
-                    console.log(`[${socket.id}][@${socket.userData.username}] was connected to room [${socket.connectedRoomId}], leaving...`)
-                    this.RoomsController.disconnectSocketFromRoom(socket)
-                }
-
-                // remove from connection pool
-                this.connectionPool = this.connectionPool.filter((client) => client.id !== socket.id)
-            })
-        },
     }
 
     inviteUserToRoom = async (socket, data) => {
@@ -430,14 +465,47 @@ export default class RoomsServer {
     initialize = async () => {
         this.io.use(withWsAuth)
 
-        Object.entries(this.events).forEach(([event, handler]) => {
-            this.io.on(event, (socket) => {
-                try {
-                    handler(socket)
-                } catch (error) {
-                    console.error(error)
-                }
-            })
+        this.io.on("connection", (socket) => {
+            try {
+                console.log(`[${socket.id}][${socket.userData.username}] connected to hub.`)
+
+                this.connectionPool.push(socket)
+
+                socket.on("disconnect", () => this.events.disconnect)
+
+                // Rooms
+                socket.on("join:room", (data) => this.RoomsController.connectSocketToRoom(socket, data.room, data.options))
+                socket.on("leave:room", (data) => this.RoomsController.disconnectSocketFromRoom(socket, data?.room ?? socket.connectedRoomId, data?.options ?? {}))
+                socket.on("invite:user", generateFnHandler(this.inviteUserToRoom, socket))
+
+                socket.on("ping", (callback) => {
+                    callback()
+                })
+
+                socket.on("disconnect", (_socket) => {
+                    console.log(`[${socket.id}][@${socket.userData.username}] disconnected to hub.`)
+
+                    if (socket.connectedRoomId) {
+                        console.log(`[${socket.id}][@${socket.userData.username}] was connected to room [${socket.connectedRoomId}], leaving...`)
+                        this.RoomsController.disconnectSocketFromRoom(socket)
+                    }
+
+                    // remove from connection pool
+                    this.connectionPool = this.connectionPool.filter((client) => client.id !== socket.id)
+                })
+
+                Object.entries(this.events).forEach(([event, handler]) => {
+                    socket.on(event, (data) => {
+                        try {
+                            handler(socket, data)
+                        } catch (error) {
+                            console.error(error)
+                        }
+                    })
+                })
+            } catch (error) {
+                console.error(error)
+            }
         })
     }
 }

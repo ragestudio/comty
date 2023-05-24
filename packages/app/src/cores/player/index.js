@@ -605,6 +605,8 @@ export default class Player extends Core {
     //
 
     async play(instance, params = {}) {
+        this.state.startingNew = true
+
         if (typeof instance === "number") {
             instance = this.audioQueue[instance]
         }
