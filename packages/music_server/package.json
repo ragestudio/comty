@@ -1,5 +1,5 @@
 {
-    "name": "@comty/music_spaces_server",
+    "name": "@comty/music_server",
     "version": "0.46.1",
     "main": "dist/index.js",
     "scripts": {
@@ -9,8 +9,9 @@
     "license": "MIT",
     "dependencies": {
         "@foxify/events": "^2.1.0",
-        "axios": "^1.2.1",
+        "axios": "^1.4.0",
         "bcrypt": "5.0.1",
+        "comty.js": "^0.46.1",
         "corenode": "0.28.26",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
@@ -21,8 +22,7 @@
         "moment-timezone": "0.5.37",
         "morgan": "^1.10.0",
         "nanoid": "3.2.0",
-        "socket.io": "^4.5.4",
-        "spotify-ws": "^0.1.1"
+        "socket.io": "^4.5.4"
     },
     "devDependencies": {
         "cross-env": "^7.0.3",

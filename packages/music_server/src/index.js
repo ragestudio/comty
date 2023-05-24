@@ -1,5 +1,24 @@
 require("dotenv").config()
 
+if (typeof process.env.NODE_ENV === "undefined") {
+    process.env.NODE_ENV = "development"
+}
+
+global.isProduction = process.env.NODE_ENV === "production"
+
+import path from "path"
+import { registerBaseAliases } from "linebridge/dist/server"
+
+const customAliases = {
+    "@services": path.resolve(__dirname, "services"),
+}
+
+if (!global.isProduction) {
+    customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+}
+
+registerBaseAliases(undefined, customAliases)
+
 // patches
 const { Buffer } = require("buffer")
 
@@ -32,16 +51,12 @@ global.toBoolean = (value) => {
     return false
 }
 
-import pkg from "../package.json"
 import API from "./api"
 
 async function main() {
     const api = new API()
 
-    console.log(`\n▶️ Initializing ${pkg.name} ...\n`)
-    const init = await api.initialize()
-
-    console.log(`\n🚀 ${pkg.name} v${pkg.version} is running on port ${init.listenPort}.\n`)
+    await api.initialize()
 }
 
 main().catch((error) => {
