@@ -24,12 +24,99 @@ if (globalThis.isServerMode) {
     }
 }
 
+export async function createWebsockets() {
+    const instances = globalThis.__comty_shared_state.wsInstances
+
+    for (let [key, instance] of Object.entries(instances)) {
+        if (instance.connected) {
+            // disconnect first
+            instance.disconnect()
+        }
+
+        // remove current listeners
+        instance.removeAllListeners()
+
+        delete globalThis.__comty_shared_state.wsInstances[key]
+    }
+
+    for (let [key, remote] of Object.entries(remotes)) {
+        if (!remote.hasWebsocket) {
+            continue
+        }
+
+        let opts = {
+            transports: ["websocket"],
+            autoConnect: remote.autoConnect ?? true,
+            ...remote.wsParams ?? {},
+        }
+
+        if (remote.noAuth !== true) {
+            opts.auth = {
+                token: SessionModel.token,
+            }
+        }
+
+        globalThis.__comty_shared_state.wsInstances[key] = io(remote.wsOrigin ?? remote.origin, opts)
+    }
+
+    // regsister events
+    for (let [key, instance] of Object.entries(instances)) {
+        instance.on("connect", () => {
+            console.debug(`[WS-API][${key}] Connected`)
+
+            if (remotes[key].useClassicAuth && remotes[key].noAuth !== true) {
+                // try to auth
+                instance.emit("authenticate", {
+                    token: SessionModel.token,
+                })
+            }
+
+            globalThis.__comty_shared_state.eventBus.emit(`${key}:connected`)
+        })
+
+        instance.on("disconnect", () => {
+            console.debug(`[WS-API][${key}] Disconnected`)
+
+            globalThis.__comty_shared_state.eventBus.emit(`${key}:disconnected`)
+        })
+
+        instance.on("error", (error) => {
+            console.error(`[WS-API][${key}] Error`, error)
+
+            globalThis.__comty_shared_state.eventBus.emit(`${key}:error`, error)
+        })
+
+        instance.onAny((event, ...args) => {
+            console.debug(`[WS-API][${key}] Event (${event})`, ...args)
+
+            globalThis.__comty_shared_state.eventBus.emit(`${key}:${event}`, ...args)
+        })
+    }
+}
+
+export async function reconnectWebsockets() {
+    const instances = globalThis.__comty_shared_state.wsInstances
+
+    for (let [key, instance] of Object.entries(instances)) {
+        if (instance.connected) {
+            // disconnect first
+            instance.disconnect()
+        }
+
+        if (remotes[key].noAuth !== true) {
+            instance.auth = {
+                token: SessionModel.token,
+            }
+        }
+
+        instance.connect()
+    }
+}
+
 export default function createClient({
     accessKey = null,
     privateKey = null,
     enableWs = false,
-    wsEvents = Object(),
-    wsParams = Object(),
 } = {}) {
     const sharedState = globalThis.__comty_shared_state = {
         onExpiredExceptionEvent: false,
@@ -54,64 +141,11 @@ export default function createClient({
         sharedState.instances[key] = axios.create({
             baseURL: remote.origin,
         })
-
-        if (enableWs && remote.hasWebsocket) {
-            let opts = {
-                transports: ["websocket"],
-                autoConnect: remote.autoConnect ?? true,
-                ...remote.wsParams ?? {},
-            }
-
-            if (wsParams[key]) {
-                if (typeof wsParams[key] === "function") {
-                    opts = wsParams[key](opts)
-                } else {
-                    opts = {
-                        ...opts,
-                        ...wsParams[key],
-                    }
-                }
-            }
-
-            sharedState.wsInstances[key] = io(remote.wsOrigin ?? remote.origin, opts)
-        }
     }
 
-    // register ws events
-    Object.keys(sharedState.wsInstances).forEach((key) => {
-        const ws = sharedState.wsInstances[key]
-
-        ws.on("connect", () => {
-            console.debug(`[WS-API][${key}] Connected`)
-
-            if (remotes[key].useClassicAuth) {
-                // try to auth
-                ws.emit("authenticate", {
-                    token: SessionModel.token,
-                })
-            }
-        })
-
-        ws.on("disconnect", () => {
-            console.log(`[WS-API][${key}] Disconnected`)
-        })
-
-        ws.on("error", (error) => {
-            console.error(`[WS-API][${key}] Error`, error)
-        })
-
-        ws.onAny((event, ...args) => {
-            console.debug(`[WS-API][${key}] Event recived`, event, ...args)
-        })
-
-        const customEvents = wsEvents[key]
-
-        if (customEvents) {
-            for (const [eventName, eventHandler] of Object.entries(customEvents)) {
-                ws.on(eventName, eventHandler)
-            }
-        }
-    })
+    if (enableWs) {
+        createWebsockets()
+    }
 
     return sharedState
 }

@@ -1,7 +1,8 @@
 import SessionModel from "../models/session"
 import request from "../handlers/request"
+import { reconnectWebsockets } from "../"
 
-export default async (refreshToken) =>{
+export default async (refreshToken) => {
     __comty_shared_state.eventBus.emit("session.expiredExceptionEvent", refreshToken)
 
     __comty_shared_state.onExpiredExceptionEvent = true
@@ -36,4 +37,7 @@ export default async (refreshToken) =>{
 
     // emit event
     __comty_shared_state.eventBus.emit("session.regenerated")
+
+    // reconnect websockets
+    reconnectWebsockets()
 }
