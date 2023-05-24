@@ -353,6 +353,8 @@ class ComtyApp extends React.Component {
 
 			await this.initialization()
 
+			app.cores.api.reconnectWebsockets()
+
 			app.navigation.goMain()
 
 			app.eventBus.emit("layout.animations.fadeIn")
