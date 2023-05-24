@@ -5,7 +5,7 @@ import classnames from "classnames"
 import { UserPreview } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
-import FeedModel from "models/feed"
+import SearchModel from "models/search"
 
 import "./index.less"
 
@@ -93,7 +93,7 @@ export default (props) => {
             return setSearchResult(null)
         }
 
-        const result = await FeedModel.search(value)
+        const result = await SearchModel.search(value)
 
         return setSearchResult(result)
     }
