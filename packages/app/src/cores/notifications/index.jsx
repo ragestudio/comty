@@ -1,9 +1,16 @@
 import Core from "evite/src/core"
 import React from "react"
-import { notification as Notf } from "antd"
+import { notification as Notf, Space, Button } from "antd"
 import { Icons, createIconRender } from "components/Icons"
 import { Translation } from "react-i18next"
 import { Haptics } from "@capacitor/haptics"
+
+const NotfTypeToAudio = {
+    info: "notification",
+    success: "notification",
+    warning: "warn",
+    error: "error",
+}
 
 export default class NotificationCore extends Core {
     static refName = "notifications"
@@ -33,9 +40,12 @@ export default class NotificationCore extends Core {
         this.playAudio(options)
     }
 
-    notify = (notification, options = {
-        type: "info"
-    }) => {
+    notify(
+        notification,
+        options = {
+            type: "info"
+        }
+    ) {
         if (typeof notification === "string") {
             notification = {
                 title: "New notification",
@@ -44,7 +54,8 @@ export default class NotificationCore extends Core {
         }
 
         const notfObj = {
-            duration: notification.duration ?? 4,
+            duration: options.duration ?? 4,
+            key: options.key ?? Date.now(),
         }
 
         if (notification.title) {
@@ -97,6 +108,34 @@ export default class NotificationCore extends Core {
             notfObj.icon = React.isValidElement(notification.icon) ? notification.icon : (createIconRender(notification.icon) ?? <Icons.Bell />)
         }
 
+        if (Array.isArray(options.actions)) {
+            notfObj.btn = (
+                <Space>
+                    {
+                        options.actions.map((action, index) => {
+                            const handleClick = () => {
+                                if (typeof action.onClick === "function") {
+                                    action.onClick()
+                                }
+
+                                if (!action.keepOpenOnClick) {
+                                    Notf.destroy(notfObj.key)
+                                }
+                            }
+
+                            return <Button
+                                key={index}
+                                type={action.type ?? "primary"}
+                                onClick={handleClick}
+                            >
+                                {action.label}
+                            </Button>
+                        })
+                    }
+                </Space>
+            )
+        }
+
         if (typeof Notf[options.type] !== "function") {
             options.type = "info"
         }
@@ -118,7 +157,9 @@ export default class NotificationCore extends Core {
 
         if (soundEnabled) {
             if (typeof window.app.cores.sound?.play === "function") {
-                window.app.cores.sound.play("notification", {
+                const sound = options.sound ?? NotfTypeToAudio[options.type] ?? "notification"
+
+                window.app.cores.sound.play(sound, {
                     volume: soundVolume,
                 })
             }
