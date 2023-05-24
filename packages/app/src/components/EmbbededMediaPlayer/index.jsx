@@ -212,7 +212,7 @@ export class SeekBar extends React.Component {
                 <Slider
                     size="small"
                     value={this.state.sliderTime}
-                    disabled={this.props.stopped || this.props.streamMode}
+                    disabled={this.props.stopped || this.props.streamMode || this.props.disabled}
                     min={0}
                     max={100}
                     step={0.1}
@@ -275,6 +275,7 @@ const AudioPlayerChangeModeButton = (props) => {
     return <antd.Button
         icon={createIconRender(modeToIcon[mode])}
         onClick={onClick}
+        disabled={props.disabled}
         type="ghost"
     />
 }
@@ -290,9 +291,18 @@ export default class AudioPlayer extends React.Component {
         showControls: false,
         minimized: false,
         streamMode: false,
+
+        syncModeLocked: app.cores.player.getState("syncModeLocked"),
+        syncMode: app.cores.player.getState("syncMode"),
     }
 
     events = {
+        "player.syncModeLocked.update": (to) => {
+            this.setState({ syncModeLocked: to })
+        },
+        "player.syncMode.update": (to) => {
+            this.setState({ syncMode: to })
+        },
         "player.livestream.update": (data) => {
             this.setState({ streamMode: data })
         },
@@ -353,6 +363,10 @@ export default class AudioPlayer extends React.Component {
         app.cores.player.close()
     }
 
+    inviteSync = () => {
+        app.cores.sync.music.createSyncRoom()
+    }
+
     updateVolume = (value) => {
         app.cores.player.volume(value)
     }
@@ -405,6 +419,15 @@ export default class AudioPlayer extends React.Component {
                             onClick={this.minimize}
                             shape="circle"
                         />
+
+                        {
+                            !this.state.syncModeLocked && !this.state.syncMode && <antd.Button
+                                icon={<Icons.MdShare />}
+                                onClick={this.inviteSync}
+                                shape="circle"
+                            />
+                        }
+
                         <antd.Button
                             icon={<Icons.X />}
                             onClick={this.close}
@@ -442,12 +465,15 @@ export default class AudioPlayer extends React.Component {
                 </div>
 
                 <div className="controls">
-                    <AudioPlayerChangeModeButton />
+                    <AudioPlayerChangeModeButton
+                        disabled={this.state.syncModeLocked}
+                    />
                     <antd.Button
                         type="ghost"
                         shape="round"
                         icon={<Icons.ChevronLeft />}
                         onClick={this.onClickPreviousButton}
+                        disabled={this.state.syncModeLocked}
                     />
                     <antd.Button
                         type="primary"
@@ -455,6 +481,7 @@ export default class AudioPlayer extends React.Component {
                         icon={this.state.streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
                         onClick={this.onClickPlayButton}
                         className="playButton"
+                        disabled={this.state.syncModeLocked}
                     >
                         {
                             loading && <div className="loadCircle">
@@ -470,6 +497,7 @@ export default class AudioPlayer extends React.Component {
                         shape="round"
                         icon={<Icons.ChevronRight />}
                         onClick={this.onClickNextButton}
+                        disabled={this.state.syncModeLocked}
                     />
                     <antd.Popover
                         content={React.createElement(
@@ -495,6 +523,7 @@ export default class AudioPlayer extends React.Component {
                     stopped={playbackStatus === "stopped"}
                     playing={playbackStatus === "playing"}
                     streamMode={this.state.streamMode}
+                    disabled={this.state.syncModeLocked}
                 />
             </div>
         </div>

@@ -1,10 +1,4 @@
 .embbededMediaPlayerWrapper {
-    position: absolute;
-    z-index: 300;
-
-    right: 0;
-    bottom: 0;
-
     display: flex;
     flex-direction: row;
 
@@ -13,8 +7,6 @@
 
     width: 270px;
     height: fit-content;
-
-    margin: 40px;
 
     border-radius: 12px;
 
@@ -25,6 +17,9 @@
     &.minimized {
         pointer-events: none;
         opacity: 0;
+
+        height: 0px;
+        width: 0px;
     }
 
     &.hovering {
@@ -93,7 +88,7 @@
         }
     }
 
-    .extra_btns_wrapper{
+    .extra_btns_wrapper {
         position: absolute;
 
         z-index: 330;
@@ -105,21 +100,21 @@
 
         .extra_btns {
             display: flex;
-    
+
             flex-direction: row;
 
             align-items: center;
             justify-content: space-between;
-           
+
             opacity: 0;
-    
+
             transition: all 150ms ease-in-out;
-    
+
             //transform: translate(60%, 60%);
-    
+
             .ant-btn {
                 background-color: var(--background-color-accent);
-    
+
                 svg {
                     margin: 0 !important;
                 }
