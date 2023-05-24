@@ -118,6 +118,8 @@
 }
 
 .ant-btn-primary[disabled] {
+    opacity: 0.5 !important;
+
     svg {
         color: unset !important;
     }
@@ -126,6 +128,10 @@
         color: unset !important;
         margin: 0;
     }
+}
+
+.ant-btn[disabled] {
+    opacity: 0.5 !important;
 }
 
 .ant-btn-default {
@@ -489,4 +495,28 @@
 
 .drawer {
     z-index: 1000;
+}
+
+.ant-notification-notice {
+    .ant-notification-notice-with-icon {
+        .ant-notification-notice-message {
+            margin-inline-start: 46px!important;
+        }
+
+        .ant-notification-notice-description {
+            margin-inline-start: 46px!important;
+        }
+
+        .ant-notification-notice-icon {
+            max-width: 40px;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+
+                border-radius: 8px;
+            }
+        }
+    }
 }
