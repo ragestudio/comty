@@ -7,10 +7,22 @@ import { FastAverageColor } from "fast-average-color"
 import EmbbededMediaPlayer from "components/EmbbededMediaPlayer"
 import BackgroundMediaPlayer from "components/BackgroundMediaPlayer"
 
-import { DOMWindow } from "components/RenderWindow"
-
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
+
+function useMusicSync(event, data) {
+    const currentRoomData = app.cores.sync.music.currentRoomData()
+
+    if (!currentRoomData) {
+        console.warn("No room data available")
+        return false
+    }
+
+    return app.cores.sync.music.dispatchEvent(event, data)
+}
+
+// this is the time tooks to fade in/out the volume when playing/pausing
+const gradualFadeMs = 150
 
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
@@ -50,6 +62,9 @@ export default class Player extends Core {
         currentAudioManifest: null,
         playbackStatus: "stopped",
         livestream: false,
+        syncMode: false,
+        syncModeLocked: false,
+        startingNew: false,
     })
 
     public = {
@@ -110,45 +125,19 @@ export default class Player extends Core {
                     return null
                 }
 
+                if (this.state.syncModeLocked) {
+                    console.warn("Sync mode is locked, cannot do this action")
+                    return false
+                }
+
                 if (this.currentAudioInstance.audioElement.paused) {
-                    this.public.playback.play()
+                    this.resumePlayback()
                 } else {
-                    this.public.playback.pause()
+                    this.pausePlayback()
                 }
             }.bind(this),
-            play: function () {
-                if (!this.currentAudioInstance) {
-                    console.error("No audio instance")
-                    return null
-                }
-
-                // set gain exponentially
-                this.currentAudioInstance.gainNode.gain.linearRampToValueAtTime(
-                    this.state.audioVolume,
-                    this.audioContext.currentTime + 0.1
-                )
-
-                setTimeout(() => {
-                    this.currentAudioInstance.audioElement.play()
-                }, 100)
-
-            }.bind(this),
-            pause: function () {
-                if (!this.currentAudioInstance) {
-                    console.error("No audio instance")
-                    return null
-                }
-
-                // set gain exponentially
-                this.currentAudioInstance.gainNode.gain.linearRampToValueAtTime(
-                    0.0001,
-                    this.audioContext.currentTime + 0.1
-                )
-
-                setTimeout(() => {
-                    this.currentAudioInstance.audioElement.pause()
-                }, 100)
-            }.bind(this),
+            play: this.resumePlayback.bind(this),
+            pause: this.pausePlayback.bind(this),
             next: this.next.bind(this),
             previous: this.previous.bind(this),
             stop: this.stop.bind(this),
@@ -167,6 +156,7 @@ export default class Player extends Core {
         duration: this.duration.bind(this),
         velocity: this.velocity.bind(this),
         close: this.close.bind(this),
+        toogleSyncMode: this.toogleSyncMode.bind(this),
     }
 
     async initializeAudioProcessors() {
@@ -216,12 +206,14 @@ export default class Player extends Core {
                         case "crossfading": {
                             app.eventBus.emit("player.crossfading.update", change.object.crossfading)
 
-                            console.log("crossfading", change.object.crossfading)
-
                             break
                         }
                         case "loading": {
                             app.eventBus.emit("player.loading.update", change.object.loading)
+
+                            if (this.state.syncMode) {
+                                useMusicSync("music:player:loading", change.object.loading)
+                            }
 
                             break
                         }
@@ -240,6 +232,12 @@ export default class Player extends Core {
                                             console.error(err)
                                         })
                                 }
+                            }
+
+                            if (this.state.syncMode) {
+                                useMusicSync("music:player:start", {
+                                    manifest: change.object.currentAudioManifest
+                                })
                             }
 
                             break
@@ -282,6 +280,19 @@ export default class Player extends Core {
                         case "playbackStatus": {
                             app.eventBus.emit("player.status.update", change.object.playbackStatus)
 
+                            if (this.state.syncMode) {
+                                if (this.state.loading) {
+                                    return false
+                                }
+
+                                useMusicSync("music:player:status", {
+                                    status: change.object.playbackStatus,
+                                    time: this.currentAudioInstance.audioElement.currentTime,
+                                    duration: this.currentAudioInstance.audioElement.duration,
+                                    startingNew: this.state.startingNew,
+                                })
+                            }
+
                             break
                         }
                         case "minimized": {
@@ -296,6 +307,12 @@ export default class Player extends Core {
                             app.eventBus.emit("player.minimized.update", change.object.minimized)
 
                             break
+                        }
+                        case "syncModeLocked": {
+                            app.eventBus.emit("player.syncModeLocked.update", change.object.syncModeLocked)
+                        }
+                        case "syncMode": {
+                            app.eventBus.emit("player.syncMode.update", change.object.syncMode)
                         }
                     }
                 }
@@ -318,11 +335,7 @@ export default class Player extends Core {
             return false
         }
 
-        this.currentDomWindow = new DOMWindow({
-            id: "mediaPlayer"
-        })
-
-        this.currentDomWindow.render(React.createElement(EmbbededMediaPlayer))
+        this.currentDomWindow = app.layout.floatingStack.add("mediaPlayer", EmbbededMediaPlayer)
     }
 
     detachPlayerComponent() {
@@ -331,7 +344,8 @@ export default class Player extends Core {
             return false
         }
 
-        this.currentDomWindow.destroy()
+        app.layout.floatingStack.remove("mediaPlayer")
+
         this.currentDomWindow = null
     }
 
@@ -416,13 +430,14 @@ export default class Player extends Core {
     //  Instance managing methods
     //
 
-    async destroyCurrentInstance() {
+    async destroyCurrentInstance({ sync = false } = {}) {
         if (!this.currentAudioInstance) {
             return false
         }
 
         // stop playback
         if (this.currentAudioInstance.audioElement) {
+            // if is in sync mode, just seek to last position to stop playback and avoid sync issues
             this.currentAudioInstance.audioElement.pause()
         }
 
@@ -473,22 +488,34 @@ export default class Player extends Core {
 
         // handle on end
         instanceObj.audioElement.addEventListener("ended", () => {
-            // cancel if is crossfading
+            // if is in sync locked mode, do noting
+            if (this.state.syncModeLocked) {
+                return false
+            }
+
             this.next()
         })
 
         instanceObj.audioElement.addEventListener("play", () => {
-            this.state.loading = false
-
             this.state.playbackStatus = "playing"
 
             instanceObj.audioElement.loop = this.state.playbackMode === "repeat"
+        })
+
+        instanceObj.audioElement.addEventListener("loadeddata", () => {
+            this.state.loading = false
+
+            console.log("Loaded audio data", instanceObj.audioElement.src)
         })
 
         instanceObj.audioElement.addEventListener("playing", () => {
             this.state.loading = false
 
             this.state.playbackStatus = "playing"
+
+            if (this.state.startingNew) {
+                this.state.startingNew = false
+            }
 
             if (this.waitUpdateTimeout) {
                 clearTimeout(this.waitUpdateTimeout)
@@ -530,7 +557,12 @@ export default class Player extends Core {
 
         instanceObj.audioElement.addEventListener("seeked", () => {
             app.eventBus.emit("player.seek.update", instanceObj.audioElement.currentTime)
-            createCrossfadeInterval()
+
+            if (this.state.syncMode) {
+                useMusicSync("music:player:seek", {
+                    position: instanceObj.audioElement.currentTime
+                })
+            }
         })
 
         // // detect if the audio is a live stream
@@ -644,7 +676,12 @@ export default class Player extends Core {
         }, { once: true })
     }
 
-    async startPlaylist(playlist, startIndex = 0) {
+    async startPlaylist(playlist, startIndex = 0, { sync = false } = {}) {
+        if (this.state.syncModeLocked && !sync) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
+        }
+
         // playlist is an array of audio manifests
         if (!playlist || !Array.isArray(playlist)) {
             throw new Error("Playlist is required")
@@ -653,7 +690,7 @@ export default class Player extends Core {
         // !IMPORTANT: abort preloads before destroying current instance 
         await this.abortPreloads()
 
-        this.destroyCurrentInstance()
+        await this.destroyCurrentInstance()
 
         // clear current queue
         this.audioQueue = []
@@ -676,11 +713,20 @@ export default class Player extends Core {
         this.play(this.audioQueue[0])
     }
 
-    async start(manifest) {
+    async start(manifest, { sync = false } = {}) {
+        if (this.state.syncModeLocked && !sync) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
+        }
+
+        this.state.startingNew = true
+
         // !IMPORTANT: abort preloads before destroying current instance 
         await this.abortPreloads()
 
-        this.destroyCurrentInstance()
+        await this.destroyCurrentInstance({
+            sync
+        })
 
         const instance = await this.createInstance(manifest)
 
@@ -693,7 +739,12 @@ export default class Player extends Core {
         this.play(this.audioQueue[0])
     }
 
-    next() {
+    next({ sync = false } = {}) {
+        if (this.state.syncModeLocked && !sync) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
+        }
+
         if (this.audioQueue.length > 0) {
             // move current audio instance to history
             this.audioQueueHistory.push(this.audioQueue.shift())
@@ -722,7 +773,12 @@ export default class Player extends Core {
         this.play(this.audioQueue[nextIndex])
     }
 
-    previous() {
+    previous({ sync = false } = {}) {
+        if (this.state.syncModeLocked && !sync) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
+        }
+
         if (this.audioQueueHistory.length > 0) {
             // move current audio instance to queue
             this.audioQueue.unshift(this.audioQueueHistory.pop())
@@ -736,6 +792,48 @@ export default class Player extends Core {
             // if there is no previous audio, start again from the first audio
             this.play(this.audioQueue[0])
         }
+    }
+
+    async pausePlayback() {
+        return await new Promise((resolve, reject) => {
+            if (!this.currentAudioInstance) {
+                console.error("No audio instance")
+                return null
+            }
+
+            // set gain exponentially
+            this.currentAudioInstance.gainNode.gain.linearRampToValueAtTime(
+                0.0001,
+                this.audioContext.currentTime + (gradualFadeMs / 1000)
+            )
+
+            setTimeout(() => {
+                this.currentAudioInstance.audioElement.pause()
+                resolve()
+            }, gradualFadeMs)
+        })
+    }
+
+    async resumePlayback() {
+        return await new Promise((resolve, reject) => {
+            if (!this.currentAudioInstance) {
+                console.error("No audio instance")
+                return null
+            }
+
+            // ensure audio elemeto starts from 0 volume
+            this.currentAudioInstance.gainNode.gain.value = 0.0001
+
+            this.currentAudioInstance.audioElement.play().then(() => {
+                resolve()
+            })
+
+            // set gain exponentially
+            this.currentAudioInstance.gainNode.gain.linearRampToValueAtTime(
+                this.state.audioVolume,
+                this.audioContext.currentTime + (gradualFadeMs / 1000)
+            )
+        })
     }
 
     stop() {
@@ -800,7 +898,7 @@ export default class Player extends Core {
         return this.state.audioVolume
     }
 
-    seek(time) {
+    seek(time, { sync = false } = {}) {
         if (!this.currentAudioInstance) {
             return false
         }
@@ -808,6 +906,11 @@ export default class Player extends Core {
         // if time not provided, return current time
         if (typeof time === "undefined") {
             return this.currentAudioInstance.audioElement.currentTime
+        }
+
+        if (this.state.syncModeLocked && !sync) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
         }
 
         // if time is provided, seek to that time
@@ -842,6 +945,11 @@ export default class Player extends Core {
     }
 
     velocity(to) {
+        if (this.state.syncModeLocked) {
+            console.warn("Sync mode is locked, cannot do this action")
+            return false
+        }
+
         if (typeof to !== "number") {
             console.warn("Velocity must be a number")
             return false
@@ -865,5 +973,20 @@ export default class Player extends Core {
         this.state.collapsed = to ?? !this.state.collapsed
 
         return this.state.collapsed
+    }
+
+    toogleSyncMode(to, lock) {
+        if (typeof to !== "boolean") {
+            console.warn("Sync mode must be a boolean")
+            return false
+        }
+
+        this.state.syncMode = to ?? !this.state.syncMode
+
+        this.state.syncModeLocked = lock ?? false
+
+        console.log(`Sync mode is now ${this.state.syncMode ? "enabled" : "disabled"} | Locked: ${this.state.syncModeLocked ? "yes" : "no"}`)
+
+        return this.state.syncMode
     }
 }
