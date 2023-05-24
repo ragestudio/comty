@@ -9,15 +9,59 @@
 
     overflow: hidden;
 
+    transition: all 250ms ease-in-out;
+
     &.empty {
         justify-content: center;
         align-items: center;
+
+        &.compact {
+            height: 5vh!important;
+        }
+    }
+    
+    &.compact {
+        height: 15vh;
+
+        justify-content: flex-end;
+
+        .liveChat_timeline {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 0;
+            margin: 0;
+
+            margin-bottom: 10px;
+
+            gap: 5px;
+
+            .textRoom_line {
+                padding: 0;
+                margin: 0;
+
+                h4 {
+                    font-size: 0.8rem;
+                }
+            }
+        }
+
+        .liveChat_textInput {
+            position: relative;
+
+            bottom: 0;
+            left: 0;
+
+            margin-bottom: 0;
+        }
     }
 
     &.floating {
         .textRoom_line {
             display: relative;
-            
+
             background-color: rgba(var(--layoutBackgroundColor), 0.7);
             backdrop-filter: blur(20px);
         }
