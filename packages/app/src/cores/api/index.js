@@ -5,8 +5,7 @@ import createClient from "comty.js"
 import measurePing from "comty.js/handlers/measurePing"
 import request from "comty.js/handlers/request"
 import useRequest from "comty.js/hooks/useRequest"
-
-import SessionModel from "comty.js/models/session"
+import { reconnectWebsockets } from "comty.js"
 
 export default class APICore extends Core {
     static refName = "api"
@@ -23,6 +22,7 @@ export default class APICore extends Core {
         unlistenEvent: this.unlistenEvent.bind(this),
         measurePing: measurePing,
         useRequest: useRequest,
+        reconnectWebsockets: reconnectWebsockets,
     }
 
     listenEvent(key, handler, instance) {
@@ -33,18 +33,46 @@ export default class APICore extends Core {
         this.instance.wsInstances[instance ?? "default"].off(key, handler)
     }
 
+    pendingPingsFromInstance = {}
+
+    createPingIntervals() {
+        Object.keys(this.instance.wsInstances).forEach((instance) => {
+            console.debug(`[API] Creating ping interval for ${instance}`)
+
+            if (this.instance.wsInstances[instance].pingInterval) {
+                clearInterval(this.instance.wsInstances[instance].pingInterval)
+            }
+
+            this.instance.wsInstances[instance].pingInterval = setInterval(() => {
+                if (this.instance.wsInstances[instance].pendingPingTry && this.instance.wsInstances[instance].pendingPingTry > 3) {
+                    console.debug(`[API] Ping timeout for ${instance}`)
+
+                    return clearInterval(this.instance.wsInstances[instance].pingInterval)
+                }
+
+                const timeStart = Date.now()
+
+                //console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
+
+                this.instance.wsInstances[instance].emit("ping", () => {
+                    this.instance.wsInstances[instance].latency = Date.now() - timeStart
+
+                    this.instance.wsInstances[instance].pendingPingTry = 0
+                })
+
+                this.instance.wsInstances[instance].pendingPingTry = this.instance.wsInstances[instance].pendingPingTry ? this.instance.wsInstances[instance].pendingPingTry + 1 : 1
+            }, 5000)
+
+            // clear interval on close
+            this.instance.wsInstances[instance].on("close", () => {
+                clearInterval(this.instance.wsInstances[instance].pingInterval)
+            })
+        })
+    }
+
     async onInitialize() {
         this.instance = await createClient({
             enableWs: true,
-            wsParams: {
-                chat: (opts) => {
-                    opts.auth = {
-                        token: SessionModel.token,
-                    }
-
-                    return opts
-                }
-            }
         })
 
         this.instance.eventBus.on("auth:login_success", () => {
@@ -73,6 +101,8 @@ export default class APICore extends Core {
         })
 
         console.debug("[API] Attached to", this.instance)
+
+        this.createPingIntervals()
 
         return this.instance
     }
