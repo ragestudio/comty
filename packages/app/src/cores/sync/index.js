@@ -67,6 +67,8 @@ class MusicSyncSubCore {
             // check if user is owner
             app.cores.player.toogleSyncMode(true, data.ownerUserId !== app.userData._id)
 
+            this.startSendStateInterval()
+
             this.eventBus.emit("room:joined", data)
         },
         "room:left": (data) => {
@@ -120,7 +122,7 @@ class MusicSyncSubCore {
         },
         // Room Control
         "music:player:start": (data) => {
-            if (data.selfUser.user_id === app.userData._id) {
+            if (data.command_issuer === app.userData._id) {
                 return false
             }
 
@@ -128,10 +130,11 @@ class MusicSyncSubCore {
 
             app.cores.player.start(data.manifest, {
                 sync: true,
+                time: data.time,
             })
         },
         "music:player:seek": (data) => {
-            if (data.selfUser.user_id === app.userData._id) {
+            if (data.command_issuer === app.userData._id) {
                 return false
             }
 
@@ -142,13 +145,14 @@ class MusicSyncSubCore {
             })
         },
         "music:player:status": (data) => {
-            if (data.selfUser.user_id === app.userData._id) {
+            if (data.command_issuer === app.userData._id) {
                 return false
             }
 
             // avoid dispatch if event pause and current time is the audio duration
             if (data.startingNew || data.status === "paused" && data.time === data.duration) {
-                return app.cores.player.stop()
+                //return app.cores.player.playback.stop()
+                return false
             }
 
             switch (data.status) {
@@ -188,6 +192,33 @@ class MusicSyncSubCore {
         Object.keys(this.hubEvents).forEach((eventName) => {
             this.musicWs.on(eventName, this.hubEvents[eventName])
         })
+    }
+
+    startSendStateInterval() {
+        if (this.sendStateInterval) {
+            clearInterval(this.sendStateInterval)
+        }
+
+        this.firstStateSent = true
+
+        this.sendStateInterval = setInterval(() => {
+            if (!this.currentRoomData) {
+                return false
+            }
+
+            let state = app.cores.player.currentState()
+
+            console.log("state", state)
+
+            this.musicWs.emit("music:state:update", {
+                ...state,
+                firstSync: this.firstStateSent
+            })
+
+            if (this.firstStateSent) {
+                this.firstStateSent = false
+            }
+        }, 2000)
     }
 
     dispatchEvent(eventName, data) {
@@ -253,6 +284,11 @@ class MusicSyncSubCore {
         })
 
         this.currentRoomData = null
+
+        if (this.sendStateInterval) {
+            this.firstStateSent = false
+            clearInterval(this.sendStateInterval)
+        }
 
         Object.keys(this.roomEvents).forEach((eventName) => {
             this.musicWs.off(eventName, this.roomEvents[eventName])

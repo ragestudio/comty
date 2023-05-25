@@ -157,6 +157,7 @@ export default class Player extends Core {
         velocity: this.velocity.bind(this),
         close: this.close.bind(this),
         toogleSyncMode: this.toogleSyncMode.bind(this),
+        currentState: this.currentState.bind(this),
     }
 
     async initializeAudioProcessors() {
@@ -212,7 +213,10 @@ export default class Player extends Core {
                             app.eventBus.emit("player.loading.update", change.object.loading)
 
                             if (this.state.syncMode) {
-                                useMusicSync("music:player:loading", change.object.loading)
+                                useMusicSync("music:player:loading", {
+                                    loading: change.object.loading,
+                                    state: this.currentState()
+                                })
                             }
 
                             break
@@ -236,7 +240,8 @@ export default class Player extends Core {
 
                             if (this.state.syncMode) {
                                 useMusicSync("music:player:start", {
-                                    manifest: change.object.currentAudioManifest
+                                    manifest: change.object.currentAudioManifest,
+                                    state: this.currentState()
                                 })
                             }
 
@@ -290,6 +295,7 @@ export default class Player extends Core {
                                     time: this.currentAudioInstance.audioElement.currentTime,
                                     duration: this.currentAudioInstance.audioElement.duration,
                                     startingNew: this.state.startingNew,
+                                    state: this.currentState(),
                                 })
                             }
 
@@ -437,6 +443,9 @@ export default class Player extends Core {
 
         // stop playback
         if (this.currentAudioInstance.audioElement) {
+            this.currentAudioInstance.audioElement.srcObj = null
+            this.currentAudioInstance.audioElement.src = null
+
             // if is in sync mode, just seek to last position to stop playback and avoid sync issues
             this.currentAudioInstance.audioElement.pause()
         }
@@ -560,7 +569,8 @@ export default class Player extends Core {
 
             if (this.state.syncMode) {
                 useMusicSync("music:player:seek", {
-                    position: instanceObj.audioElement.currentTime
+                    position: instanceObj.audioElement.currentTime,
+                    state: this.currentState(),
                 })
             }
         })
@@ -655,6 +665,13 @@ export default class Player extends Core {
 
         instance.audioElement.muted = this.state.audioMuted
 
+        console.log("Playing audio", instance.audioElement.src)
+
+        // reconstruct audio src if is not set
+        if (instance.audioElement.src !== instance.manifest.source) {
+            instance.audioElement.src = instance.manifest.source
+        }
+
         instance.audioElement.load()
 
         instance.audioElement.play()
@@ -715,7 +732,7 @@ export default class Player extends Core {
         this.play(this.audioQueue[0])
     }
 
-    async start(manifest, { sync = false } = {}) {
+    async start(manifest, { sync = false, time } = {}) {
         if (this.state.syncModeLocked && !sync) {
             console.warn("Sync mode is locked, cannot do this action")
             return false
@@ -738,7 +755,9 @@ export default class Player extends Core {
 
         this.state.loading = true
 
-        this.play(this.audioQueue[0])
+        this.play(this.audioQueue[0], {
+            time: time ?? 0
+        })
     }
 
     next({ sync = false } = {}) {
@@ -990,5 +1009,17 @@ export default class Player extends Core {
         console.log(`Sync mode is now ${this.state.syncMode ? "enabled" : "disabled"} | Locked: ${this.state.syncModeLocked ? "yes" : "no"}`)
 
         return this.state.syncMode
+    }
+
+    currentState() {
+        return {
+            playbackStatus: this.state.playbackStatus,
+            manifest: this.currentAudioInstance?.manifest ?? null,
+            loading: this.state.loading,
+            time: this.seek(),
+            duration: this.currentAudioInstance?.audioElement?.duration ?? null,
+            audioMuted: this.state.audioMuted,
+            audioVolume: this.state.audioVolume,
+        }
     }
 }
