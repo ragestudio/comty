@@ -429,6 +429,7 @@ export default class AudioPlayer extends React.Component {
                         }
 
                         <antd.Button
+                            className="bottom_btn"
                             icon={<Icons.X />}
                             onClick={this.close}
                             shape="circle"
