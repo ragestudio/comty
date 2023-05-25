@@ -16,10 +16,8 @@
 
     &.minimized {
         pointer-events: none;
-        opacity: 0;
 
-        height: 0px;
-        width: 0px;
+        animation: minimize 150ms ease-in-out forwards;
     }
 
     &.hovering {
@@ -96,15 +94,18 @@
         top: 0;
         left: 0;
 
-        width: 100%;
+        width: fit-content;
+        height: 100%;
 
         .extra_btns {
             display: flex;
 
-            flex-direction: row;
+            flex-direction: column;
 
-            align-items: center;
-            justify-content: space-between;
+            //align-items: center;
+            //justify-content: flex-start;
+
+            gap: 10px;
 
             opacity: 0;
 
@@ -118,6 +119,10 @@
                 svg {
                     margin: 0 !important;
                 }
+            }
+
+            .bottom_btn {
+                // 
             }
         }
     }
@@ -220,6 +225,7 @@
 
         .controls {
             display: inline-flex;
+            flex-direction: row;
 
             align-items: center;
             justify-content: space-evenly;
@@ -341,47 +347,6 @@
             color: var(--text-color);
         }
     }
-
-    .bpmTicker {
-        position: absolute;
-
-        top: 0;
-        left: 0;
-
-        width: 30px;
-        height: 30px;
-
-        border-radius: 50%;
-
-        background-color: var(--background-color-contrast);
-
-        transform: translate(-50%, -50%);
-
-        &.pulse {
-            animation: pulseBPM;
-            animation-iteration-count: infinite;
-            animation-fill-mode: forwards;
-
-            animation-duration: 1s;
-        }
-    }
-}
-
-@keyframes pulseBPM {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
-    }
-
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-    }
 }
 
 .ant-popover-inner-content {
@@ -406,5 +371,21 @@
 
     to {
         opacity: 1;
+    }
+}
+
+@keyframes minimize {
+    0% {
+        opacity: 1;
+    }
+
+    99% {
+        opacity: 0;
+        //transform: translateX(100%);
+    }
+
+    100% {
+        opacity: 0;
+        height: 0px;
     }
 }
