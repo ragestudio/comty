@@ -24,14 +24,15 @@ function generateFnHandler(fn, socket) {
     }
 }
 
-function composePayloadData(socket, data) {
+function composePayloadData(socket, data = {}) {
     return {
-        selfUser: {
+        user: {
             user_id: socket.userData._id,
             username: socket.userData.username,
             fullName: socket.userData.fullName,
             avatar: socket.userData.avatar,
         },
+        command_issuer: data.command_issuer ?? socket.userData._id,
         ...data
     }
 }
@@ -46,6 +47,9 @@ class Room {
         this.roomId = roomId
         this.roomOptions = roomOptions
     }
+
+    // declare the maximum audio offset from owner
+    static maxOffsetFromOwner = 1
 
     ownerUserId = null
 
@@ -65,6 +69,10 @@ class Room {
                 return false
             }
 
+            if (data.state) {
+                this.currentState = data.state
+            }
+
             this.io.to(this.roomId).emit("music:player:start", composePayloadData(socket, data))
         },
         "music:player:seek": (socket, data) => {
@@ -74,21 +82,86 @@ class Room {
                 return false
             }
 
+            if (data.state) {
+                this.currentState = data.state
+            }
+
             this.io.to(this.roomId).emit("music:player:seek", composePayloadData(socket, data))
         },
-        "music:player:loading": () => {
+        "music:player:loading": (socket, data) => {
             // TODO: Softmode and Hardmode
+            // Ignore if is the owner
+            if (socket.userData._id === this.ownerUserId) {
+                return false
+            }
 
-            // sync with current state, seek if needed (if is not owner) 
+            // if not loading, check if need to sync
+            if (!data.loading) {
+                // try to sync with current state
+                if (data.state.time > this.currentState.time + Room.maxOffsetFromOwner) {
+                    socket.emit("music:player:seek", composePayloadData(socket, {
+                        position: this.currentState.time,
+                        command_issuer: this.ownerUserId,
+                    }))
+                }
+            }
         },
         "music:player:status": (socket, data) => {
             if (socket.userData._id !== this.ownerUserId) {
                 return false
             }
 
+            if (data.state) {
+                this.currentState = data.state
+            }
+
             this.io.to(this.roomId).emit("music:player:status", composePayloadData(socket, data))
         },
-        // ROOM CONTROL
+        // UPDATE TICK
+        "music:state:update": (socket, data) => {
+            if (socket.userData._id === this.ownerUserId) {
+                // update current state
+                this.currentState = data
+
+                return true
+            }
+
+            if (!this.currentState) {
+                return false
+            }
+
+            if (data.loading) {
+                return false
+            }
+
+            // check if match with current manifest
+            if (!data.manifest || data.manifest._id !== this.currentState.manifest._id) {
+                socket.emit("music:player:start", composePayloadData(socket, {
+                    manifest: this.currentState.manifest,
+                    time: this.currentState.time,
+                    command_issuer: this.ownerUserId,
+                }))
+            }
+
+            if (data.firstSync) {
+                // if not owner, try to sync with current state
+                if (data.time > this.currentState.time + Room.maxOffsetFromOwner) {
+                    socket.emit("music:player:seek", composePayloadData(socket, {
+                        position: this.currentState.time,
+                        command_issuer: this.ownerUserId,
+                    }))
+                }
+
+                // check if match with current playing status
+                if (data.playbackStatus !== this.currentState.playbackStatus && data.firstSync) {
+                    socket.emit("music:player:status", composePayloadData(socket, {
+                        status: this.currentState.playbackStatus,
+                        command_issuer: this.ownerUserId,
+                    }))
+                }
+            }
+        },
+        // ROOM MODERATION CONTROL
         "room:moderation:kick": (socket, data) => {
             if (socket.userData._id !== this.ownerUserId) {
                 return socket.emit("error", {
