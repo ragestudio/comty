@@ -6,7 +6,7 @@ function videoTranscode(originalFilePath, outputPath, options = {}) {
     return new Promise((resolve, reject) => {
         const filename = path.basename(originalFilePath)
         const outputFilename = `${filename.split(".")[0]}.${options.format ?? "webm"}`
-        const outputFilepath = `${outputPath}/${outputFilename}`
+        const outputFilepath = `${outputPath}/${outputFilename}_transcoded`
 
         console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath}`)
 
