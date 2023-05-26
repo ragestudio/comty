@@ -17,7 +17,9 @@ const maximuns = {
 }
 
 const handleUploadVideo = async (file, params) => {
-    file.filepath = await videoTranscode(file.filepath, global.uploadCachePath)
+    const transcoded = await videoTranscode(file.filepath, params.cacheUploadDir)
+
+    file.filepath = transcoded.filepath
     file.newFilename = path.basename(file.filepath)
 
     return file
