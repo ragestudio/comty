@@ -9,7 +9,10 @@ global.isProduction = process.env.NODE_ENV === "production"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
 
+globalThis["__root"] = path.resolve(__dirname)
+
 const customAliases = {
+    "root": globalThis["__root"],
     "@services": path.resolve(__dirname, "services"),
 }
 
@@ -57,6 +60,32 @@ async function main() {
     const api = new API()
 
     await api.initialize()
+
+    // kill on process exit
+    process.on("exit", () => {
+        api.server.close()
+        process.exit(0)
+    })
+
+    // kill on ctrl+c
+    process.on("SIGINT", () => {
+        api.server.close()
+        process.exit(0)
+    })
+
+    // kill on uncaught exceptions
+    process.on("uncaughtException", (error) => {
+        console.error(`🆘 [FATAL ERROR] >`, error)
+        api.server.close()
+        process.exit(1)
+    })
+
+    // kill on unhandled rejections
+    process.on("unhandledRejection", (error) => {
+        console.error(`🆘 [FATAL ERROR] >`, error)
+        api.server.close()
+        process.exit(1)
+    })
 }
 
 main().catch((error) => {
