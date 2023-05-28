@@ -1,6 +1,5 @@
 import handleBeforeRequest from "../helpers/handleBeforeRequest"
 import handleAfterRequest from "../helpers/handleAfterRequest"
-import SessionModel from "../models/session"
 
 export default async (
     request = {
@@ -30,14 +29,6 @@ export default async (
     let result = null
 
     const makeRequest = async () => {
-        const sessionToken = await SessionModel.token
-
-        if (sessionToken) {
-            request.headers["Authorization"] = `${globalThis.isServerMode ? "Server" : "Bearer"} ${sessionToken}`
-        } else {
-            console.warn("Making a request with no session token")
-        }
-
         const _result = await instance(request, ...args)
             .catch((error) => {
                 return error
