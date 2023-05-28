@@ -1014,6 +1014,7 @@ export default class Player extends Core {
     currentState() {
         return {
             playbackStatus: this.state.playbackStatus,
+            colorAnalysis: this.state?.coverColorAnalysis ?? null,
             manifest: this.currentAudioInstance?.manifest ?? null,
             loading: this.state.loading,
             time: this.seek(),
