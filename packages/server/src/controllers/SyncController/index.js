@@ -147,6 +147,55 @@ export default class SyncController extends Controller {
                         return res.json(response.data)
                     }
                 }
+            },
+            "/spotify/search": {
+                middlewares: ["withAuthentication"],
+                fn: async (req, res) => {
+                    const user_id = req.user._id.toString()
+                    const authToken = await SecureSyncEntry.get(user_id, "spotify_access_token")
+
+                    if (!authToken) {
+                        return res.status(400).json({
+                            message: "Missing auth token",
+                        })
+                    }
+
+                    const { query, type, limit, offset } = req.query
+
+                    if (!query) {
+                        return res.status(400).json({
+                            message: "Missing query",
+                        })
+                    }
+
+                    if (!type) {
+                        return res.status(400).json({
+                            message: "Missing type",
+                        })
+                    }
+
+                    const response = await axios.get("https://api.spotify.com/v1/search", {
+                        headers: {
+                            "Authorization": `Bearer ${authToken}`
+                        },
+                        params: {
+                            q: query,
+                            type: type,
+                            limit: limit,
+                            offset: offset,
+                        }
+                    }).catch((error) => {
+                        console.error(error.response.data)
+
+                        res.status(error.response.status).json(error.response.data)
+
+                        return null
+                    })
+
+                    if (response) {
+                        return res.json(response.data)
+                    }
+                }
             }
         },
     }
