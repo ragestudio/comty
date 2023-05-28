@@ -140,6 +140,25 @@ export default function createClient({
     for (const [key, remote] of Object.entries(remotes)) {
         sharedState.instances[key] = axios.create({
             baseURL: remote.origin,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+
+        // create a interceptor to attach the token every request
+        sharedState.instances[key].interceptors.request.use((config) => {
+            // check if current request has no Authorization header, if so, attach the token
+            if (!config.headers["Authorization"]) {
+                const sessionToken = SessionModel.token
+
+                if (sessionToken) {
+                    config.headers["Authorization"] = `${globalThis.isServerMode ? "Server" : "Bearer"} ${sessionToken}`
+                } else {
+                    console.warn("Making a request with no session token")
+                }
+            }
+
+            return config
         })
     }
 
