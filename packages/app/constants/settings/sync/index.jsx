@@ -9,7 +9,7 @@ export default {
     icon: "MdSync",
     label: "Sync",
     group: "advanced",
-    disabled: true,
+    //disabled: true,
     ctxData: async () => {
         const spotifyAccount = await SyncModel.spotifyCore.getData().catch((err) => {
             return null
