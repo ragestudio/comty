@@ -6,11 +6,11 @@ import classnames from "classnames"
 import UseAnimations from "react-useanimations"
 import LoadingAnimation from "react-useanimations/lib/loading"
 
+import LikeButton from "components/LikeButton"
 import { Icons, createIconRender } from "components/Icons"
 
 import "./index.less"
 
-// TODO: Add close button
 // TODO: Queue view
 const AudioVolume = (props) => {
     return <div className="volumeSlider">
@@ -275,7 +275,7 @@ const AudioPlayerChangeModeButton = (props) => {
     return <antd.Button
         icon={createIconRender(modeToIcon[mode])}
         onClick={onClick}
-        disabled={props.disabled}
+        disabled={props.disabled ?? false}
         type="ghost"
     />
 }
@@ -325,11 +325,7 @@ export default class AudioPlayer extends React.Component {
             this.setState({ audioVolume: data })
         },
         "player.minimized.update": (minimized) => {
-            console.log(`Player minimized updated: ${minimized}`)
-
-            this.setState({
-                minimized
-            })
+            this.setState({ minimized })
         }
     }
 
@@ -363,6 +359,10 @@ export default class AudioPlayer extends React.Component {
         app.cores.player.close()
     }
 
+    openVisualizer = () => {
+        app.setLocation("/lyrics")
+    }
+
     inviteSync = () => {
         app.cores.sync.music.createSyncRoom()
     }
@@ -391,6 +391,14 @@ export default class AudioPlayer extends React.Component {
         app.cores.player.playback.next()
     }
 
+    onClickLikeButton = () => {
+        // TODO: Like
+
+        console.log("Like")
+
+        this.setState({ liked: !this.state.liked })
+    }
+
     render() {
         const {
             loading,
@@ -411,31 +419,35 @@ export default class AudioPlayer extends React.Component {
             onMouseEnter={this.onMouse}
             onMouseLeave={this.onMouse}
         >
+            <div className="top_controls">
+                <antd.Button
+                    icon={<Icons.MdFirstPage />}
+                    onClick={this.minimize}
+                    shape="circle"
+                />
+
+                {
+                    !this.state.syncModeLocked && !this.state.syncMode && <antd.Button
+                        icon={<Icons.MdShare />}
+                        onClick={this.inviteSync}
+                        shape="circle"
+                    />
+                }
+
+                <antd.Button
+                    icon={<Icons.MdOpenInFull />}
+                    onClick={this.openVisualizer}
+                    shape="circle"
+                />
+
+                <antd.Button
+                    className="bottom_btn"
+                    icon={<Icons.X />}
+                    onClick={this.close}
+                    shape="square"
+                />
+            </div>
             <div className="player">
-                <div className="extra_btns_wrapper">
-                    <div className="extra_btns">
-                        <antd.Button
-                            icon={<Icons.MdFirstPage />}
-                            onClick={this.minimize}
-                            shape="circle"
-                        />
-
-                        {
-                            !this.state.syncModeLocked && !this.state.syncMode && <antd.Button
-                                icon={<Icons.MdShare />}
-                                onClick={this.inviteSync}
-                                shape="circle"
-                            />
-                        }
-
-                        <antd.Button
-                            className="bottom_btn"
-                            icon={<Icons.X />}
-                            onClick={this.close}
-                            shape="circle"
-                        />
-                    </div>
-                </div>
                 <div
                     className="cover"
                     style={{
@@ -453,7 +465,7 @@ export default class AudioPlayer extends React.Component {
                                 }
                             </h2>
                         </div>
-                        <div>
+                        <div className="subTitle">
                             {
                                 currentPlaying?.artist && <div className="artist">
                                     <h3>
@@ -461,6 +473,11 @@ export default class AudioPlayer extends React.Component {
                                     </h3>
                                 </div>
                             }
+
+                            <LikeButton
+                                onClick={this.onClickLikeButton}
+                                liked={this.state.liked}
+                            />
                         </div>
                     </div>
                 </div>
