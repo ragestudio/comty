@@ -5,8 +5,8 @@ const ffmpeg = require("fluent-ffmpeg")
 function videoTranscode(originalFilePath, outputPath, options = {}) {
     return new Promise((resolve, reject) => {
         const filename = path.basename(originalFilePath)
-        const outputFilename = `${filename.split(".")[0]}.${options.format ?? "webm"}`
-        const outputFilepath = `${outputPath}/${outputFilename}_transcoded`
+        const outputFilename = `${filename.split(".")[0]}_transcoded.${options.format ?? "webm"}`
+        const outputFilepath = `${outputPath}/${outputFilename}`
 
         console.debug(`[TRANSCODING] Transcoding ${originalFilePath} to ${outputFilepath}`)
 
