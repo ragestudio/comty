@@ -1,0 +1,472 @@
+@enabled-video-canvas-opacity: 0.4;
+
+.lyrics_viewer {
+    display: flex;
+    flex-direction: column;
+
+    isolation: isolate;
+
+    //align-items: center;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 50px 0;
+
+    overflow-y: hidden;
+
+    transition: all 150ms ease-in-out;
+
+    background-color: rgba(var(--predominant-color-rgb-values), 0.8);
+    background:
+        linear-gradient(20deg, rgba(var(--predominant-color-rgb-values), 0.8), rgba(var(--predominant-color-rgb-values), 0.2)),
+        url(https://grainy-gradients.vercel.app/noise.svg);
+
+    //background-size: 1%;
+    background-position: center;
+
+    &.video-canvas-enabled {
+        .lyrics_viewer_video_canvas {
+            video {
+                opacity: @enabled-video-canvas-opacity;
+            }
+        }
+    }
+
+    &.centered-player {
+        .lyrics_viewer_thumbnail {
+            width: 100vw;
+
+            height: 80vh; //fallback
+            height: 80dvh;
+
+            opacity: 1;
+        }
+
+        .player_controller_wrapper {
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            align-items: center;
+            justify-content: center;
+
+            margin: 0;
+
+            .player_controller {
+                margin-top: 40%;
+
+                max-width: 50vw;
+                max-height: 50vh;
+
+                width: 100%;
+                //height: 100%;
+
+                border-radius: 18px;
+
+                gap: 50px;
+
+                .player_controller_cover {
+                    width: 0px;
+                }
+
+                .player_controller_info {
+                    .player_controller_info_title {
+                        font-size: 3rem;
+                    }
+                }
+            }
+        }
+    }
+
+    &.cinematic-mode {
+        .lyrics_viewer_mask {
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px)
+        }
+
+        .lyrics_viewer_background {
+            video {
+                opacity: 1;
+            }
+        }
+
+        .lyrics_viewer_content {
+            .lyrics_viewer_lines {
+                opacity: 0;
+            }
+        }
+    }
+
+    &.text_dark {
+        .lyrics_viewer_content {
+            .lyrics_viewer_lines {
+                .lyrics_viewer_lines_line {
+                    color: var(--text-color-white);
+
+                    h2 {
+                        color: var(--text-color-white);
+                    }
+                }
+            }
+        }
+    }
+
+    .lyrics_viewer_mask {
+        position: absolute;
+
+        z-index: 200;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        backdrop-filter: blur(21px);
+        -webkit-backdrop-filter: blur(21px)
+    }
+
+    .lyrics_viewer_video_canvas {
+        position: absolute;
+        top: 0;
+
+        width: 100%;
+        //height: 100dvh;
+        height: 100%;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+
+        transition: all 150ms ease-in-out;
+
+        video {
+            width: 100%;
+            height: 100%;
+
+            opacity: 0;
+
+            object-fit: cover;
+
+            transition: all 150ms ease-in-out;
+
+        }
+    }
+
+    .lyrics_viewer_thumbnail {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        z-index: 250;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+
+        opacity: 0;
+
+        width: 0px;
+        height: 0px;
+
+        transition: all 150ms ease-in-out;
+
+        overflow: hidden;
+
+        img {
+            width: 25vw;
+            height: 25vw;
+
+            max-width: 500px;
+            max-height: 500px;
+
+            object-fit: cover;
+            border-radius: 12px;
+
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .lyrics_viewer_content {
+        z-index: 250;
+        transition: all 150ms ease-in-out;
+
+        .lyrics_viewer_lines {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 90%;
+
+            margin: auto;
+
+            font-family: "Space Grotesk", sans-serif;
+
+            transition: all 150ms ease-in-out;
+
+            &::after,
+            &::before {
+                content: "";
+                display: block;
+                width: 100%;
+                //height: 50dvh;
+                height: 50vh;
+            }
+
+            .lyrics_viewer_lines_line {
+                transition: all 150ms ease-in-out;
+                z-index: 250;
+
+                &.current {
+                    margin: 20px 0;
+                    font-size: 2rem;
+
+                    animation: spacing-letters var(--line-time) ease-in-out forwards;
+                    animation-play-state: var(--line-animation-play-state);
+                }
+            }
+        }
+    }
+}
+
+@keyframes spacing-letters {
+    0% {
+        letter-spacing: 0.3rem;
+    }
+
+    100% {
+        letter-spacing: 0;
+    }
+}
+
+.player_controller_wrapper {
+    display: flex;
+    flex-direction: column;
+
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    margin: 50px;
+
+    z-index: 350;
+
+    transition: all 150ms ease-in-out;
+
+    .player_controller {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        width: 25vw;
+
+        min-width: 350px;
+        max-width: 500px;
+
+        height: 220px;
+
+        background-color: rgba(var(--background-color-accent-values), 0.4);
+        // background:
+        // linear-gradient(20deg, rgba(var(--background-color-accent-values), 0.8), transparent),
+        // url(https://grainy-gradients.vercel.app/noise.svg);
+
+        -webkit-backdrop-filter: blur(21px);
+        backdrop-filter: blur(21px);
+
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2);
+
+        padding: 20px;
+
+        border-radius: 12px;
+
+        gap: 20px;
+
+        color: var(--text-color);
+
+        transition: all 150ms ease-in-out;
+
+        overflow: hidden;
+
+        &.player_controller--hovering {
+            .player_controller_controls {
+                height: 8vh;
+                max-height: 100px;
+                opacity: 1;
+            }
+
+            .player_controller_progress_wrapper {
+                bottom: 7px;
+
+                .player_controller_progress {
+                    height: 10px;
+
+                    width: 90%;
+
+                    background-color: var(--background-color-accent);
+                }
+            }
+        }
+
+        .player_controller_cover {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 10vw;
+            height: 100%;
+
+            img {
+                width: 100%;
+                height: 100%;
+
+                object-fit: cover;
+
+                border-radius: 12px;
+            }
+        }
+
+        .player_controller_left {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            height: 100%;
+
+            transition: all 150ms ease-in-out;
+
+            .player_controller_info {
+                display: flex;
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 10px;
+
+                transition: all 150ms ease-in-out;
+
+                .player_controller_info_title {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+
+                    color: var(--background-color-contrast)
+                }
+
+                .player_controller_info_artist {
+                    font-size: 0.8rem;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .player_controller_controls {
+            display: flex;
+            flex-direction: row;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            padding: 10px;
+
+            height: 0px;
+            opacity: 0;
+
+            transition: all 150ms ease-in-out;
+
+            .playButton {
+                position: relative;
+
+                display: flex;
+
+                align-items: center;
+                justify-content: center;
+
+                .loadCircle {
+                    position: absolute;
+
+                    z-index: 330;
+
+                    top: 0;
+                    right: 0;
+                    left: 0;
+
+                    width: 100%;
+                    height: 100%;
+
+                    margin: auto;
+
+                    align-self: center;
+                    justify-self: center;
+
+                    transform: scale(1.5);
+
+                    svg {
+                        width: 100%;
+                        height: 100%;
+
+                        path {
+                            stroke: var(--text-color);
+                            stroke-width: 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        .player_controller_progress_wrapper {
+            position: absolute;
+
+            box-sizing: border-box;
+
+            bottom: 0;
+            left: 0;
+
+            margin: auto;
+
+            width: 100%;
+
+            .player_controller_progress {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+
+                height: 5px;
+                width: 100%;
+
+                margin: auto;
+
+                transition: all 150ms ease-in-out;
+
+                border-radius: 12px;
+
+                .player_controller_progress_bar {
+                    height: 100%;
+
+                    background-color: var(--background-color-contrast);
+
+                    border-radius: 12px;
+
+                    transition: all 150ms ease-in-out;
+                }
+            }
+        }
+    }
+}
