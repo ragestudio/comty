@@ -94,11 +94,19 @@ export async function createWebsockets() {
     }
 }
 
-export async function reconnectWebsockets() {
+export async function reconnectWebsockets({ force = false } = {}) {
     const instances = globalThis.__comty_shared_state.wsInstances
 
     for (let [key, instance] of Object.entries(instances)) {
         if (instance.connected) {
+            if (!force) {
+                instance.emit("reauthenticate", {
+                    token: SessionModel.token,
+                })
+
+                continue
+            }
+
             // disconnect first
             instance.disconnect()
         }
