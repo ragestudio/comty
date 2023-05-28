@@ -65,7 +65,7 @@ export class ThemeProvider extends React.Component {
 
 export default class StyleCore extends Core {
 	static refName = "style"
-	
+
 	static namespace = "style"
 
 	static themeManifestStorageKey = "theme"
@@ -102,6 +102,16 @@ export default class StyleCore extends Core {
 		return store.get(StyleCore.modificationStorageKey) ?? {}
 	}
 
+	static get variant() {
+		if (window.app.cores.settings.is("style.auto_darkMode", true)) {
+			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+				return "dark"
+			}
+		}
+
+		return StyleCore.storagedVariant
+	}
+
 	async onInitialize() {
 		if (StyleCore.storagedTheme) {
 			// TODO: Start remote theme loader 
@@ -123,29 +133,23 @@ export default class StyleCore extends Core {
 		}
 
 		// apply variation
-		this.applyVariant(variantKey)
+		this.applyVariant(StyleCore.variant)
 
 		// handle auto prefered color scheme
 		window.matchMedia("(prefers-color-scheme: light)").addListener(() => {
 			console.log(`[THEME] Auto color scheme changed`)
 
-			if (window.app.cores.settings.get("style.auto_darkMode")) {
-				this.handleAutoColorScheme()
-			}
+			this.applyVariant(StyleCore.variant)
 		})
-
-		if (window.app.cores.settings.get("style.auto_darkMode")) {
-			this.handleAutoColorScheme()
-		}
 	}
 
 	onEvents = {
 		"style.autoDarkModeToogle": (value) => {
 			if (value === true) {
-				this.handleAutoColorScheme()
-			} else {
-				this.applyVariant(StyleCore.storagedVariant)
+				return this.applyVariant(StyleCore.variant)
 			}
+
+			return this.applyVariant(StyleCore.variant)
 		}
 	}
 
@@ -158,6 +162,7 @@ export default class StyleCore extends Core {
 		setDefault: () => this.setDefault(),
 		update: (...args) => this.update(...args),
 		applyVariant: (...args) => this.applyVariant(...args),
+		applyInitialVariant: () => this.applyVariant(StyleCore.variant),
 		compactMode: (value = !window.app.cores.settings.get("style.compactMode")) => {
 			if (value) {
 				return this.update({
@@ -244,15 +249,5 @@ export default class StyleCore extends Core {
 		this.public.currentVariant = variant
 
 		this.update(values)
-	}
-
-	handleAutoColorScheme() {
-		const prefered = window.matchMedia("(prefers-color-scheme: light)")
-
-		if (!prefered.matches) {
-			this.applyVariant("dark")
-		} else {
-			this.applyVariant("light")
-		}
 	}
 }
