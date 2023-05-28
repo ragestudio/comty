@@ -1,4 +1,5 @@
 import React from "react"
+import classnames from "classnames"
 import { DOMWindow } from "components/RenderWindow"
 
 import "./index.less"
@@ -34,6 +35,7 @@ class FloatingStackItem extends React.PureComponent {
 export default class FloatingStack extends React.Component {
     state = {
         renders: [],
+        globalVisibility: true,
     }
 
     public = {
@@ -77,6 +79,15 @@ export default class FloatingStack extends React.Component {
             })
 
             return true
+        },
+        toogleGlobalVisibility: (to) => {
+            if (typeof to !== "boolean") {
+                to = !this.state.globalVisibility
+            }
+
+            this.setState({
+                globalVisibility: to,
+            })
         }
     }
 
@@ -90,7 +101,14 @@ export default class FloatingStack extends React.Component {
     }
 
     render() {
-        return <div className="floating_stack">
+        return <div
+            className={classnames(
+                "floating_stack",
+                {
+                    ["hidden"]: !this.state.globalVisibility,
+                }
+            )}
+        >
             {
                 this.state.renders.map((item) => {
                     return <FloatingStackItem id={item.id}>
