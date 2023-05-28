@@ -26,3 +26,5 @@ export { default as ModerationController } from "./ModerationController"
 export { default as TracksController } from "./TracksController"
 
 export { default as AdminController } from "./AdminController"
+
+export { default as SyncController } from "./SyncController"
