@@ -34,6 +34,14 @@ export default class PlaylistCreatorSteps extends React.Component {
         currentStep: 0,
     }
 
+    _hacks = {
+        revertTrackOrders: () => {
+            this.setState({
+                trackList: this.state.trackList.reverse()
+            })
+        }
+    }
+
     updatePlaylistData = (key, data) => {
         this.setState({
             playlistData: {
@@ -400,6 +408,8 @@ export default class PlaylistCreatorSteps extends React.Component {
     }
 
     componentDidMount() {
+        window._hacks = this._hacks
+
         if (this.props.playlist_id) {
             this.loadPlaylistData(this.props.playlist_id)
         } else {
@@ -407,6 +417,10 @@ export default class PlaylistCreatorSteps extends React.Component {
                 loading: false
             })
         }
+    }
+
+    componentWillUnmount() {
+        delete window._hacks
     }
 
     loadPlaylistData = async (playlist_id) => {
