@@ -1,11 +1,10 @@
-import React from "react"
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
 import AudioPlayerStorage from "./storage"
 import { FastAverageColor } from "fast-average-color"
 
-import EmbbededMediaPlayer from "components/EmbbededMediaPlayer"
-import BackgroundMediaPlayer from "components/BackgroundMediaPlayer"
+import EmbbededMediaPlayer from "components/Player/MediaPlayer"
+import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
 
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
