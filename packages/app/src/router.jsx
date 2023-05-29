@@ -160,6 +160,8 @@ export const PageRender = React.memo((props) => {
                 state,
             })
 
+            app.location.lastPathname = app.location.pathname
+
             if (state.transitionDelay >= 100) {
                 await new Promise((resolve) => {
                     setTimeout(() => {
@@ -169,6 +171,12 @@ export const PageRender = React.memo((props) => {
             }
 
             return navigate(to, {
+                state
+            })
+        }
+
+        app.backLocation = (state = {}) => {
+            return navigate(app.location.lastPathname, {
                 state
             })
         }
