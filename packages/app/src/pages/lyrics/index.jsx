@@ -1,16 +1,24 @@
 import React from "react"
 import classnames from "classnames"
-import { Button } from "antd"
+import Marquee from "react-fast-marquee"
 
-import UseAnimations from "react-useanimations"
-import LoadingAnimation from "react-useanimations/lib/loading"
-import { Icons } from "components/Icons"
+import Controls from "components/Player/Controls"
 
 import Image from "components/Image"
 
 import request from "comty.js/handlers/request"
 
 import "./index.less"
+
+function RGBStringToValues(rgbString) {
+    if (!rgbString) {
+        return [0, 0, 0]
+    }
+
+    const rgb = rgbString.replace("rgb(", "").replace(")", "").split(",").map((v) => parseInt(v))
+
+    return [rgb[0], rgb[1], rgb[2]]
+}
 
 function composeRgbValues(values) {
     let value = ""
@@ -37,12 +45,33 @@ function calculateLineTime(line) {
     return line.endTimeMs - line.startTimeMs
 }
 
+function isOverflown(element) {
+    if (!element) {
+        console.log("element is null")
+        return false
+    }
+
+    return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+}
+
 class PlayerController extends React.Component {
     state = {
-        hovering: false,
         colorAnalysis: null,
-        currentState: null,
         currentDragWidth: 0,
+        titleOverflown: false,
+
+        currentDuration: 0,
+        currentTime: 0,
+
+        currentPlaying: app.cores.player.getState("currentAudioManifest"),
+        loading: app.cores.player.getState("loading") ?? false,
+        playbackStatus: app.cores.player.getState("playbackStatus") ?? "stopped",
+
+        audioMuted: app.cores.player.getState("audioMuted") ?? false,
+        volume: app.cores.player.getState("audioVolume"),
+
+        syncModeLocked: app.cores.player.getState("syncModeLocked"),
+        syncMode: app.cores.player.getState("syncMode"),
     }
 
     events = {
@@ -50,15 +79,36 @@ class PlayerController extends React.Component {
             this.setState({ colorAnalysis })
         },
         "player.seek.update": (seekTime) => {
-            const updatedState = this.state.currentState
-
-            updatedState.time = seekTime
-
             this.setState({
-                currentState: updatedState,
+                currentTime: seekTime,
             })
         },
+        "player.status.update": (data) => {
+            this.setState({ playbackStatus: data })
+        },
+        "player.current.update": (data) => {
+            this.setState({ titleOverflown: false })
+
+            this.setState({ currentPlaying: data })
+        },
+        "player.syncModeLocked.update": (to) => {
+            this.setState({ syncModeLocked: to })
+        },
+        "player.syncMode.update": (to) => {
+            this.setState({ syncMode: to })
+        },
+        "player.mute.update": (data) => {
+            this.setState({ audioMuted: data })
+        },
+        "player.volume.update": (data) => {
+            this.setState({ audioVolume: data })
+        },
+        "player.loading.update": (data) => {
+            this.setState({ loading: data })
+        },
     }
+
+    titleRef = React.createRef()
 
     startSync() {
         // create a interval to get state from player
@@ -69,7 +119,15 @@ class PlayerController extends React.Component {
         this.syncInterval = setInterval(() => {
             const currentState = app.cores.player.currentState()
 
-            this.setState({ currentState })
+            this.setState({
+                currentDuration: currentState.duration,
+                currentTime: currentState.time,
+                colorAnalysis: currentState.colorAnalysis,
+            })
+
+            const titleOverflown = isOverflown(this.titleRef.current)
+
+            this.setState({ titleOverflown: titleOverflown })
         }, 800)
     }
 
@@ -82,11 +140,19 @@ class PlayerController extends React.Component {
     }
 
     onClickTooglePlayButton = () => {
-        if (this.state.currentState?.playbackStatus === "playing") {
+        if (this.state?.playbackStatus === "playing") {
             app.cores.player.playback.pause()
         } else {
             app.cores.player.playback.play()
         }
+    }
+
+    updateVolume = (value) => {
+        app.cores.player.volume(value)
+    }
+
+    toogleMute = () => {
+        app.cores.player.toogleMute()
     }
 
     componentDidMount() {
@@ -99,6 +165,26 @@ class PlayerController extends React.Component {
         }
 
         this.startSync()
+
+        // // create a intersection observer to check if title is overflown
+        // // if the entire title is not visible, we will use marquee
+        // this.titleObserver = new IntersectionObserver((entries) => {
+        //     for (const entry of entries) {
+        //         if (entry.isIntersecting) {
+        //             this.setState({ titleOverflown: false })
+        //         } else {
+        //             this.setState({ titleOverflown: true })
+        //         }
+        //     }
+        // }, {
+        //     root: null,
+        //     rootMargin: "0px",
+        //     threshold: 1.0,
+        // })
+
+        console.log(this.titleRef.current)
+
+        //this.titleObserver.observe(this.titleRef.current)
     }
 
     componentWillUnmount() {
@@ -121,70 +207,91 @@ class PlayerController extends React.Component {
     }
 
     render() {
+        //const bgColor = RGBStringToValues(getComputedStyle(document.documentElement).getPropertyValue("--background-color-accent-values"))
+
         return <div className="player_controller_wrapper">
             <div
-                onMouseEnter={() => {
-                    this.setState({ hovering: true })
-                }}
-                onMouseLeave={() => {
-                    this.setState({ hovering: false })
-                }}
                 className={classnames(
                     "player_controller",
-                    {
-                        ["player_controller--hovering"]: this.state.hovering || this.state.dragging,
-                    }
                 )}
             >
                 <div className="player_controller_cover">
                     <Image
-                        src={this.state.currentState?.manifest?.thumbnail}
+                        src={this.state.currentPlaying?.thumbnail ?? "/assets/no_song.png"}
                     />
                 </div>
 
                 <div className="player_controller_left">
                     <div className="player_controller_info">
                         <div className="player_controller_info_title">
-                            {this.state.currentState?.manifest?.title}
+                            {
+                                <h4
+                                    ref={this.titleRef}
+                                    className={classnames(
+                                        "player_controller_info_title_text",
+                                        {
+                                            ["overflown"]: this.state.titleOverflown,
+                                        }
+                                    )}
+                                >
+                                    {
+                                        this.state.plabackState === "stopped" ? "Nothing is playing" : <>
+                                            {this.state.currentPlaying?.title ?? "Nothing is playing"}
+                                        </>
+                                    }
+                                </h4>
+                            }
+
+                            {this.state.titleOverflown &&
+                                <Marquee
+                                    //gradient
+                                    //gradientColor={bgColor}
+                                    //gradientWidth={20}
+                                    play={this.state.plabackState !== "stopped"}
+                                >
+                                    <h4>
+                                        {
+                                            this.state.plabackState === "stopped" ? "Nothing is playing" : <>
+                                                {this.state.currentPlaying?.title ?? "Nothing is playing"}
+                                            </>
+                                        }
+                                    </h4>
+                                </Marquee>}
                         </div>
                         <div className="player_controller_info_artist">
-                            {this.state.currentState?.manifest?.artist} - {this.state.currentState?.manifest?.album}
+                            {
+                                this.state.currentPlaying?.artist && <>
+                                    <h3>
+                                        {this.state.currentPlaying?.artist ?? "Unknown"}
+                                    </h3>
+                                    {
+                                        this.state.currentPlaying?.album && <>
+                                            <span> - </span>
+                                            <h3>
+                                                {this.state.currentPlaying?.album ?? "Unknown"}
+                                            </h3>
+                                        </>
+                                    }
+                                </>
+                            }
                         </div>
                     </div>
 
-                    <div className="player_controller_controls">
-                        <Button
-                            type="ghost"
-                            shape="round"
-                            icon={<Icons.ChevronLeft />}
-                            onClick={this.onClickPreviousButton}
-                            disabled={this.state.currentState?.syncModeLocked}
-                        />
-                        <Button
-                            className="playButton"
-                            type="primary"
-                            shape="circle"
-                            icon={this.state.currentState?.playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
-                            onClick={this.onClickTooglePlayButton}
-                            disabled={this.state.currentState?.syncModeLocked}
-                        >
-                            {
-                                this.state.currentState?.loading && <div className="loadCircle">
-                                    <UseAnimations
-                                        animation={LoadingAnimation}
-                                        size="100%"
-                                    />
-                                </div>
-                            }
-                        </Button>
-                        <Button
-                            type="ghost"
-                            shape="round"
-                            icon={<Icons.ChevronRight />}
-                            onClick={this.onClickNextButton}
-                            disabled={this.state.currentState?.syncModeLocked}
-                        />
-                    </div>
+                    <Controls
+                        className="player_controller_controls"
+                        controls={{
+                            previous: this.onClickPreviousButton,
+                            toogle: this.onClickTooglePlayButton,
+                            next: this.onClickNextButton,
+                        }}
+                        syncModeLocked={this.state.syncModeLocked}
+                        playbackStatus={this.state.playbackStatus}
+                        loading={this.state.loading}
+                        audioVolume={this.state.audioVolume}
+                        audioMuted={this.state.audioMuted}
+                        onVolumeUpdate={this.updateVolume}
+                        onMuteUpdate={this.toogleMute}
+                    />
                 </div>
 
                 <div className="player_controller_progress_wrapper">
@@ -197,7 +304,7 @@ class PlayerController extends React.Component {
                         }}
                         onMouseUp={(e) => {
                             const rect = e.currentTarget.getBoundingClientRect()
-                            const seekTime = this.state.currentState?.duration * (e.clientX - rect.left) / rect.width
+                            const seekTime = this.state.currentDuration * (e.clientX - rect.left) / rect.width
 
                             this.onDragEnd(seekTime)
                         }}
@@ -210,7 +317,7 @@ class PlayerController extends React.Component {
                     >
                         <div className="player_controller_progress_bar"
                             style={{
-                                width: `${this.state.dragging ? this.state.currentDragWidth : this.state.currentState?.time / this.state.currentState?.duration * 100}%`
+                                width: `${this.state.dragging ? this.state.currentDragWidth : this.state.currentTime / this.state.currentDuration * 100}%`
                             }}
                         />
                     </div>
@@ -234,20 +341,11 @@ export default class SyncLyrics extends React.Component {
 
         colorAnalysis: null,
 
-        classnames: [
-            {
-                name: "cinematic-mode",
-                enabled: false,
-            },
-            {
-                name: "centered-player",
-                enabled: false,
-            },
-            {
-                name: "video-canvas-enabled",
-                enabled: false,
-            }
-        ]
+        classnames: {
+            "cinematic-mode": false,
+            "centered-player": false,
+            "video-canvas-enabled": false,
+        }
     }
 
     visualizerRef = React.createRef()
@@ -272,6 +370,56 @@ export default class SyncLyrics extends React.Component {
         "player.status.update": (currentStatus) => {
             this.setState({ currentStatus })
         }
+    }
+
+    toogleClassName = (className, to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.classnames[className]
+        }
+
+        if (to) {
+            if (this.state.classnames[className] === true) {
+                return false
+            }
+
+            //app.message.info("Toogling on " + className)
+
+            this.setState({
+                classnames: {
+                    ...this.state.classnames,
+                    [className]: true
+                },
+            })
+
+            return true
+        } else {
+            if (this.state.classnames[className] === false) {
+                return false
+            }
+
+            //app.message.info("Toogling off " + className)
+
+            this.setState({
+                classnames: {
+                    ...this.state.classnames,
+                    [className]: false
+                },
+            })
+
+            return true
+        }
+    }
+
+    toogleVideoCanvas = (to) => {
+        return this.toogleClassName("video-canvas-enabled", to)
+    }
+
+    toogleCenteredControllerMode = (to) => {
+        return this.toogleClassName("centered-player", to)
+    }
+
+    toogleCinematicMode = (to) => {
+        return this.toogleClassName("cinematic-mode", to)
     }
 
     isCurrentLine = (line) => {
@@ -342,9 +490,13 @@ export default class SyncLyrics extends React.Component {
 
         if (data.canvas_url) {
             //app.message.info("Video canvas loaded")
+            console.log(`[SyncLyrics] Video canvas loaded`)
+
             this.toogleVideoCanvas(true)
         } else {
             //app.message.info("No video canvas available for this song")
+            console.log(`[SyncLyrics] No video canvas available for this song`)
+
             this.toogleVideoCanvas(false)
         }
 
@@ -352,10 +504,13 @@ export default class SyncLyrics extends React.Component {
         if (data.lines.length === 0 || data.syncType !== "LINE_SYNCED") {
             //app.message.info("No lyrics available for this song")
 
+            console.log(`[SyncLyrics] No lyrics available for this song, sync type [${data.syncType}]`)
+
             this.toogleCinematicMode(false)
             this.toogleCenteredControllerMode(true)
         } else {
             //app.message.info("Lyrics loaded, starting sync...")
+            console.log(`[SyncLyrics] Starting sync with type [${data.syncType}]`)
 
             this.toogleCenteredControllerMode(false)
             this.startLyricsSync()
@@ -365,63 +520,9 @@ export default class SyncLyrics extends React.Component {
         this.setState({
             loading: false,
             syncType: data.syncType,
-            canvas_url: data.canvas_url,
+            canvas_url: data.canvas_url ?? null,
             lyrics: data.lines,
         })
-    }
-
-    toogleClassName = (className, to) => {
-        let currentState = this.state.classnames.find((c) => c.name === className)
-
-        if (!currentState) {
-            return false
-        }
-
-        if (typeof to === "undefined") {
-            to = !currentState?.enabled
-        }
-
-        if (to) {
-            if (currentState.enabled) {
-                return false
-            }
-
-            //app.message.info("Toogling on " + className)
-
-            currentState.enabled = true
-
-            this.setState({
-                classnames: this.state.classnames,
-            })
-
-            return true
-        } else {
-            if (!currentState.enabled) {
-                return false
-            }
-
-            //app.message.info("Toogling off " + className)
-
-            currentState.enabled = false
-
-            this.setState({
-                classnames: this.state.classnames,
-            })
-
-            return true
-        }
-    }
-
-    toogleVideoCanvas = (to) => {
-        return this.toogleClassName("video-canvas-enabled", to)
-    }
-
-    toogleCenteredControllerMode = (to) => {
-        return this.toogleClassName("centered-player", to)
-    }
-
-    toogleCinematicMode = (to) => {
-        return this.toogleClassName("cinematic-mode", to)
     }
 
     startLyricsSync = () => {
@@ -495,8 +596,16 @@ export default class SyncLyrics extends React.Component {
 
                 if (this.state.canvas_url) {
                     if (line.words === "♪" || line.words === "♫" || line.words === " " || line.words === "") {
+                        //console.log(`[SyncLyrics] Toogling cinematic mode on because line is empty`)
+
                         this.toogleCinematicMode(true)
                     } else {
+                        //console.log(`[SyncLyrics] Toogling cinematic mode off because line is not empty`)
+
+                        this.toogleCinematicMode(false)
+                    }
+                } else {
+                    if (this.state.classnames["cinematic-mode"] === true) {
                         this.toogleCinematicMode(false)
                     }
                 }
@@ -587,14 +696,10 @@ export default class SyncLyrics extends React.Component {
                 "lyrics_viewer",
                 {
                     ["text_dark"]: this.state.colorAnalysis?.isDark ?? false,
-                    ...this.state.classnames.map((classname) => {
+                    ...Object.entries(this.state.classnames).reduce((acc, [key, value]) => {
                         return {
-                            [classname.name]: classname.enabled,
-                        }
-                    }).reduce((a, b) => {
-                        return {
-                            ...a,
-                            ...b,
+                            ...acc,
+                            [key]: value,
                         }
                     }, {}),
                 },
@@ -628,7 +733,7 @@ export default class SyncLyrics extends React.Component {
                 className="lyrics_viewer_thumbnail"
             >
                 <Image
-                    src={this.state.currentManifest?.thumbnail}
+                    src={this.state.currentManifest?.thumbnail ?? "/assets/no_song.png"}
                     ref={this.thumbnailRef}
                 />
             </div>
