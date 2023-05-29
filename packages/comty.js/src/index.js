@@ -99,6 +99,17 @@ export async function reconnectWebsockets({ force = false } = {}) {
 
     for (let [key, instance] of Object.entries(instances)) {
         if (instance.connected) {
+            if (!instance.auth) {
+                instance.disconnect()
+
+                instance.auth = {
+                    token: SessionModel.token,
+                }
+
+                instance.connect()
+                continue
+            }
+
             if (!force) {
                 instance.emit("reauthenticate", {
                     token: SessionModel.token,
