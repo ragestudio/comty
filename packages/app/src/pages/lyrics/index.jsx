@@ -637,6 +637,18 @@ export default class SyncLyrics extends React.Component {
         app.cores.style.applyVariant("dark")
         app.layout.floatingStack.toogleGlobalVisibility(false)
 
+        // request full screen to browser
+        if (document.fullscreenEnabled) {
+            document.documentElement.requestFullscreen()
+        }
+
+        // listen when user exit full screen to exit cinematic mode
+        document.addEventListener("fullscreenchange", () => {
+            if (!document.fullscreenElement) {
+                app.backLocation()
+            }
+        })
+
         window._hacks = {
             toogleVideoCanvas: this.toogleVideoCanvas,
             toogleCinematicMode: this.toogleCinematicMode,
@@ -663,6 +675,11 @@ export default class SyncLyrics extends React.Component {
         app.cores.style.compactMode(false)
         app.cores.style.applyInitialVariant()
         app.layout.floatingStack.toogleGlobalVisibility(true)
+
+        // exit full screen
+        if (document.fullscreenEnabled) {
+            document.exitFullscreen()
+        }
     }
 
     renderLines() {
