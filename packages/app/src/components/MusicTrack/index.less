@@ -1,0 +1,164 @@
+.music-track {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    background-color: var(--background-color-accent);
+
+    cursor: pointer;
+
+    &.current {
+        background-color: var(--background-color-accent);
+
+        .music-track_actions {
+            .music-track_action {
+                .ant-btn {
+                    background-color: var(--colorPrimary) !important;
+                    border: unset;
+                    opacity: 1 !important;
+                }
+
+                .music-track_orderIndex {
+                    opacity: 0 !important;
+                }
+            }
+        }
+    }
+
+    .music-track_actions {
+        display: flex;
+
+        align-items: center;
+
+        margin-right: 10px;
+
+        &.withOrder {
+            .music-track_action {
+                &:hover {
+                    .ant-btn {
+                        opacity: 1;
+                    }
+
+                    .music-track_orderIndex {
+                        opacity: 0;
+                    }
+                }
+
+                .ant-btn {
+                    opacity: 0;
+                }
+            }
+        }
+
+        .music-track_action {
+            position: relative;
+
+            transition: all 150ms ease-in-out;
+
+            .music-track_orderIndex {
+                position: absolute;
+
+                top: 0;
+                left: 0;
+
+                height: 100%;
+
+                width: 100%;
+
+                padding: 5px 13px;
+
+                line-height: 22px;
+
+                opacity: 1;
+
+                transition: all 150ms ease-in-out;
+
+                text-align: center;
+
+                font-family: "DM Mono", monospace;
+
+                svg {
+                    margin: 0;
+                }
+            }
+
+            .ant-btn {
+                svg {
+                    margin: 0 !important;
+
+                    background-color: transparent;
+
+                    fill: var(--text-color);
+                    stroke: var(--text-color);
+                }
+
+                color: var(--text-color);
+                background-color: transparent !important;
+
+                border: 1px solid var(--text-color);
+
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .music-track_cover {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        background-color: black;
+
+        border-radius: 12px;
+
+        overflow: hidden;
+
+        width: 50px;
+        height: 50px;
+
+        img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+    }
+
+    .music-track_details {
+        display: flex;
+        flex-direction: column;
+
+        margin-left: 10px;
+
+        color: var(--text-color);
+
+        .music-track_title {
+            font-size: 1rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .music-track_artist {
+            font-size: 0.8rem;
+        }
+    }
+
+    .music-track_info {
+        display: flex;
+        flex-direction: column;
+
+        margin-left: auto;
+
+        color: var(--text-color);
+
+        .music-track_duration {
+            font-size: 0.8rem;
+        }
+    }
+}
