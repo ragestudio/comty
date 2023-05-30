@@ -7,69 +7,24 @@ import { Icons } from "components/Icons"
 
 import SeekBar from "components/Player/SeekBar"
 import Controls from "components/Player/Controls"
+import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
 import "./index.less"
 
+export default (props) => {
+    return <WithPlayerContext>
+        <AudioPlayer
+            {...props}
+        />
+    </WithPlayerContext>
+}
+
 // TODO: Queue view
-export default class AudioPlayer extends React.Component {
+export class AudioPlayer extends React.Component {
+    static contextType = Context
+
     state = {
-        loading: app.cores.player.getState("loading") ?? false,
-        currentPlaying: app.cores.player.getState("currentAudioManifest"),
-        playbackStatus: app.cores.player.getState("playbackStatus") ?? "stopped",
-        audioMuted: app.cores.player.getState("audioMuted") ?? false,
-        audioVolume: app.cores.player.getState("audioVolume") ?? 0.3,
-        bpm: app.cores.player.getState("trackBPM") ?? 0,
-        showControls: false,
-        minimized: false,
-        streamMode: false,
-
-        syncModeLocked: app.cores.player.getState("syncModeLocked"),
-        syncMode: app.cores.player.getState("syncMode"),
-    }
-
-    events = {
-        "player.syncModeLocked.update": (to) => {
-            this.setState({ syncModeLocked: to })
-        },
-        "player.syncMode.update": (to) => {
-            this.setState({ syncMode: to })
-        },
-        "player.livestream.update": (data) => {
-            this.setState({ streamMode: data })
-        },
-        "player.bpm.update": (data) => {
-            this.setState({ bpm: data })
-        },
-        "player.loading.update": (data) => {
-            this.setState({ loading: data })
-        },
-        "player.status.update": (data) => {
-            this.setState({ playbackStatus: data })
-        },
-        "player.current.update": (data) => {
-            this.setState({ currentPlaying: data })
-        },
-        "player.mute.update": (data) => {
-            this.setState({ audioMuted: data })
-        },
-        "player.volume.update": (data) => {
-            this.setState({ audioVolume: data })
-        },
-        "player.minimized.update": (minimized) => {
-            this.setState({ minimized })
-        }
-    }
-
-    componentDidMount = async () => {
-        Object.entries(this.events).forEach(([event, callback]) => {
-            app.eventBus.on(event, callback)
-        })
-    }
-
-    componentWillUnmount() {
-        Object.entries(this.events).forEach(([event, callback]) => {
-            app.eventBus.off(event, callback)
-        })
+        liked: false,
     }
 
     onMouse = (event) => {
@@ -131,20 +86,12 @@ export default class AudioPlayer extends React.Component {
     }
 
     render() {
-        const {
-            loading,
-            currentPlaying,
-            playbackStatus,
-            audioMuted,
-            audioVolume,
-        } = this.state
-
         return <div
             className={classnames(
                 "embbededMediaPlayerWrapper",
                 {
                     ["hovering"]: this.state.showControls,
-                    ["minimized"]: this.state.minimized,
+                    ["minimized"]: this.context.minimized,
                 }
             )}
             onMouseEnter={this.onMouse}
@@ -158,7 +105,7 @@ export default class AudioPlayer extends React.Component {
                 />
 
                 {
-                    !this.state.syncModeLocked && !this.state.syncMode && <antd.Button
+                    !this.context.syncModeLocked && !this.context.syncMode && <antd.Button
                         icon={<Icons.MdShare />}
                         onClick={this.inviteSync}
                         shape="circle"
@@ -182,7 +129,7 @@ export default class AudioPlayer extends React.Component {
                 <div
                     className="cover"
                     style={{
-                        backgroundImage: `url(${(currentPlaying?.thumbnail) ?? "/assets/no_song.png"})`,
+                        backgroundImage: `url(${(this.context.currentManifest?.thumbnail) ?? "/assets/no_song.png"})`,
                     }}
                 />
                 <div className="header">
@@ -190,17 +137,17 @@ export default class AudioPlayer extends React.Component {
                         <div className="title">
                             <h2>
                                 {
-                                    currentPlaying?.title
-                                        ? currentPlaying?.title
-                                        : (loading ? "Loading..." : (currentPlaying?.title ?? "Untitled"))
+                                    this.context.currentManifest?.title
+                                        ? this.context.currentManifest?.title
+                                        : (this.context.loading ? "Loading..." : (this.context.currentPlaying?.title ?? "Untitled"))
                                 }
                             </h2>
                         </div>
                         <div className="subTitle">
                             {
-                                currentPlaying?.artist && <div className="artist">
+                                this.context.currentManifest?.artist && <div className="artist">
                                     <h3>
-                                        {currentPlaying?.artist ?? "Unknown"}
+                                        {this.context.currentManifest?.artist ?? "Unknown"}
                                     </h3>
                                 </div>
                             }
@@ -214,11 +161,11 @@ export default class AudioPlayer extends React.Component {
                 </div>
 
                 <Controls
-                    syncModeLocked={this.state.syncModeLocked}
-                    syncMode={this.state.syncMode}
-                    playbackStatus={playbackStatus}
-                    audioMuted={audioMuted}
-                    audioVolume={audioVolume}
+                    syncModeLocked={this.context.syncModeLocked}
+                    syncMode={this.context.syncMode}
+                    playbackStatus={this.context.playbackStatus}
+                    audioMuted={this.context.audioMuted}
+                    audioVolume={this.context.audioVolume}
                     onVolumeUpdate={this.updateVolume}
                     onMuteUpdate={this.toogleMute}
                     controls={{
@@ -229,10 +176,10 @@ export default class AudioPlayer extends React.Component {
                 />
 
                 <SeekBar
-                    stopped={playbackStatus === "stopped"}
-                    playing={playbackStatus === "playing"}
-                    streamMode={this.state.streamMode}
-                    disabled={this.state.syncModeLocked}
+                    stopped={this.context.playbackStatus === "stopped"}
+                    playing={this.context.playbackStatus === "playing"}
+                    streamMode={this.context.streamMode}
+                    disabled={this.context.syncModeLocked}
                 />
             </div>
         </div>
