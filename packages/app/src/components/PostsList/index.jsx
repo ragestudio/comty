@@ -366,6 +366,46 @@ export class PostsListsComponent extends React.Component {
             </div>
         }
 
+        return <div className="post-list_wrapper">
+            <LoadMore
+            ref={this.listRef}
+            className="post-list"
+            loadingComponent={LoadingComponent}
+            noResultComponent={NoResultComponent}
+            hasMore={this.state.hasMore}
+            fetching={this.state.loading}
+            onBottom={this.onLoadMore}
+        >
+            {
+                !this.state.realtimeUpdates && <div className="resume_btn_wrapper">
+                    <antd.Button
+                        type="primary"
+                        shape="round"
+                        onClick={this.onResumeRealtimeUpdates}
+                        loading={this.state.resumingLoading}
+                        icon={<Icons.SyncOutlined />}
+                    >
+                        Resume
+                    </antd.Button>
+                </div>
+            }
+            {
+                this.state.list.map((data) => {
+                    return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
+                        key: data._id,
+                        data: data,
+                        events: {
+                            onClickLike: this.onLikePost,
+                            onClickSave: this.onSavePost,
+                            onClickDelete: this.onDeletePost,
+                            onClickEdit: this.onEditPost,
+                        }
+                    })
+                })
+            }
+        </LoadMore>
+        </div>
+
         return <AutoSizer
             disableWidth
             style={{
