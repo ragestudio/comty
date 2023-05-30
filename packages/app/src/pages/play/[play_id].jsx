@@ -5,36 +5,15 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import moment from "moment"
 
+import { WithPlayerContext } from "contexts/WithPlayerContext"
+
 import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
 
 import PlaylistsModel from "models/playlists"
+import MusicTrack from "components/MusicTrack"
 
 import "./index.less"
-
-const TrackItem = (props) => {
-    return <div className="track_item">
-        <div className="track_item_actions">
-            <antd.Button
-                type="primary"
-                shape="circle"
-                icon={<Icons.Play />}
-                onClick={props.onClick}
-            />
-        </div>
-        <div className="track_item_cover">
-            <ImageViewer src={props.track.thumbnail} />
-        </div>
-        <div className="track_item_details">
-            <div className="track_item_title">
-                {props.track.title}
-            </div>
-            <div className="track_item_artist">
-                {props.track.artist}
-            </div>
-        </div>
-    </div>
-}
 
 export default (props) => {
     const play_id = props.params.play_id
@@ -99,17 +78,19 @@ export default (props) => {
                     </div>
 
                     <div className="play_info_statistics">
-                        <div className="play_info_statistics_item">
-                            <p
-                                onClick={() => {
-                                    app.navigation.goToAccount(playlist.user.username)
-                                }}
-                            >
-                                <Icons.MdPerson />
+                        {
+                            playlist.publisher && <div className="play_info_statistics_item">
+                                <p
+                                    onClick={() => {
+                                        app.navigation.goToAccount(playlist.user.username)
+                                    }}
+                                >
+                                    <Icons.MdPerson />
 
-                                Publised by <a>{playlist.user.username}</a>
-                            </p>
-                        </div>
+                                    Publised by <a>{playlist.publisher.username}</a>
+                                </p>
+                            </div>
+                        }
                         <div className="play_info_statistics_item">
                             <p>
                                 <Icons.MdLibraryMusic /> {playlist.list.length} Tracks
@@ -130,14 +111,18 @@ export default (props) => {
             <h1>
                 <Icons.MdPlaylistPlay /> Tracks
             </h1>
-            {
-                playlist.list.map((item, index) => {
-                    return <TrackItem
-                        track={item}
-                        onClick={() => handleOnClickTrack(item)}
-                    />
-                })
-            }
+
+            <WithPlayerContext>
+                {
+                    playlist.list.map((item, index) => {
+                        return <MusicTrack
+                            order={index + 1}
+                            track={item}
+                            onClick={() => handleOnClickTrack(item)}
+                        />
+                    })
+                }
+            </WithPlayerContext>
         </div>
     </div>
 }
