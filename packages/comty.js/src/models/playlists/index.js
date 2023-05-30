@@ -1,33 +1,20 @@
 import request from "../../handlers/request"
 
 export default class PlaylistsModel {
+    static get api_instance() {
+        return globalThis.__comty_shared_state.instances["music"]
+    }
+
     static putPlaylist = async (payload) => {
         if (!payload) {
             throw new Error("Payload is required")
         }
 
         const { data } = await request({
+            instance: PlaylistsModel.api_instance,
             method: "PUT",
-            url: `/playlist`,
+            url: `/playlists/playlist`,
             data: payload,
-        })
-
-        return data
-    }
-
-    static getPlaylist = async (id) => {
-        const { data } = await request({
-            method: "GET",
-            url: `/playlist/data/${id}`,
-        })
-
-        return data
-    }
-
-    static getMyReleases = async () => {
-        const { data } = await request({
-            method: "GET",
-            url: `/playlist/self`,
         })
 
         return data
@@ -39,8 +26,68 @@ export default class PlaylistsModel {
         }
 
         const { data } = await request({
+            instance: PlaylistsModel.api_instance,
             method: "DELETE",
             url: `/playlist/${id}`,
+        })
+
+        return data
+    }
+
+    static getTrack = async (id) => {
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "GET",
+            url: `/tracks/${id}/data`,
+        })
+
+        return data
+    }
+
+    static getTracks = async (ids) => {
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "GET",
+            url: `/tracks/many`,
+            params: {
+                ids,
+            }
+        })
+
+        return data
+    }
+
+    static getPlaylist = async (id) => {
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "GET",
+            url: `/playlists/${id}/data`,
+        })
+
+        return data
+    }
+
+    static search = async (keywords) => {
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "GET",
+            url: `/playlists/search`,
+            params: {
+                keywords,
+            }
+        })
+
+        return data
+    }
+
+    static getMyReleases = async (keywords) => {
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "GET",
+            url: `/playlists/self`,
+            params: {
+                keywords,
+            }
         })
 
         return data
