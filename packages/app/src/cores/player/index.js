@@ -1,11 +1,13 @@
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
-import AudioPlayerStorage from "./storage"
 import { FastAverageColor } from "fast-average-color"
+
+import PlaylistModel from "comty.js/models/playlists"
 
 import EmbbededMediaPlayer from "components/Player/MediaPlayer"
 import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
 
+import AudioPlayerStorage from "./storage"
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
 
@@ -75,6 +77,14 @@ export default class Player extends Core {
         volume: this.volume.bind(this),
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
+        isIdCurrent: function (id) {
+            console.log("isIdCurrent", id, this.state.currentAudioManifest?._id === id)
+
+            return this.state.currentAudioManifest?._id === id
+        }.bind(this),
+        isIdPlaying: function (id) {
+            return this.public.isIdCurrent(id) && this.state.playbackStatus === "playing"
+        }.bind(this),
         attachProcessor: function (name) {
             // find the processor by refName
             const processor = this.audioProcessors.find((_processor) => {
@@ -705,6 +715,13 @@ export default class Player extends Core {
             throw new Error("Playlist is required")
         }
 
+        console.log("Starting playlist", playlist)
+
+        // check if the array has strings, if so its means that is the track id, then fetch the track
+        if (playlist.some(item => typeof item === "string")) {
+            playlist = await this.getTracksByIds(playlist)
+        }
+
         // !IMPORTANT: abort preloads before destroying current instance 
         await this.abortPreloads()
 
@@ -1021,5 +1038,44 @@ export default class Player extends Core {
             audioMuted: this.state.audioMuted,
             audioVolume: this.state.audioVolume,
         }
+    }
+
+    async getTracksByIds(list) {
+        if (!Array.isArray(list)) {
+            console.warn("List must be an array")
+            return false
+        }
+
+        let ids = []
+
+        list.forEach((item) => {
+            if (typeof item === "string") {
+                ids.push(item)
+            }
+        })
+
+        if (ids.length === 0) {
+            return list
+        }
+
+        const fetchedTracks = await PlaylistModel.getTracks(ids).catch((err) => {
+            console.error(err)
+            return false
+        })
+
+        if (!fetchedTracks) {
+            return list
+        }
+
+        // replace fetched tracks with the ones in the list
+        fetchedTracks.forEach((fetchedTrack) => {
+            const index = list.findIndex((item) => item === fetchedTrack._id)
+
+            if (index !== -1) {
+                list[index] = fetchedTrack
+            }
+        })
+
+        return list
     }
 }
