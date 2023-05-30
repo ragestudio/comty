@@ -36,7 +36,7 @@ export default (props) => {
     const handleVisibilityChange = (value) => {
         setPlaylistVisibility(value)
 
-        props.onVisibilityChange(value)
+        props.onVisibilityChange(value === "public")
     }
 
     return <div className="playlistCreator_layout_row">
