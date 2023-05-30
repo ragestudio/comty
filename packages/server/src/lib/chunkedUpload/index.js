@@ -74,7 +74,7 @@ export default class ChunkedUpload {
             }
         }
 
-        fs.rmdirSync(chunkPartsPath, { recursive: true })
+        //fs.rmdirSync(chunkPartsPath, { recursive: true })
 
         return mergedFilePath
     }
@@ -192,11 +192,14 @@ export default class ChunkedUpload {
                                 if (buildResult) {
                                     req.isLastPart = true
                                     req.fileResult = {
+                                        fileHash,
                                         filepath: buildResult,
                                         filename: finalFilename,
                                         mimetype: realMimeType,
                                         size: fileSize,
                                     }
+
+                                    global.cacheService.appendToDeletion(buildResult)
 
                                     next()
                                 }
