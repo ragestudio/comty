@@ -35,7 +35,6 @@ export default class FeedController extends Controller {
                         skip: req.query?.trim,
                     })
 
-
                     // add type to posts and playlists
                     posts = posts.map((data) => {
                         data.type = "post"
