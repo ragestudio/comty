@@ -11,7 +11,28 @@
 
     gap: 20px;
 
+    &.small {
+        .ant-input-affix-wrapper {
+            padding: 7px;
+
+            height: fit-content;
+
+            .ant-input-prefix {
+                font-size: 1rem;
+            }
+
+            .ant-input {
+                font-size: 0.8rem;
+            }
+        }
+    }
+
     .ant-input-affix-wrapper {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+
         border: 0;
         padding: 0;
         margin: 0;
@@ -34,6 +55,8 @@
             color: var(--text-color);
 
             font-size: 1rem;
+
+            margin: 0;
         }
     }
 
