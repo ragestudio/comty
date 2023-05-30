@@ -12,13 +12,54 @@ import "./index.less"
 const allowedTrackFieldChanges = [
     "title",
     "artist",
-    "thumbnail",
+    "cover",
     "album",
     "year",
     "genre",
     "comment",
     "explicit",
+    "lyricsEnabled",
+    "spotifyId",
+    "public",
 ]
+
+function createDefaultTrackData({
+    uid,
+    tags = {},
+    metadata = {},
+    status = "uploading",
+    title,
+    artist,
+    album,
+    source,
+    cover = "https://storage.ragestudio.net/comty-static-assets/default_song.png",
+    lyricsEnabled = false,
+    explicit = false,
+    spotifyId = null,
+}) {
+    return {
+        uid: uid,
+        title: title,
+        artist: artist,
+        album: album,
+        metadata: {
+            tags: tags,
+            duration: undefined,
+            bitrate: undefined,
+            sampleRate: undefined,
+            channels: undefined,
+            codec: undefined,
+            format: undefined,
+            ...metadata,
+        },
+        source: source,
+        status: status,
+        cover: cover,
+        lyricsEnabled: lyricsEnabled,
+        explicit: explicit,
+        spotifyId: spotifyId,
+    }
+}
 
 export default class PlaylistCreatorSteps extends React.Component {
     state = {
@@ -42,11 +83,11 @@ export default class PlaylistCreatorSteps extends React.Component {
         }
     }
 
-    updatePlaylistData = (key, data) => {
+    updatePlaylistData = (key, value) => {
         this.setState({
             playlistData: {
                 ...this.state.playlistData,
-                [key]: data
+                [key]: value
             }
         })
     }
@@ -164,7 +205,7 @@ export default class PlaylistCreatorSteps extends React.Component {
 
         if (typeof key === "object") {
             allowedTrackFieldChanges.forEach((_key) => {
-                if (key[_key]) {
+                if (typeof key[_key] !== "undefined") {
                     track[_key] = key[_key]
                 }
             })
@@ -196,7 +237,7 @@ export default class PlaylistCreatorSteps extends React.Component {
         })
 
         if (result) {
-            this.handleTrackInfoChange(uid, "thumbnail", result.url)
+            this.handleTrackInfoChange(uid, "cover", result.url)
         }
     }
 
@@ -274,23 +315,13 @@ export default class PlaylistCreatorSteps extends React.Component {
                 this.setState({
                     pendingTracksUpload: pendingTracksUpload,
                     fileList: [...this.state.fileList, change.file],
-                    trackList: [...this.state.trackList, {
+                    trackList: [...this.state.trackList, createDefaultTrackData({
                         uid: change.file.uid,
                         title: trackMetadata.tags.title ?? change.file.name,
                         artist: trackMetadata.tags.artist ?? null,
                         album: trackMetadata.tags.album ?? null,
-                        metadata: {
-                            duration: undefined,
-                            bitrate: undefined,
-                            sampleRate: undefined,
-                            channels: undefined,
-                            codec: undefined,
-                            format: undefined,
-                        },
-                        source: null,
-                        status: "uploading",
-                        thumbnail: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
-                    }]
+                        tags: trackMetadata.tags,
+                    })]
                 })
 
                 break
@@ -490,10 +521,10 @@ export default class PlaylistCreatorSteps extends React.Component {
                             this.updatePlaylistData("description", description)
                         },
                         onPlaylistCoverChange: (url) => {
-                            this.updatePlaylistData("thumbnail", url)
+                            this.updatePlaylistData("cover", url)
                         },
                         onVisibilityChange: (visibility) => {
-                            this.updatePlaylistData("visibility", visibility)
+                            this.updatePlaylistData("public", visibility)
                         },
                         onDeletePlaylist: this.handleDeletePlaylist,
 
