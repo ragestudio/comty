@@ -121,6 +121,33 @@ const FileItemEditor = (props) => {
             />
         </div>
 
+        <antd.Divider />
+
+        <div className="fileItemEditor_field">
+            <div className="fileItemEditor_field_header">
+                <Icons.MdLyrics />
+                <span>Enable lyrics</span>
+            </div>
+
+            <antd.Switch
+                checked={track.lyricsEnabled}
+                onChange={(value) => handleChange("lyricsEnabled", value)}
+            />
+        </div>
+
+        <div className="fileItemEditor_field">
+            <div className="fileItemEditor_field_header">
+                <Icons.Tag />
+                <span>Spotify ID</span>
+            </div>
+
+            <antd.Input
+                value={track.spotifyId}
+                placeholder="ID"
+                onChange={(e) => handleChange("spotifyId", e.target.value)}
+            />
+        </div>
+
         <div className="fileItemEditor_actions">
             <antd.Button
                 type="text"
@@ -247,13 +274,13 @@ const FileListItem = (props) => {
 
 export default (props) => {
     const onClickEditTrack = (track) => {
-        console.log("Editing track", track)
-
         app.DrawerController.open("track_editor", FileItemEditor, {
             type: "drawer",
             componentProps: {
                 track,
                 onSave: (newTrackData) => {
+                    console.log("Saving track", newTrackData)
+
                     props.handleTrackInfoChange(newTrackData.uid, newTrackData)
                 }
             },
