@@ -1,4 +1,4 @@
-import { Playlist, UserFollow } from "@models"
+import { Playlist, User, UserFollow } from "@models"
 
 export default async (payload) => {
     const {
@@ -29,6 +29,22 @@ export default async (payload) => {
         .sort({ created_at: -1 })
         .limit(limit)
         .skip(skip)
+
+    playlists = Promise.all(playlists.map(async (playlist) => {
+        playlist = playlist.toObject()
+
+        playlist.type = "playlist"
+
+        playlist.user = await User.findOne({
+            _id: playlist.user_id,
+        }).catch((err) => {
+            return {
+                username: "Unknown user",
+            }
+        })
+
+        return playlist
+    }))
 
     return playlists
 }
