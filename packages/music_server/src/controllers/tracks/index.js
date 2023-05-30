@@ -15,7 +15,7 @@ export default async (router) => {
     router = createRoutesFromDirectory("routes", routesPath, router)
 
     return {
-        path: "/playlists",
+        path: "/tracks",
         router,
     }
 }

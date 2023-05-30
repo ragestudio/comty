@@ -2,10 +2,6 @@ export default {
     name: "Track",
     collection: "tracks",
     schema: {
-        user_id: {
-            type: String,
-            required: true,
-        },
         title: {
             type: String,
             required: true,
@@ -44,6 +40,10 @@ export default {
         lyricsEnabled: {
             type: Boolean,
             default: true,
-        }
+        },
+        publisher: {
+            type: Object,
+            required: true,
+        },
     }
 }

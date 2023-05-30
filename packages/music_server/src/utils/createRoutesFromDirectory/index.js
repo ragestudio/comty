@@ -1,5 +1,24 @@
 import fs from "fs"
 
+function createRouteHandler(route, fn) {
+    if (typeof route !== "string") {
+        fn = route
+        route = "Unknown route"
+    }
+
+    return async (req, res) => {
+        try {
+            await fn(req, res)
+        } catch (error) {
+            console.error(`[ERROR] (${route}) >`, error)
+
+            return res.status(500).json({
+                error: error.message,
+            })
+        }
+    }
+}
+
 function createRoutesFromDirectory(startFrom, directoryPath, router) {
     const files = fs.readdirSync(directoryPath)
 
@@ -39,7 +58,7 @@ function createRoutesFromDirectory(startFrom, directoryPath, router) {
 
             handler = handler.default || handler
 
-            router[method](route, handler)
+            router[method](route, createRouteHandler(route, handler))
 
             router.routes.push({
                 method,

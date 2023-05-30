@@ -12,11 +12,10 @@ import StorageClient from "@classes/StorageClient"
 
 import RoomServer from "./roomsServer"
 
-
 import pkg from "../package.json"
 
 export default class Server {
-    static useMiddlewaresOrder = ["useLogger", "useCors", "useAuth"]
+    static useMiddlewaresOrder = ["useLogger", "useCors", "useAuth", "useErrorHandler"]
 
     eventBus = global.eventBus = new EventEmitter()
 
@@ -166,14 +165,14 @@ export default class Server {
         await this.storage.initialize()
 
         // register controllers & middlewares
+        this.server.use(express.json({ extended: false }))
+        this.server.use(express.urlencoded({ extended: true }))
+
         await this.__registerControllers()
         await this.__registerInternalMiddlewares()
         await this.__registerInternalRoutes()
 
         this.server.use(this.internalRouter)
-
-        this.server.use(express.json({ extended: false }))
-        this.server.use(express.urlencoded({ extended: true }))
 
         await this._http.listen(this.options.listenPort, this.options.listenHost)
 

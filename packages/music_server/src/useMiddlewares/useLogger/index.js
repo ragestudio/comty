@@ -7,6 +7,11 @@ export default (req, res, next) => {
 
         res._responseTimeMs = elapsedTimeInMs
 
+        // cut req.url if is too long
+        if (req.url.length > 100) {
+            req.url = req.url.substring(0, 100) + "..."
+        }
+
         console.log(`${req.method} ${res._status_code ?? res.statusCode ?? 200} ${req.url} ${elapsedTimeInMs}ms`)
     })
 
