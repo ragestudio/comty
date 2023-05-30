@@ -67,7 +67,7 @@ export default async (req, res) => {
 
     console.log(track)
 
-    if (!track.lyricsEnabled){
+    if (!track.lyricsEnabled) {
         return res.status(403).json({
             error: "Lyrics disabled for this track",
         })
