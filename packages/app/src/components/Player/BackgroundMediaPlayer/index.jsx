@@ -1,8 +1,11 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { Icons } from "components/Icons"
 import Marquee from "react-fast-marquee"
+
+import { Icons } from "components/Icons"
+
+import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
 import "./index.less"
 
@@ -16,30 +19,22 @@ function RGBStringToValues(rgbString) {
     return [rgb[0], rgb[1], rgb[2]]
 }
 
-export default class BackgroundMediaPlayer extends React.Component {
+export default (props) => {
+    return <WithPlayerContext>
+        <BackgroundMediaPlayer
+            {...props}
+        />
+    </WithPlayerContext>
+}
+
+export class BackgroundMediaPlayer extends React.Component {
+    static contextType = Context
+
     state = {
-        thumbnailAnalysis: app.cores.player.getState("coverColorAnalysis"),
-        currentPlaying: app.cores.player.getState("currentAudioManifest"),
-        plabackState: app.cores.player.getState("playbackStatus") ?? "stopped",
         expanded: false,
     }
 
     events = {
-        "player.coverColorAnalysis.update": (data) => {
-            this.setState({
-                thumbnailAnalysis: data
-            })
-        },
-        "player.current.update": (data) => {
-            this.setState({
-                currentPlaying: data
-            })
-        },
-        "player.status.update": (data) => {
-            this.setState({
-                plabackState: data
-            })
-        },
         "sidebar.expanded": (to) => {
             if (!to) {
                 this.toogleExpand(false)
@@ -78,19 +73,19 @@ export default class BackgroundMediaPlayer extends React.Component {
             className={classnames(
                 "background_media_player",
                 {
-                    ["lightBackground"]: this.state.thumbnailAnalysis?.isLight,
+                    ["lightBackground"]: this.context.coverColorAnalysis?.isLight,
                     ["expanded"]: this.state.expanded,
                 }
             )}
             style={{
-                backgroundColor: this.state.thumbnailAnalysis?.rgba,
-                "--averageColorValues": this.state.thumbnailAnalysis?.rgba,
+                backgroundColor: this.context.coverColorAnalysis?.rgba,
+                "--averageColorValues": this.context.coverColorAnalysis?.rgba,
             }}
         >
             <div
                 className="background_media_player__background"
                 style={{
-                    backgroundImage: `url(${this.state.currentPlaying?.thumbnail})`
+                    backgroundImage: `url(${this.context.currentManifest?.thumbnail})`
                 }}
             />
 
@@ -103,12 +98,12 @@ export default class BackgroundMediaPlayer extends React.Component {
                     className={classnames(
                         "background_media_player__icon",
                         {
-                            ["bounce"]: this.state.plabackState === "playing",
+                            ["bounce"]: this.context.playbackStatus === "playing",
                         }
                     )}
                 >
                     {
-                        this.state.plabackState === "playing" ? <Icons.MdMusicNote /> : <Icons.MdPause />
+                        this.context.playbackStatus === "playing" ? <Icons.MdMusicNote /> : <Icons.MdPause />
                     }
                 </div>
 
@@ -120,12 +115,12 @@ export default class BackgroundMediaPlayer extends React.Component {
                         !this.state.expanded && <Marquee
                             gradientColor={RGBStringToValues(this.state.thumbnailAnalysis?.rgb)}
                             gradientWidth={20}
-                            play={this.state.plabackState !== "stopped"}
+                            play={this.context.playbackStatus !== "stopped"}
                         >
                             <h4>
                                 {
-                                    this.state.plabackState === "stopped" ? "Nothing is playing" : <>
-                                        {`${this.state.currentPlaying?.title} - ${this.state.currentPlaying?.artist}` ?? "Untitled"}
+                                    this.context.playbackStatus === "stopped" ? "Nothing is playing" : <>
+                                        {`${this.context.currentManifest?.title} - ${this.context.currentManifest?.artist}` ?? "Untitled"}
                                     </>
                                 }
                             </h4>
@@ -136,8 +131,8 @@ export default class BackgroundMediaPlayer extends React.Component {
                             <Icons.MdAlbum />
 
                             {
-                                this.state.plabackState === "stopped" ? "Nothing is playing" : <>
-                                    {this.state.currentPlaying?.title ?? "Untitled"}
+                                this.context.playbackStatus === "stopped" ? "Nothing is playing" : <>
+                                    {this.context.currentManifest?.title ?? "Untitled"}
                                 </>
                             }
                         </h4>
@@ -170,7 +165,7 @@ export default class BackgroundMediaPlayer extends React.Component {
                     size="small"
                     type="ghost"
                     shape="circle"
-                    icon={this.state.plabackState === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
+                    icon={this.context.playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
                     onClick={app.cores.player.playback.toogle}
                 />
 
