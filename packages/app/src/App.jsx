@@ -175,7 +175,7 @@ class ComtyApp extends React.Component {
 			openSearcher: (options) => {
 				app.cores.sound.useUIAudio("navigation.search")
 
-				window.app.ModalController.open((props) => <Searcher {...props} />)
+				window.app.ModalController.open((props) => <Searcher renderResults {...props} />)
 			},
 			openNavigationMenu: () => window.app.DrawerController.open("navigation", Navigation),
 			openFullImageViewer: (src) => {
