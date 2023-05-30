@@ -4,6 +4,8 @@
 
     width: 100%;
 
+    gap: 20px;
+
     .music_panel_releases_header {
         display: flex;
         flex-direction: row;
@@ -12,6 +14,10 @@
         justify-content: space-between;
 
         width: 100%;
+
+        h1 {
+            margin: 0;
+        }
 
         .music_panel_releases_header_actions {
             display: flex;
@@ -35,6 +41,8 @@
         flex-direction: column;
 
         width: 100%;
+
+        padding-bottom: 20px;
 
         .music_panel_releases_item {
             display: flex;
@@ -103,6 +111,65 @@
                         margin-bottom: 0;
                     }
                 }
+            }
+        }
+    }
+}
+
+.music-explorer_search_results {
+    display: grid;
+
+    // if only need 1 column, it will be 1fr
+    // if need 2 colums, first column will be 1fr, and the second one will be 2fr
+    grid-template-columns: 1fr 2fr;
+
+    // auto generate rows
+    grid-template-rows: auto;
+
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+
+    &.one_column {
+        grid-template-columns: 1fr;
+    }
+
+    &.no_results {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+    }
+
+    .music-explorer_search_results_group {
+        background-color: var(--background-color-accent);
+
+        padding: 20px;
+
+        border-radius: 8px;
+
+        height: fit-content;
+
+        gap: 20px;
+
+        .explorer_search_results_group_header {
+            h1 {
+                margin: 0;
+            }
+        }
+
+        .music-explorer_search_results_group_list {
+            display: flex;
+            flex-direction: column;
+
+            gap: 10px;
+
+            .playlistItem {
+                background-color: var(--background-color-primary);
+            }
+
+            .music-track {
+                background-color: var(--background-color-primary);
             }
         }
     }
