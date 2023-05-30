@@ -7,7 +7,12 @@ export default ({
     const [activeKey, setActiveKey] = React.useState(new URLSearchParams(window.location.search).get(queryKey) ?? defaultKey)
 
     const replaceQueryTypeToCurrentTab = (key) => {
-        app.history.replace(`${window.location.pathname}?${queryKey}=${key}`)
+        if (!key) {
+            // delete query
+            return app.history.replace(window.location.pathname)
+        }
+
+        return app.history.replace(`${window.location.pathname}?${queryKey}=${key}`)
     }
 
     const changeActiveKey = (key) => {
