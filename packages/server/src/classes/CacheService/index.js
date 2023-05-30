@@ -1,10 +1,32 @@
 import fs from "fs"
-import path from "path"
 
 export default class CacheService {
-    watchingFiles = new Set()
+    intervalMaps = new Map()
 
     static deletionInterval = 1000 * 60 * 5
+
+    checkDeletionFilepath(filepath) {
+        try {
+            const stats = fs.statSync(filepath)
+
+            stats.atime = new Date(stats.atime)
+
+            if (stats.atime.getTime() + CacheService.deletionInterval < Date.now()) {
+                fs.promises.unlink(filepath)
+            } else {
+                return false
+            }
+
+            return true
+
+        } catch (error) {
+            console.error(error)
+
+            fs.promises.unlink(filepath)
+
+            return true
+        }
+    }
 
     appendToDeletion(filepath) {
         // create a interval of 5 minutes to delete the file
@@ -12,31 +34,24 @@ export default class CacheService {
         // reset the interval until the file is not accessed for 5 minutes and then delete it
         try {
             const createInterval = () => {
-                return setInterval(() => {
-                    const stats = fs.statSync(filepath)
+                let interval = setInterval(async () => {
+                    try {
+                        await this.checkDeletionFilepath(filepath)
 
-                    stats.atime = new Date(stats.atime)
+                        this.intervalMaps.delete(filepath)
 
-                    if (stats.atime.getTime() + CacheService.deletionInterval < Date.now()) {
-                        clearInterval(this.watchingFiles.get(filepath).interval)
-
-                        this.watchingFiles.delete(filepath)
-
-                        fs.promises.unlink(filepath)
-                    } else {
-                        console.log(`[${filepath}] was accessed in the last 5 minutes, resetting deletion interval`)
-
-                        clearInterval(this.watchingFiles.get(filepath).interval)
-
-                        this.watchingFiles.get(filepath).interval = createInterval()
+                        if (!results) {
+                            this.appendToDeletion(filepath)
+                        }
+                    } catch (error) {
+                        return clearInterval(interval)
                     }
                 })
+
+                return interval
             }
 
-            this.watchingFiles.add({
-                filepath,
-                interval: createInterval()
-            })
+            this.intervalMaps.set(filepath, createInterval())
         } catch (error) {
             console.error(error)
 
