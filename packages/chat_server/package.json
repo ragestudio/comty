@@ -11,7 +11,7 @@
         "@foxify/events": "^2.1.0",
         "axios": "^1.4.0",
         "bcrypt": "5.0.1",
-        "comty.js": "^0.46.1",
+        "comty.js": "^0.47.0",
         "corenode": "0.28.26",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
