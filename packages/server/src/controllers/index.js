@@ -16,14 +16,11 @@ export { default as StreamingController } from "./StreamingController"
 export { default as BadgesController } from "./BadgesController"
 export { default as FeaturedEventsController } from "./FeaturedEventsController" // Needs to migrate to lb 0.15
 
-export { default as PlaylistsController } from "./PlaylistsController" // Needs to migrate to lb 0.15
 export { default as FilesController } from "./FilesController" // Needs to migrate to lb 0.15
 export { default as RolesController } from "./RolesController" // Needs to migrate to lb 0.15
 export { default as SearchController } from "./SearchController" // Needs to migrate to lb 0.15
 
 export { default as ModerationController } from "./ModerationController"
-
-export { default as TracksController } from "./TracksController"
 
 export { default as AdminController } from "./AdminController"
 
