@@ -29,6 +29,13 @@ services:
       - "5002:3040"
     env_file:
       - marketplace.env
+  music_server:
+    build: packages/music_server
+    restart: unless-stopped
+    ports:
+      - "5003:3050"
+    env_file:
+      - music.env
   redis:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
