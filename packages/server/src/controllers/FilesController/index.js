@@ -225,6 +225,8 @@ export default class FilesController extends Controller {
                     try {
                         // remove file from cache
                         await fs.promises.unlink(req.fileResult.filepath)
+
+                        // programatically remove file from cache in the
                     } catch (error) {
                         console.log("Failed to remove file from cache", error)
 

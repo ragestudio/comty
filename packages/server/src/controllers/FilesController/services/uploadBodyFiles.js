@@ -200,9 +200,6 @@ export default async (payload) => {
                         return reject(err)
                     })
 
-                    // remove file from cache
-                    await fs.promises.unlink(file.filepath)
-
                     // get url location
                     const remoteUrlObj = global.storage.composeRemoteURL(uploadPath)
 
@@ -237,6 +234,8 @@ export default async (payload) => {
                 { concurrency: 10 }
             )
 
+
+            
             return resolve({
                 files: processedFiles,
                 failed: failedFiles,
