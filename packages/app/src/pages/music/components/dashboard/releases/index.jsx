@@ -3,10 +3,12 @@ import * as antd from "antd"
 
 import { Icons } from "components/Icons"
 import { ImageViewer } from "components"
+import Searcher from "components/Searcher"
 
 import PlaylistCreator from "../../../creator"
 
 import PlaylistsModel from "models/playlists"
+
 import "./index.less"
 
 const ReleaseItem = (props) => {
@@ -59,33 +61,34 @@ const ReleaseItem = (props) => {
     </div>
 }
 
+const openPlaylistCreator = (playlist_id) => {
+    console.log("Opening playlist creator", playlist_id)
+
+    app.DrawerController.open("playlist_creator", PlaylistCreator, {
+        type: "drawer",
+        props: {
+            title: <h2
+                style={{
+                    margin: 0,
+                }}
+            >
+                <Icons.MdOutlineQueueMusic />
+                Creator
+            </h2>,
+            width: "fit-content",
+        },
+        componentProps: {
+            playlist_id: playlist_id,
+        }
+    })
+}
+
+const navigateToPlaylist = (playlist_id) => {
+    return app.setLocation(`/play/${playlist_id}`)
+}
+
 export default (props) => {
-    const openPlaylistCreator = (playlist_id) => {
-        console.log("Opening playlist creator", playlist_id)
-
-        app.DrawerController.open("playlist_creator", PlaylistCreator, {
-            type: "drawer",
-            props: {
-                title: <h2
-                    style={{
-                        margin: 0,
-                    }}
-                >
-                    <Icons.MdOutlineQueueMusic />
-                    Creator
-                </h2>,
-                width: "fit-content",
-            },
-            componentProps: {
-                playlist_id: playlist_id,
-            }
-        })
-    }
-
-    const navigateToPlaylist = (playlist_id) => {
-        return app.setLocation(`/play/${playlist_id}`)
-    }
-
+    const [searchResults, setSearchResults] = React.useState(null)
     const [L_Releases, R_Releases, E_Releases] = app.cores.api.useRequest(PlaylistsModel.getMyReleases)
 
     if (E_Releases) {
@@ -122,9 +125,34 @@ export default (props) => {
             </div>
         </div>
 
+        <Searcher
+            small
+            renderResults={false}
+            model={PlaylistsModel.getMyReleases}
+            onSearchResult={setSearchResults}
+            onEmpty={() => setSearchResults(null)}
+        />
+
         <div className="music_panel_releases_list">
             {
-                R_Releases.map((release) => {
+                searchResults && searchResults.length === 0 && <antd.Result
+                    status="info"
+                    title="No results"
+                    subTitle="We are sorry, but we could not find any results for your search."
+                />
+            }
+            {
+                searchResults && searchResults.length > 0 && searchResults.map((release) => {
+                    return <ReleaseItem
+                        key={release._id}
+                        release={release}
+                        onClickEditTrack={() => openPlaylistCreator(release._id)}
+                        onClickNavigate={() => navigateToPlaylist(release._id)}
+                    />
+                })
+            }
+            {
+                !searchResults && R_Releases.map((release) => {
                     return <ReleaseItem
                         key={release._id}
                         release={release}
