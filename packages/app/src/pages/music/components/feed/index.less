@@ -97,7 +97,7 @@
     min-width: 400px;
     max-width: 800px;
 
-    //overflow: hidden;
+    overflow: visible;
 
     box-sizing: border-box !important;
 
@@ -111,6 +111,10 @@
     &.cover-hovering {
         .playlistItem_cover {
             transform: scale(1.1);
+
+            .playlistItem_cover_mask {
+                opacity: 1;
+            }
         }
 
         .playlistItem_info {
@@ -135,6 +139,8 @@
     }
 
     .playlistItem_cover {
+        position: relative;
+
         height: 10vh;
 
         transition: all 0.2s ease-in-out;
@@ -145,6 +151,36 @@
 
             object-fit: cover;
             border-radius: 8px;
+
+            background-color: black;
+
+            z-index: 50
+        }
+
+        .playlistItem_cover_mask {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+
+            opacity: 0;
+
+            transition: all 0.2s ease-in-out;
+
+            z-index: 55;
+
+            background-color: rgba(var(--layoutBackgroundColor), 0.6);
+            color: var(--text-color);
+
+            font-size: 3rem;
         }
     }
 
@@ -168,6 +204,10 @@
             font-family: "Space Grotesk", sans-serif;
 
             overflow: hidden;
+
+            &:hover {
+                text-decoration: underline;
+            }
 
             h1,
             h4 {

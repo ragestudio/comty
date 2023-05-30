@@ -1,11 +1,18 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { ImageViewer, UserPreview } from "components"
-import { Icons } from "components/Icons"
 import { Translation } from "react-i18next"
 
+import Searcher from "components/Searcher"
+import { ImageViewer, UserPreview } from "components"
+import { Icons, createIconRender } from "components/Icons"
+
+import { WithPlayerContext } from "contexts/WithPlayerContext"
+
 import FeedModel from "models/feed"
+import PlaylistModel from "models/playlists"
+
+import MusicTrack from "components/MusicTrack"
 
 import "./index.less"
 
@@ -25,7 +32,23 @@ const PlaylistsList = (props) => {
             return
         }
 
-        setOffset((value) => value - hopNumber)
+        setOffset((value) => {
+            const newOffset = value - hopNumber
+
+            // check if newOffset is NaN
+            if (newOffset !== newOffset) {
+                return false
+            }
+
+            if (typeof makeRequest === "function") {
+                makeRequest({
+                    trim: newOffset,
+                    limit: hopNumber,
+                })
+            }
+
+            return newOffset
+        })
     }
 
     const onClickNext = () => {
@@ -33,14 +56,24 @@ const PlaylistsList = (props) => {
             return
         }
 
-        setOffset((value) => value + hopNumber)
-    }
+        setOffset((value) => {
+            const newOffset = value + hopNumber
 
-    React.useEffect(() => {
-        if (typeof makeRequest === "function") {
-            makeRequest()
-        }
-    }, [offset])
+            // check if newOffset is NaN
+            if (newOffset !== newOffset) {
+                return false
+            }
+
+            if (typeof makeRequest === "function") {
+                makeRequest({
+                    trim: newOffset,
+                    limit: hopNumber,
+                })
+            }
+
+            return newOffset
+        })
+    }
 
     React.useEffect(() => {
         if (result) {
@@ -135,6 +168,10 @@ const PlaylistItem = (props) => {
             onMouseLeave={() => setCoverHover(false)}
             onClick={onClickPlay}
         >
+            <div className="playlistItem_cover_mask">
+                <Icons.MdPlayArrow />
+            </div>
+
             <ImageViewer
                 src={playlist.thumbnail ?? "/assets/no_song.png"}
             />
@@ -144,7 +181,10 @@ const PlaylistItem = (props) => {
             <div className="playlistItem_info_title" onClick={onClick}>
                 <h1>{playlist.title}</h1>
             </div>
-            <UserPreview user={playlist.user} />
+
+            {
+                playlist.publisher && <UserPreview user={playlist.publisher} />
+            }
         </div>
     </div>
 }
@@ -191,113 +231,141 @@ const MayLike = (props) => {
     </div>
 }
 
-const SearchResultItem = (props) => {
-    return <div>
-        <h1>SearchResultItem</h1>
+const ResultGroupsDecorators = {
+    "playlists": {
+        icon: "MdPlaylistPlay",
+        label: "Playlists",
+        renderItem: (props) => {
+            return <PlaylistItem
+                key={props.key}
+                playlist={props.item}
+            />
+        }
+    },
+    "tracks": {
+        icon: "MdMusicNote",
+        label: "Tracks",
+        renderItem: (props) => {
+            return <MusicTrack
+                key={props.key}
+                track={props.item}
+                onClick={() => app.cores.player.start(props.item)}
+            />
+        }
+    }
+}
+
+const SearchResults = ({
+    data
+}) => {
+    if (typeof data !== "object") {
+        return null
+    }
+
+    let groupsKeys = Object.keys(data)
+
+    // filter out empty groups
+    groupsKeys = groupsKeys.filter((key) => {
+        return data[key].length > 0
+    })
+
+    if (groupsKeys.length === 0) {
+        return <div className="music-explorer_search_results no_results">
+            <antd.Result
+                status="info"
+                title="No results"
+                subTitle="We are sorry, but we could not find any results for your search."
+            />
+        </div>
+    }
+
+    return <div
+        className={classnames(
+            "music-explorer_search_results",
+            {
+                ["one_column"]: groupsKeys.length === 1,
+            }
+        )}
+    >
+        <WithPlayerContext>
+            {
+                groupsKeys.map((key, index) => {
+                    const decorator = ResultGroupsDecorators[key] ?? {
+                        icon: null,
+                        label: key,
+                        renderItem: () => null
+                    }
+
+                    return <div className="music-explorer_search_results_group" key={index}>
+                        <div className="music-explorer_search_results_group_header">
+                            <h1>
+                                {
+                                    createIconRender(decorator.icon)
+                                }
+                                <Translation>
+                                    {(t) => t(decorator.label)}
+                                </Translation>
+                            </h1>
+                        </div>
+
+                        <div className="music-explorer_search_results_group_list">
+                            {
+                                data[key].map((item, index) => {
+                                    return decorator.renderItem({
+                                        key: index,
+                                        item
+                                    })
+                                })
+                            }
+                        </div>
+                    </div>
+                })
+            }
+        </WithPlayerContext>
     </div>
 }
 
 export default (props) => {
-    const [searchLoading, setSearchLoading] = React.useState(false)
-    const [searchFocused, setSearchFocused] = React.useState(false)
-    const [searchValue, setSearchValue] = React.useState("")
-    const [searchResult, setSearchResult] = React.useState([])
-
-    const handleSearchValueChange = (e) => {
-        // not allow to input space as first character
-        if (e.target.value[0] === " ") {
-            return
-        }
-
-        setSearchValue(e.target.value)
-    }
-
-    const makeSearch = async (value) => {
-        setSearchResult([])
-
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        setSearchResult([
-            {
-                title: "test",
-                thumbnail: "/assets/no_song.png",
-            },
-            {
-                title: "test2",
-                thumbnail: "/assets/no_song.png",
-            }
-        ])
-    }
-
-    React.useEffect(() => {
-        const timer = setTimeout(async () => {
-            setSearchLoading(true)
-
-            await makeSearch(searchValue)
-            
-            setSearchLoading(false)
-        }, 400)
-
-        if (searchValue === "") {
-            if (typeof props.onEmpty === "function") {
-                //props.onEmpty()
-            }
-        } else {
-            if (typeof props.onFilled === "function") {
-                //props.onFilled()
-            }
-        }
-
-        return () => clearTimeout(timer)
-    }, [searchValue])
+    const [searchResults, setSearchResults] = React.useState(false)
 
     return <div
         className={classnames(
             "musicExplorer",
             {
-                ["search-focused"]: searchFocused,
+                //["search-focused"]: searchFocused,
             }
         )}
     >
-        <div className="searcher">
-            <antd.Input
-                placeholder="Search for music"
-                prefix={<Icons.Search />}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => setSearchFocused(false)}
-                onChange={handleSearchValueChange}
-                value={searchValue}
-            />
+        <Searcher
+            useUrlQuery
+            renderResults={false}
+            model={PlaylistModel.search}
+            onSearchResult={setSearchResults}
+            onEmpty={() => setSearchResults(false)}
+        />
 
-            <div className="searcher_result">
-                {
-                    searchLoading && <antd.Skeleton active />
-                }
-                {
-                    searchFocused && searchValue !== "" && searchResult.length > 0  && searchResult.map((result, index) => {
-                        return <SearchResultItem
-                            key={index}
-                            result={result}
-                        />
-                    })
-                }
+        {
+            searchResults && <SearchResults
+                data={searchResults}
+            />
+        }
+
+        {
+            !searchResults && <div className="feed_main">
+                <RecentlyPlayed />
+
+                <PlaylistsList
+                    headerTitle="From your following artists"
+                    headerIcon={<Icons.MdPerson />}
+                    fetchMethod={FeedModel.getPlaylistsFeed}
+                />
+
+                <PlaylistsList
+                    headerTitle="Explore from global"
+                    headerIcon={<Icons.MdExplore />}
+                    fetchMethod={FeedModel.getGlobalMusicFeed}
+                />
             </div>
-        </div>
-
-        <div className="feed_main">
-            <RecentlyPlayed />
-
-            <PlaylistsList
-                headerTitle="From your following artists"
-                headerIcon={<Icons.MdPerson />}
-                fetchMethod={FeedModel.getPlaylistsFeed}
-            />
-
-            <PlaylistsList
-                headerTitle="Explore from global"
-                headerIcon={<Icons.MdExplore />}
-                fetchMethod={FeedModel.getGlobalMusicFeed}
-            />
-        </div>
+        }
     </div>
 }
