@@ -10,16 +10,6 @@ import request from "comty.js/handlers/request"
 
 import "./index.less"
 
-function RGBStringToValues(rgbString) {
-    if (!rgbString) {
-        return [0, 0, 0]
-    }
-
-    const rgb = rgbString.replace("rgb(", "").replace(")", "").split(",").map((v) => parseInt(v))
-
-    return [rgb[0], rgb[1], rgb[2]]
-}
-
 function composeRgbValues(values) {
     let value = ""
 
@@ -47,7 +37,6 @@ function calculateLineTime(line) {
 
 function isOverflown(element) {
     if (!element) {
-        console.log("element is null")
         return false
     }
 
@@ -165,26 +154,6 @@ class PlayerController extends React.Component {
         }
 
         this.startSync()
-
-        // // create a intersection observer to check if title is overflown
-        // // if the entire title is not visible, we will use marquee
-        // this.titleObserver = new IntersectionObserver((entries) => {
-        //     for (const entry of entries) {
-        //         if (entry.isIntersecting) {
-        //             this.setState({ titleOverflown: false })
-        //         } else {
-        //             this.setState({ titleOverflown: true })
-        //         }
-        //     }
-        // }, {
-        //     root: null,
-        //     rootMargin: "0px",
-        //     threshold: 1.0,
-        // })
-
-        console.log(this.titleRef.current)
-
-        //this.titleObserver.observe(this.titleRef.current)
     }
 
     componentWillUnmount() {
@@ -217,7 +186,7 @@ class PlayerController extends React.Component {
             >
                 <div className="player_controller_cover">
                     <Image
-                        src={this.state.currentPlaying?.thumbnail ?? "/assets/no_song.png"}
+                        src={this.state.currentPlaying?.cover ?? this.state.currentPlaying?.thumbnail ?? "/assets/no_song.png"}
                     />
                 </div>
 
@@ -352,7 +321,7 @@ export default class SyncLyrics extends React.Component {
 
     videoCanvasRef = React.createRef()
 
-    thumbnailCanvasRef = React.createRef()
+    coverCanvasRef = React.createRef()
 
     events = {
         "player.current.update": (currentManifest) => {
@@ -747,11 +716,11 @@ export default class SyncLyrics extends React.Component {
             </div>
 
             <div
-                className="lyrics_viewer_thumbnail"
+                className="lyrics_viewer_cover"
             >
                 <Image
-                    src={this.state.currentManifest?.thumbnail ?? "/assets/no_song.png"}
-                    ref={this.thumbnailRef}
+                    src={this.state.currentManifest?.cover ?? this.state.currentManifest?.thumbnail ?? "/assets/no_song.png"}
+                    ref={this.coverRef}
                 />
             </div>
 

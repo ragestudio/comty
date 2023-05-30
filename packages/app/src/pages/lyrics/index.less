@@ -37,13 +37,15 @@
     }
 
     &.centered-player {
-        .lyrics_viewer_thumbnail {
+        .lyrics_viewer_cover {
             width: 100vw;
 
             height: 80vh; //fallback
             height: 80dvh;
 
             opacity: 1;
+
+            bottom: 20vh;
         }
 
         .player_controller_wrapper {
@@ -175,10 +177,10 @@
         }
     }
 
-    .lyrics_viewer_thumbnail {
+    .lyrics_viewer_cover {
         position: absolute;
 
-        top: 0;
+        bottom: 0;
         left: 0;
 
         z-index: 250;
@@ -532,5 +534,15 @@
                 }
             }
         }
+    }
+}
+
+@keyframes bottom-to-top {
+    0% {
+        bottom: 0;
+    }
+
+    100% {
+        bottom: 20vh;
     }
 }
