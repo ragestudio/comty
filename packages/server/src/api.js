@@ -12,6 +12,7 @@ import { User, Session, Config } from "@models"
 
 import DbManager from "@classes/DbManager"
 import { createStorageClientInstance } from "@classes/StorageClient"
+import CacheService from "@classes/CacheService"
 
 import internalEvents from "./events"
 
@@ -40,6 +41,8 @@ export default class API {
             "Access-Control-Expose-Headers": "regenerated_token",
         },
     )
+
+    cacheService = global.cacheService = new CacheService()
 
     DB = new DbManager()
 
