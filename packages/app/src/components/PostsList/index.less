@@ -1,13 +1,28 @@
-.postList {
+.post-list_wrapper {
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+
+    width: fit-content;
+
+    //overflow: hidden;
+    overflow-y: overlay;
+
+    height: 100%;
     width: 100%;
+}
+
+.post-list {
+    position: relative;
 
     // WARN: Only use if is a performance issue (If is using virtualized list)
     //will-change: transform;
-
     overflow: hidden;
     overflow-y: overlay;
-
-    height: max-content;
+    
+    width: 100%;
+    height: 100%;
 
     display: flex;
     flex-direction: column;
@@ -17,17 +32,25 @@
     border-radius: 8px;
 
     margin: auto;
+    z-index: 150;
+    
 }
 
 .resume_btn_wrapper {
     z-index: 200;
 
-    position: absolute;
+    position: sticky;
 
     top: 0;
     right: 0;
 
-    transform: translate(0, -50%);
+    padding: 10px;
+    background-color: rgba(var(--background-color-accent-values), 0.8);
+
+    border-radius: 8px;
+
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
 
     width: 100%;
     height: fit-content;
@@ -35,6 +58,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    width: 35vw;
+    min-width: 300px;
+    max-width: 800px;
 
     opacity: 0;
 
