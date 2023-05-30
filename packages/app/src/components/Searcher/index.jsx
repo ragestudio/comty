@@ -1,6 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
+import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
+import lodash from "lodash"
 
 import { UserPreview } from "components"
 import { Icons, createIconRender } from "components/Icons"
@@ -83,20 +85,46 @@ const Results = (props) => {
     })
 }
 
+
 export default (props) => {
     const [loading, setLoading] = React.useState(false)
     const [searchResult, setSearchResult] = React.useState(null)
     const [searchValue, setSearchValue] = React.useState("")
+
+    const [query, setQuery] = useUrlQueryActiveKey({
+        queryKey: "search",
+        defaultKey: null
+    })
 
     const makeSearch = async (value) => {
         if (value === "") {
             return setSearchResult(null)
         }
 
-        const result = await SearchModel.search(value)
+        setLoading(true)
+
+        if (props.useUrlQuery) {
+            setQuery(value)
+        }
+
+        let result = null
+
+        if (typeof props.model === "function") {
+            result = await props.model(value)
+        } else {
+            result = await SearchModel.search(value)
+        }
+
+        if (typeof props.onSearchResult === "function") {
+            await props.onSearchResult(result)
+        }
+
+        setLoading(false)
 
         return setSearchResult(result)
     }
+
+    const debounceSearch = React.useCallback(lodash.debounce(makeSearch, 500), [])
 
     const handleOnSearch = (e) => {
         // not allow to input space as first character
@@ -105,6 +133,22 @@ export default (props) => {
         }
 
         setSearchValue(e.target.value)
+
+        if (e.target.value === "") {
+            if (props.useUrlQuery) {
+                setQuery(null)
+            }
+
+            if (typeof props.onEmpty === "function") {
+                props.onEmpty()
+            }
+        } else {
+            if (typeof props.onFilled === "function") {
+                props.onFilled()
+            }
+
+            debounceSearch(e.target.value)
+        }
     }
 
     const handleResultClick = (type, value) => {
@@ -130,29 +174,22 @@ export default (props) => {
     }
 
     React.useEffect(() => {
-        const timer = setTimeout(async () => {
-            setLoading(true)
-
-            await makeSearch(searchValue)
-
-            setLoading(false)
-        }, 400)
-
-        if (searchValue === "") {
-            if (typeof props.onEmpty === "function") {
-                props.onEmpty()
-            }
-        } else {
-            if (typeof props.onFilled === "function") {
-                props.onFilled()
+        if (props.useUrlQuery) {
+            if (typeof query === "string") {
+                makeSearch(query)
+                setSearchValue(query)
             }
         }
-
-        return () => clearTimeout(timer)
-    }, [searchValue])
+    }, [])
 
     return <div
-        className={classnames("searcher", { ["open"]: searchValue })}
+        className={classnames(
+            "searcher",
+            {
+                ["open"]: searchValue,
+                ["small"]: props.small,
+            }
+        )}
     >
         <antd.Input
             placeholder="Start typing to search..."
@@ -164,7 +201,7 @@ export default (props) => {
             onBlur={props.onUnfocus}
         />
 
-        {searchResult && <div className="results">
+        {searchResult && props.renderResults && <div className="results">
             {loading && <antd.Skeleton active />}
             {
                 !loading && <Results
