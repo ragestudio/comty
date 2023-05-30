@@ -1,8 +1,6 @@
 import * as Layout from "./Layout"
 export { default as Footer } from "./Footer"
 
-export { default as Clock } from "./Clock"
-
 export { default as RenderError } from "./RenderError"
 export { default as NotFound } from "./NotFound"
 export * as Crash from "./Crash"
@@ -24,7 +22,6 @@ export { default as ImageUploader } from "./ImageUploader"
 export { default as ImageViewer } from "./ImageViewer"
 export { default as Image } from "./Image"
 export { default as LoadMore } from "./LoadMore"
-export { default as EmbbededMediaPlayer } from "./EmbbededMediaPlayer"
 export { default as HashtagTrendings } from "./HashtagTrendings"
 export { default as Searcher } from "./Searcher"
 
