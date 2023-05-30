@@ -13,6 +13,7 @@ const aliases = {
     pages: path.join(__dirname, "src/pages"),
     theme: path.join(__dirname, "src/theme"),
     components: path.join(__dirname, "src/components"),
+    contexts: path.join(__dirname, "src/contexts"),
     utils: path.join(__dirname, "src/utils"),
     layouts: path.join(__dirname, "src/layouts"),
     hooks: path.join(__dirname, "src/hooks"),
