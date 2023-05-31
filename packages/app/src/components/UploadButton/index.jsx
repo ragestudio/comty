@@ -9,54 +9,24 @@ export default (props) => {
     const handleUpload = async (req) => {
         setUploading(true)
 
-        const formData = new FormData()
-
-        formData.append("files", req.file)
-
-        const response = await window.app.cores.api.customRequest({
-            url: "/files/upload",
-            method: "POST",
-            data: formData
-        }).catch((error) => {
-            console.error(error)
-            app.message.error(error.respose.data.message)
-
-            return false
+        const response = await app.cores.remoteStorage.uploadFile(req.file).catch((err) => {
+            app.notification.new({
+                message: "Could not upload file",
+                description: err.message
+            }, {
+                type: "error"
+            })
         })
 
-        if (response) {
-            // check failed uploads
-            if (response.data.failed.length > 0) {
-                app.notification.new({
-                    message: "Could not upload files",
-                    description: () => {
-                        return response.data.failed.map((fail) => {
-                            return <div
-                                style={{
-                                    marginBottom: 5
-                                }}
-                            >
-                                <b>[{fail.fileName}]</b> - {fail.error}
-                            </div>
-                        })
-                    }
-                }, {
-                    type: "error"
-                })
-            }
+        if (typeof props.ctx?.onUpdateItem === "function") {
+            props.ctx.onUpdateItem(response.url)
+        }
 
-            if (response.data.files.length > 0) {
-                if (typeof props.ctx?.onUpdateItem === "function") {
-                    props.ctx.onUpdateItem(response.data.files[0].url)
-                }
-
-                if (typeof props.onUploadDone === "function") {
-                    if (props.multiple) {
-                        await props.onUploadDone(response.data.files)
-                    } else {
-                        await props.onUploadDone(response.data.files[0])
-                    }
-                }
+        if (typeof props.onUploadDone === "function") {
+            if (props.multiple) {
+                await props.onUploadDone(response)
+            } else {
+                await props.onUploadDone(response)
             }
         }
 
