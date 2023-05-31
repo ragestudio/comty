@@ -50,7 +50,7 @@ export default (props) => {
             </div>
         </div>
         <div className="music-track_cover">
-            <ImageViewer src={props.track.thumbnail} />
+            <ImageViewer src={props.track.cover ?? props.track.thumbnail} />
         </div>
         <div className="music-track_details">
             <div className="music-track_title">

@@ -236,8 +236,8 @@ export default class Player extends Core {
                             if (change.object.currentAudioManifest) {
                                 // analyze cover color
 
-                                if (change.object.currentAudioManifest.thumbnail) {
-                                    this.fac.getColorAsync(change.object.currentAudioManifest.thumbnail)
+                                if (change.object.currentAudioManifest.cover || change.object.currentAudioManifest.thumbnail) {
+                                    this.fac.getColorAsync(change.object.currentAudioManifest.cover ?? change.object.currentAudioManifest.thumbnail)
                                         .then((color) => {
                                             this.state.coverColorAnalysis = color
                                         })

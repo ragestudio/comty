@@ -6,7 +6,7 @@ import UploadButton from "components/UploadButton"
 export default (props) => {
     const [playlistName, setPlaylistName] = React.useState(props.playlist.title)
     const [playlistDescription, setPlaylistDescription] = React.useState(props.playlist.description)
-    const [playlistThumbnail, setPlaylistThumbnail] = React.useState(props.playlist.thumbnail)
+    const [playlistThumbnail, setPlaylistThumbnail] = React.useState(props.playlist.cover ?? props.playlist.thumbnail)
     const [playlistVisibility, setPlaylistVisibility] = React.useState(props.playlist.visibility)
 
     const handleTitleOnChange = (event) => {

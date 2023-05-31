@@ -63,7 +63,7 @@ export default (props) => {
         <div className="play_info_wrapper">
             <div className="play_info">
                 <div className="play_info_cover">
-                    <ImageViewer src={playlist?.thumbnail ?? "/assets/no_song.png"} />
+                    <ImageViewer src={playlist.cover ?? playlist?.thumbnail ?? "/assets/no_song.png"} />
                 </div>
 
                 <div className="play_info_details">

@@ -173,7 +173,7 @@ const PlaylistItem = (props) => {
             </div>
 
             <ImageViewer
-                src={playlist.thumbnail ?? "/assets/no_song.png"}
+                src={playlist.cover ?? playlist.thumbnail ?? "/assets/no_song.png"}
             />
         </div>
 

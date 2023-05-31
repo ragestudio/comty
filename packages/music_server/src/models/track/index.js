@@ -27,6 +27,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        cover: {
+            type: String,
+            default: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
+        },
         thumbnail: {
             type: String,
             default: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
