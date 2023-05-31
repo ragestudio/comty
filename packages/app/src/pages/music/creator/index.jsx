@@ -69,7 +69,23 @@ export default class PlaylistCreatorSteps extends React.Component {
             this.setState({
                 trackList: this.state.trackList.reverse()
             })
-        }
+        },
+        enableLyricsForAllTracks: () => {
+            this.setState({
+                trackList: this.state.trackList.map((track) => {
+                    track.lyricsEnabled = true
+                    return track
+                })
+            })
+        },
+        disableLyricsForAllTracks: () => {
+            this.setState({
+                trackList: this.state.trackList.map((track) => {
+                    track.lyricsEnabled = false
+                    return track
+                })
+            })
+        },
     }
 
     updatePlaylistData = (key, value) => {
