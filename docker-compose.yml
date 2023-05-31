@@ -36,6 +36,13 @@ services:
       - "5003:3050"
     env_file:
       - music.env
+  file_server:
+    build: packages/file_server
+    restart: unless-stopped
+    ports:
+      - "5004:3060"
+    env_file:
+      - file.env
   redis:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
