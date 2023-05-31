@@ -121,6 +121,10 @@ export default class PlaylistCreatorSteps extends React.Component {
         if (result) {
             app.message.success("Playlist published")
 
+            if (typeof this.props.onModification === "function") {
+                this.props.onModification()
+            }
+
             if (typeof this.props.close === "function") {
                 this.props.close()
             }
@@ -249,6 +253,10 @@ export default class PlaylistCreatorSteps extends React.Component {
 
                 if (result) {
                     app.message.success("Playlist deleted")
+
+                    if (typeof this.props.onModification === "function") {
+                        this.props.onModification()
+                    }
 
                     if (typeof this.props.close === "function") {
                         this.props.close()
