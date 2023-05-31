@@ -1,5 +1,5 @@
 import { Track } from "@models"
-import { NotFoundError } from "@classes/Errors"
+import { NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
     const { track_id } = req.params

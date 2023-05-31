@@ -1,5 +1,5 @@
 import { Playlist, Track } from "@models"
-import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@classes/Errors"
+import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@shared-classes/Errors"
 
 const PlaylistAllowedUpdateFields = [
     "title",

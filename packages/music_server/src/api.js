@@ -5,10 +5,10 @@ import express from "express"
 import http from "http"
 import EventEmitter from "@foxify/events"
 
-import ComtyClient from "@classes/ComtyClient"
-import DbManager from "@classes/DbManager"
-import RedisClient from "@classes/RedisClient"
-import StorageClient from "@classes/StorageClient"
+import ComtyClient from "@shared-classes/ComtyClient"
+import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
+import StorageClient from "@shared-classes/StorageClient"
 
 import RoomServer from "./roomsServer"
 

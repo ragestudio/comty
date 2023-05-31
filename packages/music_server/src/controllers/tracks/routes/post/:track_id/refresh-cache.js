@@ -1,5 +1,5 @@
 import { Track } from "@models"
-import { NotFoundError } from "@classes/Errors"
+import { NotFoundError } from "@shared-classes/Errors"
 import getEnhancedLyricsFromTrack from "@services/getEnhancedLyricsFromTrack"
 
 export default async (req, res) => {

@@ -8,13 +8,13 @@
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
     "sharedClasses": {
-        "FileUpload": "src/classes",
-        "CacheService": "src/classes",
-        "ComtyClient": "src/classes",
-        "RedisClient": "src/classes",
-        "StorageClient": "src/classes",
-        "DbManager": "src/classes",
-        "Errors": "src/classes"
+        "FileUpload": "src/shared-classes",
+        "CacheService": "src/shared-classes",
+        "ComtyClient": "src/shared-classes",
+        "RedisClient": "src/shared-classes",
+        "StorageClient": "src/shared-classes",
+        "DbManager": "src/shared-classes",
+        "Errors": "src/shared-classes"
     },
     "license": "MIT",
     "dependencies": {

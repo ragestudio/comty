@@ -10,6 +10,7 @@ import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
 
 const customAliases = {
+    "@shared-classes": path.resolve(__dirname, "shared-classes"),
     "@services": path.resolve(__dirname, "services"),
 }
 
