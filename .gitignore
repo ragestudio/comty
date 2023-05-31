@@ -4,6 +4,8 @@
 /**/**/server.manifest
 /**/**/server.registry
 
+/**/**/_shared
+
 # Trash
 /**/**/*.log
 /**/**/dumps.log

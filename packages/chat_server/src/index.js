@@ -9,13 +9,17 @@ global.isProduction = process.env.NODE_ENV === "production"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
 
+globalThis["__root"] = path.resolve(__dirname)
+
 const customAliases = {
-    "@shared-classes": path.resolve(__dirname, "shared-classes"),
+    "root": globalThis["__root"],
+    "@shared-classes": path.resolve(__dirname, "_shared/classes"),
     "@services": path.resolve(__dirname, "services"),
 }
 
 if (!global.isProduction) {
     customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+    customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
 }
 
 registerBaseAliases(undefined, customAliases)
