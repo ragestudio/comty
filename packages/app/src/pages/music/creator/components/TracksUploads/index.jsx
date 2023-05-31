@@ -4,6 +4,8 @@ import classnames from "classnames"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import UploadButton from "components/UploadButton"
 
+import PlaylistModel from "models/playlists"
+
 import { Icons } from "components/Icons"
 
 import "./index.less"
@@ -28,6 +30,10 @@ const FileItemEditor = (props) => {
         })
     }
 
+    const onRefreshCache = () => {
+        props.onRefreshCache(track)
+    }
+
     const onClose = () => {
         if (typeof props.close === "function") {
             props.close()
@@ -50,19 +56,19 @@ const FileItemEditor = (props) => {
             </div>
 
             <div className="fileItemEditor_field_thumnail">
-                <img src={track.thumbnail} />
+                <img src={track.cover ?? track.thumbnail} />
             </div>
 
             <div className="fileItemEditor_actions">
                 <UploadButton
                     accept="image/*"
-                    onUploadDone={(file) => handleChange("thumbnail", file.url)}
+                    onUploadDone={(file) => handleChange("cover", file.url)}
                 />
                 {
-                    track.thumbnail && <antd.Button
+                    (track.cover ?? track.thumbnail) && <antd.Button
                         icon={<Icons.MdClose />}
                         type="text"
-                        onClick={() => handleChange("thumbnail", null)}
+                        onClick={() => handleChange("cover", null)}
                     >
                         Remove
                     </antd.Button>
@@ -149,6 +155,15 @@ const FileItemEditor = (props) => {
         </div>
 
         <div className="fileItemEditor_actions">
+            {
+                track._id && <antd.Button
+                    type="text"
+                    icon={<Icons.MdRefresh />}
+                    onClick={onRefreshCache}
+                >
+                    Refresh Cache
+                </antd.Button>
+            }
             <antd.Button
                 type="text"
                 icon={<Icons.MdClose />}
@@ -194,7 +209,7 @@ const FileListItem = (props) => {
 
                 <div className="fileListItem_cover">
                     <img
-                        src={props.track?.thumbnail}
+                        src={props.track.cover ?? props.track?.thumbnail}
                         alt="Track cover"
                     />
                 </div>
@@ -276,12 +291,27 @@ export default (props) => {
     const onClickEditTrack = (track) => {
         app.DrawerController.open("track_editor", FileItemEditor, {
             type: "drawer",
+            props: {
+                width: "25vw",
+                minWidth: "500px",
+            },
             componentProps: {
                 track,
                 onSave: (newTrackData) => {
                     console.log("Saving track", newTrackData)
 
                     props.handleTrackInfoChange(newTrackData.uid, newTrackData)
+                },
+                onRefreshCache: () => {
+                    console.log("Refreshing cache for track", track.uid)
+
+                    PlaylistModel.refreshTrackCache(track._id)
+                        .catch(() => {
+                            app.message.error("Failed to refresh cache for track")
+                        })
+                        .then(() => {
+                            app.message.success("Successfully refreshed cache for track")
+                        })
                 }
             },
         })
