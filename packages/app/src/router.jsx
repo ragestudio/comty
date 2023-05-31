@@ -176,7 +176,14 @@ export const PageRender = React.memo((props) => {
         }
 
         app.backLocation = (state = {}) => {
-            return navigate(app.location.lastPathname, {
+            let to = app.location.lastPathname
+
+            if (!to || to === app.location.pathname) {
+                console.warn("No last location found, redirecting to /")
+                to = "/"
+            }
+
+            return navigate(to, {
                 state
             })
         }
