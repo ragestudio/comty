@@ -48,17 +48,19 @@ function createRoutesFromDirectory(startFrom, directoryPath, router) {
             route = route.replace(".ts", "")
             route = route.replace(".tsx", "")
 
-            if (route === "index") {
-                route = "/"
-            } else {
-                route = `/${route}`
+            if (route.endsWith("/index")) {
+                route = route.replace("/index", "")
             }
+
+            route = `/${route}`
 
             let handler = require(filePath)
 
             handler = handler.default || handler
 
             router[method](route, createRouteHandler(route, handler))
+
+            //console.log(`[ROUTE] ${method.toUpperCase()} [${route}]`, handler)
 
             router.routes.push({
                 method,
