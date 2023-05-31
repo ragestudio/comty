@@ -13,12 +13,13 @@ globalThis["__root"] = path.resolve(__dirname)
 
 const customAliases = {
     "root": globalThis["__root"],
+    "@shared-classes": path.resolve(__dirname, "_shared/classes"),
     "@services": path.resolve(__dirname, "services"),
-    "@shared-classes": path.resolve(__dirname, "shared-classes"),
 }
 
 if (!global.isProduction) {
     customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+    customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
 }
 
 registerBaseAliases(undefined, customAliases)

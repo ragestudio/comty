@@ -7,39 +7,7 @@ const sharedClassesPath = path.resolve(sharedRootPath, "classes")
 const rootPath = process.cwd()
 const packagesPath = path.resolve(rootPath, "packages")
 
-const excludedPackages = ["comty.js"]
-
-function filterPackages(packages) {
-    const gitIgnore = fs.readFileSync(path.resolve(rootPath, ".gitignore"), "utf-8")
-
-    // create a regex to match all packages that are in the gitignore file
-    const gitIgnoreRegex = gitIgnore.split("\n").map((line) => {
-        // remove comments
-        if (line.startsWith("#")) return
-
-        return line.replace(/(\/)/g, "\\/").replace(/(\*)/g, "(.*)")
-    }).filter((line) => line)
-
-    // filter packages that are in the gitignore file
-    packages = packages.filter((packageName) => {
-        // filter excluded packages
-        if (excludedPackages.includes(packageName)) {
-            return false
-        }
-
-        const resolvedPath = path.resolve(packagesPath, packageName)
-
-        return !gitIgnoreRegex.some((regex) => {
-            return resolvedPath.match(regex)
-        })
-    })
-
-    packages = packages.filter((packageName) => {
-        return fs.statSync(path.resolve(packagesPath, packageName)).isDirectory()
-    })
-
-    return packages
-}
+const getPackages = require("./utils/getPackages")
 
 async function linkSharedClasses(pkgJSON, packagePath) {
     if (typeof pkgJSON !== "object") {
@@ -77,9 +45,7 @@ async function main() {
     console.time("Postinstall tooks:")
 
     // read dir with absolute paths
-    let packages = await fs.promises.readdir(packagesPath)
-
-    packages = filterPackages(packages)
+    let packages = await getPackages()
 
     for (const packageName of packages) {
         const packagePath = path.resolve(packagesPath, packageName)
