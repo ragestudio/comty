@@ -24,8 +24,8 @@ const TrackAllowedUpdateFields = [
 ]
 
 async function createOrUpdateTrack(payload) {
-    if (!payload.title || !payload.source || !payload.user_id) {
-        throw new Error("title and source and user_id are required")
+    if (!payload.title || !payload.source || !payload.publisher) {
+        throw new Error("title and source and publisher are required")
     }
 
     let track = null
@@ -70,6 +70,18 @@ export default async (req, res) => {
         return new BadRequestError(req, res, "list must be an array")
     }
 
+    const userData = await global.comty.rest.user.data({
+        user_id: req.session.user_id.toString(),
+    })
+        .catch((err) => {
+            console.log("err", err)
+            return false
+        })
+
+    if (!userData) {
+        return new AuthorizationError(req, res)
+    }
+
     let playlist = null
 
     if (!req.body._id) {
@@ -82,6 +94,7 @@ export default async (req, res) => {
             explicit: req.body.explicit,
             public: req.body.public,
             list: req.body.list,
+            public: req.body.public,
         })
 
         await playlist.save()
@@ -104,7 +117,12 @@ export default async (req, res) => {
             return track
         }
 
-        track.user_id = req.session.user_id.toString()
+        track.publisher = {
+            user_id: req.session.user_id.toString(),
+            username: userData.username,
+            avatar: userData.avatar,
+            ...track.publisher ?? {},
+        }
 
         const result = await createOrUpdateTrack(track)
 
@@ -119,7 +137,7 @@ export default async (req, res) => {
         }
     })
 
-    playlist = await Playlist.findByIdAndUpdate(req.body._id, playlist)
+    playlist = await Playlist.findByIdAndUpdate(playlist._id.toString(), playlist)
 
     if (!playlist) {
         return new NotFoundError(req, res, "Playlist not updated")
