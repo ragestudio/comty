@@ -1,10 +1,10 @@
 import fs from "fs"
 import path from "path"
 
-import RedisClient from "@classes/RedisClient"
-import StorageClient from "@classes/StorageClient"
-import CacheService from "@classes/CacheService"
-import ComtyClient from "@classes/ComtyClient"
+import RedisClient from "@shared-classes/RedisClient"
+import StorageClient from "@shared-classes/StorageClient"
+import CacheService from "@shared-classes/CacheService"
+import ComtyClient from "@shared-classes/ComtyClient"
 
 import express from "express"
 import hyperexpress from "hyper-express"

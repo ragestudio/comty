@@ -5,7 +5,7 @@ import express from "express"
 import http from "http"
 import EventEmitter from "@foxify/events"
 
-import ComtyClient from "@classes/ComtyClient"
+import ComtyClient from "@shared-classes/ComtyClient"
 
 import routes from "./routes"
 

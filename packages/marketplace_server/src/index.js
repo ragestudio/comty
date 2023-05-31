@@ -7,6 +7,7 @@ import { registerBaseAliases } from "linebridge/dist/server"
 
 const customAliases = {
     "@services": path.resolve(__dirname, "services"),
+    "@shared-classes": path.resolve(__dirname, "shared-classes"),
 }
 
 if (!global.isProduction) {

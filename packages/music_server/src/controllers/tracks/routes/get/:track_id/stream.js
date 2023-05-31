@@ -1,5 +1,5 @@
 import { Track } from "@models"
-import { NotFoundError, InternalServerError } from "@classes/Errors"
+import { NotFoundError, InternalServerError } from "@shared-classes/Errors"
 
 import mimetypes from "mime-types"
 

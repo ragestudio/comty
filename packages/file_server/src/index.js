@@ -10,6 +10,7 @@ globalThis["__root"] = path.resolve(__dirname)
 const customAliases = {
     "root": globalThis["__root"],
     "@services": path.resolve(__dirname, "services"),
+    "@shared-classes": path.resolve(__dirname, "shared-classes"),
 }
 
 if (!global.isProduction) {

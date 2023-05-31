@@ -1,5 +1,5 @@
 import { Playlist } from "@models"
-import { AuthorizationError, PermissionError, NotFoundError } from "@classes/Errors"
+import { AuthorizationError, PermissionError, NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
     if (!req.session) {

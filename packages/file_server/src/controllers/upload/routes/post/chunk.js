@@ -1,8 +1,8 @@
 import path from "path"
 import fs from "fs"
 
-import * as Errors from "@classes/Errors"
-import FileUpload from "@classes/FileUpload"
+import * as Errors from "@shared-classes/Errors"
+import FileUpload from "@shared-classes/FileUpload"
 import useCompression from "@services/useCompression"
 
 const cachePath = global.cache.constructor.cachePath

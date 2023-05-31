@@ -1,10 +1,10 @@
 import fs from "fs"
 import path from "path"
 
-import DbManager from "@classes/DbManager"
-import RedisClient from "@classes/RedisClient"
-import StorageClient from "@classes/StorageClient"
-import ComtyClient from "./classes/ComtyClient"
+import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
+import StorageClient from "@shared-classes/StorageClient"
+import ComtyClient from "@shared-classes/ComtyClient"
 
 import hyperexpress from "hyper-express"
 
