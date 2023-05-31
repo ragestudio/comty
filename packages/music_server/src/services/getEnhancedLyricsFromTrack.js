@@ -30,7 +30,7 @@ export default async (track, { req }) => {
         }
 
         const spotifyId = await findSpotifyId({
-            track: track.title,
+            title: track.title,
             artist: track.artist,
             sessionToken: req.sessionToken,
         }, { req })
