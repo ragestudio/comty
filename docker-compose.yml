@@ -9,44 +9,59 @@ services:
   api:
     build: packages/server
     restart: unless-stopped
+    networks:
+      - internal_network
     ports:
       - "5000:3010"
     env_file:
-      - api.env
+      - ./env_files/api.production.env
     volumes:
       - ./d_data/api/cache:/home/node/app/cache
   chat_server:
     build: packages/chat_server
     restart: unless-stopped
+    networks:
+      - internal_network
     ports:
       - "5001:3020"
     env_file:
-      - chat.env
+      - ./env_files/chat.production.env
   marketplace_server:
     build: packages/marketplace_server
     restart: unless-stopped
+    networks:
+      - internal_network
     ports:
       - "5002:3040"
     env_file:
-      - marketplace.env
+      - ./env_files/marketplace.production.env
   music_server:
     build: packages/music_server
     restart: unless-stopped
+    networks:
+      - internal_network
     ports:
       - "5003:3050"
     env_file:
-      - music.env
+      - ./env_files/music.production.env
   file_server:
     build: packages/file_server
     restart: unless-stopped
+    networks:
+      - internal_network
     ports:
       - "5004:3060"
     env_file:
-      - file.env
+      - ./env_files/file.production.env
   redis:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
+    networks:
+      - internal_network
     env_file:
-      - redis.env
+      - ./env_files/redis.env
     ports:
       - "6379:6379"
+
+networks:
+  internal_network:
