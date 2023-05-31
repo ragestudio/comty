@@ -42,7 +42,7 @@ export default class PlaylistsModel {
         const { data } = await request({
             instance: PlaylistsModel.api_instance,
             method: "DELETE",
-            url: `/playlist/${id}`,
+            url: `/playlists/${id}`,
         })
 
         return data
