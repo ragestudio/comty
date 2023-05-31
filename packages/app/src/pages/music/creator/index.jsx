@@ -13,6 +13,7 @@ const allowedTrackFieldChanges = [
     "title",
     "artist",
     "cover",
+    "thumbnail",
     "album",
     "year",
     "genre",
@@ -25,8 +26,6 @@ const allowedTrackFieldChanges = [
 
 function createDefaultTrackData({
     uid,
-    tags = {},
-    metadata = {},
     status = "uploading",
     title,
     artist,
@@ -42,16 +41,6 @@ function createDefaultTrackData({
         title: title,
         artist: artist,
         album: album,
-        metadata: {
-            tags: tags,
-            duration: undefined,
-            bitrate: undefined,
-            sampleRate: undefined,
-            channels: undefined,
-            codec: undefined,
-            format: undefined,
-            ...metadata,
-        },
         source: source,
         status: status,
         cover: cover,
@@ -236,6 +225,8 @@ export default class PlaylistCreatorSteps extends React.Component {
             timeout: 2000
         })
 
+        console.log(`Uploaded cover for track ${uid}: `, result)
+
         if (result) {
             this.handleTrackInfoChange(uid, "cover", result.url)
         }
@@ -357,7 +348,7 @@ export default class PlaylistCreatorSteps extends React.Component {
                     cancelText: "No",
                     okText: "Retry",
                     onOk: () => {
-                        this.handleUpload(change)
+                        this.handleUploadTrack(change)
                     },
                     onCancel: () => {
                         this.handleTrackRemove(change.file.uid)
