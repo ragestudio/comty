@@ -129,7 +129,7 @@ export class AudioPlayer extends React.Component {
                 <div
                     className="cover"
                     style={{
-                        backgroundImage: `url(${(this.context.currentManifest?.thumbnail) ?? "/assets/no_song.png"})`,
+                        backgroundImage: `url(${(this.context.currentManifest?.cover ?? this.context.currentManifest?.thumbnail) ?? "/assets/no_song.png"})`,
                     }}
                 />
                 <div className="header">
