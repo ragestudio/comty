@@ -5,6 +5,20 @@ export default class PlaylistsModel {
         return globalThis.__comty_shared_state.instances["music"]
     }
 
+    static refreshTrackCache = async (track_id) => {
+        if (!track_id) {
+            throw new Error("Track ID is required")
+        }
+
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "POST",
+            url: `/tracks/${track_id}/refresh-cache`,
+        })
+
+        return data
+    }
+
     static putPlaylist = async (payload) => {
         if (!payload) {
             throw new Error("Payload is required")
