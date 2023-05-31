@@ -1,7 +1,6 @@
 import React from "react"
 import { Button } from "antd"
 import { Icons } from "components/Icons"
-import UserPreview from "components/UserPreview"
 import Image from "components/Image"
 
 import "./index.less"
@@ -21,7 +20,7 @@ export default (props) => {
         <div className="playlistTimelineEntry_content">
             <div className="playlistTimelineEntry_thumbnail">
                 <Image
-                    src={data.thumbnail}
+                    src={data.cover ?? data.thumbnail}
                     onClick={navigateToPlaylist}
                 />
             </div>

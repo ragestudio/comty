@@ -26,7 +26,7 @@ const ReleaseItem = (props) => {
                 className="music_panel_releases_info_cover"
             >
                 <ImageViewer
-                    src={release.thumbnail ?? "/assets/no_song.png"}
+                    src={release.cover ?? release.thumbnail ?? "/assets/no_song.png"}
                 />
             </div>
             <div
@@ -61,7 +61,10 @@ const ReleaseItem = (props) => {
     </div>
 }
 
-const openPlaylistCreator = (playlist_id) => {
+const openPlaylistCreator = ({
+    playlist_id = null,
+    onModification = () => { }
+} = {}) => {
     console.log("Opening playlist creator", playlist_id)
 
     app.DrawerController.open("playlist_creator", PlaylistCreator, {
@@ -79,6 +82,7 @@ const openPlaylistCreator = (playlist_id) => {
         },
         componentProps: {
             playlist_id: playlist_id,
+            onModification: onModification,
         }
     })
 }
@@ -89,7 +93,7 @@ const navigateToPlaylist = (playlist_id) => {
 
 export default (props) => {
     const [searchResults, setSearchResults] = React.useState(null)
-    const [L_Releases, R_Releases, E_Releases] = app.cores.api.useRequest(PlaylistsModel.getMyReleases)
+    const [L_Releases, R_Releases, E_Releases, M_Releases] = app.cores.api.useRequest(PlaylistsModel.getMyReleases)
 
     if (E_Releases) {
         console.error(E_Releases)
@@ -116,7 +120,9 @@ export default (props) => {
 
             <div className="music_panel_releases_header_actions">
                 <antd.Button
-                    onClick={() => openPlaylistCreator()}
+                    onClick={() => openPlaylistCreator({
+                        onModification: M_Releases,
+                    })}
                     icon={<Icons.Plus />}
                     type="primary"
                 >
@@ -146,7 +152,10 @@ export default (props) => {
                     return <ReleaseItem
                         key={release._id}
                         release={release}
-                        onClickEditTrack={() => openPlaylistCreator(release._id)}
+                        onClickEditTrack={() => openPlaylistCreator({
+                            playlist_id: release._id,
+                            onModification: M_Releases,
+                        })}
                         onClickNavigate={() => navigateToPlaylist(release._id)}
                     />
                 })
@@ -156,7 +165,10 @@ export default (props) => {
                     return <ReleaseItem
                         key={release._id}
                         release={release}
-                        onClickEditTrack={() => openPlaylistCreator(release._id)}
+                        onClickEditTrack={() => openPlaylistCreator({
+                            playlist_id: release._id,
+                            onModification: M_Releases,
+                        })}
                         onClickNavigate={() => navigateToPlaylist(release._id)}
                     />
                 })
