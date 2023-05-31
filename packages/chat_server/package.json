@@ -1,10 +1,20 @@
 {
-    "name": "@comty/message_server",
+    "name": "@comty/chat_server",
     "version": "0.47.1",
     "main": "dist/index.js",
     "scripts": {
         "build": "corenode-cli build",
-        "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js"
+        "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js",
+        "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
+    },
+    "sharedClasses": {
+        "FileUpload": "src/classes",
+        "CacheService": "src/classes",
+        "ComtyClient": "src/classes",
+        "RedisClient": "src/classes",
+        "StorageClient": "src/classes",
+        "DbManager": "src/classes",
+        "Errors": "src/classes"
     },
     "license": "MIT",
     "dependencies": {

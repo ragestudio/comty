@@ -7,6 +7,15 @@
         "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
+    "sharedClasses": {
+        "FileUpload": "src/classes",
+        "CacheService": "src/classes",
+        "ComtyClient": "src/classes",
+        "RedisClient": "src/classes",
+        "StorageClient": "src/classes",
+        "DbManager": "src/classes",
+        "Errors": "src/classes"
+    },
     "license": "MIT",
     "dependencies": {
         "7zip-min": "^1.4.4",

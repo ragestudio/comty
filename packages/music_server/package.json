@@ -7,6 +7,13 @@
         "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
+    "sharedClasses": {
+        "ComtyClient": "src/classes",
+        "RedisClient": "src/classes",
+        "StorageClient": "src/classes",
+        "DbManager": "src/classes",
+        "Errors": "src/classes"
+    },
     "license": "MIT",
     "dependencies": {
         "@foxify/events": "^2.1.0",
