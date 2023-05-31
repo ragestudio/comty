@@ -46,5 +46,7 @@ services:
   redis:
     image: redis/redis-stack-server:latest
     restart: unless-stopped
+    env_file:
+      - redis.env
     ports:
       - "6379:6379"
