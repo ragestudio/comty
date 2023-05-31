@@ -1,11 +1,22 @@
 require("dotenv").config()
+global.isProduction = process.env.NODE_ENV === "production"
+
 import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
 
-registerBaseAliases(undefined, {
+globalThis["__root"] = path.resolve(__dirname)
+
+const customAliases = {
+    "root": globalThis["__root"],
     "@services": path.resolve(__dirname, "services"),
-})
+}
+
+if (!global.isProduction) {
+    customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+}
+
+registerBaseAliases(undefined, customAliases)
 
 // patches
 const { Buffer } = require("buffer")
@@ -41,14 +52,38 @@ global.toBoolean = (value) => {
     return false
 }
 
-global.isProduction = process.env.NODE_ENV === "production"
-
 import API from "./api"
 
 async function main() {
-    const mainAPI = new API()
+    const instance = new API()
 
-    await mainAPI.initialize()
+    await instance.initialize()
+
+    // // kill on process exit
+    // process.on("exit", () => {
+    //     instance.server.close()
+    //     process.exit(0)
+    // })
+
+    // // kill on ctrl+c
+    // process.on("SIGINT", () => {
+    //     instance.server.close()
+    //     process.exit(0)
+    // })
+
+    // // kill on uncaught exceptions
+    // process.on("uncaughtException", (error) => {
+    //     console.error(`🆘 [FATAL ERROR] >`, error)
+    //     instance.server.close()
+    //     process.exit(1)
+    // })
+
+    // // kill on unhandled rejections
+    // process.on("unhandledRejection", (error) => {
+    //     console.error(`🆘 [FATAL ERROR] >`, error)
+    //     instance.server.close()
+    //     process.exit(1)
+    // })
 }
 
 main().catch((error) => {
