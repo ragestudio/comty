@@ -9,7 +9,7 @@ const tmpPath = path.join(process.cwd(), ".tmp")
 const widgetsApi = "http://localhost:3040"
 const token = process.argv[2]
 
-const exluded = [
+const excludedFiles = [
     "/.git",
     "/.tmp",
     "/bundle.7z",
@@ -24,7 +24,7 @@ async function copyToTmp(origin) {
         const filePath = path.join(origin, file)
 
         // run a rexeg to check if the filePath is excluded
-        const isExcluded = exluded.some((excludedPath) => {
+        const isExcluded = excludedFiles.some((excludedPath) => {
             return filePath.match(excludedPath)
         })
 
