@@ -41,5 +41,5 @@ export default async ({
         return null
     }
 
-    return data.tracks.items[0]
+    return data.tracks.items[0].id
 }
