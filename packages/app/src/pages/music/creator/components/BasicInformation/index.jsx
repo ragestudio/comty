@@ -138,13 +138,15 @@ export default (props) => {
             <antd.Divider />
 
             <div className="field">
-                <antd.Button
-                    onClick={props.onDeletePlaylist}
-                    icon={<Icons.MdDelete />}
-                    danger
-                >
-                    Delete Playlist
-                </antd.Button>
+                {
+                    props.playlist._id && <antd.Button
+                        onClick={props.onDeletePlaylist}
+                        icon={<Icons.MdDelete />}
+                        danger
+                    >
+                        Delete Playlist
+                    </antd.Button>
+                }
             </div>
         </div>
     </div>
