@@ -1,24 +1,47 @@
 import fs from "fs"
 import path from "path"
 
-//import RedisClient from "@classes/RedisClient"
+import RedisClient from "@classes/RedisClient"
 import StorageClient from "@classes/StorageClient"
+import CacheService from "@classes/CacheService"
+import ComtyClient from "@classes/ComtyClient"
 
+import express from "express"
 import hyperexpress from "hyper-express"
 
 import pkg from "../package.json"
 
 export default class FileServerAPI {
-    server = global.server = new hyperexpress.Server()
+    // max body length is 1GB in bytes
+    static maxBodyLength = 1000 * 1000 * 1000
+
+    // server = global.server = new hyperexpress.Server({
+    //     auto_close: true,
+    //     fast_buffers: false,
+    //     max_body_length: FileServerAPI.maxBodyLength,
+    //     streaming: {
+    //         highWaterMark: 1000 * 1000 * 1000,
+    //         objectMode: false,
+    //     }
+    // })
+
+    //internalRouter = new hyperexpress.Router()
+    internalRouter = express.Router()
+
+    server = global.server = express()
 
     listenIp = process.env.HTTP_LISTEN_IP ?? "0.0.0.0"
-    listenPort = process.env.HTTP_LISTEN_PORT ?? 3006
+    listenPort = process.env.HTTP_LISTEN_PORT ?? 3060
 
-    internalRouter = new hyperexpress.Router()
-
-    //redis = global.redis = RedisClient()
+    redis = global.redis = RedisClient()
 
     storage = global.storage = StorageClient()
+
+    cache = global.cache = new CacheService()
+
+    comty = global.comty = ComtyClient({
+        useWs: false,
+    })
 
     async __loadControllers() {
         let controllersPath = fs.readdirSync(path.resolve(__dirname, "controllers"))
@@ -32,7 +55,7 @@ export default class FileServerAPI {
                 continue
             }
 
-            const handler = controller(new hyperexpress.Router())
+            const handler = await controller(express.Router())
 
             if (!handler) {
                 this.server.InternalConsole.error(`Controller ${controllerPath} returning not valid handler.`)
@@ -47,10 +70,27 @@ export default class FileServerAPI {
     }
 
     async __loadMiddlewares() {
-        let middlewaresPath = fs.readdirSync(path.resolve(__dirname, "middlewares"))
+        let middlewaresPath = fs.readdirSync(path.resolve(__dirname, "useMiddlewares"))
+
+        if (this.constructor.useMiddlewaresOrder) {
+            middlewaresPath = middlewaresPath.sort((a, b) => {
+                const aIndex = this.constructor.useMiddlewaresOrder.indexOf(a.replace(".js", ""))
+                const bIndex = this.constructor.useMiddlewaresOrder.indexOf(b.replace(".js", ""))
+
+                if (aIndex === -1) {
+                    return 1
+                }
+
+                if (bIndex === -1) {
+                    return -1
+                }
+
+                return aIndex - bIndex
+            })
+        }
 
         for await (const middlewarePath of middlewaresPath) {
-            const middleware = require(path.resolve(__dirname, "middlewares", middlewarePath)).default
+            const middleware = require(path.resolve(__dirname, "useMiddlewares", middlewarePath)).default
 
             if (!middleware) {
                 this.server.InternalConsole.error(`Middleware ${middlewarePath} not found.`)
@@ -72,15 +112,18 @@ export default class FileServerAPI {
     }
 
     __registerInternalRoutes() {
-        this.server.get("/", (req, res) => {
+        this.internalRouter.get("/", (req, res) => {
             return res.status(200).json({
                 name: pkg.name,
                 version: pkg.version,
-                routes: this.__getRegisteredRoutes()
             })
         })
 
-        this.server.any("*", (req, res) => {
+        // this.internalRouter.get("/routes", (req, res) => {
+        //     return res.status(200).json(this.__getRegisteredRoutes())
+        // })
+
+        this.internalRouter.get("*", (req, res) => {
             return res.status(404).json({
                 error: "Not found",
             })
@@ -94,10 +137,13 @@ export default class FileServerAPI {
         await this.redis.initialize()
         await this.storage.initialize()
 
+        this.server.use(express.json({ extended: false }))
+        this.server.use(express.urlencoded({ extended: true }))
+
         // register controllers & middlewares
-        await this.__registerInternalRoutes()
         await this.__loadControllers()
         await this.__loadMiddlewares()
+        await this.__registerInternalRoutes()
 
         // use internal router
         this.server.use(this.internalRouter)

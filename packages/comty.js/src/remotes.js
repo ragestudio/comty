@@ -17,6 +17,7 @@ const envOrigins = {
         livestreaming: `http://${getCurrentHostname()}:3030`,
         marketplace: `http://${getCurrentHostname()}:3040`,
         music: `http://${getCurrentHostname()}:3050`,
+        files: `http://${getCurrentHostname()}:3060`,
     },
     "production": {
         default: "https://api.comty.app",
@@ -24,6 +25,7 @@ const envOrigins = {
         livestreaming: `https://livestreaming_api.comty.app`,
         marketplace: `https://marketplace_api.comty.app`,
         music: `https://music_api.comty.app`,
+        files: `https://files_api.comty.app`,
     }
 }
 
@@ -48,4 +50,8 @@ export default {
     marketplace: {
         origin: composeRemote("marketplace"),
     },
+    files: {
+        origin: composeRemote("files"),
+        hasWebsocket: false,
+    }
 }
