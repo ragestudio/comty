@@ -4,6 +4,7 @@ import classnames from "classnames"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import moment from "moment"
+import fuse from "fuse.js"
 
 import { WithPlayerContext } from "contexts/WithPlayerContext"
 
@@ -13,12 +14,17 @@ import { Icons } from "components/Icons"
 import PlaylistsModel from "models/playlists"
 import MusicTrack from "components/MusicTrack"
 
+import SearchButton from "components/SearchButton"
+
 import "./index.less"
 
 export default (props) => {
     const play_id = props.params.play_id
 
     const [playlist, setPlaylist] = React.useState(null)
+    const [searchResults, setSearchResults] = React.useState(null)
+
+    let debounceSearch = null
 
     const loadData = async () => {
         const response = await PlaylistsModel.getPlaylist(play_id).catch((err) => {
@@ -45,6 +51,48 @@ export default (props) => {
         }
 
         app.cores.player.startPlaylist(playlist.list, index)
+    }
+
+    const makeSearch = (value) => {
+        const options = {
+            includeScore: true,
+            keys: [
+                "title",
+                "artist",
+                "album",
+            ],
+        }
+
+        const fuseInstance = new fuse(playlist.list, options)
+        const results = fuseInstance.search(value)
+
+        setSearchResults(results.map((result) => {
+            return result.item
+        }))
+    }
+
+    const returnTracks = (list) => {
+        return list.map((item, index) => {
+            return <MusicTrack
+                order={index + 1}
+                track={item}
+                onClick={() => handleOnClickTrack(item)}
+            />
+        })
+    }
+
+    const handleOnSearchChange = (value) => {
+        debounceSearch = setTimeout(() => {
+            makeSearch(value)
+        }, 500)
+    }
+
+    const handleOnSearchEmpty = () => {
+        if (debounceSearch) {
+            clearTimeout(debounceSearch)
+        }
+
+        setSearchResults(null)
     }
 
     React.useEffect(() => {
@@ -108,19 +156,20 @@ export default (props) => {
         </div>
 
         <div className="list">
-            <h1>
-                <Icons.MdPlaylistPlay /> Tracks
-            </h1>
+            <div className="list_header">
+                <h1>
+                    <Icons.MdPlaylistPlay /> Tracks
+                </h1>
+
+                <SearchButton
+                    onChange={handleOnSearchChange}
+                    onEmpty={handleOnSearchEmpty}
+                />
+            </div>
 
             <WithPlayerContext>
                 {
-                    playlist.list.map((item, index) => {
-                        return <MusicTrack
-                            order={index + 1}
-                            track={item}
-                            onClick={() => handleOnClickTrack(item)}
-                        />
-                    })
+                    returnTracks(searchResults ?? playlist.list)
                 }
             </WithPlayerContext>
         </div>
