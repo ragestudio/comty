@@ -173,6 +173,13 @@ export default (props) => {
                     />
                 })
             }
+            {
+                !searchResults && R_Releases.length === 0 && <antd.Result
+                    status="info"
+                    title="No releases"
+                    subTitle="You don't have any releases yet."
+                />
+            }
         </div>
     </div>
 }
