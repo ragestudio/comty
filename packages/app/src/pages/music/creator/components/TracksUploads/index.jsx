@@ -207,6 +207,19 @@ const FileListItem = (props) => {
                     />
                 }
 
+                <div className={classnames(
+                    "fileListItem_progress",
+                    {
+                        ["hidden"]: !isUploading,
+                    }
+                )}>
+                    <antd.Progress
+                        percent={props.track.progress ?? 0}
+                        status={props.track.status === "error" ? "exception" : (props.track.progress === 100 ? "success" : "active")}
+                        showInfo={false}
+                    />
+                </div>
+
                 <div className="fileListItem_cover">
                     <img
                         src={props.track.cover ?? props.track?.thumbnail}
