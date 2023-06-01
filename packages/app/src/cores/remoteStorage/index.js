@@ -207,7 +207,7 @@ export default class RemoteStorage extends Core {
                     console.error("[Uploader] Error", message)
 
                     if (typeof onError === "function") {
-                        onError(message)
+                        onError(file, message)
                     }
 
                     reject(message)
@@ -217,7 +217,7 @@ export default class RemoteStorage extends Core {
                     //console.debug(`[Uploader] Progress: ${percentProgress}%`)
 
                     if (typeof onProgress === "function") {
-                        onProgress(percentProgress)
+                        onProgress(file, percentProgress)
                     }
                 })
 
@@ -225,7 +225,7 @@ export default class RemoteStorage extends Core {
                     console.debug("[Uploader] Finish", data)
 
                     if (typeof onFinish === "function") {
-                        onFinish(data)
+                        onFinish(file, data)
                     }
 
                     resolve(data)

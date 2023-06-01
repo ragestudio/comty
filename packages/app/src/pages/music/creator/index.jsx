@@ -161,9 +161,23 @@ export default class PlaylistCreatorSteps extends React.Component {
         })
     }
 
+    handleFileProgress = (file, progress) => {
+        const trackList = this.state.trackList
+
+        const track = trackList.find((track) => track.uid === file.uid)
+
+        if (track) {
+            track.progress = progress
+
+            this.setState({
+                trackList
+            })
+        }
+    }
+
     handleUploadTrack = async (req) => {
         const response = await app.cores.remoteStorage.uploadFile(req.file, {
-            timeout: 2000
+            onProgress: this.handleFileProgress
         }).catch((error) => {
             console.error(error)
             antd.message.error(error)
