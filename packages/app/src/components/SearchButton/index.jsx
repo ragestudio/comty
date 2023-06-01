@@ -6,6 +6,8 @@ import "./index.less"
 
 export default (props) => {
     const searchBoxRef = React.useRef(null)
+
+    const [value, setValue] = React.useState()
     const [open, setOpen] = React.useState()
 
     const openSearchBox = (to) => {
@@ -17,16 +19,38 @@ export default (props) => {
         }
     }
 
+    const handleOnChange = (value) => {
+        setValue(value)
+
+        if (!value || value.length === 0 || value === "" || value === " ") {
+            if (typeof props.onEmpty === "function") {
+                props.onEmpty()
+            }
+
+            return false
+        }
+
+        if (typeof props.onChange === "function") {
+            props.onChange(value)
+        }
+    }
+
     return <div
+        className="searchButton"
         onClick={() => openSearchBox(true)}
-        className="searchButton">
+    >
         <SearchBar
             ref={searchBoxRef}
             className={classnames("searchBox", { ["open"]: open })}
             onSearch={props.onSearch}
-            onChange={props.onChange}
+            onChange={handleOnChange}
+            value={value}
             onFocus={() => openSearchBox(true)}
-            onBlur={() => openSearchBox(false)}
+            onBlur={() => {
+                if (value.length === 0) {
+                    openSearchBox(false)
+                }
+            }}
         />
     </div>
 }

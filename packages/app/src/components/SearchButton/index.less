@@ -1,18 +1,38 @@
 .searchButton {
-	.searchBox {
-        .adm-search-bar-input {
-            transition: all 150ms ease-in-out;
-            width: 0px;
-        }
-        
-		&.open {
-            .adm-search-bar-input {
-                width: 20vw;
-            }
-		}
-	}
+    .searchBox {
+        color: var(--text-color);
 
-	svg {
-		margin: 0;
-	}
+        svg {
+            color: var(--text-color);
+            margin: 0;
+        }
+
+        .adm-search-bar-input-box {
+            color: var(--text-color);
+
+            background-color: var(--background-color-accent);
+
+            padding: 0 6px;
+
+            border-radius: 12px;
+
+            .adm-search-bar-input {
+                transition: all 150ms ease-in-out;
+                width: 0px;
+
+                padding: 0;
+            }
+        }
+
+        &.open {
+            .adm-search-bar-input-box {
+                .adm-search-bar-input {
+                    width: 20vw;
+                    max-width: 400px;
+
+                    padding-left: 10px;
+                }
+            }
+        }
+    }
 }
