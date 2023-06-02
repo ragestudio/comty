@@ -1,1 +1,1 @@
-infisical run -- npm run:prod
+/usr/bin/infisical run -- npm run:prod
