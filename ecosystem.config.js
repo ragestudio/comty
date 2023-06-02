@@ -2,7 +2,7 @@ module.exports = {
     apps: [
         {
             name: "main_api",
-            script: "./infisical-run.sh",
+            script: "./dist/index.js",
             instances: "max",
             exec_mode: "cluster",
             env: {
@@ -12,7 +12,7 @@ module.exports = {
         },
         {
             name: "music_api",
-            script: "./infisical-run.sh",
+            script: "./dist/index.js",
             instances: "max",
             exec_mode: "cluster",
             env: {
@@ -22,7 +22,7 @@ module.exports = {
         },
         {
             name: "file_api",
-            script: "./infisical-run.sh",
+            script: "./dist/index.js",
             instances: "max",
             exec_mode: "cluster",
             env: {
@@ -32,7 +32,7 @@ module.exports = {
         },
         {
             name: "marketplace_api",
-            script: "./infisical-run.sh",
+            script: "./dist/index.js",
             instances: "max",
             exec_mode: "cluster",
             env: {
@@ -42,7 +42,7 @@ module.exports = {
         },
         {
             name: "chat_api",
-            script: "./infisical-run.sh",
+            script: "./dist/index.js",
             instances: "max",
             exec_mode: "cluster",
             env: {

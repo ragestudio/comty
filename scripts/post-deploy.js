@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const path = require("path")
 const fs = require("fs")
 const child_process = require("child_process")
@@ -26,7 +28,6 @@ async function main() {
         }
 
         // copy entire shared folder
-        // shared/* => /_shared/*
         fs.mkdirSync(sharedPath, { recursive: true })
 
         await child_process.execSync(`cp -r ${sharedRootPath}/* ${sharedPath} && echo Shared lib copied`, {
@@ -39,6 +40,19 @@ async function main() {
             cwd: packagePath,
             stdio: "inherit"
         })
+
+        if (process.env.INFISICAL_TOKEN) {
+            // write env
+            const envPath = path.resolve(packagePath, ".env")
+
+            if (fs.existsSync(envPath)) {
+                fs.unlinkSync(envPath)
+            }
+
+            const envData = `INFISICAL_TOKEN="${process.env.INFISICAL_TOKEN}"`
+
+            await fs.writeFileSync(envPath, envData)
+        }
     }
 }
 

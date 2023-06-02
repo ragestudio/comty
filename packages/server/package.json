@@ -5,8 +5,7 @@
     "scripts": {
         "build": "corenode-cli build",
         "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
-        "run:prod": "cross-env NODE_ENV=production node ./dist/index.js",
-        "run:infisical:prod": "infisical run -- npm run run:prod"
+        "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
     "license": "MIT",
     "dependencies": {
@@ -26,6 +25,7 @@
         "dotenv": "^16.0.3",
         "fluent-ffmpeg": "^2.1.2",
         "formidable": "^2.1.1",
+        "infisical-node": "^1.2.1",
         "jimp": "^0.16.2",
         "jsonwebtoken": "^9.0.0",
         "linebridge": "0.15.13",
