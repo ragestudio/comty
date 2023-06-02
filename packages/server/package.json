@@ -5,7 +5,8 @@
     "scripts": {
         "build": "corenode-cli build",
         "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
-        "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
+        "run:prod": "cross-env NODE_ENV=production node ./dist/index.js",
+        "run:infisical:prod": "infisical run -- npm run run:prod"
     },
     "license": "MIT",
     "dependencies": {

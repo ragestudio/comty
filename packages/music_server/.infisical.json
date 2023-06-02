@@ -2,6 +2,6 @@
     "workspaceId": "64519574a8a691b55e8b361d",
     "defaultEnvironment": "dev",
     "gitBranchToEnvironmentMapping": {
-        "master": "production"
+        "master": "prod"
     }
 }
