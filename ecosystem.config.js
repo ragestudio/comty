@@ -2,33 +2,53 @@ module.exports = {
     apps: [
         {
             name: "main_api",
-            script: "./packages/server/dist/index.js",
+            script: "./dist/index.js",
             instances: "max",
-            exec_mode: "cluster"
+            exec_mode: "cluster",
+            env: {
+                "NODE_ENV": "production",
+            },
+            cwd: "./packages/server"
         },
         {
             name: "music_api",
-            script: "./packages/music_server/dist/index.js",
+            script: "./dist/index.js",
             instances: "max",
-            exec_mode: "cluster"
+            exec_mode: "cluster",
+            env: {
+                "NODE_ENV": "production",
+            },
+            cwd: "./packages/music_server"
         },
         {
             name: "file_api",
-            script: "./packages/file_server/dist/index.js",
+            script: "./dist/index.js",
             instances: "max",
-            exec_mode: "cluster"
+            exec_mode: "cluster",
+            env: {
+                "NODE_ENV": "production",
+            },
+            cwd: "./packages/file_server"
         },
         {
             name: "marketplace_api",
-            script: "./packages/marketplace_server/dist/index.js",
+            script: "./dist/index.js",
             instances: "max",
-            exec_mode: "cluster"
+            exec_mode: "cluster",
+            env: {
+                "NODE_ENV": "production",
+            },
+            cwd: "./packages/marketplace_server"
         },
         {
             name: "chat_api",
-            script: "./packages/chat_server/dist/index.js",
+            script: "./dist/index.js",
             instances: "max",
-            exec_mode: "cluster"
+            exec_mode: "cluster",
+            env: {
+                "NODE_ENV": "production",
+            },
+            cwd: "./packages/chat_server"
         }
     ],
 }
