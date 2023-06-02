@@ -19,8 +19,8 @@ export default class Server {
         this.websocketServer = new ChatServer(this.httpServer)
 
         this.options = {
-            listenHost: process.env.LISTEN_HOST || "0.0.0.0",
-            listenPort: process.env.LISTEN_PORT || 3020,
+            listenHost: process.env.HTTP_LISTEN_HOST || "0.0.0.0",
+            listenPort: process.env.HTTP_LISTEN_PORT || 3020,
             ...options
         }
     }
