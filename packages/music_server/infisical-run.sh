@@ -1,0 +1,1 @@
+infisical run -- npm run:prod
