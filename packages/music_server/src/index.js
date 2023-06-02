@@ -1,13 +1,12 @@
-require("dotenv").config()
 
-if (typeof process.env.NODE_ENV === "undefined") {
-    process.env.NODE_ENV = "development"
-}
-
-global.isProduction = process.env.NODE_ENV === "production"
-
+import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
+import infisical from "infisical-node"
+
+require("dotenv").config()
+
+global.isProduction = process.env.NODE_ENV === "production"
 
 globalThis["__root"] = path.resolve(__dirname)
 
@@ -34,6 +33,8 @@ global.b64Encode = (data) => {
     return Buffer.from(data, "utf-8").toString("base64")
 }
 
+global.nanoid = (t = 21) => crypto.getRandomValues(new Uint8Array(t)).reduce(((t, e) => t += (e &= 63) < 36 ? e.toString(36) : e < 62 ? (e - 26).toString(36).toUpperCase() : e > 62 ? "-" : "_"), "");
+
 Array.prototype.updateFromObjectKeys = function (obj) {
     this.forEach((value, index) => {
         if (obj[value] !== undefined) {
@@ -59,33 +60,58 @@ global.toBoolean = (value) => {
 import API from "./api"
 
 async function main() {
-    const api = new API()
+    if (process.env.INFISICAL_TOKEN) {
+        const client = new infisical({
+            token: process.env.INFISICAL_TOKEN,
+        })
 
-    await api.initialize()
+        const secrets = await client.getAllSecrets()
+
+        // inject to process.env
+        secrets.forEach((secret) => {
+            process.env[secret.secretName] = secret.secretValue
+        })
+    }
+
+    const instance = new API()
+
+    await instance.initialize()
 
     // kill on process exit
     process.on("exit", () => {
-        api.server.close()
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
         process.exit(0)
     })
 
     // kill on ctrl+c
     process.on("SIGINT", () => {
-        api.server.close()
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
         process.exit(0)
     })
 
     // kill on uncaught exceptions
     process.on("uncaughtException", (error) => {
         console.error(`🆘 [FATAL ERROR] >`, error)
-        api.server.close()
+
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
+
         process.exit(1)
     })
 
     // kill on unhandled rejections
     process.on("unhandledRejection", (error) => {
         console.error(`🆘 [FATAL ERROR] >`, error)
-        api.server.close()
+
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
+
         process.exit(1)
     })
 }

@@ -1,9 +1,12 @@
-require("dotenv").config()
-global.isProduction = process.env.NODE_ENV === "production"
 
 import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
+import infisical from "infisical-node"
+
+require("dotenv").config()
+
+global.isProduction = process.env.NODE_ENV === "production"
 
 globalThis["__root"] = path.resolve(__dirname)
 
@@ -57,33 +60,58 @@ global.toBoolean = (value) => {
 import API from "./api"
 
 async function main() {
+    if (process.env.INFISICAL_TOKEN) {
+        const client = new infisical({
+            token: process.env.INFISICAL_TOKEN,
+        })
+
+        const secrets = await client.getAllSecrets()
+
+        // inject to process.env
+        secrets.forEach((secret) => {
+            process.env[secret.secretName] = secret.secretValue
+        })
+    }
+
     const instance = new API()
 
     await instance.initialize()
 
     // kill on process exit
     process.on("exit", () => {
-        instance.server.close()
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
         process.exit(0)
     })
 
     // kill on ctrl+c
     process.on("SIGINT", () => {
-        instance.server.close()
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
         process.exit(0)
     })
 
     // kill on uncaught exceptions
     process.on("uncaughtException", (error) => {
         console.error(`🆘 [FATAL ERROR] >`, error)
-        instance.server.close()
+
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
+
         process.exit(1)
     })
 
     // kill on unhandled rejections
     process.on("unhandledRejection", (error) => {
         console.error(`🆘 [FATAL ERROR] >`, error)
-        instance.server.close()
+
+        if (typeof instance.server.close === "function") {
+            instance.server.close()
+        }
+
         process.exit(1)
     })
 }
