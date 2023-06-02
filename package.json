@@ -12,7 +12,8 @@
         "dev:chat_server": "cd packages/chat_server && yarn dev",
         "dev:marketplace_server": "cd packages/marketplace_server && yarn dev",
         "dev:server": "cd packages/server && yarn dev",
-        "dev:client": "cd packages/app && yarn dev"
+        "dev:client": "cd packages/app && yarn dev",
+        "post:deploy": "node ./scripts/post-deploy.js"
     },
     "workspaces": [
         "packages/**"
