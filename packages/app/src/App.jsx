@@ -117,6 +117,8 @@ class ComtyApp extends React.Component {
 	static async initialize() {
 		window.app.version = config.package.version
 
+		window.localStorage.setItem("last_version", window.app.version)
+
 		window.app.message = antd.message
 
 		// check if electron library is available
