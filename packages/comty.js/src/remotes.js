@@ -1,5 +1,5 @@
 function composeRemote(path) {
-    return envOrigins[process.env.NODE_ENV][path]
+    return envOrigins[process.env.NODE_ENV ?? "production"][path]
 }
 
 function getCurrentHostname() {
