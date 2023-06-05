@@ -1,58 +1,28 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
+import classnames from "classnames"
 
 import AuthModel from "models/auth"
 import config from "config"
 
 import "./index.less"
 
-const LoginSteps = {
-    "username": (props) => {
-        const handleUpdate = (e) => {
-            props.onUpdate(e.target.value)
-        }
+const stepsOnError = {
+    username: "This username or email is not exist",
+    password: "Password is incorrect",
+}
 
-        return <div className="field">
-            <span><Icons.Mail /> Username or Email</span>
+const stepsValidations = {
+    username: async (state) => {
+        const check = await AuthModel.usernameValidation(state.username).catch((err) => {
+            return {
+                exists: false
+            }
+        })
 
-            <div className="component">
-                <antd.Input
-                    name="username"
-                    defaultValue={props.defaultValue}
-                    placeholder="myusername / myemail@example.com"
-                    onChange={handleUpdate}
-                    onPressEnter={props.next}
-                    autoCorrect="off"
-                    autoCapitalize="none"
-                    autoComplete="on"
-                    autoFocus
-                />
-            </div>
-        </div>
+        return check.exists
     },
-    "password": (props) => {
-        const handleUpdate = (e) => {
-            props.onUpdate(e.target.value)
-        }
-
-        return <div className="field">
-            <span><Icons.Lock /> Password</span>
-
-            <div className="component">
-                <antd.Input.Password
-                    name="password"
-                    defaultValue={props.defaultValue}
-                    onChange={handleUpdate}
-                    onPressEnter={props.next}
-                    autoCorrect="off"
-                    autoCapitalize="none"
-                    autoComplete="on"
-                    autoFocus
-                />
-            </div>
-        </div>
-    }
 }
 
 const phasesToSteps = {
@@ -71,6 +41,8 @@ export default class Login extends React.Component {
         error: null,
         phase: 0,
     }
+
+    formRef = React.createRef()
 
     handleFinish = async () => {
         const payload = {
@@ -136,6 +108,14 @@ export default class Login extends React.Component {
     }
 
     onUpdateInput = (input, value) => {
+        // remove error from ref
+        this.formRef.current.setFields([
+            {
+                name: input,
+                errors: []
+            }
+        ])
+
         this.setState({
             loginInputs: {
                 ...this.state.loginInputs,
@@ -144,19 +124,28 @@ export default class Login extends React.Component {
         })
     }
 
-    renderCurrentInput = () => {
-        const { phase } = this.state
+    nextStep = async () => {
+        const phase = phasesToSteps[this.state.phase]
 
-        const step = phasesToSteps[phase]
+        if (typeof stepsValidations[phase] === "function") {
+            this.toogleLoading(true)
 
-        return React.createElement(LoginSteps[step], {
-            onUpdate: (...props) => this.onUpdateInput(step, ...props),
-            next: this.nextStep,
-            defaultValue: this.state.loginInputs[step],
-        })
-    }
+            const result = await stepsValidations[phase](this.state.loginInputs)
 
-    nextStep = () => {
+            this.toogleLoading(false)
+
+            if (!result) {
+                this.formRef.current.setFields([
+                    {
+                        name: phase,
+                        errors: [stepsOnError[phase]]
+                    },
+                ])
+
+                return false
+            }
+        }
+
         const to = this.state.phase + 1
 
         if (!phasesToSteps[to]) {
@@ -204,36 +193,71 @@ export default class Login extends React.Component {
                     To continue to {config.app.siteName}
                 </h3>
 
-                <div className="fields">
-                    {this.renderCurrentInput()}
+                <antd.Form
+                    name="login"
+                    className="fields"
+                    autoCorrect="off"
+                    autoCapitalize="none"
+                    autoComplete="on"
+                    onFinish={this.handleFinish}
+                    ref={this.formRef}
+                >
+                    <antd.Form.Item
+                        name="username"
+                        className="field"
+                    >
+                        <span><Icons.Mail /> Username or Email</span>
+                        <antd.Input
+                            placeholder="myusername / myemail@example.com"
+                            onChange={(e) => this.onUpdateInput("username", e.target.value)}
+                            onPressEnter={this.nextStep}
+                            disabled={this.state.phase !== 0}
+                            autoFocus
+                        />
+                    </antd.Form.Item>
 
-                    <div className="field">
-                        <div className="component-row">
+                    <antd.Form.Item
+                        name="password"
+                        className={classnames(
+                            "field",
                             {
-                                this.state.phase > 0 && <antd.Button
-                                    onClick={this.prevStep}
-                                    disabled={this.state.loading}
-                                >
-                                    Back
-                                </antd.Button>
+                                ["hidden"]: this.state.phase !== 1,
                             }
-                            <antd.Button
-                                onClick={this.nextStep}
-                                disabled={!this.canNext() || this.state.loading}
-                                loading={this.state.loading}
-                            >
-                                Continue
-                            </antd.Button>
-                        </div>
-                    </div>
+                        )}
+                    >
+                        <span><Icons.Lock /> Password</span>
+                        <antd.Input.Password
+                            placeholder="********"
+                            onChange={(e) => this.onUpdateInput("password", e.target.value)}
+                            onPressEnter={this.nextStep}
+                        />
+                    </antd.Form.Item>
+                </antd.Form>
 
-                    <div className="field-error">
-                        {this.state.error}
-                    </div>
+                <div className="component-row">
+                    {
+                        this.state.phase > 0 && <antd.Button
+                            onClick={this.prevStep}
+                            disabled={this.state.loading}
+                        >
+                            Back
+                        </antd.Button>
+                    }
+                    <antd.Button
+                        onClick={this.nextStep}
+                        disabled={!this.canNext() || this.state.loading}
+                        loading={this.state.loading}
+                    >
+                        Continue
+                    </antd.Button>
+                </div>
 
-                    <div className="field" onClick={this.onClickRegister}>
-                        <a>You need a account?</a>
-                    </div>
+                <div className="field-error">
+                    {this.state.error}
+                </div>
+
+                <div className="field" onClick={this.onClickRegister}>
+                    <a>You need a account?</a>
                 </div>
             </div>
         </div>
