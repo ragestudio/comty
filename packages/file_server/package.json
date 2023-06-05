@@ -23,7 +23,7 @@
         "axios": "^1.4.0",
         "bcrypt": "^5.1.0",
         "busboy": "^1.6.0",
-        "comty.js": "0.47.1",
+        "comty.js": "^0.47.4",
         "connect-mongo": "^4.6.0",
         "content-range": "^2.0.2",
         "corenode": "0.28.26",
