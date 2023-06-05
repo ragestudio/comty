@@ -60,23 +60,27 @@
 
 				margin-bottom: 20px;
 
-				.component {
-					margin-top: 5px;
-				}
+				transition: all 150ms ease-in-out;
 
-				.component-row {
-					display: inline-flex;
-					flex-direction: row;
-
-					justify-content: space-between;
+				&.hidden {
+					height: 0px;
+					opacity: 0;
+					margin: 0;
 				}
 			}
+		}
 
-			.field-error {
-				color: red;
-				font-size: 0.8rem;
-				margin: 20px 0;
-			}
+		.component-row {
+			display: inline-flex;
+			flex-direction: row;
+
+			justify-content: space-between;
+		}
+
+		.field-error {
+			color: red;
+			font-size: 0.8rem;
+			margin: 20px 0;
 		}
 	}
 
