@@ -85,7 +85,7 @@ export class BackgroundMediaPlayer extends React.Component {
             <div
                 className="background_media_player__background"
                 style={{
-                    backgroundImage: `url(${this.context.currentManifest?.thumbnail})`
+                    backgroundImage: `url(${this.context.currentManifest?.cover ?? this.context.currentManifest?.thumbnail})`
                 }}
             />
 
