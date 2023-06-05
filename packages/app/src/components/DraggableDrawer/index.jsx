@@ -1,11 +1,11 @@
 // © Jack Hanford https://github.com/hanford/react-drag-drawer
-import React, { Component } from "react";
-import { Motion, spring, presets } from "react-motion";
-import PropTypes from "prop-types";
-import document from "global/document";
-import Observer from "react-intersection-observer";
-import { css } from "@emotion/css";
-import { createPortal } from "react-dom";
+import React, { Component } from "react"
+import { Motion, spring, presets } from "react-motion"
+import PropTypes from "prop-types"
+import document from "global/document"
+import Observer from "react-intersection-observer"
+import { css } from "@emotion/css"
+import { createPortal } from "react-dom"
 
 import {
     isDirectionBottom,
@@ -67,10 +67,15 @@ export default class Drawer extends Component {
         listenersAttached: false
     }
 
+    DESKTOP_MODE = false
     DRAGGER_HEIGHT_SIZE = 100
     MAX_NEGATIVE_SCROLL = 5
     SCROLL_TO_CLOSE = 475
     ALLOW_DRAWER_TRANSFORM = true
+
+    componentDidMount() {
+        this.DESKTOP_MODE = !window.isMobile
+    }
 
     componentDidUpdate(prevProps, nextState) {
         // in the process of closing the drawer
@@ -333,6 +338,17 @@ export default class Drawer extends Component {
         this.ALLOW_DRAWER_TRANSFORM = inView
     }
 
+    onClickOutside = (event) => {
+        if (!this.props.allowClose) {
+            return false
+        }
+
+        // check if is clicking outside main component
+        if (this.drawer && !this.drawer.contains(event.target)) {
+            this.props.onRequestClose(this)
+        }
+    }
+
     preventDefault = (event) => event.preventDefault()
     stopPropagation = (event) => event.stopPropagation()
 
@@ -392,7 +408,7 @@ export default class Drawer extends Component {
                         <div
                             id={id}
                             style={containerStyle}
-                            onClick={this.props.onRequestClose}
+                            onMouseDown={this.onClickOutside}
                             className={`${Container} ${containerElementClass} `}
                             ref={getContainerRef}
                         >
