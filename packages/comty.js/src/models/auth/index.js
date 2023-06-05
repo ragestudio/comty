@@ -1,6 +1,8 @@
 import request from "../../handlers/request"
 import SessionModel from "../session"
 
+const emailRegex = new RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+
 export default class AuthModel {
     static login = async (payload) => {
         const response = await request({
@@ -49,5 +51,32 @@ export default class AuthModel {
         }
 
         return response
+    }
+
+    static usernameValidation = async (username) => {
+        let payload = {}
+
+        // check if usename arguemnt is an email
+        if (emailRegex.test(username)) {
+            payload.email = username
+        } else {
+            payload.username = username
+        }
+
+        const response = await request({
+            method: "get",
+            url: "/auth/login/validation",
+            params: payload,
+        }).catch((error) => {
+            console.error(error)
+
+            return false
+        })
+
+        if (!response) {
+            throw new Error("Unable to validate user")
+        }
+
+        return response.data
     }
 }
