@@ -112,6 +112,13 @@ export default async (req, res) => {
 
     playlist = playlist.toObject()
 
+    playlist.publisher = {
+        user_id: req.session.user_id.toString(),
+        fullName: userData.fullName,
+        username: userData.username,
+        avatar: userData.avatar,
+    }
+
     playlist.list = await Promise.all(req.body.list.map(async (track, index) => {
         if (typeof track !== "object") {
             return track

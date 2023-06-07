@@ -30,6 +30,9 @@ export default {
             type: Date,
             required: true
         },
+        publisher: {
+            type: Object,
+        },
         public: {
             type: Boolean,
             default: true,
