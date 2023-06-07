@@ -130,7 +130,7 @@ export default (props) => {
                             playlist.publisher && <div className="play_info_statistics_item">
                                 <p
                                     onClick={() => {
-                                        app.navigation.goToAccount(playlist.user.username)
+                                        app.navigation.goToAccount(playlist.publisher.username)
                                     }}
                                 >
                                     <Icons.MdPerson />
