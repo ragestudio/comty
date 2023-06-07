@@ -1,6 +1,12 @@
+@import "theme/vars.less";
+
 .settings_wrapper {
     display: flex;
     flex-direction: row;
+
+    justify-content: center;
+
+    padding-bottom: 20px;
 
     .settings_menu {
         position: sticky;
@@ -8,7 +14,7 @@
         top: 0;
         left: 0;
 
-        height: 100%;
+        height: fit-content;
 
         display: flex;
         flex-direction: column;
@@ -16,6 +22,7 @@
         align-items: center;
 
         width: 30%;
+        max-width: 300px;
 
         padding: 0 30px;
 
@@ -34,92 +41,131 @@
         display: flex;
         flex-direction: column;
 
-        width: 70%;
+        width: 100%;
+        max-width: 700px;
 
-        .group {
+        gap: 20px;
+
+        .settings_content_group {
+            position: relative;
+
             display: flex;
             flex-direction: column;
+
             color: var(--background-color-contrast);
+            background-color: var(--background-color-accent);
 
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6 {
-                color: var(--background-color-contrast);
-            }
+            border-radius: 12px;
 
-            .content {
-                >div {
-                    margin-bottom: 25px;
-                }
-            }
-        }
+            padding: 20px;
 
-        .settingItem {
-            padding: 0 20px;
+            gap: 20px;
 
-            >div {
-                margin-bottom: 10px;
-            }
+            .settings_content_group_header {
+                position: absolute;
 
-            .header {
-                display: inline-flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
                 width: 100%;
 
-                .title {
-                    display: flex;
-                    align-items: center;
+                top: 0;
+                left: 0;
+
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6 {
+                    margin: 0;
                     color: var(--background-color-contrast);
-
-                    h1,
-                    h2,
-                    h3,
-                    h4,
-                    h5,
-                    h6 {
-                        margin: 0;
-                        color: var(--background-color-contrast);
-                    }
-
-                    p {
-                        font-size: 11px;
-                        color: var(--background-color-contrast);
-                        margin: 0;
-                    }
-
-                    >div {
-                        margin-right: 10px;
-                    }
                 }
 
-                .extraActions {
-                    display: inline-flex;
-                    align-items: center;
+                //-webkit-box-shadow: @card-shadow;
+                //-moz-box-shadow: @card-shadow;
+                //box-shadow: @card-shadow;      
 
-                    >div {
-                        margin-right: 10px;
-                    }
-                }
+                padding: 20px;
+
+                border-radius: 12px;
             }
 
-            .component {
+            .settings_content_group_settings {
                 display: flex;
                 flex-direction: column;
 
-                --ignore-dragger: true;
-                padding: 0 20px;
+                margin-top: 50px;
 
-                span {
-                    color: var(--background-color-contrast);
-                }
+                gap: 30px;
 
-                >div {
-                    margin-bottom: 10px;
+                .settings_content_group_item {
+                    display: flex;
+                    flex-direction: column;
+
+                    padding: 0 20px;
+
+                    .settings_content_group_item_header {
+                        display: inline-flex;
+                        flex-direction: row;
+                        align-items: center;
+                        justify-content: space-between;
+
+                        width: 100%;
+
+                        .settings_content_group_item_header_title {
+                            display: flex;
+                            align-items: center;
+                            color: var(--background-color-contrast);
+
+                            h1,
+                            h2,
+                            h3,
+                            h4,
+                            h5,
+                            h6 {
+                                margin: 0;
+                                color: var(--background-color-contrast);
+                            }
+
+                            p {
+                                font-size: 11px;
+                                color: var(--background-color-contrast);
+                                margin: 0;
+                            }
+
+                            >div {
+                                margin-right: 10px;
+                            }
+                        }
+
+                        .settings_content_group_item_header_actions {
+                            display: inline-flex;
+                            align-items: center;
+
+                            gap: 10px;
+
+                            .ant-btn {
+                                background-color: var(--background-color-primary-2);
+                            }
+
+                            .ant-btn:not([disabled]) {
+                                &:hover {
+                                    color: var(--colorPrimary);
+                                    border: 1px solid var(--colorPrimary);
+                                }
+                            }
+                        }
+                    }
+
+                    .settings_content_group_item_component {
+                        display: flex;
+                        flex-direction: column;
+
+                        --ignore-dragger: true;
+                        padding: 6px 20px;
+
+                        span {
+                            color: var(--background-color-contrast);
+                        }
+                    }
                 }
             }
         }

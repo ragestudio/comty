@@ -304,9 +304,9 @@ const SettingItem = (props) => {
         ...props.ctx,
     }
 
-    return <div key={item.id} className="settingItem">
-        <div className="header">
-            <div className="title">
+    return <div key={item.id} className="settings_content_group_item">
+        <div className="settings_content_group_item_header">
+            <div className="settings_content_group_item_header_title">
                 <div>
                     <h4>
                         {Icons[item.icon] ? React.createElement(Icons[item.icon]) : null}
@@ -323,7 +323,7 @@ const SettingItem = (props) => {
                 </div>
             </div>
             {item.extraActions &&
-                <div className="extraActions">
+                <div className="settings_content_group_item_header_actions">
                     {item.extraActions.map((action, index) => {
                         if (typeof action === "function") {
                             return React.createElement(action, {
@@ -351,7 +351,7 @@ const SettingItem = (props) => {
                 </div>
             }
         </div>
-        <div className="component">
+        <div className="settings_content_group_item_component">
             <div>
                 {
                     loading
@@ -398,18 +398,20 @@ const SettingGroup = React.memo((props) => {
         return null
     }
 
-    return <div index={groupKey} key={groupKey} className="group">
-        <h1>
-            {
-                fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
-            }
-            <Translation>
+    return <div index={groupKey} key={groupKey} className="settings_content_group">
+        <div className="settings_content_group_header">
+            <h1>
                 {
-                    t => t(fromDecoratorTitle ?? groupKey)
+                    fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
                 }
-            </Translation>
-        </h1>
-        <div className="content">
+                <Translation>
+                    {
+                        t => t(fromDecoratorTitle ?? groupKey)
+                    }
+                </Translation>
+            </h1>
+        </div>
+        <div className="settings_content_group_settings">
             {
                 settings.map((item) => <SettingItem
                     item={item}
