@@ -92,7 +92,7 @@ export default class User {
 
         const { data } = await request({
             method: "POST",
-            url: "/self/update_password",
+            url: "/user/self/update_password",
             data: {
                 currentPassword,
                 newPassword,
