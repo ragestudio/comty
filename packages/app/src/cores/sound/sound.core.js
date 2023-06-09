@@ -3,6 +3,7 @@ import { Howl } from "howler"
 import config from "config"
 import axios from "axios"
 import store from "store"
+import { Haptics, ImpactStyle } from "@capacitor/haptics"
 
 export default class SoundCore extends Core {
     static refName = "sound"
@@ -77,7 +78,11 @@ export default class SoundCore extends Core {
             // if button exist and has aria-checked attribute then play switch_on or switch_off
             if (button) {
                 if (button.hasAttribute("aria-checked")) {
-                   return this.public.useUIAudio(button.getAttribute("aria-checked") === "true" ? "component.slider_down" : "component.slider_up")
+                    return this.public.useUIAudio(button.getAttribute("aria-checked") === "true" ? "component.slider_down" : "component.slider_up")
+                }
+
+                if (app.cores.settings.get("haptic_feedback")) {
+                    Haptics.impact({ style: ImpactStyle.Medium })
                 }
 
                 return this.public.useUIAudio("generic_click")
