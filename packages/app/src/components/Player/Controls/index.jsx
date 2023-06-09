@@ -79,23 +79,25 @@ export default ({
             onClick={() => onClickActionsButton("next")}
             disabled={syncModeLocked}
         />
-        <antd.Popover
-            content={React.createElement(
-                AudioVolume,
-                { onChange: onVolumeUpdate, defaultValue: audioVolume }
-            )}
-            trigger="hover"
-        >
-            <div
-                className="muteButton"
-                onClick={onMuteUpdate}
+        {
+            !app.isMobile && <antd.Popover
+                content={React.createElement(
+                    AudioVolume,
+                    { onChange: onVolumeUpdate, defaultValue: audioVolume }
+                )}
+                trigger="hover"
             >
-                {
-                    audioMuted
-                        ? <Icons.VolumeX />
-                        : <Icons.Volume2 />
-                }
-            </div>
-        </antd.Popover>
+                <div
+                    className="muteButton"
+                    onClick={onMuteUpdate}
+                >
+                    {
+                        audioMuted
+                            ? <Icons.VolumeX />
+                            : <Icons.Volume2 />
+                    }
+                </div>
+            </antd.Popover>
+        }
     </div>
 }

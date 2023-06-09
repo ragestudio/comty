@@ -90,8 +90,9 @@ export class AudioPlayer extends React.Component {
             className={classnames(
                 "embbededMediaPlayerWrapper",
                 {
-                    ["hovering"]: this.state.showControls,
+                    ["hovering"]: this.props.frame !== false && this.state.showControls,
                     ["minimized"]: this.context.minimized,
+                    ["no-frame"]: this.props.frame === false,
                 }
             )}
             onMouseEnter={this.onMouse}

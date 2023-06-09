@@ -227,7 +227,7 @@ export default class Login extends React.Component {
                     >
                         <span><Icons.Lock /> Password</span>
                         <antd.Input.Password
-                            placeholder="********"
+                            //placeholder="********"
                             onChange={(e) => this.onUpdateInput("password", e.target.value)}
                             onPressEnter={this.nextStep}
                         />

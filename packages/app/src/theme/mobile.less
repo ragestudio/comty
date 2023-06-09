@@ -10,8 +10,10 @@
 		.content_wrapper {
 			height: 100%;
 			width: 100%;
+
 			overflow-y: scroll;
-			padding-top: 20px;
+
+			//padding-top: 20px;
 		}
 
 		.content_layout {
@@ -22,142 +24,139 @@
 			align-items: center;
 			justify-content: center;
 
-			width: 100vw;
-			padding: 0 10px;
+			width: 100%;
+			padding: 7px;
+
+			box-sizing: border-box;
 		}
 
-		.frameDecorator {
-			position: absolute;
-			left: 0;
-
-			z-index: 8000;
-
-			width: 100vw;
-			height: @app_frameDecorator_height;
-
-			background-color: rgba(var(--layoutBackgroundColor), 0.8);
-
-			filter: blur(4px);
-			backdrop-filter: blur(10px);
-
-			&.top {
-				top: 0;
-				transform: translate(0, -6px);
-			}
-
-			&.bottom {
-				bottom: 0;
-				transform: translate(0, 6px);
-			}
-		}
-
-		// FIXMETS FOR MOBILE LAYOUT
-		.loginPage {
-			flex-direction: column;
-
-			.wallpaper {
-				width: 100vw;
-			}
-		}
-
-		.dashboard {
-			display: flex;
-			flex-direction: column;
-		}
-
-		.postPage {
+		.playlist_view {
 			display: flex;
 			flex-direction: column;
 
-			height: 90vh;
+			.play_info_wrapper {
+				position: relative;
 
-			.postCard {
-				&.fullmode {
-					.wrapper {
-						height: 76vh;
+				.play_info {
+					width: 100%;
 
-						.post_content {
-							.post_attachments {
-								height: 60vh;
-								overflow: hidden;
+					.play_info_cover {
+						width: 100%;
+						height: 100%;
+					}
+				}
+			}
 
-								.carousel-root {
-									.carousel {
-										min-height: 200px;
+			.list {
+				padding: 30px 10px;
+			}
+		}
 
-										>div {
-											display: flex;
-											align-items: center;
-											height: 100%;
-										}
-									}
-								}
+		.pagePanels {
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+			justify-content: center;
+
+			overflow-x: visible;
+
+			width: 100%;
+			height: 100%;
+
+			.panel {
+				width: 100%;
+				//height: 100%;
+
+				&.left {
+					z-index: 500;
+					overflow: visible;
+					overflow-x: visible;
+				}
+
+				&.right {
+					z-index: 400;
+
+					overflow-x: visible;
+				}
+			}
+
+			.card {
+				width: 100%;
+				height: 100%;
+
+				display: flex;
+				flex-direction: row;
+
+				padding: 5px;
+
+				justify-content: space-between;
+
+				box-shadow: @card-shadow;
+
+				border-radius: 12px;
+
+				isolation: unset;
+				overflow: visible;
+
+				.item {
+					display: flex;
+					flex-direction: column;
+
+					justify-content: center;
+					align-items: center;
+
+					padding: 5px 10px;
+
+					border-radius: 8px;
+
+					.icon {
+						svg {
+							margin: 0 !important;
+							font-size: 1rem;
+						}
+					}
+
+					.label {
+						font-size: 0.6rem;
+					}
+
+					&.active {
+						.icon {
+							svg {
+								color: var(--colorPrimary);
+							}
+						}
+
+						.label {
+							color: var(--colorPrimary);
+						}
+
+						background-color: var(--background-color-primary);
+					}
+				}
+			}
+		}
+
+		.post-list_wrapper {
+			.post-list {
+				padding-top: 10px;
+				border-radius: 0;
+
+				.playlistTimelineEntry {
+					width: 100%;
+
+					.playlistTimelineEntry_content {
+						.playlistTimelineEntry_thumbnail {
+							img {
+								width: 20vw;
+								height: 20vw;
 							}
 						}
 					}
 				}
-			}
-		}
 
-		.accountProfile {
-			padding: 0;
-
-			.contents {
-				display: flex;
-				flex-direction: column;
-
-				padding: 0;
-
-				margin-top: -4.0vh;
-
-				padding: 0;
-
-				.tabContent {
-					padding: 0;
-					padding-top: 26px;
-				}
-
-				.tabMenuWrapper {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
-
-					width: 100%;
-
-					margin: 0;
-
-					.ant-menu {
-						padding: 0;
-						margin: 0;
-					}
-				}
-			}
-		}
-
-		.liveStream {
-			flex-direction: column;
-
-			.plyr {
-				position: absolute;
-
-				top: 0;
-				left: 0;
-
-				width: 100%;
-				height: 60vh;
-
-				border-radius: 6px;
-			}
-
-			.panel {
-				height: 40vh;
-			}
-		}
-
-		.postCard {
-			.post_actionsWrapper {
-				.actions {
+				.postCard {
 					width: 100%;
 				}
 			}

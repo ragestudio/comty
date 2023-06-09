@@ -88,7 +88,7 @@ import { DOMWindow } from "components/RenderWindow"
 
 import { Icons } from "components/Icons"
 
-import { ThemeProvider } from "cores/style"
+import { ThemeProvider } from "cores/style/style.core.jsx"
 
 import Layout from "./layout"
 import * as Router from "./router"

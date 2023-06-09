@@ -601,10 +601,16 @@ export default class SyncLyrics extends React.Component {
             colorAnalysis,
         })
 
-        app.SidebarController.toggleVisibility(false)
+        if (app.SidebarController) {
+            app.SidebarController.toggleVisibility(false)
+        }
+
+        if (app.layout.floatingStack) {
+            app.layout.floatingStack.toogleGlobalVisibility(false)
+        }
+
         app.cores.style.compactMode(true)
         app.cores.style.applyVariant("dark")
-        app.layout.floatingStack.toogleGlobalVisibility(false)
 
         // request full screen to browser
         if (document.fullscreenEnabled) {
@@ -640,10 +646,16 @@ export default class SyncLyrics extends React.Component {
 
         delete window._hacks
 
-        app.SidebarController.toggleVisibility(true)
+        if (app.SidebarController) {
+            app.SidebarController.toggleVisibility(true)
+        }
+
+        if (app.layout.floatingStack) {
+            app.layout.floatingStack.toogleGlobalVisibility(true)
+        }
+
         app.cores.style.compactMode(false)
         app.cores.style.applyInitialVariant()
-        app.layout.floatingStack.toogleGlobalVisibility(true)
 
         // exit full screen
         if (document.fullscreenEnabled) {

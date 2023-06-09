@@ -6,31 +6,39 @@ import { Motion, spring } from "react-motion"
 
 import { Icons, createIconRender } from "components/Icons"
 
+import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
+
+import PlayerView from "pages/@mobile-views/player"
+
 import "./index.less"
 
-const items = [
-    {
-        id: "creator",
-        dispatchEvent: "app.openCreator",
-        icon: "PlusCircle",
-        classnames: [["primary"]]
-    },
-    {
-        id: "feed",
-        location: "/home/feed",
-        icon: "Home",
-    },
-    {
-        id: "explore",
-        location: "/home/explore",
-        icon: "Search",
-    },
-    {
-        id: "livestreams",
-        location: "/home/livestreams",
-        icon: "Tv",
+const PlayerButton = (props) => {
+    const openPlayerView = () => {
+        app.DrawerController.open("player", PlayerView)
     }
-]
+
+    React.useEffect(() => {
+        openPlayerView()
+    }, [])
+
+    return <div
+        className={classnames(
+            "player_btn",
+            {
+                "bounce": props.playback === "playing"
+            }
+        )}
+        style={{
+            "--average-color": props.colorAnalysis?.rgba,
+            "--color": props.colorAnalysis?.isDark ? "var(--text-color-white)" : "var(--text-color-black)",
+        }}
+        onClick={openPlayerView}
+    >
+        {
+            props.playback === "playing" ? <Icons.MdMusicNote /> : <Icons.MdPause />
+        }
+    </div>
+}
 
 const AccountButton = (props) => {
     const user = app.userData
@@ -51,26 +59,10 @@ const AccountButton = (props) => {
                     key: "settings",
                     text: <><Icons.Settings /> <span>Settings</span></>,
                     onClick: () => {
-                        app.openSettings()
+                        app.navigation.goToSettings()
                         ActionSheetRef.current.close()
                     }
                 },
-                {
-                    key: "savedPosts",
-                    text: <><Icons.Bookmark /> <span>Saved Posts</span></>,
-                    onClick: () => {
-                        app.setLocation("/home/savedPosts")
-                        ActionSheetRef.current.close()
-                    }
-                },
-                {
-                    key: "about",
-                    text: <><Icons.Info /> <span>About</span></>,
-                    onClick: () => {
-                        app.setLocation("/about")
-                        ActionSheetRef.current.close()
-                    }
-                }
             ]
         })
     }
@@ -91,7 +83,17 @@ const AccountButton = (props) => {
     </div>
 }
 
-export default class BottomBar extends React.Component {
+export default (props) => {
+    return <WithPlayerContext>
+        <BottomBar
+            {...props}
+        />
+    </WithPlayerContext>
+}
+
+export class BottomBar extends React.Component {
+    static contextType = Context
+
     state = {
         allowed: true,
         show: true,
@@ -133,7 +135,7 @@ export default class BottomBar extends React.Component {
     }
 
     toggleVisibility = (to) => {
-        if (!window.isMobile) {
+        if (!app.isMobile) {
             to = false
         } else {
             to = to ?? !this.state.visible
@@ -160,21 +162,6 @@ export default class BottomBar extends React.Component {
         }
     }
 
-    renderItems = () => {
-        return items.map((item) => {
-            return <div
-                key={item.id}
-                id={item.id}
-                className={classnames("item", ...item.classnames ?? [])}
-                onClick={() => this.handleItemClick(item)}
-            >
-                <div className="icon">
-                    {createIconRender(item.icon)}
-                </div>
-            </div>
-        })
-    }
-
     render() {
         if (this.state.render) {
             return <div className="bottomBar">
@@ -195,7 +182,51 @@ export default class BottomBar extends React.Component {
                 }}
             >
                 <div className="items">
-                    {this.renderItems()}
+                    <div
+                        key="creator"
+                        id="creator"
+                        className={classnames("item", "primary")}
+                        onClick={() => app.setLocation("/")}
+                    >
+                        <div className="icon">
+                            {createIconRender("PlusCircle")}
+                        </div>
+                    </div>
+
+                    {
+                        this.context.currentManifest && <div
+                            className="item"
+                        >
+                            <PlayerButton
+                                manifest={this.context.currentManifest}
+                                playback={this.context.playbackStatus}
+                                colorAnalysis={this.context.coverColorAnalysis}
+                            />
+                        </div>
+                    }
+
+                    <div
+                        key="navigator"
+                        id="navigator"
+                        className="item"
+                        onClick={() => app.setLocation("/")}
+                    >
+                        <div className="icon">
+                            {createIconRender("Home")}
+                        </div>
+                    </div>
+
+                    <div
+                        key="searcher"
+                        id="searcher"
+                        className="item"
+                        onClick={app.controls.openSearcher}
+                    >
+                        <div className="icon">
+                            {createIconRender("Search")}
+                        </div>
+                    </div>
+
                     <AccountButton />
                 </div>
             </div>}
