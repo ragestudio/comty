@@ -54,9 +54,9 @@ export default class Player extends Core {
     state = Observable.from({
         loading: false,
         minimized: false,
-        audioMuted: AudioPlayerStorage.get("mute") ?? false,
+        audioMuted: app.isMobile ? false : (AudioPlayerStorage.get("mute") ?? false),
         playbackMode: AudioPlayerStorage.get("mode") ?? "repeat",
-        audioVolume: AudioPlayerStorage.get("volume") ?? 0.3,
+        audioVolume: app.isMobile ? 1 : (AudioPlayerStorage.get("volume") ?? 0.3),
         velocity: AudioPlayerStorage.get("velocity") ?? 1,
 
         coverColorAnalysis: null,
@@ -340,6 +340,12 @@ export default class Player extends Core {
         this.observeStateChanges()
     }
 
+    async initializeBeforeRuntimeInitialize() {
+        if (app.isMobile) {
+            this.state.audioVolume = 1
+        }
+    }
+
     //
     // UI Methods
     //
@@ -350,12 +356,22 @@ export default class Player extends Core {
             return false
         }
 
+        if (!app.layout.floatingStack) {
+            console.error("Floating stack not found")
+            return false
+        }
+
         this.currentDomWindow = app.layout.floatingStack.add("mediaPlayer", EmbbededMediaPlayer)
     }
 
     detachPlayerComponent() {
         if (!this.currentDomWindow) {
             console.warn("EmbbededMediaPlayer not attached")
+            return false
+        }
+
+        if (!app.layout.floatingStack) {
+            console.error("Floating stack not found")
             return false
         }
 
@@ -892,6 +908,11 @@ export default class Player extends Core {
     }
 
     toogleMute(to) {
+        if (app.isMobile) {
+            console.warn("Cannot mute on mobile")
+            return false
+        }
+
         this.state.audioMuted = to ?? !this.state.audioMuted
 
         if (this.currentAudioInstance) {
@@ -910,6 +931,11 @@ export default class Player extends Core {
     volume(volume) {
         if (typeof volume !== "number") {
             return this.state.audioVolume
+        }
+
+        if (app.isMobile) {
+            console.warn("Cannot change volume on mobile")
+            return false
         }
 
         if (volume > 1) {

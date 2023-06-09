@@ -234,11 +234,21 @@ class MusicSyncSubCore {
             return false
         }
 
+        if (!app.layout.floatingStack) {
+            console.error("Floating stack not found")
+            return false
+        }
+
         this.syncRoomCardRendered = app.layout.floatingStack.add("sync-room-card", SyncRoomCard)
     }
 
     dettachCard() {
         if (!this.syncRoomCardRendered) {
+            return false
+        }
+
+        if (!app.layout.floatingStack) {
+            console.error("Floating stack not found")
             return false
         }
 
