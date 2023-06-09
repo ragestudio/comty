@@ -34,7 +34,7 @@ export default class PlaylistsModel {
         return data
     }
 
-    static deletePlaylist = async (id) => {
+    static deletePlaylist = async (id, options = {}) => {
         if (!id) {
             throw new Error("ID is required")
         }
@@ -43,6 +43,7 @@ export default class PlaylistsModel {
             instance: PlaylistsModel.api_instance,
             method: "DELETE",
             url: `/playlists/${id}`,
+            params: options,
         })
 
         return data

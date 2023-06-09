@@ -1,10 +1,12 @@
-import { Playlist } from "@models"
+import { Playlist, Track } from "@models"
 import { AuthorizationError, PermissionError, NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
     if (!req.session) {
         return new AuthorizationError(req, res)
     }
+
+    const removeWithTracks = req.query.remove_with_tracks === "true"
 
     let playlist = await Playlist.findOne({
         _id: req.params.playlist_id,
@@ -23,6 +25,12 @@ export default async (req, res) => {
     await Playlist.deleteOne({
         _id: req.params.playlist_id,
     })
+
+    if (removeWithTracks) {
+        await Track.deleteMany({
+            _id: playlist.tracks,
+        })
+    }
 
     return res.json({
         success: true,
