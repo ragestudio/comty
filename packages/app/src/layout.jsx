@@ -51,12 +51,8 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		if (window.app.cores.settings.get("forceMobileMode") || window.app.capacitor.isAppCapacitor() || Math.min(window.screen.width, window.screen.height) < 768 || navigator.userAgent.indexOf("Mobi") > -1) {
-			window.isMobile = true
-
+		if (window.app.cores.settings.get("forceMobileMode") || app.isMobile) {
 			app.layout.set("mobile")
-		} else {
-			window.isMobile = false
 		}
 
 		// register events
@@ -147,7 +143,7 @@ export default class Layout extends React.PureComponent {
 			return JSON.stringify(this.state.renderError)
 		}
 
-		const Layout = Layouts[layoutType]
+		const Layout = Layouts[app.isMobile ? "mobile" : layoutType]
 
 		if (!Layout) {
 			return app.eventBus.emit("runtime.crash", new Error(`Layout type [${layoutType}] not found`))

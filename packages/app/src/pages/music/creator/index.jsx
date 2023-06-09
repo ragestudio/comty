@@ -279,7 +279,9 @@ export default class PlaylistCreatorSteps extends React.Component {
             okType: "danger",
             cancelText: "Cancel",
             onOk: async () => {
-                const result = await PlaylistModel.deletePlaylist(this.props.playlist_id)
+                const result = await PlaylistModel.deletePlaylist(this.props.playlist_id, {
+                    remove_with_tracks: true
+                })
 
                 if (result) {
                     app.message.success("Playlist deleted")

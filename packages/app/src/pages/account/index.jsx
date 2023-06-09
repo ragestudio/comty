@@ -258,7 +258,7 @@ export default class Account extends React.Component {
 				<div className="tabMenuWrapper">
 					<antd.Menu
 						className="tabMenu"
-						mode={window.isMobile ? "horizontal" : "vertical"}
+						mode={app.isMobile ? "horizontal" : "vertical"}
 						selectedKeys={[this.state.tabActiveKey]}
 						onClick={(e) => this.handlePageTransition(e.key)}
 					>

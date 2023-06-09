@@ -4,6 +4,8 @@ import * as antd from "antd"
 
 import { createIconRender } from "components/Icons"
 
+import NavMenu from "./components/NavMenu"
+
 import "./index.less"
 
 export const Panel = (props) => {
@@ -16,29 +18,6 @@ export const Panel = (props) => {
         )}
     >
         {props.children}
-    </div>
-}
-
-const NavMenu = (props) => {
-    const handleOnClickItem = (event) => {
-        return props.onClickItem(event.key)
-    }
-
-    return <div className="navmenu_wrapper">
-        {
-            props.header && <div className="card header" id="navMenu">
-                {props.header}
-            </div>
-        }
-
-        <div className="card content" id="navMenu">
-            <antd.Menu
-                mode="inline"
-                selectedKeys={[props.activeKey]}
-                onClick={handleOnClickItem}
-                items={props.items}
-            />
-        </div>
     </div>
 }
 

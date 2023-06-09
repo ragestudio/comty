@@ -18,6 +18,31 @@
 
     transition: all 150ms ease-in-out;
 
+    &.no-frame {
+        width: 100%;
+        height: 100%;
+
+        flex-direction: column;
+
+        .player {
+            background-color: transparent;
+            border-radius: 0;
+
+            box-shadow: none;
+        }
+
+        .top_controls {
+            position: relative;
+            opacity: 1;
+
+            height: @top_controls_height;
+            width: 100%;
+
+            background-color: transparent;
+            box-shadow: none;
+        }
+    }
+
     &.minimized {
         pointer-events: none;
 

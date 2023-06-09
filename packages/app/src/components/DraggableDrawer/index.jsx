@@ -74,7 +74,7 @@ export default class Drawer extends Component {
     ALLOW_DRAWER_TRANSFORM = true
 
     componentDidMount() {
-        this.DESKTOP_MODE = !window.isMobile
+        this.DESKTOP_MODE = !app.isMobile
     }
 
     componentDidUpdate(prevProps, nextState) {

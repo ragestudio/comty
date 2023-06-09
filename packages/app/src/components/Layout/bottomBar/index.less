@@ -1,4 +1,26 @@
 @import "theme/vars.less";
+@import "theme/animations.less";
+
+.player_btn {
+	color: var(--color);
+
+	background-color: var(--average-color);
+
+	padding: 10px 20px;
+
+	border-radius: 8px;
+
+	&.bounce {
+		svg {
+			animation: bounce 1s infinite;
+		}
+	}
+
+	svg {
+		color: var(--color);
+		margin: 0;
+	}
+}
 
 .bottomBar {
 	display: flex;
@@ -23,6 +45,8 @@
 
 	background-color: var(--background-color-accent);
 	border-radius: 12px 12px 0 0;
+
+	box-shadow: @card-shadow;
 
 	.items {
 		display: inline-flex;

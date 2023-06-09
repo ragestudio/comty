@@ -591,7 +591,7 @@ export default () => {
         className={classnames(
             "settings_wrapper",
             {
-                ["mobile"]: window.isMobile,
+                ["mobile"]: app.isMobile,
             }
         )}
     >

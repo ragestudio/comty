@@ -105,7 +105,7 @@ export default (props) => {
 
     return <div
         className={
-            classnames("play", playlist.type)
+            classnames("playlist_view", playlist.type)
         }
     >
         <div className="play_info_wrapper">

@@ -46,7 +46,7 @@ const mobileRoutes = Object.keys(pathsMobile).map((route) => {
 
     return {
         path,
-        element: pathsMobile[path]
+        element: pathsMobile[route]
     }
 })
 
@@ -192,13 +192,11 @@ export const PageRender = React.memo((props) => {
     return <Routes>
         {
             routes.map((route, index) => {
-                let Element = route.element
+                if (app.isMobile) {
+                    const mobileRoute = mobileRoutes.find((r) => r.path === route.path)
 
-                if (window.isMobile) {
-                    const mobileElement = mobileRoutes.find((r) => r.path === route.path)
-
-                    if (mobileElement) {
-                        Element = mobileElement
+                    if (mobileRoute) {
+                        route = mobileRoute
                     }
                 }
 

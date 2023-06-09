@@ -75,7 +75,7 @@ export default (props) => {
 
             <div className="content">
                 <div className="content_header">
-                    <img src={window.isMobile ? config.logo.alt : config.logo.full} className="logo" />
+                    <img src={app.isMobile ? config.logo.alt : config.logo.full} className="logo" />
                 </div>
 
                 {
