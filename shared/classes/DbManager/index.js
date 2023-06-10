@@ -1,7 +1,7 @@
 import mongoose from "mongoose"
 
 function getConnectionConfig(obj) {
-    const { DB_USER, DB_DRIVER, DB_NAME, DB_PWD, DB_HOSTNAME, DB_PORT } = obj
+    const { DB_USER, DB_DRIVER, DB_NAME, DB_PWD, DB_HOSTNAME, DB_PORT, DB_AUTH_SOURCE } = obj
 
     let auth = [
         DB_DRIVER ?? "mongodb",
