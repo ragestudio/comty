@@ -19,6 +19,10 @@ function getConnectionConfig(obj) {
         auth.push("/?authMechanism=DEFAULT")
     }
 
+    if (DB_AUTH_SOURCE && DB_USER) {
+        auth.push(`&authSource=${DB_AUTH_SOURCE}`)
+    }
+
     auth = auth.join("")
 
     return [
