@@ -8,22 +8,16 @@ function getConnectionConfig(obj) {
         "://",
     ]
 
-    if (DB_USER && DB_PWD) {
-        auth.push(`${DB_USER}:${DB_PWD}@`)
-    }
-
     auth.push(DB_HOSTNAME ?? "localhost")
     auth.push(`:${DB_PORT ?? "27017"}`)
-
-    if (DB_USER) {
-        auth.push("/?authMechanism=DEFAULT")
-    }
 
     auth = auth.join("")
 
     const params = {
         auth: {},
         dbName: DB_NAME,
+        user: DB_USER,
+        pass: DB_PWD,
         useNewUrlParser: true,
         useUnifiedTopology: true,
     }
@@ -49,11 +43,7 @@ export default class DBManager {
         const connection = await mongoose.connect(...dbConfig)
             .catch((err) => {
                 console.log(`❌ Failed to connect to DB, retrying...\n`)
-                console.log(error)
-
-                // setTimeout(() => {
-                //     this.initialize()
-                // }, 1000)
+                console.log(err)
 
                 return false
             })
