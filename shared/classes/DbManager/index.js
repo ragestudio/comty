@@ -19,19 +19,22 @@ function getConnectionConfig(obj) {
         auth.push("/?authMechanism=DEFAULT")
     }
 
-    if (DB_AUTH_SOURCE && DB_USER) {
-        auth.push(`&authSource=${DB_AUTH_SOURCE}`)
+    auth = auth.join("")
+
+    const params = {
+        auth: {},
+        dbName: DB_NAME,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
     }
 
-    auth = auth.join("")
+    if (DB_AUTH_SOURCE) {
+        params.auth.authSource = DB_AUTH_SOURCE
+    }
 
     return [
         auth,
-        {
-            dbName: DB_NAME,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        }
+        params,
     ]
 }
 
