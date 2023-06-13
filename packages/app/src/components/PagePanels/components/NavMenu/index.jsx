@@ -34,22 +34,20 @@ const NavMenuMobile = (props) => {
         <div className="card">
             {
                 props.items.map((item) => {
-                    return <div
+                    return <antd.Button
                         key={item.key}
                         className={classnames(
                             "item",
                             item.key === props.activeKey && "active",
                         )}
                         onClick={() => props.onClickItem(item.key)}
+                        type="ghost"
+                        disabled={item.disabled}
                     >
                         <div className="icon">
                             {item.icon}
                         </div>
-
-                        <div className="label">
-                            {item.label}
-                        </div>
-                    </div>
+                    </antd.Button>
                 })
             }
         </div>
