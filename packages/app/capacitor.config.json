@@ -6,7 +6,7 @@
     "webDir": "dist",
     "plugins": {
         "CapacitorUpdater": {
-            "updateUrl": "https://relic.ragestudio.net/comty/update_check"
+            "updateUrl": "https://api.comty.app/auto-update/mobile"
         }
     }
 }
