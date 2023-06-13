@@ -6,6 +6,8 @@
 
     justify-content: center;
 
+    width: 100%;
+
     padding-bottom: 20px;
 
     .settings_menu {
@@ -21,8 +23,8 @@
 
         align-items: center;
 
-        width: 30%;
-        max-width: 300px;
+        width: 250px;
+        min-width: 250px;
 
         padding: 0 30px;
 
@@ -41,8 +43,7 @@
         display: flex;
         flex-direction: column;
 
-        width: 100%;
-        max-width: 700px;
+        width: 700px;
 
         gap: 20px;
 
@@ -62,12 +63,9 @@
             gap: 20px;
 
             .settings_content_group_header {
-                position: absolute;
+                position: relative;
 
                 width: 100%;
-
-                top: 0;
-                left: 0;
 
                 h1,
                 h2,
@@ -78,65 +76,68 @@
                     margin: 0;
                     color: var(--background-color-contrast);
                 }
-
-                //-webkit-box-shadow: @card-shadow;
-                //-moz-box-shadow: @card-shadow;
-                //box-shadow: @card-shadow;      
-
-                padding: 20px;
-
-                border-radius: 12px;
             }
 
-            .settings_content_group_settings {
+            .settings_list {
                 display: flex;
                 flex-direction: column;
 
-                margin-top: 50px;
-
                 gap: 30px;
 
-                .settings_content_group_item {
+                width: 100%;
+
+                .setting_item {
                     display: flex;
                     flex-direction: column;
 
+                    width: 100%;
+
                     padding: 0 20px;
 
-                    .settings_content_group_item_header {
+                    .setting_item_header {
                         display: inline-flex;
                         flex-direction: row;
+
                         align-items: center;
                         justify-content: space-between;
 
                         width: 100%;
 
-                        .settings_content_group_item_header_title {
+                        .setting_item_info {
                             display: flex;
-                            align-items: center;
-                            color: var(--background-color-contrast);
+                            flex-direction: column;
 
-                            h1,
-                            h2,
-                            h3,
-                            h4,
-                            h5,
-                            h6 {
-                                margin: 0;
+                            width: 100%;
+
+                            .setting_item_header_title {
+                                display: flex;
+                                flex-direction: row;
+
+                                align-items: center;
+                                justify-content: space-between;
+
+                                width: 100%;
+
                                 color: var(--background-color-contrast);
+
+                                h1 {
+                                    font-size: 1rem;
+                                    margin: 0;
+                                    color: var(--background-color-contrast);
+                                }
                             }
 
-                            p {
-                                font-size: 11px;
-                                color: var(--background-color-contrast);
-                                margin: 0;
+                            .setting_item_header_description {
+                                p {
+                                    color: var(--background-color-contrast);
+                                    font-size: 0.7rem;
+                                    margin: 0;
+                                }
                             }
 
-                            >div {
-                                margin-right: 10px;
-                            }
                         }
 
-                        .settings_content_group_item_header_actions {
+                        .setting_item_header_actions {
                             display: inline-flex;
                             align-items: center;
 
@@ -155,16 +156,28 @@
                         }
                     }
 
-                    .settings_content_group_item_component {
+                    .setting_item_content {
                         display: flex;
                         flex-direction: column;
 
                         --ignore-dragger: true;
                         padding: 6px 20px;
 
+                        width: 100%;
+
                         span {
                             color: var(--background-color-contrast);
                         }
+
+                        button {
+                            width: min-content;
+                        }
+
+                        .ant-btn.ant-btn-icon-only {
+                            width: 32px;
+                        }
+
+                        .ant-select {}
                     }
                 }
             }

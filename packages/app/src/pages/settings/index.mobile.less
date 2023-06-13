@@ -1,0 +1,156 @@
+@top_nav_height: 52px;
+
+.__mobile__settings {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-color);
+
+    gap: 30px;
+
+    .__mobile__settings_header {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 200;
+
+        width: 100%;
+        height: @top_nav_height;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        gap: 20px;
+
+        padding: 5px 20px;
+
+        border-radius: 12px;
+
+        border-bottom: 1px solid var(--border-color);
+        background-color: var(--background-color-accent);
+
+        h1 {
+            margin: 0;
+            view-transition-name: main-header-text;
+            width: fit-content;
+        }
+
+        svg {
+            color: var(--colorPrimary);
+        }
+
+        .ant-btn {
+            font-size: 2rem;
+
+            svg {
+                color: var(--text-color);
+            }
+        }
+    }
+
+    .settings_list {
+        view-transition-name: settings-list;
+
+        display: flex;
+        flex-direction: column;
+
+        color: var(--text-color);
+
+        gap: 20px;
+
+        .settings_list_group {
+            display: flex;
+            flex-direction: column;
+
+            span {
+                font-size: 0.8rem;
+                font-weight: 600;
+
+                margin: 0;
+            }
+
+            .settings_list_group_items {
+                display: flex;
+                flex-direction: column;
+
+                height: 100%;
+
+                gap: 10px;
+
+                padding: 10px 15px;
+
+                .ant-btn {
+                    align-items: center;
+                    justify-content: flex-start;
+
+                    width: 100%;
+
+                    gap: 10vw;
+
+                    padding: 30px 20px;
+
+                    svg {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
+        }
+
+        .settings_list_render {
+            display: flex;
+            flex-direction: column;
+
+            overflow-x: hidden;
+
+            gap: 20px;
+
+            .setting_item {
+                display: flex;
+                flex-direction: column;
+
+                gap: 10px;
+
+                .setting_item_header {
+                    display: flex;
+                    flex-direction: column;
+
+                    gap: 5px;
+
+                    .setting_item_info {
+                        display: flex;
+                        flex-direction: column;
+
+                        gap: 5px;
+
+                        .setting_item_header_title {
+                            display: flex;
+                            flex-direction: row;
+
+                            align-items: center;
+                            justify-content: space-between;
+
+                            h1 {
+                                font-size: 1rem;
+                                margin: 0;
+                            }
+                        }
+
+                        .setting_item_header_description {
+                            display: flex;
+                            flex-direction: column;
+
+                            p {
+                                margin: 0;
+                            }
+                        }
+                    }
+                }
+
+                .setting_item_content {
+                    width: 100%;
+                    padding: 5px 20px;
+                }
+            }
+        }
+    }
+}
