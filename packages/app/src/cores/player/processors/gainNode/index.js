@@ -7,11 +7,35 @@ export default class GainProcessorNode extends ProcessorNode {
     static lock = true
 
     static defaultValues = {
-        volume: 0.3,
+        gain: 1,
     }
 
     state = {
-        volume: AudioPlayerStorage.get("volume") ?? GainProcessorNode.defaultValues,
+        gain: AudioPlayerStorage.get("gain") ?? GainProcessorNode.defaultValues.gain,
+    }
+
+    exposeToPublic = {
+        modifyValues: function (values) {
+            this.state = {
+                ...this.state,
+                ...values,
+            }
+
+            AudioPlayerStorage.set("gain", this.state.gain)
+
+            this.applyValues()
+        }.bind(this),
+        resetDefaultValues: function () {
+            this.exposeToPublic.modifyValues(GainProcessorNode.defaultValues)
+
+            return this.state
+        }.bind(this),
+        values: () => this.state,
+    }
+
+    applyValues() {
+        // apply to current instance
+        this.processor.gain.value = app.cores.player.volume() * this.state.gain
     }
 
     async init() {
@@ -21,8 +45,7 @@ export default class GainProcessorNode extends ProcessorNode {
 
         this.processor = this.audioContext.createGain()
 
-        // set the default values
-        this.processor.gain.value = parseFloat(this.state.volume)
+        this.applyValues()
     }
 
     mutateInstance(instance) {
