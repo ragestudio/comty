@@ -44,6 +44,8 @@
         "@mui/material": "^5.11.9",
         "@paciolan/remote-component": "^2.13.0",
         "@tsmx/human-readable": "^1.0.7",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
         "antd": "^5.2.1",
         "antd-mobile": "^5.0.0-rc.17",
         "axios": "^1.4.0",
