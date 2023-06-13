@@ -25,6 +25,11 @@ export default class ContextMenuCore extends Core {
     })
 
     async onInitialize() {
+        if (app.isMobile) {
+            console.warn("Context menu is not available on mobile")
+            return false
+        }
+
         document.addEventListener("contextmenu", this.handleEvent.bind(this))
     }
 
