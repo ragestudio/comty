@@ -1,3 +1,5 @@
+@import "theme/vars.less";
+
 .navmenu_wrapper {
     position: relative;
 }
@@ -5,7 +7,7 @@
 .__mobile__navmenu_wrapper {
     box-sizing: border-box;
 
-    position: sticky;
+    position: relative;
 
     top: 0;
     left: 0;
@@ -13,9 +15,50 @@
     width: 100%;
 
     .card {
+        width: 100%;
+        height: @app_topBar_height;
+
         display: flex;
         flex-direction: row;
 
+        justify-content: space-evenly;
+
+        box-shadow: @card-shadow;
+
         gap: 10px;
+        padding: 5px;
+        border-radius: 12px;
+
+        isolation: unset;
+        overflow: visible;
+
+        .item {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+
+            height: fit-content;
+
+            gap: 4px;
+
+            padding: 8px 10px;
+
+            &.active {
+                color: var(--colorPrimary);
+            }
+
+            .icon {
+                margin: 0;
+                line-height: 1rem;
+                font-size: 1.5rem;
+            }
+
+            .label {
+                height: fit-content;
+                line-height: 1rem;
+                font-size: 0.8rem;
+            }
+        }
     }
 }
