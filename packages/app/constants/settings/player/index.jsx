@@ -92,6 +92,33 @@ export default {
                 "player.compressor": true
             },
             storaged: false,
+        },
+        {
+            id: "player.gain",
+            title: "Gain",
+            icon: "MdGraphicEq",
+            group: "general",
+            description: "Adjust gain for audio output",
+            component: "Slider",
+            props: {
+                min: 1,
+                max: 2,
+                step: 0.1,
+                marks: {
+                    1: "Off",
+                    1.5: "50%",
+                    2: "100%"
+                }
+            },
+            defaultValue: () => {
+                return app.cores.player.gain.values().gain
+            },
+            onUpdate: (value) => {
+                app.cores.player.gain.modifyValues({
+                    gain: value
+                })
+            },
+            storaged: false,
         }
     ]
 }
