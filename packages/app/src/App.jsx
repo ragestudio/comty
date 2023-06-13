@@ -339,6 +339,15 @@ class ComtyApp extends React.Component {
 			app.eventBus.emit("layout.forceUpdate")
 			app.eventBus.emit("router.forceUpdate")
 		},
+		"app.logout_request": () => {
+			antd.Modal.confirm({
+				title: "Logout",
+				content: "Are you sure you want to logout?",
+				onOk: () => {
+					AuthModel.logout()
+				},
+			})
+		},
 		"app.no_session": async () => {
 			const location = window.location.pathname
 
@@ -452,7 +461,7 @@ class ComtyApp extends React.Component {
 				app.eventBus.emit("statusTap")
 			})
 
-			StatusBar.setOverlaysWebView({ overlay: true })
+			StatusBar.setOverlaysWebView({ overlay: false })
 
 			CapacitorApp.addListener("backButton", ({ canGoBack }) => {
 				if (!canGoBack) {
