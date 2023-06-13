@@ -313,7 +313,9 @@ export default class StreamViewer extends React.Component {
             to = !this.state.cinemaMode
         }
 
-        app.SidebarController.toggleVisibility(!to)
+        if (app.SidebarController) {
+            app.SidebarController.toggleVisibility(!to)
+        }
 
         this.setState({ cinemaMode: to })
     }

@@ -112,6 +112,11 @@ export default class Layout extends React.PureComponent {
 		toogleCenteredContent: (to) => {
 			const root = document.getElementById("root")
 
+			if (app.isMobile) {
+				console.warn("Skipping centered content on mobile")
+				return false
+			}
+
 			if (!root) {
 				console.error("root not found")
 				return false

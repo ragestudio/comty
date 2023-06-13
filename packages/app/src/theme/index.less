@@ -8,6 +8,7 @@
 *:before,
 *:after {
 	box-sizing: inherit;
+	//font-size: calc(1rem * var(--fontScale));
 }
 
 html {
@@ -123,6 +124,8 @@ html {
 		height: 100%;
 
 		background-color: var(--layoutBackgroundColor) !important;
+
+		font-size: calc(16px * var(--fontScale));
 
 		&.electron {
 			.page_layout {

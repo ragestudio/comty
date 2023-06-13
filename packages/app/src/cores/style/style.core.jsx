@@ -6,7 +6,6 @@ import Core from "evite/src/core"
 import config from "config"
 import store from "store"
 import { ConfigProvider, theme } from "antd"
-import RemoteSVGToComponent from "components/RemoteSVGToComponent"
 
 const variantToAlgorithm = {
 	light: theme.defaultAlgorithm,
@@ -57,6 +56,9 @@ export class ThemeProvider extends React.Component {
 				},
 				algorithm: themeAlgorithms,
 			}}
+			componentSize={
+				app.isMobile ? "large" : "middle"
+			}
 		>
 			{this.props.children}
 		</ConfigProvider>
@@ -142,6 +144,13 @@ export default class StyleCore extends Core {
 
 			this.applyVariant(StyleCore.variant)
 		})
+
+		// if mobile set fontScale to 1
+		if (app.isMobile) {
+			this.update({
+				fontScale: 1
+			})
+		}
 	}
 
 	onEvents = {
