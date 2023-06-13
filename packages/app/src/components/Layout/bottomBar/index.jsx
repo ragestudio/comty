@@ -83,6 +83,75 @@ const AccountButton = (props) => {
     </div>
 }
 
+
+const QuickNavMenuItems = [
+    {
+        id: "music",
+        icon: "MdAlbum",
+        label: "Music",
+        location: "/music"
+    },
+    {
+        id: "tv",
+        icon: "Tv",
+        label: "Tv",
+        location: "/tv"
+    },
+    {
+        id: "groups",
+        icon: "MdGroups",
+        label: "Groups",
+        location: "/groups",
+        disabled: true,
+    },
+    {
+        id: "marketplace",
+        icon: "Box",
+        label: "Marketplace",
+        location: "/marketplace",
+        disabled: true
+    },
+]
+
+const QuickNavMenu = ({
+    visible,
+}) => {
+    return <div
+        className={classnames(
+            "quick-nav",
+            {
+                ["active"]: visible
+            }
+        )}
+    >
+        {
+            QuickNavMenuItems.map((item, index) => {
+                return <div
+                    key={index}
+                    className={classnames(
+                        "quick-nav_item",
+                        {
+                            ["disabled"]: item.disabled
+                        }
+                    )}
+                    quicknav-item={item.id}
+                    disabled={item.disabled}
+                >
+                    {
+                        createIconRender(item.icon)
+                    }
+                    <h1>
+
+                        {
+                            item.label
+                        }
+                    </h1>
+                </div>
+            })
+        }
+    </div>
+}
+
 export default (props) => {
     return <WithPlayerContext>
         <BottomBar
@@ -99,6 +168,7 @@ export class BottomBar extends React.Component {
         show: true,
         visible: true,
         render: null,
+        quickNavVisible: false
     }
 
     busEvents = {
@@ -162,6 +232,95 @@ export class BottomBar extends React.Component {
         }
     }
 
+    handleNavTouchStart = (e) => {
+        this._navTouchStart = setTimeout(() => {
+            this.setState({ quickNavVisible: true })
+
+            app.cores.haptics.vibrate(80)
+
+            // remove the timeout
+            this._navTouchStart = null
+        }, 400)
+    }
+
+    handleNavTouchEnd = (event) => {
+        if (this._lastHovered) {
+            this._lastHovered.classList.remove("hover")
+        }
+
+        if (this._navTouchStart) {
+            clearTimeout(this._navTouchStart)
+
+            this._navTouchStart = null
+
+            return false
+        }
+
+        this.setState({ quickNavVisible: false })
+
+        // get cords of the touch
+        const x = event.changedTouches[0].clientX
+        const y = event.changedTouches[0].clientY
+
+        // get the element at the touch
+        const element = document.elementFromPoint(x, y)
+
+        // get the closest element with the attribute
+        const closest = element.closest(".quick-nav_item")
+
+        if (!closest) {
+            return false
+        }
+
+        const item = QuickNavMenuItems.find((item) => {
+            return item.id === closest.getAttribute("quicknav-item")
+        })
+
+        if (!item) {
+            return false
+        }
+
+        if (item.location) {
+            app.setLocation(item.location)
+
+            app.cores.haptics.vibrate([40, 80])
+        }
+    }
+
+    handleNavTouchMove = (event) => {
+        // check if the touch is hovering a quicknav item
+        const x = event.changedTouches[0].clientX
+        const y = event.changedTouches[0].clientY
+
+        // get the element at the touch
+        const element = document.elementFromPoint(x, y)
+
+        // get the closest element with the attribute
+        const closest = element.closest("[quicknav-item]")
+
+        if (!closest) {
+            if (this._lastHovered) {
+                this._lastHovered.classList.remove("hover")
+            }
+
+            this._lastHovered = null
+
+            return false
+        }
+
+        if (this._lastHovered !== closest) {
+            if (this._lastHovered) {
+                this._lastHovered.classList.remove("hover")
+            }
+
+            this._lastHovered = closest
+
+            closest.classList.add("hover")
+
+            app.cores.haptics.vibrate(40)
+        }
+    }
+
     render() {
         if (this.state.render) {
             return <div className="bottomBar">
@@ -173,63 +332,75 @@ export class BottomBar extends React.Component {
             return null
         }
 
-        return <Motion style={{ y: spring(this.state.show ? 0 : 300) }}>
-            {({ y }) => <div
-                className="bottomBar"
-                style={{
-                    WebkitTransform: `translate3d(0, ${y}px, 0)`,
-                    transform: `translate3d(0, ${y}px, 0)`,
-                }}
-            >
-                <div className="items">
-                    <div
-                        key="creator"
-                        id="creator"
-                        className={classnames("item", "primary")}
-                        onClick={() => app.setLocation("/")}
-                    >
-                        <div className="icon">
-                            {createIconRender("PlusCircle")}
-                        </div>
-                    </div>
+        return <>
+            <QuickNavMenu
+                visible={this.state.quickNavVisible}
+            />
 
-                    {
-                        this.context.currentManifest && <div
-                            className="item"
+            <Motion style={{ y: spring(this.state.show ? 0 : 300) }}>
+                {({ y }) => <div
+                    className="bottomBar"
+                    style={{
+                        WebkitTransform: `translate3d(0, ${y}px, 0)`,
+                        transform: `translate3d(0, ${y}px, 0)`,
+                    }}
+                >
+                    <div className="items">
+                        <div
+                            key="creator"
+                            id="creator"
+                            className={classnames("item", "primary")}
+                            onClick={() => app.setLocation("/")}
                         >
-                            <PlayerButton
-                                manifest={this.context.currentManifest}
-                                playback={this.context.playbackStatus}
-                                colorAnalysis={this.context.coverColorAnalysis}
-                            />
+                            <div className="icon">
+                                {createIconRender("PlusCircle")}
+                            </div>
                         </div>
-                    }
 
-                    <div
-                        key="navigator"
-                        id="navigator"
-                        className="item"
-                        onClick={() => app.setLocation("/")}
-                    >
-                        <div className="icon">
-                            {createIconRender("Home")}
+                        {
+                            this.context.currentManifest && <div
+                                className="item"
+                            >
+                                <PlayerButton
+                                    manifest={this.context.currentManifest}
+                                    playback={this.context.playbackStatus}
+                                    colorAnalysis={this.context.coverColorAnalysis}
+                                />
+                            </div>
+                        }
+
+                        <div
+                            key="navigator"
+                            id="navigator"
+                            className="item"
+                            onClick={() => app.setLocation("/")}
+                            onTouchMove={this.handleNavTouchMove}
+                            onTouchStart={this.handleNavTouchStart}
+                            onTouchEnd={this.handleNavTouchEnd}
+                            onTouchCancel={() => {
+                                this.setState({ quickNavVisible: false })
+                            }}
+                        >
+                            <div className="icon">
+                                {createIconRender("Home")}
+                            </div>
                         </div>
+
+                        <div
+                            key="searcher"
+                            id="searcher"
+                            className="item"
+                            onClick={app.controls.openSearcher}
+                        >
+                            <div className="icon">
+                                {createIconRender("Search")}
+                            </div>
+                        </div>
+
+                        <AccountButton />
                     </div>
-
-                    <div
-                        key="searcher"
-                        id="searcher"
-                        className="item"
-                        onClick={app.controls.openSearcher}
-                    >
-                        <div className="icon">
-                            {createIconRender("Search")}
-                        </div>
-                    </div>
-
-                    <AccountButton />
-                </div>
-            </div>}
-        </Motion>
+                </div>}
+            </Motion>
+        </>
     }
 }

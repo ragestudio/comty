@@ -12,8 +12,6 @@
 			width: 100%;
 
 			overflow-y: scroll;
-
-			//padding-top: 20px;
 		}
 
 		.content_layout {
@@ -26,8 +24,68 @@
 
 			width: 100%;
 			padding: 7px;
+			padding-bottom: 0px;
 
 			box-sizing: border-box;
+		}
+
+		.pagePanels {
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+			justify-content: flex-start;
+
+			overflow-x: visible;
+
+			width: 100%;
+			height: 100%;
+
+			.panel {
+				width: 100%;
+				//height: 100%;
+
+				&.left {
+					z-index: 310;
+
+					top: 0;
+					left: 0;
+
+					overflow: visible;
+					overflow-x: visible;
+				}
+
+				&.center {
+					z-index: 300;
+
+					overflow: visible;
+					overflow-x: visible;
+
+					height: calc(100vh - @app_bottomBar_height - @app_topBar_height);
+
+					-webkit-mask-image: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 10px, rgb(0, 0, 0) calc(100% - 10px), rgba(0, 0, 0, 0) 100%);
+					mask-image: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgb(0, 0, 0) 10px, rgb(0, 0, 0) calc(100% - 10px), rgba(0, 0, 0, 0) 100%);
+				}
+			}
+
+			.card {
+				width: 100%;
+				height: 100%;
+
+				display: flex;
+				flex-direction: row;
+
+				padding: 5px;
+
+				justify-content: space-evenly;
+
+				box-shadow: @card-shadow;
+
+				border-radius: 12px;
+
+				isolation: unset;
+				overflow: visible;
+			}
 		}
 
 		.playlist_view {
@@ -52,95 +110,6 @@
 			}
 		}
 
-		.pagePanels {
-			display: flex;
-			flex-direction: column;
-
-			align-items: center;
-			justify-content: center;
-
-			overflow-x: visible;
-
-			width: 100%;
-			height: 100%;
-
-			.panel {
-				width: 100%;
-				//height: 100%;
-
-				&.left {
-					z-index: 500;
-					overflow: visible;
-					overflow-x: visible;
-				}
-
-				&.right {
-					z-index: 400;
-
-					overflow-x: visible;
-				}
-			}
-
-			.card {
-				width: 100%;
-				height: 100%;
-
-				display: flex;
-				flex-direction: row;
-
-				padding: 5px;
-
-				justify-content: space-between;
-
-				box-shadow: @card-shadow;
-
-				border-radius: 12px;
-
-				isolation: unset;
-				overflow: visible;
-
-				.item {
-					display: flex;
-					flex-direction: column;
-
-					justify-content: center;
-					align-items: center;
-
-					padding: 5px 10px;
-
-					border-radius: 8px;
-					
-					color: var(--text-color);
-
-					.icon {
-						svg {
-							margin: 0 !important;
-							font-size: 1rem;
-						}
-					}
-
-					.label {
-						font-size: 0.6rem;
-
-					}
-
-					&.active {
-						.icon {
-							svg {
-								color: var(--colorPrimary);
-							}
-						}
-
-						.label {
-							color: var(--colorPrimary);
-						}
-
-						background-color: var(--background-color-primary);
-					}
-				}
-			}
-		}
-
 		.post-list_wrapper {
 			.post-list {
 				padding-top: 10px;
@@ -162,6 +131,27 @@
 				.postCard {
 					width: 100%;
 				}
+			}
+		}
+
+		.livestream {
+			flex-direction: column;
+			height: 100%;
+		}
+
+		.livestream_panel {
+			position: absolute;
+			bottom: 0;
+			height: 20%;
+		}
+
+		.livestream_player {
+			height: 100%;
+			width: 100%;
+
+			.plyr {
+				width: 100%;
+				height: 100%;
 			}
 		}
 	}

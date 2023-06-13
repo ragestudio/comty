@@ -73,7 +73,7 @@ export default class SoundCore extends Core {
     async injectUseUIAudio() {
         const injectOnButtons = (event) => {
             // search for closest button
-            const button = event.target.closest("button")
+            const button = event.target.closest("button") || event.target.closest(".ant-btn")
 
             // if button exist and has aria-checked attribute then play switch_on or switch_off
             if (button) {
@@ -82,7 +82,7 @@ export default class SoundCore extends Core {
                 }
 
                 if (app.cores.settings.get("haptic_feedback")) {
-                    Haptics.impact({ style: ImpactStyle.Medium })
+                    Haptics.impact({ style: ImpactStyle.Light })
                 }
 
                 return this.public.useUIAudio("generic_click")
