@@ -21,6 +21,7 @@ export default {
             group: "layout",
             emitEvent: "app.softReload",
             storaged: true,
+            mobile: false,
         },
         {
             id: "style.reduceAnimations",
