@@ -8,7 +8,7 @@
     "longPressDelay": 600,
     "autoCollapseDelay": 500,
     "autoCollapseDelayEnabled": true,
-    "haptic_feedback": false,
+    "haptic_feedback": true,
     "collapseOnLooseFocus": true,
     "style.auto_darkMode": true,
     "feed_max_fetch": 20,

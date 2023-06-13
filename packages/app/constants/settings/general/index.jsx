@@ -1,6 +1,4 @@
-import React from "react"
 import config from "config"
-import { Select } from "antd"
 
 export default {
     id: "general",
@@ -10,38 +8,42 @@ export default {
     order: 0,
     settings: [
         {
-            "id": "language",
-            "storaged": true,
-            "group": "general",
-            "component": "Select",
-            "icon": "MdTranslate",
-            "title": "Language",
-            "description": "Choose a language for the application",
-            "props": {
-                children: config.i18n.languages.map((language) => {
-                    return <Select.Option value={language.locale}>{language.name}</Select.Option>
+            id: "language",
+            storaged: true,
+            group: "general",
+            component: "Select",
+            icon: "MdTranslate",
+            title: "Language",
+            description: "Choose a language for the application",
+            props: {
+                options: config.i18n.languages.map((language) => {
+                    return {
+                        label: language.name,
+                        value: language.locale
+                    }
                 })
             },
-            "emitEvent": "changeLanguage"
+            emitEvent: "changeLanguage"
         },
         {
-            "id": "haptic_feedback",
-            "storaged": true,
-            "group": "general",
-            "component": "Switch",
-            "icon": "MdVibration",
-            "title": "Haptic Feedback",
-            "description": "Enable haptic feedback on touch events.",
+            id: "haptic_feedback",
+            storaged: true,
+            group: "general",
+            component: "Switch",
+            icon: "MdVibration",
+            title: "Haptic Feedback",
+            description: "Enable haptic feedback on touch events.",
+            desktop: false
         },
         {
-            "id": "longPressDelay",
-            "storaged": true,
-            "group": "general",
-            "component": "Slider",
-            "icon": "MdTimer",
-            "title": "Long press delay",
-            "description": "Set the delay before long press trigger is activated.",
-            "props": {
+            id: "longPressDelay",
+            storaged: true,
+            group: "general",
+            component: "Slider",
+            icon: "MdTimer",
+            title: "Long press delay",
+            description: "Set the delay before long press trigger is activated.",
+            props: {
                 min: 300,
                 max: 2000,
                 step: 100,
@@ -55,24 +57,29 @@ export default {
             }
         },
         {
-            "id": "clear_internal_storage",
-            "storaged": false,
-            "group": "general",
-            "component": "Button",
-            "icon": "MdDelete",
-            "title": "Clear internal storage",
-            "description": "Clear all the data stored in the internal storage, including your current session. It will not affect the data stored in the cloud.",
-            "emitEvent": "app.clearInternalStorage"
+            id: "clear_internal_storage",
+            storaged: false,
+            group: "general",
+            component: "Button",
+            icon: "MdDelete",
+            title: "Clear internal storage",
+            description: "Clear all the data stored in the internal storage, including your current session. It will not affect the data stored in the cloud.",
+            emitEvent: "app.clearInternalStorage",
+            props: {
+                danger: true,
+                children: "Clear"
+            },
         },
         {
-            "id": "low_performance_mode",
-            "storaged": true,
-            "group": "general",
-            "component": "Switch",
-            "icon": "MdSlowMotionVideo",
-            "title": "Low performance mode",
-            "description": "Enable low performance mode to reduce the memory usage and improve the performance in low-end devices. This will disable some animations and other decorative features.",
-            "emitEvent": "app.lowPerformanceMode",
+            id: "low_performance_mode",
+            storaged: true,
+            group: "general",
+            component: "Switch",
+            icon: "MdSlowMotionVideo",
+            title: "Low performance mode",
+            description: "Enable low performance mode to reduce the memory usage and improve the performance in low-end devices. This will disable some animations and other decorative features.",
+            emitEvent: "app.lowPerformanceMode",
+            experimental: true,
             disabled: true,
         },
         {
@@ -83,6 +90,7 @@ export default {
             icon: "MdVolumeUp",
             title: "UI effects",
             description: "Enable the UI effects.",
+            mobile: false,
         },
         {
             id: "ui.general_volume",
@@ -100,64 +108,68 @@ export default {
                 max: 100,
                 step: 10,
             },
-            emitEvent: "change:app.general_ui_volume"
+            emitEvent: "change:app.general_ui_volume",
+            mobile: false,
         },
         {
-            "id": "notifications_sound",
-            "storaged": true,
-            "group": "notifications",
-            "component": "Switch",
-            "icon": "MdVolumeUp",
-            "title": "Notifications Sound",
-            "description": "Play a sound when a notification is received.",
+            id: "notifications_sound",
+            storaged: true,
+            group: "notifications",
+            component: "Switch",
+            icon: "MdVolumeUp",
+            title: "Notifications Sound",
+            description: "Play a sound when a notification is received.",
         },
         {
-            "id": "notifications_vibrate",
-            "storaged": true,
-            "group": "notifications",
-            "component": "Switch",
-            "icon": "MdVibration",
-            "title": "Vibration",
-            "description": "Vibrate the device when a notification is received.",
-            "emitEvent": "changeNotificationsVibrate"
+            id: "notifications_vibrate",
+            storaged: true,
+            group: "notifications",
+            component: "Switch",
+            icon: "MdVibration",
+            title: "Vibration",
+            description: "Vibrate the device when a notification is received.",
+            emitEvent: "changeNotificationsVibrate",
+            desktop: false,
         },
         {
-            "id": "notifications_sound_volume",
-            "storaged": true,
-            "group": "notifications",
-            "component": "Slider",
-            "icon": "MdVolumeUp",
-            "title": "Sound Volume",
-            "description": "Set the volume of the sound when a notification is received.",
-            "props": {
+            id: "notifications_sound_volume",
+            storaged: true,
+            group: "notifications",
+            component: "Slider",
+            icon: "MdVolumeUp",
+            title: "Sound Volume",
+            description: "Set the volume of the sound when a notification is received.",
+            props: {
                 tipFormatter: (value) => {
                     return `${value}%`
                 }
             },
-            "emitEvent": "changeNotificationsSoundVolume"
+            emitEvent: "changeNotificationsSoundVolume",
+            mobile: false,
         },
         {
-            "id": "collapseOnLooseFocus",
-            "storaged": true,
-            "group": "sidebar",
-            "component": "Switch",
-            "icon": "Columns",
-            "title": "Auto Collapse",
-            "description": "Collapse the sidebar when loose focus",
-            "emitEvent": "settingChanged.sidebar_collapse",
+            id: "collapseOnLooseFocus",
+            storaged: true,
+            group: "sidebar",
+            component: "Switch",
+            icon: "Columns",
+            title: "Auto Collapse",
+            description: "Collapse the sidebar when loose focus",
+            emitEvent: "settingChanged.sidebar_collapse",
+            mobile: false,
         },
         {
-            "id": "autoCollapseDelay",
-            "storaged": true,
-            "group": "sidebar",
-            "component": "Slider",
-            "icon": "MdTimer",
-            "dependsOn": {
+            id: "autoCollapseDelay",
+            storaged: true,
+            group: "sidebar",
+            component: "Slider",
+            icon: "MdTimer",
+            dependsOn: {
                 "collapseOnLooseFocus": true
             },
-            "title": "Auto Collapse timeout",
-            "description": "Set the delay before the sidebar is collapsed",
-            "props": {
+            title: "Auto Collapse timeout",
+            description: "Set the delay before the sidebar is collapsed",
+            props: {
                 min: 0,
                 max: 2000,
                 step: 100,
@@ -168,41 +180,21 @@ export default {
                     1500: "1.5s",
                     2000: "2s",
                 }
-            }
+            },
+            mobile: false,
         },
         {
-            "id": "feed_max_fetch",
-            "title": "Fetch max items",
-            "description": "Set the maximum number of items to load per fetch in the feed list",
-            "component": "Slider",
-            "icon": "MdFormatListNumbered",
-            "group": "posts",
-            "props": {
+            id: "feed_max_fetch",
+            title: "Fetch max items",
+            description: "Set the maximum number of items to load per fetch in the feed list",
+            component: "Slider",
+            icon: "MdFormatListNumbered",
+            group: "posts",
+            props: {
                 min: 5,
                 max: 50,
             },
-            "storaged": true,
-        },
-        {
-            "id": "postCard_carrusel_auto",
-            "title": "Post autoplay",
-            "description": "Automatically play the post medias when the post has multiple medias",
-            "component": "Switch",
-            "icon": "MdPhotoCameraBack",
-            "group": "posts",
-            "storaged": true,
-            "emitEvent": "router.forceUpdate",
-            "disabled": true
-        },
-        {
-            "id": "postCard_expansible_actions",
-            "title": "Expansible actions",
-            "description": "Automatically show or hide the actions bar",
-            "component": "Switch",
-            "icon": "MdCallToAction",
-            "group": "posts",
-            "storaged": true,
-            "emitEvent": "router.forceUpdate"
+            storaged: true,
         },
     ]
 }

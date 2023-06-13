@@ -34,17 +34,6 @@ export default {
             "icon": "Monitor",
             "component": loadable(() => import("../components/sessions")),
             "storaged": false
-        },
-        {
-            "id": "logout",
-            "group": "security.other",
-            "component": "Button",
-            "icon": "LogOut",
-            "title": "Logout",
-            "description": "Logout from your account",
-            onUpdate: async () => {
-                await AuthModel.logout()
-            }
         }
     ]
 }

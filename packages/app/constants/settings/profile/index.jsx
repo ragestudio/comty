@@ -51,7 +51,7 @@ export default {
                 })
 
                 if (result) {
-                    return result
+                    return value
                 }
             },
             extraActions: [
@@ -89,7 +89,7 @@ export default {
                 })
 
                 if (result) {
-                    return result
+                    return value
                 }
             },
             "debounced": true,
@@ -105,6 +105,7 @@ export default {
                 UploadButton
             ],
             "defaultValue": (ctx) => {
+                console.log(ctx)
                 return ctx.userData.avatar
             },
             "onUpdate": async (value) => {
@@ -114,7 +115,7 @@ export default {
 
                 if (result) {
                     app.message.success("Avatar updated")
-                    return result
+                    return value
                 }
             },
             "debounced": true,
@@ -139,7 +140,7 @@ export default {
 
                 if (result) {
                     app.message.success("Cover updated")
-                    return result
+                    return value
                 }
             },
             "debounced": true,
@@ -166,7 +167,7 @@ export default {
                 })
 
                 if (result) {
-                    return result
+                    return value
                 }
             },
             "debounced": true,
