@@ -22,7 +22,9 @@ export default (props) => {
 
     React.useEffect(() => {
         if (app.userData) {
-            return app.navigation.goMain()
+            app.navigation.goMain()
+
+            return false
         }
 
         setRandomWallpaper()
@@ -30,6 +32,8 @@ export default (props) => {
         app.controls.openLoginForm({
             defaultLocked: true,
         })
+
+        return true
     }, [])
 
     return <div className="loginPage">
