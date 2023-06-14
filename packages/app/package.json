@@ -1,6 +1,6 @@
 {
     "name": "@comty/web-app",
-    "version": "0.48.1",
+    "version": "0.48.2",
     "license": "LGPL-2.1",
     "main": "electron/main",
     "author": "RageStudio",
