@@ -6,7 +6,8 @@
     "webDir": "dist",
     "plugins": {
         "CapacitorUpdater": {
-            "updateUrl": "https://api.comty.app/auto-update/mobile"
+            "updateUrl": "https://api.comty.app/auto-update/mobile",
+            "resetWhenUpdate": true
         }
     }
 }
