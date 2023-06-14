@@ -60,11 +60,14 @@ import { Helmet } from "react-helmet"
 import * as antd from "antd"
 import { Toast } from "antd-mobile"
 import { BrowserRouter } from "react-router-dom"
-import { StatusBar, Style } from "@capacitor/status-bar"
-import { App as CapacitorApp } from "@capacitor/app"
 import { Translation } from "react-i18next"
 import { Lightbox } from "react-modal-image"
 import loadable from "@loadable/component"
+
+import { StatusBar, Style } from "@capacitor/status-bar"
+import { App as CapacitorApp } from "@capacitor/app"
+import { SplashScreen } from "@capacitor/splash-screen"
+import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
 import SessionModel from "models/session"
 import UserModel from "models/user"
@@ -115,6 +118,12 @@ class ComtyApp extends React.Component {
 	static splashAwaitEvent = "app.initialization.finish"
 
 	static async initialize() {
+		CapacitorUpdater.notifyAppReady()
+
+		SplashScreen.show({
+			autoHide: false,
+		})
+
 		window.app.version = config.package.version
 
 		window.localStorage.setItem("last_version", window.app.version)
@@ -483,6 +492,8 @@ class ComtyApp extends React.Component {
 		this.setState({ initialized: true })
 
 		Utils.handleOpenDevTools()
+
+		SplashScreen.hide()
 	}
 
 	onRuntimeStateUpdate = (state) => {
