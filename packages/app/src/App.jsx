@@ -98,6 +98,8 @@ import * as Router from "./router"
 
 import "theme/index.less"
 
+CapacitorUpdater.notifyAppReady()
+
 class ComtyApp extends React.Component {
 	constructor(props) {
 		super(props)
@@ -118,8 +120,6 @@ class ComtyApp extends React.Component {
 	static splashAwaitEvent = "app.initialization.finish"
 
 	static async initialize() {
-		CapacitorUpdater.notifyAppReady()
-
 		SplashScreen.show({
 			autoHide: false,
 		})
