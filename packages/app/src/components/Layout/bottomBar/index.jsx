@@ -236,7 +236,9 @@ export class BottomBar extends React.Component {
         this._navTouchStart = setTimeout(() => {
             this.setState({ quickNavVisible: true })
 
-            app.cores.haptics.vibrate(80)
+            if (app.cores.haptics?.vibrate) {
+                app.cores.haptics.vibrate(80)
+            }
 
             // remove the timeout
             this._navTouchStart = null
@@ -283,7 +285,9 @@ export class BottomBar extends React.Component {
         if (item.location) {
             app.setLocation(item.location)
 
-            app.cores.haptics.vibrate([40, 80])
+            if (app.cores.haptics?.vibrate) {
+                app.cores.haptics.vibrate([40, 80])
+            }
         }
     }
 
@@ -317,7 +321,9 @@ export class BottomBar extends React.Component {
 
             closest.classList.add("hover")
 
-            app.cores.haptics.vibrate(40)
+            if (app.cores.haptics?.vibrate) {
+                app.cores.haptics.vibrate(40)
+            }
         }
     }
 
