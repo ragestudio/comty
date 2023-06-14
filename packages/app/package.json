@@ -30,6 +30,7 @@
         "@capacitor/haptics": "1.1.4",
         "@capacitor/ios": "^4.5.0",
         "@capacitor/push-notifications": "1.0.9",
+        "@capacitor/splash-screen": "^5.0.4",
         "@capacitor/status-bar": "1.0.7",
         "@capacitor/storage": "1.2.4",
         "@capgo/capacitor-updater": "^5.0.1",
