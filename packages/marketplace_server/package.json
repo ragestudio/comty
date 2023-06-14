@@ -1,6 +1,6 @@
 {
     "name": "@comty/marketplace_server",
-    "version": "0.48.1",
+    "version": "0.48.2",
     "main": "dist/index.js",
     "scripts": {
         "build": "corenode-cli build",
