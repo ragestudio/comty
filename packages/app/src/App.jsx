@@ -124,11 +124,11 @@ class ComtyApp extends React.Component {
 			autoHide: false,
 		})
 
+		window.app.splash = SplashScreen
 		window.app.version = config.package.version
-
-		window.localStorage.setItem("last_version", window.app.version)
-
 		window.app.message = antd.message
+		
+		window.localStorage.setItem("last_version", window.app.version)
 
 		// check if electron library is available
 		if (typeof window.electron !== "undefined") {

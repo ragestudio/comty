@@ -13,10 +13,10 @@ export default class HapticsCore extends Core {
 
     public = {
         isGlobalDisabled: HapticsCore.isGlobalDisabled,
-        vibration: this.vibration.bind(this),
+        vibrate: this.vibrate.bind(this),
     }
 
-    vibration(...args) {
+    vibrate(...args) {
         const disabled = this.isGlobalDisabled
 
         if (disabled) {
