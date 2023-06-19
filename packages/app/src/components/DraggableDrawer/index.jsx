@@ -344,8 +344,14 @@ export default class Drawer extends Component {
         }
 
         // check if is clicking outside main component
-        if (this.drawer && !this.drawer.contains(event.target)) {
-            this.props.onRequestClose(this)
+        if (this.drawer && event.target?.className) {
+            if (event.target.className.includes("ant-cascader") || event.target.className.includes("ant-select")) {
+                return false
+            }
+
+            if (!this.drawer.contains(event.target)) {
+                this.props.onRequestClose(this)
+            }
         }
     }
 
