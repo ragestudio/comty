@@ -701,9 +701,33 @@ export default class Player extends Core {
 
         instance.audioElement.play()
 
+        // set navigator metadata
+        if ("mediaSession" in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: instance.manifest.title,
+                artist: instance.manifest.artist,
+                album: instance.manifest.album,
+                artwork: [
+                    {
+                        src: instance.manifest.cover ?? instance.manifest.thumbnail,
+                        sizes: "512x512",
+                        type: "image/jpeg",
+                    }
+                ],
+            })
+        }
+
         // check if the audio is a live stream when metadata is loaded
         instance.audioElement.addEventListener("loadedmetadata", () => {
             console.log("loadedmetadata", instance.audioElement.duration)
+
+            // if ("mediaSesion" in navigator) {
+            //     navigator.mediaSession.setPositionState({
+            //         duration: instance.audioElement.duration,
+            //         playbackRate: instance.audioElement.playbackRate,
+            //         position: instance.audioElement.currentTime,
+            //     })
+            // }
 
             if (instance.audioElement.duration === Infinity) {
                 instance.manifest.stream = true
@@ -864,6 +888,10 @@ export default class Player extends Core {
                 this.currentAudioInstance.audioElement.pause()
                 resolve()
             }, gradualFadeMs)
+
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "paused"
+            }
         })
     }
 
@@ -886,6 +914,10 @@ export default class Player extends Core {
                 this.state.audioVolume,
                 this.audioContext.currentTime + (gradualFadeMs / 1000)
             )
+
+            if ("mediaSession" in navigator) {
+                navigator.mediaSession.playbackState = "playing"
+            }
         })
     }
 
@@ -900,6 +932,10 @@ export default class Player extends Core {
         this.state.livestream = false
 
         this.audioQueue = []
+
+        if ("mediaSession" in navigator) {
+            navigator.mediaSession.playbackState = "none"
+        }
     }
 
     close() {
