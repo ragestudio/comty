@@ -4,7 +4,6 @@ export default async (payload) => {
     let {
         posts,
         for_user_id,
-        skip = 0,
     } = payload
 
     if (!Array.isArray(posts)) {
@@ -20,10 +19,50 @@ export default async (payload) => {
         savedPostsIds = savedPosts.map((savedPost) => savedPost.post_id)
     }
 
-    posts = posts.map(async (post, index) => {
+    let [usersData, likesData, commentsData] = await Promise.all([
+        User.find({
+            _id: {
+                $in: posts.map((post) => post.user_id)
+            }
+        }),
+        PostLike.find({
+            post_id: {
+                $in: posts.map((post) => post._id)
+            }
+        }).catch(() => []),
+        Comment.find({
+            parent_id: {
+                $in: posts.map((post) => post._id)
+            }
+        }).catch(() => []),
+    ])
+
+    // wrap likesData by post_id
+    likesData = likesData.reduce((acc, like) => {
+        if (!acc[like.post_id]) {
+            acc[like.post_id] = []
+        }
+
+        acc[like.post_id].push(like)
+
+        return acc
+    }, {})
+
+    // wrap commentsData by post_id
+    commentsData = commentsData.reduce((acc, comment) => {
+        if (!acc[comment.parent_id]) {
+            acc[comment.parent_id] = []
+        }
+
+        acc[comment.parent_id].push(comment)
+
+        return acc
+    }, {})
+
+    posts = await Promise.all(posts.map(async (post, index) => {
         post = post.toObject()
 
-        let user = await User.findById(post.user_id).catch(() => false)
+        let user = usersData.find((user) => user._id.toString() === post.user_id.toString())
 
         if (!user) {
             user = {
@@ -31,14 +70,11 @@ export default async (payload) => {
             }
         }
 
-        let likes = await PostLike.find({ post_id: post._id.toString() })
-            .catch(() => [])
+        let likes = likesData[post._id.toString()] ?? []
 
         post.countLikes = likes.length
 
-        let comments = await Comment.find({ parent_id: post._id.toString() })
-            .select("_id")
-            .catch(() => false)
+        let comments = commentsData[post._id.toString()] ?? []
 
         post.countComments = comments.length
 
@@ -52,9 +88,7 @@ export default async (payload) => {
             comments: comments.map((comment) => comment._id.toString()),
             user,
         }
-    })
-
-    posts = await Promise.all(posts)
+    }))
 
     return posts
 }
