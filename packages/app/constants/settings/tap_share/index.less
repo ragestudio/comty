@@ -1,0 +1,281 @@
+.tap-share-render {
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+    .tap-share-field {
+        display: flex;
+        flex-direction: column;
+
+        background-color: var(--background-color-accent);
+        padding: 20px;
+
+        border-radius: 12px;
+
+        gap: 10px;
+
+        span {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .tap-share-field_header {
+            display: flex;
+
+            flex-direction: row;
+
+            align-items: center;
+
+            h1,
+            p {
+                margin: 0;
+            }
+
+            gap: 10px;
+        }
+    }
+}
+
+.tap-share-own_tags {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    gap: 10px;
+
+    .tap-share-own_tags-item {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        width: 100%;
+
+        gap: 10px;
+        padding: 10px;
+
+        background-color: var(--background-color-primary);
+
+        border-radius: 8px;
+
+        .tap-share-own_tags-item-icon {
+            font-size: 2rem;
+        }
+
+        .tap-share-own_tags-item-title {
+            display: flex;
+            flex-direction: column;
+
+            width: 100%;
+
+            gap: 10px;
+
+            color: var(--text-color);
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6,
+            p,
+            span {
+                margin: 0;
+            }
+
+            span {
+                font-size: 0.7rem;
+                opacity: 0.7px;
+            }
+        }
+
+        .tap-share-own_tags-item-actions {
+            display: flex;
+            flex-direction: row;
+
+            align-items: center;
+
+            gap: 10px;
+
+
+        }
+
+
+    }
+}
+
+.tap-share-register {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+
+    gap: 20px;
+
+    &.compact {
+        .tap-share-register-header {
+            padding: 10px;
+            flex-direction: row;
+
+            justify-content: flex-start;
+
+            .tap-share-register-header-icon {
+                font-size: 0;
+                width: 0;
+                height: 0;
+            }
+        }
+    }
+
+    .tap-share-register-header {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        gap: 10px;
+
+        background-color: var(--background-color-accent);
+
+        border-radius: 12px;
+
+        transition: all 150ms ease-in-out;
+
+        h1 {
+            margin: 0;
+        }
+
+        .tap-share-register-header-back {
+            font-size: 5rem;
+            color: var(--colorPrimary);
+
+            &.hidden {
+                width: 0;
+                height: 0;
+                padding: 0;
+            }
+        }
+
+        .tap-share-register-header-icon {
+            font-size: 5rem;
+            color: var(--colorPrimary);
+
+            svg {
+                margin: 0;
+            }
+        }
+    }
+
+    .tap-share-register-content {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        height: 100%;
+
+        .tap-share-register_step {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: flex-start;
+
+            height: 100%;
+            width: 100%;
+
+            padding: 0 10px;
+
+            transition: all 150ms ease-in-out;
+
+            h1 {
+                transition: all 150ms ease-in-out;
+            }
+
+            &.centered {
+                align-items: center;
+            }
+
+            .ant-form {
+                width: 100%;
+
+                .ant-form-item {
+                    height: fit-content;
+                    padding: 0;
+
+                    .ant-form_with_selector {
+                        display: flex;
+                        flex-direction: row;
+
+                        align-items: center;
+
+                        gap: 10px;
+
+                        .ant-select {
+                            width: fit-content;
+                        }
+
+                        .ant-input {
+                            width: 100%;
+                        }
+                    }
+
+                    .ant-form-item-label {
+                        height: fit-content;
+
+                        padding: 0;
+                        margin: 0;
+
+                        label {
+                            height: fit-content;
+                            padding: 0;
+                            margin: 0;
+                        }
+
+                    }
+
+                    .description {
+                        font-size: 0.8rem;
+                        opacity: 0.8;
+                    }
+                }
+            }
+
+            .tap-share-register_step_actions {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+
+                gap: 20px;
+
+                padding: 10px;
+            }
+        }
+    }
+}
+
+.animation-player {
+    width: 50%;
+
+    &.loading {
+        .phone-loop {
+            color: #17b2ff;
+        }
+    }
+
+    .phone-loop {
+        color: var(--colorPrimary);
+
+        path {
+            fill: currentColor;
+            stroke: currentColor;
+        }
+    }
+}
