@@ -10,7 +10,7 @@ import hyperexpress from "hyper-express"
 
 import pkg from "../package.json"
 
-export default class WidgetsAPI {
+export default class API {
     static useMiddlewaresOrder = ["useLogger", "useCors", "useAuth"]
 
     server = global.server = new hyperexpress.Server()
