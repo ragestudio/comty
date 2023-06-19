@@ -48,5 +48,10 @@ export default [
         path: "/landing/*",
         useLayout: "blank",
         public: true
+    },
+    {
+        path: "/nfc/*",
+        useLayout: "blank",
+        public: true
     }
 ]
