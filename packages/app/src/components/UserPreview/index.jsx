@@ -58,7 +58,8 @@ export default (props) => {
             "userPreview",
             {
                 ["clickable"]: typeof props.onClick === "function",
-                ["small"]: props.small
+                ["small"]: props.small && !props.big,
+                ["big"]: props.big && !props.small,
             }
         )}
     >
