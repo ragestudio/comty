@@ -1,8 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 import { Input } from "antd-mobile"
-import NFCModel from "comty.js/models/nfc"
 import { Icons } from "components/Icons"
+
+import NFCModel from "comty.js/models/nfc"
 
 import StepsContext from "../../context"
 
