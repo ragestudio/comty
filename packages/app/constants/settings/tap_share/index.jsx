@@ -1,21 +1,17 @@
 import React from "react"
 import * as antd from "antd"
-import { Input } from "antd-mobile"
 import classnames from "classnames"
 import NFCModel from "comty.js/models/nfc"
 import { Icons } from "components/Icons"
 
-import AnimationPlayer from "components/AnimationPlayer"
-
 import StepsContext from "./context"
-import NFC_ERRORS from "./errors"
-
-import "./index.less"
 
 import CheckRegister from "./steps/check_register"
 import DataEditor from "./steps/data_editor"
 import TagWritter from "./steps/tag_writter"
 import Success from "./steps/success"
+
+import "./index.less"
 
 const RegisterNewTagSteps = [
     CheckRegister,
@@ -205,9 +201,7 @@ class OwnTags extends React.Component {
             return ownedTag.serial === tag.serialNumber
         })
 
-        console.log(ownedTag)
-
-        if (!ownedTag) {
+        if (!ownedTag && app.DrawerController.drawersLength() === 0) {
             app.message.error("This tag is not registered or you don't have permission to edit it.")
             return false
         }
