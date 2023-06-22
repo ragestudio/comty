@@ -66,7 +66,6 @@ import loadable from "@loadable/component"
 
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
-import { SplashScreen } from "@capacitor/splash-screen"
 import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
 import SessionModel from "models/session"
@@ -98,6 +97,8 @@ import * as Router from "./router"
 
 import "theme/index.less"
 
+console.log(`REACT VERSION: ${React.version}`)
+
 CapacitorUpdater.notifyAppReady()
 
 class ComtyApp extends React.Component {
@@ -118,15 +119,10 @@ class ComtyApp extends React.Component {
 	}
 
 	static splashAwaitEvent = "app.initialization.finish"
-
 	static async initialize() {
-		SplashScreen.show({
-			autoHide: false,
-		})
-
-		window.app.splash = SplashScreen
 		window.app.version = config.package.version
 		window.app.message = antd.message
+		window.app.isCapacitor = window.navigator.userAgent === "capacitor"
 
 		window.localStorage.setItem("last_version", window.app.version)
 
@@ -492,8 +488,6 @@ class ComtyApp extends React.Component {
 		this.setState({ initialized: true })
 
 		Utils.handleOpenDevTools()
-
-		SplashScreen.hide()
 	}
 
 	onRuntimeStateUpdate = (state) => {
