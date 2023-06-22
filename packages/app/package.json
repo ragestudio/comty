@@ -23,7 +23,6 @@
     },
     "dependencies": {
         "@ant-design/icons": "4.7.0",
-        "@awesome-cordova-plugins/nfc": "^6.3.0",
         "@capacitor/android": "^5.0.5",
         "@capacitor/app": "^5.0.3",
         "@capacitor/cli": "^5.0.5",
@@ -45,6 +44,7 @@
         "@loadable/component": "5.15.2",
         "@mui/material": "^5.11.9",
         "@paciolan/remote-component": "^2.13.0",
+        "@ragestudio/cordova-nfc": "^1.2.0",
         "@tsmx/human-readable": "^1.0.7",
         "antd": "^5.2.1",
         "antd-mobile": "^5.31.0",
@@ -79,7 +79,6 @@
         "moment-timezone": "^0.5.37",
         "mpegts.js": "^1.6.10",
         "nprogress": "^0.2.0",
-        "phonegap-nfc": "^1.2.0",
         "plyr": "^3.6.12",
         "plyr-react": "^3.2.1",
         "prop-types": "^15.8.1",
