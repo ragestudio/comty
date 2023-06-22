@@ -22,13 +22,6 @@ export default (props) => {
             return false
         }
 
-        const nfcInstance = app.cores.nfc.instance()
-
-        if (!nfcInstance) {
-            setError(NFC_ERRORS.NFC_NOT_AVAILABLE)
-            return false
-        }
-
         setError(null)
         setLoading(true)
 
@@ -40,7 +33,7 @@ export default (props) => {
             return false
         }
 
-        nfcInstance.write({
+        app.cores.nfc.writeNdef({
             records: [{
                 recordType: "url",
                 data: context.values.endpoint_url

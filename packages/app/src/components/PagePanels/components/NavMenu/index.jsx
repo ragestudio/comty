@@ -2,8 +2,6 @@ import React from "react"
 import classnames from "classnames"
 import * as antd from "antd"
 
-import { createIconRender } from "components/Icons"
-
 import "./index.less"
 
 const NavMenu = (props) => {
