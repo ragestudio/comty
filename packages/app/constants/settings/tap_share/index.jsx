@@ -263,26 +263,37 @@ const OpenTagEditor = ({ tag, onFinish = () => app.navigation.softReload() } = {
 
 const TapShareRender = () => {
     return <div className="tap-share-render">
+        {
+            !app.cores.nfc.scanning && app.isMobile && <antd.Alert
+                type="warning"
+                message="NFC is disabled"
+                description="You can enable it in your device settings."
+            />
+        }
+
         <div className="tap-share-field">
             <div className="tap-share-field_header">
                 <h1>
                     <Icons.MdSpoke /> Registered Tags
                 </h1>
             </div>
-            <span className="tip">
-                <Icons.MdInfo /> You can quickly edit your tags by tapping them.
-            </span>
-
+            {
+                app.cores.nfc.scanning && <span className="tip">
+                    <Icons.MdInfo /> You can quickly edit your tags by tapping them.
+                </span>
+            }
             <OwnTags />
         </div>
 
-        <antd.Button
-            type="primary"
-            icon={<Icons.Plus />}
-            onClick={() => OpenTagEditor()}
-        >
-            Add new
-        </antd.Button>
+        {
+            app.isMobile && <antd.Button
+                type="primary"
+                icon={<Icons.Plus />}
+                onClick={() => OpenTagEditor()}
+            >
+                Add new
+            </antd.Button>
+        }
     </div>
 }
 
