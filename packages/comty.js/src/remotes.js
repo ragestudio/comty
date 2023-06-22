@@ -1,4 +1,10 @@
 function composeRemote(path) {
+    if (typeof window !== "undefined") {
+        if (window.localStorage.getItem("comty:use_indev") || window.location.hostname === "indev.comty.app") {
+            return envOrigins["indev"][path]
+        }
+    }
+
     return envOrigins[process.env.NODE_ENV ?? "production"][path]
 }
 
@@ -18,6 +24,14 @@ const envOrigins = {
         marketplace: `http://${getCurrentHostname()}:3040`,
         music: `http://${getCurrentHostname()}:3050`,
         files: `http://${getCurrentHostname()}:3060`,
+    },
+    "indev": {
+        default: `https://indev_api.comty.app/default`,
+        chat: `https://indev_api.comty.app/chat`,
+        livestreaming: `https://indev_api.comty.app/livestreaming`,
+        marketplace: `https://indev_api.comty.app/marketplace`,
+        music: `https://indev_api.comty.app/music`,
+        files: `https://indev_api.comty.app/files`,
     },
     "production": {
         default: "https://api.comty.app",
