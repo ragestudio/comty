@@ -1,4 +1,5 @@
 import Core from "evite/src/core"
+import { Haptics } from "@capacitor/haptics"
 
 const vibrationPatterns = {
     light: [10],
@@ -19,12 +20,28 @@ export default class HapticsCore extends Core {
     }
 
     async onInitialize() {
+        if (window.navigator.userAgent === "capacitor") {
+            navigator.vibrate = this.nativeVibrate
+        }
+
         document.addEventListener("click", this.handleClickEvent)
     }
 
     public = {
         isGlobalDisabled: HapticsCore.isGlobalDisabled,
         vibrate: this.vibrate.bind(this),
+    }
+
+    nativeVibrate = (pattern) => {
+        if (!Array.isArray(pattern)) {
+            pattern = [pattern]
+        }
+
+        for (let i = 0; i < pattern.length; i++) {
+            Haptics.vibrate({
+                duration: pattern[i],
+            })
+        }
     }
 
     handleClickEvent = (event) => {
