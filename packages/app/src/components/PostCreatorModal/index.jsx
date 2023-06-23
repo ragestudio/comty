@@ -1,12 +1,12 @@
 import React from "react"
 import classnames from "classnames"
 
-import PostCreator from "../PostCreator"
+import PostCreator from "components/PostCreator"
 
 import "./index.less"
 
 export default (props) => {
-    const [visible, setVisible] = React.useState(true)
+    const [visible, setVisible] = React.useState(false)
 
     let escTimeout = null
 
@@ -40,6 +40,10 @@ export default (props) => {
     }
 
     React.useEffect(() => {
+        setTimeout(() => {
+            setVisible(true)
+        }, 10)
+
         document.addEventListener("keydown", handleEsc, false)
 
         return () => {
@@ -51,12 +55,12 @@ export default (props) => {
         className={classnames(
             "post_creator_modal",
             {
-                ["visible"]: visible,
-            },
+                ["active"]: visible
+            }
         )}
         onClick={handleClickOutside}
     >
-        <PostCreator 
+        <PostCreator
             onPost={close}
         />
     </div>

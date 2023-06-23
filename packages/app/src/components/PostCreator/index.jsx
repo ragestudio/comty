@@ -122,6 +122,8 @@ export default class PostCreator extends React.Component {
                 console.error(error)
                 antd.message.error(error)
 
+                req.onError(error)
+
                 return false
             })
 
@@ -134,7 +136,8 @@ export default class PostCreator extends React.Component {
 
     removeAttachment = (file_uid) => {
         this.setState({
-            postAttachments: this.state.postAttachments.filter((file) => file.uid !== file_uid)
+            postAttachments: this.state.postAttachments.filter((file) => file.uid !== file_uid),
+            fileList: this.state.fileList.filter((file) => file.uid !== file_uid)
         })
     }
 
@@ -187,7 +190,6 @@ export default class PostCreator extends React.Component {
 
                 break
             }
-
             case "done": {
                 // remove pending file
                 this.setState({
@@ -341,7 +343,6 @@ export default class PostCreator extends React.Component {
         const uploading = file.status === "uploading"
 
         const onClickDelete = () => {
-            actions.remove()
             this.removeAttachment(file.uid)
         }
 
@@ -355,11 +356,15 @@ export default class PostCreator extends React.Component {
                     uploading && <Icons.LoadingOutlined style={{ margin: "0 !important" }} />
                 }
                 {
-                    !uploading && <antd.Button
-                        type="link"
-                        icon={<Icons.Trash />}
-                        onClick={onClickDelete}
-                    />
+                    !uploading && <antd.Popconfirm
+                        title="Are you sure you want to delete this file?"
+                        onConfirm={onClickDelete}
+                    >
+                        <antd.Button
+                            type="link"
+                            icon={<Icons.Trash />}
+                        />
+                    </antd.Popconfirm>
                 }
             </div>
         </div>
@@ -442,6 +447,7 @@ export default class PostCreator extends React.Component {
             ref={this.creatorRef}
             onDragEnter={this.handleDrag}
             onDragLeave={this.handleDrag}
+            style={this.props.style}
         >
             <div className="textInput">
                 <div className="avatar">
@@ -489,22 +495,14 @@ export default class PostCreator extends React.Component {
 
             <div className="actions">
                 <antd.Button
-                    type="primary"
-                    disabled={loading}
+                    type="ghost"
                     onClick={this.handleUploadClick}
                     icon={<Icons.Upload />}
                 />
 
                 <antd.Button
-                    type="primary"
-                    disabled={loading}
+                    type="ghost"
                     icon={<Icons.MdPoll />}
-                />
-
-                <antd.Button
-                    type="primary"
-                    disabled={loading}
-                    icon={<Icons.MdPrivacyTip />}
                 />
             </div>
         </div>
