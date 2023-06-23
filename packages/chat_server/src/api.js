@@ -6,6 +6,7 @@ import http from "http"
 import EventEmitter from "@foxify/events"
 
 import ComtyClient from "@shared-classes/ComtyClient"
+import RedisClient from "@shared-classes/RedisClient"
 
 import routes from "./routes"
 
@@ -24,6 +25,10 @@ export default class Server {
             ...options
         }
     }
+
+    redis = global.redis = RedisClient({
+        withWsAdapter: true
+    })
 
     comty = global.comty = ComtyClient()
 

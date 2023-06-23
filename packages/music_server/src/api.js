@@ -38,7 +38,9 @@ export default class Server {
 
     db = new DbManager()
 
-    redis = global.redis = RedisClient()
+    redis = global.redis = RedisClient({
+        withWsAdapter: true
+    })
 
     storage = global.storage = StorageClient()
 

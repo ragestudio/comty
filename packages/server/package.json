@@ -7,12 +7,25 @@
         "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
+    "sharedClasses": {
+        "FileUpload": "src/shared-classes",
+        "CacheService": "src/shared-classes",
+        "ComtyClient": "src/shared-classes",
+        "RedisClient": "src/shared-classes",
+        "StorageClient": "src/shared-classes",
+        "DbManager": "src/shared-classes",
+        "Errors": "src/shared-classes"
+    },
     "license": "MIT",
     "dependencies": {
         "@corenode/utils": "0.28.26",
         "@foxify/events": "^2.1.0",
         "@jimp/plugin-scale": "^0.22.7",
         "@octokit/rest": "^19.0.7",
+        "@socket.io/redis-adapter": "^8.2.1",
+        "@socket.io/redis-emitter": "^5.1.0",
+        "@socket.io/cluster-adapter": "^0.2.2",
+        "@socket.io/sticky": "^1.0.3",
         "@tensorflow/tfjs-node": "4.0.0",
         "axios": "^1.2.5",
         "bcrypt": "^5.1.0",

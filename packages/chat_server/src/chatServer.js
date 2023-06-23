@@ -210,6 +210,10 @@ export default class ChatServer {
             }
         })
 
+        if (global.ioAdapter) {
+            this.io.adapter(global.ioAdapter)
+        }
+
         this.RoomsController = new RoomsController(this.io)
     }
 
