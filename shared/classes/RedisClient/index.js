@@ -1,4 +1,5 @@
 import { createClient } from "redis"
+import { createAdapter } from "@socket.io/redis-adapter"
 
 function composeURL() {
     // support for auth
@@ -17,12 +18,19 @@ function composeURL() {
     return url
 }
 
-export default () => {
+export default ({
+    withWsAdapter = false
+} = {}) => {
     let client = createClient({
         url: composeURL(),
         password: process.env.REDIS_PASSWORD,
         username: process.env.REDIS_USERNAME,
     })
+
+    if (withWsAdapter) {
+        client.subClient = client.duplicate()
+        client.ioAdapter = global.ioAdapter = createAdapter(client, client.subClient)
+    }
 
     client.initialize = async () => {
         console.log("🔌 Connecting to Redis client...")

@@ -12,7 +12,8 @@ import { User, Session, Config } from "@models"
 
 import DbManager from "@classes/DbManager"
 import { createStorageClientInstance } from "@classes/StorageClient"
-import CacheService from "@classes/CacheService"
+
+import RedisClient from "@shared-classes/RedisClient"
 
 import internalEvents from "./events"
 
@@ -42,7 +43,9 @@ export default class API {
         },
     )
 
-    cacheService = global.cacheService = new CacheService()
+    redis = global.redis = RedisClient({
+        withWsAdapter: true
+    })
 
     DB = new DbManager()
 
@@ -114,6 +117,7 @@ export default class API {
     events = internalEvents
 
     async initialize() {
+        await this.redis.initialize()
         await this.DB.initialize()
         await this.initializeConfigDB()
 
@@ -220,6 +224,10 @@ export default class API {
             return socket.emit("authenticateFailed", {
                 error,
             })
+        }
+
+        if (global.ioAdapter) {
+            this.server.websocket_instance.io.adapter(global.ioAdapter)
         }
 
         this.server.websocket_instance.eventsChannels.push(["/main", "ping", async (socket) => {

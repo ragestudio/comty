@@ -1,4 +1,6 @@
 import socketio from "socket.io"
+import { createAdapter } from "@socket.io/cluster-adapter"
+import { setupWorker } from "@socket.io/sticky"
 
 import withWsAuth from "@middlewares/withWsAuth"
 
@@ -487,6 +489,10 @@ export default class RoomsServer {
                 credentials: true,
             }
         })
+
+        if (global.ioAdapter) {
+            this.io.adapter(global.ioAdapter)
+        }
 
         this.RoomsController = new RoomsController(this.io)
     }
