@@ -13,7 +13,7 @@ const getPackages = require("./utils/getPackages")
 
 async function main() {
     const packages = await getPackages({
-        ignore: ["shared", "app", "wrapper"]
+        ignore: ["shared", "app", "wrapper", "comty.js", "sync_server"]
     })
 
     for await (const packageName of packages) {
@@ -34,6 +34,8 @@ async function main() {
             cwd: packagePath,
             stdio: "inherit"
         })
+
+        console.log(`Building [${packagePath}]`)
 
         // run yarn build
         await child_process.execSync("yarn build", {
