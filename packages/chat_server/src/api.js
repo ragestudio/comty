@@ -77,6 +77,8 @@ export default class Server {
     initialize = async () => {
         const startHrTime = process.hrtime()
 
+        await this.redis.initialize()
+        
         await this.websocketServer.initialize()
 
         await this.__registerInternalMiddlewares()
