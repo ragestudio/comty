@@ -1,12 +1,11 @@
 import React from "react"
 import * as antd from "antd"
-import { SliderPicker } from "react-color"
 import { Translation } from "react-i18next"
 import classnames from "classnames"
 import config from "config"
 import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
-import { Icons, createIconRender } from "components/Icons"
+import { createIconRender } from "components/Icons"
 
 import {
     composedSettingsByGroups as settings
