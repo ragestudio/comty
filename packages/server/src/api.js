@@ -226,8 +226,8 @@ export default class API {
             })
         }
 
-        if (global.ioAdapter) {
-            this.server.websocket_instance.io.adapter(global.ioAdapter)
+        if (this.redis.ioAdapter) {
+            this.server.websocket_instance.io.adapter(this.redis.ioAdapter)
         }
 
         this.server.websocket_instance.eventsChannels.push(["/main", "ping", async (socket) => {
