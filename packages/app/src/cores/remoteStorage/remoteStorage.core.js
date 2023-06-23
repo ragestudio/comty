@@ -9,7 +9,7 @@ class ChunkedUpload {
         this.headers = params.headers || {}
         this.postParams = params.postParams
         this.chunkSize = params.chunkSize || 1000000
-        this.retries = params.retries || 5
+        this.retries = params.retries ?? app.cores.settings.get("uploader.retries") ?? 3
         this.delayBeforeRetry = params.delayBeforeRetry || 5
 
         this.start = 0
