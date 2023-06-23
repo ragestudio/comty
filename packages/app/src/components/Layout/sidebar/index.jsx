@@ -28,6 +28,9 @@ const onClickHandlers = {
 	},
 	login: () => {
 		window.app.navigation.goAuth()
+	},
+	logout: () => {
+		app.eventBus.emit("app.logout_request")
 	}
 }
 
