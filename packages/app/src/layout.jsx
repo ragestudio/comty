@@ -7,7 +7,7 @@ export default class Layout extends React.PureComponent {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 	state = {
-		layoutType: "default",
+		layoutType: app.isMobile ? "mobile" : "default",
 		renderError: null,
 	}
 
@@ -51,9 +51,9 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		if (window.app.cores.settings.get("forceMobileMode") || app.isMobile) {
-			app.layout.set("mobile")
-		}
+		// if (window.app.cores.settings.get("forceMobileMode") || app.isMobile) {
+		// 	app.layout.set("mobile")
+		// }
 
 		// register events
 		Object.keys(this.events).forEach((event) => {
