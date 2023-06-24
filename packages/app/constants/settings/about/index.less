@@ -1,15 +1,14 @@
+@border-radius: 12px;
+
 .about_app {
     display: flex;
     flex-direction: column;
 
     width: 100%;
 
-    padding: 0 20px 20px 20px;
-
-    background-color: var(--background-color-accent);
     color: var(--text-color);
 
-    border-radius: 12px;
+    gap: 20px;
 
     .header {
         display: flex;
@@ -20,10 +19,10 @@
 
         width: 100%;
 
-        margin-bottom: 20px;
+        padding: 20px;
 
-        padding: 20px 0;
-        border-bottom: 1px solid var(--border-color);
+        border-radius: @border-radius;
+        background-color: var(--background-color-accent);
 
         .branding {
             display: flex;
@@ -69,22 +68,73 @@
         flex-direction: column;
         justify-content: center;
 
-        margin-bottom: 10px;
-
-        background-color: var(--background-color-primary);
-
-        border-radius: 12px;
-
         padding: 15px;
+
+        gap: 10px;
+
+        background-color: var(--background-color-accent);
+
+        border-radius: @border-radius;
 
         h1,
         h2,
         h3,
         h4,
         h5,
-        h6 {
-            margin-top: 0;
-            margin-bottom: 5px;
+        h6,
+        p {
+            margin: 0;
+        }
+
+        .inline_field {
+            display: inline-flex;
+
+            flex-direction: row;
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 10px;
+
+            background-color: var(--background-color-primary);
+
+            border-radius: 12px;
+
+            .field_header {
+                display: inline-flex;
+
+                flex-direction: row;
+                align-items: center;
+
+                gap: 8px;
+
+                font-size: 0.8rem;
+
+                .field_icon {
+                    display: inline-flex;
+
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: center;
+
+                    background-color: var(--background-color-primary);
+
+                    border-radius: 100%;
+
+                    padding: 5px;
+
+                    font-size: 1rem;
+
+                    svg {
+                        margin: 0;
+                    }
+                }
+            }
+
+            .field_value {
+                font-family: "DM Mono", monospace;
+            }
+
         }
 
         .field {
@@ -92,6 +142,8 @@
             flex-direction: column;
 
             margin-bottom: 10px;
+
+            gap: 10px;
 
             .field_header {
                 display: flex;
@@ -102,8 +154,6 @@
 
                 font-size: 0.8rem;
 
-                margin-bottom: 8px;
-
                 h3 {
                     margin: 0;
                 }
@@ -112,19 +162,26 @@
             .field_value {
                 font-size: 0.9rem;
 
-                display: inline-flex;
-                flex-direction: row;
+                display: flex;
+                flex-direction: column;
+
+                gap: 10px;
 
                 margin-left: 10px;
 
                 font-family: "DM Mono", monospace;
 
-                background-color: var(--background-color-accent);
+                background-color: var(--background-color-primary);
                 border-radius: 7px;
                 padding: 7px;
 
                 .ant-progress {
                     margin: 0;
+                    height: fit-content;
+
+                    .ant-progress-outer {
+                        height: 0px !important;
+                    }
                 }
             }
         }
