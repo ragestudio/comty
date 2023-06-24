@@ -1,9 +1,7 @@
 import React from "react"
 import { Drawer as AntdDrawer } from "antd"
-import { DraggableDrawer } from "components"
+import DraggableDrawer from "../draggableDrawer"
 import { EventBus } from "evite"
-
-import "./index.less"
 
 export default class DrawerController extends React.Component {
 	constructor(props) {
