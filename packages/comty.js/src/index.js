@@ -1,3 +1,4 @@
+import pkg from "../package.json"
 import EventEmitter from "@foxify/events"
 
 import axios from "axios"
@@ -145,6 +146,7 @@ export default function createClient({
         instances: Object(),
         wsInstances: Object(),
         rest: null,
+        version: pkg.version,
     }
 
     if (globalThis.isServerMode) {
