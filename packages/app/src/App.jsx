@@ -160,6 +160,11 @@ class ComtyApp extends React.Component {
 					defaultLocked: options.defaultLocked ?? false,
 					componentProps: {
 						sessionController: this.sessionController,
+					},
+					props: {
+						bodyStyle: {
+							height: "100%",
+						}
 					}
 				})
 			},
@@ -226,15 +231,15 @@ class ComtyApp extends React.Component {
 				app.eventBus.emit("app.softReload")
 			},
 			goAuth: () => {
-				return app.setLocation(config.app.authPath ?? "/auth")
+				return app.location.push(config.app.authPath ?? "/auth")
 			},
 			goMain: () => {
-				return app.setLocation(config.app.mainPath ?? "/home")
+				return app.location.push(config.app.mainPath ?? "/home")
 			},
 			goToSettings: (setting_id) => {
 				app.cores.sound.useUIAudio("navigation.settings")
 
-				return app.setLocation(`/settings`, {
+				return app.location.push(`/settings`, {
 					query: {
 						setting: setting_id
 					}
@@ -250,10 +255,10 @@ class ComtyApp extends React.Component {
 					username = app.userData.username
 				}
 
-				return app.setLocation(`/account/${username}`)
+				return app.location.push(`/account/${username}`)
 			},
 			goToPost: (post_id) => {
-				return app.setLocation(`/post/${post_id}`)
+				return app.location.push(`/post/${post_id}`)
 			},
 		},
 		electron: {
@@ -299,18 +304,6 @@ class ComtyApp extends React.Component {
 				}
 				return await StatusBar.show()
 			},
-		},
-		openDebugger: () => {
-			// create a new dom window
-			const win = new DOMWindow({
-				id: "debug",
-				title: "Debug",
-			})
-
-			win.createDefaultWindow(loadable(() => import("./debug")), {
-				width: 700,
-				height: 500,
-			})
 		},
 		clearInternalStorage: async () => {
 			antd.Modal.confirm({
@@ -401,47 +394,6 @@ class ComtyApp extends React.Component {
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
 		},
-		"api.ws.main.connect": () => {
-			if (this.wsReconnecting) {
-				this.wsReconnectingTry = 0
-				this.wsReconnecting = false
-
-				setTimeout(() => {
-					Toast.show({
-						icon: "success",
-						content: "Connected",
-					})
-				}, 500)
-			}
-		},
-		"api.ws.main.connect_error": () => {
-			if (!this.wsReconnecting) {
-				this.wsReconnectingTry = 0
-				this.wsReconnecting = true
-
-				Toast.show({
-					icon: "loading",
-					content: "Connecting...",
-					duration: 0,
-				})
-			}
-
-			this.wsReconnectingTry = this.wsReconnectingTry + 1
-
-			if (this.wsReconnectingTry > 3 && app.cores.settings.get("app.reloadOnWSConnectionError")) {
-				window.location.reload()
-			}
-		},
-		"api.ws.main.disconnect": () => {
-			antd.notification.open({
-				message: <Translation>
-					{(t) => t("Disconnected")}
-				</Translation>,
-				description: <Translation>
-					{(t) => t("You have been disconnected from the server, trying to reconnect.")}
-				</Translation>
-			})
-		},
 		"devtool-opened": () => {
 			// show warning
 			antd.notification.open({
@@ -461,7 +413,7 @@ class ComtyApp extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		if (app.capacitor.isAppCapacitor()) {
+		if (app.isCapacitor) {
 			window.addEventListener("statusTap", () => {
 				app.eventBus.emit("statusTap")
 			})
@@ -472,7 +424,7 @@ class ComtyApp extends React.Component {
 				if (!canGoBack) {
 					CapacitorApp.exitApp()
 				} else {
-					window.history.back()
+					app.location.back()
 				}
 			})
 		}
@@ -557,11 +509,7 @@ class ComtyApp extends React.Component {
 
 	render() {
 		if (!this.state.initialized) {
-			return <div>
-				<h1>
-					App is initializing...
-				</h1>
-			</div>
+			return <></>
 		}
 
 		return <React.Fragment>
