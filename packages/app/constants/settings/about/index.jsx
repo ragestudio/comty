@@ -151,12 +151,40 @@ export default {
                 </div>
             </div>
 
-            <h3><Icons.Info />Server information</h3>
             <div className="group">
+                <div className="group_header">
+                    <h3><Icons.Info />Server information</h3>
+                </div>
+
                 <div className="field">
                     <div className="field_header">
                         <h3><Icons.MdOutlineStream /> Origin</h3>
 
+                        <antd.Tooltip
+                            title={secureConnection ? connectionsTooltipStrings.secure : connectionsTooltipStrings.insecure}
+                        >
+                            <antd.Tag
+                                color={secureConnection ? "green" : "red"}
+                                icon={secureConnection ? <Icons.MdHttps /> : <Icons.MdWarning />}
+                            >
+                                {
+                                    secureConnection ? " Secure connection" : "Insecure connection"
+                                }
+                            </antd.Tag>
+                        </antd.Tooltip>
+                    </div>
+
+                    <div className="field_value">
+                        {serverOrigin ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="field">
+                    <div className="field_header">
+                        <h3><Icons.MdOutlineMemory /> Instance Performance</h3>
+                    </div>
+
+                    <div className="field_value">
                         <div
                             style={{
                                 display: "flex",
@@ -192,34 +220,7 @@ export default {
                                     {connectionPing?.ws}ms
                                 </antd.Tag>
                             </div>
-
-                            <antd.Tooltip
-                                title={secureConnection ? connectionsTooltipStrings.secure : connectionsTooltipStrings.insecure}
-                            >
-                                <antd.Tag
-                                    color={secureConnection ? "green" : "red"}
-                                    icon={secureConnection ? <Icons.MdHttps /> : <Icons.MdWarning />}
-                                >
-                                    {
-                                        secureConnection ? " Secure connection" : "Insecure connection"
-                                    }
-                                </antd.Tag>
-                            </antd.Tooltip>
                         </div>
-                    </div>
-
-                    <div className="field_value">
-                        {serverOrigin ?? "Unknown"}
-                    </div>
-                </div>
-
-                <div className="field">
-                    <div className="field_header">
-                        <h3><Icons.MdBuild /> Version</h3>
-                    </div>
-
-                    <div className="field_value">
-                        {serverManifest?.version ?? "Unknown"}
                     </div>
                 </div>
 
@@ -237,14 +238,78 @@ export default {
                     </div>
                 </div>
 
-                <div className="group_footer">
-                    {
-                        serverManifest?.LINEBRIDGE_SERVER_VERSION && <h5>Powered by Linebridge™</h5>
-                    }
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdBuild />
+                        </div>
+
+                        <p>Version</p>
+                    </div>
+
+                    <div className="field_value">
+                        {serverManifest?.version ?? "Unknown"}
+                    </div>
                 </div>
             </div>
 
-            <Footer />
+            <div className="group">
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>React</p>
+                    </div>
+
+                    <div className="field_value">
+                        {React.version ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>Evite Engine</p>
+                    </div>
+
+                    <div className="field_value">
+                        {app.__eviteVersion ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>Comty.JS</p>
+                    </div>
+
+                    <div className="field_value">
+                        {__comty_shared_state.version ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>Platform</p>
+                    </div>
+
+                    <div className="field_value">
+                        {Capacitor.platform}
+                    </div>
+                </div>
+            </div>
         </div>
     }
 }
