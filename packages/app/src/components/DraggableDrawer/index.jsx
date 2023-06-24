@@ -7,14 +7,7 @@ import Observer from "react-intersection-observer"
 import { css } from "@emotion/css"
 import { createPortal } from "react-dom"
 
-import {
-    isDirectionBottom,
-    isDirectionTop,
-    isDirectionLeft,
-    isDirectionRight,
-} from "./helpers.js"
-
-export default class Drawer extends Component {
+export default class DraggableDrawer extends Component {
     static propTypes = {
         open: PropTypes.bool.isRequired,
         children: PropTypes.oneOfType([
@@ -28,13 +21,11 @@ export default class Drawer extends Component {
         inViewportChange: PropTypes.func,
         allowClose: PropTypes.bool,
         notifyWillClose: PropTypes.func,
-        direction: PropTypes.string,
         modalElementClass: PropTypes.oneOfType([
             PropTypes.object,
             PropTypes.string
         ]),
         containerOpacity: PropTypes.number,
-        containerElementClass: PropTypes.string,
         getContainerRef: PropTypes.func,
         getModalRef: PropTypes.func
     }
@@ -48,11 +39,9 @@ export default class Drawer extends Component {
         getContainerRef: () => { },
         getModalRef: () => { },
         containerOpacity: 0.6,
-        direction: "bottom",
         parentElement: document.body,
         allowClose: true,
         dontApplyListeners: false,
-        containerElementClass: "",
         modalElementClass: ""
     }
 
@@ -68,13 +57,17 @@ export default class Drawer extends Component {
     }
 
     DESKTOP_MODE = false
-    DRAGGER_HEIGHT_SIZE = 100
-    MAX_NEGATIVE_SCROLL = 5
-    SCROLL_TO_CLOSE = 475
     ALLOW_DRAWER_TRANSFORM = true
+
+    MAX_NEGATIVE_SCROLL = -50
+    PX_TO_CLOSE_FROM_BOTTOM = 200
 
     componentDidMount() {
         this.DESKTOP_MODE = !app.isMobile
+    }
+
+    componentWillUnmount() {
+        this.removeListeners()
     }
 
     componentDidUpdate(prevProps, nextState) {
@@ -86,7 +79,7 @@ export default class Drawer extends Component {
         }
 
         if (this.drawer) {
-            this.getNegativeScroll(this.drawer)
+            this.setNegativeScroll(this.drawer)
         }
 
         // in the process of opening the drawer
@@ -97,12 +90,8 @@ export default class Drawer extends Component {
         }
     }
 
-    componentWillUnmount() {
-        this.removeListeners()
-    }
-
-    attachListeners = drawer => {
-        const { dontApplyListeners, getModalRef, direction } = this.props
+    attachListeners = (drawer) => {
+        const { dontApplyListeners, getModalRef } = this.props
         const { listenersAttached } = this.state
 
         // only attach listeners once as this function gets called every re-render
@@ -118,10 +107,6 @@ export default class Drawer extends Component {
 
         let position = 0
 
-        if (isDirectionRight(direction)) {
-            position = drawer.scrollWidth
-        }
-
         this.setState({ listenersAttached: true, position }, () => {
             setTimeout(() => {
                 // trigger reflow so webkit browsers calculate height properly 😔
@@ -134,7 +119,7 @@ export default class Drawer extends Component {
     }
 
     isThumbInDraggerRange = (event) => {
-        return (event.touches[0].clientY - this.drawer.getBoundingClientRect().top) < this.DRAGGER_HEIGHT_SIZE
+        return (event.touches[0].clientY - this.drawer.getBoundingClientRect().top)
     }
 
     removeListeners = () => {
@@ -149,71 +134,70 @@ export default class Drawer extends Component {
         this.setState({ listenersAttached: false })
     }
 
-    tap = event => {
-        const { pageY, pageX } = event.touches[0]
-        const shouldIgnored = Boolean(event.target.getAttribute("ignore-dragger") || (window.getComputedStyle(event.target).getPropertyValue("--ignore-dragger") !== ""))
+    tap = (event) => {
+        const { pageY } = event.touches[0]
 
-        const start = isDirectionBottom(this.props.direction) || isDirectionTop(this.props.direction) ? pageY : pageX
+        if (!this.isThumbInDraggerRange(event)) {
+            return false
+        }
+
+        // check if event.target has dragger argument
+        const inDraggerArea = !!event.target.closest("#dragger-area")
+
+        const start = pageY
 
         // reset NEW_POSITION and MOVING_POSITION
         this.NEW_POSITION = 0
         this.MOVING_POSITION = 0
 
-        this.setState({ ignore: shouldIgnored, onRange: this.isThumbInDraggerRange(event), thumb: start, start: start, touching: true })
+        this.setState({
+            ignore: !inDraggerArea,
+            onRange: this.isThumbInDraggerRange(event),
+            thumb: start,
+            start: start,
+            touching: true
+        })
     }
 
-    drag = event => {
+    drag = (event) => {
         if (this.state.ignore) {
             return false
         }
 
-        const { direction } = this.props
+        event.preventDefault()
+
         const { thumb, position } = this.state
-        const { pageY, pageX } = event.touches[0]
+        const { pageY } = event.touches[0]
 
-        const movingPosition = isDirectionBottom(direction) || isDirectionTop(direction) ? pageY : pageX
+        const movingPosition = pageY
         const delta = movingPosition - thumb
-        const newPosition = isDirectionBottom(direction) ? position + delta : position - delta
+        const newPosition = position + delta
 
-        if (newPosition > 0 && this.ALLOW_DRAWER_TRANSFORM) {
-            // stop android's pull to refresh behavior
-            event.preventDefault()
+        if (this.ALLOW_DRAWER_TRANSFORM) {
+            // allow to drag negative scroll
+            if (newPosition < this.MAX_NEGATIVE_SCROLL) {
+                return false
+            }
 
             this.props.onDrag({ newPosition })
 
-            // we set this, so we can access it in shouldWeCloseDrawer. Since setState is async, we're not guranteed we'll have the
-            // value in time
             this.MOVING_POSITION = movingPosition
             this.NEW_POSITION = newPosition
 
-            let positionThreshold = 0
-
-            if (isDirectionRight(direction)) {
-                positionThreshold = this.drawer.scrollWidth
-            }
-
-            if (newPosition < positionThreshold && this.shouldWeCloseDrawer()) {
+            if (this.shouldWeCloseDrawer()) {
                 this.props.notifyWillClose(true)
             } else {
                 this.props.notifyWillClose(false)
             }
 
-            // not at the bottom
-            if (this.NEGATIVE_SCROLL < newPosition) {
-                this.setState({
-                    thumb: movingPosition,
-                    position:
-                        positionThreshold > 0
-                            ? Math.min(newPosition, positionThreshold)
-                            : newPosition
-                })
-            }
+            this.setState({
+                thumb: movingPosition,
+                position: newPosition,
+            })
         }
     }
 
-    release = (event) => {
-        const { direction } = this.props
-
+    release = () => {
         this.setState({ touching: false })
 
         if (this.shouldWeCloseDrawer() && this.state.onRange) {
@@ -221,33 +205,20 @@ export default class Drawer extends Component {
         } else {
             let newPosition = 0
 
-            if (isDirectionRight(direction)) {
-                newPosition = this.drawer.scrollWidth
-            }
-
             this.setState({ position: newPosition })
         }
     }
 
-    getNegativeScroll = (element) => {
-        const { direction } = this.props
+    setNegativeScroll = (element) => {
         const size = this.getElementSize()
 
-        if (isDirectionBottom(direction) || isDirectionTop(direction)) {
-            this.NEGATIVE_SCROLL = size - element.scrollHeight - this.MAX_NEGATIVE_SCROLL
-        } else {
-            this.NEGATIVE_SCROLL = size - element.scrollWidth - this.MAX_NEGATIVE_SCROLL
-        }
+        this.NEGATIVE_SCROLL = size - element.scrollHeight - this.MAX_NEGATIVE_SCROLL
     }
 
     hideDrawer = () => {
-        const { allowClose, direction } = this.props
+        const { allowClose } = this.props
 
         let defaultPosition = 0
-
-        if (isDirectionRight(direction)) {
-            defaultPosition = this.drawer.scrollWidth
-        }
 
         if (allowClose === false) {
             // if we aren't going to allow close, let's animate back to the default position
@@ -269,67 +240,31 @@ export default class Drawer extends Component {
     }
 
     shouldWeCloseDrawer = () => {
-        const { start: touchStart } = this.state
-        const { direction } = this.props
-
-        let initialPosition = 0
-
-        if (isDirectionRight(direction)) {
-            initialPosition = this.drawer.scrollWidth
+        if (this.MOVING_POSITION === 0) {
+            return false
         }
 
-        if (this.MOVING_POSITION === initialPosition) return false
+        const containerHeight = this.getElementSize()
+        const closeThreshold = containerHeight - this.PX_TO_CLOSE_FROM_BOTTOM
 
-        if (isDirectionRight(direction)) {
-            return (
-                this.NEW_POSITION < initialPosition &&
-                this.MOVING_POSITION - touchStart > this.SCROLL_TO_CLOSE
-            )
-        } else if (isDirectionLeft(direction)) {
-            return (
-                this.NEW_POSITION >= initialPosition &&
-                touchStart - this.MOVING_POSITION > this.SCROLL_TO_CLOSE
-            )
-        } else if (isDirectionTop(direction)) {
-            return (
-                this.NEW_POSITION >= initialPosition &&
-                touchStart - this.MOVING_POSITION > this.SCROLL_TO_CLOSE
-            )
-        } else {
-            return (
-                this.NEW_POSITION >= initialPosition &&
-                this.MOVING_POSITION - touchStart > this.SCROLL_TO_CLOSE
-            )
-        }
+        return (
+            this.NEW_POSITION >= 0 &&
+            this.MOVING_POSITION >= closeThreshold
+        )
     }
 
     getDrawerTransform = (value) => {
-        const { direction } = this.props
-
-        if (isDirectionBottom(direction)) {
-            return { transform: `translate3d(0, ${value}px, 0)` }
-        } else if (isDirectionTop(direction)) {
-            return { transform: `translate3d(0, -${value}px, 0)` }
-        } else if (isDirectionLeft(direction)) {
-            return { transform: `translate3d(-${Math.abs(value)}px, 0, 0)` }
-        } else if (isDirectionRight(direction)) {
-            return { transform: `translate3d(${value}px, 0, 0)` }
-        }
+        return { transform: `translate3d(0, ${value}px, 0)` }
     }
 
     getElementSize = () => {
-        return isDirectionBottom(this.props.direction) || isDirectionTop(this.props.direction) ? window.innerHeight : window.innerWidth
+        return window.innerHeight
     }
 
-    getPosition(hiddenPosition) {
+    getPosition() {
         const { position } = this.state
-        const { direction } = this.props
 
-        if (isDirectionRight(direction)) {
-            return hiddenPosition - position
-        } else {
-            return position
-        }
+        return position
     }
 
     inViewportChange = (inView) => {
@@ -360,44 +295,22 @@ export default class Drawer extends Component {
 
     render() {
         const {
-            containerElementClass,
             containerOpacity,
-            dontApplyListeners,
             id,
             getContainerRef,
-            getModalRef,
-            direction
         } = this.props
 
         const open = this.state.open && this.props.open
 
-        // If drawer isn't open or in the process of opening/closing, then remove it from the DOM
-        // also, if we're not client side we need to return early because createPortal is only
-        // a clientside method
-
-        // if ((!this.state.open && !this.props.open)) {
-        //     return null
-        // }
-
         const { touching } = this.state
 
-        const springPreset = isDirectionLeft(direction) ? { damping: 17, stiffness: 120 } : { damping: 20, stiffness: 300 }
+        const springPreset = { damping: 20, stiffness: 300 }
         const animationSpring = touching ? springPreset : presets.stiff
         const hiddenPosition = this.getElementSize()
         const position = this.getPosition(hiddenPosition)
 
-        // Style object for the container element
         let containerStyle = {
             backgroundColor: `rgba(55, 56, 56, ${open ? containerOpacity : 0})`
-        }
-
-        // If direction is right, we set the overflowX property to 'hidden' to hide the x scrollbar during
-        // the sliding animation
-        if (isDirectionRight(direction)) {
-            containerStyle = {
-                ...containerStyle,
-                overflowX: "hidden"
-            }
         }
 
         return createPortal(
@@ -415,7 +328,7 @@ export default class Drawer extends Component {
                             id={id}
                             style={containerStyle}
                             onMouseDown={this.onClickOutside}
-                            className={`${Container} ${containerElementClass} `}
+                            className="draggable-drawer"
                             ref={getContainerRef}
                         >
                             <Observer
@@ -424,11 +337,24 @@ export default class Drawer extends Component {
                             />
 
                             <div
+                                className="draggable-drawer_body"
                                 onClick={this.stopPropagation}
-                                style={this.getDrawerTransform(translate)}
+                                style={{
+                                    ...this.props.bodyStyle,
+                                    ...this.getDrawerTransform(translate),
+                                }}
                                 ref={this.attachListeners}
-                                className={this.props.modalElementClass || ""}
                             >
+                                <div
+                                    className="dragger-area"
+                                    id="dragger-area"
+                                    dragger
+                                >
+                                    <div
+                                        className="dragger-indicator"
+                                    />
+                                </div>
+
                                 {this.props.children}
                             </div>
                         </div>
@@ -439,22 +365,6 @@ export default class Drawer extends Component {
         )
     }
 }
-
-const Container = css`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  flex-shrink: 0;
-  align-items: center;
-  z-index: 11;
-  transition: background-color 0.2s linear;
-  overflow-y: auto;
-  overscroll-behavior: none;
-`
 
 const HaveWeScrolled = css`
   position: absolute;
