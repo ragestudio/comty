@@ -3,8 +3,16 @@ import PostCreator from "components/PostCreator"
 
 import "./index.less"
 
-export default () => {
+export default (props) => {
+    const onPostDone = () => {
+        if (typeof props.close === "function") {
+            props.close()
+        }
+    }
+
     return <div className="_mobile_creator">
-        <PostCreator />
+        <PostCreator
+            onPost={onPostDone}
+        />
     </div>
 }
