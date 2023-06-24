@@ -4,7 +4,7 @@ import { Button } from "antd"
 export default (props) => {
     return <Button
         onClick={() => {
-            app.setLocation("/security/sessions")
+            app.location.push("/security/sessions")
             props.ctx.close()
         }}
     >

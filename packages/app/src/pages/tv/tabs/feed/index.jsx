@@ -88,7 +88,7 @@ export default (props) => {
     const [L_Streams, R_Streams, E_Streams] = app.cores.api.useRequest(Livestream.getLivestreams)
 
     const onClickItem = (livestream) => {
-        app.setLocation(`/live/${livestream.streamUrl}`)
+        app.location.push(`/live/${livestream.streamUrl}`)
     }
 
     if (E_Streams) {

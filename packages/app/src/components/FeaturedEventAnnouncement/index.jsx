@@ -12,7 +12,7 @@ export default (props) => {
             return false
         }
 
-        app.setLocation(`/featured-event/${props.data?._id}`)
+        app.location.push(`/featured-event/${props.data?._id}`)
     }
 
     return <div

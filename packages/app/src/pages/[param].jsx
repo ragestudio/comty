@@ -7,7 +7,7 @@ export default (props) => {
     if (entryParam.startsWith("@")) {
         const username = entryParam.replace("@", "")
 
-        window.app.setLocation(`/account/${username}`, {
+        window.app.location.push(`/account/${username}`, {
             state: {
                 "noTransition": true,
             }

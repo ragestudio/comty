@@ -13,7 +13,7 @@ export default (props) => {
     }
 
     const navigateToPlaylist = () => {
-        app.setLocation(`/play/${data._id}`)
+        app.location.push(`/play/${data._id}`)
     }
 
     return <div className="playlistTimelineEntry">

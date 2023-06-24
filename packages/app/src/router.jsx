@@ -73,8 +73,8 @@ function generatePageElementWrapper(route, element, bindProps) {
         if (routeDeclaration) {
             if (!bindProps.user && (window.location.pathname !== config.app?.authPath)) {
                 if (!routeDeclaration.public) {
-                    if (typeof window.app.setLocation === "function") {
-                        window.app.setLocation(config.app?.authPath ?? "/login")
+                    if (typeof window.app.location.push === "function") {
+                        window.app.location.push(config.app?.authPath ?? "/login")
                         return <div />
                     }
 
@@ -92,7 +92,7 @@ function generatePageElementWrapper(route, element, bindProps) {
                         status="403"
                         title="403"
                         subTitle="Sorry, you are not authorized to access this page."
-                        extra={<Button type="primary" onClick={() => window.app.setLocation("/")}>Back Home</Button>}
+                        extra={<Button type="primary" onClick={() => window.app.location.push("/")}>Back Home</Button>}
                     />
                 }
             }
@@ -140,52 +140,54 @@ function generatePageElementWrapper(route, element, bindProps) {
 
 export const PageRender = React.memo((props) => {
     const navigate = useNavigate()
-    app.location = useLocation()
 
-    React.useEffect(() => {
-        app.setLocation = async (to, state = {}) => {
-            // clean double slashes
-            to = to.replace(/\/{2,}/g, "/")
+    async function setLocation(to, state = {}) {
+        // clean double slashes
+        to = to.replace(/\/{2,}/g, "/")
 
-            // if state is a number, it's a delay
-            if (typeof state !== "object") {
-                state = {}
-            }
-
-            const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
-
-            state.transitionDelay = Number(transitionDuration.replace("ms", ""))
-
-            app.eventBus.emit("router.navigate", to, {
-                state,
-            })
-
-            app.location.lastPathname = app.location.pathname
-
-            if (state.transitionDelay >= 100) {
-                await new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve()
-                    }, state.transitionDelay)
-                })
-            }
-
-            return navigate(to, {
-                state
-            })
+        // if state is a number, it's a delay
+        if (typeof state !== "object") {
+            state = {}
         }
 
-        app.backLocation = (state = {}) => {
-            let to = app.location.lastPathname
+        const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
 
-            if (!to || to === app.location.pathname) {
-                console.warn("No last location found, redirecting to /")
-                to = "/"
-            }
+        state.transitionDelay = Number(transitionDuration.replace("ms", ""))
 
-            return navigate(to, {
-                state
-            })
+        app.eventBus.emit("router.navigate", to, {
+            state,
+        })
+
+        app.location.last = window.location
+
+        if (state.transitionDelay >= 100) {
+            await new Promise((resolve) => setTimeout(resolve, state.transitionDelay))
+        }
+
+        return navigate(to, {
+            state
+        })
+    }
+
+    async function backLocation() {
+        const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
+
+        app.eventBus.emit("router.navigate")
+
+        app.location.last = window.location
+
+        if (transitionDuration >= 100) {
+            await new Promise((resolve) => setTimeout(resolve, transitionDuration))
+        }
+
+        return window.history.back()
+    }
+
+    React.useEffect(() => {
+        app.location = {
+            last: window.location,
+            push: setLocation,
+            back: backLocation,
         }
     }, [])
 

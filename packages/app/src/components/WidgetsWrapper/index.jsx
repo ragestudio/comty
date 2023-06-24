@@ -232,7 +232,7 @@ export default class WidgetsWrapper extends React.Component {
                         id: "settings",
                         icon: "Settings",
                         onClick: () => {
-                            app.setLocation("/settings?tab=widgets")
+                            app.location.push("/settings?tab=widgets")
                         }
                     },
                 ]}

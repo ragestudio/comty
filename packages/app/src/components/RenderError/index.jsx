@@ -33,7 +33,7 @@ export default (props) => {
 	}
 
 	const onClickGoMain = () => {
-		window.app.setLocation(config.app.mainPath ?? "/main")
+		window.app.location.push(config.app.mainPath ?? "/main")
 	}
 	const onClickReload = () => {
 		window.location.reload()
