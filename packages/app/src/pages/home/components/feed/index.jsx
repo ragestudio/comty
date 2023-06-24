@@ -13,7 +13,7 @@ const emptyListRender = () => {
         </h2>
 
         <p>
-            Search for new people to follow on <a onClick={() => app.setLocation("/?type=global")}>global</a> tab, and start view their posts.
+            Search for new people to follow on <a onClick={() => app.location.push("/?type=global")}>global</a> tab, and start view their posts.
         </p>
     </div>
 }

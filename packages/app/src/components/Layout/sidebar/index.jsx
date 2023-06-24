@@ -311,11 +311,11 @@ export default class Sidebar extends React.Component {
 
 		if (typeof this.state.pathResolvers === "object") {
 			if (typeof this.state.pathResolvers[e.key] !== "undefined") {
-				return window.app.setLocation(`/${this.state.pathResolvers[e.key]}`, 150)
+				return window.app.location.push(`/${this.state.pathResolvers[e.key]}`, 150)
 			}
 		}
 
-		return window.app.setLocation(`/${e.key}`, 150)
+		return window.app.location.push(`/${e.key}`, 150)
 	}
 
 	toggleExpanded = (to, force) => {

@@ -36,7 +36,7 @@ const messageRegexs = [
     {
         regex: /(@[a-zA-Z0-9_]+)/gi,
         fn: (key, result) => {
-            return <a key={key} onClick={() => window.app.setLocation(`/@${result[1].substr(1)}`)}>{result[1]}</a>
+            return <a key={key} onClick={() => window.app.location.push(`/@${result[1].substr(1)}`)}>{result[1]}</a>
         }
     },
 ]

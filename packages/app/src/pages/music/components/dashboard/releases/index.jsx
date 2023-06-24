@@ -88,7 +88,7 @@ const openPlaylistCreator = ({
 }
 
 const navigateToPlaylist = (playlist_id) => {
-    return app.setLocation(`/play/${playlist_id}`)
+    return app.location.push(`/play/${playlist_id}`)
 }
 
 export default (props) => {

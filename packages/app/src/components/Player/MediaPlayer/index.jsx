@@ -46,7 +46,7 @@ export class AudioPlayer extends React.Component {
     }
 
     openVisualizer = () => {
-        app.setLocation("/lyrics")
+        app.location.push("/lyrics")
     }
 
     inviteSync = () => {

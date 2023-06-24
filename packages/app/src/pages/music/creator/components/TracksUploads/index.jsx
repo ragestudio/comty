@@ -332,7 +332,7 @@ export default (props) => {
 
     return <div className="tracksUploads">
         <p>
-            Uploading files that are not permitted by our <a onClick={() => app.setLocation("/terms")}>Terms of Service</a> may result in your account being suspended.
+            Uploading files that are not permitted by our <a onClick={() => app.location.push("/terms")}>Terms of Service</a> may result in your account being suspended.
         </p>
 
         <div className="uploadBox">

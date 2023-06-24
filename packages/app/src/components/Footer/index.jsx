@@ -16,7 +16,7 @@ export default (props) => {
 
             if (link.location) {
                 linkProps.onClick = () => {
-                    app.setLocation(link.location)
+                    app.location.push(link.location)
                 }
             }
 

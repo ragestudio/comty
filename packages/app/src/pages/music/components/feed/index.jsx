@@ -143,7 +143,7 @@ const PlaylistItem = (props) => {
             return props.onClick(playlist)
         }
 
-        return app.setLocation(`/play/${playlist._id}`)
+        return app.location.push(`/play/${playlist._id}`)
     }
 
     const onClickPlay = (e) => {

@@ -620,7 +620,7 @@ export default class SyncLyrics extends React.Component {
         // listen when user exit full screen to exit cinematic mode
         document.addEventListener("fullscreenchange", () => {
             if (!document.fullscreenElement) {
-                app.backLocation()
+                app.location.back()
             }
         })
 
