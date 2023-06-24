@@ -3,6 +3,7 @@
         "backgroundBlur": "10px",
         "colorPrimary": "#ff6064",
         "app-color": "#ff6064",
+        "danger-color": "#ff6064",
         "backgroundColorTransparency": "0.8",
         "backgroundImage": "",
         "fontFamily": "'Inter', sans-serif",
