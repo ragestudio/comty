@@ -9,14 +9,25 @@ import { Icons, createIconRender } from "components/Icons"
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
 import PlayerView from "pages/@mobile-views/player"
+import CreatorView from "pages/@mobile-views/creator"
 
 import "./index.less"
 
-const PlayerButton = (props) => {
-    const openPlayerView = () => {
-        app.DrawerController.open("player", PlayerView)
-    }
+const openPlayerView = () => {
+    app.DrawerController.open("player", PlayerView)
+}
+const openCreator = () => {
+    app.DrawerController.open("creator", CreatorView, {
+        props: {
+            bodyStyle: {
+                minHeight: "unset",
+                height: "50vh"
+            }
+        }
+    })
+}
 
+const PlayerButton = (props) => {
     React.useEffect(() => {
         openPlayerView()
     }, [])
@@ -63,6 +74,23 @@ const AccountButton = (props) => {
                         ActionSheetRef.current.close()
                     }
                 },
+                {
+                    key: "account",
+                    text: <><Icons.User /> <span>Account</span></>,
+                    onClick: () => {
+                        app.navigation.goToAccount()
+                        ActionSheetRef.current.close()
+                    }
+                },
+                {
+                    key: "logout",
+                    text: <><Icons.MdOutlineLogout /> <span>Logout</span></>,
+                    danger: true,
+                    onClick: () => {
+                        app.eventBus.emit("app.logout_request")
+                        ActionSheetRef.current.close()
+                    }
+                }
             ]
         })
     }
@@ -228,7 +256,7 @@ export class BottomBar extends React.Component {
         if (item.dispatchEvent) {
             app.eventBus.emit(item.dispatchEvent)
         } else if (item.location) {
-            app.setLocation(item.location)
+            app.location.push(item.location)
         }
     }
 
@@ -283,7 +311,7 @@ export class BottomBar extends React.Component {
         }
 
         if (item.location) {
-            app.setLocation(item.location)
+            app.location.push(item.location)
 
             if (app.cores.haptics?.vibrate) {
                 app.cores.haptics.vibrate([40, 80])
@@ -356,7 +384,7 @@ export class BottomBar extends React.Component {
                             key="creator"
                             id="creator"
                             className={classnames("item", "primary")}
-                            onClick={() => app.setLocation("/")}
+                            onClick={openCreator}
                         >
                             <div className="icon">
                                 {createIconRender("PlusCircle")}
@@ -379,7 +407,7 @@ export class BottomBar extends React.Component {
                             key="navigator"
                             id="navigator"
                             className="item"
-                            onClick={() => app.setLocation("/")}
+                            onClick={() => app.location.push("/")}
                             onTouchMove={this.handleNavTouchMove}
                             onTouchStart={this.handleNavTouchStart}
                             onTouchEnd={this.handleNavTouchEnd}
