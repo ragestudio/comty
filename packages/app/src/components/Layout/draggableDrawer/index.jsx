@@ -7,6 +7,8 @@ import Observer from "react-intersection-observer"
 import { css } from "@emotion/css"
 import { createPortal } from "react-dom"
 
+import "./index.less"
+
 export default class DraggableDrawer extends Component {
     static propTypes = {
         open: PropTypes.bool.isRequired,
@@ -141,7 +143,6 @@ export default class DraggableDrawer extends Component {
             return false
         }
 
-        // check if event.target has dragger argument
         const inDraggerArea = !!event.target.closest("#dragger-area")
 
         const start = pageY
