@@ -1,26 +1,82 @@
-.drawer {
-	.body {
-		position: absolute;
-		top: 50px;
+.draggable-drawer {
+	position: fixed;
 
-		padding: 30px 10px 10px 10px;
-		background-color: var(--background-color-primary);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+
+	display: flex;
+	justify-content: center;
+
+	flex-shrink: 0;
+	align-items: center;
+
+	z-index: 40;
+
+	transition: background-color 0.2s linear;
+	overflow-y: hidden;
+	overscroll-behavior: none;
+
+	.draggable-drawer_body {
+		position: absolute;
+
+		bottom: 0px;
+
 		width: 100%;
 		max-width: 700px;
-		min-height: 100%;
+
+		height: fit-content;
+		max-height: 90%;
+
+		padding: 30px 10px 10px 10px;
+
+		background-color: var(--background-color-primary);
+
 		border-top-left-radius: 8px;
 		border-top-right-radius: 8px;
-	}
+		z-index: 50;
 
-	.body::before{
-		content: "";
-		background-color: var(--background-color-contrast);
-		width: 100px;
-		height: 8px;
-		position: absolute;
-		top: 10px;
-		left: 50%;
-		transform: translateX(-50%);
-		border-radius: 8px;
+		.dragger-area {
+			width: 100%;
+			height: 10px;
+
+			position: absolute;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			top: 10px;
+			left: 0;
+
+			z-index: 55;
+
+			.dragger-indicator {
+				background-color: var(--background-color-contrast);
+				width: 100px;
+				height: 8px;
+
+				border-radius: 8px;
+			}
+		}
+
+		&::after {
+			content: "";
+
+			display: block;
+			position: fixed;
+
+			left: 0;
+			bottom: 0;
+
+			width: 100%;
+			height: 120px;
+
+			z-index: 45;
+
+			background-color: var(--background-color-primary);
+
+			transform: translateY(95%);
+		}
 	}
 }
