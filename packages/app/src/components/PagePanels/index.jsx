@@ -31,11 +31,15 @@ export class PagePanelWithNavMenu extends React.Component {
     primaryPanelRef = React.createRef()
 
     componentDidMount() {
-        app.layout.top_bar.shouldUseTopBarSpacer(false)
+        if (app.isMobile) {
+            app.layout.top_bar.shouldUseTopBarSpacer(false)
+        }
     }
 
     componentWillUnmount() {
-        app.layout.top_bar.shouldUseTopBarSpacer(true)
+        if (app.isMobile) {
+            app.layout.top_bar.shouldUseTopBarSpacer(true)
+        }
     }
 
     renderActiveTab() {

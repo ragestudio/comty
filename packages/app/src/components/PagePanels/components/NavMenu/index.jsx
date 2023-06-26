@@ -34,7 +34,7 @@ const NavMenuMobile = (props) => {
                 return <antd.Button
                     key={item.key}
                     className={classnames(
-                        "card_item",
+                        "__mobile__navmenu_item",
                         item.key === props.activeKey && "active",
                     )}
                     onClick={() => props.onClickItem(item.key)}
