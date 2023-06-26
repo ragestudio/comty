@@ -8,7 +8,7 @@ import { Icons, createIconRender } from "components/Icons"
 
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
-import QuickNavMenu from "components/Layout/quickNav"
+import {QuickNavMenuItems, QuickNavMenu} from "components/Layout/quickNav"
 
 import PlayerView from "pages/@mobile-views/player"
 import CreatorView from "pages/@mobile-views/creator"
