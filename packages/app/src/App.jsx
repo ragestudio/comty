@@ -122,7 +122,10 @@ class ComtyApp extends React.Component {
 		window.app.message = antd.message
 		window.app.isCapacitor = window.navigator.userAgent === "capacitor"
 
-		window.localStorage.setItem("last_version", window.app.version)
+		if (window.app.version !== window.localStorage.getItem("last_version")) {
+			app.message.info(`Comty has been updated to version ${window.app.version}!`)
+			window.localStorage.setItem("last_version", window.app.version)
+		}
 
 		// check if electron library is available
 		if (typeof window.electron !== "undefined") {
