@@ -23,7 +23,7 @@
 	height: 0;
 	opacity: 0;
 
-	background-color: var(--background-color-accent);
+	background-color: var(--background-color-primary);
 
 	box-shadow: @card-shadow-top;
 
@@ -130,44 +130,53 @@
 	}
 }
 
+.bottomBar_wrapper {
+	//position: absolute;
+	position: relative;
+
+	bottom: 0;
+	left: 0;
+
+	z-index: 550;
+
+	display: flex;
+	flex-direction: row;
+	
+	align-items: center;
+	justify-content: center;
+
+	width: 100vw;
+
+	//padding: 10px;
+}
+
 .bottomBar {
-	position: absolute;
 	display: flex;
 	flex-direction: row;
 
 	align-items: center;
 	justify-content: center;
 
-	position: relative;
-
-	z-index: 550;
-
-	left: 0;
-	bottom: 0;
-
-	width: 100vw;
-	min-width: 100vw;
-	max-width: 100vw;
-
+	width: 100%;
 	height: @app_bottomBar_height;
 
-	padding: 10px;
 	overflow: hidden;
 
 	background-color: var(--background-color-accent);
+
+	//border-radius: 12px;
 	border-radius: 12px 12px 0 0;
 
+	//box-shadow: @card-shadow;
 	box-shadow: @card-shadow-top;
 
 	.items {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		//white-space: nowrap;
-		//overflow-x: overlay;
 
 		height: 100%;
-		width: 100vw;
+		width: 100%;
 
 		.item {
 			display: inline-flex;

@@ -372,68 +372,72 @@ export class BottomBar extends React.Component {
             />
 
             <Motion style={{ y: spring(this.state.show ? 0 : 300) }}>
-                {({ y }) => <div
-                    className="bottomBar"
-                    style={{
-                        WebkitTransform: `translate3d(0, ${y}px, 0)`,
-                        transform: `translate3d(0, ${y}px, 0)`,
-                    }}
-                >
-                    <div className="items">
+                {({ y }) =>
+                    <div className="bottomBar_wrapper">
                         <div
-                            key="creator"
-                            id="creator"
-                            className={classnames("item", "primary")}
-                            onClick={openCreator}
-                        >
-                            <div className="icon">
-                                {createIconRender("PlusCircle")}
-                            </div>
-                        </div>
-
-                        {
-                            this.context.currentManifest && <div
-                                className="item"
-                            >
-                                <PlayerButton
-                                    manifest={this.context.currentManifest}
-                                    playback={this.context.playbackStatus}
-                                    colorAnalysis={this.context.coverColorAnalysis}
-                                />
-                            </div>
-                        }
-
-                        <div
-                            key="navigator"
-                            id="navigator"
-                            className="item"
-                            onClick={() => app.location.push("/")}
-                            onTouchMove={this.handleNavTouchMove}
-                            onTouchStart={this.handleNavTouchStart}
-                            onTouchEnd={this.handleNavTouchEnd}
-                            onTouchCancel={() => {
-                                this.setState({ quickNavVisible: false })
+                            className="bottomBar"
+                            style={{
+                                WebkitTransform: `translate3d(0, ${y}px, 0)`,
+                                transform: `translate3d(0, ${y}px, 0)`,
                             }}
                         >
-                            <div className="icon">
-                                {createIconRender("Home")}
+                            <div className="items">
+                                <div
+                                    key="creator"
+                                    id="creator"
+                                    className={classnames("item", "primary")}
+                                    onClick={openCreator}
+                                >
+                                    <div className="icon">
+                                        {createIconRender("PlusCircle")}
+                                    </div>
+                                </div>
+
+                                {
+                                    this.context.currentManifest && <div
+                                        className="item"
+                                    >
+                                        <PlayerButton
+                                            manifest={this.context.currentManifest}
+                                            playback={this.context.playbackStatus}
+                                            colorAnalysis={this.context.coverColorAnalysis}
+                                        />
+                                    </div>
+                                }
+
+                                <div
+                                    key="navigator"
+                                    id="navigator"
+                                    className="item"
+                                    onClick={() => app.location.push("/")}
+                                    onTouchMove={this.handleNavTouchMove}
+                                    onTouchStart={this.handleNavTouchStart}
+                                    onTouchEnd={this.handleNavTouchEnd}
+                                    onTouchCancel={() => {
+                                        this.setState({ quickNavVisible: false })
+                                    }}
+                                >
+                                    <div className="icon">
+                                        {createIconRender("Home")}
+                                    </div>
+                                </div>
+
+                                <div
+                                    key="searcher"
+                                    id="searcher"
+                                    className="item"
+                                    onClick={app.controls.openSearcher}
+                                >
+                                    <div className="icon">
+                                        {createIconRender("Search")}
+                                    </div>
+                                </div>
+
+                                <AccountButton />
                             </div>
                         </div>
-
-                        <div
-                            key="searcher"
-                            id="searcher"
-                            className="item"
-                            onClick={app.controls.openSearcher}
-                        >
-                            <div className="icon">
-                                {createIconRender("Search")}
-                            </div>
-                        </div>
-
-                        <AccountButton />
                     </div>
-                </div>}
+                }
             </Motion>
         </>
     }
