@@ -37,10 +37,10 @@ const Footer = () => {
 const latencyToColor = (latency, type) => {
     switch (type) {
         case "http": {
-            if (latency < 100) {
+            if (latency < 200) {
                 return "green"
             }
-            if (latency < 200) {
+            if (latency < 500) {
                 return "orange"
             }
             return "red"
