@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { createIconRender } from "components/Icons"
 
-const QuickNavMenuItems = [
+export const QuickNavMenuItems = [
     {
         id: "music",
         icon: "MdAlbum",
@@ -31,7 +31,7 @@ const QuickNavMenuItems = [
     },
 ]
 
-export default ({
+export const QuickNavMenu = ({
     visible,
 }) => {
     return <div
@@ -69,3 +69,5 @@ export default ({
         }
     </div>
 }
+
+export default QuickNavMenu
