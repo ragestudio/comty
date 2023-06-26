@@ -36,6 +36,46 @@ const typeToComponent = {
     "playlist": (args) => <PlaylistTimelineEntry {...args} />,
 }
 
+const PostList = (props) => {
+    return <LoadMore
+        ref={props.listRef}
+        className="post-list"
+        loadingComponent={LoadingComponent}
+        noResultComponent={NoResultComponent}
+        hasMore={props.hasMore}
+        fetching={props.loading}
+        onBottom={props.onLoadMore}
+    >
+        {
+            !props.realtimeUpdates && !app.isMobile && <div className="resume_btn_wrapper">
+                <antd.Button
+                    type="primary"
+                    shape="round"
+                    onClick={props.onResumeRealtimeUpdates}
+                    loading={props.resumingLoading}
+                    icon={<Icons.SyncOutlined />}
+                >
+                    Resume
+                </antd.Button>
+            </div>
+        }
+        {
+            props.list.map((data) => {
+                return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
+                    key: data._id,
+                    data: data,
+                    events: {
+                        onClickLike: props.onLikePost,
+                        onClickSave: props.onSavePost,
+                        onClickDelete: props.onDeletePost,
+                        onClickEdit: props.onEditPost,
+                    }
+                })
+            })
+        }
+    </LoadMore>
+}
+
 export class PostsListsComponent extends React.Component {
     state = {
         openPost: null,
@@ -366,44 +406,34 @@ export class PostsListsComponent extends React.Component {
             </div>
         }
 
+        const PostListProps = {
+            listRef: this.listRef,
+            list: this.state.list,
+
+            onLikePost: this.onLikePost,
+            onSavePost: this.onSavePost,
+            onDeletePost: this.onDeletePost,
+            onEditPost: this.onEditPost,
+
+            onLoadMore: this.onLoadMore,
+            hasMore: this.state.hasMore,
+            loading: this.state.loading,
+
+            realtimeUpdates: this.state.realtimeUpdates,
+            resumingLoading: this.state.resumingLoading,
+            onResumeRealtimeUpdates: this.onResumeRealtimeUpdates,
+        }
+
+        if (app.isMobile) {
+            return <PostList
+                {...PostListProps}
+            />
+        }
+
         return <div className="post-list_wrapper">
-            <LoadMore
-                ref={this.listRef}
-                className="post-list"
-                loadingComponent={LoadingComponent}
-                noResultComponent={NoResultComponent}
-                hasMore={this.state.hasMore}
-                fetching={this.state.loading}
-                onBottom={this.onLoadMore}
-            >
-                {
-                    !this.state.realtimeUpdates && !app.isMobile && <div className="resume_btn_wrapper">
-                        <antd.Button
-                            type="primary"
-                            shape="round"
-                            onClick={this.onResumeRealtimeUpdates}
-                            loading={this.state.resumingLoading}
-                            icon={<Icons.SyncOutlined />}
-                        >
-                            Resume
-                        </antd.Button>
-                    </div>
-                }
-                {
-                    this.state.list.map((data) => {
-                        return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
-                            key: data._id,
-                            data: data,
-                            events: {
-                                onClickLike: this.onLikePost,
-                                onClickSave: this.onSavePost,
-                                onClickDelete: this.onDeletePost,
-                                onClickEdit: this.onEditPost,
-                            }
-                        })
-                    })
-                }
-            </LoadMore>
+            <PostList
+                {...PostListProps}
+            />
         </div>
     }
 }

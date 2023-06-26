@@ -1,3 +1,57 @@
+@import "theme/vars.less";
+
+#root {
+    &.mobile {
+        &.page-panel-spacer {
+            .pagePanels {
+                .panel {
+                    &.center {
+                        padding-top: calc(@top_bar_height + @top_bar_padding * 2);
+                    }
+                }
+            }
+        }
+
+        .pagePanels {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: flex-start;
+
+            overflow: unset;
+            overflow-x: visible;
+            overflow-y: overlay;
+
+            width: 100%;
+            height: max-content;
+
+            padding: 0;
+
+            -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
+
+            .panel {
+                width: 100%;
+
+                height: unset;
+
+                &.center {
+                    z-index: 300;
+
+                    overflow: unset;
+                    overflow-x: unset;
+                    overflow-y: unset;
+
+                    height: unset;
+
+                    transition: all 150ms ease-in-out;
+                }
+            }
+        }
+    }
+}
+
 .pagePanels {
     display: grid;
 

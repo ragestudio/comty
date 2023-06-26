@@ -5,6 +5,7 @@ import { Translation } from "react-i18next"
 import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
 import { Icons, createIconRender } from "components/Icons"
+import { UseTopBar } from "components/Layout/topBar"
 
 import {
     composedSettingsByGroups as settingsGroups,
@@ -20,38 +21,31 @@ const SettingsHeader = ({
     activeKey,
     back = () => { }
 } = {}) => {
-    if (activeKey) {
-        const currentTab = composedTabs[activeKey]
+    const currentTab = composedTabs[activeKey]
 
-        return <div className="__mobile__settings_header nav">
-            <antd.Button
+    return <UseTopBar
+        options={{
+            className: "settings_nav"
+        }}
+    >
+        {
+            activeKey && <antd.Button
                 icon={<Icons.MdChevronLeft />}
                 onClick={back}
                 size="large"
                 type="ghost"
             />
+        }
 
-            <h1>
-                {
-                    createIconRender(currentTab?.icon)
-                }
-                <Translation>
-                    {(t) => t(currentTab?.label ?? activeKey)}
-                </Translation>
-            </h1>
-        </div>
-    }
-
-    return <div className="__mobile__settings_header">
         <h1>
             {
-                createIconRender("Settings")
+                createIconRender(currentTab?.icon ?? "Settings")
             }
             <Translation>
-                {(t) => t("Settings")}
+                {(t) => t(currentTab?.label ?? activeKey ?? "Settings")}
             </Translation>
         </h1>
-    </div>
+    </UseTopBar>
 }
 
 export default (props) => {
@@ -80,6 +74,11 @@ export default (props) => {
     const changeTab = (key) => {
         lastKey = key
         setActiveKey(key)
+
+        // scroll to top
+        app.layout.scrollTo({
+            top: 0,
+        })
     }
 
     return <div className="__mobile__settings">

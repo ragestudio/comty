@@ -1,11 +1,9 @@
 import Default from "./default"
-import Mobile from "./mobile"
-import None from "./none"
+import Minimal from "./minimal"
 import Blank from "./blank"
 
 export default {
     default: Default,
-    mobile: Mobile,
-    none: None,
+    minimal: Minimal,
     blank: Blank,
 }

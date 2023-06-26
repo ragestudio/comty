@@ -4,6 +4,7 @@ import * as antd from "antd"
 
 import { createIconRender } from "components/Icons"
 
+import { UseTopBar } from "components/Layout/topBar"
 import NavMenu from "./components/NavMenu"
 
 import "./index.less"
@@ -28,6 +29,14 @@ export class PagePanelWithNavMenu extends React.Component {
     }
 
     primaryPanelRef = React.createRef()
+
+    componentDidMount() {
+        app.layout.top_bar.shouldUseTopBarSpacer(false)
+    }
+
+    componentWillUnmount() {
+        app.layout.top_bar.shouldUseTopBarSpacer(true)
+    }
 
     renderActiveTab() {
         if (!Array.isArray(this.props.tabs)) {
@@ -158,14 +167,27 @@ export class PagePanelWithNavMenu extends React.Component {
             },
         ]
 
+        if (app.isMobile) {
+            delete panels[0]
+        }
+
         if (this.props.extraPanel) {
             panels.push(this.props.extraPanel)
         }
 
-        return <PagePanels
-            primaryPanelClassName={this.props.primaryPanelClassName}
-            panels={panels}
-        />
+        return <>
+            {
+                app.isMobile && app.layout.top_bar.render(<NavMenu
+                    activeKey={this.state.activeTab}
+                    items={this.getItems(this.props.tabs)}
+                    onClickItem={(key) => this.handleTabChange(key)}
+                />)
+            }
+            <PagePanels
+                primaryPanelClassName={this.props.primaryPanelClassName}
+                panels={panels}
+            />
+        </>
     }
 }
 
