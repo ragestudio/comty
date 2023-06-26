@@ -1,0 +1,52 @@
+@import "theme/vars.less";
+
+#top-bar_spacer {
+    position: relative;
+
+    display: block;
+
+    width: 100%;
+    height: calc(@top_bar_height + @top_bar_padding * 2);
+    min-height: calc(@top_bar_height + @top_bar_padding * 2);
+
+    //height: 0;
+    //min-height: 0;
+}
+
+.top-bar_wrapper {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    z-index: 310;
+
+    padding: 10px;
+
+    width: 100%;
+}
+
+.top-bar {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: center;
+    align-items: center;
+
+    background-color: var(--background-color-accent);
+
+    border-radius: 12px;
+
+    width: 100%;
+    height: @top_bar_height;
+
+    padding: 10px;
+
+    box-shadow: @card-shadow-top;
+
+    transition: all 150ms ease-in-out;
+
+    color: var(--text-color);
+}

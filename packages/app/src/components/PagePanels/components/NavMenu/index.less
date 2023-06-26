@@ -5,60 +5,58 @@
 }
 
 .__mobile__navmenu_wrapper {
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
 
-    position: relative;
-
-    top: 0;
-    left: 0;
+    justify-content: space-evenly;
 
     width: 100%;
+}
 
-    .card {
-        width: 100%;
-        height: @app_topBar_height;
+.card {
+    width: 100%;
+    height: @app_topBar_height;
 
-        display: flex;
-        flex-direction: row;
+    display: flex;
+    flex-direction: row;
 
-        justify-content: space-evenly;
+    justify-content: space-evenly;
 
-        box-shadow: @card-shadow;
+    box-shadow: @card-shadow;
 
-        gap: 10px;
-        padding: 5px;
-        border-radius: 12px;
+    gap: 10px;
+    padding: 5px;
+    border-radius: 12px;
 
-        isolation: unset;
-        overflow: visible;
+    isolation: unset;
+    overflow: visible;
+}
 
-        .item {
-            display: flex;
-            flex-direction: column;
+.card_item {
+    display: flex;
+    flex-direction: column;
 
-            align-items: center;
+    align-items: center;
 
-            height: fit-content;
+    height: fit-content;
 
-            gap: 4px;
+    gap: 4px;
 
-            padding: 8px 10px;
+    padding: 8px 10px;
 
-            &.active {
-                color: var(--colorPrimary);
-            }
+    &.active {
+        color: var(--colorPrimary);
+    }
 
-            .icon {
-                margin: 0;
-                line-height: 1rem;
-                font-size: 1.5rem;
-            }
+    .icon {
+        margin: 0;
+        line-height: 1rem;
+        font-size: 1.5rem;
+    }
 
-            .label {
-                height: fit-content;
-                line-height: 1rem;
-                font-size: 0.8rem;
-            }
-        }
+    .label {
+        height: fit-content;
+        line-height: 1rem;
+        font-size: 0.8rem;
     }
 }

@@ -1,7 +1,7 @@
 export default [
     {
         path: "/login",
-        useLayout: "none",
+        useLayout: "minimal",
         public: true
     },
     {
@@ -46,12 +46,12 @@ export default [
     },
     {
         path: "/landing/*",
-        useLayout: "blank",
+        useLayout: "minimal",
         public: true
     },
     {
         path: "/nfc/*",
-        useLayout: "blank",
+        useLayout: "minimal",
         public: true
     }
 ]

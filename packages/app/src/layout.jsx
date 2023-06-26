@@ -7,7 +7,7 @@ export default class Layout extends React.PureComponent {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
 
 	state = {
-		layoutType: app.isMobile ? "mobile" : "default",
+		layoutType: "default",
 		renderError: null,
 	}
 
@@ -51,14 +51,18 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidMount() {
-		// if (window.app.cores.settings.get("forceMobileMode") || app.isMobile) {
-		// 	app.layout.set("mobile")
-		// }
-
 		// register events
 		Object.keys(this.events).forEach((event) => {
 			window.app.eventBus.on(event, this.events[event])
 		})
+
+		if (app.isMobile) {
+			this.layoutInterface.toogleMobileStyle(true)
+		}
+
+		if (app.cores.settings.get("reduceAnimations")) {
+			this.layoutInterface.toogleRootContainerClassname("reduce-animations", true)
+		}
 	}
 
 	componentWillUnmount() {
@@ -75,25 +79,22 @@ export default class Layout extends React.PureComponent {
 	makePageTransition(path, options = {}) {
 		this.progressBar.start()
 
-		if (app.cores.settings.get("reduceAnimations") || options.state?.noTransition) {
+		const content_layout = document.getElementById("content_layout")
+
+		if (!content_layout) {
+			console.warn("content_layout not found, no animation will be played")
+
 			this.progressBar.done()
 
 			return false
 		}
 
-		const transitionLayer = document.getElementById("transitionLayer")
-
-		if (!transitionLayer) {
-			console.warn("transitionLayer not found, no animation will be played")
-			return false
-		}
-
-		transitionLayer.classList.add("fade-transverse-leave")
+		content_layout.classList.add("fade-transverse-leave")
 
 		setTimeout(() => {
 			this.progressBar.done()
 
-			transitionLayer.classList.remove("fade-transverse-leave")
+			content_layout.classList.remove("fade-transverse-leave")
 		}, options.state?.transitionDelay ?? 250)
 	}
 
@@ -110,25 +111,53 @@ export default class Layout extends React.PureComponent {
 			})
 		},
 		toogleCenteredContent: (to) => {
+			return this.layoutInterface.toogleRootContainerClassname("centered-content", to)
+		},
+		toogleMobileStyle: (to) => {
+			return this.layoutInterface.toogleRootContainerClassname("mobile", to)
+		},
+		toogleReducedAnimations: (to) => {
+			return this.layoutInterface.toogleRootContainerClassname("reduce-animations", to)
+		},
+		toogleTopBarSpacer: (to) => {
+			return this.layoutInterface.toogleRootContainerClassname("top-bar-spacer", to)
+		},
+		tooglePagePanelSpacer: (to) => {
+			return this.layoutInterface.toogleRootContainerClassname("page-panel-spacer", to)
+		},
+		toogleRootContainerClassname: (classname, to) => {
 			const root = document.getElementById("root")
-
-			if (app.isMobile) {
-				console.warn("Skipping centered content on mobile")
-				return false
-			}
 
 			if (!root) {
 				console.error("root not found")
 				return false
 			}
 
-			to = typeof to === "boolean" ? to : !root.classList.contains("centered-content")
+			to = typeof to === "boolean" ? to : !root.classList.contains(classname)
+
+			if (root.classList.contains(classname) === to) {
+				// ignore
+				return false
+			}
 
 			if (to === true) {
-				root.classList.add("centered_content")
+				root.classList.add(classname)
 			} else {
-				root.classList.remove("centered_content")
+				root.classList.remove(classname)
 			}
+		},
+		scrollTo: (to) => {
+			const content_layout = document.getElementById("content_layout")
+
+			if (!content_layout) {
+				console.error("content_layout not found")
+				return false
+			}
+
+			content_layout.scrollTo({
+				...to,
+				behavior: "smooth",
+			})
 		}
 	}
 
@@ -148,7 +177,7 @@ export default class Layout extends React.PureComponent {
 			return JSON.stringify(this.state.renderError)
 		}
 
-		const Layout = Layouts[app.isMobile ? "mobile" : layoutType]
+		const Layout = Layouts[layoutType]
 
 		if (!Layout) {
 			return app.eventBus.emit("runtime.crash", new Error(`Layout type [${layoutType}] not found`))

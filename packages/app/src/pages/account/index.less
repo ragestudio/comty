@@ -1,4 +1,59 @@
+@import "theme/vars.less";
+
 @borderRadius: 12px;
+
+#root {
+	&.mobile {
+		.accountProfile {
+			display: flex;
+			flex-direction: column;
+
+			.panels {
+				display: flex;
+				flex-direction: column;
+
+				.tabMenuWrapper {
+					position: fixed;
+
+					top: 0px;
+					left: 0px;
+
+					z-index: 300;
+
+					width: 100%;
+
+					height: @top_bar_height;
+
+					padding: @top_bar_padding;
+
+					box-shadow: @card-shadow-top;
+
+					display: flex;
+					flex-direction: row;
+
+					align-items: center;
+
+					opacity: 0;
+
+					.ant-menu {
+						display: flex;
+						flex-direction: row;
+
+						.ant-menu-item {
+							width: fit-content;
+						}
+					}
+				}
+			}
+
+			&.topHidden {
+				.tabMenuWrapper {
+					opacity: 1;
+				}
+			}
+		}
+	}
+}
 
 .accountProfile {
 	display: flex;

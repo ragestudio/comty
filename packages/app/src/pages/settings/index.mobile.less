@@ -1,4 +1,32 @@
-@top_nav_height: 52px;
+.settings_nav {
+    display: flex;
+
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+
+    width: 100%;
+
+    gap: 20px;
+
+    h1 {
+        margin: 0;
+        view-transition-name: main-header-text;
+        width: fit-content;
+    }
+
+    svg {
+        color: var(--colorPrimary);
+    }
+
+    .ant-btn {
+        font-size: 2rem;
+
+        svg {
+            color: var(--text-color);
+        }
+    }
+}
 
 .__mobile__settings {
     display: flex;
@@ -6,47 +34,6 @@
     color: var(--text-color);
 
     gap: 30px;
-
-    .__mobile__settings_header {
-        position: sticky;
-        top: 0;
-        left: 0;
-        z-index: 200;
-
-        width: 100%;
-        height: @top_nav_height;
-
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-
-        gap: 20px;
-
-        padding: 5px 20px;
-
-        border-radius: 12px;
-
-        border-bottom: 1px solid var(--border-color);
-        background-color: var(--background-color-accent);
-
-        h1 {
-            margin: 0;
-            view-transition-name: main-header-text;
-            width: fit-content;
-        }
-
-        svg {
-            color: var(--colorPrimary);
-        }
-
-        .ant-btn {
-            font-size: 2rem;
-
-            svg {
-                color: var(--text-color);
-            }
-        }
-    }
 
     .settings_list {
         view-transition-name: settings-list;

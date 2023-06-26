@@ -1,3 +1,4 @@
+export { default as TopBar } from "./topBar"
 export { default as BottomBar } from "./bottomBar"
 export { default as Drawer } from "./drawer"
 export { default as Sidebar } from "./sidebar"
