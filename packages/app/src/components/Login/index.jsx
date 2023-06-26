@@ -73,6 +73,7 @@ export default class Login extends React.Component {
         }
 
         if (typeof this.props.close === "function") {
+            this.props.unlock()
             this.props.close()
         }
     }
