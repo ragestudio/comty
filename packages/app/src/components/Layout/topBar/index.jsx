@@ -2,31 +2,10 @@ import React from "react"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
 
+import useLayoutInterface from "hooks/useLayoutInterface"
+import useDefaultVisibility from "hooks/useDefaultVisibility"
+
 import "./index.less"
-
-const useLayoutInterface = (namespace, ctx) => {
-    React.useEffect(() => {
-        if (app.layout["namespace"] === "object") {
-            throw new Error(`Layout namespace [${namespace}] already exists`)
-        }
-
-        app.layout[namespace] = ctx
-    }, [])
-
-    return app.layout[namespace]
-}
-
-const useDefaultVisibility = (defaultValue) => {
-    const [visible, setVisible] = React.useState(defaultValue ?? false)
-
-    React.useEffect(() => {
-        setTimeout(() => {
-            setVisible(true)
-        }, 10)
-    }, [])
-
-    return [visible, setVisible]
-}
 
 export const UseTopBar = (props) => {
     app.layout.top_bar.render(
@@ -123,8 +102,6 @@ export default (props) => {
     }, [render])
 
     const heightValue = visible ? Number(app.cores.style.defaultVar("top-bar-height").replace("px", "")) : 0
-
-    console.log(render)
 
     return <Motion style={{
         y: spring(visible ? 0 : 300,),
