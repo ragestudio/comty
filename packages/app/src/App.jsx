@@ -58,16 +58,14 @@ import Splash from "./splash"
 import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import * as antd from "antd"
-import { Toast } from "antd-mobile"
-import { BrowserRouter } from "react-router-dom"
 import { Translation } from "react-i18next"
 import { Lightbox } from "react-modal-image"
-import loadable from "@loadable/component"
 
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
+import AuthModel from "models/auth"
 import SessionModel from "models/session"
 import UserModel from "models/user"
 
@@ -409,6 +407,7 @@ class ComtyApp extends React.Component {
 	}
 
 	flushState = async () => {
+		delete app.userData
 		await this.setState({ session: null, user: null })
 	}
 
@@ -429,13 +428,13 @@ class ComtyApp extends React.Component {
 			})
 		}
 
-		//app.cores.sound.useUIAudio("splash_out")
-
 		app.eventBus.emit("app.initialization.start")
 
 		await this.initialization()
 
 		app.eventBus.emit("app.initialization.finish")
+
+		app.cores.sound.useUIAudio("splash_out")
 
 		this.setState({ initialized: true })
 
@@ -518,7 +517,7 @@ class ComtyApp extends React.Component {
 				<meta name="og:description" content={config.app.siteDescription} />
 				<meta property="og:title" content={config.app.siteName} />
 			</Helmet>
-			<BrowserRouter>
+			<Router.InternalRouter>
 				<ThemeProvider>
 					<Layout
 						user={this.state.user}
@@ -534,7 +533,7 @@ class ComtyApp extends React.Component {
 						<Router.PageRender />
 					</Layout>
 				</ThemeProvider>
-			</BrowserRouter>
+			</Router.InternalRouter>
 		</React.Fragment>
 	}
 }
