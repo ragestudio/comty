@@ -180,6 +180,8 @@ export class Drawer extends React.Component {
 		}
 		const componentProps = {
 			...this.options.componentProps,
+			lock: this.lock,
+			unlock: this.unlock,
 			events: this.events,
 			close: this.close,
 			handleDone: this.handleDone,
