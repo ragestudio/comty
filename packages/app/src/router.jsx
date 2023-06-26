@@ -1,5 +1,5 @@
 import React from "react"
-import { Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom"
+import { BrowserRouter, Route, Routes, useNavigate, useParams } from "react-router-dom"
 import { Skeleton, Button, Result } from "antd"
 import config from "config"
 import loadable from "@loadable/component"
@@ -14,41 +14,50 @@ const DefaultLoadingRender = () => {
     return <Skeleton active />
 }
 
-const paths = {
-    ...import.meta.glob("/src/pages/**/[a-z[]*.jsx"),
-    ...import.meta.glob("/src/pages/**/[a-z[]*.tsx"),
+const getPagePaths = () => {
+    let paths = {
+        ...import.meta.glob("/src/pages/**/[a-z[]*.jsx"),
+        ...import.meta.glob("/src/pages/**/[a-z[]*.tsx"),
+    }
+
+    if (app.isMobile) {
+        paths = {
+            ...paths,
+            ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.jsx"),
+            ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.tsx"),
+        }
+
+        // find & replace matching non mobile routes with mobile routes
+        Object.keys(paths).forEach((path) => {
+            const mobilePath = path.replace(/\.jsx$/, ".mobile.jsx").replace(/\.tsx$/, ".mobile.tsx")
+
+            if (paths[mobilePath]) {
+                delete paths[path]
+            }
+        })
+    }
+
+    return paths
 }
 
-const pathsMobile = {
-    ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.jsx"),
-    ...import.meta.glob("/src/pages/**/[a-z[]*.mobile.tsx"),
-}
+const generateRoutes = () => {
+    let paths = getPagePaths()
 
-const routes = Object.keys(paths).map((route) => {
-    const path = route
+    return Object.keys(paths).map((route) => {
+        let path = route
         .replace(/\/src\/pages|index|\.jsx$/g, "")
         .replace(/\/src\/pages|index|\.tsx$/g, "")
-        .replace(/\[\.{3}.+\]/, "*")
-        .replace(/\[(.+)\]/, ":$1")
-
-    return {
-        path,
-        element: paths[route]
-    }
-})
-
-const mobileRoutes = Object.keys(pathsMobile).map((route) => {
-    const path = route
         .replace(/\/src\/pages|index|\.mobile|\.jsx$/g, "")
         .replace(/\/src\/pages|index|\.mobile|\.tsx$/g, "")
-        .replace(/\[\.{3}.+\]/, "*")
-        .replace(/\[(.+)\]/, ":$1")
 
-    return {
-        path,
-        element: pathsMobile[route]
-    }
-})
+        path = path.replace(/\[\.{3}.+\]/, "*").replace(/\[(.+)\]/, ":$1")
+
+        return {
+            path,
+            element: paths[route],
+        }
+    })
+}
 
 function generatePageElementWrapper(route, element, bindProps) {
     return React.createElement((props) => {
@@ -101,12 +110,6 @@ function generatePageElementWrapper(route, element, bindProps) {
                 app.layout.set(routeDeclaration.useLayout)
             }
 
-            // if (routeDeclaration.useHeader === true) {
-            //     app.layout.header?.toggle(true)
-            // } else {
-            //     app.layout.header?.toggle(false)
-            // }
-
             if (typeof routeDeclaration.useTitle !== "undefined") {
                 if (typeof routeDeclaration.useTitle === "function") {
                     routeDeclaration.useTitle = routeDeclaration.useTitle(route, params)
@@ -138,7 +141,11 @@ function generatePageElementWrapper(route, element, bindProps) {
     })
 }
 
-export const PageRender = React.memo((props) => {
+const NavigationController = (props) => {
+    if (!app.location) {
+        app.location = Object()
+    }
+
     const navigate = useNavigate()
 
     async function setLocation(to, state = {}) {
@@ -191,17 +198,27 @@ export const PageRender = React.memo((props) => {
         }
     }, [])
 
+    return props.children
+}
+
+export const InternalRouter = (props) => {
+    return <BrowserRouter>
+        <NavigationController>
+            {
+                props.children
+            }
+        </NavigationController>
+    </BrowserRouter>
+}
+
+export const PageRender = React.memo((props) => {
+    let routes = generateRoutes()
+
+    console.log(routes)
+
     return <Routes>
         {
             routes.map((route, index) => {
-                if (app.isMobile) {
-                    const mobileRoute = mobileRoutes.find((r) => r.path === route.path)
-
-                    if (mobileRoute) {
-                        route = mobileRoute
-                    }
-                }
-
                 return <Route
                     key={index}
                     path={route.path}
