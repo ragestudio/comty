@@ -18,6 +18,7 @@
         "backgroundRepeat": "no-repeat",
         "backgroundAttachment": "fixed",
         "top-bar-height": "52px",
+        "bottom-bar-height": "80px",
         "compact-mode": false
     },
     "defaultVariant": "dark",
