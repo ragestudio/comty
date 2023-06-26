@@ -8,6 +8,8 @@ import { Icons, createIconRender } from "components/Icons"
 
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
+import QuickNavMenu from "components/Layout/quickNav"
+
 import PlayerView from "pages/@mobile-views/player"
 import CreatorView from "pages/@mobile-views/creator"
 
@@ -111,75 +113,6 @@ const AccountButton = (props) => {
     </div>
 }
 
-
-const QuickNavMenuItems = [
-    {
-        id: "music",
-        icon: "MdAlbum",
-        label: "Music",
-        location: "/music"
-    },
-    {
-        id: "tv",
-        icon: "Tv",
-        label: "Tv",
-        location: "/tv"
-    },
-    {
-        id: "groups",
-        icon: "MdGroups",
-        label: "Groups",
-        location: "/groups",
-        disabled: true,
-    },
-    {
-        id: "marketplace",
-        icon: "Box",
-        label: "Marketplace",
-        location: "/marketplace",
-        disabled: true
-    },
-]
-
-const QuickNavMenu = ({
-    visible,
-}) => {
-    return <div
-        className={classnames(
-            "quick-nav",
-            {
-                ["active"]: visible
-            }
-        )}
-    >
-        {
-            QuickNavMenuItems.map((item, index) => {
-                return <div
-                    key={index}
-                    className={classnames(
-                        "quick-nav_item",
-                        {
-                            ["disabled"]: item.disabled
-                        }
-                    )}
-                    quicknav-item={item.id}
-                    disabled={item.disabled}
-                >
-                    {
-                        createIconRender(item.icon)
-                    }
-                    <h1>
-
-                        {
-                            item.label
-                        }
-                    </h1>
-                </div>
-            })
-        }
-    </div>
-}
-
 export default (props) => {
     return <WithPlayerContext>
         <BottomBar
@@ -192,11 +125,9 @@ export class BottomBar extends React.Component {
     static contextType = Context
 
     state = {
-        allowed: true,
-        show: true,
-        visible: true,
+        visible: false,
+        quickNavVisible: false,
         render: null,
-        quickNavVisible: false
     }
 
     busEvents = {
@@ -206,7 +137,7 @@ export class BottomBar extends React.Component {
     }
 
     componentDidMount = () => {
-        app.BottomBarController = {
+        this.interface = app.layout.bottom_bar = {
             toogleVisible: this.toggleVisibility,
             isVisible: () => this.state.visible,
             render: (fragment) => {
@@ -217,6 +148,10 @@ export class BottomBar extends React.Component {
             },
         }
 
+        setTimeout(() => {
+            this.setState({ visible: true })
+        }, 10)
+
         // Register bus events
         Object.keys(this.busEvents).forEach((key) => {
             app.eventBus.on(key, this.busEvents[key])
@@ -224,7 +159,7 @@ export class BottomBar extends React.Component {
     }
 
     componentWillUnmount = () => {
-        delete window.app.BottomBarController
+        delete window.app.layout.bottom_bar
 
         // Unregister bus events
         Object.keys(this.busEvents).forEach((key) => {
@@ -233,23 +168,11 @@ export class BottomBar extends React.Component {
     }
 
     toggleVisibility = (to) => {
-        if (!app.isMobile) {
-            to = false
-        } else {
-            to = to ?? !this.state.visible
+        if (typeof to === "undefined") {
+            to = !this.state.visible
         }
 
-        if (!to) {
-            this.setState({ show: to }, () => {
-                setTimeout(() => {
-                    this.setState({ visible: to })
-                }, 500)
-            })
-        } else {
-            this.setState({ visible: to }, () => {
-                this.setState({ show: to })
-            })
-        }
+        this.setState({ visible: to })
     }
 
     handleItemClick = (item) => {
@@ -362,23 +285,25 @@ export class BottomBar extends React.Component {
             </div>
         }
 
-        if (!this.state.visible) {
-            return null
-        }
+        const heightValue = this.state.visible ? Number(app.cores.style.defaultVar("bottom-bar-height").replace("px", "")) : 0
 
         return <>
             <QuickNavMenu
                 visible={this.state.quickNavVisible}
             />
 
-            <Motion style={{ y: spring(this.state.show ? 0 : 300) }}>
-                {({ y }) =>
+            <Motion style={{
+                y: spring(this.state.visible ? 0 : 300),
+                height: spring(heightValue)
+            }}>
+                {({ y, height }) =>
                     <div className="bottomBar_wrapper">
                         <div
                             className="bottomBar"
                             style={{
-                                WebkitTransform: `translate3d(0, ${y}px, 0)`,
-                                transform: `translate3d(0, ${y}px, 0)`,
+                                WebkitTransform: `translateY(${y}px)`,
+                                transform: `translateY(${y}px)`,
+                                height: `${height}px`,
                             }}
                         >
                             <div className="items">
