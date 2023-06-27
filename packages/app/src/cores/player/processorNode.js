@@ -21,6 +21,10 @@ export default class ProcessorNode {
             })
         }
 
+        if (typeof this.processor._last === "undefined") {
+            this.processor._last = this.processor
+        }
+
         return this
     }
 
@@ -59,13 +63,13 @@ export default class ProcessorNode {
         // first check if has prevNode and if is connected to something
         // if has, disconnect it
         // if it not has, its means that is the first node, so connect to the media source
-        if (prevNode && prevNode.processor.numberOfOutputs > 0) {
+        if (prevNode && prevNode.processor._last.numberOfOutputs > 0) {
             //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is already attached to the previous node, disconnecting...`)
             // if has outputs, disconnect from the next node
-            prevNode.processor.disconnect()
+            prevNode.processor._last.disconnect()
 
             // now, connect to the processor
-            prevNode.processor.connect(this.processor)
+            prevNode.processor._last.connect(this.processor)
         } else {
             //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is the first node, connecting to the media source...`)
             instance.media.connect(this.processor)
@@ -106,9 +110,9 @@ export default class ProcessorNode {
         const nextNode = instance.attachedProcessors[index + 1]
 
         // check if has previous node and if has outputs
-        if (prevNode && prevNode.processor.numberOfOutputs > 0) {
+        if (prevNode && prevNode.processor._last.numberOfOutputs > 0) {
             // if has outputs, disconnect from the previous node
-            prevNode.processor.disconnect()
+            prevNode.processor._last.disconnect()
         }
 
         // disconnect 
@@ -116,10 +120,10 @@ export default class ProcessorNode {
 
         // now, connect the previous node to the next node
         if (prevNode && nextNode) {
-            prevNode.processor.connect(nextNode.processor)
+            prevNode.processor._last.connect(nextNode.processor)
         } else {
             // it means that this is the last node, so connect to the destination
-            prevNode.processor.connect(this.audioContext.destination)
+            prevNode.processor._last.connect(this.audioContext.destination)
         }
 
         return instance
