@@ -119,6 +119,7 @@ class ComtyApp extends React.Component {
 	static splashAwaitEvent = "app.initialization.finish"
 	static async initialize() {
 		window.app.version = config.package.version
+		window.app.confirm = antd.Modal.confirm
 		window.app.message = antd.message
 		window.app.isCapacitor = window.navigator.userAgent === "capacitor"
 
