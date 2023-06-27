@@ -64,10 +64,11 @@ export default (props) => {
                         value={values[slider.key] ?? 0}
                         orientation="vertical"
                         valueLabelDisplay="off"
-                        step={slider.step ?? 0.1}
+                        step={slider.step ?? props.step ?? 0.1}
                         min={slider.min}
                         max={slider.max}
                         disabled={props.disabled}
+                        marks={props.marks ?? props.marks}
                     />
 
                     <div className="values_sliders_slider_value">
