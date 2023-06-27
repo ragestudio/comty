@@ -70,6 +70,15 @@ export default {
         const [serverHealth, setServerHealth] = React.useState(null)
         const [secureConnection, setSecureConnection] = React.useState(false)
         const [connectionPing, setConnectionPing] = React.useState({})
+        const [capInfo, setCapInfo] = React.useState(null)
+
+        const setCapacitorInfo = async () => {
+            if (Capacitor.Plugins.App) {
+                const info = await Capacitor.Plugins.App.getInfo()
+
+                setCapInfo(info)
+            }
+        }
 
         const checkServerVersion = async () => {
             const serverManifest = await app.cores.api.customRequest()
@@ -116,6 +125,8 @@ export default {
 
             fetchServerHealth()
             measurePing()
+
+            setCapacitorInfo()
 
             const measureInterval = setInterval(() => {
                 fetchServerHealth()
@@ -191,6 +202,8 @@ export default {
                                 alignItems: "center",
                                 gap: "0.5rem",
                                 fontSize: "1.4rem",
+                                justifyContent: "space-evenly",
+                                width: "100%",
                             }}
                         >
                             <div
@@ -309,6 +322,54 @@ export default {
                         {Capacitor.platform}
                     </div>
                 </div>
+
+                {
+                    capInfo && <div className="inline_field">
+                        <div className="field_header">
+                            <div className="field_icon">
+                                <Icons.MdInfo />
+                            </div>
+
+                            <p>App ID</p>
+                        </div>
+
+                        <div className="field_value">
+                            {capInfo.id}
+                        </div>
+                    </div>
+                }
+
+                {
+                    capInfo && <div className="inline_field">
+                        <div className="field_header">
+                            <div className="field_icon">
+                                <Icons.MdInfo />
+                            </div>
+
+                            <p>App Build</p>
+                        </div>
+
+                        <div className="field_value">
+                            {capInfo.build}
+                        </div>
+                    </div>
+                }
+
+                {
+                    capInfo && <div className="inline_field">
+                        <div className="field_header">
+                            <div className="field_icon">
+                                <Icons.MdInfo />
+                            </div>
+
+                            <p>App Version</p>
+                        </div>
+
+                        <div className="field_value">
+                            {capInfo.version}
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     }
