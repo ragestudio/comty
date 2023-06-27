@@ -1,6 +1,6 @@
 {
     "name": "@comty/web-app",
-    "version": "0.50.3",
+    "version": "0.50.4",
     "license": "LGPL-2.1",
     "main": "electron/main",
     "author": "RageStudio",
@@ -51,6 +51,7 @@
         "antd-mobile": "^5.31.0",
         "axios": "^1.4.0",
         "buffer": "^6.0.3",
+        "capacitor-music-controls-plugin-v3": "^1.1.0",
         "classnames": "2.3.1",
         "dexie": "^3.2.3",
         "dompurify": "^3.0.0",
