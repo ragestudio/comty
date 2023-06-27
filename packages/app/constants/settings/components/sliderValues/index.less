@@ -1,0 +1,50 @@
+.values_sliders {
+    display: flex;
+    flex-direction: row;
+
+    padding: 10px;
+
+    width: 100%;
+
+    transition: all 150ms ease-in-out;
+
+    &.disabled {
+        opacity: 0.5;
+    }
+
+    .values_sliders_slider {
+        overflow: hidden;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+
+        height: 100%;
+        width: 100%;
+
+        gap: 20px;
+
+        .values_sliders_slider_header {
+            display: inline-flex;
+            flex-direction: row;
+
+            span {
+                font-size: 0.7rem;
+            }
+        }
+
+        .values_sliders_slider_value {
+            display: inline-flex;
+            flex-direction: row;
+
+            span {
+                font-size: 0.7rem;
+            }
+        }
+
+        .MuiSlider-vertical {
+            min-height: 300px;
+        }
+    }
+}
