@@ -84,7 +84,9 @@ export class PagePanelWithNavMenu extends React.Component {
             />
         }
 
-        return React.createElement(tab.component)
+        const componentProps = tab.props ?? this.props.tabProps
+
+        return React.createElement(tab.component, componentProps)
     }
 
     replaceQueryTypeToCurrentTab = () => {
