@@ -8,6 +8,8 @@ import EmbbededMediaPlayer from "components/Player/MediaPlayer"
 import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
 
 import AudioPlayerStorage from "./storage"
+
+import EqProcessorNode from "./processors/eqNode"
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
 
@@ -25,21 +27,31 @@ function useMusicSync(event, data) {
 // this is the time tooks to fade in/out the volume when playing/pausing
 const gradualFadeMs = 150
 
+const defaultAudioProccessors = [
+    EqProcessorNode,
+    GainProcessorNode,
+    CompressorProcessorNode,
+]
+
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
     static dependencies = [
         "settings"
     ]
+
     static refName = "player"
 
     static namespace = "player"
 
+    // default statics
     static maxBufferLoadQueue = 2
+
+    static defaultSampleRate = 192000
 
     currentDomWindow = null
 
     audioContext = new AudioContext({
-        sampleRate: 192000
+        sampleRate: AudioPlayerStorage.get("sample_rate") ?? Player.defaultSampleRate
     })
 
     bufferLoadQueue = []
@@ -47,10 +59,7 @@ export default class Player extends Core {
 
     audioQueueHistory = []
     audioQueue = []
-    audioProcessors = [
-        new GainProcessorNode(this),
-        new CompressorProcessorNode(this),
-    ]
+    audioProcessors = []
 
     currentAudioInstance = null
 
@@ -172,9 +181,25 @@ export default class Player extends Core {
         close: this.close.bind(this),
         toogleSyncMode: this.toogleSyncMode.bind(this),
         currentState: this.currentState.bind(this),
+        setSampleRate: this.setSampleRate.bind(this),
     }
 
     async initializeAudioProcessors() {
+        if (this.audioProcessors.length > 0) {
+            console.log("Destroying audio processors")
+
+            this.audioProcessors.forEach((processor) => {
+                console.log(`Destroying audio processor ${processor.constructor.name}`, processor)
+                processor._destroy()
+            })
+
+            this.audioProcessors = []
+        }
+
+        for await (const defaultProccessor of defaultAudioProccessors) {
+            this.audioProcessors.push(new defaultProccessor(this))
+        }
+
         for await (const processor of this.audioProcessors) {
             console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
 
@@ -695,8 +720,6 @@ export default class Player extends Core {
 
         instance.audioElement.muted = this.state.audioMuted
 
-        console.log("Playing audio", instance.audioElement.src)
-
         // reconstruct audio src if is not set
         if (instance.audioElement.src !== instance.manifest.source) {
             instance.audioElement.src = instance.manifest.source
@@ -980,8 +1003,6 @@ export default class Player extends Core {
         }
 
         if (volume > 1) {
-            console.log(app.cores.settings.get("player.allowVolumeOver100"))
-
             if (!app.cores.settings.get("player.allowVolumeOver100")) {
                 volume = 1
             }
@@ -1144,5 +1165,43 @@ export default class Player extends Core {
         })
 
         return list
+    }
+
+    async setSampleRate(to) {
+        // must be a integer
+        if (typeof to !== "number") {
+            console.error("Sample rate must be a number")
+            return this.audioContext.sampleRate
+        }
+
+        // must be a integer
+        if (!Number.isInteger(to)) {
+            console.error("Sample rate must be a integer")
+            return this.audioContext.sampleRate
+        }
+
+        return await new Promise((resolve, reject) => {
+            app.confirm({
+                title: "Change sample rate",
+                content: `To change the sample rate, the app needs to be reloaded. Do you want to continue?`,
+                onOk: () => {
+                    try {
+                        this.audioContext = new AudioContext({ sampleRate: to })
+
+                        AudioPlayerStorage.set("sample_rate", to)
+
+                        app.navigation.reload()
+
+                        return resolve(this.audioContext.sampleRate)
+                    } catch (error) {
+                        app.message.error(`Failed to change sample rate, ${error.message}`)
+                        return resolve(this.audioContext.sampleRate)
+                    }
+                },
+                onCancel: () => {
+                    return resolve(this.audioContext.sampleRate)
+                }
+            })
+        })
     }
 }
