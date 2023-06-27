@@ -15,6 +15,10 @@ export default [
         useTitle: "Posts",
     },
     {
+        path: "/play/*",
+        centeredContent: true
+    },
+    {
         path: "/post/*",
         useLayout: "default",
         public: true
