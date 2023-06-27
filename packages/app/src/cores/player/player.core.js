@@ -1,6 +1,7 @@
 import Core from "evite/src/core"
 import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
+//import { LRUCache } from "lru-cache/dist/mjs/index"
 
 import PlaylistModel from "comty.js/models/playlists"
 
@@ -51,7 +52,8 @@ export default class Player extends Core {
     currentDomWindow = null
 
     audioContext = new AudioContext({
-        sampleRate: AudioPlayerStorage.get("sample_rate") ?? Player.defaultSampleRate
+        sampleRate: AudioPlayerStorage.get("sample_rate") ?? Player.defaultSampleRate,
+        latencyHint: "playback"
     })
 
     bufferLoadQueue = []
@@ -640,6 +642,10 @@ export default class Player extends Core {
         //this.enqueueLoadBuffer(instanceObj.audioElement)
 
         instanceObj.media = this.audioContext.createMediaElementSource(instanceObj.audioElement)
+
+        // storage media data on browser cache to improve performance
+        instanceObj.media.data = instanceObj.audioElement
+
 
         return instanceObj
     }
