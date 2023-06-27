@@ -43,15 +43,16 @@ export default class EqProcessorNode extends ProcessorNode {
     }
 
     exposeToPublic = {
-        modifyValues: function (valuesObj) {
-            // // filter keys that is not in default values or is not a number
-            // valuesObj = Object.keys(valuesObj).filter((entry) => {
-            //     return !isNaN(entry) && Object.keys(EqProcessorNode.defaultEqValue).includes(entry)
-            // })
+        modifyValues: function (values) {
+            Object.keys(values).forEach((key) => {
+                if (isNaN(key)) {
+                    delete values[key]
+                }
+            })
 
             this.state.eqValues = {
                 ...this.state.eqValues,
-                ...valuesObj,
+                ...values,
             }
 
             AudioPlayerStorage.set("eq_values", this.state.eqValues)
