@@ -214,66 +214,73 @@ export default {
                     }
                 }
             ],
+            usePadding: false,
             props: {
                 valueFormat: (value) => `${value}dB`,
+                marks:[
+                    {
+                        value: 0,
+                    }
+                ],
+                step: 0.5,
                 sliders: [
                     {
                         key: 32,
-                        label: "32 Hz",
+                        label: "32",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 64,
-                        label: "64 Hz",
+                        label: "64",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 125,
-                        label: "125 Hz",
+                        label: "125",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 250,
-                        label: "250 Hz",
+                        label: "250",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 500,
-                        label: "500 Hz",
+                        label: "500",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 1000,
-                        label: "1000 Hz",
+                        label: "1K",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 2000,
-                        label: "2000 Hz",
+                        label: "2K",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 4000,
-                        label: "4000 Hz",
+                        label: "4K",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 8000,
-                        label: "8 kHz",
+                        label: "8K",
                         max: 10,
                         min: -10,
                     },
                     {
                         key: 16000,
-                        label: "16 kHz",
+                        label: "16K",
                         max: 10,
                         min: -10,
                     }
