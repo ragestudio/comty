@@ -27,6 +27,9 @@ const gradualFadeMs = 150
 
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
+    static dependencies = [
+        "settings"
+    ]
     static refName = "player"
 
     static namespace = "player"
@@ -35,7 +38,9 @@ export default class Player extends Core {
 
     currentDomWindow = null
 
-    audioContext = new AudioContext()
+    audioContext = new AudioContext({
+        sampleRate: 192000
+    })
 
     bufferLoadQueue = []
     bufferLoadQueueLoading = false
