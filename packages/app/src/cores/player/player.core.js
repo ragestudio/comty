@@ -46,7 +46,7 @@ export default class Player extends Core {
     // default statics
     static maxBufferLoadQueue = 2
 
-    static defaultSampleRate = 192000
+    static defaultSampleRate = 48000
 
     currentDomWindow = null
 
