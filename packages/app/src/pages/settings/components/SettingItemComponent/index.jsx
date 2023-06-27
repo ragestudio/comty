@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 
 import { Translation } from "react-i18next"
 import { SliderPicker } from "react-color"
@@ -440,7 +441,7 @@ export default class SettingItemComponent extends React.PureComponent {
 
         const Component = SettingsComponents[String(this.props.setting.component).toLowerCase()]?.component ?? this.props.setting.component
 
-        return <div className="setting_item" id={this.props.setting.id} key={this.props.setting.id}>
+        return <div className={classnames("setting_item", { ["usePadding"]: this.props.setting.usePadding ?? true })} id={this.props.setting.id} key={this.props.setting.id}>
             <div className="setting_item_header">
                 <div className="setting_item_info">
                     <div className="setting_item_header_title">
