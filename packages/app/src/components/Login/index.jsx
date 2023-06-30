@@ -79,11 +79,17 @@ export default class Login extends React.Component {
     }
 
     onClickRegister = () => {
+        if (this.props.locked) {
+            this.props.unlock()
+        }
+
         if (typeof this.props.close === "function") {
             this.props.close()
         }
 
-        app.eventBus.emit("app.createRegister")
+        app.controls.openRegisterForm({
+            defaultLocked: this.props.locked
+        })
     }
 
     toggleLoading = (to) => {

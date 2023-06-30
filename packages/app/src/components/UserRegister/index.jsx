@@ -349,8 +349,18 @@ export default (props) => {
             antd.message.success("User registered successfully.")
         }
 
+        if (props.locked) {
+            props.unlock()
+        }
+
         if (typeof props.close === "function") {
             props.close()
+        }
+
+        if (app.isMobile) {
+            app.controls.openLoginForm({
+                defaultLocked: props.locked,
+            })
         }
     }
 
