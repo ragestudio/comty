@@ -1,6 +1,6 @@
 {
     "name": "@comty/chat_server",
-    "version": "0.51.0",
+    "version": "0.51.1",
     "main": "dist/index.js",
     "scripts": {
         "build": "corenode-cli build",
