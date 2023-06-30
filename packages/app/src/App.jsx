@@ -187,10 +187,17 @@ class ComtyApp extends React.Component {
 					}
 				})
 			},
-			openRegisterForm: async () => {
+			openRegisterForm: async (options = {}) => {
 				app.DrawerController.open("Register", UserRegister, {
-					allowMultiples: false,
-					panel: true,
+					defaultLocked: options.defaultLocked ?? false,
+					componentProps: {
+						sessionController: this.sessionController,
+					},
+					props: {
+						bodyStyle: {
+							height: "100%",
+						}
+					},
 				})
 			},
 			// Opens the notification window and sets up the UI for the notification to be displayed
