@@ -13,17 +13,6 @@ export default {
     order: 1,
     settings: [
         {
-            id: "sidebar.floating",
-            title: "Floating Sidebar",
-            description: "Make the sidebar float over layout content.",
-            component: "Switch",
-            icon: "MdOutlineLastPage",
-            group: "layout",
-            emitEvent: "app.softReload",
-            storaged: true,
-            mobile: false,
-        },
-        {
             id: "style.reduceAnimations",
             group: "animations",
             component: "Switch",

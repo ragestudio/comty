@@ -6,14 +6,12 @@
     "notifications_vibrate": true,
     "notifications_sound_volume": 50,
     "longPressDelay": 600,
-    "autoCollapseDelay": 500,
-    "autoCollapseDelayEnabled": true,
+    "sidebar.collapsable": true,
+    "sidebar.collapse_delay_time": 500,
     "haptic_feedback": true,
-    "collapseOnLooseFocus": true,
     "style.auto_darkMode": true,
     "feed_max_fetch": 20,
     "style.compactMode": false,
-    "sidebar.floating": false,
     "player.compressor": false,
     "language": "en"
 }
