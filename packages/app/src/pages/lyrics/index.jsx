@@ -601,8 +601,8 @@ export default class SyncLyrics extends React.Component {
             colorAnalysis,
         })
 
-        if (app.SidebarController) {
-            app.SidebarController.toggleVisibility(false)
+        if (app.layout.sidebar) {
+            app.layout.sidebar.toggleVisibility(false)
         }
 
         if (app.layout.floatingStack) {
@@ -646,8 +646,8 @@ export default class SyncLyrics extends React.Component {
 
         delete window._hacks
 
-        if (app.SidebarController) {
-            app.SidebarController.toggleVisibility(true)
+        if (app.layout.sidebar) {
+            app.layout.sidebar.toggleVisibility(true)
         }
 
         if (app.layout.floatingStack) {

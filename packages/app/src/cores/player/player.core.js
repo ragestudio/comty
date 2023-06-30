@@ -467,11 +467,11 @@ export default class Player extends Core {
                         }
                         case "minimized": {
                             if (change.object.minimized) {
-                                app.SidebarController.attachBottomItem("player", BackgroundMediaPlayer, {
+                                app.layout.sidebar.attachBottomItem("player", BackgroundMediaPlayer, {
                                     noContainer: true
                                 })
                             } else {
-                                app.SidebarController.removeBottomItem("player")
+                                app.layout.sidebar.removeBottomItem("player")
                             }
 
                             app.eventBus.emit("player.minimized.update", change.object.minimized)

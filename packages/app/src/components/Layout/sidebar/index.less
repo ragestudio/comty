@@ -1,20 +1,32 @@
 @import "theme/vars.less";
 
-.app_sidebar {
+.app_sidebar_wrapper {
 	position: relative;
-	display: flex;
-	flex-direction: column;
 
 	left: 0;
 	top: 0;
 
 	z-index: 1000;
+
+	width: fit-content;
+
+	height: 100vh;
+	height: 100dvh;
+
+	padding: 10px;
+}
+
+.app_sidebar {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
 	overflow: hidden;
 
-	width: @app_sidebar_width;
-	min-width: @app_sidebar_width;
+	width: @sidebar_width;
+	min-width: @sidebar_width;
 
-	height: 100dvh;
+	height: 100%;
 
 	padding: 10px 0;
 
@@ -22,16 +34,14 @@
 
 	background-color: var(--sidebar-background-color);
 
-	border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
+	border-radius: @sidebar_borderRadius;
+	box-shadow: @card-shadow;
+
+	//border-radius: 0 @sidebar_borderRadius @sidebar_borderRadius 0;
 	border: 1px solid var(--sidebar-background-color);
 
-	&.floating {
-		position: absolute;
-		box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.1) !important;
-	}
-
 	&.expanded {
-		width: @app_sidebar_width_expanded;
+		width: @sidebar_width_expanded;
 
 		.app_sidebar_menu_wrapper {
 			.ant-menu {
@@ -50,34 +60,10 @@
 		}
 	}
 
-	&.customRender {
-		display: flex;
-		position: relative;
-
-		width: 100%;
-		min-width: 34vw;
-
-		padding: 20px;
-		max-width: 60vw;
-
-		.app_sidebar_menu_wrapper {
-			animation: disappear 150ms ease-out forwards;
-		}
-
-		.render_content_wrapper {
-			animation: appear 150ms ease-out forwards;
-		}
-	}
-
 	&.hidden {
-		flex: 0 !important;
-		min-width: 0 !important;
-		background-color: transparent !important;
-		width: 0 !important;
-	}
-
-	&.elevated {
-		box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.1) !important;
+		width: 0;
+		min-width: 0;
+		padding: 0;
 	}
 
 	.app_sidebar_header {
@@ -154,7 +140,7 @@
 
 				width: 100%;
 
-				padding: 0 0 0 calc(@app_sidebar_width / 2);
+				padding: 0 0 0 calc(@sidebar_width / 2);
 				margin: 5px 0;
 
 				transition: all 150ms ease-in-out;
@@ -189,52 +175,6 @@
 			.ant-menu-item-selected {
 				background-color: var(--background-color-primary) !important;
 			}
-		}
-	}
-
-	.render_content_wrapper {
-		display: flex;
-		flex-direction: column;
-
-		opacity: 0;
-		transition: all 150ms ease-in-out;
-
-		overflow-y: hidden;
-
-		.render_content_header {
-			display: inline-flex;
-			flex-direction: row;
-
-			align-items: center;
-			justify-content: space-between;
-
-			.render_content_header_title {
-				display: inline-flex;
-				flex-direction: row;
-
-				align-items: center;
-
-				h1,
-				h2,
-				h3 {
-					font-size: 1.8;
-					margin: 0 !important;
-				}
-
-				svg {
-					font-size: 1.8rem;
-				}
-			}
-		}
-
-		.render_content {
-			height: 100%;
-
-			padding: 20px;
-			padding-left: 0;
-
-			overflow-x: hidden;
-			overflow-y: scroll;
 		}
 	}
 }
