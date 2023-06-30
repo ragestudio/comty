@@ -2,12 +2,9 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
-import WidgetsWrapper from "components/WidgetsWrapper"
 import { PagePanelWithNavMenu } from "components/PagePanels"
 
 import { Icons } from "components/Icons"
-
-import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
 
 import Tabs from "./home/tabs"
 

@@ -28,16 +28,54 @@ const NavMenu = (props) => {
 }
 
 const NavMenuMobile = (props) => {
-    return <div className="__mobile__navmenu_wrapper">
+    function handleClickItem(item) {
+        if (item.children && Array.isArray(item.children)) {
+            return false
+        }
+
+        return props.onClickItem(item.key)
+    }
+
+    return <div
+        className={classnames(
+            "__mobile__navmenu_wrapper",
+        )}
+    >
         {
             props.items.map((item) => {
+                if (!item.disabled && item.children && Array.isArray(item.children)) {
+                    return <antd.Dropdown
+                        trigger={["click"]}
+                        menu={{
+                            items: item.children,
+                            onClick: (item) => {
+                                handleClickItem(item)
+                            }
+                        }}
+                    >
+                        <antd.Button
+                            key={item.key}
+                            className={classnames(
+                                "__mobile__navmenu_item",
+                                item.key === props.activeKey && "active",
+                            )}
+                            type="ghost"
+                            disabled={item.disabled}
+                        >
+                            <div className="icon">
+                                {item.icon}
+                            </div>
+                        </antd.Button>
+                    </antd.Dropdown>
+                }
+
                 return <antd.Button
                     key={item.key}
                     className={classnames(
                         "__mobile__navmenu_item",
                         item.key === props.activeKey && "active",
                     )}
-                    onClick={() => props.onClickItem(item.key)}
+                    onClick={() => handleClickItem(item)}
                     type="ghost"
                     disabled={item.disabled}
                 >

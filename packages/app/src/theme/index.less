@@ -136,10 +136,25 @@ html {
 		&.centered-content {
 			.app_layout {
 				.content_layout {
-					width: 50vw !important;
+					width: 45%;
+
 					min-width: 400px;
-					max-width: 50vw;
+					max-width: 45%;
+
 					margin: auto;
+
+					padding-left: 0;
+					padding-right: 10px;
+
+					@media screen and (max-width: 1920px) {
+						width: 50%;
+						max-width: 60%;
+					}
+
+					@media screen and (max-width: 1440px) {
+						width: 80%;
+						max-width: 80%;
+					}
 				}
 			}
 		}

@@ -97,6 +97,12 @@ export default (props) => {
 
     React.useEffect(() => {
         loadData()
+
+        app.layout.toggleCenteredContent(true)
+
+        return () => {
+            app.layout.toggleCenteredContent(false)
+        }
     }, [])
 
     if (!playlist) {

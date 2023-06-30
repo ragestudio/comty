@@ -125,6 +125,7 @@ export default (props) => {
                     })}
                     icon={<Icons.Plus />}
                     type="primary"
+                    disabled={app.isMobile}
                 >
                     New release
                 </antd.Button>

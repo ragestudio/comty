@@ -4,7 +4,7 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 
 import Searcher from "components/Searcher"
-import { ImageViewer, UserPreview } from "components"
+import { ImageViewer } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
 import { WithPlayerContext } from "contexts/WithPlayerContext"
@@ -15,6 +15,18 @@ import PlaylistModel from "models/playlists"
 import MusicTrack from "components/MusicTrack"
 
 import "./index.less"
+
+const MusicNavbar = (props) => {
+    return <div className="music_navbar">
+        <Searcher
+            useUrlQuery
+            renderResults={false}
+            model={PlaylistModel.search}
+            onSearchResult={props.setSearchResults}
+            onEmpty={() => props.setSearchResults(false)}
+        />
+    </div>
+}
 
 const PlaylistsList = (props) => {
     const hopNumber = props.hopsPerPage ?? 6
@@ -181,52 +193,6 @@ const PlaylistItem = (props) => {
             <div className="playlistItem_info_title" onClick={onClick}>
                 <h1>{playlist.title}</h1>
             </div>
-
-            {
-                playlist.publisher && <UserPreview user={playlist.publisher} />
-            }
-        </div>
-    </div>
-}
-
-const RecentlyPlayed = (props) => {
-    return <div className="playlistExplorer_section">
-        <div className="playlistExplorer_section_header">
-            <h1>
-                <Icons.MdReplay />
-                <Translation>
-                    {(t) => t("Recently Played")}
-                </Translation>
-            </h1>
-        </div>
-
-        <div>
-            <antd.Result
-                status="warning"
-                title="Failed to load"
-                subTitle="We are sorry, but we could not load your playlists. Please try again later."
-            />
-        </div>
-    </div>
-}
-
-const MayLike = (props) => {
-    return <div className="playlistExplorer_section">
-        <div className="playlistExplorer_section_header">
-            <h1>
-                <Icons.MdRecommend />
-                <Translation>
-                    {(t) => t("May you like")}
-                </Translation>
-            </h1>
-        </div>
-
-        <div>
-            <antd.Result
-                status="warning"
-                title="Failed to load"
-                subTitle="We are sorry, but we could not load your recomendations. Please try again later."
-            />
         </div>
     </div>
 }
@@ -328,21 +294,42 @@ const SearchResults = ({
 export default (props) => {
     const [searchResults, setSearchResults] = React.useState(false)
 
+    React.useEffect(() => {
+        if (app.isMobile) {
+            app.layout.toggleCenteredContent(true)
+        }
+
+        app.layout.page_panels.attachComponent("music_navbar", MusicNavbar, {
+            props: {
+                setSearchResults: setSearchResults
+            }
+        })
+
+        return () => {
+            if (app.layout.page_panels) {
+                app.layout.page_panels.detachComponent("music_navbar")
+            }
+
+            if (app.isMobile) {
+                app.layout.toggleCenteredContent(false)
+            }
+        }
+    }, [])
+
     return <div
         className={classnames(
             "musicExplorer",
-            {
-                //["search-focused"]: searchFocused,
-            }
         )}
     >
-        <Searcher
-            useUrlQuery
-            renderResults={false}
-            model={PlaylistModel.search}
-            onSearchResult={setSearchResults}
-            onEmpty={() => setSearchResults(false)}
-        />
+        {
+            app.isMobile && <Searcher
+                useUrlQuery
+                renderResults={false}
+                model={PlaylistModel.search}
+                onSearchResult={setSearchResults}
+                onEmpty={() => setSearchResults(false)}
+            />
+        }
 
         {
             searchResults && <SearchResults
@@ -352,8 +339,6 @@ export default (props) => {
 
         {
             !searchResults && <div className="feed_main">
-                <RecentlyPlayed />
-
                 <PlaylistsList
                     headerTitle="From your following artists"
                     headerIcon={<Icons.MdPerson />}
