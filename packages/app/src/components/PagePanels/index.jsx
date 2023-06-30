@@ -23,13 +23,39 @@ export const Panel = (props) => {
 
 export class PagePanelWithNavMenu extends React.Component {
     state = {
-        // if defaultTab is not set, try to get it from query, if not, use the first tab
         activeTab: this.props.defaultTab ?? new URLSearchParams(window.location.search).get("type") ?? this.props.tabs[0].key,
+        renders: [],
     }
 
     primaryPanelRef = React.createRef()
 
+    interface = {
+        attachComponent: (id, component, options) => {
+            const renders = this.state.renders
+
+            renders.push({
+                id: id,
+                component: component,
+                options: options,
+                ref: React.createRef()
+            })
+
+            this.setState({
+                renders: renders,
+            })
+        },
+        detachComponent: (id) => {
+            const renders = this.state.renders
+
+            const index = renders.findIndex((render) => render.id === id)
+
+            renders.splice(index, 1)
+        }
+    }
+
     componentDidMount() {
+        app.layout.page_panels = this.interface
+
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(false)
         } else {
@@ -38,6 +64,8 @@ export class PagePanelWithNavMenu extends React.Component {
     }
 
     componentWillUnmount() {
+        delete app.layout.page_panels
+
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(true)
         } else {
@@ -163,7 +191,14 @@ export class PagePanelWithNavMenu extends React.Component {
                     />
 
                     {
-                        Array.isArray(this.props.extraMenuItems) && this.props.extraMenuItems
+                        Array.isArray(this.state.renders) && [
+                            this.state.renders.map((render, index) => {
+                                return React.createElement(render.component, {
+                                    ...render.options.props,
+                                    ref: render.ref
+                                })
+                            })
+                        ]
                     }
                 </>
             },
