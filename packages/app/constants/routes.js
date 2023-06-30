@@ -44,7 +44,7 @@ export default [
         centeredContent: true
     },
     {
-        path: "/music/creator",
+        path: "/music/*",
         useLayout: "default",
         centeredContent: true
     },
