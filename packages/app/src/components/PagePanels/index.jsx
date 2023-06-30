@@ -4,7 +4,6 @@ import * as antd from "antd"
 
 import { createIconRender } from "components/Icons"
 
-import { UseTopBar } from "components/Layout/topBar"
 import NavMenu from "./components/NavMenu"
 
 import "./index.less"
@@ -33,12 +32,16 @@ export class PagePanelWithNavMenu extends React.Component {
     componentDidMount() {
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(false)
+        } else {
+            app.layout.toggleCenteredContent(true)
         }
     }
 
     componentWillUnmount() {
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(true)
+        } else {
+            app.layout.toggleCenteredContent(false)
         }
     }
 

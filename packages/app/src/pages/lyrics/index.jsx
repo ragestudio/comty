@@ -128,7 +128,7 @@ class PlayerController extends React.Component {
         app.cores.player.playback.next()
     }
 
-    onClickTooglePlayButton = () => {
+    onClicktogglePlayButton = () => {
         if (this.state?.playbackStatus === "playing") {
             app.cores.player.playback.pause()
         } else {
@@ -140,8 +140,8 @@ class PlayerController extends React.Component {
         app.cores.player.volume(value)
     }
 
-    toogleMute = () => {
-        app.cores.player.toogleMute()
+    toggleMute = () => {
+        app.cores.player.toggleMute()
     }
 
     componentDidMount() {
@@ -250,7 +250,7 @@ class PlayerController extends React.Component {
                         className="player_controller_controls"
                         controls={{
                             previous: this.onClickPreviousButton,
-                            toogle: this.onClickTooglePlayButton,
+                            toggle: this.onClicktogglePlayButton,
                             next: this.onClickNextButton,
                         }}
                         syncModeLocked={this.state.syncModeLocked}
@@ -259,7 +259,7 @@ class PlayerController extends React.Component {
                         audioVolume={this.state.audioVolume}
                         audioMuted={this.state.audioMuted}
                         onVolumeUpdate={this.updateVolume}
-                        onMuteUpdate={this.toogleMute}
+                        onMuteUpdate={this.toggleMute}
                     />
                 </div>
 
@@ -341,7 +341,7 @@ export default class SyncLyrics extends React.Component {
         }
     }
 
-    toogleClassName = (className, to) => {
+    toggleClassName = (className, to) => {
         if (typeof to === "undefined") {
             to = !this.state.classnames[className]
         }
@@ -379,16 +379,16 @@ export default class SyncLyrics extends React.Component {
         }
     }
 
-    toogleVideoCanvas = (to) => {
-        return this.toogleClassName("video-canvas-enabled", to)
+    toggleVideoCanvas = (to) => {
+        return this.toggleClassName("video-canvas-enabled", to)
     }
 
-    toogleCenteredControllerMode = (to) => {
-        return this.toogleClassName("centered-player", to)
+    toggleCenteredControllerMode = (to) => {
+        return this.toggleClassName("centered-player", to)
     }
 
-    toogleCinematicMode = (to) => {
-        return this.toogleClassName("cinematic-mode", to)
+    toggleCinematicMode = (to) => {
+        return this.toggleClassName("cinematic-mode", to)
     }
 
     isCurrentLine = (line) => {
@@ -461,27 +461,27 @@ export default class SyncLyrics extends React.Component {
             //app.message.info("Video canvas loaded")
             console.log(`[SyncLyrics] Video canvas loaded`)
 
-            this.toogleVideoCanvas(true)
+            this.toggleVideoCanvas(true)
         } else {
             //app.message.info("No video canvas available for this song")
             console.log(`[SyncLyrics] No video canvas available for this song`)
 
-            this.toogleVideoCanvas(false)
+            this.toggleVideoCanvas(false)
         }
 
-        // if has no lyrics or are unsynced, toogle cinematic mode off and center controller
+        // if has no lyrics or are unsynced, toggle cinematic mode off and center controller
         if (data.lines.length === 0 || data.syncType !== "LINE_SYNCED") {
             //app.message.info("No lyrics available for this song")
 
             console.log(`[SyncLyrics] No lyrics available for this song, sync type [${data.syncType}]`)
 
-            this.toogleCinematicMode(false)
-            this.toogleCenteredControllerMode(true)
+            this.toggleCinematicMode(false)
+            this.toggleCenteredControllerMode(true)
         } else {
             //app.message.info("Lyrics loaded, starting sync...")
             console.log(`[SyncLyrics] Starting sync with type [${data.syncType}]`)
 
-            this.toogleCenteredControllerMode(false)
+            this.toggleCenteredControllerMode(false)
             this.startLyricsSync()
         }
 
@@ -519,7 +519,7 @@ export default class SyncLyrics extends React.Component {
 
             if (!hasStartedFirst) {
                 if (this.state.canvas_url) {
-                    this.toogleCinematicMode(true)
+                    this.toggleCinematicMode(true)
                 }
 
                 return false
@@ -567,15 +567,15 @@ export default class SyncLyrics extends React.Component {
                     if (line.words === "♪" || line.words === "♫" || line.words === " " || line.words === "") {
                         //console.log(`[SyncLyrics] Toogling cinematic mode on because line is empty`)
 
-                        this.toogleCinematicMode(true)
+                        this.toggleCinematicMode(true)
                     } else {
                         //console.log(`[SyncLyrics] Toogling cinematic mode off because line is not empty`)
 
-                        this.toogleCinematicMode(false)
+                        this.toggleCinematicMode(false)
                     }
                 } else {
                     if (this.state.classnames["cinematic-mode"] === true) {
-                        this.toogleCinematicMode(false)
+                        this.toggleCinematicMode(false)
                     }
                 }
             }
@@ -602,11 +602,7 @@ export default class SyncLyrics extends React.Component {
         })
 
         if (app.layout.sidebar) {
-            app.layout.sidebar.toggleVisibility(false)
-        }
-
-        if (app.layout.floatingStack) {
-            app.layout.floatingStack.toogleGlobalVisibility(false)
+            app.controls.toogleUIVisibility(false)
         }
 
         app.cores.style.compactMode(true)
@@ -625,9 +621,9 @@ export default class SyncLyrics extends React.Component {
         })
 
         window._hacks = {
-            toogleVideoCanvas: this.toogleVideoCanvas,
-            toogleCinematicMode: this.toogleCinematicMode,
-            toogleCenteredControllerMode: this.toogleCenteredControllerMode,
+            toggleVideoCanvas: this.toggleVideoCanvas,
+            toggleCinematicMode: this.toggleCinematicMode,
+            toggleCenteredControllerMode: this.toggleCenteredControllerMode,
         }
 
         await this.loadLyrics()
@@ -647,11 +643,7 @@ export default class SyncLyrics extends React.Component {
         delete window._hacks
 
         if (app.layout.sidebar) {
-            app.layout.sidebar.toggleVisibility(true)
-        }
-
-        if (app.layout.floatingStack) {
-            app.layout.floatingStack.toogleGlobalVisibility(true)
+            app.controls.toogleUIVisibility(true)
         }
 
         app.cores.style.compactMode(false)

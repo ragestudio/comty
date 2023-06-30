@@ -14,7 +14,7 @@ export default class WidgetsCore extends Core {
         isInstalled: this.isInstalled.bind(this),
         install: this.install.bind(this),
         uninstall: this.uninstall.bind(this),
-        toogleVisibility: this.toogleVisibility.bind(this),
+        toggleVisibility: this.toggleVisibility.bind(this),
         isVisible: this.isVisible.bind(this),
         sort: this.sort.bind(this),
     }
@@ -154,7 +154,7 @@ export default class WidgetsCore extends Core {
         return true
     }
 
-    toogleVisibility(widget_id, to) {
+    toggleVisibility(widget_id, to) {
         if (!widget_id || typeof widget_id !== "string") {
             throw new Error("Widget id must be a string.")
         }

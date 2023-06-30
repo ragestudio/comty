@@ -342,7 +342,7 @@ export class PostsListsComponent extends React.Component {
     }
 
     onLikePost = async (data) => {
-        let result = await PostModel.toogleLike({ post_id: data._id }).catch(() => {
+        let result = await PostModel.toggleLike({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to like post")
 
             return false
@@ -352,7 +352,7 @@ export class PostsListsComponent extends React.Component {
     }
 
     onSavePost = async (data) => {
-        let result = await PostModel.toogleSave({ post_id: data._id }).catch(() => {
+        let result = await PostModel.toggleSave({ post_id: data._id }).catch(() => {
             antd.message.error("Failed to save post")
 
             return false
@@ -376,7 +376,7 @@ export class PostsListsComponent extends React.Component {
         })
     }
 
-    onToogleOpen = (to, data) => {
+    ontoggleOpen = (to, data) => {
         if (typeof this.props.onOpenPost === "function") {
             this.props.onOpenPost(to, data)
         }

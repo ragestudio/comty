@@ -193,7 +193,7 @@ export default class SettingItemComponent extends React.PureComponent {
         return {}
     }
 
-    toogleLoading = (to) => {
+    toggleLoading = (to) => {
         if (typeof to === "undefined") {
             to = !this.state.loading
         }
@@ -206,7 +206,7 @@ export default class SettingItemComponent extends React.PureComponent {
     initialize = async () => {
         this.perf.start(`init tooks`)
 
-        this.toogleLoading(true)
+        this.toggleLoading(true)
 
         if (this.props.setting.storaged) {
             this.perf.start(`get value from storaged`)
@@ -221,13 +221,13 @@ export default class SettingItemComponent extends React.PureComponent {
         if (typeof this.props.setting.defaultValue === "function") {
             this.perf.start(`execute default value fn`)
 
-            this.toogleLoading(true)
+            this.toggleLoading(true)
 
             this.setState({
                 value: await this.props.setting.defaultValue(this.props.ctx)
             })
 
-            this.toogleLoading(false)
+            this.toggleLoading(false)
 
             this.perf.end(`execute default value fn`)
         }
@@ -285,7 +285,7 @@ export default class SettingItemComponent extends React.PureComponent {
             this.perf.end(`Reinitializing setting [${this.props.setting.id}]`)
         }
 
-        this.toogleLoading(false)
+        this.toggleLoading(false)
 
         this.perf.end(`init tooks`)
 

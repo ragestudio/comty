@@ -10,13 +10,13 @@ const NavMenu = (props) => {
     }
 
     return <div className="navmenu_wrapper">
-        {
-            props.header && <div className="card header" id="navMenu">
-                {props.header}
-            </div>
-        }
+        <div className="card">
+            {
+                props.header && <div className="card_header">
+                    {props.header}
+                </div>
+            }
 
-        <div className="card content" id="navMenu">
             <antd.Menu
                 mode="inline"
                 selectedKeys={[props.activeKey]}

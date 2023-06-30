@@ -6,20 +6,20 @@ import "./index.less"
 export default (props) => {
     const [streamingKeyVisibility, setStreamingKeyVisibility] = React.useState(false)
 
-    const toogleVisibility = (to) => {
+    const toggleVisibility = (to) => {
         setStreamingKeyVisibility(to ?? !streamingKeyVisibility)
     }
 
     return <div className="streamingKeyString">
         {streamingKeyVisibility ?
             <>
-                <Icons.EyeOff onClick={() => toogleVisibility()} />
+                <Icons.EyeOff onClick={() => toggleVisibility()} />
                 <code>
                     {props.streamingKey ?? "No streaming key available"}
                 </code>
             </> :
             <div
-                onClick={() => toogleVisibility()}
+                onClick={() => toggleVisibility()}
             >
                 <Icons.Eye />
                 Click to show key

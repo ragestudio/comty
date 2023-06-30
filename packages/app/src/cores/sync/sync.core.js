@@ -65,7 +65,7 @@ class MusicSyncSubCore {
             this.currentRoomData = data
 
             // check if user is owner
-            app.cores.player.toogleSyncMode(true, data.ownerUserId !== app.userData._id)
+            app.cores.player.toggleSyncMode(true, data.ownerUserId !== app.userData._id)
 
             this.startSendStateInterval()
 
@@ -78,7 +78,7 @@ class MusicSyncSubCore {
 
             this.currentRoomData = null
 
-            app.cores.player.toogleSyncMode(false, false)
+            app.cores.player.toggleSyncMode(false, false)
 
             this.eventBus.emit("room:left", data)
         },
@@ -96,7 +96,7 @@ class MusicSyncSubCore {
                 type: "error",
             })
 
-            app.cores.player.toogleSyncMode(false, false)
+            app.cores.player.toggleSyncMode(false, false)
         },
 
         "room:user:joined": (data) => {
@@ -114,7 +114,7 @@ class MusicSyncSubCore {
         "room:owner:changed": (data) => {
             const isSelf = data.ownerUserId === app.userData._id
 
-            app.cores.player.toogleSyncMode(true, !isSelf)
+            app.cores.player.toggleSyncMode(true, !isSelf)
 
             app.cores.player.playback.stop()
 
@@ -173,7 +173,7 @@ class MusicSyncSubCore {
 
             this.currentRoomData = null
 
-            app.cores.player.toogleSyncMode(false, false)
+            app.cores.player.toggleSyncMode(false, false)
 
             app.notification.new({
                 title: "Kicked",

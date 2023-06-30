@@ -207,12 +207,39 @@ export default class WidgetsWrapper extends React.Component {
         widgetsRender: getWidgets(),
     }
 
+    events = {
+        "widgets:installed": () => {
+            this.loadWidgets()
+        },
+        "widgets:uninstalled": () => {
+            this.loadWidgets()
+        }
+    }
+
+    componentDidMount() {
+        for (const [eventName, eventHandler] of Object.entries(this.events)) {
+            app.eventBus.on(eventName, eventHandler)
+        }
+    }
+
+    componentWillUnmount() {
+        for (const [eventName, eventHandler] of Object.entries(this.events)) {
+            app.eventBus.off(eventName, eventHandler)
+        }
+    }
+
     handleOnSortEnd = (widgetsRender) => {
         this.setState({
             widgetsRender
         })
 
         app.cores.widgets.sort(widgetsRender)
+    }
+
+    loadWidgets = () => {
+        this.setState({
+            widgetsRender: getWidgets(),
+        })
     }
 
     render() {

@@ -51,12 +51,12 @@ export default class Login extends React.Component {
         }
 
         this.clearError()
-        this.toogleLoading(true)
+        this.toggleLoading(true)
 
         const loginProcess = await AuthModel.login(payload).catch((error) => {
             console.error(error, error.response)
 
-            this.toogleLoading(false)
+            this.toggleLoading(false)
             this.onError(error.response.data.message)
 
             return false
@@ -86,7 +86,7 @@ export default class Login extends React.Component {
         app.eventBus.emit("app.createRegister")
     }
 
-    toogleLoading = (to) => {
+    toggleLoading = (to) => {
         if (typeof to === "undefined") {
             to = !this.state.loading
         }
@@ -129,11 +129,11 @@ export default class Login extends React.Component {
         const phase = phasesToSteps[this.state.phase]
 
         if (typeof stepsValidations[phase] === "function") {
-            this.toogleLoading(true)
+            this.toggleLoading(true)
 
             const result = await stepsValidations[phase](this.state.loginInputs)
 
-            this.toogleLoading(false)
+            this.toggleLoading(false)
 
             if (!result) {
                 this.formRef.current.setFields([

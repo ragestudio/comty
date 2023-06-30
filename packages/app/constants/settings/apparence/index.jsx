@@ -59,7 +59,7 @@ export default {
             icon: "Moon",
             title: "Sync with system",
             description: "Automatically switch to dark mode based on your system preference.",
-            emitEvent: "style.autoDarkModeToogle",
+            emitEvent: "style.autoDarkModetoggle",
             storaged: true,
         },
         {

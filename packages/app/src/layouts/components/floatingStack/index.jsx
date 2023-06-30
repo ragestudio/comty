@@ -80,7 +80,7 @@ export default class FloatingStack extends React.Component {
 
             return true
         },
-        toogleGlobalVisibility: (to) => {
+        toggleGlobalVisibility: (to) => {
             if (typeof to !== "boolean") {
                 to = !this.state.globalVisibility
             }

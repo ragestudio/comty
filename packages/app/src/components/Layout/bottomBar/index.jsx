@@ -15,6 +15,19 @@ import CreatorView from "pages/@mobile-views/creator"
 
 import "./index.less"
 
+const tourSteps = [
+    {
+        title: "Open quick nav",
+        description: "Xd",
+        ref: React.createRef(),
+    },
+    {
+        title: "Account button",
+        description: "Xd",
+        ref: React.createRef(),
+    }
+]
+
 const openPlayerView = () => {
     app.DrawerController.open("player", PlayerView)
 }
@@ -53,7 +66,7 @@ const PlayerButton = (props) => {
     </div>
 }
 
-const AccountButton = (props) => {
+const AccountButton = React.forwardRef((props, ref) => {
     const user = app.userData
     const ActionSheetRef = React.useRef()
 
@@ -101,6 +114,7 @@ const AccountButton = (props) => {
         key="account"
         id="account"
         className="item"
+        ref={ref}
         onClick={handleClick}
         onContextMenu={handleHold}
         context-menu="ignore"
@@ -111,7 +125,7 @@ const AccountButton = (props) => {
             }
         </div>
     </div>
-}
+})
 
 export default (props) => {
     return <WithPlayerContext>
@@ -128,6 +142,7 @@ export class BottomBar extends React.Component {
         visible: false,
         quickNavVisible: false,
         render: null,
+        tourOpen: false,
     }
 
     busEvents = {
@@ -136,15 +151,23 @@ export class BottomBar extends React.Component {
         }
     }
 
+    refs = {
+        homeBtn: React.createRef(),
+        accountBtn: React.createRef(),
+    }
+
     componentDidMount = () => {
         this.interface = app.layout.bottom_bar = {
-            toogleVisible: this.toggleVisibility,
+            toggleVisible: this.toggleVisibility,
             isVisible: () => this.state.visible,
             render: (fragment) => {
                 this.setState({ render: fragment })
             },
             clear: () => {
                 this.setState({ render: null })
+            },
+            toggleTour: () => {
+                this.setState({ tourOpen: !this.state.tourOpen })
             },
         }
 
@@ -278,6 +301,16 @@ export class BottomBar extends React.Component {
         }
     }
 
+    toggleTour = (to) => {
+        if (typeof to === "undefined") {
+            to = !this.state.tourOpen
+        }
+
+        this.setState({
+            tourOpen: to
+        })
+    }
+
     render() {
         if (this.state.render) {
             return <div className="bottomBar">
@@ -358,7 +391,7 @@ export class BottomBar extends React.Component {
                                     </div>
                                 </div>
 
-                                <AccountButton />
+                                <AccountButton/>
                             </div>
                         </div>
                     </div>

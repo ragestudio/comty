@@ -105,7 +105,7 @@ export default class SyncRoomCard extends React.Component {
         app.cores.sync.music.leaveRoom()
     }
 
-    toogleChatVisibility = (to) => {
+    toggleChatVisibility = (to) => {
         if (typeof to !== "boolean") {
             to = !this.state.chatVisible
         }
@@ -182,7 +182,7 @@ export default class SyncRoomCard extends React.Component {
                         <Button
                             size="small"
                             icon={<Icons.MdChat />}
-                            onClick={this.toogleChatVisibility}
+                            onClick={this.toggleChatVisibility}
                         />
                     </Badge>
                 </div>

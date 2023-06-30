@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
-import { Sidebar, Drawer, Sidedrawer, Modal, BottomBar, TopBar } from "components/Layout"
+import { Sidebar, Drawer, Sidedrawer, Modal, BottomBar, TopBar, ToolsBar } from "components/Layout"
 
 import BackgroundDecorator from "components/BackgroundDecorator"
 
@@ -40,6 +40,7 @@ const DesktopLayout = (props) => {
                     React.cloneElement(props.children, props)
                 }
             </Layout.Content>
+            <ToolsBar />
         </Layout>
     </>
 }
@@ -64,7 +65,6 @@ const MobileLayout = (props) => {
         </Layout.Content>
 
         <BottomBar />
-        <Sidedrawer />
         <Drawer />
     </Layout>
 }

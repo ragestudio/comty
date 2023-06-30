@@ -1,60 +1,77 @@
 import React from "react"
 import classnames from "classnames"
+import { Motion, spring } from "react-motion"
 
 import "./index.less"
 
-export const Sidedrawer = (props) => {
-	const sidedrawerId = props.id ?? props.key
+export class Sidedrawer extends React.Component {
+	state = {
+		visible: false,
+	}
 
-	return <div
-		key={sidedrawerId}
-		id={sidedrawerId}
-		style={props.style}
-		className={
-			classnames("sidedrawer", {
-				"hided": !props.defaultVisible,
-				"first": props.first
-			})
-		}
-	>
-		{
-			React.createElement(props.children, {
-				...props.props,
-				close: props.close,
-			})
-		}
-	</div>
+	toggleVisibility = (to) => {
+		this.setState({ visible: to ?? !this.state.visible })
+	}
+
+	render() {
+		return <Motion style={{
+			x: spring(!this.state.visible ? 100 : 0),
+			opacity: spring(!this.state.visible ? 0 : 1),
+		}}>
+			{({ x, opacity }) => {
+				return <div
+					key={this.props.id}
+					id={this.props.id}
+					className={classnames(
+						"sidedrawer",
+						{
+							"first": this.props.first
+						}
+					)}
+					style={{
+						...this.props.style,
+						transform: `translateX(-${x}%)`,
+						opacity: opacity,
+					}}
+
+				>
+					{
+						React.createElement(this.props.children, {
+							...this.props.props,
+							close: this.props.close,
+						})
+					}
+				</div>
+			}}
+		</Motion>
+	}
 }
 
 export default class SidedrawerController extends React.Component {
-	state = {
-		drawers: [],
-		lockedIds: [],
-	}
-
 	constructor(props) {
 		super(props)
 
-		this.controller = window.app["SidedrawerController"] = {
+		this.interface = app.layout.sidedrawer = {
 			open: this.open,
 			close: this.close,
 			closeAll: this.closeAll,
 			hasDrawers: this.state.drawers.length > 0,
+			toggleGlobalVisibility: () => {
+				this.setState({
+					globalVisible: !this.state.globalVisible,
+				})
+			}
 		}
+	}
+
+	state = {
+		globalVisible: true,
+		drawers: [],
+		lockedIds: [],
 	}
 
 	componentDidMount = () => {
 		this.listenEscape()
-	}
-
-	componentDidUpdate() {
-		this.controller.hasDrawers = this.state.drawers.length > 0
-
-		if (this.controller.hasDrawers) {
-			window.app.eventBus.emit("sidedrawer.hasDrawers")
-		} else {
-			window.app.eventBus.emit("sidedrawer.noDrawers")
-		}
 	}
 
 	componentWillUnmount = () => {
@@ -84,7 +101,7 @@ export default class SidedrawerController extends React.Component {
 			id = component.key ?? component.id ?? Math.random().toString(36).substr(2, 9)
 		}
 
-		let drawers = this.state.drawers
+		const drawers = this.state.drawers
 
 		// check if id is already in use
 		// but only if its allowed to be used multiple times
@@ -111,56 +128,56 @@ export default class SidedrawerController extends React.Component {
 			id = newId
 		}
 
-		drawers.push(React.createElement(
-			Sidedrawer,
-			{
-				key: id,
-				id: id,
-				first: drawers.length === 0,
-				style: {
-					zIndex: 100 - drawers.length,
-				},
-				allowMultiples: options.allowMultiples ?? false,
-				...options.props,
-				close: this.close,
-				escClosable: options.escClosable ?? true,
-				defaultVisible: false,
-				selfLock: () => {
-					this.lockDrawerId(id)
-				},
-				selfUnlock: () => {
-					this.unlockDrawer(id)
-				}
+		const drawerProps = {
+			id: id,
+			allowMultiples: options.allowMultiples ?? false,
+			escClosable: options.escClosable ?? true,
+			first: drawers.length === 0,
+			style: {
+				zIndex: 100 - drawers.length,
 			},
-			component
-		))
+			ref: React.createRef(),
+			close: this.close,
+			lock: () => this.lockDrawerId(id),
+			unlock: () => this.unlockDrawer(id),
+		}
+
+		drawers.push(React.createElement(Sidedrawer, drawerProps, component))
 
 		if (options.lock) {
 			this.lockDrawerId(id)
 		}
 
-		await this.setState({ drawers })
+		await this.setState({
+			drawers,
+		})
 
 		setTimeout(() => {
 			this.toggleDrawerVisibility(id, true)
 		}, 10)
 
 		window.app.eventBus.emit("sidedrawer.open")
+
+		if (this.state.drawers.length > 0) {
+			app.eventBus.emit("sidedrawers.visible", true)
+		}
 	}
 
 	toggleDrawerVisibility = (id, to) => {
-		const drawer = document.getElementById(id)
-		const drawerClasses = drawer.classList
+		// find drawer
+		const drawer = this.state.drawers.find(drawer => drawer.props.id === id)
 
-		if (to) {
-			app.cores.sound.useUIAudio("sidebar.expand")
-
-			drawerClasses.remove("hided")
-		} else {
-			app.cores.sound.useUIAudio("sidebar.collapse")
-
-			drawerClasses.add("hided")
+		if (!drawer) {
+			console.warn(`Sidedrawer with id "${id}" does not exist.`)
+			return
 		}
+
+		if (!drawer.ref.current) {
+			console.warn(`Sidedrawer with id "${id}" has not valid ref.`)
+			return
+		}
+
+		return drawer.ref.current.toggleVisibility(to)
 	}
 
 	close = (id) => {
@@ -186,7 +203,7 @@ export default class SidedrawerController extends React.Component {
 		// emit event
 		window.app.eventBus.emit("sidedrawer.close")
 
-		// toogleVisibility off
+		// toggleVisibility off
 		this.toggleDrawerVisibility(drawerId, false)
 
 		// await drawer transition
@@ -195,6 +212,10 @@ export default class SidedrawerController extends React.Component {
 			drawers = drawers.filter(drawer => drawer.props.id !== drawerId)
 
 			this.setState({ drawers })
+
+			if (this.state.drawers.length === 0) {
+				app.eventBus.emit("sidedrawers.visible", false)
+			}
 		}, 500)
 	}
 
@@ -231,7 +252,7 @@ export default class SidedrawerController extends React.Component {
 			className={classnames(
 				"sidedrawers-wrapper",
 				{
-					["floating-sidebar"]: window.app?.cores.settings.get("sidebar.floating")
+					["hidden"]: !this.state.drawers.length || this.state.globalVisible,
 				}
 			)}
 		>

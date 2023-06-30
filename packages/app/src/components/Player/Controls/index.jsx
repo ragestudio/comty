@@ -59,7 +59,7 @@ export default ({
             type="primary"
             shape="circle"
             icon={streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
-            onClick={() => onClickActionsButton("toogle")}
+            onClick={() => onClickActionsButton("toggle")}
             className="playButton"
             disabled={syncModeLocked}
         >

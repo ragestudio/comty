@@ -1,50 +1,48 @@
 @import "theme/vars.less";
 
 .sidedrawers-wrapper {
+    position: relative;
+    top: 0;
+    right: 0;
+
     display: flex;
     flex-direction: row;
 
-    &.floating-sidebar {
-        z-index: 950;
-        position: absolute;
-        margin-left: @app_sidebar_width;
-    }
-    
-    .sidedrawer {
-        position: relative;
+    padding: @sidebar_padding;
 
-        width: auto; // by default
-        height: 100vh;
+    height: 100dvh;
+    height: 100vh;
+
+    .sidedrawer {
+        position: absolute;
+
+        z-index: 100;
+
+        top: 0;
+        left: 0;
+        bottom: 0;
+
+        margin-top: @sidebar_padding;
+        height: calc(100% - @sidebar_padding * 2);
+
+        width: auto;
 
         min-width: 400px;
-
-        z-index: 20;
+        max-width: 15vw;
 
         background-color: var(--sidedrawer-background-color);
-        border-radius: 0 @app_sidebar_borderRadius @app_sidebar_borderRadius 0;
+        border-radius: @sidebar_borderRadius;
 
         padding: 20px;
-        padding-left: 30px;
-
-        transform: translate(-20px, 0);
 
         overflow-x: hidden;
         overflow-y: overlay;
 
-        word-break: break-all;
-        transition: all 150ms ease-in-out;
+        box-shadow: @card-shadow;
+    }
 
-        // create shadow on the right side
-        box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.1) !important;
-
-        &.first {
-            transform: translate(-10px, 0);
-        }
-
-        &.hided {
-            width: 0;
-            min-width: 0;
-            padding: 0;
-        }
+    &.hidden{
+        width: 0;
+        padding: 0;
     }
 }
