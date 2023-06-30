@@ -42,6 +42,10 @@ export const Icons = {
 }
 
 export function createIconRender(icon, props) {
+    if (React.isValidElement(icon)) {
+        return icon
+    }
+
     if (typeof Icons[icon] !== "undefined") {
         return React.createElement(Icons[icon], props)
     }
