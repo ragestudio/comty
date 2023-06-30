@@ -4,7 +4,6 @@ import { Motion, spring } from "react-motion"
 
 import useLayoutInterface from "hooks/useLayoutInterface"
 import useDefaultVisibility from "hooks/useDefaultVisibility"
-import useTopBar from "hooks/useTopBar"
 
 import "./index.less"
 
