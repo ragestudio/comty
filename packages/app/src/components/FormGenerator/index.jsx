@@ -51,7 +51,7 @@ export default class FormGenerator extends React.Component {
 		},
 		clearForm: () => {
 			this.ctx.clearErrors()
-			this.ctx.toogleValidation(false)
+			this.ctx.toggleValidation(false)
 			this.ref.current.resetFields()
 		},
 		finish: () => this.ref.current.submit(),
@@ -61,7 +61,7 @@ export default class FormGenerator extends React.Component {
 		shake: (id) => {
 			this.formItemShake(id)
 		},
-		toogleValidation: (to) => {
+		toggleValidation: (to) => {
 			if (typeof to !== "undefined") {
 				return this.setState({ validating: to })
 			}

@@ -5,7 +5,7 @@ import { Translation } from "react-i18next"
 import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
 import { Icons, createIconRender } from "components/Icons"
-import { UseTopBar } from "components/Layout/topBar"
+import UseTopBar from "hooks/useTopBar"
 
 import {
     composedSettingsByGroups as settingsGroups,

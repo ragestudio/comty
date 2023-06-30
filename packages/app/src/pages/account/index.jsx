@@ -144,7 +144,7 @@ export default class Account extends React.Component {
 	}
 
 	onClickFollow = async () => {
-		const result = await FollowsModel.toogleFollow({
+		const result = await FollowsModel.toggleFollow({
 			username: this.state.requestedUser,
 		}).catch((error) => {
 			console.error(error)
@@ -159,7 +159,7 @@ export default class Account extends React.Component {
 		})
 	}
 
-	toogleCoverExpanded = async (to) => {
+	toggleCoverExpanded = async (to) => {
 		this.setState({
 			coverExpanded: to ?? !this.state.coverExpanded,
 		})
@@ -217,7 +217,7 @@ export default class Account extends React.Component {
 					})}
 					ref={this.coverComponent}
 					style={{ backgroundImage: `url("${user.cover}")` }}
-					onClick={() => this.toogleCoverExpanded()}
+					onClick={() => this.toggleCoverExpanded()}
 					id="profile-cover"
 				/>
 			}

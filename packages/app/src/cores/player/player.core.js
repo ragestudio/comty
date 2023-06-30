@@ -135,13 +135,13 @@ class MediaSession {
 
             // External controls (iOS only)
             case "music-controls-toggle-play-pause": {
-                return app.cores.player.playback.toogle()
+                return app.cores.player.playback.toggle()
             }
 
             // Headset events (Android only)
             // All media button events are listed below
             case "music-controls-media-button": {
-                return app.cores.player.playback.toogle()
+                return app.cores.player.playback.toggle()
             }
             case "music-controls-headset-unplugged": {
                 return app.cores.player.playback.pause()
@@ -211,8 +211,8 @@ export default class Player extends Core {
         audioContext: this.audioContext,
         attachPlayerComponent: this.attachPlayerComponent.bind(this),
         detachPlayerComponent: this.detachPlayerComponent.bind(this),
-        toogleMute: this.toogleMute.bind(this),
-        minimize: this.toogleMinimize.bind(this),
+        toggleMute: this.toggleMute.bind(this),
+        minimize: this.toggleMinimize.bind(this),
         volume: this.volume.bind(this),
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
@@ -267,7 +267,7 @@ export default class Player extends Core {
 
                 return this.state.playbackMode
             }.bind(this),
-            toogle: function () {
+            toggle: function () {
                 if (!this.currentAudioInstance) {
                     console.error("No audio instance")
                     return null
@@ -304,7 +304,7 @@ export default class Player extends Core {
         duration: this.duration.bind(this),
         velocity: this.velocity.bind(this),
         close: this.close.bind(this),
-        toogleSyncMode: this.toogleSyncMode.bind(this),
+        toggleSyncMode: this.toggleSyncMode.bind(this),
         currentState: this.currentState.bind(this),
         setSampleRate: this.setSampleRate.bind(this),
     }
@@ -1073,7 +1073,7 @@ export default class Player extends Core {
         this.detachPlayerComponent()
     }
 
-    toogleMute(to) {
+    toggleMute(to) {
         if (app.isMobile) {
             console.warn("Cannot mute on mobile")
             return false
@@ -1088,7 +1088,7 @@ export default class Player extends Core {
         return this.state.audioMuted
     }
 
-    toogleMinimize(to) {
+    toggleMinimize(to) {
         this.state.minimized = to ?? !this.state.minimized
 
         return this.state.minimized
@@ -1202,7 +1202,7 @@ export default class Player extends Core {
         return this.state.collapsed
     }
 
-    toogleSyncMode(to, lock) {
+    toggleSyncMode(to, lock) {
         if (typeof to !== "boolean") {
             console.warn("Sync mode must be a boolean")
             return false

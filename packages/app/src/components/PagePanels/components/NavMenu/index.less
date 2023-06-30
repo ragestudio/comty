@@ -2,6 +2,60 @@
 
 .navmenu_wrapper {
     position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 100%;
+    width: 100%;
+
+    .card {
+        display: flex;
+        flex-direction: column;
+
+        background-color: var(--background-color-accent);
+        border-radius: 12px;
+        padding: 20px;
+
+        width: 100%;
+
+        h1,
+        h2 {
+            width: fit-content;
+            margin: 0;
+        }
+
+        .card_header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 10px;
+
+            view-transition-name: main-header;
+
+            h1 {
+                view-transition-name: main-header-text;
+            }
+        }
+
+        &.content {
+            position: relative;
+
+            transform: translateY(-30px);
+            padding-top: 35px;
+
+            z-index: 45;
+        }
+    }
+
+    &.card:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .__mobile__navmenu_wrapper {

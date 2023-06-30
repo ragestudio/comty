@@ -90,6 +90,9 @@ export default class Sidebar extends React.Component {
 
 		topItems: generateTopItems(),
 		bottomItems: [],
+
+		lockAutocollapse: false,
+		navigationRender: null,
 	}
 
 	sidebarRef = React.createRef()
@@ -97,10 +100,49 @@ export default class Sidebar extends React.Component {
 	collapseDebounce = null
 
 	interface = window.app.layout.sidebar = {
-		toggleVisibility: this.toggleVisibility,
-		toggleCollapse: this.toggleExpanded,
+		toggleVisibility: (to) => {
+			this.setState({ visible: to ?? !this.state.visible })
+		},
+		toggleCollapse: (to, force) => {
+			to = to ?? !this.state.expanded
+
+			if (this.collapseDebounce) {
+				clearTimeout(this.collapseDebounce)
+				this.collapseDebounce = null
+			}
+
+			if (!to & this.state.dropdownOpen && !force) {
+				// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
+				// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
+				//this.setState({ dropdownOpen: false })
+
+				return false
+			}
+
+			if (!to) {
+				if (this.state.lockAutocollapse) {
+					return false
+				}
+
+				this.collapseDebounce = setTimeout(() => {
+					this.setState({ expanded: to })
+				}, window.app.cores.settings.get("sidebar.collapse_delay_time") ?? 500)
+			} else {
+				this.setState({ expanded: to })
+			}
+
+			app.eventBus.emit("sidebar.expanded", to)
+		},
 		isVisible: () => this.state.visible,
 		isExpanded: () => this.state.expanded,
+		renderNavigationBar: (component, options) => {
+			this.setState({
+				navigationRender: {
+					component,
+					options,
+				}
+			})
+		},
 		updateBottomItemProps: (id, newProps) => {
 			let updatedValue = this.state.bottomItems
 
@@ -153,17 +195,37 @@ export default class Sidebar extends React.Component {
 		},
 	}
 
+	events = {
+		"sidedrawers.visible": (has) => {
+			this.setState({
+				lockAutocollapse: has
+			})
+
+			if (!has && this.state.expanded) {
+				this.interface.toggleCollapse(false)
+			}
+		}
+	}
+
 	componentDidMount = async () => {
+		for (const [event, handler] of Object.entries(this.events)) {
+			app.eventBus.on(event, handler)
+		}
+
 		setTimeout(() => {
-			this.toggleVisibility(true)
+			this.interface.toggleVisibility(true)
 
 			if (app.cores.settings.is("sidebar.collapsable", false)) {
-				this.toggleExpanded(true)
+				this.interface.toggleCollapse(true)
 			}
 		}, 10)
 	}
 
 	componentWillUnmount = () => {
+		for (const [event, handler] of Object.entries(this.events)) {
+			app.eventBus.off(event, handler)
+		}
+
 		delete app.layout.sidebar
 	}
 
@@ -192,49 +254,18 @@ export default class Sidebar extends React.Component {
 		return window.app.location.push(`/${item.path ?? e.key}`, 150)
 	}
 
-	toggleExpanded = (to, force) => {
-		to = to ?? !this.state.expanded
-
-		if (this.collapseDebounce) {
-			clearTimeout(this.collapseDebounce)
-			this.collapseDebounce = null
-		}
-
-		if (!to & this.state.dropdownOpen && !force) {
-			// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
-			// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
-			//this.setState({ dropdownOpen: false })
-
-			return false
-		}
-
-		if (!to) {
-			this.collapseDebounce = setTimeout(() => {
-				this.setState({ expanded: to })
-			}, window.app.cores.settings.get("sidebar.collapse_delay_time") ?? 500)
-		} else {
-			this.setState({ expanded: to })
-		}
-
-		app.eventBus.emit("sidebar.expanded", to)
-	}
-
-	toggleVisibility = (to) => {
-		this.setState({ visible: to ?? !this.state.visible })
-	}
-
 	onMouseEnter = () => {
 		if (!this.state.visible) return
 
 		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
 			if (!this.state.expanded) {
-				this.toggleExpanded(true)
+				this.interface.toggleCollapse(true)
 			}
 
 			return
 		}
 
-		this.toggleExpanded(true)
+		this.interface.toggleCollapse(true)
 	}
 
 	handleMouseLeave = () => {
@@ -242,13 +273,13 @@ export default class Sidebar extends React.Component {
 
 		if (window.app.cores.settings.is("sidebar.collapsable", false)) return
 
-		this.toggleExpanded(false)
+		this.interface.toggleCollapse(false)
 	}
 
 	onDropdownOpenChange = (to) => {
 		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
 		if (!to && this.state.expanded) {
-			this.toggleExpanded(false, true)
+			this.interface.toggleCollapse(false, true)
 		}
 
 		this.setState({ dropdownOpen: to })
@@ -265,126 +296,133 @@ export default class Sidebar extends React.Component {
 	render() {
 		const defaultSelectedKey = window.location.pathname.replace("/", "")
 
-		return <Motion style={{
-			x: spring(!this.state.visible ? 100 : 0),
-		}}>
-			{({ x }) => {
-				return <div
-					className="app_sidebar_wrapper"
-					style={{
-						transform: `translateX(-${x}%)`,
-					}}
-				>
-					<div
-						onMouseEnter={this.onMouseEnter}
-						onMouseLeave={this.handleMouseLeave}
+		return <>
+			<Motion style={{
+				x: spring(!this.state.visible ? 100 : 0),
+			}}>
+				{({ x }) => {
+					return <div
 						className={classnames(
-							"app_sidebar",
+							"app_sidebar_wrapper",
 							{
-								["expanded"]: this.state.visible && this.state.expanded,
-								["hidden"]: !this.state.visible,
+								visible: this.state.visible,
 							}
-						)
-						}
-						ref={this.sidebarRef}
+						)}
+						style={{
+							transform: `translateX(-${x}%)`,
+						}}
 					>
-
-						<div className="app_sidebar_header">
-							<div className="app_sidebar_header_logo">
-								<img src={config.logo?.alt} />
-							</div>
-						</div>
-
-						<div key="menu" className="app_sidebar_menu_wrapper">
-							<Menu
-								mode="inline"
-								onClick={this.handleClick}
-								defaultSelectedKeys={[defaultSelectedKey]}
-								items={this.state.topItems}
-								selectable
-							/>
-						</div>
-
 						<div
-							key="bottom"
+							onMouseEnter={this.onMouseEnter}
+							onMouseLeave={this.handleMouseLeave}
 							className={classnames(
-								"app_sidebar_menu_wrapper",
-								"bottom"
-							)}
+								"app_sidebar",
+								{
+									["expanded"]: this.state.visible && this.state.expanded,
+									["hidden"]: !this.state.visible,
+								}
+							)
+							}
+							ref={this.sidebarRef}
 						>
-							<Menu
-								selectable={false}
-								mode="inline"
-								onClick={this.handleClick}
+
+							<div className="app_sidebar_header">
+								<div className="app_sidebar_header_logo">
+									<img src={config.logo?.alt} />
+								</div>
+							</div>
+
+							<div key="menu" className="app_sidebar_menu_wrapper">
+								<Menu
+									mode="inline"
+									onClick={this.handleClick}
+									defaultSelectedKeys={[defaultSelectedKey]}
+									items={this.state.topItems}
+									selectable
+								/>
+							</div>
+
+							<div
+								key="bottom"
+								className={classnames(
+									"app_sidebar_menu_wrapper",
+									"bottom"
+								)}
 							>
-								{
-									this.state.bottomItems.map((item) => {
-										if (item.noContainer) {
-											return React.createElement(item.children, item.childrenProps)
-										}
-
-										return <Menu.Item
-											key={item.id}
-											className="extra_bottom_item"
-											icon={createIconRender(item.icon)}
-											disabled={item.disabled ?? false}
-											{...item.containerProps}
-										>
-											{
-												React.createElement(item.children, item.childrenProps)
+								<Menu
+									selectable={false}
+									mode="inline"
+									onClick={this.handleClick}
+								>
+									{
+										this.state.bottomItems.map((item) => {
+											if (item.noContainer) {
+												return React.createElement(item.children, item.childrenProps)
 											}
-										</Menu.Item>
-									})
-								}
-								<Menu.Item key="search" icon={<Icons.Search />} >
-									<Translation>
-										{(t) => t("Search")}
-									</Translation>
-								</Menu.Item>
-								<Menu.Item key="notifications" icon={<Icons.Bell />}>
-									<Translation>
-										{t => t("Notifications")}
-									</Translation>
-								</Menu.Item>
-								<Menu.Item key="settings" icon={<Icons.Settings />}>
-									<Translation>
-										{t => t("Settings")}
-									</Translation>
-								</Menu.Item>
 
-								{
-									app.userData && <Dropdown
-										menu={{
-											items: ActionMenuItems,
-											onClick: this.onClickDropdownItem
-										}}
-										autoFocus
-										placement="top"
-										trigger={["click"]}
-										onOpenChange={this.onDropdownOpenChange}
-									>
-										<Menu.Item
-											key="account"
-											className="user_avatar"
-											ignoreClick
-										>
-											<Avatar shape="square" src={app.userData?.avatar} />
-										</Menu.Item>
-									</Dropdown>
-								}
-
-								{
-									!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
+											return <Menu.Item
+												key={item.id}
+												className="extra_bottom_item"
+												icon={createIconRender(item.icon)}
+												disabled={item.disabled ?? false}
+												{...item.containerProps}
+											>
+												{
+													React.createElement(item.children, item.childrenProps)
+												}
+											</Menu.Item>
+										})
+									}
+									<Menu.Item key="search" icon={<Icons.Search />} >
 										<Translation>
-											{t => t("Login")}
+											{(t) => t("Search")}
 										</Translation>
 									</Menu.Item>
-								}
-							</Menu>
+									<Menu.Item key="notifications" icon={<Icons.Bell />}>
+										<Translation>
+											{t => t("Notifications")}
+										</Translation>
+									</Menu.Item>
+									<Menu.Item key="settings" icon={<Icons.Settings />}>
+										<Translation>
+											{t => t("Settings")}
+										</Translation>
+									</Menu.Item>
+
+									{
+										app.userData && <Dropdown
+											menu={{
+												items: ActionMenuItems,
+												onClick: this.onClickDropdownItem
+											}}
+											autoFocus
+											placement="top"
+											trigger={["click"]}
+											onOpenChange={this.onDropdownOpenChange}
+										>
+											<Menu.Item
+												key="account"
+												className="user_avatar"
+												ignoreClick
+											>
+												<Avatar shape="square" src={app.userData?.avatar} />
+											</Menu.Item>
+										</Dropdown>
+									}
+
+									{
+										!app.userData && <Menu.Item key="login" icon={<Icons.LogIn />}>
+											<Translation>
+												{t => t("Login")}
+											</Translation>
+										</Menu.Item>
+									}
+								</Menu>
+							</div>
 						</div>
 					</div>
-				</div>
-			}}
-		</Motion>
+				}}
+			</Motion>
+		</>
 	}
 }

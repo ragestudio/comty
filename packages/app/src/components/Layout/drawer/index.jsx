@@ -120,7 +120,7 @@ export class Drawer extends React.Component {
 		}
 	}
 
-	toogleVisibility = (to) => {
+	toggleVisibility = (to) => {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
@@ -137,7 +137,7 @@ export class Drawer extends React.Component {
 			return console.warn("Cannot close a locked drawer")
 		}
 
-		this.toogleVisibility(false)
+		this.toggleVisibility(false)
 
 		this.events.emit("beforeClose")
 

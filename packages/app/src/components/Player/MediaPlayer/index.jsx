@@ -57,8 +57,8 @@ export class AudioPlayer extends React.Component {
         app.cores.player.volume(value)
     }
 
-    toogleMute = () => {
-        app.cores.player.toogleMute()
+    toggleMute = () => {
+        app.cores.player.toggleMute()
     }
 
     onClickPlayButton = () => {
@@ -66,7 +66,7 @@ export class AudioPlayer extends React.Component {
             return app.cores.player.playback.stop()
         }
 
-        app.cores.player.playback.toogle()
+        app.cores.player.playback.toggle()
     }
 
     onClickPreviousButton = () => {
@@ -168,10 +168,10 @@ export class AudioPlayer extends React.Component {
                     audioMuted={this.context.audioMuted}
                     audioVolume={this.context.audioVolume}
                     onVolumeUpdate={this.updateVolume}
-                    onMuteUpdate={this.toogleMute}
+                    onMuteUpdate={this.toggleMute}
                     controls={{
                         previous: this.onClickPreviousButton,
-                        toogle: this.onClickPlayButton,
+                        toggle: this.onClickPlayButton,
                         next: this.onClickNextButton,
                     }}
                 />

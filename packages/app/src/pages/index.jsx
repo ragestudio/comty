@@ -27,41 +27,9 @@ export default class Home extends React.Component {
             </antd.Button>
         </>
 
-        const extraPanel = {
-            children: <>
-                <div className="card" id="trendings">
-                    <div className="header">
-                        <h2>
-                            <Icons.TrendingUp />
-                            <Translation>{(t) => t("Trendings")}</Translation>
-                        </h2>
-                    </div>
-
-                    <HashtagTrendings />
-                </div>
-
-                <div className="card" id="onlineFriends">
-                    <div className="header">
-                        <h2>
-                            <Icons.MdPeopleAlt />
-                            <Translation>{(t) => t("Online Friends")}</Translation>
-                        </h2>
-                    </div>
-
-                    <ConnectedFriends />
-                </div>
-
-                <WidgetsWrapper />
-            </>
-        }
-
         return <PagePanelWithNavMenu
             tabs={Tabs}
             navMenuHeader={navMenuHeader}
-            extraMenuItems={[
-                <FeaturedEventsAnnouncements />
-            ]}
-            extraPanel={extraPanel}
             primaryPanelClassName="full"
             useSetQueryType
             transition

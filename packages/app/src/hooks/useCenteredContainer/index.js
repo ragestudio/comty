@@ -2,10 +2,10 @@ import React from "react"
 
 export default () => {
     React.useEffect(() => {
-        app.layout.toogleCenteredContent(true)
+        app.layout.toggleCenteredContent(true)
 
         return () => {
-            app.layout.toogleCenteredContent(false)
+            app.layout.toggleCenteredContent(false)
         }
     }, [])
 }

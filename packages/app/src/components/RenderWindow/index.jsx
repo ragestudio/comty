@@ -111,10 +111,10 @@ class DefaultWindowRender extends React.Component {
 			this.setState({ position: this.getCenterPosition() })
 		}
 
-		this.toogleVisibility(true)
+		this.toggleVisibility(true)
 	}
 
-	toogleVisibility = (to) => {
+	toggleVisibility = (to) => {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 

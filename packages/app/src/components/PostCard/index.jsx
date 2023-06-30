@@ -104,8 +104,8 @@ export default class PostCard extends React.PureComponent {
             to = !this.state.open
         }
 
-        if (typeof this.props.events?.onToogleOpen === "function") {
-            this.props.events?.onToogleOpen(to, this.props.data)
+        if (typeof this.props.events?.ontoggleOpen === "function") {
+            this.props.events?.ontoggleOpen(to, this.props.data)
         }
 
         this.setState({

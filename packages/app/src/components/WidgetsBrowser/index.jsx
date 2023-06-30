@@ -80,7 +80,7 @@ export const WidgetBrowser = (props) => {
                             })
                         }}
                         onChangeVisible={(visible) => {
-                            app.cores.widgets.toogleVisibility(widget._id, visible)
+                            app.cores.widgets.toggleVisibility(widget._id, visible)
                         }}
                     />
                 </React.Fragment>

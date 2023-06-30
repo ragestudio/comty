@@ -37,7 +37,7 @@ export class BackgroundMediaPlayer extends React.Component {
     events = {
         "sidebar.expanded": (to) => {
             if (!to) {
-                this.toogleExpand(false)
+                this.toggleExpand(false)
             }
         }
     }
@@ -46,7 +46,7 @@ export class BackgroundMediaPlayer extends React.Component {
         app.cores.player.minimize()
     }
 
-    toogleExpand = (to) => {
+    toggleExpand = (to) => {
         if (typeof to !== "boolean") {
             to = !this.state.expanded
         }
@@ -91,7 +91,7 @@ export class BackgroundMediaPlayer extends React.Component {
 
             <div
                 className="background_media_player__row"
-                onClick={this.toogleExpand}
+                onClick={this.toggleExpand}
             >
                 <div
                     id="sidebar_item_icon"
@@ -166,7 +166,7 @@ export class BackgroundMediaPlayer extends React.Component {
                     type="ghost"
                     shape="circle"
                     icon={this.context.playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
-                    onClick={app.cores.player.playback.toogle}
+                    onClick={app.cores.player.playback.toggle}
                 />
 
                 <antd.Button

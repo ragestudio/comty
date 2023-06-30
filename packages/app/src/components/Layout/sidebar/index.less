@@ -8,12 +8,21 @@
 
 	z-index: 1000;
 
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 20px;
+
 	width: fit-content;
 
 	height: 100vh;
 	height: 100dvh;
 
-	padding: 10px;
+	&.visible {
+		padding: 10px;
+	}
 }
 
 .app_sidebar {

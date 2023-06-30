@@ -32,7 +32,7 @@ export default class WidgetsView extends React.Component {
                                     })
                                 }}
                                 onChangeVisible={(visible) => {
-                                    app.cores.widgets.toogleVisibility(manifest._id, visible)
+                                    app.cores.widgets.toggleVisibility(manifest._id, visible)
                                 }}
                             />
                         </React.Fragment>

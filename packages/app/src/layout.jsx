@@ -45,8 +45,12 @@ export default class Layout extends React.PureComponent {
 
 			transitionLayer.classList.remove("fade-opacity-leave")
 		},
-		"router.navigate": (path, options) => {
-			this.makePageTransition(path, options)
+		"router.navigate": async (path, options) => {
+			this.progressBar.start()
+
+			await this.makePageTransition(options)
+
+			this.progressBar.done()
 		},
 	}
 
@@ -57,11 +61,11 @@ export default class Layout extends React.PureComponent {
 		})
 
 		if (app.isMobile) {
-			this.layoutInterface.toogleMobileStyle(true)
+			this.layoutInterface.toggleMobileStyle(true)
 		}
 
 		if (app.cores.settings.get("reduceAnimations")) {
-			this.layoutInterface.toogleRootContainerClassname("reduce-animations", true)
+			this.layoutInterface.toggleRootContainerClassname("reduce-animations", true)
 		}
 	}
 
@@ -76,26 +80,31 @@ export default class Layout extends React.PureComponent {
 		this.setState({ renderError: { info, stack } })
 	}
 
-	makePageTransition(path, options = {}) {
-		this.progressBar.start()
+	async makePageTransition(options = {}) {
+		if (document.startViewTransition) {
+			return document.startViewTransition(async () => {
+				await new Promise((resolve) => {
+					setTimeout(resolve, options.state?.transitionDelay ?? 250)
+				})
+			})
+		}
 
 		const content_layout = document.getElementById("content_layout")
 
 		if (!content_layout) {
 			console.warn("content_layout not found, no animation will be played")
 
-			this.progressBar.done()
-
 			return false
 		}
 
 		content_layout.classList.add("fade-transverse-leave")
 
-		setTimeout(() => {
-			this.progressBar.done()
-
-			content_layout.classList.remove("fade-transverse-leave")
-		}, options.state?.transitionDelay ?? 250)
+		return await new Promise((resolve) => {
+			setTimeout(() => {
+				resolve()
+				content_layout.classList.remove("fade-transverse-leave")
+			}, options.state?.transitionDelay ?? 250)
+		})
 	}
 
 	layoutInterface = window.app.layout = {
@@ -110,22 +119,22 @@ export default class Layout extends React.PureComponent {
 				layoutType: layout,
 			})
 		},
-		toogleCenteredContent: (to) => {
-			return this.layoutInterface.toogleRootContainerClassname("centered-content", to)
+		toggleCenteredContent: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("centered-content", to)
 		},
-		toogleMobileStyle: (to) => {
-			return this.layoutInterface.toogleRootContainerClassname("mobile", to)
+		toggleMobileStyle: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("mobile", to)
 		},
-		toogleReducedAnimations: (to) => {
-			return this.layoutInterface.toogleRootContainerClassname("reduce-animations", to)
+		toggleReducedAnimations: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("reduce-animations", to)
 		},
-		toogleTopBarSpacer: (to) => {
-			return this.layoutInterface.toogleRootContainerClassname("top-bar-spacer", to)
+		toggleTopBarSpacer: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("top-bar-spacer", to)
 		},
-		tooglePagePanelSpacer: (to) => {
-			return this.layoutInterface.toogleRootContainerClassname("page-panel-spacer", to)
+		togglePagePanelSpacer: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("page-panel-spacer", to)
 		},
-		toogleRootContainerClassname: (classname, to) => {
+		toggleRootContainerClassname: (classname, to) => {
 			const root = document.getElementById("root")
 
 			if (!root) {

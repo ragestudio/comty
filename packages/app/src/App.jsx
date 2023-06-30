@@ -157,6 +157,23 @@ class ComtyApp extends React.Component {
 
 	static publicMethods = {
 		controls: {
+			toogleUIVisibility: (to) => {
+				if (app.layout.sidebar) {
+					app.layout.sidebar.toggleVisibility(to)
+				}
+
+				if (app.layout.tools_bar) {
+					app.layout.tools_bar.toggleVisibility(to)
+				}
+
+				if (app.layout.top_bar) {
+					app.layout.top_bar.toggleVisibility(to)
+				}
+
+				if (app.layout.floatingStack) {
+					app.layout.floatingStack.toggleGlobalVisibility(to)
+				}
+			},
 			openLoginForm: async (options = {}) => {
 				app.DrawerController.open("login", Login, {
 					defaultLocked: options.defaultLocked ?? false,
@@ -178,7 +195,7 @@ class ComtyApp extends React.Component {
 			},
 			// Opens the notification window and sets up the UI for the notification to be displayed
 			openNotifications: () => {
-				window.app.SidedrawerController.open("notifications", NotificationsCenter, {
+				window.app.layout.sidedrawer.open("notifications", NotificationsCenter, {
 					props: {
 						width: "fit-content",
 					},

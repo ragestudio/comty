@@ -4,24 +4,9 @@ import { Motion, spring } from "react-motion"
 
 import useLayoutInterface from "hooks/useLayoutInterface"
 import useDefaultVisibility from "hooks/useDefaultVisibility"
+import useTopBar from "hooks/useTopBar"
 
 import "./index.less"
-
-export const UseTopBar = (props) => {
-    app.layout.top_bar.render(
-        <React.Fragment>
-            {props.children}
-        </React.Fragment>,
-        props.options)
-
-    React.useEffect(() => {
-        return () => {
-            app.layout.top_bar.renderDefault()
-        }
-    }, [])
-
-    return null
-}
 
 export default (props) => {
     const [visible, setVisible] = useDefaultVisibility()
@@ -45,7 +30,7 @@ export default (props) => {
             setRender(null)
         },
         shouldUseTopBarSpacer: (to) => {
-            app.layout.toogleTopBarSpacer(to)
+            app.layout.toggleTopBarSpacer(to)
             setShouldUseTopBarSpacer(to)
         }
     })
@@ -69,27 +54,27 @@ export default (props) => {
 
     React.useEffect(() => {
         if (!shouldUseTopBarSpacer) {
-            app.layout.tooglePagePanelSpacer(true)
+            app.layout.togglePagePanelSpacer(true)
         } else {
-            app.layout.tooglePagePanelSpacer(false)
+            app.layout.togglePagePanelSpacer(false)
         }
     }, [shouldUseTopBarSpacer])
 
     React.useEffect(() => {
         if (shouldUseTopBarSpacer) {
             if (visible) {
-                app.layout.toogleTopBarSpacer(true)
+                app.layout.toggleTopBarSpacer(true)
             } else {
-                app.layout.toogleTopBarSpacer(false)
+                app.layout.toggleTopBarSpacer(false)
             }
         } else {
             if (visible) {
-                app.layout.tooglePagePanelSpacer(true)
+                app.layout.togglePagePanelSpacer(true)
             } else {
-                app.layout.tooglePagePanelSpacer(false)
+                app.layout.togglePagePanelSpacer(false)
             }
 
-            app.layout.toogleTopBarSpacer(false)
+            app.layout.toggleTopBarSpacer(false)
         }
     }, [visible])
 

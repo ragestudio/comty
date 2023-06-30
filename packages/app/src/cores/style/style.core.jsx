@@ -154,7 +154,7 @@ export default class StyleCore extends Core {
 	}
 
 	onEvents = {
-		"style.autoDarkModeToogle": (value) => {
+		"style.autoDarkModetoggle": (value) => {
 			if (value === true) {
 				return this.applyVariant(StyleCore.variant)
 			}

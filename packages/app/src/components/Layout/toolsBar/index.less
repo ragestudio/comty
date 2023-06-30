@@ -1,0 +1,67 @@
+.tools-bar {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    max-width: 20vw;
+
+    height: 100vh;
+    height: 100dvh;
+
+    border-left: 1px solid var(--border-color);
+
+    gap: 20px;
+
+
+    &.visible {
+        padding: 20px;
+    }
+
+    .card {
+        display: flex;
+        flex-direction: column;
+
+        background-color: var(--background-color-accent);
+        border-radius: 12px;
+
+        padding: 20px;
+
+        isolation: isolate;
+
+        h1,
+        h2 {
+            width: fit-content;
+            margin: 0;
+        }
+
+        &.header {
+            position: relative;
+
+            display: flex;
+            flex-direction: row;
+
+            justify-content: space-between;
+            align-items: center;
+
+            width: 100%;
+
+            margin-bottom: 10px;
+
+            z-index: 50;
+
+            -webkit-box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 var(--shadow-color);
+            -moz-box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 var(--shadow-color);
+            box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 var(--shadow-color);
+        }
+
+        &.content {
+            position: relative;
+
+            transform: translateY(-30px);
+            padding-top: 35px;
+
+            z-index: 45;
+        }
+    }
+}

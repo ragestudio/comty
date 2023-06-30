@@ -41,7 +41,7 @@ export default class PostCreator extends React.Component {
         })
     }
 
-    toogleUploaderVisibility = (to) => {
+    toggleUploaderVisibility = (to) => {
         to = to ?? !this.state.uploaderVisible
 
         if (to === this.state.uploaderVisible) {
@@ -115,7 +115,7 @@ export default class PostCreator extends React.Component {
 
     uploadFile = async (req) => {
         // hide uploader
-        this.toogleUploaderVisibility(false)
+        this.toggleUploaderVisibility(false)
 
         const request = await app.cores.remoteStorage.uploadFile(req.file)
             .catch(error => {
@@ -180,7 +180,7 @@ export default class PostCreator extends React.Component {
 
         switch (change.file.status) {
             case "uploading": {
-                this.toogleUploaderVisibility(false)
+                this.toggleUploaderVisibility(false)
 
                 this.setState({
                     pending: [...this.state.pending, change.file.uid]
@@ -377,11 +377,11 @@ export default class PostCreator extends React.Component {
         console.log(event)
 
         if (event.type === "dragenter") {
-            this.toogleUploaderVisibility(true)
+            this.toggleUploaderVisibility(true)
         } else if (event.type === "dragleave") {
             // check if mouse is over the uploader or outside the creatorRef
             if (this.state.uploaderVisible && !this.creatorRef.current.contains(event.target)) {
-                this.toogleUploaderVisibility(false)
+                this.toggleUploaderVisibility(false)
             }
         }
     }

@@ -121,9 +121,9 @@ function generatePageElementWrapper(route, element, bindProps) {
             }
 
             if (routeDeclaration.centeredContent) {
-                app.layout.toogleCenteredContent(true)
+                app.layout.toggleCenteredContent(true)
             } else {
-                app.layout.toogleCenteredContent(false)
+                app.layout.toggleCenteredContent(false)
             }
         }
 
