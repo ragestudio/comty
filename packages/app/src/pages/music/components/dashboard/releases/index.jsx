@@ -30,15 +30,31 @@ const ReleaseItem = (props) => {
                 />
             </div>
             <div
-                className="music_panel_releases_info_title"
+                className="music_panel_releases_info_data"
             >
                 <h1>
                     {release.title}
                 </h1>
 
-                <h4>
-                    {release.description}
-                </h4>
+                {
+                    release.description && <h4>
+                        {release.description}
+                    </h4>
+                }
+
+                <div className="music_panel_releases_info_extra">
+                    {
+                        release.public
+                            ? <>
+                                <Icons.MdOutlinePublic />
+                                Public
+                            </>
+                            : <>
+                                <Icons.MdOutlineLock />
+                                Private
+                            </>
+                    }
+                </div>
             </div>
         </div>
 

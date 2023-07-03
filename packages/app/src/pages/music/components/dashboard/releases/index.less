@@ -69,6 +69,8 @@
                 display: flex;
                 flex-direction: row;
 
+                height: 100%;
+
                 .music_panel_releases_info_cover {
                     display: flex;
                     flex-direction: column;
@@ -90,12 +92,28 @@
                     }
                 }
 
-                .music_panel_releases_info_title {
+                .music_panel_releases_info_data {
                     display: flex;
                     flex-direction: column;
 
+                    height: 100%;
+
                     h1 {
                         margin: 0 !important;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                    .music_panel_releases_info_extra {
+                        display: flex;
+                        flex-direction: row;
+
+
+                        align-items: center;
+                        justify-content: flex-start;
+
+                        justify-self: end;
                     }
                 }
             }
