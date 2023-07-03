@@ -24,6 +24,7 @@ export default async (req, res) => {
     }
 
     let playlists = await Playlist.find(searchQuery)
+        .sort({ created_at: -1 })
         .catch((err) => false)
     //.limit(limit)
     //.skip(offset)
