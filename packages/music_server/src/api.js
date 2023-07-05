@@ -10,7 +10,7 @@ import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 
-import RoomServer from "./roomsServer"
+import WebsocketServer from "./ws"
 
 import pkg from "../package.json"
 
@@ -24,8 +24,7 @@ export default class Server {
     constructor(options = {}) {
         this.server = express()
         this._http = http.createServer(this.server)
-
-        this.websocketServer = new RoomServer(this._http)
+        this.websocketServer = global.ws = new WebsocketServer(this._http)
 
         this.options = {
             listenHost: process.env.HTTP_LISTEN_IP ?? "0.0.0.0",
