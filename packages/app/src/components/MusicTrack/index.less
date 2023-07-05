@@ -152,14 +152,21 @@
         }
     }
 
-    .music-track_info {
+    .music-track_right_actions {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 10px;
 
         margin-left: auto;
 
         color: var(--text-color);
+    }
 
+    .music-track_info {
         .music-track_duration {
             font-size: 0.8rem;
         }
