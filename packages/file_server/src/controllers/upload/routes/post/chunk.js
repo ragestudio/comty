@@ -3,7 +3,7 @@ import fs from "fs"
 
 import * as Errors from "@shared-classes/Errors"
 import FileUpload from "@shared-classes/FileUpload"
-import useCompression from "@services/useCompression"
+import PostProcess from "@services/post-process"
 
 const cachePath = global.cache.constructor.cachePath
 
@@ -14,6 +14,8 @@ export default async (req, res) => {
     if (!auth) {
         return new Errors.AuthorizationError(req, res)
     }
+
+    const providerType = req.headers["provider-type"]
 
     const userPath = path.join(cachePath, req.session.user_id)
 
@@ -40,20 +42,55 @@ export default async (req, res) => {
                 build = await build()
 
                 if (!req.headers["no-compression"]) {
-                    build = await useCompression(build)
+                    build = await PostProcess(build)
                 }
 
                 // compose remote path
                 const remotePath = `${req.session.user_id}/${path.basename(build.filepath)}`
 
-                // upload to storage
-                await global.storage.fPutObject(process.env.S3_BUCKET, remotePath, build.filepath)
+                let url = null
+
+                switch (providerType) {
+                    case "music": {
+                        console.debug("uploading to backblaze b2")
+
+                        // use backblaze b2
+                        await global.b2Storage.authorize()
+
+                        const uploadUrl = await global.b2Storage.getUploadUrl({
+                            bucketId: process.env.B2_BUCKET_ID,
+                        })
+
+                        const data = await fs.promises.readFile(build.filepath)
+
+                        await global.b2Storage.uploadFile({
+                            uploadUrl: uploadUrl.data.uploadUrl,
+                            uploadAuthToken: uploadUrl.data.authorizationToken,
+                            fileName: remotePath,
+                            data: data,
+                            info: build.metadata
+                        })
+
+                        url = path.join(`https://`, process.env.B2_ENDPOINT, process.env.B2_BUCKET, remotePath)
+
+                        break
+                    }
+                    default: {
+                        console.debug("uploading to minio")
+                        // upload to storage
+                        await global.storage.fPutObject(process.env.S3_BUCKET, remotePath, build.filepath, build.metadata ?? {
+                            "Content-Type": build.mimetype,
+                        })
+
+                        // compose url
+                        url = global.storage.composeRemoteURL(remotePath)
+
+                        break
+                    }
+                }
 
                 // remove from cache
                 fs.promises.rm(build.cachePath, { recursive: true, force: true })
-
-                // compose url
-                const url = global.storage.composeRemoteURL(remotePath)
 
                 return res.json({
                     name: build.filename,
