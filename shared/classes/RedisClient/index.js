@@ -5,10 +5,6 @@ function composeURL() {
     // support for auth
     let url = "redis://"
 
-    if (process.env.REDIS_PASSWORD && process.env.REDIS_USERNAME) {
-        url += process.env.REDIS_USERNAME + ":" + process.env.REDIS_PASSWORD + "@"
-    }
-
     url += process.env.REDIS_HOST ?? "localhost"
 
     if (process.env.REDIS_PORT) {
@@ -25,12 +21,14 @@ export default ({
         url: composeURL(),
     }
 
-    if (process.env.REDIS_PASSWORD) {
-        clientOpts.password = process.env.REDIS_PASSWORD
-    }
+    if (!process.env.REDIS_NO_AUTH) {
+        if (process.env.REDIS_PASSWORD) {
+            clientOpts.password = process.env.REDIS_PASSWORD
+        }
 
-    if (process.env.REDIS_USERNAME) {
-        clientOpts.username = process.env.REDIS_USERNAME
+        if (process.env.REDIS_USERNAME) {
+            clientOpts.username = process.env.REDIS_USERNAME
+        }
     }
 
     let client = createClient(clientOpts)
