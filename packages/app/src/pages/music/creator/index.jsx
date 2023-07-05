@@ -86,6 +86,63 @@ export default class PlaylistCreatorSteps extends React.Component {
                 })
             })
         },
+        orderTracksByFileName: () => {
+            let fileList = this.state.fileList
+
+            fileList = fileList.sort((a, b) => {
+                return a.name.localeCompare(b.name)
+            })
+
+            const trackList = fileList.map((file) => {
+                const track = this.state.trackList.find((track) => track.uid === file.uid)
+
+                return track
+            })
+
+            console.log(fileList, trackList)
+
+            this.setState({
+                fileList,
+                trackList
+            })
+        },
+        orderByArrayIndex: (order) => {
+            const trackList = this.state.trackList
+
+            let orderedTrackList = trackList.map((track, index) => {
+                // find in order
+                const orderIndex = order.findIndex((_track) => {
+                    return _track.title === track.title && _track.artist === track.artist && _track.album === track.album
+                })
+
+                if (orderIndex === -1) {
+                    track.order = index
+                } else {
+                    track.order = orderIndex
+                }
+
+                return track
+            })
+
+            console.log(orderedTrackList)
+
+            orderedTrackList = orderedTrackList.sort((a, b) => {
+                return a.order - b.order
+            })
+
+            this.setState({
+                trackList: orderedTrackList
+            })
+        },
+        removeMetadataFromAllTracks: () => {
+            this.setState({
+                trackList: this.state.trackList.map((track) => {
+                    delete track.metadata
+
+                    return track
+                })
+            })
+        },
     }
 
     updatePlaylistData = (key, value) => {
@@ -177,7 +234,7 @@ export default class PlaylistCreatorSteps extends React.Component {
 
     handleUploadTrack = async (req) => {
         const response = await app.cores.remoteStorage.uploadFile(req.file, {
-            onProgress: this.handleFileProgress
+            onProgress: this.handleFileProgress,
         }).catch((error) => {
             console.error(error)
             antd.message.error(error)
