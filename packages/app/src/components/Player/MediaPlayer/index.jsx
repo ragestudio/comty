@@ -9,6 +9,8 @@ import SeekBar from "components/Player/SeekBar"
 import Controls from "components/Player/Controls"
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
+import PlaylistsModel from "models/playlists"
+
 import "./index.less"
 
 export default (props) => {
@@ -77,12 +79,16 @@ export class AudioPlayer extends React.Component {
         app.cores.player.playback.next()
     }
 
-    onClickLikeButton = () => {
-        // TODO: Like
+    onClickLikeButton = async () => {
+        const result = await PlaylistsModel.toogleTrackLike(this.context.currentManifest._id).catch((err) => {
+            return null
+        })
 
-        console.log("Like")
-
-        this.setState({ liked: !this.state.liked })
+        if (result) {
+            this.setState({
+                liked: result.action === "liked"
+            })
+        }
     }
 
     render() {

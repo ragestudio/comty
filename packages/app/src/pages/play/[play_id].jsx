@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import moment from "moment"
 import fuse from "fuse.js"
+import useWsEvents from "hooks/useWsEvents"
 
 import { WithPlayerContext } from "contexts/WithPlayerContext"
 
@@ -53,6 +54,10 @@ export default (props) => {
         app.cores.player.startPlaylist(playlist.list, index)
     }
 
+    const handleTrackLike = async (track) => {
+        return await PlaylistsModel.toogleTrackLike(track._id)
+    }
+
     const makeSearch = (value) => {
         const options = {
             includeScore: true,
@@ -77,6 +82,7 @@ export default (props) => {
                 order={index + 1}
                 track={item}
                 onClick={() => handleOnClickTrack(item)}
+                onLike={() => handleTrackLike(item)}
             />
         })
     }
@@ -94,6 +100,34 @@ export default (props) => {
 
         setSearchResults(null)
     }
+
+    const updateTrackLike = (track_id, liked) => {
+        setPlaylist((prev) => {
+            const index = prev.list.findIndex((item) => {
+                return item._id === track_id
+            })
+
+            if (index !== -1) {
+                const newState = {
+                    ...prev,
+                }
+
+                newState.list[index].liked = liked
+
+                return newState
+            }
+
+            return prev
+        })
+    }
+
+    useWsEvents({
+        "music:self:track:toggle:like": (data) => {
+            updateTrackLike(data.track_id, data.action === "liked")
+        }
+    }, {
+        socketName: "music",
+    })
 
     React.useEffect(() => {
         loadData()
