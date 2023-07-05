@@ -22,9 +22,9 @@
         "@foxify/events": "^2.1.0",
         "@jimp/plugin-scale": "^0.22.7",
         "@octokit/rest": "^19.0.7",
+        "@socket.io/cluster-adapter": "^0.2.2",
         "@socket.io/redis-adapter": "^8.2.1",
         "@socket.io/redis-emitter": "^5.1.0",
-        "@socket.io/cluster-adapter": "^0.2.2",
         "@socket.io/sticky": "^1.0.3",
         "@tensorflow/tfjs-node": "4.0.0",
         "axios": "^1.2.5",
@@ -58,6 +58,7 @@
         "passport-jwt": "^4.0.1",
         "passport-local": "^1.0.0",
         "path-to-regexp": "^6.2.1",
+        "peer": "^1.0.0",
         "sharp": "^0.31.3",
         "split-chunk-merge": "^1.0.0"
     },
