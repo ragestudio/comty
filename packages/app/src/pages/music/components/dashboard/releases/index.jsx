@@ -47,11 +47,15 @@ const ReleaseItem = (props) => {
                         release.public
                             ? <>
                                 <Icons.MdOutlinePublic />
-                                Public
+                                <span>
+                                    Public
+                                </span>
                             </>
                             : <>
                                 <Icons.MdOutlineLock />
-                                Private
+                                <span>
+                                    Private
+                                </span>
                             </>
                     }
                 </div>
