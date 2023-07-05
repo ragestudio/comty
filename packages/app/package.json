@@ -83,6 +83,8 @@
         "moment-timezone": "^0.5.37",
         "mpegts.js": "^1.6.10",
         "nprogress": "^0.2.0",
+        "p-map": "^6.0.0",
+        "peer": "^1.0.0",
         "plyr": "^3.6.12",
         "plyr-react": "^3.2.1",
         "prop-types": "^15.8.1",
