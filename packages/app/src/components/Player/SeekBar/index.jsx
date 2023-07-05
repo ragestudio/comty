@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import Slider from "@mui/material/Slider"
 import classnames from "classnames"
+import seekToTimeLabel from "utils/seekToTimeLabel"
 
 import "./index.less"
 
@@ -39,7 +40,7 @@ export default class SeekBar extends React.Component {
 
         // set duration
         this.setState({
-            durationText: this.seekToTimeLabel(audioDuration)
+            durationText: seekToTimeLabel(audioDuration)
         })
     }
 
@@ -49,24 +50,8 @@ export default class SeekBar extends React.Component {
 
         // set time
         this.setState({
-            timeText: this.seekToTimeLabel(seek)
+            timeText: seekToTimeLabel(seek)
         })
-    }
-
-    seekToTimeLabel = (value) => {
-        // convert seek to minutes and seconds
-        const minutes = Math.floor(value / 60)
-
-        // add leading zero if minutes is less than 10
-        const minutesString = minutes < 10 ? `0${minutes}` : minutes
-
-        // get seconds
-        const seconds = Math.floor(value - minutes * 60)
-
-        // add leading zero if seconds is less than 10
-        const secondsString = seconds < 10 ? `0${seconds}` : seconds
-
-        return `${minutesString}:${secondsString}`
     }
 
     updateProgressBar = () => {
@@ -209,7 +194,7 @@ export default class SeekBar extends React.Component {
                     }}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(value) => {
-                        return this.seekToTimeLabel((value / 100) * app.cores.player.duration())
+                        return seekToTimeLabel((value / 100) * app.cores.player.duration())
                     }}
                 />
             </div>
