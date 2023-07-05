@@ -21,11 +21,19 @@ function composeURL() {
 export default ({
     withWsAdapter = false
 } = {}) => {
-    let client = createClient({
+    let clientOpts = {
         url: composeURL(),
-        password: process.env.REDIS_PASSWORD,
-        username: process.env.REDIS_USERNAME,
-    })
+    }
+
+    if (process.env.REDIS_PASSWORD) {
+        clientOpts.password = process.env.REDIS_PASSWORD
+    }
+
+    if (process.env.REDIS_USERNAME) {
+        clientOpts.username = process.env.REDIS_USERNAME
+    }
+
+    let client = createClient()
 
     if (withWsAdapter) {
         client.subClient = client.duplicate()
