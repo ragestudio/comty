@@ -1,13 +1,13 @@
 import fs from "fs"
 import path from "path"
 
+import B2 from "backblaze-b2"
+
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 import ComtyClient from "@shared-classes/ComtyClient"
-
 import express from "express"
-import hyperexpress from "hyper-express"
 
 import pkg from "../package.json"
 
@@ -15,17 +15,6 @@ export default class FileServerAPI {
     // max body length is 1GB in bytes
     static maxBodyLength = 1000 * 1000 * 1000
 
-    // server = global.server = new hyperexpress.Server({
-    //     auto_close: true,
-    //     fast_buffers: false,
-    //     max_body_length: FileServerAPI.maxBodyLength,
-    //     streaming: {
-    //         highWaterMark: 1000 * 1000 * 1000,
-    //         objectMode: false,
-    //     }
-    // })
-
-    //internalRouter = new hyperexpress.Router()
     internalRouter = express.Router()
 
     server = global.server = express()
@@ -36,6 +25,11 @@ export default class FileServerAPI {
     redis = global.redis = RedisClient()
 
     storage = global.storage = StorageClient()
+
+    b2Storage = global.b2Storage = new B2({
+        applicationKeyId: process.env.B2_KEY_ID,
+        applicationKey: process.env.B2_APP_KEY,
+    })
 
     cache = global.cache = new CacheService()
 
@@ -136,6 +130,7 @@ export default class FileServerAPI {
         // initialize clients
         await this.redis.initialize()
         await this.storage.initialize()
+        await this.b2Storage.authorize()
 
         this.server.use(express.json({ extended: false }))
         this.server.use(express.urlencoded({ extended: true }))

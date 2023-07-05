@@ -21,6 +21,7 @@
         "@foxify/events": "^2.1.0",
         "@octokit/rest": "^19.0.7",
         "axios": "^1.4.0",
+        "backblaze-b2": "^1.7.0",
         "bcrypt": "^5.1.0",
         "busboy": "^1.6.0",
         "comty.js": "^0.49.3",
@@ -45,7 +46,7 @@
         "morgan": "^1.10.0",
         "nanoid": "3.2.0",
         "normalize-url": "^8.0.0",
-        "p-map": "^6.0.0",
+        "p-map": "4.0.0",
         "p-queue": "^7.3.4",
         "redis": "^4.6.6",
         "split-chunk-merge": "^1.0.0"
