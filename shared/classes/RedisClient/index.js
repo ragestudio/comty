@@ -33,7 +33,7 @@ export default ({
         clientOpts.username = process.env.REDIS_USERNAME
     }
 
-    let client = createClient()
+    let client = createClient(clientOpts)
 
     if (withWsAdapter) {
         client.subClient = client.duplicate()
