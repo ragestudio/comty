@@ -107,4 +107,18 @@ export default class PlaylistsModel {
 
         return data
     }
+
+    static toogleTrackLike = async (track_id) => {
+        if (!track_id) {
+            throw new Error("Track ID is required")
+        }
+
+        const { data } = await request({
+            instance: PlaylistsModel.api_instance,
+            method: "POST",
+            url: `/tracks/${track_id}/toggle-like`,
+        })
+
+        return data
+    }
 }
