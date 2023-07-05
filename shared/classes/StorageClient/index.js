@@ -83,7 +83,6 @@ export class StorageClient extends Minio.Client {
 
 export const createStorageClientInstance = (options) => {
     return new StorageClient({
-        ...options,
         endPoint: process.env.S3_ENDPOINT,
         port: Number(process.env.S3_PORT),
         useSSL: toBoolean(process.env.S3_USE_SSL),
@@ -91,6 +90,7 @@ export const createStorageClientInstance = (options) => {
         secretKey: process.env.S3_SECRET_KEY,
         defaultBucket: process.env.S3_BUCKET,
         defaultRegion: process.env.S3_REGION,
+        ...options,
     })
 }
 
