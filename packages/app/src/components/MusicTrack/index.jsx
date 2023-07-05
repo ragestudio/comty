@@ -1,6 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
+import LikeButton from "components/LikeButton"
+import seekToTimeLabel from "utils/seekToTimeLabel"
 
 import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
@@ -16,6 +18,7 @@ export default (props) => {
         playbackStatus,
     } = React.useContext(Context)
 
+    const isLiked = props.track?.liked
     const isCurrent = currentManifest?._id === props.track._id
     const isPlaying = isCurrent && playbackStatus === "playing"
 
@@ -49,9 +52,11 @@ export default (props) => {
                 />
             </div>
         </div>
+
         <div className="music-track_cover">
             <ImageViewer src={props.track.cover ?? props.track.thumbnail} />
         </div>
+
         <div className="music-track_details">
             <div className="music-track_title">
                 {props.track.title}
@@ -61,10 +66,21 @@ export default (props) => {
             </div>
         </div>
 
-        <div className="music-track_info">
-            <div className="music-track_info_duration">
-                {props.track.duration ?? "00:00"}
+        <div className="music-track_right_actions">
+            <div className="music-track_info">
+                <div className="music-track_info_duration">
+                    {
+                        props.track.metadata?.duration
+                            ? seekToTimeLabel(props.track.metadata?.duration)
+                            : "00:00"
+                    }
+                </div>
             </div>
+
+            <LikeButton
+                liked={isLiked}
+                onClick={props.onLike}
+            />
         </div>
     </div>
 }
