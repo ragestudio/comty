@@ -59,6 +59,7 @@ export function cleanChunks(dirPath) {
 export function createAssembleChunksPromise({
     tmpDir,
     headers,
+    useDate,
 }) {
     const asyncReadFile = promisify(fs.readFile)
     const asyncAppendFile = promisify(fs.appendFile)
@@ -82,7 +83,11 @@ export function createAssembleChunksPromise({
                 try {
                     const hash = await getFileHash(fs.createReadStream(assembledFilepath))
 
-                    finalFilepath = path.resolve(workPath, `${hash}_${Date.now()}.${originalExtension}`)
+                    if (useDate) {
+                        finalFilepath = path.resolve(workPath, `${hash}_${Date.now()}.${originalExtension}`)
+                    } else {
+                        finalFilepath = path.resolve(workPath, `${hash}.${originalExtension}`)
+                    }
 
                     fs.renameSync(assembledFilepath, finalFilepath)
 
@@ -130,6 +135,7 @@ export function handleFile(tmpDir, headers, fileStream) {
     const dirPath = path.join(tmpDir, headers["uploader-file-id"])
     const chunksPath = path.join(dirPath, "chunks")
     const chunkPath = path.join(chunksPath, headers["uploader-chunk-number"])
+    const useDate = headers["uploader-use-date"] === "true"
     const chunkCount = +headers["uploader-chunk-number"]
     const totalChunks = +headers["uploader-chunks-total"]
 
@@ -154,6 +160,7 @@ export function handleFile(tmpDir, headers, fileStream) {
                 assembleChunksPromise = createAssembleChunksPromise({
                     tmpDir,
                     headers,
+                    useDate,
                 })
             }
         })
