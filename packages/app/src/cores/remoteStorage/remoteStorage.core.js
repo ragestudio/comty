@@ -9,6 +9,7 @@ class ChunkedUpload {
         this.headers = params.headers || {}
         this.postParams = params.postParams
         this.chunkSize = params.chunkSize || 1000000
+        this.service = params.service ?? "default"
         this.retries = params.retries ?? app.cores.settings.get("uploader.retries") ?? 3
         this.delayBeforeRetry = params.delayBeforeRetry || 5
 
@@ -24,6 +25,7 @@ class ChunkedUpload {
         this.headers["uploader-original-name"] = encodeURIComponent(this.file.name)
         this.headers["uploader-file-id"] = this.uniqid(this.file)
         this.headers["uploader-chunks-total"] = this.totalChunks
+        this.headers["provider-type"] = this.service
 
         this._reader = new FileReader()
         this.eventBus = new EventBus()
@@ -188,6 +190,7 @@ export default class RemoteStorage extends Core {
             onProgress = () => { },
             onFinish = () => { },
             onError = () => { },
+            service = "default",
         } = {},
     ) {
         const apiEndpoint = app.cores.api.instance().instances.files.getUri()
@@ -195,12 +198,13 @@ export default class RemoteStorage extends Core {
         // TODO: get value from settings
         const chunkSize = 2 * 1000 * 1000 // 10MB
 
-        return new Promise((resolve, reject) => {
-            app.cores.tasksQueue.appendToQueue(`upload_${file.name}`, async () => {
+        return new Promise((_resolve, _reject) => {
+            const fn = async () => new Promise((resolve, reject) => {
                 const uploader = new ChunkedUpload({
                     endpoint: `${apiEndpoint}/upload/chunk`,
                     chunkSize: chunkSize,
                     file: file,
+                    service: service,
                 })
 
                 uploader.on("error", ({ message }) => {
@@ -211,6 +215,7 @@ export default class RemoteStorage extends Core {
                     }
 
                     reject(message)
+                    _reject(message)
                 })
 
                 uploader.on("progress", ({ percentProgress }) => {
@@ -229,8 +234,11 @@ export default class RemoteStorage extends Core {
                     }
 
                     resolve(data)
+                    _resolve(data)
                 })
             })
+
+            app.cores.tasksQueue.appendToQueue(`upload_${file.name}`, fn)
         })
     }
 }
