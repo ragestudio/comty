@@ -54,7 +54,7 @@ services:
     env_file:
       - ./env_files/file.production.env
   redis:
-    image: redis/redis-stack-server:latest
+    image: docker.dragonflydb.io/dragonflydb/dragonfly
     restart: unless-stopped
     networks:
       - internal_network
