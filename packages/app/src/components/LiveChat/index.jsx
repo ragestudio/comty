@@ -19,6 +19,7 @@ const Line = (props) => {
         </div>
     </div>
 }
+
 export default class LiveChat extends React.Component {
     state = {
         socket: null,
