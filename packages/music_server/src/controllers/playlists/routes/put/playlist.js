@@ -1,5 +1,6 @@
 import { Playlist, Track } from "@models"
 import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@shared-classes/Errors"
+import axios from "axios"
 
 const PlaylistAllowedUpdateFields = [
     "title",
@@ -22,6 +23,29 @@ const TrackAllowedUpdateFields = [
     "lyricsEnabled",
     "public",
 ]
+
+async function fetchTrackSourceMetadata(track) {
+    // get headers of source url (X-Amz-Meta-Duration)
+    const response = await axios({
+        method: "HEAD",
+        url: track.source,
+    }).catch((err) => {
+        return {
+            data: null,
+            headers: null,
+        }
+    })
+
+    if (response.headers) {
+        return {
+            duration: response.headers["x-amz-meta-duration"],
+            size: response.headers["content-length"],
+            bitrate: response.headers["x-amz-meta-bitrate"],
+        }
+    }
+
+    return null
+}
 
 async function createOrUpdateTrack(payload) {
     if (!payload.title || !payload.source || !payload.publisher) {
@@ -50,6 +74,12 @@ async function createOrUpdateTrack(payload) {
         }
     } else {
         track = new Track(payload)
+
+        await track.save()
+    }
+
+    if (!track.metadata) {
+        track.metadata = await fetchTrackSourceMetadata(track)
 
         await track.save()
     }

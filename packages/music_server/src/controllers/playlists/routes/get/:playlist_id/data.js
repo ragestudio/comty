@@ -1,4 +1,4 @@
-import { Playlist, Track } from "@models"
+import { Playlist, TrackLike, Track } from "@models"
 import { NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
@@ -36,6 +36,21 @@ export default async (req, res) => {
     playlist.list = playlist.list.sort((a, b) => {
         return orderedIds.findIndex((id) => id === a._id.toString()) - orderedIds.findIndex((id) => id === b._id.toString())
     })
+
+    if (req.session) {
+        const likes = await TrackLike.find({
+            user_id: req.session.user_id,
+            track_id: [...playlist.list.map((track) => track._id.toString())],
+        })
+
+        playlist.list = playlist.list.map((track) => {
+            track = track.toObject()
+
+            track.liked = likes.findIndex((like) => like.track_id === track._id.toString()) !== -1
+
+            return track
+        })
+    }
 
     return res.json(playlist)
 }

@@ -1,10 +1,13 @@
 import { Playlist, Track } from "@models"
 import { AuthorizationError, PermissionError, NotFoundError } from "@shared-classes/Errors"
+import RemoveTracks from "@services/removeTracks"
 
 export default async (req, res) => {
     if (!req.session) {
         return new AuthorizationError(req, res)
     }
+
+    let removedTracksIds = []
 
     const removeWithTracks = req.query.remove_with_tracks === "true"
 
@@ -27,12 +30,11 @@ export default async (req, res) => {
     })
 
     if (removeWithTracks) {
-        await Track.deleteMany({
-            _id: playlist.tracks,
-        })
+        removedTracksIds = await RemoveTracks(playlist.list)
     }
 
     return res.json({
         success: true,
+        removedTracksIds,
     })
 }
