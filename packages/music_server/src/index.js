@@ -1,4 +1,3 @@
-
 import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
@@ -61,17 +60,30 @@ import API from "./api"
 
 async function main() {
     if (process.env.INFISICAL_TOKEN) {
+        console.log("🔑 Fetching secrets from Infisical...")
+
         const client = new infisical({
             token: process.env.INFISICAL_TOKEN,
         })
 
         const secrets = await client.getAllSecrets()
 
+        console.log("🔑 Injecting secrets to process.env...",)
+
         // inject to process.env
         secrets.forEach((secret) => {
-            process.env[secret.secretName] = secret.secretValue
+            if (!(secret.secretName in process.env)) {
+                process.env[secret.secretName] = secret.secretValue
+            }
         })
     }
+
+    // transform "undefined" or "null" envs to undefined 
+    Object.keys(process.env).forEach((key) => {
+        if (process.env[key] === "undefined" || process.env[key] === "null") {
+            process.env[key] = undefined
+        }
+    })
 
     const instance = new API()
 
