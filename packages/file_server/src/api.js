@@ -13,7 +13,7 @@ import express from "express"
 import pkg from "../package.json"
 
 global.DEFAULT_HEADERS = {
-    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization, provider-type, Provider-Type",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE, DEL",
     "Access-Control-Allow-Credentials": "true",
@@ -23,8 +23,8 @@ global.DEFAULT_MIDDLEWARES = [
     cors({
         "origin": "*",
         "methods": DEFAULT_HEADERS["Access-Control-Allow-Methods"],
-        "preflightContinue": false,
-        "optionsSuccessStatus": 204
+        "preflightContinue": true,
+        "optionsSuccessStatus": 204,
     }),
 ]
 
