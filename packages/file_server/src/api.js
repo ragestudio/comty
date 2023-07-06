@@ -152,6 +152,7 @@ export default class FileServerAPI {
         this.server.use((req, res, next) => {
             Object.keys(global.DEFAULT_HEADERS).forEach((key) => {
                 res.setHeader(key, global.DEFAULT_HEADERS[key])
+                res.header[key] = global.DEFAULT_HEADERS[key]
             })
 
             next()
