@@ -7,6 +7,7 @@ import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 import ComtyClient from "@shared-classes/ComtyClient"
+import cors from "cors"
 import express from "express"
 
 import pkg from "../package.json"
@@ -132,6 +133,12 @@ export default class FileServerAPI {
         await this.storage.initialize()
         await this.b2Storage.authorize()
 
+        this.server.use(cors({
+            origin: "*",
+            credentials: true,
+            preflightContinue: false,
+            optionsSuccessStatus: 204,
+        }))
         this.server.use(express.json({ extended: false }))
         this.server.use(express.urlencoded({ extended: true }))
 
