@@ -1,13 +1,11 @@
 require("./globals")
 
-const pm2 = require("pm2")
-
 const fs = require("fs")
 const path = require("path")
 const express = require("express")
 const cors = require("cors")
 const chalk = require("chalk")
-const { exec, spawn, fork } = require("child_process")
+const { spawn } = require("child_process")
 
 const getInternalIp = require("./lib/getInternalIp")
 const comtyAscii = require("./ascii")
@@ -52,7 +50,7 @@ const developmentServers = [
 
 const ApiServers = [
     {
-        name: "default",
+        name: "main",
         remote: ({
             address,
             protocol,
@@ -161,7 +159,10 @@ class Main {
             }
         }
 
-        this.initializeWebAppServer()
+        if (!this.args["no-web"]) {
+            this.initializeWebAppServer()
+        }
+
         this.initializeAPIProxyServer()
 
         return this
@@ -173,10 +174,6 @@ class Main {
             shell: true,
             stdio: "inherit"
         })
-
-        // devScript.stdout.on("data", (data) => {
-        //     console.log(`${chalk.bgYellow("[WebAPP]")} ${data.toString()}`)
-        // })
 
         devScript.on("exit", (code) => {
             console.log(`🔧  ${chalk.bgYellow("WebAPP")} exited with code ${code}`)
@@ -230,7 +227,7 @@ class Main {
     onExit = async () => {
         console.clear()
         console.log(comtyAscii)
-        console.log(`Closing wrapper... \n\n`)
+        console.log(`\n\nClosing wrapper... \n\n`)
 
         setTimeout(() => {
             console.log(`Wrapper did not close in time, forcefully closing...`)
@@ -306,7 +303,7 @@ class Main {
 
         ApiServers.forEach((server) => {
             const remote = server.remote({
-                address: "eu02.ragestudio.net", //this.internalIp,
+                address: this.internalIp,
                 protocol: this.forceApiHttps ? "https" : "http",
             })
 
