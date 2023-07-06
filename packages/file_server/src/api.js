@@ -12,6 +12,22 @@ import express from "express"
 
 import pkg from "../package.json"
 
+global.DEFAULT_HEADERS = {
+    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS, PUT, PATCH, DELETE, DEL",
+    "Access-Control-Allow-Credentials": "true",
+}
+
+global.DEFAULT_MIDDLEWARES = [
+    cors({
+        "origin": "*",
+        "methods": DEFAULT_HEADERS["Access-Control-Allow-Methods"],
+        "preflightContinue": false,
+        "optionsSuccessStatus": 204
+    }),
+]
+
 export default class FileServerAPI {
     // max body length is 1GB in bytes
     static maxBodyLength = 1000 * 1000 * 1000
@@ -133,11 +149,18 @@ export default class FileServerAPI {
         await this.storage.initialize()
         await this.b2Storage.authorize()
 
-        this.server.use(cors({
-            origin: "*",
-            credentials: true,
-            preflightContinue: true,
-        }))
+        this.server.use((req, res, next) => {
+            Object.keys(global.DEFAULT_HEADERS).forEach((key) => {
+                res.setHeader(key, global.DEFAULT_HEADERS[key])
+            })
+
+            next()
+        })
+
+        global.DEFAULT_MIDDLEWARES.forEach((middleware) => {
+            this.server.use(middleware)
+        })
+
         this.server.use(express.json({ extended: false }))
         this.server.use(express.urlencoded({ extended: true }))
 
