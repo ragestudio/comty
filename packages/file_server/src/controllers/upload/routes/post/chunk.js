@@ -76,7 +76,6 @@ export default async (req, res) => {
                         break
                     }
                     default: {
-                        console.debug("uploading to minio")
                         // upload to storage
                         await global.storage.fPutObject(process.env.S3_BUCKET, remotePath, build.filepath, build.metadata ?? {
                             "Content-Type": build.mimetype,
