@@ -136,8 +136,7 @@ export default class FileServerAPI {
         this.server.use(cors({
             origin: "*",
             credentials: true,
-            preflightContinue: false,
-            optionsSuccessStatus: 204,
+            preflightContinue: true,
         }))
         this.server.use(express.json({ extended: false }))
         this.server.use(express.urlencoded({ extended: true }))
