@@ -11,6 +11,7 @@ const publicGetters = [
     "cover",
     "verified",
     "description",
+    "links",
 ]
 
 export default {
