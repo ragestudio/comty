@@ -47,7 +47,7 @@
         "@ragestudio/cordova-nfc": "^1.2.0",
         "@react-spring/web": "^9.7.2",
         "@tsmx/human-readable": "^1.0.7",
-        "antd": "^5.2.1",
+        "antd": "^5.6.4",
         "antd-mobile": "^5.31.0",
         "axios": "^1.4.0",
         "buffer": "^6.0.3",
