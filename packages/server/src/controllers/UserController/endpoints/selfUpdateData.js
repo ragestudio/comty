@@ -15,7 +15,7 @@ const AllowedPublicUpdateFields = [
 const MaxStringsLengths = {
     fullName: 120,
     email: 320,
-    description: 2000,
+    description: 320,
 }
 
 export default {
