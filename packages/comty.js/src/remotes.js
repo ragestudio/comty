@@ -26,7 +26,7 @@ const envOrigins = {
         files: `http://${getCurrentHostname()}:3060`,
     },
     "indev": {
-        default: `https://indev_api.comty.app/default`,
+        default: `https://indev_api.comty.app/main`,
         chat: `https://indev_api.comty.app/chat`,
         livestreaming: `https://indev_api.comty.app/livestreaming`,
         marketplace: `https://indev_api.comty.app/marketplace`,
