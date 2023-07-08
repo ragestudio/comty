@@ -2,59 +2,6 @@
 
 @borderRadius: 12px;
 
-#root {
-	&.mobile {
-		.accountProfile {
-			display: flex;
-			flex-direction: column;
-
-			.panels {
-				display: flex;
-				flex-direction: column;
-
-				.tabMenuWrapper {
-					position: fixed;
-
-					top: 0px;
-					left: 0px;
-
-					z-index: 300;
-
-					width: 100%;
-
-					height: @top_bar_height;
-
-					padding: @top_bar_padding;
-
-					box-shadow: @card-shadow-top;
-
-					display: flex;
-					flex-direction: row;
-
-					align-items: center;
-
-					opacity: 0;
-
-					.ant-menu {
-						display: flex;
-						flex-direction: row;
-
-						.ant-menu-item {
-							width: fit-content;
-						}
-					}
-				}
-			}
-
-			&.topHidden {
-				.tabMenuWrapper {
-					opacity: 1;
-				}
-			}
-		}
-	}
-}
-
 .accountProfile {
 	display: flex;
 
@@ -123,15 +70,18 @@
 	.panels {
 		position: relative;
 
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-template-rows: 1fr;
-		grid-column-gap: 20px;
-		grid-row-gap: 0px;
+		display: flex;
+		// grid-template-columns: repeat(3, 1fr);
+		// grid-template-rows: 1fr;
+		// grid-column-gap: 20px;
+		// grid-row-gap: 0px;
+
+		gap: 20px;
 
 		padding-top: 20px;
 
 		height: 100%;
+		width: 100%;
 
 		.leftPanel {
 			position: sticky;
@@ -178,6 +128,7 @@
 
 		.content {
 			height: 100%;
+			width: 90%;
 
 			.fade-opacity-active {
 				height: 100%;
@@ -196,17 +147,12 @@
 			padding: 20px;
 
 			height: fit-content;
-			width: 20vw;
-			min-width: 400px;
+			width: fit-content;
+			//width: 20vw;
+			//	min-width: 400px;
 
 			justify-self: center;
 		}
-	}
-
-	.details {
-		background-color: var(--background-color-accent);
-		padding: 20px;
-		border-radius: @borderRadius;
 	}
 
 	.followersList {

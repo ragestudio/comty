@@ -28,8 +28,14 @@ export default class Home extends React.Component {
             tabs={Tabs}
             navMenuHeader={navMenuHeader}
             primaryPanelClassName="full"
+            onTabChange={() => {
+                app.layout.scrollTo({
+                    top: 0,
+                })
+            }}
             useSetQueryType
             transition
+            masked
         />
     }
 }
