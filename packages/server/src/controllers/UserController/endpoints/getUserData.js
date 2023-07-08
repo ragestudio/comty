@@ -12,6 +12,7 @@ const publicGetters = [
     "verified",
     "description",
     "links",
+    "createdAt",
 ]
 
 export default {
