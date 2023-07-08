@@ -3,8 +3,8 @@ module.exports = {
         {
             name: "main_api",
             script: "./dist/index.js",
-            instances: "max",
-            exec_mode: "cluster",
+            // instances: "max",
+            // exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "MAIN_LISTEN_PORT": 5000,
@@ -14,8 +14,8 @@ module.exports = {
         {
             name: "chat_api",
             script: "./dist/index.js",
-            instances: "max",
-            exec_mode: "cluster",
+            // instances: "max",
+            // exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5001,
@@ -25,8 +25,8 @@ module.exports = {
         {
             name: "marketplace_api",
             script: "./dist/index.js",
-            instances: "max",
-            exec_mode: "cluster",
+            // instances: "max",
+            // exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5002,
@@ -36,8 +36,8 @@ module.exports = {
         {
             name: "music_api",
             script: "./dist/index.js",
-            instances: "max",
-            exec_mode: "cluster",
+            // instances: "max",
+            // exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5003,
@@ -47,8 +47,8 @@ module.exports = {
         {
             name: "file_api",
             script: "./dist/index.js",
-            instances: "max",
-            exec_mode: "cluster",
+            // instances: "max",
+            // exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5004,
