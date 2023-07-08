@@ -80,7 +80,7 @@ export class AudioPlayer extends React.Component {
     }
 
     onClickLikeButton = async () => {
-        const result = await PlaylistsModel.toogleTrackLike(this.context.currentManifest._id).catch((err) => {
+        const result = await PlaylistsModel.toggleTrackLike(this.context.currentManifest._id).catch((err) => {
             return null
         })
 

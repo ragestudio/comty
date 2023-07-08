@@ -55,7 +55,7 @@ export default (props) => {
     }
 
     const handleTrackLike = async (track) => {
-        return await PlaylistsModel.toogleTrackLike(track._id)
+        return await PlaylistsModel.toggleTrackLike(track._id)
     }
 
     const makeSearch = (value) => {

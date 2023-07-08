@@ -29,14 +29,14 @@ export default class FollowsModel {
         return response.data
     }
 
-    static toogleFollow = async ({ user_id, username }) => {
+    static toggleFollow = async ({ user_id, username }) => {
         if (!user_id && !username) {
             throw new Error("user_id or username is required")
         }
 
         const response = await request({
             method: "POST",
-            url: "/follow/user/toogle",
+            url: "/follow/user/toggle",
             data: {
                 user_id: user_id,
                 username: username

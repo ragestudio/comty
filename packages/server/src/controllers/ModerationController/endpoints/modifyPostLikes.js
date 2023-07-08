@@ -1,5 +1,5 @@
 import { Post, } from "@models"
-import toogleLike from "../../PostsController/services/toogleLike"
+import toggleLike from "../../PostsController/services/toggleLike"
 
 export default {
     method: "POST",
@@ -28,7 +28,7 @@ export default {
         for (let i = 0; i < count; i++) {
             const mokUserId = `mok_${i}_${count}`
 
-            toogleLike({
+            toggleLike({
                 post_id: postData._id.toString(),
                 user_id: mokUserId,
                 to: true

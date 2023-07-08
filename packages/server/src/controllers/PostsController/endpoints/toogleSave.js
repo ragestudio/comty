@@ -2,7 +2,7 @@ import { ToogleSavePost } from "../services"
 
 export default {
     method: "POST",
-    route: "/:post_id/toogle_save",
+    route: "/:post_id/toggle_save",
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         const post = await ToogleSavePost({
