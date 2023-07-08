@@ -5,6 +5,8 @@ import Loadable from "react-loadable"
 import { createIconRender } from "components/Icons"
 import { UserModel } from "models"
 
+import "./index.less"
+
 export default React.memo((props) => {
     return React.createElement(Loadable({
         loader: async () => {
