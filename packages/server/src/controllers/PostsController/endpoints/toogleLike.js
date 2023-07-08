@@ -3,7 +3,7 @@ import { ToogleLike } from "../services"
 
 export default {
     method: "POST",
-    route: "/:post_id/toogle_like",
+    route: "/:post_id/toggle_like",
     middlewares: ["withAuthentication"],
     fn: Schematized({
         select: ["to"],

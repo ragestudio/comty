@@ -6,12 +6,13 @@ import unfollowUser from "../services/unfollowUser"
 
 export default {
     method: "POST",
-    route: "/user/toogle",
+    route: "/user/toggle",
     middlewares: ["withAuthentication"],
     fn: Schematized({
         select: ["user_id", "username"],
     }, async (req, res) => {
         const selfUserId = req.user._id.toString()
+
         let targetUserId = null
         let result = null
 

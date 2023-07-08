@@ -157,7 +157,7 @@ class ComtyApp extends React.Component {
 
 	static publicMethods = {
 		controls: {
-			toogleUIVisibility: (to) => {
+			toggleUIVisibility: (to) => {
 				if (app.layout.sidebar) {
 					app.layout.sidebar.toggleVisibility(to)
 				}

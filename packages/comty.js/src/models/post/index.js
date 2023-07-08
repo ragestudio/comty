@@ -118,27 +118,27 @@ export default class Post {
         return data
     }
 
-    static toogleLike = async ({ post_id }) => {
+    static toggleLike = async ({ post_id }) => {
         if (!post_id) {
             throw new Error("Post ID is required")
         }
 
         const { data } = await request({
             method: "POST",
-            url: `/posts/${post_id}/toogle_like`,
+            url: `/posts/${post_id}/toggle_like`,
         })
 
         return data
     }
 
-    static toogleSave = async ({ post_id }) => {
+    static toggleSave = async ({ post_id }) => {
         if (!post_id) {
             throw new Error("Post ID is required")
         }
 
         const { data } = await request({
             method: "POST",
-            url: `/posts/${post_id}/toogle_save`,
+            url: `/posts/${post_id}/toggle_save`,
         })
 
         return data

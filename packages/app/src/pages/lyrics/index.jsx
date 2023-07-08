@@ -602,7 +602,7 @@ export default class SyncLyrics extends React.Component {
         })
 
         if (app.layout.sidebar) {
-            app.controls.toogleUIVisibility(false)
+            app.controls.toggleUIVisibility(false)
         }
 
         app.cores.style.compactMode(true)
@@ -643,7 +643,7 @@ export default class SyncLyrics extends React.Component {
         delete window._hacks
 
         if (app.layout.sidebar) {
-            app.controls.toogleUIVisibility(true)
+            app.controls.toggleUIVisibility(true)
         }
 
         app.cores.style.compactMode(false)
