@@ -66,6 +66,7 @@
                 font-size: 1rem;
 
                 svg {
+                    color: var(--text-color);
                     margin: 0;
                 }
             }
@@ -73,6 +74,58 @@
 
         .field_value {
             font-family: "DM Mono", monospace;
+            user-select: text;
+        }
+    }
+}
+
+.droppableField {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    background-color: var(--background-color-primary);
+
+    border-radius: 12px;
+
+    transition: all 150ms ease-in-out;
+
+    &.collapsed {
+        .field_body {
+            height: 0;
+            opacity: 0;
+            padding: 0;
+
+            pointer-events: none;
+        }
+    }
+
+    .inline_field {
+        margin-left: 20px;
+    }
+
+    .field_body {
+        display: flex;
+        flex-direction: column;
+
+        padding: 10px;
+        transition: all 150ms ease-in-out;
+    }
+
+    .collapse_btn {
+        position: absolute;
+
+        top: 0;
+        left: 0;
+
+        transform: translate(100%, 90%);
+
+        svg {
+            color: var(--text-color);
+            margin: 0 !important;
         }
     }
 }
