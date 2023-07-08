@@ -4,10 +4,11 @@ import classnames from "classnames"
 
 import { Translation } from "react-i18next"
 
-import { createIconRender, Icons } from "components/Icons"
-import { Skeleton, FollowButton, UserCard } from "components"
+import { Skeleton } from "components"
 import { SessionModel, UserModel, FollowsModel } from "models"
 import { PagePanelWithNavMenu } from "components/PagePanels"
+
+import { MobileUserCard } from "components/UserCard"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
@@ -58,6 +59,59 @@ export default class Account extends React.Component {
     }
 
     componentDidMount = async () => {
+        app.layout.toggleCenteredContent(true)
+
+        this.loadUser()
+    }
+
+    componentWillUnmount = () => {
+        app.layout.toggleCenteredContent(false)
+    }
+
+    toggleLike = async () => {
+        const accept = await new Promise((resolve, reject) => {
+            antd.Modal.confirm({
+                title: <Translation>
+                    {t => t("Confirm")}
+                </Translation>,
+                content: <Translation>
+                    {t => t("Are you sure you want to unfollow this user?")}
+                </Translation>,
+                okText: <Translation>
+                    {t => t("Yes")}
+                </Translation>,
+                cancelText: <Translation>
+                    {t => t("No")}
+                </Translation>,
+                onOk: () => {
+                    resolve(true)
+                },
+                onCancel: () => {
+                    resolve(false)
+                }
+            })
+        })
+
+        if (!accept) {
+            return false
+        }
+
+        const result = await FollowsModel.toggleFollow({
+            username: this.state.requestedUser,
+        }).catch((error) => {
+            console.error(error)
+            antd.message.error(error.message)
+
+            return false
+        })
+
+        await this.setState({
+            isFollowed: result.following,
+            followers: result.followers,
+        })
+    }
+
+    loadUser = async () => {
         const token = await SessionModel.getDecodedToken()
         const location = window.app.history.location
         const query = new URLSearchParams(location.search)
@@ -137,18 +191,28 @@ export default class Account extends React.Component {
                 "_mobile_account-profile",
             )}
         >
-            <UserCard
+            <MobileUserCard
                 user={user}
+                isSelf={this.state.isSelf}
+                isFollowed={this.state.isFollowed}
+                followers={this.state.followers}
+                onClickFollow={this.toggleLike}
             />
 
-            {/* <PagePanelWithNavMenu
+            <PagePanelWithNavMenu
                 tabs={Tabs}
                 useSetQueryType
                 transition
                 tabProps={{
                     state: this.state,
                 }}
-            /> */}
+                onTabChange={() => {
+                    app.layout.scrollTo({
+                        top: 0,
+                    })
+                }}
+                no_top_padding
+            />
         </div>
     }
 }

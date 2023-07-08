@@ -1,0 +1,78 @@
+@border-radius: 12px;
+
+.details {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+
+    width: 100%;
+
+    padding: 15px;
+
+    gap: 10px;
+
+    background-color: var(--background-color-accent);
+
+    border-radius: @border-radius;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p {
+        margin: 0;
+    }
+
+    .inline_field {
+        display: inline-flex;
+
+        flex-direction: row;
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 10px;
+
+        background-color: var(--background-color-primary);
+
+        border-radius: 12px;
+
+        .field_header {
+            display: inline-flex;
+
+            flex-direction: row;
+            align-items: center;
+
+            gap: 8px;
+
+            font-size: 0.8rem;
+
+            .field_icon {
+                display: inline-flex;
+
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+
+                background-color: var(--background-color-primary);
+
+                border-radius: 100%;
+
+                padding: 5px;
+
+                font-size: 1rem;
+
+                svg {
+                    margin: 0;
+                }
+            }
+        }
+
+        .field_value {
+            font-family: "DM Mono", monospace;
+        }
+    }
+}
