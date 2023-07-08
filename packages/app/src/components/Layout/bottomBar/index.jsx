@@ -17,14 +17,16 @@ import "./index.less"
 
 const tourSteps = [
     {
-        title: "Open quick nav",
-        description: "Xd",
-        ref: React.createRef(),
+        title: "Quick nav",
+        description: "Tap & hold on the icon to open the navigation menu.",
+        placement: "top",
+        refName: "navBtnRef",
     },
     {
         title: "Account button",
-        description: "Xd",
-        ref: React.createRef(),
+        description: "Tap & hold on the account icon to open miscellaneous options.",
+        placement: "top",
+        refName: "accountBtnRef",
     }
 ]
 
@@ -151,10 +153,8 @@ export class BottomBar extends React.Component {
         }
     }
 
-    refs = {
-        homeBtn: React.createRef(),
-        accountBtn: React.createRef(),
-    }
+    navBtnRef = React.createRef()
+    accountBtnRef = React.createRef()
 
     componentDidMount = () => {
         this.interface = app.layout.bottom_bar = {
@@ -179,6 +179,16 @@ export class BottomBar extends React.Component {
         Object.keys(this.busEvents).forEach((key) => {
             app.eventBus.on(key, this.busEvents[key])
         })
+
+        setTimeout(() => {
+            const isTourFinished = localStorage.getItem("mobile_tour")
+
+            if (!isTourFinished) {
+                this.toggleTour(true)
+
+                localStorage.setItem("mobile_tour", true)
+            }
+        }, 500)
     }
 
     componentWillUnmount = () => {
@@ -187,6 +197,14 @@ export class BottomBar extends React.Component {
         // Unregister bus events
         Object.keys(this.busEvents).forEach((key) => {
             app.eventBus.off(key, this.busEvents[key])
+        })
+    }
+
+    getTourSteps = () => {
+        return tourSteps.map((step) => {
+            step.target = () => this[step.refName].current
+
+            return step
         })
     }
 
@@ -321,6 +339,13 @@ export class BottomBar extends React.Component {
         const heightValue = this.state.visible ? Number(app.cores.style.defaultVar("bottom-bar-height").replace("px", "")) : 0
 
         return <>
+            {
+                this.state.tourOpen && <antd.Tour
+                    open
+                    steps={this.getTourSteps()}
+                    onClose={() => this.setState({ tourOpen: false })}
+                />
+            }
             <QuickNavMenu
                 visible={this.state.quickNavVisible}
             />
@@ -367,6 +392,7 @@ export class BottomBar extends React.Component {
                                     key="navigator"
                                     id="navigator"
                                     className="item"
+                                    ref={this.navBtnRef}
                                     onClick={() => app.location.push("/")}
                                     onTouchMove={this.handleNavTouchMove}
                                     onTouchStart={this.handleNavTouchStart}
@@ -391,7 +417,9 @@ export class BottomBar extends React.Component {
                                     </div>
                                 </div>
 
-                                <AccountButton/>
+                                <AccountButton
+                                    ref={this.accountBtnRef}
+                                />
                             </div>
                         </div>
                     </div>
