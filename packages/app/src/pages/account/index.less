@@ -71,10 +71,7 @@
 		position: relative;
 
 		display: flex;
-		// grid-template-columns: repeat(3, 1fr);
-		// grid-template-rows: 1fr;
-		// grid-column-gap: 20px;
-		// grid-row-gap: 0px;
+		flex-direction: row;
 
 		gap: 20px;
 
@@ -128,7 +125,7 @@
 
 		.content {
 			height: 100%;
-			width: 90%;
+			width: 50%;
 
 			.fade-opacity-active {
 				height: 100%;
@@ -148,8 +145,6 @@
 
 			height: fit-content;
 			width: fit-content;
-			//width: 20vw;
-			//	min-width: 400px;
 
 			justify-self: center;
 		}
@@ -159,5 +154,54 @@
 		background-color: var(--background-color-accent);
 		padding: 20px;
 		border-radius: @borderRadius;
+	}
+
+	@media (max-width: 1720px) {
+		.panels {
+			.content {
+				width: 53%;
+			}
+
+			.leftPanel {
+				.userCard {
+					width: 300px;
+					min-width: 300px;
+				}
+
+				.actions {
+					width: 300px;
+					min-width: 300px;
+				}
+			}
+
+			.tabMenuWrapper {
+				width: fit-content;
+
+				top: 0;
+				right: 0;
+
+				padding: 10px !important;
+
+				.ant-menu {
+					display: flex;
+					flex-direction: column;
+
+					margin: 0;
+					padding: 0;
+					width: fit-content;
+
+					.ant-menu-item {
+
+						width: fit-content;
+
+						.ant-menu-title-content {
+							width: 0;
+							opacity: 0;
+							margin: 0;
+						}
+					}
+				}
+			}
+		}
 	}
 }
