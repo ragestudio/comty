@@ -4,9 +4,11 @@
     &.mobile {
         &.page-panel-spacer {
             .pagePanels {
-                .panel {
-                    &.center {
-                        padding-top: calc(@top_bar_height + @top_bar_padding * 2);
+                &.withTopPadding {
+                    .panel {
+                        &.center {
+                            padding-top: calc(@top_bar_height + @top_bar_padding * 2);
+                        }
                     }
                 }
             }
@@ -28,8 +30,10 @@
 
             padding: 0;
 
-            -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
-            mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
+            &.masked {
+                -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
+                mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 1) 5%, rgba(0, 0, 0, 1) 97%, transparent 100%);
+            }
 
             .panel {
                 width: 100%;
