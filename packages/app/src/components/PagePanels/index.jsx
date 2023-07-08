@@ -124,15 +124,19 @@ export class PagePanelWithNavMenu extends React.Component {
         app.history.replace(`${window.location.pathname}?type=${this.state.activeTab}`)
     }
 
-    tabChange = (key) => {
-        if (this.props.onTabChange) {
-            this.props.onTabChange(key)
+    tabChange = async (key) => {
+        if (this.props.beforeTabChange) {
+            await this.props.beforeTabChange(key)
         }
 
-        this.setState({ activeTab: key })
+        await this.setState({ activeTab: key })
 
         if (this.props.useSetQueryType) {
             this.replaceQueryTypeToCurrentTab()
+        }
+
+        if (this.props.onTabChange) {
+            this.props.onTabChange(key)
         }
     }
 
@@ -230,6 +234,8 @@ export class PagePanelWithNavMenu extends React.Component {
             <PagePanels
                 primaryPanelClassName={this.props.primaryPanelClassName}
                 panels={panels}
+                masked={this.props.masked}
+                no_top_padding={this.props.no_top_padding}
             />
         </>
     }
@@ -262,7 +268,13 @@ export default class PagePanels extends React.Component {
         }
 
         return <div
-            className="pagePanels"
+            className={classnames(
+                "pagePanels",
+                {
+                    ["masked"]: this.props.masked,
+                    ["withTopPadding"]: !!!this.props.no_top_padding
+                }
+            )}
             style={this.generateGridStyle()}
         >
             {
