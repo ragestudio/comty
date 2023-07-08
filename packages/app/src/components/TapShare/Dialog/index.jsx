@@ -1,8 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
+import { FollowsModel } from "models"
 
-import UserCard from "components/UserCard"
+import { MobileUserCard } from "components/UserCard"
 import NFCModel from "comty.js/models/nfc"
 
 import "./index.less"
@@ -26,6 +27,27 @@ const handleAction = {
 
 export default (props) => {
     const [L_Tag, R_Tag, E_Tag] = app.cores.api.useRequest(NFCModel.getTagBySerial, props.tag.serialNumber)
+    const [isSelf, setSelf] = React.useState(false)
+    const [followers, setFollowers] = React.useState(null)
+    const [following, setFollowing] = React.useState(null)
+
+    React.useEffect(async () => {
+        if (!R_Tag) {
+            return null
+        }
+
+        const isSelf = R_Tag.user._id === app.userData._id
+
+        if (!isSelf) {
+            const followedResult = await FollowsModel.imFollowing(R_Tag.user._id).catch(() => false)
+            setFollowing(followedResult.isFollowed)
+        }
+
+        const followers = await FollowsModel.getFollowers(R_Tag.user._id).catch(() => false)
+
+        setSelf(isSelf)
+        setFollowers(followers)
+    }, [R_Tag])
 
     if (L_Tag) {
         return <antd.Skeleton active />
@@ -55,7 +77,13 @@ export default (props) => {
 
     return <div className="nfc_tag_dialog">
         <div className="nfc_tag_dialog__header">
-            <UserCard user={R_Tag.user} preview />
+            <MobileUserCard
+                user={R_Tag.user}
+                isFollowed={following}
+                followers={followers}
+                isSelf={isSelf}
+                preview
+            />
         </div>
 
         <div className="nfc_tag_dialog__body">
