@@ -24,11 +24,11 @@ const LoadingComponent = () => {
 }
 
 const NoResultComponent = () => {
-    return <antd.Result
-        status="info"
-        title="This is the end"
-        subTitle="We dont have more posts for you"
-    />
+    return <div className="postCard">
+        <antd.Empty
+            description="No more post here"
+        />
+    </div>
 }
 
 const typeToComponent = {
