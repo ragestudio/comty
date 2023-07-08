@@ -24,19 +24,23 @@ export default React.memo((props) => {
                 return null
             }
 
-            return () => badgesData.map((badge, index) => {
-                return <antd.Tooltip placement="bottom" title={badge.description ?? "An badge"}>
-                    <antd.Tag
-                        color={badge.color ?? "default"}
-                        key={index}
-                        id={badge.name}
-                        icon={createIconRender(badge.icon)}
-                        className="badge"
-                    >
-                        <span>{badge.label}</span>
-                    </antd.Tag>
-                </antd.Tooltip>
-            })
+            return () => <div className="badges">
+                {
+                    badgesData.map((badge, index) => {
+                        return <antd.Tooltip placement="bottom" title={badge.description ?? "An badge"}>
+                            <antd.Tag
+                                color={badge.color ?? "default"}
+                                key={index}
+                                id={badge.name}
+                                icon={createIconRender(badge.icon)}
+                                className="badge"
+                            >
+                                <span>{badge.label}</span>
+                            </antd.Tag>
+                        </antd.Tooltip>
+                    })
+                }
+            </div>
         },
         loading: antd.Skeleton,
     }))

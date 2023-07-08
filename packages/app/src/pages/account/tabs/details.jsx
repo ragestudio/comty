@@ -1,11 +1,13 @@
 import React from "react"
+import classnames from "classnames"
+
 import { DateTime } from "luxon"
 import { Skeleton } from "antd"
 import { UserBadges } from "components"
 
-import "./details.less"
-
 import { Icons } from "components/Icons"
+
+import "./details.less"
 
 function getJoinLabel(jsDate) {
     const date = DateTime.fromJSDate(new Date(jsDate))
@@ -14,6 +16,38 @@ function getJoinLabel(jsDate) {
     const year = String(date.year)
 
     return `${month} ${year}`
+}
+
+const DroppableField = (props) => {
+    const [collapsed, setCollapsed] = React.useState(true)
+
+    return <div
+        className={classnames(
+            "droppableField",
+            {
+                ["collapsed"]: collapsed
+            }
+        )}
+    >
+        <div className="collapse_btn" onClick={() => setCollapsed(!collapsed)}>
+            {
+                collapsed
+                    ? <Icons.ChevronDown />
+                    : <Icons.ChevronUp />
+            }
+        </div>
+        <div className="inline_field">
+            {
+                props.header
+            }
+        </div>
+
+        <div className="field_body">
+            {
+                props.children
+            }
+        </div>
+    </div>
 }
 
 export default (props) => {
@@ -88,26 +122,28 @@ export default (props) => {
             </div>
         </div>
 
-        <div className="inline_field">
-            <div className="field_header">
-                <div className="field_icon">
-                    <Icons.Award />
+        <DroppableField
+            header={<>
+                <div className="field_header">
+                    <div className="field_icon">
+                        <Icons.Award />
+                    </div>
+
+                    <span>
+                        Badges collected
+                    </span>
                 </div>
 
-                <span>
-                    Badges collected
-                </span>
-            </div>
-
-            <div className="field_value">
-                <p>
-                    {props.state.user?.badges.length}
-                </p>
-            </div>
-        </div>
-
-        <React.Suspense fallback={<Skeleton />}>
-            <UserBadges user_id={props.state.user?._id} />
-        </React.Suspense>
+                <div className="field_value">
+                    <p>
+                        {props.state.user?.badges.length}
+                    </p>
+                </div>
+            </>}
+        >
+            <React.Suspense fallback={<Skeleton />}>
+                <UserBadges user_id={props.state.user?._id} />
+            </React.Suspense>
+        </DroppableField>
     </div>
 }
