@@ -89,7 +89,7 @@ export default (props) => {
         if (result) {
             app.message.success("Profile updated")
 
-            app.ModalController.close()
+            app.layout.modal.close()
 
             M_Profiles()
         }
@@ -116,7 +116,7 @@ export default (props) => {
                 if (result) {
                     app.message.success("Profile deleted")
 
-                    app.ModalController.close()
+                    app.layout.modal.close()
 
                     setSelectedProfileId(null)
 
@@ -131,7 +131,7 @@ export default (props) => {
             return
         }
 
-        app.ModalController.open(() => <ProfileEditor
+        app.layout.modal.open("profile_editor", () => <ProfileEditor
             profileData={profileData}
             onDelete={handleCurrentProfileDelete}
             onSave={handleCurrentProfileDataUpdate}
