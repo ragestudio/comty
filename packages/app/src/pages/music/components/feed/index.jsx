@@ -4,7 +4,6 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 
 import Searcher from "components/Searcher"
-import { ImageViewer } from "components"
 import { Icons, createIconRender } from "components/Icons"
 
 import { WithPlayerContext } from "contexts/WithPlayerContext"
@@ -13,6 +12,7 @@ import FeedModel from "models/feed"
 import PlaylistModel from "models/playlists"
 
 import MusicTrack from "components/MusicTrack"
+import PlaylistItem from "components/PlaylistItem"
 
 import "./index.less"
 
@@ -146,56 +146,7 @@ const PlaylistsList = (props) => {
     </div>
 }
 
-const PlaylistItem = (props) => {
-    const [coverHover, setCoverHover] = React.useState(false)
-    const { playlist } = props
 
-    const onClick = () => {
-        if (typeof props.onClick === "function") {
-            return props.onClick(playlist)
-        }
-
-        return app.location.push(`/play/${playlist._id}`)
-    }
-
-    const onClickPlay = (e) => {
-        e.stopPropagation()
-
-        app.cores.player.startPlaylist(playlist.list)
-    }
-
-    return <div
-        id={playlist._id}
-        key={props.key}
-        className={classnames(
-            "playlistItem",
-            {
-                "cover-hovering": coverHover
-            }
-        )}
-    >
-        <div
-            className="playlistItem_cover"
-            onMouseEnter={() => setCoverHover(true)}
-            onMouseLeave={() => setCoverHover(false)}
-            onClick={onClickPlay}
-        >
-            <div className="playlistItem_cover_mask">
-                <Icons.MdPlayArrow />
-            </div>
-
-            <ImageViewer
-                src={playlist.cover ?? playlist.thumbnail ?? "/assets/no_song.png"}
-            />
-        </div>
-
-        <div className="playlistItem_info">
-            <div className="playlistItem_info_title" onClick={onClick}>
-                <h1>{playlist.title}</h1>
-            </div>
-        </div>
-    </div>
-}
 
 const ResultGroupsDecorators = {
     "playlists": {
@@ -215,7 +166,8 @@ const ResultGroupsDecorators = {
             return <MusicTrack
                 key={props.key}
                 track={props.item}
-                onClick={() => app.cores.player.start(props.item)}
+                onClickPlayBtn={() => app.cores.player.start(props.item)}
+                onClick={() => app.location.push(`/play/${props.item._id}`)}
             />
         }
     }
