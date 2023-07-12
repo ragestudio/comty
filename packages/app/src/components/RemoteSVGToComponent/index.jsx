@@ -1,12 +1,13 @@
 import loadable from "@loadable/component"
 import DOMPurify from "dompurify"
+import axios from "axios"
 
 export default loadable(async (props) => {
     // IMPORTANT: Only use this component for SVG files that you trust.
     console.warn("RemoteSVGToComponent: This component is not safe at all, cause use __dangerouslySetInnerHTML. Only use it for SVG files that you trust.")
 
     // make sure the url is local
-    if (!props.src.startsWith("/")) {
+    if (!props.src.startsWith("/") && !props.remote) {
         console.error("RemoteSVGToComponent: The file is not a local file.")
         return () => null
     }
@@ -17,23 +18,23 @@ export default loadable(async (props) => {
         return () => null
     }
 
-    const response = await fetch(props.src, {
-        headers: {
-            "Content-Type": "image/svg+xml"
-        }
+    const response = await axios({
+        method: "GET",
+        url: props.src,
+    }).catch((err) => {
+        console.error(err)
+        return false
     })
 
-    if (!response.ok) {
-        return () => <div>Error</div>
+    if (!response) {
+        return () => <></>
     }
 
-    let svg = await response.text()
-
-    svg = DOMPurify.sanitize(svg, {
-        USE_PROFILES: {
-            svg: true
-        }
-    })
-
-    return () => <div dangerouslySetInnerHTML={{ __html: svg }} />
+    return () => <div dangerouslySetInnerHTML={{
+        __html: DOMPurify.sanitize(response.data, {
+            USE_PROFILES: {
+                svg: true
+            }
+        })
+    }} />
 })
