@@ -9,6 +9,14 @@ export default {
     author: "RageStudio©",
     fundingLink: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76",
     githubRepoLink: "https://github.com/ragestudio/comty",
+    locations: {
+        terms: "/terms",
+        privacy: "/privacy",
+    },
+    legal: {
+        terms: "https://storage.ragestudio.net/rstudio/legal_docs/comty/terms/latest.md",
+        privacy: "https://storage.ragestudio.net/rstudio/legal_docs/comty/privacy/latest.md",
+    },
     footerLinks: [
         {
             label: "Terms of Service",
@@ -44,13 +52,6 @@ export default {
         mainPath: "/",
         authPath: "/login",
         copyright: "Comty - RageStudio© 2023",
-        storage: {
-            basics: "user",
-            token: "token",
-            session_frame: "session",
-            signkey: "certified",
-            settings: "app_settings"
-        },
     },
     i18n: {
         languages: [
