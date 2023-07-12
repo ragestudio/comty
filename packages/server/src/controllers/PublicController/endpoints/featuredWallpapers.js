@@ -1,4 +1,4 @@
-import { FeaturedWallpaper } from "../../../models"
+import { FeaturedWallpaper } from "@shared-classes/DbModels"
 
 export default {
     method: "GET",

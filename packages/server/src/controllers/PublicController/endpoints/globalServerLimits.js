@@ -1,4 +1,4 @@
-import { ServerLimit } from "@models"
+import { ServerLimit } from "@shared-classes/DbModels"
 
 export default {
     method: "GET",

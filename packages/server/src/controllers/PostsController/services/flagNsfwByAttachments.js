@@ -1,4 +1,4 @@
-import { Post } from "../../../models"
+import { Post } from "@shared-classes/DbModels"
 import indecentPrediction from "../../../utils/indecent-prediction"
 import isNSFW from "../../../utils/is-nsfw"
 

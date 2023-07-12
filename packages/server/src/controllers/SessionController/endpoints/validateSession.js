@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 
-import { Session } from "@models"
+import { Session } from "@shared-classes/DbModels"
 
 export default {
     method: "POST",

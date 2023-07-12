@@ -1,4 +1,4 @@
-import { Config } from "../../models"
+import { Config } from "@shared-classes/DbModels"
 
 export default (req, res, next) => {
     const requestedPath = `${req.method.toLowerCase()}${req.path.toLowerCase()}`

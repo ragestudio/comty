@@ -1,4 +1,4 @@
-import { Session, User, authorizedServerTokens } from "@models"
+import { Session, User, authorizedServerTokens } from "@shared-classes/DbModels"
 import { Token } from "@lib"
 
 import SecureEntry from "@lib/secureEntry"

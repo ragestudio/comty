@@ -1,4 +1,4 @@
-import { SyncEntry } from "@models"
+import { SyncEntry } from "@shared-classes/DbModels"
 
 import crypto from "crypto"
 

@@ -1,4 +1,4 @@
-import { User, Badge } from "@models"
+import { User, Badge } from "@shared-classes/DbModels"
 
 export default {
     method: "GET",

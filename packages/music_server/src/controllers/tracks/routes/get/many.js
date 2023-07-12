@@ -1,4 +1,4 @@
-import { Track } from "@models"
+import { Track } from "@shared-classes/DbModels"
 
 export default async (req, res) => {
     const { ids, limit = 20, offset = 0 } = req.query

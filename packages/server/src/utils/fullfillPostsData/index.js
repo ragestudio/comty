@@ -1,4 +1,4 @@
-import { User, Comment, PostLike, SavedPost } from "@models"
+import { User, Comment, PostLike, SavedPost } from "@shared-classes/DbModels"
 
 export default async (payload) => {
     let {

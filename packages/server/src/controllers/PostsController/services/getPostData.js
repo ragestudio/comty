@@ -1,4 +1,4 @@
-import { Post, SavedPost } from "@models"
+import { Post, SavedPost } from "@shared-classes/DbModels"
 import fullfillPostsData from "@utils/fullfillPostsData"
 
 export default async (payload) => {

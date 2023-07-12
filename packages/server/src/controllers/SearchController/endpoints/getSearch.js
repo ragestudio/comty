@@ -1,4 +1,5 @@
-import { User } from "@models"
+import { User, Playlist, Track } from "@shared-classes/DbModels"
+import pmap from "p-map"
 
 export default {
     method: "GET",
@@ -9,19 +10,60 @@ export default {
 
         let suggestions = {}
 
-        // search users by username or name
-        const users = await User.find({
-            $or: [
-                { username: { $regex: keywords, $options: "i" } },
-                { fullName: { $regex: keywords, $options: "i" } },
-            ],
-        })
-            .limit(5)
-            .select("username fullName avatar verified")
+        const searchers = [
+            {
+                id: "users",
+                model: User,
+                query: {
+                    $or: [
+                        { username: { $regex: keywords, $options: "i" } },
+                        { fullName: { $regex: keywords, $options: "i" } },
+                    ]
+                },
+                limit: 5,
+                select: "username fullName avatar verified",
+            },
+            {
+                id: "playlists",
+                model: Playlist,
+                query: {
+                    $or: [
+                        { title: { $regex: keywords, $options: "i" } },
+                    ]
+                },
+                limit: 5,
+            },
+            {
+                id: "tracks",
+                model: Track,
+                query: {
+                    $or: [
+                        { title: { $regex: keywords, $options: "i" } },
+                        { author: { $regex: keywords, $options: "i" } },
+                        { album: { $regex: keywords, $options: "i" } },
+                    ]
+                },
+                limit: 5,
+            }
+        ]
 
-        if (users.length > 0) {
-            suggestions["users"] = users
-        }
+        await pmap(
+            searchers,
+            async (searcher) => {
+                let results = await searcher.model.find(searcher.query)
+                    .limit(searcher.limit ?? 5)
+                    .select(searcher.select ?? undefined)
+
+                if (results.length > 0) {
+                    suggestions[searcher.id] = results
+                }
+
+                return
+            },
+            {
+                concurrency: 3
+            }
+        )
 
         return res.json(suggestions)
     }

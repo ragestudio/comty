@@ -1,4 +1,4 @@
-import { User, Comment } from "../../../models"
+import { User, Comment } from "@shared-classes/DbModels"
 
 export default async (payload = {}) => {
     const { parent_id } = payload

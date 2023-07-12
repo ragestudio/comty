@@ -1,4 +1,4 @@
-import { Badge } from "@models"
+import { Badge } from "@shared-classes/DbModels"
 
 export default {
     method: "DELETE",

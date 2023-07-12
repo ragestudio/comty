@@ -1,4 +1,4 @@
-import { Widget } from "@models"
+import { Widget } from "@shared-classes/DbModels"
 import getWidgetCode from "@utils/getWidgetCode"
 
 export default async (req, res) => {

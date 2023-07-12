@@ -1,4 +1,4 @@
-import { User, UserFollow } from "@models"
+import { User, UserFollow } from "@shared-classes/DbModels"
 
 // TODO: Sort follows by last activity
 export default async (payload = {}) => {

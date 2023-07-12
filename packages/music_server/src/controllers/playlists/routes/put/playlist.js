@@ -1,4 +1,4 @@
-import { Playlist, Track } from "@models"
+import { Playlist, Track } from "@shared-classes/DbModels"
 import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@shared-classes/Errors"
 import axios from "axios"
 

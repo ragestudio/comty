@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken } from "@models"
+import { Session, RegenerationToken } from "@shared-classes/DbModels"
 
 export async function regenerateSession(expiredToken, refreshToken, aggregateData = {}) {
     // search for a regeneration token with the expired token (Should exist only one)

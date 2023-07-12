@@ -1,5 +1,5 @@
 import findSpotifyId from "@services/findSpotifyId"
-import { Track } from "@models"
+import { Track } from "@shared-classes/DbModels"
 import axios from "axios"
 
 const syncLyricsProvider = `https://spotify-lyric-api.herokuapp.com`

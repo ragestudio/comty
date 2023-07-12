@@ -1,4 +1,4 @@
-import { Post } from "../models"
+import { Post } from "@shared-classes/DbModels"
 import DBManager from "../classes/DbManager"
 
 async function main() {

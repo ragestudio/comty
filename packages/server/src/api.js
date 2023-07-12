@@ -8,7 +8,7 @@ import passport from "passport"
 import jwt from "jsonwebtoken"
 import EventEmitter from "@foxify/events"
 
-import { User, Session, Config } from "@models"
+import { User, Session, Config } from "@shared-classes/DbModels"
 
 import DbManager from "@classes/DbManager"
 import { createStorageClientInstance } from "@classes/StorageClient"

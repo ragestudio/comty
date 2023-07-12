@@ -1,4 +1,4 @@
-import { SavedPost } from "../../../models"
+import { SavedPost } from "@shared-classes/DbModels"
 
 export default async (payload) => {
     let { post_id, user_id } = payload

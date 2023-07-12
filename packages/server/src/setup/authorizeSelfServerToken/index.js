@@ -1,5 +1,5 @@
 import SecureEntry from "@lib/secureEntry"
-import { authorizedServerTokens } from "@models"
+import { authorizedServerTokens } from "@shared-classes/DbModels"
 
 const rootClientID = "00000000-0000-0000-000000000000"
 

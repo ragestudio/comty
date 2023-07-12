@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { User, UserFollow } from "@models"
+import { User, UserFollow } from "@shared-classes/DbModels"
 
 import followUser from "../services/followUser"
 import unfollowUser from "../services/unfollowUser"

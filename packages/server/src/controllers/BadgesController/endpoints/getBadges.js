@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { Badge } from "@models"
+import { Badge } from "@shared-classes/DbModels"
 
 export default {
     method: "GET",

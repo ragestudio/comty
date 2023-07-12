@@ -1,4 +1,4 @@
-import { Post, UserFollow } from "@models"
+import { Post, UserFollow } from "@shared-classes/DbModels"
 
 import fullfillPostsData from "@utils/fullfillPostsData"
 

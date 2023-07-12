@@ -14,7 +14,8 @@
         "RedisClient": "src/shared-classes",
         "StorageClient": "src/shared-classes",
         "DbManager": "src/shared-classes",
-        "Errors": "src/shared-classes"
+        "Errors": "src/shared-classes",
+        "DbModels": "src/shared-classes"
     },
     "license": "MIT",
     "dependencies": {
@@ -52,7 +53,7 @@
         "music-metadata": "^8.1.3",
         "normalize-url": "^8.0.0",
         "nsfwjs": "2.4.2",
-        "p-map": "^6.0.0",
+        "p-map": "4",
         "p-queue": "^7.3.4",
         "passport": "^0.6.0",
         "passport-jwt": "^4.0.1",

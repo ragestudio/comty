@@ -1,4 +1,4 @@
-import { StreamingProfile, User } from "@models"
+import { StreamingProfile, User } from "@shared-classes/DbModels"
 
 export default {
     method: "POST",
