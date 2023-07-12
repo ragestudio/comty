@@ -40,7 +40,6 @@ export { default as PostsList } from "./PostsList"
 export { default as PostCard } from "./PostCard"
 export { default as PostViewer } from "./PostViewer"
 export { default as PostCreator } from "./PostCreator"
-export { default as PostCreatorModal } from "./PostCreatorModal"
 
 // COMMENTS
 export { default as CommentsCard } from "./CommentsCard"

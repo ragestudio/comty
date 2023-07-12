@@ -2,13 +2,16 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
-import { Sidebar, Drawer, Sidedrawer, Modal, BottomBar, TopBar, ToolsBar } from "components/Layout"
+import { Sidebar, Drawer, Sidedrawer, BottomBar, TopBar, ToolsBar } from "components/Layout"
 
 import BackgroundDecorator from "components/BackgroundDecorator"
 
 import { createWithDom as FloatingStack } from "../components/floatingStack"
+import InitializeModalsController from "../components/modals"
 
 const DesktopLayout = (props) => {
+    InitializeModalsController()
+
     React.useEffect(() => {
         const floatingStack = FloatingStack()
 
@@ -21,7 +24,6 @@ const DesktopLayout = (props) => {
         <BackgroundDecorator />
 
         <Layout id="app_layout" className="app_layout">
-            <Modal />
             <Drawer />
             <Sidebar />
             <Sidedrawer />
@@ -47,8 +49,6 @@ const DesktopLayout = (props) => {
 
 const MobileLayout = (props) => {
     return <Layout id="app_layout" className="app_layout">
-        <Modal />
-
         <TopBar />
 
         <Layout.Content
