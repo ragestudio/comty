@@ -1,0 +1,153 @@
+.playlistItem {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+
+    cursor: pointer;
+
+    width: 100%;
+    height: 140px;
+
+    border-radius: 12px;
+
+    transition: all 0.2s ease-in-out;
+
+    background-color: var(--background-color-accent);
+
+    &.cover-hovering {
+        .playlistItem_cover {
+            transform: scale(1.1);
+
+            .playlistItem_cover_mask {
+                opacity: 1;
+            }
+        }
+
+        .playlistItem_info {
+            transform: translateX(10px);
+        }
+    }
+
+    .playlistItem_cover {
+        position: relative;
+
+        height: 140px;
+
+        transition: all 0.2s ease-in-out;
+
+        img {
+            width: 140px;
+            height: 140px;
+
+            object-fit: cover;
+            border-radius: 8px;
+
+            background-color: black;
+
+            z-index: 50
+        }
+
+        .playlistItem_cover_mask {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+
+            opacity: 0;
+
+            transition: all 0.2s ease-in-out;
+
+            z-index: 55;
+
+            background-color: rgba(var(--layoutBackgroundColor), 0.6);
+            color: var(--text-color);
+
+            font-size: 3rem;
+        }
+    }
+
+    .playlistItem_info {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+
+        padding: 10px;
+
+        max-width: calc(100% - 10vh);
+
+        transition: all 0.2s ease-in-out;
+
+        .playlistItem_info_title {
+            font-size: 1rem;
+            font-weight: 600;
+
+            color: var(--background-color-contrast);
+            font-family: "Space Grotesk", sans-serif;
+
+            &:hover {
+                text-decoration: underline;
+            }
+
+            h1,
+            h4 {
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                margin: 0;
+            }
+        }
+
+        // set userPreview to the bottom of the playlistItem_info
+        .userPreview {
+            margin-top: auto;
+            font-size: 0.8rem;
+
+            h1 {
+                font-size: 0.8rem;
+            }
+
+            .avatar {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+                justify-content: center;
+
+                width: 30px;
+                height: 30px;
+            }
+        }
+    }
+
+    .playlistItem_actions {
+        display: flex;
+        flex-direction: column;
+
+        align-self: flex-end;
+        justify-self: flex-end;
+
+        justify-content: center;
+        align-items: center;
+
+        height: 100%;
+
+        padding: 10px;
+
+        .ant-btn {
+            svg {
+                margin: 0 !important;
+            }
+        }
+    }
+}
