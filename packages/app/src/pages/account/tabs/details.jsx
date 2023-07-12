@@ -28,8 +28,9 @@ const DroppableField = (props) => {
                 ["collapsed"]: collapsed
             }
         )}
+        onClick={() => setCollapsed(!collapsed)}
     >
-        <div className="collapse_btn" onClick={() => setCollapsed(!collapsed)}>
+        <div className="collapse_btn">
             {
                 collapsed
                     ? <Icons.ChevronDown />
