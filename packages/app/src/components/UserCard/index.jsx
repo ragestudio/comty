@@ -111,7 +111,7 @@ export const UserCard = React.forwardRef((props, ref) => {
         </div>
 
         <div className="username">
-            <div>
+            <div className="username_text">
                 <h1>
                     {user.fullName || user.username}
                     {user.verified && <Icons.verifiedBadge />}
@@ -121,42 +121,13 @@ export const UserCard = React.forwardRef((props, ref) => {
                 </span>
             </div>
 
-            <div className="indicators">
-                {
-                    user.roles.includes("admin") &&
-                    <antd.Tooltip title="Administrators Team">
-                        <Icons.FaCertificate
-                            style={{
-                                fontSize: "1em",
-                            }}
-                        />
-                    </antd.Tooltip>
-                }
-                {
-                    user.early_supporter &&
-                    <antd.Tooltip title="Early supporter">
-                        <Icons.MdLoyalty />
-                    </antd.Tooltip>
-                }
-                {
-                    user.roles.includes("internal_dev") &&
-                    <antd.Tooltip title="Internal developer">
-                        <Icons.MdCode />
-                    </antd.Tooltip>
-                }
-            </div>
+            <UserBadges user_id={user._id} />
         </div>
 
         <div className="description">
             <h3>
                 {user.description}
             </h3>
-        </div>
-
-        <div className="badges">
-            <React.Suspense fallback={<antd.Skeleton />}>
-                <UserBadges user_id={user._id} />
-            </React.Suspense>
         </div>
 
         {
