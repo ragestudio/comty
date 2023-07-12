@@ -76,42 +76,62 @@ export default class SettingTab extends React.Component {
         if (this.props.withGroups) {
             const group = composeGroupsFromSettingsTab(this.tab.settings)
 
-            return Object.entries(group).map(([groupKey, settings], index) => {
-                const fromDecoratorIcon = groupsDecorators[groupKey]?.icon
-                const fromDecoratorTitle = groupsDecorators[groupKey]?.title
+            return <>
+                {
+                    Object.entries(group).map(([groupKey, settings], index) => {
+                        const fromDecoratorIcon = groupsDecorators[groupKey]?.icon
+                        const fromDecoratorTitle = groupsDecorators[groupKey]?.title
 
-                return <div id={groupKey} key={index} className="settings_content_group">
-                    <div className="settings_content_group_header">
-                        <h1>
-                            {
-                                fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
-                            }
-                            <Translation>
+                        return <div id={groupKey} key={index} className="settings_content_group">
+                            <div className="settings_content_group_header">
+                                <h1>
+                                    {
+                                        fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
+                                    }
+                                    <Translation>
+                                        {
+                                            t => t(fromDecoratorTitle ?? groupKey)
+                                        }
+                                    </Translation>
+                                </h1>
+                            </div>
+
+                            <div className="settings_list">
                                 {
-                                    t => t(fromDecoratorTitle ?? groupKey)
+                                    settings.map((setting) => <SettingItemComponent
+                                        setting={setting}
+                                        ctx={this.state.processedCtx}
+                                    />)
                                 }
-                            </Translation>
-                        </h1>
-                    </div>
+                            </div>
+                        </div>
+                    })
+                }
 
-                    <div className="settings_list">
-                        {
-                            settings.map((setting) => <SettingItemComponent
-                                setting={setting}
-                                ctx={this.state.processedCtx}
-                            />)
-                        }
-                    </div>
-                </div>
-            })
+                {
+                    this.tab.footer && React.createElement(this.tab.footer, {
+                        ctx: this.state.processedCtx
+                    })
+                }
+            </>
         }
 
-        return this.tab.settings.map((setting, index) => {
-            return <SettingItemComponent
-                key={index}
-                setting={setting}
-                ctx={this.state.processedCtx}
-            />
-        })
+        return <>
+            {
+                this.tab.settings.map((setting, index) => {
+                    return <SettingItemComponent
+                        key={index}
+                        setting={setting}
+                        ctx={this.state.processedCtx}
+                    />
+                })
+            }
+
+            {
+                this.tab.footer && React.createElement(this.tab.footer, {
+                    ctx: this.state.processedCtx
+                })
+            }
+        </>
     }
 }
