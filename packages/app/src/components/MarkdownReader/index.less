@@ -1,0 +1,58 @@
+.document_viewer {
+    display: flex;
+    flex-direction: column;
+
+    align-items: start;
+    justify-content: start;
+
+    text-align: start;
+
+    >* {
+        user-select: text;
+    }
+
+
+    blockquote {
+        background-color: var(--background-color-accent);
+        border-radius: 8px;
+        padding: 7px;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+    span,
+    p,
+    a {
+        margin: 5px;
+    }
+
+    ul {
+        color: var(--text-color);
+    }
+
+    ol {
+        color: var(--text-color);
+    }
+
+    li {
+        color: var(--text-color);
+    }
+
+    table {
+        color: var(--text-color);
+        margin: 20px 10px;
+
+
+        td {
+            padding: 7px;
+            outline: 1px solid var(--border-color);
+        }
+    }
+}
