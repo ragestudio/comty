@@ -96,5 +96,5 @@ export const WidgetBrowser = (props) => {
 }
 
 export const openModal = () => {
-    app.ModalController.open(() => <WidgetBrowser />)
+    app.layout.modal.open("widgets_browser", () => <WidgetBrowser />)
 }

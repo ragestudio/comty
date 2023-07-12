@@ -227,5 +227,5 @@ const UserSelector = (props) => {
 }
 
 export const openModal = (props) => {
-    return app.ModalController.open(() => <UserSelector {...props} />)
+    return app.layout.modal.open("user_selector", () => <UserSelector {...props} />)
 }

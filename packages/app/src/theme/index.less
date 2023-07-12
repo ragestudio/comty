@@ -405,3 +405,60 @@ html {
 		background-color: transparent !important;
 	}
 }
+
+.app_modal_wrapper {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+	justify-content: center;
+
+	width: 100%;
+	height: 100%;
+
+	transition: all 150ms ease-in-out;
+
+	&.active {
+		background-color: rgba(var(--bg_color_6), 0.5);
+
+		backdrop-filter: blur(@modal_background_blur);
+		-webkit-backdrop-filter: blur(@modal_background_blur);
+
+		.app_modal_content {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.app_modal_content {
+		transition: all 150ms ease-in-out;
+
+		opacity: 0;
+		transform: translateY(100px);
+
+		width: 100%;
+		height: 100%;
+
+		display: flex;
+		flex-direction: column;
+
+		align-items: center;
+		justify-content: center;
+
+		// fixments
+		.postCreator {
+			box-shadow: @card-shadow;
+			-webkit-box-shadow: @card-shadow;
+			-moz-box-shadow: @card-shadow;
+		}
+
+		.searcher {
+			width: 50vw;
+			height: 80vh;
+		}
+	}
+}

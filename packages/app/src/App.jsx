@@ -76,13 +76,12 @@ import {
 	NotFound,
 	RenderError,
 	Crash,
-	Navigation,
 	Login,
 	UserRegister,
 	Searcher,
 	NotificationsCenter,
 	PostViewer,
-	PostCreatorModal,
+	PostCreator,
 } from "components"
 import { DOMWindow } from "components/RenderWindow"
 
@@ -222,7 +221,7 @@ class ComtyApp extends React.Component {
 					})
 				}
 
-				return window.app.ModalController.open((props) => <Searcher renderResults {...props} />)
+				return app.layout.modal.open("searcher", () => <Searcher renderResults />)
 			},
 			openFullImageViewer: (src) => {
 				const win = new DOMWindow({
@@ -239,22 +238,10 @@ class ComtyApp extends React.Component {
 				/>)
 			},
 			openPostViewer: (post) => {
-				const win = new DOMWindow({
-					id: "postViewer",
-					className: "postViewer",
-				})
-
-				win.render(<PostViewer post={post} />)
+				app.layout.modal.open("post_viewer", () => <PostViewer post={post} />)
 			},
 			openPostCreator: () => {
-				const win = new DOMWindow({
-					id: "postCreator",
-					className: "postCreator",
-				})
-
-				win.render(<PostCreatorModal
-					onClose={() => win.destroy()}
-				/>)
+				app.layout.modal.open("post_creator", () => <PostCreator />)
 			}
 		},
 		navigation: {
