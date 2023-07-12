@@ -1,4 +1,4 @@
-import { Post, User } from "../../../models"
+import { Post, User } from "@shared-classes/DbModels"
 
 export default async (payload) => {
     const { post_id, by_user_id } = payload

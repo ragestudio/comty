@@ -14,7 +14,8 @@
         "RedisClient": "src/shared-classes",
         "StorageClient": "src/shared-classes",
         "DbManager": "src/shared-classes",
-        "Errors": "src/shared-classes"
+        "Errors": "src/shared-classes",
+        "DbModels": "src/shared-classes"
     },
     "license": "MIT",
     "dependencies": {

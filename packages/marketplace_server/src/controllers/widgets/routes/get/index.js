@@ -1,4 +1,4 @@
-import { Widget } from "@models"
+import { Widget } from "@shared-classes/DbModels"
 
 export default async (req, res) => {
     let { limit = 20, offset = 0, keywords } = req.query

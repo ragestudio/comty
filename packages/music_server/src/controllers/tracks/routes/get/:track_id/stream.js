@@ -1,4 +1,4 @@
-import { Track } from "@models"
+import { Track } from "@shared-classes/DbModels"
 import { NotFoundError, InternalServerError } from "@shared-classes/Errors"
 
 import mimetypes from "mime-types"

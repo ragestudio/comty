@@ -1,4 +1,4 @@
-import { UserFollow } from "../models"
+import { UserFollow } from "@shared-classes/DbModels"
 
 export default async (user_id) => {
     // get followers of the user

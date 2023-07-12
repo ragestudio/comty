@@ -1,4 +1,4 @@
-import { StreamingProfile } from "@models"
+import { StreamingProfile } from "@shared-classes/DbModels"
 import NewStreamingProfile from "@services/newStreamingProfile"
 
 export default {

@@ -1,4 +1,4 @@
-import { User } from "@models"
+import { User } from "@shared-classes/DbModels"
 
 export default {
     method: "GET",

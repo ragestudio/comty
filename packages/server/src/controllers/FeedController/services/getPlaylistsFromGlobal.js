@@ -1,4 +1,4 @@
-import { Playlist } from "@models"
+import { Playlist } from "@shared-classes/DbModels"
 
 export default async (payload) => {
     const {

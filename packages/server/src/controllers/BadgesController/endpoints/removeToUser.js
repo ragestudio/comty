@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { Badge, User } from "@models"
+import { Badge, User } from "@shared-classes/DbModels"
 
 export default {
     method: "DELETE",

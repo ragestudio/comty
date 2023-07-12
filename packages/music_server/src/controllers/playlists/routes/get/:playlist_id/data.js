@@ -1,4 +1,4 @@
-import { Playlist, TrackLike, Track } from "@models"
+import { Playlist, TrackLike, Track } from "@shared-classes/DbModels"
 import { NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {

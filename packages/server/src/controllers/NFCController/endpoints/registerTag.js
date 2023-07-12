@@ -1,4 +1,4 @@
-import { NFCTag } from "@models"
+import { NFCTag } from "@shared-classes/DbModels"
 
 const allowedUpdateFields = [
     "user_id",

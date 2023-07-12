@@ -1,5 +1,5 @@
 import { Schematized } from "@lib"
-import { User } from "@models"
+import { User } from "@shared-classes/DbModels"
 
 import updateUserPassword from "../services/updateUserPassword"
 import bcrypt from "bcrypt"

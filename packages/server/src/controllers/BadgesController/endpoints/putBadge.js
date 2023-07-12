@@ -1,4 +1,4 @@
-import { Badge } from "@models"
+import { Badge } from "@shared-classes/DbModels"
 import { Schematized } from "@lib"
 
 export default {

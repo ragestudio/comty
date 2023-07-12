@@ -1,5 +1,5 @@
 import lodash from "lodash"
-import { User } from "@models"
+import { User } from "@shared-classes/DbModels"
 
 const publicGetters = [
     "_id",

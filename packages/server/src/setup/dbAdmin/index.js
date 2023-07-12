@@ -1,4 +1,4 @@
-import { User } from "@models"
+import { User } from "@shared-classes/DbModels"
 import createUser from "@controllers/UserController/services/createUser"
 
 export default async () => {

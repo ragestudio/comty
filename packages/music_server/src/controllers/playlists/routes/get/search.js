@@ -1,4 +1,4 @@
-import { Playlist, Track } from "@models"
+import { Playlist, Track } from "@shared-classes/DbModels"
 
 export default async (req, res) => {
     const { keywords, limit = 5, offset = 0 } = req.query

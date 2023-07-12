@@ -1,4 +1,4 @@
-import { Comment } from "../../../models"
+import { Comment } from "@shared-classes/DbModels"
 import CheckUserAdmin from "../../../lib/checkUserAdmin"
 
 export default async (payload) => {
