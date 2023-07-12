@@ -16,17 +16,33 @@
 
 .badges {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+
+    align-items: center;
+
+    height: fit-content;
 
     gap: 7px;
 
-    .ant-tag {
-        display: inline-flex;
+    background-color: var(--background-color-primary);
+    border-radius: 12px;
 
+    padding: 7px 15px;
+
+    .badge {
+        display: flex;
         flex-direction: row;
 
         align-items: center;
+        justify-content: center;
 
-        margin: 0 !important;
+        --outline-color: var(--icon-color);
+
+        svg {
+            font-size: 1rem;
+
+            margin: 0 !important;
+            color: var(--icon-color);
+        }
     }
 }

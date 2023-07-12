@@ -273,28 +273,28 @@
         flex-direction: row;
 
         margin-top: 20px;
-
-        h1 {
-            display: inline-flex;
-            font-size: 1.5rem;
-            font-weight: 600;
-            font-family: "Space grotesk", sans-serif;
-        }
-
-        span {
-            font-size: 0.8rem;
-            font-style: italic;
-        }
-
-        svg {
-            fill: var(--app-color);
-            font-size: 0.8rem;
-        }
-
-        div {
+    
+        .username_text {
             display: flex;
             flex-direction: column;
             width: 100%;
+
+            h1 {
+                display: inline-flex;
+                font-size: 1.5rem;
+                font-weight: 600;
+                font-family: "Space grotesk", sans-serif;
+            }
+    
+            span {
+                font-size: 0.8rem;
+                font-style: italic;
+            }
+    
+            svg {
+                fill: var(--app-color);
+                font-size: 0.8rem;
+            }
         }
 
         .indicators {
@@ -331,18 +331,7 @@
     }
 
     .badges {
-        display: flex;
-        flex-direction: row;
-
-        margin-top: 20px;
-
-        flex-wrap: wrap;
-
-        .badge {
-            margin-left: 5px;
-
-            margin-bottom: 5px;
-        }
+        justify-content: flex-end;
     }
 
     .userLinks {
