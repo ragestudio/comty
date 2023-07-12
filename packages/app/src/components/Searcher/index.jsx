@@ -1,90 +1,132 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 import lodash from "lodash"
+import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
+import { Translation } from "react-i18next"
 
-import { UserPreview } from "components"
 import { Icons, createIconRender } from "components/Icons"
+
+import UserPreview from "components/UserPreview"
+import MusicTrack from "components/MusicTrack"
+import PlaylistItem from "components/PlaylistItem"
 
 import SearchModel from "models/search"
 
 import "./index.less"
 
-const ResultRenders = {
-    users: (props) => {
-        const { item, onClick } = props
-
-        return <div className="suggestion">
-            <UserPreview onClick={onClick} user={item} />
-        </div>
-    }
-}
-
 const ResultsTypeDecorators = {
     users: {
         icon: "Users",
-        label: "Users"
+        label: "Users",
+        renderItem: (props) => {
+            const { item, onClick } = props
+
+            return <div className="suggestion">
+                <UserPreview onClick={onClick} user={item} />
+            </div>
+        }
+    },
+    tracks: {
+        icon: "Album",
+        label: "Tracks",
+        renderItem: (props) => {
+            const { item, onClick } = props
+
+            return <div className="suggestion" onClick={onClick}>
+                <MusicTrack track={item} />
+            </div>
+        }
+    },
+    playlists: {
+        icon: "Album",
+        label: "Playlists",
+        renderItem: (props) => {
+            return <div className="suggestion">
+                <PlaylistItem playlist={props.item} />
+            </div>
+        }
     }
 }
 
 const Results = (props) => {
     let { results } = props
 
-    if (!results) {
-        return <antd.Empty />
-    }
-
     if (typeof results !== "object") {
-        return <antd.Empty />
+        return null
     }
 
-    let keys = Object.keys(results)
+    let groupsKeys = Object.keys(results)
 
-    if (keys.length === 0) {
-        return <antd.Empty />
-    }
-
-    // check if all keys are valid, if not replace as "others"
-    keys = keys.map((type) => {
-        if (ResultRenders[type]) {
-            return type
-        }
-
-        return "others"
+    // filter out empty groups
+    groupsKeys = groupsKeys.filter((key) => {
+        return results[key].length > 0
     })
 
-    const handleOnClick = (type, value) => {
-        if (typeof props.onClick !== "function") {
-            console.warn("Searcher: onClick is not a function")
-            return
-        }
-
-        return props.onClick(type, value)
-    }
-
-    return keys.map((type) => {
-        const decorator = ResultsTypeDecorators[type] ?? {
-            label: keys,
-            icon: <Icons.Search />
-        }
-
-        return <div className="category" id={type}>
-            <div className="suggestions">
-                <span>
-                    <span className="icon">{createIconRender(decorator.icon)}</span>
-                    <span className="label">{decorator.label}</span>
-                </span>
-                {
-                    results[type].map((item) => {
-                        return React.createElement(ResultRenders[type], { item, onClick: (...props) => handleOnClick(type, ...props) })
-                    })
-                }
-            </div>
+    if (groupsKeys.length === 0) {
+        return <div className="searcher no_results">
+            <antd.Result
+                status="info"
+                title="No results"
+                subTitle="We are sorry, but we could not find any results for your search."
+            />
         </div>
-    })
-}
+    }
 
+    const handleClick = (props) => {
+        if (props.close) {
+            props.close()
+        }
+    }
+
+    return <div
+        className={classnames(
+            "searcher_results",
+            {
+                ["one_column"]: groupsKeys.length === 1,
+            }
+        )}
+    >
+        {
+            groupsKeys.map((key, index) => {
+                const decorator = ResultsTypeDecorators[key] ?? {
+                    icon: null,
+                    label: key,
+                    renderItem: () => null
+                }
+
+                return <div
+                    className="searcher_results_category"
+                    key={index}
+                >
+                    <div className="searcher_results_category_header">
+                        <h1>
+                            {
+                                createIconRender(decorator.icon)
+                            }
+                            <Translation>
+                                {(t) => t(decorator.label)}
+                            </Translation>
+                        </h1>
+                    </div>
+
+                    <div className="searcher_results_category_suggestions" id={key}>
+                        {
+                            results[key].map((item, index) => {
+                                return decorator.renderItem({
+                                    key: index,
+                                    item,
+                                    onClick: handleClick,
+                                    ...decorator.props,
+                                })
+                            })
+                        }
+                    </div>
+                </div>
+            })
+        }
+    </div>
+}
 
 export default (props) => {
     const [loading, setLoading] = React.useState(false)

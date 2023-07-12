@@ -9,7 +9,14 @@
 
     transition: all 0.3s ease-in-out;
 
-    gap: 20px;
+    gap: 10px;
+
+    .results {
+        border-radius: 10px;
+
+        overflow-x: hidden;
+        overflow-y: overlay;
+    }
 
     &.small {
         .ant-input-affix-wrapper {
@@ -28,6 +35,11 @@
     }
 
     .ant-input-affix-wrapper {
+        position: sticky;
+
+        top: 0;
+        left: 0;
+
         display: inline-flex;
         flex-direction: row;
 
@@ -37,6 +49,7 @@
         padding: 0;
         margin: 0;
 
+        min-height: 60px;
         height: 60px;
         border-radius: 10px;
 
@@ -59,57 +72,90 @@
             margin: 0;
         }
     }
+}
 
-    .results {
-        position: relative;
+.searcher_results {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 
+    width: 50vw;
+
+    gap: 10px;
+
+    &.one_column {
+        grid-template-columns: 1fr;
+    }
+
+    &.no_results {
         display: flex;
         flex-direction: column;
 
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
+    }
 
-        width: 100%;
-
-        padding: 10px;
-
+    .searcher_results_category {
         background-color: var(--background-color-primary);
+
+        padding: 20px;
 
         border-radius: 8px;
 
-        gap: 10px;
+        height: fit-content;
+        width: 100%;
 
-        .category {
-            h3 {
-                font-size: 1rem;
-                font-weight: 600;
+        gap: 20px;
+
+        .searcher_results_category_header {
+            h1 {
+                margin: 0;
             }
+        }
 
-            width: 100%;
+        .searcher_results_category_suggestions {
+            display: flex;
+            flex-direction: column;
 
             gap: 10px;
 
-            .suggestions {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
+            padding: 10px;
 
-                gap: 10px;
+            .playlistItem {
+                background-color: var(--background-color-accent);
 
-                .suggestion {
-                    width: 100%;
+                max-width: 300px;
+                height: 80px;
 
-                    padding: 10px;
+                .playlistItem_cover {
+                    width: 80px;
+                    height: 80px;
 
-                    border-radius: 8px;
+                    img {
+                        height: 80px;
+                        width: 80px;
+                    }
+                }
 
-                    background-color: var(--background-color-accent);
+                .playlistItem_info {
+                    max-width: unset;
+
+                    h1 {
+                        font-size: 1rem;
+                        white-space: break-spaces;
+                    }
                 }
             }
-        }
-    }
 
-    .ant-empty {
-        align-self: center;
+            .music-track {
+                background-color: var(--background-color-accent);
+            }
+        }
+
+        #playlists {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr 1fr;
+        }
     }
 }
