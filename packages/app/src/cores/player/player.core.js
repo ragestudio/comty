@@ -158,8 +158,11 @@ class MediaSession {
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
     static dependencies = [
+        "api",
         "settings"
     ]
+
+    static websocketListen = "music"
 
     static refName = "player"
 
@@ -205,6 +208,7 @@ export default class Player extends Core {
         syncMode: false,
         syncModeLocked: false,
         startingNew: false,
+        liked: false,
     })
 
     public = {
@@ -300,6 +304,7 @@ export default class Player extends Core {
 
             return this.state
         }.bind(this),
+        toggleCurrentTrackLike: this.toggleCurrentTrackLike.bind(this),
         seek: this.seek.bind(this),
         duration: this.duration.bind(this),
         velocity: this.velocity.bind(this),
@@ -307,6 +312,16 @@ export default class Player extends Core {
         toggleSyncMode: this.toggleSyncMode.bind(this),
         currentState: this.currentState.bind(this),
         setSampleRate: this.setSampleRate.bind(this),
+    }
+
+    wsEvents = {
+        "music:self:track:toggle:like": (data) => {
+            const to = data.action === "liked"
+
+            if (this.state.liked !== to) {
+                this.state.liked = to
+            }
+        }
     }
 
     async initializeAudioProcessors() {
@@ -480,9 +495,15 @@ export default class Player extends Core {
                         }
                         case "syncModeLocked": {
                             app.eventBus.emit("player.syncModeLocked.update", change.object.syncModeLocked)
+                            break
                         }
                         case "syncMode": {
                             app.eventBus.emit("player.syncMode.update", change.object.syncMode)
+                            break
+                        }
+                        case "liked": {
+                            app.eventBus.emit("player.toggle.like", change.object.liked)
+                            break
                         }
                     }
                 }
@@ -497,6 +518,10 @@ export default class Player extends Core {
     }
 
     async initializeBeforeRuntimeInitialize() {
+        for (const [eventName, eventHandler] of Object.entries(this.wsEvents)) {
+            app.cores.api.listenEvent(eventName, eventHandler, Player.websocketListen)
+        }
+
         if (app.isMobile) {
             this.state.audioVolume = 1
         }
@@ -505,6 +530,23 @@ export default class Player extends Core {
     //
     // UI Methods
     //
+
+    async toggleCurrentTrackLike() {
+        if (!this.currentAudioInstance) {
+            console.error("No track playing")
+            return false
+        }
+
+        const currentId = this.currentAudioInstance.manifest._id
+
+        const result = await PlaylistModel.toggleTrackLike(currentId).catch((err) => {
+            return null
+        })
+
+        if (result) {
+            this.state.liked = result.action === "liked"
+        }
+    }
 
     attachPlayerComponent() {
         if (this.currentDomWindow) {
@@ -833,6 +875,8 @@ export default class Player extends Core {
         this.currentAudioInstance = instance
 
         this.state.currentAudioManifest = instance.manifest
+
+        this.state.liked = instance.manifest.liked
 
         // set time to 0
         this.currentAudioInstance.audioElement.currentTime = 0
