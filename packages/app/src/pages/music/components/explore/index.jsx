@@ -11,8 +11,8 @@ import { WithPlayerContext } from "contexts/WithPlayerContext"
 import FeedModel from "models/feed"
 import PlaylistModel from "models/playlists"
 
-import MusicTrack from "components/MusicTrack"
-import PlaylistItem from "components/PlaylistItem"
+import MusicTrack from "components/Music/Track"
+import PlaylistItem from "components/Music/PlaylistItem"
 
 import "./index.less"
 
@@ -145,8 +145,6 @@ const PlaylistsList = (props) => {
         </div>
     </div>
 }
-
-
 
 const ResultGroupsDecorators = {
     "playlists": {
