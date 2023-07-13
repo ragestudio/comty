@@ -17,6 +17,11 @@ const customAliases = {
 
 if (!global.isProduction) {
     customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+
+    customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
+}
+
+if (process.env.USE_LINKED_SHARED) {
     customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
 }
 
@@ -60,15 +65,11 @@ import API from "./api"
 
 async function main() {
     if (process.env.INFISICAL_TOKEN) {
-        console.log("🔑 Fetching secrets from Infisical...")
-
         const client = new infisical({
             token: process.env.INFISICAL_TOKEN,
         })
 
         const secrets = await client.getAllSecrets()
-
-        console.log("🔑 Injecting secrets to process.env...",)
 
         // inject to process.env
         secrets.forEach((secret) => {
@@ -77,13 +78,6 @@ async function main() {
             }
         })
     }
-
-    // transform "undefined" or "null" envs to undefined 
-    Object.keys(process.env).forEach((key) => {
-        if (process.env[key] === "undefined" || process.env[key] === "null") {
-            process.env[key] = undefined
-        }
-    })
 
     const instance = new API()
 
@@ -94,6 +88,7 @@ async function main() {
         if (typeof instance.server.close === "function") {
             instance.server.close()
         }
+
         process.exit(0)
     })
 
@@ -102,6 +97,7 @@ async function main() {
         if (typeof instance.server.close === "function") {
             instance.server.close()
         }
+
         process.exit(0)
     })
 

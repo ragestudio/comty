@@ -1,4 +1,3 @@
-
 import { webcrypto as crypto } from "crypto"
 import path from "path"
 import { registerBaseAliases } from "linebridge/dist/server"
@@ -18,6 +17,11 @@ const customAliases = {
 
 if (!global.isProduction) {
     customAliases["comty.js"] = path.resolve(__dirname, "../../comty.js/src")
+
+    customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
+}
+
+if (process.env.USE_LINKED_SHARED) {
     customAliases["@shared-classes"] = path.resolve(__dirname, "shared-classes")
 }
 
@@ -69,7 +73,9 @@ async function main() {
 
         // inject to process.env
         secrets.forEach((secret) => {
-            process.env[secret.secretName] = secret.secretValue
+            if (!(secret.secretName in process.env)) {
+                process.env[secret.secretName] = secret.secretValue
+            }
         })
     }
 
@@ -82,6 +88,7 @@ async function main() {
         if (typeof instance.server.close === "function") {
             instance.server.close()
         }
+
         process.exit(0)
     })
 
@@ -90,6 +97,7 @@ async function main() {
         if (typeof instance.server.close === "function") {
             instance.server.close()
         }
+
         process.exit(0)
     })
 
