@@ -189,7 +189,7 @@ export const MobileUserCard = React.forwardRef((props, ref) => {
                             props.user.fullName ?? `@${props.user.username}`
                         }
                         {
-                            props.user.verified && <Icons.verifiedBadge />
+                            props.user.verified && <Icons.verifiedBadge id="verification_tick" />
                         }
                     </h1>
 

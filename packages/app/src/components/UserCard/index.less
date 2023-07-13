@@ -162,12 +162,20 @@ html {
                 font-family: "Space Grotesk", sans-serif;
 
                 h1 {
+                    position: relative;
+
                     color: var(--text-color);
                     margin: 0;
-                }
 
-                svg {
-                    color: var(--colorPrimary)
+                    #verification_tick {
+                        right: 0;
+                        top: 0;
+
+                        font-size: 0.8rem;
+
+                        color: var(--colorPrimary);
+                        transform: translate(0, -50%);
+                    }
                 }
 
                 margin-bottom: 10px;
