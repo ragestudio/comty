@@ -24,7 +24,7 @@
         "@socket.io/sticky": "^1.0.3",
         "axios": "^1.4.0",
         "bcrypt": "5.0.1",
-        "comty.js": "^0.52.2",
+        "comty.js": "^0.54.0",
         "connect-mongo": "^4.6.0",
         "corenode": "0.28.26",
         "cors": "^2.8.5",
