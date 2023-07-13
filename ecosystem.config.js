@@ -10,6 +10,7 @@ module.exports = {
                 "MAIN_LISTEN_PORT": 5000,
                 "LOG_REQUESTS": true,
             },
+            node_args: "-r dotenv/config",
             cwd: "./packages/server"
         },
         {
@@ -21,6 +22,7 @@ module.exports = {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5001,
             },
+            node_args: "-r dotenv/config",
             cwd: "./packages/chat_server"
         },
         {
@@ -32,6 +34,7 @@ module.exports = {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5002,
             },
+            node_args: "-r dotenv/config",
             cwd: "./packages/marketplace_server"
         },
         {
@@ -43,6 +46,7 @@ module.exports = {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5003,
             },
+            node_args: "-r dotenv/config",
             cwd: "./packages/music_server"
         },
         {
@@ -54,6 +58,7 @@ module.exports = {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5004,
             },
+            node_args: "-r dotenv/config",
             cwd: "./packages/file_server"
         },
     ],
