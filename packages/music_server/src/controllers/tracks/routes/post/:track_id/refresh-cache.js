@@ -1,8 +1,12 @@
 import { Track } from "@shared-classes/DbModels"
-import { NotFoundError } from "@shared-classes/Errors"
+import { NotFoundError, AuthorizationError } from "@shared-classes/Errors"
 import getEnhancedLyricsFromTrack from "@services/getEnhancedLyricsFromTrack"
 
 export default async (req, res) => {
+    if (!req.session) {
+        return new AuthorizationError(req, res)
+    }
+
     const { track_id } = req.params
 
     let track = await Track.findOne({
