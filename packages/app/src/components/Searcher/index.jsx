@@ -154,7 +154,9 @@ export default (props) => {
         if (typeof props.model === "function") {
             result = await props.model(value)
         } else {
-            result = await SearchModel.search(value)
+            result = await SearchModel.search(value, {
+                limit_per_section: app.isMobile ? 3 : 5
+            })
         }
 
         if (typeof props.onSearchResult === "function") {

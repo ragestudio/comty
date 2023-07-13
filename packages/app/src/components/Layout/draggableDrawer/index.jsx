@@ -1,6 +1,7 @@
 // © Jack Hanford https://github.com/hanford/react-drag-drawer
 import React, { Component } from "react"
 import { Motion, spring, presets } from "react-motion"
+import classnames from "classnames"
 import PropTypes from "prop-types"
 import document from "global/document"
 import Observer from "react-intersection-observer"
@@ -329,8 +330,13 @@ export default class DraggableDrawer extends Component {
                             id={id}
                             style={containerStyle}
                             onMouseDown={this.onClickOutside}
-                            className="draggable-drawer"
                             ref={getContainerRef}
+                            className={classnames(
+                                "draggable-drawer",
+                                {
+                                    ["fill-end"]: this.props.fillEnd
+                                }
+                            )}
                         >
                             <Observer
                                 className={HaveWeScrolled}

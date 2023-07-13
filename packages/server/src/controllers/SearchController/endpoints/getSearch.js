@@ -6,7 +6,7 @@ export default {
     route: "/",
     middlewares: ["withOptionalAuthentication"],
     fn: async (req, res) => {
-        const { keywords = "" } = req.query
+        const { keywords = "", params } = req.query
 
         let suggestions = {}
 
@@ -20,7 +20,7 @@ export default {
                         { fullName: { $regex: keywords, $options: "i" } },
                     ]
                 },
-                limit: 5,
+                limit: params.limit_per_section ?? 5,
                 select: "username fullName avatar verified",
             },
             {
@@ -31,7 +31,7 @@ export default {
                         { title: { $regex: keywords, $options: "i" } },
                     ]
                 },
-                limit: 5,
+                limit: params.limit_per_section ?? 5,
             },
             {
                 id: "tracks",
@@ -43,7 +43,7 @@ export default {
                         { album: { $regex: keywords, $options: "i" } },
                     ]
                 },
-                limit: 5,
+                limit: params.limit_per_section ?? 5,
             }
         ]
 

@@ -1,3 +1,53 @@
+html {
+    &.mobile {
+        .searcher {
+            display: flex;
+            width: 100%;
+            height: 100%;
+
+            overflow-y: scroll;
+
+            .searcher_results {
+                display: flex;
+
+                width: 100%;
+                height: 100%;
+
+                overflow-y: scroll;
+
+                .searcher_results_category {
+                    display: flex;
+                    flex-direction: column;
+
+                    padding: 0;
+
+                    gap: 5px;
+
+                    .searcher_results_category_header {
+                        font-size: 0.6rem;
+                    }
+
+                    .searcher_results_category_suggestions {
+                        padding: 0 15px;
+
+                        &#playlists {
+                            display: flex;
+                            flex-direction: column;
+
+                            padding: 0;
+
+                            .playlistItem {
+                                width: 100%;
+                                max-width: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 .searcher {
     position: relative;
 
@@ -13,6 +63,8 @@
 
     .results {
         border-radius: 10px;
+
+        width: 100%;
 
         overflow-x: hidden;
         overflow-y: overlay;
