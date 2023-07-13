@@ -10,7 +10,11 @@ function generateModels() {
     dirs.forEach((file) => {
         const model = require(path.join(__dirname, file)).default
 
-        models[model.name] = mongoose.model(model.name, new Schema(model.schema), model.collection)
+        if (mongoose.model[model.name]) {
+            return models[model.name] = mongoose.model(model.name)
+        }
+
+        return models[model.name] = mongoose.model(model.name, new Schema(model.schema), model.collection)
     })
 
     return models
