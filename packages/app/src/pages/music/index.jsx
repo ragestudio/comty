@@ -15,6 +15,7 @@ export default () => {
     return <PagePanelWithNavMenu
         tabs={Tabs}
         navMenuHeader={NavMenuHeader}
+        defaultTab="explore"
         primaryPanelClassName="full"
         useSetQueryType
         transition

@@ -1,34 +1,34 @@
-import FeedTab from "./components/feed"
-import SpacesTab from "./components/spaces"
-
+import LibraryTab from "./components/library"
+import FavoritesTab from "./components/favorites"
+import ExploreTab from "./components/explore"
 import DashboardTab from "./components/dashboard"
+
 import ReleasesTab from "./components/dashboard/releases"
 
 export default [
     {
-        key: "feed",
-        label: "Feed",
+        key: "explore",
+        label: "Explore",
         icon: "Compass",
-        component: FeedTab
-    },
-    {
-        key: "radio",
-        label: "Radio",
-        icon: "Radio",
-        disabled: true
+        component: ExploreTab
     },
     {
         key: "library",
         label: "Library",
         icon: "MdLibraryMusic",
-        component: FeedTab,
-        disabled: true
+        disabled: true,
+        component: LibraryTab,
     },
     {
-        key: "spaces",
-        label: "Spaces",
-        icon: "MdDeck",
-        component: SpacesTab,
+        key: "favorites",
+        label: "Favorites",
+        icon: "MdFavoriteBorder",
+        component: FavoritesTab,
+    },
+    {
+        key: "radio",
+        label: "Radio",
+        icon: "Radio",
         disabled: true
     },
     {
