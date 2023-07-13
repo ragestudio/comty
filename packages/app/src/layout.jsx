@@ -135,7 +135,7 @@ export default class Layout extends React.PureComponent {
 			return this.layoutInterface.toggleRootContainerClassname("page-panel-spacer", to)
 		},
 		toggleRootContainerClassname: (classname, to) => {
-			const root = document.getElementById("root")
+			const root = document.documentElement
 
 			if (!root) {
 				console.error("root not found")
