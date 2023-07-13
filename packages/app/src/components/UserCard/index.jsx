@@ -121,7 +121,9 @@ export const UserCard = React.forwardRef((props, ref) => {
                 </span>
             </div>
 
-            <UserBadges user_id={user._id} />
+            {
+                user.badges?.length > 0 && <UserBadges user_id={user._id} />
+            }
         </div>
 
         <div className="description">
@@ -195,6 +197,12 @@ export const MobileUserCard = React.forwardRef((props, ref) => {
                         props.user.fullName && <span>
                             @{props.user.username}
                         </span>
+                    }
+                </div>
+
+                <div className="_mobile_userCard_top_badges_wrapper">
+                    {
+                        props.user.badges?.length > 0 && <UserBadges user_id={props.user._id} />
                     }
                 </div>
 

@@ -138,6 +138,8 @@
         }
 
         ._mobile_userCard_top_texts {
+            position: relative;
+
             display: flex;
 
             flex-direction: column;
@@ -147,6 +149,14 @@
 
             padding: 10px;
             padding-left: 15px;
+
+            ._mobile_userCard_top_badges_wrapper {
+                position: absolute;
+                top: 0;
+                right: 0;
+
+                padding: 10px;
+            }
 
             ._mobile_userCard_top_username {
                 font-family: "Space Grotesk", sans-serif;
@@ -273,7 +283,7 @@
         flex-direction: row;
 
         margin-top: 20px;
-    
+
         .username_text {
             display: flex;
             flex-direction: column;
@@ -285,12 +295,12 @@
                 font-weight: 600;
                 font-family: "Space grotesk", sans-serif;
             }
-    
+
             span {
                 font-size: 0.8rem;
                 font-style: italic;
             }
-    
+
             svg {
                 fill: var(--app-color);
                 font-size: 0.8rem;
