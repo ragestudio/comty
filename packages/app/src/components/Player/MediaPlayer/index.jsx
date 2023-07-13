@@ -9,8 +9,6 @@ import SeekBar from "components/Player/SeekBar"
 import Controls from "components/Player/Controls"
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
-import PlaylistsModel from "models/playlists"
-
 import "./index.less"
 
 export default (props) => {
@@ -24,10 +22,6 @@ export default (props) => {
 // TODO: Queue view
 export class AudioPlayer extends React.Component {
     static contextType = Context
-
-    state = {
-        liked: false,
-    }
 
     onMouse = (event) => {
         const { type } = event
@@ -64,7 +58,7 @@ export class AudioPlayer extends React.Component {
     }
 
     onClickPlayButton = () => {
-        if (this.state.streamMode) {
+        if (this.context.streamMode) {
             return app.cores.player.playback.stop()
         }
 
@@ -79,59 +73,50 @@ export class AudioPlayer extends React.Component {
         app.cores.player.playback.next()
     }
 
-    onClickLikeButton = async () => {
-        const result = await PlaylistsModel.toggleTrackLike(this.context.currentManifest._id).catch((err) => {
-            return null
-        })
-
-        if (result) {
-            this.setState({
-                liked: result.action === "liked"
-            })
-        }
-    }
-
     render() {
         return <div
             className={classnames(
                 "embbededMediaPlayerWrapper",
                 {
                     ["hovering"]: this.props.frame !== false && this.state.showControls,
-                    ["minimized"]: this.context.minimized,
+                    ["minimized"]: !app.isMobile && this.context.minimized,
                     ["no-frame"]: this.props.frame === false,
                 }
             )}
             onMouseEnter={this.onMouse}
             onMouseLeave={this.onMouse}
         >
-            <div className="top_controls">
-                <antd.Button
-                    icon={<Icons.MdFirstPage />}
-                    onClick={this.minimize}
-                    shape="circle"
-                />
-
-                {
-                    !this.context.syncModeLocked && !this.context.syncMode && <antd.Button
-                        icon={<Icons.MdShare />}
-                        onClick={this.inviteSync}
+            {
+                !app.isMobile && <div className="top_controls">
+                    <antd.Button
+                        icon={<Icons.MdFirstPage />}
+                        onClick={this.minimize}
                         shape="circle"
                     />
-                }
 
-                <antd.Button
-                    icon={<Icons.MdOpenInFull />}
-                    onClick={this.openVisualizer}
-                    shape="circle"
-                />
+                    {
+                        !this.context.syncModeLocked && !this.context.syncMode && <antd.Button
+                            icon={<Icons.MdShare />}
+                            onClick={this.inviteSync}
+                            shape="circle"
+                        />
+                    }
 
-                <antd.Button
-                    className="bottom_btn"
-                    icon={<Icons.X />}
-                    onClick={this.close}
-                    shape="square"
-                />
-            </div>
+                    <antd.Button
+                        icon={<Icons.MdOpenInFull />}
+                        onClick={this.openVisualizer}
+                        shape="circle"
+                    />
+
+                    <antd.Button
+                        className="bottom_btn"
+                        icon={<Icons.X />}
+                        onClick={this.close}
+                        shape="square"
+                    />
+                </div>
+            }
+
             <div className="player">
                 <div
                     className="cover"
@@ -159,10 +144,12 @@ export class AudioPlayer extends React.Component {
                                 </div>
                             }
 
-                            <LikeButton
-                                onClick={this.onClickLikeButton}
-                                liked={this.state.liked}
-                            />
+                            {
+                                !app.isMobile && <LikeButton
+                                    onClick={app.cores.player.toggleCurrentTrackLike}
+                                    liked={this.context.liked}
+                                />
+                            }
                         </div>
                     </div>
                 </div>
@@ -179,7 +166,9 @@ export class AudioPlayer extends React.Component {
                         previous: this.onClickPreviousButton,
                         toggle: this.onClickPlayButton,
                         next: this.onClickNextButton,
+                        like: app.cores.player.toggleCurrentTrackLike,
                     }}
+                    liked={this.context.liked}
                 />
 
                 <SeekBar

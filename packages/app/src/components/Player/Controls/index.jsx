@@ -5,6 +5,7 @@ import UseAnimations from "react-useanimations"
 import LoadingAnimation from "react-useanimations/lib/loading"
 
 import { Icons } from "components/Icons"
+import LikeButton from "components/LikeButton"
 
 import AudioVolume from "components/Player/AudioVolume"
 import AudioPlayerChangeModeButton from "components/Player/ChangeModeButton"
@@ -23,6 +24,7 @@ export default ({
     audioVolume = 0.3,
     audioMuted = false,
     loading = false,
+    liked = false,
 } = {}) => {
     const onClickActionsButton = (event) => {
         if (typeof controls !== "object") {
@@ -79,6 +81,12 @@ export default ({
             onClick={() => onClickActionsButton("next")}
             disabled={syncModeLocked}
         />
+        {
+            app.isMobile && <LikeButton
+                onClick={controls.like}
+                liked={liked}
+            />
+        }
         {
             !app.isMobile && <antd.Popover
                 content={React.createElement(
