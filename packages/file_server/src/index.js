@@ -65,6 +65,8 @@ import API from "./api"
 
 async function main() {
     if (process.env.INFISICAL_TOKEN) {
+        console.log(`🔑 Injecting env variables from INFISICAL...`)
+        
         const client = new infisical({
             token: process.env.INFISICAL_TOKEN,
         })
