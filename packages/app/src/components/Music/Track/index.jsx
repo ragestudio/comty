@@ -24,7 +24,7 @@ export default (props) => {
 
     const handleClickPlayBtn = React.useCallback(() => {
         if (typeof props.onClickPlayBtn === "function") {
-            props.onClick(props.track)
+            props.onClickPlayBtn(props.track)
         } else {
             console.warn("Searcher: onClick is not a function, using default action...")
             app.cores.player.start(props.track)

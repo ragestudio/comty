@@ -3,7 +3,7 @@ import * as antd from "antd"
 import { Icons } from "components/Icons"
 
 import PostCard from "components/PostCard"
-import PlaylistTimelineEntry from "components/PlaylistTimelineEntry"
+import PlaylistTimelineEntry from "components/Music/PlaylistTimelineEntry"
 import LoadMore from "components/LoadMore"
 
 //import { ViewportList } from "react-viewport-list"

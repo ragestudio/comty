@@ -8,8 +8,8 @@ import { Translation } from "react-i18next"
 import { Icons, createIconRender } from "components/Icons"
 
 import UserPreview from "components/UserPreview"
-import MusicTrack from "components/MusicTrack"
-import PlaylistItem from "components/PlaylistItem"
+import MusicTrack from "components/Music/Track"
+import PlaylistItem from "components/Music/PlaylistItem"
 
 import SearchModel from "models/search"
 
