@@ -65,7 +65,7 @@ export default (props) => {
             return <MusicTrack
                 order={index + 1}
                 track={item}
-                onClick={() => handleOnClickTrack(item)}
+                onClickPlayBtn={() => handleOnClickTrack(item)}
                 onLike={() => handleTrackLike(item)}
             />
         })
