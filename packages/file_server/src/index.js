@@ -75,9 +75,7 @@ async function main() {
 
         // inject to process.env
         secrets.forEach((secret) => {
-            if (!(secret.secretName in process.env)) {
-                process.env[secret.secretName] = secret.secretValue
-            }
+            process.env[secret.secretName] = secret.secretValue
         })
     }
 
