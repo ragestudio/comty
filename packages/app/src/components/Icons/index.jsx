@@ -20,14 +20,17 @@ const marginedStyle = {
 }
 
 const customs = {
-    verifiedBadge: () => <VerifiedBadge
+    verifiedBadge: (props) => <VerifiedBadge
         style={marginedStyle}
+        {...props}
     />,
-    VrChat: () => <VrChatIcon
+    VrChat: (props) => <VrChatIcon
         style={marginedStyle}
+        {...props}
     />,
-    Crown: () => <Crown
+    Crown: (props) => <Crown
         style={marginedStyle}
+        {...props}
     />
 }
 
