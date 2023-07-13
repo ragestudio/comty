@@ -180,6 +180,7 @@ class ComtyApp extends React.Component {
 						sessionController: this.sessionController,
 					},
 					props: {
+						fillEnd: true,
 						bodyStyle: {
 							height: "100%",
 						}
