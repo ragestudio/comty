@@ -8,6 +8,7 @@ module.exports = {
             env: {
                 "NODE_ENV": "production",
                 "MAIN_LISTEN_PORT": 5000,
+                "LOG_REQUESTS": true,
             },
             cwd: "./packages/server"
         },
