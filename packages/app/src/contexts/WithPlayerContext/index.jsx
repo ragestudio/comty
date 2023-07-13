@@ -12,6 +12,7 @@ export const DefaultContextValues = {
     bpm: 0,
     syncMode: false,
     syncModeLocked: false,
+    liked: false,
 }
 
 export const Context = React.createContext(DefaultContextValues)
@@ -29,6 +30,7 @@ export class WithPlayerContext extends React.Component {
         bpm: app.cores.player.getState("trackBPM") ?? 0,
         syncMode: app.cores.player.getState("syncModeLocked"),
         syncModeLocked: app.cores.player.getState("syncMode"),
+        liked: app.cores.player.getState("liked"),
     }
 
     events = {
@@ -64,6 +66,9 @@ export class WithPlayerContext extends React.Component {
         },
         "player.coverColorAnalysis.update": (data) => {
             this.setState({ coverColorAnalysis: data })
+        },
+        "player.toggle.like": (data) => {
+            this.setState({ liked: data })
         }
     }
 
