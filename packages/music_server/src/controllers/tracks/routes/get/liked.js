@@ -9,6 +9,7 @@ export default async (req, res) => {
     let likedIds = await TrackLike.find({
         user_id: req.session.user_id,
     })
+        .sort({ created_at: -1 })
 
     likedIds = likedIds.map((item) => {
         return item.track_id
@@ -28,6 +29,13 @@ export default async (req, res) => {
         item.liked = true
 
         return item
+    })
+
+    tracks.sort((a, b) => {
+        const indexA = likedIds.indexOf(a._id.toString())
+        const indexB = likedIds.indexOf(b._id.toString())
+
+        return indexA - indexB
     })
 
     return res.json(tracks)

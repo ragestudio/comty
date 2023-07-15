@@ -9,6 +9,9 @@ export default {
         track_id: {
             type: String,
             required: true,
+        },
+        created_at: {
+            type: Date,
         }
     }
 }
