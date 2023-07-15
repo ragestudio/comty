@@ -1,3 +1,5 @@
+@import "theme/vars.less";
+
 html {
     &.mobile {
         .playlist_view {
@@ -46,12 +48,18 @@ html {
     &.vertical {
         flex-direction: column;
 
+        overflow-y: overlay;
+
         .play_info_wrapper {
             width: 100%;
+
+            z-index: 45;
 
             .play_info {
                 flex-direction: row;
                 width: 100%;
+
+                box-shadow: @card-shadow;
 
                 .play_info_cover {
                     height: 15vh !important;
@@ -69,6 +77,10 @@ html {
                     }
                 }
             }
+        }
+
+        .list {
+            z-index: 40;
         }
     }
 
