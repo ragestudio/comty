@@ -53,7 +53,7 @@ export default ({
 
     // handle when client connects
     client.on("connect", () => {
-        console.log("✅ Redis client connected.")
+        console.log("✅ Redis client connected.", process.env.REDIS_HOST)
     })
 
     return client
