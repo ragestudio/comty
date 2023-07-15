@@ -28,6 +28,7 @@ export default async (req, res) => {
         like = new TrackLike({
             track_id: track_id,
             user_id: req.session.user_id,
+            created_at: new Date().getTime(),
         })
 
         await like.save()
