@@ -605,6 +605,8 @@ export default class SyncLyrics extends React.Component {
             app.controls.toggleUIVisibility(false)
         }
 
+        app.layout.toggleCenteredContent(false)
+
         app.cores.style.compactMode(true)
         app.cores.style.applyVariant("dark")
 
