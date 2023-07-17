@@ -23,6 +23,10 @@ export default (props) => {
 export class AudioPlayer extends React.Component {
     static contextType = Context
 
+    state = {
+        showControls: false,
+    }
+
     onMouse = (event) => {
         const { type } = event
 
