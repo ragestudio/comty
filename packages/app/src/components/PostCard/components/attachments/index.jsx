@@ -7,6 +7,10 @@ import mimetypes from "mime"
 
 import ContentFailed from "../contentFailed"
 
+import BearCarousel, { BearSlideCard } from "bear-react-carousel"
+
+
+import "bear-react-carousel/dist/index.css"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
@@ -125,60 +129,40 @@ const Attachment = React.memo((props) => {
 })
 
 export default React.memo((props) => {
-    const carouselRef = React.useRef(null)
-    const [attachmentIndex, setAttachmentIndex] = React.useState(0)
-
-    const handleAttachmentChange = (index) => {
-        const currentAttachmentIndex = carouselRef.current.state.selectedItem
-        const currentAttachment = carouselRef.current.itemsRef[currentAttachmentIndex].querySelector("video, audio")
-
-        if (currentAttachmentIndex !== index) {
-            // if the attachment is a video, pause it
-            if (currentAttachment) {
-                currentAttachment.pause()
-            }
-        } else {
-            // else if the attachment is a video, play it
-            if (currentAttachment) {
-                currentAttachment.play()
-            }
-        }
-
-        setAttachmentIndex(index)
-    }
+    const [controller, setController] = React.useState()
+    const [carouselState, setCarouselState] = React.useState()
 
     React.useEffect(() => {
         // get attachment index from query string
         const attachmentIndex = parseInt(new URLSearchParams(window.location.search).get("attachment"))
 
         if (attachmentIndex) {
-            setAttachmentIndex(attachmentIndex)
+            controller?.slideToPage(attachmentIndex)
         }
     }, [])
 
     return <div className="post_attachments">
-        <Carousel
-            ref={carouselRef}
-            showArrows={true}
-            showStatus={false}
-            showThumbs={false}
-            showIndicators={props.attachments?.length > 1 ?? false}
-            selectedItem={attachmentIndex}
-            onChange={handleAttachmentChange}
-            transitionTime={150}
-            stopOnHover={true}
-        >
-            {
-                props.attachments?.length > 0 && props.attachments.map((attachment, index) => {
+        {
+            props.attachments?.length > 0 && <BearCarousel
+                data={props.attachments.map((attachment, index) => {
                     if (typeof attachment !== "object") {
                         return null
                     }
 
-                    return <React.Fragment key={index}>
-                        <Attachment index={index} attachment={attachment} />
-                    </React.Fragment>
-                })
-            }
-        </Carousel>
+                    return {
+                        key: index,
+                        children: <React.Fragment key={index}>
+                            <Attachment index={index} attachment={attachment} />
+                        </React.Fragment>
+                    }
+                })}
+                isEnableNavButton
+                isEnableMouseMove
+                isEnablePagination
+                setController={setController}
+                onSlideChange={setCarouselState}
+                isDebug
+            />
+        }
     </div>
 })

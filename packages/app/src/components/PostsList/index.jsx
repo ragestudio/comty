@@ -17,7 +17,7 @@ const LoadingComponent = () => {
     return <antd.Skeleton avatar
         style={{
             padding: "20px",
-            width: "35vw",
+            width: "100%",
             height: "160px",
         }}
     />

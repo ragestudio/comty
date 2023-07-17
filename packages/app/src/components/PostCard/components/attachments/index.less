@@ -1,91 +1,44 @@
 .post_attachments {
-    display: flex;
+    box-sizing: border-box;
 
-    width: 100%;
+    position: relative;
+
+    display: flex;
 
     align-items: center;
     justify-content: center;
 
-    transition: all 0.2s ease-in-out;
+    width: 100%;
+    max-width: 100%;
 
-    .carousel-root {
-        position: relative;
+    overflow-x: hidden;
 
+    transition: all 150ms ease-in-out;
+
+    .bear-react-carousel__root {
         font-family: "DM Mono", monospace;
 
-        height: 100%;
-        width: 100%;
+        border-radius: 12px;
 
-        .carousel {
-            display: flex;
-            background-color: black;
-            border-radius: 8px;
+        overflow: hidden;
 
-            .slider-wrapper {
-                align-self: center;
-            }
-        }
+        background-color: black;
 
-        .control-prev,
-        .control-next {
-            color: #ffffff;
-
-            height: 100%;
-            width: 30px;
-
-            opacity: 0;
-
-            transition: all 150ms ease-in-out;
-
-            &:hover {
-                opacity: 1;
-                width: 50px;
-            }
-
-            &:active {
-                transform: scale(0.5);
-                background-color: transparent;
-            }
-
-            ::before {
-                font-size: 20px;
-            }
-        }
-
-        .control-arrow {
-            z-index: 50;
-        }
-
-        .control-dots {
+        .bear-react-carousel__pagination-group {
             top: 0;
-            height: fit-content;
-            margin: 0;
+            bottom: unset;
 
-            &:hover {
-                .dot {
-                    height: 8px;
-                    width: 20px;
-                }
-            }
-
-            .dot {
-                transition: all 100ms ease-in;
-
-                height: 3px;
-                width: 15px;
-
-                border-radius: 2px;
-
-                box-shadow: none;
-            }
+            margin-top: 10px;
         }
 
-        .carousel-status {
-            padding: 10px;
+        .bear-react-carousel__pagination-group:not([data-page-content="true"]) .bear-react-carousel__pagination-button[data-active] {
+            background-color: var(--colorPrimary);
         }
     }
 
     .attachment {
+        position: relative;
+
         display: flex;
         flex-direction: column;
 
