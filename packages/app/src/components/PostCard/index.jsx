@@ -157,15 +157,15 @@ export default class PostCard extends React.PureComponent {
         return <div
             key={this.props.index}
             id={this.props.data._id}
+            style={this.props.style}
+            user-id={this.props.data.user_id}
+            context-menu={"postCard-context"}
             className={classnames(
-                "postCard",
+                "post_card",
                 {
                     ["open"]: this.state.open,
                 }
             )}
-            style={this.props.style}
-            context-menu={"postCard-context"}
-            user-id={this.props.data.user_id}
         >
             <PostHeader
                 postData={this.props.data}
@@ -176,9 +176,6 @@ export default class PostCard extends React.PureComponent {
                 id="post_content"
                 className={classnames(
                     "post_content",
-                    {
-                        ["nsfw"]: this.state.isNsfw && !this.state.nsfwAccepted,
-                    }
                 )}
             >
                 {
@@ -205,7 +202,6 @@ export default class PostCard extends React.PureComponent {
                         attachments={this.props.data.attachments}
                     />
                 }
-
             </div>
 
             <PostActions

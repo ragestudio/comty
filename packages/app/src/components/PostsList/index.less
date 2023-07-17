@@ -34,6 +34,8 @@ html {
 }
 
 .post-list_wrapper {
+    position: relative;
+
     display: flex;
     flex-direction: column;
 
@@ -42,6 +44,7 @@ html {
     width: fit-content;
 
     //overflow: hidden;
+    overflow-x: hidden;
     overflow-y: overlay;
 
     height: 100%;
@@ -52,7 +55,8 @@ html {
     position: relative;
 
     // WARN: Only use if is a performance issue (If is using virtualized list)
-    //will-change: transform;
+    will-change: transform;
+
     overflow: hidden;
     overflow-y: overlay;
 
@@ -66,17 +70,20 @@ html {
 
     border-radius: 8px;
 
-    margin: auto;
+    //margin: auto;
     z-index: 150;
 
     .postCard {
         width: 100%;
-        min-width: none;
+        min-width: 0;
+        // FIXME: This is a walkaround for a bug when a post contains multiple attachments cause a overflow
+        max-width: unset;
     }
 
     .playlistTimelineEntry {
         width: 100%;
-        min-width: none;
+        min-width: 0;
+        max-width: unset;
     }
 }
 
@@ -103,8 +110,8 @@ html {
     justify-content: center;
     align-items: center;
 
-    width: 35vw;
-    min-width: 300px;
+    width: 100%;
+    //min-width: 300px;
     max-width: 800px;
 
     opacity: 0;
