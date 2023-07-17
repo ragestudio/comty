@@ -252,6 +252,8 @@ export default class StreamViewer extends React.Component {
     }
 
     enterPlayerAnimation = () => {
+        app.layout.toggleCenteredContent(false)
+
         // make the interface a bit confortable for a video player
         app.cores.style.applyVariant("dark")
 
