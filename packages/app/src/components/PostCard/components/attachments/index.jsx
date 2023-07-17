@@ -1,19 +1,19 @@
 import React from "react"
 import { Skeleton } from "antd"
-import { Carousel } from "react-responsive-carousel"
 import { ImageViewer } from "components"
 import Plyr from "plyr-react"
 import mimetypes from "mime"
 
 import ContentFailed from "../contentFailed"
 
-import BearCarousel, { BearSlideCard } from "bear-react-carousel"
-
+import BearCarousel from "bear-react-carousel"
 
 import "bear-react-carousel/dist/index.css"
 import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
+
+const renderDebug = localStorage.getItem("render_debug") === "true"
 
 const Attachment = React.memo((props) => {
     const [loaded, setLoaded] = React.useState(false)
@@ -161,7 +161,7 @@ export default React.memo((props) => {
                 isEnablePagination
                 setController={setController}
                 onSlideChange={setCarouselState}
-                isDebug
+                isDebug={renderDebug}
             />
         }
     </div>
