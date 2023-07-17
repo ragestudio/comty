@@ -114,6 +114,32 @@ html {
 		/* disable the IOS popup when long-press on a link */
 	}
 
+	&.centered-content {
+		.app_layout {
+			.content_layout {
+				width: 45%;
+
+				min-width: 400px;
+				max-width: 45%;
+
+				margin: auto;
+
+				padding-left: 0;
+				padding-right: 10px;
+
+				@media screen and (max-width: 1920px) {
+					width: 50%;
+					max-width: 60%;
+				}
+
+				@media screen and (max-width: 1440px) {
+					width: 80%;
+					max-width: 80%;
+				}
+			}
+		}
+	}
+
 	#root {
 		position: fixed;
 		overflow: hidden;
@@ -130,32 +156,6 @@ html {
 		&.electron {
 			.ant-layout-sider {
 				padding-top: 0px;
-			}
-		}
-
-		&.centered-content {
-			.app_layout {
-				.content_layout {
-					width: 45%;
-
-					min-width: 400px;
-					max-width: 45%;
-
-					margin: auto;
-
-					padding-left: 0;
-					padding-right: 10px;
-
-					@media screen and (max-width: 1920px) {
-						width: 50%;
-						max-width: 60%;
-					}
-
-					@media screen and (max-width: 1440px) {
-						width: 80%;
-						max-width: 80%;
-					}
-				}
 			}
 		}
 	}
