@@ -1,5 +1,6 @@
 import { Session, User, authorizedServerTokens } from "@shared-classes/DbModels"
-import { Token } from "@lib"
+
+import createTokenRegeneration from "@utils/createTokenRegeneration"
 
 import SecureEntry from "@lib/secureEntry"
 
@@ -57,29 +58,12 @@ export default async (req, res, next) => {
                             return reject("Invalid token, cannot regenerate")
                         }
 
-                        let regenerationToken = null
-
-                        // check if this expired token has a regeneration token associated
-                        const associatedRegenerationToken = await Token.getRegenerationToken(token)
-
-                        if (associatedRegenerationToken) {
-                            regenerationToken = associatedRegenerationToken.refreshToken
-                        } else {
-                            // create a new regeneration token with the expired token
-                            regenerationToken = await Token.createNewRegenerationToken(token).catch((error) => {
-                                // in case of error, reject
-                                reject(error.message)
-
-                                return null
-                            })
-                        }
-
-                        if (!regenerationToken) return
+                        const refreshToken = await createTokenRegeneration(token)
 
                         // now send the regeneration token to the client (start Expired Exception Event [EEE])
                         return res.status(401).json({
                             error: "Token expired",
-                            refreshToken: regenerationToken.refreshToken,
+                            refreshToken: refreshToken,
                         })
                     }
 
