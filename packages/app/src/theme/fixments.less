@@ -121,6 +121,13 @@
     }
 }
 
+.ant-btn-primary:not(:disabled):not(.ant-btn-disabled) {
+    &:hover {
+        background-color: var(--colorPrimary);
+        filter: brightness(130%);
+    }
+}
+
 .ant-btn-primary[disabled] {
     opacity: 0.5 !important;
 
