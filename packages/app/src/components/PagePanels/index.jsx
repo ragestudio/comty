@@ -50,6 +50,10 @@ export class PagePanelWithNavMenu extends React.Component {
             const index = renders.findIndex((render) => render.id === id)
 
             renders.splice(index, 1)
+
+            this.setState({
+                renders: renders,
+            })
         }
     }
 
