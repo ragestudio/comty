@@ -62,9 +62,9 @@ export class PagePanelWithNavMenu extends React.Component {
 
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(false)
-        } else {
-            app.layout.toggleCenteredContent(true)
         }
+
+        app.layout.toggleCenteredContent(true)
     }
 
     componentWillUnmount() {
@@ -72,8 +72,6 @@ export class PagePanelWithNavMenu extends React.Component {
 
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(true)
-        } else {
-            app.layout.toggleCenteredContent(false)
         }
     }
 

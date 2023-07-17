@@ -245,9 +245,7 @@ export default (props) => {
     const [searchResults, setSearchResults] = React.useState(false)
 
     React.useEffect(() => {
-        if (app.isMobile) {
-            app.layout.toggleCenteredContent(true)
-        }
+        app.layout.toggleCenteredContent(true)
 
         app.layout.page_panels.attachComponent("music_navbar", MusicNavbar, {
             props: {
@@ -258,10 +256,6 @@ export default (props) => {
         return () => {
             if (app.layout.page_panels) {
                 app.layout.page_panels.detachComponent("music_navbar")
-            }
-
-            if (app.isMobile) {
-                app.layout.toggleCenteredContent(false)
             }
         }
     }, [])

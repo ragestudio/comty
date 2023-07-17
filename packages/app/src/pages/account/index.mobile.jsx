@@ -64,10 +64,6 @@ export default class Account extends React.Component {
         this.loadUser()
     }
 
-    componentWillUnmount = () => {
-        app.layout.toggleCenteredContent(false)
-    }
-
     toggleLike = async () => {
         const accept = await new Promise((resolve, reject) => {
             antd.Modal.confirm({

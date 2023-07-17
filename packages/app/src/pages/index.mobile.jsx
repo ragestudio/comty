@@ -5,6 +5,10 @@ import { PagePanelWithNavMenu } from "components/PagePanels"
 import Tabs from "./home/tabs"
 
 export default class Home extends React.Component {
+    componentDidMount() {
+        app.layout.toggleCenteredContent(false)
+    }
+
     render() {
         return <PagePanelWithNavMenu
             tabs={Tabs}
