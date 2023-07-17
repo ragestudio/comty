@@ -50,6 +50,7 @@
         "antd": "^5.6.4",
         "antd-mobile": "^5.31.0",
         "axios": "^1.4.0",
+        "bear-react-carousel": "^4.0.10-alpha.0",
         "buffer": "^6.0.3",
         "capacitor-music-controls-plugin-v3": "^1.1.0",
         "classnames": "2.3.1",
@@ -132,6 +133,7 @@
         "rxjs": "^7.5.5",
         "sort-by": "^1.2.0",
         "store": "^2.0.12",
+        "supertokens-web-js": "^0.6.0",
         "tone": "^14.7.77",
         "uuid": "^9.0.0",
         "wait-on": "^6.0.1"
