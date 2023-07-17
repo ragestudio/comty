@@ -45,10 +45,10 @@ const generateRoutes = () => {
 
     return Object.keys(paths).map((route) => {
         let path = route
-        .replace(/\/src\/pages|index|\.jsx$/g, "")
-        .replace(/\/src\/pages|index|\.tsx$/g, "")
-        .replace(/\/src\/pages|index|\.mobile|\.jsx$/g, "")
-        .replace(/\/src\/pages|index|\.mobile|\.tsx$/g, "")
+            .replace(/\/src\/pages|index|\.jsx$/g, "")
+            .replace(/\/src\/pages|index|\.tsx$/g, "")
+            .replace(/\/src\/pages|index|\.mobile|\.jsx$/g, "")
+            .replace(/\/src\/pages|index|\.mobile|\.tsx$/g, "")
 
         path = path.replace(/\[\.{3}.+\]/, "*").replace(/\[(.+)\]/, ":$1")
 
@@ -118,12 +118,6 @@ function generatePageElementWrapper(route, element, bindProps) {
                 document.title = `${routeDeclaration.useTitle} - ${config.app.siteName}`
             } else {
                 document.title = config.app.siteName
-            }
-
-            if (routeDeclaration.centeredContent) {
-                app.layout.toggleCenteredContent(true)
-            } else {
-                app.layout.toggleCenteredContent(false)
             }
         }
 

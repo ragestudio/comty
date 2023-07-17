@@ -8,6 +8,8 @@ html {
 
             width: 100%;
 
+            padding: 0 10px !important;
+
             .play_info_wrapper {
                 position: relative;
 
@@ -29,10 +31,6 @@ html {
                     }
                 }
             }
-
-            .list {
-                padding: 30px 0;
-            }
         }
     }
 }
@@ -45,10 +43,10 @@ html {
 
     width: 100%;
 
+    gap: 20px;
+
     &.vertical {
         flex-direction: column;
-
-        overflow-y: overlay;
 
         .play_info_wrapper {
             width: 100%;
@@ -59,7 +57,7 @@ html {
                 flex-direction: row;
                 width: 100%;
 
-                box-shadow: @card-shadow;
+                //box-shadow: @card-shadow;
 
                 .play_info_cover {
                     height: 15vh !important;
@@ -85,8 +83,6 @@ html {
     }
 
     .play_info_wrapper {
-        position: sticky;
-
         top: 0;
         left: 0;
 
@@ -223,8 +219,6 @@ html {
         flex-direction: column;
 
         color: var(--text-color);
-
-        padding: 20px 30px;
 
         gap: 10px;
 

@@ -113,18 +113,6 @@ export default (props) => {
         socketName: "music",
     })
 
-    React.useEffect(() => {
-        if (props.centered) {
-            app.layout.toggleCenteredContent(true)
-        }
-
-        return () => {
-            if (props.centered) {
-                app.layout.toggleCenteredContent(false)
-            }
-        }
-    }, [])
-
     if (!playlist) {
         return <antd.Skeleton active />
     }

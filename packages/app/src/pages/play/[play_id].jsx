@@ -5,8 +5,6 @@ import PlaylistsModel from "models/playlists"
 
 import PlaylistView from "components/Music/PlaylistView"
 
-import "./index.less"
-
 export default (props) => {
     const play_id = props.params.play_id
 
@@ -18,8 +16,6 @@ export default (props) => {
             app.message.error("Failed to load playlist")
             return null
         })
-
-        console.log(response)
 
         if (response) {
             setPlaylist(response)

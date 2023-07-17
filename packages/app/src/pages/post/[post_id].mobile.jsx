@@ -29,6 +29,8 @@ export default (props) => {
     }
 
     React.useEffect(() => {
+        app.layout.toggleCenteredContent(false)
+        
         loadData()
     }, [])
 

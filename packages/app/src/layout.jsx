@@ -67,6 +67,8 @@ export default class Layout extends React.PureComponent {
 		if (app.cores.settings.get("reduceAnimations")) {
 			this.layoutInterface.toggleRootContainerClassname("reduce-animations", true)
 		}
+
+		this.layoutInterface.toggleCenteredContent(true)
 	}
 
 	componentWillUnmount() {

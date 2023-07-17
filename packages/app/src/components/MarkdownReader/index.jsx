@@ -20,10 +20,6 @@ export default (props) => {
 
     React.useEffect(() => {
         app.layout.toggleCenteredContent(true)
-
-        return () => {
-            app.layout.toggleCenteredContent(false)
-        }
     }, [])
 
     if (E_Doc) {
