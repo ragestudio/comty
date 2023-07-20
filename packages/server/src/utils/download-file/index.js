@@ -3,26 +3,31 @@ import path from "path"
 import axios from "axios"
 
 export default async (payload) => {
-    let { url, destination } = payload
+    return new Promise(async (resolve, reject) => {
+        let { url, destination } = payload
 
-    // if destination path is not provided, use cache folder
-    if (!destination) {
-        destination = path.resolve(global.uploadCachePath, path.basename(url))
-    }
+        // if destination path is not provided, use cache folder
+        if (!destination) {
+            destination = path.resolve(global.uploadCachePath, path.basename(url))
+        }
 
-    console.log(destination)
+        const writer = fs.createWriteStream(destination).catch((err) => {
+            reject(err)
+            return false
+        })
 
-    const writer = fs.createWriteStream(destination)
+        if (!writer) {
+            return false
+        }
 
-    const response = await axios({
-        url,
-        method: "GET",
-        responseType: "stream"
-    })
+        const response = await axios({
+            url,
+            method: "GET",
+            responseType: "stream"
+        })
 
-    response.data.pipe(writer)
+        response.data.pipe(writer)
 
-    return new Promise((resolve, reject) => {
         writer.on("finish", () => resolve({
             destination,
             delete: () => fs.unlinkSync(destination),
