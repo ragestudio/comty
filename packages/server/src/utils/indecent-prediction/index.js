@@ -23,46 +23,51 @@ if (global.isProduction) {
 }
 
 export default async (payload) => {
-    let { url, image, channels = 3 } = payload
+    try {
+        let { url, image, channels = 3 } = payload
 
-    let file = null
-    const model = await nsfwjs.load()
+        let file = null
+        const model = await nsfwjs.load()
 
-    if (!image && url) {
-        file = await downloadFile({ url })
+        if (!image && url) {
+            file = await downloadFile({ url })
 
-        image = file.destination
-    }
-
-    // check if image is not a jpg
-    if (image.indexOf(".jpg") === -1) {
-        // convert image to jpg
-        const converted = await sharp(image)
-            .jpeg()
-            .toBuffer()
-
-        // write converted image to disk (use cache)
-        const destination = path.resolve(global.uploadCachePath, `${Date.now()}.jpg`)
-
-        fs.writeFileSync(destination, converted)
-
-        // set image to the converted image
-        file = {
-            destination,
-            delete: () => fs.unlinkSync(destination),
+            image = file.destination
         }
 
-        image = destination
+        // check if image is not a jpg
+        if (image.indexOf(".jpg") === -1) {
+            // convert image to jpg
+            const converted = await sharp(image)
+                .jpeg()
+                .toBuffer()
+
+            // write converted image to disk (use cache)
+            const destination = path.resolve(global.uploadCachePath, `${Date.now()}.jpg`)
+
+            fs.writeFileSync(destination, converted)
+
+            // set image to the converted image
+            file = {
+                destination,
+                delete: () => fs.unlinkSync(destination),
+            }
+
+            image = destination
+        }
+
+        const logo = readImage(image)
+        const input = imageToInput(logo, channels)
+
+        const predictions = await model.classify(input)
+
+        if (typeof file.delete === "function") {
+            await file.delete()
+        }
+
+        return predictions
+    } catch (error) {
+        console.error(`Failed to process image >`, error)
+        console.trace()
     }
-
-    const logo = readImage(image)
-    const input = imageToInput(logo, channels)
-
-    const predictions = await model.classify(input)
-
-    if (typeof file.delete === "function") {
-        await file.delete()
-    }
-
-    return predictions
 }
