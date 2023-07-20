@@ -85,7 +85,7 @@ export default class API {
 
         global.uploadCachePath = process.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
 
-        if (!fs.existSync(global.uploadCachePath)) {
+        if (!fs.existsSync(global.uploadCachePath)) {
             fs.mkdirSync(global.uploadCachePath, {
                 recursive: true,
             })
