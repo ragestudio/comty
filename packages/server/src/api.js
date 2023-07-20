@@ -84,6 +84,12 @@ export default class API {
 
         global.uploadCachePath = process.env.uploadCachePath ?? path.resolve(process.cwd(), "cache")
 
+        if (!fs.existSync(global.uploadCachePath)) {
+            fs.mkdirSync(global.uploadCachePath, {
+                recursive: true,
+            })
+        }
+
         global.DEFAULT_POSTING_POLICY = {
             maxMessageLength: 512,
             acceptedMimeTypes: [
