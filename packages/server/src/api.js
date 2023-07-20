@@ -1,4 +1,5 @@
 import path from "path"
+import fs from "fs"
 import { Server } from "linebridge/dist/server"
 
 import express from "express"
