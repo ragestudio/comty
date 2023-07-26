@@ -15,8 +15,15 @@ export default {
             return null
         })
 
+        const tidalData = await SyncModel.tidalCore.getCurrentUser().catch((err) => {
+            return null
+        })
+
         return {
-            spotifyAccount
+            publicData: {
+                spotify: spotifyAccount,
+                tidal: tidalData,
+            }
         }
     },
     settings: [
@@ -26,71 +33,34 @@ export default {
             title: "Sync Settings",
             description: "Sync your settings across all devices stored in the cloud",
             group: "sync.settings",
-            component: "Switch"
+            component: "Switch",
+            disabled: true,
+            storaged: false,
         },
         {
             id: "spotify",
             icon: "SiSpotify",
             title: "Spotify",
-            description: "Sync your Spotify account to get access to Spaces, playlists and more",
+            description: "Sync your Spotify account to get access to your playlists and other features",
             group: "sync.accounts",
-            component: loadable(() => import("./components/spotifySync")),
+            component: loadable(() => import("./components/syncAccountButton")),
+            props: {
+                icon: "SiSpotify",
+                namespace: "spotify"
+            },
             storaged: false
         },
         {
-            id: "soundcloud",
-            icon: "SiSoundcloud",
-            title: "SoundCloud",
+            id: "tidal",
+            icon: "SiTidal",
+            title: "Tidal",
+            description: "Sync your Tidal account to get access to your audio playback and playlists sync",
             group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "youtube",
-            icon: "SiYoutube",
-            title: "YouTube",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "twitch",
-            icon: "SiTwitch",
-            title: "Twitch",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "twitter",
-            icon: "SiTwitter",
-            title: "Twitter",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "instagram",
-            icon: "SiInstagram",
-            title: "Instagram",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "mixcloud",
-            icon: "SiMixcloud",
-            title: "Mixcloud",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
-            storaged: false
-        },
-        {
-            id: "discord",
-            icon: "SiDiscord",
-            title: "Discord",
-            group: "sync.accounts",
-            component: () => <p>Not implemented</p>,
+            component: loadable(() => import("./components/syncAccountButton")),
+            props: {
+                icon: "SiTidal",
+                namespace: "tidal"
+            },
             storaged: false
         }
     ]
