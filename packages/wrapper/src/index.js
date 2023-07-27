@@ -46,6 +46,11 @@ const developmentServers = [
         color: "bgYellow",
         cwd: path.resolve(global.__root, "../../file_server"),
     },
+    {
+        name: "SyncAPI",
+        color: "bgMagenta",
+        cwd: path.resolve(global.__root, "../../sync_server"),
+    }
 ]
 
 const ApiServers = [
@@ -96,6 +101,14 @@ const ApiServers = [
             protocol,
             port
         } = {}) => `${protocol ?? "http"}://${address ?? process.env.LOCALHOST}:${port ?? 3060}`
+    },
+    {
+        name: "sync",
+        remote: ({
+            address,
+            protocol,
+            port
+        } = {}) => `${protocol ?? "http"}://${address ?? process.env.LOCALHOST}:${port ?? 3070}`
     }
 ]
 
