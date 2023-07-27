@@ -3,9 +3,8 @@ import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
 import { CapacitorMusicControls } from 'capacitor-music-controls-plugin-v3'
 
-//import { LRUCache } from "lru-cache/dist/mjs/index"
-
 import PlaylistModel from "comty.js/models/playlists"
+import SyncModel from "comty.js/models/sync"
 
 import EmbbededMediaPlayer from "components/Player/MediaPlayer"
 import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
@@ -15,6 +14,26 @@ import AudioPlayerStorage from "./storage"
 import EqProcessorNode from "./processors/eqNode"
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
+
+const servicesToManifestResolver = {
+    "tidal": async (manifest) => {
+        const resolvedManifest = await SyncModel.tidalCore.getTrackManifest(manifest.id)
+
+        console.log(resolvedManifest)
+
+        manifest.source = resolvedManifest.playback.url
+
+        manifest.title = resolvedManifest.metadata.title
+        manifest.artist = resolvedManifest.metadata.artists.map(artist => artist.name).join(", ")
+        manifest.album = resolvedManifest.metadata.album.title
+
+        const coverUID = resolvedManifest.metadata.album.cover.replace(/-/g, "/")
+
+        manifest.cover = `https://resources.tidal.com/images/${coverUID}/1280x1280.jpg`
+
+        return manifest
+    }
+}
 
 function useMusicSync(event, data) {
     const currentRoomData = app.cores.sync.music.currentRoomData()
@@ -419,7 +438,10 @@ export default class Player extends Core {
 
                             if (this.state.syncMode) {
                                 useMusicSync("music:player:start", {
-                                    manifest: change.object.currentAudioManifest,
+                                    manifest: {
+                                        ...change.object.currentAudioManifest,
+                                        service: "inherit",
+                                    },
                                     state: this.currentState()
                                 })
                             }
@@ -689,6 +711,20 @@ export default class Player extends Core {
             manifest = {
                 src: manifest,
                 stream: false,
+            }
+        }
+
+        // check if manifest has `manifest` property
+        if (manifest.service) {
+            if (manifest.service !== "inherit") {
+                const resolver = servicesToManifestResolver[manifest.service]
+
+                if (!resolver) {
+                    console.error(`Service ${manifest.service} is not supported`)
+                    return false
+                }
+    
+                manifest = await resolver(manifest)
             }
         }
 
