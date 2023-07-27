@@ -24,6 +24,7 @@ const envOrigins = {
         marketplace: `http://${getCurrentHostname()}:3040`,
         music: `http://${getCurrentHostname()}:3050`,
         files: `http://${getCurrentHostname()}:3060`,
+        sync: `http://${getCurrentHostname()}:3070`,
     },
     "indev": {
         default: `https://indev_api.comty.app/main`,
@@ -32,6 +33,7 @@ const envOrigins = {
         marketplace: `https://indev_api.comty.app/marketplace`,
         music: `https://indev_api.comty.app/music`,
         files: `https://indev_api.comty.app/files`,
+        sync: `https://indev_api.comty.app/sync`,
     },
     "production": {
         default: "https://api.comty.app",
@@ -40,6 +42,7 @@ const envOrigins = {
         marketplace: `https://marketplace_api.comty.app`,
         music: `https://music_api.comty.app`,
         files: `https://files_api.comty.app`,
+        sync: `https://sync_api.comty.app`,
     }
 }
 
@@ -66,6 +69,10 @@ export default {
     },
     files: {
         origin: composeRemote("files"),
+        hasWebsocket: false,
+    },
+    sync: {
+        origin: composeRemote("sync"),
         hasWebsocket: false,
     }
 }

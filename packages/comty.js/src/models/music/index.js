@@ -14,4 +14,24 @@ export default class MusicModel {
 
         return data
     }
+
+    static search = async (keywords, {
+        limit = 5,
+        offset = 0,
+        useTidal = false,
+    }) => {
+        const { data } = await request({
+            instance: MusicModel.api_instance,
+            method: "GET",
+            url: `/search`,
+            params: {
+                keywords,
+                limit,
+                offset,
+                useTidal,
+            }
+        })
+
+        return data
+    }
 }
