@@ -13,7 +13,7 @@ const getPackages = require("./utils/getPackages")
 
 async function main() {
     const packages = await getPackages({
-        ignore: ["shared", "app", "wrapper", "comty.js", "sync_server"]
+        ignore: ["shared", "app", "wrapper", "comty.js"]
     })
 
     for await (const packageName of packages) {
