@@ -66,7 +66,7 @@ import API from "./api"
 async function main() {
     if (process.env.INFISICAL_TOKEN) {
         console.log(`🔑 Injecting env variables from INFISICAL...`)
-        
+
         const client = new infisical({
             token: process.env.INFISICAL_TOKEN,
         })
@@ -75,7 +75,9 @@ async function main() {
 
         // inject to process.env
         secrets.forEach((secret) => {
-            process.env[secret.secretName] = secret.secretValue
+            if (!(process.env[secret.secretName])) {
+                process.env[secret.secretName] = secret.secretValue
+            }
         })
     }
 
