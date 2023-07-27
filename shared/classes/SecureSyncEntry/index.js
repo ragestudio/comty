@@ -114,4 +114,21 @@ export default class SecureSyncEntry {
 
         return entry
     }
+
+    static async has(user_id, key) {
+        if (!user_id) {
+            throw new Error("Missing user_id")
+        }
+
+        if (!key) {
+            throw new Error("Missing key")
+        }
+
+        const entry = await SyncEntry.findOne({
+            user_id,
+            key,
+        }).catch(() => null)
+
+        return !!entry
+    }
 }
