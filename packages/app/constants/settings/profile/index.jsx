@@ -1,4 +1,3 @@
-import React from "react"
 import UserModel from "models/user"
 import loadable from "@loadable/component"
 import UploadButton from "components/UploadButton"
@@ -105,7 +104,6 @@ export default {
                 UploadButton
             ],
             "defaultValue": (ctx) => {
-                console.log(ctx)
                 return ctx.userData.avatar
             },
             "onUpdate": async (value) => {
@@ -118,7 +116,6 @@ export default {
                     return value
                 }
             },
-            "debounced": true,
         },
         {
             "id": "cover",
@@ -143,7 +140,6 @@ export default {
                     return value
                 }
             },
-            "debounced": true,
         },
         {
             "id": "description",

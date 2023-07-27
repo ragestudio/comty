@@ -419,6 +419,7 @@ export default class SettingItemComponent extends React.PureComponent {
                 currentValue: this.state.value,
                 dispatchUpdate: this.dispatchUpdate,
                 onUpdateItem: this.onUpdateItem,
+                processedCtx: this.props.ctx,
             },
             ref: this.componentRef,
 
@@ -469,7 +470,18 @@ export default class SettingItemComponent extends React.PureComponent {
                         {
                             this.props.setting.extraActions.map((action, index) => {
                                 if (typeof action === "function") {
-                                    return React.createElement(action)
+                                    return React.createElement(action, {
+                                        ctx: {
+                                            updateCurrentValue: (updateValue) => this.setState({
+                                                value: updateValue
+                                            }),
+                                            getCurrentValue: () => this.state.value,
+                                            currentValue: this.state.value,
+                                            dispatchUpdate: this.dispatchUpdate,
+                                            onUpdateItem: this.onUpdateItem,
+                                            processedCtx: this.props.ctx
+                                        },
+                                    })
                                 }
 
                                 const handleOnClick = () => {

@@ -7,6 +7,10 @@ import "./index.less"
 export default (props) => {
     const [value, setValue] = React.useState(props.ctx.currentValue)
 
+    React.useEffect(() => {
+        setValue(props.ctx.currentValue)
+    }, [props.ctx.currentValue])
+
     return <div className="imageUploader">
         {
             !props.noPreview && value && <div className="uploadPreview">
