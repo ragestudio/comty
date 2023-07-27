@@ -24,8 +24,6 @@ export { default as ModerationController } from "./ModerationController"
 
 export { default as AdminController } from "./AdminController"
 
-export { default as SyncController } from "./SyncController"
-
 export { default as AutoUpdateController } from "./AutoUpdate"
 
 export { default as NFCController } from "./NFCController"
