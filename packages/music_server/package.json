@@ -13,7 +13,8 @@
         "StorageClient": "src/shared-classes",
         "DbManager": "src/shared-classes",
         "Errors": "src/shared-classes",
-        "DbModels": "src/shared-classes"
+        "DbModels": "src/shared-classes",
+        "TidalAPI": "src/shared-classes"
     },
     "license": "MIT",
     "dependencies": {
