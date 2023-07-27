@@ -6,7 +6,7 @@ export default {
     route: "/",
     middlewares: ["withOptionalAuthentication"],
     fn: async (req, res) => {
-        const { keywords = "", params } = req.query
+        const { keywords = "", params = {} } = req.query
 
         let suggestions = {}
 
