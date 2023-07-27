@@ -125,7 +125,7 @@
 
 		.content {
 			height: 100%;
-			width: 50%;
+			width: 100%;
 
 			.fade-opacity-active {
 				height: 100%;
@@ -146,7 +146,13 @@
 			height: fit-content;
 			width: fit-content;
 
+			min-width: 15%;
+
 			justify-self: center;
+
+			.ant-menu-item-selected {
+				background-color: var(--background-color-primary)!important;
+			}
 		}
 	}
 
@@ -159,7 +165,7 @@
 	@media (max-width: 1720px) {
 		.panels {
 			.content {
-				width: 53%;
+				width: 60%;
 			}
 
 			.leftPanel {
@@ -176,6 +182,7 @@
 
 			.tabMenuWrapper {
 				width: fit-content;
+				min-width: 0;
 
 				top: 0;
 				right: 0;
