@@ -16,7 +16,8 @@ import "./index.less"
 const TabsComponent = {
 	"posts": PostsTab,
 	"followers": FollowersTab,
-	"details": DetailsTab
+	"details": DetailsTab,
+	"music": DetailsTab,
 }
 
 const TabRender = React.memo((props, ref) => {
@@ -75,6 +76,8 @@ export default class Account extends React.Component {
 	actionsRef = React.createRef()
 
 	componentDidMount = async () => {
+		app.layout.toggleCenteredContent(false)
+
 		const token = await SessionModel.getDecodedToken()
 		const location = window.app.history.location
 		const query = new URLSearchParams(location.search)
@@ -268,6 +271,15 @@ export default class Account extends React.Component {
 						>
 							<Translation>
 								{t => t("Posts")}
+							</Translation>
+						</antd.Menu.Item>
+
+						<antd.Menu.Item
+							key="music"
+							icon={<Icons.MdAlbum />}
+						>
+							<Translation>
+								{t => t("Music")}
 							</Translation>
 						</antd.Menu.Item>
 
