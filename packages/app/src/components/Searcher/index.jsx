@@ -152,9 +152,13 @@ export default (props) => {
         let result = null
 
         if (typeof props.model === "function") {
-            result = await props.model(value)
+            result = await props.model(value, {
+                ...props.modelParams,
+                limit_per_section: app.isMobile ? 3 : 5
+            })
         } else {
             result = await SearchModel.search(value, {
+                ...props.modelParams,
                 limit_per_section: app.isMobile ? 3 : 5
             })
         }
