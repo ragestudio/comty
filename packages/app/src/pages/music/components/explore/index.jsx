@@ -10,6 +10,8 @@ import { WithPlayerContext } from "contexts/WithPlayerContext"
 
 import FeedModel from "models/feed"
 import PlaylistModel from "models/playlists"
+import MusicModel from "models/music"
+import SyncModel from "models/sync"
 
 import MusicTrack from "components/Music/Track"
 import PlaylistItem from "components/Music/PlaylistItem"
@@ -17,11 +19,33 @@ import PlaylistItem from "components/Music/PlaylistItem"
 import "./index.less"
 
 const MusicNavbar = (props) => {
+    const [loading, setLoading] = React.useState(true)
+    const [hasTidal, setHasTidal] = React.useState(false)
+
+    React.useEffect(() => {
+        SyncModel.hasServiceLinked("tidal")
+            .catch(() => {
+                setHasTidal(false)
+                setLoading(false)
+            })
+            .then((value) => {
+                setHasTidal(value.active)
+                setLoading(false)
+            })
+    }, [])
+
+    if (loading) {
+        return null
+    }
+
     return <div className="music_navbar">
         <Searcher
             useUrlQuery
             renderResults={false}
-            model={PlaylistModel.search}
+            model={MusicModel.search}
+            modelParams={{
+                useTidal: hasTidal,
+            }}
             onSearchResult={props.setSearchResults}
             onEmpty={() => props.setSearchResults(false)}
         />
@@ -243,15 +267,27 @@ const SearchResults = ({
 
 export default (props) => {
     const [searchResults, setSearchResults] = React.useState(false)
+    const [loading, setLoading] = React.useState(true)
+    const [hasTidal, setHasTidal] = React.useState(false)
 
     React.useEffect(() => {
         app.layout.toggleCenteredContent(true)
 
         app.layout.page_panels.attachComponent("music_navbar", MusicNavbar, {
             props: {
-                setSearchResults: setSearchResults
+                setSearchResults: setSearchResults,
             }
         })
+
+        SyncModel.hasServiceLinked("tidal")
+            .catch(() => {
+                setHasTidal(false)
+                setLoading(false)
+            })
+            .then((value) => {
+                setHasTidal(value.active)
+                setLoading(false)
+            })
 
         return () => {
             if (app.layout.page_panels) {
@@ -259,6 +295,10 @@ export default (props) => {
             }
         }
     }, [])
+
+    if (loading) {
+        return null
+    }
 
     return <div
         className={classnames(
@@ -269,7 +309,10 @@ export default (props) => {
             app.isMobile && <Searcher
                 useUrlQuery
                 renderResults={false}
-                model={PlaylistModel.search}
+                model={MusicModel.search}
+                modelParams={{
+                    useTidal: hasTidal,
+                }}
                 onSearchResult={setSearchResults}
                 onEmpty={() => setSearchResults(false)}
             />
