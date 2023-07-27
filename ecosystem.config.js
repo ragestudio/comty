@@ -61,5 +61,15 @@ module.exports = {
             node_args: "-r dotenv/config",
             cwd: "./packages/file_server"
         },
+        {
+            name: "sync_api",
+            script: "./dist/index.js",
+            env:{
+                "NODE_ENV": "production",
+                "HTTP_LISTEN_PORT": 5005,
+            },
+            node_args: "-r dotenv/config",
+            cwd: "./packages/sync_server"
+        }
     ],
 }
