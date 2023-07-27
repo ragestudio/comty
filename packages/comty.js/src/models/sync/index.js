@@ -1,11 +1,47 @@
-import SpotifySyncModel from "./cores/spotifyCore"
+import spotifyService from "./services/spotify"
+import tidalService from "./services/tidal"
+
+const namespacesServices = {
+    spotify: spotifyService,
+    tidal: tidalService
+}
 
 export default class SyncModel {
-    static get bridge() {
-        return window.app?.cores.api.withEndpoints()
+    static get spotifyCore() {
+        return namespacesServices.spotify
     }
 
-    static get spotifyCore() {
-        return SpotifySyncModel
+    static get tidalCore() {
+        return namespacesServices.tidal
+    }
+
+    static async linkService(namespace) {
+        const service = namespacesServices[namespace]
+
+        if (!service || typeof service.linkAccount !== "function") {
+            throw new Error(`Service ${namespace} not found or not accepting linking.`)
+        }
+
+        return await service.linkAccount()
+    }
+
+    static async unlinkService(namespace) {
+        const service = namespacesServices[namespace]
+
+        if (!service || typeof service.unlinkAccount !== "function") {
+            throw new Error(`Service ${namespace} not found or not accepting unlinking.`)
+        }
+
+        return await service.unlinkAccount()
+    }
+
+    static async hasServiceLinked(namespace) {
+        const service = namespacesServices[namespace]
+
+        if (!service || typeof service.isActive !== "function") {
+            throw new Error(`Service ${namespace} not found or not accepting linking.`)
+        }
+
+        return await service.isActive()
     }
 }
