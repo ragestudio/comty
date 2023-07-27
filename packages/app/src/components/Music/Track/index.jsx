@@ -77,6 +77,10 @@ export default (props) => {
 
         <div className="music-track_right_actions">
             <div className="music-track_info">
+                {
+                    props.track.service === "tidal" && <Icons.SiTidal />
+                }
+                
                 <div className="music-track_info_duration">
                     {
                         props.track.metadata?.duration
