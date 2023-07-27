@@ -19,6 +19,23 @@ export default (props) => {
     </WithPlayerContext>
 }
 
+const ServiceIndicator = (props) => {
+    if (!props.service) {
+        return null
+    }
+
+    switch (props.service) {
+        case "tidal": {
+            return <div className="service_indicator">
+                <Icons.SiTidal /> Playing from Tidal
+            </div>
+        }
+        default: {
+            return null
+        }
+    }
+}
+
 // TODO: Queue view
 export class AudioPlayer extends React.Component {
     static contextType = Context
@@ -122,6 +139,10 @@ export class AudioPlayer extends React.Component {
             }
 
             <div className="player">
+                <ServiceIndicator
+                    service={this.context.currentManifest?.service}
+                />
+
                 <div
                     className="cover"
                     style={{
@@ -149,7 +170,7 @@ export class AudioPlayer extends React.Component {
                             }
 
                             {
-                                !app.isMobile && <LikeButton
+                                !app.isMobile && this.context.playbackStatus !== "stopped" && <LikeButton
                                     onClick={app.cores.player.toggleCurrentTrackLike}
                                     liked={this.context.liked}
                                 />
