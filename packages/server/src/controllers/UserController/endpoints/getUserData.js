@@ -28,6 +28,10 @@ export default {
             return res.status(404).json({ error: "User not exists" })
         }
 
+        if (req.user.roles.includes("admin")) {
+            return res.json(user)
+        }
+
         if (req.user._id.toString() !== user._id.toString()) {
             user = lodash.pick(user, publicGetters)
         }

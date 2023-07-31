@@ -4,9 +4,19 @@ export default {
     method: "GET",
     route: "/featured_wallpapers",
     fn: async (req, res) => {
-        const featuredWallpapers = await FeaturedWallpaper.find({})
+        const { all } = req.query
+
+        const query = {
+            active: true
+        }
+
+        if (all) {
+            delete query.active
+        }
+
+        const featuredWallpapers = await FeaturedWallpaper.find(query)
             .sort({ date: -1 })
-            .limit(10)
+            .limit(all ? undefined : 10)
             .catch(err => {
                 return res.status(500).json({
                     error: err.message
