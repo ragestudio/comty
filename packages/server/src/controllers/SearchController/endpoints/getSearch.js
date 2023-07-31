@@ -47,8 +47,24 @@ export default {
             }
         ]
 
+        let selectedSearchers = []
+
+        if (!Array.isArray(params.select)) {
+            selectedSearchers = searchers
+        } else {
+            const findedSearchers = []
+
+            for (const searcher of searchers) {
+                if (params.select.includes(searcher.id)) {
+                    findedSearchers.push(searcher)
+                }
+            }
+
+            selectedSearchers = findedSearchers
+        }
+
         await pmap(
-            searchers,
+            selectedSearchers,
             async (searcher) => {
                 let results = await searcher.model.find(searcher.query)
                     .limit(searcher.limit ?? 5)
