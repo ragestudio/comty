@@ -80,4 +80,14 @@ export default class TidalService {
 
         return data
     }
+
+    static async getMyFavoriteTracks() {
+        const { data } = await request({
+            instance: TidalService.api_instance,
+            method: "GET",
+            url: `/services/tidal/favorites/tracks`,
+        })
+
+        return data
+    }
 }
