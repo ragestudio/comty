@@ -9,7 +9,6 @@ export { default as UserRegister } from "./UserRegister"
 export { default as Login } from "./Login"
 
 // COMPLEX COMPONENTS
-export { default as FormGenerator } from "./FormGenerator"
 export { default as ActionsBar } from "./ActionsBar"
 export { default as ObjectInspector } from "./ObjectInspector"
 export { default as ModifierTag } from "./ModifierTag"
