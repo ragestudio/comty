@@ -56,7 +56,7 @@
         "classnames": "2.3.1",
         "dexie": "^3.2.3",
         "dompurify": "^3.0.0",
-        "evite": "^0.15.6",
+        "evite": "^0.17.0",
         "fast-average-color": "^9.2.0",
         "feather-reactjs": "2.0.13",
         "framer-motion": "^10.12.17",
