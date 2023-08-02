@@ -60,11 +60,11 @@ export default React.forwardRef((props, ref) => {
             {loadingComponent && React.createElement(loadingComponent)}
         </div>
 
-        <div
+        {/* <div
             className="no-result"
             style={{ display: hasMore ? "none" : "block" }}
         >
             {noResultComponent ? React.createElement(noResultComponent) : "No more result"}
-        </div>
+        </div> */}
     </div>
 })

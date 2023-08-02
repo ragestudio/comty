@@ -79,7 +79,7 @@ export default (props) => {
                 </div>
 
                 {
-                    props.user && <div
+                    app.userData && <div
                         className="actions"
                         style={{
                             marginBottom: "50px"
@@ -92,7 +92,7 @@ export default (props) => {
                                 app.navigation.goMain()
                             }}
                         >
-                            Continue as {props.user.username}
+                            Continue as {app.userData.username}
                         </antd.Button>
                     </div>
                 }
@@ -131,7 +131,7 @@ export default (props) => {
 
                     <p>
                         <Icons.Info />
-                        Registering a new account accepts the <a>Terms and Conditions</a> and <a>Privacy policy</a> for the services provided by {config.author}
+                        Registering a new account accepts the <a onClick={() => app.location.push("/terms")}>Terms and Conditions</a> and <a onClick={() => app.location.push("/privacy")}>Privacy policy</a> for the services provided by {config.author}
                     </p>
                 </div>
             </div>

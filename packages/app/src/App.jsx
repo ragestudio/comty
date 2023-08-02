@@ -80,7 +80,6 @@ import {
 	UserRegister,
 	Searcher,
 	NotificationsCenter,
-	PostViewer,
 	PostCreator,
 } from "components"
 import { DOMWindow } from "components/RenderWindow"
@@ -94,8 +93,6 @@ import * as Router from "./router"
 
 import "theme/index.less"
 
-console.log(`REACT VERSION: ${React.version}`)
-
 CapacitorUpdater.notifyAppReady()
 
 class ComtyApp extends React.Component {
@@ -106,9 +103,6 @@ class ComtyApp extends React.Component {
 			app.eventBus.on(event, this.eventsHandlers[event])
 		})
 	}
-
-	sessionController = new SessionModel()
-	userController = new UserModel()
 
 	state = {
 		session: null,
@@ -222,7 +216,7 @@ class ComtyApp extends React.Component {
 					})
 				}
 
-				return app.layout.modal.open("searcher", () => <Searcher renderResults />)
+				return app.layout.modal.open("searcher", (props) => <Searcher renderResults {...props} />)
 			},
 			openFullImageViewer: (src) => {
 				const win = new DOMWindow({
@@ -238,11 +232,9 @@ class ComtyApp extends React.Component {
 					showRotate
 				/>)
 			},
-			openPostViewer: (post) => {
-				app.layout.modal.open("post_viewer", () => <PostViewer post={post} />)
-			},
+
 			openPostCreator: () => {
-				app.layout.modal.open("post_creator", () => <PostCreator />)
+				app.layout.modal.open("post_creator", (props) => <PostCreator {...props} />)
 			}
 		},
 		navigation: {
@@ -452,11 +444,7 @@ class ComtyApp extends React.Component {
 			})
 		}
 
-		app.eventBus.emit("app.initialization.start")
-
 		await this.initialization()
-
-		app.eventBus.emit("app.initialization.finish")
 
 		app.cores.sound.useUIAudio("splash_out")
 
@@ -470,18 +458,15 @@ class ComtyApp extends React.Component {
 	}
 
 	initialization = async () => {
+		app.eventBus.emit("app.initialization.start")
+
 		console.debug(`[App] Initializing app`)
 
 		const initializationTasks = [
 			async () => {
 				try {
 					await this.__SessionInit()
-					await this.__UserInit()
-
-					app.eventBus.emit("app.initialization.session_success")
 				} catch (error) {
-					app.eventBus.emit("app.initialization.session_error", error)
-
 					console.error(`[App] Error while initializing session`, error)
 
 					throw {
@@ -500,6 +485,8 @@ class ComtyApp extends React.Component {
 				details: reason.details,
 			})
 		})
+
+		app.eventBus.emit("app.initialization.finish")
 	}
 
 	__SessionInit = async () => {
@@ -510,31 +497,23 @@ class ComtyApp extends React.Component {
 			return false
 		}
 
-		const session = await SessionModel.getCurrentSession().catch((error) => {
-			console.error(`[App] Cannot get current session: ${error.message}`)
+		const user = await UserModel.data().catch((err) => {
 			return false
 		})
 
-		await this.setState({ session })
-	}
-
-	__UserInit = async () => {
-		if (!this.state.session) {
+		if (!user) {
+			app.eventBus.emit("app.no_session")
 			return false
 		}
 
-		const user = await UserModel.data()
-
 		app.userData = user
 
-		this.setState({ user })
+		await this.setState({
+			user
+		})
 	}
 
 	render() {
-		if (!this.state.initialized) {
-			return <></>
-		}
-
 		return <React.Fragment>
 			<Helmet>
 				<title>{config.app.siteName}</title>
@@ -547,14 +526,12 @@ class ComtyApp extends React.Component {
 						user={this.state.user}
 						staticRenders={ComtyApp.staticRenders}
 						bindProps={{
-							staticRenders: ComtyApp.staticRenders,
 							user: this.state.user,
-							session: this.state.session,
-							sessionController: this.sessionController,
-							userController: this.userController,
 						}}
 					>
-						<Router.PageRender />
+						{
+							this.state.initialized && <Router.PageRender />
+						}
 					</Layout>
 				</ThemeProvider>
 			</Router.InternalRouter>

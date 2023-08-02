@@ -93,19 +93,6 @@ function generatePageElementWrapper(route, element, bindProps) {
                 }
             }
 
-            if (typeof routeDeclaration.requiredRoles !== "undefined") {
-                const isAdmin = bindProps.user?.roles?.includes("admin") ?? false
-
-                if (!isAdmin && !routeDeclaration.requiredRoles.some((role) => bindProps.user?.roles?.includes(role))) {
-                    return <Result
-                        status="403"
-                        title="403"
-                        subTitle="Sorry, you are not authorized to access this page."
-                        extra={<Button type="primary" onClick={() => window.app.location.push("/")}>Back Home</Button>}
-                    />
-                }
-            }
-
             if (routeDeclaration.useLayout) {
                 app.layout.set(routeDeclaration.useLayout)
             }

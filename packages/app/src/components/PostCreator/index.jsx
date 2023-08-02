@@ -28,7 +28,7 @@ export default class PostCreator extends React.Component {
         postAttachments: [],
 
         fileList: [],
-        postingPolicy: DEFAULT_POST_POLICY
+        postingPolicy: DEFAULT_POST_POLICY,
     }
 
     creatorRef = React.createRef()

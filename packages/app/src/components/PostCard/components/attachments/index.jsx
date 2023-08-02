@@ -9,7 +9,6 @@ import ContentFailed from "../contentFailed"
 import BearCarousel from "bear-react-carousel"
 
 import "bear-react-carousel/dist/index.css"
-import "react-responsive-carousel/lib/styles/carousel.min.css"
 import "plyr-react/dist/plyr.css"
 import "./index.less"
 

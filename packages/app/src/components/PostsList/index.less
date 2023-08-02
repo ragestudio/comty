@@ -73,6 +73,58 @@ html {
     //margin: auto;
     z-index: 150;
 
+    slot {
+        slot {
+            .post_card {
+                border-radius: 0;
+                border-bottom: 2px solid var(--border-color);
+            }
+
+            .playlistTimelineEntry {
+                border-radius: 0;
+                border-bottom: 2px solid var(--border-color);
+            }
+        }
+
+        &:first-child {
+            slot {
+                .post_card {
+                    border-radius: 8px;
+
+                    border-bottom-left-radius: 0px;
+                    border-bottom-right-radius: 0px;
+                }
+
+                .playlistTimelineEntry {
+                    border-radius: 8px;
+
+                    border-bottom-left-radius: 0px;
+                    border-bottom-right-radius: 0px;
+                }
+            }
+        }
+
+        &:last-child {
+            slot {
+                .post_card {
+                    border-top-left-radius: 0px;
+                    border-top-right-radius: 0px;
+
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                }
+
+                .playlistTimelineEntry {
+                    border-top-left-radius: 0px;
+                    border-top-right-radius: 0px;
+
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                }
+            }
+        }
+    }
+
     .postCard {
         width: 100%;
         min-width: 0;
