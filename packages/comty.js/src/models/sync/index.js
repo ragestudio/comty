@@ -1,6 +1,8 @@
 import spotifyService from "./services/spotify"
 import tidalService from "./services/tidal"
 
+import request from "../../handlers/request"
+
 const namespacesServices = {
     spotify: spotifyService,
     tidal: tidalService
@@ -43,5 +45,15 @@ export default class SyncModel {
         }
 
         return await service.isActive()
+    }
+
+    static async getLinkedServices() {
+        const response = await request({
+            instance:  globalThis.__comty_shared_state.instances["sync"],
+            method: "GET",
+            url: "/active_services",
+        })
+
+        return response.data
     }
 }

@@ -28,7 +28,7 @@ export default class FeedModel {
         return data
     }
 
-    static getTimelineFeed = async ({ trim, limit } = {}) => {
+    static getTimelineFeed = async ({ trim, limit = 10 } = {}) => {
         const { data } = await request({
             method: "GET",
             url: `/feed/timeline`,
