@@ -9,7 +9,6 @@ import { Icons, createIconRender } from "components/Icons"
 import { WithPlayerContext } from "contexts/WithPlayerContext"
 
 import FeedModel from "models/feed"
-import PlaylistModel from "models/playlists"
 import MusicModel from "models/music"
 import SyncModel from "models/sync"
 
@@ -19,32 +18,13 @@ import PlaylistItem from "components/Music/PlaylistItem"
 import "./index.less"
 
 const MusicNavbar = (props) => {
-    const [loading, setLoading] = React.useState(true)
-    const [hasTidal, setHasTidal] = React.useState(false)
-
-    React.useEffect(() => {
-        SyncModel.hasServiceLinked("tidal")
-            .catch(() => {
-                setHasTidal(false)
-                setLoading(false)
-            })
-            .then((value) => {
-                setHasTidal(value.active)
-                setLoading(false)
-            })
-    }, [])
-
-    if (loading) {
-        return null
-    }
-
     return <div className="music_navbar">
         <Searcher
             useUrlQuery
             renderResults={false}
             model={MusicModel.search}
             modelParams={{
-                useTidal: hasTidal,
+                useTidal: app.cores.sync.getActiveLinkedServices().tidal,
             }}
             onSearchResult={props.setSearchResults}
             onEmpty={() => props.setSearchResults(false)}
