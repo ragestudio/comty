@@ -1,6 +1,4 @@
 import React from "react"
-import ReactDOM from "react-dom"
-import SVG from "react-inlinesvg"
 
 import Core from "evite/src/core"
 import config from "config"
@@ -66,10 +64,9 @@ export class ThemeProvider extends React.Component {
 }
 
 export default class StyleCore extends Core {
-	static refName = "style"
-	static dependencies = ["settings"]
-
 	static namespace = "style"
+
+	static dependencies = ["settings"]
 
 	static themeManifestStorageKey = "theme"
 	static modificationStorageKey = "themeModifications"
@@ -140,7 +137,7 @@ export default class StyleCore extends Core {
 
 		// handle auto prefered color scheme
 		window.matchMedia("(prefers-color-scheme: light)").addListener(() => {
-			console.log(`[THEME] Auto color scheme changed`)
+			this.console.log(`[THEME] Auto color scheme changed`)
 
 			this.applyVariant(StyleCore.variant)
 		})
@@ -250,7 +247,7 @@ export default class StyleCore extends Core {
 		const values = this.public.theme.variants[variant]
 
 		if (!values) {
-			console.error(`Variant [${variant}] not found`)
+			this.console.error(`Variant [${variant}] not found`)
 			return false
 		}
 

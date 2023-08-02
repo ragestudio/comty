@@ -21,13 +21,13 @@ export default class TasksQueue extends Core {
 
     processTasks() {
         if (this.runningTasksIds.length >= TasksQueue.maxRunningTasks ?? 1) {
-            console.log("We are already running the maximum number of tasks")
+            this.console.log("We are already running the maximum number of tasks")
             return false
         }
 
         // check if there are new tasks in the queue and move them to the tasks array with the maximum number of tasks can be run
         if (this.taskQueue.length === 0) {
-            console.log("No tasks in the queue")
+            this.console.log("No tasks in the queue")
             return false
         }
 
@@ -67,7 +67,7 @@ export default class TasksQueue extends Core {
                 this.processTasks()
             })
             .catch((error) => {
-                console.error(error)
+                this.console.error(error)
                 this.processTasks()
             })
     }

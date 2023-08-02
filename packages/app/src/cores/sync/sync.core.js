@@ -7,6 +7,8 @@ import SyncRoomCard from "components/SyncRoomCard"
 import Image from "components/Image"
 import { openModal as OpenUserSelectorModal } from "components/UserSelector"
 
+import SyncModel from "comty.js/models/sync"
+
 // TODO: Sync current state with server
 class MusicSyncSubCore {
     constructor(ctx) {
@@ -40,7 +42,7 @@ class MusicSyncSubCore {
 
     hubEvents = {
         "invite:received": (data) => {
-            console.log("invite:received", data)
+            this.console.log("invite:received", data)
 
             app.notification.new({
                 title: "Sync",
@@ -60,7 +62,7 @@ class MusicSyncSubCore {
             })
         },
         "room:joined": (data) => {
-            console.log("room:joined", data)
+            this.console.log("room:joined", data)
 
             this.currentRoomData = data
 
@@ -72,7 +74,7 @@ class MusicSyncSubCore {
             this.eventBus.emit("room:joined", data)
         },
         "room:left": (data) => {
-            console.log("room:left", data)
+            this.console.log("room:left", data)
 
             this.dettachCard()
 
@@ -106,7 +108,7 @@ class MusicSyncSubCore {
             this.eventBus.emit("room:user:left", data)
         },
         "room:current-data": (data) => {
-            console.log("room:current-data", data)
+            this.console.log("room:current-data", data)
             this.currentRoomData = data
 
             this.eventBus.emit("room:current-data", data)
@@ -167,7 +169,7 @@ class MusicSyncSubCore {
             }
         },
         "room:moderation:kicked": (data) => {
-            console.log("room:moderation:kicked", data)
+            this.console.log("room:moderation:kicked", data)
 
             this.dettachCard()
 
@@ -208,7 +210,7 @@ class MusicSyncSubCore {
 
             let state = app.cores.player.currentState()
 
-            console.log("state", state)
+            this.console.log("state", state)
 
             this.musicWs.emit("music:state:update", {
                 ...state,
@@ -235,7 +237,7 @@ class MusicSyncSubCore {
         }
 
         if (!app.layout.floatingStack) {
-            console.error("Floating stack not found")
+            this.console.error("Floating stack not found")
             return false
         }
 
@@ -248,7 +250,7 @@ class MusicSyncSubCore {
         }
 
         if (!app.layout.floatingStack) {
-            console.error("Floating stack not found")
+            this.console.error("Floating stack not found")
             return false
         }
 
@@ -259,7 +261,7 @@ class MusicSyncSubCore {
 
     joinRoom(roomId, options) {
         if (this.currentRoomData) {
-            console.warn(`Already joined room ${this.currentRoomData}`)
+            this.console.warn(`Already joined room ${this.currentRoomData}`)
 
             return false
         }
@@ -280,7 +282,7 @@ class MusicSyncSubCore {
         this.dettachCard()
 
         if (!roomId && !this.currentRoomData) {
-            console.warn(`Not joined any room`)
+            this.console.warn(`Not joined any room`)
 
             return false
         }
@@ -307,7 +309,7 @@ class MusicSyncSubCore {
 
     inviteToUser(userId) {
         if (!this.currentRoomData) {
-            console.warn(`Not joined any room`)
+            this.console.warn(`Not joined any room`)
 
             return false
         }
@@ -320,7 +322,7 @@ class MusicSyncSubCore {
 
     createSyncRoom() {
         if (this.currentRoomData) {
-            console.warn(`Already joined room ${this.currentRoomData}`)
+            this.console.warn(`Already joined room ${this.currentRoomData}`)
 
             return false
         }
@@ -336,14 +338,14 @@ class MusicSyncSubCore {
         //open invite modal
         OpenUserSelectorModal({
             onFinished: (selected_ids) => {
-                console.log("selected_ids", selected_ids)
+                this.console.log("selected_ids", selected_ids)
             }
         })
     }
 
     kickUser(userId) {
         if (!this.currentRoomData) {
-            console.warn(`Not joined any room`)
+            this.console.warn(`Not joined any room`)
 
             return false
         }
@@ -356,7 +358,7 @@ class MusicSyncSubCore {
 
     transferOwner(userId) {
         if (!this.currentRoomData) {
-            console.warn(`Not joined any room`)
+            this.console.warn(`Not joined any room`)
 
             return false
         }
@@ -369,11 +371,16 @@ class MusicSyncSubCore {
 }
 
 export default class SyncCore extends Core {
-    static refName = "sync"
     static namespace = "sync"
     static dependencies = ["api", "player"]
 
-    public = {}
+    activeLinkedServices = {}
+
+    public = {
+        getActiveLinkedServices: function () {
+            return this.activeLinkedServices
+        }.bind(this),
+    }
 
     async onInitialize() {
         const subCores = [
@@ -390,8 +397,20 @@ export default class SyncCore extends Core {
                     this.public[subCore.constructor.namespace] = subCore.public
                 }
             } catch (error) {
-                console.error(error)
+                this.console.error(error)
             }
+        }
+    }
+
+    async initializeAfterCoresInit() {
+        const activeServices = await SyncModel.getLinkedServices().catch((error) => {
+            this.console.error(error)
+            return null
+        })
+
+        if (activeServices) {
+            this.console.log(`Active services`, activeServices)
+            this.activeLinkedServices = activeServices
         }
     }
 }

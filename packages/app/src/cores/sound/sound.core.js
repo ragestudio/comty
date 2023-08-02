@@ -5,8 +5,6 @@ import axios from "axios"
 import store from "store"
 
 export default class SoundCore extends Core {
-    static refName = "sound"
-
     static namespace = "sound"
 
     soundsPool = {}
@@ -20,7 +18,7 @@ export default class SoundCore extends Core {
                     this.play(audio_id)
                 }
             } catch (error) {
-                console.error(error)
+                this.console.error(error)
             }
         }.bind(this)
     }
@@ -49,17 +47,17 @@ export default class SoundCore extends Core {
 
                 soundpack = data
             } else {
-                console.error(`Soundpack [${storedCustomSoundpack}] is not a valid url.`)
+                this.console.error(`Soundpack [${storedCustomSoundpack}] is not a valid url.`)
                 return false
             }
         }
 
         if (typeof soundpack.sounds !== "object") {
-            console.error(`Soundpack [${soundpack.id}] is not a valid soundpack.`)
+            this.console.error(`Soundpack [${soundpack.id}] is not a valid soundpack.`)
             return false
         }
 
-        console.log(`Loading soundpack [${soundpack.id} | ${soundpack.name}] by ${soundpack.author} (${soundpack.version})`)
+        this.console.log(`Loading soundpack [${soundpack.id} | ${soundpack.name}] by ${soundpack.author} (${soundpack.version})`)
 
         for (const [name, path] of Object.entries(soundpack.sounds)) {
             this.soundsPool[name] = new Howl({
@@ -93,7 +91,7 @@ export default class SoundCore extends Core {
         const audioInstance = this.soundsPool[name]
 
         if (!audioInstance) {
-            console.error(`Sound [${name}] not found or is not available.`)
+            this.console.error(`Sound [${name}] not found or is not available.`)
             return false
         }
 

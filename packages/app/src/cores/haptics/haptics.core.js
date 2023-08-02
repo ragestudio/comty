@@ -9,8 +9,8 @@ const vibrationPatterns = {
 }
 
 export default class HapticsCore extends Core {
-    static refName = "haptics"
     static namespace = "haptics"
+    
     static dependencies = [
         "settings"
     ]

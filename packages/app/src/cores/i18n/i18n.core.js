@@ -15,7 +15,7 @@ export function extractLocaleFromPath(path = "") {
 const messageImports = import.meta.glob("schemas/translations/*.json")
 
 export default class I18nCore extends Core {
-    static refName = "i18n"
+    static namespace = "i18n"
     
     onEvents = {
         "changeLanguage": (locale) => {
@@ -67,7 +67,7 @@ export default class I18nCore extends Core {
                 i18n.changeLanguage(locale)
             }
         } catch (error) {
-            console.error(error)
+            this.console.error(error)
         }
     }
 }

@@ -8,8 +8,10 @@ import useRequest from "comty.js/hooks/useRequest"
 import { reconnectWebsockets } from "comty.js"
 
 export default class APICore extends Core {
-    static refName = "api"
     static namespace = "api"
+
+    static bgColor = "coral"
+    static textColor = "black"
 
     instance = null
 
@@ -37,7 +39,7 @@ export default class APICore extends Core {
 
     createPingIntervals() {
         Object.keys(this.instance.wsInstances).forEach((instance) => {
-            console.debug(`[API] Creating ping interval for ${instance}`)
+            this.console.debug(`[API] Creating ping interval for ${instance}`)
 
             if (this.instance.wsInstances[instance].pingInterval) {
                 clearInterval(this.instance.wsInstances[instance].pingInterval)
@@ -45,14 +47,14 @@ export default class APICore extends Core {
 
             this.instance.wsInstances[instance].pingInterval = setInterval(() => {
                 if (this.instance.wsInstances[instance].pendingPingTry && this.instance.wsInstances[instance].pendingPingTry > 3) {
-                    console.debug(`[API] Ping timeout for ${instance}`)
+                    this.console.debug(`[API] Ping timeout for ${instance}`)
 
                     return clearInterval(this.instance.wsInstances[instance].pingInterval)
                 }
 
                 const timeStart = Date.now()
 
-                //console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
+                //this.console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
 
                 this.instance.wsInstances[instance].emit("ping", () => {
                     this.instance.wsInstances[instance].latency = Date.now() - timeStart
@@ -92,7 +94,7 @@ export default class APICore extends Core {
             method: "GET",
             url: "/ping",
         }).catch((error) => {
-            console.error("[API] Ping error", error)
+            this.console.error("[API] Ping error", error)
 
             throw new Error(`
                 Could not connect to the API. 
@@ -100,7 +102,7 @@ export default class APICore extends Core {
             `)
         })
 
-        console.debug("[API] Attached to", this.instance)
+        this.console.debug("[API] Attached to", this.instance)
 
         this.createPingIntervals()
 

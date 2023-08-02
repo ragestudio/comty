@@ -151,7 +151,7 @@ class ChunkedUpload {
             .catch((err) => {
                 if (this.paused || this.offline) return
 
-                console.error(err)
+                this.console.error(err)
 
                 // this type of error can happen after network disconnection on CORS setup
                 this.manageRetries()
@@ -208,7 +208,7 @@ export default class RemoteStorage extends Core {
                 })
 
                 uploader.on("error", ({ message }) => {
-                    console.error("[Uploader] Error", message)
+                    this.console.error("[Uploader] Error", message)
 
                     if (typeof onError === "function") {
                         onError(file, message)
@@ -219,7 +219,7 @@ export default class RemoteStorage extends Core {
                 })
 
                 uploader.on("progress", ({ percentProgress }) => {
-                    //console.debug(`[Uploader] Progress: ${percentProgress}%`)
+                    //this.console.debug(`[Uploader] Progress: ${percentProgress}%`)
 
                     if (typeof onProgress === "function") {
                         onProgress(file, percentProgress)
@@ -227,7 +227,7 @@ export default class RemoteStorage extends Core {
                 })
 
                 uploader.on("finish", (data) => {
-                    console.debug("[Uploader] Finish", data)
+                    this.console.debug("[Uploader] Finish", data)
 
                     if (typeof onFinish === "function") {
                         onFinish(file, data)
