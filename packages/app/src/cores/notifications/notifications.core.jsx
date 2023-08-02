@@ -13,7 +13,7 @@ const NotfTypeToAudio = {
 }
 
 export default class NotificationCore extends Core {
-    static refName = "notifications"
+    static namespace = "notifications"
 
     onEvents = {
         "changeNotificationsSoundVolume": (value) => {

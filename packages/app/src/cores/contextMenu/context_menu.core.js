@@ -7,7 +7,6 @@ import ContextMenu from "./components/contextMenu"
 import InternalContexts from "schemas/menu-contexts"
 
 export default class ContextMenuCore extends Core {
-    static refName = "contextMenu"
     static namespace = "contextMenu"
 
     public = {
@@ -26,7 +25,7 @@ export default class ContextMenuCore extends Core {
 
     async onInitialize() {
         if (app.isMobile) {
-            console.warn("Context menu is not available on mobile")
+            this.console.warn("Context menu is not available on mobile")
             return false
         }
 
@@ -125,7 +124,7 @@ export default class ContextMenuCore extends Core {
         const items = await this.generateItems(component)
 
         if (!items) {
-            console.warn("No context menu items found, aborting")
+            this.console.warn("No context menu items found, aborting")
             return false
         }
 

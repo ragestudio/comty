@@ -29,7 +29,7 @@ export default class WidgetsCore extends Core {
                 store.set(WidgetsCore.storeKey, [])
             }
         } catch (error) {
-            console.error(error)
+            this.console.error(error)
         }
     }
 
@@ -40,7 +40,7 @@ export default class WidgetsCore extends Core {
     isInstalled(widget_id) {
         const widgets = this.getInstalled()
 
-        console.log(widgets)
+        this.console.log(widgets)
 
         const widget = widgets.find((widget) => widget._id === widget_id)
 
@@ -52,14 +52,14 @@ export default class WidgetsCore extends Core {
             throw new Error("Widget id must be a string.")
         }
 
-        console.debug(`🧩 Installing widget with id [${widget_id}]`)
+        this.console.debug(`🧩 Installing widget with id [${widget_id}]`)
 
         // get manifest
         let manifest = await WidgetsCore.apiInstance({
             method: "GET",
             url: `/widgets/${widget_id}/manifest`,
         }).catch((error) => {
-            console.error(error)
+            this.console.error(error)
             app.message.error("Cannot install widget.")
 
             return false
@@ -125,7 +125,7 @@ export default class WidgetsCore extends Core {
             throw new Error("Widget id must be a string.")
         }
 
-        console.debug(`🧩 Uninstalling widget with id [${widget_id}]`)
+        this.console.debug(`🧩 Uninstalling widget with id [${widget_id}]`)
 
         // check if already installed
         if (!this.isInstalled(widget_id)) {

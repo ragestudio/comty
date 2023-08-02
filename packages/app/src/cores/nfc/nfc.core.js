@@ -77,8 +77,6 @@ function parseNdefMessage(ndefMessage) {
 }
 
 export default class NFC extends Core {
-    static refName = "NFC"
-
     static namespace = "nfc"
 
     isNativeMode = false
@@ -141,7 +139,7 @@ export default class NFC extends Core {
             this.public.scanning = false
             this.public.incompatible = true
 
-            console.error(error)
+            this.console.error(error)
         }
     }
 
@@ -153,7 +151,7 @@ export default class NFC extends Core {
     }
 
     handleRead(tag) {
-        console.debug(`[NFC] READ >`, tag)
+        this.console.debug(`[NFC] READ >`, tag)
 
         // send to subscribers
         this.subscribers.forEach((subscriber) => {
@@ -173,7 +171,7 @@ export default class NFC extends Core {
     }
 
     handleNativeRead(tag) {
-        console.debug(`[NFC] NATIVE READ >`, tag)
+        this.console.debug(`[NFC] NATIVE READ >`, tag)
 
         tag.serialNumber = resolveSerialNumber(tag)
 
@@ -230,7 +228,7 @@ export default class NFC extends Core {
     }
 
     async writeNdef(payload, options) {
-        console.debug(`[NFC] WRITE >`, payload)
+        this.console.debug(`[NFC] WRITE >`, payload)
 
         if (!this.isNativeMode) {
             return this.instance.write(payload, options)

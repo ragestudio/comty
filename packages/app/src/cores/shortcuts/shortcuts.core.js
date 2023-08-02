@@ -1,7 +1,6 @@
 import Core from "evite/src/core"
 
 export default class ShortcutsCore extends Core {
-    static refName = "shortcuts"
     static namespace = "shortcuts"
 
     public = {
@@ -81,7 +80,7 @@ export default class ShortcutsCore extends Core {
         const register = this.shortcutsRegister.find((handler) => handler.id === id)
 
         if (!register) {
-            console.warn(`Shortcut with id "${id}" not found`)
+            this.console.warn(`Shortcut with id "${id}" not found`)
             return false
         }
 

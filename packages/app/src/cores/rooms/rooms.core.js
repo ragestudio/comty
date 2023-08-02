@@ -4,7 +4,6 @@ import remotes from "comty.js/remotes"
 import SessionModel from "comty.js/models/session"
 
 export default class RoomsController extends Core {
-    static refName = "rooms"
     static namespace = "rooms"
 
     connectedRooms = []
