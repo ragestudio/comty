@@ -377,13 +377,13 @@ export class BottomBar extends React.Component {
                                 </div>
 
                                 {
-                                    this.context.currentManifest && <div
+                                    this.context.track_manifest && <div
                                         className="item"
                                     >
                                         <PlayerButton
-                                            manifest={this.context.currentManifest}
-                                            playback={this.context.playbackStatus}
-                                            colorAnalysis={this.context.coverColorAnalysis}
+                                            manifest={this.context.track_manifest}
+                                            playback={this.context.playback_status}
+                                            colorAnalysis={this.context.track_manifest?.cover_analysis}
                                         />
                                     </div>
                                 }

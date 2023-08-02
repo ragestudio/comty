@@ -9,14 +9,17 @@ export default (props) => {
     const { data } = props
 
     const startPlaylist = () => {
-        app.cores.player.startPlaylist(data.list, 0)
+        app.cores.player.start(data.list, 0)
     }
 
     const navigateToPlaylist = () => {
         app.location.push(`/play/${data._id}`)
     }
 
-    return <div className="playlistTimelineEntry">
+    return <div 
+        className="playlistTimelineEntry" 
+        style={props.style}
+    >
         <div className="playlistTimelineEntry_content">
             <div className="playlistTimelineEntry_thumbnail">
                 <Image

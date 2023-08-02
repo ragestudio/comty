@@ -21,7 +21,7 @@ export default (props) => {
     const onClickPlay = (e) => {
         e.stopPropagation()
 
-        app.cores.player.startPlaylist(playlist.list)
+        app.cores.player.start(playlist.list)
     }
 
     return <div

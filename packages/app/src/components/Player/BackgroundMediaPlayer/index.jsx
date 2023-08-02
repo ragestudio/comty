@@ -73,19 +73,19 @@ export class BackgroundMediaPlayer extends React.Component {
             className={classnames(
                 "background_media_player",
                 {
-                    ["lightBackground"]: this.context.coverColorAnalysis?.isLight,
+                    ["lightBackground"]: this.context.track_manifest?.cover_analysis?.isLight ?? false,
                     ["expanded"]: this.state.expanded,
                 }
             )}
             style={{
-                backgroundColor: this.context.coverColorAnalysis?.rgba,
-                "--averageColorValues": this.context.coverColorAnalysis?.rgba,
+                backgroundColor: this.context.track_manifest?.cover_analysis?.rgba,
+                "--averageColorValues": this.context.track_manifest?.cover_analysis?.rgba,
             }}
         >
             <div
                 className="background_media_player__background"
                 style={{
-                    backgroundImage: `url(${this.context.currentManifest?.cover ?? this.context.currentManifest?.thumbnail})`
+                    backgroundImage: `url(${this.context.track_manifest?.cover ?? this.context.track_manifest?.thumbnail})`
                 }}
             />
 
@@ -98,12 +98,12 @@ export class BackgroundMediaPlayer extends React.Component {
                     className={classnames(
                         "background_media_player__icon",
                         {
-                            ["bounce"]: this.context.playbackStatus === "playing",
+                            ["bounce"]: this.context.playback_status === "playing",
                         }
                     )}
                 >
                     {
-                        this.context.playbackStatus === "playing" ? <Icons.MdMusicNote /> : <Icons.MdPause />
+                        this.context.playback_status === "playing" ? <Icons.MdMusicNote /> : <Icons.MdPause />
                     }
                 </div>
 
@@ -113,14 +113,14 @@ export class BackgroundMediaPlayer extends React.Component {
                 >
                     {
                         !this.state.expanded && <Marquee
-                            gradientColor={RGBStringToValues(this.state.thumbnailAnalysis?.rgb)}
+                            gradientColor={RGBStringToValues(this.context.track_cover_analysis?.rgb)}
                             gradientWidth={20}
-                            play={this.context.playbackStatus !== "stopped"}
+                            play={this.context.playback_status !== "stopped"}
                         >
                             <h4>
                                 {
-                                    this.context.playbackStatus === "stopped" ? "Nothing is playing" : <>
-                                        {`${this.context.currentManifest?.title} - ${this.context.currentManifest?.artist}` ?? "Untitled"}
+                                    this.context.playback_status === "stopped" ? "Nothing is playing" : <>
+                                        {`${this.context.track_manifest?.title} - ${this.context.track_manifest?.artist}` ?? "Untitled"}
                                     </>
                                 }
                             </h4>
@@ -131,8 +131,8 @@ export class BackgroundMediaPlayer extends React.Component {
                             <Icons.MdAlbum />
 
                             {
-                                this.context.playbackStatus === "stopped" ? "Nothing is playing" : <>
-                                    {this.context.currentManifest?.title ?? "Untitled"}
+                                this.context.playback_status === "stopped" ? "Nothing is playing" : <>
+                                    {this.context.track_manifest?.title ?? "Untitled"}
                                 </>
                             }
                         </h4>
@@ -165,7 +165,7 @@ export class BackgroundMediaPlayer extends React.Component {
                     size="small"
                     type="ghost"
                     shape="circle"
-                    icon={this.context.playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
+                    icon={this.context.playback_status === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
                     onClick={app.cores.player.playback.toggle}
                 />
 

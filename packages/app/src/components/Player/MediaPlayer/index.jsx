@@ -36,12 +36,60 @@ const ServiceIndicator = (props) => {
     }
 }
 
+const MemeDancer = (props) => {
+    const defaultBpm = 120
+    const [currentBpm, setCurrentBpm] = React.useState(defaultBpm)
+
+    const videoRef = React.useRef()
+
+    const togglePlayback = (to) => {
+        videoRef.current[to ? "play" : "pause"]()
+    }
+
+    React.useEffect(() => {
+        app.cores.player.eventBus.on("bpm.change", (bpm) => {
+            setCurrentBpm(bpm)
+        })
+
+        app.cores.player.eventBus.on("player.state.update:playback_status", (status) => {
+            if (status === "playing") {
+                togglePlayback(true)
+            }else {
+                togglePlayback(false)
+            }
+        })
+    }, [])
+
+    React.useEffect(() => {
+        if (typeof currentBpm === "number" && isFinite(currentBpm)) {
+            let playbackRate = currentBpm / 120;
+            playbackRate = Math.min(4.0, Math.max(0.1, playbackRate)); // Limit the range between 0.1 and 4.0
+            videoRef.current.playbackRate = playbackRate;
+        }
+    }, [currentBpm])
+
+    return <div className="meme_dancer">
+        <video
+            ref={videoRef}
+            muted
+            autoPlay
+            loop
+            controls={false}
+        >
+            <source
+                src="https://media.tenor.com/-VG9cLwSYTcAAAPo/dancing-triangle-dancing.mp4"
+            />
+        </video>
+    </div>
+}
+
 // TODO: Queue view
 export class AudioPlayer extends React.Component {
     static contextType = Context
 
     state = {
         showControls: false,
+        showDancer: false,
     }
 
     onMouse = (event) => {
@@ -79,7 +127,7 @@ export class AudioPlayer extends React.Component {
     }
 
     onClickPlayButton = () => {
-        if (this.context.streamMode) {
+        if (this.context.sync_mode) {
             return app.cores.player.playback.stop()
         }
 
@@ -92,6 +140,10 @@ export class AudioPlayer extends React.Component {
 
     onClickNextButton = () => {
         app.cores.player.playback.next()
+    }
+
+    toggleDancer = () => {
+        this.setState({ showDancer: !this.state.showDancer })
     }
 
     render() {
@@ -116,7 +168,7 @@ export class AudioPlayer extends React.Component {
                     />
 
                     {
-                        !this.context.syncModeLocked && !this.context.syncMode && <antd.Button
+                        !this.context.control_locked && !this.context.sync_mode && <antd.Button
                             icon={<Icons.MdShare />}
                             onClick={this.inviteSync}
                             shape="circle"
@@ -139,40 +191,44 @@ export class AudioPlayer extends React.Component {
             }
 
             <div className="player">
+                {
+                    this.state.showDancer && <MemeDancer />
+                }
+
                 <ServiceIndicator
-                    service={this.context.currentManifest?.service}
+                    service={this.context.track_manifest?.service}
                 />
 
                 <div
                     className="cover"
                     style={{
-                        backgroundImage: `url(${(this.context.currentManifest?.cover ?? this.context.currentManifest?.thumbnail) ?? "/assets/no_song.png"})`,
+                        backgroundImage: `url(${(this.context.track_manifest?.cover ?? this.context.track_manifest?.thumbnail) ?? "/assets/no_song.png"})`,
                     }}
                 />
                 <div className="header">
                     <div className="info">
                         <div className="title">
-                            <h2>
+                            <h2 onDoubleClick={this.toggleDancer}>
                                 {
-                                    this.context.currentManifest?.title
-                                        ? this.context.currentManifest?.title
-                                        : (this.context.loading ? "Loading..." : (this.context.currentPlaying?.title ?? "Untitled"))
+                                    this.context.track_manifest?.title
+                                        ? this.context.track_manifest?.title
+                                        : (this.context.loading ? "Loading..." : (this.context.track_manifest?.metadata?.title ?? "Untitled"))
                                 }
                             </h2>
                         </div>
                         <div className="subTitle">
                             {
-                                this.context.currentManifest?.artist && <div className="artist">
+                                this.context.track_manifest?.metadata?.artist && <div className="artist">
                                     <h3>
-                                        {this.context.currentManifest?.artist ?? "Unknown"}
+                                        {this.context.track_manifest?.metadata?.artist ?? "Unknown"}
                                     </h3>
                                 </div>
                             }
 
                             {
-                                !app.isMobile && this.context.playbackStatus !== "stopped" && <LikeButton
-                                    onClick={app.cores.player.toggleCurrentTrackLike}
-                                    liked={this.context.liked}
+                                !app.isMobile && this.context.playback_status !== "stopped" && <LikeButton
+                                    //onClick={app.cores.player.toggleCurrentTrackLike}
+                                    liked={this.context.track_manifest?.metadata?.liked}
                                 />
                             }
                         </div>
@@ -180,20 +236,20 @@ export class AudioPlayer extends React.Component {
                 </div>
 
                 <Controls
-                    syncModeLocked={this.context.syncModeLocked}
-                    syncMode={this.context.syncMode}
-                    playbackStatus={this.context.playbackStatus}
-                    audioMuted={this.context.audioMuted}
-                    audioVolume={this.context.audioVolume}
+                    syncModeLocked={this.context.control_locked}
+                    syncMode={this.context.sync_mode}
+                    playbackStatus={this.context.playback_status}
+                    audioMuted={this.context.muted}
+                    audioVolume={this.context.volume}
                     onVolumeUpdate={this.updateVolume}
                     onMuteUpdate={this.toggleMute}
                     controls={{
                         previous: this.onClickPreviousButton,
                         toggle: this.onClickPlayButton,
                         next: this.onClickNextButton,
-                        like: app.cores.player.toggleCurrentTrackLike,
+                        //like: app.cores.player.toggleCurrentTrackLike,
                     }}
-                    liked={this.context.liked}
+                    liked={this.context.track_manifest?.metadata?.liked}
                 />
 
                 <SeekBar

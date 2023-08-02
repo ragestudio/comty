@@ -14,20 +14,24 @@ import "./index.less"
 export default (props) => {
     // use react context to get the current track
     const {
-        currentManifest,
-        playbackStatus,
+        track_manifest,
+        playback_status,
     } = React.useContext(Context)
 
     const isLiked = props.track?.liked
-    const isCurrent = currentManifest?._id === props.track._id
-    const isPlaying = isCurrent && playbackStatus === "playing"
+    const isCurrent = track_manifest?._id === props.track._id
+    const isPlaying = isCurrent && playback_status === "playing"
 
     const handleClickPlayBtn = React.useCallback(() => {
         if (typeof props.onClickPlayBtn === "function") {
             props.onClickPlayBtn(props.track)
         } else {
             console.warn("Searcher: onClick is not a function, using default action...")
-            app.cores.player.start(props.track)
+            if (!isCurrent) {
+                app.cores.player.start(props.track)
+            } else {
+                app.cores.player.playback.toggle()
+            }
         }
     })
 
@@ -80,7 +84,7 @@ export default (props) => {
                 {
                     props.track.service === "tidal" && <Icons.SiTidal />
                 }
-                
+
                 <div className="music-track_info_duration">
                     {
                         props.track.metadata?.duration

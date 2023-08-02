@@ -8,6 +8,7 @@ import "./index.less"
 
 export default class SeekBar extends React.Component {
     state = {
+        playing: false,
         timeText: "00:00",
         durationText: "00:00",
         sliderTime: 0,
@@ -28,15 +29,13 @@ export default class SeekBar extends React.Component {
         }
     }
 
-    calculateDuration = () => {
+    calculateDuration = (preCalculatedDuration) => {
         // get current audio duration
-        const audioDuration = app.cores.player.duration()
+        const audioDuration = preCalculatedDuration || app.cores.player.duration()
 
         if (isNaN(audioDuration)) {
             return
         }
-
-        console.log(`Audio duration: ${audioDuration}`)
 
         // set duration
         this.setState({
@@ -74,9 +73,14 @@ export default class SeekBar extends React.Component {
         this.updateProgressBar()
     }
 
+    eventBus = app.cores.player.eventBus
+
     events = {
-        "player.status.update": (status) => {
-            console.log(`Player status updated: ${status}`)
+        // handle when player changes playback status
+        "player.state.update:playback_status": (status) => {
+            this.setState({
+                playing: status === "playing",
+            })
 
             switch (status) {
                 case "stopped":
@@ -96,9 +100,8 @@ export default class SeekBar extends React.Component {
                     break
             }
         },
-        "player.current.update": (currentAudioManifest) => {
-            console.log(`Player current audio updated:`, currentAudioManifest)
-
+        // handle when player changes track
+        "player.state.update:track_manifest": (manifest) => {
             this.updateAll()
 
             this.setState({
@@ -106,23 +109,16 @@ export default class SeekBar extends React.Component {
                 sliderTime: 0,
             })
 
-            this.calculateDuration()
+            this.calculateDuration(manifest.metadata?.duration ?? manifest.duration)
         },
-        "player.duration.update": (duration) => {
-            console.log(`Player duration updated: ${duration}`)
-
-            this.calculateDuration()
-        },
-        "player.seek.update": (seek) => {
-            console.log(`Player seek updated: ${seek}`)
-
+        "player.seeked": (seek) => {
             this.calculateTime()
             this.updateAll()
         },
     }
 
     tick = () => {
-        if (this.props.playing || this.props.streamMode) {
+        if (this.state.playing) {
             this.interval = setInterval(() => {
                 this.updateAll()
             }, 1000)
@@ -138,18 +134,18 @@ export default class SeekBar extends React.Component {
         this.tick()
 
         for (const [event, callback] of Object.entries(this.events)) {
-            app.eventBus.on(event, callback)
+            this.eventBus.on(event, callback)
         }
     }
 
     componentWillUnmount = () => {
         for (const [event, callback] of Object.entries(this.events)) {
-            app.eventBus.off(event, callback)
+            this.eventBus.off(event, callback)
         }
     }
 
     componentDidUpdate = (prevProps, prevState) => {
-        if (this.props.playing !== prevProps.playing) {
+        if (this.state.playing !== prevState.playing) {
             this.tick()
         }
     }
