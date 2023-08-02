@@ -35,7 +35,14 @@ export default (props) => {
             return
         }
 
-        app.cores.player.startPlaylist(playlist.list, index)
+        // check if is currently playing
+        if (app.cores.player.state.track_manifest?._id === track._id) {
+            app.cores.player.playback.toggle()
+        } else {
+            app.cores.player.start(playlist.list, {
+                startIndex: index
+            })
+        }
     }
 
     const handleTrackLike = async (track) => {

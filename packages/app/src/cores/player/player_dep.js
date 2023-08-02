@@ -15,31 +15,13 @@ import EqProcessorNode from "./processors/eqNode"
 import GainProcessorNode from "./processors/gainNode"
 import CompressorProcessorNode from "./processors/compressorNode"
 
-const servicesToManifestResolver = {
-    "tidal": async (manifest) => {
-        const resolvedManifest = await SyncModel.tidalCore.getTrackManifest(manifest.id)
-
-        console.log(resolvedManifest)
-
-        manifest.source = resolvedManifest.playback.url
-
-        manifest.title = resolvedManifest.metadata.title
-        manifest.artist = resolvedManifest.metadata.artists.map(artist => artist.name).join(", ")
-        manifest.album = resolvedManifest.metadata.album.title
-
-        const coverUID = resolvedManifest.metadata.album.cover.replace(/-/g, "/")
-
-        manifest.cover = `https://resources.tidal.com/images/${coverUID}/1280x1280.jpg`
-
-        return manifest
-    }
-}
+import servicesToManifestResolver from "./servicesToManifestResolver"
 
 function useMusicSync(event, data) {
     const currentRoomData = app.cores.sync.music.currentRoomData()
 
     if (!currentRoomData) {
-        console.warn("No room data available")
+        this.console.warn("No room data available")
         return false
     }
 
@@ -55,124 +37,7 @@ const defaultAudioProccessors = [
     CompressorProcessorNode,
 ]
 
-class MediaSession {
-    initialize() {
-        CapacitorMusicControls.addListener("controlsNotification", (info) => {
-            console.log(info)
-
-            this.handleControlsEvent(info)
-        })
-
-        // ANDROID (13, see bug above as to why it's necessary)
-        document.addEventListener("controlsNotification", (event) => {
-            console.log(event)
-
-            const info = { message: event.message, position: 0 }
-
-            this.handleControlsEvent(info)
-        })
-    }
-
-    update(manifest) {
-        if ("mediaSession" in navigator) {
-            return navigator.mediaSession.metadata = new MediaMetadata({
-                title: manifest.title,
-                artist: manifest.artist,
-                album: manifest.album,
-                artwork: [
-                    {
-                        src: manifest.cover ?? manifest.thumbnail,
-                        sizes: "512x512",
-                        type: "image/jpeg",
-                    }
-                ],
-            })
-        }
-
-        return CapacitorMusicControls.create({
-            track: manifest.title,
-            artist: manifest.artist,
-            album: manifest.album,
-            cover: manifest.cover,
-
-            hasPrev: false,
-            hasNext: false,
-            hasClose: true,
-
-            isPlaying: true,
-            dismissable: false,
-
-            playIcon: "media_play",
-            pauseIcon: "media_pause",
-            prevIcon: "media_prev",
-            nextIcon: "media_next",
-            closeIcon: "media_close",
-            notificationIcon: "notification"
-        })
-    }
-
-    updateIsPlaying(to, timeElapsed = 0) {
-        if ("mediaSession" in navigator) {
-            return navigator.mediaSession.playbackState = to ? "playing" : "paused"
-        }
-
-        return CapacitorMusicControls.updateIsPlaying({
-            isPlaying: to,
-            elapsed: timeElapsed,
-        })
-    }
-
-    destroy() {
-        if ("mediaSession" in navigator) {
-            navigator.mediaSession.playbackState = "none"
-        }
-
-        this.active = false
-
-        return CapacitorMusicControls.destroy()
-    }
-
-    handleControlsEvent(action) {
-        const message = action.message
-
-        switch (message) {
-            case "music-controls-next": {
-                return app.cores.player.playback.next()
-            }
-            case "music-controls-previous": {
-                return app.cores.player.playback.previous()
-            }
-            case "music-controls-pause": {
-                return app.cores.player.playback.pause()
-            }
-            case "music-controls-play": {
-                return app.cores.player.playback.play()
-            }
-            case "music-controls-destroy": {
-                return app.cores.player.playback.stop()
-            }
-
-            // External controls (iOS only)
-            case "music-controls-toggle-play-pause": {
-                return app.cores.player.playback.toggle()
-            }
-
-            // Headset events (Android only)
-            // All media button events are listed below
-            case "music-controls-media-button": {
-                return app.cores.player.playback.toggle()
-            }
-            case "music-controls-headset-unplugged": {
-                return app.cores.player.playback.pause()
-            }
-            case "music-controls-headset-plugged": {
-                return app.cores.player.playback.play()
-            }
-            default:
-                break;
-        }
-    }
-}
+import MediaSession from "./mediaSession"
 
 // TODO: Check if source playing is a stream. Also handle if it's a stream resuming after a pause will seek to the last position
 export default class Player extends Core {
@@ -183,9 +48,7 @@ export default class Player extends Core {
 
     static websocketListen = "music"
 
-    static refName = "player"
-
-    static namespace = "player"
+    static namespace = "player_dep"
 
     // default statics
     static maxBufferLoadQueue = 2
@@ -240,7 +103,7 @@ export default class Player extends Core {
         start: this.start.bind(this),
         startPlaylist: this.startPlaylist.bind(this),
         isIdCurrent: function (id) {
-            console.log("isIdCurrent", id, this.state.currentAudioManifest?._id === id)
+            this.console.log("isIdCurrent", id, this.state.currentAudioManifest?._id === id)
 
             return this.state.currentAudioManifest?._id === id
         }.bind(this),
@@ -292,12 +155,12 @@ export default class Player extends Core {
             }.bind(this),
             toggle: function () {
                 if (!this.currentAudioInstance) {
-                    console.error("No audio instance")
+                    this.console.error("No audio instance")
                     return null
                 }
 
                 if (this.state.syncModeLocked) {
-                    console.warn("Sync mode is locked, cannot do this action")
+                    this.console.warn("Sync mode is locked, cannot do this action")
                     return false
                 }
 
@@ -345,10 +208,10 @@ export default class Player extends Core {
 
     async initializeAudioProcessors() {
         if (this.audioProcessors.length > 0) {
-            console.log("Destroying audio processors")
+            this.console.log("Destroying audio processors")
 
             this.audioProcessors.forEach((processor) => {
-                console.log(`Destroying audio processor ${processor.constructor.name}`, processor)
+                this.console.log(`Destroying audio processor ${processor.constructor.name}`, processor)
                 processor._destroy()
             })
 
@@ -360,13 +223,13 @@ export default class Player extends Core {
         }
 
         for await (const processor of this.audioProcessors) {
-            console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
+            this.console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
 
             if (typeof processor._init === "function") {
                 try {
                     await processor._init(this.audioContext)
                 } catch (error) {
-                    console.error(`Failed to initialize audio processor ${processor.constructor.name} >`, error)
+                    this.console.error(`Failed to initialize audio processor ${processor.constructor.name} >`, error)
                     continue
                 }
             }
@@ -431,7 +294,7 @@ export default class Player extends Core {
                                             this.state.coverColorAnalysis = color
                                         })
                                         .catch((err) => {
-                                            console.error(err)
+                                            this.console.error(err)
                                         })
                                 }
                             }
@@ -539,7 +402,7 @@ export default class Player extends Core {
         this.native_controls.initialize()
     }
 
-    async initializeBeforeRuntimeInitialize() {
+    async initializeAfterRuntimeInitialize() {
         for (const [eventName, eventHandler] of Object.entries(this.wsEvents)) {
             app.cores.api.listenEvent(eventName, eventHandler, Player.websocketListen)
         }
@@ -555,7 +418,7 @@ export default class Player extends Core {
 
     async toggleCurrentTrackLike() {
         if (!this.currentAudioInstance) {
-            console.error("No track playing")
+            this.console.error("No track playing")
             return false
         }
 
@@ -572,12 +435,12 @@ export default class Player extends Core {
 
     attachPlayerComponent() {
         if (this.currentDomWindow) {
-            console.warn("EmbbededMediaPlayer already attached")
+            this.console.warn("EmbbededMediaPlayer already attached")
             return false
         }
 
         if (!app.layout.floatingStack) {
-            console.error("Floating stack not found")
+            this.console.error("Floating stack not found")
             return false
         }
 
@@ -586,12 +449,12 @@ export default class Player extends Core {
 
     detachPlayerComponent() {
         if (!this.currentDomWindow) {
-            console.warn("EmbbededMediaPlayer not attached")
+            this.console.warn("EmbbededMediaPlayer not attached")
             return false
         }
 
         if (!app.layout.floatingStack) {
-            console.error("Floating stack not found")
+            this.console.error("Floating stack not found")
             return false
         }
 
@@ -606,7 +469,7 @@ export default class Player extends Core {
 
     enqueueLoadBuffer(audioElement) {
         if (!audioElement) {
-            console.error("Audio element is required")
+            this.console.error("Audio element is required")
             return false
         }
 
@@ -635,7 +498,7 @@ export default class Player extends Core {
         const audioElement = this.bufferLoadQueue.shift()
 
         if (audioElement.signal.aborted) {
-            console.warn("Aborted audio element")
+            this.console.warn("Aborted audio element")
 
             this.bufferLoadQueueLoading = false
 
@@ -651,7 +514,7 @@ export default class Player extends Core {
                 resolve()
             }, { once: true })
 
-            console.log("Preloading audio buffer", audioElement.src)
+            this.console.log("Preloading audio buffer", audioElement.src)
 
             audioElement.load()
         })
@@ -703,7 +566,7 @@ export default class Player extends Core {
 
     async createInstance(manifest) {
         if (!manifest) {
-            console.error("Manifest is required")
+            this.console.error("Manifest is required")
             return false
         }
 
@@ -716,20 +579,20 @@ export default class Player extends Core {
 
         // check if manifest has `manifest` property
         if (manifest.service) {
-            if (manifest.service !== "inherit") {
+            if (manifest.service !== "inherit" && !manifest.source) {
                 const resolver = servicesToManifestResolver[manifest.service]
 
                 if (!resolver) {
-                    console.error(`Service ${manifest.service} is not supported`)
+                    this.console.error(`Service ${manifest.service} is not supported`)
                     return false
                 }
-    
+
                 manifest = await resolver(manifest)
             }
         }
 
         if (!manifest.src && !manifest.source) {
-            console.error("Manifest source is required")
+            this.console.error("Manifest source is required")
             return false
         }
 
@@ -773,7 +636,7 @@ export default class Player extends Core {
         instanceObj.audioElement.addEventListener("loadeddata", () => {
             this.state.loading = false
 
-            console.log("Loaded audio data", instanceObj.audioElement.src)
+            this.console.log("Loaded audio data", instanceObj.audioElement.src)
         })
 
         instanceObj.audioElement.addEventListener("playing", () => {
@@ -854,7 +717,7 @@ export default class Player extends Core {
     async attachProcessorsToInstance(instance) {
         for await (const [index, processor] of this.audioProcessors.entries()) {
             if (typeof processor._attach !== "function") {
-                console.error(`Processor ${processor.constructor.refName} not support attach`)
+                this.console.error(`Processor ${processor.constructor.refName} not support attach`)
 
                 continue
             }
@@ -864,7 +727,7 @@ export default class Player extends Core {
 
         const lastProcessor = instance.attachedProcessors[instance.attachedProcessors.length - 1].processor
 
-        console.log("Attached processors", instance.attachedProcessors)
+        this.console.log("Attached processors", instance.attachedProcessors)
 
         // now attach to destination
         lastProcessor.connect(this.audioContext.destination)
@@ -943,7 +806,7 @@ export default class Player extends Core {
 
         // check if the audio is a live stream when metadata is loaded
         instance.audioElement.addEventListener("loadedmetadata", () => {
-            console.log("loadedmetadata", instance.audioElement.duration)
+            this.console.log("loadedmetadata", instance.audioElement.duration)
 
             if (instance.audioElement.duration === Infinity) {
                 instance.manifest.stream = true
@@ -962,7 +825,7 @@ export default class Player extends Core {
 
     async startPlaylist(playlist, startIndex = 0, { sync = false } = {}) {
         if (this.state.syncModeLocked && !sync) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
@@ -971,12 +834,16 @@ export default class Player extends Core {
             throw new Error("Playlist is required")
         }
 
-        console.log("Starting playlist", playlist)
 
         // check if the array has strings, if so its means that is the track id, then fetch the track
-        if (playlist.some(item => typeof item === "string")) {
+        if (playlist.some((item) => typeof item === "string")) {
+            this.console.log("Resolving missing manifests by ids...")
             playlist = await this.getTracksByIds(playlist)
         }
+
+        this.console.log("Starting playlist", playlist)
+
+        this.state.loading = true
 
         // !IMPORTANT: abort preloads before destroying current instance 
         await this.abortPreloads()
@@ -985,28 +852,36 @@ export default class Player extends Core {
 
         // clear current queue
         this.audioQueue = []
-
         this.audioQueueHistory = []
 
-        this.state.loading = true
+        // sort playlist entries to prioritize instance creating from the startIndex
+        playlist[startIndex].first = true
 
-        for await (const [index, manifest] of playlist.entries()) {
+        const afterPlaylist = playlist.slice(startIndex)
+        const beforePlaylist = playlist.slice(0, startIndex).reverse()
+
+        for await (const [index, manifest] of afterPlaylist.entries()) {
             const instance = await this.createInstance(manifest)
 
-            if (index < startIndex) {
-                this.audioQueueHistory.push(instance)
-            } else {
-                this.audioQueue.push(instance)
+            this.audioQueue.push(instance)
+
+            if (index === 0) {
+                this.play(this.audioQueue[0])
             }
         }
 
-        // play first audio
-        this.play(this.audioQueue[0])
+        for await (const [index, manifest] of beforePlaylist.entries()) {
+            const instance = await this.createInstance(manifest)
+
+            this.audioQueueHistory.push(instance)
+        }
+
+        return true
     }
 
     async start(manifest, { sync = false, time } = {}) {
         if (this.state.syncModeLocked && !sync) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
@@ -1034,7 +909,7 @@ export default class Player extends Core {
 
     next({ sync = false } = {}) {
         if (this.state.syncModeLocked && !sync) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
@@ -1045,7 +920,7 @@ export default class Player extends Core {
 
         // check if there is a next audio in queue
         if (this.audioQueue.length === 0) {
-            console.log("no more audio on queue, stopping playback")
+            this.console.log("no more audio on queue, stopping playback")
 
             this.destroyCurrentInstance()
 
@@ -1068,7 +943,7 @@ export default class Player extends Core {
 
     previous({ sync = false } = {}) {
         if (this.state.syncModeLocked && !sync) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
@@ -1090,7 +965,7 @@ export default class Player extends Core {
     async pausePlayback() {
         return await new Promise((resolve, reject) => {
             if (!this.currentAudioInstance) {
-                console.error("No audio instance")
+                this.console.error("No audio instance")
                 return null
             }
 
@@ -1112,7 +987,7 @@ export default class Player extends Core {
     async resumePlayback() {
         return await new Promise((resolve, reject) => {
             if (!this.currentAudioInstance) {
-                console.error("No audio instance")
+                this.console.error("No audio instance")
                 return null
             }
 
@@ -1155,7 +1030,7 @@ export default class Player extends Core {
 
     toggleMute(to) {
         if (app.isMobile) {
-            console.warn("Cannot mute on mobile")
+            this.console.warn("Cannot mute on mobile")
             return false
         }
 
@@ -1180,7 +1055,7 @@ export default class Player extends Core {
         }
 
         if (app.isMobile) {
-            console.warn("Cannot change volume on mobile")
+            this.console.warn("Cannot change volume on mobile")
             return false
         }
 
@@ -1216,7 +1091,7 @@ export default class Player extends Core {
         }
 
         if (this.state.syncModeLocked && !sync) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
@@ -1238,7 +1113,7 @@ export default class Player extends Core {
 
     loop(to) {
         if (typeof to !== "boolean") {
-            console.warn("Loop must be a boolean")
+            this.console.warn("Loop must be a boolean")
             return false
         }
 
@@ -1253,12 +1128,12 @@ export default class Player extends Core {
 
     velocity(to) {
         if (this.state.syncModeLocked) {
-            console.warn("Sync mode is locked, cannot do this action")
+            this.console.warn("Sync mode is locked, cannot do this action")
             return false
         }
 
         if (typeof to !== "number") {
-            console.warn("Velocity must be a number")
+            this.console.warn("Velocity must be a number")
             return false
         }
 
@@ -1273,7 +1148,7 @@ export default class Player extends Core {
 
     collapse(to) {
         if (typeof to !== "boolean") {
-            console.warn("Collapse must be a boolean")
+            this.console.warn("Collapse must be a boolean")
             return false
         }
 
@@ -1284,7 +1159,7 @@ export default class Player extends Core {
 
     toggleSyncMode(to, lock) {
         if (typeof to !== "boolean") {
-            console.warn("Sync mode must be a boolean")
+            this.console.warn("Sync mode must be a boolean")
             return false
         }
 
@@ -1292,7 +1167,7 @@ export default class Player extends Core {
 
         this.state.syncModeLocked = lock ?? false
 
-        console.log(`Sync mode is now ${this.state.syncMode ? "enabled" : "disabled"} | Locked: ${this.state.syncModeLocked ? "yes" : "no"}`)
+        this.console.log(`Sync mode is now ${this.state.syncMode ? "enabled" : "disabled"} | Locked: ${this.state.syncModeLocked ? "yes" : "no"}`)
 
         return this.state.syncMode
     }
@@ -1312,7 +1187,7 @@ export default class Player extends Core {
 
     async getTracksByIds(list) {
         if (!Array.isArray(list)) {
-            console.warn("List must be an array")
+            this.console.warn("List must be an array")
             return false
         }
 
@@ -1329,7 +1204,7 @@ export default class Player extends Core {
         }
 
         const fetchedTracks = await PlaylistModel.getTracks(ids).catch((err) => {
-            console.error(err)
+            this.console.error(err)
             return false
         })
 
@@ -1352,13 +1227,13 @@ export default class Player extends Core {
     async setSampleRate(to) {
         // must be a integer
         if (typeof to !== "number") {
-            console.error("Sample rate must be a number")
+            this.console.error("Sample rate must be a number")
             return this.audioContext.sampleRate
         }
 
         // must be a integer
         if (!Number.isInteger(to)) {
-            console.error("Sample rate must be a integer")
+            this.console.error("Sample rate must be a integer")
             return this.audioContext.sampleRate
         }
 

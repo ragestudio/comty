@@ -37,7 +37,7 @@ export default class ProcessorNode {
         if (Array.isArray(this.constructor.dependsOnSettings)) {
             // check if the instance has the settings
             if (!this.constructor.dependsOnSettings.every((setting) => app.cores.settings.get(setting))) {
-                this.console.warn(`Skipping attachment for [${this.constructor.refName ?? this.constructor.name}] node, cause is not passing the settings dependecy > ${this.constructor.dependsOnSettings.join(", ")}`)
+                console.warn(`Skipping attachment for [${this.constructor.refName ?? this.constructor.name}] node, cause is not passing the settings dependecy > ${this.constructor.dependsOnSettings.join(", ")}`)
 
                 return instance
             }
@@ -55,7 +55,7 @@ export default class ProcessorNode {
 
         // check if is already attached
         if (currentIndex !== false) {
-            this.console.warn(`[${this.constructor.refName ?? this.constructor.name}] node is already attached`)
+            console.warn(`[${this.constructor.refName ?? this.constructor.name}] node is already attached`)
 
             return instance
         }
@@ -64,15 +64,15 @@ export default class ProcessorNode {
         // if has, disconnect it
         // if it not has, its means that is the first node, so connect to the media source
         if (prevNode && prevNode.processor._last.numberOfOutputs > 0) {
-            //this.console.log(`[${this.constructor.refName ?? this.constructor.name}] node is already attached to the previous node, disconnecting...`)
+            //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is already attached to the previous node, disconnecting...`)
             // if has outputs, disconnect from the next node
             prevNode.processor._last.disconnect()
 
             // now, connect to the processor
             prevNode.processor._last.connect(this.processor)
         } else {
-            //this.console.log(`[${this.constructor.refName ?? this.constructor.name}] node is the first node, connecting to the media source...`)
-            instance.media.connect(this.processor)
+            //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is the first node, connecting to the media source...`)
+            instance.track.connect(this.processor)
         }
 
         // now, check if it has a next node
@@ -153,7 +153,7 @@ export default class ProcessorNode {
         }
 
         if (!instance) {
-            this.console.warn(`Instance is not defined`)
+            console.warn(`Instance is not defined`)
 
             return false
         }
