@@ -2,9 +2,11 @@ import React from "react"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
 
+import Image from "components/Image"
+
 import Controls from "components/Player/Controls"
 
-import Image from "components/Image"
+import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
 import request from "comty.js/handlers/request"
 
@@ -52,47 +54,44 @@ class PlayerController extends React.Component {
         currentDuration: 0,
         currentTime: 0,
 
-        currentPlaying: app.cores.player.getState("currentAudioManifest"),
-        loading: app.cores.player.getState("loading") ?? false,
-        playbackStatus: app.cores.player.getState("playbackStatus") ?? "stopped",
+        currentPlaying: app.cores.player.state["track_manifest"],
+        loading: app.cores.player.state["loading"] ?? false,
+        playbackStatus: app.cores.player.state["playback_status"] ?? "stopped",
 
-        audioMuted: app.cores.player.getState("audioMuted") ?? false,
-        volume: app.cores.player.getState("audioVolume"),
+        audioMuted: app.cores.player.state["muted"] ?? false,
+        volume: app.cores.player.state["volume"],
 
-        syncModeLocked: app.cores.player.getState("syncModeLocked"),
-        syncMode: app.cores.player.getState("syncMode"),
+        syncModeLocked: app.cores.player.state["control_locked"] ?? false,
+        syncMode: app.cores.player.state["sync_mode"],
     }
 
     events = {
-        "player.coverColorAnalysis.update": (colorAnalysis) => {
-            this.setState({ colorAnalysis })
-        },
-        "player.seek.update": (seekTime) => {
+        "player.seeked": (seekTime) => {
             this.setState({
                 currentTime: seekTime,
             })
         },
-        "player.status.update": (data) => {
+        "player.state.update:playback_status": (data) => {
             this.setState({ playbackStatus: data })
         },
-        "player.current.update": (data) => {
+        "player.state.update:track_manifest": (data) => {
             this.setState({ titleOverflown: false })
 
             this.setState({ currentPlaying: data })
         },
-        "player.syncModeLocked.update": (to) => {
+        "player.state.update:control_locked": (to) => {
             this.setState({ syncModeLocked: to })
         },
-        "player.syncMode.update": (to) => {
+        "player.state.update:sync_mode": (to) => {
             this.setState({ syncMode: to })
         },
-        "player.mute.update": (data) => {
+        "player.state.update:muted": (data) => {
             this.setState({ audioMuted: data })
         },
-        "player.volume.update": (data) => {
+        "player.state.update:volume": (data) => {
             this.setState({ audioVolume: data })
         },
-        "player.loading.update": (data) => {
+        "player.state.update:loading": (data) => {
             this.setState({ loading: data })
         },
     }
@@ -106,12 +105,13 @@ class PlayerController extends React.Component {
         }
 
         this.syncInterval = setInterval(() => {
-            const currentState = app.cores.player.currentState()
+            const time = app.cores.player.seek()
+            const duration = app.cores.player.duration()
 
             this.setState({
-                currentDuration: currentState.duration,
-                currentTime: currentState.time,
-                colorAnalysis: currentState.colorAnalysis,
+                currentDuration: duration,
+                currentTime: time,
+                colorAnalysis: app.cores.player.state.track_manifest?.metadata.cover_analysis,
             })
 
             const titleOverflown = isOverflown(this.titleRef.current)
@@ -296,7 +296,17 @@ class PlayerController extends React.Component {
     }
 }
 
-export default class SyncLyrics extends React.Component {
+export default (props) => {
+    return <WithPlayerContext>
+        <SyncLyrics
+            {...props}
+        />
+    </WithPlayerContext>
+}
+
+class SyncLyrics extends React.Component {
+    static contextType = Context
+
     state = {
         loading: true,
         notAvailable: false,
@@ -324,7 +334,7 @@ export default class SyncLyrics extends React.Component {
     coverCanvasRef = React.createRef()
 
     events = {
-        "player.current.update": (currentManifest) => {
+        "player.state.update:track_manifest": (currentManifest) => {
             this.setState({ currentManifest })
 
             if (document.startViewTransition) {
@@ -333,10 +343,7 @@ export default class SyncLyrics extends React.Component {
                 this.loadLyrics()
             }
         },
-        "player.coverColorAnalysis.update": (colorAnalysis) => {
-            this.setState({ colorAnalysis })
-        },
-        "player.status.update": (currentStatus) => {
+        "player.state.update:playback_status": (currentStatus) => {
             this.setState({ currentStatus })
         }
     }
@@ -404,7 +411,7 @@ export default class SyncLyrics extends React.Component {
             clearInterval(this.syncInterval)
         }
 
-        if (!this.state.currentManifest) {
+        if (!this.context.track_manifest) {
             return false
         }
 
@@ -510,7 +517,7 @@ export default class SyncLyrics extends React.Component {
                 return false
             }
 
-            const { time } = app.cores.player.currentState()
+            const time = app.cores.player.seek()
 
             // transform audio seek time to lyrics time (ms from start) // remove decimals
             const transformedTime = Math.floor(time * 1000)
@@ -590,15 +597,14 @@ export default class SyncLyrics extends React.Component {
 
         // get current playback status and time
         const {
-            manifest,
-            playbackStatus,
-            colorAnalysis,
-        } = app.cores.player.currentState()
+            track_manifest,
+            playback_status,
+        } = app.cores.player.state
 
         await this.setState({
-            currentManifest: manifest,
-            currentStatus: playbackStatus,
-            colorAnalysis,
+            currentManifest: track_manifest,
+            currentStatus: playback_status,
+            colorAnalysis: track_manifest.cover_analysis,
         })
 
         if (app.layout.sidebar) {
