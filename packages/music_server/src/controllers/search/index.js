@@ -52,27 +52,7 @@ async function searchRoute(req, res) {
             query: keywords
         })
 
-        tidalResult.tracks.items.forEach((element) => {
-            element._id = element.id
-
-            const coverUID = element.album.cover.replace(/-/g, "/")
-
-            element.cover = `https://resources.tidal.com/images/${coverUID}/1280x1280.jpg`
-
-            element.artist = element.artists.map(artist => artist.name).join(", ")
-
-            element.metadata = {
-                title: element.title,
-                artists: element.artists.map(artist => artist.name).join(", "),
-                artist: element.artists.map(artist => artist.name).join(", "),
-                album: element.album.title,
-                duration: element.duration
-            }
-
-            element.service = "tidal"
-
-            results.tracks.push(element)
-        })
+        results.tracks = [...results.tracks, ...tidalResult]
     }
 
     return res.json(results)

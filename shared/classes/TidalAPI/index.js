@@ -1,4 +1,5 @@
 import axios from "axios"
+import { DateTime } from "luxon"
 
 const TIDAL_CLIENT_ID = process.env.TIDAL_CLIENT_ID
 const TIDAL_CLIENT_SECRET = process.env.TIDAL_CLIENT_SECRET
@@ -169,6 +170,73 @@ export default class TidalAPI {
             }
         })
 
-        return response.data
+        return response.data.tracks.items.map((item) => {
+            item._id = item.id
+
+            const coverUID = item.album.cover.replace(/-/g, "/")
+
+            item.cover = `https://resources.tidal.com/images/${coverUID}/1280x1280.jpg`
+
+            item.artist = item.artists.map(artist => artist.name).join(", ")
+
+            item.metadata = {
+                title: item.title,
+                artists: item.artists.map(artist => artist.name).join(", "),
+                artist: item.artists.map(artist => artist.name).join(", "),
+                album: item.album.title,
+                duration: item.duration
+            }
+
+            item.service = "tidal"
+
+            return item
+        })
+    }
+    static async getFavoriteTracks({
+        user_id,
+        country,
+        access_token,
+    }) {
+        const url = `https://api.tidal.com/v1/users/${user_id}/favorites/tracks?countryCode=${country}`
+
+        const response = await axios({
+            method: "GET",
+            url,
+            headers: {
+                "Origin": "http://listen.tidal.com",
+                Authorization: `Bearer ${access_token}`
+            },
+            params: {
+                order: "DATE",
+                orderDirection: "DESC"
+            }
+        })
+
+        return response.data.items.map((item) => {
+            // get js time
+            item.item.liked_at = new Date(item.created).getTime()
+            item.item.service = "tidal"
+
+            item.item._id = item.item.id
+
+            const coverUID = item.item.album.cover.replace(/-/g, "/")
+
+            item.item.cover = `https://resources.tidal.com/images/${coverUID}/1280x1280.jpg`
+
+            item.item.artist = item.item.artists.map(artist => artist.name).join(", ")
+
+            item.item.metadata = {
+                title: item.item.title,
+                artists: item.item.artists.map(artist => artist.name).join(", "),
+                artist: item.item.artists.map(artist => artist.name).join(", "),
+                album: item.item.album.title,
+                duration: item.item.duration
+            }
+
+            item.item.liked = true
+            item.item._computed = true
+
+            return item.item
+        })
     }
 }

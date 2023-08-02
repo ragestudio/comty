@@ -3,10 +3,12 @@ import * as antd from "antd"
 
 import PlaylistView from "components/Music/PlaylistView"
 
-import MusicModel from "comty.js/models/music"
+import MusicModel from "models/music"
 
 export default () => {
-    const [L_Favorites, R_Favorites, E_Favorites] = app.cores.api.useRequest(MusicModel.getFavorites)
+    const [L_Favorites, R_Favorites, E_Favorites] = app.cores.api.useRequest(MusicModel.getFavorites, {
+        useTidal: app.cores.sync.getActiveLinkedServices().tidal
+    })
 
     if (E_Favorites) {
         return <antd.Result
