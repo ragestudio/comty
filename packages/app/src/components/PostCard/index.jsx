@@ -198,9 +198,10 @@ export default class PostCard extends React.PureComponent {
                 </div>
 
                 {
-                    this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
+                    !this.props.disableAttachments && this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
                         attachments={this.props.data.attachments}
                     />
+
                 }
             </div>
 

@@ -6,29 +6,28 @@ import PostCard from "components/PostCard"
 import PlaylistTimelineEntry from "components/Music/PlaylistTimelineEntry"
 import LoadMore from "components/LoadMore"
 
-//import { ViewportList } from "react-viewport-list"
-import AutoSizer from "react-virtualized-auto-sizer"
+import { For } from "million/react"
 
 import PostModel from "models/post"
 
 import "./index.less"
 
 const LoadingComponent = () => {
-    return <antd.Skeleton avatar
+    return <antd.Skeleton
+        avatar
         style={{
-            padding: "20px",
-            width: "100%",
-            height: "160px",
+            width: "100%"
         }}
     />
 }
 
 const NoResultComponent = () => {
-    return <div className="postCard">
-        <antd.Empty
-            description="No more post here"
-        />
-    </div>
+    return <antd.Empty
+        description="No more post here"
+        style={{
+            width: "100%"
+        }}
+    />
 }
 
 const typeToComponent = {
@@ -36,9 +35,27 @@ const typeToComponent = {
     "playlist": (args) => <PlaylistTimelineEntry {...args} />,
 }
 
+const Entry = React.memo((props) => {
+    const { data } = props
+
+    return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
+        key: data._id,
+        data: data,
+        //disableAttachments: true,
+        events: {
+            onClickLike: props.onLikePost,
+            onClickSave: props.onSavePost,
+            onClickDelete: props.onDeletePost,
+            onClickEdit: props.onEditPost,
+        },
+    })
+})
+
 const PostList = (props) => {
+    const parentRef = React.useRef()
+
     return <LoadMore
-        ref={props.listRef}
+        ref={parentRef}
         className="post-list"
         loadingComponent={LoadingComponent}
         noResultComponent={NoResultComponent}
@@ -59,20 +76,26 @@ const PostList = (props) => {
                 </antd.Button>
             </div>
         }
-        {
-            props.list.map((data) => {
-                return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
-                    key: data._id,
-                    data: data,
-                    events: {
-                        onClickLike: props.onLikePost,
-                        onClickSave: props.onSavePost,
-                        onClickDelete: props.onDeletePost,
-                        onClickEdit: props.onEditPost,
-                    }
-                })
-            })
-        }
+
+        <For
+            each={props.list}
+            style={{
+                height: `100%`,
+                width: `100%`,
+            }}
+            as="div"
+        >
+            {
+                (data) => <Entry
+                    key={data._id}
+                    data={data}
+                    onLikePost={props.onLikePost}
+                    onSavePost={props.onSavePost}
+                    onDeletePost={props.onDeletePost}
+                    onEditPost={props.onEditPost}
+                />
+            }
+        </For>
     </LoadMore>
 }
 

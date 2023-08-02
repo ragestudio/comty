@@ -4,14 +4,19 @@
     display: flex;
     flex-direction: column;
 
+    //max-height: 500px;
+    //height: fit-content;
+
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
 
     gap: 15px;
     padding: 17px 17px 0px 17px;
 
     background-color: var(--background-color-accent);
-    border-bottom: 2px solid var(--border-color);
+
+    //border-bottom: 2px solid var(--border-color);
+    border-radius: 8px;
 
     color: rgba(var(--background-color-contrast));
 
@@ -67,17 +72,5 @@
                 color: #fff;
             }
         }
-    }
-
-    &:first-child {
-        border-top-left-radius: 8px;
-        border-top-right-radius: 8px;
-    }
-
-    &:last-child {
-        border-bottom-left-radius: 8px;
-        border-bottom-right-radius: 8px;
-
-        border-bottom: none;
     }
 }

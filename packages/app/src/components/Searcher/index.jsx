@@ -19,11 +19,14 @@ const ResultsTypeDecorators = {
     users: {
         icon: "Users",
         label: "Users",
+        onClick: (item) => {
+            app.navigation.goToAccount(item.username)
+        },
         renderItem: (props) => {
             const { item, onClick } = props
 
             return <div className="suggestion">
-                <UserPreview onClick={onClick} user={item} />
+                <UserPreview onClick={() => onClick(item)} user={item} />
             </div>
         }
     },
@@ -73,9 +76,13 @@ const Results = (props) => {
         </div>
     }
 
-    const handleClick = (props) => {
-        if (props.close) {
-            props.close()
+    const handleClick = async (decorator, data) => {
+        if (typeof decorator.onClick === "function") {
+            await decorator.onClick(data)
+        }
+
+        if (typeof props.onClose === "function") {
+            return props.onClose()
         }
     }
 
@@ -116,7 +123,7 @@ const Results = (props) => {
                                 return decorator.renderItem({
                                     key: index,
                                     item,
-                                    onClick: handleClick,
+                                    onClick: (...data) => handleClick(decorator, ...data),
                                     ...decorator.props,
                                 })
                             })
@@ -199,28 +206,6 @@ export default (props) => {
         }
     }
 
-    const handleResultClick = (type, value) => {
-        switch (type) {
-            case "users": {
-                app.navigation.goToAccount(value.username)
-                break
-            }
-            case "posts": {
-                app.navigation.goToPost(value)
-                break
-            }
-
-            default: {
-                console.warn("Searcher: cannot handle clicks on result of type :", type)
-                break
-            }
-        }
-
-        if (typeof props.close === "function") {
-            props.close()
-        }
-    }
-
     React.useEffect(() => {
         if (props.useUrlQuery) {
             if (typeof query === "string") {
@@ -244,7 +229,7 @@ export default (props) => {
             onChange={handleOnSearch}
             value={searchValue}
             prefix={<Icons.Search />}
-            autoFocus={props.autoFocus ?? false}
+            autoFocus={props.autoFocus ?? true}
             onFocus={props.onFocus}
             onBlur={props.onUnfocus}
         />
@@ -254,7 +239,8 @@ export default (props) => {
             {
                 !loading && <Results
                     results={searchResult}
-                    onClick={handleResultClick} />
+                    onClose={props.close}
+                />
             }
         </div>}
     </div>

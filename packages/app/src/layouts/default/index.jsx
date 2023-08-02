@@ -32,14 +32,11 @@ const DesktopLayout = (props) => {
                 className={classnames(
                     ...props.contentClassnames ?? [],
                     "content_layout",
-                    {
-                        ["floating-sidebar"]: window.app?.cores.settings.get("sidebar.floating")
-                    },
                     "fade-transverse-active",
                 )}
             >
                 {
-                    React.cloneElement(props.children, props)
+                    props.children && React.cloneElement(props.children, props)
                 }
             </Layout.Content>
             <ToolsBar />
@@ -60,7 +57,7 @@ const MobileLayout = (props) => {
             )}
         >
             {
-                React.cloneElement(props.children, props)
+                props.children && React.cloneElement(props.children, props)
             }
         </Layout.Content>
 
