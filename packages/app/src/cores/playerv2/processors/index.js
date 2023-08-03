@@ -1,10 +1,10 @@
 import EqProcessorNode from "./eqNode"
 import GainProcessorNode from "./gainNode"
 import CompressorProcessorNode from "./compressorNode"
-import BPMProcessorNode from "./bpmNode"
+//import BPMProcessorNode from "./bpmNode"
 
 export default [
-    BPMProcessorNode,
+    //BPMProcessorNode,
     EqProcessorNode,
     GainProcessorNode,
     CompressorProcessorNode,
