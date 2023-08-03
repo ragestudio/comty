@@ -12,7 +12,7 @@
 
 A prototype of a platform inside of application focused on services and creatives.
 
-> 👋 We have a open alpha preview version of the project, you can access it from [https://preview.comty.app](https://preview.comty.app)
+> 👋 We have a open alpha preview version of the project, you can access it from [https://comty.app](https://comty.app)
 
 ## 🌟 Some of features
 🚀 Real-time updates are provided to users about various activities such as new followers, likes, posts, comments, and more, thanks to a bid event engine that uses websockets.
@@ -24,6 +24,21 @@ A prototype of a platform inside of application focused on services and creative
 🎶 Comty Music lets users publish their music masterpieces, share their playlists with other users, and synchronize their music with other platforms. A powerful music player is also included in the application.
 
 🧩 Modular and Extensible architecture allows developers to create and publish extensions for the platform using the powerful API provided by Comty.
+
+## 🌐 Available platforms
+We have official public services that you can find on these platforms!
+
+🌐 Web | [Comty > https://comty.app](https://comty.app)
+
+📱 Android | [Android APK > (unsigned) (bundle auto update)](https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk)
+
+📱 IOS | Not available yet
+
+🖥 MacOS | Not available yet
+
+🖥 Windows | Not available yet
+
+🖥 Linux | Not available yet
 
 ## 🚀 Development
 ### Prerequisites
