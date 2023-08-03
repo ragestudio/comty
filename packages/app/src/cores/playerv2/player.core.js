@@ -65,7 +65,7 @@ export default class Player extends Core {
 
         track_manifest: null,
 
-        playback_mode: AudioPlayerStorage.get("mode") ?? "repeat",
+        playback_mode: AudioPlayerStorage.get("mode") ?? "normal",
         playback_status: "stopped",
     })
 
@@ -509,6 +509,7 @@ export default class Player extends Core {
         }
 
         this.track_instance.media.muted = this.state.muted
+        this.track_instance.media.loop = this.state.playback_mode === "repeat"
 
         // try to preload next audio
         if (this.track_next_instances.length > 0) {
@@ -778,6 +779,14 @@ export default class Player extends Core {
         }
 
         this.state.playback_mode = mode
+
+        if (this.track_instance) {
+            this.track_instance.media.loop = this.state.playback_mode === "repeat"
+        }
+
+        AudioPlayerStorage.set("mode", mode)
+
+        return mode
     }
 
     duration() {
@@ -850,7 +859,7 @@ export default class Player extends Core {
 
     toggleMute(to) {
         if (typeof to !== "boolean") {
-           to = !this.state.muted
+            to = !this.state.muted
         }
 
         return this.mute(to)
