@@ -8,7 +8,7 @@ import "./index.less"
 
 export default class SeekBar extends React.Component {
     state = {
-        playing: false,
+        playing: app.cores.player.state["playback_status"] === "playing",
         timeText: "00:00",
         durationText: "00:00",
         sliderTime: 0,
@@ -31,7 +31,7 @@ export default class SeekBar extends React.Component {
 
     calculateDuration = (preCalculatedDuration) => {
         // get current audio duration
-        const audioDuration = preCalculatedDuration || app.cores.player.duration()
+        const audioDuration = preCalculatedDuration ?? app.cores.player.duration()
 
         if (isNaN(audioDuration)) {
             return
@@ -102,6 +102,10 @@ export default class SeekBar extends React.Component {
         },
         // handle when player changes track
         "player.state.update:track_manifest": (manifest) => {
+            if (!manifest) {
+                return false
+            }
+
             this.updateAll()
 
             this.setState({
@@ -131,6 +135,7 @@ export default class SeekBar extends React.Component {
 
     componentDidMount = () => {
         this.calculateDuration()
+        this.updateAll()
         this.tick()
 
         for (const [event, callback] of Object.entries(this.events)) {
