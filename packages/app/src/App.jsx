@@ -211,12 +211,13 @@ class ComtyApp extends React.Component {
 					return app.DrawerController.open("searcher", Searcher, {
 						...options,
 						componentProps: {
-							renderResults: true
+							renderResults: true,
+							autoFocus: true,
 						}
 					})
 				}
 
-				return app.layout.modal.open("searcher", (props) => <Searcher renderResults {...props} />)
+				return app.layout.modal.open("searcher", (props) => <Searcher autoFocus renderResults {...props} />)
 			},
 			openFullImageViewer: (src) => {
 				const win = new DOMWindow({
