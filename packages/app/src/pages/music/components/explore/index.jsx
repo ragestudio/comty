@@ -247,8 +247,6 @@ const SearchResults = ({
 
 export default (props) => {
     const [searchResults, setSearchResults] = React.useState(false)
-    const [loading, setLoading] = React.useState(true)
-    const [hasTidal, setHasTidal] = React.useState(false)
 
     React.useEffect(() => {
         app.layout.toggleCenteredContent(true)
@@ -259,26 +257,12 @@ export default (props) => {
             }
         })
 
-        SyncModel.hasServiceLinked("tidal")
-            .catch(() => {
-                setHasTidal(false)
-                setLoading(false)
-            })
-            .then((value) => {
-                setHasTidal(value.active)
-                setLoading(false)
-            })
-
         return () => {
             if (app.layout.page_panels) {
                 app.layout.page_panels.detachComponent("music_navbar")
             }
         }
     }, [])
-
-    if (loading) {
-        return null
-    }
 
     return <div
         className={classnames(
@@ -291,7 +275,7 @@ export default (props) => {
                 renderResults={false}
                 model={MusicModel.search}
                 modelParams={{
-                    useTidal: hasTidal,
+                    useTidal: app.cores.sync.getActiveLinkedServices().tidal,
                 }}
                 onSearchResult={setSearchResults}
                 onEmpty={() => setSearchResults(false)}
