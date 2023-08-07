@@ -123,7 +123,7 @@ class MusicSyncSubCore {
             this.eventBus.emit("room:owner:changed", data)
         },
         // Room Control
-        "music:player:start": (data) => {
+        "music:player:state": (data) => {
             if (data.command_issuer === app.userData._id) {
                 return false
             }
@@ -224,7 +224,7 @@ class MusicSyncSubCore {
     }
 
     dispatchEvent(eventName, data) {
-        if (!eventName) {
+        if (!eventName || !this.currentRoomData) {
             return false
         }
 
@@ -382,7 +382,25 @@ export default class SyncCore extends Core {
         }.bind(this),
     }
 
+    events = {
+        "app.initialization.start": async () => {
+            const activeServices = await SyncModel.getLinkedServices().catch((error) => {
+                this.console.error(error)
+                return null
+            })
+
+            if (activeServices) {
+                this.console.log(`Active services`, activeServices)
+                this.activeLinkedServices = activeServices
+            }
+        }
+    }
+
     async onInitialize() {
+        for (const [key, value] of Object.entries(this.events)) {
+            app.eventBus.on(key, value)
+        }
+
         const subCores = [
             new MusicSyncSubCore(this.ctx)
         ]
@@ -402,15 +420,6 @@ export default class SyncCore extends Core {
         }
     }
 
-    async initializeAfterCoresInit() {
-        const activeServices = await SyncModel.getLinkedServices().catch((error) => {
-            this.console.error(error)
-            return null
-        })
-
-        if (activeServices) {
-            this.console.log(`Active services`, activeServices)
-            this.activeLinkedServices = activeServices
-        }
-    }
+    // async initializeAfterCoresInit() {
+    // }
 }
