@@ -229,7 +229,7 @@ export default (props) => {
             onChange={handleOnSearch}
             value={searchValue}
             prefix={<Icons.Search />}
-            autoFocus={props.autoFocus ?? true}
+            autoFocus={props.autoFocus ?? false}
             onFocus={props.onFocus}
             onBlur={props.onUnfocus}
         />
