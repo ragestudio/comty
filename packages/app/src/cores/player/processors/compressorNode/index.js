@@ -1,5 +1,5 @@
-import AudioPlayerStorage from "../../storage"
-import ProcessorNode from "../../processorNode"
+import AudioPlayerStorage from "../../player.storage"
+import ProcessorNode from "../node"
 
 export default class CompressorProcessorNode extends ProcessorNode {
     static refName = "compressor"
