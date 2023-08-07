@@ -1,5 +1,5 @@
-import ProcessorNode from "../../processorNode"
-import AudioPlayerStorage from "../../storage"
+import ProcessorNode from "../node"
+import AudioPlayerStorage from "../../player.storage"
 
 export default class EqProcessorNode extends ProcessorNode {
     static refName = "eq"

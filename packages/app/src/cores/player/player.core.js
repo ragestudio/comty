@@ -109,8 +109,29 @@ export default class Player extends Core {
         })
     }
 
+    internalEvents = {
+        "player.state.update:loading": () => {
+            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+        },
+        "player.state.update:track_manifest": () => {
+            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+        },
+        "player.state.update:playback_status": () => {
+            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+        },
+        "player.seeked": (to) => {
+            app.cores.sync.music.dispatchEvent("music.player.seek", to)  
+        },
+    }
+
     async onInitialize() {
+        this.native_controls.initialize()
+
         this.initializeAudioProcessors()
+
+        for (const [eventName, eventHandler] of Object.entries(this.internalEvents)) {
+            this.eventBus.on(eventName, eventHandler)
+        }
 
         Observable.observe(this.state, async (changes) => {
             try {
