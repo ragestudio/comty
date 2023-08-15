@@ -65,31 +65,33 @@ export default class Account extends React.Component {
     }
 
     toggleLike = async () => {
-        const accept = await new Promise((resolve, reject) => {
-            antd.Modal.confirm({
-                title: <Translation>
-                    {t => t("Confirm")}
-                </Translation>,
-                content: <Translation>
-                    {t => t("Are you sure you want to unfollow this user?")}
-                </Translation>,
-                okText: <Translation>
-                    {t => t("Yes")}
-                </Translation>,
-                cancelText: <Translation>
-                    {t => t("No")}
-                </Translation>,
-                onOk: () => {
-                    resolve(true)
-                },
-                onCancel: () => {
-                    resolve(false)
-                }
+        if (this.state.isFollowed) {
+            const accept = await new Promise((resolve, reject) => {
+                antd.Modal.confirm({
+                    title: <Translation>
+                        {t => t("Confirm")}
+                    </Translation>,
+                    content: <Translation>
+                        {t => t("Are you sure you want to unfollow this user?")}
+                    </Translation>,
+                    okText: <Translation>
+                        {t => t("Yes")}
+                    </Translation>,
+                    cancelText: <Translation>
+                        {t => t("No")}
+                    </Translation>,
+                    onOk: () => {
+                        resolve(true)
+                    },
+                    onCancel: () => {
+                        resolve(false)
+                    }
+                })
             })
-        })
 
-        if (!accept) {
-            return false
+            if (!accept) {
+                return false
+            }
         }
 
         const result = await FollowsModel.toggleFollow({
