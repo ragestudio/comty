@@ -196,6 +196,8 @@ export default class TidalAPI {
         user_id,
         country,
         access_token,
+        limit = 100,
+        offset = 0,
     }) {
         const url = `https://api.tidal.com/v1/users/${user_id}/favorites/tracks?countryCode=${country}`
 
@@ -208,11 +210,13 @@ export default class TidalAPI {
             },
             params: {
                 order: "DATE",
-                orderDirection: "DESC"
+                orderDirection: "DESC",
+                limit: limit,
+                offset: offset,
             }
         })
 
-        return response.data.items.map((item) => {
+        response.data.items = response.data.items.map((item) => {
             // get js time
             item.item.liked_at = new Date(item.created).getTime()
             item.item.service = "tidal"
@@ -238,5 +242,10 @@ export default class TidalAPI {
 
             return item.item
         })
+
+        return {
+            total_length: response.data.totalNumberOfItems,
+            tracks: response.data.items
+        }
     }
 }

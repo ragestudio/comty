@@ -7,10 +7,19 @@ export default class MusicModel {
         return globalThis.__comty_shared_state.instances["music"]
     }
 
+    // TODO: Move external services fetching to API
     static getFavorites = async ({
-        useTidal = false
+        useTidal = false,
+        limit,
+        offset,
     }) => {
         let result = []
+
+        let limitPerRequesters = limit
+
+        if (useTidal) {
+            limitPerRequesters = limitPerRequesters / 2
+        }
 
         const requesters = [
             async () => {
@@ -18,21 +27,27 @@ export default class MusicModel {
                     instance: MusicModel.api_instance,
                     method: "GET",
                     url: `/tracks/liked`,
+                    params: {
+                        limit: limitPerRequesters,
+                        offset,
+                    },
                 })
 
                 return data
             },
-        ]
-
-        if (useTidal) {
-            requesters.push(
-                async () => {
-                    const tidalResult = await SyncModel.tidalCore.getMyFavoriteTracks()
-
-                    return tidalResult
+            async () => {
+                if (!useTidal) {
+                    return []
                 }
-            )
-        }
+
+                const tidalResult = await SyncModel.tidalCore.getMyFavoriteTracks({
+                    limit: limitPerRequesters,
+                    offset,
+                })
+
+                return tidalResult
+            },
+        ]
 
         result = await pmap(
             requesters,
@@ -46,17 +61,24 @@ export default class MusicModel {
             }
         )
 
-        result = result.reduce((acc, cur) => {
-            return [...acc, ...cur]
+        let total_length = 0
+
+        result.forEach((result) => {
+            total_length += result.total_length
+        })
+
+        let tracks = result.reduce((acc, cur) => {
+            return [...acc, ...cur.tracks]
         }, [])
 
-        result = result.sort((a, b) => {
+        tracks = tracks.sort((a, b) => {
             return b.liked_at - a.liked_at
         })
 
-        console.log(result)
-
-        return result
+        return {
+            total_length,
+            tracks,
+        }
     }
 
     static search = async (keywords, {
