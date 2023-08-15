@@ -4,7 +4,7 @@ import SessionModel from "../session"
 const emailRegex = new RegExp(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
 
 export default class AuthModel {
-    static login = async (payload) => {
+    static login = async (payload, callback) => {
         const response = await request({
             method: "post",
             url: "/auth/login",
@@ -15,6 +15,10 @@ export default class AuthModel {
         })
 
         SessionModel.token = response.data.token
+
+        if (typeof callback === "function") {
+            await callback()
+        }
 
         __comty_shared_state.eventBus.emit("auth:login_success")
 
