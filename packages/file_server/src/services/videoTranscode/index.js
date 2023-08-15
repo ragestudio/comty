@@ -50,7 +50,12 @@ export default (input, cachePath, params = defaultParams) => {
                     console.warn(`[TRANSCODING] Method ${key} is not a function`)
                     return false
                 }
-                exec = exec[key](commands[key])
+
+                if (Array.isArray(commands[key])) {
+                    exec = exec[key](...commands[key])
+                } else {
+                    exec = exec[key](commands[key])
+                }
             }
         })
 
