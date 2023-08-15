@@ -132,22 +132,32 @@ export class Drawer extends React.Component {
 		return await this.setState({ locked: false })
 	}
 
-	close = () => {
-		if (this.state.locked) {
-			return console.warn("Cannot close a locked drawer")
-		}
-
-		this.toggleVisibility(false)
-
-		this.events.emit("beforeClose")
-
-		setTimeout(() => {
-			if (typeof this.options.onClose === "function") {
-				this.options.onClose()
+	close = async ({
+		unlock = false
+	} = {}) => {
+		return new Promise(async (resolve) => {
+			if (unlock) {
+				await this.setState({ locked: false })
 			}
 
-			this.props.controller.close(this.props.id)
-		}, 500)
+			if (this.state.locked && !unlock) {
+				return console.warn("Cannot close a locked drawer")
+			}
+
+			this.toggleVisibility(false)
+
+			this.events.emit("beforeClose")
+
+			setTimeout(() => {
+				if (typeof this.options.onClose === "function") {
+					this.options.onClose()
+				}
+
+				this.props.controller.close(this.props.id)
+
+				resolve()
+			}, 500)
+		})
 	}
 
 	sendEvent = (...context) => {
