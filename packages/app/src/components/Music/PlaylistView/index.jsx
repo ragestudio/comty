@@ -9,6 +9,8 @@ import useWsEvents from "hooks/useWsEvents"
 
 import { WithPlayerContext } from "contexts/WithPlayerContext"
 
+import LoadMore from "components/LoadMore"
+
 import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
 
@@ -67,17 +69,6 @@ export default (props) => {
         }))
     }
 
-    const returnTracks = (list) => {
-        return list.map((item, index) => {
-            return <MusicTrack
-                order={index + 1}
-                track={item}
-                onClickPlayBtn={() => handleOnClickTrack(item)}
-                onLike={() => handleTrackLike(item)}
-            />
-        })
-    }
-
     const handleOnSearchChange = (value) => {
         debounceSearch = setTimeout(() => {
             makeSearch(value)
@@ -119,6 +110,10 @@ export default (props) => {
     }, {
         socketName: "music",
     })
+
+    React.useEffect(() => {
+        setPlaylist(props.playlist)
+    }, [props.playlist])
 
     if (!playlist) {
         return <antd.Skeleton active />
@@ -164,7 +159,7 @@ export default (props) => {
                         }
                         <div className="play_info_statistics_item">
                             <p>
-                                <Icons.MdLibraryMusic /> {playlist.list.length} Tracks
+                                <Icons.MdLibraryMusic /> {props.length ?? playlist.list.length} Tracks
                             </p>
                         </div>
 
@@ -192,11 +187,36 @@ export default (props) => {
                 />
             </div>
 
-            <WithPlayerContext>
-                {
-                    returnTracks(searchResults ?? playlist.list)
-                }
-            </WithPlayerContext>
+            {
+                playlist.list.length === 0 && <antd.Empty
+                    description={
+                        <>
+                            <Icons.MdLibraryMusic /> This playlist its empty!
+                        </>
+                    }
+                />
+            }
+            {
+                playlist.list.length > 0 && <LoadMore
+                    className="list_content"
+                    loadingComponent={() => <antd.Skeleton />}
+                    onBottom={props.onLoadMore}
+                    hasMore={props.hasMore}
+                >
+                    <WithPlayerContext>
+                        {
+                            playlist.list.map((item, index) => {
+                                return <MusicTrack
+                                    order={index + 1}
+                                    track={item}
+                                    onClickPlayBtn={() => handleOnClickTrack(item)}
+                                    onLike={() => handleTrackLike(item)}
+                                />
+                            })
+                        }
+                    </WithPlayerContext>
+                </LoadMore>
+            }
         </div>
     </div>
 }

@@ -1,14 +1,23 @@
 import { Track, TrackLike } from "@shared-classes/DbModels"
 import { AuthorizationError } from "@shared-classes/Errors"
 
+// TODO: Fetch from external linked services (like tidal, spotify, ...)
 export default async (req, res) => {
     if (!req.session) {
         return new AuthorizationError(req, res)
     }
 
+    const { limit = 100, offset = 0 } = req.query
+
+    let totalLikedTracks = await TrackLike.count({
+        user_id: req.session.user_id,
+    })
+
     let likedTracks = await TrackLike.find({
         user_id: req.session.user_id,
     })
+        .limit(Number(limit))
+        .skip(Number(offset))
         .sort({ created_at: -1 })
 
     const likedTracksIds = likedTracks.map((item) => {
@@ -44,5 +53,8 @@ export default async (req, res) => {
         return indexA - indexB
     })
 
-    return res.json(tracks)
+    return res.json({
+        total_length: totalLikedTracks,
+        tracks,
+    })
 }

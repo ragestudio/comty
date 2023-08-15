@@ -23,6 +23,8 @@ export default async (req, res) => {
             user_id: user_data.id,
             country: user_data.countryCode,
             access_token: access_token,
+            limit: Number(req.query.limit ?? 50),
+            offset: Number(req.query.offset ?? 0),
         })
 
         return res.json(response)
