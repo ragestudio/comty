@@ -53,7 +53,7 @@ export default class Login extends React.Component {
         this.clearError()
         this.toggleLoading(true)
 
-        const loginProcess = await AuthModel.login(payload).catch((error) => {
+        await AuthModel.login(payload, () => this.onDone()).catch((error) => {
             console.error(error, error.response)
 
             this.toggleLoading(false)
@@ -61,21 +61,20 @@ export default class Login extends React.Component {
 
             return false
         })
-
-        if (loginProcess) {
-            this.onDone()
-        }
     }
 
-    onDone = () => {
+    onDone = async () => {
+        if (typeof this.props.close === "function") {
+            await this.props.close({
+                unlock: true
+            })
+        }
+
         if (typeof this.props.onDone === "function") {
             this.props.onDone()
         }
 
-        if (typeof this.props.close === "function") {
-            this.props.unlock()
-            this.props.close()
-        }
+        return true
     }
 
     onClickRegister = () => {
