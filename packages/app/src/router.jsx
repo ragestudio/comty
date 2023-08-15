@@ -195,8 +195,6 @@ export const InternalRouter = (props) => {
 export const PageRender = React.memo((props) => {
     let routes = generateRoutes()
 
-    console.log(routes)
-
     return <Routes>
         {
             routes.map((route, index) => {
