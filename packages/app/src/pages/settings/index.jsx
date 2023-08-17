@@ -88,7 +88,6 @@ const generateMenuItems = () => {
     })
 }
 
-
 export default () => {
     const [activeKey, setActiveKey] = useUrlQueryActiveKey({
         defaultKey: "general",

@@ -61,17 +61,16 @@ export class PagePanelWithNavMenu extends React.Component {
         app.layout.page_panels = this.interface
 
         if (app.isMobile) {
-            app.layout.top_bar.shouldUseTopBarSpacer(false)
+            app.layout.top_bar.shouldUseTopBarSpacer(true)
+            app.layout.toggleCenteredContent(false)
         }
-
-        app.layout.toggleCenteredContent(true)
     }
 
     componentWillUnmount() {
         delete app.layout.page_panels
 
         if (app.isMobile) {
-            app.layout.top_bar.shouldUseTopBarSpacer(true)
+            app.layout.top_bar.shouldUseTopBarSpacer(false)
         } else {
             app.layout.header.render(null)
         }
@@ -179,15 +178,18 @@ export class PagePanelWithNavMenu extends React.Component {
             return []
         }
 
-        return items.map((item) => {
+        items = items.map((item) => {
             return {
                 key: item.key,
                 icon: createIconRender(item.icon),
                 label: item.label,
                 children: item.children && this.getItems(item.children),
                 disabled: item.disabled,
+                props: item.props ?? {},
             }
         })
+
+        return items
     }
 
     render() {
@@ -204,7 +206,7 @@ export class PagePanelWithNavMenu extends React.Component {
                 !app.isMobile && app.layout.header.render(<NavMenu
                     header={this.props.navMenuHeader}
                     activeKey={this.state.activeTab}
-                    items={this.getItems(this.props.tabs)}
+                    items={this.getItems([...this.props.tabs ?? [], ...this.props.extraItems ?? []])}
                     onClickItem={(key) => this.handleTabChange(key)}
                     renderNames
                 >
@@ -221,9 +223,13 @@ export class PagePanelWithNavMenu extends React.Component {
                 </NavMenu>)
             }
 
-            {
-                this.renderActiveTab()
-            }
+            <div className="pagePanels">
+                <div className="panel">
+                    {
+                        this.renderActiveTab()
+                    }
+                </div>
+            </div>
         </>
     }
 }

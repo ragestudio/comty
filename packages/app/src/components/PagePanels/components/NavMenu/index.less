@@ -1,5 +1,22 @@
 @import "theme/vars.less";
 
+html {
+    &.mobile {
+        .navmenu_wrapper {
+            .navmenu_item {
+                &.active {
+                    color: var(--colorPrimary) !important;
+                    background-color: var(--background-color-primary);
+                }
+
+                .icon {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+    }
+}
+
 .navmenu_wrapper {
     display: flex;
     flex-direction: row;
@@ -8,8 +25,13 @@
 
     width: 100%;
 
+    .ant-btn-primary:not(.ant-btn-dangerous) {
+        .label {
+            color: var(--background-color-primary);
+        }
+    }
+
     .navmenu_item {
-        font-size: 0.7rem;
         display: flex;
         flex-direction: row;
 
@@ -23,17 +45,21 @@
 
         &.active {
             color: var(--colorPrimary);
+            background-color: var(--background-color-primary);
         }
 
         p {
             margin: 0;
+            color: var(--text-color);
+        }
+
+        svg {
+            color: currentColor;
         }
 
         .icon {
             margin: 0;
             line-height: 1rem;
-            font-size: 1.5rem;
-
             font-size: 1rem;
         }
 

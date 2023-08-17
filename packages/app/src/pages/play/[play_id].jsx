@@ -24,6 +24,8 @@ export default (props) => {
 
     React.useEffect(() => {
         loadData()
+
+        app.layout.toggleCenteredContent(false)
     }, [])
 
     if (!playlist) {
