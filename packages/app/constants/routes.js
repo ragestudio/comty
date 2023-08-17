@@ -16,7 +16,8 @@ export default [
     },
     {
         path: "/play/*",
-        centeredContent: true
+        centeredContent: true,
+        public: true,
     },
     {
         path: "/post/*",
@@ -36,26 +37,37 @@ export default [
     {
         path: "/settings/*",
         useLayout: "default",
-        centeredContent: true
+        centeredContent: {
+            mobile: true,
+            desktop: false,
+        },
     },
     {
         path: "/security/*",
         useLayout: "default",
-        centeredContent: true
+        centeredContent: true,
     },
     {
         path: "/music/*",
         useLayout: "default",
-        centeredContent: true
+        centeredContent: true,
     },
     {
         path: "/landing/*",
         useLayout: "minimal",
-        public: true
+        public: true,
     },
     {
         path: "/nfc/*",
         useLayout: "minimal",
-        public: true
+        public: true,
+    },
+    {
+        path: "/",
+        useLayout: "default",
+        centeredContent: {
+            mobile: false,
+            desktop: true,
+        },
     }
 ]
