@@ -226,7 +226,7 @@ export default class Sidebar extends React.Component {
 			app.eventBus.off(event, handler)
 		}
 
-		delete app.layout.sidebar
+		//delete app.layout.sidebar
 	}
 
 	handleClick = (e) => {
@@ -398,12 +398,13 @@ export default class Sidebar extends React.Component {
 											autoFocus
 											placement="top"
 											trigger={["click"]}
-											onOpenChange={this.onDropdownOpenChange}
+										//onOpenChange={this.onDropdownOpenChange}
 										>
 											<Menu.Item
 												key="account"
 												className="user_avatar"
 												ignoreClick
+												onDoubleClick={onClickHandlers.account}
 											>
 												<Avatar shape="square" src={app.userData?.avatar} />
 											</Menu.Item>
