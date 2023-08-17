@@ -16,8 +16,9 @@ export default [
     },
     {
         path: "/play/*",
-        centeredContent: true,
         public: true,
+        centeredContent: true,
+        mobileTopBarSpacer: true,
     },
     {
         path: "/post/*",
@@ -35,12 +36,13 @@ export default [
         public: true
     },
     {
-        path: "/settings/*",
+        path: "/settings",
         useLayout: "default",
         centeredContent: {
             mobile: true,
             desktop: false,
         },
+        mobileTopBarSpacer: true,
     },
     {
         path: "/security/*",

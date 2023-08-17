@@ -69,10 +69,10 @@ export class PagePanelWithNavMenu extends React.Component {
     componentWillUnmount() {
         delete app.layout.page_panels
 
-        if (app.isMobile) {
-            app.layout.top_bar.shouldUseTopBarSpacer(false)
-        } else {
+        if (!app.isMobile) {
             app.layout.header.render(null)
+        } else {
+            app.layout.top_bar.renderDefault()
         }
     }
 

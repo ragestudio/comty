@@ -157,6 +157,16 @@ export default class Layout extends React.PureComponent {
 				root.classList.remove(classname)
 			}
 		},
+		rootContainerHasClassname: (classname) => {
+			const root = document.documentElement
+
+			if (!root) {
+				console.error("root not found")
+				return false
+			}
+
+			return root.classList.contains(classname)
+		},
 		scrollTo: (to) => {
 			const content_layout = document.getElementById("content_layout")
 
