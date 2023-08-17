@@ -49,7 +49,7 @@ async function processImage(file) {
 
     const outputFilepath = path.resolve(file.cachePath, `${file.hash}_transformed.${format}`)
 
-    await transformResult.toFile(outputFilepath)
+    await image.toFile(outputFilepath)
 
     file.filepath = outputFilepath
 
