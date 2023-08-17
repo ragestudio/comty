@@ -1,27 +1,52 @@
 import React from "react"
 import classnames from "classnames"
+import { Motion, spring } from "react-motion"
+
+import useLayoutInterface from "hooks/useLayoutInterface"
 
 import "./index.less"
 
 export default (props) => {
-    const [visible, setVisible] = React.useState(false)
+    const [render, setRender] = React.useState(null)
 
-    const headerInterface = {
-        toggle: (to) => setVisible((prevValue) => to ?? !prevValue),
-    }
-
-    React.useEffect(() => {
-        app.layout.header = headerInterface
-    }, [])
-
-    return <div
-        className={classnames(
-            "page_header",
-            {
-                ["visible"]: visible,
+    useLayoutInterface("header", {
+        render: (component, options) => {
+            if (component === null) {
+                return setRender(null)
             }
-        )}
+
+            return setRender({
+                component,
+                options
+            })
+        }
+    })
+
+    return <Motion
+        style={{
+            y: spring(render ? 0 : 100,),
+        }}
     >
-        {String(window.location.pathname).toTitleCase()}
-    </div>
+        {({ y, height }) => {
+            return <div
+                className={classnames(
+                    "page_header_wrapper",
+                    {
+                        ["hidden"]: !render,
+                    }
+                )}
+                style={{
+                    WebkitTransform: `translateY(-${y}px)`,
+                    transform: `translateY(-${y}px)`,
+                }}
+            >
+                {
+                    render?.component && React.cloneElement(
+                        render?.component,
+                        render?.options?.props ?? {}
+                    )
+                }
+            </div>
+        }}
+    </Motion>
 }
