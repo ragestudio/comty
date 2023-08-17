@@ -1,30 +1,44 @@
-.tools-bar {
+@import "theme/vars.less";
+
+.tools-bar-wrapper {
     position: sticky;
 
     top: 0;
     right: 0;
-
-    display: flex;
-    flex-direction: column;
 
     max-width: 20vw;
 
     height: 100vh;
     height: 100dvh;
 
-    border-left: 1px solid var(--border-color);
+    padding: 10px;
+}
+
+.tools-bar {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 12px;
+
+    border-radius: @sidebar_borderRadius;
+    box-shadow: @card-shadow;
+
+    background-color: var(--background-color-accent);
 
     gap: 20px;
 
     &.visible {
-        padding: 20px;
+        padding: 10px;
     }
 
     .card {
         display: flex;
         flex-direction: column;
 
-        background-color: var(--background-color-accent);
+        background-color: var(--background-color-primary);
         border-radius: 12px;
 
         padding: 20px;
