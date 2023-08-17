@@ -162,13 +162,32 @@ export default (props) => {
     }
 
     return <div className="streamingControlPanel">
+        <div className="streamingControlPanel_header_thumbnail">
+            <img
+                src={
+                    profileData?.info.thumbnail ?? "/assets/new_file.png"
+                }
+            />
+        </div>
         <div className="streamingControlPanel_header">
-            <div className="streamingControlPanel_header_thumbnail">
-                <img
-                    src={
-                        profileData?.info.thumbnail ?? "/assets/new_file.png"
-                    }
+            <div className="streamingControlPanel_header_actions">
+                <ProfileSelector
+                    profiles={R_Profiles}
+                    value={selectedProfileId}
+                    loading={L_Profiles}
+                    onCreateProfile={handleCreateProfile}
+                    onChangeProfile={(profileID) => {
+                        setSelectedProfileId(profileID)
+                    }}
                 />
+
+                <antd.Button
+                    type="primary"
+                    icon={<Icons.Edit2 />}
+                    onClick={onClickEditInfo}
+                >
+                    Edit profile
+                </antd.Button>
             </div>
 
             <div className="streamingControlPanel_header_details">
@@ -208,42 +227,24 @@ export default (props) => {
                     <CategoryViewResolver category={profileData?.info.category} />
                 </div>
             </div>
-
-            <div className="streamingControlPanel_header_actions">
-                <ProfileSelector
-                    profiles={R_Profiles}
-                    value={selectedProfileId}
-                    loading={L_Profiles}
-                    onCreateProfile={handleCreateProfile}
-                    onChangeProfile={(profileID) => {
-                        setSelectedProfileId(profileID)
-                    }}
-                />
-
-                <antd.Button
-                    type="primary"
-                    icon={<Icons.Edit2 />}
-                    onClick={onClickEditInfo}
-                >
-                    Edit profile
-                </antd.Button>
-            </div>
         </div>
 
-        <div className="config">
+        <div className="streaming_configs">
             <LimitAlert
                 limit_id="streaming_bandwidth"
             />
 
-            <div className="panel">
+            <div className="streaming_configs_panel">
                 <h2><Icons.MdSettingsInputAntenna /> Emission</h2>
 
                 <div className="content">
                     <span>Ingestion URL</span>
 
-                    <code>
-                        {profileData?.addresses?.ingest ?? "No ingest URL available"}
-                    </code>
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.ingest ?? "No ingest URL available"}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="content">
@@ -265,7 +266,7 @@ export default (props) => {
                 </div>
             </div>
 
-            <div className="panel">
+            <div className="streaming_configs_panel">
                 <h2><Icons.Tool />Additional options</h2>
 
                 <div className="content">
@@ -291,35 +292,41 @@ export default (props) => {
                 </div>
             </div>
 
-            <div className="panel">
+            <div className="streaming_configs_panel">
                 <h2><Icons.Link /> URL Information</h2>
 
                 <div className="content">
                     <span>AAC URL (Only Audio)</span>
 
-                    <code>
-                        {profileData?.addresses?.aac ?? "No AAC URL available"}
-                    </code>
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.aac ?? "No AAC URL available"}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="content">
                     <span>HLS URL</span>
 
-                    <code>
-                        {profileData?.addresses?.hls ?? "No HLS URL available"}
-                    </code>
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.hls ?? "No HLS URL available"}
+                        </span>
+                    </div>
                 </div>
 
                 <div className="content">
                     <span>FLV URL</span>
 
-                    <code>
-                        {profileData?.addresses?.flv ?? "No FLV URL available"}
-                    </code>
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.flv ?? "No FLV URL available"}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div className="panel">
+            <div className="streaming_configs_panel">
                 <h2><Icons.Activity /> Statistics</h2>
 
                 <div className="content">
