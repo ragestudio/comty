@@ -6,8 +6,6 @@ import PostCard from "components/PostCard"
 import PlaylistTimelineEntry from "components/Music/PlaylistTimelineEntry"
 import LoadMore from "components/LoadMore"
 
-import { For } from "million/react"
-
 import PostModel from "models/post"
 
 import "./index.less"
@@ -77,7 +75,20 @@ const PostList = (props) => {
             </div>
         }
 
-        <For
+        {
+            props.list.map((data) => {
+                return <Entry
+                    key={data._id}
+                    data={data}
+                    onLikePost={props.onLikePost}
+                    onSavePost={props.onSavePost}
+                    onDeletePost={props.onDeletePost}
+                    onEditPost={props.onEditPost}
+                />
+            })
+        }
+
+        {/* <For
             each={props.list}
             style={{
                 height: `100%`,
@@ -95,7 +106,7 @@ const PostList = (props) => {
                     onEditPost={props.onEditPost}
                 />
             }
-        </For>
+        </For> */}
     </LoadMore>
 }
 
@@ -160,6 +171,7 @@ export class PostsListsComponent extends React.Component {
 
         let payload = {
             trim: this.state.list.length,
+            limit: app.cores.settings.get("feed_max_fetch"),
         }
 
         if (this.props.loadFromModelProps) {
