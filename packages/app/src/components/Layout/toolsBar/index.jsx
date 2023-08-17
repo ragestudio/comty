@@ -1,5 +1,4 @@
 import React from "react"
-import * as antd from "antd"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
 import { Translation } from "react-i18next"
@@ -45,43 +44,47 @@ export default class ToolsBar extends React.Component {
         }}>
             {({ x, width }) => {
                 return <div
-                    id="tools_bar"
-                    className={classnames(
-                        "tools-bar",
-                        {
-                            visible: this.state.visible,
-                        }
-                    )}
+                    className="tools-bar-wrapper"
                     style={{
                         width: `${width}%`,
                         transform: `translateX(${x}%)`,
                     }}
                 >
-                    <FeaturedEventsAnnouncements />
+                    <div
+                        id="tools_bar"
+                        className={classnames(
+                            "tools-bar",
+                            {
+                                visible: this.state.visible,
+                            }
+                        )}
+                    >
+                        <FeaturedEventsAnnouncements />
 
-                    <div className="card" id="trendings">
-                        <div className="header">
-                            <h2>
-                                <Icons.TrendingUp />
-                                <Translation>{(t) => t("Trendings")}</Translation>
-                            </h2>
+                        <div className="card" id="trendings">
+                            <div className="header">
+                                <h2>
+                                    <Icons.TrendingUp />
+                                    <Translation>{(t) => t("Trendings")}</Translation>
+                                </h2>
+                            </div>
+
+                            <HashtagTrendings />
                         </div>
 
-                        <HashtagTrendings />
-                    </div>
+                        <div className="card" id="onlineFriends">
+                            <div className="header">
+                                <h2>
+                                    <Icons.MdPeopleAlt />
+                                    <Translation>{(t) => t("Online Friends")}</Translation>
+                                </h2>
+                            </div>
 
-                    <div className="card" id="onlineFriends">
-                        <div className="header">
-                            <h2>
-                                <Icons.MdPeopleAlt />
-                                <Translation>{(t) => t("Online Friends")}</Translation>
-                            </h2>
+                            <ConnectedFriends />
                         </div>
 
-                        <ConnectedFriends />
+                        <WidgetsWrapper />
                     </div>
-
-                    <WidgetsWrapper />
                 </div>
             }}
         </Motion>
