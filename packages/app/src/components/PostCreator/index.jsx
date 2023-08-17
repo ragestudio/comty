@@ -18,6 +18,8 @@ const DEFAULT_POST_POLICY = {
     maximunFilesPerRequest: 10
 }
 
+// TODO: Fix close window when post created
+
 export default class PostCreator extends React.Component {
     state = {
         pending: [],
@@ -109,6 +111,10 @@ export default class PostCreator extends React.Component {
 
             if (typeof this.props.onPost === "function") {
                 this.props.onPost()
+            }
+
+            if (typeof this.props.close === "function") {
+                this.props.close()
             }
         }
     }
