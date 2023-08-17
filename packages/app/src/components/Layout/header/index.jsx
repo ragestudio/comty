@@ -19,7 +19,7 @@ export default (props) => {
                 component,
                 options
             })
-        }
+        },
     })
 
     return <Motion
