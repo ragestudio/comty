@@ -97,6 +97,22 @@ function generatePageElementWrapper(route, element, bindProps) {
                 app.layout.set(routeDeclaration.useLayout)
             }
 
+            if (typeof routeDeclaration.centeredContent !== "undefined") {
+                let finalBool = null
+
+                if (typeof routeDeclaration.centeredContent === "boolean") {
+                    finalBool = routeDeclaration.centeredContent
+                } else {
+                    if (app.isMobile) {
+                        finalBool = routeDeclaration.centeredContent?.mobile ?? null
+                    } else {
+                        finalBool = routeDeclaration.centeredContent?.desktop ?? null
+                    }
+                }
+
+                app.layout.toggleCenteredContent(finalBool)
+            }
+
             if (typeof routeDeclaration.useTitle !== "undefined") {
                 if (typeof routeDeclaration.useTitle === "function") {
                     routeDeclaration.useTitle = routeDeclaration.useTitle(route, params)
