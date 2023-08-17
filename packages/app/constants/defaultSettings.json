@@ -10,7 +10,7 @@
     "sidebar.collapse_delay_time": 500,
     "haptic_feedback": true,
     "style.auto_darkMode": true,
-    "feed_max_fetch": 20,
+    "feed_max_fetch": 7,
     "style.compactMode": false,
     "player.compressor": false,
     "language": "en"
