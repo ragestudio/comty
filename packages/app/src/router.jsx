@@ -124,6 +124,12 @@ function generatePageElementWrapper(route, element, bindProps) {
             }
         }
 
+        if (typeof routeDeclaration?.mobileTopBarSpacer === "boolean" && app.isMobile) {
+            app.layout.toggleTopBarSpacer(routeDeclaration.mobileTopBarSpacer)
+        } else {
+            app.layout.toggleTopBarSpacer(false)
+        }
+
         return React.createElement(
             loadable(element, {
                 fallback: React.createElement(bindProps.staticRenders?.PageLoad || DefaultLoadingRender),

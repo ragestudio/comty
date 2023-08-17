@@ -59,8 +59,6 @@ export default class Account extends React.Component {
     }
 
     componentDidMount = async () => {
-        app.layout.toggleCenteredContent(true)
-
         this.loadUser()
     }
 
