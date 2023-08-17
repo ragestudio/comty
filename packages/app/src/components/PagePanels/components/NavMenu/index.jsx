@@ -4,30 +4,8 @@ import * as antd from "antd"
 
 import "./index.less"
 
-const NavMenu = (props) => {
-    const handleOnClickItem = (event) => {
-        return props.onClickItem(event.key)
-    }
 
-    return <div className="navmenu_wrapper">
-        <div className="card">
-            {
-                props.header && <div className="card_header">
-                    {props.header}
-                </div>
-            }
-
-            <antd.Menu
-                mode="inline"
-                selectedKeys={[props.activeKey]}
-                onClick={handleOnClickItem}
-                items={props.items}
-            />
-        </div>
-    </div>
-}
-
-const NavMenuMobile = (props) => {
+export default (props) => {
     function handleClickItem(item) {
         if (item.children && Array.isArray(item.children)) {
             return false
@@ -38,7 +16,7 @@ const NavMenuMobile = (props) => {
 
     return <div
         className={classnames(
-            "__mobile__navmenu_wrapper",
+            "navmenu_wrapper",
         )}
     >
         {
@@ -56,7 +34,7 @@ const NavMenuMobile = (props) => {
                         <antd.Button
                             key={item.key}
                             className={classnames(
-                                "__mobile__navmenu_item",
+                                "navmenu_item",
                                 item.key === props.activeKey && "active",
                             )}
                             type="ghost"
@@ -65,6 +43,14 @@ const NavMenuMobile = (props) => {
                             <div className="icon">
                                 {item.icon}
                             </div>
+
+                            {
+                                props.renderNames && <div className="label">
+                                    <p>
+                                        {item.label ?? item.id}
+                                    </p>
+                                </div>
+                            }
                         </antd.Button>
                     </antd.Dropdown>
                 }
@@ -72,7 +58,7 @@ const NavMenuMobile = (props) => {
                 return <antd.Button
                     key={item.key}
                     className={classnames(
-                        "__mobile__navmenu_item",
+                        "navmenu_item",
                         item.key === props.activeKey && "active",
                     )}
                     onClick={() => handleClickItem(item)}
@@ -82,10 +68,16 @@ const NavMenuMobile = (props) => {
                     <div className="icon">
                         {item.icon}
                     </div>
+
+                    {
+                        props.renderNames && <div className="label">
+                            <p>
+                                {item.label ?? item.id}
+                            </p>
+                        </div>
+                    }
                 </antd.Button>
             })
         }
     </div>
 }
-
-export default app.isMobile ? NavMenuMobile : NavMenu

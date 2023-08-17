@@ -2,7 +2,15 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
-import { Sidebar, Drawer, Sidedrawer, BottomBar, TopBar, ToolsBar } from "components/Layout"
+import {
+    Sidebar,
+    Drawer,
+    Sidedrawer,
+    BottomBar,
+    TopBar,
+    ToolsBar,
+    Header,
+} from "components/Layout"
 
 import BackgroundDecorator from "components/BackgroundDecorator"
 
@@ -27,6 +35,7 @@ const DesktopLayout = (props) => {
             <Drawer />
             <Sidebar />
             <Sidedrawer />
+
             <Layout.Content
                 id="content_layout"
                 className={classnames(
@@ -35,6 +44,8 @@ const DesktopLayout = (props) => {
                     "fade-transverse-active",
                 )}
             >
+                <Header />
+
                 {
                     props.children && React.cloneElement(props.children, props)
                 }

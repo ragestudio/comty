@@ -72,6 +72,8 @@ export class PagePanelWithNavMenu extends React.Component {
 
         if (app.isMobile) {
             app.layout.top_bar.shouldUseTopBarSpacer(true)
+        } else {
+            app.layout.header.render(null)
         }
     }
 
@@ -119,7 +121,10 @@ export class PagePanelWithNavMenu extends React.Component {
 
         const componentProps = tab.props ?? this.props.tabProps
 
-        return React.createElement(tab.component, componentProps)
+        return React.createElement(tab.component, {
+            ...componentProps,
+            ref: this.primaryPanelRef,
+        })
     }
 
     replaceQueryTypeToCurrentTab = () => {
@@ -186,16 +191,23 @@ export class PagePanelWithNavMenu extends React.Component {
     }
 
     render() {
-        const panels = [
+        return <>
             {
-                children: <>
-                    <NavMenu
-                        header={this.props.navMenuHeader}
-                        activeKey={this.state.activeTab}
-                        items={this.getItems(this.props.tabs)}
-                        onClickItem={(key) => this.handleTabChange(key)}
-                    />
+                app.isMobile && app.layout.top_bar.render(<NavMenu
+                    activeKey={this.state.activeTab}
+                    items={this.getItems(this.props.tabs)}
+                    onClickItem={(key) => this.handleTabChange(key)}
+                />)
+            }
 
+            {
+                !app.isMobile && app.layout.header.render(<NavMenu
+                    header={this.props.navMenuHeader}
+                    activeKey={this.state.activeTab}
+                    items={this.getItems(this.props.tabs)}
+                    onClickItem={(key) => this.handleTabChange(key)}
+                    renderNames
+                >
                     {
                         Array.isArray(this.state.renders) && [
                             this.state.renders.map((render, index) => {
@@ -206,98 +218,14 @@ export class PagePanelWithNavMenu extends React.Component {
                             })
                         ]
                     }
-                </>
-            },
-            {
-                props: {
-                    ref: this.primaryPanelRef,
-                    className: this.props.transition ? "fade-opacity-enter" : undefined,
-                },
-                children: this.renderActiveTab()
-            },
-        ]
-
-        if (app.isMobile) {
-            delete panels[0]
-        }
-
-        if (this.props.extraPanel) {
-            panels.push(this.props.extraPanel)
-        }
-
-        return <>
-            {
-                app.isMobile && app.layout.top_bar.render(<NavMenu
-                    activeKey={this.state.activeTab}
-                    items={this.getItems(this.props.tabs)}
-                    onClickItem={(key) => this.handleTabChange(key)}
-                />)
+                </NavMenu>)
             }
-            <PagePanels
-                primaryPanelClassName={this.props.primaryPanelClassName}
-                panels={panels}
-                masked={this.props.masked}
-                no_top_padding={this.props.no_top_padding}
-            />
+
+            {
+                this.renderActiveTab()
+            }
         </>
     }
 }
 
-export default class PagePanels extends React.Component {
-    generateGridStyle = () => {
-        switch (this.props.panels.length) {
-            case 1: {
-                return {
-                    gridTemplateColumns: "1fr",
-                }
-            }
-            case 2: {
-                return {
-                    gridTemplateColumns: "1fr 3fr",
-                }
-            }
-            case 3: {
-                return {
-                    gridTemplateColumns: "0.5fr 1fr 0.5fr",
-                }
-            }
-        }
-    }
-
-    render() {
-        if (!this.props.panels) {
-            return null
-        }
-
-        return <div
-            className={classnames(
-                "pagePanels",
-                {
-                    ["masked"]: this.props.masked,
-                    ["withTopPadding"]: !!!this.props.no_top_padding
-                }
-            )}
-            style={this.generateGridStyle()}
-        >
-            {
-                this.props.panels[0] && <Panel
-                    {...this.props.panels[0]}
-                    align="left"
-                />
-            }
-            {
-                this.props.panels[1] && <Panel
-                    {...this.props.panels[1]}
-                    className={this.props.primaryPanelClassName}
-                    align="center"
-                />
-            }
-            {
-                this.props.panels[2] && <Panel
-                    {...this.props.panels[2]}
-                    align="right"
-                />
-            }
-        </div>
-    }
-}
+export default PagePanelWithNavMenu
