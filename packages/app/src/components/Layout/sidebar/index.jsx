@@ -52,6 +52,7 @@ const generateTopItems = (extra = []) => {
 		return {
 			id: item.id,
 			key: item.id,
+			path: item.path,
 			icon: createIconRender(item.icon),
 			label: <Translation>
 				{t => t(item.title ?? item.id)}
