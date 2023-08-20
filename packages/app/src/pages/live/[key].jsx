@@ -213,13 +213,13 @@ export default class StreamViewer extends React.Component {
         }
 
         // load the flv decoder (by default)
-        if (this.state.stream) {
-            if (!this.state.stream.sources) {
+        if (stream) {
+            if (!stream.sources) {
                 console.error("Stream sources not found")
                 return
             }
 
-            await this.loadDecoder("flv", this.state.stream.sources.flv)
+            await this.loadDecoder("flv", stream.sources.flv)
         }
 
         // TODO: Watch ws to get livestream:started event and load the decoder if it's not loaded
