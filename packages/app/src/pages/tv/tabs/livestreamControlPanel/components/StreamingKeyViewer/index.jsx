@@ -14,9 +14,9 @@ export default (props) => {
         {streamingKeyVisibility ?
             <>
                 <Icons.EyeOff onClick={() => toggleVisibility()} />
-                <code>
+                <div className="inline_field">
                     {props.streamingKey ?? "No streaming key available"}
-                </code>
+                </div>
             </> :
             <div
                 onClick={() => toggleVisibility()}
