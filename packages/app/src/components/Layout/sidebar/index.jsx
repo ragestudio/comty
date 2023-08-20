@@ -11,6 +11,16 @@ import sidebarItems from "schemas/sidebar"
 
 import "./index.less"
 
+const extraItems = [
+	{
+		id: "insiders",
+		title: "Insiders",
+		icon: "MdToken",
+		roles: ["insider"],
+		path: "/insiders",
+	}
+]
+
 const onClickHandlers = {
 	settings: () => {
 		window.app.navigation.goToSettings()
@@ -35,9 +45,12 @@ const onClickHandlers = {
 	}
 }
 
-const generateTopItems = () => {
-	return sidebarItems.map((item) => {
+const generateTopItems = (extra = []) => {
+	const items = [...sidebarItems, ...extra]
+
+	return items.map((item) => {
 		return {
+			id: item.id,
 			key: item.id,
 			icon: createIconRender(item.icon),
 			label: <Translation>
@@ -208,6 +221,8 @@ export default class Sidebar extends React.Component {
 	}
 
 	componentDidMount = async () => {
+		this.computeExtraItems()
+
 		for (const [event, handler] of Object.entries(this.events)) {
 			app.eventBus.on(event, handler)
 		}
@@ -227,6 +242,28 @@ export default class Sidebar extends React.Component {
 		}
 
 		//delete app.layout.sidebar
+	}
+
+	computeExtraItems = async () => {
+		const roles = await app.cores.permissions.getRoles()
+
+		const resultItems = []
+
+		if (roles.includes("admin")) {
+			resultItems.push(...extraItems)
+		} else {
+			extraItems.forEach((item) => {
+				item.roles.every((role) => {
+					if (roles.includes(role)) {
+						resultItems.push(item)
+					}
+				})
+			})
+		}
+
+		this.setState({
+			topItems: generateTopItems(resultItems)
+		})
 	}
 
 	handleClick = (e) => {
@@ -249,7 +286,7 @@ export default class Sidebar extends React.Component {
 
 		window.app.cores.sound.useUIAudio("sidebar.switch_tab")
 
-		const item = sidebarItems.find((item) => item.id === e.key)
+		const item = this.state.topItems.find((item) => item.id === e.key)
 
 		return window.app.location.push(`/${item.path ?? e.key}`, 150)
 	}
