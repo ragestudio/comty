@@ -13,6 +13,10 @@ export default class Session {
         return Storage.engine.set(this.storageTokenKey, token)
     }
 
+    static get roles() {
+        return this.getDecodedToken()?.roles
+    }
+
     static get user_id() {
         return this.getDecodedToken()?.user_id
     }
