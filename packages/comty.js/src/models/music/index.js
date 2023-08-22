@@ -37,7 +37,10 @@ export default class MusicModel {
             },
             async () => {
                 if (!useTidal) {
-                    return []
+                    return {
+                        total_length: 0,
+                        tracks: [],
+                    }
                 }
 
                 const tidalResult = await SyncModel.tidalCore.getMyFavoriteTracks({
