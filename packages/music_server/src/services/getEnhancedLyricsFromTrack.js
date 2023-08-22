@@ -2,8 +2,8 @@ import findSpotifyId from "@services/findSpotifyId"
 import { Track } from "@shared-classes/DbModels"
 import axios from "axios"
 
-const syncLyricsProvider = `https://spotify-lyric-api.herokuapp.com`
-const canvasProvider = `https://api.delitefully.com/api/canvas`
+const syncLyricsProvider = process.env.LYRICS_SYNC_PROVIDER || `https://spotify-lyric-api.herokuapp.com`
+const canvasProvider = process.env.LYRICS_CANVAS_PROVIDER || `https://c_cdn-test.ragestudio.net/api/canvas`
 
 export default async (track, { req }) => {
     if (typeof track !== "object") {
