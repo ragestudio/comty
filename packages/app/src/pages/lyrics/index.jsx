@@ -229,15 +229,15 @@ class PlayerController extends React.Component {
                         </div>
                         <div className="player_controller_info_artist">
                             {
-                                this.state.currentPlaying?.artist && <>
+                                (this.state.currentPlaying?.metadata?.artist ?? this.state.currentPlaying?.artist) && <>
                                     <h3>
-                                        {this.state.currentPlaying?.artist ?? "Unknown"}
+                                        {this.state.currentPlaying?.metadata?.artist ?? this.state.currentPlaying?.artist ?? "Unknown"}
                                     </h3>
                                     {
-                                        this.state.currentPlaying?.album && <>
+                                        (this.state.currentPlaying?.metadata?.album ?? this.state.currentPlaying?.album) && <>
                                             <span> - </span>
                                             <h3>
-                                                {this.state.currentPlaying?.album ?? "Unknown"}
+                                                {this.state.currentPlaying?.metadata?.album ?? this.state.currentPlaying?.album ?? "Unknown"}
                                             </h3>
                                         </>
                                     }
