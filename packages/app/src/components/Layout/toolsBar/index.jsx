@@ -13,6 +13,7 @@ import "./index.less"
 export default class ToolsBar extends React.Component {
     state = {
         visible: false,
+        renders: [],
     }
 
     componentDidMount() {
@@ -35,6 +36,24 @@ export default class ToolsBar extends React.Component {
                 visible: to ?? !this.state.visible,
             })
         },
+        attachRender: (id, component, props) => {
+            this.setState({
+                renders: [...this.state.renders, {
+                    id: id,
+                    component: component,
+                    props: props,
+                }],
+            })
+
+            return component
+        },
+        detachRender: (id) => {
+            this.setState({
+                renders: this.state.renders.filter((render) => render.id !== id),
+            })
+
+            return true
+        }
     }
 
     render() {
@@ -59,8 +78,6 @@ export default class ToolsBar extends React.Component {
                             }
                         )}
                     >
-                        <FeaturedEventsAnnouncements />
-
                         <div className="card" id="trendings">
                             <div className="header">
                                 <h2>
@@ -83,7 +100,17 @@ export default class ToolsBar extends React.Component {
                             <ConnectedFriends />
                         </div>
 
+                        <FeaturedEventsAnnouncements />
+
                         <WidgetsWrapper />
+
+                        <div className="attached_renders">
+                            {
+                                this.state.renders.map((render) => {
+                                    return React.createElement(render.component, render.props)
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
             }}
