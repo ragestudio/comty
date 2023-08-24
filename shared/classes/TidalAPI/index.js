@@ -1,5 +1,4 @@
 import axios from "axios"
-import { DateTime } from "luxon"
 
 const TIDAL_CLIENT_ID = process.env.TIDAL_CLIENT_ID
 const TIDAL_CLIENT_SECRET = process.env.TIDAL_CLIENT_SECRET
@@ -74,22 +73,40 @@ export default class TidalAPI {
         track_id,
         quality,
         access_token,
+        country,
     }) {
-        let data = {
-            soundQuality: quality ?? "LOSSLESS",
+        let params = {
+            countryCode: country ?? "US",
+            audioquality: quality ?? "LOSSLESS",
+            playbackmode: "STREAM",
+            assetpresentation: "FULL",
         }
 
-        const response = await axios({
+        let response = await axios({
             method: "GET",
-            url: `https://api.tidal.com/v1/tracks/${track_id}/streamUrl`,
-            params: data,
+            url: `https://api.tidal.com/v1/tracks/${track_id}/playbackinfopostpaywall`,
+            params: params,
             headers: {
-                "Origin": "http://listen.tidal.com",
+                Origin: "http://listen.tidal.com",
                 Authorization: `Bearer ${access_token}`
             }
         })
 
-        return response.data
+        let decodedManifest = JSON.parse(global.b64Decode(response.data.manifest))
+
+        decodedManifest.url = decodedManifest.urls[0]
+
+        return {
+            metadata: {
+                trackId: track_id,
+                audioMode: response.data.audioMode,
+                audioQuality: response.data.audioQuality,
+                bitDepth: response.data.bitDepth,
+                bitRate: response.data.bitRate,
+                mimeType: response.data.manifestMimeType
+            },
+            ...decodedManifest
+        }
     }
     static async getTrackMetadata({
         track_id,
@@ -98,7 +115,10 @@ export default class TidalAPI {
     }) {
         const response = await axios({
             method: "GET",
-            url: `https://api.tidal.com/v1/tracks/${track_id}/?countryCode=${country}`,
+            url: `https://api.tidal.com/v1/tracks/${track_id}`,
+            params: {
+                "countryCode": country
+            },
             headers: {
                 "Origin": "http://listen.tidal.com",
                 Authorization: `Bearer ${access_token}`
