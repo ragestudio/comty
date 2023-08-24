@@ -123,7 +123,7 @@ export default class EqProcessorNode extends ProcessorNode {
             const gainValue = this.state.eqValues[processor.frequency.value].gain
 
             if (processor.gain.value !== gainValue) {
-                this.console.debug(`[EQ] Applying values to ${processor.frequency.value} Hz frequency with gain ${gainValue}`)
+                console.debug(`[EQ] Applying values to ${processor.frequency.value} Hz frequency with gain ${gainValue}`)
                 processor.gain.value = this.state.eqValues[processor.frequency.value].gain
             }
         })
