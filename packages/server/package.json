@@ -7,15 +7,15 @@
         "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
-    "sharedClasses": {
-        "FileUpload": "src/shared-classes",
-        "CacheService": "src/shared-classes",
-        "ComtyClient": "src/shared-classes",
-        "RedisClient": "src/shared-classes",
-        "StorageClient": "src/shared-classes",
-        "DbManager": "src/shared-classes",
-        "Errors": "src/shared-classes",
-        "DbModels": "src/shared-classes"
+    "shared": {
+        "classes/FileUpload": "src/shared-classes/FileUpload",
+        "classes/CacheService": "src/shared-classes/CacheService",
+        "classes/ComtyClient": "src/shared-classes/ComtyClient",
+        "classes/RedisClient": "src/shared-classes/RedisClient",
+        "classes/StorageClient": "src/shared-classes/StorageClient",
+        "classes/DbManager": "src/shared-classes/DbManager",
+        "classes/Errors": "src/shared-classes/Errors",
+        "classes/DbModels": "src/shared-classes/DbModels"
     },
     "license": "MIT",
     "dependencies": {
