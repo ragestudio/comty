@@ -1,0 +1,3 @@
+[submodule "evite"]
+	path = evite
+	url = https://github.com/ragestudio/evite

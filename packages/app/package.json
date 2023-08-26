@@ -145,8 +145,7 @@
         "electron-log": "^4.4.8",
         "electron-squirrel-startup": "^1.0.0",
         "express": "^4.17.1",
-        "typescript": "^4.3.5",
-        "vite": "3.2.5"
+        "typescript": "^4.3.5"
     },
     "config": {
         "forge": {
