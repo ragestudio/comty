@@ -11,10 +11,9 @@ import EventEmitter from "@foxify/events"
 
 import { User, Session, Config } from "@shared-classes/DbModels"
 
-import DbManager from "@classes/DbManager"
-import { createStorageClientInstance } from "@classes/StorageClient"
-
+import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
+import StorageClient from "@shared-classes/StorageClient"
 
 import internalEvents from "./events"
 
@@ -52,7 +51,7 @@ export default class API {
 
     eventBus = global.eventBus = new EventEmitter()
 
-    storage = global.storage = createStorageClientInstance()
+    storage = global.storage = StorageClient()
 
     jwtStrategy = global.jwtStrategy = {
         jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
