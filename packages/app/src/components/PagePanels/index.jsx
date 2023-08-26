@@ -64,6 +64,8 @@ export class PagePanelWithNavMenu extends React.Component {
             app.layout.top_bar.shouldUseTopBarSpacer(true)
             app.layout.toggleCenteredContent(false)
         }
+
+        app.layout.toggleCenteredContent(true)
     }
 
     componentWillUnmount() {
