@@ -34,7 +34,7 @@ function getConnectionConfig(obj) {
 
 export default class DBManager {
     initialize = async (config) => {
-        console.log("🔌 Connecting to DB...")
+        console.log(`🔌 Connecting to DB [${process.env.DB_HOSTNAME}]...`)
 
         const dbConfig = getConnectionConfig(config ?? process.env)
 

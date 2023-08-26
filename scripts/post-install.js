@@ -40,14 +40,13 @@ async function linkSharedResources(pkgJSON, packagePath) {
             if (fs.existsSync(finalLinkPath)) {
                 console.warn(`⚠️  Resource [${resource}] link already exists in [${finalLinkPath}]`)
                 continue
-            } else {
-                fs.mkdirSync(path.resolve(packagePath, linkPath), { recursive: true })
             }
 
-            // link folder recursively
             fs.symlinkSync(originClassPath, finalLinkPath, "dir")
 
             console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+
+            continue
         }
     }
 }
