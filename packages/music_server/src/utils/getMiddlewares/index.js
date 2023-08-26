@@ -3,7 +3,7 @@ import path from "node:path"
 
 export default async (middlewares, middlewaresPath) => {
     if (typeof middlewaresPath === "undefined") {
-        middlewaresPath = path.resolve(globalThis["__root"], "middlewares")
+        middlewaresPath = path.resolve(globalThis["__src"], "middlewares")
     }
 
     if (!fs.existsSync(middlewaresPath)) {
