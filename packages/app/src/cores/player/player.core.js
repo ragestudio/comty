@@ -120,7 +120,7 @@ export default class Player extends Core {
             app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
         },
         "player.seeked": (to) => {
-            app.cores.sync.music.dispatchEvent("music.player.seek", to)  
+            app.cores.sync.music.dispatchEvent("music.player.seek", to)
         },
     }
 
@@ -213,12 +213,12 @@ export default class Player extends Core {
             return false
         }
 
-        if (!app.layout.floatingStack) {
-            this.console.error("Floating stack not found")
+        if (!app.layout.tools_bar) {
+            this.console.error("Tools bar not found")
             return false
         }
 
-        this.currentDomWindow = app.layout.floatingStack.add("mediaPlayer", EmbbededMediaPlayer)
+        this.currentDomWindow = app.layout.tools_bar.attachRender("mediaPlayer", EmbbededMediaPlayer)
     }
 
     detachPlayerComponent() {
@@ -227,12 +227,12 @@ export default class Player extends Core {
             return false
         }
 
-        if (!app.layout.floatingStack) {
-            this.console.error("Floating stack not found")
+        if (!app.layout.tools_bar) {
+            this.console.error("Tools bar not found")
             return false
         }
 
-        app.layout.floatingStack.remove("mediaPlayer")
+        app.layout.tools_bar.detachRender("mediaPlayer")
 
         this.currentDomWindow = null
     }
@@ -266,7 +266,7 @@ export default class Player extends Core {
             const img = new Image()
 
             img.crossOrigin = "anonymous"
-            img.src = `https://cors-anywhere.herokuapp.com/${instance.manifest.cover ?? instance.manifest.thumbnail}`
+            img.src = instance.manifest.cover ?? instance.manifest.thumbnail //`https://cors-anywhere.herokuapp.com/${instance.manifest.cover ?? instance.manifest.thumbnail}`
 
             const cover_analysis = await this.fac.getColorAsync(img)
                 .catch((err) => {

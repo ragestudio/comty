@@ -3,14 +3,13 @@ import { CapacitorMusicControls } from "capacitor-music-controls-plugin-v3"
 export default class MediaSession {
     initialize() {
         CapacitorMusicControls.addListener("controlsNotification", (info) => {
-            this.console.log(info)
+            console.log(info)
 
             this.handleControlsEvent(info)
         })
 
-        // ANDROID (13, see bug above as to why it's necessary)
         document.addEventListener("controlsNotification", (event) => {
-            this.console.log(event)
+            console.log(event)
 
             const info = { message: event.message, position: 0 }
 
