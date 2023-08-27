@@ -154,6 +154,7 @@ export class AudioPlayer extends React.Component {
                     ["hovering"]: this.props.frame !== false && this.state.showControls,
                     ["minimized"]: !app.isMobile && this.context.minimized,
                     ["no-frame"]: this.props.frame === false,
+                    ["minimal"]: this.props.minimal,
                 }
             )}
             onMouseEnter={this.onMouse}
