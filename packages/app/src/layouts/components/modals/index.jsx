@@ -65,11 +65,13 @@ class Modal extends React.Component {
                     ["active"]: this.state.visible
                 }
             )}
-            onClick={this.handleClickOutside}
+            onTouchEnd={this.handleClickOutside}
+            onMouseDown={this.handleClickOutside}
         >
             <div
                 className="app_modal_content"
-                onClick={this.handleClickOutside}
+                onTouchEnd={this.handleClickOutside}
+                onMouseDown={this.handleClickOutside}
             >
                 {
                     React.cloneElement(this.props.children, {
