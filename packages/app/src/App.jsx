@@ -91,6 +91,8 @@ import { ThemeProvider } from "cores/style/style.core.jsx"
 import Layout from "./layout"
 import * as Router from "./router"
 
+import * as Sentry from "@sentry/browser"
+
 import "theme/index.less"
 
 CapacitorUpdater.notifyAppReady()
@@ -139,6 +141,16 @@ class ComtyApp extends React.Component {
 
 			// append var to #root
 			document.getElementById("root").classList.add("electron")
+		}
+
+		console.log(import.meta.env)
+
+		if (import.meta.env.VITE_SENTRY_DSN) {
+			console.log(`Initializing Sentry...`)
+
+			Sentry.init({
+				dsn: import.meta.env.VITE_SENTRY_DSN
+			})
 		}
 	}
 
