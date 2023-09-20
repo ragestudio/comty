@@ -128,8 +128,8 @@ export class PagePanelWithNavMenu extends React.Component {
         })
     }
 
-    replaceQueryTypeToCurrentTab = () => {
-        app.history.replace(`${window.location.pathname}?type=${this.state.activeTab}`)
+    replaceQueryTypeToCurrentTab = (key) => {
+        app.history.replace(`${window.location.pathname}?type=${key ?? this.state.activeTab}`)
     }
 
     tabChange = async (key) => {
@@ -140,7 +140,7 @@ export class PagePanelWithNavMenu extends React.Component {
         await this.setState({ activeTab: key })
 
         if (this.props.useSetQueryType) {
-            this.replaceQueryTypeToCurrentTab()
+            this.replaceQueryTypeToCurrentTab(key)
         }
 
         if (this.props.onTabChange) {
