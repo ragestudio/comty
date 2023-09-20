@@ -149,7 +149,9 @@ class ComtyApp extends React.Component {
 			console.log(`Initializing Sentry...`)
 
 			Sentry.init({
-				dsn: import.meta.env.VITE_SENTRY_DSN
+				debug: true,
+				dsn: import.meta.env.VITE_SENTRY_DSN,
+				release: "comty-web-app",
 			})
 		}
 	}
