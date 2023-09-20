@@ -12,7 +12,6 @@ import { Context } from "contexts/WithPlayerContext"
 import "./index.less"
 
 export default (props) => {
-    // use react context to get the current track
     const {
         track_manifest,
         playback_status,
