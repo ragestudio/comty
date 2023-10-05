@@ -1,0 +1,79 @@
+@import "theme/vars.less";
+
+.app_modal_wrapper {
+    box-sizing: border-box;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+
+    transition: all 150ms ease-in-out;
+
+    &.framed {
+        .app_modal_content {
+            display: flex;
+            flex-direction: column;
+
+            padding: 30px;
+
+            background-color: var(--background-color-accent);
+
+            border-radius: 12px;
+        }
+    }
+
+    &.active {
+        background-color: rgba(var(--bg_color_6), 0.5);
+
+        backdrop-filter: blur(@modal_background_blur);
+        -webkit-backdrop-filter: blur(@modal_background_blur);
+
+        .app_modal_content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .app_modal_content {
+        box-sizing: border-box;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        opacity: 0;
+        transform: translateY(100px);
+
+        height: fit-content;
+        width: 40vw;
+
+        max-width: 600px;
+
+        transition: all 150ms ease-in-out;
+
+        // fixments
+        .postCreator {
+            box-shadow: @card-shadow;
+            -webkit-box-shadow: @card-shadow;
+            -moz-box-shadow: @card-shadow;
+        }
+
+        .searcher {
+            box-sizing: border-box;
+
+            width: 48vw;
+            height: 80vh;
+        }
+    }
+}

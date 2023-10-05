@@ -1,4 +1,5 @@
 import React from "react"
+import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
 import useLayoutInterface from "hooks/useLayoutInterface"
 import { DOMWindow } from "components/RenderWindow"
@@ -9,6 +10,8 @@ class Modal extends React.Component {
     state = {
         visible: false,
     }
+
+    contentRef = React.createRef()
 
     escTimeout = null
 
@@ -52,8 +55,18 @@ class Modal extends React.Component {
     }
 
     handleClickOutside = (e) => {
-        if (e.target === e.currentTarget) {
-            this.close()
+        if (this.contentRef.current && !this.contentRef.current.contains(e.target)) {
+            if (this.props.confirmOnOutsideClick) {
+                return AntdModal.confirm({
+                    title: this.props.confirmOnClickTitle ?? "Are you sure?",
+                    content: this.props.confirmOnClickContent ?? "Are you sure you want to close this window?",
+                    onOk: () => {
+                        this.close()
+                    }
+                })
+            }
+
+            return this.close()
         }
     }
 
@@ -62,7 +75,8 @@ class Modal extends React.Component {
             className={classnames(
                 "app_modal_wrapper",
                 {
-                    ["active"]: this.state.visible
+                    ["active"]: this.state.visible,
+                    ["framed"]: this.props.framed,
                 }
             )}
             onTouchEnd={this.handleClickOutside}
@@ -70,6 +84,7 @@ class Modal extends React.Component {
         >
             <div
                 className="app_modal_content"
+                ref={this.contentRef}
                 onTouchEnd={this.handleClickOutside}
                 onMouseDown={this.handleClickOutside}
             >
@@ -90,6 +105,12 @@ export default () => {
         id,
         render,
         {
+            framed = true,
+
+            confirmOnOutsideClick = false,
+            confirmOnClickTitle,
+            confirmOnClickContent,
+
             className,
             props,
         } = {}
@@ -105,6 +126,10 @@ export default () => {
             onClose={() => {
                 win.destroy()
             }}
+            framed={framed}
+            confirmOnOutsideClick={confirmOnOutsideClick}
+            confirmOnClickTitle={confirmOnClickTitle}
+            confirmOnClickContent={confirmOnClickContent}
         >
             {
                 React.createElement(render, props)
