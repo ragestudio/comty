@@ -55,6 +55,8 @@ const ResultsTypeDecorators = {
 const Results = (props) => {
     let { results } = props
 
+    console.log("results", results, typeof results)
+
     if (typeof results !== "object") {
         return null
     }
@@ -190,6 +192,8 @@ export default (props) => {
         setSearchValue(e.target.value)
 
         if (e.target.value === "") {
+            debounceSearch.cancel()
+
             if (props.useUrlQuery) {
                 setQuery(null)
             }
