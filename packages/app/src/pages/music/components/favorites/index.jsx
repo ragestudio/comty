@@ -49,7 +49,7 @@ export default class FavoriteTracks extends React.Component {
             loading: true,
         })
 
-        const result = await MusicModel.getFavorites({
+        const result = await MusicModel.getFavoriteTracks({
             useTidal: app.cores.sync.getActiveLinkedServices().tidal,
             offset: offset,
             limit: limit,
@@ -112,6 +112,7 @@ export default class FavoriteTracks extends React.Component {
         }
 
         return <PlaylistView
+        favorite
             type="vertical"
             playlist={{
                 title: "Your favorites",

@@ -1,61 +1,79 @@
-import { Playlist, Track } from "@shared-classes/DbModels"
+import { Release, Playlist, Track } from "@shared-classes/DbModels"
 import TidalAPI from "@shared-classes/TidalAPI"
 
 async function searchRoute(req, res) {
-    const {
-        keywords,
-        limit = 5,
-        offset = 0,
-        useTidal = false
-    } = req.query
+    try {
+        const {
+            keywords,
+            limit = 5,
+            offset = 0,
+            useTidal = false
+        } = req.query
 
-    let results = {
-        playlists: [],
-        artists: [],
-        albums: [],
-        tracks: [],
-    }
-
-    let searchQuery = {
-        public: true,
-    }
-
-    if (keywords) {
-        searchQuery = {
-            ...searchQuery,
-            title: {
-                $regex: keywords,
-                $options: "i",
-            },
-            // TODO: Improve searching by album or artist
+        let results = {
+            playlists: [],
+            artists: [],
+            tracks: [],
+            album: [],
+            ep: [],
+            single: [],
         }
-    }
 
-    let playlists = await Playlist.find(searchQuery)
-        .limit(limit)
-        .skip(offset)
+        let searchQuery = {
+            public: true,
+        }
 
-    if (playlists) {
-        results.playlists = playlists
-    }
+        if (keywords) {
+            searchQuery = {
+                ...searchQuery,
+                title: {
+                    $regex: keywords,
+                    $options: "i",
+                },
+                // TODO: Improve searching by album or artist
+            }
+        }
 
-    let tracks = await Track.find(searchQuery)
-        .limit(limit)
-        .skip(offset)
+        let releases = await Release.find(searchQuery)
+            .limit(limit)
+            .skip(offset)
 
-    if (tracks) {
-        results.tracks = tracks
-    }
+        if (releases && releases.length > 0) {
+            releases.forEach((release) => {
+                results[release.type].push(release)
+            })
+        }
 
-    if (toBoolean(useTidal)) {
-        const tidalResult = await TidalAPI.search({
-            query: keywords
+        let playlists = await Playlist.find(searchQuery)
+            .limit(limit)
+            .skip(offset)
+
+        if (playlists) {
+            results.playlists = playlists
+        }
+
+        let tracks = await Track.find(searchQuery)
+            .limit(limit)
+            .skip(offset)
+
+        if (tracks) {
+            results.tracks = tracks
+        }
+
+        if (toBoolean(useTidal)) {
+            const tidalResult = await TidalAPI.search({
+                query: keywords
+            })
+
+            results.tracks = [...results.tracks, ...tidalResult]
+        }
+
+        return res.json(results)
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message,
         })
-
-        results.tracks = [...results.tracks, ...tidalResult]
     }
-
-    return res.json(results)
 }
 
 export default (router) => {

@@ -3,9 +3,9 @@ import EventEmitter from "evite/src/internals/EventEmitter"
 import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
 
-import PlaylistModel from "comty.js/models/playlists"
+import MusicModel from "comty.js/models/music"
 
-import EmbbededMediaPlayer from "components/Player/MediaPlayer"
+import ToolBarPlayer from "components/Player/ToolBarPlayer"
 import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
 
 import AudioPlayerStorage from "./player.storage"
@@ -84,6 +84,9 @@ export default class Player extends Core {
             previous: this.previous.bind(this),
             seek: this.seek.bind(this),
         },
+        _setLoading: function (to) {
+            this.state.loading = !!to
+        }.bind(this),
         duration: this.duration.bind(this),
         volume: this.volume.bind(this),
         mute: this.mute.bind(this),
@@ -213,12 +216,10 @@ export default class Player extends Core {
             return false
         }
 
-        if (!app.layout.tools_bar) {
-            this.console.error("Tools bar not found")
-            return false
+        if (app.layout.tools_bar) {
+            this.currentDomWindow = app.layout.tools_bar.attachRender("mediaPlayer", ToolBarPlayer)
         }
 
-        this.currentDomWindow = app.layout.tools_bar.attachRender("mediaPlayer", EmbbededMediaPlayer)
     }
 
     detachPlayerComponent() {
@@ -263,12 +264,7 @@ export default class Player extends Core {
         }
 
         if (!instance.manifest.cover_analysis) {
-            const img = new Image()
-
-            img.crossOrigin = "anonymous"
-            img.src = instance.manifest.cover ?? instance.manifest.thumbnail //`https://cors-anywhere.herokuapp.com/${instance.manifest.cover ?? instance.manifest.thumbnail}`
-
-            const cover_analysis = await this.fac.getColorAsync(img)
+            const cover_analysis = await this.fac.getColorAsync(`https://corsproxy.io/?${encodeURIComponent(instance.manifest.cover ?? instance.manifest.thumbnail)}`)
                 .catch((err) => {
                     this.console.error(err)
 
@@ -762,6 +758,8 @@ export default class Player extends Core {
 
         this.state.volume = volume
 
+        AudioPlayerStorage.set("volume", volume)
+
         if (this.track_instance) {
             if (this.track_instance.gainNode) {
                 this.track_instance.gainNode.gain.value = this.state.volume
@@ -904,7 +902,7 @@ export default class Player extends Core {
             return list
         }
 
-        const fetchedTracks = await PlaylistModel.getTracks(ids).catch((err) => {
+        const fetchedTracks = await MusicModel.getTracksData(ids).catch((err) => {
             this.console.error(err)
             return false
         })

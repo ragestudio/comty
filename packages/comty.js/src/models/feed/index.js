@@ -53,17 +53,4 @@ export default class FeedModel {
 
         return data
     }
-
-    static getPlaylistsFeed = async ({ trim, limit } = {}) => {
-        const { data } = await request({
-            method: "GET",
-            url: `/feed/playlists`,
-            params: {
-                trim: trim ?? 0,
-                limit: limit ?? Settings.get("feed_max_fetch"),
-            }
-        })
-
-        return data
-    }
 }

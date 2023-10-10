@@ -1,47 +1,68 @@
-import { Playlist, Track } from "@shared-classes/DbModels"
+import { Playlist, Release, Track } from "@shared-classes/DbModels"
 import { AuthorizationError, NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
-    if (!req.session) {
-        return new AuthorizationError(req, res)
-    }
+	if (!req.session) {
+		return new AuthorizationError(req, res)
+	}
 
-    const { keywords, limit = 10, offset = 0 } = req.query
-    const user_id = req.session.user_id.toString()
+	const { keywords, limit = 10, offset = 0 } = req.query
 
-    let searchQuery = {
-        user_id,
-    }
+	const user_id = req.session.user_id.toString()
 
-    if (keywords) {
-        searchQuery = {
-            ...searchQuery,
-            title: {
-                $regex: keywords,
-                $options: "i",
-            },
-        }
-    }
+	let searchQuery = {
+		user_id,
+	}
 
-    let playlists = await Playlist.find(searchQuery)
-        .sort({ created_at: -1 })
-        .catch((err) => false)
-    //.limit(limit)
-    //.skip(offset)
+	if (keywords) {
+		searchQuery = {
+			...searchQuery,
+			title: {
+				$regex: keywords,
+				$options: "i",
+			},
+		}
+	}
 
-    if (!playlists) {
-        return new NotFoundError("Playlists not found")
-    }
+	const playlistsCount = await Playlist.count(searchQuery)
+	const releasesCount = await Release.count(searchQuery)
 
-    playlists = await Promise.all(playlists.map(async (playlist) => {
-        playlist.list = await Track.find({
-            _id: [
-                ...playlist.list,
-            ]
-        })
+	let total_length = playlistsCount + releasesCount
 
-        return playlist
-    }))
+	let playlists = await Playlist.find(searchQuery)
+		.sort({ created_at: -1 })
+		.limit(limit)
+		.skip(offset)
 
-    return res.json(playlists)
+	playlists = playlists.map((playlist) => {
+		playlist = playlist.toObject()
+
+		playlist.type = "playlist"
+
+		return playlist
+	})
+
+	let releases = await Release.find(searchQuery)
+		.sort({ created_at: -1 })
+		.limit(limit)
+		.skip(offset)
+
+	let result = [...playlists, ...releases]
+
+	if (req.query.resolveItemsData === "true") {
+		result = await Promise.all(
+			playlists.map(async playlist => {
+				playlist.list = await Track.find({
+					_id: [...playlist.list],
+				})
+
+				return playlist
+			}),
+		)
+	}
+
+	return res.json({
+		total_length: total_length,
+		items: result,
+	})
 }

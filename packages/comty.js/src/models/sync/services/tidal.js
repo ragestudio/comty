@@ -97,4 +97,63 @@ export default class TidalService {
 
         return data
     }
+
+    static async getMyFavoritePlaylists({
+        limit = 50,
+        offset = 0,
+    } = {}) {
+        const { data } = await request({
+            instance: TidalService.api_instance,
+            method: "GET",
+            url: `/services/tidal/favorites/playlists`,
+            params: {
+                limit,
+                offset,
+            },
+        })
+
+        return data
+    }
+
+    static async getPlaylistData({
+        playlist_id,
+
+        resolve_items = false,
+        limit = 50,
+        offset = 0,
+    }) {
+        const { data } = await request({
+            instance: TidalService.api_instance,
+            method: "GET",
+            url: `/services/tidal/playlist/${playlist_id}/data`,
+            params: {
+                limit,
+                offset,
+                resolve_items,
+            },
+        })
+
+        return data
+    }
+
+    static async getPlaylistItems({
+        playlist_id,
+
+        resolve_items = false,
+        limit = 50,
+        offset = 0,
+    }) {
+        const { data } = await request({
+            instance: TidalService.api_instance,
+            method: "GET",
+            url: `/services/tidal/playlist/${playlist_id}/items`,
+            params: {
+                limit,
+                offset,
+                resolve_items,
+            },
+        })
+
+        return data
+    }
 }

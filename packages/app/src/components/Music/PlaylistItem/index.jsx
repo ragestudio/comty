@@ -8,7 +8,11 @@ import "./index.less"
 
 export default (props) => {
     const [coverHover, setCoverHover] = React.useState(false)
-    const { playlist } = props
+    let { playlist } = props
+
+    if (!playlist) {
+        return null
+    }
 
     const onClick = () => {
         if (typeof props.onClick === "function") {
@@ -23,6 +27,8 @@ export default (props) => {
 
         app.cores.player.start(playlist.list)
     }
+
+    const subtitle = playlist.type === "playlist" ? `By ${playlist.user_id}` : (playlist.description ?? (playlist.publisher && `Release from ${playlist.publisher?.fullName}`))
 
     return <div
         id={playlist._id}
@@ -53,6 +59,23 @@ export default (props) => {
             <div className="playlistItem_info_title" onClick={onClick}>
                 <h1>{playlist.title}</h1>
             </div>
+
+            <div className="playlistItem_info_subtitle">
+                <p>
+                    {subtitle}
+                </p>
+            </div>
+        </div>
+
+        <div className="playlistItem_bottom">
+            <p>
+                <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length}
+            </p>
+
+            <p>
+                <Icons.MdAlbum />
+                {playlist.type ?? "playlist"}
+            </p>
         </div>
     </div>
 }

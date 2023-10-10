@@ -9,7 +9,7 @@ export default async (req, res) => {
 
     let removedTracksIds = []
 
-    const removeWithTracks = req.query.remove_with_tracks === "true"
+    // const removeWithTracks = req.query.remove_with_tracks === "true"
 
     let playlist = await Playlist.findOne({
         _id: req.params.playlist_id,
@@ -29,9 +29,9 @@ export default async (req, res) => {
         _id: req.params.playlist_id,
     })
 
-    if (removeWithTracks) {
-        removedTracksIds = await RemoveTracks(playlist.list)
-    }
+    // if (removeWithTracks) {
+    //     removedTracksIds = await RemoveTracks(playlist.list)
+    // }
 
     return res.json({
         success: true,

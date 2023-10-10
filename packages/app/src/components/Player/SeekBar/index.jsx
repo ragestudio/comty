@@ -159,6 +159,9 @@ export default class SeekBar extends React.Component {
         return <div
             className={classnames(
                 "player-seek_bar",
+                {
+                    ["stopped"]: this.props.stopped,
+                }
             )}
         >
             <div

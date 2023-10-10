@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 
-import PlaylistModel from "models/playlists"
+import MusicModel from "models/music"
 
 import BasicInformation from "./components/BasicInformation"
 import TracksUploads from "./components/TracksUploads"
@@ -50,9 +50,9 @@ function createDefaultTrackData({
     }
 }
 
-export default class PlaylistCreatorSteps extends React.Component {
+export default class PlaylistPublisherSteps extends React.Component {
     state = {
-        playlistData: {},
+        releaseData: {},
 
         fileList: [],
         trackList: [],
@@ -145,10 +145,10 @@ export default class PlaylistCreatorSteps extends React.Component {
         },
     }
 
-    updatePlaylistData = (key, value) => {
+    updateReleaseData = (key, value) => {
         this.setState({
-            playlistData: {
-                ...this.state.playlistData,
+            releaseData: {
+                ...this.state.releaseData,
                 [key]: value
             }
         })
@@ -161,9 +161,9 @@ export default class PlaylistCreatorSteps extends React.Component {
     }
 
     canSubmit = () => {
-        const { playlistData, trackList, pendingTracksUpload } = this.state
+        const { releaseData, trackList, pendingTracksUpload } = this.state
 
-        const hasValidTitle = playlistData.title && playlistData.title.length > 0
+        const hasValidTitle = releaseData.title && releaseData.title.length > 0
         const hasTracks = trackList.length > 0
         const hasPendingUploads = pendingTracksUpload.length > 0
         const tracksHasValidData = trackList.every((track) => {
@@ -178,12 +178,12 @@ export default class PlaylistCreatorSteps extends React.Component {
             submitting: true
         })
 
-        const { playlistData, trackList } = this.state
+        const { releaseData: releaseData, trackList } = this.state
 
-        console.log(`Submitting playlist ${playlistData.title} with ${trackList.length} tracks`, playlistData, trackList)
+        console.log(`Submitting playlist ${releaseData.title} with ${trackList.length} tracks`, releaseData, trackList)
 
-        const result = await PlaylistModel.putPlaylist({
-            ...playlistData,
+        const result = await MusicModel.putRelease({
+            ...releaseData,
             list: trackList,
         })
 
@@ -324,19 +324,19 @@ export default class PlaylistCreatorSteps extends React.Component {
     }
 
     handleDeletePlaylist = async () => {
-        if (!this.props.playlist_id) {
-            console.error(`Cannot delete playlist without id`)
+        if (!this.props.release_id) {
+            console.error(`Cannot delete release without id`)
             return
         }
 
         antd.Modal.confirm({
-            title: "Are you sure you want to delete this playlist?",
+            title: "Are you sure you want to delete this release?",
             content: "This action cannot be undone",
             okText: "Delete",
             okType: "danger",
             cancelText: "Cancel",
             onOk: async () => {
-                const result = await PlaylistModel.deletePlaylist(this.props.playlist_id, {
+                const result = await MusicModel.deleteRelease(this.props.release_id, {
                     remove_with_tracks: true
                 })
 
@@ -518,7 +518,7 @@ export default class PlaylistCreatorSteps extends React.Component {
         // check current step
         switch (this.state.currentStep) {
             case 0:
-                return typeof this.state.playlistData.title === "string" && this.state.playlistData.title.length > 0
+                return typeof this.state.releaseData.title === "string" && this.state.releaseData.title.length > 0
             case 1:
                 return this.canSubmit()
             default:
@@ -529,8 +529,8 @@ export default class PlaylistCreatorSteps extends React.Component {
     componentDidMount() {
         window._hacks = this._hacks
 
-        if (this.props.playlist_id) {
-            this.loadPlaylistData(this.props.playlist_id)
+        if (this.props.release_id) {
+            this.loadReleaseData(this.props.release_id)
         } else {
             this.setState({
                 loading: false
@@ -542,18 +542,20 @@ export default class PlaylistCreatorSteps extends React.Component {
         delete window._hacks
     }
 
-    loadPlaylistData = async (playlist_id) => {
-        console.log(`Loading playlist data for playlist ${playlist_id}...`)
+    loadReleaseData = async (id) => {
+        console.log(`Loading release data for ${id}...`)
 
-        const playlistData = await PlaylistModel.getPlaylist(playlist_id).catch((error) => {
+        const releaseData = await MusicModel.getReleaseData(id).catch((error) => {
             console.error(error)
             antd.message.error(error)
 
             return false
         })
 
-        if (playlistData) {
-            const trackList = playlistData.list.map((track) => {
+        console.log(releaseData)
+
+        if (releaseData) {
+            const trackList = releaseData.list.map((track) => {
                 return {
                     ...track,
                     _id: track._id,
@@ -563,7 +565,7 @@ export default class PlaylistCreatorSteps extends React.Component {
             })
 
             this.setState({
-                playlistData: playlistData,
+                releaseData: releaseData,
                 trackList: trackList,
                 fileList: trackList.map((track) => {
                     return {
@@ -597,23 +599,15 @@ export default class PlaylistCreatorSteps extends React.Component {
             <div className="stepContent">
                 {
                     React.createElement(this.steps[this.state.currentStep].crender, {
-                        playlist: this.state.playlistData,
+                        release: this.state.releaseData,
 
                         trackList: this.state.trackList,
                         fileList: this.state.fileList,
 
-                        onTitleChange: (title) => {
-                            this.updatePlaylistData("title", title)
+                        onValueChange: (key, value) => {
+                            this.updateReleaseData(key, value)
                         },
-                        onDescriptionChange: (description) => {
-                            this.updatePlaylistData("description", description)
-                        },
-                        onPlaylistCoverChange: (url) => {
-                            this.updatePlaylistData("cover", url)
-                        },
-                        onVisibilityChange: (visibility) => {
-                            this.updatePlaylistData("public", visibility)
-                        },
+
                         onDeletePlaylist: this.handleDeletePlaylist,
 
                         handleUploadTrack: this.handleUploadTrack,

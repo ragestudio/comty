@@ -10,102 +10,116 @@ import LikeButton from "components/LikeButton"
 import AudioVolume from "components/Player/AudioVolume"
 import AudioPlayerChangeModeButton from "components/Player/ChangeModeButton"
 
+import { Context } from "contexts/WithPlayerContext"
+
 import "./index.less"
 
-export default ({
-    className,
-    controls,
-    syncModeLocked = false,
-    syncMode = false,
-    streamMode,
-    playbackStatus,
-    onVolumeUpdate,
-    onMuteUpdate,
-    audioVolume = 0.3,
-    audioMuted = false,
-    loading = false,
-    liked = false,
-} = {}) => {
-    const onClickActionsButton = (event) => {
-        if (typeof controls !== "object") {
-            console.warn("[AudioPlayer] onClickActionsButton: props.controls is not an object")
+const EventsHandlers = {
+    "playback": () => {
+        return app.cores.player.playback.toggle()
+    },
+    "like": () => {
 
-            return false
-        }
-
-        if (typeof controls[event] !== "function") {
-            console.warn(`[AudioPlayer] onClickActionsButton: ${event} is not a function`)
-
-            return false
-        }
-
-        return controls[event]()
+    },
+    "previous": () => {
+        return app.cores.player.playback.previous()
+    },
+    "next": () => {
+        return app.cores.player.playback.next()
+    },
+    "volume": (ctx, value) => {
+        return app.cores.player.volume(value)
+    },
+    "mute": () => {
+        return app.cores.player.toggleMute()
     }
-
-    return <div
-        className={
-            className ?? "player-controls"
-        }
-    >
-        <AudioPlayerChangeModeButton
-            disabled={syncModeLocked}
-        />
-        <antd.Button
-            type="ghost"
-            shape="round"
-            icon={<Icons.ChevronLeft />}
-            onClick={() => onClickActionsButton("previous")}
-            disabled={syncModeLocked}
-        />
-        <antd.Button
-            type="primary"
-            shape="circle"
-            icon={streamMode ? <Icons.MdStop /> : playbackStatus === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
-            onClick={() => onClickActionsButton("toggle")}
-            className="playButton"
-            disabled={syncModeLocked}
-        >
-            {
-                loading && <div className="loadCircle">
-                    <UseAnimations
-                        animation={LoadingAnimation}
-                        size="100%"
-                    />
-                </div>
-            }
-        </antd.Button>
-        <antd.Button
-            type="ghost"
-            shape="round"
-            icon={<Icons.ChevronRight />}
-            onClick={() => onClickActionsButton("next")}
-            disabled={syncModeLocked}
-        />
-        {
-            app.isMobile && <LikeButton
-                onClick={controls.like}
-                liked={liked}
-            />
-        }
-        {
-            !app.isMobile && <antd.Popover
-                content={React.createElement(
-                    AudioVolume,
-                    { onChange: onVolumeUpdate, defaultValue: audioVolume }
-                )}
-                trigger="hover"
-            >
-                <div
-                    className="muteButton"
-                    onClick={onMuteUpdate}
-                >
-                    {
-                        audioMuted
-                            ? <Icons.VolumeX />
-                            : <Icons.Volume2 />
-                    }
-                </div>
-            </antd.Popover>
-        }
-    </div>
 }
+
+const Controls = (props) => {
+    try {
+        const ctx = React.useContext(Context)
+
+        const handleAction = (event, ...args) => {
+            if (typeof EventsHandlers[event] !== "function") {
+                throw new Error(`Unknown event "${event}"`)
+            }
+
+            return EventsHandlers[event](ctx, ...args)
+        }
+
+        return <div
+            className={
+                props.className ?? "player-controls"
+            }
+        >
+            <AudioPlayerChangeModeButton
+                disabled={ctx.control_locked}
+            />
+            <antd.Button
+                type="ghost"
+                shape="round"
+                icon={<Icons.ChevronLeft />}
+                onClick={() => handleAction("previous")}
+                disabled={ctx.control_locked}
+            />
+            <antd.Button
+                type="primary"
+                shape="circle"
+                icon={ctx.livestream_mode ? <Icons.MdStop /> : ctx.playback_status === "playing" ? <Icons.MdPause /> : <Icons.MdPlayArrow />}
+                onClick={() => handleAction("playback")}
+                className="playButton"
+                disabled={ctx.control_locked}
+            >
+                {
+                    ctx.loading && <div className="loadCircle">
+                        <UseAnimations
+                            animation={LoadingAnimation}
+                            size="100%"
+                        />
+                    </div>
+                }
+            </antd.Button>
+            <antd.Button
+                type="ghost"
+                shape="round"
+                icon={<Icons.ChevronRight />}
+                onClick={() => handleAction("next")}
+                disabled={ctx.control_locked}
+            />
+            {
+                app.isMobile && <LikeButton
+                    onClick={() => handleAction("like")}
+                    liked={ctx.track_manifest?.liked}
+                />
+            }
+            {
+                !app.isMobile && <antd.Popover
+                    content={React.createElement(
+                        AudioVolume,
+                        {
+                            onChange: (value) => handleAction("volume", value),
+                            defaultValue: ctx.volume
+                        }
+                    )}
+                    trigger="hover"
+                >
+                    <button
+                        className="muteButton"
+                        onClick={() => handleAction("mute")}
+                    >
+                        {
+                            ctx.muted
+                                ? <Icons.VolumeX />
+                                : <Icons.Volume2 />
+                        }
+                    </button>
+                </antd.Popover>
+            }
+        </div>
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+
+export default Controls

@@ -1,3 +1,21 @@
+html {
+    &.mobile {
+        .musicExplorer {
+
+            .playlistExplorer_section_list {
+                overflow: visible;
+                overflow-x: scroll;
+
+                width: unset;
+                display: flex;
+                flex-direction: row;
+
+                grid-gap: 10px;
+            }
+        }
+    }
+}
+
 .music_navbar {
     display: flex;
     flex-direction: column;
@@ -71,10 +89,12 @@
         }
 
         .playlistExplorer_section_list {
-            display: flex;
-            flex-direction: column;
+            display: grid;
 
-            gap: 10px;
+            grid-gap: 20px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+
+            min-width: 372px !important;
         }
     }
 }
@@ -103,6 +123,35 @@
             .playlistItem {
                 width: 100% !important;
                 max-width: 100% !important;
+
+                .playlistItem_info_subtitle {
+                    max-width: 300px;
+                }
+
+                .playlistItem_bottom {
+                    display: flex!important;
+                    position: absolute;
+
+                    top:0;
+                    right: 0;
+
+                    padding: 10px;
+
+                    //-webkit-backdrop-filter: blur(5px);
+                    //backdrop-filter: blur(5px);
+
+                    background-color: var(--background-color-primary);
+
+                    display: flex;
+                    flex-direction: column;
+
+                    p {
+                        display: flex;
+                        flex-direction: row-reverse;
+
+                        gap: 7px;
+                    }
+                }
             }
         }
     }
@@ -143,19 +192,36 @@
 
             gap: 10px;
 
+            @playlistItem_height: 80px;
+            @playlistItem_padding: 10px;
+
+            @playlistItem_cover_size: calc(@playlistItem_height - @playlistItem_padding * 2);
+
             .playlistItem {
+                flex-direction: row;
                 background-color: var(--background-color-primary);
 
                 max-width: 300px;
-                height: 80px;
+                width: 100%;
+                
+                height: @playlistItem_height;
+
+                padding: @playlistItem_padding;
 
                 .playlistItem_cover {
-                    width: 80px;
-                    height: 80px;
+                    width: @playlistItem_cover_size;
+                    height: @playlistItem_cover_size;
 
-                    img {
-                        height: 80px;
-                        width: 80px;
+                    min-height: @playlistItem_cover_size;
+                    min-width: @playlistItem_cover_size;
+                }
+                .playlistItem_bottom {
+                    display: none;
+                }
+
+                &:hover {
+                    .playlistItem_info {
+                        transform: none;
                     }
                 }
             }

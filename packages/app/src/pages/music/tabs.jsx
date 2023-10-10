@@ -16,7 +16,6 @@ export default [
         key: "library",
         label: "Library",
         icon: "MdLibraryMusic",
-        disabled: true,
         component: LibraryTab,
     },
     {

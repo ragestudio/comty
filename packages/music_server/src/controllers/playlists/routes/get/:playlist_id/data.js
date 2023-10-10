@@ -1,14 +1,23 @@
-import { Playlist, TrackLike, Track } from "@shared-classes/DbModels"
+import { Playlist, Release, TrackLike, Track } from "@shared-classes/DbModels"
 import { NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {
     const { playlist_id } = req.params
+    const { limit, offset } = req.query
 
     let playlist = await Playlist.findOne({
         _id: playlist_id,
     }).catch((err) => {
         return false
     })
+
+    if (!playlist) {
+        playlist = await Release.findOne({
+            _id: playlist_id,
+        }).catch((err) => {
+            return false
+        })
+    }
 
     playlist = playlist.toObject()
 

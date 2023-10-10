@@ -4,7 +4,7 @@ import classnames from "classnames"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import UploadButton from "components/UploadButton"
 
-import PlaylistModel from "models/playlists"
+import MusicModel from "models/music"
 
 import { Icons } from "components/Icons"
 
@@ -127,7 +127,24 @@ const FileItemEditor = (props) => {
             />
         </div>
 
-        <antd.Divider />
+        <div className="fileItemEditor_field">
+            <div className="fileItemEditor_field_header">
+                <Icons.MdTimeline />
+                <span>Timestamps</span>
+            </div>
+
+            <antd.Button
+                disabled
+            >
+                Edit
+            </antd.Button>
+        </div>
+
+        <antd.Divider 
+            style={{
+                margin: "5px 0",
+            }}
+        />
 
         <div className="fileItemEditor_field">
             <div className="fileItemEditor_field_header">
@@ -139,6 +156,19 @@ const FileItemEditor = (props) => {
                 checked={track.lyricsEnabled}
                 onChange={(value) => handleChange("lyricsEnabled", value)}
             />
+        </div>
+
+        <div className="fileItemEditor_field">
+            <div className="fileItemEditor_field_header">
+                <Icons.MdTextFormat />
+                <span>Upload LRC</span>
+            </div>
+
+            <antd.Button
+                disabled
+            >
+                Upload
+            </antd.Button>
         </div>
 
         <div className="fileItemEditor_field">
@@ -305,8 +335,8 @@ export default (props) => {
         app.DrawerController.open("track_editor", FileItemEditor, {
             type: "drawer",
             props: {
-                width: "25vw",
-                minWidth: "500px",
+                width: "30vw",
+                minWidth: "600px",
             },
             componentProps: {
                 track,
@@ -318,7 +348,7 @@ export default (props) => {
                 onRefreshCache: () => {
                     console.log("Refreshing cache for track", track.uid)
 
-                    PlaylistModel.refreshTrackCache(track._id)
+                    MusicModel.refreshTrackCache(track._id)
                         .catch(() => {
                             app.message.error("Failed to refresh cache for track")
                         })

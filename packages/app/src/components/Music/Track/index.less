@@ -1,42 +1,31 @@
-html {
-    &.mobile {
-        .music-track {
-            .music-track_actions {
-                .music-track_action {
-                    position: relative;
-
-                    .music-track_orderIndex {
-                        transform: translate(-45%, -30%);
-                        padding: 0;
-                        font-size: 0.7rem;
-                    }
-
-                    .ant-btn {
-                        opacity: 1;
-                    }
-                }
-            }
-        }
-    }
-}
-
 .music-track {
-    display: flex;
-    flex-direction: row;
-
-    align-items: center;
-
-    padding: 10px;
+    position: relative;
 
     border-radius: 8px;
 
     background-color: var(--background-color-accent);
 
-    cursor: pointer;
+    overflow: hidden;
+
+    isolation: isolate;
+
+    &:hover {
+        .music-track_actions {
+            &.withOrder {
+                .music-track_action {
+                    .ant-btn {
+                        opacity: 1;
+                    }
+
+                    .music-track_orderIndex {
+                        opacity: 0;
+                    }
+                }
+            }
+        }
+    }
 
     &.current {
-        background-color: var(--background-color-accent);
-
         .music-track_actions {
             .music-track_action {
                 .ant-btn {
@@ -50,6 +39,42 @@ html {
                 }
             }
         }
+
+        .music-track_background {
+            background:
+                linear-gradient(to right, rgba(var(--cover_average-color)), transparent),
+                url(https://grainy-gradients.vercel.app/noise.svg);
+        }
+
+    }
+
+    .music-track_background {
+        position: absolute;
+
+        z-index: 50;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+        height: 100%;
+
+        transition: all 150ms ease-in-out;
+
+        opacity: 0.2;
+    }
+
+    .music-track_content {
+        position: relative;
+
+        z-index: 55;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        padding: 10px;
     }
 
     .music-track_actions {
@@ -61,16 +86,6 @@ html {
 
         &.withOrder {
             .music-track_action {
-                &:hover {
-                    .ant-btn {
-                        opacity: 1;
-                    }
-
-                    .music-track_orderIndex {
-                        opacity: 0;
-                    }
-                }
-
                 .ant-btn {
                     opacity: 0;
                 }
@@ -81,6 +96,8 @@ html {
             position: relative;
 
             transition: all 150ms ease-in-out;
+
+            cursor: pointer;
 
             .music-track_orderIndex {
                 position: absolute;
