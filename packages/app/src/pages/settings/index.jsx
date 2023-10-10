@@ -58,7 +58,6 @@ const generateMenuItems = () => {
                     {createIconRender(item.icon ?? "Settings")}
                     {item.label}
                 </div>,
-                type: "item",
                 danger: item.danger,
                 disabled: item.disabled,
             }
