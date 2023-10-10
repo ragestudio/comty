@@ -95,6 +95,18 @@ html {
             grid-template-columns: repeat(3, minmax(0, 1fr));
 
             min-width: 372px !important;
+
+            @media (min-width: 2000px) {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            @media (min-width: 2300px) {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            .playlistItem {
+                justify-self: center;
+            }
         }
     }
 }
@@ -129,10 +141,10 @@ html {
                 }
 
                 .playlistItem_bottom {
-                    display: flex!important;
+                    display: flex !important;
                     position: absolute;
 
-                    top:0;
+                    top: 0;
                     right: 0;
 
                     padding: 10px;
@@ -203,7 +215,7 @@ html {
 
                 max-width: 300px;
                 width: 100%;
-                
+
                 height: @playlistItem_height;
 
                 padding: @playlistItem_padding;
@@ -215,6 +227,7 @@ html {
                     min-height: @playlistItem_cover_size;
                     min-width: @playlistItem_cover_size;
                 }
+
                 .playlistItem_bottom {
                     display: none;
                 }
