@@ -135,7 +135,9 @@ export default (props) => {
             profileData={profileData}
             onDelete={handleCurrentProfileDelete}
             onSave={handleCurrentProfileDataUpdate}
-        />)
+        />, {
+            confirmOnOutsideClick: true
+        })
     }
 
     const regenerateStreamingKey = async () => {
