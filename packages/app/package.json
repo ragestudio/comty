@@ -11,12 +11,9 @@
         "dev": "vite",
         "dev:electron": "concurrently -k \"yarn dev\" \"yarn electron:dev\"",
         "electron:dev": "cross-env IS_DEV=true electron-forge start",
-        "electron:build": "electron-forge make",
-        "electron:package": "electron-forge package",
         "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
-        "preview": "vite preview",
-        "package": "electron-forge package",
-        "make": "electron-forge make"
+        "electron:build": "cross-env IS_DEV=false electron-builder -mwl --dir",
+        "preview": "vite preview"
     },
     "peerDependencies": {
         "react": "^16.8.6"
@@ -117,6 +114,7 @@
         "supertokens-web-js": "^0.6.0",
         "tone": "^14.7.77",
         "tseep": "^1.1.1",
+        "ua-parser-js": "^1.0.36",
         "uuid": "^9.0.0",
         "virtual-scroller": "^1.12.3",
         "wait-on": "^6.0.1"
@@ -128,6 +126,7 @@
         "@electron-forge/maker-rpm": "^6.0.0-beta.66",
         "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
         "@electron-forge/maker-zip": "^6.0.0-beta.66",
+        "@electron-forge/plugin-vite": "^6.4.2",
         "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
         "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
         "@types/jest": "^26.0.24",
@@ -142,6 +141,7 @@
         "cors": "2.8.5",
         "cross-env": "^7.0.3",
         "electron": "^21.0.1",
+        "electron-builder": "^24.6.4",
         "electron-is": "^3.0.0",
         "electron-log": "^4.4.8",
         "electron-squirrel-startup": "^1.0.0",
