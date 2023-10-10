@@ -349,10 +349,10 @@ export default class Sidebar extends React.Component {
 						style={{
 							transform: `translateX(-${x}%)`,
 						}}
+						onMouseEnter={this.onMouseEnter}
+						onMouseLeave={this.handleMouseLeave}
 					>
 						<div
-							onMouseEnter={this.onMouseEnter}
-							onMouseLeave={this.handleMouseLeave}
 							className={classnames(
 								"app_sidebar",
 								{
