@@ -22,6 +22,14 @@ export default (props) => {
         },
     })
 
+    React.useEffect(() => {
+        if (render) {
+            app.layout.toggleDisableTopLayoutPadding(true)
+        } else {
+            app.layout.toggleDisableTopLayoutPadding(false)
+        }
+    }, [render])
+
     return <Motion
         style={{
             y: spring(render ? 0 : 100,),
