@@ -1,8 +1,4 @@
-import React from "react"
 import loadable from "@loadable/component"
-import AuthModel from "models/auth"
-
-// TODO: Make logout button require a valid session to be not disabled
 
 export default {
     id: "security",
@@ -33,7 +29,6 @@ export default {
             "description": "Manage your active sessions",
             "icon": "Monitor",
             "component": loadable(() => import("../components/sessions")),
-            "storaged": false
         }
     ]
 }
