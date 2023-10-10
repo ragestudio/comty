@@ -133,6 +133,9 @@ export default class Layout extends React.PureComponent {
 		toggleTopBarSpacer: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname("top-bar-spacer", to)
 		},
+		toggleDisableTopLayoutPadding: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("disable-top-layout-padding", to)
+		},
 		togglePagePanelSpacer: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname("page-panel-spacer", to)
 		},
