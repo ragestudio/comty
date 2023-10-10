@@ -231,7 +231,9 @@ class ComtyApp extends React.Component {
 					})
 				}
 
-				return app.layout.modal.open("searcher", (props) => <Searcher autoFocus renderResults {...props} />)
+				return app.layout.modal.open("searcher", (props) => <Searcher autoFocus renderResults {...props} />, {
+					framed: false
+				})
 			},
 			openFullImageViewer: (src) => {
 				const win = new DOMWindow({
@@ -249,7 +251,9 @@ class ComtyApp extends React.Component {
 			},
 
 			openPostCreator: () => {
-				app.layout.modal.open("post_creator", (props) => <PostCreator {...props} />)
+				app.layout.modal.open("post_creator", (props) => <PostCreator {...props} />, {
+					framed: false
+				})
 			}
 		},
 		navigation: {
@@ -264,6 +268,9 @@ class ComtyApp extends React.Component {
 			},
 			goMain: () => {
 				return app.location.push(config.app.mainPath ?? "/home")
+			},
+			goToMusic: () => {
+				return app.location.push("/music")
 			},
 			goToSettings: (setting_id) => {
 				app.cores.sound.useUIAudio("navigation.settings")
@@ -289,6 +296,9 @@ class ComtyApp extends React.Component {
 			goToPost: (post_id) => {
 				return app.location.push(`/post/${post_id}`)
 			},
+			goToPlaylist: (playlist_id) => {
+				return app.location.push(`/play/${playlist_id}`)
+			}
 		},
 		electron: {
 			closeApp: () => {
