@@ -124,7 +124,6 @@ export class PagePanelWithNavMenu extends React.Component {
 
         return React.createElement(tab.component, {
             ...componentProps,
-            ref: this.primaryPanelRef,
         })
     }
 
@@ -160,13 +159,15 @@ export class PagePanelWithNavMenu extends React.Component {
 
             console.warn("PagePanelWithNavMenu: transition is enabled but document.startViewTransition is not compatible with your browser")
 
-            // set to primary panel fade-opacity-leave class
-            this.primaryPanelRef.current.classList.add("fade-opacity-leave")
+            if (this.primaryPanelRef.current && this.primaryPanelRef.current?.classList) {
+                // set to primary panel fade-opacity-leave class
+                this.primaryPanelRef.current.classList.add("fade-opacity-leave")
 
-            // remove fade-opacity-leave class after animation
-            setTimeout(() => {
-                this.primaryPanelRef.current.classList.remove("fade-opacity-leave")
-            }, 300)
+                // remove fade-opacity-leave class after animation
+                setTimeout(() => {
+                    this.primaryPanelRef.current.classList.remove("fade-opacity-leave")
+                }, 300)
+            }
 
             await new Promise(resolve => setTimeout(resolve, 200))
         }
@@ -226,7 +227,7 @@ export class PagePanelWithNavMenu extends React.Component {
             }
 
             <div className="pagePanels">
-                <div className="panel">
+                <div className="panel" ref={this.primaryPanelRef}>
                     {
                         this.renderActiveTab()
                     }
