@@ -1,4 +1,4 @@
-import { Playlist } from "@shared-classes/DbModels"
+import { Release } from "@shared-classes/DbModels"
 
 export default async (payload) => {
     const {
@@ -6,7 +6,7 @@ export default async (payload) => {
         skip = 0,
     } = payload
 
-    let playlists = await Playlist.find({
+    let releases = await Release.find({
         $or: [
             { public: true },
         ]
@@ -15,5 +15,11 @@ export default async (payload) => {
         .limit(limit)
         .skip(skip)
 
-    return playlists
+    releases = Promise.all(releases.map(async (release) => {
+        release = release.toObject()
+
+        return release
+    }))
+
+    return releases
 }

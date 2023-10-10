@@ -4,39 +4,46 @@ import { Icons } from "components/Icons"
 import UploadButton from "components/UploadButton"
 
 export default (props) => {
-    const [playlistName, setPlaylistName] = React.useState(props.playlist.title)
-    const [playlistDescription, setPlaylistDescription] = React.useState(props.playlist.description)
-    const [playlistThumbnail, setPlaylistThumbnail] = React.useState(props.playlist.cover ?? props.playlist.thumbnail)
-    const [playlistVisibility, setPlaylistVisibility] = React.useState(props.playlist.visibility)
+    const [releaseName, setReleaseName] = React.useState(props.release.title)
+    const [releaseDescription, setReleaseDescription] = React.useState(props.release.description)
+    const [releaseThumbnail, setReleaseThumbnail] = React.useState(props.release.cover ?? props.release.thumbnail)
+    const [releaseVisibility, setReleaseVisibility] = React.useState(props.release.visibility)
+    const [releaseType, setReleaseType] = React.useState(props.release.type)
+
+    const handleReleaseTypeChange = (value) => {
+        setReleaseType(value)
+
+        props.onValueChange("type", value)
+    }
 
     const handleTitleOnChange = (event) => {
-        setPlaylistName(event.target.value)
+        setReleaseName(event.target.value)
 
-        props.onTitleChange(event.target.value)
+        props.onValueChange("title", event.target.value)
     }
 
     const handleDescriptionOnChange = (event) => {
-        setPlaylistDescription(event.target.value)
+        setReleaseDescription(event.target.value)
 
-        props.onDescriptionChange(event.target.value)
+        props.onValueChange("description", event.target.value)
     }
 
     const handleCoverChange = (file) => {
-        setPlaylistThumbnail(file.url)
+        setReleaseThumbnail(file.url)
 
-        props.onPlaylistCoverChange(file.url)
+        props.onValueChange("cover", file.url)
     }
 
     const handleRemoveCover = () => {
-        setPlaylistThumbnail(null)
+        setReleaseThumbnail(null)
 
-        props.onPlaylistCoverChange(null)
+        props.onValueChange("cover", null)
     }
 
     const handleVisibilityChange = (value) => {
-        setPlaylistVisibility(value)
+        setReleaseVisibility(value)
 
-        props.onVisibilityChange(value === "public")
+        props.onValueChange("public", value === "public")
     }
 
     return <div className="playlistCreator_layout_row">
@@ -51,10 +58,10 @@ export default (props) => {
 
                 <antd.Input
                     className="inputText"
-                    placeholder="Playlist Title"
+                    placeholder="Publish Title"
                     size="large"
                     bordered={false}
-                    value={playlistName}
+                    value={releaseName}
                     onChange={handleTitleOnChange}
                     maxLength={120}
                 />
@@ -70,7 +77,7 @@ export default (props) => {
                     className="inputText"
                     placeholder="Description (Support Markdown)"
                     bordered={false}
-                    value={playlistDescription}
+                    value={releaseDescription}
                     onChange={handleDescriptionOnChange}
                     maxLength={2500}
                     rows={4}
@@ -81,14 +88,31 @@ export default (props) => {
 
             <div className="field">
                 <div className="field_header">
+                    <Icons.IoMdRecording />
+                    <span>Type</span>
+                </div>
+
+                <antd.Select
+                    value={releaseType}
+                    onChange={handleReleaseTypeChange}
+                    defaultValue="album"
+                >
+                    <antd.Select.Option value="album">Album</antd.Select.Option>
+                    <antd.Select.Option value="ep">EP</antd.Select.Option>
+                    <antd.Select.Option value="single">Single</antd.Select.Option>
+                </antd.Select>
+            </div>
+
+            <div className="field">
+                <div className="field_header">
                     <Icons.Eye />
                     <span>Visibility</span>
                 </div>
 
                 <antd.Select
-                    value={playlistVisibility}
+                    value={releaseVisibility}
                     onChange={handleVisibilityChange}
-                    defaultValue={props.playlist.public ? "public" : "private"}
+                    defaultValue={props.release.public ? "public" : "private"}
                 >
                     <antd.Select.Option value="public">Public</antd.Select.Option>
                     <antd.Select.Option value="private">Private</antd.Select.Option>
@@ -111,7 +135,7 @@ export default (props) => {
 
                 <div className="coverPreview">
                     <div className="coverPreview_preview">
-                        <img src={playlistThumbnail ?? "/assets/no_song.png"} alt="Thumbnail" />
+                        <img src={releaseThumbnail ?? "/assets/no_song.png"} alt="Thumbnail" />
                     </div>
 
                     <div className="coverPreview_actions">
@@ -125,7 +149,7 @@ export default (props) => {
 
                         <antd.Button
                             onClick={handleRemoveCover}
-                            disabled={!playlistThumbnail}
+                            disabled={!releaseThumbnail}
                             icon={<Icons.MdClose />}
                             type="text"
                         >
@@ -139,7 +163,7 @@ export default (props) => {
 
             <div className="field">
                 {
-                    props.playlist._id && <antd.Button
+                    props.release._id && <antd.Button
                         onClick={props.onDeletePlaylist}
                         icon={<Icons.MdDelete />}
                         danger

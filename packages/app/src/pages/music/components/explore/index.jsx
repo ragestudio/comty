@@ -10,7 +10,6 @@ import { WithPlayerContext } from "contexts/WithPlayerContext"
 
 import FeedModel from "models/feed"
 import MusicModel from "models/music"
-import SyncModel from "models/sync"
 
 import MusicTrack from "components/Music/Track"
 import PlaylistItem from "components/Music/PlaylistItem"
@@ -207,7 +206,6 @@ const SearchResults = ({
             }
         )}
     >
-        <WithPlayerContext>
             {
                 groupsKeys.map((key, index) => {
                     const decorator = ResultGroupsDecorators[key] ?? {
@@ -241,7 +239,6 @@ const SearchResults = ({
                     </div>
                 })
             }
-        </WithPlayerContext>
     </div>
 }
 
@@ -293,7 +290,7 @@ export default (props) => {
                 <PlaylistsList
                     headerTitle="From your following artists"
                     headerIcon={<Icons.MdPerson />}
-                    fetchMethod={FeedModel.getPlaylistsFeed}
+                    fetchMethod={FeedModel.getMusicFeed}
                 />
 
                 <PlaylistsList

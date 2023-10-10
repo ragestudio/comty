@@ -36,80 +36,45 @@ html {
 }
 
 .playlist_view {
+    position: relative;
+
     display: flex;
-    flex-direction: row;
-
-    align-items: flex-start;
-
-    position: sticky;
+    flex-direction: column;
 
     width: 100%;
 
     gap: 20px;
 
-    &.vertical {
-        position: relative;
-
-        flex-direction: column;
-
-        .play_info_wrapper {
-            width: 100%;
-
-            z-index: 45;
-
-            .play_info {
-                flex-direction: row;
-                width: 100%;
-
-                //box-shadow: @card-shadow;
-
-                .play_info_cover {
-                    height: 15vh !important;
-                    width: 15vh !important;
-
-                    min-height: 15vh;
-                    min-width: 15vh;
-                }
-
-                .play_info_details {
-                    width: 100%;
-
-                    h1 {
-                        font-size: 1.2rem;
-                    }
-                }
-            }
-        }
-
-        .list {
-            z-index: 40;
-        }
-    }
-
     .play_info_wrapper {
-        top: 0;
-        left: 0;
-
         display: flex;
         flex-direction: column;
+
+        top: 0;
+        left: 0;
 
         align-items: center;
         justify-content: center;
 
-        width: fit-content;
-        height: fit-content;
+        width: 100%;
+
+        z-index: 45;
 
         color: var(--text-color);
 
         .play_info {
-            display: flex;
-            flex-direction: column;
+            display: inline-flex;
+            flex-direction: row;
+
+            gap: 20px;
 
             align-self: center;
 
+            width: 100%;
             height: 100%;
 
             padding: 20px;
+
+            overflow: hidden;
 
             background-color: var(--background-color-accent);
             border-radius: 12px;
@@ -123,11 +88,11 @@ html {
 
                 align-self: center;
 
-                width: 20vw;
-                height: 20vw;
+                height: 15vh !important;
+                width: 15vh !important;
 
-                min-height: 20vw;
-                min-width: 20vw;
+                min-height: 15vh;
+                min-width: 15vh;
 
                 max-width: 400px;
                 max-height: 400px;
@@ -146,33 +111,47 @@ html {
             }
 
             .play_info_details {
-                padding: 20px;
+                display: flex;
+                flex-direction: column;
+
+                width: 90%;
+
+                gap: 10px;
 
                 .play_info_title {
-                    font-size: 1.5rem;
+                    display: inline-flex;
+                    flex-direction: row;
+
+                    align-items: center;
+
+                    font-size: 1.2rem;
                     font-family: "Space Grotesk", sans-serif;
 
                     h1 {
                         margin: 0;
+                        font-weight: 600;
+                        word-break: break-all;
                     }
-
-                    word-break: break-all;
-
-                    font-weight: 600;
-
-                    margin-bottom: 10px;
                 }
 
                 .play_info_description {
                     font-size: 0.8rem;
                     font-weight: 400;
+
+                    max-height: 10vh;
+
+                    text-overflow: ellipsis;
+
+                    p {
+                        margin: 0;
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
                 }
 
                 .play_info_statistics {
                     display: flex;
                     flex-direction: column;
-
-                    margin-top: 20px;
 
                     background-color: var(--background-color-primary);
 
@@ -213,6 +192,15 @@ html {
                         }
                     }
 
+                }
+
+                .play_info_actions {
+                    display: inline-flex;
+                    flex-direction: row;
+
+                    align-items: center;
+
+                    gap: 10px;
                 }
             }
         }

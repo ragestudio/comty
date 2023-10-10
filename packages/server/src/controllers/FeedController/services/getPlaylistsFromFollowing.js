@@ -35,14 +35,6 @@ export default async (payload) => {
 
         playlist.type = "playlist"
 
-        playlist.user = await User.findOne({
-            _id: playlist.user_id,
-        }).catch((err) => {
-            return {
-                username: "Unknown user",
-            }
-        })
-
         return playlist
     }))
 

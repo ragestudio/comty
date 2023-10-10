@@ -1,0 +1,32 @@
+.playlist_creator {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    .playlist_creator_form {
+        display: flex;
+        flex-direction: column;
+
+        .playlist_creator_actions {
+            display: inline-flex;
+
+            width: 100%;
+
+            gap: 10px;
+
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .ant-form-item-control-input-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+
+            .ant-switch {
+                width: fit-content;
+            }
+        }
+    }
+}

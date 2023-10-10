@@ -31,6 +31,35 @@ html {
     svg {
         color: var(--text-color);
         margin: 0 !important;
+
+        font-size: 1rem;
+    }
+
+    .ant-btn {
+        height: 32px;
+        width: 32px;
+
+        padding: 0;
+        margin: 0;
+    }
+
+    .ant-btn-icon-only {
+        height: 32px;
+        width: 32px !important;
+    }
+
+    button {
+        display: inline-flex;
+        flex-direction: row;
+
+        justify-content: center;
+        align-items: center;
+
+        height: 32px;
+        width: 32px !important;
+
+        background-color: transparent;
+        border: 0;
     }
 
     .playButton {
@@ -40,6 +69,10 @@ html {
 
         align-items: center;
         justify-content: center;
+
+        .ant-btn-icon {
+            margin: 0 !important;
+        }
 
         .loadCircle {
             position: absolute;
@@ -66,15 +99,13 @@ html {
 
                 path {
                     stroke: var(--text-color);
-                    stroke-width: 1;
+                    stroke-width: 1.5;
                 }
             }
         }
     }
 
     .muteButton {
-        padding: 10px;
-
         svg {
             font-size: 1rem;
         }

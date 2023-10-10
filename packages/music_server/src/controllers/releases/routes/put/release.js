@@ -1,13 +1,13 @@
-import { Playlist, Track } from "@shared-classes/DbModels"
+import { Release, Track } from "@shared-classes/DbModels"
 import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@shared-classes/Errors"
 import axios from "axios"
 
-const PlaylistAllowedUpdateFields = [
+const AllowedUpdateFields = [
     "title",
     "cover",
     "album",
     "artist",
-    "description",
+    "type",
     "public",
 ]
 
@@ -112,44 +112,44 @@ export default async (req, res) => {
         return new AuthorizationError(req, res)
     }
 
-    let playlist = null
+    let release = null
 
     if (!req.body._id) {
-        playlist = new Playlist({
+        release = new Release({
             user_id: req.session.user_id.toString(),
             created_at: Date.now(),
             title: req.body.title ?? "Untitled",
-            description: req.body.description,
             cover: req.body.cover,
             explicit: req.body.explicit,
+            type: req.body.type,
             public: req.body.public,
             list: req.body.list,
             public: req.body.public,
         })
 
-        await playlist.save()
+        await release.save()
     } else {
-        playlist = await Playlist.findById(req.body._id)
+        release = await Release.findById(req.body._id)
     }
 
-    if (!playlist) {
-        return new NotFoundError(req, res, "Playlist not found")
+    if (!release) {
+        return new NotFoundError(req, res, "Release not found")
     }
 
-    if (playlist.user_id !== req.session.user_id.toString()) {
-        return new PermissionError(req, res, "You don't have permission to edit this playlist")
+    if (release.user_id !== req.session.user_id.toString()) {
+        return new PermissionError(req, res, "You don't have permission to edit this release")
     }
 
-    playlist = playlist.toObject()
+    release = release.toObject()
 
-    playlist.publisher = {
+    release.publisher = {
         user_id: req.session.user_id.toString(),
         fullName: userData.fullName,
         username: userData.username,
         avatar: userData.avatar,
     }
 
-    playlist.list = await Promise.all(req.body.list.map(async (track, index) => {
+    release.list = await Promise.all(req.body.list.map(async (track, index) => {
         if (typeof track !== "object") {
             return track
         }
@@ -168,19 +168,19 @@ export default async (req, res) => {
         }
     }))
 
-    PlaylistAllowedUpdateFields.forEach((field) => {
+    AllowedUpdateFields.forEach((field) => {
         if (typeof req.body[field] !== "undefined") {
-            playlist[field] = req.body[field]
+            release[field] = req.body[field]
         }
     })
 
-    playlist = await Playlist.findByIdAndUpdate(playlist._id.toString(), playlist)
+    release = await Release.findByIdAndUpdate(release._id.toString(), release)
 
-    if (!playlist) {
-        return new NotFoundError(req, res, "Playlist not updated")
+    if (!release) {
+        return new NotFoundError(req, res, "Release not updated")
     }
 
-    global.eventBus.emit(`playlist.${playlist._id}.updated`, playlist)
+    global.eventBus.emit(`release.${release._id}.updated`, release)
 
-    return res.json(playlist)
+    return res.json(release)
 }
