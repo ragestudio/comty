@@ -112,6 +112,15 @@ html {
 			max-width: 40%;
 
 			padding: 0;
+
+			padding-top: 20px;
+			padding-bottom: 20px;
+		}
+	}
+
+	&.disable-top-layout-padding {
+		.content_layout {
+			padding-top: 0;
 		}
 	}
 }
@@ -198,7 +207,7 @@ svg {
 	background-repeat: var(--backgroundRepeat);
 	background-attachment: var(--backgroundAttachment);
 
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
 
