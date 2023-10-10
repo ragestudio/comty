@@ -178,19 +178,6 @@ export default class PostCard extends React.PureComponent {
                     "post_content",
                 )}
             >
-                {
-                    this.state.isNsfw && !this.state.nsfwAccepted &&
-                    <div className="nsfw_alert">
-                        <h2>
-                            This post may contain sensitive content.
-                        </h2>
-
-                        <antd.Button onClick={() => this.setState({ nsfwAccepted: true })}>
-                            Show anyways
-                        </antd.Button>
-                    </div>
-                }
-
                 <div className="message">
                     {
                         processString(messageRegexs)(this.props.data.message ?? "")
@@ -200,8 +187,8 @@ export default class PostCard extends React.PureComponent {
                 {
                     !this.props.disableAttachments && this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
                         attachments={this.props.data.attachments}
+                        flags={this.props.data.flags}
                     />
-
                 }
             </div>
 

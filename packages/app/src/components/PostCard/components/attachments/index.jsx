@@ -1,5 +1,5 @@
 import React from "react"
-import { Skeleton } from "antd"
+import { Skeleton, Button } from "antd"
 import { ImageViewer } from "components"
 import Plyr from "plyr-react"
 import mimetypes from "mime"
@@ -130,6 +130,7 @@ const Attachment = React.memo((props) => {
 export default React.memo((props) => {
     const [controller, setController] = React.useState()
     const [carouselState, setCarouselState] = React.useState()
+    const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
 
     React.useEffect(() => {
         // get attachment index from query string
@@ -141,6 +142,19 @@ export default React.memo((props) => {
     }, [])
 
     return <div className="post_attachments">
+        {
+            props.flags && props.flags.includes("nsfw") && !nsfwAccepted &&
+            <div className="nsfw_alert">
+                <h2>
+                    This post may contain sensitive content.
+                </h2>
+
+                <Button onClick={() => setNsfwAccepted(true)}>
+                    Show anyways
+                </Button>
+            </div>
+        }
+
         {
             props.attachments?.length > 0 && <BearCarousel
                 data={props.attachments.map((attachment, index) => {
