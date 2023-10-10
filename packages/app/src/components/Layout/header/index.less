@@ -2,8 +2,6 @@
     display: flex;
     flex-direction: column;
 
-    gap: 10px;
-
     position: sticky;
 
     z-index: 100;
@@ -13,22 +11,29 @@
 
     width: 100%;
 
-    margin-bottom: 20px;
-    padding: 5px;
+    .page_header {
+        display: block;
+        margin: 10px 0 20px 0;
 
-    backdrop-filter: blur(10px);
+        padding: 5px;
 
-    background-color: rgba(var(--background-color-accent-values), 0.8);
+        gap: 10px;
 
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+        background-color: rgba(var(--background-color-accent-values), 0.8);
 
-    overflow: hidden;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+
+        overflow: hidden;
+
+        transition: all 150ms ease-in-out;
+    }
 
     &.hidden {
         opacity: 0;
         height: 0;
         padding: 0;
-        margin: 0;
+        margin: 10px 0;
     }
 }
