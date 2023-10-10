@@ -17,7 +17,10 @@ export default [
     {
         path: "/play/*",
         public: true,
-        centeredContent: true,
+        centeredContent: {
+            mobile: true,
+            desktop: true,
+        },
         mobileTopBarSpacer: true,
     },
     {
