@@ -40,12 +40,16 @@ export default (props) => {
                     transform: `translateY(-${y}px)`,
                 }}
             >
-                {
-                    render?.component && React.cloneElement(
-                        render?.component,
-                        render?.options?.props ?? {}
-                    )
-                }
+                <div
+                    className="page_header"
+                >
+                    {
+                        render?.component && React.cloneElement(
+                            render?.component,
+                            render?.options?.props ?? {}
+                        )
+                    }
+                </div>
             </div>
         }}
     </Motion>
