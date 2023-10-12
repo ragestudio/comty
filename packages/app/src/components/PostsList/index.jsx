@@ -11,12 +11,14 @@ import PostModel from "models/post"
 import "./index.less"
 
 const LoadingComponent = () => {
-    return <antd.Skeleton
-        avatar
-        style={{
-            width: "100%"
-        }}
-    />
+    return <div className="post_card">
+        <antd.Skeleton
+            avatar
+            style={{
+                width: "100%"
+            }}
+        />
+    </div>
 }
 
 const NoResultComponent = () => {
