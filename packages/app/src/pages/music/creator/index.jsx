@@ -52,7 +52,10 @@ function createDefaultTrackData({
 
 export default class PlaylistPublisherSteps extends React.Component {
     state = {
-        releaseData: {},
+        releaseData: {
+            type: "album",
+            public: false,
+        },
 
         fileList: [],
         trackList: [],
@@ -235,6 +238,7 @@ export default class PlaylistPublisherSteps extends React.Component {
     handleUploadTrack = async (req) => {
         const response = await app.cores.remoteStorage.uploadFile(req.file, {
             onProgress: this.handleFileProgress,
+            service: "premium-cdn"
         }).catch((error) => {
             console.error(error)
             antd.message.error(error)
