@@ -1,24 +1,3 @@
-html {
-    &.mobile {
-        .embbededMediaPlayerWrapper {
-            .player {
-                .player-controls {
-                    svg {
-                        font-size: 1.2rem;
-                    }
-
-                    .likeButton {
-                        svg {
-                            width: 3rem;
-                            height: 1.2rem;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 .player-controls {
     display: inline-flex;
     flex-direction: row;
@@ -36,8 +15,13 @@ html {
     }
 
     .ant-btn {
-        height: 32px;
-        width: 32px;
+        height: 32px!important;
+        max-height: 32px!important;
+        min-height: 32px!important;
+
+        width: 32px!important;
+        max-width: 32px!important;
+        min-width: 32px!important;
 
         padding: 0;
         margin: 0;
