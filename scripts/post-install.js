@@ -89,6 +89,13 @@ async function main() {
 
     await initializeEvite()
 
+    console.log("Rebuilding TFJS...")
+
+    await child_process.execSync("npm rebuild @tensorflow/tfjs-node --build-from-source &&", {
+        cwd: rootPath,
+        stdio: "inherit",
+    })
+
     // read dir with absolute paths
     let packages = await getPackages()
 

@@ -14,8 +14,8 @@
         "dev:server": "cd packages/server && yarn dev",
         "dev:client": "cd packages/app && yarn dev",
         "release": "node ./scripts/release.js",
-        "post:deploy": "node ./scripts/post-deploy.js",
-        "postinstall": "npm rebuild @tensorflow/tfjs-node --build-from-source && node ./scripts/post-install.js"
+        "postdeploy": "node ./scripts/post-deploy.js",
+        "postinstall": "node ./scripts/post-install.js"
     },
     "workspaces": [
         "packages/**"
