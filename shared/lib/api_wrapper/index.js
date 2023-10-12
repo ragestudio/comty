@@ -8,7 +8,7 @@ const infisical = require("infisical-node")
 global.isProduction = process.env.NODE_ENV === "production"
 
 globalThis["__root"] = path.resolve(process.cwd())
-globalThis["__src"] = path.resolve(globalThis["__root"], "src")
+globalThis["__src"] = path.resolve(globalThis["__root"], global.isProduction ? "dist" : "src")
 
 const customAliases = {
     "root": globalThis["__root"],
@@ -98,7 +98,7 @@ async function main({
     main_filePath,
     force_infisical,
 } = {}) {
-    const API = require(main_filePath ?? path.resolve(globalThis["__src"], "api.js")).default
+    const API = require(global._global_main_filePath ?? main_filePath ?? path.resolve(globalThis["__src"], "api.js")).default
 
     if (force_infisical || process.env.INFISICAL_TOKEN) {
         await injectEnvFromInfisical()
