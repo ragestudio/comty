@@ -140,7 +140,7 @@ const FileItemEditor = (props) => {
             </antd.Button>
         </div>
 
-        <antd.Divider 
+        <antd.Divider
             style={{
                 margin: "5px 0",
             }}
