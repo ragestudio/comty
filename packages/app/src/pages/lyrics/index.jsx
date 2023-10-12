@@ -335,6 +335,7 @@ class SyncLyrics extends React.Component {
 
     events = {
         "player.state.update:track_manifest": (currentManifest) => {
+            console.log(currentManifest)
             this.setState({ currentManifest })
 
             if (document.startViewTransition) {
@@ -616,17 +617,17 @@ class SyncLyrics extends React.Component {
         app.cores.style.compactMode(true)
         app.cores.style.applyVariant("dark")
 
-        // request full screen to browser
-        if (document.fullscreenEnabled) {
-            document.documentElement.requestFullscreen()
-        }
+        // // request full screen to browser
+        // if (document.fullscreenEnabled) {
+        //     document.documentElement.requestFullscreen()
+        // }
 
-        // listen when user exit full screen to exit cinematic mode
-        document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement) {
-                app.location.back()
-            }
-        })
+        // // listen when user exit full screen to exit cinematic mode
+        // document.addEventListener("fullscreenchange", () => {
+        //     if (!document.fullscreenElement) {
+        //         app.location.back()
+        //     }
+        // })
 
         window._hacks = {
             toggleVideoCanvas: this.toggleVideoCanvas,
@@ -657,10 +658,10 @@ class SyncLyrics extends React.Component {
         app.cores.style.compactMode(false)
         app.cores.style.applyInitialVariant()
 
-        // exit full screen
-        if (document.fullscreenEnabled) {
-            document.exitFullscreen()
-        }
+        // // exit full screen
+        // if (document.fullscreenEnabled) {
+        //     document.exitFullscreen()
+        // }
     }
 
     renderLines() {
