@@ -26,7 +26,7 @@ if (process.env.USE_LINKED_SHARED) {
     customAliases["@shared-classes"] = path.resolve(globalThis["__src"], "shared-classes")
 }
 
-registerBaseAliases(undefined, customAliases)
+registerBaseAliases(globalThis["__src"], customAliases)
 
 // patches
 const { Buffer } = require("buffer")
@@ -95,10 +95,9 @@ function handleExit(instance, code) {
 }
 
 async function main({
-    main_filePath,
     force_infisical,
 } = {}) {
-    const API = require(global._global_main_filePath ?? main_filePath ?? path.resolve(globalThis["__src"], "api.js")).default
+    const API = require(path.resolve(globalThis["__src"], "api.js")).default
 
     if (force_infisical || process.env.INFISICAL_TOKEN) {
         await injectEnvFromInfisical()
