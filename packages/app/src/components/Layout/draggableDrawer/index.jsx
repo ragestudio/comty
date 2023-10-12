@@ -56,7 +56,8 @@ export default class DraggableDrawer extends Component {
         start: 0,
         position: 0,
         touching: false,
-        listenersAttached: false
+        listenersAttached: false,
+        useBackgroundColorValues: null,
     }
 
     DESKTOP_MODE = false
@@ -65,11 +66,21 @@ export default class DraggableDrawer extends Component {
     MAX_NEGATIVE_SCROLL = -50
     PX_TO_CLOSE_FROM_BOTTOM = 200
 
+    interface = {
+        setBackgroundColorValues: (values) => {
+            this.setState({ useBackgroundColorValues: values })
+        },
+    }
+
     componentDidMount() {
+        app.currentDragger = this.interface
+
         this.DESKTOP_MODE = !app.isMobile
     }
 
     componentWillUnmount() {
+        delete app.currentDragger
+
         this.removeListeners()
     }
 
@@ -312,7 +323,8 @@ export default class DraggableDrawer extends Component {
         const position = this.getPosition(hiddenPosition)
 
         let containerStyle = {
-            backgroundColor: `rgba(55, 56, 56, ${open ? containerOpacity : 0})`
+            backgroundColor: `rgba(55, 56, 56, ${open ? containerOpacity : 0})`,
+            "--body-background": this.state.useBackgroundColorValues ? `rgba(${this.state.useBackgroundColorValues}, 1)` : "var(--background-color-primary)",
         }
 
         return createPortal(
@@ -361,6 +373,10 @@ export default class DraggableDrawer extends Component {
                                         className="dragger-indicator"
                                     />
                                 </div>
+
+                                <div
+                                    className="draggable-drawer_body_background"
+                                />
 
                                 {this.props.children}
                             </div>
