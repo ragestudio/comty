@@ -51,9 +51,7 @@ export default async (req, res) => {
                 let url = null
 
                 switch (providerType) {
-                    case "music": {
-                        console.debug("uploading to backblaze b2")
-
+                    case "premium-cdn": {
                         // use backblaze b2
                         await global.b2Storage.authorize()
 
@@ -71,7 +69,7 @@ export default async (req, res) => {
                             info: build.metadata
                         })
 
-                        url = path.join(`https://`, process.env.B2_ENDPOINT, process.env.B2_BUCKET, remotePath)
+                        url = path.join(`https://`, process.env.B2_CDN_ENDPOINT, process.env.B2_BUCKET, remotePath)
 
                         break
                     }
