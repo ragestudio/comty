@@ -7,7 +7,7 @@ import { UserBadges } from "components"
 
 import { Icons } from "components/Icons"
 
-import "./details.less"
+import "./index.less"
 
 function getJoinLabel(jsDate) {
     const date = DateTime.fromJSDate(new Date(jsDate))

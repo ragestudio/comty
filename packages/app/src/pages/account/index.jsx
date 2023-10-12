@@ -9,6 +9,7 @@ import { SessionModel, UserModel, FollowsModel } from "models"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
+import MusicTab from "./tabs/music"
 import FollowersTab from "./tabs/followers"
 
 import "./index.less"
@@ -17,7 +18,7 @@ const TabsComponent = {
 	"posts": PostsTab,
 	"followers": FollowersTab,
 	"details": DetailsTab,
-	"music": DetailsTab,
+	"music": MusicTab,
 }
 
 const TabRender = React.memo((props, ref) => {
@@ -200,7 +201,7 @@ export default class Account extends React.Component {
 		}
 
 		if (!user) {
-			return <Skeleton />
+			return <antd.Skeleton active />
 		}
 
 		return <div
