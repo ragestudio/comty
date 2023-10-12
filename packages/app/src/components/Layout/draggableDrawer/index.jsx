@@ -378,7 +378,9 @@ export default class DraggableDrawer extends Component {
                                     className="draggable-drawer_body_background"
                                 />
 
-                                {this.props.children}
+                                <div className="draggable-drawer_content">
+                                    {this.props.children}
+                                </div>
                             </div>
                         </div>
                     )
