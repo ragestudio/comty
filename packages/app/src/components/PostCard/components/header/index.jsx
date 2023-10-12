@@ -1,5 +1,6 @@
 import React from "react"
 import { DateTime } from "luxon"
+import { Tag } from "antd"
 
 import { Image } from "components"
 import { Icons } from "components/Icons"
@@ -43,8 +44,19 @@ export default (props) => {
             </div>
             <div className="info">
                 <h1 onClick={goToProfile}>
-                    {props.postData.user?.fullName ?? `${props.postData.user?.username}`}
-                    {props.postData.user?.verified && <Icons.verifiedBadge />}
+                    {
+                        props.postData.user?.fullName ?? `${props.postData.user?.username}`
+                    }
+                    {
+                        props.postData.user?.verified && <Icons.verifiedBadge />
+                    }
+                    {
+                        props.postData.flags?.includes("nsfw") && <Tag
+                            color="volcano"
+                        >
+                            NSFW
+                        </Tag>
+                    }
                 </h1>
 
                 <span className="timeago">
