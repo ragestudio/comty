@@ -3,6 +3,7 @@
 @import "theme/fonts.css";
 @import "theme/fixments.less";
 @import "theme/mobile.less";
+@import "theme/splash.less";
 
 *,
 *:before,
@@ -243,99 +244,6 @@ svg {
 	.ant-result {
 		background-color: var(--background-color-primary);
 		border-radius: 8px;
-	}
-}
-
-.app_splash_wrapper {
-	position: absolute;
-
-	top: 0;
-	left: 0;
-
-	overflow: hidden;
-
-	backdrop-filter: blur(10px);
-	--webkit-backdrop-filter: blur(10px);
-
-	background-color: #252525;
-	color: #d7d7d7;
-
-	width: 100%;
-	height: 100%;
-	z-index: 1000;
-
-	display: flex;
-	flex-direction: column;
-
-	align-items: center;
-	justify-content: center;
-
-	>div {
-		margin-bottom: 40px;
-	}
-
-	svg {
-		color: rgb(215, 215, 215) !important;
-	}
-
-	&.fade-away {
-		opacity: 0;
-		transition: all 300ms ease-in-out;
-	}
-
-	.splash_logo {
-		width: 100px;
-		height: 100px;
-
-		display: flex;
-		flex-direction: column;
-
-		align-items: center;
-		justify-content: center;
-
-		img {
-			width: 100%;
-		}
-	}
-
-	.splash_label {
-		font-size: 2rem;
-
-		svg {
-			margin: 0 !important;
-		}
-	}
-
-	.splash_footer {
-		display: flex;
-		flex-direction: column;
-
-		justify-content: center;
-		align-items: center;
-
-		position: absolute;
-
-		bottom: 0;
-		left: 0;
-		right: 0;
-
-		margin: auto;
-		width: fit-content;
-
-		height: 300px;
-
-		#powered_by {
-			height: 40px;
-			margin-bottom: 10px;
-
-			filter: grayscale(1) brightness(0.8);
-		}
-
-		h4 {
-			font-family: "Space Grotesk", sans-serif;
-			font-size: 0.8rem;
-			font-weight: 400;
-		}
 	}
 }
 

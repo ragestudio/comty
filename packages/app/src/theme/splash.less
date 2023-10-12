@@ -1,0 +1,277 @@
+@iterations: 12;
+
+.app_splash_wrapper {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    overflow: hidden;
+
+    background-color: #252525;
+    color: #d7d7d7;
+
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+
+    z-index: 1000;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    .layers_wrapper {
+        position: absolute;
+
+        z-index: 99;
+
+        width: 288px;
+        height: 288px;
+    }
+
+    .content {
+        position: relative;
+
+        z-index: 100;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 70px;
+
+        width: 300px;
+        height: 300px;
+
+        border-radius: 12px;
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    svg {
+        color: rgb(215, 215, 215) !important;
+    }
+
+    &.fade-away {
+        opacity: 0;
+        transition: all 300ms ease-in-out;
+    }
+
+    .splash_logo {
+        width: 100px;
+        height: 100px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 100%;
+        }
+    }
+
+    .splash_label {
+        font-size: 2rem;
+
+        svg {
+            margin: 0 !important;
+        }
+    }
+
+    .splash_footer {
+        display: flex;
+        flex-direction: column;
+
+        justify-content: center;
+        align-items: center;
+
+        position: absolute;
+
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        margin: auto;
+        width: fit-content;
+
+        height: 300px;
+
+        #powered_by {
+            height: 40px;
+            margin-bottom: 10px;
+
+            filter: grayscale(1) brightness(0.8);
+        }
+    }
+}
+
+// .mixin-loop (@i) when (@i > 0) {
+//     .square:nth-child(@{i}) {
+//         padding: (@i * 10px);
+
+//         top: (@i * -10px);
+//         left: (@i * -10px);
+
+//         border-radius: 12px;
+
+//         //backdrop-filter: blur(10px);
+
+//         border: 2px solid var(--colorPrimary);
+
+//         -webkit-animation: magic 1s ease forwards;
+//         -webkit-animation-delay: (@i * 200ms);
+//     }
+
+//     .mixin-loop(@i - 1);
+// }
+
+// .mixin-loop(@iterations);
+
+
+@keyframes magic {
+    0% {
+        transform: scale(1)
+    }
+
+    100% {
+        transform: scale(1.5);
+    }
+}
+
+.loader_wrapper {
+    user-select: none;
+    position: absolute;
+    z-index: 1000;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 29px;
+
+    margin: 30px;
+    background-color: #2d2d2dc2;
+    border-radius: 28px;
+
+    &.end {
+        animation: unshow 0.8s linear;
+
+        .loader>div {
+            animation: loader 0.8s linear;
+        }
+
+        opacity: 0;
+        display: none;
+    }
+
+    .loader {
+        transform: scale(0.28);
+        width: 54px;
+        height: 23px;
+    }
+
+    .loader>div {
+        width: 6px;
+        height: 20px;
+        position: absolute;
+        left: -10px;
+        bottom: 15px;
+        border-radius: 5px;
+        transform-origin: 10px 35px;
+        transform: rotate(0deg);
+        animation: loader 0.8s infinite;
+    }
+
+    .loader>div:nth-child(2) {
+        transform: rotate(45deg);
+        animation-delay: 0.1s;
+    }
+
+    .loader>div:nth-child(3) {
+        transform: rotate(90deg);
+        animation-delay: 0.2s;
+    }
+
+    .loader>div:nth-child(4) {
+        transform: rotate(135deg);
+        animation-delay: 0.3s;
+    }
+
+    .loader>div:nth-child(5) {
+        transform: rotate(180deg);
+        animation-delay: 0.4s;
+    }
+
+    .loader>div:nth-child(6) {
+        transform: rotate(225deg);
+        animation-delay: 0.5s;
+    }
+
+    .loader>div:nth-child(7) {
+        transform: rotate(270deg);
+        animation-delay: 0.6s;
+    }
+
+    .loader>div:nth-child(8) {
+        transform: rotate(315deg);
+        animation-delay: 0.7s;
+    }
+}
+
+@keyframes loader {
+    0% {
+        background: transparent;
+        left: -10px;
+        transform-origin: 10px 35px;
+    }
+
+    30% {
+        background: #fff;
+    }
+
+    100% {
+        background: transparent;
+        left: 10px;
+        transform-origin: -10px 35px;
+    }
+}
+
+@keyframes unshow {
+    0% {
+        opacity: 1;
+        display: block;
+    }
+
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes blur-out {
+    0% {
+        filter: blur(10px);
+    }
+
+    100% {
+        filter: blur(0px);
+    }
+}
