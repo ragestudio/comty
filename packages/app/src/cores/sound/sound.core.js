@@ -75,7 +75,7 @@ export default class SoundCore extends Core {
             // if button exist and has aria-checked attribute then play switch_on or switch_off
             if (button) {
                 if (button.hasAttribute("aria-checked")) {
-                    return this.public.useUIAudio(button.getAttribute("aria-checked") === "true" ? "component.slider_down" : "component.slider_up")
+                    return this.public.useUIAudio(button.getAttribute("aria-checked") === "true" ? "component.switch_off" : "component.switch_on")
                 }
 
                 return this.public.useUIAudio("generic_click")
