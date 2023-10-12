@@ -62,11 +62,11 @@ async function initializeEvite() {
 
     console.log("📦 Initializing Evite...")
 
-    console.log(`Intalling Evite dependencies...`)
-    await child_process.execSync("yarn install", {
-        cwd: evitePath,
-        stdio: "inherit",
-    })
+    // console.log(`Intalling Evite dependencies...`)
+    // await child_process.execSync("yarn install", {
+    //     cwd: evitePath,
+    //     stdio: "inherit",
+    // })
 
     console.log(`Linking Evite to app...`)
     await child_process.execSync("yarn link", {
