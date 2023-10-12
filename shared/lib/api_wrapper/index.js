@@ -1,9 +1,9 @@
 require("dotenv").config()
 
-import { webcrypto as crypto } from "crypto"
-import path from "path"
-import { registerBaseAliases } from "linebridge/dist/server"
-import infisical from "infisical-node"
+const path = require("path")
+const { registerBaseAliases } = require("linebridge/dist/server")
+const { webcrypto: crypto } = require("crypto")
+const infisical = require("infisical-node")
 
 global.isProduction = process.env.NODE_ENV === "production"
 
