@@ -1,70 +1,119 @@
+import { Modal } from "antd"
 import ProcessorNode from "../node"
-import AudioPlayerStorage from "../../player.storage"
+import Presets from "../../presets"
 
 export default class EqProcessorNode extends ProcessorNode {
-    static refName = "eq"
-    static lock = true
+    constructor(props) {
+        super(props)
 
-    static defaultEqValue = {
-        32: {
-            gain: 0,
-        },
-        64: {
-            gain: 0,
-        },
-        125: {
-            gain: 0,
-        },
-        250: {
-            gain: 0,
-        },
-        500: {
-            gain: 0,
-        },
-        1000: {
-            gain: 0,
-        },
-        2000: {
-            gain: 0,
-        },
-        4000: {
-            gain: 0,
-        },
-        8000: {
-            gain: 0,
-        },
-        16000: {
-            gain: 0,
+        this.presets_controller = new Presets({
+            storage_key: "eq",
+            defaultPresetValue: {
+                32: 0,
+                64: 0,
+                125: 0,
+                250: 0,
+                500: 0,
+                1000: 0,
+                2000: 0,
+                4000: 0,
+                8000: 0,
+                16000: 0,
+            },
+        })
+
+        this.state = {
+            eqValues: this.presets_controller.currentPresetValues,
+        }
+
+        this.exposeToPublic = {
+            presets: new Proxy(this.presets_controller, {
+                get: function (target, key) {
+                    if (!key) {
+                        return target
+                    }
+
+                    return target[key]
+                },
+            }),
+            deletePreset: this.deletePreset.bind(this),
+            createPreset: this.createPreset.bind(this),
+            changePreset: this.changePreset.bind(this),
+            modifyValues: this.modifyValues.bind(this),
+            resetDefaultValues: this.resetDefaultValues.bind(this),
         }
     }
 
-    state = {
-        eqValues: AudioPlayerStorage.get("eq_values") ?? EqProcessorNode.defaultEqValue,
+    static refName = "eq"
+    static lock = true
+
+    deletePreset(key) {
+        this.changePreset("default")
+
+        this.presets_controller.deletePreset(key)
+
+        return this.presets_controller.presets
     }
 
-    exposeToPublic = {
-        modifyValues: function (values) {
-            Object.keys(values).forEach((key) => {
-                if (isNaN(key)) {
-                    delete values[key]
-                }
-            })
+    createPreset(key, values) {
+        this.state = {
+            ...this.state,
+            eqValues: this.presets_controller.createPreset(key, values),
+        }
 
-            this.state.eqValues = {
-                ...this.state.eqValues,
-                ...values,
+        this.presets_controller.changePreset(key)
+
+        return this.presets_controller.presets
+    }
+
+    changePreset(key) {
+        const values = this.presets_controller.changePreset(key)
+
+        this.state = {
+            ...this.state,
+            eqValues: values,
+        }
+
+        this.applyValues()
+
+        return values
+    }
+
+    modifyValues(values) {
+        values = this.presets_controller.setToCurrent(values)
+
+        this.state = {
+            ...this.state,
+            eqValues: values,
+        }
+
+        this.applyValues()
+
+        return values
+    }
+
+    resetDefaultValues() {
+        Modal.confirm({
+            title: "Reset to default values?",
+            content: "Are you sure you want to reset to default values?",
+            onOk: () => {
+                this.modifyValues(this.presets_controller.defaultPresetValue)
             }
+        })
 
-            AudioPlayerStorage.set("eq_values", this.state.eqValues)
+        return this.state.eqValues
+    }
 
-            this.applyValues()
-        }.bind(this),
-        resetDefaultValues: function () {
-            this.exposeToPublic.modifyValues(EqProcessorNode.defaultEqValue)
+    applyValues() {
+        // apply to current instance
+        this.processor.eqNodes.forEach((processor) => {
+            const gainValue = this.state.eqValues[processor.frequency.value]
 
-            return this.state
-        }.bind(this),
-        values: () => this.state,
+            if (processor.gain.value !== gainValue) {
+                console.debug(`[EQ] Applying values to ${processor.frequency.value} Hz frequency with gain ${gainValue}`)
+                processor.gain.value = gainValue
+            }
+        })
     }
 
     async init() {
@@ -81,7 +130,7 @@ export default class EqProcessorNode extends ProcessorNode {
         const values = Object.entries(this.state.eqValues).map((entry) => {
             return {
                 freq: parseFloat(entry[0]),
-                gain: parseFloat(entry[1].gain),
+                gain: parseFloat(entry[1]),
             }
         })
 
@@ -115,17 +164,5 @@ export default class EqProcessorNode extends ProcessorNode {
 
         // set last processor for processor node can properly connect to the next node
         this.processor._last = this.processor.eqNodes.at(-1)
-    }
-
-    applyValues() {
-        // apply to current instance
-        this.processor.eqNodes.forEach((processor) => {
-            const gainValue = this.state.eqValues[processor.frequency.value].gain
-
-            if (processor.gain.value !== gainValue) {
-                console.debug(`[EQ] Applying values to ${processor.frequency.value} Hz frequency with gain ${gainValue}`)
-                processor.gain.value = this.state.eqValues[processor.frequency.value].gain
-            }
-        })
     }
 }

@@ -1,40 +1,110 @@
-import AudioPlayerStorage from "../../player.storage"
+import { Modal } from "antd"
 import ProcessorNode from "../node"
+import Presets from "../../presets"
 
 export default class CompressorProcessorNode extends ProcessorNode {
+    constructor(props) {
+        super(props)
+
+        this.presets_controller = new Presets({
+            storage_key: "compressor",
+            defaultPresetValue: {
+                threshold: -50,
+                knee: 40,
+                ratio: 12,
+                attack: 0.003,
+                release: 0.25,
+            },
+        })
+
+        this.state = {
+            compressorValues: this.presets_controller.currentPresetValues,
+        }
+
+        this.exposeToPublic = {
+            presets: new Proxy(this.presets_controller, {
+                get: function (target, key) {
+                    if (!key) {
+                        return target
+                    }
+
+                    return target[key]
+                }
+            }),
+            deletePreset: this.deletePreset.bind(this),
+            createPreset: this.createPreset.bind(this),
+            changePreset: this.changePreset.bind(this),
+            resetDefaultValues: this.resetDefaultValues.bind(this),
+            modifyValues: this.modifyValues.bind(this),
+            detach: this._detach.bind(this),
+            attach: this._attach.bind(this),
+            values: this.state.compressorValues,
+        }
+    }
+
     static refName = "compressor"
     static dependsOnSettings = ["player.compressor"]
-    static defaultCompressorValues = {
-        threshold: -50,
-        knee: 40,
-        ratio: 12,
-        attack: 0.003,
-        release: 0.25,
+
+    deletePreset(key) {
+        this.changePreset("default")
+
+        this.presets_controller.deletePreset(key)
+
+        return this.presets_controller.presets
     }
 
-    state = {
-        compressorValues: AudioPlayerStorage.get("compressor") ?? CompressorProcessorNode.defaultCompressorValues,
+    createPreset(key, values) {
+        this.state = {
+            ...this.state,
+            compressorValues: this.presets_controller.createPreset(key, values),
+        }
+
+        this.presets_controller.changePreset(key)
+
+        return this.presets_controller.presets
     }
 
-    exposeToPublic = {
-        modifyValues: function (values) {
-            this.state.compressorValues = {
-                ...this.state.compressorValues,
-                ...values,
-            }
+    changePreset(key) {
+        const values = this.presets_controller.changePreset(key)
 
-            AudioPlayerStorage.set("compressor", this.state.compressorValues)
+        this.state = {
+            ...this.state,
+            compressorValues: values,
+        }
 
-            this.applyValues()
-        }.bind(this),
-        resetDefaultValues: function () {
-            this.exposeToPublic.modifyValues(CompressorProcessorNode.defaultCompressorValues)
+        this.applyValues()
 
-            return this.state.compressorValues
-        }.bind(this),
-        detach: this._detach.bind(this),
-        attach: this._attach.bind(this),
-        values: this.state.compressorValues,
+        return values
+    }
+
+    modifyValues(values) {
+        values = this.presets_controller.setToCurrent(values)
+
+        this.state.compressorValues = {
+            ...this.state.compressorValues,
+            ...values,
+        }
+
+        this.applyValues()
+
+        return this.state.compressorValues
+    }
+
+    async resetDefaultValues() {
+        return await new Promise((resolve) => {
+            Modal.confirm({
+                title: "Reset to default values?",
+                content: "Are you sure you want to reset to default values?",
+                onOk: () => {
+                    this.modifyValues(this.presets_controller.defaultPresetValue)
+
+                    resolve(this.state.compressorValues)
+                },
+                onCancel: () => {
+                    resolve(this.state.compressorValues)
+                }
+            })
+        })
     }
 
     async init(AudioContext) {

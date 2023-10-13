@@ -1,5 +1,7 @@
 import loadable from "@loadable/component"
 
+
+
 export default {
     id: "player",
     icon: "PlayCircleOutlined",
@@ -104,27 +106,10 @@ export default {
             group: "general",
             description: "Adjust compression values (Warning: may cause distortion when changing values)",
             experimental: true,
-            extraActions: [
-                {
-                    id: "reset",
-                    title: "Reset",
-                    icon: "MdRefresh",
-                    onClick: (ctx) => {
-                        const values = app.cores.player.compressor.resetDefaultValues()
-
-                        ctx.updateCurrentValue(values)
-                    }
-                }
-            ],
-            defaultValue: () => {
-                return app.cores.player.compressor.values
+            dependsOn: {
+                "player.compressor": true
             },
-            onUpdate: (value) => {
-                app.cores.player.compressor.modifyValues(value)
-
-                return value
-            },
-            component: loadable(() => import("../components/sliderValues")),
+            component: loadable(() => import("./items/player.compressor")),
             props: {
                 valueFormat: (value) => `${value}dB`,
                 sliders: [
@@ -163,8 +148,22 @@ export default {
                     },
                 ],
             },
-            dependsOn: {
-                "player.compressor": true
+            extraActions: [
+                {
+                    id: "reset",
+                    title: "Reset",
+                    icon: "MdRefresh",
+                    onClick: async (ctx) => {
+                        const values = await app.cores.player.compressor.resetDefaultValues()
+
+                        ctx.updateCurrentValue(values)
+                    }
+                }
+            ],
+            onUpdate: (value) => {
+                app.cores.player.compressor.modifyValues(value)
+
+                return value
             },
             storaged: false,
         },
@@ -201,7 +200,7 @@ export default {
             group: "general",
             icon: "MdGraphicEq",
             description: "Enable equalizer for audio output",
-            component: loadable(() => import("../components/sliderValues")),
+            component: loadable(() => import("./items/player.eq")),
             extraActions: [
                 {
                     id: "reset",
@@ -212,12 +211,12 @@ export default {
 
                         ctx.updateCurrentValue(values)
                     }
-                }
+                },
             ],
             usePadding: false,
             props: {
                 valueFormat: (value) => `${value}dB`,
-                marks:[
+                marks: [
                     {
                         value: 0,
                     }
@@ -286,20 +285,9 @@ export default {
                     }
                 ]
             },
-            defaultValue: () => {
-                const values = app.cores.player.eq.values().eqValues
-
-                return Object.keys(values).reduce((acc, key) => {
-                    acc[key] = values[key].gain
-
-                    return acc
-                }, {})
-            },
             onUpdate: (value) => {
                 const values = Object.keys(value).reduce((acc, key) => {
-                    acc[key] = {
-                        gain: value[key]
-                    }
+                    acc[key] = value[key]
 
                     return acc
                 }, {})
