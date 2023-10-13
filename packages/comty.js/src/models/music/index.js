@@ -506,21 +506,41 @@ export default class MusicModel {
     /**
      * Toggles the like status of a track.
      *
-     * @param {number} track_id - The ID of the track.
-     * @throws {Error} If track_id is not provided.
-     * @return {Promise<Object>} The response data.
+     * @param {Object} manifest - The manifest object containing track information.
+     * @param {boolean} to - The like status to toggle (true for like, false for unlike).
+     * @throws {Error} Throws an error if the manifest is missing.
+     * @return {Object} The response data from the API.
      */
-    static async toggleTrackLike(track_id) {
-        if (!track_id) {
-            throw new Error("Track ID is required")
+    static async toggleTrackLike(manifest, to) {
+        if (!manifest) {
+            throw new Error("Manifest is required")
         }
 
-        const response = await request({
-            instance: MusicModel.api_instance,
-            method: "POST",
-            url: `/tracks/${track_id}/toggle-like`,
-        })
+        console.log(`Toggling track ${manifest._id} like status to ${to}`)
 
-        return response.data
+        const track_id = manifest._id
+
+        switch (manifest.service) {
+            case "tidal": {
+                const response = await SyncModel.tidalCore.toggleTrackLike({
+                    track_id,
+                    to,
+                })
+
+                return response
+            }
+            default: {
+                const response = await request({
+                    instance: MusicModel.api_instance,
+                    method: to ? "POST" : "DELETE",
+                    url: `/tracks/${track_id}/like`,
+                    params: {
+                        service: manifest.service
+                    }
+                })
+
+                return response.data
+            }
+        }
     }
 }

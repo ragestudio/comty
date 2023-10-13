@@ -8,6 +8,8 @@ import SeekBar from "components/Player/SeekBar"
 import Controls from "components/Player/Controls"
 import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
 
+import ExtraActions from "components/Player/ExtraActions"
+
 import "./index.less"
 
 const ServiceIndicator = (props) => {
@@ -112,18 +114,7 @@ const AudioPlayerComponent = (props) => {
                 disabled={ctx.control_locked}
             />
 
-            <div className="extra_actions">
-                <Button
-                    type="ghost"
-                    icon={<Icons.MdLyrics />}
-                    disabled={!lyricsEnabled}
-                />
-
-                <Button
-                    type="ghost"
-                    icon={<Icons.MdQueueMusic />}
-                />
-            </div>
+            <ExtraActions />
         </div>
     </div>
 }

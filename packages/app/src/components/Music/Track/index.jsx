@@ -1,7 +1,6 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import seekToTimeLabel from "utils/seekToTimeLabel"
 
 import { ImageViewer } from "components"
 import { Icons } from "components/Icons"
@@ -12,6 +11,17 @@ import { Context as PlayerContext } from "contexts/WithPlayerContext"
 import { Context as PlaylistContext } from "contexts/WithPlaylistContext"
 
 import "./index.less"
+
+const handlers = {
+    "like": async (ctx, track) => {
+        app.cores.player.toggleCurrentTrackLike(true, track)
+        ctx.closeMenu()
+    },
+    "unlike": async (ctx, track) => {
+        app.cores.player.toggleCurrentTrackLike(false, track)
+        ctx.closeMenu()
+    },
+}
 
 const Track = (props) => {
     const {
@@ -55,8 +65,19 @@ const Track = (props) => {
         })
     }
 
-    const handleMoreMenuItemClick = () => {
+    const handleMoreMenuItemClick = (e) => {
+        const { key } = e
 
+        if (typeof handlers[key] === "function") {
+            return handlers[key](
+                {
+                    closeMenu: () => {
+                        setMoreMenuOpened(false)
+                    }
+                },
+                props.track
+            )
+        }
     }
 
     const moreMenuItems = React.useMemo(() => {
@@ -70,18 +91,29 @@ const Track = (props) => {
                 key: "share",
                 icon: <Icons.MdShare />,
                 label: "Share",
+                disabled: true,
             },
             {
                 key: "add_to_playlist",
                 icon: <Icons.MdPlaylistAdd />,
                 label: "Add to playlist",
+                disabled: true,
             },
             {
                 key: "add_to_queue",
                 icon: <Icons.MdQueueMusic />,
                 label: "Add to queue",
+                disabled: true,
             }
         ]
+
+        if (props.track.liked) {
+            items[0] = {
+                key: "unlike",
+                icon: <Icons.MdFavorite />,
+                label: "Unlike",
+            }
+        }
 
         if (playlist_ctx) {
             if (playlist_ctx.owning_playlist) {
@@ -98,7 +130,7 @@ const Track = (props) => {
         }
 
         return items
-    })
+    }, [props.track])
 
     return <div
         id={props.track._id}

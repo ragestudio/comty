@@ -49,6 +49,7 @@
         "normalize-url": "^8.0.0",
         "p-map": "^6.0.0",
         "p-queue": "^7.3.4",
+        "qs": "^6.11.2",
         "redis": "^4.6.6",
         "sharp": "^0.31.3",
         "split-chunk-merge": "^1.0.0",

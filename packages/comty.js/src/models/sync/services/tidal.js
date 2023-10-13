@@ -156,4 +156,17 @@ export default class TidalService {
 
         return data
     }
+
+    static async toggleTrackLike({
+        track_id,
+        to,
+    }) {
+        const { data } = await request({
+            instance: TidalService.api_instance,
+            method: to ? "POST" : "DELETE",
+            url: `/services/tidal/track/${track_id}/like`,
+        })
+
+        return data
+    }
 }

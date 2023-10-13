@@ -21,27 +21,22 @@ export default async (req, res) => {
         user_id: req.session.user_id,
     })
 
-    if (like) {
-        await like.delete()
-        like = null
-    } else {
-        like = new TrackLike({
-            track_id: track_id,
-            user_id: req.session.user_id,
-            created_at: new Date().getTime(),
-        })
+    like = new TrackLike({
+        track_id: track_id,
+        user_id: req.session.user_id,
+        created_at: new Date().getTime(),
+    })
 
-        await like.save()
-    }
-
+    await like.save()
+    
     global.ws.io.emit("music:self:track:toggle:like", {
         track_id: track_id,
         user_id: req.session.user_id,
-        action: like ? "liked" : "unliked",
+        action: "liked" ,
     })
 
     return res.status(200).json({
         message: "ok",
-        action: like ? "liked" : "unliked",
+        action: "liked",
     })
 }
