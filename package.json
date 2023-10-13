@@ -33,5 +33,5 @@
         "pm2": "5.3.0"
     },
     "_web_app_path": "packages/app",
-    "version": "0.58.1"
+    "version": "0.58.2"
 }
