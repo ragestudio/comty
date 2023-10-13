@@ -18,8 +18,8 @@ const EventsHandlers = {
     "playback": () => {
         return app.cores.player.playback.toggle()
     },
-    "like": () => {
-
+    "like": async (ctx) => {
+        await app.cores.player.toggleCurrentTrackLike(!ctx.track_manifest?.liked)
     },
     "previous": () => {
         return app.cores.player.playback.previous()

@@ -1,4 +1,6 @@
 import axios from "axios"
+import FormData from "form-data"
+import qs from "qs"
 
 const TIDAL_CLIENT_ID = process.env.TIDAL_CLIENT_ID
 const TIDAL_CLIENT_SECRET = process.env.TIDAL_CLIENT_SECRET
@@ -256,7 +258,6 @@ export default class TidalAPI {
 		}
 	}
 
-
 	/**
 	 * Retrieves self favorite playlists based on specified parameters.
 	 *
@@ -423,11 +424,58 @@ export default class TidalAPI {
 		return response.data
 	}
 
-	static async toggleTrackLike(track_id) {
+	/**
+	 * Toggles the like status of a track.
+	 *
+	 * @param {Object} params - The parameters for toggling the track like.
+	 * @param {string} params.trackId - The ID of the track to toggle the like status.
+	 * @param {boolean} params.to - The new like status. True to like the track, false to unlike it.
+	 * @param {string} params.user_id - The ID of the user performing the action.
+	 * @param {string} params.access_token - The access token for authentication.
+	 * @param {string} params.country - The country code.
+	 * @return {Object} - The response data from the API.
+	 */
+	static async toggleTrackLike({
+		trackId,
+		to,
+		user_id,
 
+		access_token,
+		country,
+	}) {
+		let url = `${TidalAPI.API_V1}/users/${user_id}/favorites/tracks`
+		let payload = null
+		let headers = {
+			Origin: "http://listen.tidal.com",
+			Authorization: `Bearer ${access_token}`,
+		}
+
+		if (!to) {
+			url = `${url}/${trackId}`
+		} else {
+			payload = qs.stringify({
+				trackIds: trackId,
+				onArtifactNotFound: "FAIL"
+			})
+
+			headers["Content-Type"] = "application/x-www-form-urlencoded"
+		}
+
+		let response = await axios({
+			url: url,
+			method: to ? "POST" : "DELETE",
+			headers: headers,
+			params: {
+				countryCode: country,
+				deviceType: "BROWSER"
+			},
+			data: payload
+		})
+
+		return response.data
 	}
 
 	static async togglePlaylistLike(playlist_id) {
-		
+
 	}
 }

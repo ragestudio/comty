@@ -13,7 +13,7 @@ import Controls from "components/Player/Controls"
 
 import RGBStringToValues from "utils/rgbToValues"
 
-import LikeButton from "components/LikeButton"
+import ExtraActions from "../ExtraActions"
 
 import "./index.less"
 
@@ -43,17 +43,6 @@ const ServiceIndicator = (props) => {
             return null
         }
     }
-}
-
-const ExtraActions = (props) => {
-    return <div className="extra_actions">
-        <LikeButton />
-
-        <antd.Button
-            type="ghost"
-            icon={<Icons.MdQueueMusic />}
-        />
-    </div>
 }
 
 const Player = (props) => {

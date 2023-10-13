@@ -13,7 +13,7 @@ import AudioPlayerStorage from "./player.storage"
 import defaultAudioProccessors from "./processors"
 
 import MediaSession from "./mediaSession"
-import servicesToManifestResolver from "./servicesToManifestResolver"
+import ServicesHandlers from "./services"
 
 export default class Player extends Core {
     static dependencies = [
@@ -94,6 +94,7 @@ export default class Player extends Core {
         seek: this.seek.bind(this),
         minimize: this.toggleMinimize.bind(this),
         collapse: this.toggleCollapse.bind(this),
+        toggleCurrentTrackLike: this.toggleCurrentTrackLike.bind(this),
         state: new Proxy(this.state, {
             get: (target, prop) => {
                 return target[prop]
@@ -125,6 +126,10 @@ export default class Player extends Core {
         "player.seeked": (to) => {
             app.cores.sync.music.dispatchEvent("music.player.seek", to)
         },
+    }
+
+    wsEvents = {
+
     }
 
     async onInitialize() {
@@ -317,11 +322,16 @@ export default class Player extends Core {
 
         // check if manifest has `manifest` property, if is and not inherit or missing source, resolve
         if (manifest.service) {
+            if (!ServicesHandlers[manifest.service]) {
+                this.console.error(`Service ${manifest.service} is not supported`)
+                return false
+            }
+
             if (manifest.service !== "inherit" && !manifest.source) {
-                const resolver = servicesToManifestResolver[manifest.service]
+                const resolver = ServicesHandlers[manifest.service].resolve
 
                 if (!resolver) {
-                    this.console.error(`Service ${manifest.service} is not supported`)
+                    this.console.error(`Resolving for service [${manifest.service}] is not supported`)
                     return false
                 }
 
@@ -535,6 +545,8 @@ export default class Player extends Core {
 
         // play
         await this.track_instance.media.play()
+
+        this.console.log(this.track_instance)
 
         // update manifest
         this.state.track_manifest = instance.manifest
@@ -959,5 +971,39 @@ export default class Player extends Core {
                 }
             })
         })
+    }
+
+    async toggleCurrentTrackLike(to, manifest) {
+        let isCurrent = !!!manifest
+
+        if (typeof manifest === "undefined") {
+            manifest = this.track_instance.manifest
+        }
+
+        if (!manifest) {
+            this.console.error("Track instance or manifest not found")
+            return false
+        }
+
+        if (typeof to !== "boolean") {
+            this.console.warn("Like must be a boolean")
+            return false
+        }
+
+        const service = manifest.service ?? "default"
+
+        if (!ServicesHandlers[service].toggleLike) {
+            this.console.error(`Service [${service}] does not support like actions`)
+            return false
+        }
+
+        const result = await ServicesHandlers[service].toggleLike(manifest, to)
+
+        if (isCurrent) {
+            this.track_instance.manifest.liked = to
+            this.state.track_manifest.liked = to
+        }
+
+        return result
     }
 }
