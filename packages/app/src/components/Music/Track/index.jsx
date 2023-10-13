@@ -25,6 +25,7 @@ const handlers = {
 
 const Track = (props) => {
     const {
+        loading,
         track_manifest,
         playback_status,
     } = React.useContext(PlayerContext)
@@ -139,6 +140,7 @@ const Track = (props) => {
             {
                 ["current"]: isCurrent,
                 ["playing"]: isPlaying,
+                ["loading"]: isCurrent && loading
             }
         )}
         style={{
