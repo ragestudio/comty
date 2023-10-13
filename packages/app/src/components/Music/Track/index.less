@@ -1,3 +1,27 @@
+html {
+    &.mobile {
+        .music-track {
+            &:active {
+                animation: press 150ms ease-in-out;
+            }
+
+            &.loading {
+                // TODO: create a bottom line svg to animate stroke width
+            }
+        }
+    }
+}
+
+@keyframes press {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0.95);
+    }
+}
+
 .music-track {
     position: relative;
 
@@ -8,6 +32,8 @@
     overflow: hidden;
 
     isolation: isolate;
+
+    transition: all 150ms ease-in-out;
 
     &:hover {
         .music-track_actions {
@@ -45,7 +71,6 @@
                 linear-gradient(to right, rgba(var(--cover_average-color)), transparent),
                 url(https://grainy-gradients.vercel.app/noise.svg);
         }
-
     }
 
     .music-track_background {
