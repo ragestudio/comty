@@ -1,3 +1,6 @@
 [submodule "evite"]
 	path = evite
 	url = https://github.com/ragestudio/evite
+[submodule "linebridge"]
+	path = linebridge
+	url = https://github.com/ragestudio/linebridge
