@@ -4,7 +4,7 @@
     "main": "./dist/index.js",
     "author": "RageStudio <support@ragestudio.net>",
     "scripts": {
-        "build": "corenode-cli build"
+        "build": "hermes build"
     },
     "files": [
         "dist"
@@ -20,6 +20,7 @@
         "socket.io-client": "^4.6.1"
     },
     "devDependencies": {
+        "@ragestudio/hermes": "^0.1.0",
         "corenode": "^0.28.26"
     }
 }
