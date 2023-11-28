@@ -3,10 +3,9 @@ import * as antd from "antd"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 
+import Image from "components/Image"
 import Searcher from "components/Searcher"
 import { Icons, createIconRender } from "components/Icons"
-
-import { WithPlayerContext } from "contexts/WithPlayerContext"
 
 import FeedModel from "models/feed"
 import MusicModel from "models/music"
@@ -15,6 +14,48 @@ import MusicTrack from "components/Music/Track"
 import PlaylistItem from "components/Music/PlaylistItem"
 
 import "./index.less"
+
+const FeaturedPlaylist = (props) => {
+    const [featuredPlaylist, setFeaturedPlaylist] = React.useState(false)
+
+    const onClick = () => {
+        if (!featuredPlaylist) {
+            return
+        }
+
+        app.navigation.goToPlaylist(featuredPlaylist.playlist_id)
+    }
+
+    React.useEffect(() => {
+        MusicModel.getFeaturedPlaylists().then((data) => {
+            if (data[0]) {
+                console.log(`Loaded featured playlist >`, data[0])
+                setFeaturedPlaylist(data[0])
+            }
+        })
+    }, [])
+
+    if (!featuredPlaylist) {
+        return null
+    }
+
+    return <div className="featured_playlist" onClick={onClick}>
+        <Image
+            src={featuredPlaylist.cover_url}
+        />
+
+        <div className="featured_playlist_content">
+            <h1>{featuredPlaylist.title}</h1>
+            <p>{featuredPlaylist.description}</p>
+
+            {
+                featuredPlaylist.genre && <div className="featured_playlist_genre">
+                    <span>{featuredPlaylist.genre}</span>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 const MusicNavbar = (props) => {
     return <div className="music_navbar">
@@ -206,39 +247,39 @@ const SearchResults = ({
             }
         )}
     >
-            {
-                groupsKeys.map((key, index) => {
-                    const decorator = ResultGroupsDecorators[key] ?? {
-                        icon: null,
-                        label: key,
-                        renderItem: () => null
-                    }
+        {
+            groupsKeys.map((key, index) => {
+                const decorator = ResultGroupsDecorators[key] ?? {
+                    icon: null,
+                    label: key,
+                    renderItem: () => null
+                }
 
-                    return <div className="music-explorer_search_results_group" key={index}>
-                        <div className="music-explorer_search_results_group_header">
-                            <h1>
-                                {
-                                    createIconRender(decorator.icon)
-                                }
-                                <Translation>
-                                    {(t) => t(decorator.label)}
-                                </Translation>
-                            </h1>
-                        </div>
-
-                        <div className="music-explorer_search_results_group_list">
+                return <div className="music-explorer_search_results_group" key={index}>
+                    <div className="music-explorer_search_results_group_header">
+                        <h1>
                             {
-                                data[key].map((item, index) => {
-                                    return decorator.renderItem({
-                                        key: index,
-                                        item
-                                    })
-                                })
+                                createIconRender(decorator.icon)
                             }
-                        </div>
+                            <Translation>
+                                {(t) => t(decorator.label)}
+                            </Translation>
+                        </h1>
                     </div>
-                })
-            }
+
+                    <div className="music-explorer_search_results_group_list">
+                        {
+                            data[key].map((item, index) => {
+                                return decorator.renderItem({
+                                    key: index,
+                                    item
+                                })
+                            })
+                        }
+                    </div>
+                </div>
+            })
+        }
     </div>
 }
 
@@ -287,6 +328,8 @@ export default (props) => {
 
         {
             !searchResults && <div className="feed_main">
+                <FeaturedPlaylist />
+
                 <PlaylistsList
                     headerTitle="From your following artists"
                     headerIcon={<Icons.MdPerson />}

@@ -8,6 +8,21 @@ export default class MusicModel {
     }
 
     /**
+     * Retrieves the official featured playlists.
+     *
+     * @return {Promise<Object>} The data containing the featured playlists.
+     */
+    static async getFeaturedPlaylists() {
+        const response = await request({
+            instance: MusicModel.api_instance,
+            method: "GET",
+            url: "/featured/playlists",
+        })
+
+        return response.data
+    }
+
+    /**
      * Retrieves track data for a given ID.
      *
      * @param {string} id - The ID of the track.
