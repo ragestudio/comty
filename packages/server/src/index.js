@@ -14,7 +14,7 @@ import internalEvents from "./events"
 
 export default class API extends Server {
     static refName = "MAIN-API"
-    static listen_port = 3010
+    static listen_port = process.env.HTTP_LISTEN_PORT || 3010
 
     static requireWSAuth = true
 
