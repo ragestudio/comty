@@ -23,7 +23,7 @@ export default async (socket, next) => {
             return next(new Error(`auth:token_invalid`))
         }
 
-        const session = validation.session
+        const session = validation.data
 
         const userData = await global.comty.rest.user.data({
             user_id: session.user_id,
