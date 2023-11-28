@@ -154,7 +154,7 @@ export default class PostCard extends React.PureComponent {
     }
 
     render() {
-        return <div
+        return <article
             key={this.props.index}
             id={this.props.data._id}
             style={this.props.style}
@@ -211,6 +211,6 @@ export default class PostCard extends React.PureComponent {
                 post_id={this.props.data._id}
                 visible={this.state.open}
             />
-        </div>
+        </article>
     }
 }
