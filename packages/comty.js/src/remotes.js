@@ -50,8 +50,6 @@ export default {
     default: {
         origin: composeRemote("default"),
         hasWebsocket: true,
-        useClassicAuth: true,
-        autoconnect: true,
     },
     chat: {
         origin: composeRemote("chat"),
@@ -63,9 +61,11 @@ export default {
     },
     livestreaming: {
         origin: composeRemote("livestreaming"),
+        hasWebsocket: false,
     },
     marketplace: {
         origin: composeRemote("marketplace"),
+        hasWebsocket: false,
     },
     files: {
         origin: composeRemote("files"),
