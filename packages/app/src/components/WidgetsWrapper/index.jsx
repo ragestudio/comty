@@ -121,7 +121,7 @@ function extendsWidgetClass(parentClass, ctx) {
 const generateRemoteComponent = (props) => {
     return lodable(async () => {
         try {
-            let virtualModule = await import(props.url)
+            let virtualModule = await import(/* @vite-ignore */props.url)
 
             virtualModule = virtualModule.default
 
