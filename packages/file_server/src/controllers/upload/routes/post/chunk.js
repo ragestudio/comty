@@ -69,7 +69,7 @@ export default async (req, res) => {
                             info: build.metadata
                         })
 
-                        url = path.join(`https://`, process.env.B2_CDN_ENDPOINT, process.env.B2_BUCKET, remotePath)
+                        url = `https://${process.env.B2_CDN_ENDPOINT}/${process.env.B2_BUCKET}/${remotePath}`
 
                         break
                     }
