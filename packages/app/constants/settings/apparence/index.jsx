@@ -104,6 +104,32 @@ export default {
             storaged: true
         },
         {
+            id: "style.uiFontScale",
+            group: "aspect",
+            component: "Slider",
+            title: "UI font scale",
+            description: "Change the font scale of the application.",
+            props: {
+                min: 1,
+                max: 1.2,
+                step: 0.01,
+                tooltip: {
+                    formatter: (value) => `${value}x`
+                }
+            },
+            defaultValue: () => {
+                return app.cores.style.getValue("fontScale")
+            },
+            onUpdate: (value) => {
+                app.cores.style.modify({
+                    "fontScale": value
+                })
+
+                return value
+            },
+            storaged: true
+        },
+        {
             id: "style.uiFont",
             group: "aspect",
             component: "Select",

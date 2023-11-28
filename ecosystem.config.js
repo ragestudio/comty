@@ -3,8 +3,8 @@ module.exports = {
         {
             name: "main_api",
             script: "./dist/index.js",
-            // instances: "max",
-            // exec_mode: "cluster",
+            instances: "max",
+            exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
                 "MAIN_LISTEN_PORT": 5000,
@@ -64,7 +64,7 @@ module.exports = {
         {
             name: "sync_api",
             script: "./dist/index.js",
-            env:{
+            env: {
                 "NODE_ENV": "production",
                 "HTTP_LISTEN_PORT": 5005,
             },

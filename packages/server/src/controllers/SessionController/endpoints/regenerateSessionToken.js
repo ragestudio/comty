@@ -1,13 +1,12 @@
-import { Token } from "@lib"
+import Token from "@lib/token"
 
 export default {
     method: "POST",
     route: "/regenerate",
-    middlewares: ["useJwtStrategy"],
     fn: async (req, res) => {
         const { expiredToken, refreshToken } = req.body
 
-        const token = await Token.regenerateSession(expiredToken, refreshToken).catch((error) => {
+        const token = await Token.regenerate(expiredToken, refreshToken).catch((error) => {
             res.status(400).json({ error: error.message })
 
             return null

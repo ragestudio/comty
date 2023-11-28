@@ -4,7 +4,7 @@
     "main": "./src/index.js",
     "license": "MIT",
     "scripts": {
-        "dev": "corenode-node ./src/index.js"
+        "dev": "hermes-node ./src/index.js"
     },
     "dependencies": {
         "7zip-min": "^1.4.3",
@@ -19,6 +19,6 @@
         "pm2": "^5.3.0"
     },
     "devDependencies": {
-        "corenode": "^0.28.26"
+        "@ragestudio/hermes": "^0.1.1"
     }
 }

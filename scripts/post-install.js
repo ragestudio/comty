@@ -56,17 +56,11 @@ async function linkSharedResources(pkgJSON, packagePath) {
     }
 }
 
-async function initializeEvite() {
+async function linkInternalSubmodules(packages) {
     const appPath = path.resolve(rootPath, pkgjson._web_app_path)
+
     const evitePath = path.resolve(rootPath, "evite")
-
-    console.log("📦 Initializing Evite...")
-
-    // console.log(`Intalling Evite dependencies...`)
-    // await child_process.execSync("yarn install", {
-    //     cwd: evitePath,
-    //     stdio: "inherit",
-    // })
+    const linebridePath = path.resolve(rootPath, "linebridge")
 
     console.log(`Linking Evite to app...`)
     await child_process.execSync("yarn link", {
@@ -79,6 +73,30 @@ async function initializeEvite() {
         stdio: "inherit",
     })
 
+    console.log(`Linking Linebride to servers...`)
+
+    await child_process.execSync(`yarn link`, {
+        cwd: linebridePath,
+        stdio: "inherit",
+    })
+
+    for await (const packageName of packages) {
+        const packagePath = path.resolve(packagesPath, packageName)
+
+        const packageJsonPath = path.resolve(packagePath, "package.json")
+
+        if (!fs.existsSync(packageJsonPath)) {
+            continue
+        }
+        
+        await child_process.execSync(`yarn link "linebridge"`, {
+            cwd: packagePath,
+            stdio: "inherit",
+        })
+
+        console.log(`Linking Linebride to package [${packageName}]...`)
+    }
+
     console.log(`✅ Evite dependencies installed`)
 
     return true
@@ -87,17 +105,17 @@ async function initializeEvite() {
 async function main() {
     console.time("✅ post-install tooks:")
 
-    await initializeEvite()
+    // read dir with absolute paths
+    let packages = await getPackages()
+
+    await linkInternalSubmodules(packages)
 
     console.log("Rebuilding TFJS...")
 
-    await child_process.execSync("npm rebuild @tensorflow/tfjs-node --build-from-source &&", {
+    await child_process.execSync("npm rebuild @tensorflow/tfjs-node --build-from-source", {
         cwd: rootPath,
         stdio: "inherit",
     })
-
-    // read dir with absolute paths
-    let packages = await getPackages()
 
     for (const packageName of packages) {
         const packagePath = path.resolve(packagesPath, packageName)

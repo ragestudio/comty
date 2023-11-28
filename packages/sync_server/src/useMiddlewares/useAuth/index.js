@@ -19,7 +19,7 @@ export default async function (req, res, next) {
         return res.status(401).json({ error: "Unauthorized" })
     }
 
-    req.session = validation.session
+    req.session = validation.data
 
     return true
 }

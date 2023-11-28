@@ -67,7 +67,7 @@ export async function createWebsockets() {
 
             if (remotes[key].useClassicAuth && remotes[key].noAuth !== true) {
                 // try to auth
-                instance.emit("authenticate", {
+                instance.emit("auth", {
                     token: SessionModel.token,
                 })
             }
@@ -92,6 +92,16 @@ export async function createWebsockets() {
 
             globalThis.__comty_shared_state.eventBus.emit(`${key}:${event}`, ...args)
         })
+    }
+}
+
+export async function disconnectWebsockets() {
+    const instances = globalThis.__comty_shared_state.wsInstances
+
+    for (let [key, instance] of Object.entries(instances)) {
+        if (instance.connected) {
+            instance.disconnect()
+        }
     }
 }
 

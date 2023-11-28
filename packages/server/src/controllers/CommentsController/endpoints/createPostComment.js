@@ -13,7 +13,7 @@ export default {
         const { message } = req.selection
 
         try {
-            const comment = newComment({
+            const comment = await newComment({
                 user_id: req.user._id.toString(),
                 parent_id: post_id,
                 message: message,

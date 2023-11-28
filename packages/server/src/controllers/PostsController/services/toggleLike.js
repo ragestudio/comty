@@ -27,7 +27,7 @@ export default async (payload) => {
         await PostLike.findByIdAndDelete(likeObj._id)
     }
 
-    global.websocket_instance.io.emit(`post.${post_id}.likes.update`, {
+    global.engine.ws.io.of("/").emit(`post.${post_id}.likes.update`, {
         to,
         post_id,
         user_id,

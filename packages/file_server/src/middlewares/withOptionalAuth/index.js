@@ -16,7 +16,7 @@ export default function (req, res, next) {
             }
         })
         .then((validation) => {
-            req.session = validation.session
+            req.session = validation.data
 
             next()
         })
