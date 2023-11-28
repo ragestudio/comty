@@ -22,10 +22,10 @@ export default async (payload) => {
 
     await user.save()
 
-    global.websocket_instance.io.emit(`user.update`, {
+    global.engine.ws.io.of("/").emit(`user.update`, {
         ...user.toObject(),
     })
-    global.websocket_instance.io.emit(`user.update.${payload.user_id}`, {
+    global.engine.ws.io.of("/").emit(`user.update.${payload.user_id}`, {
         ...user.toObject(),
     })
 

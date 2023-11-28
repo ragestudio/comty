@@ -1,4 +1,4 @@
-import { Token } from "@lib"
+import Token from "@lib/token"
 
 export default async (expiredToken) => {
     let regenerationToken = null
@@ -10,7 +10,7 @@ export default async (expiredToken) => {
         regenerationToken = associatedRegenerationToken.refreshToken
     } else {
         // create a new regeneration token with the expired token
-        regenerationToken = await Token.createNewRegenerationToken(expiredToken)
+        regenerationToken = await Token.createRegenerative(expiredToken)
     }
 
     return regenerationToken.refreshToken
