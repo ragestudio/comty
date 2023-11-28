@@ -54,14 +54,21 @@ services:
     env_file:
       - ./env_files/file.production.env
   redis:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
     restart: unless-stopped
+    ulimits:
+      memlock: -1
+    command:
+      - "--requirepass=changeme2424"
     networks:
       - internal_network
     env_file:
       - ./env_files/redis.env
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis_data:/data  
+
 
 networks:
   internal_network:
