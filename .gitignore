@@ -24,6 +24,7 @@
 /**/**/.evite
 /**/**/uploads
 /**/**/d_data
+/**/**/redis_data
 /**/**/*.tar
 /**/**/*.7z
 /**/**/*.zip

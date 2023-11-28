@@ -11,9 +11,9 @@ export default {
         })
 
         if (streamingProfile) {
-            global.websocket_instance.io.emit(`streaming.end`, streamingProfile)
+            global.engine.ws.io.of("/").emit(`streaming.end`, streamingProfile)
 
-            global.websocket_instance.io.emit(`streaming.end.${streamingProfile.user_id}`, streamingProfile)
+            global.engine.ws.io.of("/").emit(`streaming.end.${streamingProfile.user_id}`, streamingProfile)
 
             return res.json({
                 code: 0,

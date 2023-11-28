@@ -1,25 +1,28 @@
 import { UserFollow } from "@shared-classes/DbModels"
 
 export default async (payload = {}) => {
-    const { from_user_id } = payload
+    const { from_user_id, limit = 10, offset = 0 } = payload
+
+    // TODO: Sort by latest history interaction
 
     // get all the users that are following
-    const following = await UserFollow.find({
+    let followingUsersIds = await UserFollow.find({
         user_id: from_user_id,
     })
+    // .skip(offset)
+    // .limit(limit)
 
-    // check if following users are connected
-    const connectedUsers = []
-
-    following.forEach((follow) => {
-        const connectedClient = global.websocket_instance.clients.find((client) => {
-            return client.user_id === follow.to
-        })
-
-        if (connectedClient) {
-            connectedUsers.push(connectedClient.user_id)
-        }
+    followingUsersIds = followingUsersIds.map((follow) => {
+        return follow.to
     })
 
-    return connectedUsers
+    const searchResult = await global.engine.ws.find.manyById(followingUsersIds)
+
+    // TODO: Calculate last session duration or last activity at
+    return searchResult.map((user) => {
+        return {
+            _id: user.user_id,
+            username: user.username,
+        }
+    })
 }

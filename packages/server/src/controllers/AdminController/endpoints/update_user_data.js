@@ -23,10 +23,10 @@ export default {
 
         await user.save()
 
-        global.websocket_instance.io.emit(`user.update`, {
+        global.engine.ws.io.of("/").emit(`user.update`, {
             ...user.toObject(),
         })
-        global.websocket_instance.io.emit(`user.update.${targetUserId}`, {
+        global.engine.ws.io.of("/").emit(`user.update.${targetUserId}`, {
             ...user.toObject(),
         })
 

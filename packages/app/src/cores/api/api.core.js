@@ -5,7 +5,7 @@ import createClient from "comty.js"
 import measurePing from "comty.js/handlers/measurePing"
 import request from "comty.js/handlers/request"
 import useRequest from "comty.js/hooks/useRequest"
-import { reconnectWebsockets } from "comty.js"
+import { reconnectWebsockets, disconnectWebsockets } from "comty.js"
 
 export default class APICore extends Core {
     static namespace = "api"
@@ -25,6 +25,7 @@ export default class APICore extends Core {
         measurePing: measurePing,
         useRequest: useRequest,
         reconnectWebsockets: reconnectWebsockets,
+        disconnectWebsockets: disconnectWebsockets,
     }
 
     listenEvent(key, handler, instance) {

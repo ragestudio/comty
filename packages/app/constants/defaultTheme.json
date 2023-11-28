@@ -1,5 +1,6 @@
 {
     "defaultVars": {
+        "fontScale": "1",
         "backgroundBlur": "10px",
         "colorPrimary": "#ff6064",
         "app-color": "#ff6064",

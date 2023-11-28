@@ -20,7 +20,7 @@ export default async function (req, res, next) {
     }
 
     req.sessionToken = auth
-    req.session = validation.session
+    req.session = validation.data
 
     return next()
 }

@@ -408,7 +408,10 @@ class ComtyApp extends React.Component {
 			app.eventBus.emit("layout.animations.fadeIn")
 		},
 		"auth:logout_success": async () => {
+			app.cores.api.disconnectWebsockets()
+
 			app.navigation.goAuth()
+
 			await this.flushState()
 		},
 		"session.invalid": async (error) => {

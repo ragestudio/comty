@@ -11,7 +11,6 @@ export default (props) => {
     const fetchConnectedFriends = async () => {
         const result = await User.getConnectedUsersFollowing().catch((err) => {
             console.error(err)
-            app.message.error("Failed to fetch connected friends")
 
             return null
         })
@@ -47,16 +46,18 @@ export default (props) => {
 
     return <div className="connectedFriends">
         {
-            connectedUsers.length === 0 ?
-                <span>No connected friends</span> :
-                connectedUsers.map((user_id, index) => {
-                    return <div
-                        key={index}
-                        className="item"
-                    >
-                        <UserPreview user_id={user_id} />
-                    </div>
-                })
+            connectedUsers.length === 0 && <span>No connected friends</span>
+        }
+
+        {
+            connectedUsers.length > 0 && connectedUsers.map((user, index) => {
+                return <div
+                    key={index}
+                    className="item"
+                >
+                    <UserPreview user_id={user._id} />
+                </div>
+            })
         }
     </div>
 }
