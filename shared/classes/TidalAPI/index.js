@@ -1,5 +1,4 @@
 import axios from "axios"
-import FormData from "form-data"
 import qs from "qs"
 
 const TIDAL_CLIENT_ID = process.env.TIDAL_CLIENT_ID
