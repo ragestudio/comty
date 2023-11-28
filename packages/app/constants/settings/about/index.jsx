@@ -1,6 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 
+import { version as linebridgeVersion } from "linebridge/package.json"
+
 import { Icons } from "components/Icons"
 
 import config from "config"
@@ -11,27 +13,6 @@ const connectionsTooltipStrings = {
     secure: "This connection is secure",
     insecure: "This connection is insecure, cause it's not using HTTPS protocol and the server cannot be verified on the trusted certificate authority.",
     warning: "This connection is secure but the server cannot be verified on the trusted certificate authority.",
-}
-
-const Footer = () => {
-    const isDevMode = window.__evite?.env?.NODE_ENV !== "production"
-
-    return <div className="footer">
-        <div>
-            <div>{config.app?.siteName}</div>
-            <div>
-                <antd.Tag>
-                    <Icons.Tag />v{window.app.version}
-                </antd.Tag>
-            </div>
-            <div>
-                <antd.Tag color={isDevMode ? "magenta" : "green"}>
-                    {isDevMode ? <Icons.Triangle /> : <Icons.Box />}
-                    {isDevMode ? "development" : "production"}
-                </antd.Tag>
-            </div>
-        </div>
-    </div>
 }
 
 const latencyToColor = (latency, type) => {
@@ -98,19 +79,6 @@ export default {
             }
         }
 
-        const fetchServerHealth = async () => {
-            const response = await app.cores.api.customRequest({
-                method: "GET",
-                url: "/server/health",
-            }).catch(() => null)
-
-            console.log(response.data)
-
-            if (response) {
-                setServerHealth(response.data)
-            }
-        }
-
         const measurePing = async () => {
             const result = await app.cores.api.measurePing()
 
@@ -123,13 +91,11 @@ export default {
             checkServerVersion()
             checkServerOrigin()
 
-            fetchServerHealth()
             measurePing()
 
             setCapacitorInfo()
 
             const measureInterval = setInterval(() => {
-                fetchServerHealth()
                 measurePing()
             }, 3000)
 
@@ -237,20 +203,6 @@ export default {
                     </div>
                 </div>
 
-                <div className="field">
-                    <div className="field_header">
-                        <h3><Icons.MdDataUsage /> Instance usage</h3>
-                    </div>
-
-                    <div className="field_value">
-                        <antd.Progress
-                            percent={serverHealth?.cpuUsage.percent ?? 0}
-                            status="active"
-                            showInfo={false}
-                        />
-                    </div>
-                </div>
-
                 <div className="inline_field">
                     <div className="field_header">
                         <div className="field_icon">
@@ -287,7 +239,21 @@ export default {
                             <Icons.MdInfo />
                         </div>
 
-                        <p>Evite Engine</p>
+                        <p>Linebridge Engine</p>
+                    </div>
+
+                    <div className="field_value">
+                        {linebridgeVersion ?? globalThis._linebrige_version ?? "Unknown"}
+                    </div>
+                </div>
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>Evite Framework</p>
                     </div>
 
                     <div className="field_value">
