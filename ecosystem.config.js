@@ -7,7 +7,7 @@ module.exports = {
             exec_mode: "cluster",
             env: {
                 "NODE_ENV": "production",
-                "MAIN_LISTEN_PORT": 5000,
+                "HTTP_LISTEN_PORT": 5000,
                 "LOG_REQUESTS": true,
             },
             node_args: "-r dotenv/config",
