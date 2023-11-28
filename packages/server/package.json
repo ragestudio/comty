@@ -8,7 +8,6 @@
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
     "shared": {
-        "classes/RTEngineServer": "src/shared-classes/RTEngineServer",
         "classes/FileUpload": "src/shared-classes/FileUpload",
         "classes/CacheService": "src/shared-classes/CacheService",
         "classes/ComtyClient": "src/shared-classes/ComtyClient",
