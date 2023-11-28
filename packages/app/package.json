@@ -66,7 +66,7 @@
         "jsmediatags": "^3.9.7",
         "jwt-decode": "3.1.2",
         "less": "4.1.2",
-        "linebridge": "0.15.7",
+        "linebridge": "0.16.0",
         "lottie-react": "^2.4.0",
         "lru-cache": "^10.0.0",
         "luxon": "^3.0.4",
@@ -115,7 +115,6 @@
         "tone": "^14.7.77",
         "tseep": "^1.1.1",
         "ua-parser-js": "^1.0.36",
-        "uuid": "^9.0.0",
         "virtual-scroller": "^1.12.3",
         "wait-on": "^6.0.1"
     },
