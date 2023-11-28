@@ -2,6 +2,28 @@ import jwt from "jsonwebtoken"
 import { Session, RegenerationToken } from "@shared-classes/DbModels"
 
 export default class Token {
+    static async createNewAuthToken(payload, options = {}) {
+        if (options.updateSession) {
+            const sessionData = await Session.findOne({ _id: options.updateSession })
+
+            payload.session_uuid = sessionData.session_uuid
+        } else {
+            payload.session_uuid = global.nanoid()
+        }
+
+        const token = jwt.sign({
+            session_uuid: payload.session_uuid,
+            username: payload.username,
+            user_id: payload.user_id,
+            signLocation: payload.signLocation,
+        }, global.jwtStrategy.secretOrKey, {
+            expiresIn: global.jwtStrategy.expiresIn ?? "1h",
+            algorithm: global.jwtStrategy.algorithm ?? "HS256"
+        })
+
+        return token
+    }
+
     static async validate(token) {
         if (typeof token === "undefined") {
             throw new Error("Token is undefined")
@@ -108,7 +130,7 @@ export default class Token {
         }
 
         // generate a new token
-        const newToken = await createNewAuthToken({
+        const newToken = await this.createNewAuthToken({
             username: decodedExpiredToken.username,
             session_uuid: session.session_uuid,
             user_id: decodedExpiredToken.user_id,
@@ -124,23 +146,7 @@ export default class Token {
     }
 
     static async createAuth(payload, options = {}) {
-        if (options.updateSession) {
-            const sessionData = await Session.findOne({ _id: options.updateSession })
-
-            payload.session_uuid = sessionData.session_uuid
-        } else {
-            payload.session_uuid = global.nanoid()
-        }
-
-        const token = jwt.sign({
-            session_uuid: payload.session_uuid,
-            username: payload.username,
-            user_id: payload.user_id,
-            signLocation: payload.signLocation,
-        }, global.jwtStrategy.secretOrKey, {
-            expiresIn: global.jwtStrategy.expiresIn ?? "1h",
-            algorithm: global.jwtStrategy.algorithm ?? "HS256"
-        })
+        const token = await this.createNewAuthToken(payload, options)
 
         const session = {
             token: token,
