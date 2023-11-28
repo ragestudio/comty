@@ -4,9 +4,13 @@ const path = require("path")
 const rootPath = process.cwd()
 const packagesPath = path.resolve(rootPath, "packages")
 
-const excludedPackages = ["comty.js"]
+async function readIgnoredPackages() {
+    const packages = await fs.promises.readFile(path.resolve(rootPath, ".ignorepackages"), "utf-8").catch(() => "")
 
-function filterPackages(packages, ignore = []) {
+    return packages.split("\n")
+}
+
+async function filterPackages(packages, ignore = []) {
     const gitIgnore = fs.readFileSync(path.resolve(rootPath, ".gitignore"), "utf-8")
 
     // create a regex to match all packages that are in the gitignore file
@@ -19,11 +23,6 @@ function filterPackages(packages, ignore = []) {
 
     // filter packages that are in the gitignore file
     packages = packages.filter((packageName) => {
-        // filter excluded packages
-        if (excludedPackages.includes(packageName)) {
-            return false
-        }
-
         // filter ignored packages
         if (ignore.includes(packageName)) {
             return false
@@ -46,7 +45,12 @@ function filterPackages(packages, ignore = []) {
 async function getPackages({ ignore = [] } = {}) {
     let packages = await fs.promises.readdir(packagesPath)
 
-    packages = filterPackages(packages, ignore)
+    const ignoredPackages = await readIgnoredPackages()
+
+    packages = filterPackages(packages, [
+        ...ignore,
+        ...ignoredPackages,
+    ])
 
     return packages
 }
