@@ -17,7 +17,7 @@ const ExtraActions = (props) => {
             app.isMobile && <Button
                 type="ghost"
                 icon={<Icons.MdAbc />}
-                disabled={!ctx.track_manifest.lyricsEnabled}
+                disabled={!ctx.track_manifest?.lyricsEnabled}
             />
         }
         {
