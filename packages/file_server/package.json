@@ -3,8 +3,8 @@
     "version": "0.58.2",
     "main": "dist/index.js",
     "scripts": {
-        "build": "corenode-cli build",
-        "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec corenode-node ./src/index.js",
+        "build": "hermes build",
+        "dev": "cross-env NODE_ENV=development nodemon --ignore dist/ --exec hermes-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
     "shared": {
@@ -28,7 +28,6 @@
         "comty.js": "^0.58.2",
         "connect-mongo": "^4.6.0",
         "content-range": "^2.0.2",
-        "corenode": "0.28.26",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
         "express": "^4.18.2",
@@ -45,7 +44,6 @@
         "moment-timezone": "^0.5.40",
         "mongoose": "^6.9.0",
         "morgan": "^1.10.0",
-        "nanoid": "3.2.0",
         "normalize-url": "^8.0.0",
         "p-map": "4.0.0",
         "p-queue": "^7.3.4",
@@ -53,6 +51,7 @@
         "split-chunk-merge": "^1.0.0"
     },
     "devDependencies": {
+        "@ragestudio/hermes": "^0.1.0",
         "chai": "^4.3.7",
         "cross-env": "^7.0.3",
         "mocha": "^10.2.0",

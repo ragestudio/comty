@@ -3,8 +3,8 @@
     "version": "0.58.2",
     "main": "dist/index.js",
     "scripts": {
-        "build": "corenode-cli build",
-        "dev": "nodemon --ignore dist/ --exec corenode-node ./src/index.js",
+        "build": "hermes build",
+        "dev": "nodemon --ignore dist/ --exec hermes-node ./src/index.js",
         "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
     },
     "shared": {
@@ -20,15 +20,10 @@
     "license": "MIT",
     "dependencies": {
         "@foxify/events": "^2.1.0",
-        "@socket.io/cluster-adapter": "^0.2.2",
-        "@socket.io/sticky": "^1.0.3",
-        "@socket.io/redis-adapter": "^8.2.1",
-        "@socket.io/redis-emitter": "^5.1.0",
         "axios": "^1.4.0",
         "bcrypt": "5.0.1",
         "comty.js": "^0.58.2",
         "connect-mongo": "^4.6.0",
-        "corenode": "0.28.26",
         "cors": "^2.8.5",
         "dotenv": "^16.0.3",
         "express": "^4.18.2",
@@ -40,11 +35,11 @@
         "moment-timezone": "0.5.37",
         "mongoose": "^6.9.0",
         "morgan": "^1.10.0",
-        "nanoid": "3.2.0",
         "redis": "^4.6.6",
         "socket.io": "^4.5.4"
     },
     "devDependencies": {
+        "@ragestudio/hermes": "^0.1.0",
         "cross-env": "^7.0.3",
         "nodemon": "^2.0.15"
     }
