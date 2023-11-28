@@ -46,9 +46,9 @@ export default {
             })
         }
 
-        global.websocket_instance.io.emit(`streaming.new`, streamingProfile)
+        global.engine.ws.io.of("/").emit(`streaming.new`, streamingProfile)
 
-        global.websocket_instance.io.emit(`streaming.new.${streamingProfile.user_id}`, streamingProfile)
+        global.engine.ws.io.of("/").emit(`streaming.new.${streamingProfile.user_id}`, streamingProfile)
 
         return res.json({
             code: 0,

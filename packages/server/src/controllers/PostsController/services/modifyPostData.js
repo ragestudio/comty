@@ -24,8 +24,8 @@ export default async (post_id, modification) => {
         }
     }
 
-    global.websocket_instance.io.emit(`post.dataUpdate`, post)
-    global.websocket_instance.io.emit(`post.dataUpdate.${post_id}`, post)
+    global.engine.ws.io.of("/").emit(`post.dataUpdate`, post)
+    global.engine.ws.io.of("/").emit(`post.dataUpdate.${post_id}`, post)
 
     return post
 }

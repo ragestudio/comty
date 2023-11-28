@@ -1,32 +1,39 @@
-import passport from "passport"
-import { Token } from "@lib"
+import Token from "@lib/token"
+import { User } from "@shared-classes/DbModels"
+import bcrypt from "bcrypt"
 
 export default {
     method: "POST",
     route: "/login",
     fn: async (req, res) => {
-        passport.authenticate("local", { session: false }, async (error, user, options) => {
-            if (error) {
-                return res.status(500).json({
-                    message: `Error validating user > ${error.message}`,
-                })
-            }
+        const { username, password } = req.body
 
-            if (!user) {
-                return res.status(401).json({
-                    message: "Invalid credentials",
-                })
-            }
+        let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
 
-            const token = await Token.createNewAuthToken({
-                username: user.username,
-                user_id: user._id.toString(),
-                ip_address: req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket.remoteAddress,
-                client: req.headers["user-agent"],
-                signLocation: global.signLocation,
-            }, options)
+        let query = isEmail ? { email: username } : { username: username }
 
-            return res.json({ token: token })
-        })(req, res)
+        const user = await User.findOne(query).select("+password")
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid credentials, user not found",
+            })
+        }
+
+        if (!bcrypt.compareSync(password, user.password)) {
+            return res.status(401).json({
+                message: "Invalid credentials",
+            })
+        }
+
+        const token = await Token.createAuth({
+            username: user.username,
+            user_id: user._id.toString(),
+            ip_address: req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket.remoteAddress,
+            client: req.headers["user-agent"],
+            signLocation: global.signLocation,
+        })
+
+        return res.json({ token: token })
     }
 }

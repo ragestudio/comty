@@ -25,12 +25,7 @@ export default async (payload) => {
 
     const userData = await User.findById(user_id)
 
-    global.websocket_instance.io.emit(`comment.new.${parent_id}`, {
-        ...comment.toObject(),
-        user: userData.toObject(),
-    })
-
-    global.websocket_instance.io.emit(`post.new.comment.${parent_id}`, {
+    global.engine.ws.io.of("/").emit(`post.new.comment.${parent_id}`, {
         ...comment.toObject(),
         user: userData.toObject(),
     })
