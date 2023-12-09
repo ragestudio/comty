@@ -30,7 +30,16 @@ async function linkSharedResources(pkgJSON, packagePath) {
         }
 
         // link entire folder
-        fs.symlinkSync(sharedRootPath, finalLinkPath, "dir")
+        try {
+            fs.symlinkSync(sharedRootPath, finalLinkPath, "dir")
+        } catch (error) {
+            if (error.code && error.code === 'EEXIST') {
+                console.warn(`⚠️  Resource [${resource}] link already exists in [${finalLinkPath}]`)
+            } else {
+                console.warn(`⚠️  Failed to link [${shared}] with [${finalLinkPath}]`)
+                throw error; // Error if symlink exists
+            }
+        }
     } else {
         for (const [resource, linkPath] of Object.entries(shared)) {
             const originClassPath = path.resolve(sharedRootPath, resource)
@@ -47,9 +56,17 @@ async function linkSharedResources(pkgJSON, packagePath) {
                 fs.mkdirSync(path.resolve(finalLinkPath, ".."), { recursive: true })
             }
 
-            fs.symlinkSync(originClassPath, finalLinkPath, "dir")
-
-            console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+            try {
+                fs.symlinkSync(originClassPath, finalLinkPath, "dir")
+                console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+            } catch (error) {
+                if (error.code && error.code === 'EEXIST') {
+                    console.warn(`⚠️  Resource [${resource}] link already exists in [${finalLinkPath}]`)
+                } else {
+                    console.warn(`⚠️  Failed to link [${shared}] with [${finalLinkPath}]`)
+                    throw error; // Error if symlink exists
+                }
+            }
 
             continue
         }
