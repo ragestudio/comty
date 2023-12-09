@@ -47,9 +47,16 @@ async function linkSharedResources(pkgJSON, packagePath) {
                 fs.mkdirSync(path.resolve(finalLinkPath, ".."), { recursive: true })
             }
 
-            fs.symlinkSync(originClassPath, finalLinkPath, "dir")
-
-            console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+            try {
+                fs.symlinkSync(originClassPath, finalLinkPath, "dir")
+                console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+            } catch (error) {
+                if (error.code && error.code == 'EEXIST') {
+                    fs.unlinkSync(finalLinkPath)
+                    fs.symlinkSync(originClassPath, finalLinkPath, "dir")
+                    console.log(`🔗 Linked resouce [${resource}] to [${finalLinkPath}]`)
+                }
+            }
 
             continue
         }
