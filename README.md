@@ -53,7 +53,7 @@ For local development you will need to have installed some tools:
 ### Setup
 - Getting the repository
 ```shell
-git clone https://github.com/ragestudio/comty && cd comty
+git clone --recurse-submodules https://github.com/ragestudio/comty && cd comty
 ```
 
 - Installing all dependencies
