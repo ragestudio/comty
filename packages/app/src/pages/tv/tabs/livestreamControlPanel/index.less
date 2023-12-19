@@ -11,6 +11,10 @@
 
     gap: 20px;
 
+    &[disabled]{
+        pointer-events: none;
+    }
+
     .inline_field {
         background-color: var(--background-color-accent);
 
@@ -133,13 +137,48 @@
 
                 width: 100%;
 
+                gap: 7px;
+
                 .title {
                     display: inline-flex;
                     flex-direction: row;
 
+                    align-items: center;
                     justify-content: space-between;
 
+                    svg {
+                        font-size: 1rem;
+                        margin: 0;
+                    }
+
+                    p {
+                        margin: 0;
+                    }
+
                     width: 100%;
+                    margin: 0;
+                }
+
+                .label {
+                    display: inline-flex;
+                    flex-direction: row;
+
+                    align-items: center;
+
+                    gap: 8px;
+
+                    svg {
+                        font-size: 1.3rem;
+                        margin: 0;
+                    }
+
+                    width: 100%;
+                    margin: 0;
+                }
+
+                .description {
+                    font-size: 0.8rem;
+                    margin: 0;
                 }
             }
         }

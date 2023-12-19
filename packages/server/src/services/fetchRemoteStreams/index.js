@@ -17,7 +17,6 @@ export default async (stream_id) => {
         url: apiURI,
         params: {
             stream: stream_id,
-            useFetch: true,
         }
     }).catch((err) => {
         console.error(err)
@@ -34,10 +33,8 @@ export default async (stream_id) => {
         streamings = data
     }
 
-    streamings = streamings.map(async (stream) => {
-        const { video, audio, clients, name } = stream
-
-        const profile_id = name.split(":")[1]
+    streamings = streamings.map(async (entry) => {
+        const { stream, profile_id } = entry
 
         let profile = await StreamingProfile.findById(profile_id)
 
@@ -62,13 +59,10 @@ export default async (stream_id) => {
         return {
             profile_id: profile._id,
             info: profile.info,
-            name: name,
+            name: stream,
             streamUrl: `${user.username}?profile=${profile._id}`,
-            user,
-            video,
-            audio,
-            connectedClients: clients ?? 0,
             sources: lodash.pick(sources, ["rtmp", "hls", "flv", "aac"]),
+            user,
         }
     })
 

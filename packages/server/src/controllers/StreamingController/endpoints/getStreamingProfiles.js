@@ -34,7 +34,7 @@ export default {
 
             profile._id = profile._id.toString()
 
-            profile.stream_key = `${req.user.username}:${profile._id}?secret=${profile.stream_key}`
+            profile.stream_key = `${req.user.username}__${profile._id}?secret=${profile.stream_key}`
 
             return profile
         })
