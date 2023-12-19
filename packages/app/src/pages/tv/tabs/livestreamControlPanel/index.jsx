@@ -15,10 +15,10 @@ import "./index.less"
 
 export default (props) => {
     const [L_Profiles, R_Profiles, E_Profiles, M_Profiles] = app.cores.api.useRequest(Livestream.getProfiles)
-
+    const [profileData, setProfileData] = React.useState(null)
     const [selectedProfileId, setSelectedProfileId] = React.useState(null)
-
     const [isConnected, setIsConnected] = React.useState(false)
+    const [loadingChanges, setLoadingChanges] = React.useState(false)
 
     React.useEffect(() => {
         if (R_Profiles) {
@@ -30,23 +30,14 @@ export default (props) => {
         }
     }, [R_Profiles])
 
-    if (E_Profiles) {
-        console.error(E_Profiles)
+    React.useEffect(() => {
+        if (selectedProfileId) {
+            console.log(R_Profiles)
+            setProfileData(R_Profiles.find((profile) => profile._id === selectedProfileId))
+        }
+    }, [selectedProfileId])
 
-        return <antd.Result
-            status="error"
-            title="Failed to load profiles"
-            subTitle="Failed to load profiles, please try again later"
-        />
-    }
-
-    if (L_Profiles) {
-        return <antd.Skeleton active />
-    }
-
-    const profileData = R_Profiles.find((profile) => profile._id === selectedProfileId)
-
-    const handleCreateProfile = async (profile_name) => {
+    async function handleCreateProfile(profile_name) {
         if (!profile_name) {
             return false
         }
@@ -70,7 +61,7 @@ export default (props) => {
         }
     }
 
-    const handleCurrentProfileDataUpdate = async (newProfileData) => {
+    async function handleCurrentProfileDataUpdate(newProfileData) {
         if (!profileData) {
             return
         }
@@ -95,7 +86,7 @@ export default (props) => {
         }
     }
 
-    const handleCurrentProfileDelete = async () => {
+    async function handleCurrentProfileDelete() {
         if (!profileData) {
             return
         }
@@ -126,7 +117,7 @@ export default (props) => {
         })
     }
 
-    const onClickEditInfo = () => {
+    async function onClickEditInfo() {
         if (!profileData) {
             return
         }
@@ -140,7 +131,7 @@ export default (props) => {
         })
     }
 
-    const regenerateStreamingKey = async () => {
+    async function regenerateStreamingKey() {
         if (!profileData) {
             return
         }
@@ -163,7 +154,58 @@ export default (props) => {
         })
     }
 
-    return <div className="streamingControlPanel">
+    async function updateOption(key, value) {
+        if (!profileData) {
+            return
+        }
+
+        setLoadingChanges(`option:${key}`)
+
+        const result = await Livestream.postProfile({
+            profile_id: profileData._id,
+            profile_name: profileData.profile_name,
+            options: {
+                [key]: value
+            }
+        }).catch((err) => {
+            console.error(err)
+            app.message.error(`Failed to update option`)
+            setLoadingChanges(false)
+
+            return false
+        })
+
+        if (result) {
+            console.log("Updated options >", result)
+
+            setProfileData((prev) => {
+                return {
+                    ...prev,
+                    ...result,
+                }
+            })
+            setLoadingChanges(false)
+        }
+    }
+
+    if (E_Profiles) {
+        console.error(E_Profiles)
+
+        return <antd.Result
+            status="error"
+            title="Failed to load profiles"
+            subTitle="Failed to load profiles, please try again later"
+        />
+    }
+
+    if (L_Profiles) {
+        return <antd.Skeleton active />
+    }
+
+    return <div
+        className="streamingControlPanel"
+        disabled={!profileData || loadingChanges}
+    >
         <div className="streamingControlPanel_header_thumbnail">
             <img
                 src={
@@ -272,23 +314,49 @@ export default (props) => {
                 <h2><Icons.Tool />Additional options</h2>
 
                 <div className="content">
-                    <span>Enable DVR</span>
+                    <p className="label">
+                        <Icons.MdFiberDvr /> DVR
+                    </p>
+
+                    <span className="description">
+                        This function will save a copy of your stream with its entire duration.
+                        You can get this copy after finishing this livestream
+                    </span>
 
                     <div className="value">
                         <antd.Switch
                             checked={profileData?.options?.dvr ?? false}
                             onChange={false}
+                            disabled
                         />
                     </div>
                 </div>
 
                 <div className="content">
-                    <span>Private mode</span>
+                    <p className="label">
+                        <Icons.MdPrivateConnectivity /> Private mode
+                    </p>
+
+                    <span className="description">
+                        When this is enabled, only users with the livestream url can access the stream. Your stream will not be visible on the app.
+                    </span>
+
+                    <span
+                        className="description"
+                        style={{
+                            fontWeight: "bold",
+                        }}
+                    >
+                        You must restart the livestream to apply the changes.
+                    </span>
 
                     <div className="value">
                         <antd.Switch
                             checked={profileData?.options?.private ?? false}
-                            onChange={false}
+                            onChange={(value) => {
+                                updateOption("private", value)
+                            }}
+                            loading={loadingChanges === "option:private"}
                         />
                     </div>
                 </div>
@@ -298,17 +366,12 @@ export default (props) => {
                 <h2><Icons.Link /> URL Information</h2>
 
                 <div className="content">
-                    <span>AAC URL (Only Audio)</span>
-
-                    <div className="inline_field">
-                        <span>
-                            {profileData?.addresses?.aac ?? "No AAC URL available"}
-                        </span>
+                    <div className="title">
+                        <p>HLS URL</p>
+                        <p>[6s~12s latency]</p>
                     </div>
-                </div>
 
-                <div className="content">
-                    <span>HLS URL</span>
+                    <span className="description">This protocol is highly compatible with a multitude of devices and services. Recommended for general use.</span>
 
                     <div className="inline_field">
                         <span>
@@ -318,11 +381,31 @@ export default (props) => {
                 </div>
 
                 <div className="content">
-                    <span>FLV URL</span>
+                    <div className="title">
+                        <p>FLV URL</p>
+                        <p>[2s~5s latency]</p>
+                    </div>
+
+                    <span className="description">This protocol operates at better latency and quality than HLS, but is less compatible for most devices.</span>
 
                     <div className="inline_field">
                         <span>
                             {profileData?.addresses?.flv ?? "No FLV URL available"}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="content">
+                    <div className="title">
+                        <p>MP3 URL (Only Audio)</p>
+                        <p>[2s ~ 5s latency]</p>
+                    </div>
+
+                    <span className="description">This protocol will only return an audio file. The maximum quality compatible with this codec will be used (320Kbps, 48KHz)</span>
+
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.mp3 ?? "No MP3 URL available"}
                         </span>
                     </div>
                 </div>

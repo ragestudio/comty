@@ -1,6 +1,8 @@
 import { StreamingProfile } from "@shared-classes/DbModels"
 import NewStreamingProfile from "@services/newStreamingProfile"
 
+const AllowedChangesFields = ["profile_name", "info", "options"]
+
 export default {
     method: "POST",
     route: "/streaming/profile",
@@ -34,9 +36,11 @@ export default {
 
         if (currentProfile && profile_id) {
             // update the profile
-            currentProfile.profile_name = profile_name
-            currentProfile.info = info
-            currentProfile.options = options
+            AllowedChangesFields.forEach((field) => {
+                if (req.body[field]) {
+                    currentProfile[field] = req.body[field]
+                }
+            })
 
             await currentProfile.save()
         } else {

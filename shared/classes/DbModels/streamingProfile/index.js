@@ -27,6 +27,7 @@ export default {
         options: {
             type: Object,
             default: {
+                connection_protected: true,
                 private: false,
                 chatEnabled: true,
                 drvEnabled: false,

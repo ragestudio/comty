@@ -30,7 +30,7 @@ export default {
             })
         }
 
-        const [username, profile_id] = app.split("/")[1].split(":")
+        const [username, profile_id] = app.split("/")[1].split("__")
 
         if (user.username !== username) {
             return res.status(403).json({
