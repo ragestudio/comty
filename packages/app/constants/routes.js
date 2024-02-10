@@ -74,5 +74,15 @@ export default [
             mobile: false,
             desktop: true,
         },
-    }
+    },
+    {
+        path: "/privacy",
+        useLayout: "default",
+        public: true
+    },
+    {
+        path: "/terms",
+        useLayout: "default",
+        public: true
+    },
 ]
