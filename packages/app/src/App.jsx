@@ -50,6 +50,8 @@ Promise.tasked = function (promises) {
 	})
 }
 
+globalThis._force_comtyjs_env = "development"//process.env.NODE_ENV
+
 import React from "react"
 import ReactDOM from "react-dom"
 
@@ -82,7 +84,6 @@ import {
 	NotificationsCenter,
 	PostCreator,
 } from "components"
-import { DOMWindow } from "components/RenderWindow"
 
 import { Icons } from "components/Icons"
 
@@ -236,24 +237,24 @@ class ComtyApp extends React.Component {
 				})
 			},
 			openFullImageViewer: (src) => {
-				const win = new DOMWindow({
-					id: "fullImageViewer",
-					className: "fullImageViewer",
-				})
-
-				win.render(<Lightbox
+				app.cores.window_mng.render("image_lightbox", <Lightbox
 					small={src}
 					large={src}
-					onClose={() => win.remove()}
+					onClose={() => app.cores.window_mng.close("image_lightbox")}
 					hideDownload
 					showRotate
 				/>)
 			},
-
-			openPostCreator: () => {
-				app.layout.modal.open("post_creator", (props) => <PostCreator {...props} />, {
+			openPostCreator: (args) => {
+				app.layout.modal.open("post_creator", (props) => <PostCreator
+					{...props}
+					{...args}
+				/>, {
 					framed: false
 				})
+			},
+			openPostView: (post_id) => {
+				return app.location.push(`/post/${post_id}`)
 			}
 		},
 		navigation: {

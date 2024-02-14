@@ -34,7 +34,11 @@ export default (props) => {
         }
     }, [])
 
-    return <div className="post_header" onDoubleClick={props.onDoubleClick}>
+    return <div
+        className="post_header"
+        onDoubleClick={props.onDoubleClick}
+        onClick={props.onClick}
+    >
         <div className="user">
             <div className="avatar">
                 <Image
@@ -42,6 +46,7 @@ export default (props) => {
                     src={props.postData.user?.avatar}
                 />
             </div>
+
             <div className="info">
                 <h1 onClick={goToProfile}>
                     {
@@ -62,6 +67,12 @@ export default (props) => {
                 <span className="timeago">
                     {timeAgo}
                 </span>
+
+                {
+                    props.postData.reply_to && <span>
+                        Repling to {props.postData.reply_to}
+                    </span>
+                }
             </div>
         </div>
     </div>

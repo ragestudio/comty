@@ -241,12 +241,16 @@ html {
 }
 
 .userCard {
+    position: relative;
+
     display: flex;
     flex-direction: column;
 
     background-color: var(--background-color-accent);
     border-radius: 12px;
     padding: 20px;
+
+    z-index: 50;
 
     height: fit-content;
     width: 20vw;
@@ -267,6 +271,46 @@ html {
     p,
     span {
         margin: 0;
+    }
+
+    .user_level {
+        position: absolute;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 10px;
+
+        z-index: 50;
+
+        top: 0;
+        right: 0;
+
+        padding: 10px 20px;
+
+        p {
+            color: var(--text-color);
+            font-size: 1rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        span {
+            color: var(--text-color);
+            font-size: 1.4rem;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 900;
+
+            // create a font background gradient 
+            background: linear-gradient(90deg, rgba(0, 255, 205, 1) 4%, rgba(148, 187, 233, 1) 32%, rgba(231, 148, 233, 1) 60%, rgba(224, 233, 148, 1) 86%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        background-color: var(--background-color-primary);
+
+        border-radius: 0 12px 0 12px;
     }
 
     .avatar {

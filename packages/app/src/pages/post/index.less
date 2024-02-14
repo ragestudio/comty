@@ -1,30 +1,42 @@
-.postPage {
+.post_view_wrapper {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 
     width: 100%;
-    height: 100vh;
 
-    overflow: hidden;
+    gap: 15px;
 
-    .postWrapper {
-        margin: 0 10px;
+    .post_view_header {
+        display: flex;
+        flex-direction: row;
 
-        height: 100%;
-        width: 70vw;
+        align-items: center;
 
-        min-width: 70vw;
-        max-width: 70vw;
+        gap: 10px;
+        padding-bottom: 10px;
+
+        border-bottom: 1px solid var(--border-color);
+
+        h1 {
+            margin: 0;
+        }
     }
 
-    .commentsWrapper {
-        height: 100vh;
-        width: 100%;
+    .post_view_content {
+        display: flex;
+        flex-direction: column;
+    
+        gap: 15px;
 
-        min-width: 300px;
+        .post_view_content_replies {
+            display: flex;
+            flex-direction: column;
+        
+            gap: 15px;
+            border-left: 3px dashed var(--border-color);
 
-        overflow: scroll;
-
-        margin: 0 10px;
+            padding-left: 7px;
+            margin-left: 7px;
+        }
     }
 }

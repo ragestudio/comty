@@ -1,8 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 
-import Post from "models/post"
-import { PostCard, CommentsCard } from "components"
+import PostService from "models/post"
+import { PostCard, PostsList } from "components"
 
 import "./index.less"
 
@@ -14,7 +14,7 @@ export default (props) => {
     const loadData = async () => {
         setData(null)
 
-        const data = await Post.getPost({ post_id }).catch(() => {
+        const data = await PostService.getPost({ post_id }).catch(() => {
             antd.message.error("Failed to get post")
 
             return false
@@ -33,12 +33,22 @@ export default (props) => {
         return <antd.Skeleton active />
     }
 
-    return <div className="postPage">
-        <div className="postWrapper">
-            <PostCard data={data} fullmode />
+    return <div className="post_view_wrapper">
+        <div className="post_view_header">
+            <h1>
+                Post
+            </h1>
         </div>
-        <div className="commentsWrapper">
-            <CommentsCard post_id={data._id} />
+
+        <div className="post_view_content">
+            <PostCard data={data} fullmode />
+
+            <div className="post_view_content_replies">
+                <PostsList
+                    loadFromModel={PostService.getReplies}
+                    loadFromModelProps={{ post_id }}
+                />
+            </div>
         </div>
     </div>
 }

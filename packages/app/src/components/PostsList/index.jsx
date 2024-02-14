@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+//import { For } from "million/react"
 import { Icons } from "components/Icons"
 
 import PostCard from "components/PostCard"
@@ -56,7 +57,7 @@ const PostList = (props) => {
 
     return <LoadMore
         ref={parentRef}
-        className="post-list"
+        className="post-list no_col"
         loadingComponent={LoadingComponent}
         noResultComponent={NoResultComponent}
         hasMore={props.hasMore}
@@ -90,13 +91,13 @@ const PostList = (props) => {
             })
         }
 
-        {/* <For
+         {/* <For
             each={props.list}
             style={{
                 height: `100%`,
                 width: `100%`,
             }}
-            as="div"
+            as="col"
         >
             {
                 (data) => <Entry
@@ -108,7 +109,7 @@ const PostList = (props) => {
                     onEditPost={props.onEditPost}
                 />
             }
-        </For> */}
+        </For>  */}
     </LoadMore>
 }
 
@@ -172,6 +173,7 @@ export class PostsListsComponent extends React.Component {
         })
 
         let payload = {
+            offset: this.state.list.length,
             trim: this.state.list.length,
             limit: app.cores.settings.get("feed_max_fetch"),
         }

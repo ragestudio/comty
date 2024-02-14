@@ -14,19 +14,10 @@ import {
 
 import BackgroundDecorator from "components/BackgroundDecorator"
 
-import { createWithDom as FloatingStack } from "../components/floatingStack"
 import InitializeModalsController from "../components/modals"
 
 const DesktopLayout = (props) => {
     InitializeModalsController()
-
-    React.useEffect(() => {
-        const floatingStack = FloatingStack()
-
-        return () => {
-            floatingStack.remove()
-        }
-    }, [])
 
     return <>
         <BackgroundDecorator />

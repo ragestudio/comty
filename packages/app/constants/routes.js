@@ -77,6 +77,11 @@ export default [
         useLayout: "default",
         public: true
     },
+    {
+        path: "/account/*",
+        useLayout: "default",
+        public: true
+    },
     // THIS MUST BE THE LAST ROUTE
     {
         path: "/",
@@ -84,6 +89,6 @@ export default [
         centeredContent: {
             mobile: false,
             desktop: true,
-        },
+        }
     },
 ]

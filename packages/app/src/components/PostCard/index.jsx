@@ -91,28 +91,10 @@ export default class PostCard extends React.PureComponent {
         return await this.props.events.onClickEdit(this.props.data)
     }
 
-    onDoubleClick = async () => {
-        this.handleOpen()
-    }
-
     onClickComments = async () => {
-        this.handleOpen()
-    }
-
-    handleOpen = (to) => {
-        if (typeof to === "undefined") {
-            to = !this.state.open
-        }
-
-        if (typeof this.props.events?.ontoggleOpen === "function") {
-            this.props.events?.ontoggleOpen(to, this.props.data)
-        }
-
-        this.setState({
-            open: to,
+        app.controls.openPostCreator({
+            reply_to: this.props.data,
         })
-
-        //app.controls.openPostViewer(this.props.data)
     }
 
     onLikesUpdate = (data) => {
@@ -127,6 +109,15 @@ export default class PostCard extends React.PureComponent {
                 countLikes: this.state.countLikes - 1,
             })
         }
+    }
+
+    onClickPost = () => {
+        // check if there is in current post
+        if (window.location.pathname === `/post/${this.props.data._id}`) {
+            return false
+        }
+
+        return app.controls.openPostView(this.props.data._id)
     }
 
     componentDidMount = async () => {
@@ -169,7 +160,7 @@ export default class PostCard extends React.PureComponent {
         >
             <PostHeader
                 postData={this.props.data}
-                onDoubleClick={this.onDoubleClick}
+                onClick={this.onClickPost}
             />
 
             <div
@@ -177,6 +168,7 @@ export default class PostCard extends React.PureComponent {
                 className={classnames(
                     "post_content",
                 )}
+                onClick={this.onClickPost}
             >
                 <div className="message">
                     {
@@ -192,25 +184,22 @@ export default class PostCard extends React.PureComponent {
                 }
             </div>
 
-            <PostActions
-                user_id={this.props.data.user_id}
-                likesCount={this.state.countLikes}
-                commentsCount={this.state.countComments}
-                defaultLiked={this.state.hasLiked}
-                defaultSaved={this.state.hasSaved}
-                actions={{
-                    onClickLike: this.onClickLike,
-                    onClickEdit: this.onClickEdit,
-                    onClickDelete: this.onClickDelete,
-                    onClickSave: this.onClickSave,
-                    onClickComments: this.onClickComments,
-                }}
-            />
-
-            <CommentsCard
-                post_id={this.props.data._id}
-                visible={this.state.open}
-            />
+            {
+                !this.props.minimal && <PostActions
+                    user_id={this.props.data.user_id}
+                    likesCount={this.state.countLikes}
+                    commentsCount={this.state.countComments}
+                    defaultLiked={this.state.hasLiked}
+                    defaultSaved={this.state.hasSaved}
+                    actions={{
+                        onClickLike: this.onClickLike,
+                        onClickEdit: this.onClickEdit,
+                        onClickDelete: this.onClickDelete,
+                        onClickSave: this.onClickSave,
+                        onClickComments: this.onClickComments,
+                    }}
+                />
+            }
         </article>
     }
 }

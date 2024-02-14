@@ -5,12 +5,7 @@
     "private": true,
     "scripts": {
         "wrapper:dev": "node ./packages/wrapper/src/index.js --dev",
-        "dev": "concurrently -k -n Client,Server,Marketplace,Chat,File,Music,Sync -c bgCyan,auto \"yarn dev:client\" \"yarn dev:server\" \"yarn dev:marketplace_server\" \"yarn dev:chat_server\"  \"yarn dev:file_server\" \"yarn dev:music_server\" \"yarn dev:sync_server\"",
-        "dev:file_server": "cd packages/file_server && yarn dev",
-        "dev:music_server": "cd packages/music_server && yarn dev",
-        "dev:chat_server": "cd packages/chat_server && yarn dev",
-        "dev:marketplace_server": "cd packages/marketplace_server && yarn dev",
-        "dev:sync_server": "cd packages/sync_server && yarn dev",
+        "dev": "concurrently -k -n Client,Server -c bgCyan,auto \"yarn dev:client\" \"yarn dev:server\"",
         "dev:server": "cd packages/server && yarn dev",
         "dev:client": "cd packages/app && yarn dev",
         "release": "node ./scripts/release.js",
@@ -18,7 +13,7 @@
         "postinstall": "node ./scripts/post-install.js"
     },
     "workspaces": [
-        "packages/**"
+        "packages/*"
     ],
     "dependencies": {
         "7zip-min": "1.4.3",
@@ -32,6 +27,9 @@
         "form-data": "^4.0.0",
         "pm2": "5.3.0"
     },
+    "resolutions": {
+        "string-width": "4.2.3"
+     },
     "_web_app_path": "packages/app",
     "version": "0.60.2"
 }

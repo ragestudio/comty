@@ -104,6 +104,17 @@ export const UserCard = React.forwardRef((props, ref) => {
         className="userCard"
         ref={ref}
     >
+        {
+            typeof user.lvl === "number" && <div className="user_level">
+                <p>LVL</p>
+                <span>
+                    {
+                        user.lvl
+                    }
+                </span>
+            </div>
+        }
+
         <div className="avatar">
             <Image
                 src={user.avatar}
