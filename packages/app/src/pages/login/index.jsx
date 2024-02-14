@@ -137,6 +137,6 @@ export default (props) => {
             </div>
         </div>
 
-        <Footer />
+        {/* <Footer /> */}
     </div>
 }
