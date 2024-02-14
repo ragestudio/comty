@@ -1,24 +1,30 @@
 import spotifyService from "./services/spotify"
 import tidalService from "./services/tidal"
+import vrcService from "./services/vrc"
 
 import request from "../../handlers/request"
 
-const namespacesServices = {
+const sync_services = {
     spotify: spotifyService,
-    tidal: tidalService
+    tidal: tidalService,
+    vrc: vrcService,
 }
 
 export default class SyncModel {
     static get spotifyCore() {
-        return namespacesServices.spotify
+        return sync_services.spotify
     }
 
     static get tidalCore() {
-        return namespacesServices.tidal
+        return sync_services.tidal
+    }
+
+    static get vrcCore() {
+        return sync_services.vrc
     }
 
     static async linkService(namespace) {
-        const service = namespacesServices[namespace]
+        const service = sync_services[namespace]
 
         if (!service || typeof service.linkAccount !== "function") {
             throw new Error(`Service ${namespace} not found or not accepting linking.`)
@@ -28,7 +34,7 @@ export default class SyncModel {
     }
 
     static async unlinkService(namespace) {
-        const service = namespacesServices[namespace]
+        const service = sync_services[namespace]
 
         if (!service || typeof service.unlinkAccount !== "function") {
             throw new Error(`Service ${namespace} not found or not accepting unlinking.`)
@@ -38,7 +44,7 @@ export default class SyncModel {
     }
 
     static async hasServiceLinked(namespace) {
-        const service = namespacesServices[namespace]
+        const service = sync_services[namespace]
 
         if (!service || typeof service.isActive !== "function") {
             throw new Error(`Service ${namespace} not found or not accepting linking.`)
@@ -49,7 +55,7 @@ export default class SyncModel {
 
     static async getLinkedServices() {
         const response = await request({
-            instance:  globalThis.__comty_shared_state.instances["sync"],
+            instance: globalThis.__comty_shared_state.instances["sync"],
             method: "GET",
             url: "/active_services",
         })

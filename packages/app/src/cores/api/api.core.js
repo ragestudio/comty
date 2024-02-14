@@ -74,6 +74,7 @@ export default class APICore extends Core {
     }
 
     async onInitialize() {
+
         this.instance = await createClient({
             enableWs: true,
         })

@@ -5,7 +5,7 @@ import getPostData from "./getPostData"
 import flagNsfwByAttachments from "./flagNsfwByAttachments"
 
 export default async (payload) => {
-    let { user_id, message, attachments, type, data, timestamp } = payload
+    let { user_id, message, attachments, timestamp, reply_to } = payload
 
     // check if is a Array and have at least one element
     const isAttachmentsValid = Array.isArray(attachments) && attachments.length > 0
@@ -22,13 +22,12 @@ export default async (payload) => {
     const created_at = momentTimezone.tz(Date.now(), current_timezone).format()
 
     const post = new Post({
-        type: type,
         created_at: created_at,
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
         message: message,
         attachments: attachments ?? [],
         timestamp: timestamp,
-        data: data,
+        reply_to: reply_to,
         flags: [],
     })
 

@@ -62,6 +62,7 @@ export default (props) => {
         onClickLike,
         onClickSave,
         onClickComments,
+        onClickReply,
     } = props.actions ?? {}
 
     const genItems = () => {
@@ -89,18 +90,21 @@ export default (props) => {
                     onClick={onClickLike}
                 />
             </div>
-            <div className="action" id="save">
-                <SaveButton
-                    defaultActive={props.defaultSaved}
-                    onClick={onClickSave}
-                />
-            </div>
+
             <div className="action" id="comments">
                 <CommentsButton
                     count={props.commentsCount}
                     onClick={onClickComments}
                 />
             </div>
+
+            <div className="action" id="save">
+                <SaveButton
+                    defaultActive={props.defaultSaved}
+                    onClick={onClickSave}
+                />
+            </div>
+
             <div className="action" id="more">
                 <Dropdown
                     menu={{

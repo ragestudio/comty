@@ -8,6 +8,7 @@ export default (username, profile_id) => {
     return {
         ingest: process.env.STREAMING_INGEST_SERVER,
         rtmp: `${streamingServerAPIUri}/${streamId}`,
+        rtsp: `rtsp://${process.env.STREAMING_INGEST_SERVER}:8554/live/${streamId}`,
         hls: `${streamingServerAPIUri}/stream/hls/${streamId}`,
         flv: `${streamingServerAPIUri}/stream/flv/${streamId}`,
         mp3: `${streamingServerAPIUri}/stream/mp3/${streamId}`,

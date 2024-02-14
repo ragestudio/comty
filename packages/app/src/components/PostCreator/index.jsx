@@ -7,6 +7,7 @@ import humanSize from "@tsmx/human-readable"
 import { Icons } from "components/Icons"
 import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 
+import PostCard from "components/PostCard"
 import PostModel from "models/post"
 
 import "./index.less"
@@ -18,7 +19,44 @@ const DEFAULT_POST_POLICY = {
     maximunFilesPerRequest: 10
 }
 
-// TODO: Fix close window when post created
+const ReplyCard = (props) => {
+    const [loading, setLoading] = React.useState(false)
+    const [replyingPost, setReplyingPost] = React.useState(props?.reply_to)
+
+    React.useEffect(() => {
+        console.log(replyingPost)
+        if (typeof replyingPost === "string") {
+            setLoading(true)
+            PostModel.getPost(replyingPost)
+                .then((post) => {
+                    console.log(post)
+                    setReplyingPost(post)
+                    setLoading(false)
+                })
+                .catch(() => {
+                    setReplyingPost(null)
+                    setLoading(false)
+                })
+        }
+    }, [])
+
+    if (loading) {
+        return <antd.Skeleton />
+    }
+
+    if (!replyingPost) {
+        return null
+    }
+
+    return <div className="reply_card">
+        <h4><Icons.MdReply /> Replying...</h4>
+
+        <PostCard
+            data={replyingPost}
+            minimal
+        />
+    </div>
+}
 
 export default class PostCreator extends React.Component {
     state = {
@@ -93,6 +131,7 @@ export default class PostCreator extends React.Component {
             message: postMessage,
             attachments: postAttachments,
             timestamp: DateTime.local().toISO(),
+            reply_to: this.props.reply_to._id,
         }
 
         const response = await PostModel.create(payload).catch(error => {
@@ -455,10 +494,15 @@ export default class PostCreator extends React.Component {
             onDragLeave={this.handleDrag}
             style={this.props.style}
         >
+            {
+                this.props.reply_to && <ReplyCard reply_to={this.props.reply_to} />
+            }
+
             <div className="textInput">
                 <div className="avatar">
                     <img src={app.userData?.avatar} />
                 </div>
+
                 <antd.Input.TextArea
                     placeholder="What are you thinking?"
                     value={postMessage}
@@ -470,6 +514,7 @@ export default class PostCreator extends React.Component {
                     draggable={false}
                     allowClear
                 />
+
                 <div>
                     <antd.Button
                         type="primary"

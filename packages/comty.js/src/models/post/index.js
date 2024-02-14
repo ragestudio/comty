@@ -32,6 +32,23 @@ export default class Post {
         return data
     }
 
+    static getReplies = async ({ post_id, trim, limit }) => {
+        if (!post_id) {
+            throw new Error("Post ID is required")
+        }
+
+        const { data } = await request({
+            method: "GET",
+            url: `/posts/post/${post_id}/replies`,
+            params: {
+                offset: trim ?? 0,
+                limit: limit ?? Settings.get("feed_max_fetch"),
+            }
+        })
+
+        return data
+    }
+
     static getPostComments = async ({ post_id }) => {
         if (!post_id) {
             throw new Error("Post ID is required")

@@ -1,0 +1,48 @@
+.http_debug {
+    display: flex;
+    flex-direction: row;
+
+    gap: 10px;
+
+    .http_debug_menu {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+
+        .ant-menu {
+            background-color: var(--background-color-accent) !important;
+
+            border-radius: 8px;
+
+            font-size: 0.8rem;
+
+            .ant-menu-submenu-title,
+            .ant-menu-item {
+                padding: 10px 15px !important;
+                margin: 0 !important;
+                height: fit-content !important;
+                line-height: 1rem !important;
+            }
+        }
+
+        .http_debug_menu_info {
+            display: flex;
+            flex-direction: column;
+
+            padding: 10px;
+
+            gap: 6px;
+
+            background-color: var(--background-color-accent);
+            border-radius: 8px;
+
+            font-size: 0.8rem;
+
+            p {
+                margin: 0;
+            }
+        }
+    }
+
+}

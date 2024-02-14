@@ -1,6 +1,6 @@
 {
     "name": "@comty/web-app",
-    "version": "0.59.1",
+    "version": "0.60.0",
     "license": "LGPL-2.1",
     "main": "electron/main",
     "author": "RageStudio",
@@ -115,7 +115,9 @@
         "tone": "^14.7.77",
         "tseep": "^1.1.1",
         "ua-parser-js": "^1.0.36",
+        "v86": "^0.4.0",
         "virtual-scroller": "^1.12.3",
+        "vite-plugin-wasm": "^3.2.2",
         "wait-on": "^6.0.1"
     },
     "devDependencies": {

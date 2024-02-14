@@ -2,7 +2,6 @@ import React from "react"
 import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
 import useLayoutInterface from "hooks/useLayoutInterface"
-import { DOMWindow } from "components/RenderWindow"
 
 import "./index.less"
 
@@ -115,16 +114,10 @@ export default () => {
             props,
         } = {}
     ) {
-        const win = new DOMWindow({
-            id: id,
-            className: className,
-        })
-
-        win.render(<Modal
+        app.cores.window_mng.render(id, <Modal
             ref={modalRef}
-            win={win}
             onClose={() => {
-                win.destroy()
+                app.cores.window_mng.close(id)
             }}
             framed={framed}
             confirmOnOutsideClick={confirmOnOutsideClick}

@@ -367,6 +367,21 @@ export default (props) => {
 
                 <div className="content">
                     <div className="title">
+                        <p>RTSP</p>
+                        <p>[1s~6s latency]</p>
+                    </div>
+
+                    <span className="description">This protocol is highly compatible with a multitude of devices and services. Recommended for general use.</span>
+
+                    <div className="inline_field">
+                        <span>
+                            {profileData?.addresses?.rtsp ?? "No RTSP available"}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="content">
+                    <div className="title">
                         <p>HLS URL</p>
                         <p>[6s~12s latency]</p>
                     </div>

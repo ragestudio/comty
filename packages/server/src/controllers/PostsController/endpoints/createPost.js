@@ -7,15 +7,14 @@ export default {
     middlewares: ["withAuthentication"],
     fn: Schematized({
         required: ["timestamp"],
-        select: ["message", "attachments", "type", "data", "timestamp"],
+        select: ["message", "attachments", "timestamp", "reply_to"],
     }, async (req, res) => {
         const post = await CreatePost({
             user_id: req.user._id.toString(),
             message: req.selection.message,
             timestamp: req.selection.timestamp,
             attachments: req.selection.attachments,
-            type: req.selection.type,
-            data: req.selection.data,
+            reply_to: req.selection.reply_to,
         })
 
         return res.json(post)

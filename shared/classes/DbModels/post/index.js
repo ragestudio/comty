@@ -8,5 +8,6 @@ export default {
         message: { type: String },
         attachments: { type: Array, default: [] },
         flags: { type: Array, default: [] },
+        reply_to: { type: String, default: null },
     }
 }

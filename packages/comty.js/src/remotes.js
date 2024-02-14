@@ -5,7 +5,7 @@ function composeRemote(path) {
         }
     }
 
-    return envOrigins[process.env.NODE_ENV ?? "production"][path]
+    return envOrigins[globalThis._force_comtyjs_env ?? "production"][path]
 }
 
 function getCurrentHostname() {
