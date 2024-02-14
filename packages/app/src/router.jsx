@@ -1,6 +1,6 @@
 import React from "react"
 import { BrowserRouter, Route, Routes, useNavigate, useParams } from "react-router-dom"
-import { Skeleton, Button, Result } from "antd"
+import { Skeleton } from "antd"
 import config from "config"
 import loadable from "@loadable/component"
 

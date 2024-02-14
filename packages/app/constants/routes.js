@@ -68,21 +68,22 @@ export default [
         public: true,
     },
     {
+        path: "/privacy/*",
+        useLayout: "default",
+        public: true
+    },
+    {
+        path: "/terms/*",
+        useLayout: "default",
+        public: true
+    },
+    // THIS MUST BE THE LAST ROUTE
+    {
         path: "/",
         useLayout: "default",
         centeredContent: {
             mobile: false,
             desktop: true,
         },
-    },
-    {
-        path: "/privacy",
-        useLayout: "default",
-        public: true
-    },
-    {
-        path: "/terms",
-        useLayout: "default",
-        public: true
     },
 ]
