@@ -17,9 +17,7 @@ This document outlines the code style guidelines for the Comty project. The goal
 ### JavaScript
 - Use ES6 syntax and features whenever possible.
 
-- Use semicolons to terminate statements.
-
-- Use double quotes for strings, but single quotes for JSX.
+- Use double quotes for strings, including for JSX.
 
 - Use const and let instead of var.
 
@@ -35,9 +33,7 @@ This document outlines the code style guidelines for the Comty project. The goal
 
 - Use a CSS preprocessor like LESS to organize styles. (We recommend use LESS cause it's used in the project, we prefer to no include another dependency)
 
-- Use kebab-case for class and ID names.
-
-- Use four spaces for indentation.
+- Use kebab-case for ID names.
 
 - Use a consistent naming convention for classes and IDs, and avoid using inline styles.
 
