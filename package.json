@@ -31,5 +31,9 @@
         "string-width": "4.2.3"
      },
     "_web_app_path": "packages/app",
+<<<<<<< HEAD
     "version": "0.60.2"
+=======
+    "version": "0.60.0"
+>>>>>>> 7949bb9eca984e4628fd0ea93c11fe358053ed56
 }

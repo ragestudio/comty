@@ -44,10 +44,17 @@ export default (props) => {
             <PostCard data={data} fullmode />
 
             <div className="post_view_content_replies">
+<<<<<<< HEAD
                 <PostsList
                     loadFromModel={PostService.getReplies}
                     loadFromModelProps={{ post_id }}
                 />
+=======
+               <PostsList 
+                    loadFromModel={PostService.getReplies}
+                    loadFromModelProps={{ post_id }}
+               />
+>>>>>>> 7949bb9eca984e4628fd0ea93c11fe358053ed56
             </div>
         </div>
     </div>

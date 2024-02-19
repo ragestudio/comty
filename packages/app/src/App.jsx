@@ -50,7 +50,11 @@ Promise.tasked = function (promises) {
 	})
 }
 
+<<<<<<< HEAD
 globalThis._force_comtyjs_env = "development"//process.env.NODE_ENV
+=======
+globalThis._force_comtyjs_env = process.env.NODE_ENV
+>>>>>>> 7949bb9eca984e4628fd0ea93c11fe358053ed56
 
 import React from "react"
 import ReactDOM from "react-dom"

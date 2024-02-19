@@ -1,6 +1,10 @@
 {
     "name": "comty.js",
+<<<<<<< HEAD
     "version": "0.60.2",
+=======
+    "version": "0.59.2",
+>>>>>>> 7949bb9eca984e4628fd0ea93c11fe358053ed56
     "main": "./dist/index.js",
     "author": "RageStudio <support@ragestudio.net>",
     "scripts": {
