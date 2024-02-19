@@ -149,7 +149,7 @@ async function main() {
         cwd: process.cwd()
     }).toString().trim()
 
-    if (gitStatus.length > 0 && !process.argv.includes("--force")) {
+    if (gitStatus.length > 0 && !process.argv.includes("--ignore-commits")) {
         console.error("🆘 There are pending changes to commit, please commit first.")
         return false
     }
