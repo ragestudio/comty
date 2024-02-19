@@ -39,22 +39,33 @@
     }
 
     .wrapper {
+        position: relative;
+        z-index: 55;
+
         display: flex;
         flex-direction: row;
 
-        position: relative;
+        width: 55vw;
+        max-width: 800px;
 
-        z-index: 55;
+        overflow: hidden;
+
+        height: 50vh;
+        max-height: 500px;
+
+        transition: all 250ms ease-in-out;
 
         background-color: var(--background-color-accent);
-        outline: 1px solid var(--border-color);
-        border-radius: 12px;
 
-        min-height: 50vh;
+        outline: 1px solid var(--border-color);
+
+        border-radius: 12px;
 
         .wrapper_background {
             height: 100%;
-            width: 300px;
+
+            min-width: 250px;
+            width: 250px;
 
             border-radius: 12px;
 
@@ -70,7 +81,7 @@
             align-items: center;
             justify-content: center;
 
-            max-width: 500px;
+            width: 100%;
 
             padding: 40px;
 

@@ -2,8 +2,10 @@ import React from "react"
 import MarkdownReader from "components/MarkdownReader"
 import config from "config"
 
-export default () => {
+const PrivacyReader = () => {
     return <MarkdownReader
         url={config.legal.privacy}
     />
 }
+
+export default PrivacyReader
