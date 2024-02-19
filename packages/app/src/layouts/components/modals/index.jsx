@@ -1,6 +1,9 @@
 import React from "react"
 import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
+
+import { Icons } from "components/Icons"
+
 import useLayoutInterface from "hooks/useLayoutInterface"
 import { DOMWindow } from "components/RenderWindow"
 
@@ -87,7 +90,17 @@ class Modal extends React.Component {
                 ref={this.contentRef}
                 onTouchEnd={this.handleClickOutside}
                 onMouseDown={this.handleClickOutside}
+                style={this.props.frameContentStyle}
             >
+                {
+                    this.props.includeCloseButton && <div
+                        className="app_modal_close"
+                        onClick={this.close}
+                    >
+                        <Icons.MdClose />
+                    </div>
+                }
+
                 {
                     React.cloneElement(this.props.children, {
                         close: this.close
@@ -106,6 +119,8 @@ export default () => {
         render,
         {
             framed = true,
+            frameContentStyle = null,
+            includeCloseButton = false,
 
             confirmOnOutsideClick = false,
             confirmOnClickTitle,
@@ -126,7 +141,9 @@ export default () => {
             onClose={() => {
                 win.destroy()
             }}
+            includeCloseButton={includeCloseButton}
             framed={framed}
+            frameContentStyle={frameContentStyle}
             confirmOnOutsideClick={confirmOnOutsideClick}
             confirmOnClickTitle={confirmOnClickTitle}
             confirmOnClickContent={confirmOnClickContent}
