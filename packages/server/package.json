@@ -27,7 +27,6 @@
         "busboy": "^1.6.0",
         "connect-mongo": "^4.6.0",
         "content-range": "^2.0.2",
-        "dicebar_lib": "1.0.1",
         "dotenv": "^16.0.3",
         "infisical-node": "^1.2.1",
         "jsonwebtoken": "^9.0.0",

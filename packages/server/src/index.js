@@ -1,4 +1,4 @@
-global.FORCE_ENV = "prod"
+global.FORCE_ENV = "dev"
 
 import Boot from "linebridge/bootstrap"
 import { Server } from "linebridge/dist/server"
