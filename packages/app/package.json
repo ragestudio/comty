@@ -116,7 +116,7 @@
         "tseep": "^1.1.1",
         "ua-parser-js": "^1.0.36",
         "virtual-scroller": "^1.12.3",
-        "vite": "4.2.1",
+        "vite": "4.5.2",
         "wait-on": "^6.0.1"
     },
     "devDependencies": {
