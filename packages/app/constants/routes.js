@@ -1,6 +1,6 @@
 export default [
     {
-        path: "/login",
+        path: "/auth",
         useLayout: "minimal",
         public: true
     },

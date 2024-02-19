@@ -14,7 +14,7 @@ export default {
         privacy: "/privacy",
     },
     legal: {
-        terms: "https://storage.ragestudio.net/rstudio/legal_docs/comty/terms/latest.md",
+        //terms: "https://storage.ragestudio.net/rstudio/legal_docs/comty/terms/latest.md",
         privacy: "https://storage.ragestudio.net/rstudio/legal_docs/comty/privacy/latest.md",
     },
     footerLinks: [
@@ -50,7 +50,7 @@ export default {
         siteName: "Comty™",
         siteDescription: "Comty, a prototype of social network.",
         mainPath: "/",
-        authPath: "/login",
+        authPath: "/auth",
         copyright: "Comty - RageStudio© 2023",
     },
     i18n: {
