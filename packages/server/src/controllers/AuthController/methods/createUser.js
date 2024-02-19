@@ -1,9 +1,16 @@
 import { User } from "@shared-classes/DbModels"
-import Avatars from "dicebar_lib"
 import bcrypt from "bcrypt"
 
 export default async function (payload) {
     let { username, password, email, fullName, roles, avatar } = payload
+
+    if (username.length < 3) {
+        throw new Error("Username must be at least 3 characters")
+    }
+
+    if (username.length > 64) {
+        throw new Error("Username cannot be longer than 64 characters")
+    }
 
     // if username has capital letters, throw error
     if (username !== username.toLowerCase()) {
@@ -43,7 +50,7 @@ export default async function (payload) {
         password: hash,
         email: email,
         fullName: fullName,
-        avatar: avatar ?? Avatars.generate({ seed: username, type: "initials" }).uri,
+        avatar: avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
         roles: roles,
         createdAt: new Date().getTime(),
     })
