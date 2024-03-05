@@ -10,7 +10,6 @@ export { default as Login } from "./Login"
 
 // COMPLEX COMPONENTS
 export { default as ActionsBar } from "./ActionsBar"
-export { default as ObjectInspector } from "./ObjectInspector"
 export { default as ModifierTag } from "./ModifierTag"
 export { default as StepsForm } from "./StepsForm"
 export { default as SearchButton } from "./SearchButton"

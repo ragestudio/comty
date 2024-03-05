@@ -1,0 +1,25 @@
+{
+    "name": "sync",
+    "version": "0.60.2",
+    "license": "MIT",
+    "dependencies": {
+        "@foxify/events": "^2.1.0",
+        "axios": "^1.2.5",
+        "bcrypt": "^5.1.0",
+        "comty.js": "^0.58.2",
+        "connect-mongo": "^4.6.0",
+        "content-range": "^2.0.2",
+        "dotenv": "^16.0.3",
+        "file-api": "^0.10.4",
+        "form-data": "^4.0.0",
+        "hyper-express": "^6.5.9",
+        "jsonwebtoken": "^9.0.0",
+        "linebridge": "0.15.12",
+        "luxon": "^3.2.1",
+        "normalize-url": "^8.0.0",
+        "p-map": "^6.0.0",
+        "p-queue": "^7.3.4",
+        "qs": "^6.11.2",
+        "redis": "^4.6.6"
+    }
+}

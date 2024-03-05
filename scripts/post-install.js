@@ -95,7 +95,7 @@ async function linkInternalSubmodules(packages) {
         if (!fs.existsSync(packageJsonPath)) {
             continue
         }
-        
+
         await child_process.execSync(`yarn link "linebridge"`, {
             cwd: packagePath,
             stdio: "inherit",
@@ -115,15 +115,7 @@ async function main() {
     // read dir with absolute paths
     let packages = await getPackages()
 
-    await linkInternalSubmodules(packages)
-
-    console.log("Rebuilding TFJS...")
-
-    await child_process.execSync("npm rebuild @tensorflow/tfjs-node --build-from-source", {
-        cwd: rootPath,
-        stdio: "inherit",
-    })
-
+    // link shared resources
     for (const packageName of packages) {
         const packagePath = path.resolve(packagesPath, packageName)
 
@@ -140,6 +132,20 @@ async function main() {
 
             await linkSharedResources(packageJson, packagePath)
         }
+    }
+
+    // link internal submodules
+    await linkInternalSubmodules(packages)
+
+    // fixes for arm architecture
+    if (process.arch == "arm64") {
+        // rebuild tfjs
+        console.log("Rebuilding TFJS...")
+
+        await child_process.execSync("npm rebuild @tensorflow/tfjs-node --build-from-source", {
+            cwd: rootPath,
+            stdio: "inherit",
+        })
     }
 
     console.timeEnd("✅ post-install tooks:")
