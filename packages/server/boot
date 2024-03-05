@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require("dotenv").config()
 require("sucrase/register")
 
 const path = require("path")
@@ -28,6 +29,7 @@ global["aliases"] = {
     "@shared-utils": path.resolve(__dirname, "utils"),
     "@shared-classes": path.resolve(__dirname, "classes"),
     "@shared-lib": path.resolve(__dirname, "lib"),
+    "@shared-middlewares": path.resolve(__dirname, "middlewares"),
 
     // expose internal resources
     "@lib": path.resolve(global["__src"], "lib"),

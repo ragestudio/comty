@@ -50,27 +50,30 @@ export default () => {
 
     clientOptions = composeURL(clientOptions)
 
-    let client = {}
+    let client = new Redis(clientOptions.host, clientOptions.port, clientOptions)
 
-    client.initialize = async () => {
-        console.log(`🔌 Connecting to Redis client [${REDIS_HOST}]`)
+    client.on("error", (error) => {
+        console.error("❌ Redis client error:", error)
+    })
 
-        client = new Redis(clientOptions)
+    client.on("connect", () => {
+        console.log(`✅ Redis client connected [${process.env.REDIS_HOST}]`)
+    })
 
-        client.on("error", (error) => {
-            console.error("❌ Redis client error:", error)
+    client.on("reconnecting", () => {
+        console.log("🔄 Redis client reconnecting...")
+    })
+
+    const initialize = async () => {
+        return await new Promise((resolve, reject) => {
+            console.log(`🔌 Connecting to Redis client [${REDIS_HOST}]`)
+
+            client.connect(resolve)
         })
-
-        client.on("connect", () => {
-            console.log(`✅ Redis client connected [${process.env.REDIS_HOST}]`)
-        })
-
-        client.on("reconnecting", () => {
-            console.log("🔄 Redis client reconnecting...")
-        })
-
-        return client
     }
 
-    return client
+    return {
+        client,
+        initialize
+    }
 }

@@ -8,7 +8,7 @@ import Token from "@lib/token"
 
 export default class API extends Server {
     static refName = "MAIN-API"
-    static listen_port = process.env.HTTP_LISTEN_PORT || 3010
+    static listen_port = process.env.HTTP_LISTEN_PORT || 3000
     static requireWSAuth = true
 
     constructor(params) {

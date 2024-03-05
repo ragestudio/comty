@@ -7,7 +7,7 @@
 3004 -> chats
 3005 -> marketplace
 3006 -> sync
-3007 -> mail
+3007 -> ems (External Messaging Service)
 3008 -> unallocated
 3009 -> unallocated
 3010 -> unallocated
@@ -16,3 +16,8 @@
 3013 -> unallocated
 3014 -> unallocated
 3015 -> unallocated
+3016 -> unallocated
+3017 -> unallocated
+3018 -> unallocated
+3019 -> unallocated
+3020 -> auth

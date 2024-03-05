@@ -10,8 +10,6 @@ export default async (payload) => {
         posts = [posts]
     }
 
-    console.log(posts, posts.every((post) => !post))
-
     if (posts.every((post) => !post)) {
         return []
     }

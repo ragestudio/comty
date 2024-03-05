@@ -17,6 +17,6 @@ export default (fields, obj) => {
     }
 
     if (missing.length > 0) {
-        throw new Error(`Missing required fields: ${missing.join(", ")}`)
+        throw new OperationError(400, `Missing required fields: ${missing.join(", ")}`)
     }
 }

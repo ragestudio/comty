@@ -16,7 +16,7 @@ export default class API {
     server = global.server = new hyperexpress.Server()
 
     listenIp = process.env.HTTP_LISTEN_IP ?? "0.0.0.0"
-    listenPort = process.env.HTTP_LISTEN_PORT ?? 3040
+    listenPort = process.env.HTTP_LISTEN_PORT ?? 3005
 
     internalRouter = new hyperexpress.Router()
 

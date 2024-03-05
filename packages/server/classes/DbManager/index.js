@@ -18,6 +18,7 @@ function getConnectionConfig(obj) {
         dbName: DB_NAME,
         user: DB_USER,
         pass: DB_PWD,
+        maxPoolSize: 100,
     }
 
     if (DB_AUTH_SOURCE) {

@@ -21,7 +21,7 @@ export default class API {
 
         this.options = {
             listenHost: process.env.HTTP_LISTEN_HOST || "0.0.0.0",
-            listenPort: process.env.HTTP_LISTEN_PORT || 3020,
+            listenPort: process.env.HTTP_LISTEN_PORT || 3004,
             ...options
         }
     }
