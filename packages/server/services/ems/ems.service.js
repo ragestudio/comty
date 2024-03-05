@@ -11,7 +11,7 @@ export default class API extends Server {
         mailTransporter: nodemailer.createTransport({
             host: process.env.SMTP_HOSTNAME,
             port: process.env.SMTP_PORT ?? 587,
-            secure: process.env.SMTP_SECURE ?? false,
+            secure: ToBoolean(process.env.SMTP_SECURE) ?? false,
             auth: {
                 user: process.env.SMTP_USERNAME,
                 pass: process.env.SMTP_PASSWORD,
