@@ -1,4 +1,4 @@
-import { Release } from "@shared-classes/DbModels"
+import { Release } from "@db_models"
 import { AuthorizationError, PermissionError, NotFoundError } from "@shared-classes/Errors"
 import RemoveTracks from "@services/removeTracks"
 

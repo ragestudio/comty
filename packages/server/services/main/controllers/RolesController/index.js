@@ -1,5 +1,5 @@
 import { Controller } from "linebridge/dist/server"
-import { Role, User } from "@shared-classes/DbModels"
+import { Role, User } from "@db_models"
 import { Schematized } from "@lib"
 
 export default class RolesController extends Controller {

@@ -1,4 +1,4 @@
-import { Track } from "@shared-classes/DbModels"
+import { Track } from "@db_models"
 import { NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {

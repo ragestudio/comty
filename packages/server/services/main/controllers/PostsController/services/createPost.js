@@ -1,5 +1,5 @@
 import momentTimezone from "moment-timezone"
-import { Post } from "@shared-classes/DbModels"
+import { Post } from "@db_models"
 
 import getPostData from "./getPostData"
 import flagNsfwByAttachments from "./flagNsfwByAttachments"

@@ -1,4 +1,4 @@
-import { Post } from "@shared-classes/DbModels"
+import { Post } from "@db_models"
 import getPostData from "./getPostData"
 
 export default async (post_id, modification) => {

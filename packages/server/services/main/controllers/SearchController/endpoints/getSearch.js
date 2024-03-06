@@ -1,4 +1,4 @@
-import { User, Playlist, Track } from "@shared-classes/DbModels"
+import { User, Playlist, Track } from "@db_models"
 import pmap from "p-map"
 
 export default {

@@ -1,4 +1,4 @@
-import { StreamingProfile } from "@shared-classes/DbModels"
+import { StreamingProfile } from "@db_models"
 
 export default {
     method: "DELETE",

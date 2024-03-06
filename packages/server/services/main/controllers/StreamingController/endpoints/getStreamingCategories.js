@@ -1,4 +1,4 @@
-import { StreamingCategory } from "@shared-classes/DbModels"
+import { StreamingCategory } from "@db_models"
 
 export default {
     method: "GET",

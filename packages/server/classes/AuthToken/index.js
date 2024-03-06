@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken, User } from "../../classes/DbModels"
+import { Session, RegenerationToken, User } from "../../db_models"
 
 export default class Token {
     static get strategy() {

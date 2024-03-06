@@ -1,4 +1,4 @@
-import { User, NFCTag } from "@shared-classes/DbModels"
+import { User, NFCTag } from "@db_models"
 
 export default {
     method: "GET",

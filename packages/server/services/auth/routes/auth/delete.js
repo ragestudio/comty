@@ -1,4 +1,4 @@
-import { Session } from "@shared-classes/DbModels"
+import { Session } from "@db_models"
 
 export default {
     middlewares: ["withAuthentication"],

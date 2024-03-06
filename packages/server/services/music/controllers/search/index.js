@@ -1,4 +1,4 @@
-import { Release, Playlist, Track } from "@shared-classes/DbModels"
+import { Release, Playlist, Track } from "@db_models"
 import TidalAPI from "@shared-classes/TidalAPI"
 
 async function searchRoute(req, res) {

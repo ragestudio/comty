@@ -1,4 +1,4 @@
-import { Playlist } from "@shared-classes/DbModels"
+import { Playlist } from "@db_models"
 import { AuthorizationError } from "@shared-classes/Errors"
 
 export default async (req, res) => {

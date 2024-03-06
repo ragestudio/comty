@@ -1,4 +1,4 @@
-import { Release, Playlist } from "@shared-classes/DbModels"
+import { Release, Playlist } from "@db_models"
 import DBManager from "@shared-classes/DbManager"
 
 async function main() {

@@ -1,4 +1,4 @@
-import { FeaturedEvent } from "@shared-classes/DbModels"
+import { FeaturedEvent } from "@db_models"
 
 export default async (payload) => {
     const {

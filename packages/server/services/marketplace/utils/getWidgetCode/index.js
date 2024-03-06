@@ -1,4 +1,4 @@
-import { Widget } from "@shared-classes/DbModels"
+import { Widget } from "@db_models"
 import compileWidgetCode from "@utils/compileWidgetCode"
 import path from "path"
 

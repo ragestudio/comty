@@ -1,4 +1,4 @@
-import { Track } from "@shared-classes/DbModels"
+import { Track } from "@db_models"
 import getEnhancedLyricsFromTrack from "@services/getEnhancedLyricsFromTrack"
 
 export default async (req, res) => {

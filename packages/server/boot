@@ -26,6 +26,7 @@ global["aliases"] = {
     "src": global["__src"],
 
     // expose shared resources
+    "@db_models": path.resolve(__dirname, "db_models"),
     "@shared-utils": path.resolve(__dirname, "utils"),
     "@shared-classes": path.resolve(__dirname, "classes"),
     "@shared-lib": path.resolve(__dirname, "lib"),
@@ -103,7 +104,7 @@ function registerAliases() {
 async function injectEnvFromInfisical() {
     const envMode = global.FORCE_ENV ?? global.isProduction ? "prod" : "dev"
 
-    console.log(`🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`)
+    console.log(`[BOOT] 🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`)
 
     const client = new InfisicalClient({
         accessToken: process.env.INFISICAL_TOKEN,
@@ -130,7 +131,7 @@ async function Boot(main) {
     }
 
     if (process.env.INFISICAL_TOKEN) {
-        console.log(`INFISICAL_TOKEN found, injecting env variables from INFISICAL...`)
+        console.log(`[BOOT] INFISICAL_TOKEN found, injecting env variables from INFISICAL...`)
         await injectEnvFromInfisical()
     }
 
@@ -138,7 +139,7 @@ async function Boot(main) {
 
     await instance.initialize()
 
-    if (process.send) {
+    if (process.env.lb_service && process.send) {
         process.send({
             status: "ready"
         })
@@ -147,7 +148,7 @@ async function Boot(main) {
     return instance
 }
 
-console.log(`Booting in [${global.isProduction ? "production" : "development"}] mode...`)
+console.log(`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`)
 
 // Apply patches
 registerPatches()

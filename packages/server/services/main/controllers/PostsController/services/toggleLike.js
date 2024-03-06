@@ -1,4 +1,4 @@
-import { PostLike } from "@shared-classes/DbModels"
+import { PostLike } from "@db_models"
 
 export default async (payload) => {
     let { post_id, user_id, to } = payload

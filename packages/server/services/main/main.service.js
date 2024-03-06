@@ -1,13 +1,14 @@
 import { Server } from "linebridge/src/server"
 
-import { Config, User } from "@shared-classes/DbModels"
+import { Config, User } from "@db_models"
 import DbManager from "@shared-classes/DbManager"
 import StorageClient from "@shared-classes/StorageClient"
 
 import Token from "@lib/token"
 
 export default class API extends Server {
-    static refName = "MAIN-API"
+    static refName = "main"
+    static useEngine = "hyper-express"
     static listen_port = process.env.HTTP_LISTEN_PORT || 3000
     static requireWSAuth = true
 
@@ -18,13 +19,6 @@ export default class API extends Server {
             maxMessageLength: 512,
             maximumFileSize: 80 * 1024 * 1024,
             maximunFilesPerRequest: 20,
-        }
-
-        global.jwtStrategy = {
-            secretOrKey: process.env.JWT_SECRET,
-            expiresIn: "1h",
-            algorithm: "HS256",
-            enforceRegenerationTokenExpiration: false,
         }
     }
 

@@ -1,4 +1,4 @@
-import { User, Comment, PostLike, SavedPost } from "@shared-classes/DbModels"
+import { User, Comment, PostLike, SavedPost } from "@db_models"
 
 export default async (payload) => {
     let {
@@ -70,6 +70,7 @@ export default async (payload) => {
 
         if (!user) {
             user = {
+                _deleted: true,
                 username: "Deleted user",
             }
         }

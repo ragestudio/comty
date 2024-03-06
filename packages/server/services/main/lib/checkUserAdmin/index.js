@@ -1,4 +1,4 @@
-import { User } from "@shared-classes/DbModels"
+import { User } from "@db_models"
 
 export default async (user_id) => {
     if (!user_id) {

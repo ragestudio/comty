@@ -3,7 +3,7 @@ require("dotenv").config()
 import fs from "fs"
 import path from "path"
 
-import { Post, PostLike } from "@shared-classes/DbModels"
+import { Post, PostLike } from "@db_models"
 import { performance } from "perf_hooks"
 import DBManager from "../classes/DbManager"
 

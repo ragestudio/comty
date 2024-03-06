@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken } from "@shared-classes/DbModels"
+import { Session, RegenerationToken } from "@db_models"
 
 export default class Token {
     static async createNewAuthToken(payload, options = {}) {

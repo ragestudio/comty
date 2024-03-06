@@ -1,4 +1,4 @@
-import { TrackLike, Track } from "@shared-classes/DbModels"
+import { TrackLike, Track } from "@db_models"
 import { AuthorizationError, NotFoundError } from "@shared-classes/Errors"
 
 export default async (req, res) => {

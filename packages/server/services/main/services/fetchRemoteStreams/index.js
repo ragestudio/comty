@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { StreamingCategory, StreamingProfile, User } from "@shared-classes/DbModels"
+import { StreamingCategory, StreamingProfile, User } from "@db_models"
 
 import composeStreamingSources from "@utils/compose-streaming-sources"
 import lodash from "lodash"

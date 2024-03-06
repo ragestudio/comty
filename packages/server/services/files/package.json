@@ -20,7 +20,7 @@
         "luxon": "^3.0.4",
         "merge-files": "^0.1.2",
         "mime-types": "^2.1.35",
-        "sharp": "^0.33.2",
+        "sharp": "0.32.6",
         "minio": "^7.0.32",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.40",

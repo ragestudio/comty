@@ -1,4 +1,4 @@
-import { Track } from "@shared-classes/DbModels"
+import { Track } from "@db_models"
 import { NotFoundError, AuthorizationError } from "@shared-classes/Errors"
 import getEnhancedLyricsFromTrack from "@services/getEnhancedLyricsFromTrack"
 

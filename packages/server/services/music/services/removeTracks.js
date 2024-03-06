@@ -1,4 +1,4 @@
-import { Track } from "@shared-classes/DbModels"
+import { Track } from "@db_models"
 
 const urlRegex = new RegExp(`^https://(.*?)/(.*)$`)
 

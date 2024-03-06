@@ -1,8 +1,8 @@
-import { authorizedServerTokens } from "../../classes/DbModels"
+import { authorizedServerTokens } from "../../db_models"
 import SecureEntry from "../../classes/SecureEntry"
 import AuthToken from "../../classes/AuthToken"
 
-export default async (req, res, next) => {
+export default async (req, res) => {
     function reject(description) {
         return res.status(401).json({ error: `${description ?? "Invalid session"}` })
     }
@@ -35,7 +35,7 @@ export default async (req, res, next) => {
                     user: validation.user
                 }
 
-                return next()
+                return
             }
             case "Server": {
                 const [client_id, token] = tokenAuthHeader[1].split(":")
@@ -65,7 +65,7 @@ export default async (req, res, next) => {
                     roles: ["server"],
                 }
 
-                return next()
+                return
             }
             default: {
                 return reject("Invalid token type")

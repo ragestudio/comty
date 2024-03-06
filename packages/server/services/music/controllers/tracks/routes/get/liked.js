@@ -1,4 +1,4 @@
-import { Track, TrackLike } from "@shared-classes/DbModels"
+import { Track, TrackLike } from "@db_models"
 import { AuthorizationError } from "@shared-classes/Errors"
 
 // TODO: Fetch from external linked services (like tidal, spotify, ...)

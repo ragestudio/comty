@@ -1,7 +1,7 @@
 import momentTimezone from "moment-timezone"
 import requiredFields from "@shared-utils/requiredFields"
 
-import { Post } from "@shared-classes/DbModels"
+import { Post } from "@db_models"
 
 export default async (payload) => {
     if (!payload) {

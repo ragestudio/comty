@@ -1,4 +1,4 @@
-import { Release } from "@shared-classes/DbModels"
+import { Release } from "@db_models"
 
 export default async (req, res) => {
     if (!req.session) {

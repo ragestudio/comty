@@ -1,4 +1,4 @@
-import { Session, User, authorizedServerTokens } from "@shared-classes/DbModels"
+import { Session, User, authorizedServerTokens } from "@db_models"
 
 import createTokenRegeneration from "@utils/createTokenRegeneration"
 

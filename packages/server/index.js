@@ -11,6 +11,8 @@ import Spinnies from "spinnies"
 import chokidar from "chokidar"
 
 import { dots as DefaultSpinner } from "spinnies/spinners.json"
+
+import IPCRouter from "linebridge/src/server/classes/IPCRouter"
 import getInternalIp from "./lib/getInternalIp"
 import comtyAscii from "./ascii"
 import pkg from "./package.json"
@@ -50,11 +52,12 @@ let services = null
 
 const spinnies = new Spinnies()
 
-const instancePool = []
+const ipcRouter = global.ipcRouter = new IPCRouter()
+const instancePool = global.instancePool = []
 const serviceFileReference = {}
-const serviceWatcher = Observable.from({})
+const serviceRegistry = global.serviceRegistry = Observable.from({})
 
-Observable.observe(serviceWatcher, (changes) => {
+Observable.observe(serviceRegistry, (changes) => {
     const { type, path, value } = changes[0]
 
     switch (type) {
@@ -62,7 +65,7 @@ Observable.observe(serviceWatcher, (changes) => {
             //console.log(`Updated service | ${path} > ${value}`)
 
             //check if all services all ready
-            if (Object.values(serviceWatcher).every((service) => service.ready)) {
+            if (Object.values(serviceRegistry).every((service) => service.ready)) {
                 handleAllReady()
             }
 
@@ -97,9 +100,9 @@ const relp_commands = [
         aliases: ["s", "sel"],
         fn: (cb, service) => {
             if (!isNaN(parseInt(service))) {
-                service = serviceWatcher[Object.keys(serviceWatcher)[service]]
+                service = serviceRegistry[Object.keys(serviceRegistry)[service]]
             } else {
-                service = serviceWatcher[service]
+                service = serviceRegistry[service]
             }
 
             if (!service) {
@@ -166,7 +169,7 @@ async function handleAllReady() {
 
 // SERVICE WATCHER FUNCTIONS
 async function handleNewServiceStarting(id) {
-    if (serviceWatcher[id].ready === false) {
+    if (serviceRegistry[id].ready === false) {
         spinnies.add(id, {
             text: `📦 [${id}] Loading service...`,
             spinner: DefaultSpinner
@@ -175,25 +178,25 @@ async function handleNewServiceStarting(id) {
 }
 
 async function handleServiceStarted(id) {
-    if (serviceWatcher[id].ready === false) {
+    if (serviceRegistry[id].ready === false) {
         if (spinnies.pick(id)) {
-            spinnies.succeed(id, { text: `[${id}][${serviceWatcher[id].index}] Ready` })
+            spinnies.succeed(id, { text: `[${id}][${serviceRegistry[id].index}] Ready` })
         }
     }
 
-    serviceWatcher[id].ready = true
+    serviceRegistry[id].ready = true
 }
 
 async function handleServiceExit(id, code, err) {
     //console.log(`🛑 Service ${id} exited with code ${code}`, err)
 
-    if (serviceWatcher[id].ready === false) {
+    if (serviceRegistry[id].ready === false) {
         if (spinnies.pick(id)) {
-            spinnies.fail(id, { text: `[${id}][${serviceWatcher[id].index}] Failed with code ${code}` })
+            spinnies.fail(id, { text: `[${id}][${serviceRegistry[id].index}] Failed with code ${code}` })
         }
     }
 
-    serviceWatcher[id].ready = false
+    serviceRegistry[id].ready = false
 }
 
 // PROCESS HANDLERS
@@ -225,16 +228,24 @@ async function handleIPCData(id, data) {
 function spawnService({ id, service, cwd }) {
     handleNewServiceStarting(id)
 
+    const instanceEnv = {
+        ...process.env,
+        lb_service: {
+            id: service.id,
+            index: service.index,
+        },
+    }
+
     let instance = ChildProcess.fork(bootloaderBin, [service], {
         detached: false,
         silent: true,
         cwd: cwd,
-        env: {
-            ...process.env
-        }
+        env: instanceEnv,
     })
 
     instance.reload = () => {
+        ipcRouter.unregister({ id, instance })
+
         instance.kill()
 
         instance = spawnService({ id, service, cwd })
@@ -278,6 +289,8 @@ function spawnService({ id, service, cwd }) {
         return handleServiceExit(id, code, err)
     })
 
+    ipcRouter.register({ id, instance })
+
     return instance
 }
 
@@ -314,7 +327,7 @@ async function main() {
 
         serviceFileReference[instanceFile] = id
 
-        serviceWatcher[id] = {
+        serviceRegistry[id] = {
             index: services.indexOf(service),
             id: id,
             version: version,
@@ -328,16 +341,18 @@ async function main() {
 
     // create a new process of node for each service
     for await (let service of services) {
-        const { id, version, cwd } = serviceWatcher[serviceFileReference[path.basename(service)]]
+        const { id, version, cwd } = serviceRegistry[serviceFileReference[path.basename(service)]]
 
         const instance = spawnService({ id, service, cwd })
 
-        // push to pool
-        instancePool.push({
+        const serviceInstance = {
             id,
             version,
             instance
-        })
+        }
+
+        // push to pool
+        instancePool.push(serviceInstance)
 
         // if is NODE_ENV to development, start a file watcher for hot-reload
         if (process.env.NODE_ENV === "development") {

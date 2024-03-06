@@ -1,4 +1,4 @@
-import { FeaturedPlaylist } from "@shared-classes/DbModels"
+import { FeaturedPlaylist } from "@db_models"
 
 export default async (req, res) => {
     const includeDisabled = req.query["include-disabled"] === "true"

@@ -1,4 +1,4 @@
-import { UserFollow } from "@shared-classes/DbModels"
+import { UserFollow } from "@db_models"
 
 export default async (payload = {}) => {
     const { from_user_id } = payload

@@ -1,4 +1,4 @@
-import { FeaturedWallpaper } from "@shared-classes/DbModels"
+import { FeaturedWallpaper } from "@db_models"
 import momentTimezone from "moment-timezone"
 
 export default {

@@ -1,4 +1,4 @@
-import { Widget } from "@shared-classes/DbModels"
+import { Widget } from "@db_models"
 
 export default async (req, res) => {
     const widget_id = req.params.widgetId

@@ -1,4 +1,4 @@
-import { User } from "@shared-classes/DbModels"
+import { User } from "@db_models"
 import Avatars from "dicebar_lib"
 import bcrypt from "bcrypt"
 

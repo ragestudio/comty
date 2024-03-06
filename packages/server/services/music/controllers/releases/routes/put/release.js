@@ -1,4 +1,4 @@
-import { Release, Track } from "@shared-classes/DbModels"
+import { Release, Track } from "@db_models"
 import { AuthorizationError, NotFoundError, PermissionError, BadRequestError } from "@shared-classes/Errors"
 import axios from "axios"
 

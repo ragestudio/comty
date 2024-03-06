@@ -1,4 +1,4 @@
-import { Post, } from "@shared-classes/DbModels"
+import { Post, } from "@db_models"
 import toggleLike from "../../PostsController/services/toggleLike"
 
 export default {

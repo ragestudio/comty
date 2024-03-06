@@ -1,6 +1,6 @@
 import { Controller } from "linebridge/dist/server"
 
-import { FeaturedEvent } from "@shared-classes/DbModels"
+import { FeaturedEvent } from "@db_models"
 import createFeaturedEvent from "./services/createFeaturedEvent"
 
 // TODO: Migrate to new linebridge 0.15 endpoint classes instead of this

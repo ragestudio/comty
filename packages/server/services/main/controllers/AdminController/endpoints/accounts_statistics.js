@@ -1,4 +1,4 @@
-import { User, Session, Post } from "@shared-classes/DbModels"
+import { User, Session, Post } from "@db_models"
 
 export default {
     method: "GET",

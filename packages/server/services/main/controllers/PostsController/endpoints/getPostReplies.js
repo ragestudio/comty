@@ -1,4 +1,4 @@
-import { Post } from "@shared-classes/DbModels"
+import { Post } from "@db_models"
 import fullfillPostsData from "@utils/fullfillPostsData"
 
 export default {

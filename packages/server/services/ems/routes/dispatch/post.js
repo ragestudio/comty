@@ -1,5 +1,6 @@
 export default {
     useContext: ["mailTransporter"],
+    middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         req.body = await req.urlencoded()
 

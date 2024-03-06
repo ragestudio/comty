@@ -5,7 +5,7 @@ import path from "path"
 
 import syncFolder from "@utils/syncDirToRemote"
 
-import { Widget } from "@shared-classes/DbModels"
+import { Widget } from "@db_models"
 
 const tmpPath = path.join(process.cwd(), ".tmp")
 

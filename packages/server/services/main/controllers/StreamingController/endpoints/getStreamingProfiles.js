@@ -1,4 +1,4 @@
-import { StreamingProfile } from "@shared-classes/DbModels"
+import { StreamingProfile } from "@db_models"
 import NewStreamingProfile from "@services/newStreamingProfile"
 import composeStreamingSources from "@utils/compose-streaming-sources"
 

@@ -1,4 +1,4 @@
-import { Playlist, Track } from "@shared-classes/DbModels"
+import { Playlist, Track } from "@db_models"
 import { AuthorizationError, PermissionError, NotFoundError } from "@shared-classes/Errors"
 import RemoveTracks from "@services/removeTracks"
 

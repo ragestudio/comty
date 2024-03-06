@@ -1,4 +1,4 @@
-import { User } from "@shared-classes/DbModels"
+import { User } from "@db_models"
 
 export default async (payload) => {
     if (typeof payload.user_id === "undefined") {
