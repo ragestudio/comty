@@ -6,7 +6,9 @@ export default async (req) => {
 
     const { email } = req.body
 
-    const user = await User.findOne({ email })
+    const user = await User
+        .findOne({ email })
+        .select("+email")
 
     if (!user) {
         throw new OperationError(400, "User not found")

@@ -6,6 +6,8 @@ import StorageClient from "@shared-classes/StorageClient"
 
 import Token from "@lib/token"
 
+import SharedMiddlewares from "@shared-middlewares"
+
 export default class API extends Server {
     static refName = "main"
     static useEngine = "hyper-express"
@@ -22,7 +24,11 @@ export default class API extends Server {
         }
     }
 
-    middlewares = require("@middlewares")
+    middlewares = {
+        ...require("@middlewares").default,
+        ...SharedMiddlewares
+    }
+
     controllers = require("@controllers")
     events = require("./events")
 

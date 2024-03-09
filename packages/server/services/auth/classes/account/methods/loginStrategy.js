@@ -7,7 +7,7 @@ export default async ({ username, password, hash }, user) => {
 
         let query = isEmail ? { email: username } : { username: username }
 
-        user = await User.findOne(query).select("+password")
+        user = await User.findOne(query).select("+email").select("+password")
     }
 
     if (!user) {

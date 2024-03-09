@@ -1,7 +1,4 @@
-export { default as PublicController } from "./PublicController"
-
 export { default as UserController } from "./UserController"
-export { default as AuthController } from "./AuthController"
 export { default as SessionController } from "./SessionController"
 
 export { default as StatusController } from "./StatusController"

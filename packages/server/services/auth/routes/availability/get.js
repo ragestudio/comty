@@ -7,14 +7,17 @@ export default async (req) => {
         throw new OperationError(400, "Missing username or email")
     }
 
-    const user = await User.findOne({
-        $or: [
-            { username: username },
-            { email: email },
-        ]
-    }).catch((error) => {
-        return false
-    })
+    const user = await User
+        .findOne({
+            $or: [
+                { username: username },
+                { email: email },
+            ]
+        })
+        .select("+email")
+        .catch((error) => {
+            return false
+        })
 
     if (user) {
         return {

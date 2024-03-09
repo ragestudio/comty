@@ -1,14 +1,10 @@
-import momentTimezone from "moment-timezone"
 import requiredFields from "@shared-utils/requiredFields"
+import { DateTime } from "luxon"
 
 import { Post } from "@db_models"
 
-export default async (payload) => {
-    if (!payload) {
-        throw new Error("Payload is required")
-    }
-
-    await requiredFields(["user_id", "timestamp"], payload)
+export default async (payload = {}) => {
+    await requiredFields(["user_id"], payload)
 
     let { user_id, message, attachments, timestamp, reply_to } = payload
 
@@ -16,18 +12,18 @@ export default async (payload) => {
     const isAttachmentsValid = Array.isArray(attachments) && attachments.length > 0
 
     if (!isAttachmentsValid && !message) {
-        throw new Error("Cannot create a post without message or attachments")
+        throw new OperationError(400, "Cannot create a post without message or attachments")
     }
 
-    const current_timezone = momentTimezone.tz.guess()
-    const created_at = momentTimezone.tz(Date.now(), current_timezone).format()
+    if (!timestamp) {
+        timestamp = DateTime.local().toISO()
+    }
 
     let post = new Post({
-        created_at: created_at,
+        created_at: timestamp,
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
         message: message,
         attachments: attachments ?? [],
-        timestamp: timestamp,
         reply_to: reply_to,
         flags: [],
     })

@@ -6,7 +6,7 @@ import Account from "@classes/account"
 export default async (payload) => {
     requiredFields(["username", "password", "email"], payload)
 
-    let { username, password, email, fullName, roles, avatar, acceptTos } = payload
+    let { username, password, email, public_name, roles, avatar, acceptTos } = payload
 
     if (ToBoolean(acceptTos) !== true) {
         throw new OperationError(400, "You must accept the terms of service in order to create an account.")
@@ -15,14 +15,17 @@ export default async (payload) => {
     await Account.usernameMeetPolicy(username)
 
     // check if username is already taken
-    const existentUser = await User.findOne({ username: username })
+    const existentUser = await User
+        .findOne({ username: username })
 
     if (existentUser) {
         throw new OperationError(400, "User already exists")
     }
 
     // check if the email is already in use
-    const existentEmail = await User.findOne({ email: email })
+    const existentEmail = await User
+        .findOne({ email: email })
+        .select("+email")
 
     if (existentEmail) {
         throw new OperationError(400, "Email already in use")
@@ -37,10 +40,10 @@ export default async (payload) => {
         username: username,
         password: hash,
         email: email,
-        fullName: fullName,
+        public_name: public_name,
         avatar: avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
         roles: roles,
-        createdAt: new Date().getTime(),
+        created_at: new Date().getTime(),
         acceptTos: acceptTos,
     })
 

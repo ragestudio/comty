@@ -1,6 +1,6 @@
 import { User, Comment, PostLike, SavedPost } from "@db_models"
 
-export default async (payload) => {
+export default async (payload = {}) => {
     let {
         posts,
         for_user_id,
@@ -28,7 +28,9 @@ export default async (payload) => {
             _id: {
                 $in: posts.map((post) => post.user_id)
             }
-        }),
+        })
+            .select("-email")
+            .select("-birthday"),
         PostLike.find({
             post_id: {
                 $in: posts.map((post) => post._id)

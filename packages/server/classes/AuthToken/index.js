@@ -5,7 +5,7 @@ export default class Token {
     static get strategy() {
         return {
             secret: process.env.JWT_SECRET,
-            expiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
+            expiresIn: process.env.JWT_EXPIRES_IN ?? "24h",
             algorithm: process.env.JWT_ALGORITHM ?? "HS256",
         }
     }

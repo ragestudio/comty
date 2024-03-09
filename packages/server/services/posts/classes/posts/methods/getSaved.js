@@ -1,0 +1,24 @@
+import { SavedPost } from "@db_models"
+import GetData from "./data"
+
+export default async (payload = {}) => {
+    let { user_id } = payload
+
+    if (!user_id) {
+        throw new OperationError(400, "Missing user_id")
+    }
+
+    let ids = await SavedPost.find({ user_id })
+
+    ids = ids.map((item) => item.post_id)
+
+    return await GetData({
+        for_user_id: user_id,
+        query: {
+            _id: {
+                $in: ids
+            }
+        }
+    })
+}
+
