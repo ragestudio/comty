@@ -20,10 +20,6 @@ export default class API extends Server {
         redis: RedisClient()
     }
 
-    events = {
-
-    }
-
     async onInitialize() {
         await this.contexts.db.initialize()
         await this.contexts.redis.initialize()

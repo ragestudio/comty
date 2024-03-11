@@ -77,6 +77,11 @@ export default [
         useLayout: "default",
         public: true
     },
+    {
+        path: "/apr/*",
+        useLayout: "minimal",
+        public: true
+    },
     // THIS MUST BE THE LAST ROUTE
     {
         path: "/",

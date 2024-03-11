@@ -9,13 +9,19 @@ import { Observable } from "@gullerya/object-observer"
 import chalk from "chalk"
 import Spinnies from "spinnies"
 import chokidar from "chokidar"
+import IPCRouter from "linebridge/src/server/classes/IPCRouter"
+import fastify from "fastify"
+import { createProxyMiddleware } from "http-proxy-middleware"
 
 import { dots as DefaultSpinner } from "spinnies/spinners.json"
-
-import IPCRouter from "linebridge/src/server/classes/IPCRouter"
 import getInternalIp from "./lib/getInternalIp"
 import comtyAscii from "./ascii"
 import pkg from "./package.json"
+
+import cors from "linebridge/src/server/middlewares/cors"
+
+import { onExit } from "signal-exit"
+
 
 const bootloaderBin = path.resolve(__dirname, "boot")
 const servicesPath = path.resolve(__dirname, "services")
@@ -45,6 +51,7 @@ async function scanServices() {
     return finalServices
 }
 
+let internal_proxy = null
 let allReady = false
 let selectedProcessInstance = null
 let internalIp = null
@@ -158,6 +165,10 @@ async function getIgnoredFiles(cwd) {
 }
 
 async function handleAllReady() {
+    if (allReady) {
+        return false
+    }
+
     console.clear()
 
     allReady = true
@@ -199,29 +210,53 @@ async function handleServiceExit(id, code, err) {
     serviceRegistry[id].ready = false
 }
 
-// PROCESS HANDLERS
-async function handleProcessExit(error, code) {
-    if (error) {
-        console.error(error)
+async function registerProxy(_path, target, pathRewrite) {
+    if (internal_proxy.proxys.has(_path)) {
+        console.warn(`Proxy already registered [${_path}], skipping...`)
+        return false
     }
 
-    console.log(`\nPreparing to exit...`)
+    console.log(`🔗 Registering path proxy [${_path}] -> [${target}]`)
 
-    for await (let instance of instancePool) {
-        console.log(`🛑 Killing ${instance.id} [${instance.instance.pid}]`)
-        await instance.instance.kill()
-    }
+    internal_proxy.proxys.add(_path)
 
-    return 0
+    internal_proxy.use(_path, createProxyMiddleware({
+        target: target,
+        changeOrigin: true,
+        pathRewrite: pathRewrite,
+        ws: true,
+        logLevel: "silent",
+    }))
+
+    return true
 }
 
-async function handleIPCData(id, data) {
-    if (data.type === "log") {
-        console.log(`[${id}] ${data.message}`)
+async function handleIPCData(service_id, msg) {
+    if (msg.type === "log") {
+        console.log(`[${service_id}] ${msg.message}`)
     }
 
-    if (data.status === "ready") {
-        await handleServiceStarted(id)
+    if (msg.status === "ready") {
+        await handleServiceStarted(service_id)
+    }
+
+    if (msg.type === "router:register") {
+        if (msg.data.path_overrides) {
+            for await (let pathOverride of msg.data.path_overrides) {
+                await registerProxy(
+                    `/${pathOverride}`,
+                    `http://${internalIp}:${msg.data.listen.port}/${pathOverride}`,
+                    {
+                        [`^/${pathOverride}`]: "",
+                    }
+                )
+            }
+        } else {
+            await registerProxy(
+                `/${service_id}`,
+                `http://${msg.data.listen.ip}:${msg.data.listen.port}`
+            )
+        }
     }
 }
 
@@ -305,6 +340,31 @@ function createServiceLogTransformer({ id, color = "bgCyan" }) {
 async function main() {
     internalIp = await getInternalIp()
 
+    internal_proxy = fastify()
+
+    internal_proxy.proxys = new Set()
+
+    await internal_proxy.register(require("@fastify/middie"))
+
+    await internal_proxy.use(cors)
+
+    internal_proxy.get("/ping", (request, reply) => {
+        return reply.send({
+            status: "ok"
+        })
+    })
+
+    internal_proxy.get("/", (request, reply) => {
+        return reply.send({
+            services: instancePool.map((instance) => {
+                return {
+                    id: instance.id,
+                    version: instance.version,
+                }
+            }),
+        })
+    })
+
     console.clear()
     console.log(comtyAscii)
     console.log(`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${internalIp} \n\n\n`)
@@ -323,7 +383,7 @@ async function main() {
         const instanceFile = path.basename(service)
         const instanceBasePath = path.dirname(service)
 
-        const { name: id, version, proxy } = require(path.resolve(instanceBasePath, "package.json"))
+        const { name: id, version } = require(path.resolve(instanceBasePath, "package.json"))
 
         serviceFileReference[instanceFile] = id
 
@@ -333,7 +393,6 @@ async function main() {
             version: version,
             file: instanceFile,
             cwd: instanceBasePath,
-            proxy: proxy,
             buffer: [],
             ready: false,
         }
@@ -413,14 +472,29 @@ async function main() {
 
             return command_fn.fn(callback, ...args)
         }
-    }).on("exit", () => {
-        process.exit(0)
+    })
+
+    await internal_proxy.listen({
+        host: "0.0.0.0",
+        port: 9000
+    })
+
+    onExit((code, signal) => {
+        console.clear()
+        console.log(`\n🛑 Preparing to exit...`)
+
+        console.log(`Stoping proxy...`)
+
+        internal_proxy.close()
+
+        console.log(`Kill all ${instancePool.length} instances...`)
+
+        for (let instance of instancePool) {
+            console.log(`Killing ${instance.id} [${instance.instance.pid}]`)
+
+            instance.instance.kill()
+        }
     })
 }
-
-process.on("exit", handleProcessExit)
-process.on("SIGINT", handleProcessExit)
-process.on("uncaughtException", handleProcessExit)
-process.on("unhandledRejection", handleProcessExit)
 
 main()

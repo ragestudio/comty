@@ -12,6 +12,8 @@
     "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
   },
   "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/middie": "^8.3.0",
     "@gullerya/object-observer": "^6.1.3",
     "@infisical/sdk": "^2.1.8",
     "@ragestudio/hermes": "^0.1.1",
@@ -21,12 +23,14 @@
     "cli-color": "^2.0.3",
     "clui": "^0.3.6",
     "dotenv": "^16.4.4",
+    "fastify": "^4.26.2",
     "http-proxy-middleware": "^2.0.6",
     "jsonwebtoken": "^9.0.2",
-    "linebridge": "^0.16.0",
+    "linebridge": "^0.18.1",
     "module-alias": "^2.2.3",
     "p-map": "^4.0.0",
     "p-queue": "^7.3.4",
+    "signal-exit": "^4.1.0",
     "spinnies": "^0.5.1"
   },
   "devDependencies": {

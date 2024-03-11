@@ -15,6 +15,8 @@ export default class API extends Server {
         ...SharedMiddlewares
     }
 
+    handleWsAuth = require("@shared-lib/handleWsAuth").default
+
     contexts = {
         db: new DbManager(),
         redis: RedisClient()

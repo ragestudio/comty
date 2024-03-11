@@ -29,48 +29,60 @@ export default class APICore extends Core {
     }
 
     listenEvent(key, handler, instance) {
-        this.instance.wsInstances[instance ?? "default"].on(key, handler)
+        if (!this.instance.wsInstances[instance ?? "default"]) {
+            console.error(`[API] Websocket instance ${instance} not found`)
+
+            return false
+        }
+
+        return this.instance.wsInstances[instance ?? "default"].on(key, handler)
     }
 
     unlistenEvent(key, handler, instance) {
-        this.instance.wsInstances[instance ?? "default"].off(key, handler)
+        if (!this.instance.wsInstances[instance ?? "default"]) {
+            console.error(`[API] Websocket instance ${instance} not found`)
+
+            return false
+        }
+
+        return this.instance.wsInstances[instance ?? "default"].off(key, handler)
     }
 
     pendingPingsFromInstance = {}
 
     createPingIntervals() {
-        Object.keys(this.instance.wsInstances).forEach((instance) => {
-            this.console.debug(`[API] Creating ping interval for ${instance}`)
+        // Object.keys(this.instance.wsInstances).forEach((instance) => {
+        //     this.console.debug(`[API] Creating ping interval for ${instance}`)
 
-            if (this.instance.wsInstances[instance].pingInterval) {
-                clearInterval(this.instance.wsInstances[instance].pingInterval)
-            }
+        //     if (this.instance.wsInstances[instance].pingInterval) {
+        //         clearInterval(this.instance.wsInstances[instance].pingInterval)
+        //     }
 
-            this.instance.wsInstances[instance].pingInterval = setInterval(() => {
-                if (this.instance.wsInstances[instance].pendingPingTry && this.instance.wsInstances[instance].pendingPingTry > 3) {
-                    this.console.debug(`[API] Ping timeout for ${instance}`)
+        //     this.instance.wsInstances[instance].pingInterval = setInterval(() => {
+        //         if (this.instance.wsInstances[instance].pendingPingTry && this.instance.wsInstances[instance].pendingPingTry > 3) {
+        //             this.console.debug(`[API] Ping timeout for ${instance}`)
 
-                    return clearInterval(this.instance.wsInstances[instance].pingInterval)
-                }
+        //             return clearInterval(this.instance.wsInstances[instance].pingInterval)
+        //         }
 
-                const timeStart = Date.now()
+        //         const timeStart = Date.now()
 
-                //this.console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
+        //         //this.console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
 
-                this.instance.wsInstances[instance].emit("ping", () => {
-                    this.instance.wsInstances[instance].latency = Date.now() - timeStart
+        //         this.instance.wsInstances[instance].emit("ping", () => {
+        //             this.instance.wsInstances[instance].latency = Date.now() - timeStart
 
-                    this.instance.wsInstances[instance].pendingPingTry = 0
-                })
+        //             this.instance.wsInstances[instance].pendingPingTry = 0
+        //         })
 
-                this.instance.wsInstances[instance].pendingPingTry = this.instance.wsInstances[instance].pendingPingTry ? this.instance.wsInstances[instance].pendingPingTry + 1 : 1
-            }, 5000)
+        //         this.instance.wsInstances[instance].pendingPingTry = this.instance.wsInstances[instance].pendingPingTry ? this.instance.wsInstances[instance].pendingPingTry + 1 : 1
+        //     }, 5000)
 
-            // clear interval on close
-            this.instance.wsInstances[instance].on("close", () => {
-                clearInterval(this.instance.wsInstances[instance].pingInterval)
-            })
-        })
+        //     // clear interval on close
+        //     this.instance.wsInstances[instance].on("close", () => {
+        //         clearInterval(this.instance.wsInstances[instance].pingInterval)
+        //     })
+        // })
     }
 
     async onInitialize() {
@@ -92,8 +104,8 @@ export default class APICore extends Core {
 
         // make a basic request to check if the API is available
         await this.instance.instances["default"]({
-            method: "GET",
-            url: "/ping",
+            method: "head",
+            url: "/",
         }).catch((error) => {
             this.console.error("[API] Ping error", error)
 
@@ -105,7 +117,7 @@ export default class APICore extends Core {
 
         this.console.debug("[API] Attached to", this.instance)
 
-        this.createPingIntervals()
+        //this.createPingIntervals()
 
         return this.instance
     }

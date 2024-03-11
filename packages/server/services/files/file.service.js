@@ -12,7 +12,7 @@ class API extends Server {
     static refName = "files"
     static useEngine = "hyper-express"
     static routesPath = `${__dirname}/routes`
-    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3008
+    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3002
 
     static maxBodyLength = 1000 * 1000 * 1000
 

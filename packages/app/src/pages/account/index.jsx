@@ -56,10 +56,10 @@ export default class Account extends React.Component {
 		requestedUser: null,
 
 		user: null,
-		followers: [],
-
 		isSelf: false,
-		isFollowed: false,
+
+		followersCount: 0,
+		following: false,
 
 		tabActiveKey: "posts",
 
@@ -87,8 +87,7 @@ export default class Account extends React.Component {
 
 		let isSelf = false
 		let user = null
-		let isFollowed = false
-		let followers = []
+		let followersCount = 0
 
 		if (requestedUser != null) {
 			if (token.username === requestedUser) {
@@ -113,33 +112,24 @@ export default class Account extends React.Component {
 
 			console.log(`Loaded User [${user.username}] >`, user)
 
-			if (!isSelf) {
-				const followedResult = await FollowsModel.imFollowing(user._id).catch(() => false)
-
-				if (followedResult) {
-					isFollowed = followedResult.isFollowed
-				}
-			}
-
 			const followersResult = await FollowsModel.getFollowers(user._id).catch(() => false)
 
 			if (followersResult) {
-				followers = followersResult
+				followersCount = followersResult.count
 			}
 		}
 
 		await this.setState({
 			isSelf,
-			user,
 			requestedUser,
-			isFollowed,
-			followers,
+			user,
+
+			following: user.following,
+			followersCount: followersCount,
 		})
 	}
 
 	onPostListTopVisibility = (to) => {
-		console.log("onPostListTopVisibility", to)
-
 		if (to) {
 			this.profileRef.current.classList.remove("topHidden")
 		} else {
@@ -149,7 +139,7 @@ export default class Account extends React.Component {
 
 	onClickFollow = async () => {
 		const result = await FollowsModel.toggleFollow({
-			username: this.state.requestedUser,
+			user_id: this.state.user._id,
 		}).catch((error) => {
 			console.error(error)
 			antd.message.error(error.message)
@@ -158,8 +148,8 @@ export default class Account extends React.Component {
 		})
 
 		await this.setState({
-			isFollowed: result.following,
-			followers: result.followers,
+			following: result.following,
+			followersCount: result.count,
 		})
 	}
 
@@ -240,9 +230,9 @@ export default class Account extends React.Component {
 						ref={this.actionsRef}
 					>
 						<FollowButton
-							count={this.state.followers.length}
+							count={this.state.followersCount}
 							onClick={this.onClickFollow}
-							followed={this.state.isFollowed}
+							followed={this.state.following}
 							self={this.state.isSelf}
 						/>
 					</div>

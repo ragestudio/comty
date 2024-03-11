@@ -1,6 +1,7 @@
 import AuthToken from "@shared-classes/AuthToken"
 import { UserConfig, MFASession } from "@db_models"
 import requiredFields from "@shared-utils/requiredFields"
+import obscureEmail from "@shared-utils/obscureEmail"
 
 import Account from "@classes/account"
 
@@ -66,6 +67,8 @@ export default async (req, res) => {
 
                 return {
                     message: `MFA required, using [${mfa.type}] method.`,
+                    method: mfa.type,
+                    sended_to: obscureEmail(user.email),
                     mfa_required: true,
                 }
             }

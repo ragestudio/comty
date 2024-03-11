@@ -9,7 +9,7 @@ export default async (payload = {}) => {
 
     // check if post exist
     let existPost = await Post.findOne({
-        post_id,
+        _id: post_id,
     })
 
     if (!existPost) {

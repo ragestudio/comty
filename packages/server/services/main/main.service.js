@@ -29,7 +29,6 @@ export default class API extends Server {
         ...SharedMiddlewares
     }
 
-    controllers = require("@controllers")
     events = require("./events")
 
     storage = global.storage = StorageClient()

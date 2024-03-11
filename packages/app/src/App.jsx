@@ -143,9 +143,7 @@ class ComtyApp extends React.Component {
 			document.getElementById("root").classList.add("electron")
 		}
 
-		console.log(import.meta.env)
-
-		if (import.meta.env.VITE_SENTRY_DSN) {
+		if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.PROD) {
 			console.log(`Initializing Sentry...`)
 
 			Sentry.init({

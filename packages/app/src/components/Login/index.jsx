@@ -40,30 +40,45 @@ export default class Login extends React.Component {
         loginInputs: {},
         error: null,
         phase: 0,
+        mfa_required: null
     }
 
     formRef = React.createRef()
 
     handleFinish = async () => {
+        this.setState({
+            mfa_required: false,
+        })
+
         const payload = {
             username: this.state.loginInputs.username,
             password: this.state.loginInputs.password,
+            mfa_code: this.state.loginInputs.mfa_code,
         }
 
         this.clearError()
         this.toggleLoading(true)
 
-        await AuthModel.login(payload, () => this.onDone()).catch((error) => {
+        await AuthModel.login(payload, this.onDone).catch((error) => {
             console.error(error, error.response)
 
             this.toggleLoading(false)
-            this.onError(error.response.data.message)
+            this.onError(error.response.data.error)
 
             return false
         })
     }
 
-    onDone = async () => {
+    onDone = async ({ mfa_required } = {}) => {
+        if (mfa_required) {
+            this.setState({
+                loading: false,
+                mfa_required: mfa_required,
+            })
+
+            return false
+        }
+
         if (typeof this.props.close === "function") {
             await this.props.close({
                 unlock: true
@@ -75,6 +90,18 @@ export default class Login extends React.Component {
         }
 
         return true
+    }
+
+    onClickForgotPassword = () => {
+        if (this.props.locked) {
+            this.props.unlock()
+        }
+
+        if (typeof this.props.close === "function") {
+            this.props.close()
+        }
+
+        app.location.push("/apr")
     }
 
     onClickRegister = () => {
@@ -238,6 +265,34 @@ export default class Login extends React.Component {
                             onPressEnter={this.nextStep}
                         />
                     </antd.Form.Item>
+
+                    <antd.Form.Item
+                        name="mfa_code"
+                        className={classnames(
+                            "field",
+                            {
+                                ["hidden"]: !this.state.mfa_required,
+                            }
+                        )}
+                    >
+                        <span><Icons.Lock /> Verification Code</span>
+
+                        {
+                            this.state.mfa_required && <>
+                                <p>We send a verification code to [{this.state.mfa_required.sended_to}]</p>
+
+                                <p>
+                                    Didn't receive the code? <a onClick={this.handleFinish}>Resend</a>
+                                </p>
+                            </>
+                        }
+
+                        <antd.Input
+                            placeholder="4 Digit MFA code"
+                            onChange={(e) => this.onUpdateInput("mfa_code", e.target.value)}
+                            onPressEnter={this.nextStep}
+                        />
+                    </antd.Form.Item>
                 </antd.Form>
 
                 <div className="component-row">
@@ -260,6 +315,10 @@ export default class Login extends React.Component {
 
                 <div className="field-error">
                     {this.state.error}
+                </div>
+
+                <div className="field" onClick={this.onClickForgotPassword}>
+                    <a>Forgot your password?</a>
                 </div>
 
                 <div className="field" onClick={this.onClickRegister}>

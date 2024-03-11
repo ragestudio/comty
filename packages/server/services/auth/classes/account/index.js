@@ -4,4 +4,6 @@ export default class Account {
     static loginStrategy = require("./methods/loginStrategy").default
     static changePassword = require("./methods/changePassword").default
     static create = require("./methods/create").default
+    static sessions = require("./methods/sessions").default
+    static deleteSession = require("./methods/deleteSession").default
 }

@@ -14,6 +14,7 @@ export default {
         verified: { type: Boolean, default: false },
         badges: { type: Array, default: [] },
         links: { type: Array, default: [] },
+        location: { type: String, default: null },
         birthday: { type: Date, default: null },
     }
 }

@@ -3,11 +3,13 @@ import { User } from "@db_models"
 import templates from "../templates"
 
 export default async (ctx, data) => {
-    const user = await User.findById(data.user_id)
+    const user = await User.findById(data.user_id).select("+email")
 
     if (!user) {
         throw new OperationError(404, "User not found")
     }
+
+    console.log(`Sending MFA code to ${user.email}...`)
 
     const result = await ctx.mailTransporter.sendMail({
         from: process.env.SMTP_USERNAME,

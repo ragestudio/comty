@@ -2,7 +2,7 @@ import { User } from "@db_models"
 import templates from "../templates"
 
 export default async (ctx, data) => {
-    const user = await User.findById(data.user_id)
+    const user = await User.findById(data.user_id).select("+email")
 
     if (!user) {
         throw new OperationError(404, "User not found")

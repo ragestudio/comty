@@ -18,7 +18,7 @@ const aliases = {
     layouts: path.join(__dirname, "src/layouts"),
     hooks: path.join(__dirname, "src/hooks"),
     classes: path.join(__dirname, "src/classes"),
-    "comty.js": path.join(__dirname, "../", "comty.js", "src"),
+    "comty.js": path.join(__dirname, "../../", "comty.js", "src"),
     models: path.join(__dirname, "../comty.js/src/models"),
 }
 

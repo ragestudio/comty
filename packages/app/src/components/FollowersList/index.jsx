@@ -47,7 +47,7 @@ export default (props) => {
 
         console.log(`Loading Followers for [${props.user_id}]...`)
 
-        const followers = await FollowsModel.getFollowers(props.user_id).catch((err) => {
+        const followers = await FollowsModel.getFollowers(props.user_id, true).catch((err) => {
             console.error(err)
             app.message.error("Failed to fetch followers")
 
