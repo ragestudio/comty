@@ -1,44 +1,50 @@
 import React from "react"
 import * as antd from "antd"
 
-import Post from "models/post"
-import { PostCard, CommentsCard } from "components"
+import PostCard from "components/PostCard"
+import PostsList from "components/PostsList"
+
+import PostService from "models/post"
 
 import "./index.less"
 
 export default (props) => {
     const post_id = props.params.post_id
 
-    const [data, setData] = React.useState(null)
+    const [loading, result, error, repeat] = app.cores.api.useRequest(PostService.getPost, {
+        post_id,
+    })
 
-    const loadData = async () => {
-        setData(null)
-
-        const data = await Post.getPost({ post_id }).catch(() => {
-            antd.message.error("Failed to get post")
-
-            return false
-        })
-
-        if (data) {
-            setData(data)
-        }
+    if (error) {
+        return <antd.Result
+            status="warning"
+            title="Failed to retrieve post"
+            subTitle={error.message}
+        />
     }
 
-    React.useEffect(() => {
-        loadData()
-    }, [])
-
-    if (!data) {
+    if (loading) {
         return <antd.Skeleton active />
     }
 
-    return <div className="postPage">
-        <div className="postWrapper">
-            <PostCard data={data} fullmode />
+    return <div className="post-page">
+        <div className="post-page-original">
+            <h1>Post</h1>
+
+            <PostCard
+                data={result}
+            />
         </div>
-        <div className="commentsWrapper">
-            <CommentsCard post_id={data._id} />
+
+        <div className="post-page-replies">
+            <h1>Replies</h1>
+            <PostsList
+                disableReplyTag
+                loadFromModel={PostService.replies}
+                loadFromModelProps={{
+                    post_id,
+                }}
+            />
         </div>
     </div>
 }

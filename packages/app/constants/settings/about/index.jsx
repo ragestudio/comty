@@ -7,6 +7,8 @@ import { Icons } from "components/Icons"
 
 import config from "config"
 
+import LatencyIndicator from "components/PerformanceIndicators/latency"
+
 import "./index.less"
 
 const connectionsTooltipStrings = {
@@ -48,9 +50,7 @@ export default {
 
         const [serverManifest, setServerManifest] = React.useState(null)
         const [serverOrigin, setServerOrigin] = React.useState(null)
-        const [serverHealth, setServerHealth] = React.useState(null)
         const [secureConnection, setSecureConnection] = React.useState(false)
-        const [connectionPing, setConnectionPing] = React.useState({})
         const [capInfo, setCapInfo] = React.useState(null)
 
         const setCapacitorInfo = async () => {
@@ -68,7 +68,7 @@ export default {
         }
 
         const checkServerOrigin = async () => {
-            const instance = app.cores.api.instance()
+            const instance = app.cores.api.client()
 
             if (instance) {
                 setServerOrigin(instance.mainOrigin)
@@ -79,29 +79,11 @@ export default {
             }
         }
 
-        const measurePing = async () => {
-            const result = await app.cores.api.measurePing()
-
-            console.log(result)
-
-            setConnectionPing(result)
-        }
-
         React.useEffect(() => {
             checkServerVersion()
             checkServerOrigin()
 
-            measurePing()
-
             setCapacitorInfo()
-
-            const measureInterval = setInterval(() => {
-                measurePing()
-            }, 3000)
-
-            return () => {
-                clearInterval(measureInterval)
-            }
         }, [])
 
         return <div className="about_app">
@@ -172,33 +154,13 @@ export default {
                                 width: "100%",
                             }}
                         >
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <Icons.MdHttp />
-                                <antd.Tag
-                                    color={latencyToColor(connectionPing?.http, "http")}
-                                >
-                                    {connectionPing?.http}ms
-                                </antd.Tag>
-                            </div>
+                            <LatencyIndicator 
+                                type="http"
+                            />
 
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                }}
-                            >
-                                <Icons.MdSettingsEthernet />
-                                <antd.Tag
-                                    color={latencyToColor(connectionPing?.ws, "ws")}
-                                >
-                                    {connectionPing?.ws}ms
-                                </antd.Tag>
-                            </div>
+                            <LatencyIndicator
+                                type="ws"
+                            />
                         </div>
                     </div>
                 </div>

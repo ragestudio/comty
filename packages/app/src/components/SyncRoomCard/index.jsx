@@ -52,7 +52,7 @@ export default class SyncRoomCard extends React.Component {
     }
 
     checkLatency = () => {
-        const instance = app.cores.api.instance().wsInstances.music
+        const instance = app.cores.api.instance().sockets.music
 
         if (instance) {
             this.setState({
@@ -67,7 +67,7 @@ export default class SyncRoomCard extends React.Component {
         })
 
         // chat instance
-        const chatInstance = app.cores.api.instance().wsInstances.chat
+        const chatInstance = app.cores.api.instance().sockets.chat
 
         if (chatInstance) {
             Object.keys(this.chatEvents).forEach((event) => {
@@ -92,7 +92,7 @@ export default class SyncRoomCard extends React.Component {
         }
 
         // chat instance
-        const chatInstance = app.cores.api.instance().wsInstances.chat
+        const chatInstance = app.cores.api.instance().sockets.chat
 
         if (chatInstance) {
             Object.keys(this.chatEvents).forEach((event) => {
@@ -231,7 +231,7 @@ export default class SyncRoomCard extends React.Component {
                 <div className="latency_display">
                     <span>
                         {
-                            app.cores.api.instance().wsInstances.music.latency ?? "..."
+                            app.cores.api.instance().sockets.music.latency ?? "..."
                         }ms
                     </span>
                 </div>

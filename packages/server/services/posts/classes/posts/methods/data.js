@@ -1,15 +1,22 @@
 import { Post } from "@db_models"
 import fullfillPostsData from "./fullfill"
 
+const maxLimit = 300
+
 export default async (payload = {}) => {
     let {
         for_user_id,
         post_id,
         query = {},
-        skip = 0,
+        trim = 0,
         limit = 20,
         sort = { created_at: -1 },
     } = payload
+
+    // set a hard limit on the number of posts to retrieve, used for pagination
+    if (limit > maxLimit) {
+        limit = maxLimit
+    }
 
     let posts = []
 
@@ -24,7 +31,7 @@ export default async (payload = {}) => {
     } else {
         posts = await Post.find({ ...query })
             .sort(sort)
-            .skip(skip)
+            .skip(trim)
             .limit(limit)
     }
 
@@ -32,7 +39,6 @@ export default async (payload = {}) => {
     posts = await fullfillPostsData({
         posts,
         for_user_id,
-        skip,
     })
 
     // if post_id is specified, return only one post

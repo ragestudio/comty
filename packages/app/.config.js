@@ -1,5 +1,4 @@
 const path = require("path")
-const { builtinModules } = require("module")
 
 const aliases = {
     "node:buffer": "buffer",
@@ -19,7 +18,7 @@ const aliases = {
     hooks: path.join(__dirname, "src/hooks"),
     classes: path.join(__dirname, "src/classes"),
     "comty.js": path.join(__dirname, "../../", "comty.js", "src"),
-    models: path.join(__dirname, "../comty.js/src/models"),
+    models: path.join(__dirname, "../../", "comty.js/src/models"),
 }
 
 module.exports = (config = {}) => {
@@ -29,11 +28,6 @@ module.exports = (config = {}) => {
     if (!config.server) {
         config.server = {}
     }
-
-    // config.define = {
-    //     "global.Uint8Array": "Uint8Array",
-    //     "process.env.NODE_DEBUG": false,
-    // }
 
     config.resolve.alias = aliases
     config.server.port = process.env.listenPort ?? 8000
@@ -55,26 +49,6 @@ module.exports = (config = {}) => {
     config.build = {
         target: "esnext"
     }
-
-    // config.build = {
-    //     sourcemap: "inline",
-    //     target: `node16`,
-    //     outDir: "dist",
-    //     assetsDir: ".",
-    //     minify: process.env.MODE !== "development",
-    //     rollupOptions: {
-    //         external: [
-    //             "electron",
-    //             "electron-devtools-installer",
-    //             ...builtinModules.flatMap(p => [p, `node:16`]),
-    //         ],
-    //         output: {
-    //             entryFileNames: "[name].js",
-    //         },
-    //     },
-    //     emptyOutDir: true,
-    //     brotliSize: false,
-    // }
 
     return config
 }

@@ -113,7 +113,7 @@ export const UserCard = React.forwardRef((props, ref) => {
         <div className="username">
             <div className="username_text">
                 <h1>
-                    {user.fullName || user.username}
+                    {user.public_name || user.username}
                     {user.verified && <Icons.verifiedBadge />}
                 </h1>
                 <span>

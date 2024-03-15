@@ -189,7 +189,7 @@ class MusicSyncSubCore {
     }
 
     async onInitialize() {
-        this.musicWs = this.ctx.CORES.api.instance.wsInstances.music
+        this.musicWs = this.ctx.CORES.api.instance.sockets.music
 
         Object.keys(this.hubEvents).forEach((eventName) => {
             this.musicWs.on(eventName, this.hubEvents[eventName])
@@ -371,6 +371,7 @@ class MusicSyncSubCore {
 }
 
 export default class SyncCore extends Core {
+    static disabled = true
     static namespace = "sync"
     static dependencies = ["api", "player"]
 

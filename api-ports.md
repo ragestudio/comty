@@ -9,7 +9,7 @@
 3006 -> sync
 3007 -> ems (External Messaging Service)
 3008 -> users
-3009 -> unallocated
+3009 -> notifications
 3010 -> unallocated
 3011 -> unallocated
 3012 -> unallocated

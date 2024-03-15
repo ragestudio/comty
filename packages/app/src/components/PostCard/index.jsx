@@ -1,11 +1,8 @@
 import React from "react"
-import * as antd from "antd"
 import classnames from "classnames"
 import Plyr from "plyr-react"
-
-import { CommentsCard } from "components"
+import { motion } from "framer-motion"
 import { Icons } from "components/Icons"
-
 import { processString } from "utils"
 
 import PostHeader from "./components/header"
@@ -13,6 +10,7 @@ import PostActions from "./components/actions"
 import PostAttachments from "./components/attachments"
 
 import "./index.less"
+import { Divider } from "antd"
 
 const messageRegexs = [
     {
@@ -43,16 +41,34 @@ const messageRegexs = [
 
 export default class PostCard extends React.PureComponent {
     state = {
+        data: this.props.data,
+
         countLikes: this.props.data.countLikes ?? 0,
-        countComments: this.props.data.countComments ?? 0,
+        countReplies: this.props.data.countComments ?? 0,
 
         hasLiked: this.props.data.isLiked ?? false,
         hasSaved: this.props.data.isSaved ?? false,
+        hasReplies: this.props.data.hasReplies ?? false,
 
         open: this.props.defaultOpened ?? false,
 
         isNsfw: this.props.data.flags?.includes("nsfw") ?? false,
         nsfwAccepted: false,
+    }
+
+    handleDataUpdate = (data) => {
+        this.setState({
+            data: data,
+        })
+    }
+
+    onDoubleClick = async () => {
+        if (typeof this.props.events.onDoubleClick !== "function") {
+            console.warn("onDoubleClick event is not a function")
+            return
+        }
+
+        return await this.props.events.onDoubleClick(this.state.data)
     }
 
     onClickDelete = async () => {
@@ -61,7 +77,7 @@ export default class PostCard extends React.PureComponent {
             return
         }
 
-        return await this.props.events.onClickDelete(this.props.data)
+        return await this.props.events.onClickDelete(this.state.data)
     }
 
     onClickLike = async () => {
@@ -70,7 +86,16 @@ export default class PostCard extends React.PureComponent {
             return
         }
 
-        return await this.props.events.onClickLike(this.props.data)
+        const actionResult = await this.props.events.onClickLike(this.state.data)
+
+        if (actionResult) {
+            this.setState({
+                hasLiked: actionResult.liked,
+                countLikes: actionResult.count,
+            })
+        }
+
+        return actionResult
     }
 
     onClickSave = async () => {
@@ -79,7 +104,15 @@ export default class PostCard extends React.PureComponent {
             return
         }
 
-        return await this.props.events.onClickSave(this.props.data)
+        const actionResult = await this.props.events.onClickSave(this.state.data)
+
+        if (actionResult) {
+            this.setState({
+                hasSaved: actionResult.saved,
+            })
+        }
+
+        return actionResult
     }
 
     onClickEdit = async () => {
@@ -88,55 +121,24 @@ export default class PostCard extends React.PureComponent {
             return
         }
 
-        return await this.props.events.onClickEdit(this.props.data)
+        return await this.props.events.onClickEdit(this.state.data)
     }
 
-    onDoubleClick = async () => {
-        this.handleOpen()
-    }
-
-    onClickComments = async () => {
-        this.handleOpen()
-    }
-
-    handleOpen = (to) => {
-        if (typeof to === "undefined") {
-            to = !this.state.open
+    onClickReply = async () => {
+        if (typeof this.props.events.onClickReply !== "function") {
+            console.warn("onClickReply event is not a function")
+            return
         }
 
-        if (typeof this.props.events?.ontoggleOpen === "function") {
-            this.props.events?.ontoggleOpen(to, this.props.data)
-        }
-
-        this.setState({
-            open: to,
-        })
-
-        //app.controls.openPostViewer(this.props.data)
+        return await this.props.events.onClickReply(this.state.data)
     }
 
-    onLikesUpdate = (data) => {
-        console.log("onLikesUpdate", data)
-
-        if (data.to) {
+    componentDidUpdate = (prevProps) => {
+        if (prevProps.data !== this.props.data) {
             this.setState({
-                countLikes: this.state.countLikes + 1,
-            })
-        } else {
-            this.setState({
-                countLikes: this.state.countLikes - 1,
+                data: this.props.data,
             })
         }
-    }
-
-    componentDidMount = async () => {
-        // first listen to post changes
-        app.cores.api.listenEvent(`post.${this.props.data._id}.likes.update`, this.onLikesUpdate)
-    }
-
-    componentWillUnmount = () => {
-        // remove the listener
-        app.cores.api.unlistenEvent(`post.${this.props.data._id}.likes.update`, this.onLikesUpdate)
     }
 
     componentDidCatch = (error, info) => {
@@ -153,12 +155,28 @@ export default class PostCard extends React.PureComponent {
         </div>
     }
 
+    componentDidMount = () => {
+        app.cores.api.listenEvent(`post.update.${this.state.data._id}`, this.handleDataUpdate, "posts")
+    }
+
+    componentWillUnmount = () => {
+        app.cores.api.unlistenEvent(`post.update.${this.state.data._id}`, this.handleDataUpdate, "posts")
+    }
+
     render() {
-        return <article
+        return <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1, }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{
+                duration: 0.1,
+            }}
+            layout
             key={this.props.index}
-            id={this.props.data._id}
+            id={this.state.data._id}
+            post_id={this.state.data._id}
             style={this.props.style}
-            user-id={this.props.data.user_id}
+            user-id={this.state.data.user_id}
             context-menu={"postCard-context"}
             className={classnames(
                 "post_card",
@@ -168,8 +186,9 @@ export default class PostCard extends React.PureComponent {
             )}
         >
             <PostHeader
-                postData={this.props.data}
+                postData={this.state.data}
                 onDoubleClick={this.onDoubleClick}
+                disableReplyTag={this.props.disableReplyTag}
             />
 
             <div
@@ -180,37 +199,43 @@ export default class PostCard extends React.PureComponent {
             >
                 <div className="message">
                     {
-                        processString(messageRegexs)(this.props.data.message ?? "")
+                        processString(messageRegexs)(this.state.data.message ?? "")
                     }
                 </div>
 
                 {
-                    !this.props.disableAttachments && this.props.data.attachments && this.props.data.attachments.length > 0 && <PostAttachments
-                        attachments={this.props.data.attachments}
-                        flags={this.props.data.flags}
+                    !this.props.disableAttachments && this.state.data.attachments && this.state.data.attachments.length > 0 && <PostAttachments
+                        attachments={this.state.data.attachments}
+                        flags={this.state.data.flags}
                     />
                 }
             </div>
 
             <PostActions
-                user_id={this.props.data.user_id}
+                user_id={this.state.data.user_id}
+
                 likesCount={this.state.countLikes}
-                commentsCount={this.state.countComments}
+                repliesCount={this.state.countReplies}
+
                 defaultLiked={this.state.hasLiked}
                 defaultSaved={this.state.hasSaved}
+
                 actions={{
                     onClickLike: this.onClickLike,
                     onClickEdit: this.onClickEdit,
                     onClickDelete: this.onClickDelete,
                     onClickSave: this.onClickSave,
-                    onClickComments: this.onClickComments,
+                    onClickReply: this.onClickReply,
                 }}
             />
 
-            <CommentsCard
-                post_id={this.props.data._id}
-                visible={this.state.open}
-            />
-        </article>
+            {
+                !this.props.disableHasReplies && this.state.hasReplies && <>
+                    <Divider />
+                    <h1>View replies</h1>
+                </>
+            }
+
+        </motion.div>
     }
 }

@@ -21,7 +21,7 @@ const MaxStringsLengths = {
 export default {
     middlewares: ["withAuthentication"],
     fn: async (req) => {
-        let { update } = req.body
+        let update = {}
 
         if (!update) {
             throw new OperationError(400, "Missing update")
@@ -33,13 +33,17 @@ export default {
 
         // sanitize update
         AllowedPublicUpdateFields.forEach((key) => {
-            if (typeof update[key] !== "undefined") {
+            if (typeof req.body[key] !== "undefined") {
                 // check maximung strings length
-                if (typeof update[key] === "string" && MaxStringsLengths[key]) {
-                    if (update[key].length > MaxStringsLengths[key]) {
+                if (typeof req.body[key] === "string" && MaxStringsLengths[key]) {
+                    if (req.body[key].length > MaxStringsLengths[key]) {
                         // create a substring
-                        update[key] = update[key].substring(0, MaxStringsLengths[key])
+                        update[key] = req.body[key].substring(0, MaxStringsLengths[key])
+                    } else {
+                        update[key] = req.body[key]
                     }
+                } else {
+                    update[key] = req.body[key]
                 }
             }
         })
@@ -56,9 +60,6 @@ export default {
             }
         }
 
-        return await UserClass.update({
-            user_id: req.auth.session.user_id,
-            update: update,
-        })
+        return await UserClass.update(req.auth.session.user_id, update)
     }
 }

@@ -10,11 +10,20 @@ const defaultParams = {
     format: "webm",
 }
 
-export default (input, cachePath, params = defaultParams) => {
+const maxTasks = 5
+
+export default (input, params = defaultParams) => {
     return new Promise((resolve, reject) => {
-        const filename = path.basename(input)
-        const outputFilename = `${filename.split(".")[0]}_ff.${params.format ?? "webm"}`
-        const outputFilepath = `${cachePath}/${outputFilename}`
+        if (!global.ffmpegTasks) {
+            global.ffmpegTasks = []
+        }
+
+        if (global.ffmpegTasks.length >= maxTasks) {
+            return reject(new Error("Too many transcoding tasks"))
+        }
+
+        const outputFilename = `${path.basename(input).split(".")[0]}_ff.${params.format ?? "webm"}`
+        const outputFilepath = `${path.dirname(input)}/${outputFilename}`
 
         console.debug(`[TRANSCODING] Transcoding ${input} to ${outputFilepath}`)
 
@@ -22,8 +31,8 @@ export default (input, cachePath, params = defaultParams) => {
             console.debug(`[TRANSCODING] Finished transcode ${input} to ${outputFilepath}`)
 
             return resolve({
-                filepath: outputFilepath,
                 filename: outputFilename,
+                filepath: outputFilepath,
             })
         }
 
@@ -42,22 +51,33 @@ export default (input, cachePath, params = defaultParams) => {
         }
 
         // chain methods
-        Object.keys(commands).forEach((key) => {
+        for (let key in commands) {
             if (exec === null) {
                 exec = ffmpeg(commands[key])
-            } else {
-                if (typeof exec[key] !== "function") {
-                    console.warn(`[TRANSCODING] Method ${key} is not a function`)
-                    return false
+                continue
+            }
+
+            if (key === "extraOptions" && Array.isArray(commands[key])) {
+                for (const option of commands[key]) {
+                    exec = exec.inputOptions(option)
                 }
 
-                if (Array.isArray(commands[key])) {
-                    exec = exec[key](...commands[key])
-                } else {
-                    exec = exec[key](commands[key])
-                }
+                continue
             }
-        })
+
+            if (typeof exec[key] !== "function") {
+                console.warn(`[TRANSCODING] Method ${key} is not a function`)
+                return false
+            }
+
+            if (Array.isArray(commands[key])) {
+                exec = exec[key](...commands[key])
+            } else {
+                exec = exec[key](commands[key])
+            }
+
+            continue
+        }
 
         exec
             .on("error", onError)

@@ -2,19 +2,18 @@ import React from "react"
 
 import { PostsList } from "components"
 
-import Post from "models/post"
+import Feed from "models/feed"
 
 import "./index.less"
 
 export default class ExplorePosts extends React.Component {
     render() {
         return <PostsList
-            loadFromModel={Post.getExplorePosts}
+            loadFromModel={Feed.getGlobalTimelineFeed}
             watchTimeline={[
                 "post.new",
                 "post.delete",
                 "feed.new",
-                "feed.delete",
             ]}
             realtime
         />

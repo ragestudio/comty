@@ -17,8 +17,8 @@ export default async (payload = {}) => {
     }
 
     let likeObj = await PostLike.findOne({
-        post_id,
         user_id,
+        post_id,
     })
 
     if (typeof to === "undefined") {
@@ -40,13 +40,22 @@ export default async (payload = {}) => {
         await PostLike.findByIdAndDelete(likeObj._id)
     }
 
-    // global.engine.ws.io.of("/").emit(`post.${post_id}.likes.update`, {
-    //     to,
-    //     post_id,
-    //     user_id,
-    // })
+    const count = await PostLike.count({
+        post_id,
+    })
+
+    const eventData = {
+        to,
+        post_id,
+        user_id,
+        count: count,
+    }
+
+    global.rtengine.io.of("/").emit(`post.${post_id}.likes.update`, eventData)
+    global.rtengine.io.of("/").emit(`post.like.update`, eventData)
 
     return {
-        liked: to
+        liked: to,
+        count: count
     }
 }

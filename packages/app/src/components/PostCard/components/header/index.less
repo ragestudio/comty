@@ -1,9 +1,26 @@
-.post_header {
+.post-header {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
 
-    .user {
+    gap: 10px;
+
+    .post-header-replied_to {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 7px;
+
+        svg {
+            color: var(--text-color);
+            margin: 0 !important;
+        }
+
+        line-height: 1.5rem;
+    }
+
+    .post-header-user {
         display: inline-flex;
         flex-direction: row;
         align-items: center;
@@ -17,7 +34,7 @@
             margin-left: 6px;
         }
 
-        .avatar {
+        .post-header-user-avatar {
             width: 40px;
             height: 40px;
 
@@ -30,7 +47,7 @@
             }
         }
 
-        .info {
+        .post-header-user-info {
             display: inline-flex;
             flex-direction: column;
 
@@ -51,7 +68,7 @@
                 color: var(--background-color-contrast);
             }
 
-            .timeago {
+            .post-header-user-info-timeago {
                 font-weight: 400;
                 font-size: 0.7rem;
 

@@ -158,6 +158,9 @@ class ComtyApp extends React.Component {
 		"clearAllOverlays": function () {
 			window.app.DrawerController.closeAll()
 		},
+		"app.clearInternalStorage": function () {
+			app.clearInternalStorage()
+		},
 	}
 
 	static publicMethods = {
@@ -248,8 +251,11 @@ class ComtyApp extends React.Component {
 				/>)
 			},
 
-			openPostCreator: () => {
-				app.layout.modal.open("post_creator", (props) => <PostCreator {...props} />, {
+			openPostCreator: (params) => {
+				app.layout.modal.open("post_creator", (props) => <PostCreator
+					{...props}
+					{...params}
+				/>, {
 					framed: false
 				})
 			}

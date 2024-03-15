@@ -17,7 +17,29 @@
     background-color: var(--background-color-accent);
     padding: 15px;
 
-    //transition: all 250ms ease-in-out;
+    gap: 10px;
+
+    .postCreator-header {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        width: 100%;
+
+        p {
+            margin: 0;
+        }
+
+        .postCreator-header-indicator {
+            display: flex;
+            flex-direction: row;
+
+            gap: 7px;
+
+            align-items: center;
+        }
+    }
 
     .actions {
         display: inline-flex;
@@ -57,8 +79,6 @@
 
         width: 100%;
         height: 100%;
-
-        padding: 10px;
 
         overflow: hidden;
         overflow-x: scroll;
@@ -125,6 +145,8 @@
                 display: flex;
                 flex-direction: row;
 
+                align-items: center;
+
                 width: 100%;
 
                 overflow-x: auto;
@@ -146,6 +168,8 @@
                     height: fit-content;
 
                     border-radius: @file_preview_borderRadius;
+
+                    margin: 0;
                 }
             }
         }

@@ -16,8 +16,9 @@ const emptyListRender = () => {
 export class SavedPosts extends React.Component {
     render() {
         return <PostsList
-            emptyListRender={emptyListRender}
             loadFromModel={PostModel.getSavedPosts}
+            emptyListRender={emptyListRender}
+            realtime={false}
         />
     }
 }

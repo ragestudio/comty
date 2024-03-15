@@ -24,14 +24,21 @@
     "clui": "^0.3.6",
     "dotenv": "^16.4.4",
     "fastify": "^4.26.2",
-    "http-proxy-middleware": "^2.0.6",
+    "http-proxy": "^1.18.1",
+    "http-proxy-middleware": "^3.0.0-beta.1",
+    "hyper-express": "^6.14.12",
     "jsonwebtoken": "^9.0.2",
     "linebridge": "^0.18.1",
     "module-alias": "^2.2.3",
     "p-map": "^4.0.0",
     "p-queue": "^7.3.4",
+    "radix3": "^1.1.1",
     "signal-exit": "^4.1.0",
-    "spinnies": "^0.5.1"
+    "spinnies": "^0.5.1",
+    "tree-kill": "^1.2.2",
+    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.41.0",
+    "uws-reverse-proxy": "^3.2.1",
+    "yume-server": "^0.0.5"
   },
   "devDependencies": {
     "chai": "^5.1.0",

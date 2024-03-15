@@ -1,8 +1,12 @@
 @import "theme/vars.less";
 
 @borderRadius: 12px;
+@stickyCardTop: 20px;
+@withCoverPanelElevation: 100px;
 
 .accountProfile {
+	position: relative;
+
 	display: flex;
 
 	flex-direction: column;
@@ -10,17 +14,20 @@
 	width: 100%;
 	height: 100%;
 
-	&.noCover {
+	&.withCover {
 		.panels {
-			padding-top: 0;
-
 			.leftPanel {
-				transform: translate(0, 0) !important;
-			}
-		}
+				position: sticky;
 
-		.userCard {
-			filter: none;
+				top: calc(@withCoverPanelElevation + @stickyCardTop);
+				left: 0;
+
+				transform: translate(0, -@withCoverPanelElevation);
+
+				.userCard {
+					filter: drop-shadow(0 0 20px var(--border-color));
+				}
+			}
 		}
 	}
 
@@ -81,14 +88,14 @@
 
 		gap: 20px;
 
-		padding-top: 20px;
-
 		height: 100%;
 		width: 100%;
 
 		.leftPanel {
 			position: sticky;
-			top: 0;
+			top: @stickyCardTop;
+
+			height: fit-content;
 
 			z-index: 55;
 
@@ -98,14 +105,6 @@
 			align-items: center;
 
 			transition: all 0.3s ease-in-out;
-
-			transform: translate(0, -100px);
-
-			.userCard {
-				position: sticky;
-				top: 0;
-				z-index: 55;
-			}
 
 			.actions {
 				display: flex;
@@ -131,25 +130,51 @@
 			}
 		}
 
-		.content {
+		.centerPanel {
+			display: flex;
+			flex-direction: column;
+
+			align-items: center;
+
 			height: 100%;
 			width: 100%;
 
 			.fade-opacity-active {
 				height: 100%;
 			}
+
+			.post-list_wrapper {
+				display: flex;
+				flex-direction: column;
+
+				align-items: center;
+
+				width: 100%;
+
+				.post-list {
+					width: 100%;
+
+					max-width: 900px;
+
+					.post_card {
+						width: 100%;
+
+						max-width: unset;
+					}
+				}
+			}
 		}
 
-		.tabMenuWrapper {
+		.rightPanel {
 			position: sticky;
-			top: 0;
+			top: @stickyCardTop;
 
 			display: flex;
 			flex-direction: column;
 
 			background-color: var(--background-color-accent);
 			border-radius: 12px;
-			padding: 20px;
+			padding: 15px;
 
 			height: fit-content;
 			width: fit-content;
@@ -157,6 +182,19 @@
 			min-width: 15%;
 
 			justify-self: center;
+
+			.ant-menu-item {
+				display: inline-flex;
+				align-items: center;
+
+				justify-content: flex-start;
+
+				padding: 5px 10px !important;
+
+				svg {
+					margin: 0 !important;
+				}
+			}
 
 			.ant-menu-item-selected {
 				background-color: var(--background-color-primary) !important;
@@ -168,14 +206,12 @@
 		background-color: var(--background-color-accent);
 		padding: 20px;
 		border-radius: @borderRadius;
+
+		width: 100%;
 	}
 
 	@media (max-width: 1720px) {
 		.panels {
-			.content {
-				width: 60%;
-			}
-
 			.leftPanel {
 				.userCard {
 					width: 300px;
@@ -188,12 +224,12 @@
 				}
 			}
 
-			.tabMenuWrapper {
+			.rightPanel {
 				width: fit-content;
-				min-width: 0;
+				min-width: 60px;
 
-				top: 0;
-				right: 0;
+				align-items: center;
+				justify-content: center;
 
 				padding: 10px !important;
 

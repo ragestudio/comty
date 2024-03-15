@@ -29,11 +29,14 @@ async function processVideo(
         videoBitrate = 2024,
     } = options
 
-    const result = await videoTranscode(file.filepath, file.cachePath, {
+    const result = await videoTranscode(file.filepath, {
         videoCodec,
         format,
         audioBitrate,
         videoBitrate: [videoBitrate, true],
+        extraOptions: [
+            "-threads 1"
+        ]
     })
 
     file.filepath = result.filepath

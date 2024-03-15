@@ -1,0 +1,71 @@
+.uploadButton {
+    display: inline-flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--background-color-accent);
+    border-radius: 8px;
+
+    padding: 5px 15px;
+
+    cursor: pointer;
+
+    transition: all 150ms ease-in-out;
+
+    &.uploading {
+        border-radius: 12px;
+
+        .uploadButton-content {
+            gap: 15px;
+        }
+    }
+
+    .ant-upload {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: center;
+    }
+
+    .uploadButton-content {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 7px;
+
+        transition: all 150ms ease-in-out;
+
+        .ant-progress {
+            position: relative;
+
+            display: inline-flex;
+            flex-direction: row;
+
+            align-items: center;
+            justify-content: center;
+
+            height: 17px;
+            width: 17px;
+
+            .ant-progress-inner,
+            .ant-progress-circle {
+                position: absolute;
+
+                top: 0;
+                left: 0;
+
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            svg {
+                margin: 0 !important;
+            }
+        }
+    }
+}

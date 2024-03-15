@@ -16,50 +16,49 @@ import SettingItemComponent from "../SettingItemComponent"
 export default class SettingTab extends React.Component {
     state = {
         loading: true,
-        processedCtx: {}
+        tab: null,
+        ctx: {},
     }
 
-    tab = composedTabs[this.props.activeKey]
+    loadTab = async () => {
+        await this.setState({
+            loading: true,
+            processedCtx: {},
+        })
 
-    processCtx = async () => {
-        if (typeof this.tab.ctxData === "function") {
-            this.setState({ loading: true })
+        const tab = composedTabs[this.props.activeKey]
 
-            const resultCtx = await this.tab.ctxData()
+        let ctx = {}
 
-            console.log(resultCtx)
-
-            this.setState({
-                loading: false,
-                processedCtx: resultCtx
-            })
+        if (typeof tab.ctxData === "function") {
+            ctx = await tab.ctxData()
         }
+
+        await this.setState({
+            tab: tab,
+            loading: false,
+            ctx: {
+                baseConfig: this.props.baseConfig,
+                ...ctx
+            },
+        })
     }
 
     // check if props.activeKey change 
     componentDidUpdate = async (prevProps) => {
         if (prevProps.activeKey !== this.props.activeKey) {
-            this.tab = composedTabs[this.props.activeKey]
-
-            this.setState({
-                loading: !!this.tab.ctxData,
-                processedCtx: {}
-            })
-
-            await this.processCtx()
+            await this.loadTab()
         }
     }
 
     componentDidMount = async () => {
-        this.setState({
-            loading: !!this.tab.ctxData,
-        })
+        await this.loadTab()
+    }
 
-        await this.processCtx()
-
-        this.setState({
-            loading: false
-        })
+    handleSettingUpdate = async (key, value) => {
+        if (typeof this.props.onUpdate === "function") {
+            await this.props.onUpdate(key, value)
+        }
     }
 
     render() {
@@ -67,14 +66,16 @@ export default class SettingTab extends React.Component {
             return <antd.Skeleton active />
         }
 
-        if (this.tab.render) {
-            return React.createElement(this.tab.render, {
-                ctx: this.state.processedCtx
+        const { ctx, tab } = this.state
+
+        if (tab.render) {
+            return React.createElement(tab.render, {
+                ctx: ctx,
             })
         }
 
         if (this.props.withGroups) {
-            const group = composeGroupsFromSettingsTab(this.tab.settings)
+            const group = composeGroupsFromSettingsTab(tab.settings)
 
             return <>
                 {
@@ -98,9 +99,11 @@ export default class SettingTab extends React.Component {
 
                             <div className="settings_list">
                                 {
-                                    settings.map((setting) => <SettingItemComponent
+                                    settings.map((setting, index) => <SettingItemComponent
+                                        key={index}
                                         setting={setting}
-                                        ctx={this.state.processedCtx}
+                                        ctx={ctx}
+                                        onUpdate={(value) => this.handleSettingUpdate(setting.id, value)}
                                     />)
                                 }
                             </div>
@@ -109,8 +112,8 @@ export default class SettingTab extends React.Component {
                 }
 
                 {
-                    this.tab.footer && React.createElement(this.tab.footer, {
-                        ctx: this.state.processedCtx
+                    tab.footer && React.createElement(tab.footer, {
+                        ctx: this.state.ctx
                     })
                 }
             </>
@@ -118,18 +121,22 @@ export default class SettingTab extends React.Component {
 
         return <>
             {
-                this.tab.settings.map((setting, index) => {
+                tab.settings.map((setting, index) => {
                     return <SettingItemComponent
                         key={index}
                         setting={setting}
-                        ctx={this.state.processedCtx}
+                        ctx={{
+                            ...this.state.ctx,
+                            baseConfig: this.props.baseConfig,
+                        }}
+                        onUpdate={(value) => this.handleSettingUpdate(setting.id, value)}
                     />
                 })
             }
 
             {
-                this.tab.footer && React.createElement(this.tab.footer, {
-                    ctx: this.state.processedCtx
+                tab.footer && React.createElement(tab.footer, {
+                    ctx: this.state.ctx
                 })
             }
         </>

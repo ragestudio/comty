@@ -28,28 +28,28 @@ export default {
             },
         },
         {
-            id: "fullName",
+            id: "public_name",
             group: "account.basicInfo",
             component: "Input",
             icon: "Edit3",
             title: "Name",
             description: "Change your public name",
             props: {
-                // set max length
-                "maxLength": 120,
-                "showCount": true,
-                "allowClear": true,
-                "placeholder": "Enter your name. e.g. John Doe",
+                maxLength: 120,
+                showCount: true,
+                allowClear: true,
+                placeholder: "Enter your name. e.g. John Doe",
             },
             defaultValue: (ctx) => {
-                return ctx.userData.fullName
+                return ctx.userData.public_name
             },
             onUpdate: async (value) => {
                 const result = await UserModel.updateData({
-                    fullName: value
+                    public_name: value
                 })
 
                 if (result) {
+                    app.message.success("Public name updated")
                     return value
                 }
             },
@@ -67,22 +67,22 @@ export default {
             storaged: false,
         },
         {
-            "id": "email",
-            "group": "account.basicInfo",
-            "component": "Input",
-            "icon": "Mail",
-            "title": "Email",
-            "description": "Change your email address",
-            "props": {
-                "placeholder": "Enter your email address",
-                "allowClear": true,
-                "showCount": true,
-                "maxLength": 320,
+            id: "email",
+            group: "account.basicInfo",
+            component: "Input",
+            icon: "Mail",
+            title: "Email",
+            description: "Change your email address",
+            props: {
+                placeholder: "Enter your email address",
+                allowClear: true,
+                showCount: true,
+                maxLength: 320,
             },
-            "defaultValue": (ctx) => {
+            defaultValue: (ctx) => {
                 return ctx.userData.email
             },
-            "onUpdate": async (value) => {
+            onUpdate: async (value) => {
                 const result = await UserModel.updateData({
                     email: value
                 })
@@ -91,22 +91,22 @@ export default {
                     return value
                 }
             },
-            "debounced": true,
+            debounced: true,
         },
         {
-            "id": "avatar",
-            "group": "account.profile",
-            "icon": "Image",
-            "title": "Avatar",
-            "description": "Change your avatar (Upload an image or use an URL)",
-            "component": loadable(() => import("../components/urlInput")),
+            id: "avatar",
+            group: "account.profile",
+            icon: "Image",
+            title: "Avatar",
+            description: "Change your avatar (Upload an image or use an URL)",
+            component: loadable(() => import("../components/urlInput")),
             extraActions: [
                 UploadButton
             ],
-            "defaultValue": (ctx) => {
+            defaultValue: (ctx) => {
                 return ctx.userData.avatar
             },
-            "onUpdate": async (value) => {
+            onUpdate: async (value) => {
                 const result = await UserModel.updateData({
                     avatar: value
                 })
@@ -118,19 +118,19 @@ export default {
             },
         },
         {
-            "id": "cover",
-            "group": "account.profile",
-            "icon": "Image",
-            "title": "Cover",
-            "description": "Change your profile cover (Upload an image or use an URL)",
-            "component": loadable(() => import("../components/urlInput")),
+            id: "cover",
+            group: "account.profile",
+            icon: "Image",
+            title: "Cover",
+            description: "Change your profile cover (Upload an image or use an URL)",
+            component: loadable(() => import("../components/urlInput")),
             extraActions: [
                 UploadButton
             ],
-            "defaultValue": (ctx) => {
+            defaultValue: (ctx) => {
                 return ctx.userData.cover
             },
-            "onUpdate": async (value) => {
+            onUpdate: async (value) => {
                 const result = await UserModel.updateData({
                     cover: value
                 })
@@ -142,22 +142,22 @@ export default {
             },
         },
         {
-            "id": "description",
-            "group": "account.profile",
-            "component": "TextArea",
-            "icon": "Edit3",
-            "title": "Description",
-            "description": "Change your description for your profile",
-            "props": {
-                "placeholder": "Enter here a description for your profile",
-                "maxLength": 320,
-                "showCount": true,
-                "allowClear": true
+            id: "description",
+            group: "account.profile",
+            component: "TextArea",
+            icon: "Edit3",
+            title: "Description",
+            description: "Change your description for your profile",
+            props: {
+                placeholder: "Enter here a description for your profile",
+                maxLength: 320,
+                showCount: true,
+                allowClear: true
             },
-            "defaultValue": (ctx) => {
+            defaultValue: (ctx) => {
                 return ctx.userData.description
             },
-            "onUpdate": async (value) => {
+            onUpdate: async (value) => {
                 const result = await UserModel.updateData({
                     description: value
                 })
@@ -166,8 +166,7 @@ export default {
                     return value
                 }
             },
-            "debounced": true,
-            storaged: false,
+            debounced: true,
         },
         {
             id: "Links",
@@ -194,7 +193,6 @@ export default {
                 return ctx.userData.links ?? []
             },
             debounced: true,
-            storaged: false,
         }
     ]
 }

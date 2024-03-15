@@ -1,11 +1,11 @@
 import React from "react"
 import * as antd from "antd"
-import { Translation } from "react-i18next"
-import classnames from "classnames"
-import config from "config"
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
-
 import { createIconRender } from "components/Icons"
+import { Translation } from "react-i18next"
+import config from "config"
+
+import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
+import useUserRemoteConfig from "hooks/useUserRemoteConfig"
 
 import {
     composedSettingsByGroups as settings
@@ -88,6 +88,7 @@ const generateMenuItems = () => {
 }
 
 export default () => {
+    const [config, setConfig, loading] = useUserRemoteConfig()
     const [activeKey, setActiveKey] = useUrlQueryActiveKey({
         defaultKey: "general",
         queryKey: "tab"
@@ -113,11 +114,14 @@ export default () => {
         return items
     }, [])
 
-    return <div
-        className={classnames(
-            "settings_wrapper",
-        )}
-    >
+    function handleOnUpdate(key, value) {
+        setConfig({
+            ...config,
+            [key]: value
+        })
+    }
+
+    return <div className="settings_wrapper">
         <div className="settings_menu">
             <antd.Menu
                 mode="vertical"
@@ -128,10 +132,17 @@ export default () => {
         </div>
 
         <div className="settings_content">
-            <SettingTab
-                activeKey={activeKey}
-                withGroups
-            />
+            {
+                loading && <antd.Skeleton active />
+            }
+            {
+                !loading && <SettingTab
+                    baseConfig={config}
+                    onUpdate={handleOnUpdate}
+                    activeKey={activeKey}
+                    withGroups
+                />
+            }
         </div>
     </div>
 }

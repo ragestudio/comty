@@ -228,6 +228,12 @@ class OwnTags extends React.Component {
             </div>
         }
 
+        if (!this.state.data) {
+            return <antd.Empty
+                description="You don't have any tags yet."
+            />
+        }
+
         return <div className="tap-share-own_tags">
             {
                 this.state.data.length === 0 && <antd.Empty

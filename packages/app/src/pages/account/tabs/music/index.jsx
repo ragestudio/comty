@@ -19,7 +19,7 @@ export default (props) => {
         return <antd.Result
             status="warning"
             title="Failed to retrieve releases"
-            subTitle={E_Releases}
+            subTitle={E_Releases.message}
         />
     }
 

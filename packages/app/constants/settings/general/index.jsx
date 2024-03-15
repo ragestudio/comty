@@ -72,13 +72,16 @@ export default {
         },
         {
             id: "low_performance_mode",
-            storaged: true,
             group: "general",
             component: "Switch",
             icon: "MdSlowMotionVideo",
             title: "Low performance mode",
             description: "Enable low performance mode to reduce the memory usage and improve the performance in low-end devices. This will disable some animations and other decorative features.",
             emitEvent: "app.lowPerformanceMode",
+            props: {
+                disabled: true
+            },
+            storaged: true,
             experimental: true,
             disabled: true,
         },
@@ -182,6 +185,23 @@ export default {
             },
             storaged: true,
             mobile: false,
+        },
+        {
+            id: "transcode_video_browser",
+            group: "posts",
+            component: "Switch",
+            icon: "MdVideoCameraFront",
+            title: "Transcode video in browser",
+            description: "Transcode videos from the application instead of on the servers. This feature may speed up the posting process depending on your computer. This will consume your computer resources.",
+            dependsOn: {
+                "low_performance_mode": false,
+            },
+            props: {
+                disabled: true,
+            },
+            experimental: true,
+            storaged: true,
+            disabled: true,
         },
         {
             id: "feed_max_fetch",

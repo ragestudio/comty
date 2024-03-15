@@ -1,104 +1,54 @@
 import path from "path"
 import fs from "fs"
 
-import FileUpload from "@shared-classes/FileUpload"
-import PostProcess from "@services/post-process"
+import ChunkFileUpload from "@shared-classes/ChunkFileUpload"
+
+import RemoteUpload from "@services/remoteUpload"
 
 export default {
-    useContext: ["cache", "storage", "b2Storage"],
+    useContext: ["cache", "limits"],
     middlewares: [
         "withAuthentication",
     ],
     fn: async (req, res) => {
-        const { cache, storage, b2Storage } = this.default.contexts
-
         const providerType = req.headers["provider-type"]
 
-        const userPath = path.join(cache.constructor.cachePath, req.session.user_id)
+        const userPath = path.join(this.default.contexts.cache.constructor.cachePath, req.auth.session.user_id)
 
-        // 10 GB in bytes
-        const maxFileSize = 10 * 1000 * 1000 * 1000
+        const tmpPath = path.resolve(userPath)
 
-        // 10MB in bytes
-        const maxChunkSize = 10 * 1000 * 1000
+        let build = await ChunkFileUpload(req, {
+            tmpDir: tmpPath,
+            maxFileSize: parseInt(this.default.contexts.limits.maxFileSizeInMB) * 1024 * 1024,
+            maxChunkSize: parseInt(this.default.contexts.limits.maxChunkSizeInMB) * 1024 * 1024,
+        }).catch((err) => {
+            throw new OperationError(err.code, err.message)
+        })
 
-        let build = await FileUpload(req, userPath, maxFileSize, maxChunkSize)
-            .catch((err) => {
-                console.log("err", err)
+        if (typeof build === "function") {
+            try {
+                build = await build()
 
-                throw new OperationError(500, err.message)
-            })
+                const result = await RemoteUpload({
+                    parentDir: req.auth.session.user_id,
+                    source: build.filePath,
+                    service: providerType,
+                    useCompression: req.headers["use-compression"] ?? true,
+                    cachePath: tmpPath,
+                })
 
-        if (build === false) {
-            return false
-        } else {
-            if (typeof build === "function") {
-                try {
-                    build = await build()
+                fs.promises.rm(tmpPath, { recursive: true, force: true })
 
-                    if (!req.headers["no-compression"]) {
-                        build = await PostProcess(build)
-                    }
+                return result
+            } catch (error) {
+                fs.promises.rm(tmpPath, { recursive: true, force: true })
 
-                    // compose remote path
-                    const remotePath = `${req.session.user_id}/${path.basename(build.filepath)}`
-
-                    let url = null
-
-                    switch (providerType) {
-                        case "premium-cdn": {
-                            // use backblaze b2
-                            await b2Storage.authorize()
-
-                            const uploadUrl = await b2Storage.getUploadUrl({
-                                bucketId: process.env.B2_BUCKET_ID,
-                            })
-
-                            const data = await fs.promises.readFile(build.filepath)
-
-                            await b2Storage.uploadFile({
-                                uploadUrl: uploadUrl.data.uploadUrl,
-                                uploadAuthToken: uploadUrl.data.authorizationToken,
-                                fileName: remotePath,
-                                data: data,
-                                info: build.metadata
-                            })
-
-                            url = `https://${process.env.B2_CDN_ENDPOINT}/${process.env.B2_BUCKET}/${remotePath}`
-
-                            break
-                        }
-                        default: {
-                            // upload to storage
-                            await storage.fPutObject(process.env.S3_BUCKET, remotePath, build.filepath, build.metadata ?? {
-                                "Content-Type": build.mimetype,
-                            })
-
-                            // compose url
-                            url = storage.composeRemoteURL(remotePath)
-
-                            break
-                        }
-                    }
-
-                    // remove from cache
-                    fs.promises.rm(build.cachePath, { recursive: true, force: true })
-
-                    return res.json({
-                        name: build.filename,
-                        id: remotePath,
-                        url: url,
-                    })
-                } catch (error) {
-                    console.log(error)
-
-                    throw new OperationError(500, error.message)
-                }
+                throw new OperationError(error.code ?? 500, error.message ?? "Failed to upload file")
             }
+        }
 
-            return res.json({
-                success: true,
-            })
+        return {
+            ok: 1
         }
     }
 }

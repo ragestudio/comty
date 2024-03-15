@@ -308,6 +308,10 @@ export default class SettingItemComponent extends React.PureComponent {
             }
         }
 
+        if (typeof this.props.onUpdate === "function") {
+            await this.props.onUpdate(updateValue)
+        }
+
         // finaly update value
         await this.setState({
             value: updateValue

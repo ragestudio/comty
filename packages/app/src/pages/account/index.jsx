@@ -2,9 +2,10 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { Icons } from "components/Icons"
-import { Skeleton, FollowButton, UserCard } from "components"
+import { FollowButton, UserCard } from "components"
 import { SessionModel, UserModel, FollowsModel } from "models"
 
 import DetailsTab from "./tabs/details"
@@ -21,36 +22,6 @@ const TabsComponent = {
 	"music": MusicTab,
 }
 
-const TabRender = React.memo((props, ref) => {
-	const [transitionActive, setTransitionActive] = React.useState(false)
-	const [activeKey, setActiveKey] = React.useState(props.renderKey)
-
-	React.useEffect(() => {
-		setTransitionActive(true)
-
-		setTimeout(() => {
-			setActiveKey(props.renderKey)
-
-			setTimeout(() => {
-				setTransitionActive(false)
-			}, 100)
-		}, 100)
-	}, [props.renderKey])
-
-	const Tab = TabsComponent[activeKey]
-
-	if (!Tab) {
-		return null
-	}
-
-	// forwards ref to the tab
-	return <div className={classnames("fade-opacity-active", { "fade-opacity-leave": transitionActive })}>
-		{
-			React.createElement(Tab, props)
-		}
-	</div>
-})
-
 export default class Account extends React.Component {
 	state = {
 		requestedUser: null,
@@ -66,15 +37,7 @@ export default class Account extends React.Component {
 		isNotExistent: false,
 	}
 
-	profileRef = React.createRef()
-
 	contentRef = React.createRef()
-
-	coverComponent = React.createRef()
-
-	leftPanelRef = React.createRef()
-
-	actionsRef = React.createRef()
 
 	componentDidMount = async () => {
 		app.layout.toggleCenteredContent(false)
@@ -129,13 +92,6 @@ export default class Account extends React.Component {
 		})
 	}
 
-	onPostListTopVisibility = (to) => {
-		if (to) {
-			this.profileRef.current.classList.remove("topHidden")
-		} else {
-			this.profileRef.current.classList.add("topHidden")
-		}
-	}
 
 	onClickFollow = async () => {
 		const result = await FollowsModel.toggleFollow({
@@ -165,8 +121,6 @@ export default class Account extends React.Component {
 			return
 		}
 
-		this.onPostListTopVisibility(true)
-
 		key = key.toLowerCase()
 
 		if (this.state.tabActiveKey === key) {
@@ -195,11 +149,10 @@ export default class Account extends React.Component {
 		}
 
 		return <div
-			ref={this.profileRef}
 			className={classnames(
 				"accountProfile",
 				{
-					["noCover"]: !user.cover,
+					["withCover"]: user.cover,
 				}
 			)}
 			id="profile"
@@ -209,7 +162,6 @@ export default class Account extends React.Component {
 					className={classnames("cover", {
 						["expanded"]: this.state.coverExpanded
 					})}
-					ref={this.coverComponent}
 					style={{ backgroundImage: `url("${user.cover}")` }}
 					onClick={() => this.toggleCoverExpanded()}
 					id="profile-cover"
@@ -217,18 +169,12 @@ export default class Account extends React.Component {
 			}
 
 			<div className="panels">
-				<div
-					className="leftPanel"
-					ref={this.leftPanelRef}
-				>
+				<div className="leftPanel">
 					<UserCard
 						user={user}
 					/>
 
-					<div
-						className="actions"
-						ref={this.actionsRef}
-					>
+					<div className="actions">
 						<FollowButton
 							count={this.state.followersCount}
 							onClick={this.onClickFollow}
@@ -239,17 +185,33 @@ export default class Account extends React.Component {
 				</div>
 
 				<div
-					className="content"
+					className="centerPanel"
 					ref={this.contentRef}
 				>
-					<TabRender
-						renderKey={this.state.tabActiveKey}
-						state={this.state}
-						onTopVisibility={this.onPostListTopVisibility}
-					/>
+					<AnimatePresence mode="wait">
+						<motion.div
+							initial={{ opacity: 0, scale: 0.95 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{
+								duration: 0.15,
+							}}
+							key={this.state.tabActiveKey}
+							style={{
+								width: "100%",
+							}}
+						>
+							{
+								React.createElement(TabsComponent[this.state.tabActiveKey], {
+									onTopVisibility: this.onPostListTopVisibility,
+									state: this.state
+								})
+							}
+						</motion.div>
+					</AnimatePresence>
 				</div>
 
-				<div className="tabMenuWrapper">
+				<div className="rightPanel">
 					<antd.Menu
 						className="tabMenu"
 						mode={app.isMobile ? "horizontal" : "vertical"}

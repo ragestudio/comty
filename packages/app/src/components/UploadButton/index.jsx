@@ -1,10 +1,15 @@
 import React from "react"
-import { Button, Upload } from "antd"
-
+import { Upload, Progress } from "antd"
+import classnames from "classnames"
 import { Icons } from "components/Icons"
+
+import useHacks from "hooks/useHacks"
+
+import "./index.less"
 
 export default (props) => {
     const [uploading, setUploading] = React.useState(false)
+    const [progess, setProgess] = React.useState(null)
 
     const handleOnStart = (file_uid, file) => {
         if (typeof props.onStart === "function") {
@@ -32,35 +37,37 @@ export default (props) => {
 
     const handleUpload = async (req) => {
         setUploading(true)
+        setProgess(1)
 
         handleOnStart(req.file.uid, req.file)
 
-        const response = await app.cores.remoteStorage.uploadFile(req.file, {
+        await app.cores.remoteStorage.uploadFile(req.file, {
             onProgress: (file, progress) => {
-                return handleOnProgress(file.uid, progress)
-            }
-        }).catch((err) => {
-            app.notification.new({
-                title: "Could not upload file",
-                description: err
-            }, {
-                type: "error"
-            })
+                setProgess(progress)
+                handleOnProgress(file.uid, progress)
+            },
+            onError: (file, error) => {
+                setProgess(null)
+                handleOnError(file.uid, error)
+                setUploading(false)
+            },
+            onFinish: (file, response) => {
+                if (typeof props.ctx?.onUpdateItem === "function") {
+                    props.ctx.onUpdateItem(response.url)
+                }
 
-            return handleOnError(req.file.uid, err)
+                if (typeof props.onUploadDone === "function") {
+                    props.onUploadDone(response)
+                }
+
+                setUploading(false)
+                handleOnSuccess(req.file.uid, response)
+
+                setTimeout(() => {
+                    setProgess(null)
+                }, 1000)
+            },
         })
-
-        if (typeof props.ctx?.onUpdateItem === "function") {
-            props.ctx.onUpdateItem(response.url)
-        }
-
-        if (typeof props.onUploadDone === "function") {
-            await props.onUploadDone(response)
-        }
-
-        setUploading(false)
-
-        return handleOnSuccess(req.file.uid, response)
     }
 
     return <Upload
@@ -69,25 +76,43 @@ export default (props) => {
             props.multiple ?? false
         }
         accept={
-            props.accept ?? "image/*"
+            props.accept ?? [
+                "image/*",
+                "video/*",
+                "audio/*",
+            ]
         }
         progress={false}
         fileList={[]}
-    >
-        <Button
-            icon={props.icon ?? <Icons.Upload
-                style={{
-                    margin: 0
-                }}
-            />}
-            loading={uploading}
-            type={
-                props.type ?? "round"
+        className={classnames(
+            "uploadButton",
+            {
+                ["uploading"]: !!progess || uploading
             }
-        >
+        )}
+        disabled={uploading}
+    >
+        <div className="uploadButton-content">
+            {
+                !progess && (props.icon ?? <Icons.Upload
+                    style={{
+                        margin: 0
+                    }}
+                />)
+            }
+
+            {
+                progess && <Progress
+                    type="circle"
+                    percent={progess}
+                    strokeWidth={20}
+                    format={() => null}
+                />
+            }
+
             {
                 props.children ?? "Upload"
             }
-        </Button>
+        </div>
     </Upload>
 }

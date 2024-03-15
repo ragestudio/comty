@@ -2,11 +2,13 @@ import { Server } from "linebridge/src/server"
 
 import B2 from "backblaze-b2"
 
+import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 
 import SharedMiddlewares from "@shared-middlewares"
+import LimitsClass from "@shared-classes/Limits"
 
 class API extends Server {
     static refName = "files"
@@ -14,13 +16,12 @@ class API extends Server {
     static routesPath = `${__dirname}/routes`
     static listen_port = process.env.HTTP_LISTEN_PORT ?? 3002
 
-    static maxBodyLength = 1000 * 1000 * 1000
-
     middlewares = {
         ...SharedMiddlewares
     }
 
     contexts = {
+        db: new DbManager(),
         cache: new CacheService(),
         redis: RedisClient(),
         storage: StorageClient(),
@@ -28,12 +29,19 @@ class API extends Server {
             applicationKeyId: process.env.B2_KEY_ID,
             applicationKey: process.env.B2_APP_KEY,
         }),
+        limits: {},
     }
 
     async onInitialize() {
+        global.storage = this.contexts.storage
+        global.b2Storage = this.contexts.b2Storage
+
+        await this.contexts.db.initialize()
         await this.contexts.redis.initialize()
         await this.contexts.storage.initialize()
         await this.contexts.b2Storage.authorize()
+
+        this.contexts.limits = await LimitsClass.get()
     }
 }
 

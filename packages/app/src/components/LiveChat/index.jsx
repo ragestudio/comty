@@ -42,7 +42,7 @@ export default class LiveChat extends React.Component {
 
     timelineRef = React.createRef()
 
-    socket = app.cores.api.instance().wsInstances.chat
+    socket = app.cores.api.instance().sockets.chat
 
     roomEvents = {
         "room:recive:message": (message) => {

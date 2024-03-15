@@ -18,7 +18,7 @@ export default async (req, res) => {
     })
 
     if (userConfig && userConfig.values) {
-        if (userConfig.values.mfa_enabled) {
+        if (userConfig.values["auth:mfa"]) {
             let codeVerified = false
 
             // search if is already a mfa session

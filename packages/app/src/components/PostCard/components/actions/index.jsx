@@ -4,7 +4,7 @@ import { Icons } from "components/Icons"
 
 import SaveButton from "./saveButton"
 import LikeButton from "./likeButton"
-import CommentsButton from "./commentsButton"
+import RepliesButton from "./replyButton"
 
 import "./index.less"
 
@@ -32,7 +32,7 @@ const MoreActionsItems = [
     {
         key: "onClickRepost",
         label: <>
-            <Icons.Repeat />
+            <Icons.MdCallSplit />
             <span>Repost</span>
         </>,
     },
@@ -61,7 +61,7 @@ export default (props) => {
     const {
         onClickLike,
         onClickSave,
-        onClickComments,
+        onClickReply,
     } = props.actions ?? {}
 
     const genItems = () => {
@@ -95,10 +95,10 @@ export default (props) => {
                     onClick={onClickSave}
                 />
             </div>
-            <div className="action" id="comments">
-                <CommentsButton
-                    count={props.commentsCount}
-                    onClick={onClickComments}
+            <div className="action" id="replies">
+                <RepliesButton
+                    count={props.repliesCount}
+                    onClick={onClickReply}
                 />
             </div>
             <div className="action" id="more">

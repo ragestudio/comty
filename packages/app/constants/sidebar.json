@@ -28,7 +28,6 @@
         "id": "Marketplace",
         "path": "/marketplace",
         "title": "Marketplace",
-        "icon": "Box",
-        "disabled": true
+        "icon": "Box"
     }
 ]

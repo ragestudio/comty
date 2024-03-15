@@ -8,5 +8,6 @@ export default {
         attachments: { type: Array, default: [] },
         flags: { type: Array, default: [] },
         reply_to: { type: String, default: null },
+        updated_at: { type: String, default: null },
     }
 }

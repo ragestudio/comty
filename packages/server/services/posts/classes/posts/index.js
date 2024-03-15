@@ -1,5 +1,6 @@
 export default class Posts {
-    static feed = require("./methods/feed").default
+    static timeline = require("./methods/timeline").default
+    static globalTimeline = require("./methods/globalTimeline").default
     static data = require("./methods/data").default
     static getLiked = require("./methods/getLiked").default
     static getSaved = require("./methods/getSaved").default
@@ -10,4 +11,7 @@ export default class Posts {
     static toggleLike = require("./methods/toggleLike").default
     static report = require("./methods/report").default
     static flag = require("./methods/flag").default
+    static delete = require("./methods/delete").default
+    static update = require("./methods/update").default
+    static replies = require("./methods/replies").default
 }

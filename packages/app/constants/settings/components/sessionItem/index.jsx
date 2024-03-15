@@ -62,8 +62,6 @@ const SessionItem = (props) => {
         return UAParser(session.client)
     })
 
-    console.log(session, ua)
-
     return <div
         className={classnames(
             "security_sessions_list_item_wrapper",

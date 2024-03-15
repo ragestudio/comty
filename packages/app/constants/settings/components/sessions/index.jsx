@@ -21,8 +21,6 @@ export default () => {
             return null
         })
 
-        console.log(response)
-
         if (response) {
             setSessions(response)
         }
@@ -72,7 +70,6 @@ export default () => {
                     return `${total} Sessions`
                 }}
                 simple
-
             />
         </div>
     </div>

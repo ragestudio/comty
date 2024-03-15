@@ -1,4 +1,6 @@
 {
+    "low_performance_mode": false,
+    "transcode_video_browser": false,
     "forceMobileMode": false,
     "ui.effects": true,
     "ui.general_volume": 50,

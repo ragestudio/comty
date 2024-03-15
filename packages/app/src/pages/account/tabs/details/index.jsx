@@ -98,7 +98,7 @@ export default (props) => {
 
             <div className="field_value">
                 <p>
-                    {props.state.followers.length}
+                    {props.state.followersCount}
                 </p>
             </div>
         </div>
@@ -117,7 +117,7 @@ export default (props) => {
             <div className="field_value">
                 <p>
                     {
-                        getJoinLabel(Number(props.state.user.createdAt))
+                        getJoinLabel(Number(props.state.user.created_at ?? props.state.user.createdAt))
                     }
                 </p>
             </div>

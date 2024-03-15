@@ -15,6 +15,6 @@ export default {
         badges: { type: Array, default: [] },
         links: { type: Array, default: [] },
         location: { type: String, default: null },
-        birthday: { type: Date, default: null },
+        birthday: { type: Date, default: null, select: false },
     }
 }

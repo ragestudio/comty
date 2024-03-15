@@ -6,7 +6,7 @@ export default {
         return await User.toggleFollow({
             user_id: req.params.user_id,
             from_user_id: req.auth.session.user_id,
-            to: req.body.to,
+            to: req.body?.to,
         })
     }
 }

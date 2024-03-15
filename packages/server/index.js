@@ -10,18 +10,16 @@ import chalk from "chalk"
 import Spinnies from "spinnies"
 import chokidar from "chokidar"
 import IPCRouter from "linebridge/src/server/classes/IPCRouter"
-import fastify from "fastify"
-import { createProxyMiddleware } from "http-proxy-middleware"
+import treeKill from "tree-kill"
 
 import { dots as DefaultSpinner } from "spinnies/spinners.json"
 import getInternalIp from "./lib/getInternalIp"
 import comtyAscii from "./ascii"
 import pkg from "./package.json"
 
-import cors from "linebridge/src/server/middlewares/cors"
-
 import { onExit } from "signal-exit"
 
+import Proxy from "./proxy"
 
 const bootloaderBin = path.resolve(__dirname, "boot")
 const servicesPath = path.resolve(__dirname, "services")
@@ -51,7 +49,7 @@ async function scanServices() {
     return finalServices
 }
 
-let internal_proxy = null
+let internal_proxy = new Proxy()
 let allReady = false
 let selectedProcessInstance = null
 let internalIp = null
@@ -72,7 +70,7 @@ Observable.observe(serviceRegistry, (changes) => {
             //console.log(`Updated service | ${path} > ${value}`)
 
             //check if all services all ready
-            if (Object.values(serviceRegistry).every((service) => service.ready)) {
+            if (Object.values(serviceRegistry).every((service) => service.initialized)) {
                 handleAllReady()
             }
 
@@ -176,6 +174,8 @@ async function handleAllReady() {
     console.log(comtyAscii)
     console.log(`🎉 All services[${services.length}] ready!\n`)
     console.log(`USE: select <service>, reboot, exit`)
+
+    await internal_proxy.listen(9000, "0.0.0.0")
 }
 
 // SERVICE WATCHER FUNCTIONS
@@ -189,6 +189,8 @@ async function handleNewServiceStarting(id) {
 }
 
 async function handleServiceStarted(id) {
+    serviceRegistry[id].initialized = true
+
     if (serviceRegistry[id].ready === false) {
         if (spinnies.pick(id)) {
             spinnies.succeed(id, { text: `[${id}][${serviceRegistry[id].index}] Ready` })
@@ -199,7 +201,7 @@ async function handleServiceStarted(id) {
 }
 
 async function handleServiceExit(id, code, err) {
-    //console.log(`🛑 Service ${id} exited with code ${code}`, err)
+    serviceRegistry[id].initialized = true
 
     if (serviceRegistry[id].ready === false) {
         if (spinnies.pick(id)) {
@@ -207,29 +209,14 @@ async function handleServiceExit(id, code, err) {
         }
     }
 
+    console.log(`[${id}] Exit with code ${code}`)
+
+    // try to unregister from proxy
+    internal_proxy.unregisterAllFromService(id)
+
     serviceRegistry[id].ready = false
 }
 
-async function registerProxy(_path, target, pathRewrite) {
-    if (internal_proxy.proxys.has(_path)) {
-        console.warn(`Proxy already registered [${_path}], skipping...`)
-        return false
-    }
-
-    console.log(`🔗 Registering path proxy [${_path}] -> [${target}]`)
-
-    internal_proxy.proxys.add(_path)
-
-    internal_proxy.use(_path, createProxyMiddleware({
-        target: target,
-        changeOrigin: true,
-        pathRewrite: pathRewrite,
-        ws: true,
-        logLevel: "silent",
-    }))
-
-    return true
-}
 
 async function handleIPCData(service_id, msg) {
     if (msg.type === "log") {
@@ -243,20 +230,34 @@ async function handleIPCData(service_id, msg) {
     if (msg.type === "router:register") {
         if (msg.data.path_overrides) {
             for await (let pathOverride of msg.data.path_overrides) {
-                await registerProxy(
-                    `/${pathOverride}`,
-                    `http://${internalIp}:${msg.data.listen.port}/${pathOverride}`,
-                    {
+                await internal_proxy.register({
+                    serviceId: service_id,
+                    path: `/${pathOverride}`,
+                    target: `http://${internalIp}:${msg.data.listen.port}/${pathOverride}`,
+                    pathRewrite: {
                         [`^/${pathOverride}`]: "",
-                    }
-                )
+                    },
+                })
             }
         } else {
-            await registerProxy(
-                `/${service_id}`,
-                `http://${msg.data.listen.ip}:${msg.data.listen.port}`
-            )
+            await internal_proxy.register({
+                serviceId: service_id,
+                path: `/${service_id}`,
+                target: `http://${msg.data.listen.ip}:${msg.data.listen.port}`,
+            })
         }
+    }
+
+    if (msg.type === "router:ws:register") {
+        await internal_proxy.register({
+            serviceId: service_id,
+            path: `/${msg.data.namespace}`,
+            target: `http://${internalIp}:${msg.data.listen.port}/${msg.data.namespace}`,
+            pathRewrite: {
+                [`^/${msg.data.namespace}`]: "",
+            },
+            ws: true,
+        })
     }
 }
 
@@ -276,10 +277,14 @@ function spawnService({ id, service, cwd }) {
         silent: true,
         cwd: cwd,
         env: instanceEnv,
+        killSignal: "SIGKILL",
     })
 
     instance.reload = () => {
         ipcRouter.unregister({ id, instance })
+
+        // try to unregister from proxy
+        internal_proxy.unregisterAllFromService(id)
 
         instance.kill()
 
@@ -340,31 +345,6 @@ function createServiceLogTransformer({ id, color = "bgCyan" }) {
 async function main() {
     internalIp = await getInternalIp()
 
-    internal_proxy = fastify()
-
-    internal_proxy.proxys = new Set()
-
-    await internal_proxy.register(require("@fastify/middie"))
-
-    await internal_proxy.use(cors)
-
-    internal_proxy.get("/ping", (request, reply) => {
-        return reply.send({
-            status: "ok"
-        })
-    })
-
-    internal_proxy.get("/", (request, reply) => {
-        return reply.send({
-            services: instancePool.map((instance) => {
-                return {
-                    id: instance.id,
-                    version: instance.version,
-                }
-            }),
-        })
-    })
-
     console.clear()
     console.log(comtyAscii)
     console.log(`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${internalIp} \n\n\n`)
@@ -417,6 +397,7 @@ async function main() {
         if (process.env.NODE_ENV === "development") {
             const ignored = [
                 ...await getIgnoredFiles(cwd),
+                "**/.cache/**",
                 "**/node_modules/**",
                 "**/dist/**",
                 "**/build/**",
@@ -438,7 +419,6 @@ async function main() {
         }
     }
 
-    // create repl 
     repl.start({
         prompt: "> ",
         useGlobal: true,
@@ -474,11 +454,6 @@ async function main() {
         }
     })
 
-    await internal_proxy.listen({
-        host: "0.0.0.0",
-        port: 9000
-    })
-
     onExit((code, signal) => {
         console.clear()
         console.log(`\n🛑 Preparing to exit...`)
@@ -493,7 +468,11 @@ async function main() {
             console.log(`Killing ${instance.id} [${instance.instance.pid}]`)
 
             instance.instance.kill()
+
+            treeKill(instance.instance.pid)
         }
+
+        treeKill(process.pid)
     })
 }
 

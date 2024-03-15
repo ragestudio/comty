@@ -200,7 +200,8 @@ export default class Login extends React.Component {
         }
 
         this.setState({
-            phase: to
+            phase: to,
+            mfa_required: null,
         })
     }
 

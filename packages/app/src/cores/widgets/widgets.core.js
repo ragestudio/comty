@@ -6,7 +6,7 @@ export default class WidgetsCore extends Core {
     static storeKey = "widgets"
 
     static get apiInstance() {
-        return app.cores.api.instance().instances.marketplace
+        return app.cores.api.client().baseRequest
     }
 
     public = {
@@ -21,7 +21,7 @@ export default class WidgetsCore extends Core {
 
     async onInitialize() {
         try {
-            await WidgetsCore.apiInstance()
+            //await WidgetsCore.apiInstance()
 
             const currentStore = this.getInstalled()
 

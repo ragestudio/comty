@@ -1,24 +1,21 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { DateTime } from "luxon"
 import humanSize from "@tsmx/human-readable"
-
+import PostLink from "components/PostLink"
 import { Icons } from "components/Icons"
-import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 
+import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 import PostModel from "models/post"
 
 import "./index.less"
 
 const DEFAULT_POST_POLICY = {
     maxMessageLength: 512,
-    acceptedMimeTypes: ["image/gif", "image/png", "image/jpeg", "image/bmp"],
-    maximumFileSize: 10 * 1024 * 1024,
+    acceptedMimeTypes: ["image/gif", "image/png", "image/jpeg", "image/bmp", "video/*"],
     maximunFilesPerRequest: 10
 }
 
-// TODO: Fix close window when post created
 
 export default class PostCreator extends React.Component {
     state = {
@@ -92,15 +89,30 @@ export default class PostCreator extends React.Component {
         const payload = {
             message: postMessage,
             attachments: postAttachments,
-            timestamp: DateTime.local().toISO(),
+            //timestamp: DateTime.local().toISO(),
         }
 
-        const response = await PostModel.create(payload).catch(error => {
-            console.error(error)
-            antd.message.error(error)
+        let response = null
 
-            return false
-        })
+        if (this.props.reply_to) {
+            payload.reply_to = this.props.reply_to
+        }
+
+        if (this.props.edit_post) {
+            response = await PostModel.update(this.props.edit_post, payload).catch(error => {
+                console.error(error)
+                antd.message.error(error)
+
+                return false
+            })
+        } else {
+            response = await PostModel.create(payload).catch(error => {
+                console.error(error)
+                antd.message.error(error)
+
+                return false
+            })
+        }
 
         this.setState({
             loading: false
@@ -115,6 +127,10 @@ export default class PostCreator extends React.Component {
 
             if (typeof this.props.close === "function") {
                 this.props.close()
+            }
+
+            if (this.props.reply_to) {
+                app.navigation.goToPost(this.props.reply_to)
             }
         }
     }
@@ -181,8 +197,6 @@ export default class PostCreator extends React.Component {
                 fileList: change.fileList
             })
         }
-
-        console.log(change)
 
         switch (change.file.status) {
             case "uploading": {
@@ -424,9 +438,37 @@ export default class PostCreator extends React.Component {
         dialog.click()
     }
 
-    componentDidMount() {
+    componentDidMount = async () => {
+        if (this.props.edit_post) {
+            await this.setState({
+                loading: true,
+                postId: this.props.edit_post,
+            })
+
+            const post = await PostModel.getPost({ post_id: this.props.edit_post })
+
+            await this.setState({
+                loading: false,
+                postMessage: post.message,
+                postAttachments: post.attachments.map((attachment) => {
+                    return {
+                        ...attachment,
+                        uid: attachment.id,
+                    }
+                }),
+                fileList: post.attachments.map((attachment) => {
+                    return {
+                        ...attachment,
+                        uid: attachment.id,
+                        id: attachment.id,
+                        thumbUrl: attachment.url,
+                        status: "done",
+                    }
+                }),
+            })
+        }
         // fetch the posting policy
-        this.fetchUploadPolicy()
+        //this.fetchUploadPolicy()
 
         // add a listener to the window
         document.addEventListener("paste", this.handlePaste)
@@ -448,6 +490,10 @@ export default class PostCreator extends React.Component {
     render() {
         const { postMessage, fileList, loading, uploaderVisible, postingPolicy } = this.state
 
+        const editMode = !!this.props.edit_post
+
+        const showHeader = !!this.props.edit_post || this.props.reply_to
+
         return <div
             className={"postCreator"}
             ref={this.creatorRef}
@@ -455,6 +501,37 @@ export default class PostCreator extends React.Component {
             onDragLeave={this.handleDrag}
             style={this.props.style}
         >
+            {
+                showHeader && <div className="postCreator-header">
+                    {
+                        this.props.edit_post && <div className="postCreator-header-indicator">
+                            <p>
+                                <Icons.MdEdit />
+                                Editing post
+                            </p>
+                        </div>
+                    }
+
+                    {
+                        this.props.reply_to && <div className="postCreator-header-indicator">
+                            <p>
+                                <Icons.MdReply />
+                                Replaying to
+                            </p>
+
+                            <PostLink
+                                post_id={this.props.reply_to}
+                                onClick={() => {
+                                    this.props.close()
+                                    app.navigation.goToPost(this.props.reply_to)
+                                }}
+
+                            />
+                        </div>
+                    }
+                </div>
+            }
+
             <div className="textInput">
                 <div className="avatar">
                     <img src={app.userData?.avatar} />
@@ -475,7 +552,7 @@ export default class PostCreator extends React.Component {
                         type="primary"
                         disabled={loading || !this.canSubmit()}
                         onClick={this.submit}
-                        icon={loading ? <Icons.LoadingOutlined spin /> : <Icons.Send />}
+                        icon={loading ? <Icons.LoadingOutlined spin /> : (editMode ? <Icons.MdEdit /> : <Icons.Send />)}
                     />
                 </div>
             </div>

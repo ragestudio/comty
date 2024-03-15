@@ -59,7 +59,7 @@ html {
     position: relative;
 
     // WARN: Only use if is a performance issue (If is using virtualized list)
-    will-change: transform;
+    //will-change: transform;
 
     overflow: hidden;
     overflow-y: overlay;
@@ -77,9 +77,13 @@ html {
     //margin: auto;
     z-index: 150;
 
+    background-color: var(--background-color-accent);
+
     .post_card {
         border-radius: 0;
         border-bottom: 2px solid var(--border-color);
+
+        background-color: transparent;
 
         &:first-child {
             border-radius: 8px;
@@ -95,32 +99,10 @@ html {
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
         }
-    }
 
-    .playlistTimelineEntry {
-        border-radius: 0;
-        border-bottom: 2px solid var(--border-color);
-
-        &:last-child {
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
+        &:last-of-type {
+            border-bottom: none;
         }
-    }
-
-    .postCard {
-        width: 100%;
-        min-width: 0;
-        // FIXME: This is a walkaround for a bug when a post contains multiple attachments cause a overflow
-        max-width: unset;
-    }
-
-    .playlistTimelineEntry {
-        width: 100%;
-        min-width: 0;
-        max-width: unset;
     }
 }
 

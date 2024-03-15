@@ -299,23 +299,100 @@
     }
 }
 
-.ant-notification-notice {
-    background-color: var(--background-color-primary) !important;
+.ant-notification {
+    display: flex;
+    flex-direction: column;
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span {
-        color: var(--text-color) !important;
+    gap: 20px;
+
+    .ant-notification-notice-wrapper {
+        margin: 0;
+        overflow: hidden;
+
+        border-radius: 12px;
+        outline: 1px solid var(--border-color) !important;
+        background-color: var(--background-color-primary) !important;
+
     }
 
-    .ant-notification-notice-message,
-    .ant-notification-notice-description {
-        color: var(--text-color) !important;
+    .ant-notification-notice {
+        display: flex;
+        flex-direction: column;
+
+        justify-content: center;
+
+        background-color: transparent !important;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        span {
+            color: var(--text-color) !important;
+        }
+
+        .ant-notification-notice-close-x {
+            svg {
+                margin: 0 !important;
+            }
+        }
+
+        .ant-notification-notice-with-icon {
+            display: flex;
+            flex-direction: column;
+
+            gap: 10px;
+
+            .ant-notification-notice-message {
+                margin: 0 !important;
+            }
+        }
+
+        .ant-notification-notice-message,
+        .ant-notification-notice-description {
+            color: var(--text-color) !important;
+        }
+
+        .ant-notification-notice-description {
+            display: none;
+        }
+
+        .ant-notification-notice-description:not(:empty) {
+            display: flex;
+        }
+
+        .ant-notification-notice-with-icon {
+            .ant-notification-notice-message {
+                margin-inline-start: 46px !important;
+            }
+
+            .ant-notification-notice-description {
+                margin-inline-start: 46px !important;
+            }
+
+            .ant-notification-notice-icon {
+                &.ant-notification-notice-icon-success {
+                    color: #52c41a !important;
+                }
+
+                max-width: 40px;
+
+                svg {
+                    margin: 0 !important;
+                }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+
+                    border-radius: 8px;
+                }
+            }
+        }
     }
 }
 
@@ -333,6 +410,7 @@
         color: var(--text-color) !important;
     }
 }
+
 
 .ant-message-error {
     svg {
@@ -516,30 +594,6 @@
 
 .drawer {
     z-index: 1000;
-}
-
-.ant-notification-notice {
-    .ant-notification-notice-with-icon {
-        .ant-notification-notice-message {
-            margin-inline-start: 46px !important;
-        }
-
-        .ant-notification-notice-description {
-            margin-inline-start: 46px !important;
-        }
-
-        .ant-notification-notice-icon {
-            max-width: 40px;
-
-            img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-
-                border-radius: 8px;
-            }
-        }
-    }
 }
 
 .adm-action-sheet {

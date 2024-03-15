@@ -2,8 +2,8 @@ import Core from "evite/src/core"
 
 import createClient from "comty.js"
 
-import measurePing from "comty.js/handlers/measurePing"
-import request from "comty.js/handlers/request"
+import request from "comty.js/request"
+import measurePing from "comty.js/helpers/measurePing"
 import useRequest from "comty.js/hooks/useRequest"
 import { reconnectWebsockets, disconnectWebsockets } from "comty.js"
 
@@ -13,11 +13,11 @@ export default class APICore extends Core {
     static bgColor = "coral"
     static textColor = "black"
 
-    instance = null
+    client = null
 
     public = {
-        instance: function () {
-            return this.instance
+        client: function () {
+            return this.client
         }.bind(this),
         customRequest: request,
         listenEvent: this.listenEvent.bind(this),
@@ -28,82 +28,45 @@ export default class APICore extends Core {
         disconnectWebsockets: disconnectWebsockets,
     }
 
-    listenEvent(key, handler, instance) {
-        if (!this.instance.wsInstances[instance ?? "default"]) {
+    listenEvent(key, handler, instance = "default") {
+        if (!this.client.sockets[instance]) {
             console.error(`[API] Websocket instance ${instance} not found`)
 
             return false
         }
 
-        return this.instance.wsInstances[instance ?? "default"].on(key, handler)
+        return this.client.sockets[instance].on(key, handler)
     }
 
-    unlistenEvent(key, handler, instance) {
-        if (!this.instance.wsInstances[instance ?? "default"]) {
+    unlistenEvent(key, handler, instance = "default") {
+        if (!this.client.sockets[instance]) {
             console.error(`[API] Websocket instance ${instance} not found`)
 
             return false
         }
 
-        return this.instance.wsInstances[instance ?? "default"].off(key, handler)
-    }
-
-    pendingPingsFromInstance = {}
-
-    createPingIntervals() {
-        // Object.keys(this.instance.wsInstances).forEach((instance) => {
-        //     this.console.debug(`[API] Creating ping interval for ${instance}`)
-
-        //     if (this.instance.wsInstances[instance].pingInterval) {
-        //         clearInterval(this.instance.wsInstances[instance].pingInterval)
-        //     }
-
-        //     this.instance.wsInstances[instance].pingInterval = setInterval(() => {
-        //         if (this.instance.wsInstances[instance].pendingPingTry && this.instance.wsInstances[instance].pendingPingTry > 3) {
-        //             this.console.debug(`[API] Ping timeout for ${instance}`)
-
-        //             return clearInterval(this.instance.wsInstances[instance].pingInterval)
-        //         }
-
-        //         const timeStart = Date.now()
-
-        //         //this.console.debug(`[API] Ping ${instance}`, this.instance.wsInstances[instance].pendingPingTry)
-
-        //         this.instance.wsInstances[instance].emit("ping", () => {
-        //             this.instance.wsInstances[instance].latency = Date.now() - timeStart
-
-        //             this.instance.wsInstances[instance].pendingPingTry = 0
-        //         })
-
-        //         this.instance.wsInstances[instance].pendingPingTry = this.instance.wsInstances[instance].pendingPingTry ? this.instance.wsInstances[instance].pendingPingTry + 1 : 1
-        //     }, 5000)
-
-        //     // clear interval on close
-        //     this.instance.wsInstances[instance].on("close", () => {
-        //         clearInterval(this.instance.wsInstances[instance].pingInterval)
-        //     })
-        // })
+        return this.client.sockets[instance].off(key, handler)
     }
 
     async onInitialize() {
-        this.instance = await createClient({
+        this.client = await createClient({
             enableWs: true,
         })
 
-        this.instance.eventBus.on("auth:login_success", () => {
+        this.client.eventBus.on("auth:login_success", () => {
             app.eventBus.emit("auth:login_success")
         })
 
-        this.instance.eventBus.on("auth:logout_success", () => {
+        this.client.eventBus.on("auth:logout_success", () => {
             app.eventBus.emit("auth:logout_success")
         })
 
-        this.instance.eventBus.on("session.invalid", (error) => {
+        this.client.eventBus.on("session.invalid", (error) => {
             app.eventBus.emit("session.invalid", error)
         })
 
         // make a basic request to check if the API is available
-        await this.instance.instances["default"]({
+        await this.client.baseRequest({
             method: "head",
             url: "/",
         }).catch((error) => {
@@ -115,10 +78,6 @@ export default class APICore extends Core {
             `)
         })
 
-        this.console.debug("[API] Attached to", this.instance)
-
-        //this.createPingIntervals()
-
-        return this.instance
+        return this.client
     }
 }

@@ -58,19 +58,17 @@ class Modal extends React.Component {
     }
 
     handleClickOutside = (e) => {
-        if (this.contentRef.current && !this.contentRef.current.contains(e.target)) {
-            if (this.props.confirmOnOutsideClick) {
-                return AntdModal.confirm({
-                    title: this.props.confirmOnClickTitle ?? "Are you sure?",
-                    content: this.props.confirmOnClickContent ?? "Are you sure you want to close this window?",
-                    onOk: () => {
-                        this.close()
-                    }
-                })
-            }
-
-            return this.close()
+        if (this.props.confirmOnOutsideClick) {
+            return AntdModal.confirm({
+                title: this.props.confirmOnClickTitle ?? "Are you sure?",
+                content: this.props.confirmOnClickContent ?? "Are you sure you want to close this window?",
+                onOk: () => {
+                    this.close()
+                }
+            })
         }
+
+        return this.close()
     }
 
     render() {
@@ -82,14 +80,15 @@ class Modal extends React.Component {
                     ["framed"]: this.props.framed,
                 }
             )}
-            onTouchEnd={this.handleClickOutside}
-            onMouseDown={this.handleClickOutside}
         >
+            <div
+                id="mask_trigger"
+                onTouchEnd={this.handleClickOutside}
+                onMouseDown={this.handleClickOutside}
+            />
             <div
                 className="app_modal_content"
                 ref={this.contentRef}
-                onTouchEnd={this.handleClickOutside}
-                onMouseDown={this.handleClickOutside}
                 style={this.props.frameContentStyle}
             >
                 {

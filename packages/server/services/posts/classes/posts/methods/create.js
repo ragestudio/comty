@@ -2,6 +2,7 @@ import requiredFields from "@shared-utils/requiredFields"
 import { DateTime } from "luxon"
 
 import { Post } from "@db_models"
+import fullfill from "./fullfill"
 
 export default async (payload = {}) => {
     await requiredFields(["user_id"], payload)
@@ -32,9 +33,13 @@ export default async (payload = {}) => {
 
     post = post.toObject()
 
-    // TODO: create background jobs (nsfw dectection)
+    const result = await fullfill({
+        posts: post,
+        for_user_id: user_id
+    })
 
-    // TODO: Push event to Websocket
+    // TODO: create background jobs (nsfw dectection)
+    global.rtengine.io.of("/").emit(`post.new`, result[0])
 
     return post
 }

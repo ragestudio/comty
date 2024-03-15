@@ -17,13 +17,15 @@ export default class API extends Server {
 
     contexts = {
         db: new DbManager(),
-        redis: RedisClient()
+        redis: RedisClient(),
     }
 
     async onInitialize() {
         await this.contexts.db.initialize()
         await this.contexts.redis.initialize()
     }
+
+    handleWsAuth = require("@shared-lib/handleWsAuth").default
 }
 
 Boot(API)

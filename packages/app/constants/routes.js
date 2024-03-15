@@ -82,6 +82,12 @@ export default [
         useLayout: "minimal",
         public: true
     },
+    {
+        path: "/marketplace/*",
+        useLayout: "default",
+        centeredContent: true,
+        extendedContent: true,
+    },
     // THIS MUST BE THE LAST ROUTE
     {
         path: "/",

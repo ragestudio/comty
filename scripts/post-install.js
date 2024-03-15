@@ -66,10 +66,13 @@ async function linkSharedResources(pkgJSON, packagePath) {
 async function linkInternalSubmodules(packages) {
     const appPath = path.resolve(rootPath, pkgjson._web_app_path)
 
+    const comtyjsPath = path.resolve(rootPath, "comty.js")
     const evitePath = path.resolve(rootPath, "evite")
     const linebridePath = path.resolve(rootPath, "linebridge")
 
+    //* EVITE LINKING
     console.log(`Linking Evite to app...`)
+
     await child_process.execSync("yarn link", {
         cwd: evitePath,
         stdio: "inherit",
@@ -80,6 +83,20 @@ async function linkInternalSubmodules(packages) {
         stdio: "inherit",
     })
 
+    //* COMTY.JS LINKING
+    console.log(`Linking comty.js to app...`)
+
+    await child_process.execSync(`yarn link`, {
+        cwd: comtyjsPath,
+        stdio: "inherit",
+    })
+
+    await child_process.execSync(`yarn link "comty.js"`, {
+        cwd: appPath,
+        stdio: "inherit",
+    })
+
+    //* LINEBRIDE LINKING
     console.log(`Linking Linebride to servers...`)
 
     await child_process.execSync(`yarn link`, {
@@ -104,7 +121,7 @@ async function linkInternalSubmodules(packages) {
         console.log(`Linking Linebride to package [${packageName}]...`)
     }
 
-    console.log(`✅ Evite dependencies installed`)
+    console.log(`✅ All submodules linked!`)
 
     return true
 }

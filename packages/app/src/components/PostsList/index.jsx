@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { Icons } from "components/Icons"
+import { AnimatePresence } from "framer-motion"
 
 import PostCard from "components/PostCard"
 import PlaylistTimelineEntry from "components/Music/PlaylistTimelineEntry"
@@ -41,21 +42,21 @@ const Entry = React.memo((props) => {
     return React.createElement(typeToComponent[data.type ?? "post"] ?? PostCard, {
         key: data._id,
         data: data,
-        //disableAttachments: true,
+        disableReplyTag: props.disableReplyTag,
         events: {
             onClickLike: props.onLikePost,
             onClickSave: props.onSavePost,
             onClickDelete: props.onDeletePost,
             onClickEdit: props.onEditPost,
+            onClickReply: props.onReplyPost,
+            onDoubleClick: props.onDoubleClick,
         },
     })
 })
 
-const PostList = (props) => {
-    const parentRef = React.useRef()
-
+const PostList = React.forwardRef((props, ref) => {
     return <LoadMore
-        ref={parentRef}
+        ref={ref}
         className="post-list"
         loadingComponent={LoadingComponent}
         noResultComponent={NoResultComponent}
@@ -77,40 +78,20 @@ const PostList = (props) => {
             </div>
         }
 
-        {
-            props.list.map((data) => {
-                return <Entry
-                    key={data._id}
-                    data={data}
-                    onLikePost={props.onLikePost}
-                    onSavePost={props.onSavePost}
-                    onDeletePost={props.onDeletePost}
-                    onEditPost={props.onEditPost}
-                />
-            })
-        }
-
-        {/* <For
-            each={props.list}
-            style={{
-                height: `100%`,
-                width: `100%`,
-            }}
-            as="div"
-        >
+        <AnimatePresence>
             {
-                (data) => <Entry
-                    key={data._id}
-                    data={data}
-                    onLikePost={props.onLikePost}
-                    onSavePost={props.onSavePost}
-                    onDeletePost={props.onDeletePost}
-                    onEditPost={props.onEditPost}
-                />
+                props.list.map((data) => {
+                    return <Entry
+                        key={data._id}
+                        data={data}
+                        {...props}
+                    />
+                })
             }
-        </For> */}
+        </AnimatePresence>
     </LoadMore>
-}
+
+})
 
 export class PostsListsComponent extends React.Component {
     state = {
@@ -238,12 +219,15 @@ export class PostsListsComponent extends React.Component {
         addPost: this.addPost,
         removePost: this.removePost,
         addRandomPost: () => {
+            const randomId = Math.random().toString(36).substring(7)
+
             this.addPost({
-                _id: Math.random().toString(36).substring(7),
-                message: `Random post ${Math.random().toString(36).substring(7)}`,
+                _id: randomId,
+                message: `Random post ${randomId}`,
                 user: {
-                    _id: Math.random().toString(36).substring(7),
+                    _id: randomId,
                     username: "random user",
+                    avatar: `https://api.dicebear.com/7.x/thumbs/svg?seed=${randomId}`,
                 }
             })
         },
@@ -336,7 +320,7 @@ export class PostsListsComponent extends React.Component {
                         console.error(`The event "${event}" is not defined in the timelineWsEvents object`)
                     }
 
-                    app.cores.api.listenEvent(event, this.timelineWsEvents[event])
+                    app.cores.api.listenEvent(event, this.timelineWsEvents[event], "posts")
                 })
             }
         }
@@ -358,7 +342,7 @@ export class PostsListsComponent extends React.Component {
                         console.error(`The event "${event}" is not defined in the timelineWsEvents object`)
                     }
 
-                    app.cores.api.unlistenEvent(event, this.timelineWsEvents[event])
+                    app.cores.api.unlistenEvent(event, this.timelineWsEvents[event], "posts")
                 })
             }
         }
@@ -370,7 +354,7 @@ export class PostsListsComponent extends React.Component {
         window._hacks = null
     }
 
-    componentDidUpdate = async (prevProps) => {
+    componentDidUpdate = async (prevProps, prevState) => {
         if (prevProps.list !== this.props.list) {
             this.setState({
                 list: this.props.list,
@@ -396,6 +380,22 @@ export class PostsListsComponent extends React.Component {
         })
 
         return result
+    }
+
+    onEditPost = (data) => {
+        app.controls.openPostCreator({
+            edit_post: data._id,
+        })
+    }
+
+    onReplyPost = (data) => {
+        app.controls.openPostCreator({
+            reply_to: data._id,
+        })
+    }
+
+    onDoubleClickPost = (data) => {
+        app.navigation.goToPost(data._id)
     }
 
     onDeletePost = async (data) => {
@@ -444,13 +444,16 @@ export class PostsListsComponent extends React.Component {
         }
 
         const PostListProps = {
-            listRef: this.listRef,
             list: this.state.list,
+
+            disableReplyTag: this.props.disableReplyTag,
 
             onLikePost: this.onLikePost,
             onSavePost: this.onSavePost,
             onDeletePost: this.onDeletePost,
             onEditPost: this.onEditPost,
+            onReplyPost: this.onReplyPost,
+            onDoubleClick: this.onDoubleClickPost,
 
             onLoadMore: this.onLoadMore,
             hasMore: this.state.hasMore,
@@ -463,12 +466,14 @@ export class PostsListsComponent extends React.Component {
 
         if (app.isMobile) {
             return <PostList
+                ref={this.listRef}
                 {...PostListProps}
             />
         }
 
         return <div className="post-list_wrapper">
             <PostList
+                ref={this.listRef}
                 {...PostListProps}
             />
         </div>

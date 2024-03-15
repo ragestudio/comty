@@ -4,7 +4,7 @@ export default async (payload = {}) => {
     const {
         for_user_id,
         user_id,
-        skip,
+        trim,
         limit,
     } = payload
 
@@ -14,8 +14,8 @@ export default async (payload = {}) => {
 
     return await GetData({
         for_user_id: for_user_id,
-        skip,
-        limit,
+        trim: trim,
+        limit: limit,
         query: {
             user_id: {
                 $in: user_id

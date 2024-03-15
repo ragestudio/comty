@@ -50,21 +50,14 @@ export default React.forwardRef((props, ref) => {
     >
         {children}
 
-        <div style={{ clear: "both" }} />
+        <lb style={{ clear: "both" }} />
 
-        <div
+        <lb
             id="bottom"
             className="bottom"
             style={{ display: hasMore ? "block" : "none" }}
         >
             {loadingComponent && React.createElement(loadingComponent)}
-        </div>
-
-        {/* <div
-            className="no-result"
-            style={{ display: hasMore ? "none" : "block" }}
-        >
-            {noResultComponent ? React.createElement(noResultComponent) : "No more result"}
-        </div> */}
+        </lb>
     </div>
 })
