@@ -4,6 +4,8 @@ import classnames from "classnames"
 import humanSize from "@tsmx/human-readable"
 import PostLink from "components/PostLink"
 import { Icons } from "components/Icons"
+import { DateTime } from "luxon"
+import lodash from "lodash"
 
 import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
 import PostModel from "models/post"
@@ -15,7 +17,6 @@ const DEFAULT_POST_POLICY = {
     acceptedMimeTypes: ["image/gif", "image/png", "image/jpeg", "image/bmp", "video/*"],
     maximunFilesPerRequest: 10
 }
-
 
 export default class PostCreator extends React.Component {
     state = {
@@ -76,10 +77,18 @@ export default class PostCreator extends React.Component {
         return true
     }
 
-    submit = async () => {
-        if (!this.canSubmit()) return
+    debounceSubmit = lodash.debounce(() => this.submit(), 50)
 
-        this.setState({
+    submit = async () => {
+        if (this.state.loading) {
+            return false
+        }
+
+        if (!this.canSubmit()) {
+            return false
+        }
+
+        await this.setState({
             loading: true,
             uploaderVisible: false
         })
@@ -89,7 +98,7 @@ export default class PostCreator extends React.Component {
         const payload = {
             message: postMessage,
             attachments: postAttachments,
-            //timestamp: DateTime.local().toISO(),
+            timestamp: DateTime.local().toISO(),
         }
 
         let response = null
@@ -255,13 +264,17 @@ export default class PostCreator extends React.Component {
         })
     }
 
-    handleKeyDown = (e) => {
+    handleKeyDown = async (e) => {
         // detect if the user pressed `enter` key and submit the form, but only if the `shift` key is not pressed
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault()
             e.stopPropagation()
 
-            this.submit()
+            if (this.state.loading) {
+                return false
+            }
+
+            return await this.debounceSubmit()
         }
     }
 
@@ -551,7 +564,7 @@ export default class PostCreator extends React.Component {
                     <antd.Button
                         type="primary"
                         disabled={loading || !this.canSubmit()}
-                        onClick={this.submit}
+                        onClick={this.debounceSubmit}
                         icon={loading ? <Icons.LoadingOutlined spin /> : (editMode ? <Icons.MdEdit /> : <Icons.Send />)}
                     />
                 </div>

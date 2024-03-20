@@ -1,6 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 
+import { Icons } from "components/Icons"
+
 import PostCard from "components/PostCard"
 import PostsList from "components/PostsList"
 
@@ -8,7 +10,7 @@ import PostService from "models/post"
 
 import "./index.less"
 
-export default (props) => {
+const PostPage = (props) => {
     const post_id = props.params.post_id
 
     const [loading, result, error, repeat] = app.cores.api.useRequest(PostService.getPost, {
@@ -29,22 +31,31 @@ export default (props) => {
 
     return <div className="post-page">
         <div className="post-page-original">
-            <h1>Post</h1>
+            <h1>
+                <Icons.MdTextSnippet />
+                Post
+            </h1>
 
             <PostCard
                 data={result}
+                disableHasReplies
             />
         </div>
 
-        <div className="post-page-replies">
-            <h1>Replies</h1>
-            <PostsList
-                disableReplyTag
-                loadFromModel={PostService.replies}
-                loadFromModelProps={{
-                    post_id,
-                }}
-            />
-        </div>
+        {
+            !!result.hasReplies && <div className="post-page-replies">
+                <h1><Icons.Repeat />Replies</h1>
+
+                <PostsList
+                    disableReplyTag
+                    loadFromModel={PostService.replies}
+                    loadFromModelProps={{
+                        post_id,
+                    }}
+                />
+            </div>
+        }
     </div>
 }
+
+export default PostPage

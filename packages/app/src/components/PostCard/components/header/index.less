@@ -6,18 +6,25 @@
 
     .post-header-replied_to {
         display: flex;
-        flex-direction: row;
-
-        align-items: center;
+        flex-direction: column;
 
         gap: 7px;
 
-        svg {
-            color: var(--text-color);
-            margin: 0 !important;
-        }
+        .post-header-replied_to-label {
+            display: flex;
+            flex-direction: row;
 
-        line-height: 1.5rem;
+            gap: 7px;
+
+            align-items: center;
+
+            svg {
+                color: var(--text-color);
+                margin: 0 !important;
+            }
+
+            line-height: 1.5rem;
+        }
     }
 
     .post-header-user {

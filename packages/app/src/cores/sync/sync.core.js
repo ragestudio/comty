@@ -44,7 +44,7 @@ class MusicSyncSubCore {
         "invite:received": (data) => {
             this.console.log("invite:received", data)
 
-            app.notification.new({
+            app.cores.notifications.new({
                 title: "Sync",
                 description: `${data.invitedBy.username} invited you to join a sync room`,
                 icon: React.createElement(Image, {
@@ -91,7 +91,7 @@ class MusicSyncSubCore {
             this.dettachCard()
             this.currentRoomData = null
 
-            app.notification.new({
+            app.cores.notifications.new({
                 title: "Sync",
                 description: "Disconnected from sync server"
             }, {
@@ -177,7 +177,7 @@ class MusicSyncSubCore {
 
             app.cores.player.toggleSyncMode(false, false)
 
-            app.notification.new({
+            app.cores.notifications.new({
                 title: "Kicked",
                 description: "You have been kicked from the sync room"
             }, {

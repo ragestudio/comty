@@ -107,7 +107,7 @@ export default class WidgetsCore extends Core {
 
         store.set(WidgetsCore.storeKey, currentStore)
 
-        app.notification.new({
+        app.cores.notifications.new({
             title: params.update ? "Widget updated" : "Widget installed",
             description: `Widget [${manifest.name}] has been ${params.update ? "updated" : "installed"}. ${params.update ? `Using current version ${manifest.version}` : ""}`,
         }, {
@@ -141,7 +141,7 @@ export default class WidgetsCore extends Core {
 
         store.set(WidgetsCore.storeKey, newStore)
 
-        app.notification.new({
+        app.cores.notifications.new({
             title: "Widget uninstalled",
             description: `Widget [${widget_id}] has been uninstalled.`,
         }, {

@@ -10,7 +10,6 @@ import PostActions from "./components/actions"
 import PostAttachments from "./components/attachments"
 
 import "./index.less"
-import { Divider } from "antd"
 
 const messageRegexs = [
     {
@@ -230,12 +229,13 @@ export default class PostCard extends React.PureComponent {
             />
 
             {
-                !this.props.disableHasReplies && this.state.hasReplies && <>
-                    <Divider />
-                    <h1>View replies</h1>
-                </>
+                !this.props.disableHasReplies && !!this.state.hasReplies && <div
+                    className="post-card-has_replies"
+                    onClick={() => app.navigation.goToPost(this.state.data._id)}
+                >
+                    <span>View {this.state.hasReplies} replies</span>
+                </div>
             }
-
         </motion.div>
     }
 }

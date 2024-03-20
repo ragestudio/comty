@@ -42,14 +42,23 @@ export function createAssembleChunksPromise({
     return () => new Promise(async (resolve, reject) => {
         let fileSize = 0
 
+        if (!fs.existsSync(chunksPath)) {
+            return reject(new OperationError(500,"No chunks found"))
+        }
+
         const chunks = await fs.promises.readdir(chunksPath)
 
         if (chunks.length === 0) {
-            throw new Error("No chunks found")
+            throw new OperationError(500, "No chunks found")
         }
 
         for await (const chunk of chunks) {
             const chunkPath = path.join(chunksPath, chunk)
+
+            if (!fs.existsSync(chunkPath)) {
+                return reject(new OperationError(500, "No chunk data found"))
+            }
+
             const data = await fs.promises.readFile(chunkPath)
 
             fileSize += data.length
@@ -85,13 +94,17 @@ export async function handleChunkFile(fileStream, { tmpDir, headers, maxFileSize
 
         // make sure chunk is in range
         if (chunkCount < 0 || chunkCount >= totalChunks) {
-            throw new Error("Chunk is out of range")
+            throw new OperationError(500, "Chunk is out of range")
         }
 
         // if is the first chunk check if dir exists before write things
         if (chunkCount === 0) {
-            if (!await fs.promises.stat(chunksPath).catch(() => false)) {
-                await fs.promises.mkdir(chunksPath, { recursive: true })
+            try {
+                if (!await fs.promises.stat(chunksPath).catch(() => false)) {
+                    await fs.promises.mkdir(chunksPath, { recursive: true })
+                }
+            } catch (error) {
+                return reject(new OperationError(500, error.message))
             }
         }
 

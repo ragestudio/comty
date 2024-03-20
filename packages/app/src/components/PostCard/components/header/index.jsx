@@ -1,27 +1,13 @@
 import React from "react"
 import { DateTime } from "luxon"
-import { Tag, Skeleton } from "antd"
+import { Tag } from "antd"
 
 import { Image } from "components"
 import { Icons } from "components/Icons"
-import PostLink from "components/PostLink"
 
-import PostService from "models/post"
+import PostReplieView from "components/PostReplieView"
 
 import "./index.less"
-
-const PostReplieView = (props) => {
-    const { data } = props
-
-    if (!data) {
-        return null
-    }
-
-    return <div>
-        @{data.user.username}
-        {data.message}
-    </div>
-}
 
 const PostCardHeader = (props) => {
     const [timeAgo, setTimeAgo] = React.useState(0)
@@ -60,11 +46,13 @@ const PostCardHeader = (props) => {
             !props.disableReplyTag && props.postData.reply_to && <div
                 className="post-header-replied_to"
             >
-                <Icons.Repeat />
+                <div className="post-header-replied_to-label">
+                    <Icons.Repeat />
 
-                <span>
-                    Replied to
-                </span>
+                    <span>
+                        Replied to
+                    </span>
+                </div>
 
                 <PostReplieView
                     data={props.postData.reply_to_data}
@@ -83,7 +71,7 @@ const PostCardHeader = (props) => {
             <div className="post-header-user-info">
                 <h1 onClick={goToProfile}>
                     {
-                        props.postData.user?.public_name ?? `${props.postData.user?.username}`
+                        props.postData.user?.public_name ?? `@${props.postData.user?.username}`
                     }
 
                     {

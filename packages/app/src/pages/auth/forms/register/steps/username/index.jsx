@@ -102,10 +102,12 @@ export const UsernameStepComponent = (props) => {
                 return false
             })
 
-            if (request) {
-                setUsernameAvailable(request.available)
+            console.log(request)
 
-                if (!request.available) {
+            if (request) {
+                setUsernameAvailable(!request.exists)
+
+                if (request.exists) {
                     props.updateValue(null)
                 } else {
                     props.updateValue(username)

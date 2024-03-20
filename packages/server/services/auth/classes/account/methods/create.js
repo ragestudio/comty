@@ -6,9 +6,9 @@ import Account from "@classes/account"
 export default async (payload) => {
     requiredFields(["username", "password", "email"], payload)
 
-    let { username, password, email, public_name, roles, avatar, acceptTos } = payload
+    let { username, password, email, public_name, roles, avatar, accept_tos } = payload
 
-    if (ToBoolean(acceptTos) !== true) {
+    if (ToBoolean(accept_tos) !== true) {
         throw new OperationError(400, "You must accept the terms of service in order to create an account.")
     }
 
@@ -44,7 +44,7 @@ export default async (payload) => {
         avatar: avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
         roles: roles,
         created_at: new Date().getTime(),
-        acceptTos: acceptTos,
+        accept_tos: accept_tos,
     })
 
     await user.save()

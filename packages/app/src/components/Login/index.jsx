@@ -141,6 +141,11 @@ export default class Login extends React.Component {
     }
 
     onUpdateInput = (input, value) => {
+        if (input === "username") {
+            value = value.toLowerCase()
+            value = value.trim()
+        }
+        
         // remove error from ref
         this.formRef.current.setFields([
             {

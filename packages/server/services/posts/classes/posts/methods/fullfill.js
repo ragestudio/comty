@@ -23,7 +23,7 @@ export default async (payload = {}) => {
         postsSavesIds = postsSaves.map((postSave) => postSave.post_id)
     }
 
-    let [usersData, likesData, repliesData] = await Promise.all([
+    let [usersData, likesData] = await Promise.all([
         User.find({
             _id: {
                 $in: posts.map((post) => post.user_id)
@@ -63,7 +63,17 @@ export default async (payload = {}) => {
 
         if (post.reply_to) {
             post.reply_to_data = await Post.findById(post.reply_to)
+
+            if (post.reply_to_data) {
+                post.reply_to_data = post.reply_to_data.toObject()
+
+                const replyUserData = await User.findById(post.reply_to_data.user_id)
+
+                post.reply_to_data.user = replyUserData.toObject()
+            }
         }
+
+        post.hasReplies = await Post.count({ reply_to: post._id })
 
         let likes = likesData[post._id.toString()] ?? []
 

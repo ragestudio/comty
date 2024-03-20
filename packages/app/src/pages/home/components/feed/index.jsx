@@ -21,6 +21,7 @@ const emptyListRender = () => {
 export class Feed extends React.Component {
     render() {
         return <PostsList
+            disableHasReplies
             ref={this.props.innerRef}
             emptyListRender={emptyListRender}
             loadFromModel={FeedModel.getTimelineFeed}

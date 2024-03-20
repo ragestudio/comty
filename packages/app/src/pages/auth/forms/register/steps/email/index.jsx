@@ -53,9 +53,9 @@ const EmailStepComponent = (props) => {
             })
 
             if (request) {
-                setEmailAvailable(request.available)
+                setEmailAvailable(!request.exist)
 
-                if (!request.available) {
+                if (request.exist) {
                     antd.message.error("Email is already in use")
                     props.updateValue(null)
                 } else {

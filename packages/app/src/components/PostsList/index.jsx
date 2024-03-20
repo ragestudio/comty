@@ -43,6 +43,7 @@ const Entry = React.memo((props) => {
         key: data._id,
         data: data,
         disableReplyTag: props.disableReplyTag,
+        disableHasReplies: props.disableHasReplies,
         events: {
             onClickLike: props.onLikePost,
             onClickSave: props.onSavePost,
@@ -447,6 +448,7 @@ export class PostsListsComponent extends React.Component {
             list: this.state.list,
 
             disableReplyTag: this.props.disableReplyTag,
+            disableHasReplies: this.props.disableHasReplies,
 
             onLikePost: this.onLikePost,
             onSavePost: this.onSavePost,

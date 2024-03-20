@@ -29,6 +29,13 @@ export default async (payload = {}) => {
         throw new OperationError(500, `An error has occurred: ${err.message}`)
     })
 
+    // delete replies
+    await Post.deleteMany({
+        reply_to: post_id,
+    }).catch((err) => {
+        throw new OperationError(500, `An error has occurred: ${err.message}`)
+    })
+
     global.rtengine.io.of("/").emit(`post.delete`, post_id)
     global.rtengine.io.of("/").emit(`post.delete.${post_id}`, post_id)
 

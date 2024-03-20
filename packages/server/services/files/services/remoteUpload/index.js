@@ -35,6 +35,10 @@ export async function b2Upload({
         bucketId: process.env.B2_BUCKET_ID,
     })
 
+    if (!fs.existsSync(source)) {
+        throw new OperationError(500, "File not found")
+    }
+
     const data = await fs.promises.readFile(source)
 
     await global.b2Storage.uploadFile({

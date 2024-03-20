@@ -16,5 +16,6 @@ export default {
         links: { type: Array, default: [] },
         location: { type: String, default: null },
         birthday: { type: Date, default: null, select: false },
+        accept_tos: { type: Boolean, default: false },
     }
 }

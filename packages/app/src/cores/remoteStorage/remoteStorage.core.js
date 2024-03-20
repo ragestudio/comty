@@ -28,7 +28,7 @@ export default class RemoteStorage extends Core {
             service = "standard",
         } = {},
     ) {
-        return new Promise((_resolve, _reject) => {
+        return await new Promise((_resolve, _reject) => {
             const fn = async () => new Promise((resolve, reject) => {
                 const uploader = new ChunkedUpload({
                     endpoint: `${app.cores.api.client().mainOrigin}/upload/chunk`,
@@ -41,7 +41,7 @@ export default class RemoteStorage extends Core {
                 uploader.on("error", ({ message }) => {
                     this.console.error("[Uploader] Error", message)
 
-                    app.notification.new({
+                    app.cores.notifications.new({
                         title: "Could not upload file",
                         description: message
                     }, {
@@ -65,7 +65,7 @@ export default class RemoteStorage extends Core {
                 uploader.on("finish", (data) => {
                     this.console.debug("[Uploader] Finish", data)
 
-                    app.notification.new({
+                    app.cores.notifications.new({
                         title: "File uploaded",
                     }, {
                         type: "success"

@@ -9,6 +9,7 @@ import "./index.less"
 export default class ExplorePosts extends React.Component {
     render() {
         return <PostsList
+            disableHasReplies
             loadFromModel={Feed.getGlobalTimelineFeed}
             watchTimeline={[
                 "post.new",

@@ -37,14 +37,18 @@ export default {
                     cachePath: tmpPath,
                 })
 
-                fs.promises.rm(tmpPath, { recursive: true, force: true })
+                fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
+                    return false
+                })
 
                 return result
             } catch (error) {
-                fs.promises.rm(tmpPath, { recursive: true, force: true })
+                fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
+                    return false
+                })
 
                 throw new OperationError(error.code ?? 500, error.message ?? "Failed to upload file")
-            }
+            } 
         }
 
         return {
