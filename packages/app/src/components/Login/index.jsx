@@ -30,7 +30,7 @@ const phasesToSteps = {
     1: "password",
 }
 
-export default class Login extends React.Component {
+class Login extends React.Component {
     static pageStatement = {
         bottomBarAllowed: false
     }
@@ -41,6 +41,7 @@ export default class Login extends React.Component {
         error: null,
         phase: 0,
         mfa_required: null,
+        forbidden: false,
     }
 
     formRef = React.createRef()
@@ -60,14 +61,10 @@ export default class Login extends React.Component {
         this.toggleLoading(true)
 
         await AuthModel.login(payload, this.onDone).catch((error) => {
-            if (error.response.data){
+            if (error.response.data) {
                 if (error.response.data.violation) {
-                    this.props.close({
-                        unlock: true
-                    })
-
-                    return app.history.push("/violation", {
-                        violation: error.response.data.violation
+                    return this.setState({
+                        forbidden: error.response.data.violation
                     })
                 }
             }
@@ -157,7 +154,7 @@ export default class Login extends React.Component {
             value = value.toLowerCase()
             value = value.trim()
         }
-        
+
         // remove error from ref
         this.formRef.current.setFields([
             {
@@ -235,6 +232,22 @@ export default class Login extends React.Component {
     }
 
     render() {
+        if (this.state.forbidden) {
+            return <div className="login_wrapper">
+                <div className="content">
+                    <h1>Access denied</h1>
+                    <h3>Your account has been disabled due a violation to our terms of service</h3>
+
+                    <p>Here is a detailed description of the violation</p>
+
+                    <div className="field-error">
+                        {this.state.forbidden.reason}
+                    </div>
+
+                    <p>If you think this is an error, or you want to apeel this decision please contact our support</p>
+                </div>
+            </div>
+        }
         return <div className="login_wrapper">
             <div className="content">
                 <h1>
@@ -346,3 +359,9 @@ export default class Login extends React.Component {
         </div>
     }
 }
+
+const ForwardedLogin = (props) => {
+    return <Login {...props} />
+}
+
+export default ForwardedLogin
