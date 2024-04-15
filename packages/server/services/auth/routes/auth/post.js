@@ -1,5 +1,5 @@
 import AuthToken from "@shared-classes/AuthToken"
-import { UserConfig, MFASession } from "@db_models"
+import { UserConfig, MFASession, TosViolations } from "@db_models"
 import requiredFields from "@shared-utils/requiredFields"
 import obscureEmail from "@shared-utils/obscureEmail"
 
@@ -12,6 +12,15 @@ export default async (req, res) => {
         username: req.body.username,
         password: req.body.password,
     })
+
+    const violation = await TosViolations.findOne({ user_id: user._id.toString() })
+
+    if (violation) {
+        return res.status(403).json({
+            error: "Terms of service violated",
+            violation: violation.toObject()
+        })
+    }
 
     const userConfig = await UserConfig.findOne({ user_id: user._id.toString() }).catch(() => {
         return {}

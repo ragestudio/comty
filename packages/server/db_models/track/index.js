@@ -9,8 +9,8 @@ export default {
         album: {
             type: String,
         },
-        artist: {
-            type: String,
+        artists: {
+            type: Array,
         },
         source: {
             type: String,
@@ -28,10 +28,6 @@ export default {
             default: true,
         },
         cover: {
-            type: String,
-            default: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
-        },
-        thumbnail: {
             type: String,
             default: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
         },

@@ -139,11 +139,7 @@ const PlaylistItem = (props) => {
 }
 
 const OwnPlaylists = (props) => {
-    const [L_Playlists, R_Playlists, E_Playlists, M_Playlists] = app.cores.api.useRequest(MusicModel.getFavoritePlaylists, {
-        services: {
-            tidal: app.cores.sync.getActiveLinkedServices().tidal
-        }
-    })
+    const [L_Playlists, R_Playlists, E_Playlists, M_Playlists] = app.cores.api.useRequest(MusicModel.getFavoritePlaylists)
 
     if (E_Playlists) {
         console.error(E_Playlists)
@@ -183,8 +179,36 @@ const OwnPlaylists = (props) => {
     </div>
 }
 
-export default () => {
+const Library = (props) => {
     return <div className="music-library">
+        <div className="music-library_header">
+            <h1>Library</h1>
+
+            <antd.Segmented
+                options={[
+                    {
+                        value: "tracks",
+                        label: "Tracks",
+                        icon: <Icons.MdMusicNote />
+                    },
+                    {
+                        value: "playlist",
+                        label: "Playlists",
+                        icon: <Icons.MdPlaylistPlay />
+                    },
+                ]}
+            />
+        </div>
+        <PlaylistItem
+            type="action"
+            data={{
+                icon: <Icons.MdPlaylistAdd />,
+                title: "Create new",
+            }}
+            onClick={OpenPlaylistCreator}
+        />
         <OwnPlaylists />
     </div>
 }
+
+export default Library

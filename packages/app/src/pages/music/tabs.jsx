@@ -1,9 +1,6 @@
 import LibraryTab from "./components/library"
 import FavoritesTab from "./components/favorites"
 import ExploreTab from "./components/explore"
-import DashboardTab from "./components/dashboard"
-
-import ReleasesTab from "./components/dashboard/releases"
 
 export default [
     {
@@ -29,19 +26,5 @@ export default [
         label: "Radio",
         icon: "Radio",
         disabled: true
-    },
-    {
-        key: "artist_panel",
-        label: "Creator Panel",
-        icon: "MdSpaceDashboard",
-        component: DashboardTab,
-        children: [
-            {
-                key: "artist_panel.releases",
-                label: "Releases",
-                icon: "MdUpcoming",
-                component: ReleasesTab,
-            }
-        ]
     },
 ]

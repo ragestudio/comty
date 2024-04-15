@@ -23,7 +23,7 @@ export const Panel = (props) => {
 
 export class PagePanelWithNavMenu extends React.Component {
     state = {
-        activeTab: this.props.defaultTab ?? new URLSearchParams(window.location.search).get("type") ?? this.props.tabs[0].key,
+        activeTab: new URLSearchParams(window.location.search).get("type") ?? this.props.defaultTab ?? this.props.tabs[0].key,
         renders: [],
     }
 

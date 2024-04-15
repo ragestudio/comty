@@ -5,7 +5,7 @@ import { Icons } from "components/Icons"
 import { ImageViewer } from "components"
 import Searcher from "components/Searcher"
 
-import ReleaseCreator from "../../../creator"
+import ReleaseCreator from "../../creator"
 
 import MusicModel from "models/music"
 

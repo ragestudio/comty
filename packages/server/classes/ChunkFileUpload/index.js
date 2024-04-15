@@ -169,7 +169,7 @@ export async function uploadChunkFile(req, {
 }) {
     return await new Promise(async (resolve, reject) => {
         if (!checkChunkUploadHeaders(req.headers)) {
-            reject(new OperationErrorError(400, "Missing header(s)"))
+            reject(new OperationError(400, "Missing header(s)"))
             return
         }
 

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken, User } from "../../db_models"
+import { Session, RegenerationToken, User, TosViolations } from "../../db_models"
 
 export default class Token {
     static get strategy() {
@@ -68,6 +68,21 @@ export default class Token {
             }
 
             result.data = decoded
+
+            // check account tos violation
+            const violation = await TosViolations.findOne({ user_id: decoded.user_id })
+
+            if (violation) {
+                console.log("violation", violation)
+
+                result.valid = false
+                result.banned = {
+                    reason: violation.reason,
+                    expire_at: violation.expire_at,
+                }
+
+                return result
+            }
 
             const sessions = await Session.find({ user_id: decoded.user_id })
             const currentSession = sessions.find((session) => session.token === token)

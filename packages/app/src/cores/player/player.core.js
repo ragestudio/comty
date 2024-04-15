@@ -115,16 +115,16 @@ export default class Player extends Core {
 
     internalEvents = {
         "player.state.update:loading": () => {
-            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+            //app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
         },
         "player.state.update:track_manifest": () => {
-            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+            //app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
         },
         "player.state.update:playback_status": () => {
-            app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
+            //app.cores.sync.music.dispatchEvent("music.player.state.update", this.state)
         },
         "player.seeked": (to) => {
-            app.cores.sync.music.dispatchEvent("music.player.seek", to)
+            //app.cores.sync.music.dispatchEvent("music.player.seek", to)
         },
     }
 
@@ -587,7 +587,7 @@ export default class Player extends Core {
 
             if (playlist.some((item) => typeof item === "string")) {
                 this.console.log("Resolving missing manifests by ids...")
-                playlist = await this.getTracksByIds(playlist)
+                playlist = await ServicesHandlers.default.resolveMany(playlist)
             }
 
             playlist = playlist.slice(startIndex)

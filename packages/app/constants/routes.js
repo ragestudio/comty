@@ -88,6 +88,11 @@ export default [
         centeredContent: true,
         extendedContent: true,
     },
+    {
+        path: "/violation",
+        useLayout: "minimal",
+        public: true,
+    },
     // THIS MUST BE THE LAST ROUTE
     {
         path: "/",

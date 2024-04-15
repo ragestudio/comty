@@ -40,7 +40,7 @@ export default class Login extends React.Component {
         loginInputs: {},
         error: null,
         phase: 0,
-        mfa_required: null
+        mfa_required: null,
     }
 
     formRef = React.createRef()
@@ -60,6 +60,18 @@ export default class Login extends React.Component {
         this.toggleLoading(true)
 
         await AuthModel.login(payload, this.onDone).catch((error) => {
+            if (error.response.data){
+                if (error.response.data.violation) {
+                    this.props.close({
+                        unlock: true
+                    })
+
+                    return app.history.push("/violation", {
+                        violation: error.response.data.violation
+                    })
+                }
+            }
+
             console.error(error, error.response)
 
             this.toggleLoading(false)
