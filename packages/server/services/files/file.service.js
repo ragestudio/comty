@@ -39,6 +39,8 @@ class API extends Server {
             })
 
             global.b2Storage = this.contexts.b2Storage
+
+            await this.contexts.b2Storage.authorize()
         } else {
             console.warn("B2 storage not configured on environment, skipping...")
         }
@@ -46,7 +48,6 @@ class API extends Server {
         await this.contexts.db.initialize()
         await this.contexts.redis.initialize()
         await this.contexts.storage.initialize()
-        await this.contexts.b2Storage.authorize()
 
         this.contexts.limits = await LimitsClass.get()
     }
