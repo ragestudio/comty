@@ -106,6 +106,10 @@ export default async ({
 
     switch (service) {
         case "b2":
+            if (!global.b2Storage) {
+                throw new OperationError(500, "B2 storage not configured on environment, unsupported service. Please use `standard` service.")
+            }
+
             result = await b2Upload({
                 remotePath,
                 source,

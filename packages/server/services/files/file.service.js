@@ -25,16 +25,23 @@ class API extends Server {
         cache: new CacheService(),
         redis: RedisClient(),
         storage: StorageClient(),
-        b2Storage: new B2({
-            applicationKeyId: process.env.B2_KEY_ID,
-            applicationKey: process.env.B2_APP_KEY,
-        }),
+        b2Storage: null,
         limits: {},
     }
 
     async onInitialize() {
         global.storage = this.contexts.storage
-        global.b2Storage = this.contexts.b2Storage
+
+        if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
+            this.contexts.b2Storage = new B2({
+                applicationKeyId: process.env.B2_KEY_ID,
+                applicationKey: process.env.B2_APP_KEY,
+            })
+
+            global.b2Storage = this.contexts.b2Storage
+        } else {
+            console.warn("B2 storage not configured on environment, skipping...")
+        }
 
         await this.contexts.db.initialize()
         await this.contexts.redis.initialize()
