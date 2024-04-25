@@ -1,6 +1,7 @@
 import React from "react"
+import { Icons } from "@components/Icons"
+
 import NFCModel from "comty.js/models/nfc"
-import { Icons } from "components/Icons"
 
 export default (props) => {
     const { tag_id } = props.params

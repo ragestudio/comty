@@ -1,7 +1,7 @@
 import Core from "evite/src/core"
 
-import UserModel from "models/user"
-import SessionModel from "models/session"
+import UserModel from "@models/user"
+import SessionModel from "@models/session"
 
 export default class PermissionsCore extends Core {
     static namespace = "permissions"

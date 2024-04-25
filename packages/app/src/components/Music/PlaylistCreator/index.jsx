@@ -1,8 +1,8 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
-import MusicModel from "models/music"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

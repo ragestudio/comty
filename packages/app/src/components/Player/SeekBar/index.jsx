@@ -2,7 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import Slider from "@mui/material/Slider"
 import classnames from "classnames"
-import seekToTimeLabel from "utils/seekToTimeLabel"
+
+import seekToTimeLabel from "@utils/seekToTimeLabel"
 
 import "./index.less"
 

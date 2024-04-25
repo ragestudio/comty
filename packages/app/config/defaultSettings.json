@@ -1,0 +1,20 @@
+{
+    "app:language": "en",
+    "low_performance_mode": false,
+    "transcode_video_browser": false,
+    "forceMobileMode": false,
+    "ui.effects": true,
+    "ui.general_volume": 50,
+    "sfx:notifications_feedback": true,
+    "sfx:notifications_volume": 50,
+    "haptics:notifications_feedback": true,
+    "longPressDelay": 600,
+    "sidebar.collapsable": true,
+    "sidebar.collapse_delay_time": 500,
+    "haptics:enabled": true,
+    "style.auto_darkMode": true,
+    "feed_max_fetch": 7,
+    "style:darkmode": false,
+    "style:auto_darkmode": true,
+    "player.compressor": false
+}

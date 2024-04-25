@@ -1,6 +1,7 @@
 import React from "react"
-import MarkdownReader from "components/MarkdownReader"
-import config from "config"
+import MarkdownReader from "@components/MarkdownReader"
+
+import config from "@config"
 
 const PrivacyReader = () => {
     return <MarkdownReader

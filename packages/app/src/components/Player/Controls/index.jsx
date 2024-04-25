@@ -4,13 +4,12 @@ import * as antd from "antd"
 import UseAnimations from "react-useanimations"
 import LoadingAnimation from "react-useanimations/lib/loading"
 
-import { Icons } from "components/Icons"
-import LikeButton from "components/LikeButton"
+import { Icons } from "@components/Icons"
+import LikeButton from "@components/LikeButton"
+import AudioVolume from "@components/Player/AudioVolume"
+import AudioPlayerChangeModeButton from "@components/Player/ChangeModeButton"
 
-import AudioVolume from "components/Player/AudioVolume"
-import AudioPlayerChangeModeButton from "components/Player/ChangeModeButton"
-
-import { Context } from "contexts/WithPlayerContext"
+import { Context } from "@contexts/WithPlayerContext"
 
 import "./index.less"
 

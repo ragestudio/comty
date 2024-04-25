@@ -2,7 +2,7 @@ import React from "react"
 
 import * as antd from "antd"
 
-import SyncModel from "models/sync"
+import SyncModel from "@models/sync"
 
 export default (props) => {
     const [error, setError] = React.useState(null)

@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { createIconRender } from "components/Icons"
+import { createIconRender } from "@components/Icons"
 
 import "./index.less"
 

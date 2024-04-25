@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
 
-import useLayoutInterface from "hooks/useLayoutInterface"
+import useLayoutInterface from "@hooks/useLayoutInterface"
 
 import "./index.less"
 

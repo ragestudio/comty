@@ -2,9 +2,9 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import PlaylistItem from "components/Music/PlaylistItem"
+import PlaylistItem from "@components/Music/PlaylistItem"
 
-import MusicModel from "models/music"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

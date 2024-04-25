@@ -1,5 +1,6 @@
-import UserModel from "models/user"
 import React from "react"
+
+import UserModel from "@models/user"
 
 export default (props = {}) => {
     const [firstLoad, setFirstLoad] = React.useState(true)

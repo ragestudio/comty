@@ -1,8 +1,8 @@
 import React from "react"
 import { Translation } from "react-i18next"
 
-import Items from "schemas/sidebar"
-import { Icons, createIconRender } from "components/Icons"
+import SidebarItems from "@config/sidebar"
+import { Icons, createIconRender } from "@components/Icons"
 
 import "./index.less"
 
@@ -70,7 +70,7 @@ export default class NavigationMenu extends React.Component {
 
     render() {
         return <div className="navigation">
-            {this.generateMenus(Items)}
+            {this.generateMenus(SidebarItems)}
         </div>
     }
 }

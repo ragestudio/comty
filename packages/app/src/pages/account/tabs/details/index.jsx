@@ -3,9 +3,9 @@ import classnames from "classnames"
 
 import { DateTime } from "luxon"
 import { Skeleton } from "antd"
-import { UserBadges } from "components"
 
-import { Icons } from "components/Icons"
+import UserBadges from "@components/UserBadges"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

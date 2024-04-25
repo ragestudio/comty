@@ -2,16 +2,16 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import lodash from "lodash"
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 import { Translation } from "react-i18next"
+import { Icons, createIconRender } from "@components/Icons"
 
-import { Icons, createIconRender } from "components/Icons"
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
 
-import UserPreview from "components/UserPreview"
-import MusicTrack from "components/Music/Track"
-import PlaylistItem from "components/Music/PlaylistItem"
+import UserPreview from "@components/UserPreview"
+import MusicTrack from "@components/Music/Track"
+import PlaylistItem from "@components/Music/PlaylistItem"
 
-import SearchModel from "models/search"
+import SearchModel from "@models/search"
 
 import "./index.less"
 

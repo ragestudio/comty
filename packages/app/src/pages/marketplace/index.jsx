@@ -1,7 +1,8 @@
 import React from "react"
-import SearchButton from "components/SearchButton"
-import { Icons, createIconRender } from "components/Icons"
-import Image from "components/Image"
+
+import { Icons } from "@components/Icons"
+import SearchButton from "@components/SearchButton"
+import Image from "@components/Image"
 
 import "./index.less"
 

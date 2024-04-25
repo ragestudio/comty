@@ -1,9 +1,10 @@
 import React from "react"
-
 import Core from "evite/src/core"
-import config from "config"
-import store from "store"
+
 import { ConfigProvider, theme } from "antd"
+import store from "store"
+
+import config from "@config"
 
 const variantToAlgorithm = {
 	light: theme.defaultAlgorithm,
@@ -91,7 +92,7 @@ export default class StyleCore extends Core {
 	}
 
 	static get storagedVariant() {
-		return app.cores.settings.get("style.darkMode") ? "dark" : "light"
+		return app.cores.settings.get("style:darkmode") ? "dark" : "light"
 	}
 
 	static set storagedModifications(modifications) {
@@ -103,7 +104,7 @@ export default class StyleCore extends Core {
 	}
 
 	static get variant() {
-		if (window.app.cores.settings.is("style.auto_darkMode", true)) {
+		if (window.app.cores.settings.is("style:auto_darkmode", true)) {
 			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
 				return "dark"
 			}
@@ -120,7 +121,6 @@ export default class StyleCore extends Core {
 		}
 
 		const modifications = StyleCore.storagedModifications
-		const variantKey = StyleCore.storagedVariant
 
 		// override with static vars
 		if (this.public.theme.defaultVars) {
@@ -151,7 +151,7 @@ export default class StyleCore extends Core {
 	}
 
 	onEvents = {
-		"style.autoDarkModetoggle": (value) => {
+		"style:auto_darkmode": (value) => {
 			if (value === true) {
 				return this.applyVariant(StyleCore.variant)
 			}

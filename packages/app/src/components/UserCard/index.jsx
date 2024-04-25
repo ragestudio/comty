@@ -2,10 +2,10 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { Icons, createIconRender } from "components/Icons"
-import { Image, UserBadges, FollowButton } from "components"
+import { Icons, createIconRender } from "@components/Icons"
+import { Image, UserBadges, FollowButton } from "@components"
 
-import linksDecorators from "schemas/userLinksDecorators"
+import linksDecorators from "@config/linksDecorators"
 
 import "./index.less"
 

@@ -10,13 +10,13 @@ const vibrationPatterns = {
 
 export default class HapticsCore extends Core {
     static namespace = "haptics"
-    
+
     static dependencies = [
         "settings"
     ]
 
     static isGlobalDisabled() {
-        return app.cores.settings.is("haptic_feedback", false)
+        return app.cores.settings.is("haptics:enabled", false)
     }
 
     async onInitialize() {

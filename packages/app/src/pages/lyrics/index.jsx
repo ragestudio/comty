@@ -2,11 +2,10 @@ import React from "react"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
 
-import Image from "components/Image"
+import Image from "@components/Image"
+import Controls from "@components/Player/Controls"
 
-import Controls from "components/Player/Controls"
-
-import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
+import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
 
 import request from "comty.js/handlers/request"
 

@@ -5,9 +5,9 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { SliderPicker } from "react-color"
 
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "@components/Icons"
 
-import PerformanceLog from "classes/PerformanceLog"
+import PerformanceLog from "@classes/PerformanceLog"
 
 export const SettingsComponents = {
     button: {
@@ -30,7 +30,7 @@ export const SettingsComponents = {
         component: antd.Slider,
         props: (_this) => {
             return {
-                onAfterChange: (event) => _this.onUpdateItem(event)
+                onChange: (event) => _this.onUpdateItem(event)
             }
         }
     },
@@ -287,7 +287,7 @@ export default class SettingItemComponent extends React.PureComponent {
             }
 
             for await (const event of this.props.setting.emitEvent) {
-                window.app.eventBus.emit(event, emissionPayload)
+                app.eventBus.emit(event, emissionPayload)
             }
         }
 
@@ -361,6 +361,8 @@ export default class SettingItemComponent extends React.PureComponent {
 
         let finalProps = {
             ...this.state.componentProps,
+
+            ...this.generateInhertedProps(),
             ...this.props.setting.props,
 
             ctx: {
@@ -374,8 +376,6 @@ export default class SettingItemComponent extends React.PureComponent {
                 processedCtx: this.props.ctx,
             },
             ref: this.componentRef,
-
-            ...this.generateInhertedProps(),
 
             // set values
             checked: this.state.value,
@@ -394,7 +394,15 @@ export default class SettingItemComponent extends React.PureComponent {
 
         const Component = SettingsComponents[String(this.props.setting.component).toLowerCase()]?.component ?? this.props.setting.component
 
-        return <div className={classnames("setting_item", { ["usePadding"]: this.props.setting.usePadding ?? true })} id={this.props.setting.id} key={this.props.setting.id}>
+        return <div
+            key={this.props.setting.id}
+            id={this.props.setting.id}
+            className={classnames(
+                "setting_item",
+                {
+                    ["usePadding"]: this.props.setting.usePadding ?? true
+                })}
+        >
             <div className="setting_item_header">
                 <div className="setting_item_info">
                     <div className="setting_item_header_title">

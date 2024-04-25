@@ -2,10 +2,10 @@ import React from "react"
 import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
+import { DOMWindow } from "@components/RenderWindow"
 
-import useLayoutInterface from "hooks/useLayoutInterface"
-import { DOMWindow } from "components/RenderWindow"
+import useLayoutInterface from "@hooks/useLayoutInterface"
 
 import "./index.less"
 

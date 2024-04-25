@@ -1,7 +1,7 @@
 import React from "react"
 import progressBar from "nprogress"
 
-import Layouts from "layouts"
+import Layouts from "@layouts"
 
 export default class Layout extends React.PureComponent {
 	progressBar = progressBar.configure({ parent: "html", showSpinner: false })

@@ -1,7 +1,8 @@
 import Core from "evite/src/core"
 import store from "store"
-import defaultSettings from "schemas/defaultSettings.json"
 import { Observable } from "rxjs"
+
+import defaultSettings from "@config/defaultSettings.json"
 
 export default class SettingsCore extends Core {
     static namespace = "settings"

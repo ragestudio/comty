@@ -1,10 +1,10 @@
 import React from "react"
 import { Result } from "antd"
 
-import PostModel from "models/post"
+import PostsList from "@components/PostsList"
+import { Icons } from "@components/Icons"
 
-import { PostsList } from "components"
-import { Icons } from "components/Icons"
+import PostModel from "@models/post"
 
 const emptyListRender = () => {
     return <Result

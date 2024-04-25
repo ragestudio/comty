@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "@components/Icons"
 
 export default (props) => {
     const [loading, setLoading] = React.useState(false)

@@ -1,6 +1,6 @@
 import React from "react"
 import { Modal, Button } from "antd"
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

@@ -2,13 +2,13 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { ImageViewer } from "components"
-import { Icons } from "components/Icons"
+import RGBStringToValues from "@utils/rgbToValues"
 
-import RGBStringToValues from "utils/rgbToValues"
+import ImageViewer from "@components/ImageViewer"
+import { Icons } from "@components/Icons"
 
-import { Context as PlayerContext } from "contexts/WithPlayerContext"
-import { Context as PlaylistContext } from "contexts/WithPlaylistContext"
+import { Context as PlayerContext } from "@contexts/WithPlayerContext"
+import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
 import "./index.less"
 

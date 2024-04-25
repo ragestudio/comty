@@ -1,10 +1,10 @@
 import React from "react"
 import { BrowserRouter, Route, Routes, useNavigate, useParams } from "react-router-dom"
 import { Skeleton } from "antd"
-import config from "config"
+import config from "@config"
 import loadable from "@loadable/component"
 
-import routesDeclaration from "schemas/routes"
+import routesDeclaration from "@config/routes"
 
 const DefaultNotFoundRender = () => {
     return <div>Not found</div>

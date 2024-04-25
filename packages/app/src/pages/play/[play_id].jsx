@@ -1,9 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 
-import MusicModel from "models/music"
+import PlaylistView from "@components/Music/PlaylistView"
 
-import PlaylistView from "components/Music/PlaylistView"
+import MusicModel from "@models/music"
 
 const PlayView = (props) => {
     const play_id = props.params.play_id

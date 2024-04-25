@@ -1,5 +1,6 @@
 import React from "react"
 import classnames from "classnames"
+
 import "./index.less"
 
 export default (props) => {
@@ -11,10 +12,10 @@ export default (props) => {
             padding: props.padding,
         }}
         className={classnames(
-            "actionsBar", 
+            "actionsBar",
             [props.mode],
-            {["transparent"]: props.type === "transparent"},
-            {["spaced"]: props.spaced},
+            { ["transparent"]: props.type === "transparent" },
+            { ["spaced"]: props.spaced },
         )}
     >
         <div

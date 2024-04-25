@@ -1,6 +1,6 @@
 import packagejson from "../package.json"
-import defaultTheme from "../constants/defaultTheme.json"
-import defaultSoundPack from "../constants/defaultSoundPack.json"
+import defaultTheme from "./defaultTheme.json"
+import defaultSoundPack from "./defaultSoundpack.json"
 
 export default {
     package: packagejson,

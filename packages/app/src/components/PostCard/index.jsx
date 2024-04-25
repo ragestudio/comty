@@ -2,8 +2,9 @@ import React from "react"
 import classnames from "classnames"
 import Plyr from "plyr-react"
 import { motion } from "framer-motion"
-import { Icons } from "components/Icons"
-import { processString } from "utils"
+
+import { Icons } from "@components/Icons"
+import { processString } from "@utils"
 
 import PostHeader from "./components/header"
 import PostActions from "./components/actions"

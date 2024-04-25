@@ -1,6 +1,7 @@
 import React from "react"
 import classnames from "classnames"
-import { DOMWindow } from "components/RenderWindow"
+
+import { DOMWindow } from "@components/RenderWindow"
 
 import "./index.less"
 

@@ -1,7 +1,8 @@
 import Core from "evite/src/core"
-import config from "config"
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
+
+import config from "@config"
 
 export const SUPPORTED_LANGUAGES = config.i18n?.languages ?? {}
 export const SUPPORTED_LOCALES = SUPPORTED_LANGUAGES.map((l) => l.locale)
@@ -12,19 +13,19 @@ export function extractLocaleFromPath(path = "") {
     return SUPPORTED_LOCALES.includes(maybeLocale) ? maybeLocale : DEFAULT_LOCALE
 }
 
-const messageImports = import.meta.glob("schemas/translations/*.json")
+const messageImports = import.meta.glob("@config/translations/*.json")
 
 export default class I18nCore extends Core {
     static namespace = "i18n"
-    
+
     onEvents = {
-        "changeLanguage": (locale) => {
+        "app:language_changes": (locale) => {
             this.loadAsyncLanguage(locale)
         }
     }
 
     onInitialize = async () => {
-        let locale = app.cores.settings.get("language") ?? DEFAULT_LOCALE
+        let locale = app.cores.settings.get("app:language") ?? DEFAULT_LOCALE
 
         if (!SUPPORTED_LOCALES.includes(locale)) {
             locale = DEFAULT_LOCALE

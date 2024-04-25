@@ -1,6 +1,6 @@
 import React from "react"
 import classnames from "classnames"
-import { createIconRender } from "components/Icons"
+import { createIconRender } from "@components/Icons"
 
 export const QuickNavMenuItems = [
     {

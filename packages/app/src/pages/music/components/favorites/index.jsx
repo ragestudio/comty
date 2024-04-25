@@ -1,9 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 
-import PlaylistView from "components/Music/PlaylistView"
+import PlaylistView from "@components/Music/PlaylistView"
 
-import MusicModel from "models/music"
+import MusicModel from "@models/music"
 
 export default class FavoriteTracks extends React.Component {
     state = {

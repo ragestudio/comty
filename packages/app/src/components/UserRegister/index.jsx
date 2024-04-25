@@ -1,11 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 
-import UserModel from "models/user"
-import AuthModel from "models/auth"
+import AuthModel from "@models/auth"
 
-import { StepsForm } from "components"
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
@@ -91,7 +89,7 @@ const steps = [
                         return
                     }
 
-                    const request = await UserModel.checkUsernameAvailability(username).catch((error) => {
+                    const request = await AuthModel.availability({ username }).catch((error) => {
                         antd.message.error(`Cannot check username availability: ${error.message}`)
                         console.error(error)
 
@@ -304,7 +302,7 @@ const steps = [
                 const timer = setTimeout(async () => {
                     if (!validFormat) return
 
-                    const request = await UserModel.checkEmailAvailability(email).catch((error) => {
+                    const request = await AuthModel.availability({ email }).catch((error) => {
                         antd.message.error(`Cannot check email availability: ${error.message}`)
 
                         return false

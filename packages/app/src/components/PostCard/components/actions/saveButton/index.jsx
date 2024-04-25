@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

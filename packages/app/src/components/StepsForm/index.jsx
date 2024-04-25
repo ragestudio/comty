@@ -1,10 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import loadable from "@loadable/component"
 import { Translation } from "react-i18next"
+import loadable from "@loadable/component"
 
-import { Icons, createIconRender } from "components/Icons"
-import { ActionsBar } from "components"
+import { Icons, createIconRender } from "@components/Icons"
+import { ActionsBar } from "@components"
 
 import "./index.less"
 

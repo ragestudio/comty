@@ -1,14 +1,14 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
-import UserModel from "models/user"
+import AuthModel from "@models/auth"
 
 export const UsernameStepComponent = (props) => {
     const [loading, setLoading] = React.useState(false)
     const [username, setUsername] = React.useState(props.currentValue ?? "")
-    
+
     const [validLength, setValidLength] = React.useState(props.currentValue ? true : null)
     const [validCharacters, setValidCharacters] = React.useState(props.currentValue ? true : null)
     const [usernameAvailable, setUsernameAvailable] = React.useState(props.currentValue ? true : null)
@@ -95,7 +95,7 @@ export const UsernameStepComponent = (props) => {
                 return
             }
 
-            const request = await UserModel.checkUsernameAvailability(username).catch((error) => {
+            const request = await AuthModel.availability({ username }).catch((error) => {
                 app.message.error(`Cannot check username availability: ${error.message}`)
                 console.error(error)
 
@@ -133,7 +133,7 @@ export const UsernameStepComponent = (props) => {
         />
 
         <div className="usernameValidity">
-        <div className="check">
+            <div className="check">
                 {
                     renderIndicator(validLength, "At least 3 characters / Maximum 64 characters")
                 }

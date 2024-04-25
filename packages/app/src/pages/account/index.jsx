@@ -4,9 +4,11 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
 
-import { Icons } from "components/Icons"
-import { FollowButton, UserCard } from "components"
-import { SessionModel, UserModel, FollowsModel } from "models"
+import { Icons } from "@components/Icons"
+import FollowButton from "@components/FollowButton"
+import UserCard from "@components/UserCard"
+
+import { SessionModel, UserModel, FollowsModel } from "@models"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"

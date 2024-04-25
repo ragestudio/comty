@@ -2,9 +2,11 @@ import React from "react"
 import lodable from "@loadable/component"
 import * as antd from "antd"
 
-import { SortableList, SortableItem } from "components/SortableList"
+import { SortableList, SortableItem } from "@components/SortableList"
 
-import StoragedState from "utils/storagedState"
+class StoragedState {
+
+}
 
 import "./index.less"
 

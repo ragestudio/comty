@@ -2,11 +2,10 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { UserPreview } from "components"
-import { Icons, createIconRender } from "components/Icons"
+import UserPreview from "@components/UserPreview"
+import { Icons, createIconRender } from "@components/Icons"
 
 import useRequest from "comty.js/hooks/useRequest"
-
 import SearchModel from "comty.js/models/search"
 
 import "./index.less"

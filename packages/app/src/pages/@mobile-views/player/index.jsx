@@ -1,14 +1,13 @@
 import React from "react"
-import { Button } from "antd"
-import { Icons } from "components/Icons"
 import classnames from "classnames"
-import RGBStringToValues from "utils/rgbToValues"
 
-import SeekBar from "components/Player/SeekBar"
-import Controls from "components/Player/Controls"
-import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
+import { Icons } from "@components/Icons"
+import SeekBar from "@components/Player/SeekBar"
+import Controls from "@components/Player/Controls"
+import ExtraActions from "@components/Player/ExtraActions"
 
-import ExtraActions from "components/Player/ExtraActions"
+import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import RGBStringToValues from "@utils/rgbToValues"
 
 import "./index.less"
 

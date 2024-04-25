@@ -1,12 +1,19 @@
 import AuthToken from "@shared-classes/AuthToken"
 import { UserConfig, MFASession, TosViolations } from "@db_models"
-import requiredFields from "@shared-utils/requiredFields"
 import obscureEmail from "@shared-utils/obscureEmail"
 
 import Account from "@classes/account"
 
 export default async (req, res) => {
-    requiredFields(["username", "password"], req.body)
+    if (req.body.refreshToken && req.body.authToken) {
+        return await AuthToken.handleRefreshToken(req.body)
+    }
+
+    if (!req.body.username || !req.body.password) {
+        return res.status(400).json({
+            error: "Missing username or password"
+        })
+    }
 
     const user = await Account.loginStrategy({
         username: req.body.username,
@@ -63,7 +70,7 @@ export default async (req, res) => {
                     // expires in 1 hour
                     expires_at: new Date().getTime() + 60 * 60 * 1000,
 
-                    ip_address: req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket?.remoteAddress ?? req.ip,
+                    ip_address: req.headers["x-forwarded-for"] ?? req.socket?.remoteAddress ?? req.ip,
                     client: req.headers["user-agent"],
                 }
 
@@ -88,11 +95,12 @@ export default async (req, res) => {
         date: new Date().getTime(),
         username: user.username,
         user_id: user._id.toString(),
-        ip_address: req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket?.remoteAddress ?? req.ip,
+        ip_address: req.headers["x-forwarded-for"] ?? req.socket?.remoteAddress ?? req.ip,
         client: req.headers["user-agent"],
     }
 
-    const token = await AuthToken.createAuth(authData)
+    const token = await AuthToken.createAuthToken(authData)
+    const refreshToken = await AuthToken.createRefreshToken(authData.user_id, token)
 
     // emit to ems to notify user for the new login, in the background
     try {
@@ -105,5 +113,9 @@ export default async (req, res) => {
         console.error(error)
     }
 
-    return { token: token }
+    return {
+        token: token,
+        refreshToken: refreshToken,
+        expires_in: AuthToken.authStrategy.expiresIn,
+    }
 }

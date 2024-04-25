@@ -1,9 +1,8 @@
 import React from "react"
 import { Upload, Progress } from "antd"
 import classnames from "classnames"
-import { Icons } from "components/Icons"
 
-import useHacks from "hooks/useHacks"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

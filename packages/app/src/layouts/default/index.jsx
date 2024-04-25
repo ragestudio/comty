@@ -10,9 +10,9 @@ import {
     TopBar,
     ToolsBar,
     Header,
-} from "components/Layout"
+} from "@components/Layout"
 
-import BackgroundDecorator from "components/BackgroundDecorator"
+import BackgroundDecorator from "@components/BackgroundDecorator"
 
 import { createWithDom as FloatingStack } from "../components/floatingStack"
 import InitializeModalsController from "../components/modals"

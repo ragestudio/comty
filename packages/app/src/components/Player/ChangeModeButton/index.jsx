@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons, createIconRender } from "components/Icons"
+import { createIconRender } from "@components/Icons"
 
 export default (props) => {
     const [mode, setMode] = React.useState(app.cores.player.playback.mode())

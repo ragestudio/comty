@@ -1,6 +1,6 @@
 {
   "name": "@comty/server",
-  "version": "0.60.2",
+  "version": "0.70.0",
   "license": "MIT",
   "workspaces": [
     "services/*"
@@ -12,39 +12,22 @@
     "run:prod": "cross-env NODE_ENV=production node ./dist/index.js"
   },
   "dependencies": {
-    "@fastify/cors": "^9.0.1",
-    "@fastify/middie": "^8.3.0",
     "@gullerya/object-observer": "^6.1.3",
     "@infisical/sdk": "^2.1.8",
     "@ragestudio/hermes": "^0.1.1",
-    "axios": "^1.6.7",
-    "bcrypt": "^5.1.1",
     "chalk": "4.1.2",
-    "cli-color": "^2.0.3",
-    "clui": "^0.3.6",
     "dotenv": "^16.4.4",
-    "fastify": "^4.26.2",
     "http-proxy": "^1.18.1",
-    "http-proxy-middleware": "^3.0.0-beta.1",
-    "hyper-express": "^6.14.12",
-    "jsonwebtoken": "^9.0.2",
     "linebridge": "^0.18.1",
     "module-alias": "^2.2.3",
-    "p-map": "^4.0.0",
-    "p-queue": "^7.3.4",
-    "radix3": "^1.1.1",
     "signal-exit": "^4.1.0",
     "spinnies": "^0.5.1",
-    "tree-kill": "^1.2.2",
-    "uWebSockets.js": "uNetworking/uWebSockets.js#v20.41.0",
-    "uws-reverse-proxy": "^3.2.1",
-    "yume-server": "^0.0.5"
+    "tree-kill": "^1.2.2"
   },
   "devDependencies": {
     "chai": "^5.1.0",
     "cross-env": "^7.0.3",
-    "mocha": "^10.3.0",
-    "nodemon": "^3.0.3"
+    "mocha": "^10.3.0"
   },
   "resolutions": {
     "string-width": "4.2.3"

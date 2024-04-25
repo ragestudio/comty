@@ -1,5 +1,5 @@
 import React from "react"
-import PostCreator from "components/PostCreator"
+import PostCreator from "@components/PostCreator"
 
 import "./index.less"
 

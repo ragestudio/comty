@@ -1,6 +1,6 @@
 import React from "react"
 
-import useRandomFeaturedWallpaperUrl from "hooks/useRandomFeaturedWallpaperUrl"
+import useRandomFeaturedWallpaperUrl from "@hooks/useRandomFeaturedWallpaperUrl"
 
 import RegisterForm from "./forms/register"
 import MainSelector from "./forms/selector"
@@ -59,7 +59,7 @@ const AuthPage = (props) => {
             <div
                 className="wrapper_background"
                 style={{
-                    backgroundImage: randomWallpaperURL ? `url(${randomWallpaperURL.url})` : null,
+                    backgroundImage: randomWallpaperURL ? `url(${randomWallpaperURL})` : null,
                     animation: randomWallpaperURL ? "opacityIn 1s" : null
                 }}
             />

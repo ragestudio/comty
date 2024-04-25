@@ -12,19 +12,6 @@ export default class NotificationCore extends Core {
 
     #newNotifications = []
 
-    onEvents = {
-        "changeNotificationsSoundVolume": (value) => {
-            NotificationFeedback.playAudio({
-                soundVolume: value
-            })
-        },
-        "changeNotificationsVibrate": (value) => {
-            NotificationFeedback.playHaptic({
-                vibrationEnabled: value,
-            })
-        }
-    }
-
     listenSockets = {
         "notifications": {
             "notification.new": (data) => {
@@ -38,7 +25,7 @@ export default class NotificationCore extends Core {
     }
 
     async new(notification, options = {}) {
-        await NotificationUI.notify(notification, options)
-        await NotificationFeedback.feedback(options.type)
+        NotificationUI.notify(notification, options)
+        NotificationFeedback.feedback(options.type)
     }
 }

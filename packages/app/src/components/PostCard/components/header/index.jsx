@@ -2,10 +2,10 @@ import React from "react"
 import { DateTime } from "luxon"
 import { Tag } from "antd"
 
-import { Image } from "components"
-import { Icons } from "components/Icons"
+import Image from "@components/Image"
+import { Icons } from "@components/Icons"
 
-import PostReplieView from "components/PostReplieView"
+import PostReplieView from "@components/PostReplieView"
 
 import "./index.less"
 

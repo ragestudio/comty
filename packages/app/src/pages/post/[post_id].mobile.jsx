@@ -1,9 +1,11 @@
 import React from "react"
 import * as antd from "antd"
-
-import Post from "models/post"
-import { PostCard, CommentsCard } from "components"
 import { FloatingPanel } from "antd-mobile"
+
+import PostCard from "@components/PostCard"
+import CommentsCard from "@components/CommentsCard"
+
+import Post from "@models/post"
 
 import "./index.less"
 
@@ -30,7 +32,7 @@ export default (props) => {
 
     React.useEffect(() => {
         app.layout.toggleCenteredContent(false)
-        
+
         loadData()
     }, [])
 

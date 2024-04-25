@@ -1,10 +1,10 @@
 import React from "react"
 import Core from "evite/src/core"
 
-import { DOMWindow } from "components/RenderWindow"
+import { DOMWindow } from "@components/RenderWindow"
 import ContextMenu from "./components/contextMenu"
 
-import InternalContexts from "schemas/menu-contexts"
+import InternalContexts from "@config/context-menu"
 
 export default class ContextMenuCore extends Core {
     static namespace = "contextMenu"

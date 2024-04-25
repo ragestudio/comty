@@ -3,9 +3,9 @@ import * as antd from "antd"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
-import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
+import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
 
 import "./index.less"
 

@@ -5,8 +5,8 @@ import { FastAverageColor } from "fast-average-color"
 
 import MusicModel from "comty.js/models/music"
 
-import ToolBarPlayer from "components/Player/ToolBarPlayer"
-import BackgroundMediaPlayer from "components/Player/BackgroundMediaPlayer"
+import ToolBarPlayer from "@components/Player/ToolBarPlayer"
+import BackgroundMediaPlayer from "@components/Player/BackgroundMediaPlayer"
 
 import AudioPlayerStorage from "./player.storage"
 

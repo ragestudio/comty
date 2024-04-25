@@ -3,15 +3,14 @@ import * as antd from "antd"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 
-import Image from "components/Image"
-import Searcher from "components/Searcher"
-import { Icons, createIconRender } from "components/Icons"
+import Image from "@components/Image"
+import Searcher from "@components/Searcher"
+import { Icons, createIconRender } from "@components/Icons"
+import MusicTrack from "@components/Music/Track"
+import PlaylistItem from "@components/Music/PlaylistItem"
 
-import FeedModel from "models/feed"
-import MusicModel from "models/music"
-
-import MusicTrack from "components/Music/Track"
-import PlaylistItem from "components/Music/PlaylistItem"
+import FeedModel from "@models/feed"
+import MusicModel from "@models/music"
 
 import "./index.less"
 
@@ -72,7 +71,7 @@ const MusicNavbar = (props) => {
     </div>
 }
 
-const PlaylistsList = (props) => {
+const ReleasesList = (props) => {
     const hopNumber = props.hopsPerPage ?? 6
 
     const [offset, setOffset] = React.useState(0)
@@ -179,7 +178,7 @@ const PlaylistsList = (props) => {
                 loading && <antd.Skeleton active />
             }
             {
-                !loading && result.map((playlist, index) => {
+                !loading && result.items.map((playlist, index) => {
                     return <PlaylistItem
                         key={index}
                         playlist={playlist}
@@ -330,13 +329,13 @@ export default (props) => {
             !searchResults && <div className="feed_main">
                 <FeaturedPlaylist />
 
-                <PlaylistsList
+                <ReleasesList
                     headerTitle="From your following artists"
                     headerIcon={<Icons.MdPerson />}
                     fetchMethod={FeedModel.getMusicFeed}
                 />
 
-                <PlaylistsList
+                <ReleasesList
                     headerTitle="Explore from global"
                     headerIcon={<Icons.MdExplore />}
                     fetchMethod={FeedModel.getGlobalMusicFeed}

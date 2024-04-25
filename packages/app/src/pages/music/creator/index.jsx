@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 
-import MusicModel from "models/music"
+import MusicModel from "@models/music"
 
 import BasicInformation from "./components/BasicInformation"
 import TracksUploads from "./components/TracksUploads"

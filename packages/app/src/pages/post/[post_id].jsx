@@ -1,12 +1,12 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
-import PostCard from "components/PostCard"
-import PostsList from "components/PostsList"
+import PostCard from "@components/PostCard"
+import PostsList from "@components/PostsList"
 
-import PostService from "models/post"
+import PostService from "@models/post"
 
 import "./index.less"
 

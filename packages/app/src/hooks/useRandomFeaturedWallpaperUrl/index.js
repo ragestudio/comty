@@ -4,18 +4,18 @@ export default () => {
     const [wallpaperData, setWallpaperData] = React.useState(null)
 
     const setRandomWallpaper = async () => {
-        const { data: featuredWallpapers } = await app.cores.api.customRequest({
+        const { data } = await app.cores.api.customRequest({
             method: "GET",
-            url: "/featured_wallpapers"
+            url: "/featured/wallpapers",
+            params: {
+                random: true
+            }
         }).catch((err) => {
             console.error(err)
             return []
         })
 
-        // get random wallpaper from array
-        const randomWallpaper = featuredWallpapers[Math.floor(Math.random() * featuredWallpapers.length)]
-
-        setWallpaperData(randomWallpaper)
+        setWallpaperData(data.url)
     }
 
     React.useEffect(() => {

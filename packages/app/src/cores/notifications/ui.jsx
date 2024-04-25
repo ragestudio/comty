@@ -1,7 +1,8 @@
 import React from "react"
-import { notification as Notf, Space, Button } from "antd"
-import { Icons, createIconRender } from "components/Icons"
 import { Translation } from "react-i18next"
+import { notification as Notf, Space, Button } from "antd"
+
+import { Icons, createIconRender } from "@components/Icons"
 
 class NotificationUI {
     static async notify(

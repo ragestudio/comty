@@ -1,13 +1,12 @@
 import React from "react"
 import * as antd from "antd"
-
-import { createIconRender } from "components/Icons"
-import { UserModel } from "models"
-
-import "./index.less"
-
 import DOMPurify from "dompurify"
 import axios from "axios"
+
+import { createIconRender } from "@components/Icons"
+import { UserModel } from "@models"
+
+import "./index.less"
 
 const RemoteSVG = (props) => {
     // IMPORTANT: Only use this component for SVG files that you trust.

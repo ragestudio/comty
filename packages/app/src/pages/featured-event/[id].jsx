@@ -3,9 +3,10 @@ import { Skeleton, Button } from "antd"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
-import ContrastYIQ from "utils/contrastYIQ"
-import ProcessString from "utils/processString"
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
+
+import ContrastYIQ from "@utils/contrastYIQ"
+import ProcessString from "@utils/processString"
 
 import "./index.less"
 
@@ -24,7 +25,7 @@ export default (props) => {
     const [eventData, setEventData] = React.useState(null)
 
     const fetchEventData = async () => {
-        const { data } = await app.cores.api.customRequest( {
+        const { data } = await app.cores.api.customRequest({
             method: "GET",
             url: `/featured_event/${eventId}`
         }).catch((err) => {

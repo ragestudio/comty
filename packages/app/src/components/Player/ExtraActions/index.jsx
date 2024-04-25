@@ -1,9 +1,10 @@
 import React from "react"
 import { Button } from "antd"
-import { Icons } from "components/Icons"
 
-import LikeButton from "components/LikeButton"
-import { Context } from "contexts/WithPlayerContext"
+import { Icons } from "@components/Icons"
+import LikeButton from "@components/LikeButton"
+
+import { Context } from "@contexts/WithPlayerContext"
 
 const ExtraActions = (props) => {
     const ctx = React.useContext(Context)

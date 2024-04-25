@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
-import Image from "components/Image"
-import { Icons } from "components/Icons"
+import Image from "@components/Image"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

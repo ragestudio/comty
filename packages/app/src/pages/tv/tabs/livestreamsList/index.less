@@ -1,0 +1,112 @@
+@item_border_radius: 10px;
+
+.livestream_list {
+    display: grid;
+
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-column-gap: 15px;
+    grid-row-gap: 15px;
+
+    width: 100%;
+    height: 100%;
+
+    @media not screen and (max-width: 1900px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    @media not screen and (max-width: 2300px) {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    @media not screen and (max-width: 2600px) {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    @media not screen and (max-width: 2900px) {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .livestream_item {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+
+        padding: 10px;
+        transition: all 150ms ease-in-out;
+
+        background-color: var(--background-color-primary-2);
+
+        outline: 1px solid var(--border-color);
+        border-radius: @item_border_radius;
+
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--background-color-accent);
+        }
+
+        &.white_background {
+
+            h1,
+            h2,
+            span {
+                color: var(--text-color-black) !important;
+            }
+        }
+
+        .livestream_thumbnail {
+            width: 100%;
+
+            img {
+                width: 100%;
+                height: 100%;
+
+                border-radius: @item_border_radius;
+
+                object-fit: cover;
+            }
+        }
+
+        .livestream_info {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+
+            width: 100%;
+
+            gap: 10px;
+
+            h1,
+            h2 {
+                margin: 0;
+            }
+
+            .livestream_titles {
+                display: flex;
+                flex-direction: column;
+
+                gap: 7px;
+
+                color: var(--text-color);
+
+                .livestream_title {
+                    margin-top: 10px;
+                    font-size: 1rem;
+                    height: fit-content;
+                    font-family: "Space Grotesk", sans-serif;
+                }
+
+                .livestream_description {
+                    font-size: 0.6rem;
+                    font-weight: 400;
+                    height: fit-content;
+                }
+            }
+        }
+    }
+}

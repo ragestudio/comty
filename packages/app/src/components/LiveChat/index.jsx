@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 import { TransitionGroup, CSSTransition } from "react-transition-group"
 
-import SessionModel from "models/session"
+import SessionModel from "@models/session"
 
 import "./index.less"
 
@@ -22,30 +22,25 @@ const Line = (props) => {
 
 export default class LiveChat extends React.Component {
     state = {
-        socket: null,
-
-        connecting: true,
-        connectionEnd: false,
-
+        joining: true,
         roomInfo: null,
 
         timeline: [],
         temporalTimeline: [],
+        maxTemporalLines: this.props.maxTemporalLines ?? 10,
 
         lastSentMessage: null,
         writtedMessage: "",
-
-        maxTemporalLines: this.props.maxTemporalLines ?? 10,
     }
 
     debouncedIntervalTimelinePurge = null
 
     timelineRef = React.createRef()
 
-    socket = app.cores.api.instance().sockets.chat
+    socket = app.cores.api.client().sockets.chats
 
     roomEvents = {
-        "room:recive:message": (message) => {
+        "room:message": (message) => {
             if (message.content === this.state.lastSentMessage) {
                 console.timeEnd("[CHATROOM] SUBMIT:MESSAGE")
             }
@@ -56,7 +51,7 @@ export default class LiveChat extends React.Component {
             console.log("[CHATROOM] Room joined", info)
 
             this.setState({
-                connecting: false,
+                joining: false,
                 roomInfo: info,
             })
         },
@@ -64,76 +59,56 @@ export default class LiveChat extends React.Component {
             console.log("[CHATROOM] Room left", info)
 
             this.setState({
-                connecting: false,
+                joining: true,
                 roomInfo: null,
             })
         }
     }
 
-    socketEvents = {
-        "connect_error": (err) => {
-            console.error("Connection error", err)
-
-            this.setState({ connectionEnd: true })
-
-            if (err.message === "auth:token_invalid") {
-                console.error("Invalid token")
-            }
-        },
-        "disconnect": (reason) => {
-            console.error("Disconnected", reason)
-
-            this.setState({ connectionEnd: true })
-        },
-        "connect": () => {
-            this.setState({ connectionEnd: false })
-
-            this.joinSocketRoom()
+    joinSocketRoom = async () => {
+        if (!SessionModel.token) {
+            return this.setState({
+                noAuthed: true,
+            })
         }
-    }
-
-    initializeSocket = async () => {
-        if (!this.socket) {
-            console.error("Socket not initialized/avaliable")
-
-            this.setState({ connectionEnd: true })
-
-            return false
-        }
+       
+        console.log(`[CHATROOM] Joining socket room [${this.props.id}]...`)
 
         for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
             this.socket.on(eventName, eventHandler)
         }
 
-        for (const [eventName, eventHandler] of Object.entries(this.socketEvents)) {
-            this.socket.on(eventName, eventHandler)
-        }
+        await this.setState({
+            joining: true,
+        })
+
+        this.socket.emit(
+            "join:room",
+            {
+                room: this.props.id,
+            },
+            (error, info) => {
+                if (error) {
+                    this.setState({ connectionEnd: true })
+
+                    return console.error("Error joining room", error)
+                }
+            }
+        )
     }
 
-    joinSocketRoom = async () => {
-        await this.setState({ connecting: true })
+    leaveSocketRoom = () => {
+        if (this.state.connectionEnd) {
+            return false
+        }
+        
+        console.log(`[CHATROOM] Leaving socket room [${this.props.id}]...`)
 
-        if (!this.socket.connected) {
-            this.socket.connect()
+        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
+            this.socket.off(eventName, eventHandler)
         }
 
-        const { roomId } = this.props
-
-        const socketNamespace = `/textRoom/${roomId}`
-
-        console.log(`[CHATROOM] Joining socket room [${socketNamespace}]...`)
-
-        this.socket.emit("join:room", { room: socketNamespace }, (error, info) => {
-            if (error) {
-                this.setState({ connectionEnd: true })
-
-                return console.error("Error joining room", error)
-            }
-
-            this.setState({
-                connecting: true,
-            })
-        })
+        this.socket.emit("leave:room")
     }
 
     submitMessage = (message) => {
@@ -245,23 +220,7 @@ export default class LiveChat extends React.Component {
     }
 
     componentDidMount = async () => {
-        // check if user is logged in
-        if (!SessionModel.token) {
-            return this.setState({
-                connecting: false,
-                noAuthed: true
-            })
-        }
-
-        await this.initializeSocket()
-
-        await this.joinSocketRoom().catch((err) => {
-            console.error("Error joining socket room", err)
-
-            this.setState({
-                connectionEnd: true
-            })
-        })
+        this.joinSocketRoom()
 
         app.ctx = {
             submit: this.submitMessage
@@ -269,21 +228,13 @@ export default class LiveChat extends React.Component {
     }
 
     componentWillUnmount() {
-        if (this.socket) {
-            this.socket.emit("leave:room")
-        }
-
-        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
-            this.socket.off(eventName, eventHandler)
-        }
-
-        for (const [eventName, eventHandler] of Object.entries(this.socketEvents)) {
-            this.socket.off(eventName, eventHandler)
-        }
-
+        this.leaveSocketRoom()
+        
         if (this.debouncedIntervalTimelinePurge) {
             clearInterval(this.debouncedIntervalTimelinePurge)
         }
+
+        delete app.ctx
     }
 
     render() {

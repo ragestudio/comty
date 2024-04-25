@@ -1,8 +1,7 @@
 import React from "react"
 
-import { Icons } from "components/Icons"
-
-import { PagePanelWithNavMenu } from "components/PagePanels"
+import { Icons } from "@components/Icons"
+import { PagePanelWithNavMenu } from "@components/PagePanels"
 
 import Tabs from "./tabs"
 

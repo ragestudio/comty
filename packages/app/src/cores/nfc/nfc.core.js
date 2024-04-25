@@ -1,5 +1,5 @@
 import Core from "evite/src/core"
-import TapShareDialog from "components/TapShare/Dialog"
+import TapShareDialog from "@components/TapShare/Dialog"
 
 const RecordTypes = {
     "T": "text",

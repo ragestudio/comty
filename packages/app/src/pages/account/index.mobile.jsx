@@ -4,11 +4,11 @@ import classnames from "classnames"
 
 import { Translation } from "react-i18next"
 
-import { Skeleton } from "components"
-import { SessionModel, UserModel, FollowsModel } from "models"
-import { PagePanelWithNavMenu } from "components/PagePanels"
+import Skeleton from "@components/Skeleton"
+import { PagePanelWithNavMenu } from "@components/PagePanels"
+import { MobileUserCard } from "@components/UserCard"
 
-import { MobileUserCard } from "components/UserCard"
+import { SessionModel, UserModel, FollowsModel } from "@models"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"

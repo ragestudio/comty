@@ -2,11 +2,9 @@ import React from "react"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
 import { Translation } from "react-i18next"
+import { Icons } from "@components/Icons"
 
-import { Icons } from "components/Icons"
-
-import { HashtagTrendings, FeaturedEventsAnnouncements, ConnectedFriends } from "components"
-import WidgetsWrapper from "components/WidgetsWrapper"
+import WidgetsWrapper from "@components/WidgetsWrapper"
 
 import "./index.less"
 
@@ -78,7 +76,7 @@ export default class ToolsBar extends React.Component {
                             }
                         )}
                     >
-                        <div className="card" id="trendings">
+                        {/* <div className="card" id="trendings">
                             <div className="header">
                                 <h2>
                                     <Icons.TrendingUp />
@@ -100,7 +98,7 @@ export default class ToolsBar extends React.Component {
                             <ConnectedFriends />
                         </div>
 
-                        <FeaturedEventsAnnouncements />
+                        <FeaturedEventsAnnouncements /> */}
 
                         <WidgetsWrapper />
 

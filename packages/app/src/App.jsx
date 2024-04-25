@@ -1,76 +1,22 @@
-// Patch global prototypes
-import { Buffer } from "buffer"
-
-window.Buffer = Buffer
-
-Array.prototype.findAndUpdateObject = function (discriminator, obj) {
-	let index = this.findIndex(item => item[discriminator] === obj[discriminator])
-	if (index !== -1) {
-		this[index] = obj
-	}
-
-	return index
-}
-
-Array.prototype.move = function (from, to) {
-	this.splice(to, 0, this.splice(from, 1)[0])
-	return this
-}
-
-String.prototype.toTitleCase = function () {
-	return this.replace(/\w\S*/g, function (txt) {
-		return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-	})
-}
-
-String.prototype.toBoolean = function () {
-	return this === "true"
-}
-
-Promise.tasked = function (promises) {
-	return new Promise(async (resolve, reject) => {
-		let rejected = false
-
-		for await (let promise of promises) {
-			if (rejected) {
-				return
-			}
-
-			try {
-				await promise()
-			} catch (error) {
-				rejected = true
-				return reject(error)
-			}
-		}
-
-		if (!rejected) {
-			return resolve()
-		}
-	})
-}
+import "./patches"
+import config from "@config"
 
 import React from "react"
-import ReactDOM from "react-dom"
-
-import Splash from "./splash"
-
 import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
-import * as antd from "antd"
 import { Translation } from "react-i18next"
-import { Lightbox } from "react-modal-image"
+import * as Sentry from "@sentry/browser"
 
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
-import AuthModel from "models/auth"
-import SessionModel from "models/session"
-import UserModel from "models/user"
+import AuthModel from "@models/auth"
+import SessionModel from "@models/session"
+import UserModel from "@models/user"
 
-import config from "config"
-import * as Utils from "./utils"
+import { Lightbox } from "react-modal-image"
+import * as antd from "antd"
 
 import {
 	NotFound,
@@ -81,19 +27,18 @@ import {
 	Searcher,
 	NotificationsCenter,
 	PostCreator,
-} from "components"
-import { DOMWindow } from "components/RenderWindow"
+} from "@components"
+import { DOMWindow } from "@components/RenderWindow"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
-import { ThemeProvider } from "cores/style/style.core.jsx"
+import { ThemeProvider } from "@cores/style/style.core.jsx"
 
 import Layout from "./layout"
 import * as Router from "./router"
+import Splash from "./splash"
 
-import * as Sentry from "@sentry/browser"
-
-import "theme/index.less"
+import "@styles/index.less"
 
 CapacitorUpdater.notifyAppReady()
 
@@ -123,26 +68,6 @@ class ComtyApp extends React.Component {
 			window.localStorage.setItem("last_version", window.app.version)
 		}
 
-		// check if electron library is available
-		if (typeof window.electron !== "undefined") {
-			window.isElectron = true
-		}
-
-		// if is electron app, append frame to body as first child
-		if (window.isElectron) {
-			const frame = document.createElement("div")
-			const systemBarComponent = await import("components/Layout/systemBar")
-
-			frame.id = "systemBar"
-
-			ReactDOM.render(<systemBarComponent.default />, frame)
-
-			document.body.insertBefore(frame, document.body.firstChild)
-
-			// append var to #root
-			document.getElementById("root").classList.add("electron")
-		}
-
 		if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.PROD) {
 			console.log(`Initializing Sentry...`)
 
@@ -154,14 +79,7 @@ class ComtyApp extends React.Component {
 		}
 	}
 
-	static publicEvents = {
-		"clearAllOverlays": function () {
-			window.app.DrawerController.closeAll()
-		},
-		"app.clearInternalStorage": function () {
-			app.clearInternalStorage()
-		},
-	}
+	static publicEvents = {}
 
 	static publicMethods = {
 		controls: {
@@ -220,8 +138,6 @@ class ComtyApp extends React.Component {
 				})
 			},
 			openSearcher: (options) => {
-				app.cores.sound.useUIAudio("navigation.search")
-
 				if (app.isMobile) {
 					return app.DrawerController.open("searcher", Searcher, {
 						...options,
@@ -277,8 +193,6 @@ class ComtyApp extends React.Component {
 				return app.location.push("/music")
 			},
 			goToSettings: (setting_id) => {
-				app.cores.sound.useUIAudio("navigation.settings")
-
 				return app.location.push(`/settings`, {
 					query: {
 						setting: setting_id
@@ -303,18 +217,6 @@ class ComtyApp extends React.Component {
 			goToPlaylist: (playlist_id) => {
 				return app.location.push(`/play/${playlist_id}`)
 			}
-		},
-		electron: {
-			closeApp: () => {
-				if (window.isElectron) {
-					window.electron.ipcRenderer.invoke("app.close")
-				}
-			},
-			minimizeApp: () => {
-				if (window.isElectron) {
-					window.electron.ipcRenderer.invoke("app.minimize")
-				}
-			},
 		},
 		capacitor: {
 			isAppCapacitor: () => window.navigator.userAgent === "capacitor",
@@ -348,15 +250,17 @@ class ComtyApp extends React.Component {
 				return await StatusBar.show()
 			},
 		},
-		clearInternalStorage: async () => {
-			antd.Modal.confirm({
-				title: "Clear internal storage",
-				content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
-				onOk: async () => {
-					Utils.deleteInternalStorage()
-				}
-			})
-		},
+		maintenance:{
+			clearInternalStorage: async () => {
+				antd.Modal.confirm({
+					title: "Clear internal storage",
+					content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
+					onOk: async () => {
+						Utils.deleteInternalStorage()
+					}
+				})
+			},
+		}
 	}
 
 	static staticRenders = {
@@ -392,31 +296,13 @@ class ComtyApp extends React.Component {
 		"app.no_session": async () => {
 			const location = window.location.pathname
 
-			if (location !== "/" && location !== "/auth" && location !== "/register") {
+			if (location !== "/auth" && location !== "/register") {
 				antd.notification.info({
 					message: "You are not logged in, to use some features you will need to log in.",
-					btn: <antd.Button type="primary" onClick={() => app.goAuth()}>Login</antd.Button>,
+					btn: <antd.Button type="primary" onClick={() => app.controls.openLoginForm()}>Login</antd.Button>,
 					duration: 15,
 				})
 			}
-		},
-		"auth:login_success": async () => {
-			app.eventBus.emit("layout.animations.fadeOut")
-
-			await this.initialization()
-
-			app.cores.api.reconnectWebsockets()
-
-			app.navigation.goMain()
-
-			app.eventBus.emit("layout.animations.fadeIn")
-		},
-		"auth:logout_success": async () => {
-			app.cores.api.disconnectWebsockets()
-
-			app.navigation.goAuth()
-
-			await this.flushState()
 		},
 		"session.invalid": async (error) => {
 			const token = await SessionModel.token
@@ -440,18 +326,24 @@ class ComtyApp extends React.Component {
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
 		},
-		"devtool-opened": () => {
-			// show warning
-			antd.notification.open({
-				message: <Translation>
-					{(t) => t("Devtool opened")}
-				</Translation>,
-				description: <Translation>
-					{(t) => t("You have opened the devtool for the first time, please be aware that this is a security risk and you should close it as soon as possible.")}
-				</Translation>,
-				icon: <Icons.MdOutlineWarning />,
-			})
-		}
+		"auth:login_success": async () => {
+			app.eventBus.emit("layout.animations.fadeOut")
+
+			await this.initialization()
+
+			app.cores.api.reconnectWebsockets()
+
+			app.navigation.goMain()
+
+			app.eventBus.emit("layout.animations.fadeIn")
+		},
+		"auth:logout_success": async () => {
+			app.cores.api.disconnectWebsockets()
+
+			app.navigation.goAuth()
+
+			await this.flushState()
+		},
 	}
 
 	flushState = async () => {
@@ -478,11 +370,9 @@ class ComtyApp extends React.Component {
 
 		await this.initialization()
 
-		app.cores.sound.useUIAudio("splash_out")
+		app.cores.sfx.play("splash_out")
 
 		this.setState({ initialized: true })
-
-		Utils.handleOpenDevTools()
 	}
 
 	onRuntimeStateUpdate = (state) => {

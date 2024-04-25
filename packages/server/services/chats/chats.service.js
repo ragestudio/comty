@@ -1,103 +1,56 @@
-import fs from "fs"
-import path from "path"
+import { Server } from "linebridge/src/server"
 
-import express from "express"
-import http from "http"
-import EventEmitter from "@foxify/events"
-
-import ComtyClient from "@shared-classes/ComtyClient"
+import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
+import RoomsController from "@classes/RoomsController"
 
-import routes from "./routes"
+import SharedMiddlewares from "@shared-middlewares"
 
-import ChatServer from "./chatServer"
+class API extends Server {
+    static refName = "chats"
+    static useEngine = "hyper-express"
+    static wsRoutesPath = `${__dirname}/ws_routes`
+    static routesPath = `${__dirname}/routes`
+    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3004
 
-export default class API {
-    constructor(options = {}) {
-        this.app = express()
-        this.httpServer = http.createServer(this.app)
+    middlewares = {
+        ...SharedMiddlewares
+    }
 
-        this.websocketServer = new ChatServer(this.httpServer)
+    contexts = {
+        db: new DbManager(),
+        redis: RedisClient(),
+        rooms: null,
+    }
 
-        this.options = {
-            listenHost: process.env.HTTP_LISTEN_HOST || "0.0.0.0",
-            listenPort: process.env.HTTP_LISTEN_PORT || 3004,
-            ...options
+    wsEvents = {
+        "join:room": (socket, data) => {
+            this.contexts.rooms.connectSocketToRoom(socket, data.room)
+        },
+        "leave:room": (socket, data) => {
+            this.contexts.rooms.disconnectSocketFromRoom(socket, data?.room ?? socket.connectedRoom)
+        },
+        "disconnect": (socket) => {
+            try {
+                console.log(`[${socket.id}] disconnected from hub.`)
+
+                if (socket.connectedRoomID) {
+                    this.contexts.rooms.disconnectSocketFromRoom(socket, socket.connectedRoomID)
+                }
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
-    redis = global.redis = RedisClient({
-        withWsAdapter: true
-    })
+    async onInitialize() {
+        this.contexts.rooms = new RoomsController(this.engine.io)
 
-    comty = global.comty = ComtyClient()
-
-    eventBus = global.eventBus = new EventEmitter()
-
-    async __registerInternalMiddlewares() {
-        let middlewaresPath = fs.readdirSync(path.resolve(__dirname, "useMiddlewares"))
-
-        for await (const middlewarePath of middlewaresPath) {
-            const middleware = require(path.resolve(__dirname, "useMiddlewares", middlewarePath)).default
-
-            if (!middleware) {
-                console.error(`Middleware ${middlewarePath} not found.`)
-
-                continue
-            }
-
-            this.app.use(middleware)
-        }
+        await this.contexts.db.initialize()
+        await this.contexts.redis.initialize()
     }
 
-    registerRoutes() {
-        routes.forEach((route) => {
-            const order = []
-
-            if (route.middlewares) {
-                route.middlewares.forEach((middleware) => {
-                    order.push(middleware)
-                })
-            }
-
-            order.push(route.routes)
-
-            this.app.use(route.use, ...order)
-        })
-    }
-
-    async registerBaseRoute() {
-        await this.app.get("/", async (req, res) => {
-            return res.json({
-                uptimeMinutes: Math.floor(process.uptime() / 60),
-            })
-        })
-    }
-
-    initialize = async () => {
-        const startHrTime = process.hrtime()
-
-        await this.redis.initialize()
-
-        await this.websocketServer.initialize()
-
-        await this.__registerInternalMiddlewares()
-
-        this.app.use(express.json({ extended: false }))
-        this.app.use(express.urlencoded({ extended: true }))
-
-        await this.registerBaseRoute()
-        await this.registerRoutes()
-
-        await this.httpServer.listen(this.options.listenPort, this.options.listenHost)
-
-        // calculate elapsed time
-        const elapsedHrTime = process.hrtime(startHrTime)
-        const elapsedTimeInMs = elapsedHrTime[0] * 1000 + elapsedHrTime[1] / 1e6
-
-        // log server started
-        console.log(`🚀 Server started ready on \n\t - http://${this.options.listenHost}:${this.options.listenPort} \n\t - Tooks ${elapsedTimeInMs}ms`)
-    }
+    handleWsAuth = require("@shared-lib/handleWsAuth").default
 }
 
 Boot(API)

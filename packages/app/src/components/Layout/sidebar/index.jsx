@@ -1,13 +1,13 @@
 import React from "react"
-import config from "config"
+import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { Motion, spring } from "react-motion"
 import { Menu, Avatar, Dropdown } from "antd"
 
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "@components/Icons"
 
-import sidebarItems from "schemas/sidebar"
+import sidebarItems from "@config/sidebar"
 
 import "./index.less"
 
@@ -277,7 +277,7 @@ export default class Sidebar extends React.Component {
 		}
 
 		if (typeof e.key === "undefined") {
-			window.app.eventBus.emit("invalidSidebarKey", e)
+			app.eventBus.emit("invalidSidebarKey", e)
 			return false
 		}
 
@@ -285,11 +285,11 @@ export default class Sidebar extends React.Component {
 			return onClickHandlers[e.key](e)
 		}
 
-		window.app.cores.sound.useUIAudio("sidebar.switch_tab")
+		app.cores.sfx.play("sidebar.switch_tab")
 
 		const item = this.state.topItems.find((item) => item.id === e.key)
 
-		return window.app.location.push(`/${item.path ?? e.key}`, 150)
+		return app.location.push(`/${item.path ?? e.key}`, 150)
 	}
 
 	onMouseEnter = () => {

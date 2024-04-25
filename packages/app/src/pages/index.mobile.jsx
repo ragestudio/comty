@@ -1,6 +1,6 @@
 import React from "react"
 
-import { PagePanelWithNavMenu } from "components/PagePanels"
+import { PagePanelWithNavMenu } from "@components/PagePanels"
 
 import Tabs from "./home/tabs"
 

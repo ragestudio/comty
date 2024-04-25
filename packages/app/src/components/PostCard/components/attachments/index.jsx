@@ -1,12 +1,12 @@
 import React from "react"
 import { Skeleton, Button } from "antd"
-import { ImageViewer } from "components"
 import Plyr from "plyr-react"
 import mimetypes from "mime"
+import BearCarousel from "bear-react-carousel"
+
+import ImageViewer from "@components/ImageViewer"
 
 import ContentFailed from "../contentFailed"
-
-import BearCarousel from "bear-react-carousel"
 
 import "bear-react-carousel/dist/index.css"
 import "plyr-react/dist/plyr.css"

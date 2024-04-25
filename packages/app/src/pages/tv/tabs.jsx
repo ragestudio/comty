@@ -1,12 +1,18 @@
-import FeedTab from "./tabs/feed"
-import ControlPanelTab from "./tabs/livestreamControlPanel"
+import LivestreamsList from "./tabs/livestreamsList"
 
 export default [
     {
-        key: "feed",
-        label: "Feed",
-        icon: "Compass",
-        component: FeedTab
+        key: "live",
+        label: "Livestreams",
+        icon: "Radio",
+        component: LivestreamsList
+    },
+    {
+        key: "videos",
+        label: "Videos",
+        icon: "Video",
+        component: LivestreamsList,
+        disabled: true,
     },
     {
         key: "controlPanel",
@@ -21,9 +27,9 @@ export default [
             },
             {
                 key: "controlPanel.streaming_settings",
-                label: "Livestreaming",
+                label: "Stream Configuration",
                 icon: "Settings",
-                component: ControlPanelTab
+                disabled: true,
             },
             {
                 key: "controlPanel.dvr_settings",

@@ -1,17 +1,18 @@
 import React from "react"
 import * as antd from "antd"
-import { createIconRender } from "components/Icons"
 import { Translation } from "react-i18next"
-import config from "config"
 
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
-import useUserRemoteConfig from "hooks/useUserRemoteConfig"
+import { createIconRender } from "@components/Icons"
+import config from "@config"
+
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
+import useUserRemoteConfig from "@hooks/useUserRemoteConfig"
 
 import {
     composedSettingsByGroups as settings
-} from "schemas/settings"
+} from "@/settings"
 
-import menuGroupsDecorators from "schemas/settingsMenuGroupsDecorators"
+import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
 
 import SettingTab from "./components/SettingTab"
 
@@ -99,7 +100,7 @@ export default () => {
             return menuEvents[event.key]()
         }
 
-        app.cores.sound.useUIAudio("navigation")
+        app.cores.sfx.play("settings.navigation")
 
         setActiveKey(event.key)
     }

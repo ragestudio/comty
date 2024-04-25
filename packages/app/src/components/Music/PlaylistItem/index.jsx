@@ -1,13 +1,22 @@
 import React from "react"
 import classnames from "classnames"
 
-import { ImageViewer } from "components"
-import { Icons } from "components/Icons"
+import { ImageViewer } from "@components"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
+const typeToNavigationType = {
+    playlist: "playlist",
+    album: "album",
+    track: "track",
+    single: "track",
+    ep: "album"
+}
+
 export default (props) => {
     const [coverHover, setCoverHover] = React.useState(false)
+
     let { playlist } = props
 
     if (!playlist) {
@@ -19,7 +28,7 @@ export default (props) => {
             return props.onClick(playlist)
         }
 
-        return app.location.push(`/play/${playlist._id}`)
+        return app.location.push(`/music/${typeToNavigationType[playlist.type.toLowerCase()]}/${playlist._id}`)
     }
 
     const onClickPlay = (e) => {

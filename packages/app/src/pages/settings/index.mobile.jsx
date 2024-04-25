@@ -1,18 +1,19 @@
 import React from "react"
 import * as antd from "antd"
-
 import { Translation } from "react-i18next"
-import useUrlQueryActiveKey from "hooks/useUrlQueryActiveKey"
 
-import { Icons, createIconRender } from "components/Icons"
-import UseTopBar from "hooks/useTopBar"
+import { Icons, createIconRender } from "@components/Icons"
+
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
+import UseTopBar from "@hooks/useTopBar"
 
 import {
     composedSettingsByGroups as settingsGroups,
     composedTabs,
-} from "schemas/settings"
+} from "@/settings"
 
-import menuGroupsDecorators from "schemas/settingsMenuGroupsDecorators"
+import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
+
 import SettingTab from "./components/SettingTab"
 
 import "./index.mobile.less"

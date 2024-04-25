@@ -1,10 +1,11 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import { FollowsModel } from "models"
 
-import { MobileUserCard } from "components/UserCard"
+import { Icons } from "@components/Icons"
+import { MobileUserCard } from "@components/UserCard"
 import NFCModel from "comty.js/models/nfc"
+
+import { FollowsModel } from "@models"
 
 import "./index.less"
 

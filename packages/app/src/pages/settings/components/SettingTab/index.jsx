@@ -2,14 +2,14 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 import {
     composedTabs,
     composeGroupsFromSettingsTab,
-} from "schemas/settings"
+} from "@/settings"
 
-import groupsDecorators from "schemas/settingsGroupsDecorators"
+import groupsDecorators from "@config/settingsGroupsDecorators"
 
 import SettingItemComponent from "../SettingItemComponent"
 

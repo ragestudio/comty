@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import UserModel from "models/user"
+import AuthModel from "@models/auth"
 
 const EmailStepComponent = (props) => {
     const [email, setEmail] = React.useState(props.currentValue ?? "")
@@ -46,7 +46,7 @@ const EmailStepComponent = (props) => {
         const timer = setTimeout(async () => {
             if (!validFormat) return
 
-            const request = await UserModel.checkEmailAvailability(email).catch((error) => {
+            const request = await AuthModel.availability({ email }).catch((error) => {
                 antd.message.error(`Cannot check email availability: ${error.message}`)
 
                 return false

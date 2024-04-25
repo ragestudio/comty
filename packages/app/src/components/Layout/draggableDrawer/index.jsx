@@ -1,11 +1,11 @@
 // © Jack Hanford https://github.com/hanford/react-drag-drawer
 import React, { Component } from "react"
+import { createPortal } from "react-dom"
 import { Motion, spring, presets } from "react-motion"
 import classnames from "classnames"
 import PropTypes from "prop-types"
 import Observer from "react-intersection-observer"
 import { css } from "@emotion/css"
-import { createPortal } from "react-dom"
 
 import "./index.less"
 

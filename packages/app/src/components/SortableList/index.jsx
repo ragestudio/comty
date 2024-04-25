@@ -1,8 +1,10 @@
 import React from "react"
 import { Button } from "antd"
-import { Icons, createIconRender } from "components/Icons"
 import classnames from "classnames"
-import useLongPress from "hooks/useLongPress"
+
+import { Icons, createIconRender } from "@components/Icons"
+
+import useLongPress from "@hooks/useLongPress"
 
 import {
     DndContext,

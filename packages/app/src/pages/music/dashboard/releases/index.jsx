@@ -1,13 +1,13 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "components/Icons"
-import { ImageViewer } from "components"
-import Searcher from "components/Searcher"
+import { Icons } from "@components/Icons"
+import ImageViewer from "@components/ImageViewer"
+import Searcher from "@components/Searcher"
 
 import ReleaseCreator from "../../creator"
 
-import MusicModel from "models/music"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

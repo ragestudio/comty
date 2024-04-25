@@ -2,11 +2,11 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
-import UploadButton from "components/UploadButton"
 
-import MusicModel from "models/music"
+import UploadButton from "@components/UploadButton"
+import { Icons } from "@components/Icons"
 
-import { Icons } from "components/Icons"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

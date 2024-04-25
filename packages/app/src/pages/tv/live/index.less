@@ -1,0 +1,331 @@
+@panel-width: 500px;
+@chatbox-header-height: 50px;
+
+html {
+    &.mobile {
+        .livestream {
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .livestream_panel {
+            position: absolute;
+            bottom: 0;
+            height: 20%;
+        }
+
+        .livestream_player {
+            height: 100%;
+            width: 100%;
+
+            .plyr {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+}
+
+.plyr__controls {
+    width: 100%;
+    display: inline-flex;
+    //justify-content: space-between;
+}
+
+.livestream {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 100vh;
+    width: 100%;
+
+    overflow: hidden;
+
+    color: var(--background-color-contrast);
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    span,
+    p {
+        color: var(--background-color-contrast);
+    }
+
+    &.cinemaMode {
+        .livestream_player {
+            width: 100vw;
+
+            video {
+                width: 100vw;
+            }
+
+            .plyr {
+                width: 100vw;
+            }
+
+            .livestream_player_header {
+                animation: disappear 0.3s ease-in-out forwards;
+            }
+        }
+
+        .livestream_panel {
+            position: absolute;
+            z-index: 99;
+
+            right: 0;
+            top: 0;
+
+            height: 60vh;
+            width: 20vw;
+
+            padding: 20px;
+
+            overflow-x: hidden;
+
+            .chatbox {
+                padding: 0;
+
+                overflow-x: hidden;
+                overflow-y: hidden;
+
+                .liveChat {
+                    .liveChat_timeline {
+                        padding-top: 0 !important;
+
+                        &::after {
+                            content: "";
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .livestream_player {
+        display: flex;
+        position: relative;
+
+        align-items: center;
+        justify-content: center;
+
+        width: calc(100% - @panel-width);
+        height: 100%;
+
+        overflow-y: hidden;
+
+        transition: all 0.3s ease-in-out;
+
+        .livestream_player_loading {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            position: absolute;
+            z-index: 90;
+
+            width: 100%;
+            height: 100%;
+
+            backdrop-filter: blur(10px);
+
+            transition: all 0.3s ease-in-out;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            &.active {
+                opacity: 1;
+            }
+        }
+
+        video {
+            z-index: 80;
+        }
+
+        .livestream_player_header {
+            display: flex;
+            flex-direction: row;
+
+            position: absolute;
+            z-index: 100;
+
+            top: 0;
+            left: 0;
+
+            width: fit-content;
+            height: fit-content;
+
+            min-width: 20vw;
+            max-width: 50vw;
+
+            margin: 20px;
+            padding: 10px;
+
+            background-color: var(--background-color-accent);
+
+            border-radius: 12px;
+
+            h1,
+            h2,
+            h3,
+            h4,
+            span {
+                margin: 0;
+
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .livestream_player_header_user {
+                display: flex;
+                flex-direction: column;
+
+                margin-right: 20px;
+
+                .livestream_player_indicators {
+                    display: flex;
+                    flex-direction: row;
+
+                    align-items: center;
+                    justify-content: space-between;
+
+                    gap: 10px;
+
+                    margin-top: 10px;
+
+                    .livestream_player_header_user_spectators {
+                        height: fit-content;
+
+                        .ant-tag {
+                            background-color: #eb0400;
+                            border-color: #eb0400;
+                            color: var(--background-color-contrast);
+                            font-size: 1rem;
+                        }
+                    }
+
+                    .livestream_player_header_user_quality {
+                        font-size: 1.8rem;
+                        height: fit-content;
+
+                        svg {
+                            color: var(--text-color);
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+
+            .livestream_player_header_info {
+                display: flex;
+                flex-direction: column;
+
+                overflow: hidden;
+
+                width: 100%;
+
+                .livestream_player_header_title {
+                    font-family: "Space Grotesk", sans-serif;
+                    font-size: 1rem;
+                    font-weight: 700;
+
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .livestream_player_header_description {
+                    font-size: 0.8rem;
+                    font-weight: 300;
+                    font-style: italic;
+
+                    h4 {
+                        margin-left: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    .livestream_panel {
+        display: flex;
+        flex-direction: column;
+
+        position: relative;
+        height: 100vh;
+
+        width: @panel-width;
+
+        .chatbox {
+            position: relative;
+
+            width: 100%;
+            height: 100%;
+
+            overflow: hidden;
+
+            padding: 20px;
+
+            .chatbox_header {
+                position: absolute;
+                z-index: 100;
+
+                display: flex;
+                flex-direction: column;
+
+                justify-content: center;
+
+                z-index: 100;
+
+                top: 0;
+                left: 0;
+
+                width: 100%;
+                height: @chatbox-header-height;
+
+                padding: 20px;
+
+                backdrop-filter: blur(20px);
+            }
+
+            .liveChat {
+                .liveChat_timeline {
+                    &::after {
+                        position: absolute;
+                        z-index: 90;
+
+                        content: "";
+
+                        top: 0px;
+                        left: 0;
+
+                        width: 100%;
+                        height: @chatbox-header-height;
+
+                        filter: blur(7px);
+                        background-color: rgba(var(--layoutBackgroundColor), 0.7);
+                    }
+
+                    padding-top: @chatbox-header-height;
+                }
+            }
+        }
+    }
+
+    .plyr {
+        border-radius: 0 4px 4px 0;
+        width: 80vw;
+        height: 100vh;
+    }
+}

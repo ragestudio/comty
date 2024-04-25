@@ -1,13 +1,12 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
 import { AnimatePresence } from "framer-motion"
+import { Icons } from "@components/Icons"
 
-import PostCard from "components/PostCard"
-import PlaylistTimelineEntry from "components/Music/PlaylistTimelineEntry"
-import LoadMore from "components/LoadMore"
+import PostCard from "@components/PostCard"
+import LoadMore from "@components/LoadMore"
 
-import PostModel from "models/post"
+import PostModel from "@models/post"
 
 import "./index.less"
 
@@ -33,7 +32,7 @@ const NoResultComponent = () => {
 
 const typeToComponent = {
     "post": (args) => <PostCard {...args} />,
-    "playlist": (args) => <PlaylistTimelineEntry {...args} />,
+    //"playlist": (args) => <PlaylistTimelineEntry {...args} />,
 }
 
 const Entry = React.memo((props) => {

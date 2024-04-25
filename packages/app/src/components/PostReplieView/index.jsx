@@ -1,7 +1,7 @@
 import React from "react"
 
-import { Image } from "components"
-import { Icons } from "components/Icons"
+import Image from "@components/Image"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 

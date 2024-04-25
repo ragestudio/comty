@@ -4,14 +4,14 @@ import classnames from "classnames"
 import { ActionSheet } from "antd-mobile"
 import { Motion, spring } from "react-motion"
 
-import { Icons, createIconRender } from "components/Icons"
+import { Icons, createIconRender } from "@components/Icons"
 
-import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
+import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
 
-import { QuickNavMenuItems, QuickNavMenu } from "components/Layout/quickNav"
+import { QuickNavMenuItems, QuickNavMenu } from "@components/Layout/quickNav"
 
-import PlayerView from "pages/@mobile-views/player"
-import CreatorView from "pages/@mobile-views/creator"
+import PlayerView from "@pages/@mobile-views/player"
+import CreatorView from "@pages/@mobile-views/creator"
 
 import "./index.less"
 

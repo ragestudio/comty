@@ -9,27 +9,20 @@ const NotfTypeToAudio = {
 
 class NotificationFeedback {
     static getSoundVolume = () => {
-        return (window.app.cores.settings.get("notifications_sound_volume") ?? 50) / 100
+        return (window.app.cores.settings.get("sfx:notifications_volume") ?? 50) / 100
     }
 
     static playHaptic = async (options = {}) => {
-        const vibrationEnabled = options.vibrationEnabled ?? window.app.cores.settings.get("notifications_vibrate")
-
-        if (vibrationEnabled) {
+        if (app.cores.settings.get("haptics:notifications_feedback")) {
             await Haptics.vibrate()
         }
     }
 
-    static playAudio = (options = {}) => {
-        const soundEnabled = options.soundEnabled ?? window.app.cores.settings.get("notifications_sound")
-        const soundVolume = options.soundVolume ? options.soundVolume / 100 : NotificationFeedback.getSoundVolume()
-
-        if (soundEnabled) {
-            if (typeof window.app.cores.sound?.play === "function") {
-                const sound = options.sound ?? NotfTypeToAudio[options.type] ?? "notification"
-
-                window.app.cores.sound.play(sound, {
-                    volume: soundVolume,
+    static playAudio = (type) => {
+        if (app.cores.settings.get("sfx:notifications_feedback")) {
+            if (typeof window.app.cores.sfx?.play === "function") {
+                window.app.cores.sfx.play(NotfTypeToAudio[type] ?? "notification", {
+                    volume: NotificationFeedback.getSoundVolume(),
                 })
             }
         }

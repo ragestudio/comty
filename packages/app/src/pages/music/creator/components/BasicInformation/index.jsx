@@ -1,7 +1,8 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
-import UploadButton from "components/UploadButton"
+
+import { Icons } from "@components/Icons"
+import UploadButton from "@components/UploadButton"
 
 export default (props) => {
     const [releaseName, setReleaseName] = React.useState(props.release.title)

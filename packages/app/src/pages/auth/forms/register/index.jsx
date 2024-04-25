@@ -1,11 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-
-import { Icons, createIconRender } from "components/Icons"
-
 import classnames from "classnames"
 
-import AuthModel from "models/auth"
+import { Icons, createIconRender } from "@components/Icons"
+
+import AuthModel from "@models/auth"
 
 import "./index.less"
 

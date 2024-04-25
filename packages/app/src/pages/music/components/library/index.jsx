@@ -2,12 +2,11 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import Image from "components/Image"
-import { Icons } from "components/Icons"
+import Image from "@components/Image"
+import { Icons } from "@components/Icons"
+import OpenPlaylistCreator from "@components/Music/PlaylistCreator"
 
-import MusicModel from "models/music"
-
-import OpenPlaylistCreator from "components/Music/PlaylistCreator"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

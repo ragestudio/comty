@@ -1,10 +1,10 @@
 import React from "react"
 import * as antd from "antd"
-import { Icons } from "components/Icons"
 import classnames from "classnames"
+import { Icons } from "@components/Icons"
 
-import AuthModel from "models/auth"
-import config from "config"
+import AuthModel from "@models/auth"
+import config from "@config"
 
 import "./index.less"
 

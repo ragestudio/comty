@@ -1,6 +1,6 @@
 import React from "react"
-import { Dropdown, Button } from "antd"
-import { Icons } from "components/Icons"
+import { Dropdown } from "antd"
+import { Icons } from "@components/Icons"
 
 import SaveButton from "./saveButton"
 import LikeButton from "./likeButton"

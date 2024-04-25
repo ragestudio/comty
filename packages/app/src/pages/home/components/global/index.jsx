@@ -1,8 +1,8 @@
 import React from "react"
 
-import { PostsList } from "components"
+import { PostsList } from "@components"
 
-import Feed from "models/feed"
+import Feed from "@models/feed"
 
 import "./index.less"
 

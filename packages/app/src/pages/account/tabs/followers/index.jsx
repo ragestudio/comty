@@ -1,6 +1,6 @@
 import React from "react"
 
-import { FollowersList } from "components"
+import FollowersList from "@components/FollowersList"
 
 import "./index.less"
 

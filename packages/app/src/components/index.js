@@ -18,7 +18,6 @@ export { default as Navigation } from "./Navigation"
 export { default as ImageViewer } from "./ImageViewer"
 export { default as Image } from "./Image"
 export { default as LoadMore } from "./LoadMore"
-export { default as HashtagTrendings } from "./HashtagTrendings"
 export { default as Searcher } from "./Searcher"
 
 export { default as FeaturedEventAnnouncement } from "./FeaturedEventAnnouncement"
@@ -35,18 +34,12 @@ export { default as FollowButton } from "./FollowButton"
 // POSTS
 export { default as PostsList } from "./PostsList"
 export { default as PostCard } from "./PostCard"
-export { default as PostViewer } from "./PostViewer"
 export { default as PostCreator } from "./PostCreator"
-
-// COMMENTS
-export { default as CommentsCard } from "./CommentsCard"
-export { default as CommentCreator } from "./CommentCreator"
 
 // USERS
 export { default as UserBadges } from "./UserBadges"
 export { default as UserCard } from "./UserCard"
 export { default as FollowersList } from "./FollowersList"
-export { default as ConnectedFriends } from "./ConnectedFriends"
 export { default as UserPreview } from "./UserPreview"
 
 // OTHERS

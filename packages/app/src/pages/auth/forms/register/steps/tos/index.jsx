@@ -1,8 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 
-import MarkdownReader from "components/MarkdownReader"
-import config from "config"
+import MarkdownReader from "@components/MarkdownReader"
+import config from "@config"
 
 const FrameStyle = {
     "width": "60vw",

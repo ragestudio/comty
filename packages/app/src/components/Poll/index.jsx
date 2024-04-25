@@ -1,5 +1,6 @@
 import React from "react"
-import { createIconRender } from "components/Icon"
+
+import { createIconRender } from "@components/Icon"
 
 import "./index.less"
 

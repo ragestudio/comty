@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken"
-import { Session, RegenerationToken, User, TosViolations } from "../../db_models"
+import { Session, RefreshToken, User, TosViolations } from "@db_models"
 
 export default class Token {
-    static get strategy() {
+    static get authStrategy() {
         return {
             secret: process.env.JWT_SECRET,
             expiresIn: process.env.JWT_EXPIRES_IN ?? "24h",
@@ -10,24 +10,18 @@ export default class Token {
         }
     }
 
-    static async createNewAuthToken(payload, options = {}) {
-        if (options.updateSession) {
-            const sessionData = await Session.findOne({ _id: options.updateSession })
-
-            payload.session_uuid = sessionData.session_uuid
-        } else {
-            payload.session_uuid = global.nanoid()
+    static get refreshStrategy() {
+        return {
+            secret: process.env.JWT_SECRET,
+            expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "30d",
+            algorithm: process.env.JWT_ALGORITHM ?? "HS256",
         }
+    }
 
-        const { secret, expiresIn, algorithm } = Token.strategy
+    static async signToken(payload, strategy = "authStrategy") {
+        const { secret, expiresIn, algorithm } = Token[strategy] ?? Token.authStrategy
 
-        const token = jwt.sign(
-            {
-                session_uuid: payload.session_uuid,
-                username: payload.username,
-                user_id: payload.user_id,
-                signLocation: payload.signLocation,
-            },
+        const token = jwt.sign(payload,
             secret,
             {
                 expiresIn: expiresIn,
@@ -36,6 +30,39 @@ export default class Token {
         )
 
         return token
+    }
+
+    static async createAuthToken(payload) {
+        const jwt_token = await this.signToken(payload, "authStrategy")
+
+        const session = new Session({
+            token: jwt_token,
+            username: payload.username,
+            user_id: payload.user_id,
+            sign_location: payload.sign_location,
+            ip_address: payload.ip_address,
+            client: payload.client,
+            date: new Date().getTime(),
+        })
+
+        await session.save()
+
+        return jwt_token
+    }
+
+    static async createRefreshToken(user_id, authToken) {
+        const jwt_token = await this.signToken({
+            user_id,
+        }, "refreshStrategy")
+
+        const refreshRegistry = new RefreshToken({
+            authToken: authToken,
+            refreshToken: jwt_token,
+        })
+
+        await refreshRegistry.save()
+
+        return jwt_token
     }
 
     static async validate(token) {
@@ -53,7 +80,7 @@ export default class Token {
             return result
         }
 
-        const { secret } = Token.strategy
+        const { secret } = Token.authStrategy
 
         await jwt.verify(token, secret, async (err, decoded) => {
             if (err) {
@@ -100,153 +127,59 @@ export default class Token {
         return result
     }
 
-    static async regenerate(expiredToken, refreshToken, aggregateData = {}) {
-        // search for a regeneration token with the expired token (Should exist only one)
-        const regenerationToken = await RegenerationToken.findOne({ refreshToken: refreshToken })
+    static async handleRefreshToken(payload) {
+        const { authToken, refreshToken } = payload
 
-        if (!regenerationToken) {
-            throw new Error("Cannot find regeneration token")
+        if (!authToken || !refreshToken) {
+            throw new OperationError(400, "Missing refreshToken or authToken")
         }
 
-        // check if the regeneration token is valid and not expired
-        let decodedRefreshToken = null
-        let decodedExpiredToken = null
-
-        try {
-            decodedRefreshToken = jwt.decode(refreshToken)
-            decodedExpiredToken = jwt.decode(expiredToken)
-        } catch (error) {
-            console.error(error)
-            // TODO: Storage this incident
+        let result = {
+            error: undefined,
+            token: undefined,
+            refreshToken: undefined,
         }
 
-        if (!decodedRefreshToken) {
-            throw new Error("Cannot decode refresh token")
-        }
-
-        if (!decodedExpiredToken) {
-            throw new Error("Cannot decode expired token")
-        }
-
-        // is not needed to verify the expired token, because it suppossed to be expired
-
-        // verify refresh token
-        await jwt.verify(refreshToken, global.jwtStrategy.secretOrKey, async (err) => {
-            // check if is expired
+        await jwt.verify(refreshToken, Token.refreshStrategy.secret, async (err, decoded) => {
             if (err) {
-                if (err.message === "jwt expired") {
-                    // check if server has enabled the enforcement of regeneration token expiration
-                    if (global.jwtStrategy.enforceRegenerationTokenExpiration) {
-                        // delete the regeneration token
-                        await RegenerationToken.deleteOne({ refreshToken: refreshToken })
-
-                        throw new Error("Regeneration token expired and cannot be regenerated due server has enabled enforcement security policy")
-                    }
-                }
+                result.error = err.message
+                return false
             }
 
-            // check if the regeneration token is associated with the expired token
-            if (decodedRefreshToken.expiredToken !== expiredToken) {
-                throw new Error("Regeneration token is not associated with the expired token")
+            if (!decoded.user_id) {
+                result.error = "Missing user_id"
+                return false
             }
-        })
 
-        // find the session associated with the expired token
-        const session = await Session.findOne({ token: expiredToken })
+            let currentSession = await Session.findOne({
+                user_id: decoded.user_id,
+                token: authToken
+            }).catch((err) => {
+                return null
+            })
 
-        if (!session) {
-            throw new Error("Cannot find session associated with the expired token")
-        }
-
-        // generate a new token
-        const newToken = await this.createNewAuthToken({
-            username: decodedExpiredToken.username,
-            session_uuid: session.session_uuid,
-            user_id: decodedExpiredToken.user_id,
-            ip_address: aggregateData.ip_address,
-        }, {
-            updateSession: session._id,
-        })
-
-        // delete the regeneration token
-        await RegenerationToken.deleteOne({ refreshToken: refreshToken })
-
-        return newToken
-    }
-
-    static async createAuth(payload, options = {}) {
-        const token = await this.createNewAuthToken(payload, options)
-
-        const session = {
-            token: token,
-            session_uuid: payload.session_uuid,
-            username: payload.username,
-            user_id: payload.user_id,
-            location: payload.signLocation,
-            ip_address: payload.ip_address,
-            client: payload.client,
-            date: new Date().getTime(),
-        }
-
-        if (options.updateSession) {
-            await Session.findByIdAndUpdate(options.updateSession, session)
-        } else {
-            let newSession = new Session(session)
-
-            await newSession.save()
-        }
-
-        return token
-    }
-
-    static async createRegenerative(expiredToken) {
-        // check if token is only expired, if is corrupted, reject
-        let decoded = null
-
-        try {
-            decoded = jwt.decode(expiredToken)
-        } catch (error) {
-            console.error(error)
-        }
-
-        if (!decoded) {
-            return false
-        }
-
-        // check if token exists on a session
-        const sessions = await Session.find({ user_id: decoded.user_id })
-        const currentSession = sessions.find((session) => session.token === expiredToken)
-
-        if (!currentSession) {
-            throw new Error("This token is not associated with any session")
-        }
-
-        // create a new refresh token and sign it with maximum expiration time of 1 day
-        const refreshToken = jwt.sign(
-            {
-                expiredToken
-            },
-            global.jwtStrategy.secretOrKey,
-            {
-                expiresIn: "1d"
+            if (!currentSession) {
+                result.error = "Session not matching with provided token"
+                return false
             }
-        )
 
-        // create a new regeneration token and save it
-        const regenerationToken = new RegenerationToken({
-            expiredToken,
-            refreshToken,
+            currentSession = currentSession.toObject()
+
+            await Session.findOneAndDelete({ _id: currentSession._id.toString() })
+
+            result.token = await this.createAuthToken({
+                ...currentSession,
+                date: new Date().getTime(),
+            })
+            result.refreshToken = await this.createRefreshToken(decoded.user_id, result.token)
+
+            return true
         })
 
-        await regenerationToken.save()
+        if (result.error) {
+            throw new OperationError(401, result.error)
+        }
 
-        // return the regeneration token
-        return regenerationToken
-    }
-
-    static async getRegenerationToken(expiredToken) {
-        const regenerationToken = await RegenerationToken.findOne({ expiredToken })
-
-        return regenerationToken
+        return result
     }
 }

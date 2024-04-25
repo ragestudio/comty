@@ -1,14 +1,14 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import humanSize from "@tsmx/human-readable"
-import PostLink from "components/PostLink"
-import { Icons } from "components/Icons"
 import { DateTime } from "luxon"
 import lodash from "lodash"
+import humanSize from "@tsmx/human-readable"
+import PostLink from "@components/PostLink"
+import { Icons } from "@components/Icons"
 
-import clipboardEventFileToFile from "utils/clipboardEventFileToFile"
-import PostModel from "models/post"
+import clipboardEventFileToFile from "@utils/clipboardEventFileToFile"
+import PostModel from "@models/post"
 
 import "./index.less"
 

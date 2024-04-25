@@ -1,17 +1,14 @@
 import React from "react"
-import { WithPlayerContext, Context } from "contexts/WithPlayerContext"
-
-import { Icons } from "components/Icons"
-
-import Marquee from "react-fast-marquee"
-
 import * as antd from "antd"
+import Marquee from "react-fast-marquee"
 import classnames from "classnames"
 
-import SeekBar from "components/Player/SeekBar"
-import Controls from "components/Player/Controls"
+import { Icons } from "@components/Icons"
+import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import SeekBar from "@components/Player/SeekBar"
+import Controls from "@components/Player/Controls"
 
-import RGBStringToValues from "utils/rgbToValues"
+import RGBStringToValues from "@utils/rgbToValues"
 
 import ExtraActions from "../ExtraActions"
 

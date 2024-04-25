@@ -1,7 +1,8 @@
 import React from "react"
 import { Result, Button, Typography } from "antd"
 import { CloseCircleOutlined } from "@ant-design/icons"
-import config from "config"
+
+import config from "@config"
 
 import "./index.less"
 

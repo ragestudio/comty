@@ -4,21 +4,19 @@ import classnames from "classnames"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import fuse from "fuse.js"
-import useWsEvents from "hooks/useWsEvents"
 
-import { WithPlayerContext } from "contexts/WithPlayerContext"
-import { Context as PlaylistContext } from "contexts/WithPlaylistContext"
+import useWsEvents from "@hooks/useWsEvents"
 
-import LoadMore from "components/LoadMore"
+import { WithPlayerContext } from "@contexts/WithPlayerContext"
+import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
-import { ImageViewer } from "components"
-import { Icons } from "components/Icons"
+import LoadMore from "@components/LoadMore"
+import { Icons } from "@components/Icons"
+import MusicTrack from "@components/Music/Track"
+import SearchButton from "@components/SearchButton"
+import ImageViewer from "@components/ImageViewer"
 
-import MusicModel from "models/music"
-
-import MusicTrack from "components/Music/Track"
-
-import SearchButton from "components/SearchButton"
+import MusicModel from "@models/music"
 
 import "./index.less"
 

@@ -1,7 +1,7 @@
 import * as antd from "antd"
-import config from "config"
+import config from "@config"
 
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 const MainSelector = (props) => {
     const {
@@ -14,26 +14,19 @@ const MainSelector = (props) => {
             <img src={app.isMobile ? config.logo.alt : config.logo.full} className="logo" />
         </div>
 
-        {
-            app.userData && <div
-                className="actions"
-                style={{
-                    marginBottom: "50px"
+        <div className="actions">
+            {
+                app.userData && <antd.Button
+                type="default"
+                size="large"
+                onClick={() => {
+                    app.navigation.goMain()
                 }}
             >
-                <antd.Button
-                    type="default"
-                    size="large"
-                    onClick={() => {
-                        app.navigation.goMain()
-                    }}
-                >
-                    Continue as {app.userData.username}
-                </antd.Button>
-            </div>
-        }
+                Continue as {app.userData.username}
+            </antd.Button>
+            }
 
-        <div className="actions">
             <antd.Button
                 onClick={onClickLogin}
                 size="large"

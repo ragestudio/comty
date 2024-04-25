@@ -1,8 +1,9 @@
 import React from "react"
-import { Button, Tooltip, Badge, Dropdown } from "antd"
-import { Icons } from "components/Icons"
-import LiveChat from "components/LiveChat"
+import { Button, Badge, Dropdown } from "antd"
 import classnames from "classnames"
+
+import { Icons } from "@components/Icons"
+import LiveChat from "@components/LiveChat"
 
 import "./index.less"
 

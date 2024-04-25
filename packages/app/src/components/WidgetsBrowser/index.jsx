@@ -1,11 +1,11 @@
 import React from "react"
-import { Skeleton, Result, Input, Button } from "antd"
-import { Icons } from "components/Icons"
-import Image from "components/Image"
+import { Skeleton, Result, Input } from "antd"
+
+import { Icons } from "@components/Icons"
+import WidgetItemPreview from "@components/WidgetItemPreview"
 
 import useRequest from "comty.js/hooks/useRequest"
 import WidgetModel from "comty.js/models/widget"
-import WidgetItemPreview from "components/WidgetItemPreview"
 
 import "./index.less"
 

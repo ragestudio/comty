@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { Rnd } from "react-rnd"
-import { Icons } from "components/Icons"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
