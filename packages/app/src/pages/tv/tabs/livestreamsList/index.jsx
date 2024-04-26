@@ -9,6 +9,7 @@ import SpectrumAPI from "@classes/SpectrumAPI"
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import "./index.less"
+import classNames from "classnames"
 
 const fac = new FastAverageColor()
 
@@ -114,7 +115,14 @@ export default (props) => {
         return <antd.Skeleton active />
     }
 
-    return <div className="livestream_list">
+    return <div
+        className={classNames(
+            "livestream_list",
+            {
+                ["empty"]: R_Streams.length === 0,
+            }
+        )}
+    >
         {
             R_Streams.length === 0 && <antd.Result>
                 <h1>
@@ -132,8 +140,9 @@ export default (props) => {
         }
 
         {
-            R_Streams.length !== 0 && R_Streams.map((livestream) => {
+            R_Streams.length !== 0 && R_Streams.map((livestream, index) => {
                 return <LivestreamItem
+                    key={index}
                     livestream={livestream}
                     onClick={onClickItem}
                 />

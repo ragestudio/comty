@@ -15,7 +15,7 @@
         "id": "music",
         "path": "/music",
         "title": "Music",
-        "icon": "MdMusicVideo"
+        "icon": "MdMusicNote"
     },
     {
         "id": "groups",

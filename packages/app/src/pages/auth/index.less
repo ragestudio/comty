@@ -14,7 +14,7 @@
     .background {
         position: absolute;
 
-        z-index: 50;
+        z-index: 10;
 
         top: 0;
         left: 0;
@@ -40,7 +40,7 @@
 
     .wrapper {
         position: relative;
-        z-index: 55;
+        z-index: 15;
 
         display: flex;
         flex-direction: row;
@@ -52,13 +52,14 @@
         overflow: hidden;
 
         height: 50vh;
+        min-height: 500px;
         max-height: 500px;
 
         transition: all 250ms ease-in-out;
 
         background-color: var(--background-color-accent);
 
-        outline: 1px solid var(--border-color);
+        border: 1px solid var(--border-color);
 
         border-radius: 12px;
 
