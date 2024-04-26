@@ -352,6 +352,13 @@ export default class Sidebar extends React.Component {
 						onMouseEnter={this.onMouseEnter}
 						onMouseLeave={this.handleMouseLeave}
 					>
+						{
+							window.__TAURI__ && navigator.platform.includes("Mac") && <div
+								className="app_sidebar_tauri"
+								data-tauri-drag-region
+							/>
+						}
+
 						<div
 							className={classnames(
 								"app_sidebar",

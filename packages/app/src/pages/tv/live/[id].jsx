@@ -306,10 +306,19 @@ export default class StreamViewer extends React.Component {
             {this.props.query.id}
             <div className="livestream_player">
                 <div className="livestream_player_header">
+                    <div
+                        className="livestream_player_header_exit"
+                        onClick={() => app.location.back()}
+                    >
+                        <Icons.IoMdExit />
+                    </div>
+
                     {
                         this.state.stream
                             ? <>
                                 <div className="livestream_player_header_user">
+
+
                                     <UserPreview user={this.state.stream.user} />
 
                                     <div className="livestream_player_indicators">

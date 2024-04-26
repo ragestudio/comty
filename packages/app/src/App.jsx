@@ -6,6 +6,9 @@ import { EviteRuntime } from "evite"
 import { Helmet } from "react-helmet"
 import { Translation } from "react-i18next"
 import * as Sentry from "@sentry/browser"
+import { invoke } from "@tauri-apps/api/tauri"
+import { Lightbox } from "react-modal-image"
+import * as antd from "antd"
 
 import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
@@ -14,9 +17,6 @@ import { CapacitorUpdater } from "@capgo/capacitor-updater"
 import AuthModel from "@models/auth"
 import SessionModel from "@models/session"
 import UserModel from "@models/user"
-
-import { Lightbox } from "react-modal-image"
-import * as antd from "antd"
 
 import {
 	NotFound,
@@ -29,8 +29,8 @@ import {
 	PostCreator,
 } from "@components"
 import { DOMWindow } from "@components/RenderWindow"
-
 import { Icons } from "@components/Icons"
+import DesktopTopBar from "@components/DesktopTopBar"
 
 import { ThemeProvider } from "@cores/style/style.core.jsx"
 
@@ -52,6 +52,7 @@ class ComtyApp extends React.Component {
 	}
 
 	state = {
+		desktopMode: false,
 		session: null,
 		initialized: false,
 	}
@@ -76,6 +77,10 @@ class ComtyApp extends React.Component {
 				dsn: import.meta.env.VITE_SENTRY_DSN,
 				release: "comty-web-app",
 			})
+		}
+
+		if (window.__TAURI__) {
+			window.__TAURI__.invoke = invoke
 		}
 	}
 
@@ -250,7 +255,7 @@ class ComtyApp extends React.Component {
 				return await StatusBar.show()
 			},
 		},
-		maintenance:{
+		maintenance: {
 			clearInternalStorage: async () => {
 				antd.Modal.confirm({
 					title: "Clear internal storage",
@@ -431,7 +436,7 @@ class ComtyApp extends React.Component {
 		app.userData = user
 
 		await this.setState({
-			user
+			user: user,
 		})
 	}
 
@@ -444,6 +449,9 @@ class ComtyApp extends React.Component {
 			</Helmet>
 			<Router.InternalRouter>
 				<ThemeProvider>
+					{
+						window.__TAURI__ && <DesktopTopBar />
+					}
 					<Layout
 						user={this.state.user}
 						staticRenders={ComtyApp.staticRenders}
