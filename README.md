@@ -78,3 +78,4 @@ Comty is licensed under the LGPL-2.1 license. See the LICENSE file for more deta
 
 ## :heart: Thanks to our supporters
 <kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
+<kbd><img src="https://avatars.githubusercontent.com/u/84641340?v=4" href="https://github.com/FoxasFoxVulpes" height="64" width="64" border="1px" align="center"></kbd>
