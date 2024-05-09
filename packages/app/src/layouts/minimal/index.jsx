@@ -2,7 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { Drawer, Sidedrawer } from "@components/Layout"
+import Drawer from "@layouts/components/drawer"
+import Sidedrawer from "@layouts/components/sidedrawer"
 
 export default (props) => {
     return <antd.Layout className={classnames("app_layout")} style={{ height: "100%" }}>

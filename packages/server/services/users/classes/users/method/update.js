@@ -25,7 +25,7 @@ export default async (user_id, update) => {
 
     user = user.toObject()
 
-    global.rtengine.io.of("/").emit(`user.update.${update}`, user)
+    global.websocket.io.of("/").emit(`user.update.${update}`, user)
 
     return user
 }

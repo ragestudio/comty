@@ -44,14 +44,7 @@ export default class Layout extends React.PureComponent {
 			}
 
 			transitionLayer.classList.remove("fade-opacity-leave")
-		},
-		"router.navigate": async (path, options) => {
-			this.progressBar.start()
-
-			await this.makePageTransition(options)
-
-			this.progressBar.done()
-		},
+		}
 	}
 
 	componentDidMount() {
@@ -80,33 +73,6 @@ export default class Layout extends React.PureComponent {
 
 	componentDidCatch(info, stack) {
 		this.setState({ renderError: { info, stack } })
-	}
-
-	async makePageTransition(options = {}) {
-		if (document.startViewTransition) {
-			return document.startViewTransition(async () => {
-				await new Promise((resolve) => {
-					setTimeout(resolve, options.state?.transitionDelay ?? 250)
-				})
-			})
-		}
-
-		const content_layout = document.getElementById("content_layout")
-
-		if (!content_layout) {
-			console.warn("content_layout not found, no animation will be played")
-
-			return false
-		}
-
-		content_layout.classList.add("fade-transverse-leave")
-
-		return await new Promise((resolve) => {
-			setTimeout(() => {
-				resolve()
-				content_layout.classList.remove("fade-transverse-leave")
-			}, options.state?.transitionDelay ?? 250)
-		})
 	}
 
 	layoutInterface = window.app.layout = {

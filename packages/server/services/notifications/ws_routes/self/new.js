@@ -1,5 +1,5 @@
 export default async () => {
-    global.rtengine.io.of("/").emit("new", {
+    global.websocket.io.of("/").emit("new", {
         hi: "hola xd"
     })
     

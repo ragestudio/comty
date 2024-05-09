@@ -40,11 +40,12 @@
         "@mui/material": "^5.11.9",
         "@ragestudio/cordova-nfc": "^1.2.0",
         "@sentry/browser": "^7.64.0",
+        "@tanstack/react-virtual": "^3.5.0",
         "@tauri-apps/api": "^1.5.4",
         "@tsmx/human-readable": "^1.0.7",
-        "antd": "^5.6.4",
+        "antd": "^5.17.0",
         "antd-mobile": "^5.31.0",
-        "axios": "^1.4.0",
+        "axios": "^1.6.8",
         "bear-react-carousel": "^4.0.10-alpha.0",
         "buffer": "^6.0.3",
         "capacitor-music-controls-plugin-v3": "^1.1.0",
@@ -65,7 +66,7 @@
         "lottie-react": "^2.4.0",
         "lru-cache": "^10.0.0",
         "luxon": "^3.0.4",
-        "million": "^2.5.4-beta.1",
+        "million": "^2.6.4",
         "mime": "^3.0.0",
         "moment": "2.29.4",
         "mpegts.js": "^1.6.10",
@@ -95,61 +96,15 @@
         "remark-gfm": "^3.0.1",
         "rxjs": "^7.5.5",
         "store": "^2.0.12",
-        "ua-parser-js": "^1.0.36"
+        "ua-parser-js": "^1.0.36",
+        "vite": "^5.2.11"
     },
     "devDependencies": {
         "@capacitor/assets": "^2.0.4",
-        "@electron-forge/cli": "^6.0.0-beta.66",
-        "@electron-forge/maker-deb": "^6.0.0-beta.66",
-        "@electron-forge/maker-rpm": "^6.0.0-beta.66",
-        "@electron-forge/maker-squirrel": "^6.0.0-beta.66",
-        "@electron-forge/maker-zip": "^6.0.0-beta.66",
-        "@electron-forge/plugin-vite": "^6.4.2",
-        "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-        "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
-        "@types/jest": "^26.0.24",
-        "@types/node": "^16.4.10",
-        "@types/react": "^17.0.15",
-        "@types/react-dom": "^17.0.9",
-        "@types/react-router-config": "^5.0.3",
-        "@types/react-router-dom": "^5.1.8",
-        "@typescript-eslint/eslint-plugin": "^4.29.0",
         "concurrently": "^7.4.0",
         "cors": "2.8.5",
         "cross-env": "^7.0.3",
-        "electron": "^21.0.1",
-        "electron-builder": "^24.6.4",
-        "electron-is": "^3.0.0",
-        "electron-log": "^4.4.8",
-        "electron-squirrel-startup": "^1.0.0",
         "express": "^4.17.1",
         "typescript": "^4.3.5"
-    },
-    "config": {
-        "forge": {
-            "packagerConfig": {},
-            "makers": [
-                {
-                    "name": "@electron-forge/maker-squirrel",
-                    "config": {
-                        "name": "comty"
-                    }
-                },
-                {
-                    "name": "@electron-forge/maker-zip",
-                    "platforms": [
-                        "darwin"
-                    ]
-                },
-                {
-                    "name": "@electron-forge/maker-deb",
-                    "config": {}
-                },
-                {
-                    "name": "@electron-forge/maker-rpm",
-                    "config": {}
-                }
-            ]
-        }
     }
 }

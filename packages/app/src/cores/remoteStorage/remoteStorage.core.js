@@ -32,8 +32,7 @@ export default class RemoteStorage extends Core {
             const fn = async () => new Promise((resolve, reject) => {
                 const uploader = new ChunkedUpload({
                     endpoint: `${app.cores.api.client().mainOrigin}/upload/chunk`,
-                    // TODO: get chunk size from settings
-                    splitChunkSize: 5 * 1024 * 1024, // 5MB in bytes 
+                    splitChunkSize: 5 * 1024 * 1024, 
                     file: file,
                     service: service,
                 })

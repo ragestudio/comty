@@ -18,8 +18,6 @@ export default React.forwardRef((props, ref) => {
     const insideViewportCb = (entries) => {
         const { fetching, onBottom } = props
 
-        console.log("entries", entries)
-
         entries.forEach(element => {
             if (element.intersectionRatio > 0 && !fetching) {
                 onBottom()
@@ -50,14 +48,14 @@ export default React.forwardRef((props, ref) => {
     >
         {children}
 
-        <lb style={{ clear: "both" }} />
+        <div style={{ clear: "both" }} />
 
-        <lb
+        <div
             id="bottom"
             className="bottom"
             style={{ display: hasMore ? "block" : "none" }}
         >
             {loadingComponent && React.createElement(loadingComponent)}
-        </lb>
+        </div>
     </div>
 })

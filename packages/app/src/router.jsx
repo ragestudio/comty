@@ -50,6 +50,7 @@ const generateRoutes = () => {
             .replace(/\/src\/pages|index|\.mobile|\.jsx$/g, "")
             .replace(/\/src\/pages|index|\.mobile|\.tsx$/g, "")
 
+        path = path.replace(/\[([a-z]+)\]/g, ":$1")
         path = path.replace(/\[\.{3}.+\]/, "*").replace(/\[(.+)\]/, ":$1")
 
         return {
@@ -59,7 +60,72 @@ const generateRoutes = () => {
     })
 }
 
-function generatePageElementWrapper(route, element, bindProps) {
+function findRouteDeclaration(route) {
+    return routesDeclaration.find((layout) => {
+        const routePath = layout.path.replace(/\*/g, ".*").replace(/!/g, "^")
+
+        return new RegExp(routePath).test(route)
+    }) ?? {
+        path: route,
+        useLayout: "default",
+    }
+}
+
+function isAuthenticated() {
+    return !!app.userData
+}
+
+function handleRouteDeclaration(declaration) {
+    React.useEffect(() => {
+        if (declaration) {
+            // if not authenticated and is not in public route, redirect
+            if (!isAuthenticated() && !declaration.public && (window.location.pathname !== config.app?.authPath)) {
+                if (typeof window.app.location.push === "function") {
+                    window.app.location.push(config.app?.authPath ?? "/login")
+
+                    app.cores.notifications.new({
+                        title: "Please login to use this feature.",
+                        duration: 15,
+                    })
+                } else {
+                    window.location.href = config.app?.authPath ?? "/login"
+                }
+            } else {
+                if (declaration.useLayout) {
+                    app.layout.set(declaration.useLayout)
+                }
+
+                if (typeof declaration.centeredContent !== "undefined") {
+                    let finalBool = null
+
+                    if (typeof declaration.centeredContent === "boolean") {
+                        finalBool = declaration.centeredContent
+                    } else {
+                        if (app.isMobile) {
+                            finalBool = declaration.centeredContent?.mobile ?? null
+                        } else {
+                            finalBool = declaration.centeredContent?.desktop ?? null
+                        }
+                    }
+
+                    app.layout.toggleCenteredContent(finalBool)
+                }
+
+                if (typeof declaration.useTitle !== "undefined") {
+                    if (typeof declaration.useTitle === "function") {
+                        declaration.useTitle = declaration.useTitle(path, params)
+                    }
+
+                    document.title = `${declaration.useTitle} - ${config.app.siteName}`
+                } else {
+                    document.title = config.app.siteName
+                }
+            }
+        }
+    }, [])
+}
+
+function generatePageElementWrapper(path, element, props, declaration) {
     return React.createElement((props) => {
         const params = useParams()
         const url = new URL(window.location)
@@ -67,76 +133,15 @@ function generatePageElementWrapper(route, element, bindProps) {
             get: (target, prop) => target.searchParams.get(prop),
         })
 
-        const routeDeclaration = routesDeclaration.find((layout) => {
-            const routePath = layout.path.replace(/\*/g, ".*").replace(/!/g, "^")
-
-            return new RegExp(routePath).test(route)
-        }) ?? {
-            path: route,
-            useLayout: "default",
-        }
-
-        route = route.replace(/\?.+$/, "").replace(/\/{2,}/g, "/")
-        route = route.replace(/\/$/, "")
-
-        if (routeDeclaration) {
-            if (!bindProps.user && (window.location.pathname !== config.app?.authPath)) {
-                if (!routeDeclaration.public) {
-                    if (typeof window.app.location.push === "function") {
-                        window.app.location.push(config.app?.authPath ?? "/login")
-                        return <div />
-                    }
-
-                    window.location.href = config.app?.authPath ?? "/login"
-
-                    return <div />
-                }
-            }
-
-            if (routeDeclaration.useLayout) {
-                app.layout.set(routeDeclaration.useLayout)
-            }
-
-            if (typeof routeDeclaration.centeredContent !== "undefined") {
-                let finalBool = null
-
-                if (typeof routeDeclaration.centeredContent === "boolean") {
-                    finalBool = routeDeclaration.centeredContent
-                } else {
-                    if (app.isMobile) {
-                        finalBool = routeDeclaration.centeredContent?.mobile ?? null
-                    } else {
-                        finalBool = routeDeclaration.centeredContent?.desktop ?? null
-                    }
-                }
-
-                app.layout.toggleCenteredContent(finalBool)
-            }
-
-            if (typeof routeDeclaration.useTitle !== "undefined") {
-                if (typeof routeDeclaration.useTitle === "function") {
-                    routeDeclaration.useTitle = routeDeclaration.useTitle(route, params)
-                }
-
-                document.title = `${routeDeclaration.useTitle} - ${config.app.siteName}`
-            } else {
-                document.title = config.app.siteName
-            }
-        }
-
-        if (typeof routeDeclaration?.mobileTopBarSpacer === "boolean" && app.isMobile) {
-            app.layout.toggleTopBarSpacer(routeDeclaration.mobileTopBarSpacer)
-        } else {
-            app.layout.toggleTopBarSpacer(false)
-        }
+        handleRouteDeclaration(declaration)
 
         return React.createElement(
             loadable(element, {
-                fallback: React.createElement(bindProps.staticRenders?.PageLoad || DefaultLoadingRender),
+                fallback: React.createElement(props.staticRenders?.PageLoad || DefaultLoadingRender),
             }),
             {
                 ...props,
-                ...bindProps,
+                ...props,
                 url: url,
                 params: params,
                 query: query,
@@ -160,19 +165,11 @@ const NavigationController = (props) => {
             state = {}
         }
 
-        const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
-
-        state.transitionDelay = Number(transitionDuration.replace("ms", ""))
-
         app.eventBus.emit("router.navigate", to, {
             state,
         })
 
         app.location.last = window.location
-
-        if (state.transitionDelay >= 100) {
-            await new Promise((resolve) => setTimeout(resolve, state.transitionDelay))
-        }
 
         return navigate(to, {
             state
@@ -180,15 +177,9 @@ const NavigationController = (props) => {
     }
 
     async function backLocation() {
-        const transitionDuration = app.cores.style.getValue("page-transition-duration") ?? "250ms"
-
         app.eventBus.emit("router.navigate")
 
         app.location.last = window.location
-
-        if (transitionDuration >= 100) {
-            await new Promise((resolve) => setTimeout(resolve, transitionDuration))
-        }
 
         return window.history.back()
     }
@@ -220,10 +211,12 @@ export const PageRender = React.memo((props) => {
     return <Routes>
         {
             routes.map((route, index) => {
+                const declaration = findRouteDeclaration(route.path)
+
                 return <Route
                     key={index}
                     path={route.path}
-                    element={generatePageElementWrapper(route.path, route.element, props)}
+                    element={generatePageElementWrapper(route.path, route.element, props, declaration)}
                     exact
                 />
             })

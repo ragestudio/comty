@@ -1,4 +1,7 @@
 import buildFunctionHandler from "@utils/buildFunctionHandler"
+import { Snowflake } from "nodejs-snowflake"
+
+import { ChatMessage } from "@db_models"
 
 export default class Room {
     constructor(io, roomID, options) {
@@ -27,10 +30,10 @@ export default class Room {
     }
 
     roomEvents = {
-        "room:change:owner": (client, payload) => {
+        "room:change:owner": async (client, payload) => {
             throw new OperationError(500, "Not implemented")
         },
-        "room:send:message": (client, payload) => {
+        "room:send:message": async (client, payload) => {
             console.log(`[${this.roomID}] [@${client.userData.username}] sent message >`, payload)
 
             let { message } = payload
@@ -43,7 +46,12 @@ export default class Room {
                 message = message.substring(0, this.limitations.maxMessageLength)
             }
 
+            const created_at = new Date().getTime()
+
+            const id = `msg:${client.userData._id}:${created_at}`
+
             this.handlers.broadcastToMembers("room:message", {
+                _id: id,
                 timestamp: payload.timestamp ?? Date.now(),
                 content: String(message),
                 user: {
@@ -53,6 +61,33 @@ export default class Room {
                     avatar: client.userData.avatar,
                 },
             })
+
+            if (payload.route) {
+                const routeValues = payload.route.split(":")
+
+                console.log(routeValues)
+
+                if (routeValues.length > 0) {
+                    const [type, to_id] = routeValues
+
+                    switch (type) {
+                        case "user": {
+                            const doc = await ChatMessage.create({
+                                type: type,
+                                from_user_id: client.userData._id,
+                                to_user_id: to_id,
+                                content: message,
+                                created_at: created_at,
+                            })
+
+                            console.log(doc)
+                        }
+
+                        default:
+                            break;
+                    }
+                }
+            }
         }
     }
 

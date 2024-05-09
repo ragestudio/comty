@@ -17,14 +17,14 @@ const MainSelector = (props) => {
         <div className="actions">
             {
                 app.userData && <antd.Button
-                type="default"
-                size="large"
-                onClick={() => {
-                    app.navigation.goMain()
-                }}
-            >
-                Continue as {app.userData.username}
-            </antd.Button>
+                    type="default"
+                    size="large"
+                    onClick={() => {
+                        app.navigation.goMain()
+                    }}
+                >
+                    Continue as {app.userData.username}
+                </antd.Button>
             }
 
             <antd.Button

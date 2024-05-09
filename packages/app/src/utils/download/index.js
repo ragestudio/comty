@@ -1,35 +1,53 @@
-export default (uri, filename) => {
-    app.message.info("Downloading media...")
+import axios from "axios"
+import mime from "mime"
 
-    fetch(uri, {
-        method: "GET",
-    })
-        .then((response) => response.blob())
-        .then((blob) => {
-            if (!filename) {
-                filename = uri.split("/").pop()
-            }
+export default async (uri) => {
+    const key = `download-${uri}`
+    console.log(`[UTIL] Downloading ${uri}`)
 
-            // Create blob link to download
-            const url = window.URL.createObjectURL(new Blob([blob]))
-
-            const link = document.createElement("a")
-
-            link.href = url
-
-            link.setAttribute("download", filename)
-
-            // Append to html link element page
-            document.body.appendChild(link)
-
-            // Start download
-            link.click()
-
-            // Clean up and remove the link
-            link.parentNode.removeChild(link)
+    try {
+        app.cores.notifications.new({
+            key: key,
+            title: "Downloading",
+            duration: 0,
+            type: "loading",
+            closable: false,
+            feedback: false,
         })
-        .catch((error) => {
-            console.error(error)
-            app.message.error("Failed to download media")
+
+        const metadata = await axios({
+            method: "HEAD",
+            url: uri,
         })
+
+        const extension = mime.getExtension(metadata.headers["content-type"])
+        const filename = `${metadata.headers["x-amz-meta-file-hash"]}.${extension}`
+
+        const content = await axios({
+            method: "GET",
+            url: uri,
+            responseType: "blob",
+        })
+
+        const file = new File([content.data], filename, {
+            name: filename,
+            type: metadata.headers["content-type"],
+        })
+
+        const url = URL.createObjectURL(file)
+
+        const link = document.createElement("a")
+
+        link.href = url
+        link.download = file.name
+        link.click()
+
+        setTimeout(() => {
+            app.cores.notifications.close(key)
+        }, 1000)
+    } catch (error) {
+        console.error(error)
+
+        app.cores.notifications.close(key)
+    }
 }

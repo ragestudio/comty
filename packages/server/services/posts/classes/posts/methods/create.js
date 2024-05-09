@@ -39,7 +39,7 @@ export default async (payload = {}) => {
     })
 
     // TODO: create background jobs (nsfw dectection)
-    global.rtengine.io.of("/").emit(`post.new`, result[0])
+    global.websocket.io.of("/").emit(`post.new`, result[0])
 
     return post
 }

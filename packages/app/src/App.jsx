@@ -28,7 +28,6 @@ import {
 	NotificationsCenter,
 	PostCreator,
 } from "@components"
-import { DOMWindow } from "@components/RenderWindow"
 import { Icons } from "@components/Icons"
 import DesktopTopBar from "@components/DesktopTopBar"
 
@@ -40,7 +39,9 @@ import Splash from "./splash"
 
 import "@styles/index.less"
 
-CapacitorUpdater.notifyAppReady()
+if (IS_MOBILE_HOST) {
+	CapacitorUpdater.notifyAppReady()
+}
 
 class ComtyApp extends React.Component {
 	constructor(props) {
@@ -52,7 +53,6 @@ class ComtyApp extends React.Component {
 	}
 
 	state = {
-		desktopMode: false,
 		session: null,
 		initialized: false,
 	}
@@ -62,7 +62,7 @@ class ComtyApp extends React.Component {
 		window.app.version = config.package.version
 		window.app.confirm = antd.Modal.confirm
 		window.app.message = antd.message
-		window.app.isCapacitor = window.navigator.userAgent === "capacitor"
+		window.app.isCapacitor = IS_MOBILE_HOST
 
 		if (window.app.version !== window.localStorage.getItem("last_version")) {
 			app.message.info(`Comty has been updated to version ${window.app.version}!`)
@@ -157,16 +157,14 @@ class ComtyApp extends React.Component {
 					framed: false
 				})
 			},
+			openMessages: () => {
+				app.location.push("/messages")	
+			},
 			openFullImageViewer: (src) => {
-				const win = new DOMWindow({
-					id: "fullImageViewer",
-					className: "fullImageViewer",
-				})
-
-				win.render(<Lightbox
+				app.cores.window_mng.render("image_lightbox", <Lightbox
 					small={src}
 					large={src}
-					onClose={() => win.remove()}
+					onClose={() => app.cores.window_mng.close("image_lightbox")}
 					hideDownload
 					showRotate
 				/>)
@@ -297,17 +295,6 @@ class ComtyApp extends React.Component {
 					AuthModel.logout()
 				},
 			})
-		},
-		"app.no_session": async () => {
-			const location = window.location.pathname
-
-			if (location !== "/auth" && location !== "/register") {
-				antd.notification.info({
-					message: "You are not logged in, to use some features you will need to log in.",
-					btn: <antd.Button type="primary" onClick={() => app.controls.openLoginForm()}>Login</antd.Button>,
-					duration: 15,
-				})
-			}
 		},
 		"session.invalid": async (error) => {
 			const token = await SessionModel.token

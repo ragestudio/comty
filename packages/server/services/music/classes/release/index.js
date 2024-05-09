@@ -7,6 +7,7 @@ const AllowedUpdateFields = [
     "artist",
     "type",
     "public",
+    "list",
 ]
 
 export default class Release {
@@ -19,7 +20,7 @@ export default class Release {
             explicit: payload.explicit,
             type: payload.type,
             public: payload.public,
-            items: payload.items,
+            list: payload.list,
             public: payload.public,
         })
 
@@ -53,7 +54,7 @@ export default class Release {
     }
 
     static async fullfillItemData(release) {
-        
+
         return release
     }
 }

@@ -5,12 +5,11 @@ import { Icons } from "@components/Icons"
 import WidgetItemPreview from "@components/WidgetItemPreview"
 
 import useRequest from "comty.js/hooks/useRequest"
-import WidgetModel from "comty.js/models/widget"
 
 import "./index.less"
 
 export const WidgetBrowser = (props) => {
-    const [L_Widgets, R_Widgets, E_Widgets, M_Widgets] = useRequest(WidgetModel.browse)
+    const [L_Widgets, R_Widgets, E_Widgets, M_Widgets] = []
 
     const [searchValue, setSearchValue] = React.useState("")
 

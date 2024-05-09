@@ -6,11 +6,21 @@ import axios from "axios"
 export default async (payload = {}) => {
     requiredFields(["title", "source", "user_id"], payload)
 
-    const { data: stream, headers } = await axios({
-        url: payload.source,
-        method: "GET",
-        responseType: "stream",
-    })
+    let stream = null
+    let headers = null
+
+    try {
+        const sourceStream = await axios({
+            url: payload.source,
+            method: "GET",
+            responseType: "stream",
+        })
+
+        stream = sourceStream.data
+        headers = sourceStream.headers
+    } catch (error) {
+        throw new OperationError(500, `Failed to process fetching source: ${error.message}`)
+    }
 
     const fileMetadata = await MusicMetadata.parseStream(stream, {
         mimeType: headers["content-type"],

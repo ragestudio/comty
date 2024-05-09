@@ -16,7 +16,7 @@ const PostPage = (props) => {
     const [loading, result, error, repeat] = app.cores.api.useRequest(PostService.getPost, {
         post_id,
     })
-
+    
     if (error) {
         return <antd.Result
             status="warning"

@@ -1,0 +1,43 @@
+.page_header_wrapper {
+    display: flex;
+    flex-direction: column;
+
+    position: sticky;
+
+    z-index: 100;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    .page_header {
+        display: flex;
+        flex-direction: column;
+        
+        margin: 10px 0 20px 0;
+
+        padding: 5px;
+
+        gap: 10px;
+
+        backdrop-filter: blur(10px);
+        background-color: rgba(var(--background-color-accent-values), 0.8);
+
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+
+        overflow: hidden;
+
+        transition: all 150ms ease-in-out;
+    }
+
+    &.hidden {
+        display: none;
+
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 10px 0;
+    }
+}

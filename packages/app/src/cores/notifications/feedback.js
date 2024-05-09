@@ -12,7 +12,7 @@ class NotificationFeedback {
         return (window.app.cores.settings.get("sfx:notifications_volume") ?? 50) / 100
     }
 
-    static playHaptic = async (options = {}) => {
+    static playHaptic = async () => {
         if (app.cores.settings.get("haptics:notifications_feedback")) {
             await Haptics.vibrate()
         }
@@ -28,7 +28,11 @@ class NotificationFeedback {
         }
     }
 
-    static async feedback(type) {
+    static async feedback({ type = "notification", feedback = true }) {
+        if (!feedback) {
+            return false
+        }
+
         NotificationFeedback.playHaptic(type)
         NotificationFeedback.playAudio(type)
     }

@@ -13,7 +13,7 @@ export default async (socket, token, err) => {
             return err(`auth:token_invalid`)
         }
 
-        const userData = await User.findById(validation.data.user_id).catch((err) => {
+        let userData = await User.findById(validation.data.user_id).catch((err) => {
             console.error(`[${socket.id}] failed to get user data caused by server error`, err)
 
             return null
@@ -22,6 +22,9 @@ export default async (socket, token, err) => {
         if (!userData) {
             return err(`auth:user_failed`)
         }
+
+        userData = userData.toObject()
+        userData._id = userData._id.toString()
 
         socket.userData = userData
         socket.token = token

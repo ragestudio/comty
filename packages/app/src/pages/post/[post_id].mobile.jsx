@@ -3,7 +3,6 @@ import * as antd from "antd"
 import { FloatingPanel } from "antd-mobile"
 
 import PostCard from "@components/PostCard"
-import CommentsCard from "@components/CommentsCard"
 
 import Post from "@models/post"
 
@@ -44,7 +43,7 @@ export default (props) => {
         <PostCard data={data} fullmode />
 
         <FloatingPanel anchors={floatingPanelAnchors}>
-            <CommentsCard post_id={post_id} />
+            
         </FloatingPanel>
     </div>
 }

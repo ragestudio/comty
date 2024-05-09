@@ -36,8 +36,8 @@ export default async (payload = {}) => {
         throw new OperationError(500, `An error has occurred: ${err.message}`)
     })
 
-    global.rtengine.io.of("/").emit(`post.delete`, post_id)
-    global.rtengine.io.of("/").emit(`post.delete.${post_id}`, post_id)
+    global.websocket.io.of("/").emit(`post.delete`, post_id)
+    global.websocket.io.of("/").emit(`post.delete.${post_id}`, post_id)
 
     return {
         deleted: true,

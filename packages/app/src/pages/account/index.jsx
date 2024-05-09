@@ -94,7 +94,6 @@ export default class Account extends React.Component {
 		})
 	}
 
-
 	onClickFollow = async () => {
 		const result = await FollowsModel.toggleFollow({
 			user_id: this.state.user._id,
@@ -183,6 +182,13 @@ export default class Account extends React.Component {
 							followed={this.state.following}
 							self={this.state.isSelf}
 						/>
+
+						{
+							!this.state.isSelf && <antd.Button
+								icon={<Icons.MdMessage />}
+								onClick={() => app.location.push(`/messages/${user._id}`)}
+							/>
+						}
 					</div>
 				</div>
 

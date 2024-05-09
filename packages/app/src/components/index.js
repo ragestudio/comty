@@ -1,4 +1,3 @@
-import * as Layout from "./Layout"
 export { default as Footer } from "./Footer"
 
 export { default as RenderError } from "./RenderError"
@@ -41,8 +40,3 @@ export { default as UserBadges } from "./UserBadges"
 export { default as UserCard } from "./UserCard"
 export { default as FollowersList } from "./FollowersList"
 export { default as UserPreview } from "./UserPreview"
-
-// OTHERS
-export * as Window from "./RenderWindow"
-
-export { Layout }

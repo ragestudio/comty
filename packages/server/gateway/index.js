@@ -189,6 +189,7 @@ export default class Gateway {
         },
         onReload: async ({ id, service, cwd, }) => {
             console.log(`[onReload] ${id} ${service}`)
+
             let instance = this.instancePool.find((instance) => instance.id === id)
 
             if (!instance) {
@@ -209,7 +210,7 @@ export default class Gateway {
             // try to unregister from proxy
             this.proxy.unregisterAllFromService(id)
 
-            instance.instance.kill()
+            await instance.instance.kill("SIGINT")
 
             instance.instance = await spawnService({
                 id,

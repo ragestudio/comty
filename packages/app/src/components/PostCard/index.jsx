@@ -12,6 +12,14 @@ import PostAttachments from "./components/attachments"
 
 import "./index.less"
 
+const articleAnimationProps = {
+    layout: true,
+    initial: { y: -100, opacity: 0 },
+    animate: { y: 0, opacity: 1, },
+    exit: { scale: 0, opacity: 0 },
+    transition: { duration: 0.1, },
+}
+
 const messageRegexs = [
     {
         regex: /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&[a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*/g,
@@ -164,79 +172,76 @@ export default class PostCard extends React.PureComponent {
     }
 
     render() {
-        return <motion.div
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1, }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{
-                duration: 0.1,
-            }}
-            layout
-            key={this.props.index}
-            id={this.state.data._id}
-            post_id={this.state.data._id}
-            style={this.props.style}
-            user-id={this.state.data.user_id}
-            context-menu={"postCard-context"}
+        return <motion.article
             className={classnames(
                 "post_card",
                 {
                     ["open"]: this.state.open,
                 }
             )}
+            id={this.state.data._id}
+            style={this.props.style}
+            {...articleAnimationProps}
         >
-            <PostHeader
-                postData={this.state.data}
-                onDoubleClick={this.onDoubleClick}
-                disableReplyTag={this.props.disableReplyTag}
-            />
-
             <div
-                id="post_content"
-                className={classnames(
-                    "post_content",
-                )}
+                className="post_card_content"
+                context-menu={"post-card"}
+                user-id={this.state.data.user_id}
             >
-                <div className="message">
+                <PostHeader
+                    postData={this.state.data}
+                    onDoubleClick={this.onDoubleClick}
+                    disableReplyTag={this.props.disableReplyTag}
+                />
+
+                <div
+                    id="post_content"
+                    className={classnames(
+                        "post_content",
+                    )}
+                >
+                    <div className="message">
+                        {
+                            processString(messageRegexs)(this.state.data.message ?? "")
+                        }
+                    </div>
+
                     {
-                        processString(messageRegexs)(this.state.data.message ?? "")
+                        !this.props.disableAttachments && this.state.data.attachments && this.state.data.attachments.length > 0 && <PostAttachments
+                            attachments={this.state.data.attachments}
+                            flags={this.state.data.flags}
+                        />
                     }
                 </div>
 
+                <PostActions
+                    user_id={this.state.data.user_id}
+
+                    likesCount={this.state.countLikes}
+                    repliesCount={this.state.countReplies}
+
+                    defaultLiked={this.state.hasLiked}
+                    defaultSaved={this.state.hasSaved}
+
+                    actions={{
+                        onClickLike: this.onClickLike,
+                        onClickEdit: this.onClickEdit,
+                        onClickDelete: this.onClickDelete,
+                        onClickSave: this.onClickSave,
+                        onClickReply: this.onClickReply,
+                    }}
+                />
+
                 {
-                    !this.props.disableAttachments && this.state.data.attachments && this.state.data.attachments.length > 0 && <PostAttachments
-                        attachments={this.state.data.attachments}
-                        flags={this.state.data.flags}
-                    />
+                    !this.props.disableHasReplies && !!this.state.hasReplies && <div
+                        className="post-card-has_replies"
+                        onClick={() => app.navigation.goToPost(this.state.data._id)}
+                    >
+                        <span>View {this.state.hasReplies} replies</span>
+                    </div>
                 }
             </div>
 
-            <PostActions
-                user_id={this.state.data.user_id}
-
-                likesCount={this.state.countLikes}
-                repliesCount={this.state.countReplies}
-
-                defaultLiked={this.state.hasLiked}
-                defaultSaved={this.state.hasSaved}
-
-                actions={{
-                    onClickLike: this.onClickLike,
-                    onClickEdit: this.onClickEdit,
-                    onClickDelete: this.onClickDelete,
-                    onClickSave: this.onClickSave,
-                    onClickReply: this.onClickReply,
-                }}
-            />
-
-            {
-                !this.props.disableHasReplies && !!this.state.hasReplies && <div
-                    className="post-card-has_replies"
-                    onClick={() => app.navigation.goToPost(this.state.data._id)}
-                >
-                    <span>View {this.state.hasReplies} replies</span>
-                </div>
-            }
-        </motion.div>
+        </motion.article>
     }
 }

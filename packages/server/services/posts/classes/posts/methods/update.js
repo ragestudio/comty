@@ -25,8 +25,8 @@ export default async (post_id, update) => {
         posts: post,
     })
 
-    global.rtengine.io.of("/").emit(`post.update`, result[0])
-    global.rtengine.io.of("/").emit(`post.update.${post_id}`, result[0])
+    global.websocket.io.of("/").emit(`post.update`, result[0])
+    global.websocket.io.of("/").emit(`post.update.${post_id}`, result[0])
 
     return result[0]
 }

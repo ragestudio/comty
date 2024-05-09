@@ -64,7 +64,7 @@ export default (props) => {
         onClickReply,
     } = props.actions ?? {}
 
-    const genItems = () => {
+    const generateMoreMenuItems = () => {
         let items = MoreActionsItems
 
         if (isSelf) {
@@ -104,7 +104,7 @@ export default (props) => {
             <div className="action" id="more">
                 <Dropdown
                     menu={{
-                        items: genItems(),
+                        items: generateMoreMenuItems(),
                         onClick: handleDropdownClickItem,
                     }}
                     trigger={["click"]}

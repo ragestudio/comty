@@ -11,6 +11,7 @@ import * as lib3 from "react-icons/md"
 import * as lib4 from "react-icons/io"
 import * as lib5 from "react-icons/si"
 import * as lib6 from "react-icons/fa"
+import * as lib7 from "react-icons/tb"
 
 const marginedStyle = {
     width: "1em",
@@ -42,6 +43,7 @@ export const Icons = {
     ...lib4,
     ...lib5,
     ...lib6,
+    ...lib7,
 }
 
 export function createIconRender(icon, props) {

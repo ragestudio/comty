@@ -239,8 +239,6 @@ export default class StyleCore extends Core {
 		app.eventBus.emit("style.update", {
 			...this.public.mutation,
 		})
-
-		ConfigProvider.config({ theme: this.public.mutation })
 	}
 
 	applyVariant(variant = (this.public.theme.defaultVariant ?? "light")) {

@@ -2,31 +2,19 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
-import {
-    Sidebar,
-    Drawer,
-    Sidedrawer,
-    BottomBar,
-    TopBar,
-    ToolsBar,
-    Header,
-} from "@components/Layout"
+import Sidebar from "@layouts/components/sidebar"
+import Drawer from "@layouts/components/drawer"
+import Sidedrawer from "@layouts/components/sidedrawer"
+import BottomBar from "@layouts/components/bottomBar"
+import TopBar from "@layouts/components/topBar"
+import ToolsBar from "@layouts/components/toolsBar"
+import Header from "@layouts/components/header"
+import InitializeModalsController from "@layouts/components/modals"
 
 import BackgroundDecorator from "@components/BackgroundDecorator"
 
-import { createWithDom as FloatingStack } from "../components/floatingStack"
-import InitializeModalsController from "../components/modals"
-
 const DesktopLayout = (props) => {
     InitializeModalsController()
-
-    React.useEffect(() => {
-        const floatingStack = FloatingStack()
-
-        return () => {
-            floatingStack.remove()
-        }
-    }, [])
 
     return <>
         <BackgroundDecorator />

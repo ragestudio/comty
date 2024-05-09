@@ -1,10 +1,10 @@
 import React from "react"
 import Core from "evite/src/core"
 
-import { DOMWindow } from "@components/RenderWindow"
 import ContextMenu from "./components/contextMenu"
 
-import InternalContexts from "@config/context-menu"
+import DefaultContenxt from "@config/context-menu/default"
+import PostCardContext from "@config/context-menu/post"
 
 export default class ContextMenuCore extends Core {
     static namespace = "contextMenu"
@@ -15,13 +15,10 @@ export default class ContextMenuCore extends Core {
         registerContext: this.registerContext.bind(this),
     }
 
-    contexts = Object()
-
-    DOMWindow = new DOMWindow({
-        id: "contextMenu",
-        className: "contextMenuWrapper",
-        clickOutsideToClose: true,
-    })
+    contexts = {
+        ...DefaultContenxt,
+        ...PostCardContext,
+    }
 
     async onInitialize() {
         if (app.isMobile) {
@@ -65,26 +62,25 @@ export default class ContextMenuCore extends Core {
             contexts.push("default-context")
         }
 
-        for await (const context of contexts) {
-            let contextObject = this.contexts[context] || InternalContexts[context]
+        for await (const [index, context] of contexts.entries()) {
+            let contextObject = this.contexts[context]
+
+            if (!contextObject) {
+                this.console.warn(`Context ${context} not found`)
+                continue
+            }
 
             if (typeof contextObject === "function") {
-                contextObject = await contextObject(parentElement, element, {
+                contextObject = await contextObject(items, parentElement, element, {
                     close: this.hide,
                 })
             }
 
             // push divider
-            if (items.length > 0) {
+            if (contexts.length > 0 && index !== contexts.length - 1) {
                 items.push({
                     type: "separator"
                 })
-            }
-
-            if (Array.isArray(contextObject)) {
-                items.push(...contextObject)
-            } else {
-                items.push(contextObject)
             }
         }
 
@@ -142,10 +138,13 @@ export default class ContextMenuCore extends Core {
     }
 
     show(payload) {
-        this.DOMWindow.render(React.createElement(ContextMenu, payload))
+        app.cores.window_mng.render("context-menu", React.createElement(ContextMenu, payload), {
+            createOrUpdate: true,
+            closeOnClickOutside: true,
+        })
     }
 
     hide() {
-        this.DOMWindow.remove()
+        app.cores.window_mng.close("context-menu")
     }
 }

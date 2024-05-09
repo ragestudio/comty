@@ -110,7 +110,8 @@ export default class Player extends Core {
             set: (target, prop, value) => {
                 return false
             }
-        })
+        }),
+        gradualFadeMs: Player.gradualFadeMs,
     }
 
     internalEvents = {
@@ -126,10 +127,6 @@ export default class Player extends Core {
         "player.seeked": (to) => {
             //app.cores.sync.music.dispatchEvent("music.player.seek", to)
         },
-    }
-
-    wsEvents = {
-
     }
 
     async onInitialize() {
@@ -695,6 +692,10 @@ export default class Player extends Core {
     }
 
     async resumePlayback() {
+        if (!this.state.playback_status === "playing") {
+            return true
+        }
+
         return await new Promise((resolve, reject) => {
             if (!this.track_instance) {
                 this.console.error("No audio instance")

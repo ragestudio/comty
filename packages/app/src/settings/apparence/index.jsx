@@ -106,7 +106,8 @@ export default {
             id: "style.uiFontScale",
             group: "aspect",
             component: "Slider",
-            title: "UI font scale",
+            icon: "MdFormatSize",
+            title: "Font scale",
             description: "Change the font scale of the application.",
             props: {
                 min: 1,
@@ -133,7 +134,7 @@ export default {
             group: "aspect",
             component: "Select",
             icon: "MdOutlineFontDownload",
-            title: "UI font",
+            title: "Font family",
             description: "Change the font of the application.",
             props: {
                 style: {
@@ -178,18 +179,7 @@ export default {
             },
             storaged: false,
         },
-        // {
-        //     id: "style.parallaxBackground",
-        //     group: "aspect",
-        //     component: "Switch",
-        //     icon: "MdOutline3DRotation",
-        //     title: "Parallax background",
-        //     description: "Create a parallax effect on the background.",
-        //     dependsOn: {
-        //         "style.backgroundImage": true
-        //     },
-        //     storaged: true,
-        // },
+       
         {
             id: "style.backgroundImage",
             group: "aspect",
@@ -223,27 +213,6 @@ export default {
                     backgroundImage: `url(${value})`
                 })
             },
-            storaged: false,
-        },
-        {
-            id: "style.backgroundPattern",
-            group: "aspect",
-            icon: "MdGrid4X4",
-            component: loadable(() => import("../components/backgroundSelector")),
-            title: "Background pattern",
-            description: "Change background pattern of the application.",
-            extraActions: [
-                {
-                    id: "remove",
-                    icon: "Delete",
-                    title: "Remove",
-                    onClick: () => {
-                        app.cores.style.modify({
-                            backgroundSVG: "unset"
-                        })
-                    }
-                }
-            ],
             storaged: false,
         },
         {

@@ -20,7 +20,9 @@ export default async (track_id, { limit = 50, offset = 0 } = {}) => {
         }
     }
 
-    const track = await Track.findById(track_id).catch(() => null)
+    const track = await Track.findOne({
+        _id: track_id
+    })
 
     if (!track) {
         throw new OperationError(404, "Track not found")

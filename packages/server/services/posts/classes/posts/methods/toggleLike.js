@@ -51,8 +51,8 @@ export default async (payload = {}) => {
         count: count,
     }
 
-    global.rtengine.io.of("/").emit(`post.${post_id}.likes.update`, eventData)
-    global.rtengine.io.of("/").emit(`post.like.update`, eventData)
+    global.websocket.io.of("/").emit(`post.${post_id}.likes.update`, eventData)
+    global.websocket.io.of("/").emit(`post.like.update`, eventData)
 
     return {
         liked: to,

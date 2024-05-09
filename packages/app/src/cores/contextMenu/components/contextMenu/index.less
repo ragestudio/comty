@@ -1,5 +1,5 @@
 .contextMenu {
-    position: absolute;
+    position: fixed;
     z-index: 100000;
 
     display: flex;
@@ -8,7 +8,7 @@
     top: 0;
     left: 0;
 
-    width: 200px;
+    width: 230px;
     height: fit-content;
 
     background-color: var(--background-color-primary);
@@ -16,11 +16,11 @@
 
     border-radius: 8px;
 
-    padding: 10px;
+    padding: 7px;
 
-    font-family: "Recursive", sans-serif;
+    font-weight: 600;
+    font-family: var(--fontFamily);
     font-size: 0.8rem;
-    font-weight: 500;
     color: var(--text-color);
 
     h1,
@@ -42,7 +42,7 @@
         align-items: center;
         justify-content: space-between;
 
-        padding: 10px 10px 10px 20px;
+        padding: 10px 10px 10px 15px;
 
         transition: all 50ms ease-in-out;
 
@@ -52,7 +52,7 @@
 
         &:hover {
             background-color: var(--background-color-accent);
-            padding-left: 25px;
+            padding-left: 18px;
         }
 
         &:active {

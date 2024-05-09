@@ -22,10 +22,15 @@ export default class NotificationCore extends Core {
 
     public = {
         new: this.new,
+        close: this.close,
     }
 
-    async new(notification, options = {}) {
-        NotificationUI.notify(notification, options)
-        NotificationFeedback.feedback(options.type)
+    async new(notification) {
+        NotificationUI.notify(notification)
+        NotificationFeedback.feedback(notification)
+    }
+
+    async close(id) {
+        NotificationUI.close(id)
     }
 }

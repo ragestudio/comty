@@ -9,8 +9,8 @@ import SharedMiddlewares from "@shared-middlewares"
 class API extends Server {
     static refName = "chats"
     static useEngine = "hyper-express"
-    static wsRoutesPath = `${__dirname}/ws_routes`
     static routesPath = `${__dirname}/routes`
+    static wsRoutesPath = `${__dirname}/routes_ws`
     static listen_port = process.env.HTTP_LISTEN_PORT ?? 3004
 
     middlewares = {
@@ -44,8 +44,12 @@ class API extends Server {
     }
 
     async onInitialize() {
-        this.contexts.rooms = new RoomsController(this.engine.io)
-
+        if (!this.engine.ws) {
+            throw new Error(`Engine WS not found!`)
+        }
+        
+        this.contexts.rooms = new RoomsController(this.engine.ws.io)
+        
         await this.contexts.db.initialize()
         await this.contexts.redis.initialize()
     }

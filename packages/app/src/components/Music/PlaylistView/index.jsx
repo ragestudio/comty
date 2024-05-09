@@ -21,19 +21,19 @@ import MusicModel from "@models/music"
 import "./index.less"
 
 const PlaylistTypeDecorators = {
-    "single": (props) => <span className="playlistType">
+    "single": () => <span className="playlistType">
         <Icons.MdMusicNote />
         Single
     </span>,
-    "album": (props) => <span className="playlistType">
+    "album": () => <span className="playlistType">
         <Icons.MdAlbum />
         Album
     </span>,
-    "ep": (props) => <span className="playlistType">
+    "ep": () => <span className="playlistType">
         <Icons.MdAlbum />
         EP
     </span>,
-    "mix": (props) => <span className="playlistType">
+    "mix": () => <span className="playlistType">
         <Icons.MdMusicNote />
         Mix
     </span>,
@@ -228,12 +228,14 @@ export default (props) => {
         return <antd.Skeleton active />
     }
 
+    const playlistType = playlist.type?.toLowerCase() ?? "playlist"
+
     return <PlaylistContext.Provider value={contextValues}>
         <WithPlayerContext>
             <div
                 className={classnames(
                     "playlist_view",
-                    props.type ?? playlist.type,
+                    playlistType,
                 )}
             >
 
@@ -257,9 +259,9 @@ export default (props) => {
 
                             <div className="play_info_statistics">
                                 {
-                                    playlist.type && PlaylistTypeDecorators[playlist.type] && <div className="play_info_statistics_item">
+                                    playlistType && PlaylistTypeDecorators[playlistType] && <div className="play_info_statistics_item">
                                         {
-                                            PlaylistTypeDecorators[playlist.type]()
+                                            PlaylistTypeDecorators[playlistType]()
                                         }
                                     </div>
                                 }

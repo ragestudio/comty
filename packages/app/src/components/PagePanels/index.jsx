@@ -84,6 +84,10 @@ export class PagePanelWithNavMenu extends React.Component {
             return <></>
         }
 
+        if (this.props.tabs.length === 0) {
+            return <></>
+        }
+
         // slip the active tab by splitting on "."
         if (!this.state.activeTab) {
             console.error("PagePanelWithNavMenu: activeTab is not defined")
