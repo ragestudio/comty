@@ -11,17 +11,13 @@ import sidebarItems from "@config/sidebar"
 
 import "./index.less"
 
-const extraItems = [
-	{
-		id: "insiders",
-		title: "Insiders",
-		icon: "MdToken",
-		roles: ["insider"],
-		path: "/insiders",
-	}
-]
-
 const onClickHandlers = {
+	addons: () => {
+		window.app.location.push("/addons")	
+	},
+	studio: () => {
+		window.app.location.push("/studio")	
+	},
 	settings: () => {
 		window.app.navigation.goToSettings()
 	},
@@ -99,11 +95,29 @@ const BottomMenuDefaultItems = [
 
 const ActionMenuItems = [
 	{
-		key: "account",
+		key: "profile",
 		label: <>
 			<Icons.User />
 			<Translation>
-				{t => t("Account")}
+				{t => t("Profile")}
+			</Translation>
+		</>,
+	},
+	{
+		key: "studio",
+		label: <>
+			<Icons.MdHardware />
+			<Translation>
+				{t => t("Studio")}
+			</Translation>
+		</>,
+	},
+	{
+		key: "addons",
+		label: <>
+			<Icons.Box />
+			<Translation>
+				{t => t("Addons")}
 			</Translation>
 		</>,
 	},
@@ -256,8 +270,6 @@ export default class Sidebar extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		this.computeExtraItems()
-
 		for (const [event, handler] of Object.entries(this.events)) {
 			app.eventBus.on(event, handler)
 		}
@@ -277,28 +289,6 @@ export default class Sidebar extends React.Component {
 		}
 
 		//delete app.layout.sidebar
-	}
-
-	computeExtraItems = async () => {
-		const roles = await app.cores.permissions.getRoles()
-
-		const resultItems = []
-
-		if (roles.includes("admin")) {
-			resultItems.push(...extraItems)
-		} else {
-			extraItems.forEach((item) => {
-				item.roles.every((role) => {
-					if (roles.includes(role)) {
-						resultItems.push(item)
-					}
-				})
-			})
-		}
-
-		this.setState({
-			topItems: generateTopItems(resultItems)
-		})
 	}
 
 	handleClick = (e) => {
@@ -470,7 +460,6 @@ export default class Sidebar extends React.Component {
 								mode="inline"
 								onClick={this.handleClick}
 								items={this.getBottomItems()}
-
 							/>
 						</div>
 					</div>

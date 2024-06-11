@@ -1,13 +1,20 @@
 import { MusicRelease, Track } from "@db_models"
 
 export default async (req) => {
-    const { limit = 10, trim = 0 } = req.query
+    const { limit = 10, trim = 0, order = "desc" } = req.query
 
-    let result = await MusicRelease.find({})
+    const searchQuery = {}
+
+    const total_length = await MusicRelease.count(searchQuery)
+
+    let result = await MusicRelease.find(searchQuery)
         .limit(limit)
         .skip(trim)
+        .sort({ created_at: order === "desc" ? -1 : 1 })
 
     return {
+        total_length: total_length,
+        has_more: total_length > trim + result.length,
         items: result,
     }
 }

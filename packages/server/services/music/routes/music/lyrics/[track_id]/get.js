@@ -1,4 +1,5 @@
 import { TrackLyric } from "@db_models"
+import axios from "axios"
 
 function parseTimeToMs(timeStr) {
     const [minutes, seconds, milliseconds] = timeStr.split(":")
@@ -8,6 +9,7 @@ function parseTimeToMs(timeStr) {
 
 export default async (req) => {
     const { track_id } = req.params
+    let { translate_lang = "original" } = req.query
 
     let trackLyric = await TrackLyric.findOne({
         track_id
@@ -19,12 +21,43 @@ export default async (req) => {
 
     trackLyric = trackLyric.toObject()
 
+    if (typeof trackLyric.lrc === "object") {
+        trackLyric.available_langs = Object.entries(trackLyric.lrc).map(([key, value]) => {
+            return {
+                id: key,
+                name: key,
+                value: value
+            }
+        })
+
+        if (typeof trackLyric.lrc[translate_lang] === "undefined") {
+            translate_lang = "original"
+        }
+
+        trackLyric.lang = translate_lang
+
+        trackLyric.lrc = trackLyric.lrc[translate_lang]
+        
+        const { data } = await axios.get(trackLyric.lrc).catch((err) => {
+            return false
+        })
+
+        trackLyric.lrc = data
+    }else {
+        trackLyric.available_langs = [{
+            id: "original",
+            name: "Original",
+            value: null
+        }]
+    }
+
     if (trackLyric.lrc) {
         trackLyric.lrc = trackLyric.lrc.split("\n")
         trackLyric.lrc = trackLyric.lrc.map((line) => {
             const syncedLine = {}
 
-            syncedLine.time = line.match(/\[.*\]/)[0]
+            //syncedLine.time = line.match(/\[.*\]/)[0]
+            syncedLine.time = line.split(" ")[0]
             syncedLine.text = line.replace(syncedLine.time, "").trim()
 
             if (syncedLine.text === "") {

@@ -93,16 +93,64 @@
     }
 
     .chat-page-input-wrapper {
-        position: absolute;
+        position: relative;
 
         bottom: 0;
         left: 0;
 
         width: 100%;
 
+        .chat-page-remote-typing {
+            position: absolute;
+
+            bottom: 0;
+            left: 0;
+
+            display: flex;
+
+            flex-direction: row;
+            align-items: center;
+
+            transform: translateY(120%);
+
+            padding: 4px 10px;
+
+            background-color: var(--background-color-accent);
+            border-radius: 12px;
+        }
+
         .chat-page-input {
             display: flex;
             flex-direction: row;
+
+            align-items: center;
+            justify-content: center;
+
+            border: 2px var(--border-color) solid;
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            background-color: var(--background-color-accent);
+
+            .ant-input {
+                border: 0;
+                border-radius: 0;
+
+                background-color: transparent;
+
+                box-shadow: none !important;
+            }
+
+            .ant-btn {
+                border: 0;
+                border-radius: 0;
+
+                height: 40px;
+                width: 40px;
+
+                border-radius: 12px;
+            }
         }
     }
 }

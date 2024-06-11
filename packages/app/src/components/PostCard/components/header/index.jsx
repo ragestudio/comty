@@ -2,6 +2,7 @@ import React from "react"
 import { DateTime } from "luxon"
 import { Tag } from "antd"
 
+import TimeAgo from "@components/TimeAgo"
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
@@ -10,36 +11,9 @@ import PostReplieView from "@components/PostReplieView"
 import "./index.less"
 
 const PostCardHeader = (props) => {
-    const [timeAgo, setTimeAgo] = React.useState(0)
-
     const goToProfile = () => {
         app.navigation.goToAccount(props.postData.user?.username)
     }
-
-    const updateTimeAgo = () => {
-        let createdAt = props.postData.timestamp ?? props.postData.created_at ?? ""
-
-        const timeAgo = DateTime.fromISO(
-            createdAt,
-            {
-                locale: app.cores.settings.get("language")
-            }
-        ).toRelative()
-
-        setTimeAgo(timeAgo)
-    }
-
-    React.useEffect(() => {
-        updateTimeAgo()
-
-        const interval = setInterval(() => {
-            updateTimeAgo()
-        }, 1000 * 60 * 5)
-
-        return () => {
-            clearInterval(interval)
-        }
-    }, [])
 
     return <div className="post-header" onDoubleClick={props.onDoubleClick}>
         {
@@ -88,7 +62,9 @@ const PostCardHeader = (props) => {
                 </h1>
 
                 <span className="post-header-user-info-timeago">
-                    {timeAgo}
+                    <TimeAgo
+                        time={props.postData.timestamp ?? props.postData.created_at}
+                    />
                 </span>
             </div>
         </div>

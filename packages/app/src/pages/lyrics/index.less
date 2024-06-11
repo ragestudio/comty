@@ -77,6 +77,12 @@
 
         padding: 60px;
 
+        transition: all 150ms ease-in-out;
+
+        &.hidden {
+            opacity: 0;
+        }
+
         .lyrics-player-controller {
             position: relative;
 
@@ -256,5 +262,11 @@
 
         width: 200px;
         height: fit-content;
+
+        transition: all 150ms ease-in-out;
+
+        &.hidden {
+            opacity: 0;
+        }
     }
 }

@@ -72,7 +72,7 @@ export default class ProcessorNode {
             prevNode.processor._last.connect(this.processor)
         } else {
             //console.log(`[${this.constructor.refName ?? this.constructor.name}] node is the first node, connecting to the media source...`)
-            instance.track.connect(this.processor)
+            instance.contextElement.connect(this.processor)
         }
 
         // now, check if it has a next node

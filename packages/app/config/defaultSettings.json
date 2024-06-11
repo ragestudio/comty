@@ -1,5 +1,5 @@
 {
-    "app:language": "en",
+    "app:language": "en_US",
     "low_performance_mode": false,
     "transcode_video_browser": false,
     "forceMobileMode": false,

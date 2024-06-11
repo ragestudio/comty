@@ -85,7 +85,7 @@ export default (props) => {
         }
     }, [render])
 
-    const heightValue = visible ? Number(app.cores.style.defaultVar("top-bar-height").replace("px", "")) : 0
+    const heightValue = visible ? Number(app.cores.style.getDefaultVar("top-bar-height").replace("px", "")) : 0
 
     return <Motion style={{
         y: spring(visible ? 0 : 300,),

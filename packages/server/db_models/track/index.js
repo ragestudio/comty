@@ -2,6 +2,10 @@ export default {
     name: "Track",
     collection: "tracks",
     schema: {
+        source: {
+            type: String,
+            required: true,
+        },
         title: {
             type: String,
             required: true,
@@ -11,10 +15,6 @@ export default {
         },
         artists: {
             type: Array,
-        },
-        source: {
-            type: String,
-            required: true,
         },
         metadata: {
             type: Object,
@@ -27,19 +27,12 @@ export default {
             type: Boolean,
             default: true,
         },
+        publish_date: {
+            type: Date,
+        },
         cover: {
             type: String,
             default: "https://storage.ragestudio.net/comty-static-assets/default_song.png"
-        },
-        videoCanvas: {
-            type: String,
-        },
-        spotifyId: {
-            type: String,
-        },
-        lyricsEnabled: {
-            type: Boolean,
-            default: true,
         },
         publisher: {
             type: Object,

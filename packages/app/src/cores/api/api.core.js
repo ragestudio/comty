@@ -30,7 +30,7 @@ export default class APICore extends Core {
 
     listenEvent(key, handler, instance = "default") {
         if (!this.client.sockets[instance]) {
-            console.error(`[API] Websocket instance ${instance} not found`)
+            this.console.error(`[API] Websocket instance ${instance} not found`)
 
             return false
         }
@@ -40,7 +40,7 @@ export default class APICore extends Core {
 
     unlistenEvent(key, handler, instance = "default") {
         if (!this.client.sockets[instance]) {
-            console.error(`[API] Websocket instance ${instance} not found`)
+            this.console.error(`[API] Websocket instance ${instance} not found`)
 
             return false
         }

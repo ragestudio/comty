@@ -1,11 +1,13 @@
 import { ChatMessage } from "@db_models"
 
 export default async (socket, payload, engine) => {
+    if (!socket.userData) {
+        throw new OperationError(401, "Unauthorized")
+    }
+
     const created_at = new Date().getTime()
 
     const [from_user_id, to_user_id] = [socket.userData._id, payload.to_user_id]
-
-    const targetSocket = await engine.find.socketByUserId(payload.to_user_id)
 
     const wsMessageObj = {
         ...payload,
@@ -24,7 +26,11 @@ export default async (socket, payload, engine) => {
 
     socket.emit("chat:receive:message", wsMessageObj)
 
-    if (targetSocket.emit) {
+    const targetSocket = await engine.find.socketByUserId(payload.to_user_id)
+
+    console.log(targetSocket)
+
+    if (targetSocket) {
         await targetSocket.emit("chat:receive:message", wsMessageObj)
     }
 

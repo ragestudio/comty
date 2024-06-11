@@ -7,7 +7,7 @@ export default {
             required: true
         },
         lrc: {
-            type: String,
+            type: Object,
         }
     }
 }

@@ -1,0 +1,93 @@
+.music-studio-release-editor {
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+
+    padding: 20px;
+
+    gap: 20px;
+
+    .music-studio-release-editor-header {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 20px;
+
+        .title {
+            font-size: 1.7rem;
+            font-family: "Space Grotesk", sans-serif;
+        }
+    }
+
+    .music-studio-release-editor-menu {
+        display: flex;
+        flex-direction: column;
+
+        gap: 20px;
+
+        align-items: center;
+
+        .ant-btn {
+            width: 100%;
+        }
+
+        .ant-menu {
+            background-color: var(--background-color-accent) !important;
+            border-radius: 12px;
+
+            padding: 8px;
+
+            gap: 5px;
+
+            .ant-menu-item {
+                padding: 5px 10px !important;
+            }
+
+            .ant-menu-item-selected {
+                background-color: var(--background-color-primary-2) !important;
+            }
+        }
+
+        .music-studio-release-editor-menu-actions {
+            display: flex;
+            flex-direction: column;
+
+            gap: 10px;
+            
+            width: 100%;
+        }
+    }
+
+    .music-studio-release-editor-content {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+
+        .music-studio-release-editor-tab {
+            display: flex;
+            flex-direction: column;
+
+            gap: 10px;
+
+            h1 {
+                margin: 0;
+            }
+
+            .ant-form-item {
+                margin-bottom: 10px;
+            }
+
+            label {
+                height: fit-content;
+
+                span {
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+}

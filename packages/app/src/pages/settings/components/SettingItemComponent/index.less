@@ -1,0 +1,121 @@
+.setting_item {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    padding: 0 15px;
+
+    &.useHorizontal {
+        flex-direction: row;
+
+        justify-content: space-between;
+
+        gap: 50px;
+
+        .setting_item_content {
+            width: fit-content;
+        }
+    }
+
+    .uploadButton {
+        background-color: var(--background-color-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .setting_item_header {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+        justify-content: space-between;
+
+        width: 100%;
+
+        .setting_item_info {
+            display: flex;
+            flex-direction: column;
+
+            gap: 7px;
+
+            width: 100%;
+
+            .setting_item_header_title {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+                justify-content: space-between;
+
+                width: 100%;
+
+                color: var(--background-color-contrast);
+
+                h1 {
+                    font-size: 1rem;
+                    margin: 0;
+                    color: var(--background-color-contrast);
+                }
+            }
+
+            .setting_item_header_description {
+                p {
+                    color: var(--background-color-contrast);
+                    font-size: 0.7rem;
+                    margin: 0;
+                }
+            }
+
+        }
+
+        .setting_item_header_actions {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 10px;
+
+            .ant-btn {
+                background-color: var(--background-color-primary-2);
+            }
+
+            .ant-btn:not([disabled]) {
+                &:hover {
+                    color: var(--colorPrimary);
+                    border: 1px solid var(--colorPrimary);
+                }
+            }
+        }
+    }
+
+    .setting_item_content {
+        display: flex;
+        flex-direction: column;
+
+        --ignore-dragger: true;
+        padding: 6px 20px;
+
+        width: 100%;
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        h3,
+        p,
+        span {
+            color: var(--background-color-contrast);
+        }
+
+        button {
+            width: min-content;
+        }
+
+        .ant-btn.ant-btn-icon-only {
+            width: 32px;
+        }
+
+        .ant-select {}
+    }
+}

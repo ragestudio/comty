@@ -161,7 +161,7 @@ export default class NFC extends Core {
         if (this.subscribers.length === 0) {
             if (tag.message.records?.length > 0) {
                 // open dialog
-                app.DrawerController.open("nfc_card_dialog", TapShareDialog, {
+                app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
                     componentProps: {
                         tag: tag,
                     }
@@ -187,7 +187,7 @@ export default class NFC extends Core {
         if (this.subscribers.length === 0 && tag.message?.records) {
             if (tag.message.records?.length > 0) {
                 // open dialog
-                app.DrawerController.open("nfc_card_dialog", TapShareDialog, {
+                app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
                     componentProps: {
                         tag: tag,
                     }

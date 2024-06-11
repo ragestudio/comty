@@ -113,20 +113,6 @@ class Login extends React.Component {
         app.location.push("/apr")
     }
 
-    onClickRegister = () => {
-        if (this.props.locked) {
-            this.props.unlock()
-        }
-
-        if (typeof this.props.close === "function") {
-            this.props.close()
-        }
-
-        app.controls.openRegisterForm({
-            defaultLocked: this.props.locked
-        })
-    }
-
     toggleLoading = (to) => {
         if (typeof to === "undefined") {
             to = !this.state.loading
@@ -350,10 +336,6 @@ class Login extends React.Component {
 
                 <div className="field" onClick={this.onClickForgotPassword}>
                     <a>Forgot your password?</a>
-                </div>
-
-                <div className="field" onClick={this.onClickRegister}>
-                    <a>You need a account?</a>
                 </div>
             </div>
         </div>

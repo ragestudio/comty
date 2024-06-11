@@ -2,12 +2,13 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
+import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 
 import useChat from "@hooks/useChat"
-import ChatsService from "@models/chats"
 
-import lodash from "lodash"
+import ChatsService from "@models/chats"
+import UserService from "@models/user"
 
 import "./index.less"
 
@@ -19,7 +20,16 @@ const ChatPage = (props) => {
     const [isOnBottomView, setIsOnBottomView] = React.useState(true)
     const [currentText, setCurrentText] = React.useState("")
 
-    const [L_History, R_History, E_History, M_History] = app.cores.api.useRequest(ChatsService.getChatHistory, to_user_id)
+    const [L_User, R_User, E_User, M_User] = app.cores.api.useRequest(
+        UserService.data,
+        {
+            user_id: to_user_id
+        }
+    )
+    const [L_History, R_History, E_History, M_History] = app.cores.api.useRequest(
+        ChatsService.getChatHistory,
+        to_user_id
+    )
 
     const {
         sendMessage,
@@ -30,7 +40,12 @@ const ChatPage = (props) => {
         isRemoteTyping,
     } = useChat(to_user_id)
 
-    async function submitMessage() {
+
+    console.log(R_User)
+
+    async function submitMessage(e) {
+        e.preventDefault()
+
         if (!currentText) {
             return false
         }
@@ -88,12 +103,8 @@ const ChatPage = (props) => {
     >
         <div className="chat-page-header">
             <UserPreview
-                user_id={to_user_id}
+                user={R_User}
             />
-
-            {
-                isRemoteTyping && <p>Typing...</p>
-            }
         </div>
 
         <div
@@ -147,13 +158,27 @@ const ChatPage = (props) => {
 
         <div className="chat-page-input-wrapper">
             <div className="chat-page-input">
-                <antd.Input
+                <antd.Input.TextArea
                     placeholder="Enter message"
                     value={currentText}
                     onChange={onInputChange}
                     onPressEnter={submitMessage}
+                    autoSize
+                    maxLength={1024}
+                    maxRows={3}
+                />
+                <antd.Button
+                    type="primary"
+                    icon={<Icons.Send />}
+                    onClick={submitMessage}
                 />
             </div>
+
+            {
+                isRemoteTyping && R_User && <div className="chat-page-remote-typing">
+                    <span>{R_User.username} is typing...</span>
+                </div>
+            }
         </div>
     </div>
 }

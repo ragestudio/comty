@@ -1,13 +1,25 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-
 import { Translation } from "react-i18next"
 import { SliderPicker } from "react-color"
 
 import { Icons, createIconRender } from "@components/Icons"
 
 import PerformanceLog from "@classes/PerformanceLog"
+
+import "./index.less"
+
+function shouldUseHorizontalLayout(type) {
+    switch (type) {
+        case "switch":
+            return true
+        case "button":
+            return true
+        default:
+            return false
+    }
+}
 
 export const SettingsComponents = {
     button: {
@@ -400,8 +412,10 @@ export default class SettingItemComponent extends React.PureComponent {
             className={classnames(
                 "setting_item",
                 {
-                    ["usePadding"]: this.props.setting.usePadding ?? true
-                })}
+                    ["usePadding"]: this.props.setting.usePadding ?? true,
+                    ["useHorizontal"]: this.props.setting.layout ?? shouldUseHorizontalLayout(String(this.props.setting.component).toLowerCase())
+                })
+            }
         >
             <div className="setting_item_header">
                 <div className="setting_item_info">
@@ -414,7 +428,9 @@ export default class SettingItemComponent extends React.PureComponent {
                                 {(t) => t(this.props.setting.title ?? this.props.setting.id)}
                             </Translation>
                         </h1>
-                        {this.props.setting.experimental && <antd.Tag> Experimental </antd.Tag>}
+                        {
+                            this.props.setting.experimental && <antd.Tag> Experimental </antd.Tag>
+                        }
                     </div>
                     <div className="setting_item_header_description">
                         <p>

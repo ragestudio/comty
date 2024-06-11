@@ -106,7 +106,7 @@ class ComtyApp extends React.Component {
 				}
 			},
 			openLoginForm: async (options = {}) => {
-				app.DrawerController.open("login", Login, {
+				app.layout.drawer.open("login", Login, {
 					defaultLocked: options.defaultLocked ?? false,
 					componentProps: {
 						sessionController: this.sessionController,
@@ -120,7 +120,7 @@ class ComtyApp extends React.Component {
 				})
 			},
 			openRegisterForm: async (options = {}) => {
-				app.DrawerController.open("Register", UserRegister, {
+				app.layout.drawer.open("Register", UserRegister, {
 					defaultLocked: options.defaultLocked ?? false,
 					componentProps: {
 						sessionController: this.sessionController,
@@ -144,7 +144,7 @@ class ComtyApp extends React.Component {
 			},
 			openSearcher: (options) => {
 				if (app.isMobile) {
-					return app.DrawerController.open("searcher", Searcher, {
+					return app.layout.drawer.open("searcher", Searcher, {
 						...options,
 						componentProps: {
 							renderResults: true,

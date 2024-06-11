@@ -32,6 +32,10 @@ export default defineConfig({
         fs: {
             allow: ["..", "../../"],
         },
+        https: {
+            key: path.join(__dirname, "ssl", "privkey.pem"),
+            cert: path.join(__dirname, "ssl", "cert.pem"),
+        }
     },
     css: {
         preprocessorOptions: {

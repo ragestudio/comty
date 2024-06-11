@@ -1,5 +1,7 @@
 import React from "react"
 
+import classnames from "classnames"
+import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
 import { Context } from "@contexts/WithPlayerContext"
 
 const maxLatencyInMs = 55
@@ -32,6 +34,13 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
         // if `sync_audio_at_ms` is present, it means the video must be synced with audio
         if (lyrics.video_source && typeof lyrics.sync_audio_at_ms !== "undefined") {
+            if (!videoRef.current) {
+                clearInterval(syncInterval)
+                setSyncInterval(null)
+                setCurrentVideoLatency(0)
+                return false
+            }
+
             const currentTrackTime = app.cores.player.seek()
             const currentVideoTime = videoRef.current.currentTime - (lyrics.sync_audio_at_ms / 1000)
 
@@ -55,7 +64,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
     }
 
     function startSyncInterval() {
-        setSyncInterval(setInterval(syncPlayback, 100))
+        setSyncInterval(setInterval(syncPlayback, 300))
     }
 
     React.useEffect(() => {
@@ -96,6 +105,17 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
             }
         }
     }, [context.playback_status])
+
+    React.useEffect(() => {
+        if (context.loading === true && context.playback_status === "playing") {
+            videoRef.current.pause()
+        }
+
+        if (context.loading === false && context.playback_status === "playing") {
+            videoRef.current.play()
+        }
+
+    }, [context.loading])
 
     //* Handle when lyrics object change
     React.useEffect(() => {
@@ -141,17 +161,24 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
     }, [])
 
     return <>
-        <div className="videoDebugOverlay">
-            <div>
-                <p>Maximun latency</p>
-                <p>{maxLatencyInMs}ms</p>
+        {
+            props.lyrics?.sync_audio_at && <div
+                className={classnames(
+                    "videoDebugOverlay",
+
+                )}
+            >
+                <div>
+                    <p>Maximun latency</p>
+                    <p>{maxLatencyInMs}ms</p>
+                </div>
+                <div>
+                    <p>Video Latency</p>
+                    <p>{(currentVideoLatency * 1000).toFixed(2)}ms</p>
+                </div>
+                {syncingVideo ? <p>Syncing video...</p> : null}
             </div>
-            <div>
-                <p>Video Latency</p>
-                <p>{(currentVideoLatency * 1000).toFixed(2)}ms</p>
-            </div>
-            {syncingVideo ? <p>Syncing video...</p> : null}
-        </div>
+        }
 
         <video
             className="lyrics-video"

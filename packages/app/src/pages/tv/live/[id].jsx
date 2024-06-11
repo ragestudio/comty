@@ -256,15 +256,16 @@ export default class StreamViewer extends React.Component {
     }
 
     enterPlayerAnimation = () => {
-        app.cores.style.applyVariant("dark")
-        app.cores.style.compactMode(true)
+        app.cores.style.applyTemporalVariant("dark")
+        app.cores.style.toggleCompactMode(true)
         app.layout.toggleCenteredContent(false)
         app.controls.toggleUIVisibility(false)
     }
 
     exitPlayerAnimation = () => {
-        app.cores.style.applyInitialVariant()
-        app.cores.style.compactMode(false)
+        app.cores.style.applyVariant(app.cores.style.currentVariantKey)
+        app.cores.style.toggleCompactMode(false)
+        app.layout.toggleCenteredContent(true)
         app.controls.toggleUIVisibility(true)
     }
 

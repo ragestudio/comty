@@ -1,0 +1,52 @@
+.music-studio-release-editor-tracks-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.music-studio-release-editor-tracks-list-item {
+    position: relative;
+
+    display: flex;
+    flex-direction: row;
+
+    padding: 10px;
+
+    gap: 10px;
+
+    border-radius: 12px;
+
+    background-color: var(--background-color-accent);
+
+    .music-studio-release-editor-tracks-list-item-actions {
+        position: absolute;
+
+        top: 0;
+        right: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        height: 100%;
+
+        padding: 0 5px;
+
+        svg {
+            margin: 0;
+        }
+
+        .music-studio-release-editor-tracks-list-item-dragger {
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                font-size: 1rem;
+            }
+        }
+    }
+}

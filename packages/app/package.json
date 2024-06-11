@@ -6,13 +6,9 @@
     "author": "RageStudio",
     "description": "A prototype of a social network.",
     "scripts": {
-        "start": "electron-forge start",
         "build": "vite build",
         "dev": "vite",
-        "dev:electron": "concurrently -k \"yarn dev\" \"yarn electron:dev\"",
-        "electron:dev": "cross-env IS_DEV=true electron-forge start",
         "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
-        "electron:build": "cross-env IS_DEV=false electron-builder -mwl --dir",
         "preview": "vite preview"
     },
     "peerDependencies": {

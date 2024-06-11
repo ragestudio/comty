@@ -8,6 +8,31 @@ import NavMenu from "./components/NavMenu"
 
 import "./index.less"
 
+export class Tab extends React.Component {
+    state = {
+        error: null
+    }
+
+    // handle on error
+    componentDidCatch(err) {
+        this.setState({ error: err })
+    }
+
+    render() {
+        if (this.state.error) {
+            return <antd.Result
+                status="error"
+                title="Error"
+                subTitle={this.state.error}
+            />
+        }
+
+        return <>
+            {this.props.children}
+        </>
+    }
+}
+
 export const Panel = (props) => {
     return <div
         {...props.props ?? {}}

@@ -26,35 +26,19 @@ export default {
             emitEvent: "app:language_changes",
         },
         {
-            id: "haptics:enabled",
-            storaged: true,
+            id: "app:lpm",
             group: "general",
             component: "Switch",
-            icon: "MdVibration",
-            title: "Haptic Feedback",
-            description: "Enable haptic feedback on touch events.",
-            desktop: false
-        },
-        {
-            id: "longPressDelay",
-            storaged: true,
-            group: "general",
-            component: "Slider",
-            icon: "MdTimer",
-            title: "Long press delay",
-            description: "Set the delay before long press trigger is activated.",
+            icon: "MdSlowMotionVideo",
+            title: "Low performance mode",
+            description: "Enable low performance mode disabling all the animations and secondary features, boosting the app performance.",
+            emitEvent: "app:lpm_changed",
             props: {
-                min: 300,
-                max: 2000,
-                step: 100,
-                marks: {
-                    300: "0.3s",
-                    600: "0.6s",
-                    1000: "1s",
-                    1500: "1.5s",
-                    2000: "2s",
-                }
-            }
+                disabled: true
+            },
+            storaged: true,
+            experimental: true,
+            disabled: true,
         },
         {
             id: "clear_internal_storage",
@@ -69,21 +53,6 @@ export default {
                 onClick: () => app.maintenance.clearInternalStorage()
             },
             noUpdate: true,
-        },
-        {
-            id: "app:lpm",
-            group: "general",
-            component: "Switch",
-            icon: "MdSlowMotionVideo",
-            title: "Low performance mode",
-            description: "Enable low performance mode disabling all the animations and secondary features, boosting the app performance.",
-            emitEvent: "app:lpm_changed",
-            props: {
-                disabled: true
-            },
-            storaged: true,
-            experimental: true,
-            disabled: true,
         },
         {
             id: "ui.effects",

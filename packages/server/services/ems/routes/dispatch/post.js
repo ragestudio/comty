@@ -1,16 +1,28 @@
+import templates from "../../templates"
+
 export default {
     useContext: ["mailTransporter"],
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
         req.body = await req.urlencoded()
 
-        const { to, subject, body } = req.body
+        let { to, subject, body, template } = req.body
+        
+        if (template) {
+            if (!templates[template]) {
+                throw new OperationError(404, "Template not found")
+            }
+
+            body = templates[template]({
+                ...req.body
+            })
+        }
 
         const mailOptions = {
-            from: "comty_no_reply@ragestudio.net",
+            from: process.env.SMTP_USERNAME,
             to: to,
             subject: subject,
-            text: body
+            html: body
         }
 
         console.log(mailOptions)

@@ -56,14 +56,14 @@ export default {
     i18n: {
         languages: [
             {
-                locale: "en",
+                locale: "en_US",
                 name: "English"
             },
             {
-                locale: "es",
+                locale: "es_ES",
                 name: "Español"
             }
         ],
-        defaultLocale: "en",
+        defaultLocale: "en_US",
     }
 }

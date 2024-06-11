@@ -55,26 +55,28 @@ export default class ToolsBar extends React.Component {
     }
 
     render() {
-        return <Motion style={{
-            x: spring(this.state.visible ? 0 : 100),
-            width: spring(this.state.visible ? 100 : 0),
-        }}>
+        return <Motion
+            style={{
+                x: spring(this.state.visible ? 0 : 100),
+                width: spring(this.state.visible ? 100 : 0),
+            }}
+        >
             {({ x, width }) => {
                 return <div
-                    className="tools-bar-wrapper"
                     style={{
                         width: `${width}%`,
                         transform: `translateX(${x}%)`,
                     }}
+                    className={classnames(
+                        "tools-bar-wrapper",
+                        {
+                            visible: this.state.visible,
+                        }
+                    )}
                 >
                     <div
                         id="tools_bar"
-                        className={classnames(
-                            "tools-bar",
-                            {
-                                visible: this.state.visible,
-                            }
-                        )}
+                        className="tools-bar"
                     >
                         {/* <div className="card" id="trendings">
                             <div className="header">

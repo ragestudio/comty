@@ -13,7 +13,7 @@ export default class DrawerController extends React.Component {
 			drawers: [],
 		}
 
-		window.app["DrawerController"] = {
+		app.layout.drawer = {
 			open: this.open,
 			close: this.close,
 			closeAll: this.closeAll,

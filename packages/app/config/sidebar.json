@@ -1,9 +1,15 @@
 [
     {
+        "id": "home",
+        "path": "/",
+        "title": "Home",
+        "icon": "Home"
+    },
+    {
         "id": "timeline",
         "path": "/",
         "title": "Timeline",
-        "icon": "Home"
+        "icon": "MdTag"
     },
     {
         "id": "tv",
@@ -16,18 +22,5 @@
         "path": "/music",
         "title": "Music",
         "icon": "MdMusicNote"
-    },
-    {
-        "id": "groups",
-        "path": "/groups",
-        "title": "Groups",
-        "icon": "MdGroups",
-        "disabled": true
-    },
-    {
-        "id": "Marketplace",
-        "path": "/marketplace",
-        "title": "Marketplace",
-        "icon": "Box"
     }
 ]

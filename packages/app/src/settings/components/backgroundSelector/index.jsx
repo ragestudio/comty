@@ -38,7 +38,7 @@ export default (props) => {
                         <div
                             className="background_selector_defaults__item_preview"
                             onClick={() => {
-                                app.cores.style.modify({
+                                app.cores.style.mutateTheme({
                                     backgroundSVG: `url("${background.src}")`
                                 })
                             }}

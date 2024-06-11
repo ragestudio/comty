@@ -202,7 +202,7 @@ class OwnTags extends React.Component {
             return ownedTag.serial === tag.serialNumber
         })
 
-        if (!ownedTag && app.DrawerController.drawersLength() === 0) {
+        if (!ownedTag && app.layout.drawer.drawersLength() === 0) {
             app.message.error("This tag is not registered or you don't have permission to edit it.")
             return false
         }
@@ -260,7 +260,7 @@ class OwnTags extends React.Component {
 }
 
 const OpenTagEditor = ({ tag, onFinish = () => app.navigation.softReload() } = {}) => {
-    app.DrawerController.open("tag_register", RegisterNewTag, {
+    app.layout.drawer.open("tag_register", RegisterNewTag, {
         componentProps: {
             tagData: tag,
             onFinish: onFinish,

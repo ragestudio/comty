@@ -3,17 +3,16 @@ import EventEmitter from "evite/src/internals/EventEmitter"
 import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
 
-import MusicModel from "comty.js/models/music"
-
 import ToolBarPlayer from "@components/Player/ToolBarPlayer"
 import BackgroundMediaPlayer from "@components/Player/BackgroundMediaPlayer"
 
 import AudioPlayerStorage from "./player.storage"
 
+import TrackInstanceClass from "./classes/TrackInstance"
 import defaultAudioProccessors from "./processors"
 
 import MediaSession from "./mediaSession"
-import ServicesHandlers from "./services"
+import ServiceProviders from "./services"
 
 export default class Player extends Core {
     static dependencies = [
@@ -32,6 +31,8 @@ export default class Player extends Core {
 
     // buffer & precomputation
     static maxManifestPrecompute = 3
+
+    service_providers = new ServiceProviders()
 
     native_controls = new MediaSession()
 
@@ -94,7 +95,6 @@ export default class Player extends Core {
         seek: this.seek.bind(this),
         minimize: this.toggleMinimize.bind(this),
         collapse: this.toggleCollapse.bind(this),
-        toggleCurrentTrackLike: this.toggleCurrentTrackLike.bind(this),
         state: new Proxy(this.state, {
             get: (target, prop) => {
                 return target[prop]
@@ -112,6 +112,9 @@ export default class Player extends Core {
             }
         }),
         gradualFadeMs: Player.gradualFadeMs,
+        trackInstance: () => {
+            return this.track_instance
+        }
     }
 
     internalEvents = {
@@ -181,8 +184,6 @@ export default class Player extends Core {
         }
 
         for await (const processor of this.audioProcessors) {
-            this.console.log(`Initializing audio processor ${processor.constructor.name}`, processor)
-
             if (typeof processor._init === "function") {
                 try {
                     await processor._init(this.audioContext)
@@ -277,7 +278,7 @@ export default class Player extends Core {
         }
 
         if (!instance._preloaded) {
-            instance.media.preload = "metadata"
+            instance.audio.preload = "metadata"
             instance._preloaded = true
         }
 
@@ -294,8 +295,8 @@ export default class Player extends Core {
         }
 
         // stop playback
-        if (this.track_instance.media) {
-            this.track_instance.media.pause()
+        if (this.track_instance.audio) {
+            this.track_instance.audio.pause()
         }
 
         // reset track_instance
@@ -305,154 +306,10 @@ export default class Player extends Core {
         this.state.livestream_mode = false
     }
 
-    async createInstance(manifest) {
-        if (!manifest) {
-            this.console.error("Manifest is required")
-            return false
-        }
-
-        if (typeof manifest === "string") {
-            manifest = {
-                src: manifest,
-            }
-        }
-
-        // check if manifest has `manifest` property, if is and not inherit or missing source, resolve
-        if (manifest.service) {
-            if (!ServicesHandlers[manifest.service]) {
-                this.console.error(`Service ${manifest.service} is not supported`)
-                return false
-            }
-
-            if (manifest.service !== "inherit" && !manifest.source) {
-                const resolver = ServicesHandlers[manifest.service].resolve
-
-                if (!resolver) {
-                    this.console.error(`Resolving for service [${manifest.service}] is not supported`)
-                    return false
-                }
-
-                manifest = await resolver(manifest)
-            }
-        }
-
-        if (!manifest.src && !manifest.source) {
-            this.console.error("Manifest source is required")
-            return false
-        }
-
-        const source = manifest.src ?? manifest.source
-
-        if (!manifest.metadata) {
-            manifest.metadata = {}
-        }
-
-        // if title is not set, use the audio source filename
-        if (!manifest.metadata.title) {
-            manifest.metadata.title = source.split("/").pop()
-        }
-
-        let instance = {
-            manifest: manifest,
-            attachedProcessors: [],
-            abortController: new AbortController(),
-            source: source,
-            media: new Audio(source),
-            duration: null,
-            seek: 0,
-            track: null,
-        }
-
-        instance.media.signal = instance.abortController.signal
-        instance.media.crossOrigin = "anonymous"
-        instance.media.preload = "none"
-
-        instance.media.loop = this.state.playback_mode === "repeat"
-        instance.media.volume = this.state.volume
-
-        // handle on end
-        instance.media.addEventListener("ended", () => {
-            this.next()
-        })
-
-        instance.media.addEventListener("loadeddata", () => {
-            this.state.loading = false
-        })
-
-        // update playback status
-        instance.media.addEventListener("play", () => {
-            this.state.playback_status = "playing"
-        })
-
-        instance.media.addEventListener("playing", () => {
-            this.state.loading = false
-
-            this.state.playback_status = "playing"
-
-            if (this.waitUpdateTimeout) {
-                clearTimeout(this.waitUpdateTimeout)
-                this.waitUpdateTimeout = null
-            }
-        })
-
-        instance.media.addEventListener("pause", () => {
-            this.state.playback_status = "paused"
-        })
-
-        instance.media.addEventListener("durationchange", (duration) => {
-            if (instance.media.paused) {
-                return false
-            }
-
-            instance.duration = duration
-        })
-
-        instance.media.addEventListener("waiting", () => {
-            if (instance.media.paused) {
-                return false
-            }
-
-            if (this.waitUpdateTimeout) {
-                clearTimeout(this.waitUpdateTimeout)
-                this.waitUpdateTimeout = null
-            }
-
-            // if takes more than 150ms to load, update loading state
-            this.waitUpdateTimeout = setTimeout(() => {
-                this.state.loading = true
-            }, 150)
-        })
-
-        instance.media.addEventListener("seeked", () => {
-            instance.seek = instance.media.currentTime
-
-            if (this.state.sync_mode) {
-                // useMusicSync("music:player:seek", {
-                //     position: instance.seek,
-                //     state: this.state,
-                // })
-            }
-
-            this.eventBus.emit(`player.seeked`, instance.seek)
-        })
-
-        instance.media.addEventListener("loadedmetadata", () => {
-            if (instance.media.duration === Infinity) {
-                instance.manifest.stream = true
-
-                this.state.livestream_mode = true
-            }
-        }, { once: true })
-
-        instance.track = this.audioContext.createMediaElementSource(instance.media)
-
-        return instance
-    }
-
     async attachProcessorsToInstance(instance) {
         for await (const [index, processor] of this.audioProcessors.entries()) {
             if (processor.constructor.node_bypass === true) {
-                instance.track.connect(processor.processor)
+                instance.contextElement.connect(processor.processor)
 
                 processor.processor.connect(this.audioContext.destination)
 
@@ -515,35 +372,32 @@ export default class Player extends Core {
         this.track_instance = await this.preloadAudioInstance(instance)
 
         // reconstruct audio src if is not set
-        if (this.track_instance.media.src !== instance.source) {
-            this.track_instance.media.src = instance.source
+        if (this.track_instance.audio.src !== instance.manifest.source) {
+            this.track_instance.audio.src = instance.manifest.source
         }
 
         // set time to 0
-        this.track_instance.media.currentTime = 0
+        this.track_instance.audio.currentTime = 0
 
         if (params.time >= 0) {
-            this.track_instance.media.currentTime = params.time
+            this.track_instance.audio.currentTime = params.time
         }
 
-        if (params.volume >= 0) {
-            this.track_instance.gainNode.gain.value = params.volume
-        } else {
-            this.track_instance.gainNode.gain.value = this.state.volume
-        }
-
-        this.track_instance.media.muted = this.state.muted
-        this.track_instance.media.loop = this.state.playback_mode === "repeat"
+        this.track_instance.audio.muted = this.state.muted
+        this.track_instance.audio.loop = this.state.playback_mode === "repeat"
+        
+        this.track_instance.gainNode.gain.value = this.state.volume
 
         // try to preload next audio
+        // TODO: Use a better way to preload queues
         if (this.track_next_instances.length > 0) {
             this.preloadAudioInstance(1)
         }
 
         // play
-        await this.track_instance.media.play()
+        await this.track_instance.audio.play()
 
-        this.console.log(this.track_instance)
+        this.console.debug(`Playing track >`, this.track_instance)
 
         // update manifest
         this.state.track_manifest = instance.manifest
@@ -572,45 +426,31 @@ export default class Player extends Core {
         this.track_prev_instances = []
         this.track_next_instances = []
 
-        const isPlaylist = Array.isArray(manifest)
+        let playlist = Array.isArray(manifest) ? manifest : [manifest]
 
-        if (isPlaylist) {
-            let playlist = manifest
-
-            if (playlist.length === 0) {
-                this.console.warn(`[PLAYER] Playlist is empty, aborting...`)
-                return false
-            }
-
-            if (playlist.some((item) => typeof item === "string")) {
-                this.console.log("Resolving missing manifests by ids...")
-                playlist = await ServicesHandlers.default.resolveMany(playlist)
-            }
-
-            playlist = playlist.slice(startIndex)
-
-            for await (const [index, _manifest] of playlist.entries()) {
-                const instance = await this.createInstance(_manifest)
-
-                this.track_next_instances.push(instance)
-
-                if (index === 0) {
-                    this.play(this.track_next_instances[0], {
-                        time: time ?? 0
-                    })
-                }
-            }
-
-            return playlist
+        if (playlist.length === 0) {
+            this.console.warn(`Playlist is empty, aborting...`)
+            return false
         }
 
-        const instance = await this.createInstance(manifest)
+        if (playlist.some((item) => typeof item === "string")) {
+            playlist = await this.service_providers.resolveMany(playlist)
+        }
 
-        this.track_next_instances.push(instance)
+        playlist = playlist.slice(startIndex)
 
-        this.play(this.track_next_instances[0], {
-            time: time ?? 0
-        })
+        for await (const [index, _manifest] of playlist.entries()) {
+            let instance = new TrackInstanceClass(this, _manifest)
+            instance = await instance.initialize()
+
+            this.track_next_instances.push(instance)
+
+            if (index === 0) {
+                this.play(this.track_next_instances[0], {
+                    time: time ?? 0
+                })
+            }
+        }
 
         return manifest
     }
@@ -627,7 +467,7 @@ export default class Player extends Core {
         }
 
         if (this.track_next_instances.length === 0) {
-            this.console.log(`[PLAYER] No more tracks to play, stopping...`)
+            this.console.log(`No more tracks to play, stopping...`)
 
             return this.stop()
         }
@@ -683,7 +523,7 @@ export default class Player extends Core {
             )
 
             setTimeout(() => {
-                this.track_instance.media.pause()
+                this.track_instance.audio.pause()
                 resolve()
             }, Player.gradualFadeMs)
 
@@ -705,7 +545,7 @@ export default class Player extends Core {
             // ensure audio elemeto starts from 0 volume
             this.track_instance.gainNode.gain.value = 0.0001
 
-            this.track_instance.media.play().then(() => {
+            this.track_instance.audio.play().then(() => {
                 resolve()
             })
 
@@ -743,7 +583,7 @@ export default class Player extends Core {
 
         if (typeof to === "boolean") {
             this.state.muted = to
-            this.track_instance.media.muted = to
+            this.track_instance.audio.muted = to
         }
 
         return this.state.muted
@@ -783,13 +623,13 @@ export default class Player extends Core {
     }
 
     seek(time, { sync = false } = {}) {
-        if (!this.track_instance || !this.track_instance.media) {
+        if (!this.track_instance || !this.track_instance.audio) {
             return false
         }
 
         // if time not provided, return current time
         if (typeof time === "undefined") {
-            return this.track_instance.media.currentTime
+            return this.track_instance.audio.currentTime
         }
 
         if (this.state.control_locked && !sync) {
@@ -797,9 +637,12 @@ export default class Player extends Core {
             return false
         }
 
+
         // if time is provided, seek to that time
         if (typeof time === "number") {
-            this.track_instance.media.currentTime = time
+            this.console.log(`Seeking to ${time} | Duration: ${this.track_instance.audio.duration}`)
+
+            this.track_instance.audio.currentTime = time
 
             return time
         }
@@ -813,7 +656,7 @@ export default class Player extends Core {
         this.state.playback_mode = mode
 
         if (this.track_instance) {
-            this.track_instance.media.loop = this.state.playback_mode === "repeat"
+            this.track_instance.audio.loop = this.state.playback_mode === "repeat"
         }
 
         AudioPlayerStorage.set("mode", mode)
@@ -826,7 +669,7 @@ export default class Player extends Core {
             return false
         }
 
-        return this.track_instance.media.duration
+        return this.track_instance.audio.duration
     }
 
     loop(to) {
@@ -837,8 +680,8 @@ export default class Player extends Core {
 
         this.state.loop = to ?? !this.state.loop
 
-        if (this.track_instance.media) {
-            this.track_instance.media.loop = this.state.loop
+        if (this.track_instance.audio) {
+            this.track_instance.audio.loop = this.state.loop
         }
 
         return this.state.loop
@@ -897,45 +740,6 @@ export default class Player extends Core {
         return this.mute(to)
     }
 
-    async getTracksByIds(list) {
-        if (!Array.isArray(list)) {
-            this.console.warn("List must be an array")
-            return false
-        }
-
-        let ids = []
-
-        list.forEach((item) => {
-            if (typeof item === "string") {
-                ids.push(item)
-            }
-        })
-
-        if (ids.length === 0) {
-            return list
-        }
-
-        const fetchedTracks = await MusicModel.getTracksData(ids).catch((err) => {
-            this.console.error(err)
-            return false
-        })
-
-        if (!fetchedTracks) {
-            return list
-        }
-
-        // replace fetched tracks with the ones in the list
-        fetchedTracks.forEach((fetchedTrack) => {
-            const index = list.findIndex((item) => item === fetchedTrack._id)
-
-            if (index !== -1) {
-                list[index] = fetchedTrack
-            }
-        })
-
-        return list
-    }
-
     async setSampleRate(to) {
         // must be a integer
         if (typeof to !== "number") {
@@ -972,39 +776,5 @@ export default class Player extends Core {
                 }
             })
         })
-    }
-
-    async toggleCurrentTrackLike(to, manifest) {
-        let isCurrent = !!!manifest
-
-        if (typeof manifest === "undefined") {
-            manifest = this.track_instance.manifest
-        }
-
-        if (!manifest) {
-            this.console.error("Track instance or manifest not found")
-            return false
-        }
-
-        if (typeof to !== "boolean") {
-            this.console.warn("Like must be a boolean")
-            return false
-        }
-
-        const service = manifest.service ?? "default"
-
-        if (!ServicesHandlers[service].toggleLike) {
-            this.console.error(`Service [${service}] does not support like actions`)
-            return false
-        }
-
-        const result = await ServicesHandlers[service].toggleLike(manifest, to)
-
-        if (isCurrent) {
-            this.track_instance.manifest.liked = to
-            this.state.track_manifest.liked = to
-        }
-
-        return result
     }
 }

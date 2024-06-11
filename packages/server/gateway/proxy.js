@@ -1,15 +1,38 @@
-import http from "node:http"
 import httpProxy from "http-proxy"
 import defaults from "linebridge/src/server/defaults"
 
 import pkg from "../package.json"
+
+import http from "node:http"
+import https from "node:https"
+
+import fs from "node:fs"
+import path from "node:path"
+
+function getHttpServerEngine(extraOptions = {}, handler = () => { }) {
+    const sslKey = path.resolve(process.cwd(), "ssl", "privkey.pem")
+    const sslCert = path.resolve(process.cwd(), "ssl", "cert.pem")
+
+    if (fs.existsSync(sslKey) && fs.existsSync(sslCert)) {
+        return https.createServer(
+            {
+                key: fs.readFileSync(sslKey),
+                cert: fs.readFileSync(sslCert),
+                ...extraOptions
+            },
+            handler
+        )
+    } else {
+        return http.createServer(extraOptions, handler)
+    }
+}
 
 export default class Proxy {
     constructor() {
         this.proxys = new Map()
         this.wsProxys = new Map()
 
-        this.http = http.createServer(this.handleHttpRequest)
+        this.http = getHttpServerEngine({}, this.handleHttpRequest)
         this.http.on("upgrade", this.handleHttpUpgrade)
     }
 

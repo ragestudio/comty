@@ -23,7 +23,7 @@ export default () => {
     React.useEffect(() => {
         app.eventBus.on("style.update", handleStyleUpdate)
 
-        const activeSVG = app.cores.style.getValue("backgroundSVG")
+        const activeSVG = app.cores.style.getVar("backgroundSVG")
 
         if (hasBackgroundSVG(activeSVG)) {
             setActiveColor(true)

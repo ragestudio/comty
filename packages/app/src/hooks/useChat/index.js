@@ -9,7 +9,7 @@ export default (to_user_id) => {
     const [isRemoteTyping, setIsRemoteTyping] = React.useState(false)
 
     const [timeoutOffTypingEvent, setTimeoutOffTypingEvent] = React.useState(null)
-
+    
     async function sendMessage(message) {
         emitTypingEvent(false)
 

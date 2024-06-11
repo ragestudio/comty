@@ -1,7 +1,9 @@
 import React from "react"
-import { Tag } from "antd"
+import { Tag, Button } from "antd"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
+
+import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
 
 import { Icons } from "@components/Icons"
 import Controls from "@components/Player/Controls"
@@ -49,6 +51,7 @@ const PlayerController = React.forwardRef((props, ref) => {
 
     const titleRef = React.useRef()
 
+    const [hide, onMouseEnter, onMouseLeave] = useHideOnMouseStop({ delay: 3000, hideCursor: true })
     const [titleIsOverflown, setTitleIsOverflown] = React.useState(false)
 
     const [currentTime, setCurrentTime] = React.useState(0)
@@ -61,6 +64,7 @@ const PlayerController = React.forwardRef((props, ref) => {
         setDraggingTime(false)
 
         app.cores.player.seek(seekTime)
+        syncPlayback()
     }
 
     async function syncPlayback() {
@@ -87,12 +91,24 @@ const PlayerController = React.forwardRef((props, ref) => {
     React.useEffect(() => {
         setTitleIsOverflown(isOverflown(titleRef.current))
         setTrackDuration(app.cores.player.duration())
+        console.log(context.track_manifest)
     }, [context.track_manifest])
+
+    React.useEffect(() => {
+        syncPlayback()
+    }, [])
 
     const isStopped = context.playback_status === "stopped"
 
     return <div
-        className="lyrics-player-controller-wrapper"
+        className={classnames(
+            "lyrics-player-controller-wrapper",
+            {
+                ["hidden"]: hide,
+            }
+        )}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
     >
         <div className="lyrics-player-controller">
             <div className="lyrics-player-controller-info">
@@ -174,7 +190,6 @@ const PlayerController = React.forwardRef((props, ref) => {
             <div className="lyrics-player-controller-tags">
                 {
                     context.track_manifest?.metadata.lossless && <Tag
-                        color="geekblue"
                         icon={<Icons.TbWaveSine />}
                         bordered={false}
                     >
@@ -187,6 +202,22 @@ const PlayerController = React.forwardRef((props, ref) => {
                     >
                         Explicit
                     </Tag>
+                }
+                {
+                    props.lyrics?.sync_audio_at && <Tag
+                        bordered={false}
+                        icon={<Icons.TbMovie />}
+                    >
+                        Video
+                    </Tag>
+                }
+                {
+                    props.lyrics?.available_langs && <Button
+                        icon={<Icons.MdTranslate />}
+                        type={props.translationEnabled ? "primary" : "default"}
+                        onClick={() => props.toggleTranslationEnabled()}
+                        size="small"
+                    />
                 }
             </div>
         </div>

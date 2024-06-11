@@ -1,0 +1,113 @@
+.addons-page {
+    display: flex;
+    flex-direction: column;
+
+    gap: 30px;
+
+    width: 100%;
+
+    .addons-header {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        width: 100%;
+
+        .addons-header-card {
+            display: flex;
+            flex-direction: row;
+
+            width: fit-content;
+
+            gap: 10px;
+
+            background-color: var(--background-color-accent);
+            padding: 10px 20px;
+
+            border-radius: 12px;
+        }
+
+        h1 {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 2rem;
+            margin: 0;
+        }
+    }
+
+    .addons-field {
+        display: flex;
+        flex-direction: column;
+
+        .addons-field-header {}
+
+        .addons-field-slider {
+            display: flex;
+            flex-direction: row;
+
+            gap: 20px;
+        }
+
+        .addons-field-item {
+            position: relative;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 10px;
+
+            width: 250px;
+            height: 280px;
+
+            background-color: var(--background-color-accent);
+
+            border-radius: 12px;
+
+            padding: 10px;
+
+            .addons-field-item-image {
+                width: 100%;
+                height: 60%;
+
+                .lazy-load-image-background {
+                    width: 100%;
+                    height: 100%;
+                }
+
+                img {
+                    width: 100%;
+                    height: 100%;
+
+                    object-fit: cover;
+
+                    overflow: hidden;
+
+                    border-radius: 12px;
+
+                    background-color: black;
+                }
+            }
+
+            .addons-field-item-info {
+                display: flex;
+                flex-direction: column;
+
+                gap: 7px;
+
+                height: 40%;
+                width: 100%;
+
+                overflow: hidden;
+
+                h1,
+                p {
+                    text-wrap: none;
+                    text-overflow: ellipsis;
+                    margin: 0;
+                }
+            }
+        }
+    }
+}

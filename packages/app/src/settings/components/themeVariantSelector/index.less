@@ -1,0 +1,45 @@
+.__setting_theme_variant_selector {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    border: 1px var(--border-color) solid;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    .__setting_theme_variant_selector-variant {
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 10px 20px;
+
+        border-right: 1px var(--border-color) solid;
+
+        transition: all 150ms ease-in-out;
+
+        cursor: pointer;
+
+        &.selected {
+            background-color: var(--background-color-primary);
+        }
+
+        // if is the last child, remove border
+        &:last-child {
+            border-right: 0;
+        }
+
+        &:hover {
+            background-color: var(--background-color-primary-2);
+        }
+
+        svg {
+            font-size: 1.3rem;
+            margin: 0;
+        }
+    }
+}

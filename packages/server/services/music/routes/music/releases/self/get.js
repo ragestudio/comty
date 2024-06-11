@@ -1,4 +1,4 @@
-import { Playlist, Release, Track } from "@db_models"
+import { MusicRelease, Track } from "@db_models"
 
 export default {
     middlewares: ["withAuthentication"],
@@ -21,33 +21,13 @@ export default {
             }
         }
 
-        const playlistsCount = await Playlist.count(searchQuery)
-        const releasesCount = await Release.count(searchQuery)
-
-        let total_length = playlistsCount + releasesCount
-
-        let playlists = await Playlist.find(searchQuery)
+        let releases = await MusicRelease.find(searchQuery)
             .sort({ created_at: -1 })
             .limit(limit)
             .skip(offset)
-
-        playlists = playlists.map((playlist) => {
-            playlist = playlist.toObject()
-
-            playlist.type = "playlist"
-
-            return playlist
-        })
-
-        let releases = await Release.find(searchQuery)
-            .sort({ created_at: -1 })
-            .limit(limit)
-            .skip(offset)
-
-        let result = [...playlists, ...releases]
 
         if (req.query.resolveItemsData === "true") {
-            result = await Promise.all(
+            releases = await Promise.all(
                 playlists.map(async playlist => {
                     playlist.list = await Track.find({
                         _id: [...playlist.list],
@@ -59,8 +39,8 @@ export default {
         }
 
         return {
-            total_length: total_length,
-            items: result,
+            total_length: await MusicRelease.count(searchQuery),
+            items: releases,
         }
     }
 }

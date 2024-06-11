@@ -31,10 +31,10 @@ const tourSteps = [
 ]
 
 const openPlayerView = () => {
-    app.DrawerController.open("player", PlayerView)
+    app.layout.drawer.open("player", PlayerView)
 }
 const openCreator = () => {
-    app.DrawerController.open("creator", CreatorView, {
+    app.layout.drawer.open("creator", CreatorView, {
         props: {
             bodyStyle: {
                 minHeight: "unset",
@@ -336,7 +336,7 @@ export class BottomBar extends React.Component {
             </div>
         }
 
-        const heightValue = this.state.visible ? Number(app.cores.style.defaultVar("bottom-bar-height").replace("px", "")) : 0
+        const heightValue = this.state.visible ? Number(app.cores.style.getDefaultVar("bottom-bar-height").replace("px", "")) : 0
 
         return <>
             {

@@ -1,6 +1,6 @@
 {
   "build": {
-    "devPath": "http://fr01.ragestudio.net:8000",
+    "devPath": "https://fr01.ragestudio.net:8000",
     "distDir": "../dist"
   },
   "package": {

@@ -54,7 +54,7 @@ const UserLink = (props) => {
     const handleOnClick = () => {
         if (!hasHref) {
             if (app.isMobile) {
-                app.DrawerController.open("link_viewer", UserLinkViewer, {
+                app.layout.drawer.open("link_viewer", UserLinkViewer, {
                     componentProps: {
                         link: link,
                         decorator: decorator

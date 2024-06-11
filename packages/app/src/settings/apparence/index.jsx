@@ -12,76 +12,14 @@ export default {
     order: 1,
     settings: [
         {
-            id: "style.reduceAnimations",
-            group: "animations",
-            component: "Switch",
-            icon: "MdOutlineSlowMotionVideo",
-            title: "Reduce animations",
-            experimental: true,
-            disabled: true,
-            storaged: true,
-        },
-        {
-            id: "style.pageTransitionDuration",
-            group: "animations",
-            component: "Slider",
-            icon: "MdOutlineSpeed",
-            title: "Page transition duration",
-            description: "Change the duration of the page transition animation.",
-            props: {
-                min: 0,
-                max: 1000,
-                step: 50,
-                marks: {
-                    [app.cores.style.defaultVar("page-transition-duration").replace("ms", "")]: " ",
-                },
-                tooltip: {
-                    formatter: (value) => `${value / 1000}s`
-                }
-            },
-            defaultValue: () => {
-                const value = app.cores.style.getValue("page-transition-duration")
-
-                return value ? Number(value.replace("ms", "")) : 250
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    "page-transition-duration": `${value}ms`
-                })
-            },
-            storaged: true,
-        },
-        {
-            id: "style:auto_darkmode",
+            id: "style:variant_mode",
             group: "aspect",
             component: "Switch",
             icon: "Moon",
-            title: "Sync with system",
-            description: "Automatically switch to dark mode based on your system preference.",
-            emitEvent: "style:auto_darkmode",
-            storaged: true,
-        },
-        {
-            id: "style:darkmode",
-            group: "aspect",
-            component: "Switch",
-            icon: "Moon",
-            title: "Dark mode",
-            description: "Change the theme variant of the application to dark.",
-            dependsOn: {
-                "style:auto_darkmode": false
-            },
-            defaultValue: () => {
-                return app.cores.style.currentVariant === "dark"
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    themeVariant: value ? "dark" : "light"
-                })
-
-                return value
-            },
-            storaged: true
+            title: "Theme",
+            description: "Change the theme of the application.",
+            component: loadable(() => import("../components/themeVariantSelector")),
+            layout: "horizontal",
         },
         {
             id: "style.compactMode",
@@ -91,10 +29,10 @@ export default {
             title: "Compact mode",
             description: "Reduce the size of the application elements.",
             defaultValue: () => {
-                return app.cores.style.getValue("compact-mode")
+                return app.cores.style.getVar("compact-mode")
             },
             onUpdate: (value) => {
-                app.cores.style.modify({
+                app.cores.style.mutateTheme({
                     "compact-mode": value
                 })
 
@@ -118,10 +56,10 @@ export default {
                 }
             },
             defaultValue: () => {
-                return app.cores.style.getValue("fontScale")
+                return app.cores.style.getVar("fontScale")
             },
             onUpdate: (value) => {
-                app.cores.style.modify({
+                app.cores.style.mutateTheme({
                     "fontScale": value
                 })
 
@@ -152,10 +90,10 @@ export default {
                 ]
             },
             defaultValue: () => {
-                return app.cores.style.getValue("fontFamily")
+                return app.cores.style.getVar("fontFamily")
             },
             onUpdate: (value) => {
-                app.cores.style.modify({
+                app.cores.style.mutateTheme({
                     "fontFamily": value
                 })
 
@@ -169,11 +107,12 @@ export default {
             component: "SliderColorPicker",
             title: "Primary color",
             description: "Change primary color of the application.",
+            icon: "IoMdColorFill",
             defaultValue: () => {
-                return app.cores.style.getValue("colorPrimary")
+                return app.cores.style.getVar("colorPrimary")
             },
             onUpdate: (value) => {
-                app.cores.style.modify({
+                app.cores.style.mutateTheme({
                     "colorPrimary": value
                 })
             },
@@ -202,261 +141,42 @@ export default {
                 UploadButton
             ],
             defaultValue: () => {
-                const value = app.cores.style.getValue("backgroundImage")
+                const value = app.cores.style.getVar("backgroundImage")
 
                 console.log(value)
 
                 return value ? value.replace(/url\(|\)/g, "") : ""
             },
             onUpdate: (value) => {
-                app.cores.style.modify({
+                app.cores.style.mutateTheme({
                     backgroundImage: `url(${value})`
                 })
             },
             storaged: false,
         },
         {
-            id: "style.backgroundBlur",
+            id: "style.backgroundTweaker",
             group: "aspect",
-            component: "Slider",
-            icon: "MdBlurOn",
-            title: "Background blur",
-            description: "Create a blur effect on the background.",
-            props: {
-                min: 0,
-                max: 50,
-                step: 1
-            },
-            defaultValue: () => {
-                const value = app.cores.style.getValue("backgroundBlur")
-
-                return value ? parseInt(value.replace("px", "")) : 0
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundBlur: `${value}px`
-                })
-            },
-            storaged: false,
-        },
-        {
-            id: "style.backgroundColorTransparency",
-            group: "aspect",
-            component: "Slider",
-            icon: "Eye",
-            title: "Background color transparency",
-            description: "Adjust the transparency of the background color.",
-            props: {
-                min: 0,
-                max: 1,
-                step: 0.1
-            },
-            defaultValue: () => {
-                const value = app.cores.style.getValue("backgroundColorTransparency")
-
-                return value ? parseFloat(value) : 1
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundColorTransparency: value
-                })
-            },
-            storaged: false
-        },
-        {
-            id: "style.backgroundSize",
-            group: "aspect",
-            component: "Select",
-            icon: "MdOutlineImageAspectRatio",
-            title: "Background size",
-            description: "Adjust the size of the background image.",
-            props: {
-                style: {
-                    width: "100%"
-                },
-                options: [
-                    {
-                        label: "Cover",
-                        value: "cover"
-                    },
-                    {
-                        label: "Contain",
-                        value: "contain"
-                    },
-                    {
-                        label: "Auto",
-                        value: "auto"
-                    },
-                    {
-                        label: "50%",
-                        value: "50%"
-                    },
-                    {
-                        label: "100%",
-                        value: "100%"
-                    },
-                    {
-                        label: "150%",
-                        value: "150%"
-                    },
-                ]
-            },
-            defaultValue: () => {
-                return app.cores.style.getValue("backgroundSize")
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundSize: value
-                })
-
-                return value
-            },
-            storaged: false
-        },
-        {
-            id: "style.backgroundPosition",
-            group: "aspect",
-            component: "Select",
-            icon: "MdOutlineImageAspectRatio",
-            title: "Background position",
-            description: "Adjust the position of the background image.",
-            props: {
-                style: {
-                    width: "100%"
-                },
-                options: [
-                    {
-                        label: "Left",
-                        value: "left"
-                    },
-                    {
-                        label: "Center",
-                        value: "center"
-                    },
-                    {
-                        label: "Right",
-                        value: "right"
-                    },
-                    {
-                        label: "Top",
-                        value: "top"
-                    },
-                ]
-            },
-            defaultValue: () => {
-                return app.cores.style.getValue("backgroundPosition")
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundPosition: value
-                })
-
-                return value
-            },
-            storaged: false
-        },
-        {
-            id: "style.backgroundRepeat",
-            group: "aspect",
-            component: "Select",
-            icon: "MdOutlineImageAspectRatio",
-            title: "Background repeat",
-            description: "Adjust the repeat of the background image.",
-            props: {
-                style: {
-                    width: "100%"
-                },
-                options: [
-                    {
-                        label: "Repeat",
-                        value: "repeat"
-                    },
-                    {
-                        label: "No repeat",
-                        value: "no-repeat"
-                    },
-                    {
-                        label: "Repeat X",
-                        value: "repeat-x"
-                    },
-                    {
-                        label: "Repeat Y",
-                        value: "repeat-y"
-                    },
-                ]
-            },
-            defaultValue: () => {
-                return app.cores.style.getValue("backgroundRepeat")
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundRepeat: value
-                })
-
-                return value
-            },
-            storaged: false
-        },
-        {
-            id: "style.backgroundAttachment",
-            group: "aspect",
-            component: "Select",
-            icon: "MdOutlineImageAspectRatio",
-            title: "Background attachment",
-            description: "Adjust the attachment of the background image.",
-            props: {
-                style: {
-                    width: "100%"
-                },
-                options: [
-                    {
-                        label: "Scroll",
-                        value: "scroll"
-                    },
-                    {
-                        label: "Fixed",
-                        value: "fixed"
-                    },
-                    {
-                        label: "Local",
-                        value: "local"
-                    },
-                    {
-                        label: "Initial",
-                        value: "initial"
-                    },
-                    {
-                        label: "Inherit",
-                        value: "inherit"
-                    },
-                ]
-            },
-            defaultValue: () => {
-                return app.cores.style.getValue("backgroundAttachment")
-            },
-            onUpdate: (value) => {
-                app.cores.style.modify({
-                    backgroundAttachment: value
-                })
-
-                return value
-            },
+            title: "Background tweaker",
+            description: "Tweak the custom background",
+            component: loadable(() => import("../components/backgroundTweaker")),
             storaged: false
         },
         {
             id: "resetTheme",
             group: "aspect",
             component: "Button",
-            title: "Reset theme",
+            icon: "IoMdRefresh",
+            title: "Reset to default theme",
             props: {
-                children: "Default Theme"
+                children: "Reset"
             },
             onUpdate: (value) => {
                 Modal.confirm({
                     title: "Are you sure you want to reset the theme to the default theme ?",
                     description: "This action will reset the theme to the default theme. All your modifications will be lost.",
                     onOk: () => {
-                        app.cores.style.setDefault()
+                        app.cores.style.resetToDefault()
                     }
                 })
             },

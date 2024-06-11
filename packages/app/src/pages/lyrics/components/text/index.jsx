@@ -54,6 +54,8 @@ const LyricsText = React.forwardRef((props, textRef) => {
         if (currentLineIndex === 0) {
             setVisible(false)
         } else {
+            setVisible(true)
+            console.log(`Scrolling to line ${currentLineIndex}`)
             // find line element by id
             const lineElement = textRef.current.querySelector(`#lyrics-line-${currentLineIndex}`)
 
@@ -63,24 +65,26 @@ const LyricsText = React.forwardRef((props, textRef) => {
                     behavior: "smooth",
                     block: "center",
                 })
+            } else {
+                // scroll to top
+                textRef.current.scrollTop = 0
             }
         }
     }, [currentLineIndex])
 
     //* Handle when playback status change
     React.useEffect(() => {
-        if (lyrics) {
-            if (typeof lyrics?.lrc !== "undefined") {
-                if (context.playback_status === "playing") {
-                    startSyncInterval()
-                } else {
-                    if (syncInterval) {
-                        clearInterval(syncInterval)
-                    }
-                } startSyncInterval()
+        if (typeof lyrics?.lrc !== "undefined") {
+            if (context.playback_status === "playing") {
+                startSyncInterval()
+            } else {
+                if (syncInterval) {
+                    clearInterval(syncInterval)
+                }
             }
+        } else {
+            clearInterval(syncInterval)
         }
-
     }, [context.playback_status])
 
     //* Handle when lyrics object change
@@ -95,6 +99,12 @@ const LyricsText = React.forwardRef((props, textRef) => {
             }
         }
     }, [lyrics])
+
+    React.useEffect(() => {
+        setVisible(false)
+        clearInterval(syncInterval)
+        setCurrentLineIndex(0)
+    }, [context.track_manifest])
 
     React.useEffect(() => {
         return () => {

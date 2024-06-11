@@ -2,6 +2,8 @@ import React from "react"
 import { Dropdown } from "antd"
 import { Icons } from "@components/Icons"
 
+import checkUserIdIsSelf from "@utils/checkUserIdIsSelf"
+
 import SaveButton from "./saveButton"
 import LikeButton from "./likeButton"
 import RepliesButton from "./replyButton"
@@ -110,7 +112,7 @@ export default (props) => {
                     trigger={["click"]}
                     onOpenChange={(open) => {
                         if (open && props.user_id) {
-                            const isSelf = app.cores.permissions.checkUserIdIsSelf(props.user_id)
+                            const isSelf = checkUserIdIsSelf(props.user_id)
 
                             setIsSelf(isSelf)
                         }

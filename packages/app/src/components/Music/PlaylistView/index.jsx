@@ -5,10 +5,11 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import fuse from "fuse.js"
 
-import useWsEvents from "@hooks/useWsEvents"
-
 import { WithPlayerContext } from "@contexts/WithPlayerContext"
 import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
+
+import useWsEvents from "@hooks/useWsEvents"
+import checkUserIdIsSelf from "@utils/checkUserIdIsSelf"
 
 import LoadMore from "@components/LoadMore"
 import { Icons } from "@components/Icons"
@@ -75,7 +76,7 @@ const MoreMenuHandlers = {
 export default (props) => {
     const [playlist, setPlaylist] = React.useState(props.playlist)
     const [searchResults, setSearchResults] = React.useState(null)
-    const [owningPlaylist, setOwningPlaylist] = React.useState(app.cores.permissions.checkUserIdIsSelf(props.playlist?.user_id))
+    const [owningPlaylist, setOwningPlaylist] = React.useState(checkUserIdIsSelf(props.playlist?.user_id))
 
     const moreMenuItems = React.useMemo(() => {
         const items = [{
@@ -84,7 +85,7 @@ export default (props) => {
         }]
 
         if (!playlist.type || playlist.type === "playlist") {
-            if (app.cores.permissions.checkUserIdIsSelf(playlist.user_id)) {
+            if (checkUserIdIsSelf(playlist.user_id)) {
                 items.push({
                     key: "delete",
                     label: "Delete",
@@ -221,7 +222,7 @@ export default (props) => {
 
     React.useEffect(() => {
         setPlaylist(props.playlist)
-        setOwningPlaylist(app.cores.permissions.checkUserIdIsSelf(props.playlist?.user_id))
+        setOwningPlaylist(checkUserIdIsSelf(props.playlist?.user_id))
     }, [props.playlist])
 
     if (!playlist) {

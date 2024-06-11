@@ -55,8 +55,6 @@ export default class SFXCore extends Core {
                 src: [path],
             })
         }
-
-        this.console.log(this.soundsPool)
     }
 
     async play(name, options = {}) {

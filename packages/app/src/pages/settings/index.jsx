@@ -122,6 +122,14 @@ export default () => {
         })
     }
 
+    React.useEffect(() => {
+        app.layout.tools_bar.toggleVisibility(false)
+
+        return () => {
+            app.layout.tools_bar.toggleVisibility(true)
+        }
+    }, [])
+
     return <div className="settings_wrapper">
         <div className="settings_menu">
             <antd.Menu

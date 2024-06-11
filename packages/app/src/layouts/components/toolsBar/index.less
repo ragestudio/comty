@@ -6,15 +6,22 @@
     top: 0;
     right: 0;
 
-    max-width: 420px;
-    min-width: 320px;
-
     height: 100vh;
     height: 100dvh;
-
-    padding: 10px;
+    max-width: 420px;
 
     z-index: 150;
+    padding: 10px;
+
+    .visible {
+        min-width: 320px;
+    }
+
+    &:not(.visible) {
+        min-width: 0;
+        padding: 0;
+
+    }
 }
 
 .tools-bar {
@@ -29,13 +36,13 @@
     border-radius: @sidebar_borderRadius;
     box-shadow: @card-shadow;
 
+    padding: 10px;
+
     background-color: var(--background-color-accent);
 
     gap: 20px;
 
-    &.visible {
-        padding: 10px;
-    }
+    flex: 0;
 
     .card {
         display: flex;
