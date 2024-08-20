@@ -304,9 +304,10 @@ class Login extends React.Component {
                             </>
                         }
 
-                        <antd.Input
-                            placeholder="4 Digit MFA code"
-                            onChange={(e) => this.onUpdateInput("mfa_code", e.target.value)}
+                        <antd.Input.OTP
+                            length={4}
+                            formatter={(str) => str.toUpperCase()}
+                            onChange={(code) => this.onUpdateInput("mfa_code", code)}
                             onPressEnter={this.nextStep}
                         />
                     </antd.Form.Item>

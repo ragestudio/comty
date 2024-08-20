@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src/server"
+import { Server } from "linebridge/dist/server"
 
 import B2 from "backblaze-b2"
 

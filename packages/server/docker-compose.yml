@@ -1,0 +1,11 @@
+services:
+  api:
+    container_name: comty-api
+    build: .
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./api.production.env
+    volumes:
+      - ./ssl:/comty-server/ssl

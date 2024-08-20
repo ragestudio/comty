@@ -1,7 +1,6 @@
 import React from "react"
 import * as antd from "antd"
 
-
 import ChatsService from "@models/chats"
 
 import TimeAgo from "@components/TimeAgo"

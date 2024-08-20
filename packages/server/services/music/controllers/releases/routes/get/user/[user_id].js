@@ -8,7 +8,7 @@ export default async (req, res) => {
     const { user_id } = req.params
     const { keywords, limit = 10, offset = 0 } = req.query
 
-    const total_length = await Release.count({
+    const total_length = await Release.countDocuments({
         user_id,
     })
 

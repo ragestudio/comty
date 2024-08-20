@@ -1,4 +1,4 @@
-import { Server } from "linebridge/src/server"
+import { Server } from "linebridge/dist/server"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"

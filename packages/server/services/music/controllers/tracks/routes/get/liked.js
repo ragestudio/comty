@@ -9,7 +9,7 @@ export default async (req, res) => {
 
     const { limit = 100, offset = 0 } = req.query
 
-    let totalLikedTracks = await TrackLike.count({
+    let totalLikedTracks = await TrackLike.countDocuments({
         user_id: req.session.user_id,
     })
 

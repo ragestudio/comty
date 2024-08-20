@@ -24,7 +24,7 @@ export default async (payload = {}) => {
 
         return followersData
     } else {
-        const count = await UserFollow.count({
+        const count = await UserFollow.countDocuments({
             to: user_id
         })
 

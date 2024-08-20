@@ -73,7 +73,7 @@ export default async (payload = {}) => {
             }
         }
 
-        post.hasReplies = await Post.count({ reply_to: post._id })
+        post.hasReplies = await Post.countDocuments({ reply_to: post._id })
 
         let likes = likesData[post._id.toString()] ?? []
 

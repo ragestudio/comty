@@ -1,10 +1,4 @@
 {
   "name": "auth",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "proxy":{
-    "namespace": "/auth",
-    "port": 3020
-  }
+  "version": "1.0.0"
 }

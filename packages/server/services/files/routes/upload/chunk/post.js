@@ -5,6 +5,8 @@ import ChunkFileUpload from "@shared-classes/ChunkFileUpload"
 
 import RemoteUpload from "@services/remoteUpload"
 
+const availableProviders = ["b2", "standard"]
+
 export default {
     useContext: ["cache", "limits"],
     middlewares: [
@@ -32,6 +34,11 @@ export default {
             limits.useCompression = req.headers["use-compression"] ?? false
 
             limits.useProvider = req.headers["provider-type"] ?? "b2"
+        }
+
+        // check if provider is valid
+        if (!availableProviders.includes(limits.useProvider)) {
+            throw new OperationError(400, "Invalid provider")
         }
 
         let build = await ChunkFileUpload(req, {

@@ -42,17 +42,18 @@ export default async (req, res) => {
 
             if (mfaSession) {
                 if (!req.body.mfa_code) {
-                    await mfaSession.delete()
+                    await MFASession.deleteMany({ user_id: user._id })
                 } else {
                     if (mfaSession.expires_at < new Date().getTime()) {
-                        await mfaSession.delete()
+                        await MFASession.deleteMany({ user_id: user._id })
 
                         throw new OperationError(401, "MFA code expired, login again...")
                     }
 
                     if (mfaSession.code == req.body.mfa_code) {
                         codeVerified = true
-                        await mfaSession.delete()
+
+                        await MFASession.deleteMany({ user_id: user._id })
                     } else {
                         throw new OperationError(401, "Invalid MFA code, try again...")
                     }

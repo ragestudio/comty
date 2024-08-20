@@ -125,11 +125,7 @@ const ChangePasswordComponent = (props) => {
 
 export default (props) => {
     const onClick = () => {
-        if (app.isMobile) {
-            return app.layout.drawer.open("passwordChange", ChangePasswordComponent)
-        }
-
-        return app.layout.sidedrawer.open("passwordChange", ChangePasswordComponent)
+        return app.layout.drawer.open("passwordChange", ChangePasswordComponent)
     }
 
     return <antd.Button onClick={onClick}>

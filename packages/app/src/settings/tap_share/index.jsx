@@ -152,7 +152,7 @@ const TagItem = (props) => {
             <antd.Button
                 icon={<Icons.MdDelete />}
                 danger
-                disabled
+                onClick={props.onDelete}
             />
         </div>
     </div>
@@ -189,6 +189,25 @@ class OwnTags extends React.Component {
             loading: false,
             data: result,
             error: null
+        })
+    }
+
+    handleTagDelete = (tag) => {
+        antd.Modal.confirm({
+            title: "Are you sure you want to delete this tag?",
+            content: `This action cannot be undone.`,
+            onOk: async () => {
+                NFCModel.deleteTag(tag._id)
+                    .then(() => {
+                        app.message.success("Tag deleted")
+                        this.loadData()
+                    })
+                    .catch((err) => {
+                        console.error(err)
+                        app.message.error(err.message)
+                        return false
+                    })
+            }
         })
     }
 
@@ -251,6 +270,9 @@ class OwnTags extends React.Component {
                             OpenTagEditor({
                                 tag
                             })
+                        }}
+                        onDelete={() => {
+                            this.handleTagDelete(tag)
                         }}
                     />
                 })

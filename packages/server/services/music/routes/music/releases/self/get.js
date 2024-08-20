@@ -39,7 +39,7 @@ export default {
         }
 
         return {
-            total_length: await MusicRelease.count(searchQuery),
+            total_length: await MusicRelease.countDocuments(searchQuery),
             items: releases,
         }
     }

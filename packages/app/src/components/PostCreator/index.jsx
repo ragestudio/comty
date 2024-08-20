@@ -4,10 +4,13 @@ import classnames from "classnames"
 import { DateTime } from "luxon"
 import lodash from "lodash"
 import humanSize from "@tsmx/human-readable"
+
 import PostLink from "@components/PostLink"
 import { Icons } from "@components/Icons"
+import Poll from "@components/Poll"
 
 import clipboardEventFileToFile from "@utils/clipboardEventFileToFile"
+
 import PostModel from "@models/post"
 
 import "./index.less"
@@ -26,6 +29,7 @@ export default class PostCreator extends React.Component {
 
         postMessage: "",
         postAttachments: [],
+        postPoll: null,
 
         fileList: [],
         postingPolicy: DEFAULT_POST_POLICY,
@@ -451,6 +455,20 @@ export default class PostCreator extends React.Component {
         dialog.click()
     }
 
+    handleAddPoll = () => {
+        if (!this.state.postPoll) {
+            this.setState({
+                postPoll: []
+            })
+        }
+    }
+
+    handleDeletePoll = () => {
+        this.setState({
+            postPoll: null
+        })
+    }
+
     componentDidMount = async () => {
         if (this.props.edit_post) {
             await this.setState({
@@ -589,6 +607,14 @@ export default class PostCreator extends React.Component {
                 </antd.Upload.Dragger>
             </div>
 
+            {
+                this.state.postPoll && <Poll
+                    options={this.state.postPoll}
+                    onClose={this.handleDeletePoll}
+                    editMode
+                />
+            }
+
             <div className="actions">
                 <antd.Button
                     type="ghost"
@@ -599,6 +625,7 @@ export default class PostCreator extends React.Component {
                 <antd.Button
                     type="ghost"
                     icon={<Icons.MdPoll />}
+                    onClick={this.handleAddPoll}
                 />
             </div>
         </div>

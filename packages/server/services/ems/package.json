@@ -2,12 +2,6 @@
   "name": "ems",
   "description": "External Messaging Service (SMS, EMAIL, PUSH)",
   "version": "0.1.0",
-  "main": "index.js",
-  "license": "MIT",
-  "proxy": {
-    "path": "/ems",
-    "port": 3007
-  },
   "dependencies": {
     "handlebars": "^4.7.8",
     "nodemailer": "^6.9.11",

@@ -106,7 +106,7 @@ class ComtyApp extends React.Component {
 				}
 			},
 			openLoginForm: async (options = {}) => {
-				app.layout.drawer.open("login", Login, {
+				app.layout.draggable.open("login", Login, {
 					defaultLocked: options.defaultLocked ?? false,
 					componentProps: {
 						sessionController: this.sessionController,
@@ -134,7 +134,7 @@ class ComtyApp extends React.Component {
 			},
 			// Opens the notification window and sets up the UI for the notification to be displayed
 			openNotifications: () => {
-				window.app.layout.sidedrawer.open("notifications", NotificationsCenter, {
+				window.app.layout.drawer.open("notifications", NotificationsCenter, {
 					props: {
 						width: "fit-content",
 					},
@@ -158,7 +158,7 @@ class ComtyApp extends React.Component {
 				})
 			},
 			openMessages: () => {
-				app.location.push("/messages")	
+				app.location.push("/messages")
 			},
 			openFullImageViewer: (src) => {
 				app.cores.window_mng.render("image_lightbox", <Lightbox
@@ -169,7 +169,6 @@ class ComtyApp extends React.Component {
 					showRotate
 				/>)
 			},
-
 			openPostCreator: (params) => {
 				app.layout.modal.open("post_creator", (props) => <PostCreator
 					{...props}

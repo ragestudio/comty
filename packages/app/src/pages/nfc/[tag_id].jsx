@@ -27,6 +27,13 @@ export default (props) => {
             case "profile": {
                 return app.navigation.goToAccount(result.behavior.value)
             }
+            case "random_list": {
+                const values = result.behavior.value.split(";")
+
+                const index = Math.floor(Math.random() * values.length)
+
+                return window.location.href = values[index]
+            }
         }
     }
 

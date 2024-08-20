@@ -1,12 +1,6 @@
 {
   "name": "posts",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "proxy": {
-    "namespace": "/posts",
-    "port": 3001
-  },
   "dependencies": {
     "moment-timezone": "^0.5.45"
   }

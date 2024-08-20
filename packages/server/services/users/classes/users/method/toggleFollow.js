@@ -46,6 +46,6 @@ export default async (payload = {}) => {
 
     return {
         following: to,
-        count: await UserFollow.count({ to: user_id }),
+        count: await UserFollow.countDocuments({ to: user_id }),
     }
 }

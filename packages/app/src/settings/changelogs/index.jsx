@@ -14,7 +14,7 @@ import "./index.less"
 const FetchChangelogs = async () => {
     const response = await app.cores.api.customRequest({
         method: "GET",
-        url: `/release-notes`,
+        url: `/repo/releases-notes`,
     })
 
     return response.data

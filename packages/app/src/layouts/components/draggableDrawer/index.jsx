@@ -9,6 +9,72 @@ import { css } from "@emotion/css"
 
 import "./index.less"
 
+// TODO: Finish me pleassse
+export class DraggableDrawerController extends Component {
+    constructor(props) {
+        super(props)
+
+        this.interface = {
+            open: this.open,
+            close: this.close,
+        }
+
+        this.state = {
+            drawers: []
+        }
+    }
+
+    componentDidMount() {
+        app.layout.draggable = this.interface
+    }
+
+    open = (id, render, options = {}) => {
+        this.setState({
+            drawers: [
+                ...this.state.drawers,
+                {
+                    id: id,
+                    locked: options.defaultLocked ?? false,
+                    render: <DraggableDrawer
+                        onRequestClose={this.close.bind(this, id)}
+                        close={this.close.bind(this, id)}
+                        open={true}
+                        destroyOnClose={true}
+                        {...options.props ?? {}}
+                    >
+                        {React.createElement(render)}
+                    </DraggableDrawer>,
+                }
+            ],
+        })
+    }
+
+    close = (id) => {
+        const drawerIndex = this.state.drawers.findIndex((drawer) => drawer.id === id)
+
+        if (drawerIndex === -1) {
+            console.error("Drawer not found")
+            return false
+        }
+
+        const drawer = this.state.drawers[drawerIndex]
+
+        if (drawer.locked === true){
+            return false
+        }
+
+        const drawers = this.state.drawers
+
+        drawers.splice(drawerIndex, 1)
+
+        this.setState({ drawers: drawers })
+    }
+
+    render() {
+        return this.state.drawers.map((drawer) => drawer.render)
+    }
+}
+
 export default class DraggableDrawer extends Component {
     static propTypes = {
         open: PropTypes.bool.isRequired,

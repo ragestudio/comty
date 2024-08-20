@@ -137,9 +137,9 @@ export default (props) => {
                             </antd.Select.Option>
 
                             <antd.Select.Option
-                                value="post"
+                                value="random_list"
                             >
-                                Post
+                                Random list
                             </antd.Select.Option>
                         </antd.Select>
                     </antd.Form.Item>

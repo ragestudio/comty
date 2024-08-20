@@ -24,8 +24,8 @@ export default async (req, res) => {
 		}
 	}
 
-	const playlistsCount = await Playlist.count(searchQuery)
-	const releasesCount = await Release.count(searchQuery)
+	const playlistsCount = await Playlist.countDocuments(searchQuery)
+	const releasesCount = await Release.countDocuments(searchQuery)
 
 	let total_length = playlistsCount + releasesCount
 

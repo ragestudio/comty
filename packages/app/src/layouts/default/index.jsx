@@ -3,26 +3,24 @@ import classnames from "classnames"
 import { Layout } from "antd"
 
 import Sidebar from "@layouts/components/sidebar"
-import Drawer from "@layouts/components/drawer"
-import Sidedrawer from "@layouts/components/sidedrawer"
-import BottomBar from "@layouts/components/bottomBar"
-import TopBar from "@layouts/components/topBar"
 import ToolsBar from "@layouts/components/toolsBar"
 import Header from "@layouts/components/header"
-import InitializeModalsController from "@layouts/components/modals"
+import Modals from "@layouts/components/modals"
+
+// mobile components
+import { DraggableDrawerController } from "@layouts/components/draggableDrawer"
+import BottomBar from "@layouts/components/@mobile/bottomBar"
+import TopBar from "@layouts/components/@mobile/topBar"
 
 import BackgroundDecorator from "@components/BackgroundDecorator"
 
 const DesktopLayout = (props) => {
-    InitializeModalsController()
-
     return <>
         <BackgroundDecorator />
+        <Modals />
 
         <Layout id="app_layout" className="app_layout">
-            <Drawer />
             <Sidebar />
-            <Sidedrawer />
 
             <Layout.Content
                 id="content_layout"
@@ -45,6 +43,7 @@ const DesktopLayout = (props) => {
 
 const MobileLayout = (props) => {
     return <Layout id="app_layout" className="app_layout">
+        <DraggableDrawerController />
         <TopBar />
 
         <Layout.Content
@@ -61,7 +60,6 @@ const MobileLayout = (props) => {
         </Layout.Content>
 
         <BottomBar />
-        <Drawer />
     </Layout>
 }
 

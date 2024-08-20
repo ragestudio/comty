@@ -1,27 +1,36 @@
-FROM node:16-bullseye-slim
+FROM node:18-bookworm-slim
+EXPOSE 9000
 
+# Install dependencies
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-
 RUN apt update
-RUN apt install --no-install-recommends curl ffmpeg python yarn build-essential -y
+RUN apt install -y --no-install-recommends build-essential
+RUN apt install -y --no-install-recommends curl
+RUN apt install -y --no-install-recommends ffmpeg
+RUN apt install -y --no-install-recommends yarn
+RUN apt install -y --no-install-recommends git
+RUN apt install -y --no-install-recommends ssh
+RUN apt install -y --no-install-recommends ca-certificates
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+# Create workdir
+RUN mkdir -p /comty-server
+WORKDIR /comty-server
 
-WORKDIR /home/node/app
+# Copy Files
+COPY package.json ./
+COPY . .
+
+# Fix permissions
+RUN chmod -R 777 /comty-server
+RUN chown -R node:node /comty-server
+
+# Set user to node
 USER node
 
-EXPOSE 3010
-
-COPY package.json ./
-COPY --chown=node:node . .
-
-RUN chmod -R 777 /home/node/app
-
-RUN export NODE_ENV=production
-
-RUN yarn global add cross-env
-RUN yarn install --production
-RUN yarn build
+# Install modules & rebuild for host
+RUN npm install
 RUN npm rebuild @tensorflow/tfjs-node --build-from-source
 
-CMD ["yarn", "run", "run:prod"]
+# Start server
+RUN export NODE_ENV=production
+CMD ["npm", "run", "start:prod"]

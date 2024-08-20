@@ -14,7 +14,6 @@ export default {
         {
             id: "style:variant_mode",
             group: "aspect",
-            component: "Switch",
             icon: "Moon",
             title: "Theme",
             description: "Change the theme of the application.",
@@ -52,7 +51,7 @@ export default {
                 max: 1.2,
                 step: 0.01,
                 tooltip: {
-                    formatter: (value) => `${value}x`
+                    formatter: (value) => `x${value}`
                 }
             },
             defaultValue: () => {
@@ -142,8 +141,6 @@ export default {
             ],
             defaultValue: () => {
                 const value = app.cores.style.getVar("backgroundImage")
-
-                console.log(value)
 
                 return value ? value.replace(/url\(|\)/g, "") : ""
             },

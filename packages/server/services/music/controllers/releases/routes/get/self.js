@@ -24,7 +24,7 @@ export default async (req, res) => {
         }
     }
 
-    const total_length = await Release.count(searchQuery)
+    const total_length = await Release.countDocuments(searchQuery)
 
     let releases = await Release.find(searchQuery)
         .sort({ created_at: -1 })

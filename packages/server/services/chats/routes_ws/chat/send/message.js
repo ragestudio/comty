@@ -28,8 +28,6 @@ export default async (socket, payload, engine) => {
 
     const targetSocket = await engine.find.socketByUserId(payload.to_user_id)
 
-    console.log(targetSocket)
-
     if (targetSocket) {
         await targetSocket.emit("chat:receive:message", wsMessageObj)
     }

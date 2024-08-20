@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json.schemastore.org/swcrc",
+    "exclude":[
+        "node_modules/minio/**",
+        "node_modules/@octokit/**"
+    ],
+    "module": {
+        "type": "commonjs",
+        // These are defaults.
+        "strict": false,
+        "strictMode": true,
+        "lazy": false,
+        "noInterop": false
+    }
+}

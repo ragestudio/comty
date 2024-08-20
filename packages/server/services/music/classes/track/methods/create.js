@@ -26,7 +26,7 @@ export default async (payload = {}) => {
         mimeType: headers["content-type"],
     })
 
-    const metadata = {
+    let metadata = {
         format: fileMetadata.format.codec,
         channels: fileMetadata.format.numberOfChannels,
         sampleRate: fileMetadata.format.sampleRate,

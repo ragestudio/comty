@@ -32,6 +32,9 @@
 
 .app_sidebar {
 	position: relative;
+
+	z-index: 1000;
+
 	display: flex;
 	flex-direction: column;
 
@@ -78,6 +81,11 @@
 		width: 0;
 		min-width: 0;
 		padding: 0;
+	}
+
+	&.disabled {
+		pointer-events: none;
+		opacity: 0.5;
 	}
 
 	.app_sidebar_header {
@@ -174,9 +182,9 @@
 				&.user_avatar {
 					.ant-menu-title-content {
 						width: 100%;
-						
+
 						display: inline-flex;
-						
+
 						align-items: flex-start;
 						justify-content: center;
 
@@ -191,8 +199,6 @@
 							}
 						}
 					}
-
-				
 
 					padding: 0 !important;
 				}

@@ -29,7 +29,16 @@ const ReleasesTypes = [
 ]
 
 const BasicInformation = (props) => {
-    const { release, onFinish } = props
+    const { release, onFinish, setState, state } = props
+
+    async function onFormChange(change) {
+        setState((globalState) => {
+            return {
+                ...globalState,
+                ...change
+            }
+        })
+    }
 
     return <div className="music-studio-release-editor-tab">
         <h1>Release Information</h1>
@@ -40,12 +49,13 @@ const BasicInformation = (props) => {
             ref={props.references.basic}
             onFinish={onFinish}
             requiredMark={false}
+            onValuesChange={onFormChange}
         >
             <antd.Form.Item
                 label=""
                 name="cover"
                 rules={[{ required: true, message: "Input a cover for the release" }]}
-                initialValue={release?.cover}
+                initialValue={state?.cover}
             >
                 <CoverEditor
                     defaultUrl="https://storage.ragestudio.net/comty-static-assets/default_song.png"
@@ -70,7 +80,7 @@ const BasicInformation = (props) => {
                 label={<><Icons.MdMusicNote /> <span>Title</span></>}
                 name="title"
                 rules={[{ required: true, message: "Input a title for the release" }]}
-                initialValue={release?.title}
+                initialValue={state?.title}
             >
                 <antd.Input
                     placeholder="Release title"
@@ -83,7 +93,7 @@ const BasicInformation = (props) => {
                 label={<><Icons.MdAlbum /> <span>Type</span></>}
                 name="type"
                 rules={[{ required: true, message: "Select a type for the release" }]}
-                initialValue={release?.type}
+                initialValue={state?.type}
             >
                 <antd.Select
                     placeholder="Release type"
@@ -94,7 +104,7 @@ const BasicInformation = (props) => {
             <antd.Form.Item
                 label={<><Icons.MdPublic /> <span>Public</span></>}
                 name="public"
-                initialValue={release?.public}
+                initialValue={state?.public}
             >
                 <antd.Switch />
             </antd.Form.Item>

@@ -64,7 +64,7 @@ export default {
         history = await Promise.all(history)
 
         return {
-            total: await ChatMessage.count(query),
+            total: await ChatMessage.countDocuments(query),
             offset: offset,
             limit: limit,
             order: order,

@@ -60,7 +60,7 @@ export default {
             group: "ui.sounds",
             component: "Switch",
             icon: "MdVolumeUp",
-            title: "UI effects",
+            title: "Effects",
             description: "Enable the UI effects.",
             mobile: false,
         },
@@ -70,8 +70,8 @@ export default {
             group: "ui.sounds",
             component: "Slider",
             icon: "MdVolumeUp",
-            title: "UI volume",
-            description: "Set the volume of the app sounds.",
+            title: "Volume",
+            description: "Set the volume of the app UI sounds.",
             props: {
                 tipFormatter: (value) => {
                     return `${value}%`
@@ -108,7 +108,7 @@ export default {
             group: "notifications",
             component: "Slider",
             icon: "MdVolumeUp",
-            title: "Sound Volume",
+            title: "Volume",
             description: "Set the volume of the sound when a notification is received.",
             props: {
                 tipFormatter: (value) => {

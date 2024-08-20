@@ -64,6 +64,7 @@ const PlayerController = React.forwardRef((props, ref) => {
         setDraggingTime(false)
 
         app.cores.player.seek(seekTime)
+
         syncPlayback()
     }
 
@@ -91,7 +92,6 @@ const PlayerController = React.forwardRef((props, ref) => {
     React.useEffect(() => {
         setTitleIsOverflown(isOverflown(titleRef.current))
         setTrackDuration(app.cores.player.duration())
-        console.log(context.track_manifest)
     }, [context.track_manifest])
 
     React.useEffect(() => {
@@ -104,7 +104,7 @@ const PlayerController = React.forwardRef((props, ref) => {
         className={classnames(
             "lyrics-player-controller-wrapper",
             {
-                ["hidden"]: hide,
+                ["hidden"]: props.lyrics?.video_source && hide,
             }
         )}
         onMouseEnter={onMouseEnter}

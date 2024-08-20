@@ -12,16 +12,14 @@ const CoverEditor = (props) => {
     const [url, setUrl] = React.useState(value)
 
     React.useEffect(() => {
-        setUrl(value)
-    }, [value])
-
-    React.useEffect(() => {
         onChange(url)
     }, [url])
 
     React.useEffect(() => {
-        if (!url) {
+        if (!value) {
             setUrl(defaultUrl)
+        } else {
+            setUrl(value)
         }
     }, [])
 

@@ -12,9 +12,6 @@
         "postdeploy": "node ./scripts/post-deploy.js",
         "postinstall": "node ./scripts/post-install.js"
     },
-    "workspaces": [
-        "packages/**"
-    ],
     "dependencies": {
         "7zip-min": "1.4.3",
         "axios": "^1.4.0",

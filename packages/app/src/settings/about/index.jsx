@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import { version as linebridgeVersion } from "linebridge/package.json"
+// import { version as linebridgeVersion } from "linebridge/package.json"
 
 import { Icons } from "@components/Icons"
 import LatencyIndicator from "@components/PerformanceIndicators/latency"
@@ -163,6 +163,20 @@ export default {
                             <Icons.MdInfo />
                         </div>
 
+                        <p>Platform</p>
+                    </div>
+
+                    <div className="field_value">
+                        {Capacitor.platform}
+                    </div>
+                </div>
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
                         <p>React</p>
                     </div>
 
@@ -177,21 +191,7 @@ export default {
                             <Icons.MdInfo />
                         </div>
 
-                        <p>Linebridge Engine</p>
-                    </div>
-
-                    <div className="field_value">
-                        {linebridgeVersion ?? globalThis._linebrige_version ?? "Unknown"}
-                    </div>
-                </div>
-
-                <div className="inline_field">
-                    <div className="field_header">
-                        <div className="field_icon">
-                            <Icons.MdInfo />
-                        </div>
-
-                        <p>Evite Framework</p>
+                        <p>Engine</p>
                     </div>
 
                     <div className="field_value">
@@ -205,25 +205,11 @@ export default {
                             <Icons.MdInfo />
                         </div>
 
-                        <p>Comty.JS</p>
+                        <p>Comty.js</p>
                     </div>
 
                     <div className="field_value">
                         {__comty_shared_state.version ?? "Unknown"}
-                    </div>
-                </div>
-
-                <div className="inline_field">
-                    <div className="field_header">
-                        <div className="field_icon">
-                            <Icons.MdInfo />
-                        </div>
-
-                        <p>Platform</p>
-                    </div>
-
-                    <div className="field_value">
-                        {Capacitor.platform}
                     </div>
                 </div>
 

@@ -1,163 +1,221 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
+import { DragDropContext, Droppable } from "react-beautiful-dnd"
+import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 
 import { Icons } from "@components/Icons"
-import TrackEditor from "@components/MusicStudio/TrackEditor"
+
+import TrackListItem from "./components/TrackListItem"
+import UploadHint from "./components/UploadHint"
 
 import "./index.less"
 
-const UploadHint = (props) => {
-    return <div className="uploadHint">
-        <Icons.MdPlaylistAdd />
-        <p>Upload your tracks</p>
-        <p>Drag and drop your tracks here or click this box to start uploading files.</p>
-    </div>
+async function uploadBinaryArrayToStorage(bin, args) {
+    const { format, data } = bin
+
+    const filenameExt = format.split("/")[1]
+    const filename = `cover.${filenameExt}`
+
+    const byteArray = new Uint8Array(data)
+    const blob = new Blob([byteArray], { type: data.type })
+
+    // create a file object
+    const file = new File([blob], filename, {
+        type: format,
+    })
+
+    return await app.cores.remoteStorage.uploadFile(file, args)
 }
 
-const TrackListItem = (props) => {
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(null)
+class TrackManifest {
+    constructor(params) {
+        this.params = params
 
-    const { track } = props
+        return this
+    }
 
-    async function onClickEditTrack() {
-        app.layout.drawer.open("track_editor", TrackEditor, {
-            type: "drawer",
-            props: {
-                width: "600px",
-                headerStyle: {
-                    display: "none",
-                }
-            },
-            componentProps: {
-                track,
-                onSave: (newTrackData) => {
-                    console.log("Saving track", newTrackData)
+    cover = "https://storage.ragestudio.net/comty-static-assets/default_song.png"
+
+    title = "Untitled"
+
+    album = "Unknown"
+
+    artist = "Unknown"
+
+    source = null
+
+    async initialize() {
+        const metadata = await this.analyzeMetadata(this.params.file.originFileObj)
+
+        console.log(metadata)
+
+        if (metadata.tags) {
+            if (metadata.tags.title) {
+                this.title = metadata.tags.title
+            }
+
+            if (metadata.tags.artist) {
+                this.artist = metadata.tags.artist
+            }
+
+            if (metadata.tags.album) {
+                this.album = metadata.tags.album
+            }
+
+            if (metadata.tags.picture) {
+                const coverUpload = await uploadBinaryArrayToStorage(metadata.tags.picture)
+
+                this.cover = coverUpload.url
+            }
+        }
+
+        return this
+    }
+
+    analyzeMetadata = async (file) => {
+        return new Promise((resolve, reject) => {
+            jsmediatags.read(file, {
+                onSuccess: (data) => {
+                    return resolve(data)
                 },
-            },
+                onError: (error) => {
+                    return reject(error)
+                }
+            })
+        })
+    }
+}
+
+class TracksManager extends React.Component {
+    state = {
+        list: [],
+        pendingUploads: [],
+    }
+
+    componentDidMount() {
+        if (typeof this.props.list !== "undefined" && Array.isArray(this.props.list)) {
+            this.setState({
+                list: this.props.list
+            })
+        }
+    }
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (prevState.list !== this.state.list || prevState.pendingUploads !== this.state.pendingUploads) {
+            if (typeof this.props.onChangeState === "function") {
+                this.props.onChangeState(this.state)
+            }
+        }
+    }
+
+    findTrackByUid = (uid) => {
+        if (!uid) {
+            return false
+        }
+
+        return this.state.list.find((item) => item.uid === uid)
+    }
+
+    addTrackToList = (track) => {
+        if (!track) {
+            return false
+        }
+
+        this.setState({
+            list: [...this.state.list, track],
         })
     }
 
-    return <Draggable
-        key={track._id}
-        draggableId={track._id}
-        index={props.index}
-    >
-        {
-            (provided, snapshot) => {
-                return <div
-                    className={classnames(
-                        "music-studio-release-editor-tracks-list-item",
-                        {
-                            ["loading"]: loading,
-                            ["failed"]: !!error
-                        }
-                    )}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                >
-                    <div className="music-studio-release-editor-tracks-list-item-index">
-                        <span>{props.index + 1}</span>
-                    </div>
-
-                    <span>{track.title}</span>
-
-                    <div className="music-studio-release-editor-tracks-list-item-actions">
-                        <antd.Button
-                            type="ghost"
-                            icon={<Icons.Edit2 />}
-                            onClick={onClickEditTrack}
-                        />
-
-                        <div
-                            {...provided.dragHandleProps}
-                            className="music-studio-release-editor-tracks-list-item-dragger"
-                        >
-                            <Icons.MdDragIndicator />
-                        </div>
-                    </div>
-                </div>
-            }
+    removeTrackByUid = (uid) => {
+        if (!uid) {
+            return false
         }
-    </Draggable>
-}
- 
-const ReleaseTracks = (props) => {
-    const { release } = props
 
-    const [list, setList] = React.useState(release.list ?? [])
-    const [pendingTracksUpload, setPendingTracksUpload] = React.useState([])
+        this.setState({
+            list: this.state.list.filter((item) => item.uid !== uid),
+        })
+    }
 
-    async function onTrackUploaderChange (change) {
+    addTrackUIDToPendingUploads = (uid) => {
+        if (!uid) {
+            return false
+        }
+
+        if (!this.state.pendingUploads.includes(uid)) {
+            this.setState({
+                pendingUploads: [...this.state.pendingUploads, uid],
+            })
+        }
+    }
+
+    removeTrackUIDFromPendingUploads = (uid) => {
+        if (!uid) {
+            return false
+        }
+
+        this.setState({
+            pendingUploads: this.state.pendingUploads.filter((item) => item !== uid),
+        })
+    }
+
+    handleUploaderStateChange = async (change) => {
         switch (change.file.status) {
             case "uploading": {
-                if (!pendingTracksUpload.includes(change.file.uid)) {
-                    pendingTracksUpload.push(change.file.uid)
-                }
+                this.addTrackUIDToPendingUploads(change.file.uid)
 
-                setList((prev) => {
-                    return [
-                        ...prev,
-                        
-                    ]
+                const trackManifest = new TrackManifest({
+                    uid: change.file.uid,
+                    file: change.file,
                 })
+
+                await trackManifest.initialize()
+
+                this.addTrackToList(trackManifest)
 
                 break
             }
             case "done": {
                 // remove pending file
-                this.setState({
-                    pendingTracksUpload: this.state.pendingTracksUpload.filter((uid) => uid !== change.file.uid)
-                })
+                this.removeTrackUIDFromPendingUploads(change.file.uid)
 
-                // update file url in the track info
-                const track = this.state.trackList.find((file) => file.uid === change.file.uid)
+                const trackIndex = this.state.list.findIndex((item) => item.uid === uid)
 
-                if (track) {
-                    track.source = change.file.response.url
-                    track.status = "done"
+                if (trackIndex === -1) {
+                    console.error(`Track with uid [${uid}] not found!`)
+                    break
                 }
 
-                this.setState({
-                    trackList: this.state.trackList
+                // update track list
+                this.setState((state) => {
+                    state.list[trackIndex].source = change.file.response.url
+        
+                    return state
                 })
 
                 break
             }
             case "error": {
                 // remove pending file
-                this.handleTrackRemove(change.file.uid)
+                this.removeTrackUIDFromPendingUploads(change.file.uid)
 
-                // open a dialog to show the error and ask user to retry
-                antd.Modal.error({
-                    title: "Upload failed",
-                    content: "An error occurred while uploading the file. You want to retry?",
-                    cancelText: "No",
-                    okText: "Retry",
-                    onOk: () => {
-                        this.handleUploadTrack(change)
-                    },
-                    onCancel: () => {
-                        this.handleTrackRemove(change.file.uid)
-                    }
-                })
+                // remove from tracklist
+                await this.removeTrackByUid(change.file.uid)
             }
             case "removed": {
-                this.handleTrackRemove(change.file.uid)
+                // stop upload & delete from pending list and tracklist
+                await this.removeTrackByUid(change.file.uid)
             }
-
             default: {
                 break
             }
         }
     }
 
-    async function handleUploadTrack (req)  {
+    uploadToStorage = async (req) => {
         const response = await app.cores.remoteStorage.uploadFile(req.file, {
-            onProgress: this.handleFileProgress,
-            service: "premium-cdn"
+            onProgress: this.handleTrackFileUploadProgress,
+            service: "b2"
         }).catch((error) => {
             console.error(error)
             antd.message.error(error)
@@ -172,38 +230,40 @@ const ReleaseTracks = (props) => {
         }
     }
 
-    async function onTrackDragEnd(result) {
-        console.log(result)
+    handleTrackFileUploadProgress = async (file, progress) => {
+        console.log(file, progress)
+    }
 
+    orderTrackList = (result) => {
         if (!result.destination) {
             return
         }
 
-        setList((prev) => {
-            const trackList = [...prev]
+        this.setState((prev) => {
+            const trackList = [...prev.list]
 
             const [removed] = trackList.splice(result.source.index, 1)
 
             trackList.splice(result.destination.index, 0, removed)
 
-            return trackList
+            return {
+                list: trackList
+            }
         })
     }
 
-    return <div className="music-studio-release-editor-tab">
-        <h1>Tracks</h1>
-
-        <div>
+    render() {
+        return <div className="music-studio-release-editor-tracks">
             <antd.Upload
-                className="uploader"
-                customRequest={handleUploadTrack}
-                onChange={onTrackUploaderChange}
+                className="music-studio-tracks-uploader"
+                onChange={this.handleUploaderStateChange}
+                customRequest={this.uploadToStorage}
                 showUploadList={false}
                 accept="audio/*"
                 multiple
             >
                 {
-                    list.length === 0 ?
+                    this.state.list.length === 0 ?
                         <UploadHint /> : <antd.Button
                             className="uploadMoreButton"
                             icon={<Icons.Plus />}
@@ -212,7 +272,7 @@ const ReleaseTracks = (props) => {
             </antd.Upload>
 
             <DragDropContext
-                onDragEnd={onTrackDragEnd}
+                onDragEnd={this.orderTrackList}
             >
                 <Droppable
                     droppableId="droppable"
@@ -224,13 +284,13 @@ const ReleaseTracks = (props) => {
                             className="music-studio-release-editor-tracks-list"
                         >
                             {
-                                list.length === 0 && <antd.Result
+                                this.state.list.length === 0 && <antd.Result
                                     status="info"
                                     title="No tracks"
                                 />
                             }
                             {
-                                list.map((track, index) => {
+                                this.state.list.map((track, index) => {
                                     return <TrackListItem
                                         index={index}
                                         track={track}
@@ -243,6 +303,25 @@ const ReleaseTracks = (props) => {
                 </Droppable>
             </DragDropContext>
         </div>
+    }
+}
+
+const ReleaseTracks = (props) => {
+    const { state, setState } = props
+
+    return <div className="music-studio-release-editor-tab">
+        <h1>Tracks</h1>
+
+        <TracksManager
+            _id={state._id}
+            list={state.list}
+            onChangeState={(managerState) => {
+                setState({
+                    ...state,
+                    ...managerState
+                })
+            }}
+        />
     </div>
 }
 

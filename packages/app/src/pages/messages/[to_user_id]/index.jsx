@@ -40,7 +40,6 @@ const ChatPage = (props) => {
         isRemoteTyping,
     } = useChat(to_user_id)
 
-
     console.log(R_User)
 
     async function submitMessage(e) {

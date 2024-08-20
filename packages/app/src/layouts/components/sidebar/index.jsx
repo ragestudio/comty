@@ -4,19 +4,69 @@ import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { Motion, spring } from "react-motion"
 import { Menu, Avatar, Dropdown } from "antd"
+import Drawer from "@layouts/components/drawer"
 
 import { Icons, createIconRender } from "@components/Icons"
+import { GiLockedChest } from "react-icons/gi"
 
 import sidebarItems from "@config/sidebar"
 
 import "./index.less"
 
+const builtInApps = [
+	{
+		key: "hb",
+		label: "Hotel",
+		icon: "MdGames",
+		location: "/apps/hb",
+	},
+	{
+		key: "pay",
+		label: "Pay",
+		icon: "MdPayment",
+		location: "/apps/pay",
+	},
+	{
+		key: "loots",
+		label: "Loots",
+		icon: <GiLockedChest />,
+		location: "/apps/loots",
+	}
+]
+
+const AppDrawer = (props) => {
+	return <div className="app-drawer">
+		<h1>Apps</h1>
+
+		{
+			builtInApps.map((item) => {
+				return <div
+					key={item.key}
+					className="app-drawer_item"
+					onClick={() => {
+						if (item.location) {
+							app.location.push(item.location)
+						}
+
+						props.close()
+					}}
+				>
+					<h3>{item.icon && createIconRender(item.icon)} {item.label}</h3>
+				</div>
+			})
+		}
+	</div>
+}
+
 const onClickHandlers = {
+	apps: () => {
+		app.layout.drawer.open("apps", AppDrawer)
+	},
 	addons: () => {
-		window.app.location.push("/addons")	
+		window.app.location.push("/addons")
 	},
 	studio: () => {
-		window.app.location.push("/studio")	
+		window.app.location.push("/studio")
 	},
 	settings: () => {
 		window.app.navigation.goToSettings()
@@ -28,12 +78,12 @@ const onClickHandlers = {
 		window.app.controls.openSearcher()
 	},
 	messages: () => {
-		window.app.controls.openMessages()	
+		window.app.controls.openMessages()
 	},
 	create: () => {
 		window.app.controls.openCreator()
 	},
-	account: () => {
+	profile: () => {
 		window.app.navigation.goToAccount()
 	},
 	login: () => {
@@ -83,6 +133,13 @@ const BottomMenuDefaultItems = [
 			{(t) => t("Notifications")}
 		</Translation>,
 		icon: <Icons.Bell />,
+	},
+	{
+		key: "apps",
+		label: <Translation>
+			{(t) => t("Apps")}
+		</Translation>,
+		icon: <Icons.MdApps />,
 	},
 	{
 		key: "settings",
@@ -258,15 +315,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	events = {
-		"sidedrawers.visible": (has) => {
-			this.setState({
-				lockAutocollapse: has
-			})
 
-			if (!has && this.state.expanded) {
-				this.interface.toggleCollapse(false)
-			}
-		}
 	}
 
 	componentDidMount = async () => {
@@ -316,7 +365,7 @@ export default class Sidebar extends React.Component {
 		return app.location.push(`/${item.path ?? e.key}`, 150)
 	}
 
-	onMouseEnter = () => {
+	onMouseEnter = (event) => {
 		if (!this.state.visible) return
 
 		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
@@ -327,10 +376,15 @@ export default class Sidebar extends React.Component {
 			return
 		}
 
+		// do nothing if is mask visible
+		if (app.layout.drawer.isMaskVisible()) {
+			return false
+		}
+
 		this.interface.toggleCollapse(true)
 	}
 
-	handleMouseLeave = () => {
+	handleMouseLeave = (event) => {
 		if (!this.state.visible) return
 
 		if (window.app.cores.settings.is("sidebar.collapsable", false)) return
@@ -431,10 +485,12 @@ export default class Sidebar extends React.Component {
 						}
 						ref={this.sidebarRef}
 					>
-
 						<div className="app_sidebar_header">
 							<div className="app_sidebar_header_logo">
-								<img src={config.logo?.alt} />
+								<img
+									src={config.logo?.alt}
+									onClick={() => app.navigation.goMain()}
+								/>
 							</div>
 						</div>
 
@@ -463,6 +519,8 @@ export default class Sidebar extends React.Component {
 							/>
 						</div>
 					</div>
+
+					<Drawer />
 				</div>
 			}}
 		</Motion>

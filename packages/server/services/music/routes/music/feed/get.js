@@ -5,7 +5,7 @@ export default async (req) => {
 
     const searchQuery = {}
 
-    const total_length = await MusicRelease.count(searchQuery)
+    const total_length = await MusicRelease.countDocuments(searchQuery)
 
     let result = await MusicRelease.find(searchQuery)
         .limit(limit)

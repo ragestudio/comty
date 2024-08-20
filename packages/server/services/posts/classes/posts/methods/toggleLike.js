@@ -40,7 +40,7 @@ export default async (payload = {}) => {
         await PostLike.findByIdAndDelete(likeObj._id)
     }
 
-    const count = await PostLike.count({
+    const count = await PostLike.countDocuments({
         post_id,
     })
 

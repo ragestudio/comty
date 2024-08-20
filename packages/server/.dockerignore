@@ -1,0 +1,8 @@
+./node_modules
+./build
+./dist
+./ssl
+
+# secrets
+./api.production.env
+./.env

@@ -25,10 +25,14 @@ const EnchancedLyrics = (props) => {
     async function loadLyrics(track_id) {
         const result = await MusicService.getTrackLyrics(track_id, {
             preferTranslation: translationEnabled,
+        }).catch((err) => {
+            return null
         })
 
         if (result) {
             setLyrics(result)
+        } else {
+            setLyrics(false)
         }
     }
 
@@ -49,7 +53,7 @@ const EnchancedLyrics = (props) => {
     //* Handle when context change track_manifest
     React.useEffect(() => {
         setLyrics(null)
-        
+
         if (context.track_manifest) {
             loadLyrics(context.track_manifest._id)
         }
@@ -72,6 +76,20 @@ const EnchancedLyrics = (props) => {
             }
         )}
     >
+        {
+            !lyrics?.video_source && <div
+                className="lyrics-background-wrapper"
+            >
+                <div
+                    className="lyrics-background-cover"
+                >
+                    <img
+                        src={context.track_manifest.cover}
+                    />
+                </div>
+            </div>
+        }
+
         <LyricsVideo
             ref={videoRef}
             lyrics={lyrics}
