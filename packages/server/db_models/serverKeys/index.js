@@ -1,14 +1,15 @@
 export default {
-    name: "authorizedServerTokens",
-    collection: "authorizedServerTokens",
+    name: "ServerKeys",
+    collection: "server_keys",
     schema: {
-        client_id: {
+        access_id: {
             type: String,
             required: true,
         },
-        token: {
+        secret_token: {
             type: String,
             required: true,
+            select: false,
         },
         access: {
             type: Array,
@@ -20,7 +21,10 @@ export default {
         description: {
             type: String,
         },
-        createdAt: {
+        owner_user_id: {
+            type: String,
+        },
+        created_at: {
             type: Date,
             default: Date.now,
         },

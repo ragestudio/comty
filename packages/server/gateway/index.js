@@ -380,6 +380,9 @@ export default class Gateway {
     async initialize() {
         onExit(this.onGatewayExit)
 
+        process.stdout.setMaxListeners(50)
+        process.stderr.setMaxListeners(50)
+        
         this.services = await scanServices()
         this.proxy = new Proxy()
         this.ipcRouter = new IPCRouter()

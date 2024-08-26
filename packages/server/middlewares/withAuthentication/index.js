@@ -1,5 +1,4 @@
-import { authorizedServerTokens } from "../../db_models"
-import SecureEntry from "../../classes/SecureEntry"
+import { ServerKeys } from "../../db_models"
 import AuthToken from "../../classes/AuthToken"
 
 export default async (req, res) => {
@@ -42,20 +41,21 @@ export default async (req, res) => {
                 return
             }
             case "Server": {
-                const [client_id, token] = tokenAuthHeader[1].split(":")
+                const [access_id, secret_token] = tokenAuthHeader[1].split(":")
 
-                if (client_id === "undefined" || token === "undefined") {
+                if (access_id === "undefined" || secret_token === "undefined") {
                     return reject({
                         error: "Invalid server token"
                     })
                 }
 
-                const secureEntries = new SecureEntry(authorizedServerTokens)
-
-                const serverTokenEntry = await secureEntries.get(client_id, undefined, {
-                    keyName: "client_id",
-                    valueName: "token",
+                const serverTokenEntry = await ServerKeys.findOne({
+                    access_id,
                 })
+                    .select("+secret_token")
+                    .catch((err) => {
+                        return null
+                    })
 
                 if (!serverTokenEntry) {
                     return reject({
@@ -63,16 +63,22 @@ export default async (req, res) => {
                     })
                 }
 
-                if (serverTokenEntry !== token) {
+                if (serverTokenEntry.secret_token !== secret_token) {
                     return reject({
-                        error: "Missmatching server token"
+                        error: "Missmatching secret_token"
                     })
                 }
 
-                req.user = {
-                    __server: true,
-                    _id: client_id,
-                    roles: ["server"],
+                req.auth = {
+                    server: true,
+                    token: tokenAuthHeader,
+                    decoded: null,
+                    session: {
+                        __server_key: true,
+                        user_id: serverTokenEntry.owner_user_id,
+                        created_at: serverTokenEntry.created_at,
+                    },
+                    user: async () => await User.findOne({ _id: serverTokenEntry.owner_user_id }),
                 }
 
                 return

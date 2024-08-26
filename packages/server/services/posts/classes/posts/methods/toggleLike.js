@@ -55,6 +55,7 @@ export default async (payload = {}) => {
     global.websocket.io.of("/").emit(`post.like.update`, eventData)
 
     return {
+        post_id: post_id,
         liked: to,
         count: count
     }
