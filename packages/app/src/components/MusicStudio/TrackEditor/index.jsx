@@ -7,9 +7,12 @@ import { Icons } from "@components/Icons"
 import LyricsEditor from "@components/MusicStudio/LyricsEditor"
 import VideoEditor from "@components/MusicStudio/VideoEditor"
 
+import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
+
 import "./index.less"
 
 const TrackEditor = (props) => {
+    const context = React.useContext(ReleaseEditorStateContext)
     const [track, setTrack] = React.useState(props.track ?? {})
 
     async function handleChange(key, value) {
@@ -22,38 +25,26 @@ const TrackEditor = (props) => {
     }
 
     async function openLyricsEditor() {
-        app.layout.drawer.open("lyrics_editor", LyricsEditor, {
-            type: "drawer",
+        context.setCustomPage({
+            header: "Lyrics Editor",
+            content: <LyricsEditor track={track} />,
             props: {
-                width: "600px",
-                headerStyle: {
-                    display: "none",
-                }
-            },
-            componentProps: {
-                track,
-                onSave: (lyrics) => {
-                    console.log("Saving lyrics for track >", lyrics)
+                onSave: () => {
+                    console.log("Saved lyrics")
                 },
-            },
+            }
         })
     }
 
     async function openVideoEditor() {
-        app.layout.drawer.open("video_editor", VideoEditor, {
-            type: "drawer",
+        context.setCustomPage({
+            header: "Video Editor",
+            content: <VideoEditor track={track} />,
             props: {
-                width: "600px",
-                headerStyle: {
-                    display: "none",
-                }
-            },
-            componentProps: {
-                track,
-                onSave: (video) => {
-                    console.log("Saving video for track", video)
+                onSave: () => {
+                    console.log("Saved video")
                 },
-            },
+            }
         })
     }
 
@@ -109,7 +100,7 @@ const TrackEditor = (props) => {
             </div>
 
             <antd.Input
-                value={track.artists.join(", ")}
+                value={track.artists?.join(", ")}
                 placeholder="Artist"
                 onChange={(e) => handleChange("artist", e.target.value)}
             />
@@ -182,24 +173,6 @@ const TrackEditor = (props) => {
                 disabled
             >
                 Edit
-            </antd.Button>
-        </div>
-
-        <div className="track-editor-actions">
-            <antd.Button
-                type="text"
-                icon={<Icons.MdClose />}
-                onClick={onClose}
-            >
-                Cancel
-            </antd.Button>
-
-            <antd.Button
-                type="primary"
-                icon={<Icons.MdCheck />}
-                onClick={onSave}
-            >
-                Save
             </antd.Button>
         </div>
     </div>

@@ -72,9 +72,12 @@ export default {
                         />
                     </div>
                     <div className="texts">
-                        <h2>{config.app.siteName}</h2>
+                        <div className="sitename-text">
+                            <h2>{config.app.siteName}</h2>
+                            <antd.Tag>Beta</antd.Tag>
+                        </div>
                         <span>{config.author}</span>
-                        <span> Licensed with {config.package?.license ?? "unlicensed"} </span>
+                        <span>Licensed with {config.package?.license ?? "unlicensed"} </span>
                     </div>
                 </div>
                 <div className="versions">

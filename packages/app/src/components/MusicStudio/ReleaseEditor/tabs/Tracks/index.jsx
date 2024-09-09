@@ -32,8 +32,34 @@ class TrackManifest {
     constructor(params) {
         this.params = params
 
+        if (params.uid) {
+            this.uid = params.uid
+        }
+
+        if (params.cover) {
+            this.cover = params.cover
+        }
+
+        if (params.title) {
+            this.title = params.title
+        }
+
+        if (params.album) {
+            this.album = params.album
+        }
+
+        if (params.artist) {
+            this.artist = params.artist
+        }
+
+        if (params.source) {
+            this.source = params.source
+        }
+
         return this
     }
+
+    uid = null
 
     cover = "https://storage.ragestudio.net/comty-static-assets/default_song.png"
 
@@ -137,6 +163,25 @@ class TracksManager extends React.Component {
         })
     }
 
+    modifyTrackByUid = (uid, track) => {
+        if (!uid || !track) {
+            return false
+        }
+
+        this.setState({
+            list: this.state.list.map((item) => {
+                if (item.uid === uid) {
+                    return {
+                        ...item,
+                        ...track,
+                    }
+                }
+
+                return item
+            }),
+        })
+    }
+
     addTrackUIDToPendingUploads = (uid) => {
         if (!uid) {
             return false
@@ -160,24 +205,28 @@ class TracksManager extends React.Component {
     }
 
     handleUploaderStateChange = async (change) => {
+        const uid = change.file.uid
+
         switch (change.file.status) {
             case "uploading": {
-                this.addTrackUIDToPendingUploads(change.file.uid)
+                this.addTrackUIDToPendingUploads(uid)
 
                 const trackManifest = new TrackManifest({
-                    uid: change.file.uid,
+                    uid: uid,
                     file: change.file,
                 })
 
-                await trackManifest.initialize()
-
                 this.addTrackToList(trackManifest)
+
+                const trackData = await trackManifest.initialize()
+
+                this.modifyTrackByUid(uid, trackData)
 
                 break
             }
             case "done": {
                 // remove pending file
-                this.removeTrackUIDFromPendingUploads(change.file.uid)
+                this.removeTrackUIDFromPendingUploads(uid)
 
                 const trackIndex = this.state.list.findIndex((item) => item.uid === uid)
 
@@ -187,24 +236,22 @@ class TracksManager extends React.Component {
                 }
 
                 // update track list
-                this.setState((state) => {
-                    state.list[trackIndex].source = change.file.response.url
-        
-                    return state
+                await this.modifyTrackByUid(uid, {
+                    source: change.file.response.url
                 })
 
                 break
             }
             case "error": {
                 // remove pending file
-                this.removeTrackUIDFromPendingUploads(change.file.uid)
+                this.removeTrackUIDFromPendingUploads(uid)
 
                 // remove from tracklist
-                await this.removeTrackByUid(change.file.uid)
+                await this.removeTrackByUid(uid)
             }
             case "removed": {
                 // stop upload & delete from pending list and tracklist
-                await this.removeTrackByUid(change.file.uid)
+                await this.removeTrackByUid(uid)
             }
             default: {
                 break
@@ -253,6 +300,7 @@ class TracksManager extends React.Component {
     }
 
     render() {
+        console.log(`Tracks List >`, this.state.list)
         return <div className="music-studio-release-editor-tracks">
             <antd.Upload
                 className="music-studio-tracks-uploader"
@@ -267,7 +315,9 @@ class TracksManager extends React.Component {
                         <UploadHint /> : <antd.Button
                             className="uploadMoreButton"
                             icon={<Icons.Plus />}
-                        />
+                        >
+                            Add another
+                        </antd.Button>
                 }
             </antd.Upload>
 

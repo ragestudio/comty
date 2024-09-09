@@ -36,8 +36,6 @@
 
     background-color: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(4px);
-
-
 }
 
 .drawer {
@@ -63,4 +61,27 @@
 
     overflow-x: hidden;
     overflow-y: overlay;
+}
+
+.drawer_close_confirm {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    width: 100%;
+
+    .drawer_close_confirm_content {
+        display: flex;
+        flex-direction: column;
+
+        gap: 2px;
+    }
+
+    .drawer_close_confirm_actions {
+        display: flex;
+        flex-direction: row;
+
+        gap: 10px;
+    }
 }

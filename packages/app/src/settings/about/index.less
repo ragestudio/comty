@@ -30,7 +30,17 @@
 
             align-items: center;
 
+            .ant-tag {
+                margin: 0;
+                width: fit-content;
+            }
+
             .logo {
+                display: flex;
+                flex-direction: row;
+
+                align-items: center;
+
                 width: 60px;
                 height: 100%;
 
@@ -45,6 +55,23 @@
             .texts {
                 display: flex;
                 flex-direction: column;
+
+                justify-content: center;
+
+                gap: 6px;
+
+                .sitename-text {
+                    display: flex;
+                    flex-direction: row;
+
+                    align-items: center;
+
+                    gap: 10px;
+
+                    h2 {
+                        margin: 0;
+                    }
+                }
             }
 
             h1,

@@ -123,10 +123,14 @@ export default () => {
     }
 
     React.useEffect(() => {
-        app.layout.tools_bar.toggleVisibility(false)
+        if (app.layout.tools_bar) {
+            app.layout.tools_bar.toggleVisibility(false)
+        }
 
         return () => {
-            app.layout.tools_bar.toggleVisibility(true)
+            if (app.layout.tools_bar) {
+                app.layout.tools_bar.toggleVisibility(true)
+            }
         }
     }, [])
 

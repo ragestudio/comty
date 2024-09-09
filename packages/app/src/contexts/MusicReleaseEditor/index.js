@@ -8,6 +8,8 @@ export const DefaultReleaseEditorState = {
 
     list: [],
     pendingUploads: [],
+
+    setCustomPage: () => {},
 }
 
 export const ReleaseEditorStateContext = React.createContext(DefaultReleaseEditorState)

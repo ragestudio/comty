@@ -7,29 +7,27 @@ import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 import TrackEditor from "@components/MusicStudio/TrackEditor"
 
+import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
+
 import "./index.less"
 
 const TrackListItem = (props) => {
+    const context = React.useContext(ReleaseEditorStateContext)
+
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
 
     const { track } = props
 
     async function onClickEditTrack() {
-        app.layout.drawer.open("track_editor", TrackEditor, {
-            type: "drawer",
+        context.setCustomPage({
+            header: "Track Editor",
+            content: <TrackEditor track={track} />,
             props: {
-                width: "600px",
-                headerStyle: {
-                    display: "none",
-                }
-            },
-            componentProps: {
-                track,
                 onSave: (newTrackData) => {
                     console.log("Saving track", newTrackData)
                 },
-            },
+            }
         })
     }
 
@@ -57,9 +55,9 @@ const TrackListItem = (props) => {
 
                     <Image
                         src={track.cover}
+                        height={25}
+                        width={25}
                         style={{
-                            width: 25,
-                            height: 25,
                             borderRadius: 8,
                         }}
                     />

@@ -1,8 +1,13 @@
 import React from "react"
 import classnames from "classnames"
-import { Motion, spring } from "react-motion"
+import * as antd from "antd"
+import { AnimatePresence, motion } from "framer-motion"
 
 import "./index.less"
+
+function transformTemplate({ x }) {
+	return `translateX(${x}px)`
+}
 
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
@@ -25,7 +30,7 @@ export class Drawer extends React.Component {
 		this.toggleVisibility(false)
 
 		this.props.controller.close(this.props.id, {
-			delay: 500
+			transition: 150
 		})
 	}
 
@@ -55,37 +60,36 @@ export class Drawer extends React.Component {
 
 	render() {
 		const componentProps = {
-			...this.options.componentProps,
+			...this.options.props,
 			close: this.close,
 			handleDone: this.handleDone,
 			handleFail: this.handleFail,
 		}
-
-		return <Motion
-			key={this.props.id}
-			style={{
-				x: spring(!this.state.visible ? 100 : 0),
-				opacity: spring(!this.state.visible ? 0 : 1),
-			}}
-		>
-			{({ x, opacity }) => {
-				return <div
+		return <AnimatePresence>
+			{
+				this.state.visible && <motion.div
 					key={this.props.id}
 					id={this.props.id}
 					className="drawer"
 					style={{
 						...this.options.style,
-						transform: `translateX(-${x}%)`,
-						opacity: opacity,
+					}}
+					transformTemplate={transformTemplate}
+					animate={{
+						x: [-100, 0],
+						opacity: [0, 1],
+					}}
+					exit={{
+						x: [0, -100],
+						opacity: [1, 0],
 					}}
 				>
-
 					{
 						React.createElement(this.props.children, componentProps)
 					}
-				</div>
-			}}
-		</Motion>
+				</motion.div>
+			}
+		</AnimatePresence>
 	}
 }
 
@@ -99,7 +103,6 @@ export default class DrawerController extends React.Component {
 			drawers: [],
 
 			maskVisible: false,
-			maskRender: false,
 		}
 
 		this.interface = {
@@ -125,10 +128,10 @@ export default class DrawerController extends React.Component {
 
 	componentWillUpdate = (prevProps, prevState) => {
 		// is mask visible, hide sidebar with `app.layout.sidebar.toggleVisibility(false)`
-		if (prevState.maskVisible !== this.state.maskVisible) {
-			app.layout.sidebar.toggleVisibility(false)
-		} else if (prevState.maskRender !== this.state.maskRender) {
-			app.layout.sidebar.toggleVisibility(true)
+		if (app.layout.sidebar) {
+			if (prevState.maskVisible !== this.state.maskVisible) {
+				app.layout.sidebar.toggleVisibility(this.state.maskVisible)
+			}
 		}
 	}
 
@@ -166,30 +169,23 @@ export default class DrawerController extends React.Component {
 		const lastDrawer = this.getLastDrawer()
 
 		if (lastDrawer) {
+			if (app.layout.modal && lastDrawer.options.confirmOnOutsideClick) {
+				return app.layout.modal.confirm({
+					descriptionText: lastDrawer.options.confirmOnOutsideClickText ?? "Are you sure you want to close this drawer?",
+					onConfirm: () => {
+						lastDrawer.close()
+					}
+				})
+			}
+
 			lastDrawer.close()
 		}
 	}
 
 	toggleMaskVisibility = async (to) => {
-		to = to ?? !this.state.maskVisible
-
 		this.setState({
-			maskVisible: to,
+			maskVisible: to ?? !this.state.maskVisible,
 		})
-
-		if (to === true) {
-			this.setState({
-				maskRender: true
-			})
-		} else {
-			await new Promise((resolve) => {
-				setTimeout(resolve, 500)
-			})
-
-			this.setState({
-				maskRender: false
-			})
-		}
 	}
 
 	open = (id, component, options) => {
@@ -198,21 +194,26 @@ export default class DrawerController extends React.Component {
 		const addresses = this.state.addresses ?? {}
 
 		const instance = {
-			id,
-			key: id,
+			id: id,
 			ref: React.createRef(),
 			children: component,
-			options,
+			options: options,
 			controller: this,
 		}
 
 		if (typeof addresses[id] === "undefined") {
-			drawers.push(<Drawer {...instance} />)
+			drawers.push(<Drawer
+				key={id}
+				{...instance}
+			/>)
 
 			addresses[id] = drawers.length - 1
 			refs[id] = instance.ref
 		} else {
-			drawers[addresses[id]] = <Drawer {...instance} />
+			drawers[addresses[id]] = <Drawer
+				key={id}
+				{...instance}
+			/>
 			refs[id] = instance.ref
 		}
 
@@ -225,7 +226,7 @@ export default class DrawerController extends React.Component {
 		this.toggleMaskVisibility(true)
 	}
 
-	close = async (id, { delay = 0 }) => {
+	close = async (id, { transition = 0 } = {}) => {
 		let { addresses, drawers, refs } = this.state
 
 		const index = addresses[id]
@@ -239,9 +240,9 @@ export default class DrawerController extends React.Component {
 			this.toggleMaskVisibility(false)
 		}
 
-		if (delay > 0) {
+		if (transition > 0) {
 			await new Promise((resolve) => {
-				setTimeout(resolve, delay)
+				setTimeout(resolve, transition)
 			})
 		}
 
@@ -267,22 +268,23 @@ export default class DrawerController extends React.Component {
 
 	render() {
 		return <>
-			<Motion
-				style={{
-					opacity: spring(this.state.maskVisible ? 1 : 0),
-				}}
-			>
-				{({ opacity }) => {
-					return <div
+			<AnimatePresence>
+				{
+					this.state.maskVisible && <motion.div
 						className="drawers-mask"
 						onClick={() => this.closeLastDrawer()}
-						style={{
-							opacity,
-							display: this.state.maskRender ? "block" : "none",
+						initial={{
+							opacity: 0,
+						}}
+						animate={{
+							opacity: 1,
+						}}
+						exit={{
+							opacity: 0,
 						}}
 					/>
-				}}
-			</Motion>
+				}
+			</AnimatePresence>
 
 			<div
 				className={classnames(
@@ -292,7 +294,9 @@ export default class DrawerController extends React.Component {
 					}
 				)}
 			>
-				{this.state.drawers}
+				<AnimatePresence>
+					{this.state.drawers}
+				</AnimatePresence>
 			</div>
 		</>
 	}

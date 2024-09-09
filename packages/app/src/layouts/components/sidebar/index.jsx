@@ -3,7 +3,7 @@ import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { Motion, spring } from "react-motion"
-import { Menu, Avatar, Dropdown } from "antd"
+import { Menu, Avatar, Dropdown, Tag } from "antd"
 import Drawer from "@layouts/components/drawer"
 
 import { Icons, createIconRender } from "@components/Icons"
@@ -491,6 +491,8 @@ export default class Sidebar extends React.Component {
 									src={config.logo?.alt}
 									onClick={() => app.navigation.goMain()}
 								/>
+
+								<Tag>Beta</Tag>
 							</div>
 						</div>
 

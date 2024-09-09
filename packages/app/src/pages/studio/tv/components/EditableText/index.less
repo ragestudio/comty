@@ -1,0 +1,44 @@
+.editable-text {
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    --fontSize: 14px;
+    --fontWeight: normal;
+
+    .editable-text-value {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 7px;
+
+        font-size: var(--fontSize);
+        font-weight: var(--fontWeight);
+
+        svg {
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+    }
+
+    .editable-text-input-container {
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 10px;
+
+        .ant-input {
+            background-color: transparent;
+            font-family: "DM Mono", sans-serif;
+
+            font-size: var(--fontSize);
+            font-weight: var(--fontWeight);
+
+            padding: 0 10px;
+        }
+    }
+}

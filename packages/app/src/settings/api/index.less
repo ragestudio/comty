@@ -22,6 +22,44 @@
         align-items: center;
         justify-content: space-between;
     }
+
+    .api_keys_list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+    }
+}
+
+.server-key-item {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-between;
+
+    background-color: var(--background-color-primary);
+    border-radius: 12px;
+
+    padding: 10px;
+
+    p {
+        margin: 0;
+    }
+
+    .server-key-item-info {
+        display: flex;
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .server-key-item-actions {
+        display: flex;
+        flex-direction: row;
+
+        gap: 5px;
+    }
 }
 
 .links {
@@ -29,4 +67,23 @@
     flex-direction: column;
 
     gap: 5px;
+}
+
+.server-key-creator {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    .server-key-creator-info {
+        display: flex;
+        flex-direction: column;
+
+        gap: 5px;
+
+        .selectable-text {
+            font-family: "DM Mono", monospace;
+            font-size: 0.7rem;
+        }
+    }
 }

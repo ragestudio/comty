@@ -3,11 +3,17 @@ import requiredFields from "@shared-utils/requiredFields"
 import MusicMetadata from "music-metadata"
 import axios from "axios"
 
+import ModifyTrack from "./modify"
+
 export default async (payload = {}) => {
     requiredFields(["title", "source", "user_id"], payload)
 
     let stream = null
     let headers = null
+
+    if (typeof payload._id === "string") {
+        return await ModifyTrack(payload._id, payload)
+    }
 
     try {
         const sourceStream = await axios({
