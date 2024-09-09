@@ -1,22 +1,22 @@
 {
     "author": "RageStudio",
-    "license": "LGPL-2.1",
-    "types": "index.d.ts",
+    "license": "ComtyLicense",
     "private": true,
     "scripts": {
-        "wrapper:dev": "node ./packages/wrapper/src/index.js --dev",
         "dev": "concurrently -k \"yarn dev:client\" \"yarn dev:server\"",
         "dev:server": "cd packages/server && yarn dev",
         "dev:client": "cd packages/app && yarn dev",
         "release": "node ./scripts/release.js",
         "postdeploy": "node ./scripts/post-deploy.js",
-        "postinstall": "node ./scripts/post-install.js"
+        "postinstall": "node ./scripts/post-install.js",
+        "wrapper:dev": "node ./packages/wrapper/src/index.js --dev"
     },
     "dependencies": {
         "7zip-min": "1.4.3",
-        "axios": "^1.4.0",
         "@ragestudio/hermes": "^0.1.1",
+        "axios": "^1.4.0",
         "dotenv": "16.0.3",
+        "mintlify": "^4.0.206",
         "octokit": "^2.0.14"
     },
     "devDependencies": {
