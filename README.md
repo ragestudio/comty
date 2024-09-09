@@ -5,14 +5,13 @@
 />
 
 # Comty - A prototype of a social network
-![CodeQL](https://github.com/srgooglo/comty/workflows/CodeQL/badge.svg?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
 [![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
 
-A prototype of a platform inside of application focused on services and creatives.
+The platform to hold all your creative.
 
-> 👋 We have a open alpha preview version of the project, you can access it from [https://comty.app](https://comty.app)
+> 👋 We have a official beta instance, you can access it from [https://comty.app](https://comty.app)
 
 ## 🌟 Some of features
 🚀 Real-time updates are provided to users about various activities such as new followers, likes, posts, comments, and more, thanks to a bid event engine that uses websockets.
@@ -44,11 +43,11 @@ We have official public services that you can find on these platforms!
 ### Prerequisites
 For local development you will need to have installed some tools:
 
-- Install Node.js (v13 or higher) [manualy](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) tool (Recommended)
+- Install Node.js (v18 or higher) [manualy](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) tool.
 
-- Install [Yarn](https://yarnpkg.com/getting-started/install) package manager (Recommended)
+- (Optional) Install [Yarn](https://yarnpkg.com/getting-started/install) package manager.
 
-- Install [Docker](https://docs.docker.com/get-docker/), used for building and deployment
+- (Optional) Install [Docker](https://docs.docker.com/get-docker/), used for building and deployment.
 
 ### Setup
 - Getting the repository
@@ -74,7 +73,7 @@ yarn
 Contributions to Comty are welcome. If you want to contribute, please follow the instructions mentioned in the CONTRIBUTING.md file.
 
 ## License 📜
-Comty is licensed under the LGPL-2.1 license. See the LICENSE file for more details.
+Comty is licensed under the Comty license. See the LICENSE file for more details.
 
 ## :heart: Thanks to our supporters
 <kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
