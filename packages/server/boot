@@ -107,7 +107,12 @@ async function injectEnvFromInfisical() {
     console.log(`[BOOT] 🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`)
 
     const client = new InfisicalClient({
-        accessToken: process.env.INFISICAL_TOKEN,
+        auth: {
+            universalAuth: {
+                clientId: process.env.INFISICAL_CLIENT_ID,
+                clientSecret: process.env.INFISICAL_CLIENT_SECRET,
+            }
+        },
     })
 
     const secrets = await client.listSecrets({
@@ -130,8 +135,8 @@ async function Boot(main) {
         throw new Error("main class is not defined")
     }
 
-    if (process.env.INFISICAL_TOKEN) {
-        console.log(`[BOOT] INFISICAL_TOKEN found, injecting env variables from INFISICAL...`)
+    if (process.env.INFISICAL_CLIENT_ID && process.env.INFISICAL_CLIENT_SECRET) {
+        console.log(`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`)
         await injectEnvFromInfisical()
     }
 

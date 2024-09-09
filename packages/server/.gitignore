@@ -1,0 +1,41 @@
+# Secrets
+/**/**/.env
+/**/**/origin.server
+/**/**/server.manifest
+/**/**/server.registry
+
+/**/**/_shared
+
+# Trash
+/**/**/*.log
+/**/**/dumps.log
+/**/**/.crash.log
+/**/**/.tmp
+/**/**/.cache
+/**/**/cache
+/**/**/out
+/**/**/.out
+/**/**/dist
+/**/**/node_modules
+/**/**/corenode_modules
+/**/**/.DS_Store
+/**/**/package-lock.json
+/**/**/yarn.lock
+/**/**/.evite
+/**/**/uploads
+/**/**/d_data
+/**/**/redis_data
+/**/**/*.tar
+/**/**/*.7z
+/**/**/*.zip
+/**/**/*.env
+
+# Logs
+/**/**/npm-debug.log*
+/**/**/yarn-error.log
+/**/**/dumps.log
+/**/**/corenode.log
+
+# Temporal configurations
+/**/**/.aliaser
+/ssl/

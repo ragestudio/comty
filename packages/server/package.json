@@ -1,11 +1,10 @@
 {
 	"name": "@comty/server",
-	"version": "0.70.0",
-	"license": "MIT",
+	"version": "1.0.0-beta",
+	"license": "ComtyLicense",
 	"workspaces": [
 		"services/*"
 	],
-	"private": true,
 	"scripts": {
 		"start:prod": "cross-env NODE_ENV=production hermes-node ./index.js",
 		"dev": "cross-env NODE_ENV=development hermes-node ./index.js",
@@ -44,11 +43,5 @@
 	},
 	"resolutions": {
 		"string-width": "4.2.3"
-	},
-	"pkg": {
-		"targets": [
-			"node18-linux-arm64"
-		],
-		"outputPath": "dist"
 	}
 }
