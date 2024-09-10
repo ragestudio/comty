@@ -8,53 +8,7 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "type": "pwa-node"
+      "type": "node"
     },
-    {
-      "name": "Attach to Chrome",
-      "port": 8000,
-      "request": "attach",
-      "type": "pwa-chrome",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Attach by Process ID",
-      "processId": "${command:PickProcess}",
-      "request": "attach",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "pwa-node"
-    },
-    {
-      "name": "Electron Main",
-      "program": "${workspaceFolder}/main/index.js",
-      "request": "launch",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "pwa-node"
-    },
-    {
-      "name": "Launch via NPM",
-      "request": "launch",
-      "runtimeArgs": [
-        "run-script",
-        "debug"
-      ],
-      "runtimeExecutable": "npm",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "pwa-node"
-    },
-    {
-      "name": "Launch WEB APP",
-      "type": "pwa-chrome",
-      "name": "http://192.168.0.2:8000",
-      "request": "launch",
-      "url": "http://192.168.0.2:8000"
-    }
   ]
 }
