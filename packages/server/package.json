@@ -2,7 +2,8 @@
 	"name": "@comty/server",
 	"version": "1.0.0-beta",
 	"license": "ComtyLicense",
-	"workspaces": [
+	"private": true,
+  "workspaces": [
 		"services/*"
 	],
 	"scripts": {
