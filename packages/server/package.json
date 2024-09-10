@@ -5,8 +5,8 @@
 	"private": true,
   "workspaces": [
 		"services/*"
-	],
-	"scripts": {
+  ],
+  "scripts": {
 		"start:prod": "cross-env NODE_ENV=production hermes-node ./index.js",
 		"dev": "cross-env NODE_ENV=development hermes-node ./index.js",
 		"build:bin": "cd build && pkg ./index.js"
