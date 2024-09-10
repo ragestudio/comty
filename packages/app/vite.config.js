@@ -20,8 +20,8 @@ export default defineConfig({
             allow: ["..", "../../"],
         },
         https: {
-            key: path.join(__dirname, "ssl", "privkey.pem"),
-            cert: path.join(__dirname, "ssl", "cert.pem"),
+            key: path.join(__dirname, ".ssl", "privkey.pem"),
+            cert: path.join(__dirname, ".ssl", "cert.pem"),
         },
         headers: {
             "Strict-Transport-Security": `max-age=${oneYearInSeconds}`

@@ -3,6 +3,7 @@
 /**/**/origin.server
 /**/**/server.manifest
 /**/**/server.registry
+/**/**/.ssl
 
 /**/**/_shared
 

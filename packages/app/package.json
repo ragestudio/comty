@@ -1,7 +1,7 @@
 {
     "name": "@comty/web-app",
-    "version": "0.70.0",
-    "license": "LGPL-2.1",
+    "version": "1.0.0-beta",
+    "license": "ComtyLicense",
     "main": "electron/main",
     "author": "RageStudio",
     "description": "A prototype of a social network.",
@@ -90,6 +90,7 @@
         "react-icons": "^4.8.0",
         "react-intersection-observer": "8.33.1",
         "react-lazy-load-image-component": "^1.5.4",
+        "react-lazyload": "^3.2.1",
         "react-markdown": "^8.0.3",
         "react-modal-image": "^2.6.0",
         "react-motion": "0.5.2",
