@@ -1,146 +1,44 @@
-@body_border_radius: 24px;
+.app-drawer-overlay {
+    position: fixed;
 
-.draggable-drawer {
-	position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+    z-index: 450;
 
-	display: flex;
-	justify-content: center;
+    background-color: rgba(var(--bg_color_1), 0.4);
+    backdrop-filter: blur(1px);
+}
 
-	align-items: center;
+.app-drawer-content {
+    position: fixed;
 
-	z-index: 50;
+    bottom: 0;
+    left: 0;
+    right: 0;
 
-	transition: background-color 0.2s linear;
+    z-index: 550;
 
-	overflow-y: hidden;
-	overscroll-behavior: none;
+    display: flex;
+    flex-direction: column;
 
-	box-sizing: border-box;
+    height: fit-content;
+    max-height: 90%;
+    min-height: 300px;
 
-	.draggable-drawer_body_background {
-		box-sizing: border-box;
+    max-width: 550px;
 
-		position: absolute;
+    padding: 20px 10px 10px 10px;
 
-		z-index: 50;
+    gap: 10px;
 
-		top: 0;
-		left: 0;
+    border-radius: 24px 24px 0 0;
 
-		width: 100%;
-		height: 100%;
+    background-color: var(--background-color-accent);
+}
 
-		border-top-left-radius: @body_border_radius;
-		border-top-right-radius: @body_border_radius;
-
-		transition: all 150ms ease-in-out;
-
-		background-color: var(--body-background);
-
-		opacity: 0.4;
-
-		&::after {
-			content: "";
-
-			display: block;
-			position: absolute;
-
-			left: 0;
-			bottom: 0;
-
-			width: 100%;
-			height: 120px;
-
-			z-index: 45;
-
-			background-color: var(--body-background);
-
-			transform: translateY(95%);
-		}
-	}
-
-	.draggable-drawer_body {
-		box-sizing: border-box;
-
-		position: absolute;
-
-		z-index: 55;
-
-		bottom: 0px;
-
-		width: 100%;
-		max-width: 700px;
-
-		height: fit-content;
-		max-height: 90%;
-
-		background-color: var(--background-color-primary);
-
-		padding: 30px 10px 10px 10px;
-
-		border-top-left-radius: @body_border_radius;
-		border-top-right-radius: @body_border_radius;
-
-		.dragger-area {
-			width: 100%;
-			height: 50px;
-
-			position: absolute;
-
-			display: flex;
-
-			align-items: flex-start;
-			justify-content: center;
-
-			top: 10px;
-			left: 0;
-
-			z-index: 55;
-
-			.dragger-indicator {
-				background-color: var(--background-color-contrast);
-
-				width: 100px;
-				height: 8px;
-
-				border-radius: 8px;
-			}
-		}
-
-		.draggable-drawer_content {
-			position: relative;
-
-			z-index: 100;
-
-			display: flex;
-			flex-direction: column;
-
-			width: 100%;
-			height: 100%;
-		}
-
-		&::after {
-			content: "";
-
-			display: block;
-			position: absolute;
-
-			left: 0;
-			bottom: 0;
-
-			width: 100%;
-			height: 120px;
-
-			z-index: 45;
-
-			background-color: var(--background-color-primary);
-
-			transform: translateY(95%);
-		}
-	}
+.app-drawer-handle {
+    background-color: var(--background-color-contrast);
 }

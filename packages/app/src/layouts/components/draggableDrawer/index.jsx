@@ -1,16 +1,9 @@
-// © Jack Hanford https://github.com/hanford/react-drag-drawer
-import React, { Component } from "react"
-import { createPortal } from "react-dom"
-import { Motion, spring, presets } from "react-motion"
-import classnames from "classnames"
-import PropTypes from "prop-types"
-import Observer from "react-intersection-observer"
-import { css } from "@emotion/css"
+import React from "react"
+import { Drawer } from "vaul"
 
 import "./index.less"
 
-// TODO: Finish me pleassse
-export class DraggableDrawerController extends Component {
+export class DraggableDrawerController extends React.Component {
     constructor(props) {
         super(props)
 
@@ -20,7 +13,7 @@ export class DraggableDrawerController extends Component {
         }
 
         this.state = {
-            drawers: []
+            drawers: [],
         }
     }
 
@@ -28,38 +21,59 @@ export class DraggableDrawerController extends Component {
         app.layout.draggable = this.interface
     }
 
-    open = (id, render, options = {}) => {
-        this.setState({
-            drawers: [
-                ...this.state.drawers,
-                {
-                    id: id,
-                    locked: options.defaultLocked ?? false,
-                    render: <DraggableDrawer
-                        onRequestClose={this.close.bind(this, id)}
-                        close={this.close.bind(this, id)}
-                        open={true}
-                        destroyOnClose={true}
-                        {...options.props ?? {}}
-                    >
-                        {React.createElement(render)}
-                    </DraggableDrawer>,
-                }
-            ],
-        })
+    async handleDrawerOnClosed(drawer) {
+        if (!drawer) {
+            return false
+        }
+
+        if (typeof drawer.options.onClosed === "function") {
+            await drawer.options.onClosed()
+        }
+
+        this.destroy(drawer.id)
     }
 
-    close = (id) => {
+    open = (id, render, options = {}) => {
+        let drawerObj = {
+            id: id,
+            render: render,
+            options: options
+        }
+
+        const win = app.cores.window_mng.render(
+            id,
+            <DraggableDrawer
+                onClosed={() => this.handleDrawerOnClosed(drawerObj)}
+            >
+                {
+                    React.createElement(render, {
+                        ...options.componentProps,
+                    })
+                }
+            </DraggableDrawer>
+        )
+
+        drawerObj.winId = win.id
+
+        this.setState({
+            drawers: [...this.state.drawers, drawerObj],
+        })
+
+        return true
+    }
+
+    destroy = (id) => {
         const drawerIndex = this.state.drawers.findIndex((drawer) => drawer.id === id)
 
         if (drawerIndex === -1) {
-            console.error("Drawer not found")
+            console.error(`Drawer [${id}] not found`)
             return false
         }
 
         const drawer = this.state.drawers[drawerIndex]
 
-        if (drawer.locked === true){
+        if (drawer.locked === true) {
+            console.error(`Drawer [${drawer.id}] is locked`)
             return false
         }
 
@@ -68,397 +82,58 @@ export class DraggableDrawerController extends Component {
         drawers.splice(drawerIndex, 1)
 
         this.setState({ drawers: drawers })
+
+        app.cores.window_mng.close(drawer.winId)
     }
 
     render() {
-        return this.state.drawers.map((drawer) => drawer.render)
+        return null
     }
 }
 
-export default class DraggableDrawer extends Component {
-    static propTypes = {
-        open: PropTypes.bool.isRequired,
-        children: PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.array,
-            PropTypes.element
-        ]),
-        onRequestClose: PropTypes.func,
-        onDrag: PropTypes.func,
-        onOpen: PropTypes.func,
-        inViewportChange: PropTypes.func,
-        allowClose: PropTypes.bool,
-        notifyWillClose: PropTypes.func,
-        modalElementClass: PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.string
-        ]),
-        containerOpacity: PropTypes.number,
-        getContainerRef: PropTypes.func,
-        getModalRef: PropTypes.func
-    }
+export const DraggableDrawer = (props) => {
+    const [isOpen, setIsOpen] = React.useState(true)
 
-    static defaultProps = {
-        notifyWillClose: () => { },
-        onOpen: () => { },
-        onDrag: () => { },
-        inViewportChange: () => { },
-        onRequestClose: () => { },
-        getContainerRef: () => { },
-        getModalRef: () => { },
-        containerOpacity: 0.6,
-        parentElement: document.body,
-        allowClose: true,
-        dontApplyListeners: false,
-        modalElementClass: ""
-    }
-
-    state = {
-        ignore: false,
-        onRange: false,
-        open: this.props.open,
-        thumb: 0,
-        start: 0,
-        position: 0,
-        touching: false,
-        listenersAttached: false,
-        useBackgroundColorValues: null,
-    }
-
-    DESKTOP_MODE = false
-    ALLOW_DRAWER_TRANSFORM = true
-
-    MAX_NEGATIVE_SCROLL = -50
-    PX_TO_CLOSE_FROM_BOTTOM = 200
-
-    interface = {
-        setBackgroundColorValues: (values) => {
-            this.setState({ useBackgroundColorValues: values })
-        },
-    }
-
-    componentDidMount() {
-        app.currentDragger = this.interface
-
-        this.DESKTOP_MODE = !app.isMobile
-    }
-
-    componentWillUnmount() {
-        delete app.currentDragger
-
-        this.removeListeners()
-    }
-
-    componentDidUpdate(prevProps, nextState) {
-        // in the process of closing the drawer
-        if (!this.props.open && prevProps.open) {
-            this.removeListeners()
-
-            setTimeout(this.setState({ open: false }), 300)
+    async function handleOnOpenChanged(to) {
+        if (to === true) {
+            return to
         }
 
-        if (this.drawer) {
-            this.setNegativeScroll(this.drawer)
-        }
+        setIsOpen(false)
 
-        // in the process of opening the drawer
-        if (this.props.open && !prevProps.open) {
-            this.props.onOpen()
-
-            this.setState({ open: true })
-        }
-    }
-
-    attachListeners = (drawer) => {
-        const { dontApplyListeners, getModalRef } = this.props
-        const { listenersAttached } = this.state
-
-        // only attach listeners once as this function gets called every re-render
-        if (!drawer || listenersAttached || dontApplyListeners) return
-
-        this.drawer = drawer
-
-        getModalRef(drawer)
-
-        this.drawer.addEventListener("touchend", this.release)
-        this.drawer.addEventListener("touchmove", this.drag)
-        this.drawer.addEventListener("touchstart", this.tap)
-
-        let position = 0
-
-        this.setState({ listenersAttached: true, position }, () => {
+        if (typeof props.onClosed === "function") {
             setTimeout(() => {
-                // trigger reflow so webkit browsers calculate height properly 😔
-                // https://bugs.webkit.org/show_bug.cgi?id=184905
-                this.drawer.style.display = "none"
-                void this.drawer.offsetHeight
-                this.drawer.style.display = ""
-            }, 300)
-        })
-    }
-
-    isThumbInDraggerRange = (event) => {
-        return (event.touches[0].clientY - this.drawer.getBoundingClientRect().top)
-    }
-
-    removeListeners = () => {
-        if (!this.drawer) {
-            return false
+                props.onClosed()
+            }, 350)
         }
 
-        this.drawer.removeEventListener("touchend", this.release)
-        this.drawer.removeEventListener("touchmove", this.drag)
-        this.drawer.removeEventListener("touchstart", this.tap)
-
-        this.setState({ listenersAttached: false })
+        return to
     }
 
-    tap = (event) => {
-        const { pageY } = event.touches[0]
+    return <Drawer.Root
+        open={isOpen}
+        onOpenChange={handleOnOpenChanged}
+    >
+        <Drawer.Portal>
+            <Drawer.Overlay
+                className="app-drawer-overlay"
+            />
 
-        if (!this.isThumbInDraggerRange(event)) {
-            return false
-        }
-
-        const inDraggerArea = !!event.target.closest("#dragger-area")
-
-        const start = pageY
-
-        // reset NEW_POSITION and MOVING_POSITION
-        this.NEW_POSITION = 0
-        this.MOVING_POSITION = 0
-
-        this.setState({
-            ignore: !inDraggerArea,
-            onRange: this.isThumbInDraggerRange(event),
-            thumb: start,
-            start: start,
-            touching: true
-        })
-    }
-
-    drag = (event) => {
-        if (this.state.ignore) {
-            return false
-        }
-
-        event.preventDefault()
-
-        const { thumb, position } = this.state
-        const { pageY } = event.touches[0]
-
-        const movingPosition = pageY
-        const delta = movingPosition - thumb
-        const newPosition = position + delta
-
-        if (this.ALLOW_DRAWER_TRANSFORM) {
-            // allow to drag negative scroll
-            if (newPosition < this.MAX_NEGATIVE_SCROLL) {
-                return false
-            }
-
-            this.props.onDrag({ newPosition })
-
-            this.MOVING_POSITION = movingPosition
-            this.NEW_POSITION = newPosition
-
-            if (this.shouldWeCloseDrawer()) {
-                this.props.notifyWillClose(true)
-            } else {
-                this.props.notifyWillClose(false)
-            }
-
-            this.setState({
-                thumb: movingPosition,
-                position: newPosition,
-            })
-        }
-    }
-
-    release = () => {
-        this.setState({ touching: false })
-
-        if (this.shouldWeCloseDrawer() && this.state.onRange) {
-            this.props.onRequestClose(this)
-        } else {
-            let newPosition = 0
-
-            this.setState({ position: newPosition })
-        }
-    }
-
-    setNegativeScroll = (element) => {
-        const size = this.getElementSize()
-
-        this.NEGATIVE_SCROLL = size - element.scrollHeight - this.MAX_NEGATIVE_SCROLL
-    }
-
-    hideDrawer = () => {
-        const { allowClose } = this.props
-
-        let defaultPosition = 0
-
-        if (allowClose === false) {
-            // if we aren't going to allow close, let's animate back to the default position
-            return this.setState({
-                position: defaultPosition,
-                thumb: 0,
-                touching: false
-            })
-        }
-
-        this.setState({
-            open: false,
-            position: defaultPosition,
-            touching: false
-        })
-
-        // cleanup
-        this.removeListeners()
-    }
-
-    shouldWeCloseDrawer = () => {
-        if (this.MOVING_POSITION === 0) {
-            return false
-        }
-
-        const containerHeight = this.getElementSize()
-        const closeThreshold = containerHeight - this.PX_TO_CLOSE_FROM_BOTTOM
-
-        return (
-            this.NEW_POSITION >= 0 &&
-            this.MOVING_POSITION >= closeThreshold
-        )
-    }
-
-    getDrawerTransform = (value) => {
-        return { transform: `translate3d(0, ${value}px, 0)` }
-    }
-
-    getElementSize = () => {
-        return window.innerHeight
-    }
-
-    getPosition() {
-        const { position } = this.state
-
-        return position
-    }
-
-    inViewportChange = (inView) => {
-        this.props.inViewportChange(inView)
-
-        this.ALLOW_DRAWER_TRANSFORM = inView
-    }
-
-    onClickOutside = (event) => {
-        if (!this.props.allowClose) {
-            return false
-        }
-
-        // check if is clicking outside main component
-        if (this.drawer && event.target?.className) {
-            if (event.target.className.includes("ant-cascader") || event.target.className.includes("ant-select")) {
-                return false
-            }
-
-            if (!this.drawer.contains(event.target)) {
-                this.props.onRequestClose(this)
-            }
-        }
-    }
-
-    preventDefault = (event) => event.preventDefault()
-    stopPropagation = (event) => event.stopPropagation()
-
-    render() {
-        const {
-            containerOpacity,
-            id,
-            getContainerRef,
-        } = this.props
-
-        const open = this.state.open && this.props.open
-
-        const { touching } = this.state
-
-        const springPreset = { damping: 20, stiffness: 300 }
-        const animationSpring = touching ? springPreset : presets.stiff
-        const hiddenPosition = this.getElementSize()
-        const position = this.getPosition(hiddenPosition)
-
-        let containerStyle = {
-            backgroundColor: `rgba(55, 56, 56, ${open ? containerOpacity : 0})`,
-            "--body-background": this.state.useBackgroundColorValues ? `rgba(${this.state.useBackgroundColorValues}, 1)` : "var(--background-color-primary)",
-        }
-
-        return createPortal(
-            <Motion
-                style={{
-                    translate: spring(open ? position : hiddenPosition, animationSpring)
-                }}
-                defaultStyle={{
-                    translate: hiddenPosition
+            <Drawer.Content
+                className="app-drawer-content"
+                onInteractOutside={() => {
+                    setIsOpen(false)
                 }}
             >
-                {({ translate }) => {
-                    return (
-                        <div
-                            id={id}
-                            style={containerStyle}
-                            onMouseDown={this.onClickOutside}
-                            ref={getContainerRef}
-                            className={classnames(
-                                "draggable-drawer",
-                                {
-                                    ["fill-end"]: this.props.fillEnd
-                                }
-                            )}
-                        >
-                            <Observer
-                                className={HaveWeScrolled}
-                                onChange={this.inViewportChange}
-                            />
-
-                            <div
-                                className="draggable-drawer_body"
-                                onClick={this.stopPropagation}
-                                style={{
-                                    ...this.props.bodyStyle,
-                                    ...this.getDrawerTransform(translate),
-                                }}
-                                ref={this.attachListeners}
-                            >
-                                <div
-                                    className="dragger-area"
-                                    id="dragger-area"
-                                    dragger
-                                >
-                                    <div
-                                        className="dragger-indicator"
-                                    />
-                                </div>
-
-                                <div
-                                    className="draggable-drawer_body_background"
-                                />
-
-                                <div className="draggable-drawer_content">
-                                    {this.props.children}
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }}
-            </Motion>,
-            this.props.parentElement
-        )
-    }
+                <Drawer.Handle
+                    className="app-drawer-handle"
+                />
+                {
+                    React.cloneElement(props.children, {
+                        close: () => setIsOpen(false),
+                    })
+                }
+            </Drawer.Content>
+        </Drawer.Portal>
+    </Drawer.Root>
 }
-
-const HaveWeScrolled = css`
-  position: absolute;
-  top: 0;
-  height: 1px;
-  width: 100%;
-`
