@@ -31,17 +31,10 @@ const tourSteps = [
 ]
 
 const openPlayerView = () => {
-    app.layout.drawer.open("player", PlayerView)
+    app.layout.draggable.open("player", PlayerView)
 }
 const openCreator = () => {
-    app.layout.drawer.open("creator", CreatorView, {
-        props: {
-            bodyStyle: {
-                minHeight: "unset",
-                height: "50vh"
-            }
-        }
-    })
+    app.layout.draggable.open("creator", CreatorView)
 }
 
 const PlayerButton = (props) => {
