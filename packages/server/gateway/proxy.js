@@ -10,8 +10,8 @@ import fs from "node:fs"
 import path from "node:path"
 
 function getHttpServerEngine(extraOptions = {}, handler = () => { }) {
-    const sslKey = path.resolve(process.cwd(), "ssl", "privkey.pem")
-    const sslCert = path.resolve(process.cwd(), "ssl", "cert.pem")
+    const sslKey = path.resolve(process.cwd(), ".ssl", "privkey.pem")
+    const sslCert = path.resolve(process.cwd(), ".ssl", "cert.pem")
 
     if (fs.existsSync(sslKey) && fs.existsSync(sslCert)) {
         return https.createServer(
