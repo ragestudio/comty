@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
+import PageTransition from "@components/PageTransition"
 import { createIconRender } from "@components/Icons"
 import config from "@config"
 
@@ -146,10 +147,14 @@ export default () => {
             />
         </div>
 
-        <div className="settings_content">
-            {
-                loading && <antd.Skeleton active />
-            }
+        {
+            loading && <antd.Skeleton active />
+        }
+
+        <PageTransition
+            className="settings_content"
+            key={activeKey}
+        >
             {
                 !loading && <SettingTab
                     baseConfig={config}
@@ -158,6 +163,6 @@ export default () => {
                     withGroups
                 />
             }
-        </div>
+        </PageTransition>
     </div>
 }
