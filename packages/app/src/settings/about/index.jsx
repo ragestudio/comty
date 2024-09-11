@@ -263,6 +263,23 @@ export default {
                         </div>
                     </div>
                 }
+
+                <div className="inline_field">
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.MdInfo />
+                        </div>
+
+                        <p>View Open Source Licenses</p>
+                    </div>
+
+                    <div className="field_value">
+                        <antd.Button
+                            icon={<Icons.MdOpenInNew />}
+                            onClick={() => app.location.push("/licenses")}
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     }

@@ -1,9 +1,48 @@
-.tpd_list {
-    display: inline-flex;
+.tpd-page {
+    display: flex;
     flex-direction: column;
-    overflow-y: scroll!important;
 
-    .item {
+    gap: 10px;
 
+    width: 100%;
+
+    .tdp-page-list {
+        display: flex;
+        flex-direction: column;
+
+        width: 100%;
+
+        gap: 7px;
+    }
+
+    .tdp-page-list-item {
+        display: flex;
+        flex-direction: column;
+
+        background-color: var(--background-color-accent);
+
+        border-radius: 12px;
+
+        padding: 10px;
+
+        gap: 10px;
+
+        .tdp-page-list-item-info {
+            display: flex;
+            flex-direction: column;
+
+            gap: 3px;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        p,
+        span {
+            margin: 0;
+        }
     }
 }

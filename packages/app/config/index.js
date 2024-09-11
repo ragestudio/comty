@@ -9,6 +9,7 @@ export default {
     author: "RageStudio©",
     fundingLink: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76",
     githubRepoLink: "https://github.com/ragestudio/comty",
+    ossLicensesUrl: "/oss-licenses.json",
     locations: {
         terms: "/terms",
         privacy: "/privacy",
