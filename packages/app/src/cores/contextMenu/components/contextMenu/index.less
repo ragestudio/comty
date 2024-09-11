@@ -1,3 +1,5 @@
+@import "@styles/vars.less";
+
 .contextMenu {
     position: fixed;
     z-index: 100000;
@@ -14,14 +16,16 @@
     background-color: var(--background-color-primary);
     border: 1px solid var(--border-color);
 
-    border-radius: 8px;
+    border-radius: 12px;
 
-    padding: 7px;
+    padding: 4px;
 
     font-weight: 600;
     font-family: var(--fontFamily);
     font-size: 0.8rem;
     color: var(--text-color);
+
+    box-shadow: @card-shadow;
 
     h1,
     h2,
@@ -42,7 +46,7 @@
         align-items: center;
         justify-content: space-between;
 
-        padding: 10px 10px 10px 15px;
+        padding: 7px 7px 7px 10px;
 
         transition: all 50ms ease-in-out;
 
@@ -71,7 +75,7 @@
         width: 100%;
         height: 1px;
 
-        margin: 10px 0;
+        margin: 5px 0;
 
         background-color: var(--border-color);
     }
