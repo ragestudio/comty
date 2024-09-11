@@ -3,43 +3,25 @@ import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { Motion, spring } from "react-motion"
-import { Menu, Avatar, Dropdown, Tag } from "antd"
+import { Menu, Avatar, Dropdown, Tag, Empty } from "antd"
+
 import Drawer from "@layouts/components/drawer"
 
 import { Icons, createIconRender } from "@components/Icons"
-import { GiLockedChest } from "react-icons/gi"
 
 import sidebarItems from "@config/sidebar"
 
 import "./index.less"
 
-const builtInApps = [
-	{
-		key: "hb",
-		label: "Hotel",
-		icon: "MdGames",
-		location: "/apps/hb",
-	},
-	{
-		key: "pay",
-		label: "Pay",
-		icon: "MdPayment",
-		location: "/apps/pay",
-	},
-	{
-		key: "loots",
-		label: "Loots",
-		icon: <GiLockedChest />,
-		location: "/apps/loots",
-	}
-]
-
 const AppDrawer = (props) => {
+	// TODO: Fetch from app core
+	const installedApps = []
+
 	return <div className="app-drawer">
 		<h1>Apps</h1>
 
 		{
-			builtInApps.map((item) => {
+			installedApps.map((item) => {
 				return <div
 					key={item.key}
 					className="app-drawer_item"
@@ -54,6 +36,13 @@ const AppDrawer = (props) => {
 					<h3>{item.icon && createIconRender(item.icon)} {item.label}</h3>
 				</div>
 			})
+		}
+
+		{
+			installedApps.length === 0 && <Empty
+				description="No apps installed"
+				image={Empty.PRESENTED_IMAGE_SIMPLE}
+			/>
 		}
 	</div>
 }
