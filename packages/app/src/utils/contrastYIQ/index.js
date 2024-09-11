@@ -16,7 +16,7 @@ export default class ContrastYIQ {
 
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
 
-        return (yiq >= 128) ? "black" : "white"
+        return (yiq >= 128) ? "var(--text-color-black)" : "var(--text-color-white)"
     }
 
     static async fromUrl(url) {
