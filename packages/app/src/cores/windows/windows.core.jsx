@@ -117,7 +117,10 @@ export default class WindowManager extends Core {
             }
         }))
 
-        return element
+        return {
+            element,
+            ...win,
+        }
     }
 
     /**
