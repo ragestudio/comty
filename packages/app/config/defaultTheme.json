@@ -7,7 +7,7 @@
         "danger-color": "#ff6064",
         "backgroundColorTransparency": "0.8",
         "backgroundImage": "",
-        "fontFamily": "'Inter', sans-serif",
+        "fontFamily": "'Noto Sans', sans-serif",
         "layoutMargin": "unset",
         "layoutPadding": "20px 20px 20px 20px",
         "borderRadius": "8px",
