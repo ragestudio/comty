@@ -6,8 +6,6 @@ import Vars from "../vars"
 export default async () => {
     const finalServices = []
 
-    console.log(Vars)
-
     let services = fs.readdirSync(Vars.servicesPath)
 
     for await (let _path of services) {
