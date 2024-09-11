@@ -79,6 +79,10 @@ export default {
                 },
                 options: [
                     {
+                        label: "Noto Sans",
+                        value: "'Noto Sans', sans-serif"
+                    },
+                    {
                         label: "Inter (Default)",
                         value: "'Inter', sans-serif"
                     },
@@ -117,7 +121,7 @@ export default {
             },
             storaged: false,
         },
-       
+
         {
             id: "style.backgroundImage",
             group: "aspect",

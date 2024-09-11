@@ -88,41 +88,75 @@ export default (props) => {
     }, [selectedPreset])
 
     return <>
-        <div
-            style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-            }}
-        >
-            <Icons.MdList
-                style={{
-                    margin: "0"
-                }}
-            />
-            <Select
-                style={{
-                    width: "50%"
-                }}
-                value={selectedPreset}
-                options={options}
-                onChange={(key) => {
-                    if (key === "new") {
-                        handleCreateNewPreset()
-                    } else {
-                        setSelectedPreset(key)
-                    }
-                }}
-            />
-            <Button
-                onClick={handleDeletePreset}
-                icon={<Icons.MdDelete />}
-                disabled={selectedPreset === "default"}
-            />
-        </div>
-
         <Sliders
             {...props}
         />
+
+        <div
+            style={{
+                display: "inline-flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "5px",
+                width: "100%",
+                backgroundColor: "rgba(var(--bg_color_3), 0.5)",
+                padding: "5px 10px",
+                borderRadius: "12px",
+            }}
+        >
+            <div
+                style={{
+                    display: "inline-flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "5px",
+                    width: "100%",
+                }}
+            >
+                <Icons.MdList
+                    style={{
+                        margin: "0"
+                    }}
+                />
+                <h4
+                    style={{
+                        margin: "0",
+                    }}
+                >
+
+                    Preset
+                </h4>
+            </div>
+
+            <div
+                style={{
+                    display: "inline-flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "5px",
+                    width: "100%",
+                }}
+            >
+                <Select
+                    style={{
+                        width: "50%"
+                    }}
+                    value={selectedPreset}
+                    options={options}
+                    onChange={(key) => {
+                        if (key === "new") {
+                            handleCreateNewPreset()
+                        } else {
+                            setSelectedPreset(key)
+                        }
+                    }}
+                />
+                <Button
+                    onClick={handleDeletePreset}
+                    icon={<Icons.MdDelete />}
+                    disabled={selectedPreset === "default"}
+                />
+            </div>
+        </div>
     </>
 }

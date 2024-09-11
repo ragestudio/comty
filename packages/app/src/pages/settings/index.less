@@ -29,6 +29,43 @@
 
         padding: 0 30px;
 
+        gap: 3px;
+
+        .ant-menu-item-group-list {
+            display: flex;
+            flex-direction: column;
+
+            width: 100%;
+            gap: 3px;
+        }
+
+        .menu-item-content {
+            display: flex;
+            flex-direction: row;
+
+            align-items: center;
+
+            height: fit-content;
+
+            gap: 10px;
+
+            svg {
+                margin: 0 !important;
+            }
+        }
+
+        .ant-menu-item {
+            padding: 0 !important;
+            padding-inline: 20px !important;
+            margin: 0;
+
+            border-radius: 24px;
+
+            .ant-menu-title-content {
+                height: fit-content;
+            }
+        }
+
         .ant-menu-item-danger {
             .ant-menu-title-content {
                 svg {
@@ -59,7 +96,7 @@
 
             border-radius: 12px;
 
-            padding: 20px;
+            padding: 15px;
 
             gap: 15px;
 

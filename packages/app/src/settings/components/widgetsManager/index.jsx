@@ -7,14 +7,14 @@ import WidgetItemPreview from "@components/WidgetItemPreview"
 
 import "./index.less"
 
-export default class WidgetsView extends React.Component {
+export default class WidgetsManager extends React.Component {
     state = {
-        loadedWidgets: this.props.ctx.currentValue ?? [],
+        loadedWidgets: app.cores.widgets.getInstalled() ?? [],
     }
 
     render() {
-        return <div className="widgets_load">
-            <div className="widgets_load_list">
+        return <div className="widgets-manager">
+            <div className="widgets-manager-list">
                 {
                     Array.isArray(this.state.loadedWidgets) && this.state.loadedWidgets.map((manifest) => {
                         return <React.Fragment>
@@ -52,7 +52,7 @@ export default class WidgetsView extends React.Component {
                         icon={<Icons.Plus />}
                         onClick={openWidgetsBrowserModal}
                     >
-                        Add widget
+                        Install more
                     </antd.Button>
                 </div>
             </div>

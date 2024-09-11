@@ -1,20 +1,20 @@
 {
     "app": {
-        "label": "Application Settings"
+        "label": "Application"
     },
     "basic": {
-        "label": "Basic Settings"
+        "label": "Basic"
     },
     "security": {
-        "label": "Security Settings"
+        "label": "Security"
     },
     "privacy": {
-        "label": "Privacy Settings"
+        "label": "Privacy"
     },
     "advanced": {
-        "label": "Advanced Settings"
+        "label": "Advanced"
     },
     "other": {
-        "label": "Other Settings"
+        "label": "Other"
     }
 }

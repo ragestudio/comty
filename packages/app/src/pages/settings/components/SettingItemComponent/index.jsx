@@ -360,6 +360,14 @@ export default class SettingItemComponent extends React.PureComponent {
         }))
     }
 
+    computeSwitchEnablerDefault = () => {
+        if (typeof this.props.setting.switchDefault === "function") {
+            return this.props.setting.switchDefault()
+        }
+
+        return this.props.setting.switchDefault
+    }
+
     render() {
         if (!this.props.setting) {
             console.error(`Item [${this.props.setting.id}] has no an setting!`)
@@ -428,8 +436,9 @@ export default class SettingItemComponent extends React.PureComponent {
                                 {(t) => t(this.props.setting.title ?? this.props.setting.id)}
                             </Translation>
                         </h1>
+
                         {
-                            this.props.setting.experimental && <antd.Tag> Experimental </antd.Tag>
+                            this.props.setting.experimental && <antd.Tag>Experimental</antd.Tag>
                         }
                     </div>
                     <div className="setting_item_header_description">
@@ -441,45 +450,50 @@ export default class SettingItemComponent extends React.PureComponent {
                     </div>
                 </div>
 
-                {
-                    this.props.setting.extraActions && <div className="setting_item_header_actions">
-                        {
-                            this.props.setting.extraActions.map((action, index) => {
-                                if (typeof action === "function") {
-                                    return React.createElement(action, {
-                                        ctx: {
-                                            updateCurrentValue: (updateValue) => this.setState({
-                                                value: updateValue
-                                            }),
-                                            getCurrentValue: () => this.state.value,
-                                            currentValue: this.state.value,
-                                            dispatchUpdate: this.dispatchUpdate,
-                                            onUpdateItem: this.onUpdateItem,
-                                            processedCtx: this.props.ctx
-                                        },
-                                    })
-                                }
+                <div className="setting_item_header_actions">
+                    {
+                        this.props.setting.extraActions && this.props.setting.extraActions.map((action, index) => {
+                            if (typeof action === "function") {
+                                return React.createElement(action, {
+                                    ctx: {
+                                        updateCurrentValue: (updateValue) => this.setState({
+                                            value: updateValue
+                                        }),
+                                        getCurrentValue: () => this.state.value,
+                                        currentValue: this.state.value,
+                                        dispatchUpdate: this.dispatchUpdate,
+                                        onUpdateItem: this.onUpdateItem,
+                                        processedCtx: this.props.ctx
+                                    },
+                                })
+                            }
 
-                                const handleOnClick = () => {
-                                    if (action.onClick) {
-                                        action.onClick(finalProps.ctx)
-                                    }
+                            const handleOnClick = () => {
+                                if (action.onClick) {
+                                    action.onClick(finalProps.ctx)
                                 }
+                            }
 
-                                return <antd.Button
-                                    key={action.id}
-                                    id={action.id}
-                                    onClick={handleOnClick}
-                                    icon={action.icon && createIconRender(action.icon)}
-                                    type={action.type ?? "round"}
-                                    disabled={this.props.setting.disabled}
-                                >
-                                    {action.title}
-                                </antd.Button>
-                            })
-                        }
-                    </div>
-                }
+                            return <antd.Button
+                                key={action.id}
+                                id={action.id}
+                                onClick={handleOnClick}
+                                icon={action.icon && createIconRender(action.icon)}
+                                type={action.type ?? "round"}
+                                disabled={this.props.setting.disabled}
+                            >
+                                {action.title}
+                            </antd.Button>
+                        })
+                    }
+
+                    {
+                        typeof this.props.setting.onEnabledChange === "function" && <antd.Switch
+                            defaultChecked={this.computeSwitchEnablerDefault()}
+                            onChange={this.props.setting.onEnabledChange}
+                        />
+                    }
+                </div>
             </div>
 
             <div className="setting_item_content">

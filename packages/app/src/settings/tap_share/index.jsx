@@ -3,14 +3,15 @@ import * as antd from "antd"
 import classnames from "classnames"
 import NFCModel from "comty.js/models/nfc"
 
-import StepsContext from "./context"
-
 import { Icons } from "@components/Icons"
+import UserShareBadge from "@components/UserShareBadge"
 
 import CheckRegister from "./steps/check_register"
 import DataEditor from "./steps/data_editor"
 import TagWritter from "./steps/tag_writter"
 import Success from "./steps/success"
+
+import StepsContext from "./context"
 
 import "./index.less"
 
@@ -306,12 +307,27 @@ const TapShareRender = () => {
                     <Icons.MdSpoke /> Registered Tags
                 </h1>
             </div>
+
             {
                 app.cores.nfc.scanning && <span className="tip">
                     <Icons.MdInfo /> You can quickly edit your tags by tapping them.
                 </span>
             }
+
             <OwnTags />
+        </div>
+
+        <div className="tap-share-field">
+            <div className="tap-share-field_header">
+                <h1>
+                    <Icons.MdBadge /> Your Badge
+                </h1>
+            </div>
+
+            <UserShareBadge
+                user={app.userData}
+                editMode
+            />
         </div>
 
         {

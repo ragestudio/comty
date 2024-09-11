@@ -7,17 +7,35 @@ export default {
     group: "app",
     settings: [
         {
-            id: "player.allowVolumeOver100",
-            title: "Allow volume over 100%",
+            id: "player.gain",
+            title: "Gain",
+            icon: "MdGraphicEq",
             group: "general",
-            icon: "MdHearing",
-            description: "Allow volume amplification over 100% (may cause distortion)",
-            component: "Switch",
-            storaged: true,
+            description: "Adjust gain for audio output",
+            component: "Slider",
+            props: {
+                min: 1,
+                max: 2,
+                step: 0.1,
+                marks: {
+                    1: "Normal",
+                    1.5: "+50%",
+                    2: "+100%"
+                }
+            },
+            defaultValue: () => {
+                return app.cores.player.gain.values().gain
+            },
+            onUpdate: (value) => {
+                app.cores.player.gain.modifyValues({
+                    gain: value
+                })
+            },
+            storaged: false,
         },
         {
             id: "player.sample_rate",
-            title: "Sample rate",
+            title: "Sample Rate",
             icon: "MdHearing",
             group: "general",
             description: "Internal sample rate for audio output",
@@ -53,53 +71,8 @@ export default {
             storaged: false,
         },
         {
-            id: "player.crossfade",
-            title: "Crossfade",
-            icon: "MdSwapHoriz",
-            group: "general",
-            description: "Enable crossfade between tracks",
-            component: "Slider",
-            props: {
-                min: 0,
-                max: 10,
-                step: 0.1,
-                marks: {
-                    0: "Off",
-                    1: "1s",
-                    2: "2s",
-                    3: "3s",
-                    4: "4s",
-                    5: "5s",
-                    6: "6s",
-                    7: "7s",
-                    8: "8s",
-                    9: "9s",
-                    10: "10s",
-                }
-            },
-            storaged: true,
-            disabled: true,
-        },
-        {
-            id: "player.compressor",
-            title: "Compression",
-            icon: "MdGraphicEq",
-            group: "general",
-            description: "Enable compression for audio output",
-            component: "Switch",
-            experimental: true,
-            beforeSave: (value) => {
-                if (value) {
-                    app.cores.player.compressor.attach()
-                } else {
-                    app.cores.player.compressor.detach()
-                }
-            },
-            storaged: true,
-        },
-        {
             id: "player.compressor.values",
-            title: "Compression adjustment",
+            title: "Compression",
             icon: "Sliders",
             group: "general",
             description: "Adjust compression values (Warning: may cause distortion when changing values)",
@@ -108,6 +81,18 @@ export default {
                 "player.compressor": true
             },
             component: loadable(() => import("./items/player.compressor")),
+            switchDefault: () => {
+                return app.cores.settings.get("player.compressor")
+            },
+            onEnabledChange: (enabled) => {
+                if (enabled === true) {
+                    app.cores.settings.set("player.compressor", true)
+                    app.cores.player.compressor.attach()
+                } else {
+                    app.cores.settings.set("player.compressor", false)
+                    app.cores.player.compressor.detach()
+                }
+            },
             props: {
                 valueFormat: (value) => `${value}dB`,
                 sliders: [
@@ -149,7 +134,7 @@ export default {
             extraActions: [
                 {
                     id: "reset",
-                    title: "Reset",
+                    title: "Default",
                     icon: "MdRefresh",
                     onClick: async (ctx) => {
                         const values = await app.cores.player.compressor.resetDefaultValues()
@@ -165,33 +150,7 @@ export default {
             },
             storaged: false,
         },
-        {
-            id: "player.gain",
-            title: "Gain",
-            icon: "MdGraphicEq",
-            group: "general",
-            description: "Adjust gain for audio output",
-            component: "Slider",
-            props: {
-                min: 1,
-                max: 2,
-                step: 0.1,
-                marks: {
-                    1: "Off",
-                    1.5: "50%",
-                    2: "100%"
-                }
-            },
-            defaultValue: () => {
-                return app.cores.player.gain.values().gain
-            },
-            onUpdate: (value) => {
-                app.cores.player.gain.modifyValues({
-                    gain: value
-                })
-            },
-            storaged: false,
-        },
+
         {
             id: "player.eq",
             title: "Equalizer",
@@ -211,7 +170,9 @@ export default {
                     }
                 },
             ],
-            usePadding: false,
+            dependsOn: {
+                "player.equalizer": true
+            },
             props: {
                 valueFormat: (value) => `${value}dB`,
                 marks: [

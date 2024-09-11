@@ -55,7 +55,7 @@ const generateMenuItems = () => {
             return {
                 key: item.id,
                 type: "item",
-                label: <div {...item.props}>
+                label: <div {...item.props} className="menu-item-content">
                     {createIconRender(item.icon ?? "Settings")}
                     {item.label}
                 </div>,
@@ -126,7 +126,9 @@ export default () => {
         if (app.layout.tools_bar) {
             app.layout.tools_bar.toggleVisibility(false)
         }
+    }, [activeKey])
 
+    React.useEffect(() => {
         return () => {
             if (app.layout.tools_bar) {
                 app.layout.tools_bar.toggleVisibility(true)
