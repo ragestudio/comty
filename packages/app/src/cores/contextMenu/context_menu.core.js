@@ -1,5 +1,6 @@
 import React from "react"
 import Core from "evite/src/core"
+import EventEmitter from "evite/src/internals/EventEmitter"
 
 import ContextMenu from "./components/contextMenu"
 
@@ -9,16 +10,12 @@ import PostCardContext from "@config/context-menu/post"
 export default class ContextMenuCore extends Core {
     static namespace = "contextMenu"
 
-    public = {
-        show: this.show.bind(this),
-        hide: this.hide.bind(this),
-        registerContext: this.registerContext.bind(this),
-    }
-
     contexts = {
         ...DefaultContenxt,
         ...PostCardContext,
     }
+
+    eventBus = new EventEmitter()
 
     async onInitialize() {
         if (app.isMobile) {
@@ -29,11 +26,48 @@ export default class ContextMenuCore extends Core {
         document.addEventListener("contextmenu", this.handleEvent.bind(this))
     }
 
-    registerContext(element, context) {
+    async handleEvent(event) {
+        event.preventDefault()
+
+        // get the cords of the mouse
+        const x = event.clientX
+        const y = event.clientY
+
+        // get the component that was clicked
+        const component = document.elementFromPoint(x, y)
+
+        // check if is clicking inside a context menu or a children inside a context menu
+        if (component.classList.contains("contextMenu") || component.closest(".contextMenu")) {
+            return
+        }
+
+        const items = await this.generateItems(component)
+
+        if (!items) {
+            this.console.warn("No context menu items found, aborting")
+            return false
+        }
+
+        this.show({
+            registerOnClose: (cb) => { this.eventBus.on("close", cb) },
+            unregisterOnClose: (cb) => { this.eventBus.off("close", cb) },
+            cords: {
+                x,
+                y,
+            },
+            clickedComponent: component,
+            items: items,
+            ctx: {
+                close: this.onClose,
+            }
+        })
+    }
+
+    registerContext = async (element, context) => {
         this.contexts[element] = context
     }
 
-    async generateItems(element) {
+    generateItems = async (element) => {
         let items = []
 
         // find the closest context with attribute (context-menu)
@@ -72,7 +106,7 @@ export default class ContextMenuCore extends Core {
 
             if (typeof contextObject === "function") {
                 contextObject = await contextObject(items, parentElement, element, {
-                    close: this.hide,
+                    close: this.onClose,
                 })
             }
 
@@ -102,49 +136,23 @@ export default class ContextMenuCore extends Core {
         return items
     }
 
-    async handleEvent(event) {
-        event.preventDefault()
-
-        // get the cords of the mouse
-        const x = event.clientX
-        const y = event.clientY
-
-        // get the component that was clicked
-        const component = document.elementFromPoint(x, y)
-
-        // check if is clicking inside a context menu or a children inside a context menu
-        if (component.classList.contains("contextMenu") || component.closest(".contextMenu")) {
-            return
-        }
-
-        const items = await this.generateItems(component)
-
-        if (!items) {
-            this.console.warn("No context menu items found, aborting")
-            return false
-        }
-
-        this.show({
-            cords: {
-                x,
-                y,
+    show = async (payload) => {
+        app.cores.window_mng.render(
+            "context-menu-portal",
+            React.createElement(ContextMenu, payload),
+            {
+                onClose: this.onClose,
+                createOrUpdate: true,
+                closeOnClickOutside: true,
             },
-            clickedComponent: component,
-            items: items,
-            ctx: {
-                close: this.hide.bind(this),
-            }
-        })
+        )
     }
 
-    show(payload) {
-        app.cores.window_mng.render("context-menu", React.createElement(ContextMenu, payload), {
-            createOrUpdate: true,
-            closeOnClickOutside: true,
-        })
-    }
+    onClose = async (delay = 200) => {
+        this.eventBus.emit("close", delay)
 
-    hide() {
-        app.cores.window_mng.close("context-menu")
+        await new Promise((resolve) => {
+            setTimeout(resolve, delay)
+        })
     }
 }

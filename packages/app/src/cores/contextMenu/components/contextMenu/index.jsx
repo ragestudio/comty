@@ -1,11 +1,22 @@
 import React from "react"
 
 import { createIconRender } from "@components/Icons"
+import { AnimatePresence, motion } from "framer-motion"
 
 import "./index.less"
 
-export default (props) => {
+const ContextMenu = (props) => {
+    const [visible, setVisible] = React.useState(true)
     const { items = [], cords, clickedComponent, ctx } = props
+
+    async function onClose() {
+        setVisible(false)
+        props.unregisterOnClose(onClose)
+    }
+
+    React.useEffect(() => {
+        props.registerOnClose(onClose)
+    }, [])
 
     const handleItemClick = async (item) => {
         if (typeof item.action === "function") {
@@ -33,21 +44,43 @@ export default (props) => {
                 <p className="label">
                     {item.label}
                 </p>
-                {item.description && <p className="description">
-                    {item.description}
-                </p>}
-                {createIconRender(item.icon)}
+
+                {
+                    item.description && <p className="description">
+                        {item.description}
+                    </p>
+                }
+
+                {
+                    createIconRender(item.icon)
+                }
             </div>
         })
     }
 
-    return <div
-        className="contextMenu"
-        style={{
-            top: cords.y,
-            left: cords.x,
-        }}
-    >
-        {renderItems()}
-    </div>
+    return <AnimatePresence>
+        {
+            visible && <div
+                className="context-menu-wrapper"
+                style={{
+                    top: cords.y,
+                    left: cords.x,
+                }}
+            >
+                <motion.div
+                    className="context-menu"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.3 }}
+                    transition={{ duration: 0.05, ease: "easeInOut" }}
+                >
+                    {
+                        renderItems()
+                    }
+                </motion.div>
+            </div>
+        }
+    </AnimatePresence>
 }
+
+export default ContextMenu

@@ -5,8 +5,6 @@ import { createRoot } from "react-dom/client"
 
 import DefaultWindow from "./components/defaultWindow"
 
-import DefaultWindowContext from "./components/defaultWindow/context"
-
 import "./index.less"
 
 export default class WindowManager extends Core {
@@ -15,7 +13,6 @@ export default class WindowManager extends Core {
     static idMount = "windows"
 
     root = null
-
     windows = []
 
     public = {
@@ -54,11 +51,12 @@ export default class WindowManager extends Core {
      * @param {boolean} options.createOrUpdate - Specifies whether to create a new element or update an existing one.
      * @return {HTMLElement} The created or updated element.
      */
-    render(
+    async render(
         id,
         fragment,
         {
             useFrame = false,
+            onClose = null,
             createOrUpdate = false,
             closeOnClickOutside = false,
         } = {}
@@ -68,6 +66,7 @@ export default class WindowManager extends Core {
         let win = null
 
         // check if window already exist
+        // if exist, try to automatically generate a new id
         if (this.root.querySelector(`#${id}`) && !createOrUpdate) {
             const newId = `${id}_${Date.now()}`
 
@@ -76,6 +75,17 @@ export default class WindowManager extends Core {
             id = newId
         }
 
+        // if closeOnClickOutside is true, add click event listener
+        if (closeOnClickOutside === true) {
+            document.addEventListener(
+                "click",
+                (e) => this.handleWrapperClick(id, e),
+                { once: true },
+            )
+        }
+
+        // check if window already exist, if exist and createOrUpdate is true, update the element
+        // if not exist, create a new element
         if (this.root.querySelector(`#${id}`) && createOrUpdate) {
             element = document.getElementById(id)
 
@@ -96,24 +106,23 @@ export default class WindowManager extends Core {
             win = {
                 id: id,
                 node: node,
+                onClose: onClose,
+                closeOnClickOutside: closeOnClickOutside,
             }
 
             this.windows.push(win)
         }
 
+        // if useFrame is true, wrap the fragment with a DefaultWindow component
         if (useFrame) {
             fragment = <DefaultWindow>
                 {fragment}
             </DefaultWindow>
         }
 
-        if (closeOnClickOutside) {
-            document.addEventListener("click", (e) => this.handleWrapperClick(id, e))
-        }
-
         node.render(React.cloneElement(fragment, {
             close: () => {
-                this.close(id)
+                this.close(id, onClose)
             }
         }))
 
@@ -129,26 +138,38 @@ export default class WindowManager extends Core {
      * @param {string} id - The ID of the window to be closed.
      * @return {boolean} Returns true if the window was successfully closed, false otherwise.
      */
-    close(id) {
+    async close(id) {
         const element = document.getElementById(id)
 
         const win = this.windows.find((node) => {
             return node.id === id
         })
 
-        if (!win) {
-            this.console.warn(`Window ${id} not found`)
-
+        if (!win || !element) {
+            this.console.error(`Window [${id}] not found`)
             return false
         }
 
+        this.console.debug(`Closing window ${id}`, win, element)
+
+        // if onClose callback is defined, call it
+        if (typeof win.onClose === "function") {
+            this.console.debug(`Trigging close callback for window ${id}`)
+            await win.onClose()
+        }
+
+        // remove the element from the DOM
+        this.console.debug(`Removing element from DOM for window ${id}`)
         win.node.unmount()
         this.root.removeChild(element)
 
+        // remove the window from the list
+        this.console.debug(`Removing window from list for window ${id}`)
         this.windows = this.windows.filter((node) => {
             return node.id !== id
         })
 
+        this.console.debug(`Window ${id} closed`)
         return true
     }
 }
