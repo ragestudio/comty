@@ -63,7 +63,6 @@ const UserShareBadge = (props) => {
                 user.badges?.length > 0 && <UserBadges user_id={user._id} />
             }
         </div>
-
     </div>
 }
 
