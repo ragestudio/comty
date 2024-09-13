@@ -392,7 +392,6 @@ export default class Sidebar extends React.Component {
 							stiffness: 100,
 							damping: 20
 						}}
-						layout
 					>
 						<div className="app_sidebar_header">
 							<div className="app_sidebar_header_logo">
