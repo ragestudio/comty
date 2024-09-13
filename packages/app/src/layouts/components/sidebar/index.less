@@ -25,9 +25,7 @@
 	height: 100vh;
 	height: 100dvh;
 
-	&.visible {
-		padding: 10px;
-	}
+	padding: 10px;
 }
 
 .app_sidebar {
@@ -47,7 +45,7 @@
 
 	padding: 10px 0;
 
-	transition: all 150ms ease-in-out;
+	transition: width 150ms ease-in-out;
 
 	background-color: var(--sidebar-background-color);
 
@@ -113,8 +111,16 @@
 				user-select: none;
 				--webkit-user-select: none;
 
-				width: 80%;
-				max-height: 40px;
+				width: fit-content;
+				max-height: 46px;
+
+				transition: all 150ms ease-in-out;
+
+				&:hover {
+					cursor: pointer;
+					scale: 1.1;
+					filter: drop-shadow(0 0 5px var(--shadow-color));
+				}
 			}
 		}
 	}

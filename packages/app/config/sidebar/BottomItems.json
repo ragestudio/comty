@@ -1,0 +1,24 @@
+[
+    {
+        "id": "search",
+        "label": "Search",
+        "icon": "Search"
+    },
+    {
+        "id": "messages",
+        "label": "Messages",
+        "icon": "MessageCircle",
+        "path": "/messages"
+    },
+    {
+        "id": "notifications",
+        "label": "Notifications",
+        "icon": "Bell"
+    },
+    {
+        "id": "settings",
+        "label": "Settings",
+        "icon": "Settings",
+        "path": "/settings"
+    }
+]

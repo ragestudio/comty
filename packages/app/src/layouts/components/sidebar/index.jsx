@@ -2,108 +2,21 @@ import React from "react"
 import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
-import { Motion, spring } from "react-motion"
-import { Menu, Avatar, Dropdown, Tag, Empty } from "antd"
+import { motion, AnimatePresence } from "framer-motion"
+import { Menu, Avatar, Dropdown, Tag } from "antd"
 
 import Drawer from "@layouts/components/drawer"
 
-import { Icons, createIconRender } from "@components/Icons"
+import { Icons } from "@components/Icons"
 
-import sidebarItems from "@config/sidebar"
+import GenerateSidebarMenuItems from "@utils/generateSidebarMenuItems"
+
+import TopMenuItems from "@config/sidebar/TopItems"
+import BottomMenuItems from "@config/sidebar/BottomItems"
+
+import ItemsClickHandlers from "./itemClickHandlers"
 
 import "./index.less"
-
-const onClickHandlers = {
-	apps: () => {
-		app.controls.openAppsMenu()
-	},
-	addons: () => {
-		window.app.location.push("/addons")
-	},
-	studio: () => {
-		window.app.location.push("/studio")
-	},
-	settings: () => {
-		window.app.navigation.goToSettings()
-	},
-	notifications: () => {
-		window.app.controls.openNotifications()
-	},
-	search: () => {
-		window.app.controls.openSearcher()
-	},
-	messages: () => {
-		window.app.controls.openMessages()
-	},
-	create: () => {
-		window.app.controls.openCreator()
-	},
-	profile: () => {
-		window.app.navigation.goToAccount()
-	},
-	login: () => {
-		window.app.navigation.goAuth()
-	},
-	logout: () => {
-		app.eventBus.emit("app.logout_request")
-	}
-}
-
-const generateTopItems = (extra = []) => {
-	const items = [...sidebarItems, ...extra]
-
-	return items.map((item) => {
-		return {
-			id: item.id,
-			key: item.id,
-			path: item.path,
-			icon: createIconRender(item.icon),
-			label: <Translation>
-				{t => t(item.title ?? item.id)}
-			</Translation>,
-			disabled: item.disabled,
-			children: item.children,
-		}
-	})
-}
-
-const BottomMenuDefaultItems = [
-	{
-		key: "search",
-		label: <Translation>
-			{(t) => t("Search")}
-		</Translation>,
-		icon: <Icons.Search />,
-	},
-	{
-		key: "messages",
-		label: <Translation>
-			{(t) => t("Messages")}
-		</Translation>,
-		icon: <Icons.MessageCircle />,
-	},
-	{
-		key: "notifications",
-		label: <Translation>
-			{(t) => t("Notifications")}
-		</Translation>,
-		icon: <Icons.Bell />,
-	},
-	// {
-	// 	key: "apps",
-	// 	label: <Translation>
-	// 		{(t) => t("Apps")}
-	// 	</Translation>,
-	// 	icon: <Icons.MdApps />,
-	// },
-	{
-		key: "settings",
-		label: <Translation>
-			{(t) => t("Settings")}
-		</Translation>,
-		icon: <Icons.Settings />,
-	}
-]
 
 const ActionMenuItems = [
 	{
@@ -162,10 +75,10 @@ export default class Sidebar extends React.Component {
 		visible: false,
 		expanded: false,
 
-		topItems: generateTopItems(),
-		bottomItems: [],
+		topItems: GenerateSidebarMenuItems(TopMenuItems),
+		bottomItems: GenerateSidebarMenuItems(BottomMenuItems),
 
-		lockAutocollapse: false,
+		selectedMenuItem: null,
 		navigationRender: null,
 	}
 
@@ -175,9 +88,15 @@ export default class Sidebar extends React.Component {
 
 	interface = window.app.layout.sidebar = {
 		toggleVisibility: (to) => {
+			if (to === false) {
+				this.interface.toggleExpanded(false, {
+					instant: true,
+				})
+			}
+
 			this.setState({ visible: to ?? !this.state.visible })
 		},
-		toggleCollapse: (to, force) => {
+		toggleExpanded: async (to, { instant = false, isDropdown = false } = {}) => {
 			to = to ?? !this.state.expanded
 
 			if (this.collapseDebounce) {
@@ -185,7 +104,7 @@ export default class Sidebar extends React.Component {
 				this.collapseDebounce = null
 			}
 
-			if (!to & this.state.dropdownOpen && !force) {
+			if (to === false & this.state.dropdownOpen === true && isDropdown === true) {
 				// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
 				// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
 				//this.setState({ dropdownOpen: false })
@@ -193,17 +112,13 @@ export default class Sidebar extends React.Component {
 				return false
 			}
 
-			if (!to) {
-				if (this.state.lockAutocollapse) {
-					return false
+			if (to === false) {
+				if (instant === false) {
+					await new Promise((resolve) => setTimeout(resolve, window.app.cores.settings.get("sidebar.collapse_delay_time") ?? 500))
 				}
-
-				this.collapseDebounce = setTimeout(() => {
-					this.setState({ expanded: to })
-				}, window.app.cores.settings.get("sidebar.collapse_delay_time") ?? 500)
-			} else {
-				this.setState({ expanded: to })
 			}
+
+			this.setState({ expanded: to })
 
 			app.eventBus.emit("sidebar.expanded", to)
 		},
@@ -217,60 +132,23 @@ export default class Sidebar extends React.Component {
 				}
 			})
 		},
-		updateBottomItemProps: (id, newProps) => {
-			let updatedValue = this.state.bottomItems
-
-			updatedValue = updatedValue.map((item) => {
-				if (item.id === id) {
-					item.props = {
-						...item.props,
-						...newProps,
-					}
-				}
-			})
-
-			this.setState({
-				bottomItems: updatedValue
-			})
-		},
-		attachBottomItem: (id, children, options) => {
-			if (!id) {
-				throw new Error("ID is required")
-			}
-
-			if (!children) {
-				throw new Error("Children is required")
-			}
-
-			if (this.state.bottomItems.find((item) => item.id === id)) {
-				throw new Error("Item already exists")
-			}
-
-			let updatedValue = this.state.bottomItems
-
-			updatedValue.push({
-				id,
-				children,
-				...options
-			})
-
-			this.setState({
-				bottomItems: updatedValue
-			})
-		},
-		removeBottomItem: (id) => {
-			let updatedValue = this.state.bottomItems
-
-			updatedValue = updatedValue.filter((item) => item.id !== id)
-
-			this.setState({
-				bottomItems: updatedValue
-			})
-		},
+		updateMenuItemProps: this.updateBottomItemProps,
+		addMenuItem: this.addMenuItem,
+		removeMenuItem: this.removeMenuItem,
 	}
 
 	events = {
+		"router.navigate": (path) => {
+			// recalculate sidebar selected item
+			const item = [...this.state.topItems, ...this.state.bottomItems].find((item) => item.path === path)
 
+
+			console.log(`Recalculate sidebar selected item: path [${path}]`, item)
+
+			this.setState({
+				selectedMenuItem: item
+			})
+		}
 	}
 
 	componentDidMount = async () => {
@@ -282,7 +160,7 @@ export default class Sidebar extends React.Component {
 			this.interface.toggleVisibility(true)
 
 			if (app.cores.settings.is("sidebar.collapsable", false)) {
-				this.interface.toggleCollapse(true)
+				this.interface.toggleExpanded(true)
 			}
 		}, 10)
 	}
@@ -292,84 +170,81 @@ export default class Sidebar extends React.Component {
 			app.eventBus.off(event, handler)
 		}
 
-		//delete app.layout.sidebar
+		delete app.layout.sidebar
 	}
 
-	handleClick = (e) => {
-		if (e.item.props.ignore_click === "true") {
-			return
+	addMenuItem = (group, item) => {
+		group = this.getMenuItemGroupStateKey(group)
+
+		if (!group) {
+			throw new Error("Invalid group")
 		}
 
-		if (e.item.props.override_event) {
-			return app.eventBus.emit(e.item.props.override_event, e.item.props.override_event_props)
-		}
+		const newItems = [...this.state[group], item]
 
-		if (typeof e.key === "undefined") {
-			app.eventBus.emit("invalidSidebarKey", e)
-			return false
-		}
+		this.setState({
+			[group]: newItems
+		})
 
-		if (typeof onClickHandlers[e.key] === "function") {
-			return onClickHandlers[e.key](e)
-		}
-
-		app.cores.sfx.play("sidebar.switch_tab")
-
-		const item = this.state.topItems.find((item) => item.id === e.key)
-
-		return app.location.push(`/${item.path ?? e.key}`, 150)
+		return newItems
 	}
 
-	onMouseEnter = (event) => {
-		if (!this.state.visible) return
+	removeMenuItem = (group, id) => {
+		group = this.getMenuItemGroupStateKey(group)
 
-		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
-			if (!this.state.expanded) {
-				this.interface.toggleCollapse(true)
+		if (!group) {
+			throw new Error("Invalid group")
+		}
+
+		const newItems = this.state[group].filter((item) => item.id !== id)
+
+		this.setState({
+			[group]: newItems
+		})
+
+		return newItems
+	}
+
+	updateBottomItemProps = (group, id, newProps) => {
+		group = this.getMenuItemGroupStateKey(group)
+
+		if (!group) {
+			throw new Error("Invalid group")
+		}
+
+		let updatedValue = this.state[group]
+
+		updatedValue = updatedValue.map((item) => {
+			if (item.id === id) {
+				item.props = {
+					...item.props,
+					...newProps,
+				}
 			}
+		})
 
-			return
-		}
+		this.setState({
+			[group]: updatedValue
+		})
 
-		// do nothing if is mask visible
-		if (app.layout.drawer.isMaskVisible()) {
-			return false
-		}
-
-		this.interface.toggleCollapse(true)
+		return updatedValue
 	}
 
-	handleMouseLeave = (event) => {
-		if (!this.state.visible) return
-
-		if (window.app.cores.settings.is("sidebar.collapsable", false)) return
-
-		this.interface.toggleCollapse(false)
-	}
-
-	onDropdownOpenChange = (to) => {
-		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
-		if (!to && this.state.expanded) {
-			this.interface.toggleCollapse(false, true)
-		}
-
-		this.setState({ dropdownOpen: to })
-	}
-
-	onClickDropdownItem = (item) => {
-		const handler = onClickHandlers[item.key]
-
-		if (typeof handler === "function") {
-			handler()
+	getMenuItemGroupStateKey = (group) => {
+		switch (group) {
+			case "top": {
+				return "topItems"
+			}
+			case "bottom": {
+				return "bottomItems"
+			}
+			default: {
+				return null
+			}
 		}
 	}
 
-	getBottomItems = () => {
-		const items = [
-			...BottomMenuDefaultItems,
-			...this.state.bottomItems,
-		]
-
+	injectUserItems(items = []) {
 		if (app.userData) {
 			items.push({
 				key: "account",
@@ -387,9 +262,8 @@ export default class Sidebar extends React.Component {
 					<Avatar shape="square" src={app.userData?.avatar} />
 				</Dropdown>,
 			})
-		}
 
-		if (!app.userData) {
+		} else {
 			items.push({
 				key: "login",
 				label: <Translation>
@@ -402,43 +276,123 @@ export default class Sidebar extends React.Component {
 		return items
 	}
 
+	handleClick = (e) => {
+		if (e.item.props.ignore_click === "true") {
+			return
+		}
+
+		if (e.item.props.override_event) {
+			return app.eventBus.emit(e.item.props.override_event, e.item.props.override_event_props)
+		}
+
+		if (typeof e.key === "undefined") {
+			app.eventBus.emit("invalidSidebarKey", e)
+			return false
+		}
+
+		if (typeof ItemsClickHandlers[e.key] === "function") {
+			return ItemsClickHandlers[e.key](e)
+		}
+
+		app.cores.sfx.play("sidebar.switch_tab")
+
+		let item = [...this.state.topItems, ...this.state.bottomItems].find((item) => item.id === e.key)
+
+		return app.location.push(`/${item.path ?? e.key}`, 150)
+	}
+
+	onMouseEnter = () => {
+		if (!this.state.visible) {
+			return false
+		}
+
+		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
+			if (!this.state.expanded) {
+				this.interface.toggleExpanded(true)
+			}
+
+			return false
+		}
+
+		// do nothing if is mask visible
+		if (app.layout.drawer.isMaskVisible()) {
+			return false
+		}
+
+		this.interface.toggleExpanded(true)
+	}
+
+	handleMouseLeave = () => {
+		if (!this.state.visible) {
+			return false
+		}
+
+		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
+			return false
+		}
+
+		this.interface.toggleExpanded(false)
+	}
+
+	onDropdownOpenChange = (to) => {
+		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
+		if (!to && this.state.expanded) {
+			this.interface.toggleExpanded(false, true)
+		}
+
+		this.setState({ dropdownOpen: to })
+	}
+
+	onClickDropdownItem = (item) => {
+		const handler = onClickHandlers[item.key]
+
+		if (typeof handler === "function") {
+			handler()
+		}
+	}
+
 	render() {
-		const defaultSelectedKey = window.location.pathname.replace("/", "")
+		const selectedKeyId = this.state.selectedMenuItem?.id ?? "home"
 
-		return <Motion style={{
-			x: spring(!this.state.visible ? 100 : 0),
-		}}>
-			{({ x }) => {
-				return <div
-					className={classnames(
-						"app_sidebar_wrapper",
-						{
-							visible: this.state.visible,
-						}
-					)}
-					style={{
-						transform: `translateX(-${x}%)`,
-					}}
-					onMouseEnter={this.onMouseEnter}
-					onMouseLeave={this.handleMouseLeave}
-				>
-					{
-						window.__TAURI__ && navigator.platform.includes("Mac") && <div
-							className="app_sidebar_tauri"
-							data-tauri-drag-region
-						/>
-					}
+		return <div
+			className="app_sidebar_wrapper"
+			onMouseEnter={this.onMouseEnter}
+			onMouseLeave={this.handleMouseLeave}
+		>
+			{
+				window.__TAURI__ && navigator.platform.includes("Mac") && <div
+					className="app_sidebar_tauri"
+					data-tauri-drag-region
+				/>
+			}
 
-					<div
+			<AnimatePresence
+				mode="popLayout"
+			>
+				{
+					this.state.visible && <motion.div
 						className={classnames(
 							"app_sidebar",
 							{
-								["expanded"]: this.state.visible && this.state.expanded,
-								["hidden"]: !this.state.visible,
+								["expanded"]: this.state.expanded,
 							}
-						)
-						}
+						)}
 						ref={this.sidebarRef}
+						initial={{
+							x: -500
+						}}
+						animate={{
+							x: 0,
+						}}
+						exit={{
+							x: -500
+						}}
+						transition={{
+							type: "spring",
+							stiffness: 100,
+							damping: 20
+						}}
+						layout
 					>
 						<div className="app_sidebar_header">
 							<div className="app_sidebar_header_logo">
@@ -455,9 +409,8 @@ export default class Sidebar extends React.Component {
 							<Menu
 								mode="inline"
 								onClick={this.handleClick}
-								defaultSelectedKeys={[defaultSelectedKey]}
+								selectedKeys={[selectedKeyId]}
 								items={this.state.topItems}
-								selectable
 							/>
 						</div>
 
@@ -469,17 +422,17 @@ export default class Sidebar extends React.Component {
 							)}
 						>
 							<Menu
-								selectable={false}
 								mode="inline"
 								onClick={this.handleClick}
-								items={this.getBottomItems()}
+								items={[...this.state.bottomItems, ...this.injectUserItems()]}
+								selectedKeys={[selectedKeyId]}
 							/>
 						</div>
-					</div>
+					</motion.div>
+				}
+			</AnimatePresence>
 
-					<Drawer />
-				</div>
-			}}
-		</Motion>
+			<Drawer />
+		</div >
 	}
 }

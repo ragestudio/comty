@@ -2,25 +2,25 @@
     {
         "id": "home",
         "path": "/",
-        "title": "Home",
+        "label": "Home",
         "icon": "Home"
     },
     {
         "id": "timeline",
         "path": "/",
-        "title": "Timeline",
+        "label": "Timeline",
         "icon": "MdTag"
     },
     {
         "id": "tv",
         "path": "/tv",
-        "title": "Tv",
+        "label": "Tv",
         "icon": "Tv"
     },
     {
         "id": "music",
         "path": "/music",
-        "title": "Music",
+        "label": "Music",
         "icon": "MdMusicNote"
     }
 ]
