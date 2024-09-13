@@ -151,13 +151,13 @@ export default class Account extends React.Component {
 		}
 
 		return <div
+			id="profile"
 			className={classnames(
-				"accountProfile",
+				"account-profile",
 				{
 					["withCover"]: user.cover,
 				}
 			)}
-			id="profile"
 		>
 			{
 				user.cover && <div
@@ -171,7 +171,7 @@ export default class Account extends React.Component {
 			}
 
 			<div className="panels">
-				<div className="leftPanel">
+				<div className="left-panel">
 					<UserCard
 						user={user}
 					/>
@@ -194,7 +194,7 @@ export default class Account extends React.Component {
 				</div>
 
 				<div
-					className="centerPanel"
+					className="center-panel"
 					ref={this.contentRef}
 				>
 					<AnimatePresence mode="wait">
@@ -220,7 +220,7 @@ export default class Account extends React.Component {
 					</AnimatePresence>
 				</div>
 
-				<div className="rightPanel">
+				<div className="right-panel">
 					<antd.Menu
 						className="tabMenu"
 						mode={app.isMobile ? "horizontal" : "vertical"}
