@@ -139,16 +139,13 @@ export default class Sidebar extends React.Component {
 
 	events = {
 		"router.navigate": (path) => {
-			// recalculate sidebar selected item
-			const item = [...this.state.topItems, ...this.state.bottomItems].find((item) => item.path === path)
-
-			this.setState({
-				selectedMenuItem: item
-			})
-		}
+			this.calculateSelectedMenuItem(path)
+		},
 	}
 
 	componentDidMount = async () => {
+		this.calculateSelectedMenuItem(window.location.pathname)
+
 		for (const [event, handler] of Object.entries(this.events)) {
 			app.eventBus.on(event, handler)
 		}
@@ -168,6 +165,12 @@ export default class Sidebar extends React.Component {
 		}
 
 		delete app.layout.sidebar
+	}
+
+	calculateSelectedMenuItem = (path) => {
+		this.setState({
+			selectedMenuItem: [...this.state.topItems, ...this.state.bottomItems].find((item) => item.path === path)
+		})
 	}
 
 	addMenuItem = (group, item) => {
