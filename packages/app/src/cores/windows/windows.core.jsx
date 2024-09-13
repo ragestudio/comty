@@ -75,15 +75,6 @@ export default class WindowManager extends Core {
             id = newId
         }
 
-        // if closeOnClickOutside is true, add click event listener
-        if (closeOnClickOutside === true) {
-            document.addEventListener(
-                "click",
-                (e) => this.handleWrapperClick(id, e),
-                { once: true },
-            )
-        }
-
         // check if window already exist, if exist and createOrUpdate is true, update the element
         // if not exist, create a new element
         if (this.root.querySelector(`#${id}`) && createOrUpdate) {
@@ -111,6 +102,15 @@ export default class WindowManager extends Core {
             }
 
             this.windows.push(win)
+
+            // if closeOnClickOutside is true, add click event listener
+            if (closeOnClickOutside === true) {
+                document.addEventListener(
+                    "click",
+                    (e) => this.handleWrapperClick(id, e),
+                    { once: true },
+                )
+            }
         }
 
         // if useFrame is true, wrap the fragment with a DefaultWindow component
