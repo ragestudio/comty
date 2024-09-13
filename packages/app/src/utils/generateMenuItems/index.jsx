@@ -1,3 +1,5 @@
+import React from "react"
+
 import { Translation } from "react-i18next"
 import { createIconRender } from "@components/Icons"
 

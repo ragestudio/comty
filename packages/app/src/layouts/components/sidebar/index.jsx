@@ -9,7 +9,7 @@ import Drawer from "@layouts/components/drawer"
 
 import { Icons } from "@components/Icons"
 
-import GenerateSidebarMenuItems from "@utils/generateSidebarMenuItems"
+import GenerateMenuItems from "@utils/generateMenuItems"
 
 import TopMenuItems from "@config/sidebar/TopItems"
 import BottomMenuItems from "@config/sidebar/BottomItems"
@@ -75,8 +75,8 @@ export default class Sidebar extends React.Component {
 		visible: false,
 		expanded: false,
 
-		topItems: GenerateSidebarMenuItems(TopMenuItems),
-		bottomItems: GenerateSidebarMenuItems(BottomMenuItems),
+		topItems: GenerateMenuItems(TopMenuItems),
+		bottomItems: GenerateMenuItems(BottomMenuItems),
 
 		selectedMenuItem: null,
 		navigationRender: null,
@@ -432,6 +432,6 @@ export default class Sidebar extends React.Component {
 			</AnimatePresence>
 
 			<Drawer />
-		</div >
+		</div>
 	}
 }

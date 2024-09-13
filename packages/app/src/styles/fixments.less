@@ -235,6 +235,32 @@
         p {
             color: var(--background-color-contrast);
         }
+
+        // active dash
+        &::before {
+            content: '';
+            display: block;
+            position: absolute;
+
+            top: auto;
+            left: 5px;
+
+            transition: all 150ms ease-in-out;
+
+            background-color: var(--colorPrimary);
+
+            width: @menu-selected-item-dash-width;
+
+            border-radius: @menu-selected-item-dash-border-radius;
+
+            // by default set opacity & height to 0
+            opacity: 0;
+            height: 0;
+        }
+
+        .ant-menu-title-content {
+            transition: @transition-ease-inout !important;
+        }
     }
 }
 
@@ -271,6 +297,12 @@
 
     &::after {
         opacity: 0;
+    }
+
+    &::before {
+        opacity: 1;
+
+        height: @menu-selected-item-dash-height;
     }
 }
 
@@ -312,7 +344,6 @@
         border-radius: 12px;
         outline: 1px solid var(--border-color) !important;
         background-color: var(--background-color-primary) !important;
-
     }
 
     .ant-notification-notice {

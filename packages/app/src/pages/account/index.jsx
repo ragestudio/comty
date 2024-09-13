@@ -1,12 +1,13 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { Translation } from "react-i18next"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Icons } from "@components/Icons"
 import FollowButton from "@components/FollowButton"
 import UserCard from "@components/UserCard"
+
+import GenerateMenuItems from "@utils/generateMenuItems"
 
 import { SessionModel, UserModel, FollowsModel } from "@models"
 
@@ -225,43 +226,29 @@ export default class Account extends React.Component {
 						mode={app.isMobile ? "horizontal" : "vertical"}
 						selectedKeys={[this.state.tabActiveKey]}
 						onClick={(e) => this.handlePageTransition(e.key)}
-					>
-						<antd.Menu.Item
-							key="posts"
-							icon={<Icons.BookOpen />}
-						>
-							<Translation>
-								{t => t("Posts")}
-							</Translation>
-						</antd.Menu.Item>
-
-						<antd.Menu.Item
-							key="music"
-							icon={<Icons.MdAlbum />}
-						>
-							<Translation>
-								{t => t("Music")}
-							</Translation>
-						</antd.Menu.Item>
-
-						<antd.Menu.Item
-							key="followers"
-							icon={<Icons.Users />}
-						>
-							<Translation>
-								{t => t("Followers")}
-							</Translation>
-						</antd.Menu.Item>
-
-						<antd.Menu.Item
-							key="details"
-							icon={<Icons.Info />}
-						>
-							<Translation>
-								{t => t("Details")}
-							</Translation>
-						</antd.Menu.Item>
-					</antd.Menu>
+						items={GenerateMenuItems([
+							{
+								id: "posts",
+								label: "Posts",
+								icon: "BookOpen",
+							},
+							{
+								id: "music",
+								label: "Music",
+								icon: "MdAlbum",
+							},
+							{
+								id: "followers",
+								label: "Followers",
+								icon: "Users",
+							},
+							{
+								id: "details",
+								label: "Details",
+								icon: "Info",
+							}
+						])}
+					/>
 				</div>
 			</div>
 		</div>
