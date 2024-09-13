@@ -142,9 +142,6 @@ export default class Sidebar extends React.Component {
 			// recalculate sidebar selected item
 			const item = [...this.state.topItems, ...this.state.bottomItems].find((item) => item.path === path)
 
-
-			console.log(`Recalculate sidebar selected item: path [${path}]`, item)
-
 			this.setState({
 				selectedMenuItem: item
 			})
