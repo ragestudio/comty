@@ -344,7 +344,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	onClickDropdownItem = (item) => {
-		const handler = onClickHandlers[item.key]
+		const handler = ItemsClickHandlers[item.key]
 
 		if (typeof handler === "function") {
 			handler()
