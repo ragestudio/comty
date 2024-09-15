@@ -46,10 +46,7 @@ export default class Account extends React.Component {
 		app.layout.toggleCenteredContent(false)
 
 		const token = await SessionModel.getDecodedToken()
-		const location = window.app.history.location
-		const query = new URLSearchParams(location.search)
-
-		const requestedUser = this.props.username ?? location.state?.username ?? query.get("username") ?? token?.username
+		const requestedUser = this.props.username ?? token?.username
 
 		let isSelf = false
 		let user = null
