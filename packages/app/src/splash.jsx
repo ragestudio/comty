@@ -20,33 +20,6 @@ class Splash extends React.Component {
         return <div
             className={this.state.visible ? "app_splash_wrapper" : "app_splash_wrapper fade-away"}
         >
-            {/* <div className="layers_wrapper">
-                <div class="square">
-                    <div class="square">
-                        <div class="square">
-                            <div class="square">
-                                <div class="square">
-                                    <div class="square">
-                                        <div class="square">
-                                            <div class="square">
-                                                <div class="square">
-                                                    <div class="square">
-                                                        <div class="square">
-                                                            <div class="square">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> */}
-
             <div className="content">
                 <img
                     src={config.logo.alt}
