@@ -152,10 +152,6 @@ export default class Sidebar extends React.Component {
 
 		setTimeout(() => {
 			this.interface.toggleVisibility(true)
-
-			if (app.cores.settings.is("sidebar.collapsable", false)) {
-				this.interface.toggleExpanded(true)
-			}
 		}, 10)
 	}
 
@@ -304,24 +300,11 @@ export default class Sidebar extends React.Component {
 	}
 
 	onMouseEnter = () => {
-		if (!this.state.visible) {
+		if (!this.state.visible || app.layout.drawer.isMaskVisible()) {
 			return false
 		}
 
-		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
-			if (!this.state.expanded) {
-				this.interface.toggleExpanded(true)
-			}
-
-			return false
-		}
-
-		// do nothing if is mask visible
-		if (app.layout.drawer.isMaskVisible()) {
-			return false
-		}
-
-		this.interface.toggleExpanded(true)
+		return this.interface.toggleExpanded(true)
 	}
 
 	handleMouseLeave = () => {
@@ -329,11 +312,7 @@ export default class Sidebar extends React.Component {
 			return false
 		}
 
-		if (window.app.cores.settings.is("sidebar.collapsable", false)) {
-			return false
-		}
-
-		this.interface.toggleExpanded(false)
+		return this.interface.toggleExpanded(false)
 	}
 
 	onDropdownOpenChange = (to) => {

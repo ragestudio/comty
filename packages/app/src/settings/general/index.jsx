@@ -118,24 +118,10 @@ export default {
             mobile: false,
         },
         {
-            id: "sidebar.collapsable",
-            group: "sidebar",
-            component: "Switch",
-            icon: "Columns",
-            title: "Auto Collapse",
-            description: "Allow to collapse the sidebar when loose focus.",
-            emitEvent: "settingChanged.sidebar_collapse",
-            storaged: true,
-            mobile: false,
-        },
-        {
             id: "sidebar.collapse_delay_time",
             group: "sidebar",
             component: "Slider",
             icon: "MdTimer",
-            dependsOn: {
-                "sidebar.collapsable": true
-            },
             title: "Auto Collapse timeout",
             description: "Set the delay before the sidebar is collapsed",
             props: {
