@@ -1,13 +1,7 @@
 [
     {
-        "id": "home",
-        "path": "/",
-        "label": "Home",
-        "icon": "Home"
-    },
-    {
         "id": "timeline",
-        "path": "/",
+        "path": "/timeline",
         "label": "Timeline",
         "icon": "MdTag"
     },
