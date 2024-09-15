@@ -1,11 +1,13 @@
 import React from "react"
 import classnames from "classnames"
-import { Layout } from "antd"
+import { Layout, Alert } from "antd"
 
 import Sidebar from "@layouts/components/sidebar"
 import ToolsBar from "@layouts/components/toolsBar"
 import Header from "@layouts/components/header"
 import Modals from "@layouts/components/modals"
+
+import BetaBanner from "@components/BetaBanner"
 
 // mobile components
 import { DraggableDrawerController } from "@layouts/components/draggableDrawer"
@@ -36,8 +38,11 @@ const DesktopLayout = (props) => {
                     props.children && React.cloneElement(props.children, props)
                 }
             </Layout.Content>
+
             <ToolsBar />
         </Layout>
+
+        <BetaBanner />
     </>
 }
 

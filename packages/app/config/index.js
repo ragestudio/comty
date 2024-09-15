@@ -37,7 +37,19 @@ export default {
         },
         {
             label: "Support this project",
-            url: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76"
+            url: "https://ko-fi.com/comty"
+        }
+    ],
+    donatives: [
+        {
+            name: "PayPal",
+            href: "https://www.paypal.com/donate/?hosted_button_id=S4TWMAN79KC76",
+            icon: "https://raw.githubusercontent.com/andreostrovsky/donate-with-paypal/master/dark.svg"
+        },
+        {
+            name: "Ko-Fi",
+            href: "https://ko-fi.com/comty",
+            icon: "https://cdn.ko-fi.com/cdn/kofi3.png?v=3",
         }
     ],
     logo: {
