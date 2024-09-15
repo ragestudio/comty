@@ -168,8 +168,10 @@ export default class Sidebar extends React.Component {
 	}
 
 	calculateSelectedMenuItem = (path) => {
+		const items = [...this.state.topItems, ...this.state.bottomItems]
+
 		this.setState({
-			selectedMenuItem: [...this.state.topItems, ...this.state.bottomItems].find((item) => item.path === path)
+			selectedMenuItem: items.find((item) => String(item.path).includes(path)),
 		})
 	}
 
@@ -352,7 +354,7 @@ export default class Sidebar extends React.Component {
 	}
 
 	render() {
-		const selectedKeyId = this.state.selectedMenuItem?.id ?? "home"
+		const selectedKeyId = this.state.selectedMenuItem?.id
 
 		return <div
 			className="app_sidebar_wrapper"
