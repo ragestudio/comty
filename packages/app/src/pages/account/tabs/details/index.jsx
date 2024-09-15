@@ -110,41 +110,37 @@ export default (props) => {
                 </div>
 
                 <span>
-                    Joined at
-                </span>
-            </div>
-
-            <div className="field_value">
-                <p>
-                    {
+                    Joined at {
                         getJoinLabel(Number(props.state.user.created_at ?? props.state.user.createdAt))
                     }
-                </p>
+                </span>
             </div>
         </div>
 
-        <DroppableField
-            header={<>
-                <div className="field_header">
-                    <div className="field_icon">
-                        <Icons.Award />
+        {
+            props.state.user?.badges.length > 0 && <DroppableField
+                header={<>
+                    <div className="field_header">
+                        <div className="field_icon">
+                            <Icons.Award />
+                        </div>
+
+                        <span>
+                            Badges collected
+                        </span>
                     </div>
 
-                    <span>
-                        Badges collected
-                    </span>
-                </div>
-
-                <div className="field_value">
-                    <p>
-                        {props.state.user?.badges.length}
-                    </p>
-                </div>
-            </>}
-        >
-            <React.Suspense fallback={<Skeleton />}>
-                <UserBadges user_id={props.state.user?._id} />
-            </React.Suspense>
-        </DroppableField>
+                    <div className="field_value">
+                        <p>
+                            {props.state.user?.badges.length}
+                        </p>
+                    </div>
+                </>}
+            >
+                <React.Suspense fallback={<Skeleton />}>
+                    <UserBadges user_id={props.state.user?._id} />
+                </React.Suspense>
+            </DroppableField>
+        }
     </div>
 }
