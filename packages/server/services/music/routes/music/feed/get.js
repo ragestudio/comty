@@ -7,7 +7,10 @@ export default async (req) => {
 
     const total_length = await MusicRelease.countDocuments(searchQuery)
 
-    let result = await MusicRelease.find(searchQuery)
+    let result = await MusicRelease.find({
+        ...searchQuery,
+        public: true,
+    })
         .limit(limit)
         .skip(trim)
         .sort({ created_at: order === "desc" ? -1 : 1 })
