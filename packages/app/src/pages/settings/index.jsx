@@ -13,7 +13,6 @@ import {
     composedSettingsByGroups as settings
 } from "@/settings"
 
-import config from "@config"
 import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
 
 import SettingTab from "./components/SettingTab"
