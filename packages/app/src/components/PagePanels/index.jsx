@@ -48,7 +48,7 @@ export const Panel = (props) => {
 
 export class PagePanelWithNavMenu extends React.Component {
     state = {
-        activeTab: new URLSearchParams(window.location.search).get("type") ?? this.props.defaultTab ?? this.props.tabs[0].key,
+        activeTab: new URLSearchParams(window.location.hash.replace("#", "?")).get("type") ?? this.props.defaultTab ?? this.props.tabs[0].key,
         renders: [],
     }
 
@@ -157,7 +157,7 @@ export class PagePanelWithNavMenu extends React.Component {
     }
 
     replaceQueryTypeToCurrentTab = (key) => {
-        app.history.replace(`${window.location.pathname}?type=${key ?? this.state.activeTab}`)
+        document.location.hash = `type=${key ?? this.state.activeTab}`
     }
 
     tabChange = async (key) => {
