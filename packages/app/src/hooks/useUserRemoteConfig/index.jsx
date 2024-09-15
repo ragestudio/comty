@@ -1,6 +1,11 @@
 import React from "react"
+import lodash from "lodash"
 
 import UserModel from "@models/user"
+
+const pushToServer = lodash.debounce(async (update) => {
+    return await UserModel.updateConfig(update)
+}, 500)
 
 export default (props = {}) => {
     const [firstLoad, setFirstLoad] = React.useState(true)
@@ -18,8 +23,8 @@ export default (props = {}) => {
             props.onUpdate(localData)
         }
 
-        const config = await UserModel.updateConfig(update)
-        setLocalData(config)
+        setLocalData(update)
+        pushToServer(update)
     }
 
     return [
