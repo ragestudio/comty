@@ -20,14 +20,20 @@ html {
 
     align-items: center;
 
-    height: fit-content;
+    min-height: 60px;
+    min-width: 60px;
 
     gap: 7px;
 
     background-color: var(--background-color-primary);
     border-radius: 12px;
 
-    padding: 7px 15px;
+    padding: 7px;
+    
+    &.single {
+        grid-template-columns: 1fr;
+        padding: 7px 15px;
+    }
 
     .badge {
         display: flex;

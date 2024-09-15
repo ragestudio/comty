@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import classnames from "classnames"
 import DOMPurify from "dompurify"
 import axios from "axios"
 
@@ -47,7 +48,7 @@ const RemoteSVG = (props) => {
 export default (props) => {
     let { user_id } = props
 
-    const [L_Badges, R_Badges, E_Badges] = app.cores.api.useRequest(UserModel.getUserBadges, user_id)
+    const [L_Badges, R_Badges, E_Badges] = app.cores.api.useRequest(UserModel.getBadges, user_id)
 
     if (E_Badges) {
         return null
@@ -61,10 +62,21 @@ export default (props) => {
         return null
     }
 
-    return <div className="badges">
+    return <div
+        className={classnames(
+            "badges",
+            {
+                ["single"]: R_Badges.length === 1
+            }
+        )}
+    >
         {
             R_Badges.map((badge, index) => {
-                return <antd.Tooltip index={index} placement="bottom" title={badge.description ?? "An badge"}>
+                return <antd.Tooltip
+                    key={index}
+                    placement="bottom"
+                    title={badge.description ?? "A badge"}
+                >
                     <div
                         key={index}
                         className="badge"
