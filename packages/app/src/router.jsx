@@ -165,23 +165,32 @@ const NavigationController = (props) => {
             state = {}
         }
 
+        app.location.last = window.location
+
+        await navigate(to, {
+            state
+        })
+
         app.eventBus.emit("router.navigate", to, {
             state,
         })
 
-        app.location.last = window.location
-
-        return navigate(to, {
-            state
-        })
+        return {
+            to,
+            state,
+        }
     }
 
     async function backLocation() {
-        app.eventBus.emit("router.navigate")
-
-        app.location.last = window.location
-
         return window.history.back()
+    }
+
+    async function onHistoryChange() {
+        setTimeout(() => {
+            app.eventBus.emit("router.navigate", window.location.pathname, {
+                state: window.location.state,
+            })
+        }, 0)
     }
 
     React.useEffect(() => {
@@ -189,6 +198,12 @@ const NavigationController = (props) => {
             last: window.location,
             push: setLocation,
             back: backLocation,
+        }
+
+        window.addEventListener("popstate", onHistoryChange)
+
+        return () => {
+            window.removeEventListener("popstate", onHistoryChange)
         }
     }, [])
 
