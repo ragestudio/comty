@@ -2,9 +2,9 @@ import React from "react"
 import * as antd from "antd"
 import { Translation } from "react-i18next"
 
+import DonativeSelector from "@components/DonativeSelector"
 import PageTransition from "@components/PageTransition"
 import { createIconRender } from "@components/Icons"
-import config from "@config"
 
 import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
 import useUserRemoteConfig from "@hooks/useUserRemoteConfig"
@@ -13,6 +13,7 @@ import {
     composedSettingsByGroups as settings
 } from "@/settings"
 
+import config from "@config"
 import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
 
 import SettingTab from "./components/SettingTab"
@@ -41,9 +42,7 @@ const extraMenuItems = [
 
 const menuEvents = {
     "donate": () => {
-        if (config.fundingLink) {
-            window.open(config.fundingLink, "_blank")
-        }
+        app.layout.modal.open("donate", DonativeSelector)
     },
     "logout": () => {
         app.eventBus.emit("app.logout_request")
