@@ -14,7 +14,7 @@ export default async (req, res) => {
         repo: process.env.GITHUB_REPO.split("/")[1]
     })
 
-    const bundle = lastRelease.data.assets.find((asset) => asset.name === "mobile_dist.zip")
+    const bundle = lastRelease.data.assets.find((asset) => asset.name === "dist.zip")
     const version = lastRelease.data.tag_name
 
     if (!bundle) {
