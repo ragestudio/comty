@@ -624,7 +624,7 @@ export default class PostCreator extends React.Component {
 
                 <antd.Button
                     type="ghost"
-                    icon={<Icons.FiMdPoll />}
+                    icon={<Icons.MdPoll />}
                     onClick={this.handleAddPoll}
                 />
             </div>
