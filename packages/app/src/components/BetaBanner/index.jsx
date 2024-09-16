@@ -24,7 +24,7 @@ const BetaBanner = () => {
         setClosed(true)
     }
 
-    if (localStorage.getItem("welcome_beta") === true || closed) {
+    if (localStorage.getItem("welcome_beta") === "true" || closed) {
         return null
     }
 
