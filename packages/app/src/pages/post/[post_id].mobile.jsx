@@ -1,14 +1,11 @@
 import React from "react"
 import * as antd from "antd"
-import { FloatingPanel } from "antd-mobile"
 
 import PostCard from "@components/PostCard"
 
 import Post from "@models/post"
 
 import "./index.less"
-
-const floatingPanelAnchors = [160, 72 + 119, window.innerHeight * 0.8]
 
 export default (props) => {
     const post_id = props.params.post_id
@@ -41,9 +38,5 @@ export default (props) => {
 
     return <div className="postPage">
         <PostCard data={data} fullmode />
-
-        <FloatingPanel anchors={floatingPanelAnchors}>
-            
-        </FloatingPanel>
     </div>
 }

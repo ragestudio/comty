@@ -1,0 +1,35 @@
+.app-actions_menu {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    color: var(--text-color);
+
+    .app-actions_menu-action {
+        display: inline-flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        padding: 10px;
+
+        gap: 20px;
+
+        border-radius: 12px;
+
+        font-size: 1rem;
+
+        background-color: var(--background-color-primary);
+
+        &.danger {
+            color: var(--danger-color);
+        }
+
+        .app-actions_menu-label {}
+
+        .app-actions_menu-icon {
+            font-size: 1.2rem;
+        }
+    }
+}

@@ -1,5 +1,5 @@
 import React from "react"
-import { SearchBar } from "antd-mobile"
+import { Input } from "antd"
 import classnames from "classnames"
 
 import "./index.less"
@@ -39,7 +39,7 @@ export default (props) => {
         className="searchButton"
         onClick={() => openSearchBox(true)}
     >
-        <SearchBar
+        <Input
             ref={searchBoxRef}
             className={classnames("searchBox", { ["open"]: open })}
             onSearch={props.onSearch}

@@ -152,11 +152,6 @@
         "license": "MIT"
     },
     {
-        "name": "antd-mobile",
-        "version": "5.37.1",
-        "license": "MIT"
-    },
-    {
         "name": "axios",
         "version": "1.7.7",
         "license": "MIT",
@@ -200,11 +195,6 @@
             "email": "hcodes@yandex.ru",
             "url": "https://github.com/fast-average-color/fast-average-color"
         }
-    },
-    {
-        "name": "feather-reactjs",
-        "version": "2.0.13",
-        "license": "MIT"
     },
     {
         "name": "framer-motion",
@@ -423,12 +413,6 @@
         "version": "6.26.2",
         "license": "MIT",
         "author": "Remix Software <hello@remix.run>"
-    },
-    {
-        "name": "react-ticker",
-        "version": "1.3.2",
-        "license": "MIT",
-        "author": "https://github.com/AndreasFaust"
     },
     {
         "name": "react-transition-group",

@@ -1,6 +1,6 @@
 import React from "react"
-import Ticker from "react-ticker"
 import * as antd from "antd"
+import Marquee from "react-fast-marquee"
 import classnames from "classnames"
 
 import UserPreview from "@components/UserPreview"
@@ -341,13 +341,13 @@ export default class StreamViewer extends React.Component {
                                             <h1>{this.state.stream.info?.title}</h1>
                                         </div>
                                         <div className="livestream_player_header_info_description">
-                                            <Ticker
+                                            <Marquee 
                                                 mode="smooth"
                                             >
                                                 {({ index }) => {
                                                     return <h4>{this.state.stream.info?.description}</h4>
                                                 }}
-                                            </Ticker>
+                                            </Marquee>
                                         </div>
                                     </div>
                                 }

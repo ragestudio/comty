@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { Input } from "antd-mobile"
+import { Input } from "antd"
 
 import { Icons } from "@components/Icons"
 

@@ -62,7 +62,6 @@ const PlayerButton = (props) => {
 
 const AccountButton = React.forwardRef((props, ref) => {
     const user = app.userData
-    const ActionMenu = React.useRef()
 
     const handleClick = () => {
         if (!user) {
@@ -73,7 +72,7 @@ const AccountButton = React.forwardRef((props, ref) => {
     }
 
     const handleHold = () => {
-        ActionMenu.current = app.layout.draggable.actions({
+        app.layout.draggable.actions({
             list: [
                 {
                     key: "settings",
@@ -81,8 +80,7 @@ const AccountButton = React.forwardRef((props, ref) => {
                     label: "Settings",
                     onClick: () => {
                         app.navigation.goToSettings()
-                        ActionMenu.current.close()
-                    }
+                    },
                 },
                 {
                     key: "account",
@@ -90,8 +88,7 @@ const AccountButton = React.forwardRef((props, ref) => {
                     label: "Account",
                     onClick: () => {
                         app.navigation.goToAccount()
-                        ActionMenu.current.close()
-                    }
+                    },
                 },
                 {
                     key: "logout",
@@ -100,8 +97,7 @@ const AccountButton = React.forwardRef((props, ref) => {
                     danger: true,
                     onClick: () => {
                         app.eventBus.emit("app.logout_request")
-                        ActionMenu.current.close()
-                    }
+                    },
                 }
             ]
         })
