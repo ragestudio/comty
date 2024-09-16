@@ -95,7 +95,7 @@ const TrackEditor = (props) => {
 
         <div className="track-editor-field">
             <div className="track-editor-field-header">
-                <Icons.User />
+                <Icons.FiUser />
                 <span>Artist</span>
             </div>
 

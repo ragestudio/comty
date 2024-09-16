@@ -137,17 +137,17 @@ export default (props) => {
             <div className="panel">
                 <div className="card">
                     <div className="dates">
-                        <Icons.Calendar /> {Array.isArray(eventData.dates) && renderDates(eventData.dates)}
+                        <Icons.FiCalendar /> {Array.isArray(eventData.dates) && renderDates(eventData.dates)}
                     </div>
 
                     <div className="location">
-                        <Icons.MapPin /> {ProcessString(LocationProcessRegexs)(eventData.location)}
+                        <Icons.FiMapPin /> {ProcessString(LocationProcessRegexs)(eventData.location)}
                     </div>
                 </div>
 
                 <div className="card">
                     <Button>
-                        <Icons.Calendar /> Add to Calendar
+                        <Icons.FiCalendar /> Add to Calendar
                     </Button>
                 </div>
             </div>

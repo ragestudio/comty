@@ -234,6 +234,7 @@ class Login extends React.Component {
                 </div>
             </div>
         }
+
         return <div className="login_wrapper">
             <div className="content">
                 <h1>
@@ -256,7 +257,7 @@ class Login extends React.Component {
                         name="username"
                         className="field"
                     >
-                        <span><Icons.Mail /> Username or Email</span>
+                        <span><Icons.FiMail /> Username or Email</span>
                         <antd.Input
                             placeholder="myusername / myemail@example.com"
                             onChange={(e) => this.onUpdateInput("username", e.target.value)}
@@ -275,7 +276,7 @@ class Login extends React.Component {
                             }
                         )}
                     >
-                        <span><Icons.Lock /> Password</span>
+                        <span><Icons.FiLock /> Password</span>
                         <antd.Input.Password
                             //placeholder="********"
                             onChange={(e) => this.onUpdateInput("password", e.target.value)}
@@ -292,7 +293,7 @@ class Login extends React.Component {
                             }
                         )}
                     >
-                        <span><Icons.Lock /> Verification Code</span>
+                        <span><Icons.FiLock /> Verification Code</span>
 
                         {
                             this.state.mfa_required && <>

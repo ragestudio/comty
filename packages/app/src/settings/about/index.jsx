@@ -18,7 +18,7 @@ const connectionsTooltipStrings = {
 
 export default {
     id: "about",
-    icon: "Info",
+    icon: "FiInfo",
     label: "About",
     group: "bottom",
     render: () => {
@@ -81,9 +81,9 @@ export default {
                     </div>
                 </div>
                 <div className="versions">
-                    <antd.Tag><Icons.Tag />v{window.app.version ?? "experimental"}</antd.Tag>
+                    <antd.Tag><Icons.FiTag />v{window.app.version ?? "experimental"}</antd.Tag>
                     <antd.Tag color={isProduction ? "green" : "magenta"}>
-                        {isProduction ? <Icons.CheckCircle /> : <Icons.Triangle />}
+                        {isProduction ? <Icons.FiCheckCircle /> : <Icons.FiTriangle />}
                         {String(import.meta.env.MODE)}
                     </antd.Tag>
                 </div>
@@ -91,7 +91,7 @@ export default {
 
             <div className="group">
                 <div className="group_header">
-                    <h3><Icons.Info />Server information</h3>
+                    <h3><Icons.FiInfo />Server information</h3>
                 </div>
 
                 <div className="field">

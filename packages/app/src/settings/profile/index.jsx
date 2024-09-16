@@ -4,7 +4,7 @@ import UploadButton from "@components/UploadButton"
 
 export default {
     id: "profile",
-    icon: "User",
+    icon: "FiUser",
     label: "Profile",
     group: "basic",
     ctxData: async () => {
@@ -19,7 +19,7 @@ export default {
             id: "username",
             group: "account.basicInfo",
             component: "Button",
-            icon: "AtSign",
+            icon: "FiAtSign",
             title: "Username",
             description: "Your username is the name you use to log in to your account.",
             props: {
@@ -31,7 +31,7 @@ export default {
             id: "public_name",
             group: "account.basicInfo",
             component: "Input",
-            icon: "Edit3",
+            icon: "FiEdit3",
             title: "Name",
             description: "Change your public name",
             props: {
@@ -70,7 +70,7 @@ export default {
             id: "email",
             group: "account.basicInfo",
             component: "Input",
-            icon: "Mail",
+            icon: "FiMail",
             title: "Email",
             description: "Change your email address",
             props: {
@@ -96,7 +96,7 @@ export default {
         {
             id: "avatar",
             group: "account.profile",
-            icon: "Image",
+            icon: "FiImage",
             title: "Avatar",
             description: "Change your avatar (Upload an image or use an URL)",
             component: loadable(() => import("../components/urlInput")),
@@ -120,7 +120,7 @@ export default {
         {
             id: "cover",
             group: "account.profile",
-            icon: "Image",
+            icon: "FiImage",
             title: "Cover",
             description: "Change your profile cover (Upload an image or use an URL)",
             component: loadable(() => import("../components/urlInput")),
@@ -145,7 +145,7 @@ export default {
             id: "description",
             group: "account.profile",
             component: "TextArea",
-            icon: "Edit3",
+            icon: "FiEdit3",
             title: "Description",
             description: "Change your description for your profile",
             props: {

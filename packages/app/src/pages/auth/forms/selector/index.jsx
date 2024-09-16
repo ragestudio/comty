@@ -11,7 +11,7 @@ const MainSelector = (props) => {
 
     return <>
         <div className="content_header">
-            <img src={app.isMobile ? config.logo.alt : config.logo.full} className="logo" />
+            <img src={config.logo.alt} className="logo" />
         </div>
 
         <div className="actions">
@@ -23,14 +23,13 @@ const MainSelector = (props) => {
                         app.navigation.goMain()
                     }}
                 >
-                    Continue as {app.userData.username}
+                    <antd.Avatar size={23} shape="square" src={app.userData.avatar} /> Continue as {app.userData.username}
                 </antd.Button>
             }
 
             <antd.Button
                 onClick={onClickLogin}
-                size="large"
-                icon={<Icons.LogIn />}
+                icon={<Icons.FiLogIn />}
                 type="primary"
             >
                 Continue with a Comty™ Account
@@ -38,28 +37,25 @@ const MainSelector = (props) => {
 
             <antd.Button
                 onClick={onClickLogin}
-                size="large"
-                icon={<Icons.LogIn />}
+                icon={<Icons.FiLogIn />}
                 type="primary"
                 disabled
             >
                 Continue with a RageStudio© ID™
             </antd.Button>
-        </div>
 
-        <h4>Or create a new account</h4>
+            <h4>Or create a new account</h4>
 
-        <div className="actions">
             <antd.Button
                 onClick={onClickRegister}
-                icon={<Icons.UserPlus />}
+                icon={<Icons.FiUserPlus />}
                 type="primary"
             >
                 Create a Comty™ Account
             </antd.Button>
 
             <p>
-                <Icons.Info />
+                <Icons.FiInfo />
                 Registering a new account accepts the <a onClick={() => app.location.push("/terms")}>Terms and Conditions</a> and <a onClick={() => app.location.push("/privacy")}>Privacy policy</a> for the services provided by {config.author}
             </p>
         </div>

@@ -67,7 +67,7 @@ const TrackListItem = (props) => {
                     <div className="music-studio-release-editor-tracks-list-item-actions">
                         <antd.Button
                             type="ghost"
-                            icon={<Icons.Edit2 />}
+                            icon={<Icons.FiEdit2 />}
                             onClick={onClickEditTrack}
                         />
 

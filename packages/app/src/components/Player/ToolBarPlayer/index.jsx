@@ -128,7 +128,7 @@ const Player = (props) => {
             </antd.Button> */}
 
             <antd.Button
-                icon={<Icons.X />}
+                icon={<Icons.FiX />}
                 shape="circle"
                 onClick={() => app.cores.player.close()}
             />

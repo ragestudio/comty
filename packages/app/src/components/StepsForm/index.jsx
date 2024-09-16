@@ -156,7 +156,7 @@ export default class StepsForm extends React.Component {
                     })
 
                     return () => <div>
-                        <Icons.XCircle /> Error
+                        <Icons.FiXCircle /> Error
                     </div>
                 }
             }, {
@@ -220,7 +220,7 @@ export default class StepsForm extends React.Component {
                 <ActionsBar mode="float">
                     {this.state.step > 0 && (
                         <antd.Button style={{ margin: "0 8px" }} onClick={() => this.prev()}>
-                            <Icons.ChevronLeft />
+                            <Icons.FiChevronLeft />
                             <Translation>
                                 {t => t("Previous")}
                             </Translation>
@@ -228,7 +228,7 @@ export default class StepsForm extends React.Component {
                     )}
                     {this.state.step < steps.length - 1 && (
                         <antd.Button disabled={!this.state.canNext} type="primary" onClick={() => this.next()}>
-                            <Icons.ChevronRight />
+                            <Icons.FiChevronRight />
                             <Translation>
                                 {t => t("Next")}
                             </Translation>

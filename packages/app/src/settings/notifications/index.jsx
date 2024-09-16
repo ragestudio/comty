@@ -2,7 +2,7 @@ import React from "react"
 
 export default {
     id: "notifications",
-    icon: "Bell",
+    icon: "FiBell",
     label: "Notifications",
     group: "basic",
     settings: [

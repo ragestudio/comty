@@ -50,7 +50,7 @@ const AuthPage = (props) => {
         changeStage(2)
     }
 
-    return <div className="loginPage">
+    return <div className="login-page">
         <div className="background">
             <GradientSVG />
         </div>

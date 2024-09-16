@@ -49,7 +49,7 @@ export default class WidgetsManager extends React.Component {
                 >
                     <antd.Button
                         type="primary"
-                        icon={<Icons.Plus />}
+                        icon={<Icons.FiPlus />}
                         onClick={openWidgetsBrowserModal}
                     >
                         Install more

@@ -25,7 +25,7 @@ const extraMenuItems = [
         label: <div style={{
             color: "#f72585"
         }}>
-            {createIconRender("Heart")}
+            {createIconRender("FiHeart")}
             Support us
         </div>,
     },

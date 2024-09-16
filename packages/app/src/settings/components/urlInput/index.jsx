@@ -28,7 +28,7 @@ export default (props) => {
             />
 
             <Button
-                icon={<Icons.Save />}
+                icon={<Icons.FiSave />}
                 onClick={() => props.ctx.dispatchUpdate(value)}
             />
         </Input.Group>

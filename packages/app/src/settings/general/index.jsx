@@ -2,7 +2,7 @@ import config from "@config"
 
 export default {
     id: "general",
-    icon: "Command",
+    icon: "FiCommand",
     label: "General",
     group: "app",
     order: 0,

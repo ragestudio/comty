@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import useRequest from "comty.js/dist/hooks/useRequest"
+import useRequest from "comty.js/hooks/useRequest"
 import Streaming from "@models/spectrum"
 
 const ProfileConnection = (props) => {

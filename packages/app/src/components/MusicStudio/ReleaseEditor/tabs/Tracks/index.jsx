@@ -314,7 +314,7 @@ class TracksManager extends React.Component {
                     this.state.list.length === 0 ?
                         <UploadHint /> : <antd.Button
                             className="uploadMoreButton"
-                            icon={<Icons.Plus />}
+                            icon={<Icons.FiPlus />}
                         >
                             Add another
                         </antd.Button>

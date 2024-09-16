@@ -4,7 +4,7 @@ import WidgetsManager from "../components/widgetsManager"
 
 export default {
     id: "widgets",
-    icon: "List",
+    icon: "FiList",
     label: "Widgets",
     group: "app",
     render: () => {

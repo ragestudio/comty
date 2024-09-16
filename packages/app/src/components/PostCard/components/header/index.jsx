@@ -21,7 +21,7 @@ const PostCardHeader = (props) => {
                 className="post-header-replied_to"
             >
                 <div className="post-header-replied_to-label">
-                    <Icons.Repeat />
+                    <Icons.FiRepeat />
 
                     <span>
                         Replied to

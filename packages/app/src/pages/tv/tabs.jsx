@@ -4,13 +4,13 @@ export default [
     {
         key: "live",
         label: "Livestreams",
-        icon: "Radio",
+        icon: "FiRadio",
         component: LivestreamsList
     },
     {
         key: "videos",
         label: "Videos",
-        icon: "Video",
+        icon: "FiVideo",
         component: LivestreamsList,
         disabled: true,
     },
@@ -22,13 +22,13 @@ export default [
             {
                 key: "controlPanel.uploads",
                 label: "Uploads",
-                icon: "Upload",
+                icon: "FiUpload",
                 disabled: true
             },
             {
                 key: "controlPanel.streaming_settings",
                 label: "Stream Configuration",
-                icon: "Settings",
+                icon: "FiSettings",
                 disabled: true,
             },
             {

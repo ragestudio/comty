@@ -17,7 +17,7 @@ import "./index.less"
 
 const ResultsTypeDecorators = {
     users: {
-        icon: "Users",
+        icon: "FiUsers",
         label: "Users",
         onClick: (item) => {
             app.navigation.goToAccount(item.username)
@@ -31,7 +31,7 @@ const ResultsTypeDecorators = {
         }
     },
     tracks: {
-        icon: "Album",
+        icon: "FiAlbum",
         label: "Tracks",
         renderItem: (props) => {
             const { item, onClick } = props
@@ -42,7 +42,7 @@ const ResultsTypeDecorators = {
         }
     },
     playlists: {
-        icon: "Album",
+        icon: "FiAlbum",
         label: "Playlists",
         renderItem: (props) => {
             return <div className="suggestion">
@@ -232,7 +232,7 @@ export default (props) => {
             placeholder="Start typing to search..."
             onChange={handleOnSearch}
             value={searchValue}
-            prefix={<Icons.Search />}
+            prefix={<Icons.FiSearch />}
             autoFocus={props.autoFocus ?? false}
             onFocus={props.onFocus}
             onBlur={props.onUnfocus}

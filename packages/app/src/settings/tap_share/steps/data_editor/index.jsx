@@ -80,10 +80,11 @@ export default (props) => {
                     disabled
                 />
             </antd.Form.Item>
+
             <antd.Form.Item
                 name="alias"
                 label={<>
-                    <Icons.Tag />
+                    <Icons.FiTag />
                     Alias
                 </>}
                 rules={[

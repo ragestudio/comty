@@ -154,7 +154,7 @@ export default class PostCard extends React.PureComponent {
 
         return <div className="postCard error">
             <h1>
-                <Icons.AlertTriangle />
+                <Icons.FiAlertTriangle />
                 <span>Cannot render this post</span>
                 <span>
                     Maybe this version of the app is outdated or is not supported yet

@@ -12,7 +12,7 @@ export default class Home extends React.Component {
             extraItems={[
                 {
                     key: "create",
-                    icon: "PlusCircle",
+                    icon: "FiPlusCircle",
                     label: <Translation>{(t) => t("Create")}</Translation>,
                     props: {
                         type: "primary",

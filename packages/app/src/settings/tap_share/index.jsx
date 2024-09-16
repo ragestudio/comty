@@ -164,6 +164,7 @@ class OwnTags extends React.Component {
         loading: true,
         error: null,
         data: null,
+        editorOpen: false,
     }
 
     loadData = async () => {
@@ -193,6 +194,23 @@ class OwnTags extends React.Component {
         })
     }
 
+    handleOpenEditor = (props) => {
+        this.setState({
+            editorOpen: true
+        })
+
+        OpenTagEditor({
+            ...props,
+            onFinish: () => {
+                this.setState({
+                    editorOpen: false
+                })
+
+                this.loadData()
+            }
+        })
+    }
+
     handleTagDelete = (tag) => {
         antd.Modal.confirm({
             title: "Are you sure you want to delete this tag?",
@@ -213,6 +231,10 @@ class OwnTags extends React.Component {
     }
 
     handleTagRead = async (error, tag) => {
+        if (this.state.editorOpen) {
+            return false
+        }
+
         if (error) {
             console.error(error)
             return false
@@ -222,12 +244,12 @@ class OwnTags extends React.Component {
             return ownedTag.serial === tag.serialNumber
         })
 
-        if (!ownedTag && app.layout.drawer.drawersLength() === 0) {
+        if (!ownedTag) {
             app.message.error("This tag is not registered or you don't have permission to edit it.")
             return false
         }
 
-        return OpenTagEditor({
+        return this.handleOpenEditor({
             tag: ownedTag
         })
     }
@@ -243,6 +265,7 @@ class OwnTags extends React.Component {
     }
 
     render() {
+        console.log(this.state)
         if (this.state.loading) {
             return <div className="tap-share-own_tags">
                 <antd.Skeleton />
@@ -268,8 +291,8 @@ class OwnTags extends React.Component {
                         key={tag.serialNumber}
                         tag={tag}
                         onEdit={() => {
-                            OpenTagEditor({
-                                tag
+                            this.handleOpenEditor({
+                                tag: tag
                             })
                         }}
                         onDelete={() => {
@@ -278,15 +301,35 @@ class OwnTags extends React.Component {
                     />
                 })
             }
+
+            {
+                app.isMobile && <antd.Button
+                    type="primary"
+                    icon={<Icons.FiPlus />}
+                    onClick={() => this.handleOpenEditor({})}
+                    className="tap-share-own_tags-add"
+                >
+                    Add new
+                </antd.Button>
+            }
         </div>
     }
 }
 
 const OpenTagEditor = ({ tag, onFinish = () => app.navigation.softReload() } = {}) => {
-    app.layout.drawer.open("tag_register", RegisterNewTag, {
+    if (!app.layout.draggable) {
+        return app.layout.drawer.open("tag_register", RegisterNewTag, {
+            props: {
+                onFinish: onFinish,
+                tagData: tag,
+            }
+        })
+    }
+
+    return app.layout.draggable.open("tag_register", RegisterNewTag, {
         componentProps: {
-            tagData: tag,
             onFinish: onFinish,
+            tagData: tag,
         }
     })
 }
@@ -329,16 +372,6 @@ const TapShareRender = () => {
                 editMode
             />
         </div>
-
-        {
-            app.isMobile && <antd.Button
-                type="primary"
-                icon={<Icons.Plus />}
-                onClick={() => OpenTagEditor()}
-            >
-                Add new
-            </antd.Button>
-        }
     </div>
 }
 

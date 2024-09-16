@@ -12,7 +12,7 @@ export default (props) => {
             type="ghost"
             shape="circle"
             onClick={props.onClick}
-            icon={<Icons.Repeat />}
+            icon={<Icons.FiRepeat />}
         />
         {
             props.count > 0 && <span className="replies_count">{props.count}</span>

@@ -42,8 +42,12 @@
     flex-direction: column;
 
     align-items: center;
-
+    
     gap: 10px;
+
+    .tap-share-own_tags-add {
+        width: 100%;
+    }
 
     .tap-share-own_tags-item {
         display: flex;
@@ -151,13 +155,14 @@
         }
 
         .tap-share-register-header-back {
-            font-size: 5rem;
+            font-size: 2rem;
             color: var(--colorPrimary);
 
             &.hidden {
                 width: 0;
                 height: 0;
                 padding: 0;
+                display: none;
             }
         }
 
@@ -175,17 +180,11 @@
         display: flex;
         flex-direction: column;
 
-        align-items: center;
-        justify-content: center;
-
         height: 100%;
 
         .tap-share-register_step {
             display: flex;
             flex-direction: column;
-
-            justify-content: center;
-            align-items: flex-start;
 
             height: 100%;
             width: 100%;
@@ -194,8 +193,13 @@
 
             transition: all 150ms ease-in-out;
 
+            .adm-input-element {
+                color: var(--text-color);
+            }
+
             h1 {
                 transition: all 150ms ease-in-out;
+                color: var(--text-color);
             }
 
             &.centered {
@@ -236,13 +240,16 @@
                             height: fit-content;
                             padding: 0;
                             margin: 0;
-                        }
 
+                            color: var(--text-color);
+                        }
                     }
 
                     .description {
                         font-size: 0.8rem;
                         opacity: 0.8;
+
+                        color: var(--text-color);
                     }
                 }
             }
@@ -256,6 +263,8 @@
                 gap: 20px;
 
                 padding: 10px;
+
+                color: var(--text-color);
             }
         }
     }

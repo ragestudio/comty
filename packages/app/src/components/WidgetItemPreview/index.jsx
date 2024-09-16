@@ -94,8 +94,8 @@ export default React.memo((props) => {
         <div className="widget_preview_item_actions">
             {
                 installed && <antd.Switch
-                    checkedChildren={<Icons.Eye />}
-                    unCheckedChildren={<Icons.EyeOff />}
+                    checkedChildren={<Icons.FiEye />}
+                    unCheckedChildren={<Icons.FiEyeOff />}
                     onChange={(checked) => {
                         props.onChangeVisible(checked)
                         setVisible(checked)
@@ -105,7 +105,7 @@ export default React.memo((props) => {
             }
 
             <antd.Button
-                icon={installed ? <Icons.MdSync /> : <Icons.Plus />}
+                icon={installed ? <Icons.MdSync /> : <Icons.FiPlus />}
                 onClick={installed ? onUpdate : onInstall}
                 type={installed ? "default" : "primary"}
             />
@@ -113,7 +113,7 @@ export default React.memo((props) => {
             {
                 installed && <antd.Button
                     type="primary"
-                    icon={<Icons.Trash />}
+                    icon={<Icons.FiTrash />}
                     onClick={handleItemRemove}
                     danger
                 />

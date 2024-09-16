@@ -127,9 +127,9 @@ export const UserCard = React.forwardRef((props, ref) => {
         </div>
 
         <div className="description">
-            <h3>
+            <span>
                 {user.description}
-            </h3>
+            </span>
         </div>
 
         {

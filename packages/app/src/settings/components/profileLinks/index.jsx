@@ -104,7 +104,7 @@ export default class ProfileEditor extends React.Component {
                         <Button
                             className="profile_links_field_removebtn"
                             onClick={() => this.remove(index)}
-                            icon={<Icons.Trash />}
+                            icon={<Icons.FiTrash />}
                             shape="circle"
                         />
                     </div>
@@ -113,7 +113,7 @@ export default class ProfileEditor extends React.Component {
 
             <Button
                 onClick={this.add}
-                icon={<Icons.Plus />}
+                icon={<Icons.FiPlus />}
             >
                 Add
             </Button>

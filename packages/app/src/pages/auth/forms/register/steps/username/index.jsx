@@ -155,7 +155,7 @@ export const UsernameStepComponent = (props) => {
 export default {
     key: "username",
     title: "Step 1",
-    icon: "User",
+    icon: "FiUser",
     description: () => <div>
         <p>Enter your username you gonna use for your account, its used to access to your account and give a easy name to identify you.</p>
         <p>You can set a diferent public name for your account after registration.</p>

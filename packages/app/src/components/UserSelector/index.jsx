@@ -16,7 +16,7 @@ const ResultsTypeDecorators = {
         label: "Recent"
     },
     "users": {
-        icon: "Users",
+        icon: "FiUsers",
         label: "Users"
     }
 }
@@ -181,7 +181,7 @@ const UserSelector = (props) => {
             placeholder="Start typing to search..."
             onChange={handleOnSearch}
             value={searchValue}
-            prefix={<Icons.Search />}
+            prefix={<Icons.FiSearch />}
             autoFocus={props.autoFocus ?? false}
             onFocus={props.onFocus}
             onBlur={props.onUnfocus}

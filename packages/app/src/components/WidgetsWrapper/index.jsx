@@ -259,7 +259,7 @@ export default class WidgetsWrapper extends React.Component {
                 activeDragActions={[
                     {
                         id: "settings",
-                        icon: "Settings",
+                        icon: "FiSettings",
                         onClick: () => {
                             app.location.push("/settings?tab=widgets")
                         }

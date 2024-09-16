@@ -227,7 +227,7 @@ export default class Account extends React.Component {
 							{
 								id: "posts",
 								label: "Posts",
-								icon: "BookOpen",
+								icon: "FiBookOpen",
 							},
 							{
 								id: "music",
@@ -237,12 +237,12 @@ export default class Account extends React.Component {
 							{
 								id: "followers",
 								label: "Followers",
-								icon: "Users",
+								icon: "FiUsers",
 							},
 							{
 								id: "details",
 								label: "Details",
-								icon: "Info",
+								icon: "FiInfo",
 							}
 						])}
 					/>

@@ -76,7 +76,7 @@ export default (props) => {
 
     if (followers.length === 0) {
         return <antd.Result
-            icon={<Icons.UserX style={{ fontSize: "50px" }} />}
+            icon={<Icons.FiUserX style={{ fontSize: "50px" }} />}
         >
             <h2>
                 It's seems this user has no followers, yet.

@@ -32,7 +32,7 @@ const DeviceIcon = (props) => {
             return <FirefoxIcon />
         }
         default: {
-            return <Icons.Globe />
+            return <Icons.FiGlobe />
         }
     }
 }
@@ -86,12 +86,12 @@ const SessionItem = (props) => {
             <antd.Badge dot={isCurrentSession}>
                 <div className="security_sessions_list_item_info">
                     <div className="security_sessions_list_item_title">
-                        <h3><Icons.Tag /> {session.session_uuid}</h3>
+                        <h3><Icons.FiTag /> {session.session_uuid}</h3>
                     </div>
 
                     <div className="security_sessions_list_item_info_details">
                         <div className="security_sessions_list_item_info_details_item">
-                            <Icons.Clock />
+                            <Icons.FiClock />
 
                             <span>
                                 {moment(session.date).format("DD/MM/YYYY HH:mm")}
@@ -130,7 +130,7 @@ const SessionItem = (props) => {
 
             {
                 ua.device.vendor && <div className="security_sessions_list_item_info_details_item">
-                    <Icons.Cpu />
+                    <Icons.FiCpu />
 
                     <span>
                         {ua.device.vendor} | {ua.device.model}

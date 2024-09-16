@@ -19,7 +19,7 @@ import "./index.mobile.less"
 const Tabs = [
     {
         key: "posts",
-        icon: "BookOpen",
+        icon: "FiBookOpen",
         label: <Translation>
             {t => t("Posts")}
         </Translation>,
@@ -27,7 +27,7 @@ const Tabs = [
     },
     {
         key: "followers",
-        icon: "Users",
+        icon: "FiUsers",
         label: <Translation>
             {t => t("Followers")}
         </Translation>,
@@ -35,7 +35,7 @@ const Tabs = [
     },
     {
         key: "details",
-        icon: "Info",
+        icon: "FiInfo",
         label: <Translation>
             {t => t("Details")}
         </Translation>,

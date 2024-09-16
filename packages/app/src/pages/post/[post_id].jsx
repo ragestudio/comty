@@ -44,7 +44,7 @@ const PostPage = (props) => {
 
         {
             !!result.hasReplies && <div className="post-page-replies">
-                <h1><Icons.Repeat />Replies</h1>
+                <h1><Icons.FiRepeat />Replies</h1>
 
                 <PostsList
                     disableReplyTag

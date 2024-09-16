@@ -6,7 +6,7 @@ export default [
     {
         key: "explore",
         label: "Explore",
-        icon: "Compass",
+        icon: "FiCompass",
         component: ExploreTab
     },
     {
@@ -24,7 +24,7 @@ export default [
     {
         key: "radio",
         label: "Radio",
-        icon: "Radio",
+        icon: "FiRadio",
         disabled: true
     },
 ]

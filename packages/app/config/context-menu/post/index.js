@@ -5,7 +5,7 @@ export default {
     "post-card": (items, parent, element, control) => {
         items.push({
             label: "Copy ID",
-            icon: "Copy",
+            icon: "FiCopy",
             action: () => {
                 copyToClipboard(parent.id)
                 control.close()
@@ -14,7 +14,7 @@ export default {
 
         items.push({
             label: "Copy Link",
-            icon: "Link",
+            icon: "FiLink",
             action: () => {
                 copyToClipboard(`${window.location.origin}/post/${parent.id}`)
                 control.close()
@@ -39,7 +39,7 @@ export default {
 
             items.push({
                 label: "Copy media URL",
-                icon: "Copy",
+                icon: "FiCopy",
                 action: () => {
                     copyToClipboard(media.src)
                     control.close()
@@ -48,7 +48,7 @@ export default {
 
             items.push({
                 label: "Open media in new tab",
-                icon: "ExternalLink",
+                icon: "FiExternalLink",
                 action: () => {
                     window.open(media.src, "_blank")
                     control.close()
@@ -57,7 +57,7 @@ export default {
 
             items.push({
                 label: "Download media",
-                icon: "Download",
+                icon: "FiDownload",
                 action: () => {
                     download(media.src)
                     control.close()

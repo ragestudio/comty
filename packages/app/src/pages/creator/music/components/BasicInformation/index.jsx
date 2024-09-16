@@ -106,7 +106,7 @@ export default (props) => {
 
             <div className="field">
                 <div className="field_header">
-                    <Icons.Eye />
+                    <Icons.FiEye />
                     <span>Visibility</span>
                 </div>
 

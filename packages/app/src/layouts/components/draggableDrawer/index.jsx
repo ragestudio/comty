@@ -1,6 +1,9 @@
 import React from "react"
 import { Drawer } from "vaul"
 
+import {createIconRender} from "@components/Icons"
+import { Translation } from "react-i18next"
+
 import "./index.less"
 
 export class DraggableDrawerController extends React.Component {
@@ -10,6 +13,7 @@ export class DraggableDrawerController extends React.Component {
         this.interface = {
             open: this.open,
             close: this.close,
+            actions: this.actions,
         }
 
         this.state = {
@@ -31,6 +35,16 @@ export class DraggableDrawerController extends React.Component {
         }
 
         this.destroy(drawer.id)
+    }
+
+    actions = (data) => {
+        const win = this.open("actions-menu", ActionsComponent, {
+            componentProps: {
+                ...data,
+            }
+        })
+
+        return win
     }
 
     open = (id, render, options = {}) => {
@@ -59,7 +73,10 @@ export class DraggableDrawerController extends React.Component {
             drawers: [...this.state.drawers, drawerObj],
         })
 
-        return true
+        return {
+            ...drawerObj,
+            close: () => this.destroy(id),
+        }
     }
 
     destroy = (id) => {
@@ -136,4 +153,26 @@ export const DraggableDrawer = (props) => {
             </Drawer.Content>
         </Drawer.Portal>
     </Drawer.Root>
+}
+
+const ActionsComponent = (props) => {
+    console.log(props)
+    return <div
+        className="app-drawer-actions"
+    >
+        {
+            props.list.map((action) => {
+                return <div
+                    key={action.id}
+                    className="app-drawer-action"
+                    onClick={() => {
+                        action.onClick()
+                    }}
+                >
+                    {createIconRender(action.icon)}
+                    <span><Translation>{t => t(action.label)}</Translation></span>
+                </div>
+            })
+        }
+    </div>
 }

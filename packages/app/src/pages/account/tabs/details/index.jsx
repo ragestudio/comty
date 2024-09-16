@@ -88,7 +88,7 @@ export default (props) => {
         <div className="inline_field">
             <div className="field_header">
                 <div className="field_icon">
-                    <Icons.Users />
+                    <Icons.FiUsers />
                 </div>
 
                 <span>
@@ -106,7 +106,7 @@ export default (props) => {
         <div className="inline_field">
             <div className="field_header">
                 <div className="field_icon">
-                    <Icons.Calendar />
+                    <Icons.FiCalendar />
                 </div>
 
                 <span>
@@ -122,7 +122,7 @@ export default (props) => {
                 header={<>
                     <div className="field_header">
                         <div className="field_icon">
-                            <Icons.Award />
+                            <Icons.FiAward />
                         </div>
 
                         <span>

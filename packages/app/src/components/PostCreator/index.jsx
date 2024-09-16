@@ -399,7 +399,7 @@ export default class PostCreator extends React.Component {
                     >
                         <antd.Button
                             type="link"
-                            icon={<Icons.Trash />}
+                            icon={<Icons.FiTrash />}
                         />
                     </antd.Popconfirm>
                 }
@@ -583,7 +583,7 @@ export default class PostCreator extends React.Component {
                         type="primary"
                         disabled={loading || !this.canSubmit()}
                         onClick={this.debounceSubmit}
-                        icon={loading ? <Icons.LoadingOutlined spin /> : (editMode ? <Icons.MdEdit /> : <Icons.Send />)}
+                        icon={loading ? <Icons.LoadingOutlined spin /> : (editMode ? <Icons.MdEdit /> : <Icons.FiSend />)}
                     />
                 </div>
             </div>
@@ -619,12 +619,12 @@ export default class PostCreator extends React.Component {
                 <antd.Button
                     type="ghost"
                     onClick={this.handleUploadClick}
-                    icon={<Icons.Upload />}
+                    icon={<Icons.FiUpload />}
                 />
 
                 <antd.Button
                     type="ghost"
-                    icon={<Icons.MdPoll />}
+                    icon={<Icons.FiMdPoll />}
                     onClick={this.handleAddPoll}
                 />
             </div>

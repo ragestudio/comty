@@ -141,7 +141,7 @@ export const DragActiveActions = ({
         <Button
             type="primary"
             size="small"
-            icon={<Icons.Check />}
+            icon={<Icons.FiCheck />}
             onClick={() => setActiveDrag(false)}
         />
 

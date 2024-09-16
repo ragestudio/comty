@@ -28,7 +28,7 @@ export default () => {
             <div className="spacesExplorer_header_actions">
                 <antd.Button
                     type="primary"
-                    icon={<Icons.PlusCircle />}
+                    icon={<Icons.FiPlusCircle />}
                 >
                     Create
                 </antd.Button>

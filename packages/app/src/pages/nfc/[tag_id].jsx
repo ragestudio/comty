@@ -18,8 +18,6 @@ export default (props) => {
             return false
         }
 
-        console.log(result)
-
         switch (result.behavior.type) {
             case "url": {
                 return window.location.href = result.behavior.value

@@ -5,7 +5,7 @@ import VerifiedBadge from "./customIcons/verifiedBadge"
 import Crown from "./customIcons/crown"
 
 // import icons lib
-import * as lib1 from "feather-reactjs"
+import * as lib1 from "react-icons/fi"
 import * as lib2 from "@ant-design/icons"
 import * as lib3 from "react-icons/md"
 import * as lib4 from "react-icons/io"

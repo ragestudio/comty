@@ -22,7 +22,7 @@ export default {
     ],
     footer: () => {
         return <div className="reminder">
-            <Icons.Info /> Take a look to our <a href="/privacy" target="_blank">privacy policy</a>.
+            <Icons.FiInfo /> Take a look to our <a href="/privacy" target="_blank">privacy policy</a>.
         </div>
     }
 }

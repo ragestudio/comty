@@ -12,13 +12,13 @@ export default [
     {
         key: "global",
         label: "Global",
-        icon: "Globe",
+        icon: "FiGlobe",
         component: GlobalTab
     },
     {
         key: "savedPosts",
         label: "Saved posts",
-        icon: "Bookmark",
+        icon: "FiBookmark",
         component: SavedPostsTab
     }
 ]

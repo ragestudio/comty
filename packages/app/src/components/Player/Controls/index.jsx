@@ -57,7 +57,7 @@ const Controls = (props) => {
             <antd.Button
                 type="ghost"
                 shape="round"
-                icon={<Icons.ChevronLeft />}
+                icon={<Icons.FiChevronLeft />}
                 onClick={() => handleAction("previous")}
                 disabled={ctx.control_locked}
             />
@@ -81,7 +81,7 @@ const Controls = (props) => {
             <antd.Button
                 type="ghost"
                 shape="round"
-                icon={<Icons.ChevronRight />}
+                icon={<Icons.FiChevronRight />}
                 onClick={() => handleAction("next")}
                 disabled={ctx.control_locked}
             />
@@ -108,8 +108,8 @@ const Controls = (props) => {
                     >
                         {
                             ctx.muted
-                                ? <Icons.VolumeX />
-                                : <Icons.Volume2 />
+                                ? <Icons.FiVolumeX />
+                                : <Icons.FiVolume2 />
                         }
                     </button>
                 </antd.Popover>

@@ -16,7 +16,7 @@ const MusicStudioPage = (props) => {
 
             <antd.Button
                 type="primary"
-                icon={<Icons.PlusCircle />}
+                icon={<Icons.FiPlusCircle />}
                 onClick={() => {
                     app.location.push("/studio/music/new")
                 }}

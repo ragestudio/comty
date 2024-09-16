@@ -38,7 +38,7 @@ export default (props) => {
         </div>
 
         <div className="indicator">
-            <Icons.Target /> <span>Featured event</span>
+            <Icons.FiTarget /> <span>Featured event</span>
         </div>
     </div>
 }

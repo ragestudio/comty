@@ -148,7 +148,7 @@ const ReleaseEditor = (props) => {
                             {
                                 customPage.props?.onSave && <antd.Button
                                     type="primary"
-                                    icon={<Icons.Save />}
+                                    icon={<Icons.FiSave />}
                                     onClick={() => customPage.props.onSave()}
                                 >
                                     Save
@@ -179,7 +179,7 @@ const ReleaseEditor = (props) => {
                             <antd.Button
                                 type="primary"
                                 onClick={handleSubmit}
-                                icon={<Icons.Save />}
+                                icon={<Icons.FiSave />}
                                 disabled={submitting || loading || !canFinish()}
                                 loading={submitting}
                             >

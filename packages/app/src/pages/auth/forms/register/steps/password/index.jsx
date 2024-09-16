@@ -118,7 +118,7 @@ export const PasswordStepComponent = (props) => {
 export default {
     key: "password",
     title: "Step 2",
-    icon: "Key",
+    icon: "FiKey",
     description: "Enter a password for the account. must comply with the password requirements policy.",
     required: true,
     content: PasswordStepComponent,

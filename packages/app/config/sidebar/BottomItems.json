@@ -2,23 +2,23 @@
     {
         "id": "search",
         "label": "Search",
-        "icon": "Search"
+        "icon": "FiSearch"
     },
     {
         "id": "messages",
         "label": "Messages",
-        "icon": "MessageCircle",
+        "icon": "FiMessageCircle",
         "path": "/messages"
     },
     {
         "id": "notifications",
         "label": "Notifications",
-        "icon": "Bell"
+        "icon": "FiBell"
     },
     {
         "id": "settings",
         "label": "Settings",
-        "icon": "Settings",
+        "icon": "FiSettings",
         "path": "/settings"
     }
 ]

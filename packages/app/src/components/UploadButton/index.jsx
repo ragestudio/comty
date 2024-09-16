@@ -93,7 +93,7 @@ export default (props) => {
     >
         <div className="uploadButton-content">
             {
-                !progess && (props.icon ?? <Icons.Upload
+                !progess && (props.icon ?? <Icons.FiUpload
                     style={{
                         margin: 0
                     }}

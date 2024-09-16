@@ -22,7 +22,7 @@ const ActionMenuItems = [
 	{
 		key: "profile",
 		label: <>
-			<Icons.User />
+			<Icons.FiUser />
 			<Translation>
 				{t => t("Profile")}
 			</Translation>
@@ -40,7 +40,7 @@ const ActionMenuItems = [
 	{
 		key: "addons",
 		label: <>
-			<Icons.Box />
+			<Icons.FiBox />
 			<Translation>
 				{t => t("Addons")}
 			</Translation>
@@ -61,7 +61,7 @@ const ActionMenuItems = [
 	{
 		key: "logout",
 		label: <>
-			<Icons.LogOut />
+			<Icons.FiLogOut />
 			<Translation>
 				{t => t("Logout")}
 			</Translation>
@@ -267,7 +267,7 @@ export default class Sidebar extends React.Component {
 				label: <Translation>
 					{t => t("Login")}
 				</Translation>,
-				icon: <Icons.LogIn />,
+				icon: <Icons.FiLogIn />,
 			})
 		}
 

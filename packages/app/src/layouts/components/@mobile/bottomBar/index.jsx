@@ -1,7 +1,6 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { ActionSheet } from "antd-mobile"
 import { Motion, spring } from "react-motion"
 
 import { Icons, createIconRender } from "@components/Icons"
@@ -63,7 +62,7 @@ const PlayerButton = (props) => {
 
 const AccountButton = React.forwardRef((props, ref) => {
     const user = app.userData
-    const ActionSheetRef = React.useRef()
+    const ActionMenu = React.useRef()
 
     const handleClick = () => {
         if (!user) {
@@ -74,31 +73,34 @@ const AccountButton = React.forwardRef((props, ref) => {
     }
 
     const handleHold = () => {
-        ActionSheetRef.current = ActionSheet.show({
-            actions: [
+        ActionMenu.current = app.layout.draggable.actions({
+            list: [
                 {
                     key: "settings",
-                    text: <><Icons.Settings /> <span>Settings</span></>,
+                    icon: "FiSettings",
+                    label: "Settings",
                     onClick: () => {
                         app.navigation.goToSettings()
-                        ActionSheetRef.current.close()
+                        ActionMenu.current.close()
                     }
                 },
                 {
                     key: "account",
-                    text: <><Icons.User /> <span>Account</span></>,
+                    icon: "FiUser",
+                    label: "Account",
                     onClick: () => {
                         app.navigation.goToAccount()
-                        ActionSheetRef.current.close()
+                        ActionMenu.current.close()
                     }
                 },
                 {
                     key: "logout",
-                    text: <><Icons.MdOutlineLogout /> <span>Logout</span></>,
+                    icon: "FiLogOut",
+                    label: "Logout",
                     danger: true,
                     onClick: () => {
                         app.eventBus.emit("app.logout_request")
-                        ActionSheetRef.current.close()
+                        ActionMenu.current.close()
                     }
                 }
             ]
@@ -116,7 +118,7 @@ const AccountButton = React.forwardRef((props, ref) => {
     >
         <div className="icon">
             {
-                user ? <antd.Avatar shape="square" src={app.userData.avatar} /> : createIconRender("Login")
+                user ? <antd.Avatar shape="square" src={app.userData.avatar} /> : createIconRender("FiLogin")
             }
         </div>
     </div>
@@ -365,7 +367,7 @@ export class BottomBar extends React.Component {
                                     onClick={openCreator}
                                 >
                                     <div className="icon">
-                                        {createIconRender("PlusCircle")}
+                                        {createIconRender("FiPlusCircle")}
                                     </div>
                                 </div>
 
@@ -395,7 +397,7 @@ export class BottomBar extends React.Component {
                                     }}
                                 >
                                     <div className="icon">
-                                        {createIconRender("Home")}
+                                        {createIconRender("FiHome")}
                                     </div>
                                 </div>
 
@@ -406,7 +408,7 @@ export class BottomBar extends React.Component {
                                     onClick={app.controls.openSearcher}
                                 >
                                     <div className="icon">
-                                        {createIconRender("Search")}
+                                        {createIconRender("FiSearch")}
                                     </div>
                                 </div>
 

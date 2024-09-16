@@ -168,7 +168,7 @@ const ChatPage = (props) => {
                 />
                 <antd.Button
                     type="primary"
-                    icon={<Icons.Send />}
+                    icon={<Icons.FiSend />}
                     onClick={submitMessage}
                 />
             </div>

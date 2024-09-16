@@ -2,7 +2,7 @@ import loadable from "@loadable/component"
 
 export default {
     id: "security",
-    icon: "Shield",
+    icon: "FiShield",
     label: "Security",
     group: "basic",
     settings: [
@@ -11,7 +11,7 @@ export default {
             group: "security.account",
             title: "Change Password",
             description: "Change your password",
-            icon: "Lock",
+            icon: "FiLock",
             component: loadable(() => import("../components/changePassword")),
         },
         {
@@ -30,7 +30,7 @@ export default {
             group: "security.account",
             title: "Sessions",
             description: "Manage your active sessions",
-            icon: "Monitor",
+            icon: "FiMonitor",
             component: loadable(() => import("../components/sessions")),
         }
     ]

@@ -53,7 +53,7 @@ export const WidgetBrowser = (props) => {
             placeholder="Start typing to search..."
             onChange={handleOnSearch}
             value={searchValue}
-            prefix={<Icons.Search />}
+            prefix={<Icons.FiSearch />}
             autoFocus
         />
 

@@ -11,7 +11,7 @@ const steps = [
     {
         key: "username",
         title: "Step 1",
-        icon: "User",
+        icon: "FiUser",
         description: () => <div>
             <p>Enter your username you gonna use for your account, its used to access to your account.</p>
             <p>It must be unique, on lower case, and contain only accepted characters as letters, numbers, underscores.</p>
@@ -141,7 +141,7 @@ const steps = [
     {
         key: "password",
         title: "Step 2",
-        icon: "Key",
+        icon: "FiKey",
         description: "Enter a password for the account. must comply with the password requirements policy.",
         required: true,
         content: (props) => {
@@ -256,7 +256,7 @@ const steps = [
     {
         key: "email",
         title: "Step 3",
-        icon: "Mail",
+        icon: "FiMail",
         description: "Enter a email for the account",
         required: true,
         content: (props) => {

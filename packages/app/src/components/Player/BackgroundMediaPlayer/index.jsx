@@ -173,7 +173,7 @@ export class BackgroundMediaPlayer extends React.Component {
                     size="small"
                     shape="rounded"
                     type="ghost"
-                    icon={<Icons.ChevronRight />}
+                    icon={<Icons.FiChevronRight />}
                     onClick={app.cores.player.playback.next}
                 />
 
@@ -181,7 +181,7 @@ export class BackgroundMediaPlayer extends React.Component {
                     size="small"
                     shape="rounded"
                     type="ghost"
-                    icon={<Icons.Minimize />}
+                    icon={<Icons.FiMinimize />}
                     onClick={this.onClickMinimize}
                 />
             </div>

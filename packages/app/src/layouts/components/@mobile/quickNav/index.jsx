@@ -11,7 +11,7 @@ export const QuickNavMenuItems = [
     },
     {
         id: "tv",
-        icon: "Tv",
+        icon: "FiTv",
         label: "Tv",
         location: "/tv"
     },
@@ -24,7 +24,7 @@ export const QuickNavMenuItems = [
     },
     {
         id: "marketplace",
-        icon: "Box",
+        icon: "FiBox",
         label: "Marketplace",
         location: "/marketplace",
         disabled: true

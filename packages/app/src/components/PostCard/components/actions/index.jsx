@@ -14,14 +14,14 @@ const SelfActionsItems = [
     {
         key: "onClickEdit",
         label: <>
-            <Icons.Edit />
+            <Icons.FiEdit />
             <span>Edit</span>
         </>,
     },
     {
         key: "onClickDelete",
         label: <>
-            <Icons.Trash />
+            <Icons.FiTrash />
             <span>Delete</span>
         </>,
     },
@@ -41,7 +41,7 @@ const MoreActionsItems = [
     {
         key: "onClickShare",
         label: <>
-            <Icons.Share />
+            <Icons.FiShare />
             <span>Share</span>
         </>,
     },
@@ -51,7 +51,7 @@ const MoreActionsItems = [
     {
         key: "onClickReport",
         label: <>
-            <Icons.AlertTriangle />
+            <Icons.FiAlertTriangle />
             <span>Report</span>
         </>,
     },
@@ -122,7 +122,7 @@ export default (props) => {
                     }}
                 >
                     <div className="icon">
-                        <Icons.MoreHorizontal />
+                        <Icons.FiMoreHorizontal />
                     </div>
                 </Dropdown>
             </div>

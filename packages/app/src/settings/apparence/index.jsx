@@ -6,7 +6,7 @@ import "./index.less"
 
 export default {
     id: "apparence",
-    icon: "Eye",
+    icon: "FiEye",
     label: "Apparence",
     group: "app",
     order: 1,
@@ -14,7 +14,7 @@ export default {
         {
             id: "style:variant_mode",
             group: "aspect",
-            icon: "Moon",
+            icon: "FiMoon",
             title: "Theme",
             description: "Change the theme of the application.",
             component: loadable(() => import("../components/themeVariantSelector")),
@@ -135,7 +135,7 @@ export default {
             extraActions: [
                 {
                     id: "delete",
-                    icon: "Delete",
+                    icon: "FiDelete",
                     title: "Remove",
                     onClick: (ctx) => {
                         return ctx.dispatchUpdate("")

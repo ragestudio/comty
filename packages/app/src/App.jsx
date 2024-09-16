@@ -14,6 +14,8 @@ import { StatusBar, Style } from "@capacitor/status-bar"
 import { App as CapacitorApp } from "@capacitor/app"
 import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
+import AppsMenu from "@components/AppMenu"
+
 import AuthModel from "@models/auth"
 import SessionModel from "@models/session"
 import UserModel from "@models/user"
@@ -118,6 +120,9 @@ class ComtyApp extends React.Component {
 						}
 					}
 				})
+			},
+			openAppsMenu: () => {
+				app.layout.drawer.open("apps", AppsMenu)
 			},
 			openRegisterForm: async (options = {}) => {
 				app.layout.drawer.open("Register", UserRegister, {
@@ -371,6 +376,10 @@ class ComtyApp extends React.Component {
 	}
 
 	initialization = async () => {
+		// await new Promise((resolve) => {
+		// 	setTimeout(resolve, 8000)
+		// })
+
 		app.eventBus.emit("app.initialization.start")
 
 		console.debug(`[App] Initializing app`)

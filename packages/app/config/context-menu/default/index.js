@@ -5,7 +5,7 @@ export default {
         if (text) {
             items.push({
                 label: "Copy",
-                icon: "Copy",
+                icon: "FiCopy",
                 action: (clickedItem, ctx) => {
                     copyToClipboard(text)
 
@@ -16,7 +16,7 @@ export default {
 
         items.push({
             label: "Paste",
-            icon: "Clipboard",
+            icon: "FiClipboard",
             action: (clickedItem, ctx) => {
                 app.message.error("This action is not supported by your browser")
 
@@ -26,7 +26,7 @@ export default {
 
         items.push({
             label: "Report a bug",
-            icon: "AlertTriangle",
+            icon: "FiAlertTriangle",
             action: (clickedItem, ctx) => {
                 app.eventBus.emit("app.reportBug", {
                     clickedItem,

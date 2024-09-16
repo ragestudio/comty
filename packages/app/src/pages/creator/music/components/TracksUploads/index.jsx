@@ -91,7 +91,7 @@ const FileItemEditor = (props) => {
 
         <div className="fileItemEditor_field">
             <div className="fileItemEditor_field_header">
-                <Icons.User />
+                <Icons.FiUser />
                 <span>Artist</span>
             </div>
 
@@ -173,7 +173,7 @@ const FileItemEditor = (props) => {
 
         <div className="fileItemEditor_field">
             <div className="fileItemEditor_field_header">
-                <Icons.Tag />
+                <Icons.FiTag />
                 <span>Spotify ID</span>
             </div>
 
@@ -378,7 +378,7 @@ export default (props) => {
                     props.fileList.length === 0 ?
                         <UploadHint /> : <antd.Button
                             className="uploadMoreButton"
-                            icon={<Icons.Plus />}
+                            icon={<Icons.FiPlus />}
                         />
                 }
             </antd.Upload>

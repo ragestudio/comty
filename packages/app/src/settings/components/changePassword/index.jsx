@@ -69,7 +69,7 @@ const ChangePasswordComponent = (props) => {
 
     return <div className="changePasswordPrompt">
         <div className="title">
-            <h1><Icons.Lock />Change Password</h1>
+            <h1><Icons.FiLock />Change Password</h1>
         </div>
 
         <div className="form">

@@ -71,7 +71,7 @@ const PostList = React.forwardRef((props, ref) => {
                     shape="round"
                     onClick={props.onResumeRealtimeUpdates}
                     loading={props.resumingLoading}
-                    icon={<Icons.SyncOutlined />}
+                    icon={<Icons.FiSyncOutlined />}
                 >
                     Resume
                 </antd.Button>

@@ -73,7 +73,7 @@ export default {
         {
             id: "player.compressor.values",
             title: "Compression",
-            icon: "Sliders",
+            icon: "FiSliders",
             group: "general",
             description: "Adjust compression values (Warning: may cause distortion when changing values)",
             experimental: true,
