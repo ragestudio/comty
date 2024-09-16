@@ -8,6 +8,10 @@ const allowedUpdateFields = [
     "icon",
 ]
 
+function buildEndpoint(id) {
+    return `${process.env.NFC_TAG_ENDPOINT}/${id}/execute`
+}
+
 export default {
     middlewares: ["withAuthentication"],
     fn: async (req, res) => {
@@ -27,7 +31,7 @@ export default {
                 active: req.body.active,
             })
 
-            tag.endpoint_url = `${process.env.NFC_TAG_ENDPOINT}/${tag._id.toString()}`
+            tag.endpoint_url = buildEndpoint(tag._id.toString())
 
             await tag.save()
         } else {
@@ -43,7 +47,7 @@ export default {
 
             let newData = {}
 
-            tag.endpoint_url = `${process.env.NFC_TAG_ENDPOINT}/${tag._id.toString()}`
+            tag.endpoint_url = buildEndpoint(tag._id.toString())
             newData.endpoint_url = tag.endpoint_url
 
             for (let field of allowedUpdateFields) {
@@ -57,6 +61,8 @@ export default {
                 }, newData)
             }
         }
+
+        console.log(tag)
 
         return tag
     }
