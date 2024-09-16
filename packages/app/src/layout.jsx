@@ -90,6 +90,9 @@ export default class Layout extends React.PureComponent {
 		toggleCenteredContent: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname("centered-content", to)
 		},
+		toggleRootScaleEffect: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("root-scale-effect", to)
+		},
 		toggleMobileStyle: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname("mobile", to)
 		},

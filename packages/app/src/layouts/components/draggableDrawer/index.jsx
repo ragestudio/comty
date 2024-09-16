@@ -1,8 +1,7 @@
 import React from "react"
 import { Drawer } from "vaul"
 
-import {createIconRender} from "@components/Icons"
-import { Translation } from "react-i18next"
+import ActionsMenu from "../@mobile/actionsMenu"
 
 import "./index.less"
 
@@ -38,7 +37,7 @@ export class DraggableDrawerController extends React.Component {
     }
 
     actions = (data) => {
-        const win = this.open("actions-menu", ActionsComponent, {
+        const win = this.open("actions-menu", ActionsMenu, {
             componentProps: {
                 ...data,
             }
@@ -57,6 +56,7 @@ export class DraggableDrawerController extends React.Component {
         const win = app.cores.window_mng.render(
             id,
             <DraggableDrawer
+                options={options}
                 onClosed={() => this.handleDrawerOnClosed(drawerObj)}
             >
                 {
@@ -103,6 +103,14 @@ export class DraggableDrawerController extends React.Component {
         app.cores.window_mng.close(drawer.winId)
     }
 
+    componentDidUpdate() {
+        if (this.state.drawers.length === 0) {
+            app.layout.toggleRootScaleEffect(false)
+        } else {
+            app.layout.toggleRootScaleEffect(true)
+        }
+    }
+
     render() {
         return null
     }
@@ -145,6 +153,13 @@ export const DraggableDrawer = (props) => {
                 <Drawer.Handle
                     className="app-drawer-handle"
                 />
+
+                <Drawer.Title
+                    className="app-drawer-title"
+                >
+                    {props.options?.title ?? "Drawer Title"}
+                </Drawer.Title>
+
                 {
                     React.cloneElement(props.children, {
                         close: () => setIsOpen(false),
@@ -153,26 +168,4 @@ export const DraggableDrawer = (props) => {
             </Drawer.Content>
         </Drawer.Portal>
     </Drawer.Root>
-}
-
-const ActionsComponent = (props) => {
-    console.log(props)
-    return <div
-        className="app-drawer-actions"
-    >
-        {
-            props.list.map((action) => {
-                return <div
-                    key={action.id}
-                    className="app-drawer-action"
-                    onClick={() => {
-                        action.onClick()
-                    }}
-                >
-                    {createIconRender(action.icon)}
-                    <span><Translation>{t => t(action.label)}</Translation></span>
-                </div>
-            })
-        }
-    </div>
 }

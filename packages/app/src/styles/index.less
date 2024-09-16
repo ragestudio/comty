@@ -70,6 +70,8 @@ a {
 	padding: 0;
 	margin: 0;
 
+	transition: all 150ms ease-in-out;
+
 	&.electron {
 		.ant-layout-sider {
 			padding-top: 0px;
@@ -145,6 +147,15 @@ html {
 
 	-webkit-overflow-scrolling: touch;
 
+	&.root-scale-effect {
+		background-color: black !important;
+
+		#root {
+			animation: rootScaleOut 250ms ease-in-out forwards;
+			animation-delay: 0;
+		}
+	}
+
 	&.centered-content {
 		.content_layout {
 			margin: 0 auto;
@@ -191,7 +202,6 @@ span {
 
 svg {
 	color: currentColor;
-	margin-right: 10px;
 	vertical-align: -0.125em;
 }
 
@@ -356,4 +366,17 @@ svg {
 	border-radius: 12px;
 
 	gap: 10px;
+}
+
+@keyframes rootScaleOut {
+	0% {
+		transform: scale(1);
+	}
+
+	100% {
+		border-radius: 24px;
+		transform: perspective(1000px) scale(0.99);
+		box-shadow: 0 0 500px 10px var(--colorPrimary);
+		overflow: hidden;
+	}
 }
