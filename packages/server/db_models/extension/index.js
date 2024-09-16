@@ -2,6 +2,10 @@ export default {
     name: "Extension",
     collection: "extensions",
     schema: {
+        version: {
+            type: String,
+            required: true
+        },
         title: {
             type: String,
             default: "Untitled"
@@ -14,17 +18,9 @@ export default {
             type: String,
             default: "https://placehold.co/400x400"
         },
-        distURL: {
-            type: String,
-            required: true,
-        },
-        createdAt: {
+        created_at: {
             type: Date,
             required: true,
-        },
-        version: {
-            type: String,
-            required: true
         },
         experimental: {
             type: Boolean,
