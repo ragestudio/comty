@@ -5,7 +5,9 @@
 /**/**/server.registry
 /**/**/.ssl
 
+# Temporal
 /**/**/_shared
+/**/**/_research
 
 # Trash
 /**/**/*.log
