@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import { FFmpeg } from "@ffmpeg/ffmpeg"
 import { fetchFile, toBlobURL } from "@ffmpeg/util"
 import isURL from "@utils/isURL"

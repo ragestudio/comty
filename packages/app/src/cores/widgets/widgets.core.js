@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import store from "store"
 
 export default class WidgetsCore extends Core {

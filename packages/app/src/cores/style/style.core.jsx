@@ -1,5 +1,5 @@
 import React from "react"
-import Core from "evite/src/core"
+import { Core } from "vessel"
 
 import { ConfigProvider, theme } from "antd"
 import store from "store"

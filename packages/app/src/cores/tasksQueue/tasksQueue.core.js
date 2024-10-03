@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import { Observable } from "object-observer"
 
 export default class TasksQueue extends Core {

@@ -1,4 +1,4 @@
-import EventBus from "evite/src/internals/eventBus"
+import { EventBus } from "vessel"
 import SessionModel from "@models/session"
 
 export default class ChunkedUpload {

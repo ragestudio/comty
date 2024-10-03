@@ -1,6 +1,6 @@
 import React from "react"
-import Core from "evite/src/core"
-import EventEmitter from "evite/src/internals/EventEmitter"
+
+import { Core, EventBus } from "vessel"
 
 import ContextMenu from "./components/contextMenu"
 
@@ -15,7 +15,7 @@ export default class ContextMenuCore extends Core {
         ...PostCardContext,
     }
 
-    eventBus = new EventEmitter()
+    eventBus = new EventBus()
 
     async onInitialize() {
         if (app.isMobile) {

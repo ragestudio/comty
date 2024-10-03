@@ -1,5 +1,4 @@
-import Core from "evite/src/core"
-import EventEmitter from "evite/src/internals/EventEmitter"
+import { Core, EventBus } from "vessel"
 import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
 
@@ -46,7 +45,7 @@ export default class Player extends Core {
 
     audioProcessors = []
 
-    eventBus = new EventEmitter()
+    eventBus = new EventBus()
 
     fac = new FastAverageColor()
 
@@ -765,7 +764,7 @@ export default class Player extends Core {
             return false
         }
 
-        
+
         // if time is provided, seek to that time
         if (typeof time === "number") {
             this.console.log(`Seeking to ${time} | Duration: ${this.track_instance.media.duration}`)

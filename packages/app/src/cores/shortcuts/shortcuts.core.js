@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 
 export default class ShortcutsCore extends Core {
     static namespace = "shortcuts"

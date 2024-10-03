@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import TapShareDialog from "@components/TapShare/Dialog"
 
 const RecordTypes = {

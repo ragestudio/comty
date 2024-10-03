@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import SyncModel from "comty.js/models/sync"
 
 export default class SyncCore extends Core {

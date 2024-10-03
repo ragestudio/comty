@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 
 import ChunkedUpload from "./chunkedUpload"
 

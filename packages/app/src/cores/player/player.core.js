@@ -1,5 +1,4 @@
-import Core from "evite/src/core"
-import EventEmitter from "evite/src/internals/EventEmitter"
+import { Core, EventBus } from "vessel"
 import { Observable } from "object-observer"
 import { FastAverageColor } from "fast-average-color"
 
@@ -45,7 +44,7 @@ export default class Player extends Core {
 
     audioProcessors = []
 
-    eventBus = new EventEmitter()
+    eventBus = new EventBus()
 
     fac = new FastAverageColor()
 
@@ -385,7 +384,7 @@ export default class Player extends Core {
 
         this.track_instance.audio.muted = this.state.muted
         this.track_instance.audio.loop = this.state.playback_mode === "repeat"
-        
+
         this.track_instance.gainNode.gain.value = this.state.volume
 
         // try to preload next audio

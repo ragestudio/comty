@@ -1,4 +1,4 @@
-import Core from "evite/src/core"
+import { Core } from "vessel"
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 
