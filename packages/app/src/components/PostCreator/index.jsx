@@ -35,6 +35,8 @@ export default class PostCreator extends React.Component {
         postingPolicy: DEFAULT_POST_POLICY,
     }
 
+    pollRef = React.createRef()
+
     creatorRef = React.createRef()
 
     cleanPostData = () => {
@@ -103,6 +105,12 @@ export default class PostCreator extends React.Component {
             message: postMessage,
             attachments: postAttachments,
             timestamp: DateTime.local().toISO(),
+        }
+
+        if (this.pollRef.current) {
+            let { options } = this.pollRef.current.getFieldsValue()
+
+            payload.poll_options = options.filter((option) => !!option.label)
         }
 
         let response = null
@@ -496,6 +504,7 @@ export default class PostCreator extends React.Component {
                         status: "done",
                     }
                 }),
+                postPoll: post.poll_options
             })
         }
         // fetch the posting policy
@@ -567,6 +576,7 @@ export default class PostCreator extends React.Component {
                 <div className="avatar">
                     <img src={app.userData?.avatar} />
                 </div>
+
                 <antd.Input.TextArea
                     placeholder="What are you thinking?"
                     value={postMessage}
@@ -578,6 +588,7 @@ export default class PostCreator extends React.Component {
                     draggable={false}
                     allowClear
                 />
+
                 <div>
                     <antd.Button
                         type="primary"
@@ -609,6 +620,7 @@ export default class PostCreator extends React.Component {
 
             {
                 this.state.postPoll && <Poll
+                    formRef={this.pollRef}
                     options={this.state.postPoll}
                     onClose={this.handleDeletePoll}
                     editMode

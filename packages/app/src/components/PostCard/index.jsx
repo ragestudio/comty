@@ -3,6 +3,7 @@ import classnames from "classnames"
 import Plyr from "plyr-react"
 import { motion } from "framer-motion"
 
+import Poll from "@components/Poll"
 import { Icons } from "@components/Icons"
 import { processString } from "@utils"
 
@@ -210,6 +211,13 @@ export default class PostCard extends React.PureComponent {
                         !this.props.disableAttachments && this.state.data.attachments && this.state.data.attachments.length > 0 && <PostAttachments
                             attachments={this.state.data.attachments}
                             flags={this.state.data.flags}
+                        />
+                    }
+
+                    {
+                        this.state.data.poll_options && <Poll
+                            post_id={this.state.data._id}
+                            options={this.state.data.poll_options}
                         />
                     }
                 </div>

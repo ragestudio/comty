@@ -13,41 +13,6 @@
 
     padding: 10px;
 
-    .poll-option {
-        display: flex;
-        flex-direction: row;
-
-        align-items: center;
-
-        gap: 10px;
-
-        padding: 5px;
-
-        width: 100%;
-
-        transition: all 150ms ease-in-out;
-
-        border-radius: 6px;
-
-        background-color: var(--background-color-accent);
-
-        cursor: pointer;
-
-        .ant-input {
-            background-color: transparent;
-            width: 100%;
-
-            border: 0;
-
-            color: var(--text-color);
-
-            &::placeholder {
-                color: var(--text-color);
-                opacity: 0.5;
-            }
-        }
-    }
-
     .poll-edit-actions {
         display: flex;
         flex-direction: row;
@@ -56,5 +21,76 @@
         justify-content: flex-end;
 
         gap: 10px;
+    }
+}
+
+.poll-option {
+    z-index: 100;
+
+    position: relative;
+
+    width: 100%;
+    height: auto;
+
+    transition: all 150ms ease-in-out;
+
+    border-radius: 6px;
+    background-color: var(--background-color-accent);
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    // &.checked {
+    //     background-color: rgba(var(--bg_color_4), 0.8);
+    // }
+
+    .percentage-indicator {
+        z-index: 95;
+
+        position: absolute;
+        background-color: var(--colorPrimary);
+
+        opacity: 0.5;
+
+        width: var(--percentage);
+        height: 100%;
+
+        border-radius: 0 6px 6px 0;
+    }
+
+    .poll-option-content {
+        z-index: 100;
+
+        position: relative;
+
+        display: flex;
+        flex-direction: row;
+
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 5px;
+    }
+}
+
+.post-poll-edit {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    .post-poll-edit-option {
+        display: flex;
+        flex-direction: row;
+
+        gap: 10px;
+
+        .ant-form-item {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
     }
 }
