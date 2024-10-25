@@ -9,10 +9,13 @@ import "./index.less"
 const CoverEditor = (props) => {
     const { value, onChange, defaultUrl } = props
 
+    const [init, setInit] = React.useState(true)
     const [url, setUrl] = React.useState(value)
 
     React.useEffect(() => {
-        onChange(url)
+        if (!init) {
+            onChange(url)
+        }
     }, [url])
 
     React.useEffect(() => {
@@ -21,6 +24,8 @@ const CoverEditor = (props) => {
         } else {
             setUrl(value)
         }
+
+        setInit(false)
     }, [])
 
     return <div className="cover-editor">
