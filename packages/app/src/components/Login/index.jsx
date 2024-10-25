@@ -40,7 +40,9 @@ class Login extends React.Component {
         loginInputs: {},
         error: null,
         phase: 0,
+
         mfa_required: null,
+        activation: null,
         forbidden: false,
     }
 
@@ -65,6 +67,15 @@ class Login extends React.Component {
                 if (error.response.data.violation) {
                     return this.setState({
                         forbidden: error.response.data.violation
+                    })
+                }
+
+                if (error.response.data.activation_required) {
+                    return this.setState({
+                        activation: {
+                            required: true,
+                            user_id: error.response.data.user_id,
+                        },
                     })
                 }
             }
@@ -95,10 +106,59 @@ class Login extends React.Component {
         }
 
         if (typeof this.props.onDone === "function") {
-            this.props.onDone()
+            await this.props.onDone()
         }
 
         return true
+    }
+
+    onClickActivateAccount = async () => {
+        const activationObj = this.state.activation
+
+        if (!activationObj) {
+            return null
+        }
+
+        try {
+            await AuthModel.activateAccount(
+                this.state.activation.user_id,
+                this.state.activation.code
+            )
+
+            this.handleFinish()
+        } catch (error) {
+            this.setState({
+                activation: {
+                    ...this.state.activation,
+                    error: error
+                }
+            })
+
+            console.error(error)
+        }
+    }
+
+    onClickResendActivationCode = async () => {
+        const activationObj = this.state.activation
+
+        if (!activationObj) {
+            return null
+        }
+
+        const rensendObj = await AuthModel.resendActivationCode(activationObj.user_id)
+            .catch((error) => {
+                app.message.info(`Please try again later...`)
+                return null
+            })
+
+        if (rensendObj) {
+            this.setState({
+                activation: {
+                    ...this.state.activation,
+                    resended: rensendObj.date,
+                },
+            })
+        }
     }
 
     onClickForgotPassword = () => {
@@ -235,14 +295,61 @@ class Login extends React.Component {
             </div>
         }
 
+        if (this.state.activation) {
+            return <div className="login_wrapper">
+                <div className="content">
+                    <h1>Activate your Account</h1>
+                    <p>We have sent you an email with a code that you need to enter below in order to activate your account.</p>
+
+                    <antd.Input.OTP
+                        length={6}
+                        onChange={(code) => this.setState({
+                            activation: {
+                                ...this.state.activation,
+                                code: code,
+                            }
+                        })}
+                    />
+
+                    <div className="resend">
+                        {
+                            this.state.activation.resended && <antd.Alert
+                                message={`Mail resended`}
+                            />
+                        }
+                        <a
+                            href="#"
+                            onClick={this.onClickResendActivationCode}
+                        >
+                            Didn't receive the email?
+                        </a>
+                    </div>
+
+                    {
+                        this.state.activation.error && <div className="field-error">
+                            {this.state.activation.error.response.data.error}
+                        </div>
+                    }
+
+                    <antd.Button
+                        onClick={this.onClickActivateAccount}
+                    >
+                        Activate
+                    </antd.Button>
+                </div>
+            </div>
+        }
+
         return <div className="login_wrapper">
             <div className="content">
-                <h1>
-                    Sign in
-                </h1>
-                <h3>
-                    To continue to {config.app.siteName}
-                </h3>
+                <div className="header">
+                    <h1>
+                        Sign in
+                    </h1>
+                    <h3>
+                        To continue to {config.app.siteName}
+                    </h3>
+                </div>
 
                 <antd.Form
                     name="login"
@@ -332,9 +439,11 @@ class Login extends React.Component {
                     </antd.Button>
                 </div>
 
-                <div className="field-error">
-                    {this.state.error}
-                </div>
+                {
+                    this.state.error && <div className="field-error">
+                        {this.state.error}
+                    </div>
+                }
 
                 <div className="field" onClick={this.onClickForgotPassword}>
                     <a>Forgot your password?</a>
