@@ -19,20 +19,20 @@ export default class SeekBar extends React.Component {
     handleSeek = (value) => {
         if (value > 0) {
             // calculate the duration of the audio
-            const duration = app.cores.player.duration()
+            const duration = app.cores.player.controls.duration()
 
             // calculate the seek of the audio
             const seek = (value / 100) * duration
 
-            app.cores.player.seek(seek)
+            app.cores.player.controls.seek(seek)
         } else {
-            app.cores.player.seek(0)
+            app.cores.player.controls.seek(0)
         }
     }
 
     calculateDuration = (preCalculatedDuration) => {
         // get current audio duration
-        const audioDuration = preCalculatedDuration ?? app.cores.player.duration()
+        const audioDuration = preCalculatedDuration ?? app.cores.player.controls.duration()
 
         if (isNaN(audioDuration)) {
             return
@@ -46,7 +46,7 @@ export default class SeekBar extends React.Component {
 
     calculateTime = () => {
         // get current audio seek
-        const seek = app.cores.player.seek()
+        const seek = app.cores.player.controls.seek()
 
         // set time
         this.setState({
@@ -59,8 +59,8 @@ export default class SeekBar extends React.Component {
             return
         }
 
-        const seek = app.cores.player.seek()
-        const duration = app.cores.player.duration()
+        const seek = app.cores.player.controls.seek()
+        const duration = app.cores.player.controls.duration()
 
         const percent = (seek / duration) * 100
 
@@ -73,8 +73,6 @@ export default class SeekBar extends React.Component {
         this.calculateTime()
         this.updateProgressBar()
     }
-
-    eventBus = app.cores.player.eventBus
 
     events = {
         // handle when player changes playback status
@@ -140,13 +138,13 @@ export default class SeekBar extends React.Component {
         this.tick()
 
         for (const [event, callback] of Object.entries(this.events)) {
-            this.eventBus.on(event, callback)
+            app.cores.player.eventBus().on(event, callback)
         }
     }
 
     componentWillUnmount = () => {
         for (const [event, callback] of Object.entries(this.events)) {
-            this.eventBus.off(event, callback)
+            app.cores.player.eventBus().off(event, callback)
         }
     }
 
@@ -199,7 +197,7 @@ export default class SeekBar extends React.Component {
                     }}
                     valueLabelDisplay="auto"
                     valueLabelFormat={(value) => {
-                        return seekToTimeLabel((value / 100) * app.cores.player.duration())
+                        return seekToTimeLabel((value / 100) * app.cores.player.controls.duration())
                     }}
                 />
             </div>

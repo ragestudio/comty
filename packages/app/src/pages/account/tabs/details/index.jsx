@@ -33,8 +33,8 @@ const DroppableField = (props) => {
         <div className="collapse_btn">
             {
                 collapsed
-                    ? <Icons.ChevronDown />
-                    : <Icons.ChevronUp />
+                    ? <Icons.FiChevronDown />
+                    : <Icons.FiChevronUp />
             }
         </div>
         <div className="inline_field">

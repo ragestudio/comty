@@ -1,4 +1,4 @@
-import { User, PostLike, PostSave, Post } from "@db_models"
+import { User, PostLike, PostSave, Post, VotePoll } from "@db_models"
 
 export default async (payload = {}) => {
     let {
@@ -23,17 +23,25 @@ export default async (payload = {}) => {
         postsSavesIds = postsSaves.map((postSave) => postSave.post_id)
     }
 
-    let [usersData, likesData] = await Promise.all([
+    const postsIds = posts.map((post) => post._id)
+    const usersIds = posts.map((post) => post.user_id)
+
+    let [usersData, likesData, pollVotes] = await Promise.all([
         User.find({
             _id: {
-                $in: posts.map((post) => post.user_id)
+                $in: usersIds
             }
         }).catch(() => { }),
         PostLike.find({
             post_id: {
-                $in: posts.map((post) => post._id)
+                $in: postsIds
             }
         }).catch(() => []),
+        VotePoll.find({
+            post_id: {
+                $in: postsIds
+            }
+        }).catch(() => [])
     ])
 
     // wrap likesData by post_id
@@ -79,9 +87,43 @@ export default async (payload = {}) => {
 
         post.countLikes = likes.length
 
+        const postPollVotes = pollVotes.filter((vote) => {
+            if (vote.post_id !== post._id.toString()) {
+                return false
+            }
+
+            return true
+        })
+
         if (for_user_id) {
             post.isLiked = likes.some((like) => like.user_id.toString() === for_user_id)
             post.isSaved = postsSavesIds.includes(post._id.toString())
+
+            if (Array.isArray(post.poll_options)) {
+                post.poll_options = post.poll_options.map((option) => {
+                    option.voted = !!postPollVotes.find((vote) => {
+                        if (vote.user_id !== for_user_id) {
+                            return false
+                        }
+
+                        if (vote.option_id !== option.id) {
+                            return false
+                        }
+
+                        return true
+                    })
+
+                    option.count = postPollVotes.filter((vote) => {
+                        if (vote.option_id !== option.id) {
+                            return false
+                        }
+
+                        return true
+                    }).length
+
+                    return option
+                })
+            }
         }
 
         return {

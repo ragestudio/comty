@@ -2,10 +2,10 @@ import React from "react"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
 
-import { Context } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 const LyricsText = React.forwardRef((props, textRef) => {
-    const context = React.useContext(Context)
+    const playerState = usePlayerStateContext()
 
     const { lyrics } = props
 
@@ -18,9 +18,9 @@ const LyricsText = React.forwardRef((props, textRef) => {
             return false
         }
 
-        const currentTrackTime = app.cores.player.seek() * 1000
+        const currentTrackTime = app.cores.player.controls.seek() * 1000
 
-        const lineIndex = lyrics.lrc.findIndex((line) => {
+        const lineIndex = lyrics.synced_lyrics.findIndex((line) => {
             return currentTrackTime >= line.startTimeMs && currentTrackTime <= line.endTimeMs
         })
 
@@ -32,7 +32,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
             return false
         }
 
-        const line = lyrics.lrc[lineIndex]
+        const line = lyrics.synced_lyrics[lineIndex]
 
         setCurrentLineIndex(lineIndex)
 
@@ -74,8 +74,8 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
     //* Handle when playback status change
     React.useEffect(() => {
-        if (typeof lyrics?.lrc !== "undefined") {
-            if (context.playback_status === "playing") {
+        if (typeof lyrics?.synced_lyrics !== "undefined") {
+            if (playerState.playback_status === "playing") {
                 startSyncInterval()
             } else {
                 if (syncInterval) {
@@ -85,15 +85,15 @@ const LyricsText = React.forwardRef((props, textRef) => {
         } else {
             clearInterval(syncInterval)
         }
-    }, [context.playback_status])
+    }, [playerState.playback_status])
 
     //* Handle when lyrics object change
     React.useEffect(() => {
         clearInterval(syncInterval)
 
         if (lyrics) {
-            if (typeof lyrics?.lrc !== "undefined") {
-                if (context.playback_status === "playing") {
+            if (typeof lyrics?.synced_lyrics !== "undefined") {
+                if (playerState.playback_status === "playing") {
                     startSyncInterval()
                 }
             }
@@ -104,7 +104,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
         setVisible(false)
         clearInterval(syncInterval)
         setCurrentLineIndex(0)
-    }, [context.track_manifest])
+    }, [playerState.track_manifest])
 
     React.useEffect(() => {
         return () => {
@@ -112,7 +112,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
         }
     }, [])
 
-    if (!lyrics?.lrc) {
+    if (!lyrics?.synced_lyrics) {
         return null
     }
 
@@ -133,7 +133,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
                     }}
                 >
                     {
-                        lyrics.lrc.map((line, index) => {
+                        lyrics.synced_lyrics.map((line, index) => {
                             return <p
                                 key={index}
                                 id={`lyrics-line-${index}`}

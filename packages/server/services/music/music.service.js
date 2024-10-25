@@ -1,4 +1,4 @@
-import { Server } from "linebridge/dist/server"
+import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
 
@@ -7,7 +7,6 @@ import LimitsClass from "@shared-classes/Limits"
 
 export default class API extends Server {
     static refName = "music"
-    static useEngine = "hyper-express"
     static routesPath = `${__dirname}/routes`
     static listen_port = process.env.HTTP_LISTEN_PORT ?? 3003
 

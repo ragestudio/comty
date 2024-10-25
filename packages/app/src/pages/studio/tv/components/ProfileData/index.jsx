@@ -78,17 +78,14 @@ const ProfileData = (props) => {
     }
 
     async function handleEditName() {
-        const modal = app.modal.info({
-            title: "Edit name",
-            content: <ProfileCreator
-                close={() => modal.destroy()}
-                editValue={profile.profile_name}
-                onEdit={async (value) => {
+        app.layout.modal.open("name_editor", ProfileCreator, {
+            props: {
+                editValue: profile.profile_name,
+                onEdit: async (value) => {
                     await handleChange("profile_name", value)
                     app.eventBus.emit("app:profiles_updated", profile._id)
-                }}
-            />,
-            footer: null
+                },
+            }
         })
     }
 
@@ -118,18 +115,18 @@ const ProfileData = (props) => {
         />
     }
 
-    return <div className="profile-data">
+    return <div className="tvstudio-profile-data">
         <div
-            className="profile-data-header"
+            className="tvstudio-profile-data-header"
         >
             <img
-                className="profile-data-header-image"
+                className="tvstudio-profile-data-header-image"
                 src={profile.info?.thumbnail}
             />
-            <div className="profile-data-header-content">
+            <div className="tvstudio-profile-data-header-content">
                 <EditableText
                     value={profile.info?.title ?? "Untitled"}
-                    className="profile-data-header-title"
+                    className="tvstudio-profile-data-header-title"
                     style={{
                         "--fontSize": "2rem",
                         "--fontWeight": "800"
@@ -141,7 +138,7 @@ const ProfileData = (props) => {
                 />
                 <EditableText
                     value={profile.info?.description ?? "No description"}
-                    className="profile-data-header-description"
+                    className="tvstudio-profile-data-header-description"
                     style={{
                         "--fontSize": "1rem",
                     }}
@@ -153,8 +150,8 @@ const ProfileData = (props) => {
             </div>
         </div>
 
-        <div className="profile-data-field">
-            <div className="profile-data-field-header">
+        <div className="tvstudio-profile-data-field">
+            <div className="tvstudio-profile-data-field-header">
                 <MdOutlineWifiTethering />
                 <span>Server</span>
             </div>
@@ -184,8 +181,8 @@ const ProfileData = (props) => {
             </div>
         </div>
 
-        <div className="profile-data-field">
-            <div className="profile-data-field-header">
+        <div className="tvstudio-profile-data-field">
+            <div className="tvstudio-profile-data-field-header">
                 <GrConfigure />
                 <span>Configuration</span>
             </div>
@@ -233,8 +230,8 @@ const ProfileData = (props) => {
         </div>
 
         {
-            profile.sources && <div className="profile-data-field">
-                <div className="profile-data-field-header">
+            profile.sources && <div className="tvstudio-profile-data-field">
+                <div className="tvstudio-profile-data-field-header">
                     <FiLink />
                     <span>Media URL</span>
                 </div>
@@ -302,8 +299,8 @@ const ProfileData = (props) => {
             </div>
         }
 
-        <div className="profile-data-field">
-            <div className="profile-data-field-header">
+        <div className="tvstudio-profile-data-field">
+            <div className="tvstudio-profile-data-field-header">
                 <span>Other</span>
             </div>
 

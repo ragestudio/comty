@@ -38,5 +38,9 @@ export default {
             type: Object,
             required: true,
         },
+        lyrics_enabled: {
+            type: Boolean,
+            default: false
+        }
     }
 }

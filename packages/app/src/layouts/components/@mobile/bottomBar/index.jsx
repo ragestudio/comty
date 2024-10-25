@@ -120,14 +120,6 @@ const AccountButton = React.forwardRef((props, ref) => {
     </div>
 })
 
-export default (props) => {
-    return <WithPlayerContext>
-        <BottomBar
-            {...props}
-        />
-    </WithPlayerContext>
-}
-
 export class BottomBar extends React.Component {
     static contextType = Context
 
@@ -418,4 +410,12 @@ export class BottomBar extends React.Component {
             </Motion>
         </>
     }
+}
+
+export default (props) => {
+    return <WithPlayerContext>
+        <BottomBar
+            {...props}
+        />
+    </WithPlayerContext>
 }

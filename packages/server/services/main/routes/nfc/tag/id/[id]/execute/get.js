@@ -11,16 +11,24 @@ export default async (req, res) => {
         })
     }
 
+    if (tag.active === false) {
+        return res.status(404).json({
+            error: "Tag is not active"
+        })
+    }
+
+    console.log(tag)
+
     switch (tag.behavior.type) {
+        case "badge": {
+            return res.redirect(`https://${tag.origin}/badge/${tag.user_id}`)
+        }
         case "url": {
             if (!tag.behavior.value.startsWith("https://")) {
                 tag.behavior.value = `https://${tag.behavior.value}`
             }
 
             return res.redirect(tag.behavior.value)
-        }
-        case "profile": {
-            return new OperationError(501, `Not implemented.`)
         }
         case "random_list": {
             const values = result.behavior.value.split(";")
@@ -34,6 +42,12 @@ export default async (req, res) => {
             }
 
             return res.redirect(values[index])
+        }
+        case "default": {
+            return res.json({
+                error: "Cannot execute tag",
+                description: "Tag contains a command that cannot exist"
+            })
         }
     }
 }

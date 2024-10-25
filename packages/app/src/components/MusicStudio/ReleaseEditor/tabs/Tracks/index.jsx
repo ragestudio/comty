@@ -2,7 +2,8 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { DragDropContext, Droppable } from "react-beautiful-dnd"
-import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
+
+import TrackManifest from "@classes/TrackManifest"
 
 import { Icons } from "@components/Icons"
 
@@ -11,124 +12,14 @@ import UploadHint from "./components/UploadHint"
 
 import "./index.less"
 
-async function uploadBinaryArrayToStorage(bin, args) {
-    const { format, data } = bin
-
-    const filenameExt = format.split("/")[1]
-    const filename = `cover.${filenameExt}`
-
-    const byteArray = new Uint8Array(data)
-    const blob = new Blob([byteArray], { type: data.type })
-
-    // create a file object
-    const file = new File([blob], filename, {
-        type: format,
-    })
-
-    return await app.cores.remoteStorage.uploadFile(file, args)
-}
-
-class TrackManifest {
-    constructor(params) {
-        this.params = params
-
-        if (params.uid) {
-            this.uid = params.uid
-        }
-
-        if (params.cover) {
-            this.cover = params.cover
-        }
-
-        if (params.title) {
-            this.title = params.title
-        }
-
-        if (params.album) {
-            this.album = params.album
-        }
-
-        if (params.artist) {
-            this.artist = params.artist
-        }
-
-        if (params.source) {
-            this.source = params.source
-        }
-
-        return this
-    }
-
-    uid = null
-
-    cover = "https://storage.ragestudio.net/comty-static-assets/default_song.png"
-
-    title = "Untitled"
-
-    album = "Unknown"
-
-    artist = "Unknown"
-
-    source = null
-
-    async initialize() {
-        const metadata = await this.analyzeMetadata(this.params.file.originFileObj)
-
-        console.log(metadata)
-
-        if (metadata.tags) {
-            if (metadata.tags.title) {
-                this.title = metadata.tags.title
-            }
-
-            if (metadata.tags.artist) {
-                this.artist = metadata.tags.artist
-            }
-
-            if (metadata.tags.album) {
-                this.album = metadata.tags.album
-            }
-
-            if (metadata.tags.picture) {
-                const coverUpload = await uploadBinaryArrayToStorage(metadata.tags.picture)
-
-                this.cover = coverUpload.url
-            }
-        }
-
-        return this
-    }
-
-    analyzeMetadata = async (file) => {
-        return new Promise((resolve, reject) => {
-            jsmediatags.read(file, {
-                onSuccess: (data) => {
-                    return resolve(data)
-                },
-                onError: (error) => {
-                    return reject(error)
-                }
-            })
-        })
-    }
-}
-
 class TracksManager extends React.Component {
     state = {
-        list: [],
+        list: Array.isArray(this.props.list) ? this.props.list : [],
         pendingUploads: [],
     }
 
-    componentDidMount() {
-        if (typeof this.props.list !== "undefined" && Array.isArray(this.props.list)) {
-            this.setState({
-                list: this.props.list
-            })
-        }
-    }
-
     componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.list !== this.state.list || prevState.pendingUploads !== this.state.pendingUploads) {
+        if (prevState.list !== this.state.list) {
             if (typeof this.props.onChangeState === "function") {
                 this.props.onChangeState(this.state)
             }
@@ -158,12 +49,16 @@ class TracksManager extends React.Component {
             return false
         }
 
+        this.removeTrackUIDFromPendingUploads(uid)
+
         this.setState({
             list: this.state.list.filter((item) => item.uid !== uid),
         })
+
     }
 
     modifyTrackByUid = (uid, track) => {
+        console.log("modifyTrackByUid", uid, track)
         if (!uid || !track) {
             return false
         }
@@ -187,9 +82,17 @@ class TracksManager extends React.Component {
             return false
         }
 
-        if (!this.state.pendingUploads.includes(uid)) {
+        const pendingUpload = this.state.pendingUploads.find((item) => item.uid === uid)
+
+        if (!pendingUpload) {
             this.setState({
-                pendingUploads: [...this.state.pendingUploads, uid],
+                pendingUploads: [
+                    ...this.state.pendingUploads,
+                    {
+                        uid: uid,
+                        progress: 0
+                    }
+                ],
             })
         }
     }
@@ -200,12 +103,42 @@ class TracksManager extends React.Component {
         }
 
         this.setState({
-            pendingUploads: this.state.pendingUploads.filter((item) => item !== uid),
+            pendingUploads: this.state.pendingUploads.filter((item) => item.uid !== uid),
+        })
+    }
+
+    getUploadProgress = (uid) => {
+        const uploadProgressIndex = this.state.pendingUploads.findIndex((item) => item.uid === uid)
+
+        if (uploadProgressIndex === -1) {
+            return 0
+        }
+
+        return this.state.pendingUploads[uploadProgressIndex].progress
+    }
+
+    updateUploadProgress = (uid, progress) => {
+        const uploadProgressIndex = this.state.pendingUploads.findIndex((item) => item.uid === uid)
+
+        if (uploadProgressIndex === -1) {
+            return false
+        }
+
+        const newData = [...this.state.pendingUploads]
+
+        newData[uploadProgressIndex].progress = progress
+
+        console.log(`Updating progress for [${uid}] to [${progress}]`)
+
+        this.setState({
+            pendingUploads: newData,
         })
     }
 
     handleUploaderStateChange = async (change) => {
         const uid = change.file.uid
+
+        console.log("handleUploaderStateChange", change)
 
         switch (change.file.status) {
             case "uploading": {
@@ -214,13 +147,10 @@ class TracksManager extends React.Component {
                 const trackManifest = new TrackManifest({
                     uid: uid,
                     file: change.file,
+                    onChange: this.modifyTrackByUid
                 })
 
                 this.addTrackToList(trackManifest)
-
-                const trackData = await trackManifest.initialize()
-
-                this.modifyTrackByUid(uid, trackData)
 
                 break
             }
@@ -228,9 +158,9 @@ class TracksManager extends React.Component {
                 // remove pending file
                 this.removeTrackUIDFromPendingUploads(uid)
 
-                const trackIndex = this.state.list.findIndex((item) => item.uid === uid)
+                const trackManifest = this.state.list.find((item) => item.uid === uid)
 
-                if (trackIndex === -1) {
+                if (!trackManifest) {
                     console.error(`Track with uid [${uid}] not found!`)
                     break
                 }
@@ -239,6 +169,8 @@ class TracksManager extends React.Component {
                 await this.modifyTrackByUid(uid, {
                     source: change.file.response.url
                 })
+
+                await trackManifest.initialize()
 
                 break
             }
@@ -278,7 +210,7 @@ class TracksManager extends React.Component {
     }
 
     handleTrackFileUploadProgress = async (file, progress) => {
-        console.log(file, progress)
+        this.updateUploadProgress(file.uid, progress)
     }
 
     orderTrackList = (result) => {
@@ -301,6 +233,7 @@ class TracksManager extends React.Component {
 
     render() {
         console.log(`Tracks List >`, this.state.list)
+
         return <div className="music-studio-release-editor-tracks">
             <antd.Upload
                 className="music-studio-tracks-uploader"
@@ -341,9 +274,15 @@ class TracksManager extends React.Component {
                             }
                             {
                                 this.state.list.map((track, index) => {
+                                    const progress = this.getUploadProgress(track.uid)
+
                                     return <TrackListItem
                                         index={index}
                                         track={track}
+                                        onEdit={this.modifyTrackByUid}
+                                        onDelete={this.removeTrackByUid}
+                                        progress={progress}
+                                        disabled={progress > 0}
                                     />
                                 })
                             }

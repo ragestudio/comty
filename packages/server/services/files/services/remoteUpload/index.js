@@ -4,59 +4,10 @@ import mimeTypes from "mime-types"
 import getFileHash from "@shared-utils/readFileHash"
 
 import PostProcess from "../post-process"
+import Transmux from "../transmux"
 
-export async function standardUpload({
-    source,
-    remotePath,
-    metadata,
-}) {
-    // upload to storage
-    await global.storage.fPutObject(process.env.S3_BUCKET, remotePath, source, metadata)
-
-    // compose url
-    const url = storage.composeRemoteURL(remotePath)
-
-    return {
-        id: remotePath,
-        url: url,
-        metadata: metadata,
-    }
-}
-
-export async function b2Upload({
-    source,
-    remotePath,
-    metadata,
-}) {
-    // use backblaze b2
-    await b2Storage.authorize()
-
-    const uploadUrl = await global.b2Storage.getUploadUrl({
-        bucketId: process.env.B2_BUCKET_ID,
-    })
-
-    if (!fs.existsSync(source)) {
-        throw new OperationError(500, "File not found")
-    }
-
-    const data = await fs.promises.readFile(source)
-
-    await global.b2Storage.uploadFile({
-        uploadUrl: uploadUrl.data.uploadUrl,
-        uploadAuthToken: uploadUrl.data.authorizationToken,
-        fileName: remotePath,
-        data: data,
-        info: metadata
-    })
-
-    const url = `https://${process.env.B2_CDN_ENDPOINT}/${process.env.B2_BUCKET}/${remotePath}`
-
-    return {
-        id: remotePath,
-        url: url,
-        metadata: metadata,
-    }
-}
+import StandardUpload from "./providers/standard"
+import B2Upload from "./providers/b2"
 
 export default async ({
     source,
@@ -64,6 +15,9 @@ export default async ({
     service,
     useCompression,
     cachePath,
+    transmux,
+    transmuxOptions,
+    isDirectory,
 }) => {
     if (!source) {
         throw new OperationError(500, "source is required")
@@ -77,9 +31,16 @@ export default async ({
         parentDir = "/"
     }
 
+    if (transmuxOptions) {
+        transmuxOptions = JSON.parse(transmuxOptions)
+    }
+
     if (useCompression) {
         try {
-            const processOutput = await PostProcess({ filepath: source, cachePath })
+            const processOutput = await PostProcess({
+                filepath: source,
+                cachePath: cachePath,
+            })
 
             if (processOutput) {
                 if (processOutput.filepath) {
@@ -89,6 +50,30 @@ export default async ({
         } catch (error) {
             console.error(error)
             throw new OperationError(500, `Failed to process file`)
+        }
+    }
+
+    if (transmux) {
+        try {
+            const processOutput = await Transmux({
+                transmuxer: transmux,
+                transmuxOptions: transmuxOptions,
+                filepath: source,
+                cachePath: cachePath
+            })
+
+            if (processOutput) {
+                if (processOutput.filepath) {
+                    source = processOutput.filepath
+                }
+
+                if (processOutput.isDirectory) {
+                    isDirectory = true
+                }
+            }
+        } catch (error) {
+            console.error(error)
+            throw new OperationError(500, `Failed to transmux file`)
         }
     }
 
@@ -104,27 +89,38 @@ export default async ({
         "File-Hash": hash,
     }
 
-    switch (service) {
-        case "b2":
-            if (!global.b2Storage) {
-                throw new OperationError(500, "B2 storage not configured on environment, unsupported service. Please use `standard` service.")
-            }
+    try {
+        switch (service) {
+            case "b2":
+                if (isDirectory) {
+                    throw new OperationError(500, "B2 storage does not support directory upload. yet...")
+                }
+                if (!global.b2Storage) {
+                    throw new OperationError(500, "B2 storage not configured on environment, unsupported service. Please use `standard` service.")
+                }
 
-            result = await b2Upload({
-                remotePath,
-                source,
-                metadata,
-            })
-            break
-        case "standard":
-            result = await standardUpload({
-                remotePath,
-                source,
-                metadata,
-            })
-            break
-        default:
-            throw new OperationError(500, "Unsupported service")
+                result = await B2Upload({
+                    source,
+                    remotePath,
+                    metadata,
+                    isDirectory,
+                })
+                break
+            case "standard":
+                result = await StandardUpload({
+                    source: isDirectory ? path.dirname(source) : source,
+                    remotePath,
+                    metadata,
+                    isDirectory,
+                    targetFilename: isDirectory ? path.basename(source) : null,
+                })
+                break
+            default:
+                throw new OperationError(500, "Unsupported service")
+        }
+    } catch (error) {
+        console.error(error)
+        throw new OperationError(500, "Failed to upload to storage")
     }
 
     return result

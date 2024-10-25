@@ -54,7 +54,7 @@ const MainSelector = (props) => {
                 Create a Comty™ Account
             </antd.Button>
 
-            <p>
+            <p style={{ display: "inline" }}>
                 <Icons.FiInfo />
                 Registering a new account accepts the <a onClick={() => app.location.push("/terms")}>Terms and Conditions</a> and <a onClick={() => app.location.push("/privacy")}>Privacy policy</a> for the services provided by {config.author}
             </p>

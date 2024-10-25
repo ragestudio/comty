@@ -1,8 +1,6 @@
 import React from "react"
 import * as antd from "antd"
 
-// import { version as linebridgeVersion } from "linebridge/package.json"
-
 import { Icons } from "@components/Icons"
 import LatencyIndicator from "@components/PerformanceIndicators/latency"
 
@@ -198,7 +196,7 @@ export default {
                     </div>
 
                     <div className="field_value">
-                        {app.__eviteVersion ?? "Unknown"}
+                        {app.__version ?? "Unknown"}
                     </div>
                 </div>
 

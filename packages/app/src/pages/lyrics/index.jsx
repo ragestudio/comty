@@ -2,7 +2,7 @@ import React from "react"
 import classnames from "classnames"
 
 import useMaxScreen from "@hooks/useMaxScreen"
-import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 import MusicService from "@models/music"
 
@@ -12,8 +12,18 @@ import LyricsText from "./components/text"
 
 import "./index.less"
 
+function getDominantColorStr(track_manifest) {
+    if (!track_manifest) {
+        return `0,0,0`
+    }
+
+    const values = track_manifest.cover_analysis?.value ?? [0, 0, 0]
+
+    return `${values[0]}, ${values[1]}, ${values[2]}`
+}
+
 const EnchancedLyrics = (props) => {
-    const context = React.useContext(Context)
+    const playerState = usePlayerStateContext()
 
     const [initialized, setInitialized] = React.useState(false)
     const [lyrics, setLyrics] = React.useState(null)
@@ -46,18 +56,20 @@ const EnchancedLyrics = (props) => {
 
     React.useEffect((prev) => {
         if (initialized) {
-            loadLyrics(context.track_manifest._id)
+            loadLyrics(playerState.track_manifest._id)
         }
     }, [translationEnabled])
 
     //* Handle when context change track_manifest
     React.useEffect(() => {
-        setLyrics(null)
-
-        if (context.track_manifest) {
-            loadLyrics(context.track_manifest._id)
+        if (playerState.track_manifest) {
+            if (!lyrics || (lyrics.track_id !== playerState.track_manifest._id)) {
+                loadLyrics(playerState.track_manifest._id)
+            }
+        } else {
+            setLyrics(null)
         }
-    }, [context.track_manifest])
+    }, [playerState.track_manifest])
 
     //* Handle when lyrics data change
     React.useEffect(() => {
@@ -72,19 +84,27 @@ const EnchancedLyrics = (props) => {
         className={classnames(
             "lyrics",
             {
-                ["stopped"]: context.playback_status !== "playing",
+                ["stopped"]: playerState.playback_status !== "playing",
             }
         )}
+        style={{
+            "--dominant-color": getDominantColorStr(playerState.track_manifest)
+        }}
     >
+        <div
+            className="lyrics-background-color"
+        />
+
         {
-            !lyrics?.video_source && <div
+            playerState.track_manifest && !lyrics?.video_source && <div
                 className="lyrics-background-wrapper"
             >
+
                 <div
                     className="lyrics-background-cover"
                 >
                     <img
-                        src={context.track_manifest.cover}
+                        src={playerState.track_manifest.cover}
                     />
                 </div>
             </div>
@@ -109,12 +129,4 @@ const EnchancedLyrics = (props) => {
     </div>
 }
 
-const EnchancedLyricsPage = (props) => {
-    return <WithPlayerContext>
-        <EnchancedLyrics
-            {...props}
-        />
-    </WithPlayerContext>
-}
-
-export default EnchancedLyricsPage
+export default EnchancedLyrics

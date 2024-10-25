@@ -21,15 +21,7 @@ const MaxStringsLengths = {
 export default {
     middlewares: ["withAuthentication"],
     fn: async (req) => {
-        let update = {}
-
-        if (!update) {
-            throw new OperationError(400, "Missing update")
-        }
-
-        if (typeof update === "string") {
-            update = JSON.parse(update)
-        }
+        const update = {}
 
         // sanitize update
         AllowedPublicUpdateFields.forEach((key) => {

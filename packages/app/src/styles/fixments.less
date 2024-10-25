@@ -83,7 +83,19 @@
 }
 
 .ant-dropdown-menu {
-    background-color: var(--background-color-primary) !important;
+    background-color: rgba(var(--layoutBackgroundColor), 0.8) !important;
+    backdrop-filter: blur(3px);
+
+    .ant-dropdown-menu-item {
+        .ant-dropdown-menu-title-content {
+            display: flex;
+            flex-direction: row;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+    }
 }
 
 // fix buttons

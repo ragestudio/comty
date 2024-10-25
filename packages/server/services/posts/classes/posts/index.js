@@ -14,4 +14,6 @@ export default class Posts {
     static delete = require("./methods/delete").default
     static update = require("./methods/update").default
     static replies = require("./methods/replies").default
+    static votePoll = require("./methods/votePoll").default
+    static deleteVotePoll = require("./methods/deletePollVote").default
 }

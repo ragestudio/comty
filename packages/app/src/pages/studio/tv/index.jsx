@@ -5,26 +5,27 @@ import ProfileSelector from "./components/ProfileSelector"
 import ProfileData from "./components/ProfileData"
 import ProfileCreator from "./components/ProfileCreator"
 
+import useCenteredContainer from "@hooks/useCenteredContainer"
+
 import "./index.less"
 
 const TVStudioPage = (props) => {
+    useCenteredContainer(true)
+
     const [selectedProfileId, setSelectedProfileId] = React.useState(null)
 
     function newProfileModal() {
-        const modal = app.modal.info({
-            title: "Create new profile",
-            content: <ProfileCreator
-                close={() => modal.destroy()}
-                onCreate={(id, data) => {
+        app.layout.modal.open("tv_profile_creator", ProfileCreator, {
+            props: {
+                onCreate: (id, data) => {
                     setSelectedProfileId(id)
-                }}
-            />,
-            footer: null
+                },
+            }
         })
     }
 
-    return <div className="main-page">
-        <div className="main-page-actions">
+    return <div className="tvstudio-page">
+        <div className="tvstudio-page-actions">
             <ProfileSelector
                 onChange={setSelectedProfileId}
             />
@@ -44,18 +45,10 @@ const TVStudioPage = (props) => {
         }
 
         {
-            !selectedProfileId && <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "70vh"
-                }}
-            >
-                <h3>
+            !selectedProfileId && <div className="tvstudio-page-selector-hint">
+                <h1>
                     Select profile or create new
-                </h3>
+                </h1>
             </div>
         }
     </div>

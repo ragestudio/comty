@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import { User } from "@db_models"
 import requiredFields from "@shared-utils/requiredFields"
+
 import Account from "@classes/account"
 
 export default async (payload) => {
@@ -45,12 +46,15 @@ export default async (payload) => {
         roles: roles,
         created_at: new Date().getTime(),
         accept_tos: accept_tos,
+        activated: false,
     })
 
     await user.save()
 
-    // TODO: dispatch event bus
-    //global.eventBus.emit("user.create", user)
+    await Account.sendActivationCode(user._id.toString())
 
-    return user
+    return {
+        activation_required: true,
+        user: user,
+    }
 }

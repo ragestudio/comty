@@ -32,6 +32,10 @@ export default {
         endpoint_url: {
             type: String,
             default: "https://comty.app/nfc/no_endpoint"
+        },
+        origin: {
+            type: String,
+            default: "comty.app"
         }
     }
 }

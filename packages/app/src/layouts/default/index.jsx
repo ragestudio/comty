@@ -1,6 +1,6 @@
 import React from "react"
 import classnames from "classnames"
-import { Layout, Alert } from "antd"
+import { Layout } from "antd"
 
 import Sidebar from "@layouts/components/sidebar"
 import ToolsBar from "@layouts/components/toolsBar"
@@ -20,6 +20,7 @@ const DesktopLayout = (props) => {
     return <>
         <BackgroundDecorator />
         <Modals />
+        <DraggableDrawerController />
 
         <Layout id="app_layout" className="app_layout">
             <Sidebar />

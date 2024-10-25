@@ -1,6 +1,5 @@
 import React from "react"
 import * as antd from "antd"
-import { Input } from "antd"
 
 import { Icons } from "@components/Icons"
 
@@ -8,8 +7,14 @@ import NFCModel from "comty.js/models/nfc"
 
 import StepsContext from "../../context"
 
+import "./index.less"
+
 export default (props) => {
     const context = React.useContext(StepsContext)
+    const ref = React.useRef()
+    const [form] = antd.Form.useForm()
+
+    const behaviorType = antd.Form.useWatch("behavior", form)
 
     if (!context.values.serial) {
         app.message.error("Serial not available.")
@@ -20,17 +25,19 @@ export default (props) => {
     }
 
     const handleOnFinish = async (values) => {
+        console.log({ values })
+
         context.setValue("alias", values.alias)
         context.setValue("behavior", values.behavior)
 
         const result = await NFCModel.registerTag(context.values.serial, {
             alias: values.alias,
-            behavior: values.behavior
+            behavior: values.behavior,
         }).catch((err) => {
             console.error(err)
 
             app.message.error("Cannot register your tag. Please try again.")
-
+            
             return false
         })
 
@@ -55,7 +62,10 @@ export default (props) => {
         return context.next()
     }
 
-    return <div className="tap-share-register_step">
+    return <div
+        className="tap-share-register_step"
+        ref={ref}
+    >
         <h2>
             Tag Data
         </h2>
@@ -68,6 +78,7 @@ export default (props) => {
                 alias: context.values.alias,
                 behavior: context.values.behavior,
             }}
+            form={form}
         >
             <antd.Form.Item
                 name="serial"
@@ -76,7 +87,7 @@ export default (props) => {
                     Serial
                 </>}
             >
-                <Input
+                <antd.Input
                     disabled
                 />
             </antd.Form.Item>
@@ -109,10 +120,11 @@ export default (props) => {
                     What will happen when someone taps your tag?
                 </span>
 
-                <div className="ant-form_with_selector">
+                <div
+                    className={"ant-form_with_selector"}
+                >
                     <antd.Form.Item
                         name={["behavior", "type"]}
-                        noStyle
                         size="large"
                         rules={[
                             {
@@ -120,49 +132,59 @@ export default (props) => {
                                 message: "Please select your tag behavior."
                             }
                         ]}
+                        initialValue={"url"}
+                        noStyle
                     >
                         <antd.Select
                             placeholder="Options"
                             size="large"
-                        >
-                            <antd.Select.Option
-                                value="url"
-                            >
-                                Custom URL
-                            </antd.Select.Option>
-
-                            <antd.Select.Option
-                                value="profile"
-                            >
-                                Profile
-                            </antd.Select.Option>
-
-                            <antd.Select.Option
-                                value="random_list"
-                            >
-                                Random list
-                            </antd.Select.Option>
-                        </antd.Select>
-                    </antd.Form.Item>
-
-                    <antd.Form.Item
-                        name={["behavior", "value"]}
-                        noStyle
-                        rules={[
-                            {
-                                required: true,
-                                message: "Please select your behavior value."
-                            }
-                        ]}
-                    >
-                        <antd.Input
-                            placeholder="value"
-                            size="large"
-                            autoCapitalize="off"
-                            autoCorrect="off"
-                            spellCheck="false"
+                            getPopupContainer={() => ref.current}
+                            options={[
+                                {
+                                    value: "url",
+                                    label: <span className="flex-row gap10">
+                                        <Icons.FiLink />
+                                        Custom URL
+                                    </span>
+                                },
+                                {
+                                    value: "badge",
+                                    label: <span className="flex-row gap10">
+                                        <Icons.FiTag />
+                                        Badge
+                                    </span>
+                                },
+                                {
+                                    value: "random_list",
+                                    label: <span className="flex-row gap10">
+                                        <Icons.FiList />
+                                        Random list
+                                    </span>
+                                }
+                            ]}
                         />
                     </antd.Form.Item>
+
+                    {
+                        behaviorType?.type !== "badge" && <antd.Form.Item
+                            name={["behavior", "value"]}
+                            noStyle
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "Please select your behavior value."
+                                }
+                            ]}
+                        >
+                            <antd.Input
+                                placeholder="value"
+                                size="large"
+                                autoCapitalize="off"
+                                autoCorrect="off"
+                                spellCheck="false"
+                            />
+                        </antd.Form.Item>
+                    }
                 </div>
             </antd.Form.Item>
 

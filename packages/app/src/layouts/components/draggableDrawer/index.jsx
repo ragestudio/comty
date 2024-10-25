@@ -11,7 +11,7 @@ export class DraggableDrawerController extends React.Component {
 
         this.interface = {
             open: this.open,
-            close: this.close,
+            destroy: this.destroy,
             actions: this.actions,
         }
 
@@ -100,9 +100,15 @@ export class DraggableDrawerController extends React.Component {
 
         this.setState({ drawers: drawers })
 
-        app.cores.window_mng.close(drawer.winId)
+        app.cores.window_mng.close(drawer.id ?? id)
     }
 
+    /**
+     * This lifecycle method is called after the component has been updated.
+     * It will toggle the root scale effect based on the amount of drawers.
+     * If there are no drawers, the root scale effect is disabled.
+     * If there are one or more drawers, the root scale effect is enabled.
+     */
     componentDidUpdate() {
         if (this.state.drawers.length === 0) {
             app.layout.toggleRootScaleEffect(false)

@@ -17,6 +17,16 @@ export default async (post_id, update) => {
 
     post.updated_at = DateTime.local().toISO()
 
+    if (Array.isArray(update.poll_options)) {
+        post.poll_options = update.poll_options.map((option) => {
+            if (!option.id) {
+                option.id = nanoid()
+            }
+
+            return option
+        })
+    }
+
     await post.save()
 
     post = post.toObject()

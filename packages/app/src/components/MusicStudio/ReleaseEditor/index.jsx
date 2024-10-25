@@ -1,9 +1,13 @@
 import React from "react"
 import * as antd from "antd"
 
-import { Icons } from "@components/Icons"
+import { Icons, createIconRender } from "@components/Icons"
 
 import MusicModel from "@models/music"
+
+import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
+
+import TrackManifest from "@classes/TrackManifest"
 
 import { DefaultReleaseEditorState, ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 
@@ -11,21 +15,25 @@ import Tabs from "./tabs"
 
 import "./index.less"
 
-console.log(MusicModel.deleteRelease)
-
 const ReleaseEditor = (props) => {
     const { release_id } = props
 
     const basicInfoRef = React.useRef()
 
     const [submitting, setSubmitting] = React.useState(false)
+    const [loading, setLoading] = React.useState(true)
     const [submitError, setSubmitError] = React.useState(null)
 
-    const [loading, setLoading] = React.useState(true)
     const [loadError, setLoadError] = React.useState(null)
     const [globalState, setGlobalState] = React.useState(DefaultReleaseEditorState)
-    const [selectedTab, setSelectedTab] = React.useState("info")
+
     const [customPage, setCustomPage] = React.useState(null)
+    const [customPageActions, setCustomPageActions] = React.useState([])
+
+    const [selectedTab, setSelectedTab] = useUrlQueryActiveKey({
+        defaultKey: "info",
+        queryKey: "tab"
+    })
 
     async function initialize() {
         setLoading(true)
@@ -33,7 +41,13 @@ const ReleaseEditor = (props) => {
 
         if (release_id !== "new") {
             try {
-                const releaseData = await MusicModel.getReleaseData(release_id)
+                let releaseData = await MusicModel.getReleaseData(release_id)
+
+                if (Array.isArray(releaseData.list)) {
+                    releaseData.list = releaseData.list.map((item) => {
+                        return new TrackManifest(item)
+                    })
+                }
 
                 setGlobalState({
                     ...globalState,
@@ -47,21 +61,23 @@ const ReleaseEditor = (props) => {
         setLoading(false)
     }
 
+    async function renderCustomPage(page, actions) {
+        setCustomPage(page ?? null)
+        setCustomPageActions(actions ?? [])
+    }
+
     async function handleSubmit() {
         setSubmitting(true)
         setSubmitError(null)
 
         try {
             // first sumbit tracks
-            console.time("submit:tracks:")
             const tracks = await MusicModel.putTrack({
                 list: globalState.list,
             })
-            console.timeEnd("submit:tracks:")
 
             // then submit release
-            console.time("submit:release:")
-            await MusicModel.putRelease({
+            const result = await MusicModel.putRelease({
                 _id: globalState._id,
                 title: globalState.title,
                 description: globalState.description,
@@ -71,7 +87,8 @@ const ReleaseEditor = (props) => {
                 type: globalState.type,
                 list: tracks.list,
             })
-            console.timeEnd("submit:release:")
+
+            app.location.push(`/studio/music/${result._id}`)
         } catch (error) {
             console.error(error)
             app.message.error(error.message)
@@ -84,8 +101,6 @@ const ReleaseEditor = (props) => {
 
         setSubmitting(false)
         app.message.success("Release saved")
-
-        return release
     }
 
     async function handleDelete() {
@@ -97,10 +112,6 @@ const ReleaseEditor = (props) => {
                 app.location.push(window.location.pathname.split("/").slice(0, -1).join("/"))
             },
         })
-    }
-
-    async function onFinish(values) {
-        console.log(values)
     }
 
     async function canFinish() {
@@ -125,10 +136,18 @@ const ReleaseEditor = (props) => {
 
     const Tab = Tabs.find(({ key }) => key === selectedTab)
 
+    const CustomPageProps = {
+        close: () => {
+            renderCustomPage(null, null)
+        }
+    }
+
     return <ReleaseEditorStateContext.Provider
         value={{
             ...globalState,
-            setCustomPage,
+            setGlobalState,
+            renderCustomPage,
+            setCustomPageActions,
         }}
     >
         <div className="music-studio-release-editor">
@@ -139,29 +158,47 @@ const ReleaseEditor = (props) => {
                             <div className="music-studio-release-editor-custom-page-header-title">
                                 <antd.Button
                                     icon={<Icons.IoIosArrowBack />}
-                                    onClick={() => setCustomPage(null)}
+                                    onClick={() => renderCustomPage(null, null)}
                                 />
 
                                 <h2>{customPage.header}</h2>
                             </div>
 
                             {
-                                customPage.props?.onSave && <antd.Button
-                                    type="primary"
-                                    icon={<Icons.FiSave />}
-                                    onClick={() => customPage.props.onSave()}
-                                >
-                                    Save
-                                </antd.Button>
+                                Array.isArray(customPageActions) && customPageActions.map((action, index) => {
+                                    return <antd.Button
+                                        key={index}
+                                        type={action.type}
+                                        icon={createIconRender(action.icon)}
+                                        onClick={async () => {
+                                            if (typeof action.onClick === "function") {
+                                                await action.onClick()
+                                            }
+
+                                            if (action.fireEvent) {
+                                                app.eventBus.emit(action.fireEvent)
+                                            }
+                                        }}
+                                        disabled={action.disabled}
+                                    >
+                                        {action.label}
+                                    </antd.Button>
+                                })
                             }
                         </div>
                     }
 
                     {
-                        React.cloneElement(customPage.content, {
-                            ...customPage.props,
-                            close: () => setCustomPage(null),
-                        })
+                        customPage.content && (React.isValidElement(customPage.content) ?
+                            React.cloneElement(customPage.content, {
+                                ...CustomPageProps,
+                                ...customPage.props
+                            }) :
+                            React.createElement(customPage.content, {
+                                ...CustomPageProps,
+                                ...customPage.props
+                            })
+                        )
                     }
                 </div>
             }
@@ -179,11 +216,11 @@ const ReleaseEditor = (props) => {
                             <antd.Button
                                 type="primary"
                                 onClick={handleSubmit}
-                                icon={<Icons.FiSave />}
+                                icon={release_id !== "new" ? <Icons.FiSave /> : <Icons.MdSend />}
                                 disabled={submitting || loading || !canFinish()}
                                 loading={submitting}
                             >
-                                Save
+                                {release_id !== "new" ? "Save" : "Release"}
                             </antd.Button>
 
                             {
@@ -209,6 +246,12 @@ const ReleaseEditor = (props) => {
 
                     <div className="music-studio-release-editor-content">
                         {
+                            submitError && <antd.Alert
+                                message={submitError.message}
+                                type="error"
+                            />
+                        }
+                        {
                             !Tab && <antd.Result
                                 status="error"
                                 title="Error"
@@ -218,7 +261,6 @@ const ReleaseEditor = (props) => {
                         {
                             Tab && React.createElement(Tab.render, {
                                 release: globalState,
-                                onFinish: onFinish,
 
                                 state: globalState,
                                 setState: setGlobalState,

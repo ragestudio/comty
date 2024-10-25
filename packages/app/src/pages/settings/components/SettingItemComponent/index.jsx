@@ -507,7 +507,7 @@ export default class SettingItemComponent extends React.PureComponent {
                     {
                         this.state.debouncedValue && <antd.Button
                             type="round"
-                            icon={<FiSave />}
+                            icon={<Icons.FiSave />}
                             onClick={async () => await this.dispatchUpdate(this.state.debouncedValue)}
                         >
                             Save

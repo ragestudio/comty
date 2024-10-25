@@ -90,6 +90,10 @@ export default {
                         label: "Varela Round",
                         value: "'Varela Round', sans-serif"
                     },
+                    {
+                        label: "Manrope",
+                        value: "'Manrope', sans-serif"
+                    }
                 ]
             },
             defaultValue: () => {

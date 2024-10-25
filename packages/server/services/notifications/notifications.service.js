@@ -1,4 +1,4 @@
-import { Server } from "linebridge/dist/server"
+import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
@@ -7,7 +7,7 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
     static refName = "notifications"
-    static useEngine = "hyper-express"
+    static enableWebsockets = true
     static wsRoutesPath = `${__dirname}/ws_routes`
     static routesPath = `${__dirname}/routes`
     static listen_port = process.env.HTTP_LISTEN_PORT ?? 3009

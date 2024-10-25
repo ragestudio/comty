@@ -6,6 +6,7 @@ const allowedUpdateFields = [
     "active",
     "behavior",
     "icon",
+    "origin",
 ]
 
 function buildEndpoint(id) {
@@ -29,6 +30,7 @@ export default {
                 alias: req.body.alias,
                 behavior: req.body.behavior,
                 active: req.body.active,
+                origin: req.body.origin,
             })
 
             tag.endpoint_url = buildEndpoint(tag._id.toString())
@@ -61,8 +63,6 @@ export default {
                 }, newData)
             }
         }
-
-        console.log(tag)
 
         return tag
     }

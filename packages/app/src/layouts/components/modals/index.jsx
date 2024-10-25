@@ -97,7 +97,7 @@ export default () => {
             confirmOnClickContent={confirmOnClickContent}
         >
             {
-                React.createElement(render, props)
+                React.isValidElement(render) ? React.cloneElement(render, props) : React.createElement(render, props)
             }
         </Modal>)
     }

@@ -1,3 +1,4 @@
+@import "@styles/layout.less";
 @import "@styles/animations.less";
 @import "@styles/vars.less";
 @import "@styles/fonts.less";
@@ -40,6 +41,10 @@ p {
 	font-size: calc(1em * var(--fontScale));
 }
 
+code {
+	user-select: text !important;
+}
+
 h1,
 h2,
 h3,
@@ -49,6 +54,12 @@ h6,
 p,
 span,
 a {
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+
+	gap: 5px;
+
 	margin: 0;
 }
 
@@ -147,14 +158,14 @@ html {
 
 	-webkit-overflow-scrolling: touch;
 
-	&.root-scale-effect {
-		background-color: black !important;
+	// &.root-scale-effect {
+	// 	background-color: black !important;
 
-		#root {
-			animation: rootScaleOut 250ms ease-in-out forwards;
-			animation-delay: 0;
-		}
-	}
+	// 	#root {
+	// 		animation: rootScaleOut 250ms ease-in-out forwards;
+	// 		animation-delay: 0;
+	// 	}
+	// }
 
 	&.centered-content {
 		.content_layout {
@@ -206,6 +217,7 @@ svg {
 }
 
 *:not(input):not(textarea):not(a) {
+	user-select: none;
 	-webkit-user-select: none;
 	/* disable selection/Copy of UIWebView */
 	-webkit-touch-callout: none;
@@ -368,15 +380,58 @@ svg {
 	gap: 10px;
 }
 
-@keyframes rootScaleOut {
-	0% {
-		transform: scale(1);
+.key-value-field {
+	display: flex;
+	flex-direction: column;
+
+	gap: 5px;
+
+	.key-value-field-key {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 10px;
+
+		font-weight: bold;
+		font-size: 0.9rem;
 	}
 
-	100% {
-		border-radius: 24px;
-		transform: perspective(1000px) scale(0.99);
-		box-shadow: 0 0 500px 10px var(--colorPrimary);
-		overflow: hidden;
+	.key-value-field-description {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+		opacity: 0.8;
+	}
+
+	.key-value-field-value {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 10px;
+		padding: 7px 5px;
+
+		border-radius: 8px;
+		background-color: var(--background-color-accent);
+
+		font-family: "DM Mono", monospace;
+
+		font-size: 0.7rem;
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		p,
+		span,
+		a {
+			user-select: all !important;
+		}
 	}
 }

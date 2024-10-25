@@ -1,5 +1,5 @@
 import httpProxy from "http-proxy"
-import defaults from "linebridge/dist/server/defaults"
+import defaults from "linebridge/dist/defaults"
 
 import pkg from "../package.json"
 

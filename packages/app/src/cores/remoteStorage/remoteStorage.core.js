@@ -1,6 +1,7 @@
 import { Core } from "vessel"
 
 import ChunkedUpload from "./chunkedUpload"
+import SessionModel from "@models/session"
 
 export default class RemoteStorage extends Core {
     static namespace = "remoteStorage"
@@ -26,18 +27,24 @@ export default class RemoteStorage extends Core {
             onFinish = () => { },
             onError = () => { },
             service = "standard",
+            headers = {},
         } = {},
     ) {
         return await new Promise((_resolve, _reject) => {
             const fn = async () => new Promise((resolve, reject) => {
                 const uploader = new ChunkedUpload({
                     endpoint: `${app.cores.api.client().mainOrigin}/upload/chunk`,
-                    splitChunkSize: 5 * 1024 * 1024, 
+                    splitChunkSize: 5 * 1024 * 1024,
                     file: file,
                     service: service,
+                    headers: {
+                        ...headers,
+                        "provider-type": service,
+                        "Authorization": `Bearer ${SessionModel.token}`,
+                    },
                 })
 
-                uploader.on("error", ({ message }) => {
+                uploader.events.on("error", ({ message }) => {
                     this.console.error("[Uploader] Error", message)
 
                     app.cores.notifications.new({
@@ -55,13 +62,13 @@ export default class RemoteStorage extends Core {
                     _reject(message)
                 })
 
-                uploader.on("progress", ({ percentProgress }) => {
+                uploader.events.on("progress", ({ percentProgress }) => {
                     if (typeof onProgress === "function") {
                         onProgress(file, percentProgress)
                     }
                 })
 
-                uploader.on("finish", (data) => {
+                uploader.events.on("finish", (data) => {
                     this.console.debug("[Uploader] Finish", data)
 
                     app.cores.notifications.new({

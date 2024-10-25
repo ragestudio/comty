@@ -59,6 +59,7 @@ export default async (payload = {}) => {
         artists: [],
         source: payload.source,
         metadata: metadata,
+        lyrics_enabled: payload.lyrics_enabled,
     }
 
     if (Array.isArray(payload.artists)) {

@@ -35,7 +35,7 @@ export default class GainProcessorNode extends ProcessorNode {
 
     applyValues() {
         // apply to current instance
-        this.processor.gain.value = app.cores.player.volume() * this.state.gain
+        this.processor.gain.value = app.cores.player.state.volume * this.state.gain
     }
 
     async init() {

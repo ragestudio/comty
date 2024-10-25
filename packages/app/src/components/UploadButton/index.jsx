@@ -41,6 +41,7 @@ export default (props) => {
         handleOnStart(req.file.uid, req.file)
 
         await app.cores.remoteStorage.uploadFile(req.file, {
+            headers: props.headers,
             onProgress: (file, progress) => {
                 setProgess(progress)
                 handleOnProgress(file.uid, progress)

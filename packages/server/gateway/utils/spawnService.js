@@ -9,6 +9,7 @@ export default async ({
     cwd,
     onReload,
     onClose,
+    onError,
     onIPCData,
 }) => {
     const instanceEnv = {
@@ -59,8 +60,12 @@ export default async ({
         return onIPCData(id, data)
     })
 
-    instance.on("close", (code, err) => {
-        return onClose(id, code, err)
+    instance.on("error", (err) => {
+        return onError(id, err)
+    })
+
+    instance.on("close", (code) => {
+        return onClose(id, code)
     })
 
     global.ipcRouter.register({ id, instance })

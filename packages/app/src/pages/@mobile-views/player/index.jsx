@@ -6,7 +6,7 @@ import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
 import ExtraActions from "@components/Player/ExtraActions"
 
-import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import RGBStringToValues from "@utils/rgbToValues"
 
 import "./index.less"
@@ -29,22 +29,14 @@ const ServiceIndicator = (props) => {
 }
 
 const AudioPlayer = (props) => {
-    return <WithPlayerContext>
-        <AudioPlayerComponent
-            {...props}
-        />
-    </WithPlayerContext>
-}
-
-const AudioPlayerComponent = (props) => {
-    const ctx = React.useContext(Context)
+    const playerState = usePlayerStateContext()
 
     React.useEffect(() => {
         if (app.currentDragger) {
-            app.currentDragger.setBackgroundColorValues(RGBStringToValues(ctx.track_manifest?.cover_analysis?.rgb))
+            app.currentDragger.setBackgroundColorValues(RGBStringToValues(playerState.track_manifest?.cover_analysis?.rgb))
         }
 
-    }, [ctx.track_manifest?.cover_analysis])
+    }, [playerState.track_manifest?.cover_analysis])
 
     const {
         title,
@@ -54,10 +46,10 @@ const AudioPlayerComponent = (props) => {
         lyricsEnabled,
         cover_analysis,
         cover,
-    } = ctx.track_manifest ?? {}
+    } = playerState.track_manifest ?? {}
 
-    const playing = ctx.playback_status === "playing"
-    const stopped = ctx.playback_status === "stopped"
+    const playing = playerState.playback_status === "playing"
+    const stopped = playerState.playback_status === "stopped"
 
     const titleText = (!playing && stopped) ? "Stopped" : (title ?? "Untitled")
     const subtitleText = `${artist} | ${album?.title ?? album}`
@@ -107,10 +99,10 @@ const AudioPlayerComponent = (props) => {
             <Controls />
 
             <SeekBar
-                stopped={ctx.playback_status === "stopped"}
-                playing={ctx.playback_status === "playing"}
-                streamMode={ctx.livestream_mode}
-                disabled={ctx.control_locked}
+                stopped={playerState.playback_status === "stopped"}
+                playing={playerState.playback_status === "playing"}
+                streamMode={playerState.livestream_mode}
+                disabled={playerState.control_locked}
             />
 
             <ExtraActions />

@@ -4,7 +4,7 @@ import * as antd from "antd"
 import Streaming from "@models/spectrum"
 
 const ProfileSelector = (props) => {
-    const [loading, result, error, repeat] = app.cores.api.useRequest(Streaming.getOwnProfiles)
+    const [loading, list, error, repeat] = app.cores.api.useRequest(Streaming.getOwnProfiles)
     const [selectedProfileId, setSelectedProfileId] = React.useState(null)
 
     function handleOnChange(value) {
@@ -22,7 +22,7 @@ const ProfileSelector = (props) => {
 
     const handleOnDeletedProfile = async (profile_id) => {
         await repeat()
-        handleOnChange(result[0]._id)
+        handleOnChange(list[0]._id)
     }
 
     React.useEffect(() => {
@@ -70,7 +70,7 @@ const ProfileSelector = (props) => {
         className="profile-selector"
     >
         {
-            result.map((profile) => {
+            list.map((profile) => {
                 return <antd.Select.Option
                     key={profile._id}
                     value={profile._id}

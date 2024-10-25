@@ -3,9 +3,7 @@ import * as antd from "antd"
 
 import CoverEditor from "@components/CoverEditor"
 import { Icons } from "@components/Icons"
-
-import LyricsEditor from "@components/MusicStudio/LyricsEditor"
-import VideoEditor from "@components/MusicStudio/VideoEditor"
+import EnhancedLyricsEditor from "@components/MusicStudio/EnhancedLyricsEditor"
 
 import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 
@@ -24,43 +22,48 @@ const TrackEditor = (props) => {
         })
     }
 
-    async function openLyricsEditor() {
-        context.setCustomPage({
-            header: "Lyrics Editor",
-            content: <LyricsEditor track={track} />,
+    async function openEnhancedLyricsEditor() {
+        context.renderCustomPage({
+            header: "Enhanced Lyrics",
+            content: EnhancedLyricsEditor,
             props: {
-                onSave: () => {
-                    console.log("Saved lyrics")
-                },
+                track: track,
             }
         })
     }
 
-    async function openVideoEditor() {
-        context.setCustomPage({
-            header: "Video Editor",
-            content: <VideoEditor track={track} />,
-            props: {
-                onSave: () => {
-                    console.log("Saved video")
-                },
+    async function handleOnSave() {
+        setTrack((prev) => {
+            const listData = [...context.list]
+
+            const trackIndex = listData.findIndex((item) => item.uid === prev.uid)
+
+            if (trackIndex === -1) {
+                return prev
             }
+
+            listData[trackIndex] = prev
+
+            context.setGlobalState({
+                ...context,
+                list: listData
+            })
+
+            return prev
         })
     }
 
-    async function onClose() {
-        if (typeof props.close === "function") {
-            props.close()
-        }
-    }
-
-    async function onSave() {
-        await props.onSave(track)
-
-        if (typeof props.close === "function") {
-            props.close()
-        }
-    }
+    React.useEffect(() => {
+        context.setCustomPageActions([
+            {
+                label: "Save",
+                icon: "FiSave",
+                type: "primary",
+                onClick: handleOnSave,
+                disabled: props.track === track,
+            },
+        ])
+    }, [track])
 
     return <div className="track-editor">
         <div className="track-editor-field">
@@ -131,49 +134,32 @@ const TrackEditor = (props) => {
             />
         </div>
 
-        <antd.Divider
-            style={{
-                margin: "5px 0",
-            }}
-        />
-
         <div className="track-editor-field">
             <div className="track-editor-field-header">
-                <Icons.TbMovie />
-                <span>Edit Video</span>
+                <Icons.MdLyrics />
+                <span>Enhanced Lyrics</span>
+
+                <antd.Switch
+                    checked={track.lyrics_enabled}
+                    onChange={(value) => handleChange("lyrics_enabled", value)}
+                    disabled={!track.params._id}
+                />
             </div>
 
-            <antd.Button
-                onClick={openVideoEditor}
-            >
-                Edit
-            </antd.Button>
-        </div>
+            <div className="track-editor-field-actions">
+                <antd.Button
+                    disabled={!track.params._id}
+                    onClick={openEnhancedLyricsEditor}
+                >
+                    Edit
+                </antd.Button>
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdTextFormat />
-                <span>Edit Lyrics</span>
+                {
+                    !track.params._id && <span>
+                        You cannot edit Video and Lyrics without release first
+                    </span>
+                }
             </div>
-
-            <antd.Button
-                onClick={openLyricsEditor}
-            >
-                Edit
-            </antd.Button>
-        </div>
-
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdTimeline />
-                <span>Timestamps</span>
-            </div>
-
-            <antd.Button
-                disabled
-            >
-                Edit
-            </antd.Button>
         </div>
     </div>
 }

@@ -1,6 +1,6 @@
 import { Modal } from "antd"
 import ProcessorNode from "../node"
-import Presets from "../../presets"
+import Presets from "../../classes/Presets"
 
 export default class EqProcessorNode extends ProcessorNode {
     constructor(props) {

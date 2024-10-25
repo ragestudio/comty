@@ -3,10 +3,10 @@
 	"version": "1.0.0-beta",
 	"license": "ComtyLicense",
 	"private": true,
-  "workspaces": [
+	"workspaces": [
 		"services/*"
-  ],
-  "scripts": {
+	],
+	"scripts": {
 		"start:prod": "cross-env NODE_ENV=production hermes-node ./index.js",
 		"dev": "cross-env NODE_ENV=development hermes-node ./index.js",
 		"build:bin": "cd build && pkg ./index.js"
@@ -21,9 +21,10 @@
 		"comty.js": "^0.60.3",
 		"dotenv": "^16.4.4",
 		"http-proxy": "^1.18.1",
+		"hyper-express": "^6.17.2",
 		"ioredis": "^5.4.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^0.20.3",
+		"linebridge": "^0.22.0",
 		"minio": "^8.0.1",
 		"module-alias": "^2.2.3",
 		"mongoose": "^8.5.3",

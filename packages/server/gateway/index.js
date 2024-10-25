@@ -5,7 +5,7 @@ import Spinnies from "spinnies"
 import { Observable } from "@gullerya/object-observer"
 import { dots as DefaultSpinner } from "spinnies/spinners.json"
 import EventEmitter from "@foxify/events"
-import IPCRouter from "linebridge/dist/server/classes/IPCRouter"
+import IPCRouter from "linebridge/dist/classes/IPCRouter"
 import chokidar from "chokidar"
 import { onExit } from "signal-exit"
 import chalk from "chalk"
@@ -76,6 +76,7 @@ export default class Gateway {
                 cwd,
                 onReload: this.serviceHandlers.onReload,
                 onClose: this.serviceHandlers.onClose,
+                onError: this.serviceHandlers.onError,
                 onIPCData: this.serviceHandlers.onIPCData,
             })
 
@@ -218,6 +219,7 @@ export default class Gateway {
                 cwd,
                 onReload: this.serviceHandlers.onReload,
                 onClose: this.serviceHandlers.onClose,
+                onError: this.serviceHandlers.onError,
                 onIPCData: this.serviceHandlers.onIPCData,
             })
 
@@ -246,10 +248,17 @@ export default class Gateway {
 
             console.log(`[${id}] Exit with code ${code}`)
 
+            if (err) {
+                console.error(err)
+            }
+
             // try to unregister from proxy
             this.proxy.unregisterAllFromService(id)
 
             this.serviceRegistry[id].ready = false
+        },
+        onError: (id, err) => {
+            console.error(`[${id}] Error`, err)
         },
     }
 
@@ -382,7 +391,7 @@ export default class Gateway {
 
         process.stdout.setMaxListeners(50)
         process.stderr.setMaxListeners(50)
-        
+
         this.services = await scanServices()
         this.proxy = new Proxy()
         this.ipcRouter = new IPCRouter()

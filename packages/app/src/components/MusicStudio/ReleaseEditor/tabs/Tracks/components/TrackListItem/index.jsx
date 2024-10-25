@@ -20,15 +20,17 @@ const TrackListItem = (props) => {
     const { track } = props
 
     async function onClickEditTrack() {
-        context.setCustomPage({
+        context.renderCustomPage({
             header: "Track Editor",
-            content: <TrackEditor track={track} />,
+            content: <TrackEditor />,
             props: {
-                onSave: (newTrackData) => {
-                    console.log("Saving track", newTrackData)
-                },
+                track: track,
             }
         })
+    }
+
+    async function onClickRemoveTrack() {
+        props.onDelete(track.uid)
     }
 
     return <Draggable
@@ -43,12 +45,20 @@ const TrackListItem = (props) => {
                         "music-studio-release-editor-tracks-list-item",
                         {
                             ["loading"]: loading,
-                            ["failed"]: !!error
+                            ["failed"]: !!error,
+                            ["disabled"]: props.disabled,
                         }
                     )}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                 >
+                    <div
+                        className="music-studio-release-editor-tracks-list-item-progress"
+                        style={{
+                            "--upload-progress": `${props.progress}%`,
+                        }}
+                    />
+
                     <div className="music-studio-release-editor-tracks-list-item-index">
                         <span>{props.index + 1}</span>
                     </div>
@@ -65,10 +75,23 @@ const TrackListItem = (props) => {
                     <span>{track.title}</span>
 
                     <div className="music-studio-release-editor-tracks-list-item-actions">
+                        <antd.Popconfirm
+                            title="Are you sure you want to delete this track?"
+                            onConfirm={onClickRemoveTrack}
+                            okText="Yes"
+                            disabled={props.disabled}
+                        >
+                            <antd.Button
+                                type="ghost"
+                                icon={<Icons.FiTrash2 />}
+                                disabled={props.disabled}
+                            />
+                        </antd.Popconfirm>
                         <antd.Button
                             type="ghost"
                             icon={<Icons.FiEdit2 />}
                             onClick={onClickEditTrack}
+                            disabled={props.disabled}
                         />
 
                         <div

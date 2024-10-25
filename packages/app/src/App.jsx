@@ -2,7 +2,7 @@ import "./patches"
 import config from "@config"
 
 import React from "react"
-import { EviteRuntime } from "evite"
+import { Runtime } from "vessel"
 import { Helmet } from "react-helmet"
 import { Translation } from "react-i18next"
 import * as Sentry from "@sentry/browser"
@@ -109,16 +109,12 @@ class ComtyApp extends React.Component {
 			},
 			openLoginForm: async (options = {}) => {
 				app.layout.draggable.open("login", Login, {
-					defaultLocked: options.defaultLocked ?? false,
-					componentProps: {
-						sessionController: this.sessionController,
-					},
 					props: {
-						fillEnd: true,
-						bodyStyle: {
-							height: "100%",
+						sessionController: this.sessionController,
+						onDone: () => {
+							app.layout.draggable.destroy("login")
 						}
-					}
+					},
 				})
 			},
 			openAppsMenu: () => {
@@ -464,4 +460,4 @@ class ComtyApp extends React.Component {
 	}
 }
 
-export default new EviteRuntime(ComtyApp)
+export default new Runtime(ComtyApp)

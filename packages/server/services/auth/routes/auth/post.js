@@ -29,6 +29,13 @@ export default async (req, res) => {
         })
     }
 
+    if (user.activated === false) {
+        return res.status(401).json({
+            user_id: user._id.toString(),
+            activation_required: true,
+        })
+    }
+
     const userConfig = await UserConfig.findOne({ user_id: user._id.toString() }).catch(() => {
         return {}
     })

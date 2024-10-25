@@ -6,4 +6,6 @@ export default class Account {
     static create = require("./methods/create").default
     static sessions = require("./methods/sessions").default
     static deleteSession = require("./methods/deleteSession").default
+    static sendActivationCode = require("./methods/sendActivationCode").default
+    static activateAccount = require("./methods/activateAccount").default
 }

@@ -1,6 +1,8 @@
-import { Server } from "linebridge/dist/server"
+import { Server } from "linebridge"
 
 import B2 from "backblaze-b2"
+
+import hePkg from "hyper-express/package.json"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
@@ -30,6 +32,8 @@ class API extends Server {
     }
 
     async onInitialize() {
+        console.log(`Using HyperExpress v${hePkg.version}`)
+
         global.storage = this.contexts.storage
 
         if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {

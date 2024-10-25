@@ -78,32 +78,6 @@ export default class ToolsBar extends React.Component {
                         id="tools_bar"
                         className="tools-bar"
                     >
-                        {/* <div className="card" id="trendings">
-                            <div className="header">
-                                <h2>
-                                    <Icons.TrendingUp />
-                                    <Translation>{(t) => t("Trendings")}</Translation>
-                                </h2>
-                            </div>
-
-                            <HashtagTrendings />
-                        </div>
-
-                        <div className="card" id="onlineFriends">
-                            <div className="header">
-                                <h2>
-                                    <Icons.MdPeopleAlt />
-                                    <Translation>{(t) => t("Online Friends")}</Translation>
-                                </h2>
-                            </div>
-
-                            <ConnectedFriends />
-                        </div>
-
-                        <FeaturedEventsAnnouncements /> */}
-
-                        <WidgetsWrapper />
-
                         <div className="attached_renders">
                             {
                                 this.state.renders.map((render) => {
@@ -111,6 +85,8 @@ export default class ToolsBar extends React.Component {
                                 })
                             }
                         </div>
+
+                        <WidgetsWrapper />
                     </div>
                 </div>
             }}

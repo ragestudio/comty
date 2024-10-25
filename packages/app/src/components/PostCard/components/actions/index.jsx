@@ -57,7 +57,7 @@ const MoreActionsItems = [
     },
 ]
 
-export default (props) => {
+const PostActions = (props) => {
     const [isSelf, setIsSelf] = React.useState(false)
 
     const {
@@ -129,3 +129,5 @@ export default (props) => {
         </div>
     </div>
 }
+
+export default PostActions

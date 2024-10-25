@@ -8,7 +8,7 @@ import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
 import { Icons } from "@components/Icons"
 import Controls from "@components/Player/Controls"
 
-import { Context } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 function isOverflown(element) {
     if (!element) {
@@ -47,7 +47,7 @@ const RenderAlbum = (props) => {
 }
 
 const PlayerController = React.forwardRef((props, ref) => {
-    const context = React.useContext(Context)
+    const playerState = usePlayerStateContext()
 
     const titleRef = React.useRef()
 
@@ -63,42 +63,42 @@ const PlayerController = React.forwardRef((props, ref) => {
     async function onDragEnd(seekTime) {
         setDraggingTime(false)
 
-        app.cores.player.seek(seekTime)
+        app.cores.player.controls.seek(seekTime)
 
         syncPlayback()
     }
 
     async function syncPlayback() {
-        if (!context.track_manifest) {
+        if (!playerState.track_manifest) {
             return false
         }
 
-        const currentTrackTime = app.cores.player.seek()
+        const currentTrackTime = app.cores.player.controls.seek()
 
         setCurrentTime(currentTrackTime)
     }
 
     //* Handle when playback status change
     React.useEffect(() => {
-        if (context.playback_status === "playing") {
+        if (playerState.playback_status === "playing") {
             setSyncInterval(setInterval(syncPlayback, 1000))
         } else {
             if (syncInterval) {
                 clearInterval(syncInterval)
             }
         }
-    }, [context.playback_status])
+    }, [playerState.playback_status])
 
     React.useEffect(() => {
         setTitleIsOverflown(isOverflown(titleRef.current))
-        setTrackDuration(app.cores.player.duration())
-    }, [context.track_manifest])
+        setTrackDuration(app.cores.player.controls.duration())
+    }, [playerState.track_manifest])
 
     React.useEffect(() => {
         syncPlayback()
     }, [])
 
-    const isStopped = context.playback_status === "stopped"
+    const isStopped = playerState.playback_status === "stopped"
 
     return <div
         className={classnames(
@@ -124,8 +124,8 @@ const PlayerController = React.forwardRef((props, ref) => {
                             )}
                         >
                             {
-                                context.playback_status === "stopped" ? "Nothing is playing" : <>
-                                    {context.track_manifest?.title ?? "Nothing is playing"}
+                                playerState.playback_status === "stopped" ? "Nothing is playing" : <>
+                                    {playerState.track_manifest?.title ?? "Nothing is playing"}
                                 </>
                             }
                         </h4>
@@ -143,7 +143,7 @@ const PlayerController = React.forwardRef((props, ref) => {
                                     isStopped ?
                                         "Nothing is playing" :
                                         <>
-                                            {context.track_manifest?.title ?? "Untitled"}
+                                            {playerState.track_manifest?.title ?? "Untitled"}
                                         </>
                                 }
                             </h4>
@@ -152,9 +152,9 @@ const PlayerController = React.forwardRef((props, ref) => {
                 </div>
 
                 <div className="lyrics-player-controller-info-details">
-                    <RenderArtist artist={context.track_manifest?.artists} />
+                    <RenderArtist artist={playerState.track_manifest?.artists} />
                     -
-                    <RenderAlbum album={context.track_manifest?.album} />
+                    <RenderAlbum album={playerState.track_manifest?.album} />
                 </div>
             </div>
 
@@ -189,7 +189,7 @@ const PlayerController = React.forwardRef((props, ref) => {
 
             <div className="lyrics-player-controller-tags">
                 {
-                    context.track_manifest?.metadata.lossless && <Tag
+                    playerState.track_manifest?.metadata.lossless && <Tag
                         icon={<Icons.TbWaveSine />}
                         bordered={false}
                     >
@@ -197,7 +197,7 @@ const PlayerController = React.forwardRef((props, ref) => {
                     </Tag>
                 }
                 {
-                    context.track_manifest?.explicit && <Tag
+                    playerState.track_manifest?.explicit && <Tag
                         bordered={false}
                     >
                         Explicit
@@ -212,7 +212,7 @@ const PlayerController = React.forwardRef((props, ref) => {
                     </Tag>
                 }
                 {
-                    props.lyrics?.available_langs && <Button
+                    props.lyrics?.available_langs?.length > 1 && <Button
                         icon={<Icons.MdTranslate />}
                         type={props.translationEnabled ? "primary" : "default"}
                         onClick={() => props.toggleTranslationEnabled()}

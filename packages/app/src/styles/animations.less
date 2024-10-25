@@ -113,3 +113,16 @@
 		transform: translateY(-3px);
 	}
 }
+
+@keyframes rootScaleOut {
+	0% {
+		transform: scale(1);
+	}
+
+	100% {
+		border-radius: 24px;
+		transform: perspective(1000px) scale(0.99);
+		box-shadow: 0 0 500px 10px var(--colorPrimary);
+		overflow: hidden;
+	}
+}

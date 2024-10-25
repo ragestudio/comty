@@ -1,42 +1,52 @@
 import React from "react"
 
-export const DefaultContextValues = {
-    loading: false,
-    minimized: false,
+function deepUnproxy(obj) {
+    // Verificar si es un array y hacer una copia en consecuencia
+    if (Array.isArray(obj)) {
+        obj = [...obj];
+    } else {
+        obj = Object.assign({}, obj);
+    }
 
-    muted: false,
-    volume: 1,
+    for (let key in obj) {
+        if (obj[key] && typeof obj[key] === "object") {
+            obj[key] = deepUnproxy(obj[key]);  // Recursión para profundizar en objetos y arrays
+        }
+    }
 
-    sync_mode: false,
-    livestream_mode: false,
-    control_locked: false,
-
-    track_cover_analysis: null,
-    track_metadata: null,
-
-    playback_mode: "repeat",
-    playback_status: null,
+    return obj;
 }
 
-export const Context = React.createContext(DefaultContextValues)
+export const usePlayerStateContext = (updater) => {
+    const [state, setState] = React.useState({ ...app.cores.player.state })
+
+    function handleStateChange(newState) {
+        newState = deepUnproxy(newState)
+
+        setState(newState)
+
+        if (typeof updater === "function") {
+            updater(newState)
+        }
+    }
+
+    React.useEffect(() => {
+        handleStateChange(app.cores.player.state)
+
+        app.cores.player.eventBus().on("player.state.update", handleStateChange)
+
+        return () => {
+            app.cores.player.eventBus().off("player.state.update", handleStateChange)
+        }
+    }, [])
+
+    return state
+}
+
+export const Context = React.createContext({})
 
 export class WithPlayerContext extends React.Component {
-    state = {
-        loading: app.cores.player.state["loading"],
-        minimized: app.cores.player.state["minimized"],
-
-        muted: app.cores.player.state["muted"],
-        volume: app.cores.player.state["volume"],
-
-        sync_mode: app.cores.player.state["sync_mode"],
-        livestream_mode: app.cores.player.state["livestream_mode"],
-        control_locked: app.cores.player.state["control_locked"],
-
-        track_manifest: app.cores.player.state["track_manifest"],
-
-        playback_mode: app.cores.player.state["playback_mode"],
-        playback_status: app.cores.player.state["playback_status"],
-    }
+    state = app.cores.player.state
 
     events = {
         "player.state.update": (state) => {
@@ -44,17 +54,15 @@ export class WithPlayerContext extends React.Component {
         },
     }
 
-    eventBus = app.cores.player.eventBus
-
     componentDidMount() {
         for (const [event, handler] of Object.entries(this.events)) {
-            this.eventBus.on(event, handler)
+            app.cores.player.eventBus().on(event, handler)
         }
     }
 
     componentWillUnmount() {
         for (const [event, handler] of Object.entries(this.events)) {
-            this.eventBus.off(event, handler)
+            app.cores.player.eventBus().off(event, handler)
         }
     }
 

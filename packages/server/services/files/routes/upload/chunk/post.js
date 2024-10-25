@@ -57,6 +57,8 @@ export default {
                     source: build.filePath,
                     service: limits.useProvider,
                     useCompression: limits.useCompression,
+                    transmux: req.headers["transmux"] ?? false,
+                    transmuxOptions: req.headers["transmux-options"],
                     cachePath: tmpPath,
                 })
 

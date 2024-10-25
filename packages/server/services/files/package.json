@@ -5,15 +5,16 @@
         "backblaze-b2": "^1.7.0",
         "busboy": "^1.6.0",
         "content-range": "^2.0.2",
+        "ffmpeg-static": "^5.2.0",
         "fluent-ffmpeg": "^2.1.2",
         "merge-files": "^0.1.2",
         "mime-types": "^2.1.35",
-        "sharp": "0.32.6",
         "minio": "^7.0.32",
         "normalize-url": "^8.0.0",
-        "p-map": "4.0.0",
+        "p-map": "4",
         "p-queue": "^7.3.4",
         "redis": "^4.6.6",
+        "sharp": "0.32.6",
         "split-chunk-merge": "^1.0.0"
     }
 }

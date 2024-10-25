@@ -2,13 +2,13 @@
 require("dotenv").config()
 require("sucrase/register")
 
-const path = require("path")
-const Module = require("module")
-const { Buffer } = require("buffer")
-const { webcrypto: crypto } = require("crypto")
+const path = require("node:path")
+const Module = require("node:module")
+const { Buffer } = require("node:buffer")
+const { webcrypto: crypto } = require("node:crypto")
 const { InfisicalClient } = require("@infisical/sdk")
-
 const moduleAlias = require("module-alias")
+const { onExit } = require("signal-exit")
 
 // Override file execution arg
 process.argv.splice(1, 1)
@@ -135,12 +135,26 @@ async function Boot(main) {
         throw new Error("main class is not defined")
     }
 
+    console.log(`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`)
+
     if (process.env.INFISICAL_CLIENT_ID && process.env.INFISICAL_CLIENT_SECRET) {
         console.log(`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`)
         await injectEnvFromInfisical()
     }
 
     const instance = new main()
+
+    onExit((code, signal) => {
+        console.log(`[BOOT] Cleaning up...`)
+
+        if (typeof instance.onClose === "function") {
+            instance.onClose()
+        }
+
+        instance.engine.close()
+    }, {
+        alwaysLast: true,
+    })
 
     await instance.initialize()
 
@@ -153,13 +167,15 @@ async function Boot(main) {
     return instance
 }
 
-console.log(`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`)
+try {
+    // Apply patches
+    registerPatches()
 
-// Apply patches
-registerPatches()
+    // Apply aliases
+    registerAliases()
 
-// Apply aliases
-registerAliases()
-
-// execute main
-Module.runMain()
+    // execute main
+    Module.runMain()
+} catch (error) {
+    console.error("[BOOT] ❌ Boot error: ", error)
+}

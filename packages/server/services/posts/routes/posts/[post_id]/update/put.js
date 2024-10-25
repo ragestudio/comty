@@ -1,7 +1,7 @@
 import PostClass from "@classes/posts"
 import { Post } from "@db_models"
 
-const AllowedFields = ["message", "tags", "attachments"]
+const AllowedFields = ["message", "tags", "attachments", "poll_options"]
 
 // TODO: Get limits from LimitsAPI
 const MaxStringsLengths = {

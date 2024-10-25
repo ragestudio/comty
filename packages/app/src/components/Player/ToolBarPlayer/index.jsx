@@ -4,7 +4,7 @@ import Marquee from "react-fast-marquee"
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
-import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
 
@@ -43,7 +43,7 @@ const ServiceIndicator = (props) => {
 }
 
 const Player = (props) => {
-    const ctx = React.useContext(Context)
+    const playerState = usePlayerStateContext()
 
     const contentRef = React.useRef()
     const titleRef = React.useRef()
@@ -64,16 +64,16 @@ const Player = (props) => {
     const {
         title,
         album,
-        artist,
+        artistStr,
         liked,
         service,
-        lyricsEnabled,
+        lyrics_enabled,
         cover_analysis,
         cover,
-    } = ctx.track_manifest ?? {}
+    } = playerState.track_manifest ?? {}
 
-    const playing = ctx.playback_status === "playing"
-    const stopped = ctx.playback_status === "stopped"
+    const playing = playerState.playback_status === "playing"
+    const stopped = playerState.playback_status === "stopped"
 
     const titleText = (!playing && stopped) ? "Stopped" : (title ?? "Untitled")
     const subtitleText = ""
@@ -89,7 +89,7 @@ const Player = (props) => {
             "toolbar_player_wrapper",
             {
                 "hover": topActionsVisible,
-                "minimized": ctx.minimized,
+                "minimized": playerState.minimized,
                 "cover_light": cover_analysis?.isLight,
             }
         )}
@@ -106,7 +106,7 @@ const Player = (props) => {
             )}
         >
             {
-                !ctx.control_locked && <antd.Button
+                !playerState.control_locked && <antd.Button
                     icon={<Icons.MdCast />}
                     shape="circle"
 
@@ -114,7 +114,7 @@ const Player = (props) => {
             }
 
             {
-                lyricsEnabled && <antd.Button
+                lyrics_enabled && <antd.Button
                     icon={<Icons.MdLyrics />}
                     shape="circle"
                     onClick={() => app.location.push("/lyrics")}
@@ -170,7 +170,7 @@ const Player = (props) => {
                         titleOverflown && <Marquee
                             gradientColor={RGBStringToValues(cover_analysis?.rgb)}
                             gradientWidth={20}
-                            play={ctx.playback_status !== "stopped"}
+                            play={playerState.playback_status !== "stopped"}
                         >
                             <h1
                                 className="toolbar_player_info_title"
@@ -185,7 +185,7 @@ const Player = (props) => {
                     }
 
                     <p className="toolbar_player_info_subtitle">
-                        {artist ?? ""}
+                        {artistStr ?? ""}
                     </p>
                 </div>
 
@@ -193,10 +193,10 @@ const Player = (props) => {
                     <Controls />
 
                     <SeekBar
-                        stopped={ctx.playback_status === "stopped"}
-                        playing={ctx.playback_status === "playing"}
-                        streamMode={ctx.livestream_mode}
-                        disabled={ctx.control_locked}
+                        stopped={playerState.playback_status === "stopped"}
+                        playing={playerState.playback_status === "playing"}
+                        streamMode={playerState.livestream_mode}
+                        disabled={playerState.control_locked}
                     />
 
                     <ExtraActions />
@@ -206,10 +206,4 @@ const Player = (props) => {
     </div>
 }
 
-const PlayerContextHandler = () => {
-    return <WithPlayerContext>
-        <Player />
-    </WithPlayerContext>
-}
-
-export default PlayerContextHandler
+export default Player

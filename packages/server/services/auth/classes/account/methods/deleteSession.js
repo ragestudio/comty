@@ -20,7 +20,9 @@ export default async (payload = {}) => {
         throw new OperationError(400, "Session not found")
     }
 
-    await session.delete()
+    await Session.findOneAndDelete({
+        _id: session._id
+    })
 
     return {
         success: true

@@ -7,7 +7,7 @@ import fullfill from "./fullfill"
 export default async (payload = {}) => {
     await requiredFields(["user_id"], payload)
 
-    let { user_id, message, attachments, timestamp, reply_to } = payload
+    let { user_id, message, attachments, timestamp, reply_to, poll_options } = payload
 
     // check if is a Array and have at least one element
     const isAttachmentsValid = Array.isArray(attachments) && attachments.length > 0
@@ -20,6 +20,16 @@ export default async (payload = {}) => {
         timestamp = DateTime.local().toISO()
     }
 
+    if (Array.isArray(poll_options)) {
+        poll_options = poll_options.map((option) => {
+            if (!option.id) {
+                option.id = nanoid()
+            }
+
+            return option
+        })
+    }
+
     let post = new Post({
         created_at: timestamp,
         user_id: typeof user_id === "object" ? user_id.toString() : user_id,
@@ -27,6 +37,7 @@ export default async (payload = {}) => {
         attachments: attachments ?? [],
         reply_to: reply_to,
         flags: [],
+        poll_options: poll_options,
     })
 
     await post.save()

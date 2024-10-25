@@ -20,39 +20,57 @@ export function checkTotalSize(
 }
 
 export function checkChunkUploadHeaders(headers) {
-    if (
-        !headers["uploader-chunk-number"] ||
-        !headers["uploader-chunks-total"] ||
-        !headers["uploader-original-name"] ||
-        !headers["uploader-file-id"] ||
-        !headers["uploader-chunks-total"].match(/^[0-9]+$/) ||
-        !headers["uploader-chunk-number"].match(/^[0-9]+$/)
-    ) {
-        return false
+    const requiredHeaders = [
+        "uploader-chunk-number",
+        "uploader-chunks-total",
+        "uploader-original-name",
+        "uploader-file-id"
+    ]
+
+    for (const header of requiredHeaders) {
+        if (!headers[header] || typeof headers[header] !== "string") {
+            return false
+        }
+
+        if (
+            (header === "uploader-chunk-number" || header === "uploader-chunks-total")
+            && !/^[0-9]+$/.test(headers[header])
+        ) {
+            return false
+        }
     }
 
     return true
 }
 
+
 export function createAssembleChunksPromise({
-    chunksPath, // chunks to assemble
-    filePath, // final assembled file path
+    chunksPath,
+    filePath,
     maxFileSize,
 }) {
     return () => new Promise(async (resolve, reject) => {
         let fileSize = 0
 
         if (!fs.existsSync(chunksPath)) {
-            return reject(new OperationError(500,"No chunks found"))
+            return reject(new OperationError(500, "No chunks found"))
         }
 
-        const chunks = await fs.promises.readdir(chunksPath)
+        let chunks = await fs.promises.readdir(chunksPath)
 
         if (chunks.length === 0) {
-            throw new OperationError(500, "No chunks found")
+            return reject(new OperationError(500, "No chunks found"))
         }
 
-        for await (const chunk of chunks) {
+        // Ordenar los chunks numéricamente
+        chunks = chunks.sort((a, b) => {
+            const aNum = parseInt(a, 10)
+            const bNum = parseInt(b, 10)
+
+            return aNum - bNum
+        })
+
+        for (const chunk of chunks) {
             const chunkPath = path.join(chunksPath, chunk)
 
             if (!fs.existsSync(chunkPath)) {
@@ -60,18 +78,13 @@ export function createAssembleChunksPromise({
             }
 
             const data = await fs.promises.readFile(chunkPath)
-
             fileSize += data.length
 
-            // check if final file gonna exceed max file size
-            // in case early estimation is wrong (due client send bad headers)
             if (fileSize > maxFileSize) {
                 return reject(new OperationError(413, "File exceeds max total file size, aborting assembly..."))
             }
 
             await fs.promises.appendFile(filePath, data)
-
-            continue
         }
 
         return resolve({
@@ -81,7 +94,15 @@ export function createAssembleChunksPromise({
     })
 }
 
-export async function handleChunkFile(fileStream, { tmpDir, headers, maxFileSize, maxChunkSize }) {
+export async function handleChunkFile(
+    fileStream,
+    {
+        tmpDir,
+        headers,
+        maxFileSize,
+        maxChunkSize
+    }
+) {
     return await new Promise(async (resolve, reject) => {
         const chunksPath = path.join(tmpDir, headers["uploader-file-id"], "chunks")
         const chunkPath = path.join(chunksPath, headers["uploader-chunk-number"])
@@ -94,7 +115,7 @@ export async function handleChunkFile(fileStream, { tmpDir, headers, maxFileSize
 
         // make sure chunk is in range
         if (chunkCount < 0 || chunkCount >= totalChunks) {
-            throw new OperationError(500, "Chunk is out of range")
+            return reject(new OperationError(500, "Chunk is out of range"))
         }
 
         // if is the first chunk check if dir exists before write things
@@ -162,11 +183,14 @@ export async function handleChunkFile(fileStream, { tmpDir, headers, maxFileSize
     })
 }
 
-export async function uploadChunkFile(req, {
-    tmpDir,
-    maxFileSize,
-    maxChunkSize,
-}) {
+export async function uploadChunkFile(
+    req,
+    {
+        tmpDir,
+        maxFileSize,
+        maxChunkSize,
+    }
+) {
     return await new Promise(async (resolve, reject) => {
         if (!checkChunkUploadHeaders(req.headers)) {
             reject(new OperationError(400, "Missing header(s)"))

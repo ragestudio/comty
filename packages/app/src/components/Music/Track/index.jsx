@@ -7,7 +7,7 @@ import RGBStringToValues from "@utils/rgbToValues"
 import ImageViewer from "@components/ImageViewer"
 import { Icons } from "@components/Icons"
 
-import { Context as PlayerContext } from "@contexts/WithPlayerContext"
+import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
 import "./index.less"
@@ -28,7 +28,7 @@ const Track = (props) => {
         loading,
         track_manifest,
         playback_status,
-    } = React.useContext(PlayerContext)
+    } = usePlayerStateContext()
 
     const playlist_ctx = React.useContext(PlaylistContext)
 
@@ -186,12 +186,16 @@ const Track = (props) => {
                         {
                             props.track.service === "tidal" && <Icons.SiTidal />
                         }
-                        {props.track.title}
+                        {
+                            props.track.title
+                        }
                     </span>
                 </div>
                 <div className="music-track_artist">
                     <span>
-                        {props.track.artist}
+                        {
+                            Array.isArray(props.track.artists) ? props.track.artists.join(", ") : props.track.artist
+                        }
                     </span>
                 </div>
             </div>

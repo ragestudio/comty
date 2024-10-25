@@ -336,7 +336,12 @@ export default class Sidebar extends React.Component {
 		const selectedKeyId = this.state.selectedMenuItem?.id
 
 		return <div
-			className="app_sidebar_wrapper"
+			className={classnames(
+				"app_sidebar_wrapper",
+				{
+					["hidden"]: !this.state.visible
+				}
+			)}
 			onMouseEnter={this.onMouseEnter}
 			onMouseLeave={this.handleMouseLeave}
 		>

@@ -2,8 +2,10 @@ import React from "react"
 import * as antd from "antd"
 import axios from "axios"
 
+import "./index.less"
+
 const LyricsTextView = (props) => {
-    const { lang, track } = props
+    const { lrcURL } = props
 
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState(null)
@@ -24,19 +26,19 @@ const LyricsTextView = (props) => {
 
             return null
         })
-        
+
         if (data) {
-            setLyrics(data.data)
+            setLyrics(data.data.split("\n"))
         }
 
         setLoading(false)
     }
 
     React.useEffect(() => {
-        getLyrics(lang.value)
-    }, [lang])
+        getLyrics(lrcURL)
+    }, [lrcURL])
 
-    if (!lang) {
+    if (!lrcURL) {
         return null
     }
 
@@ -52,8 +54,21 @@ const LyricsTextView = (props) => {
         return <antd.Skeleton active />
     }
 
-    return <div>
-        <p>{lyrics}</p>
+    if (!lyrics) {
+        return <p>No lyrics provided</p>
+    }
+
+    return <div className="lyrics-text-view">
+        {
+            lyrics?.map((line, index) => {
+                return <div
+                    key={index}
+                    className="lyrics-text-view-line"
+                >
+                    {line}
+                </div>
+            })
+        }
     </div>
 }
 

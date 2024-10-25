@@ -38,8 +38,12 @@ export class StorageClient extends Minio.Client {
         this.defaultRegion = String(options.defaultRegion)
     }
 
-    composeRemoteURL = (key) => {
-        const _path = path.join(this.defaultBucket, key)
+    composeRemoteURL = (key, extraKey) => {
+        let _path = path.join(this.defaultBucket, key)
+
+        if (typeof extraKey === "string") {
+            _path = path.join(_path, extraKey)
+        }
 
         return `${this.protocol}//${this.host}:${this.port}/${_path}`
     }

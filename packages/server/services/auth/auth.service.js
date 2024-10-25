@@ -1,4 +1,4 @@
-import { Server } from "linebridge/dist/server"
+import { Server } from "linebridge"
 import DbManager from "@shared-classes/DbManager"
 
 import SharedMiddlewares from "@shared-middlewares"

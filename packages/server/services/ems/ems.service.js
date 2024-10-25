@@ -1,9 +1,8 @@
-import { Server } from "linebridge/dist/server"
+import { Server } from "linebridge"
 import nodemailer from "nodemailer"
 import DbManager from "@shared-classes/DbManager"
 
 import SharedMiddlewares from "@shared-middlewares"
-
 export default class API extends Server {
     static refName = "ems"
     static useEngine = "hyper-express"
@@ -28,6 +27,7 @@ export default class API extends Server {
     }
 
     ipcEvents = {
+        "account:activation:send": require("./ipcEvents/accountActivation").default,
         "new:login": require("./ipcEvents/newLogin").default,
         "mfa:send": require("./ipcEvents/mfaSend").default,
         "apr:send": require("./ipcEvents/aprSend").default,
