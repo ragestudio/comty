@@ -1,22 +1,7 @@
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
 import { FastAverageColor } from "fast-average-color"
 
-async function uploadBinaryArrayToStorage(bin, args) {
-    const { format, data } = bin
-
-    const filenameExt = format.split("/")[1]
-    const filename = `cover.${filenameExt}`
-
-    const byteArray = new Uint8Array(data)
-    const blob = new Blob([byteArray], { type: data.type })
-
-    // create a file object
-    const file = new File([blob], filename, {
-        type: format,
-    })
-
-    return await app.cores.remoteStorage.uploadFile(file, args)
-}
+import MusicService from "@models/music"
 
 export default class TrackManifest {
     constructor(params) {
@@ -57,34 +42,23 @@ export default class TrackManifest {
             this.lyrics_enabled = params.lyrics_enabled
         }
 
-        if (params.cover.startsWith("http")) {
-            try {
-                this.analyzeCoverColor()
-            } catch (error) {
-                // so bad...
-            }
-        }
-
         return this
     }
 
-    uid = null
+    _id = null // used for api requests
+    uid = null // used for internal
 
     cover = "https://storage.ragestudio.net/comty-static-assets/default_song.png"
-
     title = "Untitled"
-
     album = "Unknown"
-
     artist = "Unknown"
-
     source = null
+    metadata = null
 
-    metadata = {}
-
+    // Extended from db
     lyrics_enabled = false
 
-    analyzedMetadata = null
+    liked = null
 
     async initialize() {
         if (this.params.file) {
@@ -104,7 +78,9 @@ export default class TrackManifest {
                 }
 
                 if (this.metadata.tags.picture) {
-                    const coverUpload = await uploadBinaryArrayToStorage(this.metadata.tags.picture)
+                    this.cover = app.cores.remoteStorage.binaryArrayToFile(this.metadata.tags.picture, this.title)
+
+                    const coverUpload = await app.cores.remoteStorage.uploadFile(this.cover)
 
                     this.cover = coverUpload.url
                 }
@@ -146,5 +122,13 @@ export default class TrackManifest {
         this.cover_analysis = await fac.getColorAsync(this.cover)
 
         return this
+    }
+
+    fetchLikeStatus = async () => {
+        if (!this._id) {
+            return null
+        }
+
+        return await MusicService.isItemFavourited("track", this._id)
     }
 }
