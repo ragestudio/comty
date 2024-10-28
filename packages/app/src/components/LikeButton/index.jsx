@@ -4,7 +4,31 @@ import classnames from "classnames"
 import "./index.less"
 
 export default (props) => {
+    const [liked, setLiked] = React.useState(props.liked)
     const [clicked, setClicked] = React.useState(false)
+
+    // TODO: Support handle like change on websocket event
+    if (typeof props.watchWs === "object") {
+        // useWsEvents({
+        //     [props.watchWs.event]: (data) => {
+        //         handleUpdateTrackLike(data.track_id, data.action === "liked")
+        //     }
+        // }, {
+        //     socketName: props.watchWs.socket,
+        // })
+    }
+
+    async function computeLikedState() {
+        if (typeof props.liked === "function") {
+            let result = await props.liked()
+
+            result = result.liked ?? result
+
+            return setLiked(result)
+        }
+
+        return setLiked(props.liked)
+    }
 
     const handleClick = () => {
         setClicked(true)
@@ -16,13 +40,19 @@ export default (props) => {
         if (typeof props.onClick === "function") {
             props.onClick()
         }
+
+        setLiked(!liked)
     }
+
+    React.useEffect(() => {
+        computeLikedState()
+    }, [props.liked])
 
     return <button
         className={classnames(
             "likeButton",
             {
-                ["liked"]: props.liked,
+                ["liked"]: liked,
                 ["clicked"]: clicked,
             }
         )}
