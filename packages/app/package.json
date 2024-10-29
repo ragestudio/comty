@@ -46,7 +46,7 @@
         "capacitor-music-controls-plugin-v3": "^1.1.0",
         "classnames": "2.3.1",
         "dompurify": "^3.0.0",
-        "vessel": "^0.18.0",
+        "@ragestudio/vessel": "^0.18.0",
         "fast-average-color": "^9.2.0",
         "framer-motion": "^10.12.17",
         "fuse.js": "6.5.3",
