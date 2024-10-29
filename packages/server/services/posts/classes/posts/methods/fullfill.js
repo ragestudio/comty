@@ -126,6 +126,8 @@ export default async (payload = {}) => {
             }
         }
 
+        post.share_url = `${process.env.APP_URL}/post/${post._id}`
+
         return {
             ...post,
             user,

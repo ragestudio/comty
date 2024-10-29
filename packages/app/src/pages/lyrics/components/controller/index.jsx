@@ -47,7 +47,7 @@ const RenderAlbum = (props) => {
 }
 
 const PlayerController = React.forwardRef((props, ref) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     const titleRef = React.useRef()
 

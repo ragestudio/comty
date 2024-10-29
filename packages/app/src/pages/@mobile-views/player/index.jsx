@@ -29,7 +29,7 @@ const ServiceIndicator = (props) => {
 }
 
 const AudioPlayer = (props) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     React.useEffect(() => {
         if (app.currentDragger) {

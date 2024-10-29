@@ -4,7 +4,7 @@ import classnames from "classnames"
 
 import "./index.less"
 
-export default (props) => {
+const SearchButton = (props) => {
     const searchBoxRef = React.useRef(null)
 
     const [value, setValue] = React.useState()
@@ -51,6 +51,9 @@ export default (props) => {
                     openSearchBox(false)
                 }
             }}
+            disabled={props.disabled}
         />
     </div>
 }
+
+export default SearchButton

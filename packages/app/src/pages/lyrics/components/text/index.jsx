@@ -5,7 +5,7 @@ import { Motion, spring } from "react-motion"
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 const LyricsText = React.forwardRef((props, textRef) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     const { lyrics } = props
 
@@ -55,7 +55,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
             setVisible(false)
         } else {
             setVisible(true)
-            console.log(`Scrolling to line ${currentLineIndex}`)
+
             // find line element by id
             const lineElement = textRef.current.querySelector(`#lyrics-line-${currentLineIndex}`)
 

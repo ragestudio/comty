@@ -2,22 +2,11 @@ import React from "react"
 import { Translation } from "react-i18next"
 
 import { PagePanelWithNavMenu } from "@components/PagePanels"
+import TrendingsCard from "@components/TrendingsCard"
 
 import usePageWidgets from "@hooks/usePageWidgets"
 
 import Tabs from "./tabs"
-
-const TrendingsCard = () => {
-    return <div className="card">
-        <div className="card-header">
-            <span>Trendings</span>
-        </div>
-
-        <div className="card-content">
-            <span>XD</span>
-        </div>
-    </div>
-}
 
 const TimelinePage = () => {
     usePageWidgets([

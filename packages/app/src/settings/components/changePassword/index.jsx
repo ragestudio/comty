@@ -3,7 +3,7 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 
-import UserModel from "@models/user"
+import AuthModel from "@models/auth"
 
 import "./index.less"
 
@@ -32,7 +32,7 @@ const ChangePasswordComponent = (props) => {
         setError(null)
         setLoading(true)
 
-        const result = await UserModel.changePassword({ currentPassword, newPassword }).catch((err) => {
+        const result = await AuthModel.changePassword({ currentPassword, newPassword }).catch((err) => {
             console.error(err)
             setError(err.response.data.message)
             return null

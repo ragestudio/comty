@@ -64,7 +64,7 @@ export default {
                 return app.cores.player.audioContext.sampleRate
             },
             onUpdate: async (value) => {
-                const sampleRate = await app.cores.player.setSampleRate(value)
+                const sampleRate = await app.cores.player.controls.setSampleRate(value)
 
                 return sampleRate
             },
@@ -93,6 +93,18 @@ export default {
                     app.cores.player.compressor.detach()
                 }
             },
+            extraActions: [
+                {
+                    id: "reset",
+                    title: "Default",
+                    icon: "MdRefresh",
+                    onClick: async (ctx) => {
+                        const values = await app.cores.player.compressor.presets.setCurrentPresetToDefault()
+
+                        ctx.updateCurrentValue(values)
+                    }
+                }
+            ],
             props: {
                 valueFormat: (value) => `${value}dB`,
                 sliders: [
@@ -131,20 +143,8 @@ export default {
                     },
                 ],
             },
-            extraActions: [
-                {
-                    id: "reset",
-                    title: "Default",
-                    icon: "MdRefresh",
-                    onClick: async (ctx) => {
-                        const values = await app.cores.player.compressor.resetDefaultValues()
-
-                        ctx.updateCurrentValue(values)
-                    }
-                }
-            ],
             onUpdate: (value) => {
-                app.cores.player.compressor.modifyValues(value)
+                app.cores.player.compressor.presets.setToCurrent(value)
 
                 return value
             },
@@ -164,15 +164,15 @@ export default {
                     title: "Reset",
                     icon: "MdRefresh",
                     onClick: (ctx) => {
-                        const values = app.cores.player.eq.resetDefaultValues()
+                        const values = app.cores.player.eq.presets.setCurrentPresetToDefault()
 
                         ctx.updateCurrentValue(values)
                     }
                 },
             ],
-            dependsOn: {
-                "player.equalizer": true
-            },
+            // dependsOn: {
+            //     "player.equalizer": true
+            // },
             props: {
                 valueFormat: (value) => `${value}dB`,
                 marks: [
@@ -251,7 +251,7 @@ export default {
                     return acc
                 }, {})
 
-                app.cores.player.eq.modifyValues(values)
+                app.cores.player.eq.presets.setToCurrent(values)
 
                 return value
             },

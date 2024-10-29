@@ -8,7 +8,23 @@ export default class RemoteStorage extends Core {
     static depends = ["api", "tasksQueue"]
 
     public = {
-        uploadFile: this.uploadFile.bind(this),
+        uploadFile: this.uploadFile,
+        getFileHash: this.getFileHash,
+        binaryArrayToFile: this.binaryArrayToFile,
+    }
+
+    binaryArrayToFile(bin, filename) {
+        const { format, data } = bin
+
+        const filenameExt = format.split("/")[1]
+        filename = `${filename}.${filenameExt}`
+
+        const byteArray = new Uint8Array(data)
+        const blob = new Blob([byteArray], { type: data.type })
+
+        return new File([blob], filename, {
+            type: format,
+        })
     }
 
     async getFileHash(file) {

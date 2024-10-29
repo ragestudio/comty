@@ -10,7 +10,6 @@ export default class PlayerUI {
     //
     // UI Methods
     //
-
     attachPlayerComponent() {
         if (this.currentDomWindow) {
             this.player.console.warn("EmbbededMediaPlayer already attached")
@@ -18,7 +17,9 @@ export default class PlayerUI {
         }
 
         if (app.layout.tools_bar) {
-            this.currentDomWindow = app.layout.tools_bar.attachRender("mediaPlayer", ToolBarPlayer)
+            this.currentDomWindow = app.layout.tools_bar.attachRender("mediaPlayer", ToolBarPlayer, undefined, {
+                position: "bottom",
+            })
         }
     }
 

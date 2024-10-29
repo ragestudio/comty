@@ -13,6 +13,8 @@ export default class TrackInstance {
         this.player = player
         this.manifest = manifest
 
+        this.id = this.manifest.id ?? this.manifest._id
+
         return this
     }
 
@@ -96,6 +98,18 @@ export default class TrackInstance {
         this._initialized = true
 
         return this
+    }
+
+    stop = () => {
+        this.audio.pause()
+
+        const lastProcessor = this.attachedProcessors[this.attachedProcessors.length - 1]
+
+        if (lastProcessor) {
+            this.attachedProcessors[this.attachedProcessors.length - 1]._destroy(this)
+        }
+
+        this.attachedProcessors = []
     }
 
     resolveManifest = async () => {

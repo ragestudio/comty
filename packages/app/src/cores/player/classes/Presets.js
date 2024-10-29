@@ -4,6 +4,7 @@ export default class Presets {
     constructor({
         storage_key,
         defaultPresetValue,
+        onApplyValues,
     }) {
         if (!storage_key) {
             throw new Error("storage_key is required")
@@ -11,6 +12,7 @@ export default class Presets {
 
         this.storage_key = storage_key
         this.defaultPresetValue = defaultPresetValue
+        this.onApplyValues = onApplyValues
 
         return this
     }
@@ -38,14 +40,25 @@ export default class Presets {
     }
 
     get currentPresetValues() {
-        const presets = this.presets
-        const key = this.currentPresetKey
-
-        if (!presets || !presets[key]) {
+        if (!this.presets || !this.presets[this.currentPresetKey]) {
             return this.defaultPresetValue
         }
 
-        return presets[key]
+        return this.presets[this.currentPresetKey]
+    }
+
+    set currentPresetValues(values) {
+        const newData = this.presets
+
+        newData[this.currentPresetKey] = values
+
+        this.presets = newData
+    }
+
+    applyValues() {
+        if (typeof this.onApplyValues === "function") {
+            this.onApplyValues(this.presets)
+        }
     }
 
     deletePreset(key) {
@@ -54,64 +67,74 @@ export default class Presets {
             return false
         }
 
+        // if current preset is deleted, change to default
         if (this.currentPresetKey === key) {
             this.changePreset("default")
         }
 
-        let presets = this.presets
+        let newData = this.presets
 
-        delete presets[key]
+        delete newData[key]
 
-        this.presets = presets
+        this.presets = newData
 
-        return presets
+        this.applyValues()
+
+        return newData
     }
 
     createPreset(key, values) {
-        let presets = this.presets
-
-        if (presets[key]) {
+        if (this.presets[key]) {
             app.message.error("Preset already exists")
             return false
         }
 
-        presets[key] = values ?? this.defaultPresetValue
+        let newData = this.presets
 
-        this.presets = presets
+        newData[key] = values ?? this.defaultPresetValue
 
-        return presets[key]
+        this.applyValues()
+
+        this.presets = newData
+
+        return newData
     }
 
     changePreset(key) {
-        let presets = this.presets
-
         // create new one
-        if (!presets[key]) {
-            presets[key] = this.defaultPresetValue
-
-            this.presets = presets
+        if (!this.presets[key]) {
+            this.presets[key] = this.defaultPresetValue
         }
 
         this.currentPresetKey = key
 
-        return presets[key]
+        this.applyValues()
+
+        return this.presets[key]
     }
 
     setToCurrent(values) {
-        let preset = this.currentPresetValues
-
-        preset = {
-            ...preset,
+        this.currentPresetValues = {
+            ...this.currentPresetValues,
             ...values,
         }
 
-        // update presets
-        let presets = this.presets
+        this.applyValues()
 
-        presets[this.currentPresetKey] = preset
+        return this.currentPresetValues
+    }
 
-        this.presets = presets
+    async setCurrentPresetToDefault() {
+        return await new Promise((resolve) => {
+            app.layout.modal.confirm.confirm({
+                title: "Reset to default values?",
+                content: "Are you sure you want to reset to default values?",
+                onOk: () => {
+                    this.setToCurrent(this.defaultPresetValue)
 
-        return preset
+                    resolve(this.currentPresetValues)
+                }
+            })
+        })
     }
 }

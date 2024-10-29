@@ -61,6 +61,10 @@ export default async (req) => {
     if (typeof trackLyrics.lrc === "object") {
         trackLyrics.translated_lang = translate_lang
 
+        if (!trackLyrics.lrc[translate_lang]) {
+            translate_lang = "original"
+        }
+
         if (trackLyrics.lrc[translate_lang]) {
             trackLyrics.synced_lyrics = await remoteLcrToSyncedLyrics(trackLyrics.lrc[translate_lang])
         }

@@ -43,7 +43,7 @@ export default class PlayerProcessors {
                 Object.entries(processor.exposeToPublic).forEach(([key, value]) => {
                     const refName = processor.constructor.refName
 
-                    if (typeof this.public[refName] === "undefined") {
+                    if (typeof this.player.public[refName] === "undefined") {
                         // by default create a empty object
                         this.player.public[refName] = {}
                     }
@@ -55,8 +55,6 @@ export default class PlayerProcessors {
     }
 
     async attachProcessorsToInstance(instance) {
-        this.player.console.log(instance, this.processors)
-
         for await (const [index, processor] of this.processors.entries()) {
             if (processor.constructor.node_bypass === true) {
                 instance.contextElement.connect(processor.processor)

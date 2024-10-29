@@ -7,6 +7,8 @@ import RGBStringToValues from "@utils/rgbToValues"
 import ImageViewer from "@components/ImageViewer"
 import { Icons } from "@components/Icons"
 
+import MusicModel from "@models/music"
+
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
@@ -14,21 +16,29 @@ import "./index.less"
 
 const handlers = {
     "like": async (ctx, track) => {
-        app.cores.player.toggleCurrentTrackLike(true, track)
+        await MusicModel.toggleItemFavourite("track", track._id, true)
+
+        ctx.changeState({
+            liked: true,
+        })
         ctx.closeMenu()
     },
     "unlike": async (ctx, track) => {
-        app.cores.player.toggleCurrentTrackLike(false, track)
+        await MusicModel.toggleItemFavourite("track", track._id, false)
+
+        ctx.changeState({
+            liked: false,
+        })
         ctx.closeMenu()
     },
 }
 
 const Track = (props) => {
-    const {
+    const [{
         loading,
         track_manifest,
         playback_status,
-    } = usePlayerStateContext()
+    }] = usePlayerStateContext()
 
     const playlist_ctx = React.useContext(PlaylistContext)
 
@@ -74,7 +84,8 @@ const Track = (props) => {
                 {
                     closeMenu: () => {
                         setMoreMenuOpened(false)
-                    }
+                    },
+                    changeState: props.changeState,
                 },
                 props.track
             )

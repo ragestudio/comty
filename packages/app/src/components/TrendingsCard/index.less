@@ -1,0 +1,35 @@
+.trendings {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+    padding: 0 10px;
+
+    .trending {
+        display: inline-flex;
+        flex-direction: column;
+
+        justify-content: center;
+
+        gap: 5px;
+
+        cursor: pointer;
+
+        &:not(:last-child) {
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .trending-level {
+            font-family: "DM Mono", monospace;
+        }
+
+        .trending-info {
+            font-size: 0.7rem;
+
+            span {
+                color: var(--background-color-contrast);
+            }
+        }
+    }
+}

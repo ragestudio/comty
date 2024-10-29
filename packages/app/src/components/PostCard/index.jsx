@@ -46,6 +46,12 @@ const messageRegexs = [
             return <a key={key} onClick={() => window.app.location.push(`/@${result[1].substr(1)}`)}>{result[1]}</a>
         }
     },
+    {
+        regex: /#[a-zA-Z0-9_]+/gi,
+        fn: (key, result) => {
+            return <a key={key} onClick={() => window.app.location.push(`/trending/${result[0].substr(1)}`)}>{result[0]}</a>
+        }
+    }
 ]
 
 export default class PostCard extends React.PureComponent {
@@ -223,6 +229,7 @@ export default class PostCard extends React.PureComponent {
                 </div>
 
                 <PostActions
+                    post={this.state.data}
                     user_id={this.state.data.user_id}
 
                     likesCount={this.state.countLikes}

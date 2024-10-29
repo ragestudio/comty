@@ -53,6 +53,13 @@ export default class APICore extends Core {
             enableWs: true,
         })
 
+        this.client.eventBus.on("ws:disconnected", () => {
+            app.cores.notifications.new({
+                title: "Failed to connect to server",
+                description: "The connection to the server was lost. Some features may not work properly.",
+            })
+        })
+
         this.client.eventBus.on("auth:login_success", () => {
             app.eventBus.emit("auth:login_success")
         })

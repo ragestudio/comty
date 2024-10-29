@@ -49,47 +49,62 @@ export default class FavoriteTracks extends React.Component {
             loading: true,
         })
 
-        const result = await MusicModel.getFavoriteTracks({
-            useTidal: app.cores.sync.getActiveLinkedServices().tidal,
+        const result = await MusicModel.getFavouriteFolder({
             offset: offset,
             limit: limit,
-        }).catch((err) => {
+        }).catch((error) => {
             this.setState({
-                error: err.message,
+                error: error.message,
             })
-            return false
+
+            return null
         })
 
         console.log("Loaded favorites => ", result)
 
         if (result) {
-            const { tracks, total_length } = result
+            const {
+                tracks,
+                releases,
+                playlists,
+                total_length,
+            } = result
 
-            this.setState({
-                total_length
-            })
+            const data = [
+                ...tracks.list,
+                ...releases.list,
+                ...playlists.list,
+            ]
 
-            if (tracks.length === 0) {
-                if (offset === 0) {
-                    this.setState({
-                        empty: true,
-                    })
-                }
-
-                return this.setState({
+            if (total_length === 0) {
+                this.setState({
+                    empty: true,
                     hasMore: false,
+                    initialLoading: false,
+                })
+            }
+
+            if (data.length === 0) {
+                return this.setState({
+                    empty: false,
+                    hasMore: false,
+                    initialLoading: false,
                 })
             }
 
             if (replace) {
                 this.setState({
-                    list: tracks,
+                    list: data,
                 })
             } else {
                 this.setState({
-                    list: [...this.state.list, ...tracks],
+                    list: [...this.state.list, ...data],
                 })
             }
+
+            this.setState({
+                total_length
+            })
         }
 
         this.setState({
@@ -112,7 +127,7 @@ export default class FavoriteTracks extends React.Component {
         }
 
         return <PlaylistView
-        favorite
+            favorite
             type="vertical"
             playlist={{
                 title: "Your favorites",
@@ -122,7 +137,6 @@ export default class FavoriteTracks extends React.Component {
             centered={app.isMobile}
             onLoadMore={this.onLoadMore}
             hasMore={this.state.hasMore}
-            empty={this.state.empty}
             length={this.state.total_length}
         />
     }

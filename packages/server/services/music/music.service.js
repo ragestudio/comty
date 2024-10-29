@@ -7,6 +7,7 @@ import LimitsClass from "@shared-classes/Limits"
 
 export default class API extends Server {
     static refName = "music"
+    static enableWebsockets = true
     static routesPath = `${__dirname}/routes`
     static listen_port = process.env.HTTP_LISTEN_PORT ?? 3003
 

@@ -1,20 +1,19 @@
 import React from "react"
 
 function deepUnproxy(obj) {
-    // Verificar si es un array y hacer una copia en consecuencia
     if (Array.isArray(obj)) {
-        obj = [...obj];
+        obj = [...obj]
     } else {
-        obj = Object.assign({}, obj);
+        obj = Object.assign({}, obj)
     }
 
     for (let key in obj) {
         if (obj[key] && typeof obj[key] === "object") {
-            obj[key] = deepUnproxy(obj[key]);  // Recursión para profundizar en objetos y arrays
+            obj[key] = deepUnproxy(obj[key])
         }
     }
 
-    return obj;
+    return obj
 }
 
 export const usePlayerStateContext = (updater) => {
@@ -40,7 +39,7 @@ export const usePlayerStateContext = (updater) => {
         }
     }, [])
 
-    return state
+    return [state, setState]
 }
 
 export const Context = React.createContext({})

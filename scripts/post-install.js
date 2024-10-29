@@ -67,18 +67,18 @@ async function linkInternalSubmodules(packages) {
     const appPath = path.resolve(rootPath, pkgjson._web_app_path)
 
     const comtyjsPath = path.resolve(rootPath, "comty.js")
-    const evitePath = path.resolve(rootPath, "evite")
+    const vesselPath = path.resolve(rootPath, "vessel")
     const linebridePath = path.resolve(rootPath, "linebridge")
 
-    //* EVITE LINKING
-    console.log(`Linking Evite to app...`)
+    //* APP RUNTIME LINKING
+    console.log(`Linking Vessel to app...`)
 
     await child_process.execSync("yarn link", {
-        cwd: evitePath,
+        cwd: vesselPath,
         stdio: "inherit",
     })
 
-    await child_process.execSync(`yarn link "evite"`, {
+    await child_process.execSync(`yarn link "vessel"`, {
         cwd: appPath,
         stdio: "inherit",
     })

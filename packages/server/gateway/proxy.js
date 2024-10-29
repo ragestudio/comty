@@ -160,13 +160,11 @@ export default class Proxy {
         }
 
         if (sanitizedUrl === "/") {
-            return res.end(`
-                {
-                    "name": "${pkg.name}",
-                    "version": "${pkg.version}",
-                    "lb_version": "${defaults.version}"
-                }
-            `)
+            return res.end(JSON.stringify({
+                name: pkg.name,
+                version: pkg.version,
+                lb_version: defaults.version
+            }))
         }
 
         const namespace = `/${sanitizedUrl.split("/")[1]}`

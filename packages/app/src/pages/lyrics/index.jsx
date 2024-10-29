@@ -22,8 +22,8 @@ function getDominantColorStr(track_manifest) {
     return `${values[0]}, ${values[1]}, ${values[2]}`
 }
 
-const EnchancedLyrics = (props) => {
-    const playerState = usePlayerStateContext()
+const EnchancedLyricsPage = () => {
+    const [playerState] = usePlayerStateContext()
 
     const [initialized, setInitialized] = React.useState(false)
     const [lyrics, setLyrics] = React.useState(null)
@@ -70,11 +70,6 @@ const EnchancedLyrics = (props) => {
             setLyrics(null)
         }
     }, [playerState.track_manifest])
-
-    //* Handle when lyrics data change
-    React.useEffect(() => {
-        console.log(lyrics)
-    }, [lyrics])
 
     React.useEffect(() => {
         setInitialized(true)
@@ -129,4 +124,4 @@ const EnchancedLyrics = (props) => {
     </div>
 }
 
-export default EnchancedLyrics
+export default EnchancedLyricsPage

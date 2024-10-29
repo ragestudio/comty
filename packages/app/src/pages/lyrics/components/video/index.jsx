@@ -7,7 +7,7 @@ import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 const maxLatencyInMs = 55
 
 const LyricsVideo = React.forwardRef((props, videoRef) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     const { lyrics } = props
 
@@ -57,12 +57,10 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
             setCurrentVideoLatency(currentVideoTimeDiff)
 
             if (syncingVideo === true) {
-                console.log(`Syncing video...`)
                 return false
             }
 
             if (currentVideoTimeDiff > maxOffset) {
-                console.warn(`Video offset exceeds`, maxOffset)
                 seekVideoToSyncAudio()
             }
         }

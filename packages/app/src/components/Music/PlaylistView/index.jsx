@@ -73,7 +73,7 @@ const MoreMenuHandlers = {
     }
 }
 
-export default (props) => {
+const PlaylistView = (props) => {
     const [playlist, setPlaylist] = React.useState(props.playlist)
     const [searchResults, setSearchResults] = React.useState(null)
     const [owningPlaylist, setOwningPlaylist] = React.useState(checkUserIdIsSelf(props.playlist?.user_id))
@@ -109,8 +109,27 @@ export default (props) => {
 
     let debounceSearch = null
 
+    const makeSearch = (value) => {
+        //TODO: Implement me using API
+        return app.message.info("Not implemented yet...")
+    }
+
+    const handleOnSearchChange = (value) => {
+        debounceSearch = setTimeout(() => {
+            makeSearch(value)
+        }, 500)
+    }
+
+    const handleOnSearchEmpty = () => {
+        if (debounceSearch) {
+            clearTimeout(debounceSearch)
+        }
+
+        setSearchResults(null)
+    }
+
     const handleOnClickPlaylistPlay = () => {
-        app.cores.player.start(playlist.list, 0)
+        app.cores.player.start(playlist.list)
     }
 
     const handleOnClickViewDetails = () => {
@@ -131,7 +150,7 @@ export default (props) => {
             return
         }
 
-        // check if is currently playing
+        // check if clicked track is currently playing
         if (app.cores.player.state.track_manifest?._id === track._id) {
             app.cores.player.playback.toggle()
         } else {
@@ -141,48 +160,7 @@ export default (props) => {
         }
     }
 
-    const handleTrackLike = async (track) => {
-        return await MusicModel.toggleTrackLike(track._id)
-    }
-
-    const makeSearch = (value) => {
-        //TODO: Implement me using API
-        return app.message.info("Not implemented yet...")
-
-        const options = {
-            includeScore: true,
-            keys: [
-                "title",
-                "artist",
-                "album",
-            ],
-        }
-
-        const fuseInstance = new fuse(playlist.list, options)
-        const results = fuseInstance.search(value)
-
-        console.log(results)
-
-        setSearchResults(results.map((result) => {
-            return result.item
-        }))
-    }
-
-    const handleOnSearchChange = (value) => {
-        debounceSearch = setTimeout(() => {
-            makeSearch(value)
-        }, 500)
-    }
-
-    const handleOnSearchEmpty = () => {
-        if (debounceSearch) {
-            clearTimeout(debounceSearch)
-        }
-
-        setSearchResults(null)
-    }
-
-    const updateTrackLike = (track_id, liked) => {
+    const handleUpdateTrackLike = (track_id, liked) => {
         setPlaylist((prev) => {
             const index = prev.list.findIndex((item) => {
                 return item._id === track_id
@@ -202,6 +180,29 @@ export default (props) => {
         })
     }
 
+    const handleTrackChangeState = (track_id, update) => {
+        setPlaylist((prev) => {
+            const index = prev.list.findIndex((item) => {
+                return item._id === track_id
+            })
+
+            if (index !== -1) {
+                const newState = {
+                    ...prev,
+                }
+
+                newState.list[index] = {
+                    ...newState.list[index],
+                    ...update
+                }
+
+                return newState
+            }
+
+            return prev
+        })
+    }
+
     const handleMoreMenuClick = async (e) => {
         const handler = MoreMenuHandlers[e.key]
 
@@ -213,8 +214,8 @@ export default (props) => {
     }
 
     useWsEvents({
-        "music:self:track:toggle:like": (data) => {
-            updateTrackLike(data.track_id, data.action === "liked")
+        "music:track:toggle:like": (data) => {
+            handleUpdateTrackLike(data.track_id, data.action === "liked")
         }
     }, {
         socketName: "music",
@@ -268,7 +269,7 @@ export default (props) => {
                                 }
                                 <div className="play_info_statistics_item">
                                     <p>
-                                        <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length} Tracks
+                                        <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length} Items
                                     </p>
                                 </div>
                                 {
@@ -332,16 +333,29 @@ export default (props) => {
                 </div>
 
                 <div className="list">
-                    <div className="list_header">
-                        <h1>
-                            <Icons.MdPlaylistPlay /> Tracks
-                        </h1>
+                    {
+                        playlist.list.length > 0 && <div className="list_header">
+                            <h1>
+                                <Icons.MdPlaylistPlay /> Tracks
+                            </h1>
 
-                        <SearchButton
-                            onChange={handleOnSearchChange}
-                            onEmpty={handleOnSearchEmpty}
+                            <SearchButton
+                                onChange={handleOnSearchChange}
+                                onEmpty={handleOnSearchEmpty}
+                                disabled
+                            />
+                        </div>
+                    }
+
+                    {
+                        playlist.list.length === 0 && <antd.Empty
+                            description={
+                                <>
+                                    <Icons.MdLibraryMusic /> This playlist its empty!
+                                </>
+                            }
                         />
-                    </div>
+                    }
 
                     {
                         searchResults && searchResults.map((item) => {
@@ -350,19 +364,9 @@ export default (props) => {
                                 order={item._id}
                                 track={item}
                                 onClickPlayBtn={() => handleOnClickTrack(item)}
-                                onLike={() => handleTrackLike(item)}
+                                changeState={(update) => handleTrackChangeState(item._id, update)}
                             />
                         })
-                    }
-
-                    {
-                        !searchResults && playlist.list.length === 0 && <antd.Empty
-                            description={
-                                <>
-                                    <Icons.MdLibraryMusic /> This playlist its empty!
-                                </>
-                            }
-                        />
                     }
 
                     {
@@ -379,7 +383,7 @@ export default (props) => {
                                             order={index + 1}
                                             track={item}
                                             onClickPlayBtn={() => handleOnClickTrack(item)}
-                                            onLike={() => handleTrackLike(item)}
+                                            changeState={(update) => handleTrackChangeState(item._id, update)}
                                         />
                                     })
                                 }
@@ -391,3 +395,5 @@ export default (props) => {
         </WithPlayerContext>
     </PlaylistContext.Provider>
 }
+
+export default PlaylistView

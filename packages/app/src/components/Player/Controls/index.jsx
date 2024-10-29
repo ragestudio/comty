@@ -35,7 +35,7 @@ const EventsHandlers = {
 }
 
 const Controls = (props) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     const handleAction = (event, ...args) => {
         if (typeof EventsHandlers[event] !== "function") {

@@ -26,6 +26,18 @@ export default defineConfig({
         headers: {
             "Strict-Transport-Security": `max-age=${oneYearInSeconds}`
         },
+        proxy: {
+            "/api": {
+                target: "https://0.0.0.0:9000",
+                rewrite: (path) => path.replace(/^\/api/, ""),
+                hostRewrite: true,
+                changeOrigin: true,
+                xfwd: true,
+                //ws: true,
+                toProxy: true,
+                secure: false,
+            }
+        }
     },
     css: {
         preprocessorOptions: {
@@ -42,7 +54,7 @@ export default defineConfig({
     build: {
         target: "esnext",
         rollupOptions: {
-            output:{
+            output: {
                 manualChunks(id) {
                     if (id.includes('node_modules')) {
                         return id.toString().split('node_modules/')[1].split('/')[0].toString();

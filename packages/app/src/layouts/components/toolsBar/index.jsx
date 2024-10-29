@@ -1,8 +1,6 @@
 import React from "react"
 import classnames from "classnames"
 import { Motion, spring } from "react-motion"
-import { Translation } from "react-i18next"
-import { Icons } from "@components/Icons"
 
 import WidgetsWrapper from "@components/WidgetsWrapper"
 
@@ -11,7 +9,10 @@ import "./index.less"
 export default class ToolsBar extends React.Component {
     state = {
         visible: false,
-        renders: [],
+        renders: {
+            top: [],
+            bottom: [],
+        },
     }
 
     componentDidMount() {
@@ -34,20 +35,25 @@ export default class ToolsBar extends React.Component {
                 visible: to ?? !this.state.visible,
             })
         },
-        attachRender: (id, component, props) => {
-            this.setState({
-                renders: [...this.state.renders, {
+        attachRender: (id, component, props, { position = "bottom" } = {}) => {
+            this.setState((prev) => {
+                prev.renders[position].push({
                     id: id,
                     component: component,
                     props: props,
-                }],
+                })
+
+                return prev
             })
 
             return component
         },
         detachRender: (id) => {
             this.setState({
-                renders: this.state.renders.filter((render) => render.id !== id),
+                renders: {
+                    top: this.state.renders.top.filter((render) => render.id !== id),
+                    bottom: this.state.renders.bottom.filter((render) => render.id !== id),
+                },
             })
 
             return true
@@ -78,15 +84,29 @@ export default class ToolsBar extends React.Component {
                         id="tools_bar"
                         className="tools-bar"
                     >
-                        <div className="attached_renders">
+                        <div className="attached_renders top">
                             {
-                                this.state.renders.map((render) => {
-                                    return React.createElement(render.component, render.props)
+                                this.state.renders.top.map((render, index) => {
+                                    return React.createElement(render.component, {
+                                        ...render.props,
+                                        key: index,
+                                    })
                                 })
                             }
                         </div>
 
                         <WidgetsWrapper />
+
+                        <div className="attached_renders bottom">
+                            {
+                                this.state.renders.bottom.map((render, index) => {
+                                    return React.createElement(render.component, {
+                                        ...render.props,
+                                        key: index,
+                                    })
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
             }}

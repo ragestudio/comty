@@ -4,7 +4,7 @@ import SlidersWithPresets from "../../../components/slidersWithPresets"
 export default (props) => {
     return <SlidersWithPresets
         {...props}
-        controller={app.cores.player.compressor}
+        controller={app.cores.player.compressor.presets}
         extraHeaderItems={[
             <Switch
                 onChange={props.onEnabledChange}

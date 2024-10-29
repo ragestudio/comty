@@ -6,12 +6,21 @@ import { Icons } from "@components/Icons"
 import Sliders from "../sliderValues"
 
 export default (props) => {
-    const [selectedPreset, setSelectedPreset] = React.useState(props.controller.presets.currentPresetKey)
-    const [presets, setPresets] = React.useState(props.controller.presets.presets ?? {})
+    const [selectedPreset, setSelectedPreset] = React.useState(props.controller.currentPresetKey)
+    const [presets, setPresets] = React.useState(props.controller.presets ?? {})
 
     const createPreset = (key) => {
-        setPresets(props.controller.createPreset(key))
+        const presets = props.controller.createPreset(key)
+
+        setPresets(presets)
         setSelectedPreset(key)
+    }
+
+    const deletePreset = (key) => {
+        const presets = props.controller.deletePreset(key)
+
+        setPresets(presets)
+        setSelectedPreset(props.controller.currentPresetKey)
     }
 
     const handleCreateNewPreset = () => {
@@ -51,15 +60,11 @@ export default (props) => {
         })
     }
 
-    const handleDeletePreset = () => {
+    const handleDeleteCurrentPreset = () => {
         Modal.confirm({
             title: "Delete preset",
             content: "Are you sure you want to delete this preset?",
-            onOk: () => {
-                props.controller.deletePreset(selectedPreset)
-                setPresets(props.controller.presets.presets ?? {})
-                setSelectedPreset(props.controller.presets.currentPresetKey)
-            }
+            onOk: () => deletePreset(selectedPreset)
         })
     }
 
@@ -77,14 +82,13 @@ export default (props) => {
     ]
 
     React.useEffect(() => {
-        const presets = props.controller.presets.presets ?? {}
-        const preset = presets[selectedPreset]
+        const presetValues = props.controller.presets[selectedPreset]
 
-        if (props.controller.presets.currentPresetKey !== selectedPreset) {
+        if (props.controller.currentPresetKey !== selectedPreset) {
             props.controller.changePreset(selectedPreset)
         }
 
-        props.ctx.updateCurrentValue(preset)
+        props.ctx.updateCurrentValue(presetValues)
     }, [selectedPreset])
 
     return <>
@@ -152,7 +156,7 @@ export default (props) => {
                     }}
                 />
                 <Button
-                    onClick={handleDeletePreset}
+                    onClick={handleDeleteCurrentPreset}
                     icon={<Icons.MdDelete />}
                     disabled={selectedPreset === "default"}
                 />

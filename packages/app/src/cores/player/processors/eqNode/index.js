@@ -1,4 +1,3 @@
-import { Modal } from "antd"
 import ProcessorNode from "../node"
 import Presets from "../../classes/Presets"
 
@@ -6,7 +5,7 @@ export default class EqProcessorNode extends ProcessorNode {
     constructor(props) {
         super(props)
 
-        this.presets_controller = new Presets({
+        this.presets = new Presets({
             storage_key: "eq",
             defaultPresetValue: {
                 32: 0,
@@ -20,94 +19,21 @@ export default class EqProcessorNode extends ProcessorNode {
                 8000: 0,
                 16000: 0,
             },
+            onApplyValues: this.applyValues.bind(this),
         })
 
-        this.state = {
-            eqValues: this.presets_controller.currentPresetValues,
-        }
-
         this.exposeToPublic = {
-            presets: new Proxy(this.presets_controller, {
-                get: function (target, key) {
-                    if (!key) {
-                        return target
-                    }
-
-                    return target[key]
-                },
-            }),
-            deletePreset: this.deletePreset.bind(this),
-            createPreset: this.createPreset.bind(this),
-            changePreset: this.changePreset.bind(this),
-            modifyValues: this.modifyValues.bind(this),
-            resetDefaultValues: this.resetDefaultValues.bind(this),
+            presets: this.presets,
         }
     }
 
     static refName = "eq"
     static lock = true
 
-    deletePreset(key) {
-        this.changePreset("default")
-
-        this.presets_controller.deletePreset(key)
-
-        return this.presets_controller.presets
-    }
-
-    createPreset(key, values) {
-        this.state = {
-            ...this.state,
-            eqValues: this.presets_controller.createPreset(key, values),
-        }
-
-        this.presets_controller.changePreset(key)
-
-        return this.presets_controller.presets
-    }
-
-    changePreset(key) {
-        const values = this.presets_controller.changePreset(key)
-
-        this.state = {
-            ...this.state,
-            eqValues: values,
-        }
-
-        this.applyValues()
-
-        return values
-    }
-
-    modifyValues(values) {
-        values = this.presets_controller.setToCurrent(values)
-
-        this.state = {
-            ...this.state,
-            eqValues: values,
-        }
-
-        this.applyValues()
-
-        return values
-    }
-
-    resetDefaultValues() {
-        Modal.confirm({
-            title: "Reset to default values?",
-            content: "Are you sure you want to reset to default values?",
-            onOk: () => {
-                this.modifyValues(this.presets_controller.defaultPresetValue)
-            }
-        })
-
-        return this.state.eqValues
-    }
-
     applyValues() {
         // apply to current instance
         this.processor.eqNodes.forEach((processor) => {
-            const gainValue = this.state.eqValues[processor.frequency.value]
+            const gainValue = this.presets.currentPresetValues[processor.frequency.value]
 
             if (processor.gain.value !== gainValue) {
                 console.debug(`[EQ] Applying values to ${processor.frequency.value} Hz frequency with gain ${gainValue}`)
@@ -127,7 +53,7 @@ export default class EqProcessorNode extends ProcessorNode {
 
         this.processor.eqNodes = []
 
-        const values = Object.entries(this.state.eqValues).map((entry) => {
+        const values = Object.entries(this.presets.currentPresetValues).map((entry) => {
             return {
                 freq: parseFloat(entry[0]),
                 gain: parseFloat(entry[1]),

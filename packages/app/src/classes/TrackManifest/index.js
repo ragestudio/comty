@@ -57,7 +57,6 @@ export default class TrackManifest {
 
     // Extended from db
     lyrics_enabled = false
-
     liked = null
 
     async initialize() {
@@ -78,7 +77,7 @@ export default class TrackManifest {
                 }
 
                 if (this.metadata.tags.picture) {
-                    this.cover = app.cores.remoteStorage.binaryArrayToFile(this.metadata.tags.picture, this.title)
+                    this.cover = app.cores.remoteStorage.binaryArrayToFile(this.metadata.tags.picture, "cover")
 
                     const coverUpload = await app.cores.remoteStorage.uploadFile(this.cover)
 

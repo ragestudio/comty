@@ -31,13 +31,13 @@ const SelfActionsItems = [
 ]
 
 const MoreActionsItems = [
-    {
-        key: "onClickRepost",
-        label: <>
-            <Icons.MdCallSplit />
-            <span>Repost</span>
-        </>,
-    },
+    // {
+    //     key: "onClickRepost",
+    //     label: <>
+    //         <Icons.MdCallSplit />
+    //         <span>Repost</span>
+    //     </>,
+    // },
     {
         key: "onClickShare",
         label: <>
@@ -56,6 +56,19 @@ const MoreActionsItems = [
         </>,
     },
 ]
+
+const BuiltInActions = {
+    onClickShare: (post) => {
+        navigator.share({
+            title: post.title,
+            text: `Check this post on Comty`,
+            url: post.share_url
+        })
+    },
+    onClickReport: (post) => {
+
+    }
+}
 
 const PostActions = (props) => {
     const [isSelf, setIsSelf] = React.useState(false)
@@ -77,8 +90,10 @@ const PostActions = (props) => {
     }
 
     const handleDropdownClickItem = (e) => {
-        if (typeof props.actions[e.key] === "function") {
-            props.actions[e.key]()
+        const action = BuiltInActions[e.key] ?? props.actions[e.key]
+
+        if (typeof action === "function") {
+            action(props.post)
         }
     }
 

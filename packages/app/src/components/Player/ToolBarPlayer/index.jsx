@@ -43,7 +43,7 @@ const ServiceIndicator = (props) => {
 }
 
 const Player = (props) => {
-    const playerState = usePlayerStateContext()
+    const [playerState] = usePlayerStateContext()
 
     const contentRef = React.useRef()
     const titleRef = React.useRef()
