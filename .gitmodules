@@ -1,6 +1,6 @@
-[submodule "evite"]
-	path = evite
-	url = https://github.com/ragestudio/evite
+[submodule "vessel"]
+	path = vessel
+	url = https://github.com/ragestudio/vessel
 [submodule "linebridge"]
 	path = linebridge
 	url = https://github.com/ragestudio/linebridge
