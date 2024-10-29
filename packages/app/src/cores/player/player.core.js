@@ -1,12 +1,12 @@
 import { Core } from "vessel"
 
 import TrackInstance from "@classes/TrackInstance"
+import QueueManager from "@classes/QueueManager"
 import MediaSession from "./classes/MediaSession"
 import ServiceProviders from "./classes/Services"
 import PlayerState from "./classes/PlayerState"
 import PlayerUI from "./classes/PlayerUI"
 import PlayerProcessors from "./classes/PlayerProcessors"
-import QueueManager from "./classes/QueueManager"
 
 import setSampleRate from "./helpers/setSampleRate"
 
@@ -75,13 +75,15 @@ export default class Player extends Core {
         gradualFadeMs: Player.gradualFadeMs,
     }
 
-    async initializeAfterCoresInit() {
+    async afterInitialize() {
         if (app.isMobile) {
             this.state.volume = 1
         }
 
         await this.nativeControls.initialize()
         await this.audioProcessors.initialize()
+
+        console.log(this.ui)
     }
 
     //

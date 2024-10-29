@@ -104,16 +104,12 @@ export default class QueueManager {
         if (indexPrev > -1) {
             this.prevItems.splice(indexPrev, 1)
         }
-
-        this.consoleState()
     }
 
     flush = () => {
         this.nextItems = []
         this.prevItems = []
         this.currentItem = null
-
-        this.consoleState()
     }
 
     async load(item) {

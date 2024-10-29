@@ -3,6 +3,8 @@ import ToolBarPlayer from "@components/Player/ToolBarPlayer"
 export default class PlayerUI {
     constructor(player) {
         this.player = player
+
+        return this
     }
 
     currentDomWindow = null
