@@ -82,8 +82,6 @@ export default class Player extends Core {
 
         await this.nativeControls.initialize()
         await this.audioProcessors.initialize()
-
-        console.log(this.ui)
     }
 
     //
