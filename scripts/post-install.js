@@ -11,6 +11,12 @@ const getPackages = require("./utils/getPackages")
 
 const pkgjson = require("../package.json")
 
+// vars
+const appPath = path.resolve(rootPath, pkgjson._web_app_path)
+const comtyjsPath = path.resolve(rootPath, "comty.js")
+const vesselPath = path.resolve(rootPath, "vessel")
+const linebridePath = path.resolve(rootPath, "linebridge")
+
 async function linkSharedResources(pkgJSON, packagePath) {
     if (typeof pkgJSON !== "object") {
         throw new Error("Package must be an object")
@@ -64,12 +70,6 @@ async function linkSharedResources(pkgJSON, packagePath) {
 }
 
 async function linkInternalSubmodules(packages) {
-    const appPath = path.resolve(rootPath, pkgjson._web_app_path)
-
-    const comtyjsPath = path.resolve(rootPath, "comty.js")
-    const vesselPath = path.resolve(rootPath, "vessel")
-    const linebridePath = path.resolve(rootPath, "linebridge")
-
     //* APP RUNTIME LINKING
     console.log(`Linking Vessel to app...`)
 
@@ -150,6 +150,31 @@ async function main() {
             await linkSharedResources(packageJson, packagePath)
         }
     }
+
+    // install dependencies for modules
+    console.log("Installing app dependencies...")
+    await child_process.execSync("npm install --force", {
+        cwd: appPath,
+        stdio: "inherit",
+    })
+
+    console.log("Installing vessel dependencies...")
+    await child_process.execSync("npm install --force", {
+        cwd: vesselPath,
+        stdio: "inherit",
+    })
+   
+    console.log("Installing comty.js dependencies...")
+    await child_process.execSync("npm install --force", {
+        cwd: comtyjsPath,
+        stdio: "inherit",
+    })
+
+    console.log("Installing linebridge dependencies...")
+    await child_process.execSync("npm install --force", {
+        cwd: linebridePath,
+        stdio: "inherit",
+    })
 
     // link internal submodules
     await linkInternalSubmodules(packages)

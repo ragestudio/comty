@@ -11,9 +11,6 @@
         "docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
         "preview": "vite preview"
     },
-    "peerDependencies": {
-        "react": "^18.2.0"
-    },
     "dependencies": {
         "@ant-design/icons": "^5.4.0",
         "@capacitor/android": "^5.0.5",
@@ -22,8 +19,6 @@
         "@capacitor/cli": "^5.0.5",
         "@capacitor/core": "^5.0.5",
         "@capacitor/haptics": "1.1.4",
-        "@capacitor/ios": "^5.0.5",
-        "@capacitor/push-notifications": "^5.0.4",
         "@capacitor/splash-screen": "^5.0.4",
         "@capacitor/status-bar": "^5.0.4",
         "@capacitor/storage": "^1.2.5",
@@ -37,6 +32,7 @@
         "@loadable/component": "5.15.2",
         "@mui/material": "^5.11.9",
         "@ragestudio/cordova-nfc": "^1.2.0",
+        "@ragestudio/vessel": "^0.18.1",
         "@sentry/browser": "^7.64.0",
         "@tauri-apps/api": "^1.5.4",
         "@tsmx/human-readable": "^1.0.7",
@@ -46,7 +42,6 @@
         "capacitor-music-controls-plugin-v3": "^1.1.0",
         "classnames": "2.3.1",
         "dompurify": "^3.0.0",
-        "@ragestudio/vessel": "^0.18.0",
         "fast-average-color": "^9.2.0",
         "framer-motion": "^10.12.17",
         "fuse.js": "6.5.3",
