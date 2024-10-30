@@ -1,10 +1,12 @@
+<p align="center">
 <img 
-    src="https://storage.ragestudio.net/rstudio/branding/comty/comty_banner_transparent.svg" 
-    width="100%" 
     alt="Comty logo"
+    src="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg" 
+    height="150px"
 />
+</p>
 
-# Comty - A prototype of a social network
+# Comty™
 [![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
 [![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
@@ -12,6 +14,10 @@
 The platform to hold all your creative.
 
 > 👋 We have a official beta instance, you can access it from [https://comty.app](https://comty.app)
+
+## Special Sponsors
+[![Plenix Network - Cheap Hosting Solutions](https://storage.ragestudio.net/comty-static-assets/sponsors/plenix_board.png)](https://plenix.net)
+
 
 ## 🌟 Some of features
 🚀 Real-time updates are provided to users about various activities such as new followers, likes, posts, comments, and more, thanks to a bid event engine that uses websockets.
@@ -27,17 +33,10 @@ The platform to hold all your creative.
 ## 🌐 Available platforms
 We have official public services that you can find on these platforms!
 
-🌐 Web | [Comty > https://comty.app](https://comty.app)
+🌐 Web | [https://comty.app](https://comty.app)
 
-📱 Android | [Android APK > (unsigned) (bundle auto update)](https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk)
+📱 Android APK (unsigned) (bundle auto update) | [https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk](https://github.com/ragestudio/comty/releases/download/0.50.4/app-release.apk)
 
-📱 IOS | Not available yet
-
-🖥 MacOS | Not available yet
-
-🖥 Windows | Not available yet
-
-🖥 Linux | Not available yet
 
 ## 🚀 Development
 ### Prerequisites
@@ -45,7 +44,7 @@ For local development you will need to have installed some tools:
 
 - Install Node.js (v18 or higher) [manualy](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) tool.
 
-- (Optional) Install [Yarn](https://yarnpkg.com/getting-started/install) package manager.
+- (Recomended) Install [Yarn](https://yarnpkg.com/getting-started/install) package manager.
 
 - (Optional) Install [Docker](https://docs.docker.com/get-docker/), used for building and deployment.
 
@@ -57,23 +56,30 @@ git clone --recurse-submodules https://github.com/ragestudio/comty && cd comty
 
 - Installing all dependencies
 ```shell
-yarn
+yarn install
 ```
 
 ### Starting the development server
-- You can use the command `yarn dev` to start all development servers with the `nodemon` package, which will restart the server when a file is changed.
+- You can use the command `yarn dev` to start all development servers.
+```shell
+yarn dev
+```
 
-## Status
-😎 The project is in alpha design phase, and the development is slow but continuous, prioritizing quality to ensure the project base is preserved for a long time.
+## 🧑‍💻 Status
+The project is in alpha design phase, and the development is slow but continuous, prioritizing quality to ensure the project base is preserved for a long time.
 
-## 👥 The Comty team is looking for new members, and any contribution to the project is very welcome.
+> 👥 The Comty team is looking for new members, and any contribution to the project is very welcome.
+
 > If you are interested in more depth in the project, you can join our [Discord server](https://discord.gg/yxQR6EXf2F) and talk to us.
 
-## Contributions 🤝
+## 🤝 Contributions 
 Contributions to Comty are welcome. If you want to contribute, please follow the instructions mentioned in the CONTRIBUTING.md file.
 
-## License 📜
+## 📜 License 
 Comty is licensed under the Comty license. See the LICENSE file for more details.
+
+## Our sponsors
+
 
 ## :heart: Thanks to our supporters
 <kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
