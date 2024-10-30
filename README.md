@@ -78,9 +78,6 @@ Contributions to Comty are welcome. If you want to contribute, please follow the
 ## 📜 License 
 Comty is licensed under the Comty license. See the LICENSE file for more details.
 
-## Our sponsors
-
-
 ## :heart: Thanks to our supporters
 <kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
 <kbd><img src="https://avatars.githubusercontent.com/u/84641340?v=4" href="https://github.com/FoxasFoxVulpes" height="64" width="64" border="1px" align="center"></kbd>
