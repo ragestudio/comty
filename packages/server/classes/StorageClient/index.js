@@ -57,26 +57,33 @@ export class StorageClient extends Minio.Client {
     initialize = async () => {
         console.log("🔌 Checking if storage client have default bucket...")
 
-        // check connection with s3
-        const bucketExists = await this.bucketExists(this.defaultBucket)
+        try {
+            const bucketExists = await this.bucketExists(this.defaultBucket)
 
-        if (!bucketExists) {
-            console.warn("🪣 Default bucket not exists! Creating new bucket...")
+            if (!bucketExists) {
+                console.warn("🪣 Default bucket not exists! Creating new bucket...")
 
-            await this.makeBucket(this.defaultBucket, "s3")
+                await this.makeBucket(this.defaultBucket, "s3")
 
-            // set default bucket policy
-            await this.setDefaultBucketPolicy(this.defaultBucket)
+                // set default bucket policy
+                await this.setDefaultBucketPolicy(this.defaultBucket)
+            }
+        } catch (error) {
+            console.error(`Failed to check if default bucket exists or create default bucket >`, error)
         }
 
-        // check if default bucket policy exists
-        const bucketPolicy = await this.getBucketPolicy(this.defaultBucket).catch(() => {
-            return null
-        })
+        try {
+            // check if default bucket policy exists
+            const bucketPolicy = await this.getBucketPolicy(this.defaultBucket).catch(() => {
+                return null
+            })
 
-        if (!bucketPolicy) {
-            // set default bucket policy
-            await this.setDefaultBucketPolicy(this.defaultBucket)
+            if (!bucketPolicy) {
+                // set default bucket policy
+                await this.setDefaultBucketPolicy(this.defaultBucket)
+            }
+        } catch (error) {
+            console.error(`Failed to get or set default bucket policy >`, error)
         }
 
         console.log("✅ Storage client is ready.")
