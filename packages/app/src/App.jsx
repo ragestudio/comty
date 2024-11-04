@@ -336,6 +336,10 @@ class ComtyApp extends React.Component {
 
 			await this.flushState()
 		},
+		"auth:disabled_account": async () => {
+			await SessionModel.removeToken()
+			app.navigation.goAuth()
+		}
 	}
 
 	flushState = async () => {

@@ -240,97 +240,92 @@ const PlaylistView = (props) => {
                     playlistType,
                 )}
             >
-
-                <div className="play_info_wrapper">
-                    <div className="play_info">
-                        <div className="play_info_cover">
-                            <ImageViewer src={playlist.cover ?? playlist?.thumbnail ?? "/assets/no_song.png"} />
-                        </div>
-
-                        <div className="play_info_details">
-                            <div className="play_info_title">
-                                {
-                                    playlist.service === "tidal" && <Icons.SiTidal />
-                                }
-                                {
-                                    typeof playlist.title === "function" ?
-                                        playlist.title :
-                                        <h1>{playlist.title}</h1>
-                                }
+                {
+                    !props.noHeader && <div className="play_info_wrapper">
+                        <div className="play_info">
+                            <div className="play_info_cover">
+                                <ImageViewer src={playlist.cover ?? playlist?.thumbnail ?? "/assets/no_song.png"} />
                             </div>
 
-                            <div className="play_info_statistics">
-                                {
-                                    playlistType && PlaylistTypeDecorators[playlistType] && <div className="play_info_statistics_item">
-                                        {
-                                            PlaylistTypeDecorators[playlistType]()
-                                        }
-                                    </div>
-                                }
-                                <div className="play_info_statistics_item">
-                                    <p>
-                                        <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length} Items
-                                    </p>
+                            <div className="play_info_details">
+                                <div className="play_info_title">
+                                    {
+                                        playlist.service === "tidal" && <Icons.SiTidal />
+                                    }
+                                    {
+                                        typeof playlist.title === "function" ?
+                                            playlist.title :
+                                            <h1>{playlist.title}</h1>
+                                    }
                                 </div>
-                                {
-                                    playlist.publisher && <div className="play_info_statistics_item">
-                                        <p
-                                            onClick={() => {
-                                                app.navigation.goToAccount(playlist.publisher.username)
-                                            }}
-                                        >
-                                            <Icons.MdPerson />
 
-                                            Publised by <a>{playlist.publisher.username}</a>
+                                <div className="play_info_statistics">
+                                    {
+                                        playlistType && PlaylistTypeDecorators[playlistType] && <div className="play_info_statistics_item">
+                                            {
+                                                PlaylistTypeDecorators[playlistType]()
+                                            }
+                                        </div>
+                                    }
+                                    <div className="play_info_statistics_item">
+                                        <p>
+                                            <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length} Items
                                         </p>
                                     </div>
-                                }
-                            </div>
+                                    {
+                                        playlist.publisher && <div className="play_info_statistics_item">
+                                            <p
+                                                onClick={() => {
+                                                    app.navigation.goToAccount(playlist.publisher.username)
+                                                }}
+                                            >
+                                                <Icons.MdPerson />
 
-                            <div className="play_info_actions">
-                                <antd.Button
-                                    type="primary"
-                                    shape="rounded"
-                                    size="large"
-                                    onClick={handleOnClickPlaylistPlay}
-                                >
-                                    <Icons.MdPlayArrow />
-                                    Play
-                                </antd.Button>
+                                                Publised by <a>{playlist.publisher.username}</a>
+                                            </p>
+                                        </div>
+                                    }
+                                </div>
 
-                                {
-                                    !props.favorite && <antd.Button
-                                        icon={<Icons.MdFavorite />}
-                                    />
-                                }
-
-                                {
-                                    playlist.description && <antd.Button
-                                        icon={<Icons.MdInfo />}
-                                        onClick={handleOnClickViewDetails}
-                                    />
-                                }
-
-                                {
-                                    owningPlaylist &&
-                                    <antd.Dropdown
-                                        trigger={["click"]}
-                                        placement="bottom"
-                                        menu={{
-                                            items: moreMenuItems,
-                                            onClick: handleMoreMenuClick
-                                        }}
+                                <div className="play_info_actions">
+                                    <antd.Button
+                                        type="primary"
+                                        shape="rounded"
+                                        size="large"
+                                        onClick={handleOnClickPlaylistPlay}
                                     >
-                                        <antd.Button
-                                            icon={<Icons.MdMoreVert />}
-                                        />
-                                    </antd.Dropdown>
+                                        <Icons.MdPlayArrow />
+                                        Play
+                                    </antd.Button>
 
-                                }
+                                    {
+                                        playlist.description && <antd.Button
+                                            icon={<Icons.MdInfo />}
+                                            onClick={handleOnClickViewDetails}
+                                        />
+                                    }
+
+                                    {
+                                        owningPlaylist &&
+                                        <antd.Dropdown
+                                            trigger={["click"]}
+                                            placement="bottom"
+                                            menu={{
+                                                items: moreMenuItems,
+                                                onClick: handleMoreMenuClick
+                                            }}
+                                        >
+                                            <antd.Button
+                                                icon={<Icons.MdMoreVert />}
+                                            />
+                                        </antd.Dropdown>
+
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
 
                 <div className="list">
                     {

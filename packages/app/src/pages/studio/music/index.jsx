@@ -7,6 +7,12 @@ import MyReleasesList from "@components/MusicStudio/MyReleasesList"
 
 import "./index.less"
 
+const ReleasesAnalytics = () => {
+    return <div>
+        <h1>Analytics</h1>
+    </div>   
+}
+
 const MusicStudioPage = (props) => {
     return <div
         className="music-studio-page"
@@ -24,6 +30,8 @@ const MusicStudioPage = (props) => {
                 New Release
             </antd.Button>
         </div>
+
+        <ReleasesAnalytics />
 
         <MyReleasesList />
     </div>

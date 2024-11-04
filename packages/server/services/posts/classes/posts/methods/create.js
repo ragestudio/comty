@@ -10,11 +10,22 @@ export default async (payload = {}) => {
     let { user_id, message, attachments, timestamp, reply_to, poll_options } = payload
 
     // check if is a Array and have at least one element
-    const isAttachmentsValid = Array.isArray(attachments) && attachments.length > 0
+    const isAttachmentArray = Array.isArray(attachments) && attachments.length > 0
 
-    if (!isAttachmentsValid && !message) {
+    if (!isAttachmentArray && !message) {
         throw new OperationError(400, "Cannot create a post without message or attachments")
     }
+
+    // fix attachments with url strings
+    attachments = attachments.map((attachment) => {
+        if (typeof attachment === "string") {
+            attachment = {
+                url: attachment,
+            }
+        }
+
+        return attachment
+    })
 
     if (!timestamp) {
         timestamp = DateTime.local().toISO()

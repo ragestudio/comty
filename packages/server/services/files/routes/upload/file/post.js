@@ -38,7 +38,7 @@ export default {
             parentDir: req.auth.session.user_id,
             source: localFilepath,
             service: providerType,
-            useCompression: req.headers["use-compression"] ?? true,
+            useCompression: ToBoolean(req.headers["use-compression"]) ?? true,
         })
 
         fs.promises.rm(tmpPath, { recursive: true, force: true })

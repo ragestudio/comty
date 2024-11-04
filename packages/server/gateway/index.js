@@ -389,8 +389,8 @@ export default class Gateway {
     async initialize() {
         onExit(this.onGatewayExit)
 
-        process.stdout.setMaxListeners(50)
-        process.stderr.setMaxListeners(50)
+        process.stdout.setMaxListeners(150)
+        process.stderr.setMaxListeners(150)
 
         this.services = await scanServices()
         this.proxy = new Proxy()

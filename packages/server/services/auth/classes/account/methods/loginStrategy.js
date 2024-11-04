@@ -14,6 +14,10 @@ export default async ({ username, password, hash }, user) => {
         throw new OperationError(401, "User not found")
     }
 
+    if (user.disabled == true) {
+        throw new OperationError(401, "User is disabled")
+    }
+
     if (typeof hash !== "undefined") {
         if (user.password !== hash) {
             throw new OperationError(401, "Invalid credentials")

@@ -47,6 +47,7 @@ export default (input, params = defaultParams) => {
         const commands = {
             input: input,
             ...params,
+            preset: "ultrafast",
             output: outputFilepath,
         }
 

@@ -32,6 +32,21 @@ export default {
             description: "Manage your active sessions",
             icon: "FiMonitor",
             component: loadable(() => import("../components/sessions")),
+        },
+        {
+            id: "disable-account",
+            group: "security.account",
+            title: "Disable Account",
+            description: "Disable your account",
+            icon: "FiUserX",
+            component: "Button",
+            props: {
+                danger: true,
+                children: "Disable",
+                onClick: () => {
+                    app.location.push("/disable-account")
+                }
+            }
         }
     ]
 }

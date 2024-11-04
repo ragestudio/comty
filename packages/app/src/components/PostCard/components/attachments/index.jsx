@@ -159,7 +159,9 @@ export default React.memo((props) => {
             props.attachments?.length > 0 && <BearCarousel
                 data={props.attachments.map((attachment, index) => {
                     if (typeof attachment !== "object") {
-                        return null
+                        attachment = {
+                            url: attachment,
+                        }
                     }
 
                     return {

@@ -31,6 +31,7 @@ export default async (req, res) => {
 
     if (user.activated === false) {
         return res.status(401).json({
+            code: user.email,
             user_id: user._id.toString(),
             activation_required: true,
         })

@@ -3,6 +3,7 @@ import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
 import LatencyIndicator from "@components/PerformanceIndicators/latency"
+import SponsorsList from "@components/SponsorsList"
 
 import config from "@config"
 
@@ -155,6 +156,11 @@ export default {
                         {serverManifest?.version ?? "Unknown"}
                     </div>
                 </div>
+            </div>
+
+            <div className="group">
+                <h3>Thanks to our sponsors</h3>
+                <SponsorsList />
             </div>
 
             <div className="group">

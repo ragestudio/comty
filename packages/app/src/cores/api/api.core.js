@@ -72,6 +72,10 @@ export default class APICore extends Core {
             app.eventBus.emit("session.invalid", error)
         })
 
+        this.client.eventBus.on("auth:disabled_account", () => {
+            app.eventBus.emit("auth:disabled_account")
+        })
+
         // make a basic request to check if the API is available
         await this.client.baseRequest({
             method: "head",
