@@ -58,9 +58,7 @@ export class StorageClient extends Minio.Client {
         console.log("🔌 Checking if storage client have default bucket...")
 
         // check connection with s3
-        const bucketExists = await this.bucketExists(this.defaultBucket).catch(() => {
-            return false
-        })
+        const bucketExists = await this.bucketExists(this.defaultBucket)
 
         if (!bucketExists) {
             console.warn("🪣 Default bucket not exists! Creating new bucket...")
