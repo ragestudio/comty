@@ -1,58 +1,14 @@
-version: "3"
-
 services:
-  wrapper:
-    build: packages/wrapper
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
   api:
     build: packages/server
     restart: unless-stopped
     networks:
       - internal_network
     ports:
-      - "5000:3010"
+      - "9000:9000"
     env_file:
-      - ./env_files/api.production.env
-    volumes:
-      - ./d_data/api/cache:/home/node/app/cache
-  chat_server:
-    build: packages/chat_server
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "5001:3020"
-    env_file:
-      - ./env_files/chat.production.env
-  marketplace_server:
-    build: packages/marketplace_server
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "5002:3040"
-    env_file:
-      - ./env_files/marketplace.production.env
-  music_server:
-    build: packages/music_server
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "5003:3050"
-    env_file:
-      - ./env_files/music.production.env
-  file_server:
-    build: packages/file_server
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "5004:3060"
-    env_file:
-      - ./env_files/file.production.env
+      - ./.env
+      
   redis:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
     restart: unless-stopped
@@ -63,12 +19,11 @@ services:
     networks:
       - internal_network
     env_file:
-      - ./env_files/redis.env
+      - ./.env
     ports:
       - "6379:6379"
     volumes:
-      - ./redis_data:/data  
-
+      - ./redis_data:/data
 
 networks:
   internal_network:
