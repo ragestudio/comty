@@ -8,22 +8,18 @@
         "dev:client": "cd packages/app && yarn dev",
         "release": "node ./scripts/release.js",
         "postdeploy": "node ./scripts/post-deploy.js",
-        "postinstall": "node ./scripts/post-install.js",
-        "wrapper:dev": "node ./packages/wrapper/src/index.js --dev"
+        "postinstall": "node ./scripts/post-install.js"
     },
     "dependencies": {
         "7zip-min": "1.4.3",
-        "@ragestudio/hermes": "^0.1.1",
+        "@ragestudio/hermes": "^1.0.0",
         "axios": "^1.4.0",
-        "dotenv": "16.0.3",
-        "mintlify": "^4.0.206",
-        "octokit": "^2.0.14"
-    },
-    "devDependencies": {
         "concurrently": "^7.5.0",
+        "dotenv": "16.0.3",
         "form-data": "^4.0.0",
+        "mintlify": "^4.0.206",
+        "octokit": "^2.0.14",
         "pm2": "5.3.0"
     },
-    "_web_app_path": "packages/app",
-    "version": "0.60.3"
+    "_web_app_path": "packages/app"
 }
