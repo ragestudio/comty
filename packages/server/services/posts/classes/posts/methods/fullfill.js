@@ -77,7 +77,9 @@ export default async (payload = {}) => {
 
                 const replyUserData = await User.findById(post.reply_to_data.user_id)
 
-                post.reply_to_data.user = replyUserData.toObject()
+                if (replyUserData) {
+                    post.reply_to_data.user = replyUserData.toObject()
+                }
             }
         }
 

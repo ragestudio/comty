@@ -16,16 +16,18 @@ export default async (payload = {}) => {
         throw new OperationError(400, "Cannot create a post without message or attachments")
     }
 
-    // fix attachments with url strings
-    attachments = attachments.map((attachment) => {
-        if (typeof attachment === "string") {
-            attachment = {
-                url: attachment,
+    if (isAttachmentArray) {
+        // fix attachments with url strings if needed
+        attachments = attachments.map((attachment) => {
+            if (typeof attachment === "string") {
+                attachment = {
+                    url: attachment,
+                }
             }
-        }
 
-        return attachment
-    })
+            return attachment
+        })
+    }
 
     if (!timestamp) {
         timestamp = DateTime.local().toISO()
