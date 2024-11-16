@@ -17,6 +17,9 @@ export default async (payload = {}) => {
     }
 
     if (isAttachmentArray) {
+        // clean empty attachments
+        attachments = attachments.filter((attachment) => attachment)
+
         // fix attachments with url strings if needed
         attachments = attachments.map((attachment) => {
             if (typeof attachment === "string") {
