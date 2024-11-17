@@ -11,6 +11,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
     const { lyrics } = props
 
+    const [initialLoading, setInitialLoading] = React.useState(true)
     const [syncInterval, setSyncInterval] = React.useState(null)
     const [syncingVideo, setSyncingVideo] = React.useState(false)
     const [currentVideoLatency, setCurrentVideoLatency] = React.useState(0)
@@ -29,40 +30,36 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
         setSyncingVideo(true)
 
-        videoRef.current.currentTime = currentTrackTime + (lyrics.sync_audio_at_ms / 1000) + app.cores.player.gradualFadeMs / 1000
+        let newTime = currentTrackTime + (lyrics.sync_audio_at_ms / 1000) + app.cores.player.gradualFadeMs / 1000
+
+        // dec some ms to ensure the video seeks correctly
+        newTime -= 5 / 1000
+
+        videoRef.current.currentTime = newTime
     }
 
     async function syncPlayback() {
-        if (!lyrics) {
+        // if something is wrong, stop syncing
+        if (videoRef.current === null || !lyrics || !lyrics.video_source || typeof lyrics.sync_audio_at_ms === "undefined" || playerState.playback_status !== "playing") {
+            return stopSyncInterval()
+        }
+
+        const currentTrackTime = app.cores.player.controls.seek()
+        const currentVideoTime = videoRef.current.currentTime - (lyrics.sync_audio_at_ms / 1000)
+
+        //console.log(`Current track time: ${currentTrackTime}, current video time: ${currentVideoTime}`)
+
+        const maxOffset = maxLatencyInMs / 1000
+        const currentVideoTimeDiff = Math.abs(currentVideoTime - currentTrackTime)
+
+        setCurrentVideoLatency(currentVideoTimeDiff)
+
+        if (syncingVideo === true) {
             return false
         }
 
-        // if `sync_audio_at_ms` is present, it means the video must be synced with audio
-        if (lyrics.video_source && typeof lyrics.sync_audio_at_ms !== "undefined") {
-            if (!videoRef.current) {
-                clearInterval(syncInterval)
-                setSyncInterval(null)
-                setCurrentVideoLatency(0)
-                return false
-            }
-
-            const currentTrackTime = app.cores.player.controls.seek()
-            const currentVideoTime = videoRef.current.currentTime - (lyrics.sync_audio_at_ms / 1000)
-
-            //console.log(`Current track time: ${currentTrackTime}, current video time: ${currentVideoTime}`)
-
-            const maxOffset = maxLatencyInMs / 1000
-            const currentVideoTimeDiff = Math.abs(currentVideoTime - currentTrackTime)
-
-            setCurrentVideoLatency(currentVideoTimeDiff)
-
-            if (syncingVideo === true) {
-                return false
-            }
-
-            if (currentVideoTimeDiff > maxOffset) {
-                seekVideoToSyncAudio()
-            }
+        if (currentVideoTimeDiff > maxOffset) {
+            seekVideoToSyncAudio()
         }
     }
 
@@ -70,45 +67,13 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
         setSyncInterval(setInterval(syncPlayback, 300))
     }
 
-    React.useEffect(() => {
-        videoRef.current.addEventListener("seeked", (event) => {
-            setSyncingVideo(false)
-        })
+    function stopSyncInterval() {
+        setSyncingVideo(false)
+        setSyncInterval(null)
+        clearInterval(syncInterval)
+    }
 
-        // videoRef.current.addEventListener("error", (event) => {
-        //     console.log("Failed to load", event)
-        // })
-
-        // videoRef.current.addEventListener("ended", (event) => {
-        //     console.log("Video ended", event)
-        // })
-
-        // videoRef.current.addEventListener("stalled", (event) => {
-        //     console.log("Failed to fetch data, but trying")
-        // })
-
-        // videoRef.current.addEventListener("waiting", (event) => {
-        //     console.log("Waiting for data...")
-        // })
-    }, [])
-
-    //* Handle when playback status change
-    React.useEffect(() => {
-        if (lyrics?.video_source && typeof lyrics?.sync_audio_at_ms !== "undefined") {
-            if (playerState.playback_status === "playing") {
-                videoRef.current.play()
-
-                setSyncInterval(setInterval(syncPlayback, 500))
-            } else {
-                videoRef.current.pause()
-
-                if (syncInterval) {
-                    clearInterval(syncInterval)
-                }
-            }
-        }
-    }, [playerState.playback_status])
-
+    //* handle when player is loading
     React.useEffect(() => {
         if (lyrics?.video_source && playerState.loading === true && playerState.playback_status === "playing") {
             videoRef.current.pause()
@@ -119,50 +84,61 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
         }
     }, [playerState.loading])
 
+    //* Handle when playback status change
+    React.useEffect(() => {
+        if (initialLoading === false) {
+            console.log(`VIDEO:: Playback status changed to ${playerState.playback_status}`)
+
+            if (lyrics && lyrics.video_source) {
+                if (playerState.playback_status === "playing") {
+                    videoRef.current.play()
+                    startSyncInterval()
+                } else {
+                    videoRef.current.pause()
+                    stopSyncInterval()
+                }
+            }
+        }
+    }, [playerState.playback_status])
+
     //* Handle when lyrics object change
     React.useEffect(() => {
-        clearInterval(syncInterval)
         setCurrentVideoLatency(0)
-        setSyncingVideo(false)
+        stopSyncInterval()
 
         if (lyrics) {
             if (lyrics.video_source) {
+                console.log("Loading video source >", lyrics.video_source)
                 hls.current.loadSource(lyrics.video_source)
 
                 if (typeof lyrics.sync_audio_at_ms !== "undefined") {
+                    videoRef.current.loop = false
                     videoRef.current.currentTime = lyrics.sync_audio_at_ms / 1000
 
-                    if (playerState.playback_status === "playing") {
-                        videoRef.current.play()
-                        startSyncInterval()
-                    } else {
-                        videoRef.current.pause()
-                    }
-
-                    const currentTime = app.cores.player.controls.seek()
-
-                    if (currentTime > 0) {
-                        seekVideoToSyncAudio()
-                    }
+                    startSyncInterval()
                 } else {
                     videoRef.current.loop = true
+                    videoRef.current.currentTime = 0
+                }
+
+                if (playerState.playback_status === "playing"){
                     videoRef.current.play()
                 }
-            } else {
-                videoRef.current
             }
-        } else {
-            videoRef.current
         }
+
+        setInitialLoading(false)
     }, [lyrics])
 
     React.useEffect(() => {
-        clearInterval(syncInterval)
+        videoRef.current.addEventListener("seeked", (event) => {
+            setSyncingVideo(false)
+        })
 
         hls.current.attachMedia(videoRef.current)
 
         return () => {
-            clearInterval(syncInterval)
+            stopSyncInterval()
         }
     }, [])
 

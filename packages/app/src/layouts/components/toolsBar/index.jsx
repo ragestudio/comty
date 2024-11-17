@@ -61,10 +61,14 @@ export default class ToolsBar extends React.Component {
     }
 
     render() {
+        const hasAnyRenders = this.state.renders.top.length > 0 || this.state.renders.bottom.length > 0
+
+        const isVisible = hasAnyRenders && this.state.visible
+
         return <Motion
             style={{
-                x: spring(this.state.visible ? 0 : 100),
-                width: spring(this.state.visible ? 100 : 0),
+                x: spring(isVisible ? 0 : 100),
+                width: spring(isVisible ? 100 : 0),
             }}
         >
             {({ x, width }) => {
@@ -76,7 +80,7 @@ export default class ToolsBar extends React.Component {
                     className={classnames(
                         "tools-bar-wrapper",
                         {
-                            visible: this.state.visible,
+                            visible: isVisible,
                         }
                     )}
                 >

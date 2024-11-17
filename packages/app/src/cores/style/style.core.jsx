@@ -131,7 +131,6 @@ export default class StyleCore extends Core {
 
 		mutateTheme: (...args) => this.mutateTheme(...args),
 		resetToDefault: () => this.resetToDefault(),
-		toggleCompactMode: () => this.toggleCompactMode(),
 	}
 
 	async onInitialize() {
@@ -249,20 +248,6 @@ export default class StyleCore extends Core {
 		this.applyVariant(this.public.currentVariantKey)
 
 		StyleCore.storagedModifications = this.public.mutation
-	}
-
-	toggleCompactMode(value = !window.app.cores.settings.get("style.compactMode")) {
-		if (value === true) {
-			return this.applyStyles({
-				layoutMargin: 0,
-				layoutPadding: 0,
-			})
-		}
-
-		return this.applyStyles({
-			layoutMargin: this.getVar("layoutMargin"),
-			layoutPadding: this.getVar("layoutPadding"),
-		})
 	}
 
 	resetToDefault() {

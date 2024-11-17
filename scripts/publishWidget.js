@@ -1,12 +1,11 @@
+#!/usr/bin/env node
 import path from "path"
 import fs from "fs"
 import axios from "axios"
 import sevenzip from "7zip-min"
 import formdata from "form-data"
 
-const tmpPath = path.join(process.cwd(), ".tmp")
-
-const widgetsApi = "http://localhost:3040"
+const marketplaceAPIOrigin = "https://indev.comty.app/api/extensions"
 const token = process.argv[2]
 
 const excludedFiles = [
@@ -17,8 +16,17 @@ const excludedFiles = [
     "/package-lock.json",
 ]
 
-async function copyToTmp(origin) {
+const rootPath = process.cwd()
+const tmpPath = path.join(rootPath, ".tmp")
+const buildPath = path.join(tmpPath, "build")
+const bundlePath = path.join(tmpPath, "bundle.7z")
+
+async function copySources(origin, to) {
     const files = fs.readdirSync(origin)
+
+    if (!fs.existsSync(to)) {
+        await fs.promises.mkdir(to, { recursive: true })
+    }
 
     for (const file of files) {
         const filePath = path.join(origin, file)
@@ -33,14 +41,9 @@ async function copyToTmp(origin) {
         }
 
         if (fs.lstatSync(filePath).isDirectory()) {
-            await copyToTmp(filePath)
+            await copySources(filePath, path.join(to, file))
         } else {
-            const fileContent = fs.readFileSync(filePath)
-            const relativePath = filePath.replace(process.cwd(), "")
-            const tmpFilePath = path.join(tmpPath, relativePath)
-
-            fs.mkdirSync(path.dirname(tmpFilePath), { recursive: true })
-            fs.writeFileSync(tmpFilePath, fileContent)
+            await fs.promises.copyFile(filePath, path.join(to, file))
         }
     }
 }
@@ -63,50 +66,69 @@ async function main() {
         return
     }
 
-    const rootPath = process.cwd()
-
     // create a .tmp folder
-    if (!fs.existsSync(tmpPath)) {
-        fs.mkdirSync(tmpPath)
+    if (fs.existsSync(tmpPath)) {
+        await fs.promises.rm(tmpPath, { recursive: true, force: true })
     }
 
-    const bundlePath = path.join(rootPath, "bundle.7z")
+    try {
+        // try to read package.json
+        if (!fs.existsSync(path.resolve(rootPath, "package.json"))) {
+            console.error("🛑 package.json not found")
+            return
+        }
 
-    console.log("📦 Creating bundle...")
+        const packageJSON = require(path.resolve(rootPath, "package.json"))
 
-    await copyToTmp(rootPath)
+        // check if package.json has a main file
+        if (!packageJSON.main) {
+            console.error("🛑 package.json does not have a main file")
+            return
+        }
 
-    await createBundle(`${tmpPath}/*`, bundlePath)
+        if (!fs.existsSync(path.resolve(rootPath, packageJSON.main))) {
+            console.error("🛑 main file not found")
+            return
+        }
+        
+        console.log(packageJSON)
 
-    await fs.promises.rm(tmpPath, { recursive: true, force: true })
+        console.log("📦 Creating bundle...")
 
-    console.log("📦✅ Bundle created successfully")
+        await copySources(rootPath, buildPath)
+        await createBundle(`${buildPath}/*`, bundlePath)
 
-    console.log("🚚 Publishing bundle...")
+        console.log("📦✅ Bundle created successfully")
 
-    const formData = new formdata()
+        console.log("🚚 Publishing bundle...")
 
-    formData.append("bundle", fs.createReadStream(bundlePath))
+        const formData = new formdata()
 
-    const response = await axios({
-        method: "POST",
-        url: `${widgetsApi}/widgets/publish`,
-        headers: {
-            ...formData.getHeaders(),
-            Authorization: `Bearer ${token}`,
-        },
-        data: formData,
-    }).catch((error) => {
-        console.error("🛑 Error while publishing bundle \n\t", error.response?.data ?? error)
+        formData.append("file", fs.createReadStream(bundlePath))
 
-        return false
-    })
+        const response = await axios({
+            method: "PUT",
+            url: `${marketplaceAPIOrigin}/publish`,
+            headers: {
+                ...formData.getHeaders(),
+                pkg: JSON.stringify(packageJSON),
+                Authorization: `Bearer ${token}`,
+            },
+            data: formData,
+        }).catch((error) => {
+            console.error("🛑 Error while publishing bundle \n\t", error.response?.data ?? error)
 
-    await fs.promises.rm(bundlePath, { recursive: true, force: true })
-    await fs.promises.rm(tmpPath, { recursive: true, force: true })
+            return false
+        })
 
-    if (response) {
-        console.log("🚚✅ Bundle published successfully! \n", response.data)
+        if (response) {
+            console.log("🚚✅ Bundle published successfully! \n", response.data)
+        }
+
+        await fs.promises.rm(tmpPath, { recursive: true, force: true })
+    } catch (error) {
+        console.error("🛑 Error while publishing bundle \n\t", error)
+        await fs.promises.rm(tmpPath, { recursive: true, force: true })
     }
 }
 

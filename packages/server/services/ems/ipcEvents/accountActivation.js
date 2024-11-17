@@ -1,8 +1,6 @@
 import templates from "../templates"
 
 export default async (ctx, data) => {
-    console.log(`EMS Send account activation `, data)
-    
     const { user, activation_code } = data
 
     const result = await ctx.mailTransporter.sendMail({

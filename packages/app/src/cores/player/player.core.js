@@ -273,7 +273,7 @@ export default class Player extends Core {
         })
     }
 
-    async playbackMode(mode) {
+    playbackMode(mode) {
         if (typeof mode !== "string") {
             return this.state.playback_mode
         }
@@ -289,7 +289,7 @@ export default class Player extends Core {
         return mode
     }
 
-    async stopPlayback() {
+    stopPlayback() {
         if (this.queue.currentItem) {
             this.queue.currentItem.stop()
         }

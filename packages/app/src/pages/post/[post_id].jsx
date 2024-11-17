@@ -8,15 +8,19 @@ import PostsList from "@components/PostsList"
 
 import PostService from "@models/post"
 
+import useCenteredContainer from "@hooks/useCenteredContainer"
+
 import "./index.less"
 
 const PostPage = (props) => {
     const post_id = props.params.post_id
 
+    useCenteredContainer(true)
+
     const [loading, result, error, repeat] = app.cores.api.useRequest(PostService.getPost, {
         post_id,
     })
-    
+
     if (error) {
         return <antd.Result
             status="warning"

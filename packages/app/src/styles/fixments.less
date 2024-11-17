@@ -577,7 +577,8 @@
 }
 
 // fix input
-.ant-input {
+.ant-input,
+.ant-mentions {
     background-color: var(--background-color-accent);
 
     color: var(--text-color);
@@ -588,10 +589,36 @@
     }
 }
 
-.ant-input-affix-wrapper {
-    background-color: var(--background-color-accent);
+.ant-mentions-outlined {
+    background: transparent;
 
+    &:hover {
+        background: transparent;
+        background-color: var(--background-color-accent) !important;
+    }
+
+    &:focus {
+        background: transparent;
+        background-color: var(--background-color-accent) !important;
+    }
+
+    &:focus-within {
+        background: transparent;
+        background-color: var(--background-color-accent) !important;
+    }
+}
+
+.ant-input-affix-wrapper,
+.ant-mentions-affix-wrapper {
+    background: transparent;
+    background-color: var(--background-color-accent);
     color: var(--text-color);
+
+    border: 0 !important;
+
+    :hover {
+        border: 0 !important;
+    }
 
     ::placeholder {
         color: var(--text-color);

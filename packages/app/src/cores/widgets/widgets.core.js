@@ -21,8 +21,6 @@ export default class WidgetsCore extends Core {
 
     async onInitialize() {
         try {
-            //await WidgetsCore.apiInstance()
-
             const currentStore = this.getInstalled()
 
             if (!Array.isArray(currentStore)) {

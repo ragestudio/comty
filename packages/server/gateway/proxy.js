@@ -172,12 +172,14 @@ export default class Proxy {
 
         if (!route) {
             res.statusCode = 404
-            res.end(`
-                {
-                    "error": "404 Not found"
-                }
-            `)
-            return
+
+            res.end(JSON.stringify({
+                error: "Gateway route not found",
+                details: "The gateway route you are trying to access does not exist, maybe the service is down...",
+                namespace: namespace,
+            }))
+
+            return null
         }
 
         if (route.pathRewrite) {

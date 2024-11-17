@@ -257,14 +257,14 @@ export default class StreamViewer extends React.Component {
 
     enterPlayerAnimation = () => {
         app.cores.style.applyTemporalVariant("dark")
-        app.cores.style.toggleCompactMode(true)
+        app.layout.toggleCompactMode(true)
         app.layout.toggleCenteredContent(false)
         app.controls.toggleUIVisibility(false)
     }
 
     exitPlayerAnimation = () => {
         app.cores.style.applyVariant(app.cores.style.currentVariantKey)
-        app.cores.style.toggleCompactMode(false)
+        app.layout.toggleCompactMode(false)
         app.layout.toggleCenteredContent(true)
         app.controls.toggleUIVisibility(true)
     }
@@ -341,7 +341,7 @@ export default class StreamViewer extends React.Component {
                                             <h1>{this.state.stream.info?.title}</h1>
                                         </div>
                                         <div className="livestream_player_header_info_description">
-                                            <Marquee 
+                                            <Marquee
                                                 mode="smooth"
                                             >
                                                 {({ index }) => {

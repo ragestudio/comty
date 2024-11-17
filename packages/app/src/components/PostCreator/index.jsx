@@ -12,6 +12,7 @@ import Poll from "@components/Poll"
 import clipboardEventFileToFile from "@utils/clipboardEventFileToFile"
 
 import PostModel from "@models/post"
+import SearchModel from "@models/search"
 
 import "./index.less"
 
@@ -33,6 +34,8 @@ export default class PostCreator extends React.Component {
 
         fileList: [],
         postingPolicy: DEFAULT_POST_POLICY,
+
+        mentionsLoadedData: []
     }
 
     pollRef = React.createRef()
@@ -59,14 +62,6 @@ export default class PostCreator extends React.Component {
         })
     }
 
-    fetchUploadPolicy = async () => {
-        const policy = await PostModel.getPostingPolicy()
-
-        this.setState({
-            postingPolicy: policy
-        })
-    }
-
     canSubmit = () => {
         const { postMessage, postAttachments, pending, postingPolicy } = this.state
 
@@ -83,9 +78,7 @@ export default class PostCreator extends React.Component {
         return true
     }
 
-    debounceSubmit = lodash.debounce(() => this.submit(), 50)
-
-    submit = async () => {
+    submit = lodash.debounce(async () => {
         if (this.state.loading) {
             return false
         }
@@ -154,10 +147,9 @@ export default class PostCreator extends React.Component {
                 app.navigation.goToPost(this.props.reply_to)
             }
         }
-    }
+    }, 50)
 
     uploadFile = async (req) => {
-        // hide uploader
         this.toggleUploaderVisibility(false)
 
         const request = await app.cores.remoteStorage.uploadFile(req.file)
@@ -265,18 +257,18 @@ export default class PostCreator extends React.Component {
         }
     }
 
-    onChangeMessageInput = (event) => {
+    handleMessageInputChange = (inputText) => {
         // if the fist character is a space or a whitespace remove it
-        if (event.target.value[0] === " " || event.target.value[0] === "\n") {
-            event.target.value = event.target.value.slice(1)
+        if (inputText[0] === " " || inputText[0] === "\n") {
+            inputText = inputText.slice(1)
         }
 
         this.setState({
-            postMessage: event.target.value
+            postMessage: inputText
         })
     }
 
-    handleKeyDown = async (e) => {
+    handleMessageInputKeydown = async (e) => {
         // detect if the user pressed `enter` key and submit the form, but only if the `shift` key is not pressed
         if (e.keyCode === 13 && !e.shiftKey) {
             e.preventDefault()
@@ -289,6 +281,15 @@ export default class PostCreator extends React.Component {
             return await this.debounceSubmit()
         }
     }
+
+    handleOnMentionSearch = lodash.debounce(async (value) => {
+        const results = await SearchModel.userSearch(`username:${value}`)
+
+        this.setState({
+            mentionsLoadedData: results
+        })
+
+    }, 300)
 
     updateFileList = (uid, newValue) => {
         let updatedFileList = this.state.fileList
@@ -577,16 +578,28 @@ export default class PostCreator extends React.Component {
                     <img src={app.userData?.avatar} />
                 </div>
 
-                <antd.Input.TextArea
+                <antd.Mentions
                     placeholder="What are you thinking?"
                     value={postMessage}
                     autoSize={{ minRows: 3, maxRows: 6 }}
                     maxLength={postingPolicy.maxMessageLength}
-                    onChange={this.onChangeMessageInput}
-                    onKeyDown={this.handleKeyDown}
+                    onChange={this.handleMessageInputChange}
+                    onKeyDown={this.handleMessageInputKeydown}
                     disabled={loading}
                     draggable={false}
+                    prefix="@"
                     allowClear
+                    options={this.state.mentionsLoadedData.map((item) => {
+                        return {
+                            key: item.id,
+                            value: item.username,
+                            label: <>
+                                <antd.Avatar src={item.avatar} />
+                                <span>{item.username}</span>
+                            </>,
+                        }
+                    })}
+                    onSearch={this.handleOnMentionSearch}
                 />
 
                 <div>

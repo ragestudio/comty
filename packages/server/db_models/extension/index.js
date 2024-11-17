@@ -2,13 +2,33 @@ export default {
     name: "Extension",
     collection: "extensions",
     schema: {
+        user_id: {
+            type: String,
+            required: true
+        },
+        assetsUrl: {
+            type: String,
+            required: true
+        },
+        srcUrl: {
+            type: String,
+            required: true
+        },
+        registryId: {
+            type: String,
+            required: true
+        },
+        packageUrl: {
+            type: String,
+            required: true
+        },
         version: {
             type: String,
             required: true
         },
-        title: {
+        name: {
             type: String,
-            default: "Untitled"
+            default: "untitled"
         },
         description: {
             type: String,
@@ -21,10 +41,6 @@ export default {
         created_at: {
             type: Date,
             required: true,
-        },
-        experimental: {
-            type: Boolean,
-            default: false
         },
     }
 }

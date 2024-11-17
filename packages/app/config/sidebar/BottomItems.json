@@ -5,17 +5,6 @@
         "icon": "FiSearch"
     },
     {
-        "id": "messages",
-        "label": "Messages",
-        "icon": "FiMessageCircle",
-        "path": "/messages"
-    },
-    {
-        "id": "notifications",
-        "label": "Notifications",
-        "icon": "FiBell"
-    },
-    {
         "id": "settings",
         "label": "Settings",
         "icon": "FiSettings",

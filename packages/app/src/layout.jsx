@@ -108,6 +108,9 @@ export default class Layout extends React.PureComponent {
 		togglePagePanelSpacer: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname("page-panel-spacer", to)
 		},
+		toggleCompactMode: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname("compact-mode", to)
+		},
 		toggleRootContainerClassname: (classname, to) => {
 			const root = document.documentElement
 

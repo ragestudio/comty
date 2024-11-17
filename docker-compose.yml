@@ -1,4 +1,13 @@
 services:
+  app:
+    build: packages/app
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./.env
   api:
     build: packages/server
     restart: unless-stopped
@@ -8,7 +17,7 @@ services:
       - "9000:9000"
     env_file:
       - ./.env
-      
+
   redis:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
     restart: unless-stopped

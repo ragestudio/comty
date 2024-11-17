@@ -18,6 +18,13 @@ export default {
             throw new OperationError(403, "Unauthorized")
         }
 
+        console.log(`Setting lyrics for track ${track_id} >`, {
+            track_id: track_id,
+            video_source: video_source,
+            lrc: lrc,
+            track: track,
+        })
+
         let trackLyric = await TrackLyric.findOne({
             track_id: track_id
         }).lean()
@@ -35,10 +42,9 @@ export default {
                 trackLyric.sync_audio_at = sync_audio_at
             }
 
-            trackLyric = await TrackLyric.findOneAndUpdate(
-                {
-                    _id: trackLyric._id
-                },
+            trackLyric = await TrackLyric.findOneAndUpdate({
+                track_id: track_id
+            },
                 trackLyric
             )
         } else {

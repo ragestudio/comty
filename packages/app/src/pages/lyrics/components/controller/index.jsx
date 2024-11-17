@@ -18,34 +18,6 @@ function isOverflown(element) {
     return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
 }
 
-const RenderArtist = (props) => {
-    const { artist } = props
-
-    if (!artist) {
-        return null
-    }
-
-    if (Array.isArray(artist)) {
-        return <h3>{artist.join(",")}</h3>
-    }
-
-    return <h3>{artist}</h3>
-}
-
-const RenderAlbum = (props) => {
-    const { album } = props
-
-    if (!album) {
-        return null
-    }
-
-    if (Array.isArray(album)) {
-        return <h3>{album.join(",")}</h3>
-    }
-
-    return <h3>{album}</h3>
-}
-
 const PlayerController = React.forwardRef((props, ref) => {
     const [playerState] = usePlayerStateContext()
 
@@ -152,9 +124,7 @@ const PlayerController = React.forwardRef((props, ref) => {
                 </div>
 
                 <div className="lyrics-player-controller-info-details">
-                    <RenderArtist artist={playerState.track_manifest?.artists} />
-                    -
-                    <RenderAlbum album={playerState.track_manifest?.album} />
+                    <span>{playerState.track_manifest?.artistStr}</span>
                 </div>
             </div>
 

@@ -75,17 +75,9 @@ const Attachment = React.memo((props) => {
                     return <ImageViewer src={url} />
                 }
                 case "video": {
-                    return <Plyr
-                        source={{
-                            type: "video",
-                            sources: [{
-                                src: url,
-                            }],
-                        }}
-                        options={{
-                            controls: ["play", "progress", "current-time", "mute", "volume"],
-                        }}
-                    />
+                    return <video controls>
+                        <source src={url} type={mimeType} />
+                    </video>
                 }
                 case "audio": {
                     return <audio controls>

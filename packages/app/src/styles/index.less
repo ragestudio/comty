@@ -83,6 +83,8 @@ a {
 
 	transition: all 150ms ease-in-out;
 
+	overflow-x: hidden;
+
 	&.electron {
 		.ant-layout-sider {
 			padding-top: 0px;
@@ -166,6 +168,13 @@ html {
 	// 		animation-delay: 0;
 	// 	}
 	// }
+
+	&.compact-mode {
+		.content_layout {
+			padding: 0 !important;
+			margin: 0 !important;
+		}
+	}
 
 	&.centered-content {
 		.content_layout {

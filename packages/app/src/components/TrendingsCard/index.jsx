@@ -22,6 +22,9 @@ const TrendingsCard = (props) => {
                 E_Trendings && <span>Something went wrong</span>
             }
             {
+                !L_Trendings && !E_Trendings && R_Trendings && R_Trendings.length === 0 && <span>No trendings</span>
+            }
+            {
                 !L_Trendings && !E_Trendings && R_Trendings && R_Trendings.map((trending, index) => {
                     return <div
                         key={index}
