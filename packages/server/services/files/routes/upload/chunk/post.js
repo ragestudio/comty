@@ -13,9 +13,7 @@ export default {
         "withAuthentication",
     ],
     fn: async (req, res) => {
-        const userPath = path.join(this.default.contexts.cache.constructor.cachePath, req.auth.session.user_id)
-
-        const tmpPath = path.resolve(userPath)
+        const tmpPath = path.resolve(this.default.contexts.cache.constructor.cachePath, req.auth.session.user_id)
 
         const limits = {
             maxFileSize: parseInt(this.default.contexts.limits.maxFileSizeInMB) * 1024 * 1024,
@@ -62,13 +60,13 @@ export default {
                     cachePath: tmpPath,
                 })
 
-                fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
+                await fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
                     return false
                 })
 
                 return result
             } catch (error) {
-                fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
+                await fs.promises.rm(tmpPath, { recursive: true, force: true }).catch(() => {
                     return false
                 })
 
@@ -77,7 +75,8 @@ export default {
         }
 
         return {
-            ok: 1
+            ok: 1,
+            chunkNumber: req.headers["uploader-chunk-number"],
         }
     }
 }
