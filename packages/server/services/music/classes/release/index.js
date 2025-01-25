@@ -12,6 +12,23 @@ const AllowedUpdateFields = [
 
 export default class Release {
     static async create(payload) {
+        if (!payload.title) {
+            throw new OperationError(400, "Release title is required")
+        }
+
+        if (!payload.list) {
+            throw new OperationError(400, "Release list is required")
+        }
+
+        // ensure list is an array of strings with tracks ids only
+        playload.list = playload.list.map((item) => {
+            if (typeof item !== "string") {
+                item = item._id
+            }
+
+            return item
+        })
+
         const release = new MusicRelease({
             user_id: payload.user_id,
             created_at: Date.now(),
@@ -48,13 +65,21 @@ export default class Release {
             }
         }
 
+        // ensure list is an array of strings with tracks ids only
+        release.list = release.list.map((item) => {
+            if (typeof item !== "string") {
+                item = item._id
+            }
+
+            return item
+        })
+
         release = await MusicRelease.findByIdAndUpdate(id, release)
 
         return release
     }
 
     static async fullfillItemData(release) {
-
         return release
     }
 }

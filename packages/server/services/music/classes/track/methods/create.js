@@ -15,6 +15,8 @@ export default async (payload = {}) => {
         return await ModifyTrack(payload._id, payload)
     }
 
+    let metadata = Object()
+
     try {
         const sourceStream = await axios({
             url: payload.source,
@@ -24,25 +26,26 @@ export default async (payload = {}) => {
 
         stream = sourceStream.data
         headers = sourceStream.headers
+
+        const streamMetadata = await MusicMetadata.parseStream(stream, {
+            mimeType: headers["content-type"],
+        })
+
+        metadata = {
+            ...metadata,
+            format: streamMetadata.format.codec,
+            channels: streamMetadata.format.numberOfChannels,
+            sampleRate: streamMetadata.format.sampleRate,
+            bits: streamMetadata.format.bitsPerSample,
+            lossless: streamMetadata.format.lossless,
+            duration: streamMetadata.format.duration,
+
+            title: streamMetadata.common.title,
+            artists: streamMetadata.common.artists,
+            album: streamMetadata.common.album,
+        }
     } catch (error) {
-        throw new OperationError(500, `Failed to process fetching source: ${error.message}`)
-    }
-
-    const fileMetadata = await MusicMetadata.parseStream(stream, {
-        mimeType: headers["content-type"],
-    })
-
-    let metadata = {
-        format: fileMetadata.format.codec,
-        channels: fileMetadata.format.numberOfChannels,
-        sampleRate: fileMetadata.format.sampleRate,
-        bits: fileMetadata.format.bitsPerSample,
-        lossless: fileMetadata.format.lossless,
-        duration: fileMetadata.format.duration,
-
-        title: fileMetadata.common.title,
-        artists: fileMetadata.common.artists,
-        album: fileMetadata.common.album,
+        // sowy :(
     }
 
     if (typeof payload.metadata === "object") {
@@ -50,6 +53,16 @@ export default async (payload = {}) => {
             ...metadata,
             ...payload.metadata,
         }
+    }
+
+    metadata.format = metadata.format.toUpperCase()
+
+    if (
+        metadata.format === "FLAC" || 
+        metadata.format === "WAV" || 
+        metadata.format === "ALAC"
+    ) {
+        metadata.lossless = true
     }
 
     const obj = {
@@ -68,6 +81,10 @@ export default async (payload = {}) => {
 
     if (typeof payload.artists === "string") {
         obj.artists.push(payload.artists)
+    }
+
+    if (typeof payload.artist === "string") {
+        obj.artists.push(payload.artist)
     }
 
     if (obj.artists.length === 0 || !obj.artists) {
