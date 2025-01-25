@@ -92,26 +92,24 @@ export default async ({
     try {
         switch (service) {
             case "b2":
-                if (isDirectory) {
-                    throw new OperationError(500, "B2 storage does not support directory upload. yet...")
-                }
                 if (!global.b2Storage) {
                     throw new OperationError(500, "B2 storage not configured on environment, unsupported service. Please use `standard` service.")
                 }
 
                 result = await B2Upload({
-                    source,
-                    remotePath,
-                    metadata,
-                    isDirectory,
+                    source: isDirectory ? path.dirname(source) : source,
+                    remotePath: remotePath,
+                    metadata: metadata,
+                    isDirectory: isDirectory,
+                    targetFilename: isDirectory ? path.basename(source) : null,
                 })
                 break
             case "standard":
                 result = await StandardUpload({
                     source: isDirectory ? path.dirname(source) : source,
-                    remotePath,
-                    metadata,
-                    isDirectory,
+                    remotePath: remotePath,
+                    metadata: metadata,
+                    isDirectory: isDirectory,
                     targetFilename: isDirectory ? path.basename(source) : null,
                 })
                 break
