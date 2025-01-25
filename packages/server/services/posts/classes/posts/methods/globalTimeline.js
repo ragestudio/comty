@@ -7,13 +7,10 @@ export default async (payload = {}) => {
         limit,
     } = payload
 
-    let query = {}
-
     const posts = await GetPostData({
         for_user_id: user_id,
         trim,
         limit,
-        query: query,
     })
 
     return posts

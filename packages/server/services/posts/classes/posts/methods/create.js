@@ -34,6 +34,8 @@ export default async (payload = {}) => {
 
     if (!timestamp) {
         timestamp = DateTime.local().toISO()
+    } else {
+        timestamp = DateTime.fromISO(timestamp).toISO()
     }
 
     if (Array.isArray(poll_options)) {
