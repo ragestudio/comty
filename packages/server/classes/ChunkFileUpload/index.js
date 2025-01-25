@@ -104,7 +104,8 @@ export async function handleChunkFile(
     }
 ) {
     return await new Promise(async (resolve, reject) => {
-        const chunksPath = path.join(tmpDir, headers["uploader-file-id"], "chunks")
+        const workPath = path.join(tmpDir, headers["uploader-file-id"])
+        const chunksPath = path.join(workPath, "chunks")
         const chunkPath = path.join(chunksPath, headers["uploader-chunk-number"])
 
         const chunkCount = +headers["uploader-chunk-number"]
@@ -167,7 +168,7 @@ export async function handleChunkFile(
                 return resolve(createAssembleChunksPromise({
                     // build data
                     chunksPath: chunksPath,
-                    filePath: path.resolve(chunksPath, `${filename}.${extension}`),
+                    filePath: path.resolve(workPath, `${filename}.${extension}`),
                     maxFileSize: maxFileSize,
                 }))
             }
