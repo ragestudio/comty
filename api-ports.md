@@ -10,7 +10,7 @@
 3007 -> ems (External Messaging Service)
 3008 -> users
 3009 -> notifications
-3010 -> unallocated
+3010 -> search
 3011 -> unallocated
 3012 -> unallocated
 3013 -> unallocated
