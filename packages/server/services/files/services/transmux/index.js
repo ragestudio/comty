@@ -2,6 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 
 import MultiqualityHLSJob from "@shared-classes/MultiqualityHLSJob"
+import SegmentedAudioMPDJob from "@shared-classes/SegmentedAudioMPDJob"
 
 const transmuxers = [
     {
@@ -30,7 +31,25 @@ const transmuxers = [
                 ]
             })
         },
-    }
+    },
+     {
+        id: "a-dash",
+        container: "dash",
+        extension: "mpd",
+        multipleOutput: true,
+        buildCommand: (input, outputDir) => {
+            return new SegmentedAudioMPDJob({
+                input: input,
+                outputDir: outputDir,
+                outputMasterName: "master.mpd",
+
+                audioCodec: "flac",
+                //audioBitrate: "1600k",
+                //audioSampleRate: 96000,
+                segmentTime: 10,
+            })
+        }
+    },
 ]
 
 export default async (params) => {
