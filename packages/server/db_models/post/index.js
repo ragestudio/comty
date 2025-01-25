@@ -7,7 +7,7 @@ export default {
             required: true
         },
         created_at: {
-            type: String,
+            type: Date,
             required: true
         },
         message: {
