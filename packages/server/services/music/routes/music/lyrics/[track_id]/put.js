@@ -29,25 +29,7 @@ export default {
             track_id: track_id
         }).lean()
 
-        if (trackLyric) {
-            if (video_source) {
-                trackLyric.video_source = video_source
-            }
-
-            if (lrc) {
-                trackLyric.lrc = lrc
-            }
-
-            if (sync_audio_at) {
-                trackLyric.sync_audio_at = sync_audio_at
-            }
-
-            trackLyric = await TrackLyric.findOneAndUpdate({
-                track_id: track_id
-            },
-                trackLyric
-            )
-        } else {
+        if (!trackLyric) {
             trackLyric = new TrackLyric({
                 track_id: track_id,
                 video_source: video_source,
@@ -56,6 +38,27 @@ export default {
             })
 
             await trackLyric.save()
+        } else {
+            const update = Object()
+
+            if (typeof video_source !== "undefined") {
+                update.video_source = video_source
+            }
+
+            if (typeof lrc !== "undefined") {
+                update.lrc = lrc
+            }
+
+            if (typeof sync_audio_at !== "undefined") {
+                update.sync_audio_at = sync_audio_at
+            }
+
+            trackLyric = await TrackLyric.findOneAndUpdate(
+                {
+                    track_id: track_id,
+                },
+                update,
+            )
         }
 
         return trackLyric
