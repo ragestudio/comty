@@ -5,7 +5,7 @@ import { Icons } from "@components/Icons"
 import { MobileUserCard } from "@components/UserCard"
 import NFCModel from "comty.js/models/nfc"
 
-import { FollowsModel } from "@models"
+import FollowsModel from "@models/follows"
 
 import "./index.less"
 

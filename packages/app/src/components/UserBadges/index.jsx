@@ -5,7 +5,7 @@ import DOMPurify from "dompurify"
 import axios from "axios"
 
 import { createIconRender } from "@components/Icons"
-import { UserModel } from "@models"
+import UserModel from "@models/user"
 
 import "./index.less"
 
