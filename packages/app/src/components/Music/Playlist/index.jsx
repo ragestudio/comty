@@ -14,7 +14,7 @@ const typeToNavigationType = {
     ep: "album"
 }
 
-export default (props) => {
+const Playlist = (props) => {
     const [coverHover, setCoverHover] = React.useState(false)
 
     let { playlist } = props
@@ -37,25 +37,26 @@ export default (props) => {
         app.cores.player.start(playlist.list)
     }
 
+
     const subtitle = playlist.type === "playlist" ? `By ${playlist.user_id}` : (playlist.description ?? (playlist.publisher && `Release from ${playlist.publisher?.fullName}`))
 
     return <div
         id={playlist._id}
         key={props.key}
         className={classnames(
-            "playlistItem",
+            "playlist",
             {
                 "cover-hovering": coverHover
             }
         )}
     >
         <div
-            className="playlistItem_cover"
+            className="playlist_cover"
             onMouseEnter={() => setCoverHover(true)}
             onMouseLeave={() => setCoverHover(false)}
             onClick={onClickPlay}
         >
-            <div className="playlistItem_cover_mask">
+            <div className="playlist_cover_mask">
                 <Icons.MdPlayArrow />
             </div>
 
@@ -64,27 +65,35 @@ export default (props) => {
             />
         </div>
 
-        <div className="playlistItem_info">
-            <div className="playlistItem_info_title" onClick={onClick}>
+        <div className="playlist_info">
+            <div className="playlist_info_title" onClick={onClick}>
                 <h1>{playlist.title}</h1>
             </div>
 
-            <div className="playlistItem_info_subtitle">
-                <p>
-                    {subtitle}
-                </p>
-            </div>
+            {
+                subtitle && <div className="playlist_info_subtitle">
+                    <p>
+                        {subtitle}
+                    </p>
+                </div>
+            }
         </div>
 
-        <div className="playlistItem_bottom">
-            <p>
-                <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length}
-            </p>
+        <div className="playlist_bottom">
+            {
+                props.length && <p>
+                    <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length}
+                </p>
+            }
 
-            <p>
-                <Icons.MdAlbum />
-                {playlist.type ?? "playlist"}
-            </p>
+            {
+                playlist.type && <p>
+                    <Icons.MdAlbum />
+                    {playlist.type ?? "playlist"}
+                </p>
+            }
         </div>
     </div>
 }
+
+export default Playlist
