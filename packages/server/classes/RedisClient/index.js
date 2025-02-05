@@ -1,6 +1,6 @@
 import Redis from "ioredis"
 
-function composeURL({
+export function composeURL({
     host,
     port,
     username,
