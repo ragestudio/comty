@@ -73,10 +73,6 @@ export default class TrackManifest {
 	lyrics_enabled = false
 	liked = null
 
-	// TODO: implement this server feature to fetch some data from the server,
-	// used for example to fix a incorrect lyrics time
-	overrides = null
-
 	async initialize() {
 		if (this.params.file) {
 			this.metadata = await this.analyzeMetadata(
@@ -167,11 +163,22 @@ export default class TrackManifest {
 				return null
 			}
 
-			return await this.ctx.serviceProviders.operation(
+			const result = await this.ctx.serviceProviders.operation(
 				"resolveLyrics",
 				this.service,
 				this,
 			)
+
+			console.log(this.overrides)
+
+			if (this.overrides) {
+				return {
+					...result,
+					...this.overrides,
+				}
+			}
+
+			return result
 		},
 		fetchOverride: async () => {
 			if (!this._id) {
