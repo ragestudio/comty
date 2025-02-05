@@ -50,6 +50,8 @@ const useHideOnMouseStop = ({
 
         return () => {
             window.removeEventListener("mousemove", onMouseMove)
+            // set cursor visible
+            document.body.style.cursor = "default"
         }
     }, [onMouseMove])
 
