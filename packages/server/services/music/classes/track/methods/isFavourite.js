@@ -9,7 +9,7 @@ export default async (user_id, track_id, to) => {
         throw new OperationError(400, "Missing track_id")
     }
 
-    const track = await Track.findById(track_id)
+    const track = await Track.findById(track_id).catch(() => null)
 
     if (!track) {
         throw new OperationError(404, "Track not found")

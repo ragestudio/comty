@@ -12,6 +12,7 @@ const AllowedUpdateFields = [
 
 export default class Release {
     static async create(payload) {
+        console.log(payload)
         if (!payload.title) {
             throw new OperationError(400, "Release title is required")
         }
@@ -21,7 +22,7 @@ export default class Release {
         }
 
         // ensure list is an array of strings with tracks ids only
-        playload.list = playload.list.map((item) => {
+        payload.list = payload.list.map((item) => {
             if (typeof item !== "string") {
                 item = item._id
             }

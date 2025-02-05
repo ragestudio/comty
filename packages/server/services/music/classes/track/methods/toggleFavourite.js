@@ -45,8 +45,6 @@ export default async (user_id, track_id, to) => {
         }
     }
 
-    console.log(global.websocket.find)
-
     const targetSocket = await global.websocket.find.socketByUserId(user_id)
 
     if (targetSocket) {

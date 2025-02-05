@@ -2,33 +2,33 @@ import { MusicRelease, Track } from "@db_models"
 import TrackClass from "@classes/track"
 
 export default {
-    middlewares: ["withOptionalAuthentication"],
-    fn: async (req) => {
-        const { release_id } = req.params
-        const { limit = 50, offset = 0 } = req.query
+	middlewares: ["withOptionalAuthentication"],
+	fn: async (req) => {
+		const { release_id } = req.params
+		const { limit = 50, offset = 0 } = req.query
 
-        let release = await MusicRelease.findOne({
-            _id: release_id
-        })
+		let release = await MusicRelease.findOne({
+			_id: release_id,
+		})
 
-        if (!release) {
-            throw new OperationError(404, "Release not found")
-        }
+		if (!release) {
+			throw new OperationError(404, "Release not found")
+		}
 
-        release = release.toObject()
+		release = release.toObject()
 
-        const totalTracks = await Track.countDocuments({
-            _id: release.list
-        })
+		const totalTracks = await Track.countDocuments({
+			_id: release.list,
+		})
 
-        const tracks = await TrackClass.get(release.list, {
-            user_id: req.auth?.session?.user_id,
-            onlyList: true
-        })
+		const tracks = await TrackClass.get(release.list, {
+			user_id: req.auth?.session?.user_id,
+			onlyList: true,
+		})
 
-        release.listLength = totalTracks
-        release.list = tracks
+		release.listLength = totalTracks
+		release.items = tracks
 
-        return release
-    }
+		return release
+	},
 }

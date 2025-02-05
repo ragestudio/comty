@@ -6,9 +6,8 @@ export default {
         const { track_id } = req.params
         const { video_source, lrc, sync_audio_at } = req.body
 
-        let track = await Track.findOne({
-            _id: track_id,
-        })
+        // check if track exists
+        let track = await Track.findById(track_id).catch(() => null)
 
         if (!track) {
             throw new OperationError(404, "Track not found")
@@ -22,13 +21,14 @@ export default {
             track_id: track_id,
             video_source: video_source,
             lrc: lrc,
-            track: track,
         })
 
+        // check if trackLyric exists
         let trackLyric = await TrackLyric.findOne({
             track_id: track_id
-        }).lean()
+        })
 
+        // if trackLyric exists, update it, else create it
         if (!trackLyric) {
             trackLyric = new TrackLyric({
                 track_id: track_id,

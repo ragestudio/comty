@@ -8,7 +8,9 @@ export default {
             let results = []
 
             for await (const item of req.body.list) {
-                requiredFields(["title", "source"], item)
+                if (!item.source || !item.title) {
+                    continue
+                }
 
                 const track = await TrackClass.create({
                     ...item,

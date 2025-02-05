@@ -16,6 +16,20 @@ export default {
             .limit(req.query.limit ?? 20)
             .sort({ created_at: -1 })
 
+        // filter tracks has different service than comtymusic
+        activities = activities.map((activity) => {
+            if (activity.payload.service && activity.payload.service !== "default") {
+                return null
+            }
+
+            return activity
+        })
+
+        // filter null & undefined tracks
+        activities = activities.filter((activity) => {
+            return activity
+        })
+
         // filter undefined tracks_ids
         activities = activities.filter((activity) => {
             return activity.payload && activity.payload.track_id
