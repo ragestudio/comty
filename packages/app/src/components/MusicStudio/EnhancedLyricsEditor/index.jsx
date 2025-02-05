@@ -74,6 +74,8 @@ class EnhancedLyricsEditor extends React.Component {
             app.message.error("Failed to update enhanced lyrics")
         })
 
+        app.message.success("Lyrics updated")
+
         this.setState({
             submitting: false
         })
