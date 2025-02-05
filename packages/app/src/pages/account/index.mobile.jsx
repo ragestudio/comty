@@ -8,7 +8,9 @@ import Skeleton from "@components/Skeleton"
 import { PagePanelWithNavMenu } from "@components/PagePanels"
 import { MobileUserCard } from "@components/UserCard"
 
-import { SessionModel, UserModel, FollowsModel } from "@models"
+import SessionModel from "@models/session"
+import UserModel from "@models/user"
+import FollowsModel from "@models/follows"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
@@ -62,7 +64,7 @@ export default class Account extends React.Component {
         this.loadUser()
     }
 
-    toggleLike = async () => {
+    toggleFollow = async () => {
         if (this.state.isFollowed) {
             const accept = await new Promise((resolve, reject) => {
                 antd.Modal.confirm({
@@ -189,7 +191,7 @@ export default class Account extends React.Component {
                 isSelf={this.state.isSelf}
                 isFollowed={this.state.isFollowed}
                 followers={this.state.followers}
-                onClickFollow={this.toggleLike}
+                onClickFollow={this.toggleFollow}
             />
 
             <PagePanelWithNavMenu

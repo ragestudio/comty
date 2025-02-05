@@ -9,7 +9,9 @@ import UserCard from "@components/UserCard"
 
 import GenerateMenuItems from "@utils/generateMenuItems"
 
-import { SessionModel, UserModel, FollowsModel } from "@models"
+import SessionModel from "@models/session"
+import UserModel from "@models/user"
+import FollowsModel from "@models/follows"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
