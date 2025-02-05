@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 
 import ChunkedUpload from "./chunkedUpload"
 import SessionModel from "@models/session"
