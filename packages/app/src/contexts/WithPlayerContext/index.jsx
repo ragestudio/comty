@@ -22,6 +22,11 @@ export const usePlayerStateContext = (updater) => {
     function handleStateChange(newState) {
         newState = deepUnproxy(newState)
 
+        // check if any changes happened
+        if (newState === state) {
+            return
+        }
+
         setState(newState)
 
         if (typeof updater === "function") {
