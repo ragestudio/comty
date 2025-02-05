@@ -1,6 +1,8 @@
 import React from "react"
 import classnames from "classnames"
 
+import parseTimeToMs from "@utils/parseTimeToMs"
+
 import useMaxScreen from "@hooks/useMaxScreen"
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
@@ -62,7 +64,7 @@ const EnchancedLyricsPage = () => {
 		// get current track instance
 		const instance = app.cores.player.track()
 
-		const result = await instance.manifest.serviceOperations
+		let result = await instance.manifest.serviceOperations
 			.fetchLyrics({
 				preferTranslation: translationEnabled,
 			})
@@ -70,6 +72,10 @@ const EnchancedLyricsPage = () => {
 				console.error("Failed to fetch lyrics", err)
 				return null
 			})
+
+		if (result.sync_audio_at && !result.sync_audio_at_ms) {
+			result.sync_audio_at_ms = parseTimeToMs(result.sync_audio_at)
+		}
 
 		console.log("Fetched Lyrics >", result)
 
