@@ -13,36 +13,31 @@ import videoTranscode from "@services/videoTranscode"
  * @throws {Error} Throws an error if file parameter is not provided.
  * @return {Object} The processed video file object.
  */
-async function processVideo(
-    file,
-    options = {},
-) {
-    if (!file) {
-        throw new Error("file is required")
-    }
+async function processVideo(file, options = {}) {
+	if (!file) {
+		throw new Error("file is required")
+	}
 
-    // TODO: Get values from db
-    const {
-        videoCodec = "libx264",
-        format = "mp4",
-        audioBitrate = 128,
-        videoBitrate = 2024,
-    } = options
+	// TODO: Get values from db
+	const {
+		videoCodec = "libx264",
+		format = "mp4",
+		audioBitrate = 128,
+		videoBitrate = 3000,
+	} = options
 
-    const result = await videoTranscode(file.filepath, {
-        videoCodec,
-        format,
-        audioBitrate,
-        videoBitrate: [videoBitrate, true],
-        extraOptions: [
-            "-threads 1"
-        ]
-    })
+	const result = await videoTranscode(file.filepath, {
+		videoCodec,
+		format,
+		audioBitrate,
+		videoBitrate: [videoBitrate, true],
+		extraOptions: ["-threads 2"],
+	})
 
-    file.filepath = result.filepath
-    file.filename = result.filename
+	file.filepath = result.filepath
+	file.filename = result.filename
 
-    return file
+	return file
 }
 
 export default processVideo
