@@ -2,7 +2,7 @@ import "./patches"
 import config from "@config"
 
 import React from "react"
-import { Runtime } from "vessel"
+import { Runtime } from "@ragestudio/vessel"
 import { Helmet } from "react-helmet"
 import { Translation } from "react-i18next"
 import * as Sentry from "@sentry/browser"
