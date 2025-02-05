@@ -18,7 +18,15 @@ import "./index.less"
 
 const DEFAULT_POST_POLICY = {
     maxMessageLength: 512,
-    acceptedMimeTypes: ["image/gif", "image/png", "image/jpeg", "image/bmp", "video/*"],
+    acceptedMimeTypes: [
+        "image/gif",
+        "image/png",
+        "image/jpeg",
+        "image/bmp",
+        "video/mp4",
+        "video/webm",
+        "video/quicktime"
+    ],
     maximunFilesPerRequest: 10
 }
 
@@ -278,7 +286,7 @@ export default class PostCreator extends React.Component {
                 return false
             }
 
-            return await this.debounceSubmit()
+            return await this.submit()
         }
     }
 
@@ -318,6 +326,12 @@ export default class PostCreator extends React.Component {
         }
 
         if (!isValidFormat(file.type)) {
+            app.cores.notifications.new({
+                type: "error",
+                title: `Invalid format (${file.type})`,
+                message: "Only the following file formats are allowed: " + this.state.postingPolicy.acceptedMimeTypes.join(", ")
+            })
+            return null
             throw new Error(`Invalid file format`)
         }
 
@@ -606,7 +620,7 @@ export default class PostCreator extends React.Component {
                     <antd.Button
                         type="primary"
                         disabled={loading || !this.canSubmit()}
-                        onClick={this.debounceSubmit}
+                        onClick={this.submit}
                         icon={loading ? <Icons.LoadingOutlined spin /> : (editMode ? <Icons.MdEdit /> : <Icons.FiSend />)}
                     />
                 </div>
