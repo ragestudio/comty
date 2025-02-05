@@ -1,4 +1,5 @@
-import TrackManifest from "../TrackManifest"
+import TrackManifest from "./TrackManifest"
+import { MediaPlayer } from "dashjs"
 
 export default class TrackInstance {
     constructor(player, manifest) {
@@ -61,9 +62,9 @@ export default class TrackInstance {
         "pause": () => {
             this.player.state.playback_status = "paused"
         },
-        // "durationchange": (duration) => {
-
-        // },
+        "durationchange": () => {
+            this.player.eventBus.emit(`player.durationchange`, this.audio.duration)
+        },
         "waiting": () => {
             if (this.waitUpdateTimeout) {
                 clearTimeout(this.waitUpdateTimeout)
@@ -83,11 +84,21 @@ export default class TrackInstance {
     initialize = async () => {
         this.manifest = await this.resolveManifest()
 
-        this.audio = new Audio(this.manifest.source)
+        this.audio = new Audio()
 
         this.audio.signal = this.abortController.signal
         this.audio.crossOrigin = "anonymous"
         this.audio.preload = "metadata"
+
+        // support for dash audio streaming
+        if (this.manifest.source.endsWith(".mpd")) {
+            this.muxerPlayer = MediaPlayer().create()
+            this.muxerPlayer.initialize(this.audio, null, false)
+
+            this.muxerPlayer.attachSource(this.manifest.source)
+        } else {
+            this.audio.src = this.manifest.source
+        }
 
         for (const [key, value] of Object.entries(this.mediaEvents)) {
             this.audio.addEventListener(key, value)
@@ -101,7 +112,13 @@ export default class TrackInstance {
     }
 
     stop = () => {
-        this.audio.pause()
+        if (this.audio) {
+            this.audio.pause()
+        }
+
+        if (this.muxerPlayer) {
+            this.muxerPlayer.destroy()
+        }
 
         const lastProcessor = this.attachedProcessors[this.attachedProcessors.length - 1]
 
@@ -119,18 +136,22 @@ export default class TrackInstance {
             }
         }
 
-        this.manifest = new TrackManifest(this.manifest)
-
-        this.manifest = await this.manifest.analyzeCoverColor()
+        this.manifest = new TrackManifest(this.manifest, {
+            serviceProviders: this.player.serviceProviders,
+        })
 
         if (this.manifest.service) {
-            if (!this.player.service_providers.has(manifest.service)) {
-                throw new Error(`Service ${manifest.service} is not supported`)
+            if (!this.player.serviceProviders.has(this.manifest.service)) {
+                throw new Error(`Service ${this.manifest.service} is not supported`)
             }
 
             // try to resolve source file
-            if (this.manifest.service !== "inherit" && !this.manifest.source) {
-                this.manifest = await this.player.service_providers.resolve(this.manifest.service, this.manifest)
+            if (!this.manifest.source) {
+                console.log("Resolving manifest cause no source defined")
+
+                this.manifest = await this.player.serviceProviders.resolve(this.manifest.service, this.manifest)
+
+                console.log("Manifest resolved", this.manifest)
             }
         }
 
@@ -147,6 +168,21 @@ export default class TrackInstance {
         if (!this.manifest.metadata.title) {
             this.manifest.metadata.title = this.manifest.source.split("/").pop()
         }
+
+        // check if has overrides
+        const override = await this.manifest.serviceOperations.fetchOverride()
+
+        if (override) {
+            console.log(`Override found for track ${this.manifest._id}`, override)
+            this.manifest.overrides = override
+        }
+
+        // FIXME: idk why this is here, move somewhere else
+        // try {
+        //     this.manifest = await this.manifest.analyzeCoverColor()
+        // } catch (error) {
+        //     //x
+        // }
 
         return this.manifest
     }
