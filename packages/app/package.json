@@ -1,6 +1,6 @@
 {
-	"name": "@comty/web-app",
-	"version": "1.0.0-beta",
+	"name": "@comty/app",
+	"version": "1.25.0-a",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"author": "RageStudio",
