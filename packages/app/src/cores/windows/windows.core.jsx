@@ -1,5 +1,5 @@
 import React from "react"
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 
 import { createRoot } from "react-dom/client"
 

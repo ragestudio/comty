@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 import { Howl } from "howler"
 import axios from "axios"
 import store from "store"

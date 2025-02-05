@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 import { FFmpeg } from "@ffmpeg/ffmpeg"
 import { fetchFile, toBlobURL } from "@ffmpeg/util"
 import isURL from "@utils/isURL"

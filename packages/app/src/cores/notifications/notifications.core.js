@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 
 import NotificationUI from "./ui"
 import NotificationFeedback from "./feedback"
@@ -10,19 +10,24 @@ export default class NotificationCore extends Core {
         "settings",
     ]
 
-    #newNotifications = []
-
     listenSockets = {
         "notifications": {
             "notification.new": (data) => {
                 this.new(data)
-            }
+            },
+            "notification.broadcast": (data) => {
+                this.new(data)
+            },
         }
     }
 
     public = {
         new: this.new,
         close: this.close,
+    }
+
+    async onInitialize() {
+        this.ctx.CORES.api.registerSocketListeners(this.listenSockets)
     }
 
     async new(notification) {

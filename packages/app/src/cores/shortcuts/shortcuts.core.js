@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 
 export default class ShortcutsCore extends Core {
     static namespace = "shortcuts"

@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Core, EventBus } from "vessel"
+import { Core, EventBus } from "@ragestudio/vessel"
 
 import ContextMenu from "./components/contextMenu"
 

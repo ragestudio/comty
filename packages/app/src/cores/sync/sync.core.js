@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 import SyncModel from "comty.js/models/sync"
 
 export default class SyncCore extends Core {

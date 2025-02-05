@@ -1,4 +1,4 @@
-import { Core } from "vessel"
+import { Core } from "@ragestudio/vessel"
 import store from "store"
 
 export default class WidgetsCore extends Core {
