@@ -29,7 +29,7 @@ export default {
         const type = IdToTypes[id]
 
         // get latest 20 activities
-        const latestActivities = await RecentActivity.find({
+        let latestActivities = await RecentActivity.find({
             user_id: user_id,
             type: type,
         })
@@ -37,11 +37,14 @@ export default {
             .sort({ created_at: -1 })
 
         // check if the activity is already in some position and remove
-        latestActivities.find((activity, index) => {
-            if (activity.payload === payload && activity.type === type) {
-                latestActivities.splice(index, 1)
-            }
+        const sameLatestActivityIndex = latestActivities.findIndex((activity) => {
+            return activity.payload === payload && activity.type === type
         })
+
+        // if the activity is already in some position, remove it from that position
+        if (sameLatestActivityIndex !== -1) {
+            latestActivities.splice(sameLatestActivityIndex, 1)
+        }
 
         // if the list is full, remove the oldest activity and add the new one
         if (latestActivities.length >= 20) {
