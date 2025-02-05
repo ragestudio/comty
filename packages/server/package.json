@@ -17,6 +17,7 @@
 		"@ragestudio/hermes": "^0.1.1",
 		"axios": "^1.7.4",
 		"bcrypt": "^5.1.1",
+		"bull": "^4.16.5",
 		"chalk": "4.1.2",
 		"comty.js": "^0.60.3",
 		"dotenv": "^16.4.4",
