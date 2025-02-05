@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 import { DragDropContext, Droppable } from "react-beautiful-dnd"
 
-import TrackManifest from "@classes/TrackManifest"
+import TrackManifest from "@cores/player/classes/TrackManifest"
 
 import { Icons } from "@components/Icons"
 
@@ -158,19 +158,22 @@ class TracksManager extends React.Component {
                 // remove pending file
                 this.removeTrackUIDFromPendingUploads(uid)
 
-                const trackManifest = this.state.list.find((item) => item.uid === uid)
+                let trackManifest = this.state.list.find((item) => item.uid === uid)
 
                 if (!trackManifest) {
                     console.error(`Track with uid [${uid}] not found!`)
                     break
                 }
 
-                // update track list
-                await this.modifyTrackByUid(uid, {
-                    source: change.file.response.url
-                })
+                // // update track list
+                // await this.modifyTrackByUid(uid, {
+                //     source: change.file.response.url
+                // })
 
-                await trackManifest.initialize()
+                trackManifest.source = change.file.response.url
+                trackManifest = await trackManifest.initialize()
+
+                await this.modifyTrackByUid(uid, trackManifest)
 
                 break
             }
@@ -194,7 +197,10 @@ class TracksManager extends React.Component {
     uploadToStorage = async (req) => {
         const response = await app.cores.remoteStorage.uploadFile(req.file, {
             onProgress: this.handleTrackFileUploadProgress,
-            service: "b2"
+            service: "b2",
+            headers: {
+                transmux: "a-dash"
+            }
         }).catch((error) => {
             console.error(error)
             antd.message.error(error)
@@ -281,7 +287,10 @@ class TracksManager extends React.Component {
                                         track={track}
                                         onEdit={this.modifyTrackByUid}
                                         onDelete={this.removeTrackByUid}
-                                        progress={progress}
+                                        uploading={{
+                                            progress: progress,
+                                            working: this.state.pendingUploads.find((item) => item.uid === track.uid)
+                                        }}
                                         disabled={progress > 0}
                                     />
                                 })
