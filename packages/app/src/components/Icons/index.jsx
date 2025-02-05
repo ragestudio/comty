@@ -3,6 +3,7 @@ import React from "react"
 import VrChatIcon from "./customIcons/vrchat"
 import VerifiedBadge from "./customIcons/verifiedBadge"
 import Crown from "./customIcons/crown"
+import Lossless from "./customIcons/lossless"
 
 // import icons lib
 import * as lib1 from "react-icons/fi"
@@ -21,6 +22,10 @@ const marginedStyle = {
 }
 
 const customs = {
+    Lossless: (props) => <Lossless
+        style={marginedStyle}
+        {...props}
+    />,
     verifiedBadge: (props) => <VerifiedBadge
         style={marginedStyle}
         {...props}
