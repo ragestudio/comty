@@ -7,7 +7,7 @@ import MusicModel from "@models/music"
 
 import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
 
-import TrackManifest from "@classes/TrackManifest"
+import TrackManifest from "@cores/player/classes/TrackManifest"
 
 import { DefaultReleaseEditorState, ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 
@@ -85,7 +85,7 @@ const ReleaseEditor = (props) => {
                 cover: globalState.cover,
                 explicit: globalState.explicit,
                 type: globalState.type,
-                list: tracks.list,
+                list: tracks.list.map((item) => item._id),
             })
 
             app.location.push(`/studio/music/${result._id}`)
