@@ -1,4 +1,4 @@
-export default async (req, res, next) => {
+export default async (req, res) => {
     if (!req.auth) {
         return res.status(401).json({ error: "No authenticated" })
     }
@@ -9,5 +9,5 @@ export default async (req, res, next) => {
         return res.status(403).json({ error: "To make this request it is necessary to have administrator permissions" })
     }
 
-    next()
+    return
 }
