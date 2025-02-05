@@ -18,6 +18,10 @@ class NotificationUI {
             key: notification.key ?? Date.now(),
         }
 
+        if (typeof notification.message === "string") {
+            notification.description = notification.message
+        }
+
         if (notification.title) {
             switch (typeof notification.title) {
                 case "function": {
@@ -66,6 +70,12 @@ class NotificationUI {
 
         if (notification.icon) {
             notfObj.icon = React.isValidElement(notification.icon) ? notification.icon : (createIconRender(notification.icon) ?? <Icons.FiBell />)
+        }
+
+        if (notification.image) {
+            notfObj.description = <>
+                <img src={notification.image} alt="notification-image" style={{ width: "100%" }} />
+            </>
         }
 
         if (Array.isArray(notification.actions)) {
