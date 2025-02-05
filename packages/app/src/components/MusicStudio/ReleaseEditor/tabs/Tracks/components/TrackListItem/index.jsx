@@ -34,8 +34,8 @@ const TrackListItem = (props) => {
     }
 
     return <Draggable
-        key={track._id}
-        draggableId={track._id}
+        key={track._id ?? track.id}
+        draggableId={track.id ?? track._id}
         index={props.index}
     >
         {
@@ -55,13 +55,17 @@ const TrackListItem = (props) => {
                     <div
                         className="music-studio-release-editor-tracks-list-item-progress"
                         style={{
-                            "--upload-progress": `${props.progress}%`,
+                            "--upload-progress": `${props.uploading.progress}%`,
                         }}
                     />
 
                     <div className="music-studio-release-editor-tracks-list-item-index">
                         <span>{props.index + 1}</span>
                     </div>
+
+                    {
+                        props.uploading.working && <Icons.LoadingOutlined />
+                    }
 
                     <Image
                         src={track.cover}
