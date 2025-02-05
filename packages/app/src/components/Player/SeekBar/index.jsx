@@ -118,6 +118,9 @@ export default class SeekBar extends React.Component {
             this.calculateTime()
             this.updateAll()
         },
+        "player.durationchange": () => {
+            this.calculateDuration()
+        },
     }
 
     tick = () => {

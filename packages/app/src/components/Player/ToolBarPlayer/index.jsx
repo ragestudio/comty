@@ -15,195 +15,215 @@ import ExtraActions from "../ExtraActions"
 import "./index.less"
 
 function isOverflown(parent, element) {
-    if (!parent || !element) {
-        return false
-    }
+	if (!parent || !element) {
+		return false
+	}
 
-    const parentRect = parent.getBoundingClientRect()
-    const elementRect = element.getBoundingClientRect()
+	const parentRect = parent.getBoundingClientRect()
+	const elementRect = element.getBoundingClientRect()
 
-    return elementRect.width > parentRect.width
+	return elementRect.width > parentRect.width
+}
+
+const Indicators = (props) => {
+	const { track } = props
+
+	if (!track) {
+		return null
+	}
+
+	const indicators = []
+
+	if (track.metadata) {
+		if (track.metadata.lossless) {
+			indicators.push(<Icons.Lossless />)
+		}
+	}
+
+	if (indicators.length === 0) {
+		return null
+	}
+
+	return (
+		<div className="toolbar_player_indicators_wrapper">
+			<div className="toolbar_player_indicators">{indicators}</div>
+		</div>
+	)
 }
 
 const ServiceIndicator = (props) => {
-    if (!props.service) {
-        return null
-    }
+	if (!props.service) {
+		return null
+	}
 
-    switch (props.service) {
-        case "tidal": {
-            return <div className="service_indicator">
-                <Icons.SiTidal />
-            </div>
-        }
-        default: {
-            return null
-        }
-    }
+	switch (props.service) {
+		case "tidal": {
+			return (
+				<div className="service_indicator">
+					<Icons.SiTidal />
+				</div>
+			)
+		}
+		default: {
+			return null
+		}
+	}
 }
 
 const Player = (props) => {
-    const [playerState] = usePlayerStateContext()
+	const [playerState] = usePlayerStateContext()
 
-    const contentRef = React.useRef()
-    const titleRef = React.useRef()
-    const subtitleRef = React.useRef()
+	const contentRef = React.useRef()
+	const titleRef = React.useRef()
 
-    const [topActionsVisible, setTopActionsVisible] = React.useState(false)
-    const [titleOverflown, setTitleOverflown] = React.useState(false)
-    const [subtitleOverflown, setSubtitleOverflown] = React.useState(false)
+	const [topActionsVisible, setTopActionsVisible] = React.useState(false)
+	const [titleOverflown, setTitleOverflown] = React.useState(false)
+	const [coverAnalysis, setCoverAnalysis] = React.useState(null)
 
-    const handleOnMouseInteraction = (e) => {
-        if (e.type === "mouseenter") {
-            setTopActionsVisible(true)
-        } else {
-            setTopActionsVisible(false)
-        }
-    }
+	const handleOnMouseInteraction = (e) => {
+		if (e.type === "mouseenter") {
+			setTopActionsVisible(true)
+		} else {
+			setTopActionsVisible(false)
+		}
+	}
 
-    const {
-        title,
-        album,
-        artistStr,
-        liked,
-        service,
-        lyrics_enabled,
-        cover_analysis,
-        cover,
-    } = playerState.track_manifest ?? {}
+	const { title, artistStr, service, cover_analysis, cover } =
+		playerState.track_manifest ?? {}
 
-    const playing = playerState.playback_status === "playing"
-    const stopped = playerState.playback_status === "stopped"
+	const playing = playerState.playback_status === "playing"
+	const stopped = playerState.playback_status === "stopped"
 
-    const titleText = (!playing && stopped) ? "Stopped" : (title ?? "Untitled")
-    const subtitleText = ""
+	const titleText = !playing && stopped ? "Stopped" : (title ?? "Untitled")
+	const subtitleText = ""
 
-    React.useEffect(() => {
-        const titleIsOverflown = isOverflown(contentRef.current, titleRef.current)
+	React.useEffect(() => {
+		const titleIsOverflown = isOverflown(
+			contentRef.current,
+			titleRef.current,
+		)
 
-        setTitleOverflown(titleIsOverflown)
-    }, [title])
+		setTitleOverflown(titleIsOverflown)
+	}, [title])
 
-    return <div
-        className={classnames(
-            "toolbar_player_wrapper",
-            {
-                "hover": topActionsVisible,
-                "minimized": playerState.minimized,
-                "cover_light": cover_analysis?.isLight,
-            }
-        )}
-        style={{
-            "--cover_averageValues": RGBStringToValues(cover_analysis?.rgb),
-            "--cover_isLight": cover_analysis?.isLight,
-        }}
-        onMouseEnter={handleOnMouseInteraction}
-        onMouseLeave={handleOnMouseInteraction}
-    >
-        <div
-            className={classnames(
-                "toolbar_player_top_actions",
-            )}
-        >
-            {
-                !playerState.control_locked && <antd.Button
-                    icon={<Icons.MdCast />}
-                    shape="circle"
+	React.useEffect(() => {
+		const trackInstance = app.cores.player.track()
 
-                />
-            }
+		if (playerState.track_manifest && trackInstance) {
+			if (
+				typeof trackInstance.manifest.analyzeCoverColor === "function"
+			) {
+				trackInstance.manifest
+					.analyzeCoverColor()
+					.then((analysis) => {
+						setCoverAnalysis(analysis)
+					})
+					.catch((err) => {
+						console.error("Failed to get cover analysis", err)
+					})
+			}
+		}
+	}, [playerState.track_manifest])
 
-            {
-                lyrics_enabled && <antd.Button
-                    icon={<Icons.MdLyrics />}
-                    shape="circle"
-                    onClick={() => app.location.push("/lyrics")}
-                />
-            }
+	return (
+		<div
+			className={classnames("toolbar_player_wrapper", {
+				hover: topActionsVisible,
+				minimized: playerState.minimized,
+				cover_light: coverAnalysis?.isLight,
+			})}
+			style={{
+				"--cover_averageValues": RGBStringToValues(
+					coverAnalysis?.rgb ?? "0,0,0",
+				),
+				"--cover_isLight": coverAnalysis?.isLight ?? false,
+			}}
+			onMouseEnter={handleOnMouseInteraction}
+			onMouseLeave={handleOnMouseInteraction}
+		>
+			<div className={classnames("toolbar_player_top_actions")}>
+				{!playerState.control_locked && (
+					<antd.Button icon={<Icons.MdCast />} shape="circle" />
+				)}
 
-            {/* <antd.Button
+				<antd.Button
+					icon={<Icons.MdFullscreen />}
+					shape="circle"
+					onClick={() => app.location.push("/lyrics")}
+				/>
+
+				{/* <antd.Button
                 icon={<Icons.MdOfflineBolt />}
             >
                 HyperDrive
             </antd.Button> */}
 
-            <antd.Button
-                icon={<Icons.FiX />}
-                shape="circle"
-                onClick={() => app.cores.player.close()}
-            />
-        </div>
-        <div
-            className={classnames(
-                "toolbar_player"
-            )}
-        >
-            <div
-                className="toolbar_cover_background"
-                style={{
-                    backgroundImage: `url(${cover})`
-                }}
-            />
+				<antd.Button
+					icon={<Icons.FiX />}
+					shape="circle"
+					onClick={() => app.cores.player.close()}
+				/>
+			</div>
+			<div className={classnames("toolbar_player")}>
+				<div
+					className="toolbar_cover_background"
+					style={{
+						backgroundImage: `url(${cover})`,
+					}}
+				/>
 
-            <div
-                className="toolbar_player_content"
-                ref={contentRef}
-            >
-                <div className="toolbar_player_info">
-                    <h1
-                        ref={titleRef}
-                        className={classnames(
-                            "toolbar_player_info_title",
-                            {
-                                ["overflown"]: titleOverflown
-                            }
-                        )}
-                    >
-                        <ServiceIndicator
-                            service={service}
-                        />
+				<div className="toolbar_player_content" ref={contentRef}>
+					<div className="toolbar_player_info">
+						<h1
+							ref={titleRef}
+							className={classnames("toolbar_player_info_title", {
+								["overflown"]: titleOverflown,
+							})}
+						>
+							<ServiceIndicator service={service} />
 
-                        {titleText}
-                    </h1>
+							{titleText}
+						</h1>
 
-                    {
-                        titleOverflown && <Marquee
-                            gradientColor={RGBStringToValues(cover_analysis?.rgb)}
-                            gradientWidth={20}
-                            play={playerState.playback_status !== "stopped"}
-                        >
-                            <h1
-                                className="toolbar_player_info_title"
-                            >
-                                <ServiceIndicator
-                                    service={service}
-                                />
+						{titleOverflown && (
+							<Marquee
+								gradientColor={RGBStringToValues(
+									coverAnalysis?.rgb ?? "0,0,0",
+								)}
+								gradientWidth={20}
+								play={playerState.playback_status !== "stopped"}
+							>
+								<h1 className="toolbar_player_info_title">
+									<ServiceIndicator service={service} />
 
-                                {titleText}
-                            </h1>
-                        </Marquee>
-                    }
+									{titleText}
+								</h1>
+							</Marquee>
+						)}
 
-                    <p className="toolbar_player_info_subtitle">
-                        {artistStr ?? ""}
-                    </p>
-                </div>
+						<p className="toolbar_player_info_subtitle">
+							{artistStr ?? ""}
+						</p>
+					</div>
 
-                <div className="toolbar_player_actions">
-                    <Controls />
+					<div className="toolbar_player_actions">
+						<Controls />
 
-                    <SeekBar
-                        stopped={playerState.playback_status === "stopped"}
-                        playing={playerState.playback_status === "playing"}
-                        streamMode={playerState.livestream_mode}
-                        disabled={playerState.control_locked}
-                    />
+						<SeekBar
+							stopped={playerState.playback_status === "stopped"}
+							playing={playerState.playback_status === "playing"}
+							streamMode={playerState.livestream_mode}
+							disabled={playerState.control_locked}
+						/>
 
-                    <ExtraActions />
-                </div>
-            </div>
-        </div>
-    </div>
+						<ExtraActions />
+					</div>
+
+					<Indicators track={playerState.track_manifest} />
+				</div>
+			</div>
+		</div>
+	)
 }
 
 export default Player

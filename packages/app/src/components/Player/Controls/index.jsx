@@ -30,7 +30,13 @@ const EventsHandlers = {
         return app.cores.player.controls.mute("toggle")
     },
     "like": async (ctx) => {
-        await app.cores.player.toggleCurrentTrackLike(!ctx.track_manifest?.liked)
+        if (!ctx.track_manifest) {
+            return false
+        }
+
+        const track = app.cores.player.track()
+
+        return await track.manifest.serviceOperations.toggleItemFavourite("track", ctx.track_manifest._id)
     },
 }
 
@@ -85,12 +91,6 @@ const Controls = (props) => {
             disabled={playerState.control_locked}
         />
         {
-            app.isMobile && <LikeButton
-                onClick={() => handleAction("like")}
-                liked={playerState.track_manifest?.liked}
-            />
-        }
-        {
             !app.isMobile && <antd.Popover
                 content={React.createElement(
                     AudioVolume,
@@ -112,6 +112,13 @@ const Controls = (props) => {
                     }
                 </button>
             </antd.Popover>
+        }
+
+        {
+            app.isMobile && <LikeButton
+                liked={playerState.track_manifest?.serviceOperations.fetchLikeStatus}
+                onClick={() => handleAction("like")}
+            />
         }
     </div>
 }

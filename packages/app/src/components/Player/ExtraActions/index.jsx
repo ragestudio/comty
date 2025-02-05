@@ -6,12 +6,18 @@ import LikeButton from "@components/LikeButton"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
-import MusicModel from "@models/music"
-
 const ExtraActions = (props) => {
     const [playerState] = usePlayerStateContext()
+
     const handleClickLike = async () => {
-        await MusicModel.toggleItemFavourite("track", playerState.track_manifest._id)
+        if (!playerState.track_manifest) {
+            console.error("Cannot like a track if nothing is playing")
+            return false
+        }
+
+        const track = app.cores.player.track()
+
+        await track.manifest.serviceOperations.toggleItemFavourite("track", playerState.track_manifest._id)
     }
 
     return <div className="extra_actions">
@@ -24,8 +30,8 @@ const ExtraActions = (props) => {
         }
 
         {
-            !app.isMobile && <LikeButton
-                liked={playerState.track_manifest?.fetchLikeStatus}
+            !app.isMobile && playerState.track_manifest?._id && <LikeButton
+                liked={playerState.track_manifest?.serviceOperations.fetchLikeStatus}
                 onClick={handleClickLike}
             />
         }
