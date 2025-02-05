@@ -160,11 +160,13 @@ const PlayerController = React.forwardRef((props, ref) => {
             <div className="lyrics-player-controller-tags">
                 {
                     playerState.track_manifest?.metadata.lossless && <Tag
-                        icon={<Icons.TbWaveSine />}
+                        icon={<Icons.Lossless 
+                            style={{
+                                margin:0,
+                            }}
+                        />}
                         bordered={false}
-                    >
-                        Lossless
-                    </Tag>
+                    />
                 }
                 {
                     playerState.track_manifest?.explicit && <Tag

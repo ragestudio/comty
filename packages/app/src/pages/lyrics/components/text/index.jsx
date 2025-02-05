@@ -14,10 +14,6 @@ const LyricsText = React.forwardRef((props, textRef) => {
     const [visible, setVisible] = React.useState(false)
 
     function syncPlayback() {
-        if (!lyrics) {
-            return false
-        }
-
         const currentTrackTime = app.cores.player.controls.seek() * 1000
 
         const lineIndex = lyrics.synced_lyrics.findIndex((line) => {
@@ -46,7 +42,26 @@ const LyricsText = React.forwardRef((props, textRef) => {
     }
 
     function startSyncInterval() {
+        if (!lyrics || !lyrics.synced_lyrics) {
+            stopSyncInterval()
+            return false
+        }
+
+        if (playerState.playback_status !== "playing") {
+            stopSyncInterval()
+            return false
+        }
+
+        if (syncInterval) {
+            stopSyncInterval()
+        }
+
         setSyncInterval(setInterval(syncPlayback, 100))
+    }
+
+    function stopSyncInterval() {
+        clearInterval(syncInterval)
+        setSyncInterval(null)
     }
 
     //* Handle when current line index change
@@ -74,37 +89,18 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
     //* Handle when playback status change
     React.useEffect(() => {
-        if (typeof lyrics?.synced_lyrics !== "undefined") {
-            if (playerState.playback_status === "playing") {
-                startSyncInterval()
-            } else {
-                if (syncInterval) {
-                    clearInterval(syncInterval)
-                }
-            }
-        } else {
-            clearInterval(syncInterval)
-        }
+        startSyncInterval()
     }, [playerState.playback_status])
 
-    //* Handle when lyrics object change
-    React.useEffect(() => {
-        clearInterval(syncInterval)
-
-        if (lyrics) {
-            if (typeof lyrics?.synced_lyrics !== "undefined") {
-                if (playerState.playback_status === "playing") {
-                    startSyncInterval()
-                }
-            }
-        }
-    }, [lyrics])
-
+    //* Handle when manifest object change, reset...
     React.useEffect(() => {
         setVisible(false)
-        clearInterval(syncInterval)
         setCurrentLineIndex(0)
     }, [playerState.track_manifest])
+
+    React.useEffect(() => {
+        startSyncInterval()
+    }, [lyrics])
 
     React.useEffect(() => {
         return () => {

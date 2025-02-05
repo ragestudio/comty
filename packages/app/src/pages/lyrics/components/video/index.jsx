@@ -109,7 +109,12 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
         if (lyrics) {
             if (lyrics.video_source) {
                 console.log("Loading video source >", lyrics.video_source)
-                hls.current.loadSource(lyrics.video_source)
+
+                if (lyrics.video_source.endsWith(".mp4")) {
+                    videoRef.current.src = lyrics.video_source
+                } else {
+                    hls.current.loadSource(lyrics.video_source)
+                }
 
                 if (typeof lyrics.sync_audio_at_ms !== "undefined") {
                     videoRef.current.loop = false
@@ -121,7 +126,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
                     videoRef.current.currentTime = 0
                 }
 
-                if (playerState.playback_status === "playing"){
+                if (playerState.playback_status === "playing") {
                     videoRef.current.play()
                 }
             }
