@@ -39,10 +39,10 @@ export default async function standardUpload({
         }
     }
 
-    // console.debug(`Uploading object to S3 Minio >`, {
-    //     source: source,
-    //     remote: remotePath,
-    // })
+    console.debug(`Uploading object to S3 Minio >`, {
+        source: source,
+        remote: remotePath,
+    })
 
     // upload to storage
     await global.storage.fPutObject(process.env.S3_BUCKET, remotePath, source, metadata)
