@@ -5,14 +5,14 @@ import { Translation } from "react-i18next"
 
 import { createIconRender } from "@components/Icons"
 import MusicTrack from "@components/Music/Track"
-import PlaylistItem from "@components/Music/PlaylistItem"
+import Playlist from "@components/Music/Playlist"
 
 const ResultGroupsDecorators = {
     "playlists": {
         icon: "MdPlaylistPlay",
         label: "Playlists",
         renderItem: (props) => {
-            return <PlaylistItem
+            return <Playlist
                 key={props.key}
                 playlist={props.item}
             />
@@ -41,9 +41,18 @@ const SearchResults = ({
 
     let groupsKeys = Object.keys(data)
 
-    // filter out empty groups
+    // filter out groups with no items array property
     groupsKeys = groupsKeys.filter((key) => {
-        return data[key].length > 0
+        if (!Array.isArray(data[key].items)) {
+            return false
+        }
+
+        return true
+    })
+
+    // filter out groups with empty items array
+    groupsKeys = groupsKeys.filter((key) => {
+        return data[key].items.length > 0
     })
 
     if (groupsKeys.length === 0) {
@@ -86,7 +95,7 @@ const SearchResults = ({
 
                     <div className="music-explorer_search_results_group_list">
                         {
-                            data[key].map((item, index) => {
+                            data[key].items.map((item, index) => {
                                 return decorator.renderItem({
                                     key: index,
                                     item

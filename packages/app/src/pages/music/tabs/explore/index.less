@@ -1,288 +1,287 @@
 html {
-    &.mobile {
-        .musicExplorer {
-            .playlistExplorer_section_list {
-                overflow: visible;
-                overflow-x: scroll;
+	&.mobile {
+		.musicExplorer {
+			.playlistExplorer_section_list {
+				overflow: visible;
+				overflow-x: scroll;
 
-                width: unset;
-                display: flex;
-                flex-direction: row;
+				width: unset;
+				display: flex;
+				flex-direction: row;
 
-                grid-gap: 10px;
-            }
-        }
-    }
+				grid-gap: 10px;
+			}
+		}
+	}
 }
 
 .featured_playlist {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    overflow: hidden;
+	overflow: hidden;
 
-    background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
 
-    width: 100%;
-    min-height: 200px;
-    height: fit-content;
+	width: 100%;
+	min-height: 200px;
+	height: fit-content;
 
-    border-radius: 12px;
+	border-radius: 12px;
 
-    cursor: pointer;
+	cursor: pointer;
 
-    &:hover {
-        .featured_playlist_content {
+	&:hover {
+		.featured_playlist_content {
+			h1,
+			p {
+				-webkit-text-stroke-width: 1.6px;
+				-webkit-text-stroke-color: var(--border-color);
 
-            h1,
-            p {
-                -webkit-text-stroke-width: 1.6px;
-                -webkit-text-stroke-color: var(--border-color);
+				color: var(--background-color-contrast);
+			}
+		}
 
-                color: var(--background-color-contrast);
-            }
-        }
+		.lazy-load-image-background {
+			opacity: 1;
+		}
+	}
 
-        .lazy-load-image-background {
-            opacity: 1;
-        }
-    }
+	.lazy-load-image-background {
+		z-index: 50;
 
-    .lazy-load-image-background {
-        z-index: 50;
+		position: absolute;
 
-        position: absolute;
+		opacity: 0.3;
 
-        opacity: 0.3;
+		transition: all 300ms ease-in-out !important;
 
-        transition: all 300ms ease-in-out !important;
+		img {
+			width: 100%;
+			height: 100%;
+		}
+	}
 
-        img {
-            width: 100%;
-            height: 100%;
-        }
-    }
+	.featured_playlist_content {
+		z-index: 55;
 
-    .featured_playlist_content {
-        z-index: 55;
+		padding: 20px;
 
-        padding: 20px;
+		display: flex;
+		flex-direction: column;
 
-        display: flex;
-        flex-direction: column;
+		h1 {
+			font-size: 2.5rem;
+			font-family: "Space Grotesk", sans-serif;
+			font-weight: 900;
 
-        h1 {
-            font-size: 2.5rem;
-            font-family: "Space Grotesk", sans-serif;
-            font-weight: 900;
+			transition: all 300ms ease-in-out !important;
+		}
 
-            transition: all 300ms ease-in-out !important;
-        }
+		p {
+			font-size: 1rem;
+			font-family: "Space Grotesk", sans-serif;
 
-        p {
-            font-size: 1rem;
-            font-family: "Space Grotesk", sans-serif;
+			transition: all 300ms ease-in-out !important;
+		}
 
-            transition: all 300ms ease-in-out !important;
-        }
+		.featured_playlist_genre {
+			z-index: 55;
 
-        .featured_playlist_genre {
-            z-index: 55;
+			position: absolute;
 
-            position: absolute;
+			left: 0;
+			bottom: 0;
 
-            left: 0;
-            bottom: 0;
+			margin: 10px;
 
-            margin: 10px;
+			background-color: var(--background-color-accent);
+			border: 1px solid var(--border-color);
 
-            background-color: var(--background-color-accent);
-            border: 1px solid var(--border-color);
+			border-radius: 12px;
 
-            border-radius: 12px;
-
-            padding: 10px 20px;
-        }
-    }
-
-
+			padding: 10px 20px;
+		}
+	}
 }
 
 .music_navbar {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
+	width: 100%;
 
-    background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
 
-    border-radius: 12px;
+	border-radius: 12px;
 }
 
 .musicExplorer {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 
-    gap: 20px;
+	gap: 20px;
 
-    &.search-focused {
-        .feed_main {
-            height: 0px;
-            opacity: 0;
-        }
-    }
+	&.search-focused {
+		.feed_main {
+			height: 0px;
+			opacity: 0;
+		}
+	}
 
-    .feed_main {
-        display: flex;
-        flex-direction: column;
+	.feed_main {
+		display: flex;
+		flex-direction: column;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        gap: 50px;
+		gap: 50px;
 
-        transition: all 0.2s ease-in-out;
+		transition: all 0.2s ease-in-out;
 
-        overflow-x: visible;
-    }
+		overflow-x: visible;
+	}
 }
 
 .music-explorer_search_results {
-    display: grid;
+	display: grid;
 
-    width: 100%;
+	width: 100%;
 
-    // if only need 1 column, it will be 1fr
-    // if need 2 colums, first column will be 1fr, and the second one will be 2fr
-    grid-template-columns: 1fr 2fr;
+	// if only need 1 column, it will be 1fr
+	// if need 2 colums, first column will be 1fr, and the second one will be 2fr
+	grid-template-columns: 1fr 2fr;
 
-    // auto generate rows
-    grid-template-rows: auto;
+	// auto generate rows
+	grid-template-rows: auto;
 
-    grid-column-gap: 20px;
-    grid-row-gap: 20px;
+	grid-column-gap: 20px;
+	grid-row-gap: 20px;
 
-    @media screen and (max-width: 1750px) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+	@media screen and (max-width: 1750px) {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 
-        .music-explorer_search_results_group_list {
-            .playlistItem {
-                width: 100% !important;
-                max-width: 100% !important;
+		.music-explorer_search_results_group_list {
+			.playlistItem {
+				width: 100% !important;
+				max-width: 100% !important;
 
-                .playlistItem_info_subtitle {
-                    max-width: 300px;
-                }
+				.playlistItem_info_subtitle {
+					max-width: 300px;
+				}
 
-                .playlistItem_bottom {
-                    display: flex !important;
-                    position: absolute;
+				.playlistItem_bottom {
+					display: flex !important;
+					position: absolute;
 
-                    top: 0;
-                    right: 0;
+					top: 0;
+					right: 0;
 
-                    padding: 10px;
+					padding: 10px;
 
-                    //-webkit-backdrop-filter: blur(5px);
-                    //backdrop-filter: blur(5px);
+					//-webkit-backdrop-filter: blur(5px);
+					//backdrop-filter: blur(5px);
 
-                    background-color: var(--background-color-primary);
+					background-color: var(--background-color-primary);
 
-                    display: flex;
-                    flex-direction: column;
+					display: flex;
+					flex-direction: column;
 
-                    p {
-                        display: flex;
-                        flex-direction: row-reverse;
+					p {
+						display: flex;
+						flex-direction: row-reverse;
 
-                        gap: 7px;
-                    }
-                }
-            }
-        }
-    }
+						gap: 7px;
+					}
+				}
+			}
+		}
+	}
 
-    &.one_column {
-        grid-template-columns: 1fr;
-    }
+	&.one_column {
+		grid-template-columns: 1fr;
+	}
 
-    &.no_results {
-        display: flex;
-        flex-direction: column;
+	&.no_results {
+		display: flex;
+		flex-direction: column;
 
-        align-items: center;
-        justify-content: center;
-    }
+		align-items: center;
+		justify-content: center;
+	}
 
-    .music-explorer_search_results_group {
-        background-color: var(--background-color-accent);
+	.music-explorer_search_results_group {
+		background-color: var(--background-color-accent);
 
-        padding: 20px;
+		padding: 20px;
 
-        border-radius: 8px;
+		border-radius: 8px;
 
-        height: fit-content;
-        width: 100%;
+		height: fit-content;
+		width: 100%;
 
-        gap: 20px;
+		gap: 20px;
 
-        .explorer_search_results_group_header {
-            h1 {
-                margin: 0;
-            }
-        }
+		.explorer_search_results_group_header {
+			h1 {
+				margin: 0;
+			}
+		}
 
-        .music-explorer_search_results_group_list {
-            display: flex;
-            flex-direction: column;
+		.music-explorer_search_results_group_list {
+			display: flex;
+			flex-direction: column;
 
-            gap: 10px;
+			gap: 10px;
 
-            @playlistItem_height: 80px;
-            @playlistItem_padding: 10px;
+			@playlistItem_height: 80px;
+			@playlistItem_padding: 10px;
 
-            @playlistItem_cover_size: calc(@playlistItem_height - @playlistItem_padding * 2);
+			@playlistItem_cover_size: calc(
+				@playlistItem_height - @playlistItem_padding * 2
+			);
 
-            .playlistItem {
-                flex-direction: row;
-                background-color: var(--background-color-primary);
+			.playlistItem {
+				flex-direction: row;
+				background-color: var(--background-color-primary);
 
-                max-width: 300px;
-                width: 100%;
+				max-width: 300px;
+				width: 100%;
 
-                height: @playlistItem_height;
+				height: @playlistItem_height;
 
-                padding: @playlistItem_padding;
+				padding: @playlistItem_padding;
 
-                .playlistItem_cover {
-                    width: @playlistItem_cover_size;
-                    height: @playlistItem_cover_size;
+				.playlistItem_cover {
+					width: @playlistItem_cover_size;
+					height: @playlistItem_cover_size;
 
-                    min-height: @playlistItem_cover_size;
-                    min-width: @playlistItem_cover_size;
-                }
+					min-height: @playlistItem_cover_size;
+					min-width: @playlistItem_cover_size;
+				}
 
-                .playlistItem_bottom {
-                    display: none;
-                }
+				.playlistItem_bottom {
+					display: none;
+				}
 
-                &:hover {
-                    .playlistItem_info {
-                        transform: none;
-                    }
-                }
-            }
+				&:hover {
+					.playlistItem_info {
+						transform: none;
+					}
+				}
+			}
 
-            .music-track {
-                background-color: var(--background-color-primary);
-            }
-        }
-    }
+			.music-track {
+				background-color: var(--background-color-primary);
+			}
+		}
+	}
 }

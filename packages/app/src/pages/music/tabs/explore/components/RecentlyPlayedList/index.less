@@ -14,4 +14,95 @@
 
         font-size: 1rem;
     }
+
+    .recently_played-content {
+        display: flex;
+        flex-direction: column;
+
+        overflow: hidden;
+        overflow-x: scroll;
+
+        padding: 0 20px;
+
+        .recently_played-content-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto;
+            grid-column-gap: 20px;
+            grid-row-gap: 20px;
+        }
+    }
+}
+
+.recently_played-item {
+    position: relative;
+
+    z-index: 50;
+
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    height: 100px;
+
+    overflow: hidden;
+
+    background-color: var(--background-color-accent);
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    &:hover {
+        .recently_played-item-icon {
+            opacity: 1;
+        }
+
+        .recently_played-item-cover {
+            opacity: 0.1;
+        }
+    }
+
+    .recently_played-item-icon {
+        z-index: 55;
+        position: absolute;
+        display: flex;
+
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        height: 100%;
+
+        opacity: 0;
+
+        font-size: 3rem;
+
+        transition: all 150ms ease-in-out;
+    }
+
+    .recently_played-item-cover {
+        position: absolute;
+
+        z-index: 50;
+
+        width: 100%;
+        height: 100%;
+
+        opacity: 0.5;
+
+        transition: all 150ms ease-in-out;
+
+        img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+    }
+
+    .recently_played-item-content {
+        z-index: 55;
+        padding: 10px;
+    }
 }

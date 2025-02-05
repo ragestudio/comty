@@ -1,11 +1,13 @@
 import React from "react"
 import classnames from "classnames"
 
+import useCenteredContainer from "@hooks/useCenteredContainer"
+
 import Searcher from "@components/Searcher"
 import { Icons } from "@components/Icons"
 
 import FeedModel from "@models/feed"
-import MusicModel from "@models/music"
+import SearchModel from "@models/search"
 
 import Navbar from "./components/Navbar"
 import RecentlyPlayedList from "./components/RecentlyPlayedList"
@@ -15,12 +17,12 @@ import FeaturedPlaylist from "./components/FeaturedPlaylist"
 
 import "./index.less"
 
- const MusicExploreTab = (props) => {
+const MusicExploreTab = (props) => {
     const [searchResults, setSearchResults] = React.useState(false)
 
-    React.useEffect(() => {
-        app.layout.toggleCenteredContent(true)
+    useCenteredContainer(false)
 
+    React.useEffect(() => {
         app.layout.page_panels.attachComponent("music_navbar", Navbar, {
             props: {
                 setSearchResults: setSearchResults,
@@ -43,7 +45,7 @@ import "./index.less"
             app.isMobile && <Searcher
                 useUrlQuery
                 renderResults={false}
-                model={MusicModel.search}
+                model={(keywords, params) => SearchModel.search("music", keywords, params)}
                 onSearchResult={setSearchResults}
                 onEmpty={() => setSearchResults(false)}
             />
@@ -62,13 +64,7 @@ import "./index.less"
                 <RecentlyPlayedList />
 
                 <ReleasesList
-                    headerTitle="From your following artists"
-                    headerIcon={<Icons.MdPerson />}
-                    fetchMethod={FeedModel.getMusicFeed}
-                />
-
-                <ReleasesList
-                    headerTitle="Explore from global"
+                    headerTitle="Explore"
                     headerIcon={<Icons.MdExplore />}
                     fetchMethod={FeedModel.getGlobalMusicFeed}
                 />
