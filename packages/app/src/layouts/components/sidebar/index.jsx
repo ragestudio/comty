@@ -21,53 +21,53 @@ import "./index.less"
 const ActionMenuItems = [
 	{
 		key: "profile",
-		label: <>
-			<Icons.FiUser />
-			<Translation>
-				{t => t("Profile")}
-			</Translation>
-		</>,
+		label: (
+			<>
+				<Icons.FiUser />
+				<Translation>{(t) => t("Profile")}</Translation>
+			</>
+		),
 	},
 	{
 		key: "studio",
-		label: <>
-			<Icons.MdHardware />
-			<Translation>
-				{t => t("Studio")}
-			</Translation>
-		</>,
+		label: (
+			<>
+				<Icons.MdHardware />
+				<Translation>{(t) => t("Studio")}</Translation>
+			</>
+		),
 	},
 	{
 		key: "addons",
-		label: <>
-			<Icons.FiBox />
-			<Translation>
-				{t => t("Addons")}
-			</Translation>
-		</>,
+		label: (
+			<>
+				<Icons.FiBox />
+				<Translation>{(t) => t("Addons")}</Translation>
+			</>
+		),
 	},
 	{
-		type: "divider"
+		type: "divider",
 	},
 	{
 		key: "switch_account",
-		label: <>
-			<Icons.MdSwitchAccount />
-			<Translation>
-				{t => t("Switch account")}
-			</Translation>
-		</>,
+		label: (
+			<>
+				<Icons.MdSwitchAccount />
+				<Translation>{(t) => t("Switch account")}</Translation>
+			</>
+		),
 	},
 	{
 		key: "logout",
-		label: <>
-			<Icons.FiLogOut />
-			<Translation>
-				{t => t("Logout")}
-			</Translation>
-		</>,
-		danger: true
-	}
+		label: (
+			<>
+				<Icons.FiLogOut />
+				<Translation>{(t) => t("Logout")}</Translation>
+			</>
+		),
+		danger: true,
+	},
 ]
 
 export default class Sidebar extends React.Component {
@@ -86,7 +86,7 @@ export default class Sidebar extends React.Component {
 
 	collapseDebounce = null
 
-	interface = window.app.layout.sidebar = {
+	interface = (window.app.layout.sidebar = {
 		toggleVisibility: (to) => {
 			if (to === false) {
 				this.interface.toggleExpanded(false, {
@@ -96,7 +96,10 @@ export default class Sidebar extends React.Component {
 
 			this.setState({ visible: to ?? !this.state.visible })
 		},
-		toggleExpanded: async (to, { instant = false, isDropdown = false } = {}) => {
+		toggleExpanded: async (
+			to,
+			{ instant = false, isDropdown = false } = {},
+		) => {
 			to = to ?? !this.state.expanded
 
 			if (this.collapseDebounce) {
@@ -104,7 +107,10 @@ export default class Sidebar extends React.Component {
 				this.collapseDebounce = null
 			}
 
-			if (to === false & this.state.dropdownOpen === true && isDropdown === true) {
+			if (
+				(to === false) & (this.state.dropdownOpen === true) &&
+				isDropdown === true
+			) {
 				// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
 				// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
 				//this.setState({ dropdownOpen: false })
@@ -114,7 +120,14 @@ export default class Sidebar extends React.Component {
 
 			if (to === false) {
 				if (instant === false) {
-					await new Promise((resolve) => setTimeout(resolve, window.app.cores.settings.get("sidebar.collapse_delay_time") ?? 500))
+					await new Promise((resolve) =>
+						setTimeout(
+							resolve,
+							window.app.cores.settings.get(
+								"sidebar.collapse_delay_time",
+							) ?? 500,
+						),
+					)
 				}
 			}
 
@@ -129,13 +142,13 @@ export default class Sidebar extends React.Component {
 				navigationRender: {
 					component,
 					options,
-				}
+				},
 			})
 		},
 		updateMenuItemProps: this.updateBottomItemProps,
 		addMenuItem: this.addMenuItem,
 		removeMenuItem: this.removeMenuItem,
-	}
+	})
 
 	events = {
 		"router.navigate": (path) => {
@@ -167,7 +180,9 @@ export default class Sidebar extends React.Component {
 		const items = [...this.state.topItems, ...this.state.bottomItems]
 
 		this.setState({
-			selectedMenuItem: items.find((item) => String(item.path).includes(path)),
+			selectedMenuItem: items.find((item) =>
+				String(item.path).includes(path),
+			),
 		})
 	}
 
@@ -181,7 +196,7 @@ export default class Sidebar extends React.Component {
 		const newItems = [...this.state[group], item]
 
 		this.setState({
-			[group]: newItems
+			[group]: newItems,
 		})
 
 		return newItems
@@ -197,7 +212,7 @@ export default class Sidebar extends React.Component {
 		const newItems = this.state[group].filter((item) => item.id !== id)
 
 		this.setState({
-			[group]: newItems
+			[group]: newItems,
 		})
 
 		return newItems
@@ -222,7 +237,7 @@ export default class Sidebar extends React.Component {
 		})
 
 		this.setState({
-			[group]: updatedValue
+			[group]: updatedValue,
 		})
 
 		return updatedValue
@@ -248,25 +263,24 @@ export default class Sidebar extends React.Component {
 				key: "account",
 				ignore_click: "true",
 				className: "user_avatar",
-				label: <Dropdown
-					menu={{
-						items: ActionMenuItems,
-						onClick: this.onClickDropdownItem
-					}}
-					autoFocus
-					placement="top"
-					trigger={["click"]}
-				>
-					<Avatar shape="square" src={app.userData?.avatar} />
-				</Dropdown>,
+				label: (
+					<Dropdown
+						menu={{
+							items: ActionMenuItems,
+							onClick: this.onClickDropdownItem,
+						}}
+						autoFocus
+						placement="top"
+						trigger={["click"]}
+					>
+						<Avatar shape="square" src={app.userData?.avatar} />
+					</Dropdown>
+				),
 			})
-
 		} else {
 			items.push({
 				key: "login",
-				label: <Translation>
-					{t => t("Login")}
-				</Translation>,
+				label: <Translation>{(t) => t("Login")}</Translation>,
 				icon: <Icons.FiLogIn />,
 			})
 		}
@@ -280,7 +294,10 @@ export default class Sidebar extends React.Component {
 		}
 
 		if (e.item.props.override_event) {
-			return app.eventBus.emit(e.item.props.override_event, e.item.props.override_event_props)
+			return app.eventBus.emit(
+				e.item.props.override_event,
+				e.item.props.override_event_props,
+			)
 		}
 
 		if (typeof e.key === "undefined") {
@@ -294,7 +311,9 @@ export default class Sidebar extends React.Component {
 
 		app.cores.sfx.play("sidebar.switch_tab")
 
-		let item = [...this.state.topItems, ...this.state.bottomItems].find((item) => item.id === e.key)
+		let item = [...this.state.topItems, ...this.state.bottomItems].find(
+			(item) => item.id === e.key,
+		)
 
 		return app.location.push(`/${item.path ?? e.key}`, 150)
 	}
@@ -335,89 +354,86 @@ export default class Sidebar extends React.Component {
 	render() {
 		const selectedKeyId = this.state.selectedMenuItem?.id
 
-		return <div
-			className={classnames(
-				"app_sidebar_wrapper",
-				{
-					["hidden"]: !this.state.visible
-				}
-			)}
-			onMouseEnter={this.onMouseEnter}
-			onMouseLeave={this.handleMouseLeave}
-		>
-			{
-				window.__TAURI__ && navigator.platform.includes("Mac") && <div
-					className="app_sidebar_tauri"
-					data-tauri-drag-region
-				/>
-			}
-
-			<AnimatePresence
-				mode="popLayout"
+		return (
+			<div
+				className={classnames("app_sidebar_wrapper", {
+					["hidden"]: !this.state.visible,
+				})}
+				onMouseEnter={this.onMouseEnter}
+				onMouseLeave={this.handleMouseLeave}
 			>
-				{
-					this.state.visible && <motion.div
-						className={classnames(
-							"app_sidebar",
-							{
+				{window.__TAURI__ && navigator.platform.includes("Mac") && (
+					<div className="app_sidebar_tauri" data-tauri-drag-region />
+				)}
+
+				<AnimatePresence mode="popLayout">
+					{this.state.visible && (
+						<motion.div
+							className={classnames("app_sidebar", {
 								["expanded"]: this.state.expanded,
-							}
-						)}
-						ref={this.sidebarRef}
-						initial={{
-							x: -500
-						}}
-						animate={{
-							x: 0,
-						}}
-						exit={{
-							x: -500
-						}}
-						transition={{
-							type: "spring",
-							stiffness: 100,
-							damping: 20
-						}}
-					>
-						<div className="app_sidebar_header">
-							<div className="app_sidebar_header_logo">
-								<img
-									src={config.logo?.alt}
-									onClick={() => app.navigation.goMain()}
-								/>
-
-								<Tag>Beta</Tag>
-							</div>
-						</div>
-
-						<div key="menu" className="app_sidebar_menu_wrapper">
-							<Menu
-								mode="inline"
-								onClick={this.handleClick}
-								selectedKeys={[selectedKeyId]}
-								items={this.state.topItems}
-							/>
-						</div>
-
-						<div
-							key="bottom"
-							className={classnames(
-								"app_sidebar_menu_wrapper",
-								"bottom"
-							)}
+							})}
+							ref={this.sidebarRef}
+							initial={{
+								x: -500,
+							}}
+							animate={{
+								x: 0,
+							}}
+							exit={{
+								x: -500,
+							}}
+							transition={{
+								type: "spring",
+								stiffness: 100,
+								damping: 20,
+							}}
 						>
-							<Menu
-								mode="inline"
-								onClick={this.handleClick}
-								items={[...this.state.bottomItems, ...this.injectUserItems()]}
-								selectedKeys={[selectedKeyId]}
-							/>
-						</div>
-					</motion.div>
-				}
-			</AnimatePresence>
+							<div className="app_sidebar_header">
+								<div className="app_sidebar_header_logo">
+									<img
+										src={config.logo?.alt}
+										onClick={() => app.navigation.goMain()}
+									/>
 
-			<Drawer />
-		</div>
+									<Tag>αlpha</Tag>
+								</div>
+							</div>
+
+							<div
+								key="menu"
+								className="app_sidebar_menu_wrapper"
+							>
+								<Menu
+									mode="inline"
+									onClick={this.handleClick}
+									selectedKeys={[selectedKeyId]}
+									items={this.state.topItems}
+								/>
+							</div>
+
+							<div
+								key="bottom"
+								className={classnames(
+									"app_sidebar_menu_wrapper",
+									"bottom",
+								)}
+							>
+								<Menu
+									mode="inline"
+									onClick={this.handleClick}
+									items={[
+										...this.state.bottomItems,
+										...this.injectUserItems(),
+									]}
+									selectedKeys={[selectedKeyId]}
+								/>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
+
+				<Drawer />
+			</div>
+		)
 	}
 }
