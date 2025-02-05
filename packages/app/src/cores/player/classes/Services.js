@@ -1,30 +1,9 @@
-import MusicModel from "comty.js/models/music"
-
-class ComtyMusicService {
-    static id = "default"
-
-    resolve = async (track_id) => {
-        return await MusicModel.getTrackData(track_id)
-    }
-
-    resolveMany = async (track_ids, options) => {
-        const response = await MusicModel.getTrackData(track_ids, options)
-
-        if (response.list) {
-            return response
-        }
-
-        return [response]
-    }
-
-    toggleTrackLike = async (manifest, to) => {
-        return await MusicModel.toggleTrackLike(manifest, to)
-    }
-}
+import ComtyMusicServiceInterface from "../providers/comtymusic"
 
 export default class ServiceProviders {
     providers = [
-        new ComtyMusicService()
+        // add by default here
+        new ComtyMusicServiceInterface()
     ]
 
     findProvider(providerId) {
@@ -35,7 +14,28 @@ export default class ServiceProviders {
         this.providers.push(provider)
     }
 
-    // operations
+    has(providerId) {
+        return this.providers.some((provider) => provider.constructor.id === providerId)
+    }
+
+    operation = async (operationName, providerId, manifest, args) => {
+        const provider = await this.findProvider(providerId)
+
+        if (!provider) {
+            console.error(`Failed to resolve manifest, provider [${providerId}] not registered`)
+            return manifest
+        }
+
+        const operationFn = provider[operationName]
+
+        if (typeof operationFn !== "function") {
+            console.error(`Failed to resolve manifest, provider [${providerId}] operation [${operationName}] not found`)
+            return manifest
+        }
+
+        return await operationFn(manifest, args)
+    }
+
     resolve = async (providerId, manifest) => {
         const provider = await this.findProvider(providerId)
 
