@@ -9,243 +9,257 @@ import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
 
 import UserPreview from "@components/UserPreview"
 import MusicTrack from "@components/Music/Track"
-import PlaylistItem from "@components/Music/PlaylistItem"
+import Playlist from "@components/Music/Playlist"
 
 import SearchModel from "@models/search"
 
 import "./index.less"
 
 const ResultsTypeDecorators = {
-    users: {
-        icon: "FiUsers",
-        label: "Users",
-        onClick: (item) => {
-            app.navigation.goToAccount(item.username)
-        },
-        renderItem: (props) => {
-            const { item, onClick } = props
+	users: {
+		icon: "FiUsers",
+		label: "Users",
+		onClick: (item) => {
+			app.navigation.goToAccount(item.username)
+		},
+		renderItem: (props) => {
+			const { item, onClick } = props
 
-            return <div className="suggestion">
-                <UserPreview onClick={() => onClick(item)} user={item} />
-            </div>
-        }
-    },
-    tracks: {
-        icon: "FiAlbum",
-        label: "Tracks",
-        renderItem: (props) => {
-            const { item, onClick } = props
+			return (
+				<div className="suggestion">
+					<UserPreview onClick={() => onClick(item)} user={item} />
+				</div>
+			)
+		},
+	},
+	tracks: {
+		icon: "FiAlbum",
+		label: "Tracks",
+		renderItem: (props) => {
+			const { item, onClick } = props
 
-            return <div className="suggestion" onClick={onClick}>
-                <MusicTrack track={item} />
-            </div>
-        }
-    },
-    playlists: {
-        icon: "FiAlbum",
-        label: "Playlists",
-        renderItem: (props) => {
-            return <div className="suggestion">
-                <PlaylistItem playlist={props.item} />
-            </div>
-        }
-    }
+			return (
+				<div className="suggestion" onClick={onClick}>
+					<MusicTrack track={item} />
+				</div>
+			)
+		},
+	},
+	playlists: {
+		icon: "FiAlbum",
+		label: "Playlists",
+		renderItem: (props) => {
+			return (
+				<div className="suggestion">
+					<Playlist playlist={props.item} />
+				</div>
+			)
+		},
+	},
 }
 
 const Results = (props) => {
-    let { results } = props
+	let { results } = props
 
-    console.log("results", results, typeof results)
+	// console.log("results", results, typeof results)
 
-    if (typeof results !== "object") {
-        return null
-    }
+	if (typeof results !== "object") {
+		return null
+	}
 
-    let groupsKeys = Object.keys(results)
+	let groupsKeys = Object.keys(results)
 
-    // filter out empty groups
-    groupsKeys = groupsKeys.filter((key) => {
-        return results[key].length > 0
-    })
+	// filter out groups with no items array property
+	groupsKeys = groupsKeys.filter((key) => {
+		if (!Array.isArray(results[key].items)) {
+			return false
+		}
 
-    if (groupsKeys.length === 0) {
-        return <div className="searcher no_results">
-            <antd.Result
-                status="info"
-                title="No results"
-                subTitle="We are sorry, but we could not find any results for your search."
-            />
-        </div>
-    }
+		return true
+	})
 
-    const handleClick = async (decorator, data) => {
-        if (typeof decorator.onClick === "function") {
-            await decorator.onClick(data)
-        }
+	// filter out groups with empty items array
+	groupsKeys = groupsKeys.filter((key) => {
+		return results[key].items.length > 0
+	})
 
-        if (typeof props.onClose === "function") {
-            return props.onClose()
-        }
-    }
+	if (groupsKeys.length === 0) {
+		return (
+			<div className="searcher no_results">
+				<antd.Result
+					status="info"
+					title="No results"
+					subTitle="We are sorry, but we could not find any results for your search."
+				/>
+			</div>
+		)
+	}
 
-    return <div
-        className={classnames(
-            "searcher_results",
-            {
-                ["one_column"]: groupsKeys.length === 1,
-            }
-        )}
-    >
-        {
-            groupsKeys.map((key, index) => {
-                const decorator = ResultsTypeDecorators[key] ?? {
-                    icon: null,
-                    label: key,
-                    renderItem: () => null
-                }
+	const handleClick = async (decorator, data) => {
+		if (typeof decorator.onClick === "function") {
+			await decorator.onClick(data)
+		}
 
-                return <div
-                    className="searcher_results_category"
-                    key={index}
-                >
-                    <div className="searcher_results_category_header">
-                        <h1>
-                            {
-                                createIconRender(decorator.icon)
-                            }
-                            <Translation>
-                                {(t) => t(decorator.label)}
-                            </Translation>
-                        </h1>
-                    </div>
+		if (typeof props.onClose === "function") {
+			return props.onClose()
+		}
+	}
 
-                    <div className="searcher_results_category_suggestions" id={key}>
-                        {
-                            results[key].map((item, index) => {
-                                return decorator.renderItem({
-                                    key: index,
-                                    item,
-                                    onClick: (...data) => handleClick(decorator, ...data),
-                                    ...decorator.props,
-                                })
-                            })
-                        }
-                    </div>
-                </div>
-            })
-        }
-    </div>
+	return (
+		<div
+			className={classnames("searcher_results", {
+				["one_column"]: groupsKeys.length === 1,
+			})}
+		>
+			{groupsKeys.map((key, index) => {
+				const decorator = ResultsTypeDecorators[key] ?? {
+					icon: null,
+					label: key,
+					renderItem: () => null,
+				}
+
+				return (
+					<div className="searcher_results_category" key={index}>
+						<div className="searcher_results_category_header">
+							<h1>
+								{createIconRender(decorator.icon)}
+								<Translation>
+									{(t) => t(decorator.label)}
+								</Translation>
+							</h1>
+						</div>
+
+						<div
+							className="searcher_results_category_suggestions"
+							id={key}
+						>
+							{results[key].items.map((item, index) => {
+								return decorator.renderItem({
+									key: index,
+									item,
+									onClick: (...data) =>
+										handleClick(decorator, ...data),
+									...decorator.props,
+								})
+							})}
+						</div>
+					</div>
+				)
+			})}
+		</div>
+	)
 }
 
 export default (props) => {
-    const [loading, setLoading] = React.useState(false)
-    const [searchResult, setSearchResult] = React.useState(null)
-    const [searchValue, setSearchValue] = React.useState("")
+	const [loading, setLoading] = React.useState(false)
+	const [searchResult, setSearchResult] = React.useState(null)
+	const [searchValue, setSearchValue] = React.useState("")
 
-    const [query, setQuery] = useUrlQueryActiveKey({
-        queryKey: "search",
-        defaultKey: null
-    })
+	const [query, setQuery] = useUrlQueryActiveKey({
+		queryKey: "search",
+		defaultKey: null,
+	})
 
-    const makeSearch = async (value) => {
-        if (value === "") {
-            return setSearchResult(null)
-        }
+	const makeSearch = async (value) => {
+		if (value === "") {
+			return setSearchResult(null)
+		}
 
-        setLoading(true)
+		setLoading(true)
 
-        if (props.useUrlQuery) {
-            setQuery(value)
-        }
+		if (props.useUrlQuery) {
+			setQuery(value)
+		}
 
-        let result = null
+		let result = null
 
-        if (typeof props.model === "function") {
-            result = await props.model(value, {
-                ...props.modelParams,
-                limit_per_section: app.isMobile ? 3 : 5
-            })
-        } else {
-            result = await SearchModel.search(value, {
-                ...props.modelParams,
-                limit_per_section: app.isMobile ? 3 : 5
-            })
-        }
+		if (typeof props.model === "function") {
+			result = await props.model(value, {
+				...props.modelParams,
+				limit_per_section: app.isMobile ? 3 : 5,
+			})
+		} else {
+			result = await SearchModel.search(value, {
+				...props.modelParams,
+				limit_per_section: app.isMobile ? 3 : 5,
+			})
+		}
 
-        if (typeof props.onSearchResult === "function") {
-            await props.onSearchResult(result)
-        }
+		if (typeof props.onSearchResult === "function") {
+			await props.onSearchResult(result)
+		}
 
-        setLoading(false)
+		setLoading(false)
 
-        return setSearchResult(result)
-    }
+		return setSearchResult(result)
+	}
 
-    const debounceSearch = React.useCallback(lodash.debounce(makeSearch, 500), [])
+	const debounceSearch = React.useCallback(
+		lodash.debounce(makeSearch, 500),
+		[],
+	)
 
-    const handleOnSearch = (e) => {
-        // not allow to input space as first character
-        if (e.target.value[0] === " ") {
-            return
-        }
+	const handleOnSearch = (e) => {
+		// not allow to input space as first character
+		if (e.target.value[0] === " ") {
+			return
+		}
 
-        setSearchValue(e.target.value)
+		setSearchValue(e.target.value)
 
-        if (e.target.value === "") {
-            debounceSearch.cancel()
+		if (e.target.value === "") {
+			debounceSearch.cancel()
 
-            if (props.useUrlQuery) {
-                setQuery(null)
-            }
+			if (props.useUrlQuery) {
+				setQuery(null)
+			}
 
-            if (typeof props.onEmpty === "function") {
-                props.onEmpty()
-            }
-        } else {
-            if (typeof props.onFilled === "function") {
-                props.onFilled()
-            }
+			if (typeof props.onEmpty === "function") {
+				props.onEmpty()
+			}
+		} else {
+			if (typeof props.onFilled === "function") {
+				props.onFilled()
+			}
 
-            debounceSearch(e.target.value)
-        }
-    }
+			debounceSearch(e.target.value)
+		}
+	}
 
-    React.useEffect(() => {
-        if (props.useUrlQuery) {
-            if (typeof query === "string") {
-                makeSearch(query)
-                setSearchValue(query)
-            }
-        }
-    }, [])
+	React.useEffect(() => {
+		if (props.useUrlQuery) {
+			if (typeof query === "string") {
+				makeSearch(query)
+				setSearchValue(query)
+			}
+		}
+	}, [])
 
-    return <div
-        className={classnames(
-            "searcher",
-            {
-                ["open"]: searchValue,
-                ["small"]: props.small,
-            }
-        )}
-    >
-        <antd.Input
-            placeholder="Start typing to search..."
-            onChange={handleOnSearch}
-            value={searchValue}
-            prefix={<Icons.FiSearch />}
-            autoFocus={props.autoFocus ?? false}
-            onFocus={props.onFocus}
-            onBlur={props.onUnfocus}
-        />
+	return (
+		<div
+			className={classnames("searcher", {
+				["open"]: searchValue,
+				["small"]: props.small,
+			})}
+		>
+			<antd.Input
+				placeholder="Start typing to search..."
+				onChange={handleOnSearch}
+				value={searchValue}
+				prefix={<Icons.FiSearch />}
+				autoFocus={props.autoFocus ?? false}
+				onFocus={props.onFocus}
+				onBlur={props.onUnfocus}
+			/>
 
-        {searchResult && props.renderResults && <div className="results">
-            {loading && <antd.Skeleton active />}
-            {
-                !loading && <Results
-                    results={searchResult}
-                    onClose={props.close}
-                />
-            }
-        </div>}
-    </div>
+			{searchResult && props.renderResults && (
+				<div className="results">
+					{loading && <antd.Skeleton active />}
+					{!loading && (
+						<Results results={searchResult} onClose={props.close} />
+					)}
+				</div>
+			)}
+		</div>
+	)
 }
