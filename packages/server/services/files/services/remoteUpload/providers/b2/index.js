@@ -8,6 +8,7 @@ export default async function b2Upload({
     metadata = {},
     targetFilename,
     isDirectory,
+    retryNumber = 0
 }) {
     if (isDirectory) {
         let files = await fs.promises.readdir(source)
@@ -39,30 +40,47 @@ export default async function b2Upload({
         }
     }
 
-    await global.b2Storage.authorize()
+    try {
+        await global.b2Storage.authorize()
 
-    if (!fs.existsSync(source)) {
-        throw new OperationError(500, "File not found")
+        if (!fs.existsSync(source)) {
+            throw new OperationError(500, "File not found")
+        }
+
+        const uploadUrl = await global.b2Storage.getUploadUrl({
+            bucketId: process.env.B2_BUCKET_ID,
+        })
+
+        console.debug(`Uploading object to B2 Storage >`, {
+            source: source,
+            remote: remotePath,
+        })
+
+        const data = await fs.promises.readFile(source)
+
+        await global.b2Storage.uploadFile({
+            uploadUrl: uploadUrl.data.uploadUrl,
+            uploadAuthToken: uploadUrl.data.authorizationToken,
+            fileName: remotePath,
+            data: data,
+            info: metadata
+        })
+    } catch (error) {
+        console.error(error)
+
+        if (retryNumber < 5) {
+            return await b2Upload({
+                source,
+                remotePath,
+                metadata,
+                targetFilename,
+                isDirectory,
+                retryNumber: retryNumber + 1
+            })
+        }
+
+        throw new OperationError(500, "B2 upload failed")
     }
-
-    const uploadUrl = await global.b2Storage.getUploadUrl({
-        bucketId: process.env.B2_BUCKET_ID,
-    })
-
-    console.debug(`Uploading object to B2 Storage >`, {
-        source: source,
-        remote: remotePath,
-    })
-
-    const data = await fs.promises.readFile(source)
-
-    await global.b2Storage.uploadFile({
-        uploadUrl: uploadUrl.data.uploadUrl,
-        uploadAuthToken: uploadUrl.data.authorizationToken,
-        fileName: remotePath,
-        data: data,
-        info: metadata
-    })
 
     return {
         id: remotePath,
