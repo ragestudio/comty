@@ -7,7 +7,7 @@
 	},
 	"dependencies": {
 		"7zip-min": "^2.0.0",
-		"@octokit/rest": "^21.1.0",
+		"@octokit/rest": "^19.0.4",
 		"axios": "^1.7.9",
 		"linebridge": "^0.22.3",
 		"live-directory": "^3.0.3"

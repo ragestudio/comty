@@ -48,6 +48,12 @@ async function setupLatestRelease({
 
 	const bundle = await findBundleFromRelease(release, distCompressedFile)
 
+	if (!bundle) {
+		throw new Error(
+			`Bundle not available for latest release: ${distCompressedFile}`,
+		)
+	}
+
 	console.log(`Bundle: > ${bundle.name} [${bundle.browser_download_url}]`)
 
 	// wirte a manifest file with bundle version and other info
