@@ -7,7 +7,7 @@ import fs from "node:fs"
 
 class WebWrapper extends Server {
 	static disableBaseEndpoints = true
-	static listenPort = process.env.HTTP_LISTEN_PORT || 9999
+	static listenPort = process.env.HTTP_LISTEN_PORT || 5000
 
 	static publicPath = path.resolve(process.cwd(), "public")
 	static cachePath = path.resolve(process.cwd(), ".cache")

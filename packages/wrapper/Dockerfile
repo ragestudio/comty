@@ -1,9 +1,16 @@
-FROM node:16-bullseye-slim
+FROM node:20-bookworm-slim
+EXPOSE 5000
 
+# Install dependencies
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
 RUN apt update
-RUN apt install build-essential -y
-RUN apt install python3 -y
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+RUN apt install -y --no-install-recommends build-essential
+RUN apt install -y --no-install-recommends curl
+RUN apt install -y --no-install-recommends ffmpeg
+RUN apt install -y --no-install-recommends yarn
+RUN apt install -y --no-install-recommends git
+RUN apt install -y --no-install-recommends ssh
+RUN apt install -y --no-install-recommends ca-certificates
 
 WORKDIR /home/node/app
 USER node
@@ -14,6 +21,7 @@ COPY --chown=node:node ./package.json .
 COPY --chown=node:node ./src ./src
 
 RUN chmod -R 777 /home/node/app
-RUN npm install -D --force
+RUN npm install
 
-CMD ["node", "/home/node/app/src/index.js"]
+RUN export NODE_ENV=production
+CMD ["npm", "run", "start"]
