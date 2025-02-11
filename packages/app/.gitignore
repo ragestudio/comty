@@ -8,4 +8,4 @@ yarn-error.log
 out/
 .ssl
 
-/**/**/src/cores/#*
+/**/**/src/cores/@*
