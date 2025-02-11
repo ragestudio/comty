@@ -95,6 +95,14 @@ export default class TrackInstance {
 		// support for dash audio streaming
 		if (this.manifest.source.endsWith(".mpd")) {
 			this.muxerPlayer = MediaPlayer().create()
+			this.muxerPlayer.updateSettings({
+				streaming: {
+					buffer: {
+						resetSourceBuffersForTrackSwitch: true,
+						useChangeTypeForTrackSwitch: false,
+					},
+				},
+			})
 			this.muxerPlayer.initialize(this.audio, null, false)
 
 			this.muxerPlayer.attachSource(this.manifest.source)
