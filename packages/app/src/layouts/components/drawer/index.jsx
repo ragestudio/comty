@@ -4,10 +4,6 @@ import { AnimatePresence, motion } from "motion/react"
 
 import "./index.less"
 
-function transformTemplate({ x }) {
-	return `translateX(${x}px)`
-}
-
 export class Drawer extends React.Component {
 	options = this.props.options ?? {}
 
@@ -66,30 +62,33 @@ export class Drawer extends React.Component {
 		}
 		return (
 			<AnimatePresence>
-				{this.state.visible && (
-					<motion.div
-						key={this.props.id}
-						id={this.props.id}
-						className="drawer"
-						style={{
-							...this.options.style,
-						}}
-						transformTemplate={transformTemplate}
-						animate={{
-							x: [-100, 0],
-							opacity: [0, 1],
-						}}
-						exit={{
-							x: [0, -100],
-							opacity: [1, 0],
-						}}
-					>
-						{React.createElement(
-							this.props.children,
-							componentProps,
-						)}
-					</motion.div>
-				)}
+				<motion.div
+					key={this.props.id}
+					id={this.props.id}
+					className="drawer"
+					style={{
+						...this.options.style,
+					}}
+					animate={{
+						x: 0,
+						opacity: 1,
+					}}
+					initial={{
+						x: -100,
+						opacity: 0,
+					}}
+					exit={{
+						x: -100,
+						opacity: 0,
+					}}
+					transition={{
+						type: "spring",
+						stiffness: 100,
+						damping: 20,
+					}}
+				>
+					{React.createElement(this.props.children, componentProps)}
+				</motion.div>
 			</AnimatePresence>
 		)
 	}
@@ -111,6 +110,7 @@ export default class DrawerController extends React.Component {
 			open: this.open,
 			close: this.close,
 			closeAll: this.closeAll,
+			drawers: () => this.state.drawers,
 			drawersLength: () => this.state.drawers.length,
 			isMaskVisible: () => this.state.maskVisible,
 		}
@@ -295,7 +295,7 @@ export default class DrawerController extends React.Component {
 						["hidden"]: !this.state.drawers.length,
 					})}
 				>
-					<AnimatePresence>{this.state.drawers}</AnimatePresence>
+					{this.state.drawers}
 				</div>
 			</>
 		)
