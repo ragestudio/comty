@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 
 import { Icons } from "@components/Icons"
 import FollowButton from "@components/FollowButton"
@@ -21,10 +21,10 @@ import FollowersTab from "./tabs/followers"
 import "./index.less"
 
 const TabsComponent = {
-	"posts": PostsTab,
-	"followers": FollowersTab,
-	"details": DetailsTab,
-	"music": MusicTab,
+	posts: PostsTab,
+	followers: FollowersTab,
+	details: DetailsTab,
+	music: MusicTab,
 }
 
 export default class Account extends React.Component {
@@ -60,7 +60,7 @@ export default class Account extends React.Component {
 			}
 
 			user = await UserModel.data({
-				username: requestedUser
+				username: requestedUser,
 			}).catch((error) => {
 				console.error(error)
 
@@ -77,7 +77,9 @@ export default class Account extends React.Component {
 
 			console.log(`Loaded User [${user.username}] >`, user)
 
-			const followersResult = await FollowsModel.getFollowers(user._id).catch(() => false)
+			const followersResult = await FollowsModel.getFollowers(
+				user._id,
+			).catch(() => false)
 
 			if (followersResult) {
 				followersCount = followersResult.count
@@ -118,7 +120,10 @@ export default class Account extends React.Component {
 
 	handlePageTransition = (key) => {
 		if (typeof key !== "string") {
-			console.error("Cannot handle page transition. Invalid key, only valid passing string", key)
+			console.error(
+				"Cannot handle page transition. Invalid key, only valid passing string",
+				key,
+			)
 			return
 		}
 
@@ -129,7 +134,7 @@ export default class Account extends React.Component {
 		}
 
 		this.setState({
-			tabActiveKey: key
+			tabActiveKey: key,
 		})
 	}
 
@@ -137,119 +142,119 @@ export default class Account extends React.Component {
 		const user = this.state.user
 
 		if (this.state.isNotExistent) {
-			return <antd.Result
-				status="404"
-				title="This user does not exist, yet..."
-			>
-
-			</antd.Result>
+			return (
+				<antd.Result
+					status="404"
+					title="This user does not exist, yet..."
+				></antd.Result>
+			)
 		}
 
 		if (!user) {
 			return <antd.Skeleton active />
 		}
 
-		return <div
-			id="profile"
-			className={classnames(
-				"account-profile",
-				{
+		return (
+			<div
+				id="profile"
+				className={classnames("account-profile", {
 					["withCover"]: user.cover,
-				}
-			)}
-		>
-			{
-				user.cover && <div
-					className={classnames("cover", {
-						["expanded"]: this.state.coverExpanded
-					})}
-					style={{ backgroundImage: `url("${user.cover}")` }}
-					onClick={() => this.toggleCoverExpanded()}
-					id="profile-cover"
-				/>
-			}
-
-			<div className="panels">
-				<div className="left-panel">
-					<UserCard
-						user={user}
+				})}
+			>
+				{user.cover && (
+					<div
+						className={classnames("cover", {
+							["expanded"]: this.state.coverExpanded,
+						})}
+						style={{ backgroundImage: `url("${user.cover}")` }}
+						onClick={() => this.toggleCoverExpanded()}
+						id="profile-cover"
 					/>
+				)}
 
-					<div className="actions">
-						<FollowButton
-							count={this.state.followersCount}
-							onClick={this.onClickFollow}
-							followed={this.state.following}
-							self={this.state.isSelf}
-						/>
+				<div className="panels">
+					<div className="left-panel">
+						<UserCard user={user} />
 
-						{
-							!this.state.isSelf && <antd.Button
-								icon={<Icons.MdMessage />}
-								onClick={() => app.location.push(`/messages/${user._id}`)}
+						<div className="actions">
+							<FollowButton
+								count={this.state.followersCount}
+								onClick={this.onClickFollow}
+								followed={this.state.following}
+								self={this.state.isSelf}
 							/>
-						}
+
+							{!this.state.isSelf && (
+								<antd.Button
+									icon={<Icons.MdMessage />}
+									onClick={() =>
+										app.location.push(
+											`/messages/${user._id}`,
+										)
+									}
+								/>
+							)}
+						</div>
+					</div>
+
+					<div className="center-panel" ref={this.contentRef}>
+						<AnimatePresence mode="wait">
+							<motion.div
+								initial={{ opacity: 0, scale: 0.95 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0 }}
+								transition={{
+									duration: 0.15,
+								}}
+								key={this.state.tabActiveKey}
+								style={{
+									width: "100%",
+								}}
+							>
+								{React.createElement(
+									TabsComponent[this.state.tabActiveKey],
+									{
+										onTopVisibility:
+											this.onPostListTopVisibility,
+										state: this.state,
+									},
+								)}
+							</motion.div>
+						</AnimatePresence>
+					</div>
+
+					<div className="right-panel">
+						<antd.Menu
+							className="tabMenu"
+							mode={app.isMobile ? "horizontal" : "vertical"}
+							selectedKeys={[this.state.tabActiveKey]}
+							onClick={(e) => this.handlePageTransition(e.key)}
+							items={GenerateMenuItems([
+								{
+									id: "posts",
+									label: "Posts",
+									icon: "FiBookOpen",
+								},
+								{
+									id: "music",
+									label: "Music",
+									icon: "MdAlbum",
+								},
+								{
+									id: "followers",
+									label: "Followers",
+									icon: "FiUsers",
+								},
+								{
+									id: "details",
+									label: "Details",
+									icon: "FiInfo",
+								},
+							])}
+						/>
 					</div>
 				</div>
-
-				<div
-					className="center-panel"
-					ref={this.contentRef}
-				>
-					<AnimatePresence mode="wait">
-						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							exit={{ opacity: 0 }}
-							transition={{
-								duration: 0.15,
-							}}
-							key={this.state.tabActiveKey}
-							style={{
-								width: "100%",
-							}}
-						>
-							{
-								React.createElement(TabsComponent[this.state.tabActiveKey], {
-									onTopVisibility: this.onPostListTopVisibility,
-									state: this.state
-								})
-							}
-						</motion.div>
-					</AnimatePresence>
-				</div>
-
-				<div className="right-panel">
-					<antd.Menu
-						className="tabMenu"
-						mode={app.isMobile ? "horizontal" : "vertical"}
-						selectedKeys={[this.state.tabActiveKey]}
-						onClick={(e) => this.handlePageTransition(e.key)}
-						items={GenerateMenuItems([
-							{
-								id: "posts",
-								label: "Posts",
-								icon: "FiBookOpen",
-							},
-							{
-								id: "music",
-								label: "Music",
-								icon: "MdAlbum",
-							},
-							{
-								id: "followers",
-								label: "Followers",
-								icon: "FiUsers",
-							},
-							{
-								id: "details",
-								label: "Details",
-								icon: "FiInfo",
-							}
-						])}
-					/>
-				</div>
 			</div>
-		</div>
+		)
 	}
 }

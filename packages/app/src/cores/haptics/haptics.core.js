@@ -1,68 +1,67 @@
 import { Core } from "@ragestudio/vessel"
-import { Haptics } from "@capacitor/haptics"
+// import { Haptics } from "@capacitor/haptics"
 
 const vibrationPatterns = {
-    light: [10],
-    medium: [50],
-    heavy: [80],
-    error: [100, 30, 100, 30, 100],
+	light: [10],
+	medium: [50],
+	heavy: [80],
+	error: [100, 30, 100, 30, 100],
 }
 
 export default class HapticsCore extends Core {
-    static namespace = "haptics"
+	static namespace = "haptics"
 
-    static dependencies = [
-        "settings"
-    ]
+	static dependencies = ["settings"]
 
-    static isGlobalDisabled() {
-        return app.cores.settings.is("haptics:enabled", false)
-    }
+	static isGlobalDisabled() {
+		return app.cores.settings.is("haptics:enabled", false)
+	}
 
-    async onInitialize() {
-        if (window.navigator.userAgent === "capacitor") {
-            navigator.vibrate = this.nativeVibrate
-        }
+	async onInitialize() {
+		if (window.navigator.userAgent === "capacitor") {
+			navigator.vibrate = this.nativeVibrate
+		}
 
-        document.addEventListener("click", this.handleClickEvent)
-    }
+		document.addEventListener("click", this.handleClickEvent)
+	}
 
-    public = {
-        isGlobalDisabled: HapticsCore.isGlobalDisabled,
-        vibrate: this.vibrate.bind(this),
-    }
+	public = {
+		//isGlobalDisabled: HapticsCore.isGlobalDisabled,
+		vibrate: this.vibrate.bind(this),
+	}
 
-    nativeVibrate = (pattern) => {
-        if (!Array.isArray(pattern)) {
-            pattern = [pattern]
-        }
+	// nativeVibrate = (pattern) => {
+	//     if (!Array.isArray(pattern)) {
+	//         pattern = [pattern]
+	//     }
 
-        for (let i = 0; i < pattern.length; i++) {
-            Haptics.vibrate({
-                duration: pattern[i],
-            })
-        }
-    }
+	//     for (let i = 0; i < pattern.length; i++) {
+	//         Haptics.vibrate({
+	//             duration: pattern[i],
+	//         })
+	//     }
+	// }
 
-    handleClickEvent = (event) => {
-        const button = event.target.closest("button") || event.target.closest(".ant-btn")
+	handleClickEvent = (event) => {
+		const button =
+			event.target.closest("button") || event.target.closest(".ant-btn")
 
-        if (button) {
-            this.vibrate("light")
-        }
-    }
+		if (button) {
+			this.vibrate("light")
+		}
+	}
 
-    vibrate(pattern = "light") {
-        const disabled = HapticsCore.isGlobalDisabled()
+	vibrate(pattern = "light") {
+		const disabled = HapticsCore.isGlobalDisabled()
 
-        if (disabled) {
-            return false
-        }
+		if (disabled) {
+			return false
+		}
 
-        if (typeof pattern === "string") {
-            pattern = vibrationPatterns[pattern]
-        }
+		if (typeof pattern === "string") {
+			pattern = vibrationPatterns[pattern]
+		}
 
-        return navigator.vibrate(pattern)
-    }
+		return navigator.vibrate(pattern)
+	}
 }

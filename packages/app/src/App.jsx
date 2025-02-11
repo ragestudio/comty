@@ -2,6 +2,7 @@ import "./patches"
 import config from "@config"
 
 import React from "react"
+
 import { Runtime } from "@ragestudio/vessel"
 import { Helmet } from "react-helmet"
 import { Translation } from "react-i18next"
@@ -9,10 +10,6 @@ import * as Sentry from "@sentry/browser"
 import { invoke } from "@tauri-apps/api/tauri"
 import { Lightbox } from "react-modal-image"
 import * as antd from "antd"
-
-import { StatusBar, Style } from "@capacitor/status-bar"
-import { App as CapacitorApp } from "@capacitor/app"
-import { CapacitorUpdater } from "@capgo/capacitor-updater"
 
 import AppsMenu from "@components/AppMenu"
 
@@ -41,9 +38,9 @@ import Splash from "./splash"
 
 import "@styles/index.less"
 
-if (IS_MOBILE_HOST) {
-	CapacitorUpdater.notifyAppReady()
-}
+// if (IS_MOBILE_HOST) {
+// 	CapacitorUpdater.notifyAppReady()
+// }
 
 class ComtyApp extends React.Component {
 	constructor(props) {
@@ -66,8 +63,12 @@ class ComtyApp extends React.Component {
 		window.app.message = antd.message
 		window.app.isCapacitor = IS_MOBILE_HOST
 
-		if (window.app.version !== window.localStorage.getItem("last_version")) {
-			app.message.info(`Comty has been updated to version ${window.app.version}!`)
+		if (
+			window.app.version !== window.localStorage.getItem("last_version")
+		) {
+			app.message.info(
+				`Comty has been updated to version ${window.app.version}!`,
+			)
 			window.localStorage.setItem("last_version", window.app.version)
 		}
 
@@ -113,7 +114,7 @@ class ComtyApp extends React.Component {
 						sessionController: this.sessionController,
 						onDone: () => {
 							app.layout.draggable.destroy("login")
-						}
+						},
 					},
 				})
 			},
@@ -129,19 +130,23 @@ class ComtyApp extends React.Component {
 					props: {
 						bodyStyle: {
 							height: "100%",
-						}
+						},
 					},
 				})
 			},
 			// Opens the notification window and sets up the UI for the notification to be displayed
 			openNotifications: () => {
-				window.app.layout.drawer.open("notifications", NotificationsCenter, {
-					props: {
-						width: "fit-content",
+				window.app.layout.drawer.open(
+					"notifications",
+					NotificationsCenter,
+					{
+						props: {
+							width: "fit-content",
+						},
+						allowMultiples: false,
+						escClosable: true,
 					},
-					allowMultiples: false,
-					escClosable: true,
-				})
+				)
 			},
 			openSearcher: (options) => {
 				if (app.isMobile) {
@@ -150,34 +155,44 @@ class ComtyApp extends React.Component {
 						componentProps: {
 							renderResults: true,
 							autoFocus: true,
-						}
+						},
 					})
 				}
 
-				return app.layout.modal.open("searcher", (props) => <Searcher autoFocus renderResults {...props} />, {
-					framed: false
-				})
+				return app.layout.modal.open(
+					"searcher",
+					(props) => <Searcher autoFocus renderResults {...props} />,
+					{
+						framed: false,
+					},
+				)
 			},
 			openMessages: () => {
 				app.location.push("/messages")
 			},
 			openFullImageViewer: (src) => {
-				app.cores.window_mng.render("image_lightbox", <Lightbox
-					small={src}
-					large={src}
-					onClose={() => app.cores.window_mng.close("image_lightbox")}
-					hideDownload
-					showRotate
-				/>)
+				app.cores.window_mng.render(
+					"image_lightbox",
+					<Lightbox
+						small={src}
+						large={src}
+						onClose={() =>
+							app.cores.window_mng.close("image_lightbox")
+						}
+						hideDownload
+						showRotate
+					/>,
+				)
 			},
 			openPostCreator: (params) => {
-				app.layout.modal.open("post_creator", (props) => <PostCreator
-					{...props}
-					{...params}
-				/>, {
-					framed: false
-				})
-			}
+				app.layout.modal.open(
+					"post_creator",
+					(props) => <PostCreator {...props} {...params} />,
+					{
+						framed: false,
+					},
+				)
+			},
 		},
 		navigation: {
 			reload: () => {
@@ -198,14 +213,16 @@ class ComtyApp extends React.Component {
 			goToSettings: (setting_id) => {
 				return app.location.push(`/settings`, {
 					query: {
-						setting: setting_id
-					}
+						setting: setting_id,
+					},
 				})
 			},
 			goToAccount: (username) => {
 				if (!username) {
 					if (!app.userData) {
-						console.error("Cannot go to account, no username provided and no user logged in")
+						console.error(
+							"Cannot go to account, no username provided and no user logged in",
+						)
 						return false
 					}
 
@@ -219,27 +236,33 @@ class ComtyApp extends React.Component {
 			},
 			goToPlaylist: (playlist_id) => {
 				return app.location.push(`/play/${playlist_id}`)
-			}
+			},
 		},
 		capacitor: {
 			isAppCapacitor: () => window.navigator.userAgent === "capacitor",
 			setStatusBarStyleDark: async () => {
 				if (!window.app.capacitor.isAppCapacitor()) {
-					console.warn("[App] setStatusBarStyleDark is only available on capacitor")
+					console.warn(
+						"[App] setStatusBarStyleDark is only available on capacitor",
+					)
 					return false
 				}
 				return await StatusBar.setStyle({ style: Style.Dark })
 			},
 			setStatusBarStyleLight: async () => {
 				if (!window.app.capacitor.isAppCapacitor()) {
-					console.warn("[App] setStatusBarStyleLight is not supported on this platform")
+					console.warn(
+						"[App] setStatusBarStyleLight is not supported on this platform",
+					)
 					return false
 				}
 				return await StatusBar.setStyle({ style: Style.Light })
 			},
 			hideStatusBar: async () => {
 				if (!window.app.capacitor.isAppCapacitor()) {
-					console.warn("[App] hideStatusBar is not supported on this platform")
+					console.warn(
+						"[App] hideStatusBar is not supported on this platform",
+					)
 					return false
 				}
 
@@ -247,7 +270,9 @@ class ComtyApp extends React.Component {
 			},
 			showStatusBar: async () => {
 				if (!window.app.capacitor.isAppCapacitor()) {
-					console.warn("[App] showStatusBar is not supported on this platform")
+					console.warn(
+						"[App] showStatusBar is not supported on this platform",
+					)
 					return false
 				}
 				return await StatusBar.show()
@@ -257,13 +282,14 @@ class ComtyApp extends React.Component {
 			clearInternalStorage: async () => {
 				antd.Modal.confirm({
 					title: "Clear internal storage",
-					content: "Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
+					content:
+						"Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
 					onOk: async () => {
 						Utils.deleteInternalStorage()
-					}
+					},
 				})
 			},
-		}
+		},
 	}
 
 	static staticRenders = {
@@ -309,12 +335,10 @@ class ComtyApp extends React.Component {
 			app.navigation.goAuth()
 
 			antd.notification.open({
-				message: <Translation>
-					{(t) => t("Invalid Session")}
-				</Translation>,
-				description: <Translation>
-					{(t) => t(error)}
-				</Translation>,
+				message: (
+					<Translation>{(t) => t("Invalid Session")}</Translation>
+				),
+				description: <Translation>{(t) => t(error)}</Translation>,
 				icon: <Icons.MdOutlineAccessTimeFilled />,
 			})
 		},
@@ -339,7 +363,7 @@ class ComtyApp extends React.Component {
 		"auth:disabled_account": async () => {
 			await SessionModel.removeToken()
 			app.navigation.goAuth()
-		}
+		},
 	}
 
 	flushState = async () => {
@@ -355,13 +379,13 @@ class ComtyApp extends React.Component {
 
 			StatusBar.setOverlaysWebView({ overlay: false })
 
-			CapacitorApp.addListener("backButton", ({ canGoBack }) => {
-				if (!canGoBack) {
-					CapacitorApp.exitApp()
-				} else {
-					app.location.back()
-				}
-			})
+			// CapacitorApp.addListener("backButton", ({ canGoBack }) => {
+			// 	if (!canGoBack) {
+			// 		CapacitorApp.exitApp()
+			// 	} else {
+			// 		app.location.back()
+			// 	}
+			// })
 		}
 
 		await this.initialization()
@@ -389,7 +413,10 @@ class ComtyApp extends React.Component {
 				try {
 					await this.__SessionInit()
 				} catch (error) {
-					console.error(`[App] Error while initializing session`, error)
+					console.error(
+						`[App] Error while initializing session`,
+						error,
+					)
 
 					throw {
 						cause: "Cannot initialize session",
@@ -436,31 +463,32 @@ class ComtyApp extends React.Component {
 	}
 
 	render() {
-		return <React.Fragment>
-			<Helmet>
-				<title>{config.app.siteName}</title>
-				<meta name="og:description" content={config.app.siteDescription} />
-				<meta property="og:title" content={config.app.siteName} />
-			</Helmet>
-			<Router.InternalRouter>
-				<ThemeProvider>
-					{
-						window.__TAURI__ && <DesktopTopBar />
-					}
-					<Layout
-						user={this.state.user}
-						staticRenders={ComtyApp.staticRenders}
-						bindProps={{
-							user: this.state.user,
-						}}
-					>
-						{
-							this.state.initialized && <Router.PageRender />
-						}
-					</Layout>
-				</ThemeProvider>
-			</Router.InternalRouter>
-		</React.Fragment>
+		return (
+			<React.Fragment>
+				<Helmet>
+					<title>{config.app.siteName}</title>
+					<meta
+						name="og:description"
+						content={config.app.siteDescription}
+					/>
+					<meta property="og:title" content={config.app.siteName} />
+				</Helmet>
+				<Router.InternalRouter>
+					<ThemeProvider>
+						{window.__TAURI__ && <DesktopTopBar />}
+						<Layout
+							user={this.state.user}
+							staticRenders={ComtyApp.staticRenders}
+							bindProps={{
+								user: this.state.user,
+							}}
+						>
+							{this.state.initialized && <Router.PageRender />}
+						</Layout>
+					</ThemeProvider>
+				</Router.InternalRouter>
+			</React.Fragment>
+		)
 	}
 }
 

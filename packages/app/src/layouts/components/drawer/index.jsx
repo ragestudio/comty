@@ -1,7 +1,6 @@
 import React from "react"
 import classnames from "classnames"
-import * as antd from "antd"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion } from "motion/react"
 
 import "./index.less"
 
@@ -30,7 +29,7 @@ export class Drawer extends React.Component {
 		this.toggleVisibility(false)
 
 		this.props.controller.close(this.props.id, {
-			transition: 150
+			transition: 150,
 		})
 	}
 
@@ -65,31 +64,34 @@ export class Drawer extends React.Component {
 			handleDone: this.handleDone,
 			handleFail: this.handleFail,
 		}
-		return <AnimatePresence>
-			{
-				this.state.visible && <motion.div
-					key={this.props.id}
-					id={this.props.id}
-					className="drawer"
-					style={{
-						...this.options.style,
-					}}
-					transformTemplate={transformTemplate}
-					animate={{
-						x: [-100, 0],
-						opacity: [0, 1],
-					}}
-					exit={{
-						x: [0, -100],
-						opacity: [1, 0],
-					}}
-				>
-					{
-						React.createElement(this.props.children, componentProps)
-					}
-				</motion.div>
-			}
-		</AnimatePresence>
+		return (
+			<AnimatePresence>
+				{this.state.visible && (
+					<motion.div
+						key={this.props.id}
+						id={this.props.id}
+						className="drawer"
+						style={{
+							...this.options.style,
+						}}
+						transformTemplate={transformTemplate}
+						animate={{
+							x: [-100, 0],
+							opacity: [0, 1],
+						}}
+						exit={{
+							x: [0, -100],
+							opacity: [1, 0],
+						}}
+					>
+						{React.createElement(
+							this.props.children,
+							componentProps,
+						)}
+					</motion.div>
+				)}
+			</AnimatePresence>
+		)
 	}
 }
 
@@ -171,10 +173,12 @@ export default class DrawerController extends React.Component {
 		if (lastDrawer) {
 			if (app.layout.modal && lastDrawer.options.confirmOnOutsideClick) {
 				return app.layout.modal.confirm({
-					descriptionText: lastDrawer.options.confirmOnOutsideClickText ?? "Are you sure you want to close this drawer?",
+					descriptionText:
+						lastDrawer.options.confirmOnOutsideClickText ??
+						"Are you sure you want to close this drawer?",
 					onConfirm: () => {
 						lastDrawer.close()
-					}
+					},
 				})
 			}
 
@@ -202,18 +206,12 @@ export default class DrawerController extends React.Component {
 		}
 
 		if (typeof addresses[id] === "undefined") {
-			drawers.push(<Drawer
-				key={id}
-				{...instance}
-			/>)
+			drawers.push(<Drawer key={id} {...instance} />)
 
 			addresses[id] = drawers.length - 1
 			refs[id] = instance.ref
 		} else {
-			drawers[addresses[id]] = <Drawer
-				key={id}
-				{...instance}
-			/>
+			drawers[addresses[id]] = <Drawer key={id} {...instance} />
 			refs[id] = instance.ref
 		}
 
@@ -267,37 +265,39 @@ export default class DrawerController extends React.Component {
 	}
 
 	render() {
-		return <>
-			<AnimatePresence>
-				{
-					this.state.maskVisible && <motion.div
-						className="drawers-mask"
-						onClick={() => this.closeLastDrawer()}
-						initial={{
-							opacity: 0,
-						}}
-						animate={{
-							opacity: 1,
-						}}
-						exit={{
-							opacity: 0,
-						}}
-					/>
-				}
-			</AnimatePresence>
-
-			<div
-				className={classnames(
-					"drawers-wrapper",
-					{
-						["hidden"]: !this.state.drawers.length,
-					}
-				)}
-			>
+		return (
+			<>
 				<AnimatePresence>
-					{this.state.drawers}
+					{this.state.maskVisible && (
+						<motion.div
+							className="drawers-mask"
+							onClick={() => this.closeLastDrawer()}
+							initial={{
+								opacity: 0,
+							}}
+							animate={{
+								opacity: 1,
+							}}
+							exit={{
+								opacity: 0,
+							}}
+							transition={{
+								type: "spring",
+								stiffness: 100,
+								damping: 20,
+							}}
+						/>
+					)}
 				</AnimatePresence>
-			</div>
-		</>
+
+				<div
+					className={classnames("drawers-wrapper", {
+						["hidden"]: !this.state.drawers.length,
+					})}
+				>
+					<AnimatePresence>{this.state.drawers}</AnimatePresence>
+				</div>
+			</>
+		)
 	}
 }

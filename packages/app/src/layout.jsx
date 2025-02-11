@@ -1,11 +1,8 @@
 import React from "react"
-import progressBar from "nprogress"
 
 import Layouts from "@layouts"
 
 export default class Layout extends React.PureComponent {
-	progressBar = progressBar.configure({ parent: "html", showSpinner: false })
-
 	state = {
 		layoutType: "default",
 		renderError: null,
@@ -17,14 +14,18 @@ export default class Layout extends React.PureComponent {
 		},
 		"layout.animations.fadeOut": () => {
 			if (app.cores.settings.get("reduceAnimations")) {
-				console.warn("Skipping fadeIn animation due to `reduceAnimations` setting")
+				console.warn(
+					"Skipping fadeIn animation due to `reduceAnimations` setting",
+				)
 				return false
 			}
 
 			const transitionLayer = document.getElementById("transitionLayer")
 
 			if (!transitionLayer) {
-				console.warn("transitionLayer not found, no animation will be played")
+				console.warn(
+					"transitionLayer not found, no animation will be played",
+				)
 				return false
 			}
 
@@ -32,19 +33,23 @@ export default class Layout extends React.PureComponent {
 		},
 		"layout.animations.fadeIn": () => {
 			if (app.cores.settings.get("reduceAnimations")) {
-				console.warn("Skipping fadeOut animation due to `reduceAnimations` setting")
+				console.warn(
+					"Skipping fadeOut animation due to `reduceAnimations` setting",
+				)
 				return false
 			}
 
 			const transitionLayer = document.getElementById("transitionLayer")
 
 			if (!transitionLayer) {
-				console.warn("transitionLayer not found, no animation will be played")
+				console.warn(
+					"transitionLayer not found, no animation will be played",
+				)
 				return false
 			}
 
 			transitionLayer.classList.remove("fade-opacity-leave")
-		}
+		},
 	}
 
 	componentDidMount() {
@@ -58,7 +63,10 @@ export default class Layout extends React.PureComponent {
 		}
 
 		if (app.cores.settings.get("reduceAnimations")) {
-			this.layoutInterface.toggleRootContainerClassname("reduce-animations", true)
+			this.layoutInterface.toggleRootContainerClassname(
+				"reduce-animations",
+				true,
+			)
 		}
 
 		this.layoutInterface.toggleCenteredContent(true)
@@ -75,7 +83,7 @@ export default class Layout extends React.PureComponent {
 		this.setState({ renderError: { info, stack } })
 	}
 
-	layoutInterface = window.app.layout = {
+	layoutInterface = (window.app.layout = {
 		set: (layout) => {
 			if (typeof Layouts[layout] !== "function") {
 				return console.error("Layout not found")
@@ -88,28 +96,52 @@ export default class Layout extends React.PureComponent {
 			})
 		},
 		toggleCenteredContent: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("centered-content", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"centered-content",
+				to,
+			)
 		},
 		toggleRootScaleEffect: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("root-scale-effect", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"root-scale-effect",
+				to,
+			)
 		},
 		toggleMobileStyle: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("mobile", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"mobile",
+				to,
+			)
 		},
 		toggleReducedAnimations: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("reduce-animations", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"reduce-animations",
+				to,
+			)
 		},
 		toggleTopBarSpacer: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("top-bar-spacer", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"top-bar-spacer",
+				to,
+			)
 		},
 		toggleDisableTopLayoutPadding: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("disable-top-layout-padding", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"disable-top-layout-padding",
+				to,
+			)
 		},
 		togglePagePanelSpacer: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("page-panel-spacer", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"page-panel-spacer",
+				to,
+			)
 		},
 		toggleCompactMode: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("compact-mode", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"compact-mode",
+				to,
+			)
 		},
 		toggleRootContainerClassname: (classname, to) => {
 			const root = document.documentElement
@@ -119,7 +151,10 @@ export default class Layout extends React.PureComponent {
 				return false
 			}
 
-			to = typeof to === "boolean" ? to : !root.classList.contains(classname)
+			to =
+				typeof to === "boolean"
+					? to
+					: !root.classList.contains(classname)
 
 			if (root.classList.contains(classname) === to) {
 				// ignore
@@ -154,8 +189,8 @@ export default class Layout extends React.PureComponent {
 				...to,
 				behavior: "smooth",
 			})
-		}
-	}
+		},
+	})
 
 	render() {
 		let layoutType = this.state.layoutType
@@ -167,7 +202,10 @@ export default class Layout extends React.PureComponent {
 
 		if (this.state.renderError) {
 			if (this.props.staticRenders?.RenderError) {
-				return React.createElement(this.props.staticRenders?.RenderError, { error: this.state.renderError })
+				return React.createElement(
+					this.props.staticRenders?.RenderError,
+					{ error: this.state.renderError },
+				)
 			}
 
 			return JSON.stringify(this.state.renderError)
@@ -176,11 +214,12 @@ export default class Layout extends React.PureComponent {
 		const Layout = Layouts[layoutType]
 
 		if (!Layout) {
-			return app.eventBus.emit("runtime.crash", new Error(`Layout type [${layoutType}] not found`))
+			return app.eventBus.emit(
+				"runtime.crash",
+				new Error(`Layout type [${layoutType}] not found`),
+			)
 		}
 
-		return <Layout {...layoutComponentProps}>
-			{this.props.children}
-		</Layout>
+		return <Layout {...layoutComponentProps}>{this.props.children}</Layout>
 	}
 }

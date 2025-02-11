@@ -2,7 +2,7 @@ import React from "react"
 import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react"
 import { Menu, Avatar, Dropdown, Tag } from "antd"
 
 import Drawer from "@layouts/components/drawer"
