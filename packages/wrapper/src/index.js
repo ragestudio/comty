@@ -12,7 +12,7 @@ class WebWrapper extends Server {
 	static publicPath = path.resolve(process.cwd(), "public")
 	static cachePath = path.resolve(process.cwd(), ".cache")
 	static distManifestPath = path.resolve(this.publicPath, "manifest.json")
-	static distCompressedFile = "app_dist.7z"
+	static distCompressedFile = "dist.zip"
 	static repoName = "ragestudio/comty"
 
 	routes = {
