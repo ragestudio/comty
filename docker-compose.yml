@@ -1,38 +1,38 @@
 services:
-  app:
-    build: packages/app
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./.env
-  api:
-    build: packages/server
-    restart: unless-stopped
-    networks:
-      - internal_network
-    ports:
-      - "9000:9000"
-    env_file:
-      - ./.env
+    wrapper:
+        build: packages/wrapper
+        restart: unless-stopped
+        networks:
+            - internal_network
+        ports:
+            - "3000:3000"
+        env_file:
+            - ./.env
+    api:
+        build: packages/server
+        restart: unless-stopped
+        networks:
+            - internal_network
+        ports:
+            - "9000:9000"
+        env_file:
+            - ./.env
 
-  redis:
-    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
-    restart: unless-stopped
-    ulimits:
-      memlock: -1
-    command:
-      - "--requirepass=changeme2424"
-    networks:
-      - internal_network
-    env_file:
-      - ./.env
-    ports:
-      - "6379:6379"
-    volumes:
-      - ./redis_data:/data
+    redis:
+        image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+        restart: unless-stopped
+        ulimits:
+            memlock: -1
+        command:
+            - "--requirepass=changeme2424"
+        networks:
+            - internal_network
+        env_file:
+            - ./.env
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./redis_data:/data
 
 networks:
-  internal_network:
+    internal_network:

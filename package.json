@@ -1,25 +1,26 @@
 {
-    "author": "RageStudio",
-    "license": "ComtyLicense",
-    "private": true,
-    "scripts": {
-        "dev": "concurrently -k \"yarn dev:client\" \"yarn dev:server\"",
-        "dev:server": "cd packages/server && yarn dev",
-        "dev:client": "cd packages/app && yarn dev",
-        "release": "node ./scripts/release.js",
-        "postdeploy": "node ./scripts/post-deploy.js",
-        "postinstall": "node ./scripts/post-install.js"
-    },
-    "dependencies": {
-        "7zip-min": "1.4.3",
-        "@ragestudio/hermes": "^1.0.0",
-        "axios": "^1.4.0",
-        "concurrently": "^7.5.0",
-        "dotenv": "16.0.3",
-        "form-data": "^4.0.0",
-        "mintlify": "^4.0.206",
-        "octokit": "^2.0.14",
-        "pm2": "5.3.0"
-    },
-    "_web_app_path": "packages/app"
+	"version": "1.25.0@alpha",
+	"author": "RageStudio",
+	"license": "ComtyLicense",
+	"private": true,
+	"scripts": {
+		"dev": "concurrently -k \"yarn dev:client\" \"yarn dev:server\"",
+		"dev:server": "cd packages/server && yarn dev",
+		"dev:client": "cd packages/app && yarn dev",
+		"release": "node ./scripts/release.js",
+		"postdeploy": "node ./scripts/post-deploy.js",
+		"postinstall": "node ./scripts/post-install.js"
+	},
+	"dependencies": {
+		"7zip-min": "1.4.3",
+		"@ragestudio/hermes": "^1.0.0",
+		"axios": "^1.4.0",
+		"concurrently": "^7.5.0",
+		"dotenv": "16.0.3",
+		"form-data": "^4.0.0",
+		"mintlify": "^4.0.206",
+		"octokit": "^2.0.14",
+		"pm2": "5.3.0"
+	},
+	"_web_app_path": "packages/app"
 }

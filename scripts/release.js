@@ -23,174 +23,187 @@ const changelogsPath = path.resolve(process.cwd(), "changelogs")
 const packedDistPath = path.resolve(appDistPath, "dist.zip")
 
 async function main() {
-    if (!process.env.GITHUB_TOKEN) {
-        console.error("🆘 Missing GITHUB_TOKEN env")
-        return false
-    }
+	if (!process.env.GITHUB_TOKEN) {
+		console.error("🆘 Missing GITHUB_TOKEN env")
+		return false
+	}
 
-    const octokit = new Octokit({
-        auth: process.env.GITHUB_TOKEN
-    })
+	const octokit = new Octokit({
+		auth: process.env.GITHUB_TOKEN,
+	})
 
-    let steps = {
-        build: true,
-        bundle: true,
-        publish: true,
-        ignoreCommits: false,
-        ignoreVersion: false,
-        changelog: true,
-    }
+	let steps = {
+		build: true,
+		bundle: true,
+		publish: true,
+		ignoreCommits: false,
+		ignoreVersion: false,
+		changelog: true,
+	}
 
-    if (process.argv.includes("--no-pack")) {
-        steps.bundle = false
-    }
+	let changelogData = null
 
-    if (process.argv.includes("--no-publish")) {
-        steps.publish = false
-    }
+	if (process.argv.includes("--no-pack")) {
+		steps.bundle = false
+	}
 
-    if (process.argv.includes("--no-build")) {
-        steps.build = false
-    }
+	if (process.argv.includes("--no-publish")) {
+		steps.publish = false
+	}
 
-    if (process.argv.includes("--ignore-commits")) {
-        steps.ignoreCommits = true
-    }
+	if (process.argv.includes("--no-build")) {
+		steps.build = false
+	}
 
-    if (process.argv.includes("--ignore-version")) {
-        steps.ignoreVersion = true
-    }
+	if (process.argv.includes("--ignore-commits")) {
+		steps.ignoreCommits = true
+	}
 
-    // check if is any changes pending to commit
-    if (!steps.ignoreCommits) {
-        const gitStatus = child_process.execSync("git status --porcelain", {
-            cwd: process.cwd()
-        }).toString().trim()
+	if (process.argv.includes("--ignore-version")) {
+		steps.ignoreVersion = true
+	}
 
-        if (gitStatus.length > 0) {
-            console.warn("There are pending changes to commit, please commit first.")
-            return false
-        }
-    }
+	// check if is any changes pending to commit
+	if (!steps.ignoreCommits) {
+		const gitStatus = child_process
+			.execSync("git status --porcelain", {
+				cwd: process.cwd(),
+			})
+			.toString()
+			.trim()
 
-    let currentVersion = packagejson.version
+		if (gitStatus.length > 0) {
+			console.warn(
+				"There are pending changes to commit, please commit first.",
+			)
+			return false
+		}
+	}
 
-    // check if currentVersion match with current latest release on github
-    const latestRelease = await octokit.repos.getLatestRelease({
-        owner: repo.split("/")[0],
-        repo: repo.split("/")[1]
-    }).catch((err) => {
-        console.error(`🆘 Failed to get latest release: ${err}`)
-        return false
-    })
+	let currentVersion = packagejson.version
 
-    if (!latestRelease) {
-        console.error("🆘 Failed to get latest release")
-        return false
-    }
+	// check if currentVersion match with current latest release on github
+	const latestRelease = await octokit.repos
+		.getLatestRelease({
+			owner: repo.split("/")[0],
+			repo: repo.split("/")[1],
+		})
+		.catch((err) => {
+			console.error(`🆘 Failed to get latest release: ${err}`)
+			return false
+		})
 
-    if (!steps.ignoreVersion) {
-        if (latestRelease && latestRelease.data.tag_name === currentVersion) {
-            if (process.argv.includes("--bump")) {
-                const bumpType = process.argv[process.argv.indexOf("--bump") + 1]
+	if (!latestRelease) {
+		console.error("🆘 Failed to get latest release")
+		return false
+	}
 
-                const newVersion = await bumpVersion({
-                    root: process.cwd(),
-                    type: bumpType,
-                    count: 1
-                }).catch((error) => {
-                    console.error(`🆘 Failed to bump version >`, error)
-                    return false
-                })
+	if (!steps.ignoreVersion) {
+		if (latestRelease && latestRelease.data.tag_name === currentVersion) {
+			if (process.argv.includes("--bump")) {
+				const bumpType =
+					process.argv[process.argv.indexOf("--bump") + 1]
 
-                if (!newVersion) {
-                    throw new Error("Failed to bump version")
-                }
+				const newVersion = await bumpVersion({
+					root: process.cwd(),
+					type: bumpType,
+					count: 1,
+				}).catch((error) => {
+					console.error(`🆘 Failed to bump version >`, error)
+					return false
+				})
 
-                currentVersion = newVersion
+				if (!newVersion) {
+					throw new Error("Failed to bump version")
+				}
 
-                // create new commit
-                await child_process.execSync(`git add . && git commit -m "Bump version to ${currentVersion}"`, {
-                    cwd: process.cwd(),
-                    stdio: "inherit"
-                })
+				currentVersion = newVersion
 
-                // push to remote
-                await child_process.execSync(`git push`, {
-                    cwd: process.cwd(),
-                    stdio: "inherit"
-                })
-            } else {
-                console.log("🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --ignore-version to force release.")
-                return true
-            }
-        }
-    }
+				// create new commit
+				await child_process.execSync(
+					`git add . && git commit -m "Bump version to ${currentVersion}"`,
+					{
+						cwd: process.cwd(),
+						stdio: "inherit",
+					},
+				)
 
-    if (steps.build) {
-        steps.build = await buildAppDist(appSrcPath)
-    }
+				// push to remote
+				await child_process.execSync(`git push`, {
+					cwd: process.cwd(),
+					stdio: "inherit",
+				})
+			} else {
+				console.log(
+					"🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --ignore-version to force release.",
+				)
+				return true
+			}
+		}
+	}
 
-    if (steps.bundle) {
-        steps.bundle = await compressDistBundle(appDistPath, packedDistPath)
-    }
+	if (steps.build) {
+		steps.build = await buildAppDist(appSrcPath)
+	}
 
-    if (steps.changelog) {
-        const changelog = await composeChangelog()
+	if (steps.bundle) {
+		steps.bundle = await compressDistBundle(appDistPath, packedDistPath)
+	}
 
-        steps.changelog = path.resolve(changelogsPath, `v${currentVersion.split(".").join("-")}.md`)
+	if (steps.changelog) {
+		changelogData = await composeChangelog()
 
-        console.log(`📝 Writing changelog to file > ${steps.changelog}`)
+		steps.changelog = path.resolve(
+			changelogsPath,
+			`v${currentVersion.split(".").join("-")}.md`,
+		)
 
-        // write changelog to file
-        fs.writeFileSync(steps.changelog, changelog)
-    }
+		console.log(`📝 Writing changelog to file > ${steps.changelog}`)
 
-    if (steps.publish) {
-        const release = await createGithubRelease(
-            repo,
-            {
-                version: currentVersion,
-                changelog,
-            },
-            process.env.GITHUB_TOKEN,
-        ).catch((err) => {
-            console.error(`🆘 Failed to create release: ${err}`)
-            return false
-        })
+		// write changelog to file
+		fs.writeFileSync(steps.changelog, changelogData)
+	}
 
-        console.log("🎉 Release done!")
+	if (steps.publish) {
+		const release = await createGithubRelease(
+			repo,
+			{
+				version: currentVersion,
+				changelog: changelogData,
+			},
+			process.env.GITHUB_TOKEN,
+		).catch((err) => {
+			console.error(`🆘 Failed to create release: ${err}`)
+			return false
+		})
 
-        if (!release) {
-            return false
-        }
+		console.log("🎉 Release done!")
 
-        const assets = await uploadAssets(
-            octokit,
-            repo,
-            release,
-            [
-                {
-                    name: packedDistPath,
-                    data: fs.readFileSync(packedDistPath)
-                },
-                {
-                    name: "changelog.md",
-                    data: fs.readFileSync(steps.changelog)
-                }
-            ],
-        )
+		if (!release) {
+			return false
+		}
 
-        console.log("🎉 Assets uploaded! >", assets)
+		const assets = await uploadAssets(octokit, repo, release, [
+			{
+				name: packedDistPath,
+				data: fs.readFileSync(packedDistPath),
+			},
+			{
+				name: "changelog.md",
+				data: fs.readFileSync(steps.changelog),
+			},
+		])
 
-        console.log(`🔗 ${release.html_url}`)
-    }
+		console.log("🎉 Assets uploaded! >", assets)
 
-    console.log("All Done!")
+		console.log(`🔗 ${release.html_url}`)
+	}
 
-    return true
+	console.log("All Done!")
+
+	return true
 }
 
 main().catch((err) => {
-    console.error(`Fatal error: `, err)
+	console.error(`Fatal error: `, err)
 })
