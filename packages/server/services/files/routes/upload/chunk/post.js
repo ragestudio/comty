@@ -30,17 +30,17 @@ export default {
 			useProvider: "standard",
 		}
 
-		const user = await req.auth.user()
+		// const user = await req.auth.user()
 
-		if (user.roles.includes("admin")) {
-			// maxFileSize for admins 100GB
-			limits.maxFileSize = 100 * 1024 * 1024 * 1024
+		// if (user.roles.includes("admin")) {
+		// 	// maxFileSize for admins 100GB
+		// 	limits.maxFileSize = 100 * 1024 * 1024 * 1024
 
-			// optional compression for admins
-			limits.useCompression = req.headers["use-compression"] ?? false
+		// 	// optional compression for admins
+		// 	limits.useCompression = req.headers["use-compression"] ?? false
 
-			limits.useProvider = req.headers["provider-type"] ?? "b2"
-		}
+		// 	limits.useProvider = req.headers["provider-type"] ?? "b2"
+		// }
 
 		// check if provider is valid
 		if (!availableProviders.includes(limits.useProvider)) {
