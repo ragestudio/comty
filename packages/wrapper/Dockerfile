@@ -12,16 +12,23 @@ RUN apt install -y --no-install-recommends git
 RUN apt install -y --no-install-recommends ssh
 RUN apt install -y --no-install-recommends ca-certificates
 
+# Create workdir
 WORKDIR /home/node/app
+
+# Copy Files
+COPY package.json ./
+COPY . .
+
+# Fix permissions
+RUN chmod -R 777 /home/node/app
+RUN chown -R node:node /home/node/app
+
+# Set user to node
 USER node
 
-EXPOSE 9000
-
-COPY --chown=node:node ./package.json .
-COPY --chown=node:node ./src ./src
-
-RUN chmod -R 777 /home/node/app
+# Install modules & rebuild for host
 RUN npm install
 
+# Start server
 RUN export NODE_ENV=production
 CMD ["npm", "run", "start"]
