@@ -2,6 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { DragDropContext, Droppable } from "react-beautiful-dnd"
+import { createSwapy } from "swapy"
 
 import TrackManifest from "@cores/player/classes/TrackManifest"
 
@@ -13,314 +14,338 @@ import UploadHint from "./components/UploadHint"
 import "./index.less"
 
 class TracksManager extends React.Component {
-    state = {
-        list: Array.isArray(this.props.list) ? this.props.list : [],
-        pendingUploads: [],
-    }
+	swapyRef = React.createRef()
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (prevState.list !== this.state.list) {
-            if (typeof this.props.onChangeState === "function") {
-                this.props.onChangeState(this.state)
-            }
-        }
-    }
+	state = {
+		list: Array.isArray(this.props.list) ? this.props.list : [],
+		pendingUploads: [],
+	}
 
-    findTrackByUid = (uid) => {
-        if (!uid) {
-            return false
-        }
+	componentDidUpdate = (prevProps, prevState) => {
+		if (prevState.list !== this.state.list) {
+			if (typeof this.props.onChangeState === "function") {
+				this.props.onChangeState(this.state)
+			}
+		}
+	}
 
-        return this.state.list.find((item) => item.uid === uid)
-    }
+	componentDidMount() {
+		this.swapyRef.current = createSwapy(
+			document.getElementById("editor-tracks-list"),
+			{
+				animation: "dynamic",
+				dragAxis: "y",
+			},
+		)
 
-    addTrackToList = (track) => {
-        if (!track) {
-            return false
-        }
+		this.swapyRef.current.onSwapEnd((event) => {
+			console.log("end", event)
+			this.orderTrackList(
+				event.slotItemMap.asArray.map((item) => item.item),
+			)
+		})
+	}
 
-        this.setState({
-            list: [...this.state.list, track],
-        })
-    }
+	componentWillUnmount() {
+		this.swapyRef.current.destroy()
+	}
 
-    removeTrackByUid = (uid) => {
-        if (!uid) {
-            return false
-        }
+	findTrackByUid = (uid) => {
+		if (!uid) {
+			return false
+		}
 
-        this.removeTrackUIDFromPendingUploads(uid)
+		return this.state.list.find((item) => item.uid === uid)
+	}
 
-        this.setState({
-            list: this.state.list.filter((item) => item.uid !== uid),
-        })
+	addTrackToList = (track) => {
+		if (!track) {
+			return false
+		}
 
-    }
+		this.setState({
+			list: [...this.state.list, track],
+		})
+	}
 
-    modifyTrackByUid = (uid, track) => {
-        console.log("modifyTrackByUid", uid, track)
-        if (!uid || !track) {
-            return false
-        }
+	removeTrackByUid = (uid) => {
+		if (!uid) {
+			return false
+		}
 
-        this.setState({
-            list: this.state.list.map((item) => {
-                if (item.uid === uid) {
-                    return {
-                        ...item,
-                        ...track,
-                    }
-                }
+		this.removeTrackUIDFromPendingUploads(uid)
 
-                return item
-            }),
-        })
-    }
+		this.setState({
+			list: this.state.list.filter((item) => item.uid !== uid),
+		})
+	}
 
-    addTrackUIDToPendingUploads = (uid) => {
-        if (!uid) {
-            return false
-        }
+	modifyTrackByUid = (uid, track) => {
+		console.log("modifyTrackByUid", uid, track)
+		if (!uid || !track) {
+			return false
+		}
 
-        const pendingUpload = this.state.pendingUploads.find((item) => item.uid === uid)
+		this.setState({
+			list: this.state.list.map((item) => {
+				if (item.uid === uid) {
+					return {
+						...item,
+						...track,
+					}
+				}
 
-        if (!pendingUpload) {
-            this.setState({
-                pendingUploads: [
-                    ...this.state.pendingUploads,
-                    {
-                        uid: uid,
-                        progress: 0
-                    }
-                ],
-            })
-        }
-    }
+				return item
+			}),
+		})
+	}
 
-    removeTrackUIDFromPendingUploads = (uid) => {
-        if (!uid) {
-            return false
-        }
+	addTrackUIDToPendingUploads = (uid) => {
+		if (!uid) {
+			return false
+		}
 
-        this.setState({
-            pendingUploads: this.state.pendingUploads.filter((item) => item.uid !== uid),
-        })
-    }
+		const pendingUpload = this.state.pendingUploads.find(
+			(item) => item.uid === uid,
+		)
 
-    getUploadProgress = (uid) => {
-        const uploadProgressIndex = this.state.pendingUploads.findIndex((item) => item.uid === uid)
+		if (!pendingUpload) {
+			this.setState({
+				pendingUploads: [
+					...this.state.pendingUploads,
+					{
+						uid: uid,
+						progress: 0,
+					},
+				],
+			})
+		}
+	}
 
-        if (uploadProgressIndex === -1) {
-            return 0
-        }
+	removeTrackUIDFromPendingUploads = (uid) => {
+		if (!uid) {
+			return false
+		}
 
-        return this.state.pendingUploads[uploadProgressIndex].progress
-    }
+		this.setState({
+			pendingUploads: this.state.pendingUploads.filter(
+				(item) => item.uid !== uid,
+			),
+		})
+	}
 
-    updateUploadProgress = (uid, progress) => {
-        const uploadProgressIndex = this.state.pendingUploads.findIndex((item) => item.uid === uid)
+	getUploadProgress = (uid) => {
+		const uploadProgressIndex = this.state.pendingUploads.findIndex(
+			(item) => item.uid === uid,
+		)
 
-        if (uploadProgressIndex === -1) {
-            return false
-        }
+		if (uploadProgressIndex === -1) {
+			return 0
+		}
 
-        const newData = [...this.state.pendingUploads]
+		return this.state.pendingUploads[uploadProgressIndex].progress
+	}
 
-        newData[uploadProgressIndex].progress = progress
+	updateUploadProgress = (uid, progress) => {
+		const uploadProgressIndex = this.state.pendingUploads.findIndex(
+			(item) => item.uid === uid,
+		)
 
-        console.log(`Updating progress for [${uid}] to [${progress}]`)
+		if (uploadProgressIndex === -1) {
+			return false
+		}
 
-        this.setState({
-            pendingUploads: newData,
-        })
-    }
+		const newData = [...this.state.pendingUploads]
 
-    handleUploaderStateChange = async (change) => {
-        const uid = change.file.uid
+		newData[uploadProgressIndex].progress = progress
 
-        console.log("handleUploaderStateChange", change)
+		console.log(`Updating progress for [${uid}] to [${progress}]`)
 
-        switch (change.file.status) {
-            case "uploading": {
-                this.addTrackUIDToPendingUploads(uid)
+		this.setState({
+			pendingUploads: newData,
+		})
+	}
 
-                const trackManifest = new TrackManifest({
-                    uid: uid,
-                    file: change.file,
-                    onChange: this.modifyTrackByUid
-                })
+	handleUploaderStateChange = async (change) => {
+		const uid = change.file.uid
 
-                this.addTrackToList(trackManifest)
+		console.log("handleUploaderStateChange", change)
 
-                break
-            }
-            case "done": {
-                // remove pending file
-                this.removeTrackUIDFromPendingUploads(uid)
+		switch (change.file.status) {
+			case "uploading": {
+				this.addTrackUIDToPendingUploads(uid)
 
-                let trackManifest = this.state.list.find((item) => item.uid === uid)
+				const trackManifest = new TrackManifest({
+					uid: uid,
+					file: change.file,
+					onChange: this.modifyTrackByUid,
+				})
 
-                if (!trackManifest) {
-                    console.error(`Track with uid [${uid}] not found!`)
-                    break
-                }
+				this.addTrackToList(trackManifest)
 
-                // // update track list
-                // await this.modifyTrackByUid(uid, {
-                //     source: change.file.response.url
-                // })
+				break
+			}
+			case "done": {
+				// remove pending file
+				this.removeTrackUIDFromPendingUploads(uid)
 
-                trackManifest.source = change.file.response.url
-                trackManifest = await trackManifest.initialize()
+				let trackManifest = this.state.list.find(
+					(item) => item.uid === uid,
+				)
 
-                await this.modifyTrackByUid(uid, trackManifest)
+				if (!trackManifest) {
+					console.error(`Track with uid [${uid}] not found!`)
+					break
+				}
 
-                break
-            }
-            case "error": {
-                // remove pending file
-                this.removeTrackUIDFromPendingUploads(uid)
+				// // update track list
+				// await this.modifyTrackByUid(uid, {
+				//     source: change.file.response.url
+				// })
 
-                // remove from tracklist
-                await this.removeTrackByUid(uid)
-            }
-            case "removed": {
-                // stop upload & delete from pending list and tracklist
-                await this.removeTrackByUid(uid)
-            }
-            default: {
-                break
-            }
-        }
-    }
+				trackManifest.source = change.file.response.url
+				trackManifest = await trackManifest.initialize()
 
-    uploadToStorage = async (req) => {
-        const response = await app.cores.remoteStorage.uploadFile(req.file, {
-            onProgress: this.handleTrackFileUploadProgress,
-            service: "b2",
-            headers: {
-                transmux: "a-dash"
-            }
-        }).catch((error) => {
-            console.error(error)
-            antd.message.error(error)
+				await this.modifyTrackByUid(uid, trackManifest)
 
-            req.onError(error)
+				break
+			}
+			case "error": {
+				// remove pending file
+				this.removeTrackUIDFromPendingUploads(uid)
 
-            return false
-        })
+				// remove from tracklist
+				await this.removeTrackByUid(uid)
+			}
+			case "removed": {
+				// stop upload & delete from pending list and tracklist
+				await this.removeTrackByUid(uid)
+			}
+			default: {
+				break
+			}
+		}
+	}
 
-        if (response) {
-            req.onSuccess(response)
-        }
-    }
+	uploadToStorage = async (req) => {
+		const response = await app.cores.remoteStorage
+			.uploadFile(req.file, {
+				onProgress: this.handleTrackFileUploadProgress,
+				service: "b2",
+				headers: {
+					transmux: "a-dash",
+				},
+			})
+			.catch((error) => {
+				console.error(error)
+				antd.message.error(error)
 
-    handleTrackFileUploadProgress = async (file, progress) => {
-        this.updateUploadProgress(file.uid, progress)
-    }
+				req.onError(error)
 
-    orderTrackList = (result) => {
-        if (!result.destination) {
-            return
-        }
+				return false
+			})
 
-        this.setState((prev) => {
-            const trackList = [...prev.list]
+		if (response) {
+			req.onSuccess(response)
+		}
+	}
 
-            const [removed] = trackList.splice(result.source.index, 1)
+	handleTrackFileUploadProgress = async (file, progress) => {
+		this.updateUploadProgress(file.uid, progress)
+	}
 
-            trackList.splice(result.destination.index, 0, removed)
+	orderTrackList = (orderedIdsArray) => {
+		this.setState((prev) => {
+			// move all list items by id
+			const orderedIds = orderedIdsArray.map((id) =>
+				this.state.list.find((item) => item._id === id),
+			)
+			console.log("orderedIds", orderedIds)
+			return {
+				list: orderedIds,
+			}
+		})
+	}
 
-            return {
-                list: trackList
-            }
-        })
-    }
+	render() {
+		console.log(`Tracks List >`, this.state.list)
 
-    render() {
-        console.log(`Tracks List >`, this.state.list)
+		return (
+			<div className="music-studio-release-editor-tracks">
+				<antd.Upload
+					className="music-studio-tracks-uploader"
+					onChange={this.handleUploaderStateChange}
+					customRequest={this.uploadToStorage}
+					showUploadList={false}
+					accept="audio/*"
+					multiple
+				>
+					{this.state.list.length === 0 ? (
+						<UploadHint />
+					) : (
+						<antd.Button
+							className="uploadMoreButton"
+							icon={<Icons.FiPlus />}
+						>
+							Add another
+						</antd.Button>
+					)}
+				</antd.Upload>
 
-        return <div className="music-studio-release-editor-tracks">
-            <antd.Upload
-                className="music-studio-tracks-uploader"
-                onChange={this.handleUploaderStateChange}
-                customRequest={this.uploadToStorage}
-                showUploadList={false}
-                accept="audio/*"
-                multiple
-            >
-                {
-                    this.state.list.length === 0 ?
-                        <UploadHint /> : <antd.Button
-                            className="uploadMoreButton"
-                            icon={<Icons.FiPlus />}
-                        >
-                            Add another
-                        </antd.Button>
-                }
-            </antd.Upload>
+				<div
+					id="editor-tracks-list"
+					className="music-studio-release-editor-tracks-list"
+				>
+					{this.state.list.length === 0 && (
+						<antd.Result status="info" title="No tracks" />
+					)}
 
-            <DragDropContext
-                onDragEnd={this.orderTrackList}
-            >
-                <Droppable
-                    droppableId="droppable"
-                >
-                    {(provided, snapshot) => (
-                        <div
-                            {...provided.droppableProps}
-                            ref={provided.innerRef}
-                            className="music-studio-release-editor-tracks-list"
-                        >
-                            {
-                                this.state.list.length === 0 && <antd.Result
-                                    status="info"
-                                    title="No tracks"
-                                />
-                            }
-                            {
-                                this.state.list.map((track, index) => {
-                                    const progress = this.getUploadProgress(track.uid)
+					{this.state.list.map((track, index) => {
+						const progress = this.getUploadProgress(track.uid)
 
-                                    return <TrackListItem
-                                        index={index}
-                                        track={track}
-                                        onEdit={this.modifyTrackByUid}
-                                        onDelete={this.removeTrackByUid}
-                                        uploading={{
-                                            progress: progress,
-                                            working: this.state.pendingUploads.find((item) => item.uid === track.uid)
-                                        }}
-                                        disabled={progress > 0}
-                                    />
-                                })
-                            }
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
-        </div>
-    }
+						return (
+							<div data-swapy-slot={track._id ?? track.uid}>
+								<TrackListItem
+									index={index}
+									track={track}
+									onEdit={this.modifyTrackByUid}
+									onDelete={this.removeTrackByUid}
+									uploading={{
+										progress: progress,
+										working: this.state.pendingUploads.find(
+											(item) => item.uid === track.uid,
+										),
+									}}
+									disabled={progress > 0}
+								/>
+							</div>
+						)
+					})}
+				</div>
+			</div>
+		)
+	}
 }
 
 const ReleaseTracks = (props) => {
-    const { state, setState } = props
+	const { state, setState } = props
 
-    return <div className="music-studio-release-editor-tab">
-        <h1>Tracks</h1>
+	return (
+		<div className="music-studio-release-editor-tab">
+			<h1>Tracks</h1>
 
-        <TracksManager
-            _id={state._id}
-            list={state.list}
-            onChangeState={(managerState) => {
-                setState({
-                    ...state,
-                    ...managerState
-                })
-            }}
-        />
-    </div>
+			<TracksManager
+				_id={state._id}
+				list={state.list}
+				onChangeState={(managerState) => {
+					setState({
+						...state,
+						...managerState,
+					})
+				}}
+			/>
+		</div>
+	)
 }
 
 export default ReleaseTracks

@@ -12,103 +12,94 @@ import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 import "./index.less"
 
 const TrackListItem = (props) => {
-    const context = React.useContext(ReleaseEditorStateContext)
+	const context = React.useContext(ReleaseEditorStateContext)
 
-    const [loading, setLoading] = React.useState(false)
-    const [error, setError] = React.useState(null)
+	const [loading, setLoading] = React.useState(false)
+	const [error, setError] = React.useState(null)
 
-    const { track } = props
+	const { track } = props
 
-    async function onClickEditTrack() {
-        context.renderCustomPage({
-            header: "Track Editor",
-            content: <TrackEditor />,
-            props: {
-                track: track,
-            }
-        })
-    }
+	async function onClickEditTrack() {
+		context.renderCustomPage({
+			header: "Track Editor",
+			content: <TrackEditor />,
+			props: {
+				track: track,
+			},
+		})
+	}
 
-    async function onClickRemoveTrack() {
-        props.onDelete(track.uid)
-    }
+	async function onClickRemoveTrack() {
+		props.onDelete(track.uid)
+	}
 
-    return <Draggable
-        key={track._id ?? track.id}
-        draggableId={track.id ?? track._id}
-        index={props.index}
-    >
-        {
-            (provided, snapshot) => {
-                return <div
-                    className={classnames(
-                        "music-studio-release-editor-tracks-list-item",
-                        {
-                            ["loading"]: loading,
-                            ["failed"]: !!error,
-                            ["disabled"]: props.disabled,
-                        }
-                    )}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                >
-                    <div
-                        className="music-studio-release-editor-tracks-list-item-progress"
-                        style={{
-                            "--upload-progress": `${props.uploading.progress}%`,
-                        }}
-                    />
+	console.log("render")
 
-                    <div className="music-studio-release-editor-tracks-list-item-index">
-                        <span>{props.index + 1}</span>
-                    </div>
+	return (
+		<div
+			className={classnames(
+				"music-studio-release-editor-tracks-list-item",
+				{
+					["loading"]: loading,
+					["failed"]: !!error,
+					["disabled"]: props.disabled,
+				},
+			)}
+			data-swapy-item={track.id ?? track._id}
+		>
+			<div
+				className="music-studio-release-editor-tracks-list-item-progress"
+				style={{
+					"--upload-progress": `${props.uploading.progress}%`,
+				}}
+			/>
 
-                    {
-                        props.uploading.working && <Icons.LoadingOutlined />
-                    }
+			<div className="music-studio-release-editor-tracks-list-item-index">
+				<span>{props.index + 1}</span>
+			</div>
 
-                    <Image
-                        src={track.cover}
-                        height={25}
-                        width={25}
-                        style={{
-                            borderRadius: 8,
-                        }}
-                    />
+			{props.uploading.working && <Icons.LoadingOutlined />}
 
-                    <span>{track.title}</span>
+			<Image
+				src={track.cover}
+				height={25}
+				width={25}
+				style={{
+					borderRadius: 8,
+				}}
+			/>
 
-                    <div className="music-studio-release-editor-tracks-list-item-actions">
-                        <antd.Popconfirm
-                            title="Are you sure you want to delete this track?"
-                            onConfirm={onClickRemoveTrack}
-                            okText="Yes"
-                            disabled={props.disabled}
-                        >
-                            <antd.Button
-                                type="ghost"
-                                icon={<Icons.FiTrash2 />}
-                                disabled={props.disabled}
-                            />
-                        </antd.Popconfirm>
-                        <antd.Button
-                            type="ghost"
-                            icon={<Icons.FiEdit2 />}
-                            onClick={onClickEditTrack}
-                            disabled={props.disabled}
-                        />
+			<span>{track.title}</span>
 
-                        <div
-                            {...provided.dragHandleProps}
-                            className="music-studio-release-editor-tracks-list-item-dragger"
-                        >
-                            <Icons.MdDragIndicator />
-                        </div>
-                    </div>
-                </div>
-            }
-        }
-    </Draggable>
+			<div className="music-studio-release-editor-tracks-list-item-actions">
+				<antd.Popconfirm
+					title="Are you sure you want to delete this track?"
+					onConfirm={onClickRemoveTrack}
+					okText="Yes"
+					disabled={props.disabled}
+				>
+					<antd.Button
+						type="ghost"
+						icon={<Icons.FiTrash2 />}
+						disabled={props.disabled}
+					/>
+				</antd.Popconfirm>
+				<antd.Button
+					type="ghost"
+					icon={<Icons.FiEdit2 />}
+					onClick={onClickEditTrack}
+					disabled={props.disabled}
+				/>
+
+				<div
+					data-swapy-handle
+					className="music-studio-release-editor-tracks-list-item-dragger"
+				>
+					<Icons.MdDragIndicator />
+				</div>
+			</div>
+		</div>
+	)
 }
 
 export default TrackListItem
