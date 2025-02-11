@@ -1,6 +1,5 @@
 import fs from "node:fs"
 import path from "node:path"
-import _7z from "7zip-min"
 import { Octokit } from "@octokit/rest"
 
 import downloadFile from "./downloadFile"
