@@ -4,7 +4,6 @@
 @import "@styles/fonts.less";
 @import "@styles/fixments.less";
 @import "@styles/mobile.less";
-@import "@styles/splash.less";
 
 *,
 *:before,
@@ -30,7 +29,7 @@ h4 {
 }
 
 h5 {
-	font-size: calc(1em* var(--fontScale));
+	font-size: calc(1em * var(--fontScale));
 }
 
 h6 {
@@ -245,7 +244,10 @@ svg {
 	align-items: flex-start;
 	justify-content: flex-start;
 
-	background-color: rgba(var(--layoutBackgroundColor), var(--backgroundColorTransparency)) !important;
+	background-color: rgba(
+		var(--layoutBackgroundColor),
+		var(--backgroundColorTransparency)
+	) !important;
 	backdrop-filter: blur(var(--backgroundBlur));
 }
 
@@ -285,7 +287,12 @@ svg {
 	width: 100vw;
 	height: 100dvh;
 
-	transition: background-image, background-size, background-position, background-repeat, background-attachment all 150ms ease-in-out;
+	transition:
+		background-image,
+		background-size,
+		background-position,
+		background-repeat,
+		background-attachment all 150ms ease-in-out;
 
 	pointer-events: none;
 
