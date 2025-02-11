@@ -3,7 +3,7 @@ import { Core } from "@ragestudio/vessel"
 import RemoteEvent from "@classes/RemoteEvent"
 import QueueManager from "@classes/QueueManager"
 import TrackInstance from "./classes/TrackInstance"
-import MediaSession from "./classes/MediaSession"
+//import MediaSession from "./classes/MediaSession"
 import ServiceProviders from "./classes/Services"
 import PlayerState from "./classes/PlayerState"
 import PlayerUI from "./classes/PlayerUI"
@@ -28,7 +28,7 @@ export default class Player extends Core {
 	state = new PlayerState(this)
 	ui = new PlayerUI(this)
 	serviceProviders = new ServiceProviders()
-	nativeControls = new MediaSession()
+	//nativeControls = new MediaSession()
 	audioContext = new AudioContext({
 		sampleRate:
 			AudioPlayerStorage.get("sample_rate") ?? Player.defaultSampleRate,
@@ -85,7 +85,7 @@ export default class Player extends Core {
 			this.state.volume = 1
 		}
 
-		await this.nativeControls.initialize()
+		//await this.nativeControls.initialize()
 		await this.audioProcessors.initialize()
 	}
 
@@ -148,7 +148,7 @@ export default class Player extends Core {
 		this.console.log(`Playing track >`, this.queue.currentItem)
 
 		// update native controls
-		this.nativeControls.update(this.queue.currentItem.manifest)
+		//this.nativeControls.update(this.queue.currentItem.manifest)
 
 		return this.queue.currentItem
 	}
@@ -275,7 +275,7 @@ export default class Player extends Core {
 				resolve()
 			}, Player.gradualFadeMs)
 
-			this.nativeControls.updateIsPlaying(false)
+			//this.nativeControls.updateIsPlaying(false)
 		})
 	}
 
@@ -303,7 +303,7 @@ export default class Player extends Core {
 				this.audioContext.currentTime + Player.gradualFadeMs / 1000,
 			)
 
-			this.nativeControls.updateIsPlaying(true)
+			//this.nativeControls.updateIsPlaying(true)
 		})
 	}
 
@@ -340,7 +340,7 @@ export default class Player extends Core {
 		this.track_next_instances = []
 		this.track_prev_instances = []
 
-		this.nativeControls.destroy()
+		//this.nativeControls.destroy()
 	}
 
 	//
