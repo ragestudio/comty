@@ -7,3 +7,5 @@ dist-ssr
 yarn-error.log
 out/
 .ssl
+
+/**/**/src/cores/#*
