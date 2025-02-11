@@ -7,7 +7,7 @@
 		"services/*"
 	],
 	"scripts": {
-		"start:prod": "cross-env NODE_ENV=production hermes-node ./index.js",
+		"start:prod": "cross-env NODE_ENV=production linebridge-boot ./index.js",
 		"dev": "cross-env NODE_ENV=development hermes-node ./index.js",
 		"build:bin": "cd build && pkg ./index.js"
 	},
