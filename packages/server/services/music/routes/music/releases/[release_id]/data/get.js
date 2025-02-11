@@ -28,6 +28,7 @@ export default {
 
 		release.listLength = totalTracks
 		release.items = tracks
+		release.list = tracks
 
 		return release
 	},
