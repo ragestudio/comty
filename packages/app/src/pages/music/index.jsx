@@ -5,18 +5,22 @@ import { PagePanelWithNavMenu } from "@components/PagePanels"
 
 import Tabs from "./tabs"
 
-const NavMenuHeader = <h2>
-    <Icons.MdAlbum />
-    Music
-</h2>
+const NavMenuHeader = (
+	<h2>
+		<Icons.MdAlbum />
+		Music
+	</h2>
+)
 
 export default () => {
-    return <PagePanelWithNavMenu
-        tabs={Tabs}
-        navMenuHeader={NavMenuHeader}
-        defaultTab="library"
-        primaryPanelClassName="full"
-        useSetQueryType
-        transition
-    />
+	return (
+		<PagePanelWithNavMenu
+			tabs={Tabs}
+			navMenuHeader={NavMenuHeader}
+			defaultTab="explore"
+			primaryPanelClassName="full"
+			useSetQueryType
+			transition
+		/>
+	)
 }
