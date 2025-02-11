@@ -5,7 +5,7 @@ services:
         networks:
             - internal_network
         ports:
-            - "3000:3000"
+            - "5000:5000"
         env_file:
             - ./.env
     api:
@@ -23,14 +23,10 @@ services:
         restart: unless-stopped
         ulimits:
             memlock: -1
-        command:
-            - "--requirepass=changeme2424"
         networks:
             - internal_network
         env_file:
             - ./.env
-        ports:
-            - "6379:6379"
         volumes:
             - ./redis_data:/data
 
