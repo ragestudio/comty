@@ -1,30 +1,33 @@
 import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
+import SSEManager from "@shared-classes/SSEManager"
 
 import SharedMiddlewares from "@shared-middlewares"
 import LimitsClass from "@shared-classes/Limits"
 
 export default class API extends Server {
-    static refName = "music"
-    static enableWebsockets = true
-    static routesPath = `${__dirname}/routes`
-    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3003
+	static refName = "music"
+	static enableWebsockets = true
+	static routesPath = `${__dirname}/routes`
+	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3003
 
-    middlewares = {
-        ...SharedMiddlewares
-    }
+	middlewares = {
+		...SharedMiddlewares,
+	}
 
-    contexts = {
-        db: new DbManager(),
-        limits: {},
-    }
+	contexts = {
+		db: new DbManager(),
+		SSEManager: new SSEManager(),
+	}
 
-    async onInitialize() {
-        await this.contexts.db.initialize()
+	async onInitialize() {
+		global.sse = this.contexts.SSEManager
 
-        this.contexts.limits = await LimitsClass.get()
-    }
+		await this.contexts.db.initialize()
+
+		this.contexts.limits = await LimitsClass.get()
+	}
 }
 
 Boot(API)
