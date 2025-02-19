@@ -1,6 +1,6 @@
 {
 	"name": "@comty/wrapper",
-	"version": "1.25.0-a",
+	"version": "1.26.4@alpha",
 	"license": "MIT",
 	"scripts": {
 		"start": "linebridge-boot ./src/index.js"

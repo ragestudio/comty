@@ -17,10 +17,13 @@ const bumpVersion = require("./utils/bumpVersion")
 
 // constants & paths
 const repo = "ragestudio/comty"
+const packedDistFilename = "dist.zip"
+const changelogFilename = "changelog.md"
+
 const appSrcPath = path.resolve(process.cwd(), "packages/app/src")
 const appDistPath = path.resolve(process.cwd(), "packages/app/dist")
 const changelogsPath = path.resolve(process.cwd(), "changelogs")
-const packedDistPath = path.resolve(process.cwd(), "dist.zip")
+const packedDistPath = path.resolve(process.cwd(), packedDistFilename)
 
 async function main() {
 	if (!process.env.GITHUB_TOKEN) {
@@ -185,11 +188,11 @@ async function main() {
 
 		const assets = await uploadAssets(octokit, repo, release, [
 			{
-				name: packedDistPath,
+				name: packedDistFilename,
 				data: fs.readFileSync(packedDistPath),
 			},
 			{
-				name: "changelog.md",
+				name: changelogFilename,
 				data: fs.readFileSync(steps.changelog),
 			},
 		])
