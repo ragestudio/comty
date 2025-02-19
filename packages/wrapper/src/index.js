@@ -56,6 +56,10 @@ class WebWrapper extends Server {
 	}
 
 	async updateDistApp() {
+		if (!fs.existsSync(WebWrapper.appDistPath)) {
+			await fs.promises.rm(WebWrapper.appDistPath, { recursive: true })
+		}
+
 		await Setup.setupLatestRelease({
 			repository: WebWrapper.repoName,
 			distCompressedFile: WebWrapper.distCompressedFile,
@@ -88,13 +92,20 @@ class WebWrapper extends Server {
 			return res.status(401).json({ error: "Invalid signature" })
 		}
 
+		if (req.body.action !== "published") {
+			return res.status(400).json({ error: "Invalid action" })
+		}
+
+		// return ok and schedule update for the 30 seconds
 		console.log("[WEBHOOK] Update app dist triggered >", {
 			sig: req.headers["x-hub-signature-256"],
 		})
 
-		await this.updateDistApp()
+		res.status(200).json({ ok: true })
 
-		return res.status(200).json({ ok: true })
+		setTimeout(async () => {
+			await this.updateDistApp()
+		}, 30000)
 	}
 
 	async onInitialize() {
