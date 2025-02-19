@@ -56,7 +56,7 @@ class WebWrapper extends Server {
 	}
 
 	async updateDistApp() {
-		if (!fs.existsSync(WebWrapper.appDistPath)) {
+		if (fs.existsSync(WebWrapper.appDistPath)) {
 			await fs.promises.rm(WebWrapper.appDistPath, { recursive: true })
 		}
 
