@@ -10,6 +10,7 @@ class WebWrapper extends Server {
 	static listenPort = process.env.HTTP_LISTEN_PORT || 5000
 
 	static publicPath = path.resolve(process.cwd(), "public")
+	static appDistPath = path.resolve(process.cwd(), "public/dist")
 	static cachePath = path.resolve(process.cwd(), ".cache")
 	static distManifestPath = path.resolve(this.publicPath, "manifest.json")
 	static distCompressedFile = "dist.zip"
@@ -70,7 +71,7 @@ class WebWrapper extends Server {
 			})
 		}
 
-		global.staticLiveDirectory = new LiveDirectory(WebWrapper.publicPath, {
+		global.staticLiveDirectory = new LiveDirectory(WebWrapper.appDistPath, {
 			static: true,
 		})
 	}
