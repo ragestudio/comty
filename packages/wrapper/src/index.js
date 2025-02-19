@@ -105,7 +105,14 @@ class WebWrapper extends Server {
 
 		setTimeout(async () => {
 			await this.updateDistApp()
+			await this.listenLiveDirectory()
 		}, 30000)
+	}
+
+	async listenLiveDirectory() {
+		global.staticLiveDirectory = new LiveDirectory(WebWrapper.appDistPath, {
+			static: false,
+		})
 	}
 
 	async onInitialize() {
@@ -152,9 +159,7 @@ class WebWrapper extends Server {
 			}
 		}
 
-		global.staticLiveDirectory = new LiveDirectory(WebWrapper.appDistPath, {
-			static: false,
-		})
+		await this.listenLiveDirectory()
 	}
 }
 
