@@ -5,6 +5,7 @@ import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
+import LiveInfo from "@components/Player/LiveInfo"
 import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
 
@@ -25,9 +26,7 @@ function isOverflown(parent, element) {
 	return elementRect.width > parentRect.width
 }
 
-const Indicators = (props) => {
-	const { track } = props
-
+const Indicators = ({ track, playerState }) => {
 	if (!track) {
 		return null
 	}
@@ -38,6 +37,12 @@ const Indicators = (props) => {
 		if (track.metadata.lossless) {
 			indicators.push(<Icons.Lossless />)
 		}
+	}
+
+	if (playerState.live) {
+		indicators.push(
+			<Icons.FiRadio style={{ color: "var(--colorPrimary)" }} />,
+		)
 	}
 
 	if (indicators.length === 0) {
@@ -152,12 +157,6 @@ const Player = (props) => {
 					onClick={() => app.location.push("/lyrics")}
 				/>
 
-				{/* <antd.Button
-                icon={<Icons.MdOfflineBolt />}
-            >
-                HyperDrive
-            </antd.Button> */}
-
 				<antd.Button
 					icon={<Icons.FiX />}
 					shape="circle"
@@ -206,20 +205,26 @@ const Player = (props) => {
 						</p>
 					</div>
 
+					{playerState.radioId && (
+						<LiveInfo radioId={playerState.radioId} />
+					)}
+
 					<div className="toolbar_player_actions">
-						<Controls />
+						<Controls streamMode={playerState.live} />
 
 						<SeekBar
 							stopped={playerState.playback_status === "stopped"}
 							playing={playerState.playback_status === "playing"}
-							streamMode={playerState.livestream_mode}
-							disabled={playerState.control_locked}
+							streamMode={playerState.live}
 						/>
 
-						<ExtraActions />
+						<ExtraActions streamMode={playerState.live} />
 					</div>
 
-					<Indicators track={playerState.track_manifest} />
+					<Indicators
+						track={playerState.track_manifest}
+						playerState={playerState}
+					/>
 				</div>
 			</div>
 		</div>
