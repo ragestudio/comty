@@ -200,6 +200,8 @@ async function main() {
 		console.log("🎉 Assets uploaded! >", assets)
 
 		console.log(`🔗 ${release.html_url}`)
+
+		fs.unlinkSync(packedDistPath)
 	}
 
 	console.log("All Done!")
