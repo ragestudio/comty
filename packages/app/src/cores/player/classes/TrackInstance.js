@@ -39,11 +39,11 @@ export default class TrackInstance {
 			this.player.state.loading = false
 		},
 		loadedmetadata: () => {
-			// TODO: Detect a livestream and change mode
-			// if (instance.media.duration === Infinity) {
-			//     instance.manifest.stream = true
-			//     this.state.livestream_mode = true
-			// }
+			if (this.audio.duration === Infinity) {
+				this.player.state.live = true
+			} else {
+				this.player.state.live = false
+			}
 		},
 		play: () => {
 			this.player.state.playback_status = "playing"

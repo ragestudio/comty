@@ -153,7 +153,7 @@ export default class Player extends Core {
 		return this.queue.currentItem
 	}
 
-	async start(manifest, { time, startIndex = 0 } = {}) {
+	async start(manifest, { time, startIndex = 0, radioId } = {}) {
 		this.ui.attachPlayerComponent()
 
 		if (this.queue.currentItem) {
@@ -164,6 +164,14 @@ export default class Player extends Core {
 		await this.queue.flush()
 
 		this.state.loading = true
+
+		if (typeof radioId === "string") {
+			this.state.radioId = radioId
+			this.state.live = true
+		} else {
+			this.state.radioId = null
+			this.state.live = false
+		}
 
 		let playlist = Array.isArray(manifest) ? manifest : [manifest]
 
