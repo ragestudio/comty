@@ -2,6 +2,7 @@ import { Server } from "linebridge"
 import LiveDirectory from "live-directory"
 import * as Setup from "./lib/setupDist"
 
+import crypto from "node:crypto"
 import path from "node:path"
 import fs from "node:fs"
 
@@ -12,7 +13,7 @@ class WebWrapper extends Server {
 	static publicPath = path.resolve(process.cwd(), "public")
 	static appDistPath = path.resolve(process.cwd(), "public/dist")
 	static cachePath = path.resolve(process.cwd(), ".cache")
-	static distManifestPath = path.resolve(this.publicPath, "manifest.json")
+	static appManifestPath = path.resolve(this.publicPath, "manifest.json")
 	static distCompressedFile = "dist.zip"
 	static repoName = "ragestudio/comty"
 
@@ -54,25 +55,94 @@ class WebWrapper extends Server {
 		},
 	}
 
-	async onInitialize() {
-		if (!fs.existsSync(WebWrapper.publicPath)) {
-			console.log("WebWrapper public path does not exist, creating...")
-			fs.mkdirSync(WebWrapper.publicPath)
+	async updateDistApp() {
+		await Setup.setupLatestRelease({
+			repository: WebWrapper.repoName,
+			distCompressedFile: WebWrapper.distCompressedFile,
+			destinationPath: WebWrapper.publicPath,
+			cachePath: WebWrapper.cachePath,
+		})
+	}
+
+	async handleUpdateWebhook(req, res) {
+		const bodyBuff = await req.buffer()
+
+		const requestSignature = Buffer.from(
+			req.headers["x-hub-signature-256"] || "",
+			"utf8",
+		)
+		const hmac = crypto.createHmac(
+			"sha256",
+			process.env.WRAPPER_AUTO_UPDATE_KEY,
+		)
+		const digest = Buffer.from(
+			"sha256" + "=" + hmac.update(bodyBuff).digest("hex"),
+			"utf8",
+		)
+
+		// if signatures not match, return error
+		if (
+			requestSignature.length !== digest.length ||
+			!crypto.timingSafeEqual(digest, requestSignature)
+		) {
+			return res.status(401).json({ error: "Invalid signature" })
 		}
 
-		if (!fs.existsSync(WebWrapper.distManifestPath)) {
-			console.log(`App dist manifest does not exist, setting up...`)
+		console.log("[WEBHOOK] Update app dist triggered >", {
+			sig: req.headers["x-hub-signature-256"],
+		})
 
-			await Setup.setupLatestRelease({
-				repository: WebWrapper.repoName,
-				distCompressedFile: WebWrapper.distCompressedFile,
-				destinationPath: WebWrapper.publicPath,
-				cachePath: WebWrapper.cachePath,
+		await this.updateDistApp()
+
+		return res.status(200).json({ ok: true })
+	}
+
+	async onInitialize() {
+		if (process.env.WRAPPER_AUTO_UPDATE_KEY) {
+			console.log("Auto update key is set, enabling webhook update")
+
+			this.register.http({
+				method: "POST",
+				route: "/webhooks/update",
+				fn: this.handleUpdateWebhook.bind(this),
 			})
 		}
 
+		if (!fs.existsSync(WebWrapper.publicPath)) {
+			console.log("Creating public path...")
+			fs.mkdirSync(WebWrapper.publicPath)
+		}
+
+		if (!fs.existsSync(WebWrapper.appManifestPath)) {
+			console.log(`ℹ️ Missing app manifest/dist, installing...`)
+
+			await this.updateDistApp()
+		}
+
+		let manifest = await fs.promises.readFile(
+			WebWrapper.appManifestPath,
+			"utf8",
+		)
+
+		manifest = JSON.parse(manifest)
+
+		const latestRelease = await Setup.getLatestReleaseFromGithub(
+			WebWrapper.repoName,
+		).catch(() => null)
+
+		if (latestRelease) {
+			if (latestRelease.tag_name !== manifest.version) {
+				console.log(
+					`🔰 New version available: ${latestRelease.tag_name}, updating...`,
+				)
+				await this.updateDistApp()
+			} else {
+				console.log(`✅ App dist is up to date!`)
+			}
+		}
+
 		global.staticLiveDirectory = new LiveDirectory(WebWrapper.appDistPath, {
-			static: true,
+			static: false,
 		})
 	}
 }

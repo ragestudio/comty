@@ -8,8 +8,6 @@ import extractCompressedFile from "./extractCompressedFile"
 const octokit = new Octokit()
 
 async function getLatestReleaseFromGithub(repoStr) {
-	console.log("Getting latest release from github...")
-
 	const release = await octokit.repos.getLatestRelease({
 		owner: repoStr.split("/")[0],
 		repo: repoStr.split("/")[1],
@@ -41,6 +39,8 @@ async function setupLatestRelease({
 	if (!fs.existsSync(destinationPath)) {
 		fs.mkdirSync(destinationPath)
 	}
+
+	console.log("Getting latest release from github...")
 
 	const release = await getLatestReleaseFromGithub(repository)
 
@@ -81,12 +81,15 @@ async function setupLatestRelease({
 
 	// delete cache folder
 	if (fs.existsSync(cachePath)) {
-		fs.rmdirSync(cachePath, { recursive: true })
+		await fs.promises.rm(cachePath, { recursive: true })
 	}
+
+	console.log("Dist setup complete")
 }
 
 module.exports = {
 	downloadBundle: downloadFile,
 	extractBundle: extractCompressedFile,
 	setupLatestRelease,
+	getLatestReleaseFromGithub,
 }
