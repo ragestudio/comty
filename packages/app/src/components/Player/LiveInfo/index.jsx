@@ -8,29 +8,31 @@ import "./index.less"
 const LiveInfo = ({ radioId, initialData }) => {
 	const [data, setData] = React.useState(initialData ?? {})
 
-	const eventManager = React.useMemo(
-		() =>
-			new SSEEvents(
-				`${app.cores.api.client().mainOrigin}/music/radio/sse/radio:${radioId}`,
-				{
-					update: (data) => {
-						if (typeof data.now_playing === "string") {
-							data.now_playing = JSON.parse(data.now_playing)
-						}
-
-						console.log(`Radio data updated`, data)
-						setData(data)
-					},
-				},
-			),
-		[],
-	)
+	const eventManager = React.useRef(null)
 
 	React.useEffect(() => {
-		return () => {
-			eventManager.close()
+		if (eventManager.current) {
+			eventManager.current.close()
 		}
-	}, [])
+
+		eventManager.current = new SSEEvents(
+			`${app.cores.api.client().mainOrigin}/music/radio/sse/radio:${radioId}`,
+			{
+				update: (data) => {
+					if (typeof data.now_playing === "string") {
+						data.now_playing = JSON.parse(data.now_playing)
+					}
+
+					console.log(`Radio data updated`, data)
+					setData(data)
+				},
+			},
+		)
+
+		return () => {
+			eventManager.current.close()
+		}
+	}, [radioId])
 
 	return (
 		<div className="live-info">
