@@ -1,8 +1,7 @@
-import React from "react"
+import React, { useCallback, useEffect, useMemo, useRef } from "react"
 import classnames from "classnames"
 
 import parseTimeToMs from "@utils/parseTimeToMs"
-
 import useMaxScreen from "@hooks/useMaxScreen"
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
@@ -12,185 +11,180 @@ import LyricsText from "./components/text"
 
 import "./index.less"
 
-function getDominantColorStr(analysis) {
-	if (!analysis) {
-		return `0,0,0`
-	}
-
-	const values = analysis?.value ?? [0, 0, 0]
-
-	return `${values[0]}, ${values[1]}, ${values[2]}`
+const getDominantColorStr = (analysis) => {
+	if (!analysis) return "0,0,0"
+	return analysis.value?.join(", ") || "0,0,0"
 }
 
-function toggleFullScreen(to) {
-	to = to ?? !document.fullscreenElement
+const toggleFullScreen = (to) => {
+	const targetState = to ?? !document.fullscreenElement
 
-	if (to === true) {
-		document.documentElement.requestFullscreen().catch((err) => {
-			console.log(`Failed to set to fullscreen: ${err.message}`)
-		})
-	} else {
-		try {
+	try {
+		if (targetState) {
+			document.documentElement.requestFullscreen()
+		} else if (document.fullscreenElement) {
 			document.exitFullscreen()
-		} catch (error) {
-			// xd
 		}
+	} catch (error) {
+		console.error("Fullscreen toggle failed:", error)
 	}
 }
 
-const EnchancedLyricsPage = () => {
+const EnhancedLyricsPage = () => {
+	useMaxScreen()
+
 	const [playerState] = usePlayerStateContext()
 	const [trackManifest, setTrackManifest] = React.useState(null)
-
-	const [initialized, setInitialized] = React.useState(false)
 	const [lyrics, setLyrics] = React.useState(null)
 	const [translationEnabled, setTranslationEnabled] = React.useState(false)
 	const [coverAnalysis, setCoverAnalysis] = React.useState(null)
 
-	const videoRef = React.useRef()
-	const textRef = React.useRef()
+	const videoRef = useRef()
+	const textRef = useRef()
+	const isMounted = useRef(true)
+	const currentTrackId = useRef(null)
 
-	function listenFullScreenChange() {
-		if (!document.fullscreenElement) {
-			if (app.location.last) {
-				app.location.back()
-			} else {
-				app.navigation.goMain()
-			}
+	const dominantColor = useMemo(
+		() => ({ "--dominant-color": getDominantColorStr(coverAnalysis) }),
+		[coverAnalysis],
+	)
+
+	const handleFullScreenChange = useCallback(() => {
+		if (!document.fullscreenElement && app?.location?.last) {
+			app.location.back()
 		}
-	}
+	}, [])
 
-	async function loadCurrentTrackLyrics() {
-		// get current track instance
+	const loadCurrentTrackLyrics = useCallback(async () => {
+		if (!playerState.track_manifest) return
+
 		const instance = app.cores.player.track()
+		if (!instance) return
 
-		let result = await instance.manifest.serviceOperations
-			.fetchLyrics({
-				preferTranslation: translationEnabled,
-			})
-			.catch((err) => {
-				console.error("Failed to fetch lyrics", err)
-				return null
-			})
+		try {
+			const result =
+				await instance.manifest.serviceOperations.fetchLyrics({
+					preferTranslation: translationEnabled,
+				})
 
-		if (result.sync_audio_at && !result.sync_audio_at_ms) {
-			result.sync_audio_at_ms = parseTimeToMs(result.sync_audio_at)
-		}
+			if (!isMounted.current) return
 
-		console.log("Fetched Lyrics >", result)
+			const processedLyrics =
+				result.sync_audio_at && !result.sync_audio_at_ms
+					? {
+							...result,
+							sync_audio_at_ms: parseTimeToMs(
+								result.sync_audio_at,
+							),
+						}
+					: result
 
-		if (result) {
-			setLyrics(result)
-		} else {
+			console.log("Fetched Lyrics >", processedLyrics)
+			setLyrics(processedLyrics || false)
+		} catch (error) {
+			console.error("Failed to fetch lyrics", error)
 			setLyrics(false)
 		}
-	}
+	}, [translationEnabled, playerState.track_manifest])
 
-	async function toggleTranslationEnabled(to) {
-		setTranslationEnabled((prev) => {
-			return to ?? !prev
-		})
-	}
-
-	useMaxScreen()
-
-	// React.useEffect((prev) => {
-	//     if (initialized) {
-	//         loadLyrics(playerState.track_manifest)
-	//     }
-	// }, [translationEnabled])
-
-	//* Handle when context change track_manifest
-	React.useEffect(() => {
-		if (trackManifest && playerState.track_manifest) {
-			if (!lyrics || lyrics.track_id !== playerState.track_manifest._id) {
-				loadCurrentTrackLyrics()
-			}
-		} else {
-			setLyrics(null)
-		}
-	}, [trackManifest])
-
-	React.useEffect(() => {
-		if (!playerState.track_manifest) {
-			return
-		}
-
-		const currentPlayerTrackManifest =
-			playerState.track_manifest.toSeriableObject()
-
-		// check if track manifest is the same
-		if (trackManifest === currentPlayerTrackManifest) {
-			return
-		}
-
-		setTrackManifest(currentPlayerTrackManifest)
-	}, [playerState])
-
-	React.useEffect(() => {
-		const trackInstance = app.cores.player.track()
-
-		if (playerState.track_manifest && trackInstance) {
-			if (
-				typeof trackInstance.manifest.analyzeCoverColor === "function"
-			) {
-				trackInstance.manifest
-					.analyzeCoverColor()
-					.then((analysis) => {
-						setCoverAnalysis(analysis)
-					})
-					.catch((err) => {
-						console.error("Failed to get cover analysis", err)
-					})
-			}
+	// Track manifest comparison
+	useEffect(() => {
+		const newManifest = playerState.track_manifest?.toSeriableObject()
+		if (JSON.stringify(newManifest) !== JSON.stringify(trackManifest)) {
+			setTrackManifest(newManifest)
 		}
 	}, [playerState.track_manifest])
 
-	React.useEffect(() => {
-		setInitialized(true)
-		toggleFullScreen(true)
+	// Lyrics loading trigger
+	useEffect(() => {
+		if (!trackManifest) {
+			setLyrics(null)
+			return
+		}
 
-		document.addEventListener("fullscreenchange", listenFullScreenChange)
+		if (!lyrics || lyrics.track_id !== trackManifest._id) {
+			loadCurrentTrackLyrics()
+		}
+	}, [trackManifest, lyrics?.track_id])
+
+	// Cover analysis
+	useEffect(() => {
+		const getCoverAnalysis = async () => {
+			const trackInstance = app.cores.player.track()
+			if (!trackInstance?.manifest.analyzeCoverColor) return
+
+			try {
+				const analysis =
+					await trackInstance.manifest.analyzeCoverColor()
+				if (isMounted.current) setCoverAnalysis(analysis)
+			} catch (error) {
+				console.error("Failed to get cover analysis", error)
+			}
+		}
+
+		if (playerState.track_manifest) {
+			getCoverAnalysis()
+		}
+	}, [playerState.track_manifest])
+
+	// Initialization and cleanup
+	useEffect(() => {
+		isMounted.current = true
+		toggleFullScreen(true)
+		document.addEventListener("fullscreenchange", handleFullScreenChange)
 
 		return () => {
+			isMounted.current = false
 			toggleFullScreen(false)
 			document.removeEventListener(
 				"fullscreenchange",
-				listenFullScreenChange,
+				handleFullScreenChange,
 			)
 		}
 	}, [])
 
+	// Translation toggler
+	const handleTranslationToggle = useCallback(
+		(to) => setTranslationEnabled((prev) => to ?? !prev),
+		[],
+	)
+
+	// Memoized background component
+	const renderBackground = useMemo(() => {
+		if (!playerState.track_manifest || lyrics?.video_source) return null
+
+		return (
+			<div className="lyrics-background-wrapper">
+				<div className="lyrics-background-cover">
+					<img
+						src={playerState.track_manifest.cover}
+						alt="Album cover"
+					/>
+				</div>
+			</div>
+		)
+	}, [playerState.track_manifest, lyrics?.video_source])
+
 	return (
 		<div
 			className={classnames("lyrics", {
-				["stopped"]: playerState.playback_status !== "playing",
+				stopped: playerState.playback_status !== "playing",
 			})}
-			style={{
-				"--dominant-color": getDominantColorStr(coverAnalysis),
-			}}
+			style={dominantColor}
 		>
 			<div className="lyrics-background-color" />
 
-			{playerState.track_manifest && !lyrics?.video_source && (
-				<div className="lyrics-background-wrapper">
-					<div className="lyrics-background-cover">
-						<img src={playerState.track_manifest.cover} />
-					</div>
-				</div>
-			)}
+			{renderBackground}
 
 			<LyricsVideo ref={videoRef} lyrics={lyrics} />
-
 			<LyricsText ref={textRef} lyrics={lyrics} />
-
 			<PlayerController
 				lyrics={lyrics}
 				translationEnabled={translationEnabled}
-				toggleTranslationEnabled={toggleTranslationEnabled}
+				toggleTranslationEnabled={handleTranslationToggle}
 			/>
 		</div>
 	)
 }
 
-export default EnchancedLyricsPage
+export default EnhancedLyricsPage
