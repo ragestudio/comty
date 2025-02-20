@@ -1,3 +1,5 @@
+@min-item-size: 200px;
+
 .music-releases-list {
 	display: flex;
 	flex-direction: column;
@@ -31,6 +33,9 @@
 
 	.music-releases-list-items {
 		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(@min-item-size, 1fr));
+		gap: 10px;
+		/* display: grid;
 
 		grid-gap: 20px;
 		grid-template-columns: repeat(2, 1fr);
@@ -53,11 +58,17 @@
 
 		@media (min-width: 1920px) {
 			grid-template-columns: repeat(9, 1fr);
-		}
+		} */
 
 		.playlist {
 			justify-self: center;
 			//min-width: 372px !important;
+
+			width: unset;
+			height: unset;
+
+			min-width: @min-item-size;
+			min-height: @min-item-size;
 		}
 	}
 }
