@@ -7,8 +7,8 @@ import { MdPlayCircle, MdHeadphones } from "react-icons/md"
 
 import "./index.less"
 
-const RadioItem = ({ item }) => {
-	const start = () => {
+const RadioItem = ({ item, style }) => {
+	const onClickItem = () => {
 		app.cores.player.start(
 			{
 				title: item.name,
@@ -21,11 +21,21 @@ const RadioItem = ({ item }) => {
 		)
 	}
 
+	if (!item) {
+		return (
+			<div className="radio-list-item empty" style={style}>
+				<div className="radio-list-item-content">
+					<Skeleton />
+				</div>
+			</div>
+		)
+	}
+
 	return (
-		<div className="radio-list-item" onClick={start}>
+		<div className="radio-list-item" onClick={onClickItem} style={style}>
 			<Image className="radio-list-item-cover" src={item.background} />
 			<div className="radio-list-item-content">
-				<h1>{item.name}</h1>
+				<h1 id="title">{item.name}</h1>
 				<p>{item.description}</p>
 
 				<div className="radio-list-item-info">
@@ -61,6 +71,10 @@ const RadioTab = () => {
 			{R_Radios.map((item) => (
 				<RadioItem key={item.id} item={item} />
 			))}
+
+			<RadioItem style={{ opacity: 0.5 }} />
+			<RadioItem style={{ opacity: 0.4 }} />
+			<RadioItem style={{ opacity: 0.3 }} />
 		</div>
 	)
 }

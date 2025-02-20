@@ -1,11 +1,12 @@
+@min-item-width: 250px;
+@min-item-height: 150px;
+
 .radio-list {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(@min-item-width, 1fr));
 	gap: 10px;
 
 	width: 100%;
-
-	gap: 20px;
 }
 
 .radio-list-item {
@@ -14,8 +15,8 @@
 	display: flex;
 	flex-direction: column;
 
-	height: 160px;
-	width: 100%;
+	min-width: @min-item-width;
+	min-height: @min-item-height;
 
 	border-radius: 16px;
 	background-color: var(--background-color-accent);
@@ -24,6 +25,14 @@
 
 	&:hover {
 		cursor: pointer;
+
+		.radio-list-item-content {
+			backdrop-filter: blur(2px);
+		}
+	}
+
+	&.empty {
+		cursor: default;
 	}
 
 	.lazy-load-image-background,
@@ -37,6 +46,10 @@
 
 		width: 100%;
 		height: 100%;
+
+		img {
+			object-fit: cover;
+		}
 	}
 
 	.radio-list-item-content {
@@ -51,9 +64,9 @@
 		width: 100%;
 		height: 100%;
 
-		backdrop-filter: blur(2px);
-
 		padding: 16px;
+
+		transition: all 150ms ease-in-out;
 
 		.radio-list-item-info {
 			display: flex;
