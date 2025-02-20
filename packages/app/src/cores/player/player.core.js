@@ -140,7 +140,10 @@ export default class Player extends Core {
 		this.queue.currentItem.audio.muted = this.state.muted
 		this.queue.currentItem.audio.loop =
 			this.state.playback_mode === "repeat"
-		this.queue.currentItem.gainNode.gain.value = this.state.volume
+		this.queue.currentItem.gainNode.gain.value = Math.pow(
+			this.state.volume,
+			2,
+		)
 
 		// play
 		await this.queue.currentItem.audio.play()
@@ -307,7 +310,7 @@ export default class Player extends Core {
 
 			// set gain exponentially
 			this.queue.currentItem.gainNode.gain.linearRampToValueAtTime(
-				this.state.volume,
+				Math.pow(this.state.volume, 2),
 				this.audioContext.currentTime + Player.gradualFadeMs / 1000,
 			)
 
@@ -392,15 +395,16 @@ export default class Player extends Core {
 			volume = 0
 		}
 
-		volume = Math.pow(volume, 2)
-
 		this.state.volume = volume
 
 		AudioPlayerStorage.set("volume", volume)
 
 		if (this.queue.currentItem) {
 			if (this.queue.currentItem.gainNode) {
-				this.queue.currentItem.gainNode.gain.value = this.state.volume
+				this.queue.currentItem.gainNode.gain.value = Math.pow(
+					this.state.volume,
+					2,
+				)
 			}
 		}
 
