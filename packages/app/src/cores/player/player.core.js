@@ -392,6 +392,8 @@ export default class Player extends Core {
 			volume = 0
 		}
 
+		volume = Math.pow(volume, 2)
+
 		this.state.volume = volume
 
 		AudioPlayerStorage.set("volume", volume)
