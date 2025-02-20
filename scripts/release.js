@@ -176,15 +176,18 @@ async function main() {
 			},
 			process.env.GITHUB_TOKEN,
 		).catch((err) => {
-			console.error(`🆘 Failed to create release: ${err}`)
+			console.error(
+				`🆘 Failed to create release: ${err} >`,
+				err.response.data,
+			)
 			return false
 		})
-
-		console.log("🎉 Release done!")
 
 		if (!release) {
 			return false
 		}
+
+		console.log("🎉 Release done!")
 
 		const assets = await uploadAssets(octokit, repo, release, [
 			{
