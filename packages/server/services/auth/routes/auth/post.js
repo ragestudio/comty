@@ -133,9 +133,10 @@ export default async (req, res) => {
 
 	// emit to ems to notify user for the new login, in the background
 	try {
-		global.ipc.call("ems", "new:login", authData).catch((error) => {
-			// whoipsi dupsi
-			console.error(error)
+		global.queues.createJob("notify-new-login", {
+			authData,
+			minDate: new Date().getTime() - 3 * 30 * 24 * 60 * 60 * 1000,
+			currentToken: token,
 		})
 	} catch (error) {
 		// whoipsi dupsi
