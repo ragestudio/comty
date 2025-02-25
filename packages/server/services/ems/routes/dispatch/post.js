@@ -1,42 +1,43 @@
 import templates from "../../templates"
 
 export default {
-    useContext: ["mailTransporter"],
-    middlewares: ["withAuthentication"],
-    fn: async (req, res) => {
-        req.body = await req.urlencoded()
+	useContext: ["mailTransporter"],
+	middlewares: ["withAuthentication", "onlyAdmin"],
+	fn: async (req, res) => {
+		req.body = await req.urlencoded()
 
-        let { to, subject, body, template } = req.body
-        
-        if (template) {
-            if (!templates[template]) {
-                throw new OperationError(404, "Template not found")
-            }
+		let { to, subject, body, template } = req.body
 
-            body = templates[template]({
-                ...req.body
-            })
-        }
+		if (template) {
+			if (!templates[template]) {
+				throw new OperationError(404, "Template not found")
+			}
 
-        const mailOptions = {
-            from: process.env.SMTP_USERNAME,
-            to: to,
-            subject: subject,
-            html: body
-        }
+			body = templates[template]({
+				...req.body,
+			})
+		}
 
-        console.log(mailOptions)
+		const mailOptions = {
+			from: process.env.SMTP_USERNAME,
+			to: to,
+			subject: subject,
+			html: body,
+		}
 
-        console.log(`Sending email to ${to}...`)
+		console.log(mailOptions)
 
-        const result = await this.default.contexts.mailTransporter.sendMail(mailOptions)
+		console.log(`Sending email to ${to}...`)
 
-        console.log("Email sent! >", result)
+		const result =
+			await this.default.contexts.mailTransporter.sendMail(mailOptions)
 
-        return res.json({
-            code: 0,
-            message: "ok",
-            result: result
-        })
-    }
+		console.log("Email sent! >", result)
+
+		return res.json({
+			code: 0,
+			message: "ok",
+			result: result,
+		})
+	},
 }
