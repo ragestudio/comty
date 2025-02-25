@@ -18,6 +18,12 @@ WORKDIR /comty-server
 
 # Copy Files
 COPY package.json ./
+
+# Install modules & rebuild for host
+RUN npm install
+RUN npm rebuild @tensorflow/tfjs-node --build-from-source
+
+# Copy Files
 COPY . .
 
 # Fix permissions
@@ -26,10 +32,6 @@ RUN chown -R node:node /comty-server
 
 # Set user to node
 USER node
-
-# Install modules & rebuild for host
-RUN npm install
-RUN npm rebuild @tensorflow/tfjs-node --build-from-source
 
 # Start server
 RUN export NODE_ENV=production
