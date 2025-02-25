@@ -1,8 +1,6 @@
 import fs from "node:fs"
-import Queue from "bull"
+import { Queue, Worker } from "bullmq"
 import { composeURL as composeRedisConnectionString } from "@shared-classes/RedisClient"
-
-process.env.DEBUG = "bull:*"
 
 export default class TaskQueueManager {
 	constructor(params, ctx) {
@@ -10,10 +8,12 @@ export default class TaskQueueManager {
 			throw new Error("Missing params")
 		}
 
-		this.params = params
-	}
+		this.ctx = ctx
 
-	queues = new Object()
+		this.params = params
+		this.queues = {}
+		this.workers = {}
+	}
 
 	async initialize(options = {}) {
 		const queues = fs.readdirSync(this.params.workersPath)
@@ -36,20 +36,29 @@ export default class TaskQueueManager {
 	}
 
 	registerQueue = (queueObj, options) => {
-		let queue = new Queue(queueObj.id, {
-			redis: composeRedisConnectionString(options.redisOptions),
-			removeOnSuccess: true,
+		const connection = this.ctx.engine.ws.redis
+
+		const queue = new Queue(queueObj.id, {
+			connection,
+			defaultJobOptions: {
+				removeOnComplete: true,
+			},
 		})
 
-		queue = this.registerQueueEvents(queue)
+		const worker = new Worker(queueObj.id, queueObj.process, {
+			connection,
+			concurrency: queueObj.maxJobs ?? 1,
+		})
 
-		queue.process(queueObj.maxJobs ?? 1, queueObj.process)
+		this.registerQueueEvents(worker)
+		this.queues[queueObj.id] = queue
+		this.workers[queueObj.id] = worker
 
 		return queue
 	}
 
-	registerQueueEvents = (queue) => {
-		queue.on("progress", (job, progress) => {
+	registerQueueEvents = (worker) => {
+		worker.on("progress", (job, progress) => {
 			try {
 				console.log(`Job ${job.id} reported progress: ${progress}%`)
 
@@ -61,11 +70,11 @@ export default class TaskQueueManager {
 					})
 				}
 			} catch (error) {
-				// sowy
+				// manejar error
 			}
 		})
 
-		queue.on("completed", (job, result) => {
+		worker.on("completed", (job, result) => {
 			try {
 				console.log(`Job ${job.id} completed with result:`, result)
 
@@ -78,7 +87,7 @@ export default class TaskQueueManager {
 			} catch (error) {}
 		})
 
-		queue.on("failed", (job, error) => {
+		worker.on("failed", (job, error) => {
 			try {
 				console.error(`Job ${job.id} failed:`, error)
 
@@ -90,39 +99,52 @@ export default class TaskQueueManager {
 				}
 			} catch (error) {}
 		})
-
-		return queue
 	}
 
-	createJob = async (queueId, data) => {
+	createJob = async (queueId, data, { useSSE = false } = {}) => {
 		const queue = this.queues[queueId]
 
 		if (!queue) {
 			throw new Error("Queue not found")
 		}
 
-		const sseChannelId = `${global.nanoid()}`
+		let sseChannelId = null
 
-		// create job and create a sse channel id
-		const job = queue.add({
+		if (useSSE) {
+			sseChannelId = `${global.nanoid()}`
+		}
+
+		const job = await queue.add("default", {
 			...data,
 			sseChannelId,
 		})
 
-		// create the sse channel
-		await global.sse.createChannel(sseChannelId)
+		if (sseChannelId) {
+			await global.sse.createChannel(sseChannelId)
+			console.log(
+				`[JOB] Created new job with SSE channel [${sseChannelId}]`,
+			)
 
-		console.log(`[JOB] Created new job with SSE channel [${sseChannelId}]`)
+			await global.sse.sendToChannel(sseChannelId, {
+				status: "progress",
+				events: "job_queued",
+				progress: 5,
+			})
+		}
 
-		await global.sse.sendToChannel(sseChannelId, {
-			status: "progress",
-			events: "job_queued",
-			progress: 5,
-		})
+		console.log(`[JOB] Created new job with ID [${job.id}]`)
 
 		return {
 			...job,
-			sseChannelId: sseChannelId,
+			sseChannelId,
 		}
+	}
+
+	// this function cleans up all queues, must be synchronous
+	cleanUp = () => {
+		const queues = Object.values(this.queues)
+		queues.forEach((queue) => queue.close())
+
+		console.log("All queues have been closed")
 	}
 }
