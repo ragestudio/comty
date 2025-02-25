@@ -30,9 +30,12 @@ class API extends Server {
 		limits: {},
 	}
 
-	queuesManager = new TaskQueueManager({
-		workersPath: `${__dirname}/queues`,
-	})
+	queuesManager = new TaskQueueManager(
+		{
+			workersPath: `${__dirname}/queues`,
+		},
+		this,
+	)
 
 	async onInitialize() {
 		global.sse = this.contexts.SSEManager

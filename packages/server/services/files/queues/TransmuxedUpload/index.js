@@ -29,7 +29,7 @@ export default {
 				transmuxOptions: transmuxOptions,
 				cachePath: cachePath,
 				onProgress: (progress) => {
-					job.progress(progress)
+					job.updateProgress(progress)
 				},
 			})
 

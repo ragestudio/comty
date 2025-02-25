@@ -60,15 +60,21 @@ export default {
 
 				if (req.headers["transmux"] || limits.useCompression === true) {
 					// add a background task
-					const job = await global.queues.createJob("remote_upload", {
-						filePath: build.filePath,
-						parentDir: req.auth.session.user_id,
-						service: limits.useProvider,
-						useCompression: limits.useCompression,
-						transmux: req.headers["transmux"] ?? false,
-						transmuxOptions: req.headers["transmux-options"],
-						cachePath: tmpPath,
-					})
+					const job = await global.queues.createJob(
+						"remote_upload",
+						{
+							filePath: build.filePath,
+							parentDir: req.auth.session.user_id,
+							service: limits.useProvider,
+							useCompression: limits.useCompression,
+							transmux: req.headers["transmux"] ?? false,
+							transmuxOptions: req.headers["transmux-options"],
+							cachePath: tmpPath,
+						},
+						{
+							useSSE: true,
+						},
+					)
 
 					const sseChannelId = job.sseChannelId
 
