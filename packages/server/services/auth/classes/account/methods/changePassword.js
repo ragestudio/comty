@@ -30,7 +30,7 @@ export default async (
 	}
 
 	let user = await User.findById(
-		verificationTokenDecoded.user_id || user_id,
+		user_id || verificationTokenDecoded?.user_id,
 	).select("+password")
 
 	if (!user) {
