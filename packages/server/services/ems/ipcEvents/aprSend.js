@@ -1,26 +1,35 @@
 import templates from "../templates"
 
 export default async (ctx, data) => {
-    const { user_id, username, email, apr_link, created_at, expires_at, ip_address, client } = data
+	const { code, created_at, expires_at, ip_address, client } = data
+	const { email, username } = data.user
 
-    if (!user_id || !username || !email || !apr_link || !created_at || !expires_at || !ip_address || !client) {
-        throw new OperationError(400, "Bad request")
-    }
+	console.log(`Sending password recovery email to ${email}`)
 
-    const result = await ctx.mailTransporter.sendMail({
-        from: process.env.SMTP_USERNAME,
-        to: email,
-        subject: "Password reset",
-        html: templates.password_recovery({
-            username: username,
+	if (
+		!username ||
+		!email ||
+		!code ||
+		!created_at ||
+		!expires_at ||
+		!ip_address ||
+		!client
+	) {
+		throw new OperationError(400, "Bad request")
+	}
 
-            apr_link: apr_link,
+	const result = await ctx.mailTransporter.sendMail({
+		from: process.env.SMTP_USERNAME,
+		to: email,
+		subject: "Password reset",
+		html: templates.password_recovery({
+			username: username,
+			code: code,
+			date: new Date(created_at),
+			ip: ip_address,
+			client: client,
+		}),
+	})
 
-            date: new Date(created_at),
-            ip: ip_address,
-            client: client,
-        }),
-    })
-
-    return result
+	return result
 }
