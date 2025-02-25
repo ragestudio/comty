@@ -1,39 +1,104 @@
 import bcrypt from "bcrypt"
-import { User, OperationLog } from "@db_models"
+import { User, OperationLog, PasswordRecover } from "@db_models"
 import Account from "@classes/account"
+import AuthToken from "@shared-classes/AuthToken"
 
-export default async ({ user_id, old_hash, old_password, new_password, log_comment }, req) => {
-    let user = await User.findById(user_id).select("+password")
+export default async (
+	{
+		user_id,
+		old_hash,
+		old_password,
+		new_password,
+		code,
+		verificationToken,
+		log_comment,
+	},
+	req,
+) => {
+	if (!code && !old_password) {
+		throw new OperationError(
+			400,
+			"Either code or old_password must be provided",
+		)
+	}
 
-    user = await Account.loginStrategy({ password: old_password, hash: old_hash }, user)
+	let verificationTokenDecoded = null
 
-    await Account.passwordMeetPolicy(new_password)
+	if (verificationToken) {
+		verificationTokenDecoded =
+			await AuthToken.basicDecode(verificationToken)
+	}
 
-    user.password = bcrypt.hashSync(new_password, parseInt(process.env.BCRYPT_ROUNDS ?? 3))
+	let user = await User.findById(
+		verificationTokenDecoded.user_id || user_id,
+	).select("+password")
 
-    await user.save()
+	if (!user) {
+		throw new OperationError(404, "User not found")
+	}
 
-    const operation = {
-        type: "password:changed",
-        user_id: user._id.toString(),
-        date: Date.now(),
-        comments: []
-    }
+	if (code) {
+		const passwordRecoverSession = await PasswordRecover.findOne({ code })
 
-    if (log_comment) {
-        operation.comments.push(log_comment)
-    }
+		if (!passwordRecoverSession) {
+			throw new OperationError(401, "Invalid code")
+		}
 
-    if (typeof req === "object") {
-        operation.ip_address = req.headers["x-forwarded-for"]?.split(",")[0] ?? req.socket?.remoteAddress ?? req.ip
-        operation.client = req.headers["user-agent"]
-    }
+		if (
+			verificationTokenDecoded.recoverySessionId !==
+			passwordRecoverSession._id.toString()
+		) {
+			throw new OperationError(401, "Invalid code")
+		}
 
-    const log = new OperationLog(operation)
+		if (passwordRecoverSession.expires < Date.now()) {
+			throw new OperationError(401, "Code expired")
+		}
 
-    await log.save()
+		// delete passwordRecoverSession
+		await PasswordRecover.findByIdAndDelete(
+			passwordRecoverSession._id.toString(),
+		)
+	} else {
+		user = await Account.loginStrategy(
+			{ password: old_password, hash: old_hash },
+			user,
+		)
+	}
 
-    ipc.invoke("ems", "password:changed", operation)
+	await Account.passwordMeetPolicy(new_password)
 
-    return user
+	user.password = bcrypt.hashSync(
+		new_password,
+		parseInt(process.env.BCRYPT_ROUNDS ?? 3),
+	)
+
+	await user.save()
+
+	const operation = {
+		type: "password:changed",
+		user_id: user._id.toString(),
+		date: Date.now(),
+		comments: [],
+	}
+
+	if (log_comment) {
+		operation.comments.push(log_comment)
+	}
+
+	if (typeof req === "object") {
+		operation.ip_address =
+			req.headers["x-forwarded-for"]?.split(",")[0] ??
+			req.socket?.remoteAddress ??
+			req.ip
+		operation.client = req.headers["user-agent"]
+	}
+
+	const log = new OperationLog(operation)
+
+	await log.save()
+
+	ipc.invoke("ems", "password:changed", operation)
+
+	return user
 }
