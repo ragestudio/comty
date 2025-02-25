@@ -4,62 +4,63 @@ import config from "@config"
 import { Icons } from "@components/Icons"
 
 const MainSelector = (props) => {
-    const {
-        onClickLogin,
-        onClickRegister,
-    } = props
+	return (
+		<>
+			<div className="content_header">
+				<img src={config.logo.alt} className="logo" />
+			</div>
 
-    return <>
-        <div className="content_header">
-            <img src={config.logo.alt} className="logo" />
-        </div>
+			<div className="actions">
+				{app.userData && (
+					<antd.Button
+						type="default"
+						size="large"
+						onClick={() => {
+							app.navigation.goMain()
+						}}
+					>
+						<antd.Avatar
+							size={23}
+							shape="square"
+							src={app.userData.avatar}
+						/>{" "}
+						Continue as {app.userData.username}
+					</antd.Button>
+				)}
 
-        <div className="actions">
-            {
-                app.userData && <antd.Button
-                    type="default"
-                    size="large"
-                    onClick={() => {
-                        app.navigation.goMain()
-                    }}
-                >
-                    <antd.Avatar size={23} shape="square" src={app.userData.avatar} /> Continue as {app.userData.username}
-                </antd.Button>
-            }
+				<antd.Button
+					onClick={() => app.controls.openLoginForm()}
+					icon={<Icons.FiLogIn />}
+					type="primary"
+				>
+					Continue with a Comty™ Account
+				</antd.Button>
 
-            <antd.Button
-                onClick={onClickLogin}
-                icon={<Icons.FiLogIn />}
-                type="primary"
-            >
-                Continue with a Comty™ Account
-            </antd.Button>
+				<antd.Button
+					onClick={() => app.controls.openLoginForm()}
+					icon={<Icons.FiLogIn />}
+					type="primary"
+					disabled
+				>
+					Continue with a RageStudio© ID™
+				</antd.Button>
 
-            <antd.Button
-                onClick={onClickLogin}
-                icon={<Icons.FiLogIn />}
-                type="primary"
-                disabled
-            >
-                Continue with a RageStudio© ID™
-            </antd.Button>
+				<h4>Or create a new account</h4>
 
-            <h4>Or create a new account</h4>
+				<antd.Button
+					onClick={() => props.setActiveKey("register")}
+					icon={<Icons.FiUserPlus />}
+					type="primary"
+				>
+					Create a Comty™ Account
+				</antd.Button>
 
-            <antd.Button
-                onClick={onClickRegister}
-                icon={<Icons.FiUserPlus />}
-                type="primary"
-            >
-                Create a Comty™ Account
-            </antd.Button>
-
-            <p style={{ display: "inline" }}>
-                <Icons.FiInfo />
-                Registering a new account accepts the <a onClick={() => app.location.push("/terms")}>Terms and Conditions</a> and <a onClick={() => app.location.push("/privacy")}>Privacy policy</a> for the services provided by {config.author}
-            </p>
-        </div>
-    </>
+				<a onClick={() => props.setActiveKey("recovery")}>
+					I need help to recover my account
+				</a>
+			</div>
+		</>
+	)
 }
 
 export default MainSelector
