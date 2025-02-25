@@ -2,7 +2,7 @@ import Account from "@classes/account"
 import requiredFields from "@shared-utils/requiredFields"
 
 export default {
-	//middlewares: ["withAuthentication"],
+	middlewares: ["withOptionalAuthentication"],
 	fn: async (req) => {
 		requiredFields(["new_password"], req.body)
 
