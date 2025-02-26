@@ -1,19 +1,17 @@
-require("dotenv").config()
+import dotenv from "dotenv"
+dotenv.config()
 
-// dependencies
-const packagejson = require("../package.json")
-const path = require("path")
-const fs = require("fs")
-const child_process = require("child_process")
-const { Octokit } = require("@octokit/rest")
+import packagejson from "../package.json" assert { type: "json" }
+import path from "path"
+import fs from "fs"
+import child_process from "child_process"
+import { Octokit } from "@octokit/rest"
 
-// utils
-const compressDistBundle = require("./utils/compressDistBundle")
-const buildAppDist = require("./utils/buildAppDist")
-const createGithubRelease = require("./utils/createGithubRelease")
-const uploadAssets = require("./utils/uploadAssets")
-const composeChangelog = require("./utils/composeChangelog")
-const bumpVersion = require("./utils/bumpVersion")
+import compressDistBundle from "./utils/compressDistBundle.js"
+import buildAppDist from "./utils/buildAppDist.js"
+import createGithubRelease from "./utils/createGithubRelease.js"
+import uploadAssets from "./utils/uploadAssets.js"
+import composeChangelog from "./utils/composeChangelog.js"
 
 // constants & paths
 const repo = "ragestudio/comty"
@@ -64,7 +62,7 @@ async function main() {
 		steps.ignoreVersion = true
 	}
 
-	// check if is any changes pending to commit
+	// Verifica si hay cambios pendientes para hacer commit
 	if (!steps.ignoreCommits) {
 		const gitStatus = child_process
 			.execSync("git status --porcelain", {
@@ -83,7 +81,7 @@ async function main() {
 
 	let currentVersion = packagejson.version
 
-	// check if currentVersion match with current latest release on github
+	// Verifica si la versión actual coincide con el último release en GitHub
 	const latestRelease = await octokit.repos
 		.getLatestRelease({
 			owner: repo.split("/")[0],
@@ -101,45 +99,10 @@ async function main() {
 
 	if (!steps.ignoreVersion) {
 		if (latestRelease && latestRelease.data.tag_name === currentVersion) {
-			if (process.argv.includes("--bump")) {
-				const bumpType =
-					process.argv[process.argv.indexOf("--bump") + 1]
-
-				const newVersion = await bumpVersion({
-					root: process.cwd(),
-					type: bumpType,
-					count: 1,
-				}).catch((error) => {
-					console.error(`🆘 Failed to bump version >`, error)
-					return false
-				})
-
-				if (!newVersion) {
-					throw new Error("Failed to bump version")
-				}
-
-				currentVersion = newVersion
-
-				// create new commit
-				await child_process.execSync(
-					`git add . && git commit -m "Bump version to ${currentVersion}"`,
-					{
-						cwd: process.cwd(),
-						stdio: "inherit",
-					},
-				)
-
-				// push to remote
-				await child_process.execSync(`git push`, {
-					cwd: process.cwd(),
-					stdio: "inherit",
-				})
-			} else {
-				console.log(
-					"🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --ignore-version to force release.",
-				)
-				return true
-			}
+			console.log(
+				"🚫 Current version is already latest version, please bump version first. \n - use --bump <patch|minor|major> to automatically bump version. \n - use --ignore-version to force release.",
+			)
+			return true
 		}
 	}
 
@@ -185,17 +148,15 @@ async function main() {
 		])
 
 		console.log("🎉 Assets uploaded! >", assets)
-
 		console.log(`🔗 ${release.html_url}`)
 
 		fs.unlinkSync(packedDistPath)
 	}
 
 	console.log("All Done!")
-
 	return true
 }
 
 main().catch((err) => {
-	console.error(`Fatal error: `, err)
+	console.error("Fatal error: ", err)
 })

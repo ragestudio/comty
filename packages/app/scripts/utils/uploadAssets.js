@@ -1,4 +1,4 @@
-async function uploadAssets(octokit, repo, release, assets) {
+export default async function uploadAssets(octokit, repo, release, assets) {
 	console.log("⚒  Uploading assets...")
 
 	console.log(`ReleaseID: ${release.id}`)
@@ -19,5 +19,3 @@ async function uploadAssets(octokit, repo, release, assets) {
 
 	return true
 }
-
-module.exports = uploadAssets
