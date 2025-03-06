@@ -103,7 +103,7 @@ const AccountButton = React.forwardRef((props, ref) => {
 					label: "Logout",
 					danger: true,
 					onClick: () => {
-						app.eventBus.emit("app.logout_request")
+						app.auth.logout()
 					},
 				},
 			],
