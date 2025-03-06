@@ -1,7 +1,6 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-import packagejson from "../package.json" assert { type: "json" }
 import path from "path"
 import fs from "fs"
 import child_process from "child_process"
@@ -26,6 +25,14 @@ async function main() {
 		console.error("🆘 Missing GITHUB_TOKEN env")
 		return false
 	}
+
+	let packagejson = fs.readFileSync(
+		path.join(process.cwd(), "./package.json"),
+		"utf8",
+	)
+	packagejson = JSON.parse(packagejson)
+
+	let currentVersion = packagejson.version
 
 	const octokit = new Octokit({
 		auth: process.env.GITHUB_TOKEN,
@@ -78,8 +85,6 @@ async function main() {
 			return false
 		}
 	}
-
-	let currentVersion = packagejson.version
 
 	// Verifica si la versión actual coincide con el último release en GitHub
 	const latestRelease = await octokit.repos
