@@ -29,7 +29,7 @@ const MainSelector = (props) => {
 				)}
 
 				<antd.Button
-					onClick={() => app.controls.openLoginForm()}
+					onClick={() => app.auth.login()}
 					icon={<Icons.FiLogIn />}
 					type="primary"
 				>
@@ -37,7 +37,7 @@ const MainSelector = (props) => {
 				</antd.Button>
 
 				<antd.Button
-					onClick={() => app.controls.openLoginForm()}
+					onClick={() => app.auth.login()}
 					icon={<Icons.FiLogIn />}
 					type="primary"
 					disabled
