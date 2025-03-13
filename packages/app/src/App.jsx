@@ -1,5 +1,3 @@
-import "./patches"
-
 import React from "react"
 import { Runtime } from "@ragestudio/vessel"
 import { Helmet } from "react-helmet"
