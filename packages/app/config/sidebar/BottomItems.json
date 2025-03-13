@@ -1,13 +1,18 @@
 [
-    {
-        "id": "search",
-        "label": "Search",
-        "icon": "FiSearch"
-    },
-    {
-        "id": "settings",
-        "label": "Settings",
-        "icon": "FiSettings",
-        "path": "/settings"
-    }
+	{
+		"id": "search",
+		"label": "Search",
+		"icon": "FiSearch"
+	},
+	{
+		"id": "apps",
+		"label": "Apps",
+		"icon": "MdApps"
+	},
+	{
+		"id": "settings",
+		"label": "Settings",
+		"icon": "FiSettings",
+		"path": "/settings"
+	}
 ]
