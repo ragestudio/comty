@@ -95,6 +95,12 @@ export default class Layout extends React.PureComponent {
 				layoutType: layout,
 			})
 		},
+		toggleTotalWindowHeight: (to) => {
+			return this.layoutInterface.toggleRootContainerClassname(
+				"total-window-height",
+				to,
+			)
+		},
 		toggleCenteredContent: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname(
 				"centered-content",
