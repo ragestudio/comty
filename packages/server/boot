@@ -9,6 +9,16 @@ const { webcrypto: crypto } = require("node:crypto")
 const { InfisicalClient } = require("@infisical/sdk")
 const moduleAlias = require("module-alias")
 const { onExit } = require("signal-exit")
+const opentelemetry = require("@opentelemetry/sdk-node")
+const {
+	getNodeAutoInstrumentations,
+} = require("@opentelemetry/auto-instrumentations-node")
+const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-http")
+const { OTLPLogExporter } = require("@opentelemetry/exporter-logs-otlp-http")
+const { Resource } = require("@opentelemetry/resources")
+const {
+	SemanticResourceAttributes,
+} = require("@opentelemetry/semantic-conventions")
 
 // Override file execution arg
 process.argv.splice(1, 1)
@@ -19,163 +29,222 @@ global.Boot = Boot
 global.isProduction = process.env.NODE_ENV === "production"
 
 global["__root"] = path.resolve(process.cwd())
-global["__src"] = path.resolve(globalThis["__root"], path.dirname(process.argv[1]))
+global["__src"] = path.resolve(
+	globalThis["__root"],
+	path.dirname(process.argv[1]),
+)
 
 global["aliases"] = {
-    "root": global["__root"],
-    "src": global["__src"],
+	root: global["__root"],
+	src: global["__src"],
 
-    // expose shared resources
-    "@db_models": path.resolve(__dirname, "db_models"),
-    "@shared-utils": path.resolve(__dirname, "utils"),
-    "@shared-classes": path.resolve(__dirname, "classes"),
-    "@shared-lib": path.resolve(__dirname, "lib"),
-    "@shared-middlewares": path.resolve(__dirname, "middlewares"),
+	// expose shared resources
+	"@db_models": path.resolve(__dirname, "db_models"),
+	"@shared-utils": path.resolve(__dirname, "utils"),
+	"@shared-classes": path.resolve(__dirname, "classes"),
+	"@shared-lib": path.resolve(__dirname, "lib"),
+	"@shared-middlewares": path.resolve(__dirname, "middlewares"),
 
-    // expose internal resources
-    "@lib": path.resolve(global["__src"], "lib"),
-    "@middlewares": path.resolve(global["__src"], "middlewares"),
-    "@controllers": path.resolve(global["__src"], "controllers"),
-    "@config": path.resolve(global["__src"], "config"),
-    "@shared": path.resolve(global["__src"], "shared"),
-    "@classes": path.resolve(global["__src"], "classes"),
-    "@models": path.resolve(global["__src"], "models"),
-    "@services": path.resolve(global["__src"], "services"),
-    "@utils": path.resolve(global["__src"], "utils"),
+	// expose internal resources
+	"@lib": path.resolve(global["__src"], "lib"),
+	"@middlewares": path.resolve(global["__src"], "middlewares"),
+	"@controllers": path.resolve(global["__src"], "controllers"),
+	"@config": path.resolve(global["__src"], "config"),
+	"@shared": path.resolve(global["__src"], "shared"),
+	"@classes": path.resolve(global["__src"], "classes"),
+	"@models": path.resolve(global["__src"], "models"),
+	"@services": path.resolve(global["__src"], "services"),
+	"@utils": path.resolve(global["__src"], "utils"),
 }
 
 function registerBaseAliases(fromPath, customAliases = {}) {
-    if (typeof fromPath === "undefined") {
-        if (module.parent.filename.includes("dist")) {
-            fromPath = path.resolve(process.cwd(), "dist")
-        } else {
-            fromPath = path.resolve(process.cwd(), "src")
-        }
-    }
+	if (typeof fromPath === "undefined") {
+		if (module.parent.filename.includes("dist")) {
+			fromPath = path.resolve(process.cwd(), "dist")
+		} else {
+			fromPath = path.resolve(process.cwd(), "src")
+		}
+	}
 
-    moduleAlias.addAliases({
-        ...customAliases,
-        "@controllers": path.resolve(fromPath, "controllers"),
-        "@middlewares": path.resolve(fromPath, "middlewares"),
-        "@models": path.resolve(fromPath, "models"),
-        "@classes": path.resolve(fromPath, "classes"),
-        "@lib": path.resolve(fromPath, "lib"),
-        "@utils": path.resolve(fromPath, "utils"),
-    })
+	moduleAlias.addAliases({
+		...customAliases,
+		"@controllers": path.resolve(fromPath, "controllers"),
+		"@middlewares": path.resolve(fromPath, "middlewares"),
+		"@models": path.resolve(fromPath, "models"),
+		"@classes": path.resolve(fromPath, "classes"),
+		"@lib": path.resolve(fromPath, "lib"),
+		"@utils": path.resolve(fromPath, "utils"),
+	})
 }
 
 function registerPatches() {
-    global.b64Decode = (data) => {
-        return Buffer.from(data, "base64").toString("utf-8")
-    }
-    global.b64Encode = (data) => {
-        return Buffer.from(data, "utf-8").toString("base64")
-    }
+	global.b64Decode = (data) => {
+		return Buffer.from(data, "base64").toString("utf-8")
+	}
+	global.b64Encode = (data) => {
+		return Buffer.from(data, "utf-8").toString("base64")
+	}
 
-    global.nanoid = (t = 21) => crypto.getRandomValues(new Uint8Array(t)).reduce(((t, e) => t += (e &= 63) < 36 ? e.toString(36) : e < 62 ? (e - 26).toString(36).toUpperCase() : e > 62 ? "-" : "_"), "");
+	global.nanoid = (t = 21) =>
+		crypto
+			.getRandomValues(new Uint8Array(t))
+			.reduce(
+				(t, e) =>
+					(t +=
+						(e &= 63) < 36
+							? e.toString(36)
+							: e < 62
+								? (e - 26).toString(36).toUpperCase()
+								: e > 62
+									? "-"
+									: "_"),
+				"",
+			)
 
-    Array.prototype.updateFromObjectKeys = function (obj) {
-        this.forEach((value, index) => {
-            if (obj[value] !== undefined) {
-                this[index] = obj[value]
-            }
-        })
+	Array.prototype.updateFromObjectKeys = function (obj) {
+		this.forEach((value, index) => {
+			if (obj[value] !== undefined) {
+				this[index] = obj[value]
+			}
+		})
 
-        return this
-    }
+		return this
+	}
 
-    global.ToBoolean = (value) => {
-        if (typeof value === "boolean") {
-            return value
-        }
+	global.ToBoolean = (value) => {
+		if (typeof value === "boolean") {
+			return value
+		}
 
-        if (typeof value === "string") {
-            return value.toLowerCase() === "true"
-        }
+		if (typeof value === "string") {
+			return value.toLowerCase() === "true"
+		}
 
-        return false
-    }
+		return false
+	}
 }
 
 function registerAliases() {
-    registerBaseAliases(global["__src"], global["aliases"])
+	registerBaseAliases(global["__src"], global["aliases"])
 }
 
 async function injectEnvFromInfisical() {
-    const envMode = global.FORCE_ENV ?? global.isProduction ? "prod" : "dev"
+	const envMode = (global.FORCE_ENV ?? global.isProduction) ? "prod" : "dev"
 
-    console.log(`[BOOT] 🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`)
+	console.log(
+		`[BOOT] 🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`,
+	)
 
-    const client = new InfisicalClient({
-        auth: {
-            universalAuth: {
-                clientId: process.env.INFISICAL_CLIENT_ID,
-                clientSecret: process.env.INFISICAL_CLIENT_SECRET,
-            }
-        },
-    })
+	const client = new InfisicalClient({
+		auth: {
+			universalAuth: {
+				clientId: process.env.INFISICAL_CLIENT_ID,
+				clientSecret: process.env.INFISICAL_CLIENT_SECRET,
+			},
+		},
+	})
 
-    const secrets = await client.listSecrets({
-        environment: envMode,
-        path: process.env.INFISICAL_PATH ?? "/",
-        projectId: process.env.INFISICAL_PROJECT_ID ?? null,
-        includeImports: false,
-    })
+	const secrets = await client.listSecrets({
+		environment: envMode,
+		path: process.env.INFISICAL_PATH ?? "/",
+		projectId: process.env.INFISICAL_PROJECT_ID ?? null,
+		includeImports: false,
+	})
 
-    //inject to process.env
-    secrets.forEach((secret) => {
-        if (!(process.env[secret.secretKey])) {
-            process.env[secret.secretKey] = secret.secretValue
-        }
-    })
+	//inject to process.env
+	secrets.forEach((secret) => {
+		if (!process.env[secret.secretKey]) {
+			process.env[secret.secretKey] = secret.secretValue
+		}
+	})
 }
 
 async function Boot(main) {
-    if (!main) {
-        throw new Error("main class is not defined")
-    }
+	if (!main) {
+		throw new Error("main class is not defined")
+	}
 
-    console.log(`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`)
+	const service_id = process.env.lb_service.id
 
-    if (process.env.INFISICAL_CLIENT_ID && process.env.INFISICAL_CLIENT_SECRET) {
-        console.log(`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`)
-        await injectEnvFromInfisical()
-    }
+	console.log(
+		`[BOOT] Booting (${service_id}) in [${global.isProduction ? "production" : "development"}] mode...`,
+	)
 
-    const instance = new main()
+	const traceExporter = new OTLPTraceExporter({
+		url:
+			process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ??
+			"http://fr02.ragestudio.net:4318/v1/traces",
+	})
+	const logExporter = new OTLPLogExporter({
+		url:
+			process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ??
+			"http://fr02.ragestudio.net:4318/v1/logs",
+	})
 
-    onExit((code, signal) => {
-        console.log(`[BOOT] Cleaning up...`)
+	const sdk = new opentelemetry.NodeSDK({
+		traceExporter,
+		logExporter,
+		instrumentations: [getNodeAutoInstrumentations()],
+		resource: new Resource({
+			[SemanticResourceAttributes.SERVICE_NAME]: service_id ?? "node_app",
+		}),
+	})
 
-        if (typeof instance.onClose === "function") {
-            instance.onClose()
-        }
+	sdk.start()
 
-        instance.engine.close()
-    }, {
-        alwaysLast: true,
-    })
+	if (
+		process.env.INFISICAL_CLIENT_ID &&
+		process.env.INFISICAL_CLIENT_SECRET
+	) {
+		console.log(
+			`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`,
+		)
+		await injectEnvFromInfisical()
+	}
 
-    await instance.initialize()
+	const instance = new main()
 
-    if (process.env.lb_service && process.send) {
-        process.send({
-            status: "ready"
-        })
-    }
+	onExit(
+		(code, signal) => {
+			console.log(`[BOOT] Cleaning up...`)
 
-    return instance
+			sdk.shutdown()
+				.then(() => console.log("Tracing terminated"))
+				.catch((error) =>
+					console.log("Error terminating tracing", error),
+				)
+
+			if (typeof instance.onClose === "function") {
+				instance.onClose()
+			}
+
+			instance.engine.close()
+		},
+		{
+			alwaysLast: true,
+		},
+	)
+
+	await instance.initialize()
+
+	if (process.env.lb_service && process.send) {
+		process.send({
+			status: "ready",
+		})
+	}
+
+	return instance
 }
 
 try {
-    // Apply patches
-    registerPatches()
+	// Apply patches
+	registerPatches()
 
-    // Apply aliases
-    registerAliases()
+	// Apply aliases
+	registerAliases()
 
-    // execute main
-    Module.runMain()
+	// execute main
+	Module.runMain()
 } catch (error) {
-    console.error("[BOOT] ❌ Boot error: ", error)
+	console.error("[BOOT] ❌ Boot error: ", error)
 }
