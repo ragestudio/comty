@@ -1,0 +1,117 @@
+.extensions-page {
+	display: flex;
+	flex-direction: column;
+
+	gap: 20px;
+
+	.extensions-page-header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: space-between;
+
+		.extensions-page-header-text {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.extensions-page-header-actions {
+			display: flex;
+			flex-direction: row;
+			gap: 10px;
+		}
+	}
+
+	.extensions-list {
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+	}
+}
+
+.extension-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 10px;
+	padding: 10px;
+
+	border-radius: 12px;
+	background-color: var(--background-color-accent);
+
+	.extension-item-icon {
+		width: 50px;
+		height: 50px;
+
+		overflow: hidden;
+
+		border-radius: 12px;
+
+		svg {
+			width: 100%;
+			height: 100%;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+
+			object-fit: cover;
+		}
+	}
+
+	.extension-item-details {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+
+		.ant-tag {
+			display: inline-flex;
+			flex-direction: row;
+			gap: 5px;
+
+			align-items: center;
+
+			width: fit-content;
+		}
+
+		.extension-item-name {
+			font-family: "DM Mono", monospace;
+			font-size: 0.9rem;
+			font-weight: 500;
+		}
+	}
+
+	.extension-item-actions {
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		display: flex;
+		flex-direction: column;
+
+		align-items: center;
+		justify-content: center;
+
+		gap: 10px;
+		height: 100%;
+		padding: 10px;
+	}
+}
+
+.install-custom-extension {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 10px;
+
+	font-size: 0.9rem;
+}
