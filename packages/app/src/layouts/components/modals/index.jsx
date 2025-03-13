@@ -39,6 +39,8 @@ function ConfirmModal(props) {
 				{props.descriptionText && <p>{props.descriptionText}</p>}
 			</div>
 
+			{typeof props.render === "function" && props.render()}
+
 			<div className="drawer_close_confirm_actions">
 				<Button
 					onClick={() => close({ confirm: false })}
@@ -65,6 +67,8 @@ export default () => {
 				onConfirm: options.onConfirm,
 				onCancel: options.onCancel,
 				onClose: options.onClose,
+
+				render: options.render,
 
 				headerText: options.headerText,
 				descriptionText: options.descriptionText,
