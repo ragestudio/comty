@@ -2,7 +2,7 @@ import { Lightbox } from "react-modal-image"
 import { Searcher, NotificationsCenter, PostCreator } from "@components"
 
 import config from "@config"
-import AppsMenu from "@components/AppMenu"
+import AppsMenu from "@components/AppsMenu"
 
 export default {
 	controls: {
