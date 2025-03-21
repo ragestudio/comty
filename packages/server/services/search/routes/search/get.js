@@ -1,46 +1,46 @@
-import { Track, User } from "@db_models"
 import pMap from "p-map"
+
+import UsersCollector from "../../collectors/users"
+import TracksCollector from "../../collectors/tracks"
+import ExtensionsCollector from "../../collectors/extensions"
 
 const escapeRegex = (str) => {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // Escapa caracteres especiales
 }
 
+const collectors = {
+	users: UsersCollector,
+	tracks: TracksCollector,
+	extensions: ExtensionsCollector,
+}
+
 export default {
 	useMiddlewares: ["withOptionalAuthentication"],
 	fn: async (req, res) => {
-		let { keywords, limit = 50, offset = 0 } = req.query
+		let {
+			keywords = "",
+			limit = 50,
+			offset = 0,
+			fields = "users,tracks",
+		} = req.query
 
 		if (typeof keywords === "undefined") {
 			throw new OperationError(400, "Keywords are required")
 		}
 
+		fields = fields.split(",").map((field) => field.trim())
+
 		let results = {}
 
 		keywords = escapeRegex(keywords)
 
-		const collections = [
-			{
-				key: "users",
-				model: User,
-				query: () => {
-					return {
-						$or: [
-							{ username: new RegExp(keywords, "i") },
-							{ public_name: new RegExp(keywords, "i") },
-						],
-					}
-				},
-			},
-			{
-				key: "tracks",
-				model: Track,
-				query: () => {
-					return {
-						$or: [{ title: new RegExp(keywords, "i") }],
-					}
-				},
-			},
-		]
+		const collections = []
+
+		fields.forEach((field) => {
+			if (collectors[field]) {
+				collections.push(collectors[field])
+			}
+		})
 
 		let searchers = collections.map((collection) => {
 			return async () => {
@@ -52,7 +52,7 @@ export default {
 					items: [],
 				}
 
-				const query = collection.query()
+				const query = collection.query(keywords)
 
 				const totalItems = await collection.model.countDocuments(query)
 
