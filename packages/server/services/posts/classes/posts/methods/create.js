@@ -2,73 +2,113 @@ import requiredFields from "@shared-utils/requiredFields"
 import { DateTime } from "luxon"
 
 import { Post } from "@db_models"
-import fullfill from "./fullfill"
+import stage from "./stage"
 
-export default async (payload = {}) => {
-    await requiredFields(["user_id"], payload)
+const visibilityOptions = ["public", "private", "only_mutuals"]
 
-    let { user_id, message, attachments, timestamp, reply_to, poll_options } = payload
+export default async (payload = {}, req) => {
+	await requiredFields(["user_id"], payload)
 
-    // check if is a Array and have at least one element
-    const isAttachmentArray = Array.isArray(attachments) && attachments.length > 0
+	let {
+		user_id,
+		message,
+		attachments,
+		timestamp,
+		reply_to,
+		poll_options,
+		visibility = "public",
+	} = payload
 
-    if (!isAttachmentArray && !message) {
-        throw new OperationError(400, "Cannot create a post without message or attachments")
-    }
+	// check if visibility is valid
+	if (!visibilityOptions.includes(visibility)) {
+		throw new OperationError(400, "Invalid visibility option")
+	}
 
-    if (isAttachmentArray) {
-        // clean empty attachments
-        attachments = attachments.filter((attachment) => attachment)
+	// check if is a Array and have at least one element
+	const isAttachmentArray =
+		Array.isArray(attachments) && attachments.length > 0
 
-        // fix attachments with url strings if needed
-        attachments = attachments.map((attachment) => {
-            if (typeof attachment === "string") {
-                attachment = {
-                    url: attachment,
-                }
-            }
+	if (!isAttachmentArray && !message) {
+		throw new OperationError(
+			400,
+			"Cannot create a post without message or attachments",
+		)
+	}
 
-            return attachment
-        })
-    }
+	if (isAttachmentArray) {
+		// clean empty attachments
+		attachments = attachments.filter((attachment) => attachment)
 
-    if (!timestamp) {
-        timestamp = DateTime.local().toISO()
-    } else {
-        timestamp = DateTime.fromISO(timestamp).toISO()
-    }
+		// fix attachments with url strings if needed
+		attachments = attachments.map((attachment) => {
+			if (typeof attachment === "string") {
+				attachment = {
+					url: attachment,
+				}
+			}
 
-    if (Array.isArray(poll_options)) {
-        poll_options = poll_options.map((option) => {
-            if (!option.id) {
-                option.id = nanoid()
-            }
+			return attachment
+		})
+	}
 
-            return option
-        })
-    }
+	if (!timestamp) {
+		timestamp = DateTime.local().toISO()
+	} else {
+		timestamp = DateTime.fromISO(timestamp).toISO()
+	}
 
-    let post = new Post({
-        created_at: timestamp,
-        user_id: typeof user_id === "object" ? user_id.toString() : user_id,
-        message: message,
-        attachments: attachments ?? [],
-        reply_to: reply_to,
-        flags: [],
-        poll_options: poll_options,
-    })
+	if (Array.isArray(poll_options)) {
+		poll_options = poll_options.map((option) => {
+			if (!option.id) {
+				option.id = nanoid()
+			}
 
-    await post.save()
+			return option
+		})
+	}
 
-    post = post.toObject()
+	let post = new Post({
+		created_at: timestamp,
+		user_id: typeof user_id === "object" ? user_id.toString() : user_id,
+		message: message,
+		attachments: attachments ?? [],
+		reply_to: reply_to,
+		flags: [],
+		poll_options: poll_options,
+		visibility: visibility.toLocaleLowerCase(),
+	})
 
-    const result = await fullfill({
-        posts: post,
-        for_user_id: user_id
-    })
+	await post.save()
 
-    // TODO: create background jobs (nsfw dectection)
-    global.websocket.io.of("/").emit(`post.new`, result[0])
+	post = post.toObject()
 
-    return post
+	const result = await stage({
+		posts: post,
+		for_user_id: user_id,
+	})
+
+	// broadcast post to all users
+	if (visibility === "public") {
+		global.websocket.io
+			.to("global:posts:realtime")
+			.emit(`post.new`, result[0])
+	}
+
+	if (visibility === "private") {
+		const userSocket = await global.websocket.find.socketByUserId(
+			post.user_id,
+		)
+
+		if (userSocket) {
+			userSocket.emit(`post.new`, result[0])
+		}
+	}
+
+	// TODO: create background jobs (nsfw dectection)
+	global.queues.createJob("classify_post_attachments", {
+		post_id: post._id.toString(),
+		auth_token: req.headers.authorization,
+	})
+
+	return post
 }

@@ -1,380 +1,387 @@
 @file_preview_borderRadius: 7px;
 
 .postCreator {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: center;
+	align-items: center;
 
-    width: 100%;
-    z-index: 55;
+	width: 100%;
+	z-index: 55;
 
-    max-width: 600px;
-    border-radius: 12px;
+	max-width: 600px;
+	border-radius: 12px;
 
-    background-color: var(--background-color-accent);
-    padding: 15px;
+	background-color: var(--background-color-accent);
+	padding: 15px;
 
-    gap: 10px;
+	gap: 10px;
 
-    .postCreator-header {
-        display: flex;
-        flex-direction: row;
+	.postCreator-header {
+		display: flex;
+		flex-direction: row;
 
-        align-items: center;
+		align-items: center;
 
-        width: 100%;
+		width: 100%;
 
-        p {
-            margin: 0;
-        }
+		p {
+			margin: 0;
+		}
 
-        .postCreator-header-indicator {
-            display: flex;
-            flex-direction: row;
+		.postCreator-header-indicator {
+			display: flex;
+			flex-direction: row;
 
-            gap: 7px;
+			gap: 7px;
 
-            align-items: center;
-        }
-    }
+			align-items: center;
+		}
+	}
 
-    .actions {
-        display: inline-flex;
-        flex-direction: row;
+	.actions {
+		display: inline-flex;
+		flex-direction: row;
 
-        align-items: center;
-        justify-content: flex-start;
+		align-items: center;
+		justify-content: flex-start;
 
-        width: 100%;
-        padding: 0 10px;
+		width: 100%;
+		padding: 0 10px;
 
-        gap: 10px;
+		gap: 10px;
 
-        transition: all 150ms ease-in-out;
+		transition: all 150ms ease-in-out;
 
-        .ant-btn {
-            font-size: 1.2rem;
+		.ant-btn {
+			font-size: 1.2rem;
 
-            color: var(--text-color);
+			color: var(--text-color);
 
-            opacity: 0.7;
+			opacity: 0.7;
 
-            svg {
-                margin: 0;
-            }
-        }
-    }
+			svg {
+				margin: 0;
+			}
+		}
+	}
 
-    .uploader {
-        position: relative;
+	.uploader {
+		position: relative;
 
-        display: flex;
-        flex-direction: row;
+		display: flex;
+		flex-direction: row;
 
-        align-items: center;
-        justify-content: center;
+		align-items: center;
+		justify-content: center;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        overflow: hidden;
-        overflow-x: scroll;
+		overflow: hidden;
+		overflow-x: scroll;
 
-        transition: all 150ms ease-in-out;
+		transition: all 150ms ease-in-out;
 
-        &.visible {
-            position: absolute;
-            top: 0;
-            left: 0;
+		&.visible {
+			position: absolute;
+			top: 0;
+			left: 0;
 
-            width: 100%;
-            height: 100%;
+			width: 100%;
+			height: 100%;
 
-            z-index: 150;
+			z-index: 150;
 
-            display: flex;
+			display: flex;
 
-            padding: 0;
+			padding: 0;
 
-            align-items: center;
-            justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-            border: 0;
+			border: 0;
 
-            .ant-upload-drag {
-                width: 100%;
-                height: 100%;
+			.ant-upload-drag {
+				width: 100%;
+				height: 100%;
 
-                opacity: 1;
-            }
+				opacity: 1;
+			}
 
-            .ant-upload-list {
-                opacity: 0;
-            }
-        }
+			.ant-upload-list {
+				opacity: 0;
+			}
+		}
 
-        .ant-upload-drag {
-            opacity: 0;
-            width: 0;
-            height: 0;
+		.ant-upload-drag {
+			opacity: 0;
+			width: 0;
+			height: 0;
 
-            background-color: transparent !important;
-            border: 0;
-        }
+			background-color: transparent !important;
+			border: 0;
+		}
 
-        .ant-upload-wrapper {
-            position: relative;
+		.ant-upload-wrapper {
+			position: relative;
 
-            display: flex;
-            flex-direction: column;
+			display: flex;
+			flex-direction: column;
 
-            justify-content: center;
+			justify-content: center;
 
-            background-color: transparent;
-            backdrop-filter: blur(8px);
+			background-color: transparent;
+			backdrop-filter: blur(8px);
 
-            width: 100%;
-            height: 100%;
+			width: 100%;
+			height: 100%;
 
-            overflow: hidden;
+			overflow: hidden;
 
-            .ant-upload-list {
-                display: flex;
-                flex-direction: row;
+			.ant-upload-list {
+				display: flex;
+				flex-direction: row;
 
-                align-items: center;
+				align-items: center;
 
-                width: 100%;
+				width: 100%;
 
-                overflow-x: auto;
-                overflow-y: hidden;
+				overflow-x: auto;
+				overflow-y: hidden;
 
-                white-space: nowrap;
+				white-space: nowrap;
 
-                align-items: center;
-                justify-content: flex-start;
+				align-items: center;
+				justify-content: flex-start;
 
-                gap: 10px;
+				gap: 10px;
 
-                border-radius: @file_preview_borderRadius;
+				border-radius: @file_preview_borderRadius;
 
-                .ant-upload-list-item-container {
-                    background-color: rgba(var(--bg_color_5), 1);
+				.ant-upload-list-item-container {
+					background-color: rgba(var(--bg_color_5), 1);
 
-                    width: fit-content;
-                    height: fit-content;
+					width: fit-content;
+					height: fit-content;
 
-                    border-radius: @file_preview_borderRadius;
+					border-radius: @file_preview_borderRadius;
 
-                    margin: 0;
-                }
-            }
-        }
+					margin: 0;
+				}
+			}
+		}
 
-        .ant-upload-list-item-actions {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+		.ant-upload-list-item-actions {
+			display: flex;
+			align-items: center;
+			justify-content: center;
 
-            height: 100%;
-            width: 100%;
+			height: 100%;
+			width: 100%;
 
-            font-size: 2rem;
+			font-size: 2rem;
 
-            border-radius: @file_preview_borderRadius;
-        }
+			border-radius: @file_preview_borderRadius;
+		}
 
-        .hint {
-            display: flex;
-            flex-direction: column;
+		.hint {
+			display: flex;
+			flex-direction: column;
 
-            align-items: center;
-            justify-content: center;
-            align-self: center;
+			align-items: center;
+			justify-content: center;
+			align-self: center;
 
-            text-align: center;
+			text-align: center;
 
-            background-color: transparent;
+			background-color: transparent;
 
-            font-size: 0.8rem;
+			font-size: 0.8rem;
 
-            padding: 10px;
+			padding: 10px;
 
-            svg {
-                font-size: 1.5rem;
-                margin-bottom: 6px;
-                margin-right: 0 !important;
-            }
-        }
+			svg {
+				font-size: 1.5rem;
+				margin-bottom: 6px;
+				margin-right: 0 !important;
+			}
+		}
 
-        .file {
-            position: relative;
+		.file {
+			position: relative;
 
-            width: 10vw;
-            height: 10vw;
+			width: 10vw;
+			height: 10vw;
 
-            max-width: 150px;
-            max-height: 150px;
+			max-width: 150px;
+			max-height: 150px;
 
-            font-size: 2rem;
+			font-size: 2rem;
 
-            transition: all 150ms ease-in-out;
+			transition: all 150ms ease-in-out;
 
-            border-radius: 10px;
+			border-radius: 10px;
 
-            &.uploading {
-                img {
-                    opacity: 0.5;
-                }
+			&.uploading {
+				img {
+					opacity: 0.5;
+				}
 
-                .actions {
-                    backdrop-filter: blur(5px);
-                    opacity: 1;
-                }
-            }
+				.actions {
+					backdrop-filter: blur(5px);
+					opacity: 1;
+				}
+			}
 
-            &:hover {
-                .actions {
-                    opacity: 1;
-                    backdrop-filter: blur(2px);
-                }
+			&:hover {
+				.actions {
+					opacity: 1;
+					backdrop-filter: blur(2px);
+				}
 
-                .preview {
-                    opacity: 0.5;
-                }
-            }
+				.preview {
+					opacity: 0.5;
+				}
+			}
 
-            .preview {
-                position: absolute;
+			.preview {
+				position: absolute;
 
-                top: 0;
-                left: 0;
+				top: 0;
+				left: 0;
 
-                width: 100%;
-                height: 100%;
+				width: 100%;
+				height: 100%;
 
-                img {
-                    width: 100%;
-                    height: 100%;
+				img {
+					width: 100%;
+					height: 100%;
 
-                    transition: all 150ms ease-in-out;
-                    border-radius: @file_preview_borderRadius;
+					transition: all 150ms ease-in-out;
+					border-radius: @file_preview_borderRadius;
 
-                    object-fit: contain;
-                }
-            }
+					object-fit: contain;
+				}
+			}
+		}
+	}
 
-            .actions {
-                display: flex;
-                flex-direction: column;
+	.actions {
+		display: flex;
+		flex-direction: inline-flex;
 
-                align-items: center;
-                justify-content: center;
+		svg {
+			color: var(--text-color);
+			margin: 0;
+		}
 
-                width: 100%;
-                height: 100%;
+		.ant-select {
+			.ant-select-selector {
+				border: 0;
+				padding: 4px 10px !important;
+				background-color: rgba(var(--bg_color_1), 0.8);
 
-                transition: all 150ms ease-in-out;
+				.ant-select-selection-item {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					color: var(--text-color);
+				}
+			}
 
-                opacity: 0;
-                color: rgba(var(--bg_color_1), 1);
+			.ant-select-arrow {
+				font-size: 0.6rem;
+				right: 7px;
+			}
+		}
+	}
 
-                border-radius: @file_preview_borderRadius;
+	.textInput {
+		display: flex;
 
-                svg {
-                    color: rgba(var(--bg_color_1), 1);
-                    margin: 0;
-                }
-            }
-        }
-    }
+		width: 100%;
 
-    .textInput {
-        display: flex;
+		transition: all 150ms ease-in-out;
 
-        width: 100%;
+		background-color: transparent;
 
-        transition: all 150ms ease-in-out;
+		svg {
+			margin: 0 !important;
+		}
 
-        background-color: transparent;
+		.avatar {
+			width: fit-content;
+			height: 45px;
 
-        svg {
-            margin: 0 !important;
-        }
+			display: flex;
 
-        .avatar {
-            width: fit-content;
-            height: 45px;
+			img {
+				width: 45px;
+				height: 45px;
+				border-radius: 12px;
+			}
+		}
 
-            display: flex;
+		textarea {
+			color: var(--text-color);
+		}
 
-            img {
-                width: 45px;
-                height: 45px;
-                border-radius: 12px;
-            }
-        }
+		textarea::placeholder {
+			color: rgb(var(--bg_color_4));
+		}
 
-        textarea {
-            color: var(--text-color);
-        }
+		.textArea {
+			border-radius: 8px !important;
+			transition: all 150ms ease-in-out !important;
 
-        textarea::placeholder {
-            color: rgb(var(--bg_color_4));
-        }
+			&.active {
+				background-color: var(--background-color-primary);
+			}
+		}
 
-        .textArea {
-            border-radius: 8px !important;
-            transition: all 150ms ease-in-out !important;
+		.ant-btn-primary {
+			z-index: 10;
+			position: relative;
+			border-radius: 0 10px 10px 0;
+			height: 100%;
+			vertical-align: bottom;
+			border: none;
+			box-shadow: none;
 
-            &.active {
-                background-color: var(--background-color-primary);
-            }
-        }
+			svg {
+				color: var(--text-color) !important;
+			}
+		}
 
-        .ant-btn-primary {
-            z-index: 10;
-            position: relative;
-            border-radius: 0 10px 10px 0;
-            height: 100%;
-            vertical-align: bottom;
-            border: none;
-            box-shadow: none;
+		.ant-input {
+			background-color: transparent;
 
-            svg {
-                color: var(--text-color) !important;
-            }
-        }
+			z-index: 10;
+			position: relative;
+			border-color: transparent !important;
+			box-shadow: none;
+			border-radius: 3px 0 0;
+			height: 100%;
+			padding: 5px 10px;
+			transition: height 150ms linear;
+			width: 100%;
+		}
 
-        .ant-input {
-            background-color: transparent;
+		.ant-btn-primary[disabled] {
+			background-color: var(--background-color-accent);
+		}
 
-            z-index: 10;
-            position: relative;
-            border-color: transparent !important;
-            box-shadow: none;
-            border-radius: 3px 0 0;
-            height: 100%;
-            padding: 5px 10px;
-            transition: height 150ms linear;
-            width: 100%;
-        }
+		.ant-input-affix-wrapper {
+			height: 100%;
 
-        .ant-btn-primary[disabled] {
-            background-color: var(--background-color-accent);
-        }
+			border: 0;
+			outline: 0;
+			box-shadow: none;
 
-        .ant-input-affix-wrapper {
-            height: 100%;
-
-            border: 0;
-            outline: 0;
-            box-shadow: none;
-
-            background-color: transparent;
-        }
-    }
+			background-color: transparent;
+		}
+	}
 }

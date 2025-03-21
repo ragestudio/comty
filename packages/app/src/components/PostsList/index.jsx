@@ -334,6 +334,8 @@ export class PostsListsComponent extends React.Component {
 						"posts",
 					)
 				})
+
+				app.cores.api.client().sockets.posts.emit("connect_realtime")
 			}
 		}
 
@@ -362,6 +364,8 @@ export class PostsListsComponent extends React.Component {
 						"posts",
 					)
 				})
+
+				app.cores.api.client().sockets.posts.emit("disconnect_realtime")
 			}
 		}
 
