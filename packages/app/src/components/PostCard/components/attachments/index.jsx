@@ -14,7 +14,7 @@ const renderDebug = localStorage.getItem("render_debug") === "true"
 
 const Attachment = React.memo((props) => {
 	const [loaded, setLoaded] = React.useState(false)
-
+	const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
 	const [mimeType, setMimeType] = React.useState(null)
 
 	try {
@@ -111,6 +111,17 @@ const Attachment = React.memo((props) => {
 				className="attachment"
 				onDoubleClick={onDoubleClickAttachment}
 			>
+				{props.attachment.flags &&
+					props.attachment.flags.includes("nsfw") &&
+					!nsfwAccepted && (
+						<div className="nsfw_alert">
+							<h2>This media may contain sensitive content</h2>
+
+							<Button onClick={() => setNsfwAccepted(true)}>
+								Show anyways
+							</Button>
+						</div>
+					)}
 				{renderMedia()}
 			</div>
 		)
