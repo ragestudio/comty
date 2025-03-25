@@ -200,22 +200,6 @@ export default class PostCard extends React.PureComponent {
 		)
 	}
 
-	componentDidMount = () => {
-		app.cores.api.listenEvent(
-			`post.update.${this.state.data._id}`,
-			this.handleDataUpdate,
-			"posts",
-		)
-	}
-
-	componentWillUnmount = () => {
-		app.cores.api.unlistenEvent(
-			`post.update.${this.state.data._id}`,
-			this.handleDataUpdate,
-			"posts",
-		)
-	}
-
 	render() {
 		return (
 			<motion.article
