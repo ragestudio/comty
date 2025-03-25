@@ -40,13 +40,11 @@ class ComtyApp extends React.Component {
 					await this.auth.flush()
 					await this.initialization()
 
-					app.cores.api.reconnectWebsockets()
 					app.navigation.goMain()
 				},
 				onLogout: async () => {
 					await this.auth.flush()
 
-					app.cores.api.disconnectWebsockets()
 					app.navigation.goAuth()
 				},
 				onInvalidSession: async (error) => {
