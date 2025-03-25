@@ -25,6 +25,14 @@ const Attachment = React.memo((props) => {
 				e.preventDefault()
 				e.stopPropagation()
 
+				if (
+					props.attachment.flags &&
+					props.attachment.flags.includes("nsfw") &&
+					!nsfwAccepted
+				) {
+					return false
+				}
+
 				app.controls.openFullImageViewer(url)
 			}
 		}
