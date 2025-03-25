@@ -18,13 +18,17 @@ export default class NotificationCore extends Core {
 		},
 	}
 
+	onRuntimeEvents = {
+		"wsmanager:all:connected": () => {
+			this.ctx.cores
+				.get("api")
+				.registerSocketListeners(this.listenSockets)
+		},
+	}
+
 	public = {
 		new: this.new,
 		close: this.close,
-	}
-
-	async onInitialize() {
-		this.ctx.cores.get("api").registerSocketListeners(this.listenSockets)
 	}
 
 	async new(notification) {
