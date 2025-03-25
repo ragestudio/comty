@@ -56,73 +56,20 @@ const Poll = (props) => {
 	const [hasVoted, setHasVoted] = React.useState(false)
 	const [totalVotes, setTotalVotes] = React.useState(0)
 
-	useWsEvents(
-		{
-			"post.poll.vote": (data) => {
-				const { post_id, option_id, user_id, previous_option_id } = data
-
-				if (post_id !== props.post_id) {
-					return false
-				}
-
-				console.debug(`U[${user_id}] vote to option [${option_id}]`)
-
-				setOptions((prev) => {
-					prev = prev.map((option) => {
-						return option
-					})
-
-					if (user_id === app.userData._id) {
-						// remove all `voted` properties
-						prev = prev.map((option) => {
-							delete option.voted
-
-							option.voted = option.id === option_id
-
-							return option
-						})
-					}
-
-					if (previous_option_id) {
-						const previousOptionIndex = prev.findIndex(
-							(option) => option.id === previous_option_id,
-						)
-
-						if (previousOptionIndex !== -1) {
-							prev[previousOptionIndex].count =
-								prev[previousOptionIndex].count - 1
-						}
-					}
-
-					if (option_id) {
-						const newOptionIndex = prev.findIndex(
-							(option) => option.id === option_id,
-						)
-
-						if (newOptionIndex !== -1) {
-							prev[newOptionIndex].count += 1
-						}
-					}
-
-					return prev
-				})
-			},
-		},
-		{
-			socketName: "posts",
-		},
-	)
-
 	async function onVote(id) {
 		console.debug(`Voting poll option`, {
 			option_id: id,
 			post_id: props.post_id,
 		})
 
-		await PostModel.votePoll({
+		const result = await PostModel.votePoll({
 			post_id: props.post_id,
 			option_id: id,
 		})
+
+		if (result.post.poll_options) {
+			setOptions(result.post.poll_options)
+		}
 	}
 
 	React.useEffect(() => {
