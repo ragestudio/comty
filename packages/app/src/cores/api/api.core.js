@@ -5,7 +5,6 @@ import createClient from "comty.js"
 import request from "comty.js/request"
 import measurePing from "comty.js/helpers/measurePing"
 import useRequest from "comty.js/hooks/useRequest"
-import { reconnectWebsockets, disconnectWebsockets } from "comty.js"
 
 export default class APICore extends Core {
 	static namespace = "api"
@@ -20,12 +19,13 @@ export default class APICore extends Core {
 			return this.client
 		}.bind(this),
 		customRequest: request,
+		joinTopic: this.joinTopic.bind(this),
+		leaveTopic: this.leaveTopic.bind(this),
 		listenEvent: this.listenEvent.bind(this),
 		unlistenEvent: this.unlistenEvent.bind(this),
+		emitEvent: this.emitEvent.bind(this),
 		measurePing: measurePing,
 		useRequest: useRequest,
-		reconnectWebsockets: reconnectWebsockets,
-		disconnectWebsockets: disconnectWebsockets,
 	}
 
 	registerSocketListeners = (map) => {
@@ -36,54 +36,67 @@ export default class APICore extends Core {
 		})
 	}
 
-	listenEvent(key, handler, instance = "default") {
-		if (!this.client.sockets[instance]) {
-			this.console.error(`[API] Websocket instance ${instance} not found`)
-
+	joinTopic(instance = "main", topic) {
+		if (!this.client.ws.sockets.get(instance)) {
+			this.console.error(`Websocket instance [${instance}] not found`)
 			return false
 		}
 
-		return this.client.sockets[instance].on(key, handler)
+		return this.client.ws.sockets.get(instance).joinTopic(topic)
 	}
 
-	unlistenEvent(key, handler, instance = "default") {
-		if (!this.client.sockets[instance]) {
-			this.console.error(`[API] Websocket instance ${instance} not found`)
+	leaveTopic(instance = "main", topic) {
+		if (!this.client.ws.sockets.get(instance)) {
+			this.console.error(`Websocket instance [${instance}] not found`)
+			return false
+		}
+
+		return this.client.ws.sockets.get(instance).leaveTopic(topic)
+	}
+
+	emitEvent(instance = "main", key, data) {
+		if (!this.client.ws.sockets.get(instance)) {
+			this.console.error(`Websocket instance [${instance}] not found`)
 
 			return false
 		}
 
-		return this.client.sockets[instance].off(key, handler)
+		return this.client.ws.sockets.get(instance).emit(key, data)
+	}
+
+	listenEvent(key, handler, instance = "main") {
+		if (!this.client.ws.sockets.get(instance)) {
+			this.console.error(`Websocket instance [${instance}] not found`)
+
+			return false
+		}
+
+		return this.client.ws.sockets.get(instance).on(key, handler)
+	}
+
+	unlistenEvent(key, handler, instance = "main") {
+		if (!this.client.ws.sockets.get(instance)) {
+			this.console.error(`Websocket instance [${instance}] not found`)
+
+			return false
+		}
+
+		return this.client.ws.sockets.get(instance).off(key, handler)
 	}
 
 	async onInitialize() {
 		this.client = await createClient({
 			enableWs: true,
-			//origin: "https://indev.comty.app/api"
+			eventBus: app.eventBus,
 		})
 
-		this.client.eventBus.on("ws:disconnected", () => {
-			app.cores.notifications.new({
-				title: "Failed to connect to server",
-				description:
-					"The connection to the server was lost. Some features may not work properly.",
-			})
-		})
-
+		// handle auth events
 		this.client.eventBus.on("auth:login_success", () => {
-			app.eventBus.emit("auth:login_success")
+			this.client.ws.connectAll()
 		})
 
 		this.client.eventBus.on("auth:logout_success", () => {
-			app.eventBus.emit("auth:logout_success")
-		})
-
-		this.client.eventBus.on("session.invalid", (error) => {
-			app.eventBus.emit("session.invalid", error)
-		})
-
-		this.client.eventBus.on("auth:disabled_account", () => {
-			app.eventBus.emit("auth:disabled_account")
+			this.client.ws.connectAll()
 		})
 
 		// make a basic request to check if the API is available
@@ -93,7 +106,7 @@ export default class APICore extends Core {
 				url: "/",
 			})
 			.catch((error) => {
-				this.console.error("[API] Ping error", error)
+				this.console.error("Ping error", error)
 
 				throw new Error(`
                 Could not connect to the API.
