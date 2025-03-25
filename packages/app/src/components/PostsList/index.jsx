@@ -116,34 +116,32 @@ export class PostsListsComponent extends React.Component {
 	listRef = React.createRef()
 
 	timelineWsEvents = {
-		"feed.new": (data) => {
-			console.log("New feed => ", data)
-
-			if (!this.state.realtimeUpdates) {
-				return
-			}
+		"post:new": (data) => {
+			console.log("[WS] Recived a post >", data)
 
 			this.setState({
 				list: [data, ...this.state.list],
 			})
 		},
-		"post.new": (data) => {
-			console.log("New post => ", data)
-
-			if (!this.state.realtimeUpdates) {
-				return
-			}
-
-			this.setState({
-				list: [data, ...this.state.list],
-			})
-		},
-		"post.delete": (id) => {
-			console.log("Deleted post => ", id)
+		"post:delete": (id) => {
+			console.log("[WS] Received a post delete >", id)
 
 			this.setState({
 				list: this.state.list.filter((post) => {
 					return post._id !== id
+				}),
+			})
+		},
+		"post:update": (data) => {
+			console.log("[WS] Received a post update >", data)
+
+			this.setState({
+				list: this.state.list.map((post) => {
+					if (post._id === data._id) {
+						return data
+					}
+
+					return post
 				}),
 			})
 		},
@@ -177,8 +175,6 @@ export class PostsListsComponent extends React.Component {
 
 			return null
 		})
-
-		console.log("Loaded posts => ", result)
 
 		if (result) {
 			if (result.length === 0) {
@@ -317,26 +313,17 @@ export class PostsListsComponent extends React.Component {
 			initialLoading: false,
 		})
 
-		if (this.props.watchTimeline) {
-			if (!Array.isArray(this.props.watchTimeline)) {
-				console.error("watchTimeline prop must be an array")
-			} else {
-				this.props.watchTimeline.forEach((event) => {
-					if (typeof this.timelineWsEvents[event] !== "function") {
-						console.error(
-							`The event "${event}" is not defined in the timelineWsEvents object`,
-						)
-					}
-
-					app.cores.api.listenEvent(
-						event,
-						this.timelineWsEvents[event],
-						"posts",
-					)
-				})
-
-				app.cores.api.client().sockets.posts.emit("connect_realtime")
+		if (this.props.realtime) {
+			for (const [event, handler] of Object.entries(
+				this.timelineWsEvents,
+			)) {
+				app.cores.api.listenEvent(event, handler, "posts")
 			}
+
+			app.cores.api.joinTopic(
+				"posts",
+				this.props.customTopic ?? "realtime:feed",
+			)
 		}
 
 		if (this.listRef && this.listRef.current) {
@@ -347,26 +334,17 @@ export class PostsListsComponent extends React.Component {
 	}
 
 	componentWillUnmount = async () => {
-		if (this.props.watchTimeline) {
-			if (!Array.isArray(this.props.watchTimeline)) {
-				console.error("watchTimeline prop must be an array")
-			} else {
-				this.props.watchTimeline.forEach((event) => {
-					if (typeof this.timelineWsEvents[event] !== "function") {
-						console.error(
-							`The event "${event}" is not defined in the timelineWsEvents object`,
-						)
-					}
-
-					app.cores.api.unlistenEvent(
-						event,
-						this.timelineWsEvents[event],
-						"posts",
-					)
-				})
-
-				app.cores.api.client().sockets.posts.emit("disconnect_realtime")
+		if (this.props.realtime) {
+			for (const [event, handler] of Object.entries(
+				this.timelineWsEvents,
+			)) {
+				app.cores.api.unlistenEvent(event, handler, "posts")
 			}
+
+			app.cores.api.leaveTopic(
+				"posts",
+				this.props.customTopic ?? "realtime:feed",
+			)
 		}
 
 		if (this.listRef && this.listRef.current) {
