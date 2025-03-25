@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "1.27.3@alpha",
+	"version": "1.28.0@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
@@ -12,7 +12,6 @@
 		"build:bin": "cd build && pkg ./index.js"
 	},
 	"dependencies": {
-		"@gullerya/object-observer": "^6.1.3",
 		"@infisical/sdk": "^2.1.8",
 		"@opentelemetry/api": "^1.9.0",
 		"@opentelemetry/auto-instrumentations-node": "^0.56.1",
@@ -20,16 +19,11 @@
 		"@sentry/node": "^9.4.0",
 		"axios": "^1.7.4",
 		"bcrypt": "^5.1.1",
-		"bull": "^4.16.5",
 		"bullmq": "^5.41.5",
-		"chalk": "4.1.2",
-		"comty.js": "^0.60.3",
-		"dotenv": "^16.4.4",
+		"comty.js": "^0.61.0",
 		"http-proxy": "^1.18.1",
-		"hyper-express": "^6.17.2",
-		"ioredis": "^5.4.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^0.22.8",
+		"linebridge": "^0.24.0",
 		"minio": "^8.0.1",
 		"module-alias": "^2.2.3",
 		"mongoose": "^8.5.3",

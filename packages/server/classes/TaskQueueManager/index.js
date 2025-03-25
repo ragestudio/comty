@@ -3,12 +3,10 @@ import { Queue, Worker } from "bullmq"
 import { composeURL as composeRedisConnectionString } from "@shared-classes/RedisClient"
 
 export default class TaskQueueManager {
-	constructor(params, ctx) {
+	constructor(params) {
 		if (!params) {
 			throw new Error("Missing params")
 		}
-
-		this.ctx = ctx
 
 		this.params = params
 		this.queues = {}
@@ -36,17 +34,15 @@ export default class TaskQueueManager {
 	}
 
 	registerQueue = (queueObj, options) => {
-		const connection = this.ctx.engine.ws.redis
-
 		const queue = new Queue(queueObj.id, {
-			connection,
+			connection: options.redisOptions,
 			defaultJobOptions: {
 				removeOnComplete: true,
 			},
 		})
 
 		const worker = new Worker(queueObj.id, queueObj.process, {
-			connection,
+			connection: options.redisOptions,
 			concurrency: queueObj.maxJobs ?? 1,
 		})
 

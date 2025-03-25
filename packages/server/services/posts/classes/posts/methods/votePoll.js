@@ -1,46 +1,61 @@
-import { VotePoll } from "@db_models"
+import { VotePoll, Post } from "@db_models"
+import stage from "./stage"
 
+// TODO: Implement logic to handle vote poll
 export default async (payload = {}) => {
-    if (!payload.user_id) {
-        throw new OperationError(400, "Missing user_id")
-    }
+	if (!payload.user_id) {
+		throw new OperationError(400, "Missing user_id")
+	}
 
-    if (!payload.post_id) {
-        throw new OperationError(400, "Missing post_id")
-    }
+	if (!payload.post_id) {
+		throw new OperationError(400, "Missing post_id")
+	}
 
-    if (!payload.option_id) {
-        throw new OperationError(400, "Missing option_id")
-    }
+	if (!payload.option_id) {
+		throw new OperationError(400, "Missing option_id")
+	}
 
-    let vote = await VotePoll.findOne({
-        user_id: payload.user_id,
-        post_id: payload.post_id,
-    })
+	let post = await Post.findOne({
+		_id: payload.post_id,
+	})
 
-    let previousOptionId = null
+	if (!post) {
+		throw new OperationError(404, "Post not found")
+	}
 
-    if (vote) {
-        previousOptionId = vote.option_id
+	let vote = await VotePoll.findOne({
+		user_id: payload.user_id,
+		post_id: payload.post_id,
+	})
 
-        await VotePoll.deleteOne({
-            _id: vote._id.toString()
-        })
-    }
+	let previousOptionId = null
 
-    vote = new VotePoll({
-        user_id: payload.user_id,
-        post_id: payload.post_id,
-        option_id: payload.option_id,
-    })
+	if (vote) {
+		previousOptionId = vote.option_id
 
-    await vote.save()
+		await VotePoll.deleteOne({
+			_id: vote._id.toString(),
+		})
+	}
 
-    vote = vote.toObject()
+	vote = new VotePoll({
+		user_id: payload.user_id,
+		post_id: payload.post_id,
+		option_id: payload.option_id,
+	})
 
-    vote.previous_option_id = previousOptionId
+	await vote.save()
 
-    global.websocket.io.of("/").emit(`post.poll.vote`, vote)
+	vote = vote.toObject()
 
-    return vote
+	post = (await stage({ posts: post, for_user_id: payload.user_id }))[0]
+
+	if (post.visibility === "public") {
+		global.websocket.senders.toTopic("realtime:feed", `post:update`, post)
+	}
+
+	return {
+		post: post,
+		vote: vote,
+	}
 }

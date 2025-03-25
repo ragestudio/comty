@@ -37,22 +37,20 @@ export default async (post_id, update) => {
 	})
 
 	if (post.visibility === "public") {
-		global.websocket.io
-			.to("global:posts:realtime")
-			.emit(`post.update`, result[0])
-		global.websocket.io
-			.to("global:posts:realtime")
-			.emit(`post.update.${post_id}`, result[0])
+		global.websocket.senders.toTopic(
+			"realtime:feed",
+			`post:update`,
+			result[0],
+		)
 	}
 
 	if (post.visibility === "private") {
-		const userSocket = await global.websocket.find.socketByUserId(
+		const userSockets = await global.websocket.find.clientsByUserId(
 			post.user_id,
 		)
 
-		if (userSocket) {
-			userSocket.emit(`post.update`, result[0])
-			userSocket.emit(`post.update.${post_id}`, result[0])
+		for (const userSocket of userSockets) {
+			userSocket.emit(`post:update`, result[0])
 		}
 	}
 

@@ -20,10 +20,10 @@ export default async (obj, token) => {
 
 	userData._id = userData._id.toString()
 
+	// inject to obj
 	obj.user = userData
 	obj.token = token
 	obj.session = validation.data
-	obj.user = userData
 
 	return obj
 }

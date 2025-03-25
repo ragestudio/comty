@@ -187,10 +187,20 @@ export default class Gateway {
 			}
 
 			if (msg.type === "router:ws:register") {
+				let target = `http://${this.state.internalIp}:${msg.data.listen_port ?? msg.data.listen?.port}`
+
+				if (!msg.data.ws_path && msg.data.namespace) {
+					target += `/${msg.data.namespace}`
+				}
+
+				if (msg.data.ws_path && msg.data.ws_path !== "/") {
+					target += `/${msg.data.ws_path}`
+				}
+
 				await this.proxy.register({
 					serviceId: id,
 					path: `/${msg.data.namespace}`,
-					target: `http://${this.state.internalIp}:${msg.data.listen.port}/${msg.data.namespace}`,
+					target: target,
 					pathRewrite: {
 						[`^/${msg.data.namespace}`]: "",
 					},

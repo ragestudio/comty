@@ -40,22 +40,22 @@ export default async (payload = {}) => {
 		throw new OperationError(500, `An error has occurred: ${err.message}`)
 	})
 
+	// broadcast post to all users
 	if (post.visibility === "public") {
-		global.websocket.io
-			.to("global:posts:realtime")
-			.emit(`post.delete`, post)
-		global.websocket.io
-			.to("global:posts:realtime")
-			.emit(`post.delete.${post_id}`, post)
+		global.websocket.senders.toTopic(
+			"realtime:feed",
+			"post:delete",
+			post_id,
+		)
 	}
 
 	if (post.visibility === "private") {
-		const userSocket = await global.websocket.find.socketByUserId(
+		const userSockets = await global.websocket.find.clientsByUserId(
 			post.user_id,
 		)
-		if (userSocket) {
-			userSocket.emit(`post.delete`, post_id)
-			userSocket.emit(`post.delete.${post_id}`, post_id)
+
+		for (const userSocket of userSockets) {
+			userSocket.emit(`post:delete`, post_id)
 		}
 	}
 
