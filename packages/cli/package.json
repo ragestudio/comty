@@ -1,0 +1,28 @@
+{
+	"name": "@ragestudio/comty-cli",
+	"description": "Command line interface for Comty Services",
+	"version": "0.1.2",
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./src/index.js",
+	"type": "module",
+	"license": "MIT",
+	"bin": {
+		"comty-cli": "./src/index.js"
+	},
+	"scripts": {
+		"start": "node ./src/index.js"
+	},
+	"dependencies": {
+		"7zip-min": "^2.0.0",
+		"@inquirer/prompts": "^7.4.0",
+		"axios": "^1.8.3",
+		"commander": "^13.1.0",
+		"comty.js": "^0.60.7",
+		"form-data": "^4.0.2",
+		"formdata-node": "^6.0.3",
+		"glob": "^11.0.1",
+		"yocto-spinner": "^0.2.1"
+	}
+}
