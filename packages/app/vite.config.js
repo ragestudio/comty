@@ -46,11 +46,11 @@ const config = {
 	},
 }
 
-if (fs.existsSync(sslDirPath)) {
-	config.server.https = {
-		key: path.join(__dirname, ".ssl", "privkey.pem"),
-		cert: path.join(__dirname, ".ssl", "cert.pem"),
-	}
-}
+// if (fs.existsSync(sslDirPath)) {
+// 	config.server.https = {
+// 		key: path.join(__dirname, ".ssl", "privkey.pem"),
+// 		cert: path.join(__dirname, ".ssl", "cert.pem"),
+// 	}
+// }
 
 export default defineConfig(config)
