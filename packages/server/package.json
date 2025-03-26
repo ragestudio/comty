@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "1.28.0@alpha",
+	"version": "1.29.0@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
@@ -23,7 +23,7 @@
 		"comty.js": "^0.61.0",
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^0.24.0",
+		"linebridge": "^0.24.1",
 		"minio": "^8.0.1",
 		"module-alias": "^2.2.3",
 		"mongoose": "^8.5.3",
