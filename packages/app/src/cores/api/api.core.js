@@ -42,7 +42,7 @@ export default class APICore extends Core {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).joinTopic(topic)
+		return this.client.ws.sockets.get(instance).topics.subscribe(topic)
 	}
 
 	leaveTopic(instance = "main", topic) {
@@ -51,7 +51,7 @@ export default class APICore extends Core {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).leaveTopic(topic)
+		return this.client.ws.sockets.get(instance).topics.unsubscribe(topic)
 	}
 
 	emitEvent(instance = "main", key, data) {
@@ -86,8 +86,11 @@ export default class APICore extends Core {
 
 	async onInitialize() {
 		this.client = await createClient({
-			enableWs: true,
 			eventBus: app.eventBus,
+			ws: {
+				enable: true,
+				autoConnect: true,
+			},
 		})
 
 		// handle auth events
