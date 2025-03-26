@@ -44,6 +44,9 @@ const config = {
 			},
 		},
 	},
+	esbuild: {
+		target: "es2022",
+	},
 }
 
 // if (fs.existsSync(sslDirPath)) {
