@@ -25,10 +25,7 @@ services:
             memlock: -1
         networks:
             - internal_network
-        env_file:
-            - ./.env
-        volumes:
-            - ./redis_data:/data
+        command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
 
 networks:
     internal_network:
