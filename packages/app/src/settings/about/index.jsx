@@ -30,16 +30,6 @@ export default {
 		const [secureConnection, setSecureConnection] = React.useState(false)
 		const [capInfo, setCapInfo] = React.useState(null)
 
-		const setCapacitorInfo = async () => {
-			if (Capacitor) {
-				if (Capacitor.Plugins.App) {
-					const info = await Capacitor.Plugins.App.getInfo()
-
-					setCapInfo(info)
-				}
-			}
-		}
-
 		const checkServerVersion = async () => {
 			const serverManifest = await app.cores.api.customRequest()
 
@@ -61,8 +51,6 @@ export default {
 		React.useEffect(() => {
 			checkServerVersion()
 			checkServerOrigin()
-
-			setCapacitorInfo()
 		}, [])
 
 		return (
