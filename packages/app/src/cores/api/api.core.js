@@ -3,7 +3,7 @@ import { Core } from "@ragestudio/vessel"
 import createClient from "comty.js"
 
 import request from "comty.js/request"
-import measurePing from "comty.js/helpers/measurePing"
+import measurePing from "comty.js/utils/measurePing"
 import useRequest from "comty.js/hooks/useRequest"
 
 export default class APICore extends Core {
