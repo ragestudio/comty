@@ -1,12 +1,9 @@
 require("dotenv").config()
 
 import path from "node:path"
-import Spinnies from "spinnies"
-import { Observable } from "@gullerya/object-observer"
-import { dots as DefaultSpinner } from "spinnies/spinners.json"
 import EventEmitter from "@foxify/events"
+import { Observable } from "@gullerya/object-observer"
 import IPCRouter from "linebridge/dist/classes/IPCRouter"
-import chokidar from "chokidar"
 import { onExit } from "signal-exit"
 import chalk from "chalk"
 import treeKill from "tree-kill"
@@ -14,18 +11,21 @@ import treeKill from "tree-kill"
 import getIgnoredFiles from "./utils/getIgnoredFiles"
 import scanServices from "./utils/scanServices"
 import spawnService from "./utils/spawnService"
-
 import Proxy from "./proxy"
 import RELP from "./repl"
-
 import comtyAscii from "./ascii"
 import pkg from "../package.json"
 
-const useLoadSpinner = process.argv.includes("--load-spinner")
+import ServiceManager from "./services/manager"
+import Service from "./services/service"
+
 const isProduction = process.env.NODE_ENV === "production"
 
+/**
+ * Gateway class - Main entry point for the service orchestrator
+ * Manages service discovery, spawning, and communication
+ */
 export default class Gateway {
-	spinnies = new Spinnies()
 	eventBus = new EventEmitter()
 
 	state = {
@@ -34,273 +34,224 @@ export default class Gateway {
 		allReady: false,
 	}
 
-	selectedProcessInstance = null
-
-	instancePool = []
+	selectedService = null
+	serviceManager = new ServiceManager()
 	services = []
 	serviceRegistry = Observable.from({})
-	serviceFileReference = {}
 
 	proxy = null
 	ipcRouter = null
 
-	async createServicesWatchers() {
-		for await (let service of this.services) {
-			const instanceFile = path.basename(service)
-			const instanceBasePath = path.dirname(service)
-
+	/**
+	 * Creates service registry entries based on discovered services
+	 */
+	async createServicesRegistry() {
+		for await (const servicePath of this.services) {
+			const instanceFile = path.basename(servicePath)
+			const instanceBasePath = path.dirname(servicePath)
 			const servicePkg = require(
 				path.resolve(instanceBasePath, "package.json"),
 			)
 
-			this.serviceFileReference[instanceFile] = servicePkg.name
-
 			this.serviceRegistry[servicePkg.name] = {
-				index: this.services.indexOf(service),
+				index: this.services.indexOf(servicePath),
 				id: servicePkg.name,
 				version: servicePkg.version,
 				file: instanceFile,
 				cwd: instanceBasePath,
-				buffer: [],
 				ready: false,
 			}
 		}
 	}
 
-	async createServicesProcess() {
-		for await (let service of this.services) {
-			const { id, version, cwd } =
-				this.serviceRegistry[
-					this.serviceFileReference[path.basename(service)]
-				]
+	/**
+	 * Creates and initializes all service instances
+	 */
+	async createServiceInstances() {
+		for await (const servicePath of this.services) {
+			const instanceBasePath = path.dirname(servicePath)
+			const servicePkg = require(
+				path.resolve(instanceBasePath, "package.json"),
+			)
+			const serviceId = servicePkg.name
 
-			this.serviceHandlers.onStarting(id)
+			const serviceConfig = {
+				id: serviceId,
+				version: servicePkg.version,
+				path: servicePath,
+				cwd: instanceBasePath,
+				isProduction,
+				internalIp: this.state.internalIp,
+			}
 
-			const instance = await spawnService({
-				id,
-				service,
-				cwd,
-				onReload: this.serviceHandlers.onReload,
-				onClose: this.serviceHandlers.onClose,
-				onError: this.serviceHandlers.onError,
-				onIPCData: this.serviceHandlers.onIPCData,
+			// Create service instance
+			const service = new Service(serviceConfig, {
+				onReady: this.onServiceReady.bind(this),
+				onIPCData: this.onServiceIPCData.bind(this),
+				onServiceExit: this.onServiceExit.bind(this),
 			})
 
-			if (!useLoadSpinner) {
-				instance.logs.attach()
-			}
+			// Add to service manager
+			this.serviceManager.addService(service)
 
-			const serviceInstance = {
-				id,
-				version,
-				instance,
-			}
+			// Initialize service
+			await service.initialize()
 
-			// push to pool
-			this.instancePool.push(serviceInstance)
-
-			// if is development, start a file watcher for hot-reload
-			if (!isProduction) {
-				const ignored = [
-					...(await getIgnoredFiles(cwd)),
-					"**/.cache/**",
-					"**/node_modules/**",
-					"**/dist/**",
-					"**/build/**",
-				]
-
-				const watcher = chokidar.watch(cwd, {
-					ignored: ignored,
-					persistent: true,
-					ignoreInitial: true,
-				})
-
-				watcher.on("all", (event, path) => {
-					// find instance from pool
-					const instanceIndex = this.instancePool.findIndex(
-						(instance) => instance.id === id,
-					)
-
-					console.log(event, path, instanceIndex)
-
-					// reload
-					this.instancePool[instanceIndex].instance.reload()
-				})
-			}
+			console.log(`📦 [${serviceId}] Service initialized`)
 		}
 	}
 
-	serviceHandlers = {
-		onStarting: (id) => {
-			if (this.serviceRegistry[id].ready === false) {
-				if (useLoadSpinner) {
-					this.spinnies.add(id, {
-						text: `📦 [${id}] Loading service...`,
-						spinner: DefaultSpinner,
-					})
-				}
-			}
-		},
-		onStarted: (id) => {
-			this.serviceRegistry[id].initialized = true
+	/**
+	 * Handler for service ready event
+	 * @param {Service} service - Service that is ready
+	 */
+	onServiceReady(service) {
+		const serviceId = service.id
+		this.serviceRegistry[serviceId].initialized = true
+		this.serviceRegistry[serviceId].ready = true
 
-			if (this.serviceRegistry[id].ready === false) {
-				if (useLoadSpinner) {
-					if (this.spinnies.pick(id)) {
-						this.spinnies.succeed(id, {
-							text: `[${id}][${this.serviceRegistry[id].index}] Ready`,
-						})
-					}
-				}
-			}
+		console.log(
+			`✅ [${serviceId}][${this.serviceRegistry[serviceId].index}] Ready`,
+		)
 
-			this.serviceRegistry[id].ready = true
-		},
-		onIPCData: async (id, msg) => {
-			if (msg.type === "log") {
-				console.log(`[${id}] ${msg.message}`)
-			}
+		// Check if all services are ready
+		this.checkAllServicesReady()
+	}
 
-			if (msg.status === "ready") {
-				await this.serviceHandlers.onStarted(id)
-			}
+	/**
+	 * Handler for service IPC data
+	 * @param {Service} service - Service sending the data
+	 * @param {object} data - IPC data received
+	 */
+	async onServiceIPCData(service, data) {
+		const id = service.id
 
-			if (msg.type === "router:register") {
-				if (msg.data.path_overrides) {
-					for await (let pathOverride of msg.data.path_overrides) {
-						await this.proxy.register({
-							serviceId: id,
-							path: `/${pathOverride}`,
-							target: `http://${this.state.internalIp}:${msg.data.listen.port}/${pathOverride}`,
-							pathRewrite: {
-								[`^/${pathOverride}`]: "",
-							},
-						})
-					}
-				} else {
-					await this.proxy.register({
-						serviceId: id,
-						path: `/${id}`,
-						target: `http://${msg.data.listen.ip}:${msg.data.listen.port}`,
-					})
-				}
-			}
+		if (data.type === "log") {
+			console.log(`[${id}] ${data.message}`)
+		}
 
-			if (msg.type === "router:ws:register") {
-				let target = `http://${this.state.internalIp}:${msg.data.listen_port ?? msg.data.listen?.port}`
+		if (data.status === "ready") {
+			this.onServiceReady(service)
+		}
 
-				if (!msg.data.ws_path && msg.data.namespace) {
-					target += `/${msg.data.namespace}`
-				}
+		if (data.type === "router:register") {
+			await this.handleRouterRegistration(service, data)
+		}
 
-				if (msg.data.ws_path && msg.data.ws_path !== "/") {
-					target += `/${msg.data.ws_path}`
-				}
+		if (data.type === "router:ws:register") {
+			await this.handleWebsocketRegistration(service, data)
+		}
+	}
 
+	/**
+	 * Handler for service exit
+	 * @param {Service} service - Service that exited
+	 * @param {number} code - Exit code
+	 * @param {Error} error - Error if any
+	 */
+	onServiceExit(service, code, error) {
+		const id = service.id
+
+		this.serviceRegistry[id].initialized = true
+		this.serviceRegistry[id].ready = false
+
+		console.log(`[${id}] Exit with code ${code}`)
+
+		if (error) {
+			console.error(error)
+		}
+
+		this.proxy.unregisterAllFromService(id)
+	}
+
+	/**
+	 * Handle router registration requests from services
+	 * @param {Service} service - Service registering a route
+	 * @param {object} msg - Registration message
+	 */
+	async handleRouterRegistration(service, msg) {
+		const id = service.id
+
+		if (msg.data.path_overrides) {
+			for await (const pathOverride of msg.data.path_overrides) {
 				await this.proxy.register({
 					serviceId: id,
-					path: `/${msg.data.namespace}`,
-					target: target,
+					path: `/${pathOverride}`,
+					target: `http://${this.state.internalIp}:${msg.data.listen.port}/${pathOverride}`,
 					pathRewrite: {
-						[`^/${msg.data.namespace}`]: "",
+						[`^/${pathOverride}`]: "",
 					},
-					ws: true,
 				})
 			}
-		},
-		onReload: async ({ id, service, cwd }) => {
-			console.log(`[onReload] ${id} ${service}`)
-
-			let instance = this.instancePool.find(
-				(instance) => instance.id === id,
-			)
-
-			if (!instance) {
-				console.error(`❌ Service ${id} not found`)
-				return false
-			}
-
-			// if (this.selectedProcessInstance) {
-			//     if (this.selectedProcessInstance === "all") {
-			//         this.std.detachAllServicesSTD()
-			//     } else if (this.selectedProcessInstance.id === id) {
-			//         this.selectedProcessInstance.instance.logs.detach()
-			//     }
-			// }
-
-			this.ipcRouter.unregister({ id, instance })
-
-			// try to unregister from proxy
-			this.proxy.unregisterAllFromService(id)
-
-			await instance.instance.kill("SIGINT")
-
-			instance.instance = await spawnService({
-				id,
-				service,
-				cwd,
-				onReload: this.serviceHandlers.onReload,
-				onClose: this.serviceHandlers.onClose,
-				onError: this.serviceHandlers.onError,
-				onIPCData: this.serviceHandlers.onIPCData,
+		} else {
+			await this.proxy.register({
+				serviceId: id,
+				path: `/${id}`,
+				target: `http://${msg.data.listen.ip}:${msg.data.listen.port}`,
 			})
-
-			const instanceIndex = this.instancePool.findIndex(
-				(_instance) => _instance.id === id,
-			)
-
-			if (instanceIndex !== -1) {
-				this.instancePool[instanceIndex] = instance
-			}
-
-			if (this.selectedProcessInstance) {
-				if (this.selectedProcessInstance === "all") {
-					this.std.attachAllServicesSTD()
-				} else if (this.selectedProcessInstance.id === id) {
-					this.std.attachServiceSTD(id)
-				}
-			}
-		},
-		onClose: (id, code, err) => {
-			this.serviceRegistry[id].initialized = true
-
-			if (this.serviceRegistry[id].ready === false) {
-				if (this.spinnies.pick(id)) {
-					this.spinnies.fail(id, {
-						text: `[${id}][${this.serviceRegistry[id].index}] Failed with code ${code}`,
-					})
-				}
-			}
-
-			console.log(`[${id}] Exit with code ${code}`)
-
-			if (err) {
-				console.error(err)
-			}
-
-			// try to unregister from proxy
-			this.proxy.unregisterAllFromService(id)
-
-			this.serviceRegistry[id].ready = false
-		},
-		onError: (id, err) => {
-			console.error(`[${id}] Error`, err)
-		},
-	}
-
-	onAllServicesReload = (id) => {
-		for (let instance of this.instancePool) {
-			instance.instance.reload()
 		}
 	}
 
+	/**
+	 * Handle websocket registration requests from services
+	 * @param {Service} service - Service registering a websocket
+	 * @param {object} msg - Registration message
+	 */
+	async handleWebsocketRegistration(service, msg) {
+		const id = service.id
+		const listenPort = msg.data.listen_port ?? msg.data.listen?.port
+		let target = `http://${this.state.internalIp}:${listenPort}`
+
+		if (!msg.data.ws_path && msg.data.namespace) {
+			target += `/${msg.data.namespace}`
+		}
+
+		if (msg.data.ws_path && msg.data.ws_path !== "/") {
+			target += `/${msg.data.ws_path}`
+		}
+
+		await this.proxy.register({
+			serviceId: id,
+			path: `/${msg.data.namespace}`,
+			target: target,
+			pathRewrite: {
+				[`^/${msg.data.namespace}`]: "",
+			},
+			ws: true,
+		})
+	}
+
+	/**
+	 * Check if all services are ready and trigger the ready event
+	 */
+	checkAllServicesReady() {
+		if (this.state.allReady) return
+
+		const allServicesInitialized = Object.values(
+			this.serviceRegistry,
+		).every((service) => service.initialized)
+
+		if (allServicesInitialized) {
+			this.onAllServicesReady()
+		}
+	}
+
+	/**
+	 * Reload all services
+	 */
+	reloadAllServices = () => {
+		this.serviceManager.reloadAllServices()
+	}
+
+	/**
+	 * Handle when all services are ready
+	 */
 	onAllServicesReady = async () => {
 		if (this.state.allReady) {
 			return false
 		}
 
 		console.clear()
-
 		this.state.allReady = true
 
 		console.log(comtyAscii)
@@ -308,114 +259,30 @@ export default class Gateway {
 		console.log(`USE: select <service>, reload, exit`)
 
 		await this.proxy.listen(this.state.proxyPort, this.state.internalIp)
-
-		if (useLoadSpinner) {
-			if (!this.selectedProcessInstance) {
-				this.std.detachAllServicesSTD()
-				this.std.attachAllServicesSTD()
-			}
-		}
 	}
 
-	onGatewayExit = (code, signal) => {
+	/**
+	 * Clean up resources on gateway exit
+	 */
+	onGatewayExit = () => {
 		console.clear()
 		console.log(`\n🛑 Preparing to exit...`)
-
-		console.log(`Stoping proxy...`)
+		console.log(`Stopping proxy...`)
 
 		this.proxy.close()
-
-		console.log(`Kill all ${this.instancePool.length} instances...`)
-
-		for (let instance of this.instancePool) {
-			console.log(`Killing ${instance.id} [${instance.instance.pid}]`)
-
-			instance.instance.kill()
-
-			treeKill(instance.instance.pid)
-		}
+		console.log(`Stopping all services...`)
+		this.serviceManager.stopAllServices()
 
 		treeKill(process.pid)
 	}
 
-	std = {
-		reloadService: () => {
-			if (!this.selectedProcessInstance) {
-				console.error(`No service selected`)
-				return false
-			}
-
-			if (this.selectedProcessInstance === "all") {
-				return this.onAllServicesReload()
-			}
-
-			return this.selectedProcessInstance.instance.reload()
-		},
-		findServiceById: (id) => {
-			if (!isNaN(parseInt(id))) {
-				// find by index number
-				id = this.serviceRegistry[Object.keys(this.serviceRegistry)[id]]
-			} else {
-				// find by id
-				id = this.serviceRegistry[id]
-			}
-
-			return id
-		},
-		attachServiceSTD: (id) => {
-			console.log(`Attaching service [${id}]`)
-
-			if (id === "all") {
-				console.clear()
-				this.selectedProcessInstance = "all"
-				return this.std.attachAllServicesSTD()
-			}
-
-			const service = this.std.findServiceById(id)
-
-			if (!service) {
-				console.error(`Service [${service}] not found`)
-				return false
-			}
-
-			this.selectedProcessInstance = this.instancePool.find(
-				(instance) => instance.id === service.id,
-			)
-
-			if (!this.selectedProcessInstance) {
-				this.selectedProcessInstance = null
-
-				console.error(
-					`Cannot find service [${service.id}] in the instances pool`,
-				)
-
-				return false
-			}
-
-			this.std.detachAllServicesSTD()
-			console.clear()
-			this.selectedProcessInstance.instance.logs.attach()
-
-			return true
-		},
-		dettachServiceSTD: (id) => {},
-		attachAllServicesSTD: () => {
-			this.std.detachAllServicesSTD()
-
-			for (let service of this.instancePool) {
-				service.instance.logs.attach()
-			}
-		},
-		detachAllServicesSTD: () => {
-			for (let service of this.instancePool) {
-				service.instance.logs.detach()
-			}
-		},
-	}
-
+	/**
+	 * Initialize the gateway and start all services
+	 */
 	async initialize() {
 		onExit(this.onGatewayExit)
 
+		// Increase limits to handle many services
 		process.stdout.setMaxListeners(150)
 		process.stderr.setMaxListeners(150)
 
@@ -423,6 +290,12 @@ export default class Gateway {
 		this.proxy = new Proxy()
 		this.ipcRouter = new IPCRouter()
 
+		if (this.services.length === 0) {
+			console.error("❌ No services found")
+			return process.exit(1)
+		}
+
+		// Make key components available globally
 		global.eventBus = this.eventBus
 		global.ipcRouter = this.ipcRouter
 		global.proxy = this.proxy
@@ -433,41 +306,37 @@ export default class Gateway {
 			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} \n\n\n`,
 		)
 
-		if (this.services.length === 0) {
-			console.error("❌ No services found")
-			return process.exit(1)
-		}
-
 		console.log(`📦 Found ${this.services.length} service(s)`)
 
+		// Watch for service state changes
 		Observable.observe(this.serviceRegistry, (changes) => {
-			const { type } = changes[0]
-
-			switch (type) {
-				case "update": {
-					if (
-						Object.values(this.serviceRegistry).every(
-							(service) => service.initialized,
-						)
-					) {
-						this.onAllServicesReady()
-					}
-
-					break
-				}
-			}
+			this.checkAllServicesReady()
 		})
 
-		await this.createServicesWatchers()
+		await this.createServicesRegistry()
+		await this.createServiceInstances()
 
-		await this.createServicesProcess()
-
+		// Initialize REPL interface
 		new RELP({
-			attachAllServicesSTD: this.std.attachAllServicesSTD,
-			detachAllServicesSTD: this.std.detachAllServicesSTD,
-			attachServiceSTD: this.std.attachServiceSTD,
-			dettachServiceSTD: this.std.dettachServiceSTD,
-			reloadService: this.std.reloadService,
+			attachAllServicesSTD: () =>
+				this.serviceManager.attachAllServicesStd(),
+			detachAllServicesSTD: () =>
+				this.serviceManager.detachAllServicesStd(),
+			attachServiceSTD: (id) => this.serviceManager.attachServiceStd(id),
+			dettachServiceSTD: (id) => this.serviceManager.detachServiceStd(id),
+			reloadService: () => {
+				const selectedService = this.serviceManager.getSelectedService()
+				if (!selectedService) {
+					console.error(`No service selected`)
+					return false
+				}
+
+				if (selectedService === "all") {
+					return this.reloadAllServices()
+				}
+
+				return selectedService.reload()
+			},
 			onAllServicesReady: this.onAllServicesReady,
 		})
 	}
