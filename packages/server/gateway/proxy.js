@@ -59,6 +59,11 @@ export default class Proxy {
 		proxy.on("proxyReq", (proxyReq, req, res, options) => {
 			proxyReq.setHeader("x-linebridge-version", pkg.version)
 			proxyReq.setHeader("x-forwarded-for", req.socket.remoteAddress)
+			proxyReq.setHeader("x-service-id", serviceId)
+			proxyReq.setHeader(
+				"X-Forwarded-Proto",
+				req.socket.encrypted ? "https" : "http",
+			)
 		})
 
 		proxy.on("error", (e) => {

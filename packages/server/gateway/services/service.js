@@ -1,5 +1,6 @@
 import chokidar from "chokidar"
 import path from "path"
+import { minimatch } from "minimatch"
 import spawnService from "../utils/spawnService"
 import getIgnoredFiles from "../utils/getIgnoredFiles"
 
@@ -54,7 +55,6 @@ export default class Service {
 			id: this.id,
 			service: this.path,
 			cwd: this.cwd,
-			onReload: this.handleReload.bind(this),
 			onClose: this.handleClose.bind(this),
 			onError: this.handleError.bind(this),
 			onIPCData: this.handleIPCData.bind(this),
@@ -77,7 +77,8 @@ export default class Service {
 		]
 
 		this.fileWatcher = chokidar.watch(this.cwd, {
-			ignored,
+			ignored: (path) =>
+				ignored.some((pattern) => minimatch(path, pattern)),
 			persistent: true,
 			ignoreInitial: true,
 		})
@@ -97,15 +98,6 @@ export default class Service {
 		if (this.handlers.onIPCData) {
 			this.handlers.onIPCData(this, data)
 		}
-	}
-
-	/**
-	 * Handle service reload request
-	 * @param {object} params - Reload parameters
-	 */
-	async handleReload(params) {
-		// The actual reload is handled by the reload() method
-		console.log(`[${this.id}] Handling reload request`)
 	}
 
 	/**
@@ -143,8 +135,9 @@ export default class Service {
 		console.log(`[${this.id}] Reloading service...`)
 
 		// Kill the current process if is running
-		if (this.instance.exitCode !== null) {
-			await this.instance.kill("SIGINT")
+		if (this.instance.exitCode === null) {
+			console.log(`[${this.id}] Killing current process...`)
+			await this.instance.kill("SIGKILL")
 		}
 
 		// Start a new process
@@ -165,7 +158,7 @@ export default class Service {
 		}
 
 		if (this.instance) {
-			await this.instance.kill("SIGINT")
+			await this.instance.kill("SIGKILL")
 			this.instance = null
 		}
 	}

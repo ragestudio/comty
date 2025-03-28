@@ -26,6 +26,7 @@
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",
 		"linebridge": "^0.24.1",
+		"minimatch": "^10.0.1",
 		"minio": "^8.0.1",
 		"module-alias": "^2.2.3",
 		"mongoose": "^8.5.3",
