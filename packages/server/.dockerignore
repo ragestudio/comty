@@ -1,8 +1,32 @@
-./node_modules
-./build
-./dist
-./ssl
+# Secrets
+/**/**/.env
+/**/**/.ssl
 
-# secrets
-./api.production.env
-./.env
+# Trash
+/**/**/*.log
+/**/**/dumps.log
+/**/**/.crash.log
+/**/**/.tmp
+/**/**/.cache
+/**/**/cache
+/**/**/out
+/**/**/.out
+/**/**/dist
+/**/**/node_modules
+/**/**/corenode_modules
+/**/**/.DS_Store
+/**/**/.evite
+/**/**/uploads
+/**/**/d_data
+/**/**/redis_data
+/**/**/*.env
+
+# Locks
+/**/**/package-lock.json
+/**/**/yarn.lock
+
+# Logs
+/**/**/npm-debug.log*
+/**/**/yarn-error.log
+/**/**/dumps.log
+/**/**/corenode.log
