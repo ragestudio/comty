@@ -81,7 +81,7 @@ export default {
 					return {
 						uploadId: uploadId,
 						sseChannelId: sseChannelId,
-						eventChannelURL: `https://${req.get("host")}/upload/sse_events/${sseChannelId}`,
+						eventChannelURL: `${req.protocol}://${req.get("host")}/upload/sse_events/${sseChannelId}`,
 					}
 				} else {
 					const result = await RemoteUpload({
