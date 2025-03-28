@@ -7,9 +7,8 @@
 		"services/*"
 	],
 	"scripts": {
-		"start:prod": "cross-env NODE_ENV=production linebridge-boot ./index.js",
-		"dev": "cross-env NODE_ENV=development hermes-node ./index.js",
-		"build:bin": "cd build && pkg ./index.js"
+		"start:prod": "cross-env NODE_ENV=production linebridge-boot ./start.js",
+		"dev": "cross-env NODE_ENV=development hermes-node ./start.js"
 	},
 	"dependencies": {
 		"@infisical/sdk": "^2.1.8",
@@ -20,7 +19,10 @@
 		"axios": "^1.7.4",
 		"bcrypt": "^5.1.1",
 		"bullmq": "^5.41.5",
+		"chalk": "^5.4.1",
+		"chokidar": "^4.0.3",
 		"comty.js": "^0.61.0",
+		"cross-env": "^7.0.3",
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",
 		"linebridge": "^0.24.1",
@@ -36,7 +38,6 @@
 	},
 	"devDependencies": {
 		"chai": "^5.1.0",
-		"cross-env": "^7.0.3",
 		"mocha": "^10.3.0"
 	},
 	"resolutions": {
