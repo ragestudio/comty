@@ -54,6 +54,8 @@ export default class ChunkedUpload {
 			splitChunkSize: splitChunkSize,
 			totalChunks: this.totalChunks,
 			totalSize: file.size,
+			fileName: file.name,
+			fileType: file.type,
 		})
 	}
 
@@ -89,33 +91,32 @@ export default class ChunkedUpload {
 			const start = this.chunkCount * this.splitChunkSize
 			const end = Math.min(start + this.splitChunkSize, this.file.size)
 
-			this._reader.onload = () =>
+			this._reader.onload = () => {
 				resolve(
 					new Blob([this._reader.result], {
 						type: "application/octet-stream",
 					}),
 				)
+			}
 			this._reader.readAsArrayBuffer(this.file.slice(start, end))
 		})
 	}
 
 	async sendChunk() {
-		const form = new FormData()
-
-		form.append("file", this.chunk)
-
-		this.headers["uploader-chunk-number"] = this.chunkCount
-
 		console.log(`[UPLOADER] Sending chunk ${this.chunkCount}`, {
 			currentChunk: this.chunkCount,
 			totalChunks: this.totalChunks,
+			chunk: this.chunk,
 		})
 
 		try {
 			const res = await fetch(this.endpoint, {
 				method: "POST",
-				headers: this.headers,
-				body: form,
+				headers: {
+					...this.headers,
+					"uploader-chunk-number": this.chunkCount,
+				},
+				body: this.chunk,
 			})
 
 			return res
@@ -147,11 +148,16 @@ export default class ChunkedUpload {
 
 		this.chunk = await this.loadChunk()
 
-		const res = await this.sendChunk()
+		try {
+			const res = await this.sendChunk()
 
-		const data = await res.json()
+			if (![200, 201, 204].includes(res.status)) {
+				// failed!!
+				return this.manageRetries()
+			}
 
-		if ([200, 201, 204].includes(res.status)) {
+			const data = await res.json()
+
 			console.log(`[UPLOADER] Chunk ${this.chunkCount} sent`)
 
 			this.chunkCount = this.chunkCount + 1
@@ -162,43 +168,8 @@ export default class ChunkedUpload {
 
 			// check if is the last chunk, if so, handle sse events
 			if (this.chunkCount === this.totalChunks) {
-				if (data.eventChannelURL) {
-					console.log(
-						`[UPLOADER] Connecting to SSE channel >`,
-						data.eventChannelURL,
-					)
-
-					const eventSource = new EventSource(data.eventChannelURL)
-
-					eventSource.onerror = (error) => {
-						this.events.emit("error", error)
-					}
-
-					eventSource.onopen = () => {
-						console.log(`[UPLOADER] SSE channel opened`)
-					}
-
-					eventSource.onmessage = (event) => {
-						// parse json
-						const messageData = JSON.parse(event.data)
-
-						console.log(`[UPLOADER] SSE Event >`, messageData)
-
-						if (messageData.status === "done") {
-							this.events.emit("finish", messageData.result)
-							eventSource.close()
-						}
-
-						if (messageData.status === "error") {
-							this.events.emit("error", messageData.result)
-						}
-
-						if (messageData.status === "progress") {
-							this.events.emit("progress", {
-								percentProgress: messageData.progress,
-							})
-						}
-					}
+				if (data.sseChannelId || data.eventChannelURL) {
+					this.waitOnSSE(data)
 				} else {
 					this.events.emit("finish", data)
 				}
@@ -209,12 +180,8 @@ export default class ChunkedUpload {
 					(100 / this.totalChunks) * this.chunkCount,
 				),
 			})
-		} else if ([408, 502, 503, 504].includes(res.status)) {
-			this.manageRetries()
-		} else {
-			this.events.emit("error", {
-				message: `[${res.status}] ${data.error ?? data.message}`,
-			})
+		} catch (error) {
+			this.events.emit("error", error)
 		}
 	}
 
@@ -223,6 +190,47 @@ export default class ChunkedUpload {
 
 		if (!this.paused) {
 			return this.nextSend()
+		}
+	}
+
+	waitOnSSE(data) {
+		console.log(
+			`[UPLOADER] Connecting to SSE channel >`,
+			data.eventChannelURL,
+		)
+
+		const eventSource = new EventSource(data.eventChannelURL)
+
+		eventSource.onerror = (error) => {
+			this.events.emit("error", error)
+			eventSource.close()
+		}
+
+		eventSource.onopen = () => {
+			console.log(`[UPLOADER] SSE channel opened`)
+		}
+
+		eventSource.onmessage = (event) => {
+			// parse json
+			const messageData = JSON.parse(event.data)
+
+			console.log(`[UPLOADER] SSE Event >`, messageData)
+
+			if (messageData.status === "done") {
+				this.events.emit("finish", messageData.result)
+				eventSource.close()
+			}
+
+			if (messageData.status === "error") {
+				this.events.emit("error", messageData.result)
+				eventSource.close()
+			}
+
+			if (messageData.status === "progress") {
+				this.events.emit("progress", {
+					percentProgress: messageData.progress,
+				})
+			}
 		}
 	}
 }
