@@ -33,7 +33,6 @@ export default class SSEManager {
 
 		if (!channel) {
 			channel = this.createChannel(channelId)
-			//throw new OperationError(404, `Channel [${channelId}] not found`)
 		}
 
 		channel.clients.add(req)
@@ -43,15 +42,15 @@ export default class SSEManager {
 		res.setHeader("Connection", "keep-alive")
 		res.status(200)
 
-		// if (channel.cache.length > 0) {
-		//     for (const oldData of channel.cache) {
-		//         this.writeJSONToResponse(res, oldData)
-		//     }
-		// }
-
 		this.writeJSONToResponse(res, {
 			event: "connected",
 		})
+
+		if (channel.cache.length > 0) {
+			for (const oldData of channel.cache) {
+				this.writeJSONToResponse(res, oldData)
+			}
+		}
 
 		if (initialData) {
 			this.writeJSONToResponse(res, initialData)

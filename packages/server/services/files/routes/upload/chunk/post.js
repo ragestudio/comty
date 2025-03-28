@@ -1,15 +1,30 @@
-import path from "path"
-import fs from "fs"
+import { Duplex } from "node:stream"
+import path from "node:path"
+import fs from "node:fs"
 import RemoteUpload from "@services/remoteUpload"
-
-import ChunkFileUpload from "@shared-classes/ChunkFileUpload"
+import {
+	checkChunkUploadHeaders,
+	handleChunkFile,
+} from "@classes/ChunkFileUpload"
 
 const availableProviders = ["b2", "standard"]
+
+function bufferToStream(bf) {
+	let tmp = new Duplex()
+	tmp.push(bf)
+	tmp.push(null)
+	return tmp
+}
 
 export default {
 	useContext: ["cache", "limits"],
 	middlewares: ["withAuthentication"],
 	fn: async (req, res) => {
+		if (!checkChunkUploadHeaders(req.headers)) {
+			reject(new OperationError(400, "Missing header(s)"))
+			return
+		}
+
 		const uploadId = `${req.headers["uploader-file-id"]}_${Date.now()}`
 
 		const tmpPath = path.resolve(
@@ -47,23 +62,26 @@ export default {
 			throw new OperationError(400, "Invalid provider")
 		}
 
-		let build = await ChunkFileUpload(req, {
+		// create a readable stream from req.body(buffer)
+		const dataStream = bufferToStream(await req.buffer())
+
+		let result = await handleChunkFile(dataStream, {
 			tmpDir: tmpPath,
-			...limits,
-		}).catch((err) => {
-			throw new OperationError(err.code, err.message)
+			headers: req.headers,
+			maxFileSize: limits.maxFileSize,
+			maxChunkSize: limits.maxChunkSize,
 		})
 
-		if (typeof build === "function") {
+		if (typeof result === "function") {
 			try {
-				build = await build()
+				result = await result()
 
 				if (req.headers["transmux"] || limits.useCompression === true) {
 					// add a background task
 					const job = await global.queues.createJob(
 						"remote_upload",
 						{
-							filePath: build.filePath,
+							filePath: result.filePath,
 							parentDir: req.auth.session.user_id,
 							service: limits.useProvider,
 							useCompression: limits.useCompression,
@@ -81,11 +99,11 @@ export default {
 					return {
 						uploadId: uploadId,
 						sseChannelId: sseChannelId,
-						eventChannelURL: `${req.protocol}://${req.get("host")}/upload/sse_events/${sseChannelId}`,
+						eventChannelURL: `${req.headers["x-forwarded-proto"] || req.protocol}://${req.get("host")}/upload/sse_events/${sseChannelId}`,
 					}
 				} else {
 					const result = await RemoteUpload({
-						source: build.filePath,
+						source: result.filePath,
 						parentDir: req.auth.session.user_id,
 						service: limits.useProvider,
 						useCompression: limits.useCompression,

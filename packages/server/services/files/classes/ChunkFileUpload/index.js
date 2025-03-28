@@ -206,39 +206,3 @@ export async function handleChunkFile(
 		fileStream.pipe(writeStream)
 	})
 }
-
-export async function uploadChunkFile(
-	req,
-	{ tmpDir, maxFileSize, maxChunkSize },
-) {
-	// create a readable stream from req.body data blob
-	//
-	const chunkData = new Blob([req.body], { type: "application/octet-stream" })
-
-	console.log(chunkData)
-
-	if (!checkChunkUploadHeaders(req.headers)) {
-		reject(new OperationError(400, "Missing header(s)"))
-		return
-	}
-
-	// return await new Promise(async (resolve, reject) => {
-	// 	// create a readable node stream from "req.body" (octet-stream)
-	// 	await req.multipart(async (field) => {
-	// 		try {
-	// 			const result = await handleChunkFile(field.file.stream, {
-	// 				tmpDir: tmpDir,
-	// 				headers: req.headers,
-	// 				maxFileSize: maxFileSize,
-	// 				maxChunkSize: maxChunkSize,
-	// 			})
-
-	// 			return resolve(result)
-	// 		} catch (error) {
-	// 			return reject(error)
-	// 		}
-	// 	})
-	// })
-}
-
-export default uploadChunkFile
