@@ -29,7 +29,7 @@ export default class Gateway {
 	eventBus = new EventEmitter()
 
 	state = {
-		proxyPort: 9000,
+		proxyPort: process.env.GATEWAY_LISTEN_PORT ?? 9000,
 		internalIp: "0.0.0.0",
 		allReady: false,
 	}
