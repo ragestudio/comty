@@ -1,6 +1,6 @@
 import httpProxy from "http-proxy"
 import defaults from "linebridge/dist/defaults"
-import pkg from "../../../package.json" // Ajustado la ruta para que coincida con tu estructura
+import pkg from "../../../package.json"
 
 import http from "node:http"
 import https from "node:https"
@@ -32,19 +32,19 @@ export default class Proxy {
 		this.routes = new Map()
 		this.config = config
 
-		// Crear servidor HTTP
+		// Create HTTP server
 		this.server = getHttpServerEngine({}, this.handleRequest.bind(this))
 
-		// Manejar upgrades de WebSocket
+		// Handle WebSocket upgrades
 		this.server.on("upgrade", this.handleUpgrade.bind(this))
 
-		// Crear una única instancia de proxy que se reutilizará
+		// Create a single proxy instance that will be reused
 		this.proxyServer = httpProxy.createProxyServer({
 			changeOrigin: true,
 			xfwd: true,
 		})
 
-		// Manejar errores del proxy
+		// Handle proxy errors
 		this.proxyServer.on("error", (err, req, res) => {
 			console.error("Proxy error:", err)
 			if (res && !res.headersSent) {
@@ -108,7 +108,7 @@ export default class Proxy {
 	}
 
 	initialize = async () => {
-		// No es necesario inicializar nada, el servidor ya está configurado
+		// No initialization needed, the server is already configured
 		return true
 	}
 
@@ -142,12 +142,12 @@ export default class Proxy {
 	}
 
 	applyConfiguration = async () => {
-		// No se necesita aplicar configuración específica
+		// No specific configuration needs to be applied
 		return true
 	}
 
 	reload = async () => {
-		// No es necesario recargar nada
+		// No need to reload anything
 		return true
 	}
 
@@ -190,14 +190,14 @@ export default class Proxy {
 	handleRequest = (req, res) => {
 		this.setCorsHeaders(res)
 
-		// Si es una solicitud OPTIONS, responder inmediatamente
+		// If it's an OPTIONS request, respond immediately
 		if (req.method === "OPTIONS") {
 			res.statusCode = 204
 			res.end()
 			return
 		}
 
-		// Responder a solicitudes raíz
+		// Respond to root requests
 		if (req.url === "/") {
 			res.setHeader("Content-Type", "application/json")
 			res.end(
@@ -210,7 +210,7 @@ export default class Proxy {
 			return
 		}
 
-		// Encontrar la ruta para esta solicitud
+		// Find the route for this request
 		const route = this.findRouteForPath(req.url)
 
 		if (!route) {
@@ -227,7 +227,7 @@ export default class Proxy {
 			return
 		}
 
-		// Preparar opciones de proxy
+		// Prepare proxy options
 		const proxyOptions = {
 			target: route.target,
 			changeOrigin: true,
@@ -237,14 +237,14 @@ export default class Proxy {
 		// save original url
 		req.originalUrl = req.url
 
-		// Aplicar reescritura de ruta si está configurada
+		// Apply path rewriting if configured
 		if (route.pathRewrite) {
 			req.url = this.rewritePath(route.pathRewrite, req.url)
 		} else {
 			req.url = this.rewritePath({ [`^${route.path}`]: "" }, req.url)
 		}
 
-		// Agregar encabezados personalizados
+		// Add custom headers
 		this.proxyServer.on("proxyReq", (proxyReq, req, res, options) => {
 			proxyReq.setHeader("x-linebridge-version", pkg.version)
 			proxyReq.setHeader(
@@ -258,7 +258,7 @@ export default class Proxy {
 			)
 		})
 
-		// Proxy la solicitud
+		// Proxy the request
 		this.proxyServer.web(req, res, proxyOptions, (err) => {
 			if (err) {
 				console.error("Proxy error:", err)
@@ -277,7 +277,7 @@ export default class Proxy {
 	}
 
 	handleUpgrade = (req, socket, head) => {
-		// Encontrar la ruta para esta conexión WebSocket
+		// Find the route for this WebSocket connection
 		const route = this.findRouteForPath(req.url)
 
 		if (!route) {
@@ -290,21 +290,21 @@ export default class Proxy {
 		// save original url
 		req.originalUrl = req.url
 
-		// Aplicar reescritura de ruta si está configurada
+		// Apply path rewriting if configured
 		if (route.pathRewrite) {
 			req.url = this.rewritePath(route.pathRewrite, req.url)
 		} else {
 			req.url = this.rewritePath({ [`^${route.path}`]: "" }, req.url)
 		}
 
-		// Crear un objeto de opciones de proxy específico para WebSocket
+		// Create WebSocket-specific proxy options
 		const wsProxyOptions = {
 			target: route.target,
 			ws: true,
 			changeOrigin: true,
 		}
 
-		// Proxy la conexión WebSocket
+		// Proxy the WebSocket connection
 		this.proxyServer.ws(req, socket, head, wsProxyOptions, (err) => {
 			if (err) {
 				console.error("WebSocket proxy error:", err)
