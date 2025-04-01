@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react"
-import { Skeleton, Button, Tooltip, Popover, Tag } from "antd"
+import { Skeleton, Button, Popover } from "antd"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import rehypeRaw from "rehype-raw"
 import { DateTime } from "luxon"
-import createGoogleCalendarEvent from "@utils/createGoogleCalendarEvent"
+
+import { Icons } from "@components/Icons"
 
 import EventsModel from "@models/events"
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
-import { Icons } from "@components/Icons"
-
+import createGoogleCalendarEvent from "@utils/createGoogleCalendarEvent"
 import ContrastYIQ from "@utils/contrastYIQ"
 import ProcessString from "@utils/processString"
 
@@ -263,7 +262,6 @@ const EventPage = (props) => {
 						<div className="page-render">
 							<ReactMarkdown
 								remarkPlugins={[remarkGfm]}
-								rehypePlugins={[rehypeRaw]}
 								children={R_Event.page}
 							/>
 						</div>
