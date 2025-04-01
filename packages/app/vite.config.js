@@ -36,6 +36,7 @@ const config = {
 				secure: false,
 			},
 		},
+		allowedHosts: ["indev.comty.app"],
 	},
 	css: {
 		preprocessorOptions: {
