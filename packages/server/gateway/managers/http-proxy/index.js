@@ -122,7 +122,9 @@ export default class Proxy {
 						console.error("Failed to start server:", err)
 						return reject(err)
 					}
-					console.log(`🚀 Server listening on ${host}:${port}`)
+					console.log(
+						`🚀 Gateway listening on ${this.config.port}:${this.config.internalIp}`,
+					)
 					resolve()
 				},
 			)
