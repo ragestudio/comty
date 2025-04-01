@@ -4,7 +4,7 @@ import path from "node:path"
 import { execSync, spawn } from "node:child_process"
 import { platform } from "node:os"
 
-const localNginxBinary = path.resolve(process.cwd(), "nginx")
+const localNginxBinary = path.resolve(process.cwd(), "nginx-bin")
 
 /**
  * NginxManager - Optimized version that batches configurations
