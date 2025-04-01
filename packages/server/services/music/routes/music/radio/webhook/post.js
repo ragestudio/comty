@@ -79,11 +79,7 @@ export default async (req) => {
 		await global.websocket.redis.hdel(redis_id)
 	}
 
-	console.log(`Updating Radio`, data, {
-		redis_id,
-		online: data.online,
-		existMember,
-	})
+	console.log(`[${data.radio_id}] Updating radio data`)
 
 	global.sse.sendToChannel(`radio:${data.radio_id}`, {
 		event: "update",
