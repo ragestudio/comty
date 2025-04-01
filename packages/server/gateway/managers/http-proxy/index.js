@@ -112,16 +112,20 @@ export default class Proxy {
 		return true
 	}
 
-	start = async (port = 9000, host = "0.0.0.0") => {
+	start = async () => {
 		return new Promise((resolve, reject) => {
-			this.server.listen(port, host, (err) => {
-				if (err) {
-					console.error("Failed to start server:", err)
-					return reject(err)
-				}
-				console.log(`🚀 Server listening on ${host}:${port}`)
-				resolve()
-			})
+			this.server.listen(
+				this.config.port,
+				this.config.internalIp,
+				(err) => {
+					if (err) {
+						console.error("Failed to start server:", err)
+						return reject(err)
+					}
+					console.log(`🚀 Server listening on ${host}:${port}`)
+					resolve()
+				},
+			)
 		})
 	}
 
