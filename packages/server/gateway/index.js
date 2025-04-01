@@ -320,9 +320,9 @@ export default class Gateway {
 		await this.createServicesRegistry()
 		await this.createServiceInstances()
 
-		// WARNING: Starting relp makes uwebsockets unable to work properly, surging some bugs from nodejs (domain.enter)
-		// use another alternative to parse commands, like stdin reading or something...
-		this.startRELP()
+		if (!isProduction) {
+			this.startRELP()
+		}
 	}
 
 	startRELP() {
