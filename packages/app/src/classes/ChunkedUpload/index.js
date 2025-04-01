@@ -45,6 +45,8 @@ export default class ChunkedUpload {
 			"uploader-file-id": this.getFileUID(file),
 			"uploader-chunks-total": this.totalChunks,
 			"chunk-size": splitChunkSize,
+			"cache-control": "no-cache",
+			connection: "keep-alive",
 		}
 
 		this.setupListeners()
