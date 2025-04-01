@@ -49,15 +49,15 @@ export default class ToolsBar extends React.Component {
 			return component
 		},
 		detachRender: (id) => {
-			this.setState({
-				renders: {
-					top: this.state.renders.top.filter(
-						(render) => render.id !== id,
-					),
-					bottom: this.state.renders.bottom.filter(
-						(render) => render.id !== id,
-					),
-				},
+			this.setState((prev) => {
+				prev.renders.top = prev.renders.top.filter(
+					(render) => render.id === id,
+				)
+				prev.renders.bottom = prev.renders.bottom.filter(
+					(render) => render.id === id,
+				)
+
+				return prev
 			})
 
 			return true
@@ -104,6 +104,7 @@ export default class ToolsBar extends React.Component {
 										{
 											...render.props,
 											key: index,
+											id: render.id,
 										},
 									)
 								})}
