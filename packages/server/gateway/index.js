@@ -17,7 +17,9 @@ import ServiceManager from "./services/manager"
 import Service from "./services/service"
 import * as Managers from "./managers"
 
+global.debugFlag = process.env.DEBUG === "true"
 const isProduction = process.env.NODE_ENV === "production"
+
 const sslKey = path.resolve(process.cwd(), ".ssl", "privkey.pem")
 const sslCert = path.resolve(process.cwd(), ".ssl", "cert.pem")
 
@@ -71,6 +73,10 @@ export default class Gateway {
 	 * Creates and initializes all service instances
 	 */
 	async createServiceInstances() {
+		if (!debugFlag) {
+			console.log(`🔰 Starting all services, please wait...`)
+		}
+
 		for await (const servicePath of this.services) {
 			const instanceBasePath = path.dirname(servicePath)
 			const servicePkg = require(
@@ -99,8 +105,6 @@ export default class Gateway {
 
 			// Initialize service
 			await service.initialize()
-
-			console.log(`📦 [${serviceId}] Service initialized`)
 		}
 	}
 
@@ -112,10 +116,6 @@ export default class Gateway {
 		const serviceId = service.id
 		this.serviceRegistry[serviceId].initialized = true
 		this.serviceRegistry[serviceId].ready = true
-
-		console.log(
-			`✅ [${serviceId}][${this.serviceRegistry[serviceId].index}] Ready`,
-		)
 
 		// Check if all services are ready
 		this.checkAllServicesReady()
@@ -130,7 +130,7 @@ export default class Gateway {
 		const id = service.id
 
 		if (data.type === "log") {
-			console.log(`[${id}] ${data.message}`)
+			console.log(`[ipc:${id}] ${data.message}`)
 		}
 
 		if (data.status === "ready") {
@@ -234,9 +234,9 @@ export default class Gateway {
 		//console.clear()
 		//console.log(comtyAscii)
 
-		console.log("\n\n\n")
+		console.log("\n")
 		console.log(`🎉 All services[${this.services.length}] ready!\n`)
-		console.log(`USE: select <service>, reload, exit`)
+		console.log(`USE: select <service>, reload, exit\n`)
 
 		if (typeof this.gateway.applyConfiguration === "function") {
 			await this.gateway.applyConfiguration()
@@ -285,10 +285,20 @@ export default class Gateway {
 		this.services = await scanServices()
 		this.ipcRouter = new IPCRouter()
 
+		global.eventBus = this.eventBus
+		global.ipcRouter = this.ipcRouter
+
 		if (this.services.length === 0) {
 			console.error("❌ No services found")
 			return process.exit(1)
 		}
+
+		console.log(comtyAscii)
+		console.log(
+			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} | ${this.constructor.gatewayMode} |\n`,
+		)
+
+		console.log(`📦 Found ${this.services.length} service(s)`)
 
 		// Initialize gateway
 		this.gateway = new Managers[this.constructor.gatewayMode]({
@@ -302,19 +312,6 @@ export default class Gateway {
 			await this.gateway.initialize()
 		}
 
-		// Make key components available globally
-		global.eventBus = this.eventBus
-		global.ipcRouter = this.ipcRouter
-		global.proxy = this.proxy
-
-		//console.clear()
-		console.log(comtyAscii)
-		console.log(
-			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} \n\n\n`,
-		)
-
-		console.log(`📦 Found ${this.services.length} service(s)`)
-
 		// Watch for service state changes
 		Observable.observe(this.serviceRegistry, (changes) => {
 			this.checkAllServicesReady()
@@ -325,7 +322,7 @@ export default class Gateway {
 
 		// WARNING: Starting relp makes uwebsockets unable to work properly, surging some bugs from nodejs (domain.enter)
 		// use another alternative to parse commands, like stdin reading or something...
-		//this.startRELP()
+		this.startRELP()
 	}
 
 	startRELP() {

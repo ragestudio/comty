@@ -23,18 +23,15 @@ export default async ({ id, service, cwd, onClose, onError, onIPCData }) => {
 	instance.logs = {
 		stdout: createServiceLogTransformer({ id }),
 		stderr: createServiceLogTransformer({ id, color: "bgRed" }),
-		attach: () => {
+		attach: (withBuffer = false) => {
 			instance.logs.stdout.pipe(process.stdout)
 			instance.logs.stderr.pipe(process.stderr)
 		},
-		detach: () => {
+		detach: (withBuffer = false) => {
 			instance.logs.stdout.unpipe(process.stdout)
 			instance.logs.stderr.unpipe(process.stderr)
 		},
 	}
-
-	instance.logs.stdout.history = []
-	instance.logs.stderr.history = []
 
 	// push to buffer history
 	instance.stdout.pipe(instance.logs.stdout)

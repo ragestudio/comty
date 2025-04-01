@@ -51,6 +51,8 @@ export default class Service {
 	 * Start the service process
 	 */
 	async startProcess() {
+		console.log(`🔰 [${this.id}] Starting service...`)
+
 		this.instance = await spawnService({
 			id: this.id,
 			service: this.path,
@@ -60,7 +62,9 @@ export default class Service {
 			onIPCData: this.handleIPCData.bind(this),
 		})
 
+		// if debug flag is enabled, attach logs on start
 		this.instance.logs.attach()
+
 		return this.instance
 	}
 

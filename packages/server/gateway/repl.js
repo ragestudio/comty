@@ -1,68 +1,162 @@
-import repl from "node:repl"
-
 export default class RELP {
-    constructor(handlers) {
-        this.handlers = handlers
+	constructor(handlers) {
+		this.handlers = handlers
+		this.initCommandLine()
+	}
 
-        repl.start({
-            prompt: "> ",
-            useGlobal: true,
-            eval: (input, context, filename, callback) => {
-                let inputs = input.split(" ")
+	initCommandLine() {
+		// Configure line-by-line input mode
+		process.stdin.setEncoding("utf8")
+		process.stdin.resume()
+		process.stdin.setRawMode(true)
 
-                // remove last \n from input
-                inputs[inputs.length - 1] = inputs[inputs.length - 1].replace(/\n/g, "")
+		// Buffer to store user input
+		this.inputBuffer = ""
 
-                // find relp command 
-                const command = inputs[0]
-                const args = inputs.slice(1)
+		// Show initial prompt
+		this.showPrompt()
 
-                const command_fn = this.commands.find((relp_command) => {
-                    let exising = false
+		// Handle user input
+		process.stdin.on("data", (data) => {
+			const key = data.toString()
 
-                    if (Array.isArray(relp_command.aliases)) {
-                        exising = relp_command.aliases.includes(command)
-                    }
+			// Ctrl+C to exit
+			if (key === "\u0003") {
+				process.exit(0)
+			}
 
-                    if (relp_command.cmd === command) {
-                        exising = true
-                    }
+			// Enter key
+			if (key === "\r" || key === "\n") {
+				// Move to a new line
+				console.log()
 
-                    return exising
-                })
+				// Process the command
+				const command = this.inputBuffer.trim()
+				if (command) {
+					this.processCommand(command)
+				}
 
-                if (!command_fn) {
-                    return callback(`Command not found: ${command}`)
-                }
+				// Clear the buffer
+				this.inputBuffer = ""
 
-                return command_fn.fn(callback, ...args)
-            }
-        })
-    }
+				// Show the prompt again
+				this.showPrompt()
+				return
+			}
 
-    commands = [
-        {
-            cmd: "select",
-            aliases: ["s", "sel"],
-            fn: (cb, service) => {
-                this.handlers.detachAllServicesSTD()
+			// Backspace/Delete
+			if (key === "\b" || key === "\x7f") {
+				if (this.inputBuffer.length > 0) {
+					// Delete a character from the buffer
+					this.inputBuffer = this.inputBuffer.slice(0, -1)
 
-                return this.handlers.attachServiceSTD(service)
-            }
-        },
-        {
-            cmd: "reload",
-            aliases: ["r"],
-            fn: () => {
-                this.handlers.reloadService()
-            }
-        },
-        {
-            cmd: "exit",
-            aliases: ["e"],
-            fn: () => {
-                process.exit(0)
-            }
-        }
-    ]
+					// Update the line in the terminal
+					process.stdout.write("\r\x1b[K> " + this.inputBuffer)
+				}
+				return
+			}
+
+			// Normal characters
+			if (key.length === 1 && key >= " ") {
+				this.inputBuffer += key
+				process.stdout.write(key)
+			}
+		})
+
+		// Intercept console.log to keep the prompt visible
+		const originalConsoleLog = console.log
+		console.log = (...args) => {
+			// Clear the current line
+			process.stdout.write("\r\x1b[K")
+
+			// Print the message
+			originalConsoleLog(...args)
+
+			// Reprint the prompt and current buffer
+			this.showPrompt(false)
+		}
+
+		// Do the same with console.error
+		const originalConsoleError = console.error
+		console.error = (...args) => {
+			// Clear the current line
+			process.stdout.write("\r\x1b[K")
+
+			// Print the error message
+			originalConsoleError(...args)
+
+			// Reprint the prompt and current buffer
+			this.showPrompt(false)
+		}
+	}
+
+	showPrompt(newLine = true) {
+		if (newLine) {
+			process.stdout.write("\r")
+		}
+		process.stdout.write("> " + this.inputBuffer)
+	}
+
+	processCommand(input) {
+		const inputs = input.split(" ")
+		const command = inputs[0]
+		const args = inputs.slice(1)
+
+		this.inputBuffer = ""
+
+		const commandFn = this.commands.find((relpCommand) => {
+			if (relpCommand.cmd === command) {
+				return true
+			}
+
+			if (Array.isArray(relpCommand.aliases)) {
+				return relpCommand.aliases.includes(command)
+			}
+
+			return false
+		})
+
+		if (!commandFn) {
+			console.error(`Command not found: ${command}`)
+			return
+		}
+
+		// Adapter to maintain compatibility with the original API
+		const callback = (result) => {
+			if (result) {
+				console.log(result)
+			}
+		}
+
+		try {
+			commandFn.fn(callback, ...args)
+		} catch (error) {
+			console.error(`Error executing command: ${error.message}`)
+		}
+	}
+
+	commands = [
+		{
+			cmd: "select",
+			aliases: ["s", "sel"],
+			fn: (cb, service) => {
+				this.handlers.detachAllServicesSTD()
+				return this.handlers.attachServiceSTD(service)
+			},
+		},
+		{
+			cmd: "reload",
+			aliases: ["r"],
+			fn: () => {
+				this.handlers.reloadService()
+			},
+		},
+		{
+			cmd: "exit",
+			aliases: ["e"],
+			fn: () => {
+				process.exit(0)
+			},
+		},
+	]
 }

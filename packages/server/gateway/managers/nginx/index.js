@@ -2,7 +2,8 @@ import fs from "node:fs/promises"
 import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { execSync, spawn } from "node:child_process"
-import { platform } from "node:os"
+import defaults from "linebridge/dist/defaults"
+import pkg from "../../../package.json"
 
 const localNginxBinary = path.resolve(process.cwd(), "nginx-bin")
 
@@ -42,9 +43,6 @@ export default class NginxManager {
 		// Process reference
 		this.nginxProcess = null
 		this.isNginxRunning = false
-
-		// Debug mode
-		this.debug = options.debug || false
 
 		if (
 			existsSync(this.options.cert_file_name) &&
@@ -128,12 +126,19 @@ export default class NginxManager {
 			.join(this.tempDir, "cache")
 			.replace(/\\/g, "/")
 
+		const mainEndpointJSON = JSON.stringify({
+			name: pkg.name,
+			version: "1.21.6",
+			lb_version: defaults?.version ?? "unknown",
+			gateway: "nginx",
+		})
+
 		const config = `
 # Nginx configuration for Comty API Gateway
 # Auto-generated - Do not edit manually
 
 worker_processes auto;
-error_log ${normalizedLogsDir}/error.log ${this.debug ? "debug" : "error"};
+error_log ${normalizedLogsDir}/error.log ${debugFlag ? "debug" : "error"};
 pid ${normalizedTempDir}/nginx.pid;
 
 events {
@@ -155,7 +160,7 @@ http {
                     'request_time: $request_time '
                     'http_version: $server_protocol';
 
-    access_log ${normalizedLogsDir}/access.log ${this.debug ? "debug" : "main"};
+    access_log ${normalizedLogsDir}/access.log ${debugFlag ? "debug" : "main"};
 
     sendfile on;
     tcp_nodelay on;
@@ -190,7 +195,7 @@ http {
               add_header 'Access-Control-Allow-Headers' '*' always;
               add_header 'Access-Control-Allow-Methods' 'GET,HEAD,PUT,PATCH,POST,DELETE' always;
 
-              return 200 '{"ok":1}';
+              return 200 '${mainEndpointJSON}';
             }
 
             # Include service-specific configurations
@@ -247,7 +252,7 @@ http {
 				? routePath
 				: `/${routePath}`
 
-			if (this.debug) {
+			if (debugFlag) {
 				console.log(
 					`🔍 Registering route for [${serviceId}]: ${normalizedPath} -> ${target} (${websocket ? "WebSocket" : "HTTP"})`,
 				)
@@ -349,7 +354,7 @@ http {
 		// Write the config
 		await fs.writeFile(this.servicesConfigPath, config)
 
-		if (this.debug) {
+		if (debugFlag) {
 			console.log(`📄 Writted [${this.routes.size}] service routes`)
 		}
 	}
@@ -494,7 +499,7 @@ ${locationDirective} {
 
 			const cmdString = `"${this.nginxBinary}" ${allArgs.join(" ")}`
 
-			if (this.debug) {
+			if (debugFlag) {
 				console.log(`🔍 Executing: ${cmdString}`)
 			}
 
@@ -566,7 +571,7 @@ ${locationDirective} {
 	 * Stop the Nginx server
 	 * @returns {Boolean} - Success status
 	 */
-	async close() {
+	async stop() {
 		try {
 			if (this.nginxProcess) {
 				// Try graceful shutdown first

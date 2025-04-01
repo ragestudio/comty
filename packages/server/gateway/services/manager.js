@@ -51,6 +51,7 @@ export default class ServiceManager {
 		}
 
 		const service = this.getService(id)
+
 		if (!service) {
 			console.error(`Service [${id}] not found`)
 			return false
@@ -64,8 +65,6 @@ export default class ServiceManager {
 	 * Reload all services
 	 */
 	reloadAllServices() {
-		console.log("Reloading all services...")
-
 		for (const service of this.services) {
 			service.reload()
 		}
@@ -75,8 +74,6 @@ export default class ServiceManager {
 	 * Stop all services
 	 */
 	stopAllServices() {
-		console.log("Stopping all services...")
-
 		for (const service of this.services) {
 			service.stop()
 		}
@@ -88,8 +85,6 @@ export default class ServiceManager {
 	 * @returns {boolean} True if attachment was successful
 	 */
 	attachServiceStd(id) {
-		console.log(`Attaching to service [${id}]`)
-
 		if (id === "all") {
 			this.selectedService = "all"
 			this.attachAllServicesStd()

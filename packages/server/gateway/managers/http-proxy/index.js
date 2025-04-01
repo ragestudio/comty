@@ -123,7 +123,7 @@ export default class Proxy {
 						return reject(err)
 					}
 					console.log(
-						`🚀 Gateway listening on ${this.config.port}:${this.config.internalIp}`,
+						`🚀 Gateway listening on ${this.config.internalIp}:${this.config.port}`,
 					)
 					resolve()
 				},
@@ -205,6 +205,7 @@ export default class Proxy {
 					name: pkg.name,
 					version: pkg.version,
 					lb_version: defaults?.version || "unknown",
+					gateway: "standard",
 				}),
 			)
 			return
