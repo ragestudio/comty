@@ -28,9 +28,9 @@ function getHttpServerEngine(extraOptions = {}, handler = () => {}) {
 }
 
 export default class Proxy {
-	constructor() {
+	constructor(config = {}) {
 		this.routes = new Map()
-		this.config = {}
+		this.config = config
 
 		// Crear servidor HTTP
 		this.server = getHttpServerEngine({}, this.handleRequest.bind(this))
