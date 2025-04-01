@@ -1,3 +1,3 @@
-export default () => {
-    return "pong"
+export default (req) => {
+	return "pong"
 }
