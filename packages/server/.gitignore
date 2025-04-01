@@ -20,6 +20,8 @@
 /**/**/d_data
 /**/**/redis_data
 /**/**/*.env
+/**/**/.nginx
+/**/**/nginx-bin
 
 # Locks
 /**/**/package-lock.json

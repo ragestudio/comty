@@ -8,24 +8,26 @@ import { onExit } from "signal-exit"
 import chalk from "chalk"
 import treeKill from "tree-kill"
 
-import getIgnoredFiles from "./utils/getIgnoredFiles"
 import scanServices from "./utils/scanServices"
-import spawnService from "./utils/spawnService"
-import Proxy from "./proxy"
 import RELP from "./repl"
 import comtyAscii from "./ascii"
 import pkg from "../package.json"
 
 import ServiceManager from "./services/manager"
 import Service from "./services/service"
+import * as Managers from "./managers"
 
 const isProduction = process.env.NODE_ENV === "production"
+const sslKey = path.resolve(process.cwd(), ".ssl", "privkey.pem")
+const sslCert = path.resolve(process.cwd(), ".ssl", "cert.pem")
 
 /**
  * Gateway class - Main entry point for the service orchestrator
  * Manages service discovery, spawning, and communication
  */
 export default class Gateway {
+	static gatewayMode = process.env.GATEWAY_MODE ?? "http_proxy"
+
 	eventBus = new EventEmitter()
 
 	state = {
@@ -39,7 +41,8 @@ export default class Gateway {
 	services = []
 	serviceRegistry = Observable.from({})
 
-	proxy = null
+	gateway = null
+
 	ipcRouter = null
 
 	/**
@@ -134,12 +137,8 @@ export default class Gateway {
 			this.onServiceReady(service)
 		}
 
-		if (data.type === "router:register") {
-			await this.handleRouterRegistration(service, data)
-		}
-
-		if (data.type === "router:ws:register") {
-			await this.handleWebsocketRegistration(service, data)
+		if (data.type === "service:register") {
+			await this.handleServiceRegistration(service, data)
 		}
 	}
 
@@ -161,64 +160,48 @@ export default class Gateway {
 			console.error(error)
 		}
 
-		this.proxy.unregisterAllFromService(id)
+		if (typeof this.gateway.unregisterAllFromService === "function") {
+			this.gateway.unregisterAllFromService(id)
+		}
 	}
 
 	/**
-	 * Handle router registration requests from services
-	 * @param {Service} service - Service registering a route
+	 * Handle both router and websocket registration requests from services
+	 * @param {Service} service - Service registering a route or websocket
 	 * @param {object} msg - Registration message
+	 * @param {boolean} isWebsocket - Whether this is a websocket registration
 	 */
-	async handleRouterRegistration(service, msg) {
-		const id = service.id
+	async handleServiceRegistration(service, data) {
+		const { id } = service
+		const { namespace, http, websocket, listen } = data.register
 
-		if (msg.data.path_overrides) {
-			for await (const pathOverride of msg.data.path_overrides) {
-				await this.proxy.register({
+		if (http && http.enabled === true && Array.isArray(http.paths)) {
+			for (const path of http.paths) {
+				await this.gateway.register({
 					serviceId: id,
-					path: `/${pathOverride}`,
-					target: `http://${this.state.internalIp}:${msg.data.listen.port}/${pathOverride}`,
-					pathRewrite: {
-						[`^/${pathOverride}`]: "",
-					},
+					path: path,
+					target: `${http.proto}://${listen.ip}:${listen.port}${path}`,
 				})
 			}
-		} else {
-			await this.proxy.register({
+		}
+
+		if (websocket && websocket.enabled === true) {
+			await this.gateway.register({
 				serviceId: id,
-				path: `/${id}`,
-				target: `http://${msg.data.listen.ip}:${msg.data.listen.port}`,
+				websocket: true,
+				path: websocket.path,
+				target: `${http.proto}://${listen.ip}:${listen.port}${websocket.path}`,
 			})
 		}
-	}
 
-	/**
-	 * Handle websocket registration requests from services
-	 * @param {Service} service - Service registering a websocket
-	 * @param {object} msg - Registration message
-	 */
-	async handleWebsocketRegistration(service, msg) {
-		const id = service.id
-		const listenPort = msg.data.listen_port ?? msg.data.listen?.port
-		let target = `http://${this.state.internalIp}:${listenPort}`
-
-		if (!msg.data.ws_path && msg.data.namespace) {
-			target += `/${msg.data.namespace}`
+		if (this.state.allReady) {
+			if (typeof this.gateway.applyConfiguration === "function") {
+				await this.gateway.applyConfiguration()
+			}
+			if (typeof this.gateway.reload === "function") {
+				await this.gateway.reload()
+			}
 		}
-
-		if (msg.data.ws_path && msg.data.ws_path !== "/") {
-			target += `/${msg.data.ws_path}`
-		}
-
-		await this.proxy.register({
-			serviceId: id,
-			path: `/${msg.data.namespace}`,
-			target: target,
-			pathRewrite: {
-				[`^/${msg.data.namespace}`]: "",
-			},
-			ws: true,
-		})
 	}
 
 	/**
@@ -232,6 +215,7 @@ export default class Gateway {
 		).every((service) => service.initialized)
 
 		if (allServicesInitialized) {
+			this.state.allReady = true
 			this.onAllServicesReady()
 		}
 	}
@@ -247,29 +231,34 @@ export default class Gateway {
 	 * Handle when all services are ready
 	 */
 	onAllServicesReady = async () => {
-		if (this.state.allReady) {
-			return false
-		}
+		//console.clear()
+		//console.log(comtyAscii)
 
-		console.clear()
-		this.state.allReady = true
-
-		console.log(comtyAscii)
+		console.log("\n\n\n")
 		console.log(`🎉 All services[${this.services.length}] ready!\n`)
 		console.log(`USE: select <service>, reload, exit`)
 
-		await this.proxy.listen(this.state.proxyPort, this.state.internalIp)
+		if (typeof this.gateway.applyConfiguration === "function") {
+			await this.gateway.applyConfiguration()
+		}
+
+		if (typeof this.gateway.start === "function") {
+			await this.gateway.start()
+		}
 	}
 
 	/**
 	 * Clean up resources on gateway exit
 	 */
 	onGatewayExit = () => {
-		console.clear()
+		//console.clear()
 		console.log(`\n🛑 Preparing to exit...`)
-		console.log(`Stopping proxy...`)
 
-		this.proxy.close()
+		if (typeof this.gateway.stop === "function") {
+			console.log(`Stopping gateway...`)
+			this.gateway.stop()
+		}
+
 		console.log(`Stopping all services...`)
 		this.serviceManager.stopAllServices()
 
@@ -280,6 +269,13 @@ export default class Gateway {
 	 * Initialize the gateway and start all services
 	 */
 	async initialize() {
+		if (!Managers[this.constructor.gatewayMode]) {
+			console.error(
+				`❌ Gateway mode [${this.constructor.gatewayMode}] not supported`,
+			)
+			return 0
+		}
+
 		onExit(this.onGatewayExit)
 
 		// Increase limits to handle many services
@@ -287,7 +283,6 @@ export default class Gateway {
 		process.stderr.setMaxListeners(150)
 
 		this.services = await scanServices()
-		this.proxy = new Proxy()
 		this.ipcRouter = new IPCRouter()
 
 		if (this.services.length === 0) {
@@ -295,12 +290,24 @@ export default class Gateway {
 			return process.exit(1)
 		}
 
+		// Initialize gateway
+		this.gateway = new Managers[this.constructor.gatewayMode]({
+			port: this.state.proxyPort,
+			internalIp: this.state.internalIp,
+			cert_file_name: sslCert,
+			key_file_name: sslKey,
+		})
+
+		if (typeof this.gateway.initialize === "function") {
+			await this.gateway.initialize()
+		}
+
 		// Make key components available globally
 		global.eventBus = this.eventBus
 		global.ipcRouter = this.ipcRouter
 		global.proxy = this.proxy
 
-		console.clear()
+		//console.clear()
 		console.log(comtyAscii)
 		console.log(
 			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} \n\n\n`,
@@ -316,6 +323,12 @@ export default class Gateway {
 		await this.createServicesRegistry()
 		await this.createServiceInstances()
 
+		// WARNING: Starting relp makes uwebsockets unable to work properly, surging some bugs from nodejs (domain.enter)
+		// use another alternative to parse commands, like stdin reading or something...
+		//this.startRELP()
+	}
+
+	startRELP() {
 		// Initialize REPL interface
 		new RELP({
 			attachAllServicesSTD: () =>

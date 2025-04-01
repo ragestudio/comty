@@ -11,6 +11,8 @@
 		"dev": "cross-env NODE_ENV=development hermes-node ./start.js"
 	},
 	"dependencies": {
+		"@grpc/grpc-js": "^1.13.2",
+		"@grpc/proto-loader": "^0.7.13",
 		"@infisical/sdk": "^2.1.8",
 		"@opentelemetry/api": "^1.9.0",
 		"@opentelemetry/auto-instrumentations-node": "^0.56.1",
@@ -25,7 +27,7 @@
 		"cross-env": "^7.0.3",
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^0.24.1",
+		"linebridge": "^0.25.2",
 		"minimatch": "^10.0.1",
 		"minio": "^8.0.1",
 		"module-alias": "^2.2.3",
