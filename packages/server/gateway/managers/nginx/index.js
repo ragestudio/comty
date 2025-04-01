@@ -158,17 +158,9 @@ http {
     access_log ${normalizedLogsDir}/access.log ${this.debug ? "debug" : "main"};
 
     sendfile on;
-    tcp_nopush on;
-
     tcp_nodelay on;
 
     client_max_body_size 100M;
-
-    # WebSocket support
-    map $http_upgrade $connection_upgrade {
-        default upgrade;
-        '' close;
-    }
 
     # Temp directories
     client_body_temp_path ${normalizedCacheDir}/client_body;
@@ -403,16 +395,20 @@ ${locationDirective} {
     # Set proxy configuration
     proxy_http_version 1.1;
     proxy_pass_request_headers on;
+    chunked_transfer_encoding off;
+    proxy_buffering off;
+    proxy_cache off;
 
     # Standard proxy headers
-    proxy_set_header Host $host:$server_port;
+    proxy_set_header Host $http_host;
+
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
 
     # Set headers for WebSocket support
     proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection $connection_upgrade;
+    proxy_set_header Connection "upgrade";
 
     # Proxy pass to service
     proxy_pass ${route.target};
