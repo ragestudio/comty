@@ -1,47 +1,29 @@
 import React from "react"
 
 import Announcement from "../FeaturedEventAnnouncement"
+import EventsModel from "@models/events"
 
 import "./index.less"
 
-export default React.memo((props) => {
-    const [featuredEvents, setFeaturedEvents] = React.useState([])
+const FeaturedEventsAnnouncements = React.memo((props) => {
+	const [
+		L_FeaturedEvents,
+		R_FeaturedEvents,
+		E_FeaturedEvents,
+		M_FeaturedEvents,
+	] = app.cores.api.useRequest(EventsModel.getFeatured)
 
-    const fetchFeaturedEvents = React.useCallback(async () => {
-        let { data } = await app.cores.api.customRequest({
-            url: "/featured_events",
-            method: "GET"
-        }).catch((err) => {
-            console.error(err)
-            app.message.error(`Failed to fetch featured events`)
+	if (!Array.isArray(R_FeaturedEvents)) {
+		return null
+	}
 
-            return {
-                data: null
-            }
-        })
-
-        if (data) {
-            // parse announcement data
-            data = data.map((item) => {
-                try {
-                    item.announcement = JSON.parse(item.announcement)
-                } catch (error) {
-                    console.error(error)
-                    app.message.error(`Failed to parse announcement data`)
-                }
-                return item
-            })
-
-            setFeaturedEvents(data)
-        }
-
-    }, [])
-
-    React.useEffect(() => {
-        fetchFeaturedEvents()
-    }, [])
-
-    return <div className="featuredEvents">
-        {featuredEvents.map((event, index) => <Announcement index={index} data={event} />)}
-    </div>
+	return (
+		<div className="featuredEvents">
+			{R_FeaturedEvents.map((event, index) => (
+				<Announcement index={index} data={event} />
+			))}
+		</div>
+	)
 })
+
+export default FeaturedEventsAnnouncements
