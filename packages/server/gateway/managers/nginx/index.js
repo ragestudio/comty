@@ -392,6 +392,9 @@ ${locationDirective} {
       return 200;
     }
 
+    # Add some missing headers
+    add_header 'X-Accel-Buffering' 'no';
+
     # Set proxy configuration
     proxy_http_version 1.1;
     proxy_pass_request_headers on;
