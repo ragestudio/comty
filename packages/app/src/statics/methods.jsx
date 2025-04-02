@@ -1,8 +1,8 @@
 import { Lightbox } from "react-modal-image"
-import { Searcher, NotificationsCenter, PostCreator } from "@components"
-
-import config from "@config"
+import { NotificationsCenter, PostCreator, Searcher } from "@components"
 import AppsMenu from "@components/AppsMenu"
+import config from "@config"
+import deleteInternalStorage from "@utils/deleteInternalStorage"
 
 export default {
 	controls: {
@@ -170,12 +170,12 @@ export default {
 	},
 	maintenance: {
 		clearInternalStorage: async () => {
-			antd.Modal.confirm({
-				title: "Clear internal storage",
-				content:
+			app.layout.modal.confirm({
+				headerText: "Clear internal storage",
+				descriptionText:
 					"Are you sure you want to clear all internal storage? This will remove all your data from the app, including your session.",
-				onOk: async () => {
-					Utils.deleteInternalStorage()
+				onConfirm: () => {
+					deleteInternalStorage()
 				},
 			})
 		},
