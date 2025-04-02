@@ -8,327 +8,353 @@ import SessionModel from "@models/session"
 import "./index.less"
 
 const Line = (props) => {
-    const { user, content } = props
+	const { user, content } = props
 
-    return <div className="textRoom_line">
-        <div className="textRoom_line_user">
-            <h4>{user.fullName ?? user.username}</h4>
-        </div>
-        <div className="textRoom_line_content">
-            <span>{content}</span>
-        </div>
-    </div>
+	return (
+		<div className="textRoom_line">
+			<div className="textRoom_line_user">
+				<h4>{user.fullName ?? user.username}</h4>
+			</div>
+			<div className="textRoom_line_content">
+				<span>{content}</span>
+			</div>
+		</div>
+	)
 }
 
 export default class LiveChat extends React.Component {
-    state = {
-        joining: true,
-        roomInfo: null,
+	state = {
+		joining: true,
+		roomInfo: null,
 
-        timeline: [],
-        temporalTimeline: [],
-        maxTemporalLines: this.props.maxTemporalLines ?? 10,
+		timeline: [],
+		temporalTimeline: [],
+		maxTemporalLines: this.props.maxTemporalLines ?? 10,
 
-        lastSentMessage: null,
-        writtedMessage: "",
-    }
+		lastSentMessage: null,
+		writtedMessage: "",
+	}
 
-    debouncedIntervalTimelinePurge = null
+	debouncedIntervalTimelinePurge = null
 
-    timelineRef = React.createRef()
+	timelineRef = React.createRef()
 
-    socket = app.cores.api.client().sockets.chats
+	socket = app.cores.api.client().ws.sockets.get("chats")
 
-    roomEvents = {
-        "room:message": (message) => {
-            if (message.content === this.state.lastSentMessage) {
-                console.timeEnd("[CHATROOM] SUBMIT:MESSAGE")
-            }
+	roomEvents = {
+		"room:message": (message) => {
+			if (message.content === this.state.lastSentMessage) {
+				console.timeEnd("[CHATROOM] SUBMIT:MESSAGE")
+			}
 
-            this.pushToTimeline(message)
-        },
-        "room:joined": (info) => {
-            console.log("[CHATROOM] Room joined", info)
+			this.pushToTimeline(message)
+		},
+		"room:joined": (info) => {
+			console.log("[CHATROOM] Room joined", info)
 
-            this.setState({
-                joining: false,
-                roomInfo: info,
-            })
-        },
-        "room:leave": (info) => {
-            console.log("[CHATROOM] Room left", info)
+			this.setState({
+				joining: false,
+				roomInfo: info,
+			})
+		},
+		"room:leave": (info) => {
+			console.log("[CHATROOM] Room left", info)
 
-            this.setState({
-                joining: true,
-                roomInfo: null,
-            })
-        }
-    }
+			this.setState({
+				joining: true,
+				roomInfo: null,
+			})
+		},
+	}
 
-    joinSocketRoom = async () => {
-        if (!SessionModel.token) {
-            return this.setState({
-                noAuthed: true,
-            })
-        }
-       
-        console.log(`[CHATROOM] Joining socket room [${this.props.id}]...`)
+	joinSocketRoom = async () => {
+		if (!SessionModel.token) {
+			return this.setState({
+				noAuthed: true,
+			})
+		}
 
-        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
-            this.socket.on(eventName, eventHandler)
-        }
+		console.log(`[CHATROOM] Joining socket room [${this.props.id}]...`)
 
-        await this.setState({
-            joining: true,
-        })
+		for (const [eventName, eventHandler] of Object.entries(
+			this.roomEvents,
+		)) {
+			this.socket.on(eventName, eventHandler)
+		}
 
-        this.socket.emit(
-            "join:room",
-            {
-                room: this.props.id,
-            },
-            (error, info) => {
-                if (error) {
-                    this.setState({ connectionEnd: true })
+		await this.setState({
+			joining: true,
+		})
 
-                    return console.error("Error joining room", error)
-                }
-            }
-        )
-    }
+		this.socket.emit(
+			"join:room",
+			{
+				room: this.props.id,
+			},
+			(error, info) => {
+				if (error) {
+					this.setState({ connectionEnd: true })
 
-    leaveSocketRoom = () => {
-        if (this.state.connectionEnd) {
-            return false
-        }
-        
-        console.log(`[CHATROOM] Leaving socket room [${this.props.id}]...`)
+					return console.error("Error joining room", error)
+				}
+			},
+		)
+	}
 
-        for (const [eventName, eventHandler] of Object.entries(this.roomEvents)) {
-            this.socket.off(eventName, eventHandler)
-        }
+	leaveSocketRoom = () => {
+		if (this.state.connectionEnd) {
+			return false
+		}
 
-        this.socket.emit("leave:room")
-    }
+		console.log(`[CHATROOM] Leaving socket room [${this.props.id}]...`)
 
-    submitMessage = (message) => {
-        console.time("[CHATROOM] SUBMIT:MESSAGE")
+		for (const [eventName, eventHandler] of Object.entries(
+			this.roomEvents,
+		)) {
+			this.socket.off(eventName, eventHandler)
+		}
 
-        this.socket.emit("room:send:message", {
-            message
-        })
+		this.socket.emit("leave:room")
+	}
 
-        // remove writted message
-        this.setState({
-            lastSentMessage: message,
-            writtedMessage: ""
-        })
-    }
+	submitMessage = (message) => {
+		console.time("[CHATROOM] SUBMIT:MESSAGE")
 
-    pushToTimeline = (message) => {
-        const { timeline } = this.state
+		this.socket.emit("room:send:message", {
+			message,
+		})
 
-        if (typeof message.key === "undefined") {
-            message.key = this.state.timeline.length
-        }
+		// remove writted message
+		this.setState({
+			lastSentMessage: message,
+			writtedMessage: "",
+		})
+	}
 
-        this.setState({
-            timeline: [...timeline, message]
-        })
+	pushToTimeline = (message) => {
+		const { timeline } = this.state
 
-        if (this.props.floatingMode) {
-            if (this.state.temporalTimeline.length >= this.state.maxTemporalLines) {
-                this.setState({
-                    temporalTimeline: this.state.temporalTimeline.slice(1)
-                })
-            }
+		if (typeof message.key === "undefined") {
+			message.key = this.state.timeline.length
+		}
 
-            // calculate duration based on message length (Minimum 3 second, maximum 10 seconds)
-            const calculatedDuration = Math.min(Math.max(message.content.length * 0.1, 3), 10) * 1000
+		this.setState({
+			timeline: [...timeline, message],
+		})
 
-            const temporalLine = {
-                expireTime: Date.now() + calculatedDuration,
-                duration: calculatedDuration,
-                messageKey: message.key
-            }
+		if (this.props.floatingMode) {
+			if (
+				this.state.temporalTimeline.length >=
+				this.state.maxTemporalLines
+			) {
+				this.setState({
+					temporalTimeline: this.state.temporalTimeline.slice(1),
+				})
+			}
 
-            this.setState({
-                temporalTimeline: [...this.state.temporalTimeline, temporalLine]
-            })
+			// calculate duration based on message length (Minimum 3 second, maximum 10 seconds)
+			const calculatedDuration =
+				Math.min(Math.max(message.content.length * 0.1, 3), 10) * 1000
 
-            if (this.debouncedIntervalTimelinePurge) {
-                clearInterval(this.debouncedIntervalTimelinePurge)
-            }
+			const temporalLine = {
+				expireTime: Date.now() + calculatedDuration,
+				duration: calculatedDuration,
+				messageKey: message.key,
+			}
 
-            this.debouncedIntervalTimelinePurge = setInterval(this.purgeLastTemporalLine, 3000)
-        }
+			this.setState({
+				temporalTimeline: [
+					...this.state.temporalTimeline,
+					temporalLine,
+				],
+			})
 
-        this.scrollTimelineToBottom()
-    }
+			if (this.debouncedIntervalTimelinePurge) {
+				clearInterval(this.debouncedIntervalTimelinePurge)
+			}
 
-    purgeLastTemporalLine = () => {
-        if (!this.props.floatingMode) {
-            return false
-        }
+			this.debouncedIntervalTimelinePurge = setInterval(
+				this.purgeLastTemporalLine,
+				3000,
+			)
+		}
 
-        const { temporalTimeline } = this.state
+		this.scrollTimelineToBottom()
+	}
 
-        if (temporalTimeline.length === 0) {
-            clearInterval(this.debouncedIntervalTimelinePurge)
-            return false
-        }
+	purgeLastTemporalLine = () => {
+		if (!this.props.floatingMode) {
+			return false
+		}
 
-        const lastTemporalLine = temporalTimeline[0]
+		const { temporalTimeline } = this.state
 
-        if (lastTemporalLine.expireTime < Date.now()) {
-            this.setState({
-                temporalTimeline: temporalTimeline.slice(1)
-            })
-        }
-    }
+		if (temporalTimeline.length === 0) {
+			clearInterval(this.debouncedIntervalTimelinePurge)
+			return false
+		}
 
-    handleInputChange = (e) => {
-        if (e.target.value[0] === " " || e.target.value[0] === "\n") {
-            e.target.value = e.target.value.slice(1)
-        }
+		const lastTemporalLine = temporalTimeline[0]
 
-        this.setState({
-            writtedMessage: e.target.value
-        })
-    }
+		if (lastTemporalLine.expireTime < Date.now()) {
+			this.setState({
+				temporalTimeline: temporalTimeline.slice(1),
+			})
+		}
+	}
 
-    handleOnEnter = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
+	handleInputChange = (e) => {
+		if (e.target.value[0] === " " || e.target.value[0] === "\n") {
+			e.target.value = e.target.value.slice(1)
+		}
 
-        if (e.target.value.length === 0) {
-            return
-        }
+		this.setState({
+			writtedMessage: e.target.value,
+		})
+	}
 
-        this.submitMessage(e.target.value)
-    }
+	handleOnEnter = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
 
-    scrollTimelineToBottom = () => {
-        const scrollingElement = document.getElementById("liveChat_timeline")
+		if (e.target.value.length === 0) {
+			return
+		}
 
-        if (scrollingElement) {
-            scrollingElement.scrollTo({
-                top: scrollingElement.scrollHeight,
-                behavior: "smooth"
-            })
-        }
-    }
+		this.submitMessage(e.target.value)
+	}
 
-    componentDidMount = async () => {
-        this.joinSocketRoom()
+	scrollTimelineToBottom = () => {
+		const scrollingElement = document.getElementById("liveChat_timeline")
 
-        app.ctx = {
-            submit: this.submitMessage
-        }
-    }
+		if (scrollingElement) {
+			scrollingElement.scrollTo({
+				top: scrollingElement.scrollHeight,
+				behavior: "smooth",
+			})
+		}
+	}
 
-    componentWillUnmount() {
-        this.leaveSocketRoom()
-        
-        if (this.debouncedIntervalTimelinePurge) {
-            clearInterval(this.debouncedIntervalTimelinePurge)
-        }
+	componentDidMount = async () => {
+		this.joinSocketRoom()
 
-        delete app.ctx
-    }
+		app.ctx = {
+			submit: this.submitMessage,
+		}
+	}
 
-    render() {
-        if (this.state.connectionEnd) {
-            return <div className="liveChat">
-                <antd.Result
-                    status="error"
-                    title="Connection error"
-                    subTitle="Cannot connect to the server"
-                />
-            </div>
-        }
+	componentWillUnmount() {
+		this.leaveSocketRoom()
 
-        if (this.state.connecting) {
-            return <div className="liveChat">
-                <antd.Skeleton active />
-            </div>
-        }
+		if (this.debouncedIntervalTimelinePurge) {
+			clearInterval(this.debouncedIntervalTimelinePurge)
+		}
 
-        if (this.props.floatingMode) {
-            return <div className="liveChat floating">
-                <TransitionGroup
-                    ref={this.timelineRef}
-                    className="liveChat_timeline"
-                    id="liveChat_timeline"
-                >
-                    {
-                        this.state.temporalTimeline.map((line, index) => {
-                            return <CSSTransition
-                                key={index}
-                                timeout={300}
-                                classNames={{
-                                    enterActive: "transverse-enter",
-                                    exitActive: "transverse-out"
-                                }}
-                            >
-                                <Line {...this.state.timeline[line.messageKey]} />
-                            </CSSTransition>
-                        })
-                    }
-                </TransitionGroup>
-            </div>
-        }
+		delete app.ctx
+	}
 
-        if (this.state.noAuthed) {
-            return <div className="liveChat empty">
-                <antd.Empty description="You must be logged in to use this feature" />
-            </div>
-        }
+	render() {
+		if (this.state.connectionEnd) {
+			return (
+				<div className="liveChat">
+					<antd.Result
+						status="error"
+						title="Connection error"
+						subTitle="Cannot connect to the server"
+					/>
+				</div>
+			)
+		}
 
-        return <div
-            className={classnames(
-                "liveChat",
-                {
-                    ["empty"]: this.state.timeline.length === 0,
-                    ["compact"]: this.props.compact
-                }
-            )}
-        >
-            {
-                !this.props.compact && this.state.timeline.length === 0 && <antd.Empty description="Welcome to the room" />
-            }
+		if (this.state.connecting) {
+			return (
+				<div className="liveChat">
+					<antd.Skeleton active />
+				</div>
+			)
+		}
 
-            {
-                this.props.compact && this.state.timeline.length === 0 && <p>
-                    Welcome to the room
-                </p>
-            }
+		if (this.props.floatingMode) {
+			return (
+				<div className="liveChat floating">
+					<TransitionGroup
+						ref={this.timelineRef}
+						className="liveChat_timeline"
+						id="liveChat_timeline"
+					>
+						{this.state.temporalTimeline.map((line, index) => {
+							return (
+								<CSSTransition
+									key={index}
+									timeout={300}
+									classNames={{
+										enterActive: "transverse-enter",
+										exitActive: "transverse-out",
+									}}
+								>
+									<Line
+										{...this.state.timeline[
+											line.messageKey
+										]}
+									/>
+								</CSSTransition>
+							)
+						})}
+					</TransitionGroup>
+				</div>
+			)
+		}
 
-            {
-                this.state.timeline.length !== 0 && <div
-                    className="liveChat_timeline"
-                    ref={this.timelineRef}
-                    id="liveChat_timeline"
-                >
-                    {
-                        this.state.timeline.map((line, index) => {
-                            return <Line key={index} {...line} />
-                        })
-                    }
-                </div>
-            }
+		if (this.state.noAuthed) {
+			return (
+				<div className="liveChat empty">
+					<antd.Empty description="You must be logged in to use this feature" />
+				</div>
+			)
+		}
 
-            <div className="liveChat_textInput">
-                <antd.Input.TextArea
-                    placeholder="Type your message here"
-                    autoSize={{ minRows: 1, maxRows: 3 }}
-                    value={this.state.writtedMessage}
-                    onChange={this.handleInputChange}
-                    onPressEnter={this.handleOnEnter}
-                    maxLength={this.state.roomInfo?.limitations?.maxMessageLength ?? 100}
-                    showCount
-                />
-            </div>
-        </div>
-    }
+		return (
+			<div
+				className={classnames("liveChat", {
+					["empty"]: this.state.timeline.length === 0,
+					["compact"]: this.props.compact,
+				})}
+			>
+				{!this.props.compact && this.state.timeline.length === 0 && (
+					<antd.Empty description="Welcome to the room" />
+				)}
+
+				{this.props.compact && this.state.timeline.length === 0 && (
+					<p>Welcome to the room</p>
+				)}
+
+				{this.state.timeline.length !== 0 && (
+					<div
+						className="liveChat_timeline"
+						ref={this.timelineRef}
+						id="liveChat_timeline"
+					>
+						{this.state.timeline.map((line, index) => {
+							return <Line key={index} {...line} />
+						})}
+					</div>
+				)}
+
+				<div className="liveChat_textInput">
+					<antd.Input.TextArea
+						placeholder="Type your message here"
+						autoSize={{ minRows: 1, maxRows: 3 }}
+						value={this.state.writtedMessage}
+						onChange={this.handleInputChange}
+						onPressEnter={this.handleOnEnter}
+						maxLength={
+							this.state.roomInfo?.limitations
+								?.maxMessageLength ?? 100
+						}
+						showCount
+					/>
+				</div>
+			</div>
+		)
+	}
 }
