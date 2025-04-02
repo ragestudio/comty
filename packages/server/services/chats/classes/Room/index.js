@@ -98,6 +98,10 @@ export default class Room {
 
 	handlers = {
 		join: (client) => {
+			if (!client.userData) {
+				return false
+			}
+
 			if (client.connectedRoomID) {
 				console.warn(
 					`[${client.id}][@${client.userData.username}] already connected to room ${client.connectedRoomID}`,
