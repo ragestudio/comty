@@ -139,12 +139,10 @@ export default class StreamViewer extends React.Component {
 	}
 
 	loadStream = async (stream_id) => {
-		let stream = await SpectrumModel.getLivestream(stream_id).catch(
-			(error) => {
-				console.error(error)
-				return null
-			},
-		)
+		let stream = await SpectrumModel.getStream(stream_id).catch((error) => {
+			console.error(error)
+			return null
+		})
 
 		if (!stream) {
 			return false
@@ -168,8 +166,6 @@ export default class StreamViewer extends React.Component {
 		if (typeof this.state.decoderInstance?.destroy === "function") {
 			this.state.decoderInstance.destroy()
 		}
-
-		this.state.player.destroy()
 
 		this.setState({
 			isEnded: true,
@@ -221,15 +217,10 @@ export default class StreamViewer extends React.Component {
 
 	componentDidMount = async () => {
 		this.enterPlayerAnimation()
-
-		const stream_id = this.props.params.id
-
-		console.log("Stream ID >", stream_id)
-
 		this.attachPlayer()
 
-		// get stream info
-		const stream = await this.loadStream(stream_id)
+		// load stream
+		const stream = await this.loadStream(this.props.params.id)
 
 		if (!stream) {
 			return this.onSourceEnd()
@@ -254,16 +245,15 @@ export default class StreamViewer extends React.Component {
 	}
 
 	componentWillUnmount = () => {
-		if (this.state.player) {
-			this.state.player.destroy()
-		}
-
 		if (typeof this.state.decoderInstance?.unload === "function") {
 			this.state.decoderInstance.unload()
 		}
 
-		this.exitPlayerAnimation()
+		if (typeof this.state.decoderInstance?.destroy === "function") {
+			this.state.decoderInstance.destroy()
+		}
 
+		this.exitPlayerAnimation()
 		this.toggleCinemaMode(false)
 
 		if (this.streamInfoInterval) {
@@ -272,17 +262,21 @@ export default class StreamViewer extends React.Component {
 	}
 
 	enterPlayerAnimation = () => {
-		app.cores.style.applyTemporalVariant("dark")
-		app.layout.toggleCompactMode(true)
 		app.layout.toggleCenteredContent(false)
-		app.controls.toggleUIVisibility(false)
+		app.layout.toggleTotalWindowHeight(true)
+
+		if (app.layout.tools_bar) {
+			app.layout.tools_bar.toggleVisibility(false)
+		}
 	}
 
 	exitPlayerAnimation = () => {
-		app.cores.style.applyVariant(app.cores.style.currentVariantKey)
-		app.layout.toggleCompactMode(false)
 		app.layout.toggleCenteredContent(true)
-		app.controls.toggleUIVisibility(true)
+		app.layout.toggleTotalWindowHeight(false)
+
+		if (app.layout.tools_bar) {
+			app.layout.tools_bar.toggleVisibility(true)
+		}
 	}
 
 	updateQuality = (newQuality) => {
@@ -308,6 +302,9 @@ export default class StreamViewer extends React.Component {
 			to = !this.state.cinemaMode
 		}
 
+		app.controls.toggleUIVisibility(!to)
+		app.layout.toggleCompactMode(to)
+
 		this.setState({ cinemaMode: to })
 	}
 
@@ -318,21 +315,14 @@ export default class StreamViewer extends React.Component {
 					["cinemaMode"]: this.state.cinemaMode,
 				})}
 			>
-				{this.props.query.id}
 				<div className="livestream_player">
 					<div className="livestream_player_header">
-						<div
-							className="livestream_player_header_exit"
-							onClick={() => app.location.back()}
-						>
-							<Icons.IoMdExit />
-						</div>
-
 						{this.state.stream ? (
 							<>
 								<div className="livestream_player_header_user">
 									<UserPreview
-										user={this.state.stream.user}
+										user_id={this.state.stream.user_id}
+										onlyIcon
 									/>
 
 									<div className="livestream_player_indicators">
@@ -350,24 +340,19 @@ export default class StreamViewer extends React.Component {
 
 								{this.state.stream.info && (
 									<div className="livestream_player_header_info">
-										<div className="livestream_player_header_info_title">
+										<div className="livestream_player_header_title">
 											<h1>
 												{this.state.stream.info?.title}
 											</h1>
 										</div>
-										<div className="livestream_player_header_info_description">
+										<div className="livestream_player_header_description">
 											<Marquee mode="smooth">
-												{({ index }) => {
-													return (
-														<h4>
-															{
-																this.state
-																	.stream.info
-																	?.description
-															}
-														</h4>
-													)
-												}}
+												<h4>
+													{
+														this.state.stream.info
+															?.description
+													}
+												</h4>
 											</Marquee>
 										</div>
 									</div>

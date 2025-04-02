@@ -1,344 +1,352 @@
-@panel-width: 500px;
 @chatbox-header-height: 50px;
 
+.content_layout {
+	padding: 10px;
+}
+
 html {
-    &.mobile {
-        .livestream {
-            flex-direction: column;
-            height: 100%;
-        }
+	&.mobile {
+		.livestream {
+			flex-direction: column;
+			height: 100%;
+		}
 
-        .livestream_panel {
-            position: absolute;
-            bottom: 0;
-            height: 20%;
-        }
+		.livestream_panel {
+			position: absolute;
+			bottom: 0;
+			height: 20%;
+		}
 
-        .livestream_player {
-            height: 100%;
-            width: 100%;
+		.livestream_player {
+			height: 100%;
+			width: 100%;
 
-            .plyr {
-                width: 100%;
-                height: 100%;
-            }
-        }
-    }
+			.plyr {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
 }
 
 .plyr__controls {
-    width: 100%;
-    display: inline-flex;
-    //justify-content: space-between;
+	width: 100%;
+	display: inline-flex;
+	//justify-content: space-between;
 }
 
 .livestream {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    height: 100vh;
-    width: 100%;
+	gap: 10px;
 
-    overflow: hidden;
+	height: 100%;
+	width: 100%;
 
-    color: var(--background-color-contrast);
+	color: var(--background-color-contrast);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    span,
-    p {
-        color: var(--background-color-contrast);
-    }
+	overflow: hidden;
 
-    &.cinemaMode {
-        .livestream_player {
-            width: 100vw;
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	span,
+	p {
+		color: var(--background-color-contrast);
+	}
 
-            video {
-                width: 100vw;
-            }
+	&.cinemaMode {
+		.livestream_player {
+			border-radius: 0px;
 
-            .plyr {
-                width: 100vw;
-            }
+			.livestream_player_header {
+				animation: disappear 0.3s ease-in-out forwards;
+			}
+		}
 
-            .livestream_player_header {
-                animation: disappear 0.3s ease-in-out forwards;
-            }
-        }
+		.livestream_panel {
+			position: absolute;
+			z-index: 99;
 
-        .livestream_panel {
-            position: absolute;
-            z-index: 99;
+			right: 0;
+			top: 0;
 
-            right: 0;
-            top: 0;
+			height: 60vh;
+			width: 20vw;
 
-            height: 60vh;
-            width: 20vw;
+			padding: 20px;
 
-            padding: 20px;
+			background-color: transparent;
 
-            overflow-x: hidden;
+			.chatbox {
+				padding: 0;
 
-            .chatbox {
-                padding: 0;
+				overflow-x: hidden;
+				overflow-y: hidden;
 
-                overflow-x: hidden;
-                overflow-y: hidden;
+				.liveChat {
+					.liveChat_timeline {
+						padding-top: 0 !important;
 
-                .liveChat {
-                    .liveChat_timeline {
-                        padding-top: 0 !important;
+						&::after {
+							content: "";
+							display: none;
+						}
+					}
+				}
+			}
+		}
+	}
 
-                        &::after {
-                            content: "";
-                            display: none;
-                        }
-                    }
-                }
-            }
-        }
-    }
+	.livestream_player {
+		display: flex;
+		position: relative;
 
-    .livestream_player {
-        display: flex;
-        position: relative;
+		align-items: center;
+		justify-content: center;
 
-        align-items: center;
-        justify-content: center;
+		width: 100%;
+		height: 100%;
 
-        width: calc(100% - @panel-width);
-        height: 100%;
+		overflow-y: hidden;
 
-        overflow-y: hidden;
+		transition: all 0.3s ease-in-out;
 
-        transition: all 0.3s ease-in-out;
+		border-radius: 24px;
 
-        .livestream_player_loading {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+		.livestream_player_loading {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
 
-            position: absolute;
-            z-index: 90;
+			position: absolute;
+			z-index: 90;
 
-            width: 100%;
-            height: 100%;
+			width: 100%;
+			height: 100%;
 
-            backdrop-filter: blur(10px);
+			backdrop-filter: blur(10px);
 
-            transition: all 0.3s ease-in-out;
+			transition: all 0.3s ease-in-out;
 
-            opacity: 0;
+			opacity: 0;
 
-            pointer-events: none;
+			pointer-events: none;
 
-            &.active {
-                opacity: 1;
-            }
-        }
+			&.active {
+				opacity: 1;
+			}
+		}
 
-        video {
-            z-index: 80;
-        }
+		video {
+			z-index: 80;
+		}
 
-        .livestream_player_header {
-            display: flex;
-            flex-direction: row;
+		.livestream_player_header {
+			display: flex;
+			flex-direction: row;
 
-            position: absolute;
-            z-index: 100;
+			position: absolute;
+			z-index: 100;
 
-            top: 0;
-            left: 0;
+			top: 0;
+			left: 0;
 
-            width: fit-content;
-            height: fit-content;
+			width: fit-content;
+			height: fit-content;
 
-            min-width: 20vw;
-            max-width: 50vw;
+			min-width: 20vw;
+			max-width: 50vw;
 
-            margin: 25px;
-            padding: 10px;
+			margin: 25px;
+			padding: 10px;
 
-            gap: 10px;
+			gap: 10px;
 
-            background-color: var(--background-color-accent);
+			background-color: var(--background-color-accent);
 
-            border-radius: 12px;
+			border-radius: 12px;
 
-            h1,
-            h2,
-            h3,
-            h4,
-            span {
-                margin: 0;
+			h1,
+			h2,
+			h3,
+			h4,
+			span {
+				margin: 0;
 
-                overflow: hidden;
+				overflow: hidden;
 
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 
-            .livestream_player_header_exit {
-                display: flex;
-                flex-direction: row;
+			.livestream_player_header_user {
+				display: flex;
+				flex-direction: column;
 
-                width: fit-content;
-                height: fit-content;
+				.livestream_player_indicators {
+					display: flex;
+					flex-direction: row;
 
-                svg {
-                    font-size: 1.5rem;
-                    margin: 0;
-                }
-            }
-            
-            .livestream_player_header_user {
-                display: flex;
-                flex-direction: column;
+					align-items: center;
+					justify-content: space-between;
 
-                .livestream_player_indicators {
-                    display: flex;
-                    flex-direction: row;
+					gap: 10px;
 
-                    align-items: center;
-                    justify-content: space-between;
+					margin-top: 10px;
 
-                    gap: 10px;
+					.livestream_player_header_user_spectators {
+						height: fit-content;
 
-                    margin-top: 10px;
+						.ant-tag {
+							display: flex;
+							flex-direction: row;
 
-                    .livestream_player_header_user_spectators {
-                        height: fit-content;
+							align-items: center;
+							gap: 5px;
 
-                        .ant-tag {
-                            background-color: #eb0400;
-                            border-color: #eb0400;
-                            color: var(--background-color-contrast);
-                            font-size: 1rem;
-                        }
-                    }
+							background-color: #eb0400;
+							border-color: #eb0400;
+							color: var(--background-color-contrast);
+							font-size: 1rem;
+						}
+					}
 
-                    .livestream_player_header_user_quality {
-                        font-size: 1.8rem;
-                        height: fit-content;
+					.livestream_player_header_user_quality {
+						font-size: 1.8rem;
+						height: fit-content;
 
-                        svg {
-                            color: var(--text-color);
-                            margin: 0;
-                        }
-                    }
-                }
-            }
+						svg {
+							color: var(--text-color);
+							margin: 0;
+						}
+					}
+				}
+			}
 
-            .livestream_player_header_info {
-                display: flex;
-                flex-direction: column;
+			.livestream_player_header_info {
+				display: flex;
+				flex-direction: column;
 
-                overflow: hidden;
+				overflow: hidden;
 
-                width: 100%;
+				min-width: 350px;
+				width: 100%;
 
-                .livestream_player_header_title {
-                    font-family: "Space Grotesk", sans-serif;
-                    font-size: 1rem;
-                    font-weight: 700;
+				.livestream_player_header_title {
+					font-family: "Space Grotesk", sans-serif;
+					font-size: 0.9rem;
+					font-weight: 700;
 
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
 
-                .livestream_player_header_description {
-                    font-size: 0.8rem;
-                    font-weight: 300;
-                    font-style: italic;
+				.livestream_player_header_description {
+					font-size: 0.8rem;
+					font-weight: 300;
+					font-style: italic;
 
-                    h4 {
-                        margin-left: 10px;
-                    }
-                }
-            }
-        }
-    }
+					h4 {
+						margin-left: 10px;
+					}
+				}
+			}
+		}
+	}
 
-    .livestream_panel {
-        display: flex;
-        flex-direction: column;
+	.livestream_panel {
+		position: relative;
+		z-index: 100;
 
-        position: relative;
-        height: 100vh;
+		display: flex;
+		flex-direction: column;
 
-        width: @panel-width;
+		height: 100%;
+		min-width: 300px;
+		width: 30%;
 
-        .chatbox {
-            position: relative;
+		background-color: var(--background-color-accent);
+		border-radius: 24px;
 
-            width: 100%;
-            height: 100%;
+		overflow: hidden;
 
-            overflow: hidden;
+		.chatbox {
+			position: relative;
 
-            padding: 20px;
+			width: 100%;
+			height: 100%;
 
-            .chatbox_header {
-                position: absolute;
-                z-index: 100;
+			overflow: hidden;
 
-                display: flex;
-                flex-direction: column;
+			padding: 10px;
 
-                justify-content: center;
+			.chatbox_header {
+				position: absolute;
+				z-index: 100;
 
-                z-index: 100;
+				display: flex;
+				flex-direction: column;
 
-                top: 0;
-                left: 0;
+				justify-content: center;
 
-                width: 100%;
-                height: @chatbox-header-height;
+				z-index: 100;
 
-                padding: 20px;
+				top: 0;
+				left: 0;
 
-                backdrop-filter: blur(20px);
-            }
+				width: 100%;
+				height: @chatbox-header-height;
 
-            .liveChat {
-                .liveChat_timeline {
-                    &::after {
-                        position: absolute;
-                        z-index: 90;
+				padding: 20px;
 
-                        content: "";
+				backdrop-filter: blur(20px);
+			}
 
-                        top: 0px;
-                        left: 0;
+			.liveChat {
+				.liveChat_timeline {
+					&::after {
+						position: absolute;
+						z-index: 90;
 
-                        width: 100%;
-                        height: @chatbox-header-height;
+						content: "";
 
-                        filter: blur(7px);
-                        background-color: rgba(var(--layoutBackgroundColor), 0.7);
-                    }
+						top: 0px;
+						left: 0;
 
-                    padding-top: @chatbox-header-height;
-                }
-            }
-        }
-    }
+						width: 100%;
+						height: @chatbox-header-height;
 
-    .plyr {
-        border-radius: 0 4px 4px 0;
-        width: 80vw;
-        height: 100vh;
-    }
+						filter: blur(7px);
+						background-color: rgba(
+							var(--layoutBackgroundColor),
+							0.7
+						);
+					}
+
+					padding-top: @chatbox-header-height;
+				}
+
+				.liveChat_textInput {
+					.ant-input-affix-wrapper {
+						background-color: var(--background-color-primary);
+					}
+				}
+			}
+		}
+	}
+
+	.plyr {
+		width: 100%;
+		height: 100%;
+	}
 }
