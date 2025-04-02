@@ -96,11 +96,12 @@ export default {
 						</h3>
 					</div>
 
-					<div className="field">
+					<div className="inline_field">
 						<div className="field_header">
-							<h3>
-								<Icons.MdOutlineStream /> Origin
-							</h3>
+							<div className="field_icon">
+								<Icons.MdOutlineStream />
+							</div>
+							<p>Origin</p>
 
 							<antd.Tooltip
 								title={
@@ -131,11 +132,12 @@ export default {
 						</div>
 					</div>
 
-					<div className="field">
+					<div className="inline_field">
 						<div className="field_header">
-							<h3>
-								<Icons.MdOutlineMemory /> Instance Performance
-							</h3>
+							<div className="field_icon">
+								<Icons.MdCable />
+							</div>
+							<p>Connection</p>
 						</div>
 
 						<div className="field_value">

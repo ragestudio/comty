@@ -1,229 +1,116 @@
 @border-radius: 12px;
 
 .about_app {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
+	width: 100%;
 
-    color: var(--text-color);
+	color: var(--text-color);
 
-    gap: 20px;
+	gap: 20px;
 
-    .header {
-        display: flex;
-        flex-direction: row;
+	.header {
+		display: flex;
+		flex-direction: row;
 
-        justify-content: space-between;
-        align-self: center;
+		justify-content: space-between;
+		align-self: center;
 
-        width: 100%;
+		width: 100%;
 
-        padding: 20px;
+		padding: 20px;
 
-        border-radius: @border-radius;
-        background-color: var(--background-color-accent);
+		border-radius: @border-radius;
+		background-color: var(--background-color-accent);
 
-        .branding {
-            display: flex;
-            flex-direction: row;
+		.branding {
+			display: flex;
+			flex-direction: row;
 
-            align-items: center;
+			align-items: center;
 
-            .ant-tag {
-                margin: 0;
-                width: fit-content;
-            }
+			.ant-tag {
+				margin: 0;
+				width: fit-content;
+			}
 
-            .logo {
-                display: flex;
-                flex-direction: row;
+			.logo {
+				display: flex;
+				flex-direction: row;
 
-                align-items: center;
+				align-items: center;
 
-                width: 60px;
-                height: 100%;
+				width: 60px;
+				height: 100%;
 
-                margin-right: 20px;
+				margin-right: 20px;
 
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
+				img {
+					width: 100%;
+					height: 100%;
+				}
+			}
 
-            .texts {
-                display: flex;
-                flex-direction: column;
+			.texts {
+				display: flex;
+				flex-direction: column;
 
-                justify-content: center;
+				justify-content: center;
 
-                gap: 6px;
+				gap: 6px;
 
-                .sitename-text {
-                    display: flex;
-                    flex-direction: row;
+				.sitename-text {
+					display: flex;
+					flex-direction: row;
 
-                    align-items: center;
+					align-items: center;
 
-                    gap: 10px;
+					gap: 10px;
 
-                    h2 {
-                        margin: 0;
-                    }
-                }
-            }
+					h2 {
+						margin: 0;
+					}
+				}
+			}
 
-            h1,
-            h2,
-            h3 {
-                height: fit-content;
-                line-height: 24px;
-            }
+			h1,
+			h2,
+			h3 {
+				height: fit-content;
+				line-height: 24px;
+			}
 
-            span {
-                height: fit-content;
-                color: var(--background-color-contrast);
-                font-size: 10px;
-            }
-        }
-    }
+			span {
+				height: fit-content;
+				color: var(--background-color-contrast);
+				font-size: 10px;
+			}
+		}
+	}
 
-    .group {
-        display: inline-flex;
+	.group {
+		display: inline-flex;
 
-        flex-direction: column;
-        justify-content: center;
+		flex-direction: column;
+		justify-content: center;
 
-        padding: 15px;
+		padding: 15px;
 
-        gap: 10px;
+		gap: 10px;
 
-        background-color: var(--background-color-accent);
+		background-color: var(--background-color-accent);
 
-        border-radius: @border-radius;
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        p {
-            margin: 0;
-        }
-
-        .inline_field {
-            display: inline-flex;
-
-            flex-direction: row;
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 10px;
-
-            background-color: var(--background-color-primary);
-
-            border-radius: 12px;
-
-            .field_header {
-                display: inline-flex;
-
-                flex-direction: row;
-                align-items: center;
-
-                gap: 8px;
-
-                font-size: 0.8rem;
-
-                .field_icon {
-                    display: inline-flex;
-
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: center;
-
-                    background-color: var(--background-color-primary);
-
-                    border-radius: 100%;
-
-                    padding: 5px;
-
-                    font-size: 1rem;
-
-                    svg {
-                        margin: 0;
-                    }
-                }
-            }
-
-            .field_value {
-                font-family: "DM Mono", monospace;
-            }
-        }
-
-        .field {
-            display: inline-flex;
-            flex-direction: column;
-
-            margin-bottom: 10px;
-
-            gap: 10px;
-
-            .field_header {
-                display: flex;
-                flex-direction: row;
-
-                align-items: center;
-                justify-content: space-between;
-
-                font-size: 0.8rem;
-
-                h3 {
-                    margin: 0;
-                }
-            }
-
-            .field_value {
-                font-size: 0.9rem;
-
-                display: flex;
-                flex-direction: column;
-
-                gap: 10px;
-
-                margin-left: 10px;
-
-                font-family: "DM Mono", monospace;
-
-                background-color: var(--background-color-primary);
-                border-radius: 7px;
-                padding: 7px;
-
-                .ant-progress {
-                    margin: 0;
-                    height: fit-content;
-
-                    .ant-progress-outer {
-                        height: 0px !important;
-                    }
-                }
-            }
-        }
-
-        .group_footer {
-            display: flex;
-            flex-direction: row;
-
-            justify-content: center;
-            align-items: center;
-
-            margin-top: 10px;
-
-            .button {
-                margin-left: 10px;
-            }
-        }
-    }
+		border-radius: @border-radius;
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		p {
+			margin: 0;
+		}
+	}
 }
