@@ -1,6 +1,0 @@
-{
-    "name": "clock",
-    "version": "1.0.6",
-    "description": "Display the current time",
-    "main": "./src/extension.js"
-}
