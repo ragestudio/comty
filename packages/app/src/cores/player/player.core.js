@@ -1,6 +1,6 @@
 import { Core } from "@ragestudio/vessel"
 
-import RemoteEvent from "@classes/RemoteEvent"
+import ActivityEvent from "@classes/ActivityEvent"
 import QueueManager from "@classes/QueueManager"
 import TrackInstance from "./classes/TrackInstance"
 //import MediaSession from "./classes/MediaSession"
@@ -201,7 +201,7 @@ export default class Player extends Core {
 
 		// send the event to the server
 		if (item.manifest._id && item.manifest.service === "default") {
-			new RemoteEvent("player.play", {
+			new ActivityEvent("player.play", {
 				identifier: "unique", // this must be unique to prevent duplicate events and ensure only have unique track events
 				track_id: item.manifest._id,
 				service: item.manifest.service,
