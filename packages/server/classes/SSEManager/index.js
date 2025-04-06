@@ -35,8 +35,6 @@ export default class SSEManager {
 			channel = this.createChannel(channelId)
 		}
 
-		channel.clients.add(req)
-
 		res.setHeader("Content-Type", "text/event-stream")
 		res.setHeader("Cache-Control", "no-cache")
 		res.setHeader("Connection", "keep-alive")
@@ -46,6 +44,14 @@ export default class SSEManager {
 		this.writeJSONToResponse(res, {
 			event: "connected",
 		})
+
+		req.healthPingInterval = setInterval(() => {
+			this.writeJSONToResponse(res, {
+				event: "ping",
+			})
+		}, 5000)
+
+		channel.clients.add(req)
 
 		if (channel.cache.length > 0) {
 			for (const oldData of channel.cache) {
@@ -62,6 +68,8 @@ export default class SSEManager {
 		})
 
 		req.on("close", () => {
+			clearInterval(req.healthPingInterval)
+
 			channel.clients.delete(req)
 
 			if (channel.clients.size === 0) {
