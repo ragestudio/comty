@@ -50,26 +50,56 @@ const StreamDecoders = {
 
 		return decoderInstance
 	},
-	hls: (player, source) => {
+	hls: (player, source, options = {}) => {
+		if (!player) {
+			console.error("Player is not defined")
+			return false
+		}
+
 		if (!source) {
 			console.error("Stream source is not defined")
 			return false
 		}
 
 		const hlsInstance = new Hls({
-			autoStartLoad: true,
+			maxLiveSyncPlaybackRate: 1.5,
+			strategy: "bandwidth",
+			autoplay: true,
+			xhrSetup: (xhr) => {
+				if (options.authToken) {
+					xhr.setRequestHeader(
+						"Authorization",
+						`Bearer ${options.authToken}`,
+					)
+				}
+			},
 		})
 
-		hlsInstance.attachMedia(player.current)
+		if (options.authToken) {
+			source += `?token=${options.authToken}`
+		}
 
+		console.log("Loading media hls >", source, options)
+
+		hlsInstance.attachMedia(player)
+
+		// when media attached, load source
 		hlsInstance.on(Hls.Events.MEDIA_ATTACHED, () => {
 			hlsInstance.loadSource(source)
-
-			hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-				console.log(`${data.levels.length} quality levels found`)
-			})
 		})
 
+		// process quality and tracks levels
+		hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+			console.log(`${data.levels.length} quality levels found`)
+		})
+
+		// resume to the last position when player resume playback
+		player.addEventListener("play", () => {
+			console.log("Syncing to last position")
+			player.currentTime = hlsInstance.liveSyncPosition
+		})
+
+		// handle errors
 		hlsInstance.on(Hls.Events.ERROR, (event, data) => {
 			console.error(event, data)
 
@@ -129,6 +159,8 @@ export default class StreamViewer extends React.Component {
 
 		const decoderInstance = await StreamDecoders[decoder](...args)
 
+		console.log(decoderInstance)
+
 		await this.setState({
 			decoderInstance: decoderInstance,
 		})
@@ -176,7 +208,7 @@ export default class StreamViewer extends React.Component {
 
 	attachPlayer = () => {
 		// check if user has interacted with the page
-		const player = new Plyr("#player", {
+		const player = new Plyr(this.videoPlayerRef.current, {
 			clickToPlay: false,
 			autoplay: true,
 			muted: true,
@@ -219,6 +251,8 @@ export default class StreamViewer extends React.Component {
 		this.enterPlayerAnimation()
 		this.attachPlayer()
 
+		console.log("custom token> ", this.props.query["token"])
+
 		// load stream
 		const stream = await this.loadStream(this.props.params.id)
 
@@ -234,11 +268,12 @@ export default class StreamViewer extends React.Component {
 			}
 
 			await this.loadDecoder(
-				"flv",
+				"hls",
 				this.videoPlayerRef.current,
-				stream.sources.flv,
+				stream.sources.hls,
 				{
 					onSourceEnd: this.onSourceEnd,
+					authToken: this.props.query["token"],
 				},
 			)
 		}
