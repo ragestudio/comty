@@ -1,7 +1,7 @@
 {
 	"name": "@ragestudio/comty-cli",
 	"description": "Command line interface for Comty Services",
-	"version": "0.1.2",
+	"version": "0.2.1",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -9,7 +9,7 @@
 	"type": "module",
 	"license": "MIT",
 	"bin": {
-		"comty-cli": "./src/index.js"
+		"comty-cli": "./bin/cli.js"
 	},
 	"scripts": {
 		"start": "node ./src/index.js"
