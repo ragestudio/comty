@@ -33,20 +33,20 @@ const ResultsTypeDecorators = {
 		},
 	},
 	tracks: {
-		icon: "FiAlbum",
+		icon: "MdAlbum",
 		label: "Tracks",
 		renderItem: (props) => {
 			const { item, onClick } = props
 
 			return (
-				<div className="suggestion" onClick={onClick}>
-					<MusicTrack track={item} />
+				<div className="suggestion">
+					<MusicTrack track={item} onClick={onClick} />
 				</div>
 			)
 		},
 	},
 	playlists: {
-		icon: "FiAlbum",
+		icon: "MdPlaylistPlay",
 		label: "Playlists",
 		renderItem: (props) => {
 			return (
@@ -83,18 +83,6 @@ const Results = (props) => {
 		return results[key].items.length > 0
 	})
 
-	if (groupsKeys.length === 0) {
-		return (
-			<div className="searcher no_results">
-				<antd.Result
-					status="info"
-					title="No results"
-					subTitle="We are sorry, but we could not find any results for your search."
-				/>
-			</div>
-		)
-	}
-
 	const handleClick = async (decorator, data) => {
 		if (typeof decorator.onClick === "function") {
 			await decorator.onClick(data)
@@ -103,6 +91,26 @@ const Results = (props) => {
 		if (typeof props.onClose === "function") {
 			return props.onClose()
 		}
+	}
+
+	if (props.loading) {
+		return (
+			<div className="searcher_results">
+				<antd.Skeleton active />
+			</div>
+		)
+	}
+
+	if (groupsKeys.length === 0) {
+		return (
+			<div className="searcher_results no_results">
+				<antd.Result
+					status="info"
+					title="No results"
+					subTitle="We are sorry, but we could not find any results for your search."
+				/>
+			</div>
+		)
 	}
 
 	return (
@@ -121,12 +129,12 @@ const Results = (props) => {
 				return (
 					<div className="searcher_results_category" key={index}>
 						<div className="searcher_results_category_header">
-							<h1>
+							<h2>
 								{createIconRender(decorator.icon)}
 								<Translation>
 									{(t) => t(decorator.label)}
 								</Translation>
-							</h1>
+							</h2>
 						</div>
 
 						<div
@@ -150,7 +158,7 @@ const Results = (props) => {
 	)
 }
 
-export default (props) => {
+const Searcher = (props) => {
 	const [loading, setLoading] = React.useState(false)
 	const [searchResult, setSearchResult] = React.useState(null)
 	const [searchValue, setSearchValue] = React.useState("")
@@ -253,13 +261,14 @@ export default (props) => {
 			/>
 
 			{searchResult && props.renderResults && (
-				<div className="results">
-					{loading && <antd.Skeleton active />}
-					{!loading && (
-						<Results results={searchResult} onClose={props.close} />
-					)}
-				</div>
+				<Results
+					loading={loading}
+					results={searchResult}
+					onClose={props.close}
+				/>
 			)}
 		</div>
 	)
 }
+
+export default Searcher

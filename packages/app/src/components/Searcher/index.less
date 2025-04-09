@@ -1,211 +1,224 @@
 html {
-    &.mobile {
-        .searcher {
-            display: flex;
-            width: 100%;
-            height: 100%;
+	&.mobile {
+		.searcher {
+			display: flex;
+			width: 100%;
+			height: 100%;
 
-            overflow-y: scroll;
+			overflow-y: scroll;
 
-            .searcher_results {
-                display: flex;
+			.searcher_results {
+				display: flex;
 
-                width: 100%;
-                height: 100%;
+				width: 100%;
+				height: 100%;
 
-                overflow-y: scroll;
+				overflow-y: scroll;
 
-                .searcher_results_category {
-                    display: flex;
-                    flex-direction: column;
+				.searcher_results_category {
+					display: flex;
+					flex-direction: column;
 
-                    padding: 0;
+					padding: 0;
 
-                    gap: 5px;
+					gap: 5px;
 
-                    .searcher_results_category_header {
-                        font-size: 0.6rem;
-                    }
+					.searcher_results_category_header {
+						font-size: 0.6rem;
+					}
 
-                    .searcher_results_category_suggestions {
-                        padding: 0 15px;
+					.searcher_results_category_suggestions {
+						padding: 0 15px;
 
-                        &#playlists {
-                            display: flex;
-                            flex-direction: column;
+						&#playlists {
+							display: flex;
+							flex-direction: column;
 
-                            padding: 0;
+							padding: 0;
 
-                            .playlistItem {
-                                width: 100%;
-                                max-width: none;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+							.playlistItem {
+								width: 100%;
+								max-width: none;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 .searcher {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    transition: all 0.3s ease-in-out;
+	transition: all 0.3s ease-in-out;
 
-    gap: 10px;
+	gap: 10px;
 
-    .results {
-        border-radius: 10px;
+	width: 100%;
 
-        width: 100%;
+	&.small {
+		.ant-input-affix-wrapper {
+			padding: 7px;
 
-        overflow-x: hidden;
-        overflow-y: overlay;
-    }
+			height: fit-content;
 
-    &.small {
-        .ant-input-affix-wrapper {
-            padding: 7px;
+			.ant-input-prefix {
+				font-size: 1rem;
+			}
 
-            height: fit-content;
+			.ant-input {
+				font-size: 0.8rem;
+			}
+		}
+	}
 
-            .ant-input-prefix {
-                font-size: 1rem;
-            }
+	.ant-input-affix-wrapper {
+		position: sticky;
 
-            .ant-input {
-                font-size: 0.8rem;
-            }
-        }
-    }
+		top: 0;
+		left: 0;
 
-    .ant-input-affix-wrapper {
-        position: sticky;
+		display: inline-flex;
+		flex-direction: row;
 
-        top: 0;
-        left: 0;
+		align-items: center;
 
-        display: inline-flex;
-        flex-direction: row;
+		border: 0;
+		padding: 0;
+		margin: 0;
 
-        align-items: center;
+		min-height: 60px;
+		height: 60px;
+		border-radius: 10px;
 
-        border: 0;
-        padding: 0;
-        margin: 0;
+		padding: 0 10px;
 
-        min-height: 60px;
-        height: 60px;
-        border-radius: 10px;
+		background-color: var(--background-color-primary);
 
-        padding: 0 10px;
+		.ant-input-prefix {
+			font-size: 2rem;
 
-        .ant-input-prefix {
-            font-size: 2rem;
+			svg {
+				color: var(--text-color);
+			}
+		}
 
-            svg {
-                color: var(--text-color);
-            }
-        }
+		.ant-input {
+			height: 100%;
+			color: var(--text-color);
 
-        .ant-input {
-            height: 100%;
-            color: var(--text-color);
+			font-size: 1rem;
 
-            font-size: 1rem;
-
-            margin: 0;
-        }
-    }
+			margin: 0;
+		}
+	}
 }
 
 .searcher_results {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
 
-    gap: 10px;
+	width: 100%;
+	gap: 10px;
+	padding: 20px;
 
-    &.one_column {
-        grid-template-columns: 1fr;
-    }
+	border-radius: 12px;
 
-    &.no_results {
-        display: flex;
-        flex-direction: column;
+	overflow-x: hidden;
+	overflow-y: overlay;
 
-        align-items: center;
-        justify-content: center;
-    }
+	color: var(--text-color);
+	background-color: var(--background-color-primary);
 
-    .searcher_results_category {
-        background-color: var(--background-color-primary);
+	.ant-result,
+	.ant-result-title,
+	.ant-result-subtitle {
+		color: var(--text-color);
+	}
 
-        padding: 20px;
+	&.one_column {
+		grid-template-columns: 1fr;
+	}
 
-        border-radius: 8px;
+	&.no_results {
+		display: flex;
+		flex-direction: column;
 
-        height: fit-content;
-        width: 100%;
+		align-items: center;
+		justify-content: center;
+	}
 
-        gap: 20px;
+	.searcher_results_category {
+		border-radius: 8px;
 
-        .searcher_results_category_header {
-            h1 {
-                margin: 0;
-            }
-        }
+		height: fit-content;
+		width: 100%;
 
-        .searcher_results_category_suggestions {
-            display: flex;
-            flex-direction: column;
+		gap: 20px;
 
-            gap: 10px;
+		.searcher_results_category_header {
+			background-color: var(--background-color-accent);
+			border-radius: 8px;
+			padding: 5px 10px;
 
-            padding: 10px;
+			width: fit-content;
 
-            .playlistItem {
-                background-color: var(--background-color-accent);
+			h1 {
+				margin: 0;
+			}
+		}
 
-                max-width: 300px;
-                height: 80px;
+		.searcher_results_category_suggestions {
+			display: flex;
+			flex-direction: column;
 
-                .playlistItem_cover {
-                    width: 80px;
-                    height: 80px;
+			gap: 10px;
 
-                    img {
-                        height: 80px;
-                        width: 80px;
-                    }
-                }
+			padding: 10px;
 
-                .playlistItem_info {
-                    max-width: unset;
+			.playlistItem {
+				background-color: var(--background-color-accent);
 
-                    h1 {
-                        font-size: 1rem;
-                        white-space: break-spaces;
-                    }
-                }
-            }
+				max-width: 300px;
+				height: 80px;
 
-            .music-track {
-                background-color: var(--background-color-accent);
-            }
-        }
+				.playlistItem_cover {
+					width: 80px;
+					height: 80px;
 
-        #playlists {
-            display: grid;
+					img {
+						height: 80px;
+						width: 80px;
+					}
+				}
 
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-    }
+				.playlistItem_info {
+					max-width: unset;
+
+					h1 {
+						font-size: 1rem;
+						white-space: break-spaces;
+					}
+				}
+			}
+
+			.music-track {
+				background-color: var(--background-color-accent);
+			}
+		}
+
+		#playlists {
+			display: grid;
+
+			grid-template-columns: 1fr 1fr 1fr;
+		}
+	}
 }
