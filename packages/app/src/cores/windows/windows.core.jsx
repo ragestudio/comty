@@ -171,17 +171,14 @@ export default class WindowManager extends Core {
 		}
 
 		// remove the element from the DOM
-		this.console.debug(`Removing element from DOM for window ${id}`)
 		win.node.unmount()
 		this.root.removeChild(element)
 
 		// remove the window from the list
-		this.console.debug(`Removing window from list for window ${id}`)
 		this.windows = this.windows.filter((node) => {
 			return node.id !== id
 		})
 
-		this.console.debug(`Window ${id} closed`)
 		return true
 	}
 }

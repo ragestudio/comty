@@ -93,19 +93,23 @@ export default () => {
 		app.cores.window_mng.render(
 			id,
 			<Modal
-				onClose={() => {
-					app.cores.window_mng.close(id)
-				}}
-				framed={framed}
 				className={className}
+				framed={framed}
 				confirmOnOutsideClick={confirmOnOutsideClick}
 				confirmOnClickTitle={confirmOnClickTitle}
 				confirmOnClickContent={confirmOnClickContent}
+				onClose={() => {
+					app.cores.window_mng.close(id)
+				}}
 			>
 				{React.isValidElement(render)
 					? React.cloneElement(render, props)
 					: React.createElement(render, props)}
 			</Modal>,
+			{
+				useFrame: false,
+				closeOnClickOutside: false,
+			},
 		)
 	}
 

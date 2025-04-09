@@ -23,6 +23,8 @@
 	#mask_trigger {
 		position: fixed;
 
+		z-index: 450;
+
 		top: 0;
 		left: 0;
 
@@ -59,6 +61,8 @@
 
 	.app_modal_content {
 		position: relative;
+
+		z-index: 500;
 
 		box-sizing: border-box;
 
@@ -108,13 +112,6 @@
 			box-shadow: @card-shadow;
 			-webkit-box-shadow: @card-shadow;
 			-moz-box-shadow: @card-shadow;
-		}
-
-		.searcher {
-			box-sizing: border-box;
-
-			width: 48vw;
-			height: 80vh;
 		}
 	}
 }

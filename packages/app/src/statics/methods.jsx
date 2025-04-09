@@ -1,6 +1,10 @@
 import { Lightbox } from "react-modal-image"
-import { NotificationsCenter, PostCreator, Searcher } from "@components"
+
+import NotificationsCenter from "@components/NotificationsCenter"
+import PostCreator from "@components/PostCreator"
+import Searcher from "@components/Searcher"
 import AppsMenu from "@components/AppsMenu"
+
 import config from "@config"
 import deleteInternalStorage from "@utils/deleteInternalStorage"
 
