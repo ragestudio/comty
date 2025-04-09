@@ -22,21 +22,22 @@ const extraMenuItems = [
 		key: "donate",
 		label: (
 			<div
+				className="flex-row gap-10"
 				style={{
 					color: "#f72585",
 				}}
 			>
-				{createIconRender("FiHeart")}
-				Support us
+				{createIconRender("IoMdHeart")}
+				<span>Support us</span>
 			</div>
 		),
 	},
 	{
 		key: "logout",
 		label: (
-			<div>
+			<div className="flex-row gap-10">
 				{createIconRender("MdOutlineLogout")}
-				Logout
+				<span>Logout</span>
 			</div>
 		),
 		danger: true,
