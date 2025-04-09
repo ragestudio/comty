@@ -1,5 +1,6 @@
 import { User, UserFollow } from "@db_models"
 
+// REWRITE MEE!!!
 export default async (payload = {}) => {
 	const { user_id, from_user_id, basic } = payload
 
@@ -41,6 +42,8 @@ export default async (payload = {}) => {
 				}
 			})
 		}
+
+		return data
 	} else {
 		data = await User.findOne({
 			_id: user_id,
@@ -62,7 +65,7 @@ export default async (payload = {}) => {
 
 			data.following = !!isFollowed
 		}
-	}
 
-	return data
+		return data
+	}
 }
