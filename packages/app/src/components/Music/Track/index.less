@@ -25,6 +25,9 @@ html {
 .music-track {
 	position: relative;
 
+	display: flex;
+	flex-direction: row;
+
 	border-radius: 8px;
 
 	background-color: var(--background-color-accent);
@@ -36,9 +39,9 @@ html {
 	transition: all 150ms ease-in-out;
 
 	&:hover {
-		.music-track_actions {
-			&.withOrder {
-				.music-track_action {
+		.music-track_content {
+			.music-track_play {
+				&.withOrder {
 					.ant-btn {
 						opacity: 1;
 					}
@@ -52,8 +55,8 @@ html {
 	}
 
 	&.current {
-		.music-track_actions {
-			.music-track_action {
+		.music-track_content {
+			.music-track_play {
 				.ant-btn {
 					background-color: var(--colorPrimary) !important;
 					border: unset;
@@ -67,7 +70,8 @@ html {
 		}
 
 		.music-track_background {
-			background: linear-gradient(
+			background:
+				linear-gradient(
 					to right,
 					rgba(var(--cover_average-color)),
 					transparent
@@ -94,7 +98,6 @@ html {
 
 	.music-track_content {
 		position: relative;
-
 		z-index: 55;
 
 		display: flex;
@@ -102,50 +105,41 @@ html {
 
 		align-items: center;
 
+		width: 100%;
+
+		gap: 10px;
 		padding: 6px;
-	}
 
-	.music-track_actions {
-		display: flex;
+		.music-track_play {
+			position: relative;
 
-		align-items: center;
+			transition: all 150ms ease-in-out;
+			cursor: pointer;
 
-		margin-right: 10px;
-
-		&.withOrder {
-			.music-track_action {
+			&.withOrder {
 				.ant-btn {
 					opacity: 0;
 				}
 			}
-		}
-
-		.music-track_action {
-			position: relative;
-
-			transition: all 150ms ease-in-out;
-
-			cursor: pointer;
 
 			.music-track_orderIndex {
 				position: absolute;
 
+				z-index: 55;
+
 				top: 0;
 				left: 0;
 
-				height: 100%;
+				height: 32px;
+				width: 32px;
 
-				width: 100%;
+				padding: 12px;
 
-				padding: 5px 13px;
-
-				line-height: 22px;
+				//line-height: 22px;
 
 				opacity: 1;
 
 				transition: all 150ms ease-in-out;
-
-				text-align: center;
 
 				font-family: "DM Mono", monospace;
 
@@ -155,6 +149,10 @@ html {
 			}
 
 			.ant-btn {
+				position: relative;
+
+				z-index: 60;
+
 				svg {
 					margin: 0 !important;
 
@@ -170,54 +168,57 @@ html {
 				border: 1px solid var(--text-color);
 			}
 		}
-	}
 
-	.music-track_cover {
-		display: flex;
-		flex-direction: column;
+		.music-track_cover {
+			display: flex;
+			flex-direction: column;
 
-		align-items: center;
-		justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-		background-color: black;
+			background-color: black;
 
-		border-radius: 12px;
+			border-radius: 12px;
 
-		overflow: hidden;
+			overflow: hidden;
 
-		width: 35px;
-		height: 35px;
+			width: 35px;
+			height: 35px;
 
-		min-width: 35px;
-		min-height: 35px;
+			min-width: 35px;
+			min-height: 35px;
 
-		img {
+			img {
+				width: 100%;
+				height: 100%;
+
+				object-fit: contain;
+			}
+		}
+
+		.music-track_details {
+			display: flex;
+			flex-direction: column;
+
 			width: 100%;
-			height: 100%;
 
-			object-fit: contain;
+			color: var(--text-color);
+
+			.music-track_title {
+				font-size: 1rem;
+				font-family: "Space Grotesk", sans-serif;
+			}
+
+			.music-track_artist {
+				font-size: 0.8rem;
+			}
 		}
 	}
 
-	.music-track_details {
-		display: flex;
-		flex-direction: column;
+	.music-track_actions {
+		position: relative;
+		z-index: 60;
 
-		margin-left: 10px;
-
-		color: var(--text-color);
-
-		.music-track_title {
-			font-size: 1rem;
-			font-family: "Space Grotesk", sans-serif;
-		}
-
-		.music-track_artist {
-			font-size: 0.8rem;
-		}
-	}
-
-	.music-track_right_actions {
 		display: flex;
 		flex-direction: row;
 
@@ -229,14 +230,5 @@ html {
 		margin-left: auto;
 
 		color: var(--text-color);
-	}
-
-	.music-track_info {
-		display: inline-flex;
-		flex-direction: row;
-
-		.music-track_duration {
-			font-size: 0.8rem;
-		}
 	}
 }

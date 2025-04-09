@@ -54,23 +54,24 @@ const Track = (props) => {
 	const handleClickPlayBtn = React.useCallback(() => {
 		if (typeof props.onClickPlayBtn === "function") {
 			props.onClickPlayBtn(props.track)
+		}
+
+		if (!isCurrent) {
+			app.cores.player.start(props.track)
 		} else {
-			console.warn(
-				"Searcher: onClick is not a function, using default action...",
-			)
-			if (!isCurrent) {
-				app.cores.player.start(props.track)
-			} else {
-				app.cores.player.playback.toggle()
-			}
+			app.cores.player.playback.toggle()
 		}
 	})
 
-	const handleOnClickItem = () => {
+	const handleOnClickItem = React.useCallback(() => {
+		if (props.onClick) {
+			props.onClick(props.track)
+		}
+
 		if (app.isMobile) {
 			handleClickPlayBtn()
 		}
-	}
+	})
 
 	const handleMoreMenuOpen = () => {
 		if (app.isMobile) {
@@ -170,44 +171,45 @@ const Track = (props) => {
 					track_manifest?.cover_analysis?.rgb,
 				),
 			}}
-			onClick={handleOnClickItem}
 		>
 			<div className="music-track_background" />
 
 			<div className="music-track_content">
 				{!app.isMobile && (
 					<div
-						className={classnames("music-track_actions", {
+						className={classnames("music-track_play", {
 							["withOrder"]: props.order !== undefined,
 						})}
 					>
-						<div className="music-track_action">
-							<span className="music-track_orderIndex">
-								{props.order}
-							</span>
-							<antd.Button
-								type="primary"
-								shape="circle"
-								icon={
-									isPlaying ? (
-										<Icons.MdPause />
-									) : (
-										<Icons.MdPlayArrow />
-									)
-								}
-								onClick={handleClickPlayBtn}
-							/>
-						</div>
+						<span className="music-track_orderIndex">
+							{props.order}
+						</span>
+
+						<antd.Button
+							type="primary"
+							shape="circle"
+							icon={
+								isPlaying ? (
+									<Icons.MdPause />
+								) : (
+									<Icons.MdPlayArrow />
+								)
+							}
+							onClick={handleClickPlayBtn}
+						/>
 					</div>
 				)}
 
-				<div className="music-track_cover">
+				<div className="music-track_cover" onClick={handleOnClickItem}>
 					<ImageViewer
 						src={props.track.cover ?? props.track.thumbnail}
 					/>
 				</div>
 
-				<div className="music-track_details">
+				<div
+					className="music-track_details"
+					onClick={handleOnClickItem}
+				>
 					<div className="music-track_title">
 						<span>
 							{props.track.service === "tidal" && (
@@ -224,24 +226,24 @@ const Track = (props) => {
 						</span>
 					</div>
 				</div>
+			</div>
 
-				<div className="music-track_right_actions">
-					<antd.Dropdown
-						menu={{
-							items: moreMenuItems,
-							onClick: handleMoreMenuItemClick,
-						}}
-						onOpenChange={handleMoreMenuOpen}
-						open={moreMenuOpened}
-						trigger={["click"]}
-					>
-						<antd.Button
-							type="ghost"
-							size="large"
-							icon={<Icons.IoMdMore />}
-						/>
-					</antd.Dropdown>
-				</div>
+			<div className="music-track_actions">
+				<antd.Dropdown
+					menu={{
+						items: moreMenuItems,
+						onClick: handleMoreMenuItemClick,
+					}}
+					onOpenChange={handleMoreMenuOpen}
+					open={moreMenuOpened}
+					trigger={["click"]}
+				>
+					<antd.Button
+						type="ghost"
+						size="large"
+						icon={<Icons.IoMdMore />}
+					/>
+				</antd.Dropdown>
 			</div>
 		</div>
 	)
