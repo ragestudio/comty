@@ -80,7 +80,7 @@ const LivestreamItem = (props) => {
 					</div>
 				</div>
 
-				<UserPreview user_id={livestream.user_id} small />
+				<UserPreview user={livestream.user} small />
 			</div>
 		</div>
 	)
