@@ -20,6 +20,7 @@ export default async (payload = {}) => {
 
 		data = data.map((user) => {
 			user = user.toObject()
+			return user
 		})
 
 		if (from_user_id && !basic) {
