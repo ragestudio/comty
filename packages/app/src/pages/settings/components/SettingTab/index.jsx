@@ -4,141 +4,166 @@ import { Translation } from "react-i18next"
 
 import { Icons } from "@components/Icons"
 
-import {
-    composedTabs,
-    composeGroupsFromSettingsTab,
-} from "@/settings"
+import { composedTabs, composeGroupsFromSettingsTab } from "@/settings"
 
 import groupsDecorators from "@config/settingsGroupsDecorators"
 
 import SettingItemComponent from "../SettingItemComponent"
 
 export default class SettingTab extends React.Component {
-    state = {
-        loading: true,
-        tab: null,
-        ctx: {},
-    }
+	state = {
+		loading: true,
+		tab: null,
+		ctx: {},
+	}
 
-    loadTab = async () => {
-        await this.setState({
-            loading: true,
-            processedCtx: {},
-        })
+	loadTab = async () => {
+		await this.setState({
+			loading: true,
+			processedCtx: {},
+		})
 
-        const tab = composedTabs[this.props.activeKey]
+		const tab = composedTabs[this.props.activeKey]
 
-        let ctx = {}
+		let ctx = {}
 
-        if (typeof tab.ctxData === "function") {
-            ctx = await tab.ctxData()
-        }
+		if (typeof tab.ctxData === "function") {
+			ctx = await tab.ctxData()
+		}
 
-        await this.setState({
-            tab: tab,
-            loading: false,
-            ctx: {
-                baseConfig: this.props.baseConfig,
-                ...ctx
-            },
-        })
-    }
+		if (typeof tab.onLoad === "function") {
+			await tab.onLoad(ctx)
+		}
 
-    // check if props.activeKey change 
-    componentDidUpdate = async (prevProps) => {
-        if (prevProps.activeKey !== this.props.activeKey) {
-            await this.loadTab()
-        }
-    }
+		await this.setState({
+			tab: tab,
+			loading: false,
+			ctx: {
+				baseConfig: this.props.baseConfig,
+				...ctx,
+			},
+		})
+	}
 
-    componentDidMount = async () => {
-        await this.loadTab()
-    }
+	// check if props.activeKey change
+	componentDidUpdate = async (prevProps) => {
+		if (prevProps.activeKey !== this.props.activeKey) {
+			await this.loadTab()
+		}
+	}
 
-    handleSettingUpdate = async (key, value) => {
-        if (typeof this.props.onUpdate === "function") {
-            await this.props.onUpdate(key, value)
-        }
-    }
+	componentDidMount = async () => {
+		await this.loadTab()
+	}
 
-    render() {
-        if (this.state.loading) {
-            return <antd.Skeleton active />
-        }
+	handleSettingUpdate = async (key, value) => {
+		if (typeof this.props.onUpdate === "function") {
+			await this.props.onUpdate(key, value)
+		}
+	}
 
-        const { ctx, tab } = this.state
+	render() {
+		if (this.state.loading) {
+			return <antd.Skeleton active />
+		}
 
-        if (tab.render) {
-            return React.createElement(tab.render, {
-                ctx: ctx,
-            })
-        }
+		const { ctx, tab } = this.state
 
-        if (this.props.withGroups) {
-            const group = composeGroupsFromSettingsTab(tab.settings)
+		if (tab.render) {
+			return React.createElement(tab.render, {
+				ctx: ctx,
+			})
+		}
 
-            return <>
-                {
-                    Object.entries(group).map(([groupKey, settings], index) => {
-                        const fromDecoratorIcon = groupsDecorators[groupKey]?.icon
-                        const fromDecoratorTitle = groupsDecorators[groupKey]?.title
+		if (this.props.withGroups) {
+			const group = composeGroupsFromSettingsTab(tab.settings)
 
-                        return <div id={groupKey} key={index} className="settings_content_group">
-                            <div className="settings_content_group_header">
-                                <h1>
-                                    {
-                                        fromDecoratorIcon ? React.createElement(Icons[fromDecoratorIcon]) : null
-                                    }
-                                    <Translation>
-                                        {
-                                            t => t(fromDecoratorTitle ?? groupKey)
-                                        }
-                                    </Translation>
-                                </h1>
-                            </div>
+			return (
+				<>
+					{Object.entries(group).map(
+						([groupKey, settings], index) => {
+							const fromDecoratorIcon =
+								groupsDecorators[groupKey]?.icon
+							const fromDecoratorTitle =
+								groupsDecorators[groupKey]?.title
 
-                            <div className="settings_list">
-                                {
-                                    settings.map((setting, index) => <SettingItemComponent
-                                        key={index}
-                                        setting={setting}
-                                        ctx={ctx}
-                                        onUpdate={(value) => this.handleSettingUpdate(setting.id, value)}
-                                    />)
-                                }
-                            </div>
-                        </div>
-                    })
-                }
+							return (
+								<div
+									id={groupKey}
+									key={index}
+									className="settings_content_group"
+								>
+									<div className="settings_content_group_header">
+										<h1>
+											{fromDecoratorIcon
+												? React.createElement(
+														Icons[
+															fromDecoratorIcon
+														],
+													)
+												: null}
+											<Translation>
+												{(t) =>
+													t(
+														fromDecoratorTitle ??
+															groupKey,
+													)
+												}
+											</Translation>
+										</h1>
+									</div>
 
-                {
-                    tab.footer && React.createElement(tab.footer, {
-                        ctx: this.state.ctx
-                    })
-                }
-            </>
-        }
+									<div className="settings_list">
+										{settings.map((setting, index) => (
+											<SettingItemComponent
+												key={index}
+												setting={setting}
+												ctx={ctx}
+												onUpdate={(value) =>
+													this.handleSettingUpdate(
+														setting.id,
+														value,
+													)
+												}
+											/>
+										))}
+									</div>
+								</div>
+							)
+						},
+					)}
 
-        return <>
-            {
-                tab.settings.map((setting, index) => {
-                    return <SettingItemComponent
-                        key={index}
-                        setting={setting}
-                        ctx={{
-                            ...this.state.ctx,
-                            baseConfig: this.props.baseConfig,
-                        }}
-                        onUpdate={(value) => this.handleSettingUpdate(setting.id, value)}
-                    />
-                })
-            }
+					{tab.footer &&
+						React.createElement(tab.footer, {
+							ctx: this.state.ctx,
+						})}
+				</>
+			)
+		}
 
-            {
-                tab.footer && React.createElement(tab.footer, {
-                    ctx: this.state.ctx
-                })
-            }
-        </>
-    }
+		return (
+			<>
+				{tab.settings.map((setting, index) => {
+					return (
+						<SettingItemComponent
+							key={index}
+							setting={setting}
+							ctx={{
+								...this.state.ctx,
+								baseConfig: this.props.baseConfig,
+							}}
+							onUpdate={(value) =>
+								this.handleSettingUpdate(setting.id, value)
+							}
+						/>
+					)
+				})}
+
+				{tab.footer &&
+					React.createElement(tab.footer, {
+						ctx: this.state.ctx,
+					})}
+			</>
+		)
+	}
 }
