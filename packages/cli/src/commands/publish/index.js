@@ -1,7 +1,6 @@
 import fs from "node:fs"
 import path from "node:path"
 import yoctoSpinner from "yocto-spinner"
-import { fileFromPath } from "formdata-node/file-from-path"
 import FormData from "form-data"
 
 import Cache from "../../classes/cache.js"
@@ -69,8 +68,8 @@ export default {
 				method: "PUT",
 				url: "/extensions/publish",
 				headers: {
-					Authorization: `Bearer ${token}`,
 					"Content-Type": "multipart/form-data",
+					Authorization: `Bearer ${token}`,
 					pkg: JSON.stringify(pkgJSON),
 				},
 				data: bodyData,
