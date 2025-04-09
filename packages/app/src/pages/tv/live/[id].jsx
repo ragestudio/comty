@@ -1,4 +1,5 @@
 import React from "react"
+import Plyr from "plyr"
 import * as antd from "antd"
 import Marquee from "react-fast-marquee"
 import classnames from "classnames"
@@ -9,121 +10,36 @@ import { Icons } from "@components/Icons"
 import LiveChat from "@components/LiveChat"
 import SpectrumModel from "@models/spectrum"
 
-import Plyr from "plyr"
-import Hls from "hls.js"
-import mpegts from "mpegts.js"
+import * as Decoders from "./decoders"
 
 import "plyr/dist/plyr.css"
 import "./index.less"
 
-const DecodersEvents = {
-	[Hls.Events.FPS_DROP]: (event, data) => {
-		console.log("FPS_DROP Detected", data)
-	},
-}
+async function fetchStream(stream_id) {
+	let stream = await SpectrumModel.getStream(stream_id).catch((error) => {
+		console.error(error)
+		return null
+	})
 
-const StreamDecoders = {
-	flv: async (player, source, { onSourceEnd } = {}) => {
-		if (!source) {
-			console.error("Stream source is not defined")
-			return false
-		}
+	if (!stream) {
+		return false
+	}
 
-		const decoderInstance = mpegts.createPlayer({
-			type: "flv",
-			isLive: true,
-			enableWorker: true,
-			url: source,
-		})
+	if (Array.isArray(stream)) {
+		stream = stream[0]
+	}
 
-		if (typeof onSourceEnd === "function") {
-			decoderInstance.on(mpegts.Events.ERROR, onSourceEnd)
-		}
+	if (!stream.sources) {
+		return false
+	}
 
-		decoderInstance.attachMediaElement(player)
-
-		decoderInstance.load()
-
-		await decoderInstance.play().catch((error) => {
-			console.error(error)
-		})
-
-		return decoderInstance
-	},
-	hls: (player, source, options = {}) => {
-		if (!player) {
-			console.error("Player is not defined")
-			return false
-		}
-
-		if (!source) {
-			console.error("Stream source is not defined")
-			return false
-		}
-
-		const hlsInstance = new Hls({
-			maxLiveSyncPlaybackRate: 1.5,
-			strategy: "bandwidth",
-			autoplay: true,
-			xhrSetup: (xhr) => {
-				if (options.authToken) {
-					xhr.setRequestHeader(
-						"Authorization",
-						`Bearer ${options.authToken}`,
-					)
-				}
-			},
-		})
-
-		if (options.authToken) {
-			source += `?token=${options.authToken}`
-		}
-
-		console.log("Loading media hls >", source, options)
-
-		hlsInstance.attachMedia(player)
-
-		// when media attached, load source
-		hlsInstance.on(Hls.Events.MEDIA_ATTACHED, () => {
-			hlsInstance.loadSource(source)
-		})
-
-		// process quality and tracks levels
-		hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-			console.log(`${data.levels.length} quality levels found`)
-		})
-
-		// resume to the last position when player resume playback
-		player.addEventListener("play", () => {
-			console.log("Syncing to last position")
-			player.currentTime = hlsInstance.liveSyncPosition
-		})
-
-		// handle errors
-		hlsInstance.on(Hls.Events.ERROR, (event, data) => {
-			console.error(event, data)
-
-			switch (data.details) {
-				case Hls.ErrorDetails.FRAG_LOAD_ERROR: {
-					console.error(`Error loading fragment ${data.frag.url}`)
-					return
-				}
-				default: {
-					return
-				}
-			}
-		})
-
-		// register player decoder events
-		Object.keys(DecodersEvents).forEach((event) => {
-			hlsInstance.on(event, DecodersEvents[event])
-		})
-
-		return hlsInstance
-	},
+	return stream
 }
 
 export default class StreamViewer extends React.Component {
+	static defaultDecoder = "hls"
+	static stateSyncMs = 1 * 60 * 1000 // 1 minute
+
 	state = {
 		isEnded: false,
 		loading: true,
@@ -139,8 +55,8 @@ export default class StreamViewer extends React.Component {
 	videoPlayerRef = React.createRef()
 
 	loadDecoder = async (decoder, ...args) => {
-		if (typeof StreamDecoders[decoder] === "undefined") {
-			console.error("Protocol not supported")
+		if (typeof Decoders[decoder] === "undefined") {
+			console.error("[TV] Protocol not supported")
 			return false
 		}
 
@@ -155,11 +71,9 @@ export default class StreamViewer extends React.Component {
 			this.setState({ decoderInstance: null })
 		}
 
-		console.log(`Switching decoder to: ${decoder}`)
+		console.log(`[TV] Switching decoder to: ${decoder}`)
 
-		const decoderInstance = await StreamDecoders[decoder](...args)
-
-		console.log(decoderInstance)
+		const decoderInstance = await Decoders[decoder](...args)
 
 		await this.setState({
 			decoderInstance: decoderInstance,
@@ -168,30 +82,6 @@ export default class StreamViewer extends React.Component {
 		await this.toggleLoading(false)
 
 		return decoderInstance
-	}
-
-	loadStream = async (stream_id) => {
-		let stream = await SpectrumModel.getStream(stream_id).catch((error) => {
-			console.error(error)
-			return null
-		})
-
-		if (!stream) {
-			return false
-		}
-
-		if (Array.isArray(stream)) {
-			stream = stream[0]
-		}
-
-		console.log("Stream data >", stream)
-
-		this.setState({
-			stream: stream,
-			spectators: stream.viewers,
-		})
-
-		return stream
 	}
 
 	onSourceEnd = () => {
@@ -247,53 +137,48 @@ export default class StreamViewer extends React.Component {
 		})
 	}
 
-	componentDidMount = async () => {
-		this.enterPlayerAnimation()
-		this.attachPlayer()
-
-		console.log("custom token> ", this.props.query["token"])
-
-		// load stream
-		const stream = await this.loadStream(this.props.params.id)
-
+	joinStreamWebsocket = async (stream) => {
 		if (!stream) {
-			return this.onSourceEnd()
-		}
-
-		// load the flv decoder (by default)
-		if (stream) {
-			if (!stream.sources) {
-				console.error("Stream sources not found")
-				return
-			}
-
-			await this.loadDecoder(
-				"hls",
-				this.videoPlayerRef.current,
-				stream.sources.hls,
-				{
-					onSourceEnd: this.onSourceEnd,
-					authToken: this.props.query["token"],
-				},
+			console.error(
+				`[TV] Cannot connect to stream websocket if no stream provided`,
 			)
+			return false
 		}
+
+		const client = await SpectrumModel.createStreamWebsocket(stream._id, {
+			maxConnectRetries: 3,
+			refName: "/",
+		})
+
+		this.setState({
+			websocket: client,
+		})
+
+		await client.connect()
+
+		this.streamStateInterval = setInterval(() => {
+			this.syncWithStreamState()
+		}, StreamViewer.stateSyncMs)
+
+		setTimeout(this.syncWithStreamState, 1000)
+
+		return client
 	}
 
-	componentWillUnmount = () => {
-		if (typeof this.state.decoderInstance?.unload === "function") {
-			this.state.decoderInstance.unload()
+	syncWithStreamState = async () => {
+		if (!this.state.websocket || !this.state.stream) {
+			return false
 		}
 
-		if (typeof this.state.decoderInstance?.destroy === "function") {
-			this.state.decoderInstance.destroy()
-		}
+		const state = await this.state.websocket.requestState()
 
-		this.exitPlayerAnimation()
-		this.toggleCinemaMode(false)
-
-		if (this.streamInfoInterval) {
-			clearInterval(this.streamInfoInterval)
-		}
+		return this.setState({
+			spectators: state.viewers,
+			stream: {
+				...this.state.stream,
+				...(state.profile ?? {}),
+			},
+		})
 	}
 
 	enterPlayerAnimation = () => {
@@ -314,19 +199,7 @@ export default class StreamViewer extends React.Component {
 		}
 	}
 
-	updateQuality = (newQuality) => {
-		if (this.state.loadedProtocol !== "hls") {
-			console.error("Unsupported protocol")
-			return false
-		}
-
-		this.state.protocolInstance.levels.forEach((level, levelIndex) => {
-			if (level.height === newQuality) {
-				console.log("Found quality match with " + newQuality)
-				this.state.protocolInstance.currentLevel = levelIndex
-			}
-		})
-	}
+	setStreamLevel = (level) => {}
 
 	toggleLoading = (to) => {
 		this.setState({ loading: to ?? !this.state.loading })
@@ -341,6 +214,64 @@ export default class StreamViewer extends React.Component {
 		app.layout.toggleCompactMode(to)
 
 		this.setState({ cinemaMode: to })
+	}
+
+	componentDidMount = async () => {
+		this.enterPlayerAnimation()
+		this.attachPlayer()
+
+		// fetch stream data
+		const stream = await fetchStream(this.props.params.id)
+
+		// and error occurred or no stream available/online
+		if (!stream) {
+			return this.onSourceEnd()
+		}
+
+		console.log(`[TV] Stream data >`, stream)
+
+		// set data
+		this.setState({
+			stream: stream,
+			spectators: stream.viewers,
+		})
+
+		// joinStreamWebsocket
+		await this.joinStreamWebsocket(stream)
+
+		// load decoder with provided data
+		await this.loadDecoder(
+			StreamViewer.defaultDecoder,
+			this.videoPlayerRef.current,
+			stream.sources,
+			{
+				onSourceEnd: this.onSourceEnd,
+				authToken: this.props.query["token"],
+			},
+		)
+	}
+
+	componentWillUnmount = () => {
+		if (typeof this.state.decoderInstance?.unload === "function") {
+			this.state.decoderInstance.unload()
+		}
+
+		if (typeof this.state.decoderInstance?.destroy === "function") {
+			this.state.decoderInstance.destroy()
+		}
+
+		if (this.state.websocket) {
+			if (typeof this.state.websocket.destroy === "function") {
+				this.state.websocket.destroy()
+			}
+		}
+
+		this.exitPlayerAnimation()
+		this.toggleCinemaMode(false)
+
+		if (this.streamStateInterval) {
+			clearInterval(this.streamStateInterval)
+		}
 	}
 
 	render() {

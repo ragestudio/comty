@@ -88,7 +88,7 @@ const LivestreamItem = (props) => {
 
 export default (props) => {
 	const [L_Streams, R_Streams, E_Streams] = app.cores.api.useRequest(
-		SpectrumModel.getLivestreamsList,
+		SpectrumModel.list,
 	)
 
 	useCenteredContainer(false)
