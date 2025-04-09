@@ -20,6 +20,10 @@ export default class API extends Server {
 	}
 
 	handleWsUpgrade = async (context, token, res) => {
+		if (!token) {
+			return res.upgrade(context)
+		}
+
 		context = await InjectedAuth(context, token, res)
 
 		if (!context.user) {
@@ -30,13 +34,13 @@ export default class API extends Server {
 		return res.upgrade(context)
 	}
 
-	handleWsConnection = (socket) => {
-		console.log(`[WS] @${socket.context.user.username} connected`)
-	}
+	// handleWsConnection = (socket) => {
+	// 	console.log(`[WS] @${socket.context.user.username} connected`)
+	// }
 
-	handleWsDisconnect = (socket) => {
-		console.log(`[WS] @${socket.context.user.username} disconnected`)
-	}
+	// handleWsDisconnect = (socket) => {
+	// 	console.log(`[WS] @${socket.context.user.username} disconnected`)
+	// }
 
 	contexts = {
 		db: new DbManager(),
