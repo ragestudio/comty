@@ -32,8 +32,8 @@ function ConfirmModal(props) {
 	}
 
 	return (
-		<div className="drawer_close_confirm">
-			<div className="drawer_close_confirm_content">
+		<div className="app-modal_confirm">
+			<div className="app-modal_confirm_content">
 				<h1>{props.headerText ?? "Are you sure?"}</h1>
 
 				{props.descriptionText && <p>{props.descriptionText}</p>}
@@ -41,7 +41,7 @@ function ConfirmModal(props) {
 
 			{typeof props.render === "function" && props.render()}
 
-			<div className="drawer_close_confirm_actions">
+			<div className="app-modal_confirm_actions">
 				<Button
 					onClick={() => close({ confirm: false })}
 					disabled={loading}
