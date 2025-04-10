@@ -9,13 +9,12 @@ const ContextMenu = (props) => {
 	const [visible, setVisible] = React.useState(true)
 	const { items = [], cords, clickedComponent, ctx } = props
 
-	async function onClose() {
-		setVisible(false)
-		props.unregisterOnClose(onClose)
-	}
-
 	React.useEffect(() => {
-		props.registerOnClose(onClose)
+		if (props.fireWhenClosing) {
+			props.fireWhenClosing(() => {
+				setVisible(false)
+			})
+		}
 	}, [])
 
 	const handleItemClick = async (item) => {
