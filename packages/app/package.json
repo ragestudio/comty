@@ -10,7 +10,8 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"release": "node ./scripts/release.js"
+		"release": "node ./scripts/release.js",
+		"postinstall": "./scripts/postinstall.sh"
 	},
 	"dependencies": {
 		"@ant-design/icons": "^5.4.0",
