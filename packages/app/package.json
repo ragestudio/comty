@@ -7,9 +7,8 @@
 	"author": "RageStudio",
 	"description": "A prototype of a social network.",
 	"scripts": {
-		"build": "vite build",
 		"dev": "vite",
-		"docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
+		"build": "vite build",
 		"preview": "vite preview",
 		"release": "node ./scripts/release.js"
 	},
