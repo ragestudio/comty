@@ -1,158 +1,211 @@
 import React from "react"
-
 import { Core, EventBus } from "@ragestudio/vessel"
-
 import ContextMenu from "./components/contextMenu"
-
-import DefaultContenxt from "@config/context-menu/default"
+import DefaultContext from "@config/context-menu/default"
 import PostCardContext from "@config/context-menu/post"
 
 export default class ContextMenuCore extends Core {
-    static namespace = "contextMenu"
+	static namespace = "contextMenu"
 
-    contexts = {
-        ...DefaultContenxt,
-        ...PostCardContext,
-    }
+	contexts = {
+		...DefaultContext,
+		...PostCardContext,
+	}
 
-    eventBus = new EventBus()
+	eventBus = new EventBus()
+	isMenuOpen = false
+	fireWhenClosing = null
 
-    async onInitialize() {
-        if (app.isMobile) {
-            this.console.warn("Context menu is not available on mobile")
-            return false
-        }
+	async onInitialize() {
+		if (app.isMobile) {
+			this.console.warn("Context menu is not available on mobile")
+			return false
+		}
 
-        document.addEventListener("contextmenu", this.handleEvent.bind(this))
-    }
+		document.addEventListener("contextmenu", this.handleEvent)
+	}
 
-    async handleEvent(event) {
-        event.preventDefault()
+	handleEvent = async (event) => {
+		event.preventDefault()
 
-        // get the cords of the mouse
-        const x = event.clientX
-        const y = event.clientY
+		// obtain cord of mouse
+		const x = event.clientX
+		const y = event.clientY
 
-        // get the component that was clicked
-        const component = document.elementFromPoint(x, y)
+		// get clicked component
+		const component = document.elementFromPoint(x, y)
 
-        // check if is clicking inside a context menu or a children inside a context menu
-        if (component.classList.contains("contextMenu") || component.closest(".contextMenu")) {
-            return
-        }
+		// check if right-clicked inside a context menu
+		if (
+			component.classList.contains("contextMenu") ||
+			component.closest(".contextMenu")
+		) {
+			return
+		}
 
-        const items = await this.generateItems(component)
+		// gen items
+		const items = await this.generateItems(component)
 
-        if (!items) {
-            this.console.warn("No context menu items found, aborting")
-            return false
-        }
+		// if no items, abort
+		if (!items || items.length === 0) {
+			this.console.error("No context menu items found, aborting")
+			return false
+		}
 
-        this.show({
-            registerOnClose: (cb) => { this.eventBus.on("close", cb) },
-            unregisterOnClose: (cb) => { this.eventBus.off("close", cb) },
-            cords: {
-                x,
-                y,
-            },
-            clickedComponent: component,
-            items: items,
-            ctx: {
-                close: this.onClose,
-            }
-        })
-    }
+		// render menu
+		this.show({
+			cords: { x, y },
+			clickedComponent: component,
+			items: items,
+			fireWhenClosing: (fn) => {
+				this.fireWhenClosing = fn
+			},
+			ctx: {
+				close: this.close,
+			},
+		})
+	}
 
-    registerContext = async (element, context) => {
-        this.contexts[element] = context
-    }
+	registerContext = (element, context) => {
+		this.contexts[element] = context
+	}
 
-    generateItems = async (element) => {
-        let items = []
+	generateItems = async (element) => {
+		let contextNames = []
+		let finalItems = []
 
-        // find the closest context with attribute (context-menu)
-        // if not found, use default context
-        const parentElement = element.closest("[context-menu]")
+		// search parent element with context-menu attribute
+		const parentElement = element.closest("[context-menu]")
 
-        let contexts = []
+		// if parent element exists, get context names from attribute
+		if (parentElement) {
+			const contextAttr = parentElement.getAttribute("context-menu") || ""
+			contextNames = contextAttr
+				.split(",")
+				.map((context) => context.trim())
 
-        if (parentElement) {
-            contexts = parentElement.getAttribute("context-menu") ?? []
+			// if context includes "ignore", no show context menu
+			if (contextNames.includes("ignore")) {
+				return null
+			}
+		}
 
-            if (typeof contexts === "string") {
-                contexts = contexts.split(",").map((context) => context.trim())
-            }
-        }
+		// if context includes "no-default", no add default context
+		if (!contextNames.includes("no-default")) {
+			contextNames.push("default-context")
+		} else {
+			// remove "no-default" from context names
+			contextNames = contextNames.filter(
+				(context) => context !== "no-default",
+			)
+		}
 
-        // if context includes ignore, return null
-        if (contexts.includes("ignore")) {
-            return null
-        }
+		// process each context sequentially
+		for (let i = 0; i < contextNames.length; i++) {
+			const contextName = contextNames[i]
 
-        // check if context includes no-default, if not, push default context and remove no-default
-        if (contexts.includes("no-default")) {
-            contexts = contexts.filter((context) => context !== "no-default")
-        } else {
-            contexts.push("default-context")
-        }
+			// obtain contexted items
+			const contextItems = await this.getContextItems(
+				contextName,
+				parentElement,
+				element,
+			)
 
-        for await (const [index, context] of contexts.entries()) {
-            let contextObject = this.contexts[context]
+			// if any contexted items exist, add them to the final items
+			if (contextItems && contextItems.length > 0) {
+				finalItems = finalItems.concat(contextItems)
 
-            if (!contextObject) {
-                this.console.warn(`Context ${context} not found`)
-                continue
-            }
+				// if is not the last context, add a separator
+				if (i < contextNames.length - 1) {
+					finalItems.push({
+						type: "separator",
+					})
+				}
+			}
+		}
 
-            if (typeof contextObject === "function") {
-                contextObject = await contextObject(items, parentElement, element, {
-                    close: this.onClose,
-                })
-            }
+		// assign indices
+		finalItems = finalItems.map((item, index) => {
+			if (!item.index) {
+				item.index = index
+			}
+			return item
+		})
 
-            // push divider
-            if (contexts.length > 0 && index !== contexts.length - 1) {
-                items.push({
-                    type: "separator"
-                })
-            }
-        }
+		// sort items by index
+		finalItems.sort((a, b) => a.index - b.index)
 
-        // fullfill each item with a correspondent index if missing declared
-        items = items.map((item, index) => {
-            if (!item.index) {
-                item.index = index
-            }
+		// remove undefined items
+		finalItems = finalItems.filter((item) => item !== undefined)
 
-            return item
-        })
+		return finalItems
+	}
 
-        // short items (if has declared index)
-        items = items.sort((a, b) => a.index - b.index)
+	getContextItems = async (contextName, parentElement, element) => {
+		const contextObject = this.contexts[contextName]
 
-        // remove undefined items
-        items = items.filter((item) => item !== undefined)
+		if (!contextObject) {
+			this.console.warn(`Context ${contextName} not found`)
+			return []
+		}
 
-        return items
-    }
+		// if is a function, execute it to get the elements
+		if (typeof contextObject === "function") {
+			try {
+				const newItems = []
 
-    show = async (payload) => {
-        app.cores.window_mng.render(
-            "context-menu-portal",
-            React.createElement(ContextMenu, payload),
-            {
-                onClose: this.onClose,
-                createOrUpdate: true,
-                closeOnClickOutside: true,
-            },
-        )
-    }
+				// call the function
+				const result = await contextObject(
+					newItems,
+					parentElement,
+					element,
+					{ close: this.close },
+				)
 
-    onClose = async (delay = 200) => {
-        this.eventBus.emit("close", delay)
+				return result || newItems
+			} catch (error) {
+				this.console.error(
+					`Error processing context [${contextName}] >`,
+					error,
+				)
+				return []
+			}
+		}
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, delay)
-        })
-    }
+		// if it is an object (array), return it directly
+		return Array.isArray(contextObject) ? contextObject : []
+	}
+
+	show = async (props) => {
+		app.cores.window_mng.render(
+			"context-menu-portal",
+			React.createElement(ContextMenu, props),
+			{
+				useFrame: false,
+				createOrUpdate: true,
+				closeOnClickOutside: true, // sets default click outside behavior
+				onClose: this.onClose, // triggered when the menu is closing
+			},
+		)
+
+		this.isMenuOpen = true
+	}
+
+	// triggered when the menu is closing
+	onClose = async (delay = 200) => {
+		if (typeof this.fireWhenClosing === "function") {
+			await this.fireWhenClosing()
+		}
+
+		if (delay > 0) {
+			await new Promise((resolve) => setTimeout(resolve, delay))
+		}
+
+		this.isMenuOpen = false
+	}
+
+	// close the menu
+	close = async () => {
+		app.cores.window_mng.close("context-menu-portal")
+	}
 }

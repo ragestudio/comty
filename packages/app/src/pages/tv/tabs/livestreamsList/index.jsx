@@ -1,6 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 import { FastAverageColor } from "fast-average-color"
+import { Icons } from "@components/Icons"
 
 import UserPreview from "@components/UserPreview"
 
@@ -69,15 +70,24 @@ const LivestreamItem = (props) => {
 
 			<div className="livestream_info">
 				<div className="livestream_titles">
+					<antd.Tag className="livestream_category">
+						{livestream.info?.category}
+					</antd.Tag>
+
 					<div className="livestream_title">
 						<h1>{livestream.info?.title}</h1>
 					</div>
 
 					<div className="livestream_description">
-						<h2>
+						<span className="livestream_description-text">
 							{livestream.info?.description ?? "No description"}
-						</h2>
+						</span>
 					</div>
+				</div>
+
+				<div className="livestream_views">
+					<Icons.FiEye />
+					<h4>{livestream.info?.viewers ?? 0}</h4>
 				</div>
 
 				<UserPreview user={livestream.user} small />

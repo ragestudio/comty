@@ -45,7 +45,7 @@ const ProfileData = (props) => {
 	async function handleChange(key, value) {
 		setLoading(true)
 
-		const result = await Streaming.createOrUpdateStream({
+		const result = await Streaming.createOrUpdateProfile({
 			[key]: value,
 			_id: profile._id,
 		}).catch((error) => {

@@ -1,15 +1,14 @@
 {
 	"name": "@comty/app",
-	"version": "1.36.0@alpha",
+	"version": "1.37.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
 	"author": "RageStudio",
 	"description": "A prototype of a social network.",
 	"scripts": {
-		"build": "vite build",
 		"dev": "vite",
-		"docker-compose:update_run": "docker-compose down && git pull && yarn build && docker-compose up -d --build",
+		"build": "vite build",
 		"preview": "vite preview",
 		"release": "node ./scripts/release.js"
 	},
@@ -33,7 +32,7 @@
 		"axios": "^1.7.7",
 		"bear-react-carousel": "^4.0.10-alpha.0",
 		"classnames": "2.3.1",
-		"comty.js": "^0.61.0",
+		"comty.js": "^0.63.0",
 		"dashjs": "^4.7.4",
 		"dompurify": "^3.0.0",
 		"fast-average-color": "^9.2.0",
