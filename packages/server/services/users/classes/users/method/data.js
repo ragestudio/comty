@@ -1,6 +1,5 @@
 import { User, UserFollow } from "@db_models"
 
-// REWRITE MEE!!!
 export default async (payload = {}) => {
 	const { user_id, from_user_id, basic } = payload
 
@@ -8,64 +7,45 @@ export default async (payload = {}) => {
 		throw new OperationError(400, "Missing user_id")
 	}
 
-	let data = null
+	const isMultipleUsers = Array.isArray(user_id)
 
-	if (Array.isArray(user_id)) {
-		data = await User.find({
-			_id: {
-				$in: user_id,
-			},
-		}).catch((err) => {
-			return false
-		})
+	let usersData = null
 
-		data = data.map((user) => {
-			user = user.toObject()
-			return user
-		})
+	if (isMultipleUsers) {
+		usersData = await User.find({ _id: { $in: user_id } })
 
-		if (from_user_id && !basic) {
-			const following = await UserFollow.find({
-				to: {
-					$in: ids,
-				},
-				user_id: from_user_id,
-			}).catch(() => false)
-
-			following.forEach((follow) => {
-				const userIndex = data.findIndex((user) => {
-					return user._id === follow.to
-				})
-
-				if (userIndex > -1) {
-					data[userIndex].following = true
-				}
-			})
+		if (!usersData || !usersData.length) {
+			return []
 		}
 
-		return data
+		usersData = usersData.map((user) => user.toObject())
 	} else {
-		data = await User.findOne({
-			_id: user_id,
-		}).catch((err) => {
-			return false
-		})
+		const userData = await User.findOne({ _id: user_id })
 
-		if (!data) {
+		if (!userData) {
 			throw new OperationError(404, "User not found")
 		}
 
-		data = data.toObject()
-
-		if (from_user_id && !basic) {
-			const isFollowed = await UserFollow.findOne({
-				user_id: from_user_id,
-				to: user_id,
-			}).catch(() => false)
-
-			data.following = !!isFollowed
-		}
-
-		return data
+		usersData = [userData.toObject()]
 	}
+
+	if (from_user_id && !basic) {
+		const targetUserIds = usersData.map((user) => user._id)
+
+		const followingData = await UserFollow.find({
+			user_id: from_user_id,
+			to: { $in: targetUserIds },
+		})
+
+		const followedUserIds = new Set(
+			followingData.map((follow) => follow.to.toString()),
+		)
+
+		usersData = usersData.map((user) => ({
+			...user,
+			following: followedUserIds.has(user._id.toString()),
+		}))
+	}
+
+	return isMultipleUsers ? usersData : usersData[0]
 }
