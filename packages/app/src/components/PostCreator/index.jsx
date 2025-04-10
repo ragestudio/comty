@@ -335,10 +335,17 @@ export default class PostCreator extends React.Component {
 	}
 
 	handleOnMentionSearch = lodash.debounce(async (value) => {
-		const results = await SearchModel.userSearch(`username:${value}`)
+		if (value === "") {
+			return false
+		}
+
+		const results = await SearchModel.search(`${value}`, {
+			fields: "users",
+			limit: 5,
+		})
 
 		this.setState({
-			mentionsLoadedData: results,
+			mentionsLoadedData: results.users.items,
 		})
 	}, 300)
 
@@ -674,13 +681,20 @@ export default class PostCreator extends React.Component {
 						draggable={false}
 						prefix="@"
 						allowClear
+						onBlur={() => {
+							this.setState({ mentionsLoadedData: [] })
+						}}
 						options={this.state.mentionsLoadedData.map((item) => {
 							return {
 								key: item.id,
 								value: item.username,
 								label: (
 									<>
-										<antd.Avatar src={item.avatar} />
+										<antd.Avatar
+											size={24}
+											src={item.avatar}
+											shape="square"
+										/>
 										<span>{item.username}</span>
 									</>
 								),
