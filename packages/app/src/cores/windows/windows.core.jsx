@@ -158,15 +158,15 @@ export default class WindowManager extends Core {
 		})
 
 		if (!win || !element) {
-			this.console.error(`Window [${id}] not found`)
+			this.console.error(`[${id}] Window not found`)
 			return false
 		}
 
-		this.console.debug(`Closing window ${id}`, win, element)
+		this.console.debug(`[${id}] Closing window`, win, element)
 
 		// if onClose callback is defined, call it
 		if (typeof win.onClose === "function") {
-			this.console.debug(`Trigging close callback for window ${id}`)
+			this.console.debug(`[${id}] Trigging on closing callback`)
 			await win.onClose()
 		}
 
