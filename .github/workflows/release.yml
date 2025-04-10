@@ -25,6 +25,7 @@ jobs:
             - name: Install dependencies
               run: |
                   npm install
+                  npm i @rollup/rollup-linux-x64-gnu
               working-directory: ./packages/app
 
             - name: Dump licenses
