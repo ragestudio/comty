@@ -7,5 +7,6 @@ dist-ssr
 yarn-error.log
 out/
 .ssl
+!package-lock.json
 
 /**/**/src/cores/@*
