@@ -24,7 +24,7 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  npm ci
+                  npm install
               working-directory: ./packages/app
 
             - name: Dump licenses
