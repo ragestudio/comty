@@ -1,6 +1,7 @@
 name: Release App
 
 on:
+    workflow_dispatch:
     push:
         branches:
             - master
@@ -27,10 +28,6 @@ jobs:
               run: |
                   npm install
                   npm i @rollup/rollup-linux-x64-gnu
-              working-directory: ./packages/app
-
-            - name: Dump licenses
-              run: node scripts/dump-licenses.js
               working-directory: ./packages/app
 
             - name: Run release script

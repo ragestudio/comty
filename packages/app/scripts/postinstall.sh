@@ -71,4 +71,8 @@ for submodule in $SUBMODULES; do
     fi
 done
 
+echo -e "${YELLOW}Dumping licenses...${NC}"
+cd "$(pwd)/packages/app"
+node "./scripts/dump-licenses.js"
+
 echo -e "${GREEN}=== Installation of dependencies in submodules completed ===${NC}"
