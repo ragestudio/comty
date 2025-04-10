@@ -32,7 +32,7 @@
 		"axios": "^1.7.7",
 		"bear-react-carousel": "^4.0.10-alpha.0",
 		"classnames": "2.3.1",
-		"comty.js": "^0.61.0",
+		"comty.js": "^0.63.0",
 		"dashjs": "^4.7.4",
 		"dompurify": "^3.0.0",
 		"fast-average-color": "^9.2.0",
