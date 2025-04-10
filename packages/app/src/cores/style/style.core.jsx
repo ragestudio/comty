@@ -11,7 +11,8 @@ const variantToAlgorithm = {
 	dark: theme.darkAlgorithm,
 }
 
-const ClientPrefersDark = () => window.matchMedia("(prefers-color-scheme: dark)")
+const ClientPrefersDark = () =>
+	window.matchMedia("(prefers-color-scheme: dark)")
 
 function variantKeyToColor(key) {
 	if (key == "auto") {
@@ -25,7 +26,6 @@ function variantKeyToColor(key) {
 	return key
 }
 
-
 export class ThemeProvider extends React.Component {
 	state = {
 		useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
@@ -37,7 +37,7 @@ export class ThemeProvider extends React.Component {
 
 		this.setState({
 			useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
-			useCompactMode: update["compact-mode"]
+			useCompactMode: update["compact-mode"],
 		})
 	}
 
@@ -58,19 +58,19 @@ export class ThemeProvider extends React.Component {
 			themeAlgorithms.push(theme.compactAlgorithm)
 		}
 
-		return <ConfigProvider
-			theme={{
-				token: {
-					...app.cores.style.getVar(),
-				},
-				algorithm: themeAlgorithms,
-			}}
-			componentSize={
-				app.isMobile ? "large" : "middle"
-			}
-		>
-			{this.props.children}
-		</ConfigProvider>
+		return (
+			<ConfigProvider
+				theme={{
+					token: {
+						...app.cores.style.getVar(),
+					},
+					algorithm: themeAlgorithms,
+				}}
+				componentSize={app.isMobile ? "large" : "middle"}
+			>
+				{this.props.children}
+			</ConfigProvider>
+		)
 	}
 }
 
@@ -83,9 +83,12 @@ export default class StyleCore extends Core {
 	static defaultVariantKey = "auto"
 
 	static get rootVariables() {
-		let attributes = document.documentElement.getAttribute("style").trim().split(";")
+		let attributes = document.documentElement
+			.getAttribute("style")
+			.trim()
+			.split(";")
 
-		attributes = attributes.slice(0, (attributes.length - 1))
+		attributes = attributes.slice(0, attributes.length - 1)
 
 		attributes = attributes.map((variable) => {
 			let [key, value] = variable.split(":")
@@ -107,7 +110,7 @@ export default class StyleCore extends Core {
 
 	isOnTemporalVariant = false
 
-	// modifications 
+	// modifications
 	static get storagedModifications() {
 		return store.get(StyleCore.modificationStorageKey) ?? {}
 	}
@@ -149,12 +152,14 @@ export default class StyleCore extends Core {
 		}
 
 		// apply variation
-		this.applyVariant(StyleCore.storagedVariantKey ?? StyleCore.defaultVariantKey)
+		this.applyVariant(
+			StyleCore.storagedVariantKey ?? StyleCore.defaultVariantKey,
+		)
 
 		// if mobile set fontScale to 1
 		if (app.isMobile) {
 			this.applyStyles({
-				fontScale: 1
+				fontScale: 1,
 			})
 		}
 
@@ -181,7 +186,10 @@ export default class StyleCore extends Core {
 			}
 		}
 
-		return StyleCore.storagedModifications[key] || this.public.theme.defaultVars[key]
+		return (
+			StyleCore.storagedModifications[key] ||
+			this.public.theme.defaultVars[key]
+		)
 	}
 
 	getDefaultVar(key) {
@@ -201,11 +209,14 @@ export default class StyleCore extends Core {
 		this.public.mutation = {
 			...this.public.theme.defaultVars,
 			...this.public.mutation,
-			...update
+			...update,
 		}
 
-		Object.keys(this.public.mutation).forEach(key => {
-			document.documentElement.style.setProperty(`--${key}`, this.public.mutation[key])
+		Object.keys(this.public.mutation).forEach((key) => {
+			document.documentElement.style.setProperty(
+				`--${key}`,
+				this.public.mutation[key],
+			)
 		})
 
 		app.eventBus.emit("style.update", {
@@ -213,7 +224,10 @@ export default class StyleCore extends Core {
 		})
 	}
 
-	applyVariant = (variantKey = (this.public.theme.defaultVariant ?? "light"), save = true) => {
+	applyVariant = (
+		variantKey = this.public.theme.defaultVariant ?? "light",
+		save = true,
+	) => {
 		if (save) {
 			StyleCore.storagedVariantKey = variantKey
 			this.public.currentVariantKey = variantKey
@@ -253,7 +267,10 @@ export default class StyleCore extends Core {
 	resetToDefault() {
 		store.remove(StyleCore.modificationStorageKey)
 
-		app.cores.settings.set("colorPrimary", this.public.theme.defaultVars.colorPrimary)
+		app.cores.settings.set(
+			"colorPrimary",
+			this.public.theme.defaultVars.colorPrimary,
+		)
 
 		this.onInitialize()
 	}
