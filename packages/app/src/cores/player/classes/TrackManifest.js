@@ -1,4 +1,4 @@
-import jsmediatags from "jsmediatags/dist/jsmediatags.min.js"
+import { parseBlob, selectCover } from "music-metadata"
 import { FastAverageColor } from "fast-average-color"
 
 export default class TrackManifest {
@@ -75,46 +75,43 @@ export default class TrackManifest {
 
 	async initialize() {
 		if (this.params.file) {
-			this.metadata = await this.analyzeMetadata(
-				this.params.file.originFileObj,
+			this.metadata = await parseBlob(
+				this.params.file.originFileObj, {skipPostHeaders: true}
 			)
 
 			this.metadata.format = this.metadata.type.toUpperCase()
 
-			if (this.metadata.tags) {
-				if (this.metadata.tags.title) {
-					this.title = this.metadata.tags.title
-				}
-
-				if (this.metadata.tags.artist) {
-					this.artist = this.metadata.tags.artist
-				}
-
-				if (this.metadata.tags.album) {
-					this.album = this.metadata.tags.album
-				}
-
-				if (this.metadata.tags.picture) {
-					this.cover = app.cores.remoteStorage.binaryArrayToFile(
-						this.metadata.tags.picture,
-						"cover",
-					)
-
-					const coverUpload =
-						await app.cores.remoteStorage.uploadFile(this.cover)
-
-					this.cover = coverUpload.url
-
-					delete this.metadata.tags.picture
-				}
-
-				this.handleChanges({
-					cover: this.cover,
-					title: this.title,
-					artist: this.artist,
-					album: this.album,
-				})
+			if (this.metadata.common.title) {
+				this.title = this.metadata.tags.title
 			}
+
+			if (this.metadata.common.artist) {
+				this.artist = this.metadata.tags.artist
+			}
+
+			if (this.metadata.common.album) {
+				this.album = this.metadata.tags.album
+			}
+
+			const frontCover = selectCover(this.metadata.common.picture);
+			if (frontCover) {
+
+				this.cover = new File([frontCover.data], "cover", {type: frontCover.type})
+
+				const coverUpload =
+					await app.cores.remoteStorage.uploadFile(this.cover)
+
+				this.cover = coverUpload.url
+
+				delete this.metadata.common.picture
+			}
+
+			this.handleChanges({
+				cover: this.cover,
+				title: this.title,
+				artist: this.artist,
+				album: this.album,
+			})
 		}
 
 		return this
@@ -124,19 +121,6 @@ export default class TrackManifest {
 		if (typeof this.params.onChange === "function") {
 			this.params.onChange(this.uid, changes)
 		}
-	}
-
-	analyzeMetadata = async (file) => {
-		return new Promise((resolve, reject) => {
-			jsmediatags.read(file, {
-				onSuccess: (data) => {
-					return resolve(data)
-				},
-				onError: (error) => {
-					return reject(error)
-				},
-			})
-		})
 	}
 
 	analyzeCoverColor = async () => {
