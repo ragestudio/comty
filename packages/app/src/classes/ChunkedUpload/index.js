@@ -170,7 +170,7 @@ export default class ChunkedUpload {
 
 			// check if is the last chunk, if so, handle sse events
 			if (this.chunkCount === this.totalChunks) {
-				if (data.sseChannelId || data.eventChannelURL) {
+				if (data.sseChannelId || data.sseUrl) {
 					this.waitOnSSE(data)
 				} else {
 					this.events.emit("finish", data)
@@ -178,9 +178,8 @@ export default class ChunkedUpload {
 			}
 
 			this.events.emit("progress", {
-				percentProgress: Math.round(
-					(100 / this.totalChunks) * this.chunkCount,
-				),
+				percent: Math.round((100 / this.totalChunks) * this.chunkCount),
+				state: "Uploading",
 			})
 		} catch (error) {
 			this.events.emit("error", error)
@@ -196,12 +195,9 @@ export default class ChunkedUpload {
 	}
 
 	waitOnSSE(data) {
-		console.log(
-			`[UPLOADER] Connecting to SSE channel >`,
-			data.eventChannelURL,
-		)
+		console.log(`[UPLOADER] Connecting to SSE channel >`, data.sseUrl)
 
-		const eventSource = new EventSource(data.eventChannelURL)
+		const eventSource = new EventSource(data.sseUrl)
 
 		eventSource.onerror = (error) => {
 			this.events.emit("error", error)
@@ -218,19 +214,20 @@ export default class ChunkedUpload {
 
 			console.log(`[UPLOADER] SSE Event >`, messageData)
 
-			if (messageData.status === "done") {
+			if (messageData.event === "done") {
 				this.events.emit("finish", messageData.result)
 				eventSource.close()
 			}
 
-			if (messageData.status === "error") {
+			if (messageData.event === "error") {
 				this.events.emit("error", messageData.result)
 				eventSource.close()
 			}
 
-			if (messageData.status === "progress") {
+			if (messageData.state) {
 				this.events.emit("progress", {
-					percentProgress: messageData.progress,
+					percent: messageData.percent,
+					state: messageData.state,
 				})
 			}
 		}

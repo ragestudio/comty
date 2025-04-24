@@ -56,14 +56,12 @@ export default class TaskQueueManager {
 	registerQueueEvents = (worker) => {
 		worker.on("progress", (job, progress) => {
 			try {
-				console.log(`Job ${job.id} reported progress: ${progress}%`)
+				console.log(
+					`Job ${job.id} reported progress: ${progress.percent}%`,
+				)
 
 				if (job.data.sseChannelId) {
-					global.sse.sendToChannel(job.data.sseChannelId, {
-						status: "progress",
-						events: "job_progress",
-						progress,
-					})
+					global.sse.sendToChannel(job.data.sseChannelId, progress)
 				}
 			} catch (error) {
 				// manejar error
@@ -76,8 +74,9 @@ export default class TaskQueueManager {
 
 				if (job.data.sseChannelId) {
 					global.sse.sendToChannel(job.data.sseChannelId, {
-						status: "done",
-						result,
+						event: "done",
+						state: "done",
+						result: result,
 					})
 				}
 			} catch (error) {}
@@ -89,7 +88,8 @@ export default class TaskQueueManager {
 
 				if (job.data.sseChannelId) {
 					global.sse.sendToChannel(job.data.sseChannelId, {
-						status: "error",
+						event: "error",
+						state: "error",
 						result: error.message,
 					})
 				}
@@ -122,9 +122,9 @@ export default class TaskQueueManager {
 			)
 
 			await global.sse.sendToChannel(sseChannelId, {
-				status: "progress",
-				events: "job_queued",
-				progress: 5,
+				event: "job_queued",
+				state: "progress",
+				percent: 5,
 			})
 		}
 

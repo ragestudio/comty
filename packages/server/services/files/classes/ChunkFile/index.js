@@ -104,11 +104,9 @@ export function createAssembleChunksPromise({
 
 export async function handleChunkFile(
 	fileStream,
-	{ tmpDir, headers, maxFileSize, maxChunkSize },
+	{ chunksPath, outputDir, headers, maxFileSize, maxChunkSize },
 ) {
 	return await new Promise(async (resolve, reject) => {
-		const workPath = path.join(tmpDir, headers["uploader-file-id"])
-		const chunksPath = path.join(workPath, "chunks")
 		const chunkPath = path.join(
 			chunksPath,
 			headers["uploader-chunk-number"],
@@ -123,17 +121,6 @@ export async function handleChunkFile(
 		// make sure chunk is in range
 		if (chunkCount < 0 || chunkCount >= totalChunks) {
 			return reject(new OperationError(500, "Chunk is out of range"))
-		}
-
-		// if is the first chunk check if dir exists before write things
-		if (chunkCount === 0) {
-			try {
-				if (!(await fs.promises.stat(chunksPath).catch(() => false))) {
-					await fs.promises.mkdir(chunksPath, { recursive: true })
-				}
-			} catch (error) {
-				return reject(new OperationError(500, error.message))
-			}
 		}
 
 		let dataWritten = 0
@@ -172,25 +159,18 @@ export async function handleChunkFile(
 			}
 
 			if (isLast) {
-				const mimetype = mimetypes.lookup(
-					headers["uploader-original-name"],
-				)
-				const extension = mimetypes.extension(mimetype)
+				// const mimetype = mimetypes.lookup(
+				// 	headers["uploader-original-name"],
+				// )
+				// const extension = mimetypes.extension(mimetype)
 
-				let filename = headers["uploader-file-id"]
-
-				if (headers["uploader-use-date"] === "true") {
-					filename = `${filename}_${Date.now()}`
-				}
+				let filename = nanoid()
 
 				return resolve(
 					createAssembleChunksPromise({
 						// build data
 						chunksPath: chunksPath,
-						filePath: path.resolve(
-							workPath,
-							`${filename}.${extension}`,
-						),
+						filePath: path.resolve(outputDir, filename),
 						maxFileSize: maxFileSize,
 					}),
 				)

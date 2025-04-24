@@ -1,48 +1,44 @@
 import path from "node:path"
 import fs from "node:fs"
 
-import RemoteUpload from "@services/remoteUpload"
+import Upload from "@classes/Upload"
 
 export default {
-    useContext: ["cache"],
-    middlewares: [
-        "withAuthentication",
-    ],
-    fn: async (req, res) => {
-        const { cache } = this.default.contexts
+	useContext: ["cache"],
+	middlewares: ["withAuthentication"],
+	fn: async (req, res) => {
+		const workPath = path.resolve(
+			this.default.contexts.cache.constructor.cachePath,
+			`${req.auth.session.user_id}-${nanoid()}`,
+		)
 
-        const providerType = req.headers["provider-type"] ?? "standard"
+		await fs.promises.mkdir(workPath, { recursive: true })
 
-        const userPath = path.join(cache.constructor.cachePath, req.auth.session.user_id)
+		let localFilepath = null
 
-        let localFilepath = null
-        let tmpPath =  path.resolve(userPath, `${Date.now()}`)
+		await req.multipart(async (field) => {
+			if (!field.file) {
+				throw new OperationError(400, "Missing file")
+			}
 
-        await req.multipart(async (field) => {
-            if (!field.file) {
-                throw new OperationError(400, "Missing file")
-            }
+			localFilepath = path.join(workPath, "file")
 
-            localFilepath = path.join(tmpPath, field.file.name)
+			await field.write(localFilepath)
+		})
 
-            const existTmpDir = await fs.promises.stat(tmpPath).then(() => true).catch(() => false)
+		let transformations = req.headers["transformations"]
 
-            if (!existTmpDir) {
-                await fs.promises.mkdir(tmpPath, { recursive: true })
-            }
+		if (transformations) {
+			transformations = transformations.split(",").map((t) => t.trim())
+		}
 
-            await field.write(localFilepath)
-        })
+		const result = await Upload.fileHandle({
+			user_id: req.auth.session.user_id,
+			filePath: localFilepath,
+			workPath: workPath,
+			transformations: transformations,
+		})
 
-        const result = await RemoteUpload({
-            parentDir: req.auth.session.user_id,
-            source: localFilepath,
-            service: providerType,
-            useCompression: ToBoolean(req.headers["use-compression"]) ?? true,
-        })
-
-        fs.promises.rm(tmpPath, { recursive: true, force: true })
-
-        return result
-    }
+		return result
+	},
 }

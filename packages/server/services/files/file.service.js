@@ -3,6 +3,7 @@ import { Server } from "linebridge"
 import B2 from "backblaze-b2"
 
 import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 import SSEManager from "@shared-classes/SSEManager"
@@ -10,9 +11,21 @@ import SharedMiddlewares from "@shared-middlewares"
 import LimitsClass from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
 
+// import * as Minio from 'minio'
+
+// class StorageNG {
+//   constructor() {
+
+//   }
+
+//   async initialize() {
+
+//   }
+// }
+
 class API extends Server {
 	static refName = "files"
-	static useEngine = "hyper-express"
+	static useEngine = "hyper-express-ng"
 	static routesPath = `${__dirname}/routes`
 	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3002
 	static enableWebsockets = true
@@ -27,6 +40,9 @@ class API extends Server {
 		storage: StorageClient(),
 		b2Storage: null,
 		SSEManager: new SSEManager(),
+		redis: RedisClient({
+			maxRetriesPerRequest: null,
+		}),
 		limits: {},
 	}
 
@@ -55,8 +71,9 @@ class API extends Server {
 			)
 		}
 
+		await this.contexts.redis.initialize()
 		await this.queuesManager.initialize({
-			redisOptions: this.engine.ws.redis.options,
+			redisOptions: this.contexts.redis.client,
 		})
 		await this.contexts.db.initialize()
 		await this.contexts.storage.initialize()
