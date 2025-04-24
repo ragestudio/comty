@@ -181,17 +181,9 @@ export default class Gateway {
 					serviceId: id,
 					path: path,
 					target: `${http.proto}://${listen.ip}:${listen.port}${path}`,
+					websocket: !!websocket,
 				})
 			}
-		}
-
-		if (websocket && websocket.enabled === true) {
-			await this.gateway.register({
-				serviceId: id,
-				websocket: true,
-				path: websocket.path,
-				target: `${http.proto}://${listen.ip}:${listen.port}${websocket.path}`,
-			})
 		}
 
 		if (this.state.allReady) {
