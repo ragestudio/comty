@@ -392,9 +392,7 @@ const PlaylistView = (props) => {
 										key={item._id}
 										order={item._id}
 										track={item}
-										onClickPlayBtn={() =>
-											handleOnClickTrack(item)
-										}
+										onPlay={() => handleOnClickTrack(item)}
 										changeState={(update) =>
 											handleTrackChangeState(
 												item._id,
@@ -418,7 +416,7 @@ const PlaylistView = (props) => {
 											<MusicTrack
 												order={index + 1}
 												track={item}
-												onClickPlayBtn={() =>
+												onPlay={() =>
 													handleOnClickTrack(item)
 												}
 												changeState={(update) =>
