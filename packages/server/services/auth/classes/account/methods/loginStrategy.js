@@ -10,13 +10,13 @@ export default async ({ username, password, hash }, user) => {
         user = await User.findOne(query).select("+email").select("+password")
     }
 
-    if (!user) {
-        throw new OperationError(401, "User not found")
-    }
+	if (!user) {
+		throw new OperationError(401, "User not found")
+	}
 
-    if (user.disabled == true) {
-        throw new OperationError(401, "User is disabled")
-    }
+	if (user.disabled == true) {
+		throw new OperationError(401, "User is disabled")
+	}
 
     if (typeof hash !== "undefined") {
         if (user.password !== hash) {
