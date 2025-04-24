@@ -10,158 +10,163 @@ import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 import "./index.less"
 
 const TrackEditor = (props) => {
-    const context = React.useContext(ReleaseEditorStateContext)
-    const [track, setTrack] = React.useState(props.track ?? {})
+	const context = React.useContext(ReleaseEditorStateContext)
+	const [track, setTrack] = React.useState(props.track ?? {})
 
-    async function handleChange(key, value) {
-        setTrack((prev) => {
-            return {
-                ...prev,
-                [key]: value
-            }
-        })
-    }
+	async function handleChange(key, value) {
+		setTrack((prev) => {
+			return {
+				...prev,
+				[key]: value,
+			}
+		})
+	}
 
-    async function openEnhancedLyricsEditor() {
-        context.renderCustomPage({
-            header: "Enhanced Lyrics",
-            content: EnhancedLyricsEditor,
-            props: {
-                track: track,
-            }
-        })
-    }
+	async function openEnhancedLyricsEditor() {
+		context.renderCustomPage({
+			header: "Enhanced Lyrics",
+			content: EnhancedLyricsEditor,
+			props: {
+				track: track,
+			},
+		})
+	}
 
-    async function handleOnSave() {
-        setTrack((prev) => {
-            const listData = [...context.list]
+	async function handleOnSave() {
+		setTrack((prev) => {
+			const listData = [...context.items]
 
-            const trackIndex = listData.findIndex((item) => item.uid === prev.uid)
+			const trackIndex = listData.findIndex(
+				(item) => item.uid === prev.uid,
+			)
 
-            if (trackIndex === -1) {
-                return prev
-            }
+			if (trackIndex === -1) {
+				return prev
+			}
 
-            listData[trackIndex] = prev
+			listData[trackIndex] = prev
 
-            context.setGlobalState({
-                ...context,
-                list: listData
-            })
+			context.setGlobalState({
+				...context,
+				items: listData,
+			})
 
-            return prev
-        })
-    }
+			props.close()
 
-    React.useEffect(() => {
-        context.setCustomPageActions([
-            {
-                label: "Save",
-                icon: "FiSave",
-                type: "primary",
-                onClick: handleOnSave,
-                disabled: props.track === track,
-            },
-        ])
-    }, [track])
+			return prev
+		})
+	}
 
-    return <div className="track-editor">
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdImage />
-                <span>Cover</span>
-            </div>
+	function setParentCover() {
+		handleChange("cover", context.cover)
+	}
 
-            <CoverEditor
-                value={track.cover}
-                onChange={(url) => handleChange("cover", url)}
-                extraActions={[
-                    <antd.Button>
-                        Use Parent
-                    </antd.Button>
-                ]}
-            />
-        </div>
+	React.useEffect(() => {
+		context.setCustomPageActions([
+			{
+				label: "Save",
+				icon: "FiSave",
+				type: "primary",
+				onClick: handleOnSave,
+				disabled: props.track === track,
+			},
+		])
+	}, [track])
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdOutlineMusicNote />
-                <span>Title</span>
-            </div>
+	return (
+		<div className="track-editor">
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.MdImage />
+					<span>Cover</span>
+				</div>
 
-            <antd.Input
-                value={track.title}
-                placeholder="Track title"
-                onChange={(e) => handleChange("title", e.target.value)}
-            />
-        </div>
+				<CoverEditor
+					value={track.cover}
+					onChange={(url) => handleChange("cover", url)}
+					extraActions={[
+						<antd.Button onClick={setParentCover}>
+							Use Parent
+						</antd.Button>,
+					]}
+				/>
+			</div>
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.FiUser />
-                <span>Artist</span>
-            </div>
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.MdOutlineMusicNote />
+					<span>Title</span>
+				</div>
 
-            <antd.Input
-                value={track.artists?.join(", ")}
-                placeholder="Artist"
-                onChange={(e) => handleChange("artist", e.target.value)}
-            />
-        </div>
+				<antd.Input
+					value={track.title}
+					placeholder="Track title"
+					onChange={(e) => handleChange("title", e.target.value)}
+				/>
+			</div>
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdAlbum />
-                <span>Album</span>
-            </div>
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.FiUser />
+					<span>Artist</span>
+				</div>
 
-            <antd.Input
-                value={track.album}
-                placeholder="Album"
-                onChange={(e) => handleChange("album", e.target.value)}
-            />
-        </div>
+				<antd.Input
+					value={track.artist}
+					placeholder="Artist"
+					onChange={(e) => handleChange("artist", e.target.value)}
+				/>
+			</div>
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdExplicit />
-                <span>Explicit</span>
-            </div>
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.MdAlbum />
+					<span>Album</span>
+				</div>
 
-            <antd.Switch
-                checked={track.explicit}
-                onChange={(value) => handleChange("explicit", value)}
-            />
-        </div>
+				<antd.Input
+					value={track.album}
+					placeholder="Album"
+					onChange={(e) => handleChange("album", e.target.value)}
+				/>
+			</div>
 
-        <div className="track-editor-field">
-            <div className="track-editor-field-header">
-                <Icons.MdLyrics />
-                <span>Enhanced Lyrics</span>
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.MdExplicit />
+					<span>Explicit</span>
+				</div>
 
-                <antd.Switch
-                    checked={track.lyrics_enabled}
-                    onChange={(value) => handleChange("lyrics_enabled", value)}
-                    disabled={!track.params._id}
-                />
-            </div>
+				<antd.Switch
+					checked={track.explicit}
+					onChange={(value) => handleChange("explicit", value)}
+				/>
+			</div>
 
-            <div className="track-editor-field-actions">
-                <antd.Button
-                    disabled={!track.params._id}
-                    onClick={openEnhancedLyricsEditor}
-                >
-                    Edit
-                </antd.Button>
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
+					<Icons.MdLyrics />
+					<span>Enhanced Lyrics</span>
+				</div>
 
-                {
-                    !track.params._id && <span>
-                        You cannot edit Video and Lyrics without release first
-                    </span>
-                }
-            </div>
-        </div>
-    </div>
+				<div className="track-editor-field-actions">
+					<antd.Button
+						disabled={!track.params._id}
+						onClick={openEnhancedLyricsEditor}
+					>
+						Edit
+					</antd.Button>
+
+					{!track.params._id && (
+						<span>
+							You cannot edit Video and Lyrics without release
+							first
+						</span>
+					)}
+				</div>
+			</div>
+		</div>
+	)
 }
 
 export default TrackEditor
