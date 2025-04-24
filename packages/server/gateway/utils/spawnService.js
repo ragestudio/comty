@@ -3,21 +3,29 @@ import createServiceLogTransformer from "./createServiceLogTransformer"
 
 import Vars from "../vars"
 
-export default async ({ id, service, cwd, onClose, onError, onIPCData }) => {
+export default async ({
+	id,
+	service,
+	path,
+	cwd,
+	onClose,
+	onError,
+	onIPCData,
+}) => {
 	const instanceEnv = {
 		...process.env,
-		lb_service: {
-			id: service.id,
-			index: service.index,
-		},
+		lb_service_id: service.id,
+		lb_service_path: service.path,
+		lb_service_version: service.version,
+		lb_service_cwd: service.cwd,
+		lb_service: true,
 	}
 
-	let instance = ChildProcess.fork(Vars.bootloaderBin, [service], {
+	let instance = ChildProcess.fork(Vars.bootloaderBin, [path], {
 		detached: false,
 		silent: true,
 		cwd: cwd,
 		env: instanceEnv,
-		killSignal: "SIGTERM",
 	})
 
 	instance.logs = {
