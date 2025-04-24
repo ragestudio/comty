@@ -176,8 +176,7 @@ class TracksManager extends React.Component {
 
 				const trackManifest = new TrackManifest({
 					uid: uid,
-					file: change.file,
-					onChange: this.modifyTrackByUid,
+					file: change.file.originFileObj,
 				})
 
 				this.addTrackToList(trackManifest)
@@ -204,6 +203,23 @@ class TracksManager extends React.Component {
 
 				trackManifest.source = change.file.response.url
 				trackManifest = await trackManifest.initialize()
+
+				// if has a cover, Upload
+				if (trackManifest._coverBlob) {
+					console.log(
+						`[${trackManifest.uid}] Founded cover, uploading...`,
+					)
+					const coverFile = new File(
+						[trackManifest._coverBlob],
+						"cover.jpg",
+						{ type: trackManifest._coverBlob.type },
+					)
+
+					const coverUpload =
+						await app.cores.remoteStorage.uploadFile(coverFile)
+
+					trackManifest.cover = coverUpload.url
+				}
 
 				await this.modifyTrackByUid(uid, trackManifest)
 

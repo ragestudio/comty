@@ -51,33 +51,28 @@ export default class TrackManifest {
 	_id = null // used for api requests
 	uid = null // used for internal
 
-	cover =
-		"https://storage.ragestudio.net/comty-static-assets/default_song.png"
 	title = "Untitled"
 	album = "Unknown"
 	artist = "Unknown"
+	cover = null // set default cover url
 	source = null
 	metadata = {}
 
 	// set default service to default
 	service = "default"
 
-	// Extended from db
-	liked = null
-
 	async initialize() {
 		if (!this.params.file) {
 			return this
 		}
 
-		const analyzedMetadata = await parseBlob(
-			this.params.file.originFileObj,
-			{
-				skipPostHeaders: true,
-			},
-		).catch(() => ({}))
+		const analyzedMetadata = await parseBlob(this.params.file, {
+			skipPostHeaders: true,
+		}).catch(() => ({}))
 
-		this.metadata.format = analyzedMetadata.format.codec
+		if (analyzedMetadata.format) {
+			this.metadata.format = analyzedMetadata.format.codec
+		}
 
 		if (analyzedMetadata.common) {
 			this.title = analyzedMetadata.common.title ?? this.title
@@ -88,30 +83,11 @@ export default class TrackManifest {
 		if (analyzedMetadata.common.picture) {
 			const cover = analyzedMetadata.common.picture[0]
 
-			const coverFile = new File([cover.data], "cover", {
-				type: cover.format,
-			})
-
-			const coverUpload =
-				await app.cores.remoteStorage.uploadFile(coverFile)
-
-			this.cover = coverUpload.url
+			this._coverBlob = new Blob([cover.data], { type: cover.format })
+			this.cover = URL.createObjectURL(this._coverBlob)
 		}
-
-		this.handleChanges({
-			cover: this.cover,
-			title: this.title,
-			artist: this.artist,
-			album: this.album,
-		})
 
 		return this
-	}
-
-	handleChanges = (changes) => {
-		if (typeof this.params.onChange === "function") {
-			this.params.onChange(this.uid, changes)
-		}
 	}
 
 	analyzeCoverColor = async () => {
