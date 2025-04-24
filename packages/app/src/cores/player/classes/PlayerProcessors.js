@@ -1,83 +1,96 @@
 import defaultAudioProccessors from "../processors"
 
 export default class PlayerProcessors {
-    constructor(player) {
-        this.player = player
-    }
+	constructor(base) {
+		this.base = base
+	}
 
-    processors = []
+	nodes = []
+	attached = []
 
-    public = {}
+	public = {}
 
-    async initialize() {
-        // if already exists audio processors, destroy all before create new
-        if (this.processors.length > 0) {
-            this.player.console.log("Destroying audio processors")
+	async initialize() {
+		// if already exists audio processors, destroy all before create new
+		if (this.nodes.length > 0) {
+			this.base.player.console.log("Destroying audio processors")
 
-            this.processors.forEach((processor) => {
-                this.player.console.log(`Destroying audio processor ${processor.constructor.name}`, processor)
-                processor._destroy()
-            })
+			this.nodes.forEach((node) => {
+				this.base.player.console.log(
+					`Destroying audio processor node ${node.constructor.name}`,
+					node,
+				)
+				node._destroy()
+			})
 
-            this.processors = []
-        }
+			this.nodes = []
+		}
 
-        // instanciate default audio processors
-        for await (const defaultProccessor of defaultAudioProccessors) {
-            this.processors.push(new defaultProccessor(this.player))
-        }
+		// instanciate default audio processors
+		for await (const defaultProccessor of defaultAudioProccessors) {
+			this.nodes.push(new defaultProccessor(this))
+		}
 
-        // initialize audio processors
-        for await (const processor of this.processors) {
-            if (typeof processor._init === "function") {
-                try {
-                    await processor._init(this.player.audioContext)
-                } catch (error) {
-                    this.player.console.error(`Failed to initialize audio processor ${processor.constructor.name} >`, error)
-                    continue
-                }
-            }
+		// initialize audio processors
+		for await (const node of this.nodes) {
+			if (typeof node._init === "function") {
+				try {
+					await node._init()
+				} catch (error) {
+					this.base.player.console.error(
+						`Failed to initialize audio processor node ${node.constructor.name} >`,
+						error,
+					)
+					continue
+				}
+			}
 
-            // check if processor has exposed public methods
-            if (processor.exposeToPublic) {
-                Object.entries(processor.exposeToPublic).forEach(([key, value]) => {
-                    const refName = processor.constructor.refName
+			// check if processor has exposed public methods
+			if (node.exposeToPublic) {
+				Object.entries(node.exposeToPublic).forEach(([key, value]) => {
+					const refName = node.constructor.refName
 
-                    if (typeof this.player.public[refName] === "undefined") {
-                        // by default create a empty object
-                        this.player.public[refName] = {}
-                    }
+					if (typeof this.base.processors[refName] === "undefined") {
+						// by default create a empty object
+						this.base.processors[refName] = {}
+					}
 
-                    this.player.public[refName][key] = value
-                })
-            }
-        }
-    }
+					this.base.processors[refName][key] = value
+				})
+			}
+		}
+	}
 
-    async attachProcessorsToInstance(instance) {
-        for await (const [index, processor] of this.processors.entries()) {
-            if (processor.constructor.node_bypass === true) {
-                instance.contextElement.connect(processor.processor)
+	attachAllNodes = async () => {
+		for await (const [index, node] of this.nodes.entries()) {
+			if (node.constructor.node_bypass === true) {
+				this.base.context.elementSource.connect(node.processor)
 
-                processor.processor.connect(this.player.audioContext.destination)
+				node.processor.connect(this.base.context.destination)
 
-                continue
-            }
+				continue
+			}
 
-            if (typeof processor._attach !== "function") {
-                this.player.console.error(`Processor ${processor.constructor.refName} not support attach`)
+			if (typeof node._attach !== "function") {
+				this.base.console.error(
+					`Processor ${node.constructor.refName} not support attach`,
+				)
 
-                continue
-            }
+				continue
+			}
 
-            instance = await processor._attach(instance, index)
-        }
+			await node._attach(index)
+		}
 
-        const lastProcessor = instance.attachedProcessors[instance.attachedProcessors.length - 1].processor
+		const lastProcessor = this.attached[this.attached.length - 1].processor
 
-        // now attach to destination
-        lastProcessor.connect(this.player.audioContext.destination)
+		// now attach to destination
+		lastProcessor.connect(this.base.context.destination)
+	}
 
-        return instance
-    }
+	detachAllNodes = async () => {
+		for (const [index, node] of this.attached.entries()) {
+			await node._detach()
+		}
+	}
 }

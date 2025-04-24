@@ -1,60 +1,49 @@
-import AudioPlayerStorage from "../../player.storage"
 import ProcessorNode from "../node"
 
 export default class GainProcessorNode extends ProcessorNode {
-    static refName = "gain"
+	static refName = "gain"
+	static gradualFadeMs = 150
 
-    static lock = true
+	exposeToPublic = {
+		set: this.setGain.bind(this),
+		linearRampToValueAtTime: this.linearRampToValueAtTime.bind(this),
+		fade: this.fade.bind(this),
+	}
 
-    static defaultValues = {
-        gain: 1,
-    }
+	setGain(gain) {
+		gain = this.processGainValue(gain)
 
-    state = {
-        gain: AudioPlayerStorage.get("gain") ?? GainProcessorNode.defaultValues.gain,
-    }
+		return (this.processor.gain.value = gain)
+	}
 
-    exposeToPublic = {
-        modifyValues: function (values) {
-            this.state = {
-                ...this.state,
-                ...values,
-            }
+	linearRampToValueAtTime(gain, time) {
+		gain = this.processGainValue(gain)
+		return this.processor.gain.linearRampToValueAtTime(gain, time)
+	}
 
-            AudioPlayerStorage.set("gain", this.state.gain)
+	fade(gain) {
+		if (gain <= 0) {
+			gain = 0.0001
+		} else {
+			gain = this.processGainValue(gain)
+		}
 
-            this.applyValues()
-        }.bind(this),
-        resetDefaultValues: function () {
-            this.exposeToPublic.modifyValues(GainProcessorNode.defaultValues)
+		const currentTime = this.audioContext.currentTime
+		const fadeTime = currentTime + this.constructor.gradualFadeMs / 1000
 
-            return this.state
-        }.bind(this),
-        values: () => this.state,
-    }
+		this.processor.gain.linearRampToValueAtTime(gain, fadeTime)
+	}
 
-    applyValues() {
-        // apply to current instance
-        this.processor.gain.value = app.cores.player.state.volume * this.state.gain
-    }
+	processGainValue(gain) {
+		return Math.pow(gain, 2)
+	}
 
-    async init() {
-        if (!this.audioContext) {
-            throw new Error("audioContext is required")
-        }
+	async init() {
+		if (!this.audioContext) {
+			throw new Error("audioContext is required")
+		}
 
-        this.processor = this.audioContext.createGain()
-
-        this.applyValues()
-    }
-
-    mutateInstance(instance) {
-        if (!instance) {
-            throw new Error("instance is required")
-        }
-
-        instance.gainNode = this.processor
-
-        return instance
-    }
+		this.processor = this.audioContext.createGain()
+		this.processor.gain.value = this.player.state.volume
+	}
 }
