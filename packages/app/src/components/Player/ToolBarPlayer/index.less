@@ -7,299 +7,265 @@
 @toolbar_player_top_actions_padding_horizontal: 15px;
 
 .toolbar_player_wrapper {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
+	width: 100%;
 
-    transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 
-    &.hover {
-        filter: drop-shadow(@card-drop-shadow);
+	&.hover {
+		filter: drop-shadow(@card-drop-shadow);
 
-        .toolbar_player_top_actions {
-            height: @toolbar_player_top_actions_height;
-            padding: @toolbar_player_top_actions_padding_vertical @toolbar_player_top_actions_padding_horizontal;
-            padding-bottom: calc(calc(@toolbar_player_borderRadius / 2) + @toolbar_player_top_actions_padding_vertical);
-        }
-    }
+		.toolbar_player_top_actions {
+			height: @toolbar_player_top_actions_height;
+			padding: @toolbar_player_top_actions_padding_vertical
+				@toolbar_player_top_actions_padding_horizontal;
+			padding-bottom: calc(
+				calc(@toolbar_player_borderRadius / 2) +
+					@toolbar_player_top_actions_padding_vertical
+			);
+		}
+	}
 
-    &.cover_light {
-        .toolbar_player_content {
-            color: var(--text-color-black);
-        }
+	&.cover_light {
+		.toolbar_player_content {
+			color: var(--text-color-black);
+		}
 
-        .MuiSlider-root {
-            color: var(--text-color-black);
+		.MuiSlider-root {
+			color: var(--text-color-black);
 
-            .MuiSlider-rail {
-                color: var(--text-color-black);
-            }
-        }
+			.MuiSlider-rail {
+				color: var(--text-color-black);
+			}
+		}
 
-        .loadCircle {
-            svg {
-                path {
-                    stroke: var(--text-color-black);
-                }
-            }
-        }
-    }
+		.loadCircle {
+			svg {
+				path {
+					stroke: var(--text-color-black);
+				}
+			}
+		}
+	}
 }
 
 .toolbar_player_top_actions {
-    position: relative;
+	position: relative;
 
-    z-index: 60;
+	z-index: 60;
 
-    display: inline-flex;
-    flex-direction: row;
+	display: inline-flex;
+	flex-direction: row;
 
-    width: 100%;
-    height: 0px;
+	width: 100%;
+	height: 0px;
 
-    gap: 20px;
+	gap: 20px;
 
-    transition: all 150ms ease-in-out;
-    transform: translateY(calc(@toolbar_player_borderRadius / 2));
-    overflow: hidden;
+	transition: all 150ms ease-in-out;
+	transform: translateY(calc(@toolbar_player_borderRadius / 2));
+	overflow: hidden;
 
-    background-color: var(--background-color-primary);
-    border-radius: 12px 12px 0 0;
+	background-color: var(--background-color-primary);
+	border-radius: 12px 12px 0 0;
 
-    justify-content: space-between;
-    align-items: center;
+	justify-content: space-between;
+	align-items: center;
 }
 
 .toolbar_player {
-    position: relative;
+	position: relative;
 
-    display: flex;
+	display: flex;
 
-    width: 100%;
-    height: 200px;
+	width: 100%;
+	height: 200px;
 
-    overflow: hidden;
+	overflow: hidden;
 
-    z-index: 70;
+	z-index: 70;
 
-    border-radius: @toolbar_player_borderRadius;
+	border-radius: @toolbar_player_borderRadius;
 
-    .toolbar_cover_background {
-        position: absolute;
+	.toolbar_cover_background {
+		position: absolute;
 
-        top: 0;
-        left: 0;
+		top: 0;
+		left: 0;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
 
-        transition: all 0.3s ease-in-out;
+		transition: all 0.3s ease-in-out;
 
-        opacity: 0.6;
+		opacity: 0.6;
 
-        z-index: 65;
+		z-index: 65;
 
-        // create a mask to the bottom
-        //-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-    }
+		// create a mask to the bottom
+		//-webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+	}
 
-    .toolbar_player_content {
-        position: relative;
+	.toolbar_player_content {
+		position: relative;
 
-        display: flex;
-        flex-direction: column;
+		display: flex;
+		flex-direction: column;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        padding: 10px;
+		padding: 10px;
 
-        z-index: 80;
+		z-index: 80;
 
-        justify-content: space-between;
+		justify-content: space-between;
 
-        background-color: rgba(var(--cover_averageValues), 0.7);
+		background-color: rgba(var(--cover_averageValues), 0.7);
 
-        color: var(--text-color-white);
+		color: var(--text-color-white);
 
-        .toolbar_player_info {
-            display: flex;
-            flex-direction: column;
+		.toolbar_player_info {
+			display: flex;
+			flex-direction: column;
 
-            color: currentColor;
+			color: currentColor;
 
-            .toolbar_player_info_title {
-                display: flex;
-                flex-direction: row;
+			.toolbar_player_info_title {
+				display: flex;
+				flex-direction: row;
 
-                margin: 0;
-                margin-right: 30px;
+				margin: 0;
+				margin-right: 30px;
 
-                width: fit-content;
+				width: fit-content;
 
-                overflow: hidden;
+				overflow: hidden;
 
-                font-size: 1.5rem;
-                font-weight: 600;
+				font-size: 1.5rem;
+				font-weight: 600;
 
-                font-family: "Space Grotesk", sans-serif;
+				font-family: "Space Grotesk", sans-serif;
 
-                transition: all 150ms ease-in-out;
+				transition: all 150ms ease-in-out;
 
-                color: currentColor;
+				color: currentColor;
 
-                word-break: break-all;
-                white-space: nowrap;
+				word-break: break-all;
+				white-space: nowrap;
 
-                &.overflown {
-                    opacity: 0;
-                    height: 0;
-                }
-            }
+				&.overflown {
+					opacity: 0;
+					height: 0;
+				}
+			}
 
-            .toolbar_player_info_subtitle {
-                font-size: 0.8rem;
-                font-weight: 400;
+			.toolbar_player_info_subtitle {
+				font-size: 0.8rem;
+				font-weight: 400;
 
-                color: currentColor;
-            }
-        }
+				color: currentColor;
+			}
+		}
 
-        .toolbar_player_actions {
-            position: absolute;
+		.toolbar_player_actions {
+			position: absolute;
 
-            color: currentColor;
+			color: currentColor;
 
-            bottom: 0;
-            left: 0;
+			bottom: 0;
+			left: 0;
 
-            height: fit-content;
-            width: 100%;
+			height: fit-content;
+			width: 100%;
 
-            padding: 10px;
-            gap: 5px;
+			padding: 10px;
+			gap: 5px;
 
-            display: flex;
-            flex-direction: column;
+			display: flex;
+			flex-direction: column;
 
-            .player-controls {
-                color: currentColor;
+			.player-controls {
+				color: currentColor;
 
-                transition: all 150ms ease-in-out;
+				transition: all 150ms ease-in-out;
 
-                // padding: 3px 0;
+				// padding: 3px 0;
 
-                // background-color: rgba(var(--layoutBackgroundColor), 0.7);
+				// background-color: rgba(var(--layoutBackgroundColor), 0.7);
 
-                // -webkit-backdrop-filter: blur(5px);
-                // backdrop-filter: blur(5px);
+				// -webkit-backdrop-filter: blur(5px);
+				// backdrop-filter: blur(5px);
 
-                // border-radius: 12px;
+				// border-radius: 12px;
 
-                .ant-btn-icon,
-                button {
-                    color: currentColor;
+				.ant-btn-icon,
+				button {
+					color: currentColor;
 
-                    svg {
-                        color: currentColor;
-                    }
-                }
-            }
+					svg {
+						color: currentColor;
+					}
+				}
+			}
 
-            .player-seek_bar {
-                height: fit-content;
-                margin: 0;
+			.player-seek_bar {
+				height: fit-content;
+				margin: 0;
 
-                color: currentColor;
+				color: currentColor;
 
-                .timers {
-                    color: currentColor;
+				.timers {
+					color: currentColor;
 
-                    span {
-                        color: currentColor;
-                    }
-                }
-            }
-        }
-    }
-}
-
-.extra_actions {
-    display: flex;
-    flex-direction: row;
-
-    width: 70%;
-
-    margin: auto;
-
-    padding: 7px 25px;
-
-    justify-content: space-between;
-
-    background-color: rgba(var(--layoutBackgroundColor), 0.7);
-
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-
-    border-radius: 12px;
-
-    button,
-    .likeButton {
-        width: 32px;
-        height: 16px;
-
-        .ant-btn-icon {
-            svg {
-                width: 16px;
-                height: 16px;
-            }
-        }
-    }
-
-    .ant-btn {
-        padding: 0;
-    }
+					span {
+						color: currentColor;
+					}
+				}
+			}
+		}
+	}
 }
 
 .toolbar_player_indicators_wrapper {
-    position: absolute;
+	position: absolute;
 
-    bottom: 0;
-    left: 0;
+	bottom: 0;
+	left: 0;
 
-    padding: 10px;
+	padding: 10px;
 
+	.toolbar_player_indicators {
+		display: flex;
+		flex-direction: row;
 
-    .toolbar_player_indicators {
-        display: flex;
-        flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
 
-        justify-content: space-between;
-        align-items: center;
+		width: fit-content;
 
-        width: fit-content;
+		padding: 7px 10px;
 
-        padding: 7px 10px;
+		border-radius: 12px;
 
-        border-radius: 12px;
+		background-color: rgba(var(--layoutBackgroundColor), 0.7);
+		-webkit-backdrop-filter: blur(5px);
+		backdrop-filter: blur(5px);
 
-        background-color: rgba(var(--layoutBackgroundColor), 0.7);
-        -webkit-backdrop-filter: blur(5px);
-        backdrop-filter: blur(5px);
+		font-size: 1rem;
 
-        font-size: 1rem;
+		svg {
+			margin: 0 !important;
 
-        svg {
-            margin: 0 !important;
-
-            color: white
-        }
-    }
+			color: white;
+		}
+	}
 }

@@ -8,10 +8,9 @@ import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import LiveInfo from "@components/Player/LiveInfo"
 import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
+import Actions from "@components/Player/Actions"
 
 import RGBStringToValues from "@utils/rgbToValues"
-
-import ExtraActions from "../ExtraActions"
 
 import "./index.less"
 
@@ -93,7 +92,7 @@ const Player = (props) => {
 		}
 	}
 
-	const { title, artistStr, service, cover_analysis, cover } =
+	const { title, artist, service, cover_analysis, cover } =
 		playerState.track_manifest ?? {}
 
 	const playing = playerState.playback_status === "playing"
@@ -201,7 +200,7 @@ const Player = (props) => {
 						)}
 
 						<p className="toolbar_player_info_subtitle">
-							{artistStr ?? ""}
+							{artist ?? ""}
 						</p>
 					</div>
 
@@ -218,7 +217,7 @@ const Player = (props) => {
 							streamMode={playerState.live}
 						/>
 
-						<ExtraActions streamMode={playerState.live} />
+						<Actions streamMode={playerState.live} />
 					</div>
 
 					<Indicators

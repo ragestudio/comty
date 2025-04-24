@@ -6,41 +6,51 @@ import LikeButton from "@components/LikeButton"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
+import "./index.less"
+
 const ExtraActions = (props) => {
-	const [playerState] = usePlayerStateContext()
+	const [trackInstance, setTrackInstance] = React.useState({})
+
+	const onPlayerStateChange = React.useCallback((state) => {
+		const instance = app.cores.player.track()
+
+		if (instance) {
+			setTrackInstance(instance)
+		}
+	}, [])
+
+	const [playerState] = usePlayerStateContext(onPlayerStateChange)
 
 	const handleClickLike = async () => {
-		if (!playerState.track_manifest) {
+		if (!trackInstance) {
 			console.error("Cannot like a track if nothing is playing")
 			return false
 		}
 
-		const track = app.cores.player.track()
-
-		await track.manifest.serviceOperations.toggleItemFavourite(
+		await trackInstance.manifest.serviceOperations.toggleItemFavourite(
 			"track",
-			playerState.track_manifest._id,
+			trackInstance.manifest._id,
 		)
 	}
 
 	return (
-		<div className="extra_actions">
+		<div className="player-actions">
 			{app.isMobile && (
 				<Button
 					type="ghost"
 					icon={<Icons.MdAbc />}
-					disabled={!playerState.track_manifest?.lyrics_enabled}
+					disabled={!trackInstance?.manifest?.lyrics_enabled}
 				/>
 			)}
 
 			{!app.isMobile && (
 				<LikeButton
 					liked={
-						playerState.track_manifest?.serviceOperations
-							.fetchLikeStatus
+						trackInstance?.manifest?.serviceOperations
+							?.fetchLikeStatus
 					}
 					onClick={handleClickLike}
-					disabled={!playerState.track_manifest?._id}
+					disabled={!trackInstance?.manifest?._id}
 				/>
 			)}
 
