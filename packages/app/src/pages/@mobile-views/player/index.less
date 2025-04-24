@@ -1,199 +1,184 @@
 @top_controls_height: 55px;
 
-.mobile_media_player_wrapper {
-    position: relative;
+.mobile-player_wrapper {
+	position: relative;
 
-    z-index: 320;
+	z-index: 320;
 
-    display: flex;
+	display: flex;
 
-    flex-direction: column;
+	flex-direction: column;
 
-    height: 100%;
-    width: 100%;
+	height: 100%;
+	width: 100%;
 
-    .mobile_media_player_background {
-        position: absolute;
+	margin-bottom: 30px;
 
-        z-index: 320;
+	.mobile-player_background {
+		position: absolute;
 
-        top: 0;
-        left: 0;
+		z-index: 320;
 
-        width: 100%;
-        height: 100%;
+		top: 0;
+		left: 0;
 
-        background-color: rgba(var(--cover_averageValues), 0.4);
-    }
+		width: 100%;
+		height: 100%;
+
+		background-color: rgba(var(--cover_averageValues), 0.4);
+	}
 }
 
-.mobile_media_player {
-    position: relative;
+.mobile-player {
+	position: relative;
 
-    display: inline-flex;
-    flex-direction: column;
+	display: inline-flex;
+	flex-direction: column;
 
-    align-items: flex-start;
-    justify-content: center;
+	align-items: flex-start;
+	justify-content: center;
 
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 
-    gap: 10px;
+	gap: 10px;
 
-    transition: all 150ms ease-out;
+	transition: all 150ms ease-out;
 
-    z-index: 330;
+	z-index: 330;
 
-    .service_indicator {
-        color: var(--text-color);
+	.service_indicator {
+		color: var(--text-color);
 
-        background-color: var(--background-color-accent);
-        padding: 7px;
-        border-radius: 8px;
+		background-color: var(--background-color-accent);
+		padding: 7px;
+		border-radius: 8px;
 
-        font-size: 0.9rem;
-    }
+		font-size: 0.9rem;
+	}
 
-    .cover {
-        position: relative;
+	.mobile-player-cover {
+		position: relative;
 
-        z-index: 320;
+		z-index: 320;
 
-        margin: auto;
+		margin: auto;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        min-height: 40vh;
-        min-width: 100%;
+		min-height: 40vh;
+		min-width: 100%;
 
-        border-radius: 24px;
+		border-radius: 24px;
 
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
 
-        transition: all 0.3s ease-in-out;
+		transition: all 0.3s ease-in-out;
 
-        img {
-            width: 100%;
-            height: 100%;
+		img {
+			width: 100%;
+			height: 100%;
 
-            object-fit: cover;
-            object-position: center;
-        }
-    }
+			object-fit: cover;
+			object-position: center;
+		}
+	}
 
-    .header {
-        position: relative;
+	.mobile-player-header {
+		position: relative;
 
-        display: flex;
-        flex-direction: row;
+		display: flex;
+		flex-direction: row;
 
-        width: 100%;
+		width: 100%;
 
-        .info {
-            display: flex;
-            flex-direction: column;
+		.mobile-player-info {
+			display: flex;
+			flex-direction: column;
 
-            h1,
-            h2,
-            h3,
-            h4,
-            h5,
-            h6,
-            p,
-            span {
-                margin: 0;
-                color: var(--text-color);
-            }
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			p,
+			span {
+				margin: 0;
+				color: var(--text-color);
+			}
 
-            width: 100%;
+			width: 100%;
 
-            .title {
-                font-size: 1rem;
-                font-weight: 600;
-                color: var(--text-color);
+			.mobile-player-info-title {
+				display: flex;
+				flex-direction: row;
 
-                word-break: break-all;
+				align-items: center;
 
-                font-family: "Space Grotesk", sans-serif;
-            }
+				font-size: 1rem;
+				font-weight: 600;
 
-            .subTitle {
-                display: flex;
-                flex-direction: row;
+				word-break: break-all;
 
-                width: 100%;
+				font-family: "Space Grotesk", sans-serif;
+			}
 
-                justify-content: space-between;
+			.mobile-player-info-subTitle {
+				display: flex;
+				flex-direction: row;
 
-                .likeButton {
-                    margin-right: 20px;
-                }
+				align-items: center;
+				justify-content: space-between;
 
-                .artist {
-                    font-size: 0.6rem;
-                    font-weight: 400;
-                    color: var(--text-color);
-                }
-            }
-        }
-    }
+				font-size: 0.7rem;
+				font-weight: 400;
+			}
+		}
+	}
 
-    .player-controls {
-        .ant-btn {
-            min-width: 40px !important;
-            min-height: 40px !important;
-        }
+	.player-controls {
+		.ant-btn {
+			min-width: 40px !important;
+			min-height: 40px !important;
+		}
 
-        svg {
-            font-size: 1.2rem;
-        }
+		svg {
+			font-size: 1.2rem;
+		}
 
-        .playButton {
-            min-width: 50px !important;
-            min-height: 50px !important;
+		.playButton {
+			min-width: 50px !important;
+			min-height: 50px !important;
 
-            svg {
-                font-size: 1.6rem;
-            }
-        }
-    }
+			svg {
+				font-size: 1.6rem;
+			}
+		}
+	}
 
-    .player-seek_bar {
-        .progress {
-            .MuiSlider-root {
-                .MuiSlider-rail {
-                    height: 7px;
-                }
+	.player-seek_bar {
+		.progress {
+			.MuiSlider-root {
+				.MuiSlider-rail {
+					height: 7px;
+				}
 
-                .MuiSlider-track {
-                    height: 7px;
-                }
+				.MuiSlider-track {
+					height: 7px;
+				}
 
-                .MuiSlider-thumb {
-                    width: 5px;
-                    height: 13px;
-                    border-radius: 2px;
+				.MuiSlider-thumb {
+					width: 5px;
+					height: 13px;
+					border-radius: 2px;
 
-                    background-color: var(--background-color-contrast);
-                }
-            }
-        }
-    }
-
-    .extra_actions {
-        padding: 0 30px;
-
-        .ant-btn {
-            padding: 5px;
-
-            svg {
-                height: 23px;
-                min-width: 23px;
-            }
-        }
-    }
+					background-color: var(--background-color-contrast);
+				}
+			}
+		}
+	}
 }
