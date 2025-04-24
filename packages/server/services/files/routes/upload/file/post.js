@@ -39,6 +39,12 @@ export default {
 			transformations: transformations,
 		})
 
+		res.header("deprecated", "true")
+		res.header(
+			"deprecation-replacement",
+			"Use the new chunked upload API endpoint",
+		)
+
 		return result
 	},
 }
