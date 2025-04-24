@@ -63,20 +63,17 @@ export default async (req) => {
 
 	const redis_id = `radio-${data.radio_id}`
 
-	const existMember = await global.websocket.redis.hexists(
-		redis_id,
-		"radio_id",
-	)
+	const existMember = await redis.hexists(redis_id, "radio_id")
 
 	if (data.online) {
-		await global.websocket.redis.hset(redis_id, {
+		await redis.hset(redis_id, {
 			...data,
 			now_playing: JSON.stringify(data.now_playing),
 		})
 	}
 
 	if (!data.online && existMember) {
-		await global.websocket.redis.hdel(redis_id)
+		await redis.hdel(redis_id)
 	}
 
 	console.log(`[${data.radio_id}] Updating radio data`)
@@ -85,7 +82,6 @@ export default async (req) => {
 		event: "update",
 		data: data,
 	})
-	global.websocket.io.to(`radio:${data.radio_id}`).emit(`update`, data)
 
 	return data
 }

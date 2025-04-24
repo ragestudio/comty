@@ -1,19 +1,13 @@
 import { RadioProfile } from "@db_models"
 
 async function scanKeysWithPagination(pattern, count = 10, cursor = "0") {
-	const result = await global.websocket.redis.scan(
-		cursor,
-		"MATCH",
-		pattern,
-		"COUNT",
-		count,
-	)
+	const result = await redis.scan(cursor, "MATCH", pattern, "COUNT", count)
 
 	return result[1]
 }
 
 async function getHashData(hashKey) {
-	const hashData = await global.websocket.redis.hgetall(hashKey)
+	const hashData = await redis.hgetall(hashKey)
 	return hashData
 }
 

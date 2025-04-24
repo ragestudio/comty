@@ -1,86 +1,144 @@
-import { MusicRelease, User } from "@db_models"
+import { MusicRelease, Track } from "@db_models"
+import TrackClass from "../track"
 
 const AllowedUpdateFields = [
-    "title",
-    "cover",
-    "album",
-    "artist",
-    "type",
-    "public",
-    "list",
+	"title",
+	"cover",
+	"album",
+	"artist",
+	"type",
+	"public",
+	"items",
 ]
 
 export default class Release {
-    static async create(payload) {
-        console.log(payload)
-        if (!payload.title) {
-            throw new OperationError(400, "Release title is required")
-        }
+	// TODO: implement pagination
+	static async data(id, { user_id = null, limit = 10, offset = 0 } = {}) {
+		let release = await MusicRelease.findOne({
+			_id: id,
+		})
 
-        if (!payload.list) {
-            throw new OperationError(400, "Release list is required")
-        }
+		if (!release) {
+			throw new OperationError(404, "Release not found")
+		}
 
-        // ensure list is an array of strings with tracks ids only
-        payload.list = payload.list.map((item) => {
-            if (typeof item !== "string") {
-                item = item._id
-            }
+		release = release.toObject()
 
-            return item
-        })
+		const items = release.items ?? release.list
 
-        const release = new MusicRelease({
-            user_id: payload.user_id,
-            created_at: Date.now(),
-            title: payload.title,
-            cover: payload.cover,
-            explicit: payload.explicit,
-            type: payload.type,
-            public: payload.public,
-            list: payload.list,
-            public: payload.public,
-        })
+		const totalTracks = await Track.countDocuments({
+			_id: items,
+		})
 
-        await release.save()
+		const tracks = await TrackClass.get(items, {
+			user_id: user_id,
+			onlyList: true,
+		})
 
-        return release
-    }
+		release.total_items = totalTracks
+		release.items = tracks
 
-    static async update(id, payload) {
-        let release = await MusicRelease.findById(id).catch((err) => {
-            return false
-        })
+		return release
+	}
 
-        if (!release) {
-            throw new OperationError(404, "Release not found")
-        }
+	static async create(payload) {
+		if (!payload.title) {
+			throw new OperationError(400, "Release title is required")
+		}
 
-        if (release.user_id !== payload.user_id) {
-            throw new PermissionError(403, "You dont have permission to edit this release")
-        }
+		if (!payload.items) {
+			throw new OperationError(400, "Release items is required")
+		}
 
-        for (const field of AllowedUpdateFields) {
-            if (payload[field]) {
-                release[field] = payload[field]
-            }
-        }
+		// ensure list is an array of strings with tracks ids only
+		payload.items = payload.items.map((item) => {
+			return item._id ?? item
+		})
 
-        // ensure list is an array of strings with tracks ids only
-        release.list = release.list.map((item) => {
-            if (typeof item !== "string") {
-                item = item._id
-            }
+		const release = new MusicRelease({
+			user_id: payload.user_id,
+			created_at: Date.now(),
+			title: payload.title,
+			cover: payload.cover,
+			explicit: payload.explicit,
+			type: payload.type,
+			public: payload.public,
+			items: payload.items,
+			public: payload.public,
+		})
 
-            return item
-        })
+		await release.save()
 
-        release = await MusicRelease.findByIdAndUpdate(id, release)
+		return release
+	}
 
-        return release
-    }
+	static async update(id, payload) {
+		let release = await MusicRelease.findById(id).catch((err) => {
+			return false
+		})
 
-    static async fullfillItemData(release) {
-        return release
-    }
+		if (!release) {
+			throw new OperationError(404, "Release not found")
+		}
+
+		if (release.user_id !== payload.user_id) {
+			throw new PermissionError(
+				403,
+				"You dont have permission to edit this release",
+			)
+		}
+
+		for (const field of AllowedUpdateFields) {
+			if (typeof payload[field] !== "undefined") {
+				release[field] = payload[field]
+			}
+		}
+
+		// ensure list is an array of strings with tracks ids only
+		release.items = release.items.map((item) => {
+			return item._id ?? item
+		})
+
+		await MusicRelease.findByIdAndUpdate(id, release)
+
+		return release
+	}
+
+	static async delete(id, payload = {}) {
+		let release = await MusicRelease.findById(id).catch((err) => {
+			return false
+		})
+
+		if (!release) {
+			throw new OperationError(404, "Release not found")
+		}
+
+		// check permission
+		if (release.user_id !== payload.user_id) {
+			throw new PermissionError(
+				403,
+				"You dont have permission to edit this release",
+			)
+		}
+
+		const items = release.items ?? release.list
+
+		const items_ids = items.map((item) => item._id)
+
+		// delete all releated tracks
+		await Track.deleteMany({
+			_id: { $in: items_ids },
+		})
+
+		// delete release
+		await MusicRelease.deleteOne({
+			_id: id,
+		})
+
+		return release
+	}
+
+	static async fullfillItemData(release) {
+		return release
+	}
 }

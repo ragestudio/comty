@@ -3,9 +3,7 @@ export default async (req, res) => {
 
 	const radioId = channel_id.split("radio:")[1]
 
-	let redisData = await global.websocket.redis
-		.hgetall(`radio-${radioId}`)
-		.catch(() => null)
+	let redisData = await redis.hgetall(`radio-${radioId}`).catch(() => null)
 
 	global.sse.connectToChannelStream(channel_id, req, res, {
 		initialData: {
