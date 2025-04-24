@@ -52,6 +52,10 @@ const Track = (props) => {
 	const isPlaying = isCurrent && playback_status === "playing"
 
 	const handleClickPlayBtn = React.useCallback(() => {
+		if (typeof props.onPlay === "function") {
+			return props.onPlay(props.track)
+		}
+
 		if (typeof props.onClickPlayBtn === "function") {
 			props.onClickPlayBtn(props.track)
 		}

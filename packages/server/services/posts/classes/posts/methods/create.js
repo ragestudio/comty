@@ -89,11 +89,15 @@ export default async (payload = {}, req) => {
 
 	// broadcast post to all users
 	if (visibility === "public") {
-		global.websocket.senders.toTopic("realtime:feed", "post:new", result[0])
+		global.websockets.senders.toTopic(
+			"realtime:feed",
+			"post:new",
+			result[0],
+		)
 	}
 
 	if (visibility === "private") {
-		const userSockets = await global.websocket.find.clientsByUserId(
+		const userSockets = await global.websockets.find.clientsByUserId(
 			post.user_id,
 		)
 

@@ -47,7 +47,17 @@ const EventsHandlers = {
 }
 
 const Controls = (props) => {
-	const [playerState] = usePlayerStateContext()
+	const [trackInstance, setTrackInstance] = React.useState({})
+
+	const onPlayerStateChange = React.useCallback((state) => {
+		const instance = app.cores.player.track()
+
+		if (instance) {
+			setTrackInstance(instance)
+		}
+	}, [])
+
+	const [playerState] = usePlayerStateContext(onPlayerStateChange)
 
 	const handleAction = (event, ...args) => {
 		if (typeof EventsHandlers[event] !== "function") {
@@ -122,10 +132,11 @@ const Controls = (props) => {
 			{app.isMobile && (
 				<LikeButton
 					liked={
-						playerState.track_manifest?.serviceOperations
-							.fetchLikeStatus
+						trackInstance?.manifest?.serviceOperations
+							?.fetchLikeStatus
 					}
 					onClick={() => handleAction("like")}
+					disabled={!trackInstance?.manifest?._id}
 				/>
 			)}
 		</div>

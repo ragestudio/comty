@@ -1,112 +1,108 @@
 import fs from "node:fs"
 import path from "node:path"
-import { exec } from "node:child_process"
-import { EventEmitter } from "node:events"
 
-export default class SegmentedAudioMPDJob {
-    constructor({
-        input,
-        outputDir,
-        outputMasterName = "master.mpd",
+import { FFMPEGLib, Utils } from "../FFMPEGLib"
 
-        audioCodec = "aac",
-        audioBitrate = undefined,
-        audioSampleRate = undefined,
-        segmentTime = 10,
-    }) {
-        this.input = input
-        this.outputDir = outputDir
-        this.outputMasterName = outputMasterName
+export default class SegmentedAudioMPDJob extends FFMPEGLib {
+	constructor(params = {}) {
+		super()
 
-        this.audioCodec = audioCodec
-        this.audioBitrate = audioBitrate
-        this.segmentTime = segmentTime
-        this.audioSampleRate = audioSampleRate
+		this.params = {
+			outputMasterName: "master.mpd",
+			audioCodec: "libopus",
+			audioBitrate: "320k",
+			audioSampleRate: "48000",
+			segmentTime: 10,
+			includeMetadata: true,
+			...params,
+		}
+	}
 
-        this.bin = require("ffmpeg-static")
+	buildSegmentationArgs = () => {
+		const args = [
+			//`-threads 1`, // limits to one thread
+			`-v error -hide_banner -progress pipe:1`,
+			`-i ${this.params.input}`,
+			`-c:a ${this.params.audioCodec}`,
+			`-map 0:a`,
+			`-f dash`,
+			`-dash_segment_type mp4`,
+			`-segment_time ${this.params.segmentTime}`,
+			`-use_template 1`,
+			`-use_timeline 1`,
+			`-init_seg_name "init.m4s"`,
+		]
 
-        return this
-    }
+		if (this.params.includeMetadata === false) {
+			args.push(`-map_metadata -1`)
+		}
 
-    events = new EventEmitter()
+		if (
+			typeof this.params.audioBitrate === "string" &&
+			this.params.audioBitrate !== "default"
+		) {
+			args.push(`-b:a ${this.params.audioBitrate}`)
+		}
 
-    buildCommand = () => {
-        const cmdStr = [
-            this.bin,
-            `-v quiet -stats`,
-            `-i ${this.input}`,
-            `-c:a ${this.audioCodec}`,
-            `-map 0:a`,
-            `-map_metadata -1`,
-            `-f dash`,
-            `-dash_segment_type mp4`,
-            `-segment_time ${this.segmentTime}`,
-            `-use_template 1`,
-            `-use_timeline 1`,
-            `-init_seg_name "init.m4s"`,
-        ]
+		if (
+			typeof this.params.audioSampleRate !== "undefined" &&
+			this.params.audioSampleRate !== "default"
+		) {
+			args.push(`-ar ${this.params.audioSampleRate}`)
+		}
 
-        if (typeof this.audioBitrate !== "undefined") {
-            cmdStr.push(`-b:a ${this.audioBitrate}`)
-        }
+		args.push(this.params.outputMasterName)
 
-        if (typeof this.audioSampleRate !== "undefined") {
-            cmdStr.push(`-ar ${this.audioSampleRate}`)
-        }
+		return args
+	}
 
-        cmdStr.push(this.outputMasterName)
+	run = async () => {
+		const segmentationCmd = this.buildSegmentationArgs()
+		const outputPath =
+			this.params.outputDir ?? `${path.dirname(this.params.input)}/dash`
+		const outputFile = path.join(outputPath, this.params.outputMasterName)
 
-        return cmdStr.join(" ")
-    }
+		this.emit("start", {
+			input: this.params.input,
+			output: outputPath,
+			params: this.params,
+		})
 
-    run = () => {
-        const cmdStr = this.buildCommand()
+		if (!fs.existsSync(outputPath)) {
+			fs.mkdirSync(outputPath, { recursive: true })
+		}
 
-        console.log(cmdStr)
+		const inputProbe = await Utils.probe(this.params.input)
 
-        const cwd = `${path.dirname(this.input)}/dash`
+		try {
+			const result = await this.ffmpeg({
+				args: segmentationCmd,
+				onProcess: (process) => {
+					this.handleProgress(
+						process.stdout,
+						parseFloat(inputProbe.format.duration),
+						(progress) => {
+							this.emit("progress", progress)
+						},
+					)
+				},
+				cwd: outputPath,
+			})
 
-        if (!fs.existsSync(cwd)) {
-            fs.mkdirSync(cwd, { recursive: true })
-        }
+			let outputProbe = await Utils.probe(outputFile)
 
-        console.log(`[DASH] Started audio segmentation`, {
-            input: this.input,
-            cwd: cwd,
-        })
+			this.emit("end", {
+				probe: {
+					input: inputProbe,
+					output: outputProbe,
+				},
+				outputPath: outputPath,
+				outputFile: outputFile,
+			})
 
-        const process = exec(
-            cmdStr,
-            {
-                cwd: cwd,
-            },
-            (error, stdout, stderr) => {
-                if (error) {
-                    console.log(`[DASH] Failed to segment audio >`, error)
-
-                    return this.events.emit("error", error)
-                }
-
-                if (stderr) {
-                    //return this.events.emit("error", stderr)
-                }
-
-                console.log(`[DASH] Finished segmenting audio >`, cwd)
-
-                return this.events.emit("end", {
-                    filepath: path.join(cwd, this.outputMasterName),
-                    isDirectory: true,
-                })
-            }
-        )
-
-        process.stdout.on("data", (data) => {
-            console.log(data.toString())
-        })
-    }
-
-    on = (key, cb) => {
-        this.events.on(key, cb)
-        return this
-    }
+			return result
+		} catch (err) {
+			return this.emit("error", err)
+		}
+	}
 }

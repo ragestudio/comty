@@ -3,11 +3,11 @@ import { Core } from "@ragestudio/vessel"
 import ActivityEvent from "@classes/ActivityEvent"
 import QueueManager from "@classes/QueueManager"
 import TrackInstance from "./classes/TrackInstance"
-//import MediaSession from "./classes/MediaSession"
+import MediaSession from "./classes/MediaSession"
 import ServiceProviders from "./classes/Services"
 import PlayerState from "./classes/PlayerState"
 import PlayerUI from "./classes/PlayerUI"
-import PlayerProcessors from "./classes/PlayerProcessors"
+import AudioBase from "./classes/AudioBase"
 
 import setSampleRate from "./helpers/setSampleRate"
 
@@ -22,26 +22,17 @@ export default class Player extends Core {
 
 	// player config
 	static defaultSampleRate = 48000
-	static gradualFadeMs = 150
-	static maxManifestPrecompute = 3
 
 	state = new PlayerState(this)
 	ui = new PlayerUI(this)
 	serviceProviders = new ServiceProviders()
-	//nativeControls = new MediaSession()
-	audioContext = new AudioContext({
-		sampleRate:
-			AudioPlayerStorage.get("sample_rate") ?? Player.defaultSampleRate,
-		latencyHint: "playback",
-	})
+	nativeControls = new MediaSession(this)
 
-	audioProcessors = new PlayerProcessors(this)
+	base = new AudioBase(this)
 
 	queue = new QueueManager({
 		loadFunction: this.createInstance,
 	})
-
-	currentTrackInstance = null
 
 	public = {
 		start: this.start,
@@ -74,10 +65,11 @@ export default class Player extends Core {
 		eventBus: () => {
 			return this.eventBus
 		},
+		base: () => {
+			return this.base
+		},
 		state: this.state,
 		ui: this.ui.public,
-		audioContext: this.audioContext,
-		gradualFadeMs: Player.gradualFadeMs,
 	}
 
 	async afterInitialize() {
@@ -85,8 +77,8 @@ export default class Player extends Core {
 			this.state.volume = 1
 		}
 
-		//await this.nativeControls.initialize()
-		await this.audioProcessors.initialize()
+		await this.nativeControls.initialize()
+		await this.base.initialize()
 	}
 
 	//
@@ -100,10 +92,6 @@ export default class Player extends Core {
 		}
 	}
 
-	async createInstance(manifest) {
-		return new TrackInstance(this, manifest)
-	}
-
 	//
 	// Playback methods
 	//
@@ -112,46 +100,21 @@ export default class Player extends Core {
 			throw new Error("Audio instance is required")
 		}
 
-		this.console.log("Initializing instance", instance)
-
 		// resume audio context if needed
-		if (this.audioContext.state === "suspended") {
-			this.audioContext.resume()
+		if (this.base.context.state === "suspended") {
+			this.base.context.resume()
 		}
-
-		// initialize instance if is not
-		if (this.queue.currentItem._initialized === false) {
-			this.queue.currentItem = await instance.initialize()
-		}
-
-		this.console.log("Instance", this.queue.currentItem)
 
 		// update manifest
-		this.state.track_manifest = this.queue.currentItem.manifest
-
-		// attach processors
-		this.queue.currentItem =
-			await this.audioProcessors.attachProcessorsToInstance(
-				this.queue.currentItem,
-			)
-
-		// set audio properties
-		this.queue.currentItem.audio.currentTime = params.time ?? 0
-		this.queue.currentItem.audio.muted = this.state.muted
-		this.queue.currentItem.audio.loop =
-			this.state.playback_mode === "repeat"
-		this.queue.currentItem.gainNode.gain.value = Math.pow(
-			this.state.volume,
-			2,
-		)
+		this.state.track_manifest =
+			this.queue.currentItem.manifest.toSeriableObject()
 
 		// play
-		await this.queue.currentItem.audio.play()
-
-		this.console.log(`Playing track >`, this.queue.currentItem)
+		//await this.queue.currentItem.audio.play()
+		await this.queue.currentItem.play(params)
 
 		// update native controls
-		//this.nativeControls.update(this.queue.currentItem.manifest)
+		this.nativeControls.update(this.queue.currentItem.manifest)
 
 		return this.queue.currentItem
 	}
@@ -160,10 +123,10 @@ export default class Player extends Core {
 		this.ui.attachPlayerComponent()
 
 		if (this.queue.currentItem) {
-			await this.queue.currentItem.stop()
+			await this.queue.currentItem.pause()
 		}
 
-		await this.abortPreloads()
+		//await this.abortPreloads()
 		await this.queue.flush()
 
 		this.state.loading = true
@@ -187,8 +150,8 @@ export default class Player extends Core {
 			playlist = await this.serviceProviders.resolveMany(playlist)
 		}
 
-		for await (const [index, _manifest] of playlist.entries()) {
-			let instance = await this.createInstance(_manifest)
+		for await (let [index, _manifest] of playlist.entries()) {
+			let instance = new TrackInstance(_manifest, this)
 
 			this.queue.add(instance)
 		}
@@ -229,10 +192,6 @@ export default class Player extends Core {
 	}
 
 	next() {
-		if (this.queue.currentItem) {
-			this.queue.currentItem.stop()
-		}
-
 		//const isRandom = this.state.playback_mode === "shuffle"
 		const item = this.queue.next()
 
@@ -244,10 +203,6 @@ export default class Player extends Core {
 	}
 
 	previous() {
-		if (this.queue.currentItem) {
-			this.queue.currentItem.stop()
-		}
-
 		const item = this.queue.previous()
 
 		return this.play(item)
@@ -275,18 +230,14 @@ export default class Player extends Core {
 				return null
 			}
 
-			// set gain exponentially
-			this.queue.currentItem.gainNode.gain.linearRampToValueAtTime(
-				0.0001,
-				this.audioContext.currentTime + Player.gradualFadeMs / 1000,
-			)
+			this.base.processors.gain.fade(0)
 
 			setTimeout(() => {
-				this.queue.currentItem.audio.pause()
+				this.queue.currentItem.pause()
 				resolve()
 			}, Player.gradualFadeMs)
 
-			//this.nativeControls.updateIsPlaying(false)
+			this.nativeControls.updateIsPlaying(false)
 		})
 	}
 
@@ -302,19 +253,12 @@ export default class Player extends Core {
 			}
 
 			// ensure audio elemeto starts from 0 volume
-			this.queue.currentItem.gainNode.gain.value = 0.0001
-
-			this.queue.currentItem.audio.play().then(() => {
+			this.queue.currentItem.resume().then(() => {
 				resolve()
 			})
+			this.base.processors.gain.fade(this.state.volume)
 
-			// set gain exponentially
-			this.queue.currentItem.gainNode.gain.linearRampToValueAtTime(
-				Math.pow(this.state.volume, 2),
-				this.audioContext.currentTime + Player.gradualFadeMs / 1000,
-			)
-
-			//this.nativeControls.updateIsPlaying(true)
+			this.nativeControls.updateIsPlaying(true)
 		})
 	}
 
@@ -325,10 +269,7 @@ export default class Player extends Core {
 
 		this.state.playback_mode = mode
 
-		if (this.queue.currentItem) {
-			this.queue.currentItem.audio.loop =
-				this.state.playback_mode === "repeat"
-		}
+		this.base.audio.loop = this.state.playback_mode === "repeat"
 
 		AudioPlayerStorage.set("mode", mode)
 
@@ -336,22 +277,15 @@ export default class Player extends Core {
 	}
 
 	stopPlayback() {
-		if (this.queue.currentItem) {
-			this.queue.currentItem.stop()
-		}
-
+		this.base.flush()
 		this.queue.flush()
-
-		this.abortPreloads()
 
 		this.state.playback_status = "stopped"
 		this.state.track_manifest = null
-
 		this.queue.currentItem = null
-		this.track_next_instances = []
-		this.track_prev_instances = []
 
-		//this.nativeControls.destroy()
+		//this.abortPreloads()
+		this.nativeControls.flush()
 	}
 
 	//
@@ -369,7 +303,7 @@ export default class Player extends Core {
 
 		if (typeof to === "boolean") {
 			this.state.muted = to
-			this.queue.currentItem.audio.muted = to
+			this.base.audio.muted = to
 		}
 
 		return this.state.muted
@@ -395,65 +329,42 @@ export default class Player extends Core {
 			volume = 0
 		}
 
-		this.state.volume = volume
-
 		AudioPlayerStorage.set("volume", volume)
 
-		if (this.queue.currentItem) {
-			if (this.queue.currentItem.gainNode) {
-				this.queue.currentItem.gainNode.gain.value = Math.pow(
-					this.state.volume,
-					2,
-				)
-			}
-		}
+		this.state.volume = volume
+		this.base.processors.gain.set(volume)
 
 		return this.state.volume
 	}
 
 	seek(time) {
-		if (!this.queue.currentItem || !this.queue.currentItem.audio) {
+		if (!this.base.audio) {
 			return false
 		}
 
 		// if time not provided, return current time
 		if (typeof time === "undefined") {
-			return this.queue.currentItem.audio.currentTime
+			return this.base.audio.currentTime
 		}
 
 		// if time is provided, seek to that time
 		if (typeof time === "number") {
 			this.console.log(
-				`Seeking to ${time} | Duration: ${this.queue.currentItem.audio.duration}`,
+				`Seeking to ${time} | Duration: ${this.base.audio.duration}`,
 			)
 
-			this.queue.currentItem.audio.currentTime = time
+			this.base.audio.currentTime = time
 
 			return time
 		}
 	}
 
 	duration() {
-		if (!this.queue.currentItem || !this.queue.currentItem.audio) {
+		if (!this.base.audio) {
 			return false
 		}
 
-		return this.queue.currentItem.audio.duration
-	}
-
-	loop(to) {
-		if (typeof to !== "boolean") {
-			this.console.warn("Loop must be a boolean")
-			return false
-		}
-
-		this.state.loop = to ?? !this.state.loop
-
-		if (this.queue.currentItem.audio) {
-			this.queue.currentItem.audio.loop = this.state.loop
-		}
-
-		return this.state.loop
+		return this.base.audio.duration
 	}
 
 	close() {

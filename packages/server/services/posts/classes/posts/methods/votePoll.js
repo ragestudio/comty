@@ -51,7 +51,7 @@ export default async (payload = {}) => {
 	post = (await stage({ posts: post, for_user_id: payload.user_id }))[0]
 
 	if (post.visibility === "public") {
-		global.websocket.senders.toTopic("realtime:feed", `post:update`, post)
+		global.websockets.senders.toTopic("realtime:feed", `post:update`, post)
 	}
 
 	return {

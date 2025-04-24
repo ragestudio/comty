@@ -84,9 +84,9 @@ export default class RemoteStorage extends Core {
 						_reject(message)
 					})
 
-					uploader.events.on("progress", ({ percentProgress }) => {
+					uploader.events.on("progress", (data) => {
 						if (typeof onProgress === "function") {
-							onProgress(file, percentProgress)
+							onProgress(file, data)
 						}
 					})
 

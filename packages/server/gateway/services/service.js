@@ -55,7 +55,8 @@ export default class Service {
 
 		this.instance = await spawnService({
 			id: this.id,
-			service: this.path,
+			service: this,
+			path: this.path,
 			cwd: this.cwd,
 			onClose: this.handleClose.bind(this),
 			onError: this.handleError.bind(this),
@@ -140,8 +141,7 @@ export default class Service {
 
 		// Kill the current process if is running
 		if (this.instance.exitCode === null) {
-			console.log(`[${this.id}] Killing current process...`)
-			await this.instance.kill("SIGKILL")
+			await this.instance.kill()
 		}
 
 		// Start a new process
@@ -153,17 +153,13 @@ export default class Service {
 	/**
 	 * Stop the service
 	 */
-	async stop() {
+	stop() {
 		console.log(`[${this.id}] Stopping service...`)
 
-		if (this.fileWatcher) {
-			await this.fileWatcher.close()
-			this.fileWatcher = null
-		}
+		this.instance.kill()
 
-		if (this.instance) {
-			await this.instance.kill("SIGKILL")
-			this.instance = null
+		if (this.fileWatcher) {
+			this.fileWatcher.close()
 		}
 	}
 

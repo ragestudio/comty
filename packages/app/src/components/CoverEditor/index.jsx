@@ -7,55 +7,62 @@ import UploadButton from "@components/UploadButton"
 import "./index.less"
 
 const CoverEditor = (props) => {
-    const { value, onChange, defaultUrl } = props
+	const { value, onChange, defaultUrl } = props
 
-    const [init, setInit] = React.useState(true)
-    const [url, setUrl] = React.useState(value)
+	const [init, setInit] = React.useState(true)
+	const [url, setUrl] = React.useState(value)
 
-    React.useEffect(() => {
-        if (!init) {
-            onChange(url)
-        }
-    }, [url])
+	React.useEffect(() => {
+		if (!init) {
+			onChange(url)
+		}
+	}, [url])
 
-    React.useEffect(() => {
-        if (!value) {
-            setUrl(defaultUrl)
-        } else {
-            setUrl(value)
-        }
+	React.useEffect(() => {
+		if (!value) {
+			setUrl(defaultUrl)
+		} else {
+			setUrl(value)
+		}
 
-        setInit(false)
-    }, [])
+		setInit(false)
+	}, [])
 
-    return <div className="cover-editor">
-        <div className="cover-editor-preview">
-            <Image
-                src={url}
-            />
-        </div>
+	// Handle when value prop change
+	React.useEffect(() => {
+		if (!value) {
+			setUrl(defaultUrl)
+		} else {
+			setUrl(value)
+		}
+	}, [value])
 
-        <div className="cover-editor-actions">
-            <UploadButton
-                onSuccess={(uid, response) => {
-                    setUrl(response.url)
-                }}
-            />
+	return (
+		<div className="cover-editor">
+			<div className="cover-editor-preview">
+				<Image src={url} />
+			</div>
 
-            <antd.Button
-                type="primary"
-                onClick={() => {
-                    setUrl(defaultUrl)
-                }}
-            >
-                Reset
-            </antd.Button>
+			<div className="cover-editor-actions">
+				<UploadButton
+					onSuccess={(uid, response) => {
+						setUrl(response.url)
+					}}
+				/>
 
-            {
-                props.extraActions
-            }
-        </div>
-    </div>
+				<antd.Button
+					type="primary"
+					onClick={() => {
+						setUrl(defaultUrl)
+					}}
+				>
+					Reset
+				</antd.Button>
+
+				{props.extraActions}
+			</div>
+		</div>
+	)
 }
 
 export default CoverEditor

@@ -177,7 +177,7 @@ const PlayerController = React.forwardRef((props, ref) => {
 				)}
 
 				<div className="lyrics-player-controller-tags">
-					{playerState.track_manifest?.metadata.lossless && (
+					{playerState.track_manifest?.metadata?.lossless && (
 						<Tag
 							icon={
 								<Icons.Lossless

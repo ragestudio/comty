@@ -8,17 +8,6 @@ const { Buffer } = require("node:buffer")
 const { webcrypto: crypto } = require("node:crypto")
 const { InfisicalClient } = require("@infisical/sdk")
 const moduleAlias = require("module-alias")
-const { onExit } = require("signal-exit")
-const opentelemetry = require("@opentelemetry/sdk-node")
-const {
-	getNodeAutoInstrumentations,
-} = require("@opentelemetry/auto-instrumentations-node")
-const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-http")
-const { OTLPLogExporter } = require("@opentelemetry/exporter-logs-otlp-http")
-const { Resource } = require("@opentelemetry/resources")
-const {
-	SemanticResourceAttributes,
-} = require("@opentelemetry/semantic-conventions")
 
 // Override file execution arg
 process.argv.splice(1, 1)
@@ -164,33 +153,11 @@ async function Boot(main) {
 		throw new Error("main class is not defined")
 	}
 
-	const service_id = process.env.lb_service.id
+	const { lb_service_id } = process.env
 
 	console.log(
-		`[BOOT] Booting (${service_id}) in [${global.isProduction ? "production" : "development"}] mode...`,
+		`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`,
 	)
-
-	const traceExporter = new OTLPTraceExporter({
-		url:
-			process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ??
-			"http://fr02.ragestudio.net:4318/v1/traces",
-	})
-	const logExporter = new OTLPLogExporter({
-		url:
-			process.env.OTEL_EXPORTER_OTLP_LOGS_ENDPOINT ??
-			"http://fr02.ragestudio.net:4318/v1/logs",
-	})
-
-	const sdk = new opentelemetry.NodeSDK({
-		traceExporter,
-		logExporter,
-		instrumentations: [getNodeAutoInstrumentations()],
-		resource: new Resource({
-			[SemanticResourceAttributes.SERVICE_NAME]: service_id ?? "node_app",
-		}),
-	})
-
-	sdk.start()
 
 	if (
 		process.env.INFISICAL_CLIENT_ID &&
@@ -204,30 +171,35 @@ async function Boot(main) {
 
 	const instance = new main()
 
-	onExit(
-		(code, signal) => {
-			console.log(`[BOOT] Cleaning up...`)
+	process.on("exit", (code) => {
+		console.log(`[BOOT] Closing...`)
 
-			sdk.shutdown()
-				.then(() => console.log("Tracing terminated"))
-				.catch((error) =>
-					console.log("Error terminating tracing", error),
-				)
-
+		if (instance._fireClose) {
+			instance._fireClose()
+		} else {
 			if (typeof instance.onClose === "function") {
 				instance.onClose()
 			}
 
 			instance.engine.close()
-		},
-		{
-			alwaysLast: true,
-		},
-	)
+		}
+	})
+
+	process.on("SIGTERM", () => {
+		process.exit(0)
+	})
+
+	process.on("SIGINT", () => {
+		process.exit(0)
+	})
+
+	process.on("SIGTERM", () => {
+		process.exit(0)
+	})
 
 	await instance.initialize()
 
-	if (process.env.lb_service && process.send) {
+	if (lb_service_id && process.send) {
 		process.send({
 			status: "ready",
 		})

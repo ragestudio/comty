@@ -17,12 +17,12 @@ class TracksManager extends React.Component {
 	swapyRef = React.createRef()
 
 	state = {
-		list: Array.isArray(this.props.list) ? this.props.list : [],
+		items: Array.isArray(this.props.items) ? this.props.items : [],
 		pendingUploads: [],
 	}
 
 	componentDidUpdate = (prevProps, prevState) => {
-		if (prevState.list !== this.state.list) {
+		if (prevState.items !== this.state.items) {
 			if (typeof this.props.onChangeState === "function") {
 				this.props.onChangeState(this.state)
 			}
@@ -55,7 +55,7 @@ class TracksManager extends React.Component {
 			return false
 		}
 
-		return this.state.list.find((item) => item.uid === uid)
+		return this.state.items.find((item) => item.uid === uid)
 	}
 
 	addTrackToList = (track) => {
@@ -64,7 +64,7 @@ class TracksManager extends React.Component {
 		}
 
 		this.setState({
-			list: [...this.state.list, track],
+			items: [...this.state.items, track],
 		})
 	}
 
@@ -76,18 +76,17 @@ class TracksManager extends React.Component {
 		this.removeTrackUIDFromPendingUploads(uid)
 
 		this.setState({
-			list: this.state.list.filter((item) => item.uid !== uid),
+			items: this.state.items.filter((item) => item.uid !== uid),
 		})
 	}
 
 	modifyTrackByUid = (uid, track) => {
-		console.log("modifyTrackByUid", uid, track)
 		if (!uid || !track) {
 			return false
 		}
 
 		this.setState({
-			list: this.state.list.map((item) => {
+			items: this.state.items.map((item) => {
 				if (item.uid === uid) {
 					return {
 						...item,
@@ -140,7 +139,7 @@ class TracksManager extends React.Component {
 		)
 
 		if (uploadProgressIndex === -1) {
-			return 0
+			return null
 		}
 
 		return this.state.pendingUploads[uploadProgressIndex].progress
@@ -159,7 +158,7 @@ class TracksManager extends React.Component {
 
 		newData[uploadProgressIndex].progress = progress
 
-		console.log(`Updating progress for [${uid}] to [${progress}]`)
+		console.log(`Updating progress for [${uid}] to >`, progress)
 
 		this.setState({
 			pendingUploads: newData,
@@ -177,8 +176,7 @@ class TracksManager extends React.Component {
 
 				const trackManifest = new TrackManifest({
 					uid: uid,
-					file: change.file,
-					onChange: this.modifyTrackByUid,
+					file: change.file.originFileObj,
 				})
 
 				this.addTrackToList(trackManifest)
@@ -189,7 +187,7 @@ class TracksManager extends React.Component {
 				// remove pending file
 				this.removeTrackUIDFromPendingUploads(uid)
 
-				let trackManifest = this.state.list.find(
+				let trackManifest = this.state.items.find(
 					(item) => item.uid === uid,
 				)
 
@@ -205,6 +203,23 @@ class TracksManager extends React.Component {
 
 				trackManifest.source = change.file.response.url
 				trackManifest = await trackManifest.initialize()
+
+				// if has a cover, Upload
+				if (trackManifest._coverBlob) {
+					console.log(
+						`[${trackManifest.uid}] Founded cover, uploading...`,
+					)
+					const coverFile = new File(
+						[trackManifest._coverBlob],
+						"cover.jpg",
+						{ type: trackManifest._coverBlob.type },
+					)
+
+					const coverUpload =
+						await app.cores.remoteStorage.uploadFile(coverFile)
+
+					trackManifest.cover = coverUpload.url
+				}
 
 				await this.modifyTrackByUid(uid, trackManifest)
 
@@ -231,9 +246,8 @@ class TracksManager extends React.Component {
 		const response = await app.cores.remoteStorage
 			.uploadFile(req.file, {
 				onProgress: this.handleTrackFileUploadProgress,
-				service: "b2",
 				headers: {
-					transmux: "a-dash",
+					transformations: "a-dash",
 				},
 			})
 			.catch((error) => {
@@ -258,17 +272,17 @@ class TracksManager extends React.Component {
 		this.setState((prev) => {
 			// move all list items by id
 			const orderedIds = orderedIdsArray.map((id) =>
-				this.state.list.find((item) => item._id === id),
+				this.state.items.find((item) => item._id === id),
 			)
 			console.log("orderedIds", orderedIds)
 			return {
-				list: orderedIds,
+				items: orderedIds,
 			}
 		})
 	}
 
 	render() {
-		console.log(`Tracks List >`, this.state.list)
+		console.log(`Tracks List >`, this.state.items)
 
 		return (
 			<div className="music-studio-release-editor-tracks">
@@ -280,7 +294,7 @@ class TracksManager extends React.Component {
 					accept="audio/*"
 					multiple
 				>
-					{this.state.list.length === 0 ? (
+					{this.state.items.length === 0 ? (
 						<UploadHint />
 					) : (
 						<antd.Button
@@ -296,11 +310,11 @@ class TracksManager extends React.Component {
 					id="editor-tracks-list"
 					className="music-studio-release-editor-tracks-list"
 				>
-					{this.state.list.length === 0 && (
+					{this.state.items.length === 0 && (
 						<antd.Result status="info" title="No tracks" />
 					)}
 
-					{this.state.list.map((track, index) => {
+					{this.state.items.map((track, index) => {
 						const progress = this.getUploadProgress(track.uid)
 
 						return (
@@ -310,12 +324,7 @@ class TracksManager extends React.Component {
 									track={track}
 									onEdit={this.modifyTrackByUid}
 									onDelete={this.removeTrackByUid}
-									uploading={{
-										progress: progress,
-										working: this.state.pendingUploads.find(
-											(item) => item.uid === track.uid,
-										),
-									}}
+									progress={progress}
 									disabled={progress > 0}
 								/>
 							</div>
@@ -336,7 +345,7 @@ const ReleaseTracks = (props) => {
 
 			<TracksManager
 				_id={state._id}
-				list={state.list}
+				items={state.items}
 				onChangeState={(managerState) => {
 					setState({
 						...state,

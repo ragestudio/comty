@@ -89,7 +89,8 @@ const EnhancedLyricsPage = () => {
 
 	// Track manifest comparison
 	useEffect(() => {
-		const newManifest = playerState.track_manifest?.toSeriableObject()
+		const newManifest = playerState.track_manifest
+
 		if (JSON.stringify(newManifest) !== JSON.stringify(trackManifest)) {
 			setTrackManifest(newManifest)
 		}

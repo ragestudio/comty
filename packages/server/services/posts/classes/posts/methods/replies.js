@@ -2,7 +2,7 @@ import { Post } from "@db_models"
 import stage from "./stage"
 
 export default async (payload = {}) => {
-	const { post_id, for_user_id, trim = 0, limit = 50 } = payload
+	const { post_id, for_user_id, page = 0, limit = 50 } = payload
 
 	if (!post_id) {
 		throw new OperationError(400, "Post ID is required")
@@ -12,7 +12,7 @@ export default async (payload = {}) => {
 		reply_to: post_id,
 	})
 		.limit(limit)
-		.skip(trim)
+		.skip(limit * page)
 		.sort({ created_at: -1 })
 
 	posts = await stage({

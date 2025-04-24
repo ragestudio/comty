@@ -6,6 +6,7 @@ import defaults from "linebridge/dist/defaults"
 
 const localNginxBinary = path.resolve(process.cwd(), "nginx-bin")
 const serverPkg = require("../../../package.json")
+
 /**
  * NginxManager - Optimized version that batches configurations
  * Waits for all services to register before applying configuration
@@ -253,7 +254,7 @@ http {
 
 			if (debugFlag) {
 				console.log(
-					`🔍 Registering route for [${serviceId}]: ${normalizedPath} -> ${target} (${websocket ? "WebSocket" : "HTTP"})`,
+					`🔍 Registering route for [${serviceId}]: ${normalizedPath} -> ${target}`,
 				)
 			}
 
@@ -261,8 +262,8 @@ http {
 			const effectivePathRewrite = pathRewrite || {}
 
 			this.routes.set(normalizedPath, {
-				serviceId,
-				target,
+				serviceId: serviceId,
+				target: target,
 				pathRewrite: effectivePathRewrite,
 				websocket: !!websocket,
 			})

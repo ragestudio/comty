@@ -110,6 +110,7 @@ export class PostsListsComponent extends React.Component {
 
 		hasMore: true,
 		list: this.props.list ?? [],
+		pageCount: 0,
 	}
 
 	parentRef = this.props.innerRef
@@ -148,12 +149,17 @@ export class PostsListsComponent extends React.Component {
 	}
 
 	handleLoad = async (fn, params = {}) => {
+		if (this.state.loading === true) {
+			console.warn(`Please wait to load the post before load more`)
+			return
+		}
+
 		this.setState({
 			loading: true,
 		})
 
 		let payload = {
-			trim: this.state.list.length,
+			page: this.state.pageCount,
 			limit: app.cores.settings.get("feed_max_fetch"),
 		}
 
@@ -162,10 +168,6 @@ export class PostsListsComponent extends React.Component {
 				...payload,
 				...this.props.loadFromModelProps,
 			}
-		}
-
-		if (params.replace) {
-			payload.trim = 0
 		}
 
 		const result = await fn(payload).catch((err) => {
@@ -186,10 +188,12 @@ export class PostsListsComponent extends React.Component {
 			if (params.replace) {
 				this.setState({
 					list: result,
+					pageCount: 0,
 				})
 			} else {
 				this.setState({
 					list: [...this.state.list, ...result],
+					pageCount: this.state.pageCount + 1,
 				})
 			}
 		}

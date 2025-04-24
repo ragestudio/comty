@@ -7,9 +7,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "main"
-	static enableWebsockets = true
+	static useEngine = "hyper-express-ng"
 	static routesPath = `${__dirname}/routes`
 	static listen_port = process.env.HTTP_LISTEN_PORT || 3000
+	static enableWebsockets = false
 
 	middlewares = {
 		...require("@middlewares").default,
@@ -26,8 +27,6 @@ export default class API extends Server {
 		await this.contexts.db.initialize()
 		await StartupDB()
 	}
-
-	handleWsAuth = require("@shared-lib/handleWsAuth").default
 }
 
 Boot(API)

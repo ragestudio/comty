@@ -1,7 +1,7 @@
 {
-  "name": "posts",
-  "version": "1.0.0",
-  "dependencies": {
-    "moment-timezone": "^0.5.45"
-  }
+	"name": "posts",
+	"dependencies": {
+		"linebridge": "^1.0.0-a3",
+		"moment-timezone": "^0.5.45"
+	}
 }

@@ -15,7 +15,7 @@ const MaxStringsLengths = {
 }
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		let update = {}
 

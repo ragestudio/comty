@@ -1,10 +1,10 @@
 import ExtensionClass from "@classes/extension"
 
 export default async (req) => {
-    const { user_id, pkg } = req.params
+	const { user_id, pkg } = req.params
 
-    return await ExtensionClass.resolveManifest({
-        user_id,
-        pkg,
-    })
+	return await ExtensionClass.resolve({
+		user_id,
+		pkg,
+	})
 }

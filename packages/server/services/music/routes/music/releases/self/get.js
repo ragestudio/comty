@@ -29,7 +29,7 @@ export default {
 		if (req.query.resolveItemsData === "true") {
 			releases = await Promise.all(
 				playlists.map(async (playlist) => {
-					playlist.items = await Track.find({
+					playlist.list = await Track.find({
 						_id: [...playlist.list],
 					})
 
@@ -39,7 +39,7 @@ export default {
 		}
 
 		return {
-			total_length: await MusicRelease.countDocuments(searchQuery),
+			total_items: await MusicRelease.countDocuments(searchQuery),
 			items: releases,
 		}
 	},

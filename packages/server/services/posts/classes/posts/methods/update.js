@@ -37,7 +37,7 @@ export default async (post_id, update) => {
 	})
 
 	if (post.visibility === "public") {
-		global.websocket.senders.toTopic(
+		global.websockets.senders.toTopic(
 			"realtime:feed",
 			`post:update`,
 			result[0],
@@ -45,7 +45,7 @@ export default async (post_id, update) => {
 	}
 
 	if (post.visibility === "private") {
-		const userSockets = await global.websocket.find.clientsByUserId(
+		const userSockets = await global.websockets.find.clientsByUserId(
 			post.user_id,
 		)
 

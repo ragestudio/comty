@@ -11,13 +11,27 @@ import { ReleaseEditorStateContext } from "@contexts/MusicReleaseEditor"
 
 import "./index.less"
 
+const stateToString = {
+	uploading: "Uploading",
+	transmuxing: "Processing...",
+	uploading_s3: "Archiving...",
+}
+
+const getTitleString = ({ track, progress }) => {
+	if (progress) {
+		return stateToString[progress.state] || progress.state
+	}
+
+	return track.title
+}
+
 const TrackListItem = (props) => {
 	const context = React.useContext(ReleaseEditorStateContext)
 
 	const [loading, setLoading] = React.useState(false)
 	const [error, setError] = React.useState(null)
 
-	const { track } = props
+	const { track, progress } = props
 
 	async function onClickEditTrack() {
 		context.renderCustomPage({
@@ -32,8 +46,6 @@ const TrackListItem = (props) => {
 	async function onClickRemoveTrack() {
 		props.onDelete(track.uid)
 	}
-
-	console.log("render")
 
 	return (
 		<div
@@ -50,7 +62,7 @@ const TrackListItem = (props) => {
 			<div
 				className="music-studio-release-editor-tracks-list-item-progress"
 				style={{
-					"--upload-progress": `${props.uploading.progress}%`,
+					"--upload-progress": `${props.progress?.percent ?? 0}%`,
 				}}
 			/>
 
@@ -58,7 +70,7 @@ const TrackListItem = (props) => {
 				<span>{props.index + 1}</span>
 			</div>
 
-			{props.uploading.working && <Icons.LoadingOutlined />}
+			{progress !== null && <Icons.LoadingOutlined />}
 
 			<Image
 				src={track.cover}
@@ -69,7 +81,7 @@ const TrackListItem = (props) => {
 				}}
 			/>
 
-			<span>{track.title}</span>
+			<span>{getTitleString({ track, progress })}</span>
 
 			<div className="music-studio-release-editor-tracks-list-item-actions">
 				<antd.Popconfirm

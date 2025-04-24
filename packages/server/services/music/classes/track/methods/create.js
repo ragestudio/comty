@@ -1,58 +1,52 @@
 import { Track } from "@db_models"
 import requiredFields from "@shared-utils/requiredFields"
-import MusicMetadata from "music-metadata"
-import axios from "axios"
+import * as FFMPEGLib from "@shared-classes/FFMPEGLib"
 
 import ModifyTrack from "./modify"
 
 export default async (payload = {}) => {
-	requiredFields(["title", "source", "user_id"], payload)
+	if (typeof payload.title !== "string") {
+		payload.title = undefined
+	}
 
-	let stream = null
-	let headers = null
+	if (typeof payload.album !== "string") {
+		payload.album = undefined
+	}
+
+	if (typeof payload.artist !== "string") {
+		payload.artist = undefined
+	}
+
+	if (typeof payload.cover !== "string") {
+		payload.cover = undefined
+	}
+
+	if (typeof payload.source !== "string") {
+		payload.source = undefined
+	}
+
+	if (typeof payload.user_id !== "string") {
+		payload.user_id = undefined
+	}
+
+	requiredFields(["title", "source", "user_id"], payload)
 
 	if (typeof payload._id === "string") {
 		return await ModifyTrack(payload._id, payload)
 	}
 
-	let metadata = Object()
+	const probe = await FFMPEGLib.Utils.probe(payload.source)
 
-	try {
-		const sourceStream = await axios({
-			url: payload.source,
-			method: "GET",
-			responseType: "stream",
-		})
-
-		stream = sourceStream.data
-		headers = sourceStream.headers
-
-		const streamMetadata = await MusicMetadata.parseStream(stream, {
-			mimeType: headers["content-type"],
-		})
-
-		metadata = {
-			...metadata,
-			format: streamMetadata.format.codec,
-			channels: streamMetadata.format.numberOfChannels,
-			sampleRate: streamMetadata.format.sampleRate,
-			bits: streamMetadata.format.bitsPerSample,
-			lossless: streamMetadata.format.lossless,
-			duration: streamMetadata.format.duration,
-
-			title: streamMetadata.common.title,
-			artists: streamMetadata.common.artists,
-			album: streamMetadata.common.album,
-		}
-	} catch (error) {
-		// sowy :(
-	}
-
-	if (typeof payload.metadata === "object") {
-		metadata = {
-			...metadata,
-			...payload.metadata,
-		}
+	let metadata = {
+		format: probe.streams[0].codec_name,
+		channels: probe.streams[0].channels,
+		bitrate: probe.streams[0].bit_rate ?? probe.format.bit_rate,
+		sampleRate: probe.streams[0].sample_rate,
+		bits:
+			probe.streams[0].bits_per_sample ??
+			probe.streams[0].bits_per_raw_sample,
+		duration: probe.format.duration,
+		tags: probe.format.tags ?? {},
 	}
 
 	if (metadata.format) {
@@ -68,53 +62,28 @@ export default async (payload = {}) => {
 	}
 
 	const obj = {
-		title: payload.title,
-		album: payload.album,
-		cover: payload.cover,
-		artists: [],
+		title: payload.title ?? metadata.tags["Title"],
+		album: payload.album ?? metadata.tags["Album"],
+		artist: payload.artist ?? metadata.tags["Artist"],
+		cover:
+			payload.cover ??
+			"https://storage.ragestudio.net/comty-static-assets/default_song.png",
 		source: payload.source,
 		metadata: metadata,
-		lyrics_enabled: payload.lyrics_enabled,
 	}
 
 	if (Array.isArray(payload.artists)) {
-		obj.artists = payload.artists
+		obj.artist = payload.artists.join(", ")
 	}
 
-	if (typeof payload.artists === "string") {
-		obj.artists.push(payload.artists)
-	}
+	let track = new Track({
+		...obj,
+		publisher: {
+			user_id: payload.user_id,
+		},
+	})
 
-	if (typeof payload.artist === "string") {
-		obj.artists.push(payload.artist)
-	}
+	await track.save()
 
-	if (obj.artists.length === 0 || !obj.artists) {
-		obj.artists = metadata.artists
-	}
-
-	let track = null
-
-	if (payload._id) {
-		track = await Track.findById(payload._id)
-
-		if (!track) {
-			throw new OperationError(404, "Track not found, cannot update")
-		}
-
-		throw new OperationError(501, "Not implemented")
-	} else {
-		track = new Track({
-			...obj,
-			publisher: {
-				user_id: payload.user_id,
-			},
-		})
-
-		await track.save()
-	}
-
-	track = track.toObject()
-
-	return track
+	return track.toObject()
 }

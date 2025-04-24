@@ -10,10 +10,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "posts"
-	static useEngine = "hyper-express-ng"
-	static enableWebsockets = true
-
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3001
+	static websockets = true
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3001
+	static useMiddlewares = ["logs"]
+	static bypassCors = true
 
 	middlewares = {
 		...SharedMiddlewares,
