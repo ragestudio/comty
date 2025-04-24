@@ -20,7 +20,7 @@ export default {
 			return result
 		} catch (error) {
 			await fs.promises
-				.rm(tmpPath, { recursive: true, force: true })
+				.rm(job.workPath, { recursive: true, force: true })
 				.catch(() => null)
 
 			throw error
