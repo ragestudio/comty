@@ -8,8 +8,8 @@ export default async (payload = {}) => {
 		for_user_id,
 		post_id,
 		query = {},
-		trim = 0,
 		limit = 20,
+		page = 0,
 		sort = { created_at: -1 },
 	} = payload
 
@@ -31,8 +31,8 @@ export default async (payload = {}) => {
 	} else {
 		posts = await Post.find({ ...query })
 			.sort(sort)
-			.skip(trim)
 			.limit(limit)
+			.skip(limit * page)
 	}
 
 	// fullfill data

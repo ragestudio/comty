@@ -5,11 +5,11 @@ export default {
 	fn: async (req, res) => {
 		const payload = {
 			limit: req.query?.limit,
-			trim: req.query?.trim,
+			page: req.query?.page,
 		}
 
 		if (req.auth) {
-			payload.user_id = req.auth.session.user_id
+			payload.for_user_id = req.auth.session.user_id
 		}
 
 		const result = await Posts.timeline(payload)

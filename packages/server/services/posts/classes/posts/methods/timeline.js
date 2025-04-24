@@ -3,41 +3,32 @@ import { UserFollow } from "@db_models"
 import GetPostData from "./data"
 
 export default async (payload = {}) => {
-    let {
-        user_id,
-        trim,
-        limit,
-    } = payload
+	payload.query = {}
 
-    let query = {}
+	//TODO: include posts from groups
+	//TODO: include promotional posts
+	if (payload.for_user_id) {
+		const from_users = []
 
-    //TODO: include posts from groups
-    //TODO: include promotional posts 
-    if (user_id) {
-        const from_users = []
+		from_users.push(payload.for_user_id)
 
-        from_users.push(user_id)
+		// get post from users that the user follows
+		const followingUsers = await UserFollow.find({
+			user_id: payload.for_user_id,
+		})
 
-        // get post from users that the user follows
-        const followingUsers = await UserFollow.find({
-            user_id: user_id
-        })
+		const followingUserIds = followingUsers.map(
+			(followingUser) => followingUser.to,
+		)
 
-        const followingUserIds = followingUsers.map((followingUser) => followingUser.to)
+		from_users.push(...followingUserIds)
 
-        from_users.push(...followingUserIds)
+		payload.query.user_id = {
+			$in: from_users,
+		}
+	}
 
-        query.user_id = {
-            $in: from_users
-        }
-    }
+	const posts = await GetPostData(payload)
 
-    const posts = await GetPostData({
-        for_user_id: user_id,
-        trim,
-        limit,
-        query: query,
-    })
-
-    return posts
+	return posts
 }
