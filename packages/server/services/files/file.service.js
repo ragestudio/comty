@@ -11,18 +11,6 @@ import SharedMiddlewares from "@shared-middlewares"
 import LimitsClass from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
 
-// import * as Minio from 'minio'
-
-// class StorageNG {
-//   constructor() {
-
-//   }
-
-//   async initialize() {
-
-//   }
-// }
-
 class API extends Server {
 	static refName = "files"
 	static useEngine = "hyper-express-ng"
