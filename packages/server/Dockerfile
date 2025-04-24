@@ -7,6 +7,7 @@ RUN apt install -y --no-install-recommends build-essential
 RUN apt install -y --no-install-recommends git
 RUN apt install -y --no-install-recommends ssh
 RUN apt install -y --no-install-recommends curl
+RUN apt install -y --no-install-recommends nscd
 RUN apt install -y --no-install-recommends ca-certificates
 RUN apt install -y --no-install-recommends ffmpeg
 
