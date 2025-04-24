@@ -1,5 +1,5 @@
-import { Server } from "../../../../linebridge/server/src"
-//import { Server } from "linebridge"
+//import { Server } from "../../../../linebridge/server/src"
+import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
@@ -10,10 +10,9 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "posts"
-	//static useEngine = "hyper-express-ng"
 	static websockets = true
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3001
-	//	static useMiddlewares = ["logs"]
+	static useMiddlewares = ["logs"]
 	static bypassCors = true
 
 	middlewares = {

@@ -1,7 +1,6 @@
 {
-    "name": "main",
-    "version": "0.60.2",
-    "dependencies": {
-        "@octokit/rest": "^20.0.2"
-    }
+	"name": "main",
+	"dependencies": {
+		"@octokit/rest": "^20.0.2"
+	}
 }
