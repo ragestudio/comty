@@ -1,20 +1,20 @@
 import fs from "node:fs"
 import path from "node:path"
 
-import mimeTypes from "mime-types"
-import {fileTypeFromBuffer} from 'file-type'
+import { fileTypeFromBuffer } from "file-type"
 import readChunk from "@utils/readChunk"
 
 import getFileHash from "@shared-utils/readFileHash"
 import putObject from "./putObject"
 
-import Transformation, { TransformationPayloadType } from "../Transformation"
+import Transformation from "../Transformation"
 
 export type FileHandlePayload = {
 	user_id: string
 	filePath: string
 	workPath: string
-	uploadId?: string
+	targetPath?: string // mostly provided by processed results
+	//uploadId?: string
 	transformations?: Array<string>
 	s3Provider?: string
 	onProgress?: Function
@@ -23,7 +23,8 @@ export type FileHandlePayload = {
 export type S3UploadPayload = {
 	filePath: string
 	basePath: string
-	targePath?: string
+	targetPath?: string
+	onProgress?: Function
 }
 
 export default class Upload {
@@ -38,7 +39,8 @@ export default class Upload {
 		const result = await Upload.toS3({
 			filePath: payload.filePath,
 			targetPath: payload.targetPath,
-			basePath: payload.user_id,
+			basePath: `${payload.user_id}/${global.nanoid()}`,
+			onProgress: payload.onProgress,
 		})
 
 		// delete workpath
@@ -49,7 +51,7 @@ export default class Upload {
 
 	static process = async (payload: FileHandlePayload) => {
 		if (Array.isArray(payload.transformations)) {
-			for await (const transformation: TransformationPayloadType of payload.transformations) {
+			for await (const transformation of payload.transformations) {
 				const transformationResult = await Transformation.transform({
 					filePath: payload.filePath,
 					workPath: payload.workPath,
@@ -64,9 +66,9 @@ export default class Upload {
 
 				// if is a directory, overwrite filePath to upload entire directory
 				if (transformationResult.outputPath) {
-				  payload.filePath = transformationResult.outputPath
+					payload.filePath = transformationResult.outputPath
 					payload.targetPath = transformationResult.outputFile
-					payload.isDirectory = true
+					//payload.isDirectory = true
 				}
 			}
 		}
@@ -74,19 +76,21 @@ export default class Upload {
 		return payload
 	}
 
-	static toS3 = async (payload: S3UploadPayload, onProgress?: Function) => {
-		const { filePath, basePath, targetPath } = payload
+	static toS3 = async (payload: S3UploadPayload) => {
+		const { filePath, basePath, targetPath, onProgress } = payload
 
-		const firstBuffer = await readChunk(targetPath ?? filePath, { length: 4100 })
-		const fileHash = await getFileHash(fs.createReadStream(targetPath ?? filePath))
-		const fileType = await fileTypeFromBuffer(firstBuffer)
+		// if targetPath is provided, means its a directory
+		const isDirectory = targetPath !== undefined
 
-		const uploadPath = path.join(basePath, path.basename(filePath))
+		let uploadPath = path.resolve(basePath, path.basename(filePath))
 
-		const metadata = {
-			"File-Hash": fileHash,
-			"Content-Type": fileType.mime,
+		if (isDirectory) {
+			uploadPath = basePath
 		}
+
+		const metadata = await this.buildFileMetadata(
+			isDirectory ? targetPath : filePath,
+		)
 
 		if (typeof onProgress === "function") {
 			onProgress({
@@ -95,13 +99,36 @@ export default class Upload {
 			})
 		}
 
+		console.log("Uploading to S3:", {
+			filePath,
+			uploadPath,
+			basePath,
+			targetPath,
+			metadata,
+		})
+
 		const result = await putObject({
 			filePath: filePath,
 			uploadPath: uploadPath,
 			metadata: metadata,
-			targetFilename: targetPath ? path.basename(targetPath) : null,
+			targetFilename: isDirectory ? path.basename(targetPath) : null,
 		})
 
 		return result
+	}
+
+	static async buildFileMetadata(filePath: string) {
+		const firstBuffer = await readChunk(filePath, {
+			length: 4100,
+		})
+		const fileHash = await getFileHash(fs.createReadStream(filePath))
+		const fileType = await fileTypeFromBuffer(firstBuffer)
+
+		const metadata = {
+			"File-Hash": fileHash,
+			"Content-Type": fileType?.mime ?? "application/octet-stream",
+		}
+
+		return metadata
 	}
 }

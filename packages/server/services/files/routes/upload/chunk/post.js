@@ -67,8 +67,6 @@ export default {
 			maxChunkSize: config.maxChunkSize,
 		})
 
-		const useJob = true
-
 		if (typeof assemble === "function") {
 			try {
 				assemble = await assemble()
@@ -116,6 +114,7 @@ export default {
 		return {
 			next: true,
 			chunkNumber: req.headers["uploader-chunk-number"],
+			config: config,
 		}
 	},
 }
