@@ -1,8 +1,7 @@
 const Handlers = {
 	"a-dash": require("./handlers/a-dash").default,
 	"mq-hls": require("./handlers/mq-hls").default,
-	"img-compress": require("./handlers/img-compress").default,
-	"video-compress": require("./handlers/video-compress").default,
+	optimize: require("./handlers/optimize").default,
 }
 
 export type TransformationPayloadType = {

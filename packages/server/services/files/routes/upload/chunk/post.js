@@ -86,10 +86,14 @@ export default {
 					workPath: workPath,
 					transformations: transformations,
 					s3Provider: config.useProvider,
+					useCompression: config.useCompression,
 				}
 
 				// if has transformations, use background job
-				if (transformations && transformations.length > 0) {
+				if (
+					(transformations && transformations.length > 0) ||
+					config.useCompression
+				) {
 					const job = await global.queues.createJob(
 						"file-process",
 						payload,

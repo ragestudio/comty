@@ -15,6 +15,7 @@ export type FileHandlePayload = {
 	targetPath?: string // mostly provided by processed results
 	//uploadId?: string
 	transformations?: Array<string>
+	useCompression?: boolean
 	s3Provider?: string
 	onProgress?: Function
 }
@@ -29,11 +30,26 @@ export type S3UploadPayload = {
 
 export default class Upload {
 	static fileHandle = async (payload: FileHandlePayload) => {
-		// process
-		const processed = await Upload.process(payload)
+		if (!payload.transformations) {
+			payload.transformations = []
+		}
 
-		// overwrite filePath
-		payload.filePath = processed.filePath
+		// if compression is enabled and no transformations are provided, add basic transformations for images or videos
+		if (
+			payload.useCompression === true &&
+			payload.transformations.length === 0
+		) {
+			payload.transformations.push("optimize")
+		}
+
+		// process file upload if transformations are provided
+		if (payload.transformations.length > 0) {
+			// process
+			const processed = await Upload.transform(payload)
+
+			// overwrite filePath
+			payload.filePath = processed.filePath
+		}
 
 		// upload
 		const result = await Upload.toS3({
@@ -50,7 +66,7 @@ export default class Upload {
 		return result
 	}
 
-	static process = async (payload: FileHandlePayload) => {
+	static transform = async (payload: FileHandlePayload) => {
 		if (Array.isArray(payload.transformations)) {
 			for await (const transformation of payload.transformations) {
 				const transformationResult = await Transformation.transform({
@@ -91,7 +107,7 @@ export default class Upload {
 		let uploadPath = path.join(basePath, metadata["File-Hash"])
 
 		if (isDirectory) {
-			uploadPath = path.join(basePath, nanoid())
+			uploadPath = path.join(basePath, global.nanoid())
 		}
 
 		if (typeof onProgress === "function") {
