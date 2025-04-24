@@ -11,33 +11,33 @@ export default {
 		}
 	},
 	settings: [
-		{
-			id: "player.gain",
-			title: "Gain",
-			icon: "MdGraphicEq",
-			group: "general",
-			description: "Adjust gain for audio output",
-			component: "Slider",
-			props: {
-				min: 1,
-				max: 2,
-				step: 0.1,
-				marks: {
-					1: "Normal",
-					1.5: "+50%",
-					2: "+100%",
-				},
-			},
-			defaultValue: () => {
-				return app.cores.player.gain.values().gain
-			},
-			onUpdate: (value) => {
-				app.cores.player.gain.modifyValues({
-					gain: value,
-				})
-			},
-			storaged: false,
-		},
+		// {
+		// 	id: "player.gain",
+		// 	title: "Gain",
+		// 	icon: "MdGraphicEq",
+		// 	group: "general",
+		// 	description: "Adjust gain for audio output",
+		// 	component: "Slider",
+		// 	props: {
+		// 		min: 1,
+		// 		max: 2,
+		// 		step: 0.1,
+		// 		marks: {
+		// 			1: "Normal",
+		// 			1.5: "+50%",
+		// 			2: "+100%",
+		// 		},
+		// 	},
+		// 	defaultValue: () => {
+		// 		return app.cores.player.gain.values().gain
+		// 	},
+		// 	onUpdate: (value) => {
+		// 		app.cores.player.gain.modifyValues({
+		// 			gain: value,
+		// 		})
+		// 	},
+		// 	storaged: false,
+		// },
 		{
 			id: "player.sample_rate",
 			title: "Sample Rate",
@@ -66,7 +66,7 @@ export default {
 				],
 			},
 			defaultValue: (ctx) => {
-				return app.cores.player.audioContext.sampleRate
+				return app.cores.player.base().context.sampleRate
 			},
 			onUpdate: async (value) => {
 				const sampleRate =
@@ -94,10 +94,10 @@ export default {
 			onEnabledChange: (enabled) => {
 				if (enabled === true) {
 					app.cores.settings.set("player.compressor", true)
-					app.cores.player.compressor.attach()
+					//app.cores.player.compressor.attach()
 				} else {
 					app.cores.settings.set("player.compressor", false)
-					app.cores.player.compressor.detach()
+					//app.cores.player.compressor.detach()
 				}
 			},
 			extraActions: [
@@ -106,8 +106,9 @@ export default {
 					title: "Default",
 					icon: "MdRefresh",
 					onClick: async (ctx) => {
-						const values =
-							await app.cores.player.compressor.presets.setCurrentPresetToDefault()
+						const values = await app.cores.player
+							.base()
+							.processors.compressor.presets.setCurrentPresetToDefault()
 
 						ctx.updateCurrentValue(values)
 					},
@@ -152,13 +153,14 @@ export default {
 				],
 			},
 			onUpdate: (value) => {
-				app.cores.player.compressor.presets.setToCurrent(value)
+				app.cores.player
+					.base()
+					.processors.compressor.presets.setToCurrent(value)
 
 				return value
 			},
 			storaged: false,
 		},
-
 		{
 			id: "player.eq",
 			title: "Equalizer",
@@ -172,8 +174,9 @@ export default {
 					title: "Reset",
 					icon: "MdRefresh",
 					onClick: (ctx) => {
-						const values =
-							app.cores.player.eq.presets.setCurrentPresetToDefault()
+						const values = app.cores.player
+							.base()
+							.processors.eq.presets.setCurrentPresetToDefault()
 
 						ctx.updateCurrentValue(values)
 					},
@@ -260,7 +263,9 @@ export default {
 					return acc
 				}, {})
 
-				app.cores.player.eq.presets.setToCurrent(values)
+				app.cores.player
+					.base()
+					.processors.eq.presets.setToCurrent(values)
 
 				return value
 			},
