@@ -4,47 +4,7 @@ import fs from "node:fs"
 import path from "node:path"
 import sevenzip from "7zip-min"
 
-async function uploadFolderToB2(bucketId, folderPath, b2Directory) {
-	try {
-		const uploadFiles = async (dir) => {
-			const files = fs.readdirSync(dir)
-
-			for (const file of files) {
-				const fullPath = path.join(dir, file)
-				const stats = fs.statSync(fullPath)
-
-				if (stats.isDirectory()) {
-					await uploadFiles(fullPath)
-				} else {
-					const fileData = fs.readFileSync(fullPath)
-					const b2FileName = path
-						.join(b2Directory, path.relative(folderPath, fullPath))
-						.replace(/\\/g, "/")
-
-					console.log(`Uploading ${b2FileName}...`)
-
-					const uploadUrl = await b2.getUploadUrl({
-						bucketId: bucketId,
-					})
-
-					await b2.uploadFile({
-						uploadUrl: uploadUrl.data.uploadUrl,
-						uploadAuthToken: uploadUrl.data.authorizationToken,
-						fileName: b2FileName,
-						data: fileData,
-					})
-
-					console.log(`Uploaded ${b2FileName}`)
-				}
-			}
-		}
-
-		await uploadFiles(folderPath)
-		console.log("All files uploaded successfully.")
-	} catch (error) {
-		console.error("Error uploading folder:", error)
-	}
-}
+import putObject from "@shared-classes/Upload/putObject"
 
 export default {
 	middlewares: ["withAuthentication"],
@@ -62,7 +22,7 @@ export default {
 		pkg = JSON.parse(pkg)
 
 		const { user_id } = req.auth.session
-		const registryId = `${user_id}/${pkg.name}@${pkg.version}`
+		const registryId = `${user_id}/${pkg.name}`
 		const s3Path = `extensions/${pkg.name}/${pkg.version}`
 
 		const workPath = path.resolve(
@@ -84,7 +44,7 @@ export default {
 
 		let extensionRegistry = await Extension.findOne({
 			user_id: user_id,
-			registryId: registryId,
+			name: pkg.name,
 			version: pkg.version,
 		})
 
@@ -116,16 +76,20 @@ export default {
 				})
 			})
 
-			await uploadFolderToB2(process.env.B2_BUCKET_ID, pkgPath, s3Path)
+			await putObject({
+				filePath: pkgPath,
+				uploadPath: s3Path,
+			})
 
 			fs.promises.rm(workPath, { recursive: true, force: true })
 
-			const assetsUrl = `https://${process.env.B2_CDN_ENDPOINT}/${process.env.B2_BUCKET}/${s3Path}`
+			const assetsUrl = `${process.env.B2_CDN_ENDPOINT}/${process.env.B2_BUCKET}/${s3Path}`
 
 			extensionRegistry = await Extension.create({
 				user_id: user_id,
 				name: pkg.name,
 				version: pkg.version,
+				description: pkg.description,
 				registryId: registryId,
 				assetsUrl: assetsUrl,
 				srcUrl: `${assetsUrl}/src`,

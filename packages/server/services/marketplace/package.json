@@ -1,9 +1,6 @@
 {
 	"name": "marketplace",
 	"dependencies": {
-		"7zip-min": "^1.4.4",
-		"backblaze-b2": "^1.7.0",
-		"sucrase": "^3.32.0",
-		"uglify-js": "^3.17.4"
+		"7zip-min": "^1.4.4"
 	}
 }
