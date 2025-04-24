@@ -1,147 +1,138 @@
 import fs from "node:fs"
 import path from "node:path"
-import { exec } from "node:child_process"
-import { EventEmitter } from "node:events"
 
-export default class MultiqualityHLSJob {
-    constructor({
-        input,
-        outputDir,
-        outputMasterName = "master.m3u8",
-        levels,
-    }) {
-        this.input = input
-        this.outputDir = outputDir
-        this.levels = levels
-        this.outputMasterName = outputMasterName
+import { FFMPEGLib, Utils } from "../FFMPEGLib"
 
-        this.bin = require("ffmpeg-static")
+export default class MultiqualityHLSJob extends FFMPEGLib {
+	constructor(params = {}) {
+		super()
 
-        return this
-    }
+		this.params = {
+			outputMasterName: "master.m3u8",
+			levels: [
+				{
+					original: true,
+					codec: "libx264",
+					bitrate: "10M",
+					preset: "ultrafast",
+				},
+			],
+			...params,
+		}
+	}
 
-    events = new EventEmitter()
+	buildArgs = () => {
+		const cmdStr = [
+			`-v error -hide_banner -progress pipe:1`,
+			`-i ${this.params.input}`,
+			`-filter_complex`,
+		]
 
-    buildCommand = () => {
-        const cmdStr = [
-            this.bin,
-            `-v quiet -stats`,
-            `-i ${this.input}`,
-            `-filter_complex`,
-        ]
+		// set split args
+		let splitLevels = [`[0:v]split=${this.params.levels.length}`]
 
-        // set split args
-        let splitLevels = [
-            `[0:v]split=${this.levels.length}`
-        ]
+		this.params.levels.forEach((level, i) => {
+			splitLevels[0] += `[v${i + 1}]`
+		})
 
-        this.levels.forEach((level, i) => {
-            splitLevels[0] += (`[v${i + 1}]`)
-        })
+		for (const [index, level] of this.params.levels.entries()) {
+			if (level.original) {
+				splitLevels.push(`[v1]copy[v1out]`)
+				continue
+			}
 
-        for (const [index, level] of this.levels.entries()) {
-            if (level.original) {
-                splitLevels.push(`[v1]copy[v1out]`)
-                continue
-            }
+			let scaleFilter = `[v${index + 1}]scale=w=${level.width}:h=trunc(ow/a/2)*2[v${index + 1}out]`
 
-            let scaleFilter = `[v${index + 1}]scale=w=${level.width}:h=trunc(ow/a/2)*2[v${index + 1}out]`
+			splitLevels.push(scaleFilter)
+		}
 
-            splitLevels.push(scaleFilter)
-        }
+		cmdStr.push(`"${splitLevels.join(";")}"`)
 
-        cmdStr.push(`"${splitLevels.join(";")}"`)
+		// set levels map
+		for (const [index, level] of this.params.levels.entries()) {
+			let mapArgs = [
+				`-map "[v${index + 1}out]"`,
+				`-x264-params "nal-hrd=cbr:force-cfr=1"`,
+				`-c:v:${index} ${level.codec}`,
+				`-b:v:${index} ${level.bitrate}`,
+				`-maxrate:v:${index} ${level.bitrate}`,
+				`-minrate:v:${index} ${level.bitrate}`,
+				`-bufsize:v:${index} ${level.bitrate}`,
+				`-preset ${level.preset}`,
+				`-g 48`,
+				`-sc_threshold 0`,
+				`-keyint_min 48`,
+			]
 
-        // set levels map
-        for (const [index, level] of this.levels.entries()) {
-            let mapArgs = [
-                `-map "[v${index + 1}out]"`,
-                `-x264-params "nal-hrd=cbr:force-cfr=1"`,
-                `-c:v:${index} ${level.codec}`,
-                `-b:v:${index} ${level.bitrate}`,
-                `-maxrate:v:${index} ${level.bitrate}`,
-                `-minrate:v:${index} ${level.bitrate}`,
-                `-bufsize:v:${index} ${level.bitrate}`,
-                `-preset ${level.preset}`,
-                `-g 48`,
-                `-sc_threshold 0`,
-                `-keyint_min 48`,
-            ]
+			cmdStr.push(...mapArgs)
+		}
 
-            cmdStr.push(...mapArgs)
-        }
+		// set output
+		cmdStr.push(`-f hls`)
+		cmdStr.push(`-hls_time 2`)
+		cmdStr.push(`-hls_playlist_type vod`)
+		cmdStr.push(`-hls_flags independent_segments`)
+		cmdStr.push(`-hls_segment_type mpegts`)
+		cmdStr.push(`-hls_segment_filename stream_%v/data%02d.ts`)
+		cmdStr.push(`-master_pl_name ${this.params.outputMasterName}`)
 
-        // set output
-        cmdStr.push(`-f hls`)
-        cmdStr.push(`-hls_time 2`)
-        cmdStr.push(`-hls_playlist_type vod`)
-        cmdStr.push(`-hls_flags independent_segments`)
-        cmdStr.push(`-hls_segment_type mpegts`)
-        cmdStr.push(`-hls_segment_filename stream_%v/data%02d.ts`)
-        cmdStr.push(`-master_pl_name ${this.outputMasterName}`)
+		cmdStr.push(`-var_stream_map`)
 
-        cmdStr.push(`-var_stream_map`)
+		let streamMapVar = []
 
-        let streamMapVar = []
+		for (const [index, level] of this.params.levels.entries()) {
+			streamMapVar.push(`v:${index}`)
+		}
 
-        for (const [index, level] of this.levels.entries()) {
-            streamMapVar.push(`v:${index}`)
-        }
+		cmdStr.push(`"${streamMapVar.join(" ")}"`)
+		cmdStr.push(`"stream_%v/stream.m3u8"`)
 
-        cmdStr.push(`"${streamMapVar.join(" ")}"`)
-        cmdStr.push(`"stream_%v/stream.m3u8"`)
+		return cmdStr.join(" ")
+	}
 
-        return cmdStr.join(" ")
-    }
+	run = async () => {
+		const cmdStr = this.buildArgs()
 
-    run = () => {
-        const cmdStr = this.buildCommand()
+		const outputPath =
+			this.params.outputDir ??
+			path.join(path.dirname(this.params.input), "hls")
+		const outputFile = path.join(outputPath, this.params.outputMasterName)
 
-        console.log(cmdStr)
+		this.emit("start", {
+			input: this.params.input,
+			output: outputPath,
+			params: this.params,
+		})
 
-        const cwd = `${path.dirname(this.input)}/hls`
+		if (!fs.existsSync(outputPath)) {
+			fs.mkdirSync(outputPath, { recursive: true })
+		}
 
-        if (!fs.existsSync(cwd)) {
-            fs.mkdirSync(cwd, { recursive: true })
-        }
+		const inputProbe = await Utils.probe(this.params.input)
 
-        console.log(`[HLS] Started multiquality transcode`, {
-            input: this.input,
-            cwd: cwd,
-        })
+		try {
+			const result = await this.ffmpeg({
+				args: cmdStr,
+				cwd: outputPath,
+				onProcess: (process) => {
+					this.handleProgress(
+						process.stdout,
+						parseFloat(inputProbe.format.duration),
+						(progress) => {
+							this.emit("progress", progress)
+						},
+					)
+				},
+			})
 
-        const process = exec(
-            cmdStr,
-            {
-                cwd: cwd,
-            },
-            (error, stdout, stderr) => {
-                if (error) {
-                    console.log(`[HLS] Failed to transcode >`, error)
+			this.emit("end", {
+				outputPath: outputPath,
+				outputFile: outputFile,
+			})
 
-                    return this.events.emit("error", error)
-                }
-
-                if (stderr) {
-                    //return this.events.emit("error", stderr)
-                }
-
-                console.log(`[HLS] Finished transcode >`, cwd)
-
-                return this.events.emit("end", {
-                    filepath: path.join(cwd, this.outputMasterName),
-                    isDirectory: true,
-                })
-            }
-        )
-
-        process.stdout.on("data", (data) => {
-            console.log(data.toString())
-        })
-    }
-
-    on = (key, cb) => {
-        this.events.on(key, cb)
-        return this
-    }
+			return result
+		} catch (err) {
+			return this.emit("error", err)
+		}
+	}
 }

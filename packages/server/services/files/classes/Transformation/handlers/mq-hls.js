@@ -27,12 +27,7 @@ export default async ({ filePath, workPath, onProgress }) => {
 			],
 		})
 
-		job.on("start", () => {
-			console.log("A-DASH started")
-		})
-
 		job.on("end", (data) => {
-			console.log("A-DASH completed", data)
 			resolve(data)
 		})
 
