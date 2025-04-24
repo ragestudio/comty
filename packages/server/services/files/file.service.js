@@ -1,22 +1,21 @@
 import { Server } from "linebridge"
 
-import B2 from "backblaze-b2"
-
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 import SSEManager from "@shared-classes/SSEManager"
-import SharedMiddlewares from "@shared-middlewares"
 import LimitsClass from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+
+import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "files"
 	static useEngine = "hyper-express-ng"
 	static routesPath = `${__dirname}/routes`
 	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3002
-	static enableWebsockets = true
+	//static enableWebsockets = true
 
 	middlewares = {
 		...SharedMiddlewares,

@@ -1,7 +1,7 @@
 import path from "node:path"
 import fs from "node:fs"
 
-import Upload from "@classes/Upload"
+import Upload from "@shared-classes/Upload"
 
 export default {
 	useContext: ["cache"],
