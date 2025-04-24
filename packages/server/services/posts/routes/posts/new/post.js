@@ -1,7 +1,7 @@
 import Posts from "@classes/posts"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res) => {
 		const result = await Posts.create(
 			{

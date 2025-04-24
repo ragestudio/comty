@@ -2,7 +2,7 @@ import { Post } from "@db_models"
 import stage from "@classes/posts/methods/stage"
 
 export default {
-	middlewares: ["withOptionalAuthentication"],
+	useMiddlewares: ["withOptionalAuthentication"],
 	fn: async (req) => {
 		const { limit, trim } = req.query
 
