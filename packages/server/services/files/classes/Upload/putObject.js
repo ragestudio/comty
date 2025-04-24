@@ -2,7 +2,7 @@ import fs from "node:fs"
 import path from "node:path"
 import pMap from "p-map"
 
-export default async function standardUpload({
+export default async function putObject({
 	filePath,
 	uploadPath,
 	metadata = {},
@@ -25,7 +25,7 @@ export default async function standardUpload({
 			}
 		})
 
-		await pMap(files, standardUpload, {
+		await pMap(files, putObject, {
 			concurrency: 3,
 		})
 

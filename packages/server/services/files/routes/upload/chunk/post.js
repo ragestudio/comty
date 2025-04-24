@@ -3,7 +3,7 @@ import fs from "node:fs"
 
 import { checkChunkUploadHeaders, handleChunkFile } from "@classes/ChunkFile"
 import Upload from "@classes/Upload"
-import bufferToStream from "@utils/bufferToStream"
+import bufferToStream from "@shared-utils/bufferToStream"
 
 const availableProviders = ["b2", "standard"]
 

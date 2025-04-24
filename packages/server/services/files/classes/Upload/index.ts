@@ -1,12 +1,11 @@
 import fs from "node:fs"
 import path from "node:path"
-
 import { fileTypeFromBuffer } from "file-type"
-import readChunk from "@utils/readChunk"
 
+import readChunk from "@shared-utils/readChunk"
 import getFileHash from "@shared-utils/readFileHash"
-import putObject from "./putObject"
 
+import putObject from "./putObject"
 import Transformation from "../Transformation"
 
 export type FileHandlePayload = {
