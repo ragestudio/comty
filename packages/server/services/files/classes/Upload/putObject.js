@@ -8,7 +8,14 @@ export default async function putObject({
 	metadata = {},
 	targetFilename,
 	onFinish,
+	provider = "standard",
 }) {
+	const providerClass = global.storages[provider]
+
+	if (!providerClass) {
+		throw new Error(`Provider [${provider}] not found`)
+	}
+
 	const isDirectory = await fs.promises
 		.lstat(filePath)
 		.then((stats) => stats.isDirectory())
@@ -31,13 +38,13 @@ export default async function putObject({
 
 		return {
 			id: uploadPath,
-			url: global.storage.composeRemoteURL(uploadPath, targetFilename),
+			url: providerClass.composeRemoteURL(uploadPath, targetFilename),
 			metadata: metadata,
 		}
 	}
 
 	// upload to storage
-	await global.storage.fPutObject(
+	await providerClass.fPutObject(
 		process.env.S3_BUCKET,
 		uploadPath,
 		filePath,
@@ -46,7 +53,7 @@ export default async function putObject({
 
 	const result = {
 		id: uploadPath,
-		url: global.storage.composeRemoteURL(uploadPath),
+		url: providerClass.composeRemoteURL(uploadPath),
 		metadata: metadata,
 	}
 

@@ -35,7 +35,7 @@ export default {
 				1024 *
 				1024,
 			useCompression: true,
-			useProvider: "standard",
+			useProvider: req.headers["use-provider"] ?? "standard",
 		}
 
 		// const user = await req.auth.user()
@@ -85,6 +85,7 @@ export default {
 					filePath: assemble.filePath,
 					workPath: workPath,
 					transformations: transformations,
+					s3Provider: config.useProvider,
 				}
 
 				// if has transformations, use background job

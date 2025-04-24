@@ -23,6 +23,7 @@ export type S3UploadPayload = {
 	filePath: string
 	basePath: string
 	targetPath?: string
+	s3Provider?: string
 	onProgress?: Function
 }
 
@@ -38,8 +39,9 @@ export default class Upload {
 		const result = await Upload.toS3({
 			filePath: payload.filePath,
 			targetPath: payload.targetPath,
-			basePath: `${payload.user_id}/${global.nanoid()}`,
+			basePath: payload.user_id,
 			onProgress: payload.onProgress,
+			s3Provider: payload.s3Provider,
 		})
 
 		// delete workpath
@@ -76,20 +78,21 @@ export default class Upload {
 	}
 
 	static toS3 = async (payload: S3UploadPayload) => {
-		const { filePath, basePath, targetPath, onProgress } = payload
+		const { filePath, basePath, targetPath, s3Provider, onProgress } =
+			payload
 
 		// if targetPath is provided, means its a directory
-		const isDirectory = targetPath !== undefined
-
-		let uploadPath = path.resolve(basePath, path.basename(filePath))
-
-		if (isDirectory) {
-			uploadPath = basePath
-		}
+		const isDirectory = !!targetPath
 
 		const metadata = await this.buildFileMetadata(
 			isDirectory ? targetPath : filePath,
 		)
+
+		let uploadPath = path.join(basePath, metadata["File-Hash"])
+
+		if (isDirectory) {
+			uploadPath = path.join(basePath, nanoid())
+		}
 
 		if (typeof onProgress === "function") {
 			onProgress({
@@ -98,19 +101,21 @@ export default class Upload {
 			})
 		}
 
-		console.log("Uploading to S3:", {
-			filePath,
-			uploadPath,
-			basePath,
-			targetPath,
-			metadata,
-		})
+		// console.log("Uploading to S3:", {
+		// 	filePath: filePath,
+		// 	basePath: basePath,
+		// 	uploadPath: uploadPath,
+		// 	targetPath: targetPath,
+		// 	metadata: metadata,
+		// 	s3Provider: s3Provider,
+		// })
 
 		const result = await putObject({
 			filePath: filePath,
 			uploadPath: uploadPath,
 			metadata: metadata,
 			targetFilename: isDirectory ? path.basename(targetPath) : null,
+			provider: s3Provider,
 		})
 
 		return result

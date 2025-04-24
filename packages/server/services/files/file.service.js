@@ -25,13 +25,13 @@ class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		cache: new CacheService(),
-		storage: StorageClient(),
-		b2Storage: null,
 		SSEManager: new SSEManager(),
 		redis: RedisClient({
 			maxRetriesPerRequest: null,
 		}),
 		limits: {},
+		storage: StorageClient(),
+		b2Storage: null,
 	}
 
 	queuesManager = new TaskQueueManager(
@@ -45,14 +45,18 @@ class API extends Server {
 		global.sse = this.contexts.SSEManager
 
 		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
-			this.contexts.b2Storage = new B2({
-				applicationKeyId: process.env.B2_KEY_ID,
-				applicationKey: process.env.B2_APP_KEY,
+			this.contexts.b2Storage = StorageClient({
+				endPoint: process.env.B2_ENDPOINT,
+				cdnUrl: process.env.B2_CDN_ENDPOINT,
+				defaultBucket: process.env.B2_BUCKET,
+				accessKey: process.env.B2_KEY_ID,
+				secretKey: process.env.B2_APP_KEY,
+				port: 443,
+				useSSL: true,
+				setupBucket: false,
 			})
 
-			global.b2Storage = this.contexts.b2Storage
-
-			await this.contexts.b2Storage.authorize()
+			await this.contexts.b2Storage.initialize()
 		} else {
 			console.warn(
 				"B2 storage not configured on environment, skipping...",
@@ -66,7 +70,10 @@ class API extends Server {
 		await this.contexts.db.initialize()
 		await this.contexts.storage.initialize()
 
-		global.storage = this.contexts.storage
+		global.storages = {
+			standard: this.contexts.storage,
+			b2: this.contexts.b2Storage,
+		}
 		global.queues = this.queuesManager
 
 		this.contexts.limits = await LimitsClass.get()
