@@ -56,10 +56,6 @@ export default class TaskQueueManager {
 	registerQueueEvents = (worker) => {
 		worker.on("progress", (job, progress) => {
 			try {
-				console.log(
-					`Job ${job.id} reported progress: ${progress.percent}%`,
-				)
-
 				if (job.data.sseChannelId) {
 					global.sse.sendToChannel(job.data.sseChannelId, progress)
 				}
