@@ -1,0 +1,72 @@
+.live-tab-layout {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 20px;
+
+	.live-tab-grid {
+		display: grid;
+		gap: 20px;
+
+		grid-template-columns: 1fr;
+
+		@media (min-width: 769px) {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	.status-indicator__message {
+		font-size: 0.7rem;
+	}
+
+	.live-tab-preview {
+		display: flex;
+
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		min-height: 200px;
+
+		background-color: var(--background-color-primary);
+
+		border: 1px solid var(--border-color, #e8e8e8);
+		border-radius: 4px;
+
+		font-size: 1rem;
+	}
+
+	.live-tab-stats {
+		display: grid;
+		gap: 16px;
+
+		grid-template-columns: repeat(2, 1fr);
+
+		@media (min-width: 769px) {
+			grid-template-columns: repeat(4, 1fr);
+		}
+
+		.ant-statistic {
+			font-size: 1.2rem;
+
+			.ant-statistic-title {
+				font-size: 0.8rem;
+				margin: 0;
+			}
+
+			.ant-statistic-content {
+				height: fit-content;
+			}
+			.ant-statistic-content-value {
+				font-size: 1.2rem;
+				font-family: "DM Mono", monospace;
+				height: fit-content;
+			}
+		}
+	}
+
+	.live-tab-chart {
+		width: 100%;
+	}
+}

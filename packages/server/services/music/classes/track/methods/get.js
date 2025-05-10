@@ -1,4 +1,5 @@
-import { Track, TrackLike } from "@db_models"
+import { Track } from "@db_models"
+import Library from "@classes/library"
 
 async function fullfillData(list, { user_id = null }) {
 	if (!Array.isArray(list)) {
@@ -11,19 +12,20 @@ async function fullfillData(list, { user_id = null }) {
 
 	// if user_id is provided, fetch likes
 	if (user_id) {
-		const tracksLikes = await TrackLike.find({
-			user_id: user_id,
-			track_id: { $in: trackIds },
-		})
+		const tracksLikes = await Library.isFavorite(
+			user_id,
+			trackIds,
+			"tracks",
+		)
 
 		list = list.map(async (track) => {
 			const trackLike = tracksLikes.find((trackLike) => {
-				return trackLike.track_id.toString() === track._id.toString()
+				return trackLike.item_id.toString() === track._id.toString()
 			})
 
 			if (trackLike) {
 				track.liked_at = trackLike.created_at
-				track.liked = true
+				track.liked = trackLike.liked
 			}
 
 			return track

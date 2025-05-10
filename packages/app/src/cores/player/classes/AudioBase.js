@@ -1,4 +1,4 @@
-import { MediaPlayer } from "dashjs"
+import { MediaPlayer, Debug } from "dashjs"
 import PlayerProcessors from "./PlayerProcessors"
 import AudioPlayerStorage from "../player.storage"
 
@@ -29,6 +29,7 @@ export default class AudioBase {
 		// configure some settings for audio
 		this.audio.crossOrigin = "anonymous"
 		this.audio.preload = "metadata"
+		this.audio.loop = this.player.state.playback_mode === "repeat"
 
 		// listen all events
 		for (const [key, value] of Object.entries(this.audioEvents)) {
@@ -55,6 +56,9 @@ export default class AudioBase {
 					resetSourceBuffersForTrackSwitch: true,
 				},
 			},
+			// debug: {
+			// 	logLevel: Debug.LOG_LEVEL_DEBUG,
+			// },
 		})
 
 		this.demuxer.initialize(this.audio, null, false)
@@ -65,7 +69,10 @@ export default class AudioBase {
 		this.audio.src = null
 		this.audio.currentTime = 0
 
-		this.demuxer.destroy()
+		if (this.demuxer) {
+			this.demuxer.destroy()
+		}
+
 		this.createDemuxer()
 	}
 

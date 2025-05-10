@@ -97,18 +97,6 @@ export default class TrackManifest {
 	}
 
 	serviceOperations = {
-		fetchLikeStatus: async () => {
-			if (!this._id) {
-				return null
-			}
-
-			return await this.ctx.serviceProviders.operation(
-				"isItemFavourited",
-				this.service,
-				this,
-				"track",
-			)
-		},
 		fetchLyrics: async () => {
 			if (!this._id) {
 				return null
@@ -140,17 +128,29 @@ export default class TrackManifest {
 				this,
 			)
 		},
-		toggleItemFavourite: async (to) => {
+		toggleItemFavorite: async (to) => {
 			if (!this._id) {
 				return null
 			}
 
 			return await this.ctx.serviceProviders.operation(
-				"toggleItemFavourite",
+				"toggleItemFavorite",
 				this.service,
 				this,
-				"track",
+				"tracks",
 				to,
+			)
+		},
+		isItemFavorited: async () => {
+			if (!this._id) {
+				return null
+			}
+
+			return await this.ctx.serviceProviders.operation(
+				"isItemFavorited",
+				this.service,
+				this,
+				"tracks",
 			)
 		},
 	}

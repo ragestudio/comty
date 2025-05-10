@@ -1,329 +1,298 @@
 .lyrics {
-    position: relative;
+	position: relative;
 
-    z-index: 100;
+	z-index: 100;
 
-    width: 100vw;
-    height: 100vh;
+	width: 100vw;
+	height: 100vh;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    &.stopped {
-        .lyrics-video {
-            filter: blur(6px);
-        }
-    }
+	&.stopped {
+		.lyrics-video {
+			filter: blur(6px);
+		}
+	}
 
-    .lyrics-background-color {
-        position: absolute;
+	.lyrics-background-color {
+		position: absolute;
 
-        z-index: 100;
+		z-index: 100;
 
-        width: 100%;
-        height: 100%;
+		width: 100%;
+		height: 100%;
 
-        background:
-            linear-gradient(0deg, rgba(var(--dominant-color), 1), rgba(0, 0, 0, 0)),
-            url("data:image/svg+xml,%3Csvg viewBox='0 0 284 284' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='7.59' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
+		background:
+			linear-gradient(0deg, rgb(var(--dominant-color)), rgba(0, 0, 0, 0)),
+			url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0' numOctaves='10' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+	}
 
-    .lyrics-background-wrapper {
-        z-index: 110;
-        position: absolute;
+	.lyrics-background-wrapper {
+		z-index: 110;
+		position: absolute;
 
-        top: 0;
-        left: 0;
+		top: 0;
+		left: 0;
 
-        width: 100vw;
-        height: 100vh;
+		width: 100vw;
+		height: 100vh;
 
-        backdrop-filter: blur(10px);
+		backdrop-filter: blur(10px);
 
-        .lyrics-background-cover {
-            position: relative;
+		.lyrics-background-cover {
+			position: relative;
 
-            z-index: 110;
+			z-index: 110;
 
-            display: flex;
-            flex-direction: column;
+			display: flex;
+			flex-direction: column;
 
-            align-items: center;
-            justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-            width: 100%;
-            height: 100%;
+			width: 100%;
+			height: 100%;
 
-            img {
-                width: 40vw;
-                height: 40vw;
+			img {
+				width: 40vw;
+				height: 40vw;
 
-                object-fit: cover;
+				object-fit: cover;
 
-                border-radius: 24px;
-            }
-        }
-    }
+				border-radius: 24px;
+			}
+		}
+	}
 
-    .lyrics-video {
-        z-index: 120;
-        position: absolute;
+	.lyrics-video {
+		z-index: 120;
+		position: absolute;
 
-        top: 0;
-        left: 0;
+		top: 0;
+		left: 0;
 
-        width: 100vw;
-        height: 100vh;
+		width: 100vw;
+		height: 100vh;
 
-        object-fit: cover;
+		object-fit: cover;
 
-        transition: all 150ms ease-out;
+		transition: all 150ms ease-out;
 
-        &.hidden {
-            opacity: 0;
-        }
-    }
+		&.hidden {
+			opacity: 0;
+		}
+	}
 
-    .lyrics-text-wrapper {
-        z-index: 200;
-        position: fixed;
+	.lyrics-text-wrapper {
+		z-index: 200;
+		position: fixed;
 
-        bottom: 0;
-        left: 0;
+		bottom: 0;
+		left: 0;
 
-        padding: 60px;
+		padding: 60px;
 
-        .lyrics-text {
-            display: flex;
-            flex-direction: column;
+		.lyrics-text {
+			display: flex;
+			flex-direction: column;
 
-            width: 600px;
-            height: 200px;
+			width: 600px;
+			height: 200px;
 
-            padding: 20px;
-            gap: 30px;
+			padding: 20px;
+			gap: 30px;
 
-            overflow: hidden;
+			overflow: hidden;
 
-            background-color: rgba(var(--background-color-accent-values), 0.6);
-            border-radius: 12px;
+			background-color: rgba(var(--background-color-accent-values), 0.6);
+			border-radius: 12px;
 
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+			backdrop-filter: blur(5px);
+			-webkit-backdrop-filter: blur(5px);
 
-            .line {
-                font-size: 2rem;
+			.line {
+				font-size: 2rem;
 
-                opacity: 0.1;
+				opacity: 0.1;
 
-                margin: 0;
+				margin: 0;
 
-                &.current {
-                    opacity: 1;
-                }
-            }
-        }
-    }
+				&.current {
+					opacity: 1;
+				}
+			}
+		}
+	}
 
-    .lyrics-player-controller-wrapper {
-        position: fixed;
-        z-index: 210;
+	.lyrics-player-controller-wrapper {
+		position: fixed;
+		z-index: 210;
 
-        bottom: 0;
-        right: 0;
+		bottom: 0;
+		right: 0;
 
-        padding: 60px;
+		padding: 60px;
 
-        transition: all 150ms ease-in-out;
+		transition: all 150ms ease-in-out;
 
-        &.hidden {
-            opacity: 0;
-        }
+		&.hidden {
+			opacity: 0;
+		}
 
-        .lyrics-player-controller {
-            position: relative;
+		.lyrics-player-controller {
+			position: relative;
 
-            display: flex;
-            flex-direction: column;
+			display: flex;
+			flex-direction: column;
 
-            align-items: center;
+			align-items: center;
 
-            gap: 10px;
+			gap: 10px;
 
-            width: 300px;
+			width: 300px;
 
-            padding: 30px;
+			padding: 20px;
 
-            border-radius: 12px;
+			border-radius: 12px;
 
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+			backdrop-filter: blur(5px);
+			-webkit-backdrop-filter: blur(5px);
 
-            background-color: rgba(var(--background-color-accent-values), 0.8);
+			background-color: rgba(var(--background-color-accent-values), 0.8);
 
-            transition: all 150ms ease-in-out;
+			transition: all 150ms ease-in-out;
 
-            &:hover {
-                gap: 20px;
+			&:hover {
+				gap: 20px;
 
-                .player-controls {
-                    opacity: 1;
-                    height: 30px;
-                }
+				.player-controls {
+					opacity: 1;
+					height: 30px;
+				}
 
-                .lyrics-player-controller-tags {
-                    opacity: 1;
-                    height: 10px;
-                }
-            }
+				.lyrics-player-controller-tags {
+					opacity: 1;
+					height: 10px;
+				}
+			}
 
-            .lyrics-player-controller-info {
-                display: flex;
-                flex-direction: column;
+			.lyrics-player-controller-info {
+				display: flex;
+				flex-direction: column;
 
-                width: 100%;
+				width: 100%;
 
-                gap: 10px;
+				gap: 5px;
 
-                transition: all 150ms ease-in-out;
+				transition: all 150ms ease-in-out;
 
-                .lyrics-player-controller-info-title {
-                    font-size: 1.5rem;
-                    font-weight: 600;
+				.lyrics-player-controller-info-title {
+					font-size: 1.4rem;
+					font-weight: 600;
 
-                    width: 100%;
+					width: 100%;
 
-                    color: var(--background-color-contrast);
+					color: var(--background-color-contrast);
 
-                    h4 {
-                        margin: 0;
-                    }
+					h4 {
+						margin: 0;
+					}
 
-                    .lyrics-player-controller-title-text {
-                        transition: all 150ms ease-in-out;
+					.lyrics-player-controller-title-text {
+						transition: all 150ms ease-in-out;
 
-                        width: 90%;
+						width: 90%;
 
-                        overflow: hidden;
+						overflow: hidden;
 
-                        // do not wrap text
-                        white-space: nowrap;
+						// do not wrap text
+						white-space: nowrap;
 
-                        &.overflown {
-                            opacity: 0;
-                            height: 0px;
-                        }
-                    }
-                }
+						&.overflown {
+							opacity: 0;
+							height: 0px;
+						}
+					}
+				}
 
-                .lyrics-player-controller-info-details {
-                    display: flex;
-                    flex-direction: row;
+				.lyrics-player-controller-info-details {
+					display: flex;
+					flex-direction: row;
 
-                    align-items: center;
+					align-items: center;
 
-                    gap: 7px;
+					gap: 7px;
 
-                    font-size: 0.6rem;
+					font-size: 0.7rem;
 
-                    font-weight: 400;
+					font-weight: 400;
 
-                    // do not wrap text
-                    white-space: nowrap;
+					// do not wrap text
+					white-space: nowrap;
 
-                    h3 {
-                        margin: 0;
-                    }
-                }
-            }
+					h3 {
+						margin: 0;
+					}
+				}
+			}
 
-            .player-controls {
-                opacity: 0;
-                height: 0px;
-                transition: all 150ms ease-in-out;
-            }
+			.player-controls {
+				opacity: 0;
+				height: 0px;
+				transition: all 150ms ease-in-out;
+			}
 
-            .lyrics-player-controller-progress-wrapper {
-                width: 100%;
+			.lyrics-player-controller-tags {
+				display: flex;
+				flex-direction: row;
 
-                .lyrics-player-controller-progress {
-                    display: flex;
-                    flex-direction: row;
+				align-items: center;
 
-                    align-items: center;
+				justify-content: center;
 
-                    width: 100%;
+				width: 100%;
+				height: 0px;
 
-                    margin: auto;
+				gap: 10px;
 
-                    transition: all 150ms ease-in-out;
+				opacity: 0;
 
-                    border-radius: 12px;
+				transition: all 150ms ease-in-out;
+			}
+		}
+	}
 
-                    background-color: rgba(var(--background-color-accent-values), 0.8);
+	.videoDebugOverlay {
+		position: fixed;
 
-                    &:hover {
-                        .lyrics-player-controller-progress-bar {
-                            height: 10px;
-                        }
-                    }
+		top: 20px;
+		right: 20px;
 
-                    .lyrics-player-controller-progress-bar {
-                        height: 5px;
+		z-index: 300;
 
-                        background-color: white;
+		display: flex;
 
-                        border-radius: 12px;
+		flex-direction: column;
 
-                        transition: all 150ms ease-in-out;
-                    }
-                }
-            }
+		padding: 10px;
+		border-radius: 12px;
 
-            .lyrics-player-controller-tags {
-                display: flex;
-                flex-direction: row;
+		background-color: rgba(var(--background-color-accent-values), 0.8);
 
-                align-items: center;
+		width: 200px;
+		height: fit-content;
 
-                justify-content: center;
+		transition: all 150ms ease-in-out;
 
-                width: 100%;
-                height: 0px;
+		&.hidden {
+			opacity: 0;
+		}
+	}
+}
 
-                gap: 10px;
-
-                opacity: 0;
-
-                transition: all 150ms ease-in-out;
-            }
-        }
-    }
-
-    .videoDebugOverlay {
-        position: fixed;
-
-        top: 20px;
-        right: 20px;
-
-        z-index: 300;
-
-        display: flex;
-
-        flex-direction: column;
-
-        padding: 10px;
-        border-radius: 12px;
-
-        background-color: rgba(var(--background-color-accent-values), 0.8);
-
-        width: 200px;
-        height: fit-content;
-
-        transition: all 150ms ease-in-out;
-
-        &.hidden {
-            opacity: 0;
-        }
-    }
+.lyrics-text .line .word.current-word {
+	/* Styling for the currently active word */
+	font-weight: bold;
+	color: yellow; /* Example highlight */
 }

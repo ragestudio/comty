@@ -35,6 +35,13 @@ export default class Release {
 			onlyList: true,
 		})
 
+		release.total_duration = tracks.reduce((acc, track) => {
+			if (track.metadata?.duration) {
+				return acc + parseFloat(track.metadata.duration)
+			}
+
+			return acc
+		}, 0)
 		release.total_items = totalTracks
 		release.items = tracks
 
@@ -123,7 +130,7 @@ export default class Release {
 
 		const items = release.items ?? release.list
 
-		const items_ids = items.map((item) => item._id)
+		const items_ids = items.map((item) => item._id.toString())
 
 		// delete all releated tracks
 		await Track.deleteMany({

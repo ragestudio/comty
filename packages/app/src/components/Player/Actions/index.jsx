@@ -27,8 +27,8 @@ const ExtraActions = (props) => {
 			return false
 		}
 
-		await trackInstance.manifest.serviceOperations.toggleItemFavourite(
-			"track",
+		await trackInstance.manifest.serviceOperations.toggleItemFavorite(
+			"tracks",
 			trackInstance.manifest._id,
 		)
 	}
@@ -47,7 +47,7 @@ const ExtraActions = (props) => {
 				<LikeButton
 					liked={
 						trackInstance?.manifest?.serviceOperations
-							?.fetchLikeStatus
+							?.isItemFavorited
 					}
 					onClick={handleClickLike}
 					disabled={!trackInstance?.manifest?._id}

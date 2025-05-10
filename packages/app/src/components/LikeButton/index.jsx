@@ -3,22 +3,11 @@ import classnames from "classnames"
 
 import "./index.less"
 
-export default (props) => {
+const LikeButton = (props) => {
 	const [liked, setLiked] = React.useState(
 		typeof props.liked === "function" ? false : props.liked,
 	)
 	const [clicked, setClicked] = React.useState(false)
-
-	// TODO: Support handle like change on websocket event
-	if (typeof props.watchWs === "object") {
-		// useWsEvents({
-		//     [props.watchWs.event]: (data) => {
-		//         handleUpdateTrackLike(data.track_id, data.action === "liked")
-		//     }
-		// }, {
-		//     socketName: props.watchWs.socket,
-		// })
-	}
 
 	async function computeLikedState() {
 		if (props.disabled) {
@@ -48,7 +37,7 @@ export default (props) => {
 		}, 500)
 
 		if (typeof props.onClick === "function") {
-			props.onClick()
+			props.onClick(!liked)
 		}
 
 		setLiked(!liked)
@@ -74,3 +63,5 @@ export default (props) => {
 		</button>
 	)
 }
+
+export default LikeButton

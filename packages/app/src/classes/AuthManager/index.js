@@ -17,23 +17,28 @@ export default class AuthManager {
 		}
 	}
 
+	state = {
+		user: null,
+	}
+
 	public = {
 		login: () => {
 			app.layout.draggable.open("login", Login, {
-				props: {
-					onDone: () => {
-						app.layout.draggable.destroy("login")
-						this._emitBehavior("onLogin")
-					},
+				componentProps: {
+					onDone: this.onLoginCallback,
 				},
 			})
 		},
-		logout: () => {
+		logout: (bypass) => {
+			if (bypass === true) {
+				AuthModel.logout()
+				return this._emitBehavior("onLogout")
+			}
+
 			app.layout.modal.confirm({
 				headerText: "Logout",
 				descriptionText: "Are you sure you want to logout?",
 				onConfirm: () => {
-					console.log("Logout confirmed")
 					AuthModel.logout()
 					this._emitBehavior("onLogout")
 				},
@@ -63,10 +68,6 @@ export default class AuthManager {
 		onDisabledAccount: async () => {
 			await SessionModel.removeToken()
 		},
-	}
-
-	state = {
-		user: null,
 	}
 
 	initialize = async () => {
@@ -103,4 +104,6 @@ export default class AuthManager {
 			await this.behaviors[behavior](...args)
 		}
 	}
+
+	//onLoginCallback = async (state, result) => {}
 }

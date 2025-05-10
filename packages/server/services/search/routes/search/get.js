@@ -56,6 +56,17 @@ export default {
 
 				const totalItems = await collection.model.countDocuments(query)
 
+				if (typeof collection.aggregation === "function") {
+					const aggregation = await collection.model.aggregate(
+						collection.aggregation(keywords),
+					)
+
+					results[collection.key].items = aggregation
+					results[collection.key].total_items = aggregation.length
+
+					return aggregation
+				}
+
 				let result = await collection.model
 					.find(query)
 					.limit(limit)

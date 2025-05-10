@@ -1,179 +1,233 @@
 import React from "react"
 import HLS from "hls.js"
-
 import classnames from "classnames"
+
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 const maxLatencyInMs = 55
 
 const LyricsVideo = React.forwardRef((props, videoRef) => {
 	const [playerState] = usePlayerStateContext()
-
 	const { lyrics } = props
 
 	const [initialLoading, setInitialLoading] = React.useState(true)
-	const [syncInterval, setSyncInterval] = React.useState(null)
 	const [syncingVideo, setSyncingVideo] = React.useState(false)
 	const [currentVideoLatency, setCurrentVideoLatency] = React.useState(0)
+	const isDebugEnabled = React.useMemo(
+		() => app.cores.settings.is("_debug", true),
+		[],
+	)
+
 	const hls = React.useRef(new HLS())
+	const syncIntervalRef = React.useRef(null)
 
-	async function seekVideoToSyncAudio() {
-		if (!lyrics) {
-			return null
+	const stopSyncInterval = React.useCallback(() => {
+		setSyncingVideo(false)
+		if (syncIntervalRef.current) {
+			clearInterval(syncIntervalRef.current)
+			syncIntervalRef.current = null
 		}
+	}, [setSyncingVideo])
 
+	const seekVideoToSyncAudio = React.useCallback(async () => {
 		if (
+			!lyrics ||
 			!lyrics.video_source ||
-			typeof lyrics.sync_audio_at_ms === "undefined"
+			typeof lyrics.sync_audio_at_ms === "undefined" ||
+			!videoRef.current
 		) {
 			return null
 		}
 
-		const currentTrackTime = app.cores.player.controls.seek()
-
+		const currentTrackTime = window.app.cores.player.controls.seek()
 		setSyncingVideo(true)
 
 		let newTime =
 			currentTrackTime + lyrics.sync_audio_at_ms / 1000 + 150 / 1000
-
-		// dec some ms to ensure the video seeks correctly
 		newTime -= 5 / 1000
 
 		videoRef.current.currentTime = newTime
-	}
+	}, [lyrics, videoRef, setSyncingVideo])
 
-	async function syncPlayback() {
-		// if something is wrong, stop syncing
-		if (
-			videoRef.current === null ||
-			!lyrics ||
-			!lyrics.video_source ||
-			typeof lyrics.sync_audio_at_ms === "undefined" ||
-			playerState.playback_status !== "playing"
-		) {
-			return stopSyncInterval()
+	const syncPlayback = React.useCallback(
+		async (override = false) => {
+			if (
+				!videoRef.current ||
+				!lyrics ||
+				!lyrics.video_source ||
+				typeof lyrics.sync_audio_at_ms === "undefined"
+			) {
+				stopSyncInterval()
+				return
+			}
+
+			if (playerState.playback_status !== "playing" && !override) {
+				stopSyncInterval()
+				return
+			}
+
+			const currentTrackTime = window.app.cores.player.controls.seek()
+			const currentVideoTime =
+				videoRef.current.currentTime - lyrics.sync_audio_at_ms / 1000
+			const maxOffset = maxLatencyInMs / 1000
+			const currentVideoTimeDiff = Math.abs(
+				currentVideoTime - currentTrackTime,
+			)
+
+			setCurrentVideoLatency(currentVideoTimeDiff)
+
+			if (syncingVideo === true) {
+				return
+			}
+
+			if (currentVideoTimeDiff > maxOffset) {
+				seekVideoToSyncAudio()
+			}
+		},
+		[
+			videoRef,
+			lyrics,
+			playerState.playback_status,
+			setCurrentVideoLatency,
+			syncingVideo,
+			seekVideoToSyncAudio,
+			stopSyncInterval,
+		],
+	)
+
+	const startSyncInterval = React.useCallback(() => {
+		if (syncIntervalRef.current) {
+			clearInterval(syncIntervalRef.current)
 		}
+		syncIntervalRef.current = setInterval(syncPlayback, 300)
+	}, [syncPlayback])
 
-		const currentTrackTime = app.cores.player.controls.seek()
-		const currentVideoTime =
-			videoRef.current.currentTime - lyrics.sync_audio_at_ms / 1000
-
-		//console.log(`Current track time: ${currentTrackTime}, current video time: ${currentVideoTime}`)
-
-		const maxOffset = maxLatencyInMs / 1000
-		const currentVideoTimeDiff = Math.abs(
-			currentVideoTime - currentTrackTime,
-		)
-
-		setCurrentVideoLatency(currentVideoTimeDiff)
-
-		if (syncingVideo === true) {
-			return false
-		}
-
-		if (currentVideoTimeDiff > maxOffset) {
-			seekVideoToSyncAudio()
-		}
-	}
-
-	function startSyncInterval() {
-		setSyncInterval(setInterval(syncPlayback, 300))
-	}
-
-	function stopSyncInterval() {
-		setSyncingVideo(false)
-		setSyncInterval(null)
-		clearInterval(syncInterval)
-	}
-
-	//* handle when player is loading
 	React.useEffect(() => {
+		setCurrentVideoLatency(0)
+		const videoElement = videoRef.current
+		if (!videoElement) return
+
+		if (lyrics && lyrics.video_source) {
+			console.log("VIDEO:: Loading video source >", lyrics.video_source)
+
+			if (
+				hls.current.media === videoElement &&
+				(lyrics.video_source.endsWith(".mp4") || !lyrics.video_source)
+			) {
+				hls.current.stopLoad()
+			}
+
+			if (lyrics.video_source.endsWith(".mp4")) {
+				if (hls.current.media === videoElement) {
+					hls.current.detachMedia()
+				}
+				videoElement.src = lyrics.video_source
+			} else {
+				if (HLS.isSupported()) {
+					if (hls.current.media !== videoElement) {
+						hls.current.attachMedia(videoElement)
+					}
+					hls.current.loadSource(lyrics.video_source)
+				} else if (
+					videoElement.canPlayType("application/vnd.apple.mpegurl")
+				) {
+					videoElement.src = lyrics.video_source
+				}
+			}
+
+			if (typeof lyrics.sync_audio_at_ms !== "undefined") {
+				videoElement.loop = false
+				syncPlayback(true)
+			} else {
+				videoElement.loop = true
+				videoElement.currentTime = 0
+			}
+		} else {
+			videoElement.src = ""
+			if (hls.current) {
+				hls.current.stopLoad()
+				if (hls.current.media) {
+					hls.current.detachMedia()
+				}
+			}
+		}
+		setInitialLoading(false)
+	}, [lyrics, videoRef, hls, setCurrentVideoLatency, setInitialLoading])
+
+	React.useEffect(() => {
+		stopSyncInterval()
+
+		if (initialLoading || !videoRef.current) {
+			return
+		}
+
+		const videoElement = videoRef.current
+		const canPlayVideo = lyrics && lyrics.video_source
+
+		if (!canPlayVideo) {
+			videoElement.pause()
+			return
+		}
+
 		if (
-			lyrics?.video_source &&
 			playerState.loading === true &&
 			playerState.playback_status === "playing"
 		) {
-			videoRef.current.pause()
+			videoElement.pause()
+			return
 		}
 
-		if (
-			lyrics?.video_source &&
-			playerState.loading === false &&
-			playerState.playback_status === "playing"
-		) {
-			videoRef.current.play()
-		}
-	}, [playerState.loading])
+		const shouldSync = typeof lyrics.sync_audio_at_ms !== "undefined"
 
-	//* Handle when playback status change
-	React.useEffect(() => {
-		if (initialLoading === false) {
-			console.log(
-				`VIDEO:: Playback status changed to ${playerState.playback_status}`,
-			)
-
-			if (lyrics && lyrics.video_source) {
-				if (playerState.playback_status === "playing") {
-					videoRef.current.play()
-					startSyncInterval()
-				} else {
-					videoRef.current.pause()
-					stopSyncInterval()
-				}
+		if (playerState.playback_status === "playing") {
+			videoElement
+				.play()
+				.catch((error) =>
+					console.error("VIDEO:: Error playing video:", error),
+				)
+			if (shouldSync) {
+				startSyncInterval()
 			}
+		} else {
+			videoElement.pause()
 		}
-	}, [playerState.playback_status])
-
-	//* Handle when lyrics object change
-	React.useEffect(() => {
-		setCurrentVideoLatency(0)
-		stopSyncInterval()
-
-		if (lyrics) {
-			if (lyrics.video_source) {
-				console.log("Loading video source >", lyrics.video_source)
-
-				if (lyrics.video_source.endsWith(".mp4")) {
-					videoRef.current.src = lyrics.video_source
-				} else {
-					hls.current.loadSource(lyrics.video_source)
-				}
-
-				if (typeof lyrics.sync_audio_at_ms !== "undefined") {
-					videoRef.current.loop = false
-					videoRef.current.currentTime =
-						lyrics.sync_audio_at_ms / 1000
-
-					startSyncInterval()
-				} else {
-					videoRef.current.loop = true
-					videoRef.current.currentTime = 0
-				}
-
-				if (playerState.playback_status === "playing") {
-					videoRef.current.play()
-				}
-			}
-		}
-
-		setInitialLoading(false)
-	}, [lyrics])
+	}, [
+		lyrics,
+		playerState.playback_status,
+		playerState.loading,
+		initialLoading,
+		videoRef,
+		startSyncInterval,
+		stopSyncInterval,
+	])
 
 	React.useEffect(() => {
-		videoRef.current.addEventListener("seeked", (event) => {
+		const videoElement = videoRef.current
+		const hlsInstance = hls.current
+
+		const handleSeeked = () => {
 			setSyncingVideo(false)
-		})
+		}
 
-		hls.current.attachMedia(videoRef.current)
+		if (videoElement) {
+			videoElement.addEventListener("seeked", handleSeeked)
+		}
 
 		return () => {
 			stopSyncInterval()
+
+			if (videoElement) {
+				videoElement.removeEventListener("seeked", handleSeeked)
+			}
+			if (hlsInstance) {
+				hlsInstance.destroy()
+			}
 		}
-	}, [])
+	}, [videoRef, hls, stopSyncInterval, setSyncingVideo])
 
 	return (
 		<>
-			{props.lyrics?.sync_audio_at && (
+			{isDebugEnabled && (
 				<div className={classnames("videoDebugOverlay")}>
 					<div>
 						<p>Maximun latency</p>
@@ -195,6 +249,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 				controls={false}
 				muted
 				preload="auto"
+				playsInline
 			/>
 		</>
 	)

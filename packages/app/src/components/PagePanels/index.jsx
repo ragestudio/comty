@@ -13,7 +13,6 @@ export class Tab extends React.Component {
 		error: null,
 	}
 
-	// handle on error
 	componentDidCatch(err) {
 		this.setState({ error: err })
 	}
@@ -28,7 +27,6 @@ export class Tab extends React.Component {
 				/>
 			)
 		}
-
 		return <>{this.props.children}</>
 	}
 }
@@ -49,7 +47,7 @@ export class PagePanelWithNavMenu extends React.Component {
 		activeTab:
 			new URLSearchParams(window.location.search).get("type") ??
 			this.props.defaultTab ??
-			this.props.tabs[0].key,
+			this.props.tabs[0]?.key,
 		renders: [],
 	}
 
@@ -57,30 +55,72 @@ export class PagePanelWithNavMenu extends React.Component {
 
 	interface = {
 		attachComponent: (id, component, options) => {
-			const renders = this.state.renders
-
-			renders.push({
-				id: id,
-				component: component,
-				options: options,
-				ref: React.createRef(),
-			})
-
-			this.setState({
-				renders: renders,
-			})
+			this.setState((prevState) => ({
+				renders: [
+					...prevState.renders,
+					{
+						id: id,
+						component: component,
+						options: options,
+						ref: React.createRef(),
+					},
+				],
+			}))
 		},
 		detachComponent: (id) => {
-			const renders = this.state.renders
-
-			const index = renders.findIndex((render) => render.id === id)
-
-			renders.splice(index, 1)
-
-			this.setState({
-				renders: renders,
-			})
+			this.setState((prevState) => ({
+				renders: prevState.renders.filter((render) => render.id !== id),
+			}))
 		},
+	}
+
+	updateLayoutHeaderAndTopBar = () => {
+		const navMenuItems = this.getItems([
+			...(this.props.tabs ?? []),
+			...(this.props.extraItems ?? []),
+		])
+
+		const mobileNavMenuItems = this.getItems(this.props.tabs ?? [])
+
+		if (app.isMobile) {
+			if (mobileNavMenuItems.length > 0) {
+				app.layout.top_bar.render(
+					<NavMenu
+						activeKey={this.state.activeTab}
+						items={mobileNavMenuItems}
+						onClickItem={(key) => this.handleTabChange(key)}
+					/>,
+				)
+			} else {
+				app.layout.top_bar.renderDefault()
+			}
+		} else {
+			if (
+				navMenuItems.length > 0 ||
+				this.state.renders.length > 0 ||
+				this.props.navMenuHeader
+			) {
+				app.layout.header.render(
+					<NavMenu
+						header={this.props.navMenuHeader}
+						activeKey={this.state.activeTab}
+						items={navMenuItems}
+						onClickItem={(key) => this.handleTabChange(key)}
+						renderNames
+					>
+						{this.state.renders.map((renderItem) =>
+							React.createElement(renderItem.component, {
+								...(renderItem.options.props ?? {}),
+								ref: renderItem.ref,
+								key: renderItem.id,
+							}),
+						)}
+					</NavMenu>,
+				)
+			} else {
+				app.layout.header.render(null)
+			}
+		}
 	}
 
 	componentDidMount() {
@@ -89,9 +129,24 @@ export class PagePanelWithNavMenu extends React.Component {
 		if (app.isMobile) {
 			app.layout.top_bar.shouldUseTopBarSpacer(true)
 			app.layout.toggleCenteredContent(false)
+		} else {
+			app.layout.toggleCenteredContent(true)
 		}
 
-		app.layout.toggleCenteredContent(true)
+		this.updateLayoutHeaderAndTopBar()
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (
+			prevState.activeTab !== this.state.activeTab ||
+			prevProps.tabs !== this.props.tabs ||
+			prevProps.extraItems !== this.props.extraItems ||
+			prevState.renders !== this.state.renders ||
+			prevProps.navMenuHeader !== this.props.navMenuHeader ||
+			prevProps.defaultTab !== this.props.defaultTab
+		) {
+			this.updateLayoutHeaderAndTopBar()
+		}
 	}
 
 	componentWillUnmount() {
@@ -102,7 +157,9 @@ export class PagePanelWithNavMenu extends React.Component {
 				app.layout.header.render(null)
 			}
 		} else {
-			app.layout.top_bar.renderDefault()
+			if (app.layout.top_bar) {
+				app.layout.top_bar.renderDefault()
+			}
 		}
 	}
 
@@ -112,13 +169,23 @@ export class PagePanelWithNavMenu extends React.Component {
 			return <></>
 		}
 
-		if (this.props.tabs.length === 0) {
+		if (this.props.tabs.length === 0 && !this.state.activeTab) {
 			return <></>
 		}
 
-		// slip the active tab by splitting on "."
 		if (!this.state.activeTab) {
-			console.error("PagePanelWithNavMenu: activeTab is not defined")
+			const firstTabKey = this.props.tabs[0]?.key
+
+			if (firstTabKey) {
+				console.error("PagePanelWithNavMenu: activeTab is not defined")
+				return (
+					<antd.Result
+						status="404"
+						title="404"
+						subTitle="Sorry, the tab you visited does not exist (activeTab not set)."
+					/>
+				)
+			}
 			return <></>
 		}
 
@@ -134,14 +201,12 @@ export class PagePanelWithNavMenu extends React.Component {
 					console.error(
 						"PagePanelWithNavMenu: tab.children is not defined",
 					)
-
 					return (tab = null)
 				}
-
 				tab = tab.children.find(
 					(children) =>
 						children.key ===
-						`${activeTabDirectory[index - 1]}.${key}`,
+						`${activeTabDirectory.slice(0, index).join(".")}.${key}`,
 				)
 			}
 		})
@@ -150,7 +215,6 @@ export class PagePanelWithNavMenu extends React.Component {
 			if (this.props.onNotFound) {
 				return this.props.onNotFound()
 			}
-
 			return (
 				<antd.Result
 					status="404"
@@ -161,7 +225,6 @@ export class PagePanelWithNavMenu extends React.Component {
 		}
 
 		const componentProps = tab.props ?? this.props.tabProps
-
 		return React.createElement(tab.component, {
 			...componentProps,
 		})
@@ -176,7 +239,7 @@ export class PagePanelWithNavMenu extends React.Component {
 			await this.props.beforeTabChange(key)
 		}
 
-		await this.setState({ activeTab: key })
+		this.setState({ activeTab: key })
 
 		if (this.props.useSetQueryType) {
 			this.replaceQueryTypeToCurrentTab(key)
@@ -192,9 +255,11 @@ export class PagePanelWithNavMenu extends React.Component {
 
 		if (this.props.transition) {
 			if (document.startViewTransition) {
-				return document.startViewTransition(() => {
+				document.startViewTransition(() => {
 					this.tabChange(key)
 				})
+
+				return
 			}
 
 			console.warn(
@@ -205,20 +270,17 @@ export class PagePanelWithNavMenu extends React.Component {
 				this.primaryPanelRef.current &&
 				this.primaryPanelRef.current?.classList
 			) {
-				// set to primary panel fade-opacity-leave class
 				this.primaryPanelRef.current.classList.add("fade-opacity-leave")
-
-				// remove fade-opacity-leave class after animation
 				setTimeout(() => {
-					this.primaryPanelRef.current.classList.remove(
-						"fade-opacity-leave",
-					)
+					if (this.primaryPanelRef.current) {
+						this.primaryPanelRef.current.classList.remove(
+							"fade-opacity-leave",
+						)
+					}
 				}, 300)
 			}
-
 			await new Promise((resolve) => setTimeout(resolve, 200))
 		}
-
 		return this.tabChange(key)
 	}
 
@@ -229,59 +291,19 @@ export class PagePanelWithNavMenu extends React.Component {
 			)
 			return []
 		}
-
-		items = items.map((item) => {
-			return {
-				key: item.key,
-				icon: createIconRender(item.icon),
-				label: item.label,
-				children: item.children && this.getItems(item.children),
-				disabled: item.disabled,
-				props: item.props ?? {},
-			}
-		})
-
-		return items
+		return items.map((item) => ({
+			key: item.key,
+			icon: createIconRender(item.icon),
+			label: item.label,
+			children: item.children && this.getItems(item.children),
+			disabled: item.disabled,
+			props: item.props ?? {},
+		}))
 	}
 
 	render() {
 		return (
 			<>
-				{app.isMobile &&
-					app.layout.top_bar.render(
-						<NavMenu
-							activeKey={this.state.activeTab}
-							items={this.getItems(this.props.tabs)}
-							onClickItem={(key) => this.handleTabChange(key)}
-						/>,
-					)}
-
-				{!app.isMobile &&
-					app.layout.header.render(
-						<NavMenu
-							header={this.props.navMenuHeader}
-							activeKey={this.state.activeTab}
-							items={this.getItems([
-								...(this.props.tabs ?? []),
-								...(this.props.extraItems ?? []),
-							])}
-							onClickItem={(key) => this.handleTabChange(key)}
-							renderNames
-						>
-							{Array.isArray(this.state.renders) && [
-								this.state.renders.map((render, index) => {
-									return React.createElement(
-										render.component,
-										{
-											...render.options.props,
-											ref: render.ref,
-										},
-									)
-								}),
-							]}
-						</NavMenu>,
-					)}
-
 				<div className="pagePanels">
 					<div className="panel" ref={this.primaryPanelRef}>
 						{this.renderActiveTab()}

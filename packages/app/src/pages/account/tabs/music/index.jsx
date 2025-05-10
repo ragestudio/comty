@@ -12,7 +12,7 @@ export default (props) => {
 	const user_id = props.state.user._id
 
 	const [L_Releases, R_Releases, E_Releases, M_Releases] =
-		app.cores.api.useRequest(MusicModel.getReleases, {
+		app.cores.api.useRequest(MusicModel.getAllReleases, {
 			user_id: user_id,
 		})
 

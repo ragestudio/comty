@@ -1,7 +1,7 @@
 import { User, UserFollow } from "@db_models"
 
 export default async (payload = {}) => {
-	const { user_id, from_user_id, basic } = payload
+	const { user_id, from_user_id, basic = true, add } = payload
 
 	if (!user_id) {
 		throw new OperationError(400, "Missing user_id")
@@ -20,13 +20,22 @@ export default async (payload = {}) => {
 
 		usersData = usersData.map((user) => user.toObject())
 	} else {
-		const userData = await User.findOne({ _id: user_id })
+		let query = User.findOne({ _id: user_id })
 
-		if (!userData) {
+		if (Array.isArray(add) && add.length > 0) {
+			const fieldsToSelect = add.map((field) => `+${field}`).join(" ")
+			query = query.select(fieldsToSelect)
+		}
+
+		usersData = await query
+
+		if (!usersData) {
 			throw new OperationError(404, "User not found")
 		}
 
-		usersData = [userData.toObject()]
+		usersData = usersData.toObject()
+
+		usersData = [usersData]
 	}
 
 	if (from_user_id && !basic) {

@@ -1,5 +1,10 @@
 import AuthToken from "@shared-classes/AuthToken"
-import { UserConfig, MFASession, TosViolations } from "@db_models"
+import {
+	UserConfig,
+	UserDHKeyPair,
+	MFASession,
+	TosViolations,
+} from "@db_models"
 import obscureEmail from "@shared-utils/obscureEmail"
 
 import Account from "@classes/account"
@@ -143,9 +148,15 @@ export default async (req, res) => {
 		console.error(error)
 	}
 
+	const keyPair = await UserDHKeyPair.findOne({
+		user_id: user._id.toString(),
+	})
+
 	return {
+		user_id: user._id.toString(),
 		token: token,
 		refreshToken: refreshToken,
 		expires_in: AuthToken.authStrategy.expiresIn,
+		keyPairEnc: keyPair?.str,
 	}
 }

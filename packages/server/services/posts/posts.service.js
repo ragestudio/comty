@@ -1,4 +1,4 @@
-//import { Server } from "../../../../linebridge/server/src"
+//import { Server } from "../../../../linebridge/server/dist"
 import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
@@ -10,10 +10,12 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "posts"
-	static websockets = true
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3001
-	static useMiddlewares = ["logs"]
+
+	static websockets = true
 	static bypassCors = true
+
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,

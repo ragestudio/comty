@@ -1,6 +1,6 @@
 import { Track } from "@db_models"
 
-const allowedFields = ["title", "artist", "album", "cover"]
+const allowedFields = ["title", "artist", "album", "cover", "public"]
 
 export default async (track_id, payload) => {
 	if (!track_id) {

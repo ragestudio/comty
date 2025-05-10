@@ -1,437 +1,213 @@
 import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import fuse from "fuse.js"
 
 import { WithPlayerContext } from "@contexts/WithPlayerContext"
 import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
-import useWsEvents from "@hooks/useWsEvents"
 import checkUserIdIsSelf from "@utils/checkUserIdIsSelf"
-
-import LoadMore from "@components/LoadMore"
-import { Icons } from "@components/Icons"
-import MusicTrack from "@components/Music/Track"
-import SearchButton from "@components/SearchButton"
-import ImageViewer from "@components/ImageViewer"
 
 import MusicModel from "@models/music"
 
+import PlaylistHeader from "./header"
+import TrackList from "./list"
+
 import "./index.less"
 
-const PlaylistTypeDecorators = {
-	single: () => (
-		<span className="playlistType">
-			<Icons.MdMusicNote />
-			Single
-		</span>
-	),
-	album: () => (
-		<span className="playlistType">
-			<Icons.MdAlbum />
-			Album
-		</span>
-	),
-	ep: () => (
-		<span className="playlistType">
-			<Icons.MdAlbum />
-			EP
-		</span>
-	),
-	mix: () => (
-		<span className="playlistType">
-			<Icons.MdMusicNote />
-			Mix
-		</span>
-	),
-}
-
-const PlaylistInfo = (props) => {
-	return (
-		<div>
-			<ReactMarkdown
-				remarkPlugins={[remarkGfm]}
-				children={props.data.description}
-			/>
-		</div>
-	)
-}
-
-const MoreMenuHandlers = {
-	edit: async (playlist) => {},
-	delete: async (playlist) => {
-		return antd.Modal.confirm({
-			title: "Are you sure you want to delete this playlist?",
-			onOk: async () => {
-				const result = await MusicModel.deletePlaylist(
-					playlist._id,
-				).catch((err) => {
-					console.log(err)
-
-					app.message.error("Failed to delete playlist")
-
-					return null
-				})
-
-				if (result) {
-					app.navigation.goToMusic()
-				}
-			},
-		})
-	},
-}
-
-const PlaylistView = (props) => {
-	const [playlist, setPlaylist] = React.useState(props.playlist)
+const PlaylistView = ({
+	playlist: initialPlaylist,
+	noHeader = false,
+	onLoadMore,
+	hasMore,
+}) => {
+	const [playlist, setPlaylist] = React.useState(initialPlaylist)
 	const [searchResults, setSearchResults] = React.useState(null)
-	const [owningPlaylist, setOwningPlaylist] = React.useState(
-		checkUserIdIsSelf(props.playlist?.user_id),
+	const searchTimeoutRef = React.useRef(null) // Ref for debounce timeout
+
+	// Derive ownership directly instead of using state
+	const isOwner = React.useMemo(
+		() => checkUserIdIsSelf(playlist?.user_id),
+		[playlist],
 	)
 
-	const moreMenuItems = React.useMemo(() => {
-		const items = [
-			{
-				key: "edit",
-				label: "Edit",
+	const playlistContextValue = React.useMemo(
+		() => ({
+			playlist_data: playlist,
+			owning_playlist: isOwner,
+			add_track: (track) => {
+				/* TODO: Implement */
 			},
-		]
+			remove_track: (track) => {
+				/* TODO: Implement */
+			},
+		}),
+		[playlist, isOwner],
+	)
 
-		if (!playlist.type || playlist.type === "playlist") {
-			if (checkUserIdIsSelf(playlist.user_id)) {
-				items.push({
-					key: "delete",
-					label: "Delete",
+	// Define handlers for playlist actions (Edit, Delete)
+	const MoreMenuHandlers = React.useMemo(
+		() => ({
+			edit: async (pl) => {
+				// TODO: Implement Edit Playlist logic
+				console.log("Edit playlist:", pl._id)
+				app.message.info("Edit not implemented yet.")
+			},
+			delete: async (pl) => {
+				antd.Modal.confirm({
+					title: "Are you sure you want to delete this playlist?",
+					content: `Playlist: ${pl.title}`,
+					okText: "Delete",
+					okType: "danger",
+					cancelText: "Cancel",
+					onOk: async () => {
+						try {
+							await MusicModel.deletePlaylist(pl._id)
+							app.message.success("Playlist deleted successfully")
+							app.navigation.goToMusic() // Navigate away after deletion
+						} catch (err) {
+							console.error("Failed to delete playlist:", err)
+							app.message.error(
+								err.message || "Failed to delete playlist",
+							)
+						}
+					},
 				})
-			}
-		}
-
-		return items
-	})
-
-	const contextValues = {
-		playlist_data: playlist,
-		owning_playlist: owningPlaylist,
-		add_track: (track) => {},
-		remove_track: (track) => {},
-	}
-
-	let debounceSearch = null
+			},
+		}),
+		[],
+	)
 
 	const makeSearch = (value) => {
-		//TODO: Implement me using API
-		return app.message.info("Not implemented yet...")
+		// TODO: Implement API call for search
+		console.log("Searching for:", value)
+		setSearchResults([]) // Placeholder: clear results or set loading state
+		return app.message.info("Search not implemented yet...")
 	}
 
-	const handleOnSearchChange = (value) => {
-		debounceSearch = setTimeout(() => {
+	const handleSearchChange = (value) => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current)
+		}
+		searchTimeoutRef.current = setTimeout(() => {
 			makeSearch(value)
-		}, 500)
+		}, 500) // 500ms debounce
 	}
 
-	const handleOnSearchEmpty = () => {
-		if (debounceSearch) {
-			clearTimeout(debounceSearch)
+	const handleSearchEmpty = () => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current)
 		}
-
-		setSearchResults(null)
+		setSearchResults(null) // Clear search results when input is cleared
 	}
 
-	const handleOnClickPlaylistPlay = () => {
-		app.cores.player.start(playlist.items)
+	const handlePlayAll = () => {
+		if (playlist?.items?.length > 0) {
+			app.cores.player.start(playlist.items)
+		}
 	}
 
-	const handleOnClickViewDetails = () => {
-		app.layout.modal.open("playlist_info", PlaylistInfo, {
-			props: {
-				data: playlist,
-			},
-		})
+	const handleViewDetails = () => {
+		if (playlist?.description) {
+			app.layout.modal.open(
+				"playlist_info",
+				() => (
+					<PlaylistInfoModalContent
+						description={playlist.description}
+					/>
+				),
+				{ title: playlist.title || "Playlist Info" }, // Add title to modal
+			)
+		}
 	}
 
-	const handleOnClickTrack = (track) => {
-		// search index of track
-		const index = playlist.items.findIndex((item) => {
-			return item._id === track._id
-		})
+	const handleTrackClick = (track) => {
+		const index = playlist.items.findIndex((item) => item._id === track._id)
 
+		// Track not found in current playlist items
 		if (index === -1) {
-			return
+			return false
 		}
 
-		// check if clicked track is currently playing
-		if (app.cores.player.state.track_manifest?._id === track._id) {
-			app.cores.player.playback.toggle()
+		const playerCore = app.cores.player
+		// Toggle playback if the clicked track is already playing
+		if (playerCore.state.track_manifest?._id === track._id) {
+			playerCore.playback.toggle()
 		} else {
-			app.cores.player.start(playlist.items, {
-				startIndex: index,
-			})
+			// Start playback from the clicked track
+			playerCore.start(playlist.items, { startIndex: index })
 		}
 	}
 
-	const handleUpdateTrackLike = (track_id, liked) => {
+	const handleTrackStateChange = (track_id, update) => {
 		setPlaylist((prev) => {
-			const index = prev.list.findIndex((item) => {
-				return item._id === track_id
-			})
+			if (!prev) return prev
+			const trackIndex = prev.items.findIndex(
+				(item) => item._id === track_id,
+			)
 
-			if (index !== -1) {
-				const newState = {
-					...prev,
-				}
-
-				newState.list[index].liked = liked
-
-				return newState
-			}
-
-			return prev
-		})
-	}
-
-	const handleTrackChangeState = (track_id, update) => {
-		setPlaylist((prev) => {
-			const index = prev.list.findIndex((item) => {
-				return item._id === track_id
-			})
-
-			if (index !== -1) {
-				const newState = {
-					...prev,
-				}
-
-				newState.list[index] = {
-					...newState.list[index],
+			if (trackIndex !== -1) {
+				const updatedItems = [...prev.items]
+				updatedItems[trackIndex] = {
+					...updatedItems[trackIndex],
 					...update,
 				}
-
-				return newState
+				return { ...prev, items: updatedItems }
 			}
-
 			return prev
 		})
 	}
 
 	const handleMoreMenuClick = async (e) => {
 		const handler = MoreMenuHandlers[e.key]
-
-		if (typeof handler !== "function") {
-			throw new Error(`Invalid menu handler [${e.key}]`)
+		if (typeof handler === "function") {
+			await handler(playlist)
+		} else {
+			console.error(`Invalid menu handler key: ${e.key}`)
 		}
-
-		return await handler(playlist)
 	}
 
-	useWsEvents(
-		{
-			"music:track:toggle:like": (data) => {
-				handleUpdateTrackLike(data.track_id, data.action === "liked")
-			},
-		},
-		{
-			socketName: "music",
-		},
-	)
+	React.useEffect(() => {
+		setPlaylist(initialPlaylist)
+		setSearchResults(null)
+	}, [initialPlaylist])
 
 	React.useEffect(() => {
-		setPlaylist(props.playlist)
-		setOwningPlaylist(checkUserIdIsSelf(props.playlist?.user_id))
-	}, [props.playlist])
+		return () => {
+			if (searchTimeoutRef.current) {
+				clearTimeout(searchTimeoutRef.current)
+			}
+		}
+	}, [])
 
 	if (!playlist) {
 		return <antd.Skeleton active />
 	}
 
-	const playlistType = playlist.type?.toLowerCase() ?? "playlist"
-
 	return (
-		<PlaylistContext.Provider value={contextValues}>
+		<PlaylistContext.Provider value={playlistContextValue}>
 			<WithPlayerContext>
 				<div className={classnames("playlist_view")}>
-					{!props.noHeader && (
-						<div className="play_info_wrapper">
-							<div className="play_info">
-								<div className="play_info_cover">
-									<ImageViewer
-										src={
-											playlist.cover ??
-											playlist?.thumbnail ??
-											"/assets/no_song.png"
-										}
-									/>
-								</div>
-
-								<div className="play_info_details">
-									<div className="play_info_title">
-										{playlist.service === "tidal" && (
-											<Icons.SiTidal />
-										)}
-										{typeof playlist.title ===
-										"function" ? (
-											playlist.title
-										) : (
-											<h1>{playlist.title}</h1>
-										)}
-									</div>
-
-									<div className="play_info_statistics">
-										{playlistType &&
-											PlaylistTypeDecorators[
-												playlistType
-											] && (
-												<div className="play_info_statistics_item">
-													{PlaylistTypeDecorators[
-														playlistType
-													]()}
-												</div>
-											)}
-										<div className="play_info_statistics_item">
-											<p>
-												<Icons.MdLibraryMusic />{" "}
-												{props.length ??
-													playlist.total_length ??
-													playlist.items.length}{" "}
-												Items
-											</p>
-										</div>
-										{playlist.publisher && (
-											<div className="play_info_statistics_item">
-												<p
-													onClick={() => {
-														app.navigation.goToAccount(
-															playlist.publisher
-																.username,
-														)
-													}}
-												>
-													<Icons.MdPerson />
-													Publised by{" "}
-													<a>
-														{
-															playlist.publisher
-																.username
-														}
-													</a>
-												</p>
-											</div>
-										)}
-									</div>
-
-									<div className="play_info_actions">
-										<antd.Button
-											type="primary"
-											shape="rounded"
-											size="large"
-											onClick={handleOnClickPlaylistPlay}
-										>
-											<Icons.MdPlayArrow />
-											Play
-										</antd.Button>
-
-										{playlist.description && (
-											<antd.Button
-												icon={<Icons.MdInfo />}
-												onClick={
-													handleOnClickViewDetails
-												}
-											/>
-										)}
-
-										{owningPlaylist && (
-											<antd.Dropdown
-												trigger={["click"]}
-												placement="bottom"
-												menu={{
-													items: moreMenuItems,
-													onClick:
-														handleMoreMenuClick,
-												}}
-											>
-												<antd.Button
-													icon={<Icons.MdMoreVert />}
-												/>
-											</antd.Dropdown>
-										)}
-									</div>
-								</div>
-							</div>
-						</div>
+					{!noHeader && (
+						<PlaylistHeader
+							playlist={playlist}
+							owningPlaylist={isOwner}
+							onPlayAll={handlePlayAll}
+							onViewDetails={handleViewDetails}
+							onMoreMenuClick={handleMoreMenuClick}
+						/>
 					)}
 
-					<div className="list">
-						{!props.noHeader && playlist.items.length > 0 && (
-							<div className="list_header">
-								<h1>
-									<Icons.MdPlaylistPlay /> Tracks
-								</h1>
-
-								<SearchButton
-									onChange={handleOnSearchChange}
-									onEmpty={handleOnSearchEmpty}
-									disabled
-								/>
-							</div>
-						)}
-
-						{playlist.items.length === 0 && (
-							<antd.Empty
-								description={
-									<>
-										<Icons.MdLibraryMusic /> This playlist
-										its empty!
-									</>
-								}
-							/>
-						)}
-
-						{searchResults &&
-							searchResults.map((item) => {
-								return (
-									<MusicTrack
-										key={item._id}
-										order={item._id}
-										track={item}
-										onPlay={() => handleOnClickTrack(item)}
-										changeState={(update) =>
-											handleTrackChangeState(
-												item._id,
-												update,
-											)
-										}
-									/>
-								)
-							})}
-
-						{!searchResults && playlist.items.length > 0 && (
-							<LoadMore
-								className="list_content"
-								loadingComponent={() => <antd.Skeleton />}
-								onBottom={props.onLoadMore}
-								hasMore={props.hasMore}
-							>
-								<WithPlayerContext>
-									{playlist.items.map((item, index) => {
-										return (
-											<MusicTrack
-												order={index + 1}
-												track={item}
-												onPlay={() =>
-													handleOnClickTrack(item)
-												}
-												changeState={(update) =>
-													handleTrackChangeState(
-														item._id,
-														update,
-													)
-												}
-											/>
-										)
-									})}
-								</WithPlayerContext>
-							</LoadMore>
-						)}
-					</div>
+					<TrackList
+						tracks={playlist.items || []}
+						searchResults={searchResults}
+						onTrackClick={handleTrackClick}
+						onTrackStateChange={handleTrackStateChange}
+						onSearchChange={handleSearchChange}
+						onSearchEmpty={handleSearchEmpty}
+						onLoadMore={onLoadMore}
+						hasMore={hasMore}
+						noHeader={noHeader}
+					/>
 				</div>
 			</WithPlayerContext>
 		</PlaylistContext.Provider>

@@ -39,7 +39,7 @@ const EventsHandlers = {
 
 		const track = app.cores.player.track()
 
-		return await track.manifest.serviceOperations.toggleItemFavourite(
+		return await track.manifest.serviceOperations.toggleItemFavorite(
 			"track",
 			ctx.track_manifest._id,
 		)
@@ -133,7 +133,7 @@ const Controls = (props) => {
 				<LikeButton
 					liked={
 						trackInstance?.manifest?.serviceOperations
-							?.fetchLikeStatus
+							?.isItemFavorited
 					}
 					onClick={() => handleAction("like")}
 					disabled={!trackInstance?.manifest?._id}

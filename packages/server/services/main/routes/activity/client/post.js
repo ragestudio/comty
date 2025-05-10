@@ -1,63 +1,69 @@
 import { RecentActivity } from "@db_models"
 
 const IdToTypes = {
-    "player.play": "track_played"
+	"player.play": "track_played",
 }
 
+const MAX_RECENT_ACTIVITIES = 10
+
 export default {
-    middlewares: [
-        "withAuthentication",
-    ],
-    fn: async (req, res) => {
-        const user_id = req.auth.session.user_id
-        let { id, payload } = req.body
+	middlewares: ["withAuthentication"],
+	fn: async (req, res) => {
+		const user_id = req.auth.session.user_id
+		let { id, payload } = req.body
 
-        if (!id) {
-            throw new OperationError(400, "Event id is required")
-        }
+		if (!id) {
+			throw new OperationError(400, "Event id is required")
+		}
 
-        if (!payload) {
-            throw new OperationError(400, "Event payload is required")
-        }
+		if (!payload) {
+			throw new OperationError(400, "Event payload is required")
+		}
 
-        id = id.toLowerCase()
+		id = id.toLowerCase()
 
-        if (!IdToTypes[id]) {
-            throw new OperationError(400, `Event id ${id} is not supported`)
-        }
+		if (!IdToTypes[id]) {
+			throw new OperationError(400, `Event id ${id} is not supported`)
+		}
 
-        const type = IdToTypes[id]
+		const type = IdToTypes[id]
 
-        // get latest 20 activities
-        let latestActivities = await RecentActivity.find({
-            user_id: user_id,
-            type: type,
-        })
-            .limit(20)
-            .sort({ created_at: -1 })
+		// Get the current latest activities
+		let latestActivities = await RecentActivity.find({
+			user_id: user_id,
+			type: type,
+		})
+			.limit(MAX_RECENT_ACTIVITIES)
+			.sort({ created_at: -1 }) // Newest first
 
-        // check if the activity is already in some position and remove
-        const sameLatestActivityIndex = latestActivities.findIndex((activity) => {
-            return activity.payload === payload && activity.type === type
-        })
+		const sameActivity = await RecentActivity.findOne({
+			user_id: user_id,
+			type: type,
+			payload: payload,
+		})
 
-        // if the activity is already in some position, remove it from that position
-        if (sameLatestActivityIndex !== -1) {
-            latestActivities.splice(sameLatestActivityIndex, 1)
-        }
+		if (sameActivity) {
+			// This event's payload/type is already in the recent activities.
+			// The old instance should be removed to make way for the new one.
+			await RecentActivity.findByIdAndDelete(sameActivity._id.toString())
+		} else {
+			// This event's payload/type is not in the recent activities.
+			// The oldest activity should be removed to make way for the new one.
+			if (latestActivities.length >= MAX_RECENT_ACTIVITIES) {
+				await RecentActivity.findByIdAndDelete(
+					latestActivities[MAX_RECENT_ACTIVITIES - 1]._id.toString(),
+				)
+			}
+		}
 
-        // if the list is full, remove the oldest activity and add the new one
-        if (latestActivities.length >= 20) {
-            await RecentActivity.findByIdAndDelete(latestActivities[latestActivities.length - 1]._id)
-        }
+		// Create the new activity
+		const newActivity = await RecentActivity.create({
+			user_id: user_id,
+			type: type,
+			payload: payload,
+			created_at: new Date(),
+		})
 
-        const activity = await RecentActivity.create({
-            user_id: user_id,
-            type: type,
-            payload: payload,
-            created_at: new Date(),
-        })
-
-        return activity
-    }
+		return newActivity
+	},
 }

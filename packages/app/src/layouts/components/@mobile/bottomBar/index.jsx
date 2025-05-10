@@ -5,7 +5,11 @@ import { motion, AnimatePresence } from "motion/react"
 
 import { Icons, createIconRender } from "@components/Icons"
 
-import { WithPlayerContext, Context } from "@contexts/WithPlayerContext"
+import {
+	WithPlayerContext,
+	Context,
+	usePlayerStateContext,
+} from "@contexts/WithPlayerContext"
 
 import {
 	QuickNavMenuItems,
@@ -36,33 +40,66 @@ const tourSteps = [
 const openPlayerView = () => {
 	app.layout.draggable.open("player", PlayerView)
 }
+
 const openCreator = () => {
 	app.layout.draggable.open("creator", CreatorView)
 }
 
 const PlayerButton = (props) => {
+	const [currentManifest, setCurrentManifest] = React.useState(null)
+	const [coverAnalyzed, setCoverAnalyzed] = React.useState(null)
+
+	const [player] = usePlayerStateContext((state) => {
+		setCurrentManifest((prev) => {
+			if (!state.track_manifest) {
+				return null
+			}
+
+			if (prev?._id !== state.track_manifest?._id) {
+				return state.track_manifest
+			}
+
+			return prev
+		})
+	})
+
 	React.useEffect(() => {
-		openPlayerView()
-	}, [])
+		if (currentManifest) {
+			const track = app.cores.player.track()
+
+			if (!app.layout.draggable.exists("player")) {
+				openPlayerView()
+			}
+
+			if (track.manifest?.analyzeCoverColor) {
+				track.manifest
+					.analyzeCoverColor()
+					.then((analysis) => {
+						setCoverAnalyzed(analysis)
+					})
+					.catch((err) => {
+						console.error(err)
+					})
+			}
+		}
+	}, [currentManifest])
+
+	const isPlaying = player?.playback_status === "playing" ?? false
 
 	return (
 		<div
 			className={classnames("player_btn", {
-				bounce: props.playback === "playing",
+				bounce: isPlaying,
 			})}
 			style={{
-				"--average-color": props.colorAnalysis?.rgba,
-				"--color": props.colorAnalysis?.isDark
+				"--average-color": coverAnalyzed?.rgba,
+				"--color": coverAnalyzed?.isDark
 					? "var(--text-color-white)"
 					: "var(--text-color-black)",
 			}}
 			onClick={openPlayerView}
 		>
-			{props.playback === "playing" ? (
-				<Icons.MdMusicNote />
-			) : (
-				<Icons.MdPause />
-			)}
+			{isPlaying ? <Icons.MdMusicNote /> : <Icons.MdPause />}
 		</div>
 	)
 }
@@ -385,18 +422,7 @@ export class BottomBar extends React.Component {
 
 									{this.context.track_manifest && (
 										<div className="item">
-											<PlayerButton
-												manifest={
-													this.context.track_manifest
-												}
-												playback={
-													this.context.playback_status
-												}
-												colorAnalysis={
-													this.context.track_manifest
-														?.cover_analysis
-												}
-											/>
+											<PlayerButton />
 										</div>
 									)}
 
