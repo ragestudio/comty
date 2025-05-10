@@ -1,75 +1,154 @@
 .player-seek_bar {
-    z-index: 330;
+	z-index: 330;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    align-self: center;
+	align-self: center;
 
-    width: 90%;
-    height: 100%;
+	width: 90%;
+	height: 100%;
 
-    margin: 0 0 10px 0;
+	gap: 6px;
 
-    border-radius: 8px;
+	//margin: 0 0 10px 0;
 
-    transition: all 150ms ease-in-out;
+	border-radius: 8px;
 
-    &.hidden {
-        height: 0px;
-        opacity: 0;
-        pointer-events: none;
-    }
+	transition: all 150ms ease-in-out;
 
-    .progress {
-        width: 100%;
-        height: 100%;
+	&.hidden {
+		height: 0px;
+		opacity: 0;
+		pointer-events: none;
+	}
 
-        transition: all 150ms ease-in-out;
+	.progress {
+		width: 100%;
+		height: 100%;
 
-        &.hidden {
-            opacity: 0;
-            height: 0;
-            pointer-events: none;
-        }
-    }
+		transition: all 150ms ease-in-out;
 
-    .timers {
-        display: inline-flex;
-        flex-direction: row;
+		&.hidden {
+			opacity: 0;
+			height: 0;
+			pointer-events: none;
+		}
+	}
 
-        width: 100%;
-        height: fit-content;
+	.timers {
+		display: inline-flex;
+		flex-direction: row;
 
-        justify-content: space-between;
-        align-items: center;
-    }
+		width: 100%;
+		height: fit-content;
 
-    .MuiSlider-rail {
-        height: 5px;
-    }
+		justify-content: space-between;
+		align-items: center;
 
-    .MuiSlider-track {
-        height: 5px;
-        background-color: var(--colorPrimary);
-    }
+		font-family: "DM Mono", monospace;
+		font-size: 0.8rem;
+	}
+}
 
-    .MuiSlider-thumb {
-        background-color: var(--colorPrimary);
+.slider-container {
+	position: relative;
 
-    }
+	z-index: 200;
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span {
-        color: var(--text-color);
-    }
+	width: 100%;
+	height: 8px;
+
+	transform: translateY(2px);
+
+	.slider-background-track {
+		position: absolute;
+
+		z-index: 100;
+
+		width: 100%;
+		height: 100%;
+
+		background-color: rgba(var(--layoutBackgroundColor), 0.7);
+
+		border-radius: 24px;
+
+		left: 0;
+		top: 0;
+
+		backdrop-filter: blur(5px);
+	}
+
+	.slider-progress-track {
+		position: absolute;
+
+		left: 0;
+		top: 0;
+
+		z-index: 110;
+
+		height: 100%;
+
+		background-color: var(--colorPrimary);
+		border-radius: 24px;
+	}
+
+	// This class is on the <input type="range"> itself.
+	// It needs to be transparent so the divs above show through.
+	// Its main role now is to provide the interactive thumb.
+	.slider-input {
+		position: absolute;
+
+		left: 0;
+		top: 0;
+
+		z-index: 120;
+
+		padding: 0;
+		margin: 0;
+
+		width: 100%;
+		height: 8px;
+
+		-webkit-appearance: none;
+		appearance: none;
+
+		background: transparent !important;
+
+		&::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			appearance: none;
+			background-color: transparent;
+
+			width: 8px;
+			height: 8px;
+
+			cursor: pointer;
+		}
+	}
+}
+
+.player-seek_bar-track-tooltip {
+	pointer-events: none;
+
+	position: absolute;
+	z-index: 10;
+
+	bottom: 100%;
+
+	margin-bottom: 6px;
+
+	padding: 4px 8px;
+
+	background-color: var(--tooltip-background, #333);
+	color: var(--text-color);
+	border-radius: 24px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+	font-size: 0.8rem;
+	font-family: "DM Mono", monospace;
+	white-space: nowrap;
 }

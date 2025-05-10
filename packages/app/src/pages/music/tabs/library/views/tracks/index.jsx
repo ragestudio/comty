@@ -13,49 +13,47 @@ const TracksLibraryView = () => {
 	const [hasMore, setHasMore] = React.useState(true)
 	const [initialLoading, setInitialLoading] = React.useState(true)
 
-	const [L_Favourites, R_Favourites, E_Favourites, M_Favourites] =
-		app.cores.api.useRequest(MusicModel.getFavouriteFolder, {
+	const [L_Library, R_Library, E_Library, M_Library] =
+		app.cores.api.useRequest(MusicModel.getMyLibrary, {
 			offset: offset,
 			limit: loadLimit,
+			kind: "tracks",
 		})
 
 	async function onLoadMore() {
-		const newOffset = offset + loadLimit
+		setOffset((prevOffset) => {
+			const newOffset = prevOffset + loadLimit
 
-		setOffset(newOffset)
+			M_Library({
+				offset: newOffset,
+				limit: loadLimit,
+				kind: "tracks",
+			})
 
-		M_Favourites({
-			offset: newOffset,
-			limit: loadLimit,
+			if (newOffset >= R_Library.total_items) {
+				setHasMore(false)
+			}
+
+			return newOffset
 		})
 	}
 
 	React.useEffect(() => {
-		if (R_Favourites && R_Favourites.tracks) {
+		if (R_Library && R_Library.items) {
 			if (initialLoading === true) {
 				setInitialLoading(false)
 			}
 
-			if (R_Favourites.tracks.items.length === 0) {
-				setHasMore(false)
-			} else {
-				setItems((prev) => {
-					prev = [...prev, ...R_Favourites.tracks.items]
+			setItems((prev) => {
+				prev = [...prev, ...R_Library.items]
 
-					return prev
-				})
-			}
+				return prev
+			})
 		}
-	}, [R_Favourites])
+	}, [R_Library])
 
-	if (E_Favourites) {
-		return (
-			<antd.Result
-				status="warning"
-				title="Failed to load"
-				subTitle={E_Favourites}
-			/>
-		)
+	if (E_Library) {
+		return <antd.Result status="warning" title="Failed to load" />
 	}
 
 	if (initialLoading) {
@@ -66,15 +64,14 @@ const TracksLibraryView = () => {
 		<PlaylistView
 			noHeader
 			noSearch
-			loading={L_Favourites}
+			loading={L_Library}
 			type="vertical"
 			playlist={{
 				items: items,
-				total_length: R_Favourites.tracks.total_items,
+				total_length: R_Library.total_items,
 			}}
 			onLoadMore={onLoadMore}
 			hasMore={hasMore}
-			length={R_Favourites.tracks.total_length}
 		/>
 	)
 }

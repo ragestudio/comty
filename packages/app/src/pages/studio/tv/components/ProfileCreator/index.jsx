@@ -21,7 +21,7 @@ const ProfileCreator = (props) => {
 				await props.onEdit(name)
 			}
 		} else {
-			const result = await Streaming.createOrUpdateProfile({
+			const result = await Streaming.createProfile({
 				profile_name: name,
 			}).catch((error) => {
 				console.error(error)

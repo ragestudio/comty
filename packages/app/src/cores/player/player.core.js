@@ -119,6 +119,7 @@ export default class Player extends Core {
 		return this.queue.currentItem
 	}
 
+	// TODO: Improve performance for large playlists
 	async start(manifest, { time, startIndex = 0, radioId } = {}) {
 		this.ui.attachPlayerComponent()
 
@@ -150,6 +151,10 @@ export default class Player extends Core {
 			playlist = await this.serviceProviders.resolveMany(playlist)
 		}
 
+		if (playlist.some((item) => !item.source)) {
+			playlist = await this.serviceProviders.resolveMany(playlist)
+		}
+
 		for await (let [index, _manifest] of playlist.entries()) {
 			let instance = new TrackInstance(_manifest, this)
 
@@ -176,12 +181,12 @@ export default class Player extends Core {
 
 	// similar to player.start, but add to the queue
 	// if next is true, it will add to the queue to the top of the queue
-	async addToQueue(manifest, { next = false }) {
+	async addToQueue(manifest, { next = false } = {}) {
 		if (typeof manifest === "string") {
 			manifest = await this.serviceProviders.resolve(manifest)
 		}
 
-		let instance = await this.createInstance(manifest)
+		let instance = new TrackInstance(manifest, this)
 
 		this.queue.add(instance, next === true ? "start" : "end")
 

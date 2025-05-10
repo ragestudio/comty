@@ -7,6 +7,7 @@ import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
 
 import { Icons } from "@components/Icons"
 import Controls from "@components/Player/Controls"
+import SeekBar from "@components/Player/SeekBar"
 import LiveInfo from "@components/Player/LiveInfo"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
@@ -130,9 +131,11 @@ const PlayerController = React.forwardRef((props, ref) => {
 						)}
 					</div>
 
-					<div className="lyrics-player-controller-info-details">
-						<span>{playerState.track_manifest?.artistStr}</span>
-					</div>
+					{playerState.track_manifest?.artist && (
+						<div className="lyrics-player-controller-info-details">
+							<span>{playerState.track_manifest?.artist}</span>
+						</div>
+					)}
 
 					{playerState.live && (
 						<LiveInfo radioId={playerState.radioId} />
@@ -141,40 +144,7 @@ const PlayerController = React.forwardRef((props, ref) => {
 
 				<Controls streamMode={playerState.live} />
 
-				{!playerState.live && (
-					<div className="lyrics-player-controller-progress-wrapper">
-						<div
-							className="lyrics-player-controller-progress"
-							onMouseDown={(e) => {
-								setDraggingTime(true)
-							}}
-							onMouseUp={(e) => {
-								const rect =
-									e.currentTarget.getBoundingClientRect()
-								const seekTime =
-									(trackDuration * (e.clientX - rect.left)) /
-									rect.width
-
-								onDragEnd(seekTime)
-							}}
-							onMouseMove={(e) => {
-								const rect =
-									e.currentTarget.getBoundingClientRect()
-								const atWidth =
-									((e.clientX - rect.left) / rect.width) * 100
-
-								setCurrentDragWidth(atWidth)
-							}}
-						>
-							<div
-								className="lyrics-player-controller-progress-bar"
-								style={{
-									width: `${draggingTime ? currentDragWidth : (currentTime / trackDuration) * 100}%`,
-								}}
-							/>
-						</div>
-					</div>
-				)}
+				{!playerState.live && <SeekBar />}
 
 				<div className="lyrics-player-controller-tags">
 					{playerState.track_manifest?.metadata?.lossless && (

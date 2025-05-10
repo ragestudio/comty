@@ -27,8 +27,9 @@ export default {
 			type: Boolean,
 			default: true,
 		},
-		publish_date: {
+		created_at: {
 			type: Date,
+			required: true,
 		},
 		cover: {
 			type: String,

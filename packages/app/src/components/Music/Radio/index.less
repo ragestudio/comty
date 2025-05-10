@@ -1,0 +1,82 @@
+.radio-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	min-width: 250px;
+	min-height: 150px;
+
+	border-radius: 16px;
+	background-color: var(--background-color-accent);
+
+	overflow: hidden;
+
+	&:hover {
+		cursor: pointer;
+
+		.radio-item-content {
+			backdrop-filter: blur(2px);
+		}
+	}
+
+	&.empty {
+		cursor: default;
+	}
+
+	.lazy-load-image-background,
+	.radio-item-cover {
+		position: absolute;
+
+		z-index: 1;
+
+		top: 0;
+		left: 0;
+
+		width: 100%;
+		height: 100%;
+
+		img {
+			object-fit: cover;
+		}
+	}
+
+	.radio-item-content {
+		position: relative;
+		z-index: 2;
+
+		display: flex;
+		flex-direction: column;
+
+		justify-content: space-between;
+
+		width: 100%;
+		height: 100%;
+
+		padding: 16px;
+
+		transition: all 150ms ease-in-out;
+
+		.radio-item-info {
+			display: flex;
+			align-items: center;
+
+			gap: 8px;
+
+			.radio-item-info-item {
+				display: flex;
+
+				flex-direction: row;
+				align-items: center;
+
+				gap: 8px;
+				padding: 4px;
+
+				background-color: rgba(var(--bg_color_3), 0.7);
+
+				border-radius: 8px;
+				font-size: 0.7rem;
+			}
+		}
+	}
+}

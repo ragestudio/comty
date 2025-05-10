@@ -4,8 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "concurrently -k \"yarn dev:client\" \"yarn dev:server\"",
-		"dev:server": "cd packages/server && yarn dev",
-		"dev:client": "cd packages/app && yarn dev",
+		"dev:server": "cd packages/server && npm run dev",
+		"dev:client": "cd packages/app && npm run dev",
 		"postinstall": "node ./scripts/post-install.js"
 	},
 	"dependencies": {

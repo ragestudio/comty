@@ -286,7 +286,7 @@ const ReleaseEditor = (props) => {
 										icon={<Icons.MdLink />}
 										onClick={() =>
 											app.location.push(
-												`/music/release/${globalState._id}`,
+												`/music/list/${globalState._id}`,
 											)
 										}
 									>

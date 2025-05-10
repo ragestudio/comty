@@ -4,24 +4,30 @@ import * as antd from "antd"
 import { Icons } from "@components/Icons"
 
 import TracksLibraryView from "./views/tracks"
+import ReleasesLibraryView from "./views/releases"
 import PlaylistLibraryView from "./views/playlists"
 
 import "./index.less"
 
-const TabToView = {
-	tracks: TracksLibraryView,
-	playlist: PlaylistLibraryView,
-	releases: PlaylistLibraryView,
-}
-
-const TabToHeader = {
+const Views = {
 	tracks: {
-		icon: <Icons.MdMusicNote />,
+		value: "tracks",
 		label: "Tracks",
+		icon: <Icons.MdMusicNote />,
+		element: TracksLibraryView,
 	},
-	playlist: {
-		icon: <Icons.MdPlaylistPlay />,
+	releases: {
+		value: "releases",
+		label: "Releases",
+		icon: <Icons.MdAlbum />,
+		element: ReleasesLibraryView,
+	},
+	playlists: {
+		value: "playlists",
 		label: "Playlists",
+		icon: <Icons.MdPlaylistPlay />,
+		element: PlaylistLibraryView,
+		disabled: true,
 	},
 }
 
@@ -34,29 +40,13 @@ const Library = (props) => {
 				<antd.Segmented
 					value={selectedTab}
 					onChange={setSelectedTab}
-					options={[
-						{
-							value: "tracks",
-							label: "Tracks",
-							icon: <Icons.MdMusicNote />,
-						},
-						{
-							value: "playlist",
-							label: "Playlists",
-							icon: <Icons.MdPlaylistPlay />,
-						},
-						{
-							value: "releases",
-							label: "Releases",
-							icon: <Icons.MdPlaylistPlay />,
-						},
-					]}
+					options={Object.values(Views)}
 				/>
 			</div>
 
 			{selectedTab &&
-				TabToView[selectedTab] &&
-				React.createElement(TabToView[selectedTab])}
+				Views[selectedTab] &&
+				React.createElement(Views[selectedTab].element)}
 		</div>
 	)
 }

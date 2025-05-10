@@ -91,11 +91,11 @@ class Login extends React.Component {
 		})
 	}
 
-	onDone = async ({ mfa_required } = {}) => {
-		if (mfa_required) {
+	onDone = async (result = {}) => {
+		if (result.mfa_required) {
 			this.setState({
 				loading: false,
-				mfa_required: mfa_required,
+				mfa_required: result.mfa_required,
 			})
 
 			return false
@@ -108,7 +108,7 @@ class Login extends React.Component {
 		}
 
 		if (typeof this.props.onDone === "function") {
-			await this.props.onDone()
+			await this.props.onDone(this.state, result)
 		}
 
 		return true

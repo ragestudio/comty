@@ -7,93 +7,98 @@ import { Icons } from "@components/Icons"
 import "./index.less"
 
 const typeToNavigationType = {
-    playlist: "playlist",
-    album: "album",
-    track: "track",
-    single: "track",
-    ep: "album"
+	playlist: "playlist",
+	album: "album",
+	track: "track",
+	single: "track",
+	ep: "album",
 }
 
 const Playlist = (props) => {
-    const [coverHover, setCoverHover] = React.useState(false)
+	const [coverHover, setCoverHover] = React.useState(false)
 
-    let { playlist } = props
+	let { playlist } = props
 
-    if (!playlist) {
-        return null
-    }
+	if (!playlist) {
+		return null
+	}
 
-    const onClick = () => {
-        if (typeof props.onClick === "function") {
-            return props.onClick(playlist)
-        }
+	const onClick = () => {
+		if (typeof props.onClick === "function") {
+			return props.onClick(playlist)
+		}
 
-        return app.location.push(`/music/${typeToNavigationType[playlist.type.toLowerCase()]}/${playlist._id}`)
-    }
+		return app.location.push(`/music/list/${playlist._id}`)
+	}
 
-    const onClickPlay = (e) => {
-        e.stopPropagation()
+	const onClickPlay = (e) => {
+		e.stopPropagation()
 
-        app.cores.player.start(playlist.list)
-    }
+		app.cores.player.start(playlist.items)
+	}
 
+	return (
+		<div
+			id={playlist._id}
+			className={classnames("playlist", {
+				"cover-hovering": coverHover,
+				"row-mode": props.row === true,
+			})}
+		>
+			<div
+				className="playlist_cover"
+				onMouseEnter={() => setCoverHover(true)}
+				onMouseLeave={() => setCoverHover(false)}
+				onClick={onClickPlay}
+			>
+				<div className="playlist_cover_mask">
+					<Icons.FiPlay />
+				</div>
 
-    const subtitle = playlist.type === "playlist" ? `By ${playlist.user_id}` : (playlist.description ?? (playlist.publisher && `Release from ${playlist.publisher?.fullName}`))
+				<ImageViewer
+					src={
+						playlist.cover ??
+						playlist.thumbnail ??
+						"/assets/no_song.png"
+					}
+				/>
+			</div>
 
-    return <div
-        id={playlist._id}
-        key={props.key}
-        className={classnames(
-            "playlist",
-            {
-                "cover-hovering": coverHover
-            }
-        )}
-    >
-        <div
-            className="playlist_cover"
-            onMouseEnter={() => setCoverHover(true)}
-            onMouseLeave={() => setCoverHover(false)}
-            onClick={onClickPlay}
-        >
-            <div className="playlist_cover_mask">
-                <Icons.MdPlayArrow />
-            </div>
+			<div className="playlist_info">
+				<div className="playlist_info_title" onClick={onClick}>
+					<h1>{playlist.title}</h1>
+				</div>
+				{props.row && (
+					<div className="playlist_details">
+						<p>
+							<Icons.MdAlbum />
+							{playlist.type ?? "playlist"}
+						</p>
+					</div>
+				)}
+			</div>
 
-            <ImageViewer
-                src={playlist.cover ?? playlist.thumbnail ?? "/assets/no_song.png"}
-            />
-        </div>
+			{!props.row && (
+				<div className="playlist_details">
+					{props.length && (
+						<p>
+							<Icons.MdLibraryMusic />{" "}
+							{props.length ??
+								playlist.total_length ??
+								playlist.list.length}
+						</p>
+					)}
 
-        <div className="playlist_info">
-            <div className="playlist_info_title" onClick={onClick}>
-                <h1>{playlist.title}</h1>
-            </div>
-
-            {
-                subtitle && <div className="playlist_info_subtitle">
-                    <p>
-                        {subtitle}
-                    </p>
-                </div>
-            }
-        </div>
-
-        <div className="playlist_bottom">
-            {
-                props.length && <p>
-                    <Icons.MdLibraryMusic /> {props.length ?? playlist.total_length ?? playlist.list.length}
-                </p>
-            }
-
-            {
-                playlist.type && <p>
-                    <Icons.MdAlbum />
-                    {playlist.type ?? "playlist"}
-                </p>
-            }
-        </div>
-    </div>
+					{playlist.type && (
+						<p>
+							<Icons.MdAlbum />
+							{playlist.type ?? "playlist"}
+						</p>
+					)}
+				</div>
+			)}
+		</div>
+	)
 }
 
 export default Playlist

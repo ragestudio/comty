@@ -117,7 +117,7 @@ function registerAliases() {
 	registerBaseAliases(global["__src"], global["aliases"])
 }
 
-async function injectEnvFromInfisical() {
+global.injectEnvFromInfisical = async function injectEnvFromInfisical() {
 	const envMode = (global.FORCE_ENV ?? global.isProduction) ? "prod" : "dev"
 
 	console.log(

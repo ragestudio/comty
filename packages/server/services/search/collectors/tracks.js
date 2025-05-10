@@ -5,7 +5,14 @@ export default {
 	model: Track,
 	query: (keywords) => {
 		return {
-			$or: [{ title: new RegExp(keywords, "i") }],
+			$or: [
+				{
+					title: new RegExp(keywords, "i"),
+				},
+				{
+					artist: new RegExp(keywords, "i"),
+				},
+			],
 		}
 	},
 }

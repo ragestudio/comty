@@ -1,57 +1,64 @@
 import React from "react"
 import * as antd from "antd"
 
-import ProfileSelector from "./components/ProfileSelector"
-import ProfileData from "./components/ProfileData"
 import ProfileCreator from "./components/ProfileCreator"
+import Skeleton from "@components/Skeleton"
+
+import Streaming from "@models/spectrum"
 
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import "./index.less"
 
+const Profile = ({ profile, onClick }) => {
+	return <div onClick={onClick}>{profile.profile_name}</div>
+}
+
 const TVStudioPage = (props) => {
-    useCenteredContainer(true)
+	useCenteredContainer(false)
 
-    const [selectedProfileId, setSelectedProfileId] = React.useState(null)
+	const [loading, list, error, repeat] = app.cores.api.useRequest(
+		Streaming.getOwnProfiles,
+	)
 
-    function newProfileModal() {
-        app.layout.modal.open("tv_profile_creator", ProfileCreator, {
-            props: {
-                onCreate: (id, data) => {
-                    setSelectedProfileId(id)
-                },
-            }
-        })
-    }
+	function handleNewProfileClick() {
+		app.layout.modal.open("tv_profile_creator", ProfileCreator, {
+			props: {
+				onCreate: (id, data) => {
+					setSelectedProfileId(id)
+				},
+			},
+		})
+	}
 
-    return <div className="tvstudio-page">
-        <div className="tvstudio-page-actions">
-            <ProfileSelector
-                onChange={setSelectedProfileId}
-            />
+	function handleProfileClick(id) {
+		app.location.push(`/studio/tv/${id}`)
+	}
 
-            <antd.Button
-                type="primary"
-                onClick={newProfileModal}
-            >
-                Create new
-            </antd.Button>
-        </div>
+	if (loading) {
+		return <Skeleton />
+	}
 
-        {
-            selectedProfileId && <ProfileData
-                profile_id={selectedProfileId}
-            />
-        }
+	return (
+		<div className="tvstudio-page">
+			<div className="tvstudio-page-actions">
+				<antd.Button type="primary" onClick={handleNewProfileClick}>
+					Create new
+				</antd.Button>
+			</div>
 
-        {
-            !selectedProfileId && <div className="tvstudio-page-selector-hint">
-                <h1>
-                    Select profile or create new
-                </h1>
-            </div>
-        }
-    </div>
+			{list.length > 0 &&
+				list.map((profile, index) => {
+					return (
+						<Profile
+							key={index}
+							profile={profile}
+							onClick={() => handleProfileClick(profile._id)}
+						/>
+					)
+				})}
+		</div>
+	)
 }
 
 export default TVStudioPage

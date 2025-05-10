@@ -3,7 +3,7 @@ import React from "react"
 import Searcher from "@components/Searcher"
 import SearchModel from "@models/search"
 
-const MusicNavbar = (props) => {
+const MusicNavbar = React.forwardRef((props, ref) => {
 	return (
 		<div className="music_navbar">
 			<Searcher
@@ -17,6 +17,6 @@ const MusicNavbar = (props) => {
 			/>
 		</div>
 	)
-}
+})
 
 export default MusicNavbar

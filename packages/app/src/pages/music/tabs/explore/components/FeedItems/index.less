@@ -1,0 +1,63 @@
+.music-feed-items {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	gap: 10px;
+
+	&.tracks {
+		.music-feed-items-content {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+	}
+
+	&.playlists {
+		.music-feed-items-content {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+
+			gap: 30px;
+		}
+	}
+
+	&.radios {
+		.music-feed-items-content {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+
+			gap: 30px;
+		}
+	}
+
+	.music-feed-items-header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		/* h1 {
+			font-size: 1.5rem;
+			margin: 0;
+		} */
+
+		.music-feed-items-actions {
+			display: flex;
+			flex-direction: row;
+
+			gap: 10px;
+
+			align-self: center;
+
+			margin-left: auto;
+		}
+	}
+
+	.music-feed-items-content {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(4, 1fr));
+		gap: 10px;
+	}
+}

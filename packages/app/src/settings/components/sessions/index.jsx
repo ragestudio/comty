@@ -8,70 +8,80 @@ import SessionModel from "@models/session"
 import "./index.less"
 
 export default () => {
-    const [loading, setLoading] = React.useState(true)
-    const [sessions, setSessions] = React.useState([])
-    const [sessionsPage, setSessionsPage] = React.useState(1)
-    const [itemsPerPage, setItemsPerPage] = React.useState(3)
+	const [loading, setLoading] = React.useState(true)
+	const [sessions, setSessions] = React.useState([])
+	const [sessionsPage, setSessionsPage] = React.useState(1)
+	const [itemsPerPage, setItemsPerPage] = React.useState(3)
 
-    const loadSessions = async () => {
-        setLoading(true)
+	const loadSessions = async () => {
+		setLoading(true)
 
-        const response = await SessionModel.getAllSessions().catch((err) => {
-            console.error(err)
-            app.message.error("Failed to load sessions")
-            return null
-        })
+		const response = await SessionModel.getAllSessions().catch((err) => {
+			console.error(err)
+			app.message.error("Failed to load sessions")
+			return null
+		})
 
-        if (response) {
-            setSessions(response)
-        }
+		if (response) {
+			setSessions(response)
+		}
 
-        setLoading(false)
-    }
+		setLoading(false)
+	}
 
-    const onClickRevoke = async (session) => {
-        console.log(session)
+	const onClickRevoke = async (session) => {
+		console.log(session)
 
-        app.message.warning("Not implemented yet")
-    }
+		app.message.warning("Not implemented yet")
+	}
 
-    const onClickRevokeAll = async () => {
-        app.message.warning("Not implemented yet")
-    }
+	const onClickDestroyAll = async () => {
+		app.layout.modal.confirm({
+			headerText: "Are you sure you want to delete this release?",
+			descriptionText: "This action cannot be undone.",
+			onConfirm: async () => {
+				await SessionModel.destroyAll()
+				await app.auth.logout(true)
+			},
+		})
+	}
 
-    React.useEffect(() => {
-        loadSessions()
-    }, [])
+	React.useEffect(() => {
+		loadSessions()
+	}, [])
 
-    if (loading) {
-        return <antd.Skeleton active />
-    }
+	if (loading) {
+		return <antd.Skeleton active />
+	}
 
-    const offset = (sessionsPage - 1) * itemsPerPage
-    const slicedItems = sessions.slice(offset, offset + itemsPerPage)
+	const offset = (sessionsPage - 1) * itemsPerPage
+	const slicedItems = sessions.slice(offset, offset + itemsPerPage)
 
-    return <div className="security_sessions">
-        <div className="security_sessions_list">
-            {
-                slicedItems.map((session) => {
-                    return <SessionItem
-                        key={session._id}
-                        session={session}
-                        onClickRevoke={onClickRevoke}
-                    />
-                })
-            }
+	return (
+		<div className="security_sessions">
+			<div className="security_sessions_list">
+				{slicedItems.map((session) => {
+					return (
+						<SessionItem
+							key={session._id}
+							session={session}
+							onClickRevoke={onClickRevoke}
+						/>
+					)
+				})}
 
-            <antd.Pagination
-                onChange={(page) => {
-                    setSessionsPage(page)
-                }}
-                total={sessions.length}
-                showTotal={(total) => {
-                    return `${total} Sessions`
-                }}
-                simple
-            />
-        </div>
-    </div>
+				<antd.Pagination
+					onChange={(page) => {
+						setSessionsPage(page)
+					}}
+					total={sessions.length}
+					showTotal={(total) => {
+						return `${total} Sessions`
+					}}
+					simple
+				/>
+			</div>
+			<antd.Button onClick={onClickDestroyAll}>Destroy all</antd.Button>
+		</div>
+	)
 }

@@ -1,108 +1,14 @@
-html {
-	&.mobile {
-		.musicExplorer {
-			.playlistExplorer_section_list {
-				overflow: visible;
-				overflow-x: scroll;
+&.mobile {
+	.music-explore {
+		padding: 0 10px;
 
-				width: unset;
-				display: flex;
-				flex-direction: row;
-
-				grid-gap: 10px;
-			}
-		}
-	}
-}
-
-.featured_playlist {
-	position: relative;
-
-	display: flex;
-	flex-direction: row;
-
-	overflow: hidden;
-
-	background-color: var(--background-color-accent);
-
-	width: 100%;
-	min-height: 200px;
-	height: fit-content;
-
-	border-radius: 12px;
-
-	cursor: pointer;
-
-	&:hover {
-		.featured_playlist_content {
-			h1,
-			p {
-				-webkit-text-stroke-width: 1.6px;
-				-webkit-text-stroke-color: var(--border-color);
-
-				color: var(--background-color-contrast);
-			}
+		.recently_played-content {
+			padding: 0;
 		}
 
-		.lazy-load-image-background {
-			opacity: 1;
-		}
-	}
-
-	.lazy-load-image-background {
-		z-index: 50;
-
-		position: absolute;
-
-		opacity: 0.3;
-
-		transition: all 300ms ease-in-out !important;
-
-		img {
-			width: 100%;
-			height: 100%;
-		}
-	}
-
-	.featured_playlist_content {
-		z-index: 55;
-
-		padding: 20px;
-
-		display: flex;
-		flex-direction: column;
-
-		h1 {
-			font-size: 2.5rem;
-			font-family: "Space Grotesk", sans-serif;
-			font-weight: 900;
-
-			transition: all 300ms ease-in-out !important;
-		}
-
-		p {
-			font-size: 1rem;
-			font-family: "Space Grotesk", sans-serif;
-
-			transition: all 300ms ease-in-out !important;
-		}
-
-		.featured_playlist_genre {
-			z-index: 55;
-
-			position: absolute;
-
-			left: 0;
-			bottom: 0;
-
-			margin: 10px;
-
-			background-color: var(--background-color-accent);
-			border: 1px solid var(--border-color);
-
-			border-radius: 12px;
-
-			padding: 10px 20px;
+		.music-explore-content {
+			display: flex;
+			flex-direction: column;
 		}
 	}
 }
@@ -118,14 +24,14 @@ html {
 	border-radius: 12px;
 }
 
-.musicExplorer {
+.music-explore {
 	display: flex;
 	flex-direction: column;
 
 	width: 100%;
 	height: 100%;
 
-	gap: 20px;
+	gap: 30px;
 
 	&.search-focused {
 		.feed_main {
@@ -134,18 +40,19 @@ html {
 		}
 	}
 
-	.feed_main {
-		display: flex;
-		flex-direction: column;
+	.music-explore-content {
+		display: grid;
+		grid-template-columns: repeat(2, auto);
+		grid-template-rows: auto;
 
 		width: 100%;
 		height: 100%;
 
-		gap: 50px;
+		gap: 30px;
 
-		transition: all 0.2s ease-in-out;
-
-		overflow-x: visible;
+		@media screen and (max-width: 1200px) {
+			grid-template-columns: 1fr;
+		}
 	}
 }
 

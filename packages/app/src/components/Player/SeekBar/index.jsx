@@ -1,6 +1,5 @@
 import React from "react"
-import * as antd from "antd"
-import Slider from "@mui/material/Slider"
+import Slider from "./slider"
 import classnames from "classnames"
 
 import seekToTimeLabel from "@utils/seekToTimeLabel"
@@ -8,6 +7,8 @@ import seekToTimeLabel from "@utils/seekToTimeLabel"
 import "./index.less"
 
 export default class SeekBar extends React.Component {
+	static updateInterval = 1000
+
 	state = {
 		playing: app.cores.player.state["playback_status"] === "playing",
 		timeText: "00:00",
@@ -63,10 +64,16 @@ export default class SeekBar extends React.Component {
 		const seek = app.cores.player.controls.seek()
 		const duration = app.cores.player.controls.duration()
 
-		const percent = (seek / duration) * 100
+		let percent = 0 // Default to 0
+		// Ensure duration is a positive number to prevent division by zero or NaN results
+		if (typeof duration === "number" && duration > 0) {
+			percent = (seek / duration) * 100
+		}
 
+		// Ensure percent is a finite number; otherwise, default to 0.
+		// This handles cases like NaN (e.g., 0/0) or Infinity.
 		this.setState({
-			sliderTime: percent,
+			sliderTime: Number.isFinite(percent) ? percent : 0,
 		})
 	}
 
@@ -130,7 +137,7 @@ export default class SeekBar extends React.Component {
 		if (this.state.playing) {
 			this.interval = setInterval(() => {
 				this.updateAll()
-			}, 1000)
+			}, SeekBar.updateInterval)
 		} else {
 			if (this.interval) {
 				clearInterval(this.interval)
@@ -173,7 +180,6 @@ export default class SeekBar extends React.Component {
 					})}
 				>
 					<Slider
-						size="small"
 						value={this.state.sliderTime}
 						disabled={
 							this.props.stopped ||
@@ -189,18 +195,17 @@ export default class SeekBar extends React.Component {
 								sliderLock: true,
 							})
 						}}
-						onChangeCommitted={() => {
+						onChangeCommitted={(_, value) => {
 							this.setState({
 								sliderLock: false,
 							})
 
-							this.handleSeek(this.state.sliderTime)
+							this.handleSeek(value)
 
 							if (!this.props.playing) {
 								app.cores.player.playback.play()
 							}
 						}}
-						valueLabelDisplay="auto"
 						valueLabelFormat={(value) => {
 							return seekToTimeLabel(
 								(value / 100) *

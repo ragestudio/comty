@@ -1,4 +1,4 @@
-import ToolBarPlayer from "@components/Player/ToolBarPlayer"
+import Player from "@components/Player"
 
 export default class PlayerUI {
 	constructor(player) {
@@ -21,7 +21,7 @@ export default class PlayerUI {
 		if (app.layout.tools_bar) {
 			this.currentDomWindow = app.layout.tools_bar.attachRender(
 				"mediaPlayer",
-				ToolBarPlayer,
+				Player,
 				undefined,
 				{
 					position: "bottom",

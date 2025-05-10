@@ -70,6 +70,7 @@ export default async (payload = {}) => {
 			"https://storage.ragestudio.net/comty-static-assets/default_song.png",
 		source: payload.source,
 		metadata: metadata,
+		public: payload.public ?? true,
 	}
 
 	if (Array.isArray(payload.artists)) {
@@ -81,6 +82,7 @@ export default async (payload = {}) => {
 		publisher: {
 			user_id: payload.user_id,
 		},
+		created_at: new Date(),
 	})
 
 	await track.save()
