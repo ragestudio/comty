@@ -195,9 +195,11 @@ export default class ChunkedUpload {
 	}
 
 	waitOnSSE(data) {
-		console.log(`[UPLOADER] Connecting to SSE channel >`, data.sseUrl)
+		// temporal solution until comty.js manages this
+		const url = `${app.cores.api.client().mainOrigin}/upload/sse_events/${data.sseChannelId}`
 
-		const eventSource = new EventSource(data.sseUrl)
+		console.log(`[UPLOADER] Connecting to SSE channel >`, url)
+		const eventSource = new EventSource(url)
 
 		eventSource.onerror = (error) => {
 			this.events.emit("error", error)

@@ -105,7 +105,7 @@ export default {
 					return {
 						uploadId: payload.uploadId,
 						sseChannelId: job.sseChannelId,
-						sseUrl: `${req.headers["x-forwarded-proto"] || req.protocol}://${req.get("host")}/upload/sse_events/${job.sseChannelId}`,
+						sseUrl: `${req.headers["x-forwarded-proto"] || req.protocol}://${req.get("x-forwarded-host") ?? req.get("host")}/upload/sse_events/${job.sseChannelId}`,
 					}
 				}
 
