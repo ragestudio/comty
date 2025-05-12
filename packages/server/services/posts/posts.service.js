@@ -12,7 +12,10 @@ export default class API extends Server {
 	static refName = "posts"
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3001
 
-	static websockets = true
+	static websockets = {
+		enabled: true,
+		path: "/posts",
+	}
 	static bypassCors = true
 
 	static useMiddlewares = ["logs"]
