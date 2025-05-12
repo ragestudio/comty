@@ -59,6 +59,10 @@ const ProfileData = (props) => {
 			return false
 		}
 
+		if (!ws.state.connected) {
+			return false
+		}
+
 		const health = await ws.call("stream:health", profile_id)
 
 		setStreamHealth(health)

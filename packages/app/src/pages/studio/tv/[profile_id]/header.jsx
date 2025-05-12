@@ -9,7 +9,11 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 
 	async function setTimedThumbnail() {
 		setThumbnail(() => {
-			if (streamRef.current.online && profile.info.thumbnail) {
+			if (
+				streamRef.current &&
+				streamRef.current.online &&
+				profile.info.thumbnail
+			) {
 				return `${profile.info.thumbnail}?t=${Date.now()}`
 			}
 

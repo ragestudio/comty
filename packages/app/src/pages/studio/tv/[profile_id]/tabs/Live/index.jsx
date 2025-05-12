@@ -4,6 +4,7 @@ import UploadButton from "@components/UploadButton"
 import { FiImage, FiInfo } from "react-icons/fi"
 import { MdTextFields, MdDescription } from "react-icons/md"
 
+import StreamPreview from "../../components/StreamPreview"
 import StreamRateChart from "../../components/StreamRateChart"
 import { formatBytes, formatBitrate } from "../../liveTabUtils"
 import { useStreamSignalQuality } from "../../useStreamSignalQuality"
@@ -146,7 +147,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 					</div>
 					<div className="content-panel__content">
 						<div className="status-indicator">
-							Stream Status:{" "}
+							Stream Status:
 							{streamHealth?.online ? (
 								<Tag color="green">Online</Tag>
 							) : (
@@ -155,9 +156,14 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 						</div>
 
 						<div className="live-tab-preview">
-							{streamHealth?.online
-								? "Video Preview Area"
-								: "Stream is Offline"}
+							{streamHealth?.online ? (
+								<StreamPreview
+									streamHealth={streamHealth}
+									profile={profile}
+								/>
+							) : (
+								"Stream is Offline"
+							)}
 						</div>
 					</div>
 				</div>
