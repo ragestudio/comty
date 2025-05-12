@@ -3,20 +3,10 @@
 	"license": "ComtyLicense",
 	"private": true,
 	"scripts": {
-		"dev": "concurrently -k \"yarn dev:client\" \"yarn dev:server\"",
+		"dev": "npm run dev:client & npm run dev:server",
 		"dev:server": "cd packages/server && npm run dev",
 		"dev:client": "cd packages/app && npm run dev",
-		"postinstall": "node ./scripts/post-install.js"
-	},
-	"dependencies": {
-		"7zip-min": "1.4.3",
-		"@ragestudio/hermes": "^1.0.0",
-		"axios": "^1.4.0",
-		"concurrently": "^7.5.0",
-		"dotenv": "16.0.3",
-		"form-data": "^4.0.0",
-		"mintlify": "^4.0.206",
-		"octokit": "^2.0.14"
+		"postinstall": "cd packages/app && npm install && cd ../server && npm install"
 	},
 	"_web_app_path": "packages/app"
 }
