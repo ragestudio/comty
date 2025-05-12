@@ -1,7 +1,7 @@
 <p align="center">
-<img 
+<img
     alt="Comty logo"
-    src="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg" 
+    src="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg"
     height="150px"
 />
 </p>
@@ -42,9 +42,9 @@ We have official public services that you can find on these platforms!
 ### Prerequisites
 For local development you will need to have installed some tools:
 
-- Install Node.js (v18 or higher) [manualy](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) tool.
+- Install Node.js (v18 or higher) [manualy](https://nodejs.org/en/download/) or use [nvm](https://github.com/nvm-sh/nvm) tool (or similar tools).
 
-- (Recomended) Install [Yarn](https://yarnpkg.com/getting-started/install) package manager.
+- (Recomended) Use [npm](https://docs.npmjs.com/cli/v11/configuring-npm/install) package manager.
 
 - (Optional) Install [Docker](https://docs.docker.com/get-docker/), used for building and deployment.
 
@@ -56,13 +56,13 @@ git clone --recurse-submodules https://github.com/ragestudio/comty && cd comty
 
 - Installing all dependencies
 ```shell
-yarn install
+npm install
 ```
 
 ### Starting the development server
-- You can use the command `yarn dev` to start all development servers.
+- You can use the command `npm run dev` to start all development servers.
 ```shell
-yarn dev
+npm run dev
 ```
 
 ## 🧑‍💻 Status
@@ -72,10 +72,10 @@ The project is in alpha design phase, and the development is slow but continuous
 
 > If you are interested in more depth in the project, you can join our [Discord server](https://discord.gg/yxQR6EXf2F) and talk to us.
 
-## 🤝 Contributions 
+## 🤝 Contributions
 Contributions to Comty are welcome. If you want to contribute, please follow the instructions mentioned in the CONTRIBUTING.md file.
 
-## 📜 License 
+## 📜 License
 Comty is licensed under the Comty license. See the LICENSE file for more details.
 
 ## :heart: Thanks to our supporters
