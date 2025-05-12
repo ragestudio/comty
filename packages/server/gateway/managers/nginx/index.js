@@ -371,19 +371,12 @@ http {
 
 		if (route.pathRewrite && Object.keys(route.pathRewrite).length > 0) {
 			rewriteConfig += "# Path rewrite rules\n"
+
 			for (const [pattern, replacement] of Object.entries(
 				route.pathRewrite,
 			)) {
 				// Improved rewrite pattern that preserves query parameters
-				rewriteConfig += `\trewrite ${pattern} ${replacement}$is_args$args break;`
-			}
-		} else {
-			// If no explicit rewrite is defined, but we need to strip the path prefix,
-			// Generate a default rewrite that preserves the URL structure
-			if (path !== "/") {
-				rewriteConfig += "# Default path rewrite to strip prefix\n"
-				rewriteConfig += `\trewrite ^${path}(/.*)$ $1$is_args$args break;\n`
-				rewriteConfig += `\trewrite ^${path}$ / break;`
+				rewriteConfig += `\nrewrite ${pattern} ${replacement} break;`
 			}
 		}
 
@@ -422,6 +415,8 @@ ${locationDirective} {
     # Set headers for WebSocket support
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
+
+    ${rewriteConfig}
 
     # Proxy pass to service
     proxy_pass ${route.target};

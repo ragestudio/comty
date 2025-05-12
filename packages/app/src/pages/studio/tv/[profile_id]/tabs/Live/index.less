@@ -27,7 +27,10 @@
 		justify-content: center;
 
 		width: 100%;
-		min-height: 200px;
+		height: 250px;
+
+		max-height: 250px;
+		min-height: 250px;
 
 		background-color: var(--background-color-primary);
 
@@ -35,6 +38,14 @@
 		border-radius: 4px;
 
 		font-size: 1rem;
+
+		overflow: hidden;
+
+		video {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
 	}
 
 	.live-tab-stats {

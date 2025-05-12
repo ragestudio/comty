@@ -166,6 +166,92 @@ export default class Gateway {
 	}
 
 	/**
+	 * Loads and registers additional proxy routes from ../../extra-proxies.js
+	 */
+	async registerExtraProxies() {
+		try {
+			// Dynamic import is relative to the current file.
+			// extra-proxies.js can be CJS (module.exports = ...) or ESM (export default ...)
+			const extraProxiesModule = require(
+				path.resolve(process.cwd(), "extra-proxies.js"),
+			)
+			const extraProxies = extraProxiesModule.default // Node's CJS/ESM interop puts module.exports on .default
+
+			if (
+				!extraProxies ||
+				typeof extraProxies !== "object" ||
+				Object.keys(extraProxies).length === 0
+			) {
+				console.log(
+					"[Gateway] No extra proxies defined in `extra-proxies.js`, file is empty, or format is invalid. Skipping.",
+				)
+				return
+			}
+
+			console.log(
+				`[Gateway] Registering extra proxies from 'extra-proxies.js'...`,
+			)
+
+			for (const proxyPathKey in extraProxies) {
+				if (
+					Object.prototype.hasOwnProperty.call(
+						extraProxies,
+						proxyPathKey,
+					)
+				) {
+					const config = extraProxies[proxyPathKey]
+					if (!config || typeof config.target !== "string") {
+						console.warn(
+							`[Gateway] Skipping invalid extra proxy config for path: '${proxyPathKey}' in 'extra-proxies.js'. Target is missing or not a string.`,
+						)
+						continue
+					}
+
+					let registrationPath = proxyPathKey
+
+					// Normalize paths ending with /*
+					// e.g., "/spectrum/*" becomes "/spectrum"
+					// e.g., "/*" becomes "/"
+					if (registrationPath.endsWith("/*")) {
+						registrationPath = registrationPath.slice(0, -2)
+						if (registrationPath === "") {
+							registrationPath = "/"
+						}
+					}
+
+					console.log(
+						`[Gateway] Registering extra proxy: '${proxyPathKey}' (as '${registrationPath}') -> ${config.target}`,
+					)
+
+					await this.gateway.register({
+						serviceId: `extra-proxy:${registrationPath}`, // Unique ID for this proxy rule
+						path: registrationPath,
+						target: config.target,
+						pathRewrite: config.pathRewrite, // undefined if not present
+						websocket: !!config.websocket, // false if not present or falsy
+					})
+				}
+			}
+		} catch (error) {
+			// Handle cases where the extra-proxies.js file might not exist
+			if (
+				error.code === "ERR_MODULE_NOT_FOUND" ||
+				(error.message &&
+					error.message.toLowerCase().includes("cannot find module"))
+			) {
+				console.log(
+					"[Gateway] `extra-proxies.js` not found. Skipping extra proxy registration.",
+				)
+			} else {
+				console.error(
+					"[Gateway] Error loading or registering extra proxies from `extra-proxies.js`:",
+					error,
+				)
+			}
+		}
+	}
+
+	/**
 	 * Handle both router and websocket registration requests from services
 	 * @param {Service} service - Service registering a route or websocket
 	 * @param {object} msg - Registration message
@@ -303,6 +389,9 @@ export default class Gateway {
 		if (typeof this.gateway.initialize === "function") {
 			await this.gateway.initialize()
 		}
+
+		// Register any externally defined proxies before services start
+		await this.registerExtraProxies()
 
 		// Watch for service state changes
 		Observable.observe(this.serviceRegistry, (changes) => {

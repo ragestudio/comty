@@ -1,0 +1,107 @@
+.tvstudio-page-list-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	height: 130px;
+
+	background-color: var(--background-color-accent);
+
+	overflow: hidden;
+
+	&:not(:last-child) {
+		border-bottom: 3px solid var(--border-color);
+	}
+
+	&__id {
+		position: absolute;
+		z-index: 100;
+
+		top: 0;
+		right: 0;
+
+		padding: 10px;
+	}
+
+	&__thumbnail {
+		position: absolute;
+		z-index: 55;
+
+		right: 0;
+		top: 0;
+
+		background-size: cover;
+		background-position: center;
+
+		opacity: 0.5;
+
+		width: 50%;
+		height: 100%;
+
+		cursor: pointer;
+
+		mask-image: linear-gradient(
+			to right,
+			rgba(0, 0, 0, 0),
+			rgba(0, 0, 0, 1)
+		);
+	}
+
+	&__content {
+		z-index: 100;
+
+		display: flex;
+		flex-direction: column;
+
+		width: 60%;
+		height: 100%;
+
+		padding: 20px 20px;
+
+		gap: 5px;
+
+		&__title {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			gap: 10px;
+
+			font-size: 0.8rem;
+		}
+
+		&__description {
+			display: flex;
+
+			flex-direction: row;
+			align-items: center;
+
+			gap: 10px;
+
+			font-size: 0.7rem;
+		}
+
+		&__actions {
+			position: absolute;
+
+			display: flex;
+
+			flex-direction: row;
+			align-items: center;
+
+			gap: 10px;
+
+			margin: 10px 20px;
+
+			bottom: 0;
+			left: 0;
+
+			.ant-btn {
+				font-size: 0.7rem;
+			}
+		}
+	}
+}

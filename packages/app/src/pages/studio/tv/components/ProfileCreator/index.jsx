@@ -7,33 +7,30 @@ import "./index.less"
 
 const ProfileCreator = (props) => {
 	const [loading, setLoading] = React.useState(false)
-	const [name, setName] = React.useState(props.editValue ?? null)
+	const [title, setTitle] = React.useState(props.editValue ?? null)
 
 	function handleChange(e) {
-		setName(e.target.value.trim())
+		setTitle(e.target.value.trim())
 	}
 
 	async function handleSubmit() {
 		setLoading(true)
 
-		if (props.editValue) {
-			if (typeof props.onEdit === "function") {
-				await props.onEdit(name)
-			}
-		} else {
-			const result = await Streaming.createProfile({
-				profile_name: name,
-			}).catch((error) => {
-				console.error(error)
-				app.message.error("Failed to create")
-				return null
-			})
+		const result = await Streaming.createProfile({
+			info: {
+				title: title,
+			},
+		}).catch((error) => {
+			console.error(error)
+			app.message.error("Failed to create")
+			return null
+		})
 
-			if (result) {
-				app.message.success("Created")
-				app.eventBus.emit("app:new_profile", result)
-				props.onCreate(result._id, result)
-			}
+		if (result) {
+			app.message.success("Created")
+			app.eventBus.emit("app:new_profile", result)
+
+			props.onCreate(result._id, result)
 		}
 
 		props.close()
@@ -44,8 +41,8 @@ const ProfileCreator = (props) => {
 	return (
 		<div className="profile-creator">
 			<antd.Input
-				value={name}
-				placeholder="Enter a profile name"
+				value={title}
+				placeholder="Enter a profile title"
 				onChange={handleChange}
 			/>
 
@@ -55,12 +52,12 @@ const ProfileCreator = (props) => {
 				<antd.Button
 					type="primary"
 					onClick={() => {
-						handleSubmit(name)
+						handleSubmit(title)
 					}}
-					disabled={!name || loading}
+					disabled={!title || loading}
 					loading={loading}
 				>
-					{props.editValue ? "Update" : "Create"}
+					Create
 				</antd.Button>
 			</div>
 		</div>

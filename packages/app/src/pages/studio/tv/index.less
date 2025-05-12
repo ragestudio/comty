@@ -1,37 +1,57 @@
 .tvstudio-page {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
+	width: 100%;
 
-    gap: 10px;
+	gap: 10px;
 
-    .tvstudio-page-actions {
-        display: flex;
-        flex-direction: row;
+	.tvstudio-page-header {
+		display: flex;
+		flex-direction: row;
 
-        justify-content: space-between;
+		width: fit-content;
 
-        width: 100%;
+		gap: 10px;
 
-        gap: 10px;
+		background-color: var(--background-color-accent);
+		padding: 10px 20px;
 
-        .profile-selector {
-            display: flex;
-            flex-direction: row;
+		border-radius: 12px;
 
-            width: 100%;
-        }
-    }
+		h1 {
+			font-family: "Space Grotesk", sans-serif;
+			font-size: 1.3rem;
+			margin: 0;
+		}
+	}
 
-    .tvstudio-page-selector-hint {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+	.tvstudio-page-actions {
+		display: flex;
+		flex-direction: row;
 
-        width: 100%;
+		justify-content: space-between;
 
-        padding: 50px 0;
-    }
+		width: 100%;
+
+		gap: 10px;
+
+		.profile-selector {
+			display: flex;
+			flex-direction: row;
+
+			width: 100%;
+		}
+	}
+
+	.tvstudio-page-list {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+
+		border-radius: 12px;
+
+		overflow: hidden;
+	}
 }
