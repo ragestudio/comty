@@ -5,6 +5,13 @@ export default class RELP {
 	}
 
 	initCommandLine() {
+		if (!process.stdin) {
+			console.error(
+				"Failed to initialize command line: stdin is not available",
+			)
+			return null
+		}
+
 		// Configure line-by-line input mode
 		process.stdin.setEncoding("utf8")
 		process.stdin.resume()
