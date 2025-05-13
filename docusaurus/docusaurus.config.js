@@ -40,6 +40,7 @@ const config = {
 			/** @type {import("@docusaurus/preset-classic").Options} */
 			({
 				docs: {
+					path: "../docs",
 					sidebarPath: "./sidebars.js",
 					//editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
 				},
@@ -68,12 +69,12 @@ const config = {
 						position: "left",
 						label: "Docs",
 					},
-					{
-						type: "docSidebar",
-						sidebarId: "legal",
-						position: "left",
-						label: "Legal",
-					},
+					// {
+					// 	type: "docSidebar",
+					// 	sidebarId: "legal",
+					// 	position: "left",
+					// 	label: "Legal",
+					// },
 					{
 						href: "https://github.com/ragestudio/comty",
 						label: "GitHub",
@@ -98,7 +99,7 @@ const config = {
 							{
 								label: "Comty",
 								href: "https://comty.app/@ragestudio",
-							}
+							},
 						],
 					},
 				],
@@ -107,6 +108,9 @@ const config = {
 			prism: {
 				theme: prismThemes.github,
 				darkTheme: prismThemes.dracula,
+			},
+			colorMode: {
+				defaultMode: "dark",
 			},
 		}),
 }
