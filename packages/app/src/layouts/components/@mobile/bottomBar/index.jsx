@@ -84,7 +84,7 @@ const PlayerButton = (props) => {
 		}
 	}, [currentManifest])
 
-	const isPlaying = player?.playback_status === "playing" ?? false
+	const isPlaying = player && player?.playback_status === "playing"
 
 	return (
 		<div
