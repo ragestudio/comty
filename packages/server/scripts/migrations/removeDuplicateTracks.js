@@ -22,7 +22,7 @@ async function main() {
 			!track.source.startsWith("http")
 		) {
 			console.warn(
-				`  Skipping track ID ${track._id} due to invalid or missing source URL: "${track.source}"`,
+				`Skipping track ID ${track._id} due to invalid or missing source URL: "${track.source}"`,
 			)
 			continue
 		}
@@ -31,19 +31,18 @@ async function main() {
 
 		try {
 			console.log(
-				`  [${index + 1}/${tracks.length}] Fetching ETag for source: ${track.source} (Track ID: ${track._id})`,
+				`[${index + 1}/${tracks.length}] Fetching ETag for source: ${track.source} (Track ID: ${track._id})`,
 			)
+
 			const response = await axios.head(track.source, {
 				timeout: 10000, // 10 seconds timeout
-				// Add headers to mimic a browser to avoid some 403s or other blocks
 				headers: {
-					"User-Agent":
-						"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-					Accept: "*/*", // More generic accept for HEAD
+					Accept: "*/*",
 					"Accept-Encoding": "gzip, deflate, br",
 					Connection: "keep-alive",
 				},
 			})
+
 			// ETag header can be 'etag' or 'ETag' (case-insensitive)
 			const etag = response.headers["etag"] || response.headers["ETag"]
 
@@ -52,7 +51,6 @@ async function main() {
 					tracksByETag.set(etag, [])
 				}
 				tracksByETag.get(etag).push(track)
-				// console.log(`    ETag: ${etag} found for source: ${track.source}`)
 			} else {
 				console.warn(
 					`  No ETag found for source: ${track.source} (Track ID: ${track._id})`,
@@ -60,19 +58,16 @@ async function main() {
 			}
 		} catch (error) {
 			let errorMessage = error.message
+
 			if (error.response) {
-				// The request was made and the server responded with a status code
-				// that falls out of the range of 2xx
 				errorMessage = `Server responded with status ${error.response.status} ${error.response.statusText}`
 			} else if (error.request) {
-				// The request was made but no response was received
 				errorMessage =
 					"No response received from server (e.g., timeout, network error)"
 			}
-			// else: Something happened in setting up the request that triggered an Error
 
 			console.error(
-				`  Error fetching ETag for ${track.source} (Track ID: ${track._id}): ${errorMessage}`,
+				`Error fetching ETag for ${track.source} (Track ID: ${track._id}): ${errorMessage}`,
 			)
 		}
 	}
@@ -97,21 +92,21 @@ async function main() {
 			)
 
 			const trackToKeep = tracksForETag[0]
-			const tracksToDelete = tracksForETag.slice(1) // All tracks except the newest one
+			const tracksToDelete = tracksForETag.slice(1)
 
 			if (tracksToDelete.length > 0) {
 				const idsToDelete = tracksToDelete.map((track) => track._id)
 
 				console.log(
-					`  Keeping Track ID: ${trackToKeep._id} (Source: ${trackToKeep.source}) - selected due to largest _id (assumed newer).`,
+					`Keeping Track ID: ${trackToKeep._id} (Source: ${trackToKeep.source}) - selected due to largest _id (assumed newer).`,
 				)
 				tracksToDelete.forEach((t) => {
 					console.log(
-						`    Marking for deletion: Track ID: ${t._id} (Source: ${t.source})`,
+						`Marking for deletion: Track ID: ${t._id} (Source: ${t.source})`,
 					)
 				})
 				console.log(
-					`  Attempting to delete ${idsToDelete.length} duplicate tracks for ETag: "${etag}"`,
+					`Attempting to delete ${idsToDelete.length} duplicate tracks for ETag: "${etag}"`,
 				)
 
 				try {
@@ -121,22 +116,23 @@ async function main() {
 
 					if (deleteResult.deletedCount > 0) {
 						console.log(
-							`  Successfully deleted ${deleteResult.deletedCount} tracks for ETag: "${etag}"`,
+							`Successfully deleted ${deleteResult.deletedCount} tracks for ETag: "${etag}"`,
 						)
 						deletedCount += deleteResult.deletedCount
 					} else {
 						console.warn(
-							`  Deletion command executed for ETag "${etag}", but no tracks were deleted. IDs: ${idsToDelete.join(", ")}`,
+							`Deletion command executed for ETag "${etag}", but no tracks were deleted. IDs: ${idsToDelete.join(", ")}`,
 						)
 					}
 				} catch (dbError) {
 					console.error(
-						`  Database error deleting tracks for ETag "${etag}": ${dbError.message}`,
+						`Database error deleting tracks for ETag "${etag}": ${dbError.message}`,
 					)
 				}
 			}
 		}
 	}
+
 	console.log(`Finished processing. Total tracks deleted: ${deletedCount}.`)
 }
 
