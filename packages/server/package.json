@@ -7,8 +7,9 @@
 		"services/*"
 	],
 	"scripts": {
-		"start:prod": "cross-env NODE_ENV=production linebridge-boot ./start.js",
-		"dev": "cross-env NODE_ENV=development hermes-node ./start.js"
+		"start:prod": "cross-env NODE_ENV=production hermes-node ./start.js",
+		"dev": "cross-env NODE_ENV=development hermes-node ./start.js",
+		"setup": "./boot scripts/setup/index.js"
 	},
 	"dependencies": {
 		"@grpc/grpc-js": "^1.13.2",
@@ -23,7 +24,6 @@
 		"bullmq": "^5.41.5",
 		"chalk": "^5.4.1",
 		"chokidar": "^4.0.3",
-		"comty.js": "^0.61.0",
 		"cross-env": "^7.0.3",
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",

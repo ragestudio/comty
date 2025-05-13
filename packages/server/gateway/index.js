@@ -20,15 +20,12 @@ import * as Managers from "./managers"
 global.debugFlag = process.env.DEBUG === "true"
 const isProduction = process.env.NODE_ENV === "production"
 
-const sslKey = path.resolve(process.cwd(), ".ssl", "privkey.pem")
-const sslCert = path.resolve(process.cwd(), ".ssl", "cert.pem")
-
 /**
  * Gateway class - Main entry point for the service orchestrator
  * Manages service discovery, spawning, and communication
  */
 export default class Gateway {
-	static gatewayMode = process.env.GATEWAY_MODE ?? "http_proxy"
+	static gatewayMode = process.env.GATEWAY_MODE ?? "nginx"
 
 	eventBus = new EventEmitter()
 
@@ -382,8 +379,8 @@ export default class Gateway {
 		this.gateway = new Managers[this.constructor.gatewayMode]({
 			port: this.state.proxyPort,
 			internalIp: this.state.internalIp,
-			cert_file_name: sslCert,
-			key_file_name: sslKey,
+			key_file_name: process.env.GATEWAY_SSL_KEY,
+			cert_file_name: process.env.GATEWAY_SSL_CERT,
 		})
 
 		if (typeof this.gateway.initialize === "function") {

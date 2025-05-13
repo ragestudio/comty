@@ -6,6 +6,7 @@
 		"dev": "npm run dev:client & npm run dev:server",
 		"dev:server": "cd packages/server && npm run dev",
 		"dev:client": "cd packages/app && npm run dev",
+		"setup:server": "cd packages/server && npm run setup",
 		"postinstall": "cd packages/app && npm install && cd ../server && npm install"
 	},
 	"_web_app_path": "packages/app"

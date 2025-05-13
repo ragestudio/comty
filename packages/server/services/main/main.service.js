@@ -1,8 +1,6 @@
 import { Server } from "linebridge"
 import DbManager from "@shared-classes/DbManager"
 
-import StartupDB from "./startup_db"
-
 import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
@@ -25,7 +23,6 @@ export default class API extends Server {
 
 	async onInitialize() {
 		await this.contexts.db.initialize()
-		await StartupDB()
 	}
 }
 

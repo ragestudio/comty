@@ -7,10 +7,6 @@ import defaults from "linebridge/dist/defaults"
 const localNginxBinary = path.resolve(process.cwd(), "nginx-bin")
 const serverPkg = require("../../../package.json")
 
-/**
- * NginxManager - Optimized version that batches configurations
- * Waits for all services to register before applying configuration
- */
 export default class NginxManager {
 	constructor(options = {}) {
 		this.options = options
