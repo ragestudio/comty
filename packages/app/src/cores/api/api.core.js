@@ -24,6 +24,7 @@ export default class APICore extends Core {
 		listenEvent: this.listenEvent.bind(this),
 		unlistenEvent: this.unlistenEvent.bind(this),
 		emitEvent: this.emitEvent.bind(this),
+		reset: this.reset.bind(this),
 		measurePing: measurePing,
 		useRequest: useRequest,
 	}
@@ -84,6 +85,10 @@ export default class APICore extends Core {
 		return this.client.ws.sockets.get(instance).off(key, handler)
 	}
 
+	async reset() {
+		this.client.ws.connectAll()
+	}
+
 	async onInitialize() {
 		this.client = await createClient({
 			eventBus: app.eventBus,
@@ -91,15 +96,6 @@ export default class APICore extends Core {
 				enable: true,
 				autoConnect: true,
 			},
-		})
-
-		// handle auth events
-		this.client.eventBus.on("auth:login_success", () => {
-			this.client.ws.connectAll()
-		})
-
-		this.client.eventBus.on("auth:logout_success", () => {
-			this.client.ws.connectAll()
 		})
 
 		// make a basic request to check if the API is available
