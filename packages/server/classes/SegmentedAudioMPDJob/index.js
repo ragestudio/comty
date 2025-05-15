@@ -105,9 +105,9 @@ export default class SegmentedAudioMPDJob extends FFMPEGLib {
 			fs.mkdirSync(outputPath, { recursive: true })
 		}
 
-		const inputProbe = await Utils.probe(this.params.input)
-
 		try {
+			const inputProbe = await Utils.probe(this.params.input)
+
 			const ffmpegResult = await this.ffmpeg({
 				args: segmentationCmd,
 				onProcess: (process) => {
