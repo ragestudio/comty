@@ -1,12 +1,13 @@
 import React from "react"
 import { Upload, Progress } from "antd"
 import classnames from "classnames"
+import queuedUploadFile from "@utils/queuedUploadFile"
 
 import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-export default (props) => {
+const UploadButton = (props) => {
 	const [uploading, setUploading] = React.useState(false)
 	const [progress, setProgress] = React.useState(null)
 
@@ -40,17 +41,7 @@ export default (props) => {
 
 		handleOnStart(req.file.uid, req.file)
 
-		await app.cores.remoteStorage.uploadFile(req.file, {
-			headers: props.headers,
-			onProgress: (file, progress) => {
-				setProgress(progress)
-				handleOnProgress(file.uid, progress)
-			},
-			onError: (file, error) => {
-				setProgress(null)
-				handleOnError(file.uid, error)
-				setUploading(false)
-			},
+		await queuedUploadFile(req.file, {
 			onFinish: (file, response) => {
 				if (typeof props.ctx?.onUpdateItem === "function") {
 					props.ctx.onUpdateItem(response.url)
@@ -67,6 +58,16 @@ export default (props) => {
 					setProgress(null)
 				}, 1000)
 			},
+			onError: (file, error) => {
+				setProgress(null)
+				handleOnError(file.uid, error)
+				setUploading(false)
+			},
+			onProgress: (file, progress) => {
+				setProgress(progress)
+				handleOnProgress(file.uid, progress)
+			},
+			headers: props.headers,
 		})
 	}
 
@@ -106,3 +107,5 @@ export default (props) => {
 		</Upload>
 	)
 }
+
+export default UploadButton

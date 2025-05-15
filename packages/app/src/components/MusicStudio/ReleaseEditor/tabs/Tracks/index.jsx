@@ -1,8 +1,9 @@
 import React from "react"
 import * as antd from "antd"
-import classnames from "classnames"
-import { DragDropContext, Droppable } from "react-beautiful-dnd"
 import { createSwapy } from "swapy"
+
+import queuedUploadFile from "@utils/queuedUploadFile"
+import FilesModel from "@models/files"
 
 import TrackManifest from "@cores/player/classes/TrackManifest"
 
@@ -209,14 +210,14 @@ class TracksManager extends React.Component {
 					console.log(
 						`[${trackManifest.uid}] Founded cover, uploading...`,
 					)
+
 					const coverFile = new File(
 						[trackManifest._coverBlob],
 						"cover.jpg",
 						{ type: trackManifest._coverBlob.type },
 					)
 
-					const coverUpload =
-						await app.cores.remoteStorage.uploadFile(coverFile)
+					const coverUpload = await FilesModel.upload(coverFile)
 
 					trackManifest.cover = coverUpload.url
 				}
@@ -243,25 +244,16 @@ class TracksManager extends React.Component {
 	}
 
 	uploadToStorage = async (req) => {
-		const response = await app.cores.remoteStorage
-			.uploadFile(req.file, {
-				onProgress: this.handleTrackFileUploadProgress,
-				headers: {
-					transformations: "a-dash",
-				},
-			})
-			.catch((error) => {
-				console.error(error)
-				antd.message.error(error)
-
-				req.onError(error)
-
-				return false
-			})
-
-		if (response) {
-			req.onSuccess(response)
-		}
+		await queuedUploadFile(req.file, {
+			onFinish: (file, response) => {
+				req.onSuccess(response)
+			},
+			onError: req.onError,
+			onProgress: this.handleTrackFileUploadProgress,
+			headers: {
+				transformations: "a-dash",
+			},
+		})
 	}
 
 	handleTrackFileUploadProgress = async (file, progress) => {

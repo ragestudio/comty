@@ -1,137 +1,162 @@
 .login-page {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    justify-content: center;
+	justify-content: center;
 
-    align-items: center;
+	align-items: center;
 
-    width: 100vw;
-    height: 100vh;
+	width: 100vw;
+	height: 100vh;
 
-    font-family: "Space Grotesk", sans-serif;
+	font-family: "Space Grotesk", sans-serif;
 
-    .background {
-        position: absolute;
+	.background {
+		position: absolute;
 
-        z-index: 10;
+		z-index: 10;
 
-        top: 0;
-        left: 0;
+		top: 0;
+		left: 0;
 
-        width: 100vw;
-        height: 100vh;
+		width: 100vw;
+		height: 100vh;
 
-        svg {
-            margin: 0;
+		svg {
+			margin: 0;
 
-            opacity: 0;
+			opacity: 0;
 
-            animation: opacityIn 3s ease-in-out 0s forwards;
-        }
+			animation: opacityIn 3s ease-in-out 0s forwards;
+		}
 
-        background-image: radial-gradient(rgba(var(--layout-background-contrast), 0.3) 1px, transparent 0),
-        radial-gradient(rgba(var(--layout-background-contrast), 0.3) 1px, transparent 0);
+		background-image:
+			radial-gradient(
+				rgba(var(--layout-background-contrast), 0.3) 1px,
+				transparent 0
+			),
+			radial-gradient(
+				rgba(var(--layout-background-contrast), 0.3) 1px,
+				transparent 0
+			);
 
-        background-position: 0 0,
-        25px 25px;
-        background-size: 50px 50px;
-    }
+		background-position:
+			0 0,
+			25px 25px;
+		background-size: 50px 50px;
+	}
+}
 
-    .wrapper {
-        position: relative;
-        z-index: 15;
+@login-page-card-img-width: 250px;
 
-        display: flex;
-        flex-direction: row;
+.login-page-card {
+	position: relative;
+	z-index: 15;
 
-        width: 55vw;
-        min-width: 700px;
-        max-width: 800px;
+	display: flex;
+	flex-direction: row;
 
-        overflow: hidden;
+	width: 55vw;
+	min-width: 700px;
+	max-width: 800px;
 
-        height: 50vh;
-        min-height: 500px;
-        max-height: 500px;
+	height: 50vh;
+	min-height: 500px;
+	max-height: 500px;
 
-        transition: all 250ms ease-in-out;
+	background-color: var(--background-color-accent);
+	border: 3px solid var(--border-color);
 
-        background-color: var(--background-color-accent);
+	border-radius: 12px;
 
-        border: 1px solid var(--border-color);
+	transition: all 250ms ease-in-out;
 
-        border-radius: 12px;
+	overflow: hidden;
 
-        .wrapper_background {
-            height: 100%;
+	&__background {
+		position: absolute;
 
-            min-width: 250px;
-            width: 250px;
+		left: 0;
+		top: 0;
 
-            border-radius: 12px;
+		height: 100%;
 
-            background-position: center;
-            background-size: cover;
-            background-repeat: no-repeat;
-        }
+		width: calc(@login-page-card-img-width + 10px);
+		min-width: calc(@login-page-card-img-width + 10px);
 
-        .content {
-            display: flex;
-            flex-direction: column;
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
 
-            align-items: center;
-            justify-content: center;
+		z-index: 1;
+	}
 
-            width: 100%;
+	&__content {
+		position: absolute;
+		display: flex;
+		flex-direction: column;
 
-            min-width: 420px;
+		right: 0;
 
-            gap: 20px;
+		align-items: center;
+		justify-content: center;
 
-            padding: 40px;
+		width: calc(100% - @login-page-card-img-width);
+		min-width: 420px;
 
-            .content_header {
-                height: 70px;
+		height: 100%;
 
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
+		gap: 20px;
+		padding: 40px;
 
-            .actions {
-                display: flex;
-                flex-direction: column;
+		outline: 3px solid var(--border-color-solid);
+		border-radius: 12px;
 
-                align-items: center;
-                justify-content: center;
+		background-color: var(--background-color-accent);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
 
-                width: 100%;
+		z-index: 2;
 
-                gap: 15px;
+		.content_header {
+			height: 70px;
 
-                .ant-btn {
-                    width: 100%;
+			img {
+				width: 100%;
+				height: 100%;
+			}
+		}
 
-                    font-weight: 500;
-                    letter-spacing: -0.6px;
+		.actions {
+			display: flex;
+			flex-direction: column;
 
-                    &:last-child {
-                        margin-bottom: 0;
-                    }
-                }
-            }
-        }
-    }
+			align-items: center;
+			justify-content: center;
+
+			width: 100%;
+
+			gap: 15px;
+
+			.ant-btn {
+				width: 100%;
+
+				font-weight: 500;
+				letter-spacing: -0.6px;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
 }
 
 @keyframes opacityIn {
-    from {
-        opacity: 0;
-    }
+	from {
+		opacity: 0;
+	}
 
-    to {
-        opacity: 1;
-    }
+	to {
+		opacity: 1;
+	}
 }

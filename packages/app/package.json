@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "1.41.0@alpha",
+	"version": "1.42.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -11,7 +11,8 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"release": "node ./scripts/release.js",
-		"postinstall": "./scripts/postinstall.sh"
+		"postinstall": "./scripts/postinstall.sh",
+		"eslint": "eslint"
 	},
 	"dependencies": {
 		"@ant-design/icons": "^5.4.0",
@@ -33,7 +34,7 @@
 		"axios": "^1.7.7",
 		"bear-react-carousel": "^4.0.10-alpha.0",
 		"classnames": "2.3.1",
-		"comty.js": "^0.65.5",
+		"comty.js": "^0.66.0",
 		"d3": "^7.9.0",
 		"dashjs": "^5.0.0",
 		"dompurify": "^3.0.0",
@@ -79,9 +80,13 @@
 		"vite": "^6.2.6"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.26.0",
 		"@octokit/rest": "^21.1.1",
 		"7zip-min": "1.4.3",
 		"dotenv": "16.0.3",
-		"form-data": "^4.0.0"
+		"eslint": "^9.26.0",
+		"eslint-plugin-react": "^7.37.5",
+		"form-data": "^4.0.0",
+		"globals": "^16.1.0"
 	}
 }
