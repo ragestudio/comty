@@ -1,4 +1,4 @@
-//import { Server } from "../../../../linebridge/server/dist"
+//import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
@@ -29,9 +29,12 @@ export default class API extends Server {
 			return res.upgrade(context)
 		}
 
-		context = await InjectedAuth(context, token, res)
+		context = await InjectedAuth(context, token, res).catch(() => {
+			res.close(401, "Failed to verify auth token")
+			return false
+		})
 
-		if (!context.user) {
+		if (!context || !context.user) {
 			res.close(401, "Unauthorized or missing auth token")
 			return false
 		}
