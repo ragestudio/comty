@@ -54,9 +54,9 @@ const AuthPage = (props) => {
 				<GradientSVG />
 			</div>
 
-			<div className="wrapper">
+			<div className="login-page-card">
 				<div
-					className="wrapper_background"
+					className="login-page-card__background"
 					style={{
 						backgroundImage: randomWallpaperURL
 							? `url(${randomWallpaperURL})`
@@ -65,7 +65,7 @@ const AuthPage = (props) => {
 					}}
 				/>
 
-				<div className="content">
+				<div className="login-page-card__content">
 					{React.createElement(
 						keyToComponents[activeKey] ??
 							keyToComponents["selector"],

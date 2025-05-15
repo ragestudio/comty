@@ -47,9 +47,9 @@
 	}
 }
 
-@wrapper-img-width: 250px;
+@login-page-card-img-width: 250px;
 
-.wrapper {
+.login-page-card {
 	position: relative;
 	z-index: 15;
 
@@ -73,7 +73,7 @@
 
 	overflow: hidden;
 
-	.wrapper_background {
+	&__background {
 		position: absolute;
 
 		left: 0;
@@ -81,8 +81,8 @@
 
 		height: 100%;
 
-		width: calc(@wrapper-img-width + 10px);
-		min-width: calc(@wrapper-img-width + 10px);
+		width: calc(@login-page-card-img-width + 10px);
+		min-width: calc(@login-page-card-img-width + 10px);
 
 		background-position: center;
 		background-size: cover;
@@ -91,7 +91,7 @@
 		z-index: 1;
 	}
 
-	.content {
+	&__content {
 		position: absolute;
 		display: flex;
 		flex-direction: column;
@@ -101,7 +101,7 @@
 		align-items: center;
 		justify-content: center;
 
-		width: calc(100% - @wrapper-img-width);
+		width: calc(100% - @login-page-card-img-width);
 		min-width: 420px;
 
 		height: 100%;
