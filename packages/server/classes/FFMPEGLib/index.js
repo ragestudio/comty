@@ -57,6 +57,10 @@ export class FFMPEGLib extends EventEmitter {
 		}
 
 		return new Promise((resolve, reject) => {
+			if (!bin) {
+				return reject("No binary provided")
+			}
+
 			const process = child_process.exec(
 				`${bin} ${args}`,
 				{

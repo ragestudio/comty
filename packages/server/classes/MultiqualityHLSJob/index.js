@@ -108,9 +108,9 @@ export default class MultiqualityHLSJob extends FFMPEGLib {
 			fs.mkdirSync(outputPath, { recursive: true })
 		}
 
-		const inputProbe = await Utils.probe(this.params.input)
-
 		try {
+			const inputProbe = await Utils.probe(this.params.input)
+
 			const result = await this.ffmpeg({
 				args: cmdStr,
 				cwd: outputPath,

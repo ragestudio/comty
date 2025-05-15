@@ -8,8 +8,9 @@ RUN apt install -y --no-install-recommends git
 RUN apt install -y --no-install-recommends ssh
 RUN apt install -y --no-install-recommends curl
 RUN apt install -y --no-install-recommends nscd
+RUN apt install -y --no-install-recommends bash
+RUN apt install -y --no-install-recommends which
 RUN apt install -y --no-install-recommends ca-certificates
-RUN apt install -y --no-install-recommends ffmpeg
 
 # Create workdir
 RUN mkdir -p /comty-server
@@ -40,6 +41,12 @@ RUN /comty-server/nginx-bin -v
 # Fix permissions
 RUN chmod -R 777 /comty-server
 RUN chown -R node:node /comty-server
+
+# Install manual server dependencies
+RUN mkdir -p /root/.local/bin
+RUN "/comty-server/scripts/installLatestFfmpeg.sh"
+RUN mv /root/.local/bin/ffmpeg /bin/ffmpeg
+RUN mv /root/.local/bin/ffprobe /bin/ffprobe
 
 # Set user to node
 USER node
