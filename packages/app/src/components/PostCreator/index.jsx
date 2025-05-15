@@ -10,6 +10,7 @@ import { Icons } from "@components/Icons"
 import Poll from "@components/Poll"
 
 import clipboardEventFileToFile from "@utils/clipboardEventFileToFile"
+import queuedUploadFile from "@utils/queuedUploadFile"
 
 import PostModel from "@models/post"
 import SearchModel from "@models/search"
@@ -195,22 +196,14 @@ export default class PostCreator extends React.Component {
 	uploadFile = async (req) => {
 		this.toggleUploaderVisibility(false)
 
-		const request = await app.cores.remoteStorage
-			.uploadFile(req.file)
-			.catch((error) => {
-				console.error(error)
-				antd.message.error(error)
-
-				req.onError(error)
-
-				return false
-			})
-
-		if (request) {
-			console.log(`Upload done >`, request)
-
-			return req.onSuccess(request)
-		}
+		await queuedUploadFile(req.file, {
+			onFinish: (file, response) => {
+				req.onSuccess(response)
+			},
+			onError: (file, response) => {
+				req.onError(response)
+			},
+		})
 	}
 
 	removeAttachment = (file_uid) => {
