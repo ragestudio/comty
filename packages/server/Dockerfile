@@ -4,13 +4,13 @@ EXPOSE 9000
 # Install dependencies
 RUN apt update
 RUN apt install -y --no-install-recommends build-essential
+RUN apt install -y --no-install-recommends ca-certificates
 RUN apt install -y --no-install-recommends git
 RUN apt install -y --no-install-recommends ssh
 RUN apt install -y --no-install-recommends curl
-RUN apt install -y --no-install-recommends nscd
 RUN apt install -y --no-install-recommends bash
 RUN apt install -y --no-install-recommends which
-RUN apt install -y --no-install-recommends ca-certificates
+RUN apt install -y --no-install-recommends nscd
 
 # Create workdir
 RUN mkdir -p /comty-server
