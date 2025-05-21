@@ -10,39 +10,17 @@ export default class QueueManager {
 
 	currentItem = null
 
-	next = ({ random = false } = {}) => {
-		if (this.nextItems.length === 0) {
-			return null
-		}
-
-		if (this.currentItem) {
-			this.prevItems.push(this.currentItem)
-		}
-
-		if (random) {
-			const randomIndex = Math.floor(
-				Math.random() * this.nextItems.length,
-			)
-
-			this.currentItem = this.nextItems.splice(randomIndex, 1)[0]
-		} else {
-			this.currentItem = this.nextItems.shift()
-		}
-
-		return this.currentItem
-	}
-
-	set = (item) => {
+	setCurrent = (item) => {
 		if (typeof item === "number") {
 			item = this.nextItems[item]
 		}
 
-		if (this.currentItem && this.currentItem.id === item.id) {
+		if (this.currentItem && this.currentItem._id === item._id) {
 			return this.currentItem
 		}
 
-		const itemInNext = this.nextItems.findIndex((i) => i.id === item.id)
-		const itemInPrev = this.prevItems.findIndex((i) => i.id === item.id)
+		const itemInNext = this.nextItems.findIndex((i) => i._id === item._id)
+		const itemInPrev = this.prevItems.findIndex((i) => i._id === item._id)
 
 		if (itemInNext === -1 && itemInPrev === -1) {
 			throw new Error("Item not found in the queue")
@@ -66,6 +44,28 @@ export default class QueueManager {
 			this.nextItems.unshift(...this.prevItems.splice(itemInPrev + 1))
 
 			this.currentItem = this.prevItems.pop()
+		}
+
+		return this.currentItem
+	}
+
+	next = ({ random = false } = {}) => {
+		if (this.nextItems.length === 0) {
+			return null
+		}
+
+		if (this.currentItem) {
+			this.prevItems.push(this.currentItem)
+		}
+
+		if (random) {
+			const randomIndex = Math.floor(
+				Math.random() * this.nextItems.length,
+			)
+
+			this.currentItem = this.nextItems.splice(randomIndex, 1)[0]
+		} else {
+			this.currentItem = this.nextItems.shift()
 		}
 
 		return this.currentItem
@@ -116,13 +116,5 @@ export default class QueueManager {
 		this.nextItems = []
 		this.prevItems = []
 		this.currentItem = null
-	}
-
-	async load(item) {
-		if (typeof this.params.loadFunction === "function") {
-			return await this.params.loadFunction(item)
-		}
-
-		return item
 	}
 }
