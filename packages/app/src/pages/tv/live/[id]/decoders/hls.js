@@ -40,7 +40,6 @@ export default (player, sources = {}, options = {}) => {
 		source += `?token=${options.authToken}`
 	}
 
-	console.log("[HLS] Instance options >", options)
 	console.log(`[HLS] Loading source [${source}]`)
 
 	hlsInstance.attachMedia(player)

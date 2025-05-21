@@ -29,7 +29,7 @@ async function fetchStream(stream_id) {
 		stream = stream[0]
 	}
 
-	if (!stream.sources) {
+	if (!stream.sources || !stream.sources.hls) {
 		return false
 	}
 
@@ -60,6 +60,8 @@ export default class StreamViewer extends React.Component {
 			return false
 		}
 
+		console.log(`[TV] Switching decoder to: ${decoder}`)
+
 		await this.toggleLoading(true)
 
 		// check if decoder is already loaded
@@ -70,8 +72,6 @@ export default class StreamViewer extends React.Component {
 
 			this.setState({ decoderInstance: null })
 		}
-
-		console.log(`[TV] Switching decoder to: ${decoder}`)
 
 		const decoderInstance = await Decoders[decoder](...args)
 
@@ -236,8 +236,12 @@ export default class StreamViewer extends React.Component {
 			spectators: stream.viewers,
 		})
 
-		// joinStreamWebsocket
-		await this.joinStreamWebsocket(stream)
+		try {
+			// joinStreamWebsocket
+			this.joinStreamWebsocket(stream)
+		} catch (error) {
+			console.error(error)
+		}
 
 		// load decoder with provided data
 		await this.loadDecoder(
@@ -258,6 +262,10 @@ export default class StreamViewer extends React.Component {
 
 		if (typeof this.state.decoderInstance?.destroy === "function") {
 			this.state.decoderInstance.destroy()
+		}
+
+		if (typeof this.state.decoderInstance?._destroy === "function") {
+			this.state.decoderInstance._destroy()
 		}
 
 		if (this.state.websocket) {
