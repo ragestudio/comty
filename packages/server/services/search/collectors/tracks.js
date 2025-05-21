@@ -5,6 +5,7 @@ export default {
 	model: Track,
 	query: (keywords) => {
 		return {
+			public: true,
 			$or: [
 				{
 					title: new RegExp(keywords, "i"),
