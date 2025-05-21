@@ -11,7 +11,35 @@ const MediaUrls = ({ profile }) => {
 
 	const { hls, rtsp, html } = sources
 
-	const rtspt = rtsp ? rtsp.replace("rtsp://", "rtspt://") : null
+	let rtspt = null
+
+	if (rtsp) {
+		try {
+			const url = new URL(rtsp)
+
+			const pathParts = url.pathname.split("/")
+			const lastPart = pathParts.pop()
+			const [resource, query] = lastPart.split("?")
+
+			let stoken = url.searchParams.get("stoken")
+
+			let newLastPart = resource
+
+			if (stoken) {
+				newLastPart = `${resource}:${stoken}`
+			}
+
+			pathParts.push(newLastPart)
+
+			url.protocol = "rtspt:"
+			url.pathname = pathParts.join("/")
+			url.search = ""
+
+			rtspt = url.toString()
+		} catch (err) {
+			rtspt = rtsp.replace("rtsp://", "rtspt://")
+		}
+	}
 
 	return (
 		<div className="profile-section content-panel">
