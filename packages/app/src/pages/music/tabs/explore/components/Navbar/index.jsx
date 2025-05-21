@@ -10,7 +10,11 @@ const MusicNavbar = React.forwardRef((props, ref) => {
 				useUrlQuery
 				renderResults={false}
 				model={async (keywords, params) =>
-					SearchModel.search(keywords, params, ["tracks"])
+					SearchModel.search(keywords, params, [
+						"tracks",
+						"albums",
+						"artists",
+					])
 				}
 				onSearchResult={props.setSearchResults}
 				onEmpty={() => props.setSearchResults(false)}

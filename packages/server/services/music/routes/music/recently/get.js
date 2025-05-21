@@ -3,7 +3,7 @@ import { RecentActivity } from "@db_models"
 import TrackClass from "@classes/track"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res) => {
 		const user_id = req.auth.session.user_id
 

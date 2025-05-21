@@ -3,6 +3,10 @@ import path from "node:path"
 
 import { FFMPEGLib, Utils } from "../FFMPEGLib"
 
+const codecOverrides = {
+	wav: "flac",
+}
+
 export default class SegmentedAudioMPDJob extends FFMPEGLib {
 	constructor(params = {}) {
 		super()
@@ -26,11 +30,11 @@ export default class SegmentedAudioMPDJob extends FFMPEGLib {
 			`-c:a ${this.params.audioCodec}`,
 			`-map 0:a`,
 			`-f dash`,
-			`-dash_segment_type mp4`,
 			`-segment_time ${this.params.segmentTime}`,
 			`-use_template 1`,
 			`-use_timeline 1`,
-			`-init_seg_name "init.m4s"`,
+			//`-dash_segment_type mp4`,
+			//`-init_seg_name "init.m4s"`,
 		]
 
 		if (this.params.includeMetadata === false) {
@@ -89,24 +93,68 @@ export default class SegmentedAudioMPDJob extends FFMPEGLib {
 		}
 	}
 
+	_updateMpdBandwidthAndSamplingRate = async ({
+		mpdPath,
+		bandwidth,
+		samplingRate,
+	} = {}) => {
+		try {
+			let mpdContent = await fs.promises.readFile(mpdPath, "utf-8")
+
+			// Regex to find all <Representation ...> tags
+			const representationRegex = /(<Representation\b[^>]*)(>)/g
+
+			mpdContent = mpdContent.replace(
+				representationRegex,
+				(match, startTag, endTag) => {
+					// Remove existing bandwidth and audioSamplingRate attributes if present
+					let newTag = startTag
+						.replace(/\sbandwidth="[^"]*"/, "")
+						.replace(/\saudioSamplingRate="[^"]*"/, "")
+
+					// Add new attributes
+					newTag += ` bandwidth="${bandwidth}" audioSamplingRate="${samplingRate}"`
+
+					return newTag + endTag
+				},
+			)
+
+			await fs.promises.writeFile(mpdPath, mpdContent, "utf-8")
+		} catch (error) {
+			console.error(
+				`[SegmentedAudioMPDJob] Error updating MPD bandwidth/audioSamplingRate for ${mpdPath}:`,
+				error,
+			)
+		}
+	}
+
 	run = async () => {
-		const segmentationCmd = this.buildSegmentationArgs()
 		const outputPath =
 			this.params.outputDir ?? `${path.dirname(this.params.input)}/dash`
 		const outputFile = path.join(outputPath, this.params.outputMasterName)
 
-		this.emit("start", {
-			input: this.params.input,
-			output: outputPath,
-			params: this.params,
-		})
-
-		if (!fs.existsSync(outputPath)) {
-			fs.mkdirSync(outputPath, { recursive: true })
-		}
-
 		try {
+			this.emit("start", {
+				input: this.params.input,
+				output: outputPath,
+				params: this.params,
+			})
+
 			const inputProbe = await Utils.probe(this.params.input)
+
+			if (
+				this.params.audioCodec === "copy" &&
+				codecOverrides[inputProbe.format.format_name]
+			) {
+				this.params.audioCodec =
+					codecOverrides[inputProbe.format.format_name]
+			}
+
+			const segmentationCmd = this.buildSegmentationArgs()
+
+			if (!fs.existsSync(outputPath)) {
+				fs.mkdirSync(outputPath, { recursive: true })
+			}
 
 			const ffmpegResult = await this.ffmpeg({
 				args: segmentationCmd,
@@ -134,6 +182,29 @@ export default class SegmentedAudioMPDJob extends FFMPEGLib {
 			}
 
 			let outputProbe = await Utils.probe(outputFile)
+
+			let bandwidth = null
+			let samplingRate = null
+
+			if (
+				outputProbe &&
+				outputProbe.streams &&
+				outputProbe.streams.length > 0
+			) {
+				bandwidth =
+					outputProbe.format.bit_rate ??
+					outputProbe.streams[0].bit_rate
+
+				samplingRate = outputProbe.streams[0].sample_rate
+			}
+
+			if (bandwidth && samplingRate) {
+				await this._updateMpdBandwidthAndSamplingRate({
+					mpdPath: outputFile,
+					bandwidth: bandwidth,
+					samplingRate: samplingRate,
+				})
+			}
 
 			this.emit("end", {
 				probe: {

@@ -184,12 +184,12 @@ const Searcher = (props) => {
 		if (typeof props.model === "function") {
 			result = await props.model(value, {
 				...props.modelParams,
-				limit_per_section: app.isMobile ? 3 : 5,
+				limit: app.isMobile ? 3 : 5,
 			})
 		} else {
 			result = await SearchModel.search(value, {
 				...props.modelParams,
-				limit_per_section: app.isMobile ? 3 : 5,
+				limit: app.isMobile ? 3 : 5,
 			})
 		}
 

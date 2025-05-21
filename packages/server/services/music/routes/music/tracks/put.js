@@ -2,7 +2,7 @@ import requiredFields from "@shared-utils/requiredFields"
 import TrackClass from "@classes/track"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		if (Array.isArray(req.body.items)) {
 			let results = []

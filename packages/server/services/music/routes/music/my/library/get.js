@@ -1,7 +1,7 @@
 import Library from "@classes/library"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const userId = req.auth.session.user_id
 		const { limit = 50, offset = 0, kind } = req.query

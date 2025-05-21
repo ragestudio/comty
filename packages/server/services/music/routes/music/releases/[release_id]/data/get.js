@@ -1,7 +1,7 @@
 import ReleaseClass from "@classes/release"
 
 export default {
-	middlewares: ["withOptionalAuthentication"],
+	useMiddlewares: ["withOptionalAuthentication"],
 	fn: async (req) => {
 		const { release_id } = req.params
 		const { limit = 50, offset = 0 } = req.query

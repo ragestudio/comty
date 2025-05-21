@@ -8,11 +8,19 @@ import MusicService from "@models/music"
 import "./index.less"
 
 const ListView = (props) => {
-	const { type, id } = props.params
+	const { id } = props.params
 
-	const [loading, result, error, makeRequest] = app.cores.api.useRequest(
+	const query = new URLSearchParams(window.location.search)
+	const type = query.get("type")
+	const service = query.get("service")
+
+	const [loading, result, error] = app.cores.api.useRequest(
 		MusicService.getReleaseData,
 		id,
+		{
+			type: type,
+			service: service,
+		},
 	)
 
 	if (error) {
@@ -28,6 +36,8 @@ const ListView = (props) => {
 	if (loading) {
 		return <antd.Skeleton active />
 	}
+
+	console.log(result)
 
 	return (
 		<PlaylistView
