@@ -1,0 +1,46 @@
+---
+id: addons
+title: AddonsManager
+sidebar_label: AddonsManager
+---
+
+## AddonsManager
+
+The `AddonsManager` class provides a way to register, retrieve, and manage addons within the comty.js library.
+
+**Class Overview:**
+
+The `AddonsManager` class allows you to register addons, retrieve them by name, and find addons that implement specific operations. It uses a `Map` internally to store the registered addons.
+
+### Properties
+
+*   `addons`: A `Map` that stores the registered addons. The keys are the addon names, and the values are the addon instances.
+
+### Methods
+
+*   `register(name, addon)`
+    *   Registers a new addon with the specified name.
+    *   Parameters:
+        *   `name`: *string* The name of the addon.
+        *   `addon`: *object* The addon instance.
+    *   Returns: void
+
+*   `get(name)`
+    *   Retrieves an addon by its name.
+    *   Parameters:
+        *   `name`: *string* The name of the addon to retrieve.
+    *   Returns: *object | undefined* The addon instance if found, otherwise `undefined`.
+
+*   `getByOperation(operation)`
+    *   Searches all registered addons and returns an array of addons that have a function for the specified operation.
+    *   Parameters:
+        *   `operation`: *string* The name of the operation to search for.
+    *   Returns: *Array[object]* An array of objects, where each object contains the addon's ID and the corresponding function for the specified operation. Each object has the following structure:
+            *   `id`: *string* The ID of the addon (addon.constructor.id).
+            *   `fn`: *function* The addon's function for the specified operation (addon[operation]).
+
+### API Reference
+
+*   `register(name: string, addon: object)`: void - Registers a new addon.
+*   `get(name: string)`: object | undefined - Retrieves an addon by name.
+*   `getByOperation(operation: string)`: Array[object] - Gets addons by operation.

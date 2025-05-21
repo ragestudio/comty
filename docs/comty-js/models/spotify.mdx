@@ -1,0 +1,63 @@
+---
+id: spotify
+title: SpotifySyncModel
+sidebar_label: SpotifySyncModel
+---
+
+## SpotifySyncModel
+
+The `SpotifySyncModel` class provides static methods for linking and interacting with the Spotify service.
+
+**Class Overview:**
+
+The `SpotifySyncModel` class offers methods for authorizing, linking, unlinking, and retrieving data from the Spotify service.
+
+### Static Properties
+
+*   `spotify_redirect_uri`: *string* The redirect URI for Spotify authorization.
+*   `spotify_authorize_endpoint`: *string* The Spotify authorization endpoint.
+
+### Static Methods
+
+*   `authorizeAccount()`
+
+Opens a new tab to authorize the user's Spotify account.
+
+    *   Returns: void
+
+*   `get_client_id()`
+
+Retrieves the Spotify client ID.
+
+    *   Returns: A Promise that resolves with the client ID data.
+
+*   `syncAuthCode(code)`
+
+Syncs the Spotify authorization code.
+
+    *   `code`: *string* The Spotify authorization code.
+    *   Returns: A Promise that resolves with the sync data.
+
+*   `unlinkAccount()`
+
+Unlinks the user's Spotify account.
+
+    *   Returns: A Promise that resolves with the unlink data.
+
+*   `isAuthorized()`
+
+Checks if the user is authorized with Spotify.
+
+    *   Returns: A Promise that resolves with a boolean indicating whether the user is authorized.
+
+*   `getData()`
+
+Retrieves Spotify data.
+
+    *   Returns: A Promise that resolves with the Spotify data.
+
+*   `getCurrentPlaying()`
+
+Retrieves the currently playing track from Spotify.
+
+    *   Returns: A Promise that resolves with the currently playing track data.

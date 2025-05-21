@@ -1,0 +1,114 @@
+---
+id: post
+title: Post
+sidebar_label: Post
+---
+
+## Post
+
+The `Post` class provides static methods for interacting with posts and related data on the Comty platform.
+
+### API Reference
+
+**Class Overview:**
+
+The `Post` class offers a comprehensive set of methods for retrieving, creating, updating, deleting, liking, saving, and voting on posts. It also provides functionalities for retrieving trending hashtags and posts.
+
+### Static Properties
+
+*   `maxPostTextLength`: *number* The maximum length allowed for the post text (3200).
+*   `maxCommentLength`: *number* The maximum length allowed for a comment (1200).
+
+### Static Methods
+
+*   `getPostingPolicy()`
+    *   Retrieves the posting policy from the server.
+    *   Returns: *Promise[object]* The posting policy data.
+
+*   `post(options)`
+    *   Retrieves the data of a post by its ID.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id.
+            *   `post_id`: *string* The ID of the post to retrieve.
+    *   Returns: *Promise[object]* The data of the post.
+    *   Throws: Error if the post_id is not provided.
+
+*   `replies(options)`
+    *   Retrieves the replies of a post by its ID.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id, page, and limit.
+            *   `post_id`: *string* The ID of the post to retrieve replies for.
+            *   `page`: *number, optional* The number of characters to page the reply content (default: 0).
+            *   `limit`: *number, optional* The maximum number of replies to fetch (default: Settings.get("feed_max_fetch")).
+    *   Returns: *Promise[object]* The data of the replies.
+    *   Throws: Error if the post_id is not provided.
+
+*   `getSavedPosts(options)`
+    *   Retrieves the saved posts with optional trimming and limiting.
+    *   Parameters:
+        *   `options`: *object* An object containing the page and limit.
+                *   `page`: *number, optional* The number of posts to page from the result (default: 0).
+                *   `limit`: *number, optional* The maximum number of posts to fetch (default: Settings.get("feed_max_fetch")).
+            *   Returns: *Promise[object]* The data of the liked posts.
+
+        *   `getUserPosts(options)`
+    *   Retrieves the liked posts with optional trimming and limiting.
+    *   Parameters:
+        *   `options`: *object* An object containing the page and limit.
+            *   `page`: *number, optional* The number of posts to page from the result (default: 0).
+            *   `limit`: *number, optional* The maximum number of posts to fetch (default: Settings.get("feed_max_fetch")).
+    *   Returns: *Promise[object]* The data of the liked posts.
+
+*   `getUserPosts(options)`
+    *   Retrieves the posts of a user with optional trimming and limiting.
+    *   Parameters:
+        *   `options`: *object* An object containing the user_id, page, and limit.
+            *   `user_id`: *string, optional* The ID of the user whose posts to retrieve. If not provided, the current user's ID will be used.
+            *   `page`: *number, optional* The number of characters to page the post content (default: 0).
+            *   `limit`: *number, optional* The maximum number of posts to fetch (default: Settings.get("feed_max_fetch")).
+    *   Returns: *Promise[object]* The data of the user's posts.
+
+*   `toggleLike(options)`
+    *   Toggles the like status of a post.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id.
+            *   `post_id`: *string* The ID of the post to toggle the like status.
+    *   Returns: *Promise[object]* The response data after toggling the like status.
+    *   Throws: Error if the post_id is not provided.
+
+*   `toggleSave(options)`
+    *   Toggles the save status of a post.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id.
+            *   `post_id`: *string* The ID of the post to toggle the save status.
+    *   Returns: *Promise[object]* The response data after toggling the save status.
+    *   Throws: Error if the post_id is not provided.
+
+*   `create(payload)`
+    *   Creates a new post with the given payload.
+    *   Parameters:
+        *   `payload`: *object* The data to create the post with.
+    *   Returns: *Promise[object]* The response data after creating the post.
+
+*   `update(post_id, update)`
+    *   Updates a post with the given post ID and update payload.
+    *   Parameters:
+        *   `post_id`: *string* The ID of the post to update.
+        *   `update`: *object* The data to update the post with.
+    *   Returns: *Promise[object]* The response data after updating the post.
+    *   Throws: Error if the post_id is not provided.
+
+*   `delete(options)`
+    *   Deletes a post with the given post ID.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id.
+            *   `post_id`: *string* The ID of the post to delete.
+    *   Returns: *Promise[object]* The response data after deleting the post.
+    *   Throws: Error if the post_id is not provided.
+
+*   `votePoll(options)`
+    *   Votes for a poll with the given post ID and option ID.
+    *   Parameters:
+        *   `options`: *object* An object containing the post_id and option_id.
+            *   `post_id`: *string* The ID of the post to vote for.
+            *   `

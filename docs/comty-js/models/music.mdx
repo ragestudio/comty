@@ -1,0 +1,159 @@
+---
+id: music
+title: MusicModel
+sidebar_label: MusicModel
+---
+
+## MusicModel
+
+The `MusicModel` class provides static methods for interacting with music-related data. It encapsulates various getters and setters for tracks, releases, library management, and search functionalities.
+
+**Class Overview:**
+
+The `MusicModel` class acts as a facade, providing a simplified interface to access and manipulate music data through its nested `Getters` and `Setters` classes.
+
+### Static Properties
+
+*   `Getters`: An object containing static getter methods for retrieving music data.
+*   `Setters`: An object containing static setter methods for modifying music data.
+
+### Track Related Methods
+
+*   `getAllTracks( { user_id, limit, page } )`
+    *   Retrieves tracks for a given user.
+    *   Parameters:
+        *   `user_id`: *String* The ID of the user.
+        *   `limit`: *Number* The number of tracks to retrieve per page.
+        *   `page`: *Number* The page number to retrieve.
+    *   Returns: *Promise[object]*
+
+*   `getTrackData(id: String, options: Object)`
+    *   Retrieves data for a specific track.
+    *   Parameters:
+        *   `id`: *String* The ID of the track.
+        *   `options`: *Object* Additional options for the request.
+    *   Returns: *Promise[object]*
+
+*   `putTrack(track)`
+    *   Creates/Updates a track.
+    *   Parameters:
+        *   `track`: *Object* The track object to create/update.
+    *   Returns: *Promise[object]*
+
+### Lyrics Related Methods
+
+*   `getTrackLyrics(id: String, options = { preferTranslation: false })`
+    *   Retrieves lyrics for a specific track.
+    *   Parameters:
+        *   `id`: *String* The ID of the track.
+        *   `options`: *Object*
+            *   `preferTranslation`: *Boolean* If true, attempts to retrieve lyrics in the user's preferred language.
+    *   Returns: *Promise[object]*
+
+*   `putTrackLyrics(track_id, data)`
+    *   Updates lyrics for a specific track.
+    *   Parameters:
+        *   `track_id`: *String* The ID of the track.
+        *   `data`: *Object* The lyrics data to update.
+    *   Returns: *Promise[object]*
+
+### Release Related Methods
+
+*   `getMyReleases({ limit, offset, keywords })`
+    *   Retrieves the user's releases.
+    *   Parameters:
+        *   `limit`: *Number* The number of releases to retrieve.
+        *   `offset`: *Number* The offset to start retrieving from.
+        *   `keywords`: *String* Keywords to search for.
+    *   Returns: *Promise[object]*
+
+*   `getAllReleases({ user_id, limit, page })`
+    *   Retrieves releases for a given user.
+    *   Parameters:
+        *   `user_id`: *String* The ID of the user.
+        *   `limit`: *Number* The number of releases to retrieve per page.
+        *   `page`: *Number* The page number to retrieve.
+    *   Returns: *Promise[object]*
+
+*   `getReleaseData(id: String)`
+    *   Retrieves data for a specific release.
+    *   Parameters:
+        *   `id`: *String* The ID of the release.
+    *   Returns: *Promise[object]*
+
+*   `putRelease(release)`
+    *   Creates/Updates a release.
+    *   Parameters:
+        *   `release`: *Object* The release object to create/update.
+    *   Returns: *Promise[object]*
+
+*   `deleteRelease(release_id)`
+    *   Deletes a release.
+    *   Parameters:
+        *   `release_id`: *String* The ID of the release to delete.
+    *   Returns: *Promise[object]*
+
+### Library Related Methods
+
+*   `getMyLibrary({ limit = 100, offset = 0, order = "desc", kind })`
+    *   Retrieves the user's music library.
+    *   Parameters:
+        *   `limit`: *Number* The number of items to retrieve.
+        *   `offset`: *Number* The offset to start retrieving from.
+        *   `order`: *String* The order to sort the items in ("asc" or "desc").
+        *   `kind`: *String* Filter the library by kind (e.g., "track", "release").
+    *   Returns: *Promise[object]*
+
+*   `toggleItemFavorite(type, item_id, to)`
+    *   Toggles the favorite status of an item in the library.
+    *   Parameters:
+        *   `type`: *String* The type of item ("track", "release", etc.).
+        *   `item_id`: *String* The ID of the item.
+        *   `to`: *Boolean* Whether to add to favorites (true) or remove (false).
+    *   Returns: *Promise[object]*
+
+*   `isItemFavorited(type, item_id)`
+    *   Checks if an item is favorited in the library.
+    *   Parameters:
+        *   `type`: *String* The type of item ("track", "release", etc.).
+        *   `item_id`: *String* The ID of the item.
+    *   Returns: *Promise[object]*
+
+### Other Methods
+
+*   `getRecentyPlayed(params)`
+    * Retrieves recently played tracks.
+    * Parameters:
+        * `params`: *Object* Additional parameters for the request.
+    * Returns: *Promise[object]*
+
+*   `search({ keywords, limit, offset })`
+    * Searches for music items.
+    * Parameters:
+        *   `keywords`: *String* The search keywords.
+        *   `limit`: *Number* The number of results to return.
+        *   `offset`: *Number* The offset to start the search from.
+    *   Returns: *Promise[object]*
+
+### Aliases
+
+*   `toggleItemFavourite`: Alias for `toggleItemFavorite`.
+*   `isItemFavourited`: Alias for `isItemFavorited`.
+
+### API Reference
+
+* `getAllTracks( { user_id: String, limit: Number, page: Number } )`: *Promise[object]*
+* `getTrackData(id: String, options: Object)`: *Promise[object]*
+* `putTrack(track: Object)`: *Promise[object]*
+* `getTrackLyrics(id: String, options: Object)`: *Promise[object]*
+* `putTrackLyrics(track_id: String, data: Object)`: *Promise[object]*
+* `getMyReleases({ limit: Number, offset: Number, keywords: String })`: *Promise[object]*
+* `getAllReleases({ user_id: String, limit: Number, page: Number })`: *Promise[object]*
+* `getReleaseData(id: String)`: *Promise[object]*
+* `putRelease(release: Object)`: *Promise[object]*
+* `deleteRelease(release_id: String)`: *Promise[object]*
+* `getMyLibrary({ limit: Number, offset: Number, order: String, kind: String })`: *Promise[object]*
+* `toggleItemFavorite(type: String, item_id: String, to: Boolean)`: *Promise[object]*
+* `isItemFavorited(type: String, item_id: String)`: *Promise[object]*
+* `getRecentyPlayed(params: Object)`: *Promise[object]*
+* `search({ keywords: String, limit: Number, offset: Number })`: *Promise[object]*

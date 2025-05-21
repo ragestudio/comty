@@ -1,0 +1,101 @@
+---
+id: auth
+title: AuthModel
+sidebar_label: AuthModel
+---
+
+## AuthModel
+
+The `AuthModel` class provides static methods for handling user authentication, registration, and session management.
+
+**Class Overview:**
+
+The `AuthModel` class provides methods for user login, logout, registration, token verification, username validation, password management, and account activation/disabling.
+
+### Methods
+
+*   `login(payload, callback)`
+    *   Asynchronously handles the login process.
+    *   Parameters:
+        *   `payload`: *object* An object containing the username, password, and MFA code if required.
+        *   `callback`: *function, optional* A callback function to handle further actions after login.
+    *   Returns: *Promise[object | boolean]* A Promise that resolves with the response data if login is successful. Returns `false` if MFA is required.
+
+*   `logout()`
+    *   Asynchronously logs out the user by destroying the current session and emitting an event for successful logout.
+    *   Returns: *Promise[void]* A Promise that resolves after the logout process is completed.
+
+*   `register(payload)`
+    *   Registers a new user with the provided payload.
+    *   Parameters:
+        *   `payload`: *object* An object containing the user's information username, password, email, tos.
+    *   Returns: *Promise[object]* A Promise that resolves with the response data if registration is successful.
+    *   Throws: Error if the registration fails.
+
+*   `authToken(token)`
+    *   Verifies the given token and returns the user data associated with it.
+    *   Parameters:
+        *   `token`: *string, optional* The token to verify. If not provided, the stored token is used.
+    *   Returns: *Promise[object]* A Promise that resolves with the user data if the token is valid.
+    *   Throws: Error if there was an issue with the request.
+
+*   `usernameValidation(username)`
+    *   Validates the existence of a username.
+    *   Parameters:
+        *   `username`: *string* The username to validate.
+    *   Returns: *Promise[boolean | object]* A Promise that resolves with the response data if the validation is successful, or `false` if there was an error.
+    *   Throws: Error if the validation fails.
+
+*   `availability(payload)`
+    *   Retrieves the availability of a username and email.
+    *   Parameters:
+        *   `payload`: *object* An object containing the username and email to check availability for.
+    *   Returns: *Promise[object | boolean]* A Promise that resolves with the availability data if successful, or `false` if an error occurred.
+
+*   `changePassword(payload)`
+    *   Changes the user's password.
+    *   Parameters:
+        *   `payload`: *object* An object containing the currentPassword, newPassword, and code optional.
+    *   Returns: *Promise[object]* The data response after changing the password.
+
+*   `activateAccount(user_id, code)`
+    *   Activates a user account using the provided activation code.
+    *   Parameters:
+        *   `user_id`: *string* The ID of the user to activate.
+        *   `code`: *string* The activation code sent to the user's email.
+    *   Returns: *Promise[object]* A Promise that resolves with the response data after activation.
+    *   Throws: Error if the activation process fails.
+
+*   `resendActivationCode(user_id)`
+    *   Resends the activation code to the user.
+    *   Parameters:
+        *   `user_id`: *string* The ID of the user to resend the activation code to.
+    *   Returns: *Promise[object]* A Promise that resolves with the response data after sending the activation code.
+    *   Throws: Error if the resend activation code process fails.
+
+*   `disableAccount(options)`
+    *   Disables the user's account.
+    *   Parameters:
+        *   `options`: *object, optional* An object containing options for disabling the account.
+            *   `confirm`: *boolean* Confirmation to disable the account.
+    *   Returns: *Promise[object]* A Promise that resolves with the response data after disabling the account.
+
+*   `recoverPassword(usernameOrEmail)`
+    *   Recovers the password for a user account.
+    *   Parameters:
+        *   `usernameOrEmail`: *string* The username or email associated with the account to recover.
+    *   Returns: *Promise[object]* A Promise that resolves with the response data after initiating the password recovery process.
+
+### API Reference
+
+*   `login(payload: object, callback: function | undefined)`: *Promise[object | boolean]* - Asynchronously handles the login process.
+*   `logout()`: *Promise[void]* - Asynchronously logs out the user.
+*   `register(payload: object)`: *Promise[object]* - Registers a new user.
+*   `authToken(token: string | undefined)`: *Promise[object]* - Verifies the given token.
+*   `usernameValidation(username: string)`: *Promise[boolean | object]* - Validates the existence of a username.
+*   `availability(payload: object)`: *Promise[object | boolean]* - Retrieves the availability of a username and email.
+*   `changePassword(payload: object)`: *Promise[object]* - Changes the user's password.
+*   `activateAccount(user_id: string, code: string)`: *Promise[object]* - Activates a user account.
+*   `resendActivationCode(user_id: string)`: *Promise[object]* - Resends the activation code.
+*   `disableAccount(options: object | undefined)`: *Promise[object]* - Disables the user's account.
+*   `recoverPassword(usernameOrEmail: string)`: *Promise[object]* - Recovers the password for a user account.

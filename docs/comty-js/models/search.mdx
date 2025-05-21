@@ -1,0 +1,32 @@
+---
+id: search
+title: Search
+sidebar_label: Search
+---
+
+## Search
+
+The `Search` class provides a static method for performing searches using the Comty API.
+
+**Class Overview:**
+
+The `Search` class encapsulates the search functionality, allowing you to search for content using keywords and optional parameters. It also supports external addons to extend the search functionality.
+
+### Static Methods
+
+*   `search(keywords, params, returnFields)`
+
+Performs a search using the provided keywords and optional parameters.
+
+    *   `keywords`: *string* The keywords to search for.
+    *   `params`: *object, optional* Optional parameters for the search.
+        *   `limit`: *number, optional* The maximum number of results to return default: 50.
+        *   `offset`: *number, optional* The offset to start the search from default: 0.
+        *   `sort`: *string, optional* The sort order "asc" or "desc" default: "desc".
+        *   `fields`: *array, optional* An array of fields to return in the results. If empty, all fields will be returned.
+    *   `returnFields`: *array, optional* An array of fields to return in the results. If empty, all fields will be returned.
+    *   Returns: A promise that resolves with the search results.
+
+### API Reference
+
+*   `search(keywords: string, params: object, returnFields: array)`: Promise[object] - Performs a search using the provided keywords and optional parameters.
