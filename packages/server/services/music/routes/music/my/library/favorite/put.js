@@ -1,7 +1,7 @@
 import Library from "@classes/library"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const { kind, item_id, to } = req.body
 

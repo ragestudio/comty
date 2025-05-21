@@ -1,0 +1,51 @@
+---
+id: feed
+title: FeedModel
+sidebar_label: FeedModel
+---
+
+## FeedModel
+
+The `FeedModel` class provides static methods for retrieving feed data.
+
+**Class Overview:**
+
+The `FeedModel` class offers methods for retrieving music, global music, timeline, and global timeline feeds.
+
+### Static Methods
+
+*   `getMusicFeed({ page, limit } = {})`
+
+Retrieves music feed.
+
+    *   `{ page, limit }`: *object, optional* An object containing the page and limit.
+        *   `page`: *number, optional* The number of items to page from the feed.
+        *   `limit`: *number, optional* The maximum number of items to fetch from the feed.
+    *   Returns: A Promise that resolves with the music feed data.
+
+*   `getGlobalMusicFeed({ page, limit } = {})`
+
+Retrieves global music feed.
+
+    *   `{ page, limit }`: *object, optional* An object containing the page and limit.
+        *   `page`: *number, optional* The number of items to page from the feed.
+        *   `limit`: *number, optional* The maximum number of items to fetch from the feed.
+    *   Returns: A Promise that resolves with the global music feed data.
+
+*   `getTimelineFeed({ page, limit } = {})`
+
+Retrieves timeline feed.
+
+    *   `{ page, limit }`: *object, optional* An object containing the page and limit.
+        *   `page`: *number, optional* The number of feed items to page.
+        *   `limit`: *number, optional* The maximum number of feed items to retrieve.
+    *   Returns: A Promise that resolves with the timeline feed data.
+
+*   `getGlobalTimelineFeed({ page, limit } = {})`
+
+Retrieves global timeline feed.
+
+    *   `{ page, limit }`: *object, optional* An object containing the page and limit.
+        *   `page`: *number, optional* The number of items to page from the feed.
+        *   `limit`: *number, optional* The maximum number of posts to fetch from the feed.
+    *   Returns: A Promise that resolves with the posts feed data.

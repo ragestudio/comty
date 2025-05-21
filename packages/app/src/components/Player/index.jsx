@@ -9,6 +9,7 @@ import LiveInfo from "@components/Player/LiveInfo"
 import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
 import Actions from "@components/Player/Actions"
+import Indicators from "@components/Player/Indicators"
 
 import RGBStringToValues from "@utils/rgbToValues"
 
@@ -23,40 +24,6 @@ function isOverflown(parent, element) {
 	const elementRect = element.getBoundingClientRect()
 
 	return elementRect.width > parentRect.width
-}
-
-const Indicators = ({ track, playerState }) => {
-	if (!track) {
-		return null
-	}
-
-	const indicators = []
-
-	if (track.metadata) {
-		if (track.metadata.lossless) {
-			indicators.push(
-				<antd.Tooltip title="Lossless Audio">
-					<Icons.Lossless />
-				</antd.Tooltip>,
-			)
-		}
-	}
-
-	if (playerState.live) {
-		indicators.push(
-			<Icons.FiRadio style={{ color: "var(--colorPrimary)" }} />,
-		)
-	}
-
-	if (indicators.length === 0) {
-		return null
-	}
-
-	return (
-		<div className="toolbar_player_indicators_wrapper">
-			<div className="toolbar_player_indicators">{indicators}</div>
-		</div>
-	)
 }
 
 const ServiceIndicator = (props) => {
@@ -96,14 +63,12 @@ const Player = (props) => {
 		}
 	}
 
-	const { title, artist, service, cover_analysis, cover } =
-		playerState.track_manifest ?? {}
+	const { title, artist, service, cover } = playerState.track_manifest ?? {}
 
 	const playing = playerState.playback_status === "playing"
 	const stopped = playerState.playback_status === "stopped"
 
 	const titleText = !playing && stopped ? "Stopped" : (title ?? "Untitled")
-	const subtitleText = ""
 
 	React.useEffect(() => {
 		const titleIsOverflown = isOverflown(
@@ -115,13 +80,11 @@ const Player = (props) => {
 	}, [title])
 
 	React.useEffect(() => {
-		const trackInstance = app.cores.player.track()
+		const track = app.cores.player.track()
 
-		if (playerState.track_manifest && trackInstance) {
-			if (
-				typeof trackInstance.manifest.analyzeCoverColor === "function"
-			) {
-				trackInstance.manifest
+		if (playerState.track_manifest && track) {
+			if (typeof track.analyzeCoverColor === "function") {
+				track
 					.analyzeCoverColor()
 					.then((analysis) => {
 						setCoverAnalysis(analysis)
@@ -203,9 +166,11 @@ const Player = (props) => {
 							</Marquee>
 						)}
 
-						<p className="toolbar_player_info_subtitle">
-							{artist ?? ""}
-						</p>
+						{!playerState.radioId && (
+							<p className="toolbar_player_info_subtitle">
+								{artist ?? ""}
+							</p>
+						)}
 					</div>
 
 					{playerState.radioId && (

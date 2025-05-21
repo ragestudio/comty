@@ -41,14 +41,14 @@
 
 			background-color: var(--background-color-accent);
 
-			border: 2px solid var(--border-color);
+			border: 3px solid var(--border-color);
 
 			border-radius: 12px;
 		}
 	}
 
 	&.active {
-		background-color: rgba(var(--bg_color_6), 0.1);
+		background-color: @modal_background_color;
 
 		backdrop-filter: blur(@modal_background_blur);
 		-webkit-backdrop-filter: blur(@modal_background_blur);

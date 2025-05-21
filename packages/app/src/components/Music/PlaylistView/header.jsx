@@ -16,6 +16,7 @@ const typeToKind = {
 	ep: "releases",
 	compilation: "releases",
 	playlist: "playlists",
+	single: "tracks",
 }
 
 const PlaylistHeader = ({
@@ -77,7 +78,6 @@ const PlaylistHeader = ({
 
 				<div className="play_info_details">
 					<div className="play_info_title">
-						{playlist.service === "tidal" && <Icons.SiTidal />}{" "}
 						{typeof playlist.title === "function" ? (
 							playlist.title()
 						) : (
@@ -86,19 +86,24 @@ const PlaylistHeader = ({
 					</div>
 
 					<div className="play_info_statistics">
+						{playlist.service === "tidal" && (
+							<div className="play_info_statistics_item">
+								<p>
+									<Icons.SiTidal /> From Tidal
+								</p>
+							</div>
+						)}
 						{PlaylistTypeDecorators[playlistType] && (
 							<div className="play_info_statistics_item">
 								{PlaylistTypeDecorators[playlistType]()}
 							</div>
 						)}
-
 						<div className="play_info_statistics_item">
 							<p>
 								<Icons.MdLibraryMusic /> {playlist.total_items}{" "}
 								Items
 							</p>
 						</div>
-
 						{playlist.total_duration > 0 && (
 							<div className="play_info_statistics_item">
 								<p>
@@ -107,7 +112,6 @@ const PlaylistHeader = ({
 								</p>
 							</div>
 						)}
-
 						{playlist.publisher && (
 							<div className="play_info_statistics_item">
 								<p onClick={handlePublisherClick}>

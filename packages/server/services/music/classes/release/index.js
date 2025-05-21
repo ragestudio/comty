@@ -130,7 +130,7 @@ export default class Release {
 
 		const items = release.items ?? release.list
 
-		const items_ids = items.map((item) => item._id.toString())
+		const items_ids = items.map((item) => item._id ?? item)
 
 		// delete all releated tracks
 		await Track.deleteMany({

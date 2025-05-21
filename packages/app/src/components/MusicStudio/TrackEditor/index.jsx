@@ -145,6 +145,18 @@ const TrackEditor = (props) => {
 
 			<div className="track-editor-field">
 				<div className="track-editor-field-header">
+					<Icons.FiEye />
+					<span>Public</span>
+				</div>
+
+				<antd.Switch
+					checked={track.public}
+					onChange={(value) => handleChange("public", value)}
+				/>
+			</div>
+
+			<div className="track-editor-field">
+				<div className="track-editor-field-header">
 					<Icons.MdLyrics />
 					<span>Enhanced Lyrics</span>
 				</div>

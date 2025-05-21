@@ -8,8 +8,12 @@
 @transition-ease-inout: all 150ms ease-in-out;
 
 @card-drop-shadow: 0 0 5px var(--shadow-color);
-@card-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 var(--shadow-color);
-@card-shadow-top: 0 -4px 3px 0 rgba(63, 63, 68, 0.05), 0 0 0 2px var(--shadow-color);
+@card-shadow:
+	0 0 0 1px rgba(63, 63, 68, 0.05),
+	0 1px 3px 0 var(--shadow-color);
+@card-shadow-top:
+	0 -4px 3px 0 rgba(63, 63, 68, 0.05),
+	0 0 0 2px var(--shadow-color);
 
 @default-object-padding: 10px;
 @default-gap: 20px;
@@ -25,4 +29,6 @@
 @bottomBar_iconSize: 45px;
 @topBar_height: 52px;
 
-@modal_background_blur: 2px;
+// Modal
+@modal_background_color: rgba(var(--bg_color_1), 0.3);
+@modal_background_blur: 4px;

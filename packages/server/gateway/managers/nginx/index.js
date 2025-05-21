@@ -184,8 +184,13 @@ http {
             ${this.ssl.cert_file_name ? `ssl_certificate ${this.ssl.cert_file_name};` : ""}
             ${this.ssl.key_file_name ? `ssl_certificate_key ${this.ssl.key_file_name};` : ""}
 
-            # Default route
-            location / {
+
+
+            # Include service-specific configurations
+            include ${normalizedConfigDir}/services.conf;
+
+            # Default route for /
+            location = / {
               add_header Content-Type application/json;
               add_header 'Access-Control-Allow-Origin' '*' always;
               add_header 'Access-Control-Allow-Headers' '*' always;
@@ -194,8 +199,15 @@ http {
               return 200 '${mainEndpointJSON}';
             }
 
-            # Include service-specific configurations
-            include ${normalizedConfigDir}/services.conf;
+            # Catch-all for any other unmatched path
+            location / {
+              add_header Content-Type application/json;
+              add_header 'Access-Control-Allow-Origin' '*' always;
+              add_header 'Access-Control-Allow-Headers' '*' always;
+              add_header 'Access-Control-Allow-Methods' 'GET,HEAD,PUT,PATCH,POST,DELETE' always;
+
+              return 404 '{"error":"Not found"}';
+            }
         }
     }
 `

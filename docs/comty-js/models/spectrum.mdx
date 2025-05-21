@@ -1,0 +1,97 @@
+---
+id: spectrum
+title: Streaming
+sidebar_label: Streaming
+---
+
+## Streaming
+
+The `Streaming` class provides static methods for interacting with streaming data on the Comty platform.
+
+**Class Overview:**
+
+The `Streaming` class offers methods for managing streaming profiles, streams, and websocket connections.
+
+### Static Methods
+
+*   `getStream(stream_id)`
+
+Retrieves data for a specific stream.
+
+    *   `stream_id`: *string* The ID of the stream.
+    *   Returns: A promise that resolves with the stream data.
+
+*   `getOwnProfiles()`
+
+Retrieves the streaming profiles owned by the current user.
+
+    *   Returns: A promise that resolves with the profiles data.
+
+*   `getProfile(profile_id)`
+
+Retrieves data for a specific streaming profile.
+
+    *   `profile_id`: *string* The ID of the profile.
+    *   Returns: A promise that resolves with the profile data.
+
+*   `createProfile(payload)`
+
+Creates a new streaming profile.
+
+    *   `payload`: *object* The data for the new profile.
+    *   Returns: A promise that resolves with the created profile data.
+
+*   `updateProfile(profile_id, update)`
+
+Updates a streaming profile.
+
+    *   `profile_id`: *string* The ID of the profile to update.
+    *   `update`: *object* The data to update the profile with.
+    *   Returns: A promise that resolves with the updated profile data.
+
+*   `deleteProfile(profile_id)`
+
+Deletes a streaming profile.
+
+    *   `profile_id`: *string* The ID of the profile to delete.
+    *   Returns: A promise that resolves with the response data after deleting the profile.
+
+*   `addRestreamToProfile(profileId, restreamData)`
+
+Adds a restream to a profile.
+
+    *   `profileId`: *string* The ID of the profile to add the restream to.
+    *   `restreamData`: *object* The data for the restream.
+    *   Returns: A promise that resolves with the response data.
+
+*   `deleteRestreamFromProfile(profileId, restreamIndexData)`
+
+Deletes a restream from a profile.
+
+    *   `profileId`: *string* The ID of the profile to delete the restream from.
+    *   `restreamIndexData`: *object* The index data for the restream to delete.
+    *   Returns: A promise that resolves with the response data.
+
+*   `list({ limit, offset } = {})`
+
+Lists streaming entries.
+
+    *   `{ limit, offset }`: *object, optional* An object containing pagination parameters.
+        *   `limit`: *number, optional* The maximum number of items to retrieve.
+        *   `offset`: *number, optional* The offset to start retrieving from.
+    *   Returns: A promise that resolves with the streaming entries data.
+
+*   `createWebsocket(params = {})`
+
+Creates a websocket connection.
+
+    *   `params`: *object, optional* Additional parameters for the websocket connection.
+    *   Returns: A `RTEngineClient` websocket client.
+
+*   `createStreamWebsocket(stream_id, params = {})`
+
+Creates a stream-specific websocket connection.
+
+    *   `stream_id`: *string* The ID of the stream.
+    *   `params`: *object, optional* Additional parameters for the websocket connection.
+    *   Returns: A `RTEngineClient` websocket client.

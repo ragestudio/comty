@@ -106,7 +106,6 @@ export default class SFXCore extends Core {
 
 		if (slider) {
 			// check if is up or down
-			this.console.log(slider)
 		}
 	}
 

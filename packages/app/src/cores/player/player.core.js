@@ -2,12 +2,13 @@ import { Core } from "@ragestudio/vessel"
 
 import ActivityEvent from "@classes/ActivityEvent"
 import QueueManager from "@classes/QueueManager"
-import TrackInstance from "./classes/TrackInstance"
+import TrackManifest from "./classes/TrackManifest"
 import MediaSession from "./classes/MediaSession"
 import ServiceProviders from "./classes/Services"
 import PlayerState from "./classes/PlayerState"
 import PlayerUI from "./classes/PlayerUI"
 import AudioBase from "./classes/AudioBase"
+import SyncRoom from "./classes/SyncRoom"
 
 import setSampleRate from "./helpers/setSampleRate"
 
@@ -23,16 +24,14 @@ export default class Player extends Core {
 	// player config
 	static defaultSampleRate = 48000
 
+	base = new AudioBase(this)
 	state = new PlayerState(this)
 	ui = new PlayerUI(this)
 	serviceProviders = new ServiceProviders()
 	nativeControls = new MediaSession(this)
+	syncRoom = new SyncRoom(this)
 
-	base = new AudioBase(this)
-
-	queue = new QueueManager({
-		loadFunction: this.createInstance,
-	})
+	queue = new QueueManager()
 
 	public = {
 		start: this.start,
@@ -68,8 +67,14 @@ export default class Player extends Core {
 		base: () => {
 			return this.base
 		},
+		sync: () => this.syncRoom,
+		inOnSyncMode: this.inOnSyncMode,
 		state: this.state,
 		ui: this.ui.public,
+	}
+
+	inOnSyncMode() {
+		return !!this.syncRoom.state.joined_room
 	}
 
 	async afterInitialize() {
@@ -81,53 +86,20 @@ export default class Player extends Core {
 		await this.base.initialize()
 	}
 
-	//
-	//  Instance managing methods
-	//
-	async abortPreloads() {
-		for await (const instance of this.queue.nextItems) {
-			if (instance.abortController?.abort) {
-				instance.abortController.abort()
-			}
-		}
-	}
-
-	//
-	// Playback methods
-	//
-	async play(instance, params = {}) {
-		if (!instance) {
-			throw new Error("Audio instance is required")
-		}
-
-		// resume audio context if needed
-		if (this.base.context.state === "suspended") {
-			this.base.context.resume()
-		}
-
-		// update manifest
-		this.state.track_manifest =
-			this.queue.currentItem.manifest.toSeriableObject()
-
-		// play
-		//await this.queue.currentItem.audio.play()
-		await this.queue.currentItem.play(params)
-
-		// update native controls
-		this.nativeControls.update(this.queue.currentItem.manifest)
-
-		return this.queue.currentItem
-	}
-
-	// TODO: Improve performance for large playlists
 	async start(manifest, { time, startIndex = 0, radioId } = {}) {
+		this.console.debug("start():", {
+			manifest: manifest,
+			time: time,
+			startIndex: startIndex,
+			radioId: radioId,
+		})
+
 		this.ui.attachPlayerComponent()
 
 		if (this.queue.currentItem) {
-			await this.queue.currentItem.pause()
+			await this.base.pause()
 		}
 
-		//await this.abortPreloads()
 		await this.queue.flush()
 
 		this.state.loading = true
@@ -147,32 +119,31 @@ export default class Player extends Core {
 			return false
 		}
 
-		if (playlist.some((item) => typeof item === "string")) {
-			playlist = await this.serviceProviders.resolveMany(playlist)
+		// resolve only the first item if needed
+		if (
+			typeof playlist[0] === "string" ||
+			(!playlist[0].source && !playlist[0].dash_manifest)
+		) {
+			playlist[0] = await this.serviceProviders.resolve(playlist[0])
 		}
 
-		if (playlist.some((item) => !item.source)) {
-			playlist = await this.serviceProviders.resolveMany(playlist)
-		}
+		// create instance for the first element
+		playlist[0] = new TrackManifest(playlist[0], this)
 
-		for await (let [index, _manifest] of playlist.entries()) {
-			let instance = new TrackInstance(_manifest, this)
+		this.queue.add(playlist)
 
-			this.queue.add(instance)
-		}
+		const item = this.queue.setCurrent(startIndex)
 
-		const item = this.queue.set(startIndex)
-
-		this.play(item, {
+		this.base.play(item, {
 			time: time ?? 0,
 		})
 
 		// send the event to the server
-		if (item.manifest._id && item.manifest.service === "default") {
+		if (item._id && item.service === "default") {
 			new ActivityEvent("player.play", {
 				identifier: "unique", // this must be unique to prevent duplicate events and ensure only have unique track events
-				track_id: item.manifest._id,
-				service: item.manifest.service,
+				track_id: item._id,
+				service: item.service,
 			})
 		}
 
@@ -182,13 +153,15 @@ export default class Player extends Core {
 	// similar to player.start, but add to the queue
 	// if next is true, it will add to the queue to the top of the queue
 	async addToQueue(manifest, { next = false } = {}) {
-		if (typeof manifest === "string") {
-			manifest = await this.serviceProviders.resolve(manifest)
+		if (this.inOnSyncMode()) {
+			return false
 		}
 
-		let instance = new TrackInstance(manifest, this)
+		if (this.state.playback_status === "stopped") {
+			return this.start(manifest)
+		}
 
-		this.queue.add(instance, next === true ? "start" : "end")
+		this.queue.add(manifest, next === true ? "start" : "end")
 
 		console.log("Added to queue", {
 			manifest,
@@ -197,6 +170,10 @@ export default class Player extends Core {
 	}
 
 	next() {
+		if (this.inOnSyncMode()) {
+			return false
+		}
+
 		//const isRandom = this.state.playback_mode === "shuffle"
 		const item = this.queue.next()
 
@@ -204,19 +181,27 @@ export default class Player extends Core {
 			return this.stopPlayback()
 		}
 
-		return this.play(item)
+		return this.base.play(item)
 	}
 
 	previous() {
+		if (this.inOnSyncMode()) {
+			return false
+		}
+
 		const item = this.queue.previous()
 
-		return this.play(item)
+		return this.base.play(item)
 	}
 
 	//
 	// Playback Control
 	//
 	async togglePlayback() {
+		if (this.inOnSyncMode()) {
+			return false
+		}
+
 		if (this.state.playback_status === "paused") {
 			await this.resumePlayback()
 		} else {
@@ -238,7 +223,7 @@ export default class Player extends Core {
 			this.base.processors.gain.fade(0)
 
 			setTimeout(() => {
-				this.queue.currentItem.pause()
+				this.base.pause()
 				resolve()
 			}, Player.gradualFadeMs)
 
@@ -258,7 +243,7 @@ export default class Player extends Core {
 			}
 
 			// ensure audio elemeto starts from 0 volume
-			this.queue.currentItem.resume().then(() => {
+			this.base.resume().then(() => {
 				resolve()
 			})
 			this.base.processors.gain.fade(this.state.volume)
@@ -282,14 +267,13 @@ export default class Player extends Core {
 	}
 
 	stopPlayback() {
-		this.base.flush()
-		this.queue.flush()
-
 		this.state.playback_status = "stopped"
 		this.state.track_manifest = null
 		this.queue.currentItem = null
 
-		//this.abortPreloads()
+		this.base.flush()
+		this.queue.flush()
+
 		this.nativeControls.flush()
 	}
 

@@ -6,12 +6,12 @@ async function fullfillData(list, { user_id = null }) {
 		list = [list]
 	}
 
-	const trackIds = list.map((track) => {
-		return track._id
-	})
-
 	// if user_id is provided, fetch likes
 	if (user_id) {
+		const trackIds = list.map((track) => {
+			return track._id
+		})
+
 		const tracksLikes = await Library.isFavorite(
 			user_id,
 			trackIds,
@@ -32,20 +32,14 @@ async function fullfillData(list, { user_id = null }) {
 		})
 
 		list = await Promise.all(list)
+	} else {
+		list = list.map((track) => {
+			delete track.source
+			delete track.publisher
+
+			return track
+		})
 	}
-
-	// process some metadata
-	list = list.map(async (track) => {
-		if (track.metadata) {
-			if (track.metadata.bitrate && track.metadata.bitrate > 9000) {
-				track.metadata.lossless = true
-			}
-		}
-
-		return track
-	})
-
-	list = await Promise.all(list)
 
 	return list
 }

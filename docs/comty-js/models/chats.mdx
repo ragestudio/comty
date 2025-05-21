@@ -1,0 +1,29 @@
+---
+id: chats
+title: ChatsService
+sidebar_label: ChatsService
+---
+
+## ChatsService
+
+The `ChatsService` class provides static methods for interacting with chat data.
+
+**Class Overview:**
+
+The `ChatsService` class offers methods for retrieving chat history and recent chats for a user.
+
+### Static Methods
+
+*   `getChatHistory(chat_id)`
+
+Retrieves the chat history for a given chat ID.
+
+    *   `chat_id`: *string* The ID of the chat.
+    *   Returns: A Promise that resolves with the chat history data.
+    *   Throws: Error if the chat_id is not provided.
+
+*   `getRecentChats()`
+
+Retrieves the recent chats for the current user.
+
+    *   Returns: A Promise that resolves with the chat history data.

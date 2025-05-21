@@ -19,6 +19,7 @@ export default async (req) => {
 
 	const items = await Track.find(query)
 		.limit(limit)
+		.select("-source -publisher -public")
 		.skip(trim)
 		.sort({ _id: -1 })
 

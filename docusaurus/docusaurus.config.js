@@ -37,17 +37,34 @@ const config = {
 	presets: [
 		[
 			"classic",
-			/** @type {import("@docusaurus/preset-classic").Options} */
-			({
+			{
 				docs: {
 					path: "../docs",
 					sidebarPath: "./sidebars.js",
-					//editUrl: "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
 				},
 				theme: {
 					customCss: "./src/css/custom.css",
 				},
-			}),
+			},
+		],
+	],
+
+	plugins: [
+		[
+			"docusaurus-plugin-openapi-docs",
+			{
+				id: "api", // plugin id
+				docsPluginId: "classic", // configured for preset-classic
+				config: {
+					petstore: {
+						specPath: "examples/petstore.yaml",
+						outputDir: "docs/petstore",
+						sidebarOptions: {
+							groupPathsBy: "tag",
+						},
+					},
+				},
+			},
 		],
 	],
 

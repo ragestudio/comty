@@ -1,0 +1,80 @@
+---
+id: user
+title: UserModel
+sidebar_label: UserModel
+---
+
+## UserModel
+
+The `UserModel` class provides static methods for interacting with user data on the Comty platform.
+
+**Class Overview:**
+
+The `UserModel` class offers a set of methods for retrieving and updating user data, including profile information, roles, badges, and configuration settings.
+
+### Static Methods
+
+*   `data(payload)`
+
+Retrieves the data of a user.
+
+    *   `payload`: *object, optional* An object containing the username and user_id.
+        *   `username`: *string, optional* The username of the user.
+        *   `user_id`: *string, optional* The ID of the user.
+        *   `basic`: *boolean, optional* Whether to fetch only basic user information default: false.
+    *   Returns: A promise that resolves with the data of the user.
+
+*   `updateData(payload)`
+
+Updates the user data with the given payload.
+
+    *   `payload`: *object* The data to update the user with.
+    *   Returns: A promise that resolves with the updated user data.
+
+*   `unsetPublicName()`
+
+Update the public name to null in the user data.
+
+    *   Returns: A Promise that resolves with the response data after updating the public name
+
+*   `getRoles(user_id)`
+
+Retrieves the roles of a user.
+
+    *   `user_id`: *string, optional* The ID of the user. If not provided, the current user ID will be used.
+    *   Returns: A promise that resolves with an array of roles for the user.
+
+*   `getBadges(user_id)`
+
+Retrieves the badges for a given user.
+
+    *   `user_id`: *string, optional* The ID of the user. If not provided, the current session user ID will be used.
+    *   Returns: A promise that resolves with an array of badges for the user.
+
+*   `getConfig(key)`
+
+Retrive user config from server
+
+    *   `key`: *string* A key of config
+    *   Returns: A Promise that resolves with a config object
+
+*   `updateConfig(update)`
+
+Update the configuration with the given update.
+
+    *   `update`: *Object* The object containing the updated configuration data
+    *   Returns: A Promise that resolves with the response data after the configuration is updated
+
+*   `getPublicKey(user_id)`
+
+Retrieves the public key for a given user.
+
+    *   `user_id`: *string, optional* The ID of the user. If not provided, the current session user ID will be used.
+    *   Returns: A promise that resolves with the public key for the user.
+
+*   `updatePublicKey(public_key)`
+
+Updates the public key for the current user.
+
+    *   `public_key`: *string* The new public key to set.
+    *   Returns: A promise that resolves with the response data after updating the public key.

@@ -1,0 +1,31 @@
+---
+id: e2e
+title: E2EModel
+sidebar_label: E2EModel
+---
+
+## E2EModel
+
+The `E2EModel` class provides static methods for managing end-to-end encryption keys.
+
+**Class Overview:**
+
+The `E2EModel` class offers methods for retrieving and updating key pairs.
+
+### Static Methods
+
+*   `getKeyPair()`
+
+Retrieves the key pair for the current user.
+
+    *   Returns: A Promise that resolves with the key pair data.
+
+*   `updateKeyPair(str, { imSure = false } = {})`
+
+Updates the key pair for the current user.
+
+    *   `str`: *string* The new key pair, encoded as a string.
+    *   `{ imSure = false }`: *object, optional* Options for the update.
+        *   `imSure`: *boolean, optional* Confirmation to update the keypair. Must be set to `true` to proceed.
+    *   Returns: A Promise that resolves with the updated key pair data.
+    *   Throws: Error if confirmation is missing.

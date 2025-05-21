@@ -1,0 +1,44 @@
+---
+id: index
+title: Comty.js Library
+sidebar_label: Introduction
+---
+
+Welcome to the documentation for the `comty.js` library. This library provides a set of modules and classes for interacting with the Comty platform.
+
+## Core Models
+
+The following are the core models available in the `comty.js` library:
+
+*   [AddonsManager](models/addons): Manages addons within the library.
+*   [AuthModel](models/auth): Handles user authentication and session management.
+*   [MusicModel](models/music): Handles Music Data.
+*   [Post](models/post): Handles Post Data.
+*   [Search](models/search): Handles Search requests.
+*   [SessionModel](models/session): Manages user sessions and tokens.
+*   [UserModel](models/user): Manages User Data.
+
+## Helpers
+
+*   [Remotes](remotes): Describes all the remotes.
+*   [Settings](settings): Describes all the settings.
+*   [Storage](storage): Describes all the storage.
+*   [WebsocketManager](ws): Handles websocket connections.
+
+## Getting Started
+
+To get started with the `comty.js` library, you can install it using npm:
+
+```bash
+npm install comty.js
+```
+
+Then, you can import the modules you need into your project:
+
+```javascript
+import { AuthModel, SessionModel } from 'comty.js';
+
+// Use the modules
+AuthModel.login({ username: 'myuser', password: 'mypassword' })
+  .then(data => console.log(data));
+```

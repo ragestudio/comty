@@ -1,0 +1,108 @@
+---
+id: tidal
+title: TidalService
+sidebar_label: TidalService
+---
+
+## TidalService
+
+The `TidalService` class provides static methods for linking and interacting with the Tidal service.
+
+**Class Overview:**
+
+The `TidalService` class offers methods for linking and unlinking accounts, checking the connection status, and retrieving data from the Tidal service.
+
+### Static Properties
+
+*   `api_instance`: Returns the API instance for the Tidal service.
+
+### Static Methods
+
+*   `linkAccount()`
+
+Opens a new tab to link the user's Tidal account.
+
+    *   Returns: A Promise that resolves with the link data.
+    *   Throws: Error if not running in a browser environment
+
+*   `unlinkAccount()`
+
+Unlinks the user's Tidal account.
+
+    *   Returns: A Promise that resolves with the unlink data.
+    *   Throws: Error if not running in a browser environment
+
+*   `isActive()`
+
+Checks if the user's Tidal account is linked.
+
+    *   Returns: A Promise that resolves with a boolean indicating whether the account is linked.
+    *   Throws: Error if not running in a browser environment
+
+*   `getCurrentUser()`
+
+Retrieves the current Tidal user.
+
+    *   Returns: A Promise that resolves with the current user data.
+
+*   `getPlaybackUrl(track_id)`
+
+Retrieves the playback URL for a given Tidal track ID.
+
+    *   `track_id`: *string* The ID of the Tidal track.
+    *   Returns: A Promise that resolves with the playback URL data.
+
+*   `getTrackManifest(track_id)`
+
+Retrieves the track manifest for a given Tidal track ID.
+
+    *   `track_id`: *string* The ID of the Tidal track.
+    *   Returns: A Promise that resolves with the track manifest data.
+
+*   `getMyFavoriteTracks({ limit = 50, offset = 0 } = {})`
+
+Retrieves the user's favorite Tidal tracks.
+
+    *   `{ limit, offset }`: *object, optional* An object containing pagination parameters.
+        *   `limit`: *number* The maximum number of tracks to retrieve.
+        *   `offset`: *number* The offset to start retrieving from.
+    *   Returns: A Promise that resolves with the favorite tracks data.
+
+*   `getMyFavoritePlaylists({ limit = 50, offset = 0 } = {})`
+
+Retrieves the user's favorite Tidal playlists.
+
+    *   `{ limit, offset }`: *object, optional* An object containing pagination parameters.
+        *   `limit`: *number* The maximum number of playlists to retrieve.
+        *   `offset`: *number* The offset to start retrieving from.
+    *   Returns: A Promise that resolves with the favorite playlists data.
+
+*   `getPlaylistData({ playlist_id, resolve_items = false, limit = 50, offset = 0 })`
+
+Retrieves Tidal playlist data.
+
+    *   `playlist_id`: *string* The ID of the Tidal playlist.
+    *   `{ resolve_items, limit, offset }`: *object, optional* An object containing playlist options.
+        *   `resolve_items`: *boolean* Whether to resolve playlist items.
+        *   `limit`: *number* The maximum number of items to retrieve.
+        *   `offset`: *number* The offset to start retrieving from.
+    *   Returns: A Promise that resolves with the playlist data.
+
+*   `getPlaylistItems({ playlist_id, resolve_items = false, limit = 50, offset = 0 })`
+
+Retrieves Tidal playlist items.
+
+    *   `playlist_id`: *string* The ID of the Tidal playlist.
+    *   `{ resolve_items, limit, offset }`: *object, optional* An object containing playlist options.
+        *   `resolve_items`: *boolean* Whether to resolve playlist items.
+        *   `limit`: *number* The maximum number of items to retrieve.
+        *   `offset`: *number* The offset to start retrieving from.
+    *   Returns: A Promise that resolves with the playlist items data.
+
+*   `toggleTrackLike({ track_id, to })`
+
+Toggles a Tidal track like.
+
+    *   `track_id`: *string* The ID of the Tidal track.
+    *   `to`: *boolean* Whether to like or unlike the track.
+    *   Returns: A Promise that resolves with the response data.

@@ -71,8 +71,8 @@ const PlayerButton = (props) => {
 				openPlayerView()
 			}
 
-			if (track.manifest?.analyzeCoverColor) {
-				track.manifest
+			if (track?.analyzeCoverColor) {
+				track
 					.analyzeCoverColor()
 					.then((analysis) => {
 						setCoverAnalyzed(analysis)

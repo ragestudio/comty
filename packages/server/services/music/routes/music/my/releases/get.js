@@ -1,7 +1,7 @@
 import { MusicRelease, Track } from "@db_models"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const { keywords, limit = 10, offset = 0 } = req.query
 

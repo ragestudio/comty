@@ -2,7 +2,7 @@ import path from "node:path"
 import SegmentedAudioMPDJob from "@shared-classes/SegmentedAudioMPDJob"
 
 export default async ({ filePath, workPath, onProgress }) => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve) => {
 		const outputDir = path.resolve(workPath, "a-dash")
 
 		const job = new SegmentedAudioMPDJob({
@@ -10,7 +10,7 @@ export default async ({ filePath, workPath, onProgress }) => {
 			outputDir: outputDir,
 
 			// set to default as raw flac
-			audioCodec: "flac",
+			audioCodec: "copy",
 			audioBitrate: "default",
 			audioSampleRate: "default",
 		})

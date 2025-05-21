@@ -33,8 +33,6 @@ export class ThemeProvider extends React.Component {
 	}
 
 	handleUpdate = (update) => {
-		console.log("[THEME] Update", update)
-
 		this.setState({
 			useAlgorigthm: variantKeyToColor(app.cores.style.currentVariantKey),
 			useCompactMode: update["compact-mode"],
@@ -235,11 +233,7 @@ export default class StyleCore extends Core {
 
 		this.isOnTemporalVariant = false
 
-		this.console.log(`Input variant key [${variantKey}]`)
-
 		const color = variantKeyToColor(variantKey)
-
-		this.console.log(`Applying variant [${color}]`)
 
 		const values = this.public.theme.variants[color]
 

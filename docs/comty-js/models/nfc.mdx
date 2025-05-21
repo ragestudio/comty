@@ -1,0 +1,54 @@
+---
+id: nfc
+title: NFCModel
+sidebar_label: NFCModel
+---
+
+## NFCModel
+
+The `NFCModel` class provides static methods for interacting with NFC tags.
+
+**Class Overview:**
+
+The `NFCModel` class offers methods for retrieving, registering, and deleting NFC tags.
+
+### Static Methods
+
+*   `getOwnTags()`
+
+Retrieves the list of tags owned by the current user.
+
+    *   Returns: A Promise that resolves with the data of the tags.
+
+*   `getTagById(id)`
+
+Retrieves a tag by its ID.
+
+    *   `id`: *string* The ID of the tag to retrieve.
+    *   Returns: The data of the retrieved tag.
+    *   Throws: Error if the ID is not provided.
+
+*   `getTagBySerial(serial)`
+
+Retrieves a tag by its serial number.
+
+    *   `serial`: *string* The serial number of the tag to retrieve.
+    *   Returns: A Promise that resolves with the data of the tag.
+    *   Throws: Error if the serial number is not provided.
+
+*   `registerTag(serial, payload)`
+
+Registers a tag with the given serial number and payload.
+
+    *   `serial`: *string* The serial number of the tag.
+    *   `payload`: *object* The payload data for the tag.
+    *   Returns: The data of the registered tag.
+    *   Throws: Error if the serial or payload is not provided.
+
+*   `deleteTag(id)`
+
+Deletes a tag.
+
+    *   `id`: *string* The ID of the tag to delete.
+    *   Returns: A Promise that resolves with the data of the deleted tag.
+    *   Throws: Error if the ID is not provided.

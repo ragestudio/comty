@@ -8,11 +8,11 @@ import MusicTrack from "@components/Music/Track"
 import Playlist from "@components/Music/Playlist"
 
 const ResultGroupsDecorators = {
-	playlists: {
-		icon: "MdPlaylistPlay",
-		label: "Playlists",
+	albums: {
+		icon: "MdAlbum",
+		label: "Albums",
 		renderItem: (props) => {
-			return <Playlist key={props.key} playlist={props.item} />
+			return <Playlist row playlist={props.item} />
 		},
 	},
 	tracks: {
@@ -23,7 +23,6 @@ const ResultGroupsDecorators = {
 				<MusicTrack
 					key={props.key}
 					track={props.item}
-					//onClickPlayBtn={() => app.cores.player.start(props.item)}
 					onClick={() => app.location.push(`/play/${props.item._id}`)}
 				/>
 			)
@@ -40,6 +39,10 @@ const SearchResults = ({ data }) => {
 
 	// filter out groups with no items array property
 	groupsKeys = groupsKeys.filter((key) => {
+		if (!data[key]) {
+			return false
+		}
+
 		if (!Array.isArray(data[key].items)) {
 			return false
 		}

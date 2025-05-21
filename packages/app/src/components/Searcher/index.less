@@ -90,7 +90,6 @@ html {
 
 		align-items: center;
 
-		border: 0;
 		padding: 0;
 		margin: 0;
 
@@ -101,6 +100,7 @@ html {
 		padding: 0 10px;
 
 		background-color: var(--background-color-primary);
+		border: 3px solid var(--border-color) !important;
 
 		.ant-input-prefix {
 			font-size: 2rem;
@@ -127,6 +127,9 @@ html {
 	flex-wrap: wrap;
 
 	width: 100%;
+	height: fit-content;
+	max-height: 70vh;
+
 	gap: 10px;
 	padding: 20px;
 
@@ -137,6 +140,7 @@ html {
 
 	color: var(--text-color);
 	background-color: var(--background-color-primary);
+	border: 3px solid var(--border-color);
 
 	.ant-result,
 	.ant-result-title,

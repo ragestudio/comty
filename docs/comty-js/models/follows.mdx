@@ -1,0 +1,38 @@
+---
+id: follows
+title: FollowsModel
+sidebar_label: FollowsModel
+---
+
+## FollowsModel
+
+The `FollowsModel` class provides static methods for interacting with user follow relationships.
+
+**Class Overview:**
+
+The `FollowsModel` class offers methods for checking if a user is following another user, retrieving followers, and toggling the follow status.
+
+### Static Methods
+
+*   `imFollowing(user_id)`
+
+Checks if the current user is following the specified user.
+
+    *   `user_id`: *string* The ID of the user to check if the current user is following.
+    *   Returns: A Promise that resolves with the response data indicating if the current user is following the specified user.
+    *   Throws: Error if the user_id parameter is not provided.
+
+*   `getFollowers(user_id, fetchData)`
+
+Retrieves the list of followers for a given user.
+
+    *   `user_id`: *string, optional* The ID of the user. If not provided, the current user ID will be used.
+    *   `fetchData`: *boolean* Whether to fetch additional data for each follower. Defaults to false.
+    *   Returns: A promise that resolves with the list of followers and their data.
+
+*   `toggleFollow({ user_id })`
+
+Toggles the follow status for a user.
+
+    *   `user_id`: *string* The ID of the user to toggle follow status.
+    *   Returns: A promise that resolves with the response data after toggling follow status.
