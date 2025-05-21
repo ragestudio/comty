@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "motion/react"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
+// eslint-disable-next-line
 const LyricsText = React.forwardRef((props, textRef) => {
 	const [playerState] = usePlayerStateContext()
 
@@ -74,20 +75,22 @@ const LyricsText = React.forwardRef((props, textRef) => {
 		} else {
 			setVisible(true)
 
-			// find line element by id
-			const lineElement = textRef.current.querySelector(
-				`#lyrics-line-${currentLineIndex}`,
-			)
+			if (textRef.current) {
+				// find line element by id
+				const lineElement = textRef.current.querySelector(
+					`#lyrics-line-${currentLineIndex}`,
+				)
 
-			// center scroll to current line
-			if (lineElement) {
-				lineElement.scrollIntoView({
-					behavior: "smooth",
-					block: "center",
-				})
-			} else {
-				// scroll to top
-				textRef.current.scrollTop = 0
+				// center scroll to current line
+				if (lineElement) {
+					lineElement.scrollIntoView({
+						behavior: "smooth",
+						block: "center",
+					})
+				} else {
+					// scroll to top
+					textRef.current.scrollTop = 0
+				}
 			}
 		}
 	}, [currentLineIndex])

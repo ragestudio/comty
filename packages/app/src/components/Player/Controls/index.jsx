@@ -39,21 +39,21 @@ const EventsHandlers = {
 
 		const track = app.cores.player.track()
 
-		return await track.manifest.serviceOperations.toggleItemFavorite(
+		return await track.serviceOperations.toggleItemFavorite(
 			"track",
-			ctx.track_manifest._id,
+			track._id,
 		)
 	},
 }
 
 const Controls = (props) => {
-	const [trackInstance, setTrackInstance] = React.useState({})
+	const [trackManifest, setTrackManifest] = React.useState({})
 
 	const onPlayerStateChange = React.useCallback((state) => {
-		const instance = app.cores.player.track()
+		const track = app.cores.player.track()
 
-		if (instance) {
-			setTrackInstance(instance)
+		if (track) {
+			setTrackManifest(track)
 		}
 	}, [])
 
@@ -131,12 +131,9 @@ const Controls = (props) => {
 
 			{app.isMobile && (
 				<LikeButton
-					liked={
-						trackInstance?.manifest?.serviceOperations
-							?.isItemFavorited
-					}
+					liked={trackManifest?.serviceOperations?.isItemFavorited}
 					onClick={() => handleAction("like")}
-					disabled={!trackInstance?.manifest?._id}
+					disabled={!trackManifest?._id}
 				/>
 			)}
 		</div>

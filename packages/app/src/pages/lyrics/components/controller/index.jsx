@@ -3,13 +3,13 @@ import { Tag, Button } from "antd"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
 
-import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
-
 import { Icons } from "@components/Icons"
 import Controls from "@components/Player/Controls"
+import Indicators from "@components/Player/Indicators"
 import SeekBar from "@components/Player/SeekBar"
 import LiveInfo from "@components/Player/LiveInfo"
 
+import useHideOnMouseStop from "@hooks/useHideOnMouseStop"
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
 function isOverflown(element) {
@@ -23,7 +23,7 @@ function isOverflown(element) {
 	)
 }
 
-const PlayerController = React.forwardRef((props, ref) => {
+const PlayerController = (props, ref) => {
 	const [playerState] = usePlayerStateContext()
 
 	const titleRef = React.useRef()
@@ -34,51 +34,13 @@ const PlayerController = React.forwardRef((props, ref) => {
 	})
 	const [titleIsOverflown, setTitleIsOverflown] = React.useState(false)
 
-	const [currentTime, setCurrentTime] = React.useState(0)
-	const [trackDuration, setTrackDuration] = React.useState(0)
-	const [draggingTime, setDraggingTime] = React.useState(false)
-	const [currentDragWidth, setCurrentDragWidth] = React.useState(0)
-	const [syncInterval, setSyncInterval] = React.useState(null)
-
-	async function onDragEnd(seekTime) {
-		setDraggingTime(false)
-
-		app.cores.player.controls.seek(seekTime)
-
-		syncPlayback()
-	}
-
-	async function syncPlayback() {
-		if (!playerState.track_manifest) {
-			return false
-		}
-
-		const currentTrackTime = app.cores.player.controls.seek()
-
-		setCurrentTime(currentTrackTime)
-	}
-
-	//* Handle when playback status change
-	React.useEffect(() => {
-		if (playerState.playback_status === "playing") {
-			setSyncInterval(setInterval(syncPlayback, 1000))
-		} else {
-			if (syncInterval) {
-				clearInterval(syncInterval)
-			}
-		}
-	}, [playerState.playback_status])
-
 	React.useEffect(() => {
 		setTitleIsOverflown(isOverflown(titleRef.current))
-		setTrackDuration(app.cores.player.controls.duration())
 	}, [playerState.track_manifest])
 
-	React.useEffect(() => {
-		syncPlayback()
-	}, [])
-
-	const isStopped = playerState.playback_status === "stopped"
+	if (playerState.playback_status === "stopped") {
+		return null
+	}
 
 	return (
 		<div
@@ -101,12 +63,7 @@ const PlayerController = React.forwardRef((props, ref) => {
 									},
 								)}
 							>
-								{playerState.playback_status === "stopped" ||
-									(!playerState.track_manifest?.title &&
-										"Nothing is playing")}
-
-								{playerState.playback_status !== "stopped" &&
-									playerState.track_manifest?.title}
+								{playerState.track_manifest?.title}
 							</h4>
 						}
 
@@ -115,17 +72,11 @@ const PlayerController = React.forwardRef((props, ref) => {
 								//gradient
 								//gradientColor={bgColor}
 								//gradientWidth={20}
-								play={!isStopped}
+								play={playerState.playback_status === "playing"}
 							>
 								<h4>
-									{isStopped ? (
-										"Nothing is playing"
-									) : (
-										<>
-											{playerState.track_manifest
-												?.title ?? "Untitled"}
-										</>
-									)}
+									{playerState.track_manifest?.title ??
+										"Untitled"}
 								</h4>
 							</Marquee>
 						)}
@@ -146,41 +97,13 @@ const PlayerController = React.forwardRef((props, ref) => {
 
 				{!playerState.live && <SeekBar />}
 
-				<div className="lyrics-player-controller-tags">
-					{playerState.track_manifest?.metadata?.lossless && (
-						<Tag
-							icon={
-								<Icons.Lossless
-									style={{
-										margin: 0,
-									}}
-								/>
-							}
-							bordered={false}
-						/>
-					)}
-					{playerState.track_manifest?.explicit && (
-						<Tag bordered={false}>Explicit</Tag>
-					)}
-					{props.lyrics?.sync_audio_at && (
-						<Tag bordered={false} icon={<Icons.TbMovie />}>
-							Video
-						</Tag>
-					)}
-					{props.lyrics?.available_langs?.length > 1 && (
-						<Button
-							icon={<Icons.MdTranslate />}
-							type={
-								props.translationEnabled ? "primary" : "default"
-							}
-							onClick={() => props.toggleTranslationEnabled()}
-							size="small"
-						/>
-					)}
-				</div>
+				<Indicators
+					track={playerState.track_manifest}
+					playerState={playerState}
+				/>
 			</div>
 		</div>
 	)
-})
+}
 
 export default PlayerController

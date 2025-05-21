@@ -27,14 +27,30 @@ export default class TrackManifest {
 
 		if (typeof params.album !== "undefined") {
 			this.album = params.album
+
+			if (typeof this.album === "object") {
+				this.album = this.album.title
+			}
 		}
 
 		if (typeof params.artist !== "undefined") {
 			this.artist = params.artist
+
+			if (typeof this.artist === "object") {
+				this.artist = this.artist.name
+			}
 		}
 
 		if (typeof params.source !== "undefined") {
 			this.source = params.source
+		}
+
+		if (typeof params.dash_manifest !== "undefined") {
+			this.dash_manifest = params.dash_manifest
+		}
+
+		if (typeof params.encoded_manifest !== "undefined") {
+			this.encoded_manifest = params.encoded_manifest
 		}
 
 		if (typeof params.metadata !== "undefined") {
@@ -43,6 +59,15 @@ export default class TrackManifest {
 
 		if (typeof params.liked !== "undefined") {
 			this.liked = params.liked
+		}
+
+		if (typeof params.public !== "undefined") {
+			this.public = params.public
+		}
+
+		if (this.source) {
+			this.mpd_mode =
+				this.source.startsWith("blob:") || this.source.endsWith(".mpd")
 		}
 
 		return this
@@ -60,9 +85,10 @@ export default class TrackManifest {
 
 	// set default service to default
 	service = "default"
+	mpd_mode = false
 
 	async initialize() {
-		if (!this.params.file) {
+		if (!this.params.file || !(this.params.file instanceof File)) {
 			return this
 		}
 
@@ -93,7 +119,12 @@ export default class TrackManifest {
 	analyzeCoverColor = async () => {
 		const fac = new FastAverageColor()
 
-		return await fac.getColorAsync(this.cover)
+		const img = new Image()
+
+		img.src = this.cover + "?t=a"
+		img.crossOrigin = "anonymous"
+
+		return await fac.getColorAsync(img)
 	}
 
 	serviceOperations = {
@@ -164,8 +195,11 @@ export default class TrackManifest {
 			album: this.album,
 			artist: this.artist,
 			source: this.source,
+			dash_manifest: this.dash_manifest,
+			encoded_manifest: this.encoded_manifest,
 			metadata: this.metadata,
 			liked: this.liked,
+			service: this.service,
 		}
 	}
 }
