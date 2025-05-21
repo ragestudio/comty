@@ -6,14 +6,6 @@ import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-const typeToNavigationType = {
-	playlist: "playlist",
-	album: "album",
-	track: "track",
-	single: "track",
-	ep: "album",
-}
-
 const Playlist = (props) => {
 	const [coverHover, setCoverHover] = React.useState(false)
 
@@ -28,13 +20,27 @@ const Playlist = (props) => {
 			return props.onClick(playlist)
 		}
 
-		return app.location.push(`/music/list/${playlist._id}`)
+		const params = new URLSearchParams()
+
+		if (playlist.type) {
+			params.set("type", playlist.type)
+		}
+
+		if (playlist.service) {
+			params.set("service", playlist.service)
+		}
+
+		return app.location.push(
+			`/music/list/${playlist._id}?${params.toString()}`,
+		)
 	}
 
 	const onClickPlay = (e) => {
 		e.stopPropagation()
 
-		app.cores.player.start(playlist.items)
+		if (playlist.items) {
+			app.cores.player.start(playlist.items)
+		}
 	}
 
 	return (
@@ -68,8 +74,16 @@ const Playlist = (props) => {
 				<div className="playlist_info_title" onClick={onClick}>
 					<h1>{playlist.title}</h1>
 				</div>
+
 				{props.row && (
 					<div className="playlist_details">
+						{playlist.service === "tidal" && (
+							<p>
+								<Icons.SiTidal />
+								Tidal
+							</p>
+						)}
+
 						<p>
 							<Icons.MdAlbum />
 							{playlist.type ?? "playlist"}
