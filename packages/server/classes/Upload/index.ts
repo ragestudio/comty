@@ -132,6 +132,7 @@ export default class Upload {
 			metadata: metadata,
 			targetFilename: isDirectory ? path.basename(targetPath) : null,
 			provider: s3Provider,
+			onProgress: onProgress,
 		})
 
 		return result
