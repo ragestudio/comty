@@ -14,4 +14,10 @@ export default defineConfig([
 		languageOptions: { globals: globals.browser },
 	},
 	pluginReact.configs.flat.recommended,
+	{
+		rules: {
+			"react/jsx-uses-react": "off",
+			"react/react-in-jsx-scope": "off",
+		},
+	},
 ])
