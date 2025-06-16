@@ -13,17 +13,12 @@ export default {
 		description: {
 			type: String,
 		},
-		list: {
+		items: {
 			type: Object,
 			default: [],
 			required: true,
 		},
-		cover: {
-			type: String,
-			default:
-				"https://storage.ragestudio.net/comty-static-assets/default_song.png",
-		},
-		thumbnail: {
+		image: {
 			type: String,
 			default:
 				"https://storage.ragestudio.net/comty-static-assets/default_song.png",
@@ -31,9 +26,6 @@ export default {
 		created_at: {
 			type: Date,
 			required: true,
-		},
-		publisher: {
-			type: Object,
 		},
 		public: {
 			type: Boolean,
