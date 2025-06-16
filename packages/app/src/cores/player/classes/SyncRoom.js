@@ -72,6 +72,8 @@ export default class SyncRoom {
 			track_manifest = {
 				...currentItem.toSeriableObject(),
 			}
+
+			delete track_manifest.source
 		}
 
 		// check if has changed the track
@@ -98,8 +100,6 @@ export default class SyncRoom {
 	}
 
 	syncState = async (data) => {
-		console.log(data)
-
 		if (!data || !data.track_manifest) {
 			return false
 		}
@@ -129,11 +129,12 @@ export default class SyncRoom {
 		const currentTime = this.player.seek()
 		const offset = serverTime - currentTime
 
-		console.log({
+		this.player.console.debug("sync_state", {
+			serverPayload: data,
 			serverTime: serverTime,
 			currentTime: currentTime,
-			maxTimeOffset: SyncRoom.maxTimeOffset,
 			offset: offset,
+			maxTimeOffset: SyncRoom.maxTimeOffset,
 		})
 
 		if (
@@ -182,13 +183,13 @@ export default class SyncRoom {
 		this.state.joined_room = null
 
 		if (this.socket) {
-			await this.socket.disconnect()
+			await this.socket.destroy()
 		}
 	}
 
 	createSocket = async () => {
 		if (this.socket) {
-			await this.socket.disconnect()
+			await this.socket.destroy()
 		}
 
 		this.socket = new RTEngineClient({
