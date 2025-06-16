@@ -15,6 +15,11 @@ export default [
 		public: true,
 	},
 	{
+		path: "/tv/*",
+		useLayout: "default",
+		centeredContent: false,
+	},
+	{
 		path: "/featured-event/*",
 		useLayout: "default",
 		public: true,
@@ -31,7 +36,7 @@ export default [
 	{
 		path: "/music/*",
 		useLayout: "default",
-		centeredContent: true,
+		centeredContent: false,
 	},
 	{
 		path: "/nfc/*",

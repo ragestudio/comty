@@ -1,14 +1,8 @@
-import { NotFound, RenderError, Crash } from "@components"
-
+import { NotFound, Crash, Skeleton } from "@components"
+import ErrorCatcher from "@components/ErrorCatcher"
 export default {
-	PageLoad: () => {
-		return <antd.Skeleton active />
-	},
-	NotFound: (props) => {
-		return <NotFound />
-	},
-	RenderError: (props) => {
-		return <RenderError {...props} />
-	},
+	Loading: Skeleton,
+	NotFound: NotFound,
+	RenderError: ErrorCatcher,
 	Crash: Crash.CrashWrapper,
 }

@@ -1,5 +1,8 @@
 import React from "react"
 import { Runtime } from "@ragestudio/vessel"
+import * as Router from "@ragestudio/vessel/router"
+import routesDeclarations from "@config/routes"
+
 import { Helmet } from "react-helmet"
 import * as Sentry from "@sentry/browser"
 import { invoke } from "@tauri-apps/api/tauri"
@@ -14,7 +17,6 @@ import DesktopTopBar from "@components/DesktopTopBar"
 import { ThemeProvider } from "@cores/style/style.core.jsx"
 
 import Layout from "./layout"
-import * as Router from "./router"
 
 import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
@@ -117,19 +119,21 @@ class ComtyApp extends React.Component {
 					/>
 					<meta property="og:title" content={config.app.siteName} />
 				</Helmet>
-				<Router.InternalRouter>
-					<ThemeProvider>
-						{window.__TAURI__ && <DesktopTopBar />}
-						<Layout
-							user={this.auth.user}
-							staticRenders={ComtyApp.staticRenders}
-						>
-							{this.state.firstInitialized && (
-								<Router.PageRender />
-							)}
-						</Layout>
-					</ThemeProvider>
-				</Router.InternalRouter>
+
+				<ThemeProvider>
+					{window.__TAURI__ && <DesktopTopBar />}
+					<Layout
+						user={this.auth.user}
+						staticRenders={ComtyApp.staticRenders}
+					>
+						{this.state.firstInitialized && (
+							<Router.Render
+								declarations={routesDeclarations}
+								staticRenders={ComtyApp.staticRenders}
+							/>
+						)}
+					</Layout>
+				</ThemeProvider>
 			</React.Fragment>
 		)
 	}
