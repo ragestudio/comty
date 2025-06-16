@@ -31,6 +31,10 @@ export default async (payload = {}) => {
 
 	requiredFields(["title", "source", "user_id"], payload)
 
+	console.log(`create()::`, {
+		payload,
+	})
+
 	if (typeof payload._id === "string") {
 		return await ModifyTrack(payload._id, payload)
 	}
@@ -71,19 +75,19 @@ export default async (payload = {}) => {
 		source: payload.source,
 		metadata: metadata,
 		public: payload.public ?? true,
+		publisher: {
+			user_id: payload.user_id,
+		},
+		created_at: new Date(),
 	}
 
 	if (Array.isArray(payload.artists)) {
 		obj.artist = payload.artists.join(", ")
 	}
 
-	let track = new Track({
-		...obj,
-		publisher: {
-			user_id: payload.user_id,
-		},
-		created_at: new Date(),
-	})
+	console.log({ obj: obj })
+
+	let track = new Track(obj)
 
 	await track.save()
 

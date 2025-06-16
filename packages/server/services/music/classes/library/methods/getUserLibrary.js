@@ -121,6 +121,7 @@ async function fetchAllKindsData(userId, limit, offsetStr) {
 			const actualItems = await Model.find({
 				_id: { $in: itemIds },
 			}).lean()
+
 			const actualItemsMap = new Map(
 				actualItems.map((item) => [item._id.toString(), item]),
 			)
