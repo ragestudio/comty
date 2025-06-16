@@ -1,0 +1,61 @@
+.avlyrics-editor-list {
+	display: flex;
+	flex-direction: column;
+
+	height: 500px;
+
+	overflow: overlay;
+
+	background-color: var(--background-color-accent);
+
+	border-radius: 12px;
+}
+
+.avlyrics-editor-list-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	width: 100%;
+
+	padding: 15px 10px;
+
+	&.active {
+		&:before {
+			position: absolute;
+
+			content: "";
+
+			top: 0;
+			bottom: 0;
+			left: 0;
+
+			margin: auto;
+			margin-left: 3px;
+
+			width: 5px;
+			height: 70%;
+
+			border-radius: 12px;
+			background-color: var(--colorPrimary);
+
+			//animation: active-line-indicator-enter 150ms ease-in-out linear;
+		}
+	}
+
+	&:not(:last-child) {
+		border-bottom: 1px solid var(--border-color);
+	}
+}
+
+@keyframes active-line-indicator-enter {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
