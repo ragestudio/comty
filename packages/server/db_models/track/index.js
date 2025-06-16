@@ -29,7 +29,6 @@ export default {
 		},
 		created_at: {
 			type: Date,
-			required: true,
 		},
 		cover: {
 			type: String,
