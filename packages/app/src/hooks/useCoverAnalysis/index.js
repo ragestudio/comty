@@ -32,12 +32,14 @@ export default (trackManifest) => {
 		}
 	}, [trackManifest])
 
-	const dominantColor = {
-		"--dominant-color": getDominantColorStr(coverAnalysis),
-	}
-
 	return {
 		coverAnalysis,
-		dominantColor,
+		dominantColor: getDominantColorStr(coverAnalysis),
+		cssVars: {
+			"--dominant-color": getDominantColorStr(coverAnalysis),
+			"--dominant-color-r": coverAnalysis?.value?.[0],
+			"--dominant-color-g": coverAnalysis?.value?.[1],
+			"--dominant-color-b": coverAnalysis?.value?.[2],
+		},
 	}
 }
