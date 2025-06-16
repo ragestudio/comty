@@ -92,7 +92,7 @@ export default {
 				// if has transformations, use background job
 				if (
 					(transformations && transformations.length > 0) ||
-					config.useCompression
+					(config.useCompression && !req.headers["prefer-no-job"])
 				) {
 					const job = await global.queues.createJob(
 						"file-process",
