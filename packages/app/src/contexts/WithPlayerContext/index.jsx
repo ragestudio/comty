@@ -56,7 +56,9 @@ export class WithPlayerContext extends React.Component {
 
 	events = {
 		"player.state.update": async (state) => {
-			this.setState(state)
+			if (state !== this.state) {
+				this.setState(state)
+			}
 		},
 	}
 
