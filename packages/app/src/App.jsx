@@ -3,6 +3,8 @@ import { Runtime } from "@ragestudio/vessel"
 import * as Router from "@ragestudio/vessel/router"
 import routesDeclarations from "@config/routes"
 
+import onPageMount from "@hooks/onPageMount"
+
 import { Helmet } from "react-helmet"
 import * as Sentry from "@sentry/browser"
 import { invoke } from "@tauri-apps/api/tauri"
@@ -130,6 +132,7 @@ class ComtyApp extends React.Component {
 							<Router.Render
 								declarations={routesDeclarations}
 								staticRenders={ComtyApp.staticRenders}
+								onPageMount={onPageMount}
 							/>
 						)}
 					</Layout>
