@@ -33,7 +33,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		if (
 			!lyrics ||
 			!lyrics.video_source ||
-			typeof lyrics.sync_audio_at_ms === "undefined" ||
+			typeof lyrics.video_starts_at_ms === "undefined" ||
 			!videoRef.current
 		) {
 			return null
@@ -43,7 +43,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		setSyncingVideo(true)
 
 		let newTime =
-			currentTrackTime + lyrics.sync_audio_at_ms / 1000 + 150 / 1000
+			currentTrackTime + lyrics.video_starts_at_ms / 1000 + 150 / 1000
 		newTime -= 5 / 1000
 
 		videoRef.current.currentTime = newTime
@@ -55,7 +55,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 				!videoRef.current ||
 				!lyrics ||
 				!lyrics.video_source ||
-				typeof lyrics.sync_audio_at_ms === "undefined"
+				typeof lyrics.video_starts_at_ms === "undefined"
 			) {
 				stopSyncInterval()
 				return
@@ -68,7 +68,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
 			const currentTrackTime = window.app.cores.player.controls.seek()
 			const currentVideoTime =
-				videoRef.current.currentTime - lyrics.sync_audio_at_ms / 1000
+				videoRef.current.currentTime - lyrics.video_starts_at_ms / 1000
 			const maxOffset = maxLatencyInMs / 1000
 			const currentVideoTimeDiff = Math.abs(
 				currentVideoTime - currentTrackTime,
@@ -135,7 +135,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 				}
 			}
 
-			if (typeof lyrics.sync_audio_at_ms !== "undefined") {
+			if (typeof lyrics.video_starts_at_ms !== "undefined") {
 				videoElement.loop = false
 				syncPlayback(true)
 			} else {
@@ -177,7 +177,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 			return
 		}
 
-		const shouldSync = typeof lyrics.sync_audio_at_ms !== "undefined"
+		const shouldSync = typeof lyrics.video_starts_at_ms !== "undefined"
 
 		if (playerState.playback_status === "playing") {
 			videoElement
@@ -254,5 +254,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		</>
 	)
 })
+
+LyricsVideo.displayName = "LyricsVideo"
 
 export default LyricsVideo
