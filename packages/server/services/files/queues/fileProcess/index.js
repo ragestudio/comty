@@ -22,7 +22,9 @@ export default {
 				.rm(job.workPath, { recursive: true, force: true })
 				.catch(() => null)
 
-			throw error
+			throw new Error(
+				`Failed to process file > ${error.message ?? error}`,
+			)
 		}
 	},
 }
