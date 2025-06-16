@@ -49,6 +49,11 @@ html {
 					.music-track_orderIndex {
 						opacity: 0;
 					}
+
+					.music-track_play_duration {
+						opacity: 1;
+						width: fit-content;
+					}
 				}
 			}
 		}
@@ -112,6 +117,13 @@ html {
 
 		.music-track_play {
 			position: relative;
+
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			gap: 10px;
 
 			transition: all 150ms ease-in-out;
 			cursor: pointer;
@@ -200,13 +212,31 @@ html {
 			display: flex;
 			flex-direction: column;
 
-			width: 100%;
+			width: 75%;
 
 			color: var(--text-color);
 
-			.music-track_title {
-				font-size: 1rem;
-				//font-family: "Space Grotesk", sans-serif;
+			.music-track_titles {
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+
+				gap: 5px;
+
+				.music-track_title {
+					display: flex;
+					flex-direction: row;
+
+					align-items: center;
+					font-size: 1rem;
+					gap: 5px;
+				}
+
+				.music-track_version {
+					font-size: 0.8rem;
+					opacity: 0.8;
+				}
 			}
 
 			.music-track_artist {
@@ -225,10 +255,27 @@ html {
 		align-items: center;
 		justify-content: center;
 
-		gap: 10px;
+		gap: 5px;
 
 		margin-left: auto;
 
 		color: var(--text-color);
+
+		.music-track_play_duration {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: center;
+
+			gap: 5px;
+
+			font-size: 0.8rem;
+		}
+
+		.music-track_more-menu {
+			padding: 10px;
+			cursor: pointer;
+		}
 	}
 }

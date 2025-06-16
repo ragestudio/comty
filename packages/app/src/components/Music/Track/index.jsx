@@ -14,6 +14,14 @@ import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
 import "./index.less"
 
+function secondsToIsoTime(seconds) {
+	const minutes = Math.floor(seconds / 60)
+
+	return `${minutes}:${Math.floor(seconds % 60)
+		.toString()
+		.padStart(2, "0")}`
+}
+
 const handlers = {
 	like: async (ctx, track) => {
 		await MusicModel.toggleItemFavourite("track", track._id, true)
@@ -51,7 +59,7 @@ const Track = (props) => {
 	const isCurrent = track_manifest?._id === props.track._id
 	const isPlaying = isCurrent && playback_status === "playing"
 
-	const handleClickPlayBtn = React.useCallback(() => {
+	const handleClickPlayBtn = () => {
 		if (typeof props.onPlay === "function") {
 			return props.onPlay(props.track)
 		}
@@ -65,7 +73,7 @@ const Track = (props) => {
 		} else {
 			app.cores.player.playback.toggle()
 		}
-	})
+	}
 
 	const handleOnClickItem = React.useCallback(() => {
 		if (props.onClick) {
@@ -75,9 +83,9 @@ const Track = (props) => {
 		if (app.isMobile) {
 			handleClickPlayBtn()
 		}
-	})
+	}, [])
 
-	const handleMoreMenuOpen = () => {
+	const handleMoreMenuOpen = React.useCallback(() => {
 		if (app.isMobile) {
 			return
 		}
@@ -85,9 +93,9 @@ const Track = (props) => {
 		return setMoreMenuOpened((prev) => {
 			return !prev
 		})
-	}
+	}, [])
 
-	const handleMoreMenuItemClick = (e) => {
+	const handleMoreMenuItemClick = React.useCallback((e) => {
 		const { key } = e
 
 		if (typeof handlers[key] === "function") {
@@ -101,7 +109,7 @@ const Track = (props) => {
 				props.track,
 			)
 		}
-	}
+	}, [])
 
 	const moreMenuItems = React.useMemo(() => {
 		const items = [
@@ -162,6 +170,9 @@ const Track = (props) => {
 		return items
 	}, [props.track])
 
+	const trackDuration =
+		props.track?.metadata?.duration ?? props.track?.duration
+
 	return (
 		<div
 			id={props.track._id}
@@ -201,6 +212,14 @@ const Track = (props) => {
 							}
 							onClick={handleClickPlayBtn}
 						/>
+
+						{/* {props.track?.metadata?.duration && (
+							<div className="music-track_play_duration">
+								{secondsToIsoTime(
+									props.track.metadata.duration,
+								)}
+							</div>
+						)} */}
 					</div>
 				)}
 
@@ -214,13 +233,19 @@ const Track = (props) => {
 					className="music-track_details"
 					onClick={handleOnClickItem}
 				>
-					<div className="music-track_title">
-						<span>
+					<div className="music-track_titles">
+						<span className="music-track_title">
 							{props.track.service === "tidal" && (
 								<Icons.SiTidal />
 							)}
 							{props.track.title}
 						</span>
+
+						{props.track.version && (
+							<span className="music-track_version">
+								({props.track.version})
+							</span>
+						)}
 					</div>
 					<div className="music-track_artist">
 						<span>
@@ -233,6 +258,13 @@ const Track = (props) => {
 			</div>
 
 			<div className="music-track_actions">
+				{trackDuration && (
+					<div className="music-track_play_duration">
+						<Icons.FiClock />
+						{secondsToIsoTime(trackDuration)}
+					</div>
+				)}
+
 				<antd.Dropdown
 					menu={{
 						items: moreMenuItems,
@@ -242,11 +274,9 @@ const Track = (props) => {
 					open={moreMenuOpened}
 					trigger={["click"]}
 				>
-					<antd.Button
-						type="ghost"
-						size="large"
-						icon={<Icons.IoMdMore />}
-					/>
+					<div className="music-track_more-menu">
+						<Icons.IoMdMore />
+					</div>
 				</antd.Dropdown>
 			</div>
 		</div>
