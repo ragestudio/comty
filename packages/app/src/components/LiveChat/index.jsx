@@ -102,6 +102,9 @@ export default class LiveChat extends React.Component {
 	}
 
 	leaveSocketRoom = () => {
+		if (!this.socket) {
+			return false
+		}
 		if (this.state.connectionEnd) {
 			return false
 		}
