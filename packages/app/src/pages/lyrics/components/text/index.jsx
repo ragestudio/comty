@@ -19,8 +19,8 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
 		const lineIndex = lyrics.synced_lyrics.findIndex((line) => {
 			return (
-				currentTrackTime >= line.startTimeMs &&
-				currentTrackTime <= line.endTimeMs
+				currentTrackTime >= (line.startTimeMs ?? line.start_ms) &&
+				currentTrackTime <= (line.endTimeMs ?? line.end_ms)
 			)
 		})
 
@@ -123,40 +123,38 @@ const LyricsText = React.forwardRef((props, textRef) => {
 	return (
 		<div className="lyrics-text-wrapper">
 			<AnimatePresence>
-				{visible && (
-					<motion.div
-						ref={textRef}
-						className="lyrics-text"
-						animate={{
-							opacity: 1,
-						}}
-						initial={{
-							opacity: 0,
-						}}
-						exit={{
-							opacity: 0,
-						}}
-						transition={{
-							type: "spring",
-							stiffness: 100,
-							damping: 20,
-						}}
-					>
-						{lyrics.synced_lyrics.map((line, index) => {
-							return (
-								<p
-									key={index}
-									id={`lyrics-line-${index}`}
-									className={classnames("line", {
-										["current"]: currentLineIndex === index,
-									})}
-								>
-									{line.text}
-								</p>
-							)
-						})}
-					</motion.div>
-				)}
+				<motion.div
+					ref={textRef}
+					className="lyrics-text"
+					animate={{
+						opacity: visible ? 1 : 0,
+					}}
+					initial={{
+						opacity: 0,
+					}}
+					exit={{
+						opacity: 0,
+					}}
+					transition={{
+						type: "spring",
+						stiffness: 100,
+						damping: 20,
+					}}
+				>
+					{lyrics.synced_lyrics.map((line, index) => {
+						return (
+							<p
+								key={index}
+								id={`lyrics-line-${index}`}
+								className={classnames("line", {
+									["current"]: currentLineIndex === index,
+								})}
+							>
+								{line.text}
+							</p>
+						)
+					})}
+				</motion.div>
 			</AnimatePresence>
 		</div>
 	)
