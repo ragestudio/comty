@@ -34,7 +34,10 @@ export default ({ trackManifest }) => {
 					.catch(() => null)
 			}
 		} else {
-			data = await track.serviceOperations.fetchLyrics().catch(() => null)
+			data = await track.serviceOperations.fetchLyrics().catch((err) => {
+				console.error(err)
+				return null
+			})
 		}
 
 		// if no data founded, flush lyrics
