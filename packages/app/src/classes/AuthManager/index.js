@@ -1,6 +1,7 @@
 import AuthModel from "@models/auth"
 import SessionModel from "@models/session"
 import UserModel from "@models/user"
+import localforage from "localforage"
 
 import { Login } from "@components"
 
@@ -21,7 +22,32 @@ export default class AuthManager {
 		user: null,
 	}
 
+	store = localforage.createInstance({
+		driver: localforage.INDEXEDDB,
+		name: "tokens",
+	})
+
+	listAvailableTokens = () => {
+		return this.store.keys()
+	}
+
+	loadTokenFromUserId = async (user_id) => {
+		const session = await this.store.getItem(user_id)
+		
+		if (!session) {
+			console.error("Session not found")
+			return false
+		}
+
+		SessionModel.token = session.token
+		SessionModel.refreshToken = session.refreshToken
+
+		this.initialize()
+	}
+
 	public = {
+		loadTokenFromUserId: this.loadTokenFromUserId,
+		listAvailableTokens: this.listAvailableTokens,
 		login: () => {
 			app.layout.draggable.open("login", Login, {
 				componentProps: {
@@ -105,5 +131,7 @@ export default class AuthManager {
 		}
 	}
 
-	//onLoginCallback = async (state, result) => {}
+	onLoginCallback = async (state, result) => {
+		this.store.setItem(result.user_id, result)
+	}
 }
