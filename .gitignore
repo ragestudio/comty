@@ -44,3 +44,6 @@
 
 # .vscode folder
 .vscode/
+
+# zed folder
+.zed/
