@@ -10,6 +10,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
 [![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fragestudio%2Fcomty.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fragestudio%2Fcomty?ref=badge_shield)
 
 The platform to hold all your creative.
 
@@ -47,6 +48,9 @@ We provide a [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) file to help you underst
 
 ## 📜 License
 Comty is licensed under the Comty license. See the [LICENSE](./LICENSE) file for more details.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fragestudio%2Fcomty.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fragestudio%2Fcomty?ref=badge_large)
 
 ## 🧑‍🔬 Status
 The project is in alpha design phase, and the development is slow but continuous, prioritizing quality to ensure the project base is preserved for a long time.
