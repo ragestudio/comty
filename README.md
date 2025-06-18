@@ -10,10 +10,14 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/ragestudio/comty/badge)](https://www.codefactor.io/repository/github/ragestudio/comty)
 [![Maintainability](https://api.codeclimate.com/v1/badges/f89a278695d0a1301fe5/maintainability)](https://codeclimate.com/github/srgooglo/comty/maintainability)
 [![Discord](https://img.shields.io/discord/769176303978938389?label=Discord)](https://discord.gg/yxQR6EXf2F)
+[![Kofi](https://img.shields.io/badge/Kofi-F16061.svg?logo=ko-fi&logoColor=white)
+](https://ko-fi.com/comty)
 
 The platform to hold all your creative.
 
-> 👋 We have a official beta instance, you can access it from [https://comty.app](https://comty.app)
+> 👋 Check our official beta instance, access it from [https://comty.app](https://comty.app)
+
+> We recently launched a Ko-Fi page for Comty, you can support us by donating to our page [https://ko-fi.com/comty](https://ko-fi.com/comty)
 
 ## 🌟 Some of the features
 📝 A microblogging system similar to Twitter allows users to post short messages with attachments and more.
