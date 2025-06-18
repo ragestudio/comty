@@ -2,7 +2,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import classnames from "classnames"
 
-import { parseLRC } from "../../utils/lrcParser"
+import { parseLRC, formatToLRC } from "../../utils/lrcParser"
 
 import {
 	Input,
@@ -351,6 +351,17 @@ const LyricsEditor = ({ player }) => {
 		app.message.success("Language file loaded")
 	}
 
+	const handleLanguageDownload = () => {
+		const data = formatToLRC(lines)
+		const blob = new Blob([data], { type: "text/plain" })
+		const url = URL.createObjectURL(blob)
+
+		const link = document.createElement("a")
+		link.href = url
+		link.download = `${state.track.title} - ${state.selectedLanguage}.txt`
+		link.click()
+	}
+
 	const followLineTick = () => {
 		const currentTime = player.current.audio.current.currentTime
 
@@ -409,6 +420,9 @@ const LyricsEditor = ({ player }) => {
 					>
 						Load file
 					</UploadButton>
+					<Button onClick={() => handleLanguageDownload()}>
+						Download current
+					</Button>
 				</Col>
 			</Row>
 

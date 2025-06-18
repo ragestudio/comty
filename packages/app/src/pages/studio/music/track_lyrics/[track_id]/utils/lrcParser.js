@@ -92,43 +92,22 @@ export const parseLRC = (lrcContent) => {
  * @param {Object} lrcData - Structured LRC data
  * @returns {string} LRC formatted string
  */
-export const formatToLRC = (lrcData) => {
-	const { metadata = {}, lyrics = [] } = lrcData
-	const lines = []
+export const formatToLRC = (lines) => {
+	const data = []
 
-	// Add metadata
-	const metadataMapping = {
-		artist: "ar",
-		title: "ti",
-		album: "al",
-		author: "au",
-		length: "length",
-		creator: "by",
-		editor: "re",
-		version: "ve",
-		offset: "offset",
-	}
+	lines.forEach((line) => {
+		if (line.time !== null) {
+			const timeStr = line.timeStr || formatSecondsToLRC(line.time)
 
-	Object.entries(metadata).forEach(([key, value]) => {
-		const tag = metadataMapping[key] || key
-		lines.push(`[${tag}:${value}]`)
-	})
-
-	if (lines.length > 0) {
-		lines.push("") // Empty line after metadata
-	}
-
-	// Add lyrics
-	lyrics.forEach((lyric) => {
-		if (lyric.time !== null) {
-			const timeStr = lyric.timeStr || formatSecondsToLRC(lyric.time)
-			lines.push(`[${timeStr}]${lyric.text}`)
-		} else {
-			lines.push(lyric.text)
+			if (line.break) {
+				data.push(`[${timeStr}]`)
+			} else {
+				data.push(`[${timeStr}] ${line.text}`)
+			}
 		}
 	})
 
-	return lines.join("\n")
+	return data.join("\n")
 }
 
 /**
