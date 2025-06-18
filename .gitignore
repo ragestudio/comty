@@ -41,3 +41,6 @@
 
 # Temporal configurations
 /**/**/.aliaser
+
+# .vscode folder
+.vscode/
