@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import PropTypes from "prop-types"
 import { Button, Segmented, Alert, Flex } from "antd"
 import { SaveOutlined } from "@ant-design/icons"
+import { parseLRC, formatToLRC } from "./utils/lrcParser"
 
 import {
 	LyricsEditorProvider,
@@ -35,15 +36,26 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 
 			dispatch({ type: "SET_TRACK", payload: track })
 
-			const lyrics = await MusicModel.getTrackLyrics(trackId).catch(
-				() => {
-					return {
-						lrc: {
-							original: [],
-						},
-					}
-				},
-			)
+			let lyrics = await MusicModel.getTrackLyrics(trackId, {
+				fetchAll: true,
+			}).catch(() => {
+				return {
+					lrc: {
+						original: [],
+					},
+				}
+			})
+
+			for await (const [lang, lrc] of Object.entries(lyrics.lrc)) {
+				if (typeof lrc === "string" && lrc.startsWith("https://")) {
+					lyrics.lrc[lang] = await fetch(lrc).then((res) =>
+						res.text(),
+					)
+
+					lyrics.lrc[lang] = parseLRC(lyrics.lrc[lang])
+				}
+			}
+
 			dispatch({ type: "SET_LYRICS", payload: lyrics.lrc })
 
 			if (lyrics.video_source) {

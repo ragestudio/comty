@@ -57,9 +57,7 @@ function lyricsReducer(state, action) {
 			return {
 				...state,
 				lyrics: {
-					lrc: {
-						original: [],
-					},
+					original: [],
 					...action.payload,
 				},
 			}

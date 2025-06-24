@@ -36,7 +36,6 @@ import "./index.less"
 import { useLyricsEditor } from "../../context/LyricsEditorContext"
 import { formatSecondsToLRC } from "../../utils/lrcParser"
 
-import UploadButton from "@components/UploadButton"
 import Languages from "@config/languages"
 
 const { Text } = Typography
@@ -245,7 +244,6 @@ const LyricsEditor = ({ player }) => {
 	const [followTime, setFollowTime] = React.useState(true)
 	const [lineIndex, setLineIndex] = React.useState(null)
 
-	const [selectedLanguage, setSelectedLanguage] = React.useState("original")
 	const [newLineText, setNewLineText] = React.useState("")
 
 	const [editData, setEditData] = React.useState(null)
@@ -339,16 +337,25 @@ const LyricsEditor = ({ player }) => {
 		player.current.seek(time)
 	}
 
-	const handleLanguageUpload = async (url) => {
-		const data = await fetch(url)
-		let text = await data.text()
+	const handleLanguageUpload = async () => {
+		const input = document.createElement("input")
 
-		dispatch({
-			type: "OVERRIDE_LINES",
-			payload: parseLRC(text),
-		})
+		input.type = "file"
+		input.accept = "text/*"
 
-		app.message.success("Language file loaded")
+		input.onchange = async (e) => {
+			const file = e.target.files[0]
+			const text = await file.text()
+
+			dispatch({
+				type: "OVERRIDE_LINES",
+				payload: parseLRC(text),
+			})
+
+			app.message.success("Language file loaded")
+		}
+
+		input.click()
 	}
 
 	const handleLanguageDownload = () => {
@@ -374,6 +381,13 @@ const LyricsEditor = ({ player }) => {
 		}
 
 		setLineIndex(lineIndex)
+	}
+
+	const handleSelectLanguageChange = (language) => {
+		dispatch({
+			type: "SET_SELECTED_LANGUAGE",
+			payload: language,
+		})
 	}
 
 	React.useEffect(() => {
@@ -405,22 +419,25 @@ const LyricsEditor = ({ player }) => {
 			<Row gutter={16} align="middle">
 				<Col span={6}>
 					<Select
-						value={selectedLanguage}
-						onChange={setSelectedLanguage}
+						value={state.selectedLanguage}
+						onChange={handleSelectLanguageChange}
 						options={languageOptions}
 						style={{ width: "100%" }}
 						placeholder="Select language"
 					/>
 				</Col>
 				<Col span={18}>
-					<UploadButton
-						onSuccess={(_, data) => handleLanguageUpload(data.url)}
+					<Button
+						onClick={handleLanguageUpload}
 						accept={["text/*"]}
 						size="small"
 					>
-						Load file
-					</UploadButton>
-					<Button onClick={() => handleLanguageDownload()}>
+						Load from file
+					</Button>
+					<Button
+						onClick={() => handleLanguageDownload()}
+						size="small"
+					>
 						Download current
 					</Button>
 				</Col>
