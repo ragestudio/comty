@@ -66,7 +66,7 @@ class LRCV1 {
 
 export default async (req) => {
 	const { track_id } = req.params
-	let { translate_lang = "original" } = req.query
+	let { language = "original", fetchAll = false } = req.query
 
 	let result = await TrackLyric.findOne({
 		track_id,
@@ -76,24 +76,24 @@ export default async (req) => {
 		throw new OperationError(404, "Track lyric not found")
 	}
 
-	result.translated_lang = translate_lang
+	result.translated_lang = language
 	result.available_langs = []
 
 	if (typeof result.lrc === "object") {
 		result.available_langs = Object.keys(result.lrc)
 
-		if (!result.lrc[translate_lang]) {
-			translate_lang = "original"
+		if (!result.lrc[language]) {
+			language = "original"
 		}
 
-		if (result.lrc[translate_lang]) {
-			if (typeof result.lrc[translate_lang] === "string") {
-				let { data } = await axios.get(result.lrc[translate_lang])
+		if (result.lrc[language]) {
+			if (typeof result.lrc[language] === "string") {
+				let { data } = await axios.get(result.lrc[language])
 
 				result.synced_lyrics = LRCV1.parseString(data)
 				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			} else {
-				result.synced_lyrics = result.lrc[translate_lang]
+				result.synced_lyrics = result.lrc[language]
 				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			}
 		}
@@ -103,6 +103,10 @@ export default async (req) => {
 		result.video_starts_at_ms = LRCV1.timeStrToMs(
 			result.video_starts_at ?? result.sync_audio_at,
 		)
+	}
+
+	if (!fetchAll) {
+		delete result.lrc
 	}
 
 	delete result.__v
