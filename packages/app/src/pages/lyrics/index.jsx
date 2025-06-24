@@ -40,7 +40,6 @@ const EnhancedLyricsPage = () => {
 		trackManifest,
 	})
 
-	// Inicialización y limpieza
 	React.useEffect(() => {
 		toggleFullScreen(true)
 
