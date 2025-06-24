@@ -128,7 +128,7 @@ export default class TrackManifest {
 	}
 
 	serviceOperations = {
-		fetchLyrics: async () => {
+		fetchLyrics: async (options) => {
 			if (!this._id) {
 				return null
 			}
@@ -137,6 +137,7 @@ export default class TrackManifest {
 				"resolveLyrics",
 				this.service,
 				this,
+				options,
 			)
 
 			if (this.overrides) {
