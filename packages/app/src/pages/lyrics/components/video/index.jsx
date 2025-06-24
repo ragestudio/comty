@@ -42,9 +42,13 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		const currentTrackTime = window.app.cores.player.controls.seek()
 		setSyncingVideo(true)
 
-		let newTime =
-			currentTrackTime + lyrics.video_starts_at_ms / 1000 + 150 / 1000
-		newTime -= 5 / 1000
+		let newTime = currentTrackTime + lyrics.video_starts_at_ms / 1000
+
+		// dec some ms to ensure the video seeks correctly
+		newTime -= 10 / 1000
+
+		// sum the audio gradual time fade
+		newTime = newTime + 150 / 1000
 
 		videoRef.current.currentTime = newTime
 	}, [lyrics, videoRef, setSyncingVideo])
