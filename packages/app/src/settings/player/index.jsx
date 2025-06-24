@@ -271,5 +271,15 @@ export default {
 			},
 			storaged: false,
 		},
+		{
+			id: "lyrics:prefer_translation",
+			title: "Translate Lyrics",
+			icon: "MdTranslate",
+			group: "general",
+			description:
+				"Prefer translation over original lyrics, if available.",
+			component: "Switch",
+			storaged: true,
+		},
 	],
 }
