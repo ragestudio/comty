@@ -23,7 +23,7 @@ function isOverflown(element) {
 	)
 }
 
-const PlayerController = (props, ref) => {
+const PlayerController = (props) => {
 	const [playerState] = usePlayerStateContext()
 
 	const titleRef = React.useRef()
