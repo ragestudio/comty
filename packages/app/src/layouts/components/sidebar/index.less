@@ -234,3 +234,77 @@
 		}
 	}
 }
+
+.app_sidebar_switcher {
+  position: absolute;
+  bottom: 20px;
+  left: calc(@sidebar_width + 20px);  // posición por defecto (sidebar contraído)
+  
+  width: 240px;
+  background-color: #2f2f2f;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 100;
+  transition: left 0.25s ease;
+  display: flex;
+  flex-direction: column;
+
+  .switcher_header {
+    text-align: center;
+    padding: 12px;
+    background: transparent;
+    color: #d1d1d1; 
+    font-weight: 600;
+    font-size: 14px;
+    position: relative;
+
+    button {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      background: none;
+      border: none;
+      color: #aaa; 
+      cursor: pointer;
+
+      &:hover {
+        color: #fff;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .ant-menu {
+    background: transparent;
+    border: none;
+
+    .ant-menu-item {
+      padding: 10px 14px;
+      color: #ccc; // gris claro para items
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s ease;
+
+      .ant-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+      }
+
+      &:hover {
+        background-color: #444; // gris más claro al pasar mouse
+      }
+    }
+  }
+}
+
+.app_sidebar.expanded + .app_sidebar_switcher {
+  left: calc(@sidebar_width_expanded + 20px);
+}
