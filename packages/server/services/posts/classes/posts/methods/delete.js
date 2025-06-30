@@ -42,11 +42,9 @@ export default async (payload = {}) => {
 
 	// broadcast post to all users
 	if (post.visibility === "public") {
-		global.websockets.senders.toTopic(
-			"realtime:feed",
-			"post:delete",
-			post_id,
-		)
+		global.websockets.senders.toTopic("realtime:feed", "post:delete", {
+			_id: post_id,
+		})
 	}
 
 	if (post.visibility === "private") {
@@ -55,7 +53,9 @@ export default async (payload = {}) => {
 		)
 
 		for (const userSocket of userSockets) {
-			userSocket.emit(`post:delete`, post_id)
+			userSocket.emit(`post:delete`, {
+				_id: post_id,
+			})
 		}
 	}
 

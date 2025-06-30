@@ -1,6 +1,8 @@
 import React from "react"
 import { Result } from "antd"
 
+import { useNavigation } from "react-router"
+
 import PostsList from "@components/PostsList"
 import { Icons } from "@components/Icons"
 
@@ -14,18 +16,17 @@ const emptyListRender = () => {
 	)
 }
 
-export default class UserPosts extends React.Component {
-	render() {
-		console.log(this.props.state)
-		return (
-			<PostsList
-				onTopVisibility={this.props.onTopVisibility}
-				emptyListRender={emptyListRender}
-				loadFromModel={PostModel.getUserPosts}
-				loadFromModelProps={{
-					user_id: this.props.state.user._id,
-				}}
-			/>
-		)
-	}
+const UserPosts = (props) => {
+	return (
+		<PostsList
+			onTopVisibility={props.onTopVisibility}
+			emptyListRender={emptyListRender}
+			loadFromModel={PostModel.getUserPosts}
+			loadFromModelProps={{
+				user_id: props.state.user._id,
+			}}
+		/>
+	)
 }
+
+export default UserPosts

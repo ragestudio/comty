@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import lodash from "lodash"
 import { AnimatePresence } from "motion/react"
 import { Icons } from "@components/Icons"
 
@@ -23,353 +24,8 @@ const LoadingComponent = () => {
 	)
 }
 
-const NoResultComponent = () => {
-	return (
-		<antd.Empty
-			description="No more post here"
-			style={{
-				width: "100%",
-			}}
-		/>
-	)
-}
-
-const typeToComponent = {
-	post: (args) => <PostCard {...args} />,
-	//"playlist": (args) => <PlaylistTimelineEntry {...args} />,
-}
-
-const Entry = React.memo((props) => {
-	const { data } = props
-
-	return React.createElement(
-		typeToComponent[data.type ?? "post"] ?? PostCard,
-		{
-			key: data._id,
-			data: data,
-			disableReplyTag: props.disableReplyTag,
-			disableHasReplies: props.disableHasReplies,
-			events: {
-				onClickLike: props.onLikePost,
-				onClickSave: props.onSavePost,
-				onClickDelete: props.onDeletePost,
-				onClickEdit: props.onEditPost,
-				onClickReply: props.onReplyPost,
-				onDoubleClick: props.onDoubleClick,
-			},
-		},
-	)
-})
-
-const PostList = React.forwardRef((props, ref) => {
-	return (
-		<LoadMore
-			ref={ref}
-			className="post-list"
-			loadingComponent={LoadingComponent}
-			noResultComponent={NoResultComponent}
-			hasMore={props.hasMore}
-			fetching={props.loading}
-			onBottom={props.onLoadMore}
-		>
-			{!props.realtimeUpdates && !app.isMobile && (
-				<div className="resume_btn_wrapper">
-					<antd.Button
-						type="primary"
-						shape="round"
-						onClick={props.onResumeRealtimeUpdates}
-						loading={props.resumingLoading}
-						icon={<Icons.FiSyncOutlined />}
-					>
-						Resume
-					</antd.Button>
-				</div>
-			)}
-
-			<AnimatePresence>
-				{props.list.map((data) => {
-					return <Entry key={data._id} data={data} {...props} />
-				})}
-			</AnimatePresence>
-		</LoadMore>
-	)
-})
-
-export class PostsListsComponent extends React.Component {
-	state = {
-		openPost: null,
-
-		loading: false,
-		resumingLoading: false,
-		initialLoading: true,
-		scrollingToTop: false,
-
-		topVisible: true,
-
-		realtimeUpdates: true,
-
-		hasMore: true,
-		list: this.props.list ?? [],
-		pageCount: 0,
-	}
-
-	parentRef = this.props.innerRef
-	listRef = React.createRef()
-
-	timelineWsEvents = {
-		"post:new": (data) => {
-			console.log("[WS] Recived a post >", data)
-
-			this.setState({
-				list: [data, ...this.state.list],
-			})
-		},
-		"post:delete": (id) => {
-			console.log("[WS] Received a post delete >", id)
-
-			this.setState({
-				list: this.state.list.filter((post) => {
-					return post._id !== id
-				}),
-			})
-		},
-		"post:update": (data) => {
-			console.log("[WS] Received a post update >", data)
-
-			this.setState({
-				list: this.state.list.map((post) => {
-					if (post._id === data._id) {
-						return data
-					}
-
-					return post
-				}),
-			})
-		},
-	}
-
-	handleLoad = async (fn, params = {}) => {
-		if (this.state.loading === true) {
-			console.warn(`Please wait to load the post before load more`)
-			return
-		}
-
-		this.setState({
-			loading: true,
-		})
-
-		let payload = {
-			page: this.state.pageCount,
-			limit: app.cores.settings.get("feed_max_fetch"),
-		}
-
-		if (this.props.loadFromModelProps) {
-			payload = {
-				...payload,
-				...this.props.loadFromModelProps,
-			}
-		}
-
-		const result = await fn(payload).catch((err) => {
-			console.error(err)
-
-			app.message.error("Failed to load more posts")
-
-			return null
-		})
-
-		if (result) {
-			if (result.length === 0) {
-				return this.setState({
-					hasMore: false,
-				})
-			}
-
-			if (params.replace) {
-				this.setState({
-					list: result,
-					pageCount: 0,
-				})
-			} else {
-				this.setState({
-					list: [...this.state.list, ...result],
-					pageCount: this.state.pageCount + 1,
-				})
-			}
-		}
-
-		this.setState({
-			loading: false,
-		})
-	}
-
-	addPost = (post) => {
-		this.setState({
-			list: [post, ...this.state.list],
-		})
-	}
-
-	removePost = (id) => {
-		this.setState({
-			list: this.state.list.filter((post) => {
-				return post._id !== id
-			}),
-		})
-	}
-
-	_hacks = {
-		addPost: this.addPost,
-		removePost: this.removePost,
-		addRandomPost: () => {
-			const randomId = Math.random().toString(36).substring(7)
-
-			this.addPost({
-				_id: randomId,
-				message: `Random post ${randomId}`,
-				user: {
-					_id: randomId,
-					username: "random user",
-					avatar: `https://api.dicebear.com/7.x/thumbs/svg?seed=${randomId}`,
-				},
-			})
-		},
-		listRef: this.listRef,
-	}
-
-	onResumeRealtimeUpdates = async () => {
-		console.log("Resuming realtime updates")
-
-		this.setState({
-			resumingLoading: true,
-			scrollingToTop: true,
-		})
-
-		this.listRef.current.scrollTo({
-			top: 0,
-			behavior: "smooth",
-		})
-
-		// reload posts
-		await this.handleLoad(this.props.loadFromModel, {
-			replace: true,
-		})
-
-		this.setState({
-			realtimeUpdates: true,
-			resumingLoading: false,
-		})
-	}
-
-	onScrollList = (e) => {
-		const { scrollTop } = e.target
-
-		if (this.state.scrollingToTop && scrollTop === 0) {
-			this.setState({
-				scrollingToTop: false,
-			})
-		}
-
-		if (scrollTop > 200) {
-			if (this.state.topVisible) {
-				this.setState({
-					topVisible: false,
-				})
-
-				if (typeof this.props.onTopVisibility === "function") {
-					this.props.onTopVisibility(false)
-				}
-			}
-
-			if (
-				!this.props.realtime ||
-				this.state.resumingLoading ||
-				this.state.scrollingToTop
-			) {
-				return null
-			}
-
-			this.setState({
-				realtimeUpdates: false,
-			})
-		} else {
-			if (!this.state.topVisible) {
-				this.setState({
-					topVisible: true,
-				})
-
-				if (typeof this.props.onTopVisibility === "function") {
-					this.props.onTopVisibility(true)
-				}
-
-				// if (this.props.realtime || !this.state.realtimeUpdates && !this.state.resumingLoading && scrollTop < 5) {
-				//     this.onResumeRealtimeUpdates()
-				// }
-			}
-		}
-	}
-
-	componentDidMount = async () => {
-		if (typeof this.props.loadFromModel === "function") {
-			await this.handleLoad(this.props.loadFromModel)
-		}
-
-		this.setState({
-			initialLoading: false,
-		})
-
-		if (this.props.realtime) {
-			for (const [event, handler] of Object.entries(
-				this.timelineWsEvents,
-			)) {
-				app.cores.api.listenEvent(event, handler, "posts")
-			}
-
-			app.cores.api.joinTopic(
-				"posts",
-				this.props.customTopic ?? "realtime:feed",
-			)
-		}
-
-		if (this.listRef && this.listRef.current) {
-			this.listRef.current.addEventListener("scroll", this.onScrollList)
-		}
-
-		window._hacks = this._hacks
-	}
-
-	componentWillUnmount = async () => {
-		if (this.props.realtime) {
-			for (const [event, handler] of Object.entries(
-				this.timelineWsEvents,
-			)) {
-				app.cores.api.unlistenEvent(event, handler, "posts")
-			}
-
-			app.cores.api.leaveTopic(
-				"posts",
-				this.props.customTopic ?? "realtime:feed",
-			)
-		}
-
-		if (this.listRef && this.listRef.current) {
-			this.listRef.current.removeEventListener(
-				"scroll",
-				this.onScrollList,
-			)
-		}
-
-		window._hacks = null
-	}
-
-	componentDidUpdate = async (prevProps, prevState) => {
-		if (prevProps.list !== this.props.list) {
-			this.setState({
-				list: this.props.list,
-			})
-		}
-	}
-
-	onLikePost = async (data) => {
+const PostActions = {
+	onClickLike: async (data) => {
 		let result = await PostModel.toggleLike({ post_id: data._id }).catch(
 			() => {
 				antd.message.error("Failed to like post")
@@ -379,9 +35,8 @@ export class PostsListsComponent extends React.Component {
 		)
 
 		return result
-	}
-
-	onSavePost = async (data) => {
+	},
+	onClickSave: async (data) => {
 		let result = await PostModel.toggleSave({ post_id: data._id }).catch(
 			() => {
 				antd.message.error("Failed to save post")
@@ -391,25 +46,8 @@ export class PostsListsComponent extends React.Component {
 		)
 
 		return result
-	}
-
-	onEditPost = (data) => {
-		app.controls.openPostCreator({
-			edit_post: data._id,
-		})
-	}
-
-	onReplyPost = (data) => {
-		app.controls.openPostCreator({
-			reply_to: data._id,
-		})
-	}
-
-	onDoubleClickPost = (data) => {
-		app.navigation.goToPost(data._id)
-	}
-
-	onDeletePost = async (data) => {
+	},
+	onClickDelete: async (data) => {
 		antd.Modal.confirm({
 			title: "Are you sure you want to delete this post?",
 			content: "This action is irreversible",
@@ -422,74 +60,218 @@ export class PostsListsComponent extends React.Component {
 				})
 			},
 		})
-	}
+	},
+	onClickEdit: async (data) => {
+		app.controls.openPostCreator({
+			edit_post: data._id,
+		})
+	},
+	onClickReply: async (data) => {
+		app.controls.openPostCreator({
+			reply_to: data._id,
+		})
+	},
+	onDoubleClick: async (data) => {
+		app.navigation.goToPost(data._id)
+	},
+}
 
-	ontoggleOpen = (to, data) => {
-		if (typeof this.props.onOpenPost === "function") {
-			this.props.onOpenPost(to, data)
+const Entry = (props) => {
+	const { data } = props
+
+	return (
+		<PostCard
+			key={data._id}
+			data={data}
+			disableReplyTag={props.disableReplyTag}
+			disableHasReplies={props.disableHasReplies}
+			events={PostActions}
+		/>
+	)
+}
+
+const PostList = React.forwardRef((props, ref) => {
+	return (
+		<LoadMore
+			ref={ref}
+			className="post-list"
+			loadingComponent={LoadingComponent}
+			hasMore={props.hasMore}
+			onBottom={props.onLoadMore}
+		>
+			<AnimatePresence>
+				{props.list.map((data) => {
+					return <Entry key={data._id} data={data} {...props} />
+				})}
+			</AnimatePresence>
+		</LoadMore>
+	)
+})
+
+const PostsListsComponent = (props) => {
+	const [list, setList] = React.useState([])
+	const [hasMore, setHasMore] = React.useState(true)
+
+	// Refs
+	const firstLoad = React.useRef(true)
+	const loading = React.useRef(false)
+	const page = React.useRef(0)
+	const listRef = React.useRef(null)
+	const loadModelPropsRef = React.useRef({})
+
+	const timelineWsEvents = React.useRef({
+		"post:new": (data) => {
+			console.debug("post:new", data)
+
+			setList((prev) => {
+				return [data, ...prev]
+			})
+		},
+		"post:delete": (data) => {
+			console.debug("post:delete", data)
+
+			setList((prev) => {
+				return prev.filter((item) => {
+					return item._id !== data._id
+				})
+			})
+		},
+		"post:update": (data) => {
+			console.debug("post:update", data)
+
+			setList((prev) => {
+				return prev.map((item) => {
+					if (item._id === data._id) {
+						return data
+					}
+					return item
+				})
+			})
+		},
+	})
+
+	// Logic
+	async function handleLoad(fn, params = {}) {
+		if (loading.current === true) {
+			console.warn(`Please wait to load the post before load more`)
+			return
+		}
+
+		loading.current = true
+
+		let payload = {
+			page: page.current,
+			limit: app.cores.settings.get("feed_max_fetch"),
+		}
+
+		if (loadModelPropsRef.current) {
+			payload = {
+				...payload,
+				...loadModelPropsRef.current,
+			}
+		}
+
+		const result = await fn(payload).catch((err) => {
+			console.error(err)
+			app.message.error("Failed to load more posts")
+			return null
+		})
+
+		loading.current = false
+		firstLoad.current = false
+
+		if (result) {
+			setHasMore(result.has_more)
+
+			if (result.items?.length > 0) {
+				if (params.replace) {
+					setList(result.items)
+					page.current = 0
+				} else {
+					setList((prev) => {
+						return [...prev, ...result.items]
+					})
+					page.current = page.current + 1
+				}
+			}
 		}
 	}
 
-	onLoadMore = async () => {
-		if (typeof this.props.onLoadMore === "function") {
-			return this.handleLoad(this.props.onLoadMore)
-		} else if (this.props.loadFromModel) {
-			return this.handleLoad(this.props.loadFromModel)
+	const onLoadMore = React.useCallback(() => {
+		if (typeof props.onLoadMore === "function") {
+			return handleLoad(props.onLoadMore)
+		} else if (props.loadFromModel) {
+			return handleLoad(props.loadFromModel)
 		}
-	}
+	}, [props])
 
-	render() {
-		if (this.state.initialLoading) {
-			return <antd.Skeleton active />
+	React.useEffect(() => {
+		if (
+			!lodash.isEqual(props.loadFromModelProps, loadModelPropsRef.current)
+		) {
+			loadModelPropsRef.current = props.loadFromModelProps
+
+			page.current = 0
+			loading.current = false
+
+			setHasMore(true)
+			setList([])
+			handleLoad(props.loadFromModel)
+		}
+	}, [
+		props.loadFromModel,
+		props.loadFromModelProps,
+		firstLoad.current === false,
+	])
+
+	React.useEffect(() => {
+		if (props.loadFromModelProps) {
+			loadModelPropsRef.current = props.loadFromModelProps
 		}
 
-		if (this.state.list.length === 0) {
-			if (typeof this.props.emptyListRender === "function") {
-				return React.createElement(this.props.emptyListRender)
+		if (typeof props.loadFromModel === "function") {
+			handleLoad(props.loadFromModel)
+		}
+
+		if (props.realtime) {
+			for (const [event, handler] of Object.entries(
+				timelineWsEvents.current,
+			)) {
+				app.cores.api.listenEvent(event, handler, "posts")
 			}
 
-			return (
-				<div className="no_more_posts">
-					<antd.Empty />
-					<h1>Whoa, nothing on here...</h1>
-				</div>
+			app.cores.api.joinTopic(
+				"posts",
+				props.customTopic ?? "realtime:feed",
 			)
 		}
 
-		const PostListProps = {
-			list: this.state.list,
+		return () => {
+			if (props.realtime) {
+				for (const [event, handler] of Object.entries(
+					timelineWsEvents.current,
+				)) {
+					app.cores.api.unlistenEvent(event, handler, "posts")
+				}
 
-			disableReplyTag: this.props.disableReplyTag,
-			disableHasReplies: this.props.disableHasReplies,
-
-			onLikePost: this.onLikePost,
-			onSavePost: this.onSavePost,
-			onDeletePost: this.onDeletePost,
-			onEditPost: this.onEditPost,
-			onReplyPost: this.onReplyPost,
-			onDoubleClick: this.onDoubleClickPost,
-
-			onLoadMore: this.onLoadMore,
-			hasMore: this.state.hasMore,
-			loading: this.state.loading,
-
-			realtimeUpdates: this.state.realtimeUpdates,
-			resumingLoading: this.state.resumingLoading,
-			onResumeRealtimeUpdates: this.onResumeRealtimeUpdates,
+				app.cores.api.leaveTopic(
+					"posts",
+					props.customTopic ?? "realtime:feed",
+				)
+			}
 		}
+	}, [])
 
-		if (app.isMobile) {
-			return <PostList ref={this.listRef} {...PostListProps} />
-		}
-
-		return (
-			<div className="post-list_wrapper">
-				<PostList ref={this.listRef} {...PostListProps} />
-			</div>
-		)
-	}
+	return (
+		<div className="post-list_wrapper">
+			<PostList
+				ref={listRef}
+				list={list}
+				hasMore={hasMore}
+				onLoadMore={onLoadMore}
+			/>
+		</div>
+	)
 }
 
-export default React.forwardRef((props, ref) => (
-	<PostsListsComponent innerRef={ref} {...props} />
-))
+export default PostsListsComponent
