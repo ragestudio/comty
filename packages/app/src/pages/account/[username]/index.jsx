@@ -14,7 +14,6 @@ import FollowsModel from "@models/follows"
 
 import DetailsTab from "./tabs/details"
 import PostsTab from "./tabs/posts"
-import MusicTab from "./tabs/music"
 import FollowersTab from "./tabs/followers"
 
 import "./index.less"
@@ -23,7 +22,6 @@ const TabsComponent = {
 	posts: PostsTab,
 	followers: FollowersTab,
 	details: DetailsTab,
-	music: MusicTab,
 }
 
 const Account = ({ params }) => {
@@ -115,11 +113,6 @@ const Account = ({ params }) => {
 		setTabActiveKey(normalizedKey)
 	}
 
-	const onPostListTopVisibility = () => {
-		// This function was referenced but not defined in the original component
-		// You may need to implement this based on your requirements
-	}
-
 	useEffect(() => {
 		loadUserData()
 	}, [params.username])
@@ -204,7 +197,6 @@ const Account = ({ params }) => {
 							}}
 						>
 							{React.createElement(TabsComponent[tabActiveKey], {
-								onTopVisibility: onPostListTopVisibility,
 								state: state,
 							})}
 						</motion.div>
@@ -222,11 +214,6 @@ const Account = ({ params }) => {
 								id: "posts",
 								label: "Posts",
 								icon: "FiBookOpen",
-							},
-							{
-								id: "music",
-								label: "Music",
-								icon: "MdAlbum",
 							},
 							{
 								id: "followers",
