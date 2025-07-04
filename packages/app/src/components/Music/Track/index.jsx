@@ -2,14 +2,13 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import RGBStringToValues from "@utils/rgbToValues"
-
 import ImageViewer from "@components/ImageViewer"
 import { Icons } from "@components/Icons"
 
-import MusicModel from "@models/music"
+import MenuItemsBase from "./menuItems"
+import MenuHandlers from "./menuHandlers"
 
-import { usePlayerStateContext } from "@contexts/WithPlayerContext"
+import RGBStringToValues from "@utils/rgbToValues"
 import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
 
 import "./index.less"
@@ -22,128 +21,18 @@ function secondsToIsoTime(seconds) {
 		.padStart(2, "0")}`
 }
 
-const handlers = {
-	like: async (ctx, track) => {
-		await MusicModel.toggleItemFavourite("track", track._id, true)
-
-		ctx.changeState({
-			liked: true,
-		})
-		ctx.closeMenu()
-	},
-	unlike: async (ctx, track) => {
-		await MusicModel.toggleItemFavourite("track", track._id, false)
-
-		ctx.changeState({
-			liked: false,
-		})
-		ctx.closeMenu()
-	},
-	add_to_playlist: async (ctx, track) => {},
-	add_to_queue: async (ctx, track) => {
-		await app.cores.player.queue.add(track)
-	},
-	play_next: async (ctx, track) => {
-		await app.cores.player.queue.add(track, { next: true })
-	},
-}
-
-const Track = (props) => {
-	const [{ loading, track_manifest, playback_status }] =
-		usePlayerStateContext()
-
+const Track = React.memo((props) => {
 	const playlist_ctx = React.useContext(PlaylistContext)
 
 	const [moreMenuOpened, setMoreMenuOpened] = React.useState(false)
+	const [liked, setLiked] = React.useState(props.track.liked)
 
-	const isCurrent = track_manifest?._id === props.track._id
-	const isPlaying = isCurrent && playback_status === "playing"
+	const trackDuration = React.useMemo(() => {
+		return props.track?.metadata?.duration ?? props.track?.duration
+	}, [props.track])
 
-	const handleClickPlayBtn = () => {
-		if (typeof props.onPlay === "function") {
-			return props.onPlay(props.track)
-		}
-
-		if (typeof props.onClickPlayBtn === "function") {
-			props.onClickPlayBtn(props.track)
-		}
-
-		if (!isCurrent) {
-			app.cores.player.start(props.track)
-		} else {
-			app.cores.player.playback.toggle()
-		}
-	}
-
-	const handleOnClickItem = React.useCallback(() => {
-		if (props.onClick) {
-			props.onClick(props.track)
-		}
-
-		if (app.isMobile) {
-			handleClickPlayBtn()
-		}
-	}, [])
-
-	const handleMoreMenuOpen = React.useCallback(() => {
-		if (app.isMobile) {
-			return
-		}
-
-		return setMoreMenuOpened((prev) => {
-			return !prev
-		})
-	}, [])
-
-	const handleMoreMenuItemClick = React.useCallback((e) => {
-		const { key } = e
-
-		if (typeof handlers[key] === "function") {
-			return handlers[key](
-				{
-					closeMenu: () => {
-						setMoreMenuOpened(false)
-					},
-					changeState: props.changeState,
-				},
-				props.track,
-			)
-		}
-	}, [])
-
-	const moreMenuItems = React.useMemo(() => {
-		const items = [
-			{
-				key: "like",
-				icon: <Icons.MdFavorite />,
-				label: "Like",
-			},
-			{
-				key: "share",
-				icon: <Icons.MdShare />,
-				label: "Share",
-				disabled: true,
-			},
-			{
-				key: "add_to_playlist",
-				icon: <Icons.MdPlaylistAdd />,
-				label: "Add to playlist",
-				disabled: true,
-			},
-			{
-				type: "divider",
-			},
-			{
-				key: "add_to_queue",
-				icon: <Icons.MdQueueMusic />,
-				label: "Add to queue",
-			},
-			{
-				key: "play_next",
-				icon: <Icons.MdSkipNext />,
-				label: "Play next",
-			},
-		]
+	const menuItems = React.useMemo(() => {
+		const items = [...MenuItemsBase]
 
 		if (props.track.liked) {
 			items[0] = {
@@ -170,22 +59,68 @@ const Track = (props) => {
 		return items
 	}, [props.track])
 
-	const trackDuration =
-		props.track?.metadata?.duration ?? props.track?.duration
+	const handleClickPlayBtn = React.useCallback(() => {
+		if (typeof props.onPlay === "function") {
+			return props.onPlay(props.track)
+		}
+
+		if (typeof props.onClickPlayBtn === "function") {
+			props.onClickPlayBtn(props.track)
+		}
+
+		if (!props.isCurrent) {
+			app.cores.player.start(props.track)
+		} else {
+			app.cores.player.playback.toggle()
+		}
+	}, [props.isCurrent])
+
+	const handleOnClickItem = React.useCallback(() => {
+		if (props.onClick) {
+			props.onClick(props.track)
+		}
+
+		if (app.isMobile) {
+			handleClickPlayBtn()
+		}
+	}, [props.track])
+
+	const handleMoreMenuOpen = React.useCallback(() => {
+		if (app.isMobile) {
+			return
+		}
+
+		return setMoreMenuOpened((prev) => {
+			return !prev
+		})
+	}, [])
+
+	const handleMoreMenuItemClick = React.useCallback(
+		(e) => {
+			const { key } = e
+
+			if (typeof MenuHandlers[key] === "function") {
+				return MenuHandlers[key](
+					{
+						close: () => {
+							setMoreMenuOpened(false)
+						},
+						setLiked: setLiked,
+					},
+					props.track,
+				)
+			}
+		},
+		[props.track],
+	)
 
 	return (
 		<div
 			id={props.track._id}
 			className={classnames("music-track", {
-				["current"]: isCurrent,
-				["playing"]: isPlaying,
-				["loading"]: isCurrent && loading,
+				["current"]: props.isCurrent,
+				["playing"]: props.isPlaying,
 			})}
-			style={{
-				"--cover_average-color": RGBStringToValues(
-					track_manifest?.cover_analysis?.rgb,
-				),
-			}}
 		>
 			<div className="music-track_background" />
 
@@ -204,7 +139,7 @@ const Track = (props) => {
 							type="primary"
 							shape="circle"
 							icon={
-								isPlaying ? (
+								props.isPlaying ? (
 									<Icons.MdPause />
 								) : (
 									<Icons.MdPlayArrow />
@@ -212,14 +147,6 @@ const Track = (props) => {
 							}
 							onClick={handleClickPlayBtn}
 						/>
-
-						{/* {props.track?.metadata?.duration && (
-							<div className="music-track_play_duration">
-								{secondsToIsoTime(
-									props.track.metadata.duration,
-								)}
-							</div>
-						)} */}
 					</div>
 				)}
 
@@ -267,7 +194,7 @@ const Track = (props) => {
 
 				<antd.Dropdown
 					menu={{
-						items: moreMenuItems,
+						items: menuItems,
 						onClick: handleMoreMenuItemClick,
 					}}
 					onOpenChange={handleMoreMenuOpen}
@@ -281,6 +208,8 @@ const Track = (props) => {
 			</div>
 		</div>
 	)
-}
+})
+
+Track.displayName = "Track"
 
 export default Track

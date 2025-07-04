@@ -1,9 +1,10 @@
-import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import { WithPlayerContext } from "@contexts/WithPlayerContext"
-import { Context as PlaylistContext } from "@contexts/WithPlaylistContext"
+import {
+	WithPlayerContext,
+	usePlayerStateContext,
+} from "@contexts/WithPlayerContext"
 
 import LoadMore from "@components/LoadMore"
 import { Icons } from "@components/Icons"
@@ -24,6 +25,8 @@ const TrackList = ({
 	hasMore,
 	noHeader = false,
 }) => {
+	const [{ track_manifest, playback_status }] = usePlayerStateContext()
+
 	const showListHeader = !noHeader && (tracks.length > 0 || searchResults)
 
 	if (!searchResults && tracks.length === 0) {
@@ -62,7 +65,7 @@ const TrackList = ({
 						key={item._id}
 						order={item._id} // Consider using index if order matters
 						track={item}
-						onPlay={() => onTrackClick(item)}
+						onPlay={onTrackClick}
 						changeState={(update) =>
 							onTrackStateChange(item._id, update)
 						}
@@ -76,19 +79,19 @@ const TrackList = ({
 					onBottom={onLoadMore}
 					hasMore={hasMore}
 				>
-					<WithPlayerContext>
-						{tracks.map((item, index) => (
-							<MusicTrack
-								key={item._id} // Use unique ID for key
-								order={index + 1}
-								track={item}
-								onPlay={() => onTrackClick(item)}
-								changeState={(update) =>
-									onTrackStateChange(item._id, update)
-								}
-							/>
-						))}
-					</WithPlayerContext>
+					{tracks.map((item, index) => (
+						<MusicTrack
+							key={item._id}
+							order={index + 1}
+							track={item}
+							onPlay={onTrackClick}
+							isCurrent={item._id === track_manifest?._id}
+							isPlaying={
+								item._id === track_manifest?._id &&
+								playback_status === "playing"
+							}
+						/>
+					))}
 				</LoadMore>
 			)}
 		</div>
