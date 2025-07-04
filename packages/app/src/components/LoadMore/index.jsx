@@ -3,7 +3,7 @@ import classnames from "classnames"
 
 import "./index.less"
 
-export default React.forwardRef((props, ref) => {
+const LoadMore = React.forwardRef((props, ref) => {
 	const {
 		className,
 		children,
@@ -12,10 +12,16 @@ export default React.forwardRef((props, ref) => {
 		contentProps = {},
 	} = props
 
+	const nodeRef = React.useRef(null)
+
 	let observer = null
 
 	const insideViewportCb = (entries) => {
-		const { fetching, onBottom } = props
+		const { fetching, onBottom, hasMore } = props
+
+		if (!hasMore) {
+			return false
+		}
 
 		entries.forEach((element) => {
 			if (element.intersectionRatio > 0 && !fetching) {
@@ -26,10 +32,8 @@ export default React.forwardRef((props, ref) => {
 
 	React.useEffect(() => {
 		try {
-			const node = document.getElementById("bottom")
-
 			observer = new IntersectionObserver(insideViewportCb)
-			observer.observe(node)
+			observer.observe(nodeRef.current)
 		} catch (err) {
 			console.log("err in finding node", err)
 		}
@@ -44,9 +48,10 @@ export default React.forwardRef((props, ref) => {
 		<div ref={ref} className={classnames(className)} {...contentProps}>
 			{children}
 
-			<div style={{ clear: "both" }} />
+			{/* <div style={{ clear: "both" }} /> */}
 
 			<div
+				ref={nodeRef}
 				id="bottom"
 				className="bottom"
 				style={{ display: hasMore ? "block" : "none" }}
@@ -56,3 +61,7 @@ export default React.forwardRef((props, ref) => {
 		</div>
 	)
 })
+
+LoadMore.displayName = "LoadMore"
+
+export default LoadMore
