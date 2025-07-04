@@ -11,6 +11,7 @@ export default class API extends Server {
 	static routesPath = `${__dirname}/routes`
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3008
 
+	static bypassCors = true
 	static useMiddlewares = ["logs"]
 
 	static websockets = {
