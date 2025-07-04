@@ -32,7 +32,7 @@ This document outlines the code style guidelines for the Comty project. The goal
 - Avoid using eval() and with().
 
 #### Format
-- Use 2 tabs for indentation.
+- Use tabs for indentation. (tab_width: 2)
 - Use kebab-case for ID names.
 - Use camelCase for variable and function names.
 - Use PascalCase for class and component names.
