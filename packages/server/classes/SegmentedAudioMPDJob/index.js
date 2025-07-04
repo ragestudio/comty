@@ -5,6 +5,7 @@ import { FFMPEGLib, Utils } from "../FFMPEGLib"
 
 const codecOverrides = {
 	wav: "flac",
+	mp3: "libopus",
 }
 
 export default class SegmentedAudioMPDJob extends FFMPEGLib {
