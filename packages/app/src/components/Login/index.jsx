@@ -20,7 +20,7 @@ const stepsValidations = {
 				return {
 					exists: false,
 				}
-			},
+			}
 		)
 
 		return check.exists
@@ -65,7 +65,9 @@ class Login extends React.Component {
 		this.toggleLoading(true)
 
 		await AuthModel.login(payload, this.onDone).catch((error) => {
-			if (error.response.data) {
+			if (error.response && error.response.data) {
+				this.onError(error.response.data.error)
+
 				if (error.response.data.violation) {
 					return this.setState({
 						forbidden: error.response.data.violation,
@@ -85,7 +87,6 @@ class Login extends React.Component {
 			console.error(error, error.response)
 
 			this.toggleLoading(false)
-			this.onError(error.response.data.error)
 
 			return false
 		})
@@ -124,7 +125,7 @@ class Login extends React.Component {
 		try {
 			await AuthModel.activateAccount(
 				this.state.activation.user_id,
-				this.state.activation.code,
+				this.state.activation.code
 			)
 
 			this.handleFinish()
@@ -148,7 +149,7 @@ class Login extends React.Component {
 		}
 
 		const rensendObj = await AuthModel.resendActivationCode(
-			activationObj.user_id,
+			activationObj.user_id
 		).catch((error) => {
 			app.message.info(`Please try again later...`)
 			return null
@@ -383,7 +384,7 @@ class Login extends React.Component {
 								onChange={(e) =>
 									this.onUpdateInput(
 										"username",
-										e.target.value,
+										e.target.value
 									)
 								}
 								onPressEnter={this.nextStep}
@@ -406,7 +407,7 @@ class Login extends React.Component {
 								onChange={(e) =>
 									this.onUpdateInput(
 										"password",
-										e.target.value,
+										e.target.value
 									)
 								}
 								onPressEnter={this.nextStep}
