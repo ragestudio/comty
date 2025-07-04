@@ -33,37 +33,18 @@
 }
 
 .followersList {
-    .follower {
-        display: inline-flex;
-        align-items: center;
+    display: flex;
+    flex-direction: column;
 
-        width: 100%;
+    gap: 10px;
 
-        margin-bottom: 10px;
-        padding: 10px;
+    .userPreview {
+        background-color: var(--background-color-primary);
 
         border-radius: 8px;
-        border: 1px solid var(--border-color);
 
-        cursor: pointer;
+        padding: 5px 10px;
 
-        h2 {
-            margin: 0;
-            font-size: 22px;
-            line-height: 26px;
-        }
-
-        >div {
-            margin-right: 10px;
-        }
-
-        .names {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-
-    .follower:last-child {
-        margin-bottom: 0;
+        width: 100%;
     }
 }
