@@ -8,7 +8,25 @@ async function main() {
 	const db = new DbManager()
 	await db.initialize()
 
-	const tracks = await Track.find()
+	// try to parse some queries from argv
+	let fromTime = process.argv.find((arg) => arg.startsWith("--fromTime="))
+
+	if (fromTime) {
+		fromTime = fromTime.replace("--fromTime=", "")
+		console.log(`Searching from time: ${fromTime}`, new Date(fromTime))
+	}
+
+	let query = {}
+
+	if (fromTime) {
+		query = {
+			created_at: {
+				$gte: new Date(fromTime),
+			},
+		}
+	}
+
+	const tracks = await Track.find(query)
 
 	console.log(`Total tracks in database: ${tracks.length}`)
 
