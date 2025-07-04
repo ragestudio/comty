@@ -59,6 +59,7 @@ const UserPreview = (props) => {
 
 	return (
 		<div
+			id={userData._id}
 			className={classnames("userPreview", {
 				["clickable"]: typeof props.onClick === "function",
 				["small"]: props.small && !props.big,
