@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react"
-import shaka from "shaka-player/dist/shaka-player.compiled.js"
+import React from "react"
+import * as dashjs from "dashjs"
 import { useLyricsEditor } from "../context/LyricsEditorContext"
 
 export const useAudioPlayer = (src) => {
@@ -8,10 +8,10 @@ export const useAudioPlayer = (src) => {
 	const audioRef = React.useRef(new Audio())
 	const playerRef = React.useRef(null)
 	const waitTimeoutRef = React.useRef(null)
-	const lastSeekTimeRef = React.useRef(0)
+
 	const scrubTimeoutRef = React.useRef(null)
 
-	const initializePlayer = useCallback(async () => {
+	const initializePlayer = React.useCallback(async () => {
 		if (!src) {
 			return null
 		}
@@ -22,25 +22,15 @@ export const useAudioPlayer = (src) => {
 
 			audioRef.current.loop = true
 
-			// Cleanup existing player
 			if (playerRef.current) {
-				await playerRef.current.destroy()
+				playerRef.current.destroy()
 				playerRef.current = null
 			}
 
-			// Check browser support
-			if (!shaka.Player.isBrowserSupported()) {
-				throw new Error("Browser does not support DASH playback")
-			}
+			playerRef.current = dashjs.MediaPlayer().create()
 
-			// Create new player
-			playerRef.current = new shaka.Player()
-
-			await playerRef.current.attach(audioRef.current)
-
-			// Setup DASH error handling
-			playerRef.current.addEventListener("error", (event) => {
-				const error = event.detail
+			playerRef.current.on(dashjs.MediaPlayer.events.ERROR, (event) => {
+				const error = event.error
 
 				dispatch({
 					type: "SET_AUDIO_ERROR",
@@ -48,9 +38,26 @@ export const useAudioPlayer = (src) => {
 				})
 			})
 
-			// Load the source
-			await playerRef.current.load(src)
-			dispatch({ type: "SET_AUDIO_LOADING", payload: false })
+			// setup other events
+			playerRef.current.on(
+				dashjs.MediaPlayer.events.STREAM_INITIALIZED,
+				() => {
+					dispatch({ type: "SET_AUDIO_LOADING", payload: false })
+				},
+			)
+
+			playerRef.current.on(
+				dashjs.MediaPlayer.events.PLAYBACK_ERROR,
+				(event) => {
+					dispatch({
+						type: "SET_AUDIO_ERROR",
+						payload: `Playback Error: ${event.error || "Unknown error"}`,
+					})
+				},
+			)
+
+			// initialize player with audio element
+			playerRef.current.initialize(audioRef.current, src, false)
 		} catch (error) {
 			console.error("Player initialization error:", error)
 			dispatch({ type: "SET_AUDIO_ERROR", payload: error.message })
@@ -59,7 +66,7 @@ export const useAudioPlayer = (src) => {
 	}, [src, dispatch])
 
 	// Audio controls
-	const play = useCallback(async () => {
+	const play = React.useCallback(async () => {
 		if (!audioRef.current) return
 
 		try {
@@ -75,13 +82,13 @@ export const useAudioPlayer = (src) => {
 		}
 	}, [dispatch])
 
-	const pause = useCallback(() => {
+	const pause = React.useCallback(() => {
 		if (audioRef.current) {
 			audioRef.current.pause()
 		}
 	}, [])
 
-	const toggle = useCallback(() => {
+	const toggle = React.useCallback(() => {
 		if (audioRef.current.paused) {
 			play()
 		} else {
@@ -89,19 +96,19 @@ export const useAudioPlayer = (src) => {
 		}
 	}, [audioRef.current])
 
-	const seek = useCallback((time, scrub = false) => {
+	const seek = React.useCallback((time, scrub = false) => {
 		if (audioRef.current && audioRef.current.duration > 0) {
 			const clampedTime = Math.max(
 				0,
 				Math.min(time, audioRef.current.duration),
 			)
 
-			// Update currentTime immediately for responsive UI
+			// update currentTime
 			audioRef.current.currentTime = clampedTime
 
 			if (audioRef.current.paused) {
 				if (scrub === true) {
-					// Clear any pending scrub preview
+					// clear any pending scrub preview
 					if (scrubTimeoutRef.current) {
 						clearTimeout(scrubTimeoutRef.current)
 					}
@@ -121,7 +128,7 @@ export const useAudioPlayer = (src) => {
 		}
 	}, [])
 
-	const setSpeed = useCallback(
+	const setSpeed = React.useCallback(
 		(speed) => {
 			if (audioRef.current) {
 				const clampedSpeed = Math.max(0.25, Math.min(4, speed))
@@ -132,7 +139,7 @@ export const useAudioPlayer = (src) => {
 		[dispatch],
 	)
 
-	const setVolume = useCallback(
+	const setVolume = React.useCallback(
 		(volume) => {
 			if (audioRef.current) {
 				const clampedVolume = Math.max(0, Math.min(1, volume))
@@ -143,19 +150,19 @@ export const useAudioPlayer = (src) => {
 		[dispatch],
 	)
 
-	// Initialize player when src changes
-	useEffect(() => {
+	// initialize player when src changes
+	React.useEffect(() => {
 		initializePlayer()
 
 		return () => {
 			if (playerRef.current) {
-				playerRef.current.destroy().catch(console.error)
+				playerRef.current.destroy()
 			}
 		}
 	}, [initializePlayer])
 
-	// Setup audio event listeners
-	useEffect(() => {
+	// setup audio event listeners
+	React.useEffect(() => {
 		const audio = audioRef.current
 
 		if (!audio) {
@@ -215,7 +222,6 @@ export const useAudioPlayer = (src) => {
 			dispatch({ type: "SET_AUDIO_ERROR", payload: errorMessage })
 		}
 
-		// Add event listeners
 		audio.addEventListener("play", handlePlay)
 		audio.addEventListener("pause", handlePause)
 		audio.addEventListener("waiting", handleWaiting)
@@ -223,7 +229,6 @@ export const useAudioPlayer = (src) => {
 		audio.addEventListener("error", handleError)
 
 		return () => {
-			// Remove event listeners
 			audio.removeEventListener("play", handlePlay)
 			audio.removeEventListener("pause", handlePause)
 			audio.removeEventListener("waiting", handleWaiting)
