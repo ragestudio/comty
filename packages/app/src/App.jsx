@@ -5,7 +5,6 @@ import routesDeclarations from "@config/routes"
 
 import onPageMount from "@hooks/onPageMount"
 
-import { Helmet } from "react-helmet"
 import * as Sentry from "@sentry/browser"
 import { invoke } from "@tauri-apps/api/tauri"
 import * as antd from "antd"
@@ -113,15 +112,6 @@ class ComtyApp extends React.Component {
 	render() {
 		return (
 			<React.Fragment>
-				<Helmet>
-					<title>{config.app.siteName}</title>
-					<meta
-						name="og:description"
-						content={config.app.siteDescription}
-					/>
-					<meta property="og:title" content={config.app.siteName} />
-				</Helmet>
-
 				<ThemeProvider>
 					{window.__TAURI__ && <DesktopTopBar />}
 					<Layout staticRenders={ComtyApp.staticRenders}>
