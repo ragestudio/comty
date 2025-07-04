@@ -60,11 +60,14 @@ const Account = ({ params }) => {
 				return false
 			}
 
-			console.log(`Loaded User [${userData.username}] >`, userData)
+			console.log(`Loaded User [${userData.username}] :`, userData)
 
 			const followersResult = await FollowsModel.getFollowers(
 				userData._id,
-			).catch(() => false)
+			).catch((error) => {
+				console.error(error)
+				return false
+			})
 
 			if (followersResult) {
 				followersCountData = followersResult.count
