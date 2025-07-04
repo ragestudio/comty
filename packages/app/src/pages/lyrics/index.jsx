@@ -1,5 +1,6 @@
 import React from "react"
 import classnames from "classnames"
+import { motion } from "motion/react"
 
 import useFullScreen from "@hooks/useFullScreen"
 import useSyncRoom from "@hooks/useSyncRoom"
@@ -25,12 +26,12 @@ const EnhancedLyricsPage = () => {
 	const textRef = React.useRef()
 
 	const { toggleFullScreen } = useFullScreen({
-		onExit: () => app?.location?.last && app.location.back(),
+		onExit: () => app.location.back(),
 	})
 
 	const { trackManifest } = useTrackManifest(playerState.track_manifest)
 
-	const { dominantColor } = useCoverAnalysis(trackManifest)
+	const { dominantColor, cssVars } = useCoverAnalysis(trackManifest)
 
 	const { syncRoom, subscribeLyricsUpdates, unsubscribeLyricsUpdates } =
 		useSyncRoom()
@@ -39,7 +40,6 @@ const EnhancedLyricsPage = () => {
 		trackManifest,
 	})
 
-	// Inicialización y limpieza
 	React.useEffect(() => {
 		toggleFullScreen(true)
 
@@ -61,9 +61,15 @@ const EnhancedLyricsPage = () => {
 			className={classnames("lyrics", {
 				stopped: playerState.playback_status !== "playing",
 			})}
-			style={dominantColor}
+			style={cssVars}
 		>
-			<div className="lyrics-background-color" />
+			<motion.div
+				className="lyrics-background-color"
+				initial={false}
+				animate={{
+					background: `linear-gradient(0deg, rgba(${dominantColor}), rgba(255, 255, 255, 0.5))`,
+				}}
+			/>
 
 			{playerState.playback_status === "stopped" && (
 				<div className="lyrics-stopped-decorator">

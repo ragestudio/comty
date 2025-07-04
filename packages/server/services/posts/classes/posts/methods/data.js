@@ -19,6 +19,7 @@ export default async (payload = {}) => {
 	}
 
 	let posts = []
+	let total_posts = 0
 
 	if (post_id) {
 		try {
@@ -33,6 +34,8 @@ export default async (payload = {}) => {
 			.sort(sort)
 			.limit(limit)
 			.skip(limit * page)
+
+		total_posts = await Post.countDocuments({ ...query })
 	}
 
 	// fullfill data
@@ -50,5 +53,9 @@ export default async (payload = {}) => {
 		return posts[0]
 	}
 
-	return posts
+	return {
+		items: posts,
+		total_items: total_posts,
+		has_more: total_posts > limit * page + 1,
+	}
 }

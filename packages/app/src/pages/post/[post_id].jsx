@@ -12,54 +12,56 @@ import useCenteredContainer from "@hooks/useCenteredContainer"
 
 import "./index.less"
 
-const PostPage = (props) => {
-    const post_id = props.params.post_id
+const PostPage = ({ params }) => {
+	const post_id = params.post_id
 
-    useCenteredContainer(true)
+	useCenteredContainer(true)
 
-    const [loading, result, error, repeat] = app.cores.api.useRequest(PostService.getPost, {
-        post_id,
-    })
+	const [loading, result, error, repeat] = app.cores.api.useRequest(
+		PostService.getPost,
+		{
+			post_id,
+		},
+	)
 
-    if (error) {
-        return <antd.Result
-            status="warning"
-            title="Failed to retrieve post"
-            subTitle={error.message}
-        />
-    }
+	if (error) {
+		return (
+			<antd.Result
+				status="warning"
+				title="Failed to retrieve post"
+				subTitle={error.message}
+			/>
+		)
+	}
 
-    if (loading) {
-        return <antd.Skeleton active />
-    }
+	if (loading) {
+		return <antd.Skeleton active />
+	}
 
-    return <div className="post-page">
-        <div className="post-page-original">
-            <h1>
-                <Icons.MdTextSnippet />
-                Post
-            </h1>
+	return (
+		<div className="post-page">
+			<div className="post-page-original">
+				<PostCard data={result} disableHasReplies />
+			</div>
 
-            <PostCard
-                data={result}
-                disableHasReplies
-            />
-        </div>
+			{!!result.hasReplies && (
+				<div className="post-page-replies">
+					<h1>
+						<Icons.FiRepeat />
+						Replies
+					</h1>
 
-        {
-            !!result.hasReplies && <div className="post-page-replies">
-                <h1><Icons.FiRepeat />Replies</h1>
-
-                <PostsList
-                    disableReplyTag
-                    loadFromModel={PostService.replies}
-                    loadFromModelProps={{
-                        post_id,
-                    }}
-                />
-            </div>
-        }
-    </div>
+					<PostsList
+						disableReplyTag
+						loadFromModel={PostService.replies}
+						loadFromModelProps={{
+							post_id,
+						}}
+					/>
+				</div>
+			)}
+		</div>
+	)
 }
 
 export default PostPage

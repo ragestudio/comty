@@ -8,6 +8,7 @@ export default async function putObject({
 	metadata = {},
 	targetFilename,
 	onFinish,
+	onProgress,
 	provider = "standard",
 }) {
 	const providerClass = global.storages[provider]
@@ -22,6 +23,18 @@ export default async function putObject({
 
 	if (isDirectory) {
 		let files = await fs.promises.readdir(filePath)
+		let count = 0
+
+		const handleProgress = () => {
+			if (typeof onProgress === "function") {
+				count = count + 1
+
+				onProgress({
+					percent: Math.round((count / files.length) * 100),
+					state: "uploading_s3",
+				})
+			}
+		}
 
 		files = files.map((file) => {
 			const newPath = path.join(filePath, file)
@@ -29,6 +42,8 @@ export default async function putObject({
 			return {
 				filePath: newPath,
 				uploadPath: path.join(uploadPath, file),
+				provider: provider,
+				onFinish: handleProgress,
 			}
 		})
 

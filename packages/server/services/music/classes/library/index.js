@@ -1,5 +1,4 @@
 import { Track, Playlist, MusicRelease } from "@db_models"
-import { MusicLibraryItem } from "@db_models"
 
 import toggleFavorite from "./methods/toggleFavorite"
 import getUserLibrary from "./methods/getUserLibrary"

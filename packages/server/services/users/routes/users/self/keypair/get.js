@@ -1,7 +1,7 @@
 import { UserDHKeyPair } from "@db_models"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const userId = req.auth.session.user_id
 

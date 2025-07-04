@@ -1,102 +1,114 @@
 import { TrackLyric } from "@db_models"
 import axios from "axios"
 
-function parseTimeToMs(timeStr) {
-	const [minutes, seconds, milliseconds] = timeStr.split(":")
-
-	return (
-		Number(minutes) * 60 * 1000 +
-		Number(seconds) * 1000 +
-		Number(milliseconds)
-	)
+function secondsToMs(number) {
+	return number * 1000
 }
 
-async function remoteLcrToSyncedLyrics(lrcUrl) {
-	const { data } = await axios.get(lrcUrl)
+class LRCV1 {
+	static timeStrToMs(timeStr) {
+		const [minutes, seconds, milliseconds] = timeStr.split(":")
 
-	let syncedLyrics = data
+		return (
+			Number(minutes) * 60 * 1000 +
+			Number(seconds) * 1000 +
+			Number(milliseconds)
+		)
+	}
 
-	syncedLyrics = syncedLyrics.split("\n")
+	static timeStrToSeconds(timeStr) {
+		const [minutes, seconds, milliseconds] = timeStr.split(":")
 
-	syncedLyrics = syncedLyrics.map((line) => {
-		const syncedLine = {}
+		return (
+			Number(minutes) * 60 + Number(seconds) + Number(milliseconds) / 1000
+		)
+	}
 
-		//syncedLine.time = line.match(/\[.*\]/)[0]
-		syncedLine.time = line.split(" ")[0]
-		syncedLine.text = line.replace(syncedLine.time, "").trim()
+	static parseString(str) {
+		str = str.split("\n")
 
-		if (syncedLine.text === "") {
-			delete syncedLine.text
-			syncedLine.break = true
-		}
+		str = str.map((str) => {
+			let line = {}
 
-		syncedLine.time = syncedLine.time.replace(/\[|\]/g, "")
-		syncedLine.time = syncedLine.time.replace(".", ":")
+			line.time = str.split(" ")[0]
+			line.text = str.replace(line.time, "").trim()
 
-		return syncedLine
-	})
+			// detect empty lines as breaks
+			if (line.text === "" || line.text === "<break>") {
+				delete line.text
+				line.break = true
+			}
 
-	syncedLyrics = syncedLyrics.map((syncedLine, index) => {
-		const nextLine = syncedLyrics[index + 1]
+			// parse time
+			line.time = line.time.replace(/\[|\]/g, "")
+			line.time = line.time.replace(".", ":")
+			line.time = this.timeStrToSeconds(line.time)
 
-		syncedLine.startTimeMs = parseTimeToMs(syncedLine.time)
-		syncedLine.endTimeMs = nextLine
-			? parseTimeToMs(nextLine.time)
-			: parseTimeToMs(syncedLyrics[syncedLyrics.length - 1].time)
+			return line
+		})
 
-		return syncedLine
-	})
+		return str
+	}
 
-	return syncedLyrics
+	static setTimmings(lyricsArray) {
+		lyricsArray = lyricsArray.map((line, index) => {
+			const nextLine = lyricsArray[index + 1]
+
+			line.start_ms = secondsToMs(line.time)
+			line.end_ms = secondsToMs(nextLine ? nextLine.time : line.time + 1)
+
+			return line
+		})
+
+		return lyricsArray
+	}
 }
 
 export default async (req) => {
 	const { track_id } = req.params
-	let { translate_lang = "original" } = req.query
+	let { language = "original", fetchAll = false } = req.query
 
 	let result = await TrackLyric.findOne({
 		track_id,
-	})
+	}).lean()
 
 	if (!result) {
 		throw new OperationError(404, "Track lyric not found")
 	}
 
-	result = result.toObject()
-
-	result.translated_lang = translate_lang
+	result.translated_lang = language
 	result.available_langs = []
 
-	const lrc = result.lrc_v2 ?? result.lrc
+	if (typeof result.lrc === "object") {
+		result.available_langs = Object.keys(result.lrc)
 
-	result.isLyricsV2 = !!result.lrc_v2
-
-	if (typeof lrc === "object") {
-		result.available_langs = Object.keys(lrc)
-
-		if (!lrc[translate_lang]) {
-			translate_lang = "original"
+		if (!result.lrc[language]) {
+			language = "original"
 		}
 
-		if (lrc[translate_lang]) {
-			if (result.isLyricsV2 === true) {
-				result.synced_lyrics = await axios.get(lrc[translate_lang])
+		if (result.lrc[language]) {
+			if (typeof result.lrc[language] === "string") {
+				let { data } = await axios.get(result.lrc[language])
 
-				result.synced_lyrics = result.synced_lyrics.data
+				result.synced_lyrics = LRCV1.parseString(data)
+				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			} else {
-				result.synced_lyrics = await remoteLcrToSyncedLyrics(
-					result.lrc[translate_lang],
-				)
+				result.synced_lyrics = result.lrc[language]
+				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			}
 		}
 	}
 
-	if (result.sync_audio_at) {
-		result.sync_audio_at_ms = parseTimeToMs(result.sync_audio_at)
+	if (result.video_starts_at || result.sync_audio_at) {
+		result.video_starts_at_ms = LRCV1.timeStrToMs(
+			result.video_starts_at ?? result.sync_audio_at,
+		)
 	}
 
-	result.lrc
-	delete result.lrc_v2
+	if (!fetchAll) {
+		delete result.lrc
+	}
+
 	delete result.__v
 
 	return result

@@ -19,8 +19,6 @@ detect_arch() {
         echo "amd64"
     elif [[ "$ARCH" == "aarch64" ]] || [[ "$ARCH" == "arm64" ]]; then
         echo "arm64"
-    elif [[ "$ARCH" == "armv7l" ]]; then
-        echo "armhf"
     else
         echo "unsupported"
     fi
@@ -52,19 +50,17 @@ download_ffmpeg() {
     echo -e "${YELLOW}Downloading the latest stable version of FFmpeg...${NC}"
 
     # Base URL for downloads from John van Sickle's FFmpeg builds
-    BASE_URL="https://johnvansickle.com/ffmpeg/releases"
+    BASE_URL="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest"
 
     # Map architecture to the expected format in the URL
     if [[ "$ARCH" == "amd64" ]]; then
-        URL_ARCH="amd64"
+        URL_ARCH="linux64"
     elif [[ "$ARCH" == "arm64" ]]; then
-        URL_ARCH="arm64"
-    elif [[ "$ARCH" == "armhf" ]]; then
-        URL_ARCH="armhf"
+        URL_ARCH="linuxarm64"
     fi
 
     # Create the download URL for the latest release
-    FFMPEG_URL="$BASE_URL/ffmpeg-release-$URL_ARCH-static.tar.xz"
+    FFMPEG_URL="$BASE_URL-$URL_ARCH-gpl-7.1.tar.xz"
 
     if [[ -z "$FFMPEG_URL" ]]; then
         echo -e "${RED}Could not determine the download URL for your system.${NC}"
@@ -118,9 +114,11 @@ install_binaries() {
         exit 1
     fi
 
+    echo -e "${GREEN}Extracted directory: $EXTRACTED_DIR${NC}"
+
     # Find the binaries
-    FFMPEG_BIN="$EXTRACTED_DIR/ffmpeg"
-    FFPROBE_BIN="$EXTRACTED_DIR/ffprobe"
+    FFMPEG_BIN="$EXTRACTED_DIR/bin/ffmpeg"
+    FFPROBE_BIN="$EXTRACTED_DIR/bin/ffprobe"
 
     # Verify binaries exist
     if [[ ! -f "$FFMPEG_BIN" ]] || [[ ! -f "$FFPROBE_BIN" ]]; then

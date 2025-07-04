@@ -51,42 +51,53 @@ export default async (track_id, { user_id = null, onlyList = false } = {}) => {
 
 	const isMultiple = Array.isArray(track_id) || track_id.includes(",")
 
+	let totalItems = 1
+	let data = null
+
 	if (isMultiple) {
 		const track_ids = Array.isArray(track_id)
 			? track_id
 			: track_id.split(",")
 
-		let tracks = await Track.find({
+		data = await Track.find({
 			_id: { $in: track_ids },
 		}).lean()
 
-		tracks = await fullfillData(tracks, {
-			user_id,
+		// order tracks by ids
+		data = data.sort((a, b) => {
+			return (
+				track_ids.indexOf(a._id.toString()) -
+				track_ids.indexOf(b._id.toString())
+			)
 		})
 
-		if (onlyList) {
-			return tracks
-		}
+		totalItems = await Track.countDocuments({
+			_id: { $in: track_ids },
+		})
+	} else {
+		data = await Track.findOne({
+			_id: track_id,
+		}).lean()
 
-		return {
-			total_count: await Track.countDocuments({
-				_id: { $in: track_ids },
-			}),
-			list: tracks,
+		if (!data) {
+			throw new OperationError(404, "Track not found")
 		}
 	}
 
-	let track = await Track.findOne({
-		_id: track_id,
-	}).lean()
-
-	if (!track) {
-		throw new OperationError(404, "Track not found")
-	}
-
-	track = await fullfillData(track, {
+	data = await fullfillData(data, {
 		user_id,
 	})
 
-	return track[0]
+	if (isMultiple) {
+		if (onlyList) {
+			return data
+		}
+
+		return {
+			total_count: totalItems,
+			list: data,
+		}
+	}
+
+	return data[0]
 }

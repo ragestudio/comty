@@ -45,12 +45,8 @@ export default class TrackManifest {
 			this.source = params.source
 		}
 
-		if (typeof params.dash_manifest !== "undefined") {
-			this.dash_manifest = params.dash_manifest
-		}
-
-		if (typeof params.encoded_manifest !== "undefined") {
-			this.encoded_manifest = params.encoded_manifest
+		if (typeof params.mpd_string !== "undefined") {
+			this.mpd_string = params.mpd_string
 		}
 
 		if (typeof params.metadata !== "undefined") {
@@ -128,7 +124,7 @@ export default class TrackManifest {
 	}
 
 	serviceOperations = {
-		fetchLyrics: async () => {
+		fetchLyrics: async (options) => {
 			if (!this._id) {
 				return null
 			}
@@ -137,6 +133,7 @@ export default class TrackManifest {
 				"resolveLyrics",
 				this.service,
 				this,
+				options,
 			)
 
 			if (this.overrides) {
@@ -195,8 +192,7 @@ export default class TrackManifest {
 			album: this.album,
 			artist: this.artist,
 			source: this.source,
-			dash_manifest: this.dash_manifest,
-			encoded_manifest: this.encoded_manifest,
+			mpd_string: this.mpd_string,
 			metadata: this.metadata,
 			liked: this.liked,
 			service: this.service,

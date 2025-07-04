@@ -8,5 +8,6 @@ yarn-error.log
 out/
 .ssl
 
+src/pages/_debug
 public/oss-licenses.json
 /**/**/src/cores/@*

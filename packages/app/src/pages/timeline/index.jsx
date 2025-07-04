@@ -1,7 +1,7 @@
-import React from "react"
 import { Translation } from "react-i18next"
 
 import { PagePanelWithNavMenu } from "@components/PagePanels"
+
 import TrendingsCard from "@components/TrendingsCard"
 import FeaturedEvents from "@components/FeaturedEventsAnnouncements"
 

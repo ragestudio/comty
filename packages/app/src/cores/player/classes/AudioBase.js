@@ -1,12 +1,12 @@
-import shaka from "shaka-player/dist/shaka-player.compiled.js"
+import * as dashjs from "dashjs"
+
+import MPDParser from "../mpd_parser"
 
 import PlayerProcessors from "./PlayerProcessors"
 import AudioPlayerStorage from "../player.storage"
 import TrackManifest from "../classes/TrackManifest"
 
-import findInitializationChunk from "../helpers/findInitializationChunk"
 import parseSourceFormatMetadata from "../helpers/parseSourceFormatMetadata"
-import handleInlineDashManifest from "../helpers/handleInlineDashManifest"
 
 export default class AudioBase {
 	constructor(player) {
@@ -45,14 +45,14 @@ export default class AudioBase {
 			this.audio.addEventListener(key, value)
 		}
 
-		// setup shaka player for mpd
+		// setup dash.js player for mpd
 		this.createDemuxer()
 
 		// create element source with low latency buffer
 		this.elementSource = this.context.createMediaElementSource(this.audio)
 
-		await this.processorsManager.initialize(),
-			await this.processorsManager.attachAllNodes()
+		await this.processorsManager.initialize()
+		await this.processorsManager.attachAllNodes()
 	}
 
 	itemInit = async (manifest) => {
@@ -60,28 +60,48 @@ export default class AudioBase {
 			return null
 		}
 
+		if (manifest._initialized) {
+			return manifest
+		}
+
+		this.console.time("itemInit()")
+
 		if (
 			typeof manifest === "string" ||
 			(!manifest.source && !manifest.dash_manifest)
 		) {
-			this.console.time("resolve")
+			this.console.time("resolve manifest")
 			manifest = await this.player.serviceProviders.resolve(manifest)
-			this.console.timeEnd("resolve")
+			this.console.timeEnd("resolve manifest")
 		}
 
 		if (!(manifest instanceof TrackManifest)) {
-			this.console.time("init manifest")
+			this.console.time("instanciate class")
 			manifest = new TrackManifest(manifest, this.player)
-			this.console.timeEnd("init manifest")
+			this.console.timeEnd("instanciate class")
 		}
 
-		if (manifest.mpd_mode === true && !manifest.dash_manifest) {
-			this.console.time("fetch dash manifest")
-			manifest.dash_manifest = await fetch(manifest.source).then((r) =>
-				r.text(),
+		if (
+			manifest.mpd_mode === true &&
+			!manifest.dash_manifest &&
+			this.demuxer
+		) {
+			this.console.time("fetch")
+			const manifestString = await fetch(manifest.source).then((res) =>
+				res.text(),
 			)
-			this.console.timeEnd("fetch dash manifest")
+			this.console.timeEnd("fetch")
+
+			this.console.time("parse mpd")
+			manifest.dash_manifest = await MPDParser(
+				manifestString,
+				manifest.source,
+			)
+			this.console.timeEnd("parse mpd")
 		}
+
+		manifest._initialized = true
+		this.console.timeEnd("itemInit()")
 
 		return manifest
 	}
@@ -110,28 +130,32 @@ export default class AudioBase {
 			this.processors.gain.set(this.player.state.volume)
 		}
 
-		if (this.audio.paused) {
-			try {
-				this.console.time("play")
-				await this.audio.play()
-				this.console.timeEnd("play")
-			} catch (error) {
-				this.console.error(
-					"Error during audio.play():",
-					error,
-					"State:",
-					this.audio.readyState,
-				)
-			}
+		if (manifest.mpd_mode && this.demuxer) {
+			this.console.time("play")
+			await this.demuxer.play()
+			this.console.timeEnd("play")
+		}
+
+		if (!manifest.mpd_mode && this.audio.paused) {
+			this.console.time("play")
+			await this.audio.play()
+			this.console.timeEnd("play")
 		}
 
 		let initChunk = manifest.source
 
 		if (this.demuxer && manifest.dash_manifest) {
-			initChunk = findInitializationChunk(
-				manifest.source,
-				manifest.dash_manifest,
+			let initializationTemplate =
+				manifest.dash_manifest["Period"][0]["AdaptationSet"][0][
+					"Representation"
+				][0]["SegmentTemplate"]["initialization"]
+
+			initializationTemplate = initializationTemplate.replace(
+				"$RepresentationID$",
+				"0",
 			)
+
+			initChunk = new URL(initializationTemplate, manifest.source)
 		}
 
 		try {
@@ -172,79 +196,67 @@ export default class AudioBase {
 
 			if (!this.demuxer) {
 				this.console.log("Creating demuxer cause not initialized")
-				this.createDemuxer()
+				await this.createDemuxer()
 			}
 
-			if (manifest._preloaded) {
-				this.console.log(
-					`using preloaded source >`,
-					manifest._preloaded,
-				)
+			await this.demuxer.attachSource(manifest.dash_manifest, 0)
 
-				return await this.demuxer.load(manifest._preloaded)
-			}
-
-			const inlineManifest =
-				"inline://" + manifest.source + "::" + manifest.dash_manifest
-
-			return await this.demuxer
-				.load(inlineManifest, 0, "application/dash+xml")
-				.catch((err) => {
-					this.console.error("Error loading inline manifest", err)
-				})
+			return manifest.source
 		}
 
 		// if not using demuxer, destroy previous instance
 		if (this.demuxer) {
-			await this.demuxer.unload()
-			await this.demuxer.destroy()
+			try {
+				this.demuxer.reset()
+				this.demuxer.destroy()
+			} catch (error) {
+				this.console.warn("Error destroying demuxer:", error)
+			}
+
 			this.demuxer = null
 		}
 
 		// load source
 		this.audio.src = manifest.source
-		return this.audio.load()
+		this.audio.load()
+
+		return manifest.source
 	}
 
 	async createDemuxer() {
 		// Destroy previous instance if exists
 		if (this.demuxer) {
-			await this.demuxer.unload()
-			await this.demuxer.detach()
-			await this.demuxer.destroy()
+			try {
+				this.demuxer.reset()
+				this.demuxer.destroy()
+			} catch (error) {
+				this.console.warn("Error destroying previous demuxer:", error)
+			}
 		}
 
-		this.demuxer = new shaka.Player()
+		this.demuxer = dashjs.MediaPlayer().create()
 
-		this.demuxer.attach(this.audio)
+		try {
+			this.demuxer.initialize(this.audio)
+		} catch (error) {
+			this.console.error("Error initializing DASH.js player:", error)
+			throw error
+		}
 
-		this.demuxer.configure({
-			manifest: {
-				//updatePeriod: 5,
-				disableVideo: true,
-				disableText: true,
-				dash: {
-					ignoreMinBufferTime: true,
-					ignoreMaxSegmentDuration: true,
-					autoCorrectDrift: false,
-					enableFastSwitching: true,
-					useStreamOnceInPeriodFlattening: false,
-				},
-			},
+		this.demuxer.updateSettings({
 			streaming: {
-				bufferingGoal: 15,
-				rebufferingGoal: 1,
-				bufferBehind: 30,
-				stallThreshold: 0.5,
+				//cacheInitSegments: true,
+				buffer: {
+					bufferTimeAtTopQuality: 15,
+					initialBufferLevel: 1,
+				},
 			},
 		})
 
-		shaka.net.NetworkingEngine.registerScheme(
-			"inline",
-			handleInlineDashManifest,
-		)
+		//this.demuxer.setAutoPlay(false)
 
-		this.demuxer.addEventListener("error", (event) => {
+		// Event listeners
+		this.demuxer.on(dashjs.MediaPlayer.events.ERROR, (event) => {
 			console.error("Demuxer error", event)
 		})
 	}
@@ -263,40 +275,21 @@ export default class AudioBase {
 		// if remaining time is less than 3s, try to init next item
 		if (parseInt(remainingTime) <= 10) {
 			// check if queue has next item
-			if (this.player.queue.nextItems[0]) {
+			if (
+				this.player.queue.nextItems[0] &&
+				!this.player.queue.nextItems[0]._initialized
+			) {
 				this.player.queue.nextItems[0] = await this.itemInit(
 					this.player.queue.nextItems[0],
 				)
-
-				if (
-					this.demuxer &&
-					this.player.queue.nextItems[0].source &&
-					this.player.queue.nextItems[0].mpd_mode &&
-					!this.player.queue.nextItems[0]._preloaded
-				) {
-					const manifest = this.player.queue.nextItems[0]
-
-					// preload next item
-					this.console.time("preload next item")
-					this.player.queue.nextItems[0]._preloaded =
-						await this.demuxer.preload(
-							"inline://" +
-								manifest.source +
-								"::" +
-								manifest.dash_manifest,
-							0,
-							"application/dash+xml",
-						)
-					this.console.timeEnd("preload next item")
-				}
 			}
 		}
 	}
 
-	flush() {
+	async flush() {
 		this.audio.pause()
 		this.audio.currentTime = 0
-		this.createDemuxer()
+		await this.createDemuxer()
 	}
 
 	audioEvents = {

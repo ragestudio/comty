@@ -1,87 +1,206 @@
 @import "@styles/vars.less";
 
 .drawers-wrapper {
-    position: absolute;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1200;
+	display: flex;
+	flex-direction: row;
+	padding: @sidebar_padding;
+	margin-left: calc(@sidebar_padding * 2);
+	height: 100dvh;
+	height: 100vh;
+	pointer-events: none;
 
-    top: 0;
-    left: 0;
-
-    z-index: 1200;
-
-    display: flex;
-    flex-direction: row;
-
-    padding: @sidebar_padding;
-
-    margin-left: calc(@sidebar_padding * 2);
-
-    height: 100dvh;
-    height: 100vh;
-
-    &.hidden {
-        display: none;
-    }
+	&.hidden {
+		display: none;
+	}
 }
 
 .drawers-mask {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-
-    z-index: 1100;
-
-    width: 100vw;
-    height: 100vh;
-
-    background-color: rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(4px);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1100;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.1);
+	backdrop-filter: blur(4px);
+	cursor: pointer;
 }
 
 .drawer {
-    position: relative;
+	position: relative;
+	z-index: 1300;
 
-    z-index: 1300;
+	top: 0;
+	bottom: 0;
 
-    top: 0;
-    left: 0;
-    bottom: 0;
+	display: flex;
+	flex-direction: column;
+	pointer-events: auto;
 
-    width: fit-content;
-    min-width: 320px;
-    height: 100%;
+	width: fit-content;
+	min-width: 320px;
+	max-width: 90vw;
+	height: 100%;
 
-    padding: 20px;
+	background-color: var(--background-color-accent);
+	border-radius: @sidebar_borderRadius;
+	box-shadow: @card-shadow;
+	border: 1px solid var(--sidebar-background-color);
 
-    background-color: var(--background-color-accent);
+	overflow: hidden;
 
-    border-radius: @sidebar_borderRadius;
-    box-shadow: @card-shadow;
-    border: 1px solid var(--sidebar-background-color);
+	&.drawer-left {
+		left: 0;
+		margin-right: 20px;
+	}
 
-    overflow-x: hidden;
-    overflow-y: overlay;
+	&.drawer-right {
+		right: 0;
+		margin-left: 20px;
+	}
+
+	.drawer-header {
+		flex-shrink: 0;
+		padding: 16px 20px;
+		border-bottom: 1px solid var(--border-color);
+		background-color: var(--background-color);
+
+		.drawer-header-content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+
+			.drawer-title {
+				margin: 0;
+				font-size: 18px;
+				font-weight: 600;
+				color: var(--text-color);
+				flex: 1;
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.drawer-header-actions {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-shrink: 0;
+
+				.drawer-custom-actions {
+					display: flex;
+					align-items: center;
+					gap: 8px;
+				}
+
+				.drawer-close-button {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 32px;
+					height: 32px;
+					border: none;
+					background-color: transparent;
+					color: var(--text-color);
+					font-size: 24px;
+					line-height: 1;
+					cursor: pointer;
+					border-radius: 6px;
+					transition: all 0.2s ease;
+
+					&:active {
+						transform: scale(0.95);
+					}
+				}
+			}
+		}
+	}
+
+	.drawer-content {
+		flex: 1;
+		padding: 20px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		min-height: 0;
+
+		color: var(--text-color);
+
+		&::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--scrollbar-thumb-color);
+			border-radius: 3px;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background-color: var(--scrollbar-thumb-hover-color);
+		}
+	}
 }
 
+// Responsive design
+@media (max-width: 768px) {
+	.drawers-wrapper {
+		margin-left: 0;
+		padding: 10px;
+	}
+
+	.drawer {
+		min-width: 280px;
+		max-width: calc(100vw - 20px);
+
+		.drawer-header {
+			padding: 12px 16px;
+
+			.drawer-header-content {
+				.drawer-title {
+					font-size: 16px;
+				}
+
+				.drawer-header-actions {
+					.drawer-close-button {
+						width: 28px;
+						height: 28px;
+						font-size: 20px;
+					}
+				}
+			}
+		}
+
+		.drawer-content {
+			padding: 16px;
+		}
+	}
+}
+
+// Confirm dialog styles
 .drawer_close_confirm {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	width: 100%;
 
-    gap: 10px;
+	.drawer_close_confirm_content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
 
-    width: 100%;
-
-    .drawer_close_confirm_content {
-        display: flex;
-        flex-direction: column;
-
-        gap: 2px;
-    }
-
-    .drawer_close_confirm_actions {
-        display: flex;
-        flex-direction: row;
-
-        gap: 10px;
-    }
+	.drawer_close_confirm_actions {
+		display: flex;
+		flex-direction: row;
+		gap: 10px;
+	}
 }

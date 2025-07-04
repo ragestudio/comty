@@ -71,19 +71,17 @@ export default async (payload = {}) => {
 		source: payload.source,
 		metadata: metadata,
 		public: payload.public ?? true,
+		publisher: {
+			user_id: payload.user_id,
+		},
+		created_at: new Date(),
 	}
 
 	if (Array.isArray(payload.artists)) {
 		obj.artist = payload.artists.join(", ")
 	}
 
-	let track = new Track({
-		...obj,
-		publisher: {
-			user_id: payload.user_id,
-		},
-		created_at: new Date(),
-	})
+	let track = new Track(obj)
 
 	await track.save()
 

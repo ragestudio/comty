@@ -8,20 +8,12 @@ for arg in "$@"; do
 done
 
 NGINX_VERSION="1.26.3"
-ARCH="$(dpkg --print-architecture)"
+ARCH="$(uname -m)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUTBIN="${SCRIPT_DIR}/../nginx-bin"
 
-if [ "$ARCH" = "arm64" ]; then
-    NGINX_ARCH="aarch64";
-elif [ "$ARCH" = "amd64" ]; then
-    NGINX_ARCH="x86_64";
-else
-    echo "Unsupported architecture: $ARCH";
-    exit 1;
-fi
 
-NGINX_BINARY_URL="https://jirutka.github.io/nginx-binaries/nginx-${NGINX_VERSION}-${NGINX_ARCH}-linux"
+NGINX_BINARY_URL="https://jirutka.github.io/nginx-binaries/nginx-${NGINX_VERSION}-${ARCH}-linux"
 
 if [ -f "${OUTPUTBIN}" ]; then
     if [ "$FORCE_OVERWRITE" = true ]; then

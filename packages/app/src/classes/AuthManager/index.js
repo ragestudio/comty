@@ -70,6 +70,11 @@ export default class AuthManager {
 		},
 	}
 
+	handleUserDataUpdate = (data) => {
+		this.state.user = data
+		app.eventBus.emit("self:user:update", data)
+	}
+
 	initialize = async () => {
 		const token = await SessionModel.token
 
@@ -87,6 +92,8 @@ export default class AuthManager {
 
 		app.userData = user
 		this.state.user = user
+
+		return user
 	}
 
 	flush = async () => {

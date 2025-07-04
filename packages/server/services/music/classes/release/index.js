@@ -35,6 +35,8 @@ export default class Release {
 			onlyList: true,
 		})
 
+		release.items = tracks
+		release.total_items = totalTracks
 		release.total_duration = tracks.reduce((acc, track) => {
 			if (track.metadata?.duration) {
 				return acc + parseFloat(track.metadata.duration)
@@ -42,8 +44,6 @@ export default class Release {
 
 			return acc
 		}, 0)
-		release.total_items = totalTracks
-		release.items = tracks
 
 		return release
 	}

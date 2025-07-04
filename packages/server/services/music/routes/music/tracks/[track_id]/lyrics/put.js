@@ -4,7 +4,7 @@ export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const { track_id } = req.params
-		const { video_source, lrc, sync_audio_at } = req.body
+		const { video_source, lrc, video_starts_at } = req.body
 
 		// check if track exists
 		let track = await Track.findById(track_id).catch(() => null)
@@ -17,12 +17,6 @@ export default {
 			throw new OperationError(403, "Unauthorized")
 		}
 
-		console.log(`Setting lyrics for track ${track_id} >`, {
-			track_id: track_id,
-			video_source: video_source,
-			lrc: lrc,
-		})
-
 		// check if trackLyric exists
 		let trackLyric = await TrackLyric.findOne({
 			track_id: track_id,
@@ -33,8 +27,8 @@ export default {
 			trackLyric = new TrackLyric({
 				track_id: track_id,
 				video_source: video_source,
+				video_starts_at: video_starts_at,
 				lrc: lrc,
-				sync_audio_at: sync_audio_at,
 			})
 
 			await trackLyric.save()
@@ -49,8 +43,8 @@ export default {
 				update.lrc = lrc
 			}
 
-			if (typeof sync_audio_at !== "undefined") {
-				update.sync_audio_at = sync_audio_at
+			if (typeof video_starts_at !== "undefined") {
+				update.video_starts_at = video_starts_at
 			}
 
 			trackLyric = await TrackLyric.findOneAndUpdate(

@@ -5,7 +5,7 @@ import useLayoutInterface from "@hooks/useLayoutInterface"
 
 import "./index.less"
 
-export default (props) => {
+const HeaderBar = (props) => {
 	const [render, setRender] = React.useState(null)
 
 	useLayoutInterface("header", {
@@ -33,15 +33,23 @@ export default (props) => {
 		<AnimatePresence>
 			{render && (
 				<motion.div
+					layoutRoot
 					className="page_header_wrapper"
-					animate={{
-						y: 0,
-					}}
 					initial={{
 						y: -100,
+						width: "100%",
+					}}
+					animate={{
+						y: 0,
+						position: "sticky",
+						width: "100%",
 					}}
 					exit={{
 						y: -100,
+						position: "absolute",
+						width: "100%",
+						top: 0,
+						left: 0,
 					}}
 					transition={{
 						type: "spring",
@@ -61,3 +69,5 @@ export default (props) => {
 		</AnimatePresence>
 	)
 }
+
+export default HeaderBar

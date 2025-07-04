@@ -2,7 +2,7 @@ import path from "node:path"
 import SegmentedAudioMPDJob from "@shared-classes/SegmentedAudioMPDJob"
 
 export default async ({ filePath, workPath, onProgress }) => {
-	return new Promise((resolve) => {
+	return new Promise((resolve, reject) => {
 		const outputDir = path.resolve(workPath, "a-dash")
 
 		const job = new SegmentedAudioMPDJob({
@@ -26,6 +26,10 @@ export default async ({ filePath, workPath, onProgress }) => {
 					state: "transmuxing",
 				})
 			}
+		})
+
+		job.on("error", (error) => {
+			reject(error)
 		})
 
 		job.run()

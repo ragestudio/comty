@@ -15,10 +15,9 @@ const AppPage = (props) => {
 	useTotalWindowHeight(true)
 
 	const [loading, setLoading] = React.useState(true)
-
-	const [customApp, setCustomApp] = React.useState({})
-	const [extensionRef, setExtensionRef] = React.useState({})
-	const [Render, setRender] = React.useState(() => () => null)
+	const [appMetadata, setAppMetadata] = React.useState({})
+	const [ctx, setCtx] = React.useState({})
+	const extensionRef = React.useRef(null)
 
 	async function loadApp() {
 		setLoading(true)
@@ -29,13 +28,30 @@ const AppPage = (props) => {
 			throw new Error(`Extension with id ${id} not found`)
 		}
 
+		if (!extension.main.app.component) {
+			throw new Error(`Missing component for extension with id [${id}]`)
+		}
+
+		setAppMetadata({
+			title: extension.main.app.title,
+			description: extension.main.app.description,
+			icon: extension.main.app.icon,
+		})
+
 		if (typeof extension.main.app.onLoad === "function") {
 			await extension.main.app.onLoad()
 		}
 
-		setExtensionRef(extension)
-		setCustomApp(extension.main.app)
-		setRender(extension.main.app.renderComponent)
+		if (typeof extension.main.app.component.onMount === "function") {
+			await extension.main.app.component.onMount({
+				extension,
+				ctx,
+				setCtx,
+			})
+		}
+
+		// set to ref
+		extensionRef.current = extension
 
 		setLoading(false)
 	}
@@ -48,8 +64,8 @@ const AppPage = (props) => {
 		return (
 			<div className="custom-app-page-loading">
 				<div className="custom-app-page-loading-icon">
-					{customApp.icon && (
-						<Image src={customApp.icon} alt={customApp.name} />
+					{appMetadata.icon && (
+						<Image src={appMetadata.icon} alt={appMetadata.title} />
 					)}
 				</div>
 
@@ -64,7 +80,11 @@ const AppPage = (props) => {
 	return (
 		<div className="custom-app-page-render">
 			<ErrorBoundary>
-				<Render />
+				{React.createElement(extensionRef.current.main.app.component, {
+					extension: extensionRef.current,
+					ctx,
+					setCtx,
+				})}
 			</ErrorBoundary>
 		</div>
 	)

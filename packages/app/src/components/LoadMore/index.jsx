@@ -3,59 +3,65 @@ import classnames from "classnames"
 
 import "./index.less"
 
-export default React.forwardRef((props, ref) => {
-    const {
-        className,
-        children,
-        hasMore,
-        loadingComponent,
-        noResultComponent,
-        contentProps = {},
-    } = props
+const LoadMore = React.forwardRef((props, ref) => {
+	const {
+		className,
+		children,
+		hasMore = false,
+		loadingComponent,
+		contentProps = {},
+	} = props
 
-    let observer = null
+	const nodeRef = React.useRef(null)
 
-    const insideViewportCb = (entries) => {
-        const { fetching, onBottom } = props
+	let observer = null
 
-        entries.forEach(element => {
-            if (element.intersectionRatio > 0 && !fetching) {
-                onBottom()
-            }
-        })
-    }
+	const insideViewportCb = (entries) => {
+		const { fetching, onBottom, hasMore } = props
 
-    React.useEffect(() => {
-        try {
-            const node = document.getElementById("bottom")
+		if (!hasMore) {
+			return false
+		}
 
-            observer = new IntersectionObserver(insideViewportCb)
-            observer.observe(node)
-        } catch (err) {
-            console.log("err in finding node", err)
-        }
+		entries.forEach((element) => {
+			if (element.intersectionRatio > 0 && !fetching) {
+				onBottom()
+			}
+		})
+	}
 
-        return () => {
-            observer.disconnect()
-            observer = null
-        }
-    }, [])
+	React.useEffect(() => {
+		try {
+			observer = new IntersectionObserver(insideViewportCb)
+			observer.observe(nodeRef.current)
+		} catch (err) {
+			console.log("err in finding node", err)
+		}
 
-    return <div
-        ref={ref}
-        className={classnames(className)}
-        {...contentProps}
-    >
-        {children}
+		return () => {
+			observer.disconnect()
+			observer = null
+		}
+	}, [])
 
-        <div style={{ clear: "both" }} />
+	return (
+		<div ref={ref} className={classnames(className)} {...contentProps}>
+			{children}
 
-        <div
-            id="bottom"
-            className="bottom"
-            style={{ display: hasMore ? "block" : "none" }}
-        >
-            {loadingComponent && React.createElement(loadingComponent)}
-        </div>
-    </div>
+			{/* <div style={{ clear: "both" }} /> */}
+
+			<div
+				ref={nodeRef}
+				id="bottom"
+				className="bottom"
+				style={{ display: hasMore ? "block" : "none" }}
+			>
+				{loadingComponent && React.createElement(loadingComponent)}
+			</div>
+		</div>
+	)
 })
+
+LoadMore.displayName = "LoadMore"
+
+export default LoadMore
