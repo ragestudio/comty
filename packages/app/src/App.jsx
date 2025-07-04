@@ -124,10 +124,7 @@ class ComtyApp extends React.Component {
 
 				<ThemeProvider>
 					{window.__TAURI__ && <DesktopTopBar />}
-					<Layout
-						user={this.auth.user}
-						staticRenders={ComtyApp.staticRenders}
-					>
+					<Layout staticRenders={ComtyApp.staticRenders}>
 						{this.state.firstInitialized && (
 							<Router.Render
 								declarations={routesDeclarations}
