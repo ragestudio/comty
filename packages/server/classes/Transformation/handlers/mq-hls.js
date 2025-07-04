@@ -2,7 +2,7 @@ import path from "node:path"
 import MultiqualityHLSJob from "@shared-classes/MultiqualityHLSJob"
 
 export default async ({ filePath, workPath, onProgress }) => {
-	return new Promise(async (resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		const outputDir = path.resolve(workPath, "mqhls")
 
 		const job = new MultiqualityHLSJob({
@@ -38,6 +38,10 @@ export default async ({ filePath, workPath, onProgress }) => {
 					state: "transmuxing",
 				})
 			}
+		})
+
+		job.on("error", (error) => {
+			reject(error)
 		})
 
 		job.run()
