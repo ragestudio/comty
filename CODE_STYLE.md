@@ -15,31 +15,29 @@ This document outlines the code style guidelines for the Comty project. The goal
 
 ## Language-specific Guidelines
 ### JavaScript
+
+#### Do's
 - Use ES6 syntax and features whenever possible.
-
 - Use double quotes for strings, including for JSX.
-
 - Use const and let instead of var.
-
 - Always use strict equality (=== and !==) for comparisons.
-
-- Avoid using eval() and with().
-
-- Use camelCase for variable and function names.
-
-- Use PascalCase for class and component names.
-
-- Use four spaces for indentation.
-
-- Use a CSS preprocessor like LESS to organize styles. (We recommend use LESS cause it's used in the project, we prefer to no include another dependency)
-
-- Use kebab-case for ID names.
-
+- Use a CSS preprocessor like LESS. (We recommend use LESS cause it's used in the project, we prefer to no include another dependency)
+- Use the :hover, :focus, and :active pseudo-classes as needed.
+- Use descriptive class and ID names that clearly indicate their purpose.
 - Use a consistent naming convention for classes and IDs, and avoid using inline styles.
 
-- Use the :hover, :focus, and :active pseudo-classes as needed.
+#### Dont's
+- Don't include unnecesary logs over the console.
+- Don't declare unnecesary variables.
+- Avoid using eval() and with().
 
-- Use descriptive class and ID names that clearly indicate their purpose.
+#### Format
+- Use 2 tabs for indentation.
+- Use kebab-case for ID names.
+- Use camelCase for variable and function names.
+- Use PascalCase for class and component names.
+
+Preferably use prettier to format all the code, the configuration file is included in the repository.
 
 ## Conclusion
 By following these code style guidelines, we can create code that is easy to read, understand, and maintain. These guidelines are not exhaustive, and there may be cases where they don't apply or conflict with other guidelines. In such cases, use your best judgement and work with the team to come to a consensus.
