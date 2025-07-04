@@ -1,3 +1,6 @@
 {
-	"name": "users"
+	"name": "users",
+	"dependencies": {
+		"linebridge": "^1.0.0-alpha.4"
+	}
 }

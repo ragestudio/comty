@@ -1,7 +1,7 @@
 import Users from "@classes/users"
 
 export default {
-	middlewares: ["withOptionalAuthentication"],
+	useMiddlewares: ["withOptionalAuthentication"],
 	fn: async (req) => {
 		const { user_id } = req.params
 
@@ -10,7 +10,7 @@ export default {
 		return await Users.data({
 			user_id: ids.length > 1 ? ids : user_id,
 			from_user_id: req.auth?.session.user_id,
-			basic: req.query?.basic,
+			basic: ToBoolean(req.query?.basic),
 		})
 	},
 }

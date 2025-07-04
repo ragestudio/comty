@@ -25,5 +25,13 @@ export default async (user_id, update) => {
 
 	user = user.toObject()
 
+	const userSockets = await global.websockets.find.clientsByUserId(
+		user._id.toString(),
+	)
+
+	for (const userSocket of userSockets) {
+		userSocket.emit(`self:user:update`, user)
+	}
+
 	return user
 }

@@ -1,7 +1,7 @@
 import { UserPublicKey } from "@db_models"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const targetUserId = req.params.user_id
 
