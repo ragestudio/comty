@@ -159,7 +159,10 @@ const AccountButton = React.forwardRef((props, ref) => {
 		>
 			<div className="icon">
 				{user ? (
-					<antd.Avatar shape="square" src={app.userData.avatar} />
+					<antd.Avatar
+						shape="square"
+						src={app.userData.avatar}
+					/>
 				) : (
 					createIconRender("FiLogin")
 				)}
@@ -167,6 +170,8 @@ const AccountButton = React.forwardRef((props, ref) => {
 		</div>
 	)
 })
+
+AccountButton.displayName = "AccountButton"
 
 export class BottomBar extends React.Component {
 	static contextType = Context
@@ -366,9 +371,7 @@ export class BottomBar extends React.Component {
 		}
 
 		const heightValue = Number(
-			app.cores.style
-				.getDefaultVar("bottom-bar-height")
-				.replace("px", ""),
+			app.cores.style.getDefaultVar("bottom-bar-height").replace("px", ""),
 		)
 
 		return (
@@ -409,10 +412,7 @@ export class BottomBar extends React.Component {
 									<div
 										key="creator"
 										id="creator"
-										className={classnames(
-											"item",
-											"primary",
-										)}
+										className={classnames("item", "primary")}
 										onClick={openCreator}
 									>
 										<div className="icon">
@@ -441,9 +441,7 @@ export class BottomBar extends React.Component {
 											})
 										}}
 									>
-										<div className="icon">
-											{createIconRender("FiHome")}
-										</div>
+										<div className="icon">{createIconRender("FiHome")}</div>
 									</div>
 
 									<div
@@ -452,9 +450,7 @@ export class BottomBar extends React.Component {
 										className="item"
 										onClick={app.controls.openSearcher}
 									>
-										<div className="icon">
-											{createIconRender("FiSearch")}
-										</div>
+										<div className="icon">{createIconRender("FiSearch")}</div>
 									</div>
 
 									<AccountButton ref={this.accountBtnRef} />
