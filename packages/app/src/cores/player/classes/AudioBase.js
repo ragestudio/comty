@@ -81,11 +81,7 @@ export default class AudioBase {
 			this.console.timeEnd("instanciate class")
 		}
 
-		if (
-			manifest.mpd_mode === true &&
-			!manifest.dash_manifest &&
-			this.demuxer
-		) {
+		if (manifest.mpd_mode === true && !manifest.dash_manifest && this.demuxer) {
 			this.console.time("fetch")
 			const manifestString = await fetch(manifest.source).then((res) =>
 				res.text(),
@@ -93,10 +89,7 @@ export default class AudioBase {
 			this.console.timeEnd("fetch")
 
 			this.console.time("parse mpd")
-			manifest.dash_manifest = await MPDParser(
-				manifestString,
-				manifest.source,
-			)
+			manifest.dash_manifest = await MPDParser(manifestString, manifest.source)
 			this.console.timeEnd("parse mpd")
 		}
 
@@ -247,13 +240,50 @@ export default class AudioBase {
 			streaming: {
 				//cacheInitSegments: true,
 				buffer: {
-					bufferTimeAtTopQuality: 15,
-					initialBufferLevel: 1,
+					bufferTimeAtTopQuality: 30,
+					bufferTimeAtTopQualityLongForm: 60,
+					bufferTimeDefault: 20,
+					initialBufferLevel: 5,
+					bufferToKeep: 10,
+					longFormContentDurationThreshold: 300,
+					stallThreshold: 0.5,
+					bufferPruningInterval: 30,
+				},
+				abr: {
+					initialBitrate: {
+						audio: 128,
+					},
+					rules: {
+						insufficientBufferRule: {
+							active: true,
+							parameters: {
+								bufferLevel: 0.3,
+							},
+						},
+						switchHistoryRule: {
+							active: true,
+							parameters: {
+								sampleSize: 8,
+							},
+						},
+					},
+					throughput: {
+						averageCalculationMode: "slidingWindow",
+						slidingWindowSize: 20,
+						ewmaHalfLife: 4,
+					},
+				},
+				retrySettings: {
+					maxRetries: 5,
+					retryDelayMs: 1000,
+					retryBackoffFactor: 2,
+				},
+				requests: {
+					requestTimeout: 30000,
+					xhrWithCredentials: false,
 				},
 			},
 		})
-
-		//this.demuxer.setAutoPlay(false)
 
 		// Event listeners
 		this.demuxer.on(dashjs.MediaPlayer.events.ERROR, (event) => {
