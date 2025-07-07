@@ -10,6 +10,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
 	const { lyrics } = props
 
+	const currentTrackId = React.useRef(null)
 	const [syncInterval, setSyncInterval] = React.useState(null)
 	const [currentLineIndex, setCurrentLineIndex] = React.useState(0)
 	const [visible, setVisible] = React.useState(false)
@@ -25,9 +26,7 @@ const LyricsText = React.forwardRef((props, textRef) => {
 		})
 
 		if (lineIndex === -1) {
-			if (!visible) {
-				setVisible(false)
-			}
+			setVisible(false)
 
 			return false
 		}
@@ -70,8 +69,14 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
 	//* Handle when current line index change
 	React.useEffect(() => {
+		console.debug("[lyrics] currentLineIndex", currentLineIndex)
+
 		if (currentLineIndex === 0) {
 			setVisible(false)
+
+			if (textRef.current) {
+				textRef.current.scrollTop = 0
+			}
 		} else {
 			setVisible(true)
 
@@ -87,9 +92,6 @@ const LyricsText = React.forwardRef((props, textRef) => {
 						behavior: "smooth",
 						block: "center",
 					})
-				} else {
-					// scroll to top
-					textRef.current.scrollTop = 0
 				}
 			}
 		}
@@ -102,10 +104,16 @@ const LyricsText = React.forwardRef((props, textRef) => {
 
 	//* Handle when manifest object change, reset...
 	React.useEffect(() => {
-		setVisible(false)
-		setCurrentLineIndex(0)
-		// set scroll top to 0
-		textRef.current.scrollTop = 0
+		currentTrackId.current = playerState.track_manifest?.id
+
+		if (playerState.track_manifest?.id !== currentTrackId.current) {
+			setVisible(false)
+			setCurrentLineIndex(0)
+
+			if (textRef.current) {
+				textRef.current.scrollTop = 0
+			}
+		}
 	}, [playerState.track_manifest])
 
 	React.useEffect(() => {
