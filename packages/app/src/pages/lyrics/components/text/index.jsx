@@ -104,6 +104,8 @@ const LyricsText = React.forwardRef((props, textRef) => {
 	React.useEffect(() => {
 		setVisible(false)
 		setCurrentLineIndex(0)
+		// set scroll top to 0
+		textRef.current.scrollTop = 0
 	}, [playerState.track_manifest])
 
 	React.useEffect(() => {

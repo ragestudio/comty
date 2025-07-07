@@ -1,22 +1,89 @@
-.loginPage {
-    position: relative;
+.login-page {
+	position: relative;
 
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
+	display: flex;
+	flex-direction: column;
 
-    .wallpaper {
-        position: absolute;
+	align-items: center;
+	justify-content: center;
 
-        top: 0;
-        left: 0;
+	width: 100%;
+	height: 100vh;
+	height: 100dvh;
 
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
+	.wallpaper {
+		position: fixed;
 
-        background-position: center;
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
+		top: 0;
+		left: 0;
+
+		z-index: -1;
+
+		width: 100%;
+		height: 100vh;
+		height: 100dvh;
+
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
+	}
+
+	.login-page-card {
+		position: relative;
+
+		display: flex;
+		flex-direction: column;
+
+		width: 95%;
+		padding: 15px;
+
+		background-color: var(--background-color-primary);
+
+		border-radius: 24px;
+
+		gap: 30px;
+
+		&__header {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			gap: 10px;
+
+			&__logo {
+				width: 40px;
+				height: 40px;
+			}
+		}
+
+		&__content {
+			display: flex;
+			flex-direction: column;
+
+			.ant-btn {
+				height: fit-content;
+				padding: 7px 15px;
+				font-size: 0.8rem;
+			}
+
+			.actions {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+
+				gap: 15px;
+			}
+
+			.register_form {
+				position: unset;
+
+				.register_form_actions {
+					top: 0;
+					bottom: unset;
+				}
+			}
+		}
+	}
 }
