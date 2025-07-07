@@ -1,60 +1,84 @@
 import bcrypt from "bcrypt"
 import { User } from "@db_models"
-import requiredFields from "@shared-utils/requiredFields"
-
 import Account from "@classes/account"
 
+import requiredFields from "@shared-utils/requiredFields"
+import verifyTurnstileToken from "@utils/verifyTurnstileToken"
+
 export default async (payload) => {
-    requiredFields(["username", "password", "email"], payload)
+	requiredFields(["username", "password", "email"], payload)
 
-    let { username, password, email, public_name, roles, avatar, accept_tos } = payload
+	let {
+		username,
+		password,
+		email,
+		public_name,
+		roles,
+		avatar,
+		accept_tos,
+		captcha,
+	} = payload
 
-    if (ToBoolean(accept_tos) !== true) {
-        throw new OperationError(400, "You must accept the terms of service in order to create an account.")
-    }
+	if (ToBoolean(accept_tos) !== true) {
+		throw new OperationError(
+			400,
+			"You must accept the terms of service in order to create an account.",
+		)
+	}
 
-    await Account.usernameMeetPolicy(username)
+	if (!captcha) {
+		throw new OperationError(400, "Captcha token is required")
+	}
 
-    // check if username is already taken
-    const existentUser = await User
-        .findOne({ username: username })
+	const turnstileResponse = await verifyTurnstileToken(captcha)
 
-    if (existentUser) {
-        throw new OperationError(400, "User already exists")
-    }
+	if (turnstileResponse.success !== true) {
+		throw new OperationError(400, "Invalid captcha token")
+	}
 
-    // check if the email is already in use
-    const existentEmail = await User
-        .findOne({ email: email })
-        .select("+email")
+	await Account.usernameMeetPolicy(username)
 
-    if (existentEmail) {
-        throw new OperationError(400, "Email already in use")
-    }
+	// check if username is already taken
+	const existentUser = await User.findOne({ username: username })
 
-    await Account.passwordMeetPolicy(password)
+	if (existentUser) {
+		throw new OperationError(400, "User already exists")
+	}
 
-    // hash the password
-    const hash = bcrypt.hashSync(password, parseInt(process.env.BCRYPT_ROUNDS ?? 3))
+	// check if the email is already in use
+	const existentEmail = await User.findOne({ email: email }).select("+email")
 
-    let user = new User({
-        username: username,
-        password: hash,
-        email: email,
-        public_name: public_name,
-        avatar: avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
-        roles: roles,
-        created_at: new Date().getTime(),
-        accept_tos: accept_tos,
-        activated: false,
-    })
+	if (existentEmail) {
+		throw new OperationError(400, "Email already in use")
+	}
 
-    await user.save()
+	await Account.passwordMeetPolicy(password)
 
-    await Account.sendActivationCode(user._id.toString())
+	// hash the password
+	const hash = bcrypt.hashSync(
+		password,
+		parseInt(process.env.BCRYPT_ROUNDS ?? 3),
+	)
 
-    return {
-        activation_required: true,
-        user: user,
-    }
+	let user = new User({
+		username: username,
+		password: hash,
+		email: email,
+		public_name: public_name,
+		avatar:
+			avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
+		roles: roles,
+		created_at: new Date().getTime(),
+		accept_tos: accept_tos,
+		activated: false,
+	})
+
+	await user.save()
+
+	await Account.sendActivationCode(user._id.toString())
+
+	return {
+		activation_required: true,
+		user: user,
+	}
 }

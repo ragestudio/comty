@@ -40,9 +40,7 @@ export const usePlayerStateContext = (updater) => {
 		app.cores.player.eventBus().on("player.state.update", handleStateChange)
 
 		return () => {
-			app.cores.player
-				.eventBus()
-				.off("player.state.update", handleStateChange)
+			app.cores.player.eventBus().off("player.state.update", handleStateChange)
 		}
 	}, [])
 
@@ -56,9 +54,7 @@ export class WithPlayerContext extends React.Component {
 
 	events = {
 		"player.state.update": async (state) => {
-			if (state !== this.state) {
-				this.setState(state)
-			}
+			this.setState(state)
 		},
 	}
 

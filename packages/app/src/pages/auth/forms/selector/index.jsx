@@ -6,9 +6,14 @@ import { Icons } from "@components/Icons"
 const MainSelector = (props) => {
 	return (
 		<>
-			<div className="content_header">
-				<img src={config.logo.alt} className="logo" />
-			</div>
+			{!app.isMobile && (
+				<div className="content_header">
+					<img
+						src={config.logo.alt}
+						className="logo"
+					/>
+				</div>
+			)}
 
 			<div className="actions">
 				{app.userData && (

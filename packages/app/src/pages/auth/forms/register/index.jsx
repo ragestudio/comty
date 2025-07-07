@@ -12,8 +12,9 @@ import UsernameStep from "./steps/username"
 import PasswordStep from "./steps/password"
 import EmailStep from "./steps/email"
 import TOSStep from "./steps/tos"
+import CaptchaStep from "./steps/captcha"
 
-const steps = [UsernameStep, PasswordStep, EmailStep, TOSStep]
+const steps = [UsernameStep, PasswordStep, EmailStep, TOSStep, CaptchaStep]
 
 const RegisterForm = (props) => {
 	const [finishing, setFinishing] = React.useState(false)
@@ -35,6 +36,7 @@ const RegisterForm = (props) => {
 			password: stepsValues.password,
 			email: stepsValues.email,
 			tos: stepsValues.tos,
+			captcha: stepsValues.captcha,
 		}).catch((err) => {
 			setFinishSuccess(false)
 			setFinishing(false)
@@ -107,8 +109,8 @@ const RegisterForm = (props) => {
 					<>
 						<h1>👋 Hi! Nice to meet you</h1>
 						<p>
-							Tell us some basic information to get started
-							creating your account.
+							Tell us some basic information to get started creating your
+							account.
 						</p>
 					</>
 				)}
@@ -116,8 +118,7 @@ const RegisterForm = (props) => {
 				{!finishSuccess && !finishing && step > 0 && (
 					<>
 						<h1>
-							{currentStepData?.icon &&
-								createIconRender(currentStepData.icon)}
+							{currentStepData?.icon && createIconRender(currentStepData.icon)}
 
 							{currentStepData?.title}
 						</h1>
@@ -150,10 +151,7 @@ const RegisterForm = (props) => {
 				<div className="register_form_success">
 					<Icons.CheckCircleOutlined />
 					<h1>Welcome abord!</h1>
-					<p>
-						One last step, we need you to login with your new
-						account.
-					</p>
+					<p>One last step, we need you to login with your new account.</p>
 
 					<antd.Button
 						type="primary"
@@ -165,22 +163,21 @@ const RegisterForm = (props) => {
 			)}
 
 			{finishError && (
-				<antd.Alert type="error" message={finishError.message} />
+				<antd.Alert
+					type="error"
+					message={finishError.message}
+				/>
 			)}
 
 			{!finishSuccess && !finishing && (
 				<div className="register_form_actions">
 					{step === 0 && (
-						<antd.Button
-							onClick={() => props.setActiveKey("selector")}
-						>
+						<antd.Button onClick={() => props.setActiveKey("selector")}>
 							Cancel
 						</antd.Button>
 					)}
 					{step > 0 && (
-						<antd.Button onClick={() => prevStep()}>
-							Back
-						</antd.Button>
+						<antd.Button onClick={() => prevStep()}>Back</antd.Button>
 					)}
 
 					<antd.Button

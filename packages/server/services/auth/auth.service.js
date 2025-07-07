@@ -35,7 +35,6 @@ export default class API extends Server {
 
 	onExit() {
 		this.queuesManager.cleanUp()
-		console.log("Jijija")
 	}
 }
 
