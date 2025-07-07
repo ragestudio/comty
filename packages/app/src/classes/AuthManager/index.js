@@ -1,6 +1,7 @@
 import AuthModel from "@models/auth"
 import SessionModel from "@models/session"
 import UserModel from "@models/user"
+import localforage from "localforage"
 
 import { Login } from "@components"
 
@@ -10,6 +11,7 @@ export default class AuthManager {
 		this.params = params
 		this.behaviors = params.behaviors ?? {}
 
+		this.public.initialize = this.initialize
 		this.runtime.registerPublicField("auth", this.public)
 
 		for (const [event, handler] of Object.entries(this.events)) {
@@ -21,7 +23,66 @@ export default class AuthManager {
 		user: null,
 	}
 
+	store = localforage.createInstance({
+		driver: localforage.INDEXEDDB,
+		name: "tokens",
+	})
+
+	listAvailableTokens = async () => {
+		const keys = await this.store.keys()
+		console.log("Tokens guardados en localforage:", keys)
+
+		const sessions = await Promise.all(
+			keys.map(async (key) => {
+				const session = await this.store.getItem(key)
+				console.log("Sesión leída:", key, session)
+				return {
+					userId: key,
+					name: session?.name || `Usuario ${key}`,
+					avatar: session?.avatarUrl || null,
+				}
+			})
+		)
+		return sessions
+	}
+	listAvailableTokens = async () => {
+		const keys = await this.store.keys()
+		console.log("Tokens guardados en localforage:", keys)
+
+		const sessions = await Promise.all(
+			keys.map(async (key) => {
+				const session = await this.store.getItem(key)
+				console.log("Sesión leída:", key, session)
+				return {
+					userId: key,
+					name: session?.name || `Usuario ${key}`,
+					avatar: session?.avatarUrl || null,
+				}
+			})
+		)
+		return sessions
+	}
+
+	loadTokenFromUserId = async (user_id) => {
+		const session = await this.store.getItem(user_id)
+
+		if (!session) {
+			throw new Error("No session user found for the given user ID.")
+		}
+
+		SessionModel.token = session.token
+		SessionModel.refreshToken = session.refreshToken
+
+		await this.initialize()
+
+		if (!this.state.user) {
+			throw new Error("No user data found after loading token.")
+		}
+	}
+
 	public = {
+		loadTokenFromUserId: this.loadTokenFromUserId,
+		listAvailableTokens: this.listAvailableTokens,
 		login: () => {
 			app.layout.draggable.open("login", Login, {
 				componentProps: {
@@ -112,5 +173,16 @@ export default class AuthManager {
 		}
 	}
 
-	//onLoginCallback = async (state, result) => {}
+	onLoginCallback = async (state, result) => {
+		console.log("Guardando sesión:", result)
+		await this.store.setItem(result.user_id, {
+			...result,
+			name: result.name || result.username || `Usuario ${result.user_id}`,
+			avatarUrl: result.avatarUrl || result.avatar || null,
+		})
+
+		if (this.runtime && this.runtime.eventBus) {
+			this.runtime.eventBus.emit("auth:tokens_updated")
+		}
+	}
 }

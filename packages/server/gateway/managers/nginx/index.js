@@ -427,6 +427,7 @@ ${locationDirective} {
     ${rewriteConfig}
 
     # Proxy pass to service
+	proxy_ssl_server_name on;
     proxy_pass ${route.target};
 }
 `

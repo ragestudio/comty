@@ -1,22 +1,19 @@
 services:
-    api:
-        build: .
-        restart: unless-stopped
-        networks:
-            - internal_network
+    
+    mongo:
+        image: mongo
+        restart: always
         ports:
-            - "9000:9000"
-        env_file:
-            - ./.env
+         - 27017:27017
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: example
 
     redis:
         image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
         restart: unless-stopped
+        ports:
+         - 6379:6379
         ulimits:
             memlock: -1
-        networks:
-            - internal_network
         command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
-
-networks:
-    internal_network:

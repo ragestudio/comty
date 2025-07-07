@@ -74,7 +74,9 @@ export default class Sidebar extends React.Component {
 	state = {
 		visible: false,
 		expanded: false,
-
+		showAccountSwitcher: false,
+		switcherUsers: [],
+		hoveredUserId: null,
 		topItems: GenerateMenuItems(TopMenuItems),
 		bottomItems: GenerateMenuItems(BottomMenuItems),
 
@@ -83,67 +85,48 @@ export default class Sidebar extends React.Component {
 	}
 
 	sidebarRef = React.createRef()
-
+	switcherRef = React.createRef()
 	collapseDebounce = null
 
 	interface = (window.app.layout.sidebar = {
 		toggleVisibility: (to) => {
 			if (to === false) {
-				this.interface.toggleExpanded(false, {
-					instant: true,
-				})
+				this.interface.toggleExpanded(false, { instant: true })
 			}
-
 			this.setState({ visible: to ?? !this.state.visible })
 		},
 		toggleExpanded: async (
 			to,
-			{ instant = false, isDropdown = false } = {},
+			{ instant = false, isDropdown = false } = {}
 		) => {
 			to = to ?? !this.state.expanded
-
 			if (this.collapseDebounce) {
 				clearTimeout(this.collapseDebounce)
 				this.collapseDebounce = null
 			}
-
 			if (
 				(to === false) & (this.state.dropdownOpen === true) &&
 				isDropdown === true
 			) {
-				// FIXME: This is a walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
-				// The desing defines when sidebar should be collapsed, dropdown should be closed, but in this case, gonna to keep it open untils dropdown is closed
-				//this.setState({ dropdownOpen: false })
-
 				return false
 			}
-
-			if (to === false) {
-				if (instant === false) {
-					await new Promise((resolve) =>
-						setTimeout(
-							resolve,
-							window.app.cores.settings.get(
-								"sidebar.collapse_delay_time",
-							) ?? 500,
-						),
+			if (to === false && instant === false) {
+				await new Promise((resolve) =>
+					setTimeout(
+						resolve,
+						window.app.cores.settings.get(
+							"sidebar.collapse_delay_time"
+						) ?? 500
 					)
-				}
+				)
 			}
-
 			this.setState({ expanded: to })
-
 			app.eventBus.emit("sidebar.expanded", to)
 		},
 		isVisible: () => this.state.visible,
 		isExpanded: () => this.state.expanded,
 		renderNavigationBar: (component, options) => {
-			this.setState({
-				navigationRender: {
-					component,
-					options,
-				},
-			})
+			this.setState({ navigationRender: { component, options } })
 		},
 		updateMenuItemProps: this.updateBottomItemProps,
 		addMenuItem: this.addMenuItem,
@@ -151,110 +134,108 @@ export default class Sidebar extends React.Component {
 	})
 
 	events = {
-		"router.navigate": (path) => {
-			this.calculateSelectedMenuItem(path)
-		},
+		"router.navigate": (path) => this.calculateSelectedMenuItem(path),
 	}
 
 	componentDidMount = async () => {
 		this.calculateSelectedMenuItem(window.location.pathname)
 
-		for (const [event, handler] of Object.entries(this.events)) {
+		Object.entries(this.events).forEach(([event, handler]) =>
 			app.eventBus.on(event, handler)
-		}
+		)
 
-		setTimeout(() => {
-			this.interface.toggleVisibility(true)
-		}, 10)
+		// Escuchar evento para recargar lista de usuarios cuando se actualicen los tokens
+		app.eventBus.on("auth:tokens_updated", this.loadSwitcherUsers)
+
+		// Carga inicial de usuarios
+		await this.loadSwitcherUsers()
+
+		setTimeout(() => this.interface.toggleVisibility(true), 10)
+
+		document.addEventListener("mousedown", this.handleClickOutside)
 	}
 
 	componentWillUnmount = () => {
-		for (const [event, handler] of Object.entries(this.events)) {
+		Object.entries(this.events).forEach(([event, handler]) =>
 			app.eventBus.off(event, handler)
-		}
+		)
+		app.eventBus.off("auth:tokens_updated", this.loadSwitcherUsers) // Quitar listener
 
 		delete app.layout.sidebar
+		document.removeEventListener("mousedown", this.handleClickOutside)
+	}
+
+	// Método separado para recargar la lista de usuarios
+	loadSwitcherUsers = async () => {
+		try {
+			const users = await app.auth.listAvailableTokens()
+			this.setState({ switcherUsers: users })
+		} catch (error) {
+			console.error("Error cargando usuarios para switcher:", error)
+		}
+	}
+	handleClickOutside = (event) => {
+		if (!this.state.showAccountSwitcher) return
+
+		if (
+			this.switcherRef.current &&
+			this.switcherRef.current.contains(event.target)
+		)
+			return
+
+		if (
+			this.sidebarRef.current &&
+			this.sidebarRef.current.contains(event.target)
+		)
+			return
+
+		this.setState({ showAccountSwitcher: false, switcherExpanded: false })
 	}
 
 	calculateSelectedMenuItem = (path) => {
 		const items = [...this.state.topItems, ...this.state.bottomItems]
-
 		this.setState({
 			selectedMenuItem: items.find((item) =>
-				String(item.path).includes(path),
+				String(item.path).includes(path)
 			),
 		})
 	}
 
 	addMenuItem = (group, item) => {
-		group = this.getMenuItemGroupStateKey(group)
-
-		if (!group) {
-			throw new Error("Invalid group")
-		}
-
-		const newItems = [...this.state[group], item]
-
-		this.setState({
-			[group]: newItems,
-		})
-
+		const key = this.getMenuItemGroupStateKey(group)
+		if (!key) throw new Error("Invalid group")
+		const newItems = [...this.state[key], item]
+		this.setState({ [key]: newItems })
 		return newItems
 	}
 
 	removeMenuItem = (group, id) => {
-		group = this.getMenuItemGroupStateKey(group)
-
-		if (!group) {
-			throw new Error("Invalid group")
-		}
-
-		const newItems = this.state[group].filter((item) => item.id !== id)
-
-		this.setState({
-			[group]: newItems,
-		})
-
+		const key = this.getMenuItemGroupStateKey(group)
+		if (!key) throw new Error("Invalid group")
+		const newItems = this.state[key].filter((item) => item.id !== id)
+		this.setState({ [key]: newItems })
 		return newItems
 	}
 
 	updateBottomItemProps = (group, id, newProps) => {
-		group = this.getMenuItemGroupStateKey(group)
-
-		if (!group) {
-			throw new Error("Invalid group")
-		}
-
-		let updatedValue = this.state[group]
-
-		updatedValue = updatedValue.map((item) => {
+		const key = this.getMenuItemGroupStateKey(group)
+		if (!key) throw new Error("Invalid group")
+		const updatedValue = this.state[key].map((item) => {
 			if (item.id === id) {
-				item.props = {
-					...item.props,
-					...newProps,
-				}
+				item.props = { ...item.props, ...newProps }
 			}
+			return item
 		})
-
-		this.setState({
-			[group]: updatedValue,
-		})
-
+		this.setState({ [key]: updatedValue })
 		return updatedValue
 	}
 
 	getMenuItemGroupStateKey = (group) => {
-		switch (group) {
-			case "top": {
-				return "topItems"
-			}
-			case "bottom": {
-				return "bottomItems"
-			}
-			default: {
-				return null
-			}
-		}
+		return group === "top"
+			? "topItems"
+			: group === "bottom"
+			? "bottomItems"
+			: null
 	}
 
 	injectUserItems(items = []) {
@@ -284,71 +265,53 @@ export default class Sidebar extends React.Component {
 				icon: <Icons.FiLogIn />,
 			})
 		}
-
 		return items
 	}
 
 	handleClick = (e) => {
-		if (e.item.props.ignore_click === "true") {
-			return
-		}
-
-		if (e.item.props.override_event) {
+		if (e.item.props.ignore_click === "true") return
+		if (e.item.props.override_event)
 			return app.eventBus.emit(
 				e.item.props.override_event,
-				e.item.props.override_event_props,
+				e.item.props.override_event_props
 			)
-		}
-
-		if (typeof e.key === "undefined") {
-			app.eventBus.emit("invalidSidebarKey", e)
-			return false
-		}
-
-		if (typeof ItemsClickHandlers[e.key] === "function") {
+		if (typeof e.key === "undefined")
+			return app.eventBus.emit("invalidSidebarKey", e)
+		if (typeof ItemsClickHandlers[e.key] === "function")
 			return ItemsClickHandlers[e.key](e)
-		}
 
 		app.cores.sfx.play("sidebar.switch_tab")
-
-		let item = [...this.state.topItems, ...this.state.bottomItems].find(
-			(item) => item.id === e.key,
+		const item = [...this.state.topItems, ...this.state.bottomItems].find(
+			(item) => item.id === e.key
 		)
-
-		return app.location.push(`/${item.path ?? e.key}`, 150)
+		return app.location.push(`/${item?.path ?? e.key}`, 150)
 	}
 
 	onMouseEnter = () => {
-		if (!this.state.visible || app.layout.drawer.isMaskVisible()) {
+		if (!this.state.visible || app.layout.drawer.isMaskVisible())
 			return false
-		}
-
 		return this.interface.toggleExpanded(true)
 	}
 
 	handleMouseLeave = () => {
-		if (!this.state.visible) {
-			return false
-		}
-
+		if (!this.state.visible) return false
 		return this.interface.toggleExpanded(false)
 	}
 
 	onDropdownOpenChange = (to) => {
-		// this is another walkaround for a bug in antd, causing when dropdown set to close, item click event is not fired
 		if (!to && this.state.expanded) {
 			this.interface.toggleExpanded(false, true)
 		}
-
 		this.setState({ dropdownOpen: to })
 	}
 
 	onClickDropdownItem = (item) => {
-		const handler = ItemsClickHandlers[item.key]
-
-		if (typeof handler === "function") {
-			handler()
+		if (item.key === "switch_account") {
+			this.setState({ showAccountSwitcher: true })
+			return
 		}
+		const handler = ItemsClickHandlers[item.key]
+		if (typeof handler === "function") handler()
 	}
 
 	render() {
@@ -368,67 +331,185 @@ export default class Sidebar extends React.Component {
 
 				<AnimatePresence mode="popLayout">
 					{this.state.visible && (
-						<motion.div
-							className={classnames("app_sidebar", {
-								["expanded"]: this.state.expanded,
-							})}
-							ref={this.sidebarRef}
-							initial={{
-								x: -500,
-							}}
-							animate={{
-								x: 0,
-							}}
-							exit={{
-								x: -500,
-							}}
-							transition={{
-								type: "spring",
-								stiffness: 100,
-								damping: 20,
-							}}
-						>
-							<div className="app_sidebar_header">
-								<div className="app_sidebar_header_logo">
-									<img
-										src={config.logo?.alt}
-										onClick={() => app.navigation.goMain()}
-									/>
-
-									<Tag>αlpha</Tag>
+						<>
+							{/* Sidebar Principal */}
+							<motion.div
+								className={classnames("app_sidebar", {
+									expanded: this.state.expanded,
+								})}
+								ref={this.sidebarRef}
+								initial={{ x: -500 }}
+								animate={{ x: 0 }}
+								exit={{ x: -500 }}
+								transition={{
+									type: "spring",
+									stiffness: 100,
+									damping: 20,
+								}}
+							>
+								<div className="app_sidebar_header">
+									<div className="app_sidebar_header_logo">
+										<img
+											src={config.logo?.alt}
+											onClick={() =>
+												app.navigation.goMain()
+											}
+										/>
+										<Tag>αlpha</Tag>
+									</div>
 								</div>
-							</div>
 
-							<div
-								key="menu"
-								className="app_sidebar_menu_wrapper"
-							>
-								<Menu
-									mode="inline"
-									onClick={this.handleClick}
-									selectedKeys={[selectedKeyId]}
-									items={this.state.topItems}
-								/>
-							</div>
+								<div
+									key="menu"
+									className="app_sidebar_menu_wrapper"
+								>
+									<Menu
+										mode="inline"
+										onClick={this.handleClick}
+										selectedKeys={[selectedKeyId]}
+										items={this.state.topItems}
+									/>
+								</div>
 
-							<div
-								key="bottom"
-								className={classnames(
-									"app_sidebar_menu_wrapper",
-									"bottom",
-								)}
-							>
-								<Menu
-									mode="inline"
-									onClick={this.handleClick}
-									items={[
-										...this.state.bottomItems,
-										...this.injectUserItems(),
-									]}
-									selectedKeys={[selectedKeyId]}
-								/>
-							</div>
-						</motion.div>
+								<div
+									key="bottom"
+									className="app_sidebar_menu_wrapper bottom"
+								>
+									<Menu
+										mode="inline"
+										onClick={this.handleClick}
+										items={[
+											...this.state.bottomItems,
+											...this.injectUserItems(),
+										]}
+										selectedKeys={[selectedKeyId]}
+									/>
+								</div>
+							</motion.div>
+
+							{/* Sidebar de cambio de cuenta */}
+							{this.state.showAccountSwitcher && (
+								<motion.div
+									className={classnames(
+										"app_sidebar_switcher",
+										{
+											expanded:
+												this.state.switcherExpanded,
+										}
+									)}
+									ref={this.switcherRef}
+									initial={{ x: -200, opacity: 0 }}
+									animate={{ x: 0, opacity: 1 }}
+									exit={{ x: 100, opacity: 0 }}
+									transition={{
+										type: "spring",
+										stiffness: 120,
+										damping: 20,
+									}}
+									onMouseEnter={() =>
+										this.setState({
+											switcherExpanded: true,
+										})
+									}
+									onMouseLeave={() =>
+										this.setState({
+											switcherExpanded: false,
+										})
+									}
+								>
+									<div className="switcher_header">
+										{this.state.switcherExpanded ? (
+											<>
+												<span>Switch Account</span>
+											</>
+										) : (
+											<Icons.MdSwitchAccount size={24} />
+										)}
+									</div>
+
+									<Menu
+										mode="inline"
+										selectable={false}
+										items={[
+											...this.state.switcherUsers.map(
+												(user) => ({
+													key: user.userId,
+													label:
+														user.name ||
+														`Usuario ${app.userData?.name}`,
+													icon: (
+														<Avatar
+															src={
+																app.userData?.avatar ||
+																undefined
+															}
+															alt={user.name}
+														>
+															{!user.avatar &&
+															user.name
+																? user.name
+																		.charAt(
+																			0
+																		)
+																		.toUpperCase()
+																: null}
+														</Avatar>
+													),
+												})
+											),
+											{
+												type: "divider",
+											},
+											{
+												key: "add_account",
+												label: "Add Account",
+												icon: <Icons.FiPlus />,
+											},
+										]}
+										onClick={async ({ key }) => {
+											if (key === "add_account") {
+												try {
+													await app.auth.login()
+												} catch (error) {
+													console.error(
+														"Error to add account:",
+														error
+													)
+													alert(
+														"No es posible añadir cuenta. Por favor, inténtalo más tarde."
+													)
+												}
+												return
+											}
+
+											try {
+												await app.auth.loadTokenFromUserId(
+													key
+												)
+												await app.auth.initialize()
+
+												this.setState({
+													showAccountSwitcher: false,
+													switcherExpanded: false,
+												})
+
+												app.eventBus.emit(
+													"auth:login_success"
+												)
+											} catch (err) {
+												console.error(
+													"Error al cambiar de cuenta:",
+													err
+												)
+												alert(
+													"No es posible cambiar de cuenta. Por favor, inténtalo más tarde."
+												)
+											}
+										}}
+									/>
+								</motion.div>
+							)}
+						</>
 					)}
 				</AnimatePresence>
 
