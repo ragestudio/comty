@@ -216,8 +216,47 @@ export default class AudioBase {
 		return manifest.source
 	}
 
+	handleDemuxerError = async (event) => {
+		if (!event || !event.error) {
+			return null
+		}
+
+		if (
+			event.error.message &&
+			event.error.message.includes("QuotaExceededError")
+		) {
+			this.console.warn(
+				"QuotaExceededError detected, attempting buffer cleanup and recovery",
+			)
+
+			const currentTime = this.audio.currentTime
+
+			// try to clear buffers and recover
+			if (this.demuxer) {
+				// reset and reinitialize the demuxer
+				this.demuxer.reset()
+
+				// reattach the source
+				const manifest = this.player.queue.currentItem
+
+				if (manifest && manifest.dash_manifest) {
+					await this.demuxer.attachSource(manifest.dash_manifest, currentTime)
+
+					// resume playback from current position
+					this.audio.currentTime = currentTime
+
+					if (this.player.state.playback_status === "playing") {
+						await this.demuxer.play()
+					}
+
+					this.console.log("Successfully recovered from QuotaExceededError")
+				}
+			}
+		}
+	}
+
 	async createDemuxer() {
-		// Destroy previous instance if exists
+		// destroy previous instance if exists
 		if (this.demuxer) {
 			try {
 				this.demuxer.reset()
@@ -238,57 +277,73 @@ export default class AudioBase {
 
 		this.demuxer.updateSettings({
 			streaming: {
-				//cacheInitSegments: true,
+				//cacheInitSegments: true
 				buffer: {
-					bufferTimeAtTopQuality: 30,
-					bufferTimeAtTopQualityLongForm: 60,
-					bufferTimeDefault: 20,
-					initialBufferLevel: 5,
-					bufferToKeep: 10,
+					fastSwitchEnabled: true,
+					flushBufferAtTrackSwitch: true,
+					resetSourceBuffersForTrackSwitch: true,
+					bufferToKeep: 2,
+					bufferTimeDefault: 15,
+					bufferTimeAtTopQuality: 20,
+					bufferTimeAtTopQualityLongForm: 25,
 					longFormContentDurationThreshold: 300,
-					stallThreshold: 0.5,
-					bufferPruningInterval: 30,
-				},
-				abr: {
-					initialBitrate: {
-						audio: 128,
-					},
-					rules: {
-						insufficientBufferRule: {
-							active: true,
-							parameters: {
-								bufferLevel: 0.3,
-							},
-						},
-						switchHistoryRule: {
-							active: true,
-							parameters: {
-								sampleSize: 8,
-							},
-						},
-					},
-					throughput: {
-						averageCalculationMode: "slidingWindow",
-						slidingWindowSize: 20,
-						ewmaHalfLife: 4,
-					},
-				},
-				retrySettings: {
-					maxRetries: 5,
-					retryDelayMs: 1000,
-					retryBackoffFactor: 2,
-				},
-				requests: {
-					requestTimeout: 30000,
-					xhrWithCredentials: false,
+					stallThreshold: 1,
+					bufferPruningInterval: 3,
 				},
 			},
 		})
 
-		// Event listeners
+		// event listeners
 		this.demuxer.on(dashjs.MediaPlayer.events.ERROR, (event) => {
 			console.error("Demuxer error", event)
+			this.handleDemuxerError(event)
 		})
+	}
+
+	preventiveBufferCleanup = async () => {
+		if (!this.demuxer) {
+			return null
+		}
+
+		try {
+			const currentTime = this.audio.currentTime
+			const duration = this.audio.duration
+			const bufferCleanupThreshold = 30
+			const buffered = this.audio.buffered
+
+			// clean buffers that are more than 30 seconds behind current position
+			if (currentTime && duration && duration !== Infinity) {
+				if (currentTime > bufferCleanupThreshold) {
+					//  clean old ones
+					for (let i = 0; i < buffered.length; i++) {
+						const start = buffered.start(i)
+						const end = buffered.end(i)
+
+						// if this buffer range is too far behind, its a candidate for cleanup
+						if (end < currentTime - bufferCleanupThreshold) {
+							try {
+								// force demuxer to prune old buffers
+								this.demuxer.updateSettings({
+									streaming: {
+										buffer: {
+											...this.demuxer.getSettings().streaming.buffer,
+											bufferToKeep: 2,
+											bufferPruningInterval: 1,
+										},
+									},
+								})
+
+								this.console.log(`Cleaned buffer range: ${start}-${end}`)
+							} catch (cleanupError) {
+								this.console.warn("Buffer cleanup failed:", cleanupError)
+							}
+						}
+					}
+				}
+			}
+		} catch (error) {
+			this.console.warn("Preventive buffer cleanup failed:", error)
+		}
 	}
 
 	timeTick = async () => {
@@ -314,11 +369,22 @@ export default class AudioBase {
 				)
 			}
 		}
+
+		// run preventive buffer cleanup every 10 seconds
+		if (Math.floor(this.audio.currentTime) % 10 === 0) {
+			await this.preventiveBufferCleanup()
+		}
 	}
 
 	async flush() {
 		this.audio.pause()
 		this.audio.currentTime = 0
+
+		// clear intervals
+		if (typeof this._timeTickInterval !== "undefined") {
+			clearInterval(this._timeTickInterval)
+		}
+
 		await this.createDemuxer()
 	}
 
