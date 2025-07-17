@@ -22,6 +22,7 @@ const initialState = {
 	// Video state
 	videoSource: null,
 	videoSyncTime: null,
+	videoLoop: false,
 
 	// UI state
 	loading: false,
@@ -147,6 +148,10 @@ function lyricsReducer(state, action) {
 				...state,
 				videoSyncTime: action.payload,
 			}
+		}
+
+		case "SET_VIDEO_LOOP": {
+			return { ...state, videoLoop: action.payload }
 		}
 
 		case "SET_LOADING": {
