@@ -1,52 +1,52 @@
 {
-  "name": "@comty/server",
-  "version": "1.44.0@alpha",
-  "license": "ComtyLicense",
-  "private": true,
-  "workspaces": [
-    "services/*"
-  ],
-  "scripts": {
-    "start:prod": "cross-env NODE_ENV=production hermes-node ./start.js",
-    "dev": "cross-env NODE_ENV=development hermes-node ./start.js",
-    "setup": "./boot scripts/setup/index.js"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "^1.13.2",
-    "@grpc/proto-loader": "^0.7.13",
-    "@infisical/sdk": "^2.1.8",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.56.1",
-    "@ragestudio/hermes": "^1.0.0",
-    "@sentry/node": "^9.4.0",
-    "axios": "^1.7.4",
-    "bcrypt": "^5.1.1",
-    "bullmq": "^5.41.5",
-    "chalk": "^5.4.1",
-    "chokidar": "^4.0.3",
-    "cross-env": "^7.0.3",
-    "http-proxy": "^1.18.1",
-    "jsonwebtoken": "^9.0.2",
-    "linebridge": "^0.25.2",
-    "minimatch": "^10.0.1",
-    "minio": "^8.0.1",
-    "module-alias": "^2.2.3",
-    "mongoose": "^8.5.3",
-    "pino": "^9.6.0",
-    "pino-opentelemetry-transport": "^1.0.1",
-    "pino-pretty": "^13.0.0",
-    "signal-exit": "^4.1.0",
-    "spinnies": "^0.5.1",
-    "tree-kill": "^1.2.2"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.26.0",
-    "chai": "^5.1.0",
-    "eslint": "^9.26.0",
-    "globals": "^16.1.0",
-    "mocha": "^10.3.0"
-  },
-  "resolutions": {
-    "string-width": "4.2.3"
-  }
+	"name": "@comty/server",
+	"version": "1.44.3@alpha",
+	"license": "ComtyLicense",
+	"private": true,
+	"workspaces": [
+		"services/*"
+	],
+	"scripts": {
+		"start:prod": "cross-env NODE_ENV=production hermes-node ./start.js",
+		"dev": "cross-env NODE_ENV=development hermes-node ./start.js",
+		"setup": "./boot scripts/setup/index.js"
+	},
+	"dependencies": {
+		"@grpc/grpc-js": "^1.13.2",
+		"@grpc/proto-loader": "^0.7.13",
+		"@infisical/sdk": "^2.1.8",
+		"@opentelemetry/api": "^1.9.0",
+		"@opentelemetry/auto-instrumentations-node": "^0.56.1",
+		"@ragestudio/hermes": "^1.0.0",
+		"@sentry/node": "^9.4.0",
+		"axios": "^1.7.4",
+		"bcrypt": "^5.1.1",
+		"bullmq": "^5.41.5",
+		"chalk": "^5.4.1",
+		"chokidar": "^4.0.3",
+		"cross-env": "^7.0.3",
+		"http-proxy": "^1.18.1",
+		"jsonwebtoken": "^9.0.2",
+		"linebridge": "^0.25.2",
+		"minimatch": "^10.0.1",
+		"minio": "^8.0.1",
+		"module-alias": "^2.2.3",
+		"mongoose": "^8.5.3",
+		"pino": "^9.6.0",
+		"pino-opentelemetry-transport": "^1.0.1",
+		"pino-pretty": "^13.0.0",
+		"signal-exit": "^4.1.0",
+		"spinnies": "^0.5.1",
+		"tree-kill": "^1.2.2"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.26.0",
+		"chai": "^5.1.0",
+		"eslint": "^9.26.0",
+		"globals": "^16.1.0",
+		"mocha": "^10.3.0"
+	},
+	"resolutions": {
+		"string-width": "4.2.3"
+	}
 }
