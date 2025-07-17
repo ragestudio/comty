@@ -4,7 +4,7 @@ export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const { track_id } = req.params
-		const { video_source, lrc, video_starts_at } = req.body
+		const { lrc, video_source, video_loop, video_starts_at } = req.body
 
 		// check if track exists
 		let track = await Track.findById(track_id).catch(() => null)
@@ -28,6 +28,7 @@ export default {
 				track_id: track_id,
 				video_source: video_source,
 				video_starts_at: video_starts_at,
+				video_loop: video_loop,
 				lrc: lrc,
 			})
 
@@ -35,16 +36,20 @@ export default {
 		} else {
 			const update = Object()
 
-			if (typeof video_source !== "undefined") {
-				update.video_source = video_source
-			}
-
 			if (typeof lrc !== "undefined") {
 				update.lrc = lrc
 			}
 
+			if (typeof video_source !== "undefined") {
+				update.video_source = video_source
+			}
+
 			if (typeof video_starts_at !== "undefined") {
 				update.video_starts_at = video_starts_at
+			}
+
+			if (typeof video_loop !== "undefined") {
+				update.video_loop = video_loop
 			}
 
 			trackLyric = await TrackLyric.findOneAndUpdate(

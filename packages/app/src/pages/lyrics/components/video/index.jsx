@@ -59,6 +59,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 				!videoRef.current ||
 				!lyrics ||
 				!lyrics.video_source ||
+				lyrics.video_loop ||
 				typeof lyrics.video_starts_at_ms === "undefined"
 			) {
 				stopSyncInterval()
@@ -74,9 +75,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 			const currentVideoTime =
 				videoRef.current.currentTime - lyrics.video_starts_at_ms / 1000
 			const maxOffset = maxLatencyInMs / 1000
-			const currentVideoTimeDiff = Math.abs(
-				currentVideoTime - currentTrackTime,
-			)
+			const currentVideoTimeDiff = Math.abs(currentVideoTime - currentTrackTime)
 
 			setCurrentVideoLatency(currentVideoTimeDiff)
 
@@ -132,22 +131,21 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 						hls.current.attachMedia(videoElement)
 					}
 					hls.current.loadSource(lyrics.video_source)
-				} else if (
-					videoElement.canPlayType("application/vnd.apple.mpegurl")
-				) {
+				} else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
 					videoElement.src = lyrics.video_source
 				}
 			}
 
 			if (typeof lyrics.video_starts_at_ms !== "undefined") {
-				videoElement.loop = false
+				videoElement.loop = lyrics.video_loop ?? false
 				syncPlayback(true)
 			} else {
-				videoElement.loop = true
+				videoElement.loop = lyrics.video_loop ?? true
 				videoElement.currentTime = 0
 			}
 		} else {
 			videoElement.src = ""
+
 			if (hls.current) {
 				hls.current.stopLoad()
 				if (hls.current.media) {
@@ -186,9 +184,7 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		if (playerState.playback_status === "playing") {
 			videoElement
 				.play()
-				.catch((error) =>
-					console.error("VIDEO:: Error playing video:", error),
-				)
+				.catch((error) => console.error("VIDEO:: Error playing video:", error))
 			if (shouldSync) {
 				startSyncInterval()
 			}

@@ -48,9 +48,7 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 
 			for await (const [lang, lrc] of Object.entries(lyrics.lrc)) {
 				if (typeof lrc === "string" && lrc.startsWith("https://")) {
-					lyrics.lrc[lang] = await fetch(lrc).then((res) =>
-						res.text(),
-					)
+					lyrics.lrc[lang] = await fetch(lrc).then((res) => res.text())
 
 					lyrics.lrc[lang] = parseLRC(lyrics.lrc[lang])
 				}
@@ -67,6 +65,10 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 					type: "SET_VIDEO_SYNC",
 					payload: lyrics.video_starts_at ?? lyrics.sync_audio_at,
 				})
+				dispatch({
+					type: "SET_VIDEO_LOOP",
+					payload: lyrics.video_loop ?? false,
+				})
 			}
 		} catch (error) {
 			console.error("Failed to load track:", error)
@@ -82,6 +84,7 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 			const saveData = {
 				video_source: state.videoSource || null,
 				video_starts_at: state.videoSyncTime || null,
+				video_loop: state.videoLoop,
 				lrc: state.lyrics,
 			}
 
@@ -168,7 +171,11 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 
 	return (
 		<div className="avlyrics-editor">
-			<Flex horizontal align="center" justify="space-between">
+			<Flex
+				horizontal
+				align="center"
+				justify="space-between"
+			>
 				<h1>{state.track.title}</h1>
 
 				<Button
@@ -192,7 +199,10 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 				style={{ marginBottom: "20px" }}
 			/>
 
-			<InlinePlayer ref={playerRef} src={state.track.source} />
+			<InlinePlayer
+				ref={playerRef}
+				src={state.track.source}
+			/>
 
 			{activeTab === "lyrics" && <LyricsEditor player={playerRef} />}
 			{activeTab === "video" && <VideoEditor />}

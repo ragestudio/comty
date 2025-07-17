@@ -16,5 +16,9 @@ export default {
 		video_starts_at: {
 			type: String,
 		},
+		video_loop: {
+			type: Boolean,
+			default: false,
+		},
 	},
 }

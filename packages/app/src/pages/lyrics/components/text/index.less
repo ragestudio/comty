@@ -1,0 +1,62 @@
+.lyrics-text-wrapper {
+	z-index: 200;
+	position: fixed;
+
+	bottom: 0;
+	left: 0;
+
+	padding: 60px;
+
+	.lyrics-text {
+		display: flex;
+		flex-direction: column;
+
+		width: 600px;
+		height: 200px;
+
+		padding: 20px;
+		gap: 30px;
+
+		overflow: hidden;
+
+		background-color: rgba(var(--background-color-accent-values), 0.6);
+		border-radius: 12px;
+
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+
+		.line {
+			font-size: 2rem;
+
+			opacity: 0.1;
+
+			margin: 0;
+
+			&.current {
+				opacity: 1;
+			}
+		}
+	}
+
+	&.static {
+		position: relative;
+		padding: 0;
+
+		.lyrics-text {
+			width: 100%;
+
+			padding: 0;
+			background-color: unset;
+			border-radius: unset;
+
+			.line {
+				font-size: 1.6rem;
+				opacity: 0.4;
+
+				&.current {
+					opacity: 1;
+				}
+			}
+		}
+	}
+}

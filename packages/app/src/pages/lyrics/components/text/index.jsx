@@ -4,12 +4,15 @@ import { motion, AnimatePresence } from "motion/react"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 
+import "./index.less"
+
 // eslint-disable-next-line
-const LyricsText = React.forwardRef((props, textRef) => {
+const LyricsText = React.forwardRef((props, forwardedRef) => {
 	const [playerState] = usePlayerStateContext()
 
 	const { lyrics } = props
 
+	const textRef = forwardedRef ?? React.useRef(null)
 	const currentTrackId = React.useRef(null)
 	const [syncInterval, setSyncInterval] = React.useState(null)
 	const [currentLineIndex, setCurrentLineIndex] = React.useState(0)
@@ -131,13 +134,17 @@ const LyricsText = React.forwardRef((props, textRef) => {
 	}
 
 	return (
-		<div className="lyrics-text-wrapper">
+		<div
+			className={classnames("lyrics-text-wrapper", {
+				["static"]: props.static,
+			})}
+		>
 			<AnimatePresence>
 				<motion.div
 					ref={textRef}
 					className="lyrics-text"
 					animate={{
-						opacity: visible ? 1 : 0,
+						opacity: props.static ? 1 : visible ? 1 : 0,
 					}}
 					initial={{
 						opacity: 0,

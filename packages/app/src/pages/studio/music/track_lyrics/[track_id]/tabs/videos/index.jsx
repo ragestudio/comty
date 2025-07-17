@@ -35,8 +35,10 @@ const VideoEditor = () => {
 	const handleVideoUpload = useCallback(
 		(response) => {
 			const url = response.url
+
 			dispatch({ type: "SET_VIDEO_SOURCE", payload: url })
 			setInputUrl(url)
+
 			message.success("Video uploaded successfully")
 		},
 		[dispatch],
@@ -65,6 +67,8 @@ const VideoEditor = () => {
 	const handleLoopingChange = useCallback((checked) => {
 		// Note: looping is not in simplified context, could be local state if needed
 		console.log("Looping changed:", checked)
+
+		dispatch({ type: "SET_VIDEO_LOOP", payload: checked })
 	}, [])
 
 	const videoControls = [
@@ -81,23 +85,7 @@ const VideoEditor = () => {
 		: null
 
 	return (
-		<Card
-			className="video-editor"
-			title={
-				<Title
-					level={3}
-					style={{
-						margin: 0,
-						display: "flex",
-						alignItems: "center",
-						gap: 8,
-					}}
-				>
-					<VideoCameraOutlined />
-					Video Editor
-				</Title>
-			}
-		>
+		<div className="video-editor">
 			{state.videoSource ? (
 				<div className="video-preview">
 					<VideoPlayer
@@ -108,47 +96,52 @@ const VideoEditor = () => {
 			) : (
 				<Empty
 					image={
-						<VideoCameraOutlined
-							style={{ fontSize: 64, color: "#d9d9d9" }}
-						/>
+						<VideoCameraOutlined style={{ fontSize: 64, color: "#d9d9d9" }} />
 					}
 					description="No video loaded"
 				/>
 			)}
 
-			<Space direction="vertical" style={{ width: "100%" }} size="large">
+			<Space
+				direction="vertical"
+				style={{ width: "100%" }}
+				size="large"
+			>
 				<div className="sync-controls">
-					<Space align="center" wrap>
-						<ClockCircleOutlined />
-						<Text strong>Video sync time:</Text>
-						<Text code>{state.videoSyncTime || "not set"}</Text>
+					<Space>
+						<Text>Set video mode:</Text>
+						<Switch
+							checked={state.videoLoop}
+							onChange={handleLoopingChange}
+							checkedChildren="Loop"
+							unCheckedChildren="Synced"
+						/>
 					</Space>
 
-					<Space align="center" wrap>
-						<Text>Set sync point:</Text>
+					<Space
+						align="center"
+						wrap
+					>
+						<Text>Video sync:</Text>
 						<TimePicker
 							showNow={false}
 							value={syncTime}
 							format="mm:ss:SSS"
 							onChange={handleSyncTimeChange}
 							placeholder="mm:ss:SSS"
-						/>
-						<Switch
-							checked={false}
-							onChange={handleLoopingChange}
-							checkedChildren="Loop"
-							unCheckedChildren="Once"
+							disabled={state.videoLoop}
 						/>
 					</Space>
 				</div>
 
 				<div className="upload-controls">
-					<Space direction="vertical" style={{ width: "100%" }}>
+					<Space
+						direction="vertical"
+						style={{ width: "100%" }}
+					>
 						<Space wrap>
 							<UploadButton
-								onSuccess={(_, data) =>
-									handleVideoUpload(data.url)
-								}
+								onSuccess={(_, data) => handleVideoUpload(data)}
 								accept={["video/*"]}
 								headers={{ transformations: "mq-hls" }}
 								disabled={state.saving}
@@ -171,9 +164,7 @@ const VideoEditor = () => {
 								type="primary"
 								onClick={handleUrlSet}
 								disabled={
-									!inputUrl ||
-									inputUrl === state.videoSource ||
-									state.saving
+									!inputUrl || inputUrl === state.videoSource || state.saving
 								}
 							>
 								Set URL
@@ -182,7 +173,7 @@ const VideoEditor = () => {
 					</Space>
 				</div>
 			</Space>
-		</Card>
+		</div>
 	)
 }
 
