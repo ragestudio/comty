@@ -34,7 +34,7 @@
 		"axios": "^1.7.7",
 		"bear-react-carousel": "^4.0.10-alpha.0",
 		"classnames": "2.3.1",
-		"comty.js": "^0.68.1",
+		"comty.js": "^0.69.0",
 		"d3": "^7.9.0",
 		"dashjs": "^5.0.3",
 		"dompurify": "^3.0.0",
