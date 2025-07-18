@@ -19,9 +19,8 @@
 
 		align-items: center;
 
-		width: fit-content;
+		width: 100%;
 		max-width: unset;
-		min-width: 100px;
 
 		height: fit-content;
 
@@ -44,17 +43,26 @@
 		.playlist_info {
 			justify-content: center;
 
+			width: 100%;
+			overflow: hidden;
+
 			.playlist_info_title {
 				display: flex;
 				flex-direction: row;
-
 				align-items: center;
+
+				width: 100%;
 
 				gap: 7px;
 
+				text-overflow: ellipsis;
+
 				h1 {
-					word-break: break-all;
-					white-space: wrap;
+					display: inline-block;
+
+					width: 100%;
+					white-space: nowrap;
+					overflow: hidden;
 				}
 			}
 		}
