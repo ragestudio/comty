@@ -26,7 +26,7 @@
 		"@ffmpeg/util": "^0.12.1",
 		"@mui/material": "^5.11.9",
 		"@ragestudio/cordova-nfc": "^1.2.0",
-		"@ragestudio/vessel": "^0.23.1",
+		"@ragestudio/vessel": "^0.23.2",
 		"@sentry/browser": "^7.64.0",
 		"@tauri-apps/api": "^1.5.4",
 		"@tsmx/human-readable": "^1.0.7",
