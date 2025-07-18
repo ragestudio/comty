@@ -65,7 +65,7 @@ class Login extends React.Component {
 		this.toggleLoading(true)
 
 		await AuthModel.login(payload, this.onDone).catch((error) => {
-			if (error.response.data) {
+			if (error.response && error.response.data) {
 				if (error.response.data.violation) {
 					return this.setState({
 						forbidden: error.response.data.violation,
@@ -85,7 +85,7 @@ class Login extends React.Component {
 			console.error(error, error.response)
 
 			this.toggleLoading(false)
-			this.onError(error.response.data.error)
+			this.onError(error.response?.data?.error ?? error.message)
 
 			return false
 		})
@@ -287,19 +287,17 @@ class Login extends React.Component {
 					<div className="content">
 						<h1>Access denied</h1>
 						<h3>
-							Your account has been disabled due a violation to
-							our terms of service
+							Your account has been disabled due a violation to our terms of
+							service
 						</h3>
 
 						<p>Here is a detailed description of the violation</p>
 
-						<div className="field-error">
-							{this.state.forbidden.reason}
-						</div>
+						<div className="field-error">{this.state.forbidden.reason}</div>
 
 						<p>
-							If you think this is an error, or you want to apeel
-							this decision please contact our support
+							If you think this is an error, or you want to apeel this decision
+							please contact our support
 						</p>
 					</div>
 				</div>
@@ -312,8 +310,8 @@ class Login extends React.Component {
 					<div className="content">
 						<h1>Activate your Account</h1>
 						<p>
-							We have sent you an email with a code that you need
-							to enter below in order to activate your account.
+							We have sent you an email with a code that you need to enter below
+							in order to activate your account.
 						</p>
 
 						<antd.Input.OTP
@@ -342,10 +340,7 @@ class Login extends React.Component {
 
 						{this.state.activation.error && (
 							<div className="field-error">
-								{
-									this.state.activation.error.response.data
-										.error
-								}
+								{this.state.activation.error.response.data.error}
 							</div>
 						)}
 
@@ -374,18 +369,16 @@ class Login extends React.Component {
 						onFinish={this.handleFinish}
 						ref={this.formRef}
 					>
-						<antd.Form.Item name="username" className="field">
+						<antd.Form.Item
+							name="username"
+							className="field"
+						>
 							<span>
 								<Icons.FiMail /> Username or Email
 							</span>
 							<antd.Input
 								placeholder="myusername / myemail@example.com"
-								onChange={(e) =>
-									this.onUpdateInput(
-										"username",
-										e.target.value,
-									)
-								}
+								onChange={(e) => this.onUpdateInput("username", e.target.value)}
 								onPressEnter={this.nextStep}
 								disabled={this.state.phase !== 0}
 								autoFocus
@@ -403,12 +396,7 @@ class Login extends React.Component {
 							</span>
 							<antd.Input.Password
 								//placeholder="********"
-								onChange={(e) =>
-									this.onUpdateInput(
-										"password",
-										e.target.value,
-									)
-								}
+								onChange={(e) => this.onUpdateInput("password", e.target.value)}
 								onPressEnter={this.nextStep}
 							/>
 						</antd.Form.Item>
@@ -432,9 +420,7 @@ class Login extends React.Component {
 
 									<p>
 										Didn't receive the code?{" "}
-										<a onClick={this.handleFinish}>
-											Resend
-										</a>
+										<a onClick={this.handleFinish}>Resend</a>
 									</p>
 								</>
 							)}
@@ -442,9 +428,7 @@ class Login extends React.Component {
 							<antd.Input.OTP
 								length={4}
 								formatter={(str) => str.toUpperCase()}
-								onChange={(code) =>
-									this.onUpdateInput("mfa_code", code)
-								}
+								onChange={(code) => this.onUpdateInput("mfa_code", code)}
 								onPressEnter={this.nextStep}
 							/>
 						</antd.Form.Item>
@@ -472,7 +456,10 @@ class Login extends React.Component {
 						<div className="field-error">{this.state.error}</div>
 					)}
 
-					<div className="field" onClick={this.onClickForgotPassword}>
+					<div
+						className="field"
+						onClick={this.onClickForgotPassword}
+					>
 						<a>Forgot your password?</a>
 					</div>
 				</div>
