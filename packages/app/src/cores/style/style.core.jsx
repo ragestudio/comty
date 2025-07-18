@@ -161,6 +161,10 @@ export default class StyleCore extends Core {
 			})
 		}
 
+		if (app.isDesktop) {
+			document.documentElement.classList.add("desktop")
+		}
+
 		ClientPrefersDark().addEventListener("change", (event) => {
 			this.console.log("[PREFERS-DARK] Change >", event.matches)
 
@@ -185,8 +189,7 @@ export default class StyleCore extends Core {
 		}
 
 		return (
-			StyleCore.storagedModifications[key] ||
-			this.public.theme.defaultVars[key]
+			StyleCore.storagedModifications[key] || this.public.theme.defaultVars[key]
 		)
 	}
 
