@@ -1,14 +1,78 @@
+@import "@styles/vars.less";
+
 .app-desktop_topbar_wrapper {
-    user-select: none;
+	user-select: none;
+	app-region: drag;
 
-    position: absolute;
+	position: absolute;
+	z-index: 999999;
 
-    top: 0;
-    left: 0;
+	top: 0;
+	left: 0;
 
-    z-index: 99999;
+	display: flex;
+	justify-content: flex-start;
 
-    width: 100vw;
+	width: fit-content;
+	//width: 200px;
 
-    height: 15px;
+	padding: 10px;
+
+	transition: all 150ms ease-in-out;
+
+	&.hidden {
+		opacity: 0;
+	}
+
+	&__items {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+
+		padding: 3px 10px;
+		gap: 10px;
+
+		width: fit-content;
+		min-width: 80px;
+
+		box-shadow: @card-shadow;
+		background-color: var(--background-color-accent);
+		color: var(--text-color);
+		font-weight: 800;
+
+		border-radius: 12px;
+
+		&__item {
+			app-region: no-drag;
+
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: center;
+
+			height: 20px;
+			width: 20px;
+
+			padding: 3px;
+
+			border-radius: 3px;
+
+			transition: all 150ms ease-in-out;
+
+			svg {
+				height: 100%;
+				width: 100%;
+
+				margin: 0;
+				padding: 0;
+
+				stroke-width: 3 !important;
+			}
+
+			&:hover {
+				background-color: rgba(var(--bg_color_3), 1);
+			}
+		}
+	}
 }

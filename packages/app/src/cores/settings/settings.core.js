@@ -5,81 +5,89 @@ import { Observable } from "rxjs"
 import defaultSettings from "@config/defaultSettings.json"
 
 export default class SettingsCore extends Core {
-    static namespace = "settings"
+	static namespace = "settings"
 
-    static storeKey = "app_settings"
+	static storeKey = "app_settings"
 
-    public = {
-        is: this.is,
-        set: this.set,
-        get: this.get,
-        getDefaults: this.getDefaults,
-        withEvent: this.withEvent,
-    }
+	storeInstance = null
 
-    onInitialize() {
-        const settings = this.get()
+	public = {
+		is: this.is,
+		set: this.set,
+		get: this.get,
+		getDefaults: this.getDefaults,
+		withEvent: this.withEvent,
+	}
 
-        // fulfillUndefinedWithDefaults
-        Object.keys(defaultSettings).forEach((key) => {
-            const value = defaultSettings[key]
+	onInitialize() {
+		if ("__ELECTRON__" in window) {
+			this.storeInstance = window["__ELECTRON__"].store
+		} else {
+			this.storeInstance = store
+		}
 
-            // Only set default if value is undefined
-            if (typeof settings[key] === "undefined") {
-                this.set(key, value)
-            }
-        })
-    }
+		const settings = this.get()
 
-    is(key, value) {
-        return this.get(key) === value
-    }
+		// fulfillUndefinedWithDefaults
+		Object.keys(defaultSettings).forEach((key) => {
+			const value = defaultSettings[key]
 
-    set(key, value) {
-        const settings = this.get()
+			// Only set default if value is undefined
+			if (typeof settings[key] === "undefined") {
+				this.set(key, value)
+			}
+		})
+	}
 
-        settings[key] = value
+	is(key, value) {
+		return this.get(key) === value
+	}
 
-        store.set(SettingsCore.storeKey, settings)
+	set(key, value) {
+		const settings = this.get()
 
-        window.app.eventBus.emit("setting.update", { key, value })
-        window.app.eventBus.emit(`setting.update.${key}`, value)
+		settings[key] = value
 
-        return settings
-    }
+		this.storeInstance.set(SettingsCore.storeKey, settings)
 
-    get(key) {
-        const settings = store.get(SettingsCore.storeKey) ?? {}
+		window.app.eventBus.emit("setting.update", { key, value })
+		window.app.eventBus.emit(`setting.update.${key}`, value)
 
-        if (typeof key === "undefined") {
-            return settings
-        }
+		return settings
+	}
 
-        return settings[key]
-    }
+	get(key) {
+		const settings = this.storeInstance.get(SettingsCore.storeKey) ?? {}
 
-    getDefaults(key) {
-        if (typeof key === "undefined") {
-            return defaultSettings
-        }
+		if (typeof key === "undefined") {
+			return settings
+		}
 
-        return defaultSettings[key]
-    }
+		return settings[key]
+	}
 
-    withEvent(listenEvent, defaultValue) {
-        let value = defaultValue ?? false
+	getDefaults(key) {
+		if (typeof key === "undefined") {
+			return defaultSettings
+		}
 
-        const observable = new Observable((subscriber) => {
-            subscriber.next(value)
+		return defaultSettings[key]
+	}
 
-            window.app.eventBus.on(listenEvent, (to) => {
-                value = to
-                subscriber.next(value)
-            })
-        })
+	withEvent(listenEvent, defaultValue) {
+		let value = defaultValue ?? false
 
-        return observable.subscribe((value) => {
-            return value
-        })
-    }
+		const observable = new Observable((subscriber) => {
+			subscriber.next(value)
+
+			window.app.eventBus.on(listenEvent, (to) => {
+				value = to
+				subscriber.next(value)
+			})
+		})
+
+		return observable.subscribe((value) => {
+			return value
+		})
+	}
 }

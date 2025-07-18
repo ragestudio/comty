@@ -27,10 +27,12 @@ function composeSettingsByGroups() {
 				return {
 					...module,
 					settings: module.settings.filter((setting) => {
-						if (!app.isMobile && setting.desktop === false)
+						if (!app.isMobile && setting.desktop === false) {
 							return false
-						if (app.isMobile && setting.mobile === false)
+						}
+						if (app.isMobile && setting.mobile === false) {
 							return false
+						}
 						return true
 					}),
 				}

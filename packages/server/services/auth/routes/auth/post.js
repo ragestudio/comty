@@ -64,10 +64,7 @@ export default async (req, res) => {
 					if (mfaSession.expires_at < new Date().getTime()) {
 						await MFASession.deleteMany({ user_id: user._id })
 
-						throw new OperationError(
-							401,
-							"MFA code expired, login again...",
-						)
+						throw new OperationError(401, "MFA code expired, login again...")
 					}
 
 					if (mfaSession.code == req.body.mfa_code) {
@@ -75,10 +72,7 @@ export default async (req, res) => {
 
 						await MFASession.deleteMany({ user_id: user._id })
 					} else {
-						throw new OperationError(
-							401,
-							"Invalid MFA code, try again...",
-						)
+						throw new OperationError(401, "Invalid MFA code, try again...")
 					}
 				}
 			}
@@ -148,15 +142,10 @@ export default async (req, res) => {
 		console.error(error)
 	}
 
-	const keyPair = await UserDHKeyPair.findOne({
-		user_id: user._id.toString(),
-	})
-
 	return {
 		user_id: user._id.toString(),
 		token: token,
 		refreshToken: refreshToken,
-		expires_in: AuthToken.authStrategy.expiresIn,
-		keyPairEnc: keyPair?.str,
+		expiresIn: AuthToken.authStrategy.expiresIn,
 	}
 }

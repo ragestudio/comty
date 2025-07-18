@@ -1,27 +1,21 @@
 import React from "react"
+import * as antd from "antd"
 import { Runtime } from "@ragestudio/vessel"
 import * as Router from "@ragestudio/vessel/router"
-import routesDeclarations from "@config/routes"
-
-import onPageMount from "@hooks/onPageMount"
-
 import * as Sentry from "@sentry/browser"
-import { invoke } from "@tauri-apps/api/tauri"
-import * as antd from "antd"
-
-import config from "@config"
-
-import AuthManager from "@classes/AuthManager"
-
-import DesktopTopBar from "@components/DesktopTopBar"
-
 import { ThemeProvider } from "@cores/style/style.core.jsx"
-
+import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
 
 import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
 import StaticRenders from "./statics/renders"
+
+import DesktopTopBar from "@components/DesktopTopBar"
+
+import config from "@config"
+import routesDeclarations from "@config/routes"
+import onPageMount from "@hooks/onPageMount"
 
 import "@styles/index.less"
 
@@ -69,11 +63,9 @@ class ComtyApp extends React.Component {
 		window.app.version = config.package.version
 		window.app.confirm = antd.Modal.confirm
 		window.app.message = antd.message
-		window.app.isCapacitor = IS_MOBILE_HOST
+		window.app.isCapacitor = window.IS_MOBILE_HOST
 
-		if (
-			window.app.version !== window.localStorage.getItem("last_version")
-		) {
+		if (window.app.version !== window.localStorage.getItem("last_version")) {
 			app.message.info(
 				`Comty has been updated to version ${window.app.version}!`,
 			)
@@ -88,10 +80,6 @@ class ComtyApp extends React.Component {
 				dsn: import.meta.env.VITE_SENTRY_DSN,
 				release: "comty-web-app",
 			})
-		}
-
-		if (window.__TAURI__) {
-			window.__TAURI__.invoke = invoke
 		}
 	}
 
@@ -113,7 +101,7 @@ class ComtyApp extends React.Component {
 		return (
 			<React.Fragment>
 				<ThemeProvider>
-					{window.__TAURI__ && <DesktopTopBar />}
+					{app.isDesktop && <DesktopTopBar />}
 					<Layout staticRenders={ComtyApp.staticRenders}>
 						{this.state.firstInitialized && (
 							<Router.Render

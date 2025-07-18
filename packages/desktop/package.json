@@ -1,0 +1,16 @@
+{
+	"name": "@comty/desktop",
+	"version": "0.1.0",
+	"license": "MIT",
+	"type": "module",
+	"main": "./src/main.js",
+	"scripts": {
+		"dev": "electron ."
+	},
+	"devDependencies": {
+		"electron": "^37.2.1"
+	},
+	"dependencies": {
+		"electron-store": "^10.1.0"
+	}
+}

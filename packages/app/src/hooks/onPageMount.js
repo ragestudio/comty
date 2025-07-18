@@ -83,10 +83,10 @@ export default ({ element, declaration }) => {
 		}
 
 		if (
-			typeof options.layout.centeredContent === "boolean" &&
+			typeof options.layout.centeredContent !== "undefined" &&
 			app.layout?.toggleCenteredContent
 		) {
-			app.layout.toggleCenteredContent()
+			app.layout.toggleCenteredContent(options.layout.centeredContent)
 		}
 	}
 }
