@@ -13,6 +13,7 @@ const config = {
 	resolve: {
 		alias: aliases,
 	},
+	envPrefix: ["VITE_", "TAURI_ENV_*"],
 	server: {
 		host: "0.0.0.0",
 		port: 8000,
