@@ -15,7 +15,7 @@ import FeedItems from "./components/FeedItems"
 
 import "./index.less"
 
-const MusicExploreTab = (props) => {
+const MusicExploreTab = () => {
 	const [searchResults, setSearchResults] = React.useState(false)
 
 	React.useEffect(() => {
