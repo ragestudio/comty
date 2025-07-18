@@ -28,26 +28,20 @@ export default class SyncRoom {
 
 		this.player.eventBus.on("player.state.update", this.pushState)
 
-		this.socket.on(
-			`sync_room:${app.userData._id}:request_lyrics`,
-			async () => {
-				let lyrics = null
+		this.socket.on(`sync_room:${app.userData._id}:request_lyrics`, async () => {
+			let lyrics = null
 
-				if (this.player.queue.currentItem) {
-					lyrics =
-						await this.player.queue.currentItem.manifest.serviceOperations.fetchLyrics(
-							{
-								preferTranslation: false,
-							},
-						)
-				}
+			if (this.player.queue.currentItem) {
+				lyrics =
+					await this.player.queue.currentItem.manifest.serviceOperations.fetchLyrics(
+						{
+							preferTranslation: false,
+						},
+					)
+			}
 
-				this.socket.emit(
-					`sync_room:${app.userData._id}:request_lyrics`,
-					lyrics,
-				)
-			},
-		)
+			this.socket.emit(`sync_room:${app.userData._id}:request_lyrics`, lyrics)
+		})
 	}
 
 	stop = async () => {
@@ -109,15 +103,12 @@ export default class SyncRoom {
 			!this.player.state.track_manifest ||
 			data.track_manifest._id !== this.player.state.track_manifest._id
 		) {
-			if (data.track_manifest && data.track_manifest.encoded_manifest) {
-				let mpd = new Blob(
-					[window.atob(data.track_manifest.encoded_manifest)],
-					{
-						type: "application/dash+xml",
-					},
-				)
+			if (data.track_manifest && data.track_manifest.mpd_string) {
+				let mpd = new Blob([data.track_manifest.mpd_string], {
+					type: "application/dash+xml",
+				})
 
-				data.track_manifest.dash_manifest = URL.createObjectURL(mpd)
+				data.track_manifest.source = URL.createObjectURL(mpd)
 			}
 
 			// start the player
