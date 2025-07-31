@@ -34,21 +34,12 @@ class ComtyApp extends React.Component {
 		{
 			behaviors: {
 				onLogin: async () => {
-					await this.auth.flush()
-					await this.initialization()
-
-					app.cores.api.reset()
-
 					app.navigation.goMain()
 				},
 				onLogout: async () => {
-					await this.auth.flush()
-
-					app.cores.api.reset()
-
 					app.navigation.goAuth()
 				},
-				onInvalidSession: async (error) => {
+				onInvalidSession: async () => {
 					app.navigation.goAuth()
 				},
 				onDisabledAccount: async () => {
@@ -65,7 +56,9 @@ class ComtyApp extends React.Component {
 		window.app.message = antd.message
 		window.app.isCapacitor = window.IS_MOBILE_HOST
 
-		if (window.app.version !== window.localStorage.getItem("last_version")) {
+		if (
+			window.app.version !== window.localStorage.getItem("last_version")
+		) {
 			app.message.info(
 				`Comty has been updated to version ${window.app.version}!`,
 			)
