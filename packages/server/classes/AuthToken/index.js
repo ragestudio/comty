@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { Session, RefreshToken, User, TosViolations } from "@db_models"
+import { Session, RefreshToken, User } from "@db_models"
 
 export default class Token {
 	static get authStrategy() {
@@ -96,54 +96,59 @@ export default class Token {
 			return result
 		}
 
-		const { secret } = Token.authStrategy
+		const validation = await Token.jwtVerify(token)
 
-		await jwt.verify(token, secret, async (err, decoded) => {
-			if (err) {
-				result.valid = false
-				result.error = err.message
+		// check account tos violation
+		// TODO: please not
 
-				if (err.message === "jwt expired") {
-					result.expired = true
-				}
+		// const violation = await TosViolations.findOne({
+		// 	user_id: decoded.user_id,
+		// })
 
-				return
+		// if (violation) {
+		// 	console.log("violation", violation)
+
+		// 	result.valid = false
+		// 	result.banned = {
+		// 		reason: violation.reason,
+		// 		expire_at: violation.expire_at,
+		// 	}
+
+		// 	return result
+		// }
+		//
+
+		if (validation.error) {
+			result.valid = false
+			result.error = validation.error.message
+
+			if (validation.error.message === "jwt expired") {
+				result.expired = true
 			}
 
-			result.data = decoded
+			return result
+		}
 
-			// check account tos violation
-			const violation = await TosViolations.findOne({
-				user_id: decoded.user_id,
-			})
-
-			if (violation) {
-				console.log("violation", violation)
-
-				result.valid = false
-				result.banned = {
-					reason: violation.reason,
-					expire_at: violation.expire_at,
-				}
-
-				return result
-			}
-
-			const sessions = await Session.find({ user_id: decoded.user_id })
-			const currentSession = sessions.find(
-				(session) => session.token === token,
-			)
-
-			if (!currentSession) {
-				result.valid = false
-				result.error = "Session token not found"
-			} else {
-				result.session = currentSession
-				result.valid = true
-				result.user = async () =>
-					await User.findOne({ _id: decoded.user_id })
-			}
+		// TODO: please find a better way to check sessions
+		const session = await Session.findOne({
+			user_id: validation.data.user_id,
+			token: token,
 		})
+
+		if (!session) {
+			result.valid = false
+
+			result.error = "Session token not found"
+		} else {
+			result.valid = true
+
+			result.session = session
+			result.user = async () => {
+				return await User.findOne({ _id: validation.data.user_id })
+			}
+		}
+
+		result.data = validation.data
 
 		return result
 	}
@@ -152,64 +157,74 @@ export default class Token {
 		const { authToken, refreshToken } = payload
 
 		if (!authToken || !refreshToken) {
-			throw new OperationError(400, "Missing refreshToken or authToken")
+			throw new OperationError(
+				400,
+				"Missing refreshToken or/and authToken",
+			)
 		}
 
 		let result = {
-			error: undefined,
+			error: null,
 			token: undefined,
 			refreshToken: undefined,
 		}
 
-		await jwt.verify(
-			refreshToken,
-			Token.refreshStrategy.secret,
-			async (err, decoded) => {
-				if (err) {
-					result.error = err.message
-					return false
-				}
+		const validation = await Token.jwtVerify(refreshToken)
 
-				if (!decoded.user_id) {
-					result.error = "Missing user_id"
-					return false
-				}
-
-				let currentSession = await Session.findOne({
-					user_id: decoded.user_id,
-					token: authToken,
-				}).catch((err) => {
-					return null
-				})
-
-				if (!currentSession) {
-					result.error = "Session not matching with provided token"
-					return false
-				}
-
-				currentSession = currentSession.toObject()
-
-				await Session.findOneAndDelete({
-					_id: currentSession._id.toString(),
-				})
-
-				result.token = await this.createAuthToken({
-					...currentSession,
-					date: new Date().getTime(),
-				})
-				result.refreshToken = await this.createRefreshToken(
-					decoded.user_id,
-					result.token,
-				)
-
-				return true
-			},
-		)
-
-		if (result.error) {
-			throw new OperationError(401, result.error)
+		if (validation.error) {
+			throw new OperationError(401, validation.error.message)
 		}
 
+		if (!validation.data.user_id) {
+			throw new OperationError(
+				401,
+				"Missing user_id on the refresh token",
+			)
+		}
+
+		let currentSession = await Session.findOne({
+			user_id: validation.data.user_id,
+			token: authToken,
+		})
+
+		if (!currentSession) {
+			throw new OperationError(
+				401,
+				"Session not matching with provided token",
+			)
+		}
+
+		currentSession = currentSession.toObject()
+
+		await Session.findOneAndDelete({
+			_id: currentSession._id.toString(),
+		})
+
+		result.token = await this.createAuthToken({
+			...currentSession,
+			date: new Date().getTime(),
+		})
+
+		result.refreshToken = await this.createRefreshToken(
+			validation.data.user_id,
+			result.token,
+		)
+
 		return result
+	}
+
+	static async jwtVerify(token) {
+		return await new Promise((resolve, reject) => {
+			jwt.verify(token, Token.authStrategy.secret, (err, decoded) => {
+				if (err) {
+					reject(err)
+				}
+
+				resolve({
+					error: err,
+					data: decoded,
+				})
+			})
+		})
 	}
 }
