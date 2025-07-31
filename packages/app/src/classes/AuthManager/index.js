@@ -25,23 +25,19 @@ export default class AuthManager {
 		login: () => {
 			app.layout.draggable.open("login", Login, {
 				componentProps: {
-					onDone: this.onLoginCallback,
+					onDone: this.handlers.login,
 				},
 			})
 		},
 		logout: (bypass) => {
-			if (bypass === true) {
-				AuthModel.logout()
-				return this._emitBehavior("onLogout")
+			if (bypass) {
+				return this.handlers.logout()
 			}
 
 			app.layout.modal.confirm({
 				headerText: "Logout",
 				descriptionText: "Are you sure you want to logout?",
-				onConfirm: () => {
-					AuthModel.logout()
-					this._emitBehavior("onLogout")
-				},
+				onConfirm: this.handlers.logout,
 			})
 		},
 	}
@@ -56,7 +52,27 @@ export default class AuthManager {
 	}
 
 	builtInBehavior = {
+		onAuthed: async () => {
+			app.eventBus.emit("authmanager:authed")
+		},
+		onNoSession: async () => {
+			app.eventBus.emit("authmanager:noSession")
+		},
+		onFailedUser: async () => {
+			app.eventBus.emit("authmanager:failedUser")
+		},
+		onLogin: async () => {
+			app.eventBus.emit("authmanager:login")
+			await this.flush()
+			await this.initialize()
+		},
+		onLogout: async () => {
+			app.eventBus.emit("authmanager:logout")
+			await this.flush()
+		},
 		onInvalidSession: async () => {
+			app.eventBus.emit("authmanager:invalidSession")
+
 			const token = await SessionModel.token
 
 			if (!token) {
@@ -66,20 +82,18 @@ export default class AuthManager {
 			await SessionModel.destroyCurrentSession()
 		},
 		onDisabledAccount: async () => {
+			app.eventBus.emit("authmanager:disabledAccount")
+
 			await SessionModel.removeToken()
 		},
 	}
 
-	handleUserDataUpdate = (data) => {
-		this.state.user = data
-		app.eventBus.emit("self:user:update", data)
-	}
-
 	initialize = async () => {
+		console.time("authmanager:initialize")
 		const token = await SessionModel.token
 
 		if (!token || token == null) {
-			return this._emitBehavior("noSession")
+			return this._emitBehavior("onNoSession")
 		}
 
 		const user = await UserModel.data().catch((err) => {
@@ -87,12 +101,15 @@ export default class AuthManager {
 		})
 
 		if (!user) {
-			return this._emitBehavior("failedUser")
+			return this._emitBehavior("onFailedUser")
 		}
 
 		app.userData = user
 		this.state.user = user
 
+		this._emitBehavior("onAuthed")
+
+		console.timeEnd("authmanager:initialize")
 		return user
 	}
 
@@ -112,5 +129,13 @@ export default class AuthManager {
 		}
 	}
 
-	//onLoginCallback = async (state, result) => {}
+	handlers = {
+		logout: async () => {
+			await AuthModel.logout()
+			this._emitBehavior("onLogout")
+		},
+		login: async () => {
+			console.log("errmm what tha sigma")
+		},
+	}
 }

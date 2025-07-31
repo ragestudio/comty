@@ -37,6 +37,19 @@ export default class APICore extends Core {
 		})
 	}
 
+	onRuntimeEvents = {
+		"authmanager:authed": async () => {
+			this.console.debug("auth manager started, connecting to websockets")
+			await this.client.ws.connectAll()
+		},
+		"authmanager:logout": async () => {
+			this.console.debug(
+				"auth manager started, disconnecting from websockets",
+			)
+			await this.client.ws.disconnectAll()
+		},
+	}
+
 	joinTopic(instance = "main", topic) {
 		if (!this.client.ws.sockets.get(instance)) {
 			this.console.error(`Websocket instance [${instance}] not found`)
@@ -94,7 +107,7 @@ export default class APICore extends Core {
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
-				autoConnect: true,
+				autoConnect: false,
 			},
 		})
 
