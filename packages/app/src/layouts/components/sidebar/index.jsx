@@ -273,7 +273,10 @@ export default class Sidebar extends React.Component {
 						placement="top"
 						trigger={["click"]}
 					>
-						<Avatar shape="square" src={app.userData?.avatar} />
+						<Avatar
+							shape="square"
+							src={app.userData?.avatar}
+						/>
 					</Dropdown>
 				),
 			})
@@ -363,7 +366,10 @@ export default class Sidebar extends React.Component {
 				onMouseLeave={this.handleMouseLeave}
 			>
 				{window.__TAURI__ && navigator.platform.includes("Mac") && (
-					<div className="app_sidebar_tauri" data-tauri-drag-region />
+					<div
+						className="app_sidebar_tauri"
+						data-tauri-drag-region
+					/>
 				)}
 
 				<AnimatePresence mode="popLayout">
