@@ -10,8 +10,8 @@
 3008 -> users
 3009 -> notifications
 3010 -> search
-3011 -> unallocated
-3012 -> unallocated
+3011 -> rtc
+3012 -> groups
 3013 -> unallocated
 3014 -> unallocated
 3015 -> unallocated

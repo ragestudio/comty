@@ -1,3 +1,92 @@
-.groupsExplorer {
-    display: flex;
+.groups-page {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	gap: 20px;
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		gap: 10px;
+		width: 100%;
+	}
+
+	&__groups_list {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+	}
+}
+
+.create-group-dialog {
+	display: flex;
+	flex-direction: column;
+
+	gap: 20px;
+
+	width: 100%;
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+
+		gap: 10px;
+	}
+}
+
+.groups-page__group-item {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 10px;
+
+	width: 100%;
+
+	padding: 5px 10px;
+	border-radius: 12px;
+
+	background-color: var(--background-color-accent);
+
+	&__icon {
+		display: inline-flex;
+		flex-direction: row;
+
+		width: 40px;
+		height: 40px;
+
+		background-color: rgba(var(--bg_color_1), 1);
+
+		overflow: hidden;
+
+		border-radius: 8px;
+
+		img {
+			width: 100%;
+			height: 100%;
+
+			object-fit: cover;
+		}
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+	}
+
+	&__extra {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+	}
 }

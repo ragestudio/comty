@@ -25,3 +25,5 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 		ipcRenderer.on(channel, fn)
 	},
 })
+
+//window.history.replaceState({}, "", "/")

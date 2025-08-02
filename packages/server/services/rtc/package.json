@@ -1,0 +1,7 @@
+{
+	"name": "rtc",
+	"dependencies": {
+		"linebridge": "^1.0.0-alpha.4",
+		"mediasoup": "^3.16.4"
+	}
+}

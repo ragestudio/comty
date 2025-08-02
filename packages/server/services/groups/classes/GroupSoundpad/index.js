@@ -1,0 +1,105 @@
+import { GroupSoundpadItem } from "@db_models"
+
+export default class GroupSoundpad {
+	static getBuiltInItems() {
+		return [
+			{
+				_id: "000001",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "💩",
+				name: "Funny Fart",
+				src: "https://storage.ragestudio.net/comty-static-assets/soundpacks/isma/farti.mp3",
+			},
+			{
+				_id: "000002",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "😽",
+				name: "El reportedo",
+				src: "https://storage.ragestudio.net:443/comty-cdn/627d4b628cf4b82edd0864ff/9bf80fd874b7a7d060ceee4a4933192a155d4cf9ba97997dee8faf2f15b6442b",
+			},
+			{
+				_id: "000003",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "📣",
+				name: "Real DJ",
+				src: "https://storage.ragestudio.net:443/comty-cdn/627d4b628cf4b82edd0864ff/88f4d54094cab00d2d260e4be801152f8587c2c41c7cb69b1f34759cb08678ef",
+			},
+		]
+	}
+
+	static async getItems(group_id) {
+		const groupItems = await GroupSoundpadItem.find({
+			group_id: group_id,
+		})
+
+		return [...groupItems, ...GroupSoundpad.getBuiltInItems()]
+	}
+
+	static async getItem(payload) {
+		const { _id, group_id } = payload
+
+		if (!_id) {
+			throw new OperationError(400, "Missing _id")
+		}
+
+		if (!group_id) {
+			throw new OperationError(400, "Missing group_id")
+		}
+
+		return await GroupSoundpadItem.findOne({
+			_id: _id,
+			group_id: group_id,
+		})
+	}
+
+	static async addItem(payload) {
+		const { group_id, user_id, icon, name, src } = payload
+
+		if (!group_id) {
+			throw new OperationError(400, "Missing group_id")
+		}
+
+		if (!user_id) {
+			throw new OperationError(400, "Missing user_id")
+		}
+
+		if (!icon) {
+			throw new OperationError(400, "Missing icon")
+		}
+
+		if (!src) {
+			throw new OperationError(400, "Missing src")
+		}
+
+		let soundpadItem = await GroupSoundpadItem.create({
+			group_id: group_id,
+			user_id: user_id,
+			icon: icon,
+			name: name,
+			src: src,
+			created_at: new Date(),
+		})
+
+		return soundpadItem
+	}
+
+	static async removeItem(payload) {
+		const { _id, group_id } = payload
+
+		if (!_id) {
+			throw new OperationError(400, "Missing _id")
+		}
+
+		if (!group_id) {
+			throw new OperationError(400, "Missing group_id")
+		}
+
+		return await GroupSoundpadItem.deleteOne({
+			_id: _id,
+			group_id: group_id,
+		})
+	}
+}

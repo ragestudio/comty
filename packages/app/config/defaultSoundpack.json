@@ -1,11 +1,21 @@
 {
-    "id": "default",
-    "name": "Default Soundpack",
-    "author": "RageStudio",
-    "version": "1.0.0",
-    "sounds": {
-        "crash": "/sounds/crash.wav",
-        "error": "/sounds/error.wav",
-        "notification": "/sounds/notification.wav"
-    }
+	"id": "default",
+	"name": "Default Soundpack",
+	"author": "RageStudio",
+	"version": "1.0.0",
+	"sounds": {
+		"crash": "./sounds/crash.wav",
+		"error": "./sounds/error.wav",
+		"notification": "./sounds/notification.wav",
+		"media_channel_join": "./sounds/media_channel_join.wav",
+		"media_channel_leave": "./sounds/media_channel_leave.wav",
+		"call_incoming": "./sounds/call_incoming.wav",
+		"call_outgoing": "./sounds/call_outgoing.wav",
+		"media_video_join": "./sounds/media_video_join.wav",
+		"media_video_leave": "./sounds/media_video_leave.wav",
+		"mute": "./sounds/mute.wav",
+		"unmute": "./sounds/unmute.wav",
+		"deafen": "./sounds/deafen.wav",
+		"undeafen": "./sounds/undeafen.wav"
+	}
 }

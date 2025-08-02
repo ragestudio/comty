@@ -1,20 +1,26 @@
 [
-    {
-        "id": "timeline",
-        "path": "/timeline",
-        "label": "Timeline",
-        "icon": "MdTag"
-    },
-    {
-        "id": "tv",
-        "path": "/tv",
-        "label": "Tv",
-        "icon": "FiTv"
-    },
-    {
-        "id": "music",
-        "path": "/music",
-        "label": "Music",
-        "icon": "MdMusicNote"
-    }
+	{
+		"id": "timeline",
+		"path": "/timeline",
+		"label": "Timeline",
+		"icon": "MdTag"
+	},
+	{
+		"id": "tv",
+		"path": "/tv",
+		"label": "Tv",
+		"icon": "FiTv"
+	},
+	{
+		"id": "music",
+		"path": "/music",
+		"label": "Music",
+		"icon": "MdMusicNote"
+	},
+	{
+		"id": "groups",
+		"path": "/groups",
+		"label": "Groups",
+		"icon": "MdPeople"
+	}
 ]
