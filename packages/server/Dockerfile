@@ -57,4 +57,6 @@ RUN npm install --omit=dev
 
 # Start server
 ENV NODE_ENV=production
+ENV UWS_HTTP_MAX_HEADERS_SIZE=8192
+RUN export UWS_HTTP_MAX_HEADERS_SIZE=8192
 CMD ["npm", "run", "start:prod"]
