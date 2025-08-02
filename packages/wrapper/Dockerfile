@@ -28,4 +28,5 @@ RUN npm install
 # Start server
 RUN export NODE_ENV=production
 RUN export UWS_HTTP_MAX_HEADERS_SIZE=8192
+ENV UWS_HTTP_MAX_HEADERS_SIZE=8192
 CMD ["npm", "run", "start"]
