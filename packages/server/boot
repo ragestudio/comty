@@ -2,6 +2,9 @@
 require("dotenv").config()
 require("sucrase/register")
 
+process.env.UWS_HTTP_MAX_HEADERS_COUNT = "1000"
+process.env.UWS_HTTP_MAX_HEADERS_SIZE = "650000"
+
 const path = require("node:path")
 const Module = require("node:module")
 const { Buffer } = require("node:buffer")
