@@ -46,4 +46,8 @@ const TimelinePage = () => {
 	)
 }
 
+TimelinePage.options = {
+	useTitle: "Timeline",
+}
+
 export default TimelinePage
