@@ -1,10 +1,10 @@
 import config from "@config"
 
-const isAuthenticated = () => {
+export const isAuthenticated = () => {
 	return !!app.userData
 }
 
-const handleAuthentication = (declaration) => {
+export const handleAuthentication = (declaration) => {
 	if (
 		!isAuthenticated() &&
 		!declaration.public &&
@@ -30,13 +30,13 @@ const handleAuthentication = (declaration) => {
 	return true
 }
 
-const handleLayout = (declaration) => {
+export const handleLayout = (declaration) => {
 	if (declaration.useLayout && app.layout?.set) {
 		app.layout.set(declaration.useLayout)
 	}
 }
 
-const handleCenteredContent = (declaration) => {
+export const handleCenteredContent = (declaration) => {
 	if (
 		typeof declaration.centeredContent !== "undefined" &&
 		app.layout?.toggleCenteredContent
@@ -55,11 +55,9 @@ const handleCenteredContent = (declaration) => {
 	}
 }
 
-const handleTitle = (declaration) => {
-	if (typeof declaration.useTitle !== "undefined") {
-		let title = declaration.useTitle
-
-		document.title = `${title} - ${config.app.siteName}`
+export const handleTitle = (targetTitle) => {
+	if (targetTitle) {
+		document.title = `${targetTitle} - ${config.app.siteName}`
 	} else {
 		document.title = config.app.siteName
 	}
@@ -74,8 +72,9 @@ export default ({ element, declaration }) => {
 	if (isAuthorized) {
 		handleLayout(declaration)
 		handleCenteredContent(declaration)
-		handleTitle(declaration)
 	}
+
+	handleTitle(options.useTitle ?? declaration?.useTitle)
 
 	if (options.layout) {
 		if (typeof options.layout.type === "string" && app.layout?.set) {
