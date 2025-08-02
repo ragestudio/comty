@@ -224,6 +224,8 @@ export default class Token {
 					error: err,
 					data: decoded,
 				})
+			}).catch((error) => {
+				reject(error)
 			})
 		})
 	}
