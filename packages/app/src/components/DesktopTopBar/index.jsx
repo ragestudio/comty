@@ -80,6 +80,10 @@ const DesktopTopBar = (props) => {
 			data-tauri-drag-region
 		>
 			<div className="app-desktop_topbar_wrapper__content">
+				<div className="app-desktop_topbar_wrapper__content__title">
+					<span>{title}</span>
+				</div>
+
 				<div className="app-desktop_topbar_wrapper__content__items">
 					{items.map((item, index) => (
 						<DesktopTopBarItem
@@ -87,10 +91,6 @@ const DesktopTopBar = (props) => {
 							item={item}
 						/>
 					))}
-				</div>
-
-				<div className="app-desktop_topbar_wrapper__content__title">
-					<span>{title}</span>
 				</div>
 			</div>
 		</div>
