@@ -58,7 +58,10 @@ export default {
 				<div className="header">
 					<div className="branding">
 						<div className="logo">
-							<img src={config.logo.alt} alt="Logo" />
+							<img
+								src={config.logo.alt}
+								alt="Logo"
+							/>
 						</div>
 						<div className="texts">
 							<div className="sitename-text">
@@ -173,10 +176,7 @@ export default {
 					</div>
 				</div>
 
-				<div className="group">
-					<h3>Thanks to our sponsors</h3>
-					<SponsorsList />
-				</div>
+				<SponsorsList />
 
 				<div className="group">
 					<div className="inline_field">
