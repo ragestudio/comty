@@ -5,6 +5,7 @@ import VerifiedBadge from "./customIcons/verifiedBadge"
 import Crown from "./customIcons/crown"
 import Lossless from "./customIcons/lossless"
 import Ogg from "./customIcons/ogg"
+import Connection from "./customIcons/connection"
 
 // import icons lib
 import * as lib1 from "react-icons/fi"
@@ -15,25 +16,7 @@ import * as lib5 from "react-icons/si"
 import * as lib6 from "react-icons/fa"
 import * as lib7 from "react-icons/tb"
 
-const marginedStyle = {
-	width: "1em",
-	height: "1em",
-	marginRight: "10px",
-	verticalAlign: "-0.125em",
-}
-
-const customs = {
-	Lossless: (props) => <Lossless style={marginedStyle} {...props} />,
-	verifiedBadge: (props) => (
-		<VerifiedBadge style={marginedStyle} {...props} />
-	),
-	VrChat: (props) => <VrChatIcon style={marginedStyle} {...props} />,
-	Crown: (props) => <Crown style={marginedStyle} {...props} />,
-	Ogg: (props) => <Ogg style={marginedStyle} {...props} />,
-}
-
 export const Icons = {
-	...customs,
 	...lib1,
 	...lib2,
 	...lib3,
@@ -41,6 +24,12 @@ export const Icons = {
 	...lib5,
 	...lib6,
 	...lib7,
+	Lossless: (props) => <Lossless {...props} />,
+	verifiedBadge: (props) => <VerifiedBadge {...props} />,
+	VrChat: (props) => <VrChatIcon {...props} />,
+	Crown: (props) => <Crown {...props} />,
+	Ogg: (props) => <Ogg {...props} />,
+	Connection: (props) => <Connection {...props} />,
 }
 
 export function createIconRender(icon, props) {
