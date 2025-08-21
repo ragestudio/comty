@@ -31,10 +31,7 @@ export default class Token {
 	}
 
 	static async createAuthToken(payload) {
-		const jwt_token = await this.signToken(payload, "authStrategy")
-
 		const session = new Session({
-			token: jwt_token,
 			username: payload.username,
 			user_id: payload.user_id,
 			sign_location: payload.sign_location,
@@ -43,6 +40,18 @@ export default class Token {
 			date: new Date().getTime(),
 			created_at: new Date().getTime(),
 		})
+
+		await session.save()
+
+		const jwt_token = await this.signToken(
+			{
+				...payload,
+				session_id: session._id.toString(),
+			},
+			"authStrategy",
+		)
+
+		session.token = jwt_token
 
 		await session.save()
 
@@ -98,26 +107,6 @@ export default class Token {
 
 		const validation = await Token.jwtVerify(token)
 
-		// check account tos violation
-		// TODO: please not
-
-		// const violation = await TosViolations.findOne({
-		// 	user_id: decoded.user_id,
-		// })
-
-		// if (violation) {
-		// 	console.log("violation", violation)
-
-		// 	result.valid = false
-		// 	result.banned = {
-		// 		reason: violation.reason,
-		// 		expire_at: violation.expire_at,
-		// 	}
-
-		// 	return result
-		// }
-		//
-
 		if (validation.error) {
 			result.valid = false
 			result.error = validation.error.message
@@ -129,26 +118,31 @@ export default class Token {
 			return result
 		}
 
-		// TODO: please find a better way to check sessions
-		const session = await Session.findOne({
-			user_id: validation.data.user_id,
-			token: token,
-		})
+		// FIXME: please find a better way to check sessions
+		const session = await Session.findById(
+			validation.data.session_id,
+		).catch(() => null)
 
+		// if session not found, return invalid
 		if (!session) {
 			result.valid = false
-
 			result.error = "Session token not found"
-		} else {
-			result.valid = true
-
-			result.session = session
-			result.user = async () => {
-				return await User.findOne({ _id: validation.data.user_id })
-			}
+			return result
 		}
 
+		// if session token not match, return invalid
+		if (session.token !== token) {
+			result.valid = false
+			result.error = "Session token not match"
+			return result
+		}
+
+		result.valid = true
+		result.session = session
 		result.data = validation.data
+		result.user = async () => {
+			return await User.findOne({ _id: validation.data.user_id })
+		}
 
 		return result
 	}
@@ -215,18 +209,25 @@ export default class Token {
 
 	static async jwtVerify(token) {
 		return await new Promise((resolve, reject) => {
-			jwt.verify(token, Token.authStrategy.secret, (err, decoded) => {
-				if (err) {
-					reject(err)
-				}
+			try {
+				jwt.verify(token, Token.authStrategy.secret, (err, decoded) => {
+					if (err) {
+						return resolve({
+							error: err,
+							data: decoded,
+						})
+					}
 
-				resolve({
-					error: err,
-					data: decoded,
+					resolve({
+						error: err,
+						data: decoded,
+					})
 				})
-			}).catch((error) => {
-				reject(error)
-			})
+			} catch (error) {
+				resolve({
+					error: error,
+				})
+			}
 		})
 	}
 }
