@@ -6,11 +6,17 @@
 @import "@styles/mobile.less";
 
 &.desktop {
-	.app_layout {
-		.app_sidebar_wrapper {
-			padding-top: 45px !important;
+	&.total-window-height {
+		.content_layout {
+			height: calc(100dvh - 45px);
 		}
+	}
 
+	.app_sidebar_wrapper {
+		padding-top: 45px !important;
+	}
+
+	.app_layout {
 		.content_layout {
 			margin-top: 45px !important;
 		}
@@ -30,6 +36,10 @@
 				margin-top: 0;
 			}
 		}
+	}
+
+	.ant-notification {
+		top: 45px !important;
 	}
 }
 
@@ -187,14 +197,14 @@ html {
 
 	-webkit-overflow-scrolling: touch;
 
-	// &.root-scale-effect {
-	// 	background-color: black !important;
-
-	// 	#root {
-	// 		animation: rootScaleOut 250ms ease-in-out forwards;
-	// 		animation-delay: 0;
-	// 	}
-	// }
+	&.sidebar-expanded {
+		.content_layout {
+			filter: blur(1px) brightness(0.8);
+			transform: translateX(
+				calc((@sidebar_width_expanded / 2) + @sidebar_wrapper_padding * 2)
+			);
+		}
+	}
 
 	&.compact-mode {
 		.content_layout {

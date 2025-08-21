@@ -58,6 +58,7 @@
 
 .ant-select {
 	.ant-select-arrow {
+		padding: 0 10px;
 		right: 0px;
 	}
 }
@@ -207,11 +208,31 @@
 }
 
 // fix sliders colors
+.ant-slider-track {
+	background-color: var(--colorPrimary) !important;
+
+	filter: brightness(0.7);
+}
+
 .ant-slider-rail {
 	background-color: var(--background-color-primary-2);
 
 	&:hover {
 		background-color: var(--background-color-primary);
+	}
+}
+
+.ant-slider-handle {
+	&::after {
+		box-shadow: none !important;
+		outline: 4px solid var(--border-color-solid) !important;
+		transition: all 150ms ease-in-out !important;
+	}
+
+	&:focus {
+		&::after {
+			outline: 4px solid var(--colorPrimary) !important;
+		}
 	}
 }
 
@@ -567,10 +588,13 @@
 .ant-input,
 .ant-mentions {
 	background-color: var(--background-color-accent);
-
 	color: var(--text-color);
 
 	&:active {
+		background-color: var(--background-color-accent);
+	}
+
+	&:focus {
 		background-color: var(--background-color-accent);
 	}
 
@@ -578,6 +602,12 @@
 		color: var(--text-color);
 		opacity: 0.5;
 	}
+}
+
+.ant-input-disabled {
+	background-color: var(--background-color-accent);
+	color: var(--text-color) !important;
+	opacity: 0.5 !important;
 }
 
 .ant-mentions-outlined {
@@ -608,10 +638,10 @@
 	background-color: var(--background-color-accent);
 	color: var(--text-color);
 
-	border: 0 !important;
+	border: 2px solid var(--border-color);
 
 	&:hover {
-		border: 0 !important;
+		//border: 0 !important;
 		background-color: var(--background-color-accent);
 	}
 

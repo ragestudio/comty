@@ -1,8 +1,38 @@
+// SIDEBAR
 @sidebar_width: 80px;
 @sidebar_width_expanded: 230px;
 @sidebar_padding: 10px;
 @sidebar_borderRadius: 18px;
+@sidebar_expanded_shadow: 14px 0 10px var(--shadow-color);
 
+// SIDEBAR WRAPPER
+@sidebar_wrapper_padding: 10px;
+@sidebar_wrapper_fixed_width: calc(
+	@sidebar_width + @sidebar_wrapper_padding * 2
+);
+
+// BOTTOM BAR
+@bottomBar_iconSize: 45px;
+
+// TOOLSBAR WRAPPER
+@toolsbar_wrapper_min-width: 400px;
+@toolsbar_wrapper_max-width: 420px;
+@toolsbar_wrapper_padding: 10px;
+
+// MENUS
+@menu-selected-item-dash-width: 3px;
+@menu-selected-item-dash-height: 50%;
+@menu-selected-item-dash-border-radius: 12px;
+
+// Modal
+@modal_background_color: rgba(var(--bg_color_1), 0.3);
+@modal_background_blur: 4px;
+
+// GENERIC DEFAULTS
+@default-object-padding: 10px;
+@default-gap: 20px;
+
+// PRESETS
 @transition-ease-in: all 0.3s ease-out;
 @transition-ease-out: all 0.3s ease-out;
 @transition-ease-inout: all 150ms ease-in-out;
@@ -15,20 +45,6 @@
 	0 -4px 3px 0 rgba(63, 63, 68, 0.05),
 	0 0 0 2px var(--shadow-color);
 
-@default-object-padding: 10px;
-@default-gap: 20px;
-
-@menu-selected-item-dash-width: 3px;
-@menu-selected-item-dash-height: 50%;
-@menu-selected-item-dash-border-radius: 12px;
-
-// Mobile
-@top_bar_height: 52px;
-@top_bar_padding: 10px;
-
-@bottomBar_iconSize: 45px;
-@topBar_height: 52px;
-
-// Modal
-@modal_background_color: rgba(var(--bg_color_1), 0.3);
-@modal_background_blur: 4px;
+// COMPONENTS
+// Post card
+@postcard_avatar_size: 40px;
