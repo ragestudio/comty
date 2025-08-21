@@ -11,7 +11,12 @@ export default defineConfig([
 	},
 	{
 		files: ["**/*.{js,mjs,cjs,jsx}"],
-		languageOptions: { globals: globals.browser },
+		languageOptions: {
+			globals: {
+				...globals.browser,
+				app: "writable",
+			},
+		},
 	},
 	pluginReact.configs.flat.recommended,
 	{
