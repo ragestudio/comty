@@ -5,7 +5,7 @@ import "./index.less"
 
 function getCurrentVideoSettings() {
 	const instance = app.cores.mediartc.instance()
-	const stream = instance.screenStream
+	const stream = instance.self.screenStream
 
 	if (!stream) {
 		return null
@@ -45,11 +45,6 @@ const ScreenShareOptionsDialog = ({ close }) => {
 	}
 
 	const changeVideoStreamConstraints = (type, value) => {
-		console.log({
-			type: type,
-			value: value,
-		})
-
 		if (type === "resolution") {
 			const [width, height] = value.split("x").map(Number)
 
@@ -65,8 +60,6 @@ const ScreenShareOptionsDialog = ({ close }) => {
 			})
 		}
 	}
-
-	console.log({ trackSettings, resolutionsList, frameratesList })
 
 	return (
 		<div className="screenshare-options-dialog">
