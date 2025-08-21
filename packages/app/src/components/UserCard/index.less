@@ -1,433 +1,443 @@
 @import "@styles/vars.less";
 
 html {
-    &.mobile {
-        .userCard {
-            width: 100%;
-            filter: none;
-            box-shadow: none;
-            min-width: 0;
+	&.mobile {
+		.userCard {
+			width: 100%;
+			filter: none;
+			box-shadow: none;
+			min-width: 0;
 
-            .avatar {
-                width: 20%;
-                height: fit-content;
-            }
-        }
-    }
+			.avatar {
+				width: 20%;
+				height: fit-content;
+			}
+		}
+	}
 }
 
 ._mobile_card {
-    background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
 
-    border-radius: 12px;
+	border-radius: 12px;
 
-    box-shadow: @card-shadow;
+	box-shadow: @card-shadow;
 }
 
 ._mobile_userCard {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
-    height: fit-content;
+	width: 100%;
+	height: fit-content;
 
-    gap: 10px;
+	gap: 10px;
 
-    &.no-cover {
-        ._mobile_userCard_top {
-            flex-direction: row;
+	&.no-cover {
+		._mobile_userCard_top {
+			flex-direction: row;
 
-            ._mobile_userCard_top_avatar {
-                padding: 10px;
-            }
+			._mobile_userCard_top_avatar {
+				padding: 10px;
+			}
 
-            ._mobile_userCard_top_texts {
-                margin-left: 0;
-            }
-        }
-    }
+			._mobile_userCard_top_texts {
+				margin-left: 0;
+			}
+		}
+	}
 
-    ._mobile_userCard_top {
-        position: relative;
+	._mobile_userCard_top {
+		position: relative;
 
-        display: flex;
-        flex-direction: column;
+		display: flex;
+		flex-direction: column;
 
-        width: 100%;
-        height: auto;
+		width: 100%;
+		height: auto;
 
-        background-color: var(--background-color-accent);
+		background-color: var(--background-color-accent);
 
-        border-radius: 12px;
+		border-radius: 12px;
 
-        box-shadow: @card-shadow;
+		box-shadow: @card-shadow;
 
-        ._mobile_userCard_top_cover {
-            position: relative;
+		._mobile_userCard_top_cover {
+			position: relative;
 
-            display: flex;
-            flex-direction: row;
+			display: flex;
+			flex-direction: row;
 
-            align-items: center;
-            justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-            width: 100%;
+			width: 100%;
 
-            max-height: 25vh;
+			max-height: 25vh;
 
-            z-index: 100;
+			z-index: 100;
 
-            .cover {
-                width: 100%;
-                height: 25vh;
+			.cover {
+				width: 100%;
+				height: 25vh;
 
-                background-size: 100%;
-                background-repeat: no-repeat;
-                background-position: center;
+				background-size: 100%;
+				background-repeat: no-repeat;
+				background-position: center;
 
-                border-radius: 12px;
-            }
-        }
+				border-radius: 12px;
+			}
+		}
 
-        ._mobile_userCard_top_avatar_wrapper {
-            position: absolute;
+		._mobile_userCard_top_avatar_wrapper {
+			position: absolute;
 
-            display: flex;
-            flex-direction: row;
+			display: flex;
+			flex-direction: row;
 
-            align-items: flex-end;
+			align-items: flex-end;
 
-            bottom: 0;
-            left: 0;
+			bottom: 0;
+			left: 0;
 
-            padding: 0 10px;
+			padding: 0 10px;
 
-            gap: 20px;
+			gap: 20px;
 
-            z-index: 110;
+			z-index: 110;
 
-            transform: translateY(75%);
-        }
+			transform: translateY(75%);
+		}
 
-        ._mobile_userCard_top_avatar {
-            display: flex;
-            flex-direction: row;
+		._mobile_userCard_top_avatar {
+			display: flex;
+			flex-direction: row;
 
-            align-items: center;
-            justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-            width: 120px;
-            height: 120px;
+			width: 120px;
+			height: 120px;
 
-            max-height: 120px;
-            max-width: 120px;
+			max-height: 120px;
+			max-width: 120px;
 
-            border-radius: 12px;
+			border-radius: 12px;
 
-            img {
-                width: 120px;
-                height: 120px;
+			img {
+				width: 120px;
+				height: 120px;
 
-                object-fit: contain;
-                background-color: black;
+				object-fit: contain;
+				background-color: black;
 
-                box-shadow: @card-shadow;
+				box-shadow: @card-shadow;
 
-                border-radius: 12px;
-            }
-        }
+				border-radius: 12px;
+			}
+		}
 
-        ._mobile_userCard_top_texts {
-            position: relative;
+		._mobile_userCard_top_texts {
+			position: relative;
 
-            display: flex;
+			display: flex;
 
-            flex-direction: column;
-            justify-content: center;
+			flex-direction: column;
+			justify-content: center;
 
-            margin-left: calc(120px + 10px);
+			margin-left: calc(120px + 10px);
 
-            padding: 10px;
-            padding-left: 15px;
+			padding: 10px;
+			padding-left: 15px;
 
-            ._mobile_userCard_top_badges_wrapper {
-                position: absolute;
-                top: 0;
-                right: 0;
+			._mobile_userCard_top_badges_wrapper {
+				position: absolute;
+				top: 0;
+				right: 0;
 
-                padding: 10px;
-            }
+				padding: 10px;
+			}
 
-            ._mobile_userCard_top_username {
-                font-family: "Space Grotesk", sans-serif;
+			._mobile_userCard_top_username {
+				font-family: "Space Grotesk", sans-serif;
 
-                h1 {
-                    position: relative;
+				h1 {
+					position: relative;
 
-                    color: var(--text-color);
-                    margin: 0;
+					color: var(--text-color);
+					margin: 0;
 
-                    #verification_tick {
-                        right: 0;
-                        top: 0;
+					#verification_tick {
+						right: 0;
+						top: 0;
 
-                        font-size: 0.8rem;
+						font-size: 0.8rem;
 
-                        color: var(--colorPrimary);
-                        transform: translate(0, -50%);
-                    }
-                }
+						color: var(--colorPrimary);
+						transform: translate(0, -50%);
+					}
+				}
 
-                margin-bottom: 10px;
-            }
+				margin-bottom: 10px;
+			}
 
-            ._mobile_userCard_top_description {
-                color: var(--text-color);
+			._mobile_userCard_top_description {
+				color: var(--text-color);
 
-                p {
-                    margin: 0;
-                }
+				p {
+					margin: 0;
+				}
 
-                // max-height: 30vh;
+				// max-height: 30vh;
 
-                // overflow: hidden;
+				// overflow: hidden;
 
-                // p {
-                //     text-overflow: ellipsis;
-                //     overflow: hidden;
-                //     white-space: nowrap;
-                // }
-            }
-        }
-    }
+				// p {
+				//     text-overflow: ellipsis;
+				//     overflow: hidden;
+				//     white-space: nowrap;
+				// }
+			}
+		}
+	}
 
-    ._mobile_userCard_actions {
-        display: flex;
-        flex-direction: row;
+	._mobile_userCard_actions {
+		display: flex;
+		flex-direction: row;
 
-        gap: 20px;
+		gap: 20px;
 
-        padding: 10px;
-    }
+		padding: 10px;
+	}
 
-    ._mobile_userCard_links {
-        display: flex;
-        flex-direction: row;
+	._mobile_userCard_links {
+		display: flex;
+		flex-direction: row;
 
-        justify-content: flex-start;
+		justify-content: flex-start;
 
-        gap: 15px;
+		gap: 15px;
 
-        padding: 10px 20px;
+		padding: 10px 20px;
 
-        //padding-top: 0;
+		//padding-top: 0;
 
-        .userLink {
-            display: flex;
-            flex-direction: column;
+		.userLink {
+			display: flex;
+			flex-direction: column;
 
-            align-items: center;
-            justify-content: center;
+			align-items: center;
+			justify-content: center;
 
-            font-size: 1.3rem;
+			font-size: 1.3rem;
 
-            color: var(--text-color);
+			color: var(--text-color);
 
-            p {
-                margin: 0;
-            }
-        }
-    }
+			p {
+				margin: 0;
+			}
+		}
+	}
 }
 
 .userCard {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    background-color: var(--background-color-accent);
-    border-radius: 12px;
-    padding: 20px;
+	background-color: var(--background-color-accent);
+	border-radius: 12px;
+	padding: 20px;
 
-    height: fit-content;
-    width: 20vw;
-    min-width: 400px;
+	height: fit-content;
+	width: 20vw;
+	min-width: 400px;
 
-    transition: all 0.3s ease-in-out;
+	transition: all 0.3s ease-in-out;
 
-    outline: 1px solid var(--border-color);
+	outline: 1px solid var(--border-color);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span {
-        margin: 0;
-    }
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span {
+		margin: 0;
+	}
 
-    .avatar {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
+	.avatar {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
 
-        height: 10vh;
-        width: 10vh;
+		height: 10vh;
+		width: 10vh;
 
-        align-self: center;
+		border-radius: 12px;
 
-        img {
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-        }
-    }
+		overflow: hidden;
+		align-self: center;
 
-    .username {
-        display: flex;
-        flex-direction: row;
+		background-color: var(--background-color-primary-2);
 
-        margin-top: 20px;
+		.lazy-load-image-background {
+			width: 100%;
+			height: 100%;
 
-        .username_text {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
+			img {
+				width: 100%;
+				height: 100%;
 
-            h1 {
-                display: inline-flex;
-                font-size: 1.5rem;
-                font-weight: 600;
-                font-family: "Space grotesk", sans-serif;
-            }
+				object-fit: cover;
+			}
+		}
+	}
 
-            span {
-                font-size: 0.8rem;
-                font-style: italic;
-            }
+	.username {
+		display: flex;
+		flex-direction: row;
 
-            svg {
-                fill: var(--app-color);
-                font-size: 0.8rem;
-            }
-        }
+		margin-top: 20px;
 
-        .indicators {
-            display: inline-flex;
-            flex-direction: row;
+		.username_text {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
 
-            align-items: center;
+			h1 {
+				display: inline-flex;
+				font-size: 1.5rem;
+				font-weight: 600;
+				font-family: "Space grotesk", sans-serif;
+			}
 
-            width: fit-content;
+			span {
+				font-size: 0.8rem;
+				font-style: italic;
+			}
 
-            svg {
-                font-size: 1.4rem;
-            }
-        }
-    }
+			svg {
+				fill: var(--app-color);
+				font-size: 0.8rem;
+			}
+		}
 
-    .description {
-        margin-top: 20px;
+		.indicators {
+			display: inline-flex;
+			flex-direction: row;
 
-        max-height: 295px;
+			align-items: center;
 
-        overflow: hidden;
-        text-overflow: ellipsis;
+			width: fit-content;
 
-        h3 {
-            margin: 0;
-            font-size: 0.8rem;
-            font-weight: normal;
+			svg {
+				font-size: 1.4rem;
+			}
+		}
+	}
 
-            height: 100%;
+	.description {
+		margin-top: 20px;
 
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
+		max-height: 295px;
 
-    .badges {
-        justify-content: flex-end;
-    }
+		overflow: hidden;
+		text-overflow: ellipsis;
 
-    .userLinks {
-        display: flex;
-        flex-direction: column;
+		h3 {
+			margin: 0;
+			font-size: 0.8rem;
+			font-weight: normal;
 
-        margin-top: 20px;
+			height: 100%;
 
-        gap: 10px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
 
-        .userLink {
-            display: flex;
-            flex-direction: row;
+	.badges {
+		justify-content: flex-end;
+	}
 
-            align-items: center;
+	.userLinks {
+		display: flex;
+		flex-direction: column;
 
-            width: fit-content;
+		margin-top: 20px;
 
-            gap: 5px;
+		gap: 10px;
 
-            transition: all 0.3s ease-in-out;
+		.userLink {
+			display: flex;
+			flex-direction: row;
 
-            &.clickable {
-                cursor: pointer;
+			align-items: center;
 
-                &:hover {
+			width: fit-content;
 
-                    svg,
-                    p {
-                        color: var(--app-color);
-                    }
-                }
-            }
+			gap: 5px;
 
-            svg {
-                font-size: 1rem;
-                margin-right: 0 !important;
-                color: var(--text-color);
-            }
+			transition: all 0.3s ease-in-out;
 
-            p {
-                font-size: 0.8rem;
-                font-family: "Space grotesk", sans-serif;
-                font-weight: 600;
+			&.clickable {
+				cursor: pointer;
 
-                user-select: text;
-            }
-        }
-    }
+				&:hover {
+					svg,
+					p {
+						color: var(--app-color);
+					}
+				}
+			}
+
+			svg {
+				font-size: 1rem;
+				margin-right: 0 !important;
+				color: var(--text-color);
+			}
+
+			p {
+				font-size: 0.8rem;
+				font-family: "Space grotesk", sans-serif;
+				font-weight: 600;
+
+				user-select: text;
+			}
+		}
+	}
 }
 
 .userLinkViewer {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    width: 100%;
-    height: fit-content;
+	width: 100%;
+	height: fit-content;
 
-    padding: 30px 0;
+	padding: 30px 0;
 
-    .userLinkViewer_icon {
-        font-size: 3rem;
-    }
+	.userLinkViewer_icon {
+		font-size: 3rem;
+	}
 
-    .userLinkViewer_value {
-        font-size: 1.5rem;
-        font-family: "DM Mono", monospace;
+	.userLinkViewer_value {
+		font-size: 1.5rem;
+		font-family: "DM Mono", monospace;
 
-        background-color: var(--background-color-accent);
+		background-color: var(--background-color-accent);
 
-        padding: 10px;
+		padding: 10px;
 
-        border-radius: 12px;
+		border-radius: 12px;
 
-        p {
-            margin: 0;
-        }
-    }
+		p {
+			margin: 0;
+		}
+	}
 }
