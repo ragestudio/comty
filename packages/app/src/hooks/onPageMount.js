@@ -88,4 +88,13 @@ export default ({ element, declaration }) => {
 			app.layout.toggleCenteredContent(options.layout.centeredContent)
 		}
 	}
+
+	if (
+		options?.layout?.maxHeight === true &&
+		app.layout?.toggleTotalWindowHeight
+	) {
+		app.layout.toggleTotalWindowHeight(true)
+	} else {
+		app.layout.toggleTotalWindowHeight(false)
+	}
 }
