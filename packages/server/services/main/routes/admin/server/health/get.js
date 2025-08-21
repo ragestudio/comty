@@ -10,7 +10,7 @@ function getUsage() {
 }
 
 export default {
-	middlewares: ["withAuthentication", "onlyAdmin"],
+	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async () => {
 		const cpus = os.cpus()
 

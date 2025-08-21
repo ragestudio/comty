@@ -1,39 +1,46 @@
 import { Config } from "@db_models"
 
 export default (req, res, next) => {
-    const requestedPath = `${req.method.toLowerCase()}${req.path.toLowerCase()}`
+	const requestedPath = `${req.method.toLowerCase()}${req.path.toLowerCase()}`
 
-    Config.findOne({ key: "permissions" }, undefined, {
-        lean: true,
-    }).then(({ value }) => {
-        req.assertedPermissions = []
+	Config.findOne({ key: "permissions" }, undefined, {
+		lean: true,
+	}).then(({ value }) => {
+		req.assertedPermissions = []
 
-        const pathRoles = value.pathRoles ?? {}
+		const pathRoles = value.pathRoles ?? {}
 
-        if (typeof pathRoles[requestedPath] === "undefined") {
-            console.warn(`[Permissions] No permissions defined for path ${requestedPath}`)
-            return next()
-        }
+		if (typeof pathRoles[requestedPath] === "undefined") {
+			console.warn(
+				`[Permissions] No permissions defined for path ${requestedPath}`,
+			)
+			return next()
+		}
 
-        const requiredRoles = Array.isArray(pathRoles[requestedPath]) ? pathRoles[requestedPath] : [pathRoles[requestedPath]]
+		const requiredRoles = Array.isArray(pathRoles[requestedPath])
+			? pathRoles[requestedPath]
+			: [pathRoles[requestedPath]]
 
-        requiredRoles.forEach((role) => {
-            if (req.user.roles.includes(role)) {
-                req.assertedPermissions.push(role)
-            }
-        })
+		requiredRoles.forEach((role) => {
+			if (req.user.roles.includes(role)) {
+				req.assertedPermissions.push(role)
+			}
+		})
 
-        if (req.user.roles.includes("admin")) {
-            req.assertedPermissions.push("admin")
-        }
+		if (req.user.roles.includes("admin")) {
+			req.assertedPermissions.push("admin")
+		}
 
-        if (req.assertedPermissions.length === 0 && !req.user.roles.includes("admin")) {
-            return res.status(403).json({
-                error: "forbidden",
-                message: "You don't have permission to access this resource",
-            })
-        }
+		if (
+			req.assertedPermissions.length === 0 &&
+			!req.user.roles.includes("admin")
+		) {
+			return res.status(403).json({
+				error: "forbidden",
+				message: "You don't have permission to access this resource",
+			})
+		}
 
-        next()
-    })
+		next()
+	})
 }

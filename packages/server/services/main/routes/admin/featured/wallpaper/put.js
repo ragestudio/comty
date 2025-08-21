@@ -2,7 +2,7 @@ import { FeaturedWallpaper } from "@db_models"
 import momentTimezone from "moment-timezone"
 
 export default {
-	middlewares: ["withAuthentication", "onlyAdmin"],
+	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async (req, res) => {
 		const data = req.body.wallpaper
 

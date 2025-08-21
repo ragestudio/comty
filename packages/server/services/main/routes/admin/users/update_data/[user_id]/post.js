@@ -3,7 +3,7 @@ import { User } from "@db_models"
 const filterKeys = ["_id", "__v", "password"]
 
 export default {
-	middlewares: ["withAuthentication", "onlyAdmin"],
+	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async (req, res) => {
 		const targetUserId = req.params.user_id
 
