@@ -1,6 +1,7 @@
 import React from "react"
 import { Skeleton, Button } from "antd"
 import mimetypes from "mime"
+import classNames from "classnames"
 import BearCarousel from "bear-react-carousel"
 
 import ImageViewer from "@components/ImageViewer"
@@ -83,14 +84,20 @@ const Attachment = React.memo((props) => {
 				case "video": {
 					return (
 						<video controls>
-							<source src={url} type={mimeType} />
+							<source
+								src={url}
+								type={mimeType}
+							/>
 						</video>
 					)
 				}
 				case "audio": {
 					return (
 						<audio controls>
-							<source src={url} type={mimeType} />
+							<source
+								src={url}
+								type={mimeType}
+							/>
 						</audio>
 					)
 				}
@@ -140,7 +147,9 @@ const Attachment = React.memo((props) => {
 	}
 })
 
-export default React.memo((props) => {
+Attachment.displayName = "Attachment"
+
+const Attachments = React.memo((props) => {
 	const [controller, setController] = React.useState()
 	const [carouselState, setCarouselState] = React.useState()
 	const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
@@ -157,7 +166,7 @@ export default React.memo((props) => {
 	}, [])
 
 	return (
-		<div className="post_attachments">
+		<div className={classNames("post_attachments", props.className)}>
 			{props.flags && props.flags.includes("nsfw") && !nsfwAccepted && (
 				<div className="nsfw_alert">
 					<h2>This post may contain sensitive content.</h2>
@@ -200,3 +209,10 @@ export default React.memo((props) => {
 		</div>
 	)
 })
+
+Attachments.displayName = "Attachments"
+Attachments.defaultProps = {
+	attachments: [],
+}
+
+export default Attachments

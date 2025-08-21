@@ -1,113 +1,122 @@
 .post_attachments {
-    box-sizing: border-box;
+	box-sizing: border-box;
 
-    position: relative;
+	position: relative;
 
-    display: flex;
+	display: flex;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    width: 100%;
-    max-width: 100%;
+	width: 100%;
+	max-width: 100%;
 
-    overflow-x: hidden;
+	max-height: 50vh;
 
-    transition: all 150ms ease-in-out;
+	overflow-x: hidden;
 
-    .bear-react-carousel__root {
-        font-family: "DM Mono", monospace;
+	transition: all 150ms ease-in-out;
 
-        border-radius: 12px;
+	.bear-react-carousel__root {
+		overflow: hidden;
 
-        overflow: hidden;
+		max-height: 50vh;
 
-        background-color: var(--background-color-primary);
+		border-radius: 12px;
 
-        .bear-react-carousel__pagination-group {
-            top: 0;
-            bottom: unset;
+		background-color: var(--background-color-primary);
 
-            margin-top: 10px;
-        }
+		.bear-react-carousel__container {
+			max-height: 50vh;
+		}
 
-        .bear-react-carousel__pagination-group:not([data-page-content="true"]) .bear-react-carousel__pagination-button[data-active] {
-            background-color: var(--colorPrimary);
-        }
-    }
+		.bear-react-carousel__pagination-group {
+			top: 0;
+			bottom: unset;
 
-    .attachment {
-        position: relative;
+			margin-top: 10px;
+		}
 
-        display: flex;
-        flex-direction: column;
+		.bear-react-carousel__pagination-group:not([data-page-content="true"])
+			.bear-react-carousel__pagination-button[data-active] {
+			background-color: var(--colorPrimary);
+		}
+	}
 
-        align-items: center;
-        justify-content: center;
+	.attachment {
+		position: relative;
 
-        width: 100%;
-        height: 50vh;
+		display: flex;
+		flex-direction: column;
 
-        max-height: 700px;
+		align-items: center;
+		justify-content: center;
 
-        .plyr {
-            width: 100%;
-            height: 100%;
-        }
+		width: 100%;
+		height: 100%;
 
-        // fixtures for media content
-        img {
-            width: 100%;
-            height: 100%;
+		.plyr {
+			width: 100%;
+			height: 100%;
+		}
 
-            user-select: none;
-            -webkit-user-drag: none;
+		// fixtures for media content
+		img {
+			width: 100%;
+			height: 100%;
 
-            object-fit: contain;
-        }
+			user-select: none;
+			-webkit-user-drag: none;
 
-        video {
-            height: 100%;
-            width: 100%;
+			overflow: hidden;
 
-            user-select: none;
-            -webkit-user-drag: none;
+			object-fit: contain;
+		}
 
-            object-fit: contain;
-        }
+		video {
+			height: 100%;
+			width: 100%;
 
-        audio {
-            width: 100%;
-            height: 100%;
+			user-select: none;
+			-webkit-user-drag: none;
 
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-    }
+			overflow: hidden;
+
+			object-fit: contain;
+		}
+
+		audio {
+			width: 100%;
+			height: 100%;
+
+			user-select: none;
+			-webkit-user-drag: none;
+		}
+	}
 }
 
 .plyr__controls {
-    position: absolute;
-    z-index: 60;
+	position: absolute;
+	z-index: 60;
 
-    padding: 10px 30px !important;
+	padding: 10px 30px !important;
 
-    .plyr__control {
-        &:hover {
-            background-color: var(--colorPrimary);
-        }
+	.plyr__control {
+		&:hover {
+			background-color: var(--colorPrimary);
+		}
 
-        svg {
-            color: white;
+		svg {
+			color: white;
 
-            margin: 0;
-        }
-    }
+			margin: 0;
+		}
+	}
 
-    .plyr__progress,
-    .plyr__volume {
-        input {
-            color: var(--colorPrimary);
-        }
-    }
+	.plyr__progress,
+	.plyr__volume {
+		input {
+			color: var(--colorPrimary);
+		}
+	}
 }
