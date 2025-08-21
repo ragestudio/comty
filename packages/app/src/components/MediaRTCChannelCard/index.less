@@ -118,17 +118,7 @@
 		border-radius: 12px;
 	}
 
-	&.muted {
-		img {
-			filter: grayscale(100%);
-		}
-
-		&___indicators {
-			padding-top: 5px;
-			padding-bottom: 5px;
-		}
-	}
-
+	&.muted,
 	&.deafened {
 		img {
 			filter: grayscale(100%);
@@ -180,5 +170,27 @@
 	}
 	100% {
 		box-shadow: 0 0 0 2px var(--colorPrimary);
+	}
+}
+
+.connection-indicator {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	gap: 5px;
+
+	transition: all 150 ease-in-out;
+
+	margin-left: auto;
+
+	&.connected {
+		color: #70e000;
+	}
+
+	&.failed {
+		color: #ff0000;
 	}
 }
