@@ -13,6 +13,7 @@ export default class SFXCore extends Core {
 	public = {
 		loadSoundpack: this.loadSoundpack.bind(this),
 		play: this.play,
+		soundsPool: () => this.soundsPool,
 	}
 
 	onEvents = {
