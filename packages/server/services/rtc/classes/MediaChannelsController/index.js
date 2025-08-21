@@ -1,6 +1,17 @@
 import * as mediasoup from "mediasoup"
-import { Group, GroupChannel } from "@db_models"
 import MediaChannel from "@classes/MediaChannel"
+
+import allowedMediaCodecs from "./allowedMediaCodecs.json"
+
+import joinClient from "./handlers/joinClient"
+import leaveClient from "./handlers/leaveClient"
+
+import handleUserConnectedToSocket from "./handlers/handleUserConnectedToSocket"
+import handleUserDisconnectedToSocket from "./handlers/handleUserDisconnectedToSocket"
+
+import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
+import findChannelsByGroupId from "./handlers/findChannelsByGroupId"
+import dispatchGroupStateUpdate from "./handlers/dispatchGroupStateUpdate"
 
 export default class MediaChannelsController {
 	constructor(server) {
@@ -10,170 +21,27 @@ export default class MediaChannelsController {
 	worker = null
 	instances = new Map()
 
-	static mediaCodecs = [
-		{
-			kind: "audio",
-			mimeType: "audio/opus",
-			clockRate: 48000,
-			channels: 2,
-		},
-		{
-			kind: "video",
-			mimeType: "video/VP8",
-			clockRate: 90000,
-			parameters: {
-				"x-google-start-bitrate": 1000,
-			},
-		},
-		{
-			kind: "video",
-			mimeType: "video/VP9",
-			clockRate: 90000,
-			parameters: {
-				"profile-id": 2,
-				"x-google-start-bitrate": 1000,
-			},
-		},
-		{
-			kind: "video",
-			mimeType: "video/h264",
-			clockRate: 90000,
-			parameters: {
-				"packetization-mode": 1,
-				"profile-level-id": "4d0032",
-				"level-asymmetry-allowed": 1,
-				"x-google-start-bitrate": 1000,
-			},
-		},
-		{
-			kind: "video",
-			mimeType: "video/H264",
-			clockRate: 90000,
-			parameters: {
-				"packetization-mode": 1,
-				"profile-level-id": "42e01f",
-				"level-asymmetry-allowed": 1,
-				"x-google-start-bitrate": 1000,
-			},
-		},
-	]
+	static allowedMediaCodecs = allowedMediaCodecs
 
-	async joinClient(client, channelId) {
-		try {
-			// Validate channel access
-			await this._validateChannelAccess(client.userId, channelId)
+	joinClient = joinClient.bind(this)
+	leaveClient = leaveClient.bind(this)
 
-			// Cleanup existing connection
-			if (client.currentMediaChannel) {
-				await this.leaveClient(client)
-				await new Promise((resolve) => setTimeout(resolve, 100))
-			}
+	handleUserConnectedToSocket = handleUserConnectedToSocket.bind(this)
+	handleUserDisconnectedToSocket = handleUserDisconnectedToSocket.bind(this)
 
-			// Get or create channel instance
-			let channelInstance = this.instances.get(channelId)
+	getUserJoinedGroupsIds = getUserJoinedGroupsIds.bind(this)
+	findChannelsByGroupId = findChannelsByGroupId.bind(this)
 
-			if (!channelInstance) {
-				channelInstance = await this._createChannelInstance(channelId)
-				this.instances.set(channelId, channelInstance)
-			}
-
-			// Set client channel
-			client.currentMediaChannel = channelId
-
-			// Join client to channel
-			const result = await channelInstance.joinClient(client)
-
-			// try to public to MQTT
-			globalThis.websockets.senders.toTopic(
-				channelInstance.data.group_id,
-				`group:${channelInstance.data.group_id}:state:update`,
-				{
-					event: "client:joined",
-					userId: client.userId,
-					channelId: channelId,
-					channelClients: Array.from(channelInstance.clients).map(
-						(c) => {
-							return {
-								userId: c.userId,
-							}
-						},
-					),
-				},
-			)
-
-			return result
-		} catch (error) {
-			console.error(`Error joining client ${client.userId}:`, error)
-			throw error
-		}
-	}
-
-	async leaveClient(client) {
-		try {
-			if (!client.currentMediaChannel) {
-				this._cleanupOrphanedResources(client)
-				return
-			}
-
-			const channelId = client.currentMediaChannel
-
-			const channelInstance = this.instances.get(channelId)
-
-			if (!channelInstance) {
-				client.currentMediaChannel = null
-				this._cleanupOrphanedResources(client)
-				return
-			}
-
-			// Leave channel
-			await channelInstance.leaveClient(client)
-
-			// Reset client state
-			client.currentMediaChannel = null
-
-			// Notify client
-			await client.emit("media:channel:leave", { channelId })
-
-			// Cleanup empty channel
-			if (channelInstance.clients.size === 0) {
-				console.log(`Closing empty channel ${channelId}`)
-				await channelInstance.close()
-				this.instances.delete(channelId)
-			}
-
-			// try to public to MQTT
-			globalThis.websockets.senders.toTopic(
-				channelInstance.data.group_id,
-				`group:${channelInstance.data.group_id}:state:update`,
-				{
-					event: "client:left",
-					userId: client.userId,
-					groupId: channelInstance.data.group_id,
-					channelId: channelId,
-					channelClients: Array.from(channelInstance.clients).map(
-						(c) => {
-							return {
-								userId: c.userId,
-							}
-						},
-					),
-				},
-			)
-
-			console.log(`Client ${client.userId} left channel ${channelId}`)
-		} catch (error) {
-			console.error(`Error leaving client ${client.userId}:`, error)
-		}
-	}
+	// group state handlers
+	dispatchGroupStateUpdate = dispatchGroupStateUpdate.bind(this)
 
 	async subscribeGroupState(client, groupId) {
 		await this._validateGroupAccess(client.userId, groupId)
-
-		await client.subcribe(groupId)
+		await client.subscribe(groupId)
 	}
 
 	async unsubscribeGroupState(client, groupId) {
-		await client.unsubcribe(groupId)
+		await client.unsubscribe(groupId)
 	}
 
 	async createWebRtcTransport(client) {
@@ -211,10 +79,6 @@ export default class MediaChannelsController {
 		return await channelInstance.handleSoundpadDispatch(client, payload)
 	}
 
-	getChannel(channelId) {
-		return this.instances.get(channelId)
-	}
-
 	async initialize() {
 		try {
 			console.log("Initializing mediasoup worker...")
@@ -242,6 +106,16 @@ export default class MediaChannelsController {
 				setTimeout(() => globalThis.process.exit(1), 2000)
 			})
 
+			// subcribe to websocket user connections
+			this.server.eventBus.on(
+				"user:connected",
+				this.handleUserConnectedToSocket,
+			)
+			this.server.eventBus.on(
+				"user:disconnect",
+				this.handleUserDisconnectedToSocket,
+			)
+
 			console.log("Mediasoup worker initialized successfully")
 		} catch (error) {
 			console.error("Error initializing mediasoup worker:", error)
@@ -249,27 +123,46 @@ export default class MediaChannelsController {
 		}
 	}
 
-	findChannelsByGroupId(groupId) {
-		return Array.from(this.instances.values()).filter((channelInstance) => {
-			return channelInstance.data.group_id === groupId
-		})
-	}
-
 	// Private methods
 	async _validateChannelAccess(userId, channelId) {
-		const channel = await GroupChannel.findOne({ _id: channelId })
+		const GroupsModel = global.scylla.model("groups")
+		const GroupChannelsModel = global.scylla.model("group_channels")
+		const GroupMembershipsModel = global.scylla.model("group_memberships")
+
+		const channel = await GroupChannelsModel.findOneAsync(
+			{
+				_id: channelId,
+			},
+			{
+				raw: true,
+			},
+		)
 
 		if (!channel) {
 			throw new Error("Channel not found")
 		}
 
-		const group = await Group.findOne({ _id: channel.group_id })
+		const group = await GroupsModel.findOneAsync(
+			{ _id: channel.group_id },
+			{
+				raw: true,
+			},
+		)
 
 		if (!group) {
 			throw new Error("Associated group not found")
 		}
 
-		const membership = group.members.find(
+		const memberships = await GroupMembershipsModel.findAsync(
+			{
+				group_id: group._id,
+			},
+			{
+				raw: true,
+			},
+		)
+
+		const membership = memberships.find(
 			(member) => member.user_id === userId,
 		)
 
@@ -281,13 +174,30 @@ export default class MediaChannelsController {
 	}
 
 	async _validateGroupAccess(userId, groupId) {
-		const group = await Group.findOne({ _id: groupId })
+		const GroupsModel = global.scylla.model("groups")
+		const GroupMembershipsModel = global.scylla.model("group_memberships")
+
+		const group = await GroupsModel.findOneAsync(
+			{ _id: groupId },
+			{
+				raw: true,
+			},
+		)
 
 		if (!group) {
 			throw new Error("Group not found")
 		}
 
-		const membership = group.members.find(
+		const memberships = await GroupMembershipsModel.findAsync(
+			{
+				group_id: group._id,
+			},
+			{
+				raw: true,
+			},
+		)
+
+		const membership = memberships.find(
 			(member) => member.user_id === userId,
 		)
 
@@ -298,21 +208,27 @@ export default class MediaChannelsController {
 		return group
 	}
 
-	async _createChannelInstance(channelId) {
-		const channel = await GroupChannel.findOne({ _id: channelId })
+	async _createChannelInstance(groupId, channelId) {
+		const GroupChannelsModel = global.scylla.model("group_channels")
+
+		const channel = await GroupChannelsModel.findOneAsync({
+			_id: channelId,
+			group_id: groupId,
+		})
 
 		if (!channel) {
 			throw new Error("Channel not found")
 		}
 
 		const channelInstance = new MediaChannel({
-			data: channel.toObject(),
+			data: channel.toJSON(),
 			channelId: channelId,
 			worker: this.worker,
-			mediaCodecs: MediaChannelsController.mediaCodecs,
+			mediaCodecs: MediaChannelsController.allowedMediaCodecs,
 		})
 
 		await channelInstance.initialize()
+
 		return channelInstance
 	}
 
