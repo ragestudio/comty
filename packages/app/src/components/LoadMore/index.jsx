@@ -13,10 +13,15 @@ const LoadMore = React.forwardRef((props, ref) => {
 	} = props
 
 	const nodeRef = React.useRef(null)
+	const [loading, setLoading] = React.useState(false)
 
 	let observer = null
 
 	const insideViewportCb = (entries) => {
+		if (loading) {
+			return false
+		}
+
 		const { fetching, onBottom, hasMore } = props
 
 		if (!hasMore) {
@@ -25,7 +30,11 @@ const LoadMore = React.forwardRef((props, ref) => {
 
 		entries.forEach((element) => {
 			if (element.intersectionRatio > 0 && !fetching) {
-				onBottom()
+				setLoading(true)
+
+				onBottom().then(() => {
+					setLoading(false)
+				})
 			}
 		})
 	}
@@ -45,10 +54,12 @@ const LoadMore = React.forwardRef((props, ref) => {
 	}, [])
 
 	return (
-		<div ref={ref} className={classnames(className)} {...contentProps}>
+		<div
+			ref={ref}
+			className={classnames(className)}
+			{...contentProps}
+		>
 			{children}
-
-			{/* <div style={{ clear: "both" }} /> */}
 
 			<div
 				ref={nodeRef}
