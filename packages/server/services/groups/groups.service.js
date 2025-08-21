@@ -1,6 +1,8 @@
 import { Server } from "linebridge"
+import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import RedisClient from "@shared-classes/RedisClient"
 import InjectedAuth from "@shared-lib/injectedAuth"
 import SharedMiddlewares from "@shared-middlewares"
@@ -53,11 +55,18 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		redis: RedisClient(),
+		scylla: (global.scylla = new ScyllaDb({
+			contactPoints: ["172.17.0.2"],
+			localDataCenter: "datacenter1",
+			keyspace: "comty",
+		})),
+		snowflake: (global.snowflake = new SnowflakeWorker(0, 1)),
 	}
 
 	async onInitialize() {
 		await this.contexts.db.initialize()
 		await this.contexts.redis.initialize()
+		await this.contexts.scylla.initialize()
 	}
 }
 

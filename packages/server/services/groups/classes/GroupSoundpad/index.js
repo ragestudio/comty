@@ -27,6 +27,22 @@ export default class GroupSoundpad {
 				name: "Real DJ",
 				src: "https://storage.ragestudio.net:443/comty-cdn/627d4b628cf4b82edd0864ff/88f4d54094cab00d2d260e4be801152f8587c2c41c7cb69b1f34759cb08678ef",
 			},
+			{
+				_id: "000004",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "🎙️",
+				name: "Casi vivo",
+				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/ba.ogg",
+			},
+			{
+				_id: "000005",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "🙂‍↕️",
+				name: "Ascension to heaven",
+				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/dt.ogg",
+			},
 		]
 	}
 

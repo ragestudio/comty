@@ -1,8 +1,9 @@
 import { Group } from "@db_models"
+import Groups from "@classes/Groups"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
-	fn: async (req) => {
+	fallbackFn: async (req) => {
 		const user_id = req.auth.session.user_id
 
 		let group = new Group({
@@ -20,5 +21,11 @@ export default {
 		await group.save()
 
 		return group
+	},
+	fn: async (req) => {
+		return await Groups.create({
+			...req.body,
+			owner_user_id: req.auth.session.user_id,
+		})
 	},
 }

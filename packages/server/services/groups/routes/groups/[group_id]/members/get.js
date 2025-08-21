@@ -1,50 +1,39 @@
-import { Group, User } from "@db_models"
+import { User } from "@db_models"
+import GroupMemberships from "@classes/GroupMemberships"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const { limit = 50, page = 0 } = req.query
+		const { limit = 50, offset } = req.query
 
-		const group = await Group.findById(req.params.group_id).catch(() => null)
+		const totalMembers = await GroupMemberships.getTotalMembersByGroupId(
+			req.params.group_id,
+		)
 
-		if (!group) {
-			throw new OperationError(404, "Group not found")
-		}
+		let items = await GroupMemberships.getByGroupId(req.params.group_id, {
+			limit: limit,
+			offset: offset,
+		})
 
-		const users = await User.find({
+		let users = await User.find({
 			_id: {
-				$in: group.members.map((member) => member.user_id),
+				$in: items.map((item) => item.user_id),
 			},
-		})
-			.lean()
-			.limit(limit)
-			.skip(page * limit)
+		}).lean()
 
-		if (users.length === 0) {
+		users = new Map(users.map((user) => [user._id.toString(), user]))
+
+		items = items.map((item) => {
 			return {
-				items: [],
-				total_items: group.members.length,
-				has_more: false,
-			}
-		}
-
-		const userMap = new Map(users.map((user) => [user._id.toString(), user]))
-
-		const members = group.members.map((member) => {
-			const user = userMap.get(member.user_id)
-
-			return {
-				...user,
-				joined_at: member.joined_at,
+				...item.toJSON(),
+				user: users.get(item.user_id),
 			}
 		})
 
-		const nextPage = page + 1
-
+		// TODO: add pagination
 		return {
-			items: members,
-			total_items: group.members.length,
-			has_more: group.members.length > limit * nextPage,
+			total_items: totalMembers,
+			items: items,
 		}
 	},
 }

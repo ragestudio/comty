@@ -3,10 +3,8 @@ import GroupChannels from "@classes/GroupChannels"
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		return await GroupChannels.update(
+		return await GroupChannels.getByGroupId(
 			req.params.group_id,
-			req.params.channel_id,
-			req.body,
 			req.auth.session.user_id,
 		)
 	},
