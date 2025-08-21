@@ -6,18 +6,24 @@ export default async (core, data) => {
 			return null
 		}
 
-		core.console.debug(`Producer joined:`, data)
+		core.console.debug(`Remote producer joined:`, data)
 
 		// add to producers
 		core.producers.set(data.producerId, data)
 
 		if (data.appData) {
-			// if is a user mic, start the consumer and attach media & voice detector
-			if (data.appData.mediaTag === "user-mic") {
-				core.handlers.startClientMic(data)
+			const client = core.clients.get(data.userId)
+
+			if (!client) {
+				throw new Error("Client not found/available")
 			}
 
-			// if user screen, play sfx
+			// if is a user mic, start the consumer and attach mic
+			if (data.appData.mediaTag === "user-mic") {
+				client.attachMic(data)
+			}
+
+			// if user screen, just play sfx
 			if (data.appData.mediaTag === "screen-video") {
 				app.cores.sfx.play("media_video_join")
 			}

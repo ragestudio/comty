@@ -1,47 +1,34 @@
 import { Core } from "@ragestudio/vessel"
+import { RTEngineClient } from "linebridge/client/src/rtengine"
+import SessionModel from "@models/session"
 
-import AudioProcessor from "./classes/AudioProcessor"
 import MediaRTCState from "./classes/State"
 import MediaRTCUI from "./classes/UI"
+import Self from "./classes/Self"
+import Consumers from "./classes/Consumers"
+import Producers from "./classes/Producers"
+import Clients from "./classes/Clients"
 
+import buildWebsocketHandler from "./utils/buildWebsocketHandler"
 import * as Vars from "./vars"
 
 // handlers
-import connectSocket from "./handlers/connectSocket"
-import disconnectSocket from "./handlers/disconnectSocket"
-import createProducer from "./handlers/createProducer"
 import createTransports from "./handlers/createTransports"
 import changeInputParams from "./handlers/changeInputParams"
 import changeOutputParams from "./handlers/changeOutputParams"
 import changeScreenParams from "./handlers/changeScreenParams"
-import updateClientVoiceState from "./handlers/updateClientVoiceState"
-import soundpadDispatch from "./handlers/soundpadDispatch"
-
-import muteMicrophone from "./handlers/muteMicrophone"
-import unmuteMicrophone from "./handlers/unmuteMicrophone"
-import deafenAudio from "./handlers/deafenAudio"
-import undeafenAudio from "./handlers/undeafenAudio"
 
 import joinChannel from "./handlers/joinChannel"
 import leaveChannel from "./handlers/leaveChannel"
+
 import startScreenShare from "./handlers/startScreenShare"
 import stopScreenShare from "./handlers/stopScreenShare"
-import initializeUserAudio from "./handlers/initializeUserAudio"
-import initializeUserScreen from "./handlers/initializeUserScreen"
-import attachAudioMedia from "./handlers/attachAudioMedia"
-import dettachAudioMedia from "./handlers/dettachAudioMedia"
-import startClientMic from "./handlers/startClientMic"
-import stopClientMic from "./handlers/stopClientMic"
 
-import startConsumer from "./handlers/startConsumer"
-import startAudioProducer from "./handlers/startAudioProducer"
-import startScreenProducer from "./handlers/startScreenProducer"
-import startVoiceDetector from "./handlers/startVoiceDetector"
+import toggleMute from "./handlers/toggleMute"
+import toggleDeafen from "./handlers/toggleDeafen"
 
-import stopConsumer from "./handlers/stopConsumer"
-import stopAudioProducer from "./handlers/stopAudioProducer"
-import stopScreenProducer from "./handlers/stopScreenProducer"
-import stopVoiceDetector from "./handlers/stopVoiceDetector"
+import soundpadDispatch from "./handlers/soundpadDispatch"
+import callUser from "./handlers/callUser"
 
 // ws events
 import clientJoinedEvent from "./events/clientJoined"
@@ -50,6 +37,7 @@ import clientEventEvent from "./events/clientEvent"
 import producerJoinedEvent from "./events/producerJoined"
 import producerLeftEvent from "./events/producerLeft"
 import soundpadDispatchEvent from "./events/soundpadDispatch"
+import callIncomingEvent from "./events/callIncoming"
 
 const WebsocketEvents = {
 	"media:channel:client:joined": clientJoinedEvent,
@@ -58,6 +46,7 @@ const WebsocketEvents = {
 	"media:channel:producer:joined": producerJoinedEvent,
 	"media:channel:producer:left": producerLeftEvent,
 	"media:channel:soundpad:dispatch": soundpadDispatchEvent,
+	"call:incoming": callIncomingEvent,
 }
 
 export default class MediaRTC extends Core {
@@ -76,26 +65,11 @@ export default class MediaRTC extends Core {
 		)
 	}
 
-	static get inputDeviceId() {
-		return app.cores.settings.get("mediartc:input_device")
-	}
-
-	static get outputDeviceId() {
-		return app.cores.settings.get("mediartc:output_device")
-	}
-
-	get isMuted() {
-		return this.audioProducer ? this.audioProducer.paused : false
-	}
-
-	get isDeafened() {
-		return this.audioOutput.context.state === "suspended"
-	}
-
 	static defaultAudioEncodingParams = {
 		maxBitrate: 98000,
 		priority: "high",
 		networkPriority: "high",
+		dtx: true,
 	}
 
 	static defaultVideoEncodingParams = {
@@ -111,41 +85,18 @@ export default class MediaRTC extends Core {
 		networkPriority: "high",
 	}
 
-	get audioParams() {
-		return {
-			echoCancellation:
-				app.cores.settings.get("mediartc:echoCancellation") ?? true,
-			noiseSuppression:
-				app.cores.settings.get("mediartc:noiseSuppression") ?? true,
-			autoGainControl:
-				app.cores.settings.get("mediartc:audioGainControl") ?? true,
-			sampleRate: 44100,
-			channelCount: 1,
-			volume: app.cores.settings.get("mediartc:audioVolume") ?? 1.0,
-		}
-	}
-
-	ui = new MediaRTCUI(this)
-	state = new MediaRTCState(this)
-
 	socket = null
 	device = null
 	sendTransport = null
 	recvTransport = null
 
-	audioProducer = null
-	screenShareProducer = null
+	ui = new MediaRTCUI(this)
+	state = new MediaRTCState(this)
 
-	audioStream = null
-	screenStream = null
-
-	producers = new Map()
-	consumers = new Map()
-	voiceDetectors = new Set()
-	audioElements = new Map()
-
-	audioOutput = null
-	audioInput = null
+	self = new Self(this)
+	clients = new Clients(this)
+	producers = new Producers(this)
+	consumers = new Consumers(this)
 
 	public = {
 		instance: () => this,
@@ -160,44 +111,25 @@ export default class MediaRTC extends Core {
 	}
 
 	handlers = {
-		connectSocket: connectSocket.bind(this),
-		disconnectSocket: disconnectSocket.bind(this),
 		joinChannel: joinChannel.bind(this),
 		leaveChannel: leaveChannel.bind(this),
-		initializeUserAudio: initializeUserAudio.bind(this),
-		initializeUserScreen: initializeUserScreen.bind(this),
-		attachAudioMedia: attachAudioMedia.bind(this),
-		dettachAudioMedia: dettachAudioMedia.bind(this),
-		startConsumer: startConsumer.bind(this),
 		startScreenShare: startScreenShare.bind(this),
 		stopScreenShare: stopScreenShare.bind(this),
-		startAudioProducer: startAudioProducer.bind(this),
-		startScreenProducer: startScreenProducer.bind(this),
-		startVoiceDetector: startVoiceDetector.bind(this),
-		startClientMic: startClientMic.bind(this),
-		stopClientMic: stopClientMic.bind(this),
-		stopConsumer: stopConsumer.bind(this),
-		stopAudioProducer: stopAudioProducer.bind(this),
-		stopScreenProducer: stopScreenProducer.bind(this),
-		stopVoiceDetector: stopVoiceDetector.bind(this),
 		createTransports: createTransports.bind(this),
-		createProducer: createProducer.bind(this),
-		muteMicrophone: muteMicrophone.bind(this),
-		unmuteMicrophone: unmuteMicrophone.bind(this),
-		deafenAudio: deafenAudio.bind(this),
-		undeafenAudio: undeafenAudio.bind(this),
 		changeInputParams: changeInputParams.bind(this),
 		changeOutputParams: changeOutputParams.bind(this),
 		changeScreenParams: changeScreenParams.bind(this),
-		updateClientVoiceState: updateClientVoiceState.bind(this),
 		soundpadDispatch: soundpadDispatch.bind(this),
+		toggleMute: toggleMute.bind(this),
+		toggleDeafen: toggleDeafen.bind(this),
+		callUser: callUser.bind(this),
 	}
 
 	onRuntimeEvents = {
 		"authmanager:authed": async () => {
 			this.console.debug("auth manager started, connecting to rtc")
 
-			await this.handlers.connectSocket({
+			await this.connectSocket({
 				registerEvents: WebsocketEvents,
 			})
 		},
@@ -206,22 +138,70 @@ export default class MediaRTC extends Core {
 				"auth manager logged out, disconnecting from rtc",
 			)
 
-			await this.handlers.disconnectSocket()
+			await this.disconnectSocket()
 		},
 	}
 
 	async afterInitialize() {
-		this.audioOutput = new AudioProcessor(this, {
-			sinkId: MediaRTC.outputDeviceId,
-		})
+		this.self.audioOutput.initialize()
+	}
+
+	async connectSocket({ registerEvents }) {
+		try {
+			this.state.status = "connecting"
+
+			this.console.debug(
+				"connecting to rtc websocket",
+				this.constructor.wsUrl,
+			)
+
+			this.socket = new RTEngineClient({
+				refName: "rtc",
+				url: this.constructor.wsUrl,
+				token: SessionModel.token,
+				maxConnectRetries: 0,
+			})
+
+			await this.socket.connect()
+
+			// register events
+			for (const event of Object.keys(registerEvents)) {
+				this.socket.on(
+					event,
+					buildWebsocketHandler(this, registerEvents[event]),
+				)
+			}
+
+			this.state.status = "connected"
+		} catch (error) {
+			this.console.error("Error connecting ws:", error)
+			this.state.status = "failed"
+		}
+	}
+
+	async disconnectSocket() {
+		try {
+			this.state.status = "disconnecting"
+
+			this.console.debug("disconnecting rtc websocket")
+
+			// destroy socket
+			await this.socket.destroy()
+
+			this.state.status = "disconnected"
+		} catch (error) {
+			this.console.error("Error disconnecting ws:", error)
+
+			this.state.status = "failed"
+		}
 	}
 
 	async sendVoiceStateUpdate() {
 		await this.socket.emit("channel:client_event", {
 			event: "updateVoiceState",
 			data: {
-				muted: this.isMuted,
-				deafened: this.isDeafened,
+				muted: this.self.isMuted,
+				deafened: this.self.isDeafened,
 			},
 		})
 	}

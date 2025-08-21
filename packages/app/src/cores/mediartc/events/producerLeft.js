@@ -1,19 +1,24 @@
 export default async (core, data) => {
 	try {
-		core.console.log("Producer left", data)
+		// if self producer, ignore
+		// the server should not send this event for itself
+		if (data.userId === app.userData._id) {
+			return null
+		}
+
+		core.console.log("Remote producer left", data)
 
 		// delete from producers
 		core.producers.delete(data.producerId)
 
-		// try to stop the consumer
-		core.handlers.stopConsumer({
-			producerId: data.producerId,
-			userId: data.userId,
-		})
+		// stop all consumers
+		await core.consumers.stopByProducerId(data.producerId)
 
 		if (data.appData) {
+			const client = core.clients.get(data.userId)
+
 			if (data.appData.mediaTag === "user-mic") {
-				core.handlers.stopClientMic(data)
+				client.dettachMic()
 			}
 
 			if (data.appData.mediaTag === "screen-video") {

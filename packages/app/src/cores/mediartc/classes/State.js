@@ -12,8 +12,10 @@ export default class MediaRTCState {
 		channel: null,
 		channelId: null,
 		clients: Array(),
-		speakingClients: Object(),
 		availableConsumers: Array(),
+		recvTransportState: "closed",
+		sendTransportState: "closed",
+		micStreamAvailable: false,
 	}
 
 	constructor(core) {

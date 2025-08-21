@@ -31,14 +31,22 @@ const sendTransportHandlers = {
 			errback(error)
 		}
 	},
-	close: async function (data) {
-		console.log("send transport close", data)
-	},
 	connectionstatechange: function (state) {
-		console.log("connectionstatechange", state)
+		console.log("[webrtc] [send:transport] state changed: ", state)
+
+		this.state.sendTransportState = state
+
 		if (state === "failed") {
 			this.console.error("Send transport failed")
 		}
+	},
+}
+
+const sendTransportObserver = {
+	close: async function () {
+		console.debug("[webrtc] [send:transport] closed")
+
+		this.state.sendTransportState = "closed"
 	},
 }
 
@@ -57,12 +65,21 @@ const recvTransportHandlers = {
 		}
 	},
 	connectionstatechange: function (state) {
+		console.log("[webrtc] [recv:transport] state changed: ", state)
+
+		this.state.recvTransportState = state
+
 		if (state === "failed") {
 			this.console.error("Receive transport failed")
 		}
 	},
-	close: async function (data) {
-		console.log("recv transport close", data)
+}
+
+const recvTransportObserver = {
+	close: async function () {
+		console.log("[webrtc] [recv:transport] closed")
+
+		this.state.recvTransportState = "closed"
 	},
 }
 
@@ -89,7 +106,15 @@ export default async function () {
 		this.sendTransport.on(event, handler.bind(this))
 	}
 
+	for (const [event, handler] of Object.entries(sendTransportObserver)) {
+		this.sendTransport.observer.on(event, handler.bind(this))
+	}
+
 	for (const [event, handler] of Object.entries(recvTransportHandlers)) {
 		this.recvTransport.on(event, handler.bind(this))
+	}
+
+	for (const [event, handler] of Object.entries(recvTransportObserver)) {
+		this.recvTransport.observer.on(event, handler.bind(this))
 	}
 }

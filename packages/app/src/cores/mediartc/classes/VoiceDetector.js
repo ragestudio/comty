@@ -28,13 +28,15 @@ export default class VoiceDetector {
 	async initialize(stream) {
 		try {
 			// Create audio context
-			this.audioContext = new (window.AudioContext ||
-				window.webkitAudioContext)()
+			this.audioContext = new AudioContext({
+				latencyHint: "interactive",
+			})
 
 			// Create analyser node
 			this.analyser = this.audioContext.createAnalyser()
 			this.analyser.fftSize = this.options.fftSize
-			this.analyser.smoothingTimeConstant = this.options.smoothingTimeConstant
+			this.analyser.smoothingTimeConstant =
+				this.options.smoothingTimeConstant
 
 			// Create microphone source
 			this.microphone = this.audioContext.createMediaStreamSource(stream)

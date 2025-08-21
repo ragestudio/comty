@@ -16,36 +16,17 @@ export default async function () {
 		}
 
 		// stop producers
-		await this.handlers.stopAudioProducer()
-		await this.handlers.stopScreenProducer()
+		await this.self.stopMicProducer()
+		await this.self.stopScreenProducer()
 
-		// destroy all consumers
-		for (const [producerId, consumer] of this.consumers) {
-			if (!consumer.closed) {
-				consumer.close()
-			}
-		}
+		// stop local streams
+		await this.self.destroyMicStream()
+		await this.self.destroyScreenStream()
 
-		// clear consumers map
-		this.consumers.clear()
-
-		// clear producers map
+		// destroy all consumers&producers&clients
+		await this.consumers.stopAll()
+		await this.clients.destroyAll()
 		this.producers.clear()
-
-		// destroy all remaining voice detectors
-		for await (const voiceDetector of this.voiceDetectors.values()) {
-			await voiceDetector.detector.destroy()
-		}
-
-		this.voiceDetectors.clear()
-
-		// destroy all remaining attached media
-		for (const [producerId, audioElement] of this.audioElements) {
-			audioElement.pause()
-			audioElement.srcObject = null
-		}
-
-		this.audioElements.clear()
 
 		// close transports
 		if (this.sendTransport && !this.sendTransport.closed) {
@@ -55,37 +36,13 @@ export default async function () {
 			this.recvTransport.close()
 		}
 
-		// stop local streams
-		if (this.audioStream) {
-			this.audioStream.getTracks().forEach((track) => track.stop())
-		}
-		if (this.screenStream) {
-			this.screenStream.getTracks().forEach((track) => track.stop())
-		}
-
-		// stop system audio capture if active
-		if (this.systemAudioCaptureActive && window.ipcRenderer) {
-			try {
-				await window.ipcRenderer.invoke(
-					"desktopcapturer:stopSystemAudioCapture",
-				)
-				this.systemAudioCaptureActive = false
-				this.console.log(
-					"system audio capture stopped on channel leave",
-				)
-			} catch (error) {
-				console.error(
-					"Failed to stop system audio capture on channel leave:",
-					error,
-				)
-			}
-		}
-
 		// call socket to leave
 		await this.socket.call("channel:leave")
 
 		// clear device
 		this.device = null
+
+		// default state
 		this.state.isJoined = false
 		this.state.isLoading = false
 		this.state.channelId = null
