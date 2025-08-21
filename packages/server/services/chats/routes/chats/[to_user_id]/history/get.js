@@ -1,7 +1,7 @@
 import { User, ChatMessage } from "@db_models"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const { limit = 50, offset = 0, order = "asc" } = req.query
 

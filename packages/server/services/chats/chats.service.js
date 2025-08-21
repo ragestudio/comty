@@ -1,60 +1,72 @@
-import { Server } from "linebridge"
+//import { Server } from "linebridge"
+import { Server } from "../../../../linebridge/server/src"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import RoomsController from "@classes/RoomsController"
+import InjectedAuth from "@shared-lib/injectedAuth"
+import ScyllaDb from "@shared-classes/ScyllaDb"
+import ChatChannelsController from "@classes/ChatChannelsController"
+import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
-    static refName = "chats"
-    static enableWebsockets = true
-    static routesPath = `${__dirname}/routes`
-    static wsRoutesPath = `${__dirname}/routes_ws`
-    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3004
+	static refName = "chats"
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3004
 
-    middlewares = {
-        ...SharedMiddlewares
-    }
+	static useMiddlewares = ["logs"]
+	static bypassCors = true
+	static websockets = {
+		enabled: true,
+		path: "/chats",
+	}
 
-    contexts = {
-        db: new DbManager(),
-        redis: RedisClient(),
-        rooms: null,
-    }
+	middlewares = {
+		...SharedMiddlewares,
+	}
 
-    wsEvents = {
-        "join:room": (socket, data) => {
-            this.contexts.rooms.connectSocketToRoom(socket, data.room)
-        },
-        "leave:room": (socket, data) => {
-            this.contexts.rooms.disconnectSocketFromRoom(socket, data?.room ?? socket.connectedRoom)
-        },
-        "disconnect": (socket) => {
-            try {
-                console.log(`[${socket.id}] disconnected from hub.`)
+	contexts = {
+		db: new DbManager(),
+		redis: RedisClient(),
+		chatChannelsController: new ChatChannelsController(this),
+		scylla: new ScyllaDb({
+			contactPoints: ["172.17.0.2"],
+			localDataCenter: "datacenter1",
+			keyspace: "comty",
+		}),
+		// TODO: add linebridge cluster worker & datacenter id
+		snowflake: new SnowflakeWorker(0, 1),
+	}
 
-                if (socket.connectedRoomID) {
-                    this.contexts.rooms.disconnectSocketFromRoom(socket, socket.connectedRoomID)
-                }
-            } catch (error) {
-                console.error(error)
-            }
-        }
-    }
+	handleWsUpgrade = async (context, token, res) => {
+		if (!token) {
+			return res.status(401).json({ error: "Missing auth token" })
+		}
 
-    async onInitialize() {
-        if (!this.engine.ws) {
-            throw new Error(`Engine WS not found!`)
-        }
-        
-        this.contexts.rooms = new RoomsController(this.engine.ws.io)
-        
-        await this.contexts.db.initialize()
-        await this.contexts.redis.initialize()
-    }
+		context = await InjectedAuth(context, token, res).catch(() => {
+			res.status(401).json({ error: "Failed to verify auth token" })
+			return false
+		})
 
-    handleWsAuth = require("@shared-lib/handleWsAuth").default
+		if (!context || !context.user) {
+			res.status(401).json({
+				error: "Invalid auth token",
+			})
+			return false
+		}
+
+		return res.upgrade(context)
+	}
+
+	async onInitialize() {
+		if (!this.engine.ws) {
+			throw new Error(`Engine WS not found!`)
+		}
+
+		await this.contexts.db.initialize()
+		await this.contexts.redis.initialize()
+		await this.contexts.scylla.initialize()
+	}
 }
 
 Boot(API)

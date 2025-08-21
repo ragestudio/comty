@@ -1,7 +1,7 @@
 import { UserChat } from "@db_models"
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		const current_user_id = req.auth.session.user_id
 		const target_user_id = req.params.to_user_id
