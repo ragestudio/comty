@@ -1,122 +1,123 @@
 .setting_item {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 100%;
+	width: 100%;
 
-    padding: 0 15px;
+	padding: 0 15px;
 
-    &.useHorizontal {
-        flex-direction: row;
+	gap: 10px;
 
-        justify-content: space-between;
+	&.useHorizontal {
+		flex-direction: row;
 
-        gap: 50px;
+		justify-content: space-between;
 
-        .setting_item_content {
-            width: fit-content;
-        }
-    }
+		gap: 50px;
 
-    .uploadButton {
-        background-color: var(--background-color-primary);
-        border: 1px solid var(--border-color);
-    }
+		.setting_item_content {
+			width: fit-content;
+		}
+	}
 
-    .setting_item_header {
-        display: inline-flex;
-        flex-direction: row;
+	.uploadButton {
+		background-color: var(--background-color-primary);
+		border: 1px solid var(--border-color);
+	}
 
-        align-items: center;
-        justify-content: space-between;
+	.setting_item_header {
+		display: inline-flex;
+		flex-direction: row;
 
-        width: 100%;
+		align-items: center;
+		justify-content: space-between;
 
-        .setting_item_info {
-            display: flex;
-            flex-direction: column;
+		width: 100%;
 
-            gap: 7px;
+		.setting_item_info {
+			display: flex;
+			flex-direction: column;
 
-            width: 100%;
+			//gap: 7px;
 
-            .setting_item_header_title {
-                display: flex;
-                flex-direction: row;
+			width: 100%;
 
-                align-items: center;
+			.setting_item_header_title {
+				display: flex;
+				flex-direction: row;
 
-                width: 100%;
+				align-items: center;
 
-                color: var(--background-color-contrast);
+				width: 100%;
 
-                gap: 5px;
+				color: var(--background-color-contrast);
 
-                h1 {
-                    font-size: 1rem;
-                    margin: 0;
-                    color: var(--background-color-contrast);
-                }
-            }
+				gap: 5px;
 
-            .setting_item_header_description {
-                p {
-                    color: var(--background-color-contrast);
-                    font-size: 0.7rem;
-                    margin: 0;
-                }
-            }
+				h1 {
+					font-size: 1rem;
+					margin: 0;
+					color: var(--background-color-contrast);
+				}
+			}
 
-        }
+			.setting_item_header_description {
+				p {
+					color: var(--background-color-contrast);
+					font-size: 0.7rem;
+					margin: 0;
+				}
+			}
+		}
 
-        .setting_item_header_actions {
-            display: inline-flex;
-            align-items: center;
+		.setting_item_header_actions {
+			display: inline-flex;
+			align-items: center;
 
-            gap: 10px;
+			gap: 10px;
 
-            .ant-btn {
-                background-color: var(--background-color-primary-2);
-            }
+			.ant-btn {
+				background-color: var(--background-color-primary-2);
+			}
 
-            .ant-btn:not([disabled]) {
-                &:hover {
-                    color: var(--colorPrimary);
-                    border: 1px solid var(--colorPrimary);
-                }
-            }
-        }
-    }
+			.ant-btn:not([disabled]) {
+				&:hover {
+					color: var(--colorPrimary);
+					border: 1px solid var(--colorPrimary);
+				}
+			}
+		}
+	}
 
-    .setting_item_content {
-        display: flex;
-        flex-direction: column;
+	.setting_item_content {
+		display: flex;
+		flex-direction: column;
 
-        --ignore-dragger: true;
-        padding: 6px 20px;
+		width: 100%;
 
-        width: 100%;
+		--ignore-dragger: true;
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        h3,
-        p,
-        span {
-            color: var(--background-color-contrast);
-        }
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6,
+		h3,
+		p,
+		span {
+			color: var(--background-color-contrast);
+		}
 
-        button {
-            width: min-content;
-        }
+		button {
+			width: min-content;
+		}
 
-        .ant-btn.ant-btn-icon-only {
-            width: 32px;
-        }
+		.ant-btn.ant-btn-icon-only {
+			width: 32px;
+		}
 
-        .ant-select {}
-    }
+		.ant-select {
+		}
+	}
 }
