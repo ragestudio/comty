@@ -12,6 +12,7 @@
 		"setup": "./boot scripts/setup/index.js"
 	},
 	"dependencies": {
+		"express-cassandra": "^2.9.1",
 		"@grpc/grpc-js": "^1.13.2",
 		"@grpc/proto-loader": "^0.7.13",
 		"@infisical/sdk": "^2.1.8",
