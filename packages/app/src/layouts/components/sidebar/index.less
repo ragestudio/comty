@@ -8,7 +8,9 @@
 
 	z-index: 1000;
 
-	width: fit-content;
+	// width: @sidebar_wrapper_fixed_width; // animated from motion
+	// min-width: @sidebar_wrapper_fixed_width; // animated from motion
+	max-width: @sidebar_wrapper_fixed_width;
 
 	height: 100vh;
 	height: 100dvh;
@@ -16,15 +18,16 @@
 	display: flex;
 	flex-direction: column;
 
-	align-items: center;
+	align-items: flex-start;
 
 	gap: 10px;
+	// padding: @sidebar_wrapper_padding; // animated from motion
 
-	padding: 10px;
+	overflow: visible;
 
 	&.hidden {
-		padding: 0;
-		width: 0px;
+		overflow: hidden;
+		pointer-events: none;
 	}
 }
 
@@ -60,6 +63,7 @@
 
 	&.expanded {
 		width: @sidebar_width_expanded;
+		box-shadow: @sidebar_expanded_shadow;
 
 		.app_sidebar_menu_wrapper {
 			.ant-menu {

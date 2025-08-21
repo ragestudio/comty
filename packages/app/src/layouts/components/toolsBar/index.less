@@ -10,19 +10,11 @@
 
 	height: 100vh;
 	height: 100dvh;
-	min-width: 400px;
-	max-width: 420px;
 
-	padding: 10px;
+	// min-width: @toolsbar_min-width; // animated from motion
+	max-width: @toolsbar_wrapper_max-width;
 
-	.visible {
-		min-width: 320px;
-	}
-
-	&:not(.visible) {
-		min-width: 0;
-		padding: 0;
-	}
+	// padding: @toolsbar_wrapper_padding; // animated from motion
 }
 
 .tools-bar {

@@ -23,7 +23,10 @@ const DesktopLayout = (props) => {
 			<Modals />
 			<DraggableDrawerController />
 
-			<Layout id="app_layout" className="app_layout">
+			<Layout
+				id="app_layout"
+				className="app_layout"
+			>
 				<Sidebar user={props.user} />
 
 				<Layout.Content
@@ -50,7 +53,10 @@ const DesktopLayout = (props) => {
 
 const MobileLayout = (props) => {
 	return (
-		<Layout id="app_layout" className="app_layout">
+		<Layout
+			id="app_layout"
+			className="app_layout"
+		>
 			<DraggableDrawerController />
 			<TopBar />
 
