@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import React from "react"
 import { ConfigProvider, theme } from "antd"
 import store from "store"

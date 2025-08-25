@@ -1,74 +1,74 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
+
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 
 import config from "@config"
 
-export const SUPPORTED_LANGUAGES = config.i18n?.languages ?? {}
-export const SUPPORTED_LOCALES = SUPPORTED_LANGUAGES.map((l) => l.locale)
-export const DEFAULT_LOCALE = config.i18n?.defaultLocale
+async function fetchLocale(locale) {
+	const mod = await import(`@config/translations/${locale}.json`)
 
-export function extractLocaleFromPath(path = "") {
-    const [_, maybeLocale] = path.split("/")
-    return SUPPORTED_LOCALES.includes(maybeLocale) ? maybeLocale : DEFAULT_LOCALE
+	return mod.default
 }
 
-const messageImports = import.meta.glob("@config/translations/*.json")
-
 export default class I18nCore extends Core {
-    static namespace = "i18n"
+	static namespace = "i18n"
+	static dependencies = ["settings"]
 
-    onEvents = {
-        "app:language_changes": (locale) => {
-            this.loadAsyncLanguage(locale)
-        }
-    }
+	static defaultLocale = config.i18n?.defaultLocale ?? "en_US"
+	static supportedLanguages = config.i18n?.languages ?? {}
+	static supportedLocales = I18nCore.supportedLanguages.map((l) => l.locale)
 
-    onInitialize = async () => {
-        let locale = app.cores.settings.get("app:language") ?? DEFAULT_LOCALE
+	onRuntimeEvents = {
+		"app:language_changes": (locale) => {
+			this.changeLocale(locale)
+		},
+	}
 
-        if (!SUPPORTED_LOCALES.includes(locale)) {
-            locale = DEFAULT_LOCALE
-        }
+	async afterInitialize() {
+		let locale =
+			app.cores.settings.get("app:language") ?? I18nCore.defaultLocale
 
-        const messages = await this.importLocale(locale)
+		if (!I18nCore.supportedLocales.includes(locale)) {
+			this.console.warn(
+				`Locale ${locale} is not supported, using default locale ${I18nCore.defaultLocale}`,
+			)
+			locale = I18nCore.defaultLocale
+		}
 
-        i18n
-            .use(initReactI18next) // passes i18n down to react-i18next
-            .init({
-                // debug: true,
-                resources: {
-                    [locale]: { translation: messages.default || messages },
-                },
-                lng: locale,
-                //fallbackLng: DEFAULT_LOCALE,
-                interpolation: {
-                    escapeValue: false, // react already safes from xss
-                },
-            })
-    }
+		const translation = await fetchLocale(locale).catch(() => {
+			return null
+		})
 
-    importLocale = async (locale) => {
-        const [, importLocale] =
-            Object.entries(messageImports).find(([key]) =>
-                key.includes(`/${locale}.`)
-            ) || []
+		if (!translation) {
+			this.console.error(`Locale ${locale} failed to load!`)
 
-        return importLocale && importLocale()
-    }
+			return null
+		}
 
-    loadAsyncLanguage = async function (locale) {
-        locale = locale ?? DEFAULT_LOCALE
+		i18n.use(initReactI18next).init({
+			resources: {
+				[locale]: { translation: translation },
+			},
+			lng: locale,
+			interpolation: {
+				escapeValue: false,
+			},
+		})
+	}
 
-        try {
-            const result = await this.importLocale(locale)
+	async changeLocale(locale = I18nCore.defaultLocale) {
+		const translation = await fetchLocale(locale).catch(() => {
+			return null
+		})
 
-            if (result) {
-                i18n.addResourceBundle(locale, "translation", result.default || result)
-                i18n.changeLanguage(locale)
-            }
-        } catch (error) {
-            this.console.error(error)
-        }
-    }
+		if (!translation) {
+			this.console.error(`Locale ${locale} failed to load!`)
+
+			return null
+		}
+
+		i18n.addResourceBundle(locale, "translation", translation)
+		i18n.changeLanguage(locale)
+	}
 }

@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 
 import createClient from "comty.js"
 
@@ -13,6 +13,7 @@ export default class APICore extends Core {
 	static textColor = "black"
 
 	client = null
+	mainSocketReconnecting = false
 
 	public = {
 		client: function () {
@@ -48,54 +49,93 @@ export default class APICore extends Core {
 			)
 			await this.client.ws.disconnectAll()
 		},
+		"wsmanager:main:reconnecting": () => {
+			app.cores.notifications.new({
+				key: "main-socket-reconnect",
+				type: "loading",
+				title: "Reconnecting to socket",
+				description:
+					"Something fails with the connection, we are trying to reconnect.\n Some features may not work!",
+				duration: 0,
+			})
+
+			this.mainSocketReconnecting = true
+		},
+		"wsmanager:main:reconnected": () => {
+			if (this.mainSocketReconnecting) {
+				this.mainSocketReconnecting = false
+
+				app.cores.notifications.close("main-socket-reconnect")
+				app.cores.notifications.new({
+					key: "main-socket-reconnect",
+					type: "success",
+					title: "Reconnected to socket",
+				})
+			}
+		},
+	}
+
+	getSocket(namespace) {
+		const instance = this.client.ws.sockets.get(namespace)
+
+		if (!instance) {
+			this.console.error(
+				`Websocket with namespace [${namespace}] not found`,
+			)
+			return null
+		}
+
+		return instance
 	}
 
 	joinTopic(instance = "main", topic) {
-		if (!this.client.ws.sockets.get(instance)) {
-			this.console.error(`Websocket instance [${instance}] not found`)
+		instance = this.getSocket(instance)
+
+		if (!instance) {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).topics.subscribe(topic)
+		return instance.topics.subscribe(topic)
 	}
 
 	leaveTopic(instance = "main", topic) {
-		if (!this.client.ws.sockets.get(instance)) {
-			this.console.error(`Websocket instance [${instance}] not found`)
+		instance = this.getSocket(instance)
+
+		if (!instance) {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).topics.unsubscribe(topic)
+		return instance.topics.unsubscribe(topic)
 	}
 
 	emitEvent(instance = "main", key, data) {
-		if (!this.client.ws.sockets.get(instance)) {
-			this.console.error(`Websocket instance [${instance}] not found`)
+		instance = this.getSocket(instance)
 
+		if (!instance) {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).emit(key, data)
+		return instance.get(instance).emit(key, data)
 	}
 
 	listenEvent(key, handler, instance = "main") {
-		if (!this.client.ws.sockets.get(instance)) {
-			this.console.error(`Websocket instance [${instance}] not found`)
+		instance = this.getSocket(instance)
 
+		if (!instance) {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).on(key, handler)
+		return instance.on(key, handler)
 	}
 
 	unlistenEvent(key, handler, instance = "main") {
-		if (!this.client.ws.sockets.get(instance)) {
-			this.console.error(`Websocket instance [${instance}] not found`)
+		instance = this.getSocket(instance)
 
+		if (!instance) {
 			return false
 		}
 
-		return this.client.ws.sockets.get(instance).off(key, handler)
+		return instance.off(key, handler)
 	}
 
 	async reset() {
@@ -112,19 +152,14 @@ export default class APICore extends Core {
 		})
 
 		// make a basic request to check if the API is available
-		await this.client
-			.baseRequest({
-				method: "head",
-				url: "/",
-			})
-			.catch((error) => {
-				this.console.error("Ping error", error)
+		await fetch({
+			url: this.client.mainOrigin,
+			method: "HEAD",
+		}).catch((error) => {
+			this.console.error("Ping error", error)
 
-				throw new Error(`
-                Could not connect to the API.
-                Please check your connection and try again.
-            `)
-			})
+			throw new Error(`Could not connect to the API`)
+		})
 
 		return this.client
 	}

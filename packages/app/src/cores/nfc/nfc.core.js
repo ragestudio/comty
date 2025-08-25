@@ -1,262 +1,267 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import TapShareDialog from "@components/TapShare/Dialog"
 
 const RecordTypes = {
-    "T": "text",
-    "U": "url"
+	T: "text",
+	U: "url",
 }
 
 function decodePayload(record) {
-    let recordType = nfc.bytesToString(record.type)
+	let recordType = nfc.bytesToString(record.type)
 
-    let payload = {
-        recordId: nfc.bytesToHexString(record.id),
-        recordType: RecordTypes[recordType],
-        data: null
-    }
+	let payload = {
+		recordId: nfc.bytesToHexString(record.id),
+		recordType: RecordTypes[recordType],
+		data: null,
+	}
 
-    switch (recordType) {
-        case "T": {
-            let langCodeLength = record.payload[0]
+	switch (recordType) {
+		case "T": {
+			let langCodeLength = record.payload[0]
 
-            payload.data = record.payload.slice((1 + langCodeLength), record.payload.length)
+			payload.data = record.payload.slice(
+				1 + langCodeLength,
+				record.payload.length,
+			)
 
-            payload.data = nfc.bytesToString(text)
+			payload.data = nfc.bytesToString(text)
 
-            break
-        }
-        case "U": {
-            let identifierCode = record.payload.shift()
+			break
+		}
+		case "U": {
+			let identifierCode = record.payload.shift()
 
-            payload.data = nfc.bytesToString(record.payload)
+			payload.data = nfc.bytesToString(record.payload)
 
-            switch (identifierCode) {
-                case 4: {
-                    payload.data = `https://${payload.data}`
-                    break
-                }
-                case 3: {
-                    payload.data = `http://${payload.data}`
-                    break
-                }
-            }
+			switch (identifierCode) {
+				case 4: {
+					payload.data = `https://${payload.data}`
+					break
+				}
+				case 3: {
+					payload.data = `http://${payload.data}`
+					break
+				}
+			}
 
-            break
-        }
-        default: {
-            payload.data = nfc.bytesToString(record.payload)
-            break
-        }
-    }
+			break
+		}
+		default: {
+			payload.data = nfc.bytesToString(record.payload)
+			break
+		}
+	}
 
-    return payload
+	return payload
 }
 
 function resolveSerialNumber(tag) {
-    let serialNumber = null
+	let serialNumber = null
 
-    serialNumber = nfc.bytesToHexString(tag.id)
+	serialNumber = nfc.bytesToHexString(tag.id)
 
-    // transform serialNumber to contain a ":" every 2 bytes
-    serialNumber = serialNumber.replace(/(.{2})/g, "$1:")
+	// transform serialNumber to contain a ":" every 2 bytes
+	serialNumber = serialNumber.replace(/(.{2})/g, "$1:")
 
-    // remove the last :
-    serialNumber = serialNumber.slice(0, -1)
+	// remove the last :
+	serialNumber = serialNumber.slice(0, -1)
 
-    return serialNumber
+	return serialNumber
 }
 
 function parseNdefMessage(ndefMessage) {
-    let message = []
+	let message = []
 
-    ndefMessage.forEach((ndefRecord) => {
-        message.push(decodePayload(ndefRecord))
-    })
+	ndefMessage.forEach((ndefRecord) => {
+		message.push(decodePayload(ndefRecord))
+	})
 
-    return message
+	return message
 }
 
 export default class NFC extends Core {
-    static namespace = "nfc"
+	static namespace = "nfc"
 
-    isNativeMode = false
+	isNativeMode = false
 
-    instance = null
+	instance = null
 
-    subscribers = []
+	subscribers = []
 
-    public = {
-        incompatible: true,
-        scanning: false,
-        writeNdef: this.writeNdef.bind(this),
-        instance: function () { return this.instance }.bind(this),
-        subscribe: this.subscribe.bind(this),
-        unsubscribe: this.unsubscribe.bind(this),
-    }
+	public = {
+		incompatible: true,
+		scanning: false,
+		writeNdef: this.writeNdef.bind(this),
+		instance: function () {
+			return this.instance
+		}.bind(this),
+		subscribe: this.subscribe.bind(this),
+		unsubscribe: this.unsubscribe.bind(this),
+	}
 
-    subscribe(callback) {
-        // check if scan service is available, if not try to initialize
-        if (this.public.scanning === false) {
-            this.startScanning()
-        }
+	subscribe(callback) {
+		// check if scan service is available, if not try to initialize
+		if (this.public.scanning === false) {
+			this.startScanning()
+		}
 
-        this.subscribers.push(callback)
-    }
+		this.subscribers.push(callback)
+	}
 
-    unsubscribe(callback) {
-        this.subscribers = this.subscribers.filter((subscriber) => {
-            return subscriber !== callback
-        })
-    }
+	unsubscribe(callback) {
+		this.subscribers = this.subscribers.filter((subscriber) => {
+			return subscriber !== callback
+		})
+	}
 
-    async onInitialize() {
-        if (window.nfc) {
-            this.instance = window.nfc
+	async onInitialize() {
+		if (window.nfc) {
+			this.instance = window.nfc
 
-            this.isNativeMode = true
+			this.isNativeMode = true
 
-            return this.startNativeScanning()
-        }
+			return this.startNativeScanning()
+		}
 
-        if ("NDEFReader" in window) {
-            this.instance = new NDEFReader()
+		if ("NDEFReader" in window) {
+			this.instance = new NDEFReader()
 
-            return this.startScanning()
-        }
+			return this.startScanning()
+		}
 
-        return this.public.incompatible = true
-    }
+		return (this.public.incompatible = true)
+	}
 
-    async startScanning() {
-        try {
-            await this.instance.scan()
+	async startScanning() {
+		try {
+			await this.instance.scan()
 
-            this.public.scanning = true
-            this.public.incompatible = false
+			this.public.scanning = true
+			this.public.incompatible = false
 
-            this.registerEventListeners()
-        } catch (error) {
-            this.public.scanning = false
-            this.public.incompatible = true
+			this.registerEventListeners()
+		} catch (error) {
+			this.public.scanning = false
+			this.public.incompatible = true
 
-            this.console.error(error)
-        }
-    }
+			this.console.error(error)
+		}
+	}
 
-    startNativeScanning() {
-        this.public.scanning = true
-        this.public.incompatible = false
+	startNativeScanning() {
+		this.public.scanning = true
+		this.public.incompatible = false
 
-        return this.registerNativeEventListeners()
-    }
+		return this.registerNativeEventListeners()
+	}
 
-    handleRead(tag) {
-        this.console.debug(`[NFC] READ >`, tag)
+	handleRead(tag) {
+		this.console.debug(`[NFC] READ >`, tag)
 
-        // send to subscribers
-        this.subscribers.forEach((subscriber) => {
-            subscriber(null, tag)
-        })
+		// send to subscribers
+		this.subscribers.forEach((subscriber) => {
+			subscriber(null, tag)
+		})
 
-        if (this.subscribers.length === 0) {
-            if (tag.message.records?.length > 0) {
-                // open dialog
-                app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
-                    componentProps: {
-                        tag: tag,
-                    }
-                })
-            }
-        }
-    }
+		if (this.subscribers.length === 0) {
+			if (tag.message.records?.length > 0) {
+				// open dialog
+				app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
+					componentProps: {
+						tag: tag,
+					},
+				})
+			}
+		}
+	}
 
-    handleNativeRead(tag) {
-        this.console.debug(`[NFC] NATIVE READ >`, tag)
+	handleNativeRead(tag) {
+		this.console.debug(`[NFC] NATIVE READ >`, tag)
 
-        tag.serialNumber = resolveSerialNumber(tag)
+		tag.serialNumber = resolveSerialNumber(tag)
 
-        if (tag.ndefMessage) {
-            tag.message = {}
-            tag.message.records = parseNdefMessage(tag.ndefMessage)
-        }
+		if (tag.ndefMessage) {
+			tag.message = {}
+			tag.message.records = parseNdefMessage(tag.ndefMessage)
+		}
 
-        this.subscribers.forEach((subscriber) => {
-            subscriber(null, tag)
-        })
+		this.subscribers.forEach((subscriber) => {
+			subscriber(null, tag)
+		})
 
-        if (this.subscribers.length === 0 && tag.message?.records) {
-            if (tag.message.records?.length > 0) {
-                // open dialog
-                app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
-                    componentProps: {
-                        tag: tag,
-                    }
-                })
-            }
-        }
-    }
+		if (this.subscribers.length === 0 && tag.message?.records) {
+			if (tag.message.records?.length > 0) {
+				// open dialog
+				app.layout.drawer.open("nfc_card_dialog", TapShareDialog, {
+					componentProps: {
+						tag: tag,
+					},
+				})
+			}
+		}
+	}
 
-    handleError(error) {
-        this.subscribers.forEach((subscriber) => {
-            subscriber(error, null)
-        })
-    }
+	handleError(error) {
+		this.subscribers.forEach((subscriber) => {
+			subscriber(error, null)
+		})
+	}
 
-    registerEventListeners() {
-        this.instance.addEventListener("reading", this.handleRead.bind(this))
-        this.instance.addEventListener("error", this.handleError.bind(this))
-    }
+	registerEventListeners() {
+		this.instance.addEventListener("reading", this.handleRead.bind(this))
+		this.instance.addEventListener("error", this.handleError.bind(this))
+	}
 
-    registerNativeEventListeners() {
-        nfc.addTagDiscoveredListener(
-            (e) => this.handleNativeRead(e.tag),
-            () => {
-                this.public.scanning = true
-                this.public.incompatible = false
-            },
-            this.handleError
-        )
+	registerNativeEventListeners() {
+		nfc.addTagDiscoveredListener(
+			(e) => this.handleNativeRead(e.tag),
+			() => {
+				this.public.scanning = true
+				this.public.incompatible = false
+			},
+			this.handleError,
+		)
 
-        nfc.addNdefListener(
-            (e) => this.handleNativeRead(e.tag),
-            () => {
-                this.public.scanning = true
-                this.public.incompatible = false
-            },
-            this.handleError
-        )
-    }
+		nfc.addNdefListener(
+			(e) => this.handleNativeRead(e.tag),
+			() => {
+				this.public.scanning = true
+				this.public.incompatible = false
+			},
+			this.handleError,
+		)
+	}
 
-    async writeNdef(payload, options) {
-        this.console.debug(`[NFC] WRITE >`, payload)
+	async writeNdef(payload, options) {
+		this.console.debug(`[NFC] WRITE >`, payload)
 
-        if (!this.isNativeMode) {
-            return this.instance.write(payload, options)
-        }
+		if (!this.isNativeMode) {
+			return this.instance.write(payload, options)
+		}
 
-        let message = []
+		let message = []
 
-        const { records } = payload
+		const { records } = payload
 
-        if (!Array.isArray(records)) {
-            throw new Error("records must be an array")
-        }
+		if (!Array.isArray(records)) {
+			throw new Error("records must be an array")
+		}
 
-        for (const record of records) {
-            switch (record.recordType) {
-                case "text": {
-                    message.push(ndef.textRecord(record.data))
-                    break
-                }
-                case "url": {
-                    message.push(ndef.uriRecord(record.data))
-                    break
-                }
-            }
-        }
+		for (const record of records) {
+			switch (record.recordType) {
+				case "text": {
+					message.push(ndef.textRecord(record.data))
+					break
+				}
+				case "url": {
+					message.push(ndef.uriRecord(record.data))
+					break
+				}
+			}
+		}
 
-        return await new Promise((resolve, reject) => {
-            this.instance.write(message, resolve, reject)
-        })
-    }
+		return await new Promise((resolve, reject) => {
+			this.instance.write(message, resolve, reject)
+		})
+	}
 }

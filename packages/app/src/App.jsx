@@ -24,7 +24,7 @@ class ComtyApp extends React.Component {
 	static publicEvents = StaticEvents
 	static publicMethods = StaticMethods
 	static staticRenders = StaticRenders
-	static splashAwaitEvent = "app.initialization.finish"
+	static splashAwaitEvent = "authmanager:earlyData" //"app.initialization.finish"
 
 	state = {
 		firstInitialized: false,

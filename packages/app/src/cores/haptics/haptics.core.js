@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 // import { Haptics } from "@capacitor/haptics"
 
 const vibrationPatterns = {

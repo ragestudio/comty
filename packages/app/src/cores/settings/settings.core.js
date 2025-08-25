@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import store from "store"
 import { Observable } from "rxjs"
 

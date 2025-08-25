@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import { RTEngineClient } from "linebridge/client/src/rtengine"
 import SessionModel from "@models/session"
 

@@ -1,222 +1,233 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import store from "store"
 
 export default class WidgetsCore extends Core {
-    static namespace = "widgets"
-    static storeKey = "widgets"
+	static namespace = "widgets"
+	static storeKey = "widgets"
 
-    static get apiInstance() {
-        return app.cores.api.client().baseRequest
-    }
+	static get apiInstance() {
+		return app.cores.api.client().baseRequest
+	}
 
-    public = {
-        getInstalled: this.getInstalled.bind(this),
-        isInstalled: this.isInstalled.bind(this),
-        install: this.install.bind(this),
-        uninstall: this.uninstall.bind(this),
-        toggleVisibility: this.toggleVisibility.bind(this),
-        isVisible: this.isVisible.bind(this),
-        sort: this.sort.bind(this),
-    }
+	public = {
+		getInstalled: this.getInstalled.bind(this),
+		isInstalled: this.isInstalled.bind(this),
+		install: this.install.bind(this),
+		uninstall: this.uninstall.bind(this),
+		toggleVisibility: this.toggleVisibility.bind(this),
+		isVisible: this.isVisible.bind(this),
+		sort: this.sort.bind(this),
+	}
 
-    async onInitialize() {
-        try {
-            const currentStore = this.getInstalled()
+	async onInitialize() {
+		try {
+			const currentStore = this.getInstalled()
 
-            if (!Array.isArray(currentStore)) {
-                store.set(WidgetsCore.storeKey, [])
-            }
-        } catch (error) {
-            this.console.error(error)
-        }
-    }
+			if (!Array.isArray(currentStore)) {
+				store.set(WidgetsCore.storeKey, [])
+			}
+		} catch (error) {
+			this.console.error(error)
+		}
+	}
 
-    getInstalled() {
-        return store.get(WidgetsCore.storeKey) ?? []
-    }
+	getInstalled() {
+		return store.get(WidgetsCore.storeKey) ?? []
+	}
 
-    isInstalled(widget_id) {
-        const widgets = this.getInstalled()
+	isInstalled(widget_id) {
+		const widgets = this.getInstalled()
 
-        this.console.log(widgets)
+		this.console.log(widgets)
 
-        const widget = widgets.find((widget) => widget._id === widget_id)
+		const widget = widgets.find((widget) => widget._id === widget_id)
 
-        return !!widget
-    }
+		return !!widget
+	}
 
-    async install(widget_id, params = {}) {
-        if (!widget_id || typeof widget_id !== "string") {
-            throw new Error("Widget id must be a string.")
-        }
+	async install(widget_id, params = {}) {
+		if (!widget_id || typeof widget_id !== "string") {
+			throw new Error("Widget id must be a string.")
+		}
 
-        this.console.debug(`🧩 Installing widget with id [${widget_id}]`)
+		this.console.debug(`🧩 Installing widget with id [${widget_id}]`)
 
-        // get manifest
-        let manifest = await WidgetsCore.apiInstance({
-            method: "GET",
-            url: `/widgets/${widget_id}/manifest`,
-        }).catch((error) => {
-            this.console.error(error)
-            app.message.error("Cannot install widget.")
+		// get manifest
+		let manifest = await WidgetsCore.apiInstance({
+			method: "GET",
+			url: `/widgets/${widget_id}/manifest`,
+		}).catch((error) => {
+			this.console.error(error)
+			app.message.error("Cannot install widget.")
 
-            return false
-        })
+			return false
+		})
 
-        if (!manifest) {
-            return false
-        }
+		if (!manifest) {
+			return false
+		}
 
-        manifest = manifest.data
+		manifest = manifest.data
 
-        // check if already installed
-        if (this.isInstalled(widget_id) && !params.update) {
-            app.message.error("Widget already installed.")
+		// check if already installed
+		if (this.isInstalled(widget_id) && !params.update) {
+			app.message.error("Widget already installed.")
 
-            return false
-        }
+			return false
+		}
 
-        // save manifest
-        let currentStore = this.getInstalled()
+		// save manifest
+		let currentStore = this.getInstalled()
 
-        manifest.uri = `${WidgetsCore.apiInstance.defaults.baseURL}/widgets/${manifest._id}`
+		manifest.uri = `${WidgetsCore.apiInstance.defaults.baseURL}/widgets/${manifest._id}`
 
-        if (params.update) {
-            const installationIndex = currentStore.findIndex((widget) => {
-                return widget._id === manifest._id
-            })
+		if (params.update) {
+			const installationIndex = currentStore.findIndex((widget) => {
+				return widget._id === manifest._id
+			})
 
-            if (installationIndex === -1) {
-                app.message.error("Cannot find widget to update.")
+			if (installationIndex === -1) {
+				app.message.error("Cannot find widget to update.")
 
-                return false
-            }
+				return false
+			}
 
-            currentStore[installationIndex] = {
-                ...currentStore[installationIndex],
-                ...manifest,
-            }
-        } else {
-            // set visible by default
-            manifest.visible = true
+			currentStore[installationIndex] = {
+				...currentStore[installationIndex],
+				...manifest,
+			}
+		} else {
+			// set visible by default
+			manifest.visible = true
 
-            currentStore.push(manifest)
-        }
+			currentStore.push(manifest)
+		}
 
-        store.set(WidgetsCore.storeKey, currentStore)
+		store.set(WidgetsCore.storeKey, currentStore)
 
-        app.cores.notifications.new({
-            title: params.update ? "Widget updated" : "Widget installed",
-            description: `Widget [${manifest.name}] has been ${params.update ? "updated" : "installed"}. ${params.update ? `Using current version ${manifest.version}` : ""}`,
-        }, {
-            type: "success",
-        })
+		app.cores.notifications.new(
+			{
+				title: params.update ? "Widget updated" : "Widget installed",
+				description: `Widget [${manifest.name}] has been ${params.update ? "updated" : "installed"}. ${params.update ? `Using current version ${manifest.version}` : ""}`,
+			},
+			{
+				type: "success",
+			},
+		)
 
-        app.eventBus.emit("widgets:update", currentStore)
-        app.eventBus.emit("widgets:installed", manifest)
+		app.eventBus.emit("widgets:update", currentStore)
+		app.eventBus.emit("widgets:installed", manifest)
 
-        return manifest
-    }
+		return manifest
+	}
 
-    uninstall(widget_id) {
-        if (!widget_id || typeof widget_id !== "string") {
-            throw new Error("Widget id must be a string.")
-        }
+	uninstall(widget_id) {
+		if (!widget_id || typeof widget_id !== "string") {
+			throw new Error("Widget id must be a string.")
+		}
 
-        this.console.debug(`🧩 Uninstalling widget with id [${widget_id}]`)
+		this.console.debug(`🧩 Uninstalling widget with id [${widget_id}]`)
 
-        // check if already installed
-        if (!this.isInstalled(widget_id)) {
-            app.message.error("Widget not installed.")
+		// check if already installed
+		if (!this.isInstalled(widget_id)) {
+			app.message.error("Widget not installed.")
 
-            return false
-        }
+			return false
+		}
 
-        // remove manifest
-        const currentStore = this.getInstalled()
+		// remove manifest
+		const currentStore = this.getInstalled()
 
-        const newStore = currentStore.filter((widget) => widget._id !== widget_id)
+		const newStore = currentStore.filter(
+			(widget) => widget._id !== widget_id,
+		)
 
-        store.set(WidgetsCore.storeKey, newStore)
+		store.set(WidgetsCore.storeKey, newStore)
 
-        app.cores.notifications.new({
-            title: "Widget uninstalled",
-            description: `Widget [${widget_id}] has been uninstalled.`,
-        }, {
-            type: "success",
-        })
+		app.cores.notifications.new(
+			{
+				title: "Widget uninstalled",
+				description: `Widget [${widget_id}] has been uninstalled.`,
+			},
+			{
+				type: "success",
+			},
+		)
 
-        app.eventBus.emit("widgets:update", currentStore)
-        app.eventBus.emit("widgets:uninstalled", widget_id)
+		app.eventBus.emit("widgets:update", currentStore)
+		app.eventBus.emit("widgets:uninstalled", widget_id)
 
-        return true
-    }
+		return true
+	}
 
-    toggleVisibility(widget_id, to) {
-        if (!widget_id || typeof widget_id !== "string") {
-            throw new Error("Widget id must be a string.")
-        }
+	toggleVisibility(widget_id, to) {
+		if (!widget_id || typeof widget_id !== "string") {
+			throw new Error("Widget id must be a string.")
+		}
 
-        // check if already installed
-        if (!this.isInstalled(widget_id)) {
-            app.message.error("Widget not installed.")
+		// check if already installed
+		if (!this.isInstalled(widget_id)) {
+			app.message.error("Widget not installed.")
 
-            return false
-        }
+			return false
+		}
 
-        // remove manifest
-        const currentStore = this.getInstalled()
+		// remove manifest
+		const currentStore = this.getInstalled()
 
-        const newStore = currentStore.map((widget) => {
-            if (widget._id === widget_id) {
-                widget.visible = to
-            }
+		const newStore = currentStore.map((widget) => {
+			if (widget._id === widget_id) {
+				widget.visible = to
+			}
 
-            return widget
-        })
+			return widget
+		})
 
-        store.set(WidgetsCore.storeKey, newStore)
+		store.set(WidgetsCore.storeKey, newStore)
 
-        app.eventBus.emit("widgets:update", currentStore)
-        app.eventBus.emit("widgets:visibility", widget_id, to)
+		app.eventBus.emit("widgets:update", currentStore)
+		app.eventBus.emit("widgets:visibility", widget_id, to)
 
-        return true
-    }
+		return true
+	}
 
-    isVisible(widget_id) {
-        if (!widget_id || typeof widget_id !== "string") {
-            throw new Error("Widget id must be a string.")
-        }
+	isVisible(widget_id) {
+		if (!widget_id || typeof widget_id !== "string") {
+			throw new Error("Widget id must be a string.")
+		}
 
-        // check if already installed
-        if (!this.isInstalled(widget_id)) {
-            return false
-        }
+		// check if already installed
+		if (!this.isInstalled(widget_id)) {
+			return false
+		}
 
-        // remove manifest
-        const currentStore = this.getInstalled()
+		// remove manifest
+		const currentStore = this.getInstalled()
 
-        const widget = currentStore.find((widget) => widget._id === widget_id)
+		const widget = currentStore.find((widget) => widget._id === widget_id)
 
-        return widget.visible
-    }
+		return widget.visible
+	}
 
-    sort(order) {
-        if (!Array.isArray(order)) {
-            throw new Error("Order must be an array.")
-        }
+	sort(order) {
+		if (!Array.isArray(order)) {
+			throw new Error("Order must be an array.")
+		}
 
-        const currentStore = this.getInstalled()
+		const currentStore = this.getInstalled()
 
-        const newStore = currentStore.sort((a, b) => {
-            return order.findIndex((_a) => _a.id === a._id) - order.findIndex((_b) => _b.id === b._id)
-        })
+		const newStore = currentStore.sort((a, b) => {
+			return (
+				order.findIndex((_a) => _a.id === a._id) -
+				order.findIndex((_b) => _b.id === b._id)
+			)
+		})
 
-        store.set(WidgetsCore.storeKey, newStore)
+		store.set(WidgetsCore.storeKey, newStore)
 
-        app.eventBus.emit("widgets:update", currentStore)
-        app.eventBus.emit("widgets:sort", order)
+		app.eventBus.emit("widgets:update", currentStore)
+		app.eventBus.emit("widgets:sort", order)
 
-        return true
-    }
+		return true
+	}
 }

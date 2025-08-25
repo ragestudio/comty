@@ -86,15 +86,29 @@ export default class AuthManager {
 
 			await SessionModel.removeToken()
 		},
+		earlyData: () => {
+			app.eventBus.emit("authmanager:earlyData")
+		},
 	}
 
 	initialize = async () => {
 		console.time("authmanager:initialize")
-		const token = await SessionModel.token
+
+		const token = SessionModel.token
 
 		if (!token || token == null) {
 			return this._emitBehavior("onNoSession")
 		}
+
+		const tokenData = SessionModel.getDecodedToken()
+
+		// fill with some early data from token
+		app.userData = {
+			_id: tokenData.user_id,
+			username: tokenData.username,
+		}
+
+		this._emitBehavior("earlyData")
 
 		const user = await UserModel.data().catch((err) => {
 			return false

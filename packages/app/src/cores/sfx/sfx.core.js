@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import { Howl } from "howler"
 import axios from "axios"
 import store from "store"
@@ -23,6 +23,18 @@ export default class SFXCore extends Core {
 				volume: volume / 100,
 			})
 		},
+	}
+
+	async beforeInitialize() {
+		await this.loadSoundpack()
+
+		document.addEventListener(
+			"click",
+			(...args) => {
+				this.handleClick(...args)
+			},
+			true,
+		)
 	}
 
 	async loadSoundpack(soundpack) {
@@ -108,17 +120,5 @@ export default class SFXCore extends Core {
 		if (slider) {
 			// check if is up or down
 		}
-	}
-
-	async onInitialize() {
-		await this.loadSoundpack()
-
-		document.addEventListener(
-			"click",
-			(...args) => {
-				this.handleClick(...args)
-			},
-			true,
-		)
 	}
 }

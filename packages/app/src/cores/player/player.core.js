@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 
 import ActivityEvent from "@classes/ActivityEvent"
 import QueueManager from "@classes/QueueManager"
