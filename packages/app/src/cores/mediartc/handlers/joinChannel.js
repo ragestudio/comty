@@ -47,16 +47,16 @@ export default async function (groupId, channelId) {
 			await this.self.audioOutput.resume()
 		}
 
-		// start ui
-		if (this.ui) {
-			this.ui.attach()
-		}
-
 		// create and setup transports
 		await this.handlers.createTransports()
 
 		// start audio producer
 		await this.self.startMicProducer()
+
+		// start ui
+		if (this.ui) {
+			this.ui.attach()
+		}
 
 		// sync producers & clients mic
 		if (data.producers && Array.isArray(data.producers)) {
