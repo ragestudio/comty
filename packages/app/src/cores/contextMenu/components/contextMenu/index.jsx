@@ -1,9 +1,10 @@
 import React from "react"
-
-import { createIconRender } from "@components/Icons"
 import { AnimatePresence, motion } from "motion/react"
 
+import { createIconRender } from "@components/Icons"
+
 import "./index.less"
+import classNames from "classnames"
 
 const ContextMenu = (props) => {
 	const [visible, setVisible] = React.useState(true)
@@ -34,14 +35,21 @@ const ContextMenu = (props) => {
 
 		return items.map((item, index) => {
 			if (item.type === "separator") {
-				return <div key={index} className="context-menu-separator" />
+				return (
+					<div
+						key={index}
+						className="context-menu-separator"
+					/>
+				)
 			}
 
 			return (
 				<div
 					key={index}
 					onClick={() => handleItemClick(item)}
-					className="item"
+					className={classNames("item", {
+						danger: item.danger,
+					})}
 				>
 					<p className="label">{item.label}</p>
 
@@ -58,23 +66,16 @@ const ContextMenu = (props) => {
 	return (
 		<AnimatePresence>
 			{visible && (
-				<div
-					className="context-menu-wrapper"
-					style={{
-						top: cords.y,
-						left: cords.x,
-					}}
+				<motion.div
+					id="context-menu"
+					className="context-menu"
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ opacity: 1, scale: 1 }}
+					exit={{ opacity: 0, scale: 0.3 }}
+					transition={{ duration: 0.05, ease: "easeInOut" }}
 				>
-					<motion.div
-						className="context-menu"
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.3 }}
-						transition={{ duration: 0.05, ease: "easeInOut" }}
-					>
-						{renderItems()}
-					</motion.div>
-				</div>
+					{renderItems()}
+				</motion.div>
 			)}
 		</AnimatePresence>
 	)
