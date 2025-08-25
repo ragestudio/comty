@@ -1,5 +1,6 @@
 import React from "react"
 import { Drawer } from "vaul"
+import classnames from "classnames"
 
 import ActionsMenu from "../@mobile/actionsMenu"
 
@@ -129,6 +130,9 @@ export class DraggableDrawerController extends React.Component {
 
 export const DraggableDrawer = (props) => {
 	const [isOpen, setIsOpen] = React.useState(true)
+	const [activeSnap, setActiveSnap] = React.useState(
+		props.options?.snapPoints ? props.options?.snapPoints[0] : 1,
+	)
 
 	async function handleOnOpenChanged(to) {
 		if (to === true) {
@@ -147,12 +151,21 @@ export const DraggableDrawer = (props) => {
 	}
 
 	return (
-		<Drawer.Root open={isOpen} onOpenChange={handleOnOpenChanged}>
+		<Drawer.Root
+			open={isOpen}
+			onOpenChange={handleOnOpenChanged}
+			snapPoints={props.options?.snapPoints ?? [1]}
+			activeSnapPoint={activeSnap}
+			setActiveSnapPoint={setActiveSnap}
+		>
 			<Drawer.Portal>
 				<Drawer.Overlay className="app-drawer-overlay" />
 
 				<Drawer.Content
-					className="app-drawer-content"
+					className={classnames(
+						"app-drawer-content",
+						props.options?.contentClassName,
+					)}
 					onInteractOutside={() => {
 						setIsOpen(false)
 					}}
@@ -165,6 +178,8 @@ export const DraggableDrawer = (props) => {
 
 					{React.cloneElement(props.children, {
 						close: () => setIsOpen(false),
+						activeSnap: activeSnap,
+						setActiveSnap: setActiveSnap,
 					})}
 				</Drawer.Content>
 			</Drawer.Portal>

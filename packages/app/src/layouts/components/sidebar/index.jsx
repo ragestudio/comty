@@ -5,8 +5,6 @@ import { Translation } from "react-i18next"
 import { motion, AnimatePresence, usePresence } from "motion/react"
 import { Menu, Avatar, Dropdown, Tag } from "antd"
 
-import Drawer from "@layouts/components/drawer"
-
 import { Icons } from "@components/Icons"
 
 import GenerateMenuItems from "@utils/generateMenuItems"
@@ -226,8 +224,6 @@ const Sidebar = ({
 					/>
 				</div>
 			</div>
-
-			<Drawer />
 		</motion.div>
 	)
 }
