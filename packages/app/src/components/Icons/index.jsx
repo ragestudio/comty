@@ -1,5 +1,6 @@
 import React from "react"
 
+import Bot from "./customIcons/bot"
 import VrChatIcon from "./customIcons/vrchat"
 import VerifiedBadge from "./customIcons/verifiedBadge"
 import Crown from "./customIcons/crown"
@@ -24,6 +25,7 @@ export const Icons = {
 	...lib5,
 	...lib6,
 	...lib7,
+	Bot: (props) => <Bot {...props} />,
 	Lossless: (props) => <Lossless {...props} />,
 	verifiedBadge: (props) => <VerifiedBadge {...props} />,
 	VrChat: (props) => <VrChatIcon {...props} />,
