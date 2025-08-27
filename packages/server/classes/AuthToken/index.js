@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import { Session, RefreshToken, User } from "@db_models"
 
-export default class Token {
+export default class AuthToken {
 	static get authStrategy() {
 		return {
 			secret: process.env.JWT_SECRET,
@@ -20,7 +20,7 @@ export default class Token {
 
 	static async signToken(payload, strategy = "authStrategy") {
 		const { secret, expiresIn, algorithm } =
-			Token[strategy] ?? Token.authStrategy
+			AuthToken[strategy] ?? AuthToken.authStrategy
 
 		const token = jwt.sign(payload, secret, {
 			expiresIn: expiresIn,
@@ -77,7 +77,7 @@ export default class Token {
 	}
 
 	static async basicDecode(token) {
-		const { secret } = Token.authStrategy
+		const { secret } = AuthToken.authStrategy
 
 		return new Promise((resolve, reject) => {
 			jwt.verify(token, secret, async (err, decoded) => {
@@ -105,7 +105,7 @@ export default class Token {
 			return result
 		}
 
-		const validation = await Token.jwtVerify(token)
+		const validation = await AuthToken.jwtVerify(token)
 
 		if (validation.error) {
 			result.valid = false
@@ -163,7 +163,7 @@ export default class Token {
 			refreshToken: undefined,
 		}
 
-		const validation = await Token.jwtVerify(refreshToken)
+		const validation = await AuthToken.jwtVerify(refreshToken)
 
 		if (validation.error) {
 			throw new OperationError(401, validation.error.message)
@@ -210,19 +210,23 @@ export default class Token {
 	static async jwtVerify(token) {
 		return await new Promise((resolve, reject) => {
 			try {
-				jwt.verify(token, Token.authStrategy.secret, (err, decoded) => {
-					if (err) {
-						return resolve({
+				jwt.verify(
+					token,
+					AuthToken.authStrategy.secret,
+					(err, decoded) => {
+						if (err) {
+							return resolve({
+								error: err,
+								data: decoded,
+							})
+						}
+
+						resolve({
 							error: err,
 							data: decoded,
 						})
-					}
-
-					resolve({
-						error: err,
-						data: decoded,
-					})
-				})
+					},
+				)
 			} catch (error) {
 				resolve({
 					error: error,

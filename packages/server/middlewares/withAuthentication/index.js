@@ -1,5 +1,6 @@
-import { ServerKeys } from "../../db_models"
 import AuthToken from "../../classes/AuthToken"
+import ServerToken from "../../classes/ServerToken"
+import BotToken from "../../classes/BotToken"
 
 export default async (req, res) => {
 	function reject(data) {
@@ -17,7 +18,7 @@ export default async (req, res) => {
 
 		if (!tokenAuthHeader[1]) {
 			return reject({
-				error: "Recived header, missing token",
+				error: "Received header, missing token",
 			})
 		}
 
@@ -33,55 +34,49 @@ export default async (req, res) => {
 
 				req.auth = {
 					token: token,
+					user_id: validation.session.user_id,
 					decoded: validation.data,
 					session: validation.session,
 					user: validation.user,
 				}
+
+				req.user_id = validation.session.user_id
 
 				return
 			}
 			case "Server": {
 				const [access_id, secret_token] = tokenAuthHeader[1].split(":")
 
-				if (access_id === "undefined" || secret_token === "undefined") {
-					return reject({
-						error: "Invalid server token",
-					})
-				}
-
-				const serverTokenEntry = await ServerKeys.findOne({
+				const validation = await ServerToken.validate(
 					access_id,
-				})
-					.select("+secret_token")
-					.catch((err) => {
-						return null
-					})
+					secret_token,
+				)
 
-				if (!serverTokenEntry) {
-					return reject({
-						error: "Invalid server token",
-					})
-				}
-
-				if (serverTokenEntry.secret_token !== secret_token) {
-					return reject({
-						error: "Missmatching secret_token",
-					})
+				if (!validation.valid) {
+					return reject(validation)
 				}
 
 				req.auth = {
 					server: true,
-					token: tokenAuthHeader,
-					decoded: null,
+					token: tokenAuthHeader[1],
+					user_id: validation.data.owner_user_id,
 					session: {
 						__server_key: true,
-						user_id: serverTokenEntry.owner_user_id,
-						created_at: serverTokenEntry.created_at,
+						user_id: validation.data.owner_user_id,
+						created_at: validation.data.created_at,
 					},
-					user: async () =>
-						await User.findOne({
-							_id: serverTokenEntry.owner_user_id,
-						}),
+					user: validation.user,
+				}
+
+				req.user_id = validation.data.owner_user_id
+
+				return
+			}
+			case "Bot": {
+				if (!req.auth) {
+					return reject({
+						error: "Invalid authentication",
+					})
 				}
 
 				return

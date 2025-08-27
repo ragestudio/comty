@@ -8,12 +8,12 @@ export default {
 		},
 		password: {
 			type: String,
-			required: true,
+			required: false,
 			select: false,
 		},
 		email: {
 			type: String,
-			required: true,
+			required: false,
 			select: false,
 		},
 		description: {
@@ -71,6 +71,13 @@ export default {
 		disabled: {
 			type: Boolean,
 			default: false,
+		},
+		bot: {
+			type: Boolean,
+			default: false,
+		},
+		bot_id: {
+			type: String,
 		},
 	},
 }

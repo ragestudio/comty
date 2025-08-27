@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
-import { User } from "@db_models"
+import { User, PasswordHash } from "@db_models"
 
-export default async ({ username, password, hash }, user) => {
+export default async ({ username, password }, user) => {
 	if (typeof user === "undefined") {
 		let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
 
@@ -14,11 +14,23 @@ export default async ({ username, password, hash }, user) => {
 		throw new OperationError(401, "User not found")
 	}
 
-	if (user.disabled == true) {
+	if (user.disabled === true) {
 		throw new OperationError(401, "User is disabled")
 	}
 
-	if (!bcrypt.compareSync(password, user.password)) {
+	if (user.bot === true) {
+		throw new OperationError(401, "Bots cannot login")
+	}
+
+	const passwordHash = await PasswordHash.findOne({
+		user_id: user._id.toString(),
+	})
+
+	if (!passwordHash) {
+		throw new OperationError(401, "User not found")
+	}
+
+	if (!bcrypt.compareSync(password, passwordHash.hash)) {
 		throw new OperationError(401, "Invalid credentials")
 	}
 
