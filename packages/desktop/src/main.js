@@ -1,13 +1,4 @@
-import {
-	app,
-	ipcMain,
-	Tray,
-	Menu,
-	BrowserWindow,
-	session,
-	desktopCapturer,
-} from "electron"
-import ElectronStore from "electron-store"
+import pkgjson from "../package.json" with { type: "json" }
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import os from "node:os"
@@ -16,6 +7,10 @@ import os from "node:os"
 // 	REACT_DEVELOPER_TOOLS,
 // } from "electron-devtools-installer"
 
+import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
+import ElectronStore from "electron-store"
+
+import flags from "./flags.js"
 import IPC from "./ipc.js"
 import TrayItems from "./tray.js"
 import Settings from "./classes/Settings/index.js"
@@ -164,6 +159,7 @@ class Main {
 
 	async createMainWindow() {
 		this.mainWindow = new BrowserWindow({
+			title: pkgjson.appName,
 			titleBarStyle: "hidden",
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
@@ -247,7 +243,7 @@ class Main {
 
 	async registerIpcEvents() {
 		for (const [key, fn] of Object.entries(IPC)) {
-			ipcMain.on(key, this.buildIPCEventHandler(key, fn))
+			ipcMain.handle(key, this.buildIPCEventHandler(key, fn))
 		}
 	}
 }
