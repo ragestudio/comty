@@ -7,7 +7,7 @@ import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-const UploadButton = (props) => {
+const UploadButton = React.forwardRef((props, ref) => {
 	const [uploading, setUploading] = React.useState(false)
 	const [progress, setProgress] = React.useState(null)
 
@@ -71,6 +71,32 @@ const UploadButton = (props) => {
 		})
 	}
 
+	React.useEffect(() => {
+		ref.current = {
+			uploading: uploading,
+			progress: progress,
+			uploadFile: (file) => {
+				file.uid = file.uid ?? `${file.name}_${Date.now()}`
+
+				handleUpload({
+					file,
+				})
+			},
+		}
+
+		return () => {
+			ref.current = null
+		}
+	}, [])
+
+	React.useEffect(() => {
+		ref.current.uploading = uploading
+	}, [uploading])
+
+	React.useEffect(() => {
+		ref.current.progress = progress
+	}, [progress])
+
 	return (
 		<Upload
 			customRequest={handleUpload}
@@ -106,6 +132,8 @@ const UploadButton = (props) => {
 			</div>
 		</Upload>
 	)
-}
+})
+
+UploadButton.displayName = "UploadButton"
 
 export default UploadButton
