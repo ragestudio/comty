@@ -46,7 +46,7 @@ const SortableTrackItem = ({
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
-		transition,
+		transition: transition,
 		opacity: isDragging ? 0.8 : 1,
 		zIndex: isDragging ? 1000 : 1,
 	}
