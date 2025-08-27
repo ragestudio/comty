@@ -22,28 +22,14 @@
 		width: 100vw;
 		height: 100vh;
 
-		svg {
-			margin: 0;
+		filter: blur(5px);
 
-			opacity: 0;
+		animation: opacityIn 200ms ease-in-out 0s forwards;
 
-			animation: opacityIn 3s ease-in-out 0s forwards;
+		.iridescence-container {
+			width: 100%;
+			height: 100%;
 		}
-
-		background-image:
-			radial-gradient(
-				rgba(var(--layout-background-contrast), 0.3) 1px,
-				transparent 0
-			),
-			radial-gradient(
-				rgba(var(--layout-background-contrast), 0.3) 1px,
-				transparent 0
-			);
-
-		background-position:
-			0 0,
-			25px 25px;
-		background-size: 50px 50px;
 	}
 }
 
