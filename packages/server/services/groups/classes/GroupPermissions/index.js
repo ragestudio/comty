@@ -51,6 +51,7 @@ export default class GroupPermissions {
 
 				return true
 			}
+			case "order_channels":
 			case "delete_channel":
 			case "update_channel":
 			case "create_channel": {

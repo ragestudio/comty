@@ -1,8 +1,6 @@
 import React from "react"
 import { Button, Result, Input } from "antd"
 
-import { MdPeopleAlt } from "react-icons/md"
-
 import GroupsModel from "@models/groups"
 
 import "./index.less"
@@ -79,11 +77,7 @@ const GroupListItem = ({ group }) => {
 				<p>{group.description}</p>
 			</div>
 
-			<div className="groups-page__group-item__extra">
-				<span className="groups-page__group-item__extra__members">
-					<MdPeopleAlt /> {group.members.length}
-				</span>
-			</div>
+			<div className="groups-page__group-item__extra"></div>
 		</div>
 	)
 }

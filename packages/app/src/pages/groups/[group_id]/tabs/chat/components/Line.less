@@ -1,0 +1,204 @@
+@avatar-size: 35px;
+
+.channel-chat__timeline__line {
+	/* position: absolute;
+
+	top: 0;
+	left: 0; */
+
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	width: 100%;
+	height: fit-content;
+
+	gap: 10px;
+	padding: 5px 10px;
+
+	&:hover {
+		background-color: var(--background-color-accent);
+		border-radius: 8px;
+	}
+
+	&.headless {
+		padding-left: calc(@avatar-size + 20px);
+	}
+
+	&__avatar {
+		min-width: @avatar-size;
+		min-height: @avatar-size;
+
+		max-width: @avatar-size;
+		max-height: @avatar-size;
+
+		background-color: var(--background-color-accent);
+
+		overflow: hidden;
+
+		border-radius: 8px;
+
+		.lazy-load-image-background {
+			width: 100%;
+			height: 100%;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+		}
+	}
+
+	&__content {
+		position: relative;
+
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		overflow: hidden;
+
+		gap: 5px;
+
+		&__header {
+			display: inline-flex;
+			flex-direction: row;
+
+			gap: 10px;
+
+			width: 100%;
+
+			&__username {
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+
+				gap: 10px;
+
+				font-size: 0.8rem;
+				font-weight: 800;
+
+				span {
+					user-select: text;
+				}
+
+				&__bot-indicator {
+					margin-left: auto;
+
+					padding: 2px 5px;
+					background-color: var(--border-color);
+					border-radius: 5px;
+					font-size: 0.7rem;
+				}
+			}
+
+			&__time {
+				position: absolute;
+				right: 0;
+				top: 0;
+
+				font-size: 0.7rem;
+			}
+		}
+
+		&__body {
+			display: flex;
+			flex-direction: column;
+
+			gap: 10px;
+
+			width: 100%;
+			overflow: hidden;
+
+			p {
+				display: flex;
+				flex-direction: column;
+
+				gap: 10px;
+
+				align-items: flex-start;
+
+				word-wrap: break-word;
+				word-break: break-word;
+				white-space: pre-wrap;
+
+				overflow-wrap: break-word;
+				user-select: text;
+
+				text-rendering: optimizeLegibility;
+			}
+
+			&__attachments {
+				max-width: 80%;
+				max-height: 400px;
+
+				min-width: 200px;
+				min-height: 200px;
+
+				width: fit-content;
+				height: fit-content;
+
+				overflow: hidden;
+
+				.bear-react-carousel__root {
+					width: fit-content;
+					height: 100%;
+					max-width: 100%;
+				}
+			}
+
+			.lazy-load-image-background {
+				display: flex !important;
+				width: auto;
+				height: fit-content;
+
+				min-width: 200px;
+				max-width: 40%;
+
+				border-radius: 12px;
+				overflow: hidden;
+				background-color: black;
+
+				img {
+					width: 100%;
+					height: auto;
+					max-width: 100%;
+					object-fit: cover;
+					display: block;
+				}
+			}
+
+			a {
+				word-break: break-all;
+				max-width: 100%;
+				display: inline-block;
+			}
+		}
+
+		// Responsive adjustments
+		@media (max-width: 768px) {
+			padding: 3px 8px;
+
+			&.headless {
+				padding-left: calc(@avatar-size + 16px);
+			}
+
+			&__content {
+				&__body {
+					&__attachments {
+						max-width: 95%;
+						min-width: 150px;
+					}
+
+					.lazy-load-image-background {
+						max-width: 70%;
+						min-width: 150px;
+					}
+				}
+			}
+		}
+	}
+}

@@ -3,9 +3,10 @@ import Groups from "@classes/Groups"
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		return await Groups.create({
-			...req.body,
-			owner_user_id: req.auth.session.user_id,
-		})
+		return await Groups.orderChannels(
+			req.params.group_id,
+			req.body.order,
+			req.auth.session.user_id,
+		)
 	},
 }

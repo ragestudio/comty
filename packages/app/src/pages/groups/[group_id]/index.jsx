@@ -1,15 +1,16 @@
 import React from "react"
-import { Result } from "antd"
+import { Result, Button } from "antd"
 import classnames from "classnames"
 
 import useTitle from "@hooks/useTitle"
 import imageAverageColor from "@utils/imageAverageColor"
 
 import GroupsModel from "@models/groups"
-import GroupContext from "./context"
+import GroupPageContext from "./context"
 
 import Skeleton from "@components/Skeleton"
 import Image from "@components/Image"
+import Icons from "@components/Icons"
 import MembersPanel from "./components/MembersPanel"
 import ChannelsPanel from "./components/ChannelsPanel"
 import ContentPanel from "./components/ContentPanel"
@@ -19,6 +20,8 @@ import "./index.less"
 const GroupPage = (props) => {
 	const [documentTitle, setDocumentTitle] = useTitle()
 	const mediartcSocket = React.useRef(app.cores.mediartc.socket())
+	const [selectedContentTab, setSelectedContentTab] =
+		React.useState("default")
 
 	const [group, setGroup] = React.useState(null)
 	const [groupCoverImageAverageColor, setGroupCoverImageAverageColor] =
@@ -30,7 +33,7 @@ const GroupPage = (props) => {
 	const loadGroup = React.useCallback(async () => {
 		setLoadError(null)
 
-		let data = await GroupsModel.get(props.params.group_id).catch(
+		let groupData = await GroupsModel.get(props.params.group_id).catch(
 			(error) => {
 				setLoadError(error)
 				console.error(error)
@@ -44,19 +47,28 @@ const GroupPage = (props) => {
 			},
 		)
 
-		if (!data) {
+		if (!groupData) {
 			return null
 		}
 
-		let currentGroupState = await GroupsModel.rtc.getGroupState(data._id)
+		groupData.channels = await GroupsModel.channels.list(groupData._id)
 
-		console.debug("loaded data", {
-			currentGroupState: currentGroupState,
-			data: data,
+		// load state
+		let currentGroupState = await GroupsModel.rtc.getGroupState(
+			groupData._id,
+		)
+
+		// add clients array to each channel
+		groupData.channels = groupData.channels.map((channel) => {
+			return {
+				...channel,
+				clients: [],
+			}
 		})
 
+		// override with current channels state
 		if (currentGroupState.channels) {
-			for (let channel of data.channels) {
+			for (let channel of groupData.channels) {
 				const currentStateChannel = currentGroupState.channels.find(
 					(_c) => _c._id === channel._id,
 				)
@@ -67,28 +79,45 @@ const GroupPage = (props) => {
 			}
 		}
 
-		if (data.cover) {
-			const averageColor = await imageAverageColor(data.cover)
+		// override with current connected members state
+		if (currentGroupState.connected_members) {
+			groupData.connected_members = currentGroupState.connected_members
+		}
+
+		if (groupData.cover) {
+			const averageColor = await imageAverageColor(groupData.cover)
 			setGroupCoverImageAverageColor(averageColor)
 		}
 
-		setDocumentTitle(data.name)
+		// load the first text channel
+		const firstTextChannel = groupData.channels.find(
+			(channel) => channel.kind === "chat",
+		)
+
+		setSelectedContentTab({
+			type: "chat",
+			props: { _id: firstTextChannel._id },
+		})
+
+		setDocumentTitle(groupData.name)
 		subscribeToGroupState()
 		setInitialLoading(false)
-		setGroup(data)
+		setGroup(groupData)
 	}, [group])
 
 	const handleGroupStateUpdate = React.useCallback(
-		(update) => {
-			console.log("group state update", update)
+		(data) => {
+			console.debug("group state update", data)
 
-			switch (update.event) {
+			const { event, payload } = data
+
+			switch (event) {
 				case "client:joined":
 				case "client:left": {
 					setGroup((prev) => {
 						const channels = prev.channels.map((channel) => {
-							if (channel._id === update.channelId) {
-								channel.clients = update.channelClients
+							if (channel._id === payload.channelId) {
+								channel.clients = payload.channelClients
 							}
 
 							return channel
@@ -99,6 +128,39 @@ const GroupPage = (props) => {
 							channels: channels,
 						}
 					})
+					break
+				}
+				case "user:online": {
+					setGroup((prev) => {
+						const connected_members = [...prev.connected_members]
+
+						if (!connected_members.includes(payload.userId)) {
+							connected_members.push(payload.userId)
+						}
+
+						return {
+							...prev,
+							connected_members: connected_members,
+						}
+					})
+					break
+				}
+				case "user:offline": {
+					setGroup((prev) => {
+						let connected_members = [...prev.connected_members]
+
+						if (connected_members.includes(payload.userId)) {
+							connected_members = connected_members.filter(
+								(memberId) => memberId !== payload.userId,
+							)
+						}
+
+						return {
+							...prev,
+							connected_members: connected_members,
+						}
+					})
+
 					break
 				}
 				default: {
@@ -115,7 +177,11 @@ const GroupPage = (props) => {
 				`group:${props.params.group_id}:state:update`,
 				handleGroupStateUpdate,
 			)
-			mediartcSocket.current.topics.subscribe(props.params.group_id)
+			//mediartcSocket.current.topics.subscribe(props.params.group_id)
+			mediartcSocket.current.topics.subscribe(
+				"group:subscribe_state",
+				props.params.group_id,
+			)
 		}
 	}, [])
 
@@ -125,6 +191,7 @@ const GroupPage = (props) => {
 				`group:${props.params.group_id}:state:update`,
 				handleGroupStateUpdate,
 			)
+			//mediartcSocket.current.topics.unsubscribe(props.params.group_id)
 			mediartcSocket.current.topics.unsubscribe(props.params.group_id)
 		}
 	}, [])
@@ -152,10 +219,12 @@ const GroupPage = (props) => {
 	}
 
 	return (
-		<GroupContext.Provider
+		<GroupPageContext.Provider
 			value={{
-				...group,
+				group: group,
 				groupCoverImageAverageColor: groupCoverImageAverageColor,
+				selectedContentTab: selectedContentTab,
+				setSelectedContentTab: setSelectedContentTab,
 			}}
 		>
 			<div
@@ -191,21 +260,37 @@ const GroupPage = (props) => {
 							<p>{group.description}</p>
 						</div>
 					</div>
+
+					<div className="group-page__header__actions">
+						{group.owner_user_id === app.userData._id && (
+							<Button
+								icon={<Icons.MdSettings />}
+								onClick={() => {
+									setSelectedContentTab({
+										type: "settings",
+									})
+								}}
+							/>
+						)}
+
+						<Button icon={<Icons.IoMdLink />} />
+					</div>
 				</div>
 
 				<div className="group-page__panels">
-					<ChannelsPanel channels={group.channels ?? []} />
-					<ContentPanel />
-					<MembersPanel members={group.members ?? []} />
+					<ChannelsPanel />
+					<ContentPanel selectedTab={selectedContentTab} />
+					<MembersPanel />
 				</div>
 			</div>
-		</GroupContext.Provider>
+		</GroupPageContext.Provider>
 	)
 }
 
 GroupPage.options = {
 	layout: {
 		centeredContent: false,
+		maxHeight: true,
 	},
 }
 

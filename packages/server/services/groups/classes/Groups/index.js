@@ -1,9 +1,14 @@
 import GroupMemberships from "@classes/GroupMemberships"
 import GroupChannels from "@classes/GroupChannels"
+import GroupPermissions from "@classes/GroupPermissions"
 
 export default class Groups {
 	static get model() {
 		return global.scylla.model("groups")
+	}
+
+	static get channelOrderModel() {
+		return global.scylla.model("channel_orders")
 	}
 
 	static async get(group_id) {
@@ -90,6 +95,16 @@ export default class Groups {
 
 		// create the membership
 		await GroupMemberships.create(payload.owner_user_id, groupId)
+
+		// create the general text channel
+		await GroupChannels.create(
+			groupId,
+			{
+				kind: "chat",
+				name: "General",
+			},
+			payload.owner_user_id,
+		)
 
 		return group.toJSON()
 	}
@@ -212,6 +227,45 @@ export default class Groups {
 		if (!isMember) {
 			throw new OperationError(403, "You are not a member of this group")
 		}
+
+		return group
+	}
+
+	static async orderChannels(group_id, order_ids, user_id) {
+		if (typeof group_id !== "string") {
+			throw new OperationError(400, "group_id must be a string")
+		}
+
+		if (!Array.isArray(order_ids)) {
+			throw new OperationError(400, "order_ids must be an array")
+		}
+
+		if (typeof user_id === "string") {
+			if (
+				!(await GroupPermissions.hasUserPermission(
+					user_id,
+					group_id,
+					"order_channels",
+				))
+			) {
+				throw new OperationError(
+					403,
+					"You are not allowed to order channels in this group",
+				)
+			}
+		}
+
+		console.log("Updating group channels order", {
+			group_id,
+			newOrder: order_ids,
+		})
+
+		let group = await this.channelOrderModel.updateAsync(
+			{ group_id: group_id },
+			{
+				order: order_ids,
+			},
+		)
 
 		return group
 	}

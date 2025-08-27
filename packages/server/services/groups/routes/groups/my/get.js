@@ -1,7 +1,7 @@
 import Groups from "@classes/Groups"
 
 export default {
-	useMiddlewares: ["withAuthentication"],
+	useMiddlewares: ["botAuthentication", "withAuthentication"],
 	fn: async (req) => {
 		// TODO: implement pagination
 		//const { limit, offset } = req.query

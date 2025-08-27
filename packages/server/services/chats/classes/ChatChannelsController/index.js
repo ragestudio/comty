@@ -5,13 +5,16 @@ export default class ChatChannelsController {
 		this.server = server
 	}
 
-	get = async (group_id, channel_id, user_id) => {
-		const GroupChannelsModel =
-			this.server.contexts.scylla.model("group_channels")
-		const GroupMembershipsModel =
-			this.server.contexts.scylla.model("group_memberships")
+	get GroupChannelsModel() {
+		return this.server.contexts.scylla.model("group_channels")
+	}
 
-		const channel = await GroupChannelsModel.findOneAsync(
+	get GroupMembershipsModel() {
+		return this.server.contexts.scylla.model("group_memberships")
+	}
+
+	get = async (group_id, channel_id, user_id) => {
+		const channel = await this.GroupChannelsModel.findOneAsync(
 			{
 				_id: channel_id,
 				group_id: group_id,
@@ -29,7 +32,7 @@ export default class ChatChannelsController {
 			throw new OperationError(400, "This channel is not a chat")
 		}
 
-		const membership = await GroupMembershipsModel.findOneAsync(
+		const membership = await this.GroupMembershipsModel.findOneAsync(
 			{
 				group_id: group_id,
 				user_id: user_id,
@@ -45,6 +48,4 @@ export default class ChatChannelsController {
 
 		return new ChatChannel(this, channel)
 	}
-
-	create = async (client, payload) => {}
 }

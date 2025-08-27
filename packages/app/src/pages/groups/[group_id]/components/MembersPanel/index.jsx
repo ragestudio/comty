@@ -1,41 +1,78 @@
 import React from "react"
+import classnames from "classnames"
 
 import LoadMore from "@components/LoadMore"
 import UserPreview from "@components/UserPreview"
 
 import GroupsModel from "@models/groups"
 
-import GroupContext from "../../context"
+import GroupPageContext from "../../context"
 
 import "./index.less"
 
+const Member = ({ user, connected }) => {
+	return (
+		<div
+			className={classnames("group-page__members-panel__member", {
+				["connected"]: !!connected,
+			})}
+		>
+			<div className="group-page__members-panel__member__connection" />
+
+			<div className="group-page__members-panel__member__content">
+				<UserPreview
+					user={
+						user ?? {
+							public_name: "Deleted account",
+							username: "unknown",
+						}
+					}
+					small
+				/>
+			</div>
+		</div>
+	)
+}
+
 const MembersPanel = () => {
-	const group = React.useContext(GroupContext)
+	const ctx = React.useContext(GroupPageContext)
 
 	const [totalMembers, setTotalMembers] = React.useState(0)
 	const [members, setMembers] = React.useState([])
 	const [hasMore, setHasMore] = React.useState(true)
 
-	const page = React.useRef(0)
+	const lastId = React.useRef(null)
 
 	const fetchMembers = async () => {
-		const result = await GroupsModel.members.get(group._id, {
-			page: page.current,
+		const result = await GroupsModel.members.list(ctx.group._id, {
+			offset: lastId.current,
 		})
 
-		setMembers((prev) => [...prev, ...result.items])
+		if (result.items.length > 0) {
+			lastId.current = result.items[0]._id
+			setMembers((prev) => [...prev, ...result.items])
+		}
+
 		setTotalMembers(result.total_items)
 		setHasMore(result.has_more)
 	}
 
-	const onLoadMore = async () => {
-		page.current += 1
-		await fetchMembers()
-	}
-
 	React.useEffect(() => {
-		fetchMembers()
-	}, [])
+		// sort member by connection status
+		setMembers((prev) => {
+			return prev.sort((a, b) => {
+				if (ctx.group.connected_members.includes(a._id)) {
+					return -1
+				}
+
+				if (ctx.group.connected_members.includes(b._id)) {
+					return 1
+				}
+
+				return 0
+			})
+		})
+	}, [ctx.group, members])
 
 	return (
 		<div className="group-page__members-panel">
@@ -45,14 +82,16 @@ const MembersPanel = () => {
 
 			<LoadMore
 				hasMore={hasMore}
-				onBottom={onLoadMore}
+				onBottom={fetchMembers}
 				className="group-page__members-panel__list"
 			>
 				{members.map((member) => (
-					<UserPreview
+					<Member
 						key={member._id}
-						user={member}
-						small
+						user={member.user}
+						connected={ctx.group.connected_members.includes(
+							member.user_id,
+						)}
 					/>
 				))}
 			</LoadMore>

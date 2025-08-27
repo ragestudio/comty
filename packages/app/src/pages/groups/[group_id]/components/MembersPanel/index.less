@@ -6,6 +6,8 @@
 	width: 250px;
 	min-width: 250px;
 
+	height: fit-content;
+
 	background-color: var(--background-color-accent);
 
 	border-radius: 12px;
@@ -26,5 +28,47 @@
 		gap: 10px;
 
 		width: 100%;
+	}
+}
+
+.group-page__members-panel__member {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 8px;
+
+	&.connected {
+		.group-page__members-panel__member__connection {
+			background-color: #70e000;
+		}
+	}
+
+	&__connection {
+		width: 6px;
+		height: 20px;
+
+		background-color: rgba(var(--bg_color_1), 1);
+		border-radius: 4px;
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: row;
+
+		gap: 10px;
+
+		width: 100%;
+	}
+
+	.user-preview {
+		width: 100%;
+
+		&__avatar {
+			background-color: rgba(var(--bg_color_1), 1);
+		}
 	}
 }

@@ -68,11 +68,9 @@ export default class GroupChannels {
 			}
 		}
 
-		console.time("find channels:")
-		const channels = await this.model.findAsync({
+		let channels = await this.model.findAsync({
 			group_id,
 		})
-		console.timeEnd("find channels:")
 
 		return channels
 	}
@@ -175,12 +173,12 @@ export default class GroupChannels {
 	}
 
 	static async delete(group_id, channel_id, user_id) {
-		if (typeof channel_id !== "string") {
-			throw new OperationError(400, "channel_id must be a string")
-		}
-
 		if (typeof group_id !== "string") {
 			throw new OperationError(400, "group_id must be a string")
+		}
+
+		if (typeof channel_id !== "string") {
+			throw new OperationError(400, "channel_id must be a string")
 		}
 
 		const channel = await this.get(group_id, channel_id)
