@@ -1,16 +1,20 @@
 import { contextBridge, ipcRenderer } from "electron"
-import ElectronStore from "electron-store"
 
-const store = new ElectronStore()
+import Settings from "./classes/Settings/index.js"
+
+const settings = new Settings()
 
 contextBridge.exposeInMainWorld("__ELECTRON__", {
 	desktop: true,
-	store: {
-		path: store.path,
-		get: (key) => store.get(key),
-		set: (...args) => store.set(...args),
-		delete: (...args) => store.delete(...args),
-		clear: () => store.clear(),
+	settings: {
+		path: settings.path,
+		get: (key) => settings.get(key),
+		set: (...args) => settings.set(...args),
+		delete: (...args) => settings.delete(...args),
+		clear: () => settings.clear(),
+	},
+	restart: () => {
+		ipcRenderer.invoke("app:restart")
 	},
 })
 
@@ -25,5 +29,3 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 		ipcRenderer.on(channel, fn)
 	},
 })
-
-//window.history.replaceState({}, "", "/")

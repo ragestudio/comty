@@ -2,7 +2,7 @@
 	"name": "comty-desktop",
 	"appName": "Comty",
 	"processName": "comty-desktop",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"license": "MIT",
 	"type": "module",
 	"main": "./src/main.js",
@@ -14,7 +14,8 @@
 	},
 	"devDependencies": {
 		"electron": "^37.2.1",
-		"electron-builder": "^26.0.12"
+		"electron-builder": "^26.0.12",
+		"electron-devtools-installer": "^4.0.0"
 	},
 	"dependencies": {
 		"cross-env": "^10.0.0",

@@ -26,7 +26,7 @@
 		"artifactName": "${productName}-${version}.${ext}"
 	},
 	"linux": {
-		"target": ["AppImage"],
+		"target": ["AppImage", "deb"],
 		"maintainer": "ragestudio.net",
 		"category": "Entertainment",
 		"icon": "resources/icon-512.png"
@@ -34,9 +34,5 @@
 	"appImage": {
 		"artifactName": "${productName}-${version}.${ext}"
 	},
-	"npmRebuild": false,
-	"publish": {
-		"provider": "generic",
-		"url": "https://storage.ragestudio.net/comty-desktop/release"
-	}
+	"npmRebuild": false
 }

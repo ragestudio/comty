@@ -8,6 +8,9 @@ export default {
 	"window:close": (ctx) => {
 		ctx.mainWindow.hide()
 	},
+	"app:restart": (ctx) => {
+		ctx.restart()
+	},
 	"desktopcapturer:initialize": async (ctx) => {
 		const desktopCapturerModule = ctx.modules.get("desktopCapturer")
 

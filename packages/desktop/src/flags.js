@@ -1,6 +1,4 @@
-import { app } from "electron"
-
-export default () => {
+export default (app) => {
 	if (process.argv.some((arg) => arg === "--no-flags")) return
 
 	const disableFeatures = [
