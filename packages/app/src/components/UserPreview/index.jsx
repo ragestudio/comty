@@ -60,22 +60,38 @@ const UserPreview = (props) => {
 	return (
 		<div
 			id={userData._id}
-			className={classnames("userPreview", {
+			className={classnames("user-preview", {
 				["clickable"]: typeof props.onClick === "function",
 				["small"]: props.small && !props.big,
 				["big"]: props.big && !props.small,
 			})}
 		>
-			<div className="avatar" onClick={handleOnClick}>
-				<Image alt="Avatar" src={userData.avatar} />
+			<div
+				className="user-preview__avatar"
+				onClick={handleOnClick}
+			>
+				<Image
+					alt="Avatar"
+					src={userData.avatar}
+				/>
 			</div>
+
 			{!props.onlyIcon && (
-				<div className="info" onClick={handleOnClick}>
+				<div
+					className="user-preview__info"
+					onClick={handleOnClick}
+				>
 					<h1>
-						{userData.fullName ?? userData.username}
+						{userData.public_name ?? userData.username}
 						{userData.verified && <Icons.verifiedBadge />}
 					</h1>
 					<span>@{userData.username}</span>
+				</div>
+			)}
+
+			{userData.bot && (
+				<div className="user-preview__bot">
+					<span>Bot</span>
 				</div>
 			)}
 		</div>
