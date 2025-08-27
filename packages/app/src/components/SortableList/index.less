@@ -1,111 +1,65 @@
-.shortable-list {
-    position: relative;
+.sortable-list {
+	display: flex;
+	flex-direction: column;
 
-    display: flex;
-    flex-direction: column;
-
-    gap: 10px;
-    padding: 0;
-
-    list-style: none;
-
-    transition: all 0.2s ease-in-out;
-
-    &.active-drag {
-        //border: 1px dashed var(--border-color);
-        border-radius: 12px;
-
-        padding: 10px;
-
-        background-color: var(--background-color-accent);
-    }
+	gap: 10px;
 }
 
 .sortable-item {
-    display: flex;
-    justify-content: space-between;
+	position: relative;
 
-    flex-grow: 1;
-    align-items: center;
-
-    //box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05), 0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15);
-    //border-radius: calc(4px / var(--scale-x, 1));
-
-    box-sizing: border-box;
-    list-style: none;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
 }
 
 .drag-handle {
-    display: flex;
+	display: flex;
 
-    width: 0px;
-    padding: 0px;
+	width: 12px;
+	padding: 15px;
 
-    opacity: 0;
+	align-items: center;
+	justify-content: center;
 
-    align-items: center;
-    justify-content: center;
+	flex: 0 0 auto;
 
-    flex: 0 0 auto;
+	touch-action: none;
 
-    touch-action: none;
+	cursor: var(--cursor, pointer);
 
-    cursor: var(--cursor, pointer);
+	border-radius: 5px;
+	border: none;
+	outline: none;
 
-    border-radius: 5px;
-    border: none;
-    outline: none;
+	appearance: none;
+	background-color: transparent;
+	-webkit-tap-highlight-color: transparent;
 
-    appearance: none;
-    background-color: transparent;
-    -webkit-tap-highlight-color: transparent;
+	transition: all 0.2s ease-in-out;
 
-    transition: all 0.2s ease-in-out;
+	&:hover {
+		background-color: rgba(0, 0, 0, 0.05);
+	}
 
-    &.active {
-        width: 12px;
-        padding: 15px;
+	&.disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
 
-        opacity: 1;
-    }
+		&:hover {
+			background-color: transparent;
+		}
+	}
 
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
+	svg {
+		flex: 0 0 auto;
 
-    svg {
-        flex: 0 0 auto;
+		margin: auto;
 
-        margin: auto;
+		height: 100%;
 
-        height: 100%;
+		overflow: visible;
 
-        overflow: visible;
-
-        fill: #919eab;
-    }
-}
-
-.drag-actions {
-    display: flex;
-
-    flex-direction: row;
-
-    align-items: center;
-
-    gap: 10px;
-
-    width: 0px;
-    height: 0px;
-
-    opacity: 0;
-
-    transition: all 0.2s ease-in-out;
-
-    &.active {
-        width: 100%;
-        height: 30px;
-
-        opacity: 1;
-    }
+		fill: #919eab;
+	}
 }
