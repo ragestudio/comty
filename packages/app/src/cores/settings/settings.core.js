@@ -21,7 +21,7 @@ export default class SettingsCore extends Core {
 
 	onInitialize() {
 		if ("__ELECTRON__" in window) {
-			this.storeInstance = window["__ELECTRON__"].store
+			this.storeInstance = window["__ELECTRON__"].settings
 		} else {
 			this.storeInstance = store
 		}
