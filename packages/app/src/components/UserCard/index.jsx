@@ -102,8 +102,9 @@ export const UserCard = (props) => {
 			<div className="username">
 				<div className="username_text">
 					<h1>
+						{user.bot && <Icons.Bot />}
 						{user.public_name || user.username}
-						{user.verified && <Icons.verifiedBadge />}
+						{user.verified && <Icons.verifiedBadge id="verified" />}
 					</h1>
 					<span>@{user.username}</span>
 				</div>
@@ -196,7 +197,12 @@ export const MobileUserCard = (props, ref) => {
 					props.user.links.length > 0 && (
 						<div className={classnames("_mobile_userCard_links")}>
 							{props.user.links.map((link, index) => {
-								return <UserLink index={index} link={link} />
+								return (
+									<UserLink
+										index={index}
+										link={link}
+									/>
+								)
 							})}
 						</div>
 					)}
@@ -223,7 +229,10 @@ export const MobileUserCard = (props, ref) => {
 					disabled
 				/>
 
-				<antd.Button type="primary" icon={<Icons.MdShare />} />
+				<antd.Button
+					type="primary"
+					icon={<Icons.MdShare />}
+				/>
 			</div>
 		</div>
 	)
