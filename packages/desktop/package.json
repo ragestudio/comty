@@ -1,6 +1,13 @@
 {
+<<<<<<< HEAD
 	"name": "@comty/desktop",
 	"version": "0.1.0",
+=======
+	"name": "comty-desktop",
+	"appName": "Comty",
+	"processName": "comty-desktop",
+	"version": "0.4.0",
+>>>>>>> c3cd0d3c (Add Debian package build)
 	"license": "MIT",
 	"type": "module",
 	"main": "./src/main.js",
@@ -8,7 +15,13 @@
 		"dev": "electron ."
 	},
 	"devDependencies": {
+<<<<<<< HEAD
 		"electron": "^37.2.1"
+=======
+		"electron": "^37.2.1",
+		"electron-builder": "^26.0.12",
+		"electron-devtools-installer": "^4.0.0"
+>>>>>>> c3cd0d3c (Add Debian package build)
 	},
 	"dependencies": {
 		"electron-store": "^10.1.0"

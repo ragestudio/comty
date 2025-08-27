@@ -1,0 +1,38 @@
+{
+	"appId": "com.ragestudio.comty-desktop",
+	"productName": "comty-desktop",
+	"files": [
+		"src/**/**",
+		"resources/**/**",
+		"!electron.vite.config.{js,ts,mjs,cjs}",
+		"!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
+		"!{.env,.env.*,.npmrc,pnpm-lock.yaml}"
+	],
+	"win": {
+		"executableName": "Comty",
+		"icon": "resources/icon.ico"
+	},
+	"nsis": {
+		"artifactName": "${productName}-${version}-setup.${ext}",
+		"shortcutName": "${productName}",
+		"uninstallDisplayName": "${productName}",
+		"createDesktopShortcut": "always"
+	},
+	"mac": {
+		"icon": "resources/icon.icns",
+		"notarize": false
+	},
+	"dmg": {
+		"artifactName": "${productName}-${version}.${ext}"
+	},
+	"linux": {
+		"target": ["AppImage", "deb"],
+		"maintainer": "ragestudio.net",
+		"category": "Entertainment",
+		"icon": "resources/icon-512.png"
+	},
+	"appImage": {
+		"artifactName": "${productName}-${version}.${ext}"
+	},
+	"npmRebuild": false
+}
