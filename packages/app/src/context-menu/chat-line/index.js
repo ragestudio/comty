@@ -1,4 +1,5 @@
 import copyToClipboard from "@utils/copyToClipboard"
+import ChatsModel from "@models/chats"
 
 export default {
 	"chat-line": (items, parent, element, control) => {
@@ -38,6 +39,15 @@ export default {
 
 		// check if can copy user id
 		if (messageUserId) {
+			const channelElement = parent.closest("[data-channel-id]")
+
+			if (!channelElement) {
+				return
+			}
+
+			const channelId = channelElement.getAttribute("data-channel-id")
+			const groupId = channelElement.getAttribute("data-group-id")
+
 			// push copy id
 			items.push({
 				label: "Copy user ID",
@@ -57,12 +67,21 @@ export default {
 				items.push({
 					label: "Edit message",
 					icon: "FiEdit",
+					disabled: true,
 				})
 
 				items.push({
 					label: "Delete message",
 					icon: "FiTrash2",
 					danger: true,
+					action: async () => {
+						control.close()
+						return await ChatsModel.channels.messages.delete(
+							groupId,
+							channelId,
+							messageId,
+						)
+					},
 				})
 			}
 		}

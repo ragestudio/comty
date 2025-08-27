@@ -49,7 +49,9 @@ const ContextMenu = (props) => {
 					onClick={() => handleItemClick(item)}
 					className={classNames("item", {
 						danger: item.danger,
+						disabled: item.disabled,
 					})}
+					disabled={item.disabled}
 				>
 					<p className="label">{item.label}</p>
 
