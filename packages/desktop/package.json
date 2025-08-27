@@ -6,8 +6,11 @@
 	"license": "MIT",
 	"type": "module",
 	"main": "./src/main.js",
+	"homepage": "https://comty.app",
 	"scripts": {
-		"dev": "electron ."
+		"dev": "electron .",
+		"postinstall": "electron-builder install-app-deps",
+		"pack:linux": "electron-builder --linux --config"
 	},
 	"devDependencies": {
 		"electron": "^37.2.1",
@@ -15,6 +18,8 @@
 		"electron-devtools-installer": "^4.0.0"
 	},
 	"dependencies": {
-		"electron-store": "^10.1.0"
+		"cross-env": "^10.0.0",
+		"electron-store": "^10.1.0",
+		"paclient": "^0.0.2"
 	}
 }
