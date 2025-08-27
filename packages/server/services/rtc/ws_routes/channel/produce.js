@@ -1,3 +1,9 @@
 export default async (client, payload) => {
-	return await global.mediaChannels.produce(client, payload)
+	const channelInstance = global.mediaChannels.getClientChannel(client)
+
+	if (!channelInstance) {
+		throw new OperationError(404, "No channel available")
+	}
+
+	return await channelInstance.produce(client, payload)
 }

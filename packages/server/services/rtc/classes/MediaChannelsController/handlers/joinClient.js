@@ -1,9 +1,24 @@
 export default async function (client, channelId) {
 	try {
+		const GroupChannelsModel = global.scylla.model("group_channels")
+
+		const channel = await GroupChannelsModel.findOneAsync(
+			{
+				_id: channelId,
+			},
+			{
+				raw: true,
+			},
+		)
+
+		if (!channel) {
+			throw new Error("Channel not found")
+		}
+
 		// Validate channel access
-		const { group } = await this._validateChannelAccess(
+		const group = await this.validateGroupAccess(
 			client.userId,
-			channelId,
+			channel.group_id,
 		)
 
 		// Cleanup existing connection
@@ -16,7 +31,7 @@ export default async function (client, channelId) {
 		let channelInstance = this.instances.get(channelId)
 
 		if (!channelInstance) {
-			channelInstance = await this._createChannelInstance(
+			channelInstance = await this.createChannelInstance(
 				group._id,
 				channelId,
 			)

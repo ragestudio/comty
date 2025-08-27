@@ -1,3 +1,9 @@
 export default async (client, payload) => {
-	return await global.mediaChannels.handleSoundpadDispatch(client, payload)
+	const channelInstance = global.mediaChannels.getClientChannel(client)
+
+	if (!channelInstance) {
+		throw new OperationError(404, "No channel available")
+	}
+
+	return await channelInstance.handleSoundpadDispatch(client, payload)
 }

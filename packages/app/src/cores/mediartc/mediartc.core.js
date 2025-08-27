@@ -1,5 +1,5 @@
 import Core from "vessel/core"
-import { RTEngineClient } from "linebridge/client/src/rtengine"
+import { RTEngineClient } from "linebridge-client"
 import SessionModel from "@models/session"
 
 import MediaRTCState from "./classes/State"

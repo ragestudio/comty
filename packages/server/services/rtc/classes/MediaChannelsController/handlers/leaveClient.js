@@ -1,7 +1,7 @@
 export default async function (client) {
 	try {
 		if (!client.currentMediaChannel) {
-			this._cleanupOrphanedResources(client)
+			this.cleanupOrphanedResources(client)
 			return
 		}
 
@@ -11,7 +11,7 @@ export default async function (client) {
 
 		if (!channelInstance) {
 			client.currentMediaChannel = null
-			this._cleanupOrphanedResources(client)
+			this.cleanupOrphanedResources(client)
 			return
 		}
 
