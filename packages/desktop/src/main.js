@@ -11,10 +11,10 @@ import ElectronStore from "electron-store"
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import os from "node:os"
-import {
-	installExtension,
-	REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer"
+// import {
+// 	installExtension,
+// 	REACT_DEVELOPER_TOOLS,
+// } from "electron-devtools-installer"
 
 import IPC from "./ipc.js"
 import TrayItems from "./tray.js"
@@ -86,7 +86,7 @@ class Main {
 		this.state.ready = true
 
 		// install react dev tools
-		await installExtension(REACT_DEVELOPER_TOOLS)
+		// await installExtension(REACT_DEVELOPER_TOOLS)
 
 		await this.createTray()
 		await this.createMainWindow()
