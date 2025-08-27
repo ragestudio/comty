@@ -1,41 +1,45 @@
-import React from "react"
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 
+import React from "react"
 import { createRoot } from "react-dom/client"
 
 import DefaultWindow from "./components/defaultWindow"
 
+import VirtualWindow from "./VirtualWindow"
+import DomWindow from "./DomWindow"
+
 import "./index.less"
+
+class WindowsRender extends React.Component {
+	render() {
+		return this.props.renders
+	}
+}
 
 export default class WindowManager extends Core {
 	static namespace = "window_mng"
-
 	static idMount = "windows"
 
+	rootElement = null
 	root = null
 	windows = []
 
 	public = {
-		close: this.close.bind(this),
+		close: this.closeById.bind(this),
 		render: this.render.bind(this),
+		open: this.open.bind(this),
 	}
 
 	async onInitialize() {
-		this.root = document.createElement("div")
+		this.rootElement = document.createElement("div")
+		this.rootElement.setAttribute("id", this.constructor.idMount)
 
-		this.root.setAttribute("id", this.constructor.idMount)
+		document.body.append(this.rootElement)
 
-		document.body.append(this.root)
-	}
+		this.root = createRoot(this.rootElement)
+		this.renderWindows()
 
-	handleWrapperClick = (id, event) => {
-		const element = this.root.querySelector(`#${id}`)
-
-		if (element) {
-			if (!element.contains(event.target)) {
-				this.close(id)
-			}
-		}
+		document.addEventListener("click", this.handleGlobalClick)
 	}
 
 	/**
@@ -45,103 +49,82 @@ export default class WindowManager extends Core {
 	 * If useFrame option is true, it wraps the fragment with a DefaultWindow component before rendering.
 	 *
 	 * @param {string} id - The id of the element to create or update.
-	 * @param {ReactElement} fragment - The React element to render inside the created element.
+	 * @param {ReactElement} component - The React element to render inside the created element.
 	 * @param {Object} options - The options for creating or updating the element.
-	 * @param {boolean} options.useFrame - Specifies whether to wrap the fragment with a DefaultWindow component.
 	 * @param {boolean} options.createOrUpdate - Specifies whether to create a new element or update an existing one.
+	 * @param {boolean} options.closeOnClickOutside - Specifies whether to close the window when the user clicks outside of it.
+	 * @param {function} options.onClose - Specifies a callback function to be called when the window is closed.
 	 * @return {HTMLElement} The created or updated element.
 	 */
 	async render(
 		id,
-		fragment,
+		component,
 		{
-			useFrame = false,
+			position = null,
+			className = null,
+			props = null,
 			onClose = null,
-			createOrUpdate = false,
 			closeOnClickOutside = false,
+			createOrUpdate = false,
 		} = {},
 	) {
-		let element = document.createElement("div")
-		let node = null
-		let win = null
+		let win = this.windows.find((node) => {
+			return node.id === id
+		})
 
-		// check if window already exist
-		// if exist, try to automatically generate a new id
-		if (this.root.querySelector(`#${id}`) && !createOrUpdate) {
-			const newId = `${id}_${Date.now()}`
+		if (win) {
+			this.console.log("Existent window", win)
 
-			this.console.warn(
-				`Window ${id} already exist, overwritting id to ${newId}.\nYou can use {createOrUpdate = true} option to force refresh render of window`,
-			)
+			if (createOrUpdate === true) {
+				win.updatePosition(position?.x, position?.y)
+				win.render(component)
 
-			id = newId
-		}
-
-		// check if window already exist, if exist and createOrUpdate is true, update the element
-		// if not exist, create a new element
-		if (this.root.querySelector(`#${id}`) && createOrUpdate) {
-			element = document.getElementById(id)
-
-			win = this.windows.find((_node) => {
-				return _node.id === id
-			})
-
-			if (win) {
-				node = win.node
-			}
-		} else {
-			element.setAttribute("id", id)
-
-			this.root.appendChild(element)
-
-			node = createRoot(element)
-
-			win = {
-				id: id,
-				node: node,
-				onClose: onClose,
-				closeOnClickOutside: closeOnClickOutside,
+				return win
 			}
 
-			this.windows.push(win)
-
-			// if closeOnClickOutside is true, add click event listener
-			if (closeOnClickOutside === true) {
-				document.addEventListener(
-					"click",
-					(e) => this.handleWrapperClick(id, e),
-					{ once: true },
-				)
-			}
+			id = `${id}_${Date.now()}`
 		}
 
-		// if useFrame is true, wrap the fragment with a DefaultWindow component
-		if (useFrame) {
-			fragment = <DefaultWindow>{fragment}</DefaultWindow>
+		win = new DomWindow(this, id, {
+			className: className,
+			position: position,
+			onCloseCallback: onClose,
+			closeOnClickOutside: closeOnClickOutside,
+		})
+
+		win.render(component, props)
+
+		this.windows.push(win)
+
+		return win
+	}
+
+	async open(id, element) {
+		const existentWindow = this.windows.find((node) => {
+			return node.id === id
+		})
+
+		if (existentWindow) {
+			id = `${id}_${Date.now()}`
 		}
 
-		if (React.isValidElement(fragment)) {
-			node.render(
-				React.cloneElement(fragment, {
-					close: () => {
-						this.close(id, onClose)
-					},
-				}),
-			)
-		} else {
-			node.render(
-				React.createElement(fragment, {
-					close: () => {
-						this.close(id, onClose)
-					},
-				}),
-			)
-		}
-
-		return {
+		console.debug("Opening new window", {
+			id,
 			element,
-			...win,
-		}
+		})
+
+		const win = new VirtualWindow(this, id, {
+			element: React.createElement(DefaultWindow, {
+				key: id,
+				children: element,
+			}),
+		})
+
+		this.windows.push(win)
+
+		this.renderWindows()
+
+		return win
 	}
 
 	/**
@@ -150,35 +133,69 @@ export default class WindowManager extends Core {
 	 * @param {string} id - The ID of the window to be closed.
 	 * @return {boolean} Returns true if the window was successfully closed, false otherwise.
 	 */
-	async close(id) {
-		const element = document.getElementById(id)
-
-		const win = this.windows.find((node) => {
-			return node.id === id
+	async closeById(id) {
+		const win = this.windows.find((_win) => {
+			return _win.id === id
 		})
 
-		if (!win || !element) {
-			this.console.error(`[${id}] Window not found`)
-			return false
+		if (!win) {
+			throw new Error("Window not found")
 		}
 
-		this.console.debug(`[${id}] Closing window`, win, element)
+		return await this.close(win)
+	}
 
-		// if onClose callback is defined, call it
-		if (typeof win.onClose === "function") {
-			this.console.debug(`[${id}] Trigging on closing callback`)
-			await win.onClose()
+	async close(win) {
+		if (!(win instanceof DomWindow) && !(win instanceof VirtualWindow)) {
+			throw new Error("Window must be an instance of DomWindow")
 		}
 
-		// remove the element from the DOM
-		win.node.unmount()
-		this.root.removeChild(element)
+		const winIndex = this.windows.indexOf(win)
 
-		// remove the window from the list
-		this.windows = this.windows.filter((node) => {
-			return node.id !== id
+		if (winIndex === -1) {
+			throw new Error("Window not found in the list")
+		}
+
+		this.windows.splice(winIndex, 1)
+
+		await win.close()
+
+		if (typeof win.unmount === "function") {
+			win.unmount()
+		}
+
+		return win
+	}
+
+	renderWindows = () => {
+		this.root.render(
+			<WindowsRender
+				renders={this.windows.map((_win) => {
+					return _win.params.element
+				})}
+			/>,
+		)
+	}
+
+	handleGlobalClick = (event) => {
+		// get all windows with closeOnClickOutside option
+		const windows = this.windows.filter((_win) => {
+			return _win.params.closeOnClickOutside === true
 		})
 
-		return true
+		if (windows.length === 0) {
+			return null
+		}
+
+		// get the new one
+		const win = windows[windows.length - 1]
+		const winIndex = windows.indexOf(win)
+
+		// abort if not in index or is a click inside the window
+		if (winIndex === -1 || !win || win.element.contains(event.target)) {
+			return null
+		}
+
+		this.close(win)
 	}
 }

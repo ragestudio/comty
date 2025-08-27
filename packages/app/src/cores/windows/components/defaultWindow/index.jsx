@@ -5,6 +5,8 @@ import { Icons } from "@components/Icons"
 
 import WindowContext from "./context"
 
+import "./index.less"
+
 export default class DefaultWindowRender extends React.Component {
 	static contextType = WindowContext
 
@@ -12,6 +14,7 @@ export default class DefaultWindowRender extends React.Component {
 
 	state = {
 		renderError: false,
+		visible: false,
 		title: null,
 		actions: [],
 		dimensions: {
@@ -19,10 +22,13 @@ export default class DefaultWindowRender extends React.Component {
 			width: this.props.width ?? 400,
 		},
 		position: this.props.defaultPosition,
-		visible: false,
 	}
 
 	componentDidMount = () => {
+		if (!this.state.position) {
+			this.setState({ position: this.getCenterPosition() })
+		}
+
 		this.setDefaultActions()
 
 		if (typeof this.props.actions !== "undefined") {
@@ -35,10 +41,6 @@ export default class DefaultWindowRender extends React.Component {
 
 				this.setState({ actions })
 			}
-		}
-
-		if (!this.state.position) {
-			this.setState({ position: this.getCenterPosition() })
 		}
 
 		this.toggleVisibility(true)
@@ -176,7 +178,7 @@ export default class DefaultWindowRender extends React.Component {
 				dragHandleClassName={
 					this.props.dragHandleClassName ?? "window_topbar"
 				}
-				//bounds={this.props.bounds ?? "#root"}
+				bounds="body"
 				className="window_wrapper"
 			>
 				<div className="window_topbar">
