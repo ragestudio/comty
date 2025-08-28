@@ -9,7 +9,7 @@ const path = require("node:path")
 const Module = require("node:module")
 const { Buffer } = require("node:buffer")
 const { webcrypto: crypto } = require("node:crypto")
-const { InfisicalClient } = require("@infisical/sdk")
+const { InfisicalSDK } = require("@infisical/sdk")
 const moduleAlias = require("module-alias")
 
 // Override file execution arg
@@ -127,21 +127,21 @@ global.injectEnvFromInfisical = async function injectEnvFromInfisical() {
 		`[BOOT] 🔑 Injecting env variables from INFISICAL in [${envMode}] mode...`,
 	)
 
-	const client = new InfisicalClient({
-		auth: {
-			universalAuth: {
-				clientId: process.env.INFISICAL_CLIENT_ID,
-				clientSecret: process.env.INFISICAL_CLIENT_SECRET,
-			},
-		},
+	const client = new InfisicalSDK()
+
+	await client.auth().universalAuth.login({
+		clientId: process.env.INFISICAL_CLIENT_ID,
+		clientSecret: process.env.INFISICAL_CLIENT_SECRET,
 	})
 
-	const secrets = await client.listSecrets({
-		environment: envMode,
-		path: process.env.INFISICAL_PATH ?? "/",
-		projectId: process.env.INFISICAL_PROJECT_ID ?? null,
-		includeImports: false,
-	})
+	const secrets = (
+		await client.secrets().listSecrets({
+			environment: envMode,
+			path: process.env.INFISICAL_PATH ?? "/",
+			projectId: process.env.INFISICAL_PROJECT_ID ?? null,
+			includeImports: false,
+		})
+	).secrets
 
 	//inject to process.env
 	secrets.forEach((secret) => {

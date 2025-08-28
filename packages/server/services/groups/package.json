@@ -1,6 +1,3 @@
 {
-	"name": "groups",
-	"dependencies": {
-		"linebridge": "^1.0.0"
-	}
+	"name": "groups"
 }

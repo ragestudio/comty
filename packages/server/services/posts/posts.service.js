@@ -12,13 +12,13 @@ export default class API extends Server {
 	static refName = "posts"
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3001
 
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
+
 	static websockets = {
 		enabled: true,
 		path: "/posts",
 	}
-	static bypassCors = true
-
-	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,

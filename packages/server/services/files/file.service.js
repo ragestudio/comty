@@ -12,10 +12,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "files"
-	static useEngine = "hyper-express-ng"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3002
-	//static enableWebsockets = true
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3002
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,

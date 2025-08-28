@@ -1,5 +1,5 @@
 import httpProxy from "http-proxy"
-import defaults from "linebridge/dist/defaults"
+import lbVars from "linebridge/dist/vars"
 import pkg from "../../../package.json"
 
 import http from "node:http"
@@ -204,7 +204,7 @@ export default class Proxy {
 				JSON.stringify({
 					name: pkg.name,
 					version: pkg.version,
-					lb_version: defaults?.version || "unknown",
+					lb_version: lbVars.libPkg.version || "unknown",
 					gateway: "standard",
 				}),
 			)

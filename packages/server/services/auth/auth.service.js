@@ -1,14 +1,17 @@
 import { Server } from "linebridge"
+
 import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+
 import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "auth"
-	static useEngine = "hyper-express"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3020
-	static enableWebsockets = true
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3020
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,
@@ -16,6 +19,9 @@ export default class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		redis: RedisClient({
+			maxRetriesPerRequest: null,
+		}),
 	}
 
 	queuesManager = new TaskQueueManager(
@@ -26,9 +32,10 @@ export default class API extends Server {
 	)
 
 	async onInitialize() {
+		await this.contexts.redis.initialize()
 		await this.contexts.db.initialize()
 		await this.queuesManager.initialize({
-			redisOptions: this.engine.ws.redis.options,
+			redisOptions: this.contexts.redis.client.options,
 		})
 		global.queues = this.queuesManager
 	}

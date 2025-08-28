@@ -7,8 +7,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "search"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3010
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3010
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,

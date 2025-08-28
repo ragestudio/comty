@@ -1,5 +1,5 @@
-//import { Server } from "linebridge"
-import { Server } from "../../../../linebridge/server/src"
+//import { Server } from "../../../../linebridge/server/src"
+import { Server } from "linebridge"
 import ScyllaDb from "@shared-classes/ScyllaDb"
 
 import DbManager from "@shared-classes/DbManager"
@@ -16,6 +16,7 @@ export default class API extends Server {
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true
+
 	static websockets = {
 		enabled: true,
 		path: "/rtc",

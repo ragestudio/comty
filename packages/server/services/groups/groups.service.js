@@ -13,6 +13,7 @@ export default class API extends Server {
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true
+
 	static websockets = {
 		enabled: true,
 		path: "/groups",

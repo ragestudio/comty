@@ -1,7 +1,6 @@
 {
 	"name": "chats",
 	"dependencies": {
-		"linebridge": "^1.0.0-alpha.5",
 		"snowflake-uuid": "^1.0.0"
 	}
 }

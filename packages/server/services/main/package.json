@@ -1,7 +1,6 @@
 {
 	"name": "main",
 	"dependencies": {
-		"@octokit/rest": "^20.0.2",
-		"linebridge": "^1.0.0-alpha.5"
+		"@octokit/rest": "^20.0.2"
 	}
 }

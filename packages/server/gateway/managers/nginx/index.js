@@ -2,7 +2,7 @@ import fs from "node:fs/promises"
 import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { execSync, spawn } from "node:child_process"
-import defaults from "linebridge/dist/defaults"
+import lbVars from "linebridge/dist/vars"
 
 const localNginxBinary = path.resolve(process.cwd(), "nginx-bin")
 const serverPkg = require("../../../package.json")
@@ -125,7 +125,7 @@ export default class NginxManager {
 		const mainEndpointJSON = JSON.stringify({
 			name: serverPkg.name,
 			version: serverPkg.version,
-			lb_version: defaults?.version ?? "unknown",
+			lb_version: lbVars.libPkg.version ?? "unknown",
 			gateway: "nginx",
 		})
 

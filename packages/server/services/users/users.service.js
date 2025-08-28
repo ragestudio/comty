@@ -8,7 +8,6 @@ import InjectedAuth from "@shared-lib/injectedAuth"
 
 export default class API extends Server {
 	static refName = "users"
-	static routesPath = `${__dirname}/routes`
 	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3008
 
 	static bypassCors = true

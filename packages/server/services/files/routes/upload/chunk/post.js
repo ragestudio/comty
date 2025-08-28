@@ -8,8 +8,8 @@ import bufferToStream from "@shared-utils/bufferToStream"
 const availableProviders = ["b2", "standard"]
 
 export default {
-	useContext: ["cache", "limits"],
-	middlewares: ["withAuthentication"],
+	useContexts: ["cache", "limits"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
 		if (!checkChunkUploadHeaders(req.headers)) {
 			throw new OperationError(400, "Missing header(s)")

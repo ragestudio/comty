@@ -8,9 +8,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "marketplace"
-	static useEngine = "hyper-express-ng"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3005
+	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3005
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,

@@ -4,8 +4,8 @@ import fs from "node:fs"
 import Upload from "@shared-classes/Upload"
 
 export default {
-	useContext: ["cache"],
-	middlewares: ["withAuthentication"],
+	useContexts: ["cache"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res) => {
 		const workPath = path.resolve(
 			this.default.contexts.cache.constructor.cachePath,

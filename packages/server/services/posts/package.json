@@ -1,7 +1,6 @@
 {
 	"name": "posts",
 	"dependencies": {
-		"linebridge": "^1.0.0-alpha.4",
 		"moment-timezone": "^0.5.45"
 	}
 }

@@ -7,8 +7,8 @@ import sevenzip from "7zip-min"
 import putObject from "@shared-classes/Upload/putObject"
 
 export default {
-	middlewares: ["withAuthentication"],
-	fn: async (req, res) => {
+	useMiddlewares: ["withAuthentication"],
+	fn: async (req) => {
 		let { pkg } = req.headers
 
 		if (!pkg) {
