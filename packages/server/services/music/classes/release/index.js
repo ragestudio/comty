@@ -123,7 +123,7 @@ export default class Release {
 		if (release.user_id !== payload.user_id) {
 			throw new PermissionError(
 				403,
-				"You dont have permission to edit this release",
+				"You dont have permission to delete this release",
 			)
 		}
 
