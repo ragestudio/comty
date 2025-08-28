@@ -10,10 +10,9 @@ const availableProviders = ["b2", "standard"]
 export default {
 	useContext: ["cache", "limits"],
 	middlewares: ["withAuthentication"],
-	fn: async (req, res) => {
+	fn: async (req) => {
 		if (!checkChunkUploadHeaders(req.headers)) {
-			reject(new OperationError(400, "Missing header(s)"))
-			return
+			throw new OperationError(400, "Missing header(s)")
 		}
 
 		const uploadId = `${req.headers["uploader-file-id"]}`
