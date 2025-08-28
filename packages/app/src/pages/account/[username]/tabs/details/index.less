@@ -1,131 +1,84 @@
 @border-radius: 12px;
 
 .details {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    justify-content: center;
+	justify-content: center;
 
-    width: 100%;
+	width: 100%;
 
-    padding: 15px;
+	padding: 15px;
 
-    gap: 10px;
+	gap: 10px;
 
-    background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
 
-    border-radius: @border-radius;
+	border-radius: @border-radius;
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p {
-        margin: 0;
-    }
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p {
+		margin: 0;
+	}
 
-    .inline_field {
-        display: inline-flex;
-
-        flex-direction: row;
-        align-items: center;
-
-        justify-content: space-between;
-
-        padding: 10px;
-
-        background-color: var(--background-color-primary);
-
-        border-radius: 12px;
-
-        .field_header {
-            display: inline-flex;
-
-            flex-direction: row;
-            align-items: center;
-
-            gap: 8px;
-
-            font-size: 0.8rem;
-
-            .field_icon {
-                display: inline-flex;
-
-                flex-direction: row;
-                align-items: center;
-                justify-content: center;
-
-                background-color: var(--background-color-primary);
-
-                border-radius: 100%;
-
-                padding: 5px;
-
-                font-size: 1rem;
-
-                svg {
-                    color: var(--text-color);
-                    margin: 0;
-                }
-            }
-        }
-
-        .field_value p {
-            font-family: "DM Mono", monospace;
-            user-select: text !important;
-        }
-    }
+	.field_value p {
+		font-family: "DM Mono", monospace;
+		user-select: text !important;
+	}
 }
 
 .droppableField {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    justify-content: center;
+	justify-content: center;
 
-    background-color: var(--background-color-primary);
+	background-color: var(--background-color-primary);
 
-    border-radius: 12px;
+	border-radius: 12px;
 
-    transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 
-    &.collapsed {
-        .field_body {
-            height: 0;
-            opacity: 0;
-            padding: 0;
+	&.collapsed {
+		.field_body {
+			height: 0;
+			opacity: 0;
+			padding: 0;
 
-            pointer-events: none;
-        }
-    }
+			pointer-events: none;
+		}
+	}
 
-    .inline_field {
-        margin-left: 20px;
-    }
+	.inline_field {
+		margin-left: 20px;
+	}
 
-    .field_body {
-        display: flex;
-        flex-direction: column;
+	.field_body {
+		display: flex;
+		flex-direction: column;
 
-        padding: 10px;
-        transition: all 150ms ease-in-out;
-    }
+		padding: 10px;
+		transition: all 150ms ease-in-out;
+	}
 
-    .collapse_btn {
-        position: absolute;
+	.collapse_btn {
+		position: absolute;
 
-        top: 0;
-        left: 0;
+		top: 0;
+		left: 0;
 
-        transform: translate(100%, 70%);
+		transform: translate(100%, 70%);
 
-        svg {
-            color: var(--text-color);
-            margin: 0 !important;
-        }
-    }
+		svg {
+			color: var(--text-color);
+			margin: 0 !important;
+		}
+	}
 }
