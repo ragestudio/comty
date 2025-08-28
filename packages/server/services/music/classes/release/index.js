@@ -13,9 +13,7 @@ const AllowedUpdateFields = [
 
 export default class Release {
 	static async get(release_id) {
-		let release = await MusicRelease.findById(id).catch((err) => {
-			return false
-		})
+		let release = await MusicRelease.findById(release_id).catch(() => false)
 
 		if (!release) {
 			throw new OperationError(404, "Release not found")
