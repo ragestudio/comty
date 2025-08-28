@@ -69,7 +69,6 @@ export default class Release {
 			cover: payload.cover,
 			explicit: payload.explicit,
 			type: payload.type,
-			public: payload.public,
 			items: payload.items,
 			public: payload.public,
 		})
