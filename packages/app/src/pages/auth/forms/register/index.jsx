@@ -109,8 +109,8 @@ const RegisterForm = (props) => {
 					<>
 						<h1>👋 Hi! Nice to meet you</h1>
 						<p>
-							Tell us some basic information to get started creating your
-							account.
+							Tell us some basic information to get started
+							creating your account.
 						</p>
 					</>
 				)}
@@ -118,7 +118,8 @@ const RegisterForm = (props) => {
 				{!finishSuccess && !finishing && step > 0 && (
 					<>
 						<h1>
-							{currentStepData?.icon && createIconRender(currentStepData.icon)}
+							{currentStepData?.icon &&
+								createIconRender(currentStepData.icon)}
 
 							{currentStepData?.title}
 						</h1>
@@ -149,9 +150,12 @@ const RegisterForm = (props) => {
 
 			{finishSuccess && (
 				<div className="register_form_success">
-					<Icons.CheckCircleOutlined />
+					<Icons.SquareCheckBig />
 					<h1>Welcome abord!</h1>
-					<p>One last step, we need you to login with your new account.</p>
+					<p>
+						One last step, we need you to login with your new
+						account.
+					</p>
 
 					<antd.Button
 						type="primary"
@@ -172,12 +176,16 @@ const RegisterForm = (props) => {
 			{!finishSuccess && !finishing && (
 				<div className="register_form_actions">
 					{step === 0 && (
-						<antd.Button onClick={() => props.setActiveKey("selector")}>
+						<antd.Button
+							onClick={() => props.setActiveKey("selector")}
+						>
 							Cancel
 						</antd.Button>
 					)}
 					{step > 0 && (
-						<antd.Button onClick={() => prevStep()}>Back</antd.Button>
+						<antd.Button onClick={() => prevStep()}>
+							Back
+						</antd.Button>
 					)}
 
 					<antd.Button

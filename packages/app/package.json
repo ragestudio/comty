@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "1.44.4@alpha",
+	"version": "1.44.5@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -42,6 +42,7 @@
 		"js-cookie": "3.0.1",
 		"less-vars-to-js": "^1.3.0",
 		"lottie-react": "^2.4.0",
+		"lucide-react": "^0.542.0",
 		"luxon": "^3.0.4",
 		"mediasoup-client": "^3.12.4",
 		"mime": "^3.0.0",

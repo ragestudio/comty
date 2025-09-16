@@ -1,5 +1,7 @@
 import React from "react"
 
+import "./index.less"
+
 import Bot from "./customIcons/bot"
 import VrChatIcon from "./customIcons/vrchat"
 import VerifiedBadge from "./customIcons/verifiedBadge"
@@ -16,6 +18,7 @@ import * as lib4 from "react-icons/io"
 import * as lib5 from "react-icons/si"
 import * as lib6 from "react-icons/fa"
 import * as lib7 from "react-icons/tb"
+import * as lib10 from "lucide-react"
 
 export const Icons = {
 	...lib1,
@@ -25,6 +28,7 @@ export const Icons = {
 	...lib5,
 	...lib6,
 	...lib7,
+	...lib10,
 	Bot: (props) => <Bot {...props} />,
 	Lossless: (props) => <Lossless {...props} />,
 	verifiedBadge: (props) => <VerifiedBadge {...props} />,

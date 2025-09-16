@@ -31,7 +31,7 @@ const CaptchaStepComponent = (props) => {
 export default {
 	key: "captcha",
 	title: "Step 4",
-	icon: "FiLock",
+	icon: "Bot",
 	description:
 		"We need you to prove that you are a human. Please enter the captcha below.",
 	required: true,
