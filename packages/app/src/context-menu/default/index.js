@@ -8,7 +8,7 @@ export default {
 		if (element.tagName === "A") {
 			items.push({
 				label: "Copy Link",
-				icon: "FiCopy",
+				icon: "Copy",
 				action: (clickedItem, ctx) => {
 					copyToClipboard(element.href)
 					ctx.close()
@@ -17,7 +17,7 @@ export default {
 
 			items.push({
 				label: "Open link",
-				icon: "FiExternalLink",
+				icon: "SquareArrowOutUpRight",
 				action: (clickedItem, ctx) => {
 					window.open(element.href, "_blank")
 					ctx.close()
@@ -37,7 +37,7 @@ export default {
 		) {
 			items.push({
 				label: "Copy media URL",
-				icon: "FiCopy",
+				icon: "Copy",
 				action: (clickedItem, ctx) => {
 					copyToClipboard(element.src)
 					ctx.close()
@@ -46,7 +46,7 @@ export default {
 
 			items.push({
 				label: "Open media in new tab",
-				icon: "FiExternalLink",
+				icon: "SquareArrowOutUpRight",
 				action: (clickedItem, ctx) => {
 					window.open(element.src, "_blank")
 					ctx.close()
@@ -55,7 +55,7 @@ export default {
 
 			items.push({
 				label: "Download media",
-				icon: "FiDownload",
+				icon: "Download",
 				action: (clickedItem, ctx) => {
 					download(element.src)
 					ctx.close()
@@ -72,7 +72,7 @@ export default {
 		if (text) {
 			items.push({
 				label: "Copy",
-				icon: "FiCopy",
+				icon: "Copy",
 				action: (clickedItem, ctx) => {
 					copyToClipboard(text)
 
@@ -83,7 +83,7 @@ export default {
 
 		items.push({
 			label: "Paste",
-			icon: "FiClipboard",
+			icon: "ClipboardPaste",
 			action: (clickedItem, ctx) => {
 				pasteFromClipboard(clickedItem)
 				ctx.close()
@@ -92,7 +92,7 @@ export default {
 
 		items.push({
 			label: "Report a bug",
-			icon: "FiAlertTriangle",
+			icon: "TriangleAlert",
 			action: (clickedItem, ctx) => {
 				app.eventBus.emit("app.reportBug", {
 					clickedItem,

@@ -10,60 +10,58 @@ import ContrastYIQ from "@utils/contrastYIQ"
 import "./index.less"
 
 const UserShareBadge = (props) => {
-    const { user } = props
+	const { user } = props
 
-    const [loading, setLoading] = React.useState(true)
-    const [contrastColor, setContrastColor] = React.useState(null)
+	const [loading, setLoading] = React.useState(true)
+	const [contrastColor, setContrastColor] = React.useState(null)
 
-    async function initialize(params) {
-        setLoading(true)
+	async function initialize(params) {
+		setLoading(true)
 
-        const contrastYIQ = await ContrastYIQ.fromUrl(user.cover)
+		const contrastYIQ = await ContrastYIQ.fromUrl(user.cover)
 
-        setContrastColor(contrastYIQ)
+		setContrastColor(contrastYIQ)
 
-        setLoading(false)
-    }
+		setLoading(false)
+	}
 
-    React.useEffect(() => {
-        initialize()
-    }, [])
+	React.useEffect(() => {
+		initialize()
+	}, [])
 
-    if (loading) {
-        return <div className="user-share-badge">
-            <antd.Skeleton active />
-        </div>
-    }
+	if (loading) {
+		return (
+			<div className="user-share-badge">
+				<antd.Skeleton active />
+			</div>
+		)
+	}
 
-    return <div
-        className="user-share-badge"
-        style={{
-            backgroundImage: `url("${user.cover}")`,
-            color: contrastColor
-        }}
-    >
-        <div className="user-share-badge-info">
-            <div className="user-share-badge-avatar">
-                <Image
-                    src={user.avatar}
-                />
-            </div>
+	return (
+		<div
+			className="user-share-badge"
+			style={{
+				backgroundImage: `url("${user.cover}")`,
+				color: contrastColor,
+			}}
+		>
+			<div className="user-share-badge-info">
+				<div className="user-share-badge-avatar">
+					<Image src={user.avatar} />
+				</div>
 
-            <div className="user-share-badge-username">
-                <h1>
-                    {user.public_name || user.username}
-                    {user.verified && <Icons.verifiedBadge />}
-                </h1>
-                <span>
-                    @{user.username}
-                </span>
-            </div>
+				<div className="user-share-badge-username">
+					<h1>
+						{user.public_name || user.username}
+						{user.verified && <Icons.BadgeCheck />}
+					</h1>
+					<span>@{user.username}</span>
+				</div>
 
-            {
-                user.badges?.length > 0 && <UserBadges user_id={user._id} />
-            }
-        </div>
-    </div>
+				{user.badges?.length > 0 && <UserBadges user_id={user._id} />}
+			</div>
+		</div>
+	)
 }
 
 export default UserShareBadge

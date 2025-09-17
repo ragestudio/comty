@@ -101,7 +101,13 @@ const PostList = React.forwardRef((props, ref) => {
 		>
 			<AnimatePresence>
 				{props.list.map((data) => {
-					return <Entry key={data._id} data={data} {...props} />
+					return (
+						<Entry
+							key={data._id}
+							data={data}
+							{...props}
+						/>
+					)
 				})}
 			</AnimatePresence>
 		</LoadMore>
@@ -237,11 +243,11 @@ const PostsListsComponent = (props) => {
 			for (const [event, handler] of Object.entries(
 				timelineWsEvents.current,
 			)) {
-				app.cores.api.listenEvent(event, handler, "posts")
+				app.cores.api.listenEvent(event, handler)
 			}
 
-			app.cores.api.joinTopic(
-				"posts",
+			app.cores.api.emitEvent(
+				"posts:subscribe",
 				props.customTopic ?? "realtime:feed",
 			)
 		}
@@ -251,11 +257,11 @@ const PostsListsComponent = (props) => {
 				for (const [event, handler] of Object.entries(
 					timelineWsEvents.current,
 				)) {
-					app.cores.api.unlistenEvent(event, handler, "posts")
+					app.cores.api.unlistenEvent(event, handler)
 				}
 
-				app.cores.api.leaveTopic(
-					"posts",
+				app.cores.api.emitEvent(
+					"posts:unsubscribe",
 					props.customTopic ?? "realtime:feed",
 				)
 			}

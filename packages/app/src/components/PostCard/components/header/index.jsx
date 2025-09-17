@@ -16,11 +16,14 @@ const PostCardHeader = (props) => {
 	}
 
 	return (
-		<div className="post-header" onDoubleClick={props.onDoubleClick}>
+		<div
+			className="post-header"
+			onDoubleClick={props.onDoubleClick}
+		>
 			{!props.disableReplyTag && props.postData.reply_to && (
 				<div className="post-header-replied_to">
 					<div className="post-header-replied_to-label">
-						<Icons.FiRepeat />
+						<Icons.Repeat2 />
 
 						<span>Replied to</span>
 					</div>
@@ -31,7 +34,10 @@ const PostCardHeader = (props) => {
 
 			<div className="post-header-user">
 				<div className="post-header-user-avatar">
-					<Image alt="Avatar" src={props.postData.user?.avatar} />
+					<Image
+						alt="Avatar"
+						src={props.postData.user?.avatar}
+					/>
 				</div>
 
 				<div className="post-header-user-info">
@@ -42,7 +48,7 @@ const PostCardHeader = (props) => {
 									`@${props.postData.user?.username}`}
 
 								{props.postData.user?.verified && (
-									<Icons.verifiedBadge id="verified-badge" />
+									<Icons.BadgeCheck id="verified-badge" />
 								)}
 							</h1>
 						</div>
@@ -50,7 +56,7 @@ const PostCardHeader = (props) => {
 						<div className="post-header-user-info-label-right">
 							{props.postData.visibility === "private" && (
 								<span>
-									<Icons.FiEyeOff /> Private
+									<Icons.EyeOff /> Private
 								</span>
 							)}
 							{props.postData.flags?.includes("nsfw") && (

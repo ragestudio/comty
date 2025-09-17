@@ -1,7 +1,7 @@
 import React from "react"
 import classnames from "classnames"
 
-import { ImageViewer } from "@components"
+import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
@@ -58,10 +58,10 @@ const Playlist = (props) => {
 				onClick={onClickPlay}
 			>
 				<div className="playlist_cover_mask">
-					<Icons.FiPlay />
+					<Icons.Play />
 				</div>
 
-				<ImageViewer
+				<Image
 					src={
 						playlist.cover ??
 						playlist.thumbnail ??
@@ -71,7 +71,10 @@ const Playlist = (props) => {
 			</div>
 
 			<div className="playlist_info">
-				<div className="playlist_info_title" onClick={onClick}>
+				<div
+					className="playlist_info_title"
+					onClick={onClick}
+				>
 					<h1>{playlist.title}</h1>
 				</div>
 
@@ -85,7 +88,7 @@ const Playlist = (props) => {
 						)}
 
 						<p>
-							<Icons.MdAlbum />
+							<Icons.Music2 />
 							{playlist.type ?? "playlist"}
 						</p>
 					</div>
@@ -96,7 +99,7 @@ const Playlist = (props) => {
 				<div className="playlist_details">
 					{props.length && (
 						<p>
-							<Icons.MdLibraryMusic />{" "}
+							<Icons.SquareLibrary />{" "}
 							{props.length ??
 								playlist.total_length ??
 								playlist.list.length}
@@ -105,7 +108,7 @@ const Playlist = (props) => {
 
 					{playlist.type && (
 						<p>
-							<Icons.MdAlbum />
+							<Icons.ListMusic />
 							{playlist.type ?? "playlist"}
 						</p>
 					)}

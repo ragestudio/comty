@@ -7,22 +7,24 @@ import { Icons } from "@components/Icons"
 import "./index.less"
 
 export default (props) => {
-    const [saved, setSaved] = React.useState(props.defaultActive)
+	const [saved, setSaved] = React.useState(props.defaultActive)
 
-    const onClick = async () => {
-        props.onClick({
-            to: !saved,
-        })
-        setSaved(!saved)
-    }
+	const onClick = async () => {
+		props.onClick({
+			to: !saved,
+		})
+		setSaved(!saved)
+	}
 
-    return <antd.Button
-        className={classnames("saveButton", {
-            ["active"]: saved
-        })}
-        type="ghost"
-        shape="circle"
-        onClick={onClick}
-        icon={saved ? <Icons.MdBookmark /> : <Icons.MdBookmarkBorder />}
-    />
+	return (
+		<antd.Button
+			className={classnames("saveButton", {
+				["active"]: saved,
+			})}
+			type="ghost"
+			shape="circle"
+			onClick={onClick}
+			icon={saved ? <Icons.BookmarkCheck /> : <Icons.Bookmark />}
+		/>
+	)
 }

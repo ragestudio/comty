@@ -5,8 +5,7 @@ import UploadButton from "@components/UploadButton"
 import "./index.less"
 
 export default {
-	id: "apparence",
-	icon: "FiEye",
+	icon: "PaintRoller",
 	label: "Apparence",
 	group: "app",
 	order: 1,
@@ -14,7 +13,7 @@ export default {
 		{
 			id: "style:variant_mode",
 			group: "aspect",
-			icon: "FiMoon",
+			icon: "SunMoon",
 			title: "Theme",
 			description: "Change the theme of the application.",
 			component: loadable(
@@ -26,7 +25,7 @@ export default {
 			id: "style.compactMode",
 			group: "aspect",
 			component: "Switch",
-			icon: "MdOutlineViewCompact",
+			icon: "Shrink",
 			title: "Compact mode",
 			description: "Reduce the size of the application elements.",
 			defaultValue: () => {
@@ -45,7 +44,7 @@ export default {
 			id: "style.uiFontScale",
 			group: "aspect",
 			component: "Slider",
-			icon: "MdFormatSize",
+			icon: "ALargeSmall",
 			title: "Font scale",
 			description: "Change the font scale of the application.",
 			props: {
@@ -69,54 +68,12 @@ export default {
 			storaged: true,
 		},
 		{
-			id: "style.uiFont",
-			group: "aspect",
-			component: "Select",
-			icon: "MdOutlineFontDownload",
-			title: "Font family",
-			description: "Change the font of the application.",
-			props: {
-				style: {
-					width: "100%",
-				},
-				options: [
-					{
-						label: "Noto Sans",
-						value: "'Noto Sans', sans-serif",
-					},
-					{
-						label: "Inter (Default)",
-						value: "'Inter', sans-serif",
-					},
-					{
-						label: "Varela Round",
-						value: "'Varela Round', sans-serif",
-					},
-					{
-						label: "Manrope",
-						value: "'Manrope', sans-serif",
-					},
-				],
-			},
-			defaultValue: () => {
-				return app.cores.style.vars["fontFamily"]
-			},
-			onUpdate: (value) => {
-				app.cores.style.modifyTheme({
-					fontFamily: value,
-				})
-
-				return value
-			},
-			storaged: true,
-		},
-		{
 			id: "style.colorPrimary",
 			group: "aspect",
 			component: "SliderColorPicker",
+			icon: "Palette",
 			title: "Primary color",
 			description: "Change primary color of the application.",
-			icon: "IoMdColorFill",
 			defaultValue: () => {
 				return app.cores.style.vars["colorPrimary"]
 			},
@@ -127,22 +84,21 @@ export default {
 			},
 			storaged: false,
 		},
-
 		{
 			id: "style.backgroundImage",
 			group: "aspect",
-			icon: "MdOutlineImage",
-			title: "Background image",
+			icon: "Wallpaper",
+			title: "Wallpaper",
 			description:
 				"Change background image of the application. You can use a local image or a remote image (URL).",
-			component: loadable(() => import("../components/urlInput")),
+			component: loadable(() => import("../components/wallpaper")),
 			props: {
 				noPreview: true,
 			},
 			extraActions: [
 				{
 					id: "delete",
-					icon: "FiDelete",
+					icon: "Delete",
 					title: "Remove",
 					onClick: (ctx) => {
 						return ctx.dispatchUpdate("")
@@ -163,20 +119,10 @@ export default {
 			storaged: false,
 		},
 		{
-			id: "style.backgroundTweaker",
-			group: "aspect",
-			title: "Background tweaker",
-			description: "Tweak the custom background",
-			component: loadable(
-				() => import("../components/backgroundTweaker"),
-			),
-			storaged: false,
-		},
-		{
 			id: "resetTheme",
 			group: "aspect",
 			component: "Button",
-			icon: "IoMdRefresh",
+			icon: "RotateCcw",
 			title: "Reset to default theme",
 			props: {
 				children: "Reset",

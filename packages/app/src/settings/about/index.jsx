@@ -19,7 +19,7 @@ const connectionsTooltipStrings = {
 
 export default {
 	id: "about",
-	icon: "FiInfo",
+	icon: "Info",
 	label: "About",
 	group: "bottom",
 	render: () => {
@@ -77,14 +77,13 @@ export default {
 					</div>
 					<div className="versions">
 						<antd.Tag>
-							<Icons.FiTag />v
-							{window.app.version ?? "experimental"}
+							<Icons.Tag />v{window.app.version ?? "experimental"}
 						</antd.Tag>
 						<antd.Tag color={isProduction ? "green" : "magenta"}>
 							{isProduction ? (
-								<Icons.FiCheckCircle />
+								<Icons.CircleCheck />
 							) : (
-								<Icons.FiTriangle />
+								<Icons.Triangle />
 							)}
 							{String(import.meta.env.MODE)}
 						</antd.Tag>
@@ -94,7 +93,7 @@ export default {
 				<div className="group">
 					<div className="group_header">
 						<h3>
-							<Icons.FiInfo />
+							<Icons.Info />
 							Server information
 						</h3>
 					</div>
@@ -102,7 +101,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdOutlineStream />
+								<Icons.EthernetPort />
 							</div>
 							<p>Origin</p>
 
@@ -117,9 +116,9 @@ export default {
 									color={secureConnection ? "green" : "red"}
 									icon={
 										secureConnection ? (
-											<Icons.MdHttps />
+											<Icons.LockKeyhole />
 										) : (
-											<Icons.MdWarning />
+											<Icons.TriangleAlert />
 										)
 									}
 								>
@@ -138,7 +137,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdCable />
+								<Icons.Unplug />
 							</div>
 							<p>Connection</p>
 						</div>
@@ -164,7 +163,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdBuild />
+								<Icons.Wrench />
 							</div>
 
 							<p>Version</p>
@@ -182,7 +181,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdInfo />
+								<Icons.Layers />
 							</div>
 
 							<p>Platform</p>
@@ -194,21 +193,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdInfo />
-							</div>
-
-							<p>React</p>
-						</div>
-
-						<div className="field_value">
-							{React.version ?? "Unknown"}
-						</div>
-					</div>
-
-					<div className="inline_field">
-						<div className="field_header">
-							<div className="field_icon">
-								<Icons.MdInfo />
+								<Icons.Cog />
 							</div>
 
 							<p>Engine</p>
@@ -222,7 +207,35 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdInfo />
+								<Icons.SiReact />
+							</div>
+
+							<p>React</p>
+						</div>
+
+						<div className="field_value">
+							{React.version ?? "Unknown"}
+						</div>
+					</div>
+
+					<div className="inline_field">
+						<div className="field_header">
+							<div className="field_icon">
+								<Icons.SiAntdesign />
+							</div>
+
+							<p>UI</p>
+						</div>
+
+						<div className="field_value">
+							{antd.version ?? "Unknown"}
+						</div>
+					</div>
+
+					<div className="inline_field">
+						<div className="field_header">
+							<div className="field_icon">
+								<Icons.Package />
 							</div>
 
 							<p>Comty.js</p>
@@ -237,7 +250,7 @@ export default {
 						<div className="inline_field">
 							<div className="field_header">
 								<div className="field_icon">
-									<Icons.MdInfo />
+									<Icons.Info />
 								</div>
 
 								<p>App ID</p>
@@ -251,7 +264,7 @@ export default {
 						<div className="inline_field">
 							<div className="field_header">
 								<div className="field_icon">
-									<Icons.MdInfo />
+									<Icons.Info />
 								</div>
 
 								<p>App Build</p>
@@ -265,7 +278,7 @@ export default {
 						<div className="inline_field">
 							<div className="field_header">
 								<div className="field_icon">
-									<Icons.MdInfo />
+									<Icons.Info />
 								</div>
 
 								<p>App Version</p>
@@ -278,7 +291,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.MdInfo />
+								<Icons.Scale />
 							</div>
 
 							<p>View Open Source Licenses</p>
@@ -286,7 +299,7 @@ export default {
 
 						<div className="field_value">
 							<antd.Button
-								icon={<Icons.MdOpenInNew />}
+								icon={<Icons.SquareArrowOutUpRight />}
 								onClick={() => app.location.push("/licenses")}
 							/>
 						</div>

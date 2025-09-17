@@ -27,6 +27,10 @@ const isProduction = process.env.NODE_ENV === "production"
 export default class Gateway {
 	static gatewayMode = process.env.GATEWAY_MODE ?? "nginx"
 
+	get pkg() {
+		return pkg
+	}
+
 	eventBus = new EventEmitter()
 
 	state = {
@@ -111,6 +115,7 @@ export default class Gateway {
 	 */
 	onServiceReady(service) {
 		const serviceId = service.id
+
 		this.serviceRegistry[serviceId].initialized = true
 		this.serviceRegistry[serviceId].ready = true
 
@@ -121,21 +126,21 @@ export default class Gateway {
 	/**
 	 * Handler for service IPC data
 	 * @param {Service} service - Service sending the data
-	 * @param {object} data - IPC data received
+	 * @param {object} payload - IPC data received
 	 */
-	async onServiceIPCData(service, data) {
+	async onServiceIPCData(service, payload) {
 		const id = service.id
 
-		if (data.type === "log") {
-			console.log(`[ipc:${id}] ${data.message}`)
+		if (payload.type === "log") {
+			console.log(`[ipc:${id}] ${payload.message}`)
 		}
 
-		if (data.status === "ready") {
+		if (payload.status === "ready") {
 			this.onServiceReady(service)
 		}
 
-		if (data.type === "service:register") {
-			await this.handleServiceRegistration(service, data)
+		if (payload.type === "service:register") {
+			await this.handleServiceRegistration(service, payload.data)
 		}
 	}
 
@@ -163,16 +168,14 @@ export default class Gateway {
 	}
 
 	/**
-	 * Loads and registers additional proxy routes from ../../extra-proxies.js
+	 * Loads and registers additional proxy routes from $cwd/extra-proxies.js
 	 */
 	async registerExtraProxies() {
 		try {
-			// Dynamic import is relative to the current file.
-			// extra-proxies.js can be CJS (module.exports = ...) or ESM (export default ...)
 			const extraProxiesModule = require(
 				path.resolve(process.cwd(), "extra-proxies.js"),
 			)
-			const extraProxies = extraProxiesModule.default // Node's CJS/ESM interop puts module.exports on .default
+			const extraProxies = extraProxiesModule.default
 
 			if (
 				!extraProxies ||
@@ -221,30 +224,16 @@ export default class Gateway {
 					)
 
 					await this.gateway.register({
-						serviceId: `extra-proxy:${registrationPath}`, // Unique ID for this proxy rule
+						serviceId: `extra-proxy:${registrationPath}`,
 						path: registrationPath,
 						target: config.target,
-						pathRewrite: config.pathRewrite, // undefined if not present
-						websocket: !!config.websocket, // false if not present or falsy
+						pathRewrite: config.pathRewrite,
+						websocket: !!config.websocket,
 					})
 				}
 			}
 		} catch (error) {
-			// Handle cases where the extra-proxies.js file might not exist
-			if (
-				error.code === "ERR_MODULE_NOT_FOUND" ||
-				(error.message &&
-					error.message.toLowerCase().includes("cannot find module"))
-			) {
-				console.log(
-					"[Gateway] `extra-proxies.js` not found. Skipping extra proxy registration.",
-				)
-			} else {
-				console.error(
-					"[Gateway] Error loading or registering extra proxies from `extra-proxies.js`:",
-					error,
-				)
-			}
+			console.error("[Gateway] Error loading extra proxies", error)
 		}
 	}
 
@@ -254,9 +243,11 @@ export default class Gateway {
 	 * @param {object} msg - Registration message
 	 * @param {boolean} isWebsocket - Whether this is a websocket registration
 	 */
-	async handleServiceRegistration(service, data) {
+	async handleServiceRegistration(service, data = {}) {
 		const { id } = service
-		const { namespace, http, websocket, listen } = data.register
+		const { http, websocket, listen } = data
+
+		//console.debug("Service Register:", { service, data })
 
 		if (http && http.enabled === true && Array.isArray(http.paths)) {
 			for (const path of http.paths) {
@@ -264,7 +255,31 @@ export default class Gateway {
 					serviceId: id,
 					path: path,
 					target: `${http.proto}://${listen.ip}:${listen.port}${path}`,
-					websocket: !!websocket,
+				})
+			}
+		}
+
+		if (websocket && websocket.enabled === true) {
+			await this.gateway.register({
+				serviceId: id,
+				websocket: true,
+				path: `/${websocket.path}`,
+				target: `${websocket.proto}://${listen.ip}:${listen.port}/${websocket.path}`,
+			})
+		}
+
+		if (
+			websocket &&
+			websocket.enabled === true &&
+			Array.isArray(websocket.events)
+		) {
+			for (const event of websocket.events) {
+				await this.gateway.register({
+					serviceId: id,
+					websocket: true,
+					event: event,
+					path: `/${websocket.path}`,
+					target: `${websocket.proto}://${listen.ip}:${listen.port}/${websocket.path}`,
 				})
 			}
 		}
@@ -376,19 +391,22 @@ export default class Gateway {
 		console.log(`📦 Found ${this.services.length} service(s)`)
 
 		// Initialize gateway
-		this.gateway = new Managers[this.constructor.gatewayMode]({
-			port: this.state.proxyPort,
-			internalIp: this.state.internalIp,
-			key_file_name: process.env.GATEWAY_SSL_KEY,
-			cert_file_name: process.env.GATEWAY_SSL_CERT,
-		})
+		this.gateway = new Managers[this.constructor.gatewayMode](
+			{
+				port: this.state.proxyPort,
+				internalIp: this.state.internalIp,
+				key_file_name: process.env.GATEWAY_SSL_KEY,
+				cert_file_name: process.env.GATEWAY_SSL_CERT,
+			},
+			this,
+		)
 
 		if (typeof this.gateway.initialize === "function") {
 			await this.gateway.initialize()
 		}
 
 		// Register any externally defined proxies before services start
-		await this.registerExtraProxies()
+		//await this.registerExtraProxies()
 
 		// Watch for service state changes
 		Observable.observe(this.serviceRegistry, (changes) => {

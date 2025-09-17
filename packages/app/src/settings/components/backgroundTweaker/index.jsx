@@ -166,7 +166,10 @@ const BackgroundTweaker = (props) => {
 	const [values, updateOption] = useBackgroundTweakerValues()
 
 	return (
-		<div className="background-tweaker">
+		<div
+			className="background-tweaker"
+			style={props.style}
+		>
 			<div className="background-tweaker-anchors">
 				<div className="background-tweaker-anchors-row">
 					<div
@@ -178,7 +181,7 @@ const BackgroundTweaker = (props) => {
 							updateOption("position", "top")
 						}}
 					>
-						<Icons.MdAlignVerticalTop />
+						<Icons.AlignStartHorizontal />
 					</div>
 				</div>
 
@@ -192,7 +195,7 @@ const BackgroundTweaker = (props) => {
 							updateOption("position", "left")
 						}}
 					>
-						<Icons.MdAlignHorizontalLeft />
+						<Icons.AlignStartVertical />
 					</div>
 					<div
 						id="center"
@@ -203,7 +206,7 @@ const BackgroundTweaker = (props) => {
 							updateOption("position", "center")
 						}}
 					>
-						<Icons.MdAlignVerticalCenter />
+						<Icons.SquareSquare />
 					</div>
 					<div
 						id="right"
@@ -214,7 +217,7 @@ const BackgroundTweaker = (props) => {
 							updateOption("position", "right")
 						}}
 					>
-						<Icons.MdAlignHorizontalRight />
+						<Icons.AlignEndVertical />
 					</div>
 				</div>
 
@@ -228,7 +231,7 @@ const BackgroundTweaker = (props) => {
 							updateOption("position", "bottom")
 						}}
 					>
-						<Icons.MdAlignVerticalBottom />
+						<Icons.AlignEndHorizontal />
 					</div>
 				</div>
 			</div>
@@ -236,7 +239,7 @@ const BackgroundTweaker = (props) => {
 			<div className="background-tweaker-sliders">
 				<div className="background-tweaker-sliders-option">
 					<p>
-						<Icons.MdBlurCircular /> Blur
+						<Icons.CircleDotDashed /> Blur
 					</p>
 
 					<antd.Slider
@@ -255,7 +258,7 @@ const BackgroundTweaker = (props) => {
 
 				<div className="background-tweaker-sliders-option">
 					<p>
-						<Icons.MdOpacity /> Opacity
+						<Icons.Droplet /> Opacity
 					</p>
 
 					<antd.Slider
@@ -274,7 +277,7 @@ const BackgroundTweaker = (props) => {
 
 				<div className="background-tweaker-sliders-option">
 					<p>
-						<Icons.MdRepeat /> Repeat
+						<Icons.Repeat2 /> Repeat
 					</p>
 
 					<antd.Select
@@ -288,7 +291,7 @@ const BackgroundTweaker = (props) => {
 
 				<div className="background-tweaker-sliders-option">
 					<p>
-						<Icons.TbResize /> Size
+						<Icons.Scaling /> Size
 					</p>
 
 					<antd.Select

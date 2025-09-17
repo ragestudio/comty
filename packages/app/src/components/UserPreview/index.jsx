@@ -83,7 +83,7 @@ const UserPreview = (props) => {
 				>
 					<h1>
 						{userData.public_name ?? userData.username}
-						{userData.verified && <Icons.verifiedBadge />}
+						{userData.verified && <Icons.BadgeCheck />}
 					</h1>
 					<span>@{userData.username}</span>
 				</div>

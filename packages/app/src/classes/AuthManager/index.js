@@ -49,6 +49,9 @@ export default class AuthManager {
 		"auth:logout_success": () => {
 			this._emitBehavior("onLogout")
 		},
+		"session:refreshed": () => {
+			this._emitBehavior("onRefresh")
+		},
 	}
 
 	builtInBehavior = {
@@ -60,6 +63,11 @@ export default class AuthManager {
 		},
 		onFailedUser: async () => {
 			app.eventBus.emit("authmanager:failedUser")
+		},
+		onRefresh: async () => {
+			app.eventBus.emit("authmanager:refresh")
+			await this.flush()
+			await this.initialize()
 		},
 		onLogin: async () => {
 			app.eventBus.emit("authmanager:login")

@@ -27,13 +27,13 @@ const useDocumentTitle = () => {
 
 const items = [
 	{
-		icon: "IoMdClose",
+		icon: "X",
 		onClick: () => {
 			window.ipcRenderer.invoke("window:close")
 		},
 	},
 	{
-		icon: "FiMinus",
+		icon: "Minus",
 		onClick: () => {
 			window.ipcRenderer.invoke("window:minimize")
 		},

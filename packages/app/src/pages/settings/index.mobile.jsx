@@ -8,8 +8,8 @@ import useUrlQueryActiveKey from "@hooks/useUrlQueryActiveKey"
 import UseTopBar from "@hooks/useTopBar"
 
 import {
-    composedSettingsByGroups as settingsGroups,
-    composedTabs,
+	composedSettingsByGroups as settingsGroups,
+	composedTabs,
 } from "@/settings"
 
 import menuGroupsDecorators from "@config/settingsMenuGroupsDecorators"
@@ -18,118 +18,131 @@ import SettingTab from "./components/SettingTab"
 
 import "./index.mobile.less"
 
-const SettingsHeader = ({
-    activeKey,
-    back = () => { }
-} = {}) => {
-    const currentTab = composedTabs[activeKey]
+const SettingsHeader = ({ activeKey, back = () => {} } = {}) => {
+	const currentTab = composedTabs[activeKey]
 
-    return <UseTopBar
-        options={{
-            className: "settings_nav"
-        }}
-    >
-        {
-            activeKey && <antd.Button
-                icon={<Icons.MdChevronLeft />}
-                onClick={back}
-                size="large"
-                type="ghost"
-            />
-        }
+	return (
+		<UseTopBar
+			options={{
+				className: "settings_nav",
+			}}
+		>
+			{activeKey && (
+				<antd.Button
+					icon={<Icons.ChevronLeft />}
+					onClick={back}
+					size="large"
+					type="ghost"
+				/>
+			)}
 
-        <h1>
-            {
-                createIconRender(currentTab?.icon ?? "Settings")
-            }
-            <Translation>
-                {(t) => t(currentTab?.label ?? activeKey ?? "Settings")}
-            </Translation>
-        </h1>
-    </UseTopBar>
+			<h1>
+				{createIconRender(currentTab?.icon ?? "Settings")}
+				<Translation>
+					{(t) => t(currentTab?.label ?? activeKey ?? "Settings")}
+				</Translation>
+			</h1>
+		</UseTopBar>
+	)
 }
 
 export default (props) => {
-    let lastKey = null
+	let lastKey = null
 
-    const [activeKey, setActiveKey] = useUrlQueryActiveKey({
-        queryKey: "tab",
-        defaultKey: null,
-    })
+	const [activeKey, setActiveKey] = useUrlQueryActiveKey({
+		queryKey: "tab",
+		defaultKey: null,
+	})
 
-    const handleTabChange = (key) => {
-        // star page transition using new chrome transition api
-        if (document.startViewTransition) {
-            return document.startViewTransition(() => {
-                changeTab(key)
-            })
-        }
+	const handleTabChange = (key) => {
+		// star page transition using new chrome transition api
+		if (document.startViewTransition) {
+			return document.startViewTransition(() => {
+				changeTab(key)
+			})
+		}
 
-        return changeTab(key)
-    }
+		return changeTab(key)
+	}
 
-    const goBack = () => {
-        handleTabChange(lastKey)
-    }
+	const goBack = () => {
+		handleTabChange(lastKey)
+	}
 
-    const changeTab = (key) => {
-        lastKey = key
-        setActiveKey(key)
+	const changeTab = (key) => {
+		lastKey = key
+		setActiveKey(key)
 
-        // scroll to top
-        app.layout.scrollTo({
-            top: 0,
-        })
-    }
+		// scroll to top
+		app.layout.scrollTo({
+			top: 0,
+		})
+	}
 
-    return <div className="__mobile__settings">
-        <SettingsHeader
-            activeKey={activeKey}
-            back={goBack}
-        />
+	return (
+		<div className="__mobile__settings">
+			<SettingsHeader
+				activeKey={activeKey}
+				back={goBack}
+			/>
 
-        <div className="settings_list">
-            {
-                !activeKey && settingsGroups.map((entry) => {
-                    const groupDecorator = menuGroupsDecorators[entry.group]
+			<div className="settings_list">
+				{!activeKey &&
+					settingsGroups.map((entry) => {
+						const groupDecorator = menuGroupsDecorators[entry.group]
 
-                    return <div className="settings_list_group">
-                        <span >
-                            <Translation>
-                                {(t) => t(groupDecorator?.label ?? entry.group)}
-                            </Translation>
-                        </span>
+						return (
+							<div className="settings_list_group">
+								<span>
+									<Translation>
+										{(t) =>
+											t(
+												groupDecorator?.label ??
+													entry.group,
+											)
+										}
+									</Translation>
+								</span>
 
-                        <div className="settings_list_group_items">
-                            {
-                                entry.groupModule.map((settingsModule, index) => {
-                                    return <antd.Button
-                                        size="large"
-                                        key={settingsModule.id}
-                                        id={settingsModule.id}
-                                        icon={createIconRender(settingsModule.icon)}
-                                        onClick={() => {
-                                            handleTabChange(settingsModule.id)
-                                        }}
-                                    >
-                                        <Translation>
-                                            {(t) => t(settingsModule.label)}
-                                        </Translation>
-                                    </antd.Button>
-                                })
-                            }
-                        </div>
-                    </div>
-                })
-            }
+								<div className="settings_list_group_items">
+									{entry.groupModule.map(
+										(settingsModule, index) => {
+											return (
+												<antd.Button
+													size="large"
+													key={settingsModule.id}
+													id={settingsModule.id}
+													icon={createIconRender(
+														settingsModule.icon,
+													)}
+													onClick={() => {
+														handleTabChange(
+															settingsModule.id,
+														)
+													}}
+												>
+													<Translation>
+														{(t) =>
+															t(
+																settingsModule.label,
+															)
+														}
+													</Translation>
+												</antd.Button>
+											)
+										},
+									)}
+								</div>
+							</div>
+						)
+					})}
 
-            {
-                activeKey && <div className="settings_list_render">
-                    <SettingTab
-                        activeKey={activeKey}
-                    />
-                </div>
-            }
-        </div>
-    </div>
+				{activeKey && (
+					<div className="settings_list_render">
+						<SettingTab activeKey={activeKey} />
+					</div>
+				)}
+			</div>
+		</div>
+	)
 }

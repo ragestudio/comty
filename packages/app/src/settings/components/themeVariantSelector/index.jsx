@@ -7,15 +7,15 @@ import "./index.less"
 const variants = [
 	{
 		id: "light",
-		icon: "MdLightMode",
+		icon: "Sun",
 	},
 	{
 		id: "dark",
-		icon: "MdDarkMode",
+		icon: "Moon",
 	},
 	{
 		id: "auto",
-		icon: "MdAutoFixHigh",
+		icon: "SunMoon",
 	},
 ]
 

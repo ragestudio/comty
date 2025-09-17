@@ -42,7 +42,7 @@ const FeaturedEventAnnouncement = (props) => {
 			</div>
 
 			<div className="featured_event-indicator">
-				<Icons.FiTarget /> <span>Featured event</span>
+				<Icons.Target /> <span>Featured event</span>
 			</div>
 		</div>
 	)

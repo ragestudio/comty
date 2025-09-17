@@ -106,9 +106,9 @@ const Client = ({ client }) => {
 				)}
 			>
 				<div className="mediartc-channel-card__clients__client__indicators">
-					{muted && <Icons.MdMicOff />}
-					{deafened && <Icons.MdVolumeOff />}
-					{!consumer && <Icons.MdWifiTetheringError />}
+					{muted && <Icons.MicOff />}
+					{deafened && <Icons.VolumeOff />}
+					{!consumer && <Icons.WifiOff />}
 				</div>
 
 				<UserAvatar user_id={client.userId} />
@@ -171,7 +171,7 @@ const MediaRTCChannelCard = () => {
 
 				<div className="mediartc-channel-card__header__actions">
 					<Button
-						icon={<Icons.MdCallEnd />}
+						icon={<Icons.PhoneOff />}
 						onClick={handleLeaveChannel}
 					/>
 				</div>
@@ -194,7 +194,7 @@ const MediaRTCChannelCard = () => {
 
 			<div className="mediartc-channel-card__controls">
 				<Button
-					icon={state.isMuted ? <Icons.MdMicOff /> : <Icons.MdMic />}
+					icon={state.isMuted ? <Icons.MicOff /> : <Icons.Mic />}
 					onClick={handleToggleMute}
 					type={state.isMuted ? "primary" : "default"}
 					className={state.isSpeaking ? "speaking" : ""}
@@ -203,9 +203,9 @@ const MediaRTCChannelCard = () => {
 				<Button
 					icon={
 						state.isDeafened ? (
-							<Icons.MdVolumeOff />
+							<Icons.VolumeOff />
 						) : (
-							<Icons.MdVolumeUp />
+							<Icons.Volume2 />
 						)
 					}
 					type={state.isDeafened ? "primary" : "default"}
@@ -215,9 +215,9 @@ const MediaRTCChannelCard = () => {
 				<Button
 					icon={
 						state.isProducingScreen ? (
-							<Icons.MdStopScreenShare />
+							<Icons.ScreenShareOff />
 						) : (
-							<Icons.MdScreenShare />
+							<Icons.ScreenShare />
 						)
 					}
 					type={state.isProducingScreen ? "primary" : "default"}
@@ -225,7 +225,7 @@ const MediaRTCChannelCard = () => {
 				/>
 
 				<Button
-					icon={<Icons.MdVoiceChat />}
+					icon={<Icons.Drum />}
 					onClick={() =>
 						openSoundpadDialog({ group_id: state.channel.group_id })
 					}

@@ -75,7 +75,11 @@ export default class APICore extends Core {
 		},
 	}
 
-	getSocket(namespace) {
+	getWebsocketClient(namespace) {
+		if (!this.client.ws?.sockets) {
+			return null
+		}
+
 		const instance = this.client.ws.sockets.get(namespace)
 
 		if (!instance) {
@@ -88,38 +92,38 @@ export default class APICore extends Core {
 		return instance
 	}
 
-	joinTopic(instance = "main", topic) {
-		instance = this.getSocket(instance)
+	joinTopic(subscribeEvent, topic, instance = "main") {
+		instance = this.getWebsocketClient(instance)
 
 		if (!instance) {
 			return false
 		}
 
-		return instance.topics.subscribe(topic)
+		return instance.topics.subscribe(subscribeEvent, topic)
 	}
 
-	leaveTopic(instance = "main", topic) {
-		instance = this.getSocket(instance)
+	leaveTopic(unsubscribeEvent, topic, instance = "main") {
+		instance = this.getWebsocketClient(instance)
 
 		if (!instance) {
 			return false
 		}
 
-		return instance.topics.unsubscribe(topic)
+		return instance.topics.unsubscribe(unsubscribeEvent, topic)
 	}
 
-	emitEvent(instance = "main", key, data) {
-		instance = this.getSocket(instance)
+	emitEvent(key, data, instance = "main") {
+		instance = this.getWebsocketClient(instance)
 
 		if (!instance) {
 			return false
 		}
 
-		return instance.get(instance).emit(key, data)
+		return instance.emit(key, data)
 	}
 
 	listenEvent(key, handler, instance = "main") {
-		instance = this.getSocket(instance)
+		instance = this.getWebsocketClient(instance)
 
 		if (!instance) {
 			return false
@@ -129,7 +133,7 @@ export default class APICore extends Core {
 	}
 
 	unlistenEvent(key, handler, instance = "main") {
-		instance = this.getSocket(instance)
+		instance = this.getWebsocketClient(instance)
 
 		if (!instance) {
 			return false

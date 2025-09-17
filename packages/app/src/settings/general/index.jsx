@@ -2,7 +2,7 @@ import config from "@config"
 
 export default {
 	id: "general",
-	icon: "FiCommand",
+	icon: "Command",
 	label: "General",
 	group: "app",
 	order: 0,
@@ -12,7 +12,7 @@ export default {
 			storaged: true,
 			group: "general",
 			component: "Select",
-			icon: "MdTranslate",
+			icon: "Languages",
 			title: "Language",
 			description: "Choose a language for the application",
 			props: {
@@ -29,7 +29,7 @@ export default {
 			id: "app:lpm",
 			group: "general",
 			component: "Switch",
-			icon: "MdSlowMotionVideo",
+			icon: "Gauge",
 			title: "Low performance mode",
 			description:
 				"Enable low performance mode disabling all the animations and secondary features, boosting the app performance.",
@@ -45,7 +45,7 @@ export default {
 			id: "clear_internal_storage",
 			group: "general",
 			component: "Button",
-			icon: "MdDelete",
+			icon: "Eraser",
 			title: "Clear internal storage",
 			description:
 				"Clear all the data stored in the internal storage, including your current session. It will not affect the data stored in the cloud.",
@@ -57,74 +57,10 @@ export default {
 			noUpdate: true,
 		},
 		{
-			id: "ui.effects",
-			storaged: true,
-			group: "ui.sounds",
-			component: "Switch",
-			icon: "MdVolumeUp",
-			title: "Effects",
-			description: "Enable the UI effects.",
-			mobile: false,
-		},
-		{
-			id: "ui.general_volume",
-			storaged: true,
-			group: "ui.sounds",
-			component: "Slider",
-			icon: "MdVolumeUp",
-			title: "Volume",
-			description: "Set the volume of the app UI sounds.",
-			props: {
-				tipFormatter: (value) => {
-					return `${value}%`
-				},
-				min: 0,
-				max: 100,
-				step: 10,
-			},
-			emitEvent: "sfx:test",
-			mobile: false,
-		},
-		{
-			id: "sfx:notifications_feedback",
-			storaged: true,
-			group: "notifications",
-			component: "Switch",
-			icon: "MdVolumeUp",
-			title: "Notifications Sound",
-			description: "Play a sound when a notification is received.",
-		},
-		{
-			id: "haptics:notifications_vibrate",
-			storaged: true,
-			group: "notifications",
-			component: "Switch",
-			icon: "MdVibration",
-			title: "Vibration",
-			description: "Vibrate the device when a notification is received.",
-			desktop: false,
-		},
-		{
-			id: "sfx:notifications_volume",
-			storaged: true,
-			group: "notifications",
-			component: "Slider",
-			icon: "MdVolumeUp",
-			title: "Volume",
-			description:
-				"Set the volume of the sound when a notification is received.",
-			props: {
-				tipFormatter: (value) => {
-					return `${value}%`
-				},
-			},
-			mobile: false,
-		},
-		{
 			id: "sidebar.collapse_delay_time",
 			group: "sidebar",
 			component: "Slider",
-			icon: "MdTimer",
+			icon: "Hourglass",
 			title: "Auto Collapse timeout",
 			description: "Set the delay before the sidebar is collapsed",
 			props: {
@@ -141,31 +77,6 @@ export default {
 			},
 			storaged: true,
 			mobile: false,
-		},
-		{
-			id: "transcode:browser",
-			group: "posts",
-			component: "Switch",
-			icon: "MdVideoCameraFront",
-			title: "Transcode video in browser",
-			description:
-				"Transcode videos from the application instead of on the servers. This feature may speed up the posting process depending on your computer. This will consume your computer resources.",
-			experimental: true,
-			storaged: true,
-		},
-		{
-			id: "feed_max_fetch",
-			title: "Fetch max items",
-			description:
-				"Set the maximum number of items to load per fetch in the feed list",
-			component: "Slider",
-			icon: "MdFormatListNumbered",
-			group: "posts",
-			props: {
-				min: 5,
-				max: 50,
-			},
-			storaged: true,
 		},
 	],
 }

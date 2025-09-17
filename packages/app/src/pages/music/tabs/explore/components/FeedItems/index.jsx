@@ -92,13 +92,13 @@ const FeedItems = (props) => {
 				{!props.disablePagination && (
 					<div className="music-feed-items-actions">
 						<antd.Button
-							icon={<Icons.MdChevronLeft />}
+							icon={<Icons.ChevronLeft />}
 							onClick={onClickPrev}
 							disabled={page === 0 || loading}
 						/>
 
 						<antd.Button
-							icon={<Icons.MdChevronRight />}
+							icon={<Icons.ChevronRight />}
 							onClick={onClickNext}
 							disabled={ended || loading}
 						/>
@@ -112,14 +112,31 @@ const FeedItems = (props) => {
 				{!loading &&
 					result?.items?.map((item, index) => {
 						if (props.type === "radios") {
-							return <Radio row key={index} item={item} />
+							return (
+								<Radio
+									row
+									key={index}
+									item={item}
+								/>
+							)
 						}
 
 						if (props.type === "tracks") {
-							return <Track key={index} track={item} />
+							return (
+								<Track
+									key={index}
+									track={item}
+								/>
+							)
 						}
 
-						return <Playlist row key={index} playlist={item} />
+						return (
+							<Playlist
+								row
+								key={index}
+								playlist={item}
+							/>
+						)
 					})}
 			</div>
 		</div>

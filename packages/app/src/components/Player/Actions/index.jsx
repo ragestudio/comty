@@ -35,7 +35,7 @@ const ExtraActions = (props) => {
 			{app.isMobile && (
 				<Button
 					type="ghost"
-					icon={<Icons.MdAbc />}
+					icon={<Icons.ClosedCaption />}
 					disabled={!track?.lyrics_enabled}
 				/>
 			)}
@@ -48,7 +48,10 @@ const ExtraActions = (props) => {
 				/>
 			)}
 
-			<Button type="ghost" icon={<Icons.MdQueueMusic />} />
+			<Button
+				type="ghost"
+				icon={<Icons.ListMusic />}
+			/>
 		</div>
 	)
 }

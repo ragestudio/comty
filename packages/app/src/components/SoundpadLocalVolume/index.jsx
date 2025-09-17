@@ -6,7 +6,7 @@ import "./index.less"
 const SoundpadLocalVolume = () => {
 	return (
 		<div className="soundpad-dialog__local-volume">
-			<Icons.MdVolumeUp />
+			<Icons.Volume2 />
 			<Slider
 				min={0}
 				max={1}

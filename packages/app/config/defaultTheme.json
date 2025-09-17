@@ -9,7 +9,7 @@
 		"backgroundImage": "",
 		"fontFamily": "'Noto Sans', sans-serif",
 		"layoutMargin": "unset",
-		"layoutPadding": "20px 20px 20px 20px",
+		"layoutPadding": "10px 20px 10px 10px",
 		"borderRadius": "8px",
 		"text-color-white": "#d2d2d2",
 		"text-color-black": "#000000",

@@ -98,7 +98,7 @@ class Modal extends React.Component {
 							className="app_modal_close"
 							onClick={this.close}
 						>
-							<Icons.MdClose />
+							<Icons.X />
 						</div>
 					)}
 

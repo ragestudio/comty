@@ -3,24 +3,24 @@
 		"id": "timeline",
 		"path": "/timeline",
 		"label": "Timeline",
-		"icon": "MdTag"
+		"icon": "Hash"
 	},
 	{
 		"id": "tv",
 		"path": "/tv",
 		"label": "Tv",
-		"icon": "FiTv"
+		"icon": "TvMinimalPlay"
 	},
 	{
 		"id": "music",
 		"path": "/music",
 		"label": "Music",
-		"icon": "MdMusicNote"
+		"icon": "Music2"
 	},
 	{
-		"id": "groups",
-		"path": "/groups",
-		"label": "Groups",
-		"icon": "MdPeople"
+		"id": "spaces",
+		"path": "/spaces",
+		"label": "Spaces",
+		"icon": "MessageSquareQuote"
 	}
 ]

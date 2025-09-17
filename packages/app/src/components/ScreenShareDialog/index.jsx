@@ -47,7 +47,7 @@ const ScreenShareDialog = ({ close }) => {
 					className="screenshare-dialog__selectors__field"
 				>
 					<div className="screenshare-dialog__selectors__field__icon">
-						<Icons.IoMdBrowsers />
+						<Icons.Proportions />
 					</div>
 
 					<Select
@@ -62,7 +62,7 @@ const ScreenShareDialog = ({ close }) => {
 					className="screenshare-dialog__selectors__field"
 				>
 					<div className="screenshare-dialog__selectors__field__icon">
-						<Icons.MdBlurOn />
+						<Icons.Gauge />
 					</div>
 
 					<Select

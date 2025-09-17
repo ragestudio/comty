@@ -15,7 +15,7 @@
 		"@grpc/grpc-js": "^1.13.4",
 		"@grpc/proto-loader": "^0.8.0",
 		"@gullerya/object-observer": "^6.1.4",
-		"@infisical/sdk": "^4.0.4",
+		"@infisical/sdk": "^4.0.5",
 		"@ragestudio/hermes": "^1.0.1",
 		"@sentry/node": "^10.7.0",
 		"axios": "^1.11.0",
@@ -27,14 +27,16 @@
 		"express-cassandra": "^2.9.1",
 		"http-proxy": "^1.18.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^1.0.0",
+		"linebridge": "^1.2.1",
 		"minimatch": "^10.0.3",
 		"minio": "^8.0.5",
 		"module-alias": "^2.2.3",
 		"mongoose": "^8.18.0",
 		"signal-exit": "^4.1.0",
 		"spinnies": "^0.5.1",
-		"tree-kill": "^1.2.2"
+		"tree-kill": "^1.2.2",
+		"ultimate-express": "^2.0.9",
+		"ws": "^8.18.3"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.34.0",
@@ -45,5 +47,8 @@
 	},
 	"resolutions": {
 		"string-width": "4.2.3"
+	},
+	"optionalDependencies": {
+		"bufferutil": "^4.0.9"
 	}
 }

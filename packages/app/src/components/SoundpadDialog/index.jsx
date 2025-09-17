@@ -18,7 +18,7 @@ const SoundpadDialog = ({ close, group_id }) => {
 		<div className="soundpad-dialog">
 			<div className="soundpad-dialog__header">
 				<h1>
-					<Icons.MdVoiceChat /> Soundpad
+					<Icons.Drum /> Soundpad
 				</h1>
 
 				<SoundpadLocalVolume />

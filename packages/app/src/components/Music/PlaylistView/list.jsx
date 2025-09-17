@@ -35,7 +35,7 @@ const TrackList = ({
 				<antd.Empty
 					description={
 						<>
-							<Icons.MdLibraryMusic /> This playlist is empty!
+							<Icons.ListMusic /> This playlist is empty!
 						</>
 					}
 				/>
@@ -48,7 +48,7 @@ const TrackList = ({
 			{showListHeader && (
 				<div className="list_header">
 					<h1>
-						<Icons.MdPlaylistPlay /> Tracks
+						<Icons.ListMusic /> Tracks
 					</h1>
 					{/* TODO: Implement Search API call */}
 					<SearchButton

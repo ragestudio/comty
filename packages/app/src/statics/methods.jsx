@@ -1,5 +1,6 @@
-import { Lightbox } from "react-modal-image"
+//import { Lightbox } from "react-modal-image"
 
+import Lightbox from "@components/Lightbox"
 import NotificationsCenter from "@components/NotificationsCenter"
 import PostCreator from "@components/PostCreator"
 import Searcher from "@components/Searcher"
@@ -57,7 +58,13 @@ export default {
 
 			return app.layout.modal.open(
 				"searcher",
-				(props) => <Searcher autoFocus renderResults {...props} />,
+				(props) => (
+					<Searcher
+						autoFocus
+						renderResults
+						{...props}
+					/>
+				),
 				{
 					framed: false,
 				},
@@ -66,22 +73,29 @@ export default {
 		openMessages: () => {
 			app.location.push("/messages")
 		},
-		openFullImageViewer: (src) => {
+		openFullImageViewer: (media, options = {}) => {
+			if (!Array.isArray(media)) {
+				media = [media]
+			}
+
 			app.cores.window_mng.render(
 				"image_lightbox",
 				<Lightbox
-					small={src}
-					large={src}
+					index={options?.index}
+					media={media}
 					onClose={() => app.cores.window_mng.close("image_lightbox")}
-					hideDownload
-					showRotate
 				/>,
 			)
 		},
 		openPostCreator: (params) => {
 			app.layout.modal.open(
 				"post_creator",
-				(props) => <PostCreator {...props} {...params} />,
+				(props) => (
+					<PostCreator
+						{...props}
+						{...params}
+					/>
+				),
 				{
 					framed: false,
 				},

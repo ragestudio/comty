@@ -38,7 +38,10 @@ const ReleaseTracks = ({ data, changeData }) => {
 		}
 
 		return (
-			<antd.Button className="uploadMoreButton" icon={<Icons.FiPlus />}>
+			<antd.Button
+				className="uploadMoreButton"
+				icon={<Icons.Plus />}
+			>
 				Add another
 			</antd.Button>
 		)
@@ -46,7 +49,12 @@ const ReleaseTracks = ({ data, changeData }) => {
 
 	const renderTracksList = () => {
 		if (tracks.length === 0) {
-			return <antd.Result status="info" title="No tracks" />
+			return (
+				<antd.Result
+					status="info"
+					title="No tracks"
+				/>
+			)
 		}
 
 		return (

@@ -65,7 +65,10 @@ const AppPage = (props) => {
 			<div className="custom-app-page-loading">
 				<div className="custom-app-page-loading-icon">
 					{appMetadata.icon && (
-						<Image src={appMetadata.icon} alt={appMetadata.title} />
+						<Image
+							src={appMetadata.icon}
+							alt={appMetadata.title}
+						/>
 					)}
 				</div>
 
@@ -88,6 +91,12 @@ const AppPage = (props) => {
 			</ErrorBoundary>
 		</div>
 	)
+}
+
+AppPage.options = {
+	layout: {
+		maxHeight: true,
+	},
 }
 
 export default AppPage

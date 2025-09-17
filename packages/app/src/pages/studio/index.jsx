@@ -29,18 +29,27 @@ const StudioPage = () => {
 				ref={navigatorRef}
 				{...navigatorProps}
 			>
-				<div id="music" className="studio-page-selectors-item">
-					<Icons.MdLibraryMusic />
+				<div
+					id="music"
+					className="studio-page-selectors-item"
+				>
+					<Icons.Music2 />
 					<span>Music</span>
 				</div>
 
-				<div id="tv" className="studio-page-selectors-item">
-					<Icons.MdTv />
+				<div
+					id="tv"
+					className="studio-page-selectors-item"
+				>
+					<Icons.MonitorPlay />
 					<span>TV</span>
 				</div>
 
-				<div id="marketplace" className="studio-page-selectors-item">
-					<Icons.MdCode />
+				<div
+					id="marketplace"
+					className="studio-page-selectors-item"
+				>
+					<Icons.CodeXml />
 					<span>Marketplace</span>
 				</div>
 			</div>

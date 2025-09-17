@@ -2,17 +2,17 @@
 	{
 		"id": "search",
 		"label": "Search",
-		"icon": "FiSearch"
+		"icon": "Search"
 	},
 	{
 		"id": "apps",
 		"label": "Apps",
-		"icon": "MdApps"
+		"icon": "Grid3X3"
 	},
 	{
 		"id": "settings",
 		"label": "Settings",
-		"icon": "FiSettings",
+		"icon": "Settings",
 		"path": "/settings"
 	}
 ]

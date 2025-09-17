@@ -2,11 +2,10 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
-import { SliderPicker } from "react-color"
 
 import { Icons, createIconRender } from "@components/Icons"
 
-import PerformanceLog from "@classes/PerformanceLog"
+import SettingsComponents from "./components"
 
 import "./index.less"
 
@@ -21,84 +20,43 @@ function shouldUseHorizontalLayout(type) {
 	}
 }
 
-export const SettingsComponents = {
-	button: {
-		component: antd.Button,
-		props: (_this) => {
-			return {
-				onClick: (event) => _this.onUpdateItem(event),
+const SettingItemExtraActions = ({ setting, ctx, actions }) => {
+	if (!actions) {
+		return null
+	}
+
+	return actions.map((action, index) => {
+		return React.isValidElement(action) ? "elem" : "niputaidea"
+		if (typeof action === "function") {
+			return React.createElement(action, {
+				ctx: ctx,
+				setting: setting,
+			})
+		}
+
+		if (React.isValidElement(action)) {
+			return action
+		}
+
+		const handleOnClick = () => {
+			if (action.onClick) {
+				action.onClick(ctx)
 			}
-		},
-	},
-	switch: {
-		component: antd.Switch,
-		props: (_this) => {
-			return {
-				onChange: (event) => _this.onUpdateItem(event),
-			}
-		},
-	},
-	slider: {
-		component: antd.Slider,
-		props: (_this) => {
-			return {
-				onChange: (event) => _this.onUpdateItem(event),
-			}
-		},
-	},
-	input: {
-		component: antd.Input,
-		props: (_this) => {
-			return {
-				defaultValue: _this.state.value,
-				onChange: (event) => _this.onUpdateItem(event.target.value),
-				onPressEnter: (event) => _this.dispatchUpdate(event.target.value),
-			}
-		},
-	},
-	textarea: {
-		component: antd.Input.TextArea,
-		props: (_this) => {
-			return {
-				defaultValue: _this.state.value,
-				onChange: (event) => _this.onUpdateItem(event.target.value),
-				onPressEnter: (event) => _this.dispatchUpdate(event.target.value),
-			}
-		},
-	},
-	inputnumber: {
-		component: antd.InputNumber,
-	},
-	select: {
-		component: antd.Select,
-		props: (_this) => {
-			return {
-				onChange: (event) => {
-					console.log(event)
-					_this.onUpdateItem(event)
-				},
-			}
-		},
-	},
-	slidercolorpicker: {
-		component: SliderPicker,
-		props: (_this) => {
-			return {
-				onChange: (color) => {
-					_this.setState({
-						componentProps: {
-							..._this.state.componentProps,
-							color,
-						},
-					})
-				},
-				onChangeComplete: (color) => {
-					_this.onUpdateItem(color.hex)
-				},
-				color: _this.state.value,
-			}
-		},
-	},
+		}
+
+		return (
+			<antd.Button
+				key={action.id}
+				id={action.id}
+				onClick={handleOnClick}
+				icon={action.icon && createIconRender(action.icon)}
+				type={action.type ?? "round"}
+				disabled={setting.disabled}
+			>
+				{action.title}
+			</antd.Button>
+		)
+	})
 }
 
 export default class SettingItemComponent extends React.PureComponent {
@@ -110,17 +68,15 @@ export default class SettingItemComponent extends React.PureComponent {
 		loading: true,
 	}
 
-	perf = new PerformanceLog(`Init ${this.props.setting.id}`, {
-		disabled: true,
-	})
-
 	componentType = null
 
 	componentRef = React.createRef()
 
 	componentDidMount = async () => {
 		if (typeof this.props.setting.component === "string") {
-			this.componentType = String(this.props.setting.component).toLowerCase()
+			this.componentType = String(
+				this.props.setting.component,
+			).toLowerCase()
 		}
 
 		await this.initialize()
@@ -144,8 +100,11 @@ export default class SettingItemComponent extends React.PureComponent {
 			return {}
 		}
 
-		if (typeof SettingsComponents[this.componentType].props === "function") {
-			const inhertedProps = SettingsComponents[this.componentType].props(this)
+		if (
+			typeof SettingsComponents[this.componentType].props === "function"
+		) {
+			const inhertedProps =
+				SettingsComponents[this.componentType].props(this)
 
 			return inhertedProps
 		}
@@ -164,23 +123,15 @@ export default class SettingItemComponent extends React.PureComponent {
 	}
 
 	initialize = async () => {
-		this.perf.start(`init tooks`)
-
 		this.toggleLoading(true)
 
 		if (this.props.setting.storaged) {
-			this.perf.start(`get value from storaged`)
-
-			await this.setState({
+			this.setState({
 				value: window.app.cores.settings.get(this.props.setting.id),
 			})
-
-			this.perf.end(`get value from storaged`)
 		}
 
 		if (typeof this.props.setting.defaultValue === "function") {
-			this.perf.start(`execute default value fn`)
-
 			this.toggleLoading(true)
 
 			this.setState({
@@ -188,13 +139,9 @@ export default class SettingItemComponent extends React.PureComponent {
 			})
 
 			this.toggleLoading(false)
-
-			this.perf.end(`execute default value fn`)
 		}
 
 		if (typeof this.props.setting.dependsOn === "object") {
-			this.perf.start(`register dependsOn events`)
-
 			Object.keys(this.props.setting.dependsOn).forEach((key) => {
 				// create a event handler to watch changes
 				window.app.eventBus.on(`setting.update.${key}`, () => {
@@ -207,10 +154,6 @@ export default class SettingItemComponent extends React.PureComponent {
 				})
 			})
 
-			this.perf.end(`register dependsOn events`)
-
-			this.perf.start(`check depends validation`)
-
 			// by default check depends validation
 			this.setState({
 				componentProps: {
@@ -218,48 +161,40 @@ export default class SettingItemComponent extends React.PureComponent {
 					disabled: this.checkDependsValidation(),
 				},
 			})
-
-			this.perf.end(`check depends validation`)
 		}
 
 		if (typeof this.props.setting.listenUpdateValue === "string") {
-			this.perf.start(`listen "on update" value`)
-
 			window.app.eventBus.on(
 				`setting.update.${this.props.setting.listenUpdateValue}`,
 				() => {
 					this.setState({
-						value: window.app.cores.settings.get(this.props.setting.id),
+						value: window.app.cores.settings.get(
+							this.props.setting.id,
+						),
 					})
 				},
 			)
-
-			this.perf.end(`listen "on update" value`)
 		}
 
 		if (this.props.setting.reloadValueOnUpdateEvent) {
-			this.perf.start(`Reinitializing setting [${this.props.setting.id}]`)
-
 			window.app.eventBus.on(
 				this.props.setting.reloadValueOnUpdateEvent,
 				() => {
-					console.log(`Reinitializing setting [${this.props.setting.id}]`)
+					console.log(
+						`Reinitializing setting [${this.props.setting.id}]`,
+					)
 					this.initialize()
 				},
 			)
-
-			this.perf.end(`Reinitializing setting [${this.props.setting.id}]`)
 		}
 
 		if (typeof this.props.setting.props === "function") {
-			this.props.setting.props = await this.props.setting.props(this.props.ctx)
+			this.props.setting.props = await this.props.setting.props(
+				this.props.ctx,
+			)
 		}
 
 		this.toggleLoading(false)
-
-		this.perf.end(`init tooks`)
-
-		this.perf.finally()
 	}
 
 	dispatchUpdate = async (updateValue) => {
@@ -283,14 +218,19 @@ export default class SettingItemComponent extends React.PureComponent {
 			}
 		}
 
-		const storagedValue = window.app.cores.settings.get(this.props.setting.id)
+		const storagedValue = window.app.cores.settings.get(
+			this.props.setting.id,
+		)
 
 		if (typeof updateValue === "undefined") {
 			updateValue = !storagedValue
 		}
 
 		if (this.props.setting.storaged) {
-			await window.app.cores.settings.set(this.props.setting.id, updateValue)
+			await window.app.cores.settings.set(
+				this.props.setting.id,
+				updateValue,
+			)
 
 			if (typeof this.props.setting.beforeSave === "function") {
 				await this.props.setting.beforeSave(updateValue)
@@ -320,13 +260,15 @@ export default class SettingItemComponent extends React.PureComponent {
 
 		// reset debounced value
 		if (this.props.setting.debounced) {
-			await this.setState({
+			this.setState({
 				debouncedValue: null,
 			})
 		}
 
 		if (this.componentRef.current) {
-			if (typeof this.componentRef.current.onDebounceSave === "function") {
+			if (
+				typeof this.componentRef.current.onDebounceSave === "function"
+			) {
 				await this.componentRef.current.onDebounceSave(updateValue)
 			}
 		}
@@ -336,7 +278,7 @@ export default class SettingItemComponent extends React.PureComponent {
 		}
 
 		// finaly update value
-		await this.setState({
+		this.setState({
 			value: updateValue,
 		})
 
@@ -349,7 +291,7 @@ export default class SettingItemComponent extends React.PureComponent {
 		})
 
 		if (this.props.setting.debounced) {
-			return await this.setState({
+			return this.setState({
 				debouncedValue: updateValue,
 			})
 		}
@@ -429,8 +371,9 @@ export default class SettingItemComponent extends React.PureComponent {
 		}
 
 		const Component =
-			SettingsComponents[String(this.props.setting.component).toLowerCase()]
-				?.component ?? this.props.setting.component
+			SettingsComponents[
+				String(this.props.setting.component).toLowerCase()
+			]?.component ?? this.props.setting.component
 
 		return (
 			<div
@@ -451,7 +394,12 @@ export default class SettingItemComponent extends React.PureComponent {
 							<h1>
 								{createIconRender(this.props.setting.icon)}
 								<Translation>
-									{(t) => t(this.props.setting.title ?? this.props.setting.id)}
+									{(t) =>
+										t(
+											this.props.setting.title ??
+												this.props.setting.id,
+										)
+									}
 								</Translation>
 							</h1>
 
@@ -469,45 +417,14 @@ export default class SettingItemComponent extends React.PureComponent {
 					</div>
 
 					<div className="setting_item_header_actions">
-						{this.props.setting.extraActions &&
-							this.props.setting.extraActions.map((action, index) => {
-								if (typeof action === "function") {
-									return React.createElement(action, {
-										ctx: {
-											updateCurrentValue: (updateValue) =>
-												this.setState({
-													value: updateValue,
-												}),
-											getCurrentValue: () => this.state.value,
-											currentValue: this.state.value,
-											dispatchUpdate: this.dispatchUpdate,
-											onUpdateItem: this.onUpdateItem,
-											processedCtx: this.props.ctx,
-										},
-									})
-								}
+						<SettingItemExtraActions
+							setting={this.props.setting}
+							actions={this.props.setting.extraActions}
+							ctx={finalProps.ctx}
+						/>
 
-								const handleOnClick = () => {
-									if (action.onClick) {
-										action.onClick(finalProps.ctx)
-									}
-								}
-
-								return (
-									<antd.Button
-										key={action.id}
-										id={action.id}
-										onClick={handleOnClick}
-										icon={action.icon && createIconRender(action.icon)}
-										type={action.type ?? "round"}
-										disabled={this.props.setting.disabled}
-									>
-										{action.title}
-									</antd.Button>
-								)
-							})}
-
-						{typeof this.props.setting.onEnabledChange === "function" && (
+						{typeof this.props.setting.onEnabledChange ===
+							"function" && (
 							<antd.Switch
 								defaultChecked={this.computeSwitchEnablerDefault()}
 								onChange={this.props.setting.onEnabledChange}
@@ -518,14 +435,17 @@ export default class SettingItemComponent extends React.PureComponent {
 
 				<div className="setting_item_content">
 					<>
-						{!this.state.loading && React.createElement(Component, finalProps)}
+						{!this.state.loading &&
+							React.createElement(Component, finalProps)}
 						{this.state.loading && <antd.Spin />}
 						{this.state.debouncedValue && (
 							<antd.Button
 								type="round"
-								icon={<Icons.FiSave />}
+								icon={<Icons.Check />}
 								onClick={async () =>
-									await this.dispatchUpdate(this.state.debouncedValue)
+									await this.dispatchUpdate(
+										this.state.debouncedValue,
+									)
 								}
 							>
 								Save

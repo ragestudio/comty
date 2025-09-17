@@ -1,10 +1,11 @@
 import loadable from "@loadable/component"
 import UserModel from "@models/user"
 import UploadButton from "@components/UploadButton"
+import { Icons } from "@components/Icons"
 
 export default {
 	id: "profile",
-	icon: "FiUser",
+	icon: "User",
 	label: "Profile",
 	group: "basic",
 	ctxData: async () => {
@@ -19,7 +20,7 @@ export default {
 			id: "username",
 			group: "account.basicInfo",
 			component: "Button",
-			icon: "FiAtSign",
+			icon: "AtSign",
 			title: "Username",
 			description:
 				"Your username is the name you use to log in to your account.",
@@ -32,13 +33,13 @@ export default {
 			id: "public_name",
 			group: "account.basicInfo",
 			component: "Input",
-			icon: "FiEdit3",
+			icon: "PenLine",
 			title: "Name",
 			description: "Change your public name",
 			props: {
 				maxLength: 120,
 				showCount: true,
-				allowClear: true,
+				allowClear: { clearIcon: <Icons.CircleX /> },
 				placeholder: "Enter your name. e.g. John Doe",
 			},
 			defaultValue: (ctx) => {
@@ -71,12 +72,12 @@ export default {
 			id: "email",
 			group: "account.basicInfo",
 			component: "Input",
-			icon: "FiMail",
+			icon: "Mail",
 			title: "Email",
 			description: "Change your email address",
 			props: {
 				placeholder: "Enter your email address",
-				allowClear: true,
+				allowClear: { clearIcon: <Icons.CircleX /> },
 				showCount: true,
 				maxLength: 320,
 			},
@@ -97,11 +98,11 @@ export default {
 		{
 			id: "avatar",
 			group: "account.profile",
-			icon: "FiImage",
+			icon: "SquareUser",
 			title: "Avatar",
 			description: "Change your avatar (Upload an image or use an URL)",
 			component: loadable(() => import("../components/urlInput")),
-			extraActions: [UploadButton],
+			extraActions: [React.createElement(UploadButton)],
 			defaultValue: (ctx) => {
 				return ctx.userData.avatar
 			},
@@ -119,7 +120,7 @@ export default {
 		{
 			id: "cover",
 			group: "account.profile",
-			icon: "FiImage",
+			icon: "Image",
 			title: "Cover",
 			description:
 				"Change your profile cover (Upload an image or use an URL)",
@@ -143,14 +144,14 @@ export default {
 			id: "description",
 			group: "account.profile",
 			component: "TextArea",
-			icon: "FiEdit3",
+			icon: "BookOpenText",
 			title: "Description",
 			description: "Change your description for your profile",
 			props: {
 				placeholder: "Enter here a description for your profile",
 				maxLength: 320,
 				showCount: true,
-				allowClear: true,
+				allowClear: { clearIcon: <Icons.CircleX /> },
 			},
 			defaultValue: (ctx) => {
 				return ctx.userData.description
@@ -170,7 +171,7 @@ export default {
 			id: "Links",
 			group: "account.profile",
 			component: loadable(() => import("../components/profileLinks")),
-			icon: "MdLink",
+			icon: "Link2",
 			title: "Links",
 			description: "Add links to your profile",
 			onUpdate: async (value) => {

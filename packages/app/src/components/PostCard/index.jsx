@@ -25,7 +25,12 @@ const messageRegexs = [
 	{
 		regex: /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&[a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*/g,
 		fn: (key, result) => {
-			return <ReactPlayer url={result[1]} controls />
+			return (
+				<ReactPlayer
+					url={result[1]}
+					controls
+				/>
+			)
 		},
 	},
 	{
@@ -189,7 +194,7 @@ export default class PostCard extends React.PureComponent {
 		return (
 			<div className="postCard error">
 				<h1>
-					<Icons.FiAlertTriangle />
+					<Icons.TriangleAlert />
 					<span>Cannot render this post</span>
 					<span>
 						Maybe this version of the app is outdated or is not

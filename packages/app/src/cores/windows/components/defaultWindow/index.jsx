@@ -106,7 +106,7 @@ export default class DefaultWindowRender extends React.Component {
 
 		actions.push({
 			key: "close",
-			render: () => <Icons.FiXCircle style={{ margin: 0, padding: 0 }} />,
+			render: () => <Icons.CircleX style={{ margin: 0, padding: 0 }} />,
 			onClick: () => {
 				this.props.close()
 			},

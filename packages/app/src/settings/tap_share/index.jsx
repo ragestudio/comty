@@ -92,7 +92,7 @@ const RegisterNewTag = (props) => {
 					type="link"
 					onClick={prevStep}
 					disabled={step === 0}
-					icon={<Icons.MdChevronLeft />}
+					icon={<Icons.ChevronLeft />}
 					className={classnames("tap-share-register-header-back", {
 						["hidden"]: step === 0,
 					})}
@@ -132,9 +132,12 @@ const TagItem = (props) => {
 			</div>
 
 			<div className="tap-share-own_tags-item-actions">
-				<antd.Button icon={<Icons.MdEdit />} onClick={props.onEdit} />
 				<antd.Button
-					icon={<Icons.MdDelete />}
+					icon={<Icons.Pen />}
+					onClick={props.onEdit}
+				/>
+				<antd.Button
+					icon={<Icons.Trash />}
 					danger
 					onClick={props.onDelete}
 				/>
@@ -289,7 +292,7 @@ class OwnTags extends React.Component {
 				{app.isMobile && (
 					<antd.Button
 						type="primary"
-						icon={<Icons.FiPlus />}
+						icon={<Icons.Plus />}
 						onClick={() => this.handleOpenEditor({})}
 						className="tap-share-own_tags-add"
 					>
@@ -336,14 +339,14 @@ const TapShareRender = () => {
 			<div className="tap-share-field">
 				<div className="tap-share-field_header">
 					<h1>
-						<Icons.MdSpoke /> Registered Tags
+						<Icons.Tags /> Registered Tags
 					</h1>
 				</div>
 
 				{app.cores.nfc.scanning && (
 					<span className="tip">
-						<Icons.MdInfo /> You can quickly edit your tags by
-						tapping them.
+						<Icons.Info /> You can quickly edit your tags by tapping
+						them.
 					</span>
 				)}
 
@@ -357,6 +360,6 @@ export default {
 	id: "tap_share",
 	icon: "MdNfc",
 	label: "Tap Share",
-	group: "app",
+	group: "advanced",
 	render: TapShareRender,
 }

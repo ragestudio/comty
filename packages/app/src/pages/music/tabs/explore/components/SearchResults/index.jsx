@@ -9,14 +9,19 @@ import Playlist from "@components/Music/Playlist"
 
 const ResultGroupsDecorators = {
 	albums: {
-		icon: "MdAlbum",
+		icon: "SquareLibrary",
 		label: "Albums",
 		renderItem: (props) => {
-			return <Playlist row playlist={props.item} />
+			return (
+				<Playlist
+					row
+					playlist={props.item}
+				/>
+			)
 		},
 	},
 	tracks: {
-		icon: "MdMusicNote",
+		icon: "Disk",
 		label: "Tracks",
 		renderItem: (props) => {
 			return (

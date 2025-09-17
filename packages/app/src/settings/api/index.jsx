@@ -5,10 +5,10 @@ import { Icons } from "@components/Icons"
 import SelectableText from "@components/SelectableText"
 
 import useGetMainOrigin from "@hooks/useGetMainOrigin"
-
 import textToDownload from "@utils/textToDownload"
-
 import ServerKeysModel from "@models/api"
+
+import BotManifestCreator from "./components/BotManifestCreator"
 
 import "./index.less"
 
@@ -123,18 +123,27 @@ const ServerKeyCreator = (props) => {
 				)}
 
 				{result.secret_token && (
-					<antd.Button onClick={generateAuthJSON} type="primary">
+					<antd.Button
+						onClick={generateAuthJSON}
+						type="primary"
+					>
 						Save JSON
 					</antd.Button>
 				)}
 
 				{!result.secret_token && (
-					<antd.Button type="primary" onClick={() => onRegenerate()}>
+					<antd.Button
+						type="primary"
+						onClick={() => onRegenerate()}
+					>
 						Regenerate secret
 					</antd.Button>
 				)}
 
-				<antd.Button danger onClick={() => onDelete()}>
+				<antd.Button
+					danger
+					onClick={() => onDelete()}
+				>
 					Delete
 				</antd.Button>
 
@@ -147,7 +156,10 @@ const ServerKeyCreator = (props) => {
 		<>
 			<h1>Create a server key</h1>
 
-			<antd.Form layout="vertical" onFinish={onSubmit}>
+			<antd.Form
+				layout="vertical"
+				onFinish={onSubmit}
+			>
 				<antd.Form.Item
 					label="Name"
 					name="name"
@@ -196,7 +208,10 @@ const ServerKeyCreator = (props) => {
 
 				{error && (
 					<antd.Form.Item>
-						<antd.Alert type="error" message={error} />
+						<antd.Alert
+							type="error"
+							message={error}
+						/>
 					</antd.Form.Item>
 				)}
 			</antd.Form>
@@ -227,7 +242,7 @@ const ServerKeyItem = (props) => {
 
 export default {
 	id: "api",
-	icon: "TbApi",
+	icon: "Cable",
 	label: "API",
 	group: "advanced",
 	render: () => {
@@ -236,6 +251,16 @@ export default {
 		const [L_Keys, R_Keys, E_Keys, F_Keys] = app.cores.api.useRequest(
 			ServerKeysModel.getMyServerKeys,
 		)
+
+		async function onClickCreateNewBot() {
+			app.layout.drawer.open("bot_manifest_creator", BotManifestCreator, {
+				onClose: () => {
+					F_Keys()
+				},
+				confirmOnOutsideClick: true,
+				confirmOnOutsideClickText: "All changes will be lost.",
+			})
+		}
 
 		async function onClickCreateNewKey() {
 			app.layout.drawer.open("server_key_creator", ServerKeyCreator, {
@@ -305,6 +330,22 @@ export default {
 								{R_Keys.length === 0 && <antd.Empty />}
 							</>
 						)}
+					</div>
+				</div>
+
+				<div className="card bot-manifests">
+					<div className="bot-manifests__header">
+						<div className="bot-manifests__header__title">
+							<h4>Your Bots</h4>
+							<p>Manage your bots manifests & keys </p>
+						</div>
+
+						<antd.Button
+							type="primary"
+							onClick={onClickCreateNewBot}
+						>
+							Create new
+						</antd.Button>
 					</div>
 				</div>
 

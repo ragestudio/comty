@@ -176,7 +176,7 @@ const Account = ({ params }) => {
 
 						{!isSelf && (
 							<antd.Button
-								icon={<Icons.MdMessage />}
+								icon={<Icons.MessageCircle />}
 								onClick={() =>
 									app.location.push(`/messages/${user._id}`)
 								}
@@ -185,7 +185,10 @@ const Account = ({ params }) => {
 					</div>
 				</div>
 
-				<div className="center-panel" ref={contentRef}>
+				<div
+					className="center-panel"
+					ref={contentRef}
+				>
 					<AnimatePresence mode="wait">
 						<motion.div
 							initial={{ opacity: 0, scale: 0.95 }}
@@ -216,17 +219,17 @@ const Account = ({ params }) => {
 							{
 								id: "posts",
 								label: "Posts",
-								icon: "FiBookOpen",
+								icon: "Hash",
 							},
 							{
 								id: "followers",
 								label: "Followers",
-								icon: "FiUsers",
+								icon: "Users",
 							},
 							{
 								id: "details",
 								label: "Details",
-								icon: "FiInfo",
+								icon: "Info",
 							},
 						])}
 					/>

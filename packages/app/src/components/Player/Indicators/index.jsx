@@ -7,7 +7,7 @@ function getIndicators(track, playerState) {
 
 	if (playerState.live) {
 		indicators.push({
-			icon: <Icons.FiRadio style={{ color: "var(--colorPrimary)" }} />,
+			icon: <Icons.RadioTower style={{ color: "var(--colorPrimary)" }} />,
 		})
 	}
 

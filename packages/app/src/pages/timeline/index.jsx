@@ -26,7 +26,7 @@ const TimelinePage = () => {
 			extraItems={[
 				{
 					key: "create",
-					icon: "FiPlusCircle",
+					icon: "CirclePlus",
 					label: <Translation>{(t) => t("Create")}</Translation>,
 					props: {
 						type: "primary",

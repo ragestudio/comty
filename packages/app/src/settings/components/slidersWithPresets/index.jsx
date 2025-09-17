@@ -77,7 +77,7 @@ const SlidersWithPresets = (props) => {
 			value: "new",
 			label: (
 				<span>
-					<Icons.MdAdd /> Create new
+					<Icons.Plus /> Create new
 				</span>
 			),
 		},
@@ -124,7 +124,7 @@ const SlidersWithPresets = (props) => {
 						width: "100%",
 					}}
 				>
-					<Icons.MdList
+					<Icons.List
 						style={{
 							margin: "0",
 						}}
@@ -163,7 +163,7 @@ const SlidersWithPresets = (props) => {
 					/>
 					<Button
 						onClick={handleDeleteCurrentPreset}
-						icon={<Icons.MdDelete />}
+						icon={<Icons.Delete />}
 						disabled={selectedPreset === "default"}
 					/>
 				</div>

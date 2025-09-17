@@ -48,12 +48,20 @@ const VisibilityOptionLabel = ({ label, icon }) => (
 const visibilityOptions = [
 	{
 		value: "public",
-		label: <VisibilityOptionLabel icon={<Icons.FiUser />} label="Public" />,
+		label: (
+			<VisibilityOptionLabel
+				icon={<Icons.Earth />}
+				label="Public"
+			/>
+		),
 	},
 	{
 		value: "private",
 		label: (
-			<VisibilityOptionLabel icon={<Icons.FiEyeOff />} label="Private" />
+			<VisibilityOptionLabel
+				icon={<Icons.EyeOff />}
+				label="Private"
+			/>
 		),
 	},
 ]
@@ -479,7 +487,10 @@ export default class PostCreator extends React.Component {
 							title="Are you sure you want to delete this file?"
 							onConfirm={onClickDelete}
 						>
-							<antd.Button type="link" icon={<Icons.FiTrash />} />
+							<antd.Button
+								type="link"
+								icon={<Icons.Trash />}
+							/>
 						</antd.Popconfirm>
 					)}
 				</div>
@@ -631,7 +642,7 @@ export default class PostCreator extends React.Component {
 						{this.props.edit_post && (
 							<div className="postCreator-header-indicator">
 								<p>
-									<Icons.MdEdit />
+									<Icons.SquarePen />
 									Editing post
 								</p>
 							</div>
@@ -640,7 +651,7 @@ export default class PostCreator extends React.Component {
 						{this.props.reply_to && (
 							<div className="postCreator-header-indicator">
 								<p>
-									<Icons.MdReply />
+									<Icons.Reply />
 									Replaying to
 								</p>
 
@@ -705,9 +716,9 @@ export default class PostCreator extends React.Component {
 								loading ? (
 									<Icons.LoadingOutlined spin />
 								) : editMode ? (
-									<Icons.MdEdit />
+									<Icons.SquarePen />
 								) : (
-									<Icons.FiSend />
+									<Icons.Send />
 								)
 							}
 						/>
@@ -755,13 +766,13 @@ export default class PostCreator extends React.Component {
 					<antd.Button
 						type="ghost"
 						onClick={this.handleUploadClick}
-						icon={<Icons.FiUpload />}
+						icon={<Icons.Upload />}
 					/>
 
 					<antd.Button
 						type="ghost"
-						icon={<Icons.MdPoll />}
 						onClick={this.handleAddPoll}
+						icon={<Icons.Vote />}
 					/>
 
 					<antd.Select

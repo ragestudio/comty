@@ -60,7 +60,11 @@ const LivestreamItem = (props) => {
 	}, [])
 
 	return (
-		<div className="livestream_item" onClick={handleOnClick} ref={itemRef}>
+		<div
+			className="livestream_item"
+			onClick={handleOnClick}
+			ref={itemRef}
+		>
 			<div className="livestream_thumbnail">
 				<img
 					src={livestream.info?.thumbnail ?? "/assets/new_file.png"}
@@ -86,11 +90,14 @@ const LivestreamItem = (props) => {
 				</div>
 
 				<div className="livestream_views">
-					<Icons.FiEye />
+					<Icons.Eye />
 					<h4>{livestream.info?.viewers ?? 0}</h4>
 				</div>
 
-				<UserPreview user={livestream.user} small />
+				<UserPreview
+					user={livestream.user}
+					small
+				/>
 			</div>
 		</div>
 	)

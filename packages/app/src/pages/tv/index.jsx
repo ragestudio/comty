@@ -5,18 +5,22 @@ import { PagePanelWithNavMenu } from "@components/PagePanels"
 
 import Tabs from "./tabs"
 
-const NavMenuHeader = <h2>
-    <Icons.MdLiveTv />
-    TV
-</h2>
+const NavMenuHeader = (
+	<h2>
+		<Icons.TvMinimal />
+		TV
+	</h2>
+)
 
 export default class TVDashboard extends React.Component {
-    render() {
-        return <PagePanelWithNavMenu
-            tabs={Tabs}
-            navMenuHeader={NavMenuHeader}
-            useSetQueryType
-            transition
-        />
-    }
+	render() {
+		return (
+			<PagePanelWithNavMenu
+				tabs={Tabs}
+				navMenuHeader={NavMenuHeader}
+				useSetQueryType
+				transition
+			/>
+		)
+	}
 }

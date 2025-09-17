@@ -104,7 +104,7 @@ export const UserCard = (props) => {
 					<h1>
 						{user.bot && <Icons.Bot />}
 						{user.public_name || user.username}
-						{user.verified && <Icons.verifiedBadge id="verified" />}
+						{user.verified && <Icons.BadgeCheck id="verified" />}
 					</h1>
 					<span>@{user.username}</span>
 				</div>
@@ -172,7 +172,7 @@ export const MobileUserCard = (props, ref) => {
 						<h1>
 							{props.user.fullName ?? `@${props.user.username}`}
 							{props.user.verified && (
-								<Icons.verifiedBadge id="verification_tick" />
+								<Icons.BadgeCheck id="verification_tick" />
 							)}
 						</h1>
 
@@ -225,13 +225,13 @@ export const MobileUserCard = (props, ref) => {
 
 				<antd.Button
 					type="primary"
-					icon={<Icons.MdMessage />}
+					icon={<Icons.MessageSquare />}
 					disabled
 				/>
 
 				<antd.Button
 					type="primary"
-					icon={<Icons.MdShare />}
+					icon={<Icons.Share />}
 				/>
 			</div>
 		</div>

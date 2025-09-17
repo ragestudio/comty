@@ -75,7 +75,7 @@ const FollowersList = (props) => {
 
 	if (!loading && followers.length === 0) {
 		return (
-			<antd.Result icon={<Icons.FiUserX style={{ fontSize: "50px" }} />}>
+			<antd.Result icon={<Icons.UserX style={{ fontSize: "50px" }} />}>
 				<h2>It's seems this user has no followers, yet.</h2>
 				<h3>Maybe you can help them out?</h3>
 			</antd.Result>
@@ -89,7 +89,12 @@ const FollowersList = (props) => {
 			hasMore={hasMore}
 		>
 			{followers.map((data) => {
-				return <FollowerItem key={data._id} data={data} />
+				return (
+					<FollowerItem
+						key={data._id}
+						data={data}
+					/>
+				)
 			})}
 		</LoadMore>
 	)

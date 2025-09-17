@@ -129,16 +129,25 @@ export default class MediaRTC extends Core {
 		"authmanager:authed": async () => {
 			this.console.debug("auth manager started, connecting to rtc")
 
-			await this.connectSocket({
-				registerEvents: WebsocketEvents,
-			})
+			this.socket = app.cores.api.client().ws.sockets.get("main")
+
+			for (const event of Object.keys(WebsocketEvents)) {
+				this.socket.on(
+					event,
+					buildWebsocketHandler(this, WebsocketEvents[event]),
+				)
+			}
+
+			// await this.connectSocket({
+			// 	registerEvents: WebsocketEvents,
+			// })
 		},
 		"authmanager:logout": async () => {
 			this.console.debug(
 				"auth manager logged out, disconnecting from rtc",
 			)
 
-			await this.disconnectSocket()
+			//await this.disconnectSocket()
 		},
 	}
 

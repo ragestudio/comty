@@ -95,6 +95,7 @@ export default class MediaChannel {
 			console.log(`Closing MediaChannel ${this.channelId}`)
 
 			// Close all producers
+			// FIXME: fix producer close
 			for (const [, producers] of this.producers) {
 				if (producers instanceof Map) {
 					for (const [, producer] of producers) {

@@ -17,6 +17,7 @@ import config from "@config"
 import routesDeclarations from "@config/routes"
 import onPageMount from "@hooks/onPageMount"
 
+import "@ant-design/v5-patch-for-react-19"
 import "@styles/index.less"
 
 class ComtyApp extends React.Component {

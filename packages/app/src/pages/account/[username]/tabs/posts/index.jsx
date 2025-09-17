@@ -10,7 +10,7 @@ import PostModel from "@models/post"
 
 const emptyListRender = () => {
 	return (
-		<Result icon={<Icons.FiUserX style={{ fontSize: "50px" }} />}>
+		<Result icon={<Icons.UserX style={{ fontSize: "50px" }} />}>
 			<h2>It's seems this user has no public post, yet.</h2>
 		</Result>
 	)

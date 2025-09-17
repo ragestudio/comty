@@ -5,7 +5,7 @@ import Tabs from "./tabs"
 
 const NavMenuHeader = (
 	<h2>
-		<Icons.MdAlbum />
+		<Icons.SquareLibrary />
 		Music
 	</h2>
 )

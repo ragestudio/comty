@@ -14,7 +14,7 @@ export default {
 
 		items.push({
 			label: "Copy ID",
-			icon: "FiCopy",
+			icon: "Copy",
 			action: () => {
 				copyToClipboard(messageId)
 				control.close()
@@ -29,7 +29,7 @@ export default {
 
 			items.push({
 				label: "Copy message",
-				icon: "FiCopy",
+				icon: "Copy",
 				action: (clickedItem, ctx) => {
 					copyToClipboard(messageContentText)
 					ctx.close()
@@ -51,7 +51,7 @@ export default {
 			// push copy id
 			items.push({
 				label: "Copy user ID",
-				icon: "FiCopy",
+				icon: "Copy",
 				action: () => {
 					copyToClipboard(messageUserId)
 					control.close()
@@ -66,13 +66,13 @@ export default {
 
 				items.push({
 					label: "Edit message",
-					icon: "FiEdit",
+					icon: "SquarePen",
 					disabled: true,
 				})
 
 				items.push({
 					label: "Delete message",
-					icon: "FiTrash2",
+					icon: "Trash",
 					danger: true,
 					action: async () => {
 						control.close()

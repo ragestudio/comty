@@ -38,7 +38,9 @@ const tourSteps = [
 ]
 
 const openPlayerView = () => {
-	app.layout.draggable.open("player", PlayerView)
+	app.layout.draggable.open("player", PlayerView, {
+		snapPoints: ["850px", 1],
+	})
 }
 
 const openCreator = () => {
@@ -99,7 +101,7 @@ const PlayerButton = (props) => {
 			}}
 			onClick={openPlayerView}
 		>
-			{isPlaying ? <Icons.MdMusicNote /> : <Icons.MdPause />}
+			{isPlaying ? <Icons.Music2 /> : <Icons.Pause />}
 		</div>
 	)
 }
@@ -120,7 +122,7 @@ const AccountButton = React.forwardRef((props, ref) => {
 			list: [
 				{
 					key: "settings",
-					icon: "FiSettings",
+					icon: "Settings",
 					label: "Settings",
 					onClick: () => {
 						app.navigation.goToSettings()
@@ -128,7 +130,7 @@ const AccountButton = React.forwardRef((props, ref) => {
 				},
 				{
 					key: "account",
-					icon: "FiUser",
+					icon: "User",
 					label: "Account",
 					onClick: () => {
 						app.navigation.goToAccount()
@@ -136,7 +138,7 @@ const AccountButton = React.forwardRef((props, ref) => {
 				},
 				{
 					key: "logout",
-					icon: "FiLogOut",
+					icon: "LogOut",
 					label: "Logout",
 					danger: true,
 					onClick: () => {
@@ -164,7 +166,7 @@ const AccountButton = React.forwardRef((props, ref) => {
 						src={app.userData.avatar}
 					/>
 				) : (
-					createIconRender("FiLogin")
+					createIconRender("Login")
 				)}
 			</div>
 		</div>
@@ -371,7 +373,9 @@ export class BottomBar extends React.Component {
 		}
 
 		const heightValue = Number(
-			app.cores.style.getDefaultVar("bottom-bar-height").replace("px", ""),
+			app.cores.style
+				.getDefaultVar("bottom-bar-height")
+				.replace("px", ""),
 		)
 
 		return (
@@ -412,11 +416,14 @@ export class BottomBar extends React.Component {
 									<div
 										key="creator"
 										id="creator"
-										className={classnames("item", "primary")}
+										className={classnames(
+											"item",
+											"primary",
+										)}
 										onClick={openCreator}
 									>
 										<div className="icon">
-											{createIconRender("FiPlusCircle")}
+											{createIconRender("PlusCircle")}
 										</div>
 									</div>
 
@@ -441,7 +448,9 @@ export class BottomBar extends React.Component {
 											})
 										}}
 									>
-										<div className="icon">{createIconRender("FiHome")}</div>
+										<div className="icon">
+											{createIconRender("Home")}
+										</div>
 									</div>
 
 									<div
@@ -450,7 +459,9 @@ export class BottomBar extends React.Component {
 										className="item"
 										onClick={app.controls.openSearcher}
 									>
-										<div className="icon">{createIconRender("FiSearch")}</div>
+										<div className="icon">
+											{createIconRender("Search")}
+										</div>
 									</div>
 
 									<AccountButton ref={this.accountBtnRef} />

@@ -82,11 +82,11 @@ const Controls = (props) => {
 				shape="circle"
 				icon={
 					props.streamMode ? (
-						<Icons.MdStop />
+						<Icons.Square />
 					) : playerState.playback_status === "playing" ? (
-						<Icons.MdPause />
+						<Icons.Pause />
 					) : (
-						<Icons.MdPlayArrow />
+						<Icons.Play />
 					)
 				}
 				onClick={() => handleAction("playback")}
@@ -104,7 +104,7 @@ const Controls = (props) => {
 			<antd.Button
 				type="ghost"
 				shape="round"
-				icon={<Icons.FiChevronRight />}
+				icon={<Icons.ArrowRight />}
 				onClick={() => handleAction("next")}
 				disabled={props.streamMode}
 			/>
@@ -121,9 +121,9 @@ const Controls = (props) => {
 						onClick={() => handleAction("mute")}
 					>
 						{playerState.muted ? (
-							<Icons.FiVolumeX />
+							<Icons.VolumeX />
 						) : (
-							<Icons.FiVolume2 />
+							<Icons.Volume2 />
 						)}
 					</button>
 				</antd.Popover>

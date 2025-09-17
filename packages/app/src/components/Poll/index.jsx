@@ -37,7 +37,7 @@ const PollOption = (props) => {
 			)}
 
 			<div className="poll-option-content">
-				{props.checked && createIconRender("FaCheck")}
+				{props.checked && createIconRender("Check")}
 
 				{props.showPercentage && (
 					<span>{Math.floor(props.percentage)}%</span>
@@ -149,7 +149,7 @@ const Poll = (props) => {
 
 									<antd.Button
 										onClick={() => add()}
-										icon={createIconRender("PlusOutlined")}
+										icon={createIconRender("Plus")}
 									>
 										Add Option
 									</antd.Button>
@@ -164,7 +164,7 @@ const Poll = (props) => {
 				<div className="poll-edit-actions">
 					<antd.Button
 						onClick={onClose}
-						icon={createIconRender("CloseOutlined")}
+						icon={createIconRender("X")}
 						size="small"
 						type="text"
 					/>

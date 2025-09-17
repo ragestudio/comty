@@ -9,22 +9,22 @@ const ReleasesTypes = [
 	{
 		value: "single",
 		label: "Single",
-		icon: <Icons.MdMusicNote />,
+		icon: <Icons.Disc />,
 	},
 	{
 		value: "ep",
 		label: "Episode",
-		icon: <Icons.MdAlbum />,
+		icon: <Icons.Disc />,
 	},
 	{
 		value: "album",
 		label: "Album",
-		icon: <Icons.MdAlbum />,
+		icon: <Icons.SquareLibrary />,
 	},
 	{
 		value: "compilation",
 		label: "Compilation",
-		icon: <Icons.MdAlbum />,
+		icon: <Icons.SquareLibrary />,
 	},
 ]
 
@@ -64,20 +64,23 @@ const BasicInformation = ({ data, changeData }) => {
 					<antd.Form.Item
 						label={
 							<>
-								<Icons.MdTag /> <span>ID</span>
+								<Icons.Tag /> <span>ID</span>
 							</>
 						}
 						name="_id"
 						initialValue={data._id}
 					>
-						<antd.Input placeholder="Release ID" disabled />
+						<antd.Input
+							placeholder="Release ID"
+							disabled
+						/>
 					</antd.Form.Item>
 				)}
 
 				<antd.Form.Item
 					label={
 						<>
-							<Icons.MdMusicNote /> <span>Title</span>
+							<Icons.Music2 /> <span>Title</span>
 						</>
 					}
 					name="title"
@@ -99,7 +102,7 @@ const BasicInformation = ({ data, changeData }) => {
 				<antd.Form.Item
 					label={
 						<>
-							<Icons.MdAlbum /> <span>Type</span>
+							<Icons.Album /> <span>Type</span>
 						</>
 					}
 					name="type"
@@ -120,7 +123,7 @@ const BasicInformation = ({ data, changeData }) => {
 				<antd.Form.Item
 					label={
 						<>
-							<Icons.MdPublic /> <span>Public</span>
+							<Icons.Earth /> <span>Public</span>
 						</>
 					}
 					name="public"

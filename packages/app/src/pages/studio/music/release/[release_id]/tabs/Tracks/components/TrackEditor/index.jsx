@@ -63,7 +63,7 @@ const TrackEditor = ({
 					type="primary"
 					onClick={handleSave}
 					disabled={!hasChanges}
-					icon={<Icons.FiSave />}
+					icon={<Icons.Check />}
 				>
 					Save
 				</antd.Button>,
@@ -75,7 +75,10 @@ const TrackEditor = ({
 
 	return (
 		<div className="track-editor">
-			<TrackField icon={<Icons.MdImage />} label="Cover">
+			<TrackField
+				icon={<Icons.Image />}
+				label="Cover"
+			>
 				<CoverEditor
 					value={track.cover}
 					onChange={(url) => handleChange("cover", url)}
@@ -90,7 +93,10 @@ const TrackEditor = ({
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.MdOutlineMusicNote />} label="Title">
+			<TrackField
+				icon={<Icons.Music2 />}
+				label="Title"
+			>
 				<antd.Input
 					value={track.title}
 					placeholder="Track title"
@@ -98,7 +104,10 @@ const TrackEditor = ({
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.FiUser />} label="Artist">
+			<TrackField
+				icon={<Icons.User />}
+				label="Artist"
+			>
 				<antd.Input
 					value={track.artist}
 					placeholder="Artist"
@@ -106,7 +115,10 @@ const TrackEditor = ({
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.MdAlbum />} label="Album">
+			<TrackField
+				icon={<Icons.SquareLibrary />}
+				label="Album"
+			>
 				<antd.Input
 					value={track.album}
 					placeholder="Album"
@@ -114,21 +126,30 @@ const TrackEditor = ({
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.MdExplicit />} label="Explicit">
+			<TrackField
+				icon={<Icons.CircleAlert />}
+				label="Explicit"
+			>
 				<antd.Switch
 					checked={track.explicit}
 					onChange={(value) => handleChange("explicit", value)}
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.FiEye />} label="Public">
+			<TrackField
+				icon={<Icons.Earth />}
+				label="Public"
+			>
 				<antd.Switch
 					value={track.public}
 					onChange={(checked) => handleChange("public", checked)}
 				/>
 			</TrackField>
 
-			<TrackField icon={<Icons.MdLyrics />} label="Enhanced Lyrics">
+			<TrackField
+				icon={<Icons.ClosedCaption />}
+				label="Enhanced Lyrics"
+			>
 				<div className="track-editor-field-actions">
 					<antd.Button
 						disabled={!track.params?._id}

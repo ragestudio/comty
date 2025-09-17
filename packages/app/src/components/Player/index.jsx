@@ -114,17 +114,20 @@ const Player = (props) => {
 		>
 			<div className={classnames("toolbar_player_top_actions")}>
 				{!playerState.control_locked && (
-					<antd.Button icon={<Icons.MdCast />} shape="circle" />
+					<antd.Button
+						icon={<Icons.Cast />}
+						shape="circle"
+					/>
 				)}
 
 				<antd.Button
-					icon={<Icons.MdFullscreen />}
+					icon={<Icons.Fullscreen />}
 					shape="circle"
 					onClick={() => app.location.push("/lyrics")}
 				/>
 
 				<antd.Button
-					icon={<Icons.FiX />}
+					icon={<Icons.X />}
 					shape="circle"
 					onClick={() => app.cores.player.close()}
 				/>
@@ -137,7 +140,10 @@ const Player = (props) => {
 					}}
 				/>
 
-				<div className="toolbar_player_content" ref={contentRef}>
+				<div
+					className="toolbar_player_content"
+					ref={contentRef}
+				>
 					<div className="toolbar_player_info">
 						<h1
 							ref={titleRef}

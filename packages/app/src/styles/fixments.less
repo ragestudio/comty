@@ -694,7 +694,7 @@
 }
 
 .ant-select-dropdown {
-	z-index: 5000;
+	z-index: 999999;
 }
 
 .adm-action-sheet {
@@ -741,4 +741,25 @@
 	padding: 5px !important;
 
 	color: var(--text-color);
+}
+
+.ant-menu-item-group-title {
+	&:empty {
+		padding: 5px;
+	}
+}
+
+.ant-input-clear-icon {
+	color: var(--text-color) !important;
+}
+
+.ant-select-selection-item {
+	display: flex !important;
+	flex-direction: row;
+
+	gap: 6px;
+}
+
+.ant-popover {
+	z-index: 999999;
 }

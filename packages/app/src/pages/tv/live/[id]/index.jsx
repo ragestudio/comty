@@ -302,9 +302,7 @@ export default class StreamViewer extends React.Component {
 									<div className="livestream_player_indicators">
 										{!this.state.isEnded && (
 											<div className="livestream_player_header_user_spectators">
-												<antd.Tag
-													icon={<Icons.FiEye />}
-												>
+												<antd.Tag icon={<Icons.Eye />}>
 													{this.state.spectators}
 												</antd.Tag>
 											</div>
@@ -365,7 +363,7 @@ export default class StreamViewer extends React.Component {
 						{!this.state.cinemaMode && (
 							<div className="chatbox_header">
 								<h4>
-									<Icons.FiMessageCircle /> Live chat
+									<Icons.MessageSquare /> Live chat
 								</h4>
 							</div>
 						)}

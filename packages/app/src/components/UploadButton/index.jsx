@@ -72,30 +72,38 @@ const UploadButton = React.forwardRef((props, ref) => {
 	}
 
 	React.useEffect(() => {
-		ref.current = {
-			uploading: uploading,
-			progress: progress,
-			uploadFile: (file) => {
-				file.uid = file.uid ?? `${file.name}_${Date.now()}`
+		if (ref) {
+			ref.current = {
+				uploading: uploading,
+				progress: progress,
+				uploadFile: (file) => {
+					file.uid = file.uid ?? `${file.name}_${Date.now()}`
 
-				handleUpload({
-					file,
-				})
-			},
+					handleUpload({
+						file,
+					})
+				},
+			}
 		}
 
 		return () => {
-			ref.current = null
+			if (ref) {
+				ref.current = null
+			}
 		}
 	}, [])
 
 	React.useEffect(() => {
-		ref.current.uploading = uploading
-	}, [uploading])
+		if (ref && ref?.current) {
+			ref.current.uploading = uploading
+		}
+	}, [ref, uploading])
 
 	React.useEffect(() => {
-		ref.current.progress = progress
-	}, [progress])
+		if (ref && ref?.current) {
+			ref.current.progress = progress
+		}
+	}, [ref, progress])
 
 	return (
 		<Upload
@@ -112,7 +120,7 @@ const UploadButton = React.forwardRef((props, ref) => {
 			<div className="uploadButton-content">
 				{!progress &&
 					(props.icon ?? (
-						<Icons.FiUpload
+						<Icons.Upload
 							style={{
 								margin: 0,
 							}}
