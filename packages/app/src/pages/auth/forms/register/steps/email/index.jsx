@@ -3,6 +3,10 @@ import * as antd from "antd"
 
 import AuthModel from "@models/auth"
 
+const isValidEmailFormat = (email) => {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 const EmailStepComponent = (props) => {
 	const [email, setEmail] = React.useState(props.currentValue ?? "")
 
@@ -12,10 +16,6 @@ const EmailStepComponent = (props) => {
 
 	const isValid = () => {
 		return email.length > 0 && validFormat && emailAvailable
-	}
-
-	const checkIfIsEmail = (email) => {
-		return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 	}
 
 	const submit = () => {
@@ -31,36 +31,35 @@ const EmailStepComponent = (props) => {
 	}
 
 	React.useEffect(() => {
-		if (email.length === 0) {
-			setEmailAvailable(null)
-			setValidFormat(null)
+		props.updateValue(null)
+		setEmailAvailable(null)
+		setValidFormat(null)
 
+		const validFormat = isValidEmailFormat(email)
+		setValidFormat(validFormat)
+
+		if (email.length === 0 || !validFormat) {
 			return
 		}
 
-		props.updateValue(null)
-
 		setLoading(true)
-
-		const isEmailValid = checkIfIsEmail(email)
-		setValidFormat(isEmailValid)
 
 		// check if email is available
 		const timer = setTimeout(async () => {
-			if (!isEmailValid) {
-				return false
-			}
+			const request = await AuthModel.availability({ email }).catch(
+				(error) => {
+					antd.message.error(
+						`Cannot check email availability: ${error.message}`,
+					)
 
-			const request = await AuthModel.availability({ email }).catch((error) => {
-				antd.message.error(`Cannot check email availability: ${error.message}`)
-
-				return false
-			})
+					return false
+				},
+			)
 
 			if (request) {
-				setEmailAvailable(!request.exist)
+				setEmailAvailable(!request.exists)
 
-				if (request.exist) {
+				if (request.exists) {
 					antd.message.error("Email is already in use")
 					props.updateValue(null)
 				} else {
