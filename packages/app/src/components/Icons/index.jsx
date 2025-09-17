@@ -16,8 +16,6 @@ import * as lib2 from "@ant-design/icons"
 import * as lib3 from "react-icons/md"
 import * as lib4 from "react-icons/io"
 import * as lib5 from "react-icons/si"
-import * as lib6 from "react-icons/fa"
-import * as lib7 from "react-icons/tb"
 import * as lib10 from "lucide-react"
 
 export const Icons = {
@@ -26,8 +24,6 @@ export const Icons = {
 	...lib3,
 	...lib4,
 	...lib5,
-	...lib6,
-	...lib7,
 	...lib10,
 	Bot: (props) => <Bot {...props} />,
 	Lossless: (props) => <Lossless {...props} />,
