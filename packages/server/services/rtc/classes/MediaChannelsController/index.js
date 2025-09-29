@@ -22,6 +22,7 @@ export default class MediaChannelsController {
 
 	worker = null
 	instances = new Map()
+	usersMap = new Map()
 
 	async initialize() {
 		try {
@@ -114,11 +115,13 @@ export default class MediaChannelsController {
 	}
 
 	getClientChannel(client) {
-		if (!client.currentMediaChannel) {
+		const currentUserMediaChannel = this.usersMap.get(client.userId)
+
+		if (!currentUserMediaChannel) {
 			throw new Error("No media channel joined")
 		}
 
-		const channelInstance = this.instances.get(client.currentMediaChannel)
+		const channelInstance = this.instances.get(currentUserMediaChannel)
 
 		if (!channelInstance) {
 			throw new Error("Media channel instance not found")

@@ -1,9 +1,14 @@
 import Producer from "../producer"
 import validateRtpParameters from "../utils/validateRtpParameters"
+import setFind from "@shared-utils/setFind"
 
 export default async function (client, payload) {
 	try {
-		if (!this.clients.has(client)) {
+		const clientInst = setFind(this.clients, (c) => {
+			return c.userId === client.userId
+		})
+
+		if (!clientInst) {
 			throw new Error("Client not in channel")
 		}
 
@@ -15,7 +20,7 @@ export default async function (client, payload) {
 			throw new OperationError(400, "Missing required parameters")
 		}
 
-		const transport = client.transports.get(payload.transportId)
+		const transport = clientInst.transports.get(payload.transportId)
 
 		if (!transport) {
 			throw new OperationError(404, "Transport not found")
@@ -32,7 +37,7 @@ export default async function (client, payload) {
 		// create producer
 		const producer = new Producer({
 			transport: transport,
-			client: client,
+			client: clientInst,
 			channel: this.data,
 			// events: {
 			// 	transportclose: this.removeProducer,

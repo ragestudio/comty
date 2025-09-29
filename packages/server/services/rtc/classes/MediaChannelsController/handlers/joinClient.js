@@ -21,8 +21,10 @@ export default async function (client, channelId) {
 			channel.group_id,
 		)
 
+		const currentUserMediaChannel = this.usersMap.get(client.userId)
+
 		// Cleanup existing connection
-		if (client.currentMediaChannel) {
+		if (currentUserMediaChannel) {
 			await this.leaveClient(client)
 			await new Promise((resolve) => setTimeout(resolve, 100))
 		}
@@ -35,11 +37,12 @@ export default async function (client, channelId) {
 				group._id,
 				channelId,
 			)
+
 			this.instances.set(channelId, channelInstance)
 		}
 
 		// Set client channel
-		client.currentMediaChannel = channelId
+		this.usersMap.set(client.userId, channelId)
 
 		// Join client to channel
 		const result = await channelInstance.joinClient(client)

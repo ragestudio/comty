@@ -1,7 +1,7 @@
 //import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
-import ScyllaDb from "@shared-classes/ScyllaDb"
 
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import InjectedAuth from "@shared-lib/injectedAuth"
@@ -20,28 +20,13 @@ export default class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/rtc",
+		nats: {
+			enabled: true,
+		},
 	}
 
 	middlewares = {
 		...SharedMiddlewares,
-	}
-
-	handleWsUpgrade = async (context, token, res) => {
-		if (!token) {
-			return res.status(401).json({ error: "Unauthorized" })
-		}
-
-		context = await InjectedAuth(context, token, res).catch(() => {
-			res.close(401, "Failed to verify auth token")
-			return false
-		})
-
-		if (!context || !context.user) {
-			res.close(401, "Unauthorized or missing auth token")
-			return false
-		}
-
-		return res.upgrade(context)
 	}
 
 	handleWsConnection = (socket) => {
@@ -51,20 +36,10 @@ export default class API extends Server {
 		}
 	}
 
-	handleWsDisconnect = async (socket, client) => {
+	handleWsDisconnect = async (socket) => {
 		if (socket.context.user) {
 			console.log(`[WS] @${socket.context.user.username} disconnected`)
 			this.eventBus.emit("user:disconnect", socket.context.user._id)
-		}
-
-		// Clean up media channel resources
-		try {
-			await global.mediaChannels.leaveClient(client)
-		} catch (error) {
-			console.error(
-				"Error cleaning up media channel on disconnect:",
-				error,
-			)
 		}
 	}
 

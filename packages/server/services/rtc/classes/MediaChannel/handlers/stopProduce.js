@@ -10,18 +10,18 @@ export default async function (client, payload) {
 			return { success: true }
 		}
 
-		const producer = userProducers.get(producerId)
+		const producerInst = userProducers.get(producerId)
 
-		if (!producer || producer.closed) {
+		if (!producerInst || producerInst.producer.closed) {
 			// Producer already closed
 			return { success: true }
 		}
 
 		// Close the producer
-		await producer.close()
+		await producerInst.producer.close()
 
 		// Cleanup from the map
-		userProducers.delete(producer.id)
+		userProducers.delete(producerInst.id)
 
 		// if no more producers, remove the map
 		if (userProducers.size === 0) {
@@ -29,14 +29,14 @@ export default async function (client, payload) {
 		}
 
 		await this.sendToClients(client, `media:channel:producer:left`, {
-			producerId: producer.id,
+			producerId: producerInst.id,
 			userId: client.userId,
 			channelId: this.channelId,
-			kind: producer.kind,
-			appData: producer.appData,
+			kind: producerInst.producer.kind,
+			appData: producerInst.producer.appData,
 		})
 
-		console.log(`Producer ${producer.id} stopped for ${client.userId}`)
+		console.log(`Producer ${producerInst.id} stopped for ${client.userId}`)
 
 		return { success: true }
 	} catch (error) {

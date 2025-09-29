@@ -92,16 +92,16 @@ export default class MediaChannel {
 
 	async close() {
 		try {
-			console.log(`Closing MediaChannel ${this.channelId}`)
+			console.log(`Closing MediaChannel ${this.channelId}`, {
+				producers: this.producers,
+			})
 
 			// Close all producers
 			// FIXME: fix producer close
-			for (const [, producers] of this.producers) {
-				if (producers instanceof Map) {
-					for (const [, producer] of producers) {
-						if (producer && !producer.closed) {
-							producer.close()
-						}
+			for (const [userId, userProducers] of this.producers) {
+				for (const [id, { producer }] of userProducers) {
+					if (producer && !producer.closed) {
+						producer.close()
 					}
 				}
 			}

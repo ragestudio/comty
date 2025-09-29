@@ -1,28 +1,29 @@
 export default async function (client) {
 	try {
-		if (!client.currentMediaChannel) {
-			this.cleanupOrphanedResources(client)
+		const currentUserMediaChannel = this.usersMap.get(client.userId)
+
+		if (!currentUserMediaChannel) {
 			return
 		}
 
-		const channelId = client.currentMediaChannel
-
-		const channelInstance = this.instances.get(channelId)
+		const channelInstance = this.instances.get(currentUserMediaChannel)
 
 		if (!channelInstance) {
-			client.currentMediaChannel = null
-			this.cleanupOrphanedResources(client)
 			return
 		}
+
+		const channelId = channelInstance.channelId
 
 		// Leave channel
 		await channelInstance.leaveClient(client)
 
-		// Reset client state
-		client.currentMediaChannel = null
+		// delete user from client list
+		this.usersMap.delete(client.userId)
 
 		// Notify client
-		await client.emit("media:channel:leave", { channelId })
+		await client.emit("media:channel:leave", {
+			channelId: channelId,
+		})
 
 		// Cleanup empty channel
 		if (channelInstance.clients.size === 0) {
