@@ -1,6 +1,12 @@
+import setFind from "@shared-utils/setFind"
+
 export default async function (client, payload) {
 	try {
-		if (!this.clients.has(client)) {
+		const clientInst = setFind(this.clients, (c) => {
+			return c.userId === client.userId
+		})
+
+		if (!clientInst) {
 			throw new Error("Client not in channel")
 		}
 
@@ -10,7 +16,7 @@ export default async function (client, payload) {
 			throw new Error("Missing required parameters")
 		}
 
-		const transport = client.transports.get(transportId)
+		const transport = clientInst.transports.get(transportId)
 
 		if (!transport) {
 			throw new Error("Transport not found")
@@ -38,7 +44,7 @@ export default async function (client, payload) {
 
 		this.consumers.get(client.userId).push(consumer)
 
-		this._setupConsumerEvents(consumer, client)
+		this._setupConsumerEvents(consumer, clientInst)
 
 		return {
 			id: consumer.id,

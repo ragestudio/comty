@@ -1,4 +1,6 @@
+//import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
+
 import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
@@ -17,6 +19,9 @@ export default class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/groups",
+		nats: {
+			enabled: true,
+		},
 	}
 
 	middlewares = {

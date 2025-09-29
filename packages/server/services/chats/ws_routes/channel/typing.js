@@ -19,7 +19,7 @@ export default {
 			client.userId,
 		)
 
-		const userData = client.socket.context.user
+		const userData = client.user ?? client.socket.context.user
 
 		await channel.sendEventToChannelTopic("channel:typing", {
 			user_id: client.userId,

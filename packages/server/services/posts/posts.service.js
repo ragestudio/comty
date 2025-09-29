@@ -18,6 +18,9 @@ export default class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/posts",
+		nats: {
+			enabled: true,
+		},
 	}
 
 	middlewares = {

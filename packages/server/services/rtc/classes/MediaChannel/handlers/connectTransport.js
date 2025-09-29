@@ -1,11 +1,17 @@
+import setFind from "@shared-utils/setFind"
+
 export default async function (client, payload) {
 	try {
-		if (!this.clients.has(client)) {
+		const clientInst = setFind(this.clients, (c) => {
+			return c.userId === client.userId
+		})
+
+		if (!clientInst) {
 			throw new Error("Client not in channel")
 		}
 
 		const { transportId, dtlsParameters } = payload
-		const transport = client.transports.get(transportId)
+		const transport = clientInst.transports.get(transportId)
 
 		if (!transport) {
 			throw new Error("Transport not found")

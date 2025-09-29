@@ -10,7 +10,7 @@ export default async function (req, res) {
 		// eg. /users/123/data -> /users
 		const namespace = req.path.split("/")[1]
 
-		registry = this.paths.get(namespace)
+		registry = this.targets.get(namespace)
 
 		if (!registry) {
 			res.status(404).json({

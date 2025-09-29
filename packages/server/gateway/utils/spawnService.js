@@ -11,9 +11,11 @@ export default async ({
 	onClose,
 	onError,
 	onIPCData,
+	env,
 }) => {
 	const instanceEnv = {
 		...process.env,
+		...env,
 		lb_service_id: service.id,
 		lb_service_path: service.path,
 		lb_service_version: service.version,

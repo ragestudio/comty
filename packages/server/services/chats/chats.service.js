@@ -20,6 +20,9 @@ class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/chats",
+		nats: {
+			enabled: true,
+		},
 	}
 
 	middlewares = {

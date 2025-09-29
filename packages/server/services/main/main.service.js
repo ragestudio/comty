@@ -1,10 +1,9 @@
+//import Server from "../../../../linebridge/server/src/server"
 import { Server } from "linebridge"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
-
-import InjectedAuth from "@shared-lib/injectedAuth"
 
 export default class API extends Server {
 	static refName = "main"
@@ -16,6 +15,9 @@ export default class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/main",
+		nats: {
+			enabled: true,
+		},
 	}
 
 	middlewares = {
@@ -23,28 +25,9 @@ export default class API extends Server {
 		...require("@shared-middlewares").default,
 	}
 
-	handleWsUpgrade = async (context, token, res) => {
-		if (!token) {
-			return res.upgrade(context)
-		}
-
-		context = await InjectedAuth(context, token, res).catch(() => {
-			res.close(401, "Failed to verify auth token")
-			return false
-		})
-
-		if (!context || !context.user) {
-			res.close(401, "Unauthorized or missing auth token")
-			return false
-		}
-
-		return res.upgrade(context)
-	}
-
 	handleWsConnection = async (socket) => {
-		// perform only authenticated sockets operations
 		if (socket.context.user) {
-			console.log(`[WS] @${socket.context.user.username} connected`)
+			console.log(`@${socket.context.user.username} connected`)
 
 			try {
 				this.contexts.userConnections.handleConnection(
@@ -59,10 +42,8 @@ export default class API extends Server {
 	}
 
 	handleWsDisconnect = async (socket) => {
-		// perform only authenticated sockets operations
-
 		if (socket.context.user) {
-			console.log(`[WS] @${socket.context.user.username} disconnected`)
+			console.log(`@${socket.context.user.username} disconnected`)
 
 			try {
 				this.contexts.userConnections.handleDisconnection(

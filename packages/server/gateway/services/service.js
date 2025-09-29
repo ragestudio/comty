@@ -1,5 +1,4 @@
 import chokidar from "chokidar"
-import path from "path"
 import { minimatch } from "minimatch"
 import spawnService from "../utils/spawnService"
 import getIgnoredFiles from "../utils/getIgnoredFiles"
@@ -29,6 +28,7 @@ export default class Service {
 		this.cwd = config.cwd
 		this.isProduction = config.isProduction
 		this.internalIp = config.internalIp
+		this.env = config.env
 
 		this.instance = null
 		this.fileWatcher = null
@@ -61,6 +61,7 @@ export default class Service {
 			onClose: this.handleClose.bind(this),
 			onError: this.handleError.bind(this),
 			onIPCData: this.handleIPCData.bind(this),
+			env: this.env,
 		})
 
 		// if debug flag is enabled, attach logs on start

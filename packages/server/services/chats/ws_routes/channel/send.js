@@ -19,6 +19,9 @@ export default {
 			client.userId,
 		)
 
-		return await channel.write(client.socket.context.user, payload)
+		return await channel.write(
+			client.user ?? client.socket.context.user,
+			payload,
+		)
 	},
 }

@@ -1,29 +1,20 @@
 export default async function (client) {
 	try {
-		if (!client.transports) {
-			client.transports = new Map()
-		}
+		client.transports = new Map()
 
-		if (!client.voiceState) {
-			client.voiceState = {
-				muted: false,
-				deafened: false,
-			}
-		}
-
-		// check if client is already joined
-		if (this.clients.has(client)) {
-			// disconnect
-			await this.leaveClient(client)
+		client.voiceState = {
+			muted: false,
+			deafened: false,
 		}
 
 		// add to set of clients
 		this.clients.add(client)
 
 		const clients = Array.from(this.clients)
-		const otherClients = clients.filter((c) => c.userId !== client.userId)
 
 		// Notify other clients about new client
+		const otherClients = clients.filter((c) => c.userId !== client.userId)
+
 		for (const otherClient of otherClients) {
 			await otherClient.emit(`media:channel:client:joined`, {
 				userId: client.userId,

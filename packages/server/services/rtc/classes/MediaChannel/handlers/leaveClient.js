@@ -1,19 +1,28 @@
+import setFind from "@shared-utils/setFind"
+
 export default async function (client) {
 	try {
-		this.clients.delete(client)
+		const clientInst = setFind(this.clients, (c) => {
+			return c.userId === client.userId
+		})
+
+		if (!clientInst) {
+			return null
+		}
+
+		this.clients.delete(clientInst)
+
+		const clientProducers = this.producers.get(client.userId)
 
 		const otherClients = Array.from(this.clients).filter(
 			(c) => c.userId !== client.userId,
 		)
 
-		// Cleanup producers
-		const producers = this.producers.get(client.userId)
-
-		if (producers instanceof Map) {
-			for (const [id, producer] of producers) {
+		if (clientProducers instanceof Map) {
+			for (const [id, { producer }] of clientProducers) {
 				if (producer && !producer.closed) {
 					producer.close()
-					producers.delete(id)
+					clientProducers.delete(id)
 
 					// Notify other clients
 					for (const otherClient of otherClients) {
@@ -30,10 +39,10 @@ export default async function (client) {
 		}
 
 		// Cleanup consumers
-		const consumers = this.consumers.get(client.userId)
+		const clientConsumers = this.consumers.get(client.userId)
 
-		if (Array.isArray(consumers)) {
-			for (const consumer of consumers) {
+		if (Array.isArray(clientConsumers)) {
+			for (const consumer of clientConsumers) {
 				if (consumer && !consumer.closed) {
 					consumer.close()
 				}
@@ -43,14 +52,14 @@ export default async function (client) {
 		}
 
 		// Cleanup transports
-		if (client.transports) {
-			for (const [, transport] of client.transports) {
+		if (clientInst.transports) {
+			for (const [, transport] of clientInst.transports) {
 				if (!transport.closed) {
 					transport.close()
 				}
 			}
 
-			client.transports.clear()
+			clientInst.transports.clear()
 		}
 
 		// Notify other clients about client leaving

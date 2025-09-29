@@ -2,9 +2,10 @@ import uexpress from "ultimate-express"
 import { URL } from "url"
 
 import InternalConsole from "./console"
+import WebsocketGateway from "./websocket"
 
 import MainRequest from "./requests/main"
-import WebsocketRequest from "./requests/websocket"
+import PingRequest from "./requests/ping"
 import ProxyRequest from "./requests/proxy"
 
 export default class Ultra {
@@ -12,18 +13,23 @@ export default class Ultra {
 		this.config = config
 		this.http = new uexpress()
 		this.base = base
+
+		this.console = new InternalConsole()
 	}
 
-	paths = new Map()
+	targets = new Map()
+	websocketServices = new Map()
 	events = new Map()
-	websockets = new Map()
 
-	console = new InternalConsole()
+	websocket = new WebsocketGateway(this)
 
 	async initialize() {
-		this.http.uwsApp.ws("/", new WebsocketRequest(this))
+		await this.websocket.initialize()
+
+		this.http.uwsApp.ws("/", this.websocket)
 
 		this.http.get("/", MainRequest.bind(this))
+		this.http.get("/ping", PingRequest.bind(this))
 		this.http.all("/*", ProxyRequest.bind(this))
 
 		this.http.listen(this.config.port, this.config.internalIp)
@@ -57,42 +63,39 @@ export default class Ultra {
 			})
 		}
 
-		// handle registers websocket server
-		if (params.websocket) {
-			// this.console.debug("🏷️ Registering ws server:", {
-			// 	serviceId: params.serviceId,
-			// 	path: params.path,
-			// 	target: params.target,
-			// })
+		if (params.websocket === true) {
+			//this.console.debug("🏷️ Registering ws service:", params)
 
-			return this.websockets.set(params.serviceId, {
+			return this.websocketServices.set(params.serviceId, {
 				serviceId: params.serviceId,
 				path: params.path,
 				target: params.target,
+				url: params.url,
 			})
 		}
 
-		// register a http path
-		this.console.debug("🏷️ Registering path:", params)
-		return this.paths.set(params.path.split("/")[1], {
-			serviceId: params.serviceId,
-			path: params.path,
-			target: params.target,
-			url: params.url,
-		})
+		if (!params.websocket) {
+			// register a http path
+			//this.console.debug("🏷️ Registering target:", params)
+			return this.targets.set(params.path.split("/")[1], {
+				serviceId: params.serviceId,
+				target: params.url.origin,
+				url: new URL(params.url.origin),
+			})
+		}
 	}
 
 	async unregister(params) {
-		this.console.debug("🏷️ Unregistering path:", params)
-		this.paths.delete(params.path)
+		this.console.debug("🏷️ Unregistering target:", params)
+		this.targets.delete(params.path.split("/")[1])
 	}
 
 	async unregisterAllFromService(serviceId) {
 		this.console.debug("🏷️ Unregistering all paths for service:", serviceId)
 
-		for (const [path, service] of this.paths.entries()) {
+		for (const [path, service] of this.targets.entries()) {
 			if (service.serviceId === serviceId) {
-				this.paths.delete(path)
+				this.targets.delete(path)
 			}
 		}
 

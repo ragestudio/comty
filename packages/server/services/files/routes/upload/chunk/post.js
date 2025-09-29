@@ -10,7 +10,7 @@ const availableProviders = ["b2", "standard"]
 export default {
 	useContexts: ["cache", "limits"],
 	useMiddlewares: ["withAuthentication"],
-	fn: async (req) => {
+	fn: async (req, res, ctx) => {
 		if (!checkChunkUploadHeaders(req.headers)) {
 			throw new OperationError(400, "Missing header(s)")
 		}
@@ -18,21 +18,15 @@ export default {
 		const uploadId = `${req.headers["uploader-file-id"]}`
 
 		const workPath = path.resolve(
-			this.default.contexts.cache.constructor.cachePath,
+			ctx.cache.constructor.cachePath,
 			`${req.auth.session.user_id}-${uploadId}`,
 		)
 		const chunksPath = path.join(workPath, "chunks")
 		const assembledPath = path.join(workPath, "assembled")
 
 		const config = {
-			maxFileSize:
-				parseInt(this.default.contexts.limits.maxFileSizeInMB) *
-				1024 *
-				1024,
-			maxChunkSize:
-				parseInt(this.default.contexts.limits.maxChunkSizeInMB) *
-				1024 *
-				1024,
+			maxFileSize: parseInt(ctx.limits.maxFileSizeInMB) * 1024 * 1024,
+			maxChunkSize: parseInt(ctx.limits.maxChunkSizeInMB) * 1024 * 1024,
 			useCompression: true,
 			useProvider: req.headers["use-provider"] ?? "standard",
 		}

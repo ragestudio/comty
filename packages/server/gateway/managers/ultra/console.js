@@ -8,7 +8,7 @@ export default class InternalConsole {
 			transform(data, encoding, callback) {
 				callback(
 					null,
-					`${InternalConsole.lineHeader}::\n${data.toString()}`,
+					`${InternalConsole.lineHeader}:: ${data.toString()}`,
 				)
 			},
 		})

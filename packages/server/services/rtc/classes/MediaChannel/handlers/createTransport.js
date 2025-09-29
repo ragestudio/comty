@@ -1,6 +1,16 @@
+import setFind from "@shared-utils/setFind"
+
 export default async function (client) {
 	try {
-		if (!client.transports) {
+		const clientInst = setFind(this.clients, (c) => {
+			return c.userId === client.userId
+		})
+
+		if (!clientInst) {
+			return null
+		}
+
+		if (!clientInst.transports) {
 			client.transports = new Map()
 		}
 
@@ -13,6 +23,7 @@ export default async function (client) {
 				?.trim()
 
 		let announcedIp = globalThis.process.env.MEDIASOUP_ANNOUNCED_IP
+
 		if (!announcedIp) {
 			announcedIp =
 				globalThis.process.env.NODE_ENV === "production"
@@ -42,9 +53,10 @@ export default async function (client) {
 
 		const transport =
 			await this.router.createWebRtcTransport(transportConfig)
-		client.transports.set(transport.id, transport)
 
-		this._setupTransportEvents(transport, client)
+		clientInst.transports.set(transport.id, transport)
+
+		this._setupTransportEvents(transport, clientInst)
 
 		return {
 			id: transport.id,

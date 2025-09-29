@@ -16,16 +16,39 @@ import pkg from "../package.json"
 import ServiceManager from "./services/manager"
 import Service from "./services/service"
 import * as Managers from "./managers"
+import { InfisicalSDK } from "@infisical/sdk"
 
 global.debugFlag = process.env.DEBUG === "true"
 const isProduction = process.env.NODE_ENV === "production"
+
+global.nanoid = (t = 21) =>
+	crypto
+		.getRandomValues(new Uint8Array(t))
+		.reduce(
+			(t, e) =>
+				(t +=
+					(e &= 63) < 36
+						? e.toString(36)
+						: e < 62
+							? (e - 26).toString(36).toUpperCase()
+							: e > 62
+								? "-"
+								: "_"),
+			"",
+		)
 
 /**
  * Gateway class - Main entry point for the service orchestrator
  * Manages service discovery, spawning, and communication
  */
 export default class Gateway {
-	static gatewayMode = process.env.GATEWAY_MODE ?? "nginx"
+	constructor(params = {}) {
+		this.params = params
+	}
+
+	get gatewayMode() {
+		return this.params.mode ?? process.env.GATEWAY_MODE ?? "ultra"
+	}
 
 	get pkg() {
 		return pkg
@@ -73,7 +96,7 @@ export default class Gateway {
 	/**
 	 * Creates and initializes all service instances
 	 */
-	async createServiceInstances() {
+	createServiceInstances = async () => {
 		if (!debugFlag) {
 			console.log(`🔰 Starting all services, please wait...`)
 		}
@@ -92,6 +115,7 @@ export default class Gateway {
 				cwd: instanceBasePath,
 				isProduction,
 				internalIp: this.state.internalIp,
+				env: this.env,
 			}
 
 			// Create service instance
@@ -359,14 +383,48 @@ export default class Gateway {
 	 * Initialize the gateway and start all services
 	 */
 	async initialize() {
-		if (!Managers[this.constructor.gatewayMode]) {
-			console.error(
-				`❌ Gateway mode [${this.constructor.gatewayMode}] not supported`,
-			)
+		if (!Managers[this.gatewayMode]) {
+			console.error(`❌ Gateway mode [${this.gatewayMode}] not supported`)
 			return 0
 		}
 
 		onExit(this.onGatewayExit)
+
+		if (
+			process.env.INFISICAL_CLIENT_ID &&
+			process.env.INFISICAL_CLIENT_SECRET
+		) {
+			const envMode =
+				(global.FORCE_ENV ?? global.isProduction) ? "prod" : "dev"
+
+			console.log(
+				`[Gateway] 🔑 Loading env variables from INFISICAL in [${envMode}] mode...`,
+			)
+
+			const client = new InfisicalSDK()
+
+			await client.auth().universalAuth.login({
+				clientId: process.env.INFISICAL_CLIENT_ID,
+				clientSecret: process.env.INFISICAL_CLIENT_SECRET,
+			})
+
+			const secretsList = await client.secrets().listSecrets({
+				environment: envMode,
+				path: process.env.INFISICAL_PATH ?? "/",
+				projectId: process.env.INFISICAL_PROJECT_ID ?? null,
+				includeImports: false,
+			})
+
+			secretsList.secrets.forEach((secret) => {
+				if (!process.env[secret.secretKey]) {
+					process.env[secret.secretKey] = secret.secretValue
+				}
+			})
+
+			console.log(
+				`[Gateway] 🔑 Loaded ${secretsList.secrets.length} env variables from Infisical`,
+			)
+		}
 
 		// Increase limits to handle many services
 		process.stdout.setMaxListeners(150)
@@ -385,13 +443,13 @@ export default class Gateway {
 
 		console.log(comtyAscii)
 		console.log(
-			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} | ${this.constructor.gatewayMode} |\n`,
+			`\nRunning ${chalk.bgBlue(`${pkg.name}`)} | ${chalk.bgMagenta(`[v${pkg.version}]`)} | ${this.state.internalIp} | ${isProduction ? "production" : "development"} | ${this.gatewayMode} |\n`,
 		)
 
 		console.log(`📦 Found ${this.services.length} service(s)`)
 
 		// Initialize gateway
-		this.gateway = new Managers[this.constructor.gatewayMode](
+		this.gateway = new Managers[this.gatewayMode](
 			{
 				port: this.state.proxyPort,
 				internalIp: this.state.internalIp,
