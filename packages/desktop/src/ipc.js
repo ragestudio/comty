@@ -113,4 +113,14 @@ export default {
 
 		return await desktopCapturerModule.stopSystemAudioCapture()
 	},
+
+	"extensions:load": async (ctx, event, ...args) => {
+		//return await ctx.extensions.load(...args)
+	},
+	"extensions:list": (ctx, event, ...args) => {
+		return ctx.extensions
+	},
+	"extensions:install": async (ctx, event, ...args) => {
+		return await ctx.extensions.install(...args)
+	},
 }

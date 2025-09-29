@@ -14,7 +14,10 @@ contextBridge.exposeInMainWorld("__ELECTRON__", {
 		clear: () => settings.clear(),
 	},
 	restart: () => {
-		ipcRenderer.invoke("app:restart")
+		return ipcRenderer.invoke("app:restart")
+	},
+	extensions: () => {
+		return ipcRenderer.invoke("extensions:list")
 	},
 })
 
@@ -27,5 +30,21 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 	},
 	on: (channel, fn) => {
 		ipcRenderer.on(channel, fn)
+	},
+	handle: (channel, fn) => {
+		ipcRenderer.on(channel, async (...args) => {
+			try {
+				const data = await fn(...args)
+
+				ipcRenderer.send(`${channel}:reply`, {
+					data: data,
+					error: null,
+				})
+			} catch (error) {
+				ipcRenderer.send(`${channel}:reply`, {
+					error: error.message,
+				})
+			}
+		})
 	},
 })
