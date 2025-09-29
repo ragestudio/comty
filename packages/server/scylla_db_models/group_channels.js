@@ -7,6 +7,7 @@ export default {
 		kind: "varchar",
 		name: "varchar",
 		description: "varchar",
+		explicit: "boolean",
 		params: {
 			type: "map",
 			typeDef: "<varchar, varchar>",
