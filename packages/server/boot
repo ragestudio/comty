@@ -162,16 +162,6 @@ async function Boot(main) {
 		`[BOOT] Booting in [${global.isProduction ? "production" : "development"}] mode...`,
 	)
 
-	if (
-		process.env.INFISICAL_CLIENT_ID &&
-		process.env.INFISICAL_CLIENT_SECRET
-	) {
-		console.log(
-			`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`,
-		)
-		await injectEnvFromInfisical()
-	}
-
 	const instance = new main()
 
 	process.on("exit", (code) => {
