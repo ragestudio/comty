@@ -9,6 +9,7 @@ const cwdSSLDirPath = path.resolve(__dirname, ".ssl")
 if (fs.existsSync(rootSSLDirPath) || fs.existsSync(cwdSSLDirPath)) {
 	const rootKeyPath = path.resolve(rootSSLDirPath, "privkey.pem")
 	const rootCertPath = path.resolve(rootSSLDirPath, "cert.pem")
+
 	const cwdKeyPath = path.resolve(cwdSSLDirPath, "privkey.pem")
 	const cwdCertPath = path.resolve(cwdSSLDirPath, "cert.pem")
 
@@ -21,4 +22,22 @@ if (fs.existsSync(rootSSLDirPath) || fs.existsSync(cwdSSLDirPath)) {
 	}
 }
 
-new Gateway().initialize()
+const inst = new Gateway({
+	mode: process.env.GATEWAY_MODE ?? "ultra",
+	auth: {
+		serviceId: "users",
+		url: "/users/self",
+		method: "GET",
+		data: (data) => {
+			return {
+				session: {
+					user_id: data._id,
+					username: data.username,
+				},
+				user: data,
+			}
+		},
+	},
+})
+
+inst.initialize()
