@@ -1,7 +1,6 @@
 @import "@styles/layout.less";
 @import "@styles/animations.less";
 @import "@styles/vars.less";
-@import "@styles/fonts.less";
 @import "@styles/fixments.less";
 @import "@styles/mobile.less";
 
@@ -30,7 +29,7 @@
 		}
 
 		.page_header_wrapper {
-			top: 45px;
+			/* top: 45px; */
 
 			.page_header {
 				margin-top: 0;
@@ -485,6 +484,8 @@ svg {
 }
 
 .card {
+	position: relative;
+
 	display: flex;
 	flex-direction: column;
 
@@ -494,4 +495,24 @@ svg {
 	gap: 10px;
 
 	border-radius: 12px;
+
+	/* &:after {
+		content: "";
+		position: absolute;
+
+		top: 0;
+		left: 0;
+
+		border-radius: 12px;
+
+		width: 100%;
+		height: 100%;
+
+		opacity: 0.5;
+
+		background: url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500' %3E%3Cfilter id='noise' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='5' stitchTiles='stitch'/%3E%3CfeBlend mode='screen'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E");
+		mix-blend-mode: soft-light;
+
+		//filter: blur(2px);
+	} */
 }
