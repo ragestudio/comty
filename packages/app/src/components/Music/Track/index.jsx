@@ -117,7 +117,7 @@ const Track = React.memo((props) => {
 	return (
 		<div
 			id={props.track._id}
-			className={classnames("music-track", {
+			className={classnames("music-track bg-accent", {
 				["current"]: props.isCurrent,
 				["playing"]: props.isPlaying,
 			})}

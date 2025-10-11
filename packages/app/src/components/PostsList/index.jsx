@@ -94,7 +94,7 @@ const PostList = React.forwardRef((props, ref) => {
 	return (
 		<LoadMore
 			ref={ref}
-			className="post-list"
+			className="post-list bg-accent"
 			loadingComponent={LoadingComponent}
 			hasMore={props.hasMore}
 			onBottom={props.onLoadMore}

@@ -46,7 +46,7 @@ const Playlist = (props) => {
 	return (
 		<div
 			id={playlist._id}
-			className={classnames("playlist", {
+			className={classnames("playlist bg-accent", {
 				"cover-hovering": coverHover,
 				"row-mode": props.row === true,
 			})}
