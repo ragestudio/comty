@@ -263,7 +263,7 @@ export default class StyleCore extends Core {
 
 		// emit event to eventBus
 		app.eventBus.emit("style.update", {
-			...this.public.mutation,
+			...this.public.vars,
 		})
 
 		// apply to root
@@ -323,8 +323,13 @@ export default class StyleCore extends Core {
 	}
 
 	modifyTheme(update) {
-		StyleCore.storagedModifications = update
-		return this.updateVars(update)
+		StyleCore.storagedModifications = {
+			...StyleCore.storagedModifications,
+			...update,
+		}
+
+		this.updateVars(update)
+		app.eventBus.emit("style.modify", update)
 	}
 
 	resetToDefault() {
