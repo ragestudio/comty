@@ -3,31 +3,30 @@ import React from "react"
 import { DateTime } from "luxon"
 
 const TimeAgo = (props) => {
-    const [calculationInterval, setCalculationInterval] = React.useState(null)
-    const [text, setText] = React.useState("")
+	const [calculationInterval, setCalculationInterval] = React.useState(null)
+	const [text, setText] = React.useState("")
 
-    async function calculateRelative() {
-        const timeAgo = DateTime.fromISO(
-            props.time,
-            {
-                locale: app.cores.settings.get("language")
-            }
-        ).toRelative()
+	async function calculateRelative() {
+		const timeAgo = DateTime.fromISO(props.time, {
+			locale: app.cores.settings.get("language"),
+		}).toRelative()
 
-        setText(timeAgo)
-    }
+		setText(timeAgo)
+	}
 
-    React.useEffect(() => {
-        setCalculationInterval(setInterval(calculateRelative, props.interval ?? 3000))
+	React.useEffect(() => {
+		setCalculationInterval(
+			setInterval(calculateRelative, props.interval ?? 3000),
+		)
 
-        calculateRelative()
+		calculateRelative()
 
-        return () => {
-            clearInterval(calculationInterval)
-        }
-    }, [])
+		return () => {
+			clearInterval(calculationInterval)
+		}
+	}, [])
 
-    return text
+	return text
 }
 
 export default TimeAgo
