@@ -1,156 +1,16 @@
 import React from "react"
 import classNames from "classnames"
+import { motion, AnimatePresence } from "motion/react"
+import { Icons } from "@components/Icons"
 
-import updateElementTransform from "@utils/updateElementTransform"
-import useEscKey from "@hooks/useEscKey"
+import Image from "./components/Image"
 
 import "./index.less"
-
-const Image = ({ src, onDragEnableChange }) => {
-	const ref = React.useRef(null)
-
-	const [loaded, setLoaded] = React.useState(false)
-	const [dragEnabled, setDragEnabled] = React.useState(false)
-	const [isDragging, setIsDragging] = React.useState(false)
-
-	const zoomValue = React.useRef(1)
-	const position = React.useRef({ x: 0, y: 0 })
-	const dragStart = React.useRef({ x: 0, y: 0 })
-
-	const setZoom = (value) => {
-		zoomValue.current = value
-
-		if (ref.current) {
-			updateElementTransform(ref.current, "scale", zoomValue.current)
-		}
-
-		if (value > 1) {
-			setDragEnabled(true)
-		}
-
-		if (value === 1) {
-			setDragEnabled(false)
-			setPosition(0, 0)
-		}
-	}
-
-	const setPosition = (x, y) => {
-		position.current = { x, y }
-
-		if (ref.current) {
-			updateElementTransform(
-				ref.current,
-				"translate3d",
-				`${x}px, ${y}px, 0px`,
-			)
-		}
-	}
-
-	const handleMouseUp = React.useCallback(() => {
-		setIsDragging(false)
-	}, [])
-
-	const handleMouseDown = (e) => {
-		e.preventDefault()
-
-		if (!dragEnabled) {
-			return null
-		}
-
-		setIsDragging(true)
-
-		dragStart.current = {
-			x: e.clientX - position.current.x,
-			y: e.clientY - position.current.y,
-		}
-	}
-
-	const handleMouseMove = React.useCallback(
-		(e) => {
-			if (!isDragging || !dragEnabled) {
-				return null
-			}
-
-			const newX = e.clientX - dragStart.current.x
-			const newY = e.clientY - dragStart.current.y
-
-			setPosition(newX, newY)
-		},
-		[isDragging, dragEnabled],
-	)
-
-	const handleImageLoad = () => {
-		setLoaded(true)
-	}
-
-	const handleMouseScroll = React.useCallback((e) => {
-		e.preventDefault()
-
-		const delta = e.deltaY > 0 ? -0.3 : 0.3
-		const newZoom = Math.max(1, Math.min(5, zoomValue.current + delta))
-
-		setZoom(newZoom)
-	}, [])
-
-	React.useEffect(() => {
-		if (isDragging) {
-			document.addEventListener("mousemove", handleMouseMove)
-			document.addEventListener("mouseup", handleMouseUp)
-
-			return () => {
-				document.removeEventListener("mousemove", handleMouseMove)
-				document.removeEventListener("mouseup", handleMouseUp)
-			}
-		}
-	}, [isDragging, handleMouseMove, handleMouseUp])
-
-	React.useEffect(() => {
-		const container = ref.current?.parentElement
-
-		if (container) {
-			container.addEventListener("wheel", handleMouseScroll, {
-				passive: false,
-			})
-			return () => {
-				container.removeEventListener("wheel", handleMouseScroll)
-			}
-		}
-	}, [handleMouseScroll])
-
-	React.useEffect(() => {
-		if (typeof onDragEnableChange === "function") {
-			onDragEnableChange(dragEnabled)
-		}
-	}, [dragEnabled])
-
-	React.useEffect(() => {
-		setPosition(0, 0)
-		setZoom(1)
-		setLoaded(false)
-		setDragEnabled(false)
-	}, [src])
-
-	return (
-		<img
-			src={src}
-			className={classNames("lightbox__content__media", {
-				["loaded"]: loaded,
-				["drag-enabled"]: dragEnabled,
-				["dragging"]: isDragging,
-			})}
-			ref={ref}
-			onLoad={handleImageLoad}
-			onMouseDown={handleMouseDown}
-			onDragStart={(e) => e.preventDefault()}
-		/>
-	)
-}
 
 const Lightbox = ({ media, index, onClose }) => {
 	const [selectedKey, setSelectedKey] = React.useState(index ?? 0)
 	const [focusMode, setFocusMode] = React.useState(false)
-
-	//useEscKey(() => exit())
+	const [visible, setVisible] = React.useState(true)
 
 	const onKeyPress = React.useCallback((e) => {
 		if (e.key === "Escape") {
@@ -167,9 +27,25 @@ const Lightbox = ({ media, index, onClose }) => {
 	}, [])
 
 	const exit = React.useCallback(() => {
-		if (typeof onClose === "function") {
-			onClose()
+		setVisible(false)
+
+		setTimeout(() => {
+			if (typeof onClose === "function") {
+				onClose()
+			}
+		}, 300)
+	}, [])
+
+	const handleExitClick = React.useCallback((e) => {
+		if (focusMode) {
+			return null
 		}
+
+		if (!e.target.classList.contains("lightbox__content")) {
+			return null
+		}
+
+		exit()
 	}, [])
 
 	React.useEffect(() => {
@@ -181,34 +57,60 @@ const Lightbox = ({ media, index, onClose }) => {
 	}, [])
 
 	return (
-		<div
-			className={classNames("lightbox", {
-				["focus-mode"]: focusMode || media.length < 2,
-			})}
-		>
-			<div className="lightbox__header"></div>
-
-			<div className="lightbox__content">
-				<Image
-					src={media[selectedKey]}
-					onDragEnableChange={setFocusMode}
-				/>
-			</div>
-
-			<div className="lightbox__previews">
-				{media.map((src, index) => (
-					<div
-						className={classNames("lightbox__previews__item", {
-							active: index === selectedKey,
-						})}
-						key={index}
-						onClick={() => setSelectedKey(index)}
-					>
-						<img src={src} />
+		<AnimatePresence>
+			{visible && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{
+						duration: 0.25,
+						ease: [0, 0.71, 0.2, 1.01],
+					}}
+					className={classNames("lightbox", {
+						["focus-mode"]: focusMode || media.length < 2,
+					})}
+				>
+					<div className="lightbox__header">
+						<h1>
+							<Icons.X
+								onClick={exit}
+								style={{
+									cursor: "pointer",
+								}}
+							/>
+						</h1>
 					</div>
-				))}
-			</div>
-		</div>
+
+					<div
+						className="lightbox__content"
+						onClick={handleExitClick}
+					>
+						<Image
+							src={media[selectedKey]}
+							onDragEnableChange={setFocusMode}
+						/>
+					</div>
+
+					<div className="lightbox__previews">
+						{media.map((src, index) => (
+							<div
+								className={classNames(
+									"lightbox__previews__item",
+									{
+										active: index === selectedKey,
+									},
+								)}
+								key={index}
+								onClick={() => setSelectedKey(index)}
+							>
+								<img src={src} />
+							</div>
+						))}
+					</div>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	)
 }
 

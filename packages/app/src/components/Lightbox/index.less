@@ -11,6 +11,7 @@
 	align-items: center;
 
 	height: 100vh;
+	height: 100dvh;
 	width: 100vw;
 
 	padding: @wrapper_padding;
@@ -29,8 +30,27 @@
 		}
 	}
 
+	&__trigger {
+		position: absolute;
+		background-color: red;
+
+		z-index: 850;
+
+		width: 100%;
+		height: 100%;
+	}
+
 	&__header {
 		position: absolute;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: flex-end;
+
+		z-index: 1000;
+
 		top: 0;
 		left: 0;
 
@@ -41,6 +61,8 @@
 
 	&__content {
 		position: absolute;
+
+		z-index: 800;
 
 		top: 0;
 
@@ -89,6 +111,9 @@
 
 	&__previews {
 		position: absolute;
+
+		z-index: 900;
+
 		bottom: @wrapper_padding;
 
 		display: flex;
