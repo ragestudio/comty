@@ -1,15 +1,14 @@
 {
 	"defaultVars": {
 		"fontScale": "1",
-		"backgroundBlur": "10px",
+		"backgroundBlur": "0px",
 		"colorPrimary": "#ff6064",
 		"app-color": "#ff6064",
 		"danger-color": "#ff6064",
 		"backgroundColorTransparency": "0.8",
-		"backgroundImage": "",
 		"fontFamily": "'Noto Sans', sans-serif",
 		"layoutMargin": "unset",
-		"layoutPadding": "10px 20px 10px 10px",
+		"layoutPadding": "10px 10px 10px 10px",
 		"borderRadius": "8px",
 		"text-color-white": "#d2d2d2",
 		"text-color-black": "#000000",
@@ -40,12 +39,11 @@
 			"background-color-primary-2": "#f0f0f0",
 			"shadow-color": "#4b4b4b7c",
 			"background-color-accent-values": "240, 242, 245",
-			"background-color-accent": "#f0f2f5",
+
+			"background-color-accent": "rgba(240, 242, 245, 0.8)",
 			"background-color-contrast": "#4b4b4b",
 			"border-color": "rgba(75, 75, 75, 0.2)",
-			"border-color-solid": "#b3b3b3",
-			"sidebar-background-color": "var(--background-color-accent)",
-			"sidedrawer-background-color": "var(--background-color-accent)"
+			"border-color-solid": "#b3b3b3"
 		},
 		"dark": {
 			"bg_color_1": "38, 38, 38",
@@ -60,19 +58,17 @@
 			"shadow-color": "#1010107c",
 			"layoutBackgroundColor": "38, 38, 38",
 			"layout-background-contrast": "255, 255, 255",
-			"background-color-primary": "#262626",
+			"background-color-primary": "rgba(38, 38, 38, 0.8)",
 			"background-color-primary-2": "#2c2c2c",
 			"background-color-accent-values": "53, 53, 53",
-			"background-color-accent": "#353535",
+			"background-color-accent": "rgba(53, 53, 53, 0.8)",
 			"background-color-contrast": "#ffffff",
 			"background_disabled": "#0A0A0A",
 			"border-color": "rgba(170, 170, 170, 0.2)",
 			"border-color-solid": "#4c4c4c",
 			"header-text-color": "#d2d2d2",
 			"button-background-color": "var(--colorPrimary)",
-			"button-text-color": "var(--background-color-contrast)",
-			"sidebar-background-color": "var(--background-color-accent)",
-			"sidedrawer-background-color": "var(--background-color-accent)"
+			"button-text-color": "var(--background-color-contrast)"
 		}
 	}
 }
