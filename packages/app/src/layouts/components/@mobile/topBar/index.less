@@ -1,50 +1,50 @@
 @import "@styles/vars.less";
 
 #top-bar_spacer {
-    position: relative;
+	position: relative;
 
-    display: block;
+	display: block;
 
-    width: 100%;
-    height: calc(@top_bar_height + @top_bar_padding * 2);
-    min-height: calc(@top_bar_height + @top_bar_padding * 2);
+	width: 100%;
+	height: calc(@top_bar_height + @top_bar_padding * 2);
+	min-height: calc(@top_bar_height + @top_bar_padding * 2);
 }
 
 .top-bar_wrapper {
-    position: absolute;
+	position: absolute;
 
-    top: 0;
-    left: 0;
+	top: 0;
+	left: 0;
 
-    z-index: 310;
+	z-index: 310;
 
-    padding: 10px;
+	padding: 10px;
 
-    width: 100%;
+	width: 100%;
 }
 
 .top-bar {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 
-    background-color: rgba(var(--background-color-accent-values), 0.8);
-    backdrop-filter: blur(2px);
+	/* background-color: rgba(var(--background-color-accent-values), 0.8);
+	backdrop-filter: blur(2px); */
 
-    border-radius: 12px;
+	border-radius: 12px;
 
-    width: 100%;
-    height: @top_bar_height;
+	width: 100%;
+	height: @top_bar_height;
 
-    padding: 10px;
+	padding: 10px;
 
-    box-shadow: @card-shadow;
+	box-shadow: @card-shadow;
 
-    transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 
-    color: var(--text-color);
+	color: var(--text-color);
 }

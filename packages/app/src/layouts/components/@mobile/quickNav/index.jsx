@@ -1,6 +1,7 @@
-import React from "react"
 import classnames from "classnames"
 import { createIconRender } from "@components/Icons"
+
+import "./index.less"
 
 export const QuickNavMenuItems = [
 	{
@@ -19,22 +20,14 @@ export const QuickNavMenuItems = [
 		id: "spaces",
 		icon: "MessageSquareQuote",
 		label: "Spaces",
-		location: "/groups",
-		disabled: true,
-	},
-	{
-		id: "marketplace",
-		icon: "Grid2x2Plus",
-		label: "Marketplace",
-		location: "/marketplace",
-		disabled: true,
+		location: "/spaces",
 	},
 ]
 
 export const QuickNavMenu = ({ visible }) => {
 	return (
 		<div
-			className={classnames("quick-nav", {
+			className={classnames("quick-nav bg-accent", {
 				["active"]: visible,
 			})}
 		>

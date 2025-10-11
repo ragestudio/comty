@@ -3,20 +3,17 @@ import * as antd from "antd"
 import classnames from "classnames"
 import { motion, AnimatePresence } from "motion/react"
 
-import { Icons, createIconRender } from "@components/Icons"
+import { createIconRender } from "@components/Icons"
 
-import {
-	WithPlayerContext,
-	Context,
-	usePlayerStateContext,
-} from "@contexts/WithPlayerContext"
+import CallButton from "./CallButton"
+import PlayerButton from "./PlayerButton"
+import AccountButton from "./AccountButton"
 
 import {
 	QuickNavMenuItems,
 	QuickNavMenu,
 } from "@layouts/components/@mobile/quickNav"
 
-import PlayerView from "@pages/@mobile-views/player"
 import CreatorView from "@pages/@mobile-views/creator"
 
 import "./index.less"
@@ -37,147 +34,11 @@ const tourSteps = [
 	},
 ]
 
-const openPlayerView = () => {
-	app.layout.draggable.open("player", PlayerView, {
-		snapPoints: ["850px", 1],
-	})
-}
-
 const openCreator = () => {
 	app.layout.draggable.open("creator", CreatorView)
 }
 
-const PlayerButton = (props) => {
-	const [currentManifest, setCurrentManifest] = React.useState(null)
-	const [coverAnalyzed, setCoverAnalyzed] = React.useState(null)
-
-	const [player] = usePlayerStateContext((state) => {
-		setCurrentManifest((prev) => {
-			if (!state.track_manifest) {
-				return null
-			}
-
-			if (prev?._id !== state.track_manifest?._id) {
-				return state.track_manifest
-			}
-
-			return prev
-		})
-	})
-
-	React.useEffect(() => {
-		if (currentManifest) {
-			const track = app.cores.player.track()
-
-			if (!app.layout.draggable.exists("player")) {
-				openPlayerView()
-			}
-
-			if (track?.analyzeCoverColor) {
-				track
-					.analyzeCoverColor()
-					.then((analysis) => {
-						setCoverAnalyzed(analysis)
-					})
-					.catch((err) => {
-						console.error(err)
-					})
-			}
-		}
-	}, [currentManifest])
-
-	const isPlaying = player && player?.playback_status === "playing"
-
-	return (
-		<div
-			className={classnames("player_btn", {
-				bounce: isPlaying,
-			})}
-			style={{
-				"--average-color": coverAnalyzed?.rgba,
-				"--color": coverAnalyzed?.isDark
-					? "var(--text-color-white)"
-					: "var(--text-color-black)",
-			}}
-			onClick={openPlayerView}
-		>
-			{isPlaying ? <Icons.Music2 /> : <Icons.Pause />}
-		</div>
-	)
-}
-
-const AccountButton = React.forwardRef((props, ref) => {
-	const user = app.userData
-
-	const handleClick = () => {
-		if (!user) {
-			return app.navigation.goAuth()
-		}
-
-		return app.navigation.goToAccount()
-	}
-
-	const handleHold = () => {
-		app.layout.draggable.actions({
-			list: [
-				{
-					key: "settings",
-					icon: "Settings",
-					label: "Settings",
-					onClick: () => {
-						app.navigation.goToSettings()
-					},
-				},
-				{
-					key: "account",
-					icon: "User",
-					label: "Account",
-					onClick: () => {
-						app.navigation.goToAccount()
-					},
-				},
-				{
-					key: "logout",
-					icon: "LogOut",
-					label: "Logout",
-					danger: true,
-					onClick: () => {
-						app.auth.logout()
-					},
-				},
-			],
-		})
-	}
-
-	return (
-		<div
-			key="account"
-			id="account"
-			className="item"
-			ref={ref}
-			onClick={handleClick}
-			onContextMenu={handleHold}
-			context-menu="ignore"
-		>
-			<div className="icon">
-				{user ? (
-					<antd.Avatar
-						shape="square"
-						src={app.userData.avatar}
-					/>
-				) : (
-					createIconRender("Login")
-				)}
-			</div>
-		</div>
-	)
-})
-
-AccountButton.displayName = "AccountButton"
-
 export class BottomBar extends React.Component {
-	static contextType = Context
-
 	state = {
 		visible: false,
 		quickNavVisible: false,
@@ -262,7 +123,7 @@ export class BottomBar extends React.Component {
 		}
 	}
 
-	handleNavTouchStart = (e) => {
+	handleNavTouchStart = () => {
 		this._navTouchStart = setTimeout(() => {
 			this.setState({ quickNavVisible: true })
 
@@ -369,13 +230,13 @@ export class BottomBar extends React.Component {
 
 	render() {
 		if (this.state.render) {
-			return <div className="bottomBar">{this.state.render}</div>
+			return (
+				<div className="bottomBar bg-accent">{this.state.render}</div>
+			)
 		}
 
 		const heightValue = Number(
-			app.cores.style
-				.getDefaultVar("bottom-bar-height")
-				.replace("px", ""),
+			app.cores.style.vars["bottom-bar-height"].replace("px", ""),
 		)
 
 		return (
@@ -411,7 +272,7 @@ export class BottomBar extends React.Component {
 								damping: 20,
 							}}
 						>
-							<div className="bottomBar">
+							<div className="bottomBar bg-accent">
 								<div className="items">
 									<div
 										key="creator"
@@ -427,11 +288,8 @@ export class BottomBar extends React.Component {
 										</div>
 									</div>
 
-									{this.context.track_manifest && (
-										<div className="item">
-											<PlayerButton />
-										</div>
-									)}
+									<PlayerButton />
+									<CallButton />
 
 									<div
 										key="navigator"
@@ -475,10 +333,4 @@ export class BottomBar extends React.Component {
 	}
 }
 
-export default (props) => {
-	return (
-		<WithPlayerContext>
-			<BottomBar {...props} />
-		</WithPlayerContext>
-	)
-}
+export default BottomBar
