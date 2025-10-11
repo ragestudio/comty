@@ -1,6 +1,3 @@
-import { RTEngineClient } from "linebridge-client"
-import SessionModel from "@models/session"
-
 export default class SyncRoom {
 	constructor(player) {
 		this.player = player
@@ -28,20 +25,26 @@ export default class SyncRoom {
 
 		this.player.eventBus.on("player.state.update", this.pushState)
 
-		this.socket.on(`sync_room:${app.userData._id}:request_lyrics`, async () => {
-			let lyrics = null
+		this.socket.on(
+			`sync_room:${app.userData._id}:request_lyrics`,
+			async () => {
+				let lyrics = null
 
-			if (this.player.queue.currentItem) {
-				lyrics =
-					await this.player.queue.currentItem.manifest.serviceOperations.fetchLyrics(
-						{
-							preferTranslation: false,
-						},
-					)
-			}
+				if (this.player.queue.currentItem) {
+					lyrics =
+						await this.player.queue.currentItem.manifest.serviceOperations.fetchLyrics(
+							{
+								preferTranslation: false,
+							},
+						)
+				}
 
-			this.socket.emit(`sync_room:${app.userData._id}:request_lyrics`, lyrics)
-		})
+				this.socket.emit(
+					`sync_room:${app.userData._id}:request_lyrics`,
+					lyrics,
+				)
+			},
+		)
 	}
 
 	stop = async () => {
@@ -179,16 +182,6 @@ export default class SyncRoom {
 	}
 
 	createSocket = async () => {
-		if (this.socket) {
-			await this.socket.destroy()
-		}
-
-		this.socket = new RTEngineClient({
-			refName: "sync-room",
-			url: app.cores.api.client().mainOrigin + "/music",
-			token: SessionModel.token,
-		})
-
-		await this.socket.connect()
+		this.socket = app.cores.api.socket()
 	}
 }
