@@ -26,7 +26,6 @@ const SettingItemExtraActions = ({ setting, ctx, actions }) => {
 	}
 
 	return actions.map((action, index) => {
-		return React.isValidElement(action) ? "elem" : "niputaidea"
 		if (typeof action === "function") {
 			return React.createElement(action, {
 				ctx: ctx,
