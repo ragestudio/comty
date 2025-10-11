@@ -19,7 +19,7 @@ const Tweaks = {
 			return value ? parseInt(value.replace("px", "")) : 0
 		},
 		updateValue: (value) => {
-			app.cores.style.mutateTheme({
+			app.cores.style.modifyTheme({
 				backgroundBlur: `${value}px`,
 			})
 		},
@@ -32,7 +32,7 @@ const Tweaks = {
 			return value ? parseFloat(value) : 1
 		},
 		updateValue: (value) => {
-			app.cores.style.mutateTheme({
+			app.cores.style.modifyTheme({
 				backgroundColorTransparency: value,
 			})
 		},
@@ -43,7 +43,7 @@ const Tweaks = {
 			return app.cores.style.vars["backgroundSize"]
 		},
 		updateValue: (value) => {
-			app.cores.style.mutateTheme({
+			app.cores.style.modifyTheme({
 				backgroundSize: value,
 			})
 		},
@@ -80,7 +80,7 @@ const Tweaks = {
 			return app.cores.style.vars["backgroundPosition"]
 		},
 		updateValue: (value) => {
-			app.cores.style.mutateTheme({
+			app.cores.style.modifyTheme({
 				backgroundPosition: value,
 			})
 		},
@@ -109,7 +109,7 @@ const Tweaks = {
 			return app.cores.style.vars["backgroundRepeat"]
 		},
 		updateValue: (value) => {
-			app.cores.style.mutateTheme({
+			app.cores.style.modifyTheme({
 				backgroundRepeat: value,
 			})
 		},
