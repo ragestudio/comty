@@ -72,6 +72,9 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+		decorations: {
+			type: Object,
+		},
 		bot: {
 			type: Boolean,
 			default: false,
