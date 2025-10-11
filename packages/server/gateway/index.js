@@ -481,7 +481,8 @@ export default class Gateway {
 
 	startRELP() {
 		// Initialize REPL interface
-		new RELP({
+		new RELP(this, {
+			gateway: () => this,
 			attachAllServicesSTD: () =>
 				this.serviceManager.attachAllServicesStd(),
 			detachAllServicesSTD: () =>

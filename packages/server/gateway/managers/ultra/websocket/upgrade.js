@@ -14,8 +14,10 @@ function getToken(req) {
 }
 
 export default async function (res, req, context) {
+	const abortController = new AbortController()
+
 	res.onAborted(() => {
-		console.log("aborted")
+		abortController.abort()
 	})
 
 	const ctx = {
@@ -29,7 +31,15 @@ export default async function (res, req, context) {
 
 	const data = await handleUpgrade.bind(this)(res, res, ctx)
 
+	if (abortController.signal.aborted) {
+		return null
+	}
+
 	res.cork(() => {
+		if (abortController.signal.aborted) {
+			return null
+		}
+
 		res.upgrade(
 			{
 				...ctx,

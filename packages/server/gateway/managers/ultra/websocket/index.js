@@ -24,8 +24,9 @@ export default class WebsocketGateway {
 	codec = JSONCodec()
 
 	initialize = async () => {
+		console.log(`Connecting to NATS server ["nats://localhost:4222"]`)
 		this.nats = await connect({
-			servers: "nats://127.0.0.1:4222",
+			servers: "nats://localhost:4222",
 		})
 
 		this.jetstream = await this.nats.jetstream()

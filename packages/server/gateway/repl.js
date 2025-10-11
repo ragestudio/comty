@@ -1,5 +1,6 @@
 export default class RELP {
-	constructor(handlers) {
+	constructor(gateway, handlers) {
+		this.gateway = gateway
 		this.handlers = handlers
 		this.initCommandLine()
 	}
@@ -143,6 +144,15 @@ export default class RELP {
 	}
 
 	commands = [
+		{
+			cmd: "list",
+			aliases: ["ls"],
+			fn: (cb) => {
+				const gateway = this.handlers.gateway()
+
+				console.log(gateway.serviceRegistry)
+			},
+		},
 		{
 			cmd: "select",
 			aliases: ["s", "sel"],

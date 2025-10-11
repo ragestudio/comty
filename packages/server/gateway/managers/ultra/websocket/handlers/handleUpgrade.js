@@ -12,7 +12,9 @@ export default async function (res, req, ctx) {
 			const targetOrigin = this.gateway.targets.get(authParams.serviceId)
 
 			if (!targetOrigin) {
-				return failed("No target found for service id")
+				throw new Error(
+					`Service [${authParams.serviceId}] not found in targets`,
+				)
 			}
 
 			authParams.url = new URL(

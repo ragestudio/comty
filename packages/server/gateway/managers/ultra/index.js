@@ -28,6 +28,24 @@ export default class Ultra {
 
 		this.http.uwsApp.ws("/", this.websocket)
 
+		this.http.use((req, res, next) => {
+			res.setHeader("Access-Control-Allow-Origin", "*")
+			res.setHeader("Access-Control-Allow-Headers", "*")
+			res.setHeader(
+				"Access-Control-Allow-Methods",
+				"GET, POST, DELETE, PUT, PATCH, OPTIONS",
+			)
+
+			res.setHeader("ultra-gateway", this.base.pkg.version)
+			res.setHeader("x-powered-by", "linebridge")
+
+			if (req.method === "OPTIONS") {
+				return res.status(204).end()
+			}
+
+			next()
+		})
+
 		this.http.get("/", MainRequest.bind(this))
 		this.http.get("/ping", PingRequest.bind(this))
 		this.http.all("/*", ProxyRequest.bind(this))
@@ -77,6 +95,7 @@ export default class Ultra {
 		if (!params.websocket) {
 			// register a http path
 			//this.console.debug("🏷️ Registering target:", params)
+
 			return this.targets.set(params.path.split("/")[1], {
 				serviceId: params.serviceId,
 				target: params.url.origin,

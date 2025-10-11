@@ -37,6 +37,11 @@ export default async function (req, res) {
 
 		proxyReq.on("response", (proxyRes) => {
 			if (!res.headersSent) {
+				// remove transfer-encoding
+				if (proxyRes.headers["transfer-encoding"]) {
+					delete proxyRes.headers["transfer-encoding"]
+				}
+
 				for (const [key, value] of Object.entries(proxyRes.headers)) {
 					res.setHeader(key, value)
 				}
