@@ -8,7 +8,7 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "marketplace"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3005
+	static listenPort = 3005
 
 	static bypassCors = true
 	static useMiddlewares = ["logs"]

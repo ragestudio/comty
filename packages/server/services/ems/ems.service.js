@@ -6,7 +6,7 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "ems"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3007
+	static listenPort = 3007
 
 	static bypassCors = true
 	static useMiddlewares = ["logs"]

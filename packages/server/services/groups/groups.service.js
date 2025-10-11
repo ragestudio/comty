@@ -11,7 +11,7 @@ import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "groups"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3012
+	static listenPort = 3012
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true

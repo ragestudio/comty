@@ -7,10 +7,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "notifications"
-	static enableWebsockets = true
-	static wsRoutesPath = `${__dirname}/ws_routes`
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3009
+	static listenPort = 3009
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,
@@ -25,8 +25,6 @@ class API extends Server {
 		await this.contexts.db.initialize()
 		await this.contexts.redis.initialize()
 	}
-
-	handleWsAuth = require("@shared-lib/handleWsAuth").default
 }
 
 Boot(API)

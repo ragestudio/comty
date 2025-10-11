@@ -7,7 +7,7 @@ import UserConnections from "@shared-classes/UserConnections"
 
 export default class API extends Server {
 	static refName = "main"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3000
+	static listenPort = 3000
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true

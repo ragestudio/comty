@@ -12,7 +12,7 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "files"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3002
+	static listenPort = 3002
 
 	static bypassCors = true
 	static useMiddlewares = ["logs"]
