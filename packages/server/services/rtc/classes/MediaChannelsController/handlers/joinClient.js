@@ -37,8 +37,6 @@ export default async function (client, channelId) {
 				group._id,
 				channelId,
 			)
-
-			this.instances.set(channelId, channelInstance)
 		}
 
 		// Set client channel

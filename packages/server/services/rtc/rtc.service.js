@@ -4,7 +4,6 @@ import { Server } from "linebridge"
 import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import InjectedAuth from "@shared-lib/injectedAuth"
 import SharedMiddlewares from "@shared-middlewares"
 
 import MediaChannelsController from "@classes/MediaChannelsController"
@@ -12,7 +11,7 @@ import UserCalls from "@classes/UserCalls"
 
 export default class API extends Server {
 	static refName = "rtc"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3011
+	static listenPort = 3011
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true

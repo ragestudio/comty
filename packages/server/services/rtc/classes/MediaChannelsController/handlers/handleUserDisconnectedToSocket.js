@@ -29,9 +29,11 @@ export default async function (userId) {
 
 		// if there is a channel, leave it
 		if (currentUserChannel) {
-			const channel = this.channels.get(currentUserChannel)
+			const channel = this.instances.get(currentUserChannel)
 
-			await channel.leaveClient(userId)
+			await channel.leaveClient({
+				userId: userId,
+			})
 		}
 	} catch (error) {
 		console.error("Error handling user disconnection:", error)

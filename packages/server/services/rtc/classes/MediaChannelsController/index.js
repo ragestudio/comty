@@ -111,6 +111,8 @@ export default class MediaChannelsController {
 
 		await channelInstance.initialize()
 
+		this.instances.set(channelId, channelInstance)
+
 		return channelInstance
 	}
 
