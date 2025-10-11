@@ -27,6 +27,10 @@ const DEFAULT_POST_POLICY = {
 		"video/mp4",
 		"video/webm",
 		"video/quicktime",
+		"audio/mp3",
+		"audio/wav",
+		"audio/ogg",
+		"audio/mpeg",
 	],
 	maximunFilesPerRequest: 10,
 }
