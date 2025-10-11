@@ -2,7 +2,7 @@ import React from "react"
 import classNames from "classnames"
 import { Icons } from "@components/Icons"
 import { Skeleton, Button } from "antd"
-import mimetypes from "mime"
+import mime from "mime"
 
 import Image from "@components/Image"
 
@@ -39,36 +39,35 @@ const Attachment = React.memo((props) => {
 		}
 
 		const getMediaType = async () => {
-			let extension = null
+			setLoaded(false)
+
+			let mimetype = null
 
 			// get media type by parsing the url
 			const mediaExtname = /\.([a-zA-Z0-9]+)$/.exec(url)
 
 			if (mediaExtname) {
-				extension = mediaExtname[1]
+				mimetype = mime.getType(mediaExtname[1])
 			} else {
 				// try to get media by creating requesting the url
 				const response = await fetch(url, {
 					method: "HEAD",
 				})
 
-				extension = response.headers.get("content-type").split("/")[1]
+				mimetype = response.headers.get("content-type")
 			}
 
-			extension = extension.toLowerCase()
+			mimetype = mimetype.toLowerCase()
 
-			if (!extension) {
+			if (!mimetype) {
 				setLoaded(true)
 
-				console.error("Failed to get media type", url, extension)
+				console.error("Failed to get media type", url, mimetype)
 
 				return
 			}
 
-			const mimeType = mimetypes.getType(extension)
-
-			setMimeType(mimeType)
-
+			setMimeType(mimetype)
 			setLoaded(true)
 		}
 
@@ -83,22 +82,20 @@ const Attachment = React.memo((props) => {
 				}
 				case "video": {
 					return (
-						<video controls>
-							<source
-								src={url}
-								type={mimeType}
-							/>
-						</video>
+						<video
+							controls
+							src={url}
+							type={mimeType}
+						/>
 					)
 				}
 				case "audio": {
 					return (
-						<audio controls>
-							<source
-								src={url}
-								type={mimeType}
-							/>
-						</audio>
+						<audio
+							controls
+							src={url}
+							type={mimeType}
+						/>
 					)
 				}
 				default: {
@@ -128,7 +125,7 @@ const Attachment = React.memo((props) => {
 				key={props.index}
 				id={id}
 				className="attachment"
-				onDoubleClick={onDoubleClickAttachment}
+				onClick={onDoubleClickAttachment}
 			>
 				{props.attachment.flags &&
 					props.attachment.flags.includes("nsfw") &&
