@@ -47,3 +47,6 @@
 
 # zed folder
 .zed/
+
+# idea folder
+.idea/
