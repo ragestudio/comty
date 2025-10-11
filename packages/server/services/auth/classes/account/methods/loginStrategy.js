@@ -1,14 +1,11 @@
 import bcrypt from "bcrypt"
 import { User, PasswordHash } from "@db_models"
 
-export default async ({ username, password }, user) => {
-	if (typeof user === "undefined") {
-		let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+export default async ({ username, password }) => {
+	let isEmail = username.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+	let query = isEmail ? { email: username } : { username: username }
 
-		let query = isEmail ? { email: username } : { username: username }
-
-		user = await User.findOne(query).select("+email").select("+password")
-	}
+	let user = await User.findOne(query).select("+email")
 
 	if (!user) {
 		throw new OperationError(401, "User not found")
