@@ -1,5 +1,11 @@
 export default async (client) => {
-	console.log(`[SYNC-ROOM] Requesting lyrics of room ${client.syncroom}`)
+	const currentRoom = global.userSyncRooms.get(client.userId)
 
-	return global.syncRoomLyrics.get(client.syncroom)
+	if (!currentRoom) {
+		return null
+	}
+
+	console.log(`[SYNC-ROOM] Requesting lyrics of room ${currentRoom}`)
+
+	return global.syncRoomLyrics.get(currentRoom)
 }
