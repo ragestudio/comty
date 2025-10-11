@@ -43,6 +43,14 @@ export default class GroupSoundpad {
 				name: "Ascension to heaven",
 				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/dt.ogg",
 			},
+			{
+				_id: "000006",
+				group_id: "comty",
+				user_id: "comty",
+				icon: "🎪",
+				name: "Funny song",
+				src: "https://storage.ragestudio.net/comty-static-assets/soundpad/funny_song.ogg",
+			},
 		]
 	}
 
