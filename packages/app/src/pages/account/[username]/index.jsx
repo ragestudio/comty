@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 import { motion, AnimatePresence } from "motion/react"
@@ -25,16 +25,16 @@ const TabsComponent = {
 }
 
 const Account = ({ params }) => {
-	const [requestedUser, setRequestedUser] = useState(null)
-	const [user, setUser] = useState(null)
-	const [isSelf, setIsSelf] = useState(false)
-	const [followersCount, setFollowersCount] = useState(0)
-	const [following, setFollowing] = useState(false)
-	const [tabActiveKey, setTabActiveKey] = useState("posts")
-	const [isNotExistent, setIsNotExistent] = useState(false)
-	const [coverExpanded, setCoverExpanded] = useState(false)
+	const [requestedUser, setRequestedUser] = React.useState(null)
+	const [user, setUser] = React.useState(null)
+	const [isSelf, setIsSelf] = React.useState(false)
+	const [followersCount, setFollowersCount] = React.useState(0)
+	const [following, setFollowing] = React.useState(false)
+	const [tabActiveKey, setTabActiveKey] = React.useState("posts")
+	const [isNotExistent, setIsNotExistent] = React.useState(false)
+	const [coverExpanded, setCoverExpanded] = React.useState(false)
 
-	const contentRef = useRef()
+	const contentRef = React.useRef()
 
 	const loadUserData = async () => {
 		const requestedUsername = params.username ?? app.userData.username
@@ -116,7 +116,7 @@ const Account = ({ params }) => {
 		setTabActiveKey(normalizedKey)
 	}
 
-	useEffect(() => {
+	React.useEffect(() => {
 		loadUserData()
 	}, [params.username])
 
@@ -166,7 +166,7 @@ const Account = ({ params }) => {
 				<div className="left-panel">
 					<UserCard user={user} />
 
-					<div className="actions">
+					<div className="actions bg-accent">
 						<FollowButton
 							count={followersCount}
 							onClick={onClickFollow}
