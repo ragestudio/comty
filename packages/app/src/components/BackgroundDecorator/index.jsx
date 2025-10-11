@@ -1,45 +1,34 @@
 import React from "react"
-import classnames from "classnames"
+import { motion } from "motion/react"
 
 export default () => {
-	const [activeColor, setActiveColor] = React.useState(false)
+	const [active, setActive] = React.useState(
+		!!app.cores.style.vars["backgroundImage"],
+	)
+	const [bgOpacity, setBgOpacity] = React.useState(
+		app.cores.style.vars["backgroundColorTransparency"] ?? 1,
+	)
 
-	const hasBackgroundSVG = (value) => {
-		if (value === "unset" || value === "none" || !value) {
-			return false
-		} else {
-			return true
-		}
-	}
-
-	const handleStyleUpdate = (update) => {
-		if (hasBackgroundSVG(update["backgroundSVG"])) {
-			setActiveColor(true)
-		} else {
-			setActiveColor(false)
-		}
+	const handleStyleUpdate = () => {
+		setActive(!!app.cores.style.vars["backgroundImage"])
+		setBgOpacity(app.cores.style.vars["backgroundColorTransparency"])
 	}
 
 	React.useEffect(() => {
-		app.eventBus.on("style.update", handleStyleUpdate)
-
-		const activeSVG = app.cores.style.vars["backgroundSVG"]
-
-		if (hasBackgroundSVG(activeSVG)) {
-			setActiveColor(true)
-		}
+		app.eventBus.on("style.modify", handleStyleUpdate)
 
 		return () => {
-			app.eventBus.off("style.update", handleStyleUpdate)
+			app.eventBus.off("style.modify", handleStyleUpdate)
 		}
 	}, [])
 
 	return (
-		<div
-			id="root_background"
-			className={classnames("root_background", {
-				["active"]: activeColor,
-			})}
+		<motion.div
+			className={"root_background"}
+			initial={{ opacity: 0 }}
+			animate={{
+				opacity: active ? bgOpacity : 0,
+			}}
 		/>
 	)
 }
