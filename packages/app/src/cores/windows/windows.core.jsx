@@ -28,6 +28,7 @@ export default class WindowManager extends Core {
 		close: this.closeById.bind(this),
 		render: this.render.bind(this),
 		open: this.open.bind(this),
+		has: this.has.bind(this),
 	}
 
 	async onInitialize() {
@@ -165,6 +166,12 @@ export default class WindowManager extends Core {
 		}
 
 		return win
+	}
+
+	has(id) {
+		return this.windows.find((win) => {
+			return win.id === id
+		})
 	}
 
 	renderWindows = () => {
