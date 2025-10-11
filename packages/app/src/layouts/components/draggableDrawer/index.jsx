@@ -163,7 +163,7 @@ export const DraggableDrawer = (props) => {
 
 				<Drawer.Content
 					className={classnames(
-						"app-drawer-content",
+						"app-drawer-content bg-accent",
 						props.options?.contentClassName,
 					)}
 					onInteractOutside={() => {
