@@ -5,6 +5,7 @@ import UploadButton from "@components/UploadButton"
 import "./index.less"
 
 export default {
+	id: "appearance",
 	icon: "PaintRoller",
 	label: "Apparence",
 	group: "app",
@@ -104,7 +105,7 @@ export default {
 						return ctx.dispatchUpdate("")
 					},
 				},
-				UploadButton,
+				(...props) => React.createElement(UploadButton, ...props),
 			],
 			defaultValue: () => {
 				const value = app.cores.style.vars["backgroundImage"]
@@ -112,9 +113,16 @@ export default {
 				return value ? value.replace(/url\(|\)/g, "") : ""
 			},
 			onUpdate: (value) => {
+				if (value !== "") {
+					value = value.trim()
+					value = `url(${value})`
+				}
+
 				app.cores.style.modifyTheme({
-					backgroundImage: `url(${value})`,
+					backgroundImage: value,
 				})
+
+				return value
 			},
 			storaged: false,
 		},
