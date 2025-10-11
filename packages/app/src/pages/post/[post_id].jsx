@@ -40,7 +40,7 @@ const PostPage = ({ params }) => {
 
 	return (
 		<div className="post-page">
-			<div className="post-page-original">
+			<div className="post-page__original">
 				<PostCard
 					data={result}
 					disableHasReplies
@@ -48,7 +48,7 @@ const PostPage = ({ params }) => {
 			</div>
 
 			{!!result.hasReplies && (
-				<div className="post-page-replies">
+				<div className="post-page__replies">
 					<h1>
 						<Icons.Repeat2 />
 						Replies

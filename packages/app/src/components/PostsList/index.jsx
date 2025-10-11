@@ -295,6 +295,7 @@ const PostsListsComponent = (props) => {
 				list={list}
 				hasMore={hasMore}
 				onLoadMore={onLoadMore}
+				disableReplyTag={props.disableReplyTag}
 			/>
 		</div>
 	)
