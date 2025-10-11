@@ -136,7 +136,9 @@ const UploadButton = React.forwardRef((props, ref) => {
 					/>
 				)}
 
-				{props.children ?? "Upload"}
+				{typeof props.children === "undefined"
+					? "Upload"
+					: props.children}
 			</div>
 		</Upload>
 	)
