@@ -6,6 +6,7 @@ import { motion, AnimatePresence, usePresence } from "motion/react"
 import { Menu, Avatar, Dropdown, Tag } from "antd"
 
 import { Icons } from "@components/Icons"
+import ProductChannelBadge from "@components/ProductChannelBadge"
 
 import GenerateMenuItems from "@utils/generateMenuItems"
 import useLayoutInterface from "@hooks/useLayoutInterface"
@@ -158,18 +159,21 @@ const Sidebar = ({
 				width: "100%",
 				minWidth: app.cores.style.vars["sidebar_wrapper_fixed_width"],
 				padding: app.cores.style.vars["sidebar_wrapper_padding"],
+				//paddingRight: 0,
 			}}
 			initial={{
 				x: "-100%",
 				width: "0%",
 				minWidth: 0,
 				padding: 0,
+				//paddingRight: 0,
 			}}
 			exit={{
 				x: "-100%",
 				width: "0%",
 				minWidth: 0,
 				padding: 0,
+				//paddingRight: 0,
 			}}
 			transition={{
 				type: "spring",
@@ -190,7 +194,7 @@ const Sidebar = ({
 							onClick={() => app.navigation.goMain()}
 						/>
 
-						<Tag>αlpha</Tag>
+						<ProductChannelBadge />
 					</div>
 				</div>
 
