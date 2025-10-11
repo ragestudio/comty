@@ -50,7 +50,7 @@ const PlayerController = (props) => {
 			onMouseEnter={onMouseEnter}
 			onMouseLeave={onMouseLeave}
 		>
-			<div className="lyrics-player-controller">
+			<div className="lyrics-player-controller bg-accent">
 				<div className="lyrics-player-controller-info">
 					<div className="lyrics-player-controller-info-title">
 						{
