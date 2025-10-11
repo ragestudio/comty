@@ -47,7 +47,7 @@ export default {
 		},
 		openSearcher: (options) => {
 			if (app.isMobile) {
-				return app.layout.drawer.open("searcher", Searcher, {
+				return app.layout.draggable.open("searcher", Searcher, {
 					...options,
 					componentProps: {
 						renderResults: true,
