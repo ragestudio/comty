@@ -1,31 +1,75 @@
 services:
-    wrapper:
-        build: packages/wrapper
-        restart: unless-stopped
-        networks:
-            - internal_network
-        ports:
-            - "5000:5000"
-        env_file:
-            - ./.env
-    api:
-        build: packages/server
-        restart: unless-stopped
-        networks:
-            - internal_network
-        ports:
-            - "9000:9000"
-        env_file:
-            - ./.env
+  nats:
+    image: nats:latest
+    restart: unless-stopped
+    command: "-js"
+    networks:
+      - internal_network
+    ports:
+      - "4222:4222"
+  redis:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    restart: unless-stopped
+    ulimits:
+      memlock: -1
+    networks:
+      - internal_network
+    ports:
+      - "6379:6379"
+    command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
+  scylla:
+    image: scylladb/scylla:latest
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "9042:9042/tcp"
+      - "9042:9042/udp"
+    volumes:
+      - ./scylla/data:/var/lib/scylla
+      - ./scylla/conf:/etc/scylla
+      - ./scylla/logs:/var/log/scylla
+    environment:
+      - SCYLLA_ARGS=--overprovisioned
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongodb/data:/data/db
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
 
-    redis:
-        image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
-        restart: unless-stopped
-        ulimits:
-            memlock: -1
-        networks:
-            - internal_network
-        command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
-
+  wrapper:
+    build: packages/wrapper
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./.env
+  api:
+    build: packages/server
+    restart: unless-stopped
+    networks:
+      - internal_network
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./.env
 networks:
-    internal_network:
+  internal_network:
