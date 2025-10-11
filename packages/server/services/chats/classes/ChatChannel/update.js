@@ -1,32 +1,36 @@
-export default async function (user, messageId, update = {}) {
+export default async function (user, message_id, update = {}) {
 	if (!user) {
 		throw new OperationError(400, "Missing user object")
 	}
 
-	if (!messageId) {
-		throw new OperationError(400, "Missing messageId")
+	if (!message_id) {
+		throw new OperationError(400, "Missing message_id")
 	}
 
-	const Message = this.scylla.model("channel_messages")
-
-	const entry = await Message.findOneAsync({
+	// find the message
+	const message = await this.MessageModel.findOneAsync({
 		channel_id: this.channel._id.toString(),
-		_id: messageId,
+		_id: message_id,
 	})
 
-	if (!entry) {
+	if (!message) {
 		throw new OperationError(404, "Message not found")
 	}
 
+	// validate the payload
 	this.validateMessagePayload(update)
 
 	if (update.message) {
-		entry.message = String(update.message)
+		message.message = String(update.message)
 	}
 
-	entry.updated_at = new Date().toISOString()
+	if (update.attachments) {
+		message.attachments = update.attachments
+	}
 
-	await entry.saveAsync()
+	message.updated_at = new Date().toISOString()
 
-	return entry.toJSON()
+	await message.saveAsync()
+
+	return message.toJSON()
 }

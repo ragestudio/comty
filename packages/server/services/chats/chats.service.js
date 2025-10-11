@@ -1,18 +1,21 @@
 //import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
+import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import InjectedAuth from "@shared-lib/injectedAuth"
 import ScyllaDb from "@shared-classes/ScyllaDb"
-import ChatChannelsController from "@classes/ChatChannelsController"
-import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import SharedMiddlewares from "@shared-middlewares"
 
+import ChatChannelsController from "@classes/ChatChannelsController"
+import DirectMessagesController from "@classes/DirectMessagesController"
+
 class API extends Server {
 	static refName = "chats"
-	static listenPort = process.env.HTTP_LISTEN_PORT ?? 3004
+	static listenPort = 3004
+	static routesPath = __dirname + "/routes"
 
 	static useMiddlewares = ["logs"]
 	static bypassCors = true
@@ -33,6 +36,7 @@ class API extends Server {
 		db: new DbManager(),
 		redis: RedisClient(),
 		chatChannelsController: new ChatChannelsController(this),
+		directMessagesController: new DirectMessagesController(this),
 		scylla: new ScyllaDb({
 			contactPoints: ["172.17.0.2"],
 			localDataCenter: "datacenter1",

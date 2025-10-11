@@ -1,0 +1,36 @@
+export default {
+	useContexts: ["chatChannelsController"],
+	fn: async (client, payload, ctx) => {
+		if (!client.userId) {
+			throw new OperationError(400, "Missing userId")
+		}
+
+		if (!payload.group_id) {
+			throw new OperationError(400, "Missing group_id")
+		}
+
+		if (!payload.channel_id) {
+			throw new OperationError(400, "Missing channel_id")
+		}
+
+		if (!payload.message_id) {
+			throw new OperationError(400, "Missing message_id")
+		}
+
+		if (!payload.update) {
+			throw new OperationError(400, "Missing update")
+		}
+
+		const channel = await ctx.chatChannelsController.get(
+			payload.group_id,
+			payload.channel_id,
+			client.userId,
+		)
+
+		return await channel.update(
+			client.user ?? client.socket.context.user,
+			payload.message_id,
+			payload.update,
+		)
+	},
+}

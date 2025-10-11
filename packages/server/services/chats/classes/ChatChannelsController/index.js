@@ -46,6 +46,8 @@ export default class ChatChannelsController {
 			throw new OperationError(403, "You are not a member of this group")
 		}
 
-		return new ChatChannel(this, channel)
+		return new ChatChannel(this, channel, {
+			topic: "chats:channel",
+		})
 	}
 }

@@ -11,6 +11,12 @@ export default {
 			type: "frozen",
 			typeDef: "<list <map <varchar, varchar>>>",
 		},
+		flags: {
+			type: "frozen",
+			typeDef: "<list <varchar>>",
+		},
+		reply_to_id: "varchar",
+		updated_at: "timestamp",
 		created_at: "timestamp",
 	},
 }

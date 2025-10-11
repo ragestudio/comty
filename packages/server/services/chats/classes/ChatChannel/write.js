@@ -14,12 +14,22 @@ export default async function (user, payload) {
 		_id: _id,
 		channel_id: this.channel._id.toString(),
 		user_id: user._id.toString(),
-		message: String(payload.message),
+		message: payload.message && String(payload.message),
 		attachments: payload.attachments,
+		reply_to_id: payload.reply_to_id,
 		created_at: created_at.toString(),
 	})
 
 	await message.saveAsync()
+
+	if (typeof this.onWrite === "function") {
+		try {
+			await this.onWrite(user, message)
+		} catch (error) {
+			console.error(error)
+			throw new OperationError(500, "Failed to execute onWrite hook")
+		}
+	}
 
 	const obj = {
 		...message.toJSON(),
@@ -27,7 +37,7 @@ export default async function (user, payload) {
 	}
 
 	// send to channel
-	this.sendEventToChannelTopic("channel:message:new", obj)
+	this.sendEventToChannelTopic("channel:message", obj)
 
 	return obj
 }
