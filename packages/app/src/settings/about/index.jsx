@@ -66,7 +66,6 @@ export default {
 						<div className="texts">
 							<div className="sitename-text">
 								<h2>{config.app.siteName}</h2>
-								<antd.Tag>Beta</antd.Tag>
 							</div>
 							<span>{config.author}</span>
 							<span>
