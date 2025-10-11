@@ -57,7 +57,7 @@ const HeaderBar = (props) => {
 						damping: 20,
 					}}
 				>
-					<div className="page_header">
+					<div className="page_header bg-accent">
 						{render?.component &&
 							React.cloneElement(
 								render?.component,

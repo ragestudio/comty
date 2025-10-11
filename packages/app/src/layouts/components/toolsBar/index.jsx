@@ -42,7 +42,7 @@ const ToolsBar = ({ renders = {} }) => {
 		>
 			<div
 				id="tools_bar"
-				className="tools-bar"
+				className="tools-bar bg-accent"
 			>
 				<div className="attached_renders top">
 					{renders.top.map((render, index) => {

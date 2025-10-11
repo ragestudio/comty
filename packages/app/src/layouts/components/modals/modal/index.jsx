@@ -89,7 +89,7 @@ class Modal extends React.Component {
 					onMouseDown={this.handleClickOutside}
 				/>
 				<div
-					className="app_modal_content"
+					className="app_modal_content bg-accent"
 					ref={this.contentRef}
 					style={this.props.frameContentStyle}
 				>

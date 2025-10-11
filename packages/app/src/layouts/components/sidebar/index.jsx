@@ -178,7 +178,7 @@ const Sidebar = ({
 			}}
 		>
 			<div
-				className={classnames("app_sidebar", {
+				className={classnames("app_sidebar bg-accent", {
 					["expanded"]: expanded,
 				})}
 				ref={sidebarRef}
