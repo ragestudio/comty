@@ -56,7 +56,7 @@ export default {
 	],
 	logo: {
 		//alt: "https://storage.ragestudio.net/rstudio/branding/comty/iso/logo_alt.svg",
-		alt: "/dev_alt.svg",
+		alt: "/basic_alt.svg",
 		full: "https://storage.ragestudio.net/rstudio/branding/comty/labeled/logo_full.svg",
 		ragestudio_alt:
 			"https://storage.ragestudio.net/rstudio/branding/ragestudio/iso/ragestudio.svg",
