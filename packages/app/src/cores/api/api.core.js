@@ -28,6 +28,9 @@ export default class APICore extends Core {
 		reset: this.reset.bind(this),
 		measurePing: measurePing,
 		useRequest: useRequest,
+		socket: function () {
+			return this.client.ws.sockets.get("main")
+		},
 	}
 
 	registerSocketListeners = (map) => {
@@ -120,6 +123,12 @@ export default class APICore extends Core {
 		}
 
 		return instance.emit(key, data)
+	}
+
+	listenEvents(events, instance = "main") {
+		for (const [key, handler] of Object.entries(events)) {
+			this.listenEvent(key, handler, instance)
+		}
 	}
 
 	listenEvent(key, handler, instance = "main") {
