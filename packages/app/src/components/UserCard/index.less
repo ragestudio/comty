@@ -1,260 +1,56 @@
 @import "@styles/vars.less";
 
-html {
-	&.mobile {
-		.userCard {
-			width: 100%;
-			filter: none;
-			box-shadow: none;
-			min-width: 0;
-
-			.avatar {
-				width: 20%;
-				height: fit-content;
-			}
-		}
-	}
-}
-
-._mobile_card {
-	background-color: var(--background-color-accent);
-
-	border-radius: 12px;
-
-	box-shadow: @card-shadow;
-}
-
-._mobile_userCard {
-	display: flex;
-	flex-direction: column;
-
-	width: 100%;
-	height: fit-content;
-
-	gap: 10px;
-
-	&.no-cover {
-		._mobile_userCard_top {
-			flex-direction: row;
-
-			._mobile_userCard_top_avatar {
-				padding: 10px;
-			}
-
-			._mobile_userCard_top_texts {
-				margin-left: 0;
-			}
-		}
-	}
-
-	._mobile_userCard_top {
-		position: relative;
-
-		display: flex;
-		flex-direction: column;
-
-		width: 100%;
-		height: auto;
-
-		background-color: var(--background-color-accent);
-
-		border-radius: 12px;
-
-		box-shadow: @card-shadow;
-
-		._mobile_userCard_top_cover {
-			position: relative;
-
-			display: flex;
-			flex-direction: row;
-
-			align-items: center;
-			justify-content: center;
-
-			width: 100%;
-
-			max-height: 25vh;
-
-			z-index: 100;
-
-			.cover {
-				width: 100%;
-				height: 25vh;
-
-				background-size: 100%;
-				background-repeat: no-repeat;
-				background-position: center;
-
-				border-radius: 12px;
-			}
-		}
-
-		._mobile_userCard_top_avatar_wrapper {
-			position: absolute;
-
-			display: flex;
-			flex-direction: row;
-
-			align-items: flex-end;
-
-			bottom: 0;
-			left: 0;
-
-			padding: 0 10px;
-
-			gap: 20px;
-
-			z-index: 110;
-
-			transform: translateY(75%);
-		}
-
-		._mobile_userCard_top_avatar {
-			display: flex;
-			flex-direction: row;
-
-			align-items: center;
-			justify-content: center;
-
-			width: 120px;
-			height: 120px;
-
-			max-height: 120px;
-			max-width: 120px;
-
-			border-radius: 12px;
-
-			img {
-				width: 120px;
-				height: 120px;
-
-				object-fit: contain;
-				background-color: black;
-
-				box-shadow: @card-shadow;
-
-				border-radius: 12px;
-			}
-		}
-
-		._mobile_userCard_top_texts {
-			position: relative;
-
-			display: flex;
-
-			flex-direction: column;
-			justify-content: center;
-
-			margin-left: calc(120px + 10px);
-
-			padding: 10px;
-			padding-left: 15px;
-
-			._mobile_userCard_top_badges_wrapper {
-				position: absolute;
-				top: 0;
-				right: 0;
-
-				padding: 10px;
-			}
-
-			._mobile_userCard_top_username {
-				font-family: "Space Grotesk", sans-serif;
-
-				h1 {
-					position: relative;
-
-					color: var(--text-color);
-					margin: 0;
-
-					#verification_tick {
-						right: 0;
-						top: 0;
-
-						font-size: 0.8rem;
-
-						color: var(--colorPrimary);
-						transform: translate(0, -50%);
-					}
-				}
-
-				margin-bottom: 10px;
-			}
-
-			._mobile_userCard_top_description {
-				color: var(--text-color);
-
-				p {
-					margin: 0;
-				}
-
-				// max-height: 30vh;
-
-				// overflow: hidden;
-
-				// p {
-				//     text-overflow: ellipsis;
-				//     overflow: hidden;
-				//     white-space: nowrap;
-				// }
-			}
-		}
-	}
-
-	._mobile_userCard_actions {
-		display: flex;
-		flex-direction: row;
-
-		gap: 20px;
-
-		padding: 10px;
-	}
-
-	._mobile_userCard_links {
-		display: flex;
-		flex-direction: row;
-
-		justify-content: flex-start;
-
-		gap: 15px;
-
-		padding: 10px 20px;
-
-		//padding-top: 0;
-
-		.userLink {
-			display: flex;
-			flex-direction: column;
-
-			align-items: center;
-			justify-content: center;
-
-			font-size: 1.3rem;
-
-			color: var(--text-color);
-
-			p {
-				margin: 0;
-			}
-		}
-	}
-}
-
 .userCard {
+	position: relative;
+
 	display: flex;
 	flex-direction: column;
 
-	background-color: var(--background-color-accent);
-	border-radius: 12px;
-	padding: 20px;
-
-	height: fit-content;
 	width: 20vw;
 	min-width: 400px;
+	height: fit-content;
+
+	gap: 20px;
+	padding: 20px;
+
+	border-radius: 12px;
+	border: 3px solid var(--border-color);
 
 	transition: all 0.3s ease-in-out;
 
-	outline: 1px solid var(--border-color);
+	overflow: hidden;
+
+	&__img-bg {
+		position: absolute;
+
+		top: 0;
+		left: 0;
+
+		width: 100%;
+		height: 100%;
+
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
+
+		z-index: 200;
+	}
+
+	&__gradient-bg {
+		position: absolute;
+
+		top: 0;
+		left: 0;
+
+		width: 100%;
+		height: 100%;
+
+		backdrop-filter: blur(10px);
+
+		opacity: 0.2;
+
+		z-index: 300;
+	}
 
 	h1,
 	h2,
@@ -267,60 +63,82 @@ html {
 		margin: 0;
 	}
 
-	.avatar {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-
-		height: 10vh;
-		width: 10vh;
-
-		border-radius: 12px;
-
-		overflow: hidden;
-		align-self: center;
-
-		background-color: var(--background-color-primary-2);
-
-		.lazy-load-image-background {
-			width: 100%;
-			height: 100%;
-
-			img {
-				width: 100%;
-				height: 100%;
-
-				object-fit: cover;
-			}
-		}
-	}
-
 	.username {
 		display: flex;
 		flex-direction: row;
 
-		margin-top: 20px;
+		align-items: center;
 
-		.username_text {
+		gap: 10px;
+
+		z-index: 400;
+
+		.avatar {
 			display: flex;
 			flex-direction: column;
+			justify-content: center;
+
+			gap: 5px;
+
+			.lazy-load-image-background {
+				height: 70px;
+				width: 70px;
+
+				min-height: 70px;
+				min-width: 70px;
+
+				border-radius: 12px;
+				background-color: var(--background-color-primary);
+
+				overflow: hidden;
+
+				img {
+					width: 100%;
+					height: 100%;
+
+					object-fit: cover;
+				}
+			}
+		}
+
+		.username_text {
+			position: relative;
+
+			display: flex;
+			flex-direction: column;
+
+			gap: 5px;
+
 			width: 100%;
 
 			h1 {
 				display: inline-flex;
+
 				font-size: 1.5rem;
 				font-weight: 600;
+
+				line-height: 1rem;
+
 				font-family: "Space grotesk", sans-serif;
 			}
 
 			span {
 				font-size: 0.8rem;
 				font-style: italic;
+				line-height: 1rem;
 			}
 
 			#verified {
 				fill: var(--app-color);
 				font-size: 0.8rem;
+			}
+
+			.user-badges {
+				border-radius: 10px;
+				&__badge {
+					width: 0.7rem;
+					height: 0.7rem;
+				}
 			}
 		}
 
@@ -339,12 +157,12 @@ html {
 	}
 
 	.description {
-		margin-top: 20px;
-
 		max-height: 295px;
 
 		overflow: hidden;
 		text-overflow: ellipsis;
+
+		z-index: 400;
 
 		h3 {
 			margin: 0;
@@ -366,47 +184,9 @@ html {
 		display: flex;
 		flex-direction: column;
 
-		margin-top: 20px;
+		z-index: 400;
 
 		gap: 10px;
-
-		.userLink {
-			display: flex;
-			flex-direction: row;
-
-			align-items: center;
-
-			width: fit-content;
-
-			gap: 5px;
-
-			transition: all 0.3s ease-in-out;
-
-			&.clickable {
-				cursor: pointer;
-
-				&:hover {
-					svg,
-					p {
-						color: var(--app-color);
-					}
-				}
-			}
-
-			svg {
-				font-size: 1rem;
-				margin-right: 0 !important;
-				color: var(--text-color);
-			}
-
-			p {
-				font-size: 0.8rem;
-				font-family: "Space grotesk", sans-serif;
-				font-weight: 600;
-
-				user-select: text;
-			}
-		}
 	}
 }
 

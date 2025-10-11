@@ -1,105 +1,78 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
 
-import { Icons, createIconRender } from "@components/Icons"
-import { Image, UserBadges, FollowButton } from "@components"
+import { Icons } from "@components/Icons"
+import Image from "@components/Image"
+import UserLink from "@components/UserLink"
+import UserBadges from "@components/UserBadges"
 
-import linksDecorators from "@config/linksDecorators"
+import DecorationsModel from "@models/decorations"
 
 import "./index.less"
 
-function processValue(value, decorator) {
-	if (decorator.hrefResolve) {
-		if (!String(value).includes(decorator.hrefResolve)) {
-			return `${decorator.hrefResolve}${value}`
-		}
-	}
-
-	return value
-}
-
-const UserLinkViewer = (props) => {
-	const { link, decorator } = props
-
-	return (
-		<div className="userLinkViewer">
-			<div className="userLinkViewer_icon">
-				{createIconRender(decorator.icon ?? "MdLink")}
-			</div>
-
-			<div className="userLinkViewer_value">
-				<p>{link.value}</p>
-			</div>
-		</div>
-	)
-}
-
-const UserLink = (props) => {
-	let { index, link } = props
-
-	link.key = link.key.toLowerCase()
-
-	const decorator = linksDecorators[link.key] ?? {}
-
-	link.value = processValue(link.value, decorator)
-
-	const hasHref = String(link.value).includes("://")
-
-	const handleOnClick = () => {
-		if (!hasHref) {
-			if (app.isMobile) {
-				app.layout.drawer.open("link_viewer", UserLinkViewer, {
-					componentProps: {
-						link: link,
-						decorator: decorator,
-					},
-				})
-			}
-			return false
-		}
-
-		window.open(link.value, "_blank")
-	}
-
-	const renderName = () => {
-		if (decorator.hrefResolve) {
-			return decorator.label ?? link.value
-		}
-
-		return link.value
-	}
-
-	return (
-		<div
-			key={index}
-			id={`link-${index}-${link.key}`}
-			className={`userLink ${hasHref ? "clickable" : ""}`}
-			onClick={handleOnClick}
-		>
-			{createIconRender(decorator.icon ?? "MdLink")}
-
-			{!app.isMobile && <p>{renderName()}</p>}
-		</div>
-	)
-}
-
-export const UserCard = (props) => {
+const UserCard = (props) => {
 	const [user, setUser] = React.useState(props.user)
+	const [decorations, setDecorations] = React.useState({})
+
+	const loadDecorations = React.useCallback(async () => {
+		if (!props.user || !props.user.decorations) {
+			setDecorations({})
+			return null
+		}
+
+		const data = await DecorationsModel.data(
+			Object.values(props.user.decorations),
+		).catch((err) => {
+			console.error(err)
+			return null
+		})
+
+		if (data) {
+			let obj = {}
+
+			for (const [key, value] of Object.entries(props.user.decorations)) {
+				obj[key] = data.find((item) => item._id === value)
+			}
+
+			setDecorations(obj)
+		}
+	}, [props.user])
 
 	React.useEffect(() => {
 		setUser(props.user)
-	}, [props.user])
-
-	// TODO: Support API user data fetching
+		loadDecorations()
+	}, [props])
 
 	return (
-		<div className="userCard">
-			<div className="avatar">
-				<Image src={user.avatar} />
-			</div>
+		<div
+			className="userCard bg-accent"
+			style={{
+				...decorations?.user_card_bg?.card_style,
+			}}
+		>
+			{decorations?.user_card_bg?.image_obj && (
+				<div
+					className="userCard__img-bg"
+					style={{
+						backgroundImage: `url('${decorations?.user_card_bg?.image_obj}')`,
+						...decorations?.user_card_bg?.image_obj_style,
+					}}
+				/>
+			)}
+
+			{decorations?.user_card_bg?.gradient_obj && (
+				<div
+					className="userCard__gradient-bg"
+					style={{
+						...decorations?.user_card_bg?.gradient_obj,
+					}}
+				/>
+			)}
 
 			<div className="username">
+				<div className="avatar">
+					<Image src={user.avatar} />
+				</div>
+
 				<div className="username_text">
 					<h1>
 						{user.bot && <Icons.Bot />}
@@ -107,14 +80,18 @@ export const UserCard = (props) => {
 						{user.verified && <Icons.BadgeCheck id="verified" />}
 					</h1>
 					<span>@{user.username}</span>
+
+					{user.badges?.length > 0 && (
+						<UserBadges badges={user.badges} />
+					)}
 				</div>
-
-				{user.badges?.length > 0 && <UserBadges user_id={user._id} />}
 			</div>
 
-			<div className="description">
-				<span>{user.description}</span>
-			</div>
+			{user.description && (
+				<div className="description">
+					<span>{user.description}</span>
+				</div>
+			)}
 
 			{user.links &&
 				Array.isArray(user.links) &&
@@ -131,109 +108,6 @@ export const UserCard = (props) => {
 						})}
 					</div>
 				)}
-		</div>
-	)
-}
-
-export const MobileUserCard = (props, ref) => {
-	return (
-		<div
-			ref={ref}
-			className={classnames("_mobile_userCard", {
-				["no-cover"]: !props.user.cover,
-			})}
-		>
-			<div className="_mobile_userCard_top">
-				{props.user.cover && (
-					<div className="_mobile_userCard_top_cover">
-						<div
-							className="cover"
-							style={{
-								backgroundImage: `url("${props.user.cover}")`,
-							}}
-						/>
-
-						<div className="_mobile_userCard_top_avatar_wrapper">
-							<div className="_mobile_userCard_top_avatar">
-								<Image src={props.user.avatar} />
-							</div>
-						</div>
-					</div>
-				)}
-
-				{!props.user.cover && (
-					<div className="_mobile_userCard_top_avatar">
-						<Image src={props.user.avatar} />
-					</div>
-				)}
-
-				<div className="_mobile_userCard_top_texts">
-					<div className="_mobile_userCard_top_username">
-						<h1>
-							{props.user.fullName ?? `@${props.user.username}`}
-							{props.user.verified && (
-								<Icons.BadgeCheck id="verification_tick" />
-							)}
-						</h1>
-
-						{props.user.fullName && (
-							<span>@{props.user.username}</span>
-						)}
-					</div>
-
-					<div className="_mobile_userCard_top_badges_wrapper">
-						{props.user.badges?.length > 0 && (
-							<UserBadges user_id={props.user._id} />
-						)}
-					</div>
-
-					<div className="_mobile_userCard_top_description">
-						<p>{props.user.description}</p>
-					</div>
-				</div>
-
-				{props.user.links &&
-					Array.isArray(props.user.links) &&
-					props.user.links.length > 0 && (
-						<div className={classnames("_mobile_userCard_links")}>
-							{props.user.links.map((link, index) => {
-								return (
-									<UserLink
-										index={index}
-										link={link}
-									/>
-								)
-							})}
-						</div>
-					)}
-			</div>
-
-			<div
-				className={classnames(
-					"_mobile_card",
-					"_mobile_userCard_actions",
-				)}
-			>
-				{props.followers && (
-					<FollowButton
-						count={props.followers.length}
-						onClick={props.onClickFollow}
-						followed={props.isFollowed}
-						self={props.isSelf}
-					/>
-				)}
-
-				<antd.Button
-					type="primary"
-					icon={<Icons.MessageSquare />}
-					disabled
-				/>
-
-				<antd.Button
-					type="primary"
-					icon={<Icons.Share />}
-				/>
-			</div>
 		</div>
 	)
 }
