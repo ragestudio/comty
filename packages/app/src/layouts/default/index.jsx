@@ -61,6 +61,7 @@ const MobileLayout = (props) => {
 		>
 			<DraggableDrawerController />
 			<TopBar />
+			<Modals />
 
 			<Layout.Content
 				id="content_layout"
