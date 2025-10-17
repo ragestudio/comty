@@ -89,6 +89,8 @@ export default class Client {
 			await this.dettachMic()
 		}
 
+		// remove from the producers
+
 		if (this.coreStateIndex !== -1) {
 			this.core.state.clients.splice(this.coreStateIndex, 1)
 		}
