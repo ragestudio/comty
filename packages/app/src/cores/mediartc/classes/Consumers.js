@@ -134,4 +134,12 @@ export default class Consumers extends Map {
 			throw error
 		}
 	}
+
+	findByProducerId = (producerId) => {
+		for (const consumer of this.values()) {
+			if (consumer.producerId === producerId) {
+				return consumer
+			}
+		}
+	}
 }
