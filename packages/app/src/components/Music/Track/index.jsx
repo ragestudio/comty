@@ -73,7 +73,7 @@ const Track = React.memo((props) => {
 		} else {
 			app.cores.player.playback.toggle()
 		}
-	}, [props.isCurrent])
+	}, [props.track, props.isCurrent])
 
 	const handleOnClickItem = React.useCallback(() => {
 		if (props.onClick) {
