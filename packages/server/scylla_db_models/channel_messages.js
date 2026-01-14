@@ -15,6 +15,7 @@ export default {
 			type: "frozen",
 			typeDef: "<list <varchar>>",
 		},
+		sticker: "varchar",
 		reply_to_id: "varchar",
 		updated_at: "timestamp",
 		created_at: "timestamp",
