@@ -1,4 +1,4 @@
-import handleUpgrade from "./handlers/handleUpgrade"
+import handleAuth from "./handlers/handleAuth"
 
 function getToken(req) {
 	const queryToken = req.getQuery("token")
@@ -29,7 +29,7 @@ export default async function (res, req, context) {
 	const wsProto = req.getHeader("sec-websocket-protocol")
 	const wsExt = req.getHeader("sec-websocket-extensions")
 
-	const data = await handleUpgrade.bind(this)(res, res, ctx)
+	const data = await handleAuth.bind(this)(ctx)
 
 	if (abortController.signal.aborted) {
 		return null
