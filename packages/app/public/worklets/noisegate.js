@@ -7,6 +7,18 @@ function getAlphaFromTimeConstant(timeConstant, sampleRate) {
 }
 
 class NoiseGateProcessor extends AudioWorkletProcessor {
+	constructor(options) {
+		super()
+
+		this.previousLevel = 0
+		this.previousWeight = 1.0
+
+		this.alpha = getAlphaFromTimeConstant(
+			options?.processorOptions?.timeConstant ?? 0.0025,
+			sampleRate,
+		)
+	}
+
 	static get parameterDescriptors() {
 		return [
 			{
@@ -18,16 +30,6 @@ class NoiseGateProcessor extends AudioWorkletProcessor {
 			{ name: "attack", defaultValue: 0, minValue: 0, maxValue: 1 },
 			{ name: "release", defaultValue: 0, minValue: 0, maxValue: 1 },
 		]
-	}
-
-	constructor(options) {
-		super()
-
-		this.previousLevel = 0
-		this.previousWeight = 1.0
-
-		const timeConstant = options?.processorOptions?.timeConstant ?? 0.0025
-		this.alpha = getAlphaFromTimeConstant(timeConstant, sampleRate)
 	}
 
 	process(inputs, outputs, parameters) {
