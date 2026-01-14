@@ -5,41 +5,21 @@ import Image from "@components/Image"
 import UserLink from "@components/UserLink"
 import UserBadges from "@components/UserBadges"
 
-import DecorationsModel from "@models/decorations"
+import { open as openCardViewer } from "@components/ProfileCardViewer"
 
 import "./index.less"
 
 const UserCard = (props) => {
 	const [user, setUser] = React.useState(props.user)
-	const [decorations, setDecorations] = React.useState({})
 
-	const loadDecorations = React.useCallback(async () => {
-		if (!props.user || !props.user.decorations) {
-			setDecorations({})
-			return null
-		}
+	if (!user) {
+		return null
+	}
 
-		const data = await DecorationsModel.data(
-			Object.values(props.user.decorations),
-		).catch((err) => {
-			console.error(err)
-			return null
-		})
-
-		if (data) {
-			let obj = {}
-
-			for (const [key, value] of Object.entries(props.user.decorations)) {
-				obj[key] = data.find((item) => item._id === value)
-			}
-
-			setDecorations(obj)
-		}
-	}, [props.user])
+	const decorations = user.decorations ?? {}
 
 	React.useEffect(() => {
 		setUser(props.user)
-		loadDecorations()
 	}, [props])
 
 	return (
@@ -70,7 +50,20 @@ const UserCard = (props) => {
 
 			<div className="username">
 				<div className="avatar">
-					<Image src={user.avatar} />
+					<Image
+						src={user.avatar}
+						onDoubleClick={() =>
+							openCardViewer({ user, decorations, followers: 0 })
+						}
+					/>
+
+					{decorations?.avatar_frame && (
+						<img
+							className="avatar__frame"
+							src={decorations.avatar_frame.obj_url}
+							style={decorations.avatar_frame.style}
+						/>
+					)}
 				</div>
 
 				<div className="username_text">
