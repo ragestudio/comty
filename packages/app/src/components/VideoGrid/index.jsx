@@ -28,10 +28,10 @@ const VideoGrid = ({ children, focusedId, className, ...props }) => {
 
 	// split items into focused and others
 	const focusedItem = hasFocusedItem
-		? videoItems.find((child) => child.props?.consumer?.id === focusedId)
+		? videoItems.find((child) => child.props?.producer?.id === focusedId)
 		: null
 	const otherItems = hasFocusedItem
-		? videoItems.filter((child) => child.props?.consumer?.id !== focusedId)
+		? videoItems.filter((child) => child.props?.producer?.id !== focusedId)
 		: videoItems
 
 	const renderGridItems = (items, isFocused = false) => {
@@ -70,6 +70,8 @@ const VideoGrid = ({ children, focusedId, className, ...props }) => {
 		)
 	}
 
+	console.log("VideoGrid", { itemCount, focusedItem })
+
 	return (
 		<div
 			className={classnames("video-grid", className, {
@@ -105,8 +107,9 @@ const VideoGrid = ({ children, focusedId, className, ...props }) => {
 						)}
 
 						<div className="video-grid__focused-container">
-							{focusedItem &&
-								renderGridItems([focusedItem], true)}
+							<div className="video-grid__item video-grid__item--focused">
+								{focusedItem}
+							</div>
 						</div>
 					</motion.div>
 				) : (
