@@ -6,6 +6,8 @@ import request from "comty.js/request"
 import measurePing from "comty.js/utils/measurePing"
 import useRequest from "comty.js/hooks/useRequest"
 
+import baseWsEvents from "./baseWsEvents"
+
 export default class APICore extends Core {
 	static namespace = "api"
 
@@ -42,6 +44,17 @@ export default class APICore extends Core {
 	}
 
 	onRuntimeEvents = {
+		"wsmanager:main:open": () => {
+			const events = Object.entries(baseWsEvents).reduce(
+				(acc, [key, value]) => {
+					acc[key] = value.bind(this)
+					return acc
+				},
+				{},
+			)
+
+			this.listenEvents(events)
+		},
 		"authmanager:authed": async () => {
 			this.console.debug("auth manager started, connecting to websockets")
 			await this.client.ws.connectAll()
@@ -52,11 +65,18 @@ export default class APICore extends Core {
 			)
 			await this.client.ws.disconnectAll()
 		},
+		"authmanager:refresh": async () => {
+			this.console.debug(
+				"auth manager refreshed, reconnecting to websockets",
+			)
+			await this.client.ws.reauthenticate()
+		},
 		"wsmanager:main:reconnecting": () => {
 			app.cores.notifications.new({
 				key: "main-socket-reconnect",
 				type: "loading",
 				title: "Reconnecting to socket",
+				feedback: false,
 				description:
 					"Something fails with the connection, we are trying to reconnect.\n Some features may not work!",
 				duration: 0,
