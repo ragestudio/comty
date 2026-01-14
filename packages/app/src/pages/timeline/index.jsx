@@ -48,6 +48,9 @@ const TimelinePage = () => {
 
 TimelinePage.options = {
 	useTitle: "Timeline",
+	layout: {
+		centeredContent: true,
+	},
 }
 
 export default TimelinePage
