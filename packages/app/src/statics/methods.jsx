@@ -70,9 +70,6 @@ export default {
 				},
 			)
 		},
-		openMessages: () => {
-			app.location.push("/messages")
-		},
 		openFullImageViewer: (media, options = {}) => {
 			if (!Array.isArray(media)) {
 				media = [media]
@@ -144,6 +141,15 @@ export default {
 		},
 		goToPlaylist: (playlist_id) => {
 			return app.location.push(`/play/${playlist_id}`)
+		},
+		goToDirectMessage: (user_id) => {
+			return app.location.push(`/spaces/dm/${user_id}`)
+		},
+		goToGroup: (group_id) => {
+			return app.location.push(`/spaces/group/${group_id}`)
+		},
+		goToGroupChannel: (group_id, channel_id) => {
+			return app.location.push(`/spaces/group/${group_id}/${channel_id}`)
 		},
 	},
 	capacitor: {
