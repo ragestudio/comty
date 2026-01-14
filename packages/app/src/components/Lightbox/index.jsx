@@ -3,7 +3,7 @@ import classNames from "classnames"
 import { motion, AnimatePresence } from "motion/react"
 import { Icons } from "@components/Icons"
 
-import Image from "./components/Image"
+import Media from "./components/Media"
 
 import "./index.less"
 
@@ -86,7 +86,7 @@ const Lightbox = ({ media, index, onClose }) => {
 						className="lightbox__content"
 						onClick={handleExitClick}
 					>
-						<Image
+						<Media
 							src={media[selectedKey]}
 							onDragEnableChange={setFocusMode}
 						/>
