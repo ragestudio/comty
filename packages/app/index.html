@@ -15,12 +15,11 @@
 			href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap"
 			rel="stylesheet"
 		/>
-
-		<title>Comty™</title>
-		<meta
-			name="title"
-			content="Comty™"
+		<link
+			rel="stylesheet"
+			href="/src/styles/splash.css"
 		/>
+
 		<meta
 			name="description"
 			content="Comty, a prototype of social network."
@@ -41,192 +40,42 @@
 			property="og:image"
 			content="https://storage.ragestudio.net/rstudio/branding/comty/iso/basic_alt.svg"
 		/>
+
+		<title>Comty™</title>
+
+		<meta
+			name="title"
+			content="Comty™"
+		/>
 	</head>
-
-	<style>
-		.app_splash_visible {
-			opacity: 1 !important;
-			pointer-events: auto;
-		}
-
-		.app_splash {
-			app-region: drag;
-
-			z-index: 9999;
-			position: fixed;
-
-			top: 0;
-			left: 0;
-
-			overflow: hidden;
-
-			background-color: #252525;
-			color: #d7d7d7;
-
-			width: 100vw;
-			height: 100vh;
-			height: 100dvh;
-
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-
-			opacity: 0;
-			pointer-events: none;
-
-			transition: all 300ms ease-in-out;
-		}
-
-		.app_splash .app_splash_content {
-			position: relative;
-			z-index: 100;
-
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-
-			padding: 70px;
-
-			width: 300px;
-			height: 300px;
-		}
-
-		.app_splash .app_splash_content .app_splash_content_logo {
-			width: 230px;
-			height: 230px;
-		}
-
-		.app_splash_content_loader_wrapper {
-			user-select: none;
-
-			position: fixed;
-
-			z-index: 1000;
-
-			right: 0;
-			bottom: 0;
-
-			width: fit-content;
-			height: 30px;
-
-			margin: 40px 50px;
-
-			background-color: #2d2d2dc2;
-			border-radius: 28px;
-		}
-
-		.app_splash_content_loader_wrapper .app_splash_content_loader {
-			transform: scale(0.28);
-			width: 54px;
-			height: 23px;
-		}
-
-		.app_splash_content_loader_wrapper .app_splash_content_loader > div {
-			width: 6px;
-			height: 20px;
-
-			position: absolute;
-
-			left: -10px;
-			bottom: 15px;
-			border-radius: 5px;
-			transform-origin: 10px 35px;
-			transform: rotate(0deg);
-			animation: loader 0.8s infinite;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(2) {
-			transform: rotate(45deg);
-			animation-delay: 0.1s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(3) {
-			transform: rotate(90deg);
-			animation-delay: 0.2s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(4) {
-			transform: rotate(135deg);
-			animation-delay: 0.3s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(5) {
-			transform: rotate(180deg);
-			animation-delay: 0.4s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(6) {
-			transform: rotate(225deg);
-			animation-delay: 0.5s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(7) {
-			transform: rotate(270deg);
-			animation-delay: 0.6s;
-		}
-		.app_splash_content_loader_wrapper
-			.app_splash_content_loader
-			> div:nth-child(8) {
-			transform: rotate(315deg);
-			animation-delay: 0.7s;
-		}
-		@keyframes loader {
-			0% {
-				background: transparent;
-				left: -10px;
-				transform-origin: 10px 35px;
-			}
-			30% {
-				background: #fff;
-			}
-			100% {
-				background: transparent;
-				left: 10px;
-				transform-origin: -10px 35px;
-			}
-		}
-	</style>
 
 	<body>
 		<div
 			id="splash-screen"
-			class="app_splash app_splash_visible"
+			class="app__splash"
 		>
-			<div class="app_splash_content">
-				<img
-					class="app_splash_content_logo"
-					src="/basic_alt.svg"
-				/>
-
-				<div class="app_splash_content_loader_wrapper">
-					<div class="app_splash_content_loader">
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
+			<div class="app__splash__loader">
+				<div class="app__splash__loader__box__main">
+					<div class="app__splash__loader__logo">
+						<img src="/basic_alt.svg" />
 					</div>
 				</div>
+
+				<div class="app__splash__loader__box"></div>
+				<div class="app__splash__loader__box"></div>
+				<div class="app__splash__loader__box"></div>
 			</div>
 		</div>
-		<div id="root"></div>
+
 		<script>
 			window.process = {
 				env: {},
 			}
 			window.app = {}
 		</script>
+
+		<div id="root"></div>
+
 		<script
 			type="module"
 			src="/src/App.jsx"
