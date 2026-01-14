@@ -8,7 +8,11 @@ export default async function (ws) {
 		// send to the client the connected event
 		ws.send(
 			this.codec.encode({
-				event: "gateway:connected",
+				event: "connected",
+				data: {
+					id: ws.socket_id,
+					authenticated: !!ws.session,
+				},
 			}),
 		)
 
@@ -16,7 +20,7 @@ export default async function (ws) {
 		if (!ws.session) {
 			ws.send(
 				this.codec.encode({
-					event: "gateway:user:unauthorized",
+					event: "user:unauthorized",
 				}),
 			)
 		}
@@ -30,7 +34,7 @@ export default async function (ws) {
 
 			ws.send(
 				this.codec.encode({
-					event: "gateway:user:authed",
+					event: "user:authed",
 					data: {
 						user_id: ws.session.user_id,
 					},
