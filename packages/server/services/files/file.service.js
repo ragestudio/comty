@@ -1,5 +1,6 @@
 import { Server } from "linebridge"
 
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
@@ -7,6 +8,7 @@ import CacheService from "@shared-classes/CacheService"
 import SSEManager from "@shared-classes/SSEManager"
 import LimitsClass from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+import Capabilities from "@classes/Capabilities"
 
 import SharedMiddlewares from "@shared-middlewares"
 
@@ -17,31 +19,50 @@ class API extends Server {
 	static bypassCors = true
 	static useMiddlewares = ["logs"]
 
+	static websockets = {
+		enabled: true,
+		path: "/files",
+	}
+
 	middlewares = {
 		...SharedMiddlewares,
 	}
 
 	contexts = {
 		db: new DbManager(),
-		cache: new CacheService(),
-		SSEManager: new SSEManager(),
-		redis: RedisClient({
+		scylla: (global.scylla = new ScyllaDb()),
+		redis: (global.redis = RedisClient({
 			maxRetriesPerRequest: null,
-		}),
-		limits: {},
+		})),
+		cache: (global.cache = new CacheService()),
+		SSEManager: (global.sse = new SSEManager()),
 		storage: StorageClient(),
 		b2Storage: null,
+		limits: {},
+		capabilities: new Capabilities(),
 	}
 
-	queuesManager = new TaskQueueManager(
+	queuesManager = (global.queues = new TaskQueueManager(
 		{
 			workersPath: `${__dirname}/queues`,
 		},
 		this,
-	)
+	))
 
 	async onInitialize() {
-		global.sse = this.contexts.SSEManager
+		await this.contexts.db.initialize()
+		await this.contexts.scylla.initialize()
+		await this.contexts.redis.initialize()
+
+		await this.contexts.capabilities.initialize()
+
+		console.log(this.contexts.capabilities)
+
+		await this.queuesManager.initialize({
+			redisOptions: this.contexts.redis.client,
+		})
+
+		this.contexts.limits = await LimitsClass.get()
 
 		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
 			this.contexts.b2Storage = StorageClient({
@@ -56,26 +77,14 @@ class API extends Server {
 			})
 
 			await this.contexts.b2Storage.initialize()
-		} else {
-			console.warn(
-				"B2 storage not configured on environment, skipping...",
-			)
 		}
 
-		await this.contexts.redis.initialize()
-		await this.queuesManager.initialize({
-			redisOptions: this.contexts.redis.client,
-		})
-		await this.contexts.db.initialize()
 		await this.contexts.storage.initialize()
 
 		global.storages = {
 			standard: this.contexts.storage,
 			b2: this.contexts.b2Storage,
 		}
-		global.queues = this.queuesManager
-
-		this.contexts.limits = await LimitsClass.get()
 	}
 }
 

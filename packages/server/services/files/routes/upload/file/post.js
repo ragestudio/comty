@@ -6,9 +6,9 @@ import Upload from "@shared-classes/Upload"
 export default {
 	useContexts: ["cache"],
 	useMiddlewares: ["withAuthentication"],
-	fn: async (req, res) => {
+	fn: async (req, res, ctx) => {
 		const workPath = path.resolve(
-			this.default.contexts.cache.constructor.cachePath,
+			ctx.cache.constructor.cachePath,
 			`${req.auth.session.user_id}-${nanoid()}`,
 		)
 

@@ -8,7 +8,7 @@ import bufferToStream from "@shared-utils/bufferToStream"
 const availableProviders = ["b2", "standard"]
 
 export default {
-	useContexts: ["cache", "limits"],
+	useContexts: ["cache", "limits", "capabilities"],
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res, ctx) => {
 		if (!checkChunkUploadHeaders(req.headers)) {
@@ -80,6 +80,7 @@ export default {
 					transformations: transformations,
 					s3Provider: config.useProvider,
 					useCompression: config.useCompression,
+					capabilities: ctx.capabilities,
 				}
 
 				// if has transformations, use background job
