@@ -1,8 +1,15 @@
 [
 	{
-		"id": "search",
-		"label": "Search",
-		"icon": "Search"
+		"id": "messages",
+		"path": "/spaces/dm",
+		"label": "Messages",
+		"icon": "MessageCircle"
+	},
+	{
+		"id": "notifications",
+		"path": "/notifications",
+		"label": "Notifications",
+		"icon": "Bell"
 	},
 	{
 		"id": "apps",
@@ -10,9 +17,8 @@
 		"icon": "Grid3X3"
 	},
 	{
-		"id": "settings",
-		"label": "Settings",
-		"icon": "Settings",
-		"path": "/settings"
+		"id": "search",
+		"label": "Search",
+		"icon": "Search"
 	}
 ]
