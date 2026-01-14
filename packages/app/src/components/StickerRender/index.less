@@ -1,0 +1,36 @@
+@sticker-size: 100px;
+
+.sticker-render {
+	display: inline-flex;
+
+	flex-direction: row;
+	align-content: center;
+	justify-content: center;
+
+	width: @sticker-size;
+	height: @sticker-size;
+
+	max-width: @sticker-size;
+	min-width: @sticker-size;
+
+	max-height: @sticker-size;
+	min-height: @sticker-size;
+
+	border-radius: 12px;
+
+	overflow: hidden;
+
+	img {
+		width: 100%;
+		height: 100%;
+
+		object-fit: cover;
+	}
+
+	video {
+		width: 100%;
+		height: 100%;
+
+		object-fit: cover;
+	}
+}
