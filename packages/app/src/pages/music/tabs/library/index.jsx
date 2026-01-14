@@ -27,7 +27,6 @@ const Views = {
 		label: "Playlists",
 		icon: <Icons.ListMusic />,
 		element: PlaylistLibraryView,
-		disabled: true,
 	},
 }
 
