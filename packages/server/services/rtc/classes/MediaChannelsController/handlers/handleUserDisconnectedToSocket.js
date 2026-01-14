@@ -15,13 +15,15 @@ export default async function (userId) {
 		const groupsIds = await this.getUserJoinedGroupsIds(userId)
 
 		for (const id of groupsIds) {
-			this.dispatchGroupStateUpdate({
-				groupId: id,
-				event: "user:offline",
-				payload: {
+			const groupTopic = `group:${id}`
+
+			await globalThis.websockets.senders.toTopic(
+				groupTopic,
+				`${groupTopic}:user:offline`,
+				{
 					userId: userId,
 				},
-			})
+			)
 		}
 
 		// check if this userId is connected to any channel

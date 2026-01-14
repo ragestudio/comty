@@ -23,7 +23,7 @@ export default async function (client, channelId) {
 
 		const currentUserMediaChannel = this.usersMap.get(client.userId)
 
-		// Cleanup existing connection
+		// Cleanup existing connection if any
 		if (currentUserMediaChannel) {
 			await this.leaveClient(client)
 			await new Promise((resolve) => setTimeout(resolve, 100))
@@ -43,24 +43,7 @@ export default async function (client, channelId) {
 		this.usersMap.set(client.userId, channelId)
 
 		// Join client to channel
-		const result = await channelInstance.joinClient(client)
-
-		// try to public to MQTT
-		this.dispatchGroupStateUpdate({
-			groupId: channelInstance.data.group_id,
-			event: "client:joined",
-			payload: {
-				userId: client.userId,
-				channelId: channelId,
-				channelClients: Array.from(channelInstance.clients).map((c) => {
-					return {
-						userId: c.userId,
-					}
-				}),
-			},
-		})
-
-		return result
+		return await channelInstance.joinClient(client)
 	} catch (error) {
 		console.error(`Error joining client ${client.userId}:`, error)
 		throw error

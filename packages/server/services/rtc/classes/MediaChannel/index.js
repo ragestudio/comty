@@ -1,14 +1,11 @@
-import produceHandler from "./handlers/produce"
 import consumeHandler from "./handlers/consume"
-
-import stopProduceHandler from "./handlers/stopProduce"
-//import stopConsumeHandler from "./handlers/stopConsume"
+import produceHandler from "./handlers/produce"
 
 import joinClientHandler from "./handlers/joinClient"
 import leaveClientHandler from "./handlers/leaveClient"
 
-import createTransportHandler from "./handlers/createTransport"
 import connectTransportHandler from "./handlers/connectTransport"
+import createTransportHandler from "./handlers/createTransport"
 
 export default class MediaChannel {
 	constructor(params) {
@@ -55,15 +52,14 @@ export default class MediaChannel {
 
 	async initialize() {
 		try {
-			console.log(`Initializing MediaChannel ${this.channelId}`)
+			console.log(
+				`Initializing MediaChannel ${this.channelId}`,
+				this.data,
+			)
 
 			this.router = await this.worker.createRouter({
 				mediaCodecs: this.mediaCodecs,
 			})
-
-			console.log(
-				`MediaChannel ${this.channelId} initialized successfully`,
-			)
 
 			this.router.on("workerclose", () => {
 				console.log(
@@ -88,26 +84,8 @@ export default class MediaChannel {
 	produce = produceHandler.bind(this)
 	consume = consumeHandler.bind(this)
 
-	stopProduce = stopProduceHandler.bind(this)
-
 	async close() {
 		try {
-			console.log(`Closing MediaChannel ${this.channelId}`, {
-				producers: this.producers,
-			})
-
-			// Close all producers
-			// FIXME: fix producer close
-			for (const [userId, userProducers] of this.producers) {
-				for (const [id, { producer }] of userProducers) {
-					if (producer && !producer.closed) {
-						producer.close()
-					}
-				}
-			}
-
-			this.producers.clear()
-
 			// Close all consumers
 			for (const [, consumers] of this.consumers) {
 				if (Array.isArray(consumers)) {
@@ -121,14 +99,24 @@ export default class MediaChannel {
 
 			this.consumers.clear()
 
+			// Close all producers
+			for (const [userId, userProducers] of this.producers) {
+				for (const [id, { producer }] of userProducers) {
+					if (producer && !producer.closed) {
+						producer.close()
+					}
+				}
+			}
+
+			this.producers.clear()
+
 			// Close router
 			if (this.router && !this.router.closed) {
 				this.router.close()
 			}
 
+			// Clear clients
 			this.clients.clear()
-
-			console.log(`MediaChannel ${this.channelId} closed successfully`)
 		} catch (error) {
 			console.error(
 				`Error closing MediaChannel ${this.channelId}:`,
@@ -138,8 +126,6 @@ export default class MediaChannel {
 	}
 
 	async handleClientEvent(client, payload) {
-		console.log("handleClientEvent", payload)
-
 		if (!payload.event || !payload.data) {
 			throw new Error("Missing required parameters")
 		}
@@ -165,8 +151,6 @@ export default class MediaChannel {
 	}
 
 	async handleSoundpadDispatch(client, payload) {
-		console.log("handleSoundpadDispatch", payload)
-
 		this.broadcastToClients(`media:channel:soundpad:dispatch`, {
 			userId: client.userId,
 			data: payload,
@@ -210,6 +194,25 @@ export default class MediaChannel {
 		})
 	}
 
+	getConnectedClientsUserIds() {
+		return Array.from(this.clients).map((c) => c.userId)
+	}
+
+	getConnectedClientsSerialized() {
+		return Array.from(this.clients).map((c) => {
+			return {
+				userId: c.userId,
+				voiceState: c.voiceState,
+			}
+		})
+	}
+
+	/**
+	 * Send a event to all clients except the one provided
+	 * @param {Object<Client>} Origin client client
+	 * @param {string} The event name
+	 * @param {Object} The payload object
+	 */
 	async sendToClients(client, event, payload) {
 		try {
 			const otherClients = Array.from(this.clients).filter(
@@ -227,6 +230,11 @@ export default class MediaChannel {
 		}
 	}
 
+	/**
+	 * Broadcast an event to all clients
+	 * @param {string} The event name
+	 * @param {Object} The payload object
+	 */
 	async broadcastToClients(event, payload) {
 		try {
 			for (const client of this.clients) {
@@ -234,6 +242,26 @@ export default class MediaChannel {
 			}
 		} catch (error) {
 			console.error(`Error broadcasting to clients`, error)
+		}
+	}
+
+	/**
+	 * Send an event to the group topic
+	 * @param {String} event
+	 * @param {Object} payload
+	 * @return {Promise}
+	 */
+	async sendToGroupTopic(event, payload) {
+		const topic = `group:${this.data.group_id}`
+
+		try {
+			return await globalThis.websockets.senders.toTopic(
+				topic,
+				`${topic}:${event}`,
+				payload,
+			)
+		} catch (error) {
+			console.error(`Error sending to group topic`, error)
 		}
 	}
 }

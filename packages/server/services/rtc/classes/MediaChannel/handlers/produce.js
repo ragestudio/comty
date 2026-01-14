@@ -29,34 +29,15 @@ export default async function (client, payload) {
 		// Validate RTP parameters
 		validateRtpParameters(payload.rtpParameters, payload.kind)
 
-		// check if producers set has client userId
-		if (!this.producers.has(client.userId)) {
-			this.producers.set(client.userId, new Map())
-		}
-
 		// create producer
 		const producer = new Producer({
 			transport: transport,
 			client: clientInst,
 			channel: this.data,
-			// events: {
-			// 	transportclose: this.removeProducer,
-			// },
+			instance: this,
 		})
 
 		await producer.initialize(payload)
-
-		// add the producer to user producers
-		const userProducers = this.producers.get(client.userId)
-
-		userProducers.set(producer.id, producer)
-
-		// send event other clients
-		this.sendToClients(
-			client,
-			`media:channel:producer:joined`,
-			producer.seralize(),
-		)
 
 		return producer.seralize()
 	} catch (error) {

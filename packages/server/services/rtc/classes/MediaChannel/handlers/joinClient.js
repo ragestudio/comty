@@ -38,6 +38,13 @@ export default async function (client) {
 			}
 		}
 
+		// publish to group topic
+		await this.sendToGroupTopic("client:joined", {
+			userId: client.userId,
+			channelId: this.channelId,
+			channelClients: this.getConnectedClientsSerialized(),
+		})
+
 		console.log(`Client ${client.userId} joined channel ${this.channelId}`)
 
 		return {

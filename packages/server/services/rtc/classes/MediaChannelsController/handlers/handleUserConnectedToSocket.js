@@ -7,12 +7,14 @@ export default async function (userId) {
 	const groupsIds = await this.getUserJoinedGroupsIds(userId)
 
 	for (const id of groupsIds) {
-		this.dispatchGroupStateUpdate({
-			groupId: id,
-			event: "user:online",
-			payload: {
+		const groupTopic = `group:${id}`
+
+		await globalThis.websockets.senders.toTopic(
+			groupTopic,
+			`${groupTopic}:user:online`,
+			{
 				userId: userId,
 			},
-		})
+		)
 	}
 }

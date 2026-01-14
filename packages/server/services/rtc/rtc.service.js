@@ -44,14 +44,10 @@ export default class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
 		redis: RedisClient(),
 		mediaChannels: new MediaChannelsController(this),
 		userCalls: new UserCalls(this),
-		scylla: (global.scylla = new ScyllaDb({
-			contactPoints: ["172.17.0.2"],
-			localDataCenter: "datacenter1",
-			keyspace: "comty",
-		})),
 	}
 
 	async onInitialize() {

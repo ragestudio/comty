@@ -1,6 +1,6 @@
 import setFind from "@shared-utils/setFind"
 
-export default async function (client) {
+export default async function (client, { emitEventToSelf = false } = {}) {
 	try {
 		const clientInst = setFind(this.clients, (c) => {
 			return c.userId === client.userId
@@ -23,15 +23,6 @@ export default async function (client) {
 				if (producer && !producer.closed) {
 					producer.close()
 					clientProducers.delete(id)
-
-					// Notify other clients
-					for (const otherClient of otherClients) {
-						await otherClient.emit(`media:channel:producer:left`, {
-							...producer,
-							channelId: this.channelId,
-							userId: client.userId,
-						})
-					}
 				}
 			}
 
@@ -70,7 +61,26 @@ export default async function (client) {
 			})
 		}
 
+		// publish to group topic
+		await this.sendToGroupTopic("client:left", {
+			userId: clientInst.userId,
+			channelId: this.channelId,
+			channelClients: this.getConnectedClientsSerialized(),
+		})
+
+		if (emitEventToSelf === true) {
+			// notify the client that they left the channel
+			await clientInst.emit(`media:channel:disconnected`, {
+				channelId: this.channelId,
+			})
+		}
+
 		console.log(`Client ${client.userId} left channel ${this.channelId}`)
+
+		return {
+			userId: client.userId,
+			channelId: this.channelId,
+		}
 	} catch (error) {
 		console.error(`Error leaving client ${client.userId}:`, error)
 	}
