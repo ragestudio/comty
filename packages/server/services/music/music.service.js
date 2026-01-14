@@ -1,5 +1,6 @@
 import { Server } from "linebridge"
 
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import SSEManager from "@shared-classes/SSEManager"
 import RedisClient from "@shared-classes/RedisClient"
@@ -28,6 +29,7 @@ export default class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
 		SSEManager: new SSEManager(),
 		redis: RedisClient(),
 		userSyncRooms: new Map(),
@@ -40,6 +42,7 @@ export default class API extends Server {
 		global.syncRoomLyrics = new Map()
 
 		await this.contexts.db.initialize()
+		await this.contexts.scylla.initialize()
 		await this.contexts.redis.initialize()
 
 		this.contexts.limits = await LimitsClass.get()

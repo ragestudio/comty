@@ -1,5 +1,6 @@
 import { Server } from "linebridge"
 
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import CacheService from "@shared-classes/CacheService"
 import StorageClient from "@shared-classes/StorageClient"
@@ -19,6 +20,7 @@ class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
 		cache: new CacheService({
 			fsram: false,
 		}),
@@ -36,6 +38,7 @@ class API extends Server {
 
 	async onInitialize() {
 		await this.contexts.db.initialize()
+		await this.contexts.scylla.initialize()
 		await this.contexts.storage.initialize()
 
 		global.cache = this.contexts.cache
