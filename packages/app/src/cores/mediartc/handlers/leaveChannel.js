@@ -1,32 +1,18 @@
 export default async function () {
 	try {
-		if (!this.state.isJoined) {
-			this.console.warn("No channel to leave")
-			return null
-		}
-
-		this.console.log("Leaving channel:", {
-			channelId: this.state.channelId,
-		})
-
-		app.cores.sfx.play("media_channel_leave")
-
 		if (this.ui) {
 			this.ui.detach()
 		}
 
-		// stop producers
-		await this.self.stopMicProducer()
-		await this.self.stopScreenProducer()
+		if (this.screens.size > 0) {
+			this.ui.detachFloatingScreens()
 
-		// stop local streams
-		await this.self.destroyMicStream()
-		await this.self.destroyScreenStream()
+			for (const screen of this.screens.values()) {
+				screen.stop()
+			}
 
-		// destroy all consumers&producers&clients
-		await this.consumers.stopAll()
-		await this.clients.destroyAll()
-		this.producers.clear()
+			this.screens.clear()
+		}
 
 		// close transports
 		if (this.sendTransport && !this.sendTransport.closed) {
@@ -36,8 +22,24 @@ export default async function () {
 			this.recvTransport.close()
 		}
 
-		// call socket to leave
-		await this.socket.call("channel:leave")
+		// stop all devices
+		await this.self.stopAll()
+
+		// stop all consumers
+		await this.consumers.stopAll()
+
+		// destroy all clients
+		await this.clients.destroyAll()
+
+		if (!this.state.isJoined) {
+			return null
+		}
+
+		this.console.debug("Leaving channel:", {
+			channelId: this.state.channelId,
+		})
+
+		app.cores.sfx.play("media_channel_leave")
 
 		// clear device
 		this.device = null
@@ -48,9 +50,8 @@ export default async function () {
 		this.state.channelId = null
 		this.state.channel = null
 
-		this.console.log("Left channel", {
-			channelId: this.state.channelId,
-		})
+		// call socket to leave
+		await this.socket.call("channel:leave")
 	} catch (error) {
 		this.console.error("Error leaving channel:", error)
 

@@ -26,6 +26,11 @@ export default async (core, data) => {
 				client.attachMic(data)
 			}
 
+			// if user camera, just play sfx
+			if (data.appData.mediaTag === "user-cam") {
+				app.cores.sfx.play("media_video_join")
+			}
+
 			// if user screen, just play sfx
 			if (data.appData.mediaTag === "screen-video") {
 				app.cores.sfx.play("media_video_join")

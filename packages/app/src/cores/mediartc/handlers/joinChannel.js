@@ -16,13 +16,28 @@ export default async function (groupId, channelId) {
 		// fetch channel data
 		const channelData = await GroupModel.channels.get(groupId, channelId)
 
-		this.console.log("Joining channel...", {
+		this.console.debug("Joining channel...", {
 			groupId,
 			channelId,
 			self: this,
 		})
 
+		await this.self.createMicStream()
+
+		// resume audio context
+		if (this.self.audioOutput.state === "suspended") {
+			await this.self.audioOutput.resume()
+		}
+
+		// start ui
+		if (this.ui) {
+			this.ui.attach()
+		}
+
 		const data = await this.socket.call("channel:join", channelData._id)
+
+		// dispatch sfx
+		app.cores.sfx.play("media_channel_join")
 
 		this.state.channel = channelData
 		this.state.channelId = channelData._id
@@ -37,26 +52,11 @@ export default async function (groupId, channelId) {
 			this.clients.set(client.userId, new Client(this, client))
 		}
 
-		// dispatch sfx
-		app.cores.sfx.play("media_channel_join")
-
-		await this.self.createMicStream()
-
-		// resume audio context
-		if (this.self.audioOutput.state === "suspended") {
-			await this.self.audioOutput.resume()
-		}
-
 		// create and setup transports
 		await this.handlers.createTransports()
 
 		// start audio producer
 		await this.self.startMicProducer()
-
-		// start ui
-		if (this.ui) {
-			this.ui.attach()
-		}
 
 		// sync producers & clients mic
 		if (data.producers && Array.isArray(data.producers)) {
@@ -94,12 +94,17 @@ export default async function (groupId, channelId) {
 			clients: data.clients,
 		})
 	} catch (error) {
-		this.state.isLoading = false
-
-		console.error(error)
-
 		this.console.error(error)
 		this.console.error(error.stack)
+
+		this.state.isJoined = false
+		this.state.isLoading = false
+
+		if (this.ui) {
+			this.ui.detach()
+		}
+
+		this.self.stopAll()
 
 		app.cores.notifications.new({
 			title: "Failed to join channel",

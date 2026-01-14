@@ -7,8 +7,8 @@ import UserPreview from "@components/UserPreview"
 const ignoreIncomingCallTimeout = 45000 // 45 seconds
 
 const alternativesSfx = [
-	"./sounds/pick_up_the_phone.ogg",
-	"./sounds/new_ringtone.ogg",
+	"/sounds/pick_up_the_phone.ogg",
+	"/sounds/new_ringtone.ogg",
 ]
 
 function getAudioSfx(alternative) {
@@ -53,8 +53,10 @@ export default async (core, payload) => {
 
 	// if there is an audio src, play it
 	if (incomingCallAudioSrc && !core._incomingCallAudio) {
+		const url = new URL(incomingCallAudioSrc, window.location.origin)
+
 		core._incomingCallAudio = new Howl({
-			src: incomingCallAudioSrc,
+			src: url.href,
 			loop: true,
 			volume: 0.5,
 		})

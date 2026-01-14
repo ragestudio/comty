@@ -34,8 +34,10 @@ export default async function (userId, { alternativeSfx = false } = {}) {
 		app.cores.sfx.soundsPool()["call_outgoing"]?._src
 
 	if (outgoingCallAudioSrc && !this._outgoingCallAudio) {
+		const url = new URL(outgoingCallAudioSrc, window.location.origin)
+
 		this._outgoingCallAudio = new Howl({
-			src: outgoingCallAudioSrc,
+			src: url.href,
 			loop: true,
 			volume: 0.5,
 		})
