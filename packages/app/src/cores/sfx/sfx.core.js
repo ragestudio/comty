@@ -81,7 +81,7 @@ export default class SFXCore extends Core {
 		const audioInstance = this.soundsPool[name]
 
 		if (!audioInstance) {
-			console.warn(`Sound [${name}] not found in soundpack`)
+			this.console.warn(`Sound [${name}] not found in soundpack`)
 			return false
 		}
 
