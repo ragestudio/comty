@@ -1,0 +1,61 @@
+.group-invites__list {
+	display: flex;
+	flex-direction: column;
+
+	border: 3px solid var(--border-color);
+	border-radius: 12px;
+
+	overflow: hidden;
+}
+
+.group-invites__list__item {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: space-between;
+
+	width: 100%;
+
+	padding: 5px 10px;
+	gap: 5px;
+
+	background-color: var(--background-color-accent);
+
+	// if is odd, change background color
+	&:nth-child(even) {
+		background-color: var(--background-color-accent-2);
+	}
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 5px;
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 5px;
+	}
+
+	&__btn {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		cursor: pointer;
+
+		gap: 10px;
+
+		padding: 0 5px;
+	}
+}

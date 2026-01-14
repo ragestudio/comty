@@ -1,133 +1,152 @@
 import React from "react"
-import { Button, Result, Input } from "antd"
+import { Button, Input } from "antd"
+import { motion } from "motion/react"
+import classnames from "classnames"
+import { Icons } from "@components/Icons"
 
-import GroupsModel from "@models/groups"
+import SpacesSidebar from "./components/Sidebar"
+
+import GroupsList from "./components/GroupList"
+import Group from "./components/Group"
+
+import DMRoomsList from "./components/DMRoomsList"
+import DMRoom from "./components/DMRoom"
+
+import SpacesPageContext from "./contexts/page"
 
 import "./index.less"
 
-const CreateGroup = (props) => {
-	const [name, setName] = React.useState("")
-	const [description, setDescription] = React.useState("")
+const URL_PREFIX = "spaces"
 
-	const createGroup = async () => {
-		const result = await GroupsModel.create({
-			name,
-			description,
-		}).catch((error) => {
-			console.error(error)
+const composePathname = ({ type, room, channel }) => {
+	return (
+		"/" + [URL_PREFIX, type, room, channel].filter((part) => part).join("/")
+	)
+}
 
-			app.cores.notifications.new({
-				type: "error",
-				title: "Failed to create group",
-				description: error.message,
-			})
-			return null
+const spacesPageController = () => {
+	const [firstLoad, setFirstLoad] = React.useState(true)
+	const [type, setType] = React.useState(null)
+	const [room, setRoom] = React.useState(null)
+	const [channel, setChannel] = React.useState(null)
+
+	const updateToHistory = () => {
+		const pathname = composePathname({
+			type: type,
+			room: room,
+			channel: channel,
 		})
 
-		if (result) {
-			app.message.info("Group created")
-			props.close()
+		history.pushState(undefined, undefined, pathname)
+	}
+
+	const updateFromHistory = React.useCallback(() => {
+		const parts = window.location.pathname.split("/")
+		const [_, prefix, _type, _room, _channel] = parts
+
+		if (prefix !== URL_PREFIX) {
+			return null
 		}
-	}
 
-	return (
-		<div className="create-group-dialog">
-			<h1>Create Group</h1>
+		if (_type !== type) {
+			setType(_type || null)
+		}
 
-			<Input
-				placeholder="Group name"
-				value={name}
-				onChange={(i) => setName(i.target.value)}
-			/>
-			<Input
-				placeholder="Group description"
-				value={description}
-				onChange={(i) => setDescription(i.target.value)}
-			/>
+		if (_room !== room) {
+			setRoom(_room || null)
+		}
 
-			<div className="create-group-dialog__actions">
-				<Button onClick={props.close}>Cancel</Button>
-				<Button
-					type="primary"
-					onClick={createGroup}
-				>
-					Create
-				</Button>
-			</div>
-		</div>
-	)
-}
+		if (_channel !== channel) {
+			setChannel(_channel || null)
+		}
+	}, [type, room, channel, firstLoad])
 
-const GroupListItem = ({ group }) => {
-	const onClick = () => {
-		app.location.push(`/spaces/${group._id}`)
-	}
+	// listen to history changes
+	React.useEffect(() => {
+		updateFromHistory()
+		setFirstLoad(false)
 
-	return (
-		<div
-			className="groups-page__group-item"
-			onClick={onClick}
-		>
-			<div className="groups-page__group-item__icon">
-				<img src={group.icon} />
-			</div>
+		window.addEventListener("popstate", updateFromHistory)
 
-			<div className="groups-page__group-item__content">
-				<h1>{group.name}</h1>
-				<p>{group.description}</p>
-			</div>
-
-			<div className="groups-page__group-item__extra"></div>
-		</div>
-	)
-}
-
-const GroupsPage = (props) => {
-	const [L_Groups, R_Groups, E_Groups] = app.cores.api.useRequest(
-		GroupsModel.getMy,
-	)
-
-	const showCreateGroupDialog = React.useCallback(() => {
-		app.layout.modal.open("create-group-dialog", CreateGroup)
+		return () => {
+			window.removeEventListener("popstate", updateFromHistory)
+		}
 	}, [])
 
-	if (E_Groups) {
-		return (
-			<Result
-				status="error"
-				title="Error"
-				subTitle="Failed to load groups"
-			/>
-		)
-	}
+	React.useEffect(() => {
+		if (!firstLoad) {
+			updateToHistory()
+		}
+	}, [type, room, channel, firstLoad])
 
-	if (L_Groups) {
-		return <div className="groups-page">Loading...</div>
+	return {
+		type: type,
+		room: room,
+		channel: channel,
+		setType: setType,
+		setRoom: setRoom,
+		setChannel: setChannel,
 	}
+}
+
+// TODO: support url query key to auto select a room
+// TODO: support room list pagination
+// TODO: support hybrid group layout renderer
+// TODO: improve group item design
+// TODO: add support for mobile layout
+// TODO: implement search logic
+const SpacesPage = (props) => {
+	const controller = spacesPageController()
+	const [compact, setCompact] = React.useState(false)
+
+	React.useEffect(() => {
+		if (controller.type !== null) {
+			setCompact(true)
+		} else {
+			setCompact(false)
+		}
+	}, [controller])
 
 	return (
-		<div className="groups-page">
-			<div className="groups-page__header">
-				<Button onClick={showCreateGroupDialog}>Create new</Button>
-			</div>
+		<SpacesPageContext.Provider value={controller}>
+			<div
+				className={classnames("spaces-page", {
+					["compact"]: compact,
+				})}
+			>
+				<SpacesSidebar />
 
-			<div className="groups-page__groups_list">
-				{R_Groups.items.length === 0 && (
-					<Result
-						status="info"
-						title="No groups"
-						subTitle="You have no groups yet"
-					/>
-				)}
-				{R_Groups.items.map((group) => (
-					<GroupListItem
-						key={group._id}
-						group={group}
-					/>
-				))}
+				<div className="spaces-page__content">
+					{controller.type === "group" && (
+						<Group group_id={controller.room} />
+					)}
+
+					{controller.type === "dm" && !controller.room && (
+						<DMRoomsList
+							selectedRoom={controller.room}
+							onClickItem={(room) => {
+								controller.setType("dm")
+								controller.setRoom(room.to_user_id)
+								controller.setChannel(null)
+							}}
+						/>
+					)}
+
+					{controller.type === "dm" && controller.room && (
+						<DMRoom to_user_id={controller.room} />
+					)}
+				</div>
 			</div>
-		</div>
+		</SpacesPageContext.Provider>
 	)
 }
 
-export default GroupsPage
+SpacesPage.options = {
+	layout: {
+		sidebar: false,
+		centeredContent: false,
+		maxHeight: true,
+	},
+}
+
+export default SpacesPage

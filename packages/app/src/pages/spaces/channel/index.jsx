@@ -17,13 +17,12 @@ const VideoStream = ({
 	userId,
 	onStart,
 	onStop,
-	onDoubleClick,
+	onClick,
 	selected,
 	speaking,
 	noAudio,
 }) => {
 	const videoRef = React.useRef(null)
-	const [started, setStarted] = React.useState(false)
 
 	const enterFullscreen = () => {
 		if (videoRef.current) {
@@ -55,12 +54,12 @@ const VideoStream = ({
 			videoRef.current.volume = noAudio === true ? 0 : 1
 
 			videoRef.current.play()
-			setStarted(true)
 		} else {
 			videoRef.current.srcObject = null
-			setStarted(false)
 		}
 	}, [videoRef.current, stream])
+
+	const started = stream !== null
 
 	return (
 		<motion.div
@@ -70,7 +69,7 @@ const VideoStream = ({
 				["selected"]: selected,
 				["speaking"]: speaking,
 			})}
-			onDoubleClick={onDoubleClick}
+			onClick={onClick}
 		>
 			<div className="video-consumer__overlay">
 				<div className="video-consumer__overlay__user">
@@ -121,81 +120,90 @@ const VideoStream = ({
 	)
 }
 
-const RemoteConsumer = ({ producer, onDoubleClick, selected, speaking }) => {
-	const mediaStreamRef = React.useRef(producer.stream)
-	const attachedConsumersIds = React.useRef([])
+const rtc = () => {
+	return app.cores.mediartc.instance()
+}
+
+const RemoteConsumer = ({ producer, onClick, selected, speaking }) => {
+	const [screen, setScreen] = React.useState(null)
+	const [error, setError] = React.useState(null)
 
 	// TODO:send to websocket
 	const handleOnStart = async () => {
+		setError(null)
+
 		if (producer.self) {
 			return true
 		}
 
-		const stream = new MediaStream()
+		try {
+			const screenInstance = await rtc().screens.start(producer.id)
 
-		const consumer = await app.cores.mediartc
-			.instance()
-			.consumers.start(producer)
-
-		if (consumer) {
-			if (consumer.paused) {
-				consumer.resume()
-			}
-
-			attachedConsumersIds.current.push(consumer.id)
-
-			stream.addTrack(consumer.track)
-
-			if (producer.appData) {
-				if (Array.isArray(producer.appData.childrens)) {
-					for await (const childId of producer.appData.childrens) {
-						const child = app.cores.mediartc
-							.instance()
-							.producers.get(childId)
-
-						if (child) {
-							const childConsumer = await app.cores.mediartc
-								.instance()
-								.consumers.start(child)
-
-							if (childConsumer) {
-								stream.addTrack(childConsumer.track)
-
-								attachedConsumersIds.current.push(
-									childConsumer.id,
-								)
-							}
-						}
-					}
-				}
-			}
-
-			mediaStreamRef.current = stream
+			setScreen(screenInstance)
+		} catch (error) {
+			setError(error)
 		}
 	}
 
 	// TODO:send to websocket
 	const handleOnStop = () => {
+		setError(null)
+
 		if (producer.self) {
-			return false
+			return true
 		}
 
-		for (const consumerId of attachedConsumersIds.current) {
-			app.cores.mediartc.instance().consumers.stop(consumerId)
+		if (screen) {
+			screen.stop()
+			setScreen(null)
 		}
+	}
 
-		mediaStreamRef.current = null
+	React.useEffect(() => {
+		if (producer) {
+			if (producer.self) {
+				setScreen({
+					media: producer.stream,
+				})
+
+				console.log("Setting self screen", producer.stream)
+
+				return undefined
+			}
+
+			const targetScreen = rtc().screens.get(producer.userId)
+
+			if (targetScreen) {
+				setScreen(targetScreen)
+			}
+		}
+	}, [])
+
+	if (error) {
+		return (
+			<div className="video-consumer failed">
+				<span>{error.message}</span>
+				<Button
+					onClick={(e) => {
+						e.stopPropagation()
+						handleOnStop()
+					}}
+				>
+					Stop
+				</Button>
+			</div>
+		)
 	}
 
 	return (
 		<VideoStream
-			stream={mediaStreamRef.current}
+			stream={screen && screen.media}
 			userId={producer.userId}
 			onStart={handleOnStart}
 			onStop={handleOnStop}
 			selected={selected}
 			speaking={speaking}
-			onDoubleClick={onDoubleClick}
+			onClick={onClick}
 			noAudio={producer.self}
 		/>
 	)
@@ -209,6 +217,8 @@ const ChannelPage = () => {
 
 	const ownScreenStream = rtcInstance.self.screenStream
 	const ownScreenShareProducer = rtcInstance.self.screenProducer
+	const ownCameraStream = rtcInstance.self.camStream
+	const ownCameraShareProducer = rtcInstance.self.camProducer
 
 	let producers = Array.from(rtcInstance.producers.values())
 
@@ -228,6 +238,17 @@ const ChannelPage = () => {
 		})
 	}
 
+	// put self camera video stream as a fake producer
+	if (ownCameraStream && ownCameraShareProducer) {
+		producers.push({
+			self: true,
+			id: ownCameraShareProducer?.id,
+			kind: "video",
+			userId: app.userData._id,
+			stream: ownCameraStream,
+		})
+	}
+
 	const handleOnTileClick = (consumerId) => {
 		if (focusedId === consumerId) {
 			console.log("Exiting focus mode")
@@ -240,18 +261,18 @@ const ChannelPage = () => {
 
 	const handleClickBackToGroup = () => {
 		if (state.channel.group_id) {
-			app.location.push(`/groups/${state.channel.group_id}`)
+			app.location.push(`/spaces/group/${state.channel.group_id}`)
 		}
 	}
 
+	// if there is no producers, and there is a focusedId, then we should exit focus mode
 	React.useEffect(() => {
-		if (producers.length === 0) {
-			if (focusedId) {
-				setFocusedId(null)
-			}
+		if (producers.length === 0 && focusedId) {
+			setFocusedId(null)
 		}
 	}, [producers])
 
+	// if there is a focusedId, then we should hide the sidebar to make some room
 	React.useEffect(() => {
 		if (app.layout.sidebar) {
 			if (focusedId) {
@@ -262,6 +283,7 @@ const ChannelPage = () => {
 		}
 	}, [focusedId])
 
+	// if there is a focusedId, then we should compact the layout
 	React.useEffect(() => {
 		app.layout.toggleCompactMode(true)
 
@@ -269,6 +291,19 @@ const ChannelPage = () => {
 			app.layout.toggleCompactMode(false)
 		}
 	}, [focusedId])
+
+	// handle the previews
+	React.useEffect(() => {
+		if (state.channel) {
+			rtc().ui.detachFloatingScreens()
+		}
+
+		return () => {
+			if (state.channel) {
+				rtc().ui.attachFloatingScreens()
+			}
+		}
+	}, [])
 
 	if (!state.channel) {
 		return (
@@ -278,18 +313,7 @@ const ChannelPage = () => {
 		)
 	}
 
-	// const selectedVideoConsumer = videoConsumers.find(
-	// 	(consumer) => consumer.id === fucusedId,
-	// )
-
-	// console.log({
-	// 	videoProducers: videoProducers,
-	// 	ownScreenShareProducer: ownScreenShareProducer,
-	// 	ownScreenStream: ownScreenStream,
-	// 	state: state,
-	// })
-
-	console.log({ producers })
+	console.log("focusedid", focusedId)
 
 	return (
 		<motion.div
@@ -315,16 +339,14 @@ const ChannelPage = () => {
 			<div className="channel-video-page__content">
 				<VideoGrid focusedId={focusedId}>
 					{producers.map((producer) => {
-						const isSelected = focusedId === producer.producerId
+						const isSelected = focusedId === producer.id
 
 						return (
 							<RemoteConsumer
 								key={producer.id}
 								producer={producer}
 								selected={isSelected}
-								defaultStarted={isSelected || !focusedId}
-								onDoubleClick={(e) => {
-									e.stopPropagation()
+								onClick={(e) => {
 									handleOnTileClick(producer.id)
 								}}
 							/>

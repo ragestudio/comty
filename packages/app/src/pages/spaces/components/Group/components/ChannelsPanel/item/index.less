@@ -1,0 +1,159 @@
+.group-page__channels-panel__list-item {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	transition: all 150ms ease-in-out;
+
+	&.selected {
+		.group-page__channels-panel__list-item__content {
+			padding-left: 15px;
+			background-color: var(--background-color-primary-2);
+
+			&::before {
+				opacity: 1;
+				height: 50%;
+			}
+		}
+	}
+
+	&.invalid {
+		.group-page__channels-panel__list-item__content {
+			cursor: not-allowed;
+			opacity: 0.5;
+		}
+	}
+
+	&:hover:not(.invalid) {
+		.group-page__channels-panel__list-item__content {
+			background-color: var(--background-color-primary-2);
+		}
+	}
+}
+
+.group-page__channels-panel__list-item__content {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	height: 45px;
+	min-height: 45px;
+	max-height: 45px;
+
+	padding: 5px 10px;
+	gap: 10px;
+
+	background-color: var(--background-color-accent);
+
+	border-radius: 12px;
+	border: 1px solid var(--border-color);
+
+	cursor: pointer;
+
+	transition: all 150ms ease-in-out;
+
+	&::before {
+		content: "";
+
+		position: absolute;
+		display: block;
+
+		top: auto;
+		left: 6px;
+
+		width: 3px;
+		height: 0;
+
+		transition: all 150ms ease-in-out;
+
+		background-color: var(--colorPrimary);
+		border-radius: 12px;
+
+		opacity: 0;
+	}
+
+	&__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		font-size: 1rem;
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		height: fit-content;
+
+		gap: 3px;
+
+		&__name {
+			display: flex;
+			flex-direction: row;
+
+			height: fit-content;
+
+			p {
+				font-size: 0.8rem;
+				font-weight: bold;
+				line-height: 1em;
+			}
+		}
+
+		&__description {
+			display: flex;
+			flex-direction: row;
+
+			height: fit-content;
+
+			span {
+				line-height: 1em;
+				font-size: 0.7rem;
+				height: fit-content;
+			}
+		}
+	}
+}
+
+.group-page__channels-panel__list-item__clients {
+	position: relative;
+
+	z-index: -1;
+
+	display: flex;
+	flex-direction: column;
+
+	overflow: hidden;
+
+	transform: translateY(-10px);
+
+	gap: 5px;
+	padding: 20px 10px 10px 15px;
+
+	border-radius: 0 0 12px 12px;
+	border: 1px solid var(--border-color);
+
+	background-color: var(--background-color-accent);
+
+	&__client {
+		display: inline-flex;
+		flex-direction: row;
+
+		width: 100%;
+
+		gap: 8px;
+
+		img {
+			width: 20px;
+			height: 20px;
+
+			border-radius: 8px;
+		}
+	}
+}
