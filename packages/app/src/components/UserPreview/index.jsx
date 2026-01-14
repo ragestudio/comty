@@ -12,7 +12,7 @@ import "./index.less"
 const UserPreview = (props) => {
 	let [userData, setUserData] = React.useState(props.user)
 
-	const fetchUser = async () => {
+	const fetchUser = React.useCallback(async () => {
 		if (!props.user_id && !props.username) {
 			console.error("Cannot fetch user data without user_id or username")
 			return false
@@ -30,24 +30,27 @@ const UserPreview = (props) => {
 		if (data) {
 			setUserData(data)
 		}
-	}
+	}, [props])
 
 	const handleOnClick = async () => {
-		if (typeof props.onClick !== "function") {
-			console.warn(
-				"UserPreview: onClick is not a function, executing default action",
-			)
-			return app.navigation.goToAccount(userData.username)
+		if (typeof props.onClick === "function") {
+			return await props.onClick(userData)
 		}
 
-		return await props.onClick(userData)
+		return app.navigation.goToAccount(userData.username)
 	}
 
 	React.useEffect(() => {
-		if (typeof userData === "undefined") {
+		if (!props.user) {
 			fetchUser()
 		}
-	}, [])
+	}, [props])
+
+	React.useEffect(() => {
+		if (props.user) {
+			setUserData(props.user)
+		}
+	}, [props.user])
 
 	if (!userData) {
 		return (
