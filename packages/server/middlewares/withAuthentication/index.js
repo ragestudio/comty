@@ -75,7 +75,7 @@ export default async (req, res) => {
 			case "Bot": {
 				if (!req.auth) {
 					return reject({
-						error: "Invalid authentication",
+						error: "Invalid authentication method",
 					})
 				}
 
