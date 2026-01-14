@@ -1,4 +1,5 @@
 import React from "react"
+import { motion, AnimatePresence } from "motion/react"
 import { Tag, Button } from "antd"
 import classnames from "classnames"
 import Marquee from "react-fast-marquee"
@@ -28,7 +29,7 @@ const PlayerController = (props) => {
 
 	const titleRef = React.useRef()
 
-	const [hide, onMouseEnter, onMouseLeave] = useHideOnMouseStop({
+	const [hide, onMouseEnter, onMouseLeave, isHovered] = useHideOnMouseStop({
 		delay: 3000,
 		hideCursor: true,
 	})
@@ -47,10 +48,12 @@ const PlayerController = (props) => {
 			className={classnames("lyrics-player-controller-wrapper", {
 				["hidden"]: props.lyrics?.video_source && hide,
 			})}
-			onMouseEnter={onMouseEnter}
-			onMouseLeave={onMouseLeave}
 		>
-			<div className="lyrics-player-controller bg-accent">
+			<div
+				className="lyrics-player-controller bg-accent"
+				onMouseEnter={onMouseEnter}
+				onMouseLeave={onMouseLeave}
+			>
 				<div className="lyrics-player-controller-info">
 					<div className="lyrics-player-controller-info-title">
 						{
@@ -93,14 +96,26 @@ const PlayerController = (props) => {
 					)}
 				</div>
 
-				<Controls streamMode={playerState.live} />
+				<AnimatePresence>
+					{isHovered && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: 30 }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.15 }}
+							className="lyrics-player-controller-controls"
+						>
+							<Controls streamMode={playerState.live} />
+						</motion.div>
+					)}
+				</AnimatePresence>
 
 				{!playerState.live && <SeekBar />}
 
-				<Indicators
+				{/* <Indicators
 					track={playerState.track_manifest}
 					playerState={playerState}
-				/>
+				/>*/}
 			</div>
 		</div>
 	)
