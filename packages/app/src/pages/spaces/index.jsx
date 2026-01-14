@@ -1,14 +1,8 @@
 import React from "react"
-import { Button, Input } from "antd"
-import { motion } from "motion/react"
 import classnames from "classnames"
-import { Icons } from "@components/Icons"
 
 import SpacesSidebar from "./components/Sidebar"
-
-import GroupsList from "./components/GroupList"
 import Group from "./components/Group"
-
 import DMRoomsList from "./components/DMRoomsList"
 import DMRoom from "./components/DMRoom"
 
