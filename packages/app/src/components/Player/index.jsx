@@ -187,6 +187,7 @@ const Player = (props) => {
 						<Controls streamMode={playerState.live} />
 
 						<SeekBar
+							track={playerState.track_manifest}
 							stopped={playerState.playback_status === "stopped"}
 							playing={playerState.playback_status === "playing"}
 							streamMode={playerState.live}
