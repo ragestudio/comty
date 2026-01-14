@@ -18,7 +18,7 @@ export default {
 			!(await GroupPermissions.canPerformAction(
 				req.auth.user_id,
 				group,
-				"MANAGE_MEMBERSHIPS",
+				"READ_MEMBERSHIPS",
 			))
 		) {
 			throw new OperationError(
@@ -27,6 +27,26 @@ export default {
 			)
 		}
 
-		return await GroupMemberships.delete(req.params.member_id, group._id)
+		let membership = await GroupMemberships.get(
+			group._id,
+			req.params.member_id,
+		)
+
+		if (!membership) {
+			throw new OperationError(404, "Membership not found")
+		}
+
+		membership = membership.toJSON()
+
+		if (!Array.isArray(membership.roles)) {
+			membership.roles = []
+		}
+
+		membership.roles.push({
+			_id: "member",
+			label: "Member",
+		})
+
+		return membership
 	},
 }

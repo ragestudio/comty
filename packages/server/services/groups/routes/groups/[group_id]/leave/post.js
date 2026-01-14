@@ -1,5 +1,5 @@
-import GroupMemberships from "@classes/GroupMemberships"
-import Groups from "@classes/Groups"
+import Groups from "@shared-classes/Spaces/Groups"
+import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
@@ -11,7 +11,7 @@ export default {
 		}
 
 		// check if the user trying to leave is the owner
-		if (group.owner_user_id === req.auth.session.user_id) {
+		if (group.owner_user_id === req.auth.user_id) {
 			throw new OperationError(
 				403,
 				"Owners cannot leave their own groups, delete the group instead",
@@ -20,7 +20,7 @@ export default {
 
 		// check if the user is a member of the group
 		const membership = group.memberships.find(
-			(membership) => membership.user_id === req.auth.session.user_id,
+			(membership) => membership.user_id === req.auth.user_id,
 		)
 
 		if (!membership) {
@@ -30,7 +30,7 @@ export default {
 		await GroupMemberships.delete(
 			membership._id.toString(),
 			req.params.group_id,
-			req.auth.session.user_id,
+			req.auth.user_id,
 		)
 
 		return membership

@@ -1,5 +1,5 @@
-import Groups from "@classes/Groups"
-import GroupChannels from "@classes/GroupChannels"
+import Groups from "@shared-classes/Spaces/Groups"
+import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
@@ -13,14 +13,14 @@ export default {
 			throw new OperationError(404, "Group not found")
 		}
 
-		let channels = await GroupChannels.getByGroupId(
-			req.params.group_id,
+		let channels = await GroupChannels.getAllByGroupId(
+			group,
 			req.auth.session.user_id,
 		)
 
 		channels = channels.map((channel) => channel.toJSON())
 
-		const channelOrder = await Groups.channelOrderModel
+		const channelOrder = await GroupChannels.orderModel
 			.findOneAsync({
 				group_id: req.params.group_id,
 			})

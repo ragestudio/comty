@@ -1,4 +1,4 @@
-import Groups from "@classes/Groups"
+import Groups from "@shared-classes/Spaces/Groups"
 
 export default {
 	useMiddlewares: ["botAuthentication", "withAuthentication"],

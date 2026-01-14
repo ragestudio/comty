@@ -1,10 +1,20 @@
-import GroupChannels from "@classes/GroupChannels"
+import Groups from "@shared-classes/Spaces/Groups"
+import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		return await GroupChannels.create(
+		const group = await Groups.get(
 			req.params.group_id,
+			req.auth.session.user_id,
+		)
+
+		if (!group) {
+			throw new OperationError(404, "Group not found")
+		}
+
+		return await GroupChannels.create(
+			group,
 			req.body,
 			req.auth.session.user_id,
 		)
