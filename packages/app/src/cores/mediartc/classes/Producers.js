@@ -16,8 +16,7 @@ export default class Producers extends Map {
 		const producer = await this.core.sendTransport.produce(payload)
 
 		producer.self = true
-
-		producer.on("@close", () => this.onSelfProducerClosed(producer))
+		producer.observer.on("close", () => this.onSelfProducerClosed(producer))
 
 		this.set(producer.id, producer)
 
@@ -29,21 +28,6 @@ export default class Producers extends Map {
 	}
 
 	onSelfProducerClosed(producer) {
-		try {
-			this.delete(producer.id)
-
-			this.core.socket.emit("channel:stop_production", {
-				transportId: this.core.sendTransport.id,
-				producerId: producer.id,
-				kind: producer.kind,
-				rtpParameters: producer.rtpParameters,
-				appData: producer.appData,
-			})
-		} catch (error) {
-			this.core.console.error(
-				"Failed to dispatch stop production:",
-				error,
-			)
-		}
+		this.delete(producer.id)
 	}
 }

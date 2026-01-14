@@ -5,12 +5,15 @@ export default class Self {
 		this.core = core
 
 		if (!core) {
-			new Error("Core not provided")
+			throw new Error("Core not provided")
 		}
 	}
 
 	micStream = null
 	micProducer = null
+
+	camStream = null
+	camProducer = null
 
 	screenStream = null
 	screenProducer = null
@@ -144,6 +147,8 @@ export default class Self {
 			},
 		})
 
+		this.audioOutput.context.resume()
+
 		this.audioInput.mainNode.gain.value = parseFloat(
 			this.audioSettings.inputGain,
 		)
@@ -212,22 +217,23 @@ export default class Self {
 			appData: { mediaTag: "user-mic" },
 		})
 
+		// if the producer closes, set the mic producer to null
+		this.micProducer.observer.on("close", () => {
+			this.micProducer = null
+			this.core.state.isProducingAudio = false
+
+			this.core.console.log("mic production stopped")
+		})
+
 		this.core.state.isProducingAudio = true
 
-		this.core.console.log("audio production started")
+		this.core.console.log("mic production started")
 	}
 
 	async stopMicProducer() {
-		if (!this.micProducer) {
-			return false
+		if (this.micProducer && !this.micProducer.closed) {
+			this.micProducer.close()
 		}
-
-		this.micProducer.close()
-		this.micProducer = null
-
-		this.core.state.isProducingAudio = false
-
-		this.core.console.log("audio production stopped")
 	}
 
 	async createScreenStream(options = {}) {
@@ -235,7 +241,7 @@ export default class Self {
 			this.screenStream.getTracks().forEach((track) => track.stop())
 		}
 
-		console.log(options)
+		this.core.console.debug("createScreenStream options:", options)
 
 		this.screenStream = await navigator.mediaDevices.getDisplayMedia({
 			video: {
@@ -243,6 +249,11 @@ export default class Self {
 				height: { max: options.resolution?.height ?? 1080 },
 				frameRate: { max: options.framerate ?? 60 },
 			},
+			audio: {
+				suppressLocalAudioPlayback: false,
+			},
+			selfBrowserSurface: "exclude",
+			systemAudio: "include",
 		})
 
 		// if ipcRenderer is available, start system audio capture and
@@ -324,6 +335,14 @@ export default class Self {
 				},
 			})
 
+			// if the producer closes, set the screen audio producer to null
+			this.screenAudioProducer.observer.on("close", () => {
+				this.screenAudioProducer = null
+				this.core.state.isProducingScreenAudio = false
+
+				this.core.console.log("screen audio production stopped")
+			})
+
 			this.core.state.isProducingScreenAudio = true
 		}
 
@@ -347,33 +366,26 @@ export default class Self {
 			appData: screenShareProducerData,
 		})
 
-		this.core.state.isProducingScreen = true
+		// if the producer closes, set the screen producer to null
+		this.screenProducer.observer.on("close", () => {
+			this.screenProducer = null
+			this.core.state.isProducingScreen = false
 
+			this.core.console.log("screen production stopped")
+		})
+
+		this.core.state.isProducingScreen = true
 		this.core.console.log("screen production started")
 	}
 
 	async stopScreenProducer() {
-		if (!this.screenProducer) {
-			return false
-		}
-
 		if (this.screenProducer && !this.screenProducer.closed) {
 			await this.screenProducer.close()
-
-			this.screenProducer = null
-			this.core.state.isProducingScreen = false
 		}
 
-		if (this.screenAudioProducer) {
-			if (this.screenAudioProducer && !this.screenAudioProducer.closed) {
-				await this.screenAudioProducer.close()
-
-				this.screenAudioProducer = null
-				this.core.state.isProducingScreenAudio = false
-			}
+		if (this.screenAudioProducer && !this.screenAudioProducer.closed) {
+			await this.screenAudioProducer.close()
 		}
-
-		this.core.console.log("screen production stopped")
 	}
 
 	async destroyScreenStream() {
@@ -384,8 +396,98 @@ export default class Self {
 		this.screenStream.getTracks().forEach((track) => track.stop())
 		this.screenStream = null
 
-		this.core.state.isProducingScreen = false
-
 		this.core.console.log("screen stream destroyed")
+	}
+
+	async createCameraStream(options = {}) {
+		if (this.camStream) {
+			this.camStream.getTracks().forEach((track) => track.stop())
+		}
+
+		this.core.console.debug("createCameraStream options:", options)
+
+		const params = {
+			video: {},
+		}
+
+		if (options.deviceId) {
+			params.video.deviceId = {
+				exact: options.deviceId,
+			}
+		}
+
+		this.camStream = await navigator.mediaDevices.getUserMedia(params)
+
+		return this.camStream
+	}
+
+	async destroyCameraStream() {
+		if (this.camStream) {
+			this.camStream.getTracks().forEach((track) => track.stop())
+			this.camStream = null
+		}
+	}
+
+	async startCameraProducer() {
+		if (!this.camStream) {
+			throw new Error("No local camera stream available")
+		}
+
+		const camVideoTrack = this.camStream.getVideoTracks()[0]
+
+		if (!camVideoTrack) {
+			throw new Error("No camera track found")
+		}
+
+		this.camProducer = await this.core.producers.produce({
+			track: camVideoTrack,
+			appData: {
+				mediaTag: "user-cam",
+			},
+		})
+
+		// if the producer closes, set the cam producer to null
+		this.camProducer.observer.on("close", () => {
+			this.camProducer = null
+			this.core.state.isProducingCamera = false
+
+			this.core.console.log("camera production stopped")
+		})
+
+		this.core.state.isProducingCamera = true
+
+		this.core.console.log("camera production started")
+	}
+
+	async stopCameraProducer() {
+		if (this.camProducer && !this.camProducer.closed) {
+			this.camProducer.close()
+		}
+	}
+
+	async stopAll() {
+		if (this.micProducer && !this.micProducer.closed) {
+			this.micProducer.close()
+		}
+
+		if (this.screenProducer && !this.screenProducer.closed) {
+			this.screenProducer.close()
+		}
+
+		if (this.screenAudioProducer && !this.screenAudioProducer.closed) {
+			this.screenAudioProducer.close()
+		}
+
+		if (this.micStream) {
+			this.destroyMicStream()
+		}
+
+		if (this.camStream) {
+			this.destroyCameraStream()
+		}
+
+		if (this.screenStream) {
+			this.destroyScreenStream()
+		}
 	}
 }

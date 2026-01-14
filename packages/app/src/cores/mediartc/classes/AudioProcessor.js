@@ -4,7 +4,7 @@ export default class AudioProcessor {
 		this.params = params
 
 		this.context = new AudioContext({
-			sampleRate: 44100,
+			//sampleRate: 44100,
 			latencyHint: "interactive",
 			sinkId: params.sinkId,
 		})

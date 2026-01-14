@@ -8,6 +8,7 @@ import Self from "./classes/Self"
 import Consumers from "./classes/Consumers"
 import Producers from "./classes/Producers"
 import Clients from "./classes/Clients"
+import Screens from "./classes/Screens"
 
 import buildWebsocketHandler from "./utils/buildWebsocketHandler"
 import * as Vars from "./vars"
@@ -27,10 +28,14 @@ import stopScreenShare from "./handlers/stopScreenShare"
 import toggleMute from "./handlers/toggleMute"
 import toggleDeafen from "./handlers/toggleDeafen"
 
+import startCameraShare from "./handlers/startCameraShare"
+import stopCameraShare from "./handlers/stopCameraShare"
+
 import soundpadDispatch from "./handlers/soundpadDispatch"
 import callUser from "./handlers/callUser"
 
 // ws events
+import channelDisconnectedEvent from "./events/channelDisconnected"
 import clientJoinedEvent from "./events/clientJoined"
 import clientLeftEvent from "./events/clientLeft"
 import clientEventEvent from "./events/clientEvent"
@@ -47,6 +52,7 @@ const WebsocketEvents = {
 	"media:channel:producer:left": producerLeftEvent,
 	"media:channel:soundpad:dispatch": soundpadDispatchEvent,
 	"call:incoming": callIncomingEvent,
+	"media:channel:disconnected": channelDisconnectedEvent,
 }
 
 export default class MediaRTC extends Core {
@@ -95,6 +101,8 @@ export default class MediaRTC extends Core {
 
 	self = new Self(this)
 	clients = new Clients(this)
+	screens = new Screens(this)
+
 	producers = new Producers(this)
 	consumers = new Consumers(this)
 
@@ -113,6 +121,8 @@ export default class MediaRTC extends Core {
 	handlers = {
 		joinChannel: joinChannel.bind(this),
 		leaveChannel: leaveChannel.bind(this),
+		startCameraShare: startCameraShare.bind(this),
+		stopCameraShare: stopCameraShare.bind(this),
 		startScreenShare: startScreenShare.bind(this),
 		stopScreenShare: stopScreenShare.bind(this),
 		createTransports: createTransports.bind(this),

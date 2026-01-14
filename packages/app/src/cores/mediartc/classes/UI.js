@@ -1,19 +1,20 @@
 import MediaRTCChannelCard from "@components/MediaRTCChannelCard"
+import FloatingScreens from "@components/FloatingScreens"
 
 export default class UI {
 	constructor(core) {
 		this.core = core
 	}
 
-	currentDomWindow = null
-	videoGridModal = null
+	domWindow = null
+	floatingScreen = null
 
 	attach() {
-		if (this.currentDomWindow || !app.layout.tools_bar) {
+		if (this.domWindow || !app.layout.tools_bar) {
 			return false
 		}
 
-		this.currentDomWindow = app.layout.tools_bar.attachRender(
+		this.domWindow = app.layout.tools_bar.attachRender(
 			"mediartc-channel",
 			MediaRTCChannelCard,
 			undefined,
@@ -24,12 +25,41 @@ export default class UI {
 	}
 
 	detach() {
-		if (!this.currentDomWindow || !app.layout.tools_bar) {
+		if (!this.domWindow || !app.layout.tools_bar) {
 			return false
 		}
 
 		app.layout.tools_bar.detachRender("mediartc-channel")
 
-		this.currentDomWindow = null
+		this.domWindow = null
+	}
+
+	attachFloatingScreens() {
+		if (this.floatingScreen || !app.layout.tools_bar) {
+			return false
+		}
+
+		if (this.core.screens.size === 0) {
+			return false
+		}
+
+		this.floatingScreen = app.layout.tools_bar.attachRender(
+			"mediartc-floating-screens",
+			FloatingScreens,
+			undefined,
+			{
+				position: "top",
+			},
+		)
+	}
+
+	detachFloatingScreens() {
+		if (!this.floatingScreen || !app.layout.tools_bar) {
+			return false
+		}
+
+		app.layout.tools_bar.detachRender("mediartc-floating-screens")
+
+		this.floatingScreen = null
 	}
 }

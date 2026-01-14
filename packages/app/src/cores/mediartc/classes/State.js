@@ -9,6 +9,7 @@ export default class MediaRTCState {
 		isDeafened: false,
 		isProducingAudio: false,
 		isProducingScreen: false,
+		isProducingCamera: false,
 		channel: null,
 		channelId: null,
 		clients: Array(),

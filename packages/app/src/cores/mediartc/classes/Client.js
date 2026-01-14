@@ -18,10 +18,43 @@ export default class Client {
 
 	micConsumer = null
 	micAudioElement = null
+	micSourceGainNode = null
 
 	voiceState = {
 		muted: false,
 		deafened: false,
+	}
+
+	localState = {
+		muted: false,
+		volume: 1,
+	}
+
+	setVolume = (volume) => {
+		this.localState.volume = volume / 100
+
+		if (this.micSourceGainNode) {
+			this.micSourceGainNode.gain.value = this.localState.muted
+				? 0
+				: this.localState.volume
+		}
+	}
+
+	toggleMute = (to) => {
+		if (typeof to !== "boolean") {
+			to = !this.localState.muted
+		}
+
+		this.localState.muted = to
+
+		if (to === true) {
+			this.micSourceGainNode.gain.value = 0
+		} else {
+			this.micSourceGainNode.gain.value = this.localState.volume
+		}
+
+		// update the voice state
+		this.coreState.voiceState.muted = to
 	}
 
 	// find producers of this client
@@ -39,23 +72,25 @@ export default class Client {
 		this.micConsumer = consumer
 		this.coreState.micConsumerId = consumer.id
 
-		const audioElement = new Audio()
+		const audioElement = (this.micAudioElement = new Audio())
 		const mediaStream = new MediaStream([consumer.track])
 		const source =
 			this.core.self.audioOutput.context.createMediaStreamSource(
 				mediaStream,
 			)
 
+		this.micSourceGainNode = this.core.self.audioOutput.context.createGain()
+		this.micSourceGainNode.gain.value = 1
+
+		audioElement.volume = 1
 		audioElement.srcObject = mediaStream
 		audioElement.muted = true
-
 		audioElement.onerror = (error) => {
 			this.core.console.error("Audio playback error:", error)
 		}
 
-		source.connect(this.core.self.audioOutput.mainNode)
-
-		this.micAudioElement = audioElement
+		source.connect(this.micSourceGainNode)
+		this.micSourceGainNode.connect(this.core.self.audioOutput.mainNode)
 
 		await audioElement.play()
 
@@ -73,7 +108,14 @@ export default class Client {
 				)
 			}
 
+			// disconnect the source
+			this.micSourceGainNode.disconnect(
+				this.core.self.audioOutput.mainNode,
+			)
+
+			// remove nodes
 			this.micAudioElement = null
+			this.micSourceGainNode = null
 		}
 
 		if (this.micConsumer) {
@@ -90,7 +132,6 @@ export default class Client {
 		}
 
 		// remove from the producers
-
 		if (this.coreStateIndex !== -1) {
 			this.core.state.clients.splice(this.coreStateIndex, 1)
 		}
