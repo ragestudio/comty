@@ -18,6 +18,7 @@ export default class AuthManager {
 	}
 
 	state = {
+		firstInit: true,
 		user: null,
 	}
 
@@ -49,8 +50,13 @@ export default class AuthManager {
 		"auth:logout_success": () => {
 			this._emitBehavior("onLogout")
 		},
+		"session:invalid": () => {
+			this._emitBehavior("onInvalidSession")
+		},
 		"session:refreshed": () => {
-			this._emitBehavior("onRefresh")
+			if (!this.state.firstInit) {
+				this._emitBehavior("onRefresh")
+			}
 		},
 	}
 
@@ -66,8 +72,6 @@ export default class AuthManager {
 		},
 		onRefresh: async () => {
 			app.eventBus.emit("authmanager:refresh")
-			await this.flush()
-			await this.initialize()
 		},
 		onLogin: async () => {
 			app.eventBus.emit("authmanager:login")
@@ -105,6 +109,9 @@ export default class AuthManager {
 		const token = SessionModel.token
 
 		if (!token || token == null) {
+			console.log("no token")
+
+			console.timeEnd("authmanager:initialize")
 			return this._emitBehavior("onNoSession")
 		}
 
@@ -116,6 +123,7 @@ export default class AuthManager {
 			username: tokenData.username,
 		}
 
+		console.log("auth manager early data", app.userData)
 		this._emitBehavior("earlyData")
 
 		const user = await UserModel.data().catch((err) => {
@@ -123,15 +131,21 @@ export default class AuthManager {
 		})
 
 		if (!user) {
+			console.log("failed user")
+
+			console.timeEnd("authmanager:initialize")
 			return this._emitBehavior("onFailedUser")
 		}
 
 		app.userData = user
 		this.state.user = user
 
+		console.log("auth manager ok", user)
+		console.timeEnd("authmanager:initialize")
+
+		this.state.firstInit = false
 		this._emitBehavior("onAuthed")
 
-		console.timeEnd("authmanager:initialize")
 		return user
 	}
 
