@@ -335,9 +335,17 @@ svg {
 	left: 0;
 
 	width: 100vw;
+	height: 100vh;
 	height: 100dvh;
 
 	pointer-events: none;
+
+	video {
+		width: 100%;
+		height: 100%;
+
+		object-fit: cover;
+	}
 }
 
 .app_render_error {
@@ -485,4 +493,23 @@ svg {
 	gap: 10px;
 
 	border-radius: 12px;
+}
+
+.member-context-menu__roles {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 5px;
+
+	.ant-tag {
+		margin: 0;
+
+		border-radius: 8px;
+
+		color: var(--text-color);
+
+		background-color: var(--background-color-accent);
+	}
 }
