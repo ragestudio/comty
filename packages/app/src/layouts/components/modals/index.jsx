@@ -86,6 +86,8 @@ export default () => {
 			confirmOnClickTitle,
 			confirmOnClickContent,
 
+			onClose = null,
+
 			className,
 			props,
 		} = {},
@@ -109,6 +111,7 @@ export default () => {
 			{
 				useFrame: false,
 				closeOnClickOutside: false,
+				onClose: onClose,
 			},
 		)
 	}
