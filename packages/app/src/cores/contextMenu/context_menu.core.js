@@ -7,6 +7,55 @@ function cssPxToInt(str) {
 	return parseInt(str.replace("px", ""))
 }
 
+function estimateMenuDimensions(items) {
+	// filter items that not separators
+	const actionsLength = items.filter((i) => i.type !== "separator").length
+	const sepatatorsLength = items.length - actionsLength
+
+	// calculate sizes
+	const menuWidth = cssPxToInt(app.cores.style.vars["context-menu-width"])
+
+	// sum up height of all items
+	let menuHeight =
+		cssPxToInt(app.cores.style.vars["context-menu-item-height"]) *
+		actionsLength
+
+	// add the separators height (1px)
+	menuHeight += sepatatorsLength
+
+	// add the separators margin
+	menuHeight +=
+		cssPxToInt(app.cores.style.vars["context-menu-separator-margin"]) *
+		2 *
+		sepatatorsLength
+
+	// add the padding of the menu
+	menuHeight += cssPxToInt(app.cores.style.vars["context-menu-padding"]) * 2
+
+	return { menuWidth, menuHeight }
+}
+
+function calculateFitCordinates(event, width, height) {
+	// obtain cord of mouse
+	let x = Math.max(event.clientX, ContextMenuCore.minimunPxToBorder)
+	let y = Math.max(event.clientY, ContextMenuCore.minimunPxToBorder)
+
+	// apply displacementAxisXToMouse
+	x += ContextMenuCore.displacementAxisXToMouse
+
+	// adjust x coordinate if menu would overflow right edge
+	if (x + width + ContextMenuCore.minimunPxToBorder > window.innerWidth) {
+		x = window.innerWidth - width - ContextMenuCore.minimunPxToBorder
+	}
+
+	// adjust y coordinate if menu would overflow bottom edge
+	if (y + height + ContextMenuCore.minimunPxToBorder > window.innerHeight) {
+		y = window.innerHeight - height - ContextMenuCore.minimunPxToBorder
+	}
+
+	return { x, y }
+}
+
 export default class ContextMenuCore extends Core {
 	static namespace = "ctx_menu"
 
@@ -19,7 +68,12 @@ export default class ContextMenuCore extends Core {
 	fireWhenClosing = null
 
 	public = {
+		close: () => this.close(),
 		registerContext: this.registerContext,
+		handleEvent: this.handleEvent,
+		renderMenu: this.renderMenu,
+		estimateMenuDimensions: estimateMenuDimensions,
+		calculateFitCordinates: calculateFitCordinates,
 	}
 
 	async onInitialize() {
@@ -28,9 +82,12 @@ export default class ContextMenuCore extends Core {
 			return false
 		}
 
-		let modules = await import.meta.glob(["@/context-menu/*/*.js"], {
-			eager: true,
-		})
+		let modules = await import.meta.glob(
+			["@/context-menu/*/*.js", "@/context-menu/*/*.jsx"],
+			{
+				eager: true,
+			},
+		)
 
 		modules = Object.values(modules).map((module) => {
 			return module.default
@@ -49,89 +106,16 @@ export default class ContextMenuCore extends Core {
 		this.contexts[id] = ctx
 	}
 
-	handleEvent = async (event) => {
-		event.preventDefault()
-
-		// obtain cord of mouse
-		let x = Math.max(event.clientX, ContextMenuCore.minimunPxToBorder)
-		let y = Math.max(event.clientY, ContextMenuCore.minimunPxToBorder)
-
-		// get clicked component
-		const component = document.elementFromPoint(x, y)
-
-		// check if right-clicked inside a context menu
-		if (!component || component?.closest("#context-menu")) {
-			return
-		}
-
-		// generate items
-		const items = await this.generateItems(component)
-
-		// if no items, abort
-		if (!items || items.length === 0) {
-			this.console.error("No context menu items found, aborting")
-			return false
-		}
-
-		// filter items that not separators
-		const actionsLength = items.filter((i) => i.type !== "separator").length
-		const sepatatorsLength = items.length - actionsLength
-
-		// calculate sizes
-		const menuWidth = cssPxToInt(app.cores.style.vars["context-menu-width"])
-
-		// sum up height of all items
-		let menuHeight =
-			cssPxToInt(app.cores.style.vars["context-menu-item-height"]) *
-			actionsLength
-
-		// add the separators height (1px)
-		menuHeight += sepatatorsLength
-
-		// add the separators margin
-		menuHeight +=
-			cssPxToInt(app.cores.style.vars["context-menu-separator-margin"]) *
-			2 *
-			sepatatorsLength
-
-		// add the padding of the menu
-		menuHeight +=
-			cssPxToInt(app.cores.style.vars["context-menu-padding"]) * 2
-
-		// apply displacementAxisXToMouse
-		x += ContextMenuCore.displacementAxisXToMouse
-
-		// adjust x coordinate if menu would overflow right edge
-		if (
-			x + menuWidth + ContextMenuCore.minimunPxToBorder >
-			window.innerWidth
-		) {
-			x =
-				window.innerWidth -
-				menuWidth -
-				ContextMenuCore.minimunPxToBorder
-		}
-
-		// adjust y coordinate if menu would overflow bottom edge
-		if (
-			y + menuHeight + ContextMenuCore.minimunPxToBorder >
-			window.innerHeight
-		) {
-			y =
-				window.innerHeight -
-				menuHeight -
-				ContextMenuCore.minimunPxToBorder
-		}
-
+	renderMenu(items, x, y) {
 		// render menu
 		app.cores.window_mng.render(
 			"context-menu-portal",
 			React.createElement(ContextMenu, {
 				items: items,
-				fireWhenClosing: (fn) => (this.fireWhenClosing = fn),
 				ctx: {
 					close: this.close,
 				},
+				fireWhenClosing: (fn) => (this.fireWhenClosing = fn),
 			}),
 			{
 				className: "context-menu-wrapper",
@@ -148,6 +132,53 @@ export default class ContextMenuCore extends Core {
 		this.isMenuOpen = true
 	}
 
+	handleEvent = async (event) => {
+		event.preventDefault()
+
+		// get clicked component
+		const component = document.elementFromPoint(
+			event.clientX,
+			event.clientY,
+		)
+
+		if (!component) {
+			return null
+		}
+
+		// check if right-clicked inside a context menu
+		if (component?.closest("#context-menu")) {
+			return this.close()
+		}
+
+		// check if right-clicked a item with context-menu attribute
+		if (component.closest("[context-menu]")) {
+			const contextMenuAttr = component
+				.closest("[context-menu]")
+				.getAttribute("context-menu")
+
+			// check if context-menu attribute is "ignore" or "none"
+			if (contextMenuAttr === "ignore" || contextMenuAttr === "none") {
+				return null
+			}
+		}
+
+		// generate items
+		const items = await this.generateItems(component)
+
+		// if no items, abort
+		if (!items || items.length === 0) {
+			this.console.error("No context menu items found, aborting")
+			return false
+		}
+
+		// calculate best estimated position
+		const { menuWidth, menuHeight } = estimateMenuDimensions(items)
+		const { x, y } = calculateFitCordinates(event, menuWidth, menuHeight)
+
+		// render menu
+		return this.renderMenu(items, x, y)
+	}
+
 	generateItems = async (element) => {
 		let contextNames = []
 		let finalItems = []
@@ -158,14 +189,10 @@ export default class ContextMenuCore extends Core {
 		// if parent element exists, get context names from attribute
 		if (parentElement) {
 			const contextAttr = parentElement.getAttribute("context-menu") || ""
+
 			contextNames = contextAttr
 				.split(",")
 				.map((context) => context.trim())
-
-			// if context includes "ignore", no show context menu
-			if (contextNames.includes("ignore")) {
-				return null
-			}
 		}
 
 		// if context includes "no-default", no add default context
@@ -268,7 +295,11 @@ export default class ContextMenuCore extends Core {
 	}
 
 	// close the menu
-	close = async () => {
-		app.cores.window_mng.close("context-menu-portal")
+	close = () => {
+		if (!this.isMenuOpen) {
+			return null
+		}
+
+		return app.cores.window_mng.close("context-menu-portal")
 	}
 }
