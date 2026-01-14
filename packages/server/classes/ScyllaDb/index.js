@@ -3,13 +3,18 @@ import path from "node:path"
 
 import ExpressCassandra from "express-cassandra"
 
+const { SCYLLA_CONTACT_POINTS, SCYLLA_LOCAL_DATA_CENTER, SCYLLA_KEYSPACE } =
+	process.env
+
 export default class ScyllaDb {
 	constructor(config = {}) {
 		this.config = {
 			modelsPath: path.resolve(__dirname, "../../scylla_db_models"),
-			contactPoints: ["127.0.0.1"],
-			localDataCenter: "datacenter1",
-			keyspace: "comty",
+			contactPoints: SCYLLA_CONTACT_POINTS
+				? SCYLLA_CONTACT_POINTS.split(",")
+				: ["127.0.0.1"],
+			localDataCenter: SCYLLA_LOCAL_DATA_CENTER ?? "datacenter1",
+			keyspace: SCYLLA_KEYSPACE ?? "comty",
 			port: 9042,
 			...config,
 		}
@@ -22,7 +27,7 @@ export default class ScyllaDb {
 			clientOptions: {
 				contactPoints: this.config.contactPoints,
 				localDataCenter: this.config.localDataCenter,
-				protocolOptions: { port: this.config.port },
+				protocolOptions: { port: this.config.port, version: 4 },
 				keyspace: this.config.keyspace,
 				queryOptions: {
 					consistency: ExpressCassandra.consistencies.one,
@@ -39,6 +44,8 @@ export default class ScyllaDb {
 		})
 
 		await this.loadModels()
+
+		console.log("ScyllaDB client initialized")
 	}
 
 	async loadModels() {
