@@ -58,7 +58,11 @@ export default [
 		useLayout: "minimal",
 		public: true,
 	},
-
+	{
+		path: "/spaces",
+		useLayout: "default",
+		wildcard: true,
+	},
 	{
 		path: "/marketplace/*",
 		useLayout: "default",
