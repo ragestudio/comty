@@ -1,5 +1,5 @@
 export default {
-	useContexts: ["chatChannelsController"],
+	useContexts: ["groupChannels"],
 	fn: async (client, payload, ctx) => {
 		if (!client.userId) {
 			throw new OperationError(400, "Missing userId")
@@ -13,7 +13,7 @@ export default {
 			throw new OperationError(400, "Missing channel_id")
 		}
 
-		const channel = await ctx.chatChannelsController.get(
+		const channel = await ctx.groupChannels.get(
 			payload.group_id,
 			payload.channel_id,
 			client.userId,

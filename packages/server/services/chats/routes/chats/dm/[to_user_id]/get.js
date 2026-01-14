@@ -1,16 +1,13 @@
 export default {
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
-	useContexts: ["directMessagesController"],
+	useContexts: ["dmChannels"],
 	fn: async (req, res, ctx) => {
 		const { limit, beforeId, afterId } = req.query
 
 		const from_user_id = req.auth.session.user_id
 		const to_user_id = req.params.to_user_id
 
-		const channel = await ctx.directMessagesController.get(
-			from_user_id,
-			to_user_id,
-		)
+		const channel = await ctx.dmChannels.get(from_user_id, to_user_id)
 
 		const params = {}
 

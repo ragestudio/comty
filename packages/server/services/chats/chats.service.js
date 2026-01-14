@@ -9,8 +9,8 @@ import ScyllaDb from "@shared-classes/ScyllaDb"
 
 import SharedMiddlewares from "@shared-middlewares"
 
-import ChatChannelsController from "@classes/ChatChannelsController"
-import DirectMessagesController from "@classes/DirectMessagesController"
+import GroupChatChannelController from "@classes/GroupChatChannelController"
+import DMChatChannelController from "@classes/DMChatChannelController"
 
 class API extends Server {
 	static refName = "chats"
@@ -34,14 +34,10 @@ class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
 		redis: RedisClient(),
-		chatChannelsController: new ChatChannelsController(this),
-		directMessagesController: new DirectMessagesController(this),
-		scylla: new ScyllaDb({
-			contactPoints: ["172.17.0.2"],
-			localDataCenter: "datacenter1",
-			keyspace: "comty",
-		}),
+		groupChannels: new GroupChatChannelController(this),
+		dmChannels: new DMChatChannelController(this),
 		// TODO: add linebridge cluster worker & datacenter id
 		snowflake: new SnowflakeWorker(0, 1),
 	}

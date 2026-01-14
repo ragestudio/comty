@@ -1,10 +1,10 @@
 export default {
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
-	useContexts: ["chatChannelsController"],
+	useContexts: ["groupChannels"],
 	fn: async (req, res, ctx) => {
 		const { group_id, channel_id, message_id } = req.params
 
-		const channel = await ctx.chatChannelsController.get(
+		const channel = await ctx.groupChannels.get(
 			group_id,
 			channel_id,
 			req.auth.session.user_id,

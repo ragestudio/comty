@@ -1,9 +1,7 @@
 export default {
 	useMiddlewares: ["botAuthentication", "withAuthentication"],
-	useContexts: ["directMessagesController"],
+	useContexts: ["dmChannels"],
 	fn: async (req, res, ctx) => {
-		return await ctx.directMessagesController.rooms(
-			req.auth.session.user_id,
-		)
+		return await ctx.dmChannels.rooms(req.auth.session.user_id)
 	},
 }

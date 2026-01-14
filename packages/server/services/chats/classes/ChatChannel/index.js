@@ -39,8 +39,11 @@ export default class ChatChannel {
 	update = updateMethod.bind(this)
 
 	validateMessagePayload = (payload) => {
-		if (!payload.message && !payload.attachments) {
-			throw new OperationError(400, "Missing message or attachments")
+		if (!payload.message && !payload.attachments && !payload.sticker) {
+			throw new OperationError(
+				400,
+				"Missing message or attachments or sticker",
+			)
 		}
 
 		if (payload.message) {

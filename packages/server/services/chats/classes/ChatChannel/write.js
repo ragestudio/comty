@@ -18,6 +18,7 @@ export default async function (user, payload) {
 		attachments: payload.attachments,
 		reply_to_id: payload.reply_to_id,
 		created_at: created_at.toString(),
+		sticker: payload.sticker,
 	})
 
 	await message.saveAsync()
