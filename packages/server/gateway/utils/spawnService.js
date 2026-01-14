@@ -59,7 +59,5 @@ export default async ({
 		return onClose(id, code)
 	})
 
-	global.ipcRouter.register({ id, instance })
-
 	return instance
 }
