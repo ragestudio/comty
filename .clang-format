@@ -1,0 +1,18 @@
+---
+BasedOnStyle: Google
+
+UseTab: Always
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+
+PointerAlignment: Right
+
+ColumnLimit: 0
+
+AlignAfterOpenBracket: BlockIndent
+AlignOperands: DontAlign
+
+Cpp11BracedListStyle: false
+BreakBeforeBraces: Attach
+BinPackArguments: true
