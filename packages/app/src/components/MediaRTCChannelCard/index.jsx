@@ -1,5 +1,5 @@
 import React from "react"
-import { Button, Tooltip } from "antd"
+import { Button, Tooltip, Slider } from "antd"
 import classNames from "classnames"
 import VoiceDetector from "@cores/mediartc/classes/VoiceDetector"
 
@@ -7,9 +7,14 @@ import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 import UserAvatar from "@components/UserAvatar"
 
+import copyToClipboard from "@utils/copyToClipboard"
+
+import GroupsModel from "@models/groups"
+
 import { openDialog as openScreenShareDialog } from "@components/ScreenShareDialog"
 import { openDialog as openScreenShareOptionsDialog } from "@components/ScreenShareOptionsDialog"
 import { openDialog as openSoundpadDialog } from "@components/SoundpadDialog"
+import { openDialog as openShareCameraDialog } from "@components/ShareCameraDialog"
 
 import useMediaRTCState from "@hooks/useMediaRTCState"
 
@@ -31,12 +36,159 @@ const ConnectionStateIndicator = ({ recv, send }) => {
 	)
 }
 
-const ClientTooltip = ({ client }) => {
+const ClientContextMenu = ({ client, close }) => {
+	const state = useMediaRTCState()
+
+	const clientInstance = React.useMemo(() => {
+		return app.cores.mediartc.instance().clients.get(client.userId)
+	}, [client])
+
+	const onClickCopyUserId = React.useCallback(() => {
+		copyToClipboard(client.userId)
+		close()
+	}, [client])
+
+	const onClickDirectMessage = React.useCallback(() => {
+		app.navigation.goToDirectMessage(client.userId)
+		close()
+	}, [client])
+
+	const onClickGoModerate = React.useCallback(() => {
+		close()
+	}, [client])
+
+	const onClickDisconnect = React.useCallback(async () => {
+		await GroupsModel.channels.channel.disconnectUser(
+			state.channel.group_id,
+			state.channel._id,
+			client.userId,
+		)
+
+		close()
+	}, [client])
+
+	const onClickToggleMute = React.useCallback(() => {
+		console.debug("Toggle mute", client.userId)
+
+		clientInstance.toggleMute()
+	}, [client])
+
+	const onChangeVolume = React.useCallback(
+		(value) => {
+			console.debug(
+				`Changing volume to client ${client.userId} to`,
+				value,
+			)
+
+			clientInstance.setVolume(value)
+		},
+		[client],
+	)
+
 	return (
-		<UserPreview
-			user_id={client.userId}
-			small
-		/>
+		<>
+			<UserPreview user_id={client.userId} />
+
+			<div className="context-menu-separator" />
+
+			{!client.self && (
+				<div className="item no_effect">
+					<div className="item__line">
+						<p className="item__line__label">Volume</p>
+
+						<div className="item__line__icon">
+							<Icons.Volume2 />
+						</div>
+					</div>
+
+					<Slider
+						min={0}
+						max={150}
+						defaultValue={clientInstance.localState.volume * 100}
+						onChangeComplete={onChangeVolume}
+					/>
+				</div>
+			)}
+
+			{!client.self && (
+				<div
+					className="item"
+					onClick={onClickDirectMessage}
+				>
+					<div className="item__line">
+						<p className="item__line__label">Direct Message</p>
+
+						<div className="item__line__icon">
+							<Icons.MessageCircle />
+						</div>
+					</div>
+				</div>
+			)}
+
+			<div
+				className="item disabled"
+				onClick={onClickGoModerate}
+			>
+				<div className="item__line">
+					<p className="item__line__label">Moderate</p>
+
+					<div className="item__line__icon">
+						<Icons.RectangleEllipsis />
+					</div>
+				</div>
+			</div>
+
+			<div
+				className="item"
+				onClick={onClickCopyUserId}
+			>
+				<div className="item__line">
+					<p className="item__line__label">Copy User ID</p>
+
+					<div className="item__line__icon">
+						<Icons.Copy />
+					</div>
+				</div>
+			</div>
+
+			<div className="context-menu-separator" />
+
+			{!client.self && (
+				<div
+					className="item"
+					onClick={onClickToggleMute}
+				>
+					<div className="item__line">
+						<p className="item__line__label">
+							{clientInstance.localState.muted
+								? "Unmute"
+								: "Mute"}
+						</p>
+
+						<div className="item__line__icon">
+							{clientInstance.localState.muted ? (
+								<Icons.MicOff />
+							) : (
+								<Icons.Mic />
+							)}
+						</div>
+					</div>
+				</div>
+			)}
+
+			<div
+				className="item danger"
+				onClick={onClickDisconnect}
+			>
+				<div className="item__line">
+					<p className="item__line__label">Disconnect</p>
+
+					<div className="item__line__icon">
+						<Icons.CircleMinus />
+					</div>
+				</div>
+			</div>
+		</>
 	)
 }
 
@@ -59,6 +211,34 @@ const Client = ({ client }) => {
 			? app.cores.mediartc.instance().self.micProducer
 			: client.micConsumerId,
 	])
+
+	const onContextMenu = React.useCallback(
+		(event) => {
+			event.preventDefault()
+			event.stopPropagation()
+
+			const { x, y } = app.cores.ctx_menu.calculateFitCordinates(
+				event,
+				parseInt(
+					app.cores.style.vars["context-menu-width"].replace(
+						"px",
+						"",
+					),
+				),
+				300, // FIXME: calculate height properly
+			)
+
+			app.cores.ctx_menu.renderMenu(
+				React.createElement(ClientContextMenu, {
+					client: client,
+					close: app.cores.ctx_menu.close,
+				}),
+				x,
+				y,
+			)
+		},
+		[client],
+	)
 
 	// attach voice detector
 	React.useEffect(() => {
@@ -92,28 +272,24 @@ const Client = ({ client }) => {
 	}, [consumer])
 
 	return (
-		<Tooltip title={<ClientTooltip client={client} />}>
-			<div
-				key={client.userId}
-				className={classNames(
-					"mediartc-channel-card__clients__client",
-					{
-						["speaking"]: speaking,
-						["muted"]: muted,
-						["deafened"]: deafened,
-						["failed"]: !consumer,
-					},
-				)}
-			>
-				<div className="mediartc-channel-card__clients__client__indicators">
-					{muted && <Icons.MicOff />}
-					{deafened && <Icons.VolumeOff />}
-					{!consumer && <Icons.WifiOff />}
-				</div>
-
-				<UserAvatar user_id={client.userId} />
+		<div
+			key={client.userId}
+			className={classNames("mediartc-channel-card__clients__client", {
+				["speaking"]: speaking,
+				["muted"]: muted,
+				["deafened"]: deafened,
+				["failed"]: !consumer,
+			})}
+			onContextMenu={onContextMenu}
+		>
+			<div className="mediartc-channel-card__clients__client__indicators">
+				{muted && <Icons.MicOff />}
+				{deafened && <Icons.VolumeOff />}
+				{!consumer && <Icons.WifiOff />}
 			</div>
-		</Tooltip>
+
+			<UserAvatar user_id={client.userId} />
+		</div>
 	)
 }
 
@@ -121,7 +297,7 @@ const MediaRTCChannelCard = () => {
 	const state = useMediaRTCState()
 
 	const handleGoToChannel = () => {
-		app.location.push(`/groups/channel`)
+		app.location.push(`/spaces/channel`)
 	}
 
 	const toggleScreenShare = async () => {
@@ -129,6 +305,14 @@ const MediaRTCChannelCard = () => {
 			openScreenShareOptionsDialog()
 		} else {
 			openScreenShareDialog()
+		}
+	}
+
+	const handleToggleCamera = () => {
+		if (state.isProducingCamera) {
+			app.cores.mediartc.handlers().stopCameraShare()
+		} else {
+			openShareCameraDialog()
 		}
 	}
 
@@ -210,6 +394,18 @@ const MediaRTCChannelCard = () => {
 					}
 					type={state.isDeafened ? "primary" : "default"}
 					onClick={handleToggleDeafen}
+				/>
+
+				<Button
+					icon={
+						state.isProducingCamera ? (
+							<Icons.CameraOff />
+						) : (
+							<Icons.Camera />
+						)
+					}
+					type={state.isProducingCamera ? "primary" : "default"}
+					onClick={handleToggleCamera}
 				/>
 
 				<Button
