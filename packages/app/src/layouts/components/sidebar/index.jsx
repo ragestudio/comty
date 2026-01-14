@@ -47,6 +47,15 @@ const ActionMenuItems = [
 		),
 	},
 	{
+		key: "settings",
+		label: (
+			<>
+				<Icons.FiSettings />
+				<Translation>{(t) => t("Settings")}</Translation>
+			</>
+		),
+	},
+	{
 		type: "divider",
 	},
 	{
@@ -70,7 +79,7 @@ const ActionMenuItems = [
 	},
 ]
 
-function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
+export function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
 	let items = []
 
 	if (app.userData) {
