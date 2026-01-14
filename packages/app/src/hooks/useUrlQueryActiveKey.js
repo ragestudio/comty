@@ -17,10 +17,10 @@ export default ({ defaultKey = "0", queryKey = "key" }) => {
 		if (app.isDesktop) {
 			if (!key) {
 				// unset query
-				return history.pushState({ [queryKey]: null })
+				return history.pushState({ [queryKey]: null }, {})
 			}
 
-			return history.pushState({ [queryKey]: key })
+			return history.pushState({ [queryKey]: key }, {})
 		}
 
 		if (!key) {
