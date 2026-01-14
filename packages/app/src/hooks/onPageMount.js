@@ -4,55 +4,85 @@ export const isAuthenticated = () => {
 	return !!app.userData
 }
 
-export const handleAuthentication = (declaration) => {
+export const handleProtectedPath = (isPublicPath) => {
 	if (
 		!isAuthenticated() &&
-		!declaration.public &&
+		!isPublicPath &&
 		window.location.pathname !== config.app?.authPath
 	) {
 		const authPath = config.app?.authPath ?? "/login"
 
 		if (typeof window.app?.location?.push === "function") {
 			window.app.location.push(authPath)
-
-			if (app.cores?.notifications?.new) {
-				app.cores.notifications.new({
-					title: "Please login to use this feature.",
-					duration: 15,
-				})
-			}
 		} else {
 			window.location.href = authPath
 		}
 
 		return false
 	}
+
 	return true
 }
 
-export const handleLayout = (declaration) => {
-	if (declaration.useLayout && app.layout?.set) {
-		app.layout.set(declaration.useLayout)
+export const handleLayout = (layout) => {
+	if (!app.layout || !app.layout?.set) {
+		return null
 	}
+
+	app.layout.set(layout)
 }
 
-export const handleCenteredContent = (declaration) => {
-	if (
-		typeof declaration.centeredContent !== "undefined" &&
-		app.layout?.toggleCenteredContent
-	) {
-		let finalBool = null
-
-		if (typeof declaration.centeredContent === "boolean") {
-			finalBool = declaration.centeredContent
-		} else {
-			finalBool = app.isMobile
-				? (declaration.centeredContent?.mobile ?? null)
-				: (declaration.centeredContent?.desktop ?? null)
-		}
-
-		app.layout.toggleCenteredContent(finalBool)
+export const handleCenteredContent = (option) => {
+	if (!app.layout || !app.layout?.toggleCenteredContent) {
+		return null
 	}
+
+	if (typeof option !== "boolean") {
+		return app.layout.toggleCenteredContent(false)
+	}
+
+	if (typeof option === "object") {
+		if (
+			typeof option.mobile === "boolean" ||
+			typeof option.desktop === "boolean"
+		) {
+			if (app.isMobile) {
+				return app.layout.toggleCenteredContent(option.mobile)
+			}
+
+			return app.layout.toggleCenteredContent(option.desktop)
+		}
+	}
+
+	return app.layout.toggleCenteredContent(option)
+}
+
+export const handleMaxWindowHeight = (option) => {
+	// check if max window height is available
+	if (!app.layout?.toggleTotalWindowHeight) {
+		return null
+	}
+
+	// if the option is not a  boolean, then just set the sidebar visible
+	if (typeof option !== "boolean") {
+		return app.layout.toggleTotalWindowHeight(false)
+	}
+
+	return app.layout.toggleTotalWindowHeight(option)
+}
+
+export const handleSidebarVisibility = (option) => {
+	// check if sidebar is available
+	if (!app.layout?.sidebar || !app.layout?.sidebar?.toggleVisibility) {
+		return null
+	}
+
+	// if the option is not a  boolean, then just set the sidebar visible
+	if (typeof option !== "boolean") {
+		return app.layout.sidebar.toggleVisibility(true)
+	}
+
+	return app.layout.sidebar.toggleVisibility(option)
 }
 
 export const handleTitle = (targetTitle) => {
@@ -66,35 +96,25 @@ export const handleTitle = (targetTitle) => {
 export default ({ element, declaration }) => {
 	const options = element.options ?? {}
 
-	// Handle authentication first
-	const isAuthorized = handleAuthentication(declaration)
+	// handle authentication first
+	handleProtectedPath(declaration?.public)
 
-	if (isAuthorized) {
-		handleLayout(declaration)
-		handleCenteredContent(declaration)
-	}
+	// handle layout options
+	handleLayout(options.layout?.type ?? declaration?.useLayout ?? "default")
+	handleCenteredContent(
+		options.layout?.centeredContent ?? declaration?.centeredContent,
+	)
+	handleMaxWindowHeight(options.layout?.maxHeight ?? declaration?.maxHeight)
 
+	// handle visibilities
+	handleSidebarVisibility(options.layout?.sidebar ?? declaration?.sidebar)
+	// TODO: handleToolbarVisibility(options.layout?.toolbar ?? declaration?.toolbar)
+	// TODO: handleHeaderVisibility(options.layout?.header ?? declaration?.header)
+
+	// handle mobile components visibilities
+	// TODO: handleTopBarVisibility(options.layout?.topBar ?? declaration?.topBar)
+	// TODO: handleBottomBarVisibility(options.layout?.footer ?? declaration?.footer)
+
+	// handle title
 	handleTitle(options.useTitle ?? declaration?.useTitle)
-
-	if (options.layout) {
-		if (typeof options.layout.type === "string" && app.layout?.set) {
-			app.layout.set(options.layout.type)
-		}
-
-		if (
-			typeof options.layout.centeredContent !== "undefined" &&
-			app.layout?.toggleCenteredContent
-		) {
-			app.layout.toggleCenteredContent(options.layout.centeredContent)
-		}
-	}
-
-	if (
-		options?.layout?.maxHeight === true &&
-		app.layout?.toggleTotalWindowHeight
-	) {
-		app.layout.toggleTotalWindowHeight(true)
-	} else {
-		app.layout.toggleTotalWindowHeight(false)
-	}
 }
