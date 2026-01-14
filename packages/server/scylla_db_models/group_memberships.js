@@ -5,6 +5,10 @@ export default {
 		_id: "varchar",
 		group_id: "varchar",
 		user_id: "varchar",
+		roles: {
+			type: "frozen",
+			typeDef: "<list <varchar>>",
+		},
 		created_at: "timestamp",
 	},
 }
