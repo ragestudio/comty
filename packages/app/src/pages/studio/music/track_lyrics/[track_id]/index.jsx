@@ -48,7 +48,9 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 
 			for await (const [lang, lrc] of Object.entries(lyrics.lrc)) {
 				if (typeof lrc === "string" && lrc.startsWith("https://")) {
-					lyrics.lrc[lang] = await fetch(lrc).then((res) => res.text())
+					lyrics.lrc[lang] = await fetch(lrc).then((res) =>
+						res.text(),
+					)
 
 					lyrics.lrc[lang] = parseLRC(lyrics.lrc[lang])
 				}
@@ -195,6 +197,7 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 				options={[
 					{ label: "Lyrics", value: "lyrics" },
 					{ label: "Video", value: "video" },
+					{ label: "Timings", value: "timings" },
 				]}
 				style={{ marginBottom: "20px" }}
 			/>
