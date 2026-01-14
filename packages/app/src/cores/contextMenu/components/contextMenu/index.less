@@ -46,16 +46,13 @@
 		position: relative;
 
 		display: inline-flex;
-		flex-direction: row;
-
-		align-items: center;
-		justify-content: space-between;
+		flex-direction: column;
 
 		width: 100%;
 
-		height: @context-menu-item-height;
+		//height: @context-menu-item-height;
 		min-height: @context-menu-item-height;
-		max-height: @context-menu-item-height;
+		//max-height: @context-menu-item-height;
 
 		padding: 7px 7px 7px 10px;
 
@@ -64,12 +61,12 @@
 		transition: all 50ms ease-in-out;
 		overflow: hidden;
 
-		&:hover {
+		&:hover:not(.no_effect) {
 			background-color: var(--background-color-accent);
 			padding-left: 18px;
 		}
 
-		&:active {
+		&:active:not(.no_effect) {
 			background-color: var(--background-color-primary-2);
 			transform: scale(0.95);
 		}
@@ -81,6 +78,14 @@
 
 		&.danger {
 			color: var(--danger-color);
+		}
+
+		&__line {
+			display: inline-flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: space-between;
 		}
 	}
 

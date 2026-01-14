@@ -1,22 +1,14 @@
 import React from "react"
+import classNames from "classnames"
 import { AnimatePresence, motion } from "motion/react"
 
 import { createIconRender } from "@components/Icons"
 
 import "./index.less"
-import classNames from "classnames"
 
 const ContextMenu = (props) => {
 	const [visible, setVisible] = React.useState(true)
-	const { items = [], cords, clickedComponent, ctx } = props
-
-	React.useEffect(() => {
-		if (props.fireWhenClosing) {
-			props.fireWhenClosing(() => {
-				setVisible(false)
-			})
-		}
-	}, [])
+	const { items = [], clickedComponent, ctx } = props
 
 	const handleItemClick = async (item) => {
 		if (typeof item.action === "function") {
@@ -53,30 +45,44 @@ const ContextMenu = (props) => {
 					})}
 					disabled={item.disabled}
 				>
-					<p className="label">{item.label}</p>
+					<div className="item__line">
+						<p className="item__line__label">{item.label}</p>
 
-					{item.description && (
-						<p className="description">{item.description}</p>
+						<div className="item__line__icon">
+							{createIconRender(item.icon)}
+						</div>
+					</div>
+
+					{item.render && (
+						<div className="item__line__render">
+							{React.createElement(item.render)}
+						</div>
 					)}
-
-					{createIconRender(item.icon)}
 				</div>
 			)
 		})
 	}
+
+	React.useEffect(() => {
+		if (props.fireWhenClosing) {
+			props.fireWhenClosing(() => {
+				setVisible(false)
+			})
+		}
+	}, [])
 
 	return (
 		<AnimatePresence>
 			{visible && (
 				<motion.div
 					id="context-menu"
-					className="context-menu"
+					className="context-menu bg-accent"
 					initial={{ opacity: 0, scale: 0.8 }}
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.3 }}
 					transition={{ duration: 0.05, ease: "easeInOut" }}
 				>
-					{renderItems()}
+					{React.isValidElement(items) ? items : renderItems()}
 				</motion.div>
 			)}
 		</AnimatePresence>
