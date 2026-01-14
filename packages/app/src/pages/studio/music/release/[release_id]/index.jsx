@@ -136,7 +136,6 @@ const ReleaseEditor = (props) => {
 
 ReleaseEditor.options = {
 	layout: {
-		type: "default",
 		centeredContent: true,
 	},
 }
