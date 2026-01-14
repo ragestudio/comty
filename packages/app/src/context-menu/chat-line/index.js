@@ -47,6 +47,9 @@ export default {
 
 			const channelId = channelElement.getAttribute("data-channel-id")
 			const groupId = channelElement.getAttribute("data-group-id")
+			const channelType = channelElement.getAttribute("data-type")
+
+			console.log(channelId, groupId, channelType)
 
 			// push copy id
 			items.push({
@@ -76,11 +79,23 @@ export default {
 					danger: true,
 					action: async () => {
 						control.close()
-						return await ChatsModel.channels.messages.delete(
-							groupId,
-							channelId,
-							messageId,
-						)
+
+						switch (channelType) {
+							case "direct": {
+								await ChatsModel.dm.messages.delete(
+									channelId,
+									messageId,
+								)
+								break
+							}
+							case "group": {
+								await ChatsModel.channels.messages.delete(
+									groupId,
+									channelId,
+									messageId,
+								)
+							}
+						}
 					},
 				})
 			}
