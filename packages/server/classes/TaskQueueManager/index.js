@@ -1,6 +1,5 @@
 import fs from "node:fs"
 import { Queue, Worker } from "bullmq"
-import { composeURL as composeRedisConnectionString } from "@shared-classes/RedisClient"
 
 export default class TaskQueueManager {
 	constructor(params) {
@@ -26,10 +25,7 @@ export default class TaskQueueManager {
 				continue
 			}
 
-			this.queues[queueObj.id] = await this.registerQueue(
-				queueObj,
-				options,
-			)
+			this.queues[queueObj.id] = this.registerQueue(queueObj, options)
 		}
 	}
 
@@ -60,7 +56,7 @@ export default class TaskQueueManager {
 					global.sse.sendToChannel(job.data.sseChannelId, progress)
 				}
 			} catch (error) {
-				// manejar error
+				console.error(error)
 			}
 		})
 
@@ -75,7 +71,9 @@ export default class TaskQueueManager {
 						result: result,
 					})
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.error(error)
+			}
 		})
 
 		worker.on("failed", (job, error) => {
@@ -89,7 +87,9 @@ export default class TaskQueueManager {
 						result: error.message,
 					})
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.error(error)
+			}
 		})
 	}
 
