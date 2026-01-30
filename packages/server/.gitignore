@@ -2,7 +2,7 @@
 /**/**/.env
 /**/**/.ssl
 
-# Trash
+# Temporals
 /**/**/*.log
 /**/**/dumps.log
 /**/**/.crash.log
@@ -22,6 +22,7 @@
 /**/**/*.env
 /**/**/.nginx
 /**/**/nginx-bin
+nats-data
 
 # Locks
 /**/**/package-lock.json
