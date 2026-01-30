@@ -66,11 +66,11 @@ export default class ChatChannel {
 		}
 	}
 
-	async sendEventToChannelTopic(event, payload) {
+	async sendEventToChannelTopic(event, data) {
 		return this.controller.server.engine.ws.senders.toTopic(
 			`${this.topic}:${this.channel._id.toString()}`,
 			event,
-			payload,
+			data,
 		)
 	}
 }
