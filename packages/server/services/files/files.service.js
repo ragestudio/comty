@@ -1,11 +1,11 @@
-import { Server } from "linebridge"
+//import { Server } from "linebridge"
+import { Server } from "../../../../linebridge/server/src"
 
 import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
-import SSEManager from "@shared-classes/SSEManager"
 import LimitsClass from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
 import Capabilities from "@classes/Capabilities"
@@ -35,7 +35,6 @@ class API extends Server {
 			maxRetriesPerRequest: null,
 		})),
 		cache: (global.cache = new CacheService()),
-		SSEManager: (global.sse = new SSEManager()),
 		storage: StorageClient(),
 		b2Storage: null,
 		limits: {},

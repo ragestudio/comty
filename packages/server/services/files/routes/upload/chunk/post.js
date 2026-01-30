@@ -81,6 +81,7 @@ export default {
 					s3Provider: config.useProvider,
 					useCompression: config.useCompression,
 					capabilities: ctx.capabilities,
+					useWebsocketEvents: true,
 				}
 
 				// if has transformations, use background job
@@ -91,15 +92,12 @@ export default {
 					const job = await global.queues.createJob(
 						"file-process",
 						payload,
-						{
-							useSSE: true,
-						},
 					)
 
 					return {
 						uploadId: payload.uploadId,
-						sseChannelId: job.sseChannelId,
-						sseUrl: `${req.headers["x-forwarded-proto"] || req.protocol}://${req.get("x-forwarded-host") ?? req.get("host")}/upload/sse_events/${job.sseChannelId}`,
+						jobId: job.id,
+						useWebsocketEvents: true,
 					}
 				}
 
