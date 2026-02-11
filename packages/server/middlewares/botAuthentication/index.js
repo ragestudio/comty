@@ -9,6 +9,7 @@ export default async (req, res) => {
 		const tokenAuthHeader = req.headers?.authorization?.split(" ")
 
 		if (
+			tokenAuthHeader &&
 			tokenAuthHeader[0] === "Bot" &&
 			typeof tokenAuthHeader[1] === "string"
 		) {
