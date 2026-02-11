@@ -61,74 +61,66 @@ export default class UserConnections {
 		}
 	}
 
-	async handleConnection(redis, socket, user) {
-		if (!user || !socket || !redis) {
+	async handleConnection(redis, { socket_id, user_id } = {}) {
+		if (!redis || !user_id || !socket_id) {
 			return false
 		}
 
-		const userId = user._id
-		const socketId = socket.context.id
-
-		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`
+		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${user_id}`
 
 		const connectionData = {
 			connectedAt: new Date().getTime(),
-			socketId: socketId,
+			socketId: socket_id,
 		}
 
 		const pipeline = redis.pipeline()
 
-		pipeline.hset(userHashKey, socketId, JSON.stringify(connectionData))
+		pipeline.hset(userHashKey, socket_id, JSON.stringify(connectionData))
 		pipeline.zadd(
 			UserConnections.CONNECTED_USERS_ZSET,
 			"NX",
 			Date.now(),
-			userId,
+			user_id,
 		)
 
 		await pipeline.exec()
 
-		// await redis.publish(`user:connected`, userId)
-
-		console.log(`User ${userId} added to connected users set`)
+		console.log(`User [${user_id}] added to connected users set`)
 
 		// clear orphaned connections after in the backgroud
 		if (this.server.engine.ws) {
 			setTimeout(() => {
-				this.clearUserIdOrphanedConnections(redis, userId)
+				this.clearUserIdOrphanedConnections(redis, user_id)
 			}, 1000)
 		}
 	}
 
-	async handleDisconnection(redis, socket, user) {
-		if (!user || !socket || !redis) {
+	async handleDisconnection(redis, { socket_id, user_id } = {}) {
+		if (!redis || !user_id || !socket_id) {
 			return false
 		}
 
-		const userId = user._id
-		const socketId = socket.context.id
-
-		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`
+		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${user_id}`
 
 		try {
 			// delete the socket from the user hash
-			await redis.hdel(userHashKey, socketId)
+			await redis.hdel(userHashKey, socket_id)
+
+			console.log(`User [${user_id}] removed from connected users set`)
 
 			// if no more connections, remove the user from the zset
 			const connectionsCount = await redis.hlen(userHashKey)
 
 			if (connectionsCount === 0) {
-				await redis.zrem(UserConnections.CONNECTED_USERS_ZSET, userId)
+				await redis.zrem(UserConnections.CONNECTED_USERS_ZSET, user_id)
 				await redis.del(userHashKey)
 			}
 		} catch (error) {
 			console.error(
-				`[USER_CONNECTIONS] Error while handling disconnection for user ${userId}`,
+				`[USER_CONNECTIONS] Error while handling disconnection for user ${user_id}`,
 				error,
 			)
 		}
-
-		// await redis.publish(`user:disconnect`, userId)
 	}
 
 	static async getAllConnectedUsers(redis, { offset = 0, limit = 250 } = {}) {
