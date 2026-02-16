@@ -1,10 +1,11 @@
 import React from "react"
 import classnames from "classnames"
 import * as antd from "antd"
+import Button from "@ui/Button"
 
 import "./index.less"
 
-export default (props) => {
+const NavMenu = (props) => {
 	function handleClickItem(item) {
 		if (item.children && Array.isArray(item.children)) {
 			return false
@@ -32,7 +33,7 @@ export default (props) => {
 									},
 								}}
 							>
-								<antd.Button
+								<Button
 									key={item.key}
 									className={classnames(
 										"navmenu_item",
@@ -49,13 +50,13 @@ export default (props) => {
 											<p>{item.label ?? item.id}</p>
 										</div>
 									)}
-								</antd.Button>
+								</Button>
 							</antd.Dropdown>
 						)
 					}
 
 					return (
-						<antd.Button
+						<Button
 							key={item.key}
 							className={classnames(
 								"navmenu_item",
@@ -78,7 +79,7 @@ export default (props) => {
 									<p>{item.label ?? item.id}</p>
 								</div>
 							)}
-						</antd.Button>
+						</Button>
 					)
 				})}
 			</div>
@@ -87,3 +88,5 @@ export default (props) => {
 		</>
 	)
 }
+
+export default NavMenu

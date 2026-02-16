@@ -1,74 +1,60 @@
 @import "@styles/vars.less";
 
 html {
-    &.mobile {
-        .navmenu_wrapper {
-            .navmenu_item {
-                &.active {
-                    color: var(--colorPrimary) !important;
-                    background-color: var(--background-color-primary);
-                }
+	&.mobile {
+		.navmenu_wrapper {
+			.navmenu_item {
+				&.active {
+					color: var(--colorPrimary) !important;
+					background-color: var(--background-color-primary);
+				}
 
-                .icon {
-                    font-size: 1.5rem;
-                }
-            }
-        }
-    }
+				.icon {
+					font-size: 1.5rem;
+				}
+			}
+		}
+	}
 }
 
 .navmenu_wrapper {
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    justify-content: space-evenly;
+	justify-content: space-evenly;
 
-    width: 100%;
+	width: 100%;
 
-    .ant-btn-primary:not(.ant-btn-dangerous) {
-        .label {
-            p {
-                color: var(--background-color-primary);
-            }
-        }
-    }
+	.navmenu_item {
+		display: flex;
+		flex-direction: row;
 
-    .navmenu_item {
-        display: flex;
-        flex-direction: row;
+		align-items: center;
 
-        align-items: center;
+		height: fit-content;
 
-        height: fit-content;
+		gap: 4px;
 
-        gap: 4px;
+		padding: 8px 10px;
 
-        padding: 8px 10px;
+		&.active {
+			.icon {
+				color: var(--colorPrimary);
+			}
 
-        &.active {
-            color: var(--colorPrimary);
-            background-color: var(--background-color-primary);
-        }
+			background-color: var(--background-color-primary);
+		}
 
-        p {
-            margin: 0;
-            color: var(--text-color);
-        }
+		.icon {
+			margin: 0;
+			line-height: 1rem;
+			font-size: 1rem;
+		}
 
-        svg {
-            color: currentColor;
-        }
-
-        .icon {
-            margin: 0;
-            line-height: 1rem;
-            font-size: 1rem;
-        }
-
-        .label {
-            height: fit-content;
-            line-height: 1rem;
-            font-size: 0.8rem;
-        }
-    }
+		.label {
+			height: fit-content;
+			line-height: 1rem;
+			font-size: 0.8rem;
+		}
+	}
 }
