@@ -1,5 +1,6 @@
 import React from "react"
-import * as antd from "antd"
+import Button from "@ui/Button"
+
 import Marquee from "react-fast-marquee"
 import classnames from "classnames"
 
@@ -114,19 +115,19 @@ const Player = (props) => {
 		>
 			<div className={classnames("toolbar_player_top_actions")}>
 				{!playerState.control_locked && (
-					<antd.Button
+					<Button
 						icon={<Icons.Cast />}
 						shape="circle"
 					/>
 				)}
 
-				<antd.Button
+				<Button
 					icon={<Icons.Fullscreen />}
 					shape="circle"
 					onClick={() => app.location.push("/lyrics")}
 				/>
 
-				<antd.Button
+				<Button
 					icon={<Icons.X />}
 					shape="circle"
 					onClick={() => app.cores.player.close()}
