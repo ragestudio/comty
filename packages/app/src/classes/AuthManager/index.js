@@ -121,6 +121,7 @@ export default class AuthManager {
 		app.userData = {
 			_id: tokenData.user_id,
 			username: tokenData.username,
+			flags: tokenData.flags ?? [],
 		}
 
 		console.log("auth manager early data", app.userData)
@@ -170,8 +171,6 @@ export default class AuthManager {
 			await AuthModel.logout()
 			this._emitBehavior("onLogout")
 		},
-		login: async () => {
-			console.log("errmm what tha sigma")
-		},
+		login: async () => {},
 	}
 }
