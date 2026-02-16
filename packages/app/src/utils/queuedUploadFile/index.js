@@ -40,6 +40,10 @@ export default (file, options) => {
 						options.onFinish(file, data)
 					}
 				},
+			}).finally((...args) => {
+				if (options?.onFinally) {
+					options.onFinally(...args)
+				}
 			})
 		},
 	)
