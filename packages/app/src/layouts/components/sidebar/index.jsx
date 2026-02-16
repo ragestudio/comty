@@ -3,7 +3,7 @@ import config from "@config"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 import { motion, AnimatePresence, usePresence } from "motion/react"
-import { Menu, Avatar, Dropdown, Tag } from "antd"
+import { Menu, Avatar, Dropdown } from "antd"
 
 import { Icons } from "@components/Icons"
 import ProductChannelBadge from "@components/ProductChannelBadge"
@@ -490,6 +490,11 @@ const SidebarWrapper = () => {
 		const events = {
 			"router.navigate": (path) => {
 				calculateSelectedMenuItem(path)
+			},
+			"authmanager:authed": () => {
+				// recalculate sidebar items
+				setTopItems(GenerateMenuItems(TopMenuItems))
+				setBottomItems(GenerateMenuItems(BottomMenuItems))
 			},
 		}
 
