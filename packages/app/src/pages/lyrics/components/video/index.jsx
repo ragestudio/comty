@@ -240,8 +240,6 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 			videoElement.addEventListener("seeked", handleSeeked)
 		}
 
-		console.log(hlsInstance, hlsInstance.getHlsJsInstance)
-
 		return () => {
 			stopSyncInterval()
 
