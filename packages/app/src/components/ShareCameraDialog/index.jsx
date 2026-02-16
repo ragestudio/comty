@@ -1,10 +1,8 @@
 import React from "react"
 import "./index.less"
 
-const mediaDevices = navigator.mediaDevices.enumerateDevices()
-
 const ShareCameraOptionsDialog = ({ close }) => {
-	const devices = React.use(mediaDevices)
+	const devices = React.use(navigator.mediaDevices.enumerateDevices())
 	const videoDevices = React.useMemo(() => {
 		return devices.filter((device) => device.kind === "videoinput")
 	}, [])
