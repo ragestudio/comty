@@ -1,7 +1,6 @@
 import React from "react"
 import { Skeleton } from "antd"
 import Lottie from "lottie-react"
-
 import StickersModel from "@models/stickers"
 
 import "./index.less"
@@ -94,4 +93,31 @@ const Sticker = ({ id, sticker, onClick, onDoubleClick }) => {
 	)
 }
 
-export default Sticker
+class StickerComponent extends React.Component {
+	constructor(props) {
+		super(props)
+		this.state = { hasError: false }
+	}
+
+	static getDerivedStateFromError(error) {
+		return { hasError: true }
+	}
+
+	componentDidCatch(error, errorInfo) {
+		console.error("sticker render error:", error, errorInfo)
+	}
+
+	render() {
+		if (this.state.hasError) {
+			return (
+				<div className="sticker-render">
+					<Skeleton.Image active />
+				</div>
+			)
+		}
+
+		return <Sticker {...this.props} />
+	}
+}
+
+export default StickerComponent
