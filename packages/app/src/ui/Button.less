@@ -1,0 +1,66 @@
+button {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	gap: 5px;
+
+	margin: 0;
+	padding: 8px 13px;
+
+	cursor: pointer;
+	background: none;
+	border: none;
+	outline: none;
+
+	border-radius: var(--borderRadius);
+	color: var(--textColor);
+
+	// TODO: use global-wide var for transition parameters
+	// instead of a fixed one
+	transition-property:
+		filter, background-color, border-color, outline, border, opacity;
+	transition-duration: 150ms;
+	transition-timing-function: ease-in-out;
+
+	// adjust text
+	font-weight: 500;
+	white-space: nowrap;
+
+	&.default {
+		background-color: var(--backgroundColorAccent);
+		outline: 2px solid var(--border-color);
+	}
+
+	// primary background-color
+	&.primary {
+		background-color: var(--primaryColor);
+	}
+
+	// if ghost, remove the background & border
+	&.ghost {
+		background-color: unset;
+		outline: none;
+	}
+
+	&.danger {
+		background-color: var(--danger-color);
+		outline: 2px solid var(--border-color);
+	}
+
+	// disabled state
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	// reactivity feedback for hover state
+	&:hover:not(:disabled) {
+		filter: brightness(1.2);
+	}
+}

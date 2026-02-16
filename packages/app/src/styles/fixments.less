@@ -4,6 +4,15 @@
 	--adm-color-background: var(--background-color-primary);
 }
 
+.ant-btn {
+	--ant-btn-bg-color-hover: var(--background-color-accent);
+}
+
+.ant-btn:not(:disabled):not(.ant-btn-disabled):hover {
+	--ant-btn-bg-color-hover: var(--background-color-accent);
+	color: var(--text-color);
+}
+
 .ant-tour {
 	width: fit-content;
 }
@@ -57,10 +66,17 @@
 }
 
 .ant-select {
-	.ant-select-arrow {
-		padding: 0 10px;
-		right: 0px;
+	background-color: var(--background-color-accent);
+	padding: 2.4px 10px;
+	border-radius: 12px;
+
+	.ant-select-suffix {
+		color: var(--text-color);
 	}
+}
+
+.ant-select.ant-select-outlined {
+	border-color: var(--border-color);
 }
 
 // fix colors for select & dropdown
@@ -350,6 +366,28 @@
 	border-color: var(--background-color-primary-2) !important;
 }
 
+.ant-modal-container {
+	background-color: var(--background-color-accent) !important;
+	backdrop-filter: blur(5px);
+
+	border: 3px solid var(--border-color) !important;
+	border-radius: 12px;
+
+	color: var(--text-color) !important;
+}
+
+.ant-modal-confirm-body-wrapper {
+	color: var(--text-color) !important;
+
+	.ant-modal-confirm-paragraph {
+		color: var(--text-color) !important;
+
+		.ant-modal-confirm-title {
+			color: var(--text-color) !important;
+		}
+	}
+}
+
 .ant-modal-content {
 	background-color: var(--background-color-primary) !important;
 
@@ -368,6 +406,8 @@
 	display: flex;
 	flex-direction: column;
 
+	z-index: 9999999;
+
 	gap: 20px;
 
 	.ant-notification-notice-wrapper {
@@ -377,6 +417,8 @@
 		border-radius: 12px;
 		outline: 1px solid var(--border-color) !important;
 		background-color: var(--background-color-primary) !important;
+
+		backdrop-filter: blur(5px);
 	}
 
 	.ant-notification-notice {
@@ -409,6 +451,10 @@
 			color: var(--text-color) !important;
 		}
 
+		.ant-notification-notice-title {
+			color: var(--text-color) !important;
+		}
+
 		.ant-notification-notice-description {
 			display: none;
 		}
@@ -428,11 +474,13 @@
 			}
 
 			.ant-notification-notice-message {
-				margin-inline-start: 46px !important;
+				margin-inline-start: 0 !important;
+				margin: 0;
 			}
 
 			.ant-notification-notice-description {
-				margin-inline-start: 46px !important;
+				margin-inline-start: 0 !important;
+				margin: 0;
 			}
 
 			.ant-notification-notice-icon {
@@ -730,6 +778,7 @@
 .ant-mentions-dropdown {
 	background-color: var(--background-color-primary);
 	color: var(--text-color);
+	z-index: 999999;
 }
 
 .ant-mentions-dropdown-menu-item {
