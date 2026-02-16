@@ -1,5 +1,8 @@
 {
 	"mode": "dev",
+	"control_api": {
+		"enabled": true
+	},
 	"ipc": {
 		"path": "/tmp/ultragateway.sock"
 	},
@@ -27,9 +30,9 @@
 	],
 	"routes": [
 		{
-			"path": "/spectrum/*",
-			"target": "https://live.ragestudio.net",
-			"pathRewrite": { "^/spectrum/(.*)": "/$1", "^/spectrum": "/" },
+			"path": "/spectrum/*path",
+			"target": "http://ingest.ragestudio.net:8035",
+			"pathRewrite": { "^/spectrum/(.*)": "/$1" },
 			"websocket": true
 		}
 	]
