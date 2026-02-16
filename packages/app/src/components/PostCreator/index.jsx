@@ -1,24 +1,22 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
+import classNames from "classnames"
+import { Mentions } from "antd"
 import { DateTime } from "luxon"
-import lodash from "lodash"
-import humanSize from "@tsmx/human-readable"
 
-import PostLink from "@components/PostLink"
-import { Icons } from "@components/Icons"
-import Poll from "@components/Poll"
-
-import clipboardEventFileToFile from "@utils/clipboardEventFileToFile"
 import queuedUploadFile from "@utils/queuedUploadFile"
 
 import PostModel from "@models/post"
-import SearchModel from "@models/search"
+//import SearchModel from "@models/search"
+
+import Poll from "@components/Poll"
+import PostCreatorActions from "./actions"
+import PostCreatorAttachments from "./attachments"
 
 import "./index.less"
 
 const DEFAULT_POST_POLICY = {
 	maxMessageLength: 512,
+	maxAttachments: 10,
 	acceptedMimeTypes: [
 		"image/gif",
 		"image/png",
@@ -32,762 +30,319 @@ const DEFAULT_POST_POLICY = {
 		"audio/ogg",
 		"audio/mpeg",
 	],
-	maximunFilesPerRequest: 10,
 }
 
-const VisibilityOptionLabel = ({ label, icon }) => (
-	<div
-		style={{
-			display: "inline-flex",
-			alignItems: "center",
-			justifyContent: "center",
-			gap: "10px",
-		}}
-	>
-		{icon}
-		{label}
-	</div>
-)
+// TODO: Cleanup methods
+// TODO: Support for user mentions load
+// TODO: Use a context instead of passing props down (no bueno)
+const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
+	const [loading, setLoading] = React.useState(false)
+	const [pendingFiles, setPendingFiles] = React.useState([])
+	const [postObj, setPostObj] = React.useState({})
 
-const visibilityOptions = [
-	{
-		value: "public",
-		label: (
-			<VisibilityOptionLabel
-				icon={<Icons.Earth />}
-				label="Public"
-			/>
-		),
-	},
-	{
-		value: "private",
-		label: (
-			<VisibilityOptionLabel
-				icon={<Icons.EyeOff />}
-				label="Private"
-			/>
-		),
-	},
-]
+	const [poll, setPoll] = React.useState(null)
+	const pollRef = React.useRef(null)
 
-export default class PostCreator extends React.Component {
-	state = {
-		pending: [],
-		loading: false,
-		uploaderVisible: false,
+	const updatePostObj = React.useCallback((key, value) => {
+		setPostObj((prev) => ({ ...prev, [key]: value }))
+	}, [])
 
-		postMessage: "",
-		postAttachments: [],
-		postPoll: null,
-		postVisibility: "public",
+	const resetPostObj = React.useCallback(() => {
+		setPostObj({})
+	}, [])
 
-		fileList: [],
-		postingPolicy: DEFAULT_POST_POLICY,
-
-		mentionsLoadedData: [],
-	}
-
-	pollRef = React.createRef()
-
-	creatorRef = React.createRef()
-
-	cleanPostData = () => {
-		this.setState({
-			postMessage: "",
-			postAttachments: [],
-			fileList: [],
-		})
-	}
-
-	toggleUploaderVisibility = (to) => {
-		to = to ?? !this.state.uploaderVisible
-
-		if (to === this.state.uploaderVisible) {
-			return
+	const handleMessageInputChange = React.useCallback((text) => {
+		// if the first character is a space or a whitespace remove it
+		if (text[0] === " " || text[0] === "\n") {
+			text = text.slice(1)
 		}
 
-		this.setState({
-			uploaderVisible: to,
-		})
-	}
+		updatePostObj("message", text)
+	}, [])
 
-	canSubmit = () => {
-		const { postMessage, postAttachments, pending, postingPolicy } =
-			this.state
+	const handleUploadMedia = React.useCallback(
+		async (files) => {
+			if (!files) {
+				return
+			}
+			if (!Array.isArray(files)) {
+				files = [files]
+			}
 
-		const messageLengthValid =
-			postMessage.length !== 0 &&
-			postMessage.length < postingPolicy.maxMessageLength
+			if (files.length > DEFAULT_POST_POLICY.maxAttachments) {
+				console.error("Too many attachments")
+				app.message.error("Too many attachments")
+				return
+			}
 
-		if (pending.length !== 0) {
+			for (const file of files) {
+				if (
+					!DEFAULT_POST_POLICY.acceptedMimeTypes.includes(file.type)
+				) {
+					console.error("Unsupported media type")
+					continue
+				}
+
+				file.uid = `${file.name}-${new Date().getTime()}`
+				file.percent = 0
+
+				setPendingFiles((prev) => [...prev, file])
+
+				queuedUploadFile(file, {
+					onFinish: (file, response) => {
+						setPostObj((prev) => ({
+							...prev,
+							attachments: [
+								...(prev?.attachments ?? []),
+								response,
+							],
+						}))
+					},
+					onProgress: (file, progress = {}) => {
+						setPendingFiles((prev) => {
+							const items = [...prev]
+
+							items.forEach((item) => {
+								if (item.uid === file.uid) {
+									item.percent = progress.percent
+								}
+							})
+
+							return items
+						})
+					},
+					onFinally: () => {
+						setPendingFiles((prev) =>
+							prev.filter((f) => f.uid !== file.uid),
+						)
+					},
+				})
+			}
+		},
+		[postObj],
+	)
+
+	const handleDeleteMedia = React.useCallback((attachment) => {
+		setPostObj((prev) => ({
+			...prev,
+			attachments: prev?.attachments?.filter(
+				(a) => a.id !== attachment.id,
+			),
+		}))
+	}, [])
+
+	const canPublish = React.useCallback(() => {
+		if (!postObj) {
 			return false
 		}
 
-		if (!messageLengthValid && postAttachments.length === 0) {
+		if (!postObj.message && !postObj.attachments) {
+			return false
+		}
+
+		if (pendingFiles.length !== 0) {
+			return false
+		}
+
+		const messageLengthValid =
+			postObj.message?.length > 0 &&
+			postObj.message?.length < DEFAULT_POST_POLICY.maxMessageLength
+
+		if (!messageLengthValid && postObj.attachments?.length === 0) {
 			return false
 		}
 
 		return true
-	}
+	}, [postObj])
 
-	submit = lodash.debounce(async () => {
-		if (this.state.loading) {
-			return false
+	const handleAddPoll = React.useCallback(() => {
+		if (poll) {
+			return null
 		}
 
-		if (!this.canSubmit()) {
-			return false
+		return setPoll([{ label: "" }, { label: "" }])
+	}, [poll])
+
+	const handleDeletePoll = React.useCallback(() => {
+		if (!poll) {
+			return null
 		}
 
-		await this.setState({
-			loading: true,
-			uploaderVisible: false,
-		})
+		setPoll(null)
+	}, [poll])
 
-		const { postMessage, postAttachments } = this.state
+	const submit = React.useCallback(async () => {
+		if (loading) {
+			return null
+		}
+
+		if (!canPublish()) {
+			return null
+		}
+
+		setLoading(true)
 
 		const payload = {
-			message: postMessage,
-			attachments: postAttachments,
+			message: postObj.message,
+			attachments: postObj.attachments,
+			visibility: postObj.visibility,
 			timestamp: DateTime.local().toISO(),
-			visibility: this.state.postVisibility,
+			reply_to: reply_to,
 		}
 
-		if (this.pollRef.current) {
-			let { options } = this.pollRef.current.getFieldsValue()
-
+		if (pollRef.current) {
+			let { options } = pollRef.current.getFieldsValue()
 			payload.poll_options = options.filter((option) => !!option.label)
 		}
 
 		let response = null
 
-		if (this.props.reply_to) {
-			payload.reply_to = this.props.reply_to
-		}
-
-		if (this.props.edit_post) {
-			response = await PostModel.update(
-				this.props.edit_post,
-				payload,
-			).catch((error) => {
-				console.error(error)
-				antd.message.error(error)
-
-				return false
-			})
+		if (edit_post) {
+			response = await PostModel.update(edit_post, payload).catch(
+				(error) => {
+					app.message.error(error.message)
+					return null
+				},
+			)
 		} else {
 			response = await PostModel.create(payload).catch((error) => {
-				console.error(error)
-				antd.message.error(error)
-
-				return false
+				app.message.error(error.message)
+				return null
 			})
 		}
 
-		this.setState({
-			loading: false,
-		})
+		setLoading(false)
 
 		if (response) {
-			this.cleanPostData()
+			resetPostObj()
 
-			if (typeof this.props.onPost === "function") {
-				this.props.onPost()
+			if (typeof close === "function") {
+				close()
 			}
 
-			if (typeof this.props.close === "function") {
-				this.props.close()
-			}
-
-			if (this.props.reply_to) {
-				app.navigation.goToPost(this.props.reply_to)
+			if (typeof onPost === "function") {
+				onPost()
 			}
 		}
-	}, 50)
+	}, [postObj])
 
-	uploadFile = async (req) => {
-		this.toggleUploaderVisibility(false)
+	const handleKeyDown = React.useCallback(
+		async (e) => {
+			//console.debug(e)
 
-		await queuedUploadFile(req.file, {
-			onFinish: (file, response) => {
-				req.onSuccess(response)
-			},
-			onError: (file, response) => {
-				req.onError(response)
-			},
-		})
-	}
+			// check if is ctrl + v
+			if (e.ctrlKey && e.key === "v") {
+				// check if is media on the clipboard
+				if (navigator.clipboard.read) {
+					const clipboardItems = await navigator.clipboard.read()
 
-	removeAttachment = (file_uid) => {
-		this.setState({
-			postAttachments: this.state.postAttachments.filter(
-				(file) => file.uid !== file_uid,
-			),
-			fileList: this.state.fileList.filter(
-				(file) => file.uid !== file_uid,
-			),
-		})
-	}
-
-	addAttachment = (file) => {
-		if (Array.isArray(file)) {
-			return this.setState({
-				postAttachments: [...this.state.postAttachments, ...file],
-			})
-		}
-
-		return this.setState({
-			postAttachments: [...this.state.postAttachments, file],
-		})
-	}
-
-	uploaderScrollToEnd = () => {
-		// scroll to max right
-		const element = document.querySelector(".ant-upload-list-picture-card")
-
-		// calculate the element's width and scroll to the end
-		const scrollToLeft = element.scrollWidth - element.clientWidth
-
-		if (element) {
-			element.scrollTo({
-				top: 0,
-				left: scrollToLeft,
-				behavior: "smooth",
-			})
-		}
-	}
-
-	onUploaderChange = (change) => {
-		if (this.state.fileList !== change.fileList) {
-			this.setState({
-				fileList: change.fileList,
-			})
-		}
-
-		switch (change.file.status) {
-			case "uploading": {
-				this.toggleUploaderVisibility(false)
-
-				this.setState({
-					pending: [...this.state.pending, change.file.uid],
-				})
-
-				this.uploaderScrollToEnd()
-
-				break
-			}
-			case "done": {
-				// remove pending file
-				this.setState({
-					pending: this.state.pending.filter(
-						(uid) => uid !== change.file.uid,
-					),
-				})
-
-				if (Array.isArray(change.file.response.files)) {
-					change.file.response.files.forEach((file) => {
-						this.addAttachment(file)
-					})
-				} else {
-					this.addAttachment(change.file.response)
-				}
-
-				// scroll to end
-				this.uploaderScrollToEnd()
-
-				break
-			}
-			case "error": {
-				// remove pending file
-				this.setState({
-					pending: this.state.pending.filter(
-						(uid) => uid !== change.file.uid,
-					),
-				})
-
-				// remove file from list
-				this.removeAttachment(change.file.uid)
-			}
-			default: {
-				break
-			}
-		}
-	}
-
-	handleMessageInputChange = (inputText) => {
-		// if the fist character is a space or a whitespace remove it
-		if (inputText[0] === " " || inputText[0] === "\n") {
-			inputText = inputText.slice(1)
-		}
-
-		this.setState({
-			postMessage: inputText,
-		})
-	}
-
-	handleMessageInputKeydown = async (e) => {
-		// detect if the user pressed `enter` key and submit the form, but only if the `shift` key is not pressed
-		if (e.keyCode === 13 && !e.shiftKey) {
-			e.preventDefault()
-			e.stopPropagation()
-
-			if (this.state.loading) {
-				return false
-			}
-
-			return await this.submit()
-		}
-	}
-
-	handleOnMentionSearch = lodash.debounce(async (value) => {
-		if (value === "") {
-			return false
-		}
-
-		const results = await SearchModel.search(`${value}`, {
-			fields: "users",
-			limit: 5,
-		})
-
-		this.setState({
-			mentionsLoadedData: results.users.items,
-		})
-	}, 300)
-
-	updateFileList = (uid, newValue) => {
-		let updatedFileList = this.state.fileList
-
-		// find the file in the list
-		const index = updatedFileList.findIndex((file) => file.uid === uid)
-
-		// update the file
-		updatedFileList[index] = newValue
-
-		// update the state
-		this.setState({
-			fileList: updatedFileList,
-		})
-
-		return updatedFileList
-	}
-
-	handleManualUpload = async (file) => {
-		if (!file) {
-			throw new Error(`No file provided`)
-		}
-
-		const isValidFormat = (fileType) => {
-			return this.state.postingPolicy.acceptedMimeTypes.includes(fileType)
-		}
-
-		if (!isValidFormat(file.type)) {
-			app.cores.notifications.new({
-				type: "error",
-				title: `Invalid format (${file.type})`,
-				message:
-					"Only the following file formats are allowed: " +
-					this.state.postingPolicy.acceptedMimeTypes.join(", "),
-			})
-			return null
-			throw new Error(`Invalid file format`)
-		}
-
-		file.thumbUrl = URL.createObjectURL(file)
-		file.uid = `${file.name}-${Math.random() * 1000}`
-
-		file.status = "uploading"
-
-		// add file to the uploader
-		this.onUploaderChange({
-			file,
-			fileList: [...this.state.fileList, file],
-		})
-
-		// upload the file
-		await this.uploadFile({
-			file,
-			onSuccess: (response) => {
-				file.status = "done"
-				file.response = response
-
-				this.onUploaderChange({
-					file: file,
-					fileList: this.updateFileList(file.uid, file),
-				})
-			},
-			onError: (error) => {
-				file.status = "error"
-				file.error = error
-
-				this.onUploaderChange({
-					file: file,
-					fileList: this.updateFileList(file.uid, file),
-				})
-			},
-		})
-
-		return file
-	}
-
-	handlePaste = async ({ clipboardData }) => {
-		if (clipboardData && clipboardData.items.length > 0) {
-			// check if the clipboard contains a file
-			const hasFile = Array.from(clipboardData.items).some(
-				(item) => item.kind === "file",
-			)
-
-			if (!hasFile) {
-				return false
-			}
-
-			for (let index = 0; index < clipboardData.items.length; index++) {
-				const item = clipboardData.items[index]
-
-				let file = await clipboardEventFileToFile(item).catch(
-					(error) => {
-						console.error(error)
-						app.message.error(
-							`Failed to upload file:`,
-							error.message,
+					if (
+						clipboardItems &&
+						clipboardItems[0] &&
+						DEFAULT_POST_POLICY.acceptedMimeTypes.includes(
+							clipboardItems[0].types[0],
+						)
+					) {
+						const blob = await clipboardItems[0].getType(
+							clipboardItems[0].types[0],
 						)
 
-						return false
-					},
-				)
-
-				this.handleManualUpload(file).catch((error) => {
-					console.error(error)
-					return false
-				})
-			}
-		}
-	}
-
-	handleVisibilityChange = (key) => {
-		this.setState({ postVisibility: key })
-	}
-
-	renderUploadPreviewItem = (item, file, list, actions) => {
-		const uploading = file.status === "uploading"
-
-		const onClickDelete = () => {
-			this.removeAttachment(file.uid)
-		}
-
-		return (
-			<div className={classnames("file", { ["uploading"]: uploading })}>
-				<div className="preview">
-					<img src={file.thumbUrl ?? "/assets/new_file.png"} />
-				</div>
-
-				<div className="actions">
-					{uploading && (
-						<Icons.LoadingOutlined
-							style={{ margin: "0 !important" }}
-						/>
-					)}
-					{!uploading && (
-						<antd.Popconfirm
-							title="Are you sure you want to delete this file?"
-							onConfirm={onClickDelete}
-						>
-							<antd.Button
-								type="link"
-								icon={<Icons.Trash />}
-							/>
-						</antd.Popconfirm>
-					)}
-				</div>
-			</div>
-		)
-	}
-
-	handleDrag = (event) => {
-		event.preventDefault()
-		event.stopPropagation()
-
-		console.log(event)
-
-		if (event.type === "dragenter") {
-			this.toggleUploaderVisibility(true)
-		} else if (event.type === "dragleave") {
-			// check if mouse is over the uploader or outside the creatorRef
-			if (
-				this.state.uploaderVisible &&
-				!this.creatorRef.current.contains(event.target)
-			) {
-				this.toggleUploaderVisibility(false)
-			}
-		}
-	}
-
-	handleUploadClick = () => {
-		// create a new dialog
-		const dialog = document.createElement("input")
-
-		// set the dialog type to file
-		dialog.type = "file"
-
-		// set the dialog accept to the accepted files
-		dialog.accept = this.state.postingPolicy.acceptedMimeTypes
-
-		dialog.multiple = true
-
-		// add a listener to the dialog
-		dialog.addEventListener("change", (event) => {
-			// get the files
-			const files = event.target.files
-
-			// loop through the files
-			for (let index = 0; index < files.length; index++) {
-				const file = files[index]
-
-				this.handleManualUpload(file).catch((error) => {
-					console.error(error)
-					return false
-				})
-			}
-		})
-
-		// click the dialog
-		dialog.click()
-	}
-
-	handleAddPoll = () => {
-		if (!this.state.postPoll) {
-			this.setState({
-				postPoll: [],
-			})
-		}
-	}
-
-	handleDeletePoll = () => {
-		this.setState({
-			postPoll: null,
-		})
-	}
-
-	componentDidMount = async () => {
-		if (this.props.edit_post) {
-			await this.setState({
-				loading: true,
-				postId: this.props.edit_post,
-			})
-
-			const post = await PostModel.getPost({
-				post_id: this.props.edit_post,
-			})
-
-			await this.setState({
-				loading: false,
-				postMessage: post.message,
-				postAttachments: post.attachments.map((attachment) => {
-					return {
-						...attachment,
-						uid: attachment.id,
+						handleUploadMedia([
+							new File([blob], "media", {
+								type: blob.type,
+							}),
+						])
 					}
-				}),
-				fileList: post.attachments.map((attachment) => {
-					return {
-						...attachment,
-						uid: attachment.id,
-						id: attachment.id,
-						thumbUrl: attachment.url,
-						status: "done",
-					}
-				}),
-				postPoll: post.poll_options,
-				postVisibility: post.visibility,
+				}
+
+				return
+			}
+
+			if (e.ctrlKey && e.key === "Enter") {
+				return submit()
+			}
+		},
+		[postObj],
+	)
+
+	// if edit_post is defined, load post data
+	React.useEffect(() => {
+		if (!edit_post) {
+			return edit_post
+		}
+
+		setLoading(true)
+
+		PostModel.post({ post_id: edit_post })
+			.then((post) => {
+				setPostObj(post)
+
+				if (post.poll_options) {
+					setPoll(post.poll_options)
+				}
 			})
-		}
-		// fetch the posting policy
-		//this.fetchUploadPolicy()
+			.catch((err) => {
+				if (close) {
+					close()
+				}
 
-		// add a listener to the window
-		document.addEventListener("paste", this.handlePaste)
-	}
+				console.error("Failed to load post data", err)
+				app.message.error("Failed to load post data")
+			})
+			.finally(() => {
+				setLoading(false)
+			})
+	}, [edit_post])
 
-	componentWillUnmount() {
-		document.removeEventListener("paste", this.handlePaste)
-	}
-
-	componentDidUpdate(prevProps, prevState) {
-		// if pending is not empty and is not loading
-		if (this.state.pending.length > 0 && !this.state.loading) {
-			this.setState({ loading: true })
-		} else if (this.state.pending.length === 0 && this.state.loading) {
-			this.setState({ loading: false })
-		}
-	}
-
-	render() {
-		const {
-			postMessage,
-			fileList,
-			loading,
-			uploaderVisible,
-			postingPolicy,
-		} = this.state
-
-		const editMode = !!this.props.edit_post
-
-		const showHeader = !!this.props.edit_post || this.props.reply_to
-
-		return (
-			<div
-				className={"postCreator"}
-				ref={this.creatorRef}
-				onDragEnter={this.handleDrag}
-				onDragLeave={this.handleDrag}
-				style={this.props.style}
-			>
-				{showHeader && (
-					<div className="postCreator-header">
-						{this.props.edit_post && (
-							<div className="postCreator-header-indicator">
-								<p>
-									<Icons.SquarePen />
-									Editing post
-								</p>
-							</div>
-						)}
-
-						{this.props.reply_to && (
-							<div className="postCreator-header-indicator">
-								<p>
-									<Icons.Reply />
-									Replaying to
-								</p>
-
-								<PostLink
-									post_id={this.props.reply_to}
-									onClick={() => {
-										this.props.close()
-										app.navigation.goToPost(
-											this.props.reply_to,
-										)
-									}}
-								/>
-							</div>
-						)}
-					</div>
-				)}
-
-				<div className="textInput">
-					<div className="avatar">
-						<img src={app.userData?.avatar} />
-					</div>
-
-					<antd.Mentions
-						placeholder="What are you thinking?"
-						value={postMessage}
-						autoSize={{ minRows: 3, maxRows: 6 }}
-						maxLength={postingPolicy.maxMessageLength}
-						onChange={this.handleMessageInputChange}
-						onKeyDown={this.handleMessageInputKeydown}
-						disabled={loading}
-						draggable={false}
-						prefix="@"
-						allowClear
-						onBlur={() => {
-							this.setState({ mentionsLoadedData: [] })
-						}}
-						options={this.state.mentionsLoadedData.map((item) => {
-							return {
-								key: item.id,
-								value: item.username,
-								label: (
-									<>
-										<antd.Avatar
-											size={24}
-											src={item.avatar}
-											shape="square"
-										/>
-										<span>{item.username}</span>
-									</>
-								),
-							}
-						})}
-						onSearch={this.handleOnMentionSearch}
-					/>
-
-					<div>
-						<antd.Button
-							type="primary"
-							disabled={loading || !this.canSubmit()}
-							onClick={this.submit}
-							icon={
-								loading ? (
-									<Icons.LoadingOutlined spin />
-								) : editMode ? (
-									<Icons.SquarePen />
-								) : (
-									<Icons.Send />
-								)
-							}
-						/>
-					</div>
+	return (
+		<div className={classNames("post-creator", "bg-accent")}>
+			{reply_to && (
+				<div className="flex-row gap-5">
+					<span>Replying to:</span>
+					<span>{reply_to}</span>
 				</div>
+			)}
 
-				<div
-					className={classnames("uploader", {
-						["visible"]: uploaderVisible,
-					})}
-				>
-					<antd.Upload.Dragger
-						openFileDialogOnClick={false}
-						maxCount={postingPolicy.maximunFilesPerRequest}
-						onChange={this.onUploaderChange}
-						customRequest={this.uploadFile}
-						accept={postingPolicy.acceptedMimeTypes}
-						fileList={fileList}
-						listType="picture-card"
-						itemRender={this.renderUploadPreviewItem}
-						multiple
-					>
-						<div className="hint">
-							<h3>Drag and drop files here</h3>
-							<span>
-								Max{" "}
-								{humanSize.fromBytes(
-									postingPolicy.maximumFileSize,
-								)}
-							</span>
-						</div>
-					</antd.Upload.Dragger>
-				</div>
+			<Mentions
+				placeholder="What are you thinking?"
+				value={postObj.message}
+				autoSize={{ minRows: 3, maxRows: 6 }}
+				maxLength={DEFAULT_POST_POLICY.maxMessageLength}
+				onChange={handleMessageInputChange}
+				onKeyDown={handleKeyDown}
+				disabled={loading}
+				draggable={false}
+				prefix="@"
+				allowClear
+				autoFocus
+			/>
 
-				{this.state.postPoll && (
-					<Poll
-						formRef={this.pollRef}
-						options={this.state.postPoll}
-						onClose={this.handleDeletePoll}
-						editMode
-					/>
-				)}
+			{poll && (
+				<Poll
+					formRef={pollRef}
+					options={poll}
+					onClose={handleDeletePoll}
+					editMode
+				/>
+			)}
 
-				<div className="actions">
-					<antd.Button
-						type="ghost"
-						onClick={this.handleUploadClick}
-						icon={<Icons.Upload />}
-					/>
+			<PostCreatorAttachments
+				pending={pendingFiles}
+				attachments={postObj?.attachments ?? []}
+				onClickDeleteItem={handleDeleteMedia}
+			/>
 
-					<antd.Button
-						type="ghost"
-						onClick={this.handleAddPoll}
-						icon={<Icons.Vote />}
-					/>
-
-					<antd.Select
-						id="post-visibility"
-						size="small"
-						value={this.state.postVisibility}
-						onChange={this.handleVisibilityChange}
-						options={visibilityOptions}
-					/>
-				</div>
-			</div>
-		)
-	}
+			<PostCreatorActions
+				postObj={postObj}
+				updatePostObj={updatePostObj}
+				loading={loading}
+				onPublish={submit}
+				canPublish={canPublish()}
+				handleUploadMedia={handleUploadMedia}
+				handleAddPoll={handleAddPoll}
+			/>
+		</div>
+	)
 }
+
+export default PostCreator
