@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 
 import { Icons } from "@components/Icons"
-import { MobileUserCard } from "@components/UserCard"
+//import { MobileUserCard } from "@components/UserCard"
 import NFCModel from "comty.js/models/nfc"
 
 import FollowsModel from "@models/follows"
@@ -88,13 +88,13 @@ export default (props) => {
 	return (
 		<div className="nfc_tag_dialog">
 			<div className="nfc_tag_dialog__header">
-				<MobileUserCard
+				{/* <MobileUserCard
 					user={R_Tag.user}
 					isFollowed={following}
 					followers={followers}
 					isSelf={isSelf}
 					preview
-				/>
+				/>*/}
 			</div>
 
 			<div className="nfc_tag_dialog__body">
