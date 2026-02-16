@@ -5,6 +5,7 @@ import classnames from "classnames"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
+import classNames from "classnames"
 
 class Modal extends React.Component {
 	state = {
@@ -89,7 +90,9 @@ class Modal extends React.Component {
 					onMouseDown={this.handleClickOutside}
 				/>
 				<div
-					className="app_modal_content bg-accent"
+					className={classNames("app_modal_content", {
+						"bg-accent": this.props.framed,
+					})}
 					ref={this.contentRef}
 					style={this.props.frameContentStyle}
 				>
