@@ -21,6 +21,7 @@
 		"id": "spaces",
 		"path": "/spaces",
 		"label": "Spaces",
-		"icon": "MessageSquareQuote"
+		"icon": "MessageSquareQuote",
+		"requiredFlags": ["spaces_preview"]
 	}
 ]

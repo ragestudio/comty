@@ -3,7 +3,8 @@
 		"id": "messages",
 		"path": "/spaces/dm",
 		"label": "Messages",
-		"icon": "MessageCircle"
+		"icon": "MessageCircle",
+		"requiredFlags": ["spaces_preview"]
 	},
 	{
 		"id": "notifications",
