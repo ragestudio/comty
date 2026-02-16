@@ -1,5 +1,6 @@
 import React from "react"
 import * as antd from "antd"
+import Button from "@ui/Button"
 import classnames from "classnames"
 import { Translation } from "react-i18next"
 
@@ -44,16 +45,16 @@ const SettingItemExtraActions = ({ setting, ctx, actions }) => {
 		}
 
 		return (
-			<antd.Button
+			<Button
 				key={action.id}
 				id={action.id}
 				onClick={handleOnClick}
 				icon={action.icon && createIconRender(action.icon)}
-				type={action.type ?? "round"}
+				type={action.type ?? "default"}
 				disabled={setting.disabled}
 			>
 				{action.title}
-			</antd.Button>
+			</Button>
 		)
 	})
 }
@@ -438,7 +439,7 @@ export default class SettingItemComponent extends React.PureComponent {
 							React.createElement(Component, finalProps)}
 						{this.state.loading && <antd.Spin />}
 						{this.state.debouncedValue && (
-							<antd.Button
+							<Button
 								type="round"
 								icon={<Icons.Check />}
 								onClick={async () =>
@@ -448,7 +449,7 @@ export default class SettingItemComponent extends React.PureComponent {
 								}
 							>
 								Save
-							</antd.Button>
+							</Button>
 						)}
 					</>
 				</div>

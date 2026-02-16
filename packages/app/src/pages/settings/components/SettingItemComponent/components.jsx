@@ -1,11 +1,14 @@
 import * as antd from "antd"
+import Button from "@ui/Button"
+
 import { SliderPicker } from "react-color"
 
 export const SettingsComponents = {
 	button: {
-		component: antd.Button,
+		component: Button,
 		props: (_this) => {
 			return {
+				type: "primary",
 				onClick: (event) => _this.onUpdateItem(event),
 			}
 		},
