@@ -1,42 +1,29 @@
 import React from "react"
 import PropTypes from "prop-types"
-import classnames from "classnames"
+import VirtualizedLyricsList from "@pages/studio/music/track_lyrics/[track_id]/components/LyricsEntriesList"
 
 import { parseLRC, formatToLRC } from "../../utils/lrcParser"
 
 import {
 	Input,
 	Button,
-	List,
 	Space,
 	Typography,
 	Select,
 	Row,
 	Col,
-	Popconfirm,
-	InputNumber,
 	Empty,
 	Flex,
-	Switch,
 } from "antd"
 
-import {
-	PlusOutlined,
-	DeleteOutlined,
-	EditOutlined,
-	SaveOutlined,
-	CloseOutlined,
-	PlayCircleOutlined,
-} from "@ant-design/icons"
-
+import { PlusOutlined } from "@ant-design/icons"
 import { MdSpaceBar } from "react-icons/md"
 
-import "./index.less"
-
 import { useLyricsEditor } from "../../context/LyricsEditorContext"
-import { formatSecondsToLRC } from "../../utils/lrcParser"
 
 import Languages from "@config/languages"
+
+import "./index.less"
 
 const { Text } = Typography
 const { TextArea } = Input
@@ -49,218 +36,51 @@ const languageOptions = [
 	{ label: "Original", value: "original" },
 ]
 
-const Line = ({
-	line,
-	editData,
-	setEditData,
-
-	active,
-
-	handleSeek,
-	handleDeleteLine,
-	handleEditLineSave,
-	handleEditLineCancel,
-	handleEditLineStart,
-	handleClickDuplicate,
-	handleEditLineSetAsBreak,
-}) => {
-	const editMode = editData && editData.time === line.time
-
-	if (editMode) {
-		return (
-			<List.Item>
-				<div style={{ width: "100%" }}>
-					<Space
-						direction="vertical"
-						style={{ width: "100%" }}
-						size="small"
-					>
-						<TextArea
-							value={editData.text}
-							onChange={(e) =>
-								setEditData({
-									...editData,
-									text: e.target.value,
-								})
-							}
-							autoSize={{
-								minRows: 1,
-								maxRows: 3,
-							}}
-							style={{ resize: "none" }}
-						/>
-						<Row gutter={8} align="middle">
-							<Col span={6}>
-								<InputNumber
-									value={editData.time}
-									onChange={(value) =>
-										setEditData({
-											...editData,
-											time: value,
-										})
-									}
-									step={0.1}
-									style={{
-										width: "100%",
-									}}
-									placeholder="Time (s)"
-									size="small"
-								/>
-							</Col>
-							<Col span={18}>
-								<Space size="small">
-									<Switch
-										defaultChecked={editData.break}
-										onChange={(checked) => {
-											setEditData({
-												...editData,
-												break: checked,
-											})
-										}}
-										size="small"
-										label="Break"
-									/>
-									<Button
-										type="primary"
-										size="small"
-										icon={<SaveOutlined />}
-										onClick={handleEditLineSave}
-									>
-										Save
-									</Button>
-									<Button
-										size="small"
-										icon={<CloseOutlined />}
-										onClick={handleEditLineCancel}
-									>
-										Cancel
-									</Button>
-								</Space>
-							</Col>
-						</Row>
-					</Space>
-				</div>
-			</List.Item>
-		)
-	}
-
-	return (
-		<div
-			className={classnames("avlyrics-editor-list-item", {
-				active: active,
-			})}
-			id={`t${parseInt(line.time * 1000)}`}
-		>
-			<Row
-				justify="space-between"
-				align="middle"
-				style={{ width: "100%" }}
-			>
-				<Col flex="80px">
-					<Button
-						type="link"
-						size="small"
-						icon={<PlayCircleOutlined />}
-						onClick={(e) => {
-							e.preventDefault()
-							e.stopPropagation()
-
-							handleSeek(line.time)
-						}}
-						style={{
-							padding: 0,
-							height: "auto",
-							fontSize: "12px",
-						}}
-					>
-						{formatSecondsToLRC(line.time)}
-					</Button>
-				</Col>
-
-				<Col
-					flex="1"
-					style={{
-						marginLeft: 16,
-						marginRight: 16,
-					}}
-				>
-					<Text
-						style={{
-							wordBreak: "break-word",
-						}}
-					>
-						{line.break && "<break>"}
-						{!line.break && line.text}
-					</Text>
-				</Col>
-				<Col flex="80px" style={{ textAlign: "right" }}>
-					<Space size="small">
-						<Button
-							type="text"
-							size="small"
-							onClick={() => handleClickDuplicate(line)}
-						>
-							D
-						</Button>
-						<Button
-							type="text"
-							size="small"
-							icon={<EditOutlined />}
-							onClick={() => handleEditLineStart(line)}
-							style={{ padding: "4px" }}
-						/>
-						<Popconfirm
-							title="Delete this line?"
-							onConfirm={() => handleDeleteLine(line)}
-							okText="Delete"
-							cancelText="Cancel"
-							placement="topRight"
-						>
-							<Button
-								type="text"
-								size="small"
-								icon={<DeleteOutlined />}
-								danger
-								style={{
-									padding: "4px",
-								}}
-							/>
-						</Popconfirm>
-					</Space>
-				</Col>
-			</Row>
-		</div>
-	)
-}
-
 const LyricsEditor = ({ player }) => {
 	const { state, dispatch } = useLyricsEditor()
 
 	const newLineTextRef = React.useRef(null)
-	const linesListRef = React.useRef(null)
 
 	// ticker
-	const tickerRef = React.useRef(null)
-	const [followTime, setFollowTime] = React.useState(true)
 	const [lineIndex, setLineIndex] = React.useState(null)
+	const lastUpdateRef = React.useRef(0)
 
 	const [newLineText, setNewLineText] = React.useState("")
-
 	const [editData, setEditData] = React.useState(null)
 
-	const lines = state.lyrics[state.selectedLanguage] ?? []
+	const lines = state.lyrics[state.selectedLanguage]
 
-	const scrollToTime = React.useCallback((time) => {
-		const lineSelector = `#t${parseInt(time * 1000)}`
+	// binary search for active line (optimized)
+	const findActiveLineIndex = React.useCallback(
+		(currentTime) => {
+			const linesLength = lines.length
 
-		const lineElement = linesListRef.current.querySelector(lineSelector)
+			if (linesLength === 0) return -1
+			if (currentTime < lines[0].time) return -1
+			if (currentTime >= lines[linesLength - 1].time)
+				return linesLength - 1
 
-		if (lineElement) {
-			lineElement.scrollIntoView({ behavior: "smooth" })
-		}
-	}, [])
+			let left = 0
+			let right = linesLength - 1
+			let result = -1
 
-	const handleAddLine = () => {
+			while (left <= right) {
+				const mid = (left + right) >> 1 // faster than Math.floor
+
+				if (lines[mid].time <= currentTime) {
+					result = mid
+					left = mid + 1
+				} else {
+					right = mid - 1
+				}
+			}
+
+			return result
+		},
+		[lines],
+	)
+
+	const handleAddLine = React.useCallback(() => {
 		if (!newLineText.trim()) {
 			return null
 		}
@@ -276,37 +96,39 @@ const LyricsEditor = ({ player }) => {
 		})
 
 		setNewLineText("")
-		scrollToTime(time)
-	}
+	}, [newLineText, player, dispatch])
 
-	const handleEditLineStart = (line) => {
+	const handleEditLineStart = React.useCallback((line) => {
 		setEditData({
 			text: line.text,
 			time: line.time || 0,
 		})
-	}
+	}, [])
 
-	const handleEditLineSave = () => {
+	const handleEditLineSave = React.useCallback(() => {
 		dispatch({
 			type: "UPDATE_LINE",
 			payload: editData,
 		})
 
 		setEditData(null)
-	}
+	}, [editData, dispatch])
 
-	const handleEditLineCancel = () => {
+	const handleEditLineCancel = React.useCallback(() => {
 		setEditData(null)
-	}
+	}, [])
 
-	const handleDeleteLine = (line) => {
-		dispatch({
-			type: "REMOVE_LINE",
-			payload: line,
-		})
-	}
+	const handleDeleteLine = React.useCallback(
+		(line) => {
+			dispatch({
+				type: "REMOVE_LINE",
+				payload: line,
+			})
+		},
+		[dispatch],
+	)
 
-	const handleAddLineBreak = () => {
+	const handleAddLineBreak = React.useCallback(() => {
 		const time = player.current.audio.current.currentTime
 
 		dispatch({
@@ -316,28 +138,31 @@ const LyricsEditor = ({ player }) => {
 				time: time,
 			},
 		})
+	}, [player, dispatch])
 
-		scrollToTime(time)
-	}
+	const handleClickDuplicate = React.useCallback(
+		(line) => {
+			const nextTime = line.time + 0.4
 
-	const handleClickDuplicate = (line) => {
-		const nextTime = line.time + 0.4
+			dispatch({
+				type: "ADD_LINE",
+				payload: {
+					text: line.text,
+					time: nextTime,
+				},
+			})
+		},
+		[dispatch],
+	)
 
-		dispatch({
-			type: "ADD_LINE",
-			payload: {
-				text: line.text,
-				time: nextTime,
-			},
-		})
-	}
+	const handleSeek = React.useCallback(
+		(time) => {
+			player.current.seek(time)
+		},
+		[player],
+	)
 
-	const handleSeek = (time) => {
-		// TODO: call to player seek function
-		player.current.seek(time)
-	}
-
-	const handleLanguageUpload = async () => {
+	const handleLanguageUpload = React.useCallback(async () => {
 		const input = document.createElement("input")
 
 		input.type = "file"
@@ -356,9 +181,9 @@ const LyricsEditor = ({ player }) => {
 		}
 
 		input.click()
-	}
+	}, [dispatch])
 
-	const handleLanguageDownload = () => {
+	const handleLanguageDownload = React.useCallback(() => {
 		const data = formatToLRC(lines)
 		const blob = new Blob([data], { type: "text/plain" })
 		const url = URL.createObjectURL(blob)
@@ -367,56 +192,71 @@ const LyricsEditor = ({ player }) => {
 		link.href = url
 		link.download = `${state.track.title} - ${state.selectedLanguage}.txt`
 		link.click()
-	}
+	}, [lines, state.track?.title, state.selectedLanguage])
 
-	const followLineTick = () => {
-		const currentTime = player.current.audio.current.currentTime
-
-		const lineIndex = lines.findLastIndex((line) => {
-			return currentTime >= line.time
-		})
-
-		if (lineIndex <= -1) {
-			return false
+	const followLineTick = React.useCallback(() => {
+		const now = Date.now()
+		// throttle updates to 100ms
+		if (now - lastUpdateRef.current < 100) {
+			return
 		}
 
-		setLineIndex(lineIndex)
-	}
+		const currentTime = player.current.audio.current.currentTime
+		const index = findActiveLineIndex(currentTime)
 
-	const handleSelectLanguageChange = (language) => {
-		dispatch({
-			type: "SET_SELECTED_LANGUAGE",
-			payload: language,
-		})
-	}
+		if (index !== -1 && index !== lineIndex) {
+			setLineIndex(index)
+			lastUpdateRef.current = now
+		}
+	}, [player, findActiveLineIndex, lineIndex])
 
+	const handleSelectLanguageChange = React.useCallback(
+		(language) => {
+			dispatch({
+				type: "SET_SELECTED_LANGUAGE",
+				payload: language,
+			})
+		},
+		[dispatch],
+	)
+
+	// use requestAnimationFrame for smoother updates
 	React.useEffect(() => {
-		if (state.isPlaying) {
-			if (tickerRef.current) {
-				clearInterval(tickerRef.current)
+		if (!state.isPlaying) {
+			return
+		}
+
+		let animationFrameId
+		let lastTime = 0
+
+		const updateLine = (timestamp) => {
+			if (timestamp - lastTime > 16) {
+				followLineTick()
+				lastTime = timestamp
 			}
 
-			tickerRef.current = setInterval(followLineTick, 200)
+			animationFrameId = requestAnimationFrame(updateLine)
 		}
+
+		animationFrameId = requestAnimationFrame(updateLine)
 
 		return () => {
-			clearInterval(tickerRef.current)
-		}
-	}, [followTime, state.isPlaying])
-
-	React.useEffect(() => {
-		if (followTime === true && lineIndex !== -1) {
-			const line = lines[lineIndex]
-
-			if (line) {
-				scrollToTime(line.time)
+			if (animationFrameId) {
+				cancelAnimationFrame(animationFrameId)
 			}
 		}
-	}, [lineIndex])
+	}, [state.isPlaying, followLineTick])
 
 	return (
-		<Space direction="vertical" size="large" style={{ width: "100%" }}>
-			<Row gutter={16} align="middle">
+		<Space
+			direction="vertical"
+			size="large"
+			style={{ width: "100%" }}
+		>
+			<Row
+				gutter={16}
+				align="middle"
+			>
 				<Col span={6}>
 					<Select
 						value={state.selectedLanguage}
@@ -435,7 +275,7 @@ const LyricsEditor = ({ player }) => {
 						Load from file
 					</Button>
 					<Button
-						onClick={() => handleLanguageDownload()}
+						onClick={handleLanguageDownload}
 						size="small"
 					>
 						Download current
@@ -443,7 +283,11 @@ const LyricsEditor = ({ player }) => {
 				</Col>
 			</Row>
 
-			<Flex horizontal align="center" gap={8}>
+			<Flex
+				horizontal
+				align="center"
+				gap={8}
+			>
 				<TextArea
 					ref={newLineTextRef}
 					value={newLineText}
@@ -473,48 +317,36 @@ const LyricsEditor = ({ player }) => {
 				/>
 			</Flex>
 
-			{state.lyrics.length === 0 && (
-				<Empty
-					description="No lyrics available"
-					image={Empty.PRESENTED_IMAGE_SIMPLE}
+			<Row
+				justify="space-between"
+				align="middle"
+			>
+				<Text
+					type="secondary"
+					style={{ fontSize: "12px" }}
 				>
-					<Text type="secondary">
-						Add lyrics manually or upload an LRC file
-					</Text>
-				</Empty>
-			)}
-
-			<Row justify="space-between" align="middle">
-				<Text type="secondary" style={{ fontSize: "12px" }}>
 					{lines.length} lines
 				</Text>
 			</Row>
 
-			<div className="avlyrics-editor-list" ref={linesListRef}>
-				{lines.map((line, index) => {
-					return (
-						<Line
-							key={index}
-							line={line}
-							active={index === lineIndex && followTime}
-							setEditData={setEditData}
-							editData={editData}
-							handleSeek={handleSeek}
-							handleDeleteLine={handleDeleteLine}
-							handleEditLineStart={handleEditLineStart}
-							handleEditLineSave={handleEditLineSave}
-							handleEditLineCancel={handleEditLineCancel}
-							handleClickDuplicate={handleClickDuplicate}
-						/>
-					)
-				})}
-			</div>
+			<VirtualizedLyricsList
+				lines={lines}
+				lineIndex={lineIndex}
+				editData={editData}
+				setEditData={setEditData}
+				handleSeek={handleSeek}
+				handleDeleteLine={handleDeleteLine}
+				handleEditLineStart={handleEditLineStart}
+				handleEditLineSave={handleEditLineSave}
+				handleEditLineCancel={handleEditLineCancel}
+				handleClickDuplicate={handleClickDuplicate}
+			/>
 		</Space>
 	)
 }
 
 LyricsEditor.propTypes = {
-	lyrics: PropTypes.arrayOf(PropTypes.string).isRequired,
+	player: PropTypes.object.isRequired,
 }
 
 export default LyricsEditor
