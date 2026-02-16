@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "1.45.0@alpha",
+	"version": "2.1.0@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
@@ -22,8 +22,8 @@
 		"express-cassandra": "^2.9.1",
 		"jsonwebtoken": "^9.0.2",
 		"jws": "^4.0.1",
-		"linebridge": "^1.6.0",
-		"linebridge-gateway": "^0.4.1",
+		"linebridge": "^1.6.1",
+		"linebridge-gateway": "^0.5.0",
 		"minio": "^8.0.5",
 		"mongoose": "^8.18.0",
 		"qs": "^6.14.1"
