@@ -19,11 +19,18 @@
 		"backgroundAttachment": "fixed",
 		"top-bar-height": "52px",
 		"bottom-bar-height": "80px",
-		"compact-mode": false
+		"compact-mode": false,
+
+		"primaryColor": "#ff6064",
+		"backgroundColorPrimary": "var(--background-color-primary)",
+		"backgroundColorAccent": "var(--background-color-accent)"
 	},
 	"defaultVariant": "dark",
 	"variants": {
 		"light": {
+			"textColor": "#000000",
+			"textColorContrast": "#d2d2d2",
+
 			"bg_color_1": "255, 255, 255",
 			"bg_color_2": "200, 200, 200",
 			"bg_color_3": "150, 150, 150",
@@ -38,14 +45,18 @@
 			"background-color-primary": "#ffffff",
 			"background-color-primary-2": "#f0f0f0",
 			"shadow-color": "#4b4b4b7c",
-			"background-color-accent-values": "240, 242, 245",
 
-			"background-color-accent": "rgba(240, 242, 245, 0.8)",
+			"background-color-accent": "rgba(var(--background-color-accent-values), 0.8)",
+			"background-color-accent-values": "240, 242, 245",
 			"background-color-contrast": "#4b4b4b",
+
 			"border-color": "rgba(75, 75, 75, 0.2)",
 			"border-color-solid": "#b3b3b3"
 		},
 		"dark": {
+			"textColor": "#d2d2d2",
+			"textColorContrast": "#000000",
+
 			"bg_color_1": "38, 38, 38",
 			"bg_color_2": "65, 65, 65",
 			"bg_color_3": "90, 90, 90",
