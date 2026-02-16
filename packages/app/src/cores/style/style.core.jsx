@@ -6,6 +6,7 @@ import lessToJs from "less-vars-to-js"
 
 import config from "@config"
 import builtInVars from "@styles/vars.less?raw"
+import "antd/dist/antd.css"
 
 const variantToAlgorithm = {
 	light: theme.defaultAlgorithm,
@@ -64,6 +65,7 @@ export class ThemeProvider extends React.Component {
 						...app.cores.style.vars,
 					},
 					algorithm: themeAlgorithms,
+					zeroRuntime: true,
 				}}
 				componentSize={app.isMobile ? "large" : "middle"}
 			>
