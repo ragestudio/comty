@@ -1,4 +1,3 @@
-//import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
 import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
@@ -23,9 +22,6 @@ class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/chats",
-		nats: {
-			enabled: true,
-		},
 	}
 
 	middlewares = {
@@ -42,29 +38,9 @@ class API extends Server {
 		snowflake: new SnowflakeWorker(0, 1),
 	}
 
-	handleWsUpgrade = async (context, token, res) => {
-		if (!token) {
-			return res.status(401).json({ error: "Missing auth token" })
-		}
-
-		context = await InjectedAuth(context, token, res).catch(() => {
-			res.status(401).json({ error: "Failed to verify auth token" })
-			return false
-		})
-
-		if (!context || !context.user) {
-			res.status(401).json({
-				error: "Invalid auth token",
-			})
-			return false
-		}
-
-		return res.upgrade(context)
-	}
-
 	async onInitialize() {
 		if (!this.engine.ws) {
-			throw new Error(`Engine WS not found!`)
+			throw new Error(`Websocket not enabled!`)
 		}
 
 		await this.contexts.db.initialize()

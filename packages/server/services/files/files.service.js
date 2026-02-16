@@ -1,5 +1,4 @@
-//import { Server } from "linebridge"
-import { Server } from "../../../../linebridge/server/src"
+import { Server } from "linebridge"
 
 import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
@@ -48,14 +47,15 @@ class API extends Server {
 		this,
 	))
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+		() => this.contexts.capabilities.initialize(),
+	]
+
 	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.scylla.initialize()
-		await this.contexts.redis.initialize()
-
-		await this.contexts.capabilities.initialize()
-
-		console.log(this.contexts.capabilities)
+		console.log("Server Capabilities:", this.contexts.capabilities)
 
 		await this.queuesManager.initialize({
 			redisOptions: this.contexts.redis.client,

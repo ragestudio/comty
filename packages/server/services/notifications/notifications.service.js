@@ -23,6 +23,12 @@ class API extends Server {
 		redis: RedisClient(),
 	}
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+	]
+
 	async onInitialize() {
 		await this.contexts.db.initialize()
 		await this.contexts.scylla.initialize()

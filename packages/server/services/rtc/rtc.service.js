@@ -1,4 +1,3 @@
-//import { Server } from "../../../../linebridge/server/src"
 import { Server } from "linebridge"
 
 import ScyllaDb from "@shared-classes/ScyllaDb"
@@ -19,26 +18,21 @@ export default class API extends Server {
 	static websockets = {
 		enabled: true,
 		path: "/rtc",
-		nats: {
-			enabled: true,
-		},
 	}
 
 	middlewares = {
 		...SharedMiddlewares,
 	}
 
-	handleWsConnection = (socket) => {
-		if (socket.context.user) {
-			console.log(`[WS] @${socket.context.user.username} connected`)
-			this.eventBus.emit("user:connected", socket.context.user._id)
+	onClientConnected = (ctx = {}) => {
+		if (typeof ctx.meta.user_id === "string") {
+			this.eventBus.emit("user:connected", ctx.user_id)
 		}
 	}
 
-	handleWsDisconnect = async (socket) => {
-		if (socket.context.user) {
-			console.log(`[WS] @${socket.context.user.username} disconnected`)
-			this.eventBus.emit("user:disconnect", socket.context.user._id)
+	onClientDisconnected = (ctx = {}) => {
+		if (typeof ctx.meta.user_id === "string") {
+			this.eventBus.emit("user:disconnect", ctx.user_id)
 		}
 	}
 
@@ -50,12 +44,25 @@ export default class API extends Server {
 		userCalls: new UserCalls(this),
 	}
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+		() => this.contexts.mediaChannels.initialize(),
+		() => this.contexts.userCalls.initialize(),
+	]
+
 	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.scylla.initialize()
-		await this.contexts.redis.initialize()
-		await this.contexts.mediaChannels.initialize()
-		await this.contexts.userCalls.initialize()
+		if (this.nats) {
+			await this.nats.subscribeToGlobalChannel(
+				"connection",
+				this.onClientConnected,
+			)
+			await this.nats.subscribeToGlobalChannel(
+				"disconnection",
+				this.onClientDisconnected,
+			)
+		}
 
 		global.mediaChannels = this.contexts.mediaChannels
 		global.userCalls = this.contexts.userCalls

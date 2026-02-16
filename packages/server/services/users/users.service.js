@@ -30,29 +30,11 @@ export default class API extends Server {
 		redis: RedisClient(),
 	}
 
-	handleWsUpgrade = async (context, token, res) => {
-		if (!token) {
-			return res.upgrade(context)
-		}
-
-		context = await InjectedAuth(context, token, res).catch(() => {
-			res.close(401, "Failed to verify auth token")
-			return false
-		})
-
-		if (!context || !context.user) {
-			res.close(401, "Unauthorized or missing auth token")
-			return false
-		}
-
-		return res.upgrade(context)
-	}
-
-	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.redis.initialize()
-		await this.contexts.scylla.initialize()
-	}
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.redis.initialize(),
+		() => this.contexts.scylla.initialize(),
+	]
 }
 
 Boot(API)

@@ -1,4 +1,3 @@
-//import Server from "../../../../linebridge/server/src/server"
 import { Server } from "linebridge"
 
 import ScyllaDb from "@shared-classes/ScyllaDb"
@@ -10,15 +9,12 @@ export default class API extends Server {
 	static refName = "main"
 	static listenPort = 3000
 
-	static useMiddlewares = ["logs"]
 	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	static websockets = {
 		enabled: true,
 		path: "/main",
-		nats: {
-			enabled: true,
-		},
 	}
 
 	middlewares = {
@@ -26,35 +22,31 @@ export default class API extends Server {
 		...require("@shared-middlewares").default,
 	}
 
-	handleWsConnection = async (socket) => {
-		if (socket.context.user) {
-			console.log(`@${socket.context.user.username} connected`)
-
-			try {
-				this.contexts.userConnections.handleConnection(
-					this.contexts.redis.client,
-					socket,
-					socket.context.user,
-				)
-			} catch (error) {
-				console.error(error)
-			}
+	onClientConnected = (ctx = {}) => {
+		try {
+			this.contexts.userConnections.handleConnection(
+				this.contexts.redis.client,
+				{
+					socket_id: ctx.socket_id,
+					user_id: ctx.meta.user_id,
+				},
+			)
+		} catch (error) {
+			console.error(error)
 		}
 	}
 
-	handleWsDisconnect = async (socket) => {
-		if (socket.context.user) {
-			console.log(`@${socket.context.user.username} disconnected`)
-
-			try {
-				this.contexts.userConnections.handleDisconnection(
-					this.contexts.redis.client,
-					socket,
-					socket.context.user,
-				)
-			} catch (error) {
-				console.error(error)
-			}
+	onClientDisconnected = (ctx = {}) => {
+		try {
+			this.contexts.userConnections.handleDisconnection(
+				this.contexts.redis.client,
+				{
+					socket_id: ctx.socket_id,
+					user_id: ctx.meta.user_id,
+				},
+			)
+		} catch (error) {
+			console.error(error)
 		}
 	}
 
@@ -65,10 +57,23 @@ export default class API extends Server {
 		userConnections: new UserConnections(this),
 	}
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+	]
+
 	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.scylla.initialize()
-		await this.contexts.redis.initialize()
+		if (this.nats) {
+			await this.nats.subscribeToGlobalChannel(
+				"connection",
+				this.onClientConnected,
+			)
+			await this.nats.subscribeToGlobalChannel(
+				"disconnection",
+				this.onClientDisconnected,
+			)
+		}
 	}
 }
 

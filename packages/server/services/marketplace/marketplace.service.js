@@ -36,11 +36,13 @@ class API extends Server {
 		}),
 	}
 
-	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.scylla.initialize()
-		await this.contexts.storage.initialize()
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.storage.initialize(),
+	]
 
+	async onInitialize() {
 		global.cache = this.contexts.cache
 		global.storages = {
 			standard: this.contexts.storage,
