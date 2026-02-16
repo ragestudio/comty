@@ -8,17 +8,21 @@ export default class AuthToken {
 
 	static get authStrategy() {
 		return {
-			secret: process.env.JWT_SECRET,
 			expiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
-			algorithm: process.env.JWT_ALGORITHM ?? "HS256",
+			algorithm: process.env.JWT_ALGORITHM ?? "ES256",
+			header: {
+				kid: process.env.JWT_KID,
+			},
 		}
 	}
 
 	static get refreshStrategy() {
 		return {
-			secret: process.env.JWT_SECRET,
 			expiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? "30d",
-			algorithm: process.env.JWT_ALGORITHM ?? "HS256",
+			algorithm: process.env.JWT_ALGORITHM ?? "ES256",
+			header: {
+				kid: process.env.JWT_KID,
+			},
 		}
 	}
 
@@ -36,14 +40,22 @@ export default class AuthToken {
 		})
 	}
 
-	static async signToken(payload, strategy = "authStrategy") {
-		const { secret, expiresIn, algorithm } =
-			AuthToken[strategy] ?? AuthToken.authStrategy
+	static async loadECDSAFromEnvB64() {
+		process.env.ECDSA_PRIVATE_KEY = Buffer.from(
+			process.env.ECDSA_PRIVATE_KEY_B64,
+			"base64",
+		).toString("utf-8")
 
-		return jwt.sign(payload, secret, {
-			expiresIn: expiresIn,
-			algorithm: algorithm,
-		})
+		process.env.ECDSA_PUBLIC_KEY = Buffer.from(
+			process.env.ECDSA_PUBLIC_KEY_B64,
+			"base64",
+		).toString("utf-8")
+	}
+
+	static async signToken(payload, strategy = "authStrategy") {
+		strategy = AuthToken[strategy]
+
+		return jwt.sign(payload, process.env.ECDSA_PRIVATE_KEY, strategy)
 	}
 
 	static async validate(token) {
@@ -106,22 +118,27 @@ export default class AuthToken {
 	}
 
 	static async jwtVerify(token) {
-		const { secret } = AuthToken.authStrategy
-
 		return await new Promise((resolve) => {
-			jwt.verify(token, secret, (err, decoded) => {
-				if (err) {
+			jwt.verify(
+				token,
+				process.env.ECDSA_PRIVATE_KEY,
+				{
+					algorithms: [process.env.JWT_ALGORITHM ?? "ES256"],
+				},
+				(err, decoded) => {
+					if (err) {
+						return resolve({
+							error: err,
+							data: decoded,
+						})
+					}
+
 					return resolve({
 						error: err,
 						data: decoded,
 					})
-				}
-
-				return resolve({
-					error: err,
-					data: decoded,
-				})
-			})
+				},
+			)
 		})
 	}
 }

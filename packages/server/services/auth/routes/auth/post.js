@@ -123,6 +123,7 @@ export default async (req, res) => {
 	const session = await Session.create({
 		user_id: user._id.toString(),
 		username: user.username,
+		flags: user.flags,
 		ip_address:
 			req.headers["cf-connecting-ip"] ??
 			req.headers["x-forwarded-for"] ??

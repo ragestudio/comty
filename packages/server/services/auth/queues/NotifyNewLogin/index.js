@@ -1,4 +1,3 @@
-import { Session } from "@db_models"
 import Worker from "./worker.js"
 
 export default {
