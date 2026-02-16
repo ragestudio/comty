@@ -26,11 +26,7 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		redis: RedisClient(),
-		scylla: (global.scylla = new ScyllaDb({
-			contactPoints: ["172.17.0.2"],
-			localDataCenter: "datacenter1",
-			keyspace: "comty",
-		})),
+		scylla: (global.scylla = new ScyllaDb()),
 		snowflake: (global.snowflake = new SnowflakeWorker(0, 1)),
 	}
 
