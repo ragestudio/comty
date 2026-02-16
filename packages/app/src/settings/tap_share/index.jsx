@@ -4,7 +4,6 @@ import classnames from "classnames"
 import NFCModel from "comty.js/models/nfc"
 
 import { Icons } from "@components/Icons"
-import UserShareBadge from "@components/UserShareBadge"
 
 import CheckRegister from "./steps/check_register"
 import DataEditor from "./steps/data_editor"
