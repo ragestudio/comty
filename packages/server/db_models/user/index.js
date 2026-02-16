@@ -39,6 +39,10 @@ export default {
 			type: Array,
 			default: [],
 		},
+		flags: {
+			type: Array,
+			default: [],
+		},
 		verified: {
 			type: Boolean,
 			default: false,
