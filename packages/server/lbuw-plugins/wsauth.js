@@ -15,11 +15,7 @@ function OnWebsocketConnection({ Ctx }) {
 	}
 }
 
-function OnWebsocketDisconnection({ Ctx }) {
-	if (Ctx.Meta["username"]) {
-		console.log(`This guy sucks -> @${Ctx.Meta["username"]}`)
-	}
-}
+function OnWebsocketDisconnection({ Ctx }) {}
 
 gateway.websockets.registerInternalEvent("connection", OnWebsocketConnection)
 gateway.websockets.registerInternalEvent(
