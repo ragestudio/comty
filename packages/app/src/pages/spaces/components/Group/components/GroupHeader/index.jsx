@@ -1,5 +1,5 @@
 import React from "react"
-import { Button } from "antd"
+import Button from "@ui/Button"
 import classNames from "classnames"
 
 import Image from "@components/Image"

@@ -1,5 +1,6 @@
 import React from "react"
-import { Button, Skeleton } from "antd"
+import { Skeleton } from "antd"
+import Button from "@ui/Button"
 import { DateTime } from "luxon"
 import PropTypes from "prop-types"
 import { useInView } from "react-intersection-observer"

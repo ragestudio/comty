@@ -14,7 +14,10 @@ const Client = ({ userId }) => {
 		return null
 	}
 
-	const { loading, result } = use(UsersModel.data, userId)
+	const [loading, result, error] = app.cores.api.useRequest(UsersModel.data, {
+		user_id: userId,
+		basic: true,
+	})
 
 	if (loading) {
 		return null
@@ -26,6 +29,7 @@ const Client = ({ userId }) => {
 				src={result.avatar}
 				alt={result.username}
 			/>
+			<p>{userId}</p>
 			<p>{result.public_name ?? result.username}</p>
 		</div>
 	)
@@ -81,7 +85,7 @@ const ChannelsListItem = (props) => {
 						{channel.clients.map((client) => {
 							return (
 								<Client
-									key={client.userId}
+									id={client.userId}
 									userId={client.userId}
 								/>
 							)

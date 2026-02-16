@@ -93,6 +93,11 @@ const SpacesPage = (props) => {
 	const controller = spacesPageController()
 	const [compact, setCompact] = React.useState(false)
 
+	if (!app.userData || !app.userData.flags.includes("spaces_preview")) {
+		app.navigation.goMain()
+		return null
+	}
+
 	React.useEffect(() => {
 		if (controller.type !== null) {
 			setCompact(true)

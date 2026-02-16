@@ -1,5 +1,7 @@
 import React from "react"
-import { Button, Popconfirm } from "antd"
+import Button from "@ui/Button"
+import ConfirmButton from "@ui/ConfirmButton"
+import Popover from "@ui/Popover"
 
 import { Icons } from "@components/Icons"
 
@@ -10,6 +12,20 @@ import use from "comty.js/hooks/use"
 import copyToClipboard from "@utils/copyToClipboard"
 
 import "./index.less"
+
+const PopoverConfirmComponent = ({ title, description, onConfirm }) => {
+	return (
+		<div>
+			{title && <h3>{title}</h3>}
+			{description && <p>{description}</p>}
+
+			<Button
+				size="small"
+				onClick={onConfirm}
+			/>
+		</div>
+	)
+}
 
 const GroupInviteItem = ({ invite, onClickDelete, onClickCopy }) => {
 	return (
@@ -35,16 +51,10 @@ const GroupInviteItem = ({ invite, onClickDelete, onClickCopy }) => {
 					{String(invite.max_usage ?? "∞")}
 				</p>
 
-				<Popconfirm
-					title="Delete this invite?"
-					description="Are you sure to delete this invite?"
+				<ConfirmButton
+					icon={<Icons.Trash />}
 					onConfirm={onClickDelete}
-				>
-					<Button
-						icon={<Icons.Trash />}
-						size="small"
-					/>
-				</Popconfirm>
+				/>
 			</div>
 		</div>
 	)
