@@ -6,9 +6,8 @@ import { Translation } from "react-i18next"
 
 import Skeleton from "@components/Skeleton"
 import { PagePanelWithNavMenu } from "@components/PagePanels"
-import { MobileUserCard } from "@components/UserCard"
+//import { MobileUserCard } from "@components/UserCard"
 
-import SessionModel from "@models/session"
 import UserModel from "@models/user"
 import FollowsModel from "@models/follows"
 
@@ -39,28 +38,71 @@ const Tabs = [
 	},
 ]
 
-export default class Account extends React.Component {
-	state = {
-		requestedUser: null,
+const Account = ({ params }) => {
+	const [requestedUser, setRequestedUser] = React.useState(null)
+	const [user, setUser] = React.useState(null)
+	const [isSelf, setIsSelf] = React.useState(false)
+	const [followers, setFollowers] = React.useState([])
+	const [isFollowed, setIsFollowed] = React.useState(false)
+	const [tabActiveKey, setTabActiveKey] = React.useState("posts")
+	const [isNotExistent, setIsNotExistent] = React.useState(false)
 
-		user: null,
-		followers: [],
+	const loadUserData = async () => {
+		const requestedUsername = params.username ?? app.userData.username
 
-		isSelf: false,
-		isFollowed: false,
+		let isSelfUser = false
+		let userData = null
+		let isFollowedData = false
+		let followersData = []
 
-		tabActiveKey: "posts",
+		if (requestedUsername != null) {
+			if (app.userData.username === requestedUsername) {
+				isSelfUser = true
+			}
 
-		isNotExistent: false,
+			userData = await UserModel.data({
+				username: requestedUsername,
+			}).catch((error) => {
+				console.error(error)
+				return false
+			})
+
+			if (!userData) {
+				setIsNotExistent(true)
+				return false
+			}
+
+			console.log(`Loaded User [${userData.username}] :`, userData)
+
+			if (!isSelfUser) {
+				const followedResult = await FollowsModel.imFollowing(
+					userData._id,
+				).catch(() => false)
+
+				if (followedResult) {
+					isFollowedData = followedResult.isFollowed
+				}
+			}
+
+			const followersResult = await FollowsModel.getFollowers(
+				userData._id,
+			).catch(() => false)
+
+			if (followersResult) {
+				followersData = followersResult
+			}
+		}
+
+		setRequestedUser(requestedUsername)
+		setUser(userData)
+		setIsSelf(isSelfUser)
+		setIsFollowed(isFollowedData)
+		setFollowers(followersData)
 	}
 
-	componentDidMount = async () => {
-		this.loadUser()
-	}
-
-	toggleFollow = async () => {
-		if (this.state.isFollowed) {
-			const accept = await new Promise((resolve, reject) => {
+	const toggleFollow = async () => {
+		if (isFollowed) {
+			const accept = await new Promise((resolve) => {
 				antd.Modal.confirm({
 					title: <Translation>{(t) => t("Confirm")}</Translation>,
 					content: (
@@ -89,121 +131,77 @@ export default class Account extends React.Component {
 		}
 
 		const result = await FollowsModel.toggleFollow({
-			username: this.state.requestedUser,
+			username: requestedUser,
 		}).catch((error) => {
 			console.error(error)
 			antd.message.error(error.message)
-
 			return false
 		})
 
-		await this.setState({
-			isFollowed: result.following,
-			followers: result.followers,
-		})
+		setIsFollowed(result.following)
+		setFollowers(result.followers)
 	}
 
-	loadUser = async () => {
-		const token = await SessionModel.getDecodedToken()
-		const requestedUser = this.props.username ?? token?.username
+	React.useEffect(() => {
+		loadUserData()
+	}, [params.username])
 
-		let isSelf = false
-		let user = null
-		let isFollowed = false
-		let followers = []
-
-		if (requestedUser != null) {
-			if (token.username === requestedUser) {
-				isSelf = true
-			}
-
-			user = await UserModel.data({
-				username: requestedUser,
-			}).catch((error) => {
-				console.error(error)
-
-				return false
-			})
-
-			if (!user) {
-				this.setState({
-					isNotExistent: true,
-				})
-
-				return false
-			}
-
-			console.log(`Loaded User [${user.username}] >`, user)
-
-			if (!isSelf) {
-				const followedResult = await FollowsModel.imFollowing(
-					user._id,
-				).catch(() => false)
-
-				if (followedResult) {
-					isFollowed = followedResult.isFollowed
-				}
-			}
-
-			const followersResult = await FollowsModel.getFollowers(
-				user._id,
-			).catch(() => false)
-
-			if (followersResult) {
-				followers = followersResult
-			}
-		}
-
-		await this.setState({
-			isSelf,
-			user,
-			requestedUser,
-			isFollowed,
-			followers,
-		})
-	}
-
-	render() {
-		const { user } = this.state
-
-		if (this.state.isNotExistent) {
-			return (
-				<antd.Result
-					status="404"
-					title="This user does not exist, yet..."
-				></antd.Result>
-			)
-		}
-
-		if (!user) {
-			return <Skeleton />
-		}
-
+	if (isNotExistent) {
 		return (
-			<div className={classnames("_mobile_account-profile")}>
-				<MobileUserCard
-					user={user}
-					isSelf={this.state.isSelf}
-					isFollowed={this.state.isFollowed}
-					followers={this.state.followers}
-					onClickFollow={this.toggleFollow}
-				/>
-
-				<PagePanelWithNavMenu
-					tabs={Tabs}
-					useSetQueryType
-					transition
-					tabProps={{
-						state: this.state,
-					}}
-					onTabChange={() => {
-						app.layout.scrollTo({
-							top: 0,
-						})
-					}}
-					no_top_padding
-				/>
-			</div>
+			<antd.Result
+				status="404"
+				title="This user does not exist, yet..."
+			></antd.Result>
 		)
 	}
+
+	if (!user) {
+		return <Skeleton />
+	}
+
+	const state = {
+		requestedUser,
+		user,
+		followers,
+		isSelf,
+		isFollowed,
+		tabActiveKey,
+		isNotExistent,
+	}
+
+	return (
+		<div className={classnames("_mobile_account-profile")}>
+			{/* <MobileUserCard
+				user={user}
+				isSelf={isSelf}
+				isFollowed={isFollowed}
+				followers={followers}
+				onClickFollow={toggleFollow}
+			/>*/}
+
+			<PagePanelWithNavMenu
+				tabs={Tabs}
+				useSetQueryType
+				transition
+				tabProps={{
+					state: state,
+				}}
+				onTabChange={() => {
+					app.layout.scrollTo({
+						top: 0,
+					})
+				}}
+				no_top_padding
+			/>
+		</div>
+	)
 }
+
+Account.options = {
+	layout: {
+		type: "default",
+		centeredContent: false,
+	},
+}
+
+export default Account
