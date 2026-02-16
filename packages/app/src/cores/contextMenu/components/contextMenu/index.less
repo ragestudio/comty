@@ -61,6 +61,14 @@
 		transition: all 50ms ease-in-out;
 		overflow: hidden;
 
+		&__line {
+			display: inline-flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: space-between;
+		}
+
 		&:hover:not(.no_effect) {
 			background-color: var(--background-color-accent);
 			padding-left: 18px;
@@ -77,15 +85,13 @@
 		}
 
 		&.danger {
-			color: var(--danger-color);
-		}
+			.item__line {
+				color: var(--danger-color);
 
-		&__line {
-			display: inline-flex;
-			flex-direction: row;
-
-			align-items: center;
-			justify-content: space-between;
+				&__icon {
+					color: var(--danger-color);
+				}
+			}
 		}
 	}
 
