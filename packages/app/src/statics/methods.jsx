@@ -85,7 +85,7 @@ export default {
 			)
 		},
 		openPostCreator: (params) => {
-			app.layout.modal.open(
+			return app.layout.modal.open(
 				"post_creator",
 				(props) => (
 					<PostCreator
