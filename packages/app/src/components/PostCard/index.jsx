@@ -2,6 +2,8 @@ import React from "react"
 import classnames from "classnames"
 import ReactPlayer from "react-player/lazy"
 import { motion } from "motion/react"
+import Markdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 import Poll from "@components/Poll"
 import { Icons } from "@components/Icons"
@@ -231,9 +233,12 @@ export default class PostCard extends React.PureComponent {
 						className={classnames("post_content")}
 					>
 						<div className="message">
-							{processString(messageRegexs)(
-								this.state.data.message ?? "",
-							)}
+							<Markdown remarkPlugins={[remarkGfm]}>
+								{this.state.data.message}
+								{/* {processString(messageRegexs)(
+									this.state.data.message ?? "",
+								)}*/}
+							</Markdown>
 						</div>
 
 						{!this.props.disableAttachments &&

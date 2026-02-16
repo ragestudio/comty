@@ -1,4 +1,4 @@
-import { Button } from "antd"
+import Button from "@ui/Button"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
@@ -8,7 +8,6 @@ export default (props) => {
 		<div className="reply_button">
 			<Button
 				type="ghost"
-				shape="circle"
 				onClick={props.onClick}
 				icon={
 					<Icons.Reply

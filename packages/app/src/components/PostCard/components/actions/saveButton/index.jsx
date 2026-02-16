@@ -1,5 +1,6 @@
 import React from "react"
-import * as antd from "antd"
+import Button from "@ui/Button"
+
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
@@ -17,14 +18,13 @@ export default (props) => {
 	}
 
 	return (
-		<antd.Button
-			className={classnames("saveButton", {
+		<Button
+			type="ghost"
+			className={classnames("save-button", {
 				["active"]: saved,
 			})}
-			type="ghost"
-			shape="circle"
-			onClick={onClick}
 			icon={saved ? <Icons.BookmarkCheck /> : <Icons.Bookmark />}
+			onClick={onClick}
 		/>
 	)
 }
