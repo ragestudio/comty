@@ -109,7 +109,8 @@ const UploadButton = React.forwardRef((props, ref) => {
 		<Upload
 			customRequest={handleUpload}
 			multiple={props.multiple ?? false}
-			accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
+			// TODO: Fixme, antd 6.0 broke this so bad
+			//accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
 			progress={false}
 			fileList={[]}
 			className={classnames("uploadButton", {
