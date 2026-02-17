@@ -8,9 +8,10 @@
 	],
 	"scripts": {
 		"setup": "cross-env NODE_ENV=development linebridge-boot scripts/setup/index.js",
-		"start:prod": "cross-env NODE_ENV=production linebridge-gateway",
-		"dev": "cross-env NODE_ENV=development DEBUG=true linebridge-gateway",
-		"dev:exp": "cross-env NODE_ENV=development ../../linebridge/gateway/debug.sh"
+		"start:prod": "cross-env NODE_ENV=production ultragateway",
+		"dev": "cross-env NODE_ENV=development DEBUG=true ultragateway",
+		"dev:exp": "cross-env NODE_ENV=development ../../linebridge/linebridge-gateway/debug",
+		"postinstall": "./scripts/externalDeps.sh"
 	},
 	"dependencies": {
 		"@sentry/node": "^10.7.0",
@@ -24,7 +25,6 @@
 		"jsonwebtoken": "^9.0.2",
 		"jws": "^4.0.1",
 		"linebridge": "^1.7.0",
-		"linebridge-gateway": "^0.7.0",
 		"minio": "^8.0.5",
 		"mongoose": "^8.18.0",
 		"qs": "^6.15.0"
