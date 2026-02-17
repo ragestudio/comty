@@ -25,6 +25,7 @@
 		"@loadable/component": "^5.16.7",
 		"@ragestudio/vessel": "^0.25.0",
 		"@sentry/browser": "^7.64.0",
+		"@svta/common-media-library": "^0.18.1",
 		"@tanstack/react-virtual": "^3.13.12",
 		"@tsmx/human-readable": "^1.0.7",
 		"antd": "^6.2.2",
