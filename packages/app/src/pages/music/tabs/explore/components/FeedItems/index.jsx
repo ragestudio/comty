@@ -1,6 +1,7 @@
 import React from "react"
 import classnames from "classnames"
-import * as antd from "antd"
+import { Skeleton, Result } from "antd"
+import Button from "@ui/Button"
 import { Translation } from "react-i18next"
 
 import { Icons } from "@components/Icons"
@@ -72,7 +73,7 @@ const FeedItems = (props) => {
 
 		return (
 			<div className="music-feed-items">
-				<antd.Result
+				<Result
 					status="warning"
 					title="Failed to load"
 					subTitle="We are sorry, but we could not load this requests. Please try again later."
@@ -91,14 +92,14 @@ const FeedItems = (props) => {
 
 				{!props.disablePagination && (
 					<div className="music-feed-items-actions">
-						<antd.Button
-							icon={<Icons.MdChevronLeft />}
+						<Button
+							icon={<Icons.ChevronLeft />}
 							onClick={onClickPrev}
 							disabled={page === 0 || loading}
 						/>
 
-						<antd.Button
-							icon={<Icons.MdChevronRight />}
+						<Button
+							icon={<Icons.ChevronRight />}
 							onClick={onClickNext}
 							disabled={ended || loading}
 						/>
@@ -107,19 +108,36 @@ const FeedItems = (props) => {
 			</div>
 
 			<div className="music-feed-items-content">
-				{loading && <antd.Skeleton active />}
+				{loading && <Skeleton active />}
 
 				{!loading &&
 					result?.items?.map((item, index) => {
 						if (props.type === "radios") {
-							return <Radio row key={index} item={item} />
+							return (
+								<Radio
+									row
+									key={index}
+									item={item}
+								/>
+							)
 						}
 
 						if (props.type === "tracks") {
-							return <Track key={index} track={item} />
+							return (
+								<Track
+									key={index}
+									track={item}
+								/>
+							)
 						}
 
-						return <Playlist row key={index} playlist={item} />
+						return (
+							<Playlist
+								row
+								key={index}
+								playlist={item}
+							/>
+						)
 					})}
 			</div>
 		</div>

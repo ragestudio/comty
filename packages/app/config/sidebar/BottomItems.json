@@ -1,18 +1,25 @@
 [
 	{
-		"id": "search",
-		"label": "Search",
-		"icon": "FiSearch"
+		"id": "messages",
+		"path": "/spaces/dm",
+		"label": "Messages",
+		"icon": "MessageCircle",
+		"requiredFlags": ["spaces_preview"]
+	},
+	{
+		"id": "notifications",
+		"path": "/notifications",
+		"label": "Notifications",
+		"icon": "Bell"
 	},
 	{
 		"id": "apps",
 		"label": "Apps",
-		"icon": "MdApps"
+		"icon": "Grid3X3"
 	},
 	{
-		"id": "settings",
-		"label": "Settings",
-		"icon": "FiSettings",
-		"path": "/settings"
+		"id": "search",
+		"label": "Search",
+		"icon": "Search"
 	}
 ]

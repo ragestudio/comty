@@ -1,5 +1,6 @@
 import React from "react"
-import * as antd from "antd"
+import Button from "@ui/Button"
+
 import Marquee from "react-fast-marquee"
 import classnames from "classnames"
 
@@ -114,17 +115,20 @@ const Player = (props) => {
 		>
 			<div className={classnames("toolbar_player_top_actions")}>
 				{!playerState.control_locked && (
-					<antd.Button icon={<Icons.MdCast />} shape="circle" />
+					<Button
+						icon={<Icons.Cast />}
+						shape="circle"
+					/>
 				)}
 
-				<antd.Button
-					icon={<Icons.MdFullscreen />}
+				<Button
+					icon={<Icons.Fullscreen />}
 					shape="circle"
 					onClick={() => app.location.push("/lyrics")}
 				/>
 
-				<antd.Button
-					icon={<Icons.FiX />}
+				<Button
+					icon={<Icons.X />}
 					shape="circle"
 					onClick={() => app.cores.player.close()}
 				/>
@@ -137,7 +141,10 @@ const Player = (props) => {
 					}}
 				/>
 
-				<div className="toolbar_player_content" ref={contentRef}>
+				<div
+					className="toolbar_player_content"
+					ref={contentRef}
+				>
 					<div className="toolbar_player_info">
 						<h1
 							ref={titleRef}
@@ -181,6 +188,7 @@ const Player = (props) => {
 						<Controls streamMode={playerState.live} />
 
 						<SeekBar
+							track={playerState.track_manifest}
 							stopped={playerState.playback_status === "stopped"}
 							playing={playerState.playback_status === "playing"}
 							streamMode={playerState.live}

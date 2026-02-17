@@ -9,16 +9,6 @@ const forceFlag = process.argv.includes("--force")
 const tasksPath = path.resolve(__dirname, "./tasks")
 
 async function main() {
-	if (
-		process.env.INFISICAL_CLIENT_ID &&
-		process.env.INFISICAL_CLIENT_SECRET
-	) {
-		console.log(
-			`[BOOT] INFISICAL Credentials found, injecting env variables from INFISICAL...`,
-		)
-		await global.injectEnvFromInfisical()
-	}
-
 	// create the context for tasks
 	global.db = new DbManager()
 

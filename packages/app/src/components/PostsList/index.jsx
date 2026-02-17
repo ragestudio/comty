@@ -1,8 +1,8 @@
 import React from "react"
+import PropTypes from "prop-types"
 import * as antd from "antd"
 import lodash from "lodash"
 import { AnimatePresence } from "motion/react"
-import { Icons } from "@components/Icons"
 
 import PostCard from "@components/PostCard"
 import LoadMore from "@components/LoadMore"
@@ -91,29 +91,51 @@ const Entry = (props) => {
 }
 
 const PostList = React.forwardRef((props, ref) => {
+	if (props.list.length === 0) {
+		return (
+			<div className="post-list empty bg-accent">
+				<antd.Empty description="No posts found" />
+			</div>
+		)
+	}
+
 	return (
 		<LoadMore
 			ref={ref}
-			className="post-list"
+			className="post-list bg-accent"
 			loadingComponent={LoadingComponent}
 			hasMore={props.hasMore}
 			onBottom={props.onLoadMore}
 		>
 			<AnimatePresence>
 				{props.list.map((data) => {
-					return <Entry key={data._id} data={data} {...props} />
+					return (
+						<Entry
+							key={data._id}
+							data={data}
+							{...props}
+						/>
+					)
 				})}
 			</AnimatePresence>
 		</LoadMore>
 	)
 })
 
+PostList.propTypes = {
+	list: PropTypes.array,
+	hasMore: PropTypes.bool,
+	onLoadMore: PropTypes.func,
+}
+
+PostList.displayName = "PostList"
+
 const PostsListsComponent = (props) => {
 	const [list, setList] = React.useState([])
 	const [hasMore, setHasMore] = React.useState(true)
+	const [firstLoad, setFirstLoad] = React.useState(true)
 
 	// Refs
-	const firstLoad = React.useRef(true)
 	const loading = React.useRef(false)
 	const page = React.useRef(0)
 	const listRef = React.useRef(null)
@@ -178,7 +200,7 @@ const PostsListsComponent = (props) => {
 		})
 
 		loading.current = false
-		firstLoad.current = false
+		setFirstLoad(false)
 
 		if (result) {
 			setHasMore(result.has_more)
@@ -218,11 +240,7 @@ const PostsListsComponent = (props) => {
 			setList([])
 			handleLoad(props.loadFromModel)
 		}
-	}, [
-		props.loadFromModel,
-		props.loadFromModelProps,
-		firstLoad.current === false,
-	])
+	}, [props.loadFromModel, props.loadFromModelProps, firstLoad === false])
 
 	React.useEffect(() => {
 		if (props.loadFromModelProps) {
@@ -237,11 +255,11 @@ const PostsListsComponent = (props) => {
 			for (const [event, handler] of Object.entries(
 				timelineWsEvents.current,
 			)) {
-				app.cores.api.listenEvent(event, handler, "posts")
+				app.cores.api.listenEvent(event, handler)
 			}
 
-			app.cores.api.joinTopic(
-				"posts",
+			app.cores.api.emitEvent(
+				"posts:subscribe",
 				props.customTopic ?? "realtime:feed",
 			)
 		}
@@ -251,16 +269,24 @@ const PostsListsComponent = (props) => {
 				for (const [event, handler] of Object.entries(
 					timelineWsEvents.current,
 				)) {
-					app.cores.api.unlistenEvent(event, handler, "posts")
+					app.cores.api.unlistenEvent(event, handler)
 				}
 
-				app.cores.api.leaveTopic(
-					"posts",
+				app.cores.api.emitEvent(
+					"posts:unsubscribe",
 					props.customTopic ?? "realtime:feed",
 				)
 			}
 		}
 	}, [])
+
+	if (firstLoad) {
+		return (
+			<div className="post-list_wrapper">
+				<antd.Skeleton />
+			</div>
+		)
+	}
 
 	return (
 		<div className="post-list_wrapper">
@@ -269,9 +295,18 @@ const PostsListsComponent = (props) => {
 				list={list}
 				hasMore={hasMore}
 				onLoadMore={onLoadMore}
+				disableReplyTag={props.disableReplyTag}
 			/>
 		</div>
 	)
+}
+
+PostsListsComponent.propTypes = {
+	realtime: true,
+	customTopic: true,
+	loadFromModel: true,
+	loadFromModelProps: true,
+	onLoadMore: true,
 }
 
 export default PostsListsComponent

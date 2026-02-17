@@ -1,4 +1,4 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import store from "store"
 import { Observable } from "rxjs"
 
@@ -21,7 +21,7 @@ export default class SettingsCore extends Core {
 
 	onInitialize() {
 		if ("__ELECTRON__" in window) {
-			this.storeInstance = window["__ELECTRON__"].store
+			this.storeInstance = window["__ELECTRON__"].settings
 		} else {
 			this.storeInstance = store
 		}

@@ -1,6 +1,5 @@
 import fs from "node:fs"
 import { Queue, Worker } from "bullmq"
-import { composeURL as composeRedisConnectionString } from "@shared-classes/RedisClient"
 
 export default class TaskQueueManager {
 	constructor(params) {
@@ -26,10 +25,7 @@ export default class TaskQueueManager {
 				continue
 			}
 
-			this.queues[queueObj.id] = await this.registerQueue(
-				queueObj,
-				options,
-			)
+			this.queues[queueObj.id] = this.registerQueue(queueObj, options)
 		}
 	}
 
@@ -56,80 +52,88 @@ export default class TaskQueueManager {
 	registerQueueEvents = (worker) => {
 		worker.on("progress", (job, progress) => {
 			try {
-				if (job.data.sseChannelId) {
-					global.sse.sendToChannel(job.data.sseChannelId, progress)
+				if (job.data.useWebsocketEvents && job.data.user_id) {
+					global.websockets.senders.toUserId(
+						job.data.user_id,
+						`job:${job.data.uploadId}`,
+						progress,
+					)
 				}
 			} catch (error) {
-				// manejar error
+				console.error(error)
 			}
 		})
 
 		worker.on("completed", (job, result) => {
 			try {
-				console.log(`Job ${job.id} completed with result:`, result)
+				console.debug(`Job [${job.id}] completed with result:`, result)
 
-				if (job.data.sseChannelId) {
-					global.sse.sendToChannel(job.data.sseChannelId, {
-						event: "done",
-						state: "done",
-						result: result,
-					})
+				if (job.data.useWebsocketEvents && job.data.user_id) {
+					global.websockets.senders.toUserId(
+						job.data.user_id,
+						`job:${job.data.uploadId}`,
+						{
+							event: "done",
+							state: "done",
+							result: result,
+						},
+					)
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.error(error)
+			}
 		})
 
 		worker.on("failed", (job, error) => {
 			try {
-				console.error(`Job ${job.id} failed:`, error)
+				console.error(`Job [${job.id}] failed:`, error)
 
-				if (job.data.sseChannelId) {
-					global.sse.sendToChannel(job.data.sseChannelId, {
-						event: "error",
-						state: "error",
-						result: error.message,
-					})
+				if (job.data.useWebsocketEvents && job.data.user_id) {
+					global.websockets.senders.toUserId(
+						job.data.user_id,
+						`job:${job.data.uploadId}`,
+						{
+							event: "error",
+							state: "error",
+							result: error.message,
+						},
+					)
 				}
-			} catch (error) {}
+			} catch (error) {
+				console.error(error)
+			}
 		})
 	}
 
-	createJob = async (queueId, data, { useSSE = false } = {}) => {
+	createJob = async (queueId, data) => {
 		const queue = this.queues[queueId]
 
 		if (!queue) {
 			throw new Error("Queue not found")
 		}
 
-		let sseChannelId = null
+		const job = await queue.add("default", data)
 
-		if (useSSE) {
-			sseChannelId = `${global.nanoid()}`
-		}
-
-		const job = await queue.add("default", {
-			...data,
-			sseChannelId,
-		})
-
-		if (sseChannelId) {
-			await global.sse.createChannel(sseChannelId)
-			console.log(
-				`[JOB] Created new job with SSE channel [${sseChannelId}]`,
+		if (
+			typeof data.user_id === "string" &&
+			data.useWebsocketEvents &&
+			global.websockets &&
+			typeof global.websockets.senders?.toUserId === "function"
+		) {
+			await global.websockets.senders.toUserId(
+				data.user_id,
+				`job:${data.uploadId}`,
+				{
+					event: "job_queued",
+					state: "progress",
+					percent: 5,
+				},
 			)
-
-			await global.sse.sendToChannel(sseChannelId, {
-				event: "job_queued",
-				state: "progress",
-				percent: 5,
-			})
 		}
 
 		console.log(`[JOB] Created new job with ID [${job.id}]`)
 
-		return {
-			...job,
-			sseChannelId,
-		}
+		return job
 	}
 
 	// this function cleans up all queues, must be synchronous

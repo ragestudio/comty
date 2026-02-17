@@ -6,19 +6,19 @@ export default [
 	{
 		key: "feed",
 		label: "Feed",
-		icon: "IoMdPaper",
+		icon: "Newspaper",
 		component: FeedTab,
 	},
 	{
 		key: "global",
 		label: "Global",
-		icon: "FiGlobe",
+		icon: "Earth",
 		component: GlobalTab,
 	},
 	{
 		key: "savedPosts",
 		label: "Saved",
-		icon: "FiBookmark",
+		icon: "Bookmark",
 		component: SavedPostsTab,
 	},
 ]

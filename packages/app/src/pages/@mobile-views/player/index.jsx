@@ -5,6 +5,9 @@ import { Icons } from "@components/Icons"
 import SeekBar from "@components/Player/SeekBar"
 import Controls from "@components/Player/Controls"
 import Actions from "@components/Player/Actions"
+import LyricsText from "@pages/lyrics/components/text"
+
+import useLyrics from "@hooks/useLyrics"
 
 import { usePlayerStateContext } from "@contexts/WithPlayerContext"
 import RGBStringToValues from "@utils/rgbToValues"
@@ -30,28 +33,47 @@ const ServiceIndicator = (props) => {
 	}
 }
 
+const Lyrics = ({ track }) => {
+	const { lyrics } = useLyrics({
+		trackManifest: track,
+	})
+
+	return (
+		<LyricsText
+			static
+			lyrics={lyrics}
+		/>
+	)
+}
+
 const AudioPlayer = (props) => {
 	const [playerState] = usePlayerStateContext()
+	const currentTrackId = React.useRef(null)
+	const [coverAnalysis, setCoverAnalysis] = React.useState(null)
 
 	React.useEffect(() => {
-		if (app.currentDragger) {
-			app.currentDragger.setBackgroundColorValues(
-				RGBStringToValues(
-					playerState.track_manifest?.cover_analysis?.rgb,
-				),
-			)
-		}
-	}, [playerState.track_manifest?.cover_analysis])
+		if (currentTrackId.current !== playerState.track_manifest?.id) {
+			currentTrackId.current = playerState.track_manifest?.id
 
-	const {
-		title,
-		album,
-		artist,
-		service,
-		lyricsEnabled,
-		cover_analysis,
-		cover,
-	} = playerState.track_manifest ?? {}
+			const track = app.cores.player.track()
+
+			if (track) {
+				if (track.analyzeCoverColor) {
+					track
+						.analyzeCoverColor()
+						.then((analysis) => {
+							setCoverAnalysis(analysis)
+						})
+						.catch((err) => {
+							console.error(err)
+						})
+				}
+			}
+		}
+	}, [playerState.track_manifest])
+
+	const { title, album, artist, service, cover } =
+		playerState.track_manifest ?? {}
 
 	const playing = playerState.playback_status === "playing"
 	const stopped = playerState.playback_status === "stopped"
@@ -59,13 +81,17 @@ const AudioPlayer = (props) => {
 	const titleText = !playing && stopped ? "Stopped" : (title ?? "Untitled")
 	const subtitleText = `${artist} | ${album?.title ?? album}`
 
+	console.log(coverAnalysis)
+
 	return (
 		<div
 			className={classnames("mobile-player_wrapper", {
-				cover_light: cover_analysis?.isLight,
+				["cover_light"]: coverAnalysis?.isLight,
+				["fullscreen"]: props.activeSnap === 1,
 			})}
 			style={{
-				"--cover_isLight": cover_analysis?.isLight,
+				"--cover_isLight": coverAnalysis?.isLight,
+				"--cover_averageValues": coverAnalysis?.value.slice(0, 3),
 			}}
 		>
 			<div className="mobile-player">
@@ -99,6 +125,12 @@ const AudioPlayer = (props) => {
 				/>
 
 				<Actions />
+			</div>
+
+			<div className="mobile-player-additional">
+				{props.activeSnap === 1 && (
+					<Lyrics track={playerState.track_manifest} />
+				)}
 			</div>
 		</div>
 	)

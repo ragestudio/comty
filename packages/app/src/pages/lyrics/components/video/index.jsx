@@ -13,12 +13,19 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 	const [initialLoading, setInitialLoading] = React.useState(true)
 	const [syncingVideo, setSyncingVideo] = React.useState(false)
 	const [currentVideoLatency, setCurrentVideoLatency] = React.useState(0)
-	const isDebugEnabled = React.useMemo(
-		() => app.cores.settings.is("_debug", true),
-		[],
-	)
+	// const isDebugEnabled = React.useMemo(
+	// 	() => app.cores.settings.is("_debug", true),
+	// 	[],
+	//  )
 
-	const hls = React.useRef(new HLS())
+	const isDebugEnabled = true
+
+	const hls = React.useRef(
+		new HLS({
+			autoLevelEnabled: true,
+		}),
+	)
+	const hlsStats = React.useRef(null)
 	const syncIntervalRef = React.useRef(null)
 
 	const stopSyncInterval = React.useCallback(() => {
@@ -75,7 +82,9 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 			const currentVideoTime =
 				videoRef.current.currentTime - lyrics.video_starts_at_ms / 1000
 			const maxOffset = maxLatencyInMs / 1000
-			const currentVideoTimeDiff = Math.abs(currentVideoTime - currentTrackTime)
+			const currentVideoTimeDiff = Math.abs(
+				currentVideoTime - currentTrackTime,
+			)
 
 			setCurrentVideoLatency(currentVideoTimeDiff)
 
@@ -130,8 +139,24 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 					if (hls.current.media !== videoElement) {
 						hls.current.attachMedia(videoElement)
 					}
+
 					hls.current.loadSource(lyrics.video_source)
-				} else if (videoElement.canPlayType("application/vnd.apple.mpegurl")) {
+
+					// attach hls debug messages
+					hls.current.on(HLS.Events.FRAG_LOADED, (event, data) => {
+						console.debug("VIDEO:: Fragment Loaded", data)
+					})
+
+					hls.current.on(HLS.Events.LEVEL_LOADED, (event, data) => {
+						console.debug("VIDEO:: Level Loaded", data)
+					})
+
+					hls.current.on(HLS.Events.LEVEL_SWITCHED, (event, data) => {
+						console.debug("VIDEO:: Level Switched", data)
+					})
+				} else if (
+					videoElement.canPlayType("application/vnd.apple.mpegurl")
+				) {
 					videoElement.src = lyrics.video_source
 				}
 			}
@@ -184,7 +209,9 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		if (playerState.playback_status === "playing") {
 			videoElement
 				.play()
-				.catch((error) => console.error("VIDEO:: Error playing video:", error))
+				.catch((error) =>
+					console.error("VIDEO:: Error playing video:", error),
+				)
 			if (shouldSync) {
 				startSyncInterval()
 			}
@@ -230,14 +257,30 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 			{isDebugEnabled && (
 				<div className={classnames("videoDebugOverlay")}>
 					<div>
-						<p>Maximun latency</p>
-						<p>{maxLatencyInMs}ms</p>
+						<p>Sync enabled: {lyrics?.video_loop ? "No" : "Yes"}</p>
 					</div>
 					<div>
-						<p>Video Latency</p>
-						<p>{(currentVideoLatency * 1000).toFixed(2)}ms</p>
+						<p>A/V Start: {lyrics?.video_starts_at || "N/A"}</p>
 					</div>
-					{syncingVideo ? <p>Syncing video...</p> : null}
+					<div>
+						<p>Maximun latency: {maxLatencyInMs}ms</p>
+					</div>
+					<div>
+						<p>
+							Video Latency:{" "}
+							{(currentVideoLatency * 1000).toFixed(2)}ms
+						</p>
+					</div>
+					<div>
+						<p>Is Syncing: {syncingVideo ? "Yes" : "No"}</p>
+					</div>
+
+					<div>
+						<p>
+							Video codec:{" "}
+							{hls.current?.levels[0]?.codec || "N/A"}
+						</p>
+					</div>
 				</div>
 			)}
 

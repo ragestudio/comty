@@ -8,32 +8,25 @@ import bufferToStream from "@shared-utils/bufferToStream"
 const availableProviders = ["b2", "standard"]
 
 export default {
-	useContext: ["cache", "limits"],
-	middlewares: ["withAuthentication"],
-	fn: async (req, res) => {
+	useContexts: ["cache", "limits", "capabilities"],
+	useMiddlewares: ["withAuthentication"],
+	fn: async (req, res, ctx) => {
 		if (!checkChunkUploadHeaders(req.headers)) {
-			reject(new OperationError(400, "Missing header(s)"))
-			return
+			throw new OperationError(400, "Missing header(s)")
 		}
 
 		const uploadId = `${req.headers["uploader-file-id"]}`
 
 		const workPath = path.resolve(
-			this.default.contexts.cache.constructor.cachePath,
+			ctx.cache.constructor.cachePath,
 			`${req.auth.session.user_id}-${uploadId}`,
 		)
 		const chunksPath = path.join(workPath, "chunks")
 		const assembledPath = path.join(workPath, "assembled")
 
 		const config = {
-			maxFileSize:
-				parseInt(this.default.contexts.limits.maxFileSizeInMB) *
-				1024 *
-				1024,
-			maxChunkSize:
-				parseInt(this.default.contexts.limits.maxChunkSizeInMB) *
-				1024 *
-				1024,
+			maxFileSize: parseInt(ctx.limits.maxFileSizeInMB) * 1024 * 1024,
+			maxChunkSize: parseInt(ctx.limits.maxChunkSizeInMB) * 1024 * 1024,
 			useCompression: true,
 			useProvider: req.headers["use-provider"] ?? "standard",
 		}
@@ -87,6 +80,8 @@ export default {
 					transformations: transformations,
 					s3Provider: config.useProvider,
 					useCompression: config.useCompression,
+					capabilities: ctx.capabilities,
+					useWebsocketEvents: true,
 				}
 
 				// if has transformations, use background job
@@ -97,15 +92,12 @@ export default {
 					const job = await global.queues.createJob(
 						"file-process",
 						payload,
-						{
-							useSSE: true,
-						},
 					)
 
 					return {
 						uploadId: payload.uploadId,
-						sseChannelId: job.sseChannelId,
-						sseUrl: `${req.headers["x-forwarded-proto"] || req.protocol}://${req.get("x-forwarded-host") ?? req.get("host")}/upload/sse_events/${job.sseChannelId}`,
+						jobId: job.id,
+						useWebsocketEvents: true,
 					}
 				}
 

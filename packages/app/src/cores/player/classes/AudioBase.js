@@ -81,7 +81,11 @@ export default class AudioBase {
 			this.console.timeEnd("instanciate class")
 		}
 
-		if (manifest.mpd_mode === true && !manifest.dash_manifest && this.demuxer) {
+		if (
+			manifest.mpd_mode === true &&
+			!manifest.dash_manifest &&
+			this.demuxer
+		) {
 			this.console.time("fetch")
 			const manifestString = await fetch(manifest.source).then((res) =>
 				res.text(),
@@ -89,7 +93,10 @@ export default class AudioBase {
 			this.console.timeEnd("fetch")
 
 			this.console.time("parse mpd")
-			manifest.dash_manifest = await MPDParser(manifestString, manifest.source)
+			manifest.dash_manifest = await MPDParser(
+				manifestString,
+				manifest.source,
+			)
 			this.console.timeEnd("parse mpd")
 		}
 
@@ -240,7 +247,10 @@ export default class AudioBase {
 				const manifest = this.player.queue.currentItem
 
 				if (manifest && manifest.dash_manifest) {
-					await this.demuxer.attachSource(manifest.dash_manifest, currentTime)
+					await this.demuxer.attachSource(
+						manifest.dash_manifest,
+						currentTime,
+					)
 
 					// resume playback from current position
 					this.audio.currentTime = currentTime
@@ -249,7 +259,9 @@ export default class AudioBase {
 						await this.demuxer.play()
 					}
 
-					this.console.log("Successfully recovered from QuotaExceededError")
+					this.console.log(
+						"Successfully recovered from QuotaExceededError",
+					)
 				}
 			}
 		}
@@ -326,16 +338,22 @@ export default class AudioBase {
 								this.demuxer.updateSettings({
 									streaming: {
 										buffer: {
-											...this.demuxer.getSettings().streaming.buffer,
+											...this.demuxer.getSettings()
+												.streaming.buffer,
 											bufferToKeep: 2,
 											bufferPruningInterval: 1,
 										},
 									},
 								})
 
-								this.console.log(`Cleaned buffer range: ${start}-${end}`)
+								this.console.log(
+									`Cleaned buffer range: ${start}-${end}`,
+								)
 							} catch (cleanupError) {
-								this.console.warn("Buffer cleanup failed:", cleanupError)
+								this.console.warn(
+									"Buffer cleanup failed:",
+									cleanupError,
+								)
 							}
 						}
 					}

@@ -12,15 +12,19 @@ const AllowedUpdateFields = [
 ]
 
 export default class Release {
-	// TODO: implement pagination
-	static async data(id, { user_id = null, limit = 10, offset = 0 } = {}) {
-		let release = await MusicRelease.findOne({
-			_id: id,
-		})
+	static async get(release_id) {
+		let release = await MusicRelease.findById(release_id).catch(() => false)
 
 		if (!release) {
 			throw new OperationError(404, "Release not found")
 		}
+
+		return release
+	}
+
+	// TODO: implement pagination
+	static async data(id, { user_id = null, limit = 10, offset = 0 } = {}) {
+		let release = await Release.get(id)
 
 		release = release.toObject()
 
@@ -69,7 +73,6 @@ export default class Release {
 			cover: payload.cover,
 			explicit: payload.explicit,
 			type: payload.type,
-			public: payload.public,
 			items: payload.items,
 			public: payload.public,
 		})
@@ -80,13 +83,7 @@ export default class Release {
 	}
 
 	static async update(id, payload) {
-		let release = await MusicRelease.findById(id).catch((err) => {
-			return false
-		})
-
-		if (!release) {
-			throw new OperationError(404, "Release not found")
-		}
+		let release = await Release.get(id)
 
 		if (release.user_id !== payload.user_id) {
 			throw new PermissionError(
@@ -112,19 +109,13 @@ export default class Release {
 	}
 
 	static async delete(id, payload = {}) {
-		let release = await MusicRelease.findById(id).catch((err) => {
-			return false
-		})
-
-		if (!release) {
-			throw new OperationError(404, "Release not found")
-		}
+		let release = await Release.get(id)
 
 		// check permission
 		if (release.user_id !== payload.user_id) {
 			throw new PermissionError(
 				403,
-				"You dont have permission to edit this release",
+				"You dont have permission to delete this release",
 			)
 		}
 

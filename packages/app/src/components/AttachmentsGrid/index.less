@@ -1,0 +1,69 @@
+.attachments-grid {
+	display: grid;
+
+	grid-template-columns: 1fr 1fr;
+	grid-auto-rows: auto;
+
+	gap: 10px;
+	width: 100%;
+
+	// Single attachment takes full width
+	&[data-count="1"] {
+		grid-template-columns: 1fr;
+	}
+
+	// Last item in odd-numbered grid spans full width
+	.attachment:last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+	}
+
+	// Responsive behavior for smaller screens
+	@media (max-width: 600px) {
+		grid-template-columns: 1fr;
+
+		.attachment:last-child:nth-child(odd) {
+			grid-column: unset;
+		}
+	}
+}
+
+.attachment {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+	justify-content: center;
+
+	overflow: hidden;
+
+	width: 100%;
+	height: 100%;
+
+	max-height: 45vh;
+
+	border: 3px solid var(--border-color);
+	border-radius: 12px;
+
+	background-color: var(--background-color-accent);
+
+	.lazy-load-image-background {
+		width: 100%;
+		height: 100%;
+
+		img {
+			width: 100%;
+			height: 100%;
+
+			object-fit: cover;
+		}
+	}
+
+	video {
+		height: 100%;
+		width: 100%;
+
+		object-fit: cover;
+	}
+}

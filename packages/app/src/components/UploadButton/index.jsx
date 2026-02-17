@@ -7,7 +7,7 @@ import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-const UploadButton = (props) => {
+const UploadButton = React.forwardRef((props, ref) => {
 	const [uploading, setUploading] = React.useState(false)
 	const [progress, setProgress] = React.useState(null)
 
@@ -71,11 +71,46 @@ const UploadButton = (props) => {
 		})
 	}
 
+	React.useEffect(() => {
+		if (ref) {
+			ref.current = {
+				uploading: uploading,
+				progress: progress,
+				uploadFile: (file) => {
+					file.uid = file.uid ?? `${file.name}_${Date.now()}`
+
+					handleUpload({
+						file,
+					})
+				},
+			}
+		}
+
+		return () => {
+			if (ref) {
+				ref.current = null
+			}
+		}
+	}, [])
+
+	React.useEffect(() => {
+		if (ref && ref?.current) {
+			ref.current.uploading = uploading
+		}
+	}, [ref, uploading])
+
+	React.useEffect(() => {
+		if (ref && ref?.current) {
+			ref.current.progress = progress
+		}
+	}, [ref, progress])
+
 	return (
 		<Upload
 			customRequest={handleUpload}
 			multiple={props.multiple ?? false}
-			accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
+			// TODO: Fixme, antd 6.0 broke this so bad
+			//accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
 			progress={false}
 			fileList={[]}
 			className={classnames("uploadButton", {
@@ -86,7 +121,7 @@ const UploadButton = (props) => {
 			<div className="uploadButton-content">
 				{!progress &&
 					(props.icon ?? (
-						<Icons.FiUpload
+						<Icons.Upload
 							style={{
 								margin: 0,
 							}}
@@ -102,10 +137,14 @@ const UploadButton = (props) => {
 					/>
 				)}
 
-				{props.children ?? "Upload"}
+				{typeof props.children === "undefined"
+					? "Upload"
+					: props.children}
 			</div>
 		</Upload>
 	)
-}
+})
+
+UploadButton.displayName = "UploadButton"
 
 export default UploadButton

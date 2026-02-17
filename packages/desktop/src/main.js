@@ -2,10 +2,10 @@ import pkgjson from "../package.json" with { type: "json" }
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import os from "node:os"
-// import {
-// 	installExtension,
-// 	REACT_DEVELOPER_TOOLS,
-// } from "electron-devtools-installer"
+import {
+	installExtension,
+	REACT_DEVELOPER_TOOLS,
+} from "electron-devtools-installer"
 
 import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
 import ElectronStore from "electron-store"
@@ -13,8 +13,11 @@ import ElectronStore from "electron-store"
 import flags from "./flags.js"
 import IPC from "./ipc.js"
 import TrayItems from "./tray.js"
-import Settings from "./classes/Settings/index.js"
 import Vars from "./vars.js"
+
+import API from "./classes/Api/index.js"
+import Settings from "./classes/Settings/index.js"
+import ExtensionManager from "./classes/Extensions/index.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -28,10 +31,6 @@ class Main {
 		this.app.commandLine.appendSwitch(
 			"application-name",
 			pkgjson.processName,
-		)
-		this.app.commandLine.appendSwitch(
-			"pulseaudio-product-string",
-			pkgjson.processNamee,
 		)
 		this.app.setName(pkgjson.processName)
 
@@ -58,11 +57,16 @@ class Main {
 	tray = null
 	store = null
 
+	api = new API(this)
 	modules = new Map()
 	settings = new Settings()
+	extensions = new ExtensionManager(this)
 
 	async initialize() {
 		this.state.ready = false
+
+		// initalize api daemon
+		await this.api.initialize()
 
 		// initRenderer
 		ElectronStore.initRenderer()
@@ -81,10 +85,13 @@ class Main {
 		this.state.ready = true
 
 		// install react dev tools
-		// await installExtension(REACT_DEVELOPER_TOOLS)
+		await installExtension(REACT_DEVELOPER_TOOLS)
 
 		await this.createTray()
 		await this.createMainWindow()
+
+		// initialize app extensions
+		await this.extensions.initialize()
 
 		// Handle app cleanup on quit
 		this.app.on("before-quit", async (event) => {
@@ -161,6 +168,8 @@ class Main {
 		this.mainWindow = new BrowserWindow({
 			title: pkgjson.appName,
 			titleBarStyle: "hidden",
+			frame: false,
+			transparent: true,
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
@@ -175,6 +184,10 @@ class Main {
 
 		if (Main.isDev) {
 			this.mainWindow.loadURL(Main.vars.developmentUrl)
+
+			// this.mainWindow.loadFile(
+			// 	path.resolve(__dirname, "../../app/dist/index.html"),
+			// )
 		} else {
 			switch (app_channel) {
 				case "indev":

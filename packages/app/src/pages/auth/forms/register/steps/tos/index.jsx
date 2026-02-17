@@ -54,7 +54,8 @@ const TermsOfServiceStepComponent = (props) => {
 							})
 						}}
 					>
-						Read {LegalDocumentsDecorators[key] ?? `document (${key})`}
+						Read{" "}
+						{LegalDocumentsDecorators[key] ?? `document (${key})`}
 					</antd.Button>
 				)
 			})}
@@ -74,7 +75,7 @@ const TermsOfServiceStepComponent = (props) => {
 export default {
 	key: "tos",
 	title: "Step 3",
-	icon: "FileDone",
+	icon: "FileText",
 	description: "Take your time to read these legal documents.",
 	required: true,
 	content: TermsOfServiceStepComponent,

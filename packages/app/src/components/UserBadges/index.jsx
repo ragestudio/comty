@@ -1,99 +1,124 @@
 import React from "react"
-import * as antd from "antd"
-import classnames from "classnames"
+import { Tooltip } from "antd"
 import DOMPurify from "dompurify"
-import axios from "axios"
-
 import { createIconRender } from "@components/Icons"
-import UserModel from "@models/user"
+
+import BadgesModel from "@models/badges"
+import svgCss from "@utils/svgCss"
 
 import "./index.less"
 
-const RemoteSVG = (props) => {
-    // IMPORTANT: Only use this component for SVG files that you trust.
-    console.warn("RemoteSVGToComponent: This component is not safe at all, cause use __dangerouslySetInnerHTML. Only use it for SVG files that you trust.")
+const Badge = ({ badge }) => {
+	const [bgUrl, setBgUrl] = React.useState(null)
 
-    // make sure the url is local
-    if (!props.src.startsWith("/") && !props.remote) {
-        console.error("RemoteSVGToComponent: The file is not a local file.")
-        return () => null
-    }
+	async function load() {
+		if (!badge.iconUrl) {
+			return null
+		}
 
-    // make sure the file is a SVG
-    if (!props.src.endsWith(".svg")) {
-        console.error("RemoteSVGToComponent: The file is not a SVG.")
-        return () => null
-    }
+		let data = await fetch(badge.iconUrl, {
+			method: "GET",
+			headers: {
+				"Cache-Control": "no-cache",
+			},
+		})
 
-    const [L_Badge, R_Badge, E_Badge] = app.cores.api.useRequest(async () => {
-        return await axios({
-            method: "GET",
-            url: props.src,
-        })
-    })
+		if (!data.ok) {
+			console.warn("Badge: Failed to load the badge icon.", badge.iconUrl)
+			return null
+		}
 
-    if (E_Badge || L_Badge) {
-        return <></>
-    }
+		if (data.headers.get("content-type") === "image/svg+xml") {
+			setBgUrl(
+				svgCss(
+					DOMPurify.sanitize(await data.text(), {
+						USE_PROFILES: {
+							svg: true,
+						},
+					}),
+					{
+						color: badge.color,
+					},
+				),
+			)
+		} else {
+			setBgUrl(`url('${badge.iconUrl}')`)
+		}
+	}
 
-    return <div dangerouslySetInnerHTML={{
-        __html: DOMPurify.sanitize(R_Badge.data, {
-            USE_PROFILES: {
-                svg: true
-            }
-        })
-    }} />
+	React.useEffect(() => {
+		if (badge.iconUrl || !bgUrl) {
+			load()
+		}
+	}, [badge])
+
+	return (
+		<Tooltip
+			placement="bottom"
+			title={badge.description ?? "A badge"}
+		>
+			<div
+				className="user-badges__badge"
+				style={{
+					color: badge.color ?? "var(--text-color)",
+					backgroundImage: bgUrl,
+					filter: badge.filter,
+					scale: badge.scale,
+					backgroundColor: badge.backgroundColor,
+					borderRadius: badge.borderRadius,
+				}}
+			>
+				{!bgUrl && badge.icon && createIconRender(badge.icon)}
+			</div>
+		</Tooltip>
+	)
 }
 
-export default (props) => {
-    let { user_id } = props
+const UserBadges = ({ badges }) => {
+	if (!badges || !Array.isArray(badges)) {
+		return null
+	}
 
-    const [L_Badges, R_Badges, E_Badges] = app.cores.api.useRequest(UserModel.getBadges, user_id)
+	if (badges.length > 2) {
+		badges = badges.slice(0, 2)
+	}
 
-    if (E_Badges) {
-        return null
-    }
+	const [items, setItems] = React.useState([])
 
-    if (L_Badges) {
-        return null
-    }
+	const load = React.useCallback(async () => {
+		if (!badges) {
+			return null
+		}
 
-    if (!R_Badges) {
-        return null
-    }
+		const data = await BadgesModel.data(badges).catch((err) => {
+			return null
+		})
 
-    return <div
-        className={classnames(
-            "badges",
-            {
-                ["single"]: R_Badges.length === 1
-            }
-        )}
-    >
-        {
-            R_Badges.map((badge, index) => {
-                return <antd.Tooltip
-                    key={index}
-                    placement="bottom"
-                    title={badge.description ?? "A badge"}
-                >
-                    <div
-                        key={index}
-                        className="badge"
-                        style={{
-                            "--icon-color": badge.color ?? "var(--colorPrimary)"
-                        }}
-                    >
-                        {
-                            badge.iconUrl
-                                ? <RemoteSVG
-                                    src={badge.iconUrl}
-                                />
-                                : createIconRender(badge.icon)
-                        }
-                    </div>
-                </antd.Tooltip>
-            })
-        }
-    </div>
+		if (data) {
+			setItems(data)
+		}
+	}, [badges])
+
+	React.useEffect(() => {
+		load()
+	}, [])
+
+	if (!items.length) {
+		return null
+	}
+
+	return (
+		<div className="user-badges">
+			{items.map((badge, index) => {
+				return (
+					<Badge
+						key={index}
+						badge={badge}
+					/>
+				)
+			})}
+		</div>
+	)
 }
+
+export default UserBadges

@@ -13,21 +13,20 @@ const Views = {
 	tracks: {
 		value: "tracks",
 		label: "Tracks",
-		icon: <Icons.MdMusicNote />,
+		icon: <Icons.Music2 />,
 		element: TracksLibraryView,
 	},
 	releases: {
 		value: "releases",
 		label: "Releases",
-		icon: <Icons.MdAlbum />,
+		icon: <Icons.Album />,
 		element: ReleasesLibraryView,
 	},
 	playlists: {
 		value: "playlists",
 		label: "Playlists",
-		icon: <Icons.MdPlaylistPlay />,
+		icon: <Icons.ListMusic />,
 		element: PlaylistLibraryView,
-		disabled: true,
 	},
 }
 

@@ -1,89 +1,116 @@
 .developer-settings {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    gap: 20px;
+	gap: 20px;
 }
 
 .api_keys {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
 
-    padding: 10px;
+	padding: 10px;
 
-    border-radius: 12px;
+	border-radius: 12px;
 
-    .api_keys_header {
-        display: flex;
-        flex-direction: row;
+	.api_keys_header {
+		display: flex;
+		flex-direction: row;
 
-        align-items: center;
-        justify-content: space-between;
-    }
+		align-items: center;
+		justify-content: space-between;
+	}
 
-    .api_keys_list {
-        display: flex;
-        flex-direction: column;
+	.api_keys_header_title {
+		display: flex;
+		flex-direction: column;
+	}
 
-        gap: 10px;
-    }
+	.api_keys_list {
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+	}
+}
+
+.bot-manifests {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: space-between;
+
+		width: 100%;
+
+		&__title {
+			display: flex;
+			flex-direction: column;
+		}
+	}
 }
 
 .server-key-item {
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    align-items: center;
-    justify-content: space-between;
+	align-items: center;
+	justify-content: space-between;
 
-    background-color: var(--background-color-primary);
-    border-radius: 12px;
+	background-color: var(--background-color-primary);
+	border-radius: 12px;
 
-    padding: 10px;
+	padding: 10px;
 
-    p {
-        margin: 0;
-    }
+	p {
+		margin: 0;
+	}
 
-    .server-key-item-info {
-        display: flex;
-        flex-direction: column;
+	.server-key-item-info {
+		display: flex;
+		flex-direction: column;
 
-        gap: 5px;
-    }
+		gap: 5px;
+	}
 
-    .server-key-item-actions {
-        display: flex;
-        flex-direction: row;
+	.server-key-item-actions {
+		display: flex;
+		flex-direction: row;
 
-        gap: 5px;
-    }
+		gap: 5px;
+	}
 }
 
 .links {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    gap: 5px;
+	gap: 5px;
 }
 
 .server-key-creator {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    gap: 10px;
+	gap: 10px;
 
-    .server-key-creator-info {
-        display: flex;
-        flex-direction: column;
+	.server-key-creator-info {
+		display: flex;
+		flex-direction: column;
 
-        gap: 5px;
+		gap: 5px;
 
-        .selectable-text {
-            font-family: "DM Mono", monospace;
-            font-size: 0.7rem;
-        }
-    }
+		.selectable-text {
+			font-family: "DM Mono", monospace;
+			font-size: 0.7rem;
+		}
+	}
 }

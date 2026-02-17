@@ -1,7 +1,7 @@
 import React from "react"
 import * as antd from "antd"
 
-import PlaylistView from "@components/Music/PlaylistView"
+import Playlist from "@components/Music/Playlist"
 
 import MusicModel from "@models/music"
 
@@ -50,27 +50,27 @@ const MyLibraryPlaylists = () => {
 	}, [R_Library])
 
 	if (E_Library) {
-		return <antd.Result status="warning" title="Failed to load" />
+		return (
+			<antd.Result
+				status="warning"
+				title="Failed to load"
+			/>
+		)
 	}
 
 	if (initialLoading) {
 		return <antd.Skeleton active />
 	}
 
-	return (
-		<PlaylistView
-			noHeader
-			noSearch
-			loading={L_Library}
-			type="vertical"
-			playlist={{
-				items: items,
-				total_length: R_Library.total_items,
-			}}
-			onLoadMore={onLoadMore}
-			hasMore={hasMore}
-		/>
-	)
+	return items.map((item, index) => {
+		return (
+			<Playlist
+				row
+				key={index}
+				playlist={item}
+			/>
+		)
+	})
 }
 
 export default MyLibraryPlaylists

@@ -1,52 +1,46 @@
 {
 	"name": "@comty/server",
-	"version": "1.44.5@alpha",
+	"version": "2.1.0@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
 		"services/*"
 	],
 	"scripts": {
-		"start:prod": "cross-env NODE_ENV=production hermes-node ./start.js",
-		"dev": "cross-env NODE_ENV=development hermes-node ./start.js",
-		"setup": "./boot scripts/setup/index.js"
+		"setup": "cross-env NODE_ENV=development linebridge-boot scripts/setup/index.js",
+		"start:prod": "cross-env NODE_ENV=production ultragateway",
+		"dev": "cross-env NODE_ENV=development DEBUG=true ultragateway",
+		"dev:exp": "cross-env NODE_ENV=development ../../linebridge/linebridge-gateway/debug",
+		"postinstall": "bash ./scripts/externalDeps.sh"
 	},
 	"dependencies": {
-		"@grpc/grpc-js": "^1.13.2",
-		"@grpc/proto-loader": "^0.7.13",
-		"@infisical/sdk": "^2.1.8",
-		"@opentelemetry/api": "^1.9.0",
-		"@opentelemetry/auto-instrumentations-node": "^0.56.1",
-		"@ragestudio/hermes": "^1.0.0",
-		"@sentry/node": "^9.4.0",
-		"axios": "^1.7.4",
-		"bcrypt": "^5.1.1",
-		"bullmq": "^5.41.5",
-		"chalk": "^5.4.1",
-		"chokidar": "^4.0.3",
-		"cross-env": "^7.0.3",
-		"http-proxy": "^1.18.1",
+		"@sentry/node": "^10.7.0",
+		"axios": "^1.13.5",
+		"bcrypt": "^6.0.0",
+		"braces": "^3.0.3",
+		"bullmq": "^5.58.2",
+		"cassandra-driver": "^4.8.0",
+		"cross-env": "^10.0.0",
+		"express-cassandra": "^2.9.1",
 		"jsonwebtoken": "^9.0.2",
-		"linebridge": "^0.25.2",
-		"minimatch": "^10.0.1",
-		"minio": "^8.0.1",
-		"module-alias": "^2.2.3",
-		"mongoose": "^8.5.3",
-		"pino": "^9.6.0",
-		"pino-opentelemetry-transport": "^1.0.1",
-		"pino-pretty": "^13.0.0",
-		"signal-exit": "^4.1.0",
-		"spinnies": "^0.5.1",
-		"tree-kill": "^1.2.2"
+		"jws": "^4.0.1",
+		"linebridge": "^1.7.0",
+		"minio": "^8.0.5",
+		"mongoose": "^8.18.0",
+		"qs": "^6.15.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.26.0",
-		"chai": "^5.1.0",
-		"eslint": "^9.26.0",
-		"globals": "^16.1.0",
-		"mocha": "^10.3.0"
+		"@eslint/js": "^9.34.0",
+		"chai": "^6.0.1",
+		"eslint": "^9.34.0",
+		"globals": "^16.3.0",
+		"mocha": "^11.3.0",
+		"sinon": "^21.0.0"
 	},
 	"resolutions": {
 		"string-width": "4.2.3"
+	},
+	"optionalDependencies": {
+		"bufferutil": "^4.0.9"
 	}
 }

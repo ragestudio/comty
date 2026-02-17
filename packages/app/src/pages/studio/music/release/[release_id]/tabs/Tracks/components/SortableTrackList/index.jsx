@@ -72,9 +72,9 @@ const SortableTrackList = ({
 
 	return (
 		<DndContext
+			onDragEnd={handleDragEnd}
 			sensors={sensors}
 			collisionDetection={closestCenter}
-			onDragEnd={handleDragEnd}
 			modifiers={[restrictToVerticalAxis, restrictToParentElement]}
 		>
 			<SortableContext

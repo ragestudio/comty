@@ -27,6 +27,10 @@ export default class ComtyMusicServiceInterface {
 		return await MusicModel.getTrackLyrics(manifest._id, options)
 	}
 
+	resolveTimings = async (manifest) => {
+		return await MusicModel.getTrackTimings(manifest._id)
+	}
+
 	resolveOverride = async (manifest) => {
 		// not supported yet for comty music service
 		return {}

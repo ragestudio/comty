@@ -16,7 +16,7 @@ const RecentlyPlayedItem = (props) => {
 			onClick={() => app.cores.player.start(track._id)}
 		>
 			<div className="recently_played-item-icon">
-				<Icons.FiPlay />
+				<Icons.Play />
 			</div>
 
 			<div className="recently_played-item-cover">
@@ -46,7 +46,7 @@ const RecentlyPlayedList = (props) => {
 		<div className="recently_played">
 			<div className="recently_played-header">
 				<h1>
-					<Icons.MdHistory /> Recently played
+					<Icons.History /> Recently played
 				</h1>
 			</div>
 
@@ -59,7 +59,10 @@ const RecentlyPlayedList = (props) => {
 					<div className="recently_played-content-items">
 						{R_Tracks.map((track, index) => {
 							return (
-								<RecentlyPlayedItem key={index} track={track} />
+								<RecentlyPlayedItem
+									key={index}
+									track={track}
+								/>
 							)
 						})}
 					</div>

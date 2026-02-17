@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
-import ImageViewer from "@components/ImageViewer"
+import Image from "@components/Image"
 import LikeButton from "@components/LikeButton"
 import seekToTimeLabel from "@utils/seekToTimeLabel"
 
@@ -67,7 +67,7 @@ const PlaylistHeader = ({
 		<div className="play_info_wrapper">
 			<div className="play_info">
 				<div className="play_info_cover">
-					<ImageViewer
+					<Image
 						src={
 							playlist.cover ??
 							playlist.thumbnail ??
@@ -100,14 +100,13 @@ const PlaylistHeader = ({
 						)}
 						<div className="play_info_statistics_item">
 							<p>
-								<Icons.MdLibraryMusic /> {playlist.total_items}{" "}
-								Items
+								<Icons.Disc /> {playlist.total_items} Items
 							</p>
 						</div>
 						{playlist.total_duration > 0 && (
 							<div className="play_info_statistics_item">
 								<p>
-									<Icons.IoMdTime />{" "}
+									<Icons.Clock />{" "}
 									{seekToTimeLabel(playlist.total_duration)}
 								</p>
 							</div>
@@ -115,7 +114,7 @@ const PlaylistHeader = ({
 						{playlist.publisher && (
 							<div className="play_info_statistics_item">
 								<p onClick={handlePublisherClick}>
-									<Icons.MdPerson /> Publised by{" "}
+									<Icons.User /> Publised by{" "}
 									<a>{playlist.publisher.username}</a>
 								</p>
 							</div>
@@ -130,7 +129,7 @@ const PlaylistHeader = ({
 							onClick={onPlayAll}
 							disabled={playlist.items.length === 0}
 						>
-							<Icons.MdPlayArrow /> Play
+							<Icons.Play /> Play
 						</antd.Button>
 
 						<div className="likeButtonWrapper">
@@ -149,7 +148,9 @@ const PlaylistHeader = ({
 									onClick: onMoreMenuClick,
 								}}
 							>
-								<antd.Button icon={<Icons.MdMoreVert />} />
+								<antd.Button
+									icon={<Icons.EllipsisVertical />}
+								/>
 							</antd.Dropdown>
 						)}
 					</div>

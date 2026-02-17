@@ -17,7 +17,7 @@ import "./index.less"
 
 const ResultsTypeDecorators = {
 	users: {
-		icon: "FiUsers",
+		icon: "Users",
 		label: "Users",
 		onClick: (item) => {
 			app.navigation.goToAccount(item.username)
@@ -27,26 +27,32 @@ const ResultsTypeDecorators = {
 
 			return (
 				<div className="suggestion">
-					<UserPreview onClick={() => onClick(item)} user={item} />
+					<UserPreview
+						onClick={() => onClick(item)}
+						user={item}
+					/>
 				</div>
 			)
 		},
 	},
 	tracks: {
-		icon: "MdAlbum",
+		icon: "LibraryBig",
 		label: "Tracks",
 		renderItem: (props) => {
 			const { item, onClick } = props
 
 			return (
 				<div className="suggestion">
-					<MusicTrack track={item} onClick={onClick} />
+					<MusicTrack
+						track={item}
+						onClick={onClick}
+					/>
 				</div>
 			)
 		},
 	},
 	playlists: {
-		icon: "MdPlaylistPlay",
+		icon: "ListMusic",
 		label: "Playlists",
 		renderItem: (props) => {
 			return (
@@ -127,7 +133,10 @@ const Results = (props) => {
 				}
 
 				return (
-					<div className="searcher_results_category" key={index}>
+					<div
+						className="searcher_results_category"
+						key={index}
+					>
 						<div className="searcher_results_category_header">
 							<h2>
 								{createIconRender(decorator.icon)}
@@ -254,7 +263,7 @@ const Searcher = (props) => {
 				placeholder="Start typing to search..."
 				onChange={handleOnSearch}
 				value={searchValue}
-				prefix={<Icons.FiSearch />}
+				prefix={<Icons.Search />}
 				autoFocus={props.autoFocus ?? false}
 				onFocus={props.onFocus}
 				onBlur={props.onUnfocus}

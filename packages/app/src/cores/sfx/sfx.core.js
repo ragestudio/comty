@@ -1,18 +1,19 @@
-import { Core } from "@ragestudio/vessel"
+import Core from "vessel/core"
 import { Howl } from "howler"
 import axios from "axios"
-import store from "store"
 
 import config from "@config"
 
 export default class SFXCore extends Core {
 	static namespace = "sfx"
+	static dependencies = ["settings"]
 
 	soundsPool = {}
 
 	public = {
 		loadSoundpack: this.loadSoundpack.bind(this),
 		play: this.play,
+		soundsPool: () => this.soundsPool,
 	}
 
 	onEvents = {
@@ -24,13 +25,24 @@ export default class SFXCore extends Core {
 		},
 	}
 
-	async loadSoundpack(soundpack) {
-		if (!soundpack) {
-			soundpack = store.get("soundpack")
-		}
+	async afterInitialize() {
+		await this.loadSoundpack()
 
-		if (!soundpack) {
-			soundpack = config.defaultSoundPack ?? {}
+		document.addEventListener(
+			"click",
+			(...args) => {
+				this.handleClick(...args)
+			},
+			true,
+		)
+	}
+
+	async loadSoundpack(soundpack) {
+		if (typeof soundpack === "undefined") {
+			soundpack =
+				window.app.cores.settings.get("soundpack") ??
+				config.defaultSoundPack ??
+				{}
 		}
 
 		// check if is valid url with regex
@@ -62,13 +74,14 @@ export default class SFXCore extends Core {
 	}
 
 	async play(name, options = {}) {
-		if (!window.app.cores.settings.is("ui.effects", true)) {
+		if (window.app.cores.settings.is("ui.effects", false)) {
 			return false
 		}
 
 		const audioInstance = this.soundsPool[name]
 
 		if (!audioInstance) {
+			this.console.warn(`Sound [${name}] not found in soundpack`)
 			return false
 		}
 
@@ -107,17 +120,5 @@ export default class SFXCore extends Core {
 		if (slider) {
 			// check if is up or down
 		}
-	}
-
-	async onInitialize() {
-		await this.loadSoundpack()
-
-		document.addEventListener(
-			"click",
-			(...args) => {
-				this.handleClick(...args)
-			},
-			true,
-		)
 	}
 }

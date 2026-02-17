@@ -3,6 +3,7 @@ import classnames from "classnames"
 import * as antd from "antd"
 
 import { createIconRender } from "@components/Icons"
+import { getCurrentKeyValue } from "@hooks/useUrlQueryActiveKey"
 
 import NavMenu from "./components/NavMenu"
 
@@ -45,7 +46,7 @@ export const Panel = (props) => {
 export class PagePanelWithNavMenu extends React.Component {
 	state = {
 		activeTab:
-			new URLSearchParams(window.location.search).get("type") ??
+			getCurrentKeyValue() ??
 			this.props.defaultTab ??
 			this.props.tabs[0]?.key,
 		renders: [],
@@ -231,7 +232,15 @@ export class PagePanelWithNavMenu extends React.Component {
 	}
 
 	replaceQueryTypeToCurrentTab = (key) => {
-		history.pushState(undefined, "", `?type=${key ?? this.state.activeTab}`)
+		if (app.isDesktop) {
+			history.pushState({ type: key ?? this.state.activeTab })
+		} else {
+			history.pushState(
+				undefined,
+				"",
+				`?type=${key ?? this.state.activeTab}`,
+			)
+		}
 	}
 
 	tabChange = async (key) => {
@@ -305,7 +314,10 @@ export class PagePanelWithNavMenu extends React.Component {
 		return (
 			<>
 				<div className="pagePanels">
-					<div className="panel" ref={this.primaryPanelRef}>
+					<div
+						className="panel"
+						ref={this.primaryPanelRef}
+					>
 						{this.renderActiveTab()}
 					</div>
 				</div>

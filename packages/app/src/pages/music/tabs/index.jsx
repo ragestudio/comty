@@ -6,19 +6,19 @@ export default [
 	{
 		key: "explore",
 		label: "Explore",
-		icon: "FiCompass",
+		icon: "Compass",
 		component: ExploreTab,
 	},
 	{
 		key: "library",
 		label: "Library",
-		icon: "MdLibraryMusic",
+		icon: "SquareLibrary",
 		component: LibraryTab,
 	},
 	{
 		key: "radio",
 		label: "Radio",
-		icon: "FiRadio",
+		icon: "RadioTower",
 		component: RadioTab,
 	},
 ]

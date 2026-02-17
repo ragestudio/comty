@@ -1,270 +1,138 @@
-import React from "react"
-import { Button } from "antd"
 import classnames from "classnames"
 
-import { Icons, createIconRender } from "@components/Icons"
-
-import useLongPress from "@hooks/useLongPress"
-
 import {
-    DndContext,
-    TouchSensor,
-    MouseSensor,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragOverlay,
-    defaultDropAnimationSideEffects,
+	DndContext,
+	KeyboardSensor,
+	PointerSensor,
+	closestCenter,
+	useSensor,
+	useSensors,
 } from "@dnd-kit/core"
 import {
-    SortableContext,
-    arrayMove,
-    sortableKeyboardCoordinates,
-    useSortable,
+	arrayMove,
+	SortableContext,
+	sortableKeyboardCoordinates,
+	verticalListSortingStrategy,
+	useSortable,
 } from "@dnd-kit/sortable"
+import {
+	restrictToVerticalAxis,
+	restrictToParentElement,
+} from "@dnd-kit/modifiers"
+
 import { CSS } from "@dnd-kit/utilities"
 
 import "./index.less"
 
-export const SortableItemChildrenContext = React.createContext({
-    attributes: {},
-    listeners: undefined,
-    ref() { },
-    activeDrag: true,
-})
+export const SortableItem = ({ id, index, disabled = false, children }) => {
+	const {
+		attributes,
+		listeners,
+		setNodeRef,
+		transform,
+		transition,
+		isDragging,
+	} = useSortable({ id, disabled })
 
-export const SortableItemContext = React.createContext({
-    activeDrag: true,
-    onLongPress() { },
-    setActiveDrag() { },
-})
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition: transition,
+		opacity: isDragging ? 0.8 : 1,
+		zIndex: isDragging ? 1000 : 1,
+	}
 
-export function DragHandle() {
-    const { attributes, listeners, ref, activeDrag } = React.useContext(SortableItemChildrenContext)
+	return (
+		<div
+			ref={setNodeRef}
+			style={style}
+			className="sortable-item"
+			key={id}
+		>
+			<div
+				className={classnames("drag-handle", { disabled })}
+				role="button"
+				{...attributes}
+				{...listeners}
+			>
+				<svg
+					viewBox="0 0 20 20"
+					width="12"
+				>
+					<path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
+				</svg>
+			</div>
 
-    return (
-        <button
-            className={classnames(
-                "drag-handle",
-                {
-                    ["active"]: activeDrag
-                }
-            )}
-            {...attributes}
-            {...listeners}
-            ref={ref}
-        >
-            <svg viewBox="0 0 20 20" width="12">
-                <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"></path>
-            </svg>
-        </button>
-    )
-}
-
-export function SortableOverlay({ children }) {
-    const dropAnimationConfig = {
-        sideEffects: defaultDropAnimationSideEffects({
-            styles: {
-                active: {
-                    opacity: "0.4"
-                }
-            }
-        })
-    }
-
-    return (
-        <DragOverlay dropAnimation={dropAnimationConfig}>{children}</DragOverlay>
-    )
-}
-
-export function SortableItem({
-    children,
-    id,
-}) {
-    const { activeDrag, onLongPress } = React.useContext(SortableItemContext)
-
-    const {
-        attributes,
-        isDragging,
-        listeners,
-        setNodeRef,
-        setActivatorNodeRef,
-        transform,
-        transition,
-    } = useSortable({ id })
-
-    const context = React.useMemo(
-        () => ({
-            attributes,
-            listeners,
-            ref: setActivatorNodeRef,
-            activeDrag: activeDrag
-        }),
-        [attributes, listeners, setActivatorNodeRef, activeDrag]
-    )
-
-    const style = {
-        opacity: isDragging ? 0.4 : undefined,
-        transform: CSS.Translate.toString(transform),
-        transition,
-    }
-
-    return (
-        <SortableItemChildrenContext.Provider value={context}>
-            <li
-                className="sortable-item"
-                ref={setNodeRef}
-                style={style}
-                {...useLongPress(onLongPress)}
-            >
-                {children}
-                <DragHandle />
-            </li>
-        </SortableItemChildrenContext.Provider>
-    )
-}
-
-export const DragActiveActions = ({
-    actions
-}) => {
-    const { activeDrag, setActiveDrag } = React.useContext(SortableItemContext)
-
-    return <div
-        className={classnames(
-            "drag-actions",
-            {
-                ["active"]: activeDrag
-            }
-        )}
-    >
-        <Button
-            type="primary"
-            size="small"
-            icon={<Icons.FiCheck />}
-            onClick={() => setActiveDrag(false)}
-        />
-
-        {
-            actions?.map((action, index) => {
-                return <Button
-                    key={index}
-                    type={action.type ?? "default"}
-                    size="small"
-                    icon={createIconRender(action.icon)}
-                    onClick={action.onClick}
-                    disabled={action.disabled}
-                    danger={action.danger}
-                >
-                    {action.label}
-                </Button>
-            })
-        }
-    </div>
+			{children}
+		</div>
+	)
 }
 
 export const SortableList = ({
-    items,
-    onChange,
-    renderItem,
-    activationConstraint,
-    useDragOverlay,
-    useActiveDragActions = true,
-    activeDragActions,
+	items = [],
+	onChange,
+	renderItem,
+	itemIdKey = "id",
 }) => {
-    const [active, setActive] = React.useState(null)
-    const [activeDrag, setActiveDrag] = React.useState(false)
+	const sensors = useSensors(
+		useSensor(PointerSensor, {
+			activationConstraint: {
+				distance: 8,
+			},
+		}),
+		useSensor(KeyboardSensor, {
+			coordinateGetter: sortableKeyboardCoordinates,
+		}),
+	)
 
-    const activeItem = React.useMemo(() => items.find((item) => item.id === active?.id), [active, items])
+	const onDragEnd = ({ active, over }) => {
+		if (!over) return
 
-    const context = React.useMemo(
-        () => ({
-            activeDrag,
-            onLongPress: () => setActiveDrag(true),
-            setActiveDrag: setActiveDrag,
-        }),
-    )
+		if (active.id !== over.id) {
+			const oldIndex = items.findIndex(
+				(item) => item[itemIdKey] === active.id,
+			)
+			const newIndex = items.findIndex(
+				(item) => item[itemIdKey] === over.id,
+			)
 
-    const sensors = useSensors(
-        useSensor(MouseSensor, {
-            activationConstraint,
-        }),
-        useSensor(TouchSensor, {
-            activationConstraint,
-        }),
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    )
+			if (oldIndex !== -1 && newIndex !== -1) {
+				const newItems = arrayMove(items, oldIndex, newIndex)
+				onChange?.(newItems)
+			}
+		}
+	}
 
-    const onDragStart = ({ active }) => {
-        if (!activeDrag) {
-            return
-        }
+	const itemIds = items.map((item) => item[itemIdKey])
 
-        setActive(active)
-    }
+	return (
+		<DndContext
+			onDragEnd={onDragEnd}
+			sensors={sensors}
+			collisionDetection={closestCenter}
+			modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+		>
+			<div className={classnames("sortable-list")}>
+				<SortableContext
+					items={itemIds}
+					strategy={verticalListSortingStrategy}
+				>
+					{items.map((item, index) => {
+						const key = item[itemIdKey]
 
-    const onDragEnd = ({ active, over }) => {
-        if (!activeDrag) {
-            return
-        }
-
-        if (over && active.id !== over?.id) {
-            const activeIndex = items.findIndex(({ id }) => id === active.id);
-            const overIndex = items.findIndex(({ id }) => id === over.id);
-
-            onChange(arrayMove(items, activeIndex, overIndex));
-        }
-
-        setActive(null);
-    }
-
-    const onDragCancel = () => {
-        setActive(null)
-    }
-
-    return <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragCancel={onDragCancel}
-    >
-        <SortableContext items={items}>
-            <SortableItemContext.Provider value={context}>
-                <ul
-                    className={classnames(
-                        "shortable-list",
-                        {
-                            ["active-drag"]: activeDrag
-                        }
-                    )}
-                    role="application"
-                >
-                    {
-                        items.map((item, index) => (
-                            <React.Fragment key={item.id}>
-                                {
-                                    renderItem(item, index)
-                                }
-                            </React.Fragment>
-                        ))
-                    }
-                </ul>
-
-                {
-                    useActiveDragActions && <DragActiveActions
-                        actions={activeDragActions}
-                    />
-                }
-            </SortableItemContext.Provider>
-        </SortableContext>
-
-        {
-            useDragOverlay && <SortableOverlay>
-                {activeItem ? renderItem(activeItem) : null}
-            </SortableOverlay>
-        }
-    </DndContext>
+						return (
+							<SortableItem
+								key={key}
+								id={key}
+								index={index}
+							>
+								{renderItem && renderItem(item, index)}
+							</SortableItem>
+						)
+					})}
+				</SortableContext>
+			</div>
+		</DndContext>
+	)
 }
+
+export default SortableList

@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-import { User } from "@db_models"
+import { User, PasswordHash } from "@db_models"
 import Account from "@classes/account"
 
 import requiredFields from "@shared-utils/requiredFields"
@@ -62,11 +62,11 @@ export default async (payload) => {
 
 	let user = new User({
 		username: username,
-		password: hash,
 		email: email,
 		public_name: public_name,
 		avatar:
-			avatar ?? `https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
+			avatar ??
+			`https://api.dicebear.com/7.x/thumbs/svg?seed=${username}`,
 		roles: roles,
 		created_at: new Date().getTime(),
 		accept_tos: accept_tos,
@@ -74,6 +74,11 @@ export default async (payload) => {
 	})
 
 	await user.save()
+
+	await PasswordHash.create({
+		user_id: user._id.toString(),
+		hash: hash,
+	})
 
 	await Account.sendActivationCode(user._id.toString())
 

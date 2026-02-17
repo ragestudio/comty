@@ -3,22 +3,22 @@ import { Icons } from "@components/Icons"
 const PlaylistTypeDecorators = {
 	single: () => (
 		<span className="playlistType">
-			<Icons.MdMusicNote /> Single
+			<Icons.DiscAlbum /> Single
 		</span>
 	),
 	album: () => (
 		<span className="playlistType">
-			<Icons.MdAlbum /> Album
+			<Icons.SquareLibrary /> Album
 		</span>
 	),
 	ep: () => (
 		<span className="playlistType">
-			<Icons.MdAlbum /> EP
+			<Icons.DiscAlbum /> EP
 		</span>
 	),
 	mix: () => (
 		<span className="playlistType">
-			<Icons.MdMusicNote /> Mix
+			<Icons.Turntable /> Mix
 		</span>
 	),
 }

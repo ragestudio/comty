@@ -31,7 +31,8 @@ const EnhancedLyricsPage = () => {
 
 	const { trackManifest } = useTrackManifest(playerState.track_manifest)
 
-	const { dominantColor, cssVars } = useCoverAnalysis(trackManifest)
+	const { coverAnalysis, dominantColor, cssVars } =
+		useCoverAnalysis(trackManifest)
 
 	const { syncRoom, subscribeLyricsUpdates, unsubscribeLyricsUpdates } =
 		useSyncRoom()
@@ -67,13 +68,16 @@ const EnhancedLyricsPage = () => {
 				className="lyrics-background-color"
 				initial={false}
 				animate={{
-					background: `linear-gradient(0deg, rgba(${dominantColor}), rgba(255, 255, 255, 0.5))`,
+					background: `radial-gradient(circle at 50% 50%, rgba(${dominantColor}) 0%, rgba(0, 0, 0, 0.5) 100%)`,
 				}}
 			/>
 
 			{playerState.playback_status === "stopped" && (
 				<div className="lyrics-stopped-decorator">
-					<img src="./basic_alt.svg" alt="Basic Logo" />
+					<img
+						src="./basic_alt.svg"
+						alt="Basic Logo"
+					/>
 				</div>
 			)}
 
@@ -82,12 +86,24 @@ const EnhancedLyricsPage = () => {
 				hasVideoSource={!!lyrics?.video_source}
 			/>
 
-			<LyricsVideo ref={videoRef} lyrics={lyrics} />
-			<LyricsText ref={textRef} lyrics={lyrics} />
+			<LyricsVideo
+				ref={videoRef}
+				lyrics={lyrics}
+			/>
+			<LyricsText
+				ref={textRef}
+				lyrics={lyrics}
+			/>
 
 			<PlayerController lyrics={lyrics} />
 		</div>
 	)
+}
+
+EnhancedLyricsPage.options = {
+	layout: {
+		sidebar: false,
+	},
 }
 
 export default EnhancedLyricsPage

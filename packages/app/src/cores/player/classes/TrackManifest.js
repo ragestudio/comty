@@ -61,6 +61,10 @@ export default class TrackManifest {
 			this.public = params.public
 		}
 
+		if (typeof params.timings !== "undefined") {
+			this.timings = params.timings
+		}
+
 		if (this.source) {
 			this.mpd_mode =
 				this.source.startsWith("blob:") || this.source.endsWith(".mpd")
@@ -78,6 +82,7 @@ export default class TrackManifest {
 	cover = null // set default cover url
 	source = null
 	metadata = {}
+	timings = null
 
 	// set default service to default
 	service = "default"
@@ -196,6 +201,7 @@ export default class TrackManifest {
 			metadata: this.metadata,
 			liked: this.liked,
 			service: this.service,
+			timings: this.timings,
 		}
 	}
 }

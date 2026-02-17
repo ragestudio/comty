@@ -1,9 +1,67 @@
-import { Track } from "@db_models"
+import { Track, TrackLyric } from "@db_models"
 import Library from "@classes/library"
+
+// transform minutes:seconds.milliseconds to milliseconds
+function timecodeToMs(time) {
+	if (!time) {
+		return 0
+	}
+
+	const [minutes, rest] = time.split(":")
+	const [seconds, milliseconds] = rest.split(".")
+
+	return (
+		(parseInt(minutes, 10) * 60 + parseInt(seconds, 10)) * 1000 +
+		parseInt(milliseconds, 10)
+	)
+}
+
+function parseTimings(timings) {
+	if (!Array.isArray(timings)) {
+		return null
+	}
+
+	// first parse all start times
+	timings = timings.map((timing) => {
+		timing.start_ms = timecodeToMs(timing.start)
+
+		return timing
+	})
+
+	// set the end time with the next start time
+	timings = timings.map((timing, index) => {
+		const next = timings[index + 1]
+
+		if (next) {
+			timing.end_ms = next.start_ms
+		}
+
+		return timing
+	})
+
+	return timings
+}
 
 async function fullfillData(list, { user_id = null }) {
 	if (!Array.isArray(list)) {
 		list = [list]
+	}
+
+	// fetch timings
+	const lyrics = await TrackLyric.find({
+		track_id: { $in: list.map((track) => track._id) },
+	}).lean()
+
+	for (const track of list) {
+		const lyric = lyrics.find((lyric) => {
+			return lyric.track_id.toString() === track._id.toString()
+		})
+
+		if (lyric) {
+			if (lyric.timings) {
+				track.timings = parseTimings(lyric.timings)
+			}
+		}
 	}
 
 	// if user_id is provided, fetch likes

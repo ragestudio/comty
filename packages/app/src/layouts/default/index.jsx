@@ -2,6 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { Layout } from "antd"
 
+import Drawer from "@layouts/components/drawer"
 import Sidebar from "@layouts/components/sidebar"
 import ToolsBar from "@layouts/components/toolsBar"
 import Header from "@layouts/components/header"
@@ -22,8 +23,12 @@ const DesktopLayout = (props) => {
 			<BackgroundDecorator />
 			<Modals />
 			<DraggableDrawerController />
+			<Drawer />
 
-			<Layout id="app_layout" className="app_layout">
+			<Layout
+				id="app_layout"
+				className="app_layout"
+			>
 				<Sidebar user={props.user} />
 
 				<Layout.Content
@@ -50,9 +55,13 @@ const DesktopLayout = (props) => {
 
 const MobileLayout = (props) => {
 	return (
-		<Layout id="app_layout" className="app_layout">
+		<Layout
+			id="app_layout"
+			className="app_layout"
+		>
 			<DraggableDrawerController />
 			<TopBar />
+			<Modals />
 
 			<Layout.Content
 				id="content_layout"

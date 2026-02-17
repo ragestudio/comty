@@ -1,0 +1,166 @@
+@avatar-size: 35px;
+@attachment-size: 120px;
+
+.channel-chat {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	overflow: hidden;
+
+	width: 100%;
+	height: 100%;
+
+	gap: 10px;
+
+	&__scroll-to-bottom {
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		padding: 5px 20px;
+
+		border-radius: 12px;
+
+		width: 100%;
+
+		gap: 15px;
+
+		background-color: var(--background-color-accent);
+	}
+
+	&__timeline {
+		position: relative;
+
+		display: flex;
+		flex-direction: column-reverse;
+
+		width: 100%;
+		height: 100%;
+
+		overflow-x: hidden;
+		overflow-y: scroll;
+
+		contain: layout style paint;
+		//will-change: scroll-position;
+
+		border-radius: 12px;
+
+		scrollbar-gutter: stable;
+
+		padding: 10px;
+		padding-right: 0px;
+
+		&::-webkit-scrollbar {
+			display: block;
+			width: 15px;
+
+			background-color: transparent;
+			padding: 0 5px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--border-color);
+
+			border-radius: 8px;
+			border: 5px solid transparent;
+		}
+
+		&__top-trigger {
+			position: relative;
+
+			top: 0;
+			left: 0;
+
+			flex: 1;
+		}
+	}
+}
+
+.channel-chat__attachments {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	width: 100%;
+	height: fit-content;
+
+	gap: 10px;
+	padding: 10px;
+
+	border-radius: 12px;
+	background-color: var(--background-color-accent);
+	/*
+	overflow-y: hidden;
+	overflow-x: scroll; */
+
+	scrollbar-gutter: stable;
+
+	&__item {
+		position: relative;
+
+		display: flex;
+		flex-direction: column;
+
+		width: @attachment-size;
+		height: @attachment-size;
+
+		min-width: @attachment-size;
+		min-height: @attachment-size;
+
+		max-width: @attachment-size;
+		max-height: @attachment-size;
+
+		overflow: hidden;
+
+		background-color: var(--background-color-accent);
+
+		border-radius: 12px;
+
+		&.pending {
+			filter: blur(2px);
+			opacity: 0.8;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+
+			object-fit: cover;
+		}
+	}
+}
+
+.group-page__content-panel__header__content__users-typing {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	background-color: var(--background-color-accent);
+	border-radius: 8px;
+	padding: 3px 10px;
+
+	gap: 5px;
+
+	img {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+	}
+
+	span {
+		font-size: 0.7rem;
+	}
+}

@@ -2,6 +2,6 @@
 	"name": "ems",
 	"dependencies": {
 		"handlebars": "^4.7.8",
-		"nodemailer": "^6.9.11"
+		"nodemailer": "^7.0.10"
 	}
 }

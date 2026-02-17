@@ -46,7 +46,7 @@ const SortableTrackItem = ({
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
-		transition,
+		transition: transition,
 		opacity: isDragging ? 0.8 : 1,
 		zIndex: isDragging ? 1000 : 1,
 	}
@@ -114,14 +114,14 @@ const SortableTrackItem = ({
 				>
 					<antd.Button
 						type="ghost"
-						icon={<Icons.FiTrash2 />}
+						icon={<Icons.Trash />}
 						disabled={disabled}
 					/>
 				</antd.Popconfirm>
 
 				<antd.Button
 					type="ghost"
-					icon={<Icons.FiEdit2 />}
+					icon={<Icons.Pen />}
 					onClick={handleEditTrack}
 					disabled={disabled}
 				/>
@@ -135,7 +135,7 @@ const SortableTrackItem = ({
 					tabIndex={disabled ? -1 : 0}
 					aria-label="Drag to reorder track"
 				>
-					<Icons.MdDragIndicator />
+					<Icons.GripVertical />
 				</div>
 			</div>
 		</div>

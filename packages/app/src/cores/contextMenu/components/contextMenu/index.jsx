@@ -1,21 +1,14 @@
 import React from "react"
+import classNames from "classnames"
+import { AnimatePresence, motion } from "motion/react"
 
 import { createIconRender } from "@components/Icons"
-import { AnimatePresence, motion } from "motion/react"
 
 import "./index.less"
 
 const ContextMenu = (props) => {
 	const [visible, setVisible] = React.useState(true)
-	const { items = [], cords, clickedComponent, ctx } = props
-
-	React.useEffect(() => {
-		if (props.fireWhenClosing) {
-			props.fireWhenClosing(() => {
-				setVisible(false)
-			})
-		}
-	}, [])
+	const { items = [], clickedComponent, ctx } = props
 
 	const handleItemClick = async (item) => {
 		if (typeof item.action === "function") {
@@ -34,47 +27,63 @@ const ContextMenu = (props) => {
 
 		return items.map((item, index) => {
 			if (item.type === "separator") {
-				return <div key={index} className="context-menu-separator" />
+				return (
+					<div
+						key={index}
+						className="context-menu-separator"
+					/>
+				)
 			}
 
 			return (
 				<div
 					key={index}
 					onClick={() => handleItemClick(item)}
-					className="item"
+					className={classNames("item", {
+						danger: item.danger,
+						disabled: item.disabled,
+					})}
+					disabled={item.disabled}
 				>
-					<p className="label">{item.label}</p>
+					<div className="item__line">
+						<p className="item__line__label">{item.label}</p>
 
-					{item.description && (
-						<p className="description">{item.description}</p>
+						<div className="item__line__icon">
+							{createIconRender(item.icon)}
+						</div>
+					</div>
+
+					{item.render && (
+						<div className="item__line__render">
+							{React.createElement(item.render)}
+						</div>
 					)}
-
-					{createIconRender(item.icon)}
 				</div>
 			)
 		})
 	}
 
+	React.useEffect(() => {
+		if (props.fireWhenClosing) {
+			props.fireWhenClosing(() => {
+				setVisible(false)
+			})
+		}
+	}, [])
+
 	return (
 		<AnimatePresence>
 			{visible && (
-				<div
-					className="context-menu-wrapper"
-					style={{
-						top: cords.y,
-						left: cords.x,
-					}}
+				<motion.div
+					id="context-menu"
+					className="context-menu bg-accent"
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ opacity: 1, scale: 1 }}
+					exit={{ opacity: 0, scale: 0.3 }}
+					transition={{ duration: 0.05, ease: "easeInOut" }}
 				>
-					<motion.div
-						className="context-menu"
-						initial={{ opacity: 0, scale: 0.8 }}
-						animate={{ opacity: 1, scale: 1 }}
-						exit={{ opacity: 0, scale: 0.3 }}
-						transition={{ duration: 0.05, ease: "easeInOut" }}
-					>
-						{renderItems()}
-					</motion.div>
-				</div>
+					{React.isValidElement(items) ? items : renderItems()}
+				</motion.div>
 			)}
 		</AnimatePresence>
 	)

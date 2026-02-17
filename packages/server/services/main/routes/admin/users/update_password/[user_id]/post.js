@@ -3,7 +3,7 @@ import { User } from "@db_models"
 import bcrypt from "bcrypt"
 
 export default {
-	middlewares: ["withAuthentication", "onlyAdmin"],
+	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async (req, res) => {
 		const { password } = req.body
 

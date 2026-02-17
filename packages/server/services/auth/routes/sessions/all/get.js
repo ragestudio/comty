@@ -1,10 +1,8 @@
-import AccountClass from "@classes/account"
+import Session from "@classes/session"
 
 export default {
-    middlewares: ["withAuthentication"],
-    fn: async (req, res) => {
-        return await AccountClass.sessions({
-            user_id: req.auth.session.user_id
-        })
-    }
+	useMiddlewares: ["withAuthentication"],
+	fn: async (req) => {
+		return await Session.getAllByUserId(req.auth.session.user_id)
+	},
 }

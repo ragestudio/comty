@@ -35,7 +35,7 @@ const MainSelector = (props) => {
 
 				<antd.Button
 					onClick={() => app.auth.login()}
-					icon={<Icons.FiLogIn />}
+					icon={<Icons.LogIn />}
 					type="primary"
 				>
 					Continue with a Comty™ Account
@@ -43,7 +43,7 @@ const MainSelector = (props) => {
 
 				<antd.Button
 					onClick={() => app.auth.login()}
-					icon={<Icons.FiLogIn />}
+					icon={<Icons.LogIn />}
 					type="primary"
 					disabled
 				>
@@ -54,7 +54,7 @@ const MainSelector = (props) => {
 
 				<antd.Button
 					onClick={() => props.setActiveKey("register")}
-					icon={<Icons.FiUserPlus />}
+					icon={<Icons.UserPlus />}
 					type="primary"
 				>
 					Create a Comty™ Account

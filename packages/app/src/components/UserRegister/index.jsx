@@ -11,7 +11,7 @@ const steps = [
 	{
 		key: "username",
 		title: "Step 1",
-		icon: "FiUser",
+		icon: "User",
 		description: () => (
 			<div>
 				<p>
@@ -71,7 +71,7 @@ const steps = [
 				if (value) {
 					return (
 						<>
-							<Icons.CheckCircleOutlined />
+							<Icons.SquareCheckBig />
 							<p>{label}</p>
 						</>
 					)
@@ -79,7 +79,7 @@ const steps = [
 
 				return (
 					<>
-						<Icons.CloseCircleOutlined />
+						<Icons.CircleX />
 						<p>{label}</p>
 					</>
 				)
@@ -174,7 +174,7 @@ const steps = [
 	{
 		key: "password",
 		title: "Step 2",
-		icon: "FiKey",
+		icon: "SquareAsterisk",
 		description:
 			"Enter a password for the account. must comply with the password requirements policy.",
 		required: true,
@@ -300,7 +300,7 @@ const steps = [
 	{
 		key: "email",
 		title: "Step 3",
-		icon: "FiMail",
+		icon: "Mail",
 		description: "Enter a email for the account",
 		required: true,
 		content: (props) => {
@@ -418,5 +418,10 @@ export default (props) => {
 		}
 	}
 
-	return <StepsForm steps={steps} onSubmit={onSubmit} />
+	return (
+		<StepsForm
+			steps={steps}
+			onSubmit={onSubmit}
+		/>
+	)
 }

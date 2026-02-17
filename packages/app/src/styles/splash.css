@@ -1,0 +1,169 @@
+.app__splash {
+	--loader-size: 550px;
+
+	app-region: drag;
+
+	z-index: 9999;
+	position: fixed;
+
+	top: 0;
+	left: 0;
+
+	overflow: hidden;
+
+	background-color: #252525;
+	color: #d7d7d7;
+
+	width: 100vw;
+	height: 100vh;
+	height: 100dvh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	opacity: 1;
+	pointer-events: none;
+
+	animation-delay: 0.8s;
+	animation-duration: 300ms;
+
+	animation-direction: normal;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in-out;
+}
+
+.app__splash[style*="--visible: 0"] {
+	animation-name: splashOut;
+
+	.app__splash__loader__box__main {
+		animation-name: mainBox;
+	}
+
+	.app__splash__loader > .app__splash__loader__box {
+		animation-name: outterBox;
+	}
+}
+
+.app__splash__loader {
+	position: relative;
+	height: var(--loader-size);
+	aspect-ratio: 1;
+}
+
+.app__splash__loader__box__main {
+	z-index: 99;
+
+	position: absolute;
+	border-radius: 42px;
+
+	inset: 30%;
+
+	background: #ff6064;
+
+	animation-delay: 0s;
+	animation-duration: 1s;
+}
+
+.app__splash__loader__box {
+	position: absolute;
+
+	border-top: 1px solid #646464;
+	border-radius: 42px;
+
+	background: rgba(255, 96, 100, 0.15);
+	backdrop-filter: blur(5px);
+
+	box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 10px 0px;
+
+	transform: scale(0);
+	animation-duration: 1s;
+}
+
+.app__splash__loader__box,
+.app__splash__loader__box__main {
+	animation-timing-function: ease-in-out;
+	animation-fill-mode: both;
+	animation-iteration-count: 1;
+	animation-direction: normal;
+}
+
+.app__splash__loader__box:nth-child(1) {
+	inset: 25%;
+	z-index: 98;
+	border-color: rgba(100, 100, 100, 0.8);
+	animation-delay: 0.1s;
+}
+
+.app__splash__loader__box:nth-child(2) {
+	inset: 20%;
+	z-index: 97;
+	border-color: rgba(100, 100, 100, 0.6);
+	animation-delay: 0.2s;
+}
+
+.app__splash__loader__box:nth-child(3) {
+	inset: 10%;
+	z-index: 96;
+	border-color: rgba(100, 100, 100, 0.4);
+	animation-delay: 0.3s;
+}
+
+.app__splash__loader .app__splash__loader__logo {
+	position: absolute;
+	display: grid;
+
+	inset: 0;
+
+	place-content: center;
+	padding: 5%;
+}
+
+.app__splash__loader .app__splash__loader__logo img {
+	width: 100%;
+}
+
+@keyframes mainBox {
+	0% {
+		transform: scale(1);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 10px 0px;
+	}
+	50% {
+		transform: scale(1.3);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 20px 0px;
+		opacity: 1;
+	}
+	100% {
+		transform: scale(0.5);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 10px 0px;
+		opacity: 0;
+	}
+}
+@keyframes outterBox {
+	0% {
+		transform: scale(0);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 10px 0px;
+	}
+	50% {
+		transform: scale(1.3);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 30px 20px 0px;
+	}
+	100% {
+		transform: scale(0);
+		box-shadow: rgba(0, 0, 0, 0.3) 0px 10px 10px 0px;
+	}
+}
+
+@keyframes splashOut {
+	0% {
+		opacity: 1;
+	}
+	99% {
+		opacity: 0;
+	}
+	100% {
+		display: none;
+		opacity: 0;
+	}
+}

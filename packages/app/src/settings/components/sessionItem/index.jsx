@@ -83,13 +83,13 @@ const SessionItem = (props) => {
 					<div className="security_sessions_list_item_info">
 						<div className="security_sessions_list_item_title">
 							<h3>
-								<Icons.FiTag /> {session._id}
+								<Icons.Tag /> {session._id}
 							</h3>
 						</div>
 
 						<div className="security_sessions_list_item_info_details">
 							<div className="security_sessions_list_item_info_details_item">
-								<Icons.FiClock />
+								<Icons.Clock />
 
 								<span>
 									{moment(session.date).format(
@@ -98,7 +98,7 @@ const SessionItem = (props) => {
 								</span>
 							</div>
 							<div className="security_sessions_list_item_info_details_item">
-								<Icons.IoMdLocate />
+								<Icons.Locate />
 
 								<span>{session.ip_address}</span>
 							</div>
@@ -109,20 +109,24 @@ const SessionItem = (props) => {
 
 			<div className="security_sessions_list_item_extra-body">
 				<div className="security_sessions_list_item_actions">
-					<antd.Button onClick={onClickRevoke} danger size="small">
+					<antd.Button
+						onClick={onClickRevoke}
+						danger
+						size="small"
+					>
 						Revoke
 					</antd.Button>
 				</div>
 
 				<div className="security_sessions_list_item_info_details_item">
-					<Icons.MdDns />
+					<Icons.Server />
 
 					<span>{session.location}</span>
 				</div>
 
 				{ua.device.vendor && (
 					<div className="security_sessions_list_item_info_details_item">
-						<Icons.FiCpu />
+						<Icons.Cpu />
 
 						<span>
 							{ua.device.vendor} | {ua.device.model}

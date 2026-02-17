@@ -1,115 +1,16 @@
-@topbar_height: 30px;
-@topbar_background: var(--background-color-accent);
-
-.window_wrapper {
-    border-radius: 12px;
-
-    background-color: var(--background-color-primary);
-    border: 2px solid var(--border-color);
-
-    //filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
-
-    overflow: hidden;
+#windows {
+	position: fixed;
+	top: 0;
+	left: 0;
 }
 
-.window_topbar {
-    position: sticky;
+.dom-window {
+	position: fixed;
+	z-index: 100000;
 
-    z-index: 51;
+	top: 0;
+	left: 0;
 
-    background-color: @topbar_background;
-
-    color: var(--text-color);
-
-    height: @topbar_height;
-    width: 100%;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    >div {
-        margin: 0 5px;
-        line-height: 0;
-    }
-
-    .title {
-        margin-left: 20px;
-
-        color: var(--text-color);
-
-        font-size: 13px;
-        font-style: italic;
-        font-family: "JetBrains Mono", monospace;
-    }
-
-    .actions {
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        justify-content: end;
-
-        color: var(--text-color);
-
-        >div {
-            transition: all 150ms ease-in-out;
-            margin-right: 10px;
-            cursor: pointer;
-
-            height: fit-content;
-            width: fit-content;
-            line-height: 0;
-
-            display: flex;
-            align-items: center;
-            justify-content: end;
-        }
-
-        >div:hover {
-            color: var(--primary-color);
-        }
-    }
-}
-
-.window_body {
-    z-index: 50;
-
-    padding: 10px 20px;
-    height: calc(100% - @topbar_height);
-    width: 100%;
-
-    overflow: overlay;
-    user-select: text !important;
-    --webkit-user-select: text !important;
-
-    color: var(--text-color);
-
-    >div {
-        user-select: text !important;
-        --webkit-user-select: text !important;
-    }
-
-    .render_error {
-        display: flex;
-        flex-direction: column;
-
-        align-items: center;
-
-        width: 100%;
-        height: 100%;
-
-        h1 {
-            font-size: 2rem;
-        }
-
-        code {
-            background-color: var(--background-color-accent);
-
-            padding: 5px;
-            border-radius: 8px;
-
-            user-select: text;
-        }
-    }
+	width: fit-content;
+	height: fit-content;
 }

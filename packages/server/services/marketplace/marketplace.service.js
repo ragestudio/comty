@@ -1,5 +1,6 @@
 import { Server } from "linebridge"
 
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
 import CacheService from "@shared-classes/CacheService"
 import StorageClient from "@shared-classes/StorageClient"
@@ -8,9 +9,10 @@ import SharedMiddlewares from "@shared-middlewares"
 
 class API extends Server {
 	static refName = "marketplace"
-	static useEngine = "hyper-express-ng"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3005
+	static listenPort = 3005
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
 
 	middlewares = {
 		...SharedMiddlewares,
@@ -18,6 +20,7 @@ class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
 		cache: new CacheService({
 			fsram: false,
 		}),
@@ -33,10 +36,13 @@ class API extends Server {
 		}),
 	}
 
-	async onInitialize() {
-		await this.contexts.db.initialize()
-		await this.contexts.storage.initialize()
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.storage.initialize(),
+	]
 
+	async onInitialize() {
 		global.cache = this.contexts.cache
 		global.storages = {
 			standard: this.contexts.storage,

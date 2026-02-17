@@ -27,6 +27,10 @@
 
 		background-color: rgba(var(--cover_averageValues), 0.4);
 	}
+
+	&.fullscreen {
+		margin-bottom: 50px;
+	}
 }
 
 .mobile-player {
@@ -179,6 +183,21 @@
 					background-color: var(--background-color-contrast);
 				}
 			}
+		}
+	}
+}
+
+.mobile-player-additional {
+	display: flex;
+
+	padding: 10px 0;
+
+	.lyrics-text-wrapper {
+		.lyrics-text {
+			background-color: rgba(var(--cover_averageValues), 0.4) !important;
+
+			padding: 10px !important;
+			border-radius: 12px !important;
 		}
 	}
 }

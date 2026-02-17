@@ -55,7 +55,7 @@ const MusicExploreTab = () => {
 					<FeedItems
 						type="tracks"
 						headerTitle="All Tracks"
-						headerIcon={<Icons.MdMusicNote />}
+						headerIcon={<Icons.LibraryBig />}
 						fetchMethod={MusicModel.getAllTracks}
 						itemsPerPage={6}
 					/>
@@ -63,14 +63,14 @@ const MusicExploreTab = () => {
 					<FeedItems
 						type="playlists"
 						headerTitle="All Releases"
-						headerIcon={<Icons.MdNewspaper />}
+						headerIcon={<Icons.Album />}
 						fetchMethod={MusicModel.getAllReleases}
 					/>
 
 					<FeedItems
 						type="radios"
 						headerTitle="Trending Radios"
-						headerIcon={<Icons.FiRadio />}
+						headerIcon={<Icons.RadioTower />}
 						fetchMethod={RadioModel.getTrendings}
 						disablePagination
 					/>

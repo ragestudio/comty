@@ -1,17 +1,38 @@
+// vars always first
+@import "@styles/vars.less";
+
+@import "@styles/ui.less";
 @import "@styles/layout.less";
 @import "@styles/animations.less";
-@import "@styles/vars.less";
-@import "@styles/fonts.less";
-@import "@styles/fixments.less";
+
+@import "@styles/desktop.less";
 @import "@styles/mobile.less";
+
+// only for antd
+@import "@styles/fixments.less";
 
 *,
 *:before,
 *:after {
 	box-sizing: inherit;
 	font-size: calc(1em * var(--fontScale));
+	color: var(--textColor);
 }
 
+// disable selection/Copy of UIWebView
+// disable ios popup for long-press
+*:not(input):not(textarea):not(a) {
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;
+}
+
+// enable text selection for `code` element
+code {
+	user-select: text !important;
+}
+
+// Adjust typography scale
 h1 {
 	font-size: calc(1.4em * var(--fontScale));
 }
@@ -40,10 +61,37 @@ p {
 	font-size: calc(1em * var(--fontScale));
 }
 
-code {
-	user-select: text !important;
+// sets the color of text elements
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+svg {
+	color: currentColor;
+	vertical-align: -0.125em;
 }
 
+// sets the color of svg elements
+svg {
+	> * {
+		color: currentColor;
+	}
+}
+
+// sets the color of anchors
+a {
+	color: var(--primaryColor);
+
+	&:hover {
+		color: var(--primaryColor);
+	}
+}
+
+// set some layout adjustments for text elements
 h1,
 h2,
 h3,
@@ -53,6 +101,8 @@ h6,
 p,
 span,
 a {
+	text-decoration: none;
+	text-rendering: optimizeLegibility !important;
 	display: inline-flex;
 	flex-direction: row;
 	align-items: center;
@@ -60,19 +110,10 @@ a {
 	gap: 5px;
 
 	margin: 0;
+	margin-top: 0;
 }
 
-#nprogress {
-	position: absolute;
-	top: 0;
-	width: 100vw;
-
-	.bar {
-		height: 2px;
-		background: var(--app-color);
-	}
-}
-
+// main layout styles
 #root {
 	width: 100%;
 	height: 100%;
@@ -92,23 +133,32 @@ a {
 }
 
 body {
+	overscroll-behavior: none;
+
 	width: 100%;
 	height: 100%;
 
 	padding: 0;
 	margin: 0;
+
+	color: var(--textColor);
 }
 
 html {
 	box-sizing: border-box;
+	overscroll-behavior: none;
 
-	width: 100%;
 	height: 100%;
 
 	padding: 0;
 	margin: 0;
 
-	background-color: var(--background-color-primary) !important;
+	background-color: rgba(var(--bg_color_1)) !important;
+	background: url("/grain-bg.png");
+
+	background-size: 100px;
+	background-repeat: repeat;
+	background-blend-mode: overlay;
 
 	user-select: none;
 	--webkit-user-select: none;
@@ -116,7 +166,9 @@ html {
 	scroll-behavior: smooth;
 	text-rendering: optimizeLegibility !important;
 
+	color: var(--textColor);
 	font-family: var(--fontFamily);
+	font-size: 16px;
 
 	-webkit-overflow-scrolling: touch;
 	-webkit-app-region: no-drag;
@@ -157,16 +209,14 @@ html {
 		background-color: transparent;
 	}
 
-	-webkit-overflow-scrolling: touch;
-
-	// &.root-scale-effect {
-	// 	background-color: black !important;
-
-	// 	#root {
-	// 		animation: rootScaleOut 250ms ease-in-out forwards;
-	// 		animation-delay: 0;
-	// 	}
-	// }
+	&.sidebar-expanded {
+		.content_layout {
+			filter: blur(1px) brightness(0.8);
+			transform: translateX(
+				calc((@sidebar_width_expanded / 2) + @sidebar_wrapper_padding * 2)
+			);
+		}
+	}
 
 	&.compact-mode {
 		.content_layout {
@@ -203,42 +253,6 @@ html {
 	}
 }
 
-a {
-	color: var(--colorPrimary);
-	text-decoration: none;
-
-	&:hover {
-		color: var(--colorPrimary);
-	}
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-span {
-	color: var(--text-color);
-	text-rendering: optimizeLegibility !important;
-
-	margin-top: 0;
-}
-
-svg {
-	color: currentColor;
-	vertical-align: -0.125em;
-}
-
-*:not(input):not(textarea):not(a) {
-	user-select: none;
-	-webkit-user-select: none;
-	/* disable selection/Copy of UIWebView */
-	-webkit-touch-callout: none;
-	/* disable the IOS popup when long-press on a link */
-}
-
 // LAYOUT
 .app_layout {
 	position: relative;
@@ -251,11 +265,10 @@ svg {
 	align-items: flex-start;
 	justify-content: flex-start;
 
-	background-color: rgba(
-		var(--layoutBackgroundColor),
-		var(--backgroundColorTransparency)
-	) !important;
+	background-color: transparent;
 	backdrop-filter: blur(var(--backgroundBlur));
+
+	transition: backdrop-filter 150ms ease-in-out;
 }
 
 .content_layout {
@@ -273,14 +286,14 @@ svg {
 
 	transition: all 150ms ease-in-out;
 
+	// set to clip to avoid breaking sticky elements
+	overflow-x: clip;
+
 	margin: var(--layoutMargin);
 	padding: var(--layoutPadding);
 }
 
 .root_background {
-	mask-image: var(--backgroundSVG);
-	-webkit-mask-image: var(--backgroundSVG);
-
 	background-image: var(--backgroundImage);
 	background-size: var(--backgroundSize);
 	background-position: var(--backgroundPosition);
@@ -288,28 +301,21 @@ svg {
 	background-attachment: var(--backgroundAttachment);
 
 	position: fixed;
+
 	top: 0;
 	left: 0;
 
 	width: 100vw;
+	height: 100vh;
 	height: 100dvh;
-
-	transition:
-		background-image,
-		background-size,
-		background-position,
-		background-repeat,
-		background-attachment all 150ms ease-in-out;
 
 	pointer-events: none;
 
-	&.active {
-		background-color: var(--text-color);
-	}
-
-	svg {
+	video {
 		width: 100%;
 		height: 100%;
+
+		object-fit: cover;
 	}
 }
 
@@ -331,130 +337,21 @@ svg {
 	}
 }
 
-#fullImageViewer {
-	.__react_modal_image__modal_container {
-		background-color: rgba(0, 0, 0, 0.3) !important;
-		backdrop-filter: blur(10px);
-	}
-
-	.__react_modal_image__header {
-		background-color: transparent !important;
-	}
-}
-
-.inline_field {
-	display: inline-flex;
-
+.member-context-menu__roles {
+	display: flex;
 	flex-direction: row;
+
 	align-items: center;
-
-	justify-content: space-between;
-
-	padding: 10px;
-
-	color: var(--text-color);
-
-	background-color: var(--background-color-primary);
-
-	border-radius: 12px;
-
-	.field_header {
-		display: inline-flex;
-
-		flex-direction: row;
-		align-items: center;
-
-		gap: 8px;
-
-		font-size: 0.8rem;
-
-		.field_icon {
-			display: inline-flex;
-
-			flex-direction: row;
-			align-items: center;
-			justify-content: center;
-
-			background-color: var(--background-color-primary);
-
-			border-radius: 100%;
-
-			padding: 5px;
-
-			font-size: 1rem;
-
-			svg {
-				margin: 0;
-			}
-		}
-	}
-}
-
-.card {
-	display: flex;
-	flex-direction: column;
-
-	background-color: var(--background-color-accent);
-
-	padding: 10px;
-
-	border-radius: 12px;
-
-	gap: 10px;
-}
-
-.key-value-field {
-	display: flex;
-	flex-direction: column;
 
 	gap: 5px;
 
-	.key-value-field-key {
-		display: flex;
-		flex-direction: row;
-
-		align-items: center;
-
-		gap: 10px;
-
-		font-weight: bold;
-		font-size: 0.9rem;
-	}
-
-	.key-value-field-description {
-		display: flex;
-		flex-direction: column;
-
-		gap: 5px;
-		opacity: 0.8;
-	}
-
-	.key-value-field-value {
-		display: flex;
-		flex-direction: row;
-
-		align-items: center;
-
-		gap: 10px;
-		padding: 7px 5px;
+	.ant-tag {
+		margin: 0;
 
 		border-radius: 8px;
+
+		color: var(--text-color);
+
 		background-color: var(--background-color-accent);
-
-		font-family: "DM Mono", monospace;
-
-		font-size: 0.7rem;
-
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6,
-		p,
-		span,
-		a {
-			user-select: all !important;
-		}
 	}
 }

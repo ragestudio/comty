@@ -1,20 +1,14 @@
 {
-    "app": {
-        "label": "Application"
-    },
-    "basic": {
-        "label": "Basic"
-    },
-    "security": {
-        "label": "Security"
-    },
-    "privacy": {
-        "label": "Privacy"
-    },
-    "advanced": {
-        "label": "Advanced"
-    },
-    "other": {
-        "label": "Other"
-    }
+	"app": {
+		"label": "Application"
+	},
+	"basic": {
+		"label": "Basic"
+	},
+	"advanced": {
+		"label": "Advanced"
+	},
+	"bottom": {
+		"label": null
+	}
 }

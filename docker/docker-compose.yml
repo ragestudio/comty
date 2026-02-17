@@ -1,0 +1,67 @@
+services:
+  redis:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    container_name: comty-redis
+    restart: unless-stopped
+    ulimits:
+      memlock: -1
+    networks:
+      - redis_network
+    command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
+  scylla:
+    image: scylladb/scylla:latest
+    container_name: comty-scylla
+    restart: unless-stopped
+    networks:
+      - scylla_network
+    volumes:
+      - ./data/scylla/data:/var/lib/scylla
+      - ./data/scylla/logs:/var/log/scylla
+      # - ./d_data/scylla/conf:/etc/scylla
+    environment:
+      - SCYLLA_ARGS=--overprovisioned
+  mongodb:
+    image: mongo:latest
+    container_name: comty-mongodb
+    restart: unless-stopped
+    networks:
+      - mongodb_network
+    volumes:
+      - ./data/mongodb/data:/data/db
+
+  server:
+    build: ../packages/server
+    container_name: comty-api
+    restart: unless-stopped
+    depends_on:
+      - scylla
+      - redis
+    networks:
+      - api_network
+      - mongodb_network
+      - scylla_network
+      - redis_network
+    ports:
+      - "9000:9000" # API HTTP/WS Gateway port
+      - "10000-10001:10000-10001" # WebRTC signaling ports
+    env_file:
+      - ./.env
+    volumes:
+      - ./gateway.config.json:/server/gateway.config.json
+    environment:
+      - NODE_ENV=production
+
+  # web:
+  #   build: ../packages/wrapper
+  #   container_name: comty-web
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   env_file:
+  #     - ./.env
+
+networks:
+  api_network:
+  mongodb_network:
+  scylla_network:
+  redis_network:

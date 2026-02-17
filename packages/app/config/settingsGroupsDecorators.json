@@ -1,62 +1,46 @@
 {
-    "general": {
-        "title": "General",
-        "icon": "FiSettings"
-    },
-    "notifications": {
-        "title": "Notifications",
-        "icon": "FiBell"
-    },
-    "sidebar": {
-        "title": "Sidebar",
-        "icon": "FiLayout"
-    },
-    "aspect": {
-        "title": "Aspect",
-        "icon": "FiEye"
-    },
-    "animations": {
-        "title": "Animations",
-        "icon": "MdOutlineAnimation"
-    },
-    "security.account": {
-        "title": "Account Security",
-        "icon": "FiLock"
-    },
-    "security.other": {
-        "title": "Others",
-        "icon": "FiMoreHorizontal"
-    },
-    "account.basicInfo": {
-        "title": "Basic Information",
-        "icon": "FiInfo"
-    },
-    "account.profile": {
-        "title": "Profile",
-        "icon": "FiBook"
-    },
-    "layout": {
-        "title": "Layout",
-        "icon": "FiLayers"
-    },
-    "posts": {
-        "title": "Posts",
-        "icon": "MdOutlineFeed"
-    },
-    "sync.settings": {
-        "title": "Sync Settings",
-        "icon": "MdSync"
-    },
-    "sync.accounts": {
-        "title": "Synced Accounts",
-        "icon": "MdLinearScale"
-    },
-    "ui.sounds": {
-        "title": "UI Sounds",
-        "icon": "FiVolume2"
-    },
-    "privacy.general": {
-        "title": "Privacy",
-        "icon": "MdOutlinePrivacyTip"
-    }
+	"general": {
+		"title": "General",
+		"icon": "Command"
+	},
+	"notifications": {
+		"title": "Notifications",
+		"icon": "Bell"
+	},
+	"sidebar": {
+		"title": "Sidebar",
+		"icon": "PanelLeftDashed"
+	},
+	"aspect": {
+		"title": "Aspect",
+		"icon": "Eye"
+	},
+	"security.account": {
+		"title": "Account Security",
+		"icon": "Shield"
+	},
+	"account.basicInfo": {
+		"title": "Information",
+		"icon": "Info"
+	},
+	"account.profile": {
+		"title": "Details",
+		"icon": "UserPen"
+	},
+	"sync.accounts": {
+		"title": "Synced Accounts",
+		"icon": "MdLinearScale"
+	},
+	"privacy.general": {
+		"title": "Privacy",
+		"icon": "HatGlasses"
+	},
+	"audio": {
+		"title": "Audio",
+		"icon": "Volume2"
+	},
+	"accessibility": {
+		"title": "Accessibility",
+		"icon": "PersonStanding"
+	}
 }

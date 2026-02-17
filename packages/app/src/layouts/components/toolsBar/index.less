@@ -10,18 +10,11 @@
 
 	height: 100vh;
 	height: 100dvh;
-	max-width: 420px;
 
-	padding: 10px;
+	// min-width: @toolsbar_min-width; // animated from motion
+	max-width: @toolsbar_wrapper_max-width;
 
-	.visible {
-		min-width: 320px;
-	}
-
-	&:not(.visible) {
-		min-width: 0;
-		padding: 0;
-	}
+	// padding: @toolsbar_wrapper_padding; // animated from motion
 }
 
 .tools-bar {
@@ -33,15 +26,13 @@
 	width: 100%;
 	height: 100%;
 
-	border-radius: 12px;
+	min-width: 400px;
 
 	border-radius: @sidebar_borderRadius;
-	box-shadow: @card-shadow;
+
+	//border: 3px solid var(--border-color);
 
 	padding: 10px;
-
-	background-color: var(--background-color-accent);
-
 	gap: 20px;
 
 	flex: 0;

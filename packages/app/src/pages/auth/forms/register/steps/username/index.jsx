@@ -60,7 +60,7 @@ export const UsernameStepComponent = (props) => {
 		if (value) {
 			return (
 				<>
-					<Icons.CheckCircleOutlined
+					<Icons.SquareCheckBig
 						style={{
 							color: "#99F7AB",
 						}}
@@ -72,7 +72,7 @@ export const UsernameStepComponent = (props) => {
 
 		return (
 			<>
-				<Icons.CloseCircleOutlined
+				<Icons.CircleX
 					style={{
 						color: "var(--text-color)",
 					}}
@@ -117,6 +117,8 @@ export const UsernameStepComponent = (props) => {
 					return false
 				},
 			)
+
+			console.log(request)
 
 			if (request) {
 				setUsernameAvailable(!request.exists)
@@ -179,7 +181,7 @@ export const UsernameStepComponent = (props) => {
 export default {
 	key: "username",
 	title: "Step 1",
-	icon: "FiUser",
+	icon: "User",
 	description: () => (
 		<div>
 			<p>

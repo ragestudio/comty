@@ -1,0 +1,39 @@
+{
+	"mode": "dev",
+	"control_api": {
+		"enabled": true
+	},
+	"ipc": {
+		"path": "/tmp/ultragateway.sock"
+	},
+	"http": {
+		"port": 9000,
+		"secure_port": 9001
+	},
+	"jwt": {
+		"use_keys": [
+			{
+				"key": "user_id",
+				"type": "string"
+			},
+			{
+				"key": "session_id",
+				"type": "string"
+			}
+		]
+	},
+	"scripts": [
+		{
+			"path": "./lbuw-plugins/wsauth.js",
+			"crash_if_failed": true
+		}
+	],
+	"routes": [
+		{
+			"path": "/spectrum/*path",
+			"target": "http://ingest.ragestudio.net:8035",
+			"pathRewrite": { "^/spectrum/(.*)": "/$1" },
+			"websocket": true
+		}
+	]
+}

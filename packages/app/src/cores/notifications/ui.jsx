@@ -5,126 +5,147 @@ import { notification as Notf, Space, Button } from "antd"
 import { Icons, createIconRender } from "@components/Icons"
 
 class NotificationUI {
-    static async notify(notification) {
-        if (typeof notification === "string") {
-            notification = {
-                title: "New notification",
-                description: notification
-            }
-        }
+	static async notify(notification) {
+		if (typeof notification === "string") {
+			notification = {
+				title: "New notification",
+				description: notification,
+			}
+		}
 
-        const notfObj = {
-            duration: typeof notification.duration === "undefined" ? 4 : notification.duration,
-            key: notification.key ?? Date.now(),
-        }
+		const notfObj = {
+			duration:
+				typeof notification.duration === "undefined"
+					? 4
+					: notification.duration,
+			key: notification.key ?? Date.now(),
+			onClose: notification.onClose,
+		}
 
-        if (typeof notification.message === "string") {
-            notification.description = notification.message
-        }
+		if (typeof notification.message === "string") {
+			notification.description = notification.message
+		}
 
-        if (notification.title) {
-            switch (typeof notification.title) {
-                case "function": {
-                    notfObj.message = React.createElement(notification.title)
+		if (notification.title) {
+			switch (typeof notification.title) {
+				case "function": {
+					notfObj.message = React.createElement(notification.title)
 
-                    break
-                }
-                case "object": {
-                    notfObj.message = notification.title
+					break
+				}
+				case "object": {
+					notfObj.message = notification.title
 
-                    break
-                }
-                default: {
-                    notfObj.message = <Translation>
-                        {(t) => t(notification.title)}
-                    </Translation>
+					break
+				}
+				default: {
+					notfObj.message = (
+						<Translation>
+							{(t) => t(notification.title)}
+						</Translation>
+					)
 
-                    break
-                }
-            }
-        }
+					break
+				}
+			}
+		}
 
-        if (notification.description) {
-            switch (typeof notification.description) {
-                case "function": {
-                    notfObj.description = React.createElement(notification.description)
+		if (notification.description) {
+			switch (typeof notification.description) {
+				case "function": {
+					notfObj.description = React.createElement(
+						notification.description,
+					)
 
-                    break
-                }
+					break
+				}
 
-                case "object": {
-                    notfObj.description = notification.description
+				case "object": {
+					notfObj.description = notification.description
 
-                    break
-                }
+					break
+				}
 
-                default: {
-                    notfObj.description = <Translation>
-                        {(t) => t(notification.description)}
-                    </Translation>
+				default: {
+					notfObj.description = (
+						<Translation>
+							{(t) => t(notification.description)}
+						</Translation>
+					)
 
-                    break
-                }
-            }
-        }
+					break
+				}
+			}
+		}
 
-        if (notification.icon) {
-            notfObj.icon = React.isValidElement(notification.icon) ? notification.icon : (createIconRender(notification.icon) ?? <Icons.FiBell />)
-        }
+		if (notification.icon) {
+			notfObj.icon = React.isValidElement(notification.icon)
+				? notification.icon
+				: (createIconRender(notification.icon) ?? <Icons.FiBell />)
+		}
 
-        if (notification.image) {
-            notfObj.description = <>
-                <img src={notification.image} alt="notification-image" style={{ width: "100%" }} />
-            </>
-        }
+		if (notification.image) {
+			notfObj.description = (
+				<>
+					<img
+						src={notification.image}
+						alt="notification-image"
+						style={{ width: "100%" }}
+					/>
+				</>
+			)
+		}
 
-        if (Array.isArray(notification.actions)) {
-            notfObj.btn = (
-                <Space>
-                    {
-                        notification.actions.map((action, index) => {
-                            const handleClick = () => {
-                                if (typeof action.onClick === "function") {
-                                    action.onClick()
-                                }
+		if (Array.isArray(notification.actions)) {
+			notfObj.btn = (
+				<Space>
+					{notification.actions.map((action, index) => {
+						const handleClick = () => {
+							if (typeof action.onClick === "function") {
+								action.onClick()
+							}
 
-                                if (!action.keepOpenOnClick) {
-                                    Notf.destroy(notfObj.key)
-                                }
-                            }
+							if (!action.keepOpenOnClick) {
+								Notf.destroy(notfObj.key)
+							}
+						}
 
-                            return <Button
-                                key={index}
-                                type={action.type ?? "primary"}
-                                onClick={handleClick}
-                            >
-                                {action.label}
-                            </Button>
-                        })
-                    }
-                </Space>
-            )
-        }
+						return (
+							<Button
+								key={index}
+								type={action.type ?? "primary"}
+								onClick={handleClick}
+							>
+								{action.label}
+							</Button>
+						)
+					})}
+				</Space>
+			)
+		}
 
-        if (typeof notification.closable) {
-            notfObj.closable = notification.closable
-        }
+		if (typeof notification.closable) {
+			notfObj.closable = notification.closable
+		}
 
-        if (notification.type === "loading") {
-            notification.type = "open"
-            notfObj.icon = <Icons.LoadingOutlined />
-        }
+		if (notification.type === "loading") {
+			notification.type = "open"
+			notfObj.icon = <Icons.LoadingOutlined />
+		}
 
-        if (typeof Notf[notification.type] !== "function") {
-            notification.type = "info"
-        }
+		if (typeof Notf[notification.type] !== "function") {
+			notification.type = "info"
+		}
 
-        return Notf[notification.type](notfObj)
-    }
+		// fire the ui
+		Notf[notification.type](notfObj)
 
-    static close(key) {
-        Notf.destroy(key)
-    }
+		return notfObj
+	}
+
+	static close(key) {
+		Notf.destroy(key)
+	}
 }
 
 export default NotificationUI

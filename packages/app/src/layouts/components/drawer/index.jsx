@@ -9,6 +9,7 @@ import React, {
 } from "react"
 import classnames from "classnames"
 import { AnimatePresence, motion } from "motion/react"
+import useLayoutInterface from "@hooks/useLayoutInterface"
 
 import Drawer from "./component"
 
@@ -185,7 +186,11 @@ function DrawerController() {
 					newDrawers.push({
 						...instance,
 						element: (
-							<Drawer key={id} ref={drawerRef} {...instance} />
+							<Drawer
+								key={id}
+								ref={drawerRef}
+								{...instance}
+							/>
 						),
 					})
 					newAddresses[id] = newDrawers.length - 1
@@ -194,7 +199,11 @@ function DrawerController() {
 					newDrawers[newAddresses[id]] = {
 						...instance,
 						element: (
-							<Drawer key={id} ref={drawerRef} {...instance} />
+							<Drawer
+								key={id}
+								ref={drawerRef}
+								{...instance}
+							/>
 						),
 					}
 					newRefs[id] = drawerRef
@@ -212,27 +221,10 @@ function DrawerController() {
 		[controller],
 	)
 
-	// Complete interface with open method
-	const interface_ = useMemo(
-		() => ({
-			...controller,
-			open,
-		}),
-		[controller, open],
-	)
-
-	// Setup effects
-	useEffect(() => {
-		if (app.layout) {
-			app.layout["drawer"] = interface_
-		}
-
-		return () => {
-			if (app.layout) {
-				delete app.layout["drawer"]
-			}
-		}
-	}, [interface_])
+	useLayoutInterface("drawer", {
+		...controller,
+		open,
+	})
 
 	useEffect(() => {
 		document.addEventListener("keydown", handleEscKeyPress)
@@ -250,7 +242,7 @@ function DrawerController() {
 	}, [state.maskVisible])
 
 	return (
-		<DrawerContext.Provider value={interface_}>
+		<DrawerContext.Provider value={controller}>
 			<AnimatePresence>
 				{state.maskVisible && (
 					<motion.div

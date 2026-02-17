@@ -50,7 +50,7 @@ const EventCountdown = ({ date, prefix }) => {
 	return (
 		<div className="field">
 			<div className="field-label">
-				<Icons.FiClock />
+				<Icons.Clock />
 				<p>
 					{prefix} {label}
 				</p>
@@ -70,11 +70,11 @@ const EventStartDate = ({ startDate, started }) => (
 	>
 		<div className="field">
 			<div className="field-label">
-				<Icons.FiCalendar />
+				<Icons.Calendar />
 				{startDate.toLocaleString(DateTime.DATE_FULL)}
 			</div>
 			<div className="field-label">
-				<Icons.FiClock />
+				<Icons.CalendarClock />
 				{startDate.toLocaleString(DateTime.TIME_SIMPLE)}
 			</div>
 		</div>
@@ -94,7 +94,10 @@ const EventHeader = ({ pageConfig, event, contrastColor }) => {
 			>
 				{pageConfig.header.displayLogo && (
 					<div className="logo">
-						<img src={pageConfig.header.logoImg} alt="Event Logo" />
+						<img
+							src={pageConfig.header.logoImg}
+							alt="Event Logo"
+						/>
 					</div>
 				)}
 				{pageConfig.header.displayTitle && (
@@ -115,7 +118,10 @@ const EventHeader = ({ pageConfig, event, contrastColor }) => {
 		>
 			{event.announcement.logoImg && (
 				<div className="logo">
-					<img src={event.announcement.logoImg} alt="Event Logo" />
+					<img
+						src={event.announcement.logoImg}
+						alt="Event Logo"
+					/>
 				</div>
 			)}
 			<div className="title">
@@ -229,7 +235,7 @@ const EventPage = (props) => {
 
 						<div className="field">
 							<div className="field-label">
-								<Icons.FiMapPin />
+								<Icons.MapPin />
 								{ProcessString(LocationProcessRegexs)(
 									R_Event.location,
 								)}
@@ -240,7 +246,7 @@ const EventPage = (props) => {
 					{!eventStartedOrEnded && (
 						<div className="card">
 							<Button onClick={handleClickAddToCalendar}>
-								<Icons.FiCalendar /> Add to Calendar
+								<Icons.CalendarPlus /> Add to Calendar
 							</Button>
 						</div>
 					)}
@@ -251,7 +257,7 @@ const EventPage = (props) => {
 								type="primary"
 								onClick={handleClickWatchLiveStream}
 							>
-								<Icons.FiPlay /> Watch Live
+								<Icons.SquarePlay /> Watch Live
 							</Button>
 						</div>
 					)}

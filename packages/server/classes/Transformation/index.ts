@@ -8,7 +8,10 @@ export type TransformationPayloadType = {
 	filePath: string
 	workPath: string
 	handler: string
-	onProgress?: function
+	onProgress?: Function
+	capabilities?: {
+		encoders: Array<string>
+	}
 }
 
 class Transformation {

@@ -4,11 +4,11 @@ import fs from "node:fs"
 import Upload from "@shared-classes/Upload"
 
 export default {
-	useContext: ["cache"],
-	middlewares: ["withAuthentication"],
-	fn: async (req, res) => {
+	useContexts: ["cache"],
+	useMiddlewares: ["withAuthentication"],
+	fn: async (req, res, ctx) => {
 		const workPath = path.resolve(
-			this.default.contexts.cache.constructor.cachePath,
+			ctx.cache.constructor.cachePath,
 			`${req.auth.session.user_id}-${nanoid()}`,
 		)
 

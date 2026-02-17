@@ -9,7 +9,7 @@ export default {
 
 		return await Users.data({
 			user_id: ids.length > 1 ? ids : user_id,
-			from_user_id: req.auth?.session.user_id,
+			from_user_id: req.auth?.user_id,
 			basic: ToBoolean(req.query?.basic),
 		})
 	},

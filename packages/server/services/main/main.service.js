@@ -1,28 +1,79 @@
 import { Server } from "linebridge"
-import DbManager from "@shared-classes/DbManager"
 
-import SharedMiddlewares from "@shared-middlewares"
+import ScyllaDb from "@shared-classes/ScyllaDb"
+import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
+import UserConnections from "@shared-classes/UserConnections"
 
 export default class API extends Server {
 	static refName = "main"
-	static useEngine = "hyper-express-ng"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT || 3000
-	static enableWebsockets = false
+	static listenPort = 3000
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
+
+	static websockets = {
+		enabled: true,
+		path: "/main",
+	}
 
 	middlewares = {
 		...require("@middlewares").default,
-		...SharedMiddlewares,
+		...require("@shared-middlewares").default,
 	}
 
-	events = require("./events")
+	onClientConnected = (ctx = {}) => {
+		try {
+			this.contexts.userConnections.handleConnection(
+				this.contexts.redis.client,
+				{
+					socket_id: ctx.socket_id,
+					user_id: ctx.meta.user_id,
+				},
+			)
+		} catch (error) {
+			console.error(error)
+		}
+	}
+
+	onClientDisconnected = (ctx = {}) => {
+		try {
+			this.contexts.userConnections.handleDisconnection(
+				this.contexts.redis.client,
+				{
+					socket_id: ctx.socket_id,
+					user_id: ctx.meta.user_id,
+				},
+			)
+		} catch (error) {
+			console.error(error)
+		}
+	}
 
 	contexts = {
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
+		redis: RedisClient(),
+		userConnections: new UserConnections(this),
 	}
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+	]
+
 	async onInitialize() {
-		await this.contexts.db.initialize()
+		if (this.nats) {
+			await this.nats.subscribeToGlobalChannel(
+				"connection",
+				this.onClientConnected,
+			)
+			await this.nats.subscribeToGlobalChannel(
+				"disconnection",
+				this.onClientDisconnected,
+			)
+		}
 	}
 }
 

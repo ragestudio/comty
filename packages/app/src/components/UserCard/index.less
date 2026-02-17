@@ -1,433 +1,239 @@
 @import "@styles/vars.less";
 
-html {
-    &.mobile {
-        .userCard {
-            width: 100%;
-            filter: none;
-            box-shadow: none;
-            min-width: 0;
-
-            .avatar {
-                width: 20%;
-                height: fit-content;
-            }
-        }
-    }
-}
-
-._mobile_card {
-    background-color: var(--background-color-accent);
-
-    border-radius: 12px;
-
-    box-shadow: @card-shadow;
-}
-
-._mobile_userCard {
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    height: fit-content;
-
-    gap: 10px;
-
-    &.no-cover {
-        ._mobile_userCard_top {
-            flex-direction: row;
-
-            ._mobile_userCard_top_avatar {
-                padding: 10px;
-            }
-
-            ._mobile_userCard_top_texts {
-                margin-left: 0;
-            }
-        }
-    }
-
-    ._mobile_userCard_top {
-        position: relative;
-
-        display: flex;
-        flex-direction: column;
-
-        width: 100%;
-        height: auto;
-
-        background-color: var(--background-color-accent);
-
-        border-radius: 12px;
-
-        box-shadow: @card-shadow;
-
-        ._mobile_userCard_top_cover {
-            position: relative;
-
-            display: flex;
-            flex-direction: row;
-
-            align-items: center;
-            justify-content: center;
-
-            width: 100%;
-
-            max-height: 25vh;
-
-            z-index: 100;
-
-            .cover {
-                width: 100%;
-                height: 25vh;
-
-                background-size: 100%;
-                background-repeat: no-repeat;
-                background-position: center;
-
-                border-radius: 12px;
-            }
-        }
-
-        ._mobile_userCard_top_avatar_wrapper {
-            position: absolute;
-
-            display: flex;
-            flex-direction: row;
-
-            align-items: flex-end;
-
-            bottom: 0;
-            left: 0;
-
-            padding: 0 10px;
-
-            gap: 20px;
-
-            z-index: 110;
-
-            transform: translateY(75%);
-        }
-
-        ._mobile_userCard_top_avatar {
-            display: flex;
-            flex-direction: row;
-
-            align-items: center;
-            justify-content: center;
-
-            width: 120px;
-            height: 120px;
-
-            max-height: 120px;
-            max-width: 120px;
-
-            border-radius: 12px;
-
-            img {
-                width: 120px;
-                height: 120px;
-
-                object-fit: contain;
-                background-color: black;
-
-                box-shadow: @card-shadow;
-
-                border-radius: 12px;
-            }
-        }
-
-        ._mobile_userCard_top_texts {
-            position: relative;
-
-            display: flex;
-
-            flex-direction: column;
-            justify-content: center;
-
-            margin-left: calc(120px + 10px);
-
-            padding: 10px;
-            padding-left: 15px;
-
-            ._mobile_userCard_top_badges_wrapper {
-                position: absolute;
-                top: 0;
-                right: 0;
-
-                padding: 10px;
-            }
-
-            ._mobile_userCard_top_username {
-                font-family: "Space Grotesk", sans-serif;
-
-                h1 {
-                    position: relative;
-
-                    color: var(--text-color);
-                    margin: 0;
-
-                    #verification_tick {
-                        right: 0;
-                        top: 0;
-
-                        font-size: 0.8rem;
-
-                        color: var(--colorPrimary);
-                        transform: translate(0, -50%);
-                    }
-                }
-
-                margin-bottom: 10px;
-            }
-
-            ._mobile_userCard_top_description {
-                color: var(--text-color);
-
-                p {
-                    margin: 0;
-                }
-
-                // max-height: 30vh;
-
-                // overflow: hidden;
-
-                // p {
-                //     text-overflow: ellipsis;
-                //     overflow: hidden;
-                //     white-space: nowrap;
-                // }
-            }
-        }
-    }
-
-    ._mobile_userCard_actions {
-        display: flex;
-        flex-direction: row;
-
-        gap: 20px;
-
-        padding: 10px;
-    }
-
-    ._mobile_userCard_links {
-        display: flex;
-        flex-direction: row;
-
-        justify-content: flex-start;
-
-        gap: 15px;
-
-        padding: 10px 20px;
-
-        //padding-top: 0;
-
-        .userLink {
-            display: flex;
-            flex-direction: column;
-
-            align-items: center;
-            justify-content: center;
-
-            font-size: 1.3rem;
-
-            color: var(--text-color);
-
-            p {
-                margin: 0;
-            }
-        }
-    }
-}
-
 .userCard {
-    display: flex;
-    flex-direction: column;
+	position: relative;
 
-    background-color: var(--background-color-accent);
-    border-radius: 12px;
-    padding: 20px;
+	display: flex;
+	flex-direction: column;
 
-    height: fit-content;
-    width: 20vw;
-    min-width: 400px;
+	width: 20vw;
+	min-width: 400px;
+	height: fit-content;
 
-    transition: all 0.3s ease-in-out;
+	gap: 20px;
+	padding: 20px;
 
-    outline: 1px solid var(--border-color);
+	border-radius: 12px;
+	border: 3px solid var(--border-color);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span {
-        margin: 0;
-    }
+	transition: all 0.3s ease-in-out;
 
-    .avatar {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
+	overflow: hidden;
 
-        height: 10vh;
-        width: 10vh;
+	&__img-bg {
+		position: absolute;
 
-        align-self: center;
+		top: 0;
+		left: 0;
 
-        img {
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-        }
-    }
+		width: 100%;
+		height: 100%;
 
-    .username {
-        display: flex;
-        flex-direction: row;
+		background-position: center;
+		background-size: cover;
+		background-repeat: no-repeat;
 
-        margin-top: 20px;
+		z-index: 200;
+	}
 
-        .username_text {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
+	&__gradient-bg {
+		position: absolute;
 
-            h1 {
-                display: inline-flex;
-                font-size: 1.5rem;
-                font-weight: 600;
-                font-family: "Space grotesk", sans-serif;
-            }
+		top: 0;
+		left: 0;
 
-            span {
-                font-size: 0.8rem;
-                font-style: italic;
-            }
+		width: 100%;
+		height: 100%;
 
-            svg {
-                fill: var(--app-color);
-                font-size: 0.8rem;
-            }
-        }
+		backdrop-filter: blur(10px);
 
-        .indicators {
-            display: inline-flex;
-            flex-direction: row;
+		opacity: 0.2;
 
-            align-items: center;
+		z-index: 300;
+	}
 
-            width: fit-content;
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span {
+		margin: 0;
+	}
 
-            svg {
-                font-size: 1.4rem;
-            }
-        }
-    }
+	.username {
+		display: flex;
+		flex-direction: row;
 
-    .description {
-        margin-top: 20px;
+		align-items: center;
 
-        max-height: 295px;
+		gap: 10px;
 
-        overflow: hidden;
-        text-overflow: ellipsis;
+		z-index: 400;
 
-        h3 {
-            margin: 0;
-            font-size: 0.8rem;
-            font-weight: normal;
+		.avatar {
+			position: relative;
 
-            height: 100%;
+			display: flex;
+			flex-direction: column;
 
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
+			align-items: center;
+			justify-content: center;
 
-    .badges {
-        justify-content: flex-end;
-    }
+			&__frame {
+				position: absolute;
 
-    .userLinks {
-        display: flex;
-        flex-direction: column;
+				top: 0;
+				left: 0;
 
-        margin-top: 20px;
+				width: 100%;
+				height: 100%;
 
-        gap: 10px;
+				pointer-events: none;
 
-        .userLink {
-            display: flex;
-            flex-direction: row;
+				object-fit: cover;
+			}
 
-            align-items: center;
+			.lazy-load-image-background {
+				height: 70px;
+				width: 70px;
 
-            width: fit-content;
+				min-height: 70px;
+				min-width: 70px;
 
-            gap: 5px;
+				border-radius: 12px;
+				background-color: var(--background-color-primary);
 
-            transition: all 0.3s ease-in-out;
+				overflow: hidden;
 
-            &.clickable {
-                cursor: pointer;
+				img {
+					width: 100%;
+					height: 100%;
 
-                &:hover {
+					object-fit: cover;
+				}
+			}
+		}
 
-                    svg,
-                    p {
-                        color: var(--app-color);
-                    }
-                }
-            }
+		.username_text {
+			position: relative;
 
-            svg {
-                font-size: 1rem;
-                margin-right: 0 !important;
-                color: var(--text-color);
-            }
+			display: flex;
+			flex-direction: column;
 
-            p {
-                font-size: 0.8rem;
-                font-family: "Space grotesk", sans-serif;
-                font-weight: 600;
+			gap: 5px;
 
-                user-select: text;
-            }
-        }
-    }
+			width: 100%;
+
+			h1 {
+				display: inline-flex;
+
+				font-size: 1.5rem;
+				font-weight: 600;
+
+				line-height: 1rem;
+
+				font-family: "Space grotesk", sans-serif;
+			}
+
+			span {
+				font-size: 0.8rem;
+				font-style: italic;
+				line-height: 1rem;
+			}
+
+			#verified {
+				fill: var(--app-color);
+				font-size: 0.8rem;
+			}
+
+			.user-badges {
+				border-radius: 10px;
+				&__badge {
+					width: 0.7rem;
+					height: 0.7rem;
+				}
+			}
+		}
+
+		.indicators {
+			display: inline-flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			width: fit-content;
+
+			svg {
+				font-size: 1.4rem;
+			}
+		}
+	}
+
+	.description {
+		max-height: 295px;
+
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		z-index: 400;
+
+		h3 {
+			margin: 0;
+			font-size: 0.8rem;
+			font-weight: normal;
+
+			height: 100%;
+
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.badges {
+		justify-content: flex-end;
+	}
+
+	.userLinks {
+		display: flex;
+		flex-direction: column;
+
+		z-index: 400;
+
+		gap: 10px;
+	}
 }
 
 .userLinkViewer {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 
-    width: 100%;
-    height: fit-content;
+	width: 100%;
+	height: fit-content;
 
-    padding: 30px 0;
+	padding: 30px 0;
 
-    .userLinkViewer_icon {
-        font-size: 3rem;
-    }
+	.userLinkViewer_icon {
+		font-size: 3rem;
+	}
 
-    .userLinkViewer_value {
-        font-size: 1.5rem;
-        font-family: "DM Mono", monospace;
+	.userLinkViewer_value {
+		font-size: 1.5rem;
+		font-family: "DM Mono", monospace;
 
-        background-color: var(--background-color-accent);
+		background-color: var(--background-color-accent);
 
-        padding: 10px;
+		padding: 10px;
 
-        border-radius: 12px;
+		border-radius: 12px;
 
-        p {
-            margin: 0;
-        }
-    }
+		p {
+			margin: 0;
+		}
+	}
 }

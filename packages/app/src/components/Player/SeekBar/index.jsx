@@ -2,6 +2,8 @@ import React from "react"
 import Slider from "./slider"
 import classnames from "classnames"
 
+import Timings from "@components/Player/Timings"
+
 import seekToTimeLabel from "@utils/seekToTimeLabel"
 
 import "./index.less"
@@ -62,9 +64,11 @@ export default class SeekBar extends React.Component {
 		}
 
 		const seek = app.cores.player.controls.seek()
+		const seekMs = seek * 1000
 		const duration = app.cores.player.controls.duration()
 
 		let percent = 0 // Default to 0
+
 		// Ensure duration is a positive number to prevent division by zero or NaN results
 		if (typeof duration === "number" && duration > 0) {
 			percent = (seek / duration) * 100
@@ -75,6 +79,26 @@ export default class SeekBar extends React.Component {
 		this.setState({
 			sliderTime: Number.isFinite(percent) ? percent : 0,
 		})
+
+		if (this.props.track) {
+			// check if a timing is available
+			if (this.props.track.timings) {
+				const currentTimingIndex = this.props.track.timings.findIndex(
+					(timing) => {
+						return (
+							seekMs >= timing.start_ms && seekMs <= timing.end_ms
+						)
+					},
+				)
+
+				this.setState({
+					currentTimingIndex:
+						currentTimingIndex !== -1
+							? currentTimingIndex
+							: this.props.track.timings.length - 1,
+				})
+			}
+		}
 	}
 
 	updateAll = () => {
@@ -143,6 +167,14 @@ export default class SeekBar extends React.Component {
 				clearInterval(this.interval)
 			}
 		}
+	}
+
+	seekBack = () => {
+		app.cores.player.controls.seek(app.cores.player.controls.seek() - 5)
+	}
+
+	seekForward = () => {
+		app.cores.player.controls.seek(app.cores.player.controls.seek() + 5)
 	}
 
 	componentDidMount = () => {
@@ -216,10 +248,20 @@ export default class SeekBar extends React.Component {
 				</div>
 				{!this.props.streamMode && (
 					<div className="timers">
-						<div>
+						<div onDoubleClick={this.seekBack}>
 							<span>{this.state.timeText}</span>
 						</div>
-						<div>
+
+						{this.props.track && (
+							<Timings
+								track={this.props.track}
+								currentTimingIndex={
+									this.state.currentTimingIndex
+								}
+							/>
+						)}
+
+						<div onDoubleClick={this.seekForward}>
 							<span>{this.state.durationText}</span>
 						</div>
 					</div>

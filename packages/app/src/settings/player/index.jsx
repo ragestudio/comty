@@ -2,7 +2,7 @@ import loadable from "@loadable/component"
 
 export default {
 	id: "player",
-	icon: "PlayCircleOutlined",
+	icon: "SquarePlay",
 	label: "Player",
 	group: "app",
 	onLoad: () => {
@@ -41,7 +41,7 @@ export default {
 		{
 			id: "player.sample_rate",
 			title: "Sample Rate",
-			icon: "MdHearing",
+			icon: "SquareActivity",
 			group: "general",
 			description: "Internal sample rate for audio output",
 			component: "Select",
@@ -79,7 +79,7 @@ export default {
 		{
 			id: "player.compressor.values",
 			title: "Compression",
-			icon: "FiSliders",
+			icon: "AudioWaveform",
 			group: "general",
 			description:
 				"Adjust compression values (Warning: may cause distortion when changing values)",
@@ -104,7 +104,7 @@ export default {
 				{
 					id: "reset",
 					title: "Default",
-					icon: "MdRefresh",
+					icon: "RotateCcw",
 					onClick: async (ctx) => {
 						const values = await app.cores.player
 							.base()
@@ -165,14 +165,14 @@ export default {
 			id: "player.eq",
 			title: "Equalizer",
 			group: "general",
-			icon: "MdGraphicEq",
+			icon: "AudioLines",
 			description: "Enable equalizer for audio output",
 			component: loadable(() => import("./items/player.eq")),
 			extraActions: [
 				{
 					id: "reset",
 					title: "Reset",
-					icon: "MdRefresh",
+					icon: "RotateCcw",
 					onClick: (ctx) => {
 						const values = app.cores.player
 							.base()
@@ -274,7 +274,7 @@ export default {
 		{
 			id: "lyrics:prefer_translation",
 			title: "Translate Lyrics",
-			icon: "MdTranslate",
+			icon: "Languages",
 			group: "general",
 			description:
 				"Prefer translation over original lyrics, if available.",

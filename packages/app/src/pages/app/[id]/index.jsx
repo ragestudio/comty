@@ -11,8 +11,8 @@ import "./index.less"
 const AppPage = (props) => {
 	const { id } = props.params
 
-	useCenteredContainer(false)
-	useTotalWindowHeight(true)
+	// useCenteredContainer(false)
+	// useTotalWindowHeight(true)
 
 	const [loading, setLoading] = React.useState(true)
 	const [appMetadata, setAppMetadata] = React.useState({})
@@ -53,8 +53,24 @@ const AppPage = (props) => {
 		// set to ref
 		extensionRef.current = extension
 
+		handleAppComponentOptions(extension.main.app.component)
 		setLoading(false)
 	}
+
+	const handleAppComponentOptions = React.useCallback((component) => {
+		// if app options not available, avoid handling options
+		if (!app.layout || !component.options) {
+			return null
+		}
+
+		const layoutOptions = component.options.layout
+
+		if (layoutOptions) {
+			if (typeof layoutOptions.centeredContent !== "undefined") {
+				app.layout.toggleCenteredContent(layoutOptions.centeredContent)
+			}
+		}
+	}, [])
 
 	React.useEffect(() => {
 		loadApp()
@@ -65,7 +81,10 @@ const AppPage = (props) => {
 			<div className="custom-app-page-loading">
 				<div className="custom-app-page-loading-icon">
 					{appMetadata.icon && (
-						<Image src={appMetadata.icon} alt={appMetadata.title} />
+						<Image
+							src={appMetadata.icon}
+							alt={appMetadata.title}
+						/>
 					)}
 				</div>
 
@@ -88,6 +107,12 @@ const AppPage = (props) => {
 			</ErrorBoundary>
 		</div>
 	)
+}
+
+AppPage.options = {
+	layout: {
+		maxHeight: true,
+	},
 }
 
 export default AppPage

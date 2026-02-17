@@ -10,6 +10,7 @@ const FollowButton = (props) => {
 				{props.count}
 				{props.self && " Followers"}
 			</div>
+
 			{!props.self && (
 				<Button
 					type="ghost"

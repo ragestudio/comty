@@ -1,8 +1,7 @@
 import { User, Session, Post } from "@db_models"
 
 export default {
-	method: "GET",
-	middlewares: ["withAuthentication", "onlyAdmin"],
+	useMiddlewares: ["withAuthentication", "onlyAdmin"],
 	fn: async (req) => {
 		// get number of users registered,
 		const users = await User.countDocuments()

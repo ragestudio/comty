@@ -72,7 +72,10 @@ const ReleaseEditor = (props) => {
 		return (
 			<div className="music-studio-release-editor-content">
 				{submitError && (
-					<antd.Alert message={submitError.message} type="error" />
+					<antd.Alert
+						message={submitError.message}
+						type="error"
+					/>
 				)}
 				{React.createElement(Tab.render, {
 					data: data,
@@ -96,9 +99,7 @@ const ReleaseEditor = (props) => {
 					<antd.Button
 						type="primary"
 						onClick={submitRelease}
-						icon={
-							isNewRelease ? <Icons.MdSend /> : <Icons.FiSave />
-						}
+						icon={isNewRelease ? <Icons.Send /> : <Icons.Check />}
 						disabled={!canSubmit}
 						loading={submitting}
 					>
@@ -107,7 +108,7 @@ const ReleaseEditor = (props) => {
 
 					{!isNewRelease && (
 						<antd.Button
-							icon={<Icons.IoMdTrash />}
+							icon={<Icons.Trash />}
 							disabled={loading}
 							onClick={handleDelete}
 						>
@@ -117,7 +118,7 @@ const ReleaseEditor = (props) => {
 
 					{!isNewRelease && (
 						<antd.Button
-							icon={<Icons.MdLink />}
+							icon={<Icons.Link2 />}
 							onClick={() =>
 								app.location.push(`/music/list/${data._id}`)
 							}
@@ -135,7 +136,6 @@ const ReleaseEditor = (props) => {
 
 ReleaseEditor.options = {
 	layout: {
-		type: "default",
 		centeredContent: true,
 	},
 }

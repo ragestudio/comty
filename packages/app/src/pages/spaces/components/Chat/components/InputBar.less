@@ -1,0 +1,97 @@
+@button-size: 35px;
+
+.channel-chat__input {
+	position: sticky;
+
+	bottom: 0;
+	left: 0;
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+
+	gap: 10px;
+
+	&__area {
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		width: 100%;
+
+		//gap: 10px;
+		padding: 5px 10px;
+
+		border-radius: 12px;
+
+		textarea {
+			border: 0 !important;
+			outline: 0 !important;
+			box-shadow: none !important;
+			background-color: transparent !important;
+		}
+
+		&__buttons {
+			z-index: 100;
+
+			top: 0;
+			right: 0;
+
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: center;
+
+			height: 100%;
+
+			gap: 5px;
+		}
+	}
+}
+
+.channel-chat__input__area__buttons .uploadButton {
+	width: @button-size;
+	height: @button-size;
+
+	background-color: transparent;
+
+	.ant-upload-list-text {
+		display: none;
+	}
+}
+
+.channel-chat__input__area__buttons .sendButton {
+	border: none;
+	outline: none;
+
+	width: @button-size;
+	height: @button-size;
+
+	min-width: @button-size;
+	min-height: @button-size;
+
+	border-radius: 8px;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	background-color: transparent;
+	color: var(--text-color);
+
+	transition: all 150ms ease-in-out;
+
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+}

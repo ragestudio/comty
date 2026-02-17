@@ -1,60 +1,52 @@
 import { Server } from "linebridge"
+import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import RoomsController from "@classes/RoomsController"
+import InjectedAuth from "@shared-lib/injectedAuth"
+import ScyllaDb from "@shared-classes/ScyllaDb"
 
 import SharedMiddlewares from "@shared-middlewares"
 
+import GroupChatChannelController from "@classes/GroupChatChannelController"
+import DMChatChannelController from "@classes/DMChatChannelController"
+
 class API extends Server {
-    static refName = "chats"
-    static enableWebsockets = true
-    static routesPath = `${__dirname}/routes`
-    static wsRoutesPath = `${__dirname}/routes_ws`
-    static listen_port = process.env.HTTP_LISTEN_PORT ?? 3004
+	static refName = "chats"
+	static listenPort = 3004
+	static routesPath = __dirname + "/routes"
 
-    middlewares = {
-        ...SharedMiddlewares
-    }
+	static useMiddlewares = ["logs"]
+	static bypassCors = true
 
-    contexts = {
-        db: new DbManager(),
-        redis: RedisClient(),
-        rooms: null,
-    }
+	static websockets = {
+		enabled: true,
+		path: "/chats",
+	}
 
-    wsEvents = {
-        "join:room": (socket, data) => {
-            this.contexts.rooms.connectSocketToRoom(socket, data.room)
-        },
-        "leave:room": (socket, data) => {
-            this.contexts.rooms.disconnectSocketFromRoom(socket, data?.room ?? socket.connectedRoom)
-        },
-        "disconnect": (socket) => {
-            try {
-                console.log(`[${socket.id}] disconnected from hub.`)
+	middlewares = {
+		...SharedMiddlewares,
+	}
 
-                if (socket.connectedRoomID) {
-                    this.contexts.rooms.disconnectSocketFromRoom(socket, socket.connectedRoomID)
-                }
-            } catch (error) {
-                console.error(error)
-            }
-        }
-    }
+	contexts = {
+		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
+		redis: RedisClient(),
+		groupChannels: new GroupChatChannelController(this),
+		dmChannels: new DMChatChannelController(this),
+		// TODO: add linebridge cluster worker & datacenter id
+		snowflake: new SnowflakeWorker(0, 1),
+	}
 
-    async onInitialize() {
-        if (!this.engine.ws) {
-            throw new Error(`Engine WS not found!`)
-        }
-        
-        this.contexts.rooms = new RoomsController(this.engine.ws.io)
-        
-        await this.contexts.db.initialize()
-        await this.contexts.redis.initialize()
-    }
+	async onInitialize() {
+		if (!this.engine.ws) {
+			throw new Error(`Websocket not enabled!`)
+		}
 
-    handleWsAuth = require("@shared-lib/handleWsAuth").default
+		await this.contexts.db.initialize()
+		await this.contexts.redis.initialize()
+		await this.contexts.scylla.initialize()
+	}
 }
 
 Boot(API)

@@ -1,20 +1,80 @@
+import Core from "vessel/core"
 import React from "react"
-import { Core, EventBus } from "@ragestudio/vessel"
+
 import ContextMenu from "./components/contextMenu"
-import DefaultContext from "@config/context-menu/default"
-import PostCardContext from "@config/context-menu/post"
 
-export default class ContextMenuCore extends Core {
-	static namespace = "contextMenu"
+function cssPxToInt(str) {
+	return parseInt(str.replace("px", ""))
+}
 
-	contexts = {
-		...DefaultContext,
-		...PostCardContext,
+function estimateMenuDimensions(items) {
+	// filter items that not separators
+	const actionsLength = items.filter((i) => i.type !== "separator").length
+	const sepatatorsLength = items.length - actionsLength
+
+	// calculate sizes
+	const menuWidth = cssPxToInt(app.cores.style.vars["context-menu-width"])
+
+	// sum up height of all items
+	let menuHeight =
+		cssPxToInt(app.cores.style.vars["context-menu-item-height"]) *
+		actionsLength
+
+	// add the separators height (1px)
+	menuHeight += sepatatorsLength
+
+	// add the separators margin
+	menuHeight +=
+		cssPxToInt(app.cores.style.vars["context-menu-separator-margin"]) *
+		2 *
+		sepatatorsLength
+
+	// add the padding of the menu
+	menuHeight += cssPxToInt(app.cores.style.vars["context-menu-padding"]) * 2
+
+	return { menuWidth, menuHeight }
+}
+
+function calculateFitCordinates(event, width, height) {
+	// obtain cord of mouse
+	let x = Math.max(event.clientX, ContextMenuCore.minimunPxToBorder)
+	let y = Math.max(event.clientY, ContextMenuCore.minimunPxToBorder)
+
+	// apply displacementAxisXToMouse
+	x += ContextMenuCore.displacementAxisXToMouse
+
+	// adjust x coordinate if menu would overflow right edge
+	if (x + width + ContextMenuCore.minimunPxToBorder > window.innerWidth) {
+		x = window.innerWidth - width - ContextMenuCore.minimunPxToBorder
 	}
 
-	eventBus = new EventBus()
+	// adjust y coordinate if menu would overflow bottom edge
+	if (y + height + ContextMenuCore.minimunPxToBorder > window.innerHeight) {
+		y = window.innerHeight - height - ContextMenuCore.minimunPxToBorder
+	}
+
+	return { x, y }
+}
+
+export default class ContextMenuCore extends Core {
+	static namespace = "ctx_menu"
+
+	static minimunPxToBorder = 20
+	static displacementAxisXToMouse = 20
+
+	contexts = {}
+
 	isMenuOpen = false
 	fireWhenClosing = null
+
+	public = {
+		close: () => this.close(),
+		registerContext: this.registerContext,
+		handleEvent: this.handleEvent,
+		renderMenu: this.renderMenu,
+		estimateMenuDimensions: estimateMenuDimensions,
+		calculateFitCordinates: calculateFitCordinates,
+	}
 
 	async onInitialize() {
 		if (app.isMobile) {
@@ -22,28 +82,87 @@ export default class ContextMenuCore extends Core {
 			return false
 		}
 
+		let modules = await import.meta.glob(
+			["@/context-menu/*/*.js", "@/context-menu/*/*.jsx"],
+			{
+				eager: true,
+			},
+		)
+
+		modules = Object.values(modules).map((module) => {
+			return module.default
+		})
+
+		for (const module of modules) {
+			for (const [contextName, context] of Object.entries(module)) {
+				this.registerContext(contextName, context)
+			}
+		}
+
 		document.addEventListener("contextmenu", this.handleEvent)
+	}
+
+	registerContext(id, ctx) {
+		this.contexts[id] = ctx
+	}
+
+	renderMenu(items, x, y) {
+		// render menu
+		app.cores.window_mng.render(
+			"context-menu-portal",
+			React.createElement(ContextMenu, {
+				items: items,
+				ctx: {
+					close: this.close,
+				},
+				fireWhenClosing: (fn) => (this.fireWhenClosing = fn),
+			}),
+			{
+				className: "context-menu-wrapper",
+				position: {
+					x: x,
+					y: y,
+				},
+				createOrUpdate: true,
+				closeOnClickOutside: true,
+				onClose: async () => await this.onClose(),
+			},
+		)
+
+		this.isMenuOpen = true
 	}
 
 	handleEvent = async (event) => {
 		event.preventDefault()
 
-		// obtain cord of mouse
-		const x = event.clientX
-		const y = event.clientY
-
 		// get clicked component
-		const component = document.elementFromPoint(x, y)
+		const component = document.elementFromPoint(
+			event.clientX,
+			event.clientY,
+		)
 
-		// check if right-clicked inside a context menu
-		if (
-			component.classList.contains("contextMenu") ||
-			component.closest(".contextMenu")
-		) {
-			return
+		if (!component) {
+			return null
 		}
 
-		// gen items
+		// check if right-clicked inside a context menu
+		if (component?.closest("#context-menu")) {
+			return this.close()
+		}
+
+		// check if right-clicked a item with context-menu attribute
+		if (component.closest("[context-menu]")) {
+			const contextMenuAttr = component
+				.closest("[context-menu]")
+				.getAttribute("context-menu")
+
+			// check if context-menu attribute is "ignore" or "none"
+			if (contextMenuAttr === "ignore" || contextMenuAttr === "none") {
+				return null
+			}
+		}
+
+		// generate items
 		const items = await this.generateItems(component)
 
 		// if no items, abort
@@ -52,22 +171,12 @@ export default class ContextMenuCore extends Core {
 			return false
 		}
 
-		// render menu
-		this.show({
-			cords: { x, y },
-			clickedComponent: component,
-			items: items,
-			fireWhenClosing: (fn) => {
-				this.fireWhenClosing = fn
-			},
-			ctx: {
-				close: this.close,
-			},
-		})
-	}
+		// calculate best estimated position
+		const { menuWidth, menuHeight } = estimateMenuDimensions(items)
+		const { x, y } = calculateFitCordinates(event, menuWidth, menuHeight)
 
-	registerContext = (element, context) => {
-		this.contexts[element] = context
+		// render menu
+		return this.renderMenu(items, x, y)
 	}
 
 	generateItems = async (element) => {
@@ -80,14 +189,10 @@ export default class ContextMenuCore extends Core {
 		// if parent element exists, get context names from attribute
 		if (parentElement) {
 			const contextAttr = parentElement.getAttribute("context-menu") || ""
+
 			contextNames = contextAttr
 				.split(",")
 				.map((context) => context.trim())
-
-			// if context includes "ignore", no show context menu
-			if (contextNames.includes("ignore")) {
-				return null
-			}
 		}
 
 		// if context includes "no-default", no add default context
@@ -176,21 +281,6 @@ export default class ContextMenuCore extends Core {
 		return Array.isArray(contextObject) ? contextObject : []
 	}
 
-	show = async (props) => {
-		app.cores.window_mng.render(
-			"context-menu-portal",
-			React.createElement(ContextMenu, props),
-			{
-				useFrame: false,
-				createOrUpdate: true,
-				closeOnClickOutside: true, // sets default click outside behavior
-				onClose: this.onClose, // triggered when the menu is closing
-			},
-		)
-
-		this.isMenuOpen = true
-	}
-
 	// triggered when the menu is closing
 	onClose = async (delay = 200) => {
 		if (typeof this.fireWhenClosing === "function") {
@@ -205,7 +295,11 @@ export default class ContextMenuCore extends Core {
 	}
 
 	// close the menu
-	close = async () => {
-		app.cores.window_mng.close("context-menu-portal")
+	close = () => {
+		if (!this.isMenuOpen) {
+			return null
+		}
+
+		return app.cores.window_mng.close("context-menu-portal")
 	}
 }

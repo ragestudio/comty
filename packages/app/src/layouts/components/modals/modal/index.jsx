@@ -5,6 +5,7 @@ import classnames from "classnames"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
+import classNames from "classnames"
 
 class Modal extends React.Component {
 	state = {
@@ -55,7 +56,6 @@ class Modal extends React.Component {
 	}
 
 	handleClickOutside = (e) => {
-		console.log(e)
 		// check if event click is outside of content of the modal
 		if (this.contentRef.current.contains(e.target)) {
 			return false
@@ -90,13 +90,18 @@ class Modal extends React.Component {
 					onMouseDown={this.handleClickOutside}
 				/>
 				<div
-					className="app_modal_content"
+					className={classNames("app_modal_content", {
+						"bg-accent": this.props.framed,
+					})}
 					ref={this.contentRef}
 					style={this.props.frameContentStyle}
 				>
 					{this.props.includeCloseButton && (
-						<div className="app_modal_close" onClick={this.close}>
-							<Icons.MdClose />
+						<div
+							className="app_modal_close"
+							onClick={this.close}
+						>
+							<Icons.X />
 						</div>
 					)}
 

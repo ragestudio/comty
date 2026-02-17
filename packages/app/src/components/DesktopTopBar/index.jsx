@@ -1,21 +1,41 @@
 import React from "react"
 import classnames from "classnames"
 import { createIconRender } from "@components/Icons"
-//const { getCurrentWindow } = window.__TAURI__.window
 
 import "./index.less"
 
+const useDocumentTitle = () => {
+	const observer = React.useRef(null)
+	const [title, setTitle] = React.useState(document.title)
+
+	React.useEffect(() => {
+		observer.current = new MutationObserver(() => {
+			setTitle(document.title)
+		})
+
+		observer.current.observe(document.querySelector("title"), {
+			childList: true,
+		})
+
+		return () => {
+			observer.current.disconnect()
+		}
+	}, [])
+
+	return title
+}
+
 const items = [
 	{
-		icon: "IoMdClose",
+		icon: "X",
 		onClick: () => {
-			window.ipcRenderer.send("window:close")
+			window.ipcRenderer.invoke("window:close")
 		},
 	},
 	{
-		icon: "FiMinus",
+		icon: "Minus",
 		onClick: () => {
-			window.ipcRenderer.send("window:minimize")
+			window.ipcRenderer.invoke("window:minimize")
 		},
 	},
 ]
@@ -25,7 +45,7 @@ const DesktopTopBarItem = ({ item }) => {
 
 	return (
 		<div
-			className="app-desktop_topbar_wrapper__items__item"
+			className="app-desktop_topbar_wrapper__content__items__item"
 			onClick={onClick}
 		>
 			{createIconRender(icon)}
@@ -35,6 +55,7 @@ const DesktopTopBarItem = ({ item }) => {
 
 const DesktopTopBar = (props) => {
 	const [hidden, setHidden] = React.useState(false)
+	const title = useDocumentTitle()
 
 	React.useEffect(() => {
 		const handleFullscreenChange = () => {
@@ -44,7 +65,10 @@ const DesktopTopBar = (props) => {
 		document.addEventListener("fullscreenchange", handleFullscreenChange)
 
 		return () => {
-			document.removeEventListener("fullscreenchange", handleFullscreenChange)
+			document.removeEventListener(
+				"fullscreenchange",
+				handleFullscreenChange,
+			)
 		}
 	}, [])
 
@@ -55,13 +79,19 @@ const DesktopTopBar = (props) => {
 			})}
 			data-tauri-drag-region
 		>
-			<div className="app-desktop_topbar_wrapper__items">
-				{items.map((item, index) => (
-					<DesktopTopBarItem
-						key={index}
-						item={item}
-					/>
-				))}
+			<div className="app-desktop_topbar_wrapper__content">
+				<div className="app-desktop_topbar_wrapper__content__title">
+					<span>{title}</span>
+				</div>
+
+				<div className="app-desktop_topbar_wrapper__content__items">
+					{items.map((item, index) => (
+						<DesktopTopBarItem
+							key={index}
+							item={item}
+						/>
+					))}
+				</div>
 			</div>
 		</div>
 	)

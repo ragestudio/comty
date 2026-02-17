@@ -2,7 +2,7 @@ import React from "react"
 import * as antd from "antd"
 import classnames from "classnames"
 
-import ImageViewer from "@components/ImageViewer"
+import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
 import MenuItemsBase from "./menuItems"
@@ -37,7 +37,7 @@ const Track = React.memo((props) => {
 		if (props.track.liked) {
 			items[0] = {
 				key: "unlike",
-				icon: <Icons.MdFavorite />,
+				icon: <Icons.HeartPlus />,
 				label: "Unlike",
 			}
 		}
@@ -50,7 +50,7 @@ const Track = React.memo((props) => {
 
 				items.push({
 					key: "remove_from_playlist",
-					icon: <Icons.MdPlaylistRemove />,
+					icon: <Icons.ListX />,
 					label: "Remove from playlist",
 				})
 			}
@@ -73,7 +73,7 @@ const Track = React.memo((props) => {
 		} else {
 			app.cores.player.playback.toggle()
 		}
-	}, [props.isCurrent])
+	}, [props.track, props.isCurrent])
 
 	const handleOnClickItem = React.useCallback(() => {
 		if (props.onClick) {
@@ -117,7 +117,7 @@ const Track = React.memo((props) => {
 	return (
 		<div
 			id={props.track._id}
-			className={classnames("music-track", {
+			className={classnames("music-track bg-accent", {
 				["current"]: props.isCurrent,
 				["playing"]: props.isPlaying,
 			})}
@@ -140,9 +140,9 @@ const Track = React.memo((props) => {
 							shape="circle"
 							icon={
 								props.isPlaying ? (
-									<Icons.MdPause />
+									<Icons.Pause />
 								) : (
-									<Icons.MdPlayArrow />
+									<Icons.Play />
 								)
 							}
 							onClick={handleClickPlayBtn}
@@ -150,10 +150,11 @@ const Track = React.memo((props) => {
 					</div>
 				)}
 
-				<div className="music-track_cover" onClick={handleOnClickItem}>
-					<ImageViewer
-						src={props.track.cover ?? props.track.thumbnail}
-					/>
+				<div
+					className="music-track_cover"
+					onClick={handleOnClickItem}
+				>
+					<Image src={props.track.cover ?? props.track.thumbnail} />
 				</div>
 
 				<div
@@ -187,7 +188,7 @@ const Track = React.memo((props) => {
 			<div className="music-track_actions">
 				{trackDuration && (
 					<div className="music-track_play_duration">
-						<Icons.FiClock />
+						<Icons.Clock />
 						{secondsToIsoTime(trackDuration)}
 					</div>
 				)}
@@ -202,7 +203,7 @@ const Track = React.memo((props) => {
 					trigger={["click"]}
 				>
 					<div className="music-track_more-menu">
-						<Icons.IoMdMore />
+						<Icons.EllipsisVertical />
 					</div>
 				</antd.Dropdown>
 			</div>

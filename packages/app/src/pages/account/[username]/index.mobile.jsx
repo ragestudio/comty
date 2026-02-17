@@ -6,9 +6,8 @@ import { Translation } from "react-i18next"
 
 import Skeleton from "@components/Skeleton"
 import { PagePanelWithNavMenu } from "@components/PagePanels"
-import { MobileUserCard } from "@components/UserCard"
+//import { MobileUserCard } from "@components/UserCard"
 
-import SessionModel from "@models/session"
 import UserModel from "@models/user"
 import FollowsModel from "@models/follows"
 
@@ -19,195 +18,190 @@ import FollowersTab from "./tabs/followers"
 import "./index.mobile.less"
 
 const Tabs = [
-    {
-        key: "posts",
-        icon: "FiBookOpen",
-        label: <Translation>
-            {t => t("Posts")}
-        </Translation>,
-        component: PostsTab,
-    },
-    {
-        key: "followers",
-        icon: "FiUsers",
-        label: <Translation>
-            {t => t("Followers")}
-        </Translation>,
-        component: FollowersTab,
-    },
-    {
-        key: "details",
-        icon: "FiInfo",
-        label: <Translation>
-            {t => t("Details")}
-        </Translation>,
-        component: DetailsTab,
-    }
+	{
+		key: "posts",
+		icon: "Hash",
+		label: <Translation>{(t) => t("Posts")}</Translation>,
+		component: PostsTab,
+	},
+	{
+		key: "followers",
+		icon: "Users",
+		label: <Translation>{(t) => t("Followers")}</Translation>,
+		component: FollowersTab,
+	},
+	{
+		key: "details",
+		icon: "Info",
+		label: <Translation>{(t) => t("Details")}</Translation>,
+		component: DetailsTab,
+	},
 ]
 
-export default class Account extends React.Component {
-    state = {
-        requestedUser: null,
+const Account = ({ params }) => {
+	const [requestedUser, setRequestedUser] = React.useState(null)
+	const [user, setUser] = React.useState(null)
+	const [isSelf, setIsSelf] = React.useState(false)
+	const [followers, setFollowers] = React.useState([])
+	const [isFollowed, setIsFollowed] = React.useState(false)
+	const [tabActiveKey, setTabActiveKey] = React.useState("posts")
+	const [isNotExistent, setIsNotExistent] = React.useState(false)
 
-        user: null,
-        followers: [],
+	const loadUserData = async () => {
+		const requestedUsername = params.username ?? app.userData.username
 
-        isSelf: false,
-        isFollowed: false,
+		let isSelfUser = false
+		let userData = null
+		let isFollowedData = false
+		let followersData = []
 
-        tabActiveKey: "posts",
+		if (requestedUsername != null) {
+			if (app.userData.username === requestedUsername) {
+				isSelfUser = true
+			}
 
-        isNotExistent: false,
-    }
+			userData = await UserModel.data({
+				username: requestedUsername,
+			}).catch((error) => {
+				console.error(error)
+				return false
+			})
 
-    componentDidMount = async () => {
-        this.loadUser()
-    }
+			if (!userData) {
+				setIsNotExistent(true)
+				return false
+			}
 
-    toggleFollow = async () => {
-        if (this.state.isFollowed) {
-            const accept = await new Promise((resolve, reject) => {
-                antd.Modal.confirm({
-                    title: <Translation>
-                        {t => t("Confirm")}
-                    </Translation>,
-                    content: <Translation>
-                        {t => t("Are you sure you want to unfollow this user?")}
-                    </Translation>,
-                    okText: <Translation>
-                        {t => t("Yes")}
-                    </Translation>,
-                    cancelText: <Translation>
-                        {t => t("No")}
-                    </Translation>,
-                    onOk: () => {
-                        resolve(true)
-                    },
-                    onCancel: () => {
-                        resolve(false)
-                    }
-                })
-            })
+			console.log(`Loaded User [${userData.username}] :`, userData)
 
-            if (!accept) {
-                return false
-            }
-        }
+			if (!isSelfUser) {
+				const followedResult = await FollowsModel.imFollowing(
+					userData._id,
+				).catch(() => false)
 
-        const result = await FollowsModel.toggleFollow({
-            username: this.state.requestedUser,
-        }).catch((error) => {
-            console.error(error)
-            antd.message.error(error.message)
+				if (followedResult) {
+					isFollowedData = followedResult.isFollowed
+				}
+			}
 
-            return false
-        })
+			const followersResult = await FollowsModel.getFollowers(
+				userData._id,
+			).catch(() => false)
 
-        await this.setState({
-            isFollowed: result.following,
-            followers: result.followers,
-        })
-    }
+			if (followersResult) {
+				followersData = followersResult
+			}
+		}
 
-    loadUser = async () => {
-        const token = await SessionModel.getDecodedToken()
-        const requestedUser = this.props.username ?? token?.username
+		setRequestedUser(requestedUsername)
+		setUser(userData)
+		setIsSelf(isSelfUser)
+		setIsFollowed(isFollowedData)
+		setFollowers(followersData)
+	}
 
-        let isSelf = false
-        let user = null
-        let isFollowed = false
-        let followers = []
+	const toggleFollow = async () => {
+		if (isFollowed) {
+			const accept = await new Promise((resolve) => {
+				antd.Modal.confirm({
+					title: <Translation>{(t) => t("Confirm")}</Translation>,
+					content: (
+						<Translation>
+							{(t) =>
+								t(
+									"Are you sure you want to unfollow this user?",
+								)
+							}
+						</Translation>
+					),
+					okText: <Translation>{(t) => t("Yes")}</Translation>,
+					cancelText: <Translation>{(t) => t("No")}</Translation>,
+					onOk: () => {
+						resolve(true)
+					},
+					onCancel: () => {
+						resolve(false)
+					},
+				})
+			})
 
-        if (requestedUser != null) {
-            if (token.username === requestedUser) {
-                isSelf = true
-            }
+			if (!accept) {
+				return false
+			}
+		}
 
-            user = await UserModel.data({
-                username: requestedUser
-            }).catch((error) => {
-                console.error(error)
+		const result = await FollowsModel.toggleFollow({
+			username: requestedUser,
+		}).catch((error) => {
+			console.error(error)
+			antd.message.error(error.message)
+			return false
+		})
 
-                return false
-            })
+		setIsFollowed(result.following)
+		setFollowers(result.followers)
+	}
 
-            if (!user) {
-                this.setState({
-                    isNotExistent: true,
-                })
+	React.useEffect(() => {
+		loadUserData()
+	}, [params.username])
 
-                return false
-            }
+	if (isNotExistent) {
+		return (
+			<antd.Result
+				status="404"
+				title="This user does not exist, yet..."
+			></antd.Result>
+		)
+	}
 
-            console.log(`Loaded User [${user.username}] >`, user)
+	if (!user) {
+		return <Skeleton />
+	}
 
-            if (!isSelf) {
-                const followedResult = await FollowsModel.imFollowing(user._id).catch(() => false)
+	const state = {
+		requestedUser,
+		user,
+		followers,
+		isSelf,
+		isFollowed,
+		tabActiveKey,
+		isNotExistent,
+	}
 
-                if (followedResult) {
-                    isFollowed = followedResult.isFollowed
-                }
-            }
+	return (
+		<div className={classnames("_mobile_account-profile")}>
+			{/* <MobileUserCard
+				user={user}
+				isSelf={isSelf}
+				isFollowed={isFollowed}
+				followers={followers}
+				onClickFollow={toggleFollow}
+			/>*/}
 
-            const followersResult = await FollowsModel.getFollowers(user._id).catch(() => false)
-
-            if (followersResult) {
-                followers = followersResult
-            }
-        }
-
-        await this.setState({
-            isSelf,
-            user,
-            requestedUser,
-            isFollowed,
-            followers,
-        })
-    }
-
-    render() {
-        const { user } = this.state
-
-        if (this.state.isNotExistent) {
-            return <antd.Result
-                status="404"
-                title="This user does not exist, yet..."
-            >
-
-            </antd.Result>
-        }
-
-        if (!user) {
-            return <Skeleton />
-        }
-
-        return <div
-            className={classnames(
-                "_mobile_account-profile",
-            )}
-        >
-            <MobileUserCard
-                user={user}
-                isSelf={this.state.isSelf}
-                isFollowed={this.state.isFollowed}
-                followers={this.state.followers}
-                onClickFollow={this.toggleFollow}
-            />
-
-            <PagePanelWithNavMenu
-                tabs={Tabs}
-                useSetQueryType
-                transition
-                tabProps={{
-                    state: this.state,
-                }}
-                onTabChange={() => {
-                    app.layout.scrollTo({
-                        top: 0,
-                    })
-                }}
-                no_top_padding
-            />
-        </div>
-    }
+			<PagePanelWithNavMenu
+				tabs={Tabs}
+				useSetQueryType
+				transition
+				tabProps={{
+					state: state,
+				}}
+				onTabChange={() => {
+					app.layout.scrollTo({
+						top: 0,
+					})
+				}}
+				no_top_padding
+			/>
+		</div>
+	)
 }
+
+Account.options = {
+	layout: {
+		type: "default",
+		centeredContent: false,
+	},
+}
+
+export default Account

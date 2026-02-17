@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-import { User, OperationLog, PasswordRecover } from "@db_models"
+import { User, OperationLog, PasswordRecover, PasswordHash } from "@db_models"
 import Account from "@classes/account"
 import AuthToken from "@shared-classes/AuthToken"
 
@@ -29,11 +29,13 @@ export default async (
 			await AuthToken.basicDecode(verificationToken)
 	}
 
-	let user = await User.findById(
-		user_id || verificationTokenDecoded?.user_id,
-	).select("+password")
+	let user = await User.findById(user_id || verificationTokenDecoded?.user_id)
 
-	if (!user) {
+	let passwordHash = await PasswordHash.findOne({
+		user_id: user_id || verificationTokenDecoded?.user_id,
+	})
+
+	if (!user || !passwordHash) {
 		throw new OperationError(404, "User not found")
 	}
 
@@ -68,12 +70,12 @@ export default async (
 
 	await Account.passwordMeetPolicy(new_password)
 
-	user.password = bcrypt.hashSync(
+	passwordHash.hash = bcrypt.hashSync(
 		new_password,
 		parseInt(process.env.BCRYPT_ROUNDS ?? 3),
 	)
 
-	await user.save()
+	await passwordHash.save()
 
 	const operation = {
 		type: "password:changed",

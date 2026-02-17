@@ -87,7 +87,7 @@ export default (props) => {
 	}, [render])
 
 	const heightValue = Number(
-		app.cores.style.getDefaultVar("top-bar-height").replace("px", ""),
+		app.cores.style.vars["top-bar-height"].replace("px", ""),
 	)
 
 	return (
@@ -115,7 +115,7 @@ export default (props) => {
 				>
 					<div
 						className={classnames(
-							"top-bar",
+							"top-bar bg-accent",
 							render?.options?.className,
 						)}
 					>

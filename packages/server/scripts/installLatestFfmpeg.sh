@@ -32,7 +32,7 @@ if [[ "$OS" == "unsupported" ]] || [[ "$ARCH" == "unsupported" ]]; then
     exit 1
 fi
 
-INSTALL_DIR="$HOME/.local/bin"
+INSTALL_DIR="/usr/local/bin"
 TEMP_DIR="/tmp/ffmpegdl"
 
 if [[ -d "$TEMP_DIR" ]]; then

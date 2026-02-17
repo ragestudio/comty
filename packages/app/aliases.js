@@ -2,6 +2,7 @@ import path from "path"
 
 export default {
 	"@": path.join(__dirname, "src"),
+	"@ui": path.join(__dirname, "src/ui"),
 	"@config": path.join(__dirname, "config"),
 	"@cores": path.join(__dirname, "src/cores"),
 	"@pages": path.join(__dirname, "src/pages"),
@@ -15,4 +16,5 @@ export default {
 	"@models": path.join(__dirname, "../../", "comty.js/src/models"),
 	"comty.js": path.join(__dirname, "../../", "comty.js", "src"),
 	"@ragestudio/vessel": path.join(__dirname, "../../", "vessel", "src"),
+	vessel: path.join(__dirname, "../../", "vessel", "src"),
 }

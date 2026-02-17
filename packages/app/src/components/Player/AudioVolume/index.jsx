@@ -1,25 +1,37 @@
-import React from "react"
-import * as antd from "antd"
+import Slider from "@ui/Slider"
 
 import "./index.less"
 
-export default (props) => {
+const AudioVolume = (props) => {
+	const lastUpdateTime = React.useRef(null)
+
 	return (
 		<div className="player-volume_slider">
-			<antd.Slider
+			<Slider
 				min={0}
 				max={1}
 				step={0.01}
 				value={props.volume}
-				onChangeComplete={props.onChange}
-				defaultValue={props.defaultValue}
-				tooltip={{
-					formatter: (value) => {
-						return `${Math.round(value * 100)}%`
-					},
+				onChangeComplete={(value) => {
+					props.onChange(value)
 				}}
-				vertical
+				onChange={(value) => {
+					if (
+						lastUpdateTime.current &&
+						performance.now() - lastUpdateTime.current < 150
+					) {
+						return
+					}
+					props.onChange(value)
+					lastUpdateTime.current = performance.now()
+				}}
+				defaultValue={props.defaultValue}
+				valueFormat={(value) => {
+					return `${Math.round(value * 100)}%`
+				}}
 			/>
 		</div>
 	)
 }
+
+export default AudioVolume

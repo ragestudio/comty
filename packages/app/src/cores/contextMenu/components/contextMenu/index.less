@@ -1,88 +1,114 @@
 @import "@styles/vars.less";
 
 .context-menu-wrapper {
-    position: fixed;
-    z-index: 100000;
-
-    top: 0;
-    left: 0;
-
-    transition: all 150ms ease-in-out;
+	transition: all 150ms ease-in-out;
 }
 
 .context-menu {
-    position: relative;
+	position: relative;
 
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    width: 230px;
-    height: fit-content;
+	width: @context-menu-width;
+	min-width: @context-menu-width;
+	max-width: @context-menu-width;
 
-    background-color: var(--background-color-primary);
-    border: 1px solid var(--border-color);
+	height: fit-content;
 
-    border-radius: 12px;
+	background-color: var(--background-color-primary);
+	outline: 1px solid var(--border-color);
 
-    padding: 4px;
+	border-radius: 12px;
 
-    font-weight: 450;
-    font-family: var(--fontFamily);
-    font-size: 0.8rem;
-    color: var(--text-color);
+	padding: @context-menu-padding;
 
-    box-shadow: @card-shadow;
+	font-weight: 450;
+	font-family: var(--fontFamily);
+	font-size: 0.8rem;
+	color: var(--text-color);
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    span {
-        margin: 0;
-        word-break: break-all;
-    }
+	box-shadow: @card-shadow;
 
-    .item {
-        position: relative;
-        display: inline-flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	span {
+		margin: 0;
+		word-break: break-all;
+	}
 
-        padding: 7px 7px 7px 10px;
+	.item {
+		position: relative;
 
-        transition: all 50ms ease-in-out;
+		display: inline-flex;
+		flex-direction: column;
 
-        border-radius: 8px;
+		width: 100%;
 
-        overflow: hidden;
+		//height: @context-menu-item-height;
+		min-height: @context-menu-item-height;
+		//max-height: @context-menu-item-height;
 
-        &:hover {
-            background-color: var(--background-color-accent);
-            padding-left: 18px;
-        }
+		padding: 7px 7px 7px 10px;
 
-        &:active {
-            background-color: var(--background-color-primary-2);
-            transform: scale(0.95);
-        }
-    }
+		border-radius: 8px;
 
-    .context-menu-separator {
-        position: relative;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
+		transition: all 50ms ease-in-out;
+		overflow: hidden;
 
-        width: 100%;
-        height: 1px;
+		&__line {
+			display: inline-flex;
+			flex-direction: row;
 
-        margin: 5px 0;
+			align-items: center;
+			justify-content: space-between;
+		}
 
-        background-color: var(--border-color);
-    }
+		&:hover:not(.no_effect) {
+			background-color: var(--background-color-accent);
+			padding-left: 18px;
+		}
+
+		&:active:not(.no_effect) {
+			background-color: var(--background-color-primary-2);
+			transform: scale(0.95);
+		}
+
+		&.disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		&.danger {
+			.item__line {
+				color: var(--danger-color);
+
+				&__icon {
+					color: var(--danger-color);
+				}
+			}
+		}
+	}
+
+	.context-menu-separator {
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		width: 100%;
+		height: 1px;
+
+		margin: @context-menu-separator-margin 0;
+
+		background-color: var(--border-color);
+	}
 }

@@ -1,22 +1,16 @@
-.saveButton {
-    transition: all 150ms ease-in-out;
+.save-button {
+	transition: all 150ms ease-in-out;
 
-    background-color: transparent!important;
-    border: 0!important;
-    box-shadow: none!important;
+	&.active {
+		color: var(--colorPrimary);
 
-    &.active {
-        color: var(--colorPrimary);
+		svg {
+			color: var(--colorPrimary);
+		}
+	}
 
-        svg {
-            color: var(--colorPrimary);
-        }
-    }
-
-    svg {
-        width: 1rem;
-        height: 1rem;
-
-        transition: all 150ms ease-in-out;
-    }
+	svg {
+		width: 1rem;
+		height: 1rem;
+	}
 }

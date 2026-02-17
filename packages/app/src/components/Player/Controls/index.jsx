@@ -1,5 +1,7 @@
 import React from "react"
-import * as antd from "antd"
+import PropTypes from "prop-types"
+import Button from "@ui/Button"
+import Popover from "@ui/Popover"
 
 import UseAnimations from "react-useanimations"
 import LoadingAnimation from "react-useanimations/lib/loading"
@@ -49,7 +51,7 @@ const EventsHandlers = {
 const Controls = (props) => {
 	const [trackManifest, setTrackManifest] = React.useState({})
 
-	const onPlayerStateChange = React.useCallback((state) => {
+	const onPlayerStateChange = React.useCallback(() => {
 		const track = app.cores.player.track()
 
 		if (track) {
@@ -70,27 +72,25 @@ const Controls = (props) => {
 	return (
 		<div className={props.className ?? "player-controls"}>
 			<AudioPlayerChangeModeButton disabled={props.streamMode} />
-			<antd.Button
+			<Button
 				type="ghost"
-				shape="round"
-				icon={<Icons.FiChevronLeft />}
+				icon={<Icons.ChevronLeft />}
 				onClick={() => handleAction("previous")}
 				disabled={props.streamMode}
 			/>
-			<antd.Button
+			<Button
+				className="playButton"
 				type="primary"
-				shape="circle"
 				icon={
 					props.streamMode ? (
-						<Icons.MdStop />
+						<Icons.Square />
 					) : playerState.playback_status === "playing" ? (
-						<Icons.MdPause />
+						<Icons.Pause />
 					) : (
-						<Icons.MdPlayArrow />
+						<Icons.Play />
 					)
 				}
 				onClick={() => handleAction("playback")}
-				className="playButton"
 			>
 				{playerState.loading && (
 					<div className="loadCircle">
@@ -100,33 +100,33 @@ const Controls = (props) => {
 						/>
 					</div>
 				)}
-			</antd.Button>
-			<antd.Button
+			</Button>
+			<Button
 				type="ghost"
-				shape="round"
-				icon={<Icons.FiChevronRight />}
+				icon={<Icons.ChevronRight />}
 				onClick={() => handleAction("next")}
 				disabled={props.streamMode}
 			/>
 			{!app.isMobile && (
-				<antd.Popover
+				<Popover
+					trigger="hover"
 					content={React.createElement(AudioVolume, {
 						onChange: (value) => handleAction("volume", value),
 						defaultValue: playerState.volume,
 					})}
-					trigger="hover"
 				>
-					<button
+					<Button
+						type="ghost"
 						className="muteButton"
 						onClick={() => handleAction("mute")}
 					>
 						{playerState.muted ? (
-							<Icons.FiVolumeX />
+							<Icons.VolumeX />
 						) : (
-							<Icons.FiVolume2 />
+							<Icons.Volume2 />
 						)}
-					</button>
-				</antd.Popover>
+					</Button>
+				</Popover>
 			)}
 
 			{app.isMobile && (
@@ -138,6 +138,16 @@ const Controls = (props) => {
 			)}
 		</div>
 	)
+}
+
+Controls.propTypes = {
+	className: PropTypes.string,
+	streamMode: PropTypes.bool,
+}
+
+Controls.defaultProps = {
+	className: null,
+	streamMode: false,
 }
 
 export default Controls

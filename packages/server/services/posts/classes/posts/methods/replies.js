@@ -8,6 +8,10 @@ export default async (payload = {}) => {
 		throw new OperationError(400, "Post ID is required")
 	}
 
+	const total = await Post.countDocuments({
+		reply_to: post_id,
+	})
+
 	let posts = await Post.find({
 		reply_to: post_id,
 	})
@@ -20,5 +24,9 @@ export default async (payload = {}) => {
 		for_user_id,
 	})
 
-	return posts
+	return {
+		items: posts,
+		total_items: total,
+		has_more: total > limit * page + 1,
+	}
 }

@@ -1,0 +1,159 @@
+@wrapper_padding: 30px;
+@previews_padding: 10px;
+@previews_item_size: 100px;
+
+.lightbox {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+
+	height: 100vh;
+	height: 100dvh;
+	width: 100vw;
+
+	padding: @wrapper_padding;
+	gap: 30px;
+
+	backdrop-filter: blur(4px);
+	background-color: rgba(var(--bg_color_1), 0.9);
+
+	&.focus-mode {
+		.lightbox__content {
+			padding-bottom: @wrapper_padding;
+		}
+
+		.lightbox__previews {
+			opacity: 0;
+		}
+	}
+
+	&__trigger {
+		position: absolute;
+		background-color: red;
+
+		z-index: 850;
+
+		width: 100%;
+		height: 100%;
+	}
+
+	&__header {
+		position: absolute;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: flex-end;
+
+		z-index: 1000;
+
+		top: 0;
+		left: 0;
+
+		width: 100%;
+
+		padding: 20px;
+	}
+
+	&__content {
+		position: absolute;
+
+		z-index: 800;
+
+		top: 0;
+
+		width: 100%;
+		height: 100%;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		padding: 20px;
+		padding-bottom: calc(
+			@wrapper_padding * 2 + @previews_padding * 2 + @previews_item_size
+		);
+
+		transition: all 150ms ease-in-out;
+
+		&__media {
+			position: relative;
+
+			max-width: 100%;
+			max-height: 100%;
+
+			width: auto;
+			height: auto;
+
+			object-fit: contain;
+			border-radius: 12px;
+
+			transition:
+				opacity 0.3s ease,
+				transform 0.15s ease;
+
+			transform-origin: center center;
+			user-select: none;
+			will-change: transform;
+
+			&.dragging {
+				cursor: grabbing;
+				transition: none;
+			}
+		}
+	}
+
+	&__previews {
+		position: absolute;
+
+		z-index: 900;
+
+		bottom: @wrapper_padding;
+
+		display: flex;
+		flex-direction: row;
+
+		margin: 0 auto;
+		padding: @previews_padding;
+
+		gap: 10px;
+
+		background-color: var(--background-color-accent);
+
+		border: 3px solid var(--border-color);
+		border-radius: 12px;
+
+		transition: all 150ms ease-in-out;
+
+		&__item {
+			position: relative;
+
+			width: @previews_item_size;
+			height: @previews_item_size;
+
+			overflow: hidden;
+
+			border-radius: 12px;
+
+			transition: all 150ms ease-in-out;
+			cursor: pointer;
+
+			&.active {
+				outline: 3px solid var(--colorPrimary);
+			}
+
+			img {
+				width: 100%;
+				height: 100%;
+
+				object-fit: cover;
+			}
+		}
+	}
+}

@@ -1,0 +1,166 @@
+@import "@styles/vars.less";
+
+.channel-video-page {
+	display: flex;
+
+	flex-direction: column;
+
+	width: 100%;
+	height: 100%;
+
+	padding: 10px;
+
+	overflow: hidden;
+
+	&.focused {
+		.channel-video-page__content {
+			flex: 1;
+			min-height: 0;
+		}
+	}
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+
+		padding: 0 20px;
+		gap: 20px;
+
+		&__nav_indicator {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			width: fit-content;
+
+			gap: 10px;
+			padding: 10px;
+
+			border-radius: 12px;
+			background-color: var(--background-color-accent);
+			font-size: 1rem;
+
+			svg {
+				font-size: 1.5rem;
+			}
+		}
+	}
+
+	&__content {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+.video-consumer {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+	background-color: var(--background-color-accent);
+	border: 2px solid var(--border-color);
+	box-shadow: @card-shadow;
+	transition: all 150ms ease-in-out;
+	overflow: hidden;
+	min-height: 120px;
+
+	&.started {
+		.video-consumer__overlay {
+			opacity: 0;
+		}
+
+		video {
+			opacity: 1;
+		}
+	}
+
+	&:hover {
+		.video-consumer__overlay {
+			opacity: 1;
+		}
+	}
+
+	&.speaking {
+		border-color: var(--colorPrimary);
+		border-width: 3px;
+		box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+	}
+
+	&__overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		padding: 10px;
+		z-index: 100;
+		transition: all 150ms ease-in-out;
+		background: linear-gradient(
+			to bottom,
+			rgba(0, 0, 0, 0.3) 0%,
+			rgba(0, 0, 0, 0) 30%,
+			rgba(0, 0, 0, 0) 70%,
+			rgba(0, 0, 0, 0.3) 100%
+		);
+		pointer-events: none;
+
+		* {
+			pointer-events: auto;
+		}
+
+		&__start {
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.5);
+			pointer-events: auto;
+		}
+
+		&__controls {
+			position: absolute;
+			bottom: 0;
+			right: 0;
+			display: flex;
+			flex-direction: row;
+			gap: 10px;
+			padding: 10px;
+			pointer-events: auto;
+		}
+
+		&__user {
+			display: flex;
+			align-items: center;
+			width: fit-content;
+			padding: 6px 10px;
+			border-radius: 12px;
+			gap: 10px;
+			background-color: var(--background-color-accent);
+			box-shadow: @card-shadow;
+			pointer-events: auto;
+		}
+	}
+
+	video {
+		opacity: 0;
+		transition: opacity 150ms ease-in-out;
+	}
+
+	video {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		background-color: var(--background-color-primary);
+		border-radius: inherit;
+	}
+}

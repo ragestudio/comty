@@ -27,7 +27,7 @@ const extraMenuItems = [
 					color: "#f72585",
 				}}
 			>
-				{createIconRender("IoMdHeart")}
+				{createIconRender("HandCoins")}
 				<span>Support us</span>
 			</div>
 		),
@@ -36,7 +36,7 @@ const extraMenuItems = [
 		key: "logout",
 		label: (
 			<div className="flex-row gap-10">
-				{createIconRender("MdOutlineLogout")}
+				{createIconRender("Logout")}
 				<span>Logout</span>
 			</div>
 		),
@@ -54,13 +54,16 @@ const menuEvents = {
 }
 
 const generateMenuItems = () => {
-	return settings.map((entry, index) => {
+	const items = settings.map((entry, index) => {
 		const children = entry.groupModule.map((item) => {
 			return {
 				key: item.id,
 				type: "item",
 				label: (
-					<div {...item.props} className="menu-item-content">
+					<div
+						{...item.props}
+						className="menu-item-content"
+					>
 						{createIconRender(item.icon ?? "Settings")}
 						{item.label}
 					</div>
@@ -100,9 +103,21 @@ const generateMenuItems = () => {
 				),
 		}
 	})
+
+	const keys = Object.keys(menuGroupsDecorators)
+
+	// sort by keys
+	items.sort((a, b) => {
+		const aIndex = keys.indexOf(a.key)
+		const bIndex = keys.indexOf(b.key)
+
+		return aIndex - bIndex
+	})
+
+	return items
 }
 
-export default () => {
+const SettingsPage = () => {
 	const [config, setConfig, loading] = useUserRemoteConfig()
 	const [activeKey, setActiveKey] = useUrlQueryActiveKey({
 		defaultKey: "general",
@@ -163,7 +178,10 @@ export default () => {
 
 			{loading && <antd.Skeleton active />}
 
-			<PageTransition className="settings_content" key={activeKey}>
+			<PageTransition
+				className="settings_content"
+				key={activeKey}
+			>
 				{!loading && (
 					<SettingTab
 						baseConfig={config}
@@ -176,3 +194,11 @@ export default () => {
 		</div>
 	)
 }
+
+SettingsPage.options = {
+	layout: {
+		maxHeight: true,
+	},
+}
+
+export default SettingsPage

@@ -18,6 +18,9 @@ export type FileHandlePayload = {
 	useCompression?: boolean
 	s3Provider?: string
 	onProgress?: Function
+	capabilities?: {
+		encoders: Array<string>
+	}
 }
 
 export type S3UploadPayload = {
@@ -74,6 +77,7 @@ export default class Upload {
 					workPath: payload.workPath,
 					onProgress: payload.onProgress,
 					handler: transformation,
+					capabilities: payload.capabilities,
 				})
 
 				// if is a file, overwrite filePath

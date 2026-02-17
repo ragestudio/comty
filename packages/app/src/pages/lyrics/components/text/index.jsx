@@ -72,7 +72,7 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 
 	//* Handle when current line index change
 	React.useEffect(() => {
-		console.debug("[lyrics] currentLineIndex", currentLineIndex)
+		//console.debug("[lyrics] currentLineIndex", currentLineIndex)
 
 		if (currentLineIndex === 0) {
 			setVisible(false)

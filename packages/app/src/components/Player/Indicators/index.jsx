@@ -1,5 +1,5 @@
 import React from "react"
-import { Tooltip } from "antd"
+import HoverReveal from "@ui/HoverReveal"
 import { Icons } from "@components/Icons"
 
 function getIndicators(track, playerState) {
@@ -7,14 +7,13 @@ function getIndicators(track, playerState) {
 
 	if (playerState.live) {
 		indicators.push({
-			icon: <Icons.FiRadio style={{ color: "var(--colorPrimary)" }} />,
+			icon: <Icons.RadioTower style={{ color: "var(--colorPrimary)" }} />,
 		})
 	}
 
 	if (playerState.format_metadata && playerState.format_metadata?.trackInfo) {
 		const dmuxData = playerState.format_metadata
 
-		// this commonly used my mpd's
 		const trackInfo = dmuxData.trackInfo[0]
 		const trackAudio = trackInfo?.audio
 
@@ -27,14 +26,23 @@ function getIndicators(track, playerState) {
 			if (codec.toLowerCase().includes("flac")) {
 				indicators.push({
 					icon: <Icons.Lossless />,
-					tooltip: `${sampleRate / 1000} kHz / ${bitDepth ?? 16} Bits`,
+					tooltip: (
+						<span>
+							{sampleRate / 1000}kHz / {bitDepth ?? 16} Bits
+						</span>
+					),
 				})
 			}
 
 			if (codec.toLowerCase().includes("vorbis")) {
 				indicators.push({
 					icon: <Icons.Ogg />,
-					tooltip: `Vorbis ${sampleRate / 1000} kHz / ${bitrate / 1000} kbps`,
+					tooltip: (
+						<span>
+							{sampleRate / 1000} kHz / {bitrate / 1000}
+							kbps
+						</span>
+					),
 				})
 			}
 		}
@@ -63,12 +71,11 @@ const Indicators = ({ track, playerState }) => {
 				{indicators.map((indicator, index) => {
 					if (indicator.tooltip) {
 						return (
-							<Tooltip
-								key={indicators.length}
-								title={indicator.tooltip}
-							>
-								{indicator.icon}
-							</Tooltip>
+							<HoverReveal
+								key={index}
+								children={indicator.icon}
+								component={indicator.tooltip}
+							/>
 						)
 					}
 

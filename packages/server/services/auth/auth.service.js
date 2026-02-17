@@ -1,21 +1,32 @@
 import { Server } from "linebridge"
+import crypto from "node:crypto"
+
+import ScyllaDb from "@shared-classes/ScyllaDb"
 import DbManager from "@shared-classes/DbManager"
+import RedisClient from "@shared-classes/RedisClient"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+
 import SharedMiddlewares from "@shared-middlewares"
 
 export default class API extends Server {
 	static refName = "auth"
-	static useEngine = "hyper-express"
-	static routesPath = `${__dirname}/routes`
-	static listen_port = process.env.HTTP_LISTEN_PORT ?? 3020
-	static enableWebsockets = true
+	static listenPort = 3020
+
+	static bypassCors = true
+	static useMiddlewares = ["logs"]
+	static useEngine = "heng"
 
 	middlewares = {
 		...SharedMiddlewares,
 	}
 
 	contexts = {
+		keys: {},
 		db: new DbManager(),
+		scylla: (global.scylla = new ScyllaDb()),
+		redis: RedisClient({
+			maxRetriesPerRequest: null,
+		}),
 	}
 
 	queuesManager = new TaskQueueManager(
@@ -25,11 +36,25 @@ export default class API extends Server {
 		this,
 	)
 
+	initialize = [
+		() => this.contexts.db.initialize(),
+		() => this.contexts.scylla.initialize(),
+		() => this.contexts.redis.initialize(),
+	]
+
 	async onInitialize() {
-		await this.contexts.db.initialize()
+		if (process.env.ECDSA_PUBLIC_KEY) {
+			this.contexts.keys.jwk = crypto
+				.createPublicKey(process.env.ECDSA_PUBLIC_KEY)
+				.export({
+					format: "jwk",
+				})
+		}
+
 		await this.queuesManager.initialize({
-			redisOptions: this.engine.ws.redis.options,
+			redisOptions: this.contexts.redis.client.options,
 		})
+
 		global.queues = this.queuesManager
 	}
 

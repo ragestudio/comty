@@ -2,6 +2,8 @@ import React from "react"
 import classnames from "classnames"
 import ReactPlayer from "react-player/lazy"
 import { motion } from "motion/react"
+import Markdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 import Poll from "@components/Poll"
 import { Icons } from "@components/Icons"
@@ -25,7 +27,12 @@ const messageRegexs = [
 	{
 		regex: /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})(&[a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*/g,
 		fn: (key, result) => {
-			return <ReactPlayer url={result[1]} controls />
+			return (
+				<ReactPlayer
+					url={result[1]}
+					controls
+				/>
+			)
 		},
 	},
 	{
@@ -189,7 +196,7 @@ export default class PostCard extends React.PureComponent {
 		return (
 			<div className="postCard error">
 				<h1>
-					<Icons.FiAlertTriangle />
+					<Icons.TriangleAlert />
 					<span>Cannot render this post</span>
 					<span>
 						Maybe this version of the app is outdated or is not
@@ -226,9 +233,12 @@ export default class PostCard extends React.PureComponent {
 						className={classnames("post_content")}
 					>
 						<div className="message">
-							{processString(messageRegexs)(
-								this.state.data.message ?? "",
-							)}
+							<Markdown remarkPlugins={[remarkGfm]}>
+								{this.state.data.message}
+								{/* {processString(messageRegexs)(
+									this.state.data.message ?? "",
+								)}*/}
+							</Markdown>
 						</div>
 
 						{!this.props.disableAttachments &&

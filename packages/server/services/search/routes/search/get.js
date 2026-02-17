@@ -5,7 +5,7 @@ import TracksCollector from "../../collectors/tracks"
 import ExtensionsCollector from "../../collectors/extensions"
 
 const escapeRegex = (str) => {
-	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // Escapa caracteres especiales
+	return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
 const collectors = {
@@ -16,7 +16,7 @@ const collectors = {
 
 export default {
 	useMiddlewares: ["withOptionalAuthentication"],
-	fn: async (req, res) => {
+	fn: async (req) => {
 		let {
 			keywords = "",
 			limit = 50,

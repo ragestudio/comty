@@ -1,6 +1,5 @@
-import React from "react"
-import { Button } from "antd"
-import { LuReply } from "react-icons/lu"
+import Button from "@ui/Button"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
@@ -9,10 +8,9 @@ export default (props) => {
 		<div className="reply_button">
 			<Button
 				type="ghost"
-				shape="circle"
 				onClick={props.onClick}
 				icon={
-					<LuReply
+					<Icons.Reply
 						style={{
 							fontSize: "1rem",
 							transform: "translateY(-1px)",

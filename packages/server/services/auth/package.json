@@ -1,3 +1,6 @@
 {
-	"name": "auth"
+	"name": "auth",
+	"dependencies": {
+		"oidc-provider": "^9.6.0"
+	}
 }

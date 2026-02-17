@@ -97,7 +97,7 @@ const EmailStepComponent = (props) => {
 export default {
 	key: "email",
 	title: "Step 3",
-	icon: "FiMail",
+	icon: "Mail",
 	description:
 		"Enter a email for the account, it can be used to access to your account. \n Will not be shared with anyone else and not be used for marketing purposes.",
 	required: true,

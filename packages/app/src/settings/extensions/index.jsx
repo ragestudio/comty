@@ -3,7 +3,7 @@ import loadable from "@loadable/component"
 
 export default {
 	id: "extensions",
-	icon: "MdOutlineCode",
+	icon: "Blocks",
 	label: "Extensions",
 	group: "advanced",
 	render: () => {

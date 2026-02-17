@@ -7,7 +7,7 @@ const IdToTypes = {
 const MAX_RECENT_ACTIVITIES = 10
 
 export default {
-	middlewares: ["withAuthentication"],
+	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res) => {
 		const user_id = req.auth.session.user_id
 		let { id, payload } = req.body

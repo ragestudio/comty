@@ -1,5 +1,6 @@
-import { Lightbox } from "react-modal-image"
+//import { Lightbox } from "react-modal-image"
 
+import Lightbox from "@components/Lightbox"
 import NotificationsCenter from "@components/NotificationsCenter"
 import PostCreator from "@components/PostCreator"
 import Searcher from "@components/Searcher"
@@ -46,7 +47,7 @@ export default {
 		},
 		openSearcher: (options) => {
 			if (app.isMobile) {
-				return app.layout.drawer.open("searcher", Searcher, {
+				return app.layout.draggable.open("searcher", Searcher, {
 					...options,
 					componentProps: {
 						renderResults: true,
@@ -57,31 +58,41 @@ export default {
 
 			return app.layout.modal.open(
 				"searcher",
-				(props) => <Searcher autoFocus renderResults {...props} />,
+				(props) => (
+					<Searcher
+						autoFocus
+						renderResults
+						{...props}
+					/>
+				),
 				{
 					framed: false,
 				},
 			)
 		},
-		openMessages: () => {
-			app.location.push("/messages")
-		},
-		openFullImageViewer: (src) => {
+		openFullImageViewer: (media, options = {}) => {
+			if (!Array.isArray(media)) {
+				media = [media]
+			}
+
 			app.cores.window_mng.render(
 				"image_lightbox",
 				<Lightbox
-					small={src}
-					large={src}
+					index={options?.index}
+					media={media}
 					onClose={() => app.cores.window_mng.close("image_lightbox")}
-					hideDownload
-					showRotate
 				/>,
 			)
 		},
 		openPostCreator: (params) => {
-			app.layout.modal.open(
+			return app.layout.modal.open(
 				"post_creator",
-				(props) => <PostCreator {...props} {...params} />,
+				(props) => (
+					<PostCreator
+						{...props}
+						{...params}
+					/>
+				),
 				{
 					framed: false,
 				},
@@ -130,6 +141,15 @@ export default {
 		},
 		goToPlaylist: (playlist_id) => {
 			return app.location.push(`/play/${playlist_id}`)
+		},
+		goToDirectMessage: (user_id) => {
+			return app.location.push(`/spaces/dm/${user_id}`)
+		},
+		goToGroup: (group_id) => {
+			return app.location.push(`/spaces/group/${group_id}`)
+		},
+		goToGroupChannel: (group_id, channel_id) => {
+			return app.location.push(`/spaces/group/${group_id}/${channel_id}`)
 		},
 	},
 	capacitor: {
