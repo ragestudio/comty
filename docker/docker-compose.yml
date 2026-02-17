@@ -30,7 +30,7 @@ services:
       - ./d_data/mongodb/data:/data/db
 
   server:
-    build: packages/server
+    build: ../packages/server
     container_name: comty-api
     restart: unless-stopped
     depends_on:
@@ -52,7 +52,7 @@ services:
       - NODE_ENV=production
 
   # web:
-  #   build: packages/wrapper
+  #   build: ../packages/wrapper
   #   container_name: comty-web
   #   restart: unless-stopped
   #   ports:
