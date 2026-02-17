@@ -15,9 +15,9 @@ services:
     networks:
       - scylla_network
     volumes:
-      - ./scylla/data:/var/lib/scylla
-      - ./scylla/conf:/etc/scylla
-      - ./scylla/logs:/var/log/scylla
+      - ./data/scylla/data:/var/lib/scylla
+      - ./data/scylla/logs:/var/log/scylla
+      # - ./d_data/scylla/conf:/etc/scylla
     environment:
       - SCYLLA_ARGS=--overprovisioned
   mongodb:
@@ -27,12 +27,15 @@ services:
     networks:
       - mongodb_network
     volumes:
-      - ./mongodb/data:/data/db
+      - ./d_data/mongodb/data:/data/db
 
   server:
     build: packages/server
     container_name: comty-api
     restart: unless-stopped
+    depends_on:
+      - scylla
+      - redis
     networks:
       - api_network
       - mongodb_network
@@ -43,20 +46,19 @@ services:
       - "10000-10001:10000-10001" # WebRTC signaling ports
     env_file:
       - ./.env
+    volumes:
+      - ./gateway.config.json:/comty-server/gateway.config.json
     environment:
       - NODE_ENV=production
-      - REDIS_ADDRESS=comty-redis
-      - SCYLLA_ADDRESS=comty-scylla
-      - MONGODB_ADDRESS=comty-mongodb
 
-  web:
-    build: packages/wrapper
-    container_name: comty-web
-    restart: unless-stopped
-    ports:
-      - "5000:5000"
-    env_file:
-      - ./.env
+  # web:
+  #   build: packages/wrapper
+  #   container_name: comty-web
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   env_file:
+  #     - ./.env
 
 networks:
   api_network:
