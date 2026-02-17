@@ -47,7 +47,7 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./gateway.config.json:/comty-server/gateway.config.json
+      - ./gateway.config.json:/server/gateway.config.json
     environment:
       - NODE_ENV=production
 
