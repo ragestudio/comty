@@ -2,10 +2,10 @@ import pkgjson from "../package.json" with { type: "json" }
 import { fileURLToPath } from "node:url"
 import path from "node:path"
 import os from "node:os"
-import {
-	installExtension,
-	REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer"
+// import {
+// 	installExtension,
+// 	REACT_DEVELOPER_TOOLS,
+// } from "electron-devtools-installer"
 
 import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
 import ElectronStore from "electron-store"
@@ -85,7 +85,7 @@ class Main {
 		this.state.ready = true
 
 		// install react dev tools
-		await installExtension(REACT_DEVELOPER_TOOLS)
+		//await installExtension(REACT_DEVELOPER_TOOLS)
 
 		await this.createTray()
 		await this.createMainWindow()
