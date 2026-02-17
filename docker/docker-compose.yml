@@ -27,7 +27,7 @@ services:
     networks:
       - mongodb_network
     volumes:
-      - ./d_data/mongodb/data:/data/db
+      - ./data/mongodb/data:/data/db
 
   server:
     build: ../packages/server
