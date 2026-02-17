@@ -1,20 +1,15 @@
 export default (app) => {
 	if (process.argv.some((arg) => arg === "--no-flags")) return
 
-	const disableFeatures = [
-		"UseChromeOSDirectVideoDecoder",
-		"HardwareMediaKeyHandling",
-		"MediaSessionService",
-		"WebRtcAllowInputVolumeAdjustment",
-		"Vulkan",
-	]
+	const disableFeatures = ["WebRtcAllowInputVolumeAdjustment"]
+
 	const enableFeatures = [
 		"WebRTC",
 		"WebRtcHideLocalIpsWithMdns",
 		"PlatformHEVCEncoderSupport",
-		"EnableDrDc",
+		//"EnableDrDc",
 		"CanvasOopRasterization",
-		"UseSkiaRenderer",
+		//"UseSkiaRenderer",
 	]
 
 	if (process.platform === "linux") {
@@ -45,8 +40,6 @@ export default (app) => {
 		],
 		["autoplay-policy", "no-user-gesture-required"],
 		["enable-speech-dispatcher"],
-		["disable-http-cache"], // Work around https://github.com/electron/electron/issues/40777
-		["gtk-version", "3"], // https://github.com/electron/electron/issues/46538
 		// disable renderer backgrounding to prevent the app from unloading when in the background
 		["disable-renderer-backgrounding"],
 		["disable-background-timer-throttling"],
