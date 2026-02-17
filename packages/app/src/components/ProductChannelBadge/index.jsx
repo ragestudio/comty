@@ -1,5 +1,4 @@
 import { Tag } from "antd"
-import { Icons } from "@components/Icons"
 
 const ProductChannelBadge = () => {
 	if (window.location.hostname === "comty.app") {
