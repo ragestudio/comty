@@ -102,8 +102,8 @@ jobs:
           files: dist.zip
           name: Release ${{ github.ref_name }}
           generate_release_notes: true
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        draft: false
-        prerelease: false
-        fail_on_unmatched_files: true
