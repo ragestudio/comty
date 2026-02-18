@@ -73,7 +73,7 @@ jobs:
         with:
           images: ragestudio/comty-server
           tags: |
-            type=semver,pattern={{version}}
+            type=raw,value={{version}}
             type=raw,value=latest
 
       - name: Build and push Docker image

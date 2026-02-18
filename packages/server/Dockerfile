@@ -8,9 +8,9 @@ RUN apt-get install -y --no-install-recommends curl
 RUN apt-get install -y --no-install-recommends build-essential
 RUN apt-get install -y --no-install-recommends ca-certificates
 RUN apt-get install -y --no-install-recommends git
+RUN apt-get install -y --no-install-recommends nscd
 #RUN apt-get install -y --no-install-recommends ssh
 #RUN apt-get install -y --no-install-recommends which
-#RUN apt-get install -y --no-install-recommends nscd
 
 # Create workdir
 RUN mkdir -p /server
