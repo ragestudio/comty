@@ -21,7 +21,7 @@ fi
 # check if ffmpeg is installed
 if [ ! -f /usr/local/bin/ffmpeg ]; then
     echo "Installing FFMPEG"
-    ./scripts/installLatestFfmpeg.sh
+    ./scripts/installFfmpeg.sh
     echo "FFMPEG binary installed"
 else
     echo "FFMPEG binary ok"
