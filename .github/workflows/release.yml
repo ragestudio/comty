@@ -35,11 +35,15 @@ jobs:
           npm i @rollup/rollup-linux-x64-gnu
         working-directory: ./packages/app
 
-      - name: Run release script
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/release.js --ignore-commits
+      - name: Build App
+        run: npm run build
         working-directory: ./packages/app
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-dist
+          path: ./packages/app/dist/
 
   build_server:
     name: Build Server
@@ -73,3 +77,33 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  create_release:
+    name: Create GitHub Release
+    needs: [build_app, build_server]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download App Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-dist
+          path: ./app-release-files
+
+      - name: Zip Artifact
+        run: zip -r dist.zip ./app-release-files
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist.zip
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        draft: false
+        prerelease: false
+        fail_on_unmatched_files: true
