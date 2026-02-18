@@ -7,11 +7,11 @@ import path from "node:path"
 import fs from "node:fs"
 
 class WebWrapper extends Server {
-	static disableBaseEndpoints = true
+	static baseRoutes = false
 	static listenPort = process.env.HTTP_LISTEN_PORT || 5000
 
 	static publicPath = path.resolve(process.cwd(), "public")
-	static appDistPath = path.resolve(process.cwd(), "public/dist")
+	static appDistPath = path.resolve(process.cwd(), "public/app-release-files")
 	static cachePath = path.resolve(process.cwd(), ".cache")
 	static appManifestPath = path.resolve(this.publicPath, "manifest.json")
 	static distCompressedFile = "dist.zip"

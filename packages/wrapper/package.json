@@ -1,15 +1,15 @@
 {
 	"name": "@comty/wrapper",
-	"version": "1.26.6@alpha",
+	"version": "2.1.0@alpha",
 	"license": "MIT",
 	"scripts": {
 		"start": "linebridge-boot ./src/index.js"
 	},
 	"dependencies": {
-		"7zip-min": "^2.0.0",
-		"@octokit/rest": "^19.0.4",
-		"axios": "^1.7.9",
-		"linebridge": "^0.22.3",
+		"@octokit/rest": "^22.0.1",
+		"7zip-min": "^2.1.0",
+		"axios": "^1.13.5",
+		"linebridge": "^1.7.0",
 		"live-directory": "^3.0.3"
 	}
 }
