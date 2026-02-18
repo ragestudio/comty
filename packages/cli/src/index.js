@@ -1,8 +1,11 @@
+globalThis.isServerMode = false
+
 import fs from "node:fs"
 import path from "node:path"
 import { Command } from "commander"
 import { createClient } from "comty.js"
 import SessionModel from "comty.js/dist/models/session/index.js"
+import Storage from "comty.js/dist/helpers/withStorage.js"
 
 import Cache from "./classes/cache.js"
 import Config from "./classes/config.js"
@@ -29,7 +32,8 @@ async function main() {
 		origin:
 			process.env.NODE_ENV === "production"
 				? "https://api.comty.app"
-				: "https://indev.comty.app/api",
+				: "https://indev-api.comty.app",
+		isServerMode: false,
 	})
 
 	await global.config.initialize()
@@ -42,6 +46,7 @@ async function main() {
 	}
 
 	SessionModel.default.token = global.config.get("auth").token
+	Storage.default.engine.set("token", global.config.get("auth").token)
 
 	let program = new Command()
 
