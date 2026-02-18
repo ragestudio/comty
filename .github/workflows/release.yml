@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - "rel-*"
 
 permissions:
   id-token: write
