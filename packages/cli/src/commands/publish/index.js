@@ -18,7 +18,6 @@ export default {
 		},
 	],
 	fn: async (customCwd) => {
-		const token = global.config.get("auth").token
 		const projectFolder = customCwd ?? process.cwd()
 		const pkgJsonPath = path.join(projectFolder, "package.json")
 
@@ -57,23 +56,22 @@ export default {
 			spinner.text = "Compressing files"
 			await compressFiles(`${originPath}/*`, bundlePath)
 
-			// PUT to registry
 			const bodyData = new FormData()
 
 			//bodyData.append("pkg", JSON.stringify(pkgJSON))
 			bodyData.append("bundle", fs.createReadStream(bundlePath))
 
-			spinner.text = "Publishing extension"
+			spinner.text = `Publishing extension [${global.comtyClient.mainOrigin}/extensions/publish]`
 			const response = await Request.default({
 				method: "PUT",
 				url: "/extensions/publish",
 				headers: {
 					"Content-Type": "multipart/form-data",
-					Authorization: `Bearer ${token}`,
 					pkg: JSON.stringify(pkgJSON),
 				},
 				data: bodyData,
 			}).catch((error) => {
+				console.error(error)
 				throw new Error(
 					`Failed to publish extension: ${error.response?.data?.error ?? error.message}`,
 				)

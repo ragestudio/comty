@@ -34,12 +34,12 @@ export default {
 		const bundlePath = path.resolve(workPath, "bundle.7z")
 
 		// console.log({
-		//     user_id,
-		//     pkg,
-		//     registryId,
-		//     s3Path,
-		//     workPath,
-		//     bundlePath
+		// 	user_id,
+		// 	pkg,
+		// 	registryId,
+		// 	s3Path,
+		// 	workPath,
+		// 	bundlePath,
 		// })
 
 		let extensionRegistry = await Extension.findOne({
@@ -61,6 +61,14 @@ export default {
 			await req.multipart(async (field) => {
 				await field.write(bundlePath)
 			})
+
+			// check if exist the file
+			if (!fs.existsSync(bundlePath)) {
+				throw new OperationError(
+					400,
+					"Bundle file not valid or not writted",
+				)
+			}
 
 			await new Promise((resolve, reject) => {
 				sevenzip.unpack(bundlePath, pkgPath, (error) => {
@@ -99,6 +107,7 @@ export default {
 
 			return extensionRegistry
 		} catch (error) {
+			console.error(error)
 			fs.promises.rm(workPath, { recursive: true, force: true })
 			throw error
 		}
