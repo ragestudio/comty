@@ -27,7 +27,9 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 									tooltips: ["Copied!"],
 								}}
 							>
-								{profile.ingestion_url}
+								{profile.urls?.ingest
+									? profile.urls.ingest.split("?")[0]
+									: "No URL"}
 							</antd.Typography.Text>
 						</code>
 					</div>
@@ -39,7 +41,7 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 					</div>
 
 					<div className="data-field__value">
-						<HiddenText value={profile.stream_key} />
+						<HiddenText value={`?token=${profile.token}`} />
 					</div>
 				</div>
 			</div>

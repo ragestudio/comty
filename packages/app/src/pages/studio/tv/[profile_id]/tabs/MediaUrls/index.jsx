@@ -3,13 +3,13 @@ import * as antd from "antd"
 import { FiLink } from "react-icons/fi"
 
 const MediaUrls = ({ profile }) => {
-	const { sources } = profile
+	const { urls } = profile
 
-	if (!sources || Object.keys(sources).length === 0) {
+	if (!urls || Object.keys(urls).length === 0) {
 		return null
 	}
 
-	const { hls, rtsp, html } = sources
+	const { hls, rtsp, html } = urls
 
 	let rtspt = null
 
