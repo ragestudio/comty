@@ -27,13 +27,10 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
-      - name: Install GitHub CLI
-        uses: cli/cli@v2.62.0
-        with:
-          version: latest
-
-      - name: Authenticate GitHub CLI
-        run: gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y curl jq
 
       - name: Check version changes
         id: check
@@ -44,9 +41,12 @@ jobs:
           echo "Current app version: $APP_VERSION"
           echo "Current server version: $SERVER_VERSION"
 
-          # Get latest release (excluding drafts and prereleases)
-          RELEASE_INFO=$(gh release list --limit 1 --exclude-draft --exclude-prerelease --json tagName,assets 2>/dev/null || echo "[]")
-          if [[ "$RELEASE_INFO" == "[]" || -z "$RELEASE_INFO" ]]; then
+          # Get latest release using GitHub API
+          REPO_URL="https://api.github.com/repos/${{ github.repository }}/releases/latest"
+          RELEASE_INFO=$(curl -s -H "Accept: application/vnd.github.v3+json" "$REPO_URL" || echo "{}")
+
+          # Check if we got a valid response
+          if [[ $(echo "$RELEASE_INFO" | jq -r '.tag_name // empty') == "" ]]; then
             echo "No previous releases found - both components need build"
             echo "app_changed=true" >> $GITHUB_OUTPUT
             echo "server_changed=true" >> $GITHUB_OUTPUT
@@ -54,11 +54,17 @@ jobs:
           fi
 
           # Extract tag name
-          TAG=$(echo "$RELEASE_INFO" | jq -r '.[0].tagName')
+          TAG=$(echo "$RELEASE_INFO" | jq -r '.tag_name')
           echo "Latest release tag: $TAG"
 
-          # Download versions.json from the release
-          gh release download "$TAG" --pattern "versions.json" --clobber 2>/dev/null || true
+          # Download versions.json from the release assets
+          ASSET_URL=$(echo "$RELEASE_INFO" | jq -r '.assets[] | select(.name == "versions.json") | .browser_download_url // empty')
+
+          if [[ -n "$ASSET_URL" ]]; then
+            curl -s -L -o versions.json "$ASSET_URL" || true
+          else
+            curl -s -L -o versions.json "https://github.com/${{ github.repository }}/releases/latest/download/versions.json" || true
+          fi
 
           if [[ ! -f "versions.json" ]]; then
             echo "versions.json not found in latest release - both components need build"
