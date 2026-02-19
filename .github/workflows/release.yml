@@ -14,8 +14,82 @@ permissions:
   pull-requests: write
 
 jobs:
+  check_versions:
+    name: Check Version Changes
+    runs-on: ubuntu-latest
+    outputs:
+      app_changed: ${{ steps.check.outputs.app_changed }}
+      server_changed: ${{ steps.check.outputs.server_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install GitHub CLI
+        uses: cli/cli@v2.62.0
+        with:
+          version: latest
+
+      - name: Authenticate GitHub CLI
+        run: gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Check version changes
+        id: check
+        run: |
+          # Get current versions
+          APP_VERSION=$(jq -r '.version' ./packages/app/package.json)
+          SERVER_VERSION=$(jq -r '.version' ./packages/server/package.json)
+          echo "Current app version: $APP_VERSION"
+          echo "Current server version: $SERVER_VERSION"
+
+          # Get latest release (excluding drafts and prereleases)
+          RELEASE_INFO=$(gh release list --limit 1 --exclude-draft --exclude-prerelease --json tagName,assets 2>/dev/null || echo "[]")
+          if [[ "$RELEASE_INFO" == "[]" || -z "$RELEASE_INFO" ]]; then
+            echo "No previous releases found - both components need build"
+            echo "app_changed=true" >> $GITHUB_OUTPUT
+            echo "server_changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Extract tag name
+          TAG=$(echo "$RELEASE_INFO" | jq -r '.[0].tagName')
+          echo "Latest release tag: $TAG"
+
+          # Download versions.json from the release
+          gh release download "$TAG" --pattern "versions.json" --clobber 2>/dev/null || true
+
+          if [[ ! -f "versions.json" ]]; then
+            echo "versions.json not found in latest release - both components need build"
+            echo "app_changed=true" >> $GITHUB_OUTPUT
+            echo "server_changed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Read versions from latest release
+          LATEST_APP=$(jq -r '.app' versions.json)
+          LATEST_SERVER=$(jq -r '.server' versions.json)
+          echo "Latest app version: $LATEST_APP"
+          echo "Latest server version: $LATEST_SERVER"
+
+          # Compare versions
+          if [[ "$APP_VERSION" == "$LATEST_APP" ]]; then
+            echo "app_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "app_changed=true" >> $GITHUB_OUTPUT
+          fi
+
+          if [[ "$SERVER_VERSION" == "$LATEST_SERVER" ]]; then
+            echo "server_changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "server_changed=true" >> $GITHUB_OUTPUT
+          fi
+
   build_app:
     name: Build App
+    needs: check_versions
+    if: needs.check_versions.outputs.app_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,6 +121,8 @@ jobs:
 
   build_server:
     name: Build Server
+    needs: check_versions
+    if: needs.check_versions.outputs.server_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -89,27 +165,46 @@ jobs:
 
   create_release:
     name: Create GitHub Release
-    needs: [build_app, build_server]
-    if: startsWith(github.ref, 'refs/tags/')
+    needs: [check_versions, build_app, build_server]
+    if: startsWith(github.ref, 'refs/tags/') && (needs.check_versions.outputs.app_changed == 'true' || needs.check_versions.outputs.server_changed == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Download App Artifact
+        if: needs.check_versions.outputs.app_changed == 'true'
         uses: actions/download-artifact@v4
         with:
           name: app-dist
           path: ./app-release-files
 
       - name: Zip Artifact
+        if: needs.check_versions.outputs.app_changed == 'true'
         run: zip -r dist.zip ./app-release-files
+
+      - name: Generate Versions JSON
+        run: |
+          APP_VERSION=$(jq -r '.version' ./packages/app/package.json)
+          SERVER_VERSION=$(jq -r '.version' ./packages/server/package.json)
+          jq -n --arg tag "${{ github.ref_name }}" --arg app "$APP_VERSION" --arg server "$SERVER_VERSION" '{tag: $tag, app: $app, server: $server}' > versions.json
+
+      - name: Prepare release files
+        id: prepare_release
+        run: |
+          RELEASE_FILES="versions.json"
+          if [[ -f "dist.zip" ]]; then
+            RELEASE_FILES=$(printf "%s\n%s" "$RELEASE_FILES" "dist.zip")
+          fi
+          echo "release_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist.zip
-          name: Release ${{ github.ref_name }}
+          files: ${{ steps.prepare_release.outputs.release_files }}
+          name: ${{ github.ref_name }}
           generate_release_notes: true
           draft: false
           prerelease: false

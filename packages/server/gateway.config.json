@@ -31,7 +31,7 @@
 	"routes": [
 		{
 			"path": "/spectrum/*path",
-			"target": "http://ingest.ragestudio.net:8035",
+			"target": "http://ingest.ragestudio.net:9997",
 			"pathRewrite": { "^/spectrum/(.*)": "/$1" },
 			"websocket": true
 		}
