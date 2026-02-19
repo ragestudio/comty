@@ -1,7 +1,13 @@
 #!/bin/bash
 
+if [ -f /.dockerenv ]; then
+    echo "Skipping external dependencies installation in Docker container"
+    exit 0
+fi
+
 # check if we are in sudo
 if [ "$EUID" -ne 0 ]; then
+    echo "To install external dependencies requires root privileges"
     exec sudo bash "$0" "$@"
     exit 0
 fi
