@@ -23,6 +23,10 @@
 /**/**/.nginx
 /**/**/nginx-bin
 
+./.keys
+./nats-data
+./docs
+
 # Locks
 /**/**/package-lock.json
 /**/**/yarn.lock
