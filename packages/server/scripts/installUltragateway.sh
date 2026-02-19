@@ -26,7 +26,7 @@ fi
 cd /tmp
 
 echo "Downloading from $DL_URL"
-curl -L "$DL_URL" -o "$BINARY_NAME"
+curl --fail-with-body -L "$DL_URL" -o "$BINARY_NAME"
 
 chmod +x "./$BINARY_NAME"
 mv "./${BINARY_NAME}" /usr/local/bin/
