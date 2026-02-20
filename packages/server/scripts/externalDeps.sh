@@ -5,9 +5,8 @@ if [ -f /.dockerenv ]; then
     exit 0
 fi
 
-# Check if we are inside a GitHub Action
-if [ -n "$GITHUB_ACTIONS" ]; then
-    echo "Skipping external dependencies installation in GitHub Actions"
+if [ "$IS_ACTION_RUNNER" = "true" ]; then
+    echo "Skipping external dependencies installation in GitHub Actions runner"
     exit 0
 fi
 
