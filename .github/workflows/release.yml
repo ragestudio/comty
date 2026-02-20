@@ -130,6 +130,8 @@ jobs:
     needs: check_versions
     if: needs.check_versions.outputs.server_changed == 'true'
     runs-on: ubuntu-latest
+    env:
+      IS_ACTION_RUNNER: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

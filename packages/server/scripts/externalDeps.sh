@@ -5,6 +5,11 @@ if [ -f /.dockerenv ]; then
     exit 0
 fi
 
+if [ "$IS_ACTION_RUNNER" = "true" ]; then
+    echo "Skipping external dependencies installation in GitHub Actions runner"
+    exit 0
+fi
+
 # check if we are in sudo
 if [ "$EUID" -ne 0 ]; then
     echo "To install external dependencies requires root privileges"
