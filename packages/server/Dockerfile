@@ -23,7 +23,7 @@ USER node
 
 # Install modules & rebuild for host
 RUN npm dedupe
-RUN npm install --omit=dev
+RUN IS_ACTION_RUNNER=true npm install --omit=dev
 RUN npm cache clean --force
 RUN rm package-lock.json
 
