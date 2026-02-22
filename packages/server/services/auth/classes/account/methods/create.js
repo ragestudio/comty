@@ -80,7 +80,11 @@ export default async (payload) => {
 		hash: hash,
 	})
 
-	await Account.sendActivationCode(user._id.toString())
+	try {
+		await Account.sendActivationCode(user._id.toString())
+	} catch (error) {
+		console.error(error)
+	}
 
 	return {
 		activation_required: true,
