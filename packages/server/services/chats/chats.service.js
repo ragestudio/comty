@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import Server from "linebridge/src/server"
 import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
