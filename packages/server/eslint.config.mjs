@@ -15,6 +15,8 @@ export default defineConfig([
 				...globals.node,
 				OperationError: "readonly",
 				Boot: "readonly",
+				ToBoolean: "readonly",
+				IPC: "readonly",
 				nanoid: "readonly",
 				process: "writable",
 			},
