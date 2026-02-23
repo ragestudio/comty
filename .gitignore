@@ -22,8 +22,6 @@
 /**/**/node_modules
 /**/**/corenode_modules
 /**/**/.DS_Store
-/**/**/package-lock.json
-/**/**/yarn.lock
 /**/**/.evite
 /**/**/uploads
 /**/**/d_data
