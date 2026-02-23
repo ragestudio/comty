@@ -1,4 +1,4 @@
-import Server from "linebridge/src/server"
+import { Server } from "linebridge"
 import crypto from "node:crypto"
 
 import ScyllaDb from "@shared-classes/ScyllaDb"

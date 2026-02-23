@@ -1,4 +1,4 @@
-import Server from "linebridge/src/server"
+import { Server } from "linebridge"
 
 import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
