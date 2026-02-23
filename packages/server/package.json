@@ -14,10 +14,9 @@
 		"preinstall": "bash ./scripts/externalDeps.sh"
 	},
 	"dependencies": {
-		"@sentry/node": "^10.7.0",
+		"@sentry/node": "^10.39.0",
 		"axios": "^1.13.5",
 		"bcrypt": "^6.0.0",
-		"braces": "^3.0.3",
 		"bullmq": "^5.58.2",
 		"cassandra-driver": "^4.8.0",
 		"cross-env": "^10.0.0",
@@ -34,10 +33,15 @@
 		"chai": "^6.0.1",
 		"eslint": "^10.0.1",
 		"globals": "^16.3.0",
-		"mocha": "^11.7.5",
+		"mocha": "^12.0.0-beta.9",
 		"sinon": "^21.0.0"
 	},
-	"resolutions": {
+	"overrides": {
+		"braces": "3.0.3",
+		"minimatch": "10.2.2",
+		"fast-xml-parser": "5.3.7",
+		"diff": "8.0.3",
+		"micromatch": "4.0.8",
 		"string-width": "4.2.3"
 	},
 	"optionalDependencies": {
