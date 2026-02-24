@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "2.3.0@alpha",
+	"version": "2.3.1@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
