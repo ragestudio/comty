@@ -35,5 +35,9 @@
 			"pathRewrite": { "^/spectrum/(.*)": "/$1" },
 			"websocket": true
 		}
-	]
+	],
+	"otel": {
+		"enabled": true,
+		"endpoint": "localhost:4317"
+	}
 }
