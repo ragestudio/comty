@@ -11,8 +11,6 @@ import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
 import StaticRenders from "./statics/renders"
 
-import DesktopTopBar from "@components/DesktopTopBar"
-
 import config from "@config"
 import routesDeclarations from "@config/routes"
 import onPageMount from "@hooks/onPageMount"
@@ -94,7 +92,6 @@ class ComtyApp extends React.Component {
 		return (
 			<React.Fragment>
 				<ThemeProvider>
-					{app.isDesktop && <DesktopTopBar />}
 					<Layout staticRenders={ComtyApp.staticRenders}>
 						{this.state.firstInitialized && (
 							<Router.Render
