@@ -77,6 +77,7 @@ export default {
 					uploadId: uploadId,
 					filePath: assemble.filePath,
 					workPath: workPath,
+					originalFilename: req.headers["uploader-original-name"],
 					transformations: transformations,
 					s3Provider: config.useProvider,
 					useCompression: config.useCompression,

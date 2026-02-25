@@ -14,6 +14,7 @@ export type FileHandlePayload = {
 	workPath: string
 	targetPath?: string // mostly provided by processed results
 	//uploadId?: string
+	originalFilename?: string
 	transformations?: Array<string>
 	useCompression?: boolean
 	s3Provider?: string
@@ -29,6 +30,7 @@ export type S3UploadPayload = {
 	targetPath?: string
 	s3Provider?: string
 	onProgress?: Function
+	originalFilename?: string
 }
 
 export default class Upload {
@@ -61,6 +63,7 @@ export default class Upload {
 			basePath: payload.user_id,
 			onProgress: payload.onProgress,
 			s3Provider: payload.s3Provider,
+			originalFilename: payload.originalFilename,
 		})
 
 		// delete workpath
@@ -98,8 +101,14 @@ export default class Upload {
 	}
 
 	static toS3 = async (payload: S3UploadPayload) => {
-		const { filePath, basePath, targetPath, s3Provider, onProgress } =
-			payload
+		const {
+			filePath,
+			basePath,
+			targetPath,
+			s3Provider,
+			onProgress,
+			originalFilename,
+		} = payload
 
 		// if targetPath is provided, means its a directory
 		const isDirectory = !!targetPath
@@ -111,7 +120,11 @@ export default class Upload {
 		let uploadPath = path.join(basePath, metadata["File-Hash"])
 
 		if (isDirectory) {
-			uploadPath = path.join(basePath, global.nanoid())
+			uploadPath = path.join(basePath, (global as any).nanoid())
+		}
+
+		if (originalFilename) {
+			metadata["Filename"] = originalFilename
 		}
 
 		if (typeof onProgress === "function") {
@@ -134,26 +147,27 @@ export default class Upload {
 			filePath: filePath,
 			uploadPath: uploadPath,
 			metadata: metadata,
-			targetFilename: isDirectory ? path.basename(targetPath) : null,
+			targetFilename: isDirectory ? path.basename(targetPath!) : null,
 			provider: s3Provider,
 			onProgress: onProgress,
+			onFinish: () => {},
 		})
 
 		return result
 	}
 
-	static async buildFileMetadata(filePath: string) {
+	static async buildFileMetadata(
+		filePath: string,
+	): Promise<{ [key: string]: string }> {
 		const firstBuffer = await readChunk(filePath, {
 			length: 4100,
 		})
 		const fileHash = await getFileHash(fs.createReadStream(filePath))
 		const fileType = await fileTypeFromBuffer(firstBuffer)
 
-		const metadata = {
+		return {
 			"File-Hash": fileHash,
 			"Content-Type": fileType?.mime ?? "application/octet-stream",
 		}
-
-		return metadata
 	}
 }
