@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "2.3.5@alpha",
+	"version": "2.4.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -31,7 +31,7 @@
 		"antd": "^6.2.2",
 		"axios": "^1.13.5",
 		"classnames": "2.3.1",
-		"comty.js": "^0.72.2",
+		"comty.js": "^0.73.0",
 		"d3": "^7.9.0",
 		"dashjs": "^5.0.3",
 		"dompurify": "^3.0.0",

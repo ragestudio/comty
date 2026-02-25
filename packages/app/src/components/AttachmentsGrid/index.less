@@ -68,3 +68,45 @@
 		background-color: black;
 	}
 }
+
+.attachment-generic-file {
+	display: flex;
+	flex-direction: column;
+
+	padding: 10px;
+	width: 100%;
+
+	gap: 7px;
+
+	overflow: hidden;
+
+	h3 {
+		svg {
+			font-size: 1.2rem;
+		}
+	}
+
+	code {
+		background-color: var(--backgroundColorPrimary);
+		padding: 4px;
+		border-radius: 4px;
+		font-size: 0.8rem;
+		overflow: hidden;
+
+		span {
+			text-overflow: ellipsis;
+			word-break: break-all;
+			user-select: all;
+		}
+	}
+
+	button {
+		background-color: var(--backgroundColorPrimary);
+	}
+
+	&__metadata {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+}

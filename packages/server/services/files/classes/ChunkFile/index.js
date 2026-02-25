@@ -3,7 +3,6 @@
 
 import fs from "node:fs"
 import path from "node:path"
-import mimetypes from "mime-types"
 
 export function checkTotalSize(
 	chunkSize, // in bytes

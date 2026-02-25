@@ -20,6 +20,10 @@ export default {
 
 		const remoteHeaders = await fetch(url, {
 			method: "HEAD",
+			headers: {
+				"User-Agent":
+					"Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ComtyCrawlerBot/1.0;",
+			},
 		}).then((res) => res.headers)
 
 		const headersObj = Object.fromEntries(remoteHeaders.entries())
