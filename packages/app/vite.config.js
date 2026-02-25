@@ -9,7 +9,7 @@ import react from "@vitejs/plugin-react"
 const sslDirPath = path.resolve(__dirname, "../../", ".ssl")
 
 const config = {
-	base: "./",
+	base: "/",
 	plugins: [react()],
 	resolve: {
 		alias: aliases,

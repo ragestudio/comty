@@ -1,10 +1,25 @@
-import { Server } from "linebridge"
-import LiveDirectory from "live-directory"
-import * as Setup from "./lib/setupDist"
-
-import crypto from "node:crypto"
 import path from "node:path"
 import fs from "node:fs"
+
+import { Server } from "linebridge"
+import LiveDirectory from "live-directory"
+import { isbot } from "isbot"
+import { LRUCache } from "lru-cache"
+
+import * as Setup from "./lib/setupDist"
+
+async function updateDistApp() {
+	if (fs.existsSync(WebWrapper.appDistPath)) {
+		await fs.promises.rm(WebWrapper.appDistPath, { recursive: true })
+	}
+
+	await Setup.setupLatestRelease({
+		repository: WebWrapper.repoName,
+		distCompressedFile: WebWrapper.distCompressedFile,
+		destinationPath: WebWrapper.publicPath,
+		cachePath: WebWrapper.cachePath,
+	})
+}
 
 class WebWrapper extends Server {
 	static baseRoutes = false
@@ -16,114 +31,58 @@ class WebWrapper extends Server {
 	static appManifestPath = path.resolve(this.publicPath, "manifest.json")
 	static distCompressedFile = "dist.zip"
 	static repoName = "ragestudio/comty"
+	static routesPath = __dirname + "/routes"
 
-	routes = {
-		"/*": {
-			method: "get",
-			fn: async (req, res) => {
-				let file = global.staticLiveDirectory.get(req.path)
+	//static useMiddlewares = ["logs"]
 
-				if (file === undefined) {
-					file = global.staticLiveDirectory.get("index.html")
-				}
-
-				if (file === undefined) {
-					return res.status(404).json({ error: "Not found" })
-				}
-
-				const fileParts = file.path.split(".")
-				const extension = fileParts[fileParts.length - 1]
-
-				let content = file.content
-
-				if (!content) {
-					content = file.stream()
-				}
-
-				if (!content) {
-					return res
-						.status(500)
-						.json({ error: "Cannot read this file" })
-				}
-
-				if (content instanceof Buffer) {
-					return res.type(extension).send(content)
-				} else {
-					return res.type(extension).stream(content)
-				}
-			},
+	contexts = {
+		lru: new LRUCache({
+			max: 100,
+			ttl: 1000 * 60 * 10,
+		}),
+		updateDistApp: updateDistApp,
+		listenLiveDirectory: () => {
+			this.contexts.publicFiles = new LiveDirectory(
+				WebWrapper.appDistPath,
+				{
+					static: false,
+				},
+			)
 		},
 	}
 
-	async updateDistApp() {
-		if (fs.existsSync(WebWrapper.appDistPath)) {
-			await fs.promises.rm(WebWrapper.appDistPath, { recursive: true })
+	handleRequest = async (req, res, next) => {
+		let file = this.contexts.publicFiles.get(req.path)
+
+		if (file === undefined) {
+			file = this.contexts.publicFiles.get("index.html")
+			req.indexHtml = file.content
 		}
 
-		await Setup.setupLatestRelease({
-			repository: WebWrapper.repoName,
-			distCompressedFile: WebWrapper.distCompressedFile,
-			destinationPath: WebWrapper.publicPath,
-			cachePath: WebWrapper.cachePath,
-		})
+		if (!file) {
+			throw new OperationError(404, "File not found")
+		}
+
+		req.file = file
 	}
 
-	async handleUpdateWebhook(req, res) {
-		const bodyBuff = await req.buffer()
+	middlewares = {
+		onlyBots: (req, res, next) => {
+			if (!isbot(req.headers["user-agent"])) {
+				return res.send(req.indexHtml)
+			}
 
-		const requestSignature = Buffer.from(
-			req.headers["x-hub-signature-256"] || "",
-			"utf8",
-		)
-		const hmac = crypto.createHmac(
-			"sha256",
-			process.env.WRAPPER_AUTO_UPDATE_KEY,
-		)
-		const digest = Buffer.from(
-			"sha256" + "=" + hmac.update(bodyBuff).digest("hex"),
-			"utf8",
-		)
+			console.log(req.headers["user-agent"])
 
-		// if signatures not match, return error
-		if (
-			requestSignature.length !== digest.length ||
-			!crypto.timingSafeEqual(digest, requestSignature)
-		) {
-			return res.status(401).json({ error: "Invalid signature" })
-		}
-
-		if (req.body.action !== "published") {
-			return res.status(400).json({ error: "Invalid action" })
-		}
-
-		// return ok and schedule update for the 30 seconds
-		console.log("[WEBHOOK] Update app dist triggered >", {
-			sig: req.headers["x-hub-signature-256"],
-		})
-
-		res.status(200).json({ ok: true })
-
-		setTimeout(async () => {
-			await this.updateDistApp()
-			await this.listenLiveDirectory()
-		}, 30000)
-	}
-
-	async listenLiveDirectory() {
-		global.staticLiveDirectory = new LiveDirectory(WebWrapper.appDistPath, {
-			static: false,
-		})
+			return next()
+		},
 	}
 
 	async onInitialize() {
-		if (process.env.WRAPPER_AUTO_UPDATE_KEY) {
-			console.log("Auto update key is set, enabling webhook update")
+		const LOGO_PATH = path.join(__dirname, "/logo.svg")
 
-			this.register.http({
-				method: "POST",
-				route: "/webhooks/update",
-				fn: this.handleUpdateWebhook.bind(this),
-			})
+		if (fs.existsSync(LOGO_PATH)) {
+			this.contexts.logoFile = fs.readFileSync(LOGO_PATH)
 		}
 
 		if (!fs.existsSync(WebWrapper.publicPath)) {
@@ -134,7 +93,7 @@ class WebWrapper extends Server {
 		if (!fs.existsSync(WebWrapper.appManifestPath)) {
 			console.log(`ℹ️ Missing app manifest/dist, installing...`)
 
-			await this.updateDistApp()
+			await this.contexts.updateDistApp()
 		}
 
 		let manifest = await fs.promises.readFile(
@@ -153,13 +112,14 @@ class WebWrapper extends Server {
 				console.log(
 					`🔰 New version available: ${latestRelease.tag_name}, updating...`,
 				)
-				await this.updateDistApp()
+				await this.contexts.updateDistApp()
 			} else {
 				console.log(`✅ App dist is up to date!`)
 			}
 		}
 
-		await this.listenLiveDirectory()
+		this.contexts.listenLiveDirectory()
+		this.engine.app.use(this.handleRequest)
 	}
 }
 
