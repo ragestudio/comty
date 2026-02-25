@@ -14,9 +14,12 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 
 	const textRef = forwardedRef ?? React.useRef(null)
 	const currentTrackId = React.useRef(null)
-	const [syncInterval, setSyncInterval] = React.useState(null)
-	const [currentLineIndex, setCurrentLineIndex] = React.useState(0)
+
 	const [visible, setVisible] = React.useState(false)
+
+	const [currentLineIndex, setCurrentLineIndex] = React.useState(0)
+	const [currentWordIndex, setCurrentWordIndex] = React.useState(0)
+	const [syncInterval, setSyncInterval] = React.useState(null)
 
 	function syncPlayback() {
 		const currentTrackTime = app.cores.player.controls.seek() * 1000
@@ -48,7 +51,7 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 	}
 
 	function startSyncInterval() {
-		if (!lyrics || !lyrics.synced_lyrics) {
+		if (!lyrics?.synced_lyrics) {
 			stopSyncInterval()
 			return false
 		}
@@ -72,7 +75,8 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 
 	//* Handle when current line index change
 	React.useEffect(() => {
-		//console.debug("[lyrics] currentLineIndex", currentLineIndex)
+		// console.debug("[lyrics] currentLineIndex", currentLineIndex)
+		// console.debug("[lyrics] currentWordIndex", currentWordIndex)
 
 		if (currentLineIndex === 0) {
 			setVisible(false)
@@ -117,6 +121,17 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 				textRef.current.scrollTop = 0
 			}
 		}
+
+		// if (playerState.track_manifest) {
+		// 	if (playerState.track_manifest._id === "699e13105326fc5306139905") {
+		// 		fetch("/vtt-mindset-test.vtt").then(async (data) => {
+		// 			vttParser.current.parse(await data.text())
+		// 			const parsed = vttParser.current.getData()
+		// 			setVTTData(parsed)
+		// 			console.log(parsed)
+		// 		})
+		// 	}
+		// }
 	}, [playerState.track_manifest])
 
 	React.useEffect(() => {
@@ -158,7 +173,7 @@ const LyricsText = React.forwardRef((props, forwardedRef) => {
 						damping: 20,
 					}}
 				>
-					{lyrics.synced_lyrics.map((line, index) => {
+					{lyrics?.synced_lyrics.map((line, index) => {
 						return (
 							<p
 								key={index}
