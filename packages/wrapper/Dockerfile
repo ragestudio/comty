@@ -8,6 +8,11 @@ RUN apt-get install -y --no-install-recommends curl
 RUN apt-get install -y --no-install-recommends build-essential
 RUN apt-get install -y --no-install-recommends ca-certificates
 RUN apt-get install -y --no-install-recommends git
+RUN apt-get install -y --no-install-recommends fonts-dejavu-core
+RUN apt-get install -y --no-install-recommends fontconfig
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN fc-cache -f -v
 
 # Create workdir
 WORKDIR /home/node/app
