@@ -1,12 +1,90 @@
 import React from "react"
 import classNames from "classnames"
+import Button from "@ui/Button"
 import { Icons } from "@components/Icons"
-import { Skeleton, Button } from "antd"
+import { Skeleton } from "antd"
 import mime from "mime"
+import hr from "@tsmx/human-readable"
 
 import Image from "@components/Image"
 
 import "./index.less"
+
+const GenericFile = ({ attachment }) => {
+	if (!attachment || !attachment.url) {
+		return null
+	}
+
+	const [metadata, setMetadata] = React.useState(null)
+
+	React.useEffect(() => {
+		const fetchMetadata = async () => {
+			const response = await fetch(attachment.url, {
+				method: "HEAD",
+			})
+
+			if (!response.ok) {
+				console.error(`Failed to fetch metadata for ${attachment.url}`)
+				return
+			}
+
+			setMetadata({
+				size: response.headers.get("content-length"),
+				hash: response.headers.get("x-amz-meta-file-hash"),
+				filename: response.headers.get("x-amz-meta-filename"),
+				type: response.headers.get("Content-Type"),
+			})
+		}
+
+		fetchMetadata()
+	}, [attachment.url])
+
+	if (!metadata) {
+		return null
+	}
+
+	return (
+		<div className="attachment-generic-file">
+			<h3>
+				<Icons.Paperclip />
+				Attachment
+			</h3>
+
+			<div className="attachment-generic-file__metadata">
+				{metadata.filename && (
+					<span>
+						<Icons.FileText /> File: {metadata.filename}
+					</span>
+				)}
+
+				{metadata.type && (
+					<span>
+						<Icons.FileBox /> Type: {metadata.type}
+					</span>
+				)}
+
+				{metadata.size && (
+					<span>
+						<Icons.WeightTilde /> Size:
+						{hr.fromBytes(metadata.size)}
+					</span>
+				)}
+			</div>
+
+			<code>{attachment.url}</code>
+
+			<Button
+				type="text"
+				icon={<Icons.HardDriveDownload />}
+				onClick={() => {
+					window.open(attachment.url, "_blank")
+				}}
+			>
+				Download
+			</Button>
+		</div>
+	)
+}
 
 const Attachment = React.memo((props) => {
 	const [loaded, setLoaded] = React.useState(false)
@@ -99,7 +177,11 @@ const Attachment = React.memo((props) => {
 					)
 				}
 				default: {
-					return <h4>Unsupported media type [{mimeType}]</h4>
+					return (
+						<React.Suspense>
+							<GenericFile attachment={props.attachment} />
+						</React.Suspense>
+					)
 				}
 			}
 		}
