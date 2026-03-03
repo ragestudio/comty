@@ -26,13 +26,13 @@ export default class API extends Server {
 
 	onClientConnected = (ctx = {}) => {
 		if (typeof ctx.meta.user_id === "string") {
-			this.eventBus.emit("user:connected", ctx.user_id)
+			this.eventBus.emit("user:connected", ctx)
 		}
 	}
 
 	onClientDisconnected = (ctx = {}) => {
 		if (typeof ctx.meta.user_id === "string") {
-			this.eventBus.emit("user:disconnect", ctx.user_id)
+			this.eventBus.emit("user:disconnect", ctx)
 		}
 	}
 

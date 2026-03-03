@@ -1,9 +1,11 @@
-export default async function (userId) {
-	try {
-		if (!userId) {
-			return
-		}
+export default async function (ctx) {
+	if (!ctx || !ctx.meta || !ctx.meta.user_id) {
+		return null
+	}
 
+	const userId = ctx.meta.user_id
+
+	try {
 		// check if there is not a client with this userId
 		const clients = await global.websockets.find.clientsByUserId(userId)
 

@@ -1,5 +1,6 @@
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
+import stopProduceHandler from "./handlers/stopProduce"
 
 import joinClientHandler from "./handlers/joinClient"
 import leaveClientHandler from "./handlers/leaveClient"
@@ -82,6 +83,7 @@ export default class MediaChannel {
 	connectTransport = connectTransportHandler.bind(this)
 
 	produce = produceHandler.bind(this)
+	stopProduce = stopProduceHandler.bind(this)
 	consume = consumeHandler.bind(this)
 
 	async close() {
@@ -101,9 +103,15 @@ export default class MediaChannel {
 
 			// Close all producers
 			for (const [userId, userProducers] of this.producers) {
-				for (const [id, { producer }] of userProducers) {
-					if (producer && !producer.closed) {
-						producer.close()
+				for (const [id, producerInst] of userProducers) {
+					if (
+						producerInst &&
+						producerInst.producer &&
+						!producerInst.producer.closed
+					) {
+						producerInst.producer.close()
+						// Ensure cleanup is called
+						await producerInst.onProducerClose()
 					}
 				}
 			}

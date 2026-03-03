@@ -19,9 +19,15 @@ export default async function (client, { emitEventToSelf = false } = {}) {
 		)
 
 		if (clientProducers instanceof Map) {
-			for (const [id, { producer }] of clientProducers) {
-				if (producer && !producer.closed) {
-					producer.close()
+			for (const [id, producerInst] of clientProducers) {
+				if (
+					producerInst &&
+					producerInst.producer &&
+					!producerInst.producer.closed
+				) {
+					producerInst.producer.close()
+					// Ensure cleanup is called
+					await producerInst.onProducerClose()
 					clientProducers.delete(id)
 				}
 			}
