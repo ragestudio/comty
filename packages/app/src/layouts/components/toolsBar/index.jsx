@@ -2,6 +2,7 @@ import React from "react"
 import classnames from "classnames"
 import { motion, AnimatePresence, useIsPresent } from "motion/react"
 import PropTypes from "prop-types"
+import { LayoutContext } from "@/layout"
 
 import useLayoutInterface from "@hooks/useLayoutInterface"
 import WidgetsWrapper from "@components/WidgetsWrapper"
@@ -73,13 +74,57 @@ ToolsBar.propTypes = {
 	renders: PropTypes.object,
 }
 
-const ToolsBarWrapper = () => {
+const ToolsBarWrapper = (props) => {
+	const layoutContext = React.useContext(LayoutContext)
+
 	const [visible, setVisible] = React.useState(false)
+
 	const [topRenders, setTopRenders] = React.useState([])
 	const [bottomRenders, setBottomRenders] = React.useState([])
 
 	const hasAnyRenders = topRenders.length > 0 || bottomRenders.length > 0
 	const isVisible = hasAnyRenders && visible
+
+	// restore renders from context
+	React.useEffect(() => {
+		if (
+			layoutContext &&
+			layoutContext.interfacesProperties &&
+			layoutContext.interfacesProperties["tools_bar"]
+		) {
+			if (layoutContext.interfacesProperties["tools_bar"]["topRenders"]) {
+				setTopRenders(
+					layoutContext.interfacesProperties["tools_bar"][
+						"topRenders"
+					],
+				)
+			}
+
+			if (
+				layoutContext.interfacesProperties["tools_bar"]["bottomRenders"]
+			) {
+				setBottomRenders(
+					layoutContext.interfacesProperties["tools_bar"][
+						"bottomRenders"
+					],
+				)
+			}
+		}
+	}, [])
+
+	// update renders to context
+	React.useEffect(() => {
+		if (layoutContext && layoutContext.interfacesProperties) {
+			if (!layoutContext.interfacesProperties["tools_bar"]) {
+				layoutContext.interfacesProperties["tools_bar"] = {}
+			}
+
+			layoutContext.interfacesProperties["tools_bar"] = {
+				topRenders: topRenders,
+				bottomRenders: bottomRenders,
+			}
+		}
+	}, [topRenders, bottomRenders])
 
 	useLayoutInterface("tools_bar", {
 		toggleVisibility: (to) => {
@@ -129,6 +174,10 @@ const ToolsBarWrapper = () => {
 			setVisible(true)
 		}, 10)
 	}, [])
+
+	if (props.onlyController === true) {
+		return null
+	}
 
 	return (
 		<AnimatePresence>

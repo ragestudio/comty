@@ -2,11 +2,19 @@ import React from "react"
 
 import Layouts from "@layouts"
 
+export const LAYOUT_DEFAULT_CONTEXT = {
+	interfacesProperties: {},
+}
+
+export const LayoutContext = React.createContext(LAYOUT_DEFAULT_CONTEXT)
+
 export default class Layout extends React.PureComponent {
 	state = {
 		layoutType: "default",
 		renderError: null,
 	}
+
+	interfacesProperties = React.createRef({})
 
 	events = {
 		"layout.forceUpdate": () => {
@@ -23,7 +31,9 @@ export default class Layout extends React.PureComponent {
 			const transitionLayer = document.getElementById("transitionLayer")
 
 			if (!transitionLayer) {
-				console.warn("transitionLayer not found, no animation will be played")
+				console.warn(
+					"transitionLayer not found, no animation will be played",
+				)
 				return false
 			}
 
@@ -40,7 +50,9 @@ export default class Layout extends React.PureComponent {
 			const transitionLayer = document.getElementById("transitionLayer")
 
 			if (!transitionLayer) {
-				console.warn("transitionLayer not found, no animation will be played")
+				console.warn(
+					"transitionLayer not found, no animation will be played",
+				)
 				return false
 			}
 
@@ -49,6 +61,8 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidMount() {
+		this.interfacesProperties.current = {}
+
 		// register events
 		Object.keys(this.events).forEach((event) => {
 			window.app.eventBus.on(event, this.events[event])
@@ -110,7 +124,10 @@ export default class Layout extends React.PureComponent {
 			)
 		},
 		toggleMobileStyle: (to) => {
-			return this.layoutInterface.toggleRootContainerClassname("mobile", to)
+			return this.layoutInterface.toggleRootContainerClassname(
+				"mobile",
+				to,
+			)
 		},
 		toggleReducedAnimations: (to) => {
 			return this.layoutInterface.toggleRootContainerClassname(
@@ -143,14 +160,17 @@ export default class Layout extends React.PureComponent {
 			)
 		},
 		toggleRootContainerClassname: (classname, to) => {
-		  const root = document.documentElement
+			const root = document.documentElement
 
 			if (!root) {
 				console.error("root not found")
 				return false
 			}
 
-			to = typeof to === "boolean" ? to : !root.classList.contains(classname)
+			to =
+				typeof to === "boolean"
+					? to
+					: !root.classList.contains(classname)
 
 			if (root.classList.contains(classname) === to) {
 				// ignore
@@ -198,9 +218,12 @@ export default class Layout extends React.PureComponent {
 
 		if (this.state.renderError) {
 			if (this.props.staticRenders?.RenderError) {
-				return React.createElement(this.props.staticRenders?.RenderError, {
-					error: this.state.renderError,
-				})
+				return React.createElement(
+					this.props.staticRenders?.RenderError,
+					{
+						error: this.state.renderError,
+					},
+				)
 			}
 
 			return JSON.stringify(this.state.renderError)
@@ -215,6 +238,14 @@ export default class Layout extends React.PureComponent {
 			)
 		}
 
-		return <Layout {...layoutComponentProps}>{this.props.children}</Layout>
+		return (
+			<LayoutContext.Provider
+				value={{
+					interfacesProperties: this.interfacesProperties.current,
+				}}
+			>
+				<Layout {...layoutComponentProps}>{this.props.children}</Layout>
+			</LayoutContext.Provider>
+		)
 	}
 }
