@@ -9,7 +9,7 @@ export default async (core, data) => {
 		core.console.log("Remote producer left", data)
 
 		// delete from producers
-		core.producers.delete(data.producerId)
+		core.producers.delRemote(data)
 
 		// stop all consumers
 		await core.consumers.stopByProducerId(data.producerId)

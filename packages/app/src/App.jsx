@@ -4,9 +4,9 @@ import { Runtime } from "@ragestudio/vessel"
 import * as Router from "@ragestudio/vessel/router"
 import * as Sentry from "@sentry/browser"
 import { ThemeProvider } from "@cores/style/style.core.jsx"
+import ErrorBoundary from "@components/ErrorBoundary"
 import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
-
 import StaticMethods from "./statics/methods"
 import StaticEvents from "./statics/events"
 import StaticRenders from "./statics/renders"
@@ -93,13 +93,15 @@ class ComtyApp extends React.Component {
 			<React.Fragment>
 				<ThemeProvider>
 					<Layout staticRenders={ComtyApp.staticRenders}>
-						{this.state.firstInitialized && (
-							<Router.Render
-								declarations={routesDeclarations}
-								staticRenders={ComtyApp.staticRenders}
-								onPageMount={onPageMount}
-							/>
-						)}
+						<ErrorBoundary>
+							{this.state.firstInitialized && (
+								<Router.Render
+									declarations={routesDeclarations}
+									staticRenders={ComtyApp.staticRenders}
+									onPageMount={onPageMount}
+								/>
+							)}
+						</ErrorBoundary>
 					</Layout>
 				</ThemeProvider>
 			</React.Fragment>

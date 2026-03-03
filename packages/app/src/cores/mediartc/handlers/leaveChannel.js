@@ -1,3 +1,5 @@
+import MediaRTCState from "../classes/State"
+
 export default async function () {
 	try {
 		if (this.ui) {
@@ -44,11 +46,11 @@ export default async function () {
 		// clear device
 		this.device = null
 
-		// default state
-		this.state.isJoined = false
-		this.state.isLoading = false
-		this.state.channelId = null
-		this.state.channel = null
+		// clear producers just in case
+		this.producers.clear()
+
+		// reset default state
+		this.state = Object.assign(this.state, MediaRTCState.defaultState)
 
 		// call socket to leave
 		await this.socket.call("channel:leave")

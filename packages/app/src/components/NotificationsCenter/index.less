@@ -1,16 +1,46 @@
-.notificationsCenter{
-    display: flex;
-    flex-direction: column;
+.notifications-center {
+	display: flex;
+	flex-direction: column;
 
-    .header {
-        display: flex;
-        flex-direction: column;
+	gap: 10px;
 
-        margin-bottom: 20px;
+	.header {
+		display: flex;
+		flex-direction: column;
 
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-    }
+		h2 {
+			font-size: 1.5rem;
+			font-weight: 600;
+		}
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
+}
+
+.notifications-center__item {
+	display: flex;
+	flex-direction: row;
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: column;
+
+		align-items: center;
+		justify-content: center;
+
+		margin-left: auto;
+	}
+
+	background-color: rgba(var(--layoutBackgroundColor), 0.9);
+	padding: 6px 10px;
+	border-radius: 12px;
 }

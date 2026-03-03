@@ -8,11 +8,8 @@ export default async (core, data) => {
 
 		core.console.debug(`Remote producer joined:`, data)
 
-		// add to producers
-		core.producers.set(data.producerId, {
-			remote: true,
-			...data,
-		})
+		// add as remote producer
+		core.producers.setRemote(data)
 
 		if (data.appData) {
 			const client = core.clients.get(data.userId)

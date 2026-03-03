@@ -168,7 +168,7 @@ class Main {
 		this.mainWindow = new BrowserWindow({
 			title: pkgjson.appName,
 			titleBarStyle: "hidden",
-			frame: false,
+			frame: true,
 			transparent: true,
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),

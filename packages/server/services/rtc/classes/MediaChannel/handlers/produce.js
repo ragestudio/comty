@@ -39,7 +39,7 @@ export default async function (client, payload) {
 
 		await producer.initialize(payload)
 
-		return producer.seralize()
+		return producer.serialize()
 	} catch (error) {
 		console.error(`Error producing for ${client.userId}:`, error)
 		throw error

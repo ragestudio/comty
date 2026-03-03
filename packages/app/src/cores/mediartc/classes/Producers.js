@@ -8,9 +8,33 @@ export default class Producers extends Map {
 		}
 	}
 
+	setRemote(producer) {
+		if (!producer) {
+			return null
+		}
+
+		producer.remote = true
+
+		this.set(producer.producerId, producer)
+		this.core.state.remoteProducers.push(producer)
+	}
+
+	delRemote(producer) {
+		if (!producer) {
+			return null
+		}
+
+		this.delete(producer.producerId)
+
+		this.core.state.remoteProducers =
+			this.core.state.remoteProducers.filter(
+				(p) => p.id !== producer.producerId,
+			)
+	}
+
 	produce = async (payload) => {
 		if (!this.core.device || !this.core.sendTransport) {
-			throw new Error("Device or transport not ready")
+			throw new Error("Device or send transport not ready")
 		}
 
 		const producer = await this.core.sendTransport.produce(payload)
@@ -27,7 +51,15 @@ export default class Producers extends Map {
 		return Array.from(this.values()).filter((producer) => producer.self)
 	}
 
-	onSelfProducerClosed(producer) {
+	async onSelfProducerClosed(producer) {
+		if (!producer) {
+			return null
+		}
+
 		this.delete(producer.id)
+
+		await this.core.socket.emit("channel:produce:stop", {
+			producerId: producer.id,
+		})
 	}
 }

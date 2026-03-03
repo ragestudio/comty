@@ -1,6 +1,6 @@
 import React from "react"
 
-export default (namespace, ctx) => {
+const useLayoutInterface = (namespace, ctx) => {
 	React.useEffect(() => {
 		if (app.layout[namespace] === "object") {
 			throw new Error(`Layout namespace [${namespace}] already exists`)
@@ -11,3 +11,5 @@ export default (namespace, ctx) => {
 
 	return app.layout[namespace]
 }
+
+export default useLayoutInterface

@@ -20,6 +20,9 @@ export default async function (client, payload) {
 		// Close the producer
 		await producerInst.producer.close()
 
+		// // Ensure cleanup is called even if events don't fire
+		// await producerInst.onProducerClose()
+
 		return { success: true }
 	} catch (error) {
 		console.error(`Error stopping production for ${client.userId}:`, error)

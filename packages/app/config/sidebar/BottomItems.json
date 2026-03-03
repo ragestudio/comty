@@ -7,12 +7,6 @@
 		"requiredFlags": ["spaces_preview"]
 	},
 	{
-		"id": "notifications",
-		"path": "/notifications",
-		"label": "Notifications",
-		"icon": "Bell"
-	},
-	{
 		"id": "apps",
 		"label": "Apps",
 		"icon": "Grid3X3"

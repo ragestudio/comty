@@ -3,5 +3,5 @@ import dmActivityUpdate from "./dmActivityUpdate"
 
 export default {
 	"notification:new": newNotification,
-	"chat:dm:activity:update": dmActivityUpdate,
+	"dm:activity:update": dmActivityUpdate,
 }

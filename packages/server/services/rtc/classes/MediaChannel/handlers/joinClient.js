@@ -33,7 +33,7 @@ export default async function (client) {
 						continue
 					}
 
-					producers.push(producer.seralize())
+					producers.push(producer.serialize())
 				}
 			}
 		}

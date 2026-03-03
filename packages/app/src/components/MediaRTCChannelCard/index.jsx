@@ -297,7 +297,9 @@ const MediaRTCChannelCard = () => {
 	const state = useMediaRTCState()
 
 	const handleGoToChannel = () => {
-		app.location.push(`/spaces/channel`)
+		app.location.push(
+			`/spaces/group/${state.channel.group_id}/${state.channel._id}/voice`,
+		)
 	}
 
 	const toggleScreenShare = async () => {
