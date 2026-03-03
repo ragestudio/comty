@@ -98,6 +98,12 @@ const VideoGrid = ({ children, focusedId, className, ...props }) => {
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.3 }}
 					>
+						<div className="video-grid__focused-container">
+							<div className="video-grid__item video-grid__item--focused">
+								{focusedItem}
+							</div>
+						</div>
+
 						{otherItems.length > 0 && (
 							<div className="video-grid__preview-bar">
 								<div className="video-grid__preview-content">
@@ -105,12 +111,6 @@ const VideoGrid = ({ children, focusedId, className, ...props }) => {
 								</div>
 							</div>
 						)}
-
-						<div className="video-grid__focused-container">
-							<div className="video-grid__item video-grid__item--focused">
-								{focusedItem}
-							</div>
-						</div>
 					</motion.div>
 				) : (
 					<motion.div

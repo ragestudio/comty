@@ -67,7 +67,7 @@ export default async function (groupId, channelId) {
 				}
 
 				// add to producers
-				this.producers.set(producer.producerId, producer)
+				this.producers.setRemote(producer)
 
 				const client = this.clients.get(producer.userId)
 

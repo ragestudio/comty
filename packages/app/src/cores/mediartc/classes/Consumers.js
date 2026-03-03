@@ -1,11 +1,39 @@
-export default class Consumers extends Map {
-	constructor(core, data) {
-		super(data)
-		this.core = core
-
+export default class Consumers {
+	constructor(core) {
 		if (!core) {
 			throw new Error("Core not provided")
 		}
+		this.core = core
+	}
+
+	get _mirrorMap() {
+		return this.core.recvTransport?._consumers || new Map()
+	}
+
+	get size() {
+		return this._mirrorMap.size
+	}
+	get(key) {
+		return this._mirrorMap.get(key)
+	}
+	has(key) {
+		return this._mirrorMap.has(key)
+	}
+	values() {
+		return this._mirrorMap.values()
+	}
+	keys() {
+		return this._mirrorMap.keys()
+	}
+	entries() {
+		return this._mirrorMap.entries()
+	}
+	forEach(callback, thisArg) {
+		this._mirrorMap.forEach(callback, thisArg)
+	}
+
+	[Symbol.iterator]() {
+		return this._mirrorMap[Symbol.iterator]()
 	}
 
 	start = async ({ producerId, userId, kind, appData }) => {
@@ -18,9 +46,10 @@ export default class Consumers extends Map {
 				throw new Error("Device or transport not ready")
 			}
 
-			// if consumer already exists, return it
-			if (this.has(producerId)) {
-				return this.get(producerId)
+			const existingConsumer = this.findByProducerId(producerId)
+
+			if (existingConsumer) {
+				return existingConsumer
 			}
 
 			this.core.console.log("Starting consumer", {
@@ -59,12 +88,10 @@ export default class Consumers extends Map {
 				this.core.console.warn(
 					`Consumer [${consumer.id}] transport closed`,
 				)
-				this.stop(producerId)
+				this.stop(consumer.id)
 			})
 
-			// add to consumers
-			this.set(consumer.id, consumer)
-			this.core.state.availableConsumers.push(consumer.id)
+			// this.core.state.availableConsumers.push(consumer.id)
 
 			return consumer
 		} catch (error) {
@@ -81,9 +108,6 @@ export default class Consumers extends Map {
 			}
 
 			if (consumer.closed) {
-				// consumer already closed
-				this.delete(consumerId)
-
 				return false
 			}
 
@@ -92,17 +116,13 @@ export default class Consumers extends Map {
 				consumer: consumer,
 			})
 
-			// stop the consumer
 			await consumer.close()
 
-			// delete from map
-			this.delete(consumerId)
-
 			// delete from available consumers
-			this.core.state.availableConsumers =
-				this.core.state.availableConsumers.filter(
-					(id) => id !== consumerId,
-				)
+			// this.core.state.availableConsumers =
+			// 	this.core.state.availableConsumers.filter(
+			// 		(id) => id !== consumerId,
+			// 	)
 
 			return consumer
 		} catch (error) {

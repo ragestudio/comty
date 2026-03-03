@@ -2,7 +2,6 @@ import { Observable } from "object-observer"
 
 export default class MediaRTCState {
 	static defaultState = {
-		status: "disconnected",
 		isJoined: false,
 		isLoading: false,
 		isMuted: false,
@@ -13,15 +12,13 @@ export default class MediaRTCState {
 		channel: null,
 		channelId: null,
 		clients: Array(),
-		availableConsumers: Array(),
+		remoteProducers: Array(),
 		recvTransportState: "closed",
 		sendTransportState: "closed",
 		micStreamAvailable: false,
 	}
 
-	constructor(core) {
-		this.core = core
-
+	constructor() {
 		this.state = Observable.from(MediaRTCState.defaultState)
 
 		Observable.observe(this.state, (changes) => {
@@ -30,7 +27,7 @@ export default class MediaRTCState {
 					...changes[changes.length - 1].object,
 				})
 			} catch (error) {
-				this.core.console.error("Error logging state changes:", error)
+				console.error(error)
 			}
 		})
 

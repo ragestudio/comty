@@ -1,11 +1,17 @@
+import React from "react"
+import useMediaRTCState from "@hooks/useMediaRTCState"
+
 import "./index.less"
 
 const FloatingScreens = () => {
+	const rtcState = useMediaRTCState()
 	const videoRef = React.useRef(null)
 	const [stream, setStream] = React.useState(null)
 
 	const onClickScreen = (screen) => {
-		app.location.push(`/spaces/channel`)
+		app.location.push(
+			`/spaces/group/${rtcState.channel.group_id}/${rtcState.channel._id}/voice`,
+		)
 	}
 
 	React.useEffect(() => {
