@@ -2,7 +2,7 @@
 	"name": "comty-desktop",
 	"appName": "Comty",
 	"processName": "comty-desktop",
-	"version": "0.5.2",
+	"version": "0.6.0",
 	"license": "MIT",
 	"type": "module",
 	"main": "./src/main.js",
