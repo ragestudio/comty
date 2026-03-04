@@ -96,7 +96,9 @@ const VideoEditor = () => {
 			) : (
 				<Empty
 					image={
-						<VideoCameraOutlined style={{ fontSize: 64, color: "#d9d9d9" }} />
+						<VideoCameraOutlined
+							style={{ fontSize: 64, color: "#d9d9d9" }}
+						/>
 					}
 					description="No video loaded"
 				/>
@@ -130,6 +132,7 @@ const VideoEditor = () => {
 							onChange={handleSyncTimeChange}
 							placeholder="mm:ss:SSS"
 							disabled={state.videoLoop}
+							allowClear={false}
 						/>
 					</Space>
 				</div>
@@ -164,7 +167,9 @@ const VideoEditor = () => {
 								type="primary"
 								onClick={handleUrlSet}
 								disabled={
-									!inputUrl || inputUrl === state.videoSource || state.saving
+									!inputUrl ||
+									inputUrl === state.videoSource ||
+									state.saving
 								}
 							>
 								Set URL
