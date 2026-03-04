@@ -4,7 +4,9 @@ import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
-		const group = await Groups.get(req.params.group_id, req.auth.user_id)
+		const group = await Groups.get(req.params.group_id, {
+			raw: false,
+		})
 
 		if (!group) {
 			throw new OperationError(404, "Group not found")
