@@ -14,7 +14,7 @@
 	},
 	"devDependencies": {
 		"electron": "^39.6.0",
-		"electron-builder": "^26.0.12",
+		"electron-builder": "^26.8.1",
 		"electron-devtools-installer": "^4.0.0"
 	},
 	"dependencies": {
