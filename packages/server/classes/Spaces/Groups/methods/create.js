@@ -23,11 +23,11 @@ export default async function (payload) {
 	await group.saveAsync()
 
 	// create the membership
-	await GroupMemberships.create(payload.owner_user_id, groupId)
+	await GroupMemberships.create(groupId, payload.owner_user_id)
 
 	// create the general text channel
 	await GroupChannels.create(
-		groupId,
+		group,
 		{
 			kind: "chat",
 			name: "General",
