@@ -135,19 +135,13 @@ export const DraggableDrawer = (props) => {
 	)
 
 	async function handleOnOpenChanged(to) {
-		if (to === true) {
-			return to
-		}
+		setIsOpen(!!to)
 
-		setIsOpen(false)
-
-		if (typeof props.onClosed === "function") {
+		if (to === false && typeof props.onClosed === "function") {
 			setTimeout(() => {
 				props.onClosed()
 			}, 350)
 		}
-
-		return to
 	}
 
 	return (

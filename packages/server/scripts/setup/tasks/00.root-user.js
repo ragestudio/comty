@@ -11,7 +11,7 @@ export default {
 
 		if (adminUser.length > 0) {
 			console.log("Admin user already exists")
-			return true
+			return null
 		}
 
 		const defaultUsername = "root"
@@ -33,7 +33,7 @@ export default {
 			`Root user created. Username: ${defaultUsername}, password: ${defaultPwd}\nPlease change the password after first login!!.`,
 		)
 
-		return true
+		return null
 	},
 	crashOnFail: true,
 }

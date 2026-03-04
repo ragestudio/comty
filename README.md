@@ -63,6 +63,3 @@ The project is in alpha design phase, and the development is slow but continuous
 <kbd><img src="https://avatars.githubusercontent.com/u/94137617?v=4" href="https://github.com/SoyRage" height="64" width="64" border="1px" align="center"></kbd>
 <kbd><img src="https://avatars.githubusercontent.com/u/84641340?v=4" href="https://github.com/FoxasFoxVulpes" height="64" width="64" border="1px" align="center"></kbd>
 <kbd><img src="https://avatars.githubusercontent.com/u/179495972?v=4" href="https://github.com/asiersinmasdev" height="64" width="64" border="1px" align="center"></kbd>
-
-## Special Sponsors
-[![Plenix Network - Cheap Hosting Solutions](https://storage.ragestudio.net/comty-static-assets/sponsors/plenix_board.png)](https://plenix.net)
