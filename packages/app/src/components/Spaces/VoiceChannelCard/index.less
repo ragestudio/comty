@@ -1,0 +1,133 @@
+.rtc-vc-card {
+	overflow: hidden;
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	height: fit-content;
+
+	background-color: var(--background-color-primary);
+
+	padding: 15px;
+	gap: 20px;
+
+	border-radius: 12px;
+
+	&__header {
+		position: relative;
+
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		width: 100%;
+		height: fit-content;
+
+		gap: 10px;
+
+		&__titles {
+			overflow: hidden;
+
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+
+			h1 {
+				display: block;
+				width: 100%;
+
+				cursor: pointer;
+				font-size: 0.8rem;
+
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				&:hover {
+					text-decoration: underline;
+					filter: brightness(1.1);
+				}
+			}
+		}
+
+		&__actions {
+			position: relative;
+
+			display: flex;
+			flex-direction: row;
+
+			margin-left: auto;
+		}
+	}
+
+	&__controls {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		gap: 10px;
+	}
+
+	&__self {
+		position: relative;
+
+		width: 35px;
+		height: 35px;
+		min-width: 35px;
+		min-height: 35px;
+
+		border-radius: 12px;
+
+		overflow: hidden;
+
+		&.speaking {
+			box-shadow: 0 0 0 2px var(--colorPrimary);
+			animation: speaking-pulse 1.5s ease-in-out infinite;
+		}
+
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+}
+
+@keyframes speaking-pulse {
+	0% {
+		box-shadow: 0 0 0 2px var(--colorPrimary);
+	}
+	50% {
+		box-shadow: 0 0 0 4px var(--colorPrimary);
+	}
+	100% {
+		box-shadow: 0 0 0 2px var(--colorPrimary);
+	}
+}
+
+.connection-indicator {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: center;
+
+	gap: 5px;
+
+	transition: all 150 ease-in-out;
+
+	font-size: 0.8rem;
+
+	&.connected {
+		color: #70e000;
+	}
+
+	svg path {
+		color: currentColor;
+	}
+
+	&.failed {
+		color: #ff0000;
+	}
+}
