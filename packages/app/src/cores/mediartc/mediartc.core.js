@@ -106,6 +106,8 @@ export default class MediaRTC extends Core {
 	producers = new Producers(this)
 	consumers = new Consumers(this)
 
+	rtpMicWorker = null
+
 	public = {
 		instance: () => this,
 		handlers: () => this.handlers,
@@ -163,6 +165,42 @@ export default class MediaRTC extends Core {
 
 	async afterInitialize() {
 		this.self.audioOutput.initialize()
+
+		this.rtpMicWorker = new Worker(
+			new URL("./workers/rtp-stream.js", import.meta.url),
+		)
+
+		this.rtpMicWorker.onmessage = (event) => {
+			const { id, type, isSpeaking } = event.data
+
+			if (type === "consumer" && this.consumers.has(id)) {
+				// set consumer speaking state
+				this.consumers.get(id).isSpeaking = isSpeaking
+
+				if (isSpeaking) {
+					this.state.speakingConsumers.push(id)
+				} else {
+					const index = this.state.speakingConsumers.findIndex(
+						(_id) => _id === id,
+					)
+
+					if (index !== -1) {
+						this.state.speakingConsumers.splice(index, 1)
+					}
+				}
+			}
+
+			if (type === "producer" && this.producers.has(id)) {
+				const producer = this.producers.get(id)
+
+				if (
+					producer.self === true &&
+					producer.appData?.mediaTag === "user-mic"
+				) {
+					this.state.isSpeaking = isSpeaking
+				}
+			}
+		}
 	}
 
 	async connectSocket({ registerEvents }) {

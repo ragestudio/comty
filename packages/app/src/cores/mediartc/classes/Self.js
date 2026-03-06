@@ -153,8 +153,6 @@ export default class Self {
 			this.audioSettings.inputGain,
 		)
 
-		this.core.state.micStreamAvailable = true
-
 		await this.audioInput.initialize()
 	}
 
@@ -168,8 +166,6 @@ export default class Self {
 
 		this.audioInput.destroy()
 		this.audioInput = null
-
-		this.core.state.micStreamAvailable = false
 	}
 
 	async startMicProducer() {

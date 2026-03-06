@@ -39,8 +39,27 @@ export default class Producers extends Map {
 
 		const producer = await this.core.sendTransport.produce(payload)
 
+		producer.userId = app.userData._id
 		producer.self = true
 		producer.observer.on("close", () => this.onSelfProducerClosed(producer))
+
+		const { readable, writable } = producer.rtpSender.createEncodedStreams()
+
+		if (producer.appData.mediaTag === "user-mic") {
+			this.core.rtpMicWorker.postMessage(
+				{
+					id: producer.id,
+					type: "producer",
+					readableStream: readable,
+					writableStream: writable,
+				},
+				[readable, writable],
+			)
+		} else {
+			readable
+				.pipeTo(writable)
+				.catch((e) => console.warn("Stream pipe error", e))
+		}
 
 		this.set(producer.id, producer)
 

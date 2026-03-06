@@ -68,9 +68,6 @@ export default class Consumers {
 				},
 			)
 
-			consumerInfo.rtpParameters.codecs[0].opusDtx = true
-			consumerInfo.rtpParameters.encodings[0].dtx = true
-
 			const consumer = await this.core.recvTransport.consume({
 				id: consumerInfo.id,
 				producerId: consumerInfo.producerId,
@@ -91,7 +88,24 @@ export default class Consumers {
 				this.stop(consumer.id)
 			})
 
-			// this.core.state.availableConsumers.push(consumer.id)
+			const { readable, writable } =
+				consumer.rtpReceiver.createEncodedStreams()
+
+			if (consumer.appData.mediaTag === "user-mic") {
+				this.core.rtpMicWorker.postMessage(
+					{
+						id: consumer.id,
+						type: "consumer",
+						readableStream: readable,
+						writableStream: writable,
+					},
+					[readable, writable],
+				)
+			} else {
+				readable
+					.pipeTo(writable)
+					.catch((e) => console.warn("Stream pipe error", e))
+			}
 
 			return consumer
 		} catch (error) {

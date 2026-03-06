@@ -6,6 +6,7 @@ export default class MediaRTCState {
 		isLoading: false,
 		isMuted: false,
 		isDeafened: false,
+		isSpeaking: false,
 		isProducingAudio: false,
 		isProducingScreen: false,
 		isProducingCamera: false,
@@ -13,9 +14,9 @@ export default class MediaRTCState {
 		channelId: null,
 		clients: Array(),
 		remoteProducers: Array(),
+		speakingConsumers: Array(),
 		recvTransportState: "closed",
 		sendTransportState: "closed",
-		micStreamAvailable: false,
 	}
 
 	constructor() {
