@@ -1,5 +1,40 @@
+export type ProducerParams = {
+	instance: any
+	transport: any
+	channel: any
+	client: any
+}
+
+export type ProducerInitializeParams = {
+	kind: string
+	rtpParameters: any
+	appData?: any
+}
+
+export type SerializedProducer = {
+	id: string
+	producerId: string
+	channelId: string
+	groupId: string
+	userId: string
+	kind: string | null
+	appData: any
+}
+
 export default class Producer {
-	constructor({ instance, transport, channel, client }) {
+	transport: any
+	channel: any
+	client: any
+	instance: any
+	userId: string
+	groupId: string
+	channelId: string
+
+	producer: any = null
+	id: string | null = null
+	_closing: boolean = false
+
+	constructor({ instance, transport, channel, client }: ProducerParams) {
 		this.transport = transport
 		this.channel = channel
 		this.client = client
@@ -10,10 +45,11 @@ export default class Producer {
 		this.channelId = channel._id
 	}
 
-	producer = null
-	id = null
-
-	async initialize({ kind, rtpParameters, appData }) {
+	async initialize({
+		kind,
+		rtpParameters,
+		appData,
+	}: ProducerInitializeParams) {
 		this.producer = await this.transport.produce({
 			kind,
 			rtpParameters,
@@ -29,10 +65,6 @@ export default class Producer {
 	}
 
 	onProducerOpen = async () => {
-		console.log(`Producer [${this.id}] opened`, {
-			userId: this.userId,
-		})
-
 		// send event to other clients that this producer has joined
 		await this.instance.sendToClients(
 			this.client,
@@ -49,7 +81,7 @@ export default class Producer {
 
 		const userProducers = instanceProducers.get(this.userId)
 
-		userProducers.set(this.id, this)
+		userProducers.set(this.id!, this)
 	}
 
 	onProducerClose = async () => {
@@ -59,10 +91,6 @@ export default class Producer {
 		}
 
 		this._closing = true
-
-		console.log(`Producer [${this.id}] closed`, {
-			userId: this.userId,
-		})
 
 		try {
 			// notify to other clients that this producer has closed
@@ -84,7 +112,7 @@ export default class Producer {
 
 			// remove the producer from the map if it exists
 			if (userProducers) {
-				userProducers.delete(this.id)
+				userProducers.delete(this.id!)
 
 				// if no more user producers, remove the map from the instance
 				if (userProducers.size === 0) {
@@ -108,10 +136,10 @@ export default class Producer {
 		}
 	}
 
-	serialize = () => {
+	serialize = (): SerializedProducer => {
 		return {
-			id: this.producer ? this.producer.id : this.id,
-			producerId: this.producer ? this.producer.id : this.id,
+			id: this.producer ? this.producer.id : this.id!,
+			producerId: this.producer ? this.producer.id : this.id!,
 			channelId: this.channelId,
 			groupId: this.groupId,
 			userId: this.userId,
@@ -119,7 +147,4 @@ export default class Producer {
 			appData: this.producer ? this.producer.appData : null,
 		}
 	}
-
-	// Keep backward compatibility
-	seralize = this.serialize
 }

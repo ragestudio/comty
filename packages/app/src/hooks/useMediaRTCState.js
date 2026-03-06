@@ -21,7 +21,7 @@ export const useMediaRTCState = () => {
 
 	return {
 		...state,
-		clients: Array.from(Object.values(state.clients)),
+		speakingConsumers: new Set(state.speakingConsumers),
 	}
 }
 

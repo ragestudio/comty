@@ -11,22 +11,19 @@ const DirectMessageMainPage = () => {
 
 	return (
 		<>
-			<div className="spaces-page">
-				<div className="spaces-page__content">
-					{ctx.room && <DMRoom to_user_id={ctx.room} />}
+			{ctx.room && <DMRoom to_user_id={ctx.room} />}
 
-					{!ctx.room && (
-						<DMRoomsList
-							selectedRoom={ctx.room}
-							onClickItem={(room) => {
-								ctx.setType("dm")
-								ctx.setRoom(room.to_user_id)
-								ctx.setChannel(null)
-							}}
-						/>
-					)}
-				</div>
-			</div>
+			{!ctx.room && (
+				<DMRoomsList
+					selectedRoom={ctx.room}
+					onClickItem={(room) => {
+						ctx.setType("dm")
+						ctx.setRoom(room.to_user_id)
+						ctx.setChannel(null)
+					}}
+				/>
+			)}
+
 			<ToolsBar />
 		</>
 	)

@@ -1,4 +1,4 @@
-export default (rtpParameters, kind) => {
+function validateRtpParameters(rtpParameters: any, kind?: string) {
 	if (!rtpParameters.codecs || !Array.isArray(rtpParameters.codecs)) {
 		throw new Error("Invalid rtpParameters: missing codecs")
 	}
@@ -12,7 +12,7 @@ export default (rtpParameters, kind) => {
 	// Validate that codecs match the expected kind
 	if (kind) {
 		const expectedPrefix = kind === "video" ? "video/" : "audio/"
-		const hasMatchingCodec = rtpParameters.codecs.some((c) =>
+		const hasMatchingCodec = rtpParameters.codecs.some((c: any) =>
 			c.mimeType?.startsWith(expectedPrefix),
 		)
 
@@ -23,13 +23,15 @@ export default (rtpParameters, kind) => {
 
 	// Check for mixed media types
 	const hasVideo = rtpParameters.codecs.some(
-		(c) => c.kind === "video" || c.mimeType?.startsWith("video/"),
+		(c: any) => c.kind === "video" || c.mimeType?.startsWith("video/"),
 	)
 	const hasAudio = rtpParameters.codecs.some(
-		(c) => c.kind === "audio" || c.mimeType?.startsWith("audio/"),
+		(c: any) => c.kind === "audio" || c.mimeType?.startsWith("audio/"),
 	)
 
 	if (hasVideo && hasAudio) {
 		throw new Error("Invalid rtpParameters: contains multiple media types")
 	}
 }
+
+export default validateRtpParameters

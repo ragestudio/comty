@@ -1,10 +1,21 @@
 import Producer from "../producer"
 import validateRtpParameters from "../utils/validateRtpParameters"
 import setFind from "@shared-utils/setFind"
+import type { RTCClient } from "../types.d.ts"
 
-export default async function (client, payload) {
+export type ProducePayload = {
+	transportId: string
+	kind: string
+	rtpParameters: any
+}
+
+async function produceHandler(
+	this: any,
+	client: RTCClient,
+	payload: ProducePayload,
+) {
 	try {
-		const clientInst = setFind(this.clients, (c) => {
+		const clientInst = setFind(this.clients, (c: RTCClient) => {
 			return c.userId === client.userId
 		})
 
@@ -20,7 +31,7 @@ export default async function (client, payload) {
 			throw new OperationError(400, "Missing required parameters")
 		}
 
-		const transport = clientInst.transports.get(payload.transportId)
+		const transport = clientInst.transports?.get(payload.transportId)
 
 		if (!transport) {
 			throw new OperationError(404, "Transport not found")
@@ -45,3 +56,5 @@ export default async function (client, payload) {
 		throw error
 	}
 }
+
+export default produceHandler

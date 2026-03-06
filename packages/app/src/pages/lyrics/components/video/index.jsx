@@ -13,6 +13,12 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 	const [initialLoading, setInitialLoading] = React.useState(true)
 	const [syncingVideo, setSyncingVideo] = React.useState(false)
 	const [currentVideoLatency, setCurrentVideoLatency] = React.useState(0)
+	const [videoStats, setVideoStats] = React.useState({
+		activeLevel: null,
+		resolution: null,
+		codec: null,
+		bitrate: null,
+	})
 	// const isDebugEnabled = React.useMemo(
 	// 	() => app.cores.settings.is("_debug", true),
 	// 	[],
@@ -114,10 +120,44 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 		syncIntervalRef.current = setInterval(syncPlayback, 300)
 	}, [syncPlayback])
 
+	const updateVideoStats = React.useCallback(() => {
+		if (!hls.current) {
+			return
+		}
+
+		const currentLevel = hls.current.currentLevel
+		const levels = hls.current.levels
+
+		if (currentLevel !== -1 && levels && levels[currentLevel]) {
+			const level = levels[currentLevel]
+
+			setVideoStats({
+				activeLevel: currentLevel,
+				resolution: level.height
+					? `${level.width}x${level.height}`
+					: "N/A",
+				codec: level.codec || "N/A",
+				bitrate: level.bitrate
+					? `${Math.round(level.bitrate / 1000)} kbps`
+					: "N/A",
+			})
+		} else {
+			setVideoStats({
+				activeLevel: null,
+				resolution: null,
+				codec: null,
+				bitrate: null,
+			})
+		}
+	}, [setVideoStats])
+
 	React.useEffect(() => {
 		setCurrentVideoLatency(0)
 		const videoElement = videoRef.current
-		if (!videoElement) return
+
+		if (!videoElement) {
+			return undefined
+		}
 
 		if (lyrics && lyrics.video_source) {
 			console.log("VIDEO:: Loading video source >", lyrics.video_source)
@@ -153,7 +193,19 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
 					hls.current.on(HLS.Events.LEVEL_SWITCHED, (event, data) => {
 						console.debug("VIDEO:: Level Switched", data)
+						updateVideoStats()
 					})
+
+					hls.current.on(
+						HLS.Events.MANIFEST_PARSED,
+						(event, data) => {
+							console.debug("VIDEO:: Manifest Parsed", data)
+							updateVideoStats()
+						},
+					)
+
+					// initial stats update
+					updateVideoStats()
 				} else if (
 					videoElement.canPlayType("application/vnd.apple.mpegurl")
 				) {
@@ -177,9 +229,22 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 					hls.current.detachMedia()
 				}
 			}
+			setVideoStats({
+				activeLevel: null,
+				resolution: null,
+				codec: null,
+				bitrate: null,
+			})
 		}
 		setInitialLoading(false)
-	}, [lyrics, videoRef, hls, setCurrentVideoLatency, setInitialLoading])
+	}, [
+		lyrics,
+		videoRef,
+		hls,
+		setCurrentVideoLatency,
+		setInitialLoading,
+		updateVideoStats,
+	])
 
 	React.useEffect(() => {
 		stopSyncInterval()
@@ -277,9 +342,20 @@ const LyricsVideo = React.forwardRef((props, videoRef) => {
 
 					<div>
 						<p>
-							Video codec:{" "}
-							{hls.current?.levels[0]?.codec || "N/A"}
+							Active level:{" "}
+							{videoStats.activeLevel !== null
+								? videoStats.activeLevel
+								: "N/A"}
 						</p>
+					</div>
+					<div>
+						<p>Resolution: {videoStats.resolution || "N/A"}</p>
+					</div>
+					<div>
+						<p>Codec: {videoStats.codec || "N/A"}</p>
+					</div>
+					<div>
+						<p>Bitrate: {videoStats.bitrate || "N/A"}</p>
 					</div>
 				</div>
 			)}

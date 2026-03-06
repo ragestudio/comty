@@ -1,10 +1,14 @@
 {
 	"compilerOptions": {
+		"target": "ES2022",
 		"module": "commonjs",
-		"noImplicitAny": true,
-		"removeComments": true,
+		"strict": false,
+		"noImplicitAny": false,
+		"skipLibCheck": true,
 		"preserveConstEnums": true,
 		"sourceMap": true,
+		"baseUrl": ".",
 	},
 	"files": ["global.d.ts"],
+	"include": ["**/*.ts", "types/**/*.d.ts"],
 }

@@ -30,14 +30,14 @@ export default class Screen {
 			this.media.getTracks().forEach((track) => track.stop())
 		}
 
+		// if the screens map stills having this screen, remove it
+		if (this.rtc.screens.has(this.producer.userId)) {
+			this.rtc.screens.delete(this.producer.userId)
+		}
+
 		// stop all consumers
 		for (const consumerId of this.consumersIds) {
 			await this.rtc.consumers.stop(consumerId)
-		}
-
-		// if the screens map stills having this screen, remove it
-		if (this.rtc.screens.has(this.producer.id)) {
-			this.rtc.screens.delete(this.producer.id)
 		}
 	}
 

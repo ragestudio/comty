@@ -1,8 +1,9 @@
 import setFind from "@shared-utils/setFind"
+import type { RTCClient } from "../types.d.ts"
 
-export default async function (client) {
+async function createTransportHandler(this: any, client: RTCClient) {
 	try {
-		const clientInst = setFind(this.clients, (c) => {
+		const clientInst = setFind(this.clients, (c: RTCClient) => {
 			return c.userId === client.userId
 		})
 
@@ -22,11 +23,11 @@ export default async function (client) {
 				?.split(",")[0]
 				?.trim()
 
-		let announcedIp = globalThis.process.env.MEDIASOUP_ANNOUNCED_IP
+		let announcedIp = (globalThis as any).process.env.MEDIASOUP_ANNOUNCED_IP
 
 		if (!announcedIp) {
 			announcedIp =
-				globalThis.process.env.NODE_ENV === "production"
+				(globalThis as any).process.env.NODE_ENV === "production"
 					? clientIp || "127.0.0.1"
 					: "127.0.0.1"
 		}
@@ -34,20 +35,30 @@ export default async function (client) {
 		const transportConfig = {
 			listenIps: [
 				{
-					ip: globalThis.process.env.MEDIASOUP_LISTEN_IP || "0.0.0.0",
+					ip:
+						(globalThis as any).process.env.MEDIASOUP_LISTEN_IP ||
+						"0.0.0.0",
 					announcedIp: announcedIp,
 				},
 			],
-			enableUdp: globalThis.process.env.MEDIASOUP_ENABLE_UDP !== "false",
-			enableTcp: globalThis.process.env.MEDIASOUP_ENABLE_TCP !== "false",
-			preferUdp: globalThis.process.env.MEDIASOUP_PREFER_UDP !== "false",
+			enableUdp:
+				(globalThis as any).process.env.MEDIASOUP_ENABLE_UDP !==
+				"false",
+			enableTcp:
+				(globalThis as any).process.env.MEDIASOUP_ENABLE_TCP !==
+				"false",
+			preferUdp:
+				(globalThis as any).process.env.MEDIASOUP_PREFER_UDP !==
+				"false",
 			maxIncomingBitrate:
 				parseInt(
-					globalThis.process.env.MEDIASOUP_MAX_INCOMING_BITRATE,
+					(globalThis as any).process.env
+						.MEDIASOUP_MAX_INCOMING_BITRATE,
 				) || 6000000,
 			maxOutgoingBitrate:
 				parseInt(
-					globalThis.process.env.MEDIASOUP_MAX_OUTGOING_BITRATE,
+					(globalThis as any).process.env
+						.MEDIASOUP_MAX_OUTGOING_BITRATE,
 				) || 8000000,
 		}
 
@@ -72,3 +83,5 @@ export default async function (client) {
 		throw error
 	}
 }
+
+export default createTransportHandler

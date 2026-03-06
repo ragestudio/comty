@@ -1,4 +1,4 @@
-import MediaRTCChannelCard from "@components/MediaRTCChannelCard"
+import VoiceChannelCard from "@components/Spaces/VoiceChannelCard"
 import FloatingScreens from "@components/FloatingScreens"
 
 export default class UI {
@@ -16,7 +16,7 @@ export default class UI {
 
 		this.domWindow = app.layout.tools_bar.attachRender(
 			"mediartc-channel",
-			MediaRTCChannelCard,
+			VoiceChannelCard,
 			undefined,
 			{
 				position: "bottom",

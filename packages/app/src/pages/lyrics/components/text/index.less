@@ -32,6 +32,13 @@
 
 			margin: 0;
 
+			&.words {
+				display: inline-flex;
+				flex-wrap: wrap;
+				text-wrap: balance;
+				gap: 9px;
+			}
+
 			&.current {
 				opacity: 1;
 			}
@@ -64,6 +71,7 @@
 .line__word {
 	opacity: 0.5;
 	transition: all ease-in 150ms;
+	height: fit-content;
 
 	&.current {
 		opacity: 1;

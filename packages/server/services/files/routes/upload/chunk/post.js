@@ -28,7 +28,7 @@ export default {
 			maxFileSize: parseInt(ctx.limits.maxFileSizeInMB) * 1024 * 1024,
 			maxChunkSize: parseInt(ctx.limits.maxChunkSizeInMB) * 1024 * 1024,
 			useCompression: true,
-			useProvider: req.headers["use-provider"] ?? "standard",
+			useProvider: req.headers["use-provider"] ?? "b2",
 		}
 
 		// const user = await req.auth.user()

@@ -1,4 +1,14 @@
-export default async function (client, payload) {
+import type { RTCClient } from "../types.d.ts"
+
+export type StopProducePayload = {
+	producerId: string
+}
+
+async function stopProduceHandler(
+	this: any,
+	client: RTCClient,
+	payload: StopProducePayload,
+) {
 	try {
 		const { producerId } = payload
 
@@ -29,3 +39,5 @@ export default async function (client, payload) {
 		throw error
 	}
 }
+
+export default stopProduceHandler

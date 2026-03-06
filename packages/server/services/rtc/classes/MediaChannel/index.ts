@@ -8,14 +8,14 @@ import leaveClientHandler from "./handlers/leaveClient"
 import connectTransportHandler from "./handlers/connectTransport"
 import createTransportHandler from "./handlers/createTransport"
 
+import type { MediaChannelParams, RTCClient } from "./types"
+
 export default class MediaChannel {
-	constructor(params) {
-		this.params = params
-		this.data = params.data
-		this.channelId = params.channelId
-		this.worker = params.worker
-		this.mediaCodecs = params.mediaCodecs || MediaChannel.defaultMediaCodecs
-	}
+	params: MediaChannelParams
+	data: any
+	channelId: string
+	worker: any
+	mediaCodecs: any[]
 
 	static defaultMediaCodecs = [
 		{
@@ -23,6 +23,16 @@ export default class MediaChannel {
 			mimeType: "audio/opus",
 			clockRate: 48000,
 			channels: 2,
+			parameters: {
+				useinbandfec: 1,
+				usedtx: 1,
+			},
+			headerExtensions: [
+				{
+					uri: "urn:ietf:params:rtp-hdrext:ssrc-audio-level",
+					kind: "audio",
+				},
+			],
 		},
 		{
 			kind: "video",
@@ -46,10 +56,18 @@ export default class MediaChannel {
 		},
 	]
 
-	router = null
-	clients = new Set()
-	producers = new Map()
-	consumers = new Map()
+	router: any = null
+	clients: Set<RTCClient> = new Set()
+	producers: Map<string, Map<string, any>> = new Map()
+	consumers: Map<string, any[]> = new Map()
+
+	constructor(params: MediaChannelParams) {
+		this.params = params
+		this.data = params.data
+		this.channelId = params.channelId
+		this.worker = params.worker
+		this.mediaCodecs = params.mediaCodecs || MediaChannel.defaultMediaCodecs
+	}
 
 	async initialize() {
 		try {
@@ -133,7 +151,7 @@ export default class MediaChannel {
 		}
 	}
 
-	async handleClientEvent(client, payload) {
+	async handleClientEvent(client: RTCClient, payload: any) {
 		if (!payload.event || !payload.data) {
 			throw new Error("Missing required parameters")
 		}
@@ -156,16 +174,28 @@ export default class MediaChannel {
 			data: payload.data,
 			clientVoiceState: client.voiceState,
 		})
+
+		this.sendToGroupTopic("client:vc:event", {
+			event: payload.event,
+			userId: client.userId,
+			channelId: this.channelId,
+			user: {
+				_id: client.context.user._id,
+				username: client.context.user.username,
+				avatar: client.context.user.avatar,
+			},
+			data: payload.data,
+		})
 	}
 
-	async handleSoundpadDispatch(client, payload) {
+	async handleSoundpadDispatch(client: RTCClient, payload: any) {
 		this.broadcastToClients(`media:channel:soundpad:dispatch`, {
 			userId: client.userId,
 			data: payload,
 		})
 	}
 
-	updateClientVoiceState(client, update) {
+	updateClientVoiceState(client: RTCClient, update: any) {
 		for (const c of this.clients) {
 			if (c.userId === client.userId) {
 				c.voiceState = {
@@ -176,12 +206,12 @@ export default class MediaChannel {
 		}
 	}
 
-	_setupTransportEvents(transport, client) {
-		transport.on("dtlsstatechange", (dtlsState) => {
+	_setupTransportEvents(transport: any, client: RTCClient) {
+		transport.on("dtlsstatechange", (dtlsState: string) => {
 			console.log(`Transport ${transport.id} DTLS state: ${dtlsState}`)
 		})
 
-		transport.on("iceconnectionstatechange", (iceState) => {
+		transport.on("iceconnectionstatechange", (iceState: string) => {
 			console.log(`Transport ${transport.id} ICE state: ${iceState}`)
 		})
 
@@ -192,7 +222,7 @@ export default class MediaChannel {
 		})
 	}
 
-	_setupConsumerEvents(consumer, client) {
+	_setupConsumerEvents(consumer: any, client: RTCClient) {
 		consumer.on("transportclose", () => {
 			console.log("consumer transport closed")
 		})
@@ -211,17 +241,22 @@ export default class MediaChannel {
 			return {
 				userId: c.userId,
 				voiceState: c.voiceState,
+				user: {
+					_id: c.context.user?._id,
+					username: c.context.user?.username,
+					avatar: c.context.user?.avatar,
+				},
 			}
 		})
 	}
 
 	/**
 	 * Send a event to all clients except the one provided
-	 * @param {Object<Client>} Origin client client
+	 * @param {Object<RTCClient>} Origin client client
 	 * @param {string} The event name
 	 * @param {Object} The payload object
 	 */
-	async sendToClients(client, event, payload) {
+	async sendToClients(client: RTCClient, event: string, payload: any) {
 		try {
 			const otherClients = Array.from(this.clients).filter(
 				(c) => c.userId !== client.userId,
@@ -240,10 +275,10 @@ export default class MediaChannel {
 
 	/**
 	 * Broadcast an event to all clients
-	 * @param {string} The event name
-	 * @param {Object} The payload object
+	 * @param {string} event
+	 * @param {Object} payload
 	 */
-	async broadcastToClients(event, payload) {
+	async broadcastToClients(event: string, payload: any) {
 		try {
 			for (const client of this.clients) {
 				await client.emit(event, payload)
@@ -259,11 +294,11 @@ export default class MediaChannel {
 	 * @param {Object} payload
 	 * @return {Promise}
 	 */
-	async sendToGroupTopic(event, payload) {
+	async sendToGroupTopic(event: string, payload: any) {
 		const topic = `group:${this.data.group_id}`
 
 		try {
-			return await globalThis.websockets.senders.toTopic(
+			return await (globalThis as any).websockets.senders.toTopic(
 				topic,
 				`${topic}:${event}`,
 				payload,

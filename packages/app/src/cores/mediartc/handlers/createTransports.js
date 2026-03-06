@@ -91,6 +91,9 @@ export default async function () {
 		iceParameters: sendTransportInfo.iceParameters,
 		iceCandidates: sendTransportInfo.iceCandidates,
 		dtlsParameters: sendTransportInfo.dtlsParameters,
+		additionalSettings: {
+			encodedInsertableStreams: true,
+		},
 	})
 
 	const recvTransportInfo = await this.socket.call("channel:create_transport")
@@ -100,6 +103,9 @@ export default async function () {
 		iceParameters: recvTransportInfo.iceParameters,
 		iceCandidates: recvTransportInfo.iceCandidates,
 		dtlsParameters: recvTransportInfo.dtlsParameters,
+		additionalSettings: {
+			encodedInsertableStreams: true,
+		},
 	})
 
 	for (const [event, handler] of Object.entries(sendTransportHandlers)) {

@@ -146,6 +146,18 @@ export default class Client {
 		this.coreState.voiceState = this.voiceState
 	}
 
+	getAvailableProducers() {
+		let producers = []
+
+		for (const [_, producer] of this.core.producers) {
+			if (producer.userId === this.userId) {
+				producers.push(producer)
+			}
+		}
+
+		return producers
+	}
+
 	get coreStateIndex() {
 		return this.core.state.clients.findIndex((clientState) => {
 			return clientState.userId === this.userId

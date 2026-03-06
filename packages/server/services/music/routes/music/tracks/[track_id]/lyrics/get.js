@@ -9,19 +9,26 @@ class LRCV1 {
 	static timeStrToMs(timeStr) {
 		const [minutes, seconds, milliseconds] = timeStr.split(":")
 
+		const sign = timeStr.startsWith("-") ? -1 : 1
+		const absMinutes = Math.abs(Number(minutes))
+		const absSeconds = Math.abs(Number(seconds))
+		const absMilliseconds = Math.abs(Number(milliseconds))
+
 		return (
-			Number(minutes) * 60 * 1000 +
-			Number(seconds) * 1000 +
-			Number(milliseconds)
+			sign *
+			(absMinutes * 60 * 1000 + absSeconds * 1000 + absMilliseconds)
 		)
 	}
 
 	static timeStrToSeconds(timeStr) {
 		const [minutes, seconds, milliseconds] = timeStr.split(":")
 
-		return (
-			Number(minutes) * 60 + Number(seconds) + Number(milliseconds) / 1000
-		)
+		const sign = timeStr.startsWith("-") ? -1 : 1
+		const absMinutes = Math.abs(Number(minutes))
+		const absSeconds = Math.abs(Number(seconds))
+		const absMilliseconds = Math.abs(Number(milliseconds))
+
+		return sign * (absMinutes * 60 + absSeconds + absMilliseconds / 1000)
 	}
 
 	static parseString(str) {
@@ -54,8 +61,15 @@ class LRCV1 {
 		lyricsArray = lyricsArray.map((line, index) => {
 			const nextLine = lyricsArray[index + 1]
 
-			line.start_ms = secondsToMs(line.time)
-			line.end_ms = secondsToMs(nextLine ? nextLine.time : line.time + 1)
+			if (!line.start_ms) {
+				line.start_ms = secondsToMs(line.time)
+			}
+
+			if (!line.end_ms) {
+				line.end_ms = secondsToMs(
+					nextLine ? nextLine.time : line.time + 1,
+				)
+			}
 
 			return line
 		})
@@ -90,7 +104,11 @@ export default async (req) => {
 			if (typeof result.lrc[language] === "string") {
 				let { data } = await axios.get(result.lrc[language])
 
-				result.synced_lyrics = LRCV1.parseString(data)
+				if (typeof data === "string") {
+					data = LRCV1.parseString(data)
+				}
+
+				result.synced_lyrics = data
 				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			} else {
 				result.synced_lyrics = result.lrc[language]

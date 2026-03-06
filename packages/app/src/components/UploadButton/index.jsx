@@ -33,6 +33,10 @@ const UploadButton = React.forwardRef((props, ref) => {
 		if (typeof props.onSuccess === "function") {
 			props.onSuccess(file_uid, response)
 		}
+
+		if (typeof props.onUpdate === "function") {
+			props.onUpdate(response.url)
+		}
 	}
 
 	const handleUpload = async (req) => {

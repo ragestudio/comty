@@ -6,6 +6,7 @@ import ChannelsListItem from "./item"
 
 import { GroupContext, VALID_CHANNEL_KINDS } from "@contexts/WithSpaces/group"
 import SpacesPageContext from "@contexts/WithSpaces/page"
+import useMediaRTCState from "@hooks/useMediaRTCState"
 
 import "./index.less"
 
@@ -56,11 +57,11 @@ const ChannelsPanel = () => {
 						<ChannelsListItem
 							key={channel._id}
 							channel={channel}
+							selected={page.channel === channel._id}
 							handleOnClick={() => handleOnClickChannel(channel)}
 							invalid={
 								!VALID_CHANNEL_KINDS.includes(channel.kind)
 							}
-							selected={page.channel === channel._id}
 						/>
 					))}
 			</div>
