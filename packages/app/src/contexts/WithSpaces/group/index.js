@@ -1,9 +1,12 @@
 import React from "react"
 import GroupsModel from "@models/groups"
 
-import onClientListUpdateEvent from "./events/clientListUpdate"
 import onUserOnlineEvent from "./events/userOnline"
 import onUserOfflineEvent from "./events/userOffline"
+import onClientEvent from "./events/clientEvent"
+
+import onClientVoiceChannelJoinEvent from "./events/clientVoiceChannelJoin"
+import onClientVoiceChannelLeftEvent from "./events/clientVoiceChannelLeft"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"]
 
@@ -178,22 +181,31 @@ const useGroup = ({ group_id }) => {
 
 		loadInitialData()
 
-		const handleClientUpdate = (payload) =>
-			onClientListUpdateEvent(dataRef.current, setChannels, payload)
 		const handleUserOnline = (payload) =>
 			onUserOnlineEvent(dataRef.current, setConnectedMembers, payload)
 		const handleUserOffline = (payload) =>
 			onUserOfflineEvent(dataRef.current, setConnectedMembers, payload)
 
+		const handleClientVoiceChannelJoin = (payload) =>
+			onClientVoiceChannelJoinEvent(dataRef.current, setChannels, payload)
+		const handleClientVoiceChannelLeave = (payload) =>
+			onClientVoiceChannelLeftEvent(dataRef.current, setChannels, payload)
+		const handleClientVoiceChannelEvent = (payload) =>
+			onClientEvent(dataRef.current, payload, setChannels)
+
 		if (socket.current) {
 			socket.current.emit("group:subscribe", group_id)
 			socket.current.on(
-				`group:${group_id}:client:joined`,
-				handleClientUpdate,
+				`group:${group_id}:client:vc:join`,
+				handleClientVoiceChannelJoin,
 			)
 			socket.current.on(
-				`group:${group_id}:client:left`,
-				handleClientUpdate,
+				`group:${group_id}:client:vc:left`,
+				handleClientVoiceChannelLeave,
+			)
+			socket.current.on(
+				`group:${group_id}:client:vc:event`,
+				handleClientVoiceChannelEvent,
 			)
 			socket.current.on(`group:${group_id}:user:online`, handleUserOnline)
 			socket.current.on(
@@ -208,12 +220,16 @@ const useGroup = ({ group_id }) => {
 			if (socket.current) {
 				socket.current.emit("group:unsubscribe", group_id)
 				socket.current.off(
-					`group:${group_id}:client:joined`,
-					handleClientUpdate,
+					`group:${group_id}:client:vc:join`,
+					handleClientVoiceChannelJoin,
 				)
 				socket.current.off(
-					`group:${group_id}:client:left`,
-					handleClientUpdate,
+					`group:${group_id}:client:vc:left`,
+					handleClientVoiceChannelLeave,
+				)
+				socket.current.off(
+					`group:${group_id}:client:vc:event`,
+					handleClientVoiceChannelEvent,
 				)
 				socket.current.off(
 					`group:${group_id}:user:online`,
