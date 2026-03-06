@@ -1,7 +1,7 @@
-import MediaRTCChannelCard from "@components/MediaRTCChannelCard"
+import VoiceChannelCard from "@components/Spaces/VoiceChannelCard"
 
 const CallView = () => {
-	return <MediaRTCChannelCard />
+	return <VoiceChannelCard />
 }
 
 export default CallView
