@@ -1,51 +1,76 @@
-import React from "react"
-import { motion, AnimatePresence } from "motion/react"
 import classnames from "classnames"
+import { AnimatePresence } from "motion/react"
+
+import VoiceClient from "@components/Spaces/VoiceClient"
+import useMediaRTCState from "@hooks/useMediaRTCState"
 
 import { Icons } from "@components/Icons"
-import UsersModel from "@models/user"
 
 import "./index.less"
 
-const Client = React.memo(({ userId }) => {
-	if (!userId) {
+const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
+	if (!channel) {
 		return null
 	}
 
-	const [loading, result, error] = app.cores.api.useRequest(UsersModel.data, {
-		user_id: userId,
-		basic: true,
-	})
+	const rtcState = useMediaRTCState()
+	const isJoined = rtcState.channelId === channel._id
 
-	if (loading || error || !result) {
-		return null
-	}
+	const getRtcClient = React.useCallback(
+		(client) => {
+			if (!isJoined || !client) {
+				return null
+			}
 
-	return (
-		<div className="group-page__channels-panel__list-item__clients__client">
-			<img
-				src={result.avatar}
-				alt={result.username}
-			/>
-			<p>{result.public_name ?? result.username}</p>
-		</div>
+			return app.cores.mediartc.instance().clients.get(client.userId)
+		},
+		[isJoined, rtcState],
 	)
-})
 
-const ChannelsListItem = (props) => {
-	const { channel, invalid, selected, handleOnClick } = props
+	const isClientSpeaking = React.useCallback(
+		(client) => {
+			const rtcClient = getRtcClient(client)
 
-	const isEmpty = !channel.clients || channel.clients.length === 0
+			if (!rtcClient) {
+				return null
+			}
+
+			if (rtcClient.self) {
+				return rtcState.isSpeaking
+			}
+
+			return rtcClient.micConsumer?.isSpeaking
+		},
+		[isJoined, rtcState],
+	)
+
+	const getClientProducers = React.useCallback(
+		(client) => {
+			const rtcClient = getRtcClient(client)
+
+			if (!rtcClient) {
+				return []
+			}
+
+			return rtcClient.getAvailableProducers()
+		},
+		[isJoined, rtcState],
+	)
 
 	return (
 		<div
-			className={classnames("group-page__channels-panel__list-item", {
-				["invalid"]: invalid,
-				["selected"]: selected,
-			})}
+			className={classnames(
+				"group-page__channels-panel__list-item bg-accent",
+				{
+					["invalid"]: invalid,
+					["selected"]: selected,
+					["joined"]: isJoined,
+					["empty"]: channel?.clients?.length === 0,
+				},
+			)}
 		>
 			<div
-				className="group-page__channels-panel__list-item__content bg-accent"
+				className="group-page__channels-panel__list-item__content "
 				onClick={handleOnClick}
 			>
 				<div className="group-page__channels-panel__list-item__content__icon">
@@ -66,25 +91,23 @@ const ChannelsListItem = (props) => {
 				</div>
 			</div>
 
-			<AnimatePresence initial={false}>
-				{!isEmpty && (
-					<motion.div
+			<AnimatePresence mode="sync">
+				{channel?.clients?.length !== 0 && (
+					<div
 						key={`clients-list-${channel._id}`}
 						className="group-page__channels-panel__list-item__clients bg-accent"
-						initial={{ height: 0, opacity: 0 }}
-						animate={{ height: "auto", opacity: 1 }}
-						exit={{ height: 0, opacity: 0 }}
-						style={{ overflow: "hidden" }}
 					>
-						{channel.clients.map((client) => {
+						{channel?.clients.map((client, index) => {
 							return (
-								<Client
-									key={client.userId}
-									userId={client.userId}
+								<VoiceClient
+									key={index}
+									client={client}
+									speaking={isClientSpeaking(client)}
+									producers={getClientProducers(client)}
 								/>
 							)
 						})}
-					</motion.div>
+					</div>
 				)}
 			</AnimatePresence>
 		</div>
