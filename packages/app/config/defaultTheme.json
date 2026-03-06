@@ -21,7 +21,6 @@
 		"bottom-bar-height": "80px",
 		"compact-mode": false,
 
-		"primaryColor": "#ff6064",
 		"backgroundColorPrimary": "var(--background-color-primary)",
 		"backgroundColorAccent": "var(--background-color-accent)"
 	},
