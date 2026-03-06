@@ -1,4 +1,6 @@
-export default async function (client) {
+import type { RTCClient } from "../types.d.ts"
+
+async function joinClientHandler(this: any, client: RTCClient) {
 	try {
 		client.transports = new Map()
 
@@ -13,11 +15,14 @@ export default async function (client) {
 		const clients = Array.from(this.clients)
 
 		// Notify other clients about new client
-		const otherClients = clients.filter((c) => c.userId !== client.userId)
+		const otherClients = clients.filter(
+			(c: RTCClient) => c.userId !== client.userId,
+		) as RTCClient[]
 
 		for (const otherClient of otherClients) {
 			await otherClient.emit(`media:channel:client:joined`, {
 				userId: client.userId,
+				user: client.context.user,
 				voiceState: client.voiceState,
 			})
 		}
@@ -39,25 +44,29 @@ export default async function (client) {
 		}
 
 		// publish to group topic
-		await this.sendToGroupTopic("client:joined", {
+		await this.sendToGroupTopic("client:vc:join", {
 			userId: client.userId,
 			channelId: this.channelId,
+			user: {
+				_id: client.context.user._id,
+				username: client.context.user.username,
+				avatar: client.context.user.avatar,
+			},
+			voiceState: client.voiceState,
 			channelClients: this.getConnectedClientsSerialized(),
 		})
-
-		console.log(`Client ${client.userId} joined channel ${this.channelId}`)
 
 		return {
 			room: this.data,
 			channelId: this.channelId,
 			rtpCapabilities: this.router.rtpCapabilities,
-			clients: clients.map((c) => {
+			clients: clients.map((_client: RTCClient) => {
 				const data = {
-					userId: c.userId,
-					voiceState: c.voiceState,
-				}
+					userId: _client.userId,
+					voiceState: _client.voiceState,
+				} as RTCClient
 
-				if (c.userId === client.userId) {
+				if (_client.userId === client.userId) {
 					data.self = true
 				}
 
@@ -70,3 +79,5 @@ export default async function (client) {
 		throw error
 	}
 }
+
+export default joinClientHandler

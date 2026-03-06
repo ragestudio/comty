@@ -43,13 +43,7 @@ export default {
 		channels = channels.map((channel) => {
 			return {
 				_id: channel.data._id,
-				clients: Array.from(channel.clients.values()).map((client) => {
-					return {
-						userId: client.userId,
-						voiceStatus: client.voiceStatus,
-						self: client.userId === req.auth.session.user_id,
-					}
-				}),
+				clients: channel.getConnectedClientsSerialized(),
 			}
 		})
 

@@ -1,8 +1,18 @@
 import setFind from "@shared-utils/setFind"
+import type { RTCClient } from "../types.d.ts"
 
-export default async function (client, payload) {
+export type ConnectTransportPayload = {
+	transportId: string
+	dtlsParameters: any
+}
+
+async function connectTransportHandler(
+	this: any,
+	client: RTCClient,
+	payload: ConnectTransportPayload,
+) {
 	try {
-		const clientInst = setFind(this.clients, (c) => {
+		const clientInst = setFind(this.clients, (c: RTCClient) => {
 			return c.userId === client.userId
 		})
 
@@ -11,7 +21,7 @@ export default async function (client, payload) {
 		}
 
 		const { transportId, dtlsParameters } = payload
-		const transport = clientInst.transports.get(transportId)
+		const transport = clientInst.transports?.get(transportId)
 
 		if (!transport) {
 			throw new Error("Transport not found")
@@ -23,3 +33,5 @@ export default async function (client, payload) {
 		throw error
 	}
 }
+
+export default connectTransportHandler

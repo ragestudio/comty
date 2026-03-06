@@ -1,8 +1,17 @@
 import setFind from "@shared-utils/setFind"
+import type { RTCClient } from "../types.d.ts"
 
-export default async function (client, { emitEventToSelf = false } = {}) {
+export type LeaveClientOptions = {
+	emitEventToSelf?: boolean
+}
+
+async function leaveClientHandler(
+	this: any,
+	client: RTCClient,
+	{ emitEventToSelf = false }: LeaveClientOptions = {},
+) {
 	try {
-		const clientInst = setFind(this.clients, (c) => {
+		const clientInst = setFind(this.clients, (c: RTCClient) => {
 			return c.userId === client.userId
 		})
 
@@ -15,7 +24,7 @@ export default async function (client, { emitEventToSelf = false } = {}) {
 		const clientProducers = this.producers.get(client.userId)
 
 		const otherClients = Array.from(this.clients).filter(
-			(c) => c.userId !== client.userId,
+			(c: RTCClient) => c.userId !== client.userId,
 		)
 
 		if (clientProducers instanceof Map) {
@@ -61,14 +70,14 @@ export default async function (client, { emitEventToSelf = false } = {}) {
 
 		// Notify other clients about client leaving
 		for (const otherClient of otherClients) {
-			await otherClient.emit(`media:channel:client:left`, {
+			await (otherClient as RTCClient).emit(`media:channel:client:left`, {
 				userId: client.userId,
 				channelId: this.channelId,
 			})
 		}
 
 		// publish to group topic
-		await this.sendToGroupTopic("client:left", {
+		await this.sendToGroupTopic("client:vc:left", {
 			userId: clientInst.userId,
 			channelId: this.channelId,
 			channelClients: this.getConnectedClientsSerialized(),
@@ -91,3 +100,5 @@ export default async function (client, { emitEventToSelf = false } = {}) {
 		console.error(`Error leaving client ${client.userId}:`, error)
 	}
 }
+
+export default leaveClientHandler

@@ -1,4 +1,4 @@
-import MediaChannel from "@classes/MediaChannel"
+import MediaChannel from "@classes/MediaChannel/index.ts"
 
 export default async function (groupId, channelId) {
 	const GroupChannelsModel = global.scylla.model("group_channels")
