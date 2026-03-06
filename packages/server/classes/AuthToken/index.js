@@ -27,16 +27,21 @@ export default class AuthToken {
 	}
 
 	static async basicDecode(token) {
-		const { secret } = AuthToken.authStrategy
-
 		return new Promise((resolve, reject) => {
-			jwt.verify(token, secret, async (err, decoded) => {
-				if (err) {
-					reject(err)
-				}
+			jwt.verify(
+				token,
+				process.env.ECDSA_PRIVATE_KEY,
+				{
+					algorithms: [process.env.JWT_ALGORITHM ?? "ES256"],
+				},
+				async (err, decoded) => {
+					if (err) {
+						reject(err)
+					}
 
-				resolve(decoded)
-			})
+					resolve(decoded)
+				},
+			)
 		})
 	}
 
