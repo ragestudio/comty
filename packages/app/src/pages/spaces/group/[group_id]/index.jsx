@@ -1,11 +1,10 @@
 import React from "react"
 import { Result, Splitter } from "antd"
-import classnames from "classnames"
 
 import Skeleton from "@components/Skeleton"
 import ToolsBar from "@components/Spaces/ToolsBar"
 
-import MediaRTCChannelCard from "@components/MediaRTCChannelCard"
+import VoiceChannelCard from "@components/Spaces/VoiceChannelCard"
 import GroupHeader from "@components/Spaces/Group/GroupHeader"
 import MembersPanel from "@components/Spaces/Group/MembersPanel"
 import ChannelsPanel from "@components/Spaces/Group/ChannelsPanel"
@@ -121,11 +120,7 @@ const GroupPage = (props) => {
 					>
 						<GroupHeader />
 						<ChannelsPanel />
-						{rtcState?.channelId && (
-							<div className="group-page__rtc-card">
-								<MediaRTCChannelCard />
-							</div>
-						)}
+						{rtcState?.channelId && <VoiceChannelCard />}
 					</Splitter.Panel>
 
 					<Splitter.Panel
