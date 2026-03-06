@@ -104,6 +104,10 @@ export default async (req) => {
 			if (typeof result.lrc[language] === "string") {
 				let { data } = await axios.get(result.lrc[language])
 
+				if (typeof data === "string") {
+					data = LRCV1.parseString(data)
+				}
+
 				result.synced_lyrics = data
 				result.synced_lyrics = LRCV1.setTimmings(result.synced_lyrics)
 			} else {
