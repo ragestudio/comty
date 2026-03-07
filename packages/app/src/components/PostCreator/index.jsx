@@ -60,6 +60,40 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 		updatePostObj("message", text)
 	}, [])
 
+	const onUploadFileFinish = React.useCallback(
+		(_, response) => {
+			setPostObj((prev) => ({
+				...prev,
+				attachments: [...(prev?.attachments ?? []), response],
+			}))
+		},
+		[postObj],
+	)
+
+	const onUploadFileProgress = React.useCallback(
+		(file, progress = {}) => {
+			setPendingFiles((prev) => {
+				const items = [...prev]
+
+				items.forEach((item) => {
+					if (item.uid === file.uid) {
+						item.percent = progress.percent
+					}
+				})
+
+				return items
+			})
+		},
+		[pendingFiles],
+	)
+
+	const onUploadFileFinally = React.useCallback(
+		(file) => {
+			setPendingFiles((prev) => prev.filter((f) => f.uid !== file.uid))
+		},
+		[pendingFiles],
+	)
+
 	const handleUploadMedia = React.useCallback(
 		async (files) => {
 			if (!files) {
@@ -89,33 +123,9 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 				setPendingFiles((prev) => [...prev, file])
 
 				queuedUploadFile(file, {
-					onFinish: (file, response) => {
-						setPostObj((prev) => ({
-							...prev,
-							attachments: [
-								...(prev?.attachments ?? []),
-								response,
-							],
-						}))
-					},
-					onProgress: (file, progress = {}) => {
-						setPendingFiles((prev) => {
-							const items = [...prev]
-
-							items.forEach((item) => {
-								if (item.uid === file.uid) {
-									item.percent = progress.percent
-								}
-							})
-
-							return items
-						})
-					},
-					onFinally: () => {
-						setPendingFiles((prev) =>
-							prev.filter((f) => f.uid !== file.uid),
-						)
-					},
+					onFinish: onUploadFileFinish,
+					onProgress: onUploadFileProgress,
+					onFinally: () => onUploadFileFinally(file),
 				})
 			}
 		},
