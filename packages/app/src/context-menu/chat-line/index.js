@@ -5,8 +5,8 @@ export default {
 	"chat-line": (items, parent, element, control) => {
 		parent = parent.closest("[data-message-id]")
 
-		const messageId = parent.getAttribute("data-message-id")
-		const messageUserId = parent.getAttribute("data-message-user-id")
+		const messageId = parent.dataset.messageId
+		const messageUserId = parent.dataset.messageUserId
 
 		if (!messageId) {
 			return items
@@ -45,9 +45,9 @@ export default {
 				return
 			}
 
-			const channelId = channelElement.getAttribute("data-channel-id")
-			const groupId = channelElement.getAttribute("data-group-id")
-			const channelType = channelElement.getAttribute("data-type")
+			const channelId = channelElement.dataset.channelId
+			const groupId = channelElement.dataset.groupId
+			const channelType = channelElement.dataset.type
 
 			console.log(channelId, groupId, channelType)
 

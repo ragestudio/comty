@@ -28,25 +28,22 @@ class ComtyApp extends React.Component {
 		firstInitialized: false,
 	}
 
-	auth = new AuthManager(
-		{
-			behaviors: {
-				onLogin: async () => {
-					app.navigation.goMain()
-				},
-				onLogout: async () => {
-					app.navigation.goAuth()
-				},
-				onInvalidSession: async () => {
-					app.navigation.goAuth()
-				},
-				onDisabledAccount: async () => {
-					app.navigation.goAuth()
-				},
+	auth = new AuthManager(this.props.runtime, {
+		behaviors: {
+			onLogin: async () => {
+				app.navigation.goMain()
+			},
+			onLogout: async () => {
+				app.navigation.goAuth()
+			},
+			onInvalidSession: async () => {
+				app.navigation.goAuth()
+			},
+			onDisabledAccount: async () => {
+				app.navigation.goAuth()
 			},
 		},
-		this.props.runtime,
-	)
+	})
 
 	static async initialize() {
 		window.app.version = config.package.version

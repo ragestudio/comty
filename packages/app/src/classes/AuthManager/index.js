@@ -5,7 +5,7 @@ import UserModel from "@models/user"
 import { Login } from "@components"
 
 export default class AuthManager {
-	constructor(params = {}, runtime) {
+	constructor(runtime, params = {}) {
 		this.runtime = runtime
 		this.params = params
 		this.behaviors = params.behaviors ?? {}

@@ -252,9 +252,9 @@ export default class MediaChannel {
 
 	/**
 	 * Send a event to all clients except the one provided
-	 * @param {Object<RTCClient>} Origin client client
-	 * @param {string} The event name
-	 * @param {Object} The payload object
+	 * @param {Object<RTCClient>} client Origin client client
+	 * @param {string} event The event name
+	 * @param {Object} payload The payload object to send
 	 */
 	async sendToClients(client: RTCClient, event: string, payload: any) {
 		try {

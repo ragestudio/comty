@@ -28,7 +28,7 @@ async function main() {
 
 	let licenses = []
 
-	for await (const mod of modules) {
+	for (const mod of modules) {
 		const pkgJsonPath = path.resolve(
 			cwd,
 			"node_modules",

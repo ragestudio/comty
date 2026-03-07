@@ -45,7 +45,7 @@ export default class Clients extends Map {
 	}
 
 	destroyAll = async () => {
-		for await (const client of this.values()) {
+		for (const client of this.values()) {
 			await client.onLeave()
 			this.delete(client.userId)
 		}

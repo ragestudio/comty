@@ -33,7 +33,7 @@ cd "$PROJECT_ROOT"
 SUBMODULES=$(git submodule --quiet foreach 'echo $path')
 
 # Check if there are submodules
-if [ -z "$SUBMODULES" ]; then
+if [[ -z "$SUBMODULES" ]]; then
     echo -e "${YELLOW}No submodules found in this repository.${NC}"
     exit 0
 fi
@@ -48,7 +48,7 @@ for submodule in $SUBMODULES; do
     SUBMODULE_PATH="$PROJECT_ROOT/$submodule"
 
     # Check if package.json exists in the submodule directory
-    if [ -f "$SUBMODULE_PATH/package.json" ]; then
+    if [[ -f "$SUBMODULE_PATH/package.json" ]]; then
         # Change to the submodule directory and run npm install
         (cd "$SUBMODULE_PATH" && npm install) || {
             echo -e "${RED}Error installing dependencies in $submodule${NC}"
@@ -56,7 +56,7 @@ for submodule in $SUBMODULES; do
         echo -e "${GREEN}✓ Dependencies installed in $submodule${NC}"
     else
         # Check if install-dependencies.sh exists in the submodule directory
-        if [ -f "$SUBMODULE_PATH/install-dependencies.sh" ]; then
+        if [[ -f "$SUBMODULE_PATH/install-dependencies.sh" ]]; then
             echo -e "${YELLOW}Running custom installation script in $submodule${NC}"
             # Make sure the script has execution permissions
             chmod +x "$SUBMODULE_PATH/install-dependencies.sh"

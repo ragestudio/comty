@@ -5,17 +5,12 @@ import GroupsModel from "@models/groups"
 
 export default {
 	"group-member": async (items, parent, element, control) => {
-		const group_id = parent
-			.closest("[data-group-id]")
-			.getAttribute("data-group-id")
+		const group_id = parent.closest("[data-group-id]").dataset.groupId
 
-		const user_id = element
-			.closest("[data-user-id]")
-			.getAttribute("data-user-id")
+		const user_id = element.closest("[data-user-id]").dataset.userId
 
-		const membership_id = element
-			.closest("[data-membership-id]")
-			.getAttribute("data-membership-id")
+		const membership_id = element.closest("[data-membership-id]").dataset
+			.membershipId
 
 		if (!group_id || !user_id || !membership_id) {
 			return items

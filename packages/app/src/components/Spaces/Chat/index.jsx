@@ -57,10 +57,10 @@ const Chat = ({ type = "group", _id, group = {} }) => {
 	} =
 		type === "group"
 			? useChannelChat(group._id, _id, {
-					onNewMessage: (...args) => handleOnNewMessage(...args),
+					onNewMessage: () => handleOnNewMessage(),
 				})
 			: useDMChat(_id, {
-					onNewMessage: (...args) => handleOnNewMessage(...args),
+					onNewMessage: () => handleOnNewMessage(),
 				})
 
 	const topTriggerInView = useInView()

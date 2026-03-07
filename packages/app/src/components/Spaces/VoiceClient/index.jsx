@@ -9,10 +9,6 @@ import ClientContextMenu from "./menu-context"
 import "./index.less"
 
 const VoiceClient = ({ client, speaking, producers }) => {
-	if (!client || !client?.userId) {
-		return null
-	}
-
 	const onContextMenu = React.useCallback(
 		(event) => {
 			event.preventDefault()
@@ -49,6 +45,10 @@ const VoiceClient = ({ client, speaking, producers }) => {
 			(producer) => producer.appData.mediaTag === "screen-video",
 		)
 	}, [producers])
+
+	if (!client || !client?.userId) {
+		return null
+	}
 
 	return (
 		<motion.div
