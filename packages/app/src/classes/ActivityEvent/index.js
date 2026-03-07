@@ -8,13 +8,11 @@ export default class ActivityEvent {
 		this.id = id
 		this.payload = payload
 
-		this.send().catch((err) => {
-			console.error("Failed to send remote event >", err)
-		})
+		this.send()
 	}
 
 	send = async () => {
-		app.cores.api.customRequest({
+		return await app.cores.api.customRequest({
 			url: "/activity/client",
 			method: "POST",
 			data: {
