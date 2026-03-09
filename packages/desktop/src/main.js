@@ -77,11 +77,12 @@ class Main {
 		// apply os specific patches
 		await this.applyPatches()
 
+		// await to the app being ready
+		await this.app.whenReady()
+
 		// start desktop capturer
 		this.loadModule("desktopCapturer", "./modules/desktopcapturer/index.js")
 
-		// await to the app being ready
-		await this.app.whenReady()
 		this.state.ready = true
 
 		// install react dev tools
@@ -167,9 +168,9 @@ class Main {
 	async createMainWindow() {
 		this.mainWindow = new BrowserWindow({
 			title: pkgjson.appName,
-			titleBarStyle: "hidden",
 			frame: true,
-			transparent: true,
+			transparent: false,
+			autoHideMenuBar: true,
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
