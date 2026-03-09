@@ -34,7 +34,7 @@ const PostReplieView = (props) => {
 				<span>
 					{data.message}
 
-					{data.message.length === 0 &&
+					{(data.message?.length === 0 || !data.message) &&
 						data.attachments.length > 0 && (
 							<>
 								<Icons.Paperclip />

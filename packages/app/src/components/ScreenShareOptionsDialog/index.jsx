@@ -1,5 +1,7 @@
 import React from "react"
-import { Button, Radio } from "antd"
+import Button from "@ui/Button"
+import { Select } from "antd"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
@@ -31,8 +33,11 @@ function getCurrentVideoSettings() {
 }
 
 const ScreenShareOptionsDialog = ({ close }) => {
-	const { resolutionsList, frameratesList } = app.cores.mediartc.vars()
-	const trackSettings = getCurrentVideoSettings()
+	const { resolutionsList, frameratesList } = React.useMemo(
+		() => app.cores.mediartc.vars(),
+		[],
+	)
+	const currentTrackSettings = getCurrentVideoSettings()
 
 	const stopScreenShare = () => {
 		const handlers = app.cores.mediartc.handlers()
@@ -62,36 +67,51 @@ const ScreenShareOptionsDialog = ({ close }) => {
 	}
 
 	return (
-		<div className="screenshare-options-dialog">
-			<div>
-				<p>Video Resolution</p>
-				<Radio.Group
-					options={resolutionsList}
-					defaultValue={trackSettings.resolution}
-					onChange={(e) =>
-						changeVideoStreamConstraints(
-							"resolution",
-							e.target.value,
-						)
-					}
-				/>
+		<div className="screenshare-dialog">
+			<div className="screenshare-dialog__selectors">
+				<div
+					id="resolution"
+					className="screenshare-dialog__selectors__field"
+				>
+					<div className="screenshare-dialog__selectors__field__icon">
+						<Icons.Proportions />
+						<span>Resolution</span>
+					</div>
+
+					<Select
+						options={resolutionsList}
+						value={currentTrackSettings.resolution}
+						onChange={(value) =>
+							changeVideoStreamConstraints("resolution", value)
+						}
+					/>
+				</div>
+
+				<div
+					id="framerate"
+					className="screenshare-dialog__selectors__field"
+				>
+					<div className="screenshare-dialog__selectors__field__icon">
+						<Icons.Gauge />
+						<span>Frame Rate</span>
+					</div>
+
+					<Select
+						options={frameratesList}
+						value={currentTrackSettings.frameRate}
+						onChange={(value) =>
+							changeVideoStreamConstraints("framerate", value)
+						}
+					/>
+				</div>
 			</div>
 
-			<div>
-				<p>Video Framerate</p>
-				<Radio.Group
-					options={frameratesList}
-					defaultValue={trackSettings.frameRate}
-					onChange={(e) =>
-						changeVideoStreamConstraints(
-							"framerate",
-							e.target.value,
-						)
-					}
-				/>
-			</div>
-
-			<Button onClick={stopScreenShare}>Stop Screenshare</Button>
+			<Button
+				type="primary"
+				onClick={stopScreenShare}
+			>
+				<Icons.CircleStop /> Stop Screenshare
+			</Button>
 		</div>
 	)
 }

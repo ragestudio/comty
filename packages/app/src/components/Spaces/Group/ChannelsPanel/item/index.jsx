@@ -96,6 +96,8 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 					<div
 						key={`clients-list-${channel._id}`}
 						className="group-page__channels-panel__list-item__clients bg-accent"
+						data-channel-id={channel._id}
+						data-group-id={channel.group_id}
 					>
 						{channel?.clients.map((client, index) => {
 							return (

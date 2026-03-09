@@ -11,30 +11,23 @@ export default (file, options) => {
 			await FilesModel.upload(file, {
 				...options,
 				onError: (file, error) => {
-					app.cores.notifications.new(
-						{
-							title: "Could not upload file",
-							description: error.message,
-						},
-						{
-							type: "error",
-						},
-					)
+					app.cores.notifications.new({
+						type: "error",
+						title: "Could not upload file",
+						description: error.message,
+					})
 
 					if (typeof options.onError === "function") {
 						options.onError(file, error)
 					}
 				},
 				onFinish: (file, data) => {
-					app.cores.notifications.new(
-						{
-							title: "File uploaded",
-							description: `[${file.name}] uploaded successfully!`,
-						},
-						{
-							type: "success",
-						},
-					)
+					app.cores.notifications.new({
+						type: "success",
+						title: "File uploaded",
+						description: `[${file.name}] uploaded successfully!`,
+						feedback: false,
+					})
 
 					if (typeof options.onFinish === "function") {
 						options.onFinish(file, data)

@@ -22,8 +22,10 @@ const usePageWidgets = (widgets = []) => {
 		}
 
 		return () => {
-			for (const widget of widgets) {
-				app.layout.tools_bar.detachRender(widget.id)
+			if (app.layout?.tools_bar) {
+				for (const widget of widgets) {
+					app.layout.tools_bar.detachRender(widget.id)
+				}
 			}
 		}
 	})

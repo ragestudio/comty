@@ -12,8 +12,12 @@ import useMediaRTCState from "@hooks/useMediaRTCState"
 
 import "./index.less"
 
-const ClientContextMenu = ({ client, close }) => {
+const ClientContextMenu = ({ target, client, close }) => {
 	const state = useMediaRTCState()
+	const group_id =
+		target.parentElement.closest("[data-group-id]").dataset.groupId
+	const channel_id =
+		target.parentElement.closest("[data-channel-id]").dataset.channelId
 
 	const clientInstance = React.useMemo(() => {
 		return app.cores.mediartc.instance().clients.get(client.userId)
@@ -35,8 +39,8 @@ const ClientContextMenu = ({ client, close }) => {
 
 	const onClickDisconnect = React.useCallback(async () => {
 		await GroupsModel.channels.channel.disconnectUser(
-			state.channel.group_id,
-			state.channel._id,
+			state.channel?.group_id ?? group_id,
+			state.channel?._id ?? channel_id,
 			client.userId,
 		)
 
@@ -80,7 +84,9 @@ const ClientContextMenu = ({ client, close }) => {
 					<Slider
 						min={0}
 						max={150}
-						defaultValue={clientInstance.localState.volume * 100}
+						defaultValue={
+							(clientInstance?.localState?.volume ?? 1) * 100
+						}
 						onChangeComplete={onChangeVolume}
 					/>
 				</div>
@@ -136,13 +142,13 @@ const ClientContextMenu = ({ client, close }) => {
 				>
 					<div className="item__line">
 						<p className="item__line__label">
-							{clientInstance.localState.muted
+							{clientInstance?.localState?.muted
 								? "Unmute"
 								: "Mute"}
 						</p>
 
 						<div className="item__line__icon">
-							{clientInstance.localState.muted ? (
+							{clientInstance?.localState?.muted ? (
 								<Icons.MicOff />
 							) : (
 								<Icons.Mic />

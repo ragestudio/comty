@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "2.6.0@alpha",
+	"version": "2.7.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -23,7 +23,7 @@
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@ffmpeg/util": "^0.12.1",
 		"@loadable/component": "^5.16.7",
-		"@ragestudio/vessel": "^0.25.5",
+		"@ragestudio/vessel": "^0.25.6",
 		"@sentry/browser": "^7.64.0",
 		"@svta/common-media-library": "^0.18.1",
 		"@tanstack/react-virtual": "^3.13.12",

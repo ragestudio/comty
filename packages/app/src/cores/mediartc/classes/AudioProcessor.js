@@ -23,7 +23,9 @@ export default class AudioProcessor {
 
 	async initialize() {
 		if (this.params.noiseGate) {
-			await this.context.audioWorklet.addModule("/worklets/noisegate.js")
+			await this.context.audioWorklet.addModule(
+				new URL("../worklets/noisegate.js", import.meta.url),
+			)
 
 			this.noiseGateProccesor = new AudioWorkletNode(
 				this.context,

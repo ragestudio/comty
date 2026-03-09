@@ -1,27 +1,30 @@
 import React from "react"
-import { Select, Button } from "antd"
+import Button from "@ui/Button"
+import { Select, Switch } from "antd"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
 
 const ScreenShareDialog = ({ close }) => {
-	const { resolutionsList, frameratesList } = app.cores.mediartc.vars()
-
+	const { resolutionsList, frameratesList } = React.useMemo(
+		() => app.cores.mediartc.vars(),
+		[],
+	)
 	const [resolution, setResolution] = React.useState(resolutionsList[0].value)
 	const [framerate, setFramerate] = React.useState(frameratesList[2].value)
+	const [systemAudio, setSystemAudio] = React.useState(!!app.isDesktop)
 
-	const startScreenShare = async () => {
+	const startScreenShare = React.useCallback(async () => {
 		const [width, height] = resolution.split("x").map(Number)
 
 		const options = {
 			resolution: {
-				height,
-				width,
+				height: height,
+				width: width,
 			},
 			framerate: framerate,
+			systemAudio: systemAudio,
 		}
-
-		console.log("startScreenShare", options)
 
 		try {
 			app.cores.mediartc.handlers().startScreenShare(options)
@@ -32,13 +35,13 @@ const ScreenShareDialog = ({ close }) => {
 		if (typeof close === "function") {
 			close()
 		}
-	}
+	}, [resolution, framerate, systemAudio, close])
 
 	return (
 		<div className="screenshare-dialog">
 			<div className="screenshare-dialog__header">
 				<h1>Screen Share</h1>
-				<p>Select your screen resolution and framerate</p>
+				<p>Configure your parameters</p>
 			</div>
 
 			<div className="screenshare-dialog__selectors">
@@ -48,6 +51,7 @@ const ScreenShareDialog = ({ close }) => {
 				>
 					<div className="screenshare-dialog__selectors__field__icon">
 						<Icons.Proportions />
+						<span>Resolution</span>
 					</div>
 
 					<Select
@@ -63,6 +67,7 @@ const ScreenShareDialog = ({ close }) => {
 				>
 					<div className="screenshare-dialog__selectors__field__icon">
 						<Icons.Gauge />
+						<span>Frame Rate</span>
 					</div>
 
 					<Select
@@ -71,10 +76,35 @@ const ScreenShareDialog = ({ close }) => {
 						onChange={setFramerate}
 					/>
 				</div>
+
+				<div
+					id="systemAudio"
+					className="screenshare-dialog__selectors__field"
+				>
+					<div className="screenshare-dialog__selectors__field__icon">
+						<Icons.Speaker />
+						<div className="flex-column align-start gap-5">
+							<span>System Audio</span>
+
+							{!app.isDesktop && (
+								<span style={{ fontSize: "0.8rem" }}>
+									Not supported in browsers, use desktop
+									application instead.
+								</span>
+							)}
+						</div>
+					</div>
+
+					<Switch
+						disabled={!app.isDesktop}
+						checked={systemAudio}
+						onChange={(value) => setSystemAudio(value)}
+					/>
+				</div>
 			</div>
 
 			<div className="screenshare-dialog__actions">
-				<Button onClick={close}>Hell na</Button>
+				<Button onClick={close}>Nevermind</Button>
 				<Button
 					type="primary"
 					onClick={startScreenShare}
