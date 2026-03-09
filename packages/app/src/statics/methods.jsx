@@ -10,6 +10,11 @@ import config from "@config"
 import deleteInternalStorage from "@utils/deleteInternalStorage"
 
 export default {
+	"👀": async () => {
+		const component = await import("@components/SkeletonRun")
+
+		return component.default()
+	},
 	controls: {
 		toggleUIVisibility: (to) => {
 			if (app.layout.sidebar) {
