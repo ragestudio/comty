@@ -1,4 +1,4 @@
-.screenshare-options-dialog {
+.screenshare-dialog {
 	display: flex;
 	flex-direction: column;
 
@@ -9,5 +9,54 @@
 	&__header {
 		display: flex;
 		flex-direction: column;
+	}
+
+	&__selectors {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+
+		padding: 0 20px;
+		gap: 20px;
+
+		&__field {
+			display: flex;
+			flex-direction: column;
+
+			width: 100%;
+
+			gap: 10px;
+
+			&__icon {
+				line-height: 1rem;
+
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+
+				width: 100%;
+
+				gap: 5px;
+
+				svg {
+					min-width: 30px;
+					font-size: 1.3rem;
+					color: var(--text-color);
+				}
+			}
+
+			.ant-switch {
+				width: fit-content;
+			}
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-end;
+
+		gap: 10px;
 	}
 }

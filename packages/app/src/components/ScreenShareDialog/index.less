@@ -13,28 +13,41 @@
 
 	&__selectors {
 		display: flex;
-		flex-direction: row;
-
-		align-items: center;
+		flex-direction: column;
 
 		width: 100%;
 
-		gap: 20px;
-
 		padding: 0 20px;
+		gap: 20px;
 
 		&__field {
 			display: flex;
-			flex-direction: row;
-			align-items: center;
+			flex-direction: column;
+
+			width: 100%;
 
 			gap: 10px;
 
 			&__icon {
+				line-height: 1rem;
+
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+
+				width: 100%;
+
+				gap: 5px;
+
 				svg {
+					min-width: 30px;
 					font-size: 1.3rem;
 					color: var(--text-color);
 				}
+			}
+
+			.ant-switch {
+				width: fit-content;
 			}
 		}
 	}
