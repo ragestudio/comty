@@ -12,11 +12,6 @@
 		"postinstall": "electron-builder install-app-deps",
 		"pack:linux": "electron-builder --linux --config"
 	},
-	"devDependencies": {
-		"electron": "^39.6.0",
-		"electron-builder": "^26.8.1",
-		"electron-devtools-installer": "^4.0.0"
-	},
 	"dependencies": {
 		"cross-env": "^10.0.0",
 		"electron-store": "^10.1.0",
@@ -24,5 +19,10 @@
 		"paclient": "^0.0.2",
 		"radix-router": "^3.0.1",
 		"router": "^2.2.0"
+	},
+	"devDependencies": {
+		"electron": "^39.6.0",
+		"electron-builder": "^26.8.1",
+		"electron-devtools-installer": "^4.0.0"
 	}
 }
