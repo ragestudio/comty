@@ -171,6 +171,7 @@ class Main {
 			frame: true,
 			transparent: false,
 			autoHideMenuBar: true,
+			show: false,
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
@@ -199,6 +200,9 @@ class Main {
 					break
 			}
 		}
+
+		this.mainWindow.maximize()
+		this.mainWindow.show()
 
 		return this.mainWindow
 	}
