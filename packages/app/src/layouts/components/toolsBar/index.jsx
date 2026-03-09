@@ -2,9 +2,10 @@ import React from "react"
 import classnames from "classnames"
 import { motion, AnimatePresence, useIsPresent } from "motion/react"
 import PropTypes from "prop-types"
-import { LayoutContext } from "@/layout"
 
 import useLayoutInterface from "@hooks/useLayoutInterface"
+import useToolsBarRenders from "@hooks/useToolsBarRenders"
+
 import WidgetsWrapper from "@components/WidgetsWrapper"
 
 import "./index.less"
@@ -75,56 +76,12 @@ ToolsBar.propTypes = {
 }
 
 const ToolsBarWrapper = (props) => {
-	const layoutContext = React.useContext(LayoutContext)
-
+	const { topRenders, bottomRenders, setTopRenders, setBottomRenders } =
+		useToolsBarRenders()
 	const [visible, setVisible] = React.useState(false)
-
-	const [topRenders, setTopRenders] = React.useState([])
-	const [bottomRenders, setBottomRenders] = React.useState([])
 
 	const hasAnyRenders = topRenders.length > 0 || bottomRenders.length > 0
 	const isVisible = hasAnyRenders && visible
-
-	// restore renders from context
-	React.useEffect(() => {
-		if (
-			layoutContext &&
-			layoutContext.interfacesProperties &&
-			layoutContext.interfacesProperties["tools_bar"]
-		) {
-			if (layoutContext.interfacesProperties["tools_bar"]["topRenders"]) {
-				setTopRenders(
-					layoutContext.interfacesProperties["tools_bar"][
-						"topRenders"
-					],
-				)
-			}
-
-			if (
-				layoutContext.interfacesProperties["tools_bar"]["bottomRenders"]
-			) {
-				setBottomRenders(
-					layoutContext.interfacesProperties["tools_bar"][
-						"bottomRenders"
-					],
-				)
-			}
-		}
-	}, [])
-
-	// update renders to context
-	React.useEffect(() => {
-		if (layoutContext && layoutContext.interfacesProperties) {
-			if (!layoutContext.interfacesProperties["tools_bar"]) {
-				layoutContext.interfacesProperties["tools_bar"] = {}
-			}
-
-			layoutContext.interfacesProperties["tools_bar"] = {
-				topRenders: topRenders,
-				bottomRenders: bottomRenders,
-			}
-		}
-	}, [topRenders, bottomRenders])
 
 	useLayoutInterface("tools_bar", {
 		toggleVisibility: (to) => {

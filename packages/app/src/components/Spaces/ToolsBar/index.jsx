@@ -1,53 +1,11 @@
 import React from "react"
-import { LayoutContext } from "@/layout"
+
+import useToolsBarRenders from "@hooks/useToolsBarRenders"
 import useLayoutInterface from "@hooks/useLayoutInterface"
 
 const ToolsBar = () => {
-	const layoutContext = React.useContext(LayoutContext)
-
-	const [topRenders, setTopRenders] = React.useState([])
-	const [bottomRenders, setBottomRenders] = React.useState([])
-
-	// restore renders from context
-	React.useEffect(() => {
-		if (
-			layoutContext &&
-			layoutContext.interfacesProperties &&
-			layoutContext.interfacesProperties["tools_bar"]
-		) {
-			if (layoutContext.interfacesProperties["tools_bar"]["topRenders"]) {
-				setTopRenders(
-					layoutContext.interfacesProperties["tools_bar"][
-						"topRenders"
-					],
-				)
-			}
-
-			if (
-				layoutContext.interfacesProperties["tools_bar"]["bottomRenders"]
-			) {
-				setBottomRenders(
-					layoutContext.interfacesProperties["tools_bar"][
-						"bottomRenders"
-					],
-				)
-			}
-		}
-	}, [])
-
-	// update renders to context
-	React.useEffect(() => {
-		if (layoutContext && layoutContext.interfacesProperties) {
-			if (!layoutContext.interfacesProperties["tools_bar"]) {
-				layoutContext.interfacesProperties["tools_bar"] = {}
-			}
-
-			layoutContext.interfacesProperties["tools_bar"] = {
-				topRenders: topRenders,
-				bottomRenders: bottomRenders,
-			}
-		}
-	}, [topRenders, bottomRenders])
+	const { topRenders, bottomRenders, setTopRenders, setBottomRenders } =
+		useToolsBarRenders()
 
 	useLayoutInterface("tools_bar", {
 		toggleVisibility: (to) => {
