@@ -4,7 +4,7 @@ import Upload from "@shared-classes/Upload"
 
 export default {
 	id: "file-process",
-	maxJobs: 2,
+	//maxJobs: 2,
 	process: async (job) => {
 		console.log("[JOB][file-process] running... >", job.data)
 
