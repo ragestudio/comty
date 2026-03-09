@@ -9,6 +9,7 @@ import Consumers from "./classes/Consumers"
 import Producers from "./classes/Producers"
 import Clients from "./classes/Clients"
 import Screens from "./classes/Screens"
+import SysAudio from "./classes/SysAudio"
 
 import buildWebsocketHandler from "./utils/buildWebsocketHandler"
 import * as Vars from "./vars"
@@ -199,6 +200,16 @@ export default class MediaRTC extends Core {
 				) {
 					this.state.isSpeaking = isSpeaking
 				}
+			}
+		}
+
+		if (app.isDesktop) {
+			this.self.sysAudio = new SysAudio()
+
+			try {
+				await this.self.sysAudio.initialize()
+			} catch (error) {
+				this.console.error("Error initializing sysAudio:", error)
 			}
 		}
 	}

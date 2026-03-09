@@ -23,6 +23,7 @@ export default class Self {
 	audioOutput = new AudioProcessor(this, {
 		sinkId: Self.outputDeviceId,
 	})
+	sysAudio = null
 
 	get isMuted() {
 		return this.micStream ? !this.micStream.getTracks()[0].enabled : false
@@ -252,44 +253,13 @@ export default class Self {
 			systemAudio: "include",
 		})
 
-		// if ipcRenderer is available, start system audio capture and
-		// append it to the screen stream
-		if (window.ipcRenderer) {
-			// Start system audio capture (routes all system audio except our app)
-			const captureInfo = await window.ipcRenderer.invoke(
-				"desktopcapturer:getAudioLoopbackRemapDeviceId",
-			)
+		if (options.systemAudio && this.sysAudio) {
+			try {
+				const sysAudioTrack = await this.sysAudio.startCapture()
 
-			const devices = await navigator.mediaDevices.enumerateDevices()
-
-			const loopbackDevice = devices.find(
-				(device) => device.label === captureInfo.name,
-			)
-
-			console.log({ devices, captureInfo, loopbackDevice })
-
-			if (loopbackDevice) {
-				console.log("Using audio loopback device", loopbackDevice)
-
-				const audioStream = await navigator.mediaDevices.getUserMedia({
-					audio: {
-						deviceId: {
-							exact: loopbackDevice.deviceId,
-						},
-						autoGainControl: false,
-						echoCancellation: false,
-						noiseSuppression: false,
-						channelCount: {
-							min: 2,
-							ideal: 2,
-							max: 2,
-						},
-						sampleRate: 44100,
-						sampleSize: 16,
-					},
-				})
-
-				this.screenStream.addTrack(audioStream.getAudioTracks()[0])
+				this.screenStream.addTrack(sysAudioTrack)
+			} catch (err) {
+				console.error("Failed to start system audio capture", err)
 			}
 		}
 
@@ -319,6 +289,7 @@ export default class Self {
 				track: screenAudioTrack,
 				codecOptions: {
 					opusStereo: true,
+					opusFec: true,
 				},
 				encodings: [
 					{
@@ -391,6 +362,19 @@ export default class Self {
 
 		this.screenStream.getTracks().forEach((track) => track.stop())
 		this.screenStream = null
+
+		if (window.ipcRenderer) {
+			try {
+				await window.ipcRenderer.invoke(
+					"desktopcapturer:stopSystemAudioCapture",
+				)
+				window.ipcRenderer.removeAllListeners(
+					"desktopcapturer:sysaudio-buff",
+				)
+			} catch (error) {
+				console.error(`Failed to stop system audio capture:`, error)
+			}
+		}
 
 		this.core.console.log("screen stream destroyed")
 	}
