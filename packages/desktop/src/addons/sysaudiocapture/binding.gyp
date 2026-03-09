@@ -1,0 +1,44 @@
+{
+	"targets": [
+		{
+			"target_name": "sysaudiocapture",
+			"sources": ["src/addon.cpp"],
+			"include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
+			"dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
+			"conditions": [
+				[
+					"OS=='win'",
+					{
+						"sources": ["src/win/capture.cpp"],
+						"libraries": ["-lMmdevapi.lib", "-lOle32.lib"],
+						"msvs_settings": {
+							"VCCLCompilerTool": {
+								"ExceptionHandling": 1,
+								"DisableSpecificWarnings": ["4005"]
+							}
+						},
+						"defines": ["_WIN32_WINNT=0x0A00", "NTDDI_VERSION=0x0A00000C"]
+					}
+				],
+				[
+					"OS=='linux'",
+					{
+						"sources": [
+							"src/linux/capture.cpp",
+							"src/linux/pipewire/audio_utils.cpp",
+							"src/linux/pipewire/capture_impl.cpp"
+						],
+						"libraries": ["-lpipewire-0.3"],
+						"include_dirs": [
+							"/usr/include/pipewire-0.3",
+							"/usr/include/spa-0.2"
+						]
+					}
+				]
+			],
+			"cflags!": ["-fno-exceptions", "-Wall", "-g", "-std=c11"],
+			"cflags_cc!": ["-fno-exceptions"],
+			"defines": ["NAPI_DISABLE_CPP_EXCEPTIONS"]
+		}
+	]
+}
