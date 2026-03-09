@@ -77,7 +77,7 @@ export default class TasksQueue extends Core {
 			})
 	}
 
-	appendToQueue(taskId, task) {
+	appendToQueue(taskId, task, { priority = false } = {}) {
 		if (!taskId) {
 			throw new Error("Task id is required")
 		}
@@ -86,10 +86,17 @@ export default class TasksQueue extends Core {
 			throw new Error("Task must be a function")
 		}
 
-		this.taskQueue.unshift({
-			id: taskId,
-			fn: task,
-		})
+		if (priority) {
+			this.taskQueue.unshift({
+				id: taskId,
+				fn: task,
+			})
+		} else {
+			this.taskQueue.push({
+				id: taskId,
+				fn: task,
+			})
+		}
 
 		this.processTasks()
 	}
