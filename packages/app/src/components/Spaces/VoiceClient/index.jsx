@@ -27,6 +27,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 
 			app.cores.ctx_menu.renderMenu(
 				React.createElement(ClientContextMenu, {
+					target: event.target,
 					client: {
 						...client,
 						self: client.userId === app.userData._id,
