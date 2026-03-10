@@ -1,5 +1,8 @@
 {
 	"type": "module",
+	"scripts": {
+		"build": "node-gyp rebuild"
+	},
 	"devDependencies": {
 		"node-addon-api": "^8.6.0",
 		"node-gyp": "^12.2.0",
