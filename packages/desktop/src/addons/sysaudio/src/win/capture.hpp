@@ -1,5 +1,15 @@
+#ifdef __linux
+#define INC_OLE2 true
+#define NTDDI_VERSION 0x0A00000A
+#endif
+
+#ifdef _WIN32
+#include <comdef.h>
+#endif
+
 #include <audioclient.h>
 #include <audioclientactivationparams.h>
+#include <initguid.h>
 #include <mmdeviceapi.h>
 #include <windows.h>
 
@@ -23,9 +33,13 @@ class WasapiCapture {
 
 	bool Start(DWORD processIdToExclude, AudioDataCallback callback);
 	void Stop();
+	void SendMockData();
 
    private:
 	void CaptureThread();
+	void CaptureRegularLoopback();
+	void SetupAndCaptureAudio();
+	void TestAudioPlayback();
 
 	std::thread m_captureThread;
 	std::atomic<bool> m_isCapturing;

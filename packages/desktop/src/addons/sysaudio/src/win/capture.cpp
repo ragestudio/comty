@@ -1,5 +1,7 @@
-#include <comdef.h>
-#include <initguid.h>
+#include <sys/types.h>
+
+#include <cstdio>
+#include <cstring>
 
 #include "capture.hpp"
 
@@ -9,6 +11,10 @@
 void LogComError(const char *msg, HRESULT hr) {
 	_com_error err(hr);
 	printf("[WASAPI DEBUG] %s. HRESULT: 0x%08X - %s\n", msg, hr, err.ErrorMessage());
+}
+
+void LogDebug(const char *msg) {
+	printf("[WASAPI DEBUG] %s\n", msg);
 }
 
 class AudioActivator : public IActivateAudioInterfaceCompletionHandler, public IAgileObject {
@@ -70,7 +76,7 @@ class AudioActivator : public IActivateAudioInterfaceCompletionHandler, public I
 		if (SUCCEEDED(hr) && SUCCEEDED(activateResult) && pUnk != nullptr) {
 			pUnk->QueryInterface(__uuidof(IAudioClient), (void **)&pAudioClient);
 		} else {
-			LogComError("La activacion asincrona interna fallo", activateResult);
+			LogComError("Failed to asyncronusly activate audio interface", activateResult);
 		}
 
 		if (pUnk) {
@@ -87,10 +93,12 @@ WasapiCapture::~WasapiCapture() { Stop(); }
 
 bool WasapiCapture::Start(DWORD processIdToExclude, AudioDataCallback callback) {
 	if (m_isCapturing) return false;
+
 	m_processIdToExclude = processIdToExclude;
 	m_callback = callback;
 	m_isCapturing = true;
 	m_captureThread = std::thread(&WasapiCapture::CaptureThread, this);
+
 	return true;
 }
 
@@ -112,6 +120,8 @@ void WasapiCapture::CaptureThread() {
 	}
 
 	AUDIOCLIENT_PROCESS_LOOPBACK_PARAMS loopbackParams = {};
+
+	printf("[WASAPI DEBUG] Using process loopback | Excluded PID: %u\n", m_processIdToExclude);
 	loopbackParams.TargetProcessId = m_processIdToExclude;
 	loopbackParams.ProcessLoopbackMode = PROCESS_LOOPBACK_MODE_EXCLUDE_TARGET_PROCESS_TREE;
 
@@ -144,6 +154,7 @@ void WasapiCapture::CaptureThread() {
 	}
 
 	WaitForSingleObject(activator->hEvent, INFINITE);
+	printf("[WASAPI DEBUG] Activation completed with result: 0x%08X\n", activator->activateResult);
 
 	if (FAILED(activator->activateResult) || !activator->pAudioClient) {
 		LogComError("WasapiCapture::CaptureThread: callback rejected", activator->activateResult);
@@ -157,32 +168,60 @@ void WasapiCapture::CaptureThread() {
 		return;
 	}
 
+	printf("[WASAPI DEBUG] Audio client activated successfully\n");
+
 	m_pAudioClient = activator->pAudioClient;
 	m_pAudioClient->AddRef();
 	if (pAsyncOp) pAsyncOp->Release();
 	activator->Release();
 
-	WAVEFORMATEXTENSIBLE wfx = {};
-	wfx.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
-	wfx.Format.nChannels = 2;
-	wfx.Format.nSamplesPerSec = 48000;
-	wfx.Format.wBitsPerSample = 32;
-	wfx.Format.nBlockAlign = (wfx.Format.nChannels * wfx.Format.wBitsPerSample) / 8;
-	wfx.Format.nAvgBytesPerSec = wfx.Format.nSamplesPerSec * wfx.Format.nBlockAlign;
-	wfx.Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
-	wfx.Samples.wValidBitsPerSample = 32;
-	wfx.dwChannelMask = 3;
-	wfx.SubFormat = GUID_SUBTYPE_IEEE_FLOAT;
+	WAVEFORMATEX *pMixFormat = nullptr;
+	hr = m_pAudioClient->GetMixFormat(&pMixFormat);
 
-	WAVEFORMATEX *pFormat = &wfx.Format;
+	WAVEFORMATEXTENSIBLE defaultWfx = {};
+	WAVEFORMATEX simpleFormat = {};
+	WAVEFORMATEX *pFormat = nullptr;
+
+	if (FAILED(hr) || !pMixFormat) {
+		// Use default format
+		defaultWfx.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+		defaultWfx.Format.nChannels = 2;
+		defaultWfx.Format.nSamplesPerSec = 48000;
+		defaultWfx.Format.wBitsPerSample = 32;
+		defaultWfx.Format.nBlockAlign = (defaultWfx.Format.nChannels * defaultWfx.Format.wBitsPerSample) / 8;
+		defaultWfx.Format.nAvgBytesPerSec = defaultWfx.Format.nSamplesPerSec * defaultWfx.Format.nBlockAlign;
+		defaultWfx.Format.cbSize = sizeof(WAVEFORMATEXTENSIBLE) - sizeof(WAVEFORMATEX);
+		defaultWfx.Samples.wValidBitsPerSample = 32;
+		defaultWfx.dwChannelMask = 3;
+		defaultWfx.SubFormat = GUID_SUBTYPE_IEEE_FLOAT;
+
+		pFormat = &defaultWfx.Format;
+
+		printf("[WASAPI DEBUG] Using default format: %d channels, %d Hz, %d bits\n", pFormat->nChannels, pFormat->nSamplesPerSec, pFormat->wBitsPerSample);
+	} else {
+		printf("[WASAPI DEBUG] Got mix format: %d channels, %d Hz, %d bits, tag: 0x%04X\n", pMixFormat->nChannels, pMixFormat->nSamplesPerSec, pMixFormat->wBitsPerSample, pMixFormat->wFormatTag);
+
+		if (pMixFormat->wFormatTag == WAVE_FORMAT_EXTENSIBLE && pMixFormat->cbSize >= 22) {
+			WAVEFORMATEXTENSIBLE *pwfx = (WAVEFORMATEXTENSIBLE *)pMixFormat;
+		}
+
+		pFormat = pMixFormat;
+	}
 
 	DWORD flags = AUDCLNT_STREAMFLAGS_LOOPBACK | AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY;
+	// Calculate buffer duration (100ms = 10,000,000 hundred-nanosecond units)
+	REFERENCE_TIME bufferDuration = 10000000;  // 100ms
 
-	hr = m_pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, flags, 10000000, 0, pFormat, NULL);
+	hr = m_pAudioClient->Initialize(AUDCLNT_SHAREMODE_SHARED, flags, bufferDuration, 0, pFormat, NULL);
 
 	if (FAILED(hr)) {
-		LogComError("Initialize fallo", hr);
-		goto Cleanup;
+		LogComError("WasapiCapture::CaptureThread: Failed to initialize audio client", hr);
+		return;
+	}
+
+	if (pMixFormat) {
+		CoTaskMemFree(pMixFormat);
+		pMixFormat = nullptr;
 	}
 
 	hr = m_pAudioClient->GetService(__uuidof(IAudioCaptureClient), (void **)&m_pCaptureClient);
@@ -199,33 +238,85 @@ void WasapiCapture::CaptureThread() {
 		goto Cleanup;
 	}
 
+	// Get the actual buffer size
+	UINT32 bufferFrameCount;
+	hr = m_pAudioClient->GetBufferSize(&bufferFrameCount);
+
+	// Get the device period
+	REFERENCE_TIME defaultPeriod, minimumPeriod;
+	hr = m_pAudioClient->GetDevicePeriod(&defaultPeriod, &minimumPeriod);
+
 	while (m_isCapturing) {
 		UINT32 packetLength = 0;
 		hr = m_pCaptureClient->GetNextPacketSize(&packetLength);
+
+		if (FAILED(hr)) {
+			LogComError("GetNextPacketSize failed", hr);
+			break;
+		}
 
 		while (packetLength != 0 && m_isCapturing) {
 			BYTE *pData;
 			UINT32 numFramesAvailable;
 			DWORD bufferFlags;
+			UINT64 devicePosition;
+			UINT64 qpcPosition;
 
-			hr = m_pCaptureClient->GetBuffer(&pData, &numFramesAvailable, &bufferFlags, NULL, NULL);
+			hr = m_pCaptureClient->GetBuffer(&pData, &numFramesAvailable, &bufferFlags, &devicePosition, &qpcPosition);
+
+			AudioFormat *aFormat = new AudioFormat;
+
+			aFormat->sampleRate = pFormat->nSamplesPerSec;
+			aFormat->bitsPerSample = pFormat->wBitsPerSample;
+			aFormat->channels = pFormat->nChannels;
+
+			AudioFrame *aFrame = new AudioFrame;
+
+			aFrame->format = aFormat;
+			aFrame->size = numFramesAvailable * pFormat->nBlockAlign;
 
 			if (SUCCEEDED(hr)) {
-				if (bufferFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
-					std::vector<float> silentBuffer(numFramesAvailable * pFormat->nChannels, 0.0f);
-					m_callback(silentBuffer.data(), numFramesAvailable, pFormat->nChannels, pFormat->nSamplesPerSec);
-				} else {
-					float *floatData = reinterpret_cast<float *>(pData);
-					m_callback(floatData, numFramesAvailable, pFormat->nChannels, pFormat->nSamplesPerSec);
-				}
+				if (numFramesAvailable > 0) {
+					// Always copy the buffer data to ensure it remains valid after ReleaseBuffer
+					size_t bufferSize = numFramesAvailable * pFormat->nBlockAlign;
+					uint8_t *bufferCopy = new uint8_t[bufferSize];
 
-				m_pCaptureClient->ReleaseBuffer(numFramesAvailable);
+					if (bufferFlags & AUDCLNT_BUFFERFLAGS_SILENT) {
+						memset(bufferCopy, 0, bufferSize);
+					} else {
+						memcpy(bufferCopy, pData, bufferSize);
+					}
+
+					aFrame->buff = bufferCopy;
+					aFrame->size = bufferSize;
+
+					m_callback(aFrame);
+					m_pCaptureClient->ReleaseBuffer(numFramesAvailable);
+				} else {
+					printf("[WASAPI DEBUG] No frames available in buffer\n");
+
+					delete aFrame->format;
+					delete aFrame;
+					m_pCaptureClient->ReleaseBuffer(0);
+				}
+			} else {
+				printf("[WASAPI DEBUG] GetBuffer failed\n");
+				delete aFrame->format;
+				delete aFrame;
 			}
 
-			m_pCaptureClient->GetNextPacketSize(&packetLength);
+			hr = m_pCaptureClient->GetNextPacketSize(&packetLength);
+
+			if (FAILED(hr)) {
+				LogComError("GetNextPacketSize failed in loop", hr);
+				break;
+			}
 		}
 
-		Sleep(10);
+		// Only sleep if there are no packets to process
+		if (packetLength == 0) {
+			Sleep(10);
+		}
 	}
 
 	m_pAudioClient->Stop();
@@ -237,9 +328,20 @@ Cleanup:
 	}
 
 	if (m_pAudioClient) {
+		m_pAudioClient->Stop();
 		m_pAudioClient->Release();
 		m_pAudioClient = nullptr;
 	}
 
+	if (pMixFormat) {
+		CoTaskMemFree(pMixFormat);
+		pMixFormat = nullptr;
+	}
+
 	CoUninitialize();
+
+	printf("[WASAPI DEBUG] Capture thread ended\n");
+}
+
+void WasapiCapture::SendMockData() {
 }
