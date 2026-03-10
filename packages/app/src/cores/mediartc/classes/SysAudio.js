@@ -44,13 +44,9 @@ export default class SysAudio {
 	}
 
 	startCapture = async () => {
-		const ok = await window.ipcRenderer.invoke(
+		await window.ipcRenderer.invoke(
 			"desktopcapturer:startSystemAudioCapture",
 		)
-
-		if (!ok) {
-			return null
-		}
 
 		return this.audioTrack
 	}
