@@ -18,6 +18,7 @@ import Vars from "./vars.js"
 import API from "./classes/Api/index.js"
 import Settings from "./classes/Settings/index.js"
 import ExtensionManager from "./classes/Extensions/index.js"
+import DesktopCapture from "./classes/DesktopCapturer/index.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -61,6 +62,7 @@ class Main {
 	modules = new Map()
 	settings = new Settings()
 	extensions = new ExtensionManager(this)
+	desktopCapturer = new DesktopCapture(this)
 
 	async initialize() {
 		this.state.ready = false
@@ -79,9 +81,6 @@ class Main {
 
 		// await to the app being ready
 		await this.app.whenReady()
-
-		// start desktop capturer
-		this.loadModule("desktopCapturer", "./modules/desktopcapturer/index.js")
 
 		this.state.ready = true
 
