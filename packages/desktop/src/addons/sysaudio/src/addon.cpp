@@ -1,6 +1,8 @@
-#include <cstring>
+#include <iostream>
+#include <thread>
 
-#include "../node_modules/node-addon-api/napi.h"
+#include "napi.h"
+#include "types.hpp"
 
 #ifdef _WIN32
 #define OS "win32"
@@ -22,29 +24,31 @@ WasapiCapture captureInstance;
 Capture captureInstance;
 #endif
 
-
-
 Napi::ThreadSafeFunction audioCaptureDataCallback;
 
-auto onAudioDataCallbackFn = [](Napi::Env env, Napi::Function jsCb, AudioFrame *frame) {
-	Napi::Buffer<uint8_t> buffer = Napi::Buffer<uint8_t>::New(
-		env,
-		frame->buff,
-		frame->size,
-		[](Napi::Env, void *finalizeData) {
-			delete[] static_cast<uint8_t *>(finalizeData);
-		}
-	);
+void onAudioDataCallbackFn(Napi::Env env, Napi::Function jsCb, AudioFrame *frame) {
+	if (env != nullptr && jsCb != nullptr) {
+		Napi::Buffer<uint8_t> buffer = Napi::Buffer<uint8_t>::Copy(env, frame->buff, frame->size);
 
-	Napi::Object formatObj = Napi::Object::New(env);
-	formatObj.Set("sampleRate", Napi::Number::New(env, frame->format.sampleRate));
-	formatObj.Set("channels", Napi::Number::New(env, frame->format.channels));
-	formatObj.Set("bitsPerSample", Napi::Number::New(env, frame->format.bitsPerSample));
-	formatObj.Set("format", Napi::Number::New(env, frame->format.format));
+		Napi::Object formatObj = Napi::Object::New(env);
+		formatObj.Set("sampleRate", Napi::Number::New(env, frame->format->sampleRate));
+		formatObj.Set("channels", Napi::Number::New(env, frame->format->channels));
+		formatObj.Set("bitsPerSample", Napi::Number::New(env, frame->format->bitsPerSample));
+		// formatObj.Set("format", Napi::Number::New(env, frame->format.format));
 
-	jsCb.Call({ buffer, formatObj });
+		// printf("Frame size: %zu\n", frame->size);
+		// printf("Frame buffer: %p\n", frame->buff);
 
-	delete frame;
+		jsCb.Call({ buffer, formatObj });
+	}
+
+	if (frame) {
+		// if (frame->buff) {
+		//     free(frame->buff);
+		// }
+		delete frame->format;
+		delete frame;
+	}
 };
 
 Napi::Value StartCapture(const Napi::CallbackInfo &info) {
@@ -58,42 +62,37 @@ Napi::Value StartCapture(const Napi::CallbackInfo &info) {
 	int pid = info[0].As<Napi::Number>().Int32Value();
 
 #ifdef _WIN32
-	pid = static_cast<DWORD>(info[0].As<Napi::Number>().Uint32Value());
+	pid = static_cast<DWORD>(pid);
 #endif
 
 #ifdef __linux
-	pid = static_cast<pid_t>(info[0].As<Napi::Number>().Int32Value());
+	pid = static_cast<pid_t>(pid);
 #endif
 
-	Napi::Function jsCallback = info[1].As<Napi::Function>();
-
 	audioCaptureDataCallback = Napi::ThreadSafeFunction::New(
-		env, jsCallback, "audioCaptureDataCallback", 0, 2
+		env,
+		info[1].As<Napi::Function>(),
+		"audioCaptureDataCallback",
+		0,
+		1
 	);
 
-	auto onAudioData = [](const void *pData, size_t dataSize, const AudioFormat &format) {
-		// create a copy of the audio data to ensure it remains valid
-		uint8_t *audioCopy = new uint8_t[dataSize];
-		memcpy(audioCopy, pData, dataSize);
-
-		AudioFrame *frame = new AudioFrame{
-			audioCopy,
-			dataSize,
-			format
-		};
-
-		napi_status status = audioCaptureDataCallback.NonBlockingCall(frame, onAudioDataCallbackFn);
+	auto onAudioData = [](AudioFrame *frame) {
+		napi_status status = audioCaptureDataCallback.BlockingCall(frame, onAudioDataCallbackFn);
 
 		if (status != napi_ok) {
-			delete[] audioCopy;
+			delete[] frame->buff;
+			delete frame->format;
 			delete frame;
 		}
 	};
 
-	bool success = captureInstance.Start(pid, onAudioData);
-	printf("[SYSAUDIOCAPTURE] StartCapture: success=%d\n", success);
+	std::thread([onAudioData, pid]() {
+		bool success = captureInstance.Start(pid, onAudioData);
+		printf("[SYSAUDIOCAPTURE] StartCapture: success=%d\n", success);
+	}).detach();
 
-	return Napi::Boolean::New(env, success);
+	return Napi::Boolean::New(env, true);
 }
 
 Napi::Value StopCapture(const Napi::CallbackInfo &info) {
@@ -120,4 +119,4 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 	return exports;
 }
 
-NODE_API_MODULE(wasapi_loopback, Init)
+NODE_API_MODULE(sysaudio, Init)

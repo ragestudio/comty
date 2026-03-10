@@ -13,10 +13,10 @@ struct AudioFormat {
 
 struct AudioFrame {
 	uint8_t *buff;
+	AudioFormat *format;
 	size_t size;
-	AudioFormat format;
 };
 
-using AudioDataCallback = std::function<void(const void *pData, size_t dataSize, const AudioFormat &format)>;
+using AudioDataCallback = std::function<void(AudioFrame *frame)>;
 
 #endif // AUDIOCALLBACK_HPP
