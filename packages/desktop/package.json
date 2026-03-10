@@ -1,5 +1,7 @@
 {
 	"name": "comty-desktop",
+	"author": "RageStudio",
+	"description": "Official desktop client for Comty",
 	"appName": "Comty",
 	"processName": "comty-desktop",
 	"version": "0.6.0",
@@ -10,7 +12,8 @@
 	"scripts": {
 		"dev": "electron .",
 		"postinstall": "electron-builder install-app-deps",
-		"pack:linux": "electron-builder --linux --config"
+		"pack:linux": "electron-builder --linux --config",
+		"pack:win": "electron-builder --win --config"
 	},
 	"dependencies": {
 		"cross-env": "^10.0.0",
