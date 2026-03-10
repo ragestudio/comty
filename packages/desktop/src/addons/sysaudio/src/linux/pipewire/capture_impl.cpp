@@ -16,17 +16,17 @@ CaptureImpl::~CaptureImpl() {
 }
 
 void CaptureImpl::send_mock_data() {
-	if (!data_callback) {
-		return;
-	}
+	// if (!data_callback) {
+	// 	return;
+	// }
 
-	AudioFormat format{};
-	format.sampleRate = 0;
-	format.channels = 0;
-	format.bitsPerSample = 0;
-	format.format = SPA_AUDIO_FORMAT_UNKNOWN;
+	// AudioFormat format{};
+	// format.sampleRate = 0;
+	// format.channels = 0;
+	// format.bitsPerSample = 0;
+	// format.format = SPA_AUDIO_FORMAT_UNKNOWN;
 
-	data_callback(nullptr, 0, format);
+	// data_callback(nullptr, 0, format);
 }
 
 bool CaptureImpl::start(pid_t exclude_pid, AudioDataCallback callback) {
@@ -70,8 +70,6 @@ bool CaptureImpl::start(pid_t exclude_pid, AudioDataCallback callback) {
 
 	// start the loop in a separate thread
 	capture_thread = std::thread([this]() {
-		std::cout << "PipeWire loop thread started" << std::endl;
-
 		while (is_capturing) {
 			int ret = pw_loop_iterate(loop, 100);
 
@@ -80,7 +78,6 @@ bool CaptureImpl::start(pid_t exclude_pid, AudioDataCallback callback) {
 				break;
 			}
 		}
-		std::cout << "PipeWire loop thread finished" << std::endl;
 	});
 
 	is_capturing = true;
@@ -107,6 +104,7 @@ void CaptureImpl::stop() {
 
 void on_process(void *userdata) {
 	CaptureImpl *capture = static_cast<CaptureImpl *>(userdata);
+
 	capture->process_audio();
 }
 
@@ -158,17 +156,24 @@ void CaptureImpl::process_audio() {
 	}
 
 	// create audio format info
-	AudioFormat format;
-	format.sampleRate = current_rate;
-	format.channels = current_channels;
-	format.bitsPerSample = audio::get_bytes_per_sample(static_cast<spa_audio_format>(current_format)) * 8;
-	format.format = current_format;
+	AudioFormat *format = new AudioFormat;
+	format->sampleRate = current_rate;
+	format->channels = current_channels;
+	format->bitsPerSample = audio::get_bytes_per_sample(static_cast<spa_audio_format>(current_format)) * 8;
+	format->format = current_format;
 
 	// validate buffer
-	if (!audio::validate_buffer_size(bytes, format)) {
-		pw_stream_queue_buffer(stream, buf);
-		return;
-	}
+	// if (!audio::validate_buffer_size(bytes, *format)) {
+	// 	pw_stream_queue_buffer(stream, buf);
+	// 	delete format;
+	// 	return;
+	// }
+
+	AudioFrame *frame = new AudioFrame{
+		static_cast<uint8_t *>(data->data),
+		format,
+		bytes
+	};
 
 	// // debug logging
 	// static size_t frame_count = 0;
@@ -176,13 +181,7 @@ void CaptureImpl::process_audio() {
 	// audio::log_audio_buffer(data->data, bytes, format, frame_count);
 
 	// call callback with raw audio data
-	try {
-		data_callback(data->data, bytes, format);
-	} catch (const std::exception &e) {
-		std::cerr << "Error in audio callback: " << e.what() << std::endl;
-	} catch (...) {
-		std::cerr << "Unknown error in audio callback" << std::endl;
-	}
+	data_callback(frame);
 
 	pw_stream_queue_buffer(stream, buf);
 }
@@ -203,15 +202,6 @@ void CaptureImpl::handle_param_change(uint32_t id, const struct spa_pod *param) 
 	current_format = static_cast<uint32_t>(info.format);
 	current_rate = info.rate;
 	current_channels = info.channels;
-
-	std::cout << "Audio format changed: "
-			  << "format=" << info.format
-			  << " (" << audio::format_to_string(info.format) << ")"
-			  << ", rate=" << info.rate
-			  << ", channels=" << info.channels
-			  << ", position[0]=" << (info.channels > 0 ? static_cast<int>(info.position[0]) : -1)
-			  << ", position[1]=" << (info.channels > 1 ? static_cast<int>(info.position[1]) : -1)
-			  << std::endl;
 }
 
 void CaptureImpl::handle_state_change(enum pw_stream_state old, enum pw_stream_state state, const char *error) {
