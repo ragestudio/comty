@@ -1,7 +1,7 @@
 {
 	"name": "files",
 	"dependencies": {
-		"file-type": "^20.4.1",
+		"file-type": "^21.3.1",
 		"fluent-ffmpeg": "^2.1.2",
 		"mime-types": "^2.1.35",
 		"p-map": "4",
