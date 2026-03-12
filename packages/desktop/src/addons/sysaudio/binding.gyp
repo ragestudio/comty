@@ -23,9 +23,12 @@
 					"OS=='linux'",
 					{
 						"sources": [
-							"src/linux/capture.cpp",
-							"src/linux/pipewire/audio_utils.cpp",
-							"src/linux/pipewire/capture_impl.cpp"
+							"src/linux/engine.cpp",
+							"src/linux/pipewire/utils.cpp",
+							"src/linux/pipewire/router.cpp",
+							"src/linux/pipewire/input.cpp",
+							"src/linux/pipewire/output.cpp",
+							"src/linux/pipewire/main.cpp"
 						],
 						"libraries": ["-lpipewire-0.3"],
 						"include_dirs": [

@@ -6,26 +6,30 @@
 #include <memory>
 
 #include "../types.hpp"
+#include "pipewire/main.hpp"
 
 #define INPUT_NODE_NAME "comty-sysaudio"
 
 // forward declaration of implementation
 namespace pipewire {
-class CaptureImpl;
+class PipewireAudio;
 }
 
-class Capture {
+class SysAudioLinux {
    public:
-	Capture();
-	~Capture();
+	SysAudioLinux();
+	~SysAudioLinux();
 
 	// disable copying
-	Capture(const Capture &) = delete;
-	Capture &operator=(const Capture &) = delete;
+	SysAudioLinux(const SysAudioLinux &) = delete;
+	SysAudioLinux &operator=(const SysAudioLinux &) = delete;
 
-	bool Start(pid_t excludePid, AudioDataCallback dataCallback);
 	void Stop();
-	void SendMockData();
+
+	bool StartCapture(pid_t excludePid, AudioDataCallback dataCallback);
+	void StopCapture();
+
+	void Output(AudioFrame *frame);
 
 	// audio format accessors
 	void SetAudioFormat(spa_audio_format format, uint32_t rate, uint32_t channels);
@@ -36,5 +40,5 @@ class Capture {
 	AudioFormat GetCurrentFormat() const;
 
    private:
-	std::unique_ptr<pipewire::CaptureImpl> impl;
+	std::unique_ptr<pipewire::PipewireAudio> impl;
 };

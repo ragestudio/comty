@@ -3,9 +3,63 @@
 #include <iomanip>
 #include <iostream>
 
-#include "audio_utils.hpp"
+#include "utils.hpp"
 
-namespace pipewire::audio {
+namespace pipewire::utils {
+
+bool is_pid_descendant_of(pid_t child_pid, pid_t target_parent_pid) {
+	if (child_pid == target_parent_pid) {
+		return true;
+	}
+
+	if (child_pid <= 1 || target_parent_pid <= 1) {
+		return false;
+	}
+
+	pid_t current_pid = child_pid;
+
+	while (current_pid > 1) {
+		char path[64];
+		snprintf(path, sizeof(path), "/proc/%d/stat", current_pid);
+
+		FILE *f = fopen(path, "r");
+
+		if (!f) {
+			break;
+		}
+
+		char buf[1024];
+		if (!fgets(buf, sizeof(buf), f)) {
+			fclose(f);
+			break;
+		}
+		fclose(f);
+
+		const char *rparen = strrchr(buf, ')');
+		if (!rparen) {
+			break;
+		}
+
+		char state;
+		pid_t ppid = 0;
+
+		if (sscanf(rparen + 1, " %c %d", &state, &ppid) != 2) {
+			break;
+		}
+
+		if (ppid == target_parent_pid) {
+			return true;
+		}
+
+		if (ppid == current_pid) {
+			break;
+		}
+
+		current_pid = ppid;
+	}
+
+	return false;
+}
 
 uint32_t get_bytes_per_sample(spa_audio_format format) {
 	switch (format) {
@@ -131,4 +185,4 @@ bool validate_buffer_size(size_t bytes, const AudioFormat &format) {
 	return true;
 }
 
-}  // namespace pipewire::audio
+}  // namespace pipewire::utils

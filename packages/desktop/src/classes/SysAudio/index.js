@@ -5,21 +5,22 @@ const sysaudio = createRequire(import.meta.url)(
 	"../../addons/sysaudio/build/Release/sysaudio.node",
 )
 
-export default class DesktopCapture {
+export default class SysAudio {
 	constructor(main) {
 		this.main = main
 
-		ipcMain.handle(
-			"desktopcapturer:startSystemAudioCapture",
-			this.startSystemAudioCapture,
-		)
-		ipcMain.handle(
-			"desktopcapturer:stopSystemAudioCapture",
-			this.stopSystemAudioCapture,
-		)
+		ipcMain.handle("sysaudio:startCapture", this.startCapture)
+		ipcMain.handle("sysaudio:stopCapture", this.stopCapture)
+		ipcMain.handle("sysaudio:output", this.sendToOutput)
 
 		app.whenReady().then(() => {
 			// set the default session handler
+			session.defaultSession.setPermissionRequestHandler(
+				(webContents, permission, callback) => {
+					return callback(true)
+				},
+			)
+
 			session.defaultSession.setDisplayMediaRequestHandler(
 				async (request, callback) => {
 					const sources = await desktopCapturer.getSources({
@@ -37,24 +38,28 @@ export default class DesktopCapture {
 		})
 	}
 
-	audioBufferCallback = (buffer, format) => {
-		this.main.mainWindow.webContents.send(
-			"desktopcapturer:sysaudio-buff",
-			buffer,
-		)
+	sendToOutput = (buffer, format) => {
+		sysaudio.output(buffer, format)
 	}
 
-	startSystemAudioCapture = () => {
+	audioBufferCallback = (buffer, format) => {
+		this.main.mainWindow.webContents.send("sysaudio:input", {
+			buffer: buffer,
+			...format,
+		})
+	}
+
+	startCapture = () => {
 		if (this.main.mainWindow.isDestroyed()) {
 			return false
 		}
 
-		sysaudio.start(process.pid, this.audioBufferCallback)
+		sysaudio.start_capture(process.pid, this.audioBufferCallback)
 
 		return true
 	}
 
-	stopSystemAudioCapture = () => {
-		sysaudio.stop()
+	stopCapture = () => {
+		sysaudio.stop_capture()
 	}
 }

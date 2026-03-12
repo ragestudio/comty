@@ -11,15 +11,6 @@ export default {
 	"app:restart": (ctx) => {
 		ctx.restart()
 	},
-	"desktopcapturer:initialize": async (ctx) => {
-		const desktopCapturerModule = ctx.modules.get("desktopCapturer")
-
-		if (!desktopCapturerModule) {
-			throw new Error("DesktopCapturer module is not available")
-		}
-
-		return await desktopCapturerModule.initialize()
-	},
 	"extensions:load": async (ctx, event, ...args) => {
 		//return await ctx.extensions.load(...args)
 	},

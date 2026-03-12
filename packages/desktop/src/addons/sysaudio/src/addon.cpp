@@ -1,4 +1,5 @@
-#include <iostream>
+#include <chrono>
+#include <cstdint>
 #include <thread>
 
 #include "napi.h"
@@ -12,16 +13,16 @@
 
 #ifdef __linux
 #define OS "linux"
-#include "linux/capture.hpp"
+#include "linux/engine.hpp"
 #define IS_LINUX
 #endif
 
 #ifdef _WIN32
-WasapiCapture captureInstance;
+WasapiCapture engine;
 #endif
 
 #ifdef __linux
-Capture captureInstance;
+SysAudioLinux engine;
 #endif
 
 Napi::ThreadSafeFunction audioCaptureDataCallback;
@@ -43,9 +44,9 @@ void onAudioDataCallbackFn(Napi::Env env, Napi::Function jsCb, AudioFrame *frame
 	}
 
 	if (frame) {
-		// if (frame->buff) {
-		//     free(frame->buff);
-		// }
+		if (frame->buff) {
+			delete[] frame->buff;
+		}
 		delete frame->format;
 		delete frame;
 	}
@@ -78,44 +79,77 @@ Napi::Value StartCapture(const Napi::CallbackInfo &info) {
 	);
 
 	auto onAudioData = [](AudioFrame *frame) {
-		napi_status status = audioCaptureDataCallback.BlockingCall(frame, onAudioDataCallbackFn);
-
-		if (status != napi_ok) {
-			delete[] frame->buff;
-			delete frame->format;
-			delete frame;
+		if (audioCaptureDataCallback) {
+			audioCaptureDataCallback.NonBlockingCall(frame, onAudioDataCallbackFn);
 		}
 	};
 
-	std::thread([onAudioData, pid]() {
-		bool success = captureInstance.Start(pid, onAudioData);
-		printf("[SYSAUDIOCAPTURE] StartCapture: success=%d\n", success);
-	}).detach();
+	printf("[SysAudio] Addon::StartCapture > starting capture\n");
+	engine.StartCapture(pid, onAudioData);
 
 	return Napi::Boolean::New(env, true);
 }
 
 Napi::Value StopCapture(const Napi::CallbackInfo &info) {
-	captureInstance.Stop();
+	printf("[SysAudio] Addon::StopCapture > stopping capture\n");
+
+	engine.StopCapture();
 
 	if (audioCaptureDataCallback) {
+		printf("[SysAudio] Addon::StopCapture > releasing tsfn\n");
 		audioCaptureDataCallback.Release();
+		audioCaptureDataCallback = nullptr;
 	}
 
-	printf("[SYSAUDIOCAPTURE] StopCapture: tsfn released\n");
-
+	printf("[SysAudio] Addon::StopCapture > done\n");
 	return info.Env().Undefined();
 }
 
-Napi::Value SendMockData(const Napi::CallbackInfo &info) {
-	captureInstance.SendMockData();
+Napi::Value OutputAudio(const Napi::CallbackInfo &info) {
+#ifdef __linux
+	Napi::Env env = info.Env();
+
+	if (info.Length() < 2 || !info[0].IsBuffer() || !info[1].IsObject()) {
+		Napi::TypeError::New(env, "Invalid arguments").ThrowAsJavaScriptException();
+		return env.Undefined();
+	}
+
+	Napi::Object formatObj = info[1].As<Napi::Object>();
+
+	AudioFormat *format = new AudioFormat{};
+
+	format->channels = formatObj.Get("channels").As<Napi::Number>().Int32Value();
+	format->sampleRate = formatObj.Get("sampleRate").As<Napi::Number>().Int32Value();
+	format->bitsPerSample = formatObj.Get("bitsPerSample").As<Napi::Number>().Int32Value();
+
+	AudioFrame *frame = new AudioFrame{};
+
+	frame->buff = info[0].As<Napi::Buffer<uint8_t>>().Data();
+	frame->size = info[0].As<Napi::Buffer<uint8_t>>().Length();
+	frame->format = format;
+
+	engine.Output(frame);
+	return env.Undefined();
+#else
+	Napi::Error::New(info.Env(), "OutputAudio is only supported on Linux").ThrowAsJavaScriptException();
+	return info.Env().Undefined();
+#endif
+}
+
+Napi::Value StopEngine(const Napi::CallbackInfo &info) {
+	printf("[SysAudio] Addon::Stop > stopping engine\n");
+
+	engine.Stop();
+
+	printf("[SysAudio] Addon::Stop > done\n");
 	return info.Env().Undefined();
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-	exports.Set("start", Napi::Function::New(env, StartCapture));
-	exports.Set("stop", Napi::Function::New(env, StopCapture));
-	exports.Set("send_mock_data", Napi::Function::New(env, SendMockData));
+	exports.Set("start_capture", Napi::Function::New(env, StartCapture));
+	exports.Set("stop_capture", Napi::Function::New(env, StopCapture));
+	exports.Set("stop", Napi::Function::New(env, StopEngine));
+	exports.Set("output", Napi::Function::New(env, OutputAudio));
 	return exports;
 }
 
