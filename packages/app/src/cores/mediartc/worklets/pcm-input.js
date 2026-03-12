@@ -21,12 +21,6 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 				this.channels = channels || this.channels
 				this.bitsPerSample = bitsPerSample || this.bitsPerSample
 
-				if (sampleRate && sampleRate !== globalThis.sampleRate) {
-					console.warn(
-						"Sample rate mismatch: stream is at ${sampleRate}Hz but AudioContext runs at ${globalThis.sampleRate}Hz. Audio will be distorted/speeded up.",
-					)
-				}
-
 				this.processIncomingData(buffer)
 			}
 		}
