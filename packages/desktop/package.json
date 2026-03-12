@@ -1,8 +1,10 @@
 {
 	"name": "comty-desktop",
+	"author": "RageStudio",
+	"description": "Official desktop client for Comty",
 	"appName": "Comty",
 	"processName": "comty-desktop",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"license": "MIT",
 	"type": "module",
 	"main": "./src/main.js",
@@ -10,12 +12,8 @@
 	"scripts": {
 		"dev": "electron .",
 		"postinstall": "electron-builder install-app-deps",
-		"pack:linux": "electron-builder --linux --config"
-	},
-	"devDependencies": {
-		"electron": "^39.6.0",
-		"electron-builder": "^26.8.1",
-		"electron-devtools-installer": "^4.0.0"
+		"pack:linux": "electron-builder --linux --config",
+		"pack:win": "electron-builder --win --config"
 	},
 	"dependencies": {
 		"cross-env": "^10.0.0",
@@ -24,5 +22,10 @@
 		"paclient": "^0.0.2",
 		"radix-router": "^3.0.1",
 		"router": "^2.2.0"
+	},
+	"devDependencies": {
+		"electron": "^39.6.0",
+		"electron-builder": "^26.8.1",
+		"electron-devtools-installer": "^4.0.0"
 	}
 }

@@ -7,6 +7,8 @@ import onClientEvent from "./events/clientEvent"
 
 import onClientVoiceChannelJoinEvent from "./events/clientVoiceChannelJoin"
 import onClientVoiceChannelLeftEvent from "./events/clientVoiceChannelLeft"
+import onClientVoiceChannelProducerOpenEvent from "./events/clientVoiceChannelProducerOpen"
+import onClientVoiceChannelProducerCloseEvent from "./events/clientVoiceChannelProducerClose"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"]
 
@@ -78,15 +80,25 @@ const useGroup = ({ group_id }) => {
 			const remoteState =
 				await GroupsModel.rtc.getGroupState(currentGroupId)
 
-			if (Array.isArray(remoteState.channels)) {
-				for (let channel of channelsList) {
-					const currentStateChannel = remoteState.channels.find(
-						(_c) => _c._id === channel._id,
-					)
+			for (let channel of channelsList) {
+				if (!Array.isArray(remoteState.channels)) {
+					continue
+				}
 
-					if (currentStateChannel && currentStateChannel.clients) {
-						channel.clients = currentStateChannel.clients
-					}
+				const currentStateChannel = remoteState.channels.find(
+					(_c) => _c._id === channel._id,
+				)
+
+				if (!currentStateChannel) {
+					continue
+				}
+
+				if (currentStateChannel.clients) {
+					channel.clients = currentStateChannel.clients
+				}
+
+				if (currentStateChannel.producers) {
+					channel.producers = currentStateChannel.producers
 				}
 			}
 
@@ -159,7 +171,9 @@ const useGroup = ({ group_id }) => {
 				channelsList = channelsList.map((channel) => ({
 					...channel,
 					clients: [],
+					producers: [],
 				}))
+
 				channelsList = await loadChannelsStates(channelsList, group_id)
 
 				if (!isActive) {
@@ -192,6 +206,18 @@ const useGroup = ({ group_id }) => {
 			onClientVoiceChannelLeftEvent(dataRef.current, setChannels, payload)
 		const handleClientVoiceChannelEvent = (payload) =>
 			onClientEvent(dataRef.current, payload, setChannels)
+		const handleClientVoiceChannelProducerOpen = (payload) =>
+			onClientVoiceChannelProducerOpenEvent(
+				dataRef.current,
+				setChannels,
+				payload,
+			)
+		const handleClientVoiceChannelProducerClose = (payload) =>
+			onClientVoiceChannelProducerCloseEvent(
+				dataRef.current,
+				setChannels,
+				payload,
+			)
 
 		if (socket.current) {
 			socket.current.emit("group:subscribe", group_id)
@@ -206,6 +232,14 @@ const useGroup = ({ group_id }) => {
 			socket.current.on(
 				`group:${group_id}:client:vc:event`,
 				handleClientVoiceChannelEvent,
+			)
+			socket.current.on(
+				`group:${group_id}:client:vc:producer:open`,
+				handleClientVoiceChannelProducerOpen,
+			)
+			socket.current.on(
+				`group:${group_id}:client:vc:producer:close`,
+				handleClientVoiceChannelProducerClose,
 			)
 			socket.current.on(`group:${group_id}:user:online`, handleUserOnline)
 			socket.current.on(
@@ -230,6 +264,14 @@ const useGroup = ({ group_id }) => {
 				socket.current.off(
 					`group:${group_id}:client:vc:event`,
 					handleClientVoiceChannelEvent,
+				)
+				socket.current.off(
+					`group:${group_id}:client:vc:producer:open`,
+					handleClientVoiceChannelProducerOpen,
+				)
+				socket.current.off(
+					`group:${group_id}:client:vc:producer:close`,
+					handleClientVoiceChannelProducerClose,
 				)
 				socket.current.off(
 					`group:${group_id}:user:online`,

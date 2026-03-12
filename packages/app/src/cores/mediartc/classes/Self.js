@@ -132,7 +132,7 @@ export default class Self {
 				deviceId: Self.inputDeviceId,
 				echoCancellation: this.audioSettings.echoCancellation,
 				noiseSuppression: this.audioSettings.noiseSuppression,
-				autoGainControl: this.audioSettings.autoGainControl,
+				//autoGainControl: this.audioSettings.autoGainControl,
 				voiceIsolation: true,
 				sampleRate: 44100,
 				channelCount: 1,
@@ -363,14 +363,9 @@ export default class Self {
 		this.screenStream.getTracks().forEach((track) => track.stop())
 		this.screenStream = null
 
-		if (window.ipcRenderer) {
+		if (this.sysAudio) {
 			try {
-				await window.ipcRenderer.invoke(
-					"desktopcapturer:stopSystemAudioCapture",
-				)
-				window.ipcRenderer.removeAllListeners(
-					"desktopcapturer:sysaudio-buff",
-				)
+				this.sysAudio.stopCapture()
 			} catch (error) {
 				console.error(`Failed to stop system audio capture:`, error)
 			}

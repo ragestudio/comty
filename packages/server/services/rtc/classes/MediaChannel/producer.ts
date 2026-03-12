@@ -72,6 +72,17 @@ export default class Producer {
 			this.serialize(),
 		)
 
+		this.instance.sendToGroupTopic("client:vc:producer:open", {
+			userId: this.client.userId,
+			channelId: this.channelId,
+			producer: this.serialize(),
+			user: {
+				_id: this.client.context.user._id,
+				username: this.client.context.user.username,
+				avatar: this.client.context.user.avatar,
+			},
+		})
+
 		const instanceProducers = this.instance.producers
 
 		// check if the instance producers set has client userId
@@ -99,6 +110,24 @@ export default class Producer {
 				`media:channel:producer:left`,
 				this.serialize(),
 			)
+		} catch (error) {
+			console.error(
+				`Error notifying clients about producer close:`,
+				error,
+			)
+		}
+
+		try {
+			this.instance.sendToGroupTopic("client:vc:producer:close", {
+				userId: this.client.userId,
+				channelId: this.channelId,
+				producer: this.serialize(),
+				user: {
+					_id: this.client.context.user._id,
+					username: this.client.context.user.username,
+					avatar: this.client.context.user.avatar,
+				},
+			})
 		} catch (error) {
 			console.error(
 				`Error notifying clients about producer close:`,

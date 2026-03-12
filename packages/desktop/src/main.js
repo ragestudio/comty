@@ -6,7 +6,6 @@ import os from "node:os"
 // 	installExtension,
 // 	REACT_DEVELOPER_TOOLS,
 // } from "electron-devtools-installer"
-
 import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
 import ElectronStore from "electron-store"
 
@@ -18,6 +17,7 @@ import Vars from "./vars.js"
 import API from "./classes/Api/index.js"
 import Settings from "./classes/Settings/index.js"
 import ExtensionManager from "./classes/Extensions/index.js"
+import SysAudio from "./classes/SysAudio/index.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -61,6 +61,7 @@ class Main {
 	modules = new Map()
 	settings = new Settings()
 	extensions = new ExtensionManager(this)
+	sysAudio = new SysAudio(this)
 
 	async initialize() {
 		this.state.ready = false
@@ -79,9 +80,6 @@ class Main {
 
 		// await to the app being ready
 		await this.app.whenReady()
-
-		// start desktop capturer
-		this.loadModule("desktopCapturer", "./modules/desktopcapturer/index.js")
 
 		this.state.ready = true
 
@@ -171,6 +169,9 @@ class Main {
 			frame: true,
 			transparent: false,
 			autoHideMenuBar: true,
+			width: 1280,
+			height: 720,
+			show: false,
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
@@ -198,6 +199,20 @@ class Main {
 					this.mainWindow.loadURL(Main.vars.productionUrl)
 					break
 			}
+		}
+
+		switch (os.platform()) {
+			case "win32":
+				this.mainWindow.maximize()
+				this.mainWindow.show()
+
+				break
+			// case "linux":
+			// 	this.mainWindow.show()
+			// 	break
+			default:
+				this.mainWindow.show()
+				break
 		}
 
 		return this.mainWindow

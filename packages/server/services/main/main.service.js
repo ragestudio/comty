@@ -23,6 +23,10 @@ export default class API extends Server {
 	}
 
 	onClientConnected = (ctx = {}) => {
+		if (!ctx.meta) {
+			return null
+		}
+
 		try {
 			this.contexts.userConnections.handleConnection(
 				this.contexts.redis.client,
@@ -37,6 +41,10 @@ export default class API extends Server {
 	}
 
 	onClientDisconnected = (ctx = {}) => {
+		if (!ctx.meta) {
+			return null
+		}
+
 		try {
 			this.contexts.userConnections.handleDisconnection(
 				this.contexts.redis.client,

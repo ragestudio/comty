@@ -8,56 +8,111 @@ export default class SysAudio {
 		}
 	}
 
-	get audioTrack() {
-		if (!this.destination) {
+	get audioInputTrack() {
+		if (!this.inputDestination) {
 			return null
 		}
-
-		return this.destination.stream.getAudioTracks()[0]
+		return this.inputDestination.stream.getAudioTracks()[0]
 	}
 
-	ctx = new AudioContext({
-		sampleRate: 48000,
+	inputCtx = new AudioContext({
+		sampleRate: 44100,
 		latencyHint: "interactive",
 	})
+	outputCtx = new AudioContext({
+		sampleRate: 44100,
+		latencyHint: "interactive",
+	})
+
+	inputDestination = null
+	outputBus = null
+
 	pcmInputWorklet = null
-	destination = null
+	pcmOutputWorklet = null
 
 	initialize = async () => {
-		await this.ctx.audioWorklet.addModule(
+		await this.initializeInput()
+		await this.initializeOutput()
+	}
+
+	initializeInput = async () => {
+		await this.inputCtx.audioWorklet.addModule(
 			new URL("../worklets/pcm-input.js", import.meta.url),
 		)
 
-		this.pcmInputWorklet = new AudioWorkletNode(this.ctx, "pcm-input", {
-			outputChannelCount: [2],
+		this.pcmInputWorklet = new AudioWorkletNode(
+			this.inputCtx,
+			"pcm-input",
+			{
+				outputChannelCount: [2],
+			},
+		)
+
+		window.ipcRenderer.on("sysaudio:input", (_, data) => {
+			this.pcmInputWorklet.port.postMessage(data, [data.buffer.buffer])
 		})
-		this.destination = this.ctx.createMediaStreamDestination()
+	}
 
-		this.destination.channelCountMode = "explicit"
-		this.destination.channelCount = 2
+	initializeOutput = async () => {
+		await this.outputCtx.audioWorklet.addModule(
+			new URL("../worklets/pcm-output.js", import.meta.url),
+		)
 
-		this.pcmInputWorklet.connect(this.destination)
+		this.outputBus = this.outputCtx.createGain()
 
-		window.ipcRenderer.on("desktopcapturer:sysaudio-buff", (_, data) => {
-			this.pcmInputWorklet.port.postMessage(data.buffer, [data.buffer])
-		})
+		this.pcmOutputWorklet = new AudioWorkletNode(
+			this.outputCtx,
+			"pcm-output",
+		)
+
+		this.outputBus.connect(this.pcmOutputWorklet)
+
+		this.pcmOutputWorklet.port.onmessage = (event) => {
+			const buffer = new Uint8Array(event.data)
+
+			window.ipcRenderer.send("sysaudio:output", buffer, {
+				sampleRate: this.outputCtx.sampleRate,
+				bitsPerSample: 16,
+				channels: 2,
+			})
+		}
+
+		const silenceGain = this.outputCtx.createGain()
+		silenceGain.gain.value = 0
+
+		this.pcmOutputWorklet.connect(silenceGain)
+		silenceGain.connect(this.outputCtx.destination)
 	}
 
 	startCapture = async () => {
-		const ok = await window.ipcRenderer.invoke(
-			"desktopcapturer:startSystemAudioCapture",
-		)
+		await window.ipcRenderer.invoke("sysaudio:startCapture")
 
-		if (!ok) {
-			return null
+		if (this.inputDestination) {
+			try {
+				this.pcmInputWorklet.disconnect(this.inputDestination)
+			} catch (e) {}
 		}
 
-		return this.audioTrack
+		this.inputDestination = this.inputCtx.createMediaStreamDestination()
+		this.inputDestination.channelCountMode = "explicit"
+		this.inputDestination.channelCount = 2
+
+		this.pcmInputWorklet.connect(this.inputDestination)
+
+		return this.audioInputTrack
 	}
 
 	stopCapture = async () => {
-		return await window.ipcRenderer.invoke(
-			"desktopcapturer:stopSystemAudioCapture",
-		)
+		if (this.inputDestination) {
+			this.inputDestination.stream.getTracks().forEach((t) => t.stop())
+
+			try {
+				this.pcmInputWorklet.disconnect(this.inputDestination)
+			} catch (e) {}
+
+			this.inputDestination = null
+		}
+
+		return await window.ipcRenderer.invoke("sysaudio:stopCapture")
 	}
 }

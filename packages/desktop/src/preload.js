@@ -22,11 +22,11 @@ contextBridge.exposeInMainWorld("__ELECTRON__", {
 })
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
-	invoke: async (channel, data) => {
-		return await ipcRenderer.invoke(channel, data)
+	invoke: async (channel, ...data) => {
+		return await ipcRenderer.invoke(channel, ...data)
 	},
-	send: (channel, data) => {
-		ipcRenderer.send(channel, data)
+	send: (channel, ...data) => {
+		ipcRenderer.send(channel, ...data)
 	},
 	on: (channel, fn) => {
 		ipcRenderer.on(channel, fn)

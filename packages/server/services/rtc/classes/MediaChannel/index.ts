@@ -250,6 +250,25 @@ export default class MediaChannel {
 		})
 	}
 
+	getProducersSerialized() {
+		const producers = new Set()
+
+		for (const [producerUserId, userProducers] of this.producers) {
+			for (const [producerId, producer] of userProducers) {
+				console.log(producer)
+				producers.add({
+					id: producerId,
+					producer_id: producerId,
+					user_id: producerUserId,
+					kind: producer.producer.kind,
+					appData: producer.producer.appData,
+				})
+			}
+		}
+
+		return Array.from(producers)
+	}
+
 	/**
 	 * Send a event to all clients except the one provided
 	 * @param {Object<RTCClient>} client Origin client client

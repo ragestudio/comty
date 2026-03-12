@@ -1,5 +1,5 @@
 export default (data, setData, payload) => {
-	console.log("User switch to offline", payload)
+	console.debug("User switch to offline", payload)
 
 	setData((prev) => {
 		let connected_members = [...prev]
