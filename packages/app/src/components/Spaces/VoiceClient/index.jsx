@@ -38,7 +38,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 				y,
 			)
 		},
-		[client],
+		[client.userId],
 	)
 
 	const isProducingScreen = React.useCallback(() => {
