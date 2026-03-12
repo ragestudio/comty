@@ -16,12 +16,9 @@
 		"pack:win": "electron-builder --win --config"
 	},
 	"dependencies": {
-		"cross-env": "^10.0.0",
 		"electron-store": "^10.1.0",
 		"mime": "^4.1.0",
-		"paclient": "^0.0.2",
-		"radix-router": "^3.0.1",
-		"router": "^2.2.0"
+		"radix-router": "^3.0.1"
 	},
 	"devDependencies": {
 		"electron": "^39.6.0",
