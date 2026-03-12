@@ -49,7 +49,9 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 			const rtcClient = getRtcClient(client)
 
 			if (!rtcClient) {
-				return []
+				return [...channel.producers].filter(
+					(producer) => producer.user_id === client.userId,
+				)
 			}
 
 			return rtcClient.getAvailableProducers()
