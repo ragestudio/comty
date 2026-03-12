@@ -149,7 +149,7 @@ export default class SysAudio {
 		await window.ipcRenderer.invoke("sysaudio:startCapture")
 
 		const firstFrame = await firstFramePromise
-		const targetSampleRate = firstFrame.format?.sampleRate || 44100
+		const targetSampleRate = firstFrame.sampleRate || 44100
 
 		if (this.inputCtx.sampleRate !== targetSampleRate) {
 			await this._rebuildInputContext(targetSampleRate)

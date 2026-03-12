@@ -1,6 +1,7 @@
 import crypto from "node:crypto"
 
 export default {
+	useContexts: ["updateDistApp", "listenLiveDirectory"],
 	fn: async (req, res, ctx) => {
 		if (!process.env.WRAPPER_AUTO_UPDATE_KEY) {
 			throw new OperationError(500, "Auto update key is not set")
