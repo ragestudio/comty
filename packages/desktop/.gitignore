@@ -144,3 +144,4 @@ static
 
 test/fixtures/out
 *.actual
+*.node

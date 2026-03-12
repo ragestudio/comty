@@ -145,4 +145,5 @@ static
 test/fixtures/out
 *.actual
 
-.wav
+*.wav
+*.node
