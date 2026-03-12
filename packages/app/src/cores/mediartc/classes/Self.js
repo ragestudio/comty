@@ -30,6 +30,10 @@ export default class Self {
 	}
 
 	get isDeafened() {
+		if (this.sysAudio && this.sysAudio?.outputBus) {
+			return this.sysAudio.outputBus.gain.value === 0
+		}
+
 		return this.audioOutput.context.state === "suspended"
 	}
 

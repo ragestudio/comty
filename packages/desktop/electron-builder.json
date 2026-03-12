@@ -14,10 +14,10 @@
 		"icon": "resources/icon.ico"
 	},
 	"nsis": {
+		"shortcutName": "Comty",
+		"createDesktopShortcut": "always",
 		"artifactName": "${productName}-${version}-setup.${ext}",
-		"shortcutName": "${productName}",
-		"uninstallDisplayName": "${productName}",
-		"createDesktopShortcut": "always"
+		"uninstallDisplayName": "${productName}"
 	},
 	"mac": {
 		"icon": "resources/icon.icns",
