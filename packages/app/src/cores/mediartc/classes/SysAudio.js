@@ -30,6 +30,9 @@ export default class SysAudio {
 	pcmInputWorklet = null
 	pcmOutputWorklet = null
 
+	isReadyForFrames = false
+	resolveFirstFrame = null
+
 	initialize = async () => {
 		await this.initializeInput()
 
@@ -46,14 +49,53 @@ export default class SysAudio {
 		this.pcmInputWorklet = new AudioWorkletNode(
 			this.inputCtx,
 			"pcm-input",
-			{
-				outputChannelCount: [2],
-			},
+			{ outputChannelCount: [2] },
 		)
 
 		window.ipcRenderer.on("sysaudio:input", (_, data) => {
+			if (!this.isReadyForFrames) {
+				if (this.resolveFirstFrame) {
+					this.resolveFirstFrame(data)
+					this.resolveFirstFrame = null
+				}
+
+				return
+			}
+
+			if (!this.pcmInputWorklet) return
+
 			this.pcmInputWorklet.port.postMessage(data, [data.buffer.buffer])
 		})
+	}
+
+	_rebuildInputContext = async (newSampleRate) => {
+		console.warn(
+			`[SysAudio] Updating AudioContext to match samplerate [${newSampleRate}Hz]`,
+		)
+
+		if (this.pcmInputWorklet) {
+			this.pcmInputWorklet.disconnect()
+			this.pcmInputWorklet = null
+		}
+
+		if (this.inputCtx) {
+			await this.inputCtx.close()
+		}
+
+		this.inputCtx = new AudioContext({
+			sampleRate: newSampleRate,
+			latencyHint: "interactive",
+		})
+
+		await this.inputCtx.audioWorklet.addModule(
+			new URL("../worklets/pcm-input.js", import.meta.url),
+		)
+
+		this.pcmInputWorklet = new AudioWorkletNode(
+			this.inputCtx,
+			"pcm-input",
+			{ outputChannelCount: [2] },
+		)
 	}
 
 	initializeOutput = async () => {
@@ -88,7 +130,20 @@ export default class SysAudio {
 	}
 
 	startCapture = async () => {
+		this.isReadyForFrames = false
+
+		const firstFramePromise = new Promise((resolve) => {
+			this.resolveFirstFrame = resolve
+		})
+
 		await window.ipcRenderer.invoke("sysaudio:startCapture")
+
+		const firstFrame = await firstFramePromise
+		const targetSampleRate = firstFrame.format?.sampleRate || 44100
+
+		if (this.inputCtx.sampleRate !== targetSampleRate) {
+			await this._rebuildInputContext(targetSampleRate)
+		}
 
 		if (this.inputDestination) {
 			try {
@@ -102,10 +157,14 @@ export default class SysAudio {
 
 		this.pcmInputWorklet.connect(this.inputDestination)
 
+		this.isReadyForFrames = true
+
 		return this.audioInputTrack
 	}
 
 	stopCapture = async () => {
+		this.isReadyForFrames = false
+
 		if (this.inputDestination) {
 			this.inputDestination.stream.getTracks().forEach((t) => t.stop())
 
