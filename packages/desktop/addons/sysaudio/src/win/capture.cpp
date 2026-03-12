@@ -89,9 +89,9 @@ class AudioActivator : public IActivateAudioInterfaceCompletionHandler, public I
 };
 
 WasapiCapture::WasapiCapture() : m_isCapturing(false), m_pAudioClient(nullptr), m_pCaptureClient(nullptr), m_pwfx(nullptr) {}
-WasapiCapture::~WasapiCapture() { Stop(); }
+WasapiCapture::~WasapiCapture() { StopCapture(); }
 
-bool WasapiCapture::Start(DWORD processIdToExclude, AudioDataCallback callback) {
+bool WasapiCapture::StartCapture(DWORD processIdToExclude, AudioDataCallback callback) {
 	if (m_isCapturing) return false;
 
 	m_processIdToExclude = processIdToExclude;
@@ -102,13 +102,18 @@ bool WasapiCapture::Start(DWORD processIdToExclude, AudioDataCallback callback) 
 	return true;
 }
 
-void WasapiCapture::Stop() {
+void WasapiCapture::StopCapture() {
 	if (m_isCapturing) {
 		m_isCapturing = false;
+
 		if (m_captureThread.joinable()) {
 			m_captureThread.join();
 		}
 	}
+}
+
+void WasapiCapture::Stop() {
+	StopCapture();
 }
 
 void WasapiCapture::CaptureThread() {
@@ -341,7 +346,4 @@ Cleanup:
 	CoUninitialize();
 
 	printf("[WASAPI DEBUG] Capture thread ended\n");
-}
-
-void WasapiCapture::SendMockData() {
 }

@@ -12,6 +12,10 @@ export default class SysAudio {
 		ipcMain.handle("sysaudio:startCapture", this.startCapture)
 		ipcMain.handle("sysaudio:stopCapture", this.stopCapture)
 		ipcMain.on("sysaudio:output", this.sendToOutput)
+		ipcMain.handle(
+			"sysaudio:output_supported",
+			() => sysaudio.output_supported,
+		)
 
 		app.whenReady().then(() => {
 			// set the default session handler

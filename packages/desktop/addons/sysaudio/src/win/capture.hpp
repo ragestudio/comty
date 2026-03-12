@@ -31,9 +31,9 @@ class WasapiCapture {
 	WasapiCapture();
 	~WasapiCapture();
 
-	bool Start(DWORD processIdToExclude, AudioDataCallback callback);
+	bool StartCapture(DWORD processIdToExclude, AudioDataCallback callback);
+	void StopCapture();
 	void Stop();
-	void SendMockData();
 
    private:
 	void CaptureThread();
