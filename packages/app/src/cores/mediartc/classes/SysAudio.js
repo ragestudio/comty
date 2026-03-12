@@ -32,7 +32,10 @@ export default class SysAudio {
 
 	initialize = async () => {
 		await this.initializeInput()
-		await this.initializeOutput()
+
+		if (await window.ipcRenderer.invoke("sysaudio:output_supported")) {
+			await this.initializeOutput()
+		}
 	}
 
 	initializeInput = async () => {

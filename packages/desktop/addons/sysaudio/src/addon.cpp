@@ -150,6 +150,12 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 	exports.Set("stop_capture", Napi::Function::New(env, StopCapture));
 	exports.Set("stop", Napi::Function::New(env, StopEngine));
 	exports.Set("output", Napi::Function::New(env, OutputAudio));
+
+#ifdef __linux
+	exports.Set("output_supported", Napi::Boolean::New(env, true));
+#else
+	exports.Set("output_supported", Napi::Boolean::New(env, false));
+#endif
 	return exports;
 }
 
