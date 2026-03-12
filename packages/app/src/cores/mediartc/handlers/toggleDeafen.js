@@ -9,10 +9,20 @@ export default async function (to) {
 
 	if (to) {
 		app.cores.sfx.play("deafen")
-		await this.self.audioOutput.context.suspend()
+
+		if (this.self.sysAudio && this.self.sysAudio?.outputBus) {
+			this.self.sysAudio.outputBus.gain.value = 0
+		} else {
+			await this.self.audioOutput.context.suspend()
+		}
 	} else {
 		app.cores.sfx.play("undeafen")
-		await this.self.audioOutput.context.resume()
+
+		if (this.self.sysAudio && this.self.sysAudio?.outputBus) {
+			this.self.sysAudio.outputBus.gain.value = 1
+		} else {
+			await this.self.audioOutput.context.resume()
+		}
 	}
 
 	await this.handlers.toggleMute(to)

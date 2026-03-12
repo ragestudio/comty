@@ -19,10 +19,8 @@ export default class SysAudio {
 		sampleRate: 44100,
 		latencyHint: "interactive",
 	})
-	outputCtx = new AudioContext({
-		sampleRate: 44100,
-		latencyHint: "interactive",
-	})
+	// this should be initialized if output is supported
+	outputCtx = null
 
 	inputDestination = null
 	outputBus = null
@@ -99,6 +97,18 @@ export default class SysAudio {
 	}
 
 	initializeOutput = async () => {
+		if (!(await window.ipcRenderer.invoke("sysaudio:output_supported"))) {
+			console.warn(
+				"[SysAudio] Output is not supported, cannot initialize",
+			)
+			return null
+		}
+
+		this.outputCtx = new AudioContext({
+			sampleRate: 44100,
+			latencyHint: "interactive",
+		})
+
 		await this.outputCtx.audioWorklet.addModule(
 			new URL("../worklets/pcm-output.js", import.meta.url),
 		)
