@@ -2,7 +2,7 @@ import { createRequire } from "module"
 import { app, ipcMain, session, desktopCapturer } from "electron"
 
 const sysaudio = createRequire(import.meta.url)(
-	"../../addons/sysaudio/build/Release/sysaudio.node",
+	"../../../addons/sysaudio/sysaudio.node",
 )
 
 export default class SysAudio {

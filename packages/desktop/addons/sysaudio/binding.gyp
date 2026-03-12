@@ -39,7 +39,8 @@
 				]
 			],
 			"cflags!": ["-fno-exceptions", "-Wall", "-g", "-std=c11"],
-			"cflags_cc!": ["-fno-exceptions"]
+			"cflags_cc!": ["-fno-exceptions"],
+			"product_dir": ".."
 		}
 	]
 }
