@@ -86,12 +86,16 @@ export default class Player extends Core {
 		await this.base.initialize()
 	}
 
-	async start(manifest, { time, startIndex = 0, radioId } = {}) {
+	async start(
+		manifest,
+		{ time, startIndex = 0, radioId, fromCollection } = {},
+	) {
 		this.console.debug("start():", {
 			manifest: manifest,
 			time: time,
 			startIndex: startIndex,
 			radioId: radioId,
+			fromCollection: fromCollection,
 		})
 
 		this.ui.attachPlayerComponent()
