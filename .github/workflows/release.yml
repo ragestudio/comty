@@ -173,7 +173,7 @@ jobs:
 
   create_release:
     name: Create GitHub Release
-    needs: [check_versions, build_app, build_server]
+    needs: [check_versions, build_app]
     if: startsWith(github.ref, 'refs/tags/') && (needs.check_versions.outputs.app_changed == 'true' || needs.check_versions.outputs.server_changed == 'true')
     runs-on: ubuntu-latest
     steps:
