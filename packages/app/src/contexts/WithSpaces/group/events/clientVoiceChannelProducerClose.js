@@ -2,14 +2,15 @@
 export default (data, setChannels, payload) => {
 	setChannels((prev) => {
 		const channels = prev.map((channel) => {
+			if (!channel.producers) {
+				channel.producers = []
+			}
+
 			// update the clients of the channel
 			if (channel._id === payload.channelId) {
-				channel.clients.push({
-					userId: payload.userId,
-					user: payload.user,
-					voiceState: payload.voiceState,
-					self: payload.userId === app.userData._id,
-				})
+				channel.producers = channel.producers.filter(
+					(producer) => producer.id !== payload.producer.id,
+				)
 			}
 
 			return channel
