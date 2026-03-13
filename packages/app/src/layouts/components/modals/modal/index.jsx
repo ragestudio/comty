@@ -90,9 +90,13 @@ class Modal extends React.Component {
 					onMouseDown={this.handleClickOutside}
 				/>
 				<div
-					className={classNames("app_modal_content", {
-						"bg-accent": this.props.framed,
-					})}
+					className={classNames(
+						this.props.className,
+						"app_modal_content",
+						{
+							"bg-accent": this.props.framed,
+						},
+					)}
 					ref={this.contentRef}
 					style={this.props.frameContentStyle}
 				>
