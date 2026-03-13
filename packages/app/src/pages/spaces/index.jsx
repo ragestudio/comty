@@ -1,9 +1,6 @@
 import "./index.less"
 
-// TODO: support url query key to auto select a room
 // TODO: support room list pagination
-// TODO: support hybrid group layout renderer
-// TODO: improve group item design
 // TODO: add support for mobile layout
 // TODO: implement search logic
 const SpacesPage = () => {
