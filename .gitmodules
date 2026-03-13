@@ -7,3 +7,6 @@
 [submodule "comty.js"]
 	path = comty.js
 	url = https://github.com/ragestudio/comty.js
+[submodule "packages/desktop/addons/sysaudio"]
+	path = packages/desktop/addons/sysaudio
+	url = https://git.ragestudio.net/ragestudio/sysaudio
