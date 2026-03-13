@@ -1,9 +1,9 @@
 import loadable from "@loadable/component"
 
 export default {
-	id: "audio",
-	icon: "Volume2",
-	label: "Audio",
+	id: "voice",
+	icon: "Podcast",
+	label: "Voice",
 	group: "app",
 	ctxData: async () => {
 		const devices = await navigator.mediaDevices.enumerateDevices()
