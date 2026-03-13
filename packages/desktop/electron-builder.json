@@ -1,6 +1,6 @@
 {
 	"appId": "com.ragestudio.comty-desktop",
-	"productName": "comty-desktop",
+	"productName": "Comty",
 	"files": [
 		"src/**/**",
 		"addons/**/*.node",
@@ -35,5 +35,9 @@
 	"appImage": {
 		"artifactName": "${productName}-${version}.${ext}"
 	},
-	"npmRebuild": false
+	"npmRebuild": false,
+	"publish": {
+		"provider": "generic",
+		"url": "https://b2-cdn.ragestudio.net/file/comty-desktop/releases"
+	}
 }
