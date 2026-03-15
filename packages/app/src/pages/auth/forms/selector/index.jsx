@@ -50,6 +50,17 @@ const MainSelector = (props) => {
 					Continue with a RageStudio© ID™
 				</antd.Button>
 
+				<antd.Button
+					onClick={() =>
+						(window.location.href =
+							"https://c.tenor.com/3YrLGmJ5jHkAAAAd/tenor.gif")
+					}
+					icon={<Icons.TriangleAlert />}
+					type="evil"
+				>
+					Continue with Caution™
+				</antd.Button>
+
 				<h4>Or create a new account</h4>
 
 				<antd.Button
