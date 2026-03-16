@@ -79,23 +79,17 @@ const VoiceClient = ({ client, speaking, producers }) => {
 
 			<p>{client.user?.public_name ?? client.user?.username}</p>
 
-			{(client.voiceState?.muted || client.voiceState?.deafened) && (
-				<div className="group-page__channels-panel__list-item__clients__client__indicators">
-					{isProducingScreen() && <Icons.Monitor />}
-					{/* {client.localState.muted && <Icons.MicOff />}
-					{client.localState.deafened && <Icons.VolumeOff />}*/}
-					{client.voiceState.muted && (
-						<Icons.MicOff
-							style={{ color: "var(--danger-color)" }}
-						/>
-					)}
-					{client.voiceState.deafened && (
-						<Icons.VolumeOff
-							style={{ color: "var(--danger-color)" }}
-						/>
-					)}
-				</div>
-			)}
+			<div className="group-page__channels-panel__list-item__clients__client__indicators">
+				{isProducingScreen() && <Icons.Monitor />}
+
+				{client?.voiceState?.muted && (
+					<Icons.MicOff style={{ color: "var(--danger-color)" }} />
+				)}
+
+				{client?.voiceState?.deafened && (
+					<Icons.VolumeOff style={{ color: "var(--danger-color)" }} />
+				)}
+			</div>
 		</motion.div>
 	)
 }

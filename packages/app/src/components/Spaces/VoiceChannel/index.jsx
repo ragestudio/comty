@@ -41,7 +41,9 @@ const StreamTile = ({
 			setMediaStream(stream.stream)
 			return
 		}
+
 		const screen = rtc.screens.get(stream.userId)
+
 		if (screen?.media) {
 			setMediaStream(screen.media)
 			setHasError(false)
@@ -54,7 +56,9 @@ const StreamTile = ({
 
 	React.useEffect(() => {
 		const videoElement = videoRef.current
-		if (!videoElement) return
+		if (!videoElement) {
+			return
+		}
 
 		if (mediaStream) {
 			videoElement.srcObject = mediaStream
@@ -63,7 +67,9 @@ const StreamTile = ({
 			videoElement.srcObject = null
 		}
 		return () => {
-			if (videoElement) videoElement.srcObject = null
+			if (videoElement) {
+				videoElement.srcObject = null
+			}
 		}
 	}, [mediaStream])
 
@@ -77,8 +83,10 @@ const StreamTile = ({
 	const onVolumeChange = React.useCallback(
 		(value) => {
 			setLocalVolume(value)
-			if (onStreamAction?.setVolume)
+
+			if (onStreamAction?.setVolume) {
 				onStreamAction.setVolume(stream.userId, value)
+			}
 		},
 		[stream.userId, onStreamAction],
 	)
@@ -86,9 +94,14 @@ const StreamTile = ({
 	const handleStart = React.useCallback(
 		async (e) => {
 			e.stopPropagation()
-			if (stream.isSelf) return
+
+			if (stream.isSelf) {
+				return
+			}
+
 			setIsLoading(true)
 			setHasError(false)
+
 			try {
 				await rtc.screens.start(stream.producer.id)
 				checkMedia()
@@ -104,10 +117,18 @@ const StreamTile = ({
 	const handleStop = React.useCallback(
 		async (e) => {
 			e.stopPropagation()
-			if (stream.isSelf) return
+
+			if (stream.isSelf) {
+				return
+			}
+
 			try {
 				const screen = rtc.screens.get(stream.userId)
-				if (screen) await screen.stop()
+
+				if (screen) {
+					await screen.stop()
+				}
+
 				checkMedia()
 			} catch (error) {
 				console.warn("failed to stop stream:", error)
@@ -118,15 +139,22 @@ const StreamTile = ({
 
 	const handleFullscreenClick = React.useCallback((e) => {
 		e.stopPropagation()
-		if (videoRef.current?.requestFullscreen)
+
+		if (videoRef.current?.requestFullscreen) {
 			videoRef.current.requestFullscreen()
+		}
 	}, [])
 
 	const handleTileClick = React.useCallback(
 		(e) => {
-			if (!e.target.classList.contains("video-stream-tile__overlay"))
+			if (!e.target.classList.contains("video-stream-tile__overlay")) {
 				return
-			if (mode === "single") return
+			}
+
+			if (mode === "single") {
+				return
+			}
+
 			onTileClick(stream.id)
 		},
 		[stream.id, onTileClick, mode],
@@ -161,6 +189,7 @@ const StreamTile = ({
 				{hasError && (
 					<div className="video-stream-tile__error">
 						<span>failed to start stream</span>
+
 						{showControls && (
 							<Button
 								onClick={(e) => {
@@ -205,10 +234,12 @@ const StreamTile = ({
 								onChangeComplete={onVolumeChange}
 							/>
 						</div>
+
 						<Button
 							icon={<Icons.Fullscreen />}
 							onClick={handleFullscreenClick}
 						/>
+
 						{!stream.isSelf && (
 							<Button onClick={handleStop}>stop</Button>
 						)}
@@ -252,7 +283,12 @@ const VoiceChannel = () => {
 			})
 		}
 		return result
-	}, [state.remoteProducers, state.isProducingScreen, rtc])
+	}, [
+		state.remoteProducers,
+		state.isProducingScreen,
+		state.clients,
+		state.channelId,
+	])
 
 	React.useEffect(() => {
 		const missingUserIds = streams
@@ -261,13 +297,19 @@ const VoiceChannel = () => {
 
 		if (missingUserIds.length > 0) {
 			missingUserIds.forEach((id) => fetchedUsersRef.current.add(id))
+
 			UsersModel.data({ user_id: missingUserIds }).then((data) => {
 				const usersArray = Array.isArray(data) ? data : [data]
+
 				setUserData((prev) => {
 					const next = { ...prev }
+
 					usersArray.forEach((u) => {
-						if (u) next[u._id] = u
+						if (u) {
+							next[u._id] = u
+						}
 					})
+
 					return next
 				})
 			})
@@ -295,10 +337,16 @@ const VoiceChannel = () => {
 	)
 
 	React.useEffect(() => {
-		if (!state.channel) return
+		if (!state.channel) {
+			return
+		}
+
 		rtc.ui.detachFloatingScreens()
+
 		return () => {
-			if (state.channel) rtc.ui.attachFloatingScreens()
+			if (state.channel) {
+				rtc.ui.attachFloatingScreens()
+			}
 		}
 	}, [state.channel, rtc])
 
