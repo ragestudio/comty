@@ -3,6 +3,22 @@ import config from "@config"
 
 import { Icons } from "@components/Icons"
 
+const FUNNY_GIF = "https://c.tenor.com/3YrLGmJ5jHkAAAAd/tenor.gif"
+
+const ConCuidadico = (props) => {
+	React.useEffect(() => {
+		setTimeout(() => {
+			props.close()
+		}, 3000)
+	}, [])
+
+	return (
+		<div>
+			<img src={FUNNY_GIF} />
+		</div>
+	)
+}
+
 const MainSelector = (props) => {
 	return (
 		<>
@@ -52,8 +68,7 @@ const MainSelector = (props) => {
 
 				<antd.Button
 					onClick={() =>
-						(window.location.href =
-							"https://c.tenor.com/3YrLGmJ5jHkAAAAd/tenor.gif")
+						app.cores.window_mng.render("cuidado", <ConCuidadico />)
 					}
 					icon={<Icons.TriangleAlert />}
 					type="evil"
