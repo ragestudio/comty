@@ -20,7 +20,7 @@ const SoundpadCustomUrl = ({ dispatch }) => {
 
 		setSubmitting(true)
 
-		await dispatch(url)
+		await dispatch({ src: url })
 
 		setSubmitting(false)
 	}
