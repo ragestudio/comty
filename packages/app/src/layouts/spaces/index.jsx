@@ -9,6 +9,8 @@ import Sidebar from "@components/Spaces/Sidebar"
 
 // mobile components
 import { DraggableDrawerController } from "@layouts/components/draggableDrawer"
+import TopBar from "@layouts/components/@mobile/topBar"
+import BottomBar from "@layouts/components/@mobile/bottomBar"
 
 import {
 	controller as SpacesPageController,
@@ -28,13 +30,14 @@ const SpacesLayout = (props) => {
 			<Modals />
 			<DraggableDrawerController />
 			<Drawer />
+			{app.isMobile && <TopBar noTransition />}
 
 			<Layout
 				id="app_layout"
 				className="app_layout"
 			>
 				<SpacesPageContext.Provider value={controller}>
-					<Sidebar />
+					{!app.isMobile && <Sidebar />}
 
 					<Layout.Content
 						id="content_layout"
@@ -50,6 +53,8 @@ const SpacesLayout = (props) => {
 								React.cloneElement(props.children, props)}
 						</div>
 					</Layout.Content>
+
+					{app.isMobile && <BottomBar />}
 				</SpacesPageContext.Provider>
 			</Layout>
 		</>
