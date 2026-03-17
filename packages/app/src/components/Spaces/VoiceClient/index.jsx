@@ -52,6 +52,10 @@ const VoiceClient = ({ client, speaking, producers }) => {
 
 	const handleSoundpadDispatched = React.useCallback(
 		(payload) => {
+			if (!payload) {
+				return null
+			}
+
 			if (payload?.userId !== client?.userId) {
 				return null
 			}
@@ -60,7 +64,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 				clearTimeout(soundpadIconClearTimeout.current)
 			}
 
-			setSoundpadIcon(payload.icon)
+			setSoundpadIcon(payload?.icon)
 
 			soundpadIconClearTimeout.current = setTimeout(() => {
 				setSoundpadIcon(null)

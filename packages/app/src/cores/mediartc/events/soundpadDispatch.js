@@ -21,7 +21,7 @@ export default async (core, payload) => {
 			icon: payload.data.icon,
 		})
 
-		app.eventBus.on(`rtc:vc:soundpad:${payload.userId}`, {
+		app.eventBus.emit(`rtc:vc:soundpad:${payload.userId}`, {
 			userId: payload.userId,
 			src: payload.data.src,
 			icon: payload.data.icon,
