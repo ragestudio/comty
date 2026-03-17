@@ -6,7 +6,6 @@ import ChannelsListItem from "./item"
 
 import { GroupContext, VALID_CHANNEL_KINDS } from "@contexts/WithSpaces/group"
 import SpacesPageContext from "@contexts/WithSpaces/page"
-import useMediaRTCState from "@hooks/useMediaRTCState"
 
 import "./index.less"
 
