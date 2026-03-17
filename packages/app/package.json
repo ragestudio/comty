@@ -54,7 +54,7 @@
 		"mime": "^3.0.0",
 		"moment": "2.29.4",
 		"motion": "^12.4.2",
-		"music-metadata": "^11.2.1",
+		"music-metadata": "^11.12.3",
 		"ogl": "^1.0.11",
 		"plyr": "^3.7.8",
 		"prop-types": "^15.8.1",
