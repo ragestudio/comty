@@ -63,13 +63,13 @@ const NavMenu = (props) => {
 								item.key === props.activeKey && "active",
 							)}
 							onClick={() => {
-								if (typeof item.props.onClick === "function") {
-									return item.props.onClick()
+								if (typeof item.props?.onClick === "function") {
+									return item.props?.onClick()
 								}
 
 								return handleClickItem(item)
 							}}
-							type={item.props.type ?? "ghost"}
+							type={item.props?.type ?? "ghost"}
 							disabled={item.disabled}
 						>
 							<div className="icon">{item.icon}</div>
