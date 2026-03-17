@@ -1,13 +1,24 @@
+import MediaRTC from "../mediartc.core"
 import AudioProcessor from "./AudioProcessor"
 
+import defaults from "../defaults"
+
+type CreateScreenStreamOptions = {
+	resolution?: { width: number; height: number }
+	framerate?: number
+	systemAudio?: boolean
+}
+
 export default class Self {
-	constructor(core) {
+	constructor(core: MediaRTC) {
 		this.core = core
 
 		if (!core) {
 			throw new Error("Core not provided")
 		}
 	}
+
+	core: MediaRTC
 
 	micStream = null
 	micProducer = null
@@ -53,7 +64,11 @@ export default class Self {
 		}
 	}
 
-	set audioSettings(update = {}) {
+	set audioSettings(update) {
+		if (!update) {
+			return
+		}
+
 		for (const [key, value] of Object.entries(update)) {
 			this.core.console.log("setting audio setting", key, value)
 
@@ -137,7 +152,6 @@ export default class Self {
 				echoCancellation: this.audioSettings.echoCancellation,
 				noiseSuppression: this.audioSettings.noiseSuppression,
 				//autoGainControl: this.audioSettings.autoGainControl,
-				voiceIsolation: true,
 				sampleRate: 44100,
 				channelCount: 1,
 			},
@@ -211,7 +225,7 @@ export default class Self {
 			},
 			encodings: [
 				{
-					...this.core.constructor.defaultAudioEncodingParams,
+					...defaults.audioEncodingParams,
 					...this.core.state.channel.encoding_params,
 				},
 			],
@@ -237,7 +251,7 @@ export default class Self {
 		}
 	}
 
-	async createScreenStream(options = {}) {
+	async createScreenStream(options: CreateScreenStreamOptions = {}) {
 		if (this.screenStream) {
 			this.screenStream.getTracks().forEach((track) => track.stop())
 		}
@@ -250,10 +264,7 @@ export default class Self {
 				height: { max: options.resolution?.height ?? 1080 },
 				frameRate: { max: options.framerate ?? 60 },
 			},
-			audio: {
-				suppressLocalAudioPlayback: false,
-			},
-			selfBrowserSurface: "exclude",
+			//@ts-ignore
 			systemAudio: "include",
 		})
 
@@ -271,8 +282,6 @@ export default class Self {
 			screenStream: this.screenStream,
 			screenStreamTracks: this.screenStream.getTracks(),
 		})
-
-		this.core.state.screenStreamInitialized = true
 	}
 
 	async startScreenProducer() {
@@ -297,8 +306,7 @@ export default class Self {
 				},
 				encodings: [
 					{
-						...this.core.constructor
-							.defaultScreenAudioEncodingParams,
+						...defaults.screenAudioEncodingParams,
 					},
 				],
 				appData: {
@@ -309,12 +317,8 @@ export default class Self {
 			// if the producer closes, set the screen audio producer to null
 			this.screenAudioProducer.observer.on("close", () => {
 				this.screenAudioProducer = null
-				this.core.state.isProducingScreenAudio = false
-
 				this.core.console.log("screen audio production stopped")
 			})
-
-			this.core.state.isProducingScreenAudio = true
 		}
 
 		const screenShareProducerData = {
@@ -331,7 +335,7 @@ export default class Self {
 			track: screenVideoTrack,
 			encodings: [
 				{
-					...this.core.constructor.defaultVideoEncodingParams,
+					...defaults.videoEncodingParams,
 				},
 			],
 			appData: screenShareProducerData,
@@ -379,6 +383,7 @@ export default class Self {
 	}
 
 	async createCameraStream(options = {}) {
+		return null
 		if (this.camStream) {
 			this.camStream.getTracks().forEach((track) => track.stop())
 		}
@@ -389,8 +394,11 @@ export default class Self {
 			video: {},
 		}
 
+		//@ts-ignore
 		if (options.deviceId) {
+			//@ts-ignore
 			params.video.deviceId = {
+				//@ts-ignore
 				exact: options.deviceId,
 			}
 		}

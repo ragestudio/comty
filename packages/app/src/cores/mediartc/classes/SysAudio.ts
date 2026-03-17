@@ -1,3 +1,10 @@
+type AudioFrame = {
+	buffer: Uint8Array
+	sampleRate: number
+	channels: number
+	bitsPerSample: number
+}
+
 export default class SysAudio {
 	constructor() {
 		if (!window.ipcRenderer) {
@@ -20,16 +27,16 @@ export default class SysAudio {
 		latencyHint: "interactive",
 	})
 	// this should be initialized if output is supported
-	outputCtx = null
+	outputCtx: AudioContext | null = null
 
-	inputDestination = null
-	outputBus = null
+	inputDestination: MediaStreamAudioDestinationNode | null = null
+	outputBus: GainNode | null = null
 
-	pcmInputWorklet = null
-	pcmOutputWorklet = null
+	pcmInputWorklet: AudioWorkletNode | null = null
+	pcmOutputWorklet: AudioWorkletNode | null = null
 
-	isReadyForFrames = false
-	resolveFirstFrame = null
+	isReadyForFrames: boolean = false
+	resolveFirstFrame: ((frame: AudioFrame) => void) | null = null
 
 	initialize = async () => {
 		await this.initializeInput()
@@ -66,7 +73,7 @@ export default class SysAudio {
 		})
 	}
 
-	_rebuildInputContext = async (newSampleRate) => {
+	_rebuildInputContext = async (newSampleRate: number) => {
 		console.warn(
 			`[SysAudio] Updating AudioContext to match samplerate [${newSampleRate}Hz]`,
 		)
@@ -148,7 +155,7 @@ export default class SysAudio {
 
 		await window.ipcRenderer.invoke("sysaudio:startCapture")
 
-		const firstFrame = await firstFramePromise
+		const firstFrame = (await firstFramePromise) as AudioFrame
 		const targetSampleRate = firstFrame.sampleRate || 44100
 
 		if (this.inputCtx.sampleRate !== targetSampleRate) {
