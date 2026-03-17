@@ -83,7 +83,7 @@ const SpacesSidebarBottomItems = () => {
 	}, [otherItems])
 
 	const onClickSearch = React.useCallback(() => {
-		app.location.push("/spaces/search")
+		app.controls.openSearcher()
 	}, [])
 
 	const onClickDM = React.useCallback(() => {
