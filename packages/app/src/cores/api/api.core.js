@@ -66,10 +66,18 @@ export default class APICore extends Core {
 			await this.client.ws.disconnectAll()
 		},
 		"authmanager:refresh": async () => {
-			this.console.debug(
-				"auth manager refreshed, reconnecting to websockets",
-			)
-			await this.client.ws.reauthenticate()
+			this.console.debug("auth manager refreshed")
+
+			// if the main socket is not connected, reinitialize the client
+			if (!this.client.ws.sockets.has("main")) {
+				this.console.debug("main socket not connected, reinitializing")
+				await this.onInitialize()
+				app.eventBus.emit("api:reinitialized")
+
+				return null
+			}
+
+			return await this.client.ws.reauthenticate()
 		},
 		"wsmanager:main:reconnecting": () => {
 			app.cores.notifications.new({
@@ -176,7 +184,7 @@ export default class APICore extends Core {
 	}
 
 	async onInitialize() {
-		this.client = await createClient({
+		this.client = createClient({
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
