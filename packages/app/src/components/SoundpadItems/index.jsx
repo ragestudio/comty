@@ -24,7 +24,7 @@ const SoundpadItems = ({ group_id, dispatch }) => {
 					<SoundpadItem
 						key={item._id}
 						item={item}
-						onClick={() => dispatch(item.src)}
+						onClick={() => dispatch(item)}
 					/>
 				)
 			})}

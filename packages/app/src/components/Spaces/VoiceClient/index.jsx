@@ -9,6 +9,9 @@ import ClientContextMenu from "./menu-context"
 import "./index.less"
 
 const VoiceClient = ({ client, speaking, producers }) => {
+	const [soundpadIcon, setSoundpadIcon] = React.useState(null)
+	const soundpadIconClearTimeout = React.useRef(null)
+
 	const onContextMenu = React.useCallback(
 		(event) => {
 			event.preventDefault()
@@ -47,6 +50,43 @@ const VoiceClient = ({ client, speaking, producers }) => {
 		)
 	}, [producers])
 
+	const handleSoundpadDispatched = React.useCallback(
+		(payload) => {
+			if (payload?.userId !== client?.userId) {
+				return null
+			}
+
+			if (soundpadIconClearTimeout.current) {
+				clearTimeout(soundpadIconClearTimeout.current)
+			}
+
+			setSoundpadIcon(payload.icon)
+
+			soundpadIconClearTimeout.current = setTimeout(() => {
+				setSoundpadIcon(null)
+			}, 5000)
+		},
+		[client],
+	)
+
+	React.useEffect(() => {
+		if (client && client?.userId) {
+			app.eventBus.on(
+				`rtc:vc:soundpad:${client.userId}`,
+				handleSoundpadDispatched,
+			)
+		}
+
+		return () => {
+			if (client && client?.userId) {
+				app.eventBus.off(
+					`rtc:vc:soundpad:${client.userId}`,
+					handleSoundpadDispatched,
+				)
+			}
+		}
+	}, [client])
+
 	if (!client || !client?.userId) {
 		return null
 	}
@@ -70,6 +110,11 @@ const VoiceClient = ({ client, speaking, producers }) => {
 			)}
 			transition={{ type: "tween", duration: 0.15, ease: "easeInOut" }}
 		>
+			{soundpadIcon && (
+				<div className="group-page__channels-panel__list-item__clients__client__soundpad-icon">
+					<p>{soundpadIcon}</p>
+				</div>
+			)}
 			<div className="group-page__channels-panel__list-item__clients__client__avatar">
 				<img
 					src={client.user?.avatar}
