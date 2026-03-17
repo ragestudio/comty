@@ -6,7 +6,10 @@ const SoundpadRandomKanker = ({ dispatch }) => {
 
 		response = await response.json()
 
-		dispatch(response.tts_file)
+		dispatch({
+			src: response.tts_file,
+			icon: "si",
+		})
 	}
 
 	return <Button onClick={dispatchRandomAudio}>Random kanker</Button>
