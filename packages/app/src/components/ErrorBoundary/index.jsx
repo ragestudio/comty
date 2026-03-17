@@ -11,6 +11,10 @@ class ErrorBoundary extends React.Component {
 
 	render() {
 		if (this.state.error) {
+			if (this.props.noDisplay) {
+				return null
+			}
+
 			return (
 				<div
 					style={{
