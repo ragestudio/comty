@@ -1,5 +1,6 @@
 import { User } from "@db_models"
 import DMChatChannel from "@classes/DMChatChannel"
+import mongoose from "mongoose"
 
 export function genPairKey(id1, id2) {
 	return [id1, id2].sort().join("-")
@@ -70,7 +71,7 @@ export default class DMChatChannelController {
 
 	// TODO: implement pagination
 	rooms = async (userId, { limit = 20, offset = 0 } = {}) => {
-		const activity = await this.ActivityModel.findAsync(
+		let activity = await this.ActivityModel.findAsync(
 			{
 				user_id: userId,
 				$limit: limit,
@@ -90,12 +91,27 @@ export default class DMChatChannelController {
 
 		const users = new Map()
 
+		// filter invalid user_ids (must be objectId)
+		activity = activity.filter((reg) => {
+			if (
+				reg.to_user_id &&
+				!mongoose.Types.ObjectId.isValid(reg.to_user_id)
+			) {
+				return false
+			}
+
+			return true
+		})
+
 		// if there are any activities, fetch the users
 		if (activity.length > 0) {
 			const data = await User.find({
 				_id: {
 					$in: activity.map((a) => a.to_user_id),
 				},
+			}).catch((err) => {
+				console.error(err)
+				return []
 			})
 
 			for (const user of data) {
@@ -118,6 +134,10 @@ export default class DMChatChannelController {
 		rooms = rooms.map((room) => {
 			const activityRef = activity.find((a) => a.room_id === room._id)
 
+			if (!activityRef) {
+				return null
+			}
+
 			room.last_message_at = activityRef.last_message_at
 			room.to_user_id = activityRef.to_user_id
 
@@ -127,6 +147,8 @@ export default class DMChatChannelController {
 
 			return room
 		})
+
+		rooms = rooms.filter((room) => room !== null)
 
 		rooms = rooms.sort((a, b) => {
 			return b.last_message_at - a.last_message_at

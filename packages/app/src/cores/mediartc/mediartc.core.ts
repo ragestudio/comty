@@ -1,8 +1,9 @@
 import Core from "vessel/core"
 import { RTEngineClient } from "linebridge-client"
+//@ts-ignore
 import SessionModel from "@models/session"
 
-import MediaRTCState from "./classes/State"
+import MediaRTCState, { MediaRTCStateType } from "./classes/State"
 import MediaRTCUI from "./classes/UI"
 import Self from "./classes/Self"
 import Consumers from "./classes/Consumers"
@@ -45,7 +46,11 @@ import producerLeftEvent from "./events/producerLeft"
 import soundpadDispatchEvent from "./events/soundpadDispatch"
 import callIncomingEvent from "./events/callIncoming"
 
-const WebsocketEvents = {
+import defaults from "./defaults"
+
+import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
+
+const WebsocketEvents: WebsocketEvent = {
 	"media:channel:client:joined": clientJoinedEvent,
 	"media:channel:client:left": clientLeftEvent,
 	"media:channel:client_event": clientEventEvent,
@@ -72,33 +77,17 @@ export default class MediaRTC extends Core {
 		)
 	}
 
-	static defaultAudioEncodingParams = {
-		maxBitrate: 98000,
-		priority: "high",
-		networkPriority: "high",
-		dtx: true,
-	}
+	static defaultAudioEncodingParams = defaults.audioEncodingParams
+	static defaultVideoEncodingParams = defaults.videoEncodingParams
+	static defaultScreenAudioEncodingParams = defaults.screenAudioEncodingParams
 
-	static defaultVideoEncodingParams = {
-		maxBitrate: 5000000,
-		maxFramerate: 60,
-		priority: "high",
-		networkPriority: "high",
-	}
-
-	static defaultScreenAudioEncodingParams = {
-		maxBitrate: 320000,
-		priority: "high",
-		networkPriority: "high",
-	}
-
-	socket = null
-	device = null
-	sendTransport = null
-	recvTransport = null
+	socket: RTEngineClient | null = null
+	device: any = null
+	sendTransport: any = null
+	recvTransport: any = null
 
 	ui = new MediaRTCUI(this)
-	state = new MediaRTCState(this)
+	state = new MediaRTCState(this) as unknown as MediaRTCStateType
 
 	self = new Self(this)
 	clients = new Clients(this)
@@ -107,9 +96,9 @@ export default class MediaRTC extends Core {
 	producers = new Producers(this)
 	consumers = new Consumers(this)
 
-	rtpMicWorker = null
+	rtpMicWorker: Worker | null = null
 
-	public = {
+	public: MediaRTCPublic = {
 		instance: () => this,
 		handlers: () => this.handlers,
 		state: () => {
@@ -121,7 +110,7 @@ export default class MediaRTC extends Core {
 		socket: () => this.socket,
 	}
 
-	handlers = {
+	handlers: MediaRTCHandlers = {
 		joinChannel: joinChannel.bind(this),
 		leaveChannel: leaveChannel.bind(this),
 		startCameraShare: startCameraShare.bind(this),
@@ -140,8 +129,6 @@ export default class MediaRTC extends Core {
 
 	onRuntimeEvents = {
 		"authmanager:authed": async () => {
-			this.console.debug("auth manager started, connecting to rtc")
-
 			this.socket = app.cores.api.client().ws.sockets.get("main")
 
 			for (const event of Object.keys(WebsocketEvents)) {
@@ -154,6 +141,16 @@ export default class MediaRTC extends Core {
 			// await this.connectSocket({
 			// 	registerEvents: WebsocketEvents,
 			// })
+		},
+		"api:reinitialized": async () => {
+			this.socket = app.cores.api.client().ws.sockets.get("main")
+
+			for (const event of Object.keys(WebsocketEvents)) {
+				this.socket.on(
+					event,
+					buildWebsocketHandler(this, WebsocketEvents[event]),
+				)
+			}
 		},
 		"authmanager:logout": async () => {
 			this.console.debug(
@@ -211,56 +208,6 @@ export default class MediaRTC extends Core {
 			} catch (error) {
 				this.console.error("Error initializing sysAudio:", error)
 			}
-		}
-	}
-
-	async connectSocket({ registerEvents }) {
-		try {
-			this.state.status = "connecting"
-
-			this.console.debug(
-				"connecting to rtc websocket",
-				this.constructor.wsUrl,
-			)
-
-			this.socket = new RTEngineClient({
-				refName: "rtc",
-				url: this.constructor.wsUrl,
-				token: SessionModel.token,
-				maxConnectRetries: 0,
-			})
-
-			await this.socket.connect()
-
-			// register events
-			for (const event of Object.keys(registerEvents)) {
-				this.socket.on(
-					event,
-					buildWebsocketHandler(this, registerEvents[event]),
-				)
-			}
-
-			this.state.status = "connected"
-		} catch (error) {
-			this.console.error("Error connecting ws:", error)
-			this.state.status = "failed"
-		}
-	}
-
-	async disconnectSocket() {
-		try {
-			this.state.status = "disconnecting"
-
-			this.console.debug("disconnecting rtc websocket")
-
-			// destroy socket
-			await this.socket.destroy()
-
-			this.state.status = "disconnected"
-		} catch (error) {
-			this.console.error("Error disconnecting ws:", error)
-
-			this.state.status = "failed"
 		}
 	}
 

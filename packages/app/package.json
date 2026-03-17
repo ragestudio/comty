@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "2.9.6@alpha",
+	"version": "2.10.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -23,7 +23,7 @@
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@ffmpeg/util": "^0.12.1",
 		"@loadable/component": "^5.16.7",
-		"@ragestudio/vessel": "^0.25.6",
+		"@ragestudio/vessel": "^0.25.7",
 		"@sentry/browser": "^7.64.0",
 		"@svta/common-media-library": "^0.18.1",
 		"@tanstack/react-virtual": "^3.13.12",
@@ -32,7 +32,7 @@
 		"axios": "^1.13.5",
 		"bcp-47-normalize": "^2.3.0",
 		"classnames": "2.3.1",
-		"comty.js": "^0.74.0",
+		"comty.js": "^0.74.1",
 		"d3": "^7.9.0",
 		"dashjs": "^5.0.3",
 		"dayjs": "^1.11.19",
@@ -83,6 +83,7 @@
 		"vite": "^7.3.1"
 	},
 	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^8.57.1",
 		"@eslint/js": "^9.26.0",
 		"eslint": "^9.26.0",
 		"eslint-plugin-react": "^7.37.5",

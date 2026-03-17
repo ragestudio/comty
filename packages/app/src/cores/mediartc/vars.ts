@@ -1,4 +1,14 @@
-export const resolutionsList = [
+export interface Resolution {
+	label: string
+	value: string
+}
+
+export interface Framerate {
+	label: string
+	value: number
+}
+
+export const resolutionsList: Resolution[] = [
 	{
 		label: "1080p",
 		value: "1920x1080",
@@ -13,7 +23,7 @@ export const resolutionsList = [
 	},
 ]
 
-export const frameratesList = [
+export const frameratesList: Framerate[] = [
 	{ label: "15 fps", value: 15 },
 	{ label: "25 fps", value: 25 },
 	{ label: "30 fps", value: 30 },

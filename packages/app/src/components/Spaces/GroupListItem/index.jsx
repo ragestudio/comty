@@ -16,6 +16,7 @@ const GroupListItem = ({ group, onClick, selected }) => {
 				["selected"]: selected,
 			})}
 			onClick={handleClick}
+			data-group-id={group.id}
 		>
 			<div className="group-list__item__icon">
 				{group.icon && <img src={group.icon} />}

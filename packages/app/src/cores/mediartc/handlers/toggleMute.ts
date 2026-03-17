@@ -1,4 +1,6 @@
-export default async function (to) {
+import MediaRTC from "../mediartc.core"
+
+export default async function (this: MediaRTC, to?: boolean) {
 	if (!this.self.micStream) {
 		return false
 	}

@@ -1,4 +1,5 @@
 import js from "@eslint/js"
+import ts from "@typescript-eslint/eslint-plugin"
 import globals from "globals"
 import pluginReact from "eslint-plugin-react"
 import { defineConfig } from "eslint/config"
@@ -17,6 +18,11 @@ export default defineConfig([
 				app: "writable",
 			},
 		},
+	},
+	{
+		files: ["**/*.{ts,tsx}"],
+		plugins: { ts },
+		extends: ["plugin:@typescript-eslint/recommended"],
 	},
 	pluginReact.configs.flat.recommended,
 	{

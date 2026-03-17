@@ -1,42 +1,84 @@
+import MediaRTC from "../mediartc.core"
+
+interface ConsumerData {
+	id: string
+	producerId: string
+	userId: string
+	kind: string
+	appData: {
+		mediaTag: string
+	}
+	isSpeaking?: boolean
+	close?: () => void
+	closed?: boolean
+	on?: (event: string, callback: Function) => void
+	observer?: any
+}
+
 export default class Consumers {
-	constructor(core) {
+	core: MediaRTC
+
+	constructor(core: MediaRTC) {
 		if (!core) {
 			throw new Error("Core not provided")
 		}
 		this.core = core
 	}
 
-	get _mirrorMap() {
+	get _mirrorMap(): Map<string, ConsumerData> {
 		return this.core.recvTransport?._consumers || new Map()
 	}
 
-	get size() {
+	get size(): number {
 		return this._mirrorMap.size
 	}
-	get(key) {
+
+	get(key: string): ConsumerData | undefined {
 		return this._mirrorMap.get(key)
 	}
-	has(key) {
+
+	has(key: string): boolean {
 		return this._mirrorMap.has(key)
 	}
-	values() {
+
+	values(): IterableIterator<ConsumerData> {
 		return this._mirrorMap.values()
 	}
-	keys() {
+
+	keys(): IterableIterator<string> {
 		return this._mirrorMap.keys()
 	}
-	entries() {
+
+	entries(): IterableIterator<[string, ConsumerData]> {
 		return this._mirrorMap.entries()
 	}
-	forEach(callback, thisArg) {
+
+	forEach(
+		callback: (
+			value: ConsumerData,
+			key: string,
+			map: Map<string, ConsumerData>,
+		) => void,
+		thisArg?: any,
+	): void {
 		this._mirrorMap.forEach(callback, thisArg)
 	}
 
-	[Symbol.iterator]() {
+	[Symbol.iterator](): IterableIterator<[string, ConsumerData]> {
 		return this._mirrorMap[Symbol.iterator]()
 	}
 
-	start = async ({ producerId, userId, kind, appData }) => {
+	start = async ({
+		producerId,
+		userId,
+		kind,
+		appData,
+	}: {
+		producerId: string
+		userId: string
+		kind: string
+		appData: { mediaTag: string }
+	}): Promise<ConsumerData> => {
 		try {
 			if (!this.core.socket) {
 				throw new Error("Socket not available or ready")
@@ -113,16 +155,16 @@ export default class Consumers {
 		}
 	}
 
-	stop = async (consumerId) => {
+	stop = async (consumerId: string): Promise<void> => {
 		try {
 			const consumer = this.get(consumerId)
 
 			if (!consumer) {
-				return false
+				return
 			}
 
 			if (consumer.closed) {
-				return false
+				return
 			}
 
 			this.core.console.log("Stopping consumer", {
@@ -130,22 +172,16 @@ export default class Consumers {
 				consumer: consumer,
 			})
 
-			await consumer.close()
+			consumer.close()
 
-			// delete from available consumers
-			// this.core.state.availableConsumers =
-			// 	this.core.state.availableConsumers.filter(
-			// 		(id) => id !== consumerId,
-			// 	)
-
-			return consumer
+			return
 		} catch (error) {
 			this.core.console.error("Error stopping consumer:", error)
 			throw error
 		}
 	}
 
-	stopByProducerId = async (producerId) => {
+	stopByProducerId = async (producerId: string): Promise<void> => {
 		try {
 			for (const consumer of this.values()) {
 				if (consumer.producerId === producerId) {
@@ -158,22 +194,32 @@ export default class Consumers {
 		}
 	}
 
-	stopAll = async () => {
+	stopAll = async (): Promise<void> => {
 		try {
 			for (const consumer of this.values()) {
-				this.stop(consumer.id)
+				await this.stop(consumer.id)
 			}
 		} catch (error) {
-			this.core.console.error("Error stopping consumers:", error)
-			throw error
+			this.core.console.error("Error stopping all consumers:", error)
 		}
 	}
 
-	findByProducerId = (producerId) => {
+	findByProducerId = (producerId: string): ConsumerData | undefined => {
 		for (const consumer of this.values()) {
 			if (consumer.producerId === producerId) {
 				return consumer
 			}
 		}
+		return undefined
+	}
+
+	findByUserId = (userId: string): ConsumerData[] => {
+		const consumers: ConsumerData[] = []
+		for (const consumer of this.values()) {
+			if (consumer.userId === userId) {
+				consumers.push(consumer)
+			}
+		}
+		return consumers
 	}
 }

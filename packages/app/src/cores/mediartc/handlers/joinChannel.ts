@@ -1,8 +1,15 @@
+import MediaRTC from "../mediartc.core"
+//@ts-ignore
 import GroupModel from "@models/groups"
+//@ts-ignore
 import Client from "../classes/Client"
 import { Device } from "mediasoup-client"
 
-export default async function (groupId, channelId) {
+export default async function (
+	this: MediaRTC,
+	groupId: string,
+	channelId: string,
+) {
 	try {
 		if (this.state.isJoined) {
 			await this.handlers.leaveChannel()
@@ -93,7 +100,7 @@ export default async function (groupId, channelId) {
 			channelId,
 			clients: data.clients,
 		})
-	} catch (error) {
+	} catch (error: any) {
 		this.console.error(error)
 		this.console.error(error.stack)
 

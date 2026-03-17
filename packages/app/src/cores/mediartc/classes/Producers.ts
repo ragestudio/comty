@@ -1,5 +1,28 @@
-export default class Producers extends Map {
-	constructor(core, data) {
+import MediaRTC from "../mediartc.core"
+
+interface ProducerData {
+	id: string
+	producerId: string
+	userId: string
+	kind: string
+	appData: {
+		mediaTag: string
+	}
+	remote?: boolean
+	self?: boolean
+	observer?: any
+	rtpSender?: any
+	on?: (event: string, callback: Function) => void
+	close?: () => void
+}
+
+export default class Producers extends Map<string, ProducerData> {
+	core: MediaRTC
+
+	constructor(
+		core: MediaRTC,
+		data?: Iterable<readonly [string, ProducerData]>,
+	) {
 		super(data)
 		this.core = core
 
@@ -8,7 +31,7 @@ export default class Producers extends Map {
 		}
 	}
 
-	setRemote(producer) {
+	setRemote(producer: ProducerData): ProducerData | null {
 		if (!producer) {
 			return null
 		}
@@ -17,9 +40,11 @@ export default class Producers extends Map {
 
 		this.set(producer.producerId, producer)
 		this.core.state.remoteProducers.push(producer)
+
+		return producer
 	}
 
-	delRemote(producer) {
+	delRemote(producer: ProducerData): ProducerData | null {
 		if (!producer) {
 			return null
 		}
@@ -28,11 +53,13 @@ export default class Producers extends Map {
 
 		this.core.state.remoteProducers =
 			this.core.state.remoteProducers.filter(
-				(p) => p.id !== producer.producerId,
+				(p: ProducerData) => p.producerId !== producer.producerId,
 			)
+
+		return producer
 	}
 
-	produce = async (payload) => {
+	produce = async (payload: any): Promise<ProducerData> => {
 		if (!this.core.device || !this.core.sendTransport) {
 			throw new Error("Device or send transport not ready")
 		}
@@ -66,19 +93,24 @@ export default class Producers extends Map {
 		return producer
 	}
 
-	getSelfProducers() {
-		return Array.from(this.values()).filter((producer) => producer.self)
-	}
-
-	async onSelfProducerClosed(producer) {
+	onSelfProducerClosed = (producer: ProducerData) => {
 		if (!producer) {
 			return null
 		}
 
 		this.delete(producer.id)
 
-		await this.core.socket.emit("channel:produce:stop", {
+		this.core.socket.emit("channel:produce:stop", {
 			producerId: producer.id,
 		})
+	}
+
+	getSelfProducers() {
+		return Array.from(this.values()).filter((producer) => producer.self)
+	}
+
+	clear(): void {
+		super.clear()
+		this.core.state.remoteProducers = []
 	}
 }
