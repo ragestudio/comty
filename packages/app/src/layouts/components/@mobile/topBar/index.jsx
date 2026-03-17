@@ -1,6 +1,7 @@
 import React from "react"
 import classnames from "classnames"
 import { motion, AnimatePresence } from "motion/react"
+import ErrorBoundary from "@components/ErrorBoundary"
 
 import useLayoutInterface from "@hooks/useLayoutInterface"
 import useDefaultVisibility from "@hooks/useDefaultVisibility"
@@ -36,7 +37,7 @@ export default (props) => {
 	})
 
 	const handleUpdateRender = (...args) => {
-		if (document.startViewTransition) {
+		if (document.startViewTransition && !props.noTransition) {
 			return document.startViewTransition(() => {
 				updateRender(...args)
 			})
@@ -119,11 +120,13 @@ export default (props) => {
 							render?.options?.className,
 						)}
 					>
-						{render?.component &&
-							React.cloneElement(
-								render?.component,
-								render?.options?.props ?? {},
-							)}
+						<ErrorBoundary noDisplay>
+							{render?.component &&
+								React.cloneElement(
+									render?.component,
+									render?.options?.props ?? {},
+								)}
+						</ErrorBoundary>
 					</div>
 				</motion.div>
 			)}
