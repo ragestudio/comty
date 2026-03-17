@@ -46,7 +46,6 @@ const GroupPage = (props) => {
 	const { headerContent, registerHeaderContent, unregisterHeaderContent } =
 		useContentPanelHeaderState()
 
-	const rtcState = useMediaRTCState()
 	const group = useGroup({
 		group_id: props.params.group_id,
 	})
@@ -91,17 +90,6 @@ const GroupPage = (props) => {
 		}
 
 		setDocumentTitle(group.data.name)
-
-		// if no channel is selected, load the first text channel (if any)
-		if (!page.channel) {
-			const firstTextChannel = group.channels.find(
-				(channel) => channel.kind === "chat",
-			)
-
-			if (firstTextChannel) {
-				page.setChannel(firstTextChannel._id)
-			}
-		}
 	}, [group.data, group.channels, group.loading])
 
 	// Handle channel switching

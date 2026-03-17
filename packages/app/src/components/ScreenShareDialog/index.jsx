@@ -117,7 +117,14 @@ const ScreenShareDialog = ({ close }) => {
 }
 
 export function openDialog() {
-	app.layout.modal.open("screen-share-dialog", ScreenShareDialog)
+	if (app.isMobile) {
+		return app.layout.draggable.open(
+			"screen-share-dialog",
+			ScreenShareDialog,
+		)
+	}
+
+	return app.layout.modal.open("screen-share-dialog", ScreenShareDialog)
 }
 
 export default ScreenShareDialog
