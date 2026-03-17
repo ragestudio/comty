@@ -15,6 +15,18 @@ export default async (core, payload) => {
 
 		await audio.play()
 
+		app.eventBus.emit("rtc:vc:soundpad", {
+			userId: payload.userId,
+			src: payload.data.src,
+			icon: payload.data.icon,
+		})
+
+		app.eventBus.on(`rtc:vc:soundpad:${payload.userId}`, {
+			userId: payload.userId,
+			src: payload.data.src,
+			icon: payload.data.icon,
+		})
+
 		setTimeout(() => {
 			if (!audio.ended) {
 				audio.pause()

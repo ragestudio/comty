@@ -8,9 +8,10 @@ import SoundpadCustomUrl from "@components/SoundpadCustomUrl"
 import "./index.less"
 
 const SoundpadDialog = ({ close, group_id }) => {
-	const dispatchSrc = (src) => {
+	const dispatchSrc = (item) => {
 		app.cores.mediartc.handlers().soundpadDispatch({
-			src: src,
+			src: item.src,
+			icon: item.icon,
 		})
 	}
 
