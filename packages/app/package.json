@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "2.10.2@alpha",
+	"version": "2.11.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
@@ -22,6 +22,7 @@
 		"@dnd-kit/utilities": "^3.2.2",
 		"@ffmpeg/ffmpeg": "^0.12.10",
 		"@ffmpeg/util": "^0.12.1",
+		"@gullerya/object-observer": "^6.1.4",
 		"@loadable/component": "^5.16.7",
 		"@ragestudio/vessel": "^0.25.7",
 		"@sentry/browser": "^7.64.0",
