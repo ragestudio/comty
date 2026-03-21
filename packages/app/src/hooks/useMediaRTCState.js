@@ -22,6 +22,7 @@ export const useMediaRTCState = () => {
 	return {
 		...state,
 		speakingConsumers: new Set(state.speakingConsumers),
+		remoteProducersCount: state.remoteProducers.length,
 	}
 }
 
