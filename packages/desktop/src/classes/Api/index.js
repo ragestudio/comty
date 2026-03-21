@@ -10,20 +10,38 @@ export default class Api {
 	}
 
 	static listenPort = 11150
+	listenPort = Api.listenPort
 
 	server = null
 	router = new RadixRouter()
 
 	async initialize() {
-		this.server = http.createServer(handleRequest.bind(this))
+		try {
+			this.server = http.createServer(handleRequest.bind(this))
 
-		for (const endpoint of localEndpoints) {
-			this.register(endpoint)
+			for (const endpoint of localEndpoints) {
+				this.register(endpoint)
+			}
+
+			await this.server.listen(this.listenPort)
+
+			this.server.on("error", (e) => {
+				if (e.code === "EADDRINUSE") {
+					console.error("Address in use, retrying...")
+
+					setTimeout(() => {
+						this.server.close()
+						this.listenPort++
+						this.server.listen(this.listenPort)
+					}, 1000)
+				}
+			})
+
+			console.log(`[api] Listening on http://localhost:${Api.listenPort}`)
+		} catch (e) {
+			console.error(`[api] Failed to initialize internal server:`, e)
+			return
 		}
-
-		this.server.listen(Api.listenPort)
-
-		console.log(`[api] Listening on http://localhost:${Api.listenPort}`)
 	}
 
 	register = ({ method, path, handler, such }) => {

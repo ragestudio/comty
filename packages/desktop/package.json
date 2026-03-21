@@ -7,7 +7,7 @@
 	"version": "0.7.1",
 	"license": "MIT",
 	"type": "module",
-	"main": "./src/main.js",
+	"main": "./src/boot.js",
 	"homepage": "https://comty.app",
 	"scripts": {
 		"dev": "electron .",

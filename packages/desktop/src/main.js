@@ -22,7 +22,7 @@ import SysAudio from "./classes/SysAudio/index.js"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-class Main {
+export default class Main {
 	constructor() {
 		this.app = app
 
@@ -32,7 +32,12 @@ class Main {
 			"application-name",
 			pkgjson.processName,
 		)
-		this.app.setName(pkgjson.processName)
+
+		if (Main.isDev) {
+			this.app.setName(pkgjson.processName + "_dev")
+		} else {
+			this.app.setName(pkgjson.processName)
+		}
 
 		flags(this.app)
 	}
@@ -277,5 +282,3 @@ class Main {
 		}
 	}
 }
-
-new Main().initialize()
