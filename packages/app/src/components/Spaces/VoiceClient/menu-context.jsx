@@ -1,5 +1,6 @@
 import React from "react"
-import { Slider } from "antd"
+import Slider from "@ui/Slider"
+//import { Slider } from "antd"
 
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
@@ -82,6 +83,7 @@ const ClientContextMenu = ({ target, client, close }) => {
 					</div>
 
 					<Slider
+						key={client.userId}
 						min={0}
 						max={150}
 						defaultValue={
