@@ -1,7 +1,8 @@
 import setFind from "@shared-utils/setFind"
 import type { RTCClient } from "../types.d.ts"
+import type MediaChannel from ".."
 
-async function createTransportHandler(this: any, client: RTCClient) {
+async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 	try {
 		const clientInst = setFind(this.clients, (c: RTCClient) => {
 			return c.userId === client.userId
@@ -32,7 +33,9 @@ async function createTransportHandler(this: any, client: RTCClient) {
 					: "127.0.0.1"
 		}
 
-		const transportConfig = {
+		//@ts-ignore
+		const transport = await this.router.createWebRtcTransport({
+			webRtcServer: this.webrtcServer,
 			listenIps: [
 				{
 					ip:
@@ -42,28 +45,12 @@ async function createTransportHandler(this: any, client: RTCClient) {
 				},
 			],
 			enableUdp:
-				(globalThis as any).process.env.MEDIASOUP_ENABLE_UDP !==
-				"false",
+				(globalThis as any).process.env.MEDIASOUP_ENABLE_UDP === "true",
 			enableTcp:
-				(globalThis as any).process.env.MEDIASOUP_ENABLE_TCP !==
-				"false",
+				(globalThis as any).process.env.MEDIASOUP_ENABLE_TCP == "true",
 			preferUdp:
-				(globalThis as any).process.env.MEDIASOUP_PREFER_UDP !==
-				"false",
-			maxIncomingBitrate:
-				parseInt(
-					(globalThis as any).process.env
-						.MEDIASOUP_MAX_INCOMING_BITRATE,
-				) || 6000000,
-			maxOutgoingBitrate:
-				parseInt(
-					(globalThis as any).process.env
-						.MEDIASOUP_MAX_OUTGOING_BITRATE,
-				) || 8000000,
-		}
-
-		const transport =
-			await this.router.createWebRtcTransport(transportConfig)
+				(globalThis as any).process.env.MEDIASOUP_PREFER_UDP == "true",
+		})
 
 		clientInst.transports.set(transport.id, transport)
 
