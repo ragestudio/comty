@@ -44,7 +44,7 @@ services:
       - redis_network
     ports:
       - "9000:9000" # API HTTP/WS Gateway port
-      - "10000-10100:10000-10100" # WebRTC signaling ports
+      - "40000-49999:40000-49999" # WebRTC signaling ports
     env_file:
       - ./.env
     volumes:
