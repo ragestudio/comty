@@ -7,12 +7,15 @@ export default async function (to) {
 		to = !this.self.isDeafened
 	}
 
+	const currentAudioSettings = this.self.audioSettings
+
 	if (to) {
 		app.cores.sfx.play("deafen")
 
 		if (this.self.sysAudio && this.self.sysAudio?.outputBus) {
 			this.self.sysAudio.outputBus.gain.value = 0
 		} else {
+			this.self.audioOutput.mainNode.gain.value = 0
 			await this.self.audioOutput.context.suspend()
 		}
 	} else {
@@ -21,6 +24,8 @@ export default async function (to) {
 		if (this.self.sysAudio && this.self.sysAudio?.outputBus) {
 			this.self.sysAudio.outputBus.gain.value = 1
 		} else {
+			this.self.audioOutput.mainNode.gain.value =
+				currentAudioSettings.volume
 			await this.self.audioOutput.context.resume()
 		}
 	}

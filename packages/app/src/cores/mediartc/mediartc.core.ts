@@ -1,7 +1,6 @@
 import Core from "vessel/core"
 import { RTEngineClient } from "linebridge-client"
-//@ts-ignore
-import SessionModel from "@models/session"
+import AudioProcessor from "./classes/AudioProcessor"
 
 import MediaRTCState, { MediaRTCStateType } from "./classes/State"
 import MediaRTCUI from "./classes/UI"
@@ -162,8 +161,6 @@ export default class MediaRTC extends Core {
 	}
 
 	async afterInitialize() {
-		this.self.audioOutput.initialize()
-
 		this.rtpMicWorker = new Worker(
 			new URL("./workers/rtp-stream.js", import.meta.url),
 		)
@@ -201,13 +198,27 @@ export default class MediaRTC extends Core {
 		}
 
 		if (app.isDesktop) {
-			this.self.sysAudio = new SysAudio()
+			if (!this.self.sysAudio) {
+				this.self.sysAudio = new SysAudio()
+			}
 
 			try {
 				await this.self.sysAudio.initialize()
 			} catch (error) {
 				this.console.error("Error initializing sysAudio:", error)
 			}
+
+			if (this.self.sysAudio || !this.self.sysAudio?.outputBus) {
+				// if sysAudio is initialized or does not support sysAudio-Output,
+				// fallback to AudioProcessor
+				this.self.audioOutput = new AudioProcessor(this, {
+					sinkId: Self.outputDeviceId,
+				})
+			}
+		}
+
+		if (this.self.audioOutput) {
+			this.self.audioOutput.initialize()
 		}
 	}
 

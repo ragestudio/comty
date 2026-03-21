@@ -284,7 +284,7 @@ const VoiceChannel = () => {
 		}
 		return result
 	}, [
-		state.remoteProducers,
+		state.remoteProducersCount,
 		state.isProducingScreen,
 		state.clients,
 		state.channelId,

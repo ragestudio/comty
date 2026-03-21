@@ -10,6 +10,7 @@ import UploadAttachments from "./UploadAttachments"
 
 import "./InputBar.less"
 import StickersButton from "./StickersButton"
+import EmojiPicker from "./EmojiPicker"
 
 const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 	const [inputValue, setInputValue] = React.useState("")
@@ -143,6 +144,11 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 				/>
 
 				<div className="channel-chat__input__area__buttons">
+					<EmojiPicker
+						onClickItem={(emoji) =>
+							setInputValue(inputValue + emoji)
+						}
+					/>
 					<StickersButton
 						onClickItem={(sticker) => sendSticker(sticker)}
 					/>

@@ -1,6 +1,6 @@
 import React from "react"
 import classnames from "classnames"
-import ReactPlayer from "react-player/lazy"
+import ReactPlayer from "react-player"
 import { motion } from "motion/react"
 import Markdown from "react-markdown"
 import remarkGfm from "remark-gfm"

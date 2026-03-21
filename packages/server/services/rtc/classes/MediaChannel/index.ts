@@ -1,3 +1,5 @@
+import * as mediasoup from "mediasoup"
+
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
 import stopProduceHandler from "./handlers/stopProduce"
@@ -14,7 +16,7 @@ export default class MediaChannel {
 	params: MediaChannelParams
 	data: any
 	channelId: string
-	worker: any
+	worker: mediasoup.types.Worker
 	mediaCodecs: any[]
 
 	static defaultMediaCodecs = [
@@ -56,16 +58,18 @@ export default class MediaChannel {
 		},
 	]
 
-	router: any = null
+	router: mediasoup.types.Router = null
 	clients: Set<RTCClient> = new Set()
 	producers: Map<string, Map<string, any>> = new Map()
 	consumers: Map<string, any[]> = new Map()
+	webrtcServer: mediasoup.types.WebRtcServer<mediasoup.types.AppData>
 
 	constructor(params: MediaChannelParams) {
 		this.params = params
 		this.data = params.data
 		this.channelId = params.channelId
 		this.worker = params.worker
+		this.webrtcServer = params.webrtcServer
 		this.mediaCodecs = params.mediaCodecs || MediaChannel.defaultMediaCodecs
 	}
 
@@ -313,7 +317,7 @@ export default class MediaChannel {
 	 * @param {Object} payload
 	 * @return {Promise}
 	 */
-	async sendToGroupTopic(event: string, payload: any) {
+	async sendToGroupTopic(event: string, payload: any): Promise<any> {
 		const topic = `group:${this.data.group_id}`
 
 		try {

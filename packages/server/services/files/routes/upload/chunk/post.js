@@ -5,7 +5,7 @@ import { checkChunkUploadHeaders, handleChunkFile } from "@classes/ChunkFile"
 import Upload from "@shared-classes/Upload"
 import bufferToStream from "@shared-utils/bufferToStream"
 
-const availableProviders = ["b2", "standard"]
+const availableProviders = ["ovh", "b2", "standard"]
 
 export default {
 	useContexts: ["cache", "limits", "capabilities"],
@@ -28,7 +28,10 @@ export default {
 			maxFileSize: parseInt(ctx.limits.maxFileSizeInMB) * 1024 * 1024,
 			maxChunkSize: parseInt(ctx.limits.maxChunkSizeInMB) * 1024 * 1024,
 			useCompression: true,
-			useProvider: req.headers["use-provider"] ?? "b2",
+			useProvider:
+				req.headers["use-provider"] ??
+				process.env["DEFAULT_S3_PROVIDER"] ??
+				"standard",
 		}
 
 		// const user = await req.auth.user()

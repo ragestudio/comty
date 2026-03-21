@@ -35,6 +35,7 @@ class API extends Server {
 		})),
 		cache: (global.cache = new CacheService()),
 		storage: StorageClient(),
+		ovhStorage: null,
 		b2Storage: null,
 		limits: {},
 		capabilities: new Capabilities(),
@@ -64,6 +65,8 @@ class API extends Server {
 		this.contexts.limits = await LimitsClass.get()
 
 		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
+			console.log("Initializing B2 storage")
+
 			this.contexts.b2Storage = StorageClient({
 				endPoint: process.env.B2_ENDPOINT,
 				cdnUrl: process.env.B2_CDN_ENDPOINT,
@@ -78,10 +81,29 @@ class API extends Server {
 			await this.contexts.b2Storage.initialize()
 		}
 
+		if (process.env.OVH_S3_KEY_ID && process.env.OVH_S3_SECRET_KEY) {
+			console.log("Initializing OVH storage")
+
+			this.contexts.ovhStorage = StorageClient({
+				cdnUrl: process.env.OVH_S3_CDN,
+				endPoint: process.env.OVH_S3_ENDPOINT,
+				defaultBucket: process.env.OVH_S3_BUCKET,
+				accessKey: process.env.OVH_S3_KEY_ID,
+				secretKey: process.env.OVH_S3_SECRET_KEY,
+				port: 443,
+				useSSL: true,
+				setupBucket: false,
+				pathStyle: false,
+			})
+
+			await this.contexts.ovhStorage.initialize()
+		}
+
 		await this.contexts.storage.initialize()
 
 		global.storages = {
 			standard: this.contexts.storage,
+			ovh: this.contexts.ovhStorage,
 			b2: this.contexts.b2Storage,
 		}
 	}

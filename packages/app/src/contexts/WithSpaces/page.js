@@ -1,5 +1,4 @@
 import React from "react"
-
 const URL_PREFIX = "spaces"
 
 const DEFAULT_CONTEXT_DATA = {
@@ -41,11 +40,20 @@ const controller = () => {
 			isVoice: isVoice,
 		})
 
-		history.pushState(undefined, undefined, pathname)
+		if (app.isDesktop) {
+			window.location.hash = `#${pathname}`
+		} else {
+			history.pushState(undefined, undefined, pathname)
+		}
 	}
 
 	const updateFromHistory = React.useCallback(() => {
-		const parts = window.location.pathname.split("/")
+		let parts = window.location.pathname.split("/")
+
+		if (app.isDesktop) {
+			parts = window.location.hash.split("#")[1].split("/")
+		}
+
 		const [_, prefix, _type, _room, _channel, _voice] = parts
 
 		if (prefix !== URL_PREFIX) {

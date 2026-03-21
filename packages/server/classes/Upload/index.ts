@@ -134,6 +134,8 @@ export default class Upload {
 			})
 		}
 
+		metadata["x-amz-acl"] = "public-read"
+
 		// console.log("Uploading to S3:", {
 		// 	filePath: filePath,
 		// 	basePath: basePath,

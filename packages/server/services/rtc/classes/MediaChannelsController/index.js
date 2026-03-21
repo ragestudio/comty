@@ -22,6 +22,7 @@ export default class MediaChannelsController {
 	static allowedMediaCodecs = allowedMediaCodecs
 
 	worker = null
+	webrtcServer = null
 	instances = new Map()
 	usersMap = new Map()
 
@@ -30,8 +31,6 @@ export default class MediaChannelsController {
 			console.log("Initializing mediasoup worker...")
 
 			this.worker = await mediasoup.createWorker({
-				rtcMinPort: 10000,
-				rtcMaxPort: 10100,
 				logLevel: "warn",
 				logTags: [
 					"info",
@@ -45,6 +44,23 @@ export default class MediaChannelsController {
 					"score",
 					"simulcast",
 					"svc",
+				],
+			})
+
+			this.webrtcServer = await this.worker.createWebRtcServer({
+				listenInfos: [
+					{
+						protocol: "udp",
+						ip: "0.0.0.0",
+						announcedIp: MediaChannelsController.getAnnouncedIp(),
+						port: 40000, // should be unique per worker
+					},
+					{
+						protocol: "tcp",
+						ip: "0.0.0.0",
+						announcedIp: MediaChannelsController.getAnnouncedIp(),
+						port: 40000,
+					},
 				],
 			})
 
@@ -81,6 +97,19 @@ export default class MediaChannelsController {
 
 	validateGroupAccess = validateGroupAccess.bind(this)
 	createChannelInstance = createChannelInstance.bind(this)
+
+	static getAnnouncedIp = () => {
+		let announcedIp = process.env.MEDIASOUP_ANNOUNCED_IP
+
+		if (!announcedIp) {
+			announcedIp =
+				process.env.NODE_ENV === "production"
+					? clientIp || "127.0.0.1"
+					: "127.0.0.1"
+		}
+
+		return announcedIp
+	}
 
 	getClientChannel(client) {
 		const currentUserMediaChannel = this.usersMap.get(client.userId)

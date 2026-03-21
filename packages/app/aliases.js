@@ -16,5 +16,12 @@ export default {
 	"@models": path.join(__dirname, "../../", "comty.js/src/models"),
 	"comty.js": path.join(__dirname, "../../", "comty.js", "src"),
 	"@ragestudio/vessel": path.join(__dirname, "../../", "vessel", "src"),
+	"linebridge-client": path.join(
+		__dirname,
+		"../../",
+		"linebridge",
+		"client",
+		"src",
+	),
 	vessel: path.join(__dirname, "../../", "vessel", "src"),
 }

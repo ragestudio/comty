@@ -6,7 +6,7 @@ import os from "node:os"
 // 	installExtension,
 // 	REACT_DEVELOPER_TOOLS,
 // } from "electron-devtools-installer"
-import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
+import { app, shell, ipcMain, Tray, Menu, BrowserWindow } from "electron"
 import ElectronStore from "electron-store"
 
 import flags from "./flags.js"
@@ -22,7 +22,7 @@ import SysAudio from "./classes/SysAudio/index.js"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-class Main {
+export default class Main {
 	constructor() {
 		this.app = app
 
@@ -32,7 +32,12 @@ class Main {
 			"application-name",
 			pkgjson.processName,
 		)
-		this.app.setName(pkgjson.processName)
+
+		if (Main.isDev) {
+			this.app.setName(pkgjson.processName + "_dev")
+		} else {
+			this.app.setName(pkgjson.processName)
+		}
 
 		flags(this.app)
 	}
@@ -175,6 +180,7 @@ class Main {
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
+				backgroundThrottling: false,
 			},
 		})
 
@@ -214,6 +220,11 @@ class Main {
 				this.mainWindow.show()
 				break
 		}
+
+		this.mainWindow.webContents.setWindowOpenHandler((details) => {
+			shell.openExternal(details.url)
+			return { action: "deny" }
+		})
 
 		return this.mainWindow
 	}
@@ -276,5 +287,3 @@ class Main {
 		}
 	}
 }
-
-new Main().initialize()

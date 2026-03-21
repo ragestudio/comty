@@ -83,7 +83,7 @@ export default class Client {
 			? this.core.self.sysAudio.outputCtx
 			: this.core.self.audioOutput.context
 
-		if (ctx.state === "suspended") {
+		if (ctx.state === "suspended" && !this.core.self.isDeafened) {
 			await ctx
 				.resume()
 				.catch((err) =>

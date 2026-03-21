@@ -84,7 +84,9 @@ const recvTransportObserver = {
 }
 
 export default async function () {
+	console.debug("[webrtc] Creating new send transport")
 	const sendTransportInfo = await this.socket.call("channel:create_transport")
+	console.debug("[webrtc] [send:transport] created", sendTransportInfo)
 
 	this.sendTransport = this.device.createSendTransport({
 		id: sendTransportInfo.id,
@@ -96,7 +98,9 @@ export default async function () {
 		},
 	})
 
+	console.debug("[webrtc] Creating new recv transport")
 	const recvTransportInfo = await this.socket.call("channel:create_transport")
+	console.debug("[webrtc] [recv:transport] created", recvTransportInfo)
 
 	this.recvTransport = this.device.createRecvTransport({
 		id: recvTransportInfo.id,

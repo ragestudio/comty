@@ -17,8 +17,9 @@ export default async function (groupId, channelId) {
 	const channelInstance = new MediaChannel({
 		data: channel.toJSON(),
 		channelId: channelId,
-		worker: this.worker,
 		mediaCodecs: this.constructor.allowedMediaCodecs,
+		webrtcServer: this.webrtcServer,
+		worker: this.worker,
 	})
 
 	// initialize the channel instance

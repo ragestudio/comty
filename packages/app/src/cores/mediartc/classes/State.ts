@@ -1,4 +1,4 @@
-import { Observable } from "object-observer"
+import { Observable } from "@gullerya/object-observer"
 
 export interface MediaRTCStateType {
 	isJoined: boolean

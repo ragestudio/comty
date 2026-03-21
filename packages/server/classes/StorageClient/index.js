@@ -32,10 +32,15 @@ export class StorageClient extends Client {
 		this.defaultRegion = String(options.defaultRegion)
 		this.setupBucket = Boolean(options.setupBucket)
 		this.cdnUrl = options.cdnUrl
+		this.pathStyle = Boolean(options.pathStyle ?? true)
 	}
 
 	composeRemoteURL = (key, extraKey) => {
 		let _path = path.join(this.defaultBucket, key)
+
+		if (!this.pathStyle) {
+			_path = key
+		}
 
 		if (typeof extraKey === "string") {
 			_path = path.join(_path, extraKey)

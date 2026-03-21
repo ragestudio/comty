@@ -1,7 +1,10 @@
+import * as mediasoup from "mediasoup"
+
 export type MediaChannelParams = {
 	data: any
 	channelId: string
-	worker: any
+	worker: mediasoup.types.Worker
+	webrtcServer: mediasoup.types.WebRtcServer
 	mediaCodecs?: any[]
 }
 

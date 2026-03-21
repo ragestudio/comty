@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "2.10.0@alpha",
+	"version": "2.11.0@alpha",
 	"license": "ComtyLicense",
 	"private": true,
 	"workspaces": [
@@ -14,38 +14,38 @@
 		"preinstall": "bash ./scripts/externalDeps.sh"
 	},
 	"dependencies": {
-		"@sentry/node": "^10.39.0",
-		"axios": "^1.13.5",
+		"@sentry/node": "^10.44.0",
+		"axios": "^1.13.6",
 		"bcrypt": "^6.0.0",
-		"bullmq": "^5.58.2",
+		"bullmq": "^5.71.0",
 		"cassandra-driver": "^4.8.0",
-		"cross-env": "^10.0.0",
+		"cross-env": "^10.1.0",
 		"express-cassandra": "^2.9.1",
-		"jsonwebtoken": "^9.0.2",
+		"jsonwebtoken": "^9.0.3",
 		"jws": "^4.0.1",
 		"linebridge": "^1.8.1",
-		"minio": "^8.0.5",
-		"mongoose": "^8.18.0",
+		"minio": "^8.0.7",
+		"mongoose": "^9.3.1",
 		"qs": "^6.15.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.34.0",
-		"@typescript-eslint/eslint-plugin": "^8.56.1",
-		"chai": "^6.0.1",
-		"eslint": "^10.0.1",
-		"globals": "^16.3.0",
+		"@eslint/js": "^10.0.1",
+		"@typescript-eslint/eslint-plugin": "^8.57.1",
+		"chai": "^6.2.2",
+		"eslint": "^10.0.3",
+		"globals": "^17.4.0",
 		"mocha": "^12.0.0-beta.9",
-		"sinon": "^21.0.0"
+		"sinon": "^21.0.3"
 	},
 	"overrides": {
 		"braces": "3.0.3",
-		"minimatch": "10.2.2",
-		"fast-xml-parser": "5.3.7",
+		"minimatch": "10.2.3",
+		"fast-xml-parser": "5.5.6",
 		"diff": "8.0.3",
 		"micromatch": "4.0.8",
 		"string-width": "4.2.3"
 	},
 	"optionalDependencies": {
-		"bufferutil": "^4.0.9"
+		"bufferutil": "^4.1.0"
 	}
 }

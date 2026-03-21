@@ -1,5 +1,6 @@
 import MediaRTC from "../mediartc.core"
 import AudioProcessor from "./AudioProcessor"
+import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
 
@@ -31,18 +32,22 @@ export default class Self {
 	screenAudioProducer = null
 
 	audioInput = null
-	audioOutput = new AudioProcessor(this, {
-		sinkId: Self.outputDeviceId,
-	})
-	sysAudio = null
+	audioOutput =
+		!app.isDesktop &&
+		new AudioProcessor(this, {
+			sinkId: Self.outputDeviceId,
+		})
+	sysAudio = app.isDesktop && new SysAudio()
 
 	get isMuted() {
 		return this.micStream ? !this.micStream.getTracks()[0].enabled : false
 	}
 
 	get isDeafened() {
-		if (this.sysAudio && this.sysAudio?.outputBus) {
-			return this.sysAudio.outputBus.gain.value === 0
+		if (this.sysAudio) {
+			if (this.sysAudio.outputBus) {
+				return this.sysAudio.outputBus.gain.value === 0
+			}
 		}
 
 		return this.audioOutput.context.state === "suspended"
@@ -166,7 +171,9 @@ export default class Self {
 			},
 		})
 
-		this.audioOutput.context.resume()
+		if (this.audioOutput) {
+			this.audioOutput.context.resume()
+		}
 
 		this.audioInput.mainNode.gain.value = parseFloat(
 			this.audioSettings.inputGain,
