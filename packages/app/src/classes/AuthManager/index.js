@@ -2,6 +2,9 @@ import AuthModel from "@models/auth"
 import SessionModel from "@models/session"
 import UserModel from "@models/user"
 
+import RefreshWorker from "./refresh_worker?worker"
+import * as Comlink from "comlink"
+
 import { Login } from "@components"
 
 export default class AuthManager {
@@ -15,6 +18,9 @@ export default class AuthManager {
 		for (const [event, handler] of Object.entries(this.events)) {
 			this.runtime.eventBus.on(event, handler)
 		}
+
+		this.refreshWorker = new RefreshWorker()
+		this.refreshWorkerWrap = Comlink.wrap(this.refreshWorker)
 	}
 
 	state = {
@@ -30,8 +36,8 @@ export default class AuthManager {
 				},
 			})
 		},
-		logout: (bypass) => {
-			if (bypass) {
+		logout: (confirm = false) => {
+			if (confirm == true) {
 				return this.handlers.logout()
 			}
 
@@ -142,6 +148,45 @@ export default class AuthManager {
 		this.state.user = user
 
 		console.log("auth manager ok", user)
+
+		// start token refresh worker
+		await this.refreshWorkerWrap.initialize(
+			{
+				token: SessionModel.token,
+				refreshToken: SessionModel.refreshToken,
+				endpoint: new URL(
+					"/auth",
+					globalThis.__comty_shared_state.mainOrigin,
+				).toString(),
+				method: "POST",
+			},
+			Comlink.proxy(() => {
+				__comty_shared_state.eventBus.emit("session:refreshing")
+				__comty_shared_state.refreshingToken = true
+			}),
+			Comlink.proxy((data) => {
+				if (data.token) {
+					SessionModel.token = data.token
+				}
+				if (data.refreshToken) {
+					SessionModel.refreshToken = data.refreshToken
+				}
+
+				__comty_shared_state.eventBus.emit("session:refreshed")
+				__comty_shared_state.refreshingToken = false
+			}),
+			Comlink.proxy((error) => {
+				__comty_shared_state.refreshingToken = false
+
+				__comty_shared_state.eventBus.emit(
+					"session:invalid",
+					error.message,
+				)
+
+				console.error(`Failed to regenerate token: ${error.message}`)
+			}),
+		)
+
 		console.timeEnd("authmanager:initialize")
 
 		this.state.firstInit = false
