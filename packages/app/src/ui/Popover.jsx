@@ -2,6 +2,7 @@ import React from "react"
 import PropTypes from "prop-types"
 
 import "./Popover.less"
+import classNames from "classnames"
 
 const Popover = ({
 	children,
@@ -19,8 +20,10 @@ const Popover = ({
 	const containerRef = React.useRef(null)
 	const hoverTimeoutRef = React.useRef(null)
 
-	const togglePopover = () => {
-		if (disabled) return
+	const togglePopover = (event) => {
+		if (disabled) {
+			return
+		}
 
 		const newState = !isOpen
 		setIsOpen(newState)
@@ -40,7 +43,9 @@ const Popover = ({
 			!triggerRef.current.contains(event.target)
 		) {
 			setIsOpen(false)
-			if (onClose) onClose()
+			if (onClose) {
+				onClose()
+			}
 		}
 	}
 
@@ -111,6 +116,10 @@ const Popover = ({
 		onMouseLeave: trigger === "hover" ? handlePopoverMouseLeave : undefined,
 	}
 
+	const contentProps = {
+		close: () => setIsOpen(false),
+	}
+
 	return (
 		<div
 			className="popover-container"
@@ -127,12 +136,16 @@ const Popover = ({
 			{isOpen && (
 				<div
 					ref={popoverRef}
-					className={`popover ${position} ${className} ${disabled ? "disabled" : ""}`}
+					className={classNames("popover", position, className, {
+						["disabled"]: disabled,
+					})}
 					role="tooltip"
 					{...popoverEventHandlers}
 				>
 					<div className="popover-content">
-						{typeof content === "function" ? content() : content}
+						{typeof content === "function"
+							? content({ ...contentProps })
+							: content}
 					</div>
 				</div>
 			)}
