@@ -175,6 +175,7 @@ class Main {
 			webPreferences: {
 				preload: path.resolve(__dirname, "./preload.js"),
 				nodeIntegration: true,
+				backgroundThrottling: false,
 			},
 		})
 
