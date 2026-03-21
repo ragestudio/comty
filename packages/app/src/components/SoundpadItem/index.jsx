@@ -1,17 +1,24 @@
-import { Tooltip } from "antd"
+import Popover from "@ui/Popover"
 
 import "./index.less"
 
 const SoundpadItem = ({ item, onClick }) => {
 	return (
-		<Tooltip title={item.name}>
+		<Popover
+			trigger="hover"
+			content={
+				<span style={{ width: "fit-content", whiteSpace: "nowrap" }}>
+					{item.icon} {item.name}
+				</span>
+			}
+		>
 			<div
 				className="soundpad-items__item"
 				onClick={onClick}
 			>
 				{item.icon ?? item.name}
 			</div>
-		</Tooltip>
+		</Popover>
 	)
 }
 
