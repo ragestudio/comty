@@ -220,7 +220,9 @@ const useGroup = ({ group_id }) => {
 			)
 
 		if (socket.current) {
-			socket.current.emit("group:subscribe", group_id)
+			//socket.current.emit("group:subscribe", group_id)
+			socket.current.topics.subscribe("group:subscribe", group_id)
+
 			socket.current.on(
 				`group:${group_id}:client:vc:join`,
 				handleClientVoiceChannelJoin,
@@ -252,7 +254,9 @@ const useGroup = ({ group_id }) => {
 			isActive = false
 
 			if (socket.current) {
-				socket.current.emit("group:unsubscribe", group_id)
+				//socket.current.emit("group:unsubscribe", group_id)
+				socket.current.topics.subscribe("group:unsubscribe", group_id)
+
 				socket.current.off(
 					`group:${group_id}:client:vc:join`,
 					handleClientVoiceChannelJoin,
