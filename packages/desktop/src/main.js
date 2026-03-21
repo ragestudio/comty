@@ -6,7 +6,7 @@ import os from "node:os"
 // 	installExtension,
 // 	REACT_DEVELOPER_TOOLS,
 // } from "electron-devtools-installer"
-import { app, ipcMain, Tray, Menu, BrowserWindow } from "electron"
+import { app, shell, ipcMain, Tray, Menu, BrowserWindow } from "electron"
 import ElectronStore from "electron-store"
 
 import flags from "./flags.js"
@@ -220,6 +220,11 @@ export default class Main {
 				this.mainWindow.show()
 				break
 		}
+
+		this.mainWindow.webContents.setWindowOpenHandler((details) => {
+			shell.openExternal(details.url)
+			return { action: "deny" }
+		})
 
 		return this.mainWindow
 	}
