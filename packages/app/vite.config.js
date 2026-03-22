@@ -50,6 +50,7 @@ const config = {
 	},
 	optimizeDeps: {
 		include: ["src/cores/**/*.core.js"],
+		exclude: ["vessel", "comty.js", "linebridge-client"],
 	},
 	build: {
 		rollupOptions: {
