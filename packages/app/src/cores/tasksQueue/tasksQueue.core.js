@@ -1,5 +1,5 @@
 import Core from "vessel/core"
-import { Observable } from "object-observer"
+import { Observable } from "@gullerya/object-observer"
 
 export default class TasksQueue extends Core {
 	static depends = ["settings"]
