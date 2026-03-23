@@ -1,4 +1,4 @@
-import { Observable } from "object-observer"
+import { Observable } from "@gullerya/object-observer"
 import AudioPlayerStorage from "../player.storage"
 
 export default class PlayerState {
