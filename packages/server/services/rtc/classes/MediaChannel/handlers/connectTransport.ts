@@ -29,7 +29,10 @@ async function connectTransportHandler(
 
 		await transport.connect({ dtlsParameters })
 	} catch (error) {
-		console.error(`Error connecting transport for ${client.userId}:`, error)
+		console.error(
+			`[CHANNEL:${this.channelId}] Error connecting transport for ${client.userId}:`,
+			error,
+		)
 		throw error
 	}
 }

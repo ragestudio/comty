@@ -57,6 +57,7 @@ async function joinClientHandler(this: any, client: RTCClient) {
 		})
 
 		return {
+			started_at: this.started_at,
 			room: this.data,
 			channelId: this.channelId,
 			rtpCapabilities: this.router.rtpCapabilities,
@@ -75,7 +76,10 @@ async function joinClientHandler(this: any, client: RTCClient) {
 			producers: producers,
 		}
 	} catch (error) {
-		console.error(`Error joining client ${client.userId}:`, error)
+		console.error(
+			`[CHANNEL:${this.channelId}] Error joining client ${client.userId}:`,
+			error,
+		)
 		throw error
 	}
 }

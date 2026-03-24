@@ -90,14 +90,21 @@ async function leaveClientHandler(
 			})
 		}
 
-		console.log(`Client ${client.userId} left channel ${this.channelId}`)
+		console.log(
+			`[CHANNEL:${this.channelId}] Client ${client.userId} left channel`,
+		)
+
+		// if no users left, close it self
+		if (this.clients.size === 0) {
+			this.close()
+		}
 
 		return {
 			userId: client.userId,
 			channelId: this.channelId,
 		}
 	} catch (error) {
-		console.error(`Error leaving client ${client.userId}:`, error)
+		console.error(`[CHANNEL:${this.channelId}] Error leaving client`, error)
 	}
 }
 

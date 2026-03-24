@@ -18,6 +18,8 @@ export default class MediaChannel {
 	channelId: string
 	worker: mediasoup.types.Worker
 	mediaCodecs: any[]
+	started_at: Date
+	closed: Boolean = false
 
 	static defaultMediaCodecs = [
 		{
@@ -71,14 +73,12 @@ export default class MediaChannel {
 		this.worker = params.worker
 		this.webrtcServer = params.webrtcServer
 		this.mediaCodecs = params.mediaCodecs || MediaChannel.defaultMediaCodecs
+		this.started_at = new Date()
 	}
 
 	async initialize() {
 		try {
-			console.log(
-				`Initializing MediaChannel ${this.channelId}`,
-				this.data,
-			)
+			console.log(`[CHANNEL:${this.channelId}] Initializing`, this.data)
 
 			this.router = await this.worker.createRouter({
 				mediaCodecs: this.mediaCodecs,
@@ -86,12 +86,22 @@ export default class MediaChannel {
 
 			this.router.on("workerclose", () => {
 				console.log(
-					`Router worker closed for channel ${this.channelId}`,
+					`[CHANNEL:${this.channelId}] Router worker closed for channel ${this.channelId}`,
 				)
 			})
+
+			try {
+				this.sendToGroupTopic("vc:started", {
+					...this.data,
+					channelId: this.channelId,
+					started_at: this.started_at,
+				})
+			} catch (err) {
+				console.error(err)
+			}
 		} catch (error) {
 			console.error(
-				`Error initializing MediaChannel ${this.channelId}:`,
+				`[CHANNEL:${this.channelId}] Error initializing `,
 				error,
 			)
 			throw error
@@ -109,6 +119,12 @@ export default class MediaChannel {
 	consume = consumeHandler.bind(this)
 
 	async close() {
+		if (this.closed) {
+			return null
+		}
+
+		this.closed = true
+
 		try {
 			// Close all consumers
 			for (const [, consumers] of this.consumers) {
@@ -147,11 +163,31 @@ export default class MediaChannel {
 
 			// Clear clients
 			this.clients.clear()
+
+			console.info(`[CHANNEL:${this.channelId}] closed`)
+
+			try {
+				this.sendToGroupTopic("vc:ended", {
+					channelId: this.channelId,
+				})
+			} catch (err) {
+				console.error(err)
+			}
+
+			if (this.params.controller) {
+				try {
+					this.params.controller.instances.delete(this.channelId)
+					console.log(
+						`[CHANNEL:${this.channelId}] self deleted from instances pool`,
+					)
+				} catch (err) {
+					console.error(
+						`[CHANNEL:${this.channelId}] Failed to self delete from controller`,
+					)
+				}
+			}
 		} catch (error) {
-			console.error(
-				`Error closing MediaChannel ${this.channelId}:`,
-				error,
-			)
+			console.error(`[CHANNEL:${this.channelId}] Error closing`, error)
 		}
 	}
 
@@ -212,11 +248,15 @@ export default class MediaChannel {
 
 	_setupTransportEvents(transport: any, client: RTCClient) {
 		transport.on("dtlsstatechange", (dtlsState: string) => {
-			console.log(`Transport ${transport.id} DTLS state: ${dtlsState}`)
+			console.log(
+				`[CHANNEL:${this.channelId}] Transport ${transport.id} DTLS state: ${dtlsState}`,
+			)
 		})
 
 		transport.on("iceconnectionstatechange", (iceState: string) => {
-			console.log(`Transport ${transport.id} ICE state: ${iceState}`)
+			console.log(
+				`[CHANNEL:${this.channelId}] Transport ${transport.id} ICE state: ${iceState}`,
+			)
 		})
 
 		transport.on("@close", () => {
@@ -228,11 +268,11 @@ export default class MediaChannel {
 
 	_setupConsumerEvents(consumer: any, client: RTCClient) {
 		consumer.on("transportclose", () => {
-			console.log("consumer transport closed")
+			console.log(`[CHANNEL:${this.channelId}] consumer transport closed`)
 		})
 
 		consumer.on("producerclose", () => {
-			console.log("consumer producer closed")
+			console.log(`[CHANNEL:${this.channelId}] consumer producer closed`)
 		})
 	}
 
@@ -259,7 +299,6 @@ export default class MediaChannel {
 
 		for (const [producerUserId, userProducers] of this.producers) {
 			for (const [producerId, producer] of userProducers) {
-				console.log(producer)
 				producers.add({
 					id: producerId,
 					producer_id: producerId,
@@ -290,7 +329,7 @@ export default class MediaChannel {
 			}
 		} catch (error) {
 			console.error(
-				`Error broadcasting to clients for ${client.userId}:`,
+				`[CHANNEL:${this.channelId}] Error broadcasting to clients for [${client.userId}]:`,
 				error,
 			)
 		}
@@ -307,7 +346,10 @@ export default class MediaChannel {
 				await client.emit(event, payload)
 			}
 		} catch (error) {
-			console.error(`Error broadcasting to clients`, error)
+			console.error(
+				`[CHANNEL:${this.channelId}] Error broadcasting to clients`,
+				error,
+			)
 		}
 	}
 
@@ -327,7 +369,10 @@ export default class MediaChannel {
 				payload,
 			)
 		} catch (error) {
-			console.error(`Error sending to group topic`, error)
+			console.error(
+				`[CHANNEL:${this.channelId}] Error sending to group topic`,
+				error,
+			)
 		}
 	}
 }

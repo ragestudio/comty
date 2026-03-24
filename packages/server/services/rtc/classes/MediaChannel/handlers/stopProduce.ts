@@ -35,7 +35,10 @@ async function stopProduceHandler(
 
 		return { success: true }
 	} catch (error) {
-		console.error(`Error stopping production for ${client.userId}:`, error)
+		console.error(
+			`[CHANNEL:${this.channelId}] Error stopping production for ${client.userId}:`,
+			error,
+		)
 		throw error
 	}
 }

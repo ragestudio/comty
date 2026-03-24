@@ -2,6 +2,7 @@ import React from "react"
 import { Button } from "antd"
 import classNames from "classnames"
 
+import TimeAgo from "@components/TimeAgo"
 import { Icons } from "@components/Icons"
 import ClientContextMenu from "@components/Spaces/VoiceClient/menu-context"
 
@@ -122,10 +123,25 @@ const VoiceChannelCard = () => {
 				/>
 
 				<div className="rtc-vc-card__header__titles">
-					<ConnectionStateIndicator
-						send={state.sendTransportState}
-						recv={state.recvTransportState}
-					/>
+					<div className="rtc-vc-card__header__titles__indicators">
+						<ConnectionStateIndicator
+							send={state.sendTransportState}
+							recv={state.recvTransportState}
+						/>
+
+						{state?.connectedAt && (
+							<>
+								<div className="divider" />
+								<span className="rtc-vc-card__header__titles__indicators__timer">
+									<TimeAgo
+										time={state?.connectedAt.toISOString()}
+										counterMode
+									/>
+								</span>
+							</>
+						)}
+					</div>
+
 					<h1 onClick={handleGoToChannel}>
 						<Icons.ExternalLink /> {state?.channel?.name}
 					</h1>

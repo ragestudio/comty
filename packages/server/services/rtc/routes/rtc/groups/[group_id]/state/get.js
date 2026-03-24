@@ -45,6 +45,7 @@ export default {
 				_id: channel.data._id,
 				clients: channel.getConnectedClientsSerialized(),
 				producers: channel.getProducersSerialized(),
+				started_at: channel.started_at,
 			}
 		})
 

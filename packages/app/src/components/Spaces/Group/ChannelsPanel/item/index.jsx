@@ -1,6 +1,7 @@
 import classnames from "classnames"
 import { AnimatePresence } from "motion/react"
 
+import TimeAgo from "@components/TimeAgo"
 import VoiceClient from "@components/Spaces/VoiceClient"
 import useMediaRTCState from "@hooks/useMediaRTCState"
 
@@ -85,9 +86,18 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 						<p>{channel.name}</p>
 					</div>
 
-					{channel.description && (
+					{channel.description && channel.kind !== "voice" && (
 						<div className="group-page__channels-panel__list-item__content__info__description">
 							<span>{channel.description}</span>
+						</div>
+					)}
+
+					{channel.started_at && (
+						<div className="group-page__channels-panel__list-item__content__info__timer">
+							<TimeAgo
+								time={channel.started_at}
+								counterMode={true}
+							/>
 						</div>
 					)}
 				</div>

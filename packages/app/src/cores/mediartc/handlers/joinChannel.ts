@@ -49,6 +49,10 @@ export default async function (
 		this.state.channel = channelData
 		this.state.channelId = channelData._id
 
+		if (data.started_at) {
+			this.state.channel.started_at = data.started_at
+		}
+
 		// load device
 		await this.device.load({
 			routerRtpCapabilities: data.rtpCapabilities,
@@ -94,8 +98,10 @@ export default async function (
 
 		this.state.isJoined = true
 		this.state.isLoading = false
+		this.state.connectedAt = new Date()
 
 		this.console.log("Joined channel", {
+			...data,
 			groupId,
 			channelId,
 			clients: data.clients,

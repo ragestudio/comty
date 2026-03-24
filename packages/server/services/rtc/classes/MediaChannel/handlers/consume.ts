@@ -64,7 +64,10 @@ async function consumeHandler(
 			rtpParameters: consumer.rtpParameters,
 		}
 	} catch (error) {
-		console.error(`Error consuming for ${client.userId}:`, error)
+		console.error(
+			`[CHANNEL:${this.channelId}] Error consuming for ${client.userId}:`,
+			error,
+		)
 		throw error
 	}
 }

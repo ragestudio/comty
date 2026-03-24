@@ -52,7 +52,10 @@ async function produceHandler(
 
 		return producer.serialize()
 	} catch (error) {
-		console.error(`Error producing for ${client.userId}:`, error)
+		console.error(
+			`[CHANNEL:${this.channelId}] Error producing for ${client.userId}:`,
+			error,
+		)
 		throw error
 	}
 }

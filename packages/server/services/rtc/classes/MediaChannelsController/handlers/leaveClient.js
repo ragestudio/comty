@@ -12,19 +12,19 @@ export default async function (client) {
 			return
 		}
 
-		const channelId = channelInstance.channelId
-
 		// delete user from client list
 		this.usersMap.delete(client.userId)
 
-		// Cleanup empty channel
-		if (channelInstance.clients.size === 0) {
-			await channelInstance.close()
-			this.instances.delete(channelId)
-		}
-
 		// Leave channel
-		return await channelInstance.leaveClient(client)
+		await channelInstance.leaveClient(client)
+
+		// // Cleanup empty channel
+		// if (channelInstance.clients.size === 0) {
+		// 	await channelInstance.close()
+		// 	this.instances.delete(channelId)
+		// }
+
+		return channelInstance.channelId
 	} catch (error) {
 		console.error(`Error leaving client ${client.userId}:`, error)
 	}
