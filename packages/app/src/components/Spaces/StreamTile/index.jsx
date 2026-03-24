@@ -176,7 +176,7 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 				{userData && (
 					<div className="video-stream-tile__user">
 						<UserPreview
-							user={userData ?? {}}
+							user={userData}
 							onClick={() => {}}
 							small
 						/>
