@@ -120,7 +120,7 @@ const UploadButton = React.forwardRef((props, ref) => {
 			className={classnames("uploadButton", {
 				["uploading"]: !!progress || uploading,
 			})}
-			disabled={uploading}
+			disabled={props.disabled || uploading}
 		>
 			<div className="uploadButton-content">
 				{!progress &&
