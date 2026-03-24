@@ -14,7 +14,7 @@ import "./Line.less"
 
 const messageRegexs = [
 	{
-		regex: /^(?:https?:\/\/)?(?:www\.|m\.|music\.)?youtu(?:be\.com|be)\/(?:shorts\/|live\/|v\/|embed\/|watch(?:\/|\?(?:\S+=\S+&)*v=))?([\w-]{11})(?:\S+)?$/,
+		regex: /(?:https?:)?(?:\/\/)?(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/,
 		fn: (result) => {
 			return (
 				<ReactPlayer
