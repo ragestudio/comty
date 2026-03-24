@@ -5,7 +5,7 @@ import { Layout } from "antd"
 import BackgroundDecorator from "@components/BackgroundDecorator"
 import Drawer from "@layouts/components/drawer"
 import Modals from "@layouts/components/modals"
-import Sidebar from "@components/Spaces/Sidebar"
+import Sidebar from "./sidebar"
 
 // mobile components
 import { DraggableDrawerController } from "@layouts/components/draggableDrawer"
@@ -47,7 +47,12 @@ const SpacesLayout = (props) => {
 							"fade-transverse-active",
 						)}
 					>
-						<div className="spaces-page">
+						<div
+							className="spaces-page"
+							style={{
+								width: "100%",
+							}}
+						>
 							{!controller.firstLoad &&
 								props.children &&
 								React.cloneElement(props.children, props)}
