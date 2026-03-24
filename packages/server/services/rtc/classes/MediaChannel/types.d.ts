@@ -6,6 +6,7 @@ export type MediaChannelParams = {
 	worker: mediasoup.types.Worker
 	webrtcServer: mediasoup.types.WebRtcServer
 	mediaCodecs?: any[]
+	controller?: any
 }
 
 export type RTCClient = RTEClient & {

@@ -407,13 +407,17 @@ export default class SettingItemComponent extends React.PureComponent {
 								<antd.Tag>Experimental</antd.Tag>
 							)}
 						</div>
-						<div className="setting_item_header_description">
-							<p>
-								<Translation>
-									{(t) => t(this.props.setting.description)}
-								</Translation>
-							</p>
-						</div>
+						{this.props.setting.description && (
+							<div className="setting_item_header_description">
+								<p>
+									<Translation>
+										{(t) =>
+											t(this.props.setting.description)
+										}
+									</Translation>
+								</p>
+							</div>
+						)}
 					</div>
 
 					<div className="setting_item_header_actions">

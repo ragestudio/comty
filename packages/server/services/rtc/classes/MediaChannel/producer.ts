@@ -112,7 +112,7 @@ export default class Producer {
 			)
 		} catch (error) {
 			console.error(
-				`Error notifying clients about producer close:`,
+				`[CHANNEL:${this.channelId}] Error notifying clients about producer close:`,
 				error,
 			)
 		}
@@ -130,7 +130,7 @@ export default class Producer {
 			})
 		} catch (error) {
 			console.error(
-				`Error notifying clients about producer close:`,
+				`[CHANNEL:${this.channelId}] Error notifying clients about producer close:`,
 				error,
 			)
 		}
@@ -149,7 +149,10 @@ export default class Producer {
 				}
 			}
 		} catch (error) {
-			console.error(`Error removing producer from maps:`, error)
+			console.error(
+				`[CHANNEL:${this.channelId}] Error removing producer from maps:`,
+				error,
+			)
 		}
 
 		// Clean up event listeners to prevent memory leaks

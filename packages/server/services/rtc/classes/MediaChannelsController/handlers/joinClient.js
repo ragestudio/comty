@@ -32,7 +32,7 @@ export default async function (client, channelId) {
 		// Get or create channel instance
 		let channelInstance = this.instances.get(channelId)
 
-		if (!channelInstance) {
+		if (!channelInstance || channelInstance?.closed === true) {
 			channelInstance = await this.createChannelInstance(
 				group._id,
 				channelId,

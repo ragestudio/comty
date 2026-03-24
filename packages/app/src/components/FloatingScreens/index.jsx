@@ -1,11 +1,11 @@
 import React from "react"
 import useMediaRTCState from "@hooks/useMediaRTCState"
+import StreamTile from "@components/Spaces/StreamTile"
 
 import "./index.less"
 
 const FloatingScreens = () => {
 	const rtcState = useMediaRTCState()
-	const videoRef = React.useRef(null)
 	const [stream, setStream] = React.useState(null)
 
 	const onClickScreen = (screen) => {
@@ -24,21 +24,28 @@ const FloatingScreens = () => {
 			.screens.values()
 			.next().value
 
-		console.log({ firstScreen })
-
 		if (firstScreen) {
-			setStream(firstScreen.media)
-			videoRef.current.srcObject = firstScreen.media
-			videoRef.current.play()
+			setStream({
+				id: firstScreen.producer._id,
+				userId: firstScreen.producer.userId,
+				stream: firstScreen,
+			})
 		}
 	}, [])
+
+	if (!stream) {
+		return
+	}
 
 	return (
 		<div
 			className="floating-screens"
 			onClick={onClickScreen}
 		>
-			<video ref={videoRef} />
+			<StreamTile
+				stream={stream}
+				//mode={"preview"}
+			/>
 		</div>
 	)
 }

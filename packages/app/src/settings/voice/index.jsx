@@ -22,56 +22,9 @@ export default {
 	},
 	settings: [
 		{
-			id: "mediartc:input_device",
-			group: "audio",
-			icon: "Mic",
-			title: "Input device",
-			description: "Select the input device to use for audio calls.",
-			component: "Select",
-			storaged: true,
-			props: (ctx) => {
-				return {
-					defaultValue: [ctx.inputDevices[0].deviceId],
-					options: ctx.inputDevices.map((device) => {
-						return {
-							label: device.label,
-							value: device.deviceId,
-						}
-					}),
-				}
-			},
-			onUpdate: async (value) => {
-				app.cores.mediartc
-					.handlers()
-					.changeInputParams({ deviceId: value })
-				return value
-			},
-		},
-		{
-			id: "mediartc:output_device",
-			group: "audio",
-			icon: "Headphones",
-			title: "Output device",
-			description: "Select the output device to use for audio calls.",
-			component: "Select",
-			storaged: true,
-			props: (ctx) => {
-				return {
-					defaultValue: [ctx.outputDevices[0].deviceId],
-					options: ctx.outputDevices.map((device) => {
-						return {
-							label: device.label,
-							value: device.deviceId,
-						}
-					}),
-				}
-			},
-			onUpdate: async (value) => {
-				app.cores.mediartc
-					.handlers()
-					.changeOutputParams({ deviceId: value })
-				return value
-			},
+			id: "mediartc:devices",
+			component: loadable(() => import("./devices")),
+			title: "Devices",
 		},
 		{
 			id: "mediartc:echoCancellation",

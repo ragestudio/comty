@@ -1,12 +1,12 @@
 import React from "react"
 import PropTypes from "prop-types"
 import classnames from "classnames"
+import ReactPlayer from "react-player"
 
 import Attachments from "@components/AttachmentsGrid"
 import TimeAgo from "@components/TimeAgo"
 import Image from "@components/Image"
 import StickerRender from "@components/StickerRender"
-import { processString } from "@utils"
 
 import LinkPreview from "./LinkPreview"
 
@@ -14,24 +14,37 @@ import "./Line.less"
 
 const messageRegexs = [
 	{
-		regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
-		fn: (key, result) => {
+		regex: /(?:https?:)?(?:\/\/)?(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/,
+		fn: (result) => {
 			return (
-				<LinkPreview
-					url={result[1]}
-					key={key}
+				<ReactPlayer
+					width="100%"
+					height="100%"
+					style={{
+						aspectRatio: "16/9",
+						minHeight: "300px",
+						borderRadius: "12px",
+						overflow: "hidden",
+					}}
+					url={result[0]}
+					controls
 				/>
 			)
 		},
 	},
 	{
+		regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
+		fn: (result) => {
+			return <LinkPreview url={result[1]} />
+		},
+	},
+	{
 		regex: /(@[a-zA-Z0-9_]+)/gi,
-		fn: (key, result) => {
+		fn: (result) => {
 			return (
 				<a
-					key={key}
 					onClick={() =>
-						window.app.location.push(`/@${result[1].substr(1)}`)
+						app.navigation.goToAccount(result[1].substr(1))
 					}
 				>
 					{result[1]}
@@ -41,11 +54,39 @@ const messageRegexs = [
 	},
 ]
 
-const Line = React.memo(({ data, headless }) => {
-	const processedMessage = React.useMemo(() => {
-		return processString(messageRegexs)(data.message ?? "")
-	}, [data.message])
+const RenderMessage = ({ messageStr }) => {
+	const regexs = React.useMemo(() => {
+		if (!messageRegexs) {
+			return []
+		}
 
+		return messageRegexs
+			.map((option) => {
+				const result = option.regex.exec(messageStr)
+
+				if (!result) {
+					return null
+				}
+
+				return {
+					result: result,
+					regex: option.regex,
+					fn: option.fn,
+				}
+			})
+			.filter((item) => item !== null)
+	}, [])
+
+	const firstMatch = regexs[0]
+
+	if (firstMatch && typeof firstMatch.fn === "function") {
+		return firstMatch.fn(firstMatch.result)
+	}
+
+	return <p>{messageStr}</p>
+}
+
+const Line = React.memo(({ data, headless }) => {
 	return (
 		<div
 			data-message-id={data._id}
@@ -85,12 +126,15 @@ const Line = React.memo(({ data, headless }) => {
 						</div>
 					</div>
 				)}
-				<div
-					className="channel-chat__timeline__line__content__body"
-					id="message-content"
-				>
-					<p>{processedMessage}</p>
-				</div>
+
+				{data.message && (
+					<div
+						className="channel-chat__timeline__line__content__body"
+						id="message-content"
+					>
+						<RenderMessage messageStr={data.message} />
+					</div>
+				)}
 
 				{data.attachments && data.attachments.length > 0 && (
 					<Attachments

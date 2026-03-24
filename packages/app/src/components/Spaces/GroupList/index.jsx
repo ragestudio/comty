@@ -9,9 +9,35 @@ import GroupListItem from "../GroupListItem"
 import "./index.less"
 
 const GroupsList = ({ onClickItem, onClickCreateNew, selected }) => {
-	const [L_Groups, R_Groups, E_Groups] = app.cores.api.useRequest(
+	const [L_Groups, R_Groups, E_Groups, M_Groups] = app.cores.api.useRequest(
 		GroupsModel.getMy,
 	)
+
+	const handleMembershipCreated = (data) => {
+		console.debug("groups:membership:created", data)
+		M_Groups()
+	}
+
+	const handleMembershipDeleted = (data) => {
+		console.debug("groups:membership:deleted", data)
+		M_Groups()
+	}
+
+	React.useEffect(() => {
+		const socket = app.cores.api.socket()
+
+		if (socket) {
+			socket.on("groups:membership:created", handleMembershipCreated)
+			socket.on("groups:membership:deleted", handleMembershipDeleted)
+		}
+
+		return () => {
+			if (socket) {
+				socket.off("groups:membership:created", handleMembershipCreated)
+				socket.off("groups:membership:deleted", handleMembershipDeleted)
+			}
+		}
+	}, [])
 
 	if (E_Groups) {
 		return (

@@ -151,16 +151,22 @@ export default class Self {
 			this.micStream.getTracks().forEach((track) => track.stop())
 		}
 
-		this.micStream = await navigator.mediaDevices.getUserMedia({
+		const params = {
 			audio: {
-				deviceId: Self.inputDeviceId,
+				deviceId: {
+					exact: Self.inputDeviceId,
+				},
 				echoCancellation: this.audioSettings.echoCancellation,
 				noiseSuppression: this.audioSettings.noiseSuppression,
 				//autoGainControl: this.audioSettings.autoGainControl,
 				sampleRate: 44100,
 				channelCount: 1,
 			},
-		})
+		}
+
+		this.core.console.debug("Creating mic stream", params)
+
+		this.micStream = await navigator.mediaDevices.getUserMedia(params)
 
 		this.audioInput = new AudioProcessor(this, {
 			stream: this.micStream,

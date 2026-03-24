@@ -20,6 +20,7 @@ export default async function (groupId, channelId) {
 		mediaCodecs: this.constructor.allowedMediaCodecs,
 		webrtcServer: this.webrtcServer,
 		worker: this.worker,
+		controller: this,
 	})
 
 	// initialize the channel instance

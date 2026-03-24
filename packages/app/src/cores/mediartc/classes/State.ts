@@ -17,6 +17,7 @@ export interface MediaRTCStateType {
 	recvTransportState: string
 	sendTransportState: string
 	status?: string
+	connectedAt?: Date
 }
 
 export default class MediaRTCState {
@@ -36,6 +37,7 @@ export default class MediaRTCState {
 		speakingConsumers: [],
 		recvTransportState: "closed",
 		sendTransportState: "closed",
+		connectedAt: null,
 	}
 
 	state: MediaRTCStateType

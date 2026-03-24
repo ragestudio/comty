@@ -64,7 +64,7 @@ async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 		}
 	} catch (error) {
 		console.error(
-			`Error creating WebRTC transport for ${client.userId}:`,
+			`[CHANNEL:${this.channelId}] Error creating WebRTC transport for ${client.userId}:`,
 			error,
 		)
 		throw error

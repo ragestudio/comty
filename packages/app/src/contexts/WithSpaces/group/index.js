@@ -10,6 +10,9 @@ import onClientVoiceChannelLeftEvent from "./events/clientVoiceChannelLeft"
 import onClientVoiceChannelProducerOpenEvent from "./events/clientVoiceChannelProducerOpen"
 import onClientVoiceChannelProducerCloseEvent from "./events/clientVoiceChannelProducerClose"
 
+import onVoiceChannelStated from "./events/voiceChannelStated"
+import onVoiceChannelEnded from "./events/voiceChannelEnd"
+
 const VALID_CHANNEL_KINDS = ["chat", "voice"]
 
 const getInitialMembersState = () => ({
@@ -99,6 +102,10 @@ const useGroup = ({ group_id }) => {
 
 				if (currentStateChannel.producers) {
 					channel.producers = currentStateChannel.producers
+				}
+
+				if (currentStateChannel.started_at) {
+					channel.started_at = currentStateChannel.started_at
 				}
 			}
 
@@ -195,96 +202,69 @@ const useGroup = ({ group_id }) => {
 
 		loadInitialData()
 
-		const handleUserOnline = (payload) =>
-			onUserOnlineEvent(dataRef.current, setConnectedMembers, payload)
-		const handleUserOffline = (payload) =>
-			onUserOfflineEvent(dataRef.current, setConnectedMembers, payload)
+		const events = {
+			[`group:${group_id}:vc:started`]: (payload) =>
+				onVoiceChannelStated(dataRef.current, setChannels, payload),
+			[`group:${group_id}:vc:ended`]: (payload) =>
+				onVoiceChannelEnded(dataRef.current, setChannels, payload),
 
-		const handleClientVoiceChannelJoin = (payload) =>
-			onClientVoiceChannelJoinEvent(dataRef.current, setChannels, payload)
-		const handleClientVoiceChannelLeave = (payload) =>
-			onClientVoiceChannelLeftEvent(dataRef.current, setChannels, payload)
-		const handleClientVoiceChannelEvent = (payload) =>
-			onClientEvent(dataRef.current, payload, setChannels)
-		const handleClientVoiceChannelProducerOpen = (payload) =>
-			onClientVoiceChannelProducerOpenEvent(
-				dataRef.current,
-				setChannels,
-				payload,
-			)
-		const handleClientVoiceChannelProducerClose = (payload) =>
-			onClientVoiceChannelProducerCloseEvent(
-				dataRef.current,
-				setChannels,
-				payload,
-			)
+			[`group:${group_id}:client:vc:join`]: (payload) =>
+				onClientVoiceChannelJoinEvent(
+					dataRef.current,
+					setChannels,
+					payload,
+				),
+			[`group:${group_id}:client:vc:left`]: (payload) =>
+				onClientVoiceChannelLeftEvent(
+					dataRef.current,
+					setChannels,
+					payload,
+				),
+			[`group:${group_id}:client:vc:event`]: (payload) =>
+				onClientEvent(dataRef.current, payload, setChannels),
+			[`group:${group_id}:client:vc:producer:open`]: (payload) =>
+				onClientVoiceChannelProducerOpenEvent(
+					dataRef.current,
+					setChannels,
+					payload,
+				),
+			[`group:${group_id}:client:vc:producer:close`]: (payload) =>
+				onClientVoiceChannelProducerCloseEvent(
+					dataRef.current,
+					setChannels,
+					payload,
+				),
+			[`group:${group_id}:user:online`]: (payload) =>
+				onUserOnlineEvent(
+					dataRef.current,
+					setConnectedMembers,
+					payload,
+				),
+			[`group:${group_id}:user:offline`]: (payload) =>
+				onUserOfflineEvent(
+					dataRef.current,
+					setConnectedMembers,
+					payload,
+				),
+		}
 
 		if (socket.current) {
-			//socket.current.emit("group:subscribe", group_id)
 			socket.current.topics.subscribe("group:subscribe", group_id)
 
-			socket.current.on(
-				`group:${group_id}:client:vc:join`,
-				handleClientVoiceChannelJoin,
-			)
-			socket.current.on(
-				`group:${group_id}:client:vc:left`,
-				handleClientVoiceChannelLeave,
-			)
-			socket.current.on(
-				`group:${group_id}:client:vc:event`,
-				handleClientVoiceChannelEvent,
-			)
-			socket.current.on(
-				`group:${group_id}:client:vc:producer:open`,
-				handleClientVoiceChannelProducerOpen,
-			)
-			socket.current.on(
-				`group:${group_id}:client:vc:producer:close`,
-				handleClientVoiceChannelProducerClose,
-			)
-			socket.current.on(`group:${group_id}:user:online`, handleUserOnline)
-			socket.current.on(
-				`group:${group_id}:user:offline`,
-				handleUserOffline,
-			)
+			for (const [event, handler] of Object.entries(events)) {
+				socket.current.on(event, handler)
+			}
 		}
 
 		return () => {
 			isActive = false
 
 			if (socket.current) {
-				//socket.current.emit("group:unsubscribe", group_id)
 				socket.current.topics.subscribe("group:unsubscribe", group_id)
 
-				socket.current.off(
-					`group:${group_id}:client:vc:join`,
-					handleClientVoiceChannelJoin,
-				)
-				socket.current.off(
-					`group:${group_id}:client:vc:left`,
-					handleClientVoiceChannelLeave,
-				)
-				socket.current.off(
-					`group:${group_id}:client:vc:event`,
-					handleClientVoiceChannelEvent,
-				)
-				socket.current.off(
-					`group:${group_id}:client:vc:producer:open`,
-					handleClientVoiceChannelProducerOpen,
-				)
-				socket.current.off(
-					`group:${group_id}:client:vc:producer:close`,
-					handleClientVoiceChannelProducerClose,
-				)
-				socket.current.off(
-					`group:${group_id}:user:online`,
-					handleUserOnline,
-				)
-				socket.current.off(
-					`group:${group_id}:user:offline`,
-					handleUserOffline,
-				)
+				for (const [event, handler] of Object.entries(events)) {
+					socket.current.off(event, handler)
+				}
 			}
 		}
 	}, [group_id, loadChannelsStates])

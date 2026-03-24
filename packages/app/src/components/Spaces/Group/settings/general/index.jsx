@@ -1,5 +1,6 @@
 import React from "react"
 import { Input } from "antd"
+
 import Button from "@ui/Button"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
@@ -37,6 +38,21 @@ const GeneralSettings = () => {
 	const submit = async () => {
 		console.log("submit", values)
 		await GroupsModel.modify(group?.data?._id, values)
+	}
+
+	const handleDeleteGroup = async () => {
+		app.layout.modal.confirm({
+			onConfirm: async () => {
+				await GroupsModel.delete(group?.data?._id)
+
+				app.cores.notifications.new({
+					title: "Group deleted",
+					description: "This group has been deleted permanently",
+				})
+
+				app.location.push("/spaces")
+			},
+		})
 	}
 
 	return (
@@ -79,6 +95,15 @@ const GeneralSettings = () => {
 						updateSetting("description", e.target.value)
 					}}
 				/>
+			</div>
+
+			<div className="group-settings-panel__fields__field">
+				<Button
+					type="danger"
+					onClick={handleDeleteGroup}
+				>
+					Delete
+				</Button>
 			</div>
 		</div>
 	)
