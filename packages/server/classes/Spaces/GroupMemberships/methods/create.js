@@ -24,5 +24,23 @@ export default async function (group_id, user_id) {
 
 	await membership.saveAsync()
 
+	if (global.websockets && membership.user_id) {
+		try {
+			global.websockets.senders.toUserId(
+				user_id,
+				"groups:membership:created",
+				{
+					membership_id: membership._id,
+					group_id: group_id,
+				},
+			)
+		} catch (error) {
+			console.error(
+				"Failed to send (groups:membership:created) to user",
+				error,
+			)
+		}
+	}
+
 	return membership.toJSON()
 }

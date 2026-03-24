@@ -10,11 +10,12 @@ export default async function (group) {
 	const memberships = await GroupMemberships.getByGroupId(group._id)
 
 	for (const membership of memberships) {
-		await membership.deleteAsync()
+		await GroupMemberships.delete(membership._id, group._id, group)
+		//await membership.deleteAsync()
 	}
 
 	// delete the channels
-	const channels = await GroupChannels.getByGroupId(group)
+	const channels = await GroupChannels.getAllByGroupId(group)
 
 	for (const channel of channels) {
 		await channel.deleteAsync()
