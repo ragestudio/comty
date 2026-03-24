@@ -6,7 +6,6 @@ import Slider from "@ui/Slider"
 
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
-import useMediaRTCState from "@hooks/useMediaRTCState"
 import { useStreamVolumePersistence } from "@hooks/useStreamVolumePersistence"
 
 import "./index.less"
