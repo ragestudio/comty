@@ -18,7 +18,7 @@ const messageRegexs = [
 		fn: (result) => {
 			return (
 				<ReactPlayer
-					width="100%"
+					width="50%"
 					height="100%"
 					style={{
 						aspectRatio: "16/9",

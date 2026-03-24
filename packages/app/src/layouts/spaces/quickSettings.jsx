@@ -1,6 +1,3 @@
-import React from "react"
-import { motion } from "motion/react"
-import classNames from "classnames"
 import { Icons } from "@components/Icons"
 
 import SettingsTab from "@pages/settings/components/SettingTab"

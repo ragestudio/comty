@@ -12,7 +12,6 @@ import {
 	ContentPanelHeader,
 	ContentPanelRender,
 } from "@components/Spaces/Group/ContentPanel"
-
 import useTitle from "@hooks/useTitle"
 import useMediaRTCState from "@hooks/useMediaRTCState"
 
@@ -147,6 +146,7 @@ const GroupPage = (props) => {
 						className="spaces-page__rightbar"
 						defaultSize={300}
 						min={300}
+						collapsible
 					>
 						<MembersPanel />
 
