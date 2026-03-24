@@ -23,7 +23,8 @@ button {
 	// TODO: use global-wide var for transition parameters
 	// instead of a fixed one
 	transition-property:
-		filter, background-color, border-color, outline, border, opacity;
+		width, height, filter, background-color, border-color, outline, border,
+		opacity;
 	transition-duration: 150ms;
 	transition-timing-function: ease-in-out;
 
@@ -62,5 +63,35 @@ button {
 	// reactivity feedback for hover state
 	&:hover:not(:disabled) {
 		filter: brightness(1.2);
+	}
+
+	.button-icon {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		width: 16px;
+		height: 16px;
+
+		.button-icon-spinner {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+			justify-content: center;
+
+			width: 100%;
+			height: 100%;
+
+			svg {
+				stroke-width: 2px;
+			}
+		}
+	}
+
+	&.only-icon {
+		padding: 6px 13px;
 	}
 }
