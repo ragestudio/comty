@@ -35,9 +35,11 @@ export default async function (ctx) {
 		if (currentUserChannel) {
 			const channel = this.instances.get(currentUserChannel)
 
-			await channel.leaveClient({
-				userId: userId,
-			})
+			if (channel && channel.leaveClient) {
+				await channel.leaveClient({
+					userId: userId,
+				})
+			}
 		}
 	} catch (error) {
 		console.error("Error handling user disconnection:", error)
