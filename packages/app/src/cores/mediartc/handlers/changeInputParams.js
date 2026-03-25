@@ -7,16 +7,7 @@ export default async function (payload) {
 		this.console.debug("updating input device")
 
 		app.cores.settings.set("mediartc:input_device", payload.deviceId)
-
-		if (this.self.micStream) {
-			await this.self.destroyMicStream()
-			await this.self.createMicStream()
-		}
-
-		if (this.self.micProducer) {
-			await this.self.stopMicProducer()
-			await this.self.startMicProducer()
-		}
+		await this.self.restartMic()
 
 		return true
 	}

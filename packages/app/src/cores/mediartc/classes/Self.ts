@@ -4,6 +4,8 @@ import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
 
+import type { ProducerData } from "./Producers"
+
 type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
 	framerate?: number
@@ -21,15 +23,15 @@ export default class Self {
 
 	core: MediaRTC
 
-	micStream = null
-	micProducer = null
+	micStream: MediaStream = null
+	micProducer: ProducerData = null
 
-	camStream = null
-	camProducer = null
+	camStream: MediaStream = null
+	camProducer: ProducerData = null
 
-	screenStream = null
-	screenProducer = null
-	screenAudioProducer = null
+	screenStream: MediaStream = null
+	screenProducer: ProducerData = null
+	screenAudioProducer: ProducerData = null
 
 	audioInput = null
 	audioOutput =
@@ -55,15 +57,13 @@ export default class Self {
 
 	get audioSettings() {
 		return {
+			noiseSuppression:
+				app.cores.settings.get("mediartc:noiseSuppression") ?? "native",
 			echoCancellation:
 				app.cores.settings.get("mediartc:echoCancellation") ?? true,
-			noiseSuppression:
-				app.cores.settings.get("mediartc:noiseSuppression") ?? true,
-			autoGainControl:
-				app.cores.settings.get("mediartc:audioGainControl") ?? true,
-			volume: app.cores.settings.get("mediartc:audioVolume") ?? 1.0,
-			noiseGateThreshold:
-				app.cores.settings.get("mediartc:noiseGateThreshold") ?? "-40",
+			autoGain: app.cores.settings.get("mediartc:autoGain") ?? false,
+			volumeGateThreshold:
+				app.cores.settings.get("mediartc:volumeGateThreshold") ?? "-40",
 			inputGain: app.cores.settings.get("mediartc:inputGain") ?? "1.0",
 			outputGain: app.cores.settings.get("mediartc:outputGain") ?? "1.0",
 		}
@@ -74,19 +74,24 @@ export default class Self {
 			return
 		}
 
+		let shouldRestartMic = false
+
 		for (const [key, value] of Object.entries(update)) {
 			this.core.console.log("setting audio setting", key, value)
 
-			if (key === "noiseGateThreshold") {
-				const thresholdParameter = app.cores.mediartc
-					.instance()
-					.self.audioInput.noiseGateProccesor.parameters.get(
+			if (key === "volumeGateThreshold") {
+				app.cores.settings.set("mediartc:volumeGateThreshold", value)
+
+				if (this.audioInput?.volumeGateProcessor) {
+					this.audioInput.volumeGateProcessor.parameters.get(
 						"threshold",
-					)
-				thresholdParameter.value = value
+					).value = value
+				}
 			}
 
 			if (key === "inputGain") {
+				app.cores.settings.set("mediartc:inputGain", value)
+
 				const inputGainParameter =
 					app.cores.mediartc.instance().self.audioInput.mainNode.gain
 
@@ -94,6 +99,8 @@ export default class Self {
 			}
 
 			if (key === "outputGain") {
+				app.cores.settings.set("mediartc:outputGain", value)
+
 				const outputGainParameter =
 					app.cores.mediartc.instance().self.audioOutput.mainNode.gain
 
@@ -101,22 +108,30 @@ export default class Self {
 			}
 
 			if (key === "echoCancellation") {
+				app.cores.settings.set("mediartc:echoCancellation", value)
+
 				this.updateMicStreamConstraints({
 					echoCancellation: value,
 				})
 			}
 
-			if (key === "noiseSuppression") {
-				this.updateMicStreamConstraints({
-					noiseSuppression: value,
-				})
-			}
-
 			if (key === "autoGainControl") {
+				app.cores.settings.set("mediartc:autoGainControl", value)
+
 				this.updateMicStreamConstraints({
 					autoGainControl: value,
 				})
 			}
+
+			if (key === "noiseSuppression") {
+				app.cores.settings.set("mediartc:noiseSuppression", value)
+
+				shouldRestartMic = true
+			}
+		}
+
+		if (shouldRestartMic) {
+			this.restartMic()
 		}
 	}
 
@@ -126,6 +141,37 @@ export default class Self {
 
 	static get outputDeviceId() {
 		return app.cores.settings.get("mediartc:output_device")
+	}
+
+	async restartMic() {
+		if (this.micStream) {
+			await this.destroyMicStream()
+			await this.createMicStream()
+		}
+
+		if (this.micProducer) {
+			await this.stopMicProducer()
+			await this.startMicProducer()
+		}
+	}
+
+	async changeMicOutgoingBitrate(bitrate: number) {
+		if (!this.micProducer) {
+			this.core.console.warn(
+				"Cannot change mic outgoing bitrate due is no currently producing",
+			)
+			return null
+		}
+
+		const parameters = this.micProducer.rtpSender.getParameters()
+
+		if (!parameters.encodings || parameters.encodings.length === 0) {
+			return
+		}
+
+		parameters.encodings[0].maxBitrate = bitrate
+
+		return await this.micProducer.rtpSender.setParameters(parameters)
 	}
 
 	async updateMicStreamConstraints(constraints = {}) {
@@ -157,24 +203,30 @@ export default class Self {
 					exact: Self.inputDeviceId,
 				},
 				echoCancellation: this.audioSettings.echoCancellation,
-				noiseSuppression: this.audioSettings.noiseSuppression,
-				//autoGainControl: this.audioSettings.autoGainControl,
-				sampleRate: 44100,
+				noiseSuppression:
+					this.audioSettings.noiseSuppression === "native",
+				autoGainControl: this.audioSettings.autoGain,
+				sampleRate: 48000,
 				channelCount: 1,
 			},
 		}
 
-		this.core.console.debug("Creating mic stream", params)
+		this.core.console.debug("Creating mic stream", {
+			params,
+			audioSettings: this.audioSettings,
+		})
 
 		this.micStream = await navigator.mediaDevices.getUserMedia(params)
 
 		this.audioInput = new AudioProcessor(this, {
+			channelCount: 1,
 			stream: this.micStream,
-			noiseGate: {
-				threshold: this.audioSettings.noiseGateThreshold,
+			volumeGate: {
+				threshold: this.audioSettings.volumeGateThreshold,
 				attack: 0.08,
 				release: 0.04,
 			},
+			noiseSupression: this.audioSettings.noiseSuppression === "rnn",
 		})
 
 		if (this.audioOutput) {
@@ -275,7 +327,7 @@ export default class Self {
 			video: {
 				width: { max: options.resolution?.width ?? 1920 },
 				height: { max: options.resolution?.height ?? 1080 },
-				frameRate: { max: options.framerate ?? 60 },
+				frameRate: { max: options.framerate ?? 30 },
 			},
 			//@ts-ignore
 			systemAudio: "include",

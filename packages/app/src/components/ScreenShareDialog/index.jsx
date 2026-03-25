@@ -10,7 +10,7 @@ const ScreenShareDialog = ({ close }) => {
 		() => app.cores.mediartc.vars(),
 		[],
 	)
-	const [resolution, setResolution] = React.useState(resolutionsList[0].value)
+	const [resolution, setResolution] = React.useState(resolutionsList[1].value)
 	const [framerate, setFramerate] = React.useState(frameratesList[2].value)
 	const [systemAudio, setSystemAudio] = React.useState(!!app.isDesktop)
 

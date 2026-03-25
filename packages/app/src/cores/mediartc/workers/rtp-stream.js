@@ -1,7 +1,7 @@
 const states = new Map()
 
 const PACKET_TIME_THRESHOLD = 200
-const DTX_BYTES_THRESHOLD = 100
+const DTX_BYTES_THRESHOLD = 12
 const DEBOUNCE_TICK_RATE = 100
 
 setInterval(() => {
@@ -30,6 +30,7 @@ onmessage = async (event) => {
 		type: type,
 		isSpeaking: false,
 		lastPacketTime: 0,
+		thresholdHitCount: 0,
 	})
 
 	try {
@@ -40,15 +41,18 @@ onmessage = async (event) => {
 				break
 			}
 
+			const state = states.get(id)
+
 			if (value.data.byteLength > DTX_BYTES_THRESHOLD) {
-				const state = states.get(id)
-
 				state.lastPacketTime = Date.now()
+				state.thresholdHitCount++
 
-				if (!state.isSpeaking) {
+				if (!state.isSpeaking && state.thresholdHitCount > 2) {
 					state.isSpeaking = true
 					postMessage(state)
 				}
+			} else {
+				state.thresholdHitCount = 0
 			}
 
 			writer.write(value)
