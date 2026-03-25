@@ -3,7 +3,7 @@ import classnames from "classnames"
 
 import "./index.less"
 
-const GroupListItem = ({ group, onClick, selected }) => {
+const GroupListItem = ({ ref, group, onClick, selected }) => {
 	const handleClick = () => {
 		if (typeof onClick === "function") {
 			onClick(group)
@@ -12,6 +12,7 @@ const GroupListItem = ({ group, onClick, selected }) => {
 
 	return (
 		<div
+			ref={ref}
 			className={classnames("group-list__item", "bg-accent", {
 				["selected"]: selected,
 			})}
