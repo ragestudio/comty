@@ -30,6 +30,8 @@ export default class MediaChannel {
 			parameters: {
 				useinbandfec: 1,
 				usedtx: 1,
+				minptime: 10,
+				maxplaybackrate: 48000,
 			},
 			headerExtensions: [
 				{
