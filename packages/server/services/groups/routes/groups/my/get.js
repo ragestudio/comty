@@ -6,9 +6,35 @@ export default {
 		// TODO: implement pagination
 		//const { limit, offset } = req.query
 
-		const groups = await Groups.getManyByJoinedUserId(
+		let groups = await Groups.getManyByJoinedUserId(
 			req.auth.session.user_id,
 		)
+
+		if (groups.toJSON) {
+			groups = groups.toJSON()
+		}
+
+		const sorted = await Groups.sortModel
+			.findOneAsync(
+				{
+					user_id: req.auth.session.user_id,
+				},
+				{
+					raw: true,
+				},
+			)
+			.catch(() => null)
+
+		if (sorted) {
+			if (Array.isArray(sorted.order)) {
+				groups = groups.sort((a, b) => {
+					return (
+						sorted.order.indexOf(a._id) -
+						sorted.order.indexOf(b._id)
+					)
+				})
+			}
+		}
 
 		return {
 			items: groups,

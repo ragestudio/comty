@@ -1,0 +1,44 @@
+.setting-rtc-volume-gate {
+	.slider-track {
+		height: 10px;
+		border-radius: 12px;
+	}
+}
+
+.setting-rtc-volume-gate__indicator {
+	--rms: 0;
+	--threshold: 0;
+
+	width: 100%;
+	height: 10px;
+	background-color: var(--background-color-primary);
+	position: relative;
+
+	border-radius: 12px;
+	overflow: hidden;
+
+	&__level {
+		height: 100%;
+		width: var(--rms);
+		background-color: var(--text-color);
+
+		transition: width ease-in 20ms;
+
+		border-radius: 0 4px 4px 0;
+	}
+
+	&::after {
+		content: "";
+		z-index: 1;
+		position: absolute;
+
+		top: 0;
+		left: var(--threshold);
+
+		width: 2px;
+		height: 100%;
+
+		background-color: red;
+		transform: translateX(-50%);
+	}
+}

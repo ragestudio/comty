@@ -1,19 +1,11 @@
 import MediaRTC from "../mediartc.core"
+import { types as mediasoup } from "mediasoup-client"
 
-interface ProducerData {
+export interface ProducerData extends mediasoup.Producer {
 	id: string
 	producerId: string
-	userId: string
-	kind: string
-	appData: {
-		mediaTag: string
-	}
 	remote?: boolean
 	self?: boolean
-	observer?: any
-	rtpSender?: any
-	on?: (event: string, callback: Function) => void
-	close?: () => void
 }
 
 export default class Producers extends Map<string, ProducerData> {

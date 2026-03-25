@@ -6,7 +6,7 @@ function getAlphaFromTimeConstant(timeConstant, sampleRate) {
 	return Math.exp(-1 / (sampleRate * timeConstant))
 }
 
-class NoiseGateProcessor extends AudioWorkletProcessor {
+class VolumeGateProcessor extends AudioWorkletProcessor {
 	constructor(options) {
 		super()
 
@@ -96,4 +96,4 @@ class NoiseGateProcessor extends AudioWorkletProcessor {
 	}
 }
 
-registerProcessor("noisegate", NoiseGateProcessor)
+registerProcessor("volume-gate", VolumeGateProcessor)

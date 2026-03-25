@@ -1,6 +1,6 @@
 export default {
 	audioEncodingParams: {
-		maxBitrate: 98000,
+		maxBitrate: 32000,
 		priority: "high",
 		networkPriority: "high",
 		dtx: true,
@@ -12,7 +12,7 @@ export default {
 		networkPriority: "high",
 	},
 	screenAudioEncodingParams: {
-		maxBitrate: 320000,
+		maxBitrate: 128000,
 		priority: "high",
 		networkPriority: "high",
 	},

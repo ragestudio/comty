@@ -5,10 +5,14 @@ import createMethod from "./methods/create"
 import updateMethod from "./methods/update"
 import deleteMethod from "./methods/delete"
 import canUserIdReachMethod from "./methods/canUserIdReach"
+import sortMerthod from "./methods/sort"
 
 export default class Groups {
 	static get model() {
 		return global.scylla.model("groups")
+	}
+	static get sortModel() {
+		return global.scylla.model("groups_user_orders")
 	}
 	static get inviteKeyModel() {
 		return global.scylla.model("group_invite_key")
@@ -23,4 +27,5 @@ export default class Groups {
 	static delete = deleteMethod.bind(this)
 
 	static canUserIdReach = canUserIdReachMethod.bind(this)
+	static sort = sortMerthod.bind(this)
 }

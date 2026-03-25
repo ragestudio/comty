@@ -95,14 +95,27 @@
 	background-color: var(--background-color-primary) !important;
 	color: var(--text-color) !important;
 
+	backdrop-filter: blur(5px);
+	border: 1px solid var(--border-color);
+
 	.ant-select-item-option:not(.ant-select-item-option-disabled) {
-		background-color: var(--background-color-primary) !important;
+		background-color: transparent !important;
 		color: var(--text-color) !important;
+
+		&:hover {
+			background-color: var(--background-color-primary-2) !important;
+		}
 	}
 
 	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
 		background-color: var(--background-color-primary-2) !important;
 		color: var(--text-color) !important;
+	}
+
+	.ant-select-item-option-disabled {
+		background-color: transparent !important;
+		color: var(--border-color) !important;
+		filter: brightness(0.7) !important;
 	}
 }
 

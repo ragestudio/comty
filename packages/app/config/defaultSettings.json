@@ -17,5 +17,9 @@
 	"style:darkmode": false,
 	"style:auto_darkmode": true,
 	"player.compressor": false,
-	"mediartc:soundpad:volume": 0.2
+
+	"mediartc:soundpad:volume": 0.2,
+	"mediartc:noiseSuppression": "native",
+	"mediartc:autoGain": false,
+	"mediartc:echoCancellation": true
 }

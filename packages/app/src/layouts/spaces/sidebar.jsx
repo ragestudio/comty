@@ -56,6 +56,7 @@ const SpacesSidebar = () => {
 						selected={type === "group" ? room : null}
 						onClickItem={onClickGroupListItem}
 						onClickCreateNew={onClickCreateNewGroup}
+						sortable
 					/>
 				</div>
 
