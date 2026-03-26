@@ -16,4 +16,6 @@ export interface Group {
 	members: Members
 
 	connected_members?: string[]
+
+	cached_at?: number
 }

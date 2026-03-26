@@ -11,4 +11,6 @@ export interface Message {
 
 	updated_at: Date
 	created_at: Date
+
+	cached_at?: number
 }

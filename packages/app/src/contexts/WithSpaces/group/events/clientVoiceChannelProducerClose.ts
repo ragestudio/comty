@@ -1,5 +1,4 @@
 import { EventsUpdaters } from ".."
-import { Group } from "../../collections/group"
 
 export interface ClientVoiceChannelProducerClosePayload {
 	channelId: string
@@ -10,29 +9,19 @@ export interface ClientVoiceChannelProducerClosePayload {
 }
 
 export default (
-	group: Group,
+	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: ClientVoiceChannelProducerClosePayload,
 ): void => {
-	updaters.setChannels((prev) => {
-		const channels = prev.items.map((channel) => {
-			if (!channel.producers) {
-				channel.producers = []
-			}
-
-			// update the clients of the channel
-			if (channel._id === payload.channelId) {
-				channel.producers = channel.producers.filter(
-					(producer) => producer.id !== payload.producer.id,
-				)
-			}
-
-			return channel
-		})
-
-		return {
-			...prev,
-			items: channels,
+	updaters.setStatedChannels((prev) => {
+		if (!prev[payload.channelId]) {
+			return prev
 		}
+
+		prev[payload.channelId].producers = prev[
+			payload.channelId
+		].producers.filter((producer) => producer.id !== payload.producer.id)
+
+		return prev
 	})
 }

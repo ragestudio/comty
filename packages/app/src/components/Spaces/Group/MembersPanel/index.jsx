@@ -181,7 +181,7 @@ const MembersPanel = () => {
 	const group = React.useContext(GroupContext)
 
 	const { online, offline } = React.useMemo(() => {
-		const list = group?.members?.list || []
+		const list = group?.members?.items || []
 		const connectedIds = group?.connectedMembers || []
 
 		const connectedSet = new Set(connectedIds)
@@ -210,7 +210,7 @@ const MembersPanel = () => {
 		}
 
 		return { online: onlineList, offline: offlineList }
-	}, [group?.members?.list, group?.connectedMembers])
+	}, [group?.members?.items, group?.connectedMembers])
 
 	return (
 		<div className="group-page__members-panel">
@@ -219,15 +219,15 @@ const MembersPanel = () => {
 					<Icons.UsersRound /> Members
 				</h3>
 				<span className="group-page__members-panel__header__members-count">
-					{group?.members?.total ?? 0}
+					{group?.members?.total_items ?? 0}
 				</span>
 			</div>
 
-			{(group?.loading || !group?.members?.list) && <Skeleton />}
+			{(group?.loading || !group?.members?.items) && <Skeleton />}
 
-			{!group?.loading && group?.members?.list && (
+			{!group?.loading && group?.members?.items && (
 				<LoadMore
-					hasMore={group?.members?.hasMore}
+					hasMore={group?.members?.has_hore}
 					loading={group.loading}
 					onBottom={group?.fetchMembers}
 					className="group-page__members-panel__list"

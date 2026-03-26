@@ -1,6 +1,3 @@
-import { RefObject } from "react"
-import { Group } from "../../collections/group"
-
 import clientEvent, { ClientEventPayload } from "./clientEvent"
 import clientVoiceChannelJoin, {
 	ClientVoiceChannelJoinPayload,
@@ -21,52 +18,53 @@ import voiceChannelStated, {
 	VoiceChannelStartedPayload,
 } from "./voiceChannelStated"
 import { EventsUpdaters } from ".."
+import membershipCreated, {
+	MemberchipCreatedPayload,
+} from "./membershipCreated"
+import membershipDeleted, {
+	MemberchipDeletedPayload,
+} from "./membershipDeleted"
 
 export default ({
 	group_id,
-	group_data_ref,
 	updaters,
 }: {
 	group_id: string
-	group_data_ref: RefObject<Group>
 	updaters: EventsUpdaters
 }) => {
 	return {
+		[`group:${group_id}:membership:created`]: (
+			payload: MemberchipCreatedPayload,
+		) => membershipCreated(group_id, updaters, payload),
+		[`group:${group_id}:membership:deleted`]: (
+			payload: MemberchipDeletedPayload,
+		) => membershipDeleted(group_id, updaters, payload),
+
 		[`group:${group_id}:vc:started`]: (
 			payload: VoiceChannelStartedPayload,
-		) => voiceChannelStated(group_data_ref.current, updaters, payload),
+		) => voiceChannelStated(group_id, updaters, payload),
 		[`group:${group_id}:vc:ended`]: (payload: VoiceChannelEndedPayload) =>
-			voiceChannelEnd(group_data_ref.current, updaters, payload),
+			voiceChannelEnd(group_id, updaters, payload),
 
 		[`group:${group_id}:client:vc:join`]: (
 			payload: ClientVoiceChannelJoinPayload,
-		) => clientVoiceChannelJoin(group_data_ref.current, updaters, payload),
+		) => clientVoiceChannelJoin(group_id, updaters, payload),
 		[`group:${group_id}:client:vc:left`]: (
 			payload: ClientVoiceChannelLeftPayload,
-		) => clientVoiceChannelLeft(group_data_ref.current, updaters, payload),
+		) => clientVoiceChannelLeft(group_id, updaters, payload),
 		[`group:${group_id}:client:vc:event`]: (payload: ClientEventPayload) =>
-			clientEvent(group_data_ref.current, updaters, payload),
+			clientEvent(group_id, updaters, payload),
 
 		[`group:${group_id}:client:vc:producer:open`]: (
 			payload: ClientVoiceChannelProducerOpenPayload,
-		) =>
-			clientVoiceChannelProducerOpen(
-				group_data_ref.current,
-				updaters,
-				payload,
-			),
+		) => clientVoiceChannelProducerOpen(group_id, updaters, payload),
 		[`group:${group_id}:client:vc:producer:close`]: (
 			payload: ClientVoiceChannelProducerClosePayload,
-		) =>
-			clientVoiceChannelProducerClose(
-				group_data_ref.current,
-				updaters,
-				payload,
-			),
+		) => clientVoiceChannelProducerClose(group_id, updaters, payload),
 
 		[`group:${group_id}:user:online`]: (payload: UserOnlinePayload) =>
-			userOnline(group_data_ref.current, updaters, payload),
+			userOnline(group_id, updaters, payload),
 		[`group:${group_id}:user:offline`]: (payload: UserOfflinePayload) =>
-			userOffline(group_data_ref.current, updaters, payload),
+			userOffline(group_id, updaters, payload),
 	}
 }

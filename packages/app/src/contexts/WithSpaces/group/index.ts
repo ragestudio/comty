@@ -3,20 +3,23 @@ import React from "react"
 import GroupsModel from "@models/groups"
 import buildSocketEvents from "./events"
 import loadChannelsStates from "../helpers/loadChannelsStates"
+import { cacheGroup, cacheChannels, cacheMembers } from "../helpers/cache"
 
-import { useLiveQuery } from "dexie-react-hooks"
 import db from "../store"
 
 import type { Group } from "../collections/group"
-import type { StatedChannels } from "../collections/channel"
+import type { Channels, StatedChannel } from "../collections/channel"
 import type { Members } from "../collections/member"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
 export interface EventsUpdaters {
-	setChannels: React.Dispatch<React.SetStateAction<StatedChannels>>
+	setChannels: React.Dispatch<React.SetStateAction<Channels>>
 	setMembers: React.Dispatch<React.SetStateAction<Members>>
 	setConnectedMembers: React.Dispatch<React.SetStateAction<string[]>>
+	setStatedChannels: React.Dispatch<
+		React.SetStateAction<Record<string, StatedChannel>>
+	>
 }
 
 const DEFAULT_CHANNELS_STATE = () => ({
@@ -59,43 +62,151 @@ const useGroup = ({ group_id }) => {
 	const [loading, setLoading] = React.useState<boolean>(true)
 	const [error, setError] = React.useState<Error | null>(null)
 
-	const [data, setData] = React.useState<Group | null>(DEFAULT_GROUP_STATE())
-	const [members, setMembers] = React.useState<Members>(
-		DEFAULT_MEMBERS_STATE(),
-	)
-	const [channels, setChannels] = React.useState<StatedChannels>(
-		DEFAULT_CHANNELS_STATE(),
-	)
+	const [data, setData] = React.useState<Group>(null)
+	const [members, setMembers] = React.useState<Members>(null)
+	const [channels, setChannels] = React.useState<Channels>(null)
 
+	const [statedChannels, setStatedChannels] = React.useState<
+		Record<string, StatedChannel>
+	>({})
 	const [connectedMembers, setConnectedMembers] = React.useState<string[]>([])
 
 	const lastLoadedMemberId = React.useRef<string | null>(null)
-	const dataRef = React.useRef<Group | null>(data)
 
-	// synchronize data with ref
-	React.useEffect(() => {
-		dataRef.current = data
-	}, [data])
+	const fetchGroup = React.useCallback(async () => {
+		const res = await GroupsModel.get(group_id)
 
-	const fetchMembers = React.useCallback(async (): Promise<void> => {
+		setData(res)
+		await cacheGroup(res)
+
+		return res
+	}, [group_id])
+
+	const fetchChannels = React.useCallback(async () => {
+		const res = await GroupsModel.channels.list(group_id)
+
+		setChannels(res)
+		await cacheChannels(group_id, res)
+
+		return res
+	}, [group_id])
+
+	const fetchMembers = React.useCallback(async () => {
 		try {
-			const result = await GroupsModel.members.list(group_id, {
+			const res = await GroupsModel.members.list(group_id, {
 				offset: lastLoadedMemberId.current,
 			})
 
-			if (result.items.length > 0) {
-				lastLoadedMemberId.current = result.items[0]._id
+			if (res.items.length > 0) {
+				lastLoadedMemberId.current = res.items[0]._id
 			}
 
-			setMembers((prev) => ({
-				items: [...prev.items, ...result.items],
-				total_items: result.total_items,
-				has_more: result.has_more,
-			}))
+			// update cache
+			setMembers(res)
+			await cacheMembers(group_id, res)
+
+			return res
 		} catch (err) {
 			console.error("Error fetching more members:", err)
 		}
 	}, [group_id])
+
+	const load = React.useCallback(async () => {
+		setLoading(true)
+		setError(null)
+
+		let cached = {
+			group: null,
+			members: null,
+			channels: null,
+		}
+
+		try {
+			cached.group = await db.groups.get(group_id)
+			cached.channels = await db.channels.get(group_id)
+			cached.members = await db.members.get(group_id)
+		} catch (error) {
+			console.error("Failed to get cached content", error)
+		}
+
+		console.log("useGroup::load()", {
+			group_id,
+			cached,
+		})
+
+		try {
+			//
+			// fetch the group data
+			//
+			if (!cached.group || !cached.group?.cached_at) {
+				console.time("group.get()")
+				cached.group = await fetchGroup()
+				console.timeEnd("group.get()")
+			} else {
+				setData(cached.group)
+			}
+
+			//
+			// fetch the members list
+			//
+			if (!cached.members || !cached.members?.cached_at) {
+				console.time("members.list()")
+				cached.members = await fetchMembers()
+				console.timeEnd("members.list()")
+			} else {
+				setMembers(cached.members)
+			}
+
+			//
+			// fetch the channels list
+			//
+			if (!cached.channels || !cached.channels?.cached_at) {
+				console.time("channels.list()")
+				cached.channels = await fetchChannels()
+				console.timeEnd("channels.list()")
+			} else {
+				setChannels(cached.channels)
+			}
+
+			//
+			// load group rtc state & update connected_members if available
+			//
+			console.time("getGroupState")
+			const groupState = await GroupsModel.rtc.getGroupState(group_id)
+
+			if (groupState?.connected_members) {
+				setConnectedMembers(groupState.connected_members)
+			}
+			if (groupState?.channels) {
+				setStatedChannels(
+					(groupState.channels as unknown as StatedChannel[]).reduce(
+						(curr, channel) => {
+							curr[channel._id] = channel
+							return curr
+						},
+						{},
+					),
+				)
+			}
+			console.timeEnd("getGroupState")
+
+			//
+			// load the channels states
+			//
+			// const _lo = await loadChannelsStates({
+			// 	groupState: groupState,
+			// 	channels: cached.channels,
+			// })
+
+			// cached.channels.items = _lo.items
+			// setChannels(cached.channels)
+		} catch (err) {
+			console.error(err)
+			setError(err as Error)
+		} finally {
+			setLoading(false)
+		}
+	}, [group_id, data, members, channels])
 
 	React.useEffect(() => {
 		if (error) {
@@ -108,109 +219,20 @@ const useGroup = ({ group_id }) => {
 	}, [error])
 
 	React.useEffect(() => {
+		console.log("useGroup | group_id changed", group_id)
+
 		if (!group_id) {
 			return undefined
 		}
 
-		let isActive = true
-
-		const loadInitialData = async (): Promise<void> => {
-			setLoading(true)
-			setError(null)
-			setData(null)
-			setMembers(DEFAULT_MEMBERS_STATE())
-			setChannels(DEFAULT_CHANNELS_STATE())
-			setConnectedMembers([])
-			lastLoadedMemberId.current = null
-
-			try {
-				//
-				// fetch the group data
-				//
-				const group = await GroupsModel.get(group_id)
-
-				if (!isActive) {
-					return
-				}
-
-				setData(group)
-
-				//
-				// load group rtc state & update connected_members if available
-				//
-				const groupState = await GroupsModel.rtc.getGroupState(group_id)
-
-				if (!isActive) {
-					return
-				}
-
-				if (groupState?.connected_members) {
-					setConnectedMembers(groupState.connected_members)
-				}
-
-				//
-				// fetch the members list
-				//
-				const membersResult = await GroupsModel.members.list(group_id, {
-					offset: null,
-				})
-
-				if (!isActive) {
-					return
-				}
-
-				if (membersResult.items.length > 0) {
-					lastLoadedMemberId.current = membersResult.items[0]._id
-				}
-
-				setMembers({
-					items: membersResult.items,
-					total_items: membersResult.total_items,
-					has_more: membersResult.has_more,
-				})
-
-				//
-				// fetch the channels list
-				//
-				let channelsList = await GroupsModel.channels.list(group._id)
-
-				if (!isActive) {
-					return
-				}
-
-				//
-				// load the channels states
-				//
-				const statedChannels = await loadChannelsStates({
-					groupState: groupState,
-					channels: channelsList,
-				})
-
-				if (!isActive) {
-					return
-				}
-
-				channelsList.items = statedChannels.items
-				setChannels(channelsList)
-			} catch (err) {
-				if (isActive) {
-					setError(err as Error)
-				}
-			} finally {
-				if (isActive) {
-					setLoading(false)
-				}
-			}
-		}
-
-		loadInitialData()
+		load()
 
 		const events = buildSocketEvents({
 			group_id: group_id,
-			group_data_ref: dataRef,
 			updaters: {
 				setChannels,
 				setMembers,
+				setStatedChannels,
 				setConnectedMembers,
 			},
 		})
@@ -224,7 +246,8 @@ const useGroup = ({ group_id }) => {
 		}
 
 		return () => {
-			isActive = false
+			setConnectedMembers([])
+			lastLoadedMemberId.current = null
 
 			if (socket.current) {
 				socket.current.topics.subscribe("group:unsubscribe", group_id)
@@ -234,16 +257,23 @@ const useGroup = ({ group_id }) => {
 				}
 			}
 		}
-	}, [group_id, loadChannelsStates])
+	}, [group_id])
 
 	return {
-		data,
-		channels,
-		members,
-		connectedMembers,
+		data: data,
+		channels: channels,
+		members: members,
+
+		statedChannels: statedChannels,
+		connectedMembers: connectedMembers,
+
 		loading,
 		error,
+
+		load,
 		fetchMembers,
+		fetchChannels,
+		fetchGroup,
 	}
 }
 

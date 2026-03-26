@@ -12,20 +12,21 @@ export interface Channel {
 	explicit: boolean
 
 	created_at: Date
+	cached_at?: number
 }
 
 export interface Channels {
+	group_id?: string
+	cached_at?: number
+
 	items: Channel[]
-	total_items: number
+	total_items?: number
 	has_more?: boolean
 }
 
-export interface StatedChannel extends Channel {
+export interface StatedChannel {
+	_id?: string
 	clients: Client[]
-	producers: Producer[]
-	started_at: string | Date | null
-}
-
-export interface StatedChannels extends Channels {
-	items: StatedChannel[]
+	producers?: Producer[]
+	started_at?: string | Date | null
 }

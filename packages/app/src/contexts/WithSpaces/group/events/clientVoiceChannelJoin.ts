@@ -1,5 +1,5 @@
 import { EventsUpdaters } from ".."
-import { Group } from "../../collections/group"
+import { Client } from "../../collections/client"
 
 export interface ClientVoiceChannelJoinPayload {
 	channelId: string
@@ -9,28 +9,29 @@ export interface ClientVoiceChannelJoinPayload {
 }
 
 export default (
-	group: Group,
+	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: ClientVoiceChannelJoinPayload,
 ): void => {
-	updaters.setChannels((prev) => {
-		const channels = prev.items.map((channel) => {
-			// update the clients of the channel
-			if (channel._id === payload.channelId) {
-				channel.clients.push({
-					userId: payload.userId,
-					user: payload.user,
-					voiceState: payload.voiceState,
-					self: payload.userId === app.userData._id,
-				})
-			}
-
-			return channel
-		})
-
-		return {
-			...prev,
-			items: channels,
+	updaters.setStatedChannels((prev) => {
+		const client: Client = {
+			channel_id: payload.channelId,
+			userId: payload.userId,
+			user: payload.user,
+			voiceState: payload.voiceState,
+			self: payload.userId === app.userData._id,
 		}
+
+		if (!prev[payload.channelId]) {
+			prev[payload.channelId] = {
+				_id: payload.channelId,
+				clients: [],
+				producers: [],
+			}
+		}
+
+		prev[payload.channelId].clients.push(client)
+
+		return prev
 	})
 }

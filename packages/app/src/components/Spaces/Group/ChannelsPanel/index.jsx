@@ -52,17 +52,32 @@ const ChannelsPanel = () => {
 
 				{!group?.loading &&
 					group?.channels &&
-					group?.channels.map((channel) => (
-						<ChannelsListItem
-							key={channel._id}
-							channel={channel}
-							selected={page.channel === channel._id}
-							handleOnClick={() => handleOnClickChannel(channel)}
-							invalid={
-								!VALID_CHANNEL_KINDS.includes(channel.kind)
-							}
-						/>
-					))}
+					group?.channels.items.map((channel) => {
+						const channelState =
+							group?.statedChannels?.[channel._id]
+
+						const clients = channelState?.clients || []
+						const producers = channelState?.producers || []
+
+						const startedAt = channelState?.started_at
+
+						return (
+							<ChannelsListItem
+								key={channel._id}
+								channel={channel}
+								clients={clients}
+								producers={producers}
+								startedAt={startedAt}
+								selected={page.channel === channel._id}
+								handleOnClick={() =>
+									handleOnClickChannel(channel)
+								}
+								invalid={
+									!VALID_CHANNEL_KINDS.includes(channel.kind)
+								}
+							/>
+						)
+					})}
 			</div>
 		</div>
 	)

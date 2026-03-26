@@ -1,12 +1,11 @@
 import { EventsUpdaters } from ".."
-import { Group } from "../../collections/group"
 
 export interface UserOnlinePayload {
 	userId: string
 }
 
 export default (
-	group: Group,
+	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: UserOnlinePayload,
 ): void => {

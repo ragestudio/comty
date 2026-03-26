@@ -1,5 +1,4 @@
 import { EventsUpdaters } from ".."
-import { Group } from "../../collections/group"
 
 export interface ClientVoiceChannelProducerOpenPayload {
 	channelId: string
@@ -7,26 +6,21 @@ export interface ClientVoiceChannelProducerOpenPayload {
 }
 
 export default (
-	group: Group,
+	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: ClientVoiceChannelProducerOpenPayload,
 ): void => {
-	updaters.setChannels((prev) => {
-		const channels = prev.items.map((channel) => {
-			if (!channel.producers) {
-				channel.producers = []
+	updaters.setStatedChannels((prev) => {
+		if (!prev[payload.channelId]) {
+			prev[payload.channelId] = {
+				_id: payload.channelId,
+				clients: [],
+				producers: [],
 			}
-			// update the clients of the channel
-			if (channel._id === payload.channelId) {
-				channel.producers.push(payload.producer)
-			}
-
-			return channel
-		})
-
-		return {
-			...prev,
-			items: channels,
 		}
+
+		prev[payload.channelId].producers.push(payload.producer)
+
+		return prev
 	})
 }

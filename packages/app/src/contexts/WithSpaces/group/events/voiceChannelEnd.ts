@@ -1,30 +1,25 @@
 import { EventsUpdaters } from ".."
-import { Group } from "../../collections/group"
 
 export interface VoiceChannelEndedPayload {
 	channelId: string
 }
 
 export default (
-	group: Group,
+	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: VoiceChannelEndedPayload,
 ): void => {
-	updaters.setChannels((prev) => {
-		const channels = prev.items.map((channel) => {
-			// update the clients of the channel
-			if (channel._id === payload.channelId) {
-				if (channel.started_at) {
-					delete channel.started_at
-				}
-			}
+	console.log("vc:end", payload)
 
-			return channel
-		})
+	updaters.setStatedChannels((prev) => {
+		const nw = { ...prev }
 
-		return {
-			...prev,
-			items: channels,
+		if (!nw[payload.channelId]) {
+			return nw
 		}
+
+		delete nw[payload.channelId]
+
+		return nw
 	})
 }
