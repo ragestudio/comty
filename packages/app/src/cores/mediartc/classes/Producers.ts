@@ -1,20 +1,17 @@
 import MediaRTC from "../mediartc.core"
 import { types as mediasoup } from "mediasoup-client"
 
-export interface ProducerData extends mediasoup.Producer {
+export interface Producer extends mediasoup.Producer {
 	id: string
 	producerId: string
 	remote?: boolean
 	self?: boolean
 }
 
-export default class Producers extends Map<string, ProducerData> {
+export default class Producers extends Map<string, Producer> {
 	core: MediaRTC
 
-	constructor(
-		core: MediaRTC,
-		data?: Iterable<readonly [string, ProducerData]>,
-	) {
+	constructor(core: MediaRTC, data?: Iterable<readonly [string, Producer]>) {
 		super(data)
 		this.core = core
 
@@ -23,7 +20,7 @@ export default class Producers extends Map<string, ProducerData> {
 		}
 	}
 
-	setRemote(producer: ProducerData): ProducerData | null {
+	setRemote(producer: Producer): Producer | null {
 		if (!producer) {
 			return null
 		}
@@ -36,7 +33,7 @@ export default class Producers extends Map<string, ProducerData> {
 		return producer
 	}
 
-	delRemote(producer: ProducerData): ProducerData | null {
+	delRemote(producer: Producer): Producer | null {
 		if (!producer) {
 			return null
 		}
@@ -45,13 +42,13 @@ export default class Producers extends Map<string, ProducerData> {
 
 		this.core.state.remoteProducers =
 			this.core.state.remoteProducers.filter(
-				(p: ProducerData) => p.producerId !== producer.producerId,
+				(p: Producer) => p.producerId !== producer.producerId,
 			)
 
 		return producer
 	}
 
-	produce = async (payload: any): Promise<ProducerData> => {
+	produce = async (payload: any): Promise<Producer> => {
 		if (!this.core.device || !this.core.sendTransport) {
 			throw new Error("Device or send transport not ready")
 		}
@@ -85,7 +82,7 @@ export default class Producers extends Map<string, ProducerData> {
 		return producer
 	}
 
-	onSelfProducerClosed = (producer: ProducerData) => {
+	onSelfProducerClosed = (producer: Producer) => {
 		if (!producer) {
 			return null
 		}

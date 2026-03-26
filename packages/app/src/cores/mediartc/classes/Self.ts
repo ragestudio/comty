@@ -4,7 +4,7 @@ import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
 
-import type { ProducerData } from "./Producers"
+import type { Producer } from "./Producers"
 
 type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
@@ -24,14 +24,14 @@ export default class Self {
 	core: MediaRTC
 
 	micStream: MediaStream = null
-	micProducer: ProducerData = null
+	micProducer: Producer = null
 
 	camStream: MediaStream = null
-	camProducer: ProducerData = null
+	camProducer: Producer = null
 
 	screenStream: MediaStream = null
-	screenProducer: ProducerData = null
-	screenAudioProducer: ProducerData = null
+	screenProducer: Producer = null
+	screenAudioProducer: Producer = null
 
 	audioInput = null
 	audioOutput =
@@ -92,19 +92,17 @@ export default class Self {
 			if (key === "inputGain") {
 				app.cores.settings.set("mediartc:inputGain", value)
 
-				const inputGainParameter =
-					app.cores.mediartc.instance().self.audioInput.mainNode.gain
-
-				inputGainParameter.value = value
+				if (this.audioInput && this.audioInput?.mainNode) {
+					this.audioInput.mainNode.gain.value = value
+				}
 			}
 
 			if (key === "outputGain") {
 				app.cores.settings.set("mediartc:outputGain", value)
 
-				const outputGainParameter =
-					app.cores.mediartc.instance().self.audioOutput.mainNode.gain
-
-				outputGainParameter.value = value
+				if (this.audioOutput && this.audioOutput?.mainNode) {
+					this.audioOutput.mainNode.gain.value = value
+				}
 			}
 
 			if (key === "echoCancellation") {
