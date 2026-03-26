@@ -25,5 +25,17 @@ export default async function (group, payload) {
 
 	await group.saveAsync()
 
+	if (global.websockets) {
+		try {
+			global.websockets.senders.toTopic(
+				`group:${group._id}`,
+				`group:${group._id}:update`,
+				group.toJSON(),
+			)
+		} catch (error) {
+			console.error("Failed to send to group topic", error)
+		}
+	}
+
 	return group
 }

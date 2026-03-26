@@ -24,6 +24,10 @@ import membershipCreated, {
 import membershipDeleted, {
 	MemberchipDeletedPayload,
 } from "./membershipDeleted"
+import groupUpdate from "./groupUpdate"
+import channelCreated from "./channelCreated"
+import channelDeleted from "./channelDeleted"
+import channelUpdated from "./channelUpdated"
 
 export default ({
 	group_id,
@@ -32,39 +36,65 @@ export default ({
 	group_id: string
 	updaters: EventsUpdaters
 }) => {
+	const groupTopicPrefix = `group:${group_id}`
+
 	return {
-		[`group:${group_id}:membership:created`]: (
+		//
+		// Group events
+		//
+		[`${groupTopicPrefix}:update`]: (payload: any) =>
+			groupUpdate(group_id, updaters, payload),
+
+		//
+		// Channels Events
+		//
+		[`${groupTopicPrefix}:channel:created`]: (payload: any) =>
+			channelCreated(group_id, updaters, payload),
+		[`${groupTopicPrefix}:channel:deleted`]: (payload: any) =>
+			channelDeleted(group_id, updaters, payload),
+		[`${groupTopicPrefix}:channel:updated`]: (payload: any) =>
+			channelUpdated(group_id, updaters, payload),
+
+		//
+		// Memberships Events
+		//
+		[`${groupTopicPrefix}:membership:created`]: (
 			payload: MemberchipCreatedPayload,
 		) => membershipCreated(group_id, updaters, payload),
-		[`group:${group_id}:membership:deleted`]: (
+		[`${groupTopicPrefix}:membership:deleted`]: (
 			payload: MemberchipDeletedPayload,
 		) => membershipDeleted(group_id, updaters, payload),
 
-		[`group:${group_id}:vc:started`]: (
+		//
+		// Voice Channels events
+		//
+		[`${groupTopicPrefix}:vc:started`]: (
 			payload: VoiceChannelStartedPayload,
 		) => voiceChannelStated(group_id, updaters, payload),
-		[`group:${group_id}:vc:ended`]: (payload: VoiceChannelEndedPayload) =>
+		[`${groupTopicPrefix}:vc:ended`]: (payload: VoiceChannelEndedPayload) =>
 			voiceChannelEnd(group_id, updaters, payload),
-
-		[`group:${group_id}:client:vc:join`]: (
+		[`${groupTopicPrefix}:client:vc:join`]: (
 			payload: ClientVoiceChannelJoinPayload,
 		) => clientVoiceChannelJoin(group_id, updaters, payload),
-		[`group:${group_id}:client:vc:left`]: (
+		[`${groupTopicPrefix}:client:vc:left`]: (
 			payload: ClientVoiceChannelLeftPayload,
 		) => clientVoiceChannelLeft(group_id, updaters, payload),
-		[`group:${group_id}:client:vc:event`]: (payload: ClientEventPayload) =>
-			clientEvent(group_id, updaters, payload),
-
-		[`group:${group_id}:client:vc:producer:open`]: (
+		[`${groupTopicPrefix}:client:vc:event`]: (
+			payload: ClientEventPayload,
+		) => clientEvent(group_id, updaters, payload),
+		[`${groupTopicPrefix}:client:vc:producer:open`]: (
 			payload: ClientVoiceChannelProducerOpenPayload,
 		) => clientVoiceChannelProducerOpen(group_id, updaters, payload),
-		[`group:${group_id}:client:vc:producer:close`]: (
+		[`${groupTopicPrefix}:client:vc:producer:close`]: (
 			payload: ClientVoiceChannelProducerClosePayload,
 		) => clientVoiceChannelProducerClose(group_id, updaters, payload),
 
-		[`group:${group_id}:user:online`]: (payload: UserOnlinePayload) =>
+		//
+		// Group users Events
+		//
+		[`${groupTopicPrefix}:user:online`]: (payload: UserOnlinePayload) =>
 			userOnline(group_id, updaters, payload),
-		[`group:${group_id}:user:offline`]: (payload: UserOfflinePayload) =>
+		[`${groupTopicPrefix}:user:offline`]: (payload: UserOfflinePayload) =>
 			userOffline(group_id, updaters, payload),
 	}
 }

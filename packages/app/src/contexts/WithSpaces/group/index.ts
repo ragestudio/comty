@@ -14,6 +14,7 @@ import type { Members } from "../collections/member"
 const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
 export interface EventsUpdaters {
+	setData: React.Dispatch<React.SetStateAction<Group>>
 	setChannels: React.Dispatch<React.SetStateAction<Channels>>
 	setMembers: React.Dispatch<React.SetStateAction<Members>>
 	setConnectedMembers: React.Dispatch<React.SetStateAction<string[]>>
@@ -230,6 +231,7 @@ const useGroup = ({ group_id }) => {
 		const events = buildSocketEvents({
 			group_id: group_id,
 			updaters: {
+				setData,
 				setChannels,
 				setMembers,
 				setStatedChannels,

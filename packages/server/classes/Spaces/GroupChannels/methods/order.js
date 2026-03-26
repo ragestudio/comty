@@ -31,5 +31,17 @@ export default async function (group, order_ids, user_id) {
 		},
 	)
 
+	if (global.websockets) {
+		try {
+			global.websockets.senders.toTopic(
+				`group:${group._id}`,
+				`group:${group._id}:channel:ordered`,
+				order.toJSON(),
+			)
+		} catch (error) {
+			console.error("Failed to send event to group topic", error)
+		}
+	}
+
 	return order
 }

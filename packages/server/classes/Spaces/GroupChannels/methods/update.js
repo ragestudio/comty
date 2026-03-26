@@ -44,5 +44,17 @@ export default async function (group, channel_id, payload, user_id) {
 
 	await channel.saveAsync()
 
+	if (global.websockets) {
+		try {
+			global.websockets.senders.toTopic(
+				`group:${group._id}`,
+				`group:${group._id}:channel:updated`,
+				channel.toJSON(),
+			)
+		} catch (error) {
+			console.error("Failed to send event to group topic", error)
+		}
+	}
+
 	return channel
 }

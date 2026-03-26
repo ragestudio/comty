@@ -32,5 +32,17 @@ export default async function (group, channel_id, user_id) {
 
 	await channel.deleteAsync()
 
+	if (global.websockets) {
+		try {
+			global.websockets.senders.toTopic(
+				`group:${group._id}`,
+				`group:${group._id}:channel:deleted`,
+				channel.toJSON(),
+			)
+		} catch (error) {
+			console.error("Failed to send event to group topic", error)
+		}
+	}
+
 	return channel
 }
