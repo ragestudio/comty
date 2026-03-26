@@ -24,19 +24,37 @@ export default async function (group_id, user_id) {
 
 	await membership.saveAsync()
 
-	if (global.websockets && membership.user_id) {
+	if (global.websockets) {
+		const eventPayload = {
+			membership_id: membership._id,
+			user_id: user_id,
+			group_id: group_id,
+		}
+
+		if (membership.user_id) {
+			try {
+				global.websockets.senders.toUserId(
+					user_id,
+					"groups:membership:created",
+					eventPayload,
+				)
+			} catch (error) {
+				console.error(
+					"Failed to send (groups:membership:created) to user",
+					error,
+				)
+			}
+		}
+
 		try {
-			global.websockets.senders.toUserId(
-				user_id,
-				"groups:membership:created",
-				{
-					membership_id: membership._id,
-					group_id: group_id,
-				},
+			global.websockets.senders.toTopic(
+				`group:${group_id}`,
+				`group:${group_id}:membership:created`,
+				eventPayload,
 			)
 		} catch (error) {
 			console.error(
-				"Failed to send (groups:membership:created) to user",
+				"Failed to send (groups:membership:created) to group topic",
 				error,
 			)
 		}

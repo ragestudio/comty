@@ -22,19 +22,37 @@ export default async function (membership_id, group_id, group) {
 
 	await membership.deleteAsync()
 
-	if (global.websockets && membership.user_id) {
+	if (global.websockets) {
+		const eventPayload = {
+			membership_id: membership._id,
+			user_id: user_id,
+			group_id: group_id,
+		}
+
+		if (membership.user_id) {
+			try {
+				global.websockets.senders.toUserId(
+					membership.user_id,
+					"groups:membership:deleted",
+					eventPayload,
+				)
+			} catch (error) {
+				console.error(
+					"Failed to send (groups:membership:deleted) to user",
+					error,
+				)
+			}
+		}
+
 		try {
-			global.websockets.senders.toUserId(
-				membership.user_id,
-				"groups:membership:deleted",
-				{
-					membership_id: membership_id,
-					group_id: group_id,
-				},
+			global.websockets.senders.toTopic(
+				`group:${group_id}`,
+				`group:${group_id}:membership:deleted`,
+				eventPayload,
 			)
 		} catch (error) {
 			console.error(
-				"Failed to send (groups:membership:deleted) to user",
+				"Failed to send (groups:membership:deleted) to group topic",
 				error,
 			)
 		}
