@@ -43,6 +43,9 @@ export default {
 			})
 		}
 
-		return channels
+		return {
+			total_items: channels.length,
+			items: channels,
+		}
 	},
 }

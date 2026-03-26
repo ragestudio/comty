@@ -50,7 +50,7 @@ const GroupPage = (props) => {
 
 		// if no channel is selected, load the first text channel (if any)
 		if (!page.channel) {
-			const firstTextChannel = group.channels.find(
+			const firstTextChannel = group.channels.items.find(
 				(channel) => channel.kind === "chat",
 			)
 
@@ -79,7 +79,7 @@ const GroupPage = (props) => {
 		// update the ref
 		currentPageRef.current = page
 
-		const channelData = group.channels?.find(
+		const channelData = group.channels?.items.find(
 			(_channel) => _channel._id == page.channel,
 		)
 

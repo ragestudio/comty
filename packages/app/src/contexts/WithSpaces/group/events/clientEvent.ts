@@ -1,13 +1,27 @@
-export default (_, payload, setChannels) => {
+import { EventsUpdaters } from ".."
+import { Group } from "../../collections/group"
+
+export interface ClientEventPayload {
+	event: string
+	channelId: string
+	userId: string
+	data: any
+}
+
+export default (
+	group: Group,
+	updaters: EventsUpdaters,
+	payload: ClientEventPayload,
+): void => {
 	switch (payload.event) {
 		case "updateVoiceState":
-			setChannels((prev) => {
-				const channelIndex = prev.findIndex(
+			updaters.setChannels((prev) => {
+				const channelIndex = prev.items.findIndex(
 					(channel) => channel._id === payload.channelId,
 				)
 				const clientIndex =
 					channelIndex > -1
-						? prev[channelIndex].clients.findIndex(
+						? prev.items[channelIndex].clients.findIndex(
 								(client) => client.userId === payload.userId,
 							)
 						: -1
@@ -18,13 +32,15 @@ export default (_, payload, setChannels) => {
 
 				const client = prev[channelIndex].clients[clientIndex]
 
-				return prev.with(channelIndex, {
+				prev.items = prev.items.with(channelIndex, {
 					...prev[channelIndex],
 					clients: prev[channelIndex].clients.with(clientIndex, {
 						...client,
 						voiceState: { ...client.voiceState, ...payload.data },
 					}),
 				})
+
+				return prev
 			})
 			break
 	}

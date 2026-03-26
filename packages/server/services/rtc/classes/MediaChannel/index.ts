@@ -286,7 +286,9 @@ export default class MediaChannel {
 		return Array.from(this.clients).map((c) => {
 			return {
 				userId: c.userId,
+				user_id: c.userId,
 				voiceState: c.voiceState,
+				voice_state: c.voiceState,
 				user: {
 					_id: c.context.user?._id,
 					username: c.context.user?.username,
