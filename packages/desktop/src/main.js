@@ -35,8 +35,11 @@ export default class Main {
 
 		if (Main.isDev) {
 			this.app.setName(pkgjson.processName + "_dev")
+			this.app.setPath("userData", this.app.getPath("userData") + "_dev")
+			this.appName = pkgjson.appName + "_dev"
 		} else {
 			this.app.setName(pkgjson.processName)
+			this.appName = pkgjson.appName
 		}
 
 		flags(this.app)
