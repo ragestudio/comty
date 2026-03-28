@@ -3,8 +3,8 @@ import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import InjectedAuth from "@shared-lib/injectedAuth"
 import ScyllaDb from "@shared-classes/ScyllaDb"
+import ExperimentalScyllaDriver from "@shared-classes/Scylla"
 
 import SharedMiddlewares from "@shared-middlewares"
 
@@ -31,6 +31,7 @@ class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb()),
+		scy: (global.scy = new ExperimentalScyllaDriver()),
 		redis: RedisClient(),
 		groupChannels: new GroupChatChannelController(this),
 		dmChannels: new DMChatChannelController(this),
@@ -46,6 +47,7 @@ class API extends Server {
 		await this.contexts.db.initialize()
 		await this.contexts.redis.initialize()
 		await this.contexts.scylla.initialize()
+		await this.contexts.scy.initialize()
 	}
 }
 

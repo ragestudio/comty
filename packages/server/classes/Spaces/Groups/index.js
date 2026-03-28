@@ -9,7 +9,7 @@ import sortMerthod from "./methods/sort"
 
 export default class Groups {
 	static get model() {
-		return global.scylla.model("groups")
+		return global.scy.model("groups")
 	}
 	static get sortModel() {
 		return global.scylla.model("groups_user_orders")

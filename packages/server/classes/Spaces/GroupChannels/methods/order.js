@@ -35,8 +35,8 @@ export default async function (group, order_ids, user_id) {
 		try {
 			global.websockets.senders.toTopic(
 				`group:${group._id}`,
-				`group:${group._id}:channel:ordered`,
-				order.toJSON(),
+				`group:${group._id}:channels:ordered`,
+				order_ids,
 			)
 		} catch (error) {
 			console.error("Failed to send event to group topic", error)

@@ -3,7 +3,7 @@ export default async function (group_id, { raw = true } = {}) {
 		throw new OperationError(400, "group_id must be a string")
 	}
 
-	const group = await this.model.findOneAsync(
+	const group = await this.model.findOne(
 		{
 			_id: group_id,
 		},

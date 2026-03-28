@@ -25,14 +25,17 @@ export default async function (user_id, group, action) {
 	}
 
 	// get the user membership
-	const membership = await GroupMemberships.model.findOneAsync(
+	let membership = await GroupMemberships.model.find(
 		{
+			group_id: group._id,
 			user_id: user_id,
 		},
 		{
 			raw: true,
 		},
 	)
+
+	membership = membership[0]
 
 	if (!membership) {
 		throw new OperationError(404, "Membership not found")

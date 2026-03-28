@@ -9,7 +9,7 @@ export default async function (group, channel_id, user_id) {
 		throw new OperationError(400, "channel_id must be a string")
 	}
 
-	const channel = await this.model.findOneAsync({
+	const channel = await this.model.findOne({
 		group_id: group._id,
 		_id: channel_id,
 	})

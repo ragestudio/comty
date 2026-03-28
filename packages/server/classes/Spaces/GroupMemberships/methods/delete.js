@@ -1,12 +1,18 @@
 import Groups from "@shared-classes/Spaces/Groups"
 
-export default async function (membership_id, group_id, group) {
+export default async function (user_id, membership_id, group_id, group) {
+	if (typeof user_id !== "string") {
+		throw new OperationError(400, "user_id must be a string")
+	}
+	if (typeof membership_id !== "string") {
+		throw new OperationError(400, "membership_id must be a string")
+	}
 	if (typeof group_id !== "string") {
 		throw new OperationError(400, "group_id must be a string")
 	}
 
 	if (!group) {
-		group = await Groups.model.findOneAsync({
+		group = await Groups.model.findOne({
 			_id: group_id,
 		})
 	}
@@ -15,17 +21,27 @@ export default async function (membership_id, group_id, group) {
 		throw new OperationError(404, "Group not found")
 	}
 
-	const membership = await this.model.findOneAsync({
+	let membership = await this.model.findOne({
+		user_id: user_id,
 		group_id: group_id,
 		_id: membership_id,
 	})
 
-	await membership.deleteAsync()
+	if (!membership) {
+		throw new OperationError(404, "Membership not exist for this group")
+	}
+
+	await membership.delete()
+
+	await this.modelRef.delete({
+		group_id: group_id,
+		user_id: user_id,
+	})
 
 	if (global.websockets) {
 		const eventPayload = {
 			membership_id: membership._id,
-			user_id: user_id,
+			user_id: membership.user_id,
 			group_id: group_id,
 		}
 

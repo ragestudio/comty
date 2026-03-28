@@ -6,7 +6,7 @@ export default {
 	fn: async (req) => {
 		const { group_id, action } = req.params
 
-		const group = await Groups.model.findOneAsync({
+		const group = await Groups.model.findOne({
 			_id: group_id,
 		})
 

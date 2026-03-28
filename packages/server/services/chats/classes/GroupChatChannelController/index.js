@@ -21,7 +21,7 @@ export default class GroupChatChannelController {
 			throw new OperationError(404, "Channel not found")
 		}
 
-		channel = channel.toJSON()
+		channel = channel.toRaw()
 
 		if (channel.kind !== "chat") {
 			throw new OperationError(400, "This channel is not a chat")

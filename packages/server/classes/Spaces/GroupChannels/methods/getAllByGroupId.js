@@ -21,7 +21,7 @@ export default async function (group, user_id) {
 		}
 	}
 
-	let channels = await this.model.findAsync({
+	let channels = await this.model.find({
 		group_id: group._id,
 	})
 

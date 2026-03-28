@@ -13,16 +13,27 @@ export default async function (group_id, user_id) {
 	}
 
 	const _id = global.snowflake.nextId().toString()
-	const created_at = new Date().toISOString()
+	const created_at = new Date()
 
-	const membership = new this.model({
+	const membership = this.model.obj({
 		_id: _id,
 		user_id: user_id,
 		group_id: group_id,
 		created_at: created_at,
 	})
 
-	await membership.saveAsync()
+	await membership.save()
+
+	// update the membership ref
+	const groupRef = this.modelRef.obj({
+		group_id: group_id,
+		user_id: user_id,
+		membership_id: membership._id,
+	})
+
+	await groupRef.save()
+
+	// TODO: Update group version
 
 	if (global.websockets) {
 		const eventPayload = {
@@ -60,5 +71,5 @@ export default async function (group_id, user_id) {
 		}
 	}
 
-	return membership.toJSON()
+	return membership.toRaw()
 }

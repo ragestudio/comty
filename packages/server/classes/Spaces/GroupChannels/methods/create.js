@@ -34,9 +34,10 @@ export default async function (group, payload, user_id) {
 	}
 
 	const channelId = global.snowflake.nextId().toString()
-	const created_at = new Date().toISOString()
+	const created_at = new Date()
 
-	const channel = new this.model({
+	const channel = this.model.obj({
+		__v: 0,
 		_id: channelId,
 		group_id: group._id,
 		kind: payload.kind,
@@ -46,19 +47,19 @@ export default async function (group, payload, user_id) {
 		created_at: created_at,
 	})
 
-	await channel.saveAsync()
+	await channel.save()
 
 	if (global.websockets) {
 		try {
 			global.websockets.senders.toTopic(
 				`group:${group._id}`,
 				`group:${group._id}:channel:created`,
-				channel.toJSON(),
+				channel.toRaw(),
 			)
 		} catch (error) {
 			console.error("Failed to send event to group topic", error)
 		}
 	}
 
-	return channel.toJSON()
+	return channel.toRaw()
 }

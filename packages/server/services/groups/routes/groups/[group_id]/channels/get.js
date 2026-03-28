@@ -18,7 +18,7 @@ export default {
 			req.auth.session.user_id,
 		)
 
-		channels = channels.map((channel) => channel.toJSON())
+		channels = channels.map((channel) => channel.toRaw())
 
 		const channelOrder = await GroupChannels.orderModel
 			.findOneAsync({

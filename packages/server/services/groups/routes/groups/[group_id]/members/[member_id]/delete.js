@@ -5,6 +5,10 @@ import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
+		if (typeof req.body.user_id !== "string") {
+			throw new OperationError(400, "user_id must be a string")
+		}
+
 		const group = await Groups.get(
 			req.params.group_id,
 			req.auth.session.user_id,
@@ -27,6 +31,10 @@ export default {
 			)
 		}
 
-		return await GroupMemberships.delete(req.params.member_id, group._id)
+		return await GroupMemberships.delete(
+			req.params.user_id,
+			req.params.member_id,
+			group._id,
+		)
 	},
 }

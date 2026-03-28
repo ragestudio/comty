@@ -17,7 +17,7 @@ export default async function (user_id, { limit, offset } = {}) {
 		}
 	}
 
-	const memberships = await this.model.findAsync(query)
+	const memberships = await this.model.find(query)
 
 	return memberships
 }

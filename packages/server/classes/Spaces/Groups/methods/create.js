@@ -7,9 +7,10 @@ export default async function (payload) {
 	}
 
 	const groupId = global.snowflake.nextId().toString()
-	const created_at = new Date().toISOString()
+	const created_at = new Date()
 
-	const group = new this.model({
+	const group = this.model.obj({
+		__v: 0,
 		_id: groupId,
 		name: payload.name,
 		description: payload.description,
@@ -20,7 +21,7 @@ export default async function (payload) {
 		created_at: created_at,
 	})
 
-	await group.saveAsync()
+	await group.save()
 
 	// create the membership
 	await GroupMemberships.create(groupId, payload.owner_user_id)
@@ -35,5 +36,5 @@ export default async function (payload) {
 		payload.owner_user_id,
 	)
 
-	return group.toJSON()
+	return group.toRaw()
 }

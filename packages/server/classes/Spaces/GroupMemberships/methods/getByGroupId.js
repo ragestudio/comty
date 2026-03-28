@@ -17,7 +17,18 @@ export default async function (group_id, { limit, offset } = {}) {
 		}
 	}
 
-	const memberships = await this.model.findAsync(query)
+	const membershipsRef = await this.modelRef.find({
+		group_id: group_id,
+	})
+
+	const users_ids = membershipsRef.map((ref) => ref.user_id)
+
+	const memberships = await this.model.find({
+		user_id: {
+			$in: users_ids,
+		},
+		group_id: group_id,
+	})
 
 	return memberships
 }

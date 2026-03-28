@@ -3,9 +3,9 @@ export default async function (group_id) {
 		throw new OperationError(400, "group_id must be a string")
 	}
 
-	const memberships = await this.model.findAsync({
+	const membershipsRefs = await this.modelRef.find({
 		group_id: group_id,
 	})
 
-	return memberships.length
+	return membershipsRefs.length
 }
