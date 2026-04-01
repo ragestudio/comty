@@ -1,20 +1,30 @@
 export default function (this: any, data: any) {
-	if (!this.description.options?.defaults) {
+	const defaults = this.description.options?.defaults
+
+	if (!defaults || Object.keys(defaults).length === 0) {
 		return data
 	}
 
-	let nw = { ...data }
+	let needsDefaults = false
 
-	for (let [key, value] of Object.entries(data)) {
-		const defaultValue = this.description.options.defaults[key]
-
-		if (
-			typeof defaultValue !== "undefined" &&
-			(value == null || value == undefined)
-		) {
-			nw[key] = defaultValue
+	for (const key in defaults) {
+		if (data[key] == null) {
+			needsDefaults = true
+			break
 		}
 	}
 
-	return nw
+	if (!needsDefaults) {
+		return data
+	}
+
+	const result = Object.assign({}, data)
+
+	for (const key in defaults) {
+		if (result[key] == null) {
+			result[key] = defaults[key]
+		}
+	}
+
+	return result
 }
