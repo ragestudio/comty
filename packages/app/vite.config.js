@@ -1,10 +1,9 @@
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
 import path from "node:path"
 import fs from "node:fs"
 
 import aliases from "./aliases"
-
-import { defineConfig } from "vite"
-import react from "@vitejs/plugin-react"
 
 const sslDirPath = path.resolve(__dirname, "../../", ".ssl")
 
@@ -46,7 +45,7 @@ const config = {
 		},
 	},
 	esbuild: {
-		target: "es2022",
+		target: "es2023",
 	},
 	optimizeDeps: {
 		include: ["src/cores/**/*.core.js"],
