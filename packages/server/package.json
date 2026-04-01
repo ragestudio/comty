@@ -40,7 +40,7 @@
 	"overrides": {
 		"braces": "3.0.3",
 		"minimatch": "10.2.3",
-		"fast-xml-parser": "5.5.6",
+		"fast-xml-parser": "5.5.7",
 		"diff": "8.0.3",
 		"micromatch": "4.0.8",
 		"string-width": "4.2.3"
