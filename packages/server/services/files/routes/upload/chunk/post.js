@@ -76,10 +76,13 @@ export default {
 				}
 
 				const payload = {
+					filePath: assemble.filePath,
+					fileHash: assemble.fileHash,
+
 					user_id: req.auth.session.user_id,
 					uploadId: uploadId,
-					filePath: assemble.filePath,
 					workPath: workPath,
+
 					originalFilename: req.headers["uploader-original-name"],
 					transformations: transformations,
 					s3Provider: config.useProvider,

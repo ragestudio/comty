@@ -1,6 +1,8 @@
+// @ts-ignore
 import fs from "node:fs"
+// @ts-ignore
 import path from "node:path"
-import { fileTypeFromBuffer } from "file-type"
+import { fileTypeFromBuffer, fileTypeFromFile } from "file-type"
 
 import readChunk from "@shared-utils/readChunk"
 import getFileHash from "@shared-utils/readFileHash"
@@ -9,11 +11,12 @@ import putObject from "./putObject"
 import Transformation from "../Transformation"
 
 export type FileHandlePayload = {
-	user_id: string
 	filePath: string
+	fileHash?: string
+
+	user_id: string
 	workPath: string
-	targetPath?: string // mostly provided by processed results
-	//uploadId?: string
+	targetPath?: string
 	originalFilename?: string
 	transformations?: Array<string>
 	useCompression?: boolean
@@ -26,6 +29,8 @@ export type FileHandlePayload = {
 
 export type S3UploadPayload = {
 	filePath: string
+	fileHash?: string
+
 	basePath: string
 	targetPath?: string
 	s3Provider?: string
@@ -33,13 +38,30 @@ export type S3UploadPayload = {
 	originalFilename?: string
 }
 
+export type FileIntegrityResult = {
+	isValid: boolean
+	fileSize: number
+	fileHash: string
+	error?: string
+}
+
 export default class Upload {
 	static fileHandle = async (payload: FileHandlePayload) => {
+		const integrityCheck = await Upload.validateFileIntegrity(
+			payload.filePath,
+		)
+
+		if (!integrityCheck.isValid) {
+			throw new OperationError(
+				400,
+				`File integrity check failed: ${integrityCheck.error}`,
+			)
+		}
+
 		if (!payload.transformations) {
 			payload.transformations = []
 		}
 
-		// if compression is enabled and no transformations are provided, add basic transformations for images or videos
 		if (
 			payload.useCompression === true &&
 			payload.transformations.length === 0
@@ -47,18 +69,15 @@ export default class Upload {
 			payload.transformations.push("optimize")
 		}
 
-		// process file upload if transformations are provided
 		if (payload.transformations.length > 0) {
-			// process
 			const processed = await Upload.transform(payload)
-
-			// overwrite filePath
 			payload.filePath = processed.filePath
 		}
 
-		// upload
 		const result = await Upload.toS3({
 			filePath: payload.filePath,
+			fileHash: payload.fileHash,
+
 			targetPath: payload.targetPath,
 			basePath: payload.user_id,
 			onProgress: payload.onProgress,
@@ -66,7 +85,6 @@ export default class Upload {
 			originalFilename: payload.originalFilename,
 		})
 
-		// delete workpath
 		await fs.promises.rm(payload.workPath, { recursive: true, force: true })
 
 		return result
@@ -83,16 +101,13 @@ export default class Upload {
 					capabilities: payload.capabilities,
 				})
 
-				// if is a file, overwrite filePath
 				if (transformationResult.outputFile) {
 					payload.filePath = transformationResult.outputFile
 				}
 
-				// if is a directory, overwrite filePath to upload entire directory
 				if (transformationResult.outputPath) {
 					payload.filePath = transformationResult.outputPath
 					payload.targetPath = transformationResult.outputFile
-					//payload.isDirectory = true
 				}
 			}
 		}
@@ -103,6 +118,8 @@ export default class Upload {
 	static toS3 = async (payload: S3UploadPayload) => {
 		const {
 			filePath,
+			fileHash,
+
 			basePath,
 			targetPath,
 			s3Provider,
@@ -110,11 +127,11 @@ export default class Upload {
 			originalFilename,
 		} = payload
 
-		// if targetPath is provided, means its a directory
 		const isDirectory = !!targetPath
 
 		const metadata = await this.buildFileMetadata(
 			isDirectory ? targetPath : filePath,
+			fileHash,
 		)
 
 		let uploadPath = path.join(basePath, metadata["File-Hash"])
@@ -136,15 +153,6 @@ export default class Upload {
 
 		metadata["x-amz-acl"] = "public-read"
 
-		// console.log("Uploading to S3:", {
-		// 	filePath: filePath,
-		// 	basePath: basePath,
-		// 	uploadPath: uploadPath,
-		// 	targetPath: targetPath,
-		// 	metadata: metadata,
-		// 	s3Provider: s3Provider,
-		// })
-
 		const result = await putObject({
 			filePath: filePath,
 			uploadPath: uploadPath,
@@ -160,16 +168,85 @@ export default class Upload {
 
 	static async buildFileMetadata(
 		filePath: string,
+		fileHash?: string,
 	): Promise<{ [key: string]: string }> {
-		const firstBuffer = await readChunk(filePath, {
-			length: 4100,
-		})
-		const fileHash = await getFileHash(fs.createReadStream(filePath))
-		const fileType = await fileTypeFromBuffer(firstBuffer)
+		// const firstBuffer = await readChunk(filePath, {
+		// 	length: 4100,
+		// })
+
+		const fileType = await fileTypeFromFile(filePath)
+
+		// if no hash provided, use the fallback computation
+		if (!fileHash) {
+			fileHash = await getFileHash(fs.createReadStream(filePath))
+		}
 
 		return {
-			"File-Hash": fileHash,
 			"Content-Type": fileType?.mime ?? "application/octet-stream",
+			"File-Hash": fileHash,
+		}
+	}
+
+	static async validateFileIntegrity(
+		filePath: string,
+	): Promise<FileIntegrityResult> {
+		try {
+			const stats = await fs.promises.stat(filePath)
+
+			if (!stats.isFile()) {
+				return {
+					isValid: false,
+					fileSize: 0,
+					fileHash: "",
+					error: "Path is not a file",
+				}
+			}
+
+			if (stats.size === 0) {
+				return {
+					isValid: false,
+					fileSize: 0,
+					fileHash: "",
+					error: "File is empty",
+				}
+			}
+
+			const fileHash = await getFileHash(fs.createReadStream(filePath))
+
+			if (!fileHash || fileHash.length === 0) {
+				return {
+					isValid: false,
+					fileSize: stats.size,
+					fileHash: "",
+					error: "Failed to calculate file hash",
+				}
+			}
+
+			const firstBuffer = await readChunk(filePath, {
+				length: 512,
+			})
+
+			if (!firstBuffer || firstBuffer.length === 0) {
+				return {
+					isValid: false,
+					fileSize: stats.size,
+					fileHash: fileHash,
+					error: "Failed to read file content",
+				}
+			}
+
+			return {
+				isValid: true,
+				fileSize: stats.size,
+				fileHash: fileHash,
+			}
+		} catch (error) {
+			return {
+				isValid: false,
+				fileSize: 0,
+				fileHash: "",
+				error: `Integrity check error: ${error instanceof Error ? error.message : String(error)}`,
+			}
 		}
 	}
 }
