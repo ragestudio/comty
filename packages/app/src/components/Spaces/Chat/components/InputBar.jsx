@@ -8,9 +8,11 @@ import useOnPaste from "@hooks/useOnPaste"
 
 import UploadAttachments from "./UploadAttachments"
 
-import "./InputBar.less"
 import StickersButton from "./StickersButton"
 import EmojiPicker from "./EmojiPicker"
+import GifPicker from "./GifPicker"
+
+import "./InputBar.less"
 
 const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 	const [inputValue, setInputValue] = React.useState("")
@@ -94,7 +96,11 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 
 			// update the file
 			prev[index].url = response.url
-			prev[index].hash = response.metadata["File-Hash"]
+
+			if (response.metadata) {
+				prev[index].hash = response.metadata?.["File-Hash"]
+			}
+
 			prev[index].pending = false
 
 			return prev
@@ -151,6 +157,11 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 					/>
 					<StickersButton
 						onClickItem={(sticker) => sendSticker(sticker)}
+					/>
+					<GifPicker
+						onClickItem={(gifUrl) => {
+							console.log(gifUrl)
+						}}
 					/>
 
 					<UploadButton
