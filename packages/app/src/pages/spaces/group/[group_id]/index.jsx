@@ -111,9 +111,9 @@ const GroupPage = (props) => {
 					unregisterHeaderContent: unregisterHeaderContent,
 				}}
 			>
-				<Splitter className="spaces-page group-page">
+				<Splitter className="group-page">
 					<Splitter.Panel
-						className="spaces-page__panel"
+						className="group-page__panel"
 						defaultSize={330}
 						min={270}
 					>
@@ -123,7 +123,7 @@ const GroupPage = (props) => {
 					</Splitter.Panel>
 
 					<Splitter.Panel
-						className="spaces-page__content"
+						className="group-page__panel"
 						min={500}
 					>
 						{group.loading && <Skeleton />}
@@ -143,14 +143,14 @@ const GroupPage = (props) => {
 					</Splitter.Panel>
 
 					<Splitter.Panel
-						className="spaces-page__rightbar"
+						className="group-page__rightbar"
 						defaultSize={300}
 						min={300}
 						collapsible
 					>
 						<MembersPanel />
 
-						<div className="spaces-page__rightbar__attached">
+						<div className="group-page__rightbar__attached">
 							<ToolsBar />
 						</div>
 					</Splitter.Panel>

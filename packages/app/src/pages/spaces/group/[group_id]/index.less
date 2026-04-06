@@ -4,11 +4,63 @@
 
 	overflow: hidden;
 
+	height: 100%;
+
 	//padding: 10px;
 
 	.rtc-vc-card {
 		margin-top: auto;
 		width: 100%;
 		background-color: var(--backgroundColorAccent);
+	}
+
+	&__panel {
+		overflow: hidden;
+
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		min-width: 270px;
+
+		gap: 10px;
+		padding: 10px !important;
+	}
+}
+
+.ant-splitter-bar-collapse-bar {
+	padding: 10px 13px;
+}
+
+.ant-splitter-panel.ant-splitter-panel-hidden.group-page__rightbar {
+	padding: 0px !important;
+}
+
+.group-page__rightbar {
+	overflow: hidden;
+
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	padding: 10px !important;
+
+	align-items: center;
+
+	transition: flex-basis 150ms ease-in-out;
+
+	gap: 10px;
+
+	&__attached {
+		margin-top: auto;
+		bottom: 0;
+
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		height: fit-content;
+
+		gap: 10px;
 	}
 }
