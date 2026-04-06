@@ -1,42 +1,38 @@
-import React from "react"
+import { Result, Skeleton } from "antd"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import {
-    Result,
-    Skeleton
-} from "antd"
+import use from "comty.js/hooks/use"
 
 import "./index.less"
 
-export default (props) => {
-    const [L_Doc, R_Doc, E_Doc] = app.cores.api.useRequest(async () => {
-        const response = await app.cores.api.customRequest({
-            method: "GET",
-            url: props.url,
-        })
-
-        return response.data
-    })
-
-    React.useEffect(() => {
-        app.layout.toggleCenteredContent(true)
-    }, [])
-
-    if (E_Doc) {
-        return <Result
-            status="warning"
-            title="Cannot load this document"
-            subTitle="Something went wrong, please try again later."
-        />
-    }
-
-    if (L_Doc) {
-        return <Skeleton active />
-    }
-
-    return <div className="document_viewer">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {R_Doc}
-        </ReactMarkdown>
-    </div>
+const fetchText = async (url, args) => {
+	return await (await fetch(url, args)).text()
 }
+
+const MarkdownReader = (props) => {
+	const { loading, result, error } = use(fetchText, props.url, {
+		method: "GET",
+	})
+
+	if (error) {
+		return (
+			<Result
+				status="warning"
+				title="Cannot load this document"
+				subTitle="Something went wrong, please try again later."
+			/>
+		)
+	}
+
+	if (loading) {
+		return <Skeleton active />
+	}
+
+	return (
+		<div className="document_viewer">
+			<ReactMarkdown remarkPlugins={[remarkGfm]}>{result}</ReactMarkdown>
+		</div>
+	)
+}
+
+export default MarkdownReader
