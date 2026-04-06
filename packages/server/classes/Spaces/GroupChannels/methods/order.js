@@ -24,7 +24,7 @@ export default async function (group, order_ids, user_id) {
 		}
 	}
 
-	let order = await this.orderModel.updateAsync(
+	let order = await this.orderModel.update(
 		{ group_id: group._id },
 		{
 			order: order_ids,

@@ -10,7 +10,7 @@ export default async function (user, messageId) {
 	const Message = this.scylla.model("channel_messages")
 
 	// try to fetch the message
-	const message = await Message.findOneAsync({
+	const message = await Message.findOne({
 		channel_id: this.channel._id.toString(),
 		_id: messageId,
 	})
@@ -25,7 +25,7 @@ export default async function (user, messageId) {
 		throw new OperationError(403, "You are not the owner of this message")
 	}
 
-	await message.deleteAsync()
+	await message.delete()
 
 	this.sendEventToChannelTopic("channel:message:deleted", {
 		_id: message._id.toString(),

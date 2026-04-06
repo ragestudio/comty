@@ -11,7 +11,7 @@ export default {
 		)
 
 		const sorted = await Groups.sortModel
-			.findOneAsync(
+			.findOne(
 				{
 					user_id: req.auth.session.user_id,
 				},

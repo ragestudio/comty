@@ -3,7 +3,7 @@ export default async function (group) {
 		throw new OperationError(400, "group must be provided")
 	}
 
-	const invites = await this.model.findAsync(
+	const invites = await this.model.find(
 		{
 			group_id: group._id.toString(),
 		},

@@ -2,7 +2,7 @@ export default {
 	key: [["group_id"], "_id"],
 	table_name: "group_channels",
 	fields: {
-		__v: "int",
+		__v: "bigint",
 		_id: "varchar",
 		group_id: "varchar",
 		kind: "varchar",

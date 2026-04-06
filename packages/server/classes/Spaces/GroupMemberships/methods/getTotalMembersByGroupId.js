@@ -3,9 +3,13 @@ export default async function (group_id) {
 		throw new OperationError(400, "group_id must be a string")
 	}
 
-	const membershipsRefs = await this.modelRef.find({
+	const reg = await this.modelCounter.findOne({
 		group_id: group_id,
 	})
 
-	return membershipsRefs.length
+	if (reg?.counter) {
+		return parseInt(reg.counter)
+	}
+
+	return 0
 }

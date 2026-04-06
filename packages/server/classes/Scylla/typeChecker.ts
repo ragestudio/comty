@@ -43,12 +43,6 @@ export default function (this: any, data: any) {
 					)
 				}
 				break
-			case "bigint":
-			case "counter":
-				if (typeof value !== "number" || !Number.isInteger(value)) {
-					throw new TypeError(`${colErrStrPrefix} must be an integer`)
-				}
-				break
 			case "double":
 			case "float":
 				if (typeof value !== "number") {
@@ -191,10 +185,6 @@ export default function (this: any, data: any) {
 					}
 				}
 				break
-			default:
-				throw new TypeError(
-					`${colErrStrPrefix} has unsupported type: ${fieldType}`,
-				)
 		}
 	}
 }

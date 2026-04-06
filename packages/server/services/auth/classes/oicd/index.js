@@ -26,7 +26,7 @@ class Adapter {
 				response_types: payload.response_types || [],
 			})
 
-			return await client.saveAsync()
+			return await client.save()
 		}
 
 		const options = expiresIn ? { ttl: expiresIn } : {}
@@ -39,12 +39,12 @@ class Adapter {
 			uid: payload.uid,
 		})
 
-		await store.saveAsync(options)
+		await store.save(options)
 	}
 
 	async find(id) {
 		if (this.name === "Client") {
-			const client = await Adapter.OidcClient.findOneAsync(
+			const client = await Adapter.OidcClient.findOne(
 				{ client_id: id },
 				{ raw: true },
 			)
@@ -59,28 +59,25 @@ class Adapter {
 			}
 		}
 
-		const data = await Adapter.OidcStore.findOneAsync(
-			{ id: id },
-			{ raw: true },
-		)
+		const data = await Adapter.OidcStore.findOne({ id: id }, { raw: true })
 		return data ? JSON.parse(data.payload) : undefined
 	}
 
 	async consume(id) {
-		const data = await Adapter.OidcStore.findOneAsync({ id: id })
+		const data = await Adapter.OidcStore.findOne({ id: id })
 
 		if (data) {
 			data.consumedAt = new Date()
-			await data.saveAsync()
+			await data.save()
 		}
 	}
 
 	async destroy(id) {
-		await Adapter.OidcStore.deleteAsync({ id: id })
+		await Adapter.OidcStore.delete({ id: id })
 	}
 
 	async revokeByGrantId(grantId) {
-		await Adapter.OidcStore.deleteAsync({ grantId: grantId })
+		await Adapter.OidcStore.delete({ grantId: grantId })
 	}
 }
 
@@ -148,13 +145,13 @@ export default class OIDCProvider {
 			response_types: ["code"],
 		})
 
-		await newApp.saveAsync()
+		await newApp.save()
 
 		return { clientId, clientSecret }
 	}
 
 	async getAppsByDeveloper(userId) {
-		return await Adapter.OidcClient.findAsync(
+		return await Adapter.OidcClient.find(
 			{ owner_id: userId },
 			{ raw: true },
 		)

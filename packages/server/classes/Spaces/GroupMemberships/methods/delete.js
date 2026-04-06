@@ -1,5 +1,8 @@
 import Groups from "@shared-classes/Spaces/Groups"
 
+import cassandra from "cassandra-driver"
+const { q } = cassandra.mapping
+
 export default async function (user_id, membership_id, group_id, group) {
 	if (typeof user_id !== "string") {
 		throw new OperationError(400, "user_id must be a string")
@@ -36,6 +39,12 @@ export default async function (user_id, membership_id, group_id, group) {
 	await this.modelRef.delete({
 		group_id: group_id,
 		user_id: user_id,
+	})
+
+	// decrease the counter
+	await this.modelCounter.update({
+		group_id: group_id,
+		counter: q.decr(1),
 	})
 
 	if (global.websockets) {

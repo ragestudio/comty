@@ -10,7 +10,7 @@ export default async function (user_id, sortArr) {
 		)
 	}
 
-	await this.sortModel.updateAsync(
+	await this.sortModel.update(
 		{
 			user_id: user_id,
 		},

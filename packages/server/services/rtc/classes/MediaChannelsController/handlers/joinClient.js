@@ -2,7 +2,7 @@ export default async function (client, channelId) {
 	try {
 		const GroupChannelsModel = global.scylla.model("group_channels")
 
-		const channel = await GroupChannelsModel.findOneAsync(
+		const channel = await GroupChannelsModel.findOne(
 			{
 				_id: channelId,
 			},

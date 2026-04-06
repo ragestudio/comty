@@ -1,6 +1,7 @@
-import { User } from "@db_models"
-import DMChatChannel from "@classes/DMChatChannel"
 import mongoose from "mongoose"
+import { User } from "@db_models"
+
+import DMChatChannel from "./instance"
 
 export function genPairKey(id1, id2) {
 	return [id1, id2].sort().join("-")
@@ -36,7 +37,7 @@ export default class DMChatChannelController {
 		const pair_key = genPairKey(from_user_id, to_user_id)
 
 		// search by pairkey
-		let room = await this.RoomsModel.findOneAsync(
+		let room = await this.RoomsModel.findOne(
 			{
 				pair_key: pair_key,
 			},
@@ -52,17 +53,17 @@ export default class DMChatChannelController {
 			// )
 
 			const room_id = this.snowflake.nextId().toString()
-			const created_at = new Date().toISOString()
+			const created_at = new Date()
 
-			room = new this.RoomsModel({
+			room = this.RoomsModel.obj({
 				_id: room_id,
 				pair_key: pair_key,
 				created_at: created_at,
 			})
 
-			await room.saveAsync()
+			await room.save()
 
-			room = room.toJSON()
+			room = room.toRaw()
 		}
 
 		// just return the room instance
@@ -71,7 +72,7 @@ export default class DMChatChannelController {
 
 	// TODO: implement pagination
 	rooms = async (userId, { limit = 20, offset = 0 } = {}) => {
-		let activity = await this.ActivityModel.findAsync(
+		let activity = await this.ActivityModel.find(
 			{
 				user_id: userId,
 				$limit: limit,
@@ -119,7 +120,7 @@ export default class DMChatChannelController {
 			}
 		}
 
-		let rooms = await this.RoomsModel.findAsync(
+		let rooms = await this.RoomsModel.find(
 			{
 				pair_key: {
 					$in: pairs,

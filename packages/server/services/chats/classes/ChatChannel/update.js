@@ -8,7 +8,7 @@ export default async function (user, message_id, update = {}) {
 	}
 
 	// find the message
-	const message = await this.MessageModel.findOneAsync({
+	const message = await this.MessageModel.findOne({
 		channel_id: this.channel._id.toString(),
 		_id: message_id,
 	})
@@ -28,9 +28,9 @@ export default async function (user, message_id, update = {}) {
 		message.attachments = update.attachments
 	}
 
-	message.updated_at = new Date().toISOString()
+	message.updated_at = new Date()
 
-	await message.saveAsync()
+	await message.save()
 
-	return message.toJSON()
+	return message.toRaw()
 }

@@ -4,7 +4,7 @@ export default async function (groupId, channelId) {
 	const GroupChannelsModel = global.scylla.model("group_channels")
 
 	// get the channel
-	const channel = await GroupChannelsModel.findOneAsync({
+	const channel = await GroupChannelsModel.findOne({
 		_id: channelId,
 		group_id: groupId,
 	})
@@ -15,7 +15,7 @@ export default async function (groupId, channelId) {
 
 	// create the channel instance
 	const channelInstance = new MediaChannel({
-		data: channel.toJSON(),
+		data: channel.toRaw(),
 		channelId: channelId,
 		mediaCodecs: this.constructor.allowedMediaCodecs,
 		webrtcServer: this.webrtcServer,

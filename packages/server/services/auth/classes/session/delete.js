@@ -1,5 +1,5 @@
 export default async function (session_id) {
-	const session = await this.Model.findOneAsync({
+	const session = await this.Model.findOne({
 		_id: session_id,
 	})
 
@@ -7,7 +7,7 @@ export default async function (session_id) {
 		throw new OperationError(401, "Session not found or not valid")
 	}
 
-	await session.deleteAsync()
+	await session.delete()
 
-	return session.toJSON()
+	return session.toRaw()
 }

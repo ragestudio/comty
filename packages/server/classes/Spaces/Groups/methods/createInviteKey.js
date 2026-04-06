@@ -18,7 +18,7 @@ export default async function (
 		)
 	}
 
-	const obj = new this.inviteKeyModel({
+	const obj = this.inviteKeyModel.obj({
 		group_id: group_id,
 		key: nanoid(),
 		issuer_user_id: issuer_user_id,
@@ -27,7 +27,7 @@ export default async function (
 		max_usage: maxUsage,
 	})
 
-	await obj.saveAsync()
+	await obj.save()
 
-	return obj.toJSON()
+	return obj.toRaw()
 }

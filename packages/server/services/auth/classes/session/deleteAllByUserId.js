@@ -1,5 +1,5 @@
 export default async function (user_id) {
-	const sessions = await this.Model.findAsync(
+	const sessions = await this.Model.find(
 		{
 			user_id: user_id,
 		},
@@ -9,7 +9,7 @@ export default async function (user_id) {
 	)
 
 	for await (const session of sessions) {
-		await session.deleteAsync()
+		await session.delete()
 	}
 
 	return sessions.length

@@ -7,7 +7,7 @@ export default async function (group, key, { raw = true } = {}) {
 		throw new OperationError(400, "key must be provided")
 	}
 
-	const invite = await this.model.findOneAsync({
+	const invite = await this.model.findOne({
 		group_id: group._id.toString(),
 		key: key,
 	})
@@ -17,7 +17,7 @@ export default async function (group, key, { raw = true } = {}) {
 	}
 
 	if (raw === true) {
-		return invite.toJSON()
+		return invite.toRaw()
 	}
 
 	return invite

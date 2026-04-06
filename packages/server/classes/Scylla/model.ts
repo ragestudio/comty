@@ -49,7 +49,7 @@ export class Model {
 	obj = (data: any) => this._wrap(data)
 
 	find = async (query: any, options: QueryOptions) => {
-		const { $limit, ...rest } = query
+		const { $limit, $orderby, ...rest } = query
 
 		query = this._queryParser(rest)
 
@@ -63,6 +63,10 @@ export class Model {
 			}
 
 			docInfo.limit = $limit
+		}
+
+		if ($orderby !== undefined) {
+			docInfo.orderBy = $orderby
 		}
 
 		const operation = async () => {

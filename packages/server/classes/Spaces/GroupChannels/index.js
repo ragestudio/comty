@@ -7,7 +7,7 @@ import orderMethod from "./methods/order"
 
 export default class GroupChannels {
 	static get model() {
-		return global.scy.model("group_channels")
+		return global.scylla.model("group_channels")
 	}
 
 	static get orderModel() {

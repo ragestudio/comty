@@ -8,7 +8,7 @@ export default class GroupRoles {
 			throw new OperationError(400, "group_id must be a string")
 		}
 
-		const roles = await this.model.findAsync(
+		const roles = await this.model.find(
 			{
 				group_id: group_id,
 			},

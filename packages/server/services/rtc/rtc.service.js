@@ -1,14 +1,12 @@
 import { Server } from "linebridge"
 
-import ScyllaDb from "@shared-classes/ScyllaDb"
+import ScyllaDb from "@shared-classes/Scylla"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
 
 import MediaChannelsController from "@classes/MediaChannelsController"
 import UserCalls from "@classes/UserCalls"
-
-import ExperimentalScyllaDriver from "@shared-classes/Scylla"
 
 export default class API extends Server {
 	static refName = "rtc"
@@ -41,7 +39,6 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb()),
-		scy: (global.scy = new ExperimentalScyllaDriver()),
 		redis: RedisClient(),
 		mediaChannels: new MediaChannelsController(this),
 		userCalls: new UserCalls(this),
@@ -53,7 +50,6 @@ export default class API extends Server {
 		() => this.contexts.redis.initialize(),
 		() => this.contexts.mediaChannels.initialize(),
 		() => this.contexts.userCalls.initialize(),
-		() => this.contexts.scy.initialize(),
 	]
 
 	async onInitialize() {

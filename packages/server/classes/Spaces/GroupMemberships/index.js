@@ -8,10 +8,13 @@ import isUserIdOnMembersMethod from "./methods/isUserIdOnMembers"
 
 export default class GroupMemberships {
 	static get model() {
-		return global.scy.model("group_memberships")
+		return global.scylla.model("group_memberships")
 	}
 	static get modelRef() {
-		return global.scy.model("group_memberships_ref")
+		return global.scylla.model("group_memberships_ref")
+	}
+	static get modelCounter() {
+		return global.scylla.model("group_memberships_counter")
 	}
 
 	static get = getMethod.bind(this)

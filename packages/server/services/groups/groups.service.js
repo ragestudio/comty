@@ -3,11 +3,9 @@ import { Server } from "linebridge"
 import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
-import ScyllaDb from "@shared-classes/ScyllaDb"
+import ScyllaDb from "@shared-classes/Scylla"
 import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
-
-import ExperimentalScyllaDriver from "@shared-classes/Scylla"
 
 export default class API extends Server {
 	static refName = "groups"
@@ -29,7 +27,6 @@ export default class API extends Server {
 		db: new DbManager(),
 		redis: RedisClient(),
 		scylla: (global.scylla = new ScyllaDb()),
-		scy: (global.scy = new ExperimentalScyllaDriver()),
 		snowflake: (global.snowflake = new SnowflakeWorker(0, 1)),
 	}
 
@@ -37,7 +34,6 @@ export default class API extends Server {
 		() => this.contexts.db.initialize(),
 		() => this.contexts.redis.initialize(),
 		() => this.contexts.scylla.initialize(),
-		() => this.contexts.scy.initialize(),
 	]
 }
 

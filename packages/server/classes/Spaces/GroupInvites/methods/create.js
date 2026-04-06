@@ -11,7 +11,7 @@ export default async function (group, payload) {
 		throw new OperationError(400, "issuer_user_id must be provided")
 	}
 
-	const invite = new this.model({
+	const invite = this.model.obj({
 		group_id: group._id.toString(),
 		key: nanoid(),
 		issuer_user_id: payload.issuer_user_id,
@@ -19,7 +19,7 @@ export default async function (group, payload) {
 		created_at: new Date().toISOString(),
 	})
 
-	await invite.saveAsync()
+	await invite.save()
 
-	return invite.toJSON()
+	return invite.toRaw()
 }

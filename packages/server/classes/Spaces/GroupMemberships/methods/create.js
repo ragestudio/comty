@@ -1,3 +1,7 @@
+// @ts-ignore
+import cassandra from "cassandra-driver"
+const { q } = cassandra.mapping
+
 export default async function (group_id, user_id) {
 	if (typeof group_id !== "string") {
 		throw new OperationError(400, "group_id must be provided")
@@ -29,11 +33,16 @@ export default async function (group_id, user_id) {
 		group_id: group_id,
 		user_id: user_id,
 		membership_id: membership._id,
+		created_at: created_at,
 	})
 
 	await groupRef.save()
 
-	// TODO: Update group version
+	// increase the counter
+	await this.modelCounter.update({
+		group_id: group_id,
+		counter: q.incr(1),
+	})
 
 	if (global.websockets) {
 		const eventPayload = {

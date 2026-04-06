@@ -34,11 +34,11 @@ export default function (this: Model, query: any, depth: number = 0) {
 		) {
 			const operators = Object.keys(value)
 
-			if (operators.length > 1) {
-				throw new Error(
-					`Multiple operators not allowed for field: ${field}`,
-				)
-			}
+			// if (operators.length > 1) {
+			// 	throw new Error(
+			// 		`Multiple operators not allowed for field: ${field}`,
+			// 	)
+			// }
 
 			const operator = operators[0]
 			let opValue = value[operator]

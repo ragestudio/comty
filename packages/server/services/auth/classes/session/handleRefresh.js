@@ -15,13 +15,10 @@ export default async function (req) {
 		throw new OperationError(401, "Invalid refresh token format")
 	}
 
-	let session = await this.Model.findOneAsync(
-		{
-			_id: validation.data.session_id,
-			user_id: validation.data.user_id,
-		},
-		{ raw: true },
-	)
+	let session = await this.Model.findOne({
+		_id: validation.data.session_id,
+		user_id: validation.data.user_id,
+	})
 
 	// check if session not found
 	if (!session) {
@@ -39,7 +36,7 @@ export default async function (req) {
 	const newAuthToken = await AuthToken.signToken(
 		{
 			...validation.data,
-			session_id: session._id.toString(),
+			session_id: session._id,
 		},
 		"authStrategy",
 	)
@@ -50,15 +47,9 @@ export default async function (req) {
 	)
 
 	// update session token
-	await this.Model.updateAsync(
-		{
-			_id: session._id.toString(),
-			user_id: session.user_id,
-		},
-		{
-			token: newAuthToken,
-		},
-	)
+	session.token = newAuthToken
+
+	await session.save()
 
 	return {
 		token: newAuthToken,

@@ -91,9 +91,10 @@ export default class AuthToken {
 			return result
 		}
 
-		const session = await AuthToken.SessionModel.findOneAsync(
+		const session = await AuthToken.SessionModel.findOne(
 			{
 				_id: validation.data.session_id,
+				user_id: validation.data.user_id,
 			},
 			{ raw: true },
 		)

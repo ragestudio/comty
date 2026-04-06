@@ -1,7 +1,7 @@
 import Groups from "@shared-classes/Spaces/Groups"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
-import ChatChannel from "@classes/ChatChannel"
+import GroupChatChannel from "./instance"
 
 export default class GroupChatChannelController {
 	constructor(server) {
@@ -21,14 +21,12 @@ export default class GroupChatChannelController {
 			throw new OperationError(404, "Channel not found")
 		}
 
-		channel = channel.toRaw()
+		//channel = channel.toRaw()
 
 		if (channel.kind !== "chat") {
 			throw new OperationError(400, "This channel is not a chat")
 		}
 
-		return new ChatChannel(this, channel, {
-			topic: "chats:channel",
-		})
+		return new GroupChatChannel(this, channel)
 	}
 }

@@ -5,13 +5,13 @@ export default async function (payload) {
 	const session_id = nanoid()
 
 	// create a new Session obj
-	const session = new this.Model({
+	const session = this.Model.obj({
 		_id: session_id,
 		user_id: payload.user_id,
 		sign_location: payload.sign_location,
 		ip_address: payload.ip_address,
 		client: payload.client,
-		created_at: new Date().getTime(),
+		created_at: new Date(),
 	})
 
 	// create and sign a new auth token
@@ -35,10 +35,10 @@ export default async function (payload) {
 	session.token = signedAuthToken
 
 	// save the session
-	await session.saveAsync()
+	await session.save()
 
 	return {
-		data: session.toJSON(),
+		data: session.toRaw(),
 		authToken: signedAuthToken,
 		refreshToken: signedRefreshToken,
 		expiresIn: AuthToken.authStrategy.expiresIn,

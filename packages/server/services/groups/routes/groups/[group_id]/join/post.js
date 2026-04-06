@@ -64,7 +64,7 @@ export default {
 		invite.usages++
 
 		// save the invite
-		await invite.saveAsync()
+		await invite.save()
 
 		return membership
 	},

@@ -7,7 +7,7 @@ export default async function (group, key) {
 		throw new OperationError(400, "key must be provided")
 	}
 
-	const invite = await this.model.findOneAsync({
+	const invite = await this.model.findOne({
 		group_id: group._id.toString(),
 		key: key,
 	})
@@ -16,7 +16,7 @@ export default async function (group, key) {
 		throw new OperationError(404, "Invite not found")
 	}
 
-	await invite.deleteAsync()
+	await invite.delete()
 
-	return invite.toJSON()
+	return invite.toRaw()
 }

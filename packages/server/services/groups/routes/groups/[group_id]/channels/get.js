@@ -21,7 +21,7 @@ export default {
 		channels = channels.map((channel) => channel.toRaw())
 
 		const channelOrder = await GroupChannels.orderModel
-			.findOneAsync({
+			.findOne({
 				group_id: req.params.group_id,
 			})
 			.catch(() => null)

@@ -5,23 +5,21 @@ export default async function (user, payload) {
 
 	this.validateMessagePayload(payload)
 
-	const Message = this.scylla.model("channel_messages")
-
 	const _id = this.snowflake.nextId().toString()
-	const created_at = new Date().toISOString()
+	const created_at = new Date()
 
-	let message = new Message({
+	let message = this.MessageModel.obj({
 		_id: _id,
 		channel_id: this.channel._id.toString(),
 		user_id: user._id.toString(),
 		message: payload.message && String(payload.message),
 		attachments: payload.attachments,
 		reply_to_id: payload.reply_to_id,
-		created_at: created_at.toString(),
+		created_at: created_at,
 		sticker: payload.sticker,
 	})
 
-	await message.saveAsync()
+	await message.save()
 
 	if (typeof this.onWrite === "function") {
 		try {
@@ -33,7 +31,7 @@ export default async function (user, payload) {
 	}
 
 	const obj = {
-		...message.toJSON(),
+		...message.toRaw(),
 		user: user,
 	}
 

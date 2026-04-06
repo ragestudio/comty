@@ -7,7 +7,7 @@ export default async function (user, payload) {
 		channel_id: this.channel._id.toString(),
 		$limit: limit,
 		$orderby: {
-			$desc: "_id",
+			_id: "desc",
 		},
 	}
 
@@ -25,7 +25,7 @@ export default async function (user, payload) {
 
 	const Message = this.scylla.model("channel_messages")
 
-	let messages = await Message.findAsync(query, {
+	let messages = await Message.find(query, {
 		raw: true,
 	})
 	let users = []
