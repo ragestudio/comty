@@ -104,6 +104,9 @@ export default class APICore extends Core {
 				})
 			}
 		},
+		"wsmanager:main:open": () => {
+			this.console.log("Main socket open")
+		},
 	}
 
 	getWebsocketClient(namespace) {
@@ -184,7 +187,7 @@ export default class APICore extends Core {
 	}
 
 	async onInitialize() {
-		this.client = createClient({
+		this.client = await createClient({
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
