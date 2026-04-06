@@ -1,17 +1,16 @@
 import React from "react"
-import { Skeleton } from "antd"
-import Button from "@ui/Button"
+import { Result, Skeleton } from "antd"
 import { DateTime } from "luxon"
+import { AnimatePresence, motion } from "motion/react"
 import PropTypes from "prop-types"
-import { useInView } from "react-intersection-observer"
+import { useOnInView } from "react-intersection-observer"
 
-import useChannelChat from "comty.js/hooks/useChannelChat"
-import useDMChat from "comty.js/hooks/useDMChat"
-
-import { useContentPanelHeaderRender } from "@contexts/WithSpaces/contentPanel"
-
-import Line from "./components/Line"
+import Icons from "@components/Icons"
+import Button from "@ui/Button"
 import ChatInputBar from "./components/InputBar"
+import Line from "./components/Line"
+
+import useChat from "@contexts/WithSpaces/chat"
 
 import "./index.less"
 
@@ -21,7 +20,7 @@ function shouldMergeWithNextItem(nextItem, item) {
 		return false
 	}
 
-	if (nextItem.user.username !== item.user.username) {
+	if (nextItem.user_id !== item.user_id) {
 		return false
 	}
 
@@ -37,10 +36,40 @@ function shouldMergeWithNextItem(nextItem, item) {
 	return true
 }
 
-const Chat = ({ type = "group", _id, group = {} }) => {
-	if (!_id) {
+const useTriggerValue = (callback) => {
+	const prevValueRef = React.useRef(false)
+
+	return (value) => {
+		if (value === true && prevValueRef.current === false) {
+			callback()
+		}
+
+		prevValueRef.current = value
+	}
+}
+
+const Chat = ({ _id, type = "group", group }) => {
+	let useChatParam = {}
+
+	if (!_id || !type) {
 		return null
 	}
+
+	if (type === "group" && !group) {
+		console.error("Chat with type group, must provide a group context")
+		return null
+	}
+
+	if (type === "group") {
+		useChatParam = { group_id: group.data._id, channel_id: _id }
+	}
+
+	if (type === "dm") {
+		useChatParam = { to_user_id: _id }
+	}
+
+	const timelineRef = React.useRef()
+	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 
 	const {
 		timeline,
@@ -54,107 +83,58 @@ const Chat = ({ type = "group", _id, group = {} }) => {
 		initialLoading,
 		pausedUpdate,
 		setPausedUpdates,
-	} =
-		type === "group"
-			? useChannelChat(group._id, _id, {
-					onNewMessage: () => handleOnNewMessage(),
-				})
-			: useDMChat(_id, {
-					onNewMessage: () => handleOnNewMessage(),
-				})
+	} = useChat(type, useChatParam, {
+		onNewMessage: () => handleOnNewMessage(),
+	})
 
-	const topTriggerInView = useInView()
+	const bottomTrigger = useTriggerValue(() => {
+		console.debug("View is BOTTOM, loading lasts messages")
+		loadAfter()
+	})
 
-	const timelineRef = React.useRef()
-	const canLoadBottom = React.useRef(false)
-	const canLoadTop = React.useRef(true)
+	const topTrigger = useTriggerValue(() => {
+		console.debug("View is TOP, loading older messages")
+		loadBefore()
+	})
 
-	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
+	const topTriggerRef = useOnInView((inView) => topTrigger(inView))
 
-	const handleOnNewMessage = async () => {
-		if (
-			timelineRef.current.scrollTop >= -100 &&
-			timelineRef.current.scrollTop <= 0
-		) {
-			console.debug("scrolling to new messages")
+	const goToBottom = React.useCallback(() => {
+		if (timelineRef.current) {
 			timelineRef.current.scrollTo(0, 0)
 		}
-	}
+	}, [timelineRef.current])
 
-	const handleOnScroll = React.useCallback(
-		(e) => {
-			const scrollPosition = Math.abs(timelineRef.current.scrollTop)
-
-			const isScrollBottomInRange =
-				scrollPosition >= 0 && scrollPosition < 100
-
-			if (!loading && canLoadBottom.current && isScrollBottomInRange) {
-				canLoadBottom.current = false
-
-				console.debug("[chat tab] loading bottom messages")
-
-				loadAfter()
-				setPausedUpdates(false)
-				setScrollableToBottom(false)
-			}
-
-			if (!isScrollBottomInRange && !canLoadBottom.current) {
-				canLoadBottom.current = true
-				setPausedUpdates(true)
-				setScrollableToBottom(true)
-			}
-		},
-		[_id, loadAfter],
-	)
-
-	const headerRender = React.useCallback(() => {
-		return (
-			<>
-				{scrollableToBottom && (
-					<Button
-						size="small"
-						shape="default"
-						onClick={() => {
-							timelineRef.current.scrollTo(0, 0)
-						}}
-					>
-						Go to bottom
-					</Button>
-				)}
-
-				{usersTyping.length > 0 && (
-					<div className="group-page__content-panel__header__content__users-typing">
-						{usersTyping.map((user) => (
-							<img
-								key={user._id}
-								src={user.avatar}
-								alt={user.username}
-							/>
-						))}
-						<span>is typing...</span>
-					</div>
-				)}
-			</>
-		)
-	}, [_id, usersTyping, scrollableToBottom])
-
-	useContentPanelHeaderRender(headerRender)
-
-	// load more data when scroll is on top
-	React.useEffect(() => {
-		if (!loading && topTriggerInView.inView && canLoadTop.current) {
-			console.debug("[chat tab] loading more messages")
-
-			loadBefore()
-			canLoadTop.current = false
+	const handleOnNewMessage = React.useCallback(() => {
+		if (!timelineRef.current || pausedUpdate) {
+			return
 		}
 
-		if (!topTriggerInView.inView && !canLoadTop.current) {
-			canLoadTop.current = true
+		if (!scrollableToBottom) {
+			timelineRef.current.scrollTo(0, 0)
 		}
-	}, [loadBefore, topTriggerInView])
+	}, [timelineRef, pausedUpdate])
+
+	const handleOnScroll = React.useCallback((e) => {
+		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
+		const isOnBottom = scrollPosition >= 0 && scrollPosition < 100
+
+		bottomTrigger(isOnBottom)
+
+		if (isOnBottom) {
+			setPausedUpdates(false)
+			setScrollableToBottom(false)
+		} else {
+			setPausedUpdates(true)
+			setScrollableToBottom(true)
+		}
+	}, [])
 
 	React.useEffect(() => {
+		if (initialLoading) {
+			return
+		}
+
 		if (timelineRef.current) {
 			timelineRef.current.addEventListener("scroll", handleOnScroll)
 		}
@@ -167,15 +147,28 @@ const Chat = ({ type = "group", _id, group = {} }) => {
 				)
 			}
 		}
-	}, [timelineRef.current])
+	}, [initialLoading, timelineRef.current])
 
 	if (error) {
-		return <p>Error: {error.message}</p>
+		return (
+			<Result
+				status="warning"
+				title="Failed to load messages"
+				subTitle={error.message}
+			/>
+		)
 	}
 
 	if (initialLoading) {
-		return <p>Loading...</p>
+		return null
 	}
+
+	const trimmedUsersTyping = usersTyping?.slice(0, 3)
+	const isUsersTypingOverflowing = usersTyping?.length > 3
+
+	const usernamesTyping = trimmedUsersTyping.reduce((str, user) => {
+		return `${str} ${user.username},`
+	}, "")
 
 	return (
 		<div
@@ -183,34 +176,103 @@ const Chat = ({ type = "group", _id, group = {} }) => {
 			data-is-dm={type === "direct"}
 			data-type={type}
 			data-channel-id={_id}
-			data-group-id={group._id}
+			data-group-id={group?.data?._id}
 		>
-			<div
-				id="chat-timeline"
-				className="channel-chat__timeline bg-accent"
-				ref={timelineRef}
-			>
-				{timeline.map((item, index) => {
-					const headless = shouldMergeWithNextItem(
-						timeline[index + 1],
-						item,
-					)
-
-					return (
-						<Line
-							key={item._id}
-							data={item}
-							headless={headless}
-						/>
-					)
-				})}
-
+			<div className="channel-chat__wrapper bg-accent">
 				<div
-					className="channel-chat__timeline__top-trigger"
-					ref={topTriggerInView.ref}
+					id="chat-timeline"
+					className="channel-chat__wrapper__timeline"
+					ref={timelineRef}
 				>
-					<Skeleton avatar />
+					<AnimatePresence mode="sync">
+						{usersTyping.length > 0 && (
+							<motion.div
+								className="channel-chat__timeline__typers"
+								animate={{
+									height: "100%",
+									left: 0,
+									y: 0,
+								}}
+								exit={{
+									height: 0,
+									y: 50,
+								}}
+								initial={{
+									height: 0,
+									y: 50,
+								}}
+								style={{
+									"--items": trimmedUsersTyping.length,
+								}}
+							>
+								<div className="channel-chat__timeline__typers__images">
+									{trimmedUsersTyping.map((user) => (
+										<img
+											key={user._id}
+											src={user.avatar}
+											alt={user.username}
+										/>
+									))}
+								</div>
+
+								<span>
+									{usernamesTyping}{" "}
+									{isUsersTypingOverflowing && "and more,"}{" "}
+									are typing...
+								</span>
+							</motion.div>
+						)}
+					</AnimatePresence>
+
+					{timeline.map((item, index) => {
+						const headless = shouldMergeWithNextItem(
+							timeline[index + 1],
+							item,
+						)
+
+						return (
+							<Line
+								key={item._id}
+								data={item}
+								headless={headless}
+							/>
+						)
+					})}
+
+					<div
+						className="channel-chat__timeline__top-trigger"
+						ref={topTriggerRef}
+					>
+						<Skeleton avatar />
+					</div>
 				</div>
+
+				<AnimatePresence>
+					{scrollableToBottom && (
+						<motion.div
+							className="channel-chat__timeline__scrollToBottom"
+							animate={{
+								y: 0,
+							}}
+							exit={{
+								y: 50,
+							}}
+							initial={{
+								y: 50,
+							}}
+						>
+							<div className="channel-chat__timeline__scrollToBottom__container bg-accent">
+								<Button
+									type="ghost"
+									onClick={goToBottom}
+								>
+									<Icons.ArrowDownToLine /> Go to recent
+									messages
+								</Button>
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 
 			<ChatInputBar
