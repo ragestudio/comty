@@ -1,4 +1,4 @@
-import type { StatedChannels } from "./channel"
+import type { Channels } from "./channel"
 import type { Members } from "./member"
 
 export interface Group {
@@ -12,10 +12,11 @@ export interface Group {
 	cover?: string
 	groupCoverImageAverageColor?: string
 
-	channels: StatedChannels
+	channels: Channels
 	members: Members
 
 	connected_members?: string[]
 
+	__v?: number
 	cached_at?: number
 }

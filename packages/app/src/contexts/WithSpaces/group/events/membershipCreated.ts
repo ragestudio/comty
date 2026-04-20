@@ -1,26 +1,26 @@
 import { EventsUpdaters } from ".."
 import db from "../../store"
+import UserModel from "@models/user"
 
 export interface MemberchipCreatedPayload {
+	group_id: string
 	membership_id: string
 	user_id: string
-	group_id: string
-	created_at: string
+	user?: any
 }
 
-export default (
+export default async (
 	currentGroupId: string,
 	updaters: EventsUpdaters,
 	payload: MemberchipCreatedPayload,
 ) => {
-	// exclude yourself
-	if (payload.user_id === app.userData._id) {
-		return null
-	}
-	// exclude not current group_id
-	// (this should not happend, cause those type of events its topic only, but never knows)
-	if (payload.group_id !== currentGroupId) {
-		return null
+	console.debug("membershipCreated", payload)
+
+	if (!payload.user) {
+		payload.user = await UserModel.data({
+			user_id: payload.user_id,
+			basic: true,
+		})
 	}
 
 	// update members
@@ -33,7 +33,7 @@ export default (
 			_id: payload.membership_id,
 			group_id: payload.group_id,
 			user_id: payload.user_id,
-			created_at: payload.created_at,
+			user: payload.user,
 		})
 
 		try {
@@ -45,8 +45,4 @@ export default (
 
 		return nw
 	})
-
-	// update db
-
-	return null
 }

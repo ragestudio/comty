@@ -1,13 +1,17 @@
 import UserConnections from "@shared-classes/UserConnections"
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
+import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
-	useContexts: ["redis", "scy", "scylla", "mediaChannels"],
+	useContexts: ["redis", "scylla", "mediaChannels"],
 	fn: async (req, res, ctx) => {
 		const { group_id } = req.params
 
-		const GroupsModel = ctx.scy.model("groups")
+		const GroupsModel = ctx.scylla.model("groups")
+		const LastChannelMessageIdModel = ctx.scylla.model(
+			"group_channels_last_message_id",
+		)
 
 		const group = await GroupsModel.findOne(
 			{ _id: group_id },
@@ -29,15 +33,37 @@ export default {
 
 		let state = {
 			group: group,
-			memberships: (await GroupMemberships.getByGroupId(group_id)) ?? [],
-			channels:
-				(await ctx.mediaChannels.findChannelsByGroupId(group_id)) ?? [],
-			connected_members: [],
+			total_members: 0,
 		}
 
-		if (Array.isArray(state.channels)) {
+		console.time("getLastChannelsMessages")
+		let channels = await GroupChannels.getAllByGroupId(
+			group,
+			req.auth.session.user_id,
+		)
+
+		const channelsIds = channels.map((channel) => channel._id)
+
+		state.last_channels_messages = await LastChannelMessageIdModel.find({
+			channel_id: {
+				$in: channelsIds,
+			},
+		})
+		console.timeEnd("getLastChannelsMessages")
+
+		console.time("getTotalMembersByGroupId")
+		state.total_members =
+			await GroupMemberships.getTotalMembersByGroupId(group_id)
+		console.timeEnd("getTotalMembersByGroupId")
+
+		console.time("getRtcState")
+		state.rtc =
+			(await ctx.mediaChannels.findChannelsByGroupId(group_id)) ?? []
+		console.timeEnd("getRtcState")
+
+		if (Array.isArray(state.rtc)) {
 			// map channel clients
-			state.channels = state.channels.map((channel) => {
+			state.rtc = state.rtc.map((channel) => {
 				return {
 					__v: channel.data.__v,
 					_id: channel.data._id,

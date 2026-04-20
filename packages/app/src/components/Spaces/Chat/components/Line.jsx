@@ -9,6 +9,9 @@ import Image from "@components/Image"
 import StickerRender from "@components/StickerRender"
 
 import LinkPreview from "./LinkPreview"
+import { useLiveQuery } from "dexie-react-hooks"
+
+import db from "@contexts/WithSpaces/store"
 
 import "./Line.less"
 
@@ -28,6 +31,11 @@ const messageRegexs = [
 					}}
 					url={result[0]}
 					controls
+					config={{
+						youtube: {
+							host: "https://youtube-nocookie.com",
+						},
+					}}
 				/>
 			)
 		},
@@ -87,10 +95,12 @@ const RenderMessage = ({ messageStr }) => {
 }
 
 const Line = React.memo(({ data, headless }) => {
+	const userData = useLiveQuery(() => db.users.get(data.user_id))
+
 	return (
 		<div
 			data-message-id={data._id}
-			data-message-user-id={data.user?._id ?? "unknown"}
+			data-message-user-id={data.user_id ?? "unknown"}
 			context-menu="chat-line"
 			className={classnames("channel-chat__timeline__line", {
 				["headless"]: headless,
@@ -99,8 +109,8 @@ const Line = React.memo(({ data, headless }) => {
 			{!headless && (
 				<div className="channel-chat__timeline__line__avatar">
 					<Image
-						src={data.user.avatar}
-						alt={data.user.username}
+						src={userData?.avatar}
+						alt={userData?.username}
 					/>
 				</div>
 			)}
@@ -110,11 +120,11 @@ const Line = React.memo(({ data, headless }) => {
 					<div className="channel-chat__timeline__line__content__header">
 						<div className="channel-chat__timeline__line__content__header__username">
 							<span>
-								{data.user?.public_name ??
-									`@${data.user?.username}`}
+								{userData?.public_name ??
+									`@${userData?.username}`}
 							</span>
 
-							{data.user.bot && (
+							{userData?.bot && (
 								<div className="channel-chat__timeline__line__content__header__username__bot-indicator">
 									<span>Bot</span>
 								</div>

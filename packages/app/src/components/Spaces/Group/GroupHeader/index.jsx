@@ -80,12 +80,10 @@ const GroupHeader = () => {
 			</div>
 
 			<div className="group-page__header__actions">
-				{data.owner_user_id === app.userData._id && (
-					<Button
-						icon={<Icons.Settings />}
-						onClick={onClickSettingsButton}
-					/>
-				)}
+				<Button
+					icon={<Icons.Settings />}
+					onClick={onClickSettingsButton}
+				/>
 
 				<Button
 					icon={<Icons.Link2 />}

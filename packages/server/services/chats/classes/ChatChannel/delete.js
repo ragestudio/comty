@@ -27,6 +27,15 @@ export default async function (user, messageId) {
 
 	await message.delete()
 
+	if (typeof this.onDelete === "function") {
+		try {
+			await this.onDelete(user, message)
+		} catch (error) {
+			console.error("Failed to execute onDelete hook", error)
+			throw error
+		}
+	}
+
 	this.sendEventToChannelTopic("channel:message:deleted", {
 		_id: message._id.toString(),
 	})

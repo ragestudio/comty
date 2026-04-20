@@ -11,6 +11,8 @@ export interface Channel {
 	description?: string
 	explicit: boolean
 
+	last_message_id?: string
+
 	created_at: Date
 	cached_at?: number
 }

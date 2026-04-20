@@ -32,4 +32,17 @@ export default class GroupChatChannel extends ChatChannel {
 			console.error("Failed to update channel last message id", err)
 		}
 	}
+
+	onDelete = async (deleted_message) => {
+		try {
+			const lastMessage = await this.getLastMessageObj()
+
+			await GroupChatChannel.LastChannelMessageIdModel.update({
+				channel_id: this.channel._id,
+				_id: lastMessage._id,
+			})
+		} catch (err) {
+			console.error("Failed to update channel last message id", err)
+		}
+	}
 }

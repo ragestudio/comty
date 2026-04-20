@@ -66,6 +66,22 @@ export default class ChatChannel {
 		}
 	}
 
+	async getLastMessageObj() {
+		const message = await this.MessageModel.find({
+			channel_id: this._id,
+			$limit: 1,
+			$orderby: {
+				_id: "desc",
+			},
+		})
+
+		if (message.length === 0) {
+			throw new OperationError(404, "No last message found")
+		}
+
+		return message[0]
+	}
+
 	async sendEventToChannelTopic(event, data) {
 		return this.controller.server.engine.ws.senders.toTopic(
 			`${this.topic}:${this.channel._id.toString()}`,

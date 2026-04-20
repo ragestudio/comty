@@ -3,13 +3,19 @@ import React from "react"
 import GroupsModel from "@models/groups"
 import buildSocketEvents from "./events"
 import loadChannelsStates from "../helpers/loadChannelsStates"
-import { cacheGroup, cacheChannels, cacheMembers } from "../helpers/cache"
+import {
+	cacheGroup,
+	cacheChannels,
+	cacheMembers,
+	cacheTotalMembers,
+} from "../helpers/cache"
 
 import db from "../store"
 
 import type { Group } from "../collections/group"
-import type { Channels, StatedChannel } from "../collections/channel"
-import type { Members } from "../collections/member"
+import type { Channel, Channels, StatedChannel } from "../collections/channel"
+import type { Member, Members } from "../collections/member"
+import { GroupState } from "../types"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
@@ -104,12 +110,57 @@ const useGroup = ({ group_id }) => {
 
 			// update cache
 			setMembers(res)
-			await cacheMembers(group_id, res)
+			await cacheMembers(res)
+			await cacheTotalMembers(group_id, res.total_items)
 
 			return res
 		} catch (err) {
 			console.error("Error fetching more members:", err)
 		}
+	}, [group_id])
+
+	const syncWithState = React.useCallback(async () => {
+		const groupState = (await GroupsModel.rtc.getGroupState(
+			group_id,
+		)) as GroupState
+
+		if (groupState?.connected_members) {
+			setConnectedMembers(groupState.connected_members)
+		}
+
+		if (groupState?.rtc) {
+			setStatedChannels(
+				(groupState.rtc as unknown as StatedChannel[]).reduce(
+					(curr, channel) => {
+						curr[channel._id] = channel
+						return curr
+					},
+					{},
+				),
+			)
+		}
+
+		// cache the channels
+		if (groupState?.channels && Array.isArray(groupState?.channels)) {
+			try {
+				//setChannels(groupState.channels)
+				//cacheChannels(group_id, groupState.channels)
+			} catch (error) {
+				console.error("Failed to sync to local db", error)
+			}
+		}
+
+		// update last_channels_messages
+		if (
+			groupState?.last_channels_messages &&
+			Array.isArray(groupState?.last_channels_messages)
+		) {
+			await db.last_channels_message.bulkPut(
+				groupState.last_channels_messages,
+			)
+		}
+
+		return groupState
 	}, [group_id])
 
 	const load = React.useCallback(async () => {
@@ -118,14 +169,33 @@ const useGroup = ({ group_id }) => {
 
 		let cached = {
 			group: null,
-			members: null,
+
+			memberships: null,
+			total_members: 0,
+
 			channels: null,
+		} as {
+			group: Group | null
+
+			memberships: Member[] | null
+			total_members: number | null
+
+			channels: Channels | null
 		}
 
 		try {
 			cached.group = await db.groups.get(group_id)
+
 			cached.channels = await db.channels.get(group_id)
-			cached.members = await db.members.get(group_id)
+
+			cached.memberships = await db.members
+				.where("group_id")
+				.equals(group_id)
+				.limit(50)
+				.toArray()
+
+			cached.total_members =
+				(await db.members_counter.get(group_id)).counter ?? 0
 		} catch (error) {
 			console.error("Failed to get cached content", error)
 		}
@@ -150,12 +220,15 @@ const useGroup = ({ group_id }) => {
 			//
 			// fetch the members list
 			//
-			if (!cached.members || !cached.members?.cached_at) {
+			if (!cached.memberships || cached.memberships.length === 0) {
 				console.time("members.list()")
-				cached.members = await fetchMembers()
+				await fetchMembers()
 				console.timeEnd("members.list()")
 			} else {
-				setMembers(cached.members)
+				setMembers({
+					items: cached.memberships,
+					total_items: cached.total_members,
+				})
 			}
 
 			//
@@ -169,38 +242,16 @@ const useGroup = ({ group_id }) => {
 				setChannels(cached.channels)
 			}
 
-			//
-			// load group rtc state & update connected_members if available
-			//
-			console.time("getGroupState")
-			const groupState = await GroupsModel.rtc.getGroupState(group_id)
+			const state = await syncWithState()
 
-			if (groupState?.connected_members) {
-				setConnectedMembers(groupState.connected_members)
+			if ((cached.group.__v ?? 0) < (state.group.__v ?? 0)) {
+				console.log("Group Version invalidates the cache")
+				await fetchGroup()
 			}
-			if (groupState?.channels) {
-				setStatedChannels(
-					(groupState.channels as unknown as StatedChannel[]).reduce(
-						(curr, channel) => {
-							curr[channel._id] = channel
-							return curr
-						},
-						{},
-					),
-				)
+
+			if (cached.total_members < state.total_members) {
+				await fetchMembers()
 			}
-			console.timeEnd("getGroupState")
-
-			//
-			// load the channels states
-			//
-			// const _lo = await loadChannelsStates({
-			// 	groupState: groupState,
-			// 	channels: cached.channels,
-			// })
-
-			// cached.channels.items = _lo.items
-			// setChannels(cached.channels)
 		} catch (err) {
 			console.error(err)
 			setError(err as Error)

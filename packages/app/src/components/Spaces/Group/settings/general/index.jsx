@@ -2,6 +2,7 @@ import React from "react"
 import { Input } from "antd"
 
 import Button from "@ui/Button"
+import ConfirmButton from "@ui/ConfirmButton"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
 
@@ -55,6 +56,16 @@ const GeneralSettings = () => {
 		})
 	}
 
+	const handleLeaveGroup = async () => {
+		app.layout.modal.confirm({
+			onConfirm: async () => {
+				await GroupsModel.leave(group?.data?._id)
+
+				app.location.push("/spaces")
+			},
+		})
+	}
+
 	return (
 		<div className="group-settings-panel__fields">
 			<div className="group-settings-panel__fields__field">
@@ -98,12 +109,20 @@ const GeneralSettings = () => {
 			</div>
 
 			<div className="group-settings-panel__fields__field">
-				<Button
+				<ConfirmButton
 					type="danger"
-					onClick={handleDeleteGroup}
+					onConfirm={handleDeleteGroup}
 				>
 					Delete
-				</Button>
+				</ConfirmButton>
+			</div>
+			<div className="group-settings-panel__fields__field">
+				<ConfirmButton
+					type="danger"
+					onConfirm={handleLeaveGroup}
+				>
+					Leave
+				</ConfirmButton>
 			</div>
 		</div>
 	)

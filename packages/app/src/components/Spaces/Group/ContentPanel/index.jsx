@@ -52,7 +52,7 @@ export const ContentPanelHeader = () => {
 		)
 	}
 
-	if (content.type === "channel") {
+	if (content.type === "group") {
 		return (
 			<div className="group-page__content-panel__header">
 				<p>
@@ -107,6 +107,6 @@ export const ContentPanelRender = () => {
 
 	return React.createElement(Tabs[content.type].component, {
 		...content.props,
-		group: group.data,
+		group: group,
 	})
 }

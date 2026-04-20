@@ -1,7 +1,7 @@
 import React from "react"
 import Button from "@ui/Button"
 import { Icons } from "@components/Icons"
-
+import ConfirmButton from "@ui/ConfirmButton"
 import SortableList from "@components/SortableList"
 
 import GroupsModel from "@models/groups"
@@ -9,7 +9,7 @@ import GroupContext from "@contexts/WithSpaces/group"
 
 import "./index.less"
 
-const Channel = ({ data }) => {
+const Channel = ({ data, onClickDelete }) => {
 	const { _id, name, description } = data
 
 	return (
@@ -24,12 +24,13 @@ const Channel = ({ data }) => {
 
 			<div className="group-settings-channels__list__channel__actions">
 				<Button>Edit</Button>
+				<ConfirmButton onConfirm={onClickDelete}>Delete</ConfirmButton>
 			</div>
 		</div>
 	)
 }
 
-const ChannelsList = () => {
+const ChannelsList = ({ onDeleteChannel }) => {
 	const group = React.useContext(GroupContext)
 	const [channels, setChannels] = React.useState([])
 
@@ -39,7 +40,7 @@ const ChannelsList = () => {
 	)
 
 	const hasChanges = () => {
-		const originalChannelsIds = R_Channels.map((c) => c._id)
+		const originalChannelsIds = R_Channels.items.map((c) => c._id)
 		const channelsIds = channels.map((c) => c._id)
 
 		// check if the channels orders are different
@@ -67,7 +68,7 @@ const ChannelsList = () => {
 
 	React.useEffect(() => {
 		if (R_Channels) {
-			setChannels(R_Channels)
+			setChannels(R_Channels.items)
 		}
 	}, [R_Channels])
 
@@ -89,6 +90,7 @@ const ChannelsList = () => {
 					<Channel
 						key={channel._id}
 						data={channel}
+						onClickDelete={() => onDeleteChannel(channel._id)}
 					/>
 				)}
 				onChange={(arr) => {
@@ -100,17 +102,30 @@ const ChannelsList = () => {
 }
 
 const ChannelsSettings = () => {
+	const group = React.useContext(GroupContext)
+
+	const handleCreateNewChannel = async () => {
+		await GroupsModel.channels.create(group.data._id, {
+			name: "New channel",
+			kind: "chat",
+		})
+	}
+
+	const handleDeleteChannel = async (channel_id) => {
+		await GroupsModel.channels.channel.delete(group.data._id, channel_id)
+	}
+
 	return (
 		<div className="group-settings-channels">
 			<div className="group-settings-channels__header">
 				<h3>Channels</h3>
 
 				<div className="group-settings-channels__header__actions">
-					<Button>Create new</Button>
+					<Button onClick={handleCreateNewChannel}>Create new</Button>
 				</div>
 			</div>
 
-			<ChannelsList />
+			<ChannelsList onDeleteChannel={handleDeleteChannel} />
 		</div>
 	)
 }

@@ -14,9 +14,9 @@ import clientVoiceChannelProducerOpen, {
 import userOffline, { UserOfflinePayload } from "./userOffline"
 import userOnline, { UserOnlinePayload } from "./userOnline"
 import voiceChannelEnd, { VoiceChannelEndedPayload } from "./voiceChannelEnd"
-import voiceChannelStated, {
+import voiceChannelStarted, {
 	VoiceChannelStartedPayload,
-} from "./voiceChannelStated"
+} from "./voiceChannelStarted"
 import { EventsUpdaters } from ".."
 import membershipCreated, {
 	MemberchipCreatedPayload,
@@ -28,6 +28,9 @@ import groupUpdate from "./groupUpdate"
 import channelCreated from "./channelCreated"
 import channelDeleted from "./channelDeleted"
 import channelUpdated from "./channelUpdated"
+import channelsOrdered from "./channelsOrdered"
+import channelNewMessage from "./channelNewMessage"
+import channelDeletedMessage from "./channelDeletedMessage"
 
 export default ({
 	group_id,
@@ -54,6 +57,15 @@ export default ({
 			channelDeleted(group_id, updaters, payload),
 		[`${groupTopicPrefix}:channel:updated`]: (payload: any) =>
 			channelUpdated(group_id, updaters, payload),
+		[`${groupTopicPrefix}:channels:ordered`]: (payload: any) =>
+			channelsOrdered(group_id, updaters, payload),
+
+		[`${groupTopicPrefix}:channels:new:message`]: (payload: any) =>
+			channelNewMessage(group_id, updaters, payload),
+		[`${groupTopicPrefix}:channels:deleted:message`]: (payload: any) =>
+			channelDeletedMessage(group_id, updaters, payload),
+		// [`${groupTopicPrefix}:channels:updated:message`]: (payload: any) =>
+		//   channelNewMessage(group_id, updaters, payload),
 
 		//
 		// Memberships Events
@@ -70,7 +82,7 @@ export default ({
 		//
 		[`${groupTopicPrefix}:vc:started`]: (
 			payload: VoiceChannelStartedPayload,
-		) => voiceChannelStated(group_id, updaters, payload),
+		) => voiceChannelStarted(group_id, updaters, payload),
 		[`${groupTopicPrefix}:vc:ended`]: (payload: VoiceChannelEndedPayload) =>
 			voiceChannelEnd(group_id, updaters, payload),
 		[`${groupTopicPrefix}:client:vc:join`]: (

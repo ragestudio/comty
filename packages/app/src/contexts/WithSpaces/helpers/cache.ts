@@ -1,6 +1,7 @@
 import { Channels } from "../collections/channel"
 import { Group } from "../collections/group"
 import { Members } from "../collections/member"
+import { User } from "../collections/user"
 
 import db from "../store"
 
@@ -19,17 +20,28 @@ export const cacheGroup = async (group: Group): Promise<void> => {
 }
 
 // cache members list
-export const cacheMembers = async (
-	group_id: string,
-	members: Members,
-): Promise<void> => {
+export const cacheMembers = async (members: Members): Promise<void> => {
 	try {
-		members.group_id = group_id
-		members.cached_at = Date.now()
+		members.items = members.items.map((member) => {
+			member.cached_at = Date.now()
 
-		await db.members.put(members)
+			return member
+		})
+
+		await db.members.bulkPut(members.items)
 	} catch (err) {
 		console.error("Error caching members:", err)
+	}
+}
+
+export const cacheTotalMembers = async (group_id: string, counter: number) => {
+	try {
+		await db.members_counter.put({
+			group_id: group_id,
+			counter: counter,
+		})
+	} catch (err) {
+		console.error("Error caching total members:", err)
 	}
 }
 
@@ -45,6 +57,23 @@ export const cacheChannels = async (
 		await db.channels.put(channels)
 	} catch (err) {
 		console.error("Error caching channels:", err)
+	}
+}
+
+export const cacheUsers = async (users: User[]) => {
+	try {
+		if (!Array.isArray(users)) {
+			throw new Error(`"users" must be a array`)
+		}
+
+		users = users.map((user) => {
+			user.cached_at = Date.now()
+			return user
+		})
+
+		await db.users.bulkPut(users)
+	} catch (error) {
+		console.error("Error caching users", error)
 	}
 }
 

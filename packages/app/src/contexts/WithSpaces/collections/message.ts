@@ -1,4 +1,11 @@
+import { User } from "./user"
+
 export interface Message {
+	__v?: number
+	cached_at?: number
+
+	user?: User
+
 	_id: string
 	channel_id: string
 	user_id: string
@@ -9,8 +16,6 @@ export interface Message {
 	sticker?: string
 	reply_to_id?: string
 
-	updated_at: Date
 	created_at: Date
-
-	cached_at?: number
+	updated_at?: Date
 }

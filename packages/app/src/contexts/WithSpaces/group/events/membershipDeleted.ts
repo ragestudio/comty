@@ -12,15 +12,7 @@ export default (
 	updaters: EventsUpdaters,
 	payload: MemberchipDeletedPayload,
 ) => {
-	// exclude yourself
-	if (payload.user_id === app.userData._id) {
-		return null
-	}
-	// exclude not current group_id
-	// (this should not happend, cause those type of events its topic only, but never knows)
-	if (payload.group_id !== currentGroupId) {
-		return null
-	}
+	console.debug("membershipDeleted", payload)
 
 	// update members
 	updaters.setMembers((prev) => {
@@ -45,6 +37,4 @@ export default (
 
 		return nw
 	})
-
-	return null
 }
