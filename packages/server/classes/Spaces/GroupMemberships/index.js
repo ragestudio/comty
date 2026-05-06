@@ -6,15 +6,19 @@ import getByUserIdMethod from "./methods/getByUserId"
 import getTotalMembersByGroupIdMethod from "./methods/getTotalMembersByGroupId"
 import isUserIdOnMembersMethod from "./methods/isUserIdOnMembers"
 
+import GroupMembershipsModel from "@db/group_memberships"
+import GroupMembershipsRefModel from "@db/group_memberships_ref"
+import GroupMembershipsCounterModel from "@db/group_memberships_counter"
+
 export default class GroupMemberships {
 	static get model() {
-		return global.scylla.model("group_memberships")
+		return GroupMembershipsModel
 	}
 	static get modelRef() {
-		return global.scylla.model("group_memberships_ref")
+		return GroupMembershipsRefModel
 	}
 	static get modelCounter() {
-		return global.scylla.model("group_memberships_counter")
+		return GroupMembershipsCounterModel
 	}
 
 	static get = getMethod.bind(this)

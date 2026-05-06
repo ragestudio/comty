@@ -1,6 +1,6 @@
 import { Server } from "linebridge"
 
-import ScyllaDb from "@shared-classes/Scylla"
+import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"

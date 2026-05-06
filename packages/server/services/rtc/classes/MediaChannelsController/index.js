@@ -141,4 +141,28 @@ export default class MediaChannelsController {
 			client.transports.clear()
 		}
 	}
+
+	/**
+	 * Send an event to the group topic
+	 * @param {String} group_id
+	 * @param {String} event
+	 * @param {Object} payload
+	 * @return {Promise}
+	 */
+	async sendToGroupTopic(group_id, event, payload) {
+		const topic = `group:${group_id}`
+
+		try {
+			return await globalThis.websockets.senders.toTopic(
+				topic,
+				`${topic}:${event}`,
+				payload,
+			)
+		} catch (error) {
+			console.error(
+				`[CHANNEL:${this.channelId}] Error sending to group topic`,
+				error,
+			)
+		}
+	}
 }

@@ -3,6 +3,8 @@ import cassandra from "cassandra-driver"
 import { DateTime, Duration } from "luxon"
 import type { mapping } from "cassandra-driver/lib/mapping"
 
+import schema from "@db/group_memberships_ref"
+
 type SyncPayload = {
 	group_id: string
 	data_sync_time?: string
@@ -29,10 +31,6 @@ export default {
 			throw new OperationError(400, "Missing group_id to sync with")
 		}
 
-		const GroupMembershipsRefModel = ctx.scylla.model(
-			"group_memberships_ref",
-		)
-
 		console.log("groups::sync", payload)
 
 		let eventsBeforeSyncTime: EventBefore = {}
@@ -46,9 +44,7 @@ export default {
 				cacheMiss.members = true
 			} else {
 				const newMemberships = (
-					await (
-						GroupMembershipsRefModel.mapper as mapping.ModelMapper
-					).find(
+					await (schema.mapper as mapping.ModelMapper).find(
 						{
 							group_id: payload.group_id,
 							created_at: cassandra.mapping.q.gt(

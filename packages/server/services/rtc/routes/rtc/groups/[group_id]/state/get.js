@@ -2,16 +2,14 @@ import UserConnections from "@shared-classes/UserConnections"
 import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
+import GroupsModel from "@db/groups"
+import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
+
 export default {
 	useMiddlewares: ["withAuthentication"],
 	useContexts: ["redis", "scylla", "mediaChannels"],
 	fn: async (req, res, ctx) => {
 		const { group_id } = req.params
-
-		const GroupsModel = ctx.scylla.model("groups")
-		const LastChannelMessageIdModel = ctx.scylla.model(
-			"group_channels_last_message_id",
-		)
 
 		const group = await GroupsModel.findOne(
 			{ _id: group_id },

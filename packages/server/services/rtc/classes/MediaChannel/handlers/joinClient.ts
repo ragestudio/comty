@@ -9,6 +9,8 @@ async function joinClientHandler(this: any, client: RTCClient) {
 			deafened: false,
 		}
 
+		client.channel_id = this.channelId
+
 		// add to set of clients
 		this.clients.add(client)
 
@@ -44,17 +46,21 @@ async function joinClientHandler(this: any, client: RTCClient) {
 		}
 
 		// publish to group topic
-		await this.sendToGroupTopic("client:vc:join", {
-			userId: client.userId,
-			channelId: this.channelId,
-			user: {
-				_id: client.context.user._id,
-				username: client.context.user.username,
-				avatar: client.context.user.avatar,
-			},
-			voiceState: client.voiceState,
-			channelClients: this.getConnectedClientsSerialized(),
-		})
+		this.events.emit("client:join", this, client)
+		// await this.sendToGroupTopic("client:vc:join", {
+		// 	userId: client.userId,
+		// 	channelId: this.channelId,
+		// 	user: {
+		// 		_id: client.context.user._id,
+		// 		username: client.context.user.username,
+		// 		avatar: client.context.user.avatar,
+		// 	},
+		// 	voiceState: client.voiceState,
+		// 	channelClients: this.getConnectedClientsSerialized(),
+		// })
+		//
+
+		console.log("joinClient", client.userId, client.channel_id)
 
 		return {
 			started_at: this.started_at,

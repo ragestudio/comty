@@ -1,6 +1,7 @@
 import { Server } from "linebridge"
+import path from "path"
 
-import ScyllaDb from "@shared-classes/Scylla"
+import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
@@ -60,14 +61,19 @@ export default class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb()),
+		scylla: (global.scylla = new ScyllaDb({
+			modelsPath: path.resolve(__dirname, "../../db"),
+		})),
 		redis: RedisClient(),
 		userConnections: new UserConnections(this),
 	}
 
 	initialize = [
 		() => this.contexts.db.initialize(),
-		() => this.contexts.scylla.initialize(),
+		() =>
+			this.contexts.scylla.initialize({
+				sync: true,
+			}),
 		() => this.contexts.redis.initialize(),
 	]
 

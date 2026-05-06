@@ -5,13 +5,16 @@ import updateMethod from "./methods/update"
 import deleteMethod from "./methods/delete"
 import orderMethod from "./methods/order"
 
+import GroupChannelsModel from "@db/group_channels"
+import ChannelOrdersModel from "@db/channel_orders"
+
 export default class GroupChannels {
 	static get model() {
-		return global.scylla.model("group_channels")
+		return GroupChannelsModel
 	}
 
 	static get orderModel() {
-		return global.scylla.model("channel_orders")
+		return ChannelOrdersModel
 	}
 
 	static kinds = {

@@ -1,5 +1,7 @@
+import SessionModel from "@db/auth_session"
+
 export default async function (user_id) {
-	const sessions = await this.Model.find(
+	const sessions = await SessionModel.find(
 		{
 			user_id: user_id,
 		},

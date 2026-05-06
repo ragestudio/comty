@@ -1,11 +1,12 @@
 import AuthToken from "@shared-classes/AuthToken"
+import SessionModel from "@db/auth_session"
 
 export default async function (payload) {
 	// generate a new session id
 	const session_id = nanoid()
 
 	// create a new Session obj
-	const session = this.Model.obj({
+	const session = SessionModel.obj({
 		_id: session_id,
 		user_id: payload.user_id,
 		sign_location: payload.sign_location,

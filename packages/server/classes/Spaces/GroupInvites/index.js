@@ -3,9 +3,11 @@ import getAllByGroupMethod from "./methods/getAllByGroup"
 import createMethod from "./methods/create"
 import deleteMethod from "./methods/delete"
 
+import GroupInviteKeyModel from "@db/group_invite_key"
+
 export default class GroupInvites {
 	static get model() {
-		return global.scylla.model("group_invite_key")
+		return GroupInviteKeyModel
 	}
 
 	static get = getMethod.bind(this)

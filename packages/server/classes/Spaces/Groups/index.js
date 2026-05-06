@@ -7,15 +7,19 @@ import deleteMethod from "./methods/delete"
 import canUserIdReachMethod from "./methods/canUserIdReach"
 import sortMerthod from "./methods/sort"
 
+import GroupsModel from "@db/groups"
+import GroupsUserOrdersModel from "@db/groups_user_orders"
+import GroupInviteKeyModel from "@db/group_invite_key"
+
 export default class Groups {
 	static get model() {
-		return global.scylla.model("groups")
+		return GroupsModel
 	}
 	static get sortModel() {
-		return global.scylla.model("groups_user_orders")
+		return GroupsUserOrdersModel
 	}
 	static get inviteKeyModel() {
-		return global.scylla.model("group_invite_key")
+		return GroupInviteKeyModel
 	}
 
 	static get = getMethod.bind(this)

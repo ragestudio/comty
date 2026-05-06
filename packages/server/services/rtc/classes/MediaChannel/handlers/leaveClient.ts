@@ -77,11 +77,13 @@ async function leaveClientHandler(
 		}
 
 		// publish to group topic
-		await this.sendToGroupTopic("client:vc:left", {
-			userId: clientInst.userId,
-			channelId: this.channelId,
-			channelClients: this.getConnectedClientsSerialized(),
-		})
+		this.events.emit("client:leave", this, clientInst)
+
+		// await this.sendToGroupTopic("client:vc:left", {
+		// 	userId: clientInst.userId,
+		// 	channelId: this.channelId,
+		// 	channelClients: this.getConnectedClientsSerialized(),
+		// })
 
 		if (emitEventToSelf === true) {
 			// notify the client that they left the channel

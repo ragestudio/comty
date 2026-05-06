@@ -1,6 +1,6 @@
 import AuthToken from "../../classes/AuthToken"
 import ServerToken from "../../classes/ServerToken"
-import BotToken from "../../classes/BotToken"
+//import BotToken from "../../classes/BotToken"
 
 export default async (req, res) => {
 	function reject(data) {

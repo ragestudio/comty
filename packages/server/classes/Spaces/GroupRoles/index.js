@@ -1,14 +1,12 @@
-export default class GroupRoles {
-	static get model() {
-		return global.scylla.model("group_roles")
-	}
+import GroupRolesModel from "@db/group_roles"
 
+export default class GroupRoles {
 	static async getByGroupId(group_id) {
 		if (typeof group_id !== "string") {
 			throw new OperationError(400, "group_id must be a string")
 		}
 
-		const roles = await this.model.find(
+		const roles = await GroupRolesModel.find(
 			{
 				group_id: group_id,
 			},

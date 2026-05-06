@@ -3,12 +3,13 @@ import { Worker as SnowflakeWorker } from "snowflake-uuid"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import ScyllaDb from "@shared-classes/Scylla"
+import ScyllaDb from "@ragestudio/scylla-odm"
 
 import SharedMiddlewares from "@shared-middlewares"
 
 import GroupChatChannelController from "@classes/GroupChatChannelController"
 import DMChatChannelController from "@classes/DMChatChannelController"
+import TestModel from "@db/test_key"
 
 class API extends Server {
 	static refName = "chats"
@@ -44,7 +45,9 @@ class API extends Server {
 
 		await this.contexts.db.initialize()
 		await this.contexts.redis.initialize()
-		await this.contexts.scylla.initialize()
+		await this.contexts.scylla.initialize({
+			sync: true,
+		})
 	}
 }
 

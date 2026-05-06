@@ -1,4 +1,5 @@
 import AuthToken from "@shared-classes/AuthToken"
+import SessionModel from "@db/auth_session"
 
 export default async function (req) {
 	if (!req.body.refreshToken || !req.body.authToken) {
@@ -15,7 +16,7 @@ export default async function (req) {
 		throw new OperationError(401, "Invalid refresh token format")
 	}
 
-	let session = await this.Model.findOne({
+	let session = await SessionModel.findOne({
 		_id: validation.data.session_id,
 		user_id: validation.data.user_id,
 	})

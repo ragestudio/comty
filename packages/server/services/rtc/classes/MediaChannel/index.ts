@@ -1,4 +1,5 @@
 import * as mediasoup from "mediasoup"
+import EventEmitter from "@foxify/events"
 
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
@@ -20,6 +21,7 @@ export default class MediaChannel {
 	mediaCodecs: any[]
 	started_at: Date
 	closed: Boolean = false
+	events: EventEmitter = new EventEmitter()
 
 	static defaultMediaCodecs = [
 		{
@@ -92,15 +94,17 @@ export default class MediaChannel {
 				)
 			})
 
-			try {
-				this.sendToGroupTopic("vc:started", {
-					...this.data,
-					channelId: this.channelId,
-					started_at: this.started_at,
-				})
-			} catch (err) {
-				console.error(err)
-			}
+			this.events.emit("started", this)
+
+			// try {
+			// 	this.sendToGroupTopic("vc:started", {
+			// 		...this.data,
+			// 		channelId: this.channelId,
+			// 		started_at: this.started_at,
+			// 	})
+			// } catch (err) {
+			// 	console.error(err)
+			// }
 		} catch (error) {
 			console.error(
 				`[CHANNEL:${this.channelId}] Error initializing `,
@@ -168,13 +172,15 @@ export default class MediaChannel {
 
 			console.info(`[CHANNEL:${this.channelId}] closed`)
 
-			try {
-				this.sendToGroupTopic("vc:ended", {
-					channelId: this.channelId,
-				})
-			} catch (err) {
-				console.error(err)
-			}
+			this.events.emit("closed", this)
+
+			// try {
+			// 	this.sendToGroupTopic("vc:ended", {
+			// 		channelId: this.channelId,
+			// 	})
+			// } catch (err) {
+			// 	console.error(err)
+			// }
 
 			if (this.params.controller) {
 				try {
@@ -217,17 +223,18 @@ export default class MediaChannel {
 			clientVoiceState: client.voiceState,
 		})
 
-		this.sendToGroupTopic("client:vc:event", {
-			event: payload.event,
-			userId: client.userId,
-			channelId: this.channelId,
-			user: {
-				_id: client.context.user._id,
-				username: client.context.user.username,
-				avatar: client.context.user.avatar,
-			},
-			data: payload.data,
-		})
+		this.events.emit("client:event", this, client, payload)
+		// this.sendToGroupTopic("client:vc:event", {
+		// 	event: payload.event,
+		// 	userId: client.userId,
+		// 	channelId: this.channelId,
+		// 	user: {
+		// 		_id: client.context.user._id,
+		// 		username: client.context.user.username,
+		// 		avatar: client.context.user.avatar,
+		// 	},
+		// 	data: payload.data,
+		// })
 	}
 
 	async handleSoundpadDispatch(client: RTCClient, payload: any) {
@@ -363,20 +370,20 @@ export default class MediaChannel {
 	 * @param {Object} payload
 	 * @return {Promise}
 	 */
-	async sendToGroupTopic(event: string, payload: any): Promise<any> {
-		const topic = `group:${this.data.group_id}`
+	// async sendToGroupTopic(event: string, payload: any): Promise<any> {
+	// 	const topic = `group:${this.data.group_id}`
 
-		try {
-			return await (globalThis as any).websockets.senders.toTopic(
-				topic,
-				`${topic}:${event}`,
-				payload,
-			)
-		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error sending to group topic`,
-				error,
-			)
-		}
-	}
+	// 	try {
+	// 		return await (globalThis as any).websockets.senders.toTopic(
+	// 			topic,
+	// 			`${topic}:${event}`,
+	// 			payload,
+	// 		)
+	// 	} catch (error) {
+	// 		console.error(
+	// 			`[CHANNEL:${this.channelId}] Error sending to group topic`,
+	// 			error,
+	// 		)
+	// 	}
+	// }
 }

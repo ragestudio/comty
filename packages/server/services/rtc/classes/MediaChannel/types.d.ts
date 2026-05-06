@@ -10,6 +10,7 @@ export type MediaChannelParams = {
 }
 
 export type RTCClient = RTEClient & {
+	channel_id?: string
 	transports?: Map<string, any>
 	voiceState?: {
 		muted: boolean

@@ -2,6 +2,7 @@
 	"name": "@comty/server",
 	"version": "2.14.0@alpha",
 	"license": "ComtyLicense",
+	"type": "module",
 	"private": true,
 	"workspaces": [
 		"services/*"
@@ -18,14 +19,13 @@
 	},
 	"dependencies": {
 		"@foxify/events": "^2.1.0",
+		"@ragestudio/scylla-odm": "^0.14.0",
 		"@sentry/node": "^10.44.0",
 		"@types/luxon": "^3.7.1",
-		"axios": "^1.13.6",
+		"axios": "^1.16.0",
 		"bcrypt": "^6.0.0",
 		"bullmq": "^5.71.0",
-		"cassandra-driver": "^4.8.0",
 		"cross-env": "^10.1.0",
-		"express-cassandra": "^2.9.1",
 		"jsonwebtoken": "^9.0.3",
 		"jws": "^4.0.1",
 		"linebridge": "^1.8.1",
@@ -47,14 +47,6 @@
 		"sinon": "^21.0.3",
 		"ts-jest": "^29.1.0",
 		"vitest": "^3.0.9"
-	},
-	"overrides": {
-		"braces": "3.0.3",
-		"minimatch": "10.2.3",
-		"fast-xml-parser": "5.5.7",
-		"diff": "8.0.3",
-		"micromatch": "4.0.8",
-		"string-width": "4.2.3"
 	},
 	"optionalDependencies": {
 		"bufferutil": "^4.1.0"

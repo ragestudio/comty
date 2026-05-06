@@ -1,9 +1,7 @@
-export default async function (userId, groupId) {
-	const GroupsModel = global.scylla.model("groups")
-	const GroupMembershipsRefModel = global.scylla.model(
-		"group_memberships_ref",
-	)
+import GroupsModel from "@db/groups"
+import GroupMembershipsRefModel from "@db/group_memberships_ref"
 
+export default async function (userId, groupId) {
 	const group = await GroupsModel.findOne(
 		{ _id: groupId },
 		{
