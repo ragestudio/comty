@@ -22,6 +22,7 @@ const config = {
 		},
 		headers: {
 			"Strict-Transport-Security": `max-age=31536000`,
+			"Access-Control-Allow-Origin": "*",
 		},
 		proxy: {
 			"/api": {
