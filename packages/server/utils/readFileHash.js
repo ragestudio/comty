@@ -1,9 +1,9 @@
 import fs from "node:fs"
 import crypto from "crypto"
 
-export default async (file) => {
-	if (typeof file === "string") {
-		file = fs.createReadStream(file)
+export default async (stream) => {
+	if (typeof stream === "string") {
+		stream = fs.createReadStream(stream)
 	}
 
 	const hash = crypto.createHash("sha256")
