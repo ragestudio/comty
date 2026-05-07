@@ -70,10 +70,10 @@ export default class DMChatChannelController {
 		let activity = await ActivityModel.find(
 			{
 				user_id: userId,
-				$limit: limit,
 			},
 			{
 				raw: true,
+				limit: limit,
 			},
 		)
 

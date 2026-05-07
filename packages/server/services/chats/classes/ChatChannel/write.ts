@@ -1,6 +1,7 @@
+import type ChatChannel from "../ChatChannel"
 import MessageModel from "@db/channel_messages"
 
-export default async function (user, payload) {
+export default async function (this: ChatChannel, user, payload) {
 	if (!user) {
 		throw new OperationError(400, "Missing user object")
 	}
@@ -9,6 +10,8 @@ export default async function (user, payload) {
 
 	const _id = this.snowflake.nextId().toString()
 	const created_at = new Date()
+
+	const batch = this.scylla.batch()
 
 	let message = MessageModel.obj({
 		_id: _id,
@@ -21,16 +24,20 @@ export default async function (user, payload) {
 		sticker: payload.sticker,
 	})
 
-	await message.save()
+	MessageModel.batch.insert(batch, message.toRaw())
+
+	//await message.save()
 
 	if (typeof this.onWrite === "function") {
 		try {
-			await this.onWrite(user, message)
+			await this.onWrite(user, message, batch)
 		} catch (error) {
 			console.error(error)
 			throw new OperationError(500, "Failed to execute onWrite hook")
 		}
 	}
+
+	await batch.execute()
 
 	const obj = {
 		...message.toRaw(),

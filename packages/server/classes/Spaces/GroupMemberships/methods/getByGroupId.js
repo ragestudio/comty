@@ -6,9 +6,10 @@ export default async function (group_id, { limit, offset } = {}) {
 	const query = {
 		group_id: group_id,
 	}
+	const options = {}
 
 	if (limit) {
-		query.$limit = parseInt(limit)
+		options.limit = parseInt(limit)
 	}
 
 	if (offset) {
@@ -17,9 +18,7 @@ export default async function (group_id, { limit, offset } = {}) {
 		}
 	}
 
-	const membershipsRef = await this.modelRef.find({
-		group_id: group_id,
-	})
+	const membershipsRef = await this.modelRef.find(query, limit)
 
 	const users_ids = membershipsRef.map((ref) => ref.user_id)
 

@@ -6,9 +6,10 @@ export default async function (user_id, { limit, offset } = {}) {
 	const query = {
 		user_id: user_id,
 	}
+	const options = {}
 
 	if (limit) {
-		query.$limit = parseInt(limit)
+		options.limit = parseInt(limit)
 	}
 
 	if (offset) {
@@ -17,7 +18,7 @@ export default async function (user_id, { limit, offset } = {}) {
 		}
 	}
 
-	const memberships = await this.model.find(query)
+	const memberships = await this.model.find(query, options)
 
 	return memberships
 }

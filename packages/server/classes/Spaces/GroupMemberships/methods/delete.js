@@ -1,7 +1,6 @@
 import Groups from "@shared-classes/Spaces/Groups"
 
-import cassandra from "cassandra-driver"
-const { q } = cassandra.mapping
+import { q } from "@ragestudio/scylla-odm/driver/mapping/q"
 
 export default async function (user_id, membership_id, group_id, group) {
 	if (typeof user_id !== "string") {

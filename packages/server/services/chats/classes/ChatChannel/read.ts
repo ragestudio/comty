@@ -1,29 +1,22 @@
 // @ts-ignore
 import { User } from "@db_models"
+import type ChatChannel from "../ChatChannel"
 
 import MessageModel from "@db/channel_messages"
 
 type ReadQuery = {
 	channel_id: string
-	$limit: number
-	$orderby: {
-		_id: "asc" | "desc"
-	}
 	_id?: {
 		$lt?: string
 		$gt?: string
 	}
 }
 
-export default async function (user, payload) {
+export default async function (this: ChatChannel, user, payload) {
 	const { limit = 50, beforeId, afterId } = payload
 
 	let query: ReadQuery = {
 		channel_id: this.channel._id.toString(),
-		$limit: limit,
-		$orderby: {
-			_id: "desc",
-		},
 	}
 
 	if (beforeId) {
@@ -39,7 +32,11 @@ export default async function (user, payload) {
 	}
 
 	let messages = await MessageModel.find(query, {
-		raw: true,
+		raw: false,
+		limit: limit,
+		orderBy: {
+			_id: "desc",
+		},
 	})
 	let users = []
 

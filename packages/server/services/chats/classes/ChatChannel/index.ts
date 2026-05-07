@@ -1,22 +1,33 @@
+import type { Worker as SnowflakeWorker } from "snowflake-uuid"
+import type ScyllaClientType from "@ragestudio/scylla-odm"
+import { Doc, InferDoc } from "@ragestudio/scylla-odm/types"
+
 import readMethod from "./read"
 import writeMethod from "./write"
 import updateMethod from "./update"
 import deleteMethod from "./delete"
 
-import MessageModel from "@db/channel_messages"
+import ChannelMessagesModel from "@db/channel_messages"
+import { Batch } from "@ragestudio/scylla-odm"
 
-import type { Worker as SnowflakeWorker } from "snowflake-uuid"
-import type ScyllaClientType from "@ragestudio/scylla-odm"
-
-type onWriteCallbackType = (user: RTEClient, message: any) => Promise<void>
-type onReadCallbackType = (
+export type onWriteCallbackType = (
 	user: RTEClient,
-	messages: any[],
-	users: any[],
+	message: Doc<InferDoc<typeof ChannelMessagesModel.schema>>,
+	batch: Batch,
 ) => Promise<void>
-type onDeleteCallbackType = (user: RTEClient, message: any) => Promise<void>
+export type onReadCallbackType = (
+	user: RTEClient,
+	messages: Doc<InferDoc<typeof ChannelMessagesModel.schema>>[],
+	users: any[],
+	batch: Batch,
+) => Promise<void>
+export type onDeleteCallbackType = (
+	user: RTEClient,
+	message: Doc<InferDoc<typeof ChannelMessagesModel.schema>>,
+	batch: Batch,
+) => Promise<void>
 
-type ChatChannelOptions = {
+export type ChatChannelOptions = {
 	onWrite?: onWriteCallbackType
 	onRead?: onReadCallbackType
 	onDelete?: onDeleteCallbackType
@@ -96,19 +107,39 @@ export default class ChatChannel {
 	}
 
 	async getLastMessageObj() {
-		const message = await MessageModel.find({
-			channel_id: this._id,
-			$limit: 1,
-			$orderby: {
-				_id: "desc",
+		const message = await ChannelMessagesModel.find(
+			{
+				channel_id: this._id,
 			},
-		})
+			{
+				limit: 1,
+				orderBy: {
+					_id: "desc",
+				},
+			},
+		)
 
 		if (message.length === 0) {
 			throw new OperationError(404, "No last message found")
 		}
 
 		return message[0]
+	}
+
+	async getFirstMessageBeforeId(messageId: string) {
+		return await ChannelMessagesModel.findOne(
+			{
+				channel_id: this._id,
+				_id: {
+					$lt: messageId,
+				},
+			},
+			{
+				orderBy: {
+					_id: "desc",
+				},
+			},
+		)
 	}
 
 	async sendEventToChannelTopic(event: string, data: any) {

@@ -1,8 +1,10 @@
+import type ChatChannel from "../ChatChannel"
 import MessageModel, {
 	schema as ChannelMessagesSchema,
 } from "@db/channel_messages"
 
 export default async function (
+	this: ChatChannel,
 	user,
 	message_id,
 	update = {} as typeof ChannelMessagesSchema.fields,

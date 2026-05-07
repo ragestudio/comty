@@ -1,4 +1,5 @@
 import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
+import GroupChannelsModel from "@db/group_channels"
 
 export default async function (group, channel_id, user_id) {
 	if (typeof group !== "object") {
@@ -9,7 +10,7 @@ export default async function (group, channel_id, user_id) {
 		throw new OperationError(400, "channel_id must be a string")
 	}
 
-	const channel = await this.model.findOne({
+	const channel = await GroupChannelsModel.findOne({
 		group_id: group._id,
 		_id: channel_id,
 	})

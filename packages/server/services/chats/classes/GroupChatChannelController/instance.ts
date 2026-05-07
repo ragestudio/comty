@@ -1,8 +1,8 @@
-import { Doc, InferDoc } from "@ragestudio/scylla-odm/types"
 import ChatChannel from "../ChatChannel"
+import type { onWriteCallbackType, onDeleteCallbackType } from "../ChatChannel"
 
-import { schema } from "@db/channel_messages"
 import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
+import ChannelMessagesModel from "@db/channel_messages"
 
 export default class GroupChatChannel extends ChatChannel {
 	constructor(controller, channel) {
@@ -10,15 +10,12 @@ export default class GroupChatChannel extends ChatChannel {
 		this.topic = "chats:channel"
 	}
 
-	onWrite = async (user, message: Doc<InferDoc<typeof schema>>) => {
-		try {
-			await LastChannelMessageIdModel.update({
-				channel_id: this.channel._id,
-				_id: message._id,
-			})
-		} catch (err) {
-			console.error("Failed to update channel last message id", err)
-		}
+	onWrite: onWriteCallbackType = async (user, message, batch) => {
+		// update last message id
+		LastChannelMessageIdModel.batch.update(batch, {
+			channel_id: this.channel._id,
+			_id: message._id,
+		})
 
 		try {
 			this.controller.server.engine.ws.senders.toTopic(
@@ -31,14 +28,18 @@ export default class GroupChatChannel extends ChatChannel {
 		}
 	}
 
-	onDelete = async (deleted_message) => {
+	onDelete: onDeleteCallbackType = async (user, message, batch) => {
 		try {
-			const lastMessage = await this.getLastMessageObj()
+			// retrieve the last message
+			const lastMessage = await this.getFirstMessageBeforeId(message._id)
 
-			await LastChannelMessageIdModel.update({
-				channel_id: this.channel._id,
-				_id: lastMessage._id,
-			})
+			if (lastMessage) {
+				// update last message id
+				LastChannelMessageIdModel.batch.update(batch, {
+					channel_id: this.channel._id,
+					_id: lastMessage._id,
+				})
+			}
 		} catch (err) {
 			console.error("Failed to update channel last message id", err)
 		}

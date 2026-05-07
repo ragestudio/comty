@@ -1,9 +1,6 @@
-// @ts-ignore
-import cassandra from "cassandra-driver"
 import { DateTime, Duration } from "luxon"
-import type { mapping } from "cassandra-driver/lib/mapping"
 
-import schema from "@db/group_memberships_ref"
+import MembershipsModel from "@db/group_memberships_ref"
 
 type SyncPayload = {
 	group_id: string
@@ -43,19 +40,17 @@ export default {
 			) {
 				cacheMiss.members = true
 			} else {
-				const newMemberships = (
-					await (schema.mapper as mapping.ModelMapper).find(
-						{
-							group_id: payload.group_id,
-							created_at: cassandra.mapping.q.gt(
-								new Date(payload.members_sync_time),
-							),
+				const newMemberships = await MembershipsModel.find(
+					{
+						group_id: payload.group_id,
+						created_at: {
+							$gt: new Date(payload.members_sync_time),
 						},
-						{
-							limit: MAX_NEW_MEMBERSHIPS_UNTIL_INVALIDATE + 1,
-						},
-					)
-				).toArray()
+					},
+					{
+						limit: MAX_NEW_MEMBERSHIPS_UNTIL_INVALIDATE + 1,
+					},
+				)
 
 				if (
 					newMemberships.length > MAX_NEW_MEMBERSHIPS_UNTIL_INVALIDATE

@@ -1,6 +1,5 @@
 // @ts-ignore
-import cassandra from "cassandra-driver"
-const { q } = cassandra.mapping
+import { q } from "@ragestudio/scylla-odm/driver/mapping/q"
 
 export default async function (group_id, user_id) {
 	if (typeof group_id !== "string") {

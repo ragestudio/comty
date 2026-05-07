@@ -32,27 +32,32 @@ export default async function (
 		throw new OperationError(403, "You are not the owner of this message")
 	}
 
-	await message.delete()
+	// create batch
+	const batch = this.scylla.batch()
+
+	// delete message
+	MessageModel.batch.delete(batch, message.toRaw())
 
 	// create a new deleted message obj
-	const deletedMessage = DeletedMessageModel.obj({
+	DeletedMessageModel.batch.insert(batch, {
 		_id: messageId,
 		channel_id: this.channel._id.toString(),
 		deleted_by_user_id: user._id.toString(),
 		deleted_at: new Date(),
 	})
 
-	await deletedMessage.save()
-
 	// if onDelete callback is defined, execute it
 	if (typeof this.onDelete === "function") {
 		try {
-			await this.onDelete(user, message)
+			await this.onDelete(user, message, batch)
 		} catch (error) {
 			console.error("Failed to execute onDelete hook", error)
 			throw error
 		}
 	}
+
+	// execute the batch
+	await batch.execute()
 
 	this.sendEventToChannelTopic("channel:message:deleted", {
 		_id: message._id.toString(),
