@@ -15,7 +15,7 @@
 	},
 	"dependencies": {
 		"@sentry/node": "^10.44.0",
-		"axios": "^1.13.6",
+		"axios": "^1.16.0",
 		"bcrypt": "^6.0.0",
 		"bullmq": "^5.71.0",
 		"cassandra-driver": "^4.8.0",
