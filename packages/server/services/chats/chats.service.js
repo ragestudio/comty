@@ -9,7 +9,6 @@ import SharedMiddlewares from "@shared-middlewares"
 
 import GroupChatChannelController from "@classes/GroupChatChannelController"
 import DMChatChannelController from "@classes/DMChatChannelController"
-import TestModel from "@db/test_key"
 
 class API extends Server {
 	static refName = "chats"
@@ -30,7 +29,9 @@ class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb()),
+		scylla: (global.scylla = new ScyllaDb({
+			modelsPath: global["paths"].root + "/db",
+		})),
 		redis: RedisClient(),
 		groupChannels: new GroupChatChannelController(this),
 		dmChannels: new DMChatChannelController(this),

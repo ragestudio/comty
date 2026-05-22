@@ -1,4 +1,5 @@
 import type ChatChannel from "../ChatChannel"
+
 import MessageModel from "@db/channel_messages"
 
 export default async function (this: ChatChannel, user, payload) {
@@ -25,8 +26,6 @@ export default async function (this: ChatChannel, user, payload) {
 	})
 
 	MessageModel.batch.insert(batch, message.toRaw())
-
-	//await message.save()
 
 	if (typeof this.onWrite === "function") {
 		try {
