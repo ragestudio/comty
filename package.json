@@ -10,5 +10,8 @@
 		"setup:server": "cd packages/server && npm run setup",
 		"postinstall": "cd packages/app && npm install && cd ../server && npm install"
 	},
-	"_web_app_path": "packages/app"
+	"_web_app_path": "packages/app",
+	"devDependencies": {
+		"typescript": "^6.0.3"
+	}
 }
