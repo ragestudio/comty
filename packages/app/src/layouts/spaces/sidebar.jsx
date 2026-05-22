@@ -43,15 +43,15 @@ const SpacesSidebar = () => {
 					collapsed: compact,
 				})}
 			>
-				<div className="spaces-page__sidebar__section">
-					<div className="spaces-page__sidebar__section__header">
-						<img
-							src={config.logo?.alt}
-							onClick={() => app.navigation.goMain()}
-							className="spaces-page__sidebar__section__header__logo"
-						/>
-					</div>
+				<div className="spaces-page__sidebar__header">
+					<img
+						src={config.logo?.alt}
+						onClick={() => app.navigation.goMain()}
+						className="spaces-page__sidebar__header__logo"
+					/>
+				</div>
 
+				<div className="spaces-page__sidebar__section">
 					<GroupsList
 						selected={type === "group" ? room : null}
 						onClickItem={onClickGroupListItem}
@@ -100,7 +100,7 @@ const SpacesSidebarBottomItems = () => {
 
 	return (
 		<div
-			className="spaces-page__sidebar__section"
+			className="spaces-page__sidebar__footer"
 			style={{
 				marginTop: "auto",
 				gap: "5px",
