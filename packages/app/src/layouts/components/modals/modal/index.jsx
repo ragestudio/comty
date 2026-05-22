@@ -1,4 +1,5 @@
 import React from "react"
+import { AnimatePresence, motion } from "motion/react"
 import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
 
@@ -30,7 +31,7 @@ class Modal extends React.Component {
 		document.removeEventListener("keydown", this.handleEsc, false)
 	}
 
-	close = () => {
+	close = async () => {
 		this.setState({
 			visible: false,
 		})
@@ -40,6 +41,12 @@ class Modal extends React.Component {
 				this.props.onClose()
 			}
 		}, 250)
+	}
+
+	onCloseAnimationEnd = () => {
+		// if (typeof this.props.onClose === "function") {
+		// 	this.props.onClose()
+		// }
 	}
 
 	handleEsc = (e) => {
@@ -89,30 +96,45 @@ class Modal extends React.Component {
 					onTouchEnd={this.handleClickOutside}
 					onMouseDown={this.handleClickOutside}
 				/>
-				<div
-					className={classNames(
-						this.props.className,
-						"app_modal_content",
-						{
-							"bg-accent": this.props.framed,
-						},
-					)}
-					ref={this.contentRef}
-					style={this.props.frameContentStyle}
-				>
-					{this.props.includeCloseButton && (
-						<div
-							className="app_modal_close"
-							onClick={this.close}
-						>
-							<Icons.X />
-						</div>
-					)}
 
-					{React.cloneElement(this.props.children, {
-						close: this.close,
-					})}
-				</div>
+				<AnimatePresence onExitComplete={this.onCloseAnimationEnd}>
+					{this.state.visible && (
+						<motion.div
+							initial={{ opacity: 0, scale: 0.8 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{
+								type: "spring",
+								stiffness: 1000,
+								damping: 40,
+								mass: 1,
+								visualDuration: 0.15,
+							}}
+							className={classNames(
+								this.props.className,
+								"app_modal_content",
+								{
+									"bg-accent": this.props.framed,
+								},
+							)}
+							ref={this.contentRef}
+							style={this.props.frameContentStyle}
+						>
+							{this.props.includeCloseButton && (
+								<div
+									className="app_modal_close"
+									onClick={this.close}
+								>
+									<Icons.X />
+								</div>
+							)}
+
+							{React.cloneElement(this.props.children, {
+								close: this.close,
+							})}
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		)
 	}
