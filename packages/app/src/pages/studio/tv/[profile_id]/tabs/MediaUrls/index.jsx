@@ -9,38 +9,6 @@ const MediaUrls = ({ profile }) => {
 		return null
 	}
 
-	const { hls, rtsp, html } = urls
-
-	let rtspt = null
-
-	if (rtsp) {
-		try {
-			const url = new URL(rtsp)
-
-			const pathParts = url.pathname.split("/")
-			const lastPart = pathParts.pop()
-			const [resource, query] = lastPart.split("?")
-
-			let stoken = url.searchParams.get("stoken")
-
-			let newLastPart = resource
-
-			if (stoken) {
-				newLastPart = `${resource}:${stoken}`
-			}
-
-			pathParts.push(newLastPart)
-
-			url.protocol = "rtspt:"
-			url.pathname = pathParts.join("/")
-			url.search = ""
-
-			rtspt = url.toString()
-		} catch (err) {
-			rtspt = rtsp.replace("rtsp://", "rtspt://")
-		}
-	}
-
 	return (
 		<div className="profile-section content-panel">
 			<div className="profile-section__header">
@@ -49,7 +17,7 @@ const MediaUrls = ({ profile }) => {
 				</span>
 			</div>
 
-			{hls && (
+			{urls.hls && (
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>HLS</span>
@@ -70,14 +38,14 @@ const MediaUrls = ({ profile }) => {
 									tooltips: ["Copy HLS URL", "Copied!"],
 								}}
 							>
-								{hls}
+								{urls.hls}
 							</antd.Typography.Text>
 						</code>
 					</div>
 				</div>
 			)}
 
-			{rtsp && (
+			{urls.rtsp && (
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>RTSP [tcp]</span>
@@ -95,14 +63,14 @@ const MediaUrls = ({ profile }) => {
 									tooltips: ["Copy RTSP URL", "Copied!"],
 								}}
 							>
-								{rtsp}
+								{urls.rtsp}
 							</antd.Typography.Text>
 						</code>
 					</div>
 				</div>
 			)}
 
-			{rtspt && (
+			{urls.rtspt && (
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>RTSPT [vrchat]</span>
@@ -121,14 +89,14 @@ const MediaUrls = ({ profile }) => {
 									tooltips: ["Copy RTSPT URL", "Copied!"],
 								}}
 							>
-								{rtspt}
+								{urls.rtspt}
 							</antd.Typography.Text>
 						</code>
 					</div>
 				</div>
 			)}
 
-			{html && (
+			{urls.html && (
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>HTML Viewer</span>
@@ -149,7 +117,7 @@ const MediaUrls = ({ profile }) => {
 									],
 								}}
 							>
-								{html}
+								{urls.html}
 							</antd.Typography.Text>
 						</code>
 					</div>
