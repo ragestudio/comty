@@ -1,6 +1,7 @@
 import { Observable } from "@gullerya/object-observer"
 
 export interface MediaRTCStateType {
+	isDm: boolean
 	isJoined: boolean
 	isLoading: boolean
 	isMuted: boolean
@@ -22,6 +23,7 @@ export interface MediaRTCStateType {
 
 export default class MediaRTCState {
 	static defaultState: MediaRTCStateType = {
+		isDm: false,
 		isJoined: false,
 		isLoading: false,
 		isMuted: false,
