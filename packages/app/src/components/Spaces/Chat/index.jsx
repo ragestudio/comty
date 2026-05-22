@@ -103,7 +103,7 @@ const Chat = ({ _id, type = "group", group }) => {
 		if (timelineRef.current) {
 			timelineRef.current.scrollTo(0, 0)
 		}
-	}, [timelineRef.current])
+	}, [timelineRef])
 
 	const handleOnNewMessage = React.useCallback(() => {
 		if (!timelineRef.current || pausedUpdate) {
