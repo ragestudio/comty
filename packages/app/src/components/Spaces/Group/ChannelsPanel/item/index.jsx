@@ -122,7 +122,7 @@ const ChannelsListItem = ({
 						{clients?.map((client, index) => {
 							return (
 								<VoiceClient
-									key={index}
+									key={client._id}
 									client={client}
 									speaking={isClientSpeaking(client)}
 									producers={getClientProducers(client)}
