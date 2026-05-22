@@ -23,12 +23,18 @@ export default async function (userId, { alternativeSfx = false } = {}) {
 		throw new Error("userId must be a string")
 	}
 
-	const callInfo = await this.socket.call("call:dispatch", {
+	const data = await this.socket.call("call:dispatch", {
 		userId,
 		alternativeSfx: alternativeSfx,
 	})
 
-	console.log(callInfo)
+	this.state.isDm = true
+	this.state.channelId = data.channelId
+	this.state.channel = {
+		channelId: data.channelId,
+		_id: data.channelId,
+		name: userId,
+	}
 
 	const outgoingCallAudioSrc =
 		app.cores.sfx.soundsPool()["call_outgoing"]?._src
@@ -41,11 +47,13 @@ export default async function (userId, { alternativeSfx = false } = {}) {
 			loop: true,
 			volume: 0.5,
 		})
-		this._outgoingCallAudio.play()
+		//this._outgoingCallAudio.play()
 	}
 
 	// start the timeout
 	this._outgoingCallIgnoreTimeout = setTimeout(() => {
 		ignoreOutgoingCall(this)
 	}, ignoreIncomingCallTimeout)
+
+	await this.handlers.attachChannel(data)
 }

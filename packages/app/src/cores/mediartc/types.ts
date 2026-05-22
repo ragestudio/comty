@@ -2,6 +2,7 @@ import type MediaRTC from "./mediartc.core"
 import * as Vars from "./vars"
 
 export interface MediaRTCHandlers {
+	attachChannel: (data: any) => Promise<void>
 	joinChannel: (groupId: string, channelId: string) => Promise<void>
 	leaveChannel: () => Promise<void>
 	startCameraShare: () => Promise<void>

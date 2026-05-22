@@ -50,11 +50,19 @@ export default async function (this: MediaRTC) {
 		// clear producers just in case
 		this.producers.clear()
 
+		try {
+			// call socket to leave
+			if (this.state.isDm) {
+				this.socket?.call("call:leave")
+			} else {
+				this.socket?.call("channel:leave")
+			}
+		} catch (error: any) {
+			this.console.error("Error leaving channel:", error)
+		}
+
 		// reset default state
 		this.state = Object.assign(this.state, MediaRTCState.defaultState)
-
-		// call socket to leave
-		await this.socket?.call("channel:leave")
 	} catch (error: any) {
 		this.console.error("Error leaving channel:", error)
 

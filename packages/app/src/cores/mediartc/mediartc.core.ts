@@ -15,6 +15,7 @@ import buildWebsocketHandler from "./utils/buildWebsocketHandler"
 import * as Vars from "./vars"
 
 // handlers
+import attachChannel from "./handlers/attachChannel"
 import createTransports from "./handlers/createTransports"
 import changeInputParams from "./handlers/changeInputParams"
 import changeOutputParams from "./handlers/changeOutputParams"
@@ -110,6 +111,7 @@ export default class MediaRTC extends Core {
 	}
 
 	handlers: MediaRTCHandlers = {
+		attachChannel: attachChannel.bind(this),
 		joinChannel: joinChannel.bind(this),
 		leaveChannel: leaveChannel.bind(this),
 		startCameraShare: startCameraShare.bind(this),
