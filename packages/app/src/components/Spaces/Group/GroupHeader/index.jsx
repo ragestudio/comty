@@ -56,10 +56,17 @@ const GroupHeader = () => {
 	return (
 		<div
 			className={classNames("group-page__header", {
-				["cover_light"]: groupCoverImageAverageColor?.isLight ?? false,
+				["has_banner"]: data.cover,
+				["cover_light"]:
+					(data.cover && groupCoverImageAverageColor?.isLight) ??
+					false,
+				["average_color"]: groupCoverImageAverageColor?.hex,
 			})}
 			style={{
-				backgroundColor: data.coverColor,
+				"--cover-av-color": groupCoverImageAverageColor?.value.slice(
+					0,
+					-1,
+				),
 			}}
 		>
 			{data.cover && (
@@ -69,26 +76,16 @@ const GroupHeader = () => {
 			)}
 
 			<div className="group-page__header__content">
-				<div className="group-page__header__content__icon">
-					<Image src={data.icon} />
-				</div>
-
 				<div className="group-page__header__content__text">
 					<h1>{data.name}</h1>
-					<p>{data.description}</p>
 				</div>
-			</div>
 
-			<div className="group-page__header__actions">
-				<Button
-					icon={<Icons.Settings />}
-					onClick={onClickSettingsButton}
-				/>
-
-				<Button
-					icon={<Icons.Link2 />}
-					onClick={onClickInviteButton}
-				/>
+				<div className="group-page__header__actions">
+					<Button
+						icon={<Icons.Settings />}
+						onClick={onClickSettingsButton}
+					/>
+				</div>
 			</div>
 		</div>
 	)

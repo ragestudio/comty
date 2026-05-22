@@ -1,4 +1,5 @@
 .group-settings-panel {
+	position: relative;
 	display: flex;
 	flex-direction: row;
 
@@ -22,16 +23,45 @@
 	}
 
 	&__fields {
+		position: relative;
+
 		display: flex;
 		flex-direction: column;
 
-		gap: 10px;
+		height: 100%;
+
+		gap: 15px;
 
 		&__field {
 			display: flex;
-			flex-direction: row;
+			flex-direction: column;
 
-			gap: 10px;
+			gap: 5px;
+
+			&__label {
+				display: flex;
+				flex-direction: row;
+
+				gap: 10px;
+			}
+
+			&__content {
+				display: flex;
+				flex-direction: row;
+
+				gap: 10px;
+			}
+		}
+
+		&__bottom {
+			position: sticky;
+
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-end;
+
+			bottom: 0;
+			left: 0;
 		}
 	}
 }
