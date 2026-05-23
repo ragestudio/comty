@@ -33,7 +33,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 
 	React.useEffect(() => {
 		if (
-			streamHealth &&
+			streamHealth?.available &&
 			signalQualityInfo.currentReceivedRateBps !== undefined &&
 			signalQualityInfo.currentSentRateBps !== undefined
 		) {
@@ -46,6 +46,8 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 			setStreamData((prevData) =>
 				[...prevData, newPoint].slice(-MAX_DATA_POINTS),
 			)
+		} else {
+			setStreamData([])
 		}
 	}, [
 		streamHealth,
