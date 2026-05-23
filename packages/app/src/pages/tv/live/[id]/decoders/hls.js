@@ -4,9 +4,6 @@ const Events = {
 	[Hls.Events.FPS_DROP]: (event, data) => {
 		console.warn("[HLS] FPS_DROP Detected", data)
 	},
-	[Hls.Events.ERROR]: (event, data) => {
-		console.error("[HLS] Error", data)
-	},
 }
 
 export default (player, sources = {}, options = {}) => {
@@ -67,6 +64,32 @@ export default (player, sources = {}, options = {}) => {
 	player.addEventListener("play", () => {
 		console.log("[HLS] Syncing to last position")
 		player.currentTime = hlsInstance.liveSyncPosition
+	})
+
+	// handle errors with automatic recovery
+	hlsInstance.on(Hls.Events.ERROR, (event, data) => {
+		console.error("[HLS] Error", data)
+
+		if (!data.fatal) {
+			return
+		}
+
+		switch (data.type) {
+			case Hls.ErrorTypes.NETWORK_ERROR:
+				console.warn("[HLS] Fatal network error, attempting recovery")
+				hlsInstance.startLoad()
+				break
+
+			case Hls.ErrorTypes.MEDIA_ERROR:
+				console.warn("[HLS] Fatal media error, attempting recovery")
+				hlsInstance.recoverMediaError()
+				break
+
+			default:
+				console.error("[HLS] Unrecoverable error, destroying instance")
+				hlsInstance.destroy()
+				break
+		}
 	})
 
 	// register hls decoder events

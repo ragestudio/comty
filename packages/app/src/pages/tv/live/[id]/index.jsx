@@ -7,7 +7,6 @@ import classnames from "classnames"
 import UserPreview from "@components/UserPreview"
 import { Icons } from "@components/Icons"
 
-import LiveChat from "@components/LiveChat"
 import SpectrumModel from "@models/spectrum"
 
 import * as Decoders from "./decoders"
@@ -29,76 +28,94 @@ async function fetchStream(stream_id) {
 		stream = stream[0]
 	}
 
-	if (!stream.sources || !stream.sources.hls) {
-		return false
-	}
-
 	return stream
 }
 
-export default class StreamViewer extends React.Component {
-	static defaultDecoder = "hls"
-	static stateSyncMs = 1 * 60 * 1000 // 1 minute
+const StreamViewer = ({ params }) => {
+	const [data, setData] = React.useState(null)
+	const [loading, setLoading] = React.useState(true)
+	const [isEnded, setIsEnded] = React.useState(false)
+	const [spectators, setSpectators] = React.useState(0)
 
-	state = {
-		isEnded: false,
-		loading: true,
-		cinemaMode: false,
+	const decoderRef = React.useRef(null)
+	const playerRef = React.useRef(null)
+	const videoRef = React.useRef(null)
+	const syncInterval = React.useRef(null)
 
-		stream: null,
-		spectators: 0,
-
-		player: null,
-		decoderInstance: null,
-	}
-
-	videoPlayerRef = React.createRef()
-
-	loadDecoder = async (decoder, ...args) => {
+	const loadDecoder = async (decoder, ...args) => {
 		if (typeof Decoders[decoder] === "undefined") {
 			console.error("[TV] Protocol not supported")
 			return false
 		}
 
-		console.log(`[TV] Switching decoder to: ${decoder}`)
-
-		await this.toggleLoading(true)
-
-		// check if decoder is already loaded
-		if (this.state.decoderInstance) {
-			if (typeof this.state.decoderInstance.destroy === "function") {
-				this.state.decoderInstance.destroy()
+		if (decoderRef.current) {
+			if (typeof decoderRef.current.destroy === "function") {
+				decoderRef.current.destroy()
 			}
 
-			this.setState({ decoderInstance: null })
+			decoderRef.current = null
 		}
 
-		const decoderInstance = await Decoders[decoder](...args)
-
-		await this.setState({
-			decoderInstance: decoderInstance,
-		})
-
-		await this.toggleLoading(false)
-
-		return decoderInstance
+		decoderRef.current = Decoders[decoder](...args)
 	}
 
-	onSourceEnd = () => {
-		if (typeof this.state.decoderInstance?.destroy === "function") {
-			this.state.decoderInstance.destroy()
+	const loadStream = async (stream_id) => {
+		if (!playerRef.current) return
+		if (!videoRef.current) return
+
+		setLoading(true)
+		setIsEnded(false)
+
+		const stream = await fetchStream(stream_id)
+
+		console.log(`[TV] Stream data >`, stream)
+
+		setLoading(false)
+		setIsEnded(!stream || !stream?.available)
+		setData(stream)
+
+		if (stream) {
+			setSpectators(stream.viewers)
+
+			if (stream.info?.available) {
+				playerRef.current.poster = stream.info?.thumbnail
+			} else {
+				playerRef.current.poster = stream.info?.offline_thumbnail
+			}
+
+			if (stream.available) {
+				await loadDecoder(
+					StreamViewer.defaultDecoder,
+					videoRef.current,
+					stream.urls,
+					{
+						onSourceEnd: () => {
+							setIsEnded(true)
+						},
+					},
+				)
+			}
 		}
-
-		this.setState({
-			isEnded: true,
-			loading: false,
-			cinemaMode: false,
-		})
 	}
 
-	attachPlayer = () => {
-		// check if user has interacted with the page
-		const player = new Plyr(this.videoPlayerRef.current, {
+	const syncData = async (stream_id) => {
+		const stream = await fetchStream(stream_id)
+		const streamIsEnded = !stream || !stream?.available
+
+		setIsEnded(streamIsEnded)
+
+		if (stream) {
+			setData(stream)
+			setSpectators(stream.viewers)
+
+			if (!streamIsEnded && !decoderRef.current) {
+				loadStream(stream_id)
+			}
+		}
+	}
+
+	React.useEffect(() => {
+		playerRef.current = new Plyr(videoRef.current, {
 			clickToPlay: false,
 			autoplay: true,
 			muted: true,
@@ -113,267 +130,111 @@ export default class StreamViewer extends React.Component {
 			settings: ["quality"],
 		})
 
-		player.muted = true
+		playerRef.current.muted = true
 
-		// insert a button to enter to cinema mode
-		player.elements.buttons.fullscreen.insertAdjacentHTML(
-			"beforeBegin",
-			`
-            <button class="plyr__controls__item plyr__control" type="button" data-plyr="cinema">
-                <span class="label">Cinema mode</span>
-            </button>
-        `,
-		)
+		loadStream(params.id)
 
-		player.elements.buttons.cinema =
-			player.elements.container.querySelector("[data-plyr='cinema']")
-
-		player.elements.buttons.cinema.addEventListener("click", () =>
-			this.toggleCinemaMode(),
-		)
-
-		this.setState({
-			player,
-		})
-	}
-
-	joinStreamWebsocket = async (stream) => {
-		if (!stream) {
-			console.error(
-				`[TV] Cannot connect to stream websocket if no stream provided`,
-			)
-			return false
-		}
-
-		const client = await SpectrumModel.createStreamWebsocket(stream._id, {
-			maxConnectRetries: 3,
-			refName: "/",
-		})
-
-		this.setState({
-			websocket: client,
-		})
-
-		await client.connect()
-
-		this.streamStateInterval = setInterval(() => {
-			this.syncWithStreamState()
+		syncInterval.current = setInterval(() => {
+			syncData(params.id)
 		}, StreamViewer.stateSyncMs)
 
-		setTimeout(this.syncWithStreamState, 1000)
+		return () => {
+			if (decoderRef.current) {
+				if (typeof decoderRef.current.unload === "function") {
+					decoderRef.current.unload()
+				}
 
-		return client
-	}
+				if (typeof decoderRef.current.destroy === "function") {
+					decoderRef.current.destroy()
+				}
 
-	syncWithStreamState = async () => {
-		if (!this.state.websocket || !this.state.stream) {
-			return false
-		}
+				decoderRef.current = null
+			}
 
-		const state = await this.state.websocket.requestState()
-
-		return this.setState({
-			spectators: state.viewers,
-			stream: {
-				...this.state.stream,
-				...(state.profile ?? {}),
-			},
-		})
-	}
-
-	enterPlayerAnimation = () => {
-		app.layout.toggleCenteredContent(false)
-		app.layout.toggleTotalWindowHeight(true)
-
-		if (app.layout.tools_bar) {
-			app.layout.tools_bar.toggleVisibility(false)
-		}
-	}
-
-	exitPlayerAnimation = () => {
-		app.layout.toggleCenteredContent(true)
-		app.layout.toggleTotalWindowHeight(false)
-
-		if (app.layout.tools_bar) {
-			app.layout.tools_bar.toggleVisibility(true)
-		}
-	}
-
-	setStreamLevel = (level) => {}
-
-	toggleLoading = (to) => {
-		this.setState({ loading: to ?? !this.state.loading })
-	}
-
-	toggleCinemaMode = (to) => {
-		if (typeof to === "undefined") {
-			to = !this.state.cinemaMode
-		}
-
-		app.controls.toggleUIVisibility(!to)
-		app.layout.toggleCompactMode(to)
-
-		this.setState({ cinemaMode: to })
-	}
-
-	componentDidMount = async () => {
-		this.enterPlayerAnimation()
-		this.attachPlayer()
-
-		// fetch stream data
-		const stream = await fetchStream(this.props.params.id)
-
-		// and error occurred or no stream available/online
-		if (!stream) {
-			return this.onSourceEnd()
-		}
-
-		console.log(`[TV] Stream data >`, stream)
-
-		// set data
-		this.setState({
-			stream: stream,
-			spectators: stream.viewers,
-		})
-
-		try {
-			// joinStreamWebsocket
-			this.joinStreamWebsocket(stream)
-		} catch (error) {
-			console.error(error)
-		}
-
-		// load decoder with provided data
-		await this.loadDecoder(
-			StreamViewer.defaultDecoder,
-			this.videoPlayerRef.current,
-			stream.sources,
-			{
-				onSourceEnd: this.onSourceEnd,
-				authToken: this.props.query["token"],
-			},
-		)
-	}
-
-	componentWillUnmount = () => {
-		if (typeof this.state.decoderInstance?.unload === "function") {
-			this.state.decoderInstance.unload()
-		}
-
-		if (typeof this.state.decoderInstance?.destroy === "function") {
-			this.state.decoderInstance.destroy()
-		}
-
-		if (typeof this.state.decoderInstance?._destroy === "function") {
-			this.state.decoderInstance._destroy()
-		}
-
-		if (this.state.websocket) {
-			if (typeof this.state.websocket.destroy === "function") {
-				this.state.websocket.destroy()
+			if (syncInterval.current) {
+				clearInterval(syncInterval.current)
+				syncInterval.current = null
 			}
 		}
+	}, [params.id])
 
-		this.exitPlayerAnimation()
-		this.toggleCinemaMode(false)
+	return (
+		<div
+			className={classnames("livestream", {
+				["isEnded"]: isEnded,
+			})}
+		>
+			<div className="livestream_player">
+				<div className="livestream_player_header">
+					{(!data || loading) && <antd.Skeleton active />}
+					{data && (
+						<>
+							<div className="livestream_player_header_user">
+								<UserPreview
+									user_id={data.user_id}
+									onlyIcon
+								/>
 
-		if (this.streamStateInterval) {
-			clearInterval(this.streamStateInterval)
-		}
-	}
+								<div className="livestream_player_indicators">
+									{!isEnded && (
+										<div className="livestream_player_header_user_spectators">
+											<antd.Tag icon={<Icons.Eye />}>
+												{spectators}
+											</antd.Tag>
+										</div>
+									)}
+								</div>
+							</div>
 
-	render() {
-		return (
-			<div
-				className={classnames("livestream", {
-					["cinemaMode"]: this.state.cinemaMode,
-				})}
-			>
-				<div className="livestream_player">
-					<div className="livestream_player_header">
-						{this.state.stream ? (
-							<>
-								<div className="livestream_player_header_user">
-									<UserPreview
-										user_id={this.state.stream.user_id}
-										onlyIcon
-									/>
-
-									<div className="livestream_player_indicators">
-										{!this.state.isEnded && (
-											<div className="livestream_player_header_user_spectators">
-												<antd.Tag icon={<Icons.Eye />}>
-													{this.state.spectators}
-												</antd.Tag>
-											</div>
-										)}
+							{data.info && (
+								<div className="livestream_player_header_info">
+									<div className="livestream_player_header_title">
+										<h1>{data.info?.title}</h1>
+									</div>
+									<div className="livestream_player_header_description">
+										<Marquee mode="smooth">
+											<h4>{data.info?.description}</h4>
+										</Marquee>
 									</div>
 								</div>
+							)}
+						</>
+					)}
+				</div>
 
-								{this.state.stream.info && (
-									<div className="livestream_player_header_info">
-										<div className="livestream_player_header_title">
-											<h1>
-												{this.state.stream.info?.title}
-											</h1>
-										</div>
-										<div className="livestream_player_header_description">
-											<Marquee mode="smooth">
-												<h4>
-													{
-														this.state.stream.info
-															?.description
-													}
-												</h4>
-											</Marquee>
-										</div>
-									</div>
-								)}
-							</>
-						) : (
-							<antd.Skeleton active />
-						)}
-					</div>
+				<video
+					id="player"
+					ref={videoRef}
+					playsinline
+				/>
 
-					<video
-						ref={this.videoPlayerRef}
-						id="player"
-						style={{
-							display: this.state.isEnded ? "none" : "block",
-						}}
-					/>
-
-					{this.state.isEnded && (
+				{isEnded && (
+					<div className="ended_banner">
 						<antd.Result>
 							<h1>This stream is ended</h1>
 						</antd.Result>
-					)}
-
-					<div
-						className={classnames("livestream_player_loading", {
-							["active"]: this.state.loading,
-						})}
-					>
-						<antd.Spin />
 					</div>
-				</div>
+				)}
 
-				<div className="livestream_panel">
-					<div className="chatbox">
-						{!this.state.cinemaMode && (
-							<div className="chatbox_header">
-								<h4>
-									<Icons.MessageSquare /> Live chat
-								</h4>
-							</div>
-						)}
-						<LiveChat
-							id={`livestream:${this.props.params.id}`}
-							floatingMode={this.state.cinemaMode}
-						/>
-					</div>
+				<div
+					className={classnames("livestream_player_loading", {
+						["active"]: loading,
+					})}
+				>
+					<antd.Spin />
 				</div>
 			</div>
-		)
-	}
+		</div>
+	)
 }
+
+StreamViewer.defaultDecoder = "hls"
+StreamViewer.stateSyncMs = 15000 // 15 seconds
+StreamViewer.options = {
+	layout: {
+		centeredContent: false,
+		maxHeight: true,
+	},
+}
+
+export default StreamViewer
