@@ -1,7 +1,9 @@
 import React from "react"
 import * as antd from "antd"
 
-import Streaming from "@models/spectrum"
+import { RTEngineClient } from "linebridge-client"
+import StreamingModel from "@models/spectrum"
+import SessionModel from "@models/session"
 
 import useCenteredContainer from "@hooks/useCenteredContainer"
 
@@ -21,18 +23,70 @@ const KeyToComponent = {
 	media_urls: MediaUrls,
 }
 
-const useSpectrumWS = () => {
-	const client = React.useMemo(() => Streaming.createWebsocket(), [])
+const useStreamWebsocket = ({ stream_id, statsInterval = 1000 } = {}) => {
+	if (!stream_id) {
+		console.error("stream_id is required")
+		return { client: null, data: {} }
+	}
+
+	const [data, setData] = React.useState({})
+	const statsIntervalRef = React.useRef(null)
+	const available = React.useRef(false)
+
+	const client = React.useMemo(
+		() =>
+			new RTEngineClient({
+				url: `${StreamingModel.baseUrl}/stream/${stream_id}/ws`,
+				token: SessionModel.token,
+			}),
+		[],
+	)
+
+	const handleOnUpdate = (update_data) => {
+		setData({ ...update_data })
+	}
+
+	const handleStatsTick = async () => {
+		if (!client) {
+			return false
+		}
+
+		if (!client.state.connected) {
+			return false
+		}
+
+		if (!available.current) {
+			return false
+		}
+
+		const stats = await client.call("get:stats")
+
+		setData((prevData) => ({ ...prevData, ...stats }))
+
+		console.debug("stream stats tick", stats)
+	}
 
 	React.useEffect(() => {
+		available.current = data?.available
+	}, [data])
+
+	React.useEffect(() => {
+		statsIntervalRef.current = setInterval(handleStatsTick, statsInterval)
+
+		client.on("update", handleOnUpdate)
 		client.connect()
 
 		return () => {
+			if (statsIntervalRef.current) {
+				clearInterval(statsIntervalRef.current)
+			}
+
+			client.off("update", handleOnUpdate)
 			client.destroy()
 		}
 	}, [])
 
-	return client
+	return { client, data }
 }
 
 const ProfileData = (props) => {
@@ -44,38 +98,27 @@ const ProfileData = (props) => {
 
 	useCenteredContainer(false)
 
-	const ws = useSpectrumWS()
+	const { client, data } = useStreamWebsocket({ stream_id: profile_id })
 
-	const [loading, setLoading] = React.useState(false)
-	const [fetching, setFetching] = React.useState(true)
+	const [initialLoading, setInitialLoading] = React.useState(true)
+	const [loading, setLoading] = React.useState(true)
 	const [error, setError] = React.useState(null)
-	const [profile, setProfile] = React.useState(null)
 	const [selectedTab, setSelectedTab] = React.useState("live")
-	const [streamHealth, setStreamHealth] = React.useState(null)
-	const streamHealthIntervalRef = React.useRef(null)
 
-	async function fetchStreamHealth() {
-		if (!ws) {
-			return false
-		}
-
-		if (!ws.state.connected) {
-			return false
-		}
-
-		const health = await ws.call("stream:health", profile_id)
-
-		setStreamHealth(health)
-	}
+	const [profile, setProfile] = React.useState(null)
 
 	async function fetchProfileData(idToFetch) {
-		setFetching(true)
-		setError(null)
-
 		try {
-			const result = await Streaming.getProfile(idToFetch)
+			setError(null)
+			setLoading(true)
+
+			const result = await StreamingModel.getProfile(idToFetch)
 
 			if (result) {
+				if (!Array.isArray(result.restreams)) {
+					result.restreams = []
+				}
+
 				setProfile(result)
 			} else {
 				setError({
@@ -87,7 +130,8 @@ const ProfileData = (props) => {
 			console.error("Error fetching profile:", err)
 			setError(err)
 		} finally {
-			setFetching(false)
+			setLoading(false)
+			setInitialLoading(false)
 		}
 	}
 
@@ -97,15 +141,13 @@ const ProfileData = (props) => {
 			return false
 		}
 
-		setLoading(true)
-
 		try {
-			const updatedProfile = await Streaming.updateProfile(profile._id, {
+			await StreamingModel.updateProfile(profile._id, {
 				[key]: value,
 			})
+			await fetchProfileData(profile_id)
 
-			antd.message.success("Change applyed")
-			setProfile(updatedProfile)
+			app.message.success("Change applied")
 		} catch (err) {
 			console.error(`Error updating profile (${key}):`, err)
 
@@ -114,13 +156,15 @@ const ProfileData = (props) => {
 				err.message ||
 				`Failed to update ${key}.`
 
-			antd.message.error(errorMessage)
+			app.message.error(errorMessage)
 
 			return false
-		} finally {
-			setLoading(false)
 		}
 	}
+
+	React.useEffect(() => {
+		fetchProfileData(profile_id)
+	}, [data.available])
 
 	React.useEffect(() => {
 		if (profile_id) {
@@ -131,21 +175,13 @@ const ProfileData = (props) => {
 		}
 	}, [profile_id])
 
-	React.useEffect(() => {
-		if (profile_id) {
-			streamHealthIntervalRef.current = setInterval(
-				fetchStreamHealth,
-				1000,
-			)
-		}
-
-		return () => {
-			clearInterval(streamHealthIntervalRef.current)
-		}
-	}, [profile_id])
-
-	if (fetching) {
-		return <antd.Skeleton active style={{ padding: "20px" }} />
+	if (initialLoading) {
+		return (
+			<antd.Skeleton
+				active
+				style={{ padding: "20px" }}
+			/>
+		)
 	}
 
 	if (error) {
@@ -182,7 +218,10 @@ const ProfileData = (props) => {
 
 	return (
 		<div className="profile-view">
-			<ProfileHeader profile={profile} streamHealth={streamHealth} />
+			<ProfileHeader
+				profile={profile}
+				streamHealth={data}
+			/>
 
 			<antd.Segmented
 				options={[
@@ -210,9 +249,9 @@ const ProfileData = (props) => {
 			{KeyToComponent[selectedTab] &&
 				React.createElement(KeyToComponent[selectedTab], {
 					profile,
-					loading,
+					loading: loading,
 					handleProfileUpdate,
-					streamHealth,
+					streamHealth: data,
 				})}
 		</div>
 	)

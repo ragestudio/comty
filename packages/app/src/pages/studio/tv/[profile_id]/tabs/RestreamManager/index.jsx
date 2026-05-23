@@ -6,6 +6,43 @@ import HiddenText from "../../components/HiddenText"
 import { FiXCircle } from "react-icons/fi"
 import NewRestreamServerForm from "./NewRestreamServerForm"
 
+import ConfirmButton from "@ui/ConfirmButton"
+
+const parseRestreamItem = (str) => {
+	const parts = str.split("/")
+
+	const key = parts.pop()
+	const host = parts.join("/")
+
+	return {
+		key,
+		host,
+	}
+}
+
+const RestreamItem = ({ item, index, loading, onDelete }) => {
+	const { host, key } = parseRestreamItem(item)
+
+	return (
+		<div
+			className="restream-server-item"
+			key={index}
+		>
+			<div className="data-field__label">
+				<span style={{ userSelect: "all" }}>{host}</span>
+				<p>{key ? key.replace(/./g, "*") : ""}</p>
+			</div>
+
+			<div className="data-field__actions">
+				<ConfirmButton
+					icon={<FiXCircle />}
+					onConfirm={onDelete}
+				/>
+			</div>
+		</div>
+	)
+}
+
 // Component to manage restream settings
 const RestreamManager = ({ profile, loading, handleProfileUpdate }) => {
 	async function handleToggleRestreamEnabled(isEnabled) {
@@ -22,15 +59,17 @@ const RestreamManager = ({ profile, loading, handleProfileUpdate }) => {
 		}
 
 		try {
-			const updatedProfile = await Streaming.deleteRestreamFromProfile(
-				profile._id,
-				{ index: indexToDelete },
-			)
+			const updatedProfile = await Streaming.updateProfile(profile._id, {
+				restreams: profile.restreams.filter(
+					(_, index) => index !== indexToDelete,
+				),
+			})
+
 			if (updatedProfile && updatedProfile.restreams) {
 				handleProfileUpdate("restreams", updatedProfile.restreams)
-				antd.message.success("Restream server deleted successfully.")
+				app.message.success("Restream server deleted successfully.")
 			} else {
-				antd.message.error(
+				app.message.error(
 					"Failed to delete restream server: No profile data returned from API.",
 				)
 			}
@@ -80,29 +119,12 @@ const RestreamManager = ({ profile, loading, handleProfileUpdate }) => {
 					</div>
 
 					{profile.restreams.map((item, index) => (
-						<div className="restream-server-item" key={index}>
-							<div className="data-field__label">
-								<span style={{ userSelect: "all" }}>
-									{item.host}
-								</span>
-								<p>
-									{item.key
-										? item.key.replace(/./g, "*")
-										: ""}
-								</p>
-							</div>
-
-							<div className="data-field__actions">
-								<antd.Button
-									icon={<FiXCircle />}
-									danger
-									onClick={() => handleDeleteRestream(index)}
-									loading={loading}
-								>
-									Delete
-								</antd.Button>
-							</div>
-						</div>
+						<RestreamItem
+							item={item}
+							index={index}
+							onDelete={() => handleDeleteRestream(index)}
+							loading={loading}
+						/>
 					))}
 
 					{profile.restreams.length === 0 && (

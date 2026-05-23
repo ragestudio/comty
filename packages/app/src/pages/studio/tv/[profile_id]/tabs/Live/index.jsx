@@ -148,7 +148,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 					<div className="content-panel__content">
 						<div className="status-indicator">
 							Stream Status:
-							{streamHealth?.online ? (
+							{streamHealth?.available ? (
 								<Tag color="green">Online</Tag>
 							) : (
 								<Tag color="red">Offline</Tag>
@@ -156,7 +156,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 						</div>
 
 						<div className="live-tab-preview">
-							{streamHealth?.online ? (
+							{streamHealth?.available ? (
 								<StreamPreview
 									streamHealth={streamHealth}
 									profile={profile}
