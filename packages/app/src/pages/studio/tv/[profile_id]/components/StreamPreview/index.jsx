@@ -15,7 +15,7 @@ const StreamPreview = ({ profile }) => {
 		hlsInstance.current.attachMedia(videoRef.current)
 
 		hlsInstance.current.on(Hls.Events.MEDIA_ATTACHED, () => {
-			hlsInstance.current.loadSource(profile.sources.hls)
+			hlsInstance.current.loadSource(profile.urls.hls)
 		})
 
 		videoRef.current.addEventListener("play", () => {

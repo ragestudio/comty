@@ -11,7 +11,7 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 		setThumbnail(() => {
 			if (
 				streamRef.current &&
-				streamRef.current.online &&
+				streamRef.current.available &&
 				profile.info.thumbnail
 			) {
 				return `${profile.info.thumbnail}?t=${Date.now()}`
@@ -35,7 +35,10 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 
 	return (
 		<div className="profile-header">
-			<img className="profile-header__image" src={thumbnail} />
+			<img
+				className="profile-header__image"
+				src={thumbnail}
+			/>
 
 			<div className="profile-header__content">
 				<div className="profile-header__card titles">
@@ -58,7 +61,7 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 				</div>
 
 				<div className="flex-row gap-10">
-					{streamHealth?.online ? (
+					{streamHealth?.available ? (
 						<div className="profile-header__card on_live">
 							<span>
 								<FiRadio /> On Live

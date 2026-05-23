@@ -27,9 +27,7 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 									tooltips: ["Copied!"],
 								}}
 							>
-								{profile.urls?.ingest
-									? profile.urls.ingest.split("?")[0]
-									: "No URL"}
+								{`rtmp://${profile.urls?.public_host}`}
 							</antd.Typography.Text>
 						</code>
 					</div>
@@ -41,7 +39,9 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 					</div>
 
 					<div className="data-field__value">
-						<HiddenText value={`?token=${profile.token}`} />
+						<HiddenText
+							value={`${profile._id}?token=${profile.token}`}
+						/>
 					</div>
 				</div>
 			</div>

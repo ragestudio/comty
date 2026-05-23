@@ -24,27 +24,32 @@ const NewRestreamServerForm = ({ profile, loading, handleProfileUpdate }) => {
 		}
 
 		try {
-			const updatedProfile = await Streaming.addRestreamToProfile(
-				profile._id,
-				{ host: newRestreamHost, key: newRestreamKey },
-			)
+			const updatedProfile = await Streaming.updateProfile(profile._id, {
+				restreams: [
+					...profile.restreams,
+					`${newRestreamHost}/${newRestreamKey}`,
+				],
+			})
+
 			if (updatedProfile && updatedProfile.restreams) {
 				handleProfileUpdate("restreams", updatedProfile.restreams)
 				setNewRestreamHost("")
 				setNewRestreamKey("")
-				antd.message.success("Restream server added successfully.")
+
+				app.message.success("Restream server added successfully.")
 			} else {
-				antd.message.error(
+				app.message.error(
 					"Failed to add restream server: No profile data returned from API.",
 				)
 			}
 		} catch (err) {
-			console.error("Failed to add restream server:", err)
 			const errorMessage =
 				err.response?.data?.message ||
 				err.message ||
 				"An unknown error occurred while adding the restream server."
-			antd.message.error(errorMessage)
+
+			console.error("Failed to add restream server:", err)
+			app.message.error(errorMessage)
 		}
 	}
 
