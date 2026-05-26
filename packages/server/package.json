@@ -11,7 +11,7 @@
 		"setup": "cross-env NODE_ENV=development linebridge-boot scripts/setup/index.js",
 		"start:prod": "cross-env NODE_ENV=production ultragateway",
 		"dev": "cross-env NODE_ENV=development DEBUG=true ultragateway",
-		"dev:exp": "cross-env NODE_ENV=development ../../linebridge/linebridge-gateway/debug",
+		"dev:exp": "cross-env NODE_ENV=development ../../modules/linebridge/linebridge-gateway/debug",
 		"preinstall": "bash ./scripts/externalDeps.sh",
 		"test": "vitest run",
 		"test:watch": "vitest",
