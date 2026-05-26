@@ -1,11 +1,11 @@
 [submodule "vessel"]
-	path = vessel
+	path = modules/vessel
 	url = https://github.com/ragestudio/vessel
 [submodule "linebridge"]
-	path = linebridge
+	path = modules/linebridge
 	url = https://github.com/ragestudio/linebridge
 [submodule "comty.js"]
-	path = comty.js
+	path = modules/comty.js
 	url = https://github.com/ragestudio/comty.js
 [submodule "packages/desktop/addons/sysaudio"]
 	path = packages/desktop/addons/sysaudio
