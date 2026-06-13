@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm"
 
 import Poll from "@components/Poll"
 import { Icons } from "@components/Icons"
-import { processString } from "@utils"
+import processString from "@utils/processString"
 
 import PostHeader from "./components/header"
 import PostActions from "./components/actions"
@@ -29,7 +29,7 @@ const messageRegexs = [
 		fn: (key, result) => {
 			return (
 				<ReactPlayer
-					url={result[1]}
+					src={result[1]}
 					controls
 				/>
 			)
