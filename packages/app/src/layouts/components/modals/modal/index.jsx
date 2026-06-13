@@ -1,6 +1,5 @@
 import React from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { Modal as AntdModal } from "antd"
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
@@ -69,12 +68,12 @@ class Modal extends React.Component {
 		}
 
 		if (this.props.confirmOnOutsideClick) {
-			return AntdModal.confirm({
+			return app.layout.modal.confirm({
 				title: this.props.confirmOnClickTitle ?? "Are you sure?",
 				content:
 					this.props.confirmOnClickContent ??
 					"Are you sure you want to close this window?",
-				onOk: () => {
+				onConfirm: () => {
 					this.close()
 				},
 			})
