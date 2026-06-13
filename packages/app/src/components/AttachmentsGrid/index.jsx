@@ -9,6 +9,7 @@ import hr from "@tsmx/human-readable"
 import Image from "@components/Image"
 
 import "./index.less"
+import PropTypes from "prop-types"
 
 const GenericFile = ({ attachment }) => {
 	if (!attachment || !attachment.url) {
@@ -257,6 +258,12 @@ const AttachmentsGrid = ({ attachments, className, style }) => {
 			})}
 		</div>
 	)
+}
+
+AttachmentsGrid.propTypes = {
+	attachments: PropTypes.arrayOf(PropTypes.object),
+	className: PropTypes.string,
+	style: PropTypes.object,
 }
 
 export default AttachmentsGrid
