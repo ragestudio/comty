@@ -1,5 +1,7 @@
-export default {
-	useContexts: ["keys"],
+import type API from "@services/auth/auth.service"
+
+export default defineRoute<API>()({
+	useContexts: ["keys"] as const,
 	fn: async (req, res, ctx) => {
 		return {
 			keys: [
@@ -12,4 +14,4 @@ export default {
 			],
 		}
 	},
-}
+})

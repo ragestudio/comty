@@ -7,34 +7,31 @@ import RedisClient from "@shared-classes/RedisClient"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
 
 import SharedMiddlewares from "@shared-middlewares"
+import OAuthProvider from "@classes/oauth"
 
 export default class API extends Server {
 	static refName = "auth"
 	static listenPort = 3020
 
-	static bypassCors = true
 	static useMiddlewares = ["logs"]
-	static useEngine = "heng"
 
 	middlewares = {
 		...SharedMiddlewares,
 	}
 
 	contexts = {
-		keys: {},
+		keys: {} as Record<string, any>,
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb()),
 		redis: RedisClient({
 			maxRetriesPerRequest: null,
 		}),
+		oauth: new OAuthProvider(),
 	}
 
-	queuesManager = new TaskQueueManager(
-		{
-			workersPath: `${__dirname}/queues`,
-		},
-		this,
-	)
+	queuesManager = new TaskQueueManager({
+		workersPath: `${__dirname}/queues`,
+	})
 
 	initialize = [
 		() => this.contexts.db.initialize(),
@@ -56,6 +53,13 @@ export default class API extends Server {
 		})
 
 		global.queues = this.queuesManager
+
+		// ensure ttl index for oauth codes
+		try {
+			await this.contexts.oauth.ensureTTLIndex()
+		} catch (err) {
+			console.warn("oauth ttl index creation failed:", err.message)
+		}
 	}
 
 	onExit() {
