@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 
 import moment from "moment"
-import UAParser from "ua-parser-js"
+import { UAParser } from "ua-parser-js"
 
 import { Icons } from "@components/Icons"
 
