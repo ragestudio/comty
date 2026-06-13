@@ -1,0 +1,11 @@
+allowBuilds:
+  bcrypt: true
+  bufferutil: true
+  esbuild: true
+  msgpackr-extract: true
+  unrs-resolver: set this to true or false
+
+blockExoticSubdeps: false
+
+overrides:
+  linebridge: link:../../modules/linebridge/server/build
