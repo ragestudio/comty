@@ -14,6 +14,7 @@ const Button = ({
 	type,
 	disabled = false,
 	loading = false,
+	style,
 }) => {
 	const onlyIcon = !children && icon
 
@@ -34,6 +35,7 @@ const Button = ({
 			className={classnames(classes, { "only-icon": onlyIcon })}
 			onClick={onClick}
 			disabled={disabled}
+			style={style}
 		>
 			{loading && (
 				<div className="button-icon">
@@ -54,6 +56,8 @@ Button.propTypes = {
 	onClick: PropTypes.func,
 	disabled: PropTypes.bool,
 	loading: PropTypes.bool,
+	style: PropTypes.object,
+	children: PropTypes.node,
 }
 
 Button.defaultProps = {
@@ -63,6 +67,8 @@ Button.defaultProps = {
 	type: "ghost",
 	disabled: false,
 	loading: false,
+	style: null,
+	children: null,
 }
 
 export default Button
