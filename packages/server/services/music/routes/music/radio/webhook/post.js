@@ -17,7 +17,7 @@ function parseBasicAuth(auth) {
 		return result
 	}
 
-	decoded = new Buffer(parts[1], "base64").toString("utf8")
+	decoded = Buffer.from(parts[1], "base64").toString("utf8")
 	colon = decoded.indexOf(":")
 
 	result.username = decoded.substr(0, colon)
