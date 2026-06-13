@@ -2,7 +2,7 @@ import AuthToken from "../../classes/AuthToken"
 import ServerToken from "../../classes/ServerToken"
 //import BotToken from "../../classes/BotToken"
 
-export default async (req, res) => {
+export default async (req, res, next) => {
 	function reject(data) {
 		return res.status(401).json(data)
 	}
@@ -41,6 +41,7 @@ export default async (req, res) => {
 				}
 
 				req.user_id = validation.session.user_id
+				next()
 
 				return
 			}
@@ -69,7 +70,7 @@ export default async (req, res) => {
 				}
 
 				req.user_id = validation.data.owner_user_id
-
+				next()
 				return
 			}
 			case "Bot": {

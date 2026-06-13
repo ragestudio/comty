@@ -1,6 +1,6 @@
 import BotToken from "../../classes/BotToken"
 
-export default async (req, res) => {
+export default async (req, res, next) => {
 	function reject(data) {
 		return res.status(401).json(data)
 	}
@@ -34,6 +34,8 @@ export default async (req, res) => {
 			}
 
 			req.user_id = validation.data.user_id.toString()
+
+			next()
 		}
 	} catch (error) {
 		console.error(error)

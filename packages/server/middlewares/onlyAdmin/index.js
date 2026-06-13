@@ -1,4 +1,4 @@
-export default async (req, res) => {
+export default async (req, res, next) => {
 	if (!req.auth) {
 		return res.status(401).json({ error: "No authenticated" })
 	}
@@ -11,5 +11,5 @@ export default async (req, res) => {
 		})
 	}
 
-	return
+	next()
 }
