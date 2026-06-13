@@ -124,7 +124,7 @@ export default class DMChatChannelController {
 			{
 				raw: true,
 			},
-		)) as ExtendedDataRoom[]
+		)) as unknown as ExtendedDataRoom[]
 
 		// insert last message_at & sort
 		rooms = rooms.map((room) => {
