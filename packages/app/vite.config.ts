@@ -1,17 +1,18 @@
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
-import path from "node:path"
-import fs from "node:fs"
 
 import aliases from "./aliases"
 
-const sslDirPath = path.resolve(__dirname, "../../", ".ssl")
-
-const config = {
+export default defineConfig({
 	base: "/",
-	plugins: [react()],
+	plugins: [
+		react({
+			disableOxcRecommendation: false,
+		}),
+	],
 	resolve: {
 		alias: aliases,
+		mainFields: ["browser", "module", "main"],
 	},
 	envPrefix: ["VITE_", "TAURI_ENV_*"],
 	server: {
@@ -28,7 +29,6 @@ const config = {
 			"/api": {
 				target: "http://0.0.0.0:9000",
 				rewrite: (path) => path.replace(/^\/api/, ""),
-				hostRewrite: true,
 				changeOrigin: true,
 				xfwd: true,
 				ws: true,
@@ -45,13 +45,12 @@ const config = {
 			},
 		},
 	},
-	esbuild: {
-		target: "es2023",
-	},
+
 	optimizeDeps: {
-		include: ["src/cores/**/*.core.js"],
+		include: ["src/cores/**/*.core.js", "src/cores/**/*.core.ts"],
 		exclude: ["vessel", "comty.js", "linebridge-client"],
 	},
+
 	build: {
 		rollupOptions: {
 			output: {
@@ -65,25 +64,4 @@ const config = {
 			},
 		},
 	},
-}
-
-if (fs.existsSync(sslDirPath)) {
-	const keyPath = path.join(sslDirPath, "privkey.pem")
-	const certPath = path.join(sslDirPath, "cert.pem")
-
-	if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
-		console.info(`Starting server on SSL mode > [${sslDirPath}]`)
-
-		config.server.proxy["/api"].target = "https://0.0.0.0:9000"
-		config.server.https = {
-			key: keyPath,
-			cert: certPath,
-		}
-	} else {
-		console.error(
-			`SSL path finded, but some files are missing. Disabling ssl mode.\nRequired files:\n\t${keyPath}\n\t${certPath}`,
-		)
-	}
-}
-
-export default defineConfig(config)
+})
