@@ -1,8 +1,8 @@
 import React from "react"
 import PropTypes from "prop-types"
+import classNames from "classnames"
 
 import "./Popover.less"
-import classNames from "classnames"
 
 const Popover = ({
 	children,
