@@ -1,4 +1,6 @@
 import type API from "@services/auth/auth.service"
+//@ts-ignore
+import { OidcApp } from "@db_models"
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
@@ -6,16 +8,12 @@ export default defineRoute<API>()({
 	fn: async (req, res, ctx) => {
 		const { clientId } = req.params
 
-		const client = await ctx.oauth.validateClient(clientId)
+		const client = await OidcApp.findOne({ client_id: clientId }).lean()
 
 		if (!client) {
 			throw new OperationError(404, "client not found")
 		}
 
-		return {
-			client_id: client.client_id,
-			client_name: client.client_name,
-			redirect_uris: client.redirect_uris,
-		}
+		return client
 	},
 })

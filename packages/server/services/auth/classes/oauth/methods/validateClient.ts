@@ -2,7 +2,9 @@
 import { OidcApp } from "@db_models"
 
 export default async function (clientId: string, clientSecret?: string) {
-	const client = await OidcApp.findOne({ client_id: clientId }).lean()
+	const client = await OidcApp.findOne({ client_id: clientId })
+		.select("+client_secret")
+		.lean()
 
 	if (!client) {
 		return null

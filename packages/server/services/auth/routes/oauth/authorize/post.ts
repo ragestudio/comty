@@ -40,12 +40,12 @@ export default defineRoute<API>()({
 
 		if (action === "approve") {
 			const code = await ctx.oauth.createAuthorizationCode({
-				client_id,
+				client_id: client_id,
 				user_id: req.auth.user_id,
-				redirect_uri,
+				redirect_uri: redirect_uri,
 				scope: scope || "",
-				code_challenge,
-				code_challenge_method,
+				code_challenge: code_challenge,
+				code_challenge_method: code_challenge_method,
 			})
 
 			redirectParams.set("code", code)

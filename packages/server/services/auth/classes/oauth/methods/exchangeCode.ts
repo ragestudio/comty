@@ -1,8 +1,8 @@
 import crypto from "node:crypto"
 //@ts-ignore
-import { OauthCode } from "@db_models"
+import { User, OauthCode } from "@db_models"
 import AuthToken from "@shared-classes/AuthToken"
-import { parseExpiresIn } from "../utils"
+import { parseExpiresIn, buildClaims } from "../utils"
 
 export default async function (params: {
 	code: string
@@ -82,11 +82,35 @@ export default async function (params: {
 		"refreshStrategy",
 	)
 
-	return {
+	const result: Record<string, any> = {
 		access_token: accessToken,
 		token_type: "Bearer",
 		expires_in: parseExpiresIn(AuthToken.authStrategy.expiresIn),
 		refresh_token: refreshToken,
 		scope: stored.scope,
 	}
+
+	if (stored.scope.includes("openid")) {
+		const user = await User.findById(stored.user_id).select("+email").lean()
+
+		if (user) {
+			const issuerUrl =
+				process.env.OIDC_ISSUER_URL || `http://localhost:3020`
+
+			const idToken = await AuthToken.signToken(
+				{
+					iss: issuerUrl,
+					sub: stored.user_id,
+					aud: stored.client_id,
+					...buildClaims(user, stored.scope),
+					type: "id_token",
+				},
+				"authStrategy",
+			)
+
+			result.id_token = idToken
+		}
+	}
+
+	return result
 }
