@@ -66,7 +66,16 @@ const OAuthPage = (props) => {
 			redirect_uri: props.loaderData.redirect_uri,
 			response_type: props.loaderData.response_type,
 			state: props.loaderData.state,
+		}).catch((e) => {
+			app.cores.notifications.new({
+				type: "error",
+				title: "Failed to Authorize",
+				message: e.response.data.error ?? String(e),
+			})
+			return null
 		})
+
+		if (!approval) return
 
 		if (approval.redirect_uri) {
 			window.location.href = approval.redirect_uri
