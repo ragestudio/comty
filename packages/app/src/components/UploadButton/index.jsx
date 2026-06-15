@@ -2,12 +2,13 @@ import React from "react"
 import { Upload, Progress } from "antd"
 import classnames from "classnames"
 import queuedUploadFile from "@utils/queuedUploadFile"
+import PropTypes from "prop-types"
 
 import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-const UploadButton = React.forwardRef((props, ref) => {
+const UploadButton = (props) => {
 	const [uploading, setUploading] = React.useState(false)
 	const [progress, setProgress] = React.useState(null)
 
@@ -76,8 +77,8 @@ const UploadButton = React.forwardRef((props, ref) => {
 	}
 
 	React.useEffect(() => {
-		if (ref) {
-			ref.current = {
+		if (props.ref) {
+			props.ref.current = {
 				uploading: uploading,
 				progress: progress,
 				uploadFile: (file) => {
@@ -91,23 +92,23 @@ const UploadButton = React.forwardRef((props, ref) => {
 		}
 
 		return () => {
-			if (ref) {
-				ref.current = null
+			if (props.ref) {
+				props.ref.current = null
 			}
 		}
 	}, [])
 
 	React.useEffect(() => {
-		if (ref && ref?.current) {
-			ref.current.uploading = uploading
+		if (props.ref && props.ref?.current) {
+			props.ref.current.uploading = uploading
 		}
-	}, [ref, uploading])
+	}, [props.ref, uploading])
 
 	React.useEffect(() => {
-		if (ref && ref?.current) {
-			ref.current.progress = progress
+		if (props.ref && props.ref?.current) {
+			props.ref.current.progress = progress
 		}
-	}, [ref, progress])
+	}, [props.ref, progress])
 
 	return (
 		<Upload
@@ -147,8 +148,17 @@ const UploadButton = React.forwardRef((props, ref) => {
 			</div>
 		</Upload>
 	)
-})
+}
 
-UploadButton.displayName = "UploadButton"
+UploadButton.propTypes = {
+	onStart: PropTypes.func,
+	onProgress: PropTypes.func,
+	onError: PropTypes.func,
+	onSuccess: PropTypes.func,
+	multiple: PropTypes.bool,
+	disabled: PropTypes.bool,
+	icon: PropTypes.node,
+	children: PropTypes.node,
+}
 
 export default UploadButton
