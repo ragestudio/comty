@@ -28,6 +28,7 @@
 				"./services/users/classes/*",
 			],
 			"@db_models": ["./db_models"],
+			"@db_models/*": ["./db_models/*"],
 			"@db/*": ["./db/*"],
 			"@services/*": ["./services/*"],
 		},
