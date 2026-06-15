@@ -15,6 +15,7 @@
 		"paths": {
 			"@/*": ["./src/*"],
 			"@config/*": ["./config/*"],
+			"@config": ["./config/index.js"],
 
 			"@ui/*": ["./src/ui/*"],
 			"@cores/*": ["./src/cores/*"],
