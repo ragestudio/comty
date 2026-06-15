@@ -1,0 +1,31 @@
+.hidden-text {
+	position: relative;
+
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	overflow: hidden;
+	width: 100%;
+
+	gap: 10px;
+	padding: 5px;
+
+	background-color: var(--background-color-primary);
+
+	border-radius: 8px;
+
+	font-family: "DM Mono", monospace;
+	font-size: 0.8rem;
+
+	&__value {
+		user-select: all;
+	}
+
+	&__copy {
+		position: absolute;
+		right: 0;
+		margin-right: 10px;
+	}
+}

@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import HiddenText from "../../components/HiddenText"
+import HiddenText from "@components/HiddenText"
 
 import { IoMdEyeOff } from "react-icons/io"
 import { GrStorage, GrConfigure } from "react-icons/gr"
