@@ -1,5 +1,4 @@
 import { Octokit } from "@octokit/rest"
-import axios from "axios"
 
 const octokit = new Octokit({})
 
@@ -27,12 +26,15 @@ export default async (req, res) => {
 		)
 
 		if (bundle) {
-			const response = await axios
-				.get(bundle.browser_download_url)
-				.catch(() => null)
+			let response
+			try {
+				response = await fetch(bundle.browser_download_url)
+			} catch {
+				response = null
+			}
 
-			if (response) {
-				changelogData = response.data
+			if (response && response.ok) {
+				changelogData = await response.text()
 			}
 		}
 

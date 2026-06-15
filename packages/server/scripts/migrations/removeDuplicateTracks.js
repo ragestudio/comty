@@ -1,6 +1,5 @@
 import DbManager from "@shared-classes/DbManager"
 import { Track } from "@db_models"
-import axios from "axios"
 
 async function main() {
 	await global.injectEnvFromInfisical()
@@ -47,45 +46,45 @@ async function main() {
 
 		const index = tracks.indexOf(track)
 
-		try {
-			console.log(
-				`[${index + 1}/${tracks.length}] Fetching ETag for source: ${track.source} (Track ID: ${track._id})`,
-			)
+		console.log(
+			`[${index + 1}/${tracks.length}] Fetching ETag for source: ${track.source} (Track ID: ${track._id})`,
+		)
 
-			const response = await axios.head(track.source, {
-				timeout: 10000, // 10 seconds timeout
+		let response
+		try {
+			response = await fetch(track.source, {
+				method: "HEAD",
+				signal: AbortSignal.timeout(10000),
 				headers: {
 					Accept: "*/*",
 					"Accept-Encoding": "gzip, deflate, br",
 					Connection: "keep-alive",
 				},
 			})
-
-			// ETag header can be 'etag' or 'ETag' (case-insensitive)
-			const etag = response.headers["etag"] || response.headers["ETag"]
-
-			if (etag) {
-				if (!tracksByETag.has(etag)) {
-					tracksByETag.set(etag, [])
-				}
-				tracksByETag.get(etag).push(track)
-			} else {
-				console.warn(
-					`  No ETag found for source: ${track.source} (Track ID: ${track._id})`,
-				)
-			}
 		} catch (error) {
-			let errorMessage = error.message
-
-			if (error.response) {
-				errorMessage = `Server responded with status ${error.response.status} ${error.response.statusText}`
-			} else if (error.request) {
-				errorMessage =
-					"No response received from server (e.g., timeout, network error)"
-			}
-
 			console.error(
-				`Error fetching ETag for ${track.source} (Track ID: ${track._id}): ${errorMessage}`,
+				`Error fetching ETag for ${track.source} (Track ID: ${track._id}): ${error.message}`,
+			)
+			continue
+		}
+
+		if (!response.ok) {
+			console.error(
+				`Error fetching ETag for ${track.source} (Track ID: ${track._id}): Server responded with status ${response.status} ${response.statusText}`,
+			)
+			continue
+		}
+
+		const etag = response.headers.get("etag")
+
+		if (etag) {
+			if (!tracksByETag.has(etag)) {
+				tracksByETag.set(etag, [])
+			}
+			tracksByETag.get(etag).push(track)
+		} else {
+			console.warn(
+				`  No ETag found for source: ${track.source} (Track ID: ${track._id})`,
 			)
 		}
 	}
