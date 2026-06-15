@@ -7,6 +7,7 @@ import { Icons } from "@/components/Icons"
 import OAuth from "@models/oauth"
 
 import "./index.less"
+import { Tag } from "antd"
 
 const ScopesBlocks = {
 	openid: {
@@ -62,7 +63,7 @@ const OAuthPage = (props) => {
 		const approval = await OAuth.authorize({
 			action: "approve",
 			client_id: props.loaderData.client_id,
-			scope: props.loaderData.scope,
+			scope: props.loaderData.scope_list,
 			redirect_uri: props.loaderData.redirect_uri,
 			response_type: props.loaderData.response_type,
 			state: props.loaderData.state,
@@ -95,7 +96,10 @@ const OAuthPage = (props) => {
 			)}
 
 			<div className="oauth-consent__card card bg-accent">
-				<h1>{client?.client_name}</h1>
+				<h1>
+					{!client.production && <Tag color="red">Sandbox</Tag>}
+					{client?.client_name}
+				</h1>
 				<p>Wants to access some data</p>
 
 				<div className="oauth-consent__card__permissions">
