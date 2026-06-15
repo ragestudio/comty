@@ -9,6 +9,7 @@ export type OidcApp = {
 	scopes: string[]
 	logo_url?: string
 	website_url?: string
+	production?: boolean
 }
 
 export default {
@@ -56,6 +57,10 @@ export default {
 		},
 		website_url: {
 			type: String,
+		},
+		production: {
+			type: Boolean,
+			default: false,
 		},
 	},
 }
