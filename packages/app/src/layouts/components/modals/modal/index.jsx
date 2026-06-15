@@ -50,14 +50,15 @@ class Modal extends React.Component {
 
 	handleEsc = (e) => {
 		if (e.key === "Escape") {
-			if (this.escTimeout !== null) {
-				clearTimeout(this.escTimeout)
-				return this.close()
-			}
+			this.close()
+			// if (this.escTimeout !== null) {
+			// 	clearTimeout(this.escTimeout)
+			// 	return this.close()
+			// }
 
-			this.escTimeout = setTimeout(() => {
-				this.escTimeout = null
-			}, 250)
+			// this.escTimeout = setTimeout(() => {
+			// 	this.escTimeout = null
+			// }, 250)
 		}
 	}
 
