@@ -28,6 +28,7 @@ export default class API extends Server {
 		scylla: (global.scylla = new ScyllaDb()),
 		redis: RedisClient(),
 		userSyncRooms: new Map(),
+		limits: null,
 	}
 
 	initialize = [
