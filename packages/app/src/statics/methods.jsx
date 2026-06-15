@@ -5,6 +5,7 @@ import NotificationsCenter from "@components/NotificationsCenter"
 import PostCreator from "@components/PostCreator"
 import Searcher from "@components/Searcher"
 import AppsMenu from "@components/AppsMenu"
+import MarkdownReader from "@components/MarkdownReader"
 
 import config from "@config"
 import deleteInternalStorage from "@utils/deleteInternalStorage"
@@ -74,6 +75,14 @@ export default {
 					framed: false,
 				},
 			)
+		},
+		openMarkdownReader: ({ url }) => {
+			app.layout.modal.open("markdown-reader", MarkdownReader, {
+				includeCloseButton: true,
+				props: {
+					url: url,
+				},
+			})
 		},
 		openFullImageViewer: (media, options = {}) => {
 			if (!Array.isArray(media)) {

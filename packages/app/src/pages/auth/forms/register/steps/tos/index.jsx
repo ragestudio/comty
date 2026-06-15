@@ -1,16 +1,5 @@
 import * as antd from "antd"
-
-import MarkdownReader from "@components/MarkdownReader"
 import config from "@config"
-
-const FrameStyle = {
-	width: "60vw",
-	"max-width": "60vw",
-	height: "90vh",
-	"max-height": "90vh",
-	overflow: "overlay",
-	"justify-content": "flex-start",
-}
 
 const LegalDocumentsDecorators = {
 	terms: "Terms of Service",
@@ -45,13 +34,7 @@ const TermsOfServiceStepComponent = (props) => {
 					<antd.Button
 						key={key}
 						onClick={() => {
-							app.layout.modal.open(key, MarkdownReader, {
-								includeCloseButton: true,
-								frameContentStyle: FrameStyle,
-								props: {
-									url: value,
-								},
-							})
+							app.controls.openMarkdownReader({ url: value })
 						}}
 					>
 						Read{" "}
