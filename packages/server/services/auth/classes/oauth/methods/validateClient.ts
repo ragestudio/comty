@@ -2,9 +2,9 @@
 import { OidcApp } from "@db_models"
 
 export default async function (clientId: string, clientSecret?: string) {
-	const client = await OidcApp.findOne({ client_id: clientId })
+	const client = (await OidcApp.findOne({ client_id: clientId })
 		.select("+client_secret")
-		.lean()
+		.lean()) as OidcApp
 
 	if (!client) {
 		return null
@@ -19,5 +19,6 @@ export default async function (clientId: string, clientSecret?: string) {
 		client_name: client.client_name,
 		redirect_uris: client.redirect_uris,
 		owner_id: client.owner_id,
+		production: client.production,
 	}
 }

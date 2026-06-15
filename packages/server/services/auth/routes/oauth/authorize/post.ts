@@ -1,4 +1,5 @@
 import type API from "@services/auth/auth.service"
+import type { OidcApp } from "@db_models/oidc_apps"
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
@@ -20,7 +21,9 @@ export default defineRoute<API>()({
 			throw new OperationError(400, "missing required parameters")
 		}
 
-		const client = await ctx.oauth.validateClient(client_id)
+		const client = (await ctx.oauth.validateClient(
+			client_id,
+		)) as OidcApp | null
 
 		if (!client) {
 			throw new OperationError(400, "invalid_client")
@@ -39,6 +42,15 @@ export default defineRoute<API>()({
 		}
 
 		if (action === "approve") {
+			if (!client.production) {
+				if (req.auth.user_id !== client.owner_id) {
+					throw new OperationError(
+						403,
+						"Not production apps can not be used by non-owners",
+					)
+				}
+			}
+
 			const code = await ctx.oauth.createAuthorizationCode({
 				client_id: client_id,
 				user_id: req.auth.user_id,
