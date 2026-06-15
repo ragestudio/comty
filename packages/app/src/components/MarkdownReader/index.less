@@ -2,25 +2,58 @@
 	display: flex;
 	flex-direction: column;
 
+	gap: 5px;
+
 	align-items: start;
 	justify-content: start;
 
-	text-align: start;
-
 	height: 100%;
+	width: 100%;
 
-	padding-bottom: 10px;
+	overflow: auto;
 
-	> * {
+	text-align: start;
+	user-select: text;
+
+	word-break: keep-all;
+
+	* {
 		user-select: text;
 	}
 
 	blockquote {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
 		background-color: var(--background-color-accent);
 		border-radius: 8px;
+
 		padding: 7px;
+		margin: 0;
+
+		border: 2px var(--border-color) solid;
+
+		p {
+			margin: 0;
+			padding: 0;
+		}
 	}
 
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	span,
+	p,
+	a {
+		display: inline;
+	}
+
+	h1,
 	h2,
 	h3,
 	h4,
@@ -28,12 +61,6 @@
 	h6 {
 		margin-top: 10px;
 		margin-bottom: 5px;
-	}
-
-	span,
-	p,
-	a {
-		margin: 5px;
 	}
 
 	ul {
