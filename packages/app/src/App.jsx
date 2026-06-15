@@ -89,8 +89,8 @@ class ComtyApp extends React.Component {
 		return (
 			<React.Fragment>
 				<ThemeProvider>
-					<Layout staticRenders={ComtyApp.staticRenders}>
-						<ErrorBoundary>
+					<ErrorBoundary>
+						<Layout staticRenders={ComtyApp.staticRenders}>
 							{this.state.firstInitialized && (
 								<Router.Render
 									declarations={routesDeclarations}
@@ -98,8 +98,8 @@ class ComtyApp extends React.Component {
 									onPageMount={onPageMount}
 								/>
 							)}
-						</ErrorBoundary>
-					</Layout>
+						</Layout>
+					</ErrorBoundary>
 				</ThemeProvider>
 			</React.Fragment>
 		)
