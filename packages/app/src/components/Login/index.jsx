@@ -49,6 +49,36 @@ class Login extends React.Component {
 	}
 
 	formRef = React.createRef()
+	usernameInputRef = React.createRef()
+	passwordInputRef = React.createRef()
+	mfaCodeInputRef = React.createRef()
+
+	componentDidUpdate(prevProps, prevState) {
+		const phaseChanged = prevState.phase !== this.state.phase
+		const mfaAppeared = !prevState.mfa_required && this.state.mfa_required
+		const mfaDisappeared =
+			prevState.mfa_required && !this.state.mfa_required
+
+		if (phaseChanged || mfaAppeared) {
+			this.focusCurrentStep()
+		} else if (mfaDisappeared) {
+			setTimeout(() => {
+				this.passwordInputRef.current?.focus()
+			}, 100)
+		}
+	}
+
+	focusCurrentStep = () => {
+		const ref = this.state.mfa_required
+			? this.mfaCodeInputRef
+			: this.state.phase === 0
+				? this.usernameInputRef
+				: this.passwordInputRef
+
+		setTimeout(() => {
+			ref.current?.focus?.()
+		}, 100)
+	}
 
 	handleFinish = async () => {
 		this.setState({
@@ -382,6 +412,7 @@ class Login extends React.Component {
 								<Icons.AtSign /> Username or Email
 							</span>
 							<antd.Input
+								ref={this.usernameInputRef}
 								placeholder="myusername / myemail@example.com"
 								onChange={(e) =>
 									this.onUpdateInput(
@@ -405,6 +436,7 @@ class Login extends React.Component {
 								<Icons.SquareAsterisk /> Password
 							</span>
 							<antd.Input.Password
+								ref={this.passwordInputRef}
 								//placeholder="********"
 								onChange={(e) =>
 									this.onUpdateInput(
@@ -443,6 +475,7 @@ class Login extends React.Component {
 							)}
 
 							<antd.Input.OTP
+								ref={this.mfaCodeInputRef}
 								length={4}
 								formatter={(str) => str.toUpperCase()}
 								onChange={(code) =>
