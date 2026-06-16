@@ -14,7 +14,6 @@ export function useChatSocket({
 }: any) {
 	const [error, setError] = React.useState<Error | null>(null)
 
-	// use refs to avoid unnecessary resubscriptions
 	const callbacksRef = React.useRef({
 		onNewMessage,
 		onMessageUpdated,

@@ -34,6 +34,9 @@ export const schema = new Schema(
 		reply_to_id: {
 			type: ColumnTypes.Varchar,
 		} as Column<string>,
+		nonce: {
+			type: ColumnTypes.Varchar,
+		} as Column<string>,
 		updated_at: {
 			type: ColumnTypes.Timestamp,
 		} as Column<Date>,

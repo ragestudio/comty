@@ -4,9 +4,9 @@ import type { Column } from "@ragestudio/scylla-odm/types"
 export const schema = new Schema(
 	{
 		table_name: "channel_log",
-		keys: [["channel_id"], "log_id"],
+		keys: [["channel_id"], "timestamp", "log_id"],
 		clustering_order: {
-			channel_id: "desc",
+			timestamp: "desc",
 		},
 	},
 	{

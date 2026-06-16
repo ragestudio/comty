@@ -44,6 +44,7 @@ function useChat(type: string, params: any, events: any) {
 		loadBefore,
 		loadAfter,
 		send: sendMessages,
+		sync,
 		handleNewMessage,
 		handleMessageDeleted,
 		handleMessageUpdated,
@@ -77,32 +78,15 @@ function useChat(type: string, params: any, events: any) {
 
 	const initialize = async () => {
 		const cachedMessages = await adapter.getCachedMessages(params, 50)
-		const lastCachedMessage = cachedMessages.at(0) as Message
 
-		if (type === "group") {
-			const lastChannelMessageRef = await db.last_channels_message.get(
-				params.channel_id,
-			)
-
-			console.log({
-				lastChannelMessageRef,
-				lastCachedMessage,
-			})
-
-			if (
-				!lastCachedMessage ||
-				parseInt(lastCachedMessage?._id) <
-					parseInt(lastChannelMessageRef?._id)
-			) {
-				console.debug("Cached messages is expired, fetching new...")
-				await load()
-			} else {
-				setTimeline(sortMessages(cachedMessages))
-			}
+		if (cachedMessages.length > 0) {
+			setTimeline(sortMessages(cachedMessages))
 		}
 
-		if (type === "dm") {
-			// TODO: lookup the last dm message ref for this room
+		// Trigger background sync
+		sync().catch(console.error)
+
+		if (cachedMessages.length === 0) {
 			await load()
 		}
 	}

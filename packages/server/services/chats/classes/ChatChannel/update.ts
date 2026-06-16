@@ -1,7 +1,9 @@
 import type ChatChannel from "../ChatChannel"
+
 import MessageModel, {
 	schema as ChannelMessagesSchema,
 } from "@db/channel_messages"
+import ChannelLogModel from "@db/channel_log"
 
 export default async function (
 	this: ChatChannel,
@@ -40,7 +42,23 @@ export default async function (
 
 	message.updated_at = new Date()
 
+	const batch = this.scylla.batch()
 	await message.save()
 
-	return message.toRaw()
+	ChannelLogModel.batch.insert(batch, {
+		channel_id: this.channel._id.toString(),
+		log_id: this.snowflake.nextId().toString(),
+		type: "message:updated",
+		target_id: message._id,
+		actor_id: user._id.toString(),
+		timestamp: new Date(),
+	})
+
+	await batch.execute()
+
+	const data = message.toRaw()
+
+	this.sendEventToChannelTopic("channel:message:updated", data)
+
+	return data
 }

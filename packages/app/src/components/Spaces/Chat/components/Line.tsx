@@ -1,5 +1,4 @@
 import React from "react"
-import PropTypes from "prop-types"
 import classnames from "classnames"
 import ReactPlayer from "react-player"
 
@@ -7,18 +6,21 @@ import Attachments from "@components/AttachmentsGrid"
 import TimeAgo from "@components/TimeAgo"
 import Image from "@components/Image"
 import StickerRender from "@components/StickerRender"
+import { Icons } from "@components/Icons"
 
 import LinkPreview from "./LinkPreview"
 import { useLiveQuery } from "dexie-react-hooks"
 
 import db from "@contexts/WithSpaces/store"
+import { ExtendedMessage as Message } from "@contexts/WithSpaces/chat/types"
 
 import "./Line.less"
 
 const messageRegexs = [
 	{
-		regex: /(?:https?:)?(?:\/\/)?(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/,
-		fn: (result) => {
+		regex:
+			/(?:https?:)?(?:\/\/)?(?:[0-9A-Z-]+\.)?(?:youtu\.be\/|youtube(?:-nocookie)?\.com\S*?[^\w\s-])([\w-]{11})(?=[^\w-]|$)(?![?=&+%\w.-]*(?:['"][^<>]*>|<\/a>))[?=&+%\w.-]*/,
+		fn: (result: RegExpExecArray) => {
 			return (
 				<ReactPlayer
 					width="50%"
@@ -41,18 +43,19 @@ const messageRegexs = [
 		},
 	},
 	{
-		regex: /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
-		fn: (result) => {
+		regex:
+			/(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi,
+		fn: (result: RegExpExecArray) => {
 			return <LinkPreview url={result[1]} />
 		},
 	},
 	{
 		regex: /(@[a-zA-Z0-9_]+)/gi,
-		fn: (result) => {
+		fn: (result: RegExpExecArray) => {
 			return (
 				<a
 					onClick={() =>
-						app.navigation.goToAccount(result[1].substr(1))
+						(globalThis as any).app.navigation.goToAccount(result[1].substr(1))
 					}
 				>
 					{result[1]}
@@ -62,7 +65,7 @@ const messageRegexs = [
 	},
 ]
 
-const RenderMessage = ({ messageStr }) => {
+const RenderMessage = ({ messageStr }: { messageStr: string }) => {
 	const regexs = React.useMemo(() => {
 		if (!messageRegexs) {
 			return []
@@ -83,7 +86,7 @@ const RenderMessage = ({ messageStr }) => {
 				}
 			})
 			.filter((item) => item !== null)
-	}, [])
+	}, [messageStr])
 
 	const firstMatch = regexs[0]
 
@@ -94,8 +97,21 @@ const RenderMessage = ({ messageStr }) => {
 	return <p>{messageStr}</p>
 }
 
-const Line = React.memo(({ data, headless }) => {
-	const userData = useLiveQuery(() => db.users.get(data.user_id))
+interface LineProps {
+	data: Message
+	headless: boolean
+}
+
+const Line = React.memo(({ data, headless }: LineProps) => {
+	const dbUserData = useLiveQuery(() => db.users.get(data.user_id))
+	const appUserData =
+		(globalThis as any).app?.userData || (window as any).app?.userData
+
+	const userData = React.useMemo(() => {
+		if (dbUserData) return dbUserData
+		if (appUserData && appUserData._id === data.user_id) return appUserData
+		return null
+	}, [dbUserData, appUserData, data.user_id])
 
 	return (
 		<div
@@ -104,6 +120,8 @@ const Line = React.memo(({ data, headless }) => {
 			context-menu="chat-line"
 			className={classnames("channel-chat__timeline__line", {
 				["headless"]: headless,
+				["sending"]: data.status === "sending",
+				["error"]: data.status === "error",
 			})}
 		>
 			{!headless && (
@@ -121,7 +139,7 @@ const Line = React.memo(({ data, headless }) => {
 						<div className="channel-chat__timeline__line__content__header__username">
 							<span>
 								{userData?.public_name ??
-									`@${userData?.username}`}
+									(userData?.username ? `@${userData?.username}` : "...")}
 							</span>
 
 							{userData?.bot && (
@@ -132,7 +150,13 @@ const Line = React.memo(({ data, headless }) => {
 						</div>
 
 						<div className="channel-chat__timeline__line__content__header__time">
-							<TimeAgo time={data.created_at} />
+							{data.status === "sending" ? (
+								<Icons.Loader2 className="animate-spin" />
+							) : data.status === "error" ? (
+								<Icons.AlertCircle className="text-danger" />
+							) : (
+								<TimeAgo time={data.created_at} />
+							)}
 						</div>
 					</div>
 				)}
@@ -148,7 +172,7 @@ const Line = React.memo(({ data, headless }) => {
 
 				{data.attachments && data.attachments.length > 0 && (
 					<Attachments
-						attachments={data.attachments}
+						attachments={data.attachments as any}
 						className="channel-chat__timeline__line__content__body__attachments"
 					/>
 				)}
@@ -160,21 +184,5 @@ const Line = React.memo(({ data, headless }) => {
 })
 
 Line.displayName = "Line"
-
-Line.propTypes = {
-	data: PropTypes.shape({
-		_id: PropTypes.string.isRequired,
-		message: PropTypes.string,
-		created_at: PropTypes.string.isRequired,
-		user: PropTypes.shape({
-			username: PropTypes.string.isRequired,
-			avatar: PropTypes.string,
-			public_name: PropTypes.string,
-			bot: PropTypes.bool,
-		}).isRequired,
-		attachments: PropTypes.array,
-	}).isRequired,
-	headless: PropTypes.bool.isRequired,
-}
 
 export default Line

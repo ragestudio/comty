@@ -2,7 +2,6 @@ import React from "react"
 import { Result, Skeleton } from "antd"
 import { DateTime } from "luxon"
 import { AnimatePresence, motion } from "motion/react"
-import PropTypes from "prop-types"
 import { useOnInView } from "react-intersection-observer"
 
 import Icons from "@components/Icons"
@@ -11,11 +10,12 @@ import ChatInputBar from "./components/InputBar"
 import Line from "./components/Line"
 
 import useChat from "@contexts/WithSpaces/chat"
+import { ExtendedMessage as Message } from "@contexts/WithSpaces/chat/types"
 
 import "./index.less"
 
 // if is the same user, in a 3 minutes window, merge with the previous one
-function shouldMergeWithNextItem(nextItem, item) {
+function shouldMergeWithNextItem(nextItem: Message | undefined, item: Message) {
 	if (!nextItem) {
 		return false
 	}
@@ -24,8 +24,8 @@ function shouldMergeWithNextItem(nextItem, item) {
 		return false
 	}
 
-	const nextItemCreatedAt = DateTime.fromISO(nextItem.created_at)
-	const currentCreatedAt = DateTime.fromISO(item.created_at)
+	const nextItemCreatedAt = DateTime.fromISO(nextItem.created_at as any)
+	const currentCreatedAt = DateTime.fromISO(item.created_at as any)
 
 	const timeDiff = currentCreatedAt.diff(nextItemCreatedAt).as("minutes")
 
@@ -36,10 +36,10 @@ function shouldMergeWithNextItem(nextItem, item) {
 	return true
 }
 
-const useTriggerValue = (callback) => {
+const useTriggerValue = (callback: () => void) => {
 	const prevValueRef = React.useRef(false)
 
-	return (value) => {
+	return (value: boolean) => {
 		if (value === true && prevValueRef.current === false) {
 			callback()
 		}
@@ -48,8 +48,14 @@ const useTriggerValue = (callback) => {
 	}
 }
 
-const Chat = ({ _id, type = "group", group }) => {
-	let useChatParam = {}
+interface ChatProps {
+	_id: string
+	type?: "group" | "dm"
+	group?: any
+}
+
+const Chat = ({ _id, type = "group", group }: ChatProps) => {
+	let useChatParam: any = {}
 
 	if (!_id || !type) {
 		return null
@@ -68,7 +74,7 @@ const Chat = ({ _id, type = "group", group }) => {
 		useChatParam = { to_user_id: _id }
 	}
 
-	const timelineRef = React.useRef()
+	const timelineRef = React.useRef<HTMLDivElement>(null)
 	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 
 	const {
@@ -81,7 +87,7 @@ const Chat = ({ _id, type = "group", group }) => {
 		typing,
 		usersTyping,
 		initialLoading,
-		pausedUpdate,
+		pausedUpdates,
 		setPausedUpdates,
 	} = useChat(type, useChatParam, {
 		onNewMessage: () => handleOnNewMessage(),
@@ -97,7 +103,9 @@ const Chat = ({ _id, type = "group", group }) => {
 		loadBefore()
 	})
 
-	const topTriggerRef = useOnInView((inView) => topTrigger(inView))
+	const { ref: topTriggerRef } = useOnInView({
+		onChange: (inView) => topTrigger(inView),
+	})
 
 	const goToBottom = React.useCallback(() => {
 		if (timelineRef.current) {
@@ -106,16 +114,17 @@ const Chat = ({ _id, type = "group", group }) => {
 	}, [timelineRef])
 
 	const handleOnNewMessage = React.useCallback(() => {
-		if (!timelineRef.current || pausedUpdate) {
+		if (!timelineRef.current || pausedUpdates) {
 			return
 		}
 
 		if (!scrollableToBottom) {
 			timelineRef.current.scrollTo(0, 0)
 		}
-	}, [timelineRef, pausedUpdate])
+	}, [timelineRef, pausedUpdates, scrollableToBottom])
 
-	const handleOnScroll = React.useCallback((e) => {
+	const handleOnScroll = React.useCallback(() => {
+		if (!timelineRef.current) return
 		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
 		const isOnBottom = scrollPosition >= 0 && scrollPosition < 100
 
@@ -128,26 +137,24 @@ const Chat = ({ _id, type = "group", group }) => {
 			setPausedUpdates(true)
 			setScrollableToBottom(true)
 		}
-	}, [])
+	}, [bottomTrigger, setPausedUpdates])
 
 	React.useEffect(() => {
 		if (initialLoading) {
 			return
 		}
 
-		if (timelineRef.current) {
-			timelineRef.current.addEventListener("scroll", handleOnScroll)
+		const currentRef = timelineRef.current
+		if (currentRef) {
+			currentRef.addEventListener("scroll", handleOnScroll)
 		}
 
 		return () => {
-			if (timelineRef.current) {
-				timelineRef.current.removeEventListener(
-					"scroll",
-					handleOnScroll,
-				)
+			if (currentRef) {
+				currentRef.removeEventListener("scroll", handleOnScroll)
 			}
 		}
-	}, [initialLoading, timelineRef.current])
+	}, [initialLoading, handleOnScroll])
 
 	if (error) {
 		return (
@@ -164,7 +171,7 @@ const Chat = ({ _id, type = "group", group }) => {
 	}
 
 	const trimmedUsersTyping = usersTyping?.slice(0, 3)
-	const isUsersTypingOverflowing = usersTyping?.length > 3
+	const isUsersTypingOverflowing = (usersTyping?.length ?? 0) > 3
 
 	const usernamesTyping = trimmedUsersTyping.reduce((str, user) => {
 		return `${str} ${user.username},`
@@ -173,7 +180,7 @@ const Chat = ({ _id, type = "group", group }) => {
 	return (
 		<div
 			className="channel-chat"
-			data-is-dm={type === "direct"}
+			data-is-dm={type === "dm"}
 			data-type={type}
 			data-channel-id={_id}
 			data-group-id={group?.data?._id}
@@ -201,9 +208,11 @@ const Chat = ({ _id, type = "group", group }) => {
 									height: 0,
 									y: 50,
 								}}
-								style={{
-									"--items": trimmedUsersTyping.length,
-								}}
+								style={
+									{
+										"--items": trimmedUsersTyping.length,
+									} as React.CSSProperties
+								}
 							>
 								<div className="channel-chat__timeline__typers__images">
 									{trimmedUsersTyping.map((user) => (
@@ -216,8 +225,7 @@ const Chat = ({ _id, type = "group", group }) => {
 								</div>
 
 								<span>
-									{usernamesTyping}{" "}
-									{isUsersTypingOverflowing && "and more,"}{" "}
+									{usernamesTyping} {isUsersTypingOverflowing && "and more,"}{" "}
 									are typing...
 								</span>
 							</motion.div>
@@ -225,10 +233,7 @@ const Chat = ({ _id, type = "group", group }) => {
 					</AnimatePresence>
 
 					{timeline.map((item, index) => {
-						const headless = shouldMergeWithNextItem(
-							timeline[index + 1],
-							item,
-						)
+						const headless = shouldMergeWithNextItem(timeline[index + 1], item)
 
 						return (
 							<Line
@@ -243,7 +248,7 @@ const Chat = ({ _id, type = "group", group }) => {
 						className="channel-chat__timeline__top-trigger"
 						ref={topTriggerRef}
 					>
-						<Skeleton avatar />
+						{loading && <Skeleton avatar />}
 					</div>
 				</div>
 
@@ -266,8 +271,7 @@ const Chat = ({ _id, type = "group", group }) => {
 									type="ghost"
 									onClick={goToBottom}
 								>
-									<Icons.ArrowDownToLine /> Go to recent
-									messages
+									<Icons.ArrowDownToLine /> Go to recent messages
 								</Button>
 							</div>
 						</motion.div>
@@ -282,10 +286,6 @@ const Chat = ({ _id, type = "group", group }) => {
 			/>
 		</div>
 	)
-}
-
-Chat.propTypes = {
-	_id: PropTypes.string.isRequired,
 }
 
 export default Chat

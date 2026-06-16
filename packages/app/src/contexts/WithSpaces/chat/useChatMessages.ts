@@ -1,19 +1,19 @@
 import React from "react"
-import userDataMap from "../helpers/usersDataMap"
 import { getAdapter } from "./adapters"
 import { getSocket } from "./useChatSocket"
-import { Message } from "../collections/message"
+import { ExtendedMessage as Message } from "./types"
 import { User } from "../collections/user"
 import {
 	DeleteMessagePayload,
 	LoadMessagesParams,
 	T_UseChatMessagesArgs,
-} from "../types"
+} from "./types"
 
 import { cacheUsers } from "../helpers/cache"
 import sortMessages from "../utils/sortMessages"
 
 import db from "../store"
+import ChatsService from "@models/chats"
 
 export function useChatMessages({
 	type,
@@ -28,7 +28,7 @@ export function useChatMessages({
 	const [loading, setLoading] = React.useState(false)
 	const loadingRef = React.useRef(false)
 
-	const [timeline, setTimeline] = React.useState<any[]>([])
+	const [timeline, setTimeline] = React.useState<Message[]>([])
 	const [error, setError] = React.useState<Error | null>(null)
 
 	const [hasMore, setHasMore] = React.useState(true)
@@ -39,6 +39,10 @@ export function useChatMessages({
 	const pausedUpdatesRef = React.useRef(false)
 	const oldestId = React.useRef<string | null>(null)
 	const newestId = React.useRef<string | null>(null)
+
+	const chatId = React.useMemo(() => {
+		return type === "group" ? params.channel_id : params.to_user_id
+	}, [type, params])
 
 	React.useEffect(() => {
 		paramsRef.current = params
@@ -53,33 +57,50 @@ export function useChatMessages({
 	}, [timeline])
 
 	const pushToTimeline = React.useCallback(
-		(messages: Message[], position: string) => {
-			if (!position) {
-				position = "top"
-			}
-
+		(messages: Message[], position: "top" | "bottom" = "top") => {
 			setTimeline((prev) => {
-				if (position === "top") {
-					return sortMessages([...prev, ...messages])
-				}
+				const combined = [...prev]
 
-				if (position === "bottom") {
-					return sortMessages([...messages, ...prev])
-				}
+				messages.forEach((msg) => {
+					const finalMsg =
+						msg.status === "sending" || msg.status === "error"
+							? msg
+							: { ...msg, status: "sent" as const }
+
+					const index = combined.findIndex(
+						(m) =>
+							m._id === finalMsg._id ||
+							(finalMsg.nonce && m.nonce === finalMsg.nonce),
+					)
+
+					if (index !== -1) {
+						combined[index] = { ...combined[index], ...finalMsg }
+					} else {
+						combined.push(finalMsg)
+					}
+				})
+
+				return sortMessages(combined)
 			})
 		},
 		[setTimeline],
 	)
 
 	const handleNewMessage = React.useCallback(
-		(data: Message) => {
+		(data: Message & { user?: User }) => {
 			console.debug("useChat::handleNewMessage", data)
 
-			try {
-				adapter.storeMessage(data)
-			} catch (err) {
-				console.error("failed to store message to local db", err)
+			if (data.user) {
+				cacheUsers([data.user]).catch(console.error)
 			}
+
+			adapter.storeMessage(data).catch(console.error)
+			adapter
+				.updateSyncState({
+					chat_id: chatId,
+					last_message_id: data._id,
+				})
+				.catch(console.error)
 
 			if (!pausedUpdatesRef.current) {
 				pushToTimeline([data], "bottom")
@@ -89,29 +110,25 @@ export function useChatMessages({
 				eventsRef.current.onNewMessage(data)
 			}
 		},
-		[type],
+		[type, chatId, adapter, pushToTimeline],
 	)
 
 	const handleMessageDeleted = React.useCallback(
 		(data: DeleteMessagePayload) => {
-			console.debug("useChat::handleMessageDeleted", data)
-
-			try {
-				adapter.deleteMessage(data._id)
-			} catch (err) {
-				console.error("failed to delete message from local db", err)
-			}
-
+			adapter.deleteMessage(data._id).catch(console.error)
 			setTimeline((prev) => prev.filter((msg) => msg._id !== data._id))
-
-			if (typeof eventsRef.current?.onDeletedMessage === "function") {
-				eventsRef.current.onDeletedMessage(data)
-			}
+			eventsRef.current?.onDeletedMessage?.(data)
 		},
-		[type],
+		[type, adapter],
 	)
 
 	const handleMessageUpdated = React.useCallback((data: any) => {
+		setTimeline((prev) =>
+			prev.map((msg) =>
+				msg._id === data._id ? { ...msg, ...data } : msg,
+			),
+		)
+
 		eventsRef.current?.onUpdatedMessage?.(data)
 	}, [])
 
@@ -124,6 +141,23 @@ export function useChatMessages({
 				return null
 			}
 
+			const nonce = Math.random().toString(36).substring(7)
+			const optimisticMessage: Message = {
+				_id: `temp-${nonce}`,
+				nonce: nonce,
+				channel_id:
+					type === "group" ? paramsRef.current.channel_id : "",
+				user_id: app.userData?._id,
+
+				message: message,
+				attachments: attachments,
+				sticker: sticker,
+				status: "sending",
+				created_at: new Date().toISOString() as any,
+			}
+
+			pushToTimeline([optimisticMessage], "bottom")
+
 			const formattedAttachments = attachments.map((att: any) =>
 				typeof att === "string"
 					? { url: att }
@@ -134,10 +168,20 @@ export function useChatMessages({
 				message,
 				attachments: formattedAttachments,
 				sticker,
+				nonce,
 			})
 
-			if (socket) {
-				await socket.call(config.methods.send, data)
+			try {
+				if (socket) {
+					await socket.call(config.methods.send, data)
+				}
+			} catch (err) {
+				console.error("failed to send message", err)
+				setTimeline((prev) =>
+					prev.map((msg) =>
+						msg.nonce === nonce ? { ...msg, status: "error" } : msg,
+					),
+				)
 			}
 
 			if (stopTyping) {
@@ -146,101 +190,127 @@ export function useChatMessages({
 
 			return true
 		},
-		[config],
+		[config, socket, type, pushToTimeline],
 	)
+
+	const sync = React.useCallback(async () => {
+		const syncState = await adapter.getSyncState(chatId)
+		const lastId = syncState?.last_message_id
+		const lastSyncAt = syncState?.last_synced_at || 0
+
+		try {
+			const { logs, newMessages, updatedMessages, users } =
+				await ChatsService.channels.sync(
+					paramsRef.current.group_id,
+					paramsRef.current.channel_id,
+					{
+						last_synced_at: lastSyncAt,
+						last_message_id: lastId,
+					},
+				)
+
+			// Handle Logs (Deletions)
+			for (const log of logs) {
+				if (log.type === "message:deleted") {
+					await adapter.deleteMessage(log.target_id)
+
+					setTimeline((prev) =>
+						prev.filter((m) => m._id !== log.target_id),
+					)
+				}
+			}
+
+			// Handle Updated Messages
+			if (updatedMessages && updatedMessages.length > 0) {
+				await adapter.cacheMessages(updatedMessages)
+				pushToTimeline(updatedMessages, "bottom")
+			}
+
+			// Handle New Messages
+			if (newMessages && newMessages.length > 0) {
+				if (users) {
+					await cacheUsers(users)
+				}
+
+				await adapter.cacheMessages(newMessages)
+
+				pushToTimeline(newMessages, "bottom")
+
+				const newest = newMessages.sort((a: any, b: any) =>
+					b._id.localeCompare(a._id),
+				)[0]
+
+				await adapter.updateSyncState({
+					chat_id: chatId,
+					last_message_id: newest._id,
+					last_synced_at: Date.now(),
+				})
+			} else {
+				await adapter.updateSyncState({
+					chat_id: chatId,
+					last_synced_at: Date.now(),
+				})
+			}
+		} catch (err) {
+			console.error("Sync failed", err)
+		}
+	}, [chatId, adapter, pushToTimeline])
 
 	const load = React.useCallback(
 		async ({ beforeId, afterId, limit = 30 }: LoadMessagesParams = {}) => {
-			if (loadingRef.current === true) {
-				console.warn("Waiting to finish loading messages...")
-				return
-			}
-
-			if (afterId && beforeId) {
-				throw new Error(
-					"only one of beforeId or afterId can be provided",
-				)
-			}
-
+			if (loadingRef.current) return
 			setLoading(true)
 			loadingRef.current = true
 
 			try {
-				const currentParams = paramsRef.current
-				const adapter = getAdapter(type)
-
-				let data: {
-					items: Message[]
-					users: User[]
-				} = {
-					items: [],
-					users: [],
-				}
-
-				const cachedMessages = await adapter.getCachedMessages(
-					currentParams,
+				const cached = await adapter.getCachedMessages(
+					paramsRef.current,
 					limit,
 					beforeId,
 					afterId,
 				)
 
-				let isCacheInvalidated = await adapter.invalidateCache(
-					cachedMessages,
-					beforeId,
-					afterId,
-					{
-						channel_id: currentParams.channel_id,
-					},
-				)
+				if (cached.length > 0) {
+					await db.users
+						.where("_id")
+						.anyOf(cached.map((m) => m.user_id))
+						.toArray()
 
-				if (isCacheInvalidated) {
-					console.time("useChat::load::apiFetchMessages")
-					const response = await config.model.get(currentParams, {
-						limit: limit,
+					pushToTimeline(cached, afterId ? "top" : "bottom")
+				}
+
+				// If we dont have enough cached or we are explicitly asking for more
+				if (cached.length < limit || afterId) {
+					const response = await config.model.get(paramsRef.current, {
+						limit,
 						beforeId,
 						afterId,
 					})
-					console.timeEnd("useChat::load::apiFetchMessages")
 
 					if (response.items.length > 0) {
-						// cache users from api
 						if (response.users) {
 							await cacheUsers(response.users)
 						}
 
-						data.items = response.items
+						await adapter.cacheMessages(response.items)
 
-						try {
-							await adapter.cacheMessages(data.items)
-						} catch (error) {
-							console.error("failed to cache messages:", error)
-						}
-					} else {
+						pushToTimeline(
+							response.items,
+							afterId ? "top" : "bottom",
+						)
+					} else if (!afterId) {
 						setHasMore(false)
 						hasMoreRef.current = false
 					}
-				} else {
-					data.items = cachedMessages
 				}
-
-				if (data.items.length > 0) {
-					data.users = await db.users
-						.where("_id")
-						.anyOf(data.items.map((message) => message.user_id))
-						.toArray()
-				}
-
-				console.log({ data })
-				pushToTimeline(data.items, afterId ? "top" : "bottom")
 			} catch (err: any) {
-				console.error("error loading historical messages:", err)
 				setError(err)
 			} finally {
 				setLoading(false)
 				loadingRef.current = false
 			}
 		},
-		[config, type],
+		[config, type, adapter, pushToTimeline],
 	)
 
 	const loadBefore = React.useCallback(
@@ -253,21 +323,18 @@ export function useChatMessages({
 		[load],
 	)
 
-	const setPausedUpdates = React.useCallback((to: boolean) => {
-		pausedUpdatesRef.current = to
-	}, [])
-
 	const resetMessages = React.useCallback(() => {
 		setTimeline([])
 		setInitialLoading(true)
-
 		setLoading(false)
 		loadingRef.current = false
-
 		setHasMore(true)
 		hasMoreRef.current = true
-
 		setError(null)
+	}, [])
+
+	const setPausedUpdates = React.useCallback((to: boolean) => {
+		pausedUpdatesRef.current = to
 	}, [])
 
 	return {
@@ -284,6 +351,7 @@ export function useChatMessages({
 		loadBefore,
 		loadAfter,
 		send,
+		sync,
 		handleNewMessage,
 		handleMessageDeleted,
 		handleMessageUpdated,

@@ -21,6 +21,7 @@ export default async function (this: ChatChannel, user, payload) {
 		message: payload.message && String(payload.message),
 		attachments: payload.attachments as any[],
 		reply_to_id: payload.reply_to_id,
+		nonce: payload.nonce,
 		created_at: created_at,
 		sticker: payload.sticker,
 	})

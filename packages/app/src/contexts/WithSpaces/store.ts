@@ -5,6 +5,7 @@ import { Member, Members } from "./collections/member"
 
 import { Message } from "./collections/message"
 import { User } from "./collections/user"
+import { ChatSyncState } from "./chat/types"
 
 type LastChannelsMessage = {
 	channel_id: string
@@ -36,9 +37,11 @@ const db = new Dexie("spaces_store") as Dexie & {
 
 	direct_messages: EntityTable<Message, "_id">
 	users: EntityTable<User, "_id">
+
+	chats_sync: EntityTable<ChatSyncState, "chat_id">
 }
 
-db.version(1).stores({
+db.version(2).stores({
 	groups: "_id",
 
 	channels: "group_id",
@@ -54,6 +57,8 @@ db.version(1).stores({
 	direct_messages: "_id, to_user_id, [to_user_id+_id]",
 
 	users: "_id",
+
+	chats_sync: "chat_id",
 })
 
 export default db
