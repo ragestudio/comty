@@ -1,4 +1,4 @@
-import Worker from "./worker.js"
+import Worker from "./worker"
 
 export default {
 	id: "notify-new-login",
