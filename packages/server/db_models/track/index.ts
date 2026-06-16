@@ -1,0 +1,45 @@
+import { defineModel } from "@db_models"
+
+export default defineModel({
+	name: "Track",
+	collection: "tracks",
+	schema: {
+		source: {
+			type: String,
+			required: true,
+		},
+		title: {
+			type: String,
+			required: true,
+		},
+		album: {
+			type: String,
+		},
+		artist: {
+			type: String,
+		},
+		metadata: {
+			type: Object,
+		},
+		explicit: {
+			type: Boolean,
+			default: false,
+		},
+		public: {
+			type: Boolean,
+			default: true,
+		},
+		created_at: {
+			type: Date,
+		},
+		cover: {
+			type: String,
+			default:
+				"https://storage.ragestudio.net/comty-static-assets/default_song.png",
+		},
+		publisher: {
+			type: Object,
+			required: true,
+		},
+	},
+})

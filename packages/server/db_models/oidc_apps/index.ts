@@ -1,3 +1,5 @@
+import { defineModel } from "@db_models"
+
 export type OidcApp = {
 	client_id: string
 	client_secret: string
@@ -12,7 +14,7 @@ export type OidcApp = {
 	production?: boolean
 }
 
-export default {
+export default defineModel({
 	name: "OidcApp",
 	collection: "oidc_apps",
 	schema: {
@@ -63,4 +65,4 @@ export default {
 			default: false,
 		},
 	},
-}
+})
