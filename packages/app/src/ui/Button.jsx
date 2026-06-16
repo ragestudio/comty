@@ -8,6 +8,7 @@ import "./Button.less"
 
 const Button = ({
 	children,
+	id,
 	icon,
 	className,
 	onClick,
@@ -32,6 +33,7 @@ const Button = ({
 
 	return (
 		<button
+			id={id}
 			className={classnames(classes, { "only-icon": onlyIcon })}
 			onClick={onClick}
 			disabled={disabled}
@@ -52,6 +54,7 @@ const Button = ({
 
 Button.propTypes = {
 	className: PropTypes.string,
+	id: PropTypes.string,
 	icon: PropTypes.element,
 	onClick: PropTypes.func,
 	disabled: PropTypes.bool,
@@ -62,6 +65,7 @@ Button.propTypes = {
 
 Button.defaultProps = {
 	className: null,
+	id: null,
 	icon: null,
 	onClick: () => {},
 	type: "ghost",
