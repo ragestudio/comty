@@ -1,3 +1,5 @@
+@import "@styles/vars.less";
+
 button {
 	position: relative;
 
@@ -39,7 +41,12 @@ button {
 
 	// primary background-color
 	&.primary {
-		background-color: var(--colorPrimary);
+		//background-color: var(--colorPrimary);
+		background-color: color-mix(
+			in oklab,
+			var(--colorPrimary),
+			var(--backgroundColorAccent) 15%
+		);
 	}
 
 	// if ghost, remove the background & border
