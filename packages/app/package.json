@@ -27,7 +27,7 @@
 		"@gullerya/object-observer": "^7.0.0",
 		"@loadable/component": "^5.16.7",
 		"@preact/signals-react": "^3.10.1",
-		"@ragestudio/vessel": "^0.25.7",
+		"@ragestudio/vessel": "^0.26.0",
 		"@sentry/browser": "^10.57.0",
 		"@svta/common-media-library": "^0.18.1",
 		"@tanstack/react-virtual": "^3.14.2",
