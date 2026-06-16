@@ -38,7 +38,7 @@
 		"classnames": "2.3.1",
 		"comty.js": "^0.74.1",
 		"d3": "^7.9.0",
-		"dashjs": "^5.0.3",
+		"dashjs": "^5.2.0",
 		"dayjs": "^1.11.19",
 		"dompurify": "^3.3.2",
 		"fast-average-color": "^9.2.0",
@@ -84,7 +84,7 @@
 		"remark-gfm": "^3.0.1",
 		"rxjs": "^7.5.5",
 		"store": "^2.0.12",
-		"ua-parser-js": "^1.0.36",
+		"ua-parser-js": "^2.0.10",
 		"vaul": "^1.1.2",
 		"vite": "^7.3.1"
 	},
