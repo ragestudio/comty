@@ -22,7 +22,9 @@ export default class API extends Server {
 	contexts = {
 		keys: {} as Record<string, any>,
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb()),
+		scylla: (global.scylla = new ScyllaDb({
+			modelsPath: `${global.paths.root}/db`,
+		})),
 		redis: RedisClient({
 			maxRetriesPerRequest: null,
 		}),

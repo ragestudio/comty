@@ -137,7 +137,6 @@ export default async (req, res) => {
 		global.queues.createJob("notify-new-login", {
 			authData: session.data,
 			minDate: new Date().getTime() - 3 * 30 * 24 * 60 * 60 * 1000,
-			currentToken: session.authToken,
 		})
 	} catch (error) {
 		// whoipsi dupsi
