@@ -12,6 +12,8 @@ export default class NotificationCore extends Core {
 	static namespace = "notifications"
 	static depenpencies = ["settings"]
 
+	ui = new NotificationUI()
+
 	state = {
 		hasOsPermision: false,
 	}
@@ -49,7 +51,7 @@ export default class NotificationCore extends Core {
 		}
 
 		if (notification.ui !== false) {
-			NotificationUI.notify(notification)
+			this.ui.notify(notification)
 		}
 
 		if (notification.feedback !== false) {
@@ -98,7 +100,7 @@ export default class NotificationCore extends Core {
 	}
 
 	async close(id) {
-		NotificationUI.close(id)
+		this.ui.close(id)
 	}
 
 	async onInitialize() {

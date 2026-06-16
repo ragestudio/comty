@@ -2,10 +2,14 @@ import React from "react"
 import { Translation } from "react-i18next"
 import { notification as Notf, Space, Button } from "antd"
 
+import NotificationRenderer from "./render"
+
 import { Icons, createIconRender } from "@components/Icons"
 
 class NotificationUI {
-	static async notify(notification) {
+	apiRef = React.createRef()
+
+	async notify(notification) {
 		if (typeof notification === "string") {
 			notification = {
 				title: "New notification",
@@ -138,12 +142,21 @@ class NotificationUI {
 		}
 
 		// fire the ui
-		Notf[notification.type](notfObj)
+		//
+		if (this.apiRef.current) {
+			this.apiRef.current[notification.type](notfObj)
+		} else {
+			Notf[notification.type](notfObj)
+		}
 
 		return notfObj
 	}
 
-	static close(key) {
+	mount = (ref) => {
+		this.apiRef = ref
+	}
+
+	close(key) {
 		Notf.destroy(key)
 	}
 }

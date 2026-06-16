@@ -2,22 +2,23 @@
 
 :root {
 	--adm-color-background: var(--background-color-primary);
-	--ant-color-primary: var(--colorPrimary) !important;
-	--ant-color-primary-hover: var(--colorPrimaryHover) !important;
-}
-
-.css-var-root {
-	--ant-color-primary: var(--colorPrimary) !important;
-	--ant-color-primary-hover: var(--colorPrimary) !important;
 }
 
 .ant-btn {
-	--ant-btn-bg-color-hover: var(--background-color-accent);
-}
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 
-.ant-btn:not(:disabled):not(.ant-btn-disabled):hover {
-	--ant-btn-bg-color-hover: var(--background-color-accent);
-	color: var(--text-color);
+	svg {
+		margin: 0 !important;
+	}
+
+	gap: 10px;
+
+	span {
+		margin: 0;
+		line-height: 1rem;
+	}
 }
 
 .ant-tour {
@@ -39,10 +40,6 @@
 	svg {
 		margin: 0;
 	}
-}
-
-.ant-avatar-square {
-	border-radius: 12px;
 }
 
 // fix results
@@ -73,55 +70,20 @@
 }
 
 .ant-result-body {
-	border-radius: 12px;
 	backdrop-filter: blur(5px);
 }
 
 .ant-select {
-	background-color: var(--background-color-accent);
 	padding: 2.4px 10px;
-	border-radius: 12px;
 
 	.ant-select-suffix {
 		color: var(--text-color);
 	}
 }
 
-.ant-select.ant-select-outlined {
-	border-color: var(--border-color);
-}
-
-// fix colors for select & dropdown
-.ant-select:not(.ant-select-customize-input) .ant-select-selector {
-	background-color: var(--background-color-primary);
-}
-
 .ant-select-dropdown {
-	background-color: var(--background-color-primary) !important;
-	color: var(--text-color) !important;
-
 	backdrop-filter: blur(5px);
 	border: 1px solid var(--border-color);
-
-	.ant-select-item-option:not(.ant-select-item-option-disabled) {
-		background-color: transparent !important;
-		color: var(--text-color) !important;
-
-		&:hover {
-			background-color: var(--background-color-primary-2) !important;
-		}
-	}
-
-	.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-		background-color: var(--background-color-primary-2) !important;
-		color: var(--text-color) !important;
-	}
-
-	.ant-select-item-option-disabled {
-		background-color: transparent !important;
-		color: var(--border-color) !important;
-		filter: brightness(0.7) !important;
-	}
 }
 
 .ant-dropdown-menu {
@@ -140,44 +102,8 @@
 	}
 }
 
-// fix buttons
-.ant-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-
-	svg {
-		margin: 0 !important;
-	}
-
-	gap: 10px;
-
-	span {
-		margin: 0;
-		line-height: 1rem;
-	}
-}
-
-.ant-btn-primary:not(.ant-btn-dangerous) {
-	svg {
-		color: var(--background-color-primary) !important;
-	}
-
-	span {
-		color: var(--background-color-primary) !important;
-		margin: 0;
-	}
-
-	background-color: var(--colorPrimary);
-
-	&:hover {
-		background-color: var(--colorPrimary);
-	}
-}
-
 .ant-btn-primary:not(:disabled):not(.ant-btn-disabled) {
 	&:hover {
-		background-color: var(--colorPrimary);
 		filter: brightness(130%);
 	}
 }
@@ -199,45 +125,9 @@
 	opacity: 0.5 !important;
 }
 
-.ant-btn-default {
-	&:not(.ant-btn-dangerous) {
-		border-color: var(--background-color-primary-2) !important;
-
-		&:hover {
-			border-color: var(--background-color-primary) !important;
-		}
-
-		&:active {
-			border-color: var(--background-color-primary) !important;
-		}
-
-		&:focus {
-			border-color: var(--background-color-primary) !important;
-		}
-	}
-
-	color: var(--text-color);
-	background: var(--background-color-primary);
-
-	&:hover {
-		color: var(--text-color);
-		background: var(--background-color-primary-2);
-	}
-
-	&:active {
-		color: var(--text-color);
-		background: var(--background-color-primary-2);
-	}
-
-	&:focus {
-		color: var(--text-color);
-		background: var(--background-color-primary-2);
-	}
-}
-
 .ant-btn-dangerous {
 	span {
-		color: var(--ant-error-color);
+		color: var(--danger-color);
 	}
 }
 
@@ -249,20 +139,6 @@
 }
 
 // fix sliders colors
-.ant-slider-track {
-	background-color: var(--colorPrimary) !important;
-
-	filter: brightness(0.7);
-}
-
-.ant-slider-rail {
-	background-color: var(--background-color-primary-2);
-
-	&:hover {
-		background-color: var(--background-color-primary);
-	}
-}
-
 .ant-slider-handle {
 	&::after {
 		box-shadow: none !important;
@@ -280,9 +156,6 @@
 // fix menu colors
 .ant-menu,
 .ant-menu ul {
-	background: transparent !important;
-	background-color: transparent !important;
-
 	border-right: 0 !important;
 
 	.ant-menu-item {
@@ -297,8 +170,6 @@
 		padding: 10px 10px 10px 25px !important;
 		margin: 3px 0;
 
-		color: var(--background-color-contrast);
-
 		h1,
 		h2,
 		h3,
@@ -307,7 +178,7 @@
 		h6,
 		span,
 		p {
-			color: var(--background-color-contrast);
+			color: inherit;
 		}
 
 		// active dash
@@ -356,19 +227,7 @@
 	}
 }
 
-.ant-menu-item {
-	color: var(--text-color);
-
-	&:hover {
-		color: var(--text-color);
-		background-color: var(--background-color-primary-2);
-	}
-}
-
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
-	color: var(--text-color);
-	background-color: var(--background-color-accent) !important;
-
 	&::after {
 		opacity: 0;
 	}
@@ -380,51 +239,9 @@
 	}
 }
 
-.ant-menu-item:active {
-	background-color: var(--background-color-primary-2) !important;
-}
-
-// fix uploader drag
-.ant-upload-drag {
-	color: var(--text-color) !important;
-	background: var(--background-color-primary) !important;
-	border-color: var(--background-color-primary-2) !important;
-}
-
 .ant-modal-container {
-	background-color: var(--background-color-accent) !important;
 	backdrop-filter: blur(5px);
-
 	border: 3px solid var(--border-color) !important;
-	border-radius: 12px;
-
-	color: var(--text-color) !important;
-}
-
-.ant-modal-confirm-body-wrapper {
-	color: var(--text-color) !important;
-
-	.ant-modal-confirm-paragraph {
-		color: var(--text-color) !important;
-
-		.ant-modal-confirm-title {
-			color: var(--text-color) !important;
-		}
-	}
-}
-
-.ant-modal-content {
-	background-color: var(--background-color-primary) !important;
-
-	p,
-	span,
-	svg {
-		color: var(--text-color) !important;
-	}
-
-	.ant-modal-confirm-content {
-		color: var(--text-color) !important;
-	}
 }
 
 .ant-notification {
@@ -436,14 +253,10 @@
 	gap: 20px;
 
 	.ant-notification-notice-wrapper {
-		margin: 0;
-		overflow: hidden;
-
-		border-radius: 12px;
-		outline: 1px solid var(--border-color) !important;
-		background-color: var(--background-color-primary) !important;
-
+		//outline: 1px solid var(--border-color) !important;
 		backdrop-filter: blur(5px);
+
+		padding: 20px;
 	}
 
 	.ant-notification-notice {
@@ -452,32 +265,18 @@
 
 		justify-content: center;
 
-		background-color: transparent !important;
+		background-color: var(--background-color-primary);
 
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6,
-		p,
-		span {
-			color: var(--text-color) !important;
-		}
+		border: 0;
+		outline: 0;
+		padding: 0;
+
+		overflow: hidden;
 
 		.ant-notification-notice-close-x {
 			svg {
 				margin: 0 !important;
 			}
-		}
-
-		.ant-notification-notice-message,
-		.ant-notification-notice-description {
-			color: var(--text-color) !important;
-		}
-
-		.ant-notification-notice-title {
-			color: var(--text-color) !important;
 		}
 
 		.ant-notification-notice-description {
@@ -509,10 +308,6 @@
 			}
 
 			.ant-notification-notice-icon {
-				&.ant-notification-notice-icon-success {
-					color: #52c41a !important;
-				}
-
 				max-width: 40px;
 
 				svg {
@@ -531,230 +326,29 @@
 	}
 }
 
-.ant-message-notice-content {
-	background-color: var(--background-color-primary) !important;
-
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6,
-	p,
-	span {
-		color: var(--text-color) !important;
-	}
-}
-
-.ant-message-error {
-	svg {
-		color: var(--ant-error-color) !important;
-	}
-}
-
-.ant-message-info {
-	svg {
-		color: var(--ant-info-color) !important;
-	}
-}
-
-.ant-message-warning {
-	svg {
-		color: var(--ant-warning-color) !important;
-	}
-}
-
-.ant-message-success {
-	svg {
-		color: var(--ant-success-color) !important;
-	}
-}
-
-// FIX TAGS COLORS
-.ant-tag-red {
-	svg,
-	span {
-		color: #cf1322 !important;
-	}
-}
-
-.ant-tag-volcano {
-	svg,
-	span {
-		color: #d4380d !important;
-	}
-}
-
-.ant-tag-orange {
-	svg,
-	span {
-		color: #d46b08 !important;
-	}
-}
-
-.ant-tag-gold {
-	svg,
-	span {
-		color: #d48806 !important;
-	}
-}
-
-.ant-tag-yellow {
-	svg,
-	span {
-		color: #d4b106 !important;
-	}
-}
-
-.ant-tag-lime {
-	svg,
-	span {
-		color: #7cb305 !important;
-	}
-}
-
-.ant-tag-green {
-	svg,
-	span {
-		color: #389e0d !important;
-	}
-}
-
-.ant-tag-cyan {
-	svg,
-	span {
-		color: #08979c !important;
-	}
-}
-
-.ant-tag-blue {
-	svg,
-	span {
-		color: #096dd9 !important;
-	}
-}
-
-.ant-tag-geekblue {
-	svg,
-	span {
-		color: #1d39c4 !important;
-	}
-}
-
-.ant-tag-purple {
-	svg,
-	span {
-		color: #531dab !important;
-	}
-}
-
-.ant-tag-magenta {
-	svg,
-	span {
-		color: #c41d7f !important;
-	}
-}
-
 // fix input
 .ant-input,
 .ant-mentions {
-	background-color: var(--background-color-accent);
-	color: var(--text-color);
-
-	&:active {
-		background-color: var(--background-color-accent);
-	}
-
-	&:focus {
-		background-color: var(--background-color-accent);
-	}
-
 	::placeholder {
 		color: var(--text-color);
 		opacity: 0.5;
 	}
-}
-
-.ant-input-disabled {
-	background-color: var(--background-color-accent);
-	color: var(--text-color) !important;
-	opacity: 0.5 !important;
-}
-
-.ant-mentions-outlined {
-	background: transparent;
-
-	&:hover {
-		background: transparent;
-		background-color: var(--background-color-accent) !important;
-	}
-
-	&:focus {
-		background: transparent;
-		background-color: var(--background-color-accent) !important;
-	}
-
-	&:focus-within {
-		background: transparent;
-		background-color: var(--background-color-accent) !important;
-	}
-}
-
-.ant-input-affix-wrapper-focused {
-	background-color: var(--background-color-accent) !important;
 }
 
 .ant-input-affix-wrapper,
 .ant-mentions-affix-wrapper {
-	background-color: var(--background-color-accent);
-	color: var(--text-color);
-
 	border: 2px solid var(--border-color);
-
-	&:hover {
-		//border: 0 !important;
-		background-color: var(--background-color-accent);
-	}
-
-	&:active {
-		background-color: var(--background-color-accent);
-	}
 
 	::placeholder {
 		color: var(--text-color);
 		opacity: 0.5;
 	}
-}
-
-.ant-input-affix-wrapper-status-error {
-	background-color: var(--background-color-accent) !important;
-
-	color: var(--text-color);
-}
-
-// fix adm cards
-.adm-card {
-	background: var(--background-color-accent);
-
-	color: var(--text-color);
 }
 
 .adm-floating-panel {
 	.adm-floating-panel-header {
 		border-top: 1px solid var(--border-color);
 	}
-}
-
-.ant-result-title {
-	color: var(--text-color);
-}
-
-.ant-result-subtitle {
-	color: var(--text-color);
-}
-
-.ant-typography {
-	color: var(--text-color);
 }
 
 .ant-slider-dot {
@@ -792,17 +386,7 @@
 	}
 }
 
-.ant-empty-image {
-	color: var(--text-color) !important;
-}
-
-.ant-empty-description {
-	color: var(--text-color) !important;
-}
-
 .ant-mentions-dropdown {
-	background-color: var(--background-color-primary);
-	color: var(--text-color);
 	z-index: 999999;
 }
 
@@ -813,18 +397,12 @@
 
 	gap: 10px;
 	padding: 5px !important;
-
-	color: var(--text-color);
 }
 
 .ant-menu-item-group-title {
 	&:empty {
 		padding: 5px;
 	}
-}
-
-.ant-input-clear-icon {
-	color: var(--text-color) !important;
 }
 
 .ant-select-selection-item {
@@ -837,7 +415,3 @@
 .ant-popover {
 	z-index: 999999;
 }
-
-/* .ant-switch.ant-switch-checked {
-    background: var(--adm-color-primary);
-} */

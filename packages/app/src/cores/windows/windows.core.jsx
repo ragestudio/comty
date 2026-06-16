@@ -8,6 +8,8 @@ import DefaultWindow from "./components/defaultWindow"
 import VirtualWindow from "./VirtualWindow"
 import DomWindow from "./DomWindow"
 
+import { ThemeProvider } from "@cores/style/style.core"
+
 import "./index.less"
 
 class WindowsRender extends React.Component {
@@ -18,6 +20,7 @@ class WindowsRender extends React.Component {
 
 export default class WindowManager extends Core {
 	static namespace = "window_mng"
+	static dependencies = ["style"]
 	static idMount = "windows"
 
 	rootElement = null
@@ -176,11 +179,13 @@ export default class WindowManager extends Core {
 
 	renderWindows = () => {
 		this.root.render(
-			<WindowsRender
-				renders={this.windows.map((_win) => {
-					return _win.params.element
-				})}
-			/>,
+			<ThemeProvider>
+				<WindowsRender
+					renders={this.windows.map((_win) => {
+						return _win.params.element
+					})}
+				/>
+			</ThemeProvider>,
 		)
 	}
 

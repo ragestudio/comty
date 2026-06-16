@@ -4,6 +4,7 @@ import { Runtime } from "@ragestudio/vessel"
 import * as Router from "@ragestudio/vessel/router"
 import * as Sentry from "@sentry/browser"
 import { ThemeProvider } from "@cores/style/style.core.jsx"
+import NotificationsRenderer from "./cores/notifications/render"
 import ErrorBoundary from "@components/ErrorBoundary"
 import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
@@ -45,6 +46,8 @@ class ComtyApp extends React.Component {
 		},
 	})
 
+	notificationsRef = React.createRef()
+
 	static async initialize() {
 		window.app.version = config.package.version
 		window.app.confirm = antd.Modal.confirm
@@ -72,6 +75,12 @@ class ComtyApp extends React.Component {
 	}
 
 	componentDidMount = async () => {
+		const notfCore = this.props.runtime.cores.cores.get("notifications")
+
+		if (notfCore) {
+			notfCore.ui.mount(this.notificationsRef)
+		}
+
 		await this.initialization()
 		this.setState({ firstInitialized: true })
 		app.cores.sfx.play("splash_out")
@@ -89,6 +98,7 @@ class ComtyApp extends React.Component {
 		return (
 			<React.Fragment>
 				<ThemeProvider>
+					<NotificationsRenderer ref={this.notificationsRef} />
 					<ErrorBoundary>
 						<Layout staticRenders={ComtyApp.staticRenders}>
 							{this.state.firstInitialized && (
