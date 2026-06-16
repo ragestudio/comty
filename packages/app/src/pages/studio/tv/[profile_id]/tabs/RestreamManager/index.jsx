@@ -2,7 +2,6 @@ import React from "react"
 import * as antd from "antd"
 import Streaming from "@models/spectrum"
 
-import HiddenText from "../../components/HiddenText"
 import { FiXCircle } from "react-icons/fi"
 import NewRestreamServerForm from "./NewRestreamServerForm"
 
