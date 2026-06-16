@@ -5,7 +5,7 @@ import UserModel from "@models/user"
 import RefreshWorker from "./refresh_worker?worker"
 import * as Comlink from "comlink"
 
-import { Login } from "@components"
+import Login from "@components/Login"
 
 export default class AuthManager {
 	constructor(runtime, params = {}) {
