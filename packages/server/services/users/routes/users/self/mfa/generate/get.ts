@@ -10,8 +10,9 @@ import { encrypt } from "@shared-utils/mfa"
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
+		//@ts-ignore
 		const user = await req.auth.user()
-
+		//@ts-ignore
 		const user_id = req.auth.user_id
 
 		const secret = authenticator.generateSecret()

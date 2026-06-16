@@ -3,12 +3,14 @@ import type API from "@services/users/users.service"
 import * as authenticator from "otplib"
 import { decrypt } from "@shared-utils/mfa"
 
+import UserConfig from "@db_models/userConfig"
 import UserTotp from "@db_models/userTotp"
 import User from "@db_models/user"
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
+		//@ts-ignore
 		const user_id = req.auth.session.user_id
 		const { code } = req.body
 
@@ -47,6 +49,16 @@ export default defineRoute<API>()({
 		await User.updateOne(
 			{ _id: user_id },
 			{ $addToSet: { flags: "has_totp" } },
+		)
+
+		await UserConfig.updateOne(
+			{ user_id: user_id },
+			{
+				$set: {
+					values: { "auth:2fa-type": "totp" },
+				},
+			},
+			{ upsert: true },
 		)
 
 		return {
