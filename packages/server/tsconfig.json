@@ -12,6 +12,7 @@
 			"linebridge": ["../../modules/linebridge/server/src/*"],
 			"@shared-classes/*": ["./classes/*"],
 			"@shared-middlewares": ["./middlewares/*"],
+			"@shared-utils/*": ["./utils/*"],
 			"@classes/*": [
 				"./services/auth/classes/*",
 				"./services/chats/classes/*",
