@@ -1,7 +1,16 @@
-import { User, UserFollow } from "@db_models"
+//@ts-ignore
+import { UserFollow } from "@db_models"
+import User from "@db_models/user"
 
-export default async (payload = {}) => {
-	const { user_id, from_user_id, basic = true, add } = payload
+export type GetUserData = {
+	user_id: string | string[]
+	from_user_id?: string
+	basic?: boolean
+	add?: string[]
+}
+
+export default async (payload: GetUserData) => {
+	const { user_id, from_user_id, basic = true, add } = payload ?? {}
 
 	if (!user_id) {
 		throw new OperationError(400, "Missing user_id")
