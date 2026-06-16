@@ -15,9 +15,9 @@ export default class MFAStage extends LoginStage {
 		const userConfig = await UserConfig.findOne({ user_id }).lean()
 		const userTotp = await UserTotp.findOne({ user_id, enabled: true })
 
-		const mfaEnabled = userTotp || userConfig?.values?.["auth:mfa"]
+		const twoFactorType = userTotp || userConfig?.values?.["auth:2fa-type"]
 
-		if (!mfaEnabled) return
+		if (!twoFactorType) return
 
 		// 1. Check if MFA code is provided
 		if (payload.mfa_code) {
@@ -40,6 +40,7 @@ export default class MFAStage extends LoginStage {
 			}
 		} else {
 			const mfaData = await this.createEmailMFASession(user, request)
+
 			context.result = {
 				message: `MFA required, using [email] method.`,
 				method: "email",
