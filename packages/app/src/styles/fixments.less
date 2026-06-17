@@ -37,8 +37,15 @@
 }
 
 .ant-message {
+	z-index: 9999999;
+
 	svg {
 		margin: 0;
+	}
+
+	.ant-message-notice {
+		outline: 2px solid var(--border-color) !important;
+		backdrop-filter: blur(5px);
 	}
 }
 
@@ -253,9 +260,6 @@
 	gap: 20px;
 
 	.ant-notification-notice-wrapper {
-		//outline: 1px solid var(--border-color) !important;
-		backdrop-filter: blur(5px);
-
 		padding: 20px;
 	}
 
@@ -266,6 +270,9 @@
 		justify-content: center;
 
 		background-color: var(--background-color-primary);
+		backdrop-filter: blur(5px);
+
+		outline: 2px solid var(--border-color) !important;
 
 		border: 0;
 		outline: 0;

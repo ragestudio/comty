@@ -142,9 +142,8 @@ class NotificationUI {
 		}
 
 		// fire the ui
-		//
 		if (this.apiRef.current) {
-			this.apiRef.current[notification.type](notfObj)
+			this.apiRef.current?.notification?.[notification.type](notfObj)
 		} else {
 			Notf[notification.type](notfObj)
 		}

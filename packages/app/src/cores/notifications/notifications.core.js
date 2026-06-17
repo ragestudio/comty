@@ -73,8 +73,6 @@ export default class NotificationCore extends Core {
 
 		const notification = await this.db.get(STORE_NAME, notf_id)
 
-		console.log(notification)
-
 		if (!notification) {
 			return null
 		}
@@ -117,5 +115,43 @@ export default class NotificationCore extends Core {
 				}
 			},
 		})
+	}
+
+	message = {
+		open: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.open(...args)
+			}
+		},
+		destroy: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.destroy(...args)
+			}
+		},
+		info: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.info(...args)
+			}
+		},
+		success: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.success(...args)
+			}
+		},
+		warning: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.warning(...args)
+			}
+		},
+		error: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.error(...args)
+			}
+		},
+		loading: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.loading(...args)
+			}
+		},
 	}
 }

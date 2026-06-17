@@ -1,18 +1,20 @@
 import React from "react"
-import { notification } from "antd"
+import { notification, message } from "antd"
 
 export const NotificationsRenderer = (props) => {
-	const [api, contextHolder] = notification.useNotification()
+	const [notfApi, notfContextHolder] = notification.useNotification()
+	const [mesApi, mesContextHolder] = message.useMessage()
 
 	React.useEffect(() => {
 		if (props.ref) {
-			props.ref.current = api
+			props.ref.current = { notification: notfApi, message: mesApi }
 		}
 	}, [props.ref])
 
 	return (
 		<>
-			{contextHolder}
+			{notfContextHolder}
+			{mesContextHolder}
 			{props.children}
 		</>
 	)

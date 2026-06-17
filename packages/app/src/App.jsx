@@ -50,18 +50,7 @@ class ComtyApp extends React.Component {
 
 	static async initialize() {
 		window.app.version = config.package.version
-		window.app.confirm = antd.Modal.confirm
-		window.app.message = antd.message
 		window.app.isCapacitor = window.IS_MOBILE_HOST
-
-		if (
-			window.app.version !== window.localStorage.getItem("last_version")
-		) {
-			app.message.info(
-				`Comty has been updated to version ${window.app.version}!`,
-			)
-			window.localStorage.setItem("last_version", window.app.version)
-		}
 
 		if (import.meta.env.VITE_SENTRY_DSN && import.meta.env.PROD) {
 			console.log(`Initializing Sentry...`)
@@ -76,6 +65,7 @@ class ComtyApp extends React.Component {
 
 	componentDidMount = async () => {
 		const notfCore = this.props.runtime.cores.cores.get("notifications")
+		app.message = notfCore.message
 
 		if (notfCore) {
 			notfCore.ui.mount(this.notificationsRef)
@@ -83,7 +73,17 @@ class ComtyApp extends React.Component {
 
 		await this.initialization()
 		this.setState({ firstInitialized: true })
+
 		app.cores.sfx.play("splash_out")
+
+		if (
+			window.app.version !== window.localStorage.getItem("last_version")
+		) {
+			app.message.info(
+				`Comty has been updated to version ${window.app.version}!`,
+			)
+			window.localStorage.setItem("last_version", window.app.version)
+		}
 	}
 
 	initialization = async () => {

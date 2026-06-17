@@ -64,6 +64,7 @@ export class ThemeProvider extends React.Component {
 					token: {
 						...app.cores.style.vars,
 						borderRadius: 12,
+						borderRadiusSM: 8,
 						colorBgContainer: "var(--background-color-primary)",
 						colorBgElevated: "var(--background-color-primary)",
 						colorBgLayout: "var(--background-color-primary)",
