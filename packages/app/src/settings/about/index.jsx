@@ -75,15 +75,19 @@ export default {
 						</div>
 					</div>
 					<div className="versions">
-						<antd.Tag>
-							<Icons.Tag />v{window.app.version ?? "experimental"}
+						<antd.Tag icon={<Icons.Tag />}>
+							v{window.app.version ?? "experimental"}
 						</antd.Tag>
-						<antd.Tag color={isProduction ? "green" : "magenta"}>
-							{isProduction ? (
-								<Icons.CircleCheck />
-							) : (
-								<Icons.Triangle />
-							)}
+						<antd.Tag
+							color={isProduction ? "green" : "magenta"}
+							icon={
+								isProduction ? (
+									<Icons.CircleCheck />
+								) : (
+									<Icons.Triangle />
+								)
+							}
+						>
 							{String(import.meta.env.MODE)}
 						</antd.Tag>
 					</div>
