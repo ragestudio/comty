@@ -16,13 +16,10 @@ export default React.memo((props) => {
 	)
 
 	const handleItemRemove = () => {
-		antd.Modal.confirm({
-			title: "Are you sure?",
-			content: "Do you want to remove this widget?",
-			okText: "Yes",
-			okType: "danger",
-			cancelText: "No",
-			onOk: () => {
+		app.layout.modal.confirm({
+			headerText: "Are you sure?",
+			descriptionText: "Do you want to remove this widget?",
+			onConfirm: () => {
 				onRemove()
 			},
 		})
