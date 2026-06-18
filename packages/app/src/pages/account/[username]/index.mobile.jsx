@@ -103,9 +103,11 @@ const Account = ({ params }) => {
 	const toggleFollow = async () => {
 		if (isFollowed) {
 			const accept = await new Promise((resolve) => {
-				antd.Modal.confirm({
-					title: <Translation>{(t) => t("Confirm")}</Translation>,
-					content: (
+				app.layout.modal.confirm({
+					headerText: (
+						<Translation>{(t) => t("Confirm")}</Translation>
+					),
+					descriptionText: (
 						<Translation>
 							{(t) =>
 								t(
@@ -114,9 +116,7 @@ const Account = ({ params }) => {
 							}
 						</Translation>
 					),
-					okText: <Translation>{(t) => t("Yes")}</Translation>,
-					cancelText: <Translation>{(t) => t("No")}</Translation>,
-					onOk: () => {
+					onConfirm: () => {
 						resolve(true)
 					},
 					onCancel: () => {
