@@ -197,10 +197,10 @@ class OwnTags extends React.Component {
 	}
 
 	handleTagDelete = (tag) => {
-		antd.Modal.confirm({
-			title: "Are you sure you want to delete this tag?",
-			content: `This action cannot be undone.`,
-			onOk: async () => {
+		app.layout.modal.confirm({
+			headerText: "Are you sure you want to delete this tag?",
+			descriptionText: `This action cannot be undone.`,
+			onConfirm: async () => {
 				NFCModel.deleteTag(tag._id)
 					.then(() => {
 						app.message.success("Tag deleted")
