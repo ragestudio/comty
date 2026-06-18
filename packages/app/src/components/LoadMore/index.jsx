@@ -3,7 +3,7 @@ import classnames from "classnames"
 
 import "./index.less"
 
-const LoadMore = React.forwardRef((props, ref) => {
+const LoadMore = (props) => {
 	const {
 		className,
 		children,
@@ -55,7 +55,7 @@ const LoadMore = React.forwardRef((props, ref) => {
 
 	return (
 		<div
-			ref={ref}
+			ref={props.ref}
 			className={classnames(className)}
 			{...contentProps}
 		>
@@ -71,7 +71,7 @@ const LoadMore = React.forwardRef((props, ref) => {
 			</div>
 		</div>
 	)
-})
+}
 
 LoadMore.displayName = "LoadMore"
 

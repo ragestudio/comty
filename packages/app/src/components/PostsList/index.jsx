@@ -48,13 +48,10 @@ const PostActions = {
 		return result
 	},
 	onClickDelete: async (data) => {
-		antd.Modal.confirm({
-			title: "Are you sure you want to delete this post?",
-			content: "This action is irreversible",
-			okText: "Yes",
-			okType: "danger",
-			cancelText: "No",
-			onOk: async () => {
+		app.layout.modal.confirm({
+			headerText: "Are you sure you want to delete this post?",
+			descriptionText: "This action is irreversible",
+			onConfirm: async () => {
 				await PostModel.deletePost({ post_id: data._id }).catch(() => {
 					antd.message.error("Failed to delete post")
 				})

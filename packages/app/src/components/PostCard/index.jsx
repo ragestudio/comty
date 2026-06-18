@@ -265,7 +265,6 @@ export default class PostCard extends React.PureComponent {
 						repliesCount={this.state.countReplies}
 						defaultLiked={this.state.hasLiked}
 						defaultSaved={this.state.hasSaved}
-						PP
 						actions={{
 							onClickLike: this.onClickLike,
 							onClickEdit: this.onClickEdit,
