@@ -26,7 +26,7 @@
 		"@ffmpeg/util": "^0.12.1",
 		"@gullerya/object-observer": "^6.1.4",
 		"@loadable/component": "^5.16.7",
-		"@ragestudio/vessel": "^0.25.7",
+		"@ragestudio/vessel": "^0.26.0",
 		"@sentry/browser": "^7.64.0",
 		"@svta/common-media-library": "^0.18.1",
 		"@tanstack/react-virtual": "^3.13.12",
@@ -86,7 +86,7 @@
 		"store": "^2.0.12",
 		"ua-parser-js": "^1.0.36",
 		"vaul": "^1.1.2",
-		"vite": "^7.3.1"
+		"vite": "^8.0.16"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.26.0",
