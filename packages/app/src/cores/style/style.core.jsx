@@ -72,6 +72,7 @@ export class ThemeProvider extends React.Component {
 						colorBorder: "var(--border-color)",
 						colorSuccess: "#52c41a",
 						colorWarning: "#faad14",
+						fontFamily: app.cores.style.vars.fontFamily,
 					},
 					components: {
 						Button: {
