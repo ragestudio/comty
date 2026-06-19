@@ -7,6 +7,9 @@
 	"workspaces": [
 		"services/*"
 	],
+	"aliases": {
+		"@db": "../shared/db"
+	},
 	"scripts": {
 		"setup": "cross-env NODE_ENV=development linebridge-boot scripts/setup/index.js",
 		"start:prod": "cross-env NODE_ENV=production ultragateway",
@@ -20,7 +23,7 @@
 	"dependencies": {
 		"@foxify/events": "^2.1.0",
 		"@otplib/uri": "^13.4.1",
-		"@ragestudio/scylla-odm": "^0.22.0",
+		"@ragestudio/scylla-odm": "0.22.10",
 		"@sentry/node": "^10.58.0",
 		"bcrypt": "^6.0.0",
 		"bullmq": "^5.79.0",

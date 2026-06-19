@@ -20,8 +20,6 @@ export default defineRoute<API>()({
 
 		let group = (await Groups.canUserIdReach(user_id, group_id)) as Group
 
-		console.log(group)
-
 		let meta: MetaGroup = {
 			group_v: group.__v ?? 0,
 			total_channels: 0,

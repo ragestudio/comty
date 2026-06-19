@@ -5,6 +5,10 @@ export default async function (this: typeof Groups, group_ids: string[]) {
 		throw new OperationError(400, "group_ids must be an array")
 	}
 
+	if (group_ids.length === 0) {
+		return []
+	}
+
 	let groups = await this.model.find(
 		{
 			_id: {

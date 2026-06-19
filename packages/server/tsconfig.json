@@ -30,7 +30,7 @@
 			],
 			"@db_models": ["./db_models"],
 			"@db_models/*": ["./db_models/*"],
-			"@db/*": ["./db/*"],
+			"@db/*": ["../shared/db/*"],
 			"@services/*": ["./services/*"],
 		},
 	},

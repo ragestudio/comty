@@ -28,6 +28,10 @@ export default async function (
 
 	const users_ids = membershipsRef.map((ref) => ref.user_id)
 
+	if (users_ids.length === 0) {
+		return []
+	}
+
 	const memberships = await this.model.find({
 		user_id: {
 			$in: users_ids,
