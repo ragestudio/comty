@@ -15,9 +15,9 @@ export default class MFAStage extends LoginStage {
 		const userConfig = await UserConfig.findOne({ user_id }).lean()
 		const userTotp = await UserTotp.findOne({ user_id, enabled: true })
 
-		const twoFactorType = userTotp || userConfig?.values?.["auth:2fa-type"]
+		const twoFactorType = userConfig?.values?.["auth:2fa-type"]
 
-		if (!twoFactorType) return
+		if (!twoFactorType || twoFactorType === "none") return
 
 		// 1. Check if MFA code is provided
 		if (payload.mfa_code) {
