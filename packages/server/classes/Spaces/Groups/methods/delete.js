@@ -19,7 +19,7 @@ export default async function (group) {
 	}
 
 	// delete the channels
-	const channels = await GroupChannels.getAllByGroupId(group)
+	const channels = await GroupChannels.getAllByGroup(group)
 
 	for (const channel of channels) {
 		await channel.delete()

@@ -23,6 +23,9 @@ export default async function (group, payload) {
 		group.reachability = payload.reachability
 	}
 
+	// update the __v
+	group.__v = (group.__v ?? 0) + 1
+
 	await group.save()
 
 	if (global.websockets) {

@@ -13,7 +13,7 @@ export default async function (group_id, { limit, offset } = {}) {
 	}
 
 	if (offset) {
-		query._id = {
+		query.membership_id = {
 			$lt: offset,
 		}
 	}

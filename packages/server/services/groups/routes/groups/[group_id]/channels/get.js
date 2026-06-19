@@ -13,7 +13,7 @@ export default {
 			throw new OperationError(404, "Group not found")
 		}
 
-		let channels = await GroupChannels.getAllByGroupId(
+		let channels = await GroupChannels.getAllByGroup(
 			group,
 			req.auth.session.user_id,
 		)

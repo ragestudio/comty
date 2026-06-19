@@ -6,6 +6,7 @@ import DbManager from "@shared-classes/DbManager"
 import ScyllaDb from "@ragestudio/scylla-odm"
 import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
+import UserConnections from "@shared-classes/UserConnections"
 
 export default class API extends Server {
 	static refName = "groups"
@@ -26,8 +27,11 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		redis: RedisClient(),
-		scylla: (global.scylla = new ScyllaDb()),
+		scylla: (global.scylla = new ScyllaDb({
+			modelsPath: global["paths"].root + "/db",
+		})),
 		snowflake: (global.snowflake = new SnowflakeWorker(0, 1)),
+		usersConnections: new UserConnections(this),
 	}
 
 	initialize = [

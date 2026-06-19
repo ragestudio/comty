@@ -8,6 +8,9 @@ import SharedMiddlewares from "@shared-middlewares"
 import MediaChannelsController from "@classes/MediaChannelsController"
 import UserCalls from "@classes/UserCalls"
 
+import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+import UserConnections from "@shared-classes/UserConnections"
+
 export default class API extends Server {
 	static refName = "rtc"
 	static listenPort = 3011
@@ -24,13 +27,13 @@ export default class API extends Server {
 		...SharedMiddlewares,
 	}
 
-	onClientConnected = (ctx = {}) => {
+	onClientConnected = (ctx: RtEngineContext) => {
 		if (typeof ctx.meta.user_id === "string") {
 			this.eventBus.emit("user:connected", ctx)
 		}
 	}
 
-	onClientDisconnected = (ctx = {}) => {
+	onClientDisconnected = (ctx: RtEngineContext) => {
 		if (typeof ctx.meta.user_id === "string") {
 			this.eventBus.emit("user:disconnect", ctx)
 		}
@@ -42,6 +45,7 @@ export default class API extends Server {
 		redis: RedisClient(),
 		mediaChannels: new MediaChannelsController(this),
 		userCalls: new UserCalls(this),
+		userConnections: new UserConnections(this),
 	}
 
 	initialize = [

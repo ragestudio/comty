@@ -4,17 +4,17 @@ import type { Column } from "@ragestudio/scylla-odm/types"
 export const schema = new Schema(
 	{
 		table_name: "group_memberships_ref",
-		keys: [["group_id"], "created_at"],
+		keys: [["group_id"], "membership_id", "created_at"],
 	},
 	{
 		group_id: {
 			type: ColumnTypes.Varchar,
 			required: true,
 		} as Column<string>,
-		user_id: {
+		membership_id: {
 			type: ColumnTypes.Varchar,
 		} as Column<string>,
-		membership_id: {
+		user_id: {
 			type: ColumnTypes.Varchar,
 		} as Column<string>,
 		created_at: {

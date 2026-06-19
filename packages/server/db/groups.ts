@@ -1,6 +1,18 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
 import type { Column } from "@ragestudio/scylla-odm/types"
 
+export type Group = {
+	__v?: number
+	_id: string
+	name: string
+	description: string
+	icon: string
+	cover: string
+	reachability: string
+	owner_user_id: string
+	created_at: Date
+}
+
 export const schema = new Schema(
 	{
 		table_name: "groups",

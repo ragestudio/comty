@@ -1,22 +1,53 @@
+import type Redis from "ioredis"
+import type { Server } from "linebridge"
+
+export type ConnectionEventParams = {
+	socket_id: string
+	user_id: string | number
+}
+
+export type QueryParams = {
+	offset?: number
+	limit?: number
+}
+
+export type UserConn = {
+	userId: string | number
+	connected: boolean
+	connectionsCount?: number
+}
+
 export default class UserConnections {
-	constructor(server) {
-		this.server = server
-
-		if (!this.server) {
-			throw new Error("Server instance is required for UserConnections")
-		}
-	}
-
 	static CONNECTED_USERS_ZSET = "connected_users_zset"
 	static USER_CONNECTIONS_PREFIX = "connections:user:"
 	static fetchHardLimit = 200
 
+	constructor(server: Server) {
+		if (!server) {
+			throw new Error("Server instance is required for UserConnections")
+		}
+
+		this.server = server
+	}
+
+	server: Server
+
+	get redis(): Redis {
+		if (!this.server.contexts.redis) {
+			throw new Error(
+				"server.contexts.redis | is required for UserConnections",
+			)
+		}
+
+		return this.server.contexts.redis.client
+	}
+
 	//
 	// Clear all orphaned connections for a given user, checking from the RTEngine instance
 	//
-	async clearUserIdOrphanedConnections(redis, userId) {
+	async clearUserIdOrphanedConnections(userId: string | number) {
 		try {
-			if (!redis || !userId) {
+			if (!userId) {
 				return false
 			}
 
@@ -26,10 +57,7 @@ export default class UserConnections {
 
 			const websocketClients = this.server.engine.ws.clients
 
-			const connections = await UserConnections.getUserIdConnections(
-				redis,
-				userId,
-			)
+			const connections = await this.getUserIdConnections(userId)
 
 			const socketsIdToRemove = []
 
@@ -42,7 +70,7 @@ export default class UserConnections {
 			}
 
 			// create a pipeline
-			const pipeline = redis.pipeline()
+			const pipeline = this.redis.pipeline()
 
 			for (const socketId of socketsIdToRemove) {
 				pipeline.hdel(
@@ -61,8 +89,8 @@ export default class UserConnections {
 		}
 	}
 
-	async handleConnection(redis, { socket_id, user_id } = {}) {
-		if (!redis || !user_id || !socket_id) {
+	async handleConnection({ socket_id, user_id }: ConnectionEventParams) {
+		if (!user_id || !socket_id) {
 			return false
 		}
 
@@ -73,7 +101,7 @@ export default class UserConnections {
 			socketId: socket_id,
 		}
 
-		const pipeline = redis.pipeline()
+		const pipeline = this.redis.pipeline()
 
 		pipeline.hset(userHashKey, socket_id, JSON.stringify(connectionData))
 		pipeline.zadd(
@@ -85,18 +113,16 @@ export default class UserConnections {
 
 		await pipeline.exec()
 
-		console.log(`User [${user_id}] added to connected users set`)
-
 		// clear orphaned connections after in the backgroud
 		if (this.server.engine.ws) {
 			setTimeout(() => {
-				this.clearUserIdOrphanedConnections(redis, user_id)
+				this.clearUserIdOrphanedConnections(user_id)
 			}, 1000)
 		}
 	}
 
-	async handleDisconnection(redis, { socket_id, user_id } = {}) {
-		if (!redis || !user_id || !socket_id) {
+	async handleDisconnection({ socket_id, user_id }: ConnectionEventParams) {
+		if (!user_id || !socket_id) {
 			return false
 		}
 
@@ -104,16 +130,17 @@ export default class UserConnections {
 
 		try {
 			// delete the socket from the user hash
-			await redis.hdel(userHashKey, socket_id)
-
-			console.log(`User [${user_id}] removed from connected users set`)
+			await this.redis.hdel(userHashKey, socket_id)
 
 			// if no more connections, remove the user from the zset
-			const connectionsCount = await redis.hlen(userHashKey)
+			const connectionsCount = await this.redis.hlen(userHashKey)
 
 			if (connectionsCount === 0) {
-				await redis.zrem(UserConnections.CONNECTED_USERS_ZSET, user_id)
-				await redis.del(userHashKey)
+				await this.redis.zrem(
+					UserConnections.CONNECTED_USERS_ZSET,
+					user_id,
+				)
+				await this.redis.del(userHashKey)
 			}
 		} catch (error) {
 			console.error(
@@ -123,8 +150,8 @@ export default class UserConnections {
 		}
 	}
 
-	static async getAllConnectedUsers(redis, { offset = 0, limit = 250 } = {}) {
-		if (!redis) {
+	async getAllConnectedUsers({ offset = 0, limit = 250 }: QueryParams = {}) {
+		if (!this.redis) {
 			throw new OperationError(400, "missing redis")
 		}
 
@@ -144,21 +171,21 @@ export default class UserConnections {
 			limit = UserConnections.fetchHardLimit
 		}
 
-		return await redis.zrange(
+		return await this.redis.zrange(
 			UserConnections.CONNECTED_USERS_ZSET,
 			offset,
 			offset + limit - 1,
 		)
 	}
 
-	static async getUserIdConnections(redis, userId) {
-		if (!redis || !userId) {
+	async getUserIdConnections(userId: string | number) {
+		if (!userId) {
 			throw new OperationError(400, "missing redis or userId")
 		}
 
 		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`
 
-		const connections = await redis.hgetall(userHashKey)
+		const connections = await this.redis.hgetall(userHashKey)
 
 		const parsedConnections = {}
 
@@ -175,23 +202,24 @@ export default class UserConnections {
 		return parsedConnections
 	}
 
-	static async isUserConnected(redis, userId) {
-		if (!redis || !userId) {
+	async isUserConnected(userId: string | number): Promise<UserConn> {
+		if (!userId) {
 			throw new OperationError(400, "missing redis or userId")
 		}
 
 		const userHashKey = `${UserConnections.USER_CONNECTIONS_PREFIX}${userId}`
 
-		const connectionsCount = await redis.hlen(userHashKey)
+		const connectionsCount = await this.redis.hlen(userHashKey)
 
 		return {
+			userId: userId,
 			connected: connectionsCount > 0,
 			connectionsCount: connectionsCount,
 		}
 	}
 
-	static async isUsersConnected(redis, userIds) {
-		if (!redis || !userIds) {
+	async isUsersConnected(userIds: string[] | number[]): Promise<UserConn[]> {
+		if (!userIds) {
 			throw new OperationError(400, "missing redis or userIds")
 		}
 
@@ -200,26 +228,26 @@ export default class UserConnections {
 		}
 
 		if (userIds.length === 0) {
-			return {}
+			return []
 		}
 
-		const pipeline = redis.pipeline()
+		const pipeline = this.redis.pipeline()
 
 		for (const userId of userIds) {
-			pipeline.zscore(this.CONNECTED_USERS_ZSET, userId)
+			pipeline.zscore(UserConnections.CONNECTED_USERS_ZSET, userId)
 		}
 
 		let results = await pipeline.exec()
 
 		return results.map((result, index) => {
 			return {
-				user_id: userIds[index],
+				userId: userIds[index],
 				connected: !!result[1],
 			}
 		})
 	}
 
-	static async getTotalConnectedUsers(redis) {
-		return redis.zcard(UserConnections.CONNECTED_USERS_ZSET)
+	async getTotalConnectedUsers() {
+		return this.redis.zcard(UserConnections.CONNECTED_USERS_ZSET)
 	}
 }

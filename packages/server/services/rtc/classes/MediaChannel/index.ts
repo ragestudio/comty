@@ -13,7 +13,36 @@ import createTransportHandler from "./handlers/createTransport"
 
 import type { MediaChannelParams, RTCClient } from "./types"
 
-export default class MediaChannel {
+export type SerializedMediaChannel = {
+	__v: number
+	_id: string
+	clients: SerializedClient[]
+	producers: SerializedProducer[]
+	started_at: Date
+}
+
+export type SerializedClient = {
+	_id: string
+	userId: string
+	user_id: string
+	voice_state: any
+	voiceState: any
+	user: {
+		_id: string
+		name: string
+		avatar: string
+	}
+}
+
+export type SerializedProducer = {
+	id: string
+	producer_id: string
+	user_id: string
+	kind: string
+	appData: any
+}
+
+export class MediaChannel {
 	params: MediaChannelParams
 	data: any
 	channelId: string
@@ -285,11 +314,11 @@ export default class MediaChannel {
 		})
 	}
 
-	getConnectedClientsUserIds() {
+	getConnectedClientsUserIds(): string[] {
 		return Array.from(this.clients).map((c) => c.userId)
 	}
 
-	getConnectedClientsSerialized() {
+	getConnectedClientsSerialized(): SerializedClient[] {
 		return Array.from(this.clients).map((c) => {
 			return {
 				userId: c.userId,
@@ -305,7 +334,7 @@ export default class MediaChannel {
 		})
 	}
 
-	getProducersSerialized() {
+	getProducersSerialized(): SerializedProducer[] {
 		const producers = new Set()
 
 		for (const [producerUserId, userProducers] of this.producers) {
@@ -320,7 +349,17 @@ export default class MediaChannel {
 			}
 		}
 
-		return Array.from(producers)
+		return Array.from(producers) as SerializedProducer[]
+	}
+
+	serialize(): SerializedMediaChannel {
+		return {
+			__v: this.data.__v,
+			_id: this.data._id,
+			clients: this.getConnectedClientsSerialized(),
+			producers: this.getProducersSerialized(),
+			started_at: this.started_at,
+		}
 	}
 
 	/**
@@ -387,3 +426,5 @@ export default class MediaChannel {
 	// 	}
 	// }
 }
+
+export default MediaChannel

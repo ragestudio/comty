@@ -1,6 +1,17 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
 import type { Column } from "@ragestudio/scylla-odm/types"
 
+export type GroupChannel = {
+	_id: string
+	group_id: string
+	kind: string
+	name: string
+	description: string
+	explicit: boolean
+	params: Record<string, string>
+	created_at: Date
+}
+
 export const schema = new Schema(
 	{
 		table_name: "group_channels",

@@ -6,6 +6,8 @@ import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
 
+import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+
 export default class API extends Server {
 	static refName = "main"
 	static listenPort = 3000
@@ -23,37 +25,29 @@ export default class API extends Server {
 		...require("@shared-middlewares").default,
 	}
 
-	onClientConnected = (ctx = {}) => {
-		if (!ctx.meta) {
-			return null
-		}
+	onClientConnected = (ctx: RtEngineContext) => {
+		if (!ctx) return null
+		if (!ctx.meta) return null
 
 		try {
-			this.contexts.userConnections.handleConnection(
-				this.contexts.redis.client,
-				{
-					socket_id: ctx.socket_id,
-					user_id: ctx.meta.user_id,
-				},
-			)
+			this.contexts.userConnections.handleConnection({
+				socket_id: ctx.socket_id,
+				user_id: ctx.meta.user_id,
+			})
 		} catch (error) {
 			console.error(error)
 		}
 	}
 
-	onClientDisconnected = (ctx = {}) => {
-		if (!ctx.meta) {
-			return null
-		}
+	onClientDisconnected = (ctx: RtEngineContext) => {
+		if (!ctx) return null
+		if (!ctx.meta) return null
 
 		try {
-			this.contexts.userConnections.handleDisconnection(
-				this.contexts.redis.client,
-				{
-					socket_id: ctx.socket_id,
-					user_id: ctx.meta.user_id,
-				},
-			)
+			this.contexts.userConnections.handleDisconnection({
+				socket_id: ctx.socket_id,
+				user_id: ctx.meta.user_id,
+			})
 		} catch (error) {
 			console.error(error)
 		}
