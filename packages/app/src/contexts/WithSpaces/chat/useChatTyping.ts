@@ -14,6 +14,10 @@ export function useChatTyping(config: any, params: any) {
 	}, [params])
 
 	const handleTypingEvent = React.useCallback((data: any) => {
+		if (!data) {
+			return null
+		}
+
 		setUsersTyping((prev) => {
 			const userId = data.user_id || data.user?.id || data.user?._id
 
