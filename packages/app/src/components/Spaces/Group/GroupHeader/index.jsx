@@ -69,12 +69,6 @@ const GroupHeader = () => {
 				),
 			}}
 		>
-			{data.cover && (
-				<div className="group-page__header__cover">
-					<Image src={data.cover} />
-				</div>
-			)}
-
 			<div className="group-page__header__content">
 				<div className="group-page__header__content__text">
 					<h1>{data.name}</h1>
@@ -87,6 +81,12 @@ const GroupHeader = () => {
 					/>
 				</div>
 			</div>
+
+			{data.cover && (
+				<div className="group-page__header__cover">
+					<Image src={data.cover} />
+				</div>
+			)}
 		</div>
 	)
 }

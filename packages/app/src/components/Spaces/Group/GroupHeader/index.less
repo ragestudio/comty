@@ -1,7 +1,7 @@
 .group-page__header {
 	position: relative;
 
-	z-index: -1;
+	z-index: 100;
 
 	overflow: hidden;
 
@@ -54,7 +54,7 @@
 		width: 100%;
 		height: 100%;
 
-		opacity: 0.8;
+		opacity: 0.6;
 
 		.lazy-load-image-background {
 			width: 100%;
@@ -70,6 +70,8 @@
 	}
 
 	&__content {
+		position: relative;
+
 		display: flex;
 		flex-direction: row;
 
@@ -104,6 +106,7 @@
 	}
 
 	&__actions {
+		position: relative;
 		display: flex;
 		flex-direction: row;
 
