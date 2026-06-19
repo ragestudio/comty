@@ -10,9 +10,15 @@ export default class GroupInvites {
 		return GroupInviteKeyModel
 	}
 
-	static get = getMethod.bind(this)
-	static getAllByGroup = getAllByGroupMethod.bind(this)
+	static get = getMethod.bind(this) as OmitThisParameter<typeof getMethod>
+	static getAllByGroup = getAllByGroupMethod.bind(this) as OmitThisParameter<
+		typeof getAllByGroupMethod
+	>
 
-	static create = createMethod.bind(this)
-	static delete = deleteMethod.bind(this)
+	static create = createMethod.bind(this) as OmitThisParameter<
+		typeof createMethod
+	>
+	static delete = deleteMethod.bind(this) as OmitThisParameter<
+		typeof deleteMethod
+	>
 }

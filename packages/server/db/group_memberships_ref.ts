@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type GroupMembershipsRef = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,20 +9,20 @@ export const schema = new Schema(
 		keys: [["group_id"], "membership_id", "created_at"],
 	},
 	{
-		group_id: {
+		group_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		membership_id: {
+		}),
+		membership_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		user_id: {
+		}),
+		user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		created_at: {
+		}),
+		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
 			required: true,
-		} as Column<Date>,
+		}),
 	},
 )
 

@@ -1,16 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
 
-export type GroupChannel = {
-	_id: string
-	group_id: string
-	kind: string
-	name: string
-	description: string
-	explicit: boolean
-	params: Record<string, string>
-	created_at: Date
-}
+export type GroupChannel = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -18,35 +9,35 @@ export const schema = new Schema(
 		keys: [["group_id"], "_id"],
 	},
 	{
-		__v: {
+		__v: defineColumn<bigint>()({
 			type: ColumnTypes.Bigint,
-		} as Column<bigint>,
-		_id: {
+		}),
+		_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		group_id: {
+		}),
+		group_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		kind: {
+		}),
+		kind: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		name: {
+		}),
+		name: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		description: {
+		}),
+		description: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		explicit: {
+		}),
+		explicit: defineColumn<boolean>()({
 			type: ColumnTypes.Boolean,
-		} as Column<boolean>,
-		params: {
+		}),
+		params: defineColumn<Record<string, string>>()({
 			type: "map<varchar, varchar>",
-		} as Column<any>,
-		created_at: {
+		}),
+		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
+		}),
 	},
 )
 

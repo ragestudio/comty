@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type GroupChannelsLastMessageId = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,13 +9,13 @@ export const schema = new Schema(
 		keys: ["channel_id"],
 	},
 	{
-		channel_id: {
+		channel_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		_id: {
+		}),
+		_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
+		}),
 	},
 )
 

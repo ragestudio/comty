@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type ChannelMessage = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -8,41 +10,41 @@ export const schema = new Schema(
 		clustering_order: { _id: "asc" },
 	},
 	{
-		_id: {
+		_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		channel_id: {
+		}),
+		channel_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		user_id: {
+		}),
+		user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		message: {
+		}),
+		message: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		attachments: {
+		}),
+		attachments: defineColumn<Array<Record<string, string>>>()({
 			type: "frozen<list<map<varchar, varchar>>>",
-		} as Column<Array<any>>,
-		flags: {
+		}),
+		flags: defineColumn<Array<string>>()({
 			type: "frozen<list<varchar>>",
-		} as Column<any>,
-		sticker: {
+		}),
+		sticker: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		reply_to_id: {
+		}),
+		reply_to_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		nonce: {
+		}),
+		nonce: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		updated_at: {
+		}),
+		updated_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
-		created_at: {
+		}),
+		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
+		}),
 	},
 )
 

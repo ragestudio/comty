@@ -1,0 +1,72 @@
+import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
+import type { Group } from "@db/groups"
+import type GroupChannels from "../index"
+
+export default async function (
+	this: typeof GroupChannels,
+	group: Group,
+	payload: any,
+	user_id?: string,
+) {
+	if (typeof group !== "object") {
+		throw new OperationError(400, "group must be provided")
+	}
+
+	if (!payload.name || payload.name.length < 3) {
+		throw new OperationError(400, "Channel `name` is missing or too short")
+	}
+
+	if (typeof payload.kind !== "string") {
+		throw new OperationError(400, "Channel `kind` is missing")
+	}
+
+	if (!this.kinds[payload.kind]) {
+		throw new OperationError(400, "Channel `kind` is not valid")
+	}
+
+	// if user_id is provided, check if the user has permissions to create a channel
+	if (typeof user_id === "string") {
+		if (
+			!(await GroupPermissions.canPerformAction(
+				user_id,
+				group,
+				"MANAGE_CHANNELS",
+			))
+		) {
+			throw new OperationError(
+				403,
+				"You are not allowed to create a channel in this group",
+			)
+		}
+	}
+
+	const channelId = global.snowflake.nextId().toString()
+	const created_at = new Date()
+
+	const channel = this.model.obj({
+		__v: BigInt(0),
+		_id: channelId,
+		group_id: group._id,
+		kind: payload.kind,
+		name: payload.name,
+		description: payload.description,
+		params: payload.params,
+		created_at: created_at,
+	})
+
+	await channel.save()
+
+	if (global.websockets) {
+		try {
+			global.websockets.senders.toTopic(
+				`group:${group._id}`,
+				`group:${group._id}:channel:created`,
+				channel.toRaw(),
+			)
+		} catch (error) {
+			console.error("Failed to send event to group topic", error)
+		}
+	}
+
+	return channel.toRaw()
+}

@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type GroupInviteKey = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,29 +9,29 @@ export const schema = new Schema(
 		keys: [["group_id"], "key"],
 	},
 	{
-		group_id: {
+		group_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		key: {
+		}),
+		key: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		issuer_user_id: {
+		}),
+		issuer_user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		created_at: {
+		}),
+		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
-		expires_at: {
+		}),
+		expires_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
-		max_usage: {
+		}),
+		max_usage: defineColumn<number>()({
 			type: ColumnTypes.Int,
-		} as Column<number>,
-		usages: {
+		}),
+		usages: defineColumn<number>()({
 			type: ColumnTypes.Int,
-		} as Column<number>,
+		}),
 	},
 )
 

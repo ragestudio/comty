@@ -1,17 +1,8 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn } from "@ragestudio/scylla-odm/types"
+import type { InferDoc } from "@ragestudio/scylla-odm/types"
 
-export type Group = {
-	__v?: number
-	_id: string
-	name: string
-	description: string
-	icon: string
-	cover: string
-	reachability: string
-	owner_user_id: string
-	created_at: Date
-}
+export type Group = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -19,34 +10,34 @@ export const schema = new Schema(
 		keys: ["_id"],
 	},
 	{
-		__v: {
+		__v: defineColumn<number>()({
 			type: ColumnTypes.Int,
-		} as Column<number>,
-		_id: {
+		}),
+		_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		name: {
+		}),
+		name: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		description: {
+		}),
+		description: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		icon: {
+		}),
+		icon: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		cover: {
+		}),
+		cover: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		reachability: {
+		}),
+		reachability: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		owner_user_id: {
+		}),
+		owner_user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		created_at: {
+		}),
+		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
+		}),
 	},
 )
 

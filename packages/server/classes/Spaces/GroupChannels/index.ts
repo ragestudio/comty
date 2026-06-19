@@ -23,14 +23,24 @@ export default class GroupChannels {
 		voice: "voice",
 	}
 
-	static get = getMethod.bind(this)
-	static getAllByGroup = getAllByGroupIdMethod.bind(this)
+	static get = getMethod.bind(this) as OmitThisParameter<typeof getMethod>
+	static getAllByGroup = getAllByGroupIdMethod.bind(
+		this,
+	) as OmitThisParameter<typeof getAllByGroupIdMethod>
 	static getTotalByGroup = getTotalByGroupId.bind(this) as OmitThisParameter<
 		typeof getTotalByGroupId
 	>
 
-	static create = createMethod.bind(this)
-	static update = updateMethod.bind(this)
-	static delete = deleteMethod.bind(this)
-	static order = orderMethod.bind(this)
+	static create = createMethod.bind(this) as OmitThisParameter<
+		typeof createMethod
+	>
+	static update = updateMethod.bind(this) as OmitThisParameter<
+		typeof updateMethod
+	>
+	static delete = deleteMethod.bind(this) as OmitThisParameter<
+		typeof deleteMethod
+	>
+	static order = orderMethod.bind(this) as OmitThisParameter<
+		typeof orderMethod
+	>
 }

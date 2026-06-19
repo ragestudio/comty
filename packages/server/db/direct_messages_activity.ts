@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type DirectMessagesActivity = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,26 +9,26 @@ export const schema = new Schema(
 		keys: [["user_id"], "room_id"],
 	},
 	{
-		user_id: {
+		user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		room_id: {
+		}),
+		room_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		to_user_id: {
+		}),
+		to_user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		last_message_at: {
+		}),
+		last_message_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
-		direction: {
+		}),
+		direction: defineColumn<string>()({
 			type: ColumnTypes.Text,
-		} as Column<string>,
-		short_message: {
+		}),
+		short_message: defineColumn<string>()({
 			type: ColumnTypes.Text,
-		} as Column<string>,
+		}),
 	},
 )
 

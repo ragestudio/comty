@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type GroupVersion = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,13 +9,13 @@ export const schema = new Schema(
 		keys: ["group_id"],
 	},
 	{
-		group_id: {
+		group_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
-		__v: {
+		}),
+		__v: defineColumn<number>()({
 			type: ColumnTypes.Counter,
-		} as Column<number>,
+		}),
 	},
 )
 

@@ -1,5 +1,7 @@
 import { ColumnTypes, Model, Schema } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type ChannelLog = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -10,24 +12,24 @@ export const schema = new Schema(
 		},
 	},
 	{
-		channel_id: {
+		channel_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		log_id: {
+		}),
+		log_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		type: {
+		}),
+		type: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		target_id: {
+		}),
+		target_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		actor_id: {
+		}),
+		actor_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
-		} as Column<string>,
-		timestamp: {
+		}),
+		timestamp: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,
-		} as Column<Date>,
+		}),
 	},
 )
 

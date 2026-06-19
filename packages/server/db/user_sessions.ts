@@ -1,5 +1,7 @@
 import { Model, Schema, ColumnTypes } from "@ragestudio/scylla-odm"
-import type { Column } from "@ragestudio/scylla-odm/types"
+import { defineColumn, type InferDoc } from "@ragestudio/scylla-odm/types"
+
+export type UserSession = InferDoc<typeof schema>
 
 export const schema = new Schema(
 	{
@@ -7,15 +9,15 @@ export const schema = new Schema(
 		keys: [["user_id"], "session_id"],
 	},
 	{
-		session_id: {
+		session_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
+		}),
 
-		user_id: {
+		user_id: defineColumn<string>()({
 			type: ColumnTypes.Varchar,
 			required: true,
-		} as Column<string>,
+		}),
 	},
 )
 

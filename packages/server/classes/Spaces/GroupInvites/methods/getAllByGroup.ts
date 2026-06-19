@@ -1,6 +1,8 @@
 import GroupInviteKeyModel from "@db/group_invite_key"
+import type { Group } from "@db/groups"
+import type { GroupInviteKey } from "@db/group_invite_key"
 
-export default async function (group: any) {
+export default async function (group: Group): Promise<GroupInviteKey[]> {
 	if (typeof group !== "object") {
 		throw new OperationError(400, "group must be provided")
 	}
