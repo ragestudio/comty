@@ -1,11 +1,20 @@
+packages:
+  - "services/*"
+
 allowBuilds:
   bcrypt: true
   bufferutil: true
   esbuild: true
+  mediasoup: true
   msgpackr-extract: true
+  sharp: true
   unrs-resolver: set this to true or false
+  xxhash-addon: true
 
 blockExoticSubdeps: false
+
+minimumReleaseAgeExclude:
+  - '@ragestudio/scylla-odm@0.22.0'
 
 overrides:
   linebridge: link:../../modules/linebridge/server/build
