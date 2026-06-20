@@ -40,7 +40,7 @@
 		"d3": "^7.9.0",
 		"dashjs": "^5.0.3",
 		"dayjs": "^1.11.19",
-		"dompurify": "^3.3.2",
+		"dompurify": "^3.4.11",
 		"fast-average-color": "^9.2.0",
 		"file-type": "^21.3.3",
 		"fuse.js": "6.5.3",
