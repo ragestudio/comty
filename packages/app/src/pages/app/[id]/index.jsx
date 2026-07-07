@@ -1,9 +1,8 @@
 import React from "react"
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
-import ErrorBoundary from "@components/ErrorBoundary"
+import ErrorCatcher from "@components/ErrorCatcher"
 
-import useCenteredContainer from "@hooks/useCenteredContainer"
 import useTotalWindowHeight from "@hooks/useTotalWindowHeight"
 
 import "./index.less"
@@ -98,13 +97,13 @@ const AppPage = (props) => {
 
 	return (
 		<div className="custom-app-page-render">
-			<ErrorBoundary>
+			<ErrorCatcher>
 				{React.createElement(extensionRef.current.main.app.component, {
 					extension: extensionRef.current,
 					ctx,
 					setCtx,
 				})}
-			</ErrorBoundary>
+			</ErrorCatcher>
 		</div>
 	)
 }
