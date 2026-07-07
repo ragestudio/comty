@@ -30,41 +30,67 @@
 	&__list {
 		display: flex;
 		flex-direction: column;
+	}
+}
 
-		&__channel {
-			display: flex;
-			flex-direction: row;
+.group-settings-channels__list__channel {
+	display: flex;
+	flex-direction: row;
 
-			align-items: center;
+	align-items: center;
 
-			width: 100%;
+	width: 100%;
 
-			padding: 5px 10px;
-			gap: 5px;
+	padding: 5px 10px;
+	gap: 5px;
 
-			background-color: var(--background-color-accent);
+	background-color: var(--background-color-accent);
+	border-radius: 12px;
 
-			// if is odd, change background color
-			&:nth-child(odd) {
-				background-color: var(--background-color-accent-2);
-			}
+	// if is odd, change background color
+	&:nth-child(odd) {
+		background-color: var(--background-color-accent-2);
+	}
 
-			&__text {
-				display: flex;
-				flex-direction: column;
+	&__text {
+		display: flex;
+		flex-direction: column;
 
-				p {
-					font-size: 0.7rem;
-					opacity: 0.7;
-				}
-			}
-
-			&__actions {
-				display: flex;
-				flex-direction: row;
-
-				margin-left: auto;
-			}
+		p {
+			font-size: 0.7rem;
+			opacity: 0.7;
 		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		margin-left: auto;
+	}
+}
+
+.new-channel-dialog {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 10px;
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		gap: 5px;
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		gap: 5px;
+
+		margin-left: auto;
 	}
 }

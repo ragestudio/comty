@@ -1,7 +1,9 @@
 import React from "react"
+import { Radio, Input } from "antd"
 import Button from "@ui/Button"
-import { Icons } from "@components/Icons"
 import ConfirmButton from "@ui/ConfirmButton"
+
+import { Icons } from "@components/Icons"
 import SortableList from "@components/SortableList"
 
 import GroupsModel from "@models/groups"
@@ -9,8 +11,98 @@ import GroupContext from "@contexts/WithSpaces/group"
 
 import "./index.less"
 
+const CHANNEL_TYPES = ["chat", "voice"]
+
+const NewChannelDialog = ({ group_id, onCreated, close }) => {
+	const [name, setName] = React.useState("")
+	const [type, setType] = React.useState("chat")
+	const [loading, setLoading] = React.useState(false)
+
+	const canContinue = () => {
+		if (name.trim() === "") return false
+		if (!CHANNEL_TYPES.includes(type)) return false
+
+		return true
+	}
+
+	const submit = async () => {
+		if (!canContinue()) return
+		setLoading(true)
+
+		try {
+			const newChannel = await GroupsModel.channels.create(group_id, {
+				name: name,
+				kind: type,
+			})
+
+			if (typeof onCreated === "function") {
+				await onCreated(newChannel)
+			}
+		} catch (err) {
+		} finally {
+			if (typeof close === "function") {
+				close()
+			}
+			setLoading(false)
+		}
+	}
+
+	if (!group_id) {
+		if (typeof close === "function") {
+			close()
+		}
+
+		return null
+	}
+
+	return (
+		<div className="new-channel-dialog">
+			<h2>Create a new Channel</h2>
+
+			<div className="new-channel-dialog__field">
+				<span>Channel name</span>
+				<Input
+					placeholder="A new channel"
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+				/>
+			</div>
+
+			<div className="new-channel-dialog__field">
+				<span>Channel Type</span>
+				<Radio.Group
+					vertical
+					options={[
+						{
+							value: "chat",
+							label: "Text",
+						},
+						{
+							value: "voice",
+							label: "Voice",
+						},
+					]}
+					value={type}
+					onChange={(e) => setType(e.target.value)}
+				/>
+			</div>
+
+			<div className="new-channel-dialog__actions">
+				<Button
+					type="primary"
+					disabled={!canContinue()}
+					onClick={submit}
+					loading={loading}
+				>
+					Create
+				</Button>
+			</div>
+		</div>
+	)
+}
+
 const Channel = ({ data, onClickDelete }) => {
-	const { _id, name, description } = data
+	const { _id, name, kind, description } = data
 
 	return (
 		<div
@@ -18,7 +110,11 @@ const Channel = ({ data, onClickDelete }) => {
 			className="group-settings-channels__list__channel"
 		>
 			<div className="group-settings-channels__list__channel__text">
-				<span>{name}</span>
+				<span>
+					{kind === "chat" && <Icons.MessageSquare />}
+					{kind === "voice" && <Icons.Volume2 />}
+					{name}
+				</span>
 				<p>{description}</p>
 			</div>
 
@@ -34,13 +130,8 @@ const ChannelsList = ({ onDeleteChannel }) => {
 	const group = React.useContext(GroupContext)
 	const [channels, setChannels] = React.useState([])
 
-	const [L_Channels, R_Channels, E_Channels] = app.cores.api.useRequest(
-		GroupsModel.channels.list,
-		group?.data?._id,
-	)
-
 	const hasChanges = () => {
-		const originalChannelsIds = R_Channels.items.map((c) => c._id)
+		const originalChannelsIds = group.channels.items.map((c) => c._id)
 		const channelsIds = channels.map((c) => c._id)
 
 		// check if the channels orders are different
@@ -67,25 +158,15 @@ const ChannelsList = ({ onDeleteChannel }) => {
 	}
 
 	React.useEffect(() => {
-		if (R_Channels) {
-			setChannels(R_Channels.items)
-		}
-	}, [R_Channels])
-
-	if (E_Channels) {
-		return <div>Error</div>
-	}
-
-	if (L_Channels) {
-		return <div>Loading</div>
-	}
+		setChannels(group.channels.items)
+	}, [])
 
 	return (
 		<div className="group-settings-channels__list">
 			{hasChanges() ? "changes" : "no changes"}
 			<SortableList
 				itemIdKey="_id"
-				items={channels}
+				items={group.channels.items}
 				renderItem={(channel) => (
 					<Channel
 						key={channel._id}
@@ -105,9 +186,11 @@ const ChannelsSettings = () => {
 	const group = React.useContext(GroupContext)
 
 	const handleCreateNewChannel = async () => {
-		await GroupsModel.channels.create(group.data._id, {
-			name: "New channel",
-			kind: "chat",
+		app.layout.modal.open("new-channel-dialog", NewChannelDialog, {
+			props: {
+				group_id: group.data._id,
+				onCreated: (channel) => {},
+			},
 		})
 	}
 
@@ -118,10 +201,16 @@ const ChannelsSettings = () => {
 	return (
 		<div className="group-settings-channels">
 			<div className="group-settings-channels__header">
-				<h3>Channels</h3>
+				<h2>Channels</h2>
 
 				<div className="group-settings-channels__header__actions">
-					<Button onClick={handleCreateNewChannel}>Create new</Button>
+					<Button
+						type="default"
+						icon={<Icons.PlusCircle />}
+						onClick={handleCreateNewChannel}
+					>
+						Create new
+					</Button>
 				</div>
 			</div>
 
