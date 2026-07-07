@@ -1,3 +1,6 @@
 allowBuilds:
   core-js: true
   esbuild: true
+overrides:
+  '@comty/shared': link:../shared
+  shared: link:../shared
