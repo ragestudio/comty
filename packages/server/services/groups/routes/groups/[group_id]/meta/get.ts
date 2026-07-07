@@ -26,14 +26,9 @@ export default defineRoute<API>()({
 			total_members: 0,
 		}
 
-		console.time("getTotalMembers")
 		meta.total_members =
 			await GroupMemberships.getTotalMembersByGroupId(group_id)
-		console.timeEnd("getTotalMembers")
-
-		console.time("getTotalChannels")
 		meta.total_channels = await GroupChannels.getTotalByGroup(group)
-		console.timeEnd("getTotalChannels")
 
 		return meta
 	},
