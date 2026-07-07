@@ -1,5 +1,3 @@
-import UserAvatar from "@components/UserAvatar"
-
 export default async function (data) {
 	console.log("dmActivityUpdate", data)
 
