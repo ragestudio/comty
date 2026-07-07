@@ -38,7 +38,7 @@ export default class SysAudio {
 			session.defaultSession.setDisplayMediaRequestHandler(
 				async (request, callback) => {
 					const sources = await desktopCapturer.getSources({
-						types: ["screen"],
+						types: ["screen", "window"],
 					})
 
 					const obj = {
