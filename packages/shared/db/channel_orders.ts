@@ -19,6 +19,6 @@ export const schema = new Schema(
 	},
 )
 
-export const model = new Model("channel_orders", schema)
+export const model = new Model("group_channels_order", schema)
 
 export default model
