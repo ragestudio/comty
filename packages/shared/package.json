@@ -8,6 +8,6 @@
 		}
 	},
 	"dependencies": {
-		"@ragestudio/scylla-odm": "^0.22.10"
+		"@ragestudio/scylla-odm": "^0.22.12"
 	}
 }
