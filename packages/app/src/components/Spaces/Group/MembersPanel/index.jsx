@@ -49,7 +49,6 @@ const MemberContextMenu = ({ member, close }) => {
 				{member.roles?.map((role, index) => (
 					<Tag
 						key={role._id || index}
-						size="small"
 						variant={"filled"}
 					>
 						{role.label}
@@ -184,8 +183,6 @@ const MembersPanel = () => {
 		const list = group?.members?.items || []
 		const connectedIds = group?.connectedMembers || []
 
-		const connectedSet = new Set(connectedIds)
-
 		const onlineList = []
 		const offlineList = []
 
@@ -202,7 +199,7 @@ const MembersPanel = () => {
 		})
 
 		for (const member of sortedList) {
-			if (connectedSet.has(member.user_id)) {
+			if (connectedIds.includes(member.user_id)) {
 				onlineList.push(member)
 			} else {
 				offlineList.push(member)
@@ -210,7 +207,7 @@ const MembersPanel = () => {
 		}
 
 		return { online: onlineList, offline: offlineList }
-	}, [group?.members?.items, group?.connectedMembers])
+	}, [group.loading, group?.members?.items, group?.connectedMembers])
 
 	return (
 		<div className="group-page__members-panel">
@@ -227,7 +224,7 @@ const MembersPanel = () => {
 
 			{!group?.loading && group?.members?.items && (
 				<LoadMore
-					hasMore={group?.members?.has_hore}
+					hasMore={group?.members?.has_more}
 					loading={group.loading}
 					onBottom={group?.fetchMembers}
 					className="group-page__members-panel__list"
