@@ -1,6 +1,6 @@
 import React from "react"
 import Button from "@ui/Button"
-import { Select, Switch } from "antd"
+import { Radio, Select, Switch } from "antd"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
@@ -54,11 +54,13 @@ const ScreenShareDialog = ({ close }) => {
 						<span>Resolution</span>
 					</div>
 
-					<Select
-						options={resolutionsList}
-						value={resolution}
-						onChange={setResolution}
-					/>
+					<div className="screenshare-dialog__selectors__field__content">
+						<Select
+							options={resolutionsList}
+							value={resolution}
+							onChange={setResolution}
+						/>
+					</div>
 				</div>
 
 				<div
@@ -70,11 +72,13 @@ const ScreenShareDialog = ({ close }) => {
 						<span>Frame Rate</span>
 					</div>
 
-					<Select
-						options={frameratesList}
-						value={framerate}
-						onChange={setFramerate}
-					/>
+					<div className="screenshare-dialog__selectors__field__content">
+						<Select
+							options={frameratesList}
+							value={framerate}
+							onChange={setFramerate}
+						/>
+					</div>
 				</div>
 
 				<div
@@ -95,11 +99,13 @@ const ScreenShareDialog = ({ close }) => {
 						</div>
 					</div>
 
-					<Switch
-						disabled={!app.isDesktop}
-						checked={systemAudio}
-						onChange={(value) => setSystemAudio(value)}
-					/>
+					<div className="screenshare-dialog__selectors__field__content">
+						<Switch
+							disabled={!app.isDesktop}
+							checked={systemAudio}
+							onChange={(value) => setSystemAudio(value)}
+						/>
+					</div>
 				</div>
 			</div>
 
