@@ -1,7 +1,6 @@
 import ChatChannel from "."
 
 import MessageModel from "@db/channel_messages"
-import DeletedMessageModel from "@db/channel_deleted_messages"
 import ChannelLogModel from "@db/channel_log"
 
 export default async function (
@@ -47,14 +46,6 @@ export default async function (
 		actor_id: user._id,
 		timestamp: new Date(),
 	})
-
-	// // create a new deleted message obj
-	// DeletedMessageModel.batch.insert(batch, {
-	// 	_id: messageId,
-	// 	channel_id: this.channel._id.toString(),
-	// 	deleted_by_user_id: user._id.toString(),
-	// 	deleted_at: new Date(),
-	// })
 
 	// if onDelete callback is defined, execute it
 	if (typeof this.onDelete === "function") {

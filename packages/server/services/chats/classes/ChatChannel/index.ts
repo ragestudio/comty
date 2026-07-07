@@ -1,6 +1,9 @@
 import type { Worker as SnowflakeWorker } from "snowflake-uuid"
 import type ScyllaClientType from "@ragestudio/scylla-odm"
+import type { Client as RTEClient } from "linebridge/dist/classes/RtEngine/classes/client"
+
 import { Doc, InferDoc } from "@ragestudio/scylla-odm/types"
+import { Batch } from "@ragestudio/scylla-odm"
 
 import readMethod from "./read"
 import writeMethod from "./write"
@@ -8,7 +11,6 @@ import updateMethod from "./update"
 import deleteMethod from "./delete"
 
 import ChannelMessagesModel from "@db/channel_messages"
-import { Batch } from "@ragestudio/scylla-odm"
 
 export type onWriteCallbackType = (
 	user: RTEClient,
@@ -19,7 +21,7 @@ export type onReadCallbackType = (
 	user: RTEClient,
 	messages: Doc<InferDoc<typeof ChannelMessagesModel.schema>>[],
 	users: any[],
-	batch: Batch,
+	batch?: Batch,
 ) => Promise<void>
 export type onDeleteCallbackType = (
 	user: RTEClient,

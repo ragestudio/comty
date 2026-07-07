@@ -2,7 +2,7 @@ import type ChatChannel from "../ChatChannel"
 
 import MessageModel from "@db/channel_messages"
 
-export default async function (this: ChatChannel, user, payload) {
+export default async function (this: ChatChannel, user: any, payload: any) {
 	if (!user) {
 		throw new OperationError(400, "Missing user object")
 	}

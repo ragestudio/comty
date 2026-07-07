@@ -7,8 +7,8 @@ import ChannelLogModel from "@db/channel_log"
 
 export default async function (
 	this: ChatChannel,
-	user,
-	message_id,
+	user: any,
+	message_id: string,
 	update = {} as typeof ChannelMessagesSchema.fields,
 ) {
 	if (!user) {

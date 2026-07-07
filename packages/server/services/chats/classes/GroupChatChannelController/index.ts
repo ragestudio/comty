@@ -1,14 +1,18 @@
+import type { Server } from "linebridge"
+
 import Groups from "@shared-classes/Spaces/Groups"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
 
 import GroupChatChannel from "./instance"
 
 export default class GroupChatChannelController {
-	constructor(server) {
+	constructor(server: Server) {
 		this.server = server
 	}
 
-	get = async (group_id, channel_id, user_id) => {
+	server: Server
+
+	get = async (group_id: string, channel_id: string, user_id: string) => {
 		const group = await Groups.get(group_id, user_id)
 
 		if (!group) {

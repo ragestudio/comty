@@ -1,5 +1,4 @@
-// @ts-ignore
-import { User } from "@db_models"
+import User from "@db_models/user"
 import type ChatChannel from "../ChatChannel"
 
 import MessageModel from "@db/channel_messages"

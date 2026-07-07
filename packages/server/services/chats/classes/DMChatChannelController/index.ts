@@ -1,6 +1,6 @@
+import type { Server } from "linebridge"
 import mongoose from "mongoose"
-// @ts-ignore
-import { User } from "@db_models"
+import User from "@db_models/user"
 
 import DMChatChannel from "./instance"
 
@@ -16,11 +16,11 @@ type ExtendedDataRoom = typeof RoomsModel.schema.fields &
 	typeof ActivityModel.schema.fields
 
 export default class DMChatChannelController {
-	constructor(server) {
+	constructor(server: Server) {
 		this.server = server
 	}
 
-	server: any
+	server: Server
 
 	get snowflake() {
 		return this.server.contexts.snowflake
@@ -39,9 +39,11 @@ export default class DMChatChannelController {
 		const pair_key = genPairKey(from_user_id, to_user_id)
 
 		// search by pairkey
-		let room = await RoomsModel.findOne({
-			pair_key: pair_key,
-		})
+		let room = (
+			await RoomsModel.find({
+				pair_key: pair_key,
+			})
+		)[0]
 
 		// if the room doesn't exist, create it
 		if (!room) {
