@@ -1,22 +1,14 @@
+import type { Group as base } from "@comty/shared/db/groups"
+
 import type { Channels } from "./channel"
 import type { Members } from "./member"
 
-export interface Group {
-	_id: string
-	owner_user_id: string
-
-	name: string
-	description: string
-
-	icon?: string
-	cover?: string
-	groupCoverImageAverageColor?: string
+export interface Group extends Omit<base, "created_at"> {
+	created_at?: string
 
 	channels: Channels
 	members: Members
 
-	connected_members?: string[]
-
-	__v?: number
 	cached_at?: number
+	groupCoverImageAverageColor?: string
 }
