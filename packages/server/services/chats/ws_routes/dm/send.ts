@@ -16,6 +16,6 @@ export default defineRoute<API, "ws">()({
 
 		const room = await ctx.dmChannels.get(from_user_id, to_user_id)
 
-		return await room.write(client.socket.context.user, payload)
+		return await room.write(client.context.user, payload)
 	},
 })
