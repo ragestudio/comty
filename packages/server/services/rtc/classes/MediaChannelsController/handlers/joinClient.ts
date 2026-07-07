@@ -1,9 +1,18 @@
 import GroupChannelsModel from "@db/group_channels"
 
-export default async function (client, channelId) {
+import type MediaChannelsController from "../index"
+import { RTCClient } from "@services/rtc/types"
+
+export default async function (
+	this: MediaChannelsController,
+	client: RTCClient,
+	group_id: string,
+	channelId: string,
+) {
 	try {
 		const channel = await GroupChannelsModel.findOne(
 			{
+				group_id: group_id,
 				_id: channelId,
 			},
 			{
@@ -42,7 +51,6 @@ export default async function (client, channelId) {
 		// Set client channel
 		this.usersMap.set(client.userId, channelId)
 
-		// Join client to channel
 		return await channelInstance.joinClient(client)
 	} catch (error) {
 		console.error(`Error joining client ${client.userId}:`, error)

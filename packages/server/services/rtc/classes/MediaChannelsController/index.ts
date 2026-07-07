@@ -14,19 +14,26 @@ import handleUserDisconnectedToSocket from "./handlers/handleUserDisconnectedToS
 import findChannelsByGroupId from "./handlers/findChannelsByGroupId"
 import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
 
+import type { MediaChannel } from "@classes/MediaChannel/index.ts"
+import type { Server } from "linebridge"
+import { RTCClient } from "@services/rtc/types"
+
 export default class MediaChannelsController {
-	constructor(server) {
+	server: Server
+
+	constructor(server: Server) {
 		this.server = server
 	}
 
 	static allowedMediaCodecs = allowedMediaCodecs
 
-	worker = null
-	webrtcServer = null
-	instances = new Map()
-	usersMap = new Map()
+	worker: mediasoup.types.Worker = null
+	webrtcServer: mediasoup.types.WebRtcServer = null
+	instances: Map<string, MediaChannel> = new Map()
+	usersMap: Map<string, string> = new Map()
+	pendingDisconnectsTimeout: Map<string, NodeJS.Timeout> = new Map()
 
-	async initialize() {
+	async initialize(): Promise<void> {
 		try {
 			console.log("Initializing mediasoup worker...")
 
@@ -86,32 +93,46 @@ export default class MediaChannelsController {
 		}
 	}
 
-	joinClient = joinClient.bind(this)
-	leaveClient = leaveClient.bind(this)
+	joinClient = joinClient.bind(this) as OmitThisParameter<typeof joinClient>
+	leaveClient = leaveClient.bind(this) as OmitThisParameter<
+		typeof leaveClient
+	>
 
-	getUserJoinedGroupsIds = getUserJoinedGroupsIds.bind(this)
-	findChannelsByGroupId = findChannelsByGroupId.bind(this)
+	getUserJoinedGroupsIds = getUserJoinedGroupsIds.bind(
+		this,
+	) as OmitThisParameter<typeof getUserJoinedGroupsIds>
+	findChannelsByGroupId = findChannelsByGroupId.bind(
+		this,
+	) as OmitThisParameter<typeof findChannelsByGroupId>
 
-	handleUserConnectedToSocket = handleUserConnectedToSocket.bind(this)
-	handleUserDisconnectedToSocket = handleUserDisconnectedToSocket.bind(this)
+	handleUserConnectedToSocket = handleUserConnectedToSocket.bind(
+		this,
+	) as OmitThisParameter<typeof handleUserConnectedToSocket>
+	handleUserDisconnectedToSocket = handleUserDisconnectedToSocket.bind(
+		this,
+	) as OmitThisParameter<typeof handleUserDisconnectedToSocket>
 
-	validateGroupAccess = validateGroupAccess.bind(this)
-	createChannelInstance = createChannelInstance.bind(this)
+	validateGroupAccess = validateGroupAccess.bind(this) as OmitThisParameter<
+		typeof validateGroupAccess
+	>
+	createChannelInstance = createChannelInstance.bind(
+		this,
+	) as OmitThisParameter<typeof createChannelInstance>
 
-	static getAnnouncedIp = () => {
+	static getAnnouncedIp = (): string => {
 		let announcedIp = process.env.MEDIASOUP_ANNOUNCED_IP
 
 		if (!announcedIp) {
 			announcedIp =
 				process.env.NODE_ENV === "production"
-					? clientIp || "127.0.0.1"
+					? "127.0.0.1"
 					: "127.0.0.1"
 		}
 
 		return announcedIp
 	}
 
-	getClientChannel(client) {
+	getClientChannel(client: RTCClient): MediaChannel {
 		const currentUserMediaChannel = this.usersMap.get(client.userId)
 
 		if (!currentUserMediaChannel) {
@@ -127,7 +148,7 @@ export default class MediaChannelsController {
 		return channelInstance
 	}
 
-	cleanupOrphanedResources(client) {
+	cleanupOrphanedResources(client: RTCClient): void {
 		if (client.transports) {
 			for (const [, transport] of client.transports) {
 				try {
@@ -142,14 +163,11 @@ export default class MediaChannelsController {
 		}
 	}
 
-	/**
-	 * Send an event to the group topic
-	 * @param {String} group_id
-	 * @param {String} event
-	 * @param {Object} payload
-	 * @return {Promise}
-	 */
-	async sendToGroupTopic(group_id, event, payload) {
+	async sendToGroupTopic(
+		group_id: string,
+		event: string,
+		payload: any,
+	): Promise<any> {
 		const topic = `group:${group_id}`
 
 		try {
@@ -159,10 +177,7 @@ export default class MediaChannelsController {
 				payload,
 			)
 		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error sending to group topic`,
-				error,
-			)
+			console.error(`[CHANNEL] Error sending to group topic`, error)
 		}
 	}
 }

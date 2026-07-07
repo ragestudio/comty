@@ -1,3 +1,4 @@
+import type { RTEClient } from "linebridge"
 import * as mediasoup from "mediasoup"
 
 export type MediaChannelParams = {

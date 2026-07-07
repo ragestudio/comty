@@ -1,4 +1,10 @@
-export default async function (client) {
+import { RTCClient } from "@services/rtc/types"
+import type MediaChannelsController from "../index"
+
+export default async function (
+	this: MediaChannelsController,
+	client: RTCClient,
+): Promise<string | void> {
 	try {
 		const currentUserMediaChannel = this.usersMap.get(client.userId)
 
@@ -16,13 +22,9 @@ export default async function (client) {
 		this.usersMap.delete(client.userId)
 
 		// Leave channel
-		await channelInstance.leaveClient(client)
-
-		// // Cleanup empty channel
-		// if (channelInstance.clients.size === 0) {
-		// 	await channelInstance.close()
-		// 	this.instances.delete(channelId)
-		// }
+		await channelInstance.leaveClient(client, {
+			emitEventToSelf: true,
+		})
 
 		return channelInstance.channelId
 	} catch (error) {

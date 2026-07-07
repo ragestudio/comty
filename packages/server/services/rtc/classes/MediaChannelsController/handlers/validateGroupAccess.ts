@@ -1,7 +1,7 @@
 import GroupsModel from "@db/groups"
 import GroupMembershipsRefModel from "@db/group_memberships_ref"
 
-export default async function (userId, groupId) {
+export default async function (userId: string, groupId: string) {
 	const group = await GroupsModel.findOne(
 		{ _id: groupId },
 		{

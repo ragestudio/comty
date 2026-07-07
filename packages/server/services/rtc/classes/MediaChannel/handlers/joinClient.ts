@@ -1,6 +1,6 @@
-import type { RTCClient } from "../types.d.ts"
+import type { RTCClient } from "@services/rtc/types"
 
-async function joinClientHandler(this: any, client: RTCClient) {
+export default async function (this: any, client: RTCClient) {
 	try {
 		client.transports = new Map()
 
@@ -47,20 +47,6 @@ async function joinClientHandler(this: any, client: RTCClient) {
 
 		// publish to group topic
 		this.events.emit("client:join", this, client)
-		// await this.sendToGroupTopic("client:vc:join", {
-		// 	userId: client.userId,
-		// 	channelId: this.channelId,
-		// 	user: {
-		// 		_id: client.context.user._id,
-		// 		username: client.context.user.username,
-		// 		avatar: client.context.user.avatar,
-		// 	},
-		// 	voiceState: client.voiceState,
-		// 	channelClients: this.getConnectedClientsSerialized(),
-		// })
-		//
-
-		console.log("joinClient", client.userId, client.channel_id)
 
 		return {
 			started_at: this.started_at,
@@ -89,5 +75,3 @@ async function joinClientHandler(this: any, client: RTCClient) {
 		throw error
 	}
 }
-
-export default joinClientHandler

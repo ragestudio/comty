@@ -1,13 +1,13 @@
 import setFind from "@shared-utils/setFind"
-import type { RTCClient } from "../types.d.ts"
 
+import type { RTCClient } from "@services/rtc/types"
 export type LeaveClientOptions = {
 	emitEventToSelf?: boolean
 }
 
 async function leaveClientHandler(
 	this: any,
-	client: RTCClient,
+	client: Partial<RTCClient>,
 	{ emitEventToSelf = false }: LeaveClientOptions = {},
 ) {
 	try {

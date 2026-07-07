@@ -1,4 +1,10 @@
-export default async function (ctx) {
+import type MediaChannelsController from "../index"
+import type { ConnectionContext } from "../types"
+
+export default async function (
+	this: MediaChannelsController,
+	ctx: ConnectionContext,
+): Promise<null | void> {
 	if (!ctx || !ctx.meta || !ctx.meta.user_id) {
 		return null
 	}

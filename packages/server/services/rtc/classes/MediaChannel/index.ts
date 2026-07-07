@@ -11,7 +11,7 @@ import leaveClientHandler from "./handlers/leaveClient"
 import connectTransportHandler from "./handlers/connectTransport"
 import createTransportHandler from "./handlers/createTransport"
 
-import type { MediaChannelParams, RTCClient } from "./types"
+import type { MediaChannelParams, RTCClient } from "../../types"
 
 export type SerializedMediaChannel = {
 	__v: number
@@ -27,10 +27,10 @@ export type SerializedClient = {
 	user_id: string
 	voice_state: any
 	voiceState: any
-	user: {
-		_id: string
-		name: string
-		avatar: string
+	user?: {
+		_id?: string
+		name?: string
+		avatar?: string
 	}
 }
 
@@ -143,15 +143,29 @@ export class MediaChannel {
 		}
 	}
 
-	joinClient = joinClientHandler.bind(this)
-	leaveClient = leaveClientHandler.bind(this)
+	joinClient = joinClientHandler.bind(this) as OmitThisParameter<
+		typeof joinClientHandler
+	>
+	leaveClient = leaveClientHandler.bind(this) as OmitThisParameter<
+		typeof leaveClientHandler
+	>
 
-	createTransport = createTransportHandler.bind(this)
-	connectTransport = connectTransportHandler.bind(this)
+	createTransport = createTransportHandler.bind(this) as OmitThisParameter<
+		typeof createTransportHandler
+	>
+	connectTransport = connectTransportHandler.bind(this) as OmitThisParameter<
+		typeof connectTransportHandler
+	>
 
-	produce = produceHandler.bind(this)
-	stopProduce = stopProduceHandler.bind(this)
-	consume = consumeHandler.bind(this)
+	produce = produceHandler.bind(this) as OmitThisParameter<
+		typeof produceHandler
+	>
+	stopProduce = stopProduceHandler.bind(this) as OmitThisParameter<
+		typeof stopProduceHandler
+	>
+	consume = consumeHandler.bind(this) as OmitThisParameter<
+		typeof consumeHandler
+	>
 
 	async close() {
 		if (this.closed) {
@@ -321,6 +335,7 @@ export class MediaChannel {
 	getConnectedClientsSerialized(): SerializedClient[] {
 		return Array.from(this.clients).map((c) => {
 			return {
+				_id: c.userId,
 				userId: c.userId,
 				user_id: c.userId,
 				voiceState: c.voiceState,

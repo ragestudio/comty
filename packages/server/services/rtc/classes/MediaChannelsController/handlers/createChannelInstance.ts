@@ -1,7 +1,14 @@
-import MediaChannel from "@classes/MediaChannel/index.ts"
+import MediaChannel from "@classes/MediaChannel"
 import GroupChannelsModel from "@db/group_channels"
 
-export default async function (groupId, channelId) {
+import type MediaChannelsController from "../index"
+import type { MediaChannel as MediaChannelInstance } from "@classes/MediaChannel"
+
+export default async function (
+	this: MediaChannelsController,
+	groupId: string,
+	channelId: string,
+): Promise<MediaChannelInstance> {
 	// get the channel
 	const channel = await GroupChannelsModel.findOne({
 		_id: channelId,
@@ -16,14 +23,12 @@ export default async function (groupId, channelId) {
 	const channelInstance = new MediaChannel({
 		data: channel.toRaw(),
 		channelId: channelId,
+		// @ts-ignore
 		mediaCodecs: this.constructor.allowedMediaCodecs,
 		webrtcServer: this.webrtcServer,
 		worker: this.worker,
 		controller: this,
 	})
-
-	// initialize the channel instance
-	await channelInstance.initialize()
 
 	channelInstance.events.on("started", (_ch) => {
 		this.sendToGroupTopic(groupId, "vc:started", {
@@ -33,7 +38,7 @@ export default async function (groupId, channelId) {
 		})
 	})
 
-	channelInstance.events.on("ended", (_ch) => {
+	channelInstance.events.on("closed", (_ch) => {
 		this.sendToGroupTopic(groupId, "vc:ended", { channelId: _ch.channelId })
 	})
 
@@ -95,6 +100,9 @@ export default async function (groupId, channelId) {
 			},
 		})
 	})
+
+	// initialize the channel instance
+	await channelInstance.initialize()
 
 	// add the channel instance to the instances map
 	this.instances.set(channelId, channelInstance)
