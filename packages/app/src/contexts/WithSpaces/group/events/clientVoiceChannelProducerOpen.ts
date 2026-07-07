@@ -19,7 +19,13 @@ export default (
 			}
 		}
 
-		prev[payload.channelId].producers.push(payload.producer)
+		if (
+			!prev[payload.channelId].producers.some(
+				(p) => p.producerId === payload.producer.producerId,
+			)
+		) {
+			prev[payload.channelId].producers.push(payload.producer)
+		}
 
 		return prev
 	})

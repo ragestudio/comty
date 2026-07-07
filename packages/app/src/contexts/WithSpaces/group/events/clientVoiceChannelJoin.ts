@@ -30,7 +30,13 @@ export default (
 			}
 		}
 
-		prev[payload.channelId].clients.push(client)
+		if (
+			!prev[payload.channelId].clients.some(
+				(c) => c.userId === payload.userId,
+			)
+		) {
+			prev[payload.channelId].clients.push(client)
+		}
 
 		return prev
 	})

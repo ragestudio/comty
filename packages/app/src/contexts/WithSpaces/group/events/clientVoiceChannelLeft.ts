@@ -15,9 +15,9 @@ export default (
 			return prev
 		}
 
-		prev[payload.channelId].clients = prev[
-			payload.channelId
-		].clients.filter((client) => {
+		const newState = { ...prev[payload.channelId] }
+
+		newState.clients = newState.clients.filter((client) => {
 			if (client.userId === payload.userId) {
 				return false
 			}
@@ -25,6 +25,6 @@ export default (
 			return true
 		})
 
-		return prev
+		return { ...prev, [payload.channelId]: newState }
 	})
 }
