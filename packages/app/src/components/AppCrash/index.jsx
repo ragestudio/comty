@@ -1,6 +1,6 @@
 import React from "react"
 
-class ErrorBoundary extends React.Component {
+class AppCrash extends React.Component {
 	state = {
 		error: null,
 	}
@@ -26,7 +26,7 @@ class ErrorBoundary extends React.Component {
 						borderRadius: "14px",
 					}}
 				>
-					<h3>Render Error</h3>
+					<h3>App Crashed!</h3>
 					<code>{this.state.error.stack}</code>
 				</div>
 			)
@@ -36,4 +36,4 @@ class ErrorBoundary extends React.Component {
 	}
 }
 
-export default ErrorBoundary
+export default AppCrash

@@ -1,5 +1,4 @@
 import React from "react"
-import { useRouteError } from "react-router"
 import { Flex, Button } from "antd"
 import Image from "@components/Image"
 
@@ -17,13 +16,15 @@ const detailsPreStyle = {
 }
 
 const PageErrorBoundary = (props) => {
-	const error = useRouteError()
-	const errorId = React.useCallback(
+	const rawError = props.error
+
+	const error = rawError?.info || rawError
+	const componentStack = rawError?.componentStack || "unknown"
+
+	const errorId = React.useMemo(
 		() => `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 		[],
 	)
-	const errorInfo = error?.errorInfo
-
 	const handleRetry = () => {}
 
 	const handleReload = () => {
@@ -43,7 +44,7 @@ const PageErrorBoundary = (props) => {
 			errorId: errorId,
 			message: error?.message,
 			stack: error?.stack,
-			componentStack: errorInfo?.componentStack,
+			componentStack: componentStack,
 			path: props.path,
 			url: window.location.href,
 			timestamp: new Date().toISOString(),
@@ -59,6 +60,10 @@ const PageErrorBoundary = (props) => {
 		}
 	}
 
+	if (props.noDisplay) {
+		return null
+	}
+
 	return (
 		<Flex
 			vertical
@@ -68,7 +73,11 @@ const PageErrorBoundary = (props) => {
 				width: "100%",
 			}}
 		>
-			<Flex horizontal gap={20} align="center">
+			<Flex
+				horizontal
+				gap={20}
+				align="center"
+			>
 				<Image
 					src={
 						randomErrorImages[
@@ -89,7 +98,10 @@ const PageErrorBoundary = (props) => {
 					}}
 				/>
 
-				<Flex vertical gap={10}>
+				<Flex
+					vertical
+					gap={10}
+				>
 					<h2 style={{ margin: 0, fontSize: "1.2rem" }}>
 						Something went wrong
 					</h2>
@@ -109,7 +121,10 @@ const PageErrorBoundary = (props) => {
 				</pre>
 			</Flex>
 
-			<Flex vertical gap={10}>
+			<Flex
+				vertical
+				gap={10}
+			>
 				<details>
 					<summary style={{ cursor: "pointer", fontWeight: "bold" }}>
 						Error Stack
@@ -124,8 +139,7 @@ const PageErrorBoundary = (props) => {
 						Component Stack
 					</summary>
 					<pre style={detailsPreStyle}>
-						{errorInfo?.componentStack ||
-							"No component stack available"}
+						{componentStack || "No component stack available"}
 					</pre>
 				</details>
 
@@ -139,7 +153,10 @@ const PageErrorBoundary = (props) => {
 				</details>
 			</Flex>
 
-			<Flex horizontal gap={10}>
+			<Flex
+				horizontal
+				gap={10}
+			>
 				<Button onClick={handleRetry}>🔄 Retry</Button>
 				<Button onClick={handleReload}>🔄 Reload Page</Button>
 				<Button onClick={copyErrorDetails}>
