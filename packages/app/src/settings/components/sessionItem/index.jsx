@@ -32,7 +32,7 @@ const DeviceIcon = (props) => {
 			return <FirefoxIcon />
 		}
 		default: {
-			return <Icons.FiGlobe />
+			return <Icons.Globe />
 		}
 	}
 }

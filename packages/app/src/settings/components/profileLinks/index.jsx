@@ -6,7 +6,7 @@ import userLinksDecorators from "@config/linksDecorators"
 
 import "./index.less"
 
-export default class ProfileEditor extends React.Component {
+export default class ProfileLinks extends React.Component {
 	state = {
 		fields: this.props.ctx.currentValue ?? [],
 	}
@@ -147,7 +147,7 @@ export default class ProfileEditor extends React.Component {
 
 				<Button
 					onClick={this.add}
-					icon={<Icons.FiPlus />}
+					icon={<Icons.Plus />}
 				>
 					Add
 				</Button>

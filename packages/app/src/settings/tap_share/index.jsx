@@ -98,7 +98,7 @@ const RegisterNewTag = (props) => {
 				/>
 
 				<div className="tap-share-register-header-icon">
-					<Icons.MdNfc />
+					<Icons.Nfc />
 				</div>
 
 				<h1>Register new tag</h1>
@@ -121,7 +121,7 @@ const TagItem = (props) => {
 			className="tap-share-own_tags-item"
 		>
 			<div className="tap-share-own_tags-item-icon">
-				<Icons.MdNfc />
+				<Icons.Nfc />
 			</div>
 
 			<div className="tap-share-own_tags-item-title">
@@ -357,7 +357,7 @@ const TapShareRender = () => {
 
 export default {
 	id: "tap_share",
-	icon: "MdNfc",
+	icon: "Nfc",
 	label: "Tap Share",
 	group: "advanced",
 	render: TapShareRender,

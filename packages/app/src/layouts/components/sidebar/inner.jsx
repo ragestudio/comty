@@ -16,7 +16,7 @@ const ActionMenuItems = [
 		key: "profile",
 		label: (
 			<>
-				<Icons.FiUser />
+				<Icons.User />
 				<Translation>{(t) => t("Profile")}</Translation>
 			</>
 		),
@@ -25,7 +25,7 @@ const ActionMenuItems = [
 		key: "studio",
 		label: (
 			<>
-				<Icons.MdHardware />
+				<Icons.CircleFadingPlusIcon />
 				<Translation>{(t) => t("Studio")}</Translation>
 			</>
 		),
@@ -34,7 +34,7 @@ const ActionMenuItems = [
 		key: "addons",
 		label: (
 			<>
-				<Icons.FiBox />
+				<Icons.Box />
 				<Translation>{(t) => t("Addons")}</Translation>
 			</>
 		),
@@ -43,7 +43,7 @@ const ActionMenuItems = [
 		key: "settings",
 		label: (
 			<>
-				<Icons.FiSettings />
+				<Icons.Settings />
 				<Translation>{(t) => t("Settings")}</Translation>
 			</>
 		),
@@ -55,7 +55,7 @@ const ActionMenuItems = [
 		key: "switch_account",
 		label: (
 			<>
-				<Icons.MdSwitchAccount />
+				<Icons.SquareArrowRightEnter />
 				<Translation>{(t) => t("Switch account")}</Translation>
 			</>
 		),
@@ -64,7 +64,7 @@ const ActionMenuItems = [
 		key: "logout",
 		label: (
 			<>
-				<Icons.FiLogOut />
+				<Icons.LogOut />
 				<Translation>{(t) => t("Logout")}</Translation>
 			</>
 		),
@@ -109,7 +109,7 @@ export function authorizedItems({ onClickDropdownItem, onDropdownOpenChange }) {
 		items.push({
 			key: "login",
 			label: <Translation>{(t) => t("Login")}</Translation>,
-			icon: <Icons.FiLogIn />,
+			icon: <Icons.LogIn />,
 		})
 	}
 
@@ -129,7 +129,7 @@ const SidebarInner = ({
 }) => {
 	const [isPresent] = usePresence()
 	const [hidden, setHidden] = React.useState(false)
-	const sidebarRef = React.useRef()
+	const sidebarRef = React.useRef(null)
 
 	const handleOnMouseEnter = () => {
 		if (hidden) {

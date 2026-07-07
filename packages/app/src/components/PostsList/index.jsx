@@ -1,6 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import * as antd from "antd"
+import { Icons } from "@components/Icons"
 import lodash from "lodash"
 import { AnimatePresence } from "motion/react"
 

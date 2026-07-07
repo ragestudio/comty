@@ -46,7 +46,7 @@ const MoreActionsItems = [
 		key: "onClickShare",
 		label: (
 			<>
-				<Icons.FiShare />
+				<Icons.Send />
 				<span>Share</span>
 			</>
 		),
@@ -58,7 +58,7 @@ const MoreActionsItems = [
 		key: "onClickReport",
 		label: (
 			<>
-				<Icons.FiAlertTriangle />
+				<Icons.TriangleAlert />
 				<span>Report</span>
 			</>
 		),
@@ -152,7 +152,7 @@ const PostActions = (props) => {
 						}}
 					>
 						<div className="icon">
-							<Icons.FiMoreHorizontal />
+							<Icons.MoreHorizontal />
 						</div>
 					</Dropdown>
 				</div>

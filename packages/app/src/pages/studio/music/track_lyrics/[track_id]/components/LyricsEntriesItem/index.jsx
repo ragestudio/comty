@@ -14,13 +14,7 @@ import {
 	Switch,
 } from "antd"
 
-import {
-	DeleteOutlined,
-	EditOutlined,
-	SaveOutlined,
-	CloseOutlined,
-	PlayCircleOutlined,
-} from "@ant-design/icons"
+import { Icons } from "@components/Icons"
 
 import { formatSecondsToLRC } from "../../utils/lrcParser"
 
@@ -102,14 +96,14 @@ const Line = React.memo(
 										<Button
 											type="primary"
 											size="small"
-											icon={<SaveOutlined />}
+											icon={<Icons.Save />}
 											onClick={handleEditLineSave}
 										>
 											Save
 										</Button>
 										<Button
 											size="small"
-											icon={<CloseOutlined />}
+											icon={<Icons.XCircle />}
 											onClick={handleEditLineCancel}
 										>
 											Cancel
@@ -139,7 +133,7 @@ const Line = React.memo(
 						<Button
 							type="link"
 							size="small"
-							icon={<PlayCircleOutlined />}
+							icon={<Icons.PlayCircle />}
 							onClick={(e) => {
 								e.preventDefault()
 								e.stopPropagation()
@@ -187,7 +181,7 @@ const Line = React.memo(
 							<Button
 								type="text"
 								size="small"
-								icon={<EditOutlined />}
+								icon={<Icons.Edit3 />}
 								onClick={() => handleEditLineStart(line)}
 								style={{ padding: "4px" }}
 							/>
@@ -201,7 +195,7 @@ const Line = React.memo(
 								<Button
 									type="text"
 									size="small"
-									icon={<DeleteOutlined />}
+									icon={<Icons.Delete />}
 									danger
 									style={{
 										padding: "4px",

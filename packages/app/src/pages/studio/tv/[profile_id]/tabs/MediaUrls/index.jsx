@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { FiLink } from "react-icons/fi"
+import { Icons } from "@components/Icons"
 
 const MediaUrls = ({ profile }) => {
 	const { urls } = profile
@@ -13,7 +13,7 @@ const MediaUrls = ({ profile }) => {
 		<div className="profile-section content-panel">
 			<div className="profile-section__header">
 				<span>
-					<FiLink /> Medias
+					<Icons.Link /> Medias
 				</span>
 			</div>
 

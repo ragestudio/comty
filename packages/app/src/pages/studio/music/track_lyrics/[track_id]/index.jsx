@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
 import { Button, Segmented, Alert, Flex } from "antd"
-import { SaveOutlined } from "@ant-design/icons"
+import { Icons } from "@components/Icons"
 import { parseLRC, formatToLRC } from "./utils/lrcParser"
 
 import {
@@ -182,7 +182,7 @@ const EnhancedLyricsEditorContent = ({ trackId }) => {
 
 				<Button
 					type="primary"
-					icon={<SaveOutlined />}
+					icon={<Icons.Save />}
 					onClick={handleSave}
 					loading={state.saving}
 					//disabled={!state.isDirty}

@@ -1,8 +1,8 @@
 import React from "react"
 import * as antd from "antd"
 import Streaming from "@models/spectrum"
+import { Icons } from "@components/Icons"
 
-import { FiXCircle } from "react-icons/fi"
 import NewRestreamServerForm from "./NewRestreamServerForm"
 
 import ConfirmButton from "@ui/ConfirmButton"
@@ -34,7 +34,7 @@ const RestreamItem = ({ item, index, loading, onDelete }) => {
 
 			<div className="data-field__actions">
 				<ConfirmButton
-					icon={<FiXCircle />}
+					icon={<Icons.XCircle />}
 					onConfirm={onDelete}
 				/>
 			</div>

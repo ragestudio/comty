@@ -10,11 +10,8 @@ import {
 	Typography,
 	message,
 } from "antd"
-import {
-	VideoCameraOutlined,
-	ClockCircleOutlined,
-	UploadOutlined,
-} from "@ant-design/icons"
+import { Icons } from "@components/Icons"
+
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 
@@ -96,7 +93,7 @@ const VideoEditor = () => {
 			) : (
 				<Empty
 					image={
-						<VideoCameraOutlined
+						<Icons.VideoOff
 							style={{ fontSize: 64, color: "#d9d9d9" }}
 						/>
 					}
@@ -148,7 +145,7 @@ const VideoEditor = () => {
 								accept={["video/*"]}
 								headers={{ transformations: "mq-hls" }}
 								disabled={state.saving}
-								icon={<UploadOutlined />}
+								icon={<Icons.Upload />}
 							>
 								Upload Video
 							</UploadButton>

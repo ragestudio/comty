@@ -1,6 +1,6 @@
 export default {
 	id: "app",
-	icon: "FiCommand",
+	icon: "Command",
 	label: "Application",
 	group: "advanced",
 	disabled: !app.isDesktop,

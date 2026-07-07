@@ -1,5 +1,5 @@
 import React from "react"
-import { FiEye, FiRadio } from "react-icons/fi"
+import { Icons } from "@components/Icons"
 
 const ProfileHeader = ({ profile, streamHealth }) => {
 	const streamRef = React.useRef(streamHealth ?? {})
@@ -64,7 +64,7 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 					{streamHealth?.available ? (
 						<div className="profile-header__card on_live">
 							<span>
-								<FiRadio /> On Live
+								<Icons.Radio /> On Live
 							</span>
 						</div>
 					) : (
@@ -75,7 +75,7 @@ const ProfileHeader = ({ profile, streamHealth }) => {
 
 					<div className="profile-header__card viewers">
 						<span>
-							<FiEye />
+							<Icons.Eye />
 							{streamHealth?.viewers}
 						</span>
 					</div>

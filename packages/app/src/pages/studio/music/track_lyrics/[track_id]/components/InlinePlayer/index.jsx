@@ -1,12 +1,8 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { Button, Slider, Flex } from "antd"
-import {
-	PlayCircleOutlined,
-	PauseCircleOutlined,
-	SoundOutlined,
-	LoadingOutlined,
-} from "@ant-design/icons"
+
+import { Icons } from "@components/Icons"
 
 import { useAudioPlayer } from "../../hooks/useAudioPlayer"
 
@@ -46,19 +42,25 @@ const InlinePlayer = React.forwardRef(({ src }, ref) => {
 
 	return (
 		<div className="inline-player">
-			<Flex horizontal align="center" justify="space-between">
-				<Flex horizontal align="center" gap={20}>
+			<Flex
+				align="center"
+				justify="space-between"
+			>
+				<Flex
+					align="center"
+					gap={20}
+				>
 					<Button
 						type="primary"
 						shape="circle"
 						size="large"
 						icon={
 							isLoading ? (
-								<LoadingOutlined spin />
+								<Icons.LoadingOutlined spin />
 							) : isPlaying ? (
-								<PauseCircleOutlined />
+								<Icons.PauseCircle />
 							) : (
-								<PlayCircleOutlined />
+								<Icons.PlayCircle />
 							)
 						}
 						onClick={toggle}
@@ -66,8 +68,11 @@ const InlinePlayer = React.forwardRef(({ src }, ref) => {
 						className="control-button play-button"
 					/>
 
-					<Flex horizontal align="center" gap={5}>
-						<SoundOutlined />
+					<Flex
+						align="center"
+						gap={5}
+					>
+						<Icons.Volume2 />
 						<Slider
 							min={0}
 							max={1}
@@ -79,7 +84,7 @@ const InlinePlayer = React.forwardRef(({ src }, ref) => {
 								formatter: (value) =>
 									`${Math.round(value * 100)}%`,
 							}}
-							icon={<SoundOutlined />}
+							icon={<Icons.Volume1 />}
 							style={{ width: "100px" }}
 						/>
 					</Flex>
@@ -90,8 +95,14 @@ const InlinePlayer = React.forwardRef(({ src }, ref) => {
 				</code>
 			</Flex>
 
-			<Flex vertical gap={10}>
-				<SeekBar audio={audio} onSeek={seek} />
+			<Flex
+				vertical
+				gap={10}
+			>
+				<SeekBar
+					audio={audio}
+					onSeek={seek}
+				/>
 
 				<div className="speed-controls">
 					{speedOptions.map((option) => (
