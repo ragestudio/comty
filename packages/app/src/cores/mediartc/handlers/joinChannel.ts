@@ -16,15 +16,28 @@ export default async function (
 			self: this,
 		})
 
-		const data = await this.socket.call("channel:join", channelData._id)
+		const data = await this.socket.call("channel:join", {
+			is_dm: false,
+			channel_id: channelData._id,
+			group_id: groupId,
+		})
+
+		this.console.debug("Channel join data:", data)
+
+		if (!data) {
+			console.error(
+				"Server did not respond with a valid channel join data",
+			)
+			throw new Error("Invalid server response")
+		}
 
 		this.state.channel = channelData
 		this.state.channelId = channelId
 
+		await this.handlers.attachChannel(data)
+
 		// dispatch sfx
 		app.cores.sfx.play("media_channel_join")
-
-		await this.handlers.attachChannel(data)
 	} catch (error: any) {
 		app.cores.notifications.new({
 			title: "Failed to join channel",
