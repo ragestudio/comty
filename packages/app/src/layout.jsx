@@ -1,6 +1,7 @@
 import React from "react"
 
 import Layouts from "@layouts"
+import ErrorCatcher from "@components/ErrorCatcher"
 
 export const LAYOUT_DEFAULT_CONTEXT = {
 	interfacesProperties: {},
@@ -90,7 +91,9 @@ export default class Layout extends React.PureComponent {
 	}
 
 	componentDidCatch(info, stack) {
-		this.setState({ renderError: { info, stack } })
+		this.setState({
+			renderError: { info, componentStack: stack.componentStack },
+		})
 	}
 
 	layoutInterface = (window.app.layout = {
@@ -217,25 +220,22 @@ export default class Layout extends React.PureComponent {
 		}
 
 		if (this.state.renderError) {
-			if (this.props.staticRenders?.RenderError) {
-				return React.createElement(
-					this.props.staticRenders?.RenderError,
-					{
-						error: this.state.renderError,
-					},
-				)
-			}
-
-			return JSON.stringify(this.state.renderError)
+			return (
+				<div className="app-layout__error">
+					<ErrorCatcher error={this.state.renderError} />
+				</div>
+			)
 		}
 
 		const Layout = Layouts[layoutType]
 
 		if (!Layout) {
-			return app.eventBus.emit(
+			app.eventBus.emit(
 				"runtime.crash",
 				new Error(`Layout type [${layoutType}] not found`),
 			)
+
+			return null
 		}
 
 		return (
