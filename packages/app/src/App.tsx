@@ -1,11 +1,13 @@
+import { Runtime } from "vessel/runtime"
+import ReactAdapter from "vessel/adapters/react"
+
 import React from "react"
 import * as antd from "antd"
-import { Runtime } from "@ragestudio/vessel"
-import * as Router from "@ragestudio/vessel/router"
+import * as Router from "vessel/router"
 import * as Sentry from "@sentry/browser"
 import { ThemeProvider } from "@cores/style/style.core.jsx"
 import NotificationsRenderer from "./cores/notifications/render"
-import ErrorBoundary from "@components/ErrorBoundary"
+import AppCrash from "@components/AppCrash"
 import AuthManager from "@classes/AuthManager"
 import Layout from "./layout"
 import StaticMethods from "./statics/methods"
@@ -17,8 +19,9 @@ import routesDeclarations from "@config/routes"
 import onPageMount from "@hooks/onPageMount"
 
 import "@styles/index.less"
+import { VesselApp } from "vessel/runtime"
 
-class ComtyApp extends React.Component {
+class ComtyApp extends React.Component implements VesselApp {
 	// "mierda conocida, mejor que mierda por conocer" - yugel nunca dijo. 2025.
 	static publicEvents = StaticEvents
 	static publicMethods = StaticMethods
@@ -64,7 +67,7 @@ class ComtyApp extends React.Component {
 	}
 
 	componentDidMount = async () => {
-		const notfCore = this.props.runtime.cores.cores.get("notifications")
+		const notfCore = this.props.runtime.cores.get("notifications")
 		app.message = notfCore.message
 
 		if (notfCore) {
@@ -76,9 +79,7 @@ class ComtyApp extends React.Component {
 
 		app.cores.sfx.play("splash_out")
 
-		if (
-			window.app.version !== window.localStorage.getItem("last_version")
-		) {
+		if (window.app.version !== window.localStorage.getItem("last_version")) {
 			app.message.info(
 				`Comty has been updated to version ${window.app.version}!`,
 			)
@@ -98,8 +99,8 @@ class ComtyApp extends React.Component {
 		return (
 			<React.Fragment>
 				<ThemeProvider>
-					<NotificationsRenderer ref={this.notificationsRef} />
-					<ErrorBoundary>
+					<AppCrash>
+						<NotificationsRenderer ref={this.notificationsRef} />
 						<Layout staticRenders={ComtyApp.staticRenders}>
 							{this.state.firstInitialized && (
 								<Router.Render
@@ -109,11 +110,11 @@ class ComtyApp extends React.Component {
 								/>
 							)}
 						</Layout>
-					</ErrorBoundary>
+					</AppCrash>
 				</ThemeProvider>
 			</React.Fragment>
 		)
 	}
 }
 
-export default new Runtime(ComtyApp)
+export default new Runtime(ComtyApp, ReactAdapter)
