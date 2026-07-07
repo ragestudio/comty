@@ -65,7 +65,7 @@ const DMChat = ({ to_user_id }) => {
 
 				<Chat
 					_id={to_user_id}
-					type="direct"
+					type="dm"
 				/>
 			</div>
 		</ContentPanelContext>
