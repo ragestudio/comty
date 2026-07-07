@@ -5,7 +5,7 @@ const DEFAULT_DATA = {
 	title: null,
 	props: null,
 	headerContent: null,
-	setContent: () => {},
+	setContent: (data) => {},
 	registerHeaderContent: () => {},
 	unregisterHeaderContent: () => {},
 	setSelectedContentTab: () => {},
