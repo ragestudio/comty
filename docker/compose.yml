@@ -8,6 +8,7 @@ services:
     networks:
       - redis_network
     command: "dragonfly --logtostderr --cache_mode=true --maxmemory=8gb --cluster_mode=emulated --lock_on_hashtags --default_lua_flags=allow-undeclared-keys"
+
   scylla:
     image: scylladb/scylla:latest
     container_name: comty-scylla
@@ -18,6 +19,7 @@ services:
       - ./data/scylladb:/var/lib/scylla
     environment:
       - SCYLLA_ARGS=--overprovisioned
+
   mongodb:
     image: mongo:8.0.17
     container_name: comty-mongodb
@@ -30,8 +32,14 @@ services:
       - ./data/mongodb:/data/db
 
   server:
-    build: ../packages/server
     container_name: comty-api
+    image: ragestudio/comty-server
+    build:
+      context: ../packages/server
+      dockerfile: ./Dockerfile
+      additional_contexts:
+        shared: ../packages/shared
+
     restart: unless-stopped
     depends_on:
       - mongodb
@@ -44,7 +52,7 @@ services:
       - redis_network
     ports:
       - "9000:9000" # API HTTP/WS Gateway port
-      - "40000-40099:40000-40099" # WebRTC signaling ports
+      - "40000:40000" # WebRTC signaling ports
     env_file:
       - ./.env
     volumes:
