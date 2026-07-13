@@ -29,6 +29,9 @@ importers:
       bullmq:
         specifier: ^5.79.0
         version: 5.79.1
+      cross-env:
+        specifier: 10.1.0
+        version: 10.1.0
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -81,9 +84,6 @@ importers:
       chai:
         specifier: ^6.2.2
         version: 6.2.2
-      cross-env:
-        specifier: ^10.1.0
-        version: 10.1.0
       eslint:
         specifier: ^10.5.0
         version: 10.5.0
