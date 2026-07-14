@@ -9,14 +9,14 @@ import { authorizedItems } from "@layouts/components/sidebar/inner"
 import SidebarItemsClickHandlers from "@layouts/components/sidebar/itemClickHandlers"
 
 import GroupsList from "@components/Spaces/GroupList"
-import SpacesPageContext from "@contexts/WithSpaces/page"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 
 import QuickSettings from "./quickSettings"
 
 import "./sidebar.less"
 
 const SpacesSidebar = () => {
-	const { type, room } = React.useContext(SpacesPageContext)
+	const { type, room } = useSpacesNavigation()
 
 	const [compact, setCompact] = React.useState(false)
 

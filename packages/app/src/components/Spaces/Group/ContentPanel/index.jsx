@@ -5,84 +5,83 @@ import Chat from "@components/Spaces/Chat"
 import VoiceChannel from "@components/Spaces/VoiceChannel"
 import SettingsPanel from "@components/Spaces/Group/SettingsPanel"
 
-import ContentPanelContext from "@contexts/WithSpaces/contentPanel"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 import GroupContext from "@contexts/WithSpaces/group"
 
 import "./index.less"
 
-const Tabs = {
+const CONTENT_REGISTRY = {
 	chat: {
+		icon: Icons.Hash,
 		title: "Chat",
 		component: Chat,
+	},
+	channel: {
+		icon: Icons.Volume2,
+		title: "Channel",
+		component: VoiceChannel,
 	},
 	settings: {
 		title: "Settings",
 		component: SettingsPanel,
 	},
-	channel: {
-		title: "Channel",
-		component: VoiceChannel,
-	},
+}
+
+const resolveContent = (spaces, group) => {
+	if (spaces.subview === "settings") {
+		return {
+			type: "settings",
+			definition: CONTENT_REGISTRY.settings,
+			channelData: null,
+		}
+	}
+
+	if (!spaces.channel) {
+		return { type: null, definition: null, channelData: null }
+	}
+
+	const channelData =
+		group?.channels?.items?.find((c) => c._id === spaces.channel) ?? null
+
+	const contentType =
+		spaces.subview === "voice" || channelData?.kind === "voice"
+			? "channel"
+			: "chat"
+
+	return {
+		type: contentType,
+		definition: CONTENT_REGISTRY[contentType],
+		channelData,
+	}
 }
 
 export const ContentPanelHeader = () => {
-	const content = React.useContext(ContentPanelContext)
+	const spaces = useSpacesNavigation()
+	const group = React.useContext(GroupContext)
 
-	if (content.type === "chat") {
-		return (
-			<div className="group-page__content-panel__header">
-				<p>
-					<Icons.Hash />
-					{content.title ?? Tabs[content.type]?.title}
-				</p>
+	const { definition, channelData } = resolveContent(spaces, group)
 
-				{content.description && (
-					<>
-						<div className="divider" />
-						<span>{content.description}</span>
-					</>
-				)}
-
-				{content.headerContent && (
-					<div className="group-page__content-panel__header__content">
-						{content.headerContent()}
-					</div>
-				)}
-			</div>
-		)
-	}
-
-	if (content.type === "group") {
-		return (
-			<div className="group-page__content-panel__header">
-				<p>
-					<Icons.Volume2 />
-					{content.title ?? Tabs[content.type]?.title}
-				</p>
-
-				{content.description && (
-					<>
-						<div className="divider" />
-						<span>{content.description}</span>
-					</>
-				)}
-
-				{content.headerContent && (
-					<div className="group-page__content-panel__header__content">
-						{content.headerContent()}
-					</div>
-				)}
-			</div>
-		)
-	}
+	const title = channelData?.name ?? definition?.title
+	const description = channelData?.description
+	const Icon = definition?.icon
 
 	return (
 		<div className="group-page__content-panel__header">
-			{Tabs[content.type]?.title}
+			<p>
+				{Icon && <Icon />}
+				{title}
+			</p>
 
-			{content.headerContent && (
+			{description && (
+				<>
+					<div className="divider" />
+					<span>{description}</span>
+				</>
+			)}
+
+			{spaces.headerContent && (
 				<div className="group-page__content-panel__header__content">
-					{content.headerContent()}
+					{spaces.headerContent()}
 				</div>
 			)}
 		</div>
@@ -90,23 +89,17 @@ export const ContentPanelHeader = () => {
 }
 
 export const ContentPanelRender = () => {
-	const content = React.useContext(ContentPanelContext)
+	const spaces = useSpacesNavigation()
 	const group = React.useContext(GroupContext)
 
-	if (!content.type) {
+	const { type, definition } = resolveContent(spaces, group)
+
+	if (!type || !definition?.component) {
 		return null
 	}
 
-	if (!Tabs[content.type] || !Tabs[content.type].component) {
-		return (
-			<div>
-				<p>Not valid</p>
-			</div>
-		)
-	}
-
-	return React.createElement(Tabs[content.type].component, {
-		...content.props,
-		group: group,
+	return React.createElement(definition.component, {
+		_id: spaces.channel,
+		group,
 	})
 }

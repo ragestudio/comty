@@ -5,13 +5,13 @@ import { Icons } from "@components/Icons"
 import ChannelsListItem from "./item"
 
 import { GroupContext, VALID_CHANNEL_KINDS } from "@contexts/WithSpaces/group"
-import SpacesPageContext from "@contexts/WithSpaces/page"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 
 import "./index.less"
 
 const ChannelsPanel = () => {
 	const group = React.useContext(GroupContext)
-	const page = React.useContext(SpacesPageContext)
+	const spaces = useSpacesNavigation()
 
 	const handleOnClickChannel = React.useCallback(
 		(channel) => {
@@ -21,8 +21,10 @@ const ChannelsPanel = () => {
 
 			if (channel.kind === "voice") {
 				if (app.cores.mediartc.state().channelId === channel._id) {
-					page.setChannel(channel._id)
-					page.setIsVoice(true)
+					spaces.navigate({
+						channel: channel._id,
+						subview: "voice",
+					})
 					return
 				}
 
@@ -32,8 +34,10 @@ const ChannelsPanel = () => {
 			}
 
 			if (channel.kind === "chat") {
-				page.setChannel(channel._id)
-				page.setIsVoice(false)
+				spaces.navigate({
+					channel: channel._id,
+					subview: null,
+				})
 			}
 		},
 		[group],
@@ -68,7 +72,7 @@ const ChannelsPanel = () => {
 								clients={clients}
 								producers={producers}
 								startedAt={startedAt}
-								selected={page.channel === channel._id}
+								selected={spaces.channel === channel._id}
 								handleOnClick={() =>
 									handleOnClickChannel(channel)
 								}

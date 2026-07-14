@@ -15,9 +15,9 @@ import BottomBar from "@layouts/components/@mobile/bottomBar"
 import OptInDialog from "../../components/Spaces/OptInDialog"
 
 import {
-	controller as SpacesPageController,
-	context as SpacesPageContext,
-} from "@contexts/WithSpaces/page"
+	useSpacesNavigationController,
+	SpacesNavigationContext,
+} from "@contexts/WithSpaces/navigation"
 
 import "./index.less"
 
@@ -49,7 +49,7 @@ const useIsConnectedToMainSocket = () => {
 }
 
 const SpacesLayout = (props) => {
-	const controller = SpacesPageController()
+	const controller = useSpacesNavigationController()
 	const isMainSocketConnected = useIsConnectedToMainSocket()
 
 	React.useEffect(() => {
@@ -79,7 +79,7 @@ const SpacesLayout = (props) => {
 				id="app_layout"
 				className="app_layout"
 			>
-				<SpacesPageContext.Provider value={controller}>
+				<SpacesNavigationContext.Provider value={controller}>
 					{!app.isMobile && <Sidebar />}
 
 					<Layout.Content
@@ -104,7 +104,7 @@ const SpacesLayout = (props) => {
 					</Layout.Content>
 
 					{app.isMobile && <BottomBar />}
-				</SpacesPageContext.Provider>
+				</SpacesNavigationContext.Provider>
 			</Layout>
 		</>
 	)

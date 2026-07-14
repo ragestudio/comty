@@ -15,19 +15,13 @@ import MembersPanel from "@components/Spaces/Group/MembersPanel"
 import useMediaRTCState from "@hooks/useMediaRTCState"
 import useTitle from "@hooks/useTitle"
 
-import {
-	ContentPanelContext,
-	useContentPanelHeaderState,
-} from "@contexts/WithSpaces/contentPanel"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
-import SpacesPageContext from "@contexts/WithSpaces/page"
 
 import "@pages/spaces/index.less"
 import "./index.less"
 
 const MembersPanelView = (props) => {
-	console.log("MembersPanelView", props)
-
 	return (
 		<GroupContext.Provider value={props.group}>
 			<MembersPanel />
@@ -36,16 +30,12 @@ const MembersPanelView = (props) => {
 }
 
 const GroupPage = (props) => {
-	const page = React.useContext(SpacesPageContext)
-	const currentPageRef = React.useRef()
+	const spaces = useSpacesNavigation()
 
 	const [documentTitle, setDocumentTitle] = useTitle()
-	const [content, setContent] = React.useState({})
 	const [activeKey, setActiveKey] = React.useState("channels")
 
-	const { headerContent, registerHeaderContent, unregisterHeaderContent } =
-		useContentPanelHeaderState()
-
+	const rtcState = useMediaRTCState()
 	const group = useGroup({
 		group_id: props.params.group_id,
 	})
@@ -54,8 +44,7 @@ const GroupPage = (props) => {
 		if (key === "channels") {
 			setActiveKey(key)
 
-			page.setChannel(null)
-			page.setIsVoice(false)
+			spaces.navigate({ channel: null, subview: null })
 
 			return
 		}
@@ -66,6 +55,12 @@ const GroupPage = (props) => {
 					group: group,
 				},
 			})
+			return
+		}
+
+		if (key === "settings") {
+			spaces.navigate({ channel: null, subview: "settings" })
+
 			return
 		}
 
@@ -83,7 +78,7 @@ const GroupPage = (props) => {
 		/>,
 	)
 
-	// handle group loading
+	// set document title when group loads
 	React.useEffect(() => {
 		if (!group.data || !group.channels || group.loading) {
 			return undefined
@@ -92,77 +87,29 @@ const GroupPage = (props) => {
 		setDocumentTitle(group.data.name)
 	}, [group.data, group.channels, group.loading])
 
-	// Handle channel switching
-	React.useEffect(() => {
-		if (!group.data || group.loading) {
-			return undefined
-		}
-
-		// check if is needed
-		if (currentPageRef.current) {
-			if (
-				currentPageRef.current.room === page.room &&
-				currentPageRef.current.channel === page.channel
-			) {
-				return undefined
-			}
-		}
-
-		// update the ref
-		currentPageRef.current = page
-
-		const channelData = group.channels?.find(
-			(_channel) => _channel._id == page.channel,
-		)
-
-		setContent({
-			type: page.isVoice ? "channel" : "chat",
-			title: channelData?.name ?? "Chat",
-			description: channelData?.description,
-			props: { _id: page.channel },
-		})
-
-		console.debug(
-			`[GROUP](${group.data._id}) Switching to channel -> (${page.channel})`,
-			{
-				data: group.data,
-				channelData,
-				page,
-			},
-		)
-	}, [group.data, group.loading, page, props.params.group_id])
-
 	if (group.loading) {
 		return <Skeleton />
 	}
 
 	return (
 		<GroupContext.Provider value={group}>
-			<ContentPanelContext.Provider
-				value={{
-					...content,
-					setContent: setContent,
-					headerContent: headerContent,
-					registerHeaderContent: registerHeaderContent,
-					unregisterHeaderContent: unregisterHeaderContent,
-				}}
-			>
-				<div className="spaces-page group-page">
-					{activeKey === "channels" && !page.channel && (
+			<div className="spaces-page group-page">
+				{activeKey === "channels" &&
+					!spaces.channel &&
+					!spaces.subview && (
 						<div className="spaces-page__panel">
 							<GroupHeader />
 							<ChannelsPanel />
 						</div>
 					)}
 
-					{page.channel && (
-						<div className="group-page__content-panel">
-							<ContentPanelHeader />
-							<ContentPanelRender />
-						</div>
-					)}
-				</div>
-			</ContentPanelContext.Provider>
+				{(spaces.channel || spaces.subview) && (
+					<div className="group-page__content-panel">
+						<ContentPanelHeader />
+						<ContentPanelRender />
+					</div>
+				)}
+			</div>
 		</GroupContext.Provider>
 	)
 }

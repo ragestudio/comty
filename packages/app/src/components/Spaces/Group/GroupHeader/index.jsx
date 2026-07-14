@@ -9,12 +9,12 @@ import Icons from "@components/Icons"
 import imageAverageColor from "@utils/imageAverageColor"
 
 import GroupContext from "@contexts/WithSpaces/group"
-import ContentPanelContext from "@contexts/WithSpaces/contentPanel"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 
 import "./index.less"
 
 const GroupHeader = () => {
-	const contentPanel = React.useContext(ContentPanelContext)
+	const spaces = useSpacesNavigation()
 	const group = React.useContext(GroupContext)
 
 	const data = group?.data ?? {}
@@ -23,15 +23,11 @@ const GroupHeader = () => {
 		React.useState(null)
 
 	const onClickSettingsButton = () => {
-		contentPanel.setContent({
-			type: "settings",
-		})
+		spaces.navigate({ channel: null, subview: "settings" })
 	}
 
 	const onClickInviteButton = () => {
-		contentPanel.setContent({
-			type: "settings",
-		})
+		spaces.navigate({ channel: null, subview: "settings" })
 	}
 
 	// calculate the average color of the group cover image
