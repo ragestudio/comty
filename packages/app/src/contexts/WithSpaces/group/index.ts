@@ -15,7 +15,6 @@ import db from "../store"
 import type { Group } from "../collections/group"
 import type { Channel, Channels, StatedChannel } from "../collections/channel"
 import type { Member, Members } from "../collections/member"
-import { GroupState } from "../types"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
@@ -292,8 +291,6 @@ const useGroup = ({ group_id }) => {
 				setData(cached.group)
 			}
 
-			setLoading(false)
-
 			//
 			// fetch the members list
 			// if the members list is not cached or is empty
@@ -317,11 +314,6 @@ const useGroup = ({ group_id }) => {
 			} else {
 				setChannels(cached.channels)
 			}
-
-			//
-			// sync the stated RTC channels
-			//
-			await syncStatedRTCChannels()
 		} catch (err) {
 			console.error(err)
 			setError(err as Error)
@@ -331,7 +323,12 @@ const useGroup = ({ group_id }) => {
 			//
 			// check the cache
 			//
-			deferredCacheChecking(cached)
+      deferredCacheChecking(cached)
+
+     	//
+			// sync the stated RTC channels
+			//
+			await syncStatedRTCChannels()
 		}
 	}, [group_id, data, members, channels])
 
