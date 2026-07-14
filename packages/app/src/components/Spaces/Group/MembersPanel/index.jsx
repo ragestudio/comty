@@ -207,7 +207,7 @@ const MembersPanel = () => {
 		}
 
 		return { online: onlineList, offline: offlineList }
-	}, [group.loading, group?.members?.items, group?.connectedMembers])
+	}, [group.loading, group])
 
 	return (
 		<div className="group-page__members-panel">

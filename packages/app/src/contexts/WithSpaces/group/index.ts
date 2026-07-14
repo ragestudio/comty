@@ -122,10 +122,26 @@ const useGroup = ({ group_id }) => {
 				lastLoadedMemberId.current = res.items[0]._id
 			}
 
-			console.log(res)
+			console.debug("[members] fetched members:", res)
 
 			// update cache
-			setMembers(res)
+			setMembers((prev) => {
+				if (!prev) {
+					prev = {
+						items: [],
+						total_items: 0,
+					}
+				}
+
+				if (!Array.isArray(prev.items)) {
+					prev.items = []
+				}
+
+				prev.items.push(...res.items)
+				prev.total_items = res.total_items
+
+				return prev
+			})
 			await cacheMembers(res)
 			await cacheTotalMembers(group_id, res.total_items)
 			await evaluateMembersConnections(res.items)
@@ -270,7 +286,7 @@ const useGroup = ({ group_id }) => {
 				.toArray()
 
 			cached.total_members =
-				(await db.members_counter.get(group_id)).counter ?? 0
+				(await db.members_counter.get(group_id))?.counter ?? 0
 		} catch (error) {
 			console.error("Failed to get cached content", error)
 		}
@@ -323,9 +339,9 @@ const useGroup = ({ group_id }) => {
 			//
 			// check the cache
 			//
-      deferredCacheChecking(cached)
+			deferredCacheChecking(cached)
 
-     	//
+			//
 			// sync the stated RTC channels
 			//
 			await syncStatedRTCChannels()
