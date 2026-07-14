@@ -45,7 +45,8 @@ export default async function (
 
 	await this.modelRef.delete({
 		group_id: group_id,
-		user_id: user_id,
+		membership_id: membership._id,
+		created_at: membership.created_at,
 	})
 
 	// decrease the counter
