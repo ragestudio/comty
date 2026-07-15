@@ -25,6 +25,8 @@ export interface MediaRTCPublic {
 	state: () => any
 	vars: () => typeof Vars
 	socket: () => any
+	openDebugWindow: () => Promise<void>
+	closeDebugWindow: () => Promise<void>
 }
 
 export interface WebsocketEvent {

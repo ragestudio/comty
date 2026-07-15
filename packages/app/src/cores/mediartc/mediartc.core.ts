@@ -47,6 +47,8 @@ import soundpadDispatchEvent from "./events/soundpadDispatch"
 import callIncomingEvent from "./events/callIncoming"
 
 import defaults from "./defaults"
+import DebugWindow from "./debug/DebugWindow"
+import React from "react"
 
 import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
 
@@ -63,7 +65,7 @@ const WebsocketEvents: WebsocketEvent = {
 
 export default class MediaRTC extends Core {
 	static namespace = "mediartc"
-	static dependencies = ["settings", "api", "sfx"]
+	static dependencies = ["settings", "api", "sfx", "window_mng"]
 
 	static bgColor = "hotPink"
 	static textColor = "black"
@@ -108,6 +110,8 @@ export default class MediaRTC extends Core {
 		},
 		vars: () => Vars,
 		socket: () => this.socket,
+		openDebugWindow: this.openDebugWindow.bind(this),
+		closeDebugWindow: this.closeDebugWindow.bind(this),
 	}
 
 	handlers: MediaRTCHandlers = {
@@ -222,6 +226,29 @@ export default class MediaRTC extends Core {
 		if (this.self.audioOutput) {
 			this.self.audioOutput.initialize()
 		}
+	}
+
+	debugWindowId = "mediartc-debug"
+
+	async openDebugWindow() {
+		if (app.cores.window_mng.has(this.debugWindowId)) {
+			this.console.log("Debug window already open")
+			return
+		}
+
+		const component = React.createElement(DebugWindow)
+
+		await app.cores.window_mng.open(this.debugWindowId, component)
+
+		this.console.log("Debug window opened")
+	}
+
+	async closeDebugWindow() {
+		if (!app.cores.window_mng.has(this.debugWindowId)) {
+			return
+		}
+
+		await app.cores.window_mng.closeById(this.debugWindowId)
 	}
 
 	async sendVoiceStateUpdate() {

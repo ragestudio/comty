@@ -1,0 +1,46 @@
+.mediartc-debug-window {
+	--debug-active: var(--colorPrimary, #ff6064);
+	--debug-inactive: var(--danger-color, #ff4d4f);
+	--debug-loading: var(--disabled-color, #faad14);
+	--debug-log-bg: var(--background-color-accent);
+	--debug-log-text: var(--text-color);
+	--debug-log-border: var(--border-color);
+	--debug-log-meta: var(--disabled-color);
+	--debug-bg: var(--background-color-primary);
+	--debug-text: var(--text-color);
+
+	background: var(--debug-bg);
+	color: var(--debug-text);
+	min-width: 800px;
+	min-height: 600px;
+	max-height: 80vh;
+	overflow: auto;
+
+	.debug-panel {
+		padding: 4px 0;
+	}
+
+	.debug-header {
+		h3 {
+			font-size: 16px;
+			font-weight: 600;
+		}
+	}
+
+	.ant-descriptions-item-label {
+		font-weight: 500;
+	}
+
+	.ant-tag {
+		margin-right: 2px;
+	}
+
+	.ant-statistic-title {
+		font-size: 11px;
+	}
+
+	pre {
+		white-space: pre-wrap;
+		word-break: break-all;
+	}
+}
