@@ -10,37 +10,35 @@ import "./index.less"
 export default class DefaultWindowRender extends React.Component {
 	static contextType = WindowContext
 
-	ref = React.createRef()
+	rndRef = React.createRef()
 
 	state = {
 		renderError: false,
 		visible: false,
 		title: null,
 		actions: [],
-		dimensions: {
-			height: this.props.height ?? 600,
-			width: this.props.width ?? 400,
-		},
-		position: this.props.defaultPosition,
+	}
+
+	dragPos = this.props.defaultPosition || { x: 0, y: 0 }
+	dragSize = {
+		width: this.props.width ?? 400,
+		height: this.props.height ?? 600,
 	}
 
 	componentDidMount = () => {
-		if (!this.state.position) {
-			this.setState({ position: this.getCenterPosition() })
+		if (!this.props.defaultPosition) {
+			this.dragPos = {
+				x: (window.innerWidth - this.dragSize.width) / 2,
+				y: (window.innerHeight - this.dragSize.height) / 2,
+			}
 		}
 
 		this.setDefaultActions()
 
-		if (typeof this.props.actions !== "undefined") {
-			if (Array.isArray(this.props.actions)) {
-				const actions = this.state.actions ?? []
-
-				this.props.actions.forEach((action) => {
-					actions.push(action)
-				})
-
-				this.setState({ actions })
-			}
+		if (Array.isArray(this.props.actions)) {
+			const actions = [...(this.state.actions ?? [])]
+			this.props.actions.forEach((action) => actions.push(action))
+			this.setState({ actions })
 		}
 
 		this.toggleVisibility(true)
@@ -48,35 +46,27 @@ export default class DefaultWindowRender extends React.Component {
 
 	componentDidCatch = (error) => {
 		console.error(error)
-
-		this.setState({
-			renderError: error,
-		})
+		this.setState({ renderError: error })
 	}
 
 	updateTitle = (title) => {
 		this.setState({ title })
 	}
 
-	updateDimensions = (
-		dimensions = {
-			width: 0,
-			height: 0,
-		},
-	) => {
-		this.ref.current?.updateSize({
+	updateDimensions = (dimensions = { width: 0, height: 0 }) => {
+		this.dragSize = {
+			width: dimensions.width,
+			height: dimensions.height,
+		}
+		this.rndRef.current?.updateSize({
 			width: dimensions.width,
 			height: dimensions.height,
 		})
 	}
 
-	updatePosition = (
-		position = {
-			x: 0,
-			y: 0,
-		},
-	) => {
-		this.ref.current?.updatePosition({
+	updatePosition = (position = { x: 0, y: 0 }) => {
+		this.dragPos = { x: position.x, y: position.y }
+		this.rndRef.current?.updatePosition({
 			x: position.x,
 			y: position.y,
 		})
@@ -86,23 +76,8 @@ export default class DefaultWindowRender extends React.Component {
 		this.setState({ visible: to ?? !this.state.visible })
 	}
 
-	getCenterPosition = () => {
-		const dimensions = this.state?.dimensions ?? {}
-
-		const windowHeight = dimensions.height ?? 600
-		const windowWidth = dimensions.width ?? 400
-
-		const y = window.innerHeight / 2 - windowHeight / 2
-		const x = window.innerWidth / 2 - windowWidth / 2
-
-		return {
-			x: x,
-			y: y,
-		}
-	}
-
 	setDefaultActions = () => {
-		const { actions } = this.state
+		const actions = [...this.state.actions]
 
 		actions.push({
 			key: "close",
@@ -113,6 +88,18 @@ export default class DefaultWindowRender extends React.Component {
 		})
 
 		this.setState({ actions })
+	}
+
+	handleDragStop = (_e, d) => {
+		this.dragPos = { x: d.x, y: d.y }
+	}
+
+	handleResizeStop = (_e, _direction, ref, _delta, position) => {
+		this.dragPos = { x: position.x, y: position.y }
+		this.dragSize = {
+			width: ref.offsetWidth,
+			height: ref.offsetHeight,
+		}
 	}
 
 	renderActions = () => {
@@ -144,8 +131,8 @@ export default class DefaultWindowRender extends React.Component {
 			updateDimensions: this.updateDimensions,
 			updatePosition: this.updatePosition,
 			close: this.props.close,
-			position: this.state.position,
-			dimensions: this.state.dimensions,
+			position: this.dragPos,
+			dimensions: this.dragSize,
 		}
 
 		return (
@@ -158,7 +145,7 @@ export default class DefaultWindowRender extends React.Component {
 	}
 
 	render() {
-		const { position, dimensions, visible } = this.state
+		const { visible } = this.state
 
 		if (!visible) {
 			return null
@@ -166,11 +153,13 @@ export default class DefaultWindowRender extends React.Component {
 
 		return (
 			<Rnd
-				ref={this.ref}
+				ref={this.rndRef}
 				default={{
-					...position,
-					...dimensions,
+					...this.dragPos,
+					...this.dragSize,
 				}}
+				onDragStop={this.handleDragStop}
+				onResizeStop={this.handleResizeStop}
 				minWidth={this.props.minWidth}
 				minHeight={this.props.minHeight}
 				enableResizing={this.props.enableResizing ?? true}
@@ -178,7 +167,7 @@ export default class DefaultWindowRender extends React.Component {
 				dragHandleClassName={
 					this.props.dragHandleClassName ?? "window_topbar"
 				}
-				bounds="body"
+				bounds="window"
 				className="window_wrapper"
 			>
 				<div className="window_topbar">

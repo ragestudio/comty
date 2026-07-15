@@ -121,6 +121,7 @@ export default class WindowManager extends Core {
 			element: React.createElement(DefaultWindow, {
 				key: id,
 				children: element,
+				close: () => this.closeById(id),
 			}),
 		})
 
@@ -166,6 +167,8 @@ export default class WindowManager extends Core {
 
 		if (typeof win.unmount === "function") {
 			win.unmount()
+		} else {
+			this.renderWindows()
 		}
 
 		return win
