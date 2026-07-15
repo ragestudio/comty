@@ -118,34 +118,55 @@ const UploadButton = (props) => {
 			//accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
 			progress={false}
 			fileList={[]}
-			className={classnames("uploadButton", {
-				["uploading"]: !!progress || uploading,
-			})}
+			className={
+				!props.render &&
+				classnames("uploadButton", {
+					["uploading"]: !!progress || uploading,
+				})
+			}
 			disabled={props.disabled || uploading}
 		>
-			<div className="uploadButton-content">
-				{!progress &&
-					(props.icon ?? (
-						<Icons.Upload
-							style={{
-								margin: 0,
-							}}
+			{typeof props.render === "function" &&
+				props.render({
+					uploading,
+					progress,
+					progress_element: (
+						<Progress
+							type="circle"
+							percent={progress?.percent ?? 0}
+							strokeWidth={20}
+							format={() => null}
 						/>
-					))}
+					),
+				})}
 
-				{progress && (
-					<Progress
-						type="circle"
-						percent={progress?.percent ?? 0}
-						strokeWidth={20}
-						format={() => null}
-					/>
-				)}
+			{typeof props.render !== "function" && (
+				<>
+					<div className="uploadButton-content">
+						{!progress &&
+							(props.icon ?? (
+								<Icons.Upload
+									style={{
+										margin: 0,
+									}}
+								/>
+							))}
 
-				{typeof props.children === "undefined"
-					? "Upload"
-					: props.children}
-			</div>
+						{progress && (
+							<Progress
+								type="circle"
+								percent={progress?.percent ?? 0}
+								strokeWidth={20}
+								format={() => null}
+							/>
+						)}
+
+						{typeof props.children === "undefined"
+							? "Upload"
+							: props.children}
+					</div>
+				</>
+			)}
 		</Upload>
 	)
 }
@@ -159,6 +180,7 @@ UploadButton.propTypes = {
 	disabled: PropTypes.bool,
 	icon: PropTypes.node,
 	children: PropTypes.node,
+	render: PropTypes.func,
 }
 
 export default UploadButton
