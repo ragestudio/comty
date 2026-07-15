@@ -53,5 +53,56 @@
 
 			object-fit: cover;
 		}
+
+		&__progress {
+			position: absolute;
+			inset: 0;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			.ant-progress-circle {
+				width: 48px !important;
+				height: 48px !important;
+			}
+		}
+
+		&__remove {
+			position: absolute;
+			top: 4px;
+			right: 4px;
+
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 22px;
+			height: 22px;
+
+			border: none;
+			border-radius: 50%;
+
+			background-color: rgba(0, 0, 0, 0.5);
+			color: #fff;
+
+			cursor: pointer;
+
+			opacity: 0;
+			transition: opacity 150ms ease-in-out;
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.75);
+			}
+
+			svg {
+				width: 14px;
+				height: 14px;
+			}
+		}
+
+		&:hover &__remove {
+			opacity: 1;
+		}
 	}
 }
