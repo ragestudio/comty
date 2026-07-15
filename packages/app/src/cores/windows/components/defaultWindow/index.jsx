@@ -17,6 +17,7 @@ export default class DefaultWindowRender extends React.Component {
 		visible: false,
 		title: null,
 		actions: [],
+		maximized: false,
 	}
 
 	dragPos = this.props.defaultPosition || { x: 0, y: 0 }
@@ -24,6 +25,8 @@ export default class DefaultWindowRender extends React.Component {
 		width: this.props.width ?? 400,
 		height: this.props.height ?? 600,
 	}
+	preMaxPos = null
+	preMaxSize = null
 
 	componentDidMount = () => {
 		if (!this.props.defaultPosition) {
@@ -74,6 +77,40 @@ export default class DefaultWindowRender extends React.Component {
 
 	toggleVisibility = (to) => {
 		this.setState({ visible: to ?? !this.state.visible })
+	}
+
+	handleTopbarDoubleClick = () => {
+		const { maximized } = this.state
+
+		if (maximized) {
+			this.rndRef.current?.updatePosition({
+				x: this.preMaxPos.x,
+				y: this.preMaxPos.y,
+			})
+			this.rndRef.current?.updateSize({
+				width: this.preMaxSize.width,
+				height: this.preMaxSize.height,
+			})
+			this.dragPos = { ...this.preMaxPos }
+			this.dragSize = { ...this.preMaxSize }
+			this.preMaxPos = null
+			this.preMaxSize = null
+		} else {
+			this.preMaxPos = { ...this.dragPos }
+			this.preMaxSize = { ...this.dragSize }
+			this.rndRef.current?.updatePosition({ x: 0, y: 0 })
+			this.rndRef.current?.updateSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			})
+			this.dragPos = { x: 0, y: 0 }
+			this.dragSize = {
+				width: window.innerWidth,
+				height: window.innerHeight,
+			}
+		}
+
+		this.setState({ maximized: !maximized })
 	}
 
 	setDefaultActions = () => {
@@ -145,7 +182,7 @@ export default class DefaultWindowRender extends React.Component {
 	}
 
 	render() {
-		const { visible } = this.state
+		const { visible, maximized } = this.state
 
 		if (!visible) {
 			return null
@@ -162,15 +199,18 @@ export default class DefaultWindowRender extends React.Component {
 				onResizeStop={this.handleResizeStop}
 				minWidth={this.props.minWidth}
 				minHeight={this.props.minHeight}
-				enableResizing={this.props.enableResizing ?? true}
-				disableDragging={this.props.disableDragging ?? false}
+				enableResizing={this.props.enableResizing ?? !maximized}
+				disableDragging={this.props.disableDragging ?? maximized}
 				dragHandleClassName={
 					this.props.dragHandleClassName ?? "window_topbar"
 				}
 				bounds="window"
 				className="window_wrapper"
 			>
-				<div className="window_topbar">
+				<div
+					className="window_topbar"
+					onDoubleClick={this.handleTopbarDoubleClick}
+				>
 					<div className="title">{this.state.title}</div>
 					<div className="actions">{this.renderActions()}</div>
 				</div>
