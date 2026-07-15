@@ -7,6 +7,7 @@ import "./Popover.less"
 const Popover = ({
 	children,
 	content,
+	contentProps = {},
 	position = "top",
 	trigger = "click",
 	disabled = false,
@@ -266,8 +267,9 @@ const Popover = ({
 		onMouseLeave: trigger === "hover" ? handlePopoverMouseLeave : undefined,
 	}
 
-	const contentProps = {
+	const contentPropsFinal = {
 		close: () => setIsOpen(false),
+		...contentProps,
 	}
 
 	return (
@@ -294,7 +296,7 @@ const Popover = ({
 				>
 					<div className="popover-content">
 						{typeof content === "function"
-							? content({ ...contentProps })
+							? content({ ...contentPropsFinal })
 							: content}
 					</div>
 				</div>
@@ -306,6 +308,7 @@ const Popover = ({
 Popover.propTypes = {
 	children: PropTypes.node.isRequired,
 	content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
+	contentProps: PropTypes.object,
 	position: PropTypes.oneOf(["top", "bottom", "left", "right"]),
 	trigger: PropTypes.oneOf(["click", "hover"]),
 	disabled: PropTypes.bool,
