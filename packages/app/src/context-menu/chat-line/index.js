@@ -17,6 +17,31 @@ export default {
 			icon: "ReplyAll",
 			action: () => {
 				control.close()
+
+				const channelElement = parent.closest("[data-channel-id]")
+				if (!channelElement) return
+
+				const messageTextElement =
+					parent.querySelector("#message-content")
+				const messageText =
+					messageTextElement?.textContent?.trim() || ""
+
+				const userNameElement = parent.querySelector(
+					".channel-chat__timeline__line__content__header__username span",
+				)
+				const userName = userNameElement?.textContent?.trim() || ""
+
+				const event = new CustomEvent("chat:reply", {
+					bubbles: true,
+					detail: {
+						messageId,
+						messageUserId,
+						messageText,
+						userName,
+					},
+				})
+
+				channelElement.dispatchEvent(event)
 			},
 		})
 

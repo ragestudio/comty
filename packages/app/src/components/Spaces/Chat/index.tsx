@@ -63,9 +63,18 @@ interface ChatInnerProps {
 	useChatParam: any
 }
 
+interface ReplyTarget {
+	messageId: string
+	messageUserId: string
+	messageText: string
+	userName: string
+}
+
 const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
+	const chatContainerRef = React.useRef<HTMLDivElement>(null)
 	const timelineRef = React.useRef<HTMLDivElement>(null)
 	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
+	const [replyTo, setReplyTo] = React.useState<ReplyTarget | null>(null)
 
 	const {
 		timeline,
@@ -74,6 +83,7 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		send,
 		loadBefore,
 		loadAfter,
+		loadAround,
 		typing,
 		usersTyping,
 		initialLoading,
@@ -97,9 +107,29 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		null,
 	)
 
+	const hasInitialScrolledRef = React.useRef(false)
+
 	React.useEffect(() => {
 		setTimelineRoot(timelineRef.current)
 	}, [])
+
+	React.useEffect(() => {
+		hasInitialScrolledRef.current = false
+		setReplyTo(null)
+	}, [_id])
+
+	React.useEffect(() => {
+		if (initialLoading || timeline.length === 0) return
+		if (hasInitialScrolledRef.current) return
+
+		hasInitialScrolledRef.current = true
+
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				timelineRef.current?.scrollTo(0, 0)
+			})
+		})
+	}, [initialLoading, timeline.length])
 
 	const topTriggerRef = useOnInView((inView) => topTrigger(inView), {
 		root: timelineRoot,
@@ -172,6 +202,92 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		}
 	}, [setScrollableToBottom])
 
+	const handleReplyEvent = React.useCallback((e: Event) => {
+		const detail = (e as CustomEvent).detail as ReplyTarget
+		setReplyTo(detail)
+	}, [])
+
+	const cancelReply = React.useCallback(() => {
+		setReplyTo(null)
+	}, [])
+
+	const scrollToMessage = React.useCallback((messageId: string) => {
+		const container = timelineRef.current
+
+		const targetEl = document.querySelector(`[data-message-id="${messageId}"]`)
+
+		if (!container || !targetEl) return false
+
+		let applied = false
+
+		const applyHighlight = () => {
+			if (applied) return
+			applied = true
+
+			const onAnimationEnd = () => {
+				targetEl.classList.remove("channel-chat__timeline__line--highlight")
+				targetEl.removeEventListener("animationend", onAnimationEnd)
+			}
+
+			targetEl.addEventListener("animationend", onAnimationEnd)
+			targetEl.classList.add("channel-chat__timeline__line--highlight")
+		}
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const entry = entries[0]
+				if (entry && entry.isIntersecting) {
+					observer.disconnect()
+					applyHighlight()
+				}
+			},
+			{ root: container, threshold: 0.6 },
+		)
+
+		observer.observe(targetEl)
+
+		targetEl.scrollIntoView({ behavior: "smooth", block: "center" })
+
+		return true
+	}, [])
+
+	const jumpToMessage = React.useCallback(
+		async (messageId: string) => {
+			// first try to scroll to it if it's already in the dom
+			if (scrollToMessage(messageId)) return
+
+			// not in dom, load messages around it
+			await loadAround(messageId)
+
+			// wait for react to render the new messages
+			await new Promise((resolve) => requestAnimationFrame(resolve))
+			await new Promise((resolve) => requestAnimationFrame(resolve))
+
+			scrollToMessage(messageId)
+		},
+		[loadAround, scrollToMessage],
+	)
+
+	const handleReplyPreviewClick = React.useCallback(
+		(replyToId: string) => {
+			jumpToMessage(replyToId)
+		},
+		[jumpToMessage],
+	)
+
+	React.useEffect(() => {
+		if (initialLoading) return
+
+		const el = chatContainerRef.current
+		if (!el) return
+
+		el.addEventListener("chat:reply", handleReplyEvent)
+
+		return () => {
+			el.removeEventListener("chat:reply", handleReplyEvent)
+		}
+	}, [initialLoading, handleReplyEvent])
+
 	React.useEffect(() => {
 		if (initialLoading) {
 			return
@@ -216,6 +332,7 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 
 	return (
 		<div
+			ref={chatContainerRef}
 			className="channel-chat"
 			data-is-dm={type === "dm"}
 			data-type={type}
@@ -277,6 +394,8 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 								key={item._id}
 								data={item}
 								headless={headless}
+								type={type}
+								onReplyPreviewClick={handleReplyPreviewClick}
 							/>
 						)
 					})}
@@ -320,6 +439,8 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 				send={send}
 				typing={typing}
 				channel_id={_id}
+				replyTo={replyTo}
+				onCancelReply={cancelReply}
 			/>
 		</div>
 	)

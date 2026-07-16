@@ -16,9 +16,15 @@
 
 	transition: all 50ms ease-in-out;
 
+	border-radius: 12px;
+
 	&:hover {
 		background-color: var(--background-color-primary-2);
 		border-radius: 8px;
+	}
+
+	&--highlight {
+		animation: chat-line-highlight 2s ease-out;
 	}
 
 	&.headless {
@@ -73,6 +79,58 @@
 		overflow: hidden;
 
 		gap: 5px;
+
+		&__reply-preview {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+
+			gap: 6px;
+			padding: 4px 8px;
+
+			border-left: 2px solid var(--border-color);
+			border-radius: 4px;
+
+			background-color: var(--background-color-primary-1);
+			cursor: pointer;
+
+			&:hover {
+				background-color: var(--background-color-primary-2);
+			}
+
+			&__icon {
+				flex-shrink: 0;
+
+				width: 14px;
+				height: 14px;
+
+				margin-top: 2px;
+				opacity: 0.5;
+			}
+
+			&__content {
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				gap: 2px;
+			}
+
+			&__username {
+				font-size: 0.7rem;
+				font-weight: 700;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			&__text {
+				font-size: 0.75rem;
+				opacity: 0.7;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+		}
 
 		&__header {
 			display: inline-flex;
@@ -192,5 +250,22 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes chat-line-highlight {
+	0% {
+		background-color: var(--background-color-accent);
+		filter: brightness(1.4);
+	}
+
+	25% {
+		background-color: var(--background-color-accent);
+		filter: brightness(1.4);
+	}
+
+	100% {
+		background-color: transparent;
+		filter: brightness(1);
 	}
 }

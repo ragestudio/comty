@@ -134,7 +134,7 @@ export function useChatMessages({
 
 	const send = React.useCallback(
 		async (
-			{ message, attachments = [], sticker }: any = {},
+			{ message, attachments = [], sticker, reply_to_id }: any = {},
 			stopTyping?: () => void,
 		) => {
 			if (!message && attachments.length === 0 && !sticker) {
@@ -148,10 +148,10 @@ export function useChatMessages({
 				channel_id:
 					type === "group" ? paramsRef.current.channel_id : "",
 				user_id: app.userData?._id,
-
 				message: message,
 				attachments: attachments,
 				sticker: sticker,
+				reply_to_id: reply_to_id,
 				status: "sending",
 				created_at: new Date().toISOString() as any,
 			}
@@ -169,6 +169,7 @@ export function useChatMessages({
 				attachments: formattedAttachments,
 				sticker,
 				nonce,
+				reply_to_id,
 			})
 
 			try {
@@ -323,6 +324,63 @@ export function useChatMessages({
 		[load],
 	)
 
+	const loadAround = React.useCallback(
+		async (messageId: string) => {
+			if (loadingRef.current) return
+			setLoading(true)
+			loadingRef.current = true
+
+			try {
+				const olderResponse = await config.model.get(
+					paramsRef.current,
+					{
+						beforeId: messageId,
+						limit: 15,
+					},
+				)
+
+				const newerResponse = await config.model.get(
+					paramsRef.current,
+					{
+						afterId: messageId,
+						limit: 15,
+					},
+				)
+
+				const targetMessage =
+					type === "group"
+						? await db.channel_messages.get(messageId)
+						: await db.direct_messages.get(messageId)
+
+				const allMessages = [
+					...(olderResponse.items || []),
+					...(targetMessage ? [targetMessage] : []),
+					...(newerResponse.items || []),
+				]
+
+				if (allMessages.length > 0) {
+					const users = [
+						...(olderResponse.users || []),
+						...(newerResponse.users || []),
+					]
+
+					if (users.length > 0) {
+						await cacheUsers(users)
+					}
+
+					await adapter.cacheMessages(allMessages)
+					pushToTimeline(allMessages, "bottom")
+				}
+			} catch (err: any) {
+				console.error("loadAround failed", err)
+			} finally {
+				setLoading(false)
+				loadingRef.current = false
+			}
+		},
+		[config, type, adapter, pushToTimeline],
+	)
+
 	const resetMessages = React.useCallback(() => {
 		setTimeline([])
 		setInitialLoading(true)
@@ -350,6 +408,7 @@ export function useChatMessages({
 		load,
 		loadBefore,
 		loadAfter,
+		loadAround,
 		send,
 		sync,
 		handleNewMessage,

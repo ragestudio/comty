@@ -54,7 +54,13 @@ const InputMenu = ({
 	)
 }
 
-export const ChatInputBar = ({ channel_id, send, typing }) => {
+export const ChatInputBar = ({
+	channel_id,
+	send,
+	typing,
+	replyTo,
+	onCancelReply,
+}) => {
 	const [inputValue, setInputValue] = React.useState("")
 	const [attachments, setAttachments] = React.useState([])
 
@@ -94,6 +100,7 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 		const response = await send({
 			message: message,
 			attachments: attachments,
+			reply_to_id: replyTo?.messageId,
 		}).catch((e) => {
 			console.error(e)
 			return null
@@ -102,6 +109,10 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 		if (response) {
 			setInputValue("")
 			setAttachments([])
+
+			if (typeof onCancelReply === "function") {
+				onCancelReply()
+			}
 		}
 	}
 
@@ -185,6 +196,13 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 		setAttachments([])
 	}, [channel_id])
 
+	// Focus textarea when reply is initiated
+	React.useEffect(() => {
+		if (replyTo && textAreaRef.current) {
+			textAreaRef.current.focus()
+		}
+	}, [replyTo])
+
 	return (
 		<div className="channel-chat__input">
 			{attachments.length > 0 && (
@@ -192,6 +210,27 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 					items={attachments}
 					onRemove={removeAttachment}
 				/>
+			)}
+
+			{replyTo && (
+				<div className="channel-chat__input__reply-indicator bg-accent">
+					<div className="channel-chat__input__reply-indicator__content">
+						<Icons.Reply className="channel-chat__input__reply-indicator__icon" />
+						<div className="channel-chat__input__reply-indicator__text">
+							<span className="channel-chat__input__reply-indicator__username">
+								{replyTo.userName}
+							</span>
+							<span className="channel-chat__input__reply-indicator__message">
+								{replyTo.messageText}
+							</span>
+						</div>
+					</div>
+					<Button
+						type="ghost"
+						icon={<Icons.X />}
+						onClick={onCancelReply}
+					/>
+				</div>
 			)}
 
 			<div className="channel-chat__input__area bg-accent">
