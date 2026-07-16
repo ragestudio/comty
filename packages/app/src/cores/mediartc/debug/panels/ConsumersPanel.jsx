@@ -11,11 +11,7 @@ import {
 	message,
 	Space,
 } from "antd"
-import {
-	BarChartOutlined,
-	PauseOutlined,
-	CaretRightOutlined,
-} from "@ant-design/icons"
+import { Icons } from "@components/Icons"
 
 function ConsumerStats({ consumerId, core }) {
 	const [stats, setStats] = useState(null)
@@ -156,7 +152,7 @@ function ConsumerStats({ consumerId, core }) {
 			>
 				<Button
 					size="small"
-					icon={<BarChartOutlined />}
+					icon={<Icons.BarChart3 />}
 					loading={loading}
 					onClick={fetchStats}
 				>
@@ -164,9 +160,7 @@ function ConsumerStats({ consumerId, core }) {
 				</Button>
 				<Button
 					size="small"
-					icon={
-						autoRefresh ? <PauseOutlined /> : <CaretRightOutlined />
-					}
+					icon={autoRefresh ? <Icons.Pause /> : <Icons.Play />}
 					onClick={() => setAutoRefresh((v) => !v)}
 					type={autoRefresh ? "primary" : "default"}
 				>

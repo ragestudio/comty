@@ -12,12 +12,8 @@ import {
 	Switch,
 	Collapse,
 } from "antd"
-import {
-	CloseOutlined,
-	ReloadOutlined,
-	SoundOutlined,
-	SearchOutlined,
-} from "@ant-design/icons"
+
+import { Icons } from "@components/Icons"
 
 function getClientInstance(core, userId) {
 	if (!core?.clients) return null
@@ -180,7 +176,7 @@ export default function ClientsPanel({
 							<Button
 								size="small"
 								danger
-								icon={<CloseOutlined />}
+								icon={<Icons.LogOut />}
 							/>
 						</Popconfirm>
 						<Popconfirm
@@ -191,14 +187,14 @@ export default function ClientsPanel({
 						>
 							<Button
 								size="small"
-								icon={<ReloadOutlined />}
+								icon={<Icons.RefreshCcw />}
 							/>
 						</Popconfirm>
 						<Button
 							size="small"
 							type={localMuted ? "primary" : "default"}
 							danger={localMuted}
-							icon={<SoundOutlined />}
+							icon={<Icons.Volume />}
 							onClick={() => handleLocalMute(record.userId)}
 						/>
 					</Space>
@@ -443,7 +439,7 @@ export default function ClientsPanel({
 
 												<Button
 													size="small"
-													icon={<SearchOutlined />}
+													icon={<Icons.Link />}
 													onClick={() =>
 														onNavigateToConsumer?.(
 															c.id,
