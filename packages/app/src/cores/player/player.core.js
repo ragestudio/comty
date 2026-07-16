@@ -36,13 +36,13 @@ export default class Player extends Core {
 	public = {
 		start: this.start,
 		close: this.close,
-		queue: this.bindableReadOnlyProxy({
+		queue: this.proxiedInterface({
 			items: () => {
 				return this.queue.nextItems
 			},
 			add: this.addToQueue,
 		}),
-		playback: this.bindableReadOnlyProxy({
+		playback: this.proxiedInterface({
 			toggle: this.togglePlayback,
 			play: this.resumePlayback,
 			pause: this.pausePlayback,
@@ -51,7 +51,7 @@ export default class Player extends Core {
 			next: this.next,
 			mode: this.playbackMode,
 		}),
-		controls: this.bindableReadOnlyProxy({
+		controls: this.proxiedInterface({
 			duration: this.duration,
 			volume: this.volume,
 			mute: this.mute,
@@ -70,7 +70,6 @@ export default class Player extends Core {
 		sync: () => this.syncRoom,
 		inOnSyncMode: this.inOnSyncMode,
 		state: this.state,
-		ui: this.ui.public,
 	}
 
 	inOnSyncMode() {
