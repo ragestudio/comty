@@ -10,7 +10,7 @@ RUN mkdir -p /server
 WORKDIR /server
 
 # Copy Files
-COPY . .
+COPY packages/server .
 
 # Fix permissions
 RUN chmod -R 777 /server
@@ -21,8 +21,6 @@ RUN /server/scripts/installFfmpeg.sh
 # Set user to node
 USER node
 
-# Install modules & rebuild for host
-RUN npm dedupe
 RUN IS_ACTION_RUNNER=true npm install --omit=dev
 RUN npm cache clean --force
 
@@ -44,7 +42,7 @@ WORKDIR /server
 COPY --from=build /server /server
 COPY --from=build /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=build /usr/local/bin/ffprobe /usr/local/bin/ffprobe
-COPY --from=shared . /shared
+COPY packages/shared /shared
 
 RUN rm -rf /shared/node_modules
 RUN rm -rf /shared/assets
