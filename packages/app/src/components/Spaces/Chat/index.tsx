@@ -93,8 +93,16 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		loadBefore()
 	})
 
-	const { ref: topTriggerRef } = useOnInView({
-		onChange: (inView) => topTrigger(inView),
+	const [timelineRoot, setTimelineRoot] = React.useState<HTMLDivElement | null>(
+		null,
+	)
+
+	React.useEffect(() => {
+		setTimelineRoot(timelineRef.current)
+	}, [])
+
+	const topTriggerRef = useOnInView((inView) => topTrigger(inView), {
+		root: timelineRoot,
 	})
 
 	const goToBottom = React.useCallback(() => {
