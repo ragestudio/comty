@@ -49,6 +49,8 @@ COPY --from=shared . /shared
 RUN rm -rf /shared/node_modules
 RUN rm -rf /shared/assets
 
+RUN ln -s /server/node_modules /shared/node_modules
+
 # Fix permissions
 RUN chmod -R 777 /server
 RUN chown -R node:node /server
