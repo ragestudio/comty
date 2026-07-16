@@ -56,26 +56,14 @@ interface ChatProps {
 	group?: any
 }
 
-const Chat = ({ _id, type = "group", group }: ChatProps) => {
-	let useChatParam: any = {}
+interface ChatInnerProps {
+	_id: string
+	type: "group" | "dm"
+	group?: any
+	useChatParam: any
+}
 
-	if (!_id || !type) {
-		return null
-	}
-
-	if (type === "group" && !group) {
-		console.error("Chat with type group, must provide a group context")
-		return null
-	}
-
-	if (type === "group") {
-		useChatParam = { group_id: group.data._id, channel_id: _id }
-	}
-
-	if (type === "dm") {
-		useChatParam = { to_user_id: _id }
-	}
-
+const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 	const timelineRef = React.useRef<HTMLDivElement>(null)
 	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 
@@ -111,7 +99,6 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 
 	const goToBottom = React.useCallback(() => {
 		if (timelineRef.current) {
-			// unpause updates so new messages start flowing again
 			setPausedUpdates(false)
 			setScrollableToBottom(false)
 			timelineRef.current.scrollTo(0, 0)
@@ -153,7 +140,6 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
 		const isOnBottom = scrollPosition < 100
 
-		// wait until the scroll settles to avoid layout shifts from loading skeleton
 		if (isOnBottom) {
 			if (bottomDebounceRef.current) {
 				clearTimeout(bottomDebounceRef.current)
@@ -166,20 +152,15 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 				clearTimeout(bottomDebounceRef.current)
 				bottomDebounceRef.current = null
 			}
-			// reset the trigger so it can fire again when user returns to bottom
 			bottomTriggerRef.current(false)
 		}
 
-		// only manage button visibility here, dont toggle pausedUpdates
-		// pausedUpdates should only change when user explicitly clicks "go to bottom"
 		if (isOnBottom) {
 			if (scrollableToBottomRef.current) {
 				setScrollableToBottom(false)
 			}
-		} else {
-			if (!scrollableToBottomRef.current) {
-				setScrollableToBottom(true)
-			}
+		} else if (!scrollableToBottomRef.current) {
+			setScrollableToBottom(true)
 		}
 	}, [setScrollableToBottom])
 
@@ -333,6 +314,36 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 				channel_id={_id}
 			/>
 		</div>
+	)
+}
+
+const Chat = ({ _id, type = "group", group }: ChatProps) => {
+	if (!_id || !type) {
+		return null
+	}
+
+	if (type === "group" && !group) {
+		console.error("Chat with type group, must provide a group context")
+		return null
+	}
+
+	let useChatParam: any = {}
+
+	if (type === "group") {
+		useChatParam = { group_id: group.data._id, channel_id: _id }
+	}
+
+	if (type === "dm") {
+		useChatParam = { to_user_id: _id }
+	}
+
+	return (
+		<ChatInner
+			_id={_id}
+			type={type}
+			group={group}
+			useChatParam={useChatParam}
+		/>
 	)
 }
 
