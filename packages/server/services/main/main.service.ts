@@ -57,7 +57,7 @@ export default class API extends Server {
 	contexts = {
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb({
-			modelsPath: path.resolve(__dirname, "../../db"),
+			modelsPath: path.resolve(global["paths"].root, "../shared/db"),
 		})),
 		redis: RedisClient(),
 		userConnections: new UserConnections(this),
