@@ -12,10 +12,10 @@ import "./index.less"
 function getJoinLabel(jsDate) {
 	const date = DateTime.fromJSDate(new Date(jsDate))
 
-	const month = String(date.toLocaleString({ month: "long" })).toTitleCase()
+	const month = String(date.toLocaleString({ month: "long" }))
 	const year = String(date.year)
 
-	return `${month} ${year}`
+	return `${month[0].toUpperCase() + month.slice(1)} ${year}`
 }
 
 const DroppableField = (props) => {

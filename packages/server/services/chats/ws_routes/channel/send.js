@@ -13,16 +13,12 @@ export default {
 			throw new OperationError(400, "Missing channel_id")
 		}
 
-		console.time("get-channel")
 		const channel = await ctx.groupChannels.get(
 			payload.group_id,
 			payload.channel_id,
 			client.userId,
 		)
-		console.timeEnd("get-channel")
 
-		console.time("write-channel")
 		await channel.write(client.user ?? client.socket.context.user, payload)
-		console.timeEnd("write-channel")
 	},
 }

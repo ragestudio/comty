@@ -56,28 +56,25 @@ interface ChatProps {
 	group?: any
 }
 
-const Chat = ({ _id, type = "group", group }: ChatProps) => {
-	let useChatParam: any = {}
+interface ChatInnerProps {
+	_id: string
+	type: "group" | "dm"
+	group?: any
+	useChatParam: any
+}
 
-	if (!_id || !type) {
-		return null
-	}
+interface ReplyTarget {
+	messageId: string
+	messageUserId: string
+	messageText: string
+	userName: string
+}
 
-	if (type === "group" && !group) {
-		console.error("Chat with type group, must provide a group context")
-		return null
-	}
-
-	if (type === "group") {
-		useChatParam = { group_id: group.data._id, channel_id: _id }
-	}
-
-	if (type === "dm") {
-		useChatParam = { to_user_id: _id }
-	}
-
+const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
+	const chatContainerRef = React.useRef<HTMLDivElement>(null)
 	const timelineRef = React.useRef<HTMLDivElement>(null)
 	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
+	const [replyTo, setReplyTo] = React.useState<ReplyTarget | null>(null)
 
 	const {
 		timeline,
@@ -86,6 +83,7 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		send,
 		loadBefore,
 		loadAfter,
+		loadAround,
 		typing,
 		usersTyping,
 		initialLoading,
@@ -105,13 +103,40 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		loadBefore()
 	})
 
-	const { ref: topTriggerRef } = useOnInView({
-		onChange: (inView) => topTrigger(inView),
+	const [timelineRoot, setTimelineRoot] = React.useState<HTMLDivElement | null>(
+		null,
+	)
+
+	const hasInitialScrolledRef = React.useRef(false)
+
+	React.useEffect(() => {
+		setTimelineRoot(timelineRef.current)
+	}, [])
+
+	React.useEffect(() => {
+		hasInitialScrolledRef.current = false
+		setReplyTo(null)
+	}, [_id])
+
+	React.useEffect(() => {
+		if (initialLoading || timeline.length === 0) return
+		if (hasInitialScrolledRef.current) return
+
+		hasInitialScrolledRef.current = true
+
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				timelineRef.current?.scrollTo(0, 0)
+			})
+		})
+	}, [initialLoading, timeline.length])
+
+	const topTriggerRef = useOnInView((inView) => topTrigger(inView), {
+		root: timelineRoot,
 	})
 
 	const goToBottom = React.useCallback(() => {
 		if (timelineRef.current) {
-			// unpause updates so new messages start flowing again
 			setPausedUpdates(false)
 			setScrollableToBottom(false)
 			timelineRef.current.scrollTo(0, 0)
@@ -153,7 +178,6 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
 		const isOnBottom = scrollPosition < 100
 
-		// wait until the scroll settles to avoid layout shifts from loading skeleton
 		if (isOnBottom) {
 			if (bottomDebounceRef.current) {
 				clearTimeout(bottomDebounceRef.current)
@@ -166,22 +190,103 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 				clearTimeout(bottomDebounceRef.current)
 				bottomDebounceRef.current = null
 			}
-			// reset the trigger so it can fire again when user returns to bottom
 			bottomTriggerRef.current(false)
 		}
 
-		// only manage button visibility here, dont toggle pausedUpdates
-		// pausedUpdates should only change when user explicitly clicks "go to bottom"
 		if (isOnBottom) {
 			if (scrollableToBottomRef.current) {
 				setScrollableToBottom(false)
 			}
-		} else {
-			if (!scrollableToBottomRef.current) {
-				setScrollableToBottom(true)
-			}
+		} else if (!scrollableToBottomRef.current) {
+			setScrollableToBottom(true)
 		}
 	}, [setScrollableToBottom])
+
+	const handleReplyEvent = React.useCallback((e: Event) => {
+		const detail = (e as CustomEvent).detail as ReplyTarget
+		setReplyTo(detail)
+	}, [])
+
+	const cancelReply = React.useCallback(() => {
+		setReplyTo(null)
+	}, [])
+
+	const scrollToMessage = React.useCallback((messageId: string) => {
+		const container = timelineRef.current
+
+		const targetEl = document.querySelector(`[data-message-id="${messageId}"]`)
+
+		if (!container || !targetEl) return false
+
+		let applied = false
+
+		const applyHighlight = () => {
+			if (applied) return
+			applied = true
+
+			const onAnimationEnd = () => {
+				targetEl.classList.remove("channel-chat__timeline__line--highlight")
+				targetEl.removeEventListener("animationend", onAnimationEnd)
+			}
+
+			targetEl.addEventListener("animationend", onAnimationEnd)
+			targetEl.classList.add("channel-chat__timeline__line--highlight")
+		}
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const entry = entries[0]
+				if (entry && entry.isIntersecting) {
+					observer.disconnect()
+					applyHighlight()
+				}
+			},
+			{ root: container, threshold: 0.6 },
+		)
+
+		observer.observe(targetEl)
+
+		targetEl.scrollIntoView({ behavior: "smooth", block: "center" })
+
+		return true
+	}, [])
+
+	const jumpToMessage = React.useCallback(
+		async (messageId: string) => {
+			// first try to scroll to it if it's already in the dom
+			if (scrollToMessage(messageId)) return
+
+			// not in dom, load messages around it
+			await loadAround(messageId)
+
+			// wait for react to render the new messages
+			await new Promise((resolve) => requestAnimationFrame(resolve))
+			await new Promise((resolve) => requestAnimationFrame(resolve))
+
+			scrollToMessage(messageId)
+		},
+		[loadAround, scrollToMessage],
+	)
+
+	const handleReplyPreviewClick = React.useCallback(
+		(replyToId: string) => {
+			jumpToMessage(replyToId)
+		},
+		[jumpToMessage],
+	)
+
+	React.useEffect(() => {
+		if (initialLoading) return
+
+		const el = chatContainerRef.current
+		if (!el) return
+
+		el.addEventListener("chat:reply", handleReplyEvent)
+
+		return () => {
+			el.removeEventListener("chat:reply", handleReplyEvent)
+		}
+	}, [initialLoading, handleReplyEvent])
 
 	React.useEffect(() => {
 		if (initialLoading) {
@@ -227,6 +332,7 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 
 	return (
 		<div
+			ref={chatContainerRef}
 			className="channel-chat"
 			data-is-dm={type === "dm"}
 			data-type={type}
@@ -288,6 +394,8 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 								key={item._id}
 								data={item}
 								headless={headless}
+								type={type}
+								onReplyPreviewClick={handleReplyPreviewClick}
 							/>
 						)
 					})}
@@ -331,8 +439,40 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 				send={send}
 				typing={typing}
 				channel_id={_id}
+				replyTo={replyTo}
+				onCancelReply={cancelReply}
 			/>
 		</div>
+	)
+}
+
+const Chat = ({ _id, type = "group", group }: ChatProps) => {
+	if (!_id || !type) {
+		return null
+	}
+
+	if (type === "group" && !group) {
+		console.error("Chat with type group, must provide a group context")
+		return null
+	}
+
+	let useChatParam: any = {}
+
+	if (type === "group") {
+		useChatParam = { group_id: group.data._id, channel_id: _id }
+	}
+
+	if (type === "dm") {
+		useChatParam = { to_user_id: _id }
+	}
+
+	return (
+		<ChatInner
+			_id={_id}
+			type={type}
+			group={group}
+			useChatParam={useChatParam}
+		/>
 	)
 }
 
