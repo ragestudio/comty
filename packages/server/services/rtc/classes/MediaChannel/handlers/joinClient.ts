@@ -1,6 +1,14 @@
 import type { RTCClient } from "@services/rtc/types"
 
-export default async function (this: any, client: RTCClient) {
+export type JoinClientOptions = {
+	isReconnection?: boolean
+}
+
+export default async function (
+	this: any,
+	client: RTCClient,
+	options: JoinClientOptions = {},
+) {
 	try {
 		client.transports = new Map()
 
@@ -14,24 +22,33 @@ export default async function (this: any, client: RTCClient) {
 		// add to set of clients
 		this.clients.add(client)
 
-		const clients = Array.from(this.clients)
+		const clients = Array.from(this.clients) as RTCClient[]
 
-		// Notify other clients about new client
-		const otherClients = clients.filter(
-			(c: RTCClient) => c.userId !== client.userId,
-		) as RTCClient[]
+		// only notify other clients if this is NOT a reconnection
+		if (!options.isReconnection) {
+			const otherClients = clients.filter(
+				(c) => c.userId !== client.userId,
+			)
 
-		for (const otherClient of otherClients) {
-			await otherClient.emit(`media:channel:client:joined`, {
-				userId: client.userId,
-				user: client.context.user,
-				voiceState: client.voiceState,
-			})
+			for (const otherClient of otherClients) {
+				await otherClient.emit(`media:channel:client:joined`, {
+					userId: client.userId,
+					user: client.context.user,
+					voiceState: client.voiceState,
+				})
+			}
+
+			// publish to group topic only for new joins
+			this.events.emit("client:join", this, client)
 		}
 
 		const producers = []
 
-		for (const c of otherClients) {
+		for (const c of clients) {
+			if (c.userId === client.userId) {
+				continue
+			}
+
 			let userProducers = this.producers.get(c.userId)
 
 			if (userProducers instanceof Map) {
@@ -45,15 +62,12 @@ export default async function (this: any, client: RTCClient) {
 			}
 		}
 
-		// publish to group topic
-		this.events.emit("client:join", this, client)
-
 		return {
 			started_at: this.started_at,
 			room: this.data,
 			channelId: this.channelId,
 			rtpCapabilities: this.router.rtpCapabilities,
-			clients: clients.map((_client: RTCClient) => {
+			clients: clients.map((_client) => {
 				const data = {
 					userId: _client.userId,
 					voiceState: _client.voiceState,

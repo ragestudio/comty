@@ -6,6 +6,10 @@ export default async function (
 	groupId: string,
 	channelId: string,
 ) {
+	// mark that we are intentionally switching channels to prevent
+	// auto-recovery from triggering on the disconnection of the old channel
+	this._switchingToChannelId = channelId
+
 	try {
 		// fetch channel data
 		const channelData = await GroupModel.channels.get(groupId, channelId)
@@ -31,6 +35,9 @@ export default async function (
 			throw new Error("Invalid server response")
 		}
 
+		this._switchingToChannelId = null
+
+		this._joinedGroupId = groupId
 		this.state.channel = channelData
 		this.state.channelId = channelId
 
@@ -39,10 +46,16 @@ export default async function (
 		// dispatch sfx
 		app.cores.sfx.play("media_channel_join")
 	} catch (error: any) {
-		app.cores.notifications.new({
-			title: "Failed to join channel",
-			message: error.message,
-			type: "error",
-		})
+		this._switchingToChannelId = null
+
+		if (!this.autoRecovery.isRecovering) {
+			app.cores.notifications.new({
+				title: "Failed to join channel",
+				message: error.message,
+				type: "error",
+			})
+		}
+
+		throw error
 	}
 }

@@ -11,6 +11,9 @@ export default async function (
 
 	const userId = ctx.meta.user_id
 
+	// cancel any pending disconnect
+	this.cancelPendingDisconnect(userId)
+
 	// get all groups that is member
 	const groupsIds = await this.getUserJoinedGroupsIds(userId)
 

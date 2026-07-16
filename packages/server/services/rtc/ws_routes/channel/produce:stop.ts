@@ -18,7 +18,7 @@ export default defineRoute<API, "ws">()({
 		}
 
 		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
+			return null
 		}
 
 		return await channelInstance.stopProduce(client, payload)

@@ -80,16 +80,21 @@ export default async function (this: MediaRTC, data: any) {
 		this.state.isJoined = false
 		this.state.isLoading = false
 
-		if (this.ui) {
-			this.ui.detach()
+		// during recovery, keep UI visible and streams alive
+		if (!this.autoRecovery.isRecovering) {
+			if (this.ui) {
+				this.ui.detach()
+			}
+
+			this.self.stopAll()
+
+			app.cores.notifications.new({
+				title: "Failed to join channel",
+				message: error.message,
+				type: "error",
+			})
 		}
 
-		this.self.stopAll()
-
-		app.cores.notifications.new({
-			title: "Failed to join channel",
-			message: error.message,
-			type: "error",
-		})
+		throw error
 	}
 }

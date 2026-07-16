@@ -4,6 +4,7 @@ export interface MediaRTCStateType {
 	isDm: boolean
 	isJoined: boolean
 	isLoading: boolean
+	isReconnecting: boolean
 	isMuted: boolean
 	isDeafened: boolean
 	isSpeaking: boolean
@@ -26,6 +27,7 @@ export default class MediaRTCState {
 		isDm: false,
 		isJoined: false,
 		isLoading: false,
+		isReconnecting: false,
 		isMuted: false,
 		isDeafened: false,
 		isSpeaking: false,

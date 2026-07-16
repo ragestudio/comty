@@ -3,6 +3,9 @@ import MediaRTCState from "../classes/State"
 
 export default async function (this: MediaRTC) {
 	try {
+		// cancel any pending auto-recovery
+		this.autoRecovery.cancel()
+
 		if (this.ui) {
 			this.ui.detach()
 		}
@@ -49,6 +52,9 @@ export default async function (this: MediaRTC) {
 
 		// clear producers just in case
 		this.producers.clear()
+
+		// clear the joined groupId
+		this._joinedGroupId = null
 
 		try {
 			// call socket to leave

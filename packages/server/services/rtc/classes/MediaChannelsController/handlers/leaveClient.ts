@@ -18,6 +18,9 @@ export default async function (
 			return
 		}
 
+		// cancel any pending disconnect timeout
+		this.cancelPendingDisconnect(client.userId)
+
 		// delete user from client list
 		this.usersMap.delete(client.userId)
 

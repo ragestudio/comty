@@ -18,6 +18,11 @@ import type { MediaChannel } from "@classes/MediaChannel/index.ts"
 import type { Server } from "linebridge"
 import { RTCClient } from "@services/rtc/types"
 
+type PendingDisconnectEntry = {
+	timeout: NodeJS.Timeout
+	channelId: string
+}
+
 export default class MediaChannelsController {
 	server: Server
 
@@ -31,7 +36,7 @@ export default class MediaChannelsController {
 	webrtcServer: mediasoup.types.WebRtcServer = null
 	instances: Map<string, MediaChannel> = new Map()
 	usersMap: Map<string, string> = new Map()
-	pendingDisconnectsTimeout: Map<string, NodeJS.Timeout> = new Map()
+	pendingDisconnectsTimeout: Map<string, PendingDisconnectEntry> = new Map()
 
 	async initialize(): Promise<void> {
 		try {
@@ -161,6 +166,26 @@ export default class MediaChannelsController {
 			}
 			client.transports.clear()
 		}
+	}
+
+	/**
+	 * Cancel a pending disconnect for a user. Returns true if one was found.
+	 */
+	cancelPendingDisconnect(userId: string): boolean {
+		const entry = this.pendingDisconnectsTimeout.get(userId)
+
+		if (entry) {
+			clearTimeout(entry.timeout)
+			this.pendingDisconnectsTimeout.delete(userId)
+
+			console.log(
+				`[media-channels] Cancelled pending disconnect for user ${userId}`,
+			)
+
+			return true
+		}
+
+		return false
 	}
 
 	async sendToGroupTopic(

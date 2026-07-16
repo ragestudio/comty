@@ -9,18 +9,16 @@ interface LeavePayload {
 export default defineRoute<API, "ws">()({
 	useContexts: ["mediaChannels", "userCalls"] as const,
 	fn: async (client: RTCClient, payload: LeavePayload = {}, ctx) => {
-		let channelInstance = null
-
 		if (payload.isDm === true) {
-			channelInstance = ctx.userCalls.getClientChannel(client)
-		} else {
-			channelInstance = ctx.mediaChannels.getClientChannel(client)
+			const channelInstance = ctx.userCalls.getClientChannel(client)
+
+			if (!channelInstance) {
+				throw new OperationError(404, "No channel available")
+			}
+
+			return await channelInstance.leaveClient(client)
 		}
 
-		if (!channelInstance) {
-			throw new OperationError(404, "No channel available")
-		}
-
-		return await channelInstance.leaveClient(client)
+		return await ctx.mediaChannels.leaveClient(client)
 	},
 })

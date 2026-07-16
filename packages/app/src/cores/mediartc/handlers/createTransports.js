@@ -1,7 +1,7 @@
 const sendTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			await this.socket.call("channel:connect_transport", {
+			const result = await this.socket.call("channel:connect_transport", {
 				isDm: this.state.isDm ?? false,
 				transportId: this.sendTransport.id,
 				dtlsParameters,
@@ -39,7 +39,8 @@ const sendTransportHandlers = {
 		this.state.sendTransportState = state
 
 		if (state === "failed") {
-			this.console.error("Send transport failed")
+			this.console.error("Send transport failed, triggering recovery")
+			this._handleTransportFailure()
 		}
 	},
 }
@@ -55,7 +56,7 @@ const sendTransportObserver = {
 const recvTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			await this.socket.call("channel:connect_transport", {
+			const result = await this.socket.call("channel:connect_transport", {
 				isDm: this.state.isDm ?? false,
 				transportId: this.recvTransport.id,
 				dtlsParameters,
@@ -73,7 +74,8 @@ const recvTransportHandlers = {
 		this.state.recvTransportState = state
 
 		if (state === "failed") {
-			this.console.error("Receive transport failed")
+			this.console.error("Receive transport failed, triggering recovery")
+			this._handleTransportFailure()
 		}
 	},
 }
@@ -94,6 +96,13 @@ export default async function () {
 			isDm: this.state.isDm ?? false,
 		},
 	)
+
+	if (!sendTransportInfo) {
+		throw new Error(
+			"Server returned null for send transport (room state may be stale)",
+		)
+	}
+
 	console.debug("[webrtc] [send:transport] created", sendTransportInfo)
 
 	this.sendTransport = this.device.createSendTransport({
@@ -113,6 +122,13 @@ export default async function () {
 			isDm: this.state.isDm ?? false,
 		},
 	)
+
+	if (!recvTransportInfo) {
+		throw new Error(
+			"Server returned null for recv transport (room state may be stale)",
+		)
+	}
+
 	console.debug("[webrtc] [recv:transport] created", recvTransportInfo)
 
 	this.recvTransport = this.device.createRecvTransport({
