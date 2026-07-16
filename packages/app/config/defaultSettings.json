@@ -10,7 +10,7 @@
 	"haptics:notifications_feedback": true,
 	"longPressDelay": 600,
 	"sidebar.collapsable": true,
-	"sidebar.collapse_delay_time": 500,
+	"sidebar.collapse_delay_time": 200,
 	"haptics:enabled": true,
 	"style.auto_darkMode": true,
 	"feed_max_fetch": 7,
