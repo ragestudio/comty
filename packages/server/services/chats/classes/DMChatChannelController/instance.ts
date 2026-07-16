@@ -1,4 +1,4 @@
-import ChatChannel from "../ChatChannel"
+import ChatChannel from "@shared-classes/Spaces/ChatChannel"
 import ActivityModel from "@db/direct_messages_activity"
 
 function genShortMessage(messageObj) {

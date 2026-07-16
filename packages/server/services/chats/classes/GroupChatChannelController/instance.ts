@@ -1,6 +1,6 @@
-import ChatChannel from "../ChatChannel"
 import type { onWriteCallbackType, onDeleteCallbackType } from "../ChatChannel"
 
+import ChatChannel from "@shared-classes/Spaces/ChatChannel"
 import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
 
 export default class GroupChatChannel extends ChatChannel {
