@@ -6,6 +6,8 @@ import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
 
+import SharedMiddlewares from "@shared-middlewares"
+
 import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
 
 export default class API extends Server {
@@ -21,8 +23,7 @@ export default class API extends Server {
 	}
 
 	middlewares = {
-		...require("@middlewares").default,
-		...require("@shared-middlewares").default,
+		...SharedMiddlewares,
 	}
 
 	onClientConnected = (ctx: RtEngineContext) => {
