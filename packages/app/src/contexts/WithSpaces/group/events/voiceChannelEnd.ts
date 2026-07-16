@@ -14,11 +14,9 @@ export default (
 	updaters.setStatedChannels((prev) => {
 		const nw = { ...prev }
 
-		if (!nw[payload.channelId]) {
-			return nw
+		if (nw[payload.channelId]) {
+			delete nw[payload.channelId]
 		}
-
-		delete nw[payload.channelId]
 
 		return nw
 	})
