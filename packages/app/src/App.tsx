@@ -1,8 +1,7 @@
-import { Runtime } from "vessel/runtime"
+import { Runtime, VesselApp } from "vessel/runtime"
 import ReactAdapter from "vessel/adapters/react"
 
 import React from "react"
-import * as antd from "antd"
 import * as Router from "vessel/router"
 import * as Sentry from "@sentry/browser"
 import { ThemeProvider } from "@cores/style/style.core.jsx"
@@ -19,13 +18,12 @@ import routesDeclarations from "@config/routes"
 import onPageMount from "@hooks/onPageMount"
 
 import "@styles/index.less"
-import { VesselApp } from "vessel/runtime"
 
 class ComtyApp extends React.Component implements VesselApp {
 	// "mierda conocida, mejor que mierda por conocer" - yugel nunca dijo. 2025.
-	static publicEvents = StaticEvents
-	static publicMethods = StaticMethods
-	static staticRenders = StaticRenders
+	static readonly publicEvents = StaticEvents
+	static readonly publicMethods = StaticMethods
+	static readonly staticRenders = StaticRenders
 	//static splashAwaitEvent = "app.initialization.finish"
 
 	state = {
@@ -97,22 +95,20 @@ class ComtyApp extends React.Component implements VesselApp {
 
 	render() {
 		return (
-			<React.Fragment>
-				<ThemeProvider>
-					<AppCrash>
-						<NotificationsRenderer ref={this.notificationsRef} />
-						<Layout staticRenders={ComtyApp.staticRenders}>
-							{this.state.firstInitialized && (
-								<Router.Render
-									declarations={routesDeclarations}
-									staticRenders={ComtyApp.staticRenders}
-									onPageMount={onPageMount}
-								/>
-							)}
-						</Layout>
-					</AppCrash>
-				</ThemeProvider>
-			</React.Fragment>
+			<ThemeProvider>
+				<AppCrash>
+					<NotificationsRenderer ref={this.notificationsRef} />
+					<Layout staticRenders={ComtyApp.staticRenders}>
+						{this.state.firstInitialized && (
+							<Router.Render
+								declarations={routesDeclarations}
+								staticRenders={ComtyApp.staticRenders}
+								onPageMount={onPageMount}
+							/>
+						)}
+					</Layout>
+				</AppCrash>
+			</ThemeProvider>
 		)
 	}
 }
