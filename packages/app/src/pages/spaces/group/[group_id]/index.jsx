@@ -19,6 +19,7 @@ import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
 import useRtcChannelId from "@hooks/useRtcChannelId"
 import useTitle from "@hooks/useTitle"
 
+import SplitterSizes from "./splitter_sizes"
 import "@pages/spaces/index.less"
 import "./index.less"
 
@@ -31,6 +32,12 @@ const GroupPage = (props) => {
 	const group = useGroup({
 		group_id: props.params.group_id,
 	})
+
+	const savedSizes = React.useMemo(() => SplitterSizes.loadSizes(), [])
+
+	const handleResizeEnd = React.useCallback((sizes) => {
+		SplitterSizes.saveSizes(sizes)
+	}, [])
 
 	// set document title when group loads
 	React.useEffect(() => {
@@ -54,10 +61,13 @@ const GroupPage = (props) => {
 
 	return (
 		<GroupContext.Provider value={group}>
-			<Splitter className="group-page">
+			<Splitter
+				className="group-page"
+				onResizeEnd={handleResizeEnd}
+			>
 				<Splitter.Panel
 					className="group-page__panel"
-					defaultSize={330}
+					defaultSize={savedSizes?.[0] ?? 330}
 					min={270}
 				>
 					<GroupHeader />
@@ -87,7 +97,7 @@ const GroupPage = (props) => {
 
 				<Splitter.Panel
 					className="group-page__rightbar"
-					defaultSize={300}
+					defaultSize={savedSizes?.[2] ?? 300}
 					min={300}
 					collapsible
 				>
