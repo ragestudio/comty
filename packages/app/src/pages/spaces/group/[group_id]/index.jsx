@@ -12,11 +12,12 @@ import {
 	ContentPanelHeader,
 	ContentPanelRender,
 } from "@components/Spaces/Group/ContentPanel"
-import useTitle from "@hooks/useTitle"
-import useMediaRTCState from "@hooks/useMediaRTCState"
 
 import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
+
+import useRtcChannelId from "@hooks/useRtcChannelId"
+import useTitle from "@hooks/useTitle"
 
 import "@pages/spaces/index.less"
 import "./index.less"
@@ -26,7 +27,7 @@ const GroupPage = (props) => {
 
 	const [documentTitle, setDocumentTitle] = useTitle()
 
-	const rtcState = useMediaRTCState()
+	const rtcChannelId = useRtcChannelId()
 	const group = useGroup({
 		group_id: props.params.group_id,
 	})
@@ -61,7 +62,7 @@ const GroupPage = (props) => {
 				>
 					<GroupHeader />
 					<ChannelsPanel />
-					{rtcState?.channelId && <VoiceChannelCard />}
+					{rtcChannelId && <VoiceChannelCard />}
 				</Splitter.Panel>
 
 				<Splitter.Panel
