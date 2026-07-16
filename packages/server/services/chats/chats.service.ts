@@ -1,5 +1,5 @@
 import { Server } from "linebridge"
-import { Worker as SnowflakeWorker } from "snowflake-uuid"
+import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
