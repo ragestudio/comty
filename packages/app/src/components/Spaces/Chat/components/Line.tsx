@@ -135,6 +135,28 @@ const Line = React.memo(
 			onReplyPreviewClick(data.reply_to_id)
 		}, [data.reply_to_id, onReplyPreviewClick])
 
+		const isSystemMessage = data.flags?.includes("system")
+
+		if (isSystemMessage) {
+			return (
+				<div
+					data-message-id={data._id}
+					className={classnames(
+						"channel-chat__timeline__line",
+						"channel-chat__timeline__line--system",
+					)}
+				>
+					<div className="channel-chat__timeline__line__content">
+						<div className="channel-chat__timeline__line__content__body">
+							<p className="channel-chat__timeline__line--system__text">
+								{data.message}
+							</p>
+						</div>
+					</div>
+				</div>
+			)
+		}
+
 		return (
 			<div
 				data-message-id={data._id}

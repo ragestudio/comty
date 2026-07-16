@@ -27,6 +27,25 @@
 		animation: chat-line-highlight 2s ease-out;
 	}
 
+	&--system {
+		justify-content: center;
+		padding: 3px 10px;
+
+		&:hover {
+			background-color: transparent;
+		}
+
+		&__text {
+			text-align: center;
+			font-size: 0.75rem;
+			font-weight: 500;
+			opacity: 0.55;
+			user-select: text;
+			word-wrap: break-word;
+			white-space: pre-wrap;
+		}
+	}
+
 	&.headless {
 		padding-left: calc(@avatar-size + 20px);
 	}
@@ -88,8 +107,8 @@
 			gap: 6px;
 			padding: 4px 8px;
 
-			border-left: 2px solid var(--border-color);
-			border-radius: 4px;
+			border-left: 4px solid var(--border-color);
+			border-radius: 2px;
 
 			background-color: var(--background-color-primary-1);
 			cursor: pointer;
