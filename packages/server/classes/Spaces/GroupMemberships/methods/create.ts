@@ -1,6 +1,7 @@
 // @ts-ignore
 import { q } from "@ragestudio/scylla-odm/driver/mapping/q"
 import type GroupMemberships from "../index"
+import Groups from "@shared-classes/Spaces/Groups"
 
 export default async function (
 	this: typeof GroupMemberships,
@@ -83,6 +84,13 @@ export default async function (
 			)
 		}
 	}
+
+	// send system message to general channel
+	Groups.sendSystemMessage(group_id, `@${user_id} joined the group`).catch(
+		(error) => {
+			console.error("Failed to send join system message:", error)
+		},
+	)
 
 	return membership.toRaw()
 }

@@ -91,5 +91,12 @@ export default async function (
 		}
 	}
 
+	// send system message to general channel
+	Groups.sendSystemMessage(group_id, `@${user_id} left the group`).catch(
+		(error) => {
+			console.error("Failed to send leave system message:", error)
+		},
+	)
+
 	return membership
 }
