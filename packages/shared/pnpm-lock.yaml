@@ -208,20 +208,20 @@ importers:
   .:
     dependencies:
       '@ragestudio/scylla-odm':
-        specifier: ^0.22.12
-        version: 0.22.12
+        specifier: ^0.22.16
+        version: 0.22.16
 
 packages:
 
-  '@ragestudio/scylla-odm@0.22.12':
-    resolution: {integrity: sha512-s3v0/6GkSxtTwq/UU2a8Gg0LmTrsqzCtYCunoU9kV4n6+W0mxJKq6W0vGa9jLTSf9nt1luB5d+9Mcrmndazv0A==}
+  '@ragestudio/scylla-odm@0.22.16':
+    resolution: {integrity: sha512-sbbOJxJ/mB+fHkdYKPJWaWpYB0PXtGFfHkrsK6Am/eo1d+Ig/WZbdCSUs+bWmEbl7gzYUjaZRyDfGw+zPmBWew==}
 
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
 
 snapshots:
 
-  '@ragestudio/scylla-odm@0.22.12':
+  '@ragestudio/scylla-odm@0.22.16':
     dependencies:
       long: 5.3.2
 
