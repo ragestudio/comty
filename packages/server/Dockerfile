@@ -25,7 +25,6 @@ USER node
 RUN npm dedupe
 RUN IS_ACTION_RUNNER=true npm install --omit=dev
 RUN npm cache clean --force
-RUN rm package-lock.json
 
 RUN node-prune
 
@@ -45,6 +44,10 @@ WORKDIR /server
 COPY --from=build /server /server
 COPY --from=build /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=build /usr/local/bin/ffprobe /usr/local/bin/ffprobe
+COPY --from=shared . /shared
+
+RUN rm -rf /shared/node_modules
+RUN rm -rf /shared/assets
 
 # Fix permissions
 RUN chmod -R 777 /server
@@ -55,4 +58,4 @@ USER node
 
 # Start server
 ENV NODE_ENV=production
-CMD ["npm", "run", "start:prod"]
+CMD ["ultragateway"]
