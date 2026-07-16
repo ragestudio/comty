@@ -9,16 +9,12 @@ import UploadButton from "@components/UploadButton"
 import useOnPaste from "@hooks/useOnPaste"
 
 import UploadAttachments from "./UploadAttachments"
-
-import StickersButton from "./StickersButton"
-import EmojiPicker from "./EmojiPicker"
-import GifPicker from "./GifPicker"
+import ExpressionsMenu from "@components/Expressions/menu"
 
 import "./InputBar.less"
 
 const InputMenu = ({
 	close,
-	uploaderRef,
 	onUploaderStart,
 	onUploaderSuccess,
 	onUploaderProgress,
@@ -32,7 +28,6 @@ const InputMenu = ({
 		<div className="channel-chat__input__area__menu">
 			<UploadButton
 				multiple
-				ref={uploaderRef}
 				onStart={handleOnUploaderStart}
 				onProgress={onUploaderProgress}
 				onSuccess={onUploaderSuccess}
@@ -64,6 +59,7 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 	const [attachments, setAttachments] = React.useState([])
 
 	const uploaderRef = React.useRef(null)
+	const textAreaRef = React.useRef(null)
 
 	const canSubmit = () => {
 		if (attachments.some((item) => item.pending)) {
@@ -107,18 +103,6 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 			setInputValue("")
 			setAttachments([])
 		}
-	}
-
-	const sendSticker = async (sticker) => {
-		if (!sticker) {
-			return
-		}
-
-		console.log("sending sticker", sticker)
-
-		await send({
-			sticker: sticker._id ?? sticker,
-		})
 	}
 
 	const onUploaderStart = React.useCallback((uid, file) => {
@@ -169,6 +153,17 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 		setAttachments((prev) => prev.filter((item) => item.uid !== uid))
 	}, [])
 
+	const injectChar = React.useCallback(
+		(char) => {
+			handleMessageChange({
+				target: {
+					value: textAreaRef.current?.nativeElement?.value + char,
+				},
+			})
+		},
+		[textAreaRef],
+	)
+
 	useOnPaste((event) => {
 		const { clipboardData } = event
 
@@ -203,7 +198,6 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 				<Popover
 					content={InputMenu}
 					contentProps={{
-						uploaderRef,
 						onUploaderStart,
 						onUploaderSuccess,
 						onUploaderProgress,
@@ -213,6 +207,7 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 				</Popover>
 
 				<Input.TextArea
+					ref={textAreaRef}
 					name="message"
 					id="message"
 					placeholder="Type a message..."
@@ -227,10 +222,9 @@ export const ChatInputBar = ({ channel_id, send, typing }) => {
 				/>
 
 				<div className="channel-chat__input__area__buttons">
-					<EmojiPicker
-						onClickItem={(emoji) =>
-							setInputValue(inputValue + emoji)
-						}
+					<ExpressionsMenu
+						send={send}
+						injectChar={injectChar}
 					/>
 
 					<UploadButton

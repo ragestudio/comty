@@ -1,14 +1,16 @@
-.emoji-picker-dialog {
-	display: flex;
-
-	width: 310px;
-	max-height: 400px;
-
+.emoji-picker {
 	overflow: hidden;
+
+	width: 100%;
+	max-width: 100%;
+
+	height: 100%;
 
 	&__list {
 		overflow: hidden;
 		overflow-y: scroll;
+
+		height: 100%;
 
 		display: grid;
 		grid-template-columns: repeat(10, 1fr);
@@ -32,8 +34,4 @@
 			}
 		}
 	}
-}
-
-.emoji-picker-popover {
-	transform: translateX(-54%) !important;
 }

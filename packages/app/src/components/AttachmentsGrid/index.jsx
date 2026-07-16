@@ -10,6 +10,7 @@ import Image from "@components/Image"
 
 import "./index.less"
 import PropTypes from "prop-types"
+import { GifItem } from "../Expressions/GifPicker"
 
 const GenericFile = ({ attachment }) => {
 	if (!attachment || !attachment.url) {
@@ -155,9 +156,30 @@ const Attachment = React.memo((props) => {
 				return null
 			}
 
-			switch (mimeType.split("/")[0]) {
+			const mime = mimeType.split("/")
+
+			switch (mime[0]) {
 				case "image": {
-					return <Image src={url} />
+					if (mime[1] === "gif") {
+						return (
+							<GifItem
+								item={{
+									resource_url: url,
+									metadata: {
+										source: "attachment",
+									},
+								}}
+								onClick={onDoubleClickAttachment}
+							/>
+						)
+					}
+
+					return (
+						<Image
+							src={url}
+							onClick={onDoubleClickAttachment}
+						/>
+					)
 				}
 				case "video": {
 					return (
@@ -208,7 +230,6 @@ const Attachment = React.memo((props) => {
 				key={props.index}
 				id={id}
 				className="attachment"
-				onClick={onDoubleClickAttachment}
 			>
 				{props.attachment.flags &&
 					props.attachment.flags.includes("nsfw") &&
