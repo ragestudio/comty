@@ -1,3 +1,5 @@
+@playButtonSize: 32px;
+
 .player-controls {
 	display: inline-flex;
 	flex-direction: row;
@@ -27,7 +29,15 @@
 	}
 
 	.playButton {
+		position: relative;
+
 		border-radius: 12px;
+
+		width: @playButtonSize;
+		height: @playButtonSize;
+
+		max-width: @playButtonSize;
+		max-height: @playButtonSize;
 
 		svg {
 			stroke-width: 0.3;
@@ -43,8 +53,8 @@
 			right: 0;
 			left: 0;
 
-			width: 100%;
-			height: 100%;
+			width: @playButtonSize;
+			height: @playButtonSize;
 
 			margin: auto;
 
@@ -58,7 +68,7 @@
 				height: 100%;
 
 				path {
-					stroke: var(--text-color);
+					stroke: var(--background-color-accent) !important;
 					stroke-width: 1.5;
 				}
 			}

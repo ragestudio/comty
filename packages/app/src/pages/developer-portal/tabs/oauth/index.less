@@ -1,0 +1,146 @@
+.oauth-dev-page {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	gap: 20px;
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		justify-content: space-between;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+
+		border: 3px solid var(--border-color);
+		border-radius: 12px;
+
+		overflow: hidden;
+	}
+}
+
+.oauth-dev-page__list__item {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+	justify-content: space-between;
+
+	width: 100%;
+
+	padding: 5px 10px;
+	gap: 5px;
+
+	background-color: var(--background-color-accent);
+
+	// if is odd, change background color
+	&:nth-child(even) {
+		background-color: var(--background-color-accent-2);
+	}
+
+	&__header {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 5px;
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+
+		gap: 5px;
+	}
+
+	&__btn {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		cursor: pointer;
+
+		gap: 10px;
+
+		padding: 0 5px;
+	}
+}
+
+.oauth-app-create {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 10px;
+
+	&__fields {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+
+		&__field {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		gap: 5px;
+	}
+}
+
+.oauth-app-info {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	gap: 10px;
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		width: 100%;
+		gap: 5px;
+
+		&__right {
+			margin-left: auto;
+		}
+	}
+
+	&__data {
+		display: flex;
+		flex-direction: column;
+
+		gap: 10px;
+	}
+
+	&__data__field {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+	}
+
+	&__uris {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+	}
+}

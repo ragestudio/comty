@@ -12,6 +12,8 @@ export default class NotificationCore extends Core {
 	static namespace = "notifications"
 	static depenpencies = ["settings"]
 
+	ui = new NotificationUI()
+
 	state = {
 		hasOsPermision: false,
 	}
@@ -49,7 +51,7 @@ export default class NotificationCore extends Core {
 		}
 
 		if (notification.ui !== false) {
-			NotificationUI.notify(notification)
+			this.ui.notify(notification)
 		}
 
 		if (notification.feedback !== false) {
@@ -70,8 +72,6 @@ export default class NotificationCore extends Core {
 		}
 
 		const notification = await this.db.get(STORE_NAME, notf_id)
-
-		console.log(notification)
 
 		if (!notification) {
 			return null
@@ -98,7 +98,7 @@ export default class NotificationCore extends Core {
 	}
 
 	async close(id) {
-		NotificationUI.close(id)
+		this.ui.close(id)
 	}
 
 	async onInitialize() {
@@ -115,5 +115,43 @@ export default class NotificationCore extends Core {
 				}
 			},
 		})
+	}
+
+	message = {
+		open: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.open(...args)
+			}
+		},
+		destroy: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.destroy(...args)
+			}
+		},
+		info: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.info(...args)
+			}
+		},
+		success: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.success(...args)
+			}
+		},
+		warning: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.warning(...args)
+			}
+		},
+		error: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.error(...args)
+			}
+		},
+		loading: (...args) => {
+			if (this.ui.apiRef.current?.message) {
+				this.ui.apiRef.current.message.loading(...args)
+			}
+		},
 	}
 }

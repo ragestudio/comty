@@ -3,8 +3,6 @@ import Button from "@ui/Button"
 import { Select } from "antd"
 import { Icons } from "@components/Icons"
 
-import "./index.less"
-
 function getCurrentVideoSettings() {
 	const instance = app.cores.mediartc.instance()
 	const stream = instance.self.screenStream

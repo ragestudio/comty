@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm"
 
 import Poll from "@components/Poll"
 import { Icons } from "@components/Icons"
-import { processString } from "@utils"
+import processString from "@utils/processString"
 
 import PostHeader from "./components/header"
 import PostActions from "./components/actions"
@@ -29,7 +29,7 @@ const messageRegexs = [
 		fn: (key, result) => {
 			return (
 				<ReactPlayer
-					url={result[1]}
+					src={result[1]}
 					controls
 				/>
 			)
@@ -265,7 +265,6 @@ export default class PostCard extends React.PureComponent {
 						repliesCount={this.state.countReplies}
 						defaultLiked={this.state.hasLiked}
 						defaultSaved={this.state.hasSaved}
-						PP
 						actions={{
 							onClickLike: this.onClickLike,
 							onClickEdit: this.onClickEdit,

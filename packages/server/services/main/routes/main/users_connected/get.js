@@ -1,11 +1,9 @@
-import UserConnections from "@shared-classes/UserConnections"
-
 export default {
-	useContexts: ["redis"],
+	useContexts: ["redis", "userConnections"],
 	fn: async (req, res, ctx) => {
 		const { limit, offset } = req.query
 
-		return await UserConnections.getAllConnectedUsers(ctx.redis.client, {
+		return await ctx.userConnections.getAllConnectedUsers({
 			offset: offset,
 			limit: limit,
 		})

@@ -75,15 +75,19 @@ export default {
 						</div>
 					</div>
 					<div className="versions">
-						<antd.Tag>
-							<Icons.Tag />v{window.app.version ?? "experimental"}
+						<antd.Tag icon={<Icons.Tag />}>
+							v{window.app.version ?? "experimental"}
 						</antd.Tag>
-						<antd.Tag color={isProduction ? "green" : "magenta"}>
-							{isProduction ? (
-								<Icons.CircleCheck />
-							) : (
-								<Icons.Triangle />
-							)}
+						<antd.Tag
+							color={isProduction ? "green" : "magenta"}
+							icon={
+								isProduction ? (
+									<Icons.CircleCheck />
+								) : (
+									<Icons.Triangle />
+								)
+							}
+						>
 							{String(import.meta.env.MODE)}
 						</antd.Tag>
 					</div>
@@ -206,7 +210,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.SiReact />
+								<Icons.React />
 							</div>
 
 							<p>React</p>
@@ -220,7 +224,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.SiAntdesign />
+								<Icons.Antd />
 							</div>
 
 							<p>UI</p>

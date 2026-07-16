@@ -3,7 +3,7 @@ import * as antd from "antd"
 import classnames from "classnames"
 
 import moment from "moment"
-import UAParser from "ua-parser-js"
+import { UAParser } from "ua-parser-js"
 
 import { Icons } from "@components/Icons"
 
@@ -32,7 +32,7 @@ const DeviceIcon = (props) => {
 			return <FirefoxIcon />
 		}
 		default: {
-			return <Icons.FiGlobe />
+			return <Icons.Globe />
 		}
 	}
 }
@@ -55,13 +55,13 @@ const SessionItem = (props) => {
 	}
 
 	const isCurrentSession = React.useMemo(() => {
-		const currentUUID = SessionModel.session_uuid
-		return session.session_uuid === currentUUID
-	})
+		const currentToken = SessionModel.getDecodedToken()
+		return session._id === currentToken.session_id
+	}, [session])
 
 	const ua = React.useMemo(() => {
 		return UAParser(session.client)
-	})
+	}, [session.client])
 
 	return (
 		<div
@@ -92,7 +92,7 @@ const SessionItem = (props) => {
 								<Icons.Clock />
 
 								<span>
-									{moment(session.date).format(
+									{moment(session.created_at).format(
 										"DD/MM/YYYY HH:mm",
 									)}
 								</span>
@@ -121,7 +121,7 @@ const SessionItem = (props) => {
 				<div className="security_sessions_list_item_info_details_item">
 					<Icons.Server />
 
-					<span>{session.location}</span>
+					<span>{session.sign_location}</span>
 				</div>
 
 				{ua.device.vendor && (

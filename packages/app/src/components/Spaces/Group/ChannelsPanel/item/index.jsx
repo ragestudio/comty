@@ -9,7 +9,15 @@ import { Icons } from "@components/Icons"
 
 import "./index.less"
 
-const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
+const ChannelsListItem = ({
+	channel,
+	clients,
+	producers,
+	startedAt,
+	invalid,
+	selected,
+	handleOnClick,
+}) => {
 	if (!channel) {
 		return null
 	}
@@ -50,7 +58,7 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 			const rtcClient = getRtcClient(client)
 
 			if (!rtcClient) {
-				return [...channel.producers].filter(
+				return [...producers].filter(
 					(producer) => producer.user_id === client.userId,
 				)
 			}
@@ -68,7 +76,7 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 					["invalid"]: invalid,
 					["selected"]: selected,
 					["joined"]: isJoined,
-					["empty"]: channel?.clients?.length === 0,
+					["empty"]: clients?.length === 0,
 				},
 			)}
 		>
@@ -92,10 +100,10 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 						</div>
 					)}
 
-					{channel.started_at && (
+					{startedAt && (
 						<div className="group-page__channels-panel__list-item__content__info__timer">
 							<TimeAgo
-								time={channel.started_at}
+								time={startedAt}
 								counterMode={true}
 							/>
 						</div>
@@ -104,17 +112,17 @@ const ChannelsListItem = ({ channel, invalid, selected, handleOnClick }) => {
 			</div>
 
 			<AnimatePresence mode="sync">
-				{channel?.clients?.length !== 0 && (
+				{(clients?.length ?? 0) !== 0 && (
 					<div
 						key={`clients-list-${channel._id}`}
 						className="group-page__channels-panel__list-item__clients bg-accent"
 						data-channel-id={channel._id}
 						data-group-id={channel.group_id}
 					>
-						{channel?.clients.map((client, index) => {
+						{clients?.map((client, index) => {
 							return (
 								<VoiceClient
-									key={index}
+									key={client._id}
 									client={client}
 									speaking={isClientSpeaking(client)}
 									producers={getClientProducers(client)}

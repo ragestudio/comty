@@ -1,17 +1,15 @@
 import React from "react"
 import * as antd from "antd"
-import HiddenText from "../../components/HiddenText"
+import HiddenText from "@components/HiddenText"
 
-import { IoMdEyeOff } from "react-icons/io"
-import { GrStorage, GrConfigure } from "react-icons/gr"
-import { MdOutlineWifiTethering } from "react-icons/md"
+import { Icons } from "@components/Icons"
 
 const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 	return (
 		<>
 			<div className="profile-section content-panel">
 				<div className="profile-section__header">
-					<MdOutlineWifiTethering />
+					<Icons.Router />
 					<span>Server</span>
 				</div>
 
@@ -27,8 +25,7 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 									tooltips: ["Copied!"],
 								}}
 							>
-								{profile.urls?.public_host &&
-									`rtmp://${profile.urls?.public_host}`}
+								{`rtmp://${profile.urls?.public_host}`}
 							</antd.Typography.Text>
 						</code>
 					</div>
@@ -49,14 +46,14 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 
 			<div className="profile-section content-panel">
 				<div className="profile-section__header">
-					<GrConfigure />
+					<Icons.MonitorCog />
 					<span>Options</span>
 				</div>
 
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>
-							<IoMdEyeOff /> Private Mode
+							<Icons.EyeOff /> Private Mode
 						</span>
 					</div>
 					<div className="data-field__description">
@@ -86,7 +83,7 @@ const StreamConfiguration = ({ profile, loading, handleProfileUpdate }) => {
 				<div className="data-field">
 					<div className="data-field__label">
 						<span>
-							<GrStorage />
+							<Icons.CassetteTape />
 							DVR [beta]
 						</span>
 					</div>

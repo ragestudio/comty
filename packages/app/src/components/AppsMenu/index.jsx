@@ -1,6 +1,6 @@
 import React from "react"
 import { Popover, Empty } from "antd"
-import { FiInfo, FiBox, FiUser } from "react-icons/fi"
+import { Icons } from "@components/Icons"
 
 import RouterLink from "@components/RouterLink"
 import Image from "@components/Image"
@@ -30,11 +30,11 @@ const AppInfo = ({ item }) => {
 	return (
 		<div className="apps-menu-item-info-extra">
 			<span>
-				<FiUser />
+				<Icons.User />
 				{item.author}
 			</span>
 			<span>
-				<FiBox /> v{item.version}
+				<Icons.Box /> v{item.version}
 			</span>
 		</div>
 	)
@@ -47,9 +47,17 @@ const App = ({ item, close }) => {
 	}
 
 	return (
-		<div className="apps-menu-item" onClick={onClick}>
+		<div
+			className="apps-menu-item"
+			onClick={onClick}
+		>
 			<div className="apps-menu-item-icon">
-				{item.icon && <Image src={item.icon} alt={item.title} />}
+				{item.icon && (
+					<Image
+						src={item.icon}
+						alt={item.title}
+					/>
+				)}
 			</div>
 
 			<div className="apps-menu-item-info">
@@ -66,7 +74,7 @@ const App = ({ item, close }) => {
 						body: "apps-menu-item-info-extra",
 					}}
 				>
-					<FiInfo />
+					<Icons.Info />
 				</Popover>
 			</div>
 		</div>
@@ -83,7 +91,13 @@ const AppMenu = (props) => {
 			<h1>Apps</h1>
 
 			{installedApps.map((item) => {
-				return <App item={item} key={item.key} {...props} />
+				return (
+					<App
+						item={item}
+						key={item.key}
+						{...props}
+					/>
+				)
 			})}
 
 			{installedApps.length === 0 && (
@@ -95,7 +109,10 @@ const AppMenu = (props) => {
 
 			<p>
 				Manage or install your apps from
-				<RouterLink to="/settings?tab=extensions" onClick={props.close}>
+				<RouterLink
+					to="/settings?tab=extensions"
+					onClick={props.close}
+				>
 					here
 				</RouterLink>
 			</p>

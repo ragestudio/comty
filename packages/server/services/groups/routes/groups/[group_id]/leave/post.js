@@ -18,19 +18,27 @@ export default {
 			)
 		}
 
-		// check if the user is a member of the group
-		const membership = group.memberships.find(
-			(membership) => membership.user_id === req.auth.user_id,
+		let membership = await GroupMemberships.model.find(
+			{
+				user_id: req.auth.user_id,
+				group_id: req.params.group_id,
+			},
+			{
+				raw: true,
+			},
 		)
+
+		membership = membership[0]
 
 		if (!membership) {
 			throw new OperationError(403, "You are not a member of this group")
 		}
 
 		await GroupMemberships.delete(
-			membership._id.toString(),
-			req.params.group_id,
 			req.auth.user_id,
+			membership._id,
+			req.params.group_id,
+			group,
 		)
 
 		return membership

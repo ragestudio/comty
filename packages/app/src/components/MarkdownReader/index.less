@@ -1,58 +1,87 @@
 .document_viewer {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 
-    align-items: start;
-    justify-content: start;
+	gap: 5px;
 
-    text-align: start;
+	align-items: start;
+	justify-content: start;
 
-    >* {
-        user-select: text;
-    }
+	height: 100%;
+	width: 100%;
 
+	overflow: auto;
 
-    blockquote {
-        background-color: var(--background-color-accent);
-        border-radius: 8px;
-        padding: 7px;
-    }
+	text-align: start;
+	user-select: text;
 
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-top: 10px;
-        margin-bottom: 5px;
-    }
+	word-break: keep-all;
 
-    span,
-    p,
-    a {
-        margin: 5px;
-    }
+	* {
+		user-select: text;
+	}
 
-    ul {
-        color: var(--text-color);
-    }
+	blockquote {
+		display: flex;
+		flex-direction: row;
 
-    ol {
-        color: var(--text-color);
-    }
+		align-items: center;
 
-    li {
-        color: var(--text-color);
-    }
+		background-color: var(--background-color-accent);
+		border-radius: 8px;
 
-    table {
-        color: var(--text-color);
-        margin: 20px 10px;
+		padding: 7px;
+		margin: 0;
 
+		border: 2px var(--border-color) solid;
 
-        td {
-            padding: 7px;
-            outline: 1px solid var(--border-color);
-        }
-    }
+		p {
+			margin: 0;
+			padding: 0;
+		}
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	span,
+	p,
+	a {
+		display: inline;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		margin-top: 10px;
+		margin-bottom: 5px;
+	}
+
+	ul {
+		color: var(--text-color);
+	}
+
+	ol {
+		color: var(--text-color);
+	}
+
+	li {
+		color: var(--text-color);
+	}
+
+	table {
+		color: var(--text-color);
+		margin: 20px 10px;
+
+		td {
+			padding: 7px;
+			outline: 1px solid var(--border-color);
+		}
+	}
 }

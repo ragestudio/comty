@@ -1,15 +1,17 @@
 import React from "react"
 import PropTypes from "prop-types"
+import classNames from "classnames"
 
 import "./Popover.less"
-import classNames from "classnames"
 
 const Popover = ({
 	children,
 	content,
+	contentProps = {},
 	position = "top",
 	trigger = "click",
 	disabled = false,
+	autoAdjust = true,
 	className = "",
 	onOpen,
 	onClose,
@@ -19,6 +21,98 @@ const Popover = ({
 	const triggerRef = React.useRef(null)
 	const containerRef = React.useRef(null)
 	const hoverTimeoutRef = React.useRef(null)
+	const positionRef = React.useRef(position)
+	const autoAdjustRef = React.useRef(autoAdjust)
+	const offsetCacheRef = React.useRef({})
+	const contentObserverRef = React.useRef(null)
+
+	positionRef.current = position
+	autoAdjustRef.current = autoAdjust
+
+	const findClippingAncestor = (startEl) => {
+		let ancestor = startEl.parentElement
+
+		while (ancestor && ancestor !== document.body) {
+			const style = window.getComputedStyle(ancestor)
+			const overflowX = style.overflowX
+			const overflowY = style.overflowY
+
+			if (
+				overflowX === "hidden" ||
+				overflowX === "auto" ||
+				overflowX === "scroll" ||
+				overflowX === "clip" ||
+				overflowY === "hidden" ||
+				overflowY === "auto" ||
+				overflowY === "scroll" ||
+				overflowY === "clip"
+			) {
+				break
+			}
+
+			ancestor = ancestor.parentElement
+		}
+
+		return ancestor
+	}
+
+	const computeOffset = React.useCallback(() => {
+		const popover = popoverRef.current
+		const container = containerRef.current
+
+		if (!popover || !container) return null
+
+		popover.style.transform = ""
+
+		const ancestor = findClippingAncestor(container)
+		const clipRect = ancestor.getBoundingClientRect()
+		const popoverRect = popover.getBoundingClientRect()
+
+		const overflowLeft = Math.max(0, clipRect.left - popoverRect.left)
+		const overflowRight = Math.max(0, popoverRect.right - clipRect.right)
+		const overflowTop = Math.max(0, clipRect.top - popoverRect.top)
+		const overflowBottom = Math.max(0, popoverRect.bottom - clipRect.bottom)
+
+		if (
+			!overflowLeft &&
+			!overflowRight &&
+			!overflowTop &&
+			!overflowBottom
+		) {
+			return { offsetX: 0, offsetY: 0 }
+		}
+
+		let offsetX = 0
+		let offsetY = 0
+
+		if (overflowLeft > 0) {
+			offsetX = overflowLeft
+		} else if (overflowRight > 0) {
+			offsetX = -overflowRight
+		}
+
+		if (overflowTop > 0) {
+			offsetY = overflowTop
+		} else if (overflowBottom > 0) {
+			offsetY = -overflowBottom
+		}
+
+		return { offsetX, offsetY }
+	}, [])
+
+	const applyOffset = React.useCallback((offsetX, offsetY) => {
+		const popover = popoverRef.current
+
+		if (!popover) return
+
+		const currentPosition = positionRef.current
+
+		if (currentPosition === "top" || currentPosition === "bottom") {
+			popover.style.transform = `translate(calc(-50% + ${offsetX}px), ${offsetY}px)`
+		} else {
+			popover.style.transform = `translate(${offsetX}px, calc(-50% + ${offsetY}px))`
+		}
+	}, [])
 
 	const togglePopover = (event) => {
 		if (disabled) {
@@ -55,6 +149,63 @@ const Popover = ({
 			if (onClose) onClose()
 		}
 	}
+
+	React.useLayoutEffect(() => {
+		if (!autoAdjustRef.current) return
+
+		if (!isOpen) {
+			if (contentObserverRef.current) {
+				contentObserverRef.current.disconnect()
+				contentObserverRef.current = null
+			}
+
+			if (popoverRef.current) {
+				popoverRef.current.style.transform = ""
+			}
+
+			return
+		}
+
+		const popover = popoverRef.current
+		const currentPosition = positionRef.current
+
+		const cached = offsetCacheRef.current[currentPosition]
+
+		if (cached) {
+			applyOffset(cached.offsetX, cached.offsetY)
+		} else {
+			const result = computeOffset()
+
+			if (result) {
+				offsetCacheRef.current[currentPosition] = result
+				applyOffset(result.offsetX, result.offsetY)
+			}
+		}
+
+		const contentEl = popover.querySelector(".popover-content")
+
+		if (contentEl) {
+			contentObserverRef.current = new ResizeObserver(() => {
+				delete offsetCacheRef.current[currentPosition]
+
+				const result = computeOffset()
+
+				if (result) {
+					offsetCacheRef.current[currentPosition] = result
+					applyOffset(result.offsetX, result.offsetY)
+				}
+			})
+
+			contentObserverRef.current.observe(contentEl)
+		}
+
+		return () => {
+			if (contentObserverRef.current) {
+				contentObserverRef.current.disconnect()
+				contentObserverRef.current = null
+			}
+		}
+	}, [isOpen, computeOffset, applyOffset])
 
 	React.useEffect(() => {
 		if (trigger === "click") {
@@ -116,8 +267,9 @@ const Popover = ({
 		onMouseLeave: trigger === "hover" ? handlePopoverMouseLeave : undefined,
 	}
 
-	const contentProps = {
+	const contentPropsFinal = {
 		close: () => setIsOpen(false),
+		...contentProps,
 	}
 
 	return (
@@ -144,7 +296,7 @@ const Popover = ({
 				>
 					<div className="popover-content">
 						{typeof content === "function"
-							? content({ ...contentProps })
+							? content({ ...contentPropsFinal })
 							: content}
 					</div>
 				</div>
@@ -156,9 +308,11 @@ const Popover = ({
 Popover.propTypes = {
 	children: PropTypes.node.isRequired,
 	content: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
+	contentProps: PropTypes.object,
 	position: PropTypes.oneOf(["top", "bottom", "left", "right"]),
 	trigger: PropTypes.oneOf(["click", "hover"]),
 	disabled: PropTypes.bool,
+	autoAdjust: PropTypes.bool,
 	className: PropTypes.string,
 	onOpen: PropTypes.func,
 	onClose: PropTypes.func,
@@ -168,6 +322,7 @@ Popover.defaultProps = {
 	position: "bottom",
 	trigger: "click",
 	disabled: false,
+	autoAdjust: true,
 	className: "",
 	onOpen: null,
 	onClose: null,

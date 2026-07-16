@@ -6,6 +6,11 @@ import Popover from "@ui/Popover"
 import UseAnimations from "react-useanimations"
 import LoadingAnimation from "react-useanimations/lib/loading"
 
+// // @ts-ignore
+// const UseAnimations = UseAnimationsModule.default
+// // @ts-ignore
+// const LoadingAnimation = LoadingAnimationModule.default
+
 import { Icons } from "@components/Icons"
 import LikeButton from "@components/LikeButton"
 import AudioVolume from "@components/Player/AudioVolume"
@@ -72,6 +77,7 @@ const Controls = (props) => {
 	return (
 		<div className={props.className ?? "player-controls"}>
 			<AudioPlayerChangeModeButton disabled={props.streamMode} />
+
 			<Button
 				type="ghost"
 				icon={<Icons.ChevronLeft />}
@@ -93,12 +99,20 @@ const Controls = (props) => {
 				onClick={() => handleAction("playback")}
 			>
 				{playerState.loading && (
-					<div className="loadCircle">
-						<UseAnimations
-							animation={LoadingAnimation}
-							size="100%"
-						/>
-					</div>
+					<UseAnimations
+						animation={LoadingAnimation}
+						render={(eventProps, animationProps) => (
+							<div className="loadCircle">
+								<div
+									{...animationProps}
+									style={{
+										width: "100%",
+										height: "100%",
+									}}
+								/>
+							</div>
+						)}
+					/>
 				)}
 			</Button>
 			<Button

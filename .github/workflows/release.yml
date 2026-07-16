@@ -104,15 +104,21 @@ jobs:
           fetch-depth: 0
           submodules: recursive
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@8912a9102ac27614460f54aedde9e1e7f9aec20d # v6.0.5
+        with:
+          version: 11
+
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "./packages/app/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: |
-          npm install
-          npm i @rollup/rollup-linux-x64-gnu
+          pnpm install
         working-directory: ./packages/app
 
       - name: Build App

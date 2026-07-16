@@ -1,5 +1,4 @@
 import { Post } from "@db_models"
-import axios from "axios"
 
 const classifyAPI = "https://vision-service.ragestudio.net"
 
@@ -34,24 +33,23 @@ export default {
 				continue
 			}
 
-			const response = await axios({
-				method: "GET",
-				url: `${classifyAPI}/safe_detect`,
-				headers: {
-					Authorization: auth_token,
+			const params = new URLSearchParams({ url: attachment.url })
+			const response = await fetch(
+				`${classifyAPI}/safe_detect?${params}`,
+				{
+					headers: {
+						Authorization: auth_token,
+					},
 				},
-				params: {
-					url: attachment.url,
-				},
-			})
+			)
+
+			const data = await response.json()
 
 			console.log(
-				`[CLASSIFY] Attachment [${attachment.url}] classified as ${response.data.detections.adult}`,
+				`[CLASSIFY] Attachment [${attachment.url}] classified as ${data.detections.adult}`,
 			)
 
-			const adultLevel = adultLevels.indexOf(
-				response.data.detections.adult,
-			)
+			const adultLevel = adultLevels.indexOf(data.detections.adult)
 
 			if (!Array.isArray(attachment.flags)) {
 				attachment.flags = []

@@ -1,6 +1,6 @@
 import React from "react"
 import * as antd from "antd"
-import { FiPlusCircle } from "react-icons/fi"
+import { Icons } from "@components/Icons"
 import Streaming from "@models/spectrum"
 
 const NewRestreamServerForm = ({ profile, loading, handleProfileUpdate }) => {
@@ -87,7 +87,7 @@ const NewRestreamServerForm = ({ profile, loading, handleProfileUpdate }) => {
 				onClick={handleAddRestream}
 				loading={loading}
 				disabled={loading || !newRestreamHost || !newRestreamKey}
-				icon={<FiPlusCircle />}
+				icon={<Icons.PlusCircle />}
 			>
 				Add Restream Server
 			</antd.Button>

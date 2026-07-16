@@ -9,12 +9,12 @@ import Icons from "@components/Icons"
 import imageAverageColor from "@utils/imageAverageColor"
 
 import GroupContext from "@contexts/WithSpaces/group"
-import ContentPanelContext from "@contexts/WithSpaces/contentPanel"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 
 import "./index.less"
 
 const GroupHeader = () => {
-	const contentPanel = React.useContext(ContentPanelContext)
+	const spaces = useSpacesNavigation()
 	const group = React.useContext(GroupContext)
 
 	const data = group?.data ?? {}
@@ -23,15 +23,11 @@ const GroupHeader = () => {
 		React.useState(null)
 
 	const onClickSettingsButton = () => {
-		contentPanel.setContent({
-			type: "settings",
-		})
+		spaces.navigate({ channel: null, subview: "settings" })
 	}
 
 	const onClickInviteButton = () => {
-		contentPanel.setContent({
-			type: "settings",
-		})
+		spaces.navigate({ channel: null, subview: "settings" })
 	}
 
 	// calculate the average color of the group cover image
@@ -56,42 +52,37 @@ const GroupHeader = () => {
 	return (
 		<div
 			className={classNames("group-page__header", {
-				["cover_light"]: groupCoverImageAverageColor?.isLight ?? false,
+				["has_banner"]: data.cover,
+				["cover_light"]:
+					(data.cover && groupCoverImageAverageColor?.isLight) ??
+					false,
+				["average_color"]: groupCoverImageAverageColor?.hex,
 			})}
 			style={{
-				backgroundColor: data.coverColor,
+				"--cover-av-color": groupCoverImageAverageColor?.value.slice(
+					0,
+					-1,
+				),
 			}}
 		>
+			<div className="group-page__header__content">
+				<div className="group-page__header__content__text">
+					<h1>{data.name}</h1>
+				</div>
+
+				<div className="group-page__header__actions">
+					<Button
+						icon={<Icons.Settings />}
+						onClick={onClickSettingsButton}
+					/>
+				</div>
+			</div>
+
 			{data.cover && (
 				<div className="group-page__header__cover">
 					<Image src={data.cover} />
 				</div>
 			)}
-
-			<div className="group-page__header__content">
-				<div className="group-page__header__content__icon">
-					<Image src={data.icon} />
-				</div>
-
-				<div className="group-page__header__content__text">
-					<h1>{data.name}</h1>
-					<p>{data.description}</p>
-				</div>
-			</div>
-
-			<div className="group-page__header__actions">
-				{data.owner_user_id === app.userData._id && (
-					<Button
-						icon={<Icons.Settings />}
-						onClick={onClickSettingsButton}
-					/>
-				)}
-
-				<Button
-					icon={<Icons.Link2 />}
-					onClick={onClickInviteButton}
-				/>
-			</div>
 		</div>
 	)
 }

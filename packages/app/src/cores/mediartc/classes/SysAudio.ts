@@ -121,6 +121,7 @@ export default class SysAudio {
 		)
 
 		this.outputBus = this.outputCtx.createGain()
+		this.outputBus.gain.value = 1
 
 		this.pcmOutputWorklet = new AudioWorkletNode(
 			this.outputCtx,

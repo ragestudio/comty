@@ -11,7 +11,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get the project root directory path
 PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../.." && pwd )"
 
-echo -e "${YELLOW}=== Starting installation of dependencies in submodules ===${NC}"
+echo -e "${YELLOW}=== Starting installation of module dependencies ===${NC}"
 echo -e "${YELLOW}Project directory: ${GREEN}$PROJECT_ROOT${NC}"
 
 # Check if git is installed
@@ -29,50 +29,74 @@ fi
 # Change to the project root directory
 cd "$PROJECT_ROOT"
 
-# Get the list of submodules
-SUBMODULES=$(git submodule --quiet foreach 'echo $path')
-
-# Check if there are submodules
-if [[ -z "$SUBMODULES" ]]; then
-    echo -e "${YELLOW}No submodules found in this repository.${NC}"
-    exit 0
-fi
-
 # Initialize submodules if necessary
 echo -e "${YELLOW}Initializing submodules...${NC}"
 git submodule update --init --recursive
 
-# For each submodule, install dependencies
-for submodule in $SUBMODULES; do
-    echo -e "${YELLOW}Installing dependencies in: ${GREEN}$submodule${NC}"
-    SUBMODULE_PATH="$PROJECT_ROOT/$submodule"
+# Check if pnpm is available
+HAS_PNPM=false
+if command -v pnpm &> /dev/null; then
+    HAS_PNPM=true
+fi
 
-    # Check if package.json exists in the submodule directory
-    if [[ -f "$SUBMODULE_PATH/package.json" ]]; then
-        # Change to the submodule directory and run npm install
-        (cd "$SUBMODULE_PATH" && npm install) || {
-            echo -e "${RED}Error installing dependencies in $submodule${NC}"
-        }
-        echo -e "${GREEN}✓ Dependencies installed in $submodule${NC}"
-    else
-        # Check if install-dependencies.sh exists in the submodule directory
-        if [[ -f "$SUBMODULE_PATH/install-dependencies.sh" ]]; then
-            echo -e "${YELLOW}Running custom installation script in $submodule${NC}"
-            # Make sure the script has execution permissions
-            chmod +x "$SUBMODULE_PATH/install-dependencies.sh"
-            # Run the custom installation script
-            (cd "$SUBMODULE_PATH" && ./install-dependencies.sh) || {
-                echo -e "${RED}Error executing install-dependencies.sh in $submodule${NC}"
+MODULES_DIR="$PROJECT_ROOT/modules"
+
+if [[ ! -d "$MODULES_DIR" ]]; then
+    echo -e "${YELLOW}No modules directory found.${NC}"
+else
+    # For each module in the modules directory
+    for module_dir in "$MODULES_DIR"/*/; do
+        module_name=$(basename "$module_dir")
+
+        # Skip if it's not actually a directory (empty glob case)
+        [[ ! -d "$module_dir" ]] && continue
+
+        echo -e "${YELLOW}Installing dependencies in: ${GREEN}modules/$module_name${NC}"
+
+        # Handle linebridge with its own install script
+        if [[ "$module_name" == "linebridge" ]] && [[ -f "$module_dir/install-dependencies.sh" ]]; then
+            (cd "$module_dir" && bash "./install-dependencies.sh") || {
+                echo -e "${RED}Error installing dependencies in $module_name${NC}"
             }
-            echo -e "${GREEN}✓ Custom installation script executed in $submodule${NC}"
-        else
-            echo -e "${YELLOW}⚠ Neither package.json nor install-dependencies.sh found in $submodule${NC}"
+            echo -e "${GREEN}✓ Dependencies installed in $module_name${NC}"
+            continue
         fi
-    fi
-done
+
+        # Check if package.json exists in the module directory
+        if [[ -f "$module_dir/package.json" ]]; then
+            # Detect package manager from lock files
+            cd "$module_dir"
+            if [[ -f "pnpm-lock.yaml" ]] && $HAS_PNPM; then
+                echo -e "  using pnpm"
+                pnpm install || {
+                    echo -e "${RED}Error installing dependencies in $module_name${NC}"
+                }
+            elif [[ -f "package-lock.json" ]]; then
+                echo -e "  using npm"
+                npm install || {
+                    echo -e "${RED}Error installing dependencies in $module_name${NC}"
+                }
+            elif [[ -f "pnpm-lock.yaml" ]]; then
+                echo -e "  using npm (pnpm not available, but pnpm-lock found)"
+                npm install || {
+                    echo -e "${RED}Error installing dependencies in $module_name${NC}"
+                }
+            else
+                echo -e "  using npm (default)"
+                npm install || {
+                    echo -e "${RED}Error installing dependencies in $module_name${NC}"
+                }
+            fi
+            cd "$PROJECT_ROOT"
+            echo -e "${GREEN}✓ Dependencies installed in $module_name${NC}"
+        else
+            echo -e "${YELLOW}⚠ No package.json found in $module_name, skipping${NC}"
+        fi
+    done
+fi
 
 echo -e "${YELLOW}Dumping licenses...${NC}"
-cd "$(pwd)/packages/app"
+cd "$PROJECT_ROOT/packages/app"
 node "./scripts/dump-licenses.js"
 
-echo -e "${GREEN}=== Installation of dependencies in submodules completed ===${NC}"
+echo -e "${GREEN}=== Installation of module dependencies completed ===${NC}"

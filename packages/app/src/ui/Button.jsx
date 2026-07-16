@@ -2,19 +2,20 @@ import React from "react"
 import PropTypes from "prop-types"
 import classnames from "classnames"
 
-import UseAnimations from "react-useanimations"
-import loadingAnim from "react-useanimations/lib/loading"
+import LoadIcon from "./LoadIcon"
 
 import "./Button.less"
 
 const Button = ({
 	children,
+	id,
 	icon,
 	className,
 	onClick,
 	type,
 	disabled = false,
 	loading = false,
+	style,
 }) => {
 	const onlyIcon = !children && icon
 
@@ -32,24 +33,15 @@ const Button = ({
 
 	return (
 		<button
+			id={id}
 			className={classnames(classes, { "only-icon": onlyIcon })}
 			onClick={onClick}
 			disabled={disabled}
+			style={style}
 		>
 			{loading && (
 				<div className="button-icon">
-					<UseAnimations
-						animation={loadingAnim}
-						strokeColor="currentColor"
-						render={(eventProps, animationProps) => {
-							return (
-								<div
-									className="button-icon-spinner"
-									ref={animationProps.ref}
-								/>
-							)
-						}}
-					/>
+					<LoadIcon />
 				</div>
 			)}
 
@@ -62,19 +54,25 @@ const Button = ({
 
 Button.propTypes = {
 	className: PropTypes.string,
+	id: PropTypes.string,
 	icon: PropTypes.element,
 	onClick: PropTypes.func,
 	disabled: PropTypes.bool,
 	loading: PropTypes.bool,
+	style: PropTypes.object,
+	children: PropTypes.node,
 }
 
 Button.defaultProps = {
 	className: null,
+	id: null,
 	icon: null,
 	onClick: () => {},
 	type: "ghost",
 	disabled: false,
 	loading: false,
+	style: null,
+	children: null,
 }
 
 export default Button

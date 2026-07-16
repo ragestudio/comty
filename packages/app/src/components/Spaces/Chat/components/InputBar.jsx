@@ -1,27 +1,68 @@
 import React from "react"
 import { Input } from "antd"
 
+import Popover from "@/ui/Popover"
+import Button from "@/ui/Button"
 import { Icons } from "@components/Icons"
 import UploadButton from "@components/UploadButton"
 
 import useOnPaste from "@hooks/useOnPaste"
 
 import UploadAttachments from "./UploadAttachments"
+import ExpressionsMenu from "@components/Expressions/menu"
 
 import "./InputBar.less"
-import StickersButton from "./StickersButton"
-import EmojiPicker from "./EmojiPicker"
 
-const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
+const InputMenu = ({
+	close,
+	onUploaderStart,
+	onUploaderSuccess,
+	onUploaderProgress,
+}) => {
+	const handleOnUploaderStart = (...args) => {
+		if (typeof close === "function") close()
+		if (typeof onUploaderStart === "function") onUploaderStart(...args)
+	}
+
+	return (
+		<div className="channel-chat__input__area__menu">
+			<UploadButton
+				multiple
+				onStart={handleOnUploaderStart}
+				onProgress={onUploaderProgress}
+				onSuccess={onUploaderSuccess}
+				render={() => {
+					return (
+						<Button
+							type="ghost"
+							icon={<Icons.FileUp />}
+						>
+							<span>Upload a File</span>
+						</Button>
+					)
+				}}
+			/>
+
+			<Button
+				type="ghost"
+				icon={<Icons.FormInput />}
+				disabled
+			>
+				<span>Create a Poll</span>
+			</Button>
+		</div>
+	)
+}
+
+export const ChatInputBar = ({ channel_id, send, typing }) => {
 	const [inputValue, setInputValue] = React.useState("")
 	const [attachments, setAttachments] = React.useState([])
 
-	const uploaderRef = React.useRef()
+	const uploaderRef = React.useRef(null)
+	const textAreaRef = React.useRef(null)
 
-	// check if the message is empty or if there are attachments
-	// also check if something is uploading
 	const canSubmit = () => {
-		if (uploaderRef.current?.uploading) {
+		if (attachments.some((item) => item.pending)) {
 			return false
 		}
 
@@ -64,18 +105,6 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 		}
 	}
 
-	const sendSticker = async (sticker) => {
-		if (!sticker) {
-			return
-		}
-
-		console.log("sending sticker", sticker)
-
-		await send({
-			sticker: sticker._id ?? sticker,
-		})
-	}
-
 	const onUploaderStart = React.useCallback((uid, file) => {
 		setAttachments((prev) => [
 			...prev,
@@ -83,23 +112,57 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 				uid: uid,
 				file: file,
 				pending: true,
+				progress: 0,
 			},
 		])
 	}, [])
 
+	const onUploaderProgress = React.useCallback((uid, progress) => {
+		setAttachments((prev) =>
+			prev.map((item) => {
+				if (item.uid !== uid) {
+					return item
+				}
+
+				return {
+					...item,
+					progress: progress?.percent ?? 0,
+				}
+			}),
+		)
+	}, [])
+
 	const onUploaderSuccess = React.useCallback((uid, response) => {
 		setAttachments((prev) => {
-			// find the file in the list
-			const index = [...prev].findIndex((file) => file.uid === uid)
+			return prev.map((file) => {
+				if (file.uid !== uid) {
+					return file
+				}
 
-			// update the file
-			prev[index].url = response.url
-			prev[index].hash = response.metadata["File-Hash"]
-			prev[index].pending = false
-
-			return prev
+				return {
+					...file,
+					url: response.url,
+					hash: response.metadata?.["File-Hash"],
+					pending: false,
+				}
+			})
 		})
 	}, [])
+
+	const removeAttachment = React.useCallback((uid) => {
+		setAttachments((prev) => prev.filter((item) => item.uid !== uid))
+	}, [])
+
+	const injectChar = React.useCallback(
+		(char) => {
+			handleMessageChange({
+				target: {
+					value: textAreaRef.current?.nativeElement?.value + char,
+				},
+			})
+		},
+		[textAreaRef],
+	)
 
 	useOnPaste((event) => {
 		const { clipboardData } = event
@@ -125,11 +188,26 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 	return (
 		<div className="channel-chat__input">
 			{attachments.length > 0 && (
-				<UploadAttachments items={attachments} />
+				<UploadAttachments
+					items={attachments}
+					onRemove={removeAttachment}
+				/>
 			)}
 
 			<div className="channel-chat__input__area bg-accent">
+				<Popover
+					content={InputMenu}
+					contentProps={{
+						onUploaderStart,
+						onUploaderSuccess,
+						onUploaderProgress,
+					}}
+				>
+					<Button icon={<Icons.Plus />} />
+				</Popover>
+
 				<Input.TextArea
+					ref={textAreaRef}
 					name="message"
 					id="message"
 					placeholder="Type a message..."
@@ -144,19 +222,16 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 				/>
 
 				<div className="channel-chat__input__area__buttons">
-					<EmojiPicker
-						onClickItem={(emoji) =>
-							setInputValue(inputValue + emoji)
-						}
-					/>
-					<StickersButton
-						onClickItem={(sticker) => sendSticker(sticker)}
+					<ExpressionsMenu
+						send={send}
+						injectChar={injectChar}
 					/>
 
 					<UploadButton
 						multiple
 						ref={uploaderRef}
 						onStart={onUploaderStart}
+						onProgress={onUploaderProgress}
 						onSuccess={onUploaderSuccess}
 						children={null}
 					/>
@@ -172,6 +247,8 @@ const ChatInputBar = React.memo(({ channel_id, send, typing }) => {
 			</div>
 		</div>
 	)
-})
+}
 
-export default ChatInputBar
+export const MemoizedChatInputBar = React.memo(ChatInputBar)
+
+export default MemoizedChatInputBar

@@ -9,6 +9,16 @@ export default class SysAudio {
 	constructor(main) {
 		this.main = main
 
+		sysaudio.initialize({
+			excluded_pid: process.pid,
+			node_name: this.main.constructor.isDev
+				? "comty-sysaudio-dev"
+				: "comty-sysaudio",
+			device_app_id: "comty.desktop",
+			device_app_name: this.main.constructor.isDev ? "ComtyDev" : "Comty",
+			device_app_icon_name: "comty",
+		})
+
 		ipcMain.handle("sysaudio:startCapture", this.startCapture)
 		ipcMain.handle("sysaudio:stopCapture", this.stopCapture)
 		ipcMain.on("sysaudio:output", this.sendToOutput)
@@ -28,7 +38,7 @@ export default class SysAudio {
 			session.defaultSession.setDisplayMediaRequestHandler(
 				async (request, callback) => {
 					const sources = await desktopCapturer.getSources({
-						types: ["screen"],
+						types: ["screen", "window"],
 					})
 
 					const obj = {

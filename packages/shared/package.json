@@ -1,0 +1,14 @@
+{
+	"name": "@comty/shared",
+	"type": "module",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.3.0",
+			"onFail": "download"
+		}
+	},
+	"dependencies": {
+		"@ragestudio/scylla-odm": "^0.22.16"
+	}
+}

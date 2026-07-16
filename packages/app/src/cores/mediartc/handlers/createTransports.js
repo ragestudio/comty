@@ -1,7 +1,8 @@
 const sendTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			await this.socket.call("channel:connect_transport", {
+			const result = await this.socket.call("channel:connect_transport", {
+				isDm: this.state.isDm ?? false,
 				transportId: this.sendTransport.id,
 				dtlsParameters,
 			})
@@ -19,6 +20,7 @@ const sendTransportHandlers = {
 	) {
 		try {
 			const result = await this.socket.call("channel:produce", {
+				isDm: this.state.isDm ?? false,
 				transportId: this.sendTransport.id,
 				kind,
 				rtpParameters,
@@ -37,7 +39,8 @@ const sendTransportHandlers = {
 		this.state.sendTransportState = state
 
 		if (state === "failed") {
-			this.console.error("Send transport failed")
+			this.console.error("Send transport failed, triggering recovery")
+			this._handleTransportFailure()
 		}
 	},
 }
@@ -53,7 +56,8 @@ const sendTransportObserver = {
 const recvTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			await this.socket.call("channel:connect_transport", {
+			const result = await this.socket.call("channel:connect_transport", {
+				isDm: this.state.isDm ?? false,
 				transportId: this.recvTransport.id,
 				dtlsParameters,
 			})
@@ -70,7 +74,8 @@ const recvTransportHandlers = {
 		this.state.recvTransportState = state
 
 		if (state === "failed") {
-			this.console.error("Receive transport failed")
+			this.console.error("Receive transport failed, triggering recovery")
+			this._handleTransportFailure()
 		}
 	},
 }
@@ -85,7 +90,19 @@ const recvTransportObserver = {
 
 export default async function () {
 	console.debug("[webrtc] Creating new send transport")
-	const sendTransportInfo = await this.socket.call("channel:create_transport")
+	const sendTransportInfo = await this.socket.call(
+		"channel:create_transport",
+		{
+			isDm: this.state.isDm ?? false,
+		},
+	)
+
+	if (!sendTransportInfo) {
+		throw new Error(
+			"Server returned null for send transport (room state may be stale)",
+		)
+	}
+
 	console.debug("[webrtc] [send:transport] created", sendTransportInfo)
 
 	this.sendTransport = this.device.createSendTransport({
@@ -99,7 +116,19 @@ export default async function () {
 	})
 
 	console.debug("[webrtc] Creating new recv transport")
-	const recvTransportInfo = await this.socket.call("channel:create_transport")
+	const recvTransportInfo = await this.socket.call(
+		"channel:create_transport",
+		{
+			isDm: this.state.isDm ?? false,
+		},
+	)
+
+	if (!recvTransportInfo) {
+		throw new Error(
+			"Server returned null for recv transport (room state may be stale)",
+		)
+	}
+
 	console.debug("[webrtc] [recv:transport] created", recvTransportInfo)
 
 	this.recvTransport = this.device.createRecvTransport({

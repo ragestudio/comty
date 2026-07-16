@@ -20,6 +20,8 @@
 
 	"mediartc:soundpad:volume": 0.2,
 	"mediartc:noiseSuppression": "native",
+	"mediartc:inputGain": 1,
+	"mediartc:outputGain": 1,
 	"mediartc:autoGain": false,
 	"mediartc:echoCancellation": true
 }

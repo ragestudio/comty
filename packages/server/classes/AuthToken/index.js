@@ -1,11 +1,8 @@
 import jwt from "jsonwebtoken"
 import { User } from "@db_models"
+import AuthSessionModel from "@db/auth_session"
 
 export default class AuthToken {
-	static get SessionModel() {
-		return global.scylla.model("auth_session")
-	}
-
 	static get authStrategy() {
 		return {
 			expiresIn: process.env.JWT_EXPIRES_IN ?? "1h",
@@ -91,9 +88,10 @@ export default class AuthToken {
 			return result
 		}
 
-		const session = await AuthToken.SessionModel.findOneAsync(
+		const session = await AuthSessionModel.findOne(
 			{
 				_id: validation.data.session_id,
+				user_id: validation.data.user_id,
 			},
 			{ raw: true },
 		)

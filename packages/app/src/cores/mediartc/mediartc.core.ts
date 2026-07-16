@@ -10,11 +10,13 @@ import Producers from "./classes/Producers"
 import Clients from "./classes/Clients"
 import Screens from "./classes/Screens"
 import SysAudio from "./classes/SysAudio"
+import AutoRecovery from "./classes/AutoRecovery"
 
 import buildWebsocketHandler from "./utils/buildWebsocketHandler"
 import * as Vars from "./vars"
 
 // handlers
+import attachChannel from "./handlers/attachChannel"
 import createTransports from "./handlers/createTransports"
 import changeInputParams from "./handlers/changeInputParams"
 import changeOutputParams from "./handlers/changeOutputParams"
@@ -46,6 +48,8 @@ import soundpadDispatchEvent from "./events/soundpadDispatch"
 import callIncomingEvent from "./events/callIncoming"
 
 import defaults from "./defaults"
+import DebugWindow from "./debug/DebugWindow"
+import React from "react"
 
 import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
 
@@ -62,7 +66,7 @@ const WebsocketEvents: WebsocketEvent = {
 
 export default class MediaRTC extends Core {
 	static namespace = "mediartc"
-	static dependencies = ["settings", "api", "sfx"]
+	static dependencies = ["settings", "api", "sfx", "window_mng"]
 
 	static bgColor = "hotPink"
 	static textColor = "black"
@@ -94,6 +98,13 @@ export default class MediaRTC extends Core {
 
 	producers = new Producers(this)
 	consumers = new Consumers(this)
+	autoRecovery = new AutoRecovery(this)
+
+	// the groupId used to join the current channel (for recovery)
+	_joinedGroupId: string | null = null
+
+	// set while intentionally switching channels to prevent auto-recovery
+	_switchingToChannelId: string | null = null
 
 	rtpMicWorker: Worker | null = null
 
@@ -107,9 +118,12 @@ export default class MediaRTC extends Core {
 		},
 		vars: () => Vars,
 		socket: () => this.socket,
+		openDebugWindow: this.openDebugWindow.bind(this),
+		closeDebugWindow: this.closeDebugWindow.bind(this),
 	}
 
 	handlers: MediaRTCHandlers = {
+		attachChannel: attachChannel.bind(this),
 		joinChannel: joinChannel.bind(this),
 		leaveChannel: leaveChannel.bind(this),
 		startCameraShare: startCameraShare.bind(this),
@@ -136,10 +150,6 @@ export default class MediaRTC extends Core {
 					buildWebsocketHandler(this, WebsocketEvents[event]),
 				)
 			}
-
-			// await this.connectSocket({
-			// 	registerEvents: WebsocketEvents,
-			// })
 		},
 		"api:reinitialized": async () => {
 			this.socket = app.cores.api.client().ws.sockets.get("main")
@@ -150,13 +160,28 @@ export default class MediaRTC extends Core {
 					buildWebsocketHandler(this, WebsocketEvents[event]),
 				)
 			}
+
+			if (this.autoRecovery.snapshot) {
+				this.console.log(
+					"[auto-recovery] WS reinitialized, attempting recovery",
+				)
+				this.autoRecovery.start()
+			}
+		},
+		"wsmanager:main:reconnected": () => {
+			if (this.autoRecovery.snapshot) {
+				this.console.log(
+					"[auto-recovery] WS reconnected, attempting recovery",
+				)
+				this.autoRecovery.start()
+			}
 		},
 		"authmanager:logout": async () => {
 			this.console.debug(
 				"auth manager logged out, disconnecting from rtc",
 			)
 
-			//await this.disconnectSocket()
+			this.autoRecovery.cancel()
 		},
 	}
 
@@ -222,6 +247,29 @@ export default class MediaRTC extends Core {
 		}
 	}
 
+	debugWindowId = "mediartc-debug"
+
+	async openDebugWindow() {
+		if (app.cores.window_mng.has(this.debugWindowId)) {
+			this.console.log("Debug window already open")
+			return
+		}
+
+		const component = React.createElement(DebugWindow)
+
+		await app.cores.window_mng.open(this.debugWindowId, component)
+
+		this.console.log("Debug window opened")
+	}
+
+	async closeDebugWindow() {
+		if (!app.cores.window_mng.has(this.debugWindowId)) {
+			return
+		}
+
+		await app.cores.window_mng.closeById(this.debugWindowId)
+	}
+
 	async sendVoiceStateUpdate() {
 		await this.socket.emit("channel:client_event", {
 			event: "updateVoiceState",
@@ -230,5 +278,68 @@ export default class MediaRTC extends Core {
 				deafened: this.self.isDeafened,
 			},
 		})
+	}
+
+	async _handleTransportFailure() {
+		if (this.autoRecovery.isRecovering) {
+			this.console.debug(
+				"[auto-recovery] Transport failure during recovery, skipping",
+			)
+			return
+		}
+
+		if (!this.state.isJoined) {
+			this.console.debug(
+				"[auto-recovery] Not joined, skipping transport failure handler",
+			)
+			return
+		}
+
+		this.console.warn(
+			"[auto-recovery] Transport failure detected, starting recovery",
+		)
+
+		const snapshot = this.autoRecovery.takeSnapshot()
+
+		if (!snapshot) {
+			return
+		}
+
+		await this.consumers.stopAll()
+		await this.clients.destroyAll()
+
+		// stop self producers but keep media streams alive
+		if (this.self.micProducer && !this.self.micProducer.closed) {
+			this.self.micProducer.close()
+		}
+		if (this.self.screenProducer && !this.self.screenProducer.closed) {
+			this.self.screenProducer.close()
+		}
+		if (
+			this.self.screenAudioProducer &&
+			!this.self.screenAudioProducer.closed
+		) {
+			this.self.screenAudioProducer.close()
+		}
+		if (this.self.camProducer && !this.self.camProducer.closed) {
+			this.self.camProducer.close()
+		}
+
+		if (this.sendTransport && !this.sendTransport.closed) {
+			this.sendTransport.close()
+		}
+		if (this.recvTransport && !this.recvTransport.closed) {
+			this.recvTransport.close()
+		}
+
+		this.producers.clear()
+		this.device = null
+
+		this.state.isJoined = false
+		this.state.isLoading = false
+		this.state.recvTransportState = "closed"
+		this.state.sendTransportState = "closed"
+
+		this.autoRecovery.start()
 	}
 }

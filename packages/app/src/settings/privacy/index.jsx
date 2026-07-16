@@ -24,7 +24,7 @@ export default {
 	footer: () => {
 		return (
 			<div className="reminder">
-				<Icons.FiInfo /> Take a look to our{" "}
+				<Icons.Info /> Take a look to our{" "}
 				<a
 					href="/privacy"
 					target="_blank"

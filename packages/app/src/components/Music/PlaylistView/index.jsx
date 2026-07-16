@@ -53,13 +53,11 @@ const PlaylistView = ({
 				app.message.info("Edit not implemented yet.")
 			},
 			delete: async (pl) => {
-				antd.Modal.confirm({
-					title: "Are you sure you want to delete this playlist?",
-					content: `Playlist: ${pl.title}`,
-					okText: "Delete",
-					okType: "danger",
-					cancelText: "Cancel",
-					onOk: async () => {
+				app.layout.modal.confirm({
+					headerText:
+						"Are you sure you want to delete this playlist?",
+					descriptionText: `Playlist: ${pl.title}`,
+					onConfirm: async () => {
 						try {
 							await MusicModel.deletePlaylist(pl._id)
 							app.message.success("Playlist deleted successfully")

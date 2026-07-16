@@ -12,150 +12,92 @@ import {
 	ContentPanelHeader,
 	ContentPanelRender,
 } from "@components/Spaces/Group/ContentPanel"
-import useTitle from "@hooks/useTitle"
-import useMediaRTCState from "@hooks/useMediaRTCState"
 
-import SpacesPageContext from "@contexts/WithSpaces/page"
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
-import {
-	useContentPanelHeaderState,
-	ContentPanelContext,
-} from "@contexts/WithSpaces/contentPanel"
+
+import useRtcChannelId from "@hooks/useRtcChannelId"
+import useTitle from "@hooks/useTitle"
 
 import "@pages/spaces/index.less"
 import "./index.less"
 
 const GroupPage = (props) => {
-	const page = React.useContext(SpacesPageContext)
-	const currentPageRef = React.useRef()
+	const spaces = useSpacesNavigation()
 
 	const [documentTitle, setDocumentTitle] = useTitle()
-	const [content, setContent] = React.useState({})
 
-	const { headerContent, registerHeaderContent, unregisterHeaderContent } =
-		useContentPanelHeaderState()
-
-	const rtcState = useMediaRTCState()
+	const rtcChannelId = useRtcChannelId()
 	const group = useGroup({
 		group_id: props.params.group_id,
 	})
 
-	// handle group loading
+	// set document title when group loads
 	React.useEffect(() => {
-		if (!group.data || !group.channels || group.loading) {
+		if (!group.data || group.loading) {
 			return undefined
 		}
 
 		setDocumentTitle(group.data.name)
 
 		// if no channel is selected, load the first text channel (if any)
-		if (!page.channel) {
-			const firstTextChannel = group.channels.find(
+		if (!spaces.channel && !spaces.subview) {
+			const firstTextChannel = group.channels.items.find(
 				(channel) => channel.kind === "chat",
 			)
 
 			if (firstTextChannel) {
-				page.setChannel(firstTextChannel._id)
+				spaces.navigate({ channel: firstTextChannel._id })
 			}
 		}
-	}, [group.data, group.channels, group.loading])
-
-	// Handle channel switching
-	React.useEffect(() => {
-		if (!group.data || group.loading) {
-			return undefined
-		}
-
-		// check if is needed
-		if (currentPageRef.current) {
-			if (
-				currentPageRef.current.room === page.room &&
-				currentPageRef.current.channel === page.channel
-			) {
-				return undefined
-			}
-		}
-
-		// update the ref
-		currentPageRef.current = page
-
-		const channelData = group.channels?.find(
-			(_channel) => _channel._id == page.channel,
-		)
-
-		setContent({
-			type: page.isVoice ? "channel" : "chat",
-			title: channelData?.name ?? "Chat",
-			description: channelData?.description,
-			props: { _id: page.channel },
-		})
-
-		console.debug(
-			`[GROUP](${group.data._id}) Switching to channel -> (${page.channel})`,
-			{
-				data: group.data,
-				channelData,
-				page,
-			},
-		)
-	}, [group.data, group.loading, page, props.params.group_id])
+	}, [group.data, group.loading])
 
 	return (
 		<GroupContext.Provider value={group}>
-			<ContentPanelContext.Provider
-				value={{
-					...content,
-					setContent: setContent,
-					headerContent: headerContent,
-					registerHeaderContent: registerHeaderContent,
-					unregisterHeaderContent: unregisterHeaderContent,
-				}}
-			>
-				<Splitter className="spaces-page group-page">
-					<Splitter.Panel
-						className="spaces-page__panel"
-						defaultSize={330}
-						min={270}
-					>
-						<GroupHeader />
-						<ChannelsPanel />
-						{rtcState?.channelId && <VoiceChannelCard />}
-					</Splitter.Panel>
+			<Splitter className="group-page">
+				<Splitter.Panel
+					className="group-page__panel"
+					defaultSize={330}
+					min={270}
+				>
+					<GroupHeader />
+					<ChannelsPanel />
+					{rtcChannelId && <VoiceChannelCard />}
+				</Splitter.Panel>
 
-					<Splitter.Panel
-						className="spaces-page__content"
-						min={500}
-					>
-						{group.loading && <Skeleton />}
-						{!group.loading && !group.error && (
-							<div className="group-page__content-panel">
-								<ContentPanelHeader />
-								<ContentPanelRender />
-							</div>
-						)}
-						{group.error && (
-							<Result
-								status="error"
-								title="Error"
-								subTitle={group.error.message}
-							/>
-						)}
-					</Splitter.Panel>
-
-					<Splitter.Panel
-						className="spaces-page__rightbar"
-						defaultSize={300}
-						min={300}
-						collapsible
-					>
-						<MembersPanel />
-
-						<div className="spaces-page__rightbar__attached">
-							<ToolsBar />
+				<Splitter.Panel
+					className="group-page__panel"
+					min={500}
+				>
+					{group.loading && <Skeleton />}
+					{!group.loading && !group.error && (
+						<div className="group-page__content-panel">
+							<ContentPanelHeader />
+							<ContentPanelRender />
 						</div>
-					</Splitter.Panel>
-				</Splitter>
-			</ContentPanelContext.Provider>
+					)}
+					{group.error && (
+						<Result
+							status="error"
+							title="Error"
+							subTitle={group.error.message}
+						/>
+					)}
+				</Splitter.Panel>
+
+				<Splitter.Panel
+					className="group-page__rightbar"
+					defaultSize={300}
+					min={300}
+					collapsible
+				>
+					<MembersPanel />
+
+					<div className="group-page__rightbar__attached">
+						<ToolsBar />
+					</div>
+				</Splitter.Panel>
+			</Splitter>
 		</GroupContext.Provider>
 	)
 }

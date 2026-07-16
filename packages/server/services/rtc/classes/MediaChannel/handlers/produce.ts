@@ -1,7 +1,8 @@
 import Producer from "../producer"
 import validateRtpParameters from "../utils/validateRtpParameters"
 import setFind from "@shared-utils/setFind"
-import type { RTCClient } from "../types.d.ts"
+
+import type { RTCClient } from "@services/rtc/types"
 
 export type ProducePayload = {
 	transportId: string

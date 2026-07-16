@@ -1,8 +1,7 @@
+import React from "react"
 import { Button, Input, Statistic, Tag } from "antd"
 import UploadButton from "@components/UploadButton"
-
-import { FiImage, FiInfo } from "react-icons/fi"
-import { MdTextFields, MdDescription } from "react-icons/md"
+import { Icons } from "@components/Icons"
 
 import StreamPreview from "../../components/StreamPreview"
 import StreamRateChart from "../../components/StreamRateChart"
@@ -33,7 +32,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 
 	React.useEffect(() => {
 		if (
-			streamHealth &&
+			streamHealth?.available &&
 			signalQualityInfo.currentReceivedRateBps !== undefined &&
 			signalQualityInfo.currentSentRateBps !== undefined
 		) {
@@ -46,6 +45,8 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 			setStreamData((prevData) =>
 				[...prevData, newPoint].slice(-MAX_DATA_POINTS),
 			)
+		} else {
+			setStreamData([])
 		}
 	}, [
 		streamHealth,
@@ -65,14 +66,14 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 			<div className="profile-section content-panel live-tab-info">
 				<div className="profile-section__header">
 					<span>
-						<FiInfo /> Information
+						<Icons.Info /> Information
 					</span>
 				</div>
 				<div className="content-panel__content">
 					<div className="data-field">
 						<div className="data-field__label">
 							<span>
-								<MdTextFields /> Title
+								<Icons.TextInitial /> Title
 							</span>
 						</div>
 						<div className="data-field__value">
@@ -89,7 +90,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 					<div className="data-field">
 						<div className="data-field__label">
 							<span>
-								<MdDescription /> Description
+								<Icons.Text /> Description
 							</span>
 						</div>
 						<div className="data-field__value">
@@ -108,7 +109,7 @@ const Live = ({ profile, loading, handleProfileUpdate, streamHealth }) => {
 					<div className="data-field">
 						<div className="data-field__label">
 							<span>
-								<FiImage /> Offline Thumbnail
+								<Icons.Image /> Offline Thumbnail
 							</span>
 							<p>Displayed when the stream is offline</p>
 						</div>

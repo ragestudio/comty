@@ -5,6 +5,10 @@ import GroupPermissions from "@shared-classes/Spaces/GroupPermissions"
 export default {
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req) => {
+		if (typeof req.body.user_id !== "string") {
+			throw new OperationError(400, "user_id must be a string")
+		}
+
 		const group = await Groups.get(
 			req.params.group_id,
 			req.auth.session.user_id,
@@ -29,6 +33,7 @@ export default {
 
 		let membership = await GroupMemberships.get(
 			group._id,
+			req.body.user_id,
 			req.params.member_id,
 		)
 
@@ -36,7 +41,7 @@ export default {
 			throw new OperationError(404, "Membership not found")
 		}
 
-		membership = membership.toJSON()
+		membership = membership.toRaw()
 
 		if (!Array.isArray(membership.roles)) {
 			membership.roles = []

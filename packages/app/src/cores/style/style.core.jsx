@@ -63,6 +63,82 @@ export class ThemeProvider extends React.Component {
 				theme={{
 					token: {
 						...app.cores.style.vars,
+						borderRadius: 12,
+						borderRadiusSM: 8,
+						colorBgContainer: "var(--background-color-primary)",
+						colorBgElevated: "var(--background-color-primary)",
+						colorBgLayout: "var(--background-color-primary)",
+						colorText: "var(--text-color)",
+						colorBorder: "var(--border-color)",
+						colorSuccess: "#52c41a",
+						colorWarning: "#faad14",
+						fontFamily: app.cores.style.vars.fontFamily,
+					},
+					components: {
+						Button: {
+							borderRadius: 12,
+							primaryColor: "var(--background-color-primary)",
+							defaultBg: "var(--background-color-primary)",
+							defaultColor: "var(--text-color)",
+							defaultBorderColor:
+								"var(--background-color-primary-2)",
+							defaultHoverBg: "var(--background-color-primary-2)",
+							defaultHoverColor: "var(--text-color)",
+							defaultHoverBorderColor:
+								"var(--background-color-primary)",
+						},
+						Select: {
+							borderRadius: 12,
+							selectorBg: "var(--background-color-accent)",
+							optionSelectedBg:
+								"var(--background-color-primary-2)",
+						},
+						Input: {
+							borderRadius: 12,
+							colorBgContainer: "var(--background-color-accent)",
+						},
+						Mentions: {
+							borderRadius: 12,
+							colorBgContainer: "var(--background-color-accent)",
+						},
+						Modal: {
+							borderRadius: 12,
+							contentBg: "var(--background-color-primary)",
+							headerBg: "var(--background-color-primary)",
+							footerBg: "var(--background-color-primary)",
+						},
+						Menu: {
+							colorBgContainer: "transparent",
+							itemBg: "transparent",
+							subMenuItemBg: "transparent",
+							itemColor: "var(--background-color-contrast)",
+							itemHoverColor: "var(--text-color)",
+							itemSelectedColor: "var(--text-color)",
+							itemHoverBg: "var(--background-color-primary-2)",
+							itemSelectedBg: "var(--background-color-accent)",
+						},
+						Notification: {
+							borderRadius: 12,
+							colorBgElevated: "var(--background-color-primary)",
+						},
+						Message: {
+							colorBgElevated: "var(--background-color-primary)",
+						},
+						Tag: {
+							borderRadius: 12,
+						},
+						Avatar: {
+							borderRadius: 12,
+						},
+						Slider: {
+							trackBg: "var(--colorPrimary)",
+							railBg: "var(--background-color-primary-2)",
+							railHoverBg: "var(--background-color-primary)",
+						},
+						Upload: {
+							colorBgContainer: "var(--background-color-primary)",
+							colorBorder: "var(--background-color-primary-2)",
+						},
 					},
 					algorithm: themeAlgorithms,
 					zeroRuntime: true,
@@ -92,9 +168,7 @@ export default class StyleCore extends Core {
 	}
 
 	static get rootAppVariables() {
-		let rootRules = StyleCore.rootAppVarsElement.childNodes[0]
-
-		rootRules = rootRules.textContent
+		let rootRules = StyleCore.rootAppVarsElement.childNodes[0].textContent
 
 		rootRules = rootRules.replace(/\n/g, "").replace(/\t/g, "").trim()
 
@@ -121,11 +195,11 @@ export default class StyleCore extends Core {
 
 	// variants
 	static get storagedVariantKey() {
-		return app.cores.settings.get("style:theme_variant")
+		return app.cores?.settings?.get("style:theme_variant")
 	}
 
 	static set storagedVariantKey(key) {
-		app.cores.settings.set("style:theme_variant", key)
+		app.cores?.settings?.set("style:theme_variant", key)
 	}
 
 	// modifications
@@ -315,7 +389,7 @@ export default class StyleCore extends Core {
 		}
 
 		this.isOnTemporalVariant = temporal
-		this.public.variantKey = variantKey
+		this.public.currentVariantKey = variantKey
 
 		return this.updateVars(values)
 	}

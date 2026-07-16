@@ -13,6 +13,18 @@ export default {
 		}
 
 		items.push({
+			label: "Reply",
+			icon: "ReplyAll",
+			action: () => {
+				control.close()
+			},
+		})
+
+		items.push({
+			type: "separator",
+		})
+
+		items.push({
 			label: "Copy ID",
 			icon: "Copy",
 			action: () => {

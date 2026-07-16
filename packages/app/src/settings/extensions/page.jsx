@@ -76,7 +76,7 @@ const ExtensionsPage = () => {
 				<div className="extensions-page-header-actions">
 					<Button
 						type="primary"
-						icon={<Icons.FiPlus />}
+						icon={<Icons.Plus />}
 						onClick={() =>
 							app.layout.modal.open(
 								"install_custom",

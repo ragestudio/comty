@@ -1,8 +1,43 @@
 import React from "react"
 import classnames from "classnames"
-import CountUp from "react-countup"
 
 import "./index.less"
+
+const CountUp = ({ value, duration = 3000, className }) => {
+	const [displayValue, setDisplayValue] = React.useState(value)
+
+	React.useEffect(() => {
+		if (displayValue === value) return
+
+		let startValue = displayValue
+		let endValue = value
+		let startTime = performance.now()
+
+		const animate = (currentTime) => {
+			const elapsed = currentTime - startTime
+			const progress = Math.min(elapsed / duration, 1)
+
+			const easeOut = 1 - Math.pow(1 - progress, 3)
+			const currentVal = Math.floor(
+				startValue + (endValue - startValue) * easeOut,
+			)
+
+			setDisplayValue(currentVal)
+
+			if (progress < 1) {
+				requestAnimationFrame(animate)
+			}
+		}
+
+		requestAnimationFrame(animate)
+	}, [value, duration])
+
+	return (
+		<span className={className}>
+			{displayValue.toLocaleString("de-DE")}
+		</span>
+	)
+}
 
 const LikeButtonAction = (props) => {
 	const [liked, setLiked] = React.useState(props.defaultLiked ?? false)
@@ -45,13 +80,9 @@ const LikeButtonAction = (props) => {
 			</button>
 
 			<CountUp
-				start={props.count}
-				separator="."
-				end={props.count}
-				startOnMount={false}
+				value={props.count}
 				duration={3}
 				className="count"
-				useEasing={true}
 			/>
 		</div>
 	)

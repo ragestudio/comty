@@ -27,6 +27,7 @@ export default class AudioProcessor {
 		}
 
 		this.mainNode = this.context.createGain()
+		this.mainNode.gain.value = 1
 	}
 
 	lastNode = null

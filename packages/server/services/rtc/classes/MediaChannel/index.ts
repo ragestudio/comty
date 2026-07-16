@@ -1,4 +1,5 @@
 import * as mediasoup from "mediasoup"
+import EventEmitter from "@foxify/events"
 
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
@@ -10,9 +11,38 @@ import leaveClientHandler from "./handlers/leaveClient"
 import connectTransportHandler from "./handlers/connectTransport"
 import createTransportHandler from "./handlers/createTransport"
 
-import type { MediaChannelParams, RTCClient } from "./types"
+import type { MediaChannelParams, RTCClient } from "../../types"
 
-export default class MediaChannel {
+export type SerializedMediaChannel = {
+	__v: number
+	_id: string
+	clients: SerializedClient[]
+	producers: SerializedProducer[]
+	started_at: Date
+}
+
+export type SerializedClient = {
+	_id: string
+	userId: string
+	user_id: string
+	voice_state: any
+	voiceState: any
+	user?: {
+		_id?: string
+		name?: string
+		avatar?: string
+	}
+}
+
+export type SerializedProducer = {
+	id: string
+	producer_id: string
+	user_id: string
+	kind: string
+	appData: any
+}
+
+export class MediaChannel {
 	params: MediaChannelParams
 	data: any
 	channelId: string
@@ -20,6 +50,7 @@ export default class MediaChannel {
 	mediaCodecs: any[]
 	started_at: Date
 	closed: Boolean = false
+	events: EventEmitter = new EventEmitter()
 
 	static defaultMediaCodecs = [
 		{
@@ -92,15 +123,17 @@ export default class MediaChannel {
 				)
 			})
 
-			try {
-				this.sendToGroupTopic("vc:started", {
-					...this.data,
-					channelId: this.channelId,
-					started_at: this.started_at,
-				})
-			} catch (err) {
-				console.error(err)
-			}
+			this.events.emit("started", this)
+
+			// try {
+			// 	this.sendToGroupTopic("vc:started", {
+			// 		...this.data,
+			// 		channelId: this.channelId,
+			// 		started_at: this.started_at,
+			// 	})
+			// } catch (err) {
+			// 	console.error(err)
+			// }
 		} catch (error) {
 			console.error(
 				`[CHANNEL:${this.channelId}] Error initializing `,
@@ -110,15 +143,29 @@ export default class MediaChannel {
 		}
 	}
 
-	joinClient = joinClientHandler.bind(this)
-	leaveClient = leaveClientHandler.bind(this)
+	joinClient = joinClientHandler.bind(this) as OmitThisParameter<
+		typeof joinClientHandler
+	>
+	leaveClient = leaveClientHandler.bind(this) as OmitThisParameter<
+		typeof leaveClientHandler
+	>
 
-	createTransport = createTransportHandler.bind(this)
-	connectTransport = connectTransportHandler.bind(this)
+	createTransport = createTransportHandler.bind(this) as OmitThisParameter<
+		typeof createTransportHandler
+	>
+	connectTransport = connectTransportHandler.bind(this) as OmitThisParameter<
+		typeof connectTransportHandler
+	>
 
-	produce = produceHandler.bind(this)
-	stopProduce = stopProduceHandler.bind(this)
-	consume = consumeHandler.bind(this)
+	produce = produceHandler.bind(this) as OmitThisParameter<
+		typeof produceHandler
+	>
+	stopProduce = stopProduceHandler.bind(this) as OmitThisParameter<
+		typeof stopProduceHandler
+	>
+	consume = consumeHandler.bind(this) as OmitThisParameter<
+		typeof consumeHandler
+	>
 
 	async close() {
 		if (this.closed) {
@@ -168,13 +215,15 @@ export default class MediaChannel {
 
 			console.info(`[CHANNEL:${this.channelId}] closed`)
 
-			try {
-				this.sendToGroupTopic("vc:ended", {
-					channelId: this.channelId,
-				})
-			} catch (err) {
-				console.error(err)
-			}
+			this.events.emit("closed", this)
+
+			// try {
+			// 	this.sendToGroupTopic("vc:ended", {
+			// 		channelId: this.channelId,
+			// 	})
+			// } catch (err) {
+			// 	console.error(err)
+			// }
 
 			if (this.params.controller) {
 				try {
@@ -217,17 +266,18 @@ export default class MediaChannel {
 			clientVoiceState: client.voiceState,
 		})
 
-		this.sendToGroupTopic("client:vc:event", {
-			event: payload.event,
-			userId: client.userId,
-			channelId: this.channelId,
-			user: {
-				_id: client.context.user._id,
-				username: client.context.user.username,
-				avatar: client.context.user.avatar,
-			},
-			data: payload.data,
-		})
+		this.events.emit("client:event", this, client, payload)
+		// this.sendToGroupTopic("client:vc:event", {
+		// 	event: payload.event,
+		// 	userId: client.userId,
+		// 	channelId: this.channelId,
+		// 	user: {
+		// 		_id: client.context.user._id,
+		// 		username: client.context.user.username,
+		// 		avatar: client.context.user.avatar,
+		// 	},
+		// 	data: payload.data,
+		// })
 	}
 
 	async handleSoundpadDispatch(client: RTCClient, payload: any) {
@@ -278,15 +328,18 @@ export default class MediaChannel {
 		})
 	}
 
-	getConnectedClientsUserIds() {
+	getConnectedClientsUserIds(): string[] {
 		return Array.from(this.clients).map((c) => c.userId)
 	}
 
-	getConnectedClientsSerialized() {
+	getConnectedClientsSerialized(): SerializedClient[] {
 		return Array.from(this.clients).map((c) => {
 			return {
+				_id: c.userId,
 				userId: c.userId,
+				user_id: c.userId,
 				voiceState: c.voiceState,
+				voice_state: c.voiceState,
 				user: {
 					_id: c.context.user?._id,
 					username: c.context.user?.username,
@@ -296,7 +349,7 @@ export default class MediaChannel {
 		})
 	}
 
-	getProducersSerialized() {
+	getProducersSerialized(): SerializedProducer[] {
 		const producers = new Set()
 
 		for (const [producerUserId, userProducers] of this.producers) {
@@ -311,7 +364,17 @@ export default class MediaChannel {
 			}
 		}
 
-		return Array.from(producers)
+		return Array.from(producers) as SerializedProducer[]
+	}
+
+	serialize(): SerializedMediaChannel {
+		return {
+			__v: this.data.__v,
+			_id: this.data._id,
+			clients: this.getConnectedClientsSerialized(),
+			producers: this.getProducersSerialized(),
+			started_at: this.started_at,
+		}
 	}
 
 	/**
@@ -361,20 +424,22 @@ export default class MediaChannel {
 	 * @param {Object} payload
 	 * @return {Promise}
 	 */
-	async sendToGroupTopic(event: string, payload: any): Promise<any> {
-		const topic = `group:${this.data.group_id}`
+	// async sendToGroupTopic(event: string, payload: any): Promise<any> {
+	// 	const topic = `group:${this.data.group_id}`
 
-		try {
-			return await (globalThis as any).websockets.senders.toTopic(
-				topic,
-				`${topic}:${event}`,
-				payload,
-			)
-		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error sending to group topic`,
-				error,
-			)
-		}
-	}
+	// 	try {
+	// 		return await (globalThis as any).websockets.senders.toTopic(
+	// 			topic,
+	// 			`${topic}:${event}`,
+	// 			payload,
+	// 		)
+	// 	} catch (error) {
+	// 		console.error(
+	// 			`[CHANNEL:${this.channelId}] Error sending to group topic`,
+	// 			error,
+	// 		)
+	// 	}
+	// }
 }
+
+export default MediaChannel

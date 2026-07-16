@@ -3,6 +3,9 @@ import MediaRTCState from "../classes/State"
 
 export default async function (this: MediaRTC) {
 	try {
+		// cancel any pending auto-recovery
+		this.autoRecovery.cancel()
+
 		if (this.ui) {
 			this.ui.detach()
 		}
@@ -50,11 +53,22 @@ export default async function (this: MediaRTC) {
 		// clear producers just in case
 		this.producers.clear()
 
+		// clear the joined groupId
+		this._joinedGroupId = null
+
+		try {
+			// call socket to leave
+			if (this.state.isDm) {
+				this.socket?.call("call:leave")
+			} else {
+				this.socket?.call("channel:leave")
+			}
+		} catch (error: any) {
+			this.console.error("Error leaving channel:", error)
+		}
+
 		// reset default state
 		this.state = Object.assign(this.state, MediaRTCState.defaultState)
-
-		// call socket to leave
-		await this.socket?.call("channel:leave")
 	} catch (error: any) {
 		this.console.error("Error leaving channel:", error)
 

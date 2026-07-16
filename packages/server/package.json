@@ -1,49 +1,56 @@
 {
 	"name": "@comty/server",
-	"version": "2.14.0@alpha",
+	"version": "2.15.0@alpha",
 	"license": "ComtyLicense",
+	"type": "module",
 	"private": true,
 	"workspaces": [
 		"services/*"
 	],
+	"aliases": {
+		"@db": "../shared/db"
+	},
 	"scripts": {
 		"setup": "cross-env NODE_ENV=development linebridge-boot scripts/setup/index.js",
-		"start:prod": "cross-env NODE_ENV=production ultragateway",
 		"dev": "cross-env NODE_ENV=development DEBUG=true ultragateway",
-		"dev:exp": "cross-env NODE_ENV=development ../../linebridge/linebridge-gateway/debug",
-		"preinstall": "bash ./scripts/externalDeps.sh"
+		"dev:exp": "cross-env NODE_ENV=development DEBUG=true ../../modules/linebridge/linebridge-gateway/debug",
+		"preinstall": "bash ./scripts/externalDeps.sh",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
-		"@sentry/node": "^10.44.0",
-		"axios": "^1.13.6",
+		"@foxify/events": "^2.1.0",
+		"@otplib/uri": "^13.4.1",
+		"@ragestudio/scylla-odm": "0.22.16",
+		"@sentry/node": "^10.58.0",
 		"bcrypt": "^6.0.0",
-		"bullmq": "^5.71.0",
-		"cassandra-driver": "^4.8.0",
-		"cross-env": "^10.1.0",
-		"express-cassandra": "^2.9.1",
+		"bullmq": "^5.79.0",
+		"cross-env": "10.1.0",
+		"ioredis": "^5.11.1",
 		"jsonwebtoken": "^9.0.3",
-		"jws": "^4.0.1",
-		"linebridge": "^1.8.1",
+		"linebridge": "2.0.0-alpha25",
+		"lodash": "^4.18.1",
 		"minio": "^8.0.7",
-		"mongoose": "^9.3.1",
-		"qs": "^6.15.0"
+		"mongoose": "^9.7.1",
+		"otplib": "^13.4.1",
+		"qrcode": "^1.5.4",
+		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
-		"@typescript-eslint/eslint-plugin": "^8.57.1",
+		"@types/bcrypt": "^6.0.0",
+		"@types/jest": "^30.0.0",
+		"@types/luxon": "^3.7.1",
+		"@types/node": "^25.9.3",
+		"@types/qrcode": "^1.5.6",
+		"@typescript-eslint/eslint-plugin": "^8.61.1",
+		"@vitest/coverage-v8": "^4.1.9",
 		"chai": "^6.2.2",
-		"eslint": "^10.0.3",
-		"globals": "^17.4.0",
-		"mocha": "^12.0.0-beta.9",
-		"sinon": "^21.0.3"
-	},
-	"overrides": {
-		"braces": "3.0.3",
-		"minimatch": "10.2.3",
-		"fast-xml-parser": "5.5.6",
-		"diff": "8.0.3",
-		"micromatch": "4.0.8",
-		"string-width": "4.2.3"
+		"eslint": "^10.5.0",
+		"globals": "^17.6.0",
+		"sinon": "^22.0.0",
+		"vitest": "^4.1.9"
 	},
 	"optionalDependencies": {
 		"bufferutil": "^4.1.0"

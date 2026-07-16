@@ -2,24 +2,26 @@ import React from "react"
 import DMRoomsList from "@components/Spaces/DMRoomsList"
 import DMRoom from "@components/Spaces/DMRoom"
 import ToolsBar from "@layouts/components/toolsBar"
-import SpacesPageContext from "@contexts/WithSpaces/page"
+
+import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
 
 import "@pages/spaces/index.less"
 
 const DirectMessageMainPage = () => {
-	const ctx = React.useContext(SpacesPageContext)
+	const spaces = useSpacesNavigation()
 
 	return (
 		<>
-			{ctx.room && <DMRoom to_user_id={ctx.room} />}
+			{spaces.room && <DMRoom to_user_id={spaces.room} />}
 
-			{!ctx.room && (
+			{!spaces.room && (
 				<DMRoomsList
-					selectedRoom={ctx.room}
+					selectedRoom={spaces.room}
 					onClickItem={(room) => {
-						ctx.setType("dm")
-						ctx.setRoom(room.to_user_id)
-						ctx.setChannel(null)
+						spaces.navigate({
+							type: "dm",
+							room: room.to_user_id,
+						})
 					}}
 				/>
 			)}

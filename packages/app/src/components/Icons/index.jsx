@@ -1,7 +1,7 @@
 import React from "react"
+import { Icon } from "./icon"
 
-import "./index.less"
-
+import * as lucide from "lucide-react"
 import Bot from "./customIcons/bot"
 import VrChatIcon from "./customIcons/vrchat"
 import VerifiedBadge from "./customIcons/verifiedBadge"
@@ -9,22 +9,21 @@ import Crown from "./customIcons/crown"
 import Lossless from "./customIcons/lossless"
 import Ogg from "./customIcons/ogg"
 import Connection from "./customIcons/connection"
+import LoadingOutlined from "./customIcons/loading"
+import ReactIcon from "./customIcons/react"
+import AntdIcon from "./customIcons/antd"
 
-// import icons lib
-import * as lib1 from "react-icons/fi"
-import * as lib2 from "@ant-design/icons"
-import * as lib3 from "react-icons/md"
-import * as lib4 from "react-icons/io"
-import * as lib5 from "react-icons/si"
-import * as lib10 from "lucide-react"
+import "./index.less"
 
 export const Icons = {
-	...lib1,
-	...lib2,
-	...lib3,
-	...lib4,
-	...lib5,
-	...lib10,
+	...lucide,
+	LoadingOutlined: (props) => (
+		<Icon
+			{...props}
+			children={LoadingOutlined}
+			spin
+		/>
+	),
 	Bot: (props) => <Bot {...props} />,
 	Lossless: (props) => <Lossless {...props} />,
 	verifiedBadge: (props) => <VerifiedBadge {...props} />,
@@ -32,6 +31,8 @@ export const Icons = {
 	Crown: (props) => <Crown {...props} />,
 	Ogg: (props) => <Ogg {...props} />,
 	Connection: (props) => <Connection {...props} />,
+	React: (props) => <ReactIcon {...props} />,
+	Antd: (props) => <AntdIcon {...props} />,
 }
 
 export function createIconRender(icon, props) {

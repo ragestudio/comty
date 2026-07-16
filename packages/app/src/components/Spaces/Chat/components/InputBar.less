@@ -1,7 +1,7 @@
 @button-size: 35px;
 
 .channel-chat__input {
-	position: sticky;
+	position: relative;
 
 	bottom: 0;
 	left: 0;
@@ -93,5 +93,15 @@
 	&:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+}
+
+.channel-chat__input__area__menu {
+	display: flex;
+	flex-direction: column;
+
+	button {
+		justify-content: flex-start;
+		padding-left: 3px;
 	}
 }

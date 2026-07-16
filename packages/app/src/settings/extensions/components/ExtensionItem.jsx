@@ -5,7 +5,10 @@ import Image from "@components/Image"
 
 const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 	return (
-		<div key={extension.id} className="extension-item">
+		<div
+			key={extension.id}
+			className="extension-item"
+		>
 			{extension.manifest.icon && (
 				<div className="extension-item-icon">
 					<Image
@@ -17,7 +20,7 @@ const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 
 			{!extension.manifest.icon && (
 				<div className="extension-item-icon">
-					<Icons.FiBox />
+					<Icons.Box />
 				</div>
 			)}
 
@@ -29,25 +32,31 @@ const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 					{extension.manifest.description}
 				</p>
 				<div className="extension-item-indicators">
-					<Tag color="blue" icon={<Icons.FiTag />}>
+					<Tag
+						color="blue"
+						icon={<Icons.Tag />}
+					>
 						v{extension.manifest.version}
 					</Tag>
-					<Tag color="green" icon={<Icons.FiClock />}>
+					<Tag
+						color="green"
+						icon={<Icons.Clock />}
+					>
 						Load {extension.loadDuration.toFixed(2)}ms
 					</Tag>
 					{extension.manifest.author && (
-						<Tag icon={<Icons.FiUser />}>
+						<Tag icon={<Icons.User />}>
 							{extension.manifest.author}
 						</Tag>
 					)}
 					{extension.manifest.license && (
-						<Tag icon={<Icons.FiLock />}>
+						<Tag icon={<Icons.Lock />}>
 							{extension.manifest.license}
 						</Tag>
 					)}
 
 					{extension.manifest.homepage && (
-						<Tag icon={<Icons.FiExternalLink />}>
+						<Tag icon={<Icons.ExternalLink />}>
 							{extension.manifest.homepage}
 						</Tag>
 					)}
@@ -61,7 +70,7 @@ const ExtensionItem = ({ extension, onClickUninstall, onSwitchEnable }) => {
 				/>
 
 				<Button
-					icon={<Icons.FiTrash />}
+					icon={<Icons.Trash />}
 					onClick={() => onClickUninstall(extension)}
 				/>
 			</div>

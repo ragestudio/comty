@@ -1,18 +1,16 @@
 import fs from "node:fs"
 import crypto from "crypto"
 
-export default async (file) => {
-    return new Promise((resolve, reject) => {
-        if (typeof file === "string") {
-            file = fs.createReadStream(file)
-        }
+export default async (stream) => {
+	if (typeof stream === "string") {
+		stream = fs.createReadStream(stream)
+	}
 
-        const hash = crypto.createHash("sha256")
+	const hash = crypto.createHash("sha256")
 
-        file.on("data", (chunk) => hash.update(chunk))
+	for await (const chunk of stream) {
+		hash.update(chunk)
+	}
 
-        file.on("end", () => resolve(hash.digest("hex")))
-
-        file.on("error", reject)
-    })
+	return hash.digest("hex")
 }

@@ -8,9 +8,9 @@ const baseConfig = [
 		value: "en-us",
 	},
 	{
-		key: "auth:mfa",
-		type: "boolean",
-		value: false,
+		key: "auth:2fa-type",
+		type: "string",
+		value: "none",
 	},
 ]
 
@@ -25,6 +25,7 @@ export default {
 
 		baseConfig.forEach((config) => {
 			const fromBody = req.body[config.key]
+
 			if (typeof fromBody !== "undefined") {
 				if (typeof fromBody === config.type) {
 					values[config.key] = req.body[config.key]

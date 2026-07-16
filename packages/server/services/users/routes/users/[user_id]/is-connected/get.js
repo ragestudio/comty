@@ -1,20 +1,14 @@
-import UserConnections from "@shared-classes/UserConnections"
-
 export default {
-	useContexts: ["redis"],
+	useContexts: ["redis", "usersConnections"],
 	fn: async (req, res, ctx) => {
 		const isMultiple = req.params.user_id.includes(",")
 
 		if (isMultiple) {
-			return await UserConnections.isUsersConnected(
-				ctx.redis.client,
+			return await ctx.usersConnections.isUsersConnected(
 				req.params.user_id.split(",").map((id) => id.trim()),
 			)
 		}
 
-		return await UserConnections.isUserConnected(
-			ctx.redis.client,
-			req.params.user_id,
-		)
+		return await ctx.usersConnections.isUserConnected(req.params.user_id)
 	},
 }

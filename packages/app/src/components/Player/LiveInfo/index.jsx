@@ -1,7 +1,7 @@
 import React from "react"
 import SSEEvents from "@classes/SSEEvents"
 
-import { MdPlayCircle, MdHeadphones } from "react-icons/md"
+import { Icons } from "@components/Icons"
 
 import "./index.less"
 
@@ -39,10 +39,10 @@ const LiveInfo = ({ radioId, initialData }) => {
 			{data.now_playing && (
 				<>
 					<div className="live-info-title">
-						<MdPlayCircle /> {data.now_playing.song.text}
+						<Icons.PlayCircle /> {data.now_playing.song.text}
 					</div>
 					<div className="live-info-listeners">
-						<MdHeadphones /> {data.listeners}
+						<Icons.Headphones /> {data.listeners}
 					</div>
 				</>
 			)}

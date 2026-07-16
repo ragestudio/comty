@@ -17,7 +17,7 @@
 
 		width: 100%;
 
-		padding: 0 20px;
+		padding: 0 10px;
 		gap: 20px;
 
 		&__field {
@@ -28,6 +28,20 @@
 
 			gap: 10px;
 
+			&__content {
+				display: flex;
+				flex-direction: row;
+
+				align-items: center;
+
+				width: 100%;
+				padding: 0 10px;
+
+				.ant-switch {
+					width: fit-content;
+				}
+			}
+
 			&__icon {
 				line-height: 1rem;
 
@@ -35,19 +49,12 @@
 				flex-direction: row;
 				align-items: flex-start;
 
-				width: 100%;
-
 				gap: 5px;
 
 				svg {
-					min-width: 30px;
 					font-size: 1.3rem;
 					color: var(--text-color);
 				}
-			}
-
-			.ant-switch {
-				width: fit-content;
 			}
 		}
 	}

@@ -1,17 +1,20 @@
 import React from "react"
 
 export default (props) => {
-    app.layout.top_bar.render(
-        <React.Fragment>
-            {props.children}
-        </React.Fragment>,
-        props.options)
+	if (!app.layout?.top_bar) {
+		return null
+	}
 
-    React.useEffect(() => {
-        return () => {
-            app.layout.top_bar.renderDefault()
-        }
-    }, [])
+	app.layout.top_bar.render(
+		<React.Fragment>{props.children}</React.Fragment>,
+		props.options,
+	)
 
-    return null
+	React.useEffect(() => {
+		return () => {
+			app.layout.top_bar.renderDefault()
+		}
+	}, [])
+
+	return null
 }

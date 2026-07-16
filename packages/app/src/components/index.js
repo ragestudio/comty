@@ -1,8 +1,6 @@
 export { default as Footer } from "./Footer"
 
-export { default as RenderError } from "./RenderError"
 export { default as NotFound } from "./NotFound"
-export * as Crash from "./Crash"
 
 export { default as UserRegister } from "./UserRegister"
 export { default as Login } from "./Login"

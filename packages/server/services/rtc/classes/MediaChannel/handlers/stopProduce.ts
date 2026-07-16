@@ -1,4 +1,4 @@
-import type { RTCClient } from "../types.d.ts"
+import type { RTCClient } from "@services/rtc/types"
 
 export type StopProducePayload = {
 	producerId: string

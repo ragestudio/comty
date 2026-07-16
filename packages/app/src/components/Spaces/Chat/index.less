@@ -1,6 +1,3 @@
-@avatar-size: 35px;
-@attachment-size: 120px;
-
 .channel-chat {
 	position: relative;
 
@@ -14,78 +11,106 @@
 
 	gap: 10px;
 
-	&__scroll-to-bottom {
+	&__wrapper {
 		position: relative;
 
+		display: flex;
+		flex-direction: column;
+
+		width: 100%;
+		height: 100%;
+
+		border-radius: 12px;
+
+		overflow-x: hidden;
+		overflow-y: scroll;
+
+		&__timeline {
+			position: relative;
+
+			display: flex;
+			flex-direction: column-reverse;
+
+			width: 100%;
+			height: 100%;
+
+			contain: layout style paint;
+			//will-change: scroll-position;
+
+			border-radius: 12px;
+
+			scrollbar-gutter: stable;
+
+			overflow-x: hidden;
+			overflow-y: scroll;
+
+			padding: 10px;
+			padding-right: 0px;
+
+			&::-webkit-scrollbar {
+				display: block;
+				width: 15px;
+
+				background-color: transparent;
+				padding: 0 5px;
+			}
+
+			&::-webkit-scrollbar-track {
+				background-color: transparent;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background-color: var(--border-color);
+
+				border-radius: 8px;
+				border: 5px solid transparent;
+			}
+
+			&__top-trigger {
+				position: relative;
+
+				top: 0;
+				left: 0;
+
+				flex: 1;
+			}
+		}
+	}
+}
+
+.channel-chat__timeline__scrollToBottom {
+	z-index: 1000;
+	position: absolute;
+	bottom: 0;
+
+	width: 100%;
+
+	padding: 7px;
+
+	&__container {
 		display: flex;
 		flex-direction: row;
 
 		align-items: center;
 
-		padding: 5px 20px;
-
-		border-radius: 12px;
-
 		width: 100%;
+		border-radius: 8px;
+		padding: 5px 12px;
 
-		gap: 15px;
-
-		background-color: var(--background-color-accent);
-	}
-
-	&__timeline {
-		position: relative;
-
-		display: flex;
-		flex-direction: column-reverse;
-
-		width: 100%;
-		height: 100%;
-
-		overflow-x: hidden;
-		overflow-y: scroll;
-
-		contain: layout style paint;
-		//will-change: scroll-position;
-
-		border-radius: 12px;
-
-		scrollbar-gutter: stable;
-
-		padding: 10px;
-		padding-right: 0px;
-
-		&::-webkit-scrollbar {
-			display: block;
-			width: 15px;
-
-			background-color: transparent;
-			padding: 0 5px;
-		}
-
-		&::-webkit-scrollbar-track {
-			background-color: transparent;
-		}
-
-		&::-webkit-scrollbar-thumb {
-			background-color: var(--border-color);
-
-			border-radius: 8px;
-			border: 5px solid transparent;
-		}
-
-		&__top-trigger {
-			position: relative;
-
-			top: 0;
-			left: 0;
-
-			flex: 1;
+		button {
+			padding: 3px;
 		}
 	}
 }
 
-.channel-chat__attachments {
+@timeline__typers__image-size: 20px;
+@timeline__typers__image_half: calc(@timeline__typers__image-size / 2);
+
+@timeline__typers__overflow_image_transform: calc(
+	-1 * @timeline__typers__image_half
+);
+
+.channel-chat__timeline__typers {
 	position: relative;
 
 	display: flex;
@@ -94,73 +119,64 @@
 	align-items: center;
 
 	width: 100%;
-	height: fit-content;
+	max-height: 30px;
 
-	gap: 10px;
-	padding: 10px;
+	padding-top: 5px;
+	gap: 7px;
 
-	border-radius: 12px;
-	background-color: var(--background-color-accent);
-	/*
-	overflow-y: hidden;
-	overflow-x: scroll; */
+	font-size: 0.8rem;
 
-	scrollbar-gutter: stable;
-
-	&__item {
+	&__images {
 		position: relative;
 
 		display: flex;
-		flex-direction: column;
+		flex-direction: row;
 
-		width: @attachment-size;
-		height: @attachment-size;
+		align-items: center;
 
-		min-width: @attachment-size;
-		min-height: @attachment-size;
+		width: calc(
+			((@timeline__typers__image_half * var(--items))) +
+				@timeline__typers__image_half
+		);
 
-		max-width: @attachment-size;
-		max-height: @attachment-size;
+		:not(:first-child) {
+			z-index: -1;
+		}
 
-		overflow: hidden;
-
-		background-color: var(--background-color-accent);
-
-		border-radius: 12px;
-
-		&.pending {
-			filter: blur(2px);
-			opacity: 0.8;
+		:nth-child(2) {
+			transform: translateX(@timeline__typers__overflow_image_transform);
+		}
+		:nth-child(3) {
+			transform: translateX(
+				calc(
+					@timeline__typers__overflow_image_transform -
+						(@timeline__typers__image_half * 1)
+				)
+			);
+		}
+		:nth-child(4) {
+			transform: translateX(
+				calc(
+					@timeline__typers__overflow_image_transform -
+						(@timeline__typers__image_half * 2)
+				)
+			);
 		}
 
 		img {
-			width: 100%;
-			height: 100%;
+			width: @timeline__typers__image-size;
+			height: @timeline__typers__image-size;
 
-			object-fit: cover;
+			min-width: @timeline__typers__image-size;
+			min-height: @timeline__typers__image-size;
+
+			max-width: @timeline__typers__image-size;
+			max-height: @timeline__typers__image-size;
+
+			border-radius: 100%;
+
+			background-color: black;
+			outline: 1px solid var(--border-color);
 		}
-	}
-}
-
-.group-page__content-panel__header__content__users-typing {
-	display: flex;
-	flex-direction: row;
-
-	align-items: center;
-
-	background-color: var(--background-color-accent);
-	border-radius: 8px;
-	padding: 3px 10px;
-
-	gap: 5px;
-
-	img {
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-	}
-
-	span {
-		font-size: 0.7rem;
 	}
 }

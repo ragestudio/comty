@@ -1,5 +1,5 @@
 import React from "react"
-import * as antd from "antd"
+import { Form, Input, Button, Alert } from "antd"
 import classnames from "classnames"
 import { Icons } from "@components/Icons"
 
@@ -8,487 +8,464 @@ import config from "@config"
 
 import "./index.less"
 
-const stepsOnError = {
+const STEPS_ON_ERROR = {
 	username: "This username or email is not exist",
 	password: "Password is incorrect",
 }
 
-const stepsValidations = {
-	username: async (state) => {
-		const check = await AuthModel.usernameValidation(state.username).catch(
-			(err) => {
-				return {
-					exists: false,
-				}
-			},
+const STEPS_VALIDATIONS = {
+	username: async (username) => {
+		const check = await AuthModel.usernameValidation(username).catch(
+			() => ({ exists: false }),
 		)
 
 		return check.exists
 	},
 }
 
-const phasesToSteps = {
+const PHASES_TO_STEPS = {
 	0: "username",
 	1: "password",
 }
 
-class Login extends React.Component {
-	static pageStatement = {
-		bottomBarAllowed: false,
-	}
+const Login = ({ close, onDone: onDoneProp, locked, unlock }) => {
+	const [loading, setLoading] = React.useState(false)
+	const [loginInputs, setLoginInputs] = React.useState({})
+	const [error, setError] = React.useState(null)
+	const [phase, setPhase] = React.useState(0)
 
-	state = {
-		loading: false,
-		loginInputs: {},
-		error: null,
-		phase: 0,
+	const [mfaRequired, setMfaRequired] = React.useState(null)
+	const [activation, setActivation] = React.useState(null)
+	const [forbidden, setForbidden] = React.useState(false)
 
-		mfa_required: null,
-		activation: null,
-		forbidden: false,
-	}
+	const formRef = React.useRef(null)
+	const usernameInputRef = React.useRef(null)
+	const passwordInputRef = React.useRef(null)
+	const mfaCodeInputRef = React.useRef(null)
 
-	formRef = React.createRef()
+	const focusCurrentStep = React.useCallback(() => {
+		const ref = mfaRequired
+			? mfaCodeInputRef
+			: phase === 0
+				? usernameInputRef
+				: passwordInputRef
 
-	handleFinish = async () => {
-		this.setState({
-			mfa_required: false,
-		})
+		setTimeout(() => {
+			ref.current?.focus?.()
+		}, 100)
+	}, [mfaRequired, phase])
 
-		const payload = {
-			username: this.state.loginInputs.username,
-			password: this.state.loginInputs.password,
-			mfa_code: this.state.loginInputs.mfa_code,
-		}
+	React.useEffect(() => {
+		focusCurrentStep()
+	}, [phase, mfaRequired, focusCurrentStep])
 
-		this.clearError()
-		this.toggleLoading(true)
-
-		await AuthModel.login(payload, this.onDone).catch((error) => {
-			if (error.response && error.response.data) {
-				if (error.response.data.violation) {
-					return this.setState({
-						forbidden: error.response.data.violation,
-					})
-				}
-
-				if (error.response.data.activation_required) {
-					return this.setState({
-						activation: {
-							required: true,
-							user_id: error.response.data.user_id,
-						},
-					})
-				}
+	const onDone = React.useCallback(
+		async (result = {}) => {
+			if (typeof close === "function") {
+				await close({
+					unlock: true,
+				})
 			}
 
-			console.error(error, error.response)
+			if (typeof onDoneProp === "function") {
+				await onDoneProp(
+					{ loginInputs, phase, mfaRequired, activation, forbidden },
+					result,
+				)
+			}
 
-			this.toggleLoading(false)
-			this.onError(error.response?.data?.error ?? error.message)
+			return true
+		},
+		[
+			close,
+			onDoneProp,
+			loginInputs,
+			phase,
+			mfaRequired,
+			activation,
+			forbidden,
+		],
+	)
 
-			return false
-		})
-	}
-
-	onDone = async (result = {}) => {
-		if (result.mfa_required) {
-			this.setState({
-				loading: false,
-				mfa_required: result.mfa_required,
-			})
-
-			return false
+	const handleFinish = async () => {
+		const payload = {
+			username: loginInputs.username,
+			password: loginInputs.password,
+			mfa_code: loginInputs.mfa_code,
 		}
 
-		if (typeof this.props.close === "function") {
-			await this.props.close({
-				unlock: true,
-			})
-		}
-
-		if (typeof this.props.onDone === "function") {
-			await this.props.onDone(this.state, result)
-		}
-
-		return true
-	}
-
-	onClickActivateAccount = async () => {
-		const activationObj = this.state.activation
-
-		if (!activationObj) {
-			return null
-		}
+		setError(null)
+		setLoading(true)
 
 		try {
-			await AuthModel.activateAccount(
-				this.state.activation.user_id,
-				this.state.activation.code,
-			)
-
-			this.handleFinish()
-		} catch (error) {
-			this.setState({
-				activation: {
-					...this.state.activation,
-					error: error,
-				},
+			// AuthModel.login callback is called if mfa is required
+			const result = await AuthModel.login(payload, async (res) => {
+				if (res?.mfa_required) {
+					// State update is scheduled
+					setMfaRequired(res.mfa_required)
+				}
 			})
 
-			console.error(error)
+			// If we get a result (token), it's a success
+			if (result && result.token) {
+				await onDone(result)
+			} else {
+				// If result is false (MFA required) or no token, stop loading
+				setLoading(false)
+			}
+		} catch (err) {
+			setLoading(false)
+			console.error("[Login] handleFinish catch:", err)
+
+			if (err.response && err.response.data) {
+				const data = err.response.data
+				if (data.violation) {
+					setForbidden(data.violation)
+					return
+				}
+
+				if (data.activation_required) {
+					setActivation({
+						required: true,
+						user_id: data.user_id,
+					})
+					return
+				}
+
+				setError(data.error || data.message || "An error occurred")
+			} else {
+				setError(err.message || "An error occurred")
+			}
 		}
 	}
 
-	onClickResendActivationCode = async () => {
-		const activationObj = this.state.activation
-
-		if (!activationObj) {
-			return null
-		}
-
-		const rensendObj = await AuthModel.resendActivationCode(
-			activationObj.user_id,
-		).catch((error) => {
-			app.message.info(`Please try again later...`)
-			return null
-		})
-
-		if (rensendObj) {
-			this.setState({
-				activation: {
-					...this.state.activation,
-					resended: rensendObj.date,
-				},
-			})
-		}
-	}
-
-	onClickForgotPassword = () => {
-		if (this.props.locked) {
-			this.props.unlock()
-		}
-
-		if (typeof this.props.close === "function") {
-			this.props.close()
-		}
-
-		app.location.push("/auth?key=recover")
-	}
-
-	toggleLoading = (to) => {
-		if (typeof to === "undefined") {
-			to = !this.state.loading
-		}
-
-		this.setState({
-			loading: to,
-		})
-	}
-
-	clearError = () => {
-		this.setState({
-			error: null,
-		})
-	}
-
-	onError = (error) => {
-		this.setState({
-			error: error,
-		})
-	}
-
-	onUpdateInput = (input, value) => {
+	const onUpdateInput = (input, value) => {
 		if (input === "username") {
-			value = value.toLowerCase()
-			value = value.trim()
+			value = value.toLowerCase().trim()
 		}
 
 		// remove error from ref
-		this.formRef.current.setFields([
+		formRef.current?.setFields([
 			{
 				name: input,
 				errors: [],
 			},
 		])
 
-		this.setState({
-			loginInputs: {
-				...this.state.loginInputs,
-				[input]: value,
-			},
-		})
+		setLoginInputs((prev) => ({
+			...prev,
+			[input]: value,
+		}))
 	}
 
-	nextStep = async () => {
-		const phase = phasesToSteps[this.state.phase]
+	const nextStep = async () => {
+		if (mfaRequired) {
+			return handleFinish()
+		}
 
-		if (typeof stepsValidations[phase] === "function") {
-			this.toggleLoading(true)
+		const step = PHASES_TO_STEPS[phase]
 
-			const result = await stepsValidations[phase](this.state.loginInputs)
-
-			this.toggleLoading(false)
+		if (typeof STEPS_VALIDATIONS[step] === "function") {
+			setLoading(true)
+			const result = await STEPS_VALIDATIONS[step](loginInputs[step])
+			setLoading(false)
 
 			if (!result) {
-				this.formRef.current.setFields([
+				formRef.current?.setFields([
 					{
-						name: phase,
-						errors: [stepsOnError[phase]],
+						name: step,
+						errors: [STEPS_ON_ERROR[step]],
 					},
 				])
-
 				return false
 			}
 		}
 
-		const to = this.state.phase + 1
+		const to = phase + 1
 
-		if (!phasesToSteps[to]) {
-			return this.handleFinish()
+		if (!PHASES_TO_STEPS[to]) {
+			return handleFinish()
 		}
 
-		this.setState({
-			phase: to,
-		})
+		setPhase(to)
 	}
 
-	prevStep = () => {
-		const to = this.state.phase - 1
-
-		if (!phasesToSteps[to]) {
-			console.warn("No step found for phase", to)
-
+	const prevStep = () => {
+		if (mfaRequired) {
+			setMfaRequired(null)
+			loginInputs.mfa_code = null
 			return
 		}
 
-		this.setState({
-			phase: to,
-			mfa_required: null,
-		})
+		const to = phase - 1
+
+		if (PHASES_TO_STEPS[to] === undefined) {
+			return
+		}
+
+		setPhase(to)
 	}
 
-	canNext = () => {
-		if (this.state.loading) {
-			return false
+	const canNext = () => {
+		if (loading) return false
+
+		if (mfaRequired) {
+			const code = loginInputs.mfa_code
+			const requiredLength = mfaRequired.method === "totp" ? 6 : 4
+			return code && code.length === requiredLength
 		}
 
-		const { phase } = this.state
-
-		const step = phasesToSteps[phase]
-
-		return !!this.state.loginInputs[step]
+		const step = PHASES_TO_STEPS[phase]
+		return !!loginInputs[step]
 	}
 
-	render() {
-		if (this.state.forbidden) {
-			return (
-				<div className="login_wrapper">
-					<div className="content">
-						<h1>Access denied</h1>
-						<h3>
-							Your account has been disabled due a violation to
-							our terms of service
-						</h3>
+	const onClickActivateAccount = async () => {
+		if (!activation) return
 
-						<p>Here is a detailed description of the violation</p>
-
-						<div className="field-error">
-							{this.state.forbidden.reason}
-						</div>
-
-						<p>
-							If you think this is an error, or you want to apeel
-							this decision please contact our support
-						</p>
-					</div>
-				</div>
-			)
+		try {
+			setLoading(true)
+			await AuthModel.activateAccount(activation.user_id, activation.code)
+			handleFinish()
+		} catch (err) {
+			setActivation((prev) => ({
+				...prev,
+				error: err,
+			}))
+			setLoading(false)
+			console.error(err)
 		}
+	}
 
-		if (this.state.activation) {
-			return (
-				<div className="login_wrapper">
-					<div className="content">
-						<h1>Activate your Account</h1>
-						<p>
-							We have sent you an email with a code that you need
-							to enter below in order to activate your account.
-						</p>
+	const onClickResendActivationCode = async (e) => {
+		e?.preventDefault()
+		if (!activation) return
 
-						<antd.Input.OTP
-							length={6}
-							onChange={(code) =>
-								this.setState({
-									activation: {
-										...this.state.activation,
-										code: code,
-									},
-								})
-							}
-						/>
-
-						<div className="resend">
-							{this.state.activation.resended && (
-								<antd.Alert message={`Mail resended`} />
-							)}
-							<a
-								href="#"
-								onClick={this.onClickResendActivationCode}
-							>
-								Didn't receive the email?
-							</a>
-						</div>
-
-						{this.state.activation.error && (
-							<div className="field-error">
-								{
-									this.state.activation.error.response.data
-										.error
-								}
-							</div>
-						)}
-
-						<antd.Button onClick={this.onClickActivateAccount}>
-							Activate
-						</antd.Button>
-					</div>
-				</div>
+		try {
+			const resendObj = await AuthModel.resendActivationCode(
+				activation.user_id,
 			)
+			if (resendObj) {
+				setActivation((prev) => ({
+					...prev,
+					resended: resendObj.date,
+				}))
+			}
+		} catch (err) {
+			if (typeof app !== "undefined") {
+				app.message?.info(`Please try again later...`)
+			}
+			console.error(err)
 		}
+	}
 
+	const onClickForgotPassword = () => {
+		if (locked) {
+			unlock()
+		}
+		if (typeof close === "function") {
+			close()
+		}
+		if (typeof app !== "undefined") {
+			app.location?.push("/auth?key=recover")
+		}
+	}
+
+	if (forbidden) {
 		return (
 			<div className="login_wrapper">
 				<div className="content">
-					<div className="header">
-						<h1>Sign in</h1>
-						<h3>To continue to {config.app.siteName}</h3>
-					</div>
-
-					<antd.Form
-						name="login"
-						className="fields"
-						autoCorrect="off"
-						autoCapitalize="none"
-						autoComplete="on"
-						onFinish={this.handleFinish}
-						ref={this.formRef}
-					>
-						<antd.Form.Item
-							name="username"
-							className="field"
-						>
-							<span>
-								<Icons.AtSign /> Username or Email
-							</span>
-							<antd.Input
-								placeholder="myusername / myemail@example.com"
-								onChange={(e) =>
-									this.onUpdateInput(
-										"username",
-										e.target.value,
-									)
-								}
-								onPressEnter={this.nextStep}
-								disabled={this.state.phase !== 0}
-								autoFocus
-							/>
-						</antd.Form.Item>
-
-						<antd.Form.Item
-							name="password"
-							className={classnames("field", {
-								["hidden"]: this.state.phase !== 1,
-							})}
-						>
-							<span>
-								<Icons.SquareAsterisk /> Password
-							</span>
-							<antd.Input.Password
-								//placeholder="********"
-								onChange={(e) =>
-									this.onUpdateInput(
-										"password",
-										e.target.value,
-									)
-								}
-								onPressEnter={this.nextStep}
-							/>
-						</antd.Form.Item>
-
-						<antd.Form.Item
-							name="mfa_code"
-							className={classnames("field", {
-								["hidden"]: !this.state.mfa_required,
-							})}
-						>
-							<span>
-								<Icons.RectangleEllipsis /> Verification Code
-							</span>
-
-							{this.state.mfa_required && (
-								<>
-									<p>
-										We send a verification code to [
-										{this.state.mfa_required.sended_to}]
-									</p>
-
-									<p>
-										Didn't receive the code?{" "}
-										<a onClick={this.handleFinish}>
-											Resend
-										</a>
-									</p>
-								</>
-							)}
-
-							<antd.Input.OTP
-								length={4}
-								formatter={(str) => str.toUpperCase()}
-								onChange={(code) =>
-									this.onUpdateInput("mfa_code", code)
-								}
-								onPressEnter={this.nextStep}
-							/>
-						</antd.Form.Item>
-					</antd.Form>
-
-					<div className="component-row">
-						{this.state.phase > 0 && (
-							<antd.Button
-								onClick={this.prevStep}
-								disabled={this.state.loading}
-							>
-								Back
-							</antd.Button>
-						)}
-						<antd.Button
-							onClick={this.nextStep}
-							disabled={!this.canNext() || this.state.loading}
-							loading={this.state.loading}
-						>
-							Continue
-						</antd.Button>
-					</div>
-
-					{this.state.error && (
-						<div className="field-error">{this.state.error}</div>
-					)}
-
-					<div
-						className="field"
-						onClick={this.onClickForgotPassword}
-					>
-						<a>Forgot your password?</a>
-					</div>
+					<h1>Access denied</h1>
+					<h3>
+						Your account has been disabled due a violation to our
+						terms of service
+					</h3>
+					<div className="field-error">{forbidden.reason}</div>
+					<p>If you think this is an error, please contact support</p>
 				</div>
 			</div>
 		)
 	}
+
+	if (activation) {
+		return (
+			<div className="login_wrapper">
+				<div className="content">
+					<h1>Activate your Account</h1>
+					<p>
+						We have sent you an email with a code that you need to
+						enter below.
+					</p>
+
+					<Input.OTP
+						length={6}
+						onChange={(code) =>
+							setActivation((prev) => ({ ...prev, code }))
+						}
+					/>
+
+					<div className="resend">
+						{activation.resended && (
+							<Alert
+								message={`Mail resended`}
+								type="success"
+							/>
+						)}
+						<a
+							href="#"
+							onClick={onClickResendActivationCode}
+						>
+							Didn't receive the email?
+						</a>
+					</div>
+
+					{activation.error && (
+						<div className="field-error">
+							{activation.error.response?.data?.error ||
+								activation.error.message}
+						</div>
+					)}
+
+					<Button
+						onClick={onClickActivateAccount}
+						loading={loading}
+					>
+						Activate
+					</Button>
+				</div>
+			</div>
+		)
+	}
+
+	return (
+		<div className="login_wrapper">
+			<div className="content">
+				<div className="header">
+					<h1>Sign in</h1>
+					<h3>To continue to {config.app.siteName}</h3>
+				</div>
+
+				<Form
+					name="login"
+					className="fields"
+					autoCorrect="off"
+					autoCapitalize="none"
+					autoComplete="on"
+					onFinish={handleFinish}
+					ref={formRef}
+				>
+					<Form.Item
+						name="username"
+						// className={classnames("field", {
+						// 	hidden: mfaRequired || phase !== 0,
+						// })}
+					>
+						<span>
+							<Icons.AtSign /> Username or Email
+						</span>
+						<Input
+							ref={usernameInputRef}
+							placeholder="myusername / myemail@example.com"
+							onChange={(e) =>
+								onUpdateInput("username", e.target.value)
+							}
+							onPressEnter={nextStep}
+							autoFocus
+						/>
+					</Form.Item>
+
+					<Form.Item
+						name="password"
+						className={classnames("field", {
+							hidden: mfaRequired || phase !== 1,
+						})}
+					>
+						<span>
+							<Icons.SquareAsterisk /> Password
+						</span>
+						<Input.Password
+							ref={passwordInputRef}
+							onChange={(e) =>
+								onUpdateInput("password", e.target.value)
+							}
+							onPressEnter={nextStep}
+						/>
+					</Form.Item>
+
+					<Form.Item
+						name="mfa_code"
+						className={classnames("field", {
+							hidden: !mfaRequired,
+						})}
+					>
+						<span>
+							<Icons.RectangleEllipsis /> Verification Code
+						</span>
+
+						{mfaRequired && (
+							<div style={{ marginBottom: 10 }}>
+								{mfaRequired.method === "totp" ? (
+									<p>
+										Enter the 6-digit code from your
+										authenticator app.
+									</p>
+								) : (
+									<>
+										<p>
+											We send a verification code to [
+											{mfaRequired.sended_to}]
+										</p>
+										<p>
+											Didn't receive the code?{" "}
+											<a onClick={handleFinish}>Resend</a>
+										</p>
+									</>
+								)}
+							</div>
+						)}
+
+						<Input.OTP
+							ref={mfaCodeInputRef}
+							length={mfaRequired?.method === "totp" ? 6 : 4}
+							formatter={(str) => str.toUpperCase()}
+							onChange={(code) => onUpdateInput("mfa_code", code)}
+							onPressEnter={nextStep}
+						/>
+					</Form.Item>
+				</Form>
+
+				<div className="component-row">
+					{(phase > 0 || mfaRequired) && (
+						<Button
+							onClick={prevStep}
+							disabled={loading}
+						>
+							Back
+						</Button>
+					)}
+					<Button
+						onClick={nextStep}
+						disabled={!canNext() || loading}
+						loading={loading}
+					>
+						Continue
+					</Button>
+				</div>
+
+				{error && <div className="field-error">{error}</div>}
+
+				<div
+					className="field"
+					onClick={onClickForgotPassword}
+				>
+					<a>Forgot your password?</a>
+				</div>
+			</div>
+		</div>
+	)
 }
 
-const ForwardedLogin = (props) => {
-	return <Login {...props} />
+Login.pageStatement = {
+	bottomBarAllowed: false,
 }
 
-export default ForwardedLogin
+export default Login

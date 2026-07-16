@@ -64,7 +64,7 @@ export default {
 
 		items = items.map((item) => {
 			return {
-				...item.toJSON(),
+				...item.toRaw(),
 				user: users.get(item.user_id),
 			}
 		})

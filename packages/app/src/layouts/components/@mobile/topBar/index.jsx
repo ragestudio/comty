@@ -1,7 +1,7 @@
 import React from "react"
 import classnames from "classnames"
 import { motion, AnimatePresence } from "motion/react"
-import ErrorBoundary from "@components/ErrorBoundary"
+import ErrorCatcher from "@components/ErrorCatcher"
 
 import useLayoutInterface from "@hooks/useLayoutInterface"
 import useDefaultVisibility from "@hooks/useDefaultVisibility"
@@ -120,13 +120,13 @@ export default (props) => {
 							render?.options?.className,
 						)}
 					>
-						<ErrorBoundary noDisplay>
+						<ErrorCatcher noDisplay>
 							{render?.component &&
 								React.cloneElement(
 									render?.component,
 									render?.options?.props ?? {},
 								)}
-						</ErrorBoundary>
+						</ErrorCatcher>
 					</div>
 				</motion.div>
 			)}

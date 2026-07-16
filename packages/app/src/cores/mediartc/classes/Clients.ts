@@ -13,10 +13,11 @@ export default class Clients extends Map<string, Client> {
 		}
 	}
 
-	join = async (data: any): Promise<Client> => {
+	join = async (data: any): Promise<Client | null> => {
 		// check if userid is already in clients
 		if (this.has(data.userId)) {
-			throw new Error("User already in the clients map")
+			console.error("User already in the clients map")
+			return null
 		}
 
 		app.cores.sfx.play("media_channel_join")

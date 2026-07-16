@@ -98,7 +98,7 @@ const RegisterNewTag = (props) => {
 				/>
 
 				<div className="tap-share-register-header-icon">
-					<Icons.MdNfc />
+					<Icons.Nfc />
 				</div>
 
 				<h1>Register new tag</h1>
@@ -121,7 +121,7 @@ const TagItem = (props) => {
 			className="tap-share-own_tags-item"
 		>
 			<div className="tap-share-own_tags-item-icon">
-				<Icons.MdNfc />
+				<Icons.Nfc />
 			</div>
 
 			<div className="tap-share-own_tags-item-title">
@@ -197,10 +197,10 @@ class OwnTags extends React.Component {
 	}
 
 	handleTagDelete = (tag) => {
-		antd.Modal.confirm({
-			title: "Are you sure you want to delete this tag?",
-			content: `This action cannot be undone.`,
-			onOk: async () => {
+		app.layout.modal.confirm({
+			headerText: "Are you sure you want to delete this tag?",
+			descriptionText: `This action cannot be undone.`,
+			onConfirm: async () => {
 				NFCModel.deleteTag(tag._id)
 					.then(() => {
 						app.message.success("Tag deleted")
@@ -357,7 +357,7 @@ const TapShareRender = () => {
 
 export default {
 	id: "tap_share",
-	icon: "MdNfc",
+	icon: "Nfc",
 	label: "Tap Share",
 	group: "advanced",
 	render: TapShareRender,

@@ -1,5 +1,5 @@
 import React from "react"
-import { Modal as AntdModal } from "antd"
+import { AnimatePresence, motion } from "motion/react"
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
@@ -30,7 +30,7 @@ class Modal extends React.Component {
 		document.removeEventListener("keydown", this.handleEsc, false)
 	}
 
-	close = () => {
+	close = async () => {
 		this.setState({
 			visible: false,
 		})
@@ -42,16 +42,23 @@ class Modal extends React.Component {
 		}, 250)
 	}
 
+	onCloseAnimationEnd = () => {
+		// if (typeof this.props.onClose === "function") {
+		// 	this.props.onClose()
+		// }
+	}
+
 	handleEsc = (e) => {
 		if (e.key === "Escape") {
-			if (this.escTimeout !== null) {
-				clearTimeout(this.escTimeout)
-				return this.close()
-			}
+			this.close()
+			// if (this.escTimeout !== null) {
+			// 	clearTimeout(this.escTimeout)
+			// 	return this.close()
+			// }
 
-			this.escTimeout = setTimeout(() => {
-				this.escTimeout = null
-			}, 250)
+			// this.escTimeout = setTimeout(() => {
+			// 	this.escTimeout = null
+			// }, 250)
 		}
 	}
 
@@ -62,12 +69,12 @@ class Modal extends React.Component {
 		}
 
 		if (this.props.confirmOnOutsideClick) {
-			return AntdModal.confirm({
+			return app.layout.modal.confirm({
 				title: this.props.confirmOnClickTitle ?? "Are you sure?",
 				content:
 					this.props.confirmOnClickContent ??
 					"Are you sure you want to close this window?",
-				onOk: () => {
+				onConfirm: () => {
 					this.close()
 				},
 			})
@@ -89,30 +96,45 @@ class Modal extends React.Component {
 					onTouchEnd={this.handleClickOutside}
 					onMouseDown={this.handleClickOutside}
 				/>
-				<div
-					className={classNames(
-						this.props.className,
-						"app_modal_content",
-						{
-							"bg-accent": this.props.framed,
-						},
-					)}
-					ref={this.contentRef}
-					style={this.props.frameContentStyle}
-				>
-					{this.props.includeCloseButton && (
-						<div
-							className="app_modal_close"
-							onClick={this.close}
-						>
-							<Icons.X />
-						</div>
-					)}
 
-					{React.cloneElement(this.props.children, {
-						close: this.close,
-					})}
-				</div>
+				<AnimatePresence onExitComplete={this.onCloseAnimationEnd}>
+					{this.state.visible && (
+						<motion.div
+							initial={{ opacity: 0, scale: 0.8 }}
+							animate={{ opacity: 1, scale: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{
+								type: "spring",
+								stiffness: 1000,
+								damping: 40,
+								mass: 1,
+								visualDuration: 0.15,
+							}}
+							className={classNames(
+								this.props.className,
+								"app_modal_content",
+								{
+									"bg-accent": this.props.framed,
+								},
+							)}
+							ref={this.contentRef}
+							style={this.props.frameContentStyle}
+						>
+							{this.props.includeCloseButton && (
+								<div
+									className="app_modal_close"
+									onClick={this.close}
+								>
+									<Icons.X />
+								</div>
+							)}
+
+							{React.cloneElement(this.props.children, {
+								close: this.close,
+							})}
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		)
 	}

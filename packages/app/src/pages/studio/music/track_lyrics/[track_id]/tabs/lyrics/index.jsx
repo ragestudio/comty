@@ -16,8 +16,7 @@ import {
 	Flex,
 } from "antd"
 
-import { PlusOutlined } from "@ant-design/icons"
-import { MdSpaceBar } from "react-icons/md"
+import { Icons } from "@components/Icons"
 
 import { useLyricsEditor } from "../../context/LyricsEditorContext"
 
@@ -305,13 +304,13 @@ const LyricsEditor = ({ player }) => {
 				/>
 				<Button
 					type="primary"
-					icon={<PlusOutlined />}
+					icon={<Icons.Plus />}
 					onClick={handleAddLine}
 					disabled={!newLineText.trim()}
 					style={{ width: "fit-content", minWidth: "30px" }}
 				/>
 				<Button
-					icon={<MdSpaceBar />}
+					icon={<Icons.Space />}
 					onClick={handleAddLineBreak}
 					style={{ width: "fit-content", minWidth: "30px" }}
 				/>

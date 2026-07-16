@@ -1,6 +1,7 @@
 import setFind from "@shared-utils/setFind"
-import type { RTCClient } from "../types.d.ts"
 import type MediaChannel from ".."
+
+import type { RTCClient } from "@services/rtc/types"
 
 async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 	try {
@@ -16,20 +17,12 @@ async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 			client.transports = new Map()
 		}
 
-		const clientIp =
-			client.ip ||
-			client.socket?.remoteAddress ||
-			client.socket?.request?.connection?.remoteAddress ||
-			client.socket?.request?.headers?.["x-forwarded-for"]
-				?.split(",")[0]
-				?.trim()
-
 		let announcedIp = (globalThis as any).process.env.MEDIASOUP_ANNOUNCED_IP
 
 		if (!announcedIp) {
 			announcedIp =
 				(globalThis as any).process.env.NODE_ENV === "production"
-					? clientIp || "127.0.0.1"
+					? client.socket.ip || "127.0.0.1"
 					: "127.0.0.1"
 		}
 

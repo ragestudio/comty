@@ -1,5 +1,6 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
+import { ThemeProvider } from "@cores/style/style.core"
 
 export default class DomWindow {
 	constructor(controller, id, params) {
@@ -68,12 +69,14 @@ export default class DomWindow {
 		}
 
 		return this.node.render(
-			React.cloneElement(component, {
-				...props,
-				close: () => {
-					app.cores.window_mng.close(this.id)
-				},
-			}),
+			<ThemeProvider>
+				{React.cloneElement(component, {
+					...props,
+					close: () => {
+						app.cores.window_mng.close(this.id)
+					},
+				})}
+			</ThemeProvider>,
 		)
 	}
 

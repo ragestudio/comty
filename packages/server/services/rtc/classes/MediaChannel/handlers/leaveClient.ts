@@ -1,13 +1,13 @@
 import setFind from "@shared-utils/setFind"
-import type { RTCClient } from "../types.d.ts"
 
+import type { RTCClient } from "@services/rtc/types"
 export type LeaveClientOptions = {
 	emitEventToSelf?: boolean
 }
 
 async function leaveClientHandler(
 	this: any,
-	client: RTCClient,
+	client: Partial<RTCClient>,
 	{ emitEventToSelf = false }: LeaveClientOptions = {},
 ) {
 	try {
@@ -77,11 +77,13 @@ async function leaveClientHandler(
 		}
 
 		// publish to group topic
-		await this.sendToGroupTopic("client:vc:left", {
-			userId: clientInst.userId,
-			channelId: this.channelId,
-			channelClients: this.getConnectedClientsSerialized(),
-		})
+		this.events.emit("client:leave", this, clientInst)
+
+		// await this.sendToGroupTopic("client:vc:left", {
+		// 	userId: clientInst.userId,
+		// 	channelId: this.channelId,
+		// 	channelClients: this.getConnectedClientsSerialized(),
+		// })
 
 		if (emitEventToSelf === true) {
 			// notify the client that they left the channel

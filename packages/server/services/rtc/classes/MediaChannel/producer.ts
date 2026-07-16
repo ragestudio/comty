@@ -72,16 +72,18 @@ export default class Producer {
 			this.serialize(),
 		)
 
-		this.instance.sendToGroupTopic("client:vc:producer:open", {
-			userId: this.client.userId,
-			channelId: this.channelId,
-			producer: this.serialize(),
-			user: {
-				_id: this.client.context.user._id,
-				username: this.client.context.user.username,
-				avatar: this.client.context.user.avatar,
-			},
-		})
+		this.instance.events.emit("producer:open", this)
+
+		// this.instance.sendToGroupTopic("client:vc:producer:open", {
+		// 	userId: this.client.userId,
+		// 	channelId: this.channelId,
+		// 	producer: this.serialize(),
+		// 	user: {
+		// 		_id: this.client.context.user._id,
+		// 		username: this.client.context.user.username,
+		// 		avatar: this.client.context.user.avatar,
+		// 	},
+		// })
 
 		const instanceProducers = this.instance.producers
 
@@ -117,23 +119,25 @@ export default class Producer {
 			)
 		}
 
-		try {
-			this.instance.sendToGroupTopic("client:vc:producer:close", {
-				userId: this.client.userId,
-				channelId: this.channelId,
-				producer: this.serialize(),
-				user: {
-					_id: this.client.context.user._id,
-					username: this.client.context.user.username,
-					avatar: this.client.context.user.avatar,
-				},
-			})
-		} catch (error) {
-			console.error(
-				`[CHANNEL:${this.channelId}] Error notifying clients about producer close:`,
-				error,
-			)
-		}
+		this.instance.events.emit("producer:close", this)
+
+		// try {
+		// 	this.instance.sendToGroupTopic("client:vc:producer:close", {
+		// 		userId: this.client.userId,
+		// 		channelId: this.channelId,
+		// 		producer: this.serialize(),
+		// 		user: {
+		// 			_id: this.client.context.user._id,
+		// 			username: this.client.context.user.username,
+		// 			avatar: this.client.context.user.avatar,
+		// 		},
+		// 	})
+		// } catch (error) {
+		// 	console.error(
+		// 		`[CHANNEL:${this.channelId}] Error notifying clients about producer close:`,
+		// 		error,
+		// 	)
+		// }
 
 		try {
 			const instanceProducers = this.instance.producers

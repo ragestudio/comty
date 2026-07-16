@@ -1,0 +1,98 @@
+@oauth-consent-logo-size: 100px;
+
+.oauth-consent {
+	display: flex;
+	flex-direction: column;
+
+	align-items: center;
+	justify-content: center;
+
+	width: 100%;
+	height: 100%;
+
+	gap: 30px;
+
+	&__logo {
+		height: @oauth-consent-logo-size;
+		width: @oauth-consent-logo-size;
+
+		max-height: @oauth-consent-logo-size;
+		max-width: @oauth-consent-logo-size;
+
+		min-height: @oauth-consent-logo-size;
+		min-width: @oauth-consent-logo-size;
+
+		.lazy-load-image-background,
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+		}
+	}
+}
+
+.oauth-consent__card {
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	padding: 10px;
+
+	overflow: hidden;
+
+	border: 2px var(--border-color) solid;
+
+	&__actions {
+		display: flex;
+		flex-direction: row;
+
+		gap: 10px;
+	}
+
+	&__permissions {
+		display: flex;
+		flex-direction: column;
+
+		gap: 5px;
+
+		&__list {
+			display: flex;
+			flex-direction: column;
+
+			gap: 8px;
+		}
+	}
+
+	&__redirect-text {
+		font-size: 0.7rem;
+	}
+}
+
+.oauth-consent__card__permissions__scope {
+	display: flex;
+	flex-direction: row;
+
+	align-items: center;
+
+	gap: 10px;
+
+	border: 2px var(--border-color) solid;
+	border-radius: 12px;
+	padding: 10px;
+
+	&__icon {
+		font-size: 1.3rem;
+	}
+
+	&__info {
+		display: flex;
+		flex-direction: column;
+		gap: 0px;
+	}
+}

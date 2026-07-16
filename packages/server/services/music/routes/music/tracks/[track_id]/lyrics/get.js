@@ -1,5 +1,4 @@
 import { TrackLyric } from "@db_models"
-import axios from "axios"
 
 function secondsToMs(number) {
 	return number * 1000
@@ -102,7 +101,15 @@ export default async (req) => {
 
 		if (result.lrc[language]) {
 			if (typeof result.lrc[language] === "string") {
-				let { data } = await axios.get(result.lrc[language])
+				const response = await fetch(result.lrc[language])
+				let data = await response.text()
+
+				// try to parse as json first
+				try {
+					data = JSON.parse(data)
+				} catch {
+					// keep as string for lrc parsing
+				}
 
 				if (typeof data === "string") {
 					data = LRCV1.parseString(data)

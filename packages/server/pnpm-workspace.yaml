@@ -1,0 +1,17 @@
+packages:
+  - "services/*"
+
+allowBuilds:
+  bcrypt: true
+  bufferutil: true
+  esbuild: true
+  mediasoup: true
+  msgpackr-extract: true
+  sharp: true
+  unrs-resolver: set this to true or false
+  xxhash-addon: true
+
+blockExoticSubdeps: false
+
+overrides:
+  linebridge: link:../../modules/linebridge/server/build

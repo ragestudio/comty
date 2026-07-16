@@ -13,15 +13,15 @@ export default {
 			throw new OperationError(404, "Group not found")
 		}
 
-		let channels = await GroupChannels.getAllByGroupId(
+		let channels = await GroupChannels.getAllByGroup(
 			group,
 			req.auth.session.user_id,
 		)
 
-		channels = channels.map((channel) => channel.toJSON())
+		channels = channels.map((channel) => channel.toRaw())
 
 		const channelOrder = await GroupChannels.orderModel
-			.findOneAsync({
+			.findOne({
 				group_id: req.params.group_id,
 			})
 			.catch(() => null)
@@ -43,6 +43,9 @@ export default {
 			})
 		}
 
-		return channels
+		return {
+			total_items: channels.length,
+			items: channels,
+		}
 	},
 }

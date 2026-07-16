@@ -1,0 +1,27 @@
+.expressions-menu {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+
+	width: 100%;
+	height: 100%;
+
+	overflow: hidden;
+	flex: 1 1 auto;
+
+	&__tabs {
+		border-top: 2px solid var(--border-color);
+		padding-top: 5px;
+		position: relative;
+		width: 100%;
+		height: fit-content;
+	}
+}
+
+.expressions-menu-popover {
+	.popover-content {
+		width: 24rem;
+		height: 24rem;
+	}
+}

@@ -1,25 +1,16 @@
 import MediaRTC from "../mediartc.core"
-//@ts-ignore
 import GroupModel from "@models/groups"
-//@ts-ignore
-import Client from "../classes/Client"
-import { Device } from "mediasoup-client"
 
 export default async function (
 	this: MediaRTC,
 	groupId: string,
 	channelId: string,
 ) {
+	// mark that we are intentionally switching channels to prevent
+	// auto-recovery from triggering on the disconnection of the old channel
+	this._switchingToChannelId = channelId
+
 	try {
-		if (this.state.isJoined) {
-			await this.handlers.leaveChannel()
-		}
-
-		this.state.isLoading = true
-
-		// create device
-		this.device = await Device.factory()
-
 		// fetch channel data
 		const channelData = await GroupModel.channels.get(groupId, channelId)
 
@@ -29,100 +20,42 @@ export default async function (
 			self: this,
 		})
 
-		await this.self.createMicStream()
+		const data = await this.socket.call("channel:join", {
+			is_dm: false,
+			channel_id: channelData._id,
+			group_id: groupId,
+		})
 
-		// resume audio context
-		if (this.self.audioOutput.state === "suspended") {
-			await this.self.audioOutput.resume()
+		this.console.debug("Channel join data:", data)
+
+		if (!data) {
+			console.error(
+				"Server did not respond with a valid channel join data",
+			)
+			throw new Error("Invalid server response")
 		}
 
-		// start ui
-		if (this.ui) {
-			this.ui.attach()
-		}
+		this._switchingToChannelId = null
 
-		const data = await this.socket.call("channel:join", channelData._id)
+		this._joinedGroupId = groupId
+		this.state.channel = channelData
+		this.state.channelId = channelId
+
+		await this.handlers.attachChannel(data)
 
 		// dispatch sfx
 		app.cores.sfx.play("media_channel_join")
-
-		this.state.channel = channelData
-		this.state.channelId = channelData._id
-
-		if (data.started_at) {
-			this.state.channel.started_at = data.started_at
-		}
-
-		// load device
-		await this.device.load({
-			routerRtpCapabilities: data.rtpCapabilities,
-		})
-
-		// set all clients
-		for (let client of data.clients) {
-			this.clients.set(client.userId, new Client(this, client))
-		}
-
-		// create and setup transports
-		await this.handlers.createTransports()
-
-		// start audio producer
-		await this.self.startMicProducer()
-
-		// sync producers & clients mic
-		if (data.producers && Array.isArray(data.producers)) {
-			for (const producer of data.producers) {
-				// if is self producer, skip
-				if (producer.userId === app.userData._id) {
-					continue
-				}
-
-				// add to producers
-				this.producers.setRemote(producer)
-
-				const client = this.clients.get(producer.userId)
-
-				if (client) {
-					// attach current client mic
-					if (producer.appData.mediaTag === "user-mic") {
-						await client.attachMic({
-							producerId: producer.producerId,
-							userId: producer.userId,
-							kind: producer.kind,
-							appData: producer.appData,
-						})
-					}
-				}
-			}
-		}
-
-		this.state.isJoined = true
-		this.state.isLoading = false
-		this.state.connectedAt = new Date()
-
-		this.console.log("Joined channel", {
-			...data,
-			groupId,
-			channelId,
-			clients: data.clients,
-		})
 	} catch (error: any) {
-		this.console.error(error)
-		this.console.error(error.stack)
+		this._switchingToChannelId = null
 
-		this.state.isJoined = false
-		this.state.isLoading = false
-
-		if (this.ui) {
-			this.ui.detach()
+		if (!this.autoRecovery.isRecovering) {
+			app.cores.notifications.new({
+				title: "Failed to join channel",
+				message: error.message,
+				type: "error",
+			})
 		}
 
-		this.self.stopAll()
-
-		app.cores.notifications.new({
-			title: "Failed to join channel",
-			message: error.message,
-			type: "error",
-		})
+		throw error
 	}
 }

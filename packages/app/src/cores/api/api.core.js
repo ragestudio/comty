@@ -54,6 +54,8 @@ export default class APICore extends Core {
 			)
 
 			this.listenEvents(events)
+
+			this.console.log("Main socket open")
 		},
 		"authmanager:authed": async () => {
 			this.console.debug("auth manager started, connecting to websockets")
@@ -184,7 +186,7 @@ export default class APICore extends Core {
 	}
 
 	async onInitialize() {
-		this.client = createClient({
+		this.client = await createClient({
 			eventBus: app.eventBus,
 			ws: {
 				enable: true,
@@ -193,8 +195,7 @@ export default class APICore extends Core {
 		})
 
 		// make a basic request to check if the API is available
-		await fetch({
-			url: this.client.mainOrigin,
+		await fetch(this.client.mainOrigin, {
 			method: "HEAD",
 		}).catch((error) => {
 			this.console.error("Ping error", error)

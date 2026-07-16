@@ -1,5 +1,3 @@
-import axios from "axios"
-
 export default async (token) => {
 	const secret = process.env.TURNSTILE_SECRET
 
@@ -7,20 +5,25 @@ export default async (token) => {
 		throw new Error("Turnstile secret is not set")
 	}
 
-	let response = await axios({
-		url: "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
+	const response = await fetch(
+		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+		{
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				secret: secret,
+				response: token,
+			}),
 		},
-		data: {
-			secret: secret,
-			response: token,
-		},
-	}).catch((err) => {
-		console.error(err.response.data)
-		throw new Error("Turnstile verification failed")
-	})
+	)
 
-	return response.data
+	if (!response.ok) {
+		const errorBody = await response.text()
+		console.error(errorBody)
+		throw new Error("Turnstile verification failed")
+	}
+
+	return response.json()
 }

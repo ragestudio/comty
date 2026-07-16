@@ -2,20 +2,12 @@
 // Copyright (c) 2018, Quentin Busuttil All rights reserved.
 
 import fs from "node:fs"
+import fsPromises from "node:fs/promises"
 import path from "node:path"
+import { XXHash64 } from "xxhash-addon"
 
-export function checkTotalSize(
-	chunkSize, // in bytes
-	totalChunks, // number of chunks
-	maxFileSize, // in bytes
-) {
-	const totalSize = chunkSize * totalChunks
-
-	if (totalSize > maxFileSize) {
-		return false
-	}
-
-	return true
+export function checkTotalSize(chunkSize, totalChunks, maxFileSize) {
+	return chunkSize * totalChunks < maxFileSize
 }
 
 export function checkChunkUploadHeaders(headers) {
@@ -27,161 +19,180 @@ export function checkChunkUploadHeaders(headers) {
 	]
 
 	for (const header of requiredHeaders) {
-		if (!headers[header] || typeof headers[header] !== "string") {
+		const val = headers[header]
+
+		if (!val || typeof val !== "string") {
 			return false
 		}
 
 		if (
-			(header === "uploader-chunk-number" ||
-				header === "uploader-chunks-total") &&
-			!/^[0-9]+$/.test(headers[header])
+			header === "uploader-chunk-number" ||
+			header === "uploader-chunks-total"
 		) {
-			return false
+			if (!/^\d+$/.test(val)) return false
 		}
 	}
 
 	return true
 }
 
+export async function computeFileHash(filePath) {
+	const hasher = new XXHash64(Buffer.alloc(4))
+	const stream = fs.createReadStream(filePath)
+
+	for await (const chunk of stream) {
+		hasher.update(chunk)
+	}
+
+	return hasher.digest().toString("hex")
+}
+
 export function createAssembleChunksPromise({
 	chunksPath,
 	filePath,
 	maxFileSize,
+	originalFileHash,
 }) {
-	return () =>
-		new Promise(async (resolve, reject) => {
-			let fileSize = 0
+	return async () => {
+		let chunks
 
-			if (!fs.existsSync(chunksPath)) {
-				return reject(new OperationError(500, "No chunks found"))
-			}
+		try {
+			chunks = await fsPromises.readdir(chunksPath)
+		} catch (err) {
+			throw new OperationError(500, "No chunks found or folder missing")
+		}
 
-			let chunks = await fs.promises.readdir(chunksPath)
+		if (chunks.length === 0) {
+			throw new OperationError(500, "No chunks found")
+		}
 
-			if (chunks.length === 0) {
-				return reject(new OperationError(500, "No chunks found"))
-			}
+		chunks.sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
 
-			// Ordenar los chunks numéricamente
-			chunks = chunks.sort((a, b) => {
-				const aNum = parseInt(a, 10)
-				const bNum = parseInt(b, 10)
+		let fileSize = 0
+		const writeStream = fs.createWriteStream(filePath)
 
-				return aNum - bNum
-			})
-
+		try {
 			for (const chunk of chunks) {
 				const chunkPath = path.join(chunksPath, chunk)
 
-				if (!fs.existsSync(chunkPath)) {
-					return reject(
-						new OperationError(500, "No chunk data found"),
-					)
+				const stat = await fsPromises.stat(chunkPath).catch(() => null)
+
+				if (!stat) {
+					throw new OperationError(500, "Failed to read chunk data")
 				}
 
-				const data = await fs.promises.readFile(chunkPath)
-				fileSize += data.length
+				fileSize += stat.size
 
 				if (fileSize > maxFileSize) {
-					return reject(
-						new OperationError(
-							413,
-							"File exceeds max total file size, aborting assembly...",
-						),
+					throw new OperationError(
+						413,
+						"File exceeds max total file size, aborting assembly...",
 					)
 				}
 
-				await fs.promises.appendFile(filePath, data)
-			}
+				await new Promise((resolve, reject) => {
+					const readStream = fs.createReadStream(chunkPath)
 
-			return resolve({
-				chunksLength: chunks.length,
-				filePath: filePath,
-			})
-		})
+					readStream.pipe(writeStream, { end: false })
+					readStream.on("end", resolve)
+					readStream.on("error", reject)
+				})
+			}
+		} finally {
+			writeStream.end()
+			await new Promise((resolve) => writeStream.on("finish", resolve))
+		}
+
+		const fileHash = await computeFileHash(filePath)
+
+		if (
+			typeof originalFileHash === "string" &&
+			originalFileHash !== fileHash
+		) {
+			throw new OperationError(
+				400,
+				`Invalid file hash check, hashes dont match\n original: [${originalFileHash}] received: [${fileHash}]`,
+			)
+		}
+
+		// clear assembled chunks
+		await fsPromises
+			.rm(chunksPath, { recursive: true, force: true })
+			.catch(() => {})
+
+		return {
+			filePath,
+			fileHash,
+			chunksLength: chunks.length,
+		}
+	}
 }
 
 export async function handleChunkFile(
 	fileStream,
 	{ chunksPath, outputDir, headers, maxFileSize, maxChunkSize },
 ) {
-	return await new Promise(async (resolve, reject) => {
-		const chunkPath = path.join(
-			chunksPath,
-			headers["uploader-chunk-number"],
-		)
+	const chunkCount = parseInt(headers["uploader-chunk-number"], 10)
+	const totalChunks = parseInt(headers["uploader-chunks-total"], 10)
+	const chunkPath = path.join(chunksPath, chunkCount.toString())
 
-		const chunkCount = +headers["uploader-chunk-number"]
-		const totalChunks = +headers["uploader-chunks-total"]
+	const isLast = chunkCount === totalChunks - 1
 
-		// check if file has all chunks uploaded
-		const isLast = chunkCount === totalChunks - 1
+	if (chunkCount < 0 || chunkCount >= totalChunks) {
+		throw new OperationError(500, "Chunk is out of range")
+	}
 
-		// make sure chunk is in range
-		if (chunkCount < 0 || chunkCount >= totalChunks) {
-			return reject(new OperationError(500, "Chunk is out of range"))
-		}
+	await fsPromises.mkdir(chunksPath, { recursive: true })
+	const writeStream = fs.createWriteStream(chunkPath)
 
-		let dataWritten = 0
+	let dataWritten = 0
 
-		let writeStream = fs.createWriteStream(chunkPath)
+	try {
+		for await (const chunk of fileStream) {
+			dataWritten += chunk.byteLength
 
-		writeStream.on("error", (err) => {
-			reject(err)
-		})
-
-		writeStream.on("close", () => {
-			if (maxChunkSize !== undefined) {
-				if (dataWritten > maxChunkSize) {
-					reject(
-						new OperationError(
-							413,
-							"Chunk size exceeds max chunk size, aborting upload...",
-						),
-					)
-					return
-				}
-
-				// estimate total file size,
-				// if estimation exceeds maxFileSize, abort upload
-				if (chunkCount === 0 && totalChunks > 0) {
-					if (dataWritten * (totalChunks - 1) > maxFileSize) {
-						reject(
-							new OperationError(
-								413,
-								"File estimated size exceeds max total file size, aborting upload...",
-							),
-						)
-						return
-					}
-				}
-			}
-
-			if (isLast) {
-				// const mimetype = mimetypes.lookup(
-				// 	headers["uploader-original-name"],
-				// )
-				// const extension = mimetypes.extension(mimetype)
-
-				let filename = nanoid()
-
-				return resolve(
-					createAssembleChunksPromise({
-						// build data
-						chunksPath: chunksPath,
-						filePath: path.resolve(outputDir, filename),
-						maxFileSize: maxFileSize,
-					}),
+			if (maxChunkSize !== undefined && dataWritten > maxChunkSize) {
+				throw new OperationError(
+					413,
+					"Chunk size exceeds max chunk size, aborting upload...",
 				)
 			}
 
-			return resolve(null)
-		})
+			if (!writeStream.write(chunk)) {
+				await new Promise((resolve) =>
+					writeStream.once("drain", resolve),
+				)
+			}
+		}
 
-		fileStream.on("data", (buffer) => {
-			dataWritten += buffer.byteLength
-		})
+		writeStream.end()
+		await new Promise((resolve) => writeStream.once("finish", resolve))
+	} catch (error) {
+		writeStream.destroy()
 
-		fileStream.pipe(writeStream)
-	})
+		await fsPromises.rm(chunkPath, { force: true }).catch(() => {})
+		throw error
+	}
+
+	if (chunkCount === 0 && totalChunks > 0 && maxChunkSize !== undefined) {
+		if (dataWritten * (totalChunks - 1) > maxFileSize) {
+			await fsPromises.rm(chunkPath, { force: true }).catch(() => {})
+
+			throw new OperationError(
+				413,
+				"File estimated size exceeds max total file size, aborting upload...",
+			)
+		}
+	}
+
+	if (isLast) {
+		return createAssembleChunksPromise({
+			chunksPath,
+			filePath: path.resolve(outputDir, nanoid()),
+			maxFileSize,
+			originalFileHash: headers?.["uploader-file-hash"],
+		})
+	}
+
+	return null
 }

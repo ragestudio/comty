@@ -10,12 +10,8 @@ export default {
 			req.auth.session.user_id,
 		)
 
-		if (groups.toJSON) {
-			groups = groups.toJSON()
-		}
-
 		const sorted = await Groups.sortModel
-			.findOneAsync(
+			.findOne(
 				{
 					user_id: req.auth.session.user_id,
 				},
