@@ -23,8 +23,10 @@ export default function DebugWindow() {
 	const [consumers, setConsumers] = useState([])
 	const [clients, setClients] = useState([])
 	const [screens, setScreens] = useState([])
-	const [refreshKey, setRefreshKey] = useState(0)
+	const [activeTab, setActiveTab] = useState("overview")
+	const [highlightConsumerId, setHighlightConsumerId] = useState(null)
 
+	const coreRef = useRef(null)
 	const pollInterval = useRef(null)
 
 	const addLogEvent = useCallback((type, data) => {
@@ -49,13 +51,14 @@ export default function DebugWindow() {
 		}
 
 		const core = app.cores.mediartc.instance()
+		coreRef.current = core
 		setRtcCore(core)
 
 		const refreshData = () => {
-			const s = app.cores.mediartc.state()
-			setState({ ...s })
+			const _core = coreRef.current
+			if (!_core) return
 
-			const p = Array.from(core.producers.values()).map((p) => ({
+			const p = Array.from(_core.producers.values()).map((p) => ({
 				id: p.id,
 				producerId: p.producerId,
 				kind: p.kind,
@@ -88,7 +91,7 @@ export default function DebugWindow() {
 			}))
 			setProducers(p)
 
-			const c = Array.from(core.consumers.values()).map((c) => ({
+			const cons = Array.from(_core.consumers.values()).map((c) => ({
 				id: c.id,
 				producerId: c.producerId,
 				kind: c.kind,
@@ -109,12 +112,12 @@ export default function DebugWindow() {
 						}
 					: null,
 			}))
-			setConsumers(c)
+			setConsumers(cons)
 
-			const cl = s.clients || []
+			const cl = app.cores.mediartc.state().clients || []
 			setClients(cl)
 
-			const sc = Array.from(core.screens.values()).map((sc) => ({
+			const sc = Array.from(_core.screens.values()).map((sc) => ({
 				userId: sc.producer?.userId,
 				consumersIds: sc.consumersIds,
 				mediaTracks: sc.media
@@ -127,40 +130,18 @@ export default function DebugWindow() {
 					: [],
 			}))
 			setScreens(sc)
-
-			setRefreshKey((k) => k + 1)
-		}
-
-		// Capture any emit to log events
-		const originalEmit = app.eventBus?.emit
-		if (app.eventBus) {
-			app.eventBus.emit = function (event, ...args) {
-				if (
-					event &&
-					event.startsWith &&
-					event.startsWith("mediartc:")
-				) {
-					addLogEvent("eventBus:" + event, args[0])
-				}
-				return originalEmit?.call?.(this, event, ...args)
-			}
-		}
-
-		// Also intercept the socket events if possible
-		const socket = core.socket
-		if (socket) {
-			const originalOn = socket.on
-			// We can't easily intercept already-registered handlers, but we can listen for state changes
 		}
 
 		// Subscribe to state changes
-		const stateHandler = (newState) => {
+		const stateHandler = () => {
+			const newState = app.cores.mediartc.state()
 			addLogEvent("state:change", newState)
 			setState({ ...newState })
 		}
 		app.eventBus?.on?.("mediartc:state:change", stateHandler)
 
 		// Initial load
+		setState({ ...app.cores.mediartc.state() })
 		refreshData()
 
 		// Poll for non-observable data
@@ -172,127 +153,141 @@ export default function DebugWindow() {
 		}
 	}, [addLogEvent])
 
-	const activePanelsCount = [
-		state.isJoined,
-		producers.length > 0,
-		consumers.length > 0,
-		clients.length > 0,
-		screens.length > 0,
-	].filter(Boolean).length
+	const navigateToConsumer = useCallback((consumerId) => {
+		setHighlightConsumerId(consumerId)
+		setActiveTab("consumers")
+	}, [])
 
-	const tabItems = [
-		{
-			key: "overview",
-			label: (
-				<span>
-					Overview{" "}
-					<Badge
-						count={state.isJoined ? "ON" : "OFF"}
-						style={{
-							backgroundColor: state.isJoined
-								? "var(--debug-active)"
-								: "var(--debug-inactive)",
-						}}
+	const tabItems = React.useMemo(
+		() => [
+			{
+				key: "overview",
+				label: (
+					<span>
+						Overview{" "}
+						<Badge
+							count={state.isJoined ? "ON" : "OFF"}
+							style={{
+								backgroundColor: state.isJoined
+									? "var(--debug-active)"
+									: "var(--debug-inactive)",
+							}}
+						/>
+					</span>
+				),
+				children: (
+					<StatusOverview
+						state={state}
+						core={rtcCore}
 					/>
-				</span>
-			),
-			children: (
-				<StatusOverview
-					state={state}
-					core={rtcCore}
-				/>
-			),
-		},
-		{
-			key: "transports",
-			label: (
-				<span>
-					Transports{" "}
-					<Tag
-						color={
-							state.sendTransportState === "connected"
-								? "green"
-								: "red"
-						}
-					>
-						S
-					</Tag>
-					<Tag
-						color={
-							state.recvTransportState === "connected"
-								? "green"
-								: "red"
-						}
-					>
-						R
-					</Tag>
-				</span>
-			),
-			children: (
-				<TransportsPanel
-					state={state}
-					core={rtcCore}
-				/>
-			),
-		},
-		{
-			key: "producers",
-			label: `Producers (${producers.length})`,
-			children: (
-				<ProducersPanel
-					producers={producers}
-					core={rtcCore}
-				/>
-			),
-		},
-		{
-			key: "consumers",
-			label: `Consumers (${consumers.length})`,
-			children: (
-				<ConsumersPanel
-					consumers={consumers}
-					state={state}
-				/>
-			),
-		},
-		{
-			key: "clients",
-			label: `Clients (${clients.length})`,
-			children: (
-				<ClientsPanel
-					clients={clients}
-					core={rtcCore}
-					consumers={consumers}
-				/>
-			),
-		},
-		{
-			key: "screens",
-			label: `Screens (${screens.length})`,
-			children: <ScreensPanel screens={screens} />,
-		},
-		{
-			key: "audio",
-			label: "Audio Pipeline",
-			children: <AudioPipeline core={rtcCore} />,
-		},
-		{
-			key: "events",
-			label: `Events (${eventLog.length})`,
-			children: <EventLog events={eventLog} />,
-		},
-		{
-			key: "actions",
-			label: "Actions",
-			children: (
-				<ActionsPanel
-					core={rtcCore}
-					state={state}
-					addLogEvent={addLogEvent}
-				/>
-			),
-		},
-	]
+				),
+			},
+			{
+				key: "transports",
+				label: (
+					<span>
+						Transports{" "}
+						<Tag
+							color={
+								state.sendTransportState === "connected"
+									? "green"
+									: "red"
+							}
+						>
+							S
+						</Tag>
+						<Tag
+							color={
+								state.recvTransportState === "connected"
+									? "green"
+									: "red"
+							}
+						>
+							R
+						</Tag>
+					</span>
+				),
+				children: (
+					<TransportsPanel
+						state={state}
+						core={rtcCore}
+					/>
+				),
+			},
+			{
+				key: "producers",
+				label: `Producers (${producers.length})`,
+				children: (
+					<ProducersPanel
+						producers={producers}
+						core={rtcCore}
+					/>
+				),
+			},
+			{
+				key: "consumers",
+				label: `Consumers (${consumers.length})`,
+				children: (
+					<ConsumersPanel
+						consumers={consumers}
+						state={state}
+						core={rtcCore}
+						highlightConsumerId={highlightConsumerId}
+					/>
+				),
+			},
+			{
+				key: "clients",
+				label: `Clients (${clients.length})`,
+				children: (
+					<ClientsPanel
+						clients={clients}
+						core={rtcCore}
+						consumers={consumers}
+						onNavigateToConsumer={navigateToConsumer}
+					/>
+				),
+			},
+			{
+				key: "screens",
+				label: `Screens (${screens.length})`,
+				children: <ScreensPanel screens={screens} />,
+			},
+			{
+				key: "audio",
+				label: "Audio Pipeline",
+				children: <AudioPipeline core={rtcCore} />,
+			},
+			{
+				key: "events",
+				label: `Events (${eventLog.length})`,
+				children: <EventLog events={eventLog} />,
+			},
+			{
+				key: "actions",
+				label: "Actions",
+				children: (
+					<ActionsPanel
+						core={rtcCore}
+						state={state}
+						addLogEvent={addLogEvent}
+					/>
+				),
+			},
+		],
+		[
+			state,
+			producers,
+			consumers,
+			clients,
+			screens,
+			eventLog,
+			rtcCore,
+			addLogEvent,
+			navigateToConsumer,
+			highlightConsumerId,
+		],
+	)
 
 	return (
 		<div
@@ -311,7 +306,8 @@ export default function DebugWindow() {
 				<h3 style={{ margin: 0 }}>MediaRTC Debug Console</h3>
 			</div>
 			<Tabs
-				defaultActiveKey="overview"
+				activeKey={activeTab}
+				onChange={setActiveTab}
 				items={tabItems}
 				size="small"
 				tabBarStyle={{ marginBottom: 8 }}

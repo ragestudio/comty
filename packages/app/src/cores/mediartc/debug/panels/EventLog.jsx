@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from "react"
-import { Card, Tag, Empty } from "antd"
+import React, { useRef, useEffect, useState, useCallback } from "react"
+import { Card, Tag, Empty, Switch } from "antd"
 
 const TYPE_COLORS = {
 	"state:change": "blue",
@@ -15,15 +15,39 @@ function getLogColor(type) {
 
 export default function EventLog({ events }) {
 	const listRef = useRef(null)
+	const [autoScroll, setAutoScroll] = useState(true)
+	const userScrolledRef = useRef(false)
+
+	const handleScroll = useCallback(() => {
+		const el = listRef.current
+		if (!el) return
+
+		// if user scrolled away from top, disable auto-scroll
+		if (el.scrollTop > 8) {
+			userScrolledRef.current = true
+			setAutoScroll(false)
+		} else {
+			userScrolledRef.current = false
+			setAutoScroll(true)
+		}
+	}, [])
 
 	useEffect(() => {
-		if (listRef.current) {
-			listRef.current.scrollTop = 0
-		}
-	}, [events.length])
+		if (!autoScroll || !listRef.current) return
+		listRef.current.scrollTop = 0
+	}, [events.length, autoScroll])
 
 	if (events.length === 0) {
-		return <Empty description="No events captured yet" />
+		return (
+			<div className="debug-panel">
+				<Card
+					size="small"
+					title="Event Log"
+				>
+					<Empty description="No events captured yet" />
+				</Card>
+			</div>
+		)
 	}
 
 	return (
@@ -31,11 +55,20 @@ export default function EventLog({ events }) {
 			<Card
 				size="small"
 				title={`Event Log (${events.length} entries, latest first)`}
+				extra={
+					<Switch
+						size="small"
+						checked={autoScroll}
+						onChange={setAutoScroll}
+						checkedChildren="auto"
+						unCheckedChildren="manual"
+					/>
+				}
 			>
 				<div
 					ref={listRef}
+					onScroll={handleScroll}
 					style={{
-						maxHeight: 500,
 						overflow: "auto",
 						fontFamily: "monospace",
 						fontSize: 11,
@@ -60,13 +93,15 @@ export default function EventLog({ events }) {
 								{String(
 									event.timestamp.getMilliseconds(),
 								).padStart(3, "0")}
-							</span>{" "}
+							</span>
+
 							<Tag
 								color={getLogColor(event.type)}
 								style={{ fontSize: 10, marginRight: 4 }}
 							>
 								{event.type}
 							</Tag>
+
 							<span>
 								{typeof event.data === "object"
 									? JSON.stringify(event.data, null, 0)
