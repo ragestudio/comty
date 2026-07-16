@@ -1,7 +1,6 @@
 import React from "react"
 import Button from "@ui/Button"
 import { Image } from "@/components"
-import { SiOpenid } from "react-icons/si"
 import { Icons } from "@/components/Icons"
 
 import OAuth from "@models/oauth"
@@ -11,7 +10,7 @@ import { Tag } from "antd"
 
 const ScopesBlocks = {
 	openid: {
-		icon: SiOpenid,
+		icon: Icons.OpenId,
 		title: "OpenID",
 		description: "Read your account unique identifier",
 	},

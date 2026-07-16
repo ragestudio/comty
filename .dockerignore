@@ -1,0 +1,67 @@
+# Secrets
+**/.env
+**/.ssl
+**/.keys
+
+# Dependencies
+**/node_modules
+**/corenode_modules
+
+# Build artifacts
+**/dist
+**/build
+**/out
+**/.out
+**/.cache
+**/cache
+**/.tmp
+
+# Logs
+**/*.log
+**/npm-debug.log*
+**/yarn-error.log
+
+# OS files
+**/.DS_Store
+
+# IDE
+**/.idea
+**/.zed
+**/.vscode
+
+# Git
+**/.git
+**/.gitmodules
+
+# Server specific excludes
+packages/server/nats-data
+packages/server/docs
+
+# Other packages (not needed for server build)
+packages/app
+packages/cli
+packages/desktop
+packages/wrapper
+packages/shared/assets
+packages/shared/node_modules
+modules
+docs
+docusaurus
+scripts
+docker/data
+docker/.env
+
+# Misc
+**/.evite
+**/uploads
+**/d_data
+**/redis_data
+**/.nginx
+**/nginx-bin
+**/sponsors.json
+**/todo.md
+**/CODE_OF_CONDUCT.md
+**/CONTRIBUTING.md
+**/CODE_STYLE.md
+**/LICENSE
+**/README.md

@@ -2,7 +2,7 @@ import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Result, Skeleton } from "antd"
-import { SiGithub } from "react-icons/si"
+import { Icons } from "@/components/Icons"
 
 import config from "@config"
 
@@ -86,7 +86,7 @@ export default {
 						window.open(config.githubRepoLink, "_blank")
 					}}
 				>
-					<SiGithub
+					<Icons.Github
 						style={{
 							fontSize: "2rem",
 							marginBottom: "10px",

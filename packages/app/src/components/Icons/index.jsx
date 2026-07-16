@@ -12,6 +12,8 @@ import Connection from "./customIcons/connection"
 import LoadingOutlined from "./customIcons/loading"
 import ReactIcon from "./customIcons/react"
 import AntdIcon from "./customIcons/antd"
+import OpenIdIcon from "./customIcons/openid"
+import GithubIcon from "./customIcons/github"
 
 import "./index.less"
 
@@ -33,6 +35,8 @@ export const Icons = {
 	Connection: (props) => <Connection {...props} />,
 	React: (props) => <ReactIcon {...props} />,
 	Antd: (props) => <AntdIcon {...props} />,
+	OpenId: (props) => <OpenIdIcon {...props} />,
+	Github: (props) => <GithubIcon {...props} />,
 }
 
 export function createIconRender(icon, props) {

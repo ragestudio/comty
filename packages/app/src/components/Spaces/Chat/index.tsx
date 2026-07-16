@@ -38,14 +38,16 @@ function shouldMergeWithNextItem(nextItem: Message | undefined, item: Message) {
 
 const useTriggerValue = (callback: () => void) => {
 	const prevValueRef = React.useRef(false)
+	const callbackRef = React.useRef(callback)
+	callbackRef.current = callback
 
-	return (value: boolean) => {
+	return React.useCallback((value: boolean) => {
 		if (value === true && prevValueRef.current === false) {
-			callback()
+			callbackRef.current()
 		}
 
 		prevValueRef.current = value
-	}
+	}, [])
 }
 
 interface ChatProps {
@@ -109,35 +111,77 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 
 	const goToBottom = React.useCallback(() => {
 		if (timelineRef.current) {
+			// unpause updates so new messages start flowing again
+			setPausedUpdates(false)
+			setScrollableToBottom(false)
 			timelineRef.current.scrollTo(0, 0)
 		}
-	}, [timelineRef])
+	}, [setPausedUpdates, setScrollableToBottom])
+
+	const scrollableToBottomRef = React.useRef(scrollableToBottom)
+	scrollableToBottomRef.current = scrollableToBottom
+
+	const pausedUpdatesRef = React.useRef(pausedUpdates)
+	pausedUpdatesRef.current = pausedUpdates
+
+	const bottomTriggerRef = React.useRef(bottomTrigger)
+	bottomTriggerRef.current = bottomTrigger
+
+	const setPausedUpdatesRef = React.useRef(setPausedUpdates)
+	setPausedUpdatesRef.current = setPausedUpdates
 
 	const handleOnNewMessage = React.useCallback(() => {
-		if (!timelineRef.current || pausedUpdates) {
+		if (!timelineRef.current || pausedUpdatesRef.current) {
 			return
 		}
 
-		if (!scrollableToBottom) {
-			timelineRef.current.scrollTo(0, 0)
+		if (!scrollableToBottomRef.current) {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					timelineRef.current?.scrollTo(0, 0)
+				})
+			})
 		}
-	}, [timelineRef, pausedUpdates, scrollableToBottom])
+	}, [])
+
+	const bottomDebounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+		null,
+	)
 
 	const handleOnScroll = React.useCallback(() => {
 		if (!timelineRef.current) return
 		const scrollPosition = Math.abs(timelineRef.current.scrollTop)
-		const isOnBottom = scrollPosition >= 0 && scrollPosition < 100
+		const isOnBottom = scrollPosition < 100
 
-		bottomTrigger(isOnBottom)
-
+		// wait until the scroll settles to avoid layout shifts from loading skeleton
 		if (isOnBottom) {
-			setPausedUpdates(false)
-			setScrollableToBottom(false)
+			if (bottomDebounceRef.current) {
+				clearTimeout(bottomDebounceRef.current)
+			}
+			bottomDebounceRef.current = setTimeout(() => {
+				bottomTriggerRef.current(true)
+			}, 300)
 		} else {
-			setPausedUpdates(true)
-			setScrollableToBottom(true)
+			if (bottomDebounceRef.current) {
+				clearTimeout(bottomDebounceRef.current)
+				bottomDebounceRef.current = null
+			}
+			// reset the trigger so it can fire again when user returns to bottom
+			bottomTriggerRef.current(false)
 		}
-	}, [bottomTrigger, setPausedUpdates])
+
+		// only manage button visibility here, dont toggle pausedUpdates
+		// pausedUpdates should only change when user explicitly clicks "go to bottom"
+		if (isOnBottom) {
+			if (scrollableToBottomRef.current) {
+				setScrollableToBottom(false)
+			}
+		} else {
+			if (!scrollableToBottomRef.current) {
+				setScrollableToBottom(true)
+			}
+		}
+	}, [setScrollableToBottom])
 
 	React.useEffect(() => {
 		if (initialLoading) {
@@ -152,6 +196,10 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		return () => {
 			if (currentRef) {
 				currentRef.removeEventListener("scroll", handleOnScroll)
+			}
+
+			if (bottomDebounceRef.current) {
+				clearTimeout(bottomDebounceRef.current)
 			}
 		}
 	}, [initialLoading, handleOnScroll])

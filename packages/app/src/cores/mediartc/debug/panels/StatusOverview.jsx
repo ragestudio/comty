@@ -10,13 +10,8 @@ import {
 	Space,
 	Collapse,
 } from "antd"
-import {
-	CheckCircleOutlined,
-	CloseCircleOutlined,
-	LoadingOutlined,
-	PauseOutlined,
-	CaretRightOutlined,
-} from "@ant-design/icons"
+
+import { Icons } from "@components/Icons"
 
 function TransportStats({ core }) {
 	const [stats, setStats] = useState(null)
@@ -144,9 +139,7 @@ function TransportStats({ core }) {
 			extra={
 				<Button
 					size="small"
-					icon={
-						autoRefresh ? <PauseOutlined /> : <CaretRightOutlined />
-					}
+					icon={autoRefresh ? <Icons.Pause /> : <Icons.Play />}
 					onClick={() => setAutoRefresh((v) => !v)}
 					type={autoRefresh ? "primary" : "default"}
 				>
@@ -704,11 +697,11 @@ export default function StatusOverview({ state, core }) {
 							valueStyle={{ color: statusColor, fontSize: 16 }}
 							prefix={
 								state.isLoading ? (
-									<LoadingOutlined />
+									<Icons.LoadingOutlined />
 								) : state.isJoined ? (
-									<CheckCircleOutlined />
+									<Icons.CheckCircle />
 								) : (
-									<CloseCircleOutlined />
+									<Icons.LogOut />
 								)
 							}
 						/>
