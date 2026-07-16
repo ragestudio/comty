@@ -10,6 +10,7 @@ import sortMerthod from "./methods/sort"
 import GroupsModel from "@db/groups"
 import GroupsUserOrdersModel from "@db/groups_user_orders"
 import GroupInviteKeyModel from "@db/group_invite_key"
+import sendSystemMessage from "./methods/sendSystemMessage"
 
 export default class Groups {
 	static get model() {
@@ -46,4 +47,8 @@ export default class Groups {
 	static sort = sortMerthod.bind(this) as OmitThisParameter<
 		typeof sortMerthod
 	>
+
+	static sendSystemMessage = sendSystemMessage.bind(
+		this,
+	) as OmitThisParameter<typeof sendSystemMessage>
 }
