@@ -10,6 +10,8 @@ import Lossless from "./customIcons/lossless"
 import Ogg from "./customIcons/ogg"
 import Connection from "./customIcons/connection"
 import LoadingOutlined from "./customIcons/loading"
+import ReactIcon from "./customIcons/react"
+import AntdIcon from "./customIcons/antd"
 
 import "./index.less"
 
@@ -29,6 +31,8 @@ export const Icons = {
 	Crown: (props) => <Crown {...props} />,
 	Ogg: (props) => <Ogg {...props} />,
 	Connection: (props) => <Connection {...props} />,
+	React: (props) => <ReactIcon {...props} />,
+	Antd: (props) => <AntdIcon {...props} />,
 }
 
 export function createIconRender(icon, props) {

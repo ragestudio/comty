@@ -210,7 +210,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.SiReact />
+								<Icons.React />
 							</div>
 
 							<p>React</p>
@@ -224,7 +224,7 @@ export default {
 					<div className="inline_field">
 						<div className="field_header">
 							<div className="field_icon">
-								<Icons.SiAntdesign />
+								<Icons.Antd />
 							</div>
 
 							<p>UI</p>
