@@ -1,6 +1,8 @@
 allowBuilds:
   core-js: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - comty.js@0.81.0
 overrides:
   "@comty/shared": link:../shared
   shared: link:../shared
