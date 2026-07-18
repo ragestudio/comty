@@ -389,6 +389,9 @@ export default class Self {
 			throw new Error("No screen track found")
 		}
 
+		// hint the encoder to prioritize smooth framerate over detail
+		screenVideoTrack.contentHint = "motion"
+
 		// if scree audio is available, start producing
 		if (screenAudioTrack) {
 			this.screenAudioProducer = await this.core.producers.produce({
@@ -423,10 +426,11 @@ export default class Self {
 			screenShareProducerData.childrens.push(this.screenAudioProducer.id)
 		}
 
-		// prefer h264 codec better for hardware encoding support
-		const referredCodec = this.core.device.rtpCapabilities.codecs.find(
+		const hasH264 = this.core.device.rtpCapabilities.codecs.some(
 			(c) => c.mimeType.toLowerCase() === "video/h264",
 		)
+
+		this.core.console.debug("screen producer h264 available:", hasH264)
 
 		const adaptiveEncoding = this.computeScreenEncoding()
 
@@ -435,7 +439,6 @@ export default class Self {
 		// produce
 		this.screenProducer = await this.core.producers.produce({
 			track: screenVideoTrack,
-			codec: referredCodec,
 			encodings: [adaptiveEncoding],
 			appData: screenShareProducerData,
 		})

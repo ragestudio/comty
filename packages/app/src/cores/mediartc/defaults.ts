@@ -12,12 +12,12 @@ export default {
 		networkPriority: "high",
 	},
 	screenVideoEncodingParams: {
-		maxBitrate: 4000000,
+		maxBitrate: 5000000,
 		maxFramerate: 30,
 		priority: "high",
 		networkPriority: "high",
 	},
-	maxScreenBitrate: 8000000,
+	maxScreenBitrate: 12000000,
 	screenAudioEncodingParams: {
 		maxBitrate: 128000,
 		priority: "high",
