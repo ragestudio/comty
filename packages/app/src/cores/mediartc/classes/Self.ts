@@ -350,7 +350,7 @@ export default class Self {
 		})
 	}
 
-	computeScreenBitrate(): number {
+	computeScreenEncoding() {
 		const track = this.screenStream.getVideoTracks()[0]
 		const settings = track.getSettings()
 
@@ -361,13 +361,20 @@ export default class Self {
 		const pixelRatio = (width * height) / (1920 * 1080)
 		const fpsRatio = fps / 30
 
-		const bitrate = Math.round(
-			defaults.screenVideoEncodingParams.maxBitrate *
-				pixelRatio *
-				fpsRatio,
+		const maxBitrate = Math.min(
+			Math.round(
+				defaults.screenVideoEncodingParams.maxBitrate *
+					pixelRatio *
+					fpsRatio,
+			),
+			defaults.maxScreenBitrate,
 		)
 
-		return Math.min(bitrate, defaults.maxScreenBitrate)
+		return {
+			...defaults.screenVideoEncodingParams,
+			maxBitrate,
+			maxFramerate: fps,
+		}
 	}
 
 	async startScreenProducer() {
@@ -421,20 +428,15 @@ export default class Self {
 			(c) => c.mimeType.toLowerCase() === "video/h264",
 		)
 
-		const adaptiveBitrate = this.computeScreenBitrate()
+		const adaptiveEncoding = this.computeScreenEncoding()
 
-		this.core.console.debug("screen producer bitrate:", adaptiveBitrate)
+		this.core.console.debug("screen producer encoding:", adaptiveEncoding)
 
 		// produce
 		this.screenProducer = await this.core.producers.produce({
 			track: screenVideoTrack,
-			codec: referredCodec,
-			encodings: [
-				{
-					...defaults.screenVideoEncodingParams,
-					maxBitrate: adaptiveBitrate,
-				},
-			],
+			codec: h264Codec,
+			encodings: [adaptiveEncoding],
 			appData: screenShareProducerData,
 		})
 
