@@ -14,6 +14,7 @@ export default (app) => {
 
 	if (process.platform === "linux") {
 		// enableFeatures.push("PulseaudioLoopbackForScreenShare")
+		enableFeatures.push("WebRTCPipeWireCapturer")
 
 		if (!process.argv.some((arg) => arg === "--no-vaapi")) {
 			enableFeatures.push(
