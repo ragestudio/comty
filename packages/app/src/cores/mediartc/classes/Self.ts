@@ -435,7 +435,7 @@ export default class Self {
 		// produce
 		this.screenProducer = await this.core.producers.produce({
 			track: screenVideoTrack,
-			codec: h264Codec,
+			codec: referredCodec,
 			encodings: [adaptiveEncoding],
 			appData: screenShareProducerData,
 		})
