@@ -81,7 +81,8 @@ export default class MediaRTC extends Core {
 	}
 
 	static defaultAudioEncodingParams = defaults.audioEncodingParams
-	static defaultVideoEncodingParams = defaults.videoEncodingParams
+	static defaultCameraVideoEncodingParams = defaults.cameraVideoEncodingParams
+	static defaultScreenVideoEncodingParams = defaults.screenVideoEncodingParams
 	static defaultScreenAudioEncodingParams = defaults.screenAudioEncodingParams
 
 	socket: RTEngineClient | null = null

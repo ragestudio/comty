@@ -5,12 +5,19 @@ export default {
 		networkPriority: "high",
 		dtx: true,
 	},
-	videoEncodingParams: {
-		maxBitrate: 5000000,
-		maxFramerate: 60,
+	cameraVideoEncodingParams: {
+		maxBitrate: 3000000,
+		maxFramerate: 30,
 		priority: "high",
 		networkPriority: "high",
 	},
+	screenVideoEncodingParams: {
+		maxBitrate: 4000000,
+		maxFramerate: 30,
+		priority: "high",
+		networkPriority: "high",
+	},
+	maxScreenBitrate: 8000000,
 	screenAudioEncodingParams: {
 		maxBitrate: 128000,
 		priority: "high",

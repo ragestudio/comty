@@ -32,6 +32,7 @@ export default class Self {
 	screenStream: MediaStream = null
 	screenProducer: Producer = null
 	screenAudioProducer: Producer = null
+	screenOptions: CreateScreenStreamOptions = null
 
 	audioInput = null
 	audioOutput =
@@ -319,6 +320,8 @@ export default class Self {
 			this.screenStream.getTracks().forEach((track) => track.stop())
 		}
 
+		this.screenOptions = options
+
 		this.core.console.debug("createScreenStream options:", options)
 
 		this.screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -345,6 +348,26 @@ export default class Self {
 			screenStream: this.screenStream,
 			screenStreamTracks: this.screenStream.getTracks(),
 		})
+	}
+
+	computeScreenBitrate(): number {
+		const track = this.screenStream.getVideoTracks()[0]
+		const settings = track.getSettings()
+
+		const width = settings.width ?? 1920
+		const height = settings.height ?? 1080
+		const fps = settings.frameRate ?? this.screenOptions?.framerate ?? 30
+
+		const pixelRatio = (width * height) / (1920 * 1080)
+		const fpsRatio = fps / 30
+
+		const bitrate = Math.round(
+			defaults.screenVideoEncodingParams.maxBitrate *
+				pixelRatio *
+				fpsRatio,
+		)
+
+		return Math.min(bitrate, defaults.maxScreenBitrate)
 	}
 
 	async startScreenProducer() {
@@ -393,12 +416,23 @@ export default class Self {
 			screenShareProducerData.childrens.push(this.screenAudioProducer.id)
 		}
 
+		// prefer h264 codec better for hardware encoding support
+		const referredCodec = this.core.device.rtpCapabilities.codecs.find(
+			(c) => c.mimeType.toLowerCase() === "video/h264",
+		)
+
+		const adaptiveBitrate = this.computeScreenBitrate()
+
+		this.core.console.debug("screen producer bitrate:", adaptiveBitrate)
+
 		// produce
 		this.screenProducer = await this.core.producers.produce({
 			track: screenVideoTrack,
+			codec: referredCodec,
 			encodings: [
 				{
-					...defaults.videoEncodingParams,
+					...defaults.screenVideoEncodingParams,
+					maxBitrate: adaptiveBitrate,
 				},
 			],
 			appData: screenShareProducerData,
