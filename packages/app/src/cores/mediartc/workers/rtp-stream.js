@@ -55,7 +55,7 @@ onmessage = async (event) => {
 				state.thresholdHitCount = 0
 			}
 
-			writer.write(value)
+			await writer.write(value)
 		}
 	} catch (e) {
 		console.warn(`Closed stream [${id}]`)
