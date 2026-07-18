@@ -22,6 +22,9 @@ export default (app) => {
 				"AcceleratedVideoEncoder",
 				"AcceleratedVideoDecoder",
 				"AcceleratedVideoDecodeLinuxZeroCopyGL",
+				"VaapiVideoEncoder",
+				"VaapiVideoDecodeLinuxGL",
+				"VaapiIgnoreDriverChecks",
 			)
 		}
 	}
@@ -48,6 +51,17 @@ export default (app) => {
 		["disable-features", disableFeatures.join(",")],
 		["enable-features", enableFeatures.join(",")],
 	]
+
+	if (
+		process.platform === "linux" &&
+		!process.argv.some((arg) => arg === "--no-vaapi")
+	) {
+		switches.push(
+			["ignore-gpu-blocklist"],
+			["use-gl", "angle"],
+			["use-angle", "gl-egl"],
+		)
+	}
 
 	for (const [key, val] of switches) {
 		app.commandLine.appendSwitch(key, val)
