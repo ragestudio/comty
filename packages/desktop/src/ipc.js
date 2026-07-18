@@ -20,4 +20,24 @@ export default {
 	"extensions:install": async (ctx, event, ...args) => {
 		return await ctx.extensions.install(...args)
 	},
+	"debug:open-chrome-page": async (ctx, event, page) => {
+		const { BrowserWindow } = await import("electron")
+
+		const win = new BrowserWindow({
+			width: 1200,
+			height: 800,
+			title: page,
+			webPreferences: {
+				nodeIntegration: false,
+				sandbox: false,
+				webSecurity: false,
+			},
+		})
+
+		await win.loadURL(`chrome://${page}`)
+
+		win.on("closed", () => win.destroy())
+
+		return true
+	},
 }
