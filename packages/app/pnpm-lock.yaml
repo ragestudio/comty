@@ -85,8 +85,8 @@ importers:
         specifier: ^4.4.2
         version: 4.4.2
       comty.js:
-        specifier: ^0.80.0
-        version: 0.80.0(react@19.2.7)
+        specifier: ^0.81.0
+        version: 0.81.0(react@19.2.7)
       d3:
         specifier: ^7.9.0
         version: 7.9.0
@@ -1788,8 +1788,8 @@ packages:
   compute-scroll-into-view@3.1.1:
     resolution: {integrity: sha512-VRhuHOLoKYOy4UbilLbUzbYg93XLjv2PncJC50EuTWPA3gaja1UjBsUP/D/9/juV3vQFr6XBEzn9KCAHdUvOHw==}
 
-  comty.js@0.80.0:
-    resolution: {integrity: sha512-O2ME3IqzVyj125mJ2y8EIFHjby9jLsdkZ5mdS9sa+qFQmeb2iTvDHkNXTmAA7CBpoQFqKnu7zTDGYm4aZwYKvw==}
+  comty.js@0.81.0:
+    resolution: {integrity: sha512-zR3N6fkjpLVP+B88lOpHGRQJLDBCp8S/N4mF7G4EHQksGY6w3fvpBFpP/fqhX1h2pg/IuovL26b5mwsWjTrYyA==}
     peerDependencies:
       react: ^18.3.0
 
@@ -4865,8 +4865,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.61.0(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.61.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.61.0
+      '@typescript-eslint/tsconfig-utils': 8.64.0(typescript@6.0.3)
+      '@typescript-eslint/types': 8.64.0
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 6.0.3
     transitivePeerDependencies:
@@ -5244,7 +5244,7 @@ snapshots:
 
   compute-scroll-into-view@3.1.1: {}
 
-  comty.js@0.80.0(react@19.2.7):
+  comty.js@0.81.0(react@19.2.7):
     dependencies:
       '@foxify/events': 2.1.0
       axios: 1.18.1
