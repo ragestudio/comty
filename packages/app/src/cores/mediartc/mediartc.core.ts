@@ -233,9 +233,8 @@ export default class MediaRTC extends Core {
 				this.console.error("Error initializing sysAudio:", error)
 			}
 
-			if (this.self.sysAudio || !this.self.sysAudio?.outputBus) {
-				// if sysAudio is initialized or does not support sysAudio-Output,
-				// fallback to AudioProcessor
+			if (!this.self.sysAudio?.outputBus) {
+				// sysaudio output not available, fallback to AudioProcessor
 				this.self.audioOutput = new AudioProcessor(this, {
 					sinkId: Self.outputDeviceId,
 				})
