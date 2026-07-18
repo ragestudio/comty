@@ -1,6 +1,6 @@
 {
 	"name": "@comty/app",
-	"version": "2.17.2@alpha",
+	"version": "2.18.0@alpha",
 	"license": "ComtyLicense",
 	"main": "electron/main",
 	"type": "module",
