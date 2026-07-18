@@ -8,48 +8,77 @@ const LoadMore = (props) => {
 		className,
 		children,
 		hasMore = false,
+		onBottom,
 		loadingComponent,
 		contentProps = {},
 	} = props
 
-	const nodeRef = React.useRef(null)
-	const [loading, setLoading] = React.useState(false)
+	const sentinelRef = React.useRef(null)
+	const [fetching, setFetching] = React.useState(false)
 
-	let observer = null
+	const hasMoreRef = React.useRef(hasMore)
+	hasMoreRef.current = hasMore
 
-	const insideViewportCb = (entries) => {
-		if (loading) {
-			return false
-		}
+	const onBottomRef = React.useRef(onBottom)
+	onBottomRef.current = onBottom
 
-		const { fetching, onBottom, hasMore } = props
+	const fetchingRef = React.useRef(fetching)
+	fetchingRef.current = fetching
 
-		if (!hasMore) {
-			return false
-		}
+	const trigger = React.useCallback(() => {
+		if (!hasMoreRef.current) return
+		if (fetchingRef.current) return
 
-		entries.forEach((element) => {
-			if (element.intersectionRatio > 0 && !fetching) {
-				setLoading(true)
+		const fn = onBottomRef.current
+		if (typeof fn !== "function") return
 
-				onBottom().then(() => {
-					setLoading(false)
-				})
-			}
+		setFetching(true)
+		Promise.resolve(fn()).finally(() => {
+			setFetching(false)
 		})
-	}
+	}, [])
 
+	// auto-load when hasMore is true and sentinel is already in viewport
+	// (list content is shorter than the scrollable area)
 	React.useEffect(() => {
+		if (!hasMore) return
+
+		const el = sentinelRef.current
+		if (!el) return
+
+		const timer = setTimeout(() => {
+			const rect = el.getBoundingClientRect()
+			if (rect.top < window.innerHeight) {
+				trigger()
+			}
+		}, 100)
+
+		return () => clearTimeout(timer)
+	}, [hasMore, trigger])
+
+	// intersection observer for scroll-based loading
+	React.useEffect(() => {
+		const el = sentinelRef.current
+		if (!el) return
+
+		let observer = null
+
 		try {
-			observer = new IntersectionObserver(insideViewportCb)
-			observer.observe(nodeRef.current)
+			observer = new IntersectionObserver(
+				(entries) => {
+					if (entries[0]?.isIntersecting && hasMoreRef.current) {
+						trigger()
+					}
+				},
+				{ rootMargin: "0px 0px 200px 0px" },
+			)
+			observer.observe(el)
 		} catch (err) {
-			console.log("err in finding node", err)
+			console.log("err creating observer", err)
 		}
 
 		return () => {
-			observer.disconnect()
-			observer = null
+			if (observer) observer.disconnect()
 		}
 	}, [])
 
@@ -62,13 +91,14 @@ const LoadMore = (props) => {
 			{children}
 
 			<div
-				ref={nodeRef}
-				id="bottom"
+				ref={sentinelRef}
 				className="bottom"
-				style={{ display: hasMore ? "block" : "none" }}
-			>
-				{loadingComponent && React.createElement(loadingComponent)}
-			</div>
+				style={{ height: "1px" }}
+			/>
+
+			{loadingComponent && fetching
+				? React.createElement(loadingComponent)
+				: null}
 		</div>
 	)
 }
