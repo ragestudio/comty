@@ -39,7 +39,7 @@
 		"bcp-47-normalize": "^2.3.0",
 		"classnames": "2.5.1",
 		"comlink": "^4.4.2",
-		"comty.js": "^0.80.0",
+		"comty.js": "^0.81.0",
 		"d3": "^7.9.0",
 		"dashjs": "^5.2.0",
 		"dayjs": "^1.11.21",
