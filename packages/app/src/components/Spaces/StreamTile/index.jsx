@@ -68,11 +68,16 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 	React.useEffect(() => {
 		if (videoRef.current) {
 			const screen = rtc.screens.get(stream.userId)
-			// mute video only when audio is routed through sysaudio
-			videoRef.current.muted = screen?.shouldMuteVideo || false
-			videoRef.current.volume = volume / 100
+
+			if (stream.isSelf) {
+				// self screen must be always muted, we dont want a infinite loopback of audio
+				videoRef.current.muted = true
+			} else {
+				videoRef.current.muted = screen?.shouldMuteVideo || false
+				videoRef.current.volume = volume / 100
+			}
 		}
-	}, [volume, stream.userId, rtc])
+	}, [volume, stream.userId, stream.isSelf, rtc])
 
 	const onVolumeChange = React.useCallback(
 		(value) => {
@@ -229,14 +234,16 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 
 				{hasVideo && !hasError && showControls && (
 					<div className="video-stream-tile__controls">
-						<div className="video-stream-tile__controls__volume bg-accent">
-							<Icons.Volume2 />
-							<Slider
-								value={volume}
-								onChange={onVolumeChange}
-								onChangeComplete={onVolumeChange}
-							/>
-						</div>
+						{!stream.isSelf && (
+							<div className="video-stream-tile__controls__volume bg-accent">
+								<Icons.Volume2 />
+								<Slider
+									value={volume}
+									onChange={onVolumeChange}
+									onChangeComplete={onVolumeChange}
+								/>
+							</div>
+						)}
 
 						<Button
 							icon={<Icons.Fullscreen />}

@@ -83,12 +83,16 @@ export default class Screen {
 		consumer.observer.on("close", this.stop)
 		consumer.observer.on("trackended", this.stop)
 
-		// add the track to the media stream
-		this.media.addTrack(consumer.track)
+		// add the track to the media stream.
+		// never add self audio tracks
+		const isSelfAudio = producer.self && consumer.kind === "audio"
 
-		// route audio tracks through sysaudio output to avoid capture feedback
-		// only when sysaudio native output is available (not through voice audioOutput)
-		if (consumer.kind === "audio") {
+		if (!isSelfAudio) {
+			this.media.addTrack(consumer.track)
+		}
+
+		// route audio tracks through sysaudio output to avoid capture feedback.
+		if (consumer.kind === "audio" && !producer.self) {
 			this.attachAudio(consumer.track)
 		}
 
