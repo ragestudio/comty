@@ -122,8 +122,6 @@ const useGroup = ({ group_id }) => {
 				lastLoadedMemberId.current = res.items[0]._id
 			}
 
-			console.debug("[members] fetched members:", res)
-
 			setMembers((prev) => {
 				const existingIds = new Set(
 					(prev?.items || []).map((m) => m._id),
@@ -133,14 +131,16 @@ const useGroup = ({ group_id }) => {
 					(item) => !existingIds.has(item._id),
 				)
 
+				const mergedItems = [...(prev?.items || []), ...newItems]
+
 				return {
-					items: [...(prev?.items || []), ...newItems],
+					items: mergedItems,
 					total_items: res.total_items,
-					has_more: res.has_more ?? false,
+					has_more: mergedItems.length < res.total_items,
 				}
 			})
 
-			await cacheMembers(res)
+			await cacheMembers(group_id, res)
 			await cacheTotalMembers(group_id, res.total_items)
 			await evaluateMembersConnections(res.items)
 
@@ -239,9 +239,13 @@ const useGroup = ({ group_id }) => {
 				await fetchGroup()
 			}
 
-			if ((cached.total_members ?? 0) < (meta.total_members ?? 0)) {
+			const knownTotal = Math.max(
+				cached.total_members ?? 0,
+				cached.memberships?.length ?? 0,
+			)
+			if (knownTotal < (meta.total_members ?? 0)) {
 				console.debug("[cache] total_members invalidated", {
-					cached: cached.total_members,
+					knownTotal,
 					actual: meta.total_members,
 				})
 				await fetchMembers()
@@ -282,7 +286,6 @@ const useGroup = ({ group_id }) => {
 			cached.memberships = await db.members
 				.where("group_id")
 				.equals(group_id)
-				.limit(50)
 				.toArray()
 
 			cached.total_members =
@@ -317,6 +320,7 @@ const useGroup = ({ group_id }) => {
 				setMembers({
 					items: cached.memberships,
 					total_items: cached.total_members,
+					has_more: cached.total_members > cached.memberships.length,
 				})
 				await evaluateMembersConnections(cached.memberships)
 			}

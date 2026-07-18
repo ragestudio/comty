@@ -20,11 +20,14 @@ export const cacheGroup = async (group: Group): Promise<void> => {
 }
 
 // cache members list
-export const cacheMembers = async (members: Members): Promise<void> => {
+export const cacheMembers = async (
+	group_id: string,
+	members: Members,
+): Promise<void> => {
 	try {
 		members.items = members.items.map((member) => {
+			member.group_id = group_id
 			member.cached_at = Date.now()
-
 			return member
 		})
 

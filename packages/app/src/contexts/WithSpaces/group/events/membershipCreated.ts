@@ -23,26 +23,26 @@ export default async (
 		})
 	}
 
-	// update members
+	const newMember = {
+		_id: payload.membership_id,
+		group_id: payload.group_id,
+		user_id: payload.user_id,
+		user: payload.user,
+	}
+
+	// update react state
 	updaters.setMembers((prev) => {
-		const nw = { ...prev }
-
-		nw.total_items = nw.total_items + 1
-
-		nw.items.push({
-			_id: payload.membership_id,
-			group_id: payload.group_id,
-			user_id: payload.user_id,
-			user: payload.user,
-		})
-
-		try {
-			db.members.update(payload.group_id, nw)
-		} catch (err) {
-			console.error(`Failed to update db cache`, err)
-			db.members.delete(payload.group_id)
+		return {
+			...prev,
+			total_items: (prev?.total_items ?? 0) + 1,
+			items: [...(prev?.items ?? []), newMember],
 		}
-
-		return nw
 	})
+
+	// cache to dexie
+	try {
+		db.members.put(newMember)
+	} catch (err) {
+		console.error(`Failed to cache new member`, err)
+	}
 }

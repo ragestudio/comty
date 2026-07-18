@@ -28,7 +28,7 @@ const db = new Dexie("spaces_store") as Dexie & {
 	channels: EntityTable<Channels, "group_id">
 	channels_sync: EntityTable<GroupEntitySyncTime, "group_id">
 
-	members: EntityTable<Member, "group_id">
+	members: EntityTable<Member, "_id">
 	members_counter: EntityTable<MembersCounter, "group_id">
 	members_sync: EntityTable<GroupEntitySyncTime, "group_id">
 
@@ -41,7 +41,7 @@ const db = new Dexie("spaces_store") as Dexie & {
 	chats_sync: EntityTable<ChatSyncState, "chat_id">
 }
 
-db.version(2).stores({
+db.version(3).stores({
 	groups: "_id",
 
 	channels: "group_id",
