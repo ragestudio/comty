@@ -124,24 +124,22 @@ const useGroup = ({ group_id }) => {
 
 			console.debug("[members] fetched members:", res)
 
-			// update cache
 			setMembers((prev) => {
-				if (!prev) {
-					prev = {
-						items: [],
-						total_items: 0,
-					}
+				const existingIds = new Set(
+					(prev?.items || []).map((m) => m._id),
+				)
+
+				const newItems = res.items.filter(
+					(item) => !existingIds.has(item._id),
+				)
+
+				return {
+					items: [...(prev?.items || []), ...newItems],
+					total_items: res.total_items,
+					has_more: res.has_more ?? false,
 				}
-
-				if (!Array.isArray(prev.items)) {
-					prev.items = []
-				}
-
-				prev.items.push(...res.items)
-				prev.total_items = res.total_items
-
-				return prev
 			})
+
 			await cacheMembers(res)
 			await cacheTotalMembers(group_id, res.total_items)
 			await evaluateMembersConnections(res.items)
@@ -213,7 +211,9 @@ const useGroup = ({ group_id }) => {
 						!memberState.connected &&
 						newState.includes(memberState.userId)
 					) {
-						newState.filter((id) => id !== memberState.userId)
+						return newState.filter(
+							(id) => id !== memberState.userId,
+						)
 					}
 
 					return newState

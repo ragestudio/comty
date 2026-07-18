@@ -127,7 +127,10 @@ export const Member = ({
 
 			const { x, y } = app.cores.ctx_menu.calculateFitCordinates(
 				event,
-				parseInt(app.cores.style.vars["context-menu-width"].replace("px", "")),
+				parseInt(
+					app.cores.style.vars["context-menu-width"].replace("px", ""),
+					10,
+				),
 				100,
 			)
 
