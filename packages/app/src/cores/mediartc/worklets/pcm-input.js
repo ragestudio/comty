@@ -1,7 +1,7 @@
 class PCMInputProcessor extends AudioWorkletProcessor {
 	constructor() {
 		super()
-		this.ringBufferSize = 1048576
+		this.ringBufferSize = 16384
 		this.mask = this.ringBufferSize - 1
 		this.ringBuffer = new Float32Array(this.ringBufferSize)
 
@@ -12,7 +12,10 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 
 		this.channels = 2
 		this.bitsPerSample = 16
-		this.preBuffer = 3072
+		this.preBuffer = 256
+
+		// max desired latency in samples before aggressive catch-up
+		this.maxBufferSamples = 16384
 
 		this.port.onmessage = (event) => {
 			const { buffer, sampleRate, channels, bitsPerSample } = event.data
@@ -81,7 +84,8 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		if (this.availableSamples < this.ringBufferSize) {
 			this.availableSamples++
 		} else {
-			this.readOffset = (this.readOffset + 1) & this.mask
+			// drop one complete frame to keep channel alignment
+			this.readOffset = (this.readOffset + this.channels) & this.mask
 		}
 	}
 
@@ -103,6 +107,16 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		if (this.availableSamples < samplesNeeded) {
 			this.isPlaying = false
 			return true
+		}
+
+		// latency guard: drop excess if buffer grows beyond desired max
+		if (this.availableSamples > this.maxBufferSamples) {
+			const excessSamples = this.availableSamples - this.maxBufferSamples
+			const excessFrames = Math.floor(excessSamples / inputChannels)
+			const skipSamples = excessFrames * inputChannels
+
+			this.readOffset = (this.readOffset + skipSamples) & this.mask
+			this.availableSamples -= skipSamples
 		}
 
 		for (let i = 0; i < framesNeeded; i++) {
