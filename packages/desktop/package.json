@@ -16,12 +16,12 @@
 		"pack:win": "electron-builder --win --config"
 	},
 	"dependencies": {
-		"electron-store": "^10.1.0",
+		"electron-store": "^11.0.2",
 		"mime": "^4.1.0",
 		"radix-router": "^3.0.1"
 	},
 	"devDependencies": {
-		"electron": "^39.8.10",
+		"electron": "^43.1.1",
 		"electron-builder": "^26.15.3",
 		"electron-devtools-installer": "^4.0.0"
 	}
