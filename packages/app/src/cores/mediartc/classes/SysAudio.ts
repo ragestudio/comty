@@ -37,6 +37,7 @@ export default class SysAudio {
 
 	isReadyForFrames: boolean = false
 	resolveFirstFrame: ((frame: AudioFrame) => void) | null = null
+	pendingFrames: AudioFrame[] = []
 
 	initialize = async () => {
 		await this.initializeInput()
@@ -62,6 +63,9 @@ export default class SysAudio {
 				if (this.resolveFirstFrame) {
 					this.resolveFirstFrame(data)
 					this.resolveFirstFrame = null
+				} else {
+					// buffer frames received during setup / context rebuild
+					this.pendingFrames.push(data)
 				}
 
 				return
@@ -149,6 +153,7 @@ export default class SysAudio {
 
 	startCapture = async () => {
 		this.isReadyForFrames = false
+		this.pendingFrames = []
 
 		const firstFramePromise = new Promise((resolve) => {
 			this.resolveFirstFrame = resolve
@@ -177,11 +182,22 @@ export default class SysAudio {
 
 		this.isReadyForFrames = true
 
+		// flush buffered frames that arrived during setup
+		if (this.pendingFrames.length > 0) {
+			for (const frame of this.pendingFrames) {
+				this.pcmInputWorklet.port.postMessage(frame, [
+					frame.buffer.buffer,
+				])
+			}
+			this.pendingFrames = []
+		}
+
 		return this.audioInputTrack
 	}
 
 	stopCapture = async () => {
 		this.isReadyForFrames = false
+		this.pendingFrames = []
 
 		if (this.inputDestination) {
 			this.inputDestination.stream.getTracks().forEach((t) => t.stop())
