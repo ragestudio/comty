@@ -65,7 +65,11 @@ export default defineRoute<API>()({
 		let users = []
 		if (allMessages.length > 0) {
 			users = await User.find({
-				_id: { $in: allMessages.map((m) => m.user_id) },
+				_id: {
+					$in: allMessages
+						.map((m) => m.user_id)
+						.filter((id) => id !== "0"), // filter out the "0" user_id, is a system user
+				},
 			}).select("_id username public_name roles avatar cover bot bot_id")
 		}
 
