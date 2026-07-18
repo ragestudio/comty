@@ -16,7 +16,7 @@ export default async function (this: MediaRTC, data: any) {
 		await this.self.createMicStream()
 
 		// resume audio context
-		if (this.self.audioOutput.state === "suspended") {
+		if (this.self.audioOutput?.state === "suspended") {
 			await this.self.audioOutput.resume()
 		}
 

@@ -52,7 +52,7 @@ export default class Self {
 			}
 		}
 
-		return this.audioOutput.context.state === "suspended"
+		return this.audioOutput?.context?.state === "suspended"
 	}
 
 	get audioSettings() {

@@ -1,5 +1,5 @@
 export default async function (to) {
-	if (!this.self.audioOutput) {
+	if (!this.self.audioOutput && !this.self.sysAudio?.outputBus) {
 		return false
 	}
 

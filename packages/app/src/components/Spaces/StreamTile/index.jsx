@@ -67,10 +67,12 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 
 	React.useEffect(() => {
 		if (videoRef.current) {
-			videoRef.current.muted = stream.isSelf
+			const screen = rtc.screens.get(stream.userId)
+			// mute video only when audio is routed through sysaudio
+			videoRef.current.muted = screen?.shouldMuteVideo || false
 			videoRef.current.volume = volume / 100
 		}
-	}, [volume, stream.isSelf])
+	}, [volume, stream.userId, rtc])
 
 	const onVolumeChange = React.useCallback(
 		(value) => {
@@ -79,8 +81,13 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			if (stream?.userId) {
 				setVolume(stream.userId, value)
 			}
+
+			const screen = rtc.screens.get(stream.userId)
+			if (screen?.setVolume) {
+				screen.setVolume(value)
+			}
 		},
-		[stream.userId, setVolume],
+		[stream.userId, setVolume, rtc],
 	)
 
 	const handleStart = React.useCallback(

@@ -2,6 +2,9 @@ export default class Screen {
 	constructor(producer) {
 		this.producer = producer
 		this.media = new MediaStream()
+		this.audioNodes = []
+		this.audioGainNode = null
+		this.shouldMuteVideo = false
 	}
 
 	get rtc() {
@@ -25,6 +28,9 @@ export default class Screen {
 	}
 
 	stop = async () => {
+		// disconnect audio routing
+		this.detachAudio()
+
 		if (this.media) {
 			// stop the tracks
 			this.media.getTracks().forEach((track) => track.stop())
@@ -38,6 +44,12 @@ export default class Screen {
 		// stop all consumers
 		for (const consumerId of this.consumersIds) {
 			await this.rtc.consumers.stop(consumerId)
+		}
+	}
+
+	setVolume = (volume) => {
+		if (this.audioGainNode) {
+			this.audioGainNode.gain.value = volume / 100
 		}
 	}
 
@@ -71,12 +83,59 @@ export default class Screen {
 		consumer.observer.on("close", this.stop)
 		consumer.observer.on("trackended", this.stop)
 
-		// add the track
+		// add the track to the media stream
 		this.media.addTrack(consumer.track)
+
+		// route audio tracks through sysaudio output to avoid capture feedback
+		// only when sysaudio native output is available (not through voice audioOutput)
+		if (consumer.kind === "audio") {
+			this.attachAudio(consumer.track)
+		}
 
 		// add the id
 		this.consumersIds.push(consumer.id)
 
 		return consumer
+	}
+
+	attachAudio = (track) => {
+		const hasSysAudio = !!(
+			this.rtc.self.sysAudio && this.rtc.self.sysAudio.outputCtx
+		)
+
+		// only route through sysaudio native output, never through voice audioOutput
+		// voice path is for low-latency speech and gets silenced on deafen
+		if (!hasSysAudio) return
+
+		const ctx = this.rtc.self.sysAudio.outputCtx
+		const destination = this.rtc.self.sysAudio.outputBus
+		if (!ctx || !destination) return
+
+		const stream = new MediaStream([track])
+		const source = ctx.createMediaStreamSource(stream)
+		const gainNode = ctx.createGain()
+		gainNode.gain.value = 1
+
+		source.connect(gainNode)
+		gainNode.connect(destination)
+
+		this.audioNodes.push({ stream, source, gainNode, destination })
+		this.audioGainNode = gainNode
+
+		// signal that video should be muted since audio goes through sysaudio
+		this.shouldMuteVideo = true
+	}
+
+	detachAudio = () => {
+		for (const node of this.audioNodes) {
+			try {
+				node.source.disconnect()
+				node.gainNode.disconnect()
+				node.stream.getTracks().forEach((t) => t.stop())
+			} catch (e) {}
+		}
+		this.audioNodes = []
+		this.audioGainNode = null
+		this.shouldMuteVideo = false
 	}
 }
