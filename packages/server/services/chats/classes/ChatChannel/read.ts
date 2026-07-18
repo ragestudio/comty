@@ -43,7 +43,9 @@ export default async function (this: ChatChannel, user, payload) {
 	if (messages.length !== 0) {
 		users = await User.find({
 			_id: {
-				$in: messages.map((message) => message.user_id),
+				$in: messages
+					.map((message) => message.user_id)
+					.filter((id) => id !== "0"), // filter out system messages
 			},
 		}).select("_id username public_name roles avatar cover bot bot_id")
 	}
