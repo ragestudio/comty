@@ -1,7 +1,7 @@
 class PCMOutputProcessor extends AudioWorkletProcessor {
 	constructor() {
 		super()
-		this.bufferSize = 4096
+		this.bufferSize = 256
 		this.interleaved = new Int16Array(this.bufferSize * 2)
 		this.writeIndex = 0
 	}

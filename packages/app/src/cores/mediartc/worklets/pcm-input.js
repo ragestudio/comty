@@ -15,7 +15,7 @@ class PCMInputProcessor extends AudioWorkletProcessor {
 		this.preBuffer = 256
 
 		// max desired latency in samples before aggressive catch-up
-		this.maxBufferSamples = 16384
+		this.maxBufferSamples = 4096
 
 		this.port.onmessage = (event) => {
 			const { buffer, sampleRate, channels, bitsPerSample } = event.data
