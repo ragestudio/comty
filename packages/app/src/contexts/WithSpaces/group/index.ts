@@ -8,6 +8,7 @@ import {
 	cacheChannels,
 	cacheMembers,
 	cacheTotalMembers,
+	resolveCachedMembersUsers,
 } from "../helpers/cache"
 
 import db from "../store"
@@ -36,6 +37,8 @@ export interface CachedGroup {
 
 	channels: Channels | null
 }
+
+const INITIAL_CACHE_PAGE_SIZE = 50
 
 const DEFAULT_CHANNELS_STATE = () => ({
 	items: [],
@@ -286,6 +289,7 @@ const useGroup = ({ group_id }) => {
 			cached.memberships = await db.members
 				.where("group_id")
 				.equals(group_id)
+				.limit(INITIAL_CACHE_PAGE_SIZE)
 				.toArray()
 
 			cached.total_members =
@@ -317,6 +321,11 @@ const useGroup = ({ group_id }) => {
 			if (!cached.memberships || cached.memberships.length === 0) {
 				await fetchMembers()
 			} else {
+				// inject user data from users cache into memberships
+				cached.memberships = await resolveCachedMembersUsers(
+					cached.memberships,
+				)
+
 				setMembers({
 					items: cached.memberships,
 					total_items: cached.total_members,

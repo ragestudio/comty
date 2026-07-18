@@ -1,9 +1,11 @@
 import { Channels } from "../collections/channel"
 import { Group } from "../collections/group"
-import { Members } from "../collections/member"
+import { Member, Members } from "../collections/member"
 import { User } from "../collections/user"
 
 import db from "../store"
+
+const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
 
 // cache group data
 export const cacheGroup = async (group: Group): Promise<void> => {
@@ -19,19 +21,49 @@ export const cacheGroup = async (group: Group): Promise<void> => {
 	}
 }
 
-// cache members list
+// cache members list — strips user data into separate users table
 export const cacheMembers = async (
 	group_id: string,
 	members: Members,
 ): Promise<void> => {
 	try {
-		members.items = members.items.map((member) => {
-			member.group_id = group_id
-			member.cached_at = Date.now()
-			return member
-		})
+		// extract and cache users separately
+		const users = members.items
+			.map((m) => m.user)
+			.filter((u): u is NonNullable<typeof u> => !!u)
 
-		await db.members.bulkPut(members.items)
+		if (users.length > 0) {
+			await cacheUsers(users)
+		}
+
+		// store members without nested user data
+		const stripped = members.items.map(({ user, ...member }) => ({
+			...member,
+			group_id: group_id,
+			cached_at: Date.now(),
+		}))
+
+		await db.members.bulkPut(stripped)
+
+		// enforce per-group member limit (keep most recent)
+		const total = await db.members
+			.where("group_id")
+			.equals(group_id)
+			.count()
+
+		if (total > CACHED_MEMBERS_PER_GROUP_LIMIT) {
+			const oldest = await db.members
+				.where("group_id")
+				.equals(group_id)
+				.sortBy("cached_at")
+
+			const toDelete = oldest.slice(
+				0,
+				oldest.length - CACHED_MEMBERS_PER_GROUP_LIMIT,
+			)
+
+			await db.members.bulkDelete(toDelete.map((m) => m._id))
+		}
 	} catch (err) {
 		console.error("Error caching members:", err)
 	}
@@ -69,15 +101,38 @@ export const cacheUsers = async (users: User[]) => {
 			throw new Error(`"users" must be a array`)
 		}
 
-		users = users.map((user) => {
-			user.cached_at = Date.now()
-			return user
-		})
+		const now = Date.now()
+
+		users = users.map((user) => ({
+			...user,
+			cached_at: now,
+		}))
 
 		await db.users.bulkPut(users)
 	} catch (error) {
 		console.error("Error caching users", error)
 	}
+}
+
+// resolve cached memberships by injecting user data from the users table
+export const resolveCachedMembersUsers = async (
+	memberships: Member[],
+): Promise<Member[]> => {
+	if (!memberships || memberships.length === 0) return memberships
+
+	const userIds = [
+		...new Set(memberships.map((m) => m.user_id).filter(Boolean)),
+	]
+
+	if (userIds.length === 0) return memberships
+
+	const users = await db.users.bulkGet(userIds)
+	const userMap = new Map(users.filter(Boolean).map((u) => [u._id, u]))
+
+	return memberships.map((m) => ({
+		...m,
+		user: userMap.get(m.user_id) || null,
+	}))
 }
 
 // clear cache for a group

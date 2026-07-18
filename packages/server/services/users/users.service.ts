@@ -25,14 +25,14 @@ export default class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb()),
 		redis: RedisClient(),
+		scylla: (global.scylla = new ScyllaDb()),
 	}
 
 	initialize = [
-		() => this.contexts.db.initialize(),
-		() => this.contexts.redis.initialize(),
-		() => this.contexts.scylla.initialize(),
+		() => this.contexts.db.initialize().then(() => {}),
+		() => this.contexts.redis.initialize().then(() => {}),
+		() => this.contexts.scylla.initialize().then(() => {}),
 	]
 }
 
