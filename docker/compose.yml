@@ -31,45 +31,93 @@ services:
     volumes:
       - ./data/mongodb:/data/db
 
-  server:
-    container_name: comty-api
+  nats:
+    image: nats:latest
+    container_name: comty-nats
+    restart: unless-stopped
+    command: "--jetstream --store_dir /data"
+    networks:
+      - nats_network
+    volumes:
+      - ./data/nats:/data
+
+  haproxy:
+    image: haproxy:latest
+    container_name: comty-haproxy
+    restart: unless-stopped
+    networks:
+      - api_network
+    ports:
+      - "9000:9000"
+      - "40000:40000"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+
+  server-blue:
+    container_name: comty-server-blue
     image: ragestudio/comty-server
     build:
       context: ..
       dockerfile: ./packages/server/Dockerfile
-
-    restart: unless-stopped
+    restart: "no"
     depends_on:
       - mongodb
       - scylla
       - redis
+      - nats
     networks:
       - api_network
       - mongodb_network
       - scylla_network
       - redis_network
-    ports:
-      - "9000:9000" # API HTTP/WS Gateway port
-      - "40000:40000/tcp" # webrtc on TCP
-      - "40000:40000/udp" # webrtc on UDP
+      - nats_network
     env_file:
       - ./.env
     volumes:
       - ./gateway.config.json:/server/gateway.config.json
     environment:
       - NODE_ENV=production
+      - GRACEFUL_SHUTDOWN_TIMEOUT=30
+      - NATS_URL=nats://comty-nats:4222
+    ports:
+      - "40000:40000/udp"
+    profiles:
+      - blue
 
-  # web:
-  #   build: ../packages/wrapper
-  #   container_name: comty-web
-  #   restart: unless-stopped
-  #   ports:
-  #     - "5000:5000"
-  #   env_file:
-  #     - ./.env
+  server-green:
+    container_name: comty-server-green
+    image: ragestudio/comty-server
+    build:
+      context: ..
+      dockerfile: ./packages/server/Dockerfile
+    restart: "no"
+    depends_on:
+      - mongodb
+      - scylla
+      - redis
+      - nats
+    networks:
+      - api_network
+      - mongodb_network
+      - scylla_network
+      - redis_network
+      - nats_network
+    env_file:
+      - ./.env
+    volumes:
+      - ./gateway.config.json:/server/gateway.config.json
+    environment:
+      - NODE_ENV=production
+      - GRACEFUL_SHUTDOWN_TIMEOUT=30
+      - NATS_URL=nats://comty-nats:4222
+    ports:
+      - "40000:40000/udp"
+    profiles:
+      - green
 
 networks:
   api_network:
   mongodb_network:
   scylla_network:
   redis_network:
+  nats_network:
