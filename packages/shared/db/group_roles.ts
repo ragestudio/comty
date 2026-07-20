@@ -18,7 +18,7 @@ export const schema = new Schema(
 			required: true,
 		}),
 		permissions: defineColumn<Record<string, boolean>>()({
-			type: "<map<varchar, boolean>>",
+			type: "map<varchar, boolean>",
 		}),
 	},
 )
