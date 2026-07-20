@@ -13,5 +13,8 @@ allowBuilds:
 
 blockExoticSubdeps: false
 
+minimumReleaseAgeExclude:
+  - '@ragestudio/scylla-odm@0.22.17'
+
 overrides:
   linebridge: link:../../modules/linebridge/server/build

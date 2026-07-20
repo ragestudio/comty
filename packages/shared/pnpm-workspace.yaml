@@ -1,0 +1,2 @@
+minimumReleaseAgeExclude:
+  - '@ragestudio/scylla-odm@0.22.17'
