@@ -17,6 +17,7 @@ import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
 import type { MediaChannel } from "@classes/MediaChannel/index.ts"
 import type { Server } from "linebridge"
 import { RTCClient } from "@services/rtc/types"
+import { resolvePublicIP } from "@shared-utils/resolvePublicIP"
 
 type PendingDisconnectEntry = {
 	timeout: NodeJS.Timeout
@@ -59,18 +60,22 @@ export default class MediaChannelsController {
 				],
 			})
 
+			console.log("Resolving public IP...")
+			const announcedIp = await resolvePublicIP()
+			console.log("Announced WebRTC IP:", announcedIp)
+
 			this.webrtcServer = await this.worker.createWebRtcServer({
 				listenInfos: [
 					{
 						protocol: "udp",
 						ip: "0.0.0.0",
-						announcedIp: MediaChannelsController.getAnnouncedIp(),
+						announcedIp: announcedIp,
 						port: 40000, // should be unique per worker
 					},
 					{
 						protocol: "tcp",
 						ip: "0.0.0.0",
-						announcedIp: MediaChannelsController.getAnnouncedIp(),
+						announcedIp: announcedIp,
 						port: 40000,
 					},
 				],
