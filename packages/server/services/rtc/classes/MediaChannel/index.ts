@@ -73,6 +73,11 @@ export class MediaChannel {
 		},
 		{
 			kind: "video",
+			mimeType: "video/AV1",
+			clockRate: 90000,
+		},
+		{
+			kind: "video",
 			mimeType: "video/h264",
 			clockRate: 90000,
 			parameters: {
