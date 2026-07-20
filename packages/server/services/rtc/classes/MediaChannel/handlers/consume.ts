@@ -48,6 +48,19 @@ async function consumeHandler(
 			paused: false,
 		})
 
+		// request a keyframe immediately so the new viewer
+		// does not wait for the next periodic keyframe
+		if (consumer.kind === "video") {
+			try {
+				await consumer.requestKeyFrame()
+			} catch (e) {
+				console.warn(
+					`[CHANNEL:${this.channelId}] consumer.requestKeyFrame failed for ${producerId}:`,
+					e,
+				)
+			}
+		}
+
 		// Store consumer
 		if (!this.consumers.has(client.userId)) {
 			this.consumers.set(client.userId, [])
