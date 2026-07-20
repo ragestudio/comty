@@ -14,7 +14,7 @@ export default async function (
 
 		client.voiceState = {
 			muted: false,
-			deafened: false,
+			deafen: false,
 		}
 
 		client.channel_id = this.channelId

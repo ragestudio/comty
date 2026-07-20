@@ -108,7 +108,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 				{
 					speaking: speaking,
 					muted: client.voiceState?.muted,
-					deafened: client.voiceState?.deafened,
+					deafen: client.voiceState?.deafen,
 					failed: false,
 				},
 			)}
@@ -135,7 +135,7 @@ const VoiceClient = ({ client, speaking, producers }) => {
 					<Icons.MicOff style={{ color: "var(--danger-color)" }} />
 				)}
 
-				{client?.voiceState?.deafened && (
+				{client?.voiceState?.deafen && (
 					<Icons.VolumeOff style={{ color: "var(--danger-color)" }} />
 				)}
 			</div>

@@ -15,7 +15,7 @@ export type RTCClient = RTEClient & {
 	transports?: Map<string, any>
 	voiceState?: {
 		muted: boolean
-		deafened: boolean
+		deafen: boolean
 	}
 	self?: Boolean
 }

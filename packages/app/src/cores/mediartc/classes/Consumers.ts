@@ -1,19 +1,7 @@
-import MediaRTC from "../mediartc.core"
+import type Consumer from "./Consumer"
 
-interface ConsumerData {
-	id: string
-	producerId: string
-	userId: string
-	kind: string
-	appData: {
-		mediaTag: string
-	}
-	isSpeaking?: boolean
-	close?: () => void
-	closed?: boolean
-	on?: (event: string, callback: Function) => void
-	observer?: any
-}
+import MediaRTC from "../mediartc.core"
+import Producer from "./Producer"
 
 export default class Consumers {
 	core: MediaRTC
@@ -25,7 +13,7 @@ export default class Consumers {
 		this.core = core
 	}
 
-	get _mirrorMap(): Map<string, ConsumerData> {
+	get _mirrorMap(): Map<string, Consumer> {
 		return this.core.recvTransport?._consumers || new Map()
 	}
 
@@ -33,7 +21,7 @@ export default class Consumers {
 		return this._mirrorMap.size
 	}
 
-	get(key: string): ConsumerData | undefined {
+	get(key: string): Consumer | undefined {
 		return this._mirrorMap.get(key)
 	}
 
@@ -41,7 +29,7 @@ export default class Consumers {
 		return this._mirrorMap.has(key)
 	}
 
-	values(): IterableIterator<ConsumerData> {
+	values(): IterableIterator<Consumer> {
 		return this._mirrorMap.values()
 	}
 
@@ -49,22 +37,22 @@ export default class Consumers {
 		return this._mirrorMap.keys()
 	}
 
-	entries(): IterableIterator<[string, ConsumerData]> {
+	entries(): IterableIterator<[string, Consumer]> {
 		return this._mirrorMap.entries()
 	}
 
 	forEach(
 		callback: (
-			value: ConsumerData,
+			value: Consumer,
 			key: string,
-			map: Map<string, ConsumerData>,
+			map: Map<string, Consumer>,
 		) => void,
 		thisArg?: any,
 	): void {
 		this._mirrorMap.forEach(callback, thisArg)
 	}
 
-	[Symbol.iterator](): IterableIterator<[string, ConsumerData]> {
+	[Symbol.iterator](): IterableIterator<[string, Consumer]> {
 		return this._mirrorMap[Symbol.iterator]()
 	}
 
@@ -73,12 +61,7 @@ export default class Consumers {
 		userId,
 		kind,
 		appData,
-	}: {
-		producerId: string
-		userId: string
-		kind: string
-		appData: { mediaTag: string }
-	}): Promise<ConsumerData> => {
+	}: Partial<Consumer>): Promise<Consumer> => {
 		try {
 			if (!this.core.socket) {
 				throw new Error("Socket not available or ready")
@@ -204,17 +187,18 @@ export default class Consumers {
 		}
 	}
 
-	findByProducerId = (producerId: string): ConsumerData | undefined => {
+	findByProducerId = (producerId: string): Consumer | undefined => {
 		for (const consumer of this.values()) {
 			if (consumer.producerId === producerId) {
 				return consumer
 			}
 		}
+
 		return undefined
 	}
 
-	findByUserId = (userId: string): ConsumerData[] => {
-		const consumers: ConsumerData[] = []
+	findByUserId = (userId: string): Consumer[] => {
+		const consumers: Consumer[] = []
 		for (const consumer of this.values()) {
 			if (consumer.userId === userId) {
 				consumers.push(consumer)

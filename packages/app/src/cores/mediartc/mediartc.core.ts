@@ -275,7 +275,7 @@ export default class MediaRTC extends Core {
 			event: "updateVoiceState",
 			data: {
 				muted: this.self.isMuted,
-				deafened: this.self.isDeafened,
+				deafen: this.self.isDeafened,
 			},
 		})
 	}

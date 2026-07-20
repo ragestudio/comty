@@ -1,17 +1,34 @@
+import type Producer from "./Producer"
+import type MediaRTCCore from "../mediartc.core"
+
+type ScreenAudioObjects = {
+	stream: MediaStream
+	source: MediaStreamAudioSourceNode
+	gainNode: GainNode
+	destination: AudioNode
+}
+
 export default class Screen {
-	constructor(producer) {
+	constructor(producer: Producer) {
 		this.producer = producer
 		this.media = new MediaStream()
-		this.audioNodes = []
+		this.audioObjs = []
 		this.audioGainNode = null
 		this.shouldMuteVideo = false
 	}
 
-	get rtc() {
-		return app.cores.mediartc.instance()
-	}
+	media: MediaStream = null
+	producer: Producer = null
+
+	audioObjs: ScreenAudioObjects[] = []
+	audioGainNode: GainNode = null
+	shouldMuteVideo: boolean = false
 
 	consumersIds = []
+
+	get rtc() {
+		return app.cores.mediartc.instance() as MediaRTCCore
+	}
 
 	start = async () => {
 		await this.appendFromProducer(this.producer.id)
@@ -76,7 +93,7 @@ export default class Screen {
 
 		// if consumer is paused, resume it
 		if (consumer.paused) {
-			await consumer.resume()
+			consumer.resume()
 		}
 
 		// add to the consumer the events when the consumer is ended
@@ -113,6 +130,7 @@ export default class Screen {
 
 		const ctx = this.rtc.self.sysAudio.outputCtx
 		const destination = this.rtc.self.sysAudio.outputBus
+
 		if (!ctx || !destination) return
 
 		const stream = new MediaStream([track])
@@ -123,7 +141,7 @@ export default class Screen {
 		source.connect(gainNode)
 		gainNode.connect(destination)
 
-		this.audioNodes.push({ stream, source, gainNode, destination })
+		this.audioObjs.push({ stream, source, gainNode, destination })
 		this.audioGainNode = gainNode
 
 		// signal that video should be muted since audio goes through sysaudio
@@ -131,14 +149,14 @@ export default class Screen {
 	}
 
 	detachAudio = () => {
-		for (const node of this.audioNodes) {
+		for (const node of this.audioObjs) {
 			try {
 				node.source.disconnect()
 				node.gainNode.disconnect()
 				node.stream.getTracks().forEach((t) => t.stop())
 			} catch (e) {}
 		}
-		this.audioNodes = []
+		this.audioObjs = []
 		this.audioGainNode = null
 		this.shouldMuteVideo = false
 	}

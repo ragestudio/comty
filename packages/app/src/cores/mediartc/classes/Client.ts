@@ -1,5 +1,12 @@
+import type { VoiceState } from "../types"
+import type MediaRTC from "../mediartc.core"
+import type Consumer from "./Consumer"
+
 export default class Client {
-	constructor(core, data) {
+	constructor(
+		core: MediaRTC,
+		data: { userId: string; voiceState?: VoiceState },
+	) {
 		this.core = core
 		this.userId = data.userId
 		this.self = this.userId === app.userData._id
@@ -16,6 +23,10 @@ export default class Client {
 		})
 	}
 
+	core: MediaRTC
+	userId: string
+	self: boolean
+
 	micConsumer = null
 	micMediaStream = null
 	mediaStreamSource = null
@@ -24,9 +35,9 @@ export default class Client {
 
 	micAudioElement = null
 
-	voiceState = {
+	voiceState: VoiceState = {
 		muted: false,
-		deafened: false,
+		deafen: false,
 	}
 
 	localState = {
@@ -34,8 +45,9 @@ export default class Client {
 		volume: 1,
 	}
 
-	setVolume = (volume) => {
+	setVolume = (volume: number) => {
 		this.localState.volume = volume / 100
+
 		if (this.micSourceGainNode) {
 			this.micSourceGainNode.gain.value = this.localState.muted
 				? 0
@@ -43,10 +55,11 @@ export default class Client {
 		}
 	}
 
-	toggleMute = (to) => {
+	toggleMute = (to?: boolean) => {
 		if (typeof to !== "boolean") {
 			to = !this.localState.muted
 		}
+
 		this.localState.muted = to
 
 		if (this.micSourceGainNode) {
@@ -57,7 +70,7 @@ export default class Client {
 		this.coreState.voiceState.muted = to
 	}
 
-	attachMic = async (payload) => {
+	attachMic = async (payload: Partial<Consumer>) => {
 		const consumer = await this.core.consumers.start({
 			producerId: payload.producerId,
 			userId: this.userId,
@@ -158,7 +171,7 @@ export default class Client {
 		}
 	}
 
-	updateVoiceState = (update) => {
+	updateVoiceState = (update: Partial<VoiceState>) => {
 		this.voiceState = { ...this.voiceState, ...update }
 		this.coreState.voiceState = this.voiceState
 	}

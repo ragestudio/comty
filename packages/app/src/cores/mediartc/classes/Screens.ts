@@ -1,17 +1,19 @@
+import type MediaRTC from "../mediartc.core"
 import Screen from "./Screen"
 
 export default class Screens extends Map {
-	constructor(core) {
-		super()
-
-		this.core = core
-
+	constructor(core: MediaRTC) {
 		if (!core) {
 			throw new Error("Core not provided")
 		}
+
+		super()
+		this.core = core
 	}
 
-	start = async (producerId) => {
+	core: MediaRTC
+
+	start = async (producerId: string) => {
 		// get the producer
 		const producer = this.core.producers.get(producerId)
 
@@ -30,7 +32,7 @@ export default class Screens extends Map {
 		return screen
 	}
 
-	stop = async (producerId) => {
+	stop = async (producerId: string) => {
 		// get the producer
 		const producer = this.core.producers.get(producerId)
 

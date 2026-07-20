@@ -122,7 +122,7 @@ export default function ClientsPanel({
 							muted
 						</Tag>,
 					)
-				if (vs.deafened)
+				if (vs.deafen)
 					tags.push(
 						<Tag
 							key="d"

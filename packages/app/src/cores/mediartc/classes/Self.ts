@@ -4,7 +4,7 @@ import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
 
-import type { Producer } from "./Producers"
+import type { Producer } from "./Producer"
 
 type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
