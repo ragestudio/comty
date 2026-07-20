@@ -45,6 +45,8 @@ export default async function (
 
 		// dispatch sfx
 		app.cores.sfx.play("media_channel_join")
+
+		await this.sendVoiceStateUpdate()
 	} catch (error: any) {
 		this._switchingToChannelId = null
 
