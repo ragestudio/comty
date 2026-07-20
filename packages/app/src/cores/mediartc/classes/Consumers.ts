@@ -61,7 +61,7 @@ export default class Consumers {
 		userId,
 		kind,
 		appData,
-	}: Partial<Consumer>): Promise<Consumer> => {
+	}: Partial<Producer>): Promise<Consumer> => {
 		try {
 			if (!this.core.socket) {
 				throw new Error("Socket not available or ready")

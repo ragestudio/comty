@@ -1,4 +1,4 @@
-export default async function (payload) {
+export default async function (payload: any) {
 	if (!payload) {
 		return false
 	}

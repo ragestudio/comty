@@ -1,3 +1,5 @@
+import type MediaRTC from "../mediartc.core"
+
 import NotificationUI from "../../notifications/ui"
 import { Howl } from "howler"
 
@@ -43,7 +45,7 @@ function ignoreIncomingCall(core) {
 	core.state.incomingCall = null
 }
 
-export default async (core, payload) => {
+export default async (core: MediaRTC, payload: any) => {
 	core.console.log("incoming call", payload)
 
 	// set incoming call state

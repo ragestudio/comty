@@ -1,6 +1,7 @@
 import type { VoiceState } from "../types"
 import type MediaRTC from "../mediartc.core"
 import type Consumer from "./Consumer"
+import Producer from "./Producer"
 
 export default class Client {
 	constructor(
@@ -70,7 +71,7 @@ export default class Client {
 		this.coreState.voiceState.muted = to
 	}
 
-	attachMic = async (payload: Partial<Consumer>) => {
+	attachMic = async (payload: Partial<Producer>) => {
 		const consumer = await this.core.consumers.start({
 			producerId: payload.producerId,
 			userId: this.userId,

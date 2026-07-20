@@ -1,4 +1,6 @@
-export default async (core, data) => {
+import type MediaRTC from "../mediartc.core"
+
+export default async (core: MediaRTC, data: any) => {
 	core.console.debug("disconnected from channel:", data)
 
 	// if we are intentionally switching channels, dont trigger recovery

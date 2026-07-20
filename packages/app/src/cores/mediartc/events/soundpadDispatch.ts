@@ -1,6 +1,8 @@
+import type MediaRTC from "../mediartc.core"
+
 const maxPlaytime = 10000 // 10 seconds
 
-export default async (core, payload) => {
+export default async (core: MediaRTC, payload: any) => {
 	try {
 		core.console.log(
 			`User ${payload.userId} dispatched soundpad :`,

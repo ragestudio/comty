@@ -1,4 +1,6 @@
-export default async (core, data) => {
+import type MediaRTC from "../mediartc.core"
+
+export default async (core: MediaRTC, data: any) => {
 	core.console.debug("received client event:", data)
 
 	const client = core.clients.get(data.userId)

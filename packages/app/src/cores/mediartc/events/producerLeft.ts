@@ -1,4 +1,6 @@
-export default async (core, data) => {
+import type MediaRTC from "../mediartc.core"
+
+export default async (core: MediaRTC, data: any) => {
 	try {
 		// if self producer, ignore
 		// the server should not send this event for itself
