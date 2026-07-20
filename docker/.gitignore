@@ -1,3 +1,4 @@
 data
 .keys
 *.override.yml
+.bluegreen_state
