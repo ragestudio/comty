@@ -20,12 +20,10 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage"
 	},
-	"peerDependencies": {
+	"dependencies": {
 		"@nats-io/jetstream": "^3.4.0",
 		"@nats-io/kv": "^3.4.0",
-		"@nats-io/transport-node": "^3.4.0"
-	},
-	"dependencies": {
+		"@nats-io/transport-node": "^3.4.0",
 		"@foxify/events": "^2.1.0",
 		"@otplib/uri": "^13.4.1",
 		"@ragestudio/scylla-odm": "0.22.17",
