@@ -29,13 +29,9 @@ get_active_slot() {
     fi
 }
 
-set_active_slot() {
-    echo "$1" > "$STATE_FILE"
-}
+set_active_slot() { echo "$1" > "$STATE_FILE"; }
 
-dc() {
-    docker compose $COMPOSE_ARGS "$@"
-}
+dc() { docker compose $COMPOSE_ARGS "$@"; }
 
 slot_profile()  { echo "$1"; }
 slot_service()  { echo "server-$1"; }
@@ -57,26 +53,20 @@ haproxy_disable() {
 
 wait_healthy() {
     local container=$1
-    local retries=$MAX_HEALTH_RETRIES
-    log_info "Waiting for healthcheck on $container ..."
-    for i in $(seq 1 $retries); do
+    for i in $(seq 1 $MAX_HEALTH_RETRIES); do
         if docker exec "$container" curl -sf http://localhost:9000/health > /dev/null 2>&1; then
             log_info "Healthcheck OK (attempt $i)"
             return 0
         fi
         sleep "$HEALTH_RETRY_INTERVAL"
     done
-    log_error "Healthcheck failed after $retries attempts"
+    log_error "Healthcheck failed after $MAX_HEALTH_RETRIES attempts"
     return 1
 }
 
 ensure_infra() {
     log_info "Ensuring infrastructure is running..."
-
-    # start all services without a profile (includes sfu-node from override if present)
-    if ! dc up -d --profile "" redis scylla mongodb nats haproxy sfu-node 2>/dev/null; then
-        dc up -d redis scylla mongodb nats haproxy sfu-node
-    fi
+    dc up -d
     sleep 2
 }
 
@@ -94,11 +84,9 @@ deploy() {
 
     log_info "Active: $active_slot -> Deploying to $new_slot ($new_container)"
 
-    # step 1: build
     log_info "Building server image..."
     dc --profile "$new_profile" build "$new_service"
 
-    # step 2: start new alongside old
     log_info "Starting new server ($new_container)..."
     if ! dc --profile "$new_profile" up -d "$new_service"; then
         log_error "Failed to start new container."
@@ -107,7 +95,6 @@ deploy() {
 
     sleep 2
 
-    # step 3: healthcheck
     if ! wait_healthy "$new_container"; then
         log_error "New container failed healthcheck. Cleaning up..."
         dc --profile "$new_profile" stop "$new_service" 2>/dev/null || true
@@ -115,19 +102,16 @@ deploy() {
         exit 1
     fi
 
-    # step 4: switch HAProxy to new
     haproxy_enable "$new_slot"
     haproxy_disable "$active_slot"
 
-    # step 5: signal old to drain and auto-shutdown when idle
-    log_info "Signaling old container ($old_container) to drain gracefully..."
+    log_info "Signaling old ($old_container) to drain gracefully..."
     docker kill -s SIGTERM "$old_container" 2>/dev/null || true
     log_info "Old container will auto-exit when all clients disconnect"
 
     set_active_slot "$new_slot"
 
     log_info "Deploy complete! $new_slot is now active"
-    log_info "To rollback: $0 --rollback"
 }
 
 rollback() {
@@ -150,7 +134,7 @@ rollback() {
     sleep 2
 
     if ! wait_healthy "$prev_container"; then
-        log_error "Previous container failed healthcheck. Manual intervention required."
+        log_error "Previous container failed healthcheck."
         exit 1
     fi
 
@@ -163,8 +147,7 @@ rollback() {
 
 status_cmd() {
     echo "=== Blue-Green Status ==="
-    local active=$(get_active_slot)
-    echo "Active: $active"
+    echo "Active: $(get_active_slot)"
     echo ""
     for slot in blue green; do
         local container=$(slot_container "$slot")
@@ -188,14 +171,10 @@ case "${1:-deploy}" in
         slot=$(get_active_slot)
         log_info "Stopping active slot ($slot)..."
         dc --profile "$slot" stop "$(slot_service "$slot")"
-        log_info "Stopped."
         ;;
     stop-all|--stop-all)
-        log_info "Stopping all services..."
-        dc --profile blue stop 2>/dev/null || true
-        dc --profile green stop 2>/dev/null || true
-        dc stop redis scylla mongodb nats haproxy sfu-node 2>/dev/null || true
-        log_info "All services stopped."
+        log_info "Stopping everything..."
+        dc stop
         ;;
     *) echo "Usage: $0 [deploy|rollback|status|infra|stop|stop-all]" ; exit 1 ;;
 esac
