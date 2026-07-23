@@ -52,6 +52,25 @@ services:
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
 
+  sfu-node:
+    container_name: comty-sfu-node
+    image: ragestudio/comty-sfu-node
+    build:
+      context: ..
+      dockerfile: ./packages/sfu-node/Dockerfile
+    restart: "unless-stopped"
+    environment:
+      - NATS_ADDRESS=nats:4222
+    ports:
+      - "40001:40001/tcp"
+      - "40001:40001/udp"
+    depends_on:
+      - nats
+    networks:
+      - nats_network
+      - api_network
+      - redis_network
+
   server-blue:
     container_name: comty-server-blue
     image: ragestudio/comty-server
@@ -113,25 +132,6 @@ services:
       - AUTO_SHUTDOWN_WHEN_IDLE=true
     profiles:
       - green
-
-  sfu-node:
-    container_name: comty-sfu-node
-    image: ragestudio/comty-sfu-node
-    build:
-      context: ..
-      dockerfile: ./packages/sfu-node/Dockerfile
-    restart: "unless-stopped"
-    environment:
-      - NATS_ADDRESS=nats:4222
-    ports:
-      - "40001:40001/tcp"
-      - "40001:40001/udp"
-    depends_on:
-      - nats
-    networks:
-      - nats_network
-      - api_network
-      - redis_network
 
 networks:
   api_network:
