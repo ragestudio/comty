@@ -5,7 +5,7 @@ import type {
 import type MediaChannelsController from "."
 
 import { EventEmitter } from "tseep/lib/ee-safe"
-import { Bucket } from "./kv"
+import { Bucket } from "../../../../classes/KV/manager"
 import { SFUNode } from "./sfu/node"
 
 const BUCKET = "sfu_nodes"

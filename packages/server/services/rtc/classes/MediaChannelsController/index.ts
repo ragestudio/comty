@@ -7,7 +7,7 @@ import { StorageType } from "@nats-io/jetstream"
 
 import { SfuNodeDiscovery } from "./sfu_discovery"
 import { SFUNode } from "./sfu/node"
-import { Bucket, KvManager } from "./kv"
+import { Bucket, KvManager } from "@shared-classes/KV"
 import { IPC } from "./ipc"
 
 import createChannelInstanceHandler from "./handlers/createChannelInstance"
@@ -71,16 +71,18 @@ export default class MediaChannelsController {
 	>
 
 	async initialize() {
+		// initialize KV engine
+		this.kv.init(this.server.nats.connection)
+
+		// initialize users & ipc
 		this.users = new Users(this.server.contexts.redis?.client)
 		this.ipc = new IPC(this.server.nats.connection)
 
+		// create flush timer
 		this.flushTimer = setInterval(
 			() => this.flushDirtyInstancesState(),
 			2000,
 		)
-
-		// initialize KV engine
-		await this.kv.init(this.server.nats.connection)
 
 		// initialize media channels state bucket
 		this.mediaChannelsStateBucket = await this.kv.bucket(
