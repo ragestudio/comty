@@ -1,11 +1,10 @@
 import type API from "@services/rtc/rtc.service"
-
-import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import type {
 	MediaChannel,
-	SerializedMediaChannel,
+	SerializedStateMediaChannel,
 } from "@classes/MediaChannel"
 
+import GroupMemberships from "@shared-classes/Spaces/GroupMemberships"
 import GroupsModel from "@db/groups"
 
 export default defineRoute<API>()({
@@ -33,12 +32,12 @@ export default defineRoute<API>()({
 			group_id,
 		)) as MediaChannel[]
 
-		let result: SerializedMediaChannel[] = []
+		let result: SerializedStateMediaChannel[] = []
 
 		if (Array.isArray(state)) {
 			// map channel clients
 			result = state.map((channel) => {
-				return channel.serialize()
+				return channel.serialized_state()
 			})
 		}
 
