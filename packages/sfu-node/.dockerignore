@@ -1,0 +1,34 @@
+# Secrets
+/**/**/.env
+/**/**/.ssl
+
+# Trash
+/**/**/*.log
+/**/**/dumps.log
+/**/**/.crash.log
+/**/**/.tmp
+/**/**/.cache
+/**/**/cache
+/**/**/out
+/**/**/.out
+/**/**/dist
+/**/**/node_modules
+/**/**/corenode_modules
+/**/**/.DS_Store
+/**/**/.evite
+/**/**/uploads
+/**/**/d_data
+/**/**/redis_data
+/**/**/*.env
+/**/**/.nginx
+/**/**/nginx-bin
+
+./.keys
+./nats-data
+./docs
+
+# Logs
+/**/**/npm-debug.log*
+/**/**/yarn-error.log
+/**/**/dumps.log
+/**/**/corenode.log
