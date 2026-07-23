@@ -1,13 +1,10 @@
+import type { ExtendedMessage as Message, T_UseChatMessagesArgs } from "./types"
+import type { DeleteMessagePayload, LoadMessagesParams } from "../types"
+
 import React from "react"
 import { getAdapter } from "./adapters"
 import { getSocket } from "./useChatSocket"
-import { ExtendedMessage as Message } from "./types"
 import { User } from "../collections/user"
-import {
-	DeleteMessagePayload,
-	LoadMessagesParams,
-	T_UseChatMessagesArgs,
-} from "./types"
 
 import { cacheUsers } from "../helpers/cache"
 import sortMessages from "../utils/sortMessages"

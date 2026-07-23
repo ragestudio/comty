@@ -21,13 +21,3 @@ export type T_UseChatMessagesArgs = {
 	params: any
 	events: any
 }
-
-export type LoadMessagesParams = {
-	beforeId?: string
-	afterId?: string
-	limit?: number
-}
-
-export type DeleteMessagePayload = {
-	_id: string
-}
