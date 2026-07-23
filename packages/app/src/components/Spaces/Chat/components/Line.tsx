@@ -205,40 +205,39 @@ const Line = React.memo(
 						</div>
 					)}
 
-					{data.message && (
-						<div
-							className="channel-chat__timeline__line__content__body"
-							id="message-content"
-						>
-							{replyData && (
-								<div
-									className="channel-chat__timeline__line__content__reply-preview"
-									onClick={handleReplyPreviewClick}
-								>
-									<Icons.Reply className="channel-chat__timeline__line__content__reply-preview__icon" />
-									<div className="channel-chat__timeline__line__content__reply-preview__content">
-										<span className="channel-chat__timeline__line__content__reply-preview__username">
-											{replyData.user?.public_name ??
-												(replyData.user?.username
-													? `@${replyData.user.username}`
-													: "...")}
-										</span>
-										<span className="channel-chat__timeline__line__content__reply-preview__text">
-											{replyData.message.message}
-										</span>
-									</div>
+					<div
+						className="channel-chat__timeline__line__content__body"
+						id="message-content"
+					>
+						{replyData && (
+							<div
+								className="channel-chat__timeline__line__content__reply-preview"
+								onClick={handleReplyPreviewClick}
+							>
+								<Icons.Reply className="channel-chat__timeline__line__content__reply-preview__icon" />
+								<div className="channel-chat__timeline__line__content__reply-preview__content">
+									<span className="channel-chat__timeline__line__content__reply-preview__username">
+										{replyData.user?.public_name ??
+											(replyData.user?.username
+												? `@${replyData.user.username}`
+												: "...")}
+									</span>
+									<span className="channel-chat__timeline__line__content__reply-preview__text">
+										{replyData.message.message}
+									</span>
 								</div>
-							)}
-							<RenderMessage messageStr={data.message} />
-						</div>
-					)}
+							</div>
+						)}
 
-					{data.attachments && data.attachments.length > 0 && (
-						<Attachments
-							attachments={data.attachments as any}
-							className="channel-chat__timeline__line__content__body__attachments"
-						/>
-					)}
+						{data.message && <RenderMessage messageStr={data.message} />}
+
+						{data.attachments && data.attachments.length > 0 && (
+							<Attachments
+								attachments={data.attachments as any}
+								className="channel-chat__timeline__line__content__body__attachments"
+							/>
+						)}
+					</div>
 
 					{data.sticker && <StickerRender id={data.sticker} />}
 				</div>

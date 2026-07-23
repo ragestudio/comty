@@ -201,7 +201,7 @@ const Attachment = React.memo((props) => {
 				}
 				default: {
 					return (
-						<React.Suspense>
+						<React.Suspense fallback={<Skeleton active />}>
 							<GenericFile attachment={props.attachment} />
 						</React.Suspense>
 					)
@@ -248,7 +248,11 @@ const Attachment = React.memo((props) => {
 	} catch (error) {
 		console.error(error)
 
-		return <ContentFailed />
+		return (
+			<div className="attachment failed">
+				<Icons.CloudOff />
+			</div>
+		)
 	}
 })
 
