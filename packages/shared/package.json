@@ -8,7 +8,8 @@
 			"onFail": "download"
 		}
 	},
-	"dependencies": {
-		"@ragestudio/scylla-odm": "^0.22.17"
+	"peerDependencies": {
+		"@ragestudio/scylla-odm": "^0.22.17",
+		"mediasoup": "^3.22.0"
 	}
 }
