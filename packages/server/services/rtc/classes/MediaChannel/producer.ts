@@ -1,5 +1,7 @@
+import type { MediaChannel } from "./"
+
 export type ProducerParams = {
-	instance: any
+	instance: MediaChannel
 	transport: any
 	channel: any
 	client: any
@@ -22,10 +24,12 @@ export type SerializedProducer = {
 }
 
 export default class Producer {
+	instance: MediaChannel
+
 	transport: any
 	channel: any
 	client: any
-	instance: any
+
 	userId: string
 	groupId: string
 	channelId: string
@@ -61,6 +65,10 @@ export default class Producer {
 		this.producer.on("transportclose", this.onProducerClose)
 		this.producer.observer.on("close", this.onProducerClose)
 
+		if (this.instance.controller) {
+			this.instance.controller.markInstanceDirty(this.channelId)
+		}
+
 		await this.onProducerOpen()
 	}
 
@@ -74,27 +82,24 @@ export default class Producer {
 
 		this.instance.events.emit("producer:open", this)
 
-		// this.instance.sendToGroupTopic("client:vc:producer:open", {
-		// 	userId: this.client.userId,
-		// 	channelId: this.channelId,
-		// 	producer: this.serialize(),
-		// 	user: {
-		// 		_id: this.client.context.user._id,
-		// 		username: this.client.context.user.username,
-		// 		avatar: this.client.context.user.avatar,
-		// 	},
-		// })
-
 		const instanceProducers = this.instance.producers
 
 		// check if the instance producers set has client userId
 		if (!instanceProducers.has(this.userId)) {
 			instanceProducers.set(this.userId, new Map())
+
+			if (this.instance.controller) {
+				this.instance.controller.markInstanceDirty(this.channelId)
+			}
 		}
 
 		const userProducers = instanceProducers.get(this.userId)
 
 		userProducers.set(this.id!, this)
+
+		if (this.instance.controller) {
+			this.instance.controller.markInstanceDirty(this.channelId)
+		}
 	}
 
 	onProducerClose = async () => {
@@ -121,24 +126,6 @@ export default class Producer {
 
 		this.instance.events.emit("producer:close", this)
 
-		// try {
-		// 	this.instance.sendToGroupTopic("client:vc:producer:close", {
-		// 		userId: this.client.userId,
-		// 		channelId: this.channelId,
-		// 		producer: this.serialize(),
-		// 		user: {
-		// 			_id: this.client.context.user._id,
-		// 			username: this.client.context.user.username,
-		// 			avatar: this.client.context.user.avatar,
-		// 		},
-		// 	})
-		// } catch (error) {
-		// 	console.error(
-		// 		`[CHANNEL:${this.channelId}] Error notifying clients about producer close:`,
-		// 		error,
-		// 	)
-		// }
-
 		try {
 			const instanceProducers = this.instance.producers
 			const userProducers = instanceProducers.get(this.userId)
@@ -150,6 +137,10 @@ export default class Producer {
 				// if no more user producers, remove the map from the instance
 				if (userProducers.size === 0) {
 					instanceProducers.delete(this.userId)
+				}
+
+				if (this.instance.controller) {
+					this.instance.controller.markInstanceDirty(this.channelId)
 				}
 			}
 		} catch (error) {
@@ -163,8 +154,13 @@ export default class Producer {
 		if (this.producer) {
 			try {
 				this.producer.removeAllListeners("transportclose")
+
 				if (this.producer.observer) {
 					this.producer.observer.removeAllListeners("close")
+				}
+
+				if (this.instance.controller) {
+					this.instance.controller.markInstanceDirty(this.channelId)
 				}
 			} catch (error) {
 				// Ignore errors during cleanup

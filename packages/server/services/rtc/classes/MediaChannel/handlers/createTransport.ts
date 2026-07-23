@@ -17,37 +17,15 @@ async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 			client.transports = new Map()
 		}
 
-		let announcedIp = (globalThis as any).process.env.MEDIASOUP_ANNOUNCED_IP
-
-		if (!announcedIp) {
-			announcedIp =
-				(globalThis as any).process.env.NODE_ENV === "production"
-					? client.socket.ip || "127.0.0.1"
-					: "127.0.0.1"
-		}
-
-		//@ts-ignore
-		const transport = await this.router.createWebRtcTransport({
-			webRtcServer: this.webrtcServer,
-			listenIps: [
-				{
-					ip:
-						(globalThis as any).process.env.MEDIASOUP_LISTEN_IP ||
-						"0.0.0.0",
-					announcedIp: announcedIp,
-				},
-			],
-			enableUdp:
-				(globalThis as any).process.env.MEDIASOUP_ENABLE_UDP === "true",
-			enableTcp:
-				(globalThis as any).process.env.MEDIASOUP_ENABLE_TCP == "true",
-			preferUdp:
-				(globalThis as any).process.env.MEDIASOUP_PREFER_UDP == "true",
-		})
+		const transport = await this.router.createWebRtcTransport()
 
 		clientInst.transports.set(transport.id, transport)
 
 		this._setupTransportEvents(transport, clientInst)
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
 
 		return {
 			id: transport.id,

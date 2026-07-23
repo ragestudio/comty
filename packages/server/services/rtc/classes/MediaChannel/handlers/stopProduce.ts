@@ -22,7 +22,11 @@ async function stopProduceHandler(
 
 		const producerInst = userProducers.get(producerId)
 
-		if (!producerInst || producerInst.producer.closed) {
+		if (!producerInst) {
+			return { success: true }
+		}
+
+		if (producerInst.producer?.closed) {
 			// Producer already closed
 			return { success: true }
 		}
@@ -32,6 +36,10 @@ async function stopProduceHandler(
 
 		// // Ensure cleanup is called even if events don't fire
 		// await producerInst.onProducerClose()
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
 
 		return { success: true }
 	} catch (error) {

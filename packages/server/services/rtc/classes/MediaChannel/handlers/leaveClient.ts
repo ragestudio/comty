@@ -79,17 +79,15 @@ async function leaveClientHandler(
 		// publish to group topic
 		this.events.emit("client:leave", this, clientInst)
 
-		// await this.sendToGroupTopic("client:vc:left", {
-		// 	userId: clientInst.userId,
-		// 	channelId: this.channelId,
-		// 	channelClients: this.getConnectedClientsSerialized(),
-		// })
-
-		if (emitEventToSelf === true) {
-			// notify the client that they left the channel
-			await clientInst.emit(`media:channel:disconnected`, {
-				channelId: this.channelId,
-			})
+		try {
+			if (emitEventToSelf === true && !clientInst.staled) {
+				// notify the client that they left the channel
+				await clientInst.emit(`media:channel:disconnected`, {
+					channelId: this.channelId,
+				})
+			}
+		} catch (error) {
+			console.error(error)
 		}
 
 		console.log(
@@ -99,6 +97,10 @@ async function leaveClientHandler(
 		// if no users left, close it self
 		if (this.clients.size === 0) {
 			this.close()
+		}
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
 		}
 
 		return {

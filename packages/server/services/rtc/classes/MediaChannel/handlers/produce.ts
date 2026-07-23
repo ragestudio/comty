@@ -51,6 +51,10 @@ async function produceHandler(
 
 		await producer.initialize(payload)
 
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
+
 		return producer.serialize()
 	} catch (error) {
 		console.error(

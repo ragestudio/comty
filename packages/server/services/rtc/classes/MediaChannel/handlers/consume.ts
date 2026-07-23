@@ -64,11 +64,19 @@ async function consumeHandler(
 		// Store consumer
 		if (!this.consumers.has(client.userId)) {
 			this.consumers.set(client.userId, [])
+
+			if (this.controller) {
+				this.controller.markInstanceDirty(this.channelId)
+			}
 		}
 
 		this.consumers.get(client.userId).push(consumer)
 
 		this._setupConsumerEvents(consumer, clientInst)
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
 
 		return {
 			id: consumer.id,

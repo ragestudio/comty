@@ -28,6 +28,10 @@ async function connectTransportHandler(
 		}
 
 		await transport.connect({ dtlsParameters })
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
+		}
 	} catch (error) {
 		console.error(
 			`[CHANNEL:${this.channelId}] Error connecting transport for ${client.userId}:`,

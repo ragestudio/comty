@@ -1,4 +1,7 @@
-import * as mediasoup from "mediasoup"
+import type { RemoteRouter } from "../MediaChannelsController/sfu/router"
+import type { MediaChannelParams, RTCClient } from "../../types"
+
+import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
 import EventEmitter from "@foxify/events"
 
 import consumeHandler from "./handlers/consume"
@@ -11,9 +14,29 @@ import leaveClientHandler from "./handlers/leaveClient"
 import connectTransportHandler from "./handlers/connectTransport"
 import createTransportHandler from "./handlers/createTransport"
 
-import type { MediaChannelParams, RTCClient } from "../../types"
+import closeHandler from "./handlers/close"
+import handleClientEventHandler from "./handlers/clientEvent"
+
+import defaults from "./defaults"
+import MediaChannelsController from "@classes/MediaChannelsController"
+import { Consumer } from "mediasoup/types"
+import type Producer from "./producer"
 
 export type SerializedMediaChannel = {
+	controller_id: string | null
+	router_id: string | null
+	channel_id: string
+	sfu_node_id: string
+	closed: boolean
+	data: any
+	clients: SerializedClient[]
+	producers: Record<string, Record<string, any>>
+	consumers: Record<string, any[]>
+	started_at: string
+	mediaCodecs: any[]
+}
+
+export type SerializedStateMediaChannel = {
 	__v: number
 	_id: string
 	clients: SerializedClient[]
@@ -42,75 +65,53 @@ export type SerializedProducer = {
 	appData: any
 }
 
+export interface SerializedConsumer extends Partial<Consumer> {
+	user_id: string
+}
+
 export class MediaChannel {
+	controller: MediaChannelsController
+
 	params: MediaChannelParams
 	data: any
 	channelId: string
-	worker: mediasoup.types.Worker
+
+	sfu_node: SFUNode
+	router: RemoteRouter = null
+
 	mediaCodecs: any[]
 	started_at: Date
-	closed: Boolean = false
+
+	closed: boolean = false
 	events: EventEmitter = new EventEmitter()
 
-	static defaultMediaCodecs = [
-		{
-			kind: "audio",
-			mimeType: "audio/opus",
-			clockRate: 48000,
-			channels: 2,
-			parameters: {
-				useinbandfec: 1,
-				usedtx: 1,
-				minptime: 10,
-				maxplaybackrate: 48000,
-			},
-			headerExtensions: [
-				{
-					uri: "urn:ietf:params:rtp-hdrext:ssrc-audio-level",
-					kind: "audio",
-				},
-			],
-		},
-		{
-			kind: "video",
-			mimeType: "video/AV1",
-			clockRate: 90000,
-		},
-		{
-			kind: "video",
-			mimeType: "video/h264",
-			clockRate: 90000,
-			parameters: {
-				"packetization-mode": 1,
-				"profile-level-id": "64001f",
-				"level-asymmetry-allowed": 1,
-				"x-google-start-bitrate": 1000,
-			},
-		},
-		{
-			kind: "video",
-			mimeType: "video/vp9",
-			clockRate: 90000,
-			parameters: {
-				"profile-id": 2,
-				"x-google-start-bitrate": 1000,
-			},
-		},
-	]
-
-	router: mediasoup.types.Router = null
 	clients: Set<RTCClient> = new Set()
-	producers: Map<string, Map<string, any>> = new Map()
-	consumers: Map<string, any[]> = new Map()
-	webrtcServer: mediasoup.types.WebRtcServer<mediasoup.types.AppData>
+	producers: Map<string, Map<string, Producer>> = new Map()
+	consumers: Map<string, Consumer[]> = new Map()
 
-	constructor(params: MediaChannelParams) {
+	constructor(
+		params: MediaChannelParams,
+		controller: MediaChannelsController,
+		sfu_node: SFUNode,
+		remoteRouter?: RemoteRouter,
+	) {
+		this.controller = controller
+
+		if (!this.controller) throw new Error("controller is required")
+
+		this.sfu_node = sfu_node
+
+		if (!this.sfu_node) throw new Error("sfu_node is required")
+
+		if (remoteRouter) {
+			this.router = remoteRouter
+		}
+
 		this.params = params
 		this.data = params.data
 		this.channelId = params.channelId
-		this.worker = params.worker
-		this.webrtcServer = params.webrtcServer
-		this.mediaCodecs = params.mediaCodecs || MediaChannel.defaultMediaCodecs
+
+		this.mediaCodecs = params.mediaCodecs || defaults.mediaCodecs
 		this.started_at = new Date()
 	}
 
@@ -118,27 +119,25 @@ export class MediaChannel {
 		try {
 			console.log(`[CHANNEL:${this.channelId}] Initializing`, this.data)
 
-			this.router = await this.worker.createRouter({
-				mediaCodecs: this.mediaCodecs,
-			})
-
-			this.router.on("workerclose", () => {
+			// if no router provided, create one
+			if (!this.router) {
 				console.log(
-					`[CHANNEL:${this.channelId}] Router worker closed for channel ${this.channelId}`,
+					`[CHANNEL:${this.channelId}] No router provided, creating one`,
 				)
-			})
 
+				this.router = await this.sfu_node.createRouter({
+					channelId: this.channelId,
+					groupId: this.data.group_id,
+					mediaCodecs: this.mediaCodecs,
+				})
+			}
+
+			console.log(`[CHANNEL:${this.channelId}] Started`)
 			this.events.emit("started", this)
 
-			// try {
-			// 	this.sendToGroupTopic("vc:started", {
-			// 		...this.data,
-			// 		channelId: this.channelId,
-			// 		started_at: this.started_at,
-			// 	})
-			// } catch (err) {
-			// 	console.error(err)
-			// }
+			if (this.controller) {
+				this.controller.markInstanceDirty(this.channelId)
+			}
 		} catch (error) {
 			console.error(
 				`[CHANNEL:${this.channelId}] Error initializing `,
@@ -172,118 +171,40 @@ export class MediaChannel {
 		typeof consumeHandler
 	>
 
-	async close() {
-		if (this.closed) {
-			return null
+	static deserializeMaps(state: SerializedMediaChannel) {
+		const producersMap = new Map<string, Map<string, any>>()
+		const consumersMap = new Map<string, any[]>()
+
+		if (state.producers) {
+			for (const [userId, userProducers] of Object.entries(
+				state.producers,
+			)) {
+				const innerMap = new Map<string, any>()
+				for (const [producerId, producerData] of Object.entries(
+					userProducers,
+				)) {
+					innerMap.set(producerId, producerData)
+				}
+				producersMap.set(userId, innerMap)
+			}
 		}
 
-		this.closed = true
-
-		try {
-			// Close all consumers
-			for (const [, consumers] of this.consumers) {
-				if (Array.isArray(consumers)) {
-					for (const consumer of consumers) {
-						if (consumer && !consumer.closed) {
-							consumer.close()
-						}
-					}
-				}
+		if (state.consumers) {
+			for (const [consumerId, consumers] of Object.entries(
+				state.consumers,
+			)) {
+				consumersMap.set(consumerId, consumers)
 			}
-
-			this.consumers.clear()
-
-			// Close all producers
-			for (const [userId, userProducers] of this.producers) {
-				for (const [id, producerInst] of userProducers) {
-					if (
-						producerInst &&
-						producerInst.producer &&
-						!producerInst.producer.closed
-					) {
-						producerInst.producer.close()
-						// Ensure cleanup is called
-						await producerInst.onProducerClose()
-					}
-				}
-			}
-
-			this.producers.clear()
-
-			// Close router
-			if (this.router && !this.router.closed) {
-				this.router.close()
-			}
-
-			// Clear clients
-			this.clients.clear()
-
-			console.info(`[CHANNEL:${this.channelId}] closed`)
-
-			this.events.emit("closed", this)
-
-			// try {
-			// 	this.sendToGroupTopic("vc:ended", {
-			// 		channelId: this.channelId,
-			// 	})
-			// } catch (err) {
-			// 	console.error(err)
-			// }
-
-			if (this.params.controller) {
-				try {
-					this.params.controller.instances.delete(this.channelId)
-					console.log(
-						`[CHANNEL:${this.channelId}] self deleted from instances pool`,
-					)
-				} catch (err) {
-					console.error(
-						`[CHANNEL:${this.channelId}] Failed to self delete from controller`,
-					)
-				}
-			}
-		} catch (error) {
-			console.error(`[CHANNEL:${this.channelId}] Error closing`, error)
 		}
+
+		return { producers: producersMap, consumers: consumersMap }
 	}
 
-	async handleClientEvent(client: RTCClient, payload: any) {
-		if (!payload.event || !payload.data) {
-			throw new Error("Missing required parameters")
-		}
+	close = closeHandler.bind(this) as OmitThisParameter<typeof closeHandler>
 
-		switch (payload.event) {
-			case "updateVoiceState": {
-				this.updateClientVoiceState(client, payload.data)
-				break
-			}
-
-			default: {
-				throw new Error("Invalid event")
-			}
-		}
-
-		// broadcast to other clients
-		this.sendToClients(client, `media:channel:client_event`, {
-			userId: client.userId,
-			event: payload.event,
-			data: payload.data,
-			clientVoiceState: client.voiceState,
-		})
-
-		this.events.emit("client:event", this, client, payload)
-		// this.sendToGroupTopic("client:vc:event", {
-		// 	event: payload.event,
-		// 	userId: client.userId,
-		// 	channelId: this.channelId,
-		// 	user: {
-		// 		_id: client.context.user._id,
-		// 		username: client.context.user.username,
-		// 		avatar: client.context.user.avatar,
-		// 	},
-		// 	data: payload.data,
-		// })
-	}
+	handleClientEvent = handleClientEventHandler.bind(
+		this,
+	) as OmitThisParameter<typeof handleClientEventHandler>
 
 	async handleSoundpadDispatch(client: RTCClient, payload: any) {
 		this.broadcastToClients(`media:channel:soundpad:dispatch`, {
@@ -300,6 +221,10 @@ export class MediaChannel {
 					...update,
 				}
 			}
+		}
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
 		}
 	}
 
@@ -363,8 +288,14 @@ export class MediaChannel {
 					id: producerId,
 					producer_id: producerId,
 					user_id: producerUserId,
-					kind: producer.producer.kind,
-					appData: producer.producer.appData,
+					kind:
+						(producer as any).producer?.kind ??
+						(producer as any).kind ??
+						null,
+					appData:
+						(producer as any).producer?.appData ??
+						(producer as any).appData ??
+						null,
 				})
 			}
 		}
@@ -372,7 +303,55 @@ export class MediaChannel {
 		return Array.from(producers) as SerializedProducer[]
 	}
 
-	serialize(): SerializedMediaChannel {
+	serialize = (): SerializedMediaChannel => {
+		// convert producers Map to JSON-compatible Record
+		const producers: Record<string, Record<string, any>> = {}
+		for (const [userId, userProducers] of this.producers) {
+			producers[userId] = {}
+			for (const [producerId, producer] of userProducers) {
+				// if already serialized (from state reconstruction), use as-is
+				producers[userId][producerId] =
+					typeof producer.serialize === "function"
+						? producer.serialize()
+						: producer
+			}
+		}
+
+		// convert consumers Map to JSON-compatible Record
+		const consumers: Record<string, any[]> = {}
+		for (const [consumerId, consumerList] of this.consumers) {
+			consumers[consumerId] = consumerList.map((c) => ({
+				user_id: (c as any).user_id || "",
+				id: c.id,
+				kind: c.kind,
+				appData: c.appData,
+				producerId: c.producerId,
+				rtpParameters: c.rtpParameters,
+				type: c.type,
+				paused: c.paused,
+				score: c.score,
+				producerPaused: c.producerPaused,
+				preferredLayers: c.preferredLayers,
+				currentLayers: c.currentLayers,
+			}))
+		}
+
+		return {
+			router_id: this.router?.id ?? null,
+			controller_id: this.controller?.controller_id ?? null,
+			channel_id: this.channelId,
+			sfu_node_id: this.sfu_node.node_id.toString(),
+			closed: this.closed,
+			started_at: this.started_at.toISOString(),
+			data: this.data,
+			mediaCodecs: this.mediaCodecs,
+			clients: this.getConnectedClientsSerialized(),
+			producers,
+			consumers,
+		}
+	}
+
+	serialized_state(): SerializedStateMediaChannel {
 		return {
 			__v: this.data.__v,
 			_id: this.data._id,
@@ -422,29 +401,6 @@ export class MediaChannel {
 			)
 		}
 	}
-
-	/**
-	 * Send an event to the group topic
-	 * @param {String} event
-	 * @param {Object} payload
-	 * @return {Promise}
-	 */
-	// async sendToGroupTopic(event: string, payload: any): Promise<any> {
-	// 	const topic = `group:${this.data.group_id}`
-
-	// 	try {
-	// 		return await (globalThis as any).websockets.senders.toTopic(
-	// 			topic,
-	// 			`${topic}:${event}`,
-	// 			payload,
-	// 		)
-	// 	} catch (error) {
-	// 		console.error(
-	// 			`[CHANNEL:${this.channelId}] Error sending to group topic`,
-	// 			error,
-	// 		)
-	// 	}
-	// }
 }
 
 export default MediaChannel

@@ -1,11 +1,12 @@
 import type { RTCClient } from "@services/rtc/types"
+import type { MediaChannel } from "../"
 
 export type JoinClientOptions = {
 	isReconnection?: boolean
 }
 
 export default async function (
-	this: any,
+	this: MediaChannel,
 	client: RTCClient,
 	options: JoinClientOptions = {},
 ) {
@@ -53,13 +54,21 @@ export default async function (
 
 			if (userProducers instanceof Map) {
 				for (const [id, producer] of userProducers) {
-					if (producer.closed) {
+					if ((producer as any).closed) {
 						continue
 					}
 
-					producers.push(producer.serialize())
+					producers.push(
+						typeof producer.serialize === "function"
+							? producer.serialize()
+							: producer,
+					)
 				}
 			}
+		}
+
+		if (this.controller) {
+			this.controller.markInstanceDirty(this.channelId)
 		}
 
 		return {
