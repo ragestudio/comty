@@ -2,7 +2,12 @@
 set -euo pipefail
 
 export COMPOSE_PROJECT_NAME="comty"
-COMPOSE_FILE="docker/compose.yml"
+COMPOSE_ARGS="-f docker/compose.yml"
+
+if [ -f docker/compose.override.yml ]; then
+    COMPOSE_ARGS="$COMPOSE_ARGS -f docker/compose.override.yml"
+fi
+
 STATE_FILE="docker/.bluegreen_state"
 MAX_HEALTH_RETRIES=30
 HEALTH_RETRY_INTERVAL=2
@@ -26,6 +31,10 @@ get_active_slot() {
 
 set_active_slot() {
     echo "$1" > "$STATE_FILE"
+}
+
+dc() {
+    docker compose $COMPOSE_ARGS "$@"
 }
 
 slot_profile()  { echo "$1"; }
@@ -63,9 +72,10 @@ wait_healthy() {
 
 ensure_infra() {
     log_info "Ensuring infrastructure is running..."
-    if ! docker compose -f "$COMPOSE_FILE" up -d redis scylla mongodb nats haproxy sfu-node; then
-        log_error "Failed to start infrastructure."
-        exit 1
+
+    # start all services without a profile (includes sfu-node from override if present)
+    if ! dc up -d --profile "" redis scylla mongodb nats haproxy sfu-node 2>/dev/null; then
+        dc up -d redis scylla mongodb nats haproxy sfu-node
     fi
     sleep 2
 }
@@ -86,11 +96,11 @@ deploy() {
 
     # step 1: build
     log_info "Building server image..."
-    docker compose -f "$COMPOSE_FILE" --profile "$new_profile" build "$new_service"
+    dc --profile "$new_profile" build "$new_service"
 
     # step 2: start new alongside old
     log_info "Starting new server ($new_container)..."
-    if ! docker compose -f "$COMPOSE_FILE" --profile "$new_profile" up -d "$new_service"; then
+    if ! dc --profile "$new_profile" up -d "$new_service"; then
         log_error "Failed to start new container."
         exit 1
     fi
@@ -100,7 +110,7 @@ deploy() {
     # step 3: healthcheck
     if ! wait_healthy "$new_container"; then
         log_error "New container failed healthcheck. Cleaning up..."
-        docker compose -f "$COMPOSE_FILE" --profile "$new_profile" stop "$new_service" 2>/dev/null || true
+        dc --profile "$new_profile" stop "$new_service" 2>/dev/null || true
         log_info "Old container ($old_container) is still serving traffic"
         exit 1
     fi
@@ -132,7 +142,7 @@ rollback() {
 
     log_warn "Rolling back to $prev_slot ($prev_container)..."
 
-    if ! docker compose -f "$COMPOSE_FILE" --profile "$prev_slot" up -d "$prev_service" 2>/dev/null; then
+    if ! dc --profile "$prev_slot" up -d "$prev_service" 2>/dev/null; then
         log_error "Failed to start previous container."
         exit 1
     fi
@@ -177,14 +187,14 @@ case "${1:-deploy}" in
     stop|--stop)
         slot=$(get_active_slot)
         log_info "Stopping active slot ($slot)..."
-        docker compose -f "$COMPOSE_FILE" --profile "$slot" stop "$(slot_service "$slot")"
+        dc --profile "$slot" stop "$(slot_service "$slot")"
         log_info "Stopped."
         ;;
     stop-all|--stop-all)
         log_info "Stopping all services..."
-        docker compose -f "$COMPOSE_FILE" --profile blue stop 2>/dev/null || true
-        docker compose -f "$COMPOSE_FILE" --profile green stop 2>/dev/null || true
-        docker compose -f "$COMPOSE_FILE" stop redis scylla mongodb nats haproxy sfu-node 2>/dev/null || true
+        dc --profile blue stop 2>/dev/null || true
+        dc --profile green stop 2>/dev/null || true
+        dc stop redis scylla mongodb nats haproxy sfu-node 2>/dev/null || true
         log_info "All services stopped."
         ;;
     *) echo "Usage: $0 [deploy|rollback|status|infra|stop|stop-all]" ; exit 1 ;;
