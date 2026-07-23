@@ -1,8 +1,16 @@
-import * as mediasoup from "mediasoup"
+import type { RTCClient } from "@services/rtc/types"
+import type { Server } from "linebridge"
 
-import allowedMediaCodecs from "./allowedMediaCodecs.json"
+import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
+import { MediaChannel, SerializedMediaChannel } from "@classes/MediaChannel"
+import { StorageType } from "@nats-io/jetstream"
 
-import createChannelInstance from "./handlers/createChannelInstance"
+import { SfuNodeDiscovery } from "./sfu_discovery"
+import { SFUNode } from "./sfu/node"
+import { Bucket, KvManager } from "./kv"
+import { IPC } from "./ipc"
+
+import createChannelInstanceHandler from "./handlers/createChannelInstance"
 import validateGroupAccess from "./handlers/validateGroupAccess"
 
 import joinClient from "./handlers/joinClient"
@@ -13,11 +21,9 @@ import handleUserDisconnectedToSocket from "./handlers/handleUserDisconnectedToS
 
 import findChannelsByGroupId from "./handlers/findChannelsByGroupId"
 import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
-
-import type { MediaChannel } from "@classes/MediaChannel/index.ts"
-import type { Server } from "linebridge"
-import { RTCClient } from "@services/rtc/types"
-import { resolvePublicIP } from "@shared-utils/resolvePublicIP"
+import flushDirtyInstancesState from "./handlers/flushDirtyInstancesState"
+import getInstance from "./handlers/getInstance"
+import { Users } from "./users"
 
 type PendingDisconnectEntry = {
 	timeout: NodeJS.Timeout
@@ -25,83 +31,118 @@ type PendingDisconnectEntry = {
 }
 
 export default class MediaChannelsController {
+	snowflakeWorker: SnowflakeWorker
+	controller_id: string
+
 	server: Server
+	ipc: IPC | null = null
+	kv: KvManager = new KvManager()
+	users: Users
+
+	sfuDiscovery = new SfuNodeDiscovery(this)
+	mediaChannelsStateBucket: Bucket
+	//mediaChannelsOwnershipBucket: Bucket
+
+	instances: Map<string, MediaChannel> = new Map()
+	pendingDisconnectsTimeout: Map<string, PendingDisconnectEntry> = new Map()
+
+	dirtyInstances: Set<string> = new Set()
+	flushTimer: NodeJS.Timeout | null = null
+	isFlushing: boolean = false
+	flushChunkSize: number = 25
 
 	constructor(server: Server) {
 		this.server = server
+		this.snowflakeWorker = new SnowflakeWorker()
+		this.controller_id = this.snowflakeWorker.nextId().toString()
 	}
 
-	static allowedMediaCodecs = allowedMediaCodecs
+	// TODO: implement find strategy
+	pickSfuNode = async (): Promise<SFUNode> => {
+		const node = this.sfuDiscovery.nodes[0]
 
-	worker: mediasoup.types.Worker = null
-	webrtcServer: mediasoup.types.WebRtcServer = null
-	instances: Map<string, MediaChannel> = new Map()
-	usersMap: Map<string, string> = new Map()
-	pendingDisconnectsTimeout: Map<string, PendingDisconnectEntry> = new Map()
+		if (!node) throw new Error("No SFU nodes available")
 
-	async initialize(): Promise<void> {
-		try {
-			console.log("Initializing mediasoup worker...")
+		return node
+	}
 
-			this.worker = await mediasoup.createWorker({
-				logLevel: "warn",
-				logTags: [
-					"info",
-					"ice",
-					"dtls",
-					"rtp",
-					"srtp",
-					"rtcp",
-					"rtx",
-					"bwe",
-					"score",
-					"simulcast",
-					"svc",
-				],
-			})
+	getInstance = getInstance.bind(this) as OmitThisParameter<
+		typeof getInstance
+	>
 
-			console.log("Resolving public IP...")
-			const announcedIp = await resolvePublicIP()
-			console.log("Announced WebRTC IP:", announcedIp)
+	async initialize() {
+		this.users = new Users(this.server.contexts.redis?.client)
+		this.ipc = new IPC(this.server.nats.connection)
 
-			this.webrtcServer = await this.worker.createWebRtcServer({
-				listenInfos: [
-					{
-						protocol: "udp",
-						ip: "0.0.0.0",
-						announcedIp: announcedIp,
-						port: 40000, // should be unique per worker
-					},
-					{
-						protocol: "tcp",
-						ip: "0.0.0.0",
-						announcedIp: announcedIp,
-						port: 40000,
-					},
-				],
-			})
+		this.flushTimer = setInterval(
+			() => this.flushDirtyInstancesState(),
+			2000,
+		)
 
-			this.worker.on("died", (error) => {
-				console.error("mediasoup worker died:", error)
-				setTimeout(() => globalThis.process.exit(1), 2000)
-			})
+		// initialize KV engine
+		await this.kv.init(this.server.nats.connection)
 
-			// subcribe to websocket user connections
-			this.server.eventBus.on(
-				"user:connected",
-				this.handleUserConnectedToSocket,
-			)
-			this.server.eventBus.on(
-				"user:disconnect",
-				this.handleUserDisconnectedToSocket,
-			)
+		// initialize media channels state bucket
+		this.mediaChannelsStateBucket = await this.kv.bucket(
+			"mediachannels-states",
+			{
+				compression: true,
+				storage: StorageType.File,
+				history: 1,
+				ttl: 3600000,
+			},
+		)
 
-			console.log("Mediasoup worker initialized successfully")
-		} catch (error) {
-			console.error("Error initializing mediasoup worker:", error)
-			throw error
+		// register SFU discovery event handlers & init discovery
+		await this.sfuDiscovery.init()
+
+		// websocket connection tracking
+		this.server.eventBus.on(
+			"user:connected",
+			this.handleUserConnectedToSocket,
+		)
+		this.server.eventBus.on(
+			"user:disconnect",
+			this.handleUserDisconnectedToSocket,
+		)
+	}
+
+	async getClientChannel(client: RTCClient): Promise<MediaChannel> {
+		let channelId =
+			(await this.users.get(client.userId)) || client.channel_id
+
+		if (!channelId) {
+			throw new Error("No channel joined")
 		}
+
+		let channelInstance = await this.getInstance(channelId, client)
+
+		if (channelInstance && channelInstance.closed) {
+			channelInstance = null
+		}
+
+		if (!channelInstance) {
+			throw new Error("Media channel instance not found")
+		}
+
+		return channelInstance
 	}
+
+	markInstanceDirty = (channelId: string) => {
+		this.dirtyInstances.add(channelId)
+	}
+
+	unmarkInstanceDirty = (channelId: string) => {
+		this.dirtyInstances.delete(channelId)
+	}
+
+	flushDirtyInstancesState = flushDirtyInstancesState.bind(
+		this,
+	) as OmitThisParameter<typeof flushDirtyInstancesState>
+
+	createChannelInstance = createChannelInstanceHandler.bind(
+		this,
+	) as OmitThisParameter<typeof createChannelInstanceHandler>
 
 	joinClient = joinClient.bind(this) as OmitThisParameter<typeof joinClient>
 	leaveClient = leaveClient.bind(this) as OmitThisParameter<
@@ -125,38 +166,6 @@ export default class MediaChannelsController {
 	validateGroupAccess = validateGroupAccess.bind(this) as OmitThisParameter<
 		typeof validateGroupAccess
 	>
-	createChannelInstance = createChannelInstance.bind(
-		this,
-	) as OmitThisParameter<typeof createChannelInstance>
-
-	static getAnnouncedIp = (): string => {
-		let announcedIp = process.env.MEDIASOUP_ANNOUNCED_IP
-
-		if (!announcedIp) {
-			announcedIp =
-				process.env.NODE_ENV === "production"
-					? "127.0.0.1"
-					: "127.0.0.1"
-		}
-
-		return announcedIp
-	}
-
-	getClientChannel(client: RTCClient): MediaChannel {
-		const currentUserMediaChannel = this.usersMap.get(client.userId)
-
-		if (!currentUserMediaChannel) {
-			throw new Error("No media channel joined")
-		}
-
-		const channelInstance = this.instances.get(currentUserMediaChannel)
-
-		if (!channelInstance) {
-			throw new Error("Media channel instance not found")
-		}
-
-		return channelInstance
-	}
 
 	cleanupOrphanedResources(client: RTCClient): void {
 		if (client.transports) {
@@ -173,9 +182,6 @@ export default class MediaChannelsController {
 		}
 	}
 
-	/**
-	 * Cancel a pending disconnect for a user. Returns true if one was found.
-	 */
 	cancelPendingDisconnect(userId: string): boolean {
 		const entry = this.pendingDisconnectsTimeout.get(userId)
 

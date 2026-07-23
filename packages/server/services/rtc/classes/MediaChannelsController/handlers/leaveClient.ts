@@ -6,13 +6,14 @@ export default async function (
 	client: RTCClient,
 ): Promise<string | void> {
 	try {
-		const currentUserMediaChannel = this.usersMap.get(client.userId)
+		// get current channel from cache
+		const currentChannelId = await this.users.get(client.userId)
 
-		if (!currentUserMediaChannel) {
+		if (!currentChannelId) {
 			return
 		}
 
-		const channelInstance = this.instances.get(currentUserMediaChannel)
+		const channelInstance = await this.getInstance(currentChannelId, client)
 
 		if (!channelInstance) {
 			return
@@ -21,8 +22,8 @@ export default async function (
 		// cancel any pending disconnect timeout
 		this.cancelPendingDisconnect(client.userId)
 
-		// delete user from client list
-		this.usersMap.delete(client.userId)
+		// clean cache
+		await this.users.remove(client.userId, currentChannelId)
 
 		// Leave channel
 		await channelInstance.leaveClient(client, {

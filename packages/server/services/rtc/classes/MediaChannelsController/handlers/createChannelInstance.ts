@@ -1,8 +1,8 @@
+import type { MediaChannel as MediaChannelInstance } from "@classes/MediaChannel"
+import type MediaChannelsController from "../index"
+
 import MediaChannel from "@classes/MediaChannel"
 import GroupChannelsModel from "@db/group_channels"
-
-import type MediaChannelsController from "../index"
-import type { MediaChannel as MediaChannelInstance } from "@classes/MediaChannel"
 
 export default async function (
 	this: MediaChannelsController,
@@ -19,16 +19,17 @@ export default async function (
 		throw new Error("Channel not found")
 	}
 
+	const targetSFUNode = await this.pickSfuNode()
+
 	// create the channel instance
-	const channelInstance = new MediaChannel({
-		data: channel.toRaw(),
-		channelId: channelId,
-		// @ts-ignore
-		mediaCodecs: this.constructor.allowedMediaCodecs,
-		webrtcServer: this.webrtcServer,
-		worker: this.worker,
-		controller: this,
-	})
+	const channelInstance = new MediaChannel(
+		{
+			data: channel.toRaw(),
+			channelId: channelId,
+		},
+		this,
+		targetSFUNode,
+	)
 
 	channelInstance.events.on("started", (_ch) => {
 		this.sendToGroupTopic(groupId, "vc:started", {
@@ -101,7 +102,7 @@ export default async function (
 		})
 	})
 
-	// initialize the channel instance
+	// initialize the channel instance with the remote router
 	await channelInstance.initialize()
 
 	// add the channel instance to the instances map

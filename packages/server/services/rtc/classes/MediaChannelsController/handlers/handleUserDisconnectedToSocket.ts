@@ -1,11 +1,11 @@
+import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
 import type MediaChannelsController from "../index"
-import type { ConnectionContext } from "../types"
 
 const GRACE_PERIOD_MS = 15000
 
 export default async function (
 	this: MediaChannelsController,
-	ctx: ConnectionContext,
+	ctx: RtEngineContext,
 ): Promise<null | void> {
 	if (!ctx || !ctx.meta || !ctx.meta.user_id) {
 		return null
@@ -38,7 +38,7 @@ export default async function (
 		}
 
 		// check if this userId is connected to any channel
-		const channelId = this.usersMap.get(userId)
+		const channelId = await this.users.get(userId)
 
 		if (!channelId) {
 			return null
@@ -56,14 +56,15 @@ export default async function (
 		const timeout = setTimeout(async () => {
 			this.pendingDisconnectsTimeout.delete(userId)
 
-			const channel = this.instances.get(channelId)
+			const channel = await this.getInstance(channelId)
 
 			if (channel && channel.leaveClient) {
+				// clean cache
+				await this.users.remove(userId, channelId)
+
 				console.log(
 					`[media-channels] Grace period expired for user ${userId}, leaving channel`,
 				)
-
-				this.usersMap.delete(userId)
 
 				await channel.leaveClient({
 					userId: userId,

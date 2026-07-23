@@ -34,18 +34,24 @@ export default async function (
 		// cancel any pending disconnect timeout
 		this.cancelPendingDisconnect(client.userId)
 
-		const currentUserMediaChannel = this.usersMap.get(client.userId)
+		// check cache for existing membership
+		const joinedChannel = await this.users.get(client.userId)
 
-		// check if this is a reconnection (user was already mapped to a channel)
-		if (currentUserMediaChannel) {
+		// // if the user is already in the channel, skip
+		// if (joinedChannel === channelId) {
+		// 	return null
+		// }
+
+		// check if this is a reconnection (user already in a channel)
+		if (joinedChannel) {
 			// if joining a different channel, leave the old one first
-			if (currentUserMediaChannel !== channelId) {
+			if (joinedChannel !== channelId) {
 				await this.leaveClient(client)
-				await new Promise((resolve) => setTimeout(resolve, 100))
 			} else {
 				// check if reconnection is possible
-				const channelInstance = this.instances.get(
-					currentUserMediaChannel,
+				const channelInstance = await this.getInstance(
+					channelId,
+					client,
 				)
 
 				if (channelInstance && !channelInstance.closed) {
@@ -60,7 +66,8 @@ export default async function (
 						channelInstance.clients.delete(oldClient)
 					}
 
-					this.usersMap.set(client.userId, channelId)
+					// update cache
+					await this.users.set(client.userId, channelId)
 
 					console.log(
 						`[media-channels] User ${client.userId} reconnected to channel ${channelId}`,
@@ -71,9 +78,6 @@ export default async function (
 					})
 				}
 
-				// clean up stale usersMap entry and do a fresh join
-				this.usersMap.delete(client.userId)
-
 				console.log(
 					`[media-channels] User ${client.userId} rejoining after channel was closed`,
 				)
@@ -81,7 +85,7 @@ export default async function (
 		}
 
 		// get or create channel instance
-		let channelInstance = this.instances.get(channelId)
+		let channelInstance = await this.getInstance(channelId, client)
 
 		if (!channelInstance || channelInstance?.closed === true) {
 			channelInstance = await this.createChannelInstance(
@@ -90,7 +94,7 @@ export default async function (
 			)
 		}
 
-		this.usersMap.set(client.userId, channelId)
+		await this.users.set(client.userId, channelId)
 
 		return await channelInstance.joinClient(client)
 	} catch (error) {

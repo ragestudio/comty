@@ -1,9 +1,9 @@
 import type MediaChannelsController from "../index"
-import type { ConnectionContext } from "../types"
+import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
 
 export default async function (
 	this: MediaChannelsController,
-	ctx: ConnectionContext,
+	ctx: RtEngineContext,
 ): Promise<null | void> {
 	if (!ctx || !ctx.meta || !ctx.meta.user_id) {
 		return null
