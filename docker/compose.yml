@@ -49,7 +49,6 @@ services:
       - api_network
     ports:
       - "9000:9000"
-      - "40000:40000"
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
 
@@ -60,6 +59,7 @@ services:
       context: ..
       dockerfile: ./packages/server/Dockerfile
     restart: "no"
+    stop_grace_period: 60s
     depends_on:
       - mongodb
       - scylla
@@ -74,13 +74,12 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./gateway.config.json:/server/gateway.config.json
+      - ./gateway.config.json:/packages/server/gateway.config.json
     environment:
       - NODE_ENV=production
       - GRACEFUL_SHUTDOWN_TIMEOUT=30
       - NATS_URL=nats://comty-nats:4222
-    ports:
-      - "40000:40000/udp"
+      - AUTO_SHUTDOWN_WHEN_IDLE=true
     profiles:
       - blue
 
@@ -91,6 +90,7 @@ services:
       context: ..
       dockerfile: ./packages/server/Dockerfile
     restart: "no"
+    stop_grace_period: 60s
     depends_on:
       - mongodb
       - scylla
@@ -105,15 +105,33 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./gateway.config.json:/server/gateway.config.json
+      - ./gateway.config.json:/packages/server/gateway.config.json
     environment:
       - NODE_ENV=production
       - GRACEFUL_SHUTDOWN_TIMEOUT=30
       - NATS_URL=nats://comty-nats:4222
-    ports:
-      - "40000:40000/udp"
+      - AUTO_SHUTDOWN_WHEN_IDLE=true
     profiles:
       - green
+
+  sfu-node:
+    container_name: comty-sfu-node
+    image: ragestudio/comty-sfu-node
+    build:
+      context: ..
+      dockerfile: ./packages/sfu-node/Dockerfile
+    restart: "unless-stopped"
+    environment:
+      - NATS_ADDRESS=nats:4222
+    ports:
+      - "40001:40001/tcp"
+      - "40001:40001/udp"
+    depends_on:
+      - nats
+    networks:
+      - nats_network
+      - api_network
+      - redis_network
 
 networks:
   api_network:
