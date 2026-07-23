@@ -2,59 +2,64 @@ FROM ragestudio/ultragateway:latest AS build
 
 # Install dependencies
 RUN apt update -y
-RUN apt install -y curl nscd git ssh build-essential
+RUN apt install -y curl git build-essential
 RUN curl -sf https://gobinaries.com/tj/node-prune | sh
 
-# Create workdir
-RUN mkdir -p /server
-WORKDIR /server
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME/bin:$PATH"
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
+RUN corepack enable
 
 # Copy Files
-COPY packages/server .
+COPY packages/server /packages/server
+COPY packages/shared /packages/shared
+COPY modules/linebridge /modules/linebridge
 
-# Fix permissions
-RUN chmod -R 777 /server
-RUN chown -R node:node /server
+WORKDIR /modules/linebridge/server
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install
+RUN pnpm run build
+RUN pnpm clean
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN /server/scripts/installFfmpeg.sh
-
-# Set user to node
-USER node
-
-RUN IS_ACTION_RUNNER=true npm install --omit=dev
-RUN npm cache clean --force
+WORKDIR /packages/shared
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
 RUN node-prune
 
+WORKDIR /packages/server
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+
+RUN node-prune
+
+RUN node-prune /packages/server/node_modules && \
+    node-prune /packages/shared/node_modules && \
+    node-prune /modules/linebridge/server/node_modules && \
+    find /packages /modules -type f \( -name "*.map" -o -name "*.tsbuildinfo" -o -name "*.md" -o -name "*.test.*" -o -name "*.spec.*" \) -delete
+
 #### RUNTIME
 FROM ragestudio/ultragateway:latest AS runtime
-EXPOSE 9000
 
 # clean apt cache
 RUN apt autoclean -y
 RUN apt clean -y
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Create server workdir
-RUN mkdir -p /server
-WORKDIR /server
+USER node
+WORKDIR /packages/server
 
 # copy server dir
-COPY --from=build /server /server
-COPY --from=build /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
-COPY --from=build /usr/local/bin/ffprobe /usr/local/bin/ffprobe
-COPY packages/shared /shared
+COPY --from=build --chown=node:node /packages/server /packages/server
+COPY --from=build --chown=node:node /packages/shared /packages/shared
+COPY --from=build --chown=node:node /modules/linebridge /modules/linebridge
 
-RUN rm -rf /shared/node_modules
-RUN rm -rf /shared/assets
+COPY --from=build --chown=node:node /usr/local/bin/ffmpeg /usr/local/bin/ffmpeg
+COPY --from=build --chown=node:node /usr/local/bin/ffprobe /usr/local/bin/ffprobe
 
-RUN ln -s /server/node_modules /shared/node_modules
+RUN rm -rf /packages/shared/node_modules
+RUN rm -rf /packages/shared/assets
 
-# Fix permissions
-RUN chmod -R 777 /server
-RUN chown -R node:node /server
-
-# Set user to node
-USER node
+RUN ln -s /packages/server/node_modules /packages/shared/node_modules
 
 # Start server
 ENV NODE_ENV=production
