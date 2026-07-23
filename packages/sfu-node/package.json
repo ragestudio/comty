@@ -1,0 +1,30 @@
+{
+	"name": "sfu-node",
+	"version": "1.0.0",
+	"type": "commonjs",
+	"scripts": {
+		"build": "tsgo",
+		"start": "node ./build/run.js"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.3.0",
+			"onFail": "download"
+		}
+	},
+	"dependencies": {
+		"@comty/shared": "link:../shared",
+		"@nats-io/jetstream": "^3.4.0",
+		"@nats-io/kv": "^3.4.0",
+		"@nats-io/transport-node": "^3.4.0",
+		"@types/node": "^26.1.1",
+		"exit-hook": "^5.1.0",
+		"mediasoup": "^3.22.0",
+		"tseep": "^1.3.1"
+	},
+	"devDependencies": {
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"typescript": "^7.0.2"
+	}
+}

@@ -1,0 +1,6 @@
+allowBuilds:
+  mediasoup: true
+minimumReleaseAgeExclude:
+  - mediasoup@3.22.0
+overrides:
+  '@comty/shared': link:../shared
