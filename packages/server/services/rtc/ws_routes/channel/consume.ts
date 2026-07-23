@@ -14,7 +14,7 @@ export default defineRoute<API, "ws">()({
 		if (payload.isDm === true) {
 			channelInstance = ctx.userCalls.getClientChannel(client)
 		} else {
-			channelInstance = ctx.mediaChannels.getClientChannel(client)
+			channelInstance = await ctx.mediaChannels.getClientChannel(client)
 		}
 
 		if (!channelInstance) {
