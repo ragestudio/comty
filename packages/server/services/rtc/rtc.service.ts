@@ -1,15 +1,16 @@
+import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+
 import { Server } from "linebridge"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import SharedMiddlewares from "@shared-middlewares"
+import UserConnections from "@shared-classes/UserConnections"
 
 import MediaChannelsController from "@classes/MediaChannelsController"
 import UserCalls from "@classes/UserCalls"
-
-import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
-import UserConnections from "@shared-classes/UserConnections"
+import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 
 export default class API extends Server {
 	static refName = "rtc"
@@ -46,6 +47,7 @@ export default class API extends Server {
 		mediaChannels: new MediaChannelsController(this),
 		userCalls: new UserCalls(this),
 		userConnections: new UserConnections(this),
+		snowflake: (global.snowflake = new SnowflakeWorker()),
 	}
 
 	initialize = [
