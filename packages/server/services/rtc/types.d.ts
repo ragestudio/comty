@@ -1,13 +1,9 @@
 import type { RTEClient } from "linebridge"
-import * as mediasoup from "mediasoup"
 
 export type MediaChannelParams = {
 	data: any
 	channelId: string
-	worker: mediasoup.types.Worker
-	webrtcServer: mediasoup.types.WebRtcServer
 	mediaCodecs?: any[]
-	controller?: any
 }
 
 export type RTCClient = RTEClient & {
@@ -17,7 +13,8 @@ export type RTCClient = RTEClient & {
 		muted: boolean
 		deafen: boolean
 	}
-	self?: Boolean
+	self?: boolean
+	staled?: boolean
 }
 
 export type ProducerInstance = {
