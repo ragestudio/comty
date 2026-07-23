@@ -38,13 +38,6 @@ packages/server/nats-data
 packages/server/docs
 
 # Other packages (not needed for server build)
-packages/app
-packages/cli
-packages/desktop
-packages/wrapper
-packages/shared/assets
-packages/shared/node_modules
-modules
 docs
 docusaurus
 scripts
@@ -60,8 +53,3 @@ docker/.env
 **/nginx-bin
 **/sponsors.json
 **/todo.md
-**/CODE_OF_CONDUCT.md
-**/CONTRIBUTING.md
-**/CODE_STYLE.md
-**/LICENSE
-**/README.md
