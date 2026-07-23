@@ -14,7 +14,10 @@ allowBuilds:
 blockExoticSubdeps: false
 
 minimumReleaseAgeExclude:
-  - '@ragestudio/scylla-odm@0.22.17'
+  - "@ragestudio/scylla-odm@0.22.17"
 
 overrides:
-  linebridge: link:../../modules/linebridge/server/build
+  #linebridge: link:../../modules/linebridge/server/build
+  "@nats-io/transport-node": "3.4.0"
+  "@nats-io/jetstream": "3.4.0"
+  "@nats-io/kv": "3.4.0"
