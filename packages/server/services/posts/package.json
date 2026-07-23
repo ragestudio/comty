@@ -1,6 +1,7 @@
 {
 	"name": "posts",
 	"dependencies": {
-		"moment-timezone": "^0.5.45"
+		"luxon": "^3.7.2",
+		"moment-timezone": "^0.5.48"
 	}
 }
