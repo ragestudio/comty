@@ -32,6 +32,7 @@
 			"@db_models/*": ["./db_models/*"],
 			"@db/*": ["../shared/db/*"],
 			"@services/*": ["./services/*"],
+			"@comty/shared/*": ["../shared/*"],
 		},
 	},
 	// "files": ["../../modules/linebridge/server/src/global.d.ts"],
