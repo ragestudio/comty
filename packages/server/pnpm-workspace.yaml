@@ -8,9 +8,10 @@ allowBuilds:
   mediasoup: true
   msgpackr-extract: true
   sharp: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: true
   xxhash-addon: true
 
+nodeLinker: hoisted
 blockExoticSubdeps: false
 
 minimumReleaseAgeExclude:
