@@ -9,7 +9,7 @@ import GroupsModel from "@db/groups"
 
 export default defineRoute<API>()({
 	useMiddlewares: ["withAuthentication"],
-	useContexts: ["redis", "scylla", "mediaChannels"] as const,
+	useContexts: ["mediaChannels"] as const,
 	fn: async (req, res, ctx) => {
 		const { group_id } = req.params
 		// @ts-ignore

@@ -8,15 +8,15 @@ interface ChannelPayload {
 }
 
 export default defineRoute<API, "ws">()({
-	useContexts: ["mediaChannels", "userCalls"] as const,
+	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: ChannelPayload, ctx) => {
-		let channelInstance = null
+		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
 
-		if (payload.isDm === true) {
-			channelInstance = ctx.userCalls.getClientChannel(client)
-		} else {
-			channelInstance = await ctx.mediaChannels.getClientChannel(client)
-		}
+		// if (payload.isDm === true) {
+		// 	channelInstance = ctx.userCalls.getClientChannel(client)
+		// } else {
+		// 	channelInstance = await ctx.mediaChannels.getClientChannel(client)
+		// }
 
 		if (!channelInstance) {
 			throw new OperationError(404, "No channel available")

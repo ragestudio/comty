@@ -9,7 +9,7 @@ interface JoinPayload {
 }
 
 export default defineRoute<API, "ws">()({
-	useContexts: ["mediaChannels", "userCalls"] as const,
+	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, payload: JoinPayload, ctx) => {
 		if (typeof payload !== "object") {
 			throw new OperationError(400, "Invalid payload")

@@ -2,7 +2,7 @@ import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
 
 export default defineRoute<API, "ws">()({
-	useContexts: ["mediaChannels", "userCalls"] as const,
+	useContexts: ["mediaChannels"] as const,
 	fn: async (client: RTCClient, group_id: string, ctx) => {
 		if (typeof group_id !== "string") {
 			throw new OperationError(400, "group_id is required")

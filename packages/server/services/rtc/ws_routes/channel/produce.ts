@@ -1,21 +1,22 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
+import type { ProducePayload } from "@classes/MediaChannel/handlers/produce"
 
-interface ProducePayload {
+interface ProducePayloadReq extends ProducePayload {
 	isDm?: boolean
 	[key: string]: any
 }
 
 export default defineRoute<API, "ws">()({
-	useContexts: ["mediaChannels", "userCalls"] as const,
-	fn: async (client: RTCClient, payload: ProducePayload, ctx) => {
-		let channelInstance = null
+	useContexts: ["mediaChannels"] as const,
+	fn: async (client: RTCClient, payload: ProducePayloadReq, ctx) => {
+		let channelInstance = await ctx.mediaChannels.getClientChannel(client)
 
-		if (payload.isDm === true) {
-			channelInstance = ctx.userCalls.getClientChannel(client)
-		} else {
-			channelInstance = await ctx.mediaChannels.getClientChannel(client)
-		}
+		// if (payload.isDm === true) {
+		// 	channelInstance = ctx.userCalls.getClientChannel(client)
+		// } else {
+		// 	channelInstance = await ctx.mediaChannels.getClientChannel(client)
+		// }
 
 		if (!channelInstance) {
 			throw new OperationError(404, "No channel available")
