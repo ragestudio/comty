@@ -2,12 +2,13 @@ import type { RTCClient } from "@services/rtc/types"
 import type { Server } from "linebridge"
 
 import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
-import { MediaChannel, SerializedMediaChannel } from "@classes/MediaChannel"
+import { MediaChannel } from "@classes/MediaChannel"
 import { StorageType } from "@nats-io/jetstream"
 
 import { SfuNodeDiscovery } from "./sfu_discovery"
 import { SFUNode } from "./sfu/node"
 import { Bucket, KvManager } from "@shared-classes/KV"
+import { Users } from "./users"
 import { IPC } from "./ipc"
 
 import createChannelInstanceHandler from "./handlers/createChannelInstance"
@@ -23,7 +24,6 @@ import findChannelsByGroupId from "./handlers/findChannelsByGroupId"
 import getUserJoinedGroupsIds from "./handlers/getUserJoinedGroupsIds"
 import flushDirtyInstancesState from "./handlers/flushDirtyInstancesState"
 import getInstance from "./handlers/getInstance"
-import { Users } from "./users"
 
 type PendingDisconnectEntry = {
 	timeout: NodeJS.Timeout
@@ -59,11 +59,13 @@ export default class MediaChannelsController {
 
 	// TODO: implement find strategy
 	pickSfuNode = async (): Promise<SFUNode> => {
-		const node = this.sfuDiscovery.nodes[0]
+		for (const node of this.sfuDiscovery.nodes) {
+			const alive = await node.alive().catch(() => false)
 
-		if (!node) throw new Error("No SFU nodes available")
+			if (alive) return node
+		}
 
-		return node
+		throw new Error("No SFU nodes available")
 	}
 
 	getInstance = getInstance.bind(this) as OmitThisParameter<
