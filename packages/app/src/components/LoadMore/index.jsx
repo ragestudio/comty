@@ -46,9 +46,20 @@ const LoadMore = (props) => {
 		const el = sentinelRef.current
 		if (!el) return
 
+		const scrollParent = el.closest(
+			"[class*='scroll'], [class*='overflow']",
+		)
+		const rootBounds = scrollParent
+			? scrollParent.getBoundingClientRect()
+			: null
+
 		const timer = setTimeout(() => {
 			const rect = el.getBoundingClientRect()
-			if (rect.top < window.innerHeight) {
+			const threshold = rootBounds
+				? rootBounds.bottom
+				: window.innerHeight
+
+			if (rect.top < threshold) {
 				trigger()
 			}
 		}, 100)
