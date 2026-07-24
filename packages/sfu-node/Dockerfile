@@ -24,8 +24,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-l
 FROM node:24-trixie-slim AS runner
 
 USER node
-WORKDIR /server
 
-COPY --from=builder --chown=node:node /packages/sfu-node /server
+COPY --from=builder --chown=node:node /packages/sfu-node /packages/sfu-node
+COPY --from=builder --chown=node:node /packages/shared /packages/shared
 
+WORKDIR /packages/sfu-node
 CMD ["node", "build/run.js"]
