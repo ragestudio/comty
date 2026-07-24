@@ -1,6 +1,10 @@
 import type { NatsConnection, Subscription } from "@nats-io/transport-node"
 
 import { EventEmitter } from "tseep/lib/ee-safe"
+import {
+	EventDataEncode,
+	EventDataDecode,
+} from "@comty/shared/types/event_data"
 
 export class IPC extends EventEmitter {
 	nats: NatsConnection
@@ -74,10 +78,16 @@ export class IPC extends EventEmitter {
 	async requestToNode(node_id: string, event: string, data?: any) {
 		const response = await this.nats.request(
 			`${this.sfuIpcPrefixSubject}${node_id}`,
-			JSON.stringify({ event, data }),
+			EventDataEncode(event, data),
 		)
 
-		return response.json()
+		const payload = EventDataDecode(response.data)
+
+		if (payload.error) {
+			throw new Error(payload.error)
+		}
+
+		return payload.data
 	}
 }
 
