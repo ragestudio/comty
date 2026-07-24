@@ -93,6 +93,10 @@ const Attachment = React.memo((props) => {
 	const [nsfwAccepted, setNsfwAccepted] = React.useState(false)
 	const [mimeType, setMimeType] = React.useState(null)
 
+	const mimetypeParts = React.useMemo(() => {
+		return mimeType?.split("/")
+	}, [mimeType])
+
 	try {
 		const { url, id } = props.attachment
 
@@ -152,17 +156,14 @@ const Attachment = React.memo((props) => {
 		}
 
 		const renderMedia = () => {
-			if (!mimeType) {
-				return null
-			}
+			if (!mimetypeParts) return null
 
-			const mime = mimeType.split("/")
-
-			switch (mime[0]) {
+			switch (mimetypeParts[0]) {
 				case "image": {
-					if (mime[1] === "gif") {
+					if (mimetypeParts[1] === "gif") {
 						return (
 							<GifItem
+								fav
 								item={{
 									resource_url: url,
 									metadata: {
@@ -229,7 +230,11 @@ const Attachment = React.memo((props) => {
 			<div
 				key={props.index}
 				id={id}
-				className="attachment"
+				className={classNames("attachment", {
+					gif:
+						mimetypeParts?.[0] === "image" &&
+						mimetypeParts?.[1] === "gif",
+				})}
 			>
 				{props.attachment.flags &&
 					props.attachment.flags.includes("nsfw") &&
