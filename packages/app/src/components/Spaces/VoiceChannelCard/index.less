@@ -1,5 +1,5 @@
 .rtc-vc-card {
-	overflow: hidden;
+	//overflow: hidden;
 
 	display: flex;
 	flex-direction: column;
@@ -28,7 +28,7 @@
 		gap: 10px;
 
 		&__titles {
-			overflow: hidden;
+			//overflow: hidden;
 
 			display: flex;
 			flex-direction: column;
@@ -132,21 +132,61 @@
 	align-items: center;
 	justify-content: center;
 
-	gap: 5px;
-
-	transition: all 150 ease-in-out;
-
-	font-size: 0.8rem;
-
 	&.connected {
-		color: #70e000;
-	}
-
-	svg path {
-		color: currentColor;
+		.popover-trigger {
+			color: #70e000;
+		}
 	}
 
 	&.failed {
-		color: #ff0000;
+		.popover-trigger {
+			color: #ff0000;
+		}
+	}
+
+	.popover-trigger {
+		display: flex;
+		flex-direction: row;
+
+		align-items: center;
+		justify-content: center;
+
+		gap: 5px;
+
+		transition: all 150 ease-in-out;
+
+		font-size: 0.8rem;
+
+		svg path {
+			color: currentColor;
+		}
+	}
+
+	.popover-content {
+		width: 270px;
+	}
+}
+
+.connection-indicator {
+	.connection-stats {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+
+		&__group {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+
+			&__title {
+				font-size: 0.8rem;
+				color: #70e000;
+			}
+
+			span {
+				font-family: "DM Mono", monospace;
+				font-size: 0.8rem;
+			}
+		}
 	}
 }

@@ -2,6 +2,7 @@ import React from "react"
 import { Button } from "antd"
 import classNames from "classnames"
 
+import Popover from "@ui/Popover"
 import TimeAgo from "@components/TimeAgo"
 import { Icons } from "@components/Icons"
 import ClientContextMenu from "@components/Spaces/VoiceClient/menu-context"
@@ -13,6 +14,8 @@ import { openDialog as openShareCameraDialog } from "@components/ShareCameraDial
 
 import useMediaRTCState from "@hooks/useMediaRTCState"
 
+import VoiceChannelStats from "./stats"
+
 import "./index.less"
 
 const stateToText = {
@@ -22,12 +25,29 @@ const stateToText = {
 	connected: "Connected",
 }
 
-const ConnectionStateIndicator = ({ recv, send }) => {
+const ConnectionStateIndicator = ({ state }) => {
 	return (
-		<p className={classNames("connection-indicator", send)}>
-			<Icons.Connection />
-			{stateToText[send] ?? send}
-		</p>
+		<div
+			className={classNames("connection-indicator", {
+				loading: state.isLoading,
+				connected: state.sendTransportState === "connected",
+			})}
+		>
+			<Popover
+				trigger="click"
+				position="top"
+				content={() => <VoiceChannelStats state={state} />}
+				autoAdjust={true}
+			>
+				{state.isLoading && <Icons.LoadingOutlined />}
+				{!state.isLoading && <Icons.Connection />}
+
+				{state.isLoading && "Connecting..."}
+				{!state.isLoading &&
+					(stateToText[state.sendTransportState] ??
+						state.sendTransportState)}
+			</Popover>
+		</div>
 	)
 }
 
@@ -48,11 +68,14 @@ const Self = ({ client, speaking }) => {
 				300, // FIXME: calculate height properly
 			)
 
+			const contextMenuProps = {
+				target: event.target,
+				client: { ...client, self: true },
+				close: app.cores.ctx_menu.close,
+			}
+
 			app.cores.ctx_menu.renderMenu(
-				React.createElement(ClientContextMenu, {
-					client: { ...client, self: true },
-					close: app.cores.ctx_menu.close,
-				}),
+				React.createElement(ClientContextMenu, contextMenuProps),
 				x,
 				y,
 			)
@@ -115,8 +138,6 @@ const VoiceChannelCard = () => {
 			<div className="rtc-vc-card__header">
 				<Self
 					speaking={state.isSpeaking}
-					sendTransportState={state.sendTransportState}
-					recvTransportState={state.recvTransportState}
 					client={{
 						userId: app.userData._id,
 					}}
@@ -125,6 +146,8 @@ const VoiceChannelCard = () => {
 				<div className="rtc-vc-card__header__titles">
 					<div className="rtc-vc-card__header__titles__indicators">
 						<ConnectionStateIndicator
+							state={state}
+							loading={state.isLoading}
 							send={state.sendTransportState}
 							recv={state.recvTransportState}
 						/>
