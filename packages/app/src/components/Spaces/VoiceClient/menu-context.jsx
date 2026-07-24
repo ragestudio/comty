@@ -16,9 +16,14 @@ import "./index.less"
 const ClientContextMenu = ({ target, client, close }) => {
 	const state = useMediaRTCState()
 	const group_id =
-		target.parentElement.closest("[data-group-id]").dataset.groupId
+		target.parentElement.closest("[data-group-id]")?.dataset.groupId
 	const channel_id =
-		target.parentElement.closest("[data-channel-id]").dataset.channelId
+		target.parentElement.closest("[data-channel-id]")?.dataset.channelId
+
+	if (!group_id || !channel_id) {
+		close()
+		return null
+	}
 
 	const clientInstance = React.useMemo(() => {
 		return app.cores.mediartc.instance().clients.get(client.userId)
