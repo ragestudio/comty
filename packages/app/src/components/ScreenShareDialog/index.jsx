@@ -6,13 +6,16 @@ import { Icons } from "@components/Icons"
 import "./index.less"
 
 const ScreenShareDialog = ({ close }) => {
-	const { resolutionsList, frameratesList } = React.useMemo(
+	const { resolutionsList, frameratesList, contentHintsList } = React.useMemo(
 		() => app.cores.mediartc.vars(),
 		[],
 	)
 	const [resolution, setResolution] = React.useState(resolutionsList[1].value)
 	const [framerate, setFramerate] = React.useState(frameratesList[2].value)
 	const [systemAudio, setSystemAudio] = React.useState(!!app.isDesktop)
+	const [contentHint, setContentHint] = React.useState(
+		contentHintsList[0].value,
+	)
 
 	const startScreenShare = React.useCallback(async () => {
 		const [width, height] = resolution.split("x").map(Number)
@@ -24,6 +27,7 @@ const ScreenShareDialog = ({ close }) => {
 			},
 			framerate: framerate,
 			systemAudio: systemAudio,
+			contentHint: contentHint,
 		}
 
 		try {
@@ -35,7 +39,7 @@ const ScreenShareDialog = ({ close }) => {
 		if (typeof close === "function") {
 			close()
 		}
-	}, [resolution, framerate, systemAudio, close])
+	}, [resolution, contentHint, framerate, systemAudio, close])
 
 	return (
 		<div className="screenshare-dialog">
@@ -77,6 +81,24 @@ const ScreenShareDialog = ({ close }) => {
 							options={frameratesList}
 							value={framerate}
 							onChange={setFramerate}
+						/>
+					</div>
+				</div>
+
+				<div
+					id="contentHint"
+					className="screenshare-dialog__selectors__field"
+				>
+					<div className="screenshare-dialog__selectors__field__icon">
+						<Icons.Sparkles />
+						<span>Content Hint</span>
+					</div>
+
+					<div className="screenshare-dialog__selectors__field__content">
+						<Select
+							options={contentHintsList}
+							value={contentHint}
+							onChange={setContentHint}
 						/>
 					</div>
 				</div>

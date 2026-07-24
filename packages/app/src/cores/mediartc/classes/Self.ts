@@ -10,6 +10,7 @@ type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
 	framerate?: number
 	systemAudio?: boolean
+	contentHint?: "motion" | "detail" | "text"
 }
 
 export default class Self {
@@ -372,7 +373,7 @@ export default class Self {
 		}
 	}
 
-	async startScreenProducer() {
+	async startScreenProducer(options: CreateScreenStreamOptions = {}) {
 		if (!this.screenStream) {
 			throw new Error("No local screen stream available")
 		}
@@ -384,8 +385,9 @@ export default class Self {
 			throw new Error("No screen track found")
 		}
 
-		// hint the encoder to prioritize smooth framerate over detail
-		screenVideoTrack.contentHint = "motion"
+		// hint the encoder with options from the screen share dialog
+		screenVideoTrack.contentHint =
+			this.screenOptions.contentHint ?? options.contentHint ?? "detail"
 
 		// if scree audio is available, start producing
 		if (screenAudioTrack) {

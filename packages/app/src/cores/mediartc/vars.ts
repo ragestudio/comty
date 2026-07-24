@@ -1,16 +1,10 @@
-export interface Resolution {
+export interface Option {
 	label: string
-	value: string
+	value: any
 	disabled?: boolean
 }
 
-export interface Framerate {
-	label: string
-	value: number
-	disabled?: boolean
-}
-
-export const resolutionsList: Resolution[] = [
+export const resolutionsList: Option[] = [
 	{
 		label: "2160p",
 		value: "3840x2160",
@@ -30,10 +24,16 @@ export const resolutionsList: Resolution[] = [
 	},
 ]
 
-export const frameratesList: Framerate[] = [
+export const frameratesList: Option[] = [
 	{ label: "15 fps", value: 15 },
 	{ label: "25 fps", value: 25 },
 	{ label: "30 fps", value: 30 },
 	{ label: "60 fps", value: 60 },
 	{ label: "90 fps", value: 90, disabled: true },
+]
+
+export const contentHintsList: Option[] = [
+	{ label: "Detail", value: "detail" },
+	{ label: "Motion", value: "motion" },
+	{ label: "Text", value: "text" },
 ]
