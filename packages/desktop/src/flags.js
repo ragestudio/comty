@@ -6,14 +6,12 @@ export default (app) => {
 	const enableFeatures = [
 		"WebRTC",
 		"WebRtcHideLocalIpsWithMdns",
-		"PlatformHEVCEncoderSupport",
-		//"EnableDrDc",
 		"CanvasOopRasterization",
+		//"EnableDrDc",
 		//"UseSkiaRenderer",
 	]
 
 	if (process.platform === "linux") {
-		// enableFeatures.push("PulseaudioLoopbackForScreenShare")
 		enableFeatures.push("WebRTCPipeWireCapturer")
 
 		if (!process.argv.some((arg) => arg === "--no-vaapi")) {
@@ -23,6 +21,7 @@ export default (app) => {
 				"AcceleratedVideoDecoder",
 				"AcceleratedVideoDecodeLinuxZeroCopyGL",
 				"VaapiVideoEncoder",
+				"VaapiVideoEncodeAV1",
 				"VaapiVideoDecodeLinuxGL",
 				"VaapiIgnoreDriverChecks",
 			)
