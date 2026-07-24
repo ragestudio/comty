@@ -12,6 +12,7 @@ import "./index.less"
 
 const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 	const videoRef = React.useRef(null)
+
 	const [isLoading, setIsLoading] = React.useState(false)
 	const [hasError, setHasError] = React.useState(false)
 	const [mediaStream, setMediaStream] = React.useState(null)
