@@ -19,6 +19,7 @@ export default {
 		maxFramerate: 90,
 		priority: "high",
 		networkPriority: "high",
+		scalabilityMode: "L1T1",
 	} satisfies RtpEncodingParameters,
 	screenAudioEncodingParams: {
 		dtx: false,
