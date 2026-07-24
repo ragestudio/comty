@@ -1,3 +1,6 @@
+import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
+import type { Transport } from "mediasoup-client/types"
+
 import Core from "vessel/core"
 import { RTEngineClient } from "linebridge-client"
 import AudioProcessor from "./classes/AudioProcessor"
@@ -51,8 +54,6 @@ import defaults from "./defaults"
 import DebugWindow from "./debug/DebugWindow"
 import React from "react"
 
-import type { MediaRTCHandlers, MediaRTCPublic, WebsocketEvent } from "./types"
-
 const WebsocketEvents: WebsocketEvent = {
 	"media:channel:client:joined": clientJoinedEvent,
 	"media:channel:client:left": clientLeftEvent,
@@ -87,8 +88,11 @@ export default class MediaRTC extends Core {
 
 	socket: RTEngineClient | null = null
 	device: any = null
-	sendTransport: any = null
-	recvTransport: any = null
+	sendTransport: Transport = null
+	recvTransport: Transport = null
+
+	preferredVideoCodec: any = null
+	preferredAudioCodec: any = null
 
 	ui = new MediaRTCUI(this)
 	state = new MediaRTCState(this) as unknown as MediaRTCStateType

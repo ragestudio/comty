@@ -1,6 +1,10 @@
-import MediaRTC from "../mediartc.core"
 import { Device } from "mediasoup-client"
+import MediaRTC from "../mediartc.core"
 import Client from "../classes/Client"
+import {
+	getPreferredVideoCodec,
+	getPreferredAudioCodec,
+} from "../utils/getPreferredCodec"
 
 export default async function (this: MediaRTC, data: any) {
 	try {
@@ -29,6 +33,23 @@ export default async function (this: MediaRTC, data: any) {
 		await this.device.load({
 			routerRtpCapabilities: data.rtpCapabilities,
 		})
+
+		// compute preferred codecs based on gpu hardware capabilities
+		this.preferredVideoCodec = await getPreferredVideoCodec(
+			this.device.rtpCapabilities,
+		)
+		this.preferredAudioCodec = await getPreferredAudioCodec(
+			this.device.rtpCapabilities,
+		)
+
+		this.console.debug(
+			"preferred video codec:",
+			this.preferredVideoCodec?.mimeType,
+		)
+		this.console.debug(
+			"preferred audio codec:",
+			this.preferredAudioCodec?.mimeType,
+		)
 
 		// set all clients
 		for (let client of data.clients) {

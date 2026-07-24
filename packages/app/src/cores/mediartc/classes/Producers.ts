@@ -1,5 +1,7 @@
+import type { ProducerOptions } from "mediasoup-client/types"
+import type { Producer } from "./Producer"
+
 import MediaRTC from "../mediartc.core"
-import type Producer from "./Producer"
 
 export default class Producers extends Map<string, Producer> {
 	core: MediaRTC
@@ -41,17 +43,20 @@ export default class Producers extends Map<string, Producer> {
 		return producer
 	}
 
-	produce = async (payload: any): Promise<Producer> => {
+	produce = async (payload: ProducerOptions): Promise<Producer> => {
 		if (!this.core.device || !this.core.sendTransport) {
 			throw new Error("Device or send transport not ready")
 		}
 
-		const producer = await this.core.sendTransport.produce(payload)
+		const producer = (await this.core.sendTransport.produce(
+			payload,
+		)) as Producer
 
 		producer.userId = app.userData._id
 		producer.self = true
 		producer.observer.on("close", () => this.onSelfProducerClosed(producer))
 
+		// @ts-ignore
 		const { readable, writable } = producer.rtpSender.createEncodedStreams()
 
 		if (producer.appData.mediaTag === "user-mic") {

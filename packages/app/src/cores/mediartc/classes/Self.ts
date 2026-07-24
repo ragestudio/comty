@@ -1,10 +1,10 @@
+import type { Producer } from "./Producer"
+
 import MediaRTC from "../mediartc.core"
 import AudioProcessor from "./AudioProcessor"
 import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
-
-import type { Producer } from "./Producer"
 
 type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
@@ -273,16 +273,7 @@ export default class Self {
 
 		this.micProducer = await this.core.producers.produce({
 			track: audioTrack,
-			codecs: [
-				{
-					kind: "audio",
-					mimeType: "audio/opus",
-					clockRate: 41000,
-					channels: 1,
-					dtx: true,
-					opusDtx: true,
-				},
-			],
+			codec: this.core.preferredAudioCodec,
 			codecOptions: {
 				opusStereo: false,
 				opusDtx: true,
@@ -396,9 +387,11 @@ export default class Self {
 		if (screenAudioTrack) {
 			this.screenAudioProducer = await this.core.producers.produce({
 				track: screenAudioTrack,
+				codec: this.core.preferredAudioCodec,
 				codecOptions: {
 					opusStereo: true,
 					opusFec: true,
+					opusDtx: false,
 				},
 				encodings: [
 					{
@@ -426,22 +419,29 @@ export default class Self {
 			screenShareProducerData.childrens.push(this.screenAudioProducer.id)
 		}
 
-		const hasH264 = this.core.device.rtpCapabilities.codecs.some(
-			(c) => c.mimeType.toLowerCase() === "video/h264",
-		)
-
-		this.core.console.debug("screen producer h264 available:", hasH264)
-
 		const adaptiveEncoding = this.computeScreenEncoding()
 
 		this.core.console.debug("screen producer encoding:", adaptiveEncoding)
 
-		// produce
-		this.screenProducer = await this.core.producers.produce({
+		// build produce payload
+		const producePayload: any = {
 			track: screenVideoTrack,
 			encodings: [adaptiveEncoding],
 			appData: screenShareProducerData,
-		})
+		}
+
+		// only pass explicit codec when overriding the default
+		const preferredCodec = this.core.preferredVideoCodec
+
+		if (
+			preferredCodec &&
+			!preferredCodec.mimeType.toLowerCase().includes("h264")
+		) {
+			producePayload.codec = preferredCodec
+		}
+
+		// produce
+		this.screenProducer = await this.core.producers.produce(producePayload)
 
 		// if the producer closes, set the screen producer to null
 		this.screenProducer.observer.on("close", () => {
@@ -452,7 +452,7 @@ export default class Self {
 		})
 
 		this.core.state.isProducingScreen = true
-		this.core.console.log("screen production started")
+		this.core.console.log("screen production started", producePayload)
 	}
 
 	async stopScreenProducer() {
@@ -528,12 +528,22 @@ export default class Self {
 			throw new Error("No camera track found")
 		}
 
-		this.camProducer = await this.core.producers.produce({
+		const producePayload: any = {
 			track: camVideoTrack,
 			appData: {
 				mediaTag: "user-cam",
 			},
-		})
+		}
+
+		const preferredCodec = this.core.preferredVideoCodec
+		if (
+			preferredCodec &&
+			!preferredCodec.mimeType.toLowerCase().includes("h264")
+		) {
+			producePayload.codec = preferredCodec
+		}
+
+		this.camProducer = await this.core.producers.produce(producePayload)
 
 		// if the producer closes, set the cam producer to null
 		this.camProducer.observer.on("close", () => {
