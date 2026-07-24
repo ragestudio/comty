@@ -11,6 +11,7 @@ const Slider = ({
 	defaultValue,
 	onChange,
 	onChangeComplete,
+	onDoubleClick,
 	disabled = false,
 	showValue = true,
 	valueFormat,
@@ -257,6 +258,7 @@ const Slider = ({
 				className="slider-thumb"
 				style={{ left: `${percentage}%` }}
 				onMouseDown={handleMouseDown}
+				onDoubleClick={onDoubleClick}
 			/>
 
 			{showValue && (
@@ -277,6 +279,7 @@ Slider.propTypes = {
 	step: PropTypes.number,
 	value: PropTypes.number,
 	defaultValue: PropTypes.number,
+	onDoubleClick: PropTypes.func,
 	onChange: PropTypes.func,
 	onChangeComplete: PropTypes.func,
 	disabled: PropTypes.bool,
@@ -292,6 +295,7 @@ Slider.defaultProps = {
 	step: 1,
 	value: undefined,
 	defaultValue: undefined,
+	onDoubleClick: null,
 	onChange: null,
 	onChangeComplete: null,
 	disabled: false,
