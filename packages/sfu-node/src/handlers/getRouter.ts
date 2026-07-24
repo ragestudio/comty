@@ -1,16 +1,16 @@
 import type { SFU_Node } from ".."
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 
-export default async function (this: SFU_Node, data: any, msg: MsgImpl) {
+export default async function (this: SFU_Node, data: any, msg: IPCMsg) {
 	const router_id = data.router_id
 	if (!router_id) {
-		msg.respond(JSON.stringify(null))
+		msg.respond(null, "Missing router_id")
 		return
 	}
 
 	const router = this.routers.get(router_id)
 	if (!router) {
-		msg.respond(JSON.stringify(null))
+		msg.respond(null, "Router not found")
 		return
 	}
 

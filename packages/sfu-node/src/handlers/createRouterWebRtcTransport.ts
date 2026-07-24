@@ -1,11 +1,11 @@
 import type { SFU_Node } from ".."
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 import type { IPC_CreateRouterRTCTransportPayload } from "@comty/shared/types/rtc"
 
 export default async function (
 	this: SFU_Node,
 	data: IPC_CreateRouterRTCTransportPayload,
-	msg: MsgImpl,
+	msg: IPCMsg,
 ) {
 	console.log("Creating router RTC transport:", data)
 
@@ -29,5 +29,5 @@ export default async function (
 	this.transports.set(transport.id, transport)
 	this.setupTransportEvents(transport)
 
-	msg.respond(JSON.stringify(await transport.dump()))
+	msg.respond(await transport.dump())
 }

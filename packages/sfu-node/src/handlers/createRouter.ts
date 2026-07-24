@@ -1,11 +1,11 @@
 import type { SFU_Node } from ".."
 import type { RouterOptions } from "mediasoup/types"
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 
 export default async function (
 	this: SFU_Node,
 	data: RouterOptions & { channelId?: string; groupId?: string },
-	msg: MsgImpl,
+	msg: IPCMsg,
 ) {
 	console.log("Creating router with options:", data)
 
@@ -21,10 +21,8 @@ export default async function (
 
 	const dump = await router.dump()
 
-	msg.respond(
-		JSON.stringify({
-			...dump,
-			rtpCapabilities: router.rtpCapabilities,
-		}),
-	)
+	msg.respond({
+		...dump,
+		rtpCapabilities: router.rtpCapabilities,
+	})
 }

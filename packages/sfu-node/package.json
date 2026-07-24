@@ -4,7 +4,10 @@
 	"type": "commonjs",
 	"scripts": {
 		"build": "tsgo",
-		"start": "node ./build/run.js"
+		"start": "node --experimental-strip-types ./build/run.js"
+	},
+	"engines": {
+		"node": ">=24"
 	},
 	"devEngines": {
 		"packageManager": {

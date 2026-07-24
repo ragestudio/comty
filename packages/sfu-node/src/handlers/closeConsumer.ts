@@ -1,11 +1,11 @@
 import type { SFU_Node } from ".."
-import type { MsgImpl } from "@nats-io/transport-node"
 import type { IPC_CloseConsumerPayload } from "@comty/shared/types/rtc"
+import type { IPCMsg } from "../ipc"
 
 export default async function (
 	this: SFU_Node,
 	data: IPC_CloseConsumerPayload,
-	msg: MsgImpl,
+	msg: IPCMsg,
 ) {
 	const consumer = this.consumers.get(data.consumer_id)
 	if (!consumer) return
@@ -13,5 +13,5 @@ export default async function (
 	consumer.close()
 	this.consumers.delete(data.consumer_id)
 
-	msg.respond(JSON.stringify({ success: true }))
+	msg.respond({ success: true })
 }

@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"target": "ESNext",
+		"target": "esnext",
 		"module": "CommonJS",
 		"moduleResolution": "bundler",
 		"strict": false,
@@ -20,5 +20,4 @@
 		"isolatedModules": true,
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules", "dist"],
 }

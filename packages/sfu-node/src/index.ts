@@ -13,6 +13,7 @@ import IPC from "./ipc"
 import { Worker as SnowflakeWorker } from "./classes/Snowflake"
 import { getDnsPublicIP } from "./utils/resolvePublicIp"
 
+import base_handler from "./base_handler"
 import * as handlers from "./handlers"
 import { Bucket, KvManager } from "./classes/KV"
 
@@ -74,21 +75,20 @@ export class SFU_Node {
 	}
 
 	handlers = {
-		alive: handlers.alive.bind(this),
-		getRouter: handlers.getRouter.bind(this),
-		createRouter: handlers.createRouter.bind(this),
-		listRouters: handlers.listRouters.bind(this),
-		closeRouter: handlers.closeRouter.bind(this),
-		createRouterWebRtcTransport:
-			handlers.createRouterWebRtcTransport.bind(this),
-		routerCanConsume: handlers.routerCanConsume.bind(this),
-		connectTransport: handlers.connectTransport.bind(this),
-		produce: handlers.produce.bind(this),
-		consume: handlers.consume.bind(this),
-		closeTransport: handlers.closeTransport.bind(this),
-		closeProducer: handlers.closeProducer.bind(this),
-		closeConsumer: handlers.closeConsumer.bind(this),
-		requestKeyFrame: handlers.requestKeyFrame.bind(this),
+		alive: handlers.alive,
+		getRouter: handlers.getRouter,
+		createRouter: handlers.createRouter,
+		listRouters: handlers.listRouters,
+		closeRouter: handlers.closeRouter,
+		createRouterWebRtcTransport: handlers.createRouterWebRtcTransport,
+		routerCanConsume: handlers.routerCanConsume,
+		connectTransport: handlers.connectTransport,
+		produce: handlers.produce,
+		consume: handlers.consume,
+		closeTransport: handlers.closeTransport,
+		closeProducer: handlers.closeProducer,
+		closeConsumer: handlers.closeConsumer,
+		requestKeyFrame: handlers.requestKeyFrame,
 	}
 
 	setupTransportEvents(transport: Transport) {
@@ -220,7 +220,10 @@ export class SFU_Node {
 		this.nats_adapter = new IPC(this)
 
 		for (const eventKey in this.handlers) {
-			this.nats_adapter.on(eventKey, this.handlers[eventKey])
+			this.nats_adapter.on(
+				eventKey,
+				base_handler(this.handlers[eventKey].bind(this)).bind(this),
+			)
 		}
 
 		await this.registerNode()

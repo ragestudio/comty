@@ -1,11 +1,11 @@
 import type { SFU_Node } from ".."
 import type { IPC_CloseRouterPayload } from "@comty/shared/types/rtc"
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 
 export default async function (
 	this: SFU_Node,
 	data: IPC_CloseRouterPayload,
-	msg: MsgImpl,
+	msg: IPCMsg,
 ) {
 	console.log("Closing router by ID:", data.id)
 	if (!data.id) return

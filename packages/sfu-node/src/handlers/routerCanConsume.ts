@@ -1,11 +1,11 @@
 import type { SFU_Node } from ".."
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 import type { IPC_RouterCanConsumePayload } from "@comty/shared/types/rtc"
 
 export default async function (
 	this: SFU_Node,
 	data: IPC_RouterCanConsumePayload,
-	msg: MsgImpl,
+	msg: IPCMsg,
 ) {
 	const router = this.routers.get(data.router_id)
 	if (!router) return
@@ -15,5 +15,5 @@ export default async function (
 		rtpCapabilities: data.rtpCapabilities,
 	})
 
-	msg.respond(JSON.stringify(canConsume))
+	msg.respond({ canConsume })
 }

@@ -1,7 +1,7 @@
 import type { SFU_Node } from ".."
-import type { MsgImpl } from "@nats-io/transport-node"
+import type { IPCMsg } from "../ipc"
 
-export default async function (this: SFU_Node, _data: any, msg: MsgImpl) {
+export default async function (this: SFU_Node, _data: any, msg: IPCMsg) {
 	const routers: {
 		id: string
 		channelId?: string
@@ -18,5 +18,5 @@ export default async function (this: SFU_Node, _data: any, msg: MsgImpl) {
 		}
 	}
 
-	msg.respond(JSON.stringify(routers))
+	msg.respond(routers)
 }
