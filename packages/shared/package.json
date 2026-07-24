@@ -1,6 +1,10 @@
 {
 	"name": "@comty/shared",
-	"type": "module",
+	"exports": {
+		"./types/event_data": "./types/event_data.ts",
+		"./types/rtc": "./types/rtc.ts",
+		"./db/*": "./db/*.ts"
+	},
 	"devEngines": {
 		"packageManager": {
 			"name": "pnpm",
