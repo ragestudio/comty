@@ -104,6 +104,10 @@ export default class Self {
 				if (this.audioOutput && this.audioOutput?.mainNode) {
 					this.audioOutput.mainNode.gain.value = value
 				}
+
+				if (this.sysAudio && this.sysAudio.outputBus) {
+					this.sysAudio.outputBus.gain.value = value
+				}
 			}
 
 			if (key === "echoCancellation") {
