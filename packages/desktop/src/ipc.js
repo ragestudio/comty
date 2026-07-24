@@ -1,4 +1,11 @@
+import { BrowserWindow } from "electron"
+
+import getCPUInfo from "./ipc_handlers/getCpuInfo.js"
+import getGpuEncodeCaps from "./ipc_handlers/getGpuEncodeCaps.js"
+
 export default {
+	"cpu:info": getCPUInfo,
+	"gpu:encode-caps": getGpuEncodeCaps,
 	"window:minimize": (ctx) => {
 		ctx.mainWindow.minimize()
 	},
@@ -21,8 +28,6 @@ export default {
 		return await ctx.extensions.install(...args)
 	},
 	"debug:open-chrome-page": async (ctx, event, page) => {
-		const { BrowserWindow } = await import("electron")
-
 		const win = new BrowserWindow({
 			width: 1200,
 			height: 800,
