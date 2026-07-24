@@ -1,26 +1,31 @@
 import React from "react"
 import { Select } from "antd"
+import Slider from "@ui/Slider"
 import Icons from "@components/Icons"
 
 import "./devices.less"
-//const devicesEnum = navigator.mediaDevices.enumerateDevices()
+
+const gainPercentageFormat = (value) =>
+	`${Number(parseFloat(value) * 100).toFixed(0)}%`
 
 const Devices = ({ ctx }) => {
-	//const devices = React.use(devicesEnum)
-
 	const inputDevices = ctx.processedCtx.inputDevices ?? []
 	const outputDevices = ctx.processedCtx.outputDevices ?? []
 
-	const onInputDeviceChange = (value) => {
-		console.log(value)
+	const onInputGainChange = (value) => {
+		app.cores.mediartc.instance().self.audioSettings = { inputGain: value }
+	}
 
+	const onOutputGainChange = (value) => {
+		app.cores.mediartc.instance().self.audioSettings = { outputGain: value }
+	}
+
+	const onInputDeviceChange = (value) => {
 		app.cores.settings.set("mediartc:input_device", value)
 		app.cores.mediartc.handlers().changeInputParams({ deviceId: value })
 	}
 
 	const onOutputDeviceChange = (value) => {
-		console.log(value)
-
 		app.cores.settings.set("mediartc:output_device", value)
 		app.cores.mediartc.handlers().changeOutputParams({ deviceId: value })
 	}
@@ -51,6 +56,16 @@ const Devices = ({ ctx }) => {
 						inputDevices[0].deviceId
 					}
 				/>
+				<Slider
+					defaultValue={parseFloat(
+						app.cores.settings.get("mediartc:inputGain"),
+					)}
+					valueFormat={gainPercentageFormat}
+					onChange={onInputGainChange}
+					min={0.1}
+					max={3.0}
+					step={0.1}
+				/>
 			</div>
 			<div className="mediartc-voice-devices__select">
 				<span>
@@ -69,6 +84,16 @@ const Devices = ({ ctx }) => {
 						app.cores.settings.get("mediartc:output_device") ??
 						outputDevices[0].deviceId
 					}
+				/>
+				<Slider
+					defaultValue={parseFloat(
+						app.cores.settings.get("mediartc:outputGain"),
+					)}
+					valueFormat={gainPercentageFormat}
+					onChange={onOutputGainChange}
+					min={0.1}
+					max={3.0}
+					step={0.1}
 				/>
 			</div>
 		</div>

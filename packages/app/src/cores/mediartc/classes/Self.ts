@@ -65,7 +65,7 @@ export default class Self {
 			autoGain: app.cores.settings.get("mediartc:autoGain") ?? false,
 			volumeGateThreshold:
 				app.cores.settings.get("mediartc:volumeGateThreshold") ?? "-40",
-			inputGain: app.cores.settings.get("mediartc:inputGain") ?? "1.0",
+			inputGain: app.cores.settings.get("mediartc:inputGain") ?? "1.3",
 			outputGain: app.cores.settings.get("mediartc:outputGain") ?? "1.0",
 		}
 	}
