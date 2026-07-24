@@ -118,7 +118,11 @@ async function fetchCpuCapabilities(): Promise<CpuCapabilities | null> {
 	return null
 }
 
-// av1 software encoding needs 8+ threads, sse2 and avx2 to be viable
+// av1 hardware encoding produces streams that consumers cannot decode
+// (dav1d and vaapi both fail with framesDecoded=0).
+// av1 software (libaom) is fine, prioritize it when cpu is powerful.
+const AV1_HW_BROKEN = true
+
 function canSoftwareAv1(cpuCaps: CpuCapabilities | null): boolean {
 	if (!cpuCaps) return false
 
@@ -131,6 +135,8 @@ function buildDynamicPriority(
 ): string[] {
 	const priority: string[] = []
 	const av1Viable = canSoftwareAv1(cpuCaps)
+	const vp9Viable =
+		cpuCaps && cpuCaps.cores >= 8 && cpuCaps.simd.sse2 && cpuCaps.simd.avx2
 
 	const norm = (c: string) => c.toLowerCase()
 	const has = (s: string) => priority.some((p) => norm(p) === norm(s))
@@ -146,10 +152,12 @@ function buildDynamicPriority(
 		(c) => !hwAV1.includes(c) && !hwVP9.includes(c) && !hwH264.includes(c),
 	)
 
-	// hardware av1, best possible
-	for (const c of hwAV1) push(c)
+	// only push hwAV1 if AV1_HW_BROKEN is false
+	if (!AV1_HW_BROKEN) {
+		for (const c of hwAV1) push(c)
+	}
 
-	// use software av1 if cpu can handle it
+	// software av1 if cpu can handle it
 	if (av1Viable) {
 		push("video/AV1")
 		push("video/av1")
@@ -159,7 +167,7 @@ function buildDynamicPriority(
 	for (const c of hwVP9) push(c)
 
 	// use software vp9 if cpu can handle it
-	if (av1Viable) {
+	if (vp9Viable) {
 		push("video/VP9")
 		push("video/vp9")
 	}
