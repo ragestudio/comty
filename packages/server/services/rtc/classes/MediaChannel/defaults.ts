@@ -20,11 +20,6 @@ export default {
 		},
 		{
 			kind: "video",
-			mimeType: "video/AV1",
-			clockRate: 90000,
-		},
-		{
-			kind: "video",
 			mimeType: "video/h264",
 			clockRate: 90000,
 			parameters: {
@@ -33,6 +28,11 @@ export default {
 				"level-asymmetry-allowed": 1,
 				"x-google-start-bitrate": 1000,
 			},
+		},
+		{
+			kind: "video",
+			mimeType: "video/AV1",
+			clockRate: 90000,
 		},
 		{
 			kind: "video",
