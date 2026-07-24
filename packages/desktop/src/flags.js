@@ -12,20 +12,18 @@ export default (app) => {
 	]
 
 	if (process.platform === "linux") {
-		enableFeatures.push("WebRTCPipeWireCapturer")
+		enableFeatures.push(
+			"WebRTCPipeWireCapturer",
+			"AcceleratedVideoDecoder",
+			"AcceleratedVideoEncoder",
+			"AcceleratedVideoDecodeLinuxZeroCopyGL",
+		)
 
 		if (!process.argv.some((arg) => arg === "--no-vaapi")) {
-			enableFeatures.push(
-				"AcceleratedVideoDecodeLinuxGL",
-				"AcceleratedVideoEncoder",
-				"AcceleratedVideoDecoder",
-				"AcceleratedVideoDecodeLinuxZeroCopyGL",
-				"VaapiVideoEncoder",
-				"VaapiVideoEncodeAV1",
-				"VaapiVideoDecodeLinuxGL",
-				"VaapiIgnoreDriverChecks",
-			)
+			enableFeatures.push("VaapiVideoDecoder", "VaapiVideoEncoder")
 		}
+
+		disableFeatures.push("UseChromeOSDirectVideoDecoder")
 	}
 
 	if (process.platform === "win32") {
