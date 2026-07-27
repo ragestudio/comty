@@ -1,10 +1,10 @@
 {
 	"name": "files",
 	"dependencies": {
-		"file-type": "^21.3.1",
-		"mime-types": "^2.1.35",
-		"p-map": "^4.0.0",
-		"sharp": "0.32.6",
+		"file-type": "^22.0.1",
+		"mime-types": "^3.0.2",
+		"p-map": "^7.0.6",
+		"sharp": "0.35.3",
 		"xxhash-addon": "^2.1.0"
 	}
 }
