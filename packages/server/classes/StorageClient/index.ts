@@ -1,5 +1,6 @@
 import path from "node:path"
 import { Client } from "minio"
+import { AwsClient } from "aws4fetch"
 
 export const generateDefaultBucketPolicy = (payload) => {
 	const { bucketName } = payload
@@ -25,17 +26,30 @@ export const generateDefaultBucketPolicy = (payload) => {
 }
 
 export class StorageClient extends Client {
+	awsClient: AwsClient | undefined
+	defaultBucket: string
+	defaultRegion: string
+	setupBucket: boolean
+	cdnUrl: string | undefined
+
 	constructor(options) {
 		super(options)
 
 		this.defaultBucket = String(options.defaultBucket)
-		this.defaultRegion = String(options.defaultRegion)
+		this.defaultRegion = String(options.defaultRegion) ?? "s3"
 		this.setupBucket = Boolean(options.setupBucket)
 		this.cdnUrl = options.cdnUrl
 		this.pathStyle = Boolean(options.pathStyle ?? true)
+
+		this.awsClient = new AwsClient({
+			accessKeyId: String(options.accessKey),
+			secretAccessKey: String(options.secretKey),
+			region: this.defaultRegion,
+			service: "s3",
+		})
 	}
 
-	composeRemoteURL = (key, extraKey) => {
+	composeRemoteURL = (key, extraKey?) => {
 		let _path = path.join(this.defaultBucket, key)
 
 		if (!this.pathStyle) {
@@ -107,7 +121,7 @@ export class StorageClient extends Client {
 	}
 }
 
-export const createStorageClientInstance = (options) => {
+export const createStorageClientInstance = (options?) => {
 	return new StorageClient({
 		endPoint: process.env.S3_ENDPOINT,
 		port: Number(process.env.S3_PORT),

@@ -28,6 +28,7 @@
 		"@otplib/uri": "^13.4.1",
 		"@ragestudio/scylla-odm": "0.22.17",
 		"@sentry/node": "^10.65.0",
+		"aws4fetch": "^1.0.20",
 		"bcrypt": "^6.0.0",
 		"bullmq": "^5.80.4",
 		"cross-env": "10.1.0",
