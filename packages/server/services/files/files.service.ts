@@ -3,10 +3,10 @@ import { Server } from "linebridge"
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
-import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
 import LimitsClass, { LimitsValues } from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+import { S3Manager } from "@shared-classes/StorageClient"
 import { Multipart } from "@shared-classes/Multipart"
 
 import Capabilities from "@classes/Capabilities"
@@ -32,19 +32,17 @@ export class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb({
+		scylla: new ScyllaDb({
 			modelsPath: path.resolve(global["paths"].root, "../shared/db"),
-		})),
-		redis: (global.redis = RedisClient({
+		}),
+		redis: RedisClient({
 			maxRetriesPerRequest: null,
-		})),
-		cache: (global.cache = new CacheService()),
-		storage: StorageClient(),
-		ovhStorage: null,
-		b2Storage: null as ReturnType<typeof StorageClient>,
+		}),
+		cache: new CacheService(),
 		limits: {} as LimitsValues,
 		capabilities: new Capabilities(),
 		multipartUpload: null as Multipart,
+		s3: new S3Manager(),
 	}
 
 	queuesManager = (global.queues = new TaskQueueManager({
@@ -58,39 +56,18 @@ export class API extends Server {
 				sync: true,
 			}),
 		() => this.contexts.redis.initialize(),
+		() =>
+			this.queuesManager.initialize({
+				redisOptions: this.contexts.redis.client,
+			}),
 		() => this.contexts.capabilities.initialize(),
 	]
 
 	async onInitialize() {
-		console.log("Server Capabilities:", this.contexts.capabilities)
-
-		await this.queuesManager.initialize({
-			redisOptions: this.contexts.redis.client,
-		})
-
 		this.contexts.limits = await LimitsClass.getAll()
 
-		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
-			console.log("Initializing B2 storage")
-
-			this.contexts.b2Storage = StorageClient({
-				endPoint: process.env.B2_ENDPOINT,
-				cdnUrl: process.env.B2_CDN_ENDPOINT,
-				defaultBucket: process.env.B2_BUCKET,
-				accessKey: process.env.B2_KEY_ID,
-				secretKey: process.env.B2_APP_KEY,
-				port: 443,
-				useSSL: true,
-				setupBucket: false,
-			})
-
-			await this.contexts.b2Storage.initialize()
-		}
-
 		if (process.env.OVH_S3_KEY_ID && process.env.OVH_S3_SECRET_KEY) {
-			console.log("Initializing OVH storage")
-
-			this.contexts.ovhStorage = StorageClient({
+			await this.contexts.s3.addService("ovh", {
 				cdnUrl: process.env.OVH_S3_CDN,
 				endPoint: process.env.OVH_S3_ENDPOINT,
 				defaultBucket: process.env.OVH_S3_BUCKET,
@@ -101,22 +78,30 @@ export class API extends Server {
 				setupBucket: false,
 				pathStyle: false,
 			})
-
-			await this.contexts.ovhStorage.initialize()
-
-			this.contexts.multipartUpload = new Multipart(
-				this.contexts.ovhStorage,
-				this.contexts.limits,
-			)
 		}
 
-		await this.contexts.storage.initialize()
-
-		global.storages = {
-			standard: this.contexts.storage,
-			ovh: this.contexts.ovhStorage,
-			b2: this.contexts.b2Storage,
+		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
+			await this.contexts.s3.addService("b2", {
+				endPoint: process.env.B2_ENDPOINT,
+				cdnUrl: process.env.B2_CDN_ENDPOINT,
+				accessKey: process.env.B2_KEY_ID,
+				secretKey: process.env.B2_APP_KEY,
+				defaultBucket: process.env.B2_BUCKET,
+				port: 443,
+				useSSL: true,
+				setupBucket: false,
+			})
 		}
+
+		this.contexts.multipartUpload = new Multipart(
+			this.contexts.s3.getDefaultService(),
+			this.contexts.limits,
+		)
+
+		console.log({
+			capabilities: this.contexts.capabilities,
+			limits: this.contexts.limits,
+		})
 	}
 }
 

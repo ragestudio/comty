@@ -2,6 +2,17 @@ import path from "node:path"
 import { Client } from "minio"
 import { AwsClient } from "aws4fetch"
 
+export type createClientOptions = {
+	endPoint: string
+	port: number
+	useSSL?: boolean
+	accessKey: string
+	secretKey: string
+	defaultBucket?: string
+	defaultRegion?: string
+	[key: string]: any
+}
+
 export const generateDefaultBucketPolicy = (payload) => {
 	const { bucketName } = payload
 
@@ -32,7 +43,7 @@ export class StorageClient extends Client {
 	setupBucket: boolean
 	cdnUrl: string | undefined
 
-	constructor(options) {
+	constructor(options: createClientOptions) {
 		super(options)
 
 		this.defaultBucket = String(options.defaultBucket)
@@ -121,7 +132,44 @@ export class StorageClient extends Client {
 	}
 }
 
-export const createStorageClientInstance = (options?) => {
+export class S3Manager {
+	private defaultService: string = null
+	services: Map<string, StorageClient> = new Map()
+
+	setDefaultService(level: string) {
+		if (!this.services.get(level)) {
+			throw new Error("Level not exist")
+		}
+
+		this.defaultService = level
+	}
+
+	getDefaultService() {
+		return this.services.get(this.defaultService)
+	}
+
+	getService(level: string) {
+		return this.services.get(level)
+	}
+
+	async addService(level: string, options?: createClientOptions) {
+		console.debug(`[S3] Adding new level (${level})`)
+
+		if (this.services.size === 0) {
+			console.debug(`[S3] Setting level (${level}) as default`)
+			this.defaultService = level
+		}
+
+		const client = new StorageClient(options)
+		await client.initialize()
+
+		this.services.set(level, client)
+
+		return client
+	}
+}
+
+export const createStorageClientInstance = (options?: createClientOptions) => {
 	return new StorageClient({
 		endPoint: process.env.S3_ENDPOINT,
 		port: Number(process.env.S3_PORT),
