@@ -49,7 +49,7 @@ export class StorageClient extends Client {
 		})
 	}
 
-	composeRemoteURL = (key, extraKey?) => {
+	composeRemoteURL = (key: string, extraKey?: string) => {
 		let _path = path.join(this.defaultBucket, key)
 
 		if (!this.pathStyle) {
@@ -67,7 +67,7 @@ export class StorageClient extends Client {
 		return `${this.protocol}//${this.host}:${this.port}/${_path}`
 	}
 
-	setDefaultBucketPolicy = async (bucketName) => {
+	setDefaultBucketPolicy = async (bucketName: string) => {
 		const policy = generateDefaultBucketPolicy({ bucketName })
 
 		return this.setBucketPolicy(bucketName, JSON.stringify(policy))
