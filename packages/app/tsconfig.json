@@ -31,6 +31,7 @@
 
 			"comty.js/*": ["../../modules/comty.js/src/*"],
 			"vessel/*": ["../../modules/vessel/src/*"],
+			"@comty/shared/*": ["../shared/*"],
 		},
 	},
 	"files": ["./src/global.d.ts", "./src/declarations.d.ts"],
