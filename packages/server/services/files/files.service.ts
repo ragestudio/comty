@@ -5,13 +5,16 @@ import DbManager from "@shared-classes/DbManager"
 import RedisClient from "@shared-classes/RedisClient"
 import StorageClient from "@shared-classes/StorageClient"
 import CacheService from "@shared-classes/CacheService"
-import LimitsClass from "@shared-classes/Limits"
+import LimitsClass, { LimitsValues } from "@shared-classes/Limits"
 import TaskQueueManager from "@shared-classes/TaskQueueManager"
+import { Multipart } from "@shared-classes/Multipart"
+
 import Capabilities from "@classes/Capabilities"
 
 import SharedMiddlewares from "@shared-middlewares"
+import path from "node:path"
 
-class API extends Server {
+export class API extends Server {
 	static refName = "files"
 	static listenPort = 3002
 
@@ -29,28 +32,31 @@ class API extends Server {
 
 	contexts = {
 		db: new DbManager(),
-		scylla: (global.scylla = new ScyllaDb()),
+		scylla: (global.scylla = new ScyllaDb({
+			modelsPath: path.resolve(global["paths"].root, "../shared/db"),
+		})),
 		redis: (global.redis = RedisClient({
 			maxRetriesPerRequest: null,
 		})),
 		cache: (global.cache = new CacheService()),
 		storage: StorageClient(),
 		ovhStorage: null,
-		b2Storage: null,
-		limits: {},
+		b2Storage: null as ReturnType<typeof StorageClient>,
+		limits: {} as LimitsValues,
 		capabilities: new Capabilities(),
+		multipartUpload: null as Multipart,
 	}
 
-	queuesManager = (global.queues = new TaskQueueManager(
-		{
-			workersPath: `${__dirname}/queues`,
-		},
-		this,
-	))
+	queuesManager = (global.queues = new TaskQueueManager({
+		workersPath: `${__dirname}/queues`,
+	}))
 
 	initialize = [
 		() => this.contexts.db.initialize(),
-		() => this.contexts.scylla.initialize(),
+		() =>
+			this.contexts.scylla.initialize({
+				sync: true,
+			}),
 		() => this.contexts.redis.initialize(),
 		() => this.contexts.capabilities.initialize(),
 	]
@@ -62,7 +68,7 @@ class API extends Server {
 			redisOptions: this.contexts.redis.client,
 		})
 
-		this.contexts.limits = await LimitsClass.get()
+		this.contexts.limits = await LimitsClass.getAll()
 
 		if (process.env.B2_KEY_ID && process.env.B2_APP_KEY) {
 			console.log("Initializing B2 storage")
@@ -97,6 +103,11 @@ class API extends Server {
 			})
 
 			await this.contexts.ovhStorage.initialize()
+
+			this.contexts.multipartUpload = new Multipart(
+				this.contexts.ovhStorage,
+				this.contexts.limits,
+			)
 		}
 
 		await this.contexts.storage.initialize()
