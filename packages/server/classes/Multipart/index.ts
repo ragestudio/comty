@@ -1,6 +1,6 @@
 import type { BucketItemStat } from "minio"
 import type { StorageClient } from "@shared-classes/StorageClient"
-import type { DefaultLimits } from "@shared-classes/Limits"
+import type { LimitsValues } from "@shared-classes/Limits"
 import type { MultipartUploadCompletedResult } from "@comty/shared/types/multipart"
 
 import { MultipartUpload } from "@db/multipart_uploads"
@@ -15,11 +15,11 @@ export interface UploadPart {
 }
 
 export class Multipart {
-	limits: Partial<DefaultLimits>
+	limits: Partial<LimitsValues>
 
 	constructor(
 		protected storageClient: StorageClient,
-		limits: Partial<DefaultLimits>,
+		limits: Partial<LimitsValues>,
 	) {
 		if (!storageClient) throw new Error("StorageClient is required")
 		this.limits = limits
