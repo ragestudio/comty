@@ -1,9 +1,9 @@
 import type { Job } from "bullmq"
+import type { S3Manager } from "@shared-classes/StorageClient"
 
 import fs from "node:fs"
 import path from "node:path"
 import Transformation from "@shared-classes/Transformation"
-import { S3Manager } from "@shared-classes/StorageClient"
 import putObject from "@shared-classes/Upload/putObject"
 
 export default {
@@ -32,9 +32,7 @@ export default {
 					filePath: job.data.filePath,
 					workPath: job.data.workPath,
 					capabilities: job.data.capabilities,
-					onProgress: (progress) => {
-						job.updateProgress(progress)
-					},
+					onProgress: (progress) => job.updateProgress(progress),
 				})
 			}
 
