@@ -1,3 +1,5 @@
+import type { API } from "@services/files/files.service"
+
 import path from "node:path"
 import fs from "node:fs"
 
@@ -7,20 +9,20 @@ import bufferToStream from "@shared-utils/bufferToStream"
 
 const availableProviders = ["ovh", "b2", "standard"]
 
-export default {
-	useContexts: ["cache", "limits", "capabilities"],
+export default defineRoute<API>()({
+	useContexts: ["cache", "limits", "capabilities", "tasker", "s3"] as const,
 	useMiddlewares: ["withAuthentication"],
 	fn: async (req, res, ctx) => {
+		// @ts-ignore
+		const user_id = req.auth.session.user_id
+
 		if (!checkChunkUploadHeaders(req.headers)) {
 			throw new OperationError(400, "Missing header(s)")
 		}
 
 		const uploadId = `${req.headers["uploader-file-id"]}`
 
-		const workPath = path.resolve(
-			ctx.cache.constructor.cachePath,
-			`${req.auth.session.user_id}-${uploadId}`,
-		)
+		const workPath = path.resolve(ctx.cache.path, `${user_id}-${uploadId}`)
 		const chunksPath = path.join(workPath, "chunks")
 		const assembledPath = path.join(workPath, "assembled")
 
@@ -65,21 +67,21 @@ export default {
 
 		if (typeof assemble === "function") {
 			try {
-				assemble = await assemble()
+				const assembled = await assemble()
 
-				let transformations = req.headers["transformations"]
+				let transformations: string[]
 
-				if (transformations) {
-					transformations = transformations
+				if (req.headers["transformations"]) {
+					transformations = req.headers["transformations"]
 						.split(",")
 						.map((t) => t.trim())
 				}
 
 				const payload = {
-					filePath: assemble.filePath,
-					fileHash: assemble.fileHash,
+					filePath: assembled.filePath,
+					fileHash: assembled.fileHash,
 
-					user_id: req.auth.session.user_id,
+					user_id: user_id,
 					uploadId: uploadId,
 					workPath: workPath,
 
@@ -96,7 +98,7 @@ export default {
 					(transformations && transformations.length > 0) ||
 					(config.useCompression && !req.headers["prefer-no-job"])
 				) {
-					const job = await global.queues.createJob(
+					const job = await ctx.tasker.createJob(
 						"file-process",
 						payload,
 					)
@@ -108,7 +110,7 @@ export default {
 					}
 				}
 
-				return await Upload.fileHandle(payload)
+				return await Upload.fileHandle(payload, ctx.s3)
 			} catch (error) {
 				await fs.promises.rm(workPath, { recursive: true })
 				throw error
@@ -121,4 +123,4 @@ export default {
 			config: config,
 		}
 	},
-}
+})
