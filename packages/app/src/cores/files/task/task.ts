@@ -27,6 +27,10 @@ export type UploadProgress = {
 }
 
 export class UploadTask extends EventEmitter implements UploadTaskInternals {
+	static get chunkSizeInKB() {
+		return 8192
+	}
+
 	id: string
 	file: HashedFile
 	ready: boolean = false
@@ -38,14 +42,6 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 	custom_headers: Record<string, string> = {}
 
 	completedParts: CompletedPart[] = []
-
-	static get chunkSizeInKB() {
-		return 8192
-	}
-	get chunkSizeInBytes() {
-		return UploadTask.chunkSizeInKB * 1024
-	}
-
 	chunksNumber: number = 0
 	result: MultipartUploadCompletedResult = null
 
@@ -67,6 +63,7 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 
 	activeTimeMs: number = 0
 	lastResumeTimestamp: number = 0
+	jobId: string | null = null
 
 	private progressTimer: ReturnType<typeof setInterval> | null = null
 
@@ -82,12 +79,34 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 		if (typeof headers === "object") {
 			this.custom_headers = headers
 		}
+
+		if (this.websocket) {
+			this.websocket.on("cloud-tasks:job", this.handleJobWebsocketEvent)
+
+			this.on("finish", () => {
+				this.websocket?.off(
+					this.jobEventId,
+					this.handleJobWebsocketEvent,
+				)
+			})
+		}
+	}
+
+	get websocket() {
+		return globalThis.__comty_shared_state?.ws?.sockets?.get("main") ?? null
+	}
+
+	get chunkSizeInBytes() {
+		return UploadTask.chunkSizeInKB * 1024
+	}
+
+	get jobEventId() {
+		return `job:${this.jobId}`
 	}
 
 	start = () => {
 		if (this.result) {
-			this.emitFullProgress()
-			this.emit("finish", this.file, this.result)
+			this.complete()
 			return
 		}
 
@@ -110,10 +129,31 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 
 	resume = () => {
 		if (this.hasFatalError) return
+
 		this.paused = false
+
 		this.startProgressTicker()
 		this.emit("resumed")
 		this.processNext()
+	}
+
+	handleJobWebsocketEvent = (data) => {
+		if (data.job_id !== this.jobId) return
+
+		if (data.event === "done") {
+			this.emit("finish", this.file, data.result)
+		}
+
+		if (data.event === "error") {
+			this.emit("error", this.file, data.result)
+		}
+
+		if (data.state) {
+			this.emit("progress", this.file, {
+				percent: data.percent,
+				state: data.state ?? "Pending",
+			})
+		}
 	}
 
 	startProgressTicker = () => {

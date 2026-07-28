@@ -1,12 +1,12 @@
-import type { UploadTaskInternals } from "./internals"
 import type {
 	MultipartUploadCompletedResult,
 	MultipartUploadStartResult,
 } from "@comty/shared/types/multipart"
+import type { UploadTask } from "./task"
 
 import request from "comty.js/request"
 
-export async function initializeUpload(this: UploadTaskInternals) {
+export async function initializeUpload(this: UploadTask) {
 	this.chunksNumber = Math.ceil(this.file.size / this.chunkSizeInBytes)
 
 	this.pendingChunks = Array.from({ length: this.chunksNumber }, (_, i) => i)
@@ -27,24 +27,28 @@ export async function initializeUpload(this: UploadTaskInternals) {
 	const result = response.data as MultipartUploadStartResult &
 		MultipartUploadCompletedResult
 
+	this.object_path = response.data.object_path
+	this.upload_id = response.data.upload_id
+	this.part_urls = response.data.part_urls
+
 	if (result.status && result.status === "completed") {
 		this.result = result
 		return
 	}
 
-	this.upload_id = response.data.upload_id
-	this.object_path = response.data.object_path
-	this.part_urls = response.data.part_urls
 	this.ready = true
 }
 
-export async function completeUpload(this: UploadTaskInternals) {
+export async function completeUpload(this: UploadTask) {
 	try {
 		const response = await request({
 			method: "POST",
 			url: "/upload/parts/complete",
-			data: {
+			headers: {
 				...(this.custom_headers ?? {}),
+			},
+			data: {
+				task_id: this.id,
 				file_hash: this.file.hash,
 				upload_id: this.upload_id,
 				object_path: this.object_path,
@@ -52,7 +56,14 @@ export async function completeUpload(this: UploadTaskInternals) {
 			},
 		})
 
-		this.emit("finish", this.file, response.data)
+		if (!response.data.useWebsocketEvents) {
+			this.emit("finish", this.file, response.data)
+		} else {
+			this.jobId = response.data.jobId
+			console.log(
+				`[Task ${this.id}] Upload completed, waiting for worker job...`,
+			)
+		}
 	} catch (error: any) {
 		this.hasFatalError = true
 		this.stopProgressTicker()

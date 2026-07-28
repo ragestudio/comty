@@ -1,3 +1,4 @@
+import type { HashedFile } from "@comty/shared/types/files"
 import type { FilesCore } from "../files.core"
 import type { UploadTask } from "./task"
 
@@ -20,7 +21,7 @@ export class UploadTasksManager extends EventEmitter {
 			this.running_ids = this.running_ids.filter((id) => id !== task.id)
 		}
 
-		const taskError = (error: Error) => {
+		const taskError = (file: HashedFile, error: Error) => {
 			this.core.console.error(`Task [${task.id}] error. >`, error)
 
 			removeFromRunning()
@@ -33,8 +34,11 @@ export class UploadTasksManager extends EventEmitter {
 			this.emit(`task-${task.id}-error`, error)
 		}
 
-		const taskFinish = (result: any) => {
-			this.core.console.debug(`Task [${task.id}] finished. >`, result)
+		const taskFinish = (file: HashedFile, result: any) => {
+			this.core.console.debug(`Task [${task.id}] finished. >`, {
+				file,
+				result,
+			})
 
 			removeFromRunning()
 			this.tick()
@@ -55,19 +59,19 @@ export class UploadTasksManager extends EventEmitter {
 					await task.initialize()
 				}
 
-				task.once("finish", (result) => {
-					taskFinish(result)
+				task.once("finish", (file, result) => {
+					taskFinish(file, result)
 					resolve(result)
 				})
 
-				task.once("error", (e) => {
-					taskError(e)
+				task.once("error", (file, e) => {
+					taskError(file, e)
 					reject(e)
 				})
 
 				task.start()
 			} catch (e) {
-				taskError(e)
+				taskError(null, e)
 				reject(e)
 			}
 		})

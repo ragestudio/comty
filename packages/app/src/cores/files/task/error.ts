@@ -1,7 +1,7 @@
-import type { UploadTaskInternals } from "./internals"
+import type { UploadTask } from "./task"
 
 export function handleChunkError(
-	this: UploadTaskInternals,
+	this: UploadTask,
 	chunkIndex: number,
 	error: Error,
 ) {

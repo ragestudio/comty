@@ -1,11 +1,8 @@
-import type { UploadTaskInternals } from "./internals"
+import type { UploadTask } from "./task"
 
 import { getChunkSize, getChunkBlob } from "../utils/chunk"
 
-export async function uploadChunk(
-	this: UploadTaskInternals,
-	chunkIndex: number,
-) {
+export async function uploadChunk(this: UploadTask, chunkIndex: number) {
 	const chunkBlob = getChunkBlob(chunkIndex, this.chunkSizeInBytes, this.file)
 	const targetUrl = this.part_urls[chunkIndex]
 

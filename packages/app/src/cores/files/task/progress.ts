@@ -1,9 +1,8 @@
-import type { UploadTaskInternals } from "./internals"
-import type { UploadProgress } from "./task"
+import type { UploadTask, UploadProgress } from "./task"
 
 import { formatSpeed } from "../utils/format"
 
-export function emitFullProgress(this: UploadTaskInternals) {
+export function emitFullProgress(this: UploadTask) {
 	this.emit("progress", this.file, {
 		percent: 100,
 		bytesUploaded: this.file.size,
@@ -17,10 +16,7 @@ export function emitFullProgress(this: UploadTaskInternals) {
 	} as UploadProgress)
 }
 
-export function emitProgress(
-	this: UploadTaskInternals,
-	completedChunkIndex?: number,
-) {
+export function emitProgress(this: UploadTask, completedChunkIndex?: number) {
 	let activeBytes = 0
 	for (const bytes of this.activeChunkBytes.values()) {
 		activeBytes += bytes
