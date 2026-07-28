@@ -107,13 +107,12 @@ export default class TaskQueueManager {
 			if (!global.websockets) return
 			if (typeof global.websockets?.senders?.toUserId !== "function")
 				return
-			if (!job || !job.data) return
-			if (!job.data.useWebsocketEvents) return
+			if (!job || !job?.data) return
 			if (!job.data.user_id) return
 
 			await global.websockets.senders.toUserId(
 				job.data.user_id,
-				`cloud-tasks:job`,
+				`tasks:job`,
 				{
 					job_id: job.id,
 					...payload,
