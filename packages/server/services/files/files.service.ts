@@ -43,13 +43,13 @@ export class API extends Server {
 		capabilities: new Capabilities(),
 		multipartUpload: null as Multipart,
 		s3: new S3Manager(),
+		tasker: new TaskQueueManager({
+			workersPath: `${__dirname}/queues`,
+		}),
 	}
 
-	queuesManager = (global.queues = new TaskQueueManager({
-		workersPath: `${__dirname}/queues`,
-	}))
-
 	initialize = [
+		() => this.contexts.capabilities.initialize(),
 		() => this.contexts.db.initialize(),
 		() =>
 			this.contexts.scylla.initialize({
@@ -57,10 +57,9 @@ export class API extends Server {
 			}),
 		() => this.contexts.redis.initialize(),
 		() =>
-			this.queuesManager.initialize({
+			this.contexts.tasker.initialize({
 				redisOptions: this.contexts.redis.client,
 			}),
-		() => this.contexts.capabilities.initialize(),
 	]
 
 	async onInitialize() {
@@ -97,6 +96,8 @@ export class API extends Server {
 			this.contexts.s3.getDefaultService(),
 			this.contexts.limits,
 		)
+
+		global.storages = this.contexts.s3
 
 		console.log({
 			capabilities: this.contexts.capabilities,
