@@ -45,6 +45,7 @@ export default async function (
 		if (uploadEntry.status === "COMPLETED") {
 			return {
 				status: "completed",
+				upload_id: uploadEntry.upload_id,
 				...(await this.composeObjectData(
 					objectPath,
 					this.entryToStat(uploadEntry),
