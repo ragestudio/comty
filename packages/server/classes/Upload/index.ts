@@ -9,6 +9,7 @@ import getFileHash from "@shared-utils/readFileHash"
 
 import putObject from "./putObject"
 import Transformation from "../Transformation"
+import { S3Manager } from "@shared-classes/StorageClient"
 
 export type FileHandlePayload = {
 	filePath: string
@@ -46,7 +47,10 @@ export type FileIntegrityResult = {
 }
 
 export default class Upload {
-	static fileHandle = async (payload: FileHandlePayload) => {
+	static fileHandle = async (
+		payload: FileHandlePayload,
+		s3_providers: S3Manager,
+	) => {
 		const integrityCheck = await Upload.validateFileIntegrity(
 			payload.filePath,
 		)
@@ -74,16 +78,19 @@ export default class Upload {
 			payload.filePath = processed.filePath
 		}
 
-		const result = await Upload.toS3({
-			filePath: payload.filePath,
-			fileHash: payload.fileHash,
+		const result = await Upload.toS3(
+			{
+				originalFilename: payload.originalFilename,
+				filePath: payload.filePath,
+				fileHash: payload.fileHash,
 
-			targetPath: payload.targetPath,
-			basePath: payload.user_id,
-			onProgress: payload.onProgress,
-			s3Provider: payload.s3Provider,
-			originalFilename: payload.originalFilename,
-		})
+				targetPath: payload.targetPath,
+				basePath: payload.user_id,
+				onProgress: payload.onProgress,
+				//s3Provider: payload.s3Provider,
+			},
+			s3_providers,
+		)
 
 		await fs.promises.rm(payload.workPath, { recursive: true, force: true })
 
@@ -115,14 +122,14 @@ export default class Upload {
 		return payload
 	}
 
-	static toS3 = async (payload: S3UploadPayload) => {
+	static toS3 = async (payload: S3UploadPayload, providers: S3Manager) => {
 		const {
 			filePath,
 			fileHash,
 
 			basePath,
 			targetPath,
-			s3Provider,
+			//s3Provider,
 			onProgress,
 			originalFilename,
 		} = payload
@@ -158,9 +165,9 @@ export default class Upload {
 			uploadPath: uploadPath,
 			metadata: metadata,
 			targetFilename: isDirectory ? path.basename(targetPath!) : null,
-			provider: s3Provider,
 			onProgress: onProgress,
 			onFinish: () => {},
+			providerClass: providers.getDefaultService(),
 		})
 
 		return result

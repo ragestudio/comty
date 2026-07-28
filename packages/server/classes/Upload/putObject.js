@@ -9,12 +9,12 @@ export default async function putObject({
 	targetFilename,
 	onFinish,
 	onProgress,
-	provider = "standard",
+	providerClass,
 }) {
-	const providerClass = global.storages[provider]
+	//const providerClass = global.storages[provider]
 
 	if (!providerClass) {
-		throw new Error(`Provider [${provider}] not found`)
+		throw new Error(`S3 Provider not found`)
 	}
 
 	const isDirectory = await fs.promises
@@ -42,8 +42,8 @@ export default async function putObject({
 			return {
 				filePath: newPath,
 				uploadPath: path.join(uploadPath, file),
-				provider: provider,
 				onFinish: handleProgress,
+				providerClass: providerClass,
 			}
 		})
 
@@ -60,7 +60,7 @@ export default async function putObject({
 
 	// upload to storage
 	await providerClass.fPutObject(
-		process.env.S3_BUCKET,
+		providerClass.defaultBucket,
 		uploadPath,
 		filePath,
 		metadata,
