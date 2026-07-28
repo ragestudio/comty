@@ -81,7 +81,7 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 		}
 
 		if (this.websocket) {
-			this.websocket.on("cloud-tasks:job", this.handleJobWebsocketEvent)
+			this.websocket.on("tasks:job", this.handleJobWebsocketEvent)
 
 			this.on("finish", () => {
 				this.websocket?.off(
@@ -90,6 +90,13 @@ export class UploadTask extends EventEmitter implements UploadTaskInternals {
 				)
 			})
 		}
+
+		this.on("finish", (...args) => {
+			this.emit("finally", ...args)
+		})
+		this.on("error", (...args) => {
+			this.emit("finally", ...args)
+		})
 	}
 
 	get websocket() {

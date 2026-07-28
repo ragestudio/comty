@@ -7,6 +7,7 @@ export type UploadMethodHandlers = {
 	onFinish: (file: HashedFile, result: any) => void
 	onError: (e: Error) => void
 	onProgress: (file: HashedFile, progress: UploadProgress) => void
+	onFinally: (file: HashedFile, result: any) => void
 }
 
 export default async function (
@@ -33,6 +34,9 @@ export default async function (
 		}
 		if (typeof handlers?.onProgress === "function") {
 			task.on("progress", handlers.onProgress)
+		}
+		if (typeof handlers?.onFinally === "function") {
+			task.on("finally", handlers.onFinally)
 		}
 
 		resolvePromises.push(this.tasks.add(task))

@@ -50,7 +50,7 @@ export class UploadTasksManager extends EventEmitter {
 			this.emit(`task-${task.id}-finish`, result)
 		}
 
-		return new Promise(async (resolve, reject) => {
+		return new Promise(async (resolve) => {
 			try {
 				this.core.console.log(`Task [${task.id}] started`)
 				this.running_ids.push(task.id)
@@ -66,13 +66,13 @@ export class UploadTasksManager extends EventEmitter {
 
 				task.once("error", (file, e) => {
 					taskError(file, e)
-					reject(e)
+					resolve(e)
 				})
 
 				task.start()
 			} catch (e) {
 				taskError(null, e)
-				reject(e)
+				resolve(e)
 			}
 		})
 	}
@@ -81,10 +81,10 @@ export class UploadTasksManager extends EventEmitter {
 		if (this.running_ids.length >= UploadTasksManager.maxTasks) {
 			return false
 		}
-
 		if (this.queue.length === 0) {
 			return false
 		}
+
 		const tasksToStart = this.queue
 			.splice(0, UploadTasksManager.maxTasks - this.running_ids.length)
 			.filter((t) => t)
