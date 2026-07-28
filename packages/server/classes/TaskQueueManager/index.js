@@ -51,57 +51,27 @@ export default class TaskQueueManager {
 
 	registerQueueEvents = (worker) => {
 		worker.on("progress", (job, progress) => {
-			try {
-				if (job.data.useWebsocketEvents && job.data.user_id) {
-					global.websockets.senders.toUserId(
-						job.data.user_id,
-						`job:${job.data.uploadId}`,
-						progress,
-					)
-				}
-			} catch (error) {
-				console.error(error)
-			}
+			this.toClientSocket(job, progress)
 		})
 
 		worker.on("completed", (job, result) => {
-			try {
-				console.debug(`Job [${job.id}] completed with result:`, result)
+			console.debug(`Job [${job.id}] completed with result:`, result)
 
-				if (job.data.useWebsocketEvents && job.data.user_id) {
-					global.websockets.senders.toUserId(
-						job.data.user_id,
-						`job:${job.data.uploadId}`,
-						{
-							event: "done",
-							state: "done",
-							result: result,
-						},
-					)
-				}
-			} catch (error) {
-				console.error(error)
-			}
+			this.toClientSocket(job, {
+				event: "done",
+				state: "done",
+				result: result,
+			})
 		})
 
 		worker.on("failed", (job, error) => {
-			try {
-				console.error(`Job [${job.id}] failed:`, error)
+			console.error(`Job [${job.id}] failed:`, error)
 
-				if (job.data.useWebsocketEvents && job.data.user_id) {
-					global.websockets.senders.toUserId(
-						job.data.user_id,
-						`job:${job.data.uploadId}`,
-						{
-							event: "error",
-							state: "error",
-							result: error.message,
-						},
-					)
-				}
-			} catch (error) {
-				console.error(error)
-			}
+			this.toClientSocket(job, {
+				event: "error",
+				state: "error",
+				result: error.message,
+			})
 		})
 	}
 
@@ -113,25 +83,13 @@ export default class TaskQueueManager {
 		}
 
 		const job = await queue.add("default", data)
-
-		if (
-			typeof data.user_id === "string" &&
-			data.useWebsocketEvents &&
-			global.websockets &&
-			typeof global.websockets.senders?.toUserId === "function"
-		) {
-			await global.websockets.senders.toUserId(
-				data.user_id,
-				`job:${data.uploadId}`,
-				{
-					event: "job_queued",
-					state: "progress",
-					percent: 5,
-				},
-			)
-		}
-
 		console.log(`[JOB] Created new job with ID [${job.id}]`)
+
+		this.toClientSocket(job, {
+			event: "job_queued",
+			state: "progress",
+			percent: 5,
+		})
 
 		return job
 	}
@@ -142,5 +100,32 @@ export default class TaskQueueManager {
 		queues.forEach((queue) => queue.close())
 
 		console.log("All queues have been closed")
+	}
+
+	toClientSocket = async (job, payload) => {
+		try {
+			if (!global.websockets) return
+			if (typeof global.websockets?.senders?.toUserId !== "function")
+				return
+			if (!job || !job.data) return
+			if (!job.data.useWebsocketEvents) return
+			if (!job.data.user_id) return
+
+			await global.websockets.senders.toUserId(
+				job.data.user_id,
+				`cloud-tasks:job`,
+				{
+					job_id: job.id,
+					...payload,
+				},
+			)
+			// await global.websockets.senders.toUserId(
+			// 	job.data.user_id,
+			// 	`job:${job.id}`,
+			// 	payload,
+			// )
+		} catch (err) {
+			console.error("Error sending job data to client socket:", err)
+		}
 	}
 }
