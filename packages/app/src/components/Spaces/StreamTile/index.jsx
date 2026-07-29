@@ -15,12 +15,15 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 
 	const videoRef = React.useRef(null)
 	const containerRef = React.useRef(null)
+	const idleTimeoutRef = React.useRef(null)
 
 	const [isLoading, setIsLoading] = React.useState(false)
 	const [hasError, setHasError] = React.useState(false)
 	const [mediaStream, setMediaStream] = React.useState(null)
 	const [volume, setLocalVolume] = React.useState(100)
+
 	const [isFullscreen, setIsFullscreen] = React.useState(false)
+	const [isIdle, setIsIdle] = React.useState(false)
 
 	const { getVolume, setVolume } = useStreamVolumePersistence()
 
@@ -94,6 +97,52 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 				handleFullscreenChange,
 			)
 	}, [])
+
+	const resetIdleTimer = React.useCallback(() => {
+		if (!isFullscreen) return
+
+		setIsIdle(false)
+
+		if (idleTimeoutRef.current) {
+			clearTimeout(idleTimeoutRef.current)
+		}
+
+		idleTimeoutRef.current = setTimeout(() => {
+			setIsIdle(true)
+		}, 1000)
+	}, [isFullscreen])
+
+	const handleMouseMove = React.useCallback(() => {
+		if (isFullscreen) {
+			resetIdleTimer()
+		}
+	}, [isFullscreen, resetIdleTimer])
+
+	const handleMouseLeave = React.useCallback(() => {
+		if (isFullscreen) {
+			setIsIdle(true)
+			if (idleTimeoutRef.current) {
+				clearTimeout(idleTimeoutRef.current)
+			}
+		}
+	}, [isFullscreen])
+
+	React.useEffect(() => {
+		if (isFullscreen) {
+			resetIdleTimer()
+		} else {
+			setIsIdle(false)
+			if (idleTimeoutRef.current) {
+				clearTimeout(idleTimeoutRef.current)
+			}
+		}
+
+		return () => {
+			if (idleTimeoutRef.current) {
+				clearTimeout(idleTimeoutRef.current)
+			}
+		}
+	}, [isFullscreen, resetIdleTimer])
 
 	const onVolumeChange = React.useCallback(
 		(value) => {
@@ -198,11 +247,14 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 		<motion.div
 			layout
 			onClick={handleTileClick}
+			onMouseMove={handleMouseMove}
+			onMouseLeave={handleMouseLeave}
 			className={classnames("video-stream-tile", {
 				[`video-stream-tile--${mode}`]: mode !== "grid",
 				"video-stream-tile--active": hasVideo,
 				"video-stream-tile--error": hasError,
 				"video-stream-tile--loading": isLoading,
+				"video-stream-tile--fullscreen-idle": isFullscreen && isIdle,
 			})}
 			initial={{ opacity: 0, scale: 0.9 }}
 			animate={{ opacity: 1, scale: 1 }}
