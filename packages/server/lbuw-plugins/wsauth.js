@@ -5,7 +5,7 @@ function OnWebsocketConnection({ Ctx }) {
 			Method: "GET",
 			Url: "/users/self",
 			Headers: {
-				Authorization: `Bearer ${Ctx.Token}`,
+				Authorization: `${Ctx.TokenType} ${Ctx.Token}`,
 			},
 		})
 
