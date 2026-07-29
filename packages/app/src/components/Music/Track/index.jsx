@@ -163,9 +163,6 @@ const Track = React.memo((props) => {
 				>
 					<div className="music-track_titles">
 						<span className="music-track_title">
-							{props.track.service === "tidal" && (
-								<Icons.SiTidal />
-							)}
 							{props.track.title}
 						</span>
 

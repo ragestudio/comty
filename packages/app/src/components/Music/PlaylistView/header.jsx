@@ -86,13 +86,6 @@ const PlaylistHeader = ({
 					</div>
 
 					<div className="play_info_statistics">
-						{playlist.service === "tidal" && (
-							<div className="play_info_statistics_item">
-								<p>
-									<Icons.SiTidal /> From Tidal
-								</p>
-							</div>
-						)}
 						{PlaylistTypeDecorators[playlistType] && (
 							<div className="play_info_statistics_item">
 								{PlaylistTypeDecorators[playlistType]()}

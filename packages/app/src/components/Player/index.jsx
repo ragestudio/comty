@@ -33,13 +33,6 @@ const ServiceIndicator = (props) => {
 	}
 
 	switch (props.service) {
-		case "tidal": {
-			return (
-				<div className="service_indicator">
-					<Icons.SiTidal />
-				</div>
-			)
-		}
 		default: {
 			return null
 		}

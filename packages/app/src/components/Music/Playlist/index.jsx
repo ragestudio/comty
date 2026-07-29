@@ -80,13 +80,6 @@ const Playlist = (props) => {
 
 				{props.row && (
 					<div className="playlist_details">
-						{playlist.service === "tidal" && (
-							<p>
-								<Icons.SiTidal />
-								Tidal
-							</p>
-						)}
-
 						<p>
 							<Icons.Music2 />
 							{playlist.type ?? "playlist"}
