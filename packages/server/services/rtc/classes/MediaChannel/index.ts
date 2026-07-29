@@ -374,6 +374,10 @@ export class MediaChannel {
 			)
 
 			for (const otherClient of otherClients) {
+				if (otherClient.staled || !otherClient.emit) {
+					continue
+				}
+
 				await otherClient.emit(event, payload)
 			}
 		} catch (error) {
@@ -392,6 +396,10 @@ export class MediaChannel {
 	async broadcastToClients(event: string, payload: any) {
 		try {
 			for (const client of this.clients) {
+				if (client.staled || !client.emit) {
+					continue
+				}
+
 				await client.emit(event, payload)
 			}
 		} catch (error) {
