@@ -17,6 +17,7 @@ const Slider = ({
 	valueFormat,
 	marks = false,
 	className = "",
+	style,
 }) => {
 	const isControlled = controlledValue !== undefined
 	const [internalValue, setInternalValue] = React.useState(
@@ -244,6 +245,7 @@ const Slider = ({
 			aria-disabled={disabled}
 			tabIndex={disabled ? -1 : 0}
 			onKeyDown={handleKeyDown}
+			style={style}
 		>
 			<div className="slider-track">
 				<div
@@ -287,6 +289,7 @@ Slider.propTypes = {
 	valueFormat: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
 	marks: PropTypes.oneOfType([PropTypes.bool, PropTypes.object]),
 	className: PropTypes.string,
+	style: PropTypes.object,
 }
 
 Slider.defaultProps = {
@@ -303,6 +306,7 @@ Slider.defaultProps = {
 	valueFormat: null,
 	marks: false,
 	className: "",
+	style: null,
 }
 
 export default Slider
