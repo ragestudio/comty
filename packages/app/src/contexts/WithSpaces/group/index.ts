@@ -2,20 +2,19 @@ import React from "react"
 // @ts-ignore
 import GroupsModel from "@models/groups"
 import buildSocketEvents from "./events"
-import UsersModel from "@models/user"
-import {
-	cacheGroup,
-	cacheChannels,
-	cacheMembers,
-	cacheTotalMembers,
-	resolveCachedMembersUsers,
-} from "../helpers/cache"
-
-import db from "../store"
+import { cacheGroup, cacheChannels, cacheMembers } from "../helpers/cache"
 
 import type { Group } from "../collections/group"
-import type { Channel, Channels, StatedChannel } from "../collections/channel"
+import type { Channels, StatedChannel } from "../collections/channel"
 import type { Member, Members } from "../collections/member"
+
+import { useGroupData } from "./hooks/useGroupData"
+import { useGroupChannels } from "./hooks/useGroupChannels"
+import { useGroupMembers } from "./hooks/useGroupMembers"
+import { useRTCChannels } from "./hooks/useRTCChannels"
+import { useMembersConnections } from "./hooks/useMembersConnections"
+import { useMembersDecorations } from "./hooks/useMembersDecorations"
+import { useGroupLoad } from "./hooks/useGroupLoad"
 
 const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
@@ -28,17 +27,6 @@ export interface EventsUpdaters {
 		React.SetStateAction<Record<string, StatedChannel>>
 	>
 }
-
-export interface CachedGroup {
-	group: Group | null
-
-	memberships: Member[] | null
-	total_members: number | null
-
-	channels: Channels | null
-}
-
-const INITIAL_CACHE_PAGE_SIZE = 50
 
 const DEFAULT_CHANNELS_STATE = () => ({
 	items: [],
@@ -70,353 +58,53 @@ const DEFAULT_GROUP_STATE = () => ({
 	},
 })
 
-export type UserConnectionReference = {
-	connected: boolean
-}
+export type { UserConnectionReference } from "./hooks/useMembersConnections"
+export type { CachedGroup } from "./hooks/useGroupLoad"
 
-const useGroup = ({ group_id }) => {
+const useGroup = ({ group_id }: { group_id: string }) => {
 	if (!group_id) {
 		throw new Error("group_id is required")
 	}
 
-	const socket = React.useRef(app.cores.api.socket())
+	const socket = React.useRef((app as any).cores.api.socket())
 
-	const [loading, setLoading] = React.useState<boolean>(true)
-	const [error, setError] = React.useState<Error | null>(null)
+	const { data, setData, fetchGroup } = useGroupData(group_id)
+	const { channels, setChannels, fetchChannels } = useGroupChannels(group_id)
 
-	const [data, setData] = React.useState<Group>(null)
-	const [members, setMembers] = React.useState<Members>(null)
-	const [channels, setChannels] = React.useState<Channels>(null)
+	const {
+		connectedMembers,
+		setConnectedMembers,
+		usersConnectionsRef,
+		evaluateMembersConnections,
+	} = useMembersConnections(group_id)
+	const {
+		membersDecorations,
+		setMembersDecorations,
+		fetchedDecorationsRef,
+		evaluateMembersDecorations,
+	} = useMembersDecorations()
 
-	const [connectedMembers, setConnectedMembers] = React.useState<string[]>([])
-	const [membersDecorations, setMembersDecorations] = React.useState<
-		Record<string, any>
-	>({})
-	const [statedChannels, setStatedChannels] = React.useState<
-		Record<string, StatedChannel>
-	>({})
-
-	const usersConnectionsRef: Map<string, UserConnectionReference> = new Map()
-	const fetchedDecorationsRef = React.useRef<Set<string>>(new Set())
-	const lastLoadedMemberId = React.useRef<string | null>(null)
-
-	const fetchGroup = React.useCallback(async () => {
-		const res = await GroupsModel.get(group_id)
-
-		setData(res)
-		await cacheGroup(res)
-
-		return res
-	}, [group_id])
-
-	const fetchChannels = React.useCallback(async () => {
-		const res = await GroupsModel.channels.list(group_id)
-
-		setChannels(res)
-		await cacheChannels(group_id, res)
-
-		return res
-	}, [group_id])
-
-	const fetchMembers = React.useCallback(async () => {
-		try {
-			const res = await GroupsModel.members.list(group_id, {
-				offset: lastLoadedMemberId.current,
-			})
-
-			if (res.items.length > 0) {
-				lastLoadedMemberId.current = res.items[0]._id
-			}
-
-			setMembers((prev) => {
-				const existingIds = new Set(
-					(prev?.items || []).map((m) => m._id),
-				)
-
-				const newItems = res.items.filter(
-					(item) => !existingIds.has(item._id),
-				)
-
-				const mergedItems = [...(prev?.items || []), ...newItems]
-
-				return {
-					items: mergedItems,
-					total_items: res.total_items,
-					has_more: mergedItems.length < res.total_items,
-				}
-			})
-
-			await cacheMembers(group_id, res)
-			await cacheTotalMembers(group_id, res.total_items)
-
-			evaluateMembersConnections(res.items)
-			evaluateMembersDecorations(res.items)
-
-			return res
-		} catch (err) {
-			console.error("Error fetching more members:", err)
-		}
-	}, [group_id])
-
-	const syncStatedRTCChannels = React.useCallback(async () => {
-		console.debug("[rtc] gathering state")
-
-		const state = (await GroupsModel.rtc.getGroupState(
+	const { members, setMembers, fetchMembers, lastLoadedMemberId } =
+		useGroupMembers(
 			group_id,
-		)) as StatedChannel[]
+			evaluateMembersConnections,
+			evaluateMembersDecorations,
+		)
+	const { statedChannels, setStatedChannels, syncStatedRTCChannels } =
+		useRTCChannels(group_id)
 
-		console.debug("[rtc] gathered state:", state)
-
-		if (Array.isArray(state)) {
-			setStatedChannels(
-				state.reduce((curr, channel) => {
-					curr[channel._id] = channel
-					return curr
-				}, {}),
-			)
-		}
-
-		return state
-	}, [group_id])
-
-	const evaluateMembersConnections = React.useCallback(
-		async (members: Member[]) => {
-			console.debug("[members] evaluating:", members)
-
-			if (members.length === 0) return
-
-			let missingReferences = []
-
-			for (const member of members) {
-				if (!usersConnectionsRef.has(member.user_id)) {
-					missingReferences.push(member.user_id)
-				}
-			}
-
-			console.debug("[members] missing refs:", missingReferences)
-
-			const states = await GroupsModel.members.connections(
-				group_id,
-				missingReferences,
-			)
-
-			if (!Array.isArray(states)) return
-
-			console.log("[members] computing ref states:", states)
-
-			for (const memberState of states) {
-				usersConnectionsRef.set(memberState.userId, memberState)
-
-				setConnectedMembers((prev) => {
-					const newState = [...prev]
-
-					if (
-						memberState.connected &&
-						!newState.includes(memberState.userId)
-					) {
-						newState.push(memberState.userId)
-					} else if (
-						!memberState.connected &&
-						newState.includes(memberState.userId)
-					) {
-						return newState.filter(
-							(id) => id !== memberState.userId,
-						)
-					}
-
-					return newState
-				})
-			}
-		},
-		[group_id, setConnectedMembers, usersConnectionsRef],
-	)
-
-	const evaluateMembersDecorations = React.useCallback(
-		async (membersList: Member[]) => {
-			if (!membersList || membersList.length === 0) return
-
-			const missingIds = membersList
-				.map((m) => m.user_id)
-				.filter((id) => !fetchedDecorationsRef.current.has(id))
-
-			if (missingIds.length === 0) return
-
-			for (const id of missingIds) {
-				fetchedDecorationsRef.current.add(id)
-			}
-
-			console.debug(
-				"[decorations] fetching missing decorations for:",
-				missingIds.length,
-				"users",
-			)
-
-			try {
-				// Fetcheamos en lote
-				const users_ids = missingIds.join(",")
-				const fetchedData =
-					await UsersModel.V2.decorations.get(users_ids)
-
-				if (Array.isArray(fetchedData)) {
-					setMembersDecorations((prev) => {
-						const newDecorationsDict = fetchedData.reduce(
-							(acc, curr) => {
-								acc[curr.user_id] = curr.decorations || {}
-								return acc
-							},
-							{},
-						)
-
-						return { ...prev, ...newDecorationsDict }
-					})
-				}
-			} catch (err) {
-				console.error("[decorations] Failed to fetch decorations:", err)
-
-				for (const id of missingIds) {
-					fetchedDecorationsRef.current.delete(id)
-				}
-			}
-		},
-		[],
-	)
-
-	const deferredCacheChecking = async (cached: CachedGroup) => {
-		try {
-			console.debug("[cache] checking", { cached })
-
-			const meta = await GroupsModel.meta(group_id)
-
-			console.debug("[cache] actual meta:", meta)
-
-			if (cached.group?.__v < meta.group_v) {
-				console.debug("[cache] group_v invalidated", {
-					cached: cached.group?.__v,
-					actual: meta.group_v,
-				})
-				await fetchGroup()
-			}
-
-			const knownTotal = Math.max(
-				cached.total_members ?? 0,
-				cached.memberships?.length ?? 0,
-			)
-			if (knownTotal < (meta.total_members ?? 0)) {
-				console.debug("[cache] total_members invalidated", {
-					knownTotal,
-					actual: meta.total_members,
-				})
-				await fetchMembers()
-			}
-
-			if (
-				(cached.channels?.total_items ?? 0) < (meta.total_channels ?? 0)
-			) {
-				console.debug("[cache] channels.total_items invalidated", {
-					cached: cached.channels?.total_items,
-					actual: meta.total_channels,
-				})
-				await fetchChannels()
-			}
-		} catch (err) {
-			console.error("[cache] check fail:", err)
-		}
-	}
-
-	const load = React.useCallback(async () => {
-		setLoading(true)
-		setError(null)
-
-		let cached = {
-			group: null,
-
-			memberships: null,
-			total_members: 0,
-
-			channels: null,
-		} as CachedGroup
-
-		try {
-			cached.group = await db.groups.get(group_id)
-
-			cached.channels = await db.channels.get(group_id)
-
-			cached.memberships = await db.members
-				.where("group_id")
-				.equals(group_id)
-				.limit(INITIAL_CACHE_PAGE_SIZE)
-				.toArray()
-
-			cached.total_members =
-				(await db.members_counter.get(group_id))?.counter ?? 0
-		} catch (error) {
-			console.error("Failed to get cached content", error)
-		}
-
-		console.log("useGroup::load()", {
-			group_id,
-			cached,
-		})
-
-		try {
-			//
-			// fetch the group data,
-			// if the group data is not cached
-			//
-			if (!cached.group || !cached.group?.cached_at) {
-				cached.group = await fetchGroup()
-			} else {
-				setData(cached.group)
-			}
-
-			//
-			// fetch the members list
-			// if the members list is not cached or is empty
-			//
-			if (!cached.memberships || cached.memberships.length === 0) {
-				await fetchMembers()
-			} else {
-				// inject user data from users cache into memberships
-				cached.memberships = await resolveCachedMembersUsers(
-					cached.memberships,
-				)
-
-				setMembers({
-					items: cached.memberships,
-					total_items: cached.total_members,
-					has_more: cached.total_members > cached.memberships.length,
-				})
-
-				evaluateMembersConnections(cached.memberships)
-				evaluateMembersDecorations(cached.memberships)
-			}
-
-			//
-			// fetch the channels list
-			// if the channels list is not cached or is empty
-			//
-			if (!cached.channels || !cached.channels?.cached_at) {
-				cached.channels = await fetchChannels()
-			} else {
-				setChannels(cached.channels)
-			}
-		} catch (err) {
-			console.error(err)
-			setError(err as Error)
-		} finally {
-			setLoading(false)
-
-			//
-			// check the cache
-			//
-			deferredCacheChecking(cached)
-
-			//
-			// sync the stated RTC channels
-			//
-			await syncStatedRTCChannels()
-		}
-	}, [group_id, data, members, channels])
+	const { loading, error, load } = useGroupLoad({
+		group_id,
+		fetchGroup,
+		setData,
+		fetchMembers,
+		setMembers,
+		evaluateMembersConnections,
+		evaluateMembersDecorations,
+		fetchChannels,
+		setChannels,
+		syncStatedRTCChannels,
+	})
 
 	React.useEffect(() => {
 		if (error) {
