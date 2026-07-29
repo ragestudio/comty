@@ -154,10 +154,7 @@ export default class AuthManager {
 			{
 				token: SessionModel.token,
 				refreshToken: SessionModel.refreshToken,
-				endpoint: new URL(
-					"/auth",
-					globalThis.__comty_shared_state.mainOrigin,
-				).toString(),
+				endpoint: `${globalThis.__comty_shared_state.mainOrigin}/auth`,
 				method: "POST",
 			},
 			Comlink.proxy(() => {
