@@ -122,8 +122,6 @@ const MemberBackgroundDecoration = ({
 	const mediaRef = React.useRef(null)
 
 	React.useEffect(() => {
-		console.log(playing)
-
 		if (!mediaRef.current) return undefined
 
 		if (playing) {
