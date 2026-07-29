@@ -5,8 +5,6 @@ import Consumer from "./Consumer"
 type ScreenAudioObjects = {
 	stream: MediaStream
 	source: MediaStreamAudioSourceNode
-	gainNode: GainNode
-	destination: AudioNode
 }
 
 export class Screen {
@@ -20,12 +18,23 @@ export class Screen {
 
 	audioObjs: ScreenAudioObjects[] = []
 	audioGainNode: GainNode = null
-	shouldMuteVideo: boolean = false
 
 	consumersIds = []
 
 	get rtc() {
 		return app.cores.mediartc.instance() as MediaRTCCore
+	}
+
+	get isSysAudioOutputAvailable() {
+		return !!(
+			this.rtc.self.sysAudio &&
+			this.rtc.self.sysAudio.outputCtx &&
+			this.rtc.self.sysAudio.pcmOutputWorklet
+		)
+	}
+
+	get shouldMuteVideo() {
+		return this.isSysAudioOutputAvailable
 	}
 
 	start = async () => {
@@ -118,32 +127,20 @@ export class Screen {
 	}
 
 	attachToSAOutput = (track: MediaStreamTrack) => {
-		const hasSysAudio = !!(
-			this.rtc.self.sysAudio && this.rtc.self.sysAudio.outputCtx
-		)
-
-		// only route through sysaudio native output, never through voice audioOutput
-		// voice path is for low-latency speech and gets silenced on deafen
-		if (!hasSysAudio) return false
+		if (!this.isSysAudioOutputAvailable) return false
 
 		const ctx = this.rtc.self.sysAudio.outputCtx
-		const destination = this.rtc.self.sysAudio.outputBus
-
-		if (!ctx || !destination) return false
 
 		const stream = new MediaStream([track])
 		const source = ctx.createMediaStreamSource(stream)
-		const gainNode = ctx.createGain()
-		gainNode.gain.value = 1
 
-		source.connect(gainNode)
-		gainNode.connect(destination)
+		this.audioGainNode = ctx.createGain()
+		this.audioGainNode.gain.value = 1
 
-		this.audioObjs.push({ stream, source, gainNode, destination })
-		this.audioGainNode = gainNode
+		source.connect(this.audioGainNode)
+		this.audioGainNode.connect(this.rtc.self.sysAudio.pcmOutputWorklet)
 
-		// signal that video should be muted since audio goes through sysaudio
-		this.shouldMuteVideo = true
+		this.audioObjs.push({ stream, source })
 
 		return true
 	}
@@ -151,15 +148,14 @@ export class Screen {
 	detachAudio = () => {
 		for (const node of this.audioObjs) {
 			try {
-				node.source.disconnect()
-				node.gainNode.disconnect()
 				node.stream.getTracks().forEach((t) => t.stop())
+				node.source.disconnect()
+				this.audioGainNode.disconnect()
 			} catch (e) {}
 		}
 
 		this.audioObjs = []
 		this.audioGainNode = null
-		this.shouldMuteVideo = false
 	}
 
 	setVolume = (volume) => {
