@@ -100,18 +100,23 @@ const useTracksManager = (initialTracks = [], updater) => {
 
 	const uploadToStorage = React.useCallback(
 		async (req) => {
-			await queuedUploadFile(req.file, {
-				onFinish: (file, response) => {
-					req.onSuccess(response)
+			await app.cores.files.upload(
+				[req.file],
+				{
+					onError: req.onError,
+					onFinish: (file, response) => {
+						req.onSuccess(response)
+					},
+					onProgress: (file, progress) => {
+						updateUploadProgress(file.uid, progress)
+					},
 				},
-				onError: req.onError,
-				onProgress: (file, progress) => {
-					updateUploadProgress(file.uid, progress)
-				},
-				headers: {
+				{
+					// important to set transformations to "a-dash" to properly generate
+					// an audio segmented file.
 					transformations: "a-dash",
 				},
-			})
+			)
 		},
 		[updateUploadProgress],
 	)
