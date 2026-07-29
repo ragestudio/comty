@@ -46,34 +46,66 @@ const UploadButton = (props) => {
 
 		handleOnStart(req.file.uid, req.file)
 
-		await queuedUploadFile(req.file, {
-			onFinish: (file, response) => {
-				if (typeof props.ctx?.onUpdateItem === "function") {
-					props.ctx.onUpdateItem(response.url)
-				}
+		await app.cores.files.upload(
+			req.file,
+			{
+				onFinish: (file, response) => {
+					if (typeof props.ctx?.onUpdateItem === "function") {
+						props.ctx.onUpdateItem(response.url)
+					}
 
-				if (typeof props.onUploadDone === "function") {
-					props.onUploadDone(response)
-				}
+					if (typeof props.onUploadDone === "function") {
+						props.onUploadDone(response)
+					}
 
-				setUploading(false)
-				handleOnSuccess(req.file.uid, response)
+					setUploading(false)
+					handleOnSuccess(req.file.uid, response)
 
-				setTimeout(() => {
+					setTimeout(() => {
+						setProgress(null)
+					}, 1000)
+				},
+				onError: (file, error) => {
 					setProgress(null)
-				}, 1000)
+					handleOnError(file.uid, error)
+					setUploading(false)
+				},
+				onProgress: (file, progress) => {
+					setProgress(progress)
+					handleOnProgress(file.uid, progress)
+				},
 			},
-			onError: (file, error) => {
-				setProgress(null)
-				handleOnError(file.uid, error)
-				setUploading(false)
-			},
-			onProgress: (file, progress) => {
-				setProgress(progress)
-				handleOnProgress(file.uid, progress)
-			},
-			headers: props.headers,
-		})
+			props.headers,
+		)
+
+		// await queuedUploadFile(req.file, {
+		// 	onFinish: (file, response) => {
+		// 		if (typeof props.ctx?.onUpdateItem === "function") {
+		// 			props.ctx.onUpdateItem(response.url)
+		// 		}
+
+		// 		if (typeof props.onUploadDone === "function") {
+		// 			props.onUploadDone(response)
+		// 		}
+
+		// 		setUploading(false)
+		// 		handleOnSuccess(req.file.uid, response)
+
+		// 		setTimeout(() => {
+		// 			setProgress(null)
+		// 		}, 1000)
+		// 	},
+		// 	onError: (file, error) => {
+		// 		setProgress(null)
+		// 		handleOnError(file.uid, error)
+		// 		setUploading(false)
+		// 	},
+		// 	onProgress: (file, progress) => {
+		// 		setProgress(progress)
+		// 		handleOnProgress(file.uid, progress)
+		// 	},
+		// 	headers: props.headers,
+		// })
 	}
 
 	React.useEffect(() => {
