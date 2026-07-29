@@ -11,7 +11,7 @@ const ItemMediaPreview = ({ attachment }) => {
 	if (!attachment.metadata) {
 		return null
 	}
-	if (!attachment.metadata["Content-Type"]) {
+	if (!attachment.metadata["content-type"]) {
 		return null
 	}
 
@@ -19,7 +19,7 @@ const ItemMediaPreview = ({ attachment }) => {
 		app.controls.openFullImageViewer(attachment.url)
 	}
 
-	switch (attachment.metadata["Content-Type"].split("/")[0]) {
+	switch (attachment.metadata["content-type"].split("/")[0]) {
 		case "image":
 			return (
 				<img
@@ -75,10 +75,11 @@ const Item = ({ file, attachment, uploading, onClickDelete }) => {
 
 					<div className="post-creator__attachments__item__details">
 						<p>
-							<Icons.File /> {attachment.metadata["Content-Type"]}
+							<Icons.File />{" "}
+							{attachment.metadata?.["content-type"]}
 						</p>
 						<span>
-							<Icons.Hash /> {attachment.metadata["File-Hash"]}
+							<Icons.Hash /> {attachment.metadata?.["file-hash"]}
 						</span>
 					</div>
 

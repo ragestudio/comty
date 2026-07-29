@@ -3,8 +3,6 @@ import classNames from "classnames"
 import { Mentions } from "antd"
 import { DateTime } from "luxon"
 
-import queuedUploadFile from "@utils/queuedUploadFile"
-
 import PostModel from "@models/post"
 //import SearchModel from "@models/search"
 
@@ -87,6 +85,19 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 		[pendingFiles],
 	)
 
+	const onUploadFileError = React.useCallback(
+		(file, error) => {
+			app.cores.notifications.new({
+				type: "error",
+				title: "File upload error",
+				message: error,
+			})
+
+			setPendingFiles((prev) => prev.filter((f) => f.uid !== file.uid))
+		},
+		[pendingFiles],
+	)
+
 	const onUploadFileFinally = React.useCallback(
 		(file) => {
 			setPendingFiles((prev) => prev.filter((f) => f.uid !== file.uid))
@@ -109,6 +120,8 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 				return
 			}
 
+			console.log("Uploading files", files)
+
 			for (const file of files) {
 				if (
 					!DEFAULT_POST_POLICY.acceptedMimeTypes.includes(file.type)
@@ -122,11 +135,18 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 
 				setPendingFiles((prev) => [...prev, file])
 
-				queuedUploadFile(file, {
-					onFinish: onUploadFileFinish,
-					onProgress: onUploadFileProgress,
-					onFinally: () => onUploadFileFinally(file),
-				})
+				app.cores.files.upload(
+					[file],
+					{
+						onFinish: onUploadFileFinish,
+						onProgress: onUploadFileProgress,
+						onError: onUploadFileError,
+						onFinally: () => onUploadFileFinally(file),
+					},
+					{
+						transformations: "optimize",
+					},
+				)
 			}
 		},
 		[postObj],
@@ -238,30 +258,36 @@ const PostCreator = ({ edit_post, reply_to, close, onPost }) => {
 
 	const handleKeyDown = React.useCallback(
 		async (e) => {
-			//console.debug(e)
-
 			// check if is ctrl + v
 			if (e.ctrlKey && e.key === "v") {
 				// check if is media on the clipboard
 				if (navigator.clipboard.read) {
 					const clipboardItems = await navigator.clipboard.read()
+					const targetItem = clipboardItems[0]
 
-					if (
-						clipboardItems &&
-						clipboardItems[0] &&
-						DEFAULT_POST_POLICY.acceptedMimeTypes.includes(
-							clipboardItems[0].types[0],
+					if (targetItem) {
+						const targetMimetype = targetItem.types.find(
+							(mimetype) =>
+								DEFAULT_POST_POLICY.acceptedMimeTypes.includes(
+									mimetype,
+								),
 						)
-					) {
-						const blob = await clipboardItems[0].getType(
-							clipboardItems[0].types[0],
-						)
+						if (targetMimetype) {
+							const blob =
+								await targetItem.getType(targetMimetype)
 
-						handleUploadMedia([
-							new File([blob], "media", {
-								type: blob.type,
-							}),
-						])
+							console.debug(
+								"Found media on clipboard",
+								targetMimetype,
+								blob,
+							)
+
+							handleUploadMedia([
+								new File([blob], "media", {
+									type: blob.type,
+								}),
+							])
+						}
 					}
 				}
 
