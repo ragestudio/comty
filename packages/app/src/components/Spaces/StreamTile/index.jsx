@@ -11,14 +11,17 @@ import { useStreamVolumePersistence } from "@hooks/useStreamVolumePersistence"
 import "./index.less"
 
 const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
+	const rtc = app.cores.mediartc.instance()
+
 	const videoRef = React.useRef(null)
+	const containerRef = React.useRef(null)
 
 	const [isLoading, setIsLoading] = React.useState(false)
 	const [hasError, setHasError] = React.useState(false)
 	const [mediaStream, setMediaStream] = React.useState(null)
 	const [volume, setLocalVolume] = React.useState(100)
+	const [isFullscreen, setIsFullscreen] = React.useState(false)
 
-	const rtc = app.cores.mediartc.instance()
 	const { getVolume, setVolume } = useStreamVolumePersistence()
 
 	const showControls = mode !== "preview"
@@ -71,7 +74,6 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			const screen = rtc.screens.get(stream.userId)
 
 			if (stream.isSelf) {
-				// self screen must be always muted, we dont want a infinite loopback of audio
 				videoRef.current.muted = true
 			} else {
 				videoRef.current.muted = screen?.shouldMuteVideo || false
@@ -79,6 +81,19 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			}
 		}
 	}, [volume, stream.userId, stream.isSelf, rtc])
+
+	React.useEffect(() => {
+		const handleFullscreenChange = () => {
+			setIsFullscreen(!!document.fullscreenElement)
+		}
+
+		document.addEventListener("fullscreenchange", handleFullscreenChange)
+		return () =>
+			document.removeEventListener(
+				"fullscreenchange",
+				handleFullscreenChange,
+			)
+	}, [])
 
 	const onVolumeChange = React.useCallback(
 		(value) => {
@@ -142,11 +157,21 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 		[stream, rtc, checkMedia],
 	)
 
-	const handleFullscreenClick = React.useCallback((e) => {
-		e.stopPropagation()
-
-		if (videoRef.current?.requestFullscreen) {
-			videoRef.current.requestFullscreen()
+	const handleFullscreenClick = React.useCallback(async () => {
+		if (!document.fullscreenElement) {
+			try {
+				if (containerRef.current.requestFullscreen) {
+					await containerRef.current.requestFullscreen()
+				} else if (containerRef.current.webkitRequestFullscreen) {
+					await containerRef.current.webkitRequestFullscreen()
+				}
+			} catch (err) {
+				console.error("Failed to enter fullscreen:", err)
+			}
+		} else {
+			if (document.exitFullscreen) {
+				await document.exitFullscreen()
+			}
 		}
 	}, [])
 
@@ -183,6 +208,7 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			animate={{ opacity: 1, scale: 1 }}
 			exit={{ opacity: 0, scale: 0.9 }}
 			transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+			ref={containerRef}
 		>
 			<div className="video-stream-tile__overlay">
 				{userData && (
@@ -261,6 +287,7 @@ const StreamTile = ({ stream, userData, mode = "grid", onTileClick }) => {
 			<video
 				ref={videoRef}
 				playsInline
+				controls={false}
 			/>
 		</motion.div>
 	)
