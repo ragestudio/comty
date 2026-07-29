@@ -12,6 +12,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
+		"types": ["@types/audioworklet"],
 		"paths": {
 			"@/*": ["./src/*"],
 			"@config/*": ["./config/*"],
