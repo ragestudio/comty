@@ -8,7 +8,18 @@ export default async (core: MediaRTC, data: any) => {
 		core.console.debug(
 			"[auto-recovery] Intentional channel switch detected, skipping recovery",
 		)
-		core.handlers.leaveChannel()
+
+		core.state.isJoined = false
+
+		if (core.sendTransport && !core.sendTransport.closed) {
+			core.sendTransport.close()
+		}
+		if (core.recvTransport && !core.recvTransport.closed) {
+			core.recvTransport.close()
+		}
+
+		core.self.stopAll()
+
 		return
 	}
 

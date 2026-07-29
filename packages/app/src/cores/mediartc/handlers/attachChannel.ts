@@ -8,8 +8,29 @@ import {
 
 export default async function (this: MediaRTC, data: any) {
 	try {
+		// if already joined, do local cleanup only
 		if (this.state.isJoined) {
-			await this.handlers.leaveChannel()
+			// stop all devices
+			await this.self.stopAll()
+
+			// close transports
+			if (this.sendTransport && !this.sendTransport.closed) {
+				this.sendTransport.close()
+			}
+			if (this.recvTransport && !this.recvTransport.closed) {
+				this.recvTransport.close()
+			}
+
+			// stop consumers
+			await this.consumers.stopAll()
+
+			// destroy clients
+			await this.clients.destroyAll()
+
+			// clear state
+			this.producers.clear()
+			this.device = null
+			this.state.isJoined = false
 		}
 
 		this.state.isLoading = true
