@@ -6,7 +6,7 @@
 		"start": "linebridge-boot ./src/index.js"
 	},
 	"dependencies": {
-		"7zip-min": "^2.1.0",
+		"7zip-min": "^3.0.1",
 		"@octokit/rest": "^22.0.1",
 		"axios": "^1.18.1",
 		"cheerio": "^1.2.0",
@@ -15,7 +15,7 @@
 		"live-directory": "^3.0.3",
 		"lru-cache": "^11.5.2",
 		"node-addon-api": "^8.9.0",
-		"node-gyp": "^12.4.0",
-		"sharp": "^0.34.5"
+		"node-gyp": "^13.0.1",
+		"sharp": "^0.35.3"
 	}
 }
