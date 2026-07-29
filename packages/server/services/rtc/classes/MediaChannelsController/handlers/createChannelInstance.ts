@@ -48,9 +48,9 @@ export default async function (
 			userId: client.userId,
 			channelId: _ch.channelId,
 			user: {
-				_id: client.context.user._id,
-				username: client.context.user.username,
-				avatar: client.context.user.avatar,
+				_id: client?.context?.user?._id,
+				username: client?.context?.user?.username,
+				avatar: client?.context?.user?.avatar,
 			},
 			voiceState: client.voiceState,
 			channelClients: _ch.getConnectedClientsSerialized(),
@@ -69,9 +69,9 @@ export default async function (
 			userId: client.userId,
 			channelId: _ch.channelId,
 			user: {
-				_id: client.context.user._id,
-				username: client.context.user.username,
-				avatar: client.context.user.avatar,
+				_id: client?.context?.user?._id,
+				username: client?.context?.user?.username,
+				avatar: client?.context?.user?.avatar,
 			},
 			data: payload.data,
 		})
@@ -83,9 +83,9 @@ export default async function (
 			channelId: producer.channelId,
 			producer: producer.serialize(),
 			user: {
-				_id: producer.client.context.user._id,
-				username: producer.client.context.user.username,
-				avatar: producer.client.context.user.avatar,
+				_id: producer.client?.context?.user?._id,
+				username: producer.client?.context?.user?.username,
+				avatar: producer.client?.context?.user?.avatar,
 			},
 		})
 	})
@@ -95,9 +95,9 @@ export default async function (
 			channelId: producer.channelId,
 			producer: producer.serialize(),
 			user: {
-				_id: producer.client.context.user._id,
-				username: producer.client.context.user.username,
-				avatar: producer.client.context.user.avatar,
+				_id: producer.client?.context?.user?._id,
+				username: producer.client?.context?.user?.username,
+				avatar: producer.client?.context?.user?.avatar,
 			},
 		})
 	})
