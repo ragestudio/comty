@@ -1,14 +1,15 @@
+import type { Member as T_Member } from "@/contexts/WithSpaces/collections/member"
+
 import React from "react"
 import { Tag } from "antd"
 import classnames from "classnames"
 
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
-
 import copyToClipboard from "@utils/copyToClipboard"
 
 import "./member.less"
-import type { Member as T_Member } from "@/contexts/WithSpaces/collections/member"
+import classNames from "classnames"
 
 export const MemberContextMenu = ({ member, close }) => {
 	const onClickUser = React.useCallback(() => {
@@ -37,7 +38,7 @@ export const MemberContextMenu = ({ member, close }) => {
 	}, [member, close])
 
 	return (
-		<>
+		<div className="member__context-menu">
 			<UserPreview
 				user={member.user}
 				onClick={onClickUser}
@@ -107,18 +108,62 @@ export const MemberContextMenu = ({ member, close }) => {
 					</div>
 				</div>
 			</div>
-		</>
+		</div>
+	)
+}
+
+const MemberBackgroundDecoration = ({
+	decoration,
+	playing,
+}: {
+	decoration: any
+	playing?: boolean
+}) => {
+	const mediaRef = React.useRef(null)
+
+	React.useEffect(() => {
+		console.log(playing)
+
+		if (!mediaRef.current) return undefined
+
+		if (playing) {
+			mediaRef.current.play()
+		} else {
+			mediaRef.current.pause()
+		}
+	}, [playing])
+
+	return (
+		<div
+			className={classNames(
+				"group-page__members-panel__member__bg-decoration",
+				{
+					playing: playing,
+				},
+			)}
+		>
+			<video
+				src={decoration?.image_obj}
+				ref={mediaRef}
+				playsInline
+				loop
+				muted
+			/>
+		</div>
 	)
 }
 
 export const Member = ({
 	member,
 	connected,
+	decorations,
 }: {
 	member: T_Member
 	connected: boolean
+	decorations?: Record<string, any>
 }) => {
 	if (!member || !member.user) return null
+	const [hovering, setHovering] = React.useState(false)
 
 	const onContextMenuClick = React.useCallback(
 		(event) => {
@@ -153,9 +198,18 @@ export const Member = ({
 			data-user-id={member.user._id}
 			className={classnames("group-page__members-panel__member", {
 				["connected"]: !!connected,
+				["hovering"]: hovering,
 			})}
-			onContextMenu={onContextMenuClick}
+			onClick={onContextMenuClick}
+			onMouseEnter={() => setHovering(true)}
+			onMouseLeave={() => setHovering(false)}
 		>
+			{decorations?.member_bg && (
+				<MemberBackgroundDecoration
+					decoration={decorations.member_bg}
+					playing={hovering}
+				/>
+			)}
 			<div className="group-page__members-panel__member__connection" />
 			<div className="group-page__members-panel__member__content">
 				<UserPreview
@@ -166,6 +220,7 @@ export const Member = ({
 						}
 					}
 					small
+					onClick={() => {}}
 				/>
 			</div>
 		</div>
@@ -175,7 +230,8 @@ export const Member = ({
 export const MemberMemo = React.memo(Member, (prevProps, nextProps) => {
 	return (
 		prevProps.member._id === nextProps.member._id &&
-		prevProps.connected === nextProps.connected
+		prevProps.connected === nextProps.connected &&
+		prevProps.decorations === nextProps.decorations
 	)
 })
 

@@ -2,7 +2,7 @@ import React from "react"
 // @ts-ignore
 import GroupsModel from "@models/groups"
 import buildSocketEvents from "./events"
-import loadChannelsStates from "../helpers/loadChannelsStates"
+import UsersModel from "@models/user"
 import {
 	cacheGroup,
 	cacheChannels,
@@ -88,13 +88,16 @@ const useGroup = ({ group_id }) => {
 	const [members, setMembers] = React.useState<Members>(null)
 	const [channels, setChannels] = React.useState<Channels>(null)
 
+	const [connectedMembers, setConnectedMembers] = React.useState<string[]>([])
+	const [membersDecorations, setMembersDecorations] = React.useState<
+		Record<string, any>
+	>({})
 	const [statedChannels, setStatedChannels] = React.useState<
 		Record<string, StatedChannel>
 	>({})
 
-	const [connectedMembers, setConnectedMembers] = React.useState<string[]>([])
 	const usersConnectionsRef: Map<string, UserConnectionReference> = new Map()
-
+	const fetchedDecorationsRef = React.useRef<Set<string>>(new Set())
 	const lastLoadedMemberId = React.useRef<string | null>(null)
 
 	const fetchGroup = React.useCallback(async () => {
@@ -145,7 +148,9 @@ const useGroup = ({ group_id }) => {
 
 			await cacheMembers(group_id, res)
 			await cacheTotalMembers(group_id, res.total_items)
-			await evaluateMembersConnections(res.items)
+
+			evaluateMembersConnections(res.items)
+			evaluateMembersDecorations(res.items)
 
 			return res
 		} catch (err) {
@@ -224,6 +229,56 @@ const useGroup = ({ group_id }) => {
 			}
 		},
 		[group_id, setConnectedMembers, usersConnectionsRef],
+	)
+
+	const evaluateMembersDecorations = React.useCallback(
+		async (membersList: Member[]) => {
+			if (!membersList || membersList.length === 0) return
+
+			const missingIds = membersList
+				.map((m) => m.user_id)
+				.filter((id) => !fetchedDecorationsRef.current.has(id))
+
+			if (missingIds.length === 0) return
+
+			for (const id of missingIds) {
+				fetchedDecorationsRef.current.add(id)
+			}
+
+			console.debug(
+				"[decorations] fetching missing decorations for:",
+				missingIds.length,
+				"users",
+			)
+
+			try {
+				// Fetcheamos en lote
+				const users_ids = missingIds.join(",")
+				const fetchedData =
+					await UsersModel.V2.decorations.get(users_ids)
+
+				if (Array.isArray(fetchedData)) {
+					setMembersDecorations((prev) => {
+						const newDecorationsDict = fetchedData.reduce(
+							(acc, curr) => {
+								acc[curr.user_id] = curr.decorations || {}
+								return acc
+							},
+							{},
+						)
+
+						return { ...prev, ...newDecorationsDict }
+					})
+				}
+			} catch (err) {
+				console.error("[decorations] Failed to fetch decorations:", err)
+
+				for (const id of missingIds) {
+					fetchedDecorationsRef.current.delete(id)
+				}
+			}
+		},
+		[],
 	)
 
 	const deferredCacheChecking = async (cached: CachedGroup) => {
@@ -331,7 +386,9 @@ const useGroup = ({ group_id }) => {
 					total_items: cached.total_members,
 					has_more: cached.total_members > cached.memberships.length,
 				})
-				await evaluateMembersConnections(cached.memberships)
+
+				evaluateMembersConnections(cached.memberships)
+				evaluateMembersDecorations(cached.memberships)
 			}
 
 			//
@@ -400,6 +457,8 @@ const useGroup = ({ group_id }) => {
 
 		return () => {
 			setConnectedMembers([])
+			setMembersDecorations({})
+			fetchedDecorationsRef.current.clear()
 			lastLoadedMemberId.current = null
 
 			if (socket.current) {
@@ -417,6 +476,7 @@ const useGroup = ({ group_id }) => {
 		channels: channels as Channels,
 		members: members as Members,
 
+		membersDecorations: membersDecorations,
 		statedChannels: statedChannels,
 		connectedMembers: connectedMembers,
 		usersConnectionsRef: usersConnectionsRef,

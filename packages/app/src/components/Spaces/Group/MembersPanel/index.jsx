@@ -70,6 +70,9 @@ const MembersPanel = () => {
 							key={`online-${member._id}`}
 							member={member}
 							connected={true}
+							decorations={
+								group.membersDecorations[member.user_id]
+							}
 						/>
 					))}
 
