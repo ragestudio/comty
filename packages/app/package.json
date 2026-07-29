@@ -95,6 +95,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@types/audioworklet": "^0.0.100",
 		"@types/react": "^19.2.17",
 		"@typescript-eslint/eslint-plugin": "^8.64.0",
 		"@vitejs/plugin-react": "^4.7.0",
