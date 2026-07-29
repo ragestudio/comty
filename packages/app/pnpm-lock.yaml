@@ -247,6 +247,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.7.0)
+      '@types/audioworklet':
+        specifier: ^0.0.100
+        version: 0.0.100
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17
@@ -1457,6 +1460,9 @@ packages:
   '@tsmx/human-readable@2.0.4':
     resolution: {integrity: sha512-RDGX6aDZYV7JI6GfPRujWXHoYIzqPXqiXJtHXH5a8Zy/tH+vPtxLhbIU90YlM865Dv7cBrTItF3kutST6bVdrA==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+
+  '@types/audioworklet@0.0.100':
+    resolution: {integrity: sha512-mWt4Z5CWi0CupDnSYWJgx6dw61XUk9JSRGrM9F/YNrpOoY/0XG+sxP+8rAjQq80H4febOe8PrzGmmN/X3w8LsQ==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4755,6 +4761,8 @@ snapshots:
   '@tokenizer/token@0.3.0': {}
 
   '@tsmx/human-readable@2.0.4': {}
+
+  '@types/audioworklet@0.0.100': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
