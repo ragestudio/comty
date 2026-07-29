@@ -78,11 +78,13 @@ export default async ({ filePath, workPath, onProgress }) => {
 			//metadata["file-hash"] = image
 
 			await image.toFile(filePath)
+
+			return {
+				outputFile: filePath,
+				metadata: metadata,
+			}
 		}
 	}
 
-	return {
-		outputFile: filePath,
-		metadata: metadata,
-	}
+	return null
 }
