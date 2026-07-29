@@ -108,13 +108,15 @@ export default class Upload {
 					capabilities: payload.capabilities,
 				})
 
-				if (transformationResult.outputFile) {
-					payload.filePath = transformationResult.outputFile
-				}
+				if (transformationResult) {
+					if (transformationResult.outputFile) {
+						payload.filePath = transformationResult.outputFile
+					}
 
-				if (transformationResult.outputPath) {
-					payload.filePath = transformationResult.outputPath
-					payload.targetPath = transformationResult.outputFile
+					if (transformationResult.outputPath) {
+						payload.filePath = transformationResult.outputPath
+						payload.targetPath = transformationResult.outputFile
+					}
 				}
 			}
 		}

@@ -28,7 +28,7 @@ export default async function (
 
 	const uploadId = params.upload_id
 	const objectPath = params.object_path
-	const uploadEntry = await MultipartUploadsModel.findOne(
+	let uploadEntry = await MultipartUploadsModel.findOne(
 		{
 			file_hash: params.file_hash,
 			user_id: params.user_id,
@@ -73,19 +73,35 @@ export default async function (
 		throw new OperationError(413, "File size exceeds maximum allowed")
 	}
 
-	await MultipartUploadsModel.update({
-		status: "COMPLETED",
-		user_id: params.user_id,
-		file_hash: params.file_hash,
-		file_size: objectStat.size,
-		etag: objectStat.etag,
-		uploaded_parts: JSON.stringify(formattedParts),
-		metadata: JSON.stringify(objectStat.metaData),
-		updated_at: new Date(),
-	})
+	await MultipartUploadsModel.update(
+		{
+			status: "COMPLETED",
+			user_id: params.user_id,
+			file_hash: params.file_hash,
+			file_size: objectStat.size,
+			etag: objectStat.etag,
+			uploaded_parts: JSON.stringify(formattedParts),
+			metadata: JSON.stringify(objectStat.metaData),
+			updated_at: new Date(),
+		},
+		{
+			raw: true,
+		},
+	)
+
+	uploadEntry = await MultipartUploadsModel.findOne(
+		{
+			file_hash: params.file_hash,
+			user_id: params.user_id,
+		},
+		{ raw: true },
+	)
 
 	return {
 		status: "completed",
-		...(await this.composeObjectData(objectPath, objectStat)),
+		...(await this.composeObjectData(
+			objectPath,
+			this.entryToStat(uploadEntry),
+		)),
 	}
 }

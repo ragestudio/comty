@@ -47,6 +47,7 @@ export class Multipart {
 		return {
 			object_path: objectPath,
 			url: this.storageClient.composeRemoteURL(objectPath),
+			metadata: stat.metaData,
 			stat: stat,
 		}
 	}
@@ -65,11 +66,16 @@ export class Multipart {
 	}
 
 	entryToStat = (entry: MultipartUpload): BucketItemStat => {
+		const metadata = JSON.parse(entry.metadata)
+
 		return {
 			size: Number(entry.file_size),
 			etag: entry.etag,
 			lastModified: entry.updated_at,
-			metaData: JSON.parse(entry.metadata),
+			metaData: {
+				...metadata,
+				"file-hash": entry.file_hash,
+			},
 		}
 	}
 }

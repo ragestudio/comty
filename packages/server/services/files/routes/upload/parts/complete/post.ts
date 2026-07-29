@@ -28,10 +28,7 @@ export default defineRoute<API>()({
 		})
 
 		if (req.headers["transformations"]) {
-			const workPath = path.resolve(
-				ctx.cache.path,
-				`${user_id}-${upload_id}`,
-			)
+			const workPath = path.resolve(ctx.cache.path, user_id, upload_id)
 
 			const transKeys = req.headers["transformations"]
 				.split(",")
@@ -39,6 +36,8 @@ export default defineRoute<API>()({
 
 			if (transKeys && transKeys.length > 0) {
 				const job = await ctx.tasker.createJob("transformations", {
+					prevResult: result,
+
 					user_id: user_id,
 					taskId: task_id,
 					workPath: workPath,

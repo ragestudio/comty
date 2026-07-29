@@ -1,4 +1,4 @@
-import type { BucketItemStat } from "./bucket"
+import type { BucketItemStat, ItemBucketMetadata } from "./bucket"
 
 export type MultipartUploadStartResult = {
 	upload_id: string
@@ -12,4 +12,5 @@ export type MultipartUploadCompletedResult = {
 	object_path: string
 	url: string
 	stat: BucketItemStat
+	metadata?: ItemBucketMetadata
 }
