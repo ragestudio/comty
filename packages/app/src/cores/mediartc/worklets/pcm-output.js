@@ -1,9 +1,5 @@
 class PCMOutputProcessor extends AudioWorkletProcessor {
-	private bufferSize: number
-	private interleaved: Int16Array
-	private writeIndex: number
-
-	constructor(options?: AudioWorkletNodeOptions) {
+	constructor(options) {
 		super()
 
 		this.bufferSize = options?.processorOptions?.bufferSize || 256
@@ -11,11 +7,7 @@ class PCMOutputProcessor extends AudioWorkletProcessor {
 		this.writeIndex = 0
 	}
 
-	process(
-		inputs: Float32Array[][],
-		outputs: Float32Array[][],
-		parameters: Record<string, Float32Array>,
-	): boolean {
+	process(inputs, outputs, parameters) {
 		const input = inputs[0]
 
 		if (!input || input.length === 0) {
@@ -23,12 +15,8 @@ class PCMOutputProcessor extends AudioWorkletProcessor {
 		}
 
 		const isSilent = !input || input.length === 0
-		const left: Float32Array | null = isSilent ? null : input[0]
-		const right: Float32Array | null = isSilent
-			? null
-			: input.length > 1
-				? input[1]
-				: input[0]
+		const left = isSilent ? null : input[0]
+		const right = isSilent ? null : input.length > 1 ? input[1] : input[0]
 
 		const length = left.length
 
