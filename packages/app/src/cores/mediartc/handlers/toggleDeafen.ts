@@ -16,7 +16,6 @@ export default async function (to) {
 			this.self.sysAudio.outputBus.gain.value = 0
 		} else {
 			this.self.audioOutput.mainNode.gain.value = 0
-			await this.self.audioOutput.context.suspend()
 		}
 	} else {
 		app.cores.sfx.play("undeafen")
@@ -27,7 +26,6 @@ export default async function (to) {
 		} else {
 			this.self.audioOutput.mainNode.gain.value =
 				currentAudioSettings.outputGain
-			await this.self.audioOutput.context.resume()
 		}
 	}
 
