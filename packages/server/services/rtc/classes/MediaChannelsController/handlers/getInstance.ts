@@ -106,10 +106,18 @@ export default async function (
 					voice_state: client.voiceState,
 				}
 
+				staleClient.socket = {
+					// @ts-ignore
+					context: {
+						// @ts-ignore
+						user: client.user,
+					},
+				}
 				// @ts-ignore
-				staleClient.socket.context.user = client.user
-				// @ts-ignore
-				staleClient.context.user = client.user
+				staleClient.context = {
+					// @ts-ignore
+					user: client.user,
+				}
 
 				return staleClient
 			}),
