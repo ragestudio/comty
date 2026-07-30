@@ -36,6 +36,6 @@
 		},
 	},
 	"files": ["./src/global.d.ts", "./src/declarations.d.ts"],
-	"include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+	"include": ["./src/**/*.ts", "./src/**/*.tsx"],
 	"exclude": ["node_modules", "dist", "build"],
 }
