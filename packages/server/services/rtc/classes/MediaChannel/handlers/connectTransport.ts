@@ -1,10 +1,10 @@
-import setFind from "@shared-utils/setFind"
-
 import type { RTCClient } from "@services/rtc/types"
 export type ConnectTransportPayload = {
 	transportId: string
 	dtlsParameters: any
 }
+
+import setFind from "@shared-utils/setFind"
 
 async function connectTransportHandler(
 	this: any,

@@ -87,7 +87,7 @@ export default class Producers extends Map<string, Producer> {
 
 		this.delete(producer.id)
 
-		this.core.socket.emit("channel:stop_produce", {
+		this.core.socket.emit("channel:producer_stop", {
 			producerId: producer.id,
 		})
 	}

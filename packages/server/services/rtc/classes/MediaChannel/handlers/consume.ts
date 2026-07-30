@@ -1,6 +1,8 @@
+import type { MediaChannel } from ".."
+import type { RTCClient } from "@services/rtc/types"
+
 import setFind from "@shared-utils/setFind"
 
-import type { RTCClient } from "@services/rtc/types"
 export type ConsumePayload = {
 	producerId: string
 	transportId: string
@@ -9,7 +11,7 @@ export type ConsumePayload = {
 }
 
 async function consumeHandler(
-	this: any,
+	this: MediaChannel,
 	client: RTCClient,
 	payload: ConsumePayload,
 ) {
@@ -48,19 +50,6 @@ async function consumeHandler(
 			rtpCapabilities,
 			paused: paused ?? false,
 		})
-
-		// // request a keyframe immediately so the new viewer
-		// // does not wait for the next periodic keyframe
-		// if (consumer.kind === "video") {
-		// 	try {
-		// 		await consumer.requestKeyFrame()
-		// 	} catch (e) {
-		// 		console.warn(
-		// 			`[CHANNEL:${this.channelId}] consumer.requestKeyFrame failed for ${producerId}:`,
-		// 			e,
-		// 		)
-		// 	}
-		// }
 
 		// Store consumer
 		if (!this.consumers.has(client.userId)) {

@@ -165,6 +165,18 @@ export default class Consumers {
 				consumer: consumer,
 			})
 
+			try {
+				await this.core.socket.emit("channel:consumer_stop", {
+					consumer_id: consumerId,
+					producer_id: consumer.producerId,
+				})
+			} catch (err) {
+				this.core.console.error(
+					`Failed to signal consumer stopped`,
+					err,
+				)
+			}
+
 			consumer.close()
 
 			return

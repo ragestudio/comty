@@ -10,6 +10,7 @@ import EventEmitter from "@foxify/events"
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
 import stopProduceHandler from "./handlers/stopProduce"
+import stopConsumeHandler from "./handlers/stopConsume"
 import consumerControlHandler from "./handlers/consumerControl"
 
 import joinClientHandler from "./handlers/joinClient"
@@ -170,6 +171,9 @@ export class MediaChannel {
 	>
 	consume = consumeHandler.bind(this) as OmitThisParameter<
 		typeof consumeHandler
+	>
+	stopConsume = stopConsumeHandler.bind(this) as OmitThisParameter<
+		typeof stopConsumeHandler
 	>
 	consumerControl = consumerControlHandler.bind(this) as OmitThisParameter<
 		typeof consumerControlHandler
