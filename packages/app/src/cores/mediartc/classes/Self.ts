@@ -224,6 +224,12 @@ export default class Self {
 
 		this.micStream = await navigator.mediaDevices.getUserMedia(params)
 
+		if (this.core.state.isMuted) {
+			for (const track of this.micStream.getAudioTracks()) {
+				track.enabled = false
+			}
+		}
+
 		this.audioInput = new AudioProcessor(this, {
 			channelCount: 1,
 			stream: this.micStream,

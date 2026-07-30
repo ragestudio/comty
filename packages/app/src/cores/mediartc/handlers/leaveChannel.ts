@@ -67,8 +67,16 @@ export default async function (this: MediaRTC) {
 			this.console.error("Error leaving channel:", error)
 		}
 
+		// save persistent state
+		const isMuted = this.state.isMuted
+		const isDeafened = this.state.isDeafened
+
 		// reset default state
 		this.state = Object.assign(this.state, MediaRTCState.defaultState)
+
+		// restore persistent state
+		this.state.isMuted = isMuted
+		this.state.isDeafened = isDeafened
 	} catch (error: any) {
 		this.console.error("Error leaving channel:", error)
 
