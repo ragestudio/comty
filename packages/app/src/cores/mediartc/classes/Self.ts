@@ -54,7 +54,7 @@ export default class Self {
 			}
 		}
 
-		return this.audioOutput?.context?.state === "suspended"
+		return this.audioOutput?.mainNode?.gain.value === 0
 	}
 
 	get audioSettings() {
