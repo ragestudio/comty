@@ -1,6 +1,6 @@
 {
 	"name": "@comty/server",
-	"version": "2.31.2@alpha",
+	"version": "2.32.0@alpha",
 	"license": "ComtyLicense",
 	"type": "module",
 	"private": true,
