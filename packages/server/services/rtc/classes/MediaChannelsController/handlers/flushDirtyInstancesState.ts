@@ -33,10 +33,10 @@ export default async function (this: MediaChannelsController) {
 				try {
 					const serializedState = channelInstance.serialize()
 
-					console.log(
-						`Flushing channel ${channelId}`,
-						serializedState,
-					)
+					// console.log(
+					// 	`Flushing channel ${channelId}`,
+					// 	serializedState,
+					// )
 
 					await this.mediaChannelsStateBucket.put(
 						channelId,
