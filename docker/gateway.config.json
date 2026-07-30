@@ -10,6 +10,10 @@
 		"port": 9000,
 		"secure_port": 9001
 	},
+	"redis": {
+		"enabled": true,
+		"url": "redis://redis:6379"
+	},
 	"jwt": {
 		"use_keys": [
 			{
