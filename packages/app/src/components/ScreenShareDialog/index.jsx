@@ -1,9 +1,27 @@
 import React from "react"
 import Button from "@ui/Button"
-import { Radio, Select, Switch } from "antd"
+import { Select, Switch } from "antd"
 import { Icons } from "@components/Icons"
 
 import "./index.less"
+
+function retreiveAvailableVideoCodecs() {
+	const core = app.cores.mediartc.instance()
+
+	if (!core.device) {
+		return []
+	}
+
+	if (!core.device.sendRtpCapabilities) {
+		return []
+	}
+
+	return core.device.sendRtpCapabilities.codecs.filter(
+		(cap) => cap.kind === "video",
+	)
+}
+
+const excludedCodecs = ["rtx"]
 
 const ScreenShareDialog = ({ close }) => {
 	const { resolutionsList, frameratesList, contentHintsList } = React.useMemo(
@@ -16,6 +34,33 @@ const ScreenShareDialog = ({ close }) => {
 	const [contentHint, setContentHint] = React.useState(
 		contentHintsList[0].value,
 	)
+	const [preferredCodec, setPreferredCodec] = React.useState("auto")
+
+	const availableVideoCodecs = React.useMemo(() => {
+		let codecs = new Set([
+			{
+				label: "Auto Select",
+				value: "auto",
+				data: {},
+			},
+		])
+
+		for (const codec of retreiveAvailableVideoCodecs()) {
+			const mime = codec.mimeType.split("/")
+
+			if (excludedCodecs.includes(mime[1])) {
+				continue
+			}
+
+			codecs.add({
+				label: mime[1].toUpperCase(),
+				value: mime[1],
+				data: codec,
+			})
+		}
+
+		return Array.from(codecs).sort((a, b) => a.label.localeCompare(b.label))
+	}, [])
 
 	const startScreenShare = React.useCallback(async () => {
 		const [width, height] = resolution.split("x").map(Number)
@@ -27,6 +72,7 @@ const ScreenShareDialog = ({ close }) => {
 			},
 			framerate: framerate,
 			systemAudio: systemAudio,
+			preferredCodec: preferredCodec,
 			contentHint: contentHint,
 		}
 
@@ -39,7 +85,7 @@ const ScreenShareDialog = ({ close }) => {
 		if (typeof close === "function") {
 			close()
 		}
-	}, [resolution, contentHint, framerate, systemAudio, close])
+	}, [resolution, contentHint, framerate, systemAudio, preferredCodec, close])
 
 	return (
 		<div className="screenshare-dialog">
@@ -49,57 +95,79 @@ const ScreenShareDialog = ({ close }) => {
 			</div>
 
 			<div className="screenshare-dialog__selectors">
-				<div
-					id="resolution"
-					className="screenshare-dialog__selectors__field"
-				>
-					<div className="screenshare-dialog__selectors__field__icon">
-						<Icons.Proportions />
-						<span>Resolution</span>
+				<div className="screenshare-dialog__selectors__row">
+					<div
+						id="resolution"
+						className="screenshare-dialog__selectors__field"
+					>
+						<div className="screenshare-dialog__selectors__field__icon">
+							<Icons.Proportions />
+							<span>Resolution</span>
+						</div>
+
+						<div className="screenshare-dialog__selectors__field__content">
+							<Select
+								options={resolutionsList}
+								value={resolution}
+								onChange={setResolution}
+							/>
+						</div>
 					</div>
 
-					<div className="screenshare-dialog__selectors__field__content">
-						<Select
-							options={resolutionsList}
-							value={resolution}
-							onChange={setResolution}
-						/>
+					<div
+						id="framerate"
+						className="screenshare-dialog__selectors__field"
+					>
+						<div className="screenshare-dialog__selectors__field__icon">
+							<Icons.Gauge />
+							<span>Frame Rate</span>
+						</div>
+
+						<div className="screenshare-dialog__selectors__field__content">
+							<Select
+								options={frameratesList}
+								value={framerate}
+								onChange={setFramerate}
+							/>
+						</div>
 					</div>
 				</div>
 
-				<div
-					id="framerate"
-					className="screenshare-dialog__selectors__field"
-				>
-					<div className="screenshare-dialog__selectors__field__icon">
-						<Icons.Gauge />
-						<span>Frame Rate</span>
+				<div className="screenshare-dialog__selectors__row">
+					<div
+						id="contentHint"
+						className="screenshare-dialog__selectors__field"
+					>
+						<div className="screenshare-dialog__selectors__field__icon">
+							<Icons.Sparkles />
+							<span>Content Hint</span>
+						</div>
+
+						<div className="screenshare-dialog__selectors__field__content">
+							<Select
+								options={contentHintsList}
+								value={contentHint}
+								onChange={setContentHint}
+							/>
+						</div>
 					</div>
 
-					<div className="screenshare-dialog__selectors__field__content">
-						<Select
-							options={frameratesList}
-							value={framerate}
-							onChange={setFramerate}
-						/>
-					</div>
-				</div>
+					<div
+						id="video_codec"
+						className="screenshare-dialog__selectors__field"
+					>
+						<div className="screenshare-dialog__selectors__field__icon">
+							<Icons.Cpu />
+							<span>Video Codec</span>
+						</div>
 
-				<div
-					id="contentHint"
-					className="screenshare-dialog__selectors__field"
-				>
-					<div className="screenshare-dialog__selectors__field__icon">
-						<Icons.Sparkles />
-						<span>Content Hint</span>
-					</div>
-
-					<div className="screenshare-dialog__selectors__field__content">
-						<Select
-							options={contentHintsList}
-							value={contentHint}
-							onChange={setContentHint}
-						/>
+						<div className="screenshare-dialog__selectors__field__content">
+							<Select
+								options={availableVideoCodecs}
+								value={preferredCodec}
+								onChange={setPreferredCodec}
+							/>
+						</div>
 					</div>
 				</div>
 
@@ -132,7 +200,7 @@ const ScreenShareDialog = ({ close }) => {
 			</div>
 
 			<div className="screenshare-dialog__actions">
-				<Button onClick={close}>Fuh Naw💔🥀</Button>
+				<Button onClick={close}>Cancel</Button>
 				<Button
 					type="primary"
 					onClick={startScreenShare}

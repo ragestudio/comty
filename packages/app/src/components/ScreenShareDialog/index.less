@@ -17,8 +17,19 @@
 
 		width: 100%;
 
+		overflow: hidden;
+
 		padding: 0 10px;
 		gap: 20px;
+
+		&__row {
+			display: flex;
+			flex-direction: row;
+
+			align-items: center;
+
+			gap: 10px;
+		}
 
 		&__field {
 			display: flex;
@@ -39,6 +50,10 @@
 
 				.ant-switch {
 					width: fit-content;
+				}
+
+				.ant-select {
+					width: 100%;
 				}
 			}
 
