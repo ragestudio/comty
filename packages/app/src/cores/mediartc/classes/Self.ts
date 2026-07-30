@@ -5,12 +5,14 @@ import AudioProcessor from "./AudioProcessor"
 import SysAudio from "./SysAudio"
 
 import defaults from "../defaults"
+import { ProducerOptions } from "mediasoup-client/types"
 
 type CreateScreenStreamOptions = {
 	resolution?: { width: number; height: number }
 	framerate?: number
 	systemAudio?: boolean
 	contentHint?: "motion" | "detail" | "text"
+	preferredCodec?: string
 }
 
 export default class Self {
@@ -430,20 +432,31 @@ export default class Self {
 		this.core.console.debug("screen producer encoding:", adaptiveEncoding)
 
 		// build produce payload
-		const producePayload: any = {
+		const producePayload: ProducerOptions = {
 			track: screenVideoTrack,
 			encodings: [adaptiveEncoding],
 			appData: screenShareProducerData,
 		}
 
-		// only pass explicit codec when overriding the default
-		const preferredCodec = this.core.preferredVideoCodec
-
 		if (
-			preferredCodec &&
-			!preferredCodec.mimeType.toLowerCase().includes("h264")
+			this.core.preferredVideoCodec &&
+			!this.core.preferredVideoCodec.mimeType
+				.toLowerCase()
+				.includes("h264")
 		) {
-			producePayload.codec = preferredCodec
+			producePayload.codec = this.core.preferredVideoCodec
+		}
+
+		if (options.preferredCodec && options?.preferredCodec !== "auto") {
+			const codecCap = this.core.device.sendRtpCapabilities.codecs.find(
+				(cap) => cap.mimeType === `video/${options.preferredCodec}`,
+			)
+
+			console.log("Setting preferred codec to:", codecCap)
+
+			if (codecCap) {
+				producePayload.codec = codecCap
+			}
 		}
 
 		// produce

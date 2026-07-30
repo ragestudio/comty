@@ -1,6 +1,6 @@
 export default async function (options) {
 	await this.self.createScreenStream(options)
-	await this.self.startScreenProducer()
+	await this.self.startScreenProducer(options)
 
 	app.cores.sfx.play("media_video_join")
 

@@ -1,5 +1,8 @@
 import type { RemoteRouter } from "../MediaChannelsController/sfu/router"
 import type { MediaChannelParams, RTCClient } from "../../types"
+import type { Consumer } from "mediasoup/types"
+import type Producer from "./producer"
+import type MediaChannelsController from "@classes/MediaChannelsController"
 
 import { SFUNode } from "@classes/MediaChannelsController/sfu/node"
 import EventEmitter from "@foxify/events"
@@ -7,6 +10,7 @@ import EventEmitter from "@foxify/events"
 import consumeHandler from "./handlers/consume"
 import produceHandler from "./handlers/produce"
 import stopProduceHandler from "./handlers/stopProduce"
+import consumerControlHandler from "./handlers/consumerControl"
 
 import joinClientHandler from "./handlers/joinClient"
 import leaveClientHandler from "./handlers/leaveClient"
@@ -18,9 +22,6 @@ import closeHandler from "./handlers/close"
 import handleClientEventHandler from "./handlers/clientEvent"
 
 import defaults from "./defaults"
-import MediaChannelsController from "@classes/MediaChannelsController"
-import { Consumer } from "mediasoup/types"
-import type Producer from "./producer"
 
 export type SerializedMediaChannel = {
 	controller_id: string | null
@@ -169,6 +170,9 @@ export class MediaChannel {
 	>
 	consume = consumeHandler.bind(this) as OmitThisParameter<
 		typeof consumeHandler
+	>
+	consumerControl = consumerControlHandler.bind(this) as OmitThisParameter<
+		typeof consumerControlHandler
 	>
 
 	static deserializeMaps(state: SerializedMediaChannel) {

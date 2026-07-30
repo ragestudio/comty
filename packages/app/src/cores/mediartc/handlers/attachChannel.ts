@@ -40,11 +40,6 @@ export default async function (this: MediaRTC, data: any) {
 
 		await this.self.createMicStream()
 
-		// resume audio context
-		if (this.self.audioOutput?.state === "suspended") {
-			await this.self.audioOutput.resume()
-		}
-
 		// start ui
 		if (this.ui) {
 			this.ui.attach()
@@ -57,20 +52,16 @@ export default async function (this: MediaRTC, data: any) {
 
 		// compute preferred codecs based on gpu hardware capabilities
 		this.preferredVideoCodec = await getPreferredVideoCodec(
-			this.device.rtpCapabilities,
+			this.device.sendRtpCapabilities,
 		)
 		this.preferredAudioCodec = await getPreferredAudioCodec(
-			this.device.rtpCapabilities,
+			this.device.sendRtpCapabilities,
 		)
 
-		this.console.debug(
-			"preferred video codec:",
-			this.preferredVideoCodec?.mimeType,
-		)
-		this.console.debug(
-			"preferred audio codec:",
-			this.preferredAudioCodec?.mimeType,
-		)
+		this.console.debug("preferred system codecs:", {
+			audio: this.preferredAudioCodec?.mimeType,
+			video: this.preferredVideoCodec?.mimeType,
+		})
 
 		// set all clients
 		for (let client of data.clients) {

@@ -1,4 +1,8 @@
-import type { IPC_RegisterNodePayload } from "@comty/shared/types/rtc"
+import type {
+	IPC_ConsumerControlPayload,
+	IPC_RegisterNodePayload,
+	IPC_RequestKeyframePayload,
+} from "@comty/shared/types/rtc"
 import type { NatsConnection } from "@nats-io/transport-node"
 import type { RouterOptions } from "mediasoup/types"
 
@@ -102,28 +106,18 @@ export class SFUNode {
 	) {
 		return new RemoteRouter(
 			this,
-			await this.ipc.requestToNode(
-				this.node_id.toString(),
-				"createRouter",
-				options,
-			),
+			await this.request("createRouter", options),
 		)
 	}
 
 	async listRouters() {
-		return (await this.ipc.requestToNode(
-			this.node_id.toString(),
-			"listRouters",
-		)) as { id: string; channelId?: string; groupId?: string }[] | undefined
+		return (await this.request("listRouters")) as
+			| { id: string; channelId?: string; groupId?: string }[]
+			| undefined
 	}
 
 	async getRouter(router_id: string): Promise<RemoteRouter | null> {
-		const data = await this.ipc.requestToNode(
-			this.node_id.toString(),
-			"getRouter",
-			{ router_id },
-		)
-
+		const data = await this.request("getRouter", { router_id })
 		if (!data) return null
 
 		return new RemoteRouter(this, data)
@@ -131,15 +125,26 @@ export class SFUNode {
 
 	async alive() {
 		try {
-			const response = await this.ipc.requestToNode(
-				this.node_id.toString(),
-				"alive",
-			)
-
-			return !!response
+			return !!(await this.request("alive"))
 		} catch {
 			return false
 		}
+	}
+
+	async consumerControl(payload: IPC_ConsumerControlPayload) {
+		return await this.request("consumerControl", payload)
+	}
+
+	async requestKeyframe(payload: IPC_RequestKeyframePayload) {
+		return await this.request("requestKeyframe", payload)
+	}
+
+	async request(event: string, payload?: any) {
+		return await this.ipc.requestToNode(
+			this.node_id.toString(),
+			event,
+			payload,
+		)
 	}
 
 	serialize() {

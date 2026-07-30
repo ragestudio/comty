@@ -95,6 +95,10 @@ export class Screen {
 			this.media.addTrack(consumer.track)
 		}
 
+		if (producer.kind === "video") {
+			this.requestVideoKeyframeUntilDecoded(consumer)
+		}
+
 		return consumer
 	}
 
@@ -162,6 +166,54 @@ export class Screen {
 		if (this.audioGainNode) {
 			this.audioGainNode.gain.value = volume / 100
 		}
+	}
+
+	requestVideoKeyframeUntilDecoded = (consumer: Consumer) => {
+		let attempts = 0
+
+		const requestKeyframe = () => {
+			try {
+				if (this.active && !consumer.closed) {
+					this.rtc.socket.emit("channel:request_keyframe", {
+						consumer_id: consumer.id,
+					})
+				}
+			} catch (err) {
+				this.rtc.console.error(
+					`Failed to request keyframe for consumer [${consumer.id}]: ${err.message}`,
+				)
+			}
+		}
+
+		requestKeyframe()
+
+		const checkStatsInterval = setInterval(async () => {
+			if (!this.active || consumer.closed || attempts > 10) {
+				clearInterval(checkStatsInterval)
+				return
+			}
+			attempts++
+
+			try {
+				const stats = await consumer.getStats()
+				let framesDecoded = 0
+
+				stats.forEach((report) => {
+					if (
+						report.type === "inbound-rtp" &&
+						report.kind === "video"
+					) {
+						framesDecoded = report.framesDecoded || 0
+					}
+				})
+
+				if (framesDecoded === 0) {
+					requestKeyframe()
+				} else {
+					clearInterval(checkStatsInterval)
+				}
+			} catch (err) {}
+		}, 1000)
 	}
 }
 

@@ -84,16 +84,20 @@ export default class Consumers {
 				appData,
 			})
 
+			// create a new remote consumer
+			// IMPORTANT: we need to set paused to true.
 			const consumerInfo = await this.core.socket.call(
 				"channel:consume",
 				{
 					producerId: producerId,
 					transportId: this.core.recvTransport.id,
 					rtpCapabilities: this.core.device.rtpCapabilities,
+					paused: true,
 				},
 			)
 
-			const consumer = await this.core.recvTransport.consume({
+			// create the local consumer
+			const consumer = (await this.core.recvTransport.consume({
 				id: consumerInfo.id,
 				producerId: consumerInfo.producerId,
 				kind: consumerInfo.kind,
@@ -101,7 +105,7 @@ export default class Consumers {
 					...consumerInfo.rtpParameters,
 				},
 				appData: appData,
-			})
+			})) as Consumer
 
 			consumer.userId = userId
 
@@ -111,6 +115,12 @@ export default class Consumers {
 					`Consumer [${consumer.id}] transport closed`,
 				)
 				this.stop(consumer.id)
+			})
+
+			// important to call the sfu to resume the remote consumer
+			await this.core.socket.call("channel:consumer_control", {
+				consumer_id: consumer.id,
+				paused: false,
 			})
 
 			const { readable, writable } =

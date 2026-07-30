@@ -88,7 +88,8 @@ export class SFU_Node {
 		closeTransport: handlers.closeTransport,
 		closeProducer: handlers.closeProducer,
 		closeConsumer: handlers.closeConsumer,
-		requestKeyFrame: handlers.requestKeyFrame,
+		consumerControl: handlers.consumerControl,
+		requestKeyframe: handlers.requestKeyframe,
 	}
 
 	setupTransportEvents(transport: Transport) {

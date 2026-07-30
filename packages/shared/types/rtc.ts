@@ -47,6 +47,11 @@ export type IPC_ConsumePayload = {
 	paused?: boolean
 }
 
+export type IPC_ConsumerControlPayload = {
+	consumer_id: string
+	paused: boolean
+}
+
 export type IPC_CloseTransportPayload = {
 	transport_id: string
 }
@@ -59,6 +64,6 @@ export type IPC_CloseConsumerPayload = {
 	consumer_id: string
 }
 
-export type IPC_RequestKeyFramePayload = {
-	producer_id: string
+export type IPC_RequestKeyframePayload = {
+	consumer_id: string
 }

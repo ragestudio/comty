@@ -5,6 +5,7 @@ export type ConsumePayload = {
 	producerId: string
 	transportId: string
 	rtpCapabilities: any
+	paused: boolean
 }
 
 async function consumeHandler(
@@ -21,7 +22,7 @@ async function consumeHandler(
 			throw new Error("Client not in channel")
 		}
 
-		const { producerId, transportId, rtpCapabilities } = payload
+		const { producerId, transportId, rtpCapabilities, paused } = payload
 
 		if (!producerId || !transportId || !rtpCapabilities) {
 			throw new Error("Missing required parameters")
@@ -45,21 +46,21 @@ async function consumeHandler(
 		const consumer = await transport.consume({
 			producerId,
 			rtpCapabilities,
-			paused: false,
+			paused: paused ?? false,
 		})
 
-		// request a keyframe immediately so the new viewer
-		// does not wait for the next periodic keyframe
-		if (consumer.kind === "video") {
-			try {
-				await consumer.requestKeyFrame()
-			} catch (e) {
-				console.warn(
-					`[CHANNEL:${this.channelId}] consumer.requestKeyFrame failed for ${producerId}:`,
-					e,
-				)
-			}
-		}
+		// // request a keyframe immediately so the new viewer
+		// // does not wait for the next periodic keyframe
+		// if (consumer.kind === "video") {
+		// 	try {
+		// 		await consumer.requestKeyFrame()
+		// 	} catch (e) {
+		// 		console.warn(
+		// 			`[CHANNEL:${this.channelId}] consumer.requestKeyFrame failed for ${producerId}:`,
+		// 			e,
+		// 		)
+		// 	}
+		// }
 
 		// Store consumer
 		if (!this.consumers.has(client.userId)) {

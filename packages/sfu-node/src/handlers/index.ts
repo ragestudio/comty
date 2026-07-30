@@ -8,10 +8,11 @@ import routerCanConsume from "./routerCanConsume"
 import connectTransport from "./connectTransport"
 import produce from "./produce"
 import consume from "./consume"
+import consumerControl from "./consumerControl"
 import closeTransport from "./closeTransport"
 import closeProducer from "./closeProducer"
 import closeConsumer from "./closeConsumer"
-import requestKeyFrame from "./requestKeyFrame"
+import requestKeyframe from "./requestKeyframe"
 
 export {
 	alive,
@@ -24,8 +25,9 @@ export {
 	connectTransport,
 	produce,
 	consume,
+	consumerControl,
 	closeTransport,
 	closeProducer,
 	closeConsumer,
-	requestKeyFrame,
+	requestKeyframe,
 }
