@@ -136,8 +136,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0
       linebridge-client:
-        specifier: ^1.6.0
-        version: 1.6.0
+        specifier: ^1.7.0
+        version: 1.7.0
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -2600,6 +2600,9 @@ packages:
 
   linebridge-client@1.6.0:
     resolution: {integrity: sha512-zk63HWjVKxR1f90qnEnDZrMCL7AO/zNj9k8MhqrRuHxv6+zD/hwaaA+FJJLCCEuELg35RRfnuLdLJ3gEgAz2GQ==}
+
+  linebridge-client@1.7.0:
+    resolution: {integrity: sha512-P5XtWfecVByVPWuSMg9C2SGtCwVU6emhpmq0hDk4D24Yad6O8N8O4+KdlW7p1a8kVoU78o4RJEV7jcbrrp1qOA==}
 
   loadjs@4.3.0:
     resolution: {integrity: sha512-vNX4ZZLJBeDEOBvdr2v/F+0aN5oMuPu7JTqrMwp+DtgK+AryOlpy6Xtm2/HpNr+azEa828oQjOtWsB6iDtSfSQ==}
@@ -6230,6 +6233,8 @@ snapshots:
       immediate: 3.0.6
 
   linebridge-client@1.6.0: {}
+
+  linebridge-client@1.7.0: {}
 
   loadjs@4.3.0: {}
 
