@@ -26,34 +26,6 @@ export default class API extends Server {
 		...SharedMiddlewares,
 	}
 
-	onClientConnected = (ctx: RtEngineContext) => {
-		if (!ctx) return null
-		if (!ctx.meta) return null
-
-		try {
-			this.contexts.userConnections.handleConnection({
-				socket_id: ctx.socket_id,
-				user_id: ctx.meta.user_id,
-			})
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
-	onClientDisconnected = (ctx: RtEngineContext) => {
-		if (!ctx) return null
-		if (!ctx.meta) return null
-
-		try {
-			this.contexts.userConnections.handleDisconnection({
-				socket_id: ctx.socket_id,
-				user_id: ctx.meta.user_id,
-			})
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
 	contexts = {
 		db: new DbManager(),
 		scylla: (global.scylla = new ScyllaDb({
@@ -71,19 +43,6 @@ export default class API extends Server {
 			}),
 		() => this.contexts.redis.initialize(),
 	]
-
-	async onInitialize() {
-		if (this.nats) {
-			await this.nats.subscribeToGlobalChannel(
-				"connection",
-				this.onClientConnected,
-			)
-			await this.nats.subscribeToGlobalChannel(
-				"disconnection",
-				this.onClientDisconnected,
-			)
-		}
-	}
 }
 
 Boot(API)
