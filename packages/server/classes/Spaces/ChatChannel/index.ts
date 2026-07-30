@@ -129,7 +129,7 @@ export default class ChatChannel {
 	}
 
 	async getFirstMessageBeforeId(messageId: string) {
-		return await ChannelMessagesModel.findOne(
+		const results = await ChannelMessagesModel.find(
 			{
 				channel_id: this._id,
 				_id: {
@@ -140,8 +140,11 @@ export default class ChatChannel {
 				orderBy: {
 					_id: "desc",
 				},
+				limit: 1,
 			},
 		)
+
+		return results[0]
 	}
 
 	async sendEventToChannelTopic(event: string, data: any) {
