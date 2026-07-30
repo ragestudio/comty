@@ -3,6 +3,7 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - comty.js@0.81.0
+  - linebridge-client@1.7.0
 overrides:
   "@comty/shared": link:../shared
   shared: link:../shared
