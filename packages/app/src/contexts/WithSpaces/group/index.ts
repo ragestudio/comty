@@ -146,7 +146,10 @@ const useGroup = ({ group_id }: { group_id: string }) => {
 		return () => {
 			setConnectedMembers([])
 			setMembersDecorations({})
+
+			usersConnectionsRef.current.clear()
 			fetchedDecorationsRef.current.clear()
+
 			lastLoadedMemberId.current = null
 
 			if (socket.current) {

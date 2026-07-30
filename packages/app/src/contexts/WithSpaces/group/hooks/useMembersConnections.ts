@@ -11,23 +11,26 @@ export const useMembersConnections = (group_id: string) => {
 	const [connectedMembers, setConnectedMembers] = React.useState<string[]>([])
 	const usersConnectionsRef = React.useRef<
 		Map<string, UserConnectionReference>
-	>(new Map()).current
+	>(new Map())
 
 	const evaluateMembersConnections = React.useCallback(
 		async (members: Member[]) => {
-			console.debug("[members] evaluating:", members)
+			console.debug("[members] evaluating connections:", members)
 
 			if (members.length === 0) return
 
 			let missingReferences: string[] = []
 
 			for (const member of members) {
-				if (!usersConnectionsRef.has(member.user_id)) {
+				if (!usersConnectionsRef.current.has(member.user_id)) {
 					missingReferences.push(member.user_id)
 				}
 			}
 
-			console.debug("[members] missing refs:", missingReferences)
+			console.debug(
+				"[members] connections missing refs:",
+				missingReferences,
+			)
 
 			const states = await GroupsModel.members.connections(
 				group_id,
@@ -39,7 +42,7 @@ export const useMembersConnections = (group_id: string) => {
 			console.log("[members] computing ref states:", states)
 
 			for (const memberState of states) {
-				usersConnectionsRef.set(memberState.userId, memberState)
+				usersConnectionsRef.current.set(memberState.userId, memberState)
 
 				setConnectedMembers((prev) => {
 					const newState = [...prev]
