@@ -84,6 +84,9 @@ const MembersPanel = () => {
 							key={`offline-${member._id}`}
 							member={member}
 							connected={false}
+							decorations={
+								group.membersDecorations[member.user_id]
+							}
 						/>
 					))}
 				</LoadMore>

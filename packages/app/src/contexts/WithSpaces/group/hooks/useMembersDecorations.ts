@@ -30,7 +30,6 @@ export const useMembersDecorations = () => {
 			)
 
 			try {
-				// Fetcheamos en lote
 				const users_ids = missingIds.join(",")
 				const fetchedData =
 					await UsersModel.V2.decorations.get(users_ids)

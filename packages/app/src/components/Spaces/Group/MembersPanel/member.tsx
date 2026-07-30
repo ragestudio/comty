@@ -2,14 +2,13 @@ import type { Member as T_Member } from "@/contexts/WithSpaces/collections/membe
 
 import React from "react"
 import { Tag } from "antd"
-import classnames from "classnames"
+import classNames from "classnames"
 
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 import copyToClipboard from "@utils/copyToClipboard"
 
 import "./member.less"
-import classNames from "classnames"
 
 export const MemberContextMenu = ({ member, close }) => {
 	const onClickUser = React.useCallback(() => {
@@ -120,6 +119,25 @@ const MemberBackgroundDecoration = ({
 	playing?: boolean
 }) => {
 	const mediaRef = React.useRef(null)
+	const [mimetype, setMimetype] = React.useState(null)
+
+	const getMimetype = async () => {
+		try {
+			const response = await fetch(decoration.image_obj, {
+				method: "HEAD",
+			})
+
+			const contentType = response.headers.get("content-type")
+
+			if (!contentType) {
+				return null
+			}
+
+			setMimetype(contentType.split("/"))
+		} catch (error) {
+			console.error(error)
+		}
+	}
 
 	React.useEffect(() => {
 		if (!mediaRef.current) return undefined
@@ -131,6 +149,15 @@ const MemberBackgroundDecoration = ({
 		}
 	}, [playing])
 
+	React.useEffect(() => {
+		if (!decoration?.image_obj) return undefined
+
+		getMimetype()
+	}, [decoration])
+
+	if (!decoration) return null
+	if (!mimetype) return null
+
 	return (
 		<div
 			className={classNames(
@@ -140,13 +167,17 @@ const MemberBackgroundDecoration = ({
 				},
 			)}
 		>
-			<video
-				src={decoration?.image_obj}
-				ref={mediaRef}
-				playsInline
-				loop
-				muted
-			/>
+			{mimetype[0] === "video" && (
+				<video
+					src={decoration.image_obj}
+					ref={mediaRef}
+					playsInline
+					loop
+					muted
+				/>
+			)}
+
+			{mimetype[0] === "image" && <img src={decoration.image_obj} />}
 		</div>
 	)
 }
@@ -194,7 +225,7 @@ export const Member = ({
 			context-menu="ignore"
 			data-membership-id={member._id}
 			data-user-id={member.user._id}
-			className={classnames("group-page__members-panel__member", {
+			className={classNames("group-page__members-panel__member", {
 				["connected"]: !!connected,
 				["hovering"]: hovering,
 			})}
