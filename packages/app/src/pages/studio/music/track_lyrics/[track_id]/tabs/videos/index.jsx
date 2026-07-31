@@ -142,7 +142,7 @@ const VideoEditor = () => {
 						<Space wrap>
 							<UploadButton
 								onSuccess={(_, data) => handleVideoUpload(data)}
-								accept={["video/*"]}
+								accept={"video/*"}
 								headers={{ transformations: "mq-hls" }}
 								disabled={state.saving}
 								icon={<Icons.Upload />}
