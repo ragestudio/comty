@@ -146,9 +146,7 @@ const UploadButton = (props) => {
 		<Upload
 			customRequest={handleUpload}
 			multiple={props.multiple ?? false}
-			// TODO: Fixme, antd 6.0 broke this so bad
-			//accept={props.accept ?? ["image/*", "video/*", "audio/*"]}
-			progress={false}
+			accept={props.accept}
 			fileList={[]}
 			className={
 				!props.render &&
