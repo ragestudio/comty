@@ -1,12 +1,10 @@
 import React from "react"
-// @ts-ignore
-import GroupsModel from "@models/groups"
 import buildSocketEvents from "./events"
 import { cacheGroup, cacheChannels, cacheMembers } from "../helpers/cache"
 
 import type { Group } from "../collections/group"
 import type { Channels, StatedChannel } from "../collections/channel"
-import type { Member, Members } from "../collections/member"
+import type { Members } from "../collections/member"
 
 import { useGroupData } from "./hooks/useGroupData"
 import { useGroupChannels } from "./hooks/useGroupChannels"
@@ -16,7 +14,10 @@ import { useMembersConnections } from "./hooks/useMembersConnections"
 import { useMembersDecorations } from "./hooks/useMembersDecorations"
 import { useGroupLoad } from "./hooks/useGroupLoad"
 
-const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
+export type { UserConnectionReference } from "./hooks/useMembersConnections"
+export type { CachedGroup } from "./hooks/useGroupLoad"
+
+export const VALID_CHANNEL_KINDS = ["chat", "voice"] as const
 
 export interface EventsUpdaters {
 	setData: React.Dispatch<React.SetStateAction<Group>>
@@ -28,17 +29,17 @@ export interface EventsUpdaters {
 	>
 }
 
-const DEFAULT_CHANNELS_STATE = () => ({
+export const DEFAULT_CHANNELS_STATE = () => ({
 	items: [],
 	total_items: 0,
 	has_more: false,
 })
-const DEFAULT_MEMBERS_STATE = () => ({
+export const DEFAULT_MEMBERS_STATE = () => ({
 	items: [],
 	total_items: 0,
 	has_more: false,
 })
-const DEFAULT_GROUP_STATE = () => ({
+export const DEFAULT_GROUP_STATE = () => ({
 	_id: null,
 	name: null,
 	description: null,
@@ -46,22 +47,11 @@ const DEFAULT_GROUP_STATE = () => ({
 	owner_user_id: null,
 	groupCoverImageAverageColor: null,
 	connectedMembers: [],
-	channels: {
-		items: [],
-		total_items: 0,
-		has_more: false,
-	},
-	members: {
-		items: [],
-		total_items: 0,
-		has_more: false,
-	},
+	channels: DEFAULT_CHANNELS_STATE(),
+	members: DEFAULT_MEMBERS_STATE(),
 })
 
-export type { UserConnectionReference } from "./hooks/useMembersConnections"
-export type { CachedGroup } from "./hooks/useGroupLoad"
-
-const useGroup = ({ group_id }: { group_id: string }) => {
+export const useGroup = ({ group_id }: { group_id: string }) => {
 	if (!group_id) {
 		throw new Error("group_id is required")
 	}
@@ -190,12 +180,7 @@ const useGroup = ({ group_id }: { group_id: string }) => {
 	}
 }
 
-const GroupContext = React.createContext<ReturnType<typeof useGroup>>(null)
+export const GroupContext =
+	React.createContext<ReturnType<typeof useGroup>>(null)
 
-export {
-	VALID_CHANNEL_KINDS,
-	DEFAULT_GROUP_STATE as DEFAULT_CONTEXT_DATA,
-	GroupContext,
-	useGroup,
-}
 export default GroupContext

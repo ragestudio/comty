@@ -7,6 +7,7 @@ import GroupsModel from "@models/groups"
 
 import db from "../../store"
 import { resolveCachedMembersUsers } from "../../helpers/cache"
+import { DEFAULT_MEMBERS_STATE } from ".."
 
 export interface CachedGroup {
 	group: Group | null
@@ -125,6 +126,8 @@ export const useGroupLoad = ({
 
 			// fetch the members list if not cached or is empty
 			if (!cached.memberships || cached.memberships.length === 0) {
+				// if the members list is not cached or is empty, set it to the default state and fetch it
+				setMembers(DEFAULT_MEMBERS_STATE())
 				await fetchMembers()
 			} else {
 				// inject user data from users cache into memberships
