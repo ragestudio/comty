@@ -1,4 +1,5 @@
-import { EventsUpdaters } from ".."
+import type { EventsUpdaters } from ".."
+
 import db from "../../store"
 
 export default (

@@ -1,5 +1,5 @@
-import { EventsUpdaters } from ".."
-import { Message } from "../../collections/message"
+import type { EventsUpdaters } from ".."
+import type { Message } from "../../collections/message"
 
 import db from "../../store"
 

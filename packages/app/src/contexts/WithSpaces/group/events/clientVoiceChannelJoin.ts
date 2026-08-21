@@ -1,5 +1,5 @@
-import { EventsUpdaters } from ".."
-import { Client } from "../../collections/client"
+import type { EventsUpdaters } from ".."
+import type { Client } from "../../collections/client"
 
 export interface ClientVoiceChannelJoinPayload {
 	channelId: string

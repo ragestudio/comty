@@ -1,6 +1,7 @@
-import { EventsUpdaters } from ".."
-import db from "../../store"
+import type { EventsUpdaters } from ".."
+
 import UserModel from "@models/user"
+import db from "../../store"
 
 export interface MemberchipCreatedPayload {
 	group_id: string

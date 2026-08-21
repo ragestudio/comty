@@ -1,4 +1,4 @@
-import { EventsUpdaters } from ".."
+import type { EventsUpdaters } from ".."
 
 export interface UserOfflinePayload {
 	userId: string

@@ -1,5 +1,5 @@
-import { EventsUpdaters } from ".."
-import { Channel } from "../../collections/channel"
+import type { EventsUpdaters } from ".."
+import type { Channel } from "../../collections/channel"
 
 import db from "../../store"
 
