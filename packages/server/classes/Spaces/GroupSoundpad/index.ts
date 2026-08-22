@@ -1,13 +1,7 @@
 import * as db_models from "@db_models"
 const { GroupSoundpadItem } = db_models as any
 
-export interface SoundpadItemPayload {
-	group_id: string
-	user_id: string
-	icon: string
-	name: string
-	src: string
-}
+import type { SoundpadItemPayload } from "@comty/shared/types/spaces/soundpad"
 
 export default class GroupSoundpad {
 	static getBuiltInItems(): any[] {
