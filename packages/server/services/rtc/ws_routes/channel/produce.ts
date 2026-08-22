@@ -1,11 +1,6 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
-import type { ProducePayload } from "@classes/MediaChannel/handlers/produce"
-
-interface ProducePayloadReq extends ProducePayload {
-	isDm?: boolean
-	[key: string]: any
-}
+import type { RTC_ProducePayload as ProducePayloadReq } from "@comty/shared/types/rtc/events/index"
 
 export default defineRoute<API, "ws">()({
 	useContexts: ["mediaChannels"] as const,

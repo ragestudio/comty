@@ -1,6 +1,6 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
-import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc"
+import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc/events/index"
 
 export default defineRoute<API, "ws">()({
 	useContexts: ["mediaChannels"] as const,

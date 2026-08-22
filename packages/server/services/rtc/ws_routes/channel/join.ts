@@ -1,12 +1,6 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
-
-interface JoinPayload {
-	is_dm?: boolean
-	channel_id?: string
-	group_id?: string
-	[key: string]: any
-}
+import type { RTC_JoinPayload as JoinPayload } from "@comty/shared/types/rtc/events/index"
 
 export default defineRoute<API, "ws">()({
 	useContexts: ["mediaChannels"] as const,

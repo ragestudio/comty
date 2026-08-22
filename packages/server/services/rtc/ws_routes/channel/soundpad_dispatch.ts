@@ -1,10 +1,6 @@
 import type API from "@services/rtc/rtc.service"
 import type { RTCClient } from "@services/rtc/types"
-
-interface SoundpadPayload {
-	isDm?: boolean
-	[key: string]: any
-}
+import type { RTC_SoundpadPayload as SoundpadPayload } from "@comty/shared/types/rtc/events/index"
 
 export default defineRoute<API, "ws">()({
 	useContexts: ["mediaChannels"] as const,
