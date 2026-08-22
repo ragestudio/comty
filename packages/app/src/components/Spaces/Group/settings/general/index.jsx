@@ -5,24 +5,23 @@ import Button from "@ui/Button"
 import ConfirmButton from "@ui/ConfirmButton"
 import UploadButton from "@components/UploadButton"
 import { Icons } from "@components/Icons"
-import Upload from "antd/es/upload/Upload"
 
-import GroupContext from "@contexts/WithSpaces/group"
+import { useGroupData } from "@contexts/WithSpaces/stores"
 import GroupsModel from "@models/groups"
 
 import "./index.less"
 
 const GeneralSettings = () => {
-	const group = React.useContext(GroupContext)
+	const data = useGroupData()
 
 	const baseValues = React.useMemo(() => {
 		return {
-			name: group?.data?.name,
-			description: group?.data?.description,
-			icon: group?.data?.icon,
-			cover: group?.data?.cover,
+			name: data?.name,
+			description: data?.description,
+			icon: data?.icon,
+			cover: data?.cover,
 		}
-	}, [group.data])
+	}, [data])
 
 	const [values, setValues] = React.useState(baseValues)
 
@@ -41,14 +40,14 @@ const GeneralSettings = () => {
 
 	const submit = async () => {
 		console.log("submit", values)
-		await GroupsModel.modify(group?.data?._id, values)
+		await GroupsModel.modify(data?._id, values)
 		baseValues
 	}
 
 	const handleDeleteGroup = async () => {
 		app.layout.modal.confirm({
 			onConfirm: async () => {
-				await GroupsModel.delete(group?.data?._id)
+				await GroupsModel.delete(data?._id)
 
 				app.cores.notifications.new({
 					title: "Group deleted",
@@ -63,7 +62,7 @@ const GeneralSettings = () => {
 	const handleLeaveGroup = async () => {
 		app.layout.modal.confirm({
 			onConfirm: async () => {
-				await GroupsModel.leave(group?.data?._id)
+				await GroupsModel.leave(data?._id)
 
 				app.location.push("/spaces")
 			},

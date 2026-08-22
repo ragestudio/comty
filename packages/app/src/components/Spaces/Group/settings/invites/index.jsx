@@ -1,31 +1,15 @@
 import React from "react"
 import Button from "@ui/Button"
 import ConfirmButton from "@ui/ConfirmButton"
-import Popover from "@ui/Popover"
-
 import { Icons } from "@components/Icons"
 
 import GroupsModel from "@models/groups"
-import GroupContext from "@contexts/WithSpaces/group"
+import { useGroupData } from "@contexts/WithSpaces/stores"
 
 import use from "comty.js/hooks/use"
 import copyToClipboard from "@utils/copyToClipboard"
 
 import "./index.less"
-
-const PopoverConfirmComponent = ({ title, description, onConfirm }) => {
-	return (
-		<div>
-			{title && <h3>{title}</h3>}
-			{description && <p>{description}</p>}
-
-			<Button
-				size="small"
-				onClick={onConfirm}
-			/>
-		</div>
-	)
-}
 
 const GroupInviteItem = ({ invite, onClickDelete, onClickCopy }) => {
 	return (
@@ -61,34 +45,34 @@ const GroupInviteItem = ({ invite, onClickDelete, onClickCopy }) => {
 }
 
 const GroupInvitesSettings = () => {
-	const group = React.useContext(GroupContext)
+	const data = useGroupData()
 
 	const { loading, error, result, repeat } = use(
 		GroupsModel.invites.getAll,
-		group?.data?._id,
+		data?._id,
 	)
 
 	const onClickCopyItem = React.useCallback(
 		(item) => {
 			copyToClipboard(
-				`${window.location.origin}/invite/${group?.data?._id}/${item.key}`,
+				`${window.location.origin}/invite/${data?._id}/${item.key}`,
 			)
 		},
-		[result],
+		[result, data],
 	)
 
 	const onClickDeleteItem = React.useCallback(
 		async (item) => {
-			await GroupsModel.invites.delete(group?.data?._id, item.key)
+			await GroupsModel.invites.delete(data?._id, item.key)
 			await repeat()
 		},
-		[result],
+		[result, data],
 	)
 
 	const onClickCreateNewItem = React.useCallback(async () => {
-		await GroupsModel.invites.create(group?.data?._id)
+		await GroupsModel.invites.create(data?._id)
 		await repeat()
-	}, [result])
+	}, [result, data])
 
 	if (error) {
 		return <div>Error {String(error.message)}</div>

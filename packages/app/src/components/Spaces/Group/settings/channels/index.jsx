@@ -7,7 +7,7 @@ import { Icons } from "@components/Icons"
 import SortableList from "@components/SortableList"
 
 import GroupsModel from "@models/groups"
-import GroupContext from "@contexts/WithSpaces/group"
+import { useGroupData, useGroupChannels } from "@contexts/WithSpaces/stores"
 
 import "./index.less"
 
@@ -127,11 +127,12 @@ const Channel = ({ data, onClickDelete }) => {
 }
 
 const ChannelsList = ({ onDeleteChannel }) => {
-	const group = React.useContext(GroupContext)
+	const data = useGroupData()
+	const groupChannels = useGroupChannels()
 	const [channels, setChannels] = React.useState([])
 
 	const hasChanges = () => {
-		const originalChannelsIds = group.channels.items.map((c) => c._id)
+		const originalChannelsIds = groupChannels?.items?.map((c) => c._id) || []
 		const channelsIds = channels.map((c) => c._id)
 
 		// check if the channels orders are different
@@ -152,21 +153,23 @@ const ChannelsList = ({ onDeleteChannel }) => {
 		setChannels(arr)
 
 		await GroupsModel.channels.order(
-			group?.data?._id,
+			data?._id,
 			arr.map((c) => c._id),
 		)
 	}
 
 	React.useEffect(() => {
-		setChannels(group.channels.items)
-	}, [])
+		if (groupChannels?.items) {
+			setChannels(groupChannels.items)
+		}
+	}, [groupChannels?.items])
 
 	return (
 		<div className="group-settings-channels__list">
 			{hasChanges() ? "changes" : "no changes"}
 			<SortableList
 				itemIdKey="_id"
-				items={group.channels.items}
+				items={groupChannels?.items || []}
 				renderItem={(channel) => (
 					<Channel
 						key={channel._id}
@@ -183,19 +186,19 @@ const ChannelsList = ({ onDeleteChannel }) => {
 }
 
 const ChannelsSettings = () => {
-	const group = React.useContext(GroupContext)
+	const data = useGroupData()
 
 	const handleCreateNewChannel = async () => {
 		app.layout.modal.open("new-channel-dialog", NewChannelDialog, {
 			props: {
-				group_id: group.data._id,
+				group_id: data?._id,
 				onCreated: (channel) => {},
 			},
 		})
 	}
 
 	const handleDeleteChannel = async (channel_id) => {
-		await GroupsModel.channels.channel.delete(group.data._id, channel_id)
+		await GroupsModel.channels.channel.delete(data?._id, channel_id)
 	}
 
 	return (
