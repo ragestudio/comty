@@ -2,15 +2,18 @@ import type {
 	onWriteCallbackType,
 	onDeleteCallbackType,
 } from "@shared-classes/Spaces/ChatChannel"
+import type GroupChatChannelController from "."
 
 import ChatChannel from "@shared-classes/Spaces/ChatChannel"
 import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
 
 export default class GroupChatChannel extends ChatChannel {
-	constructor(controller, channel) {
+	constructor(controller: GroupChatChannelController, channel) {
 		super(controller, channel)
 		this.topic = "chats:channel"
 	}
+
+	declare controller: GroupChatChannelController
 
 	onWrite: onWriteCallbackType = async (user, message, batch) => {
 		// update last message id
