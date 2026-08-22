@@ -8,16 +8,15 @@ import Icons from "@components/Icons"
 
 import imageAverageColor from "@utils/imageAverageColor"
 
-import GroupContext from "@contexts/WithSpaces/group"
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
+import { useGroupData, useGroupLoading } from "@contexts/WithSpaces/stores"
+import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
 
 import "./index.less"
 
 const GroupHeader = () => {
 	const spaces = useSpacesNavigation()
-	const group = React.useContext(GroupContext)
-
-	const data = group?.data ?? {}
+	const data = useGroupData() || {}
+	const loading = useGroupLoading()
 
 	const [groupCoverImageAverageColor, setGroupCoverImageAverageColor] =
 		React.useState(null)
@@ -39,7 +38,7 @@ const GroupHeader = () => {
 		}
 	}, [data])
 
-	if (!group || group.loading) {
+	if (loading) {
 		return (
 			<div className={"group-page__header"}>
 				<div className="group-page__header__content">
