@@ -8,13 +8,14 @@ import { DragDropProvider } from "@dnd-kit/react"
 import { useSortable } from "@dnd-kit/react/sortable"
 import { move } from "@dnd-kit/helpers"
 
+//import useAckNotifications from "@hooks/useAckNotifications"
 import GroupsModel from "@models/groups"
 
 import GroupListItem from "../GroupListItem"
 
 import "./index.less"
 
-const SortableItem = ({ group, index, onClick, selected }) => {
+const SortableItem = ({ group, index, onClick, selected, unreadBadge }) => {
 	const sortable = useSortable({ id: group._id, index })
 
 	return (
@@ -30,6 +31,7 @@ const SortableItem = ({ group, index, onClick, selected }) => {
 
 const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 	const { loading, error, result, setResult, repeat } = use(GroupsModel.getMy)
+	//const { pending } = useAckNotifications()
 
 	const handleMembershipCreated = (data) => {
 		console.debug("groups:membership:created", data)
@@ -110,27 +112,41 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 					onDragEnd={handleOnDragEndItems}
 					modifiers={[RestrictToVerticalAxis]}
 				>
-					{result.items.map((group, index) => (
-						<SortableItem
-							key={group._id}
-							index={index}
-							group={group}
-							onClick={onClickItem}
-							selected={selected === group._id}
-						/>
-					))}
+					{result.items.map((group, index) => {
+						// const unreadBadge = pending.filter(
+						// 	(n) => n.group_id === group._id,
+						// ).length
+
+						return (
+							<SortableItem
+								key={group._id}
+								index={index}
+								group={group}
+								onClick={onClickItem}
+								selected={selected === group._id}
+								//unreadBadge={unreadBadge}
+							/>
+						)
+					})}
 				</DragDropProvider>
 			)}
 
 			{!sortable &&
-				result.items.map((group) => (
-					<GroupListItem
-						key={group._id}
-						group={group}
-						onClick={onClickItem}
-						selected={selected === group._id}
-					/>
-				))}
+				result.items.map((group) => {
+					// const unreadBadge = pending.filter(
+					// 	(n) => n.group_id === group._id,
+					// ).length
+
+					return (
+						<GroupListItem
+							key={group._id}
+							group={group}
+							onClick={onClickItem}
+							selected={selected === group._id}
+							//unreadBadge={unreadBadge}
+						/>
+					)
+				})}
 
 			<div
 				id="create-space-button"
