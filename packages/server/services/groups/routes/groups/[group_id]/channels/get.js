@@ -1,5 +1,6 @@
 import Groups from "@shared-classes/Spaces/Groups"
 import GroupChannels from "@shared-classes/Spaces/GroupChannels"
+import LastChannelMessageIdModel from "@db/group_channels_last_message_id"
 
 export default {
 	useMiddlewares: ["withAuthentication"],
@@ -19,6 +20,16 @@ export default {
 		)
 
 		channels = channels.map((channel) => channel.toRaw())
+
+		const lastMessageIds = await Promise.all(
+			channels.map(c => LastChannelMessageIdModel.findOne({ channel_id: c._id }).catch(() => null))
+		)
+
+		channels.forEach((c, index) => {
+			if (lastMessageIds[index]) {
+				c.last_message_id = lastMessageIds[index]._id
+			}
+		})
 
 		const channelOrder = await GroupChannels.orderModel
 			.findOne({

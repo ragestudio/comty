@@ -1,7 +1,7 @@
 import type API from "@services/chats/chats.service"
 
 import User from "@db_models/user"
-import ChannelLogModel from "@db/channel_log"
+import ChannelLogModel, { type ChannelLog } from "@db/channel_log"
 import MessageModel from "@db/channel_messages"
 
 export default defineRoute<API>()({
@@ -24,13 +24,13 @@ export default defineRoute<API>()({
 			: new Date(0)
 
 		// fetch logs for deletions and updates since last sync
-		const logs = await ChannelLogModel.find(
+		const logs = (await ChannelLogModel.find(
 			{
 				channel_id,
 				timestamp: { $gt: syncFrom },
 			},
 			{ raw: true },
-		)
+		)) as ChannelLog[]
 
 		// fetch updated messages content
 		const updatedMessageIds = logs
