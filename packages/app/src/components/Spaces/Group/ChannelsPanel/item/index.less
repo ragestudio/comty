@@ -9,6 +9,21 @@
 	background-color: var(--background-color-accent);
 	overflow: hidden;
 
+	&.has-unread {
+		.group-page__channels-panel__list-item__content__icon {
+			svg {
+				fill: var(--colorPrimary);
+				stroke: var(--colorPrimary);
+			}
+		}
+
+		.group-page__channels-panel__list-item__content__info__name {
+			p {
+				font-weight: 900;
+			}
+		}
+	}
+
 	&.empty {
 	}
 
@@ -103,6 +118,8 @@
 			display: flex;
 			flex-direction: row;
 
+			gap: 3px;
+
 			height: fit-content;
 
 			p {
@@ -133,6 +150,14 @@
 
 			color: #70e000;
 		}
+	}
+
+	&__unread-badge {
+		background-color: var(--colorPrimary);
+
+		width: 3px;
+		height: 3px;
+		border-radius: 12px;
 	}
 }
 

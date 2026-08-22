@@ -17,6 +17,7 @@ const ChannelsListItem = ({
 	invalid,
 	selected,
 	handleOnClick,
+	hasUnread,
 }) => {
 	if (!channel) {
 		return null
@@ -77,11 +78,12 @@ const ChannelsListItem = ({
 					["selected"]: selected,
 					["joined"]: isJoined,
 					["empty"]: clients?.length === 0,
+					["has-unread"]: hasUnread,
 				},
 			)}
 		>
 			<div
-				className="group-page__channels-panel__list-item__content "
+				className="group-page__channels-panel__list-item__content"
 				onClick={handleOnClick}
 			>
 				<div className="group-page__channels-panel__list-item__content__icon">
@@ -90,7 +92,14 @@ const ChannelsListItem = ({
 				</div>
 
 				<div className="group-page__channels-panel__list-item__content__info">
-					<div className="group-page__channels-panel__list-item__content__info__name">
+					<div
+						className="group-page__channels-panel__list-item__content__info__name"
+						style={{ display: "flex", alignItems: "center" }}
+					>
+						{hasUnread && (
+							<span className="group-page__channels-panel__list-item__content__unread-badge" />
+						)}
+
 						<p>{channel.name}</p>
 					</div>
 

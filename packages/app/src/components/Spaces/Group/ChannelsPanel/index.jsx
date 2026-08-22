@@ -4,18 +4,28 @@ import { Icons } from "@components/Icons"
 
 import ChannelsListItem from "./item"
 
-import { GroupContext, VALID_CHANNEL_KINDS } from "@contexts/WithSpaces/group"
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
+import {
+	useGroupLoading,
+	useGroupChannels,
+	useGroupRTC,
+	useGroupData,
+	VALID_CHANNEL_KINDS,
+} from "@contexts/WithSpaces/stores"
+import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
 
 import "./index.less"
 
 const ChannelsPanel = () => {
-	const group = React.useContext(GroupContext)
+	const loading = useGroupLoading()
+	const channels = useGroupChannels()
+	const statedChannels = useGroupRTC()
+	const data = useGroupData()
+
 	const spaces = useSpacesNavigation()
 
 	const handleOnClickChannel = React.useCallback(
 		(channel) => {
-			if (!group || !group.data) {
+			if (!data) {
 				return null
 			}
 
@@ -30,7 +40,7 @@ const ChannelsPanel = () => {
 
 				return app.cores.mediartc
 					.handlers()
-					.joinChannel(group.data._id, channel._id)
+					.joinChannel(data._id, channel._id)
 			}
 
 			if (channel.kind === "chat") {
@@ -40,7 +50,7 @@ const ChannelsPanel = () => {
 				})
 			}
 		},
-		[group],
+		[data],
 	)
 
 	return (
@@ -52,17 +62,14 @@ const ChannelsPanel = () => {
 			</div>
 
 			<div className="group-page__channels-panel__list">
-				{group?.loading && <Skeleton />}
+				{loading && <Skeleton />}
 
-				{!group?.loading &&
-					group?.channels &&
-					group?.channels.items.map((channel) => {
-						const channelState =
-							group?.statedChannels?.[channel._id]
-
+				{!loading &&
+					channels &&
+					channels.items.map((channel) => {
+						const channelState = statedChannels?.[channel._id]
 						const clients = channelState?.clients || []
 						const producers = channelState?.producers || []
-
 						const startedAt = channelState?.started_at
 
 						return (
