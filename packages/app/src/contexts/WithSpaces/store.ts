@@ -1,11 +1,11 @@
 import { Dexie, type EntityTable } from "dexie"
-import { Group } from "./collections/group"
-import { Channels } from "./collections/channel"
-import { Member, Members } from "./collections/member"
 
-import { Message } from "./collections/message"
-import { User } from "./collections/user"
-import { ChatSyncState } from "./chat/types"
+import type { User } from "@comty/shared/types/user"
+import type { Group } from "@comty/shared/types/spaces/group"
+import type { Channels } from "@comty/shared/types/spaces/channel"
+import type { Member } from "@comty/shared/types/spaces/member"
+import type { Message } from "@comty/shared/types/spaces/message"
+import type { ChatSyncState } from "./stores/chat/types"
 
 type LastChannelsMessage = {
 	channel_id: string
@@ -17,20 +17,13 @@ type MembersCounter = {
 	counter: number
 }
 
-type GroupEntitySyncTime = {
-	group_id: string
-	time: Date
-}
-
 const db = new Dexie("spaces_store") as Dexie & {
 	groups: EntityTable<Group, "_id">
 
 	channels: EntityTable<Channels, "group_id">
-	channels_sync: EntityTable<GroupEntitySyncTime, "group_id">
 
 	members: EntityTable<Member, "_id">
 	members_counter: EntityTable<MembersCounter, "group_id">
-	members_sync: EntityTable<GroupEntitySyncTime, "group_id">
 
 	channel_messages: EntityTable<Message, "_id">
 	last_channels_message: EntityTable<LastChannelsMessage, "channel_id">
@@ -41,15 +34,13 @@ const db = new Dexie("spaces_store") as Dexie & {
 	chats_sync: EntityTable<ChatSyncState, "chat_id">
 }
 
-db.version(4).stores({
+db.version(5).stores({
 	groups: "_id",
 
 	channels: "group_id",
-	channels_sync: "group_id",
 
 	members: "_id, group_id, [group_id+_id]",
 	members_counter: "group_id",
-	members_sync: "group_id",
 
 	channel_messages: "_id, channel_id, [channel_id+_id]",
 	last_channels_message: "channel_id",

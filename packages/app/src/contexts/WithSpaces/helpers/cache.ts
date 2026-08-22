@@ -1,7 +1,7 @@
-import { Channels } from "../collections/channel"
-import { Group } from "../collections/group"
-import { Member, Members } from "../collections/member"
-import { User } from "../collections/user"
+import type { User } from "@comty/shared/types/user"
+import type { Channels } from "@comty/shared/types/spaces/channel"
+import type { Group } from "@comty/shared/types/spaces/group"
+import type { Member, Members } from "@comty/shared/types/spaces/member"
 
 import db from "../store"
 
@@ -21,7 +21,7 @@ export const cacheGroup = async (group: Group): Promise<void> => {
 	}
 }
 
-// cache members list — strips user data into separate users table
+// cache members list, strips user data into separate users table
 export const cacheMembers = async (
 	group_id: string,
 	members: Members,
@@ -133,15 +133,4 @@ export const resolveCachedMembersUsers = async (
 		...m,
 		user: userMap.get(m.user_id) || null,
 	}))
-}
-
-// clear cache for a group
-export const clearGroupCache = async (group_id: string): Promise<void> => {
-	try {
-		await db.members.where("group_id").equals(group_id).delete()
-		await db.channels.where("group_id").equals(group_id).delete()
-		await db.groups.delete(group_id)
-	} catch (err) {
-		console.error("Error clearing group cache:", err)
-	}
 }

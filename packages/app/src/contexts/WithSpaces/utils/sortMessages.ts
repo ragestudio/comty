@@ -1,4 +1,4 @@
-import { Message } from "../collections/message"
+import type { Message } from "@comty/shared/types/spaces/message"
 
 export default (arr: Message[]) => {
 	return arr.sort((a, b) => {
