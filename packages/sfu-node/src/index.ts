@@ -2,7 +2,7 @@ import type { Transport, TransportListenInfo } from "mediasoup/types"
 import type {
 	IPC_RegisterNodePayload,
 	IPC_UnregisterNodePayload,
-} from "@comty/shared/types/rtc"
+} from "@comty/shared/types/rtc/events/index"
 
 import { connect, NatsConnection } from "@nats-io/transport-node"
 import * as mediasoup from "mediasoup"

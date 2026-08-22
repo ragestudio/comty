@@ -1,5 +1,5 @@
 import type { SFU_Node } from ".."
-import type { IPC_CloseConsumerPayload } from "@comty/shared/types/rtc"
+import type { IPC_CloseConsumerPayload } from "@comty/shared/types/rtc/events/ipc"
 import type { IPCMsg } from "../ipc"
 
 export default async function (
