@@ -10,6 +10,7 @@ export default async function (data) {
 		!document.hasFocus()
 	) {
 		app.cores.notifications.new({
+			type: "info",
 			os: true,
 			title: "New DM Message",
 			description: `${data.to_user_id} send you a message`,
