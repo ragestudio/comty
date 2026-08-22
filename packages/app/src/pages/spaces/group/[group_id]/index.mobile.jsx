@@ -15,17 +15,21 @@ import MembersPanel from "@components/Spaces/Group/MembersPanel"
 import useMediaRTCState from "@hooks/useMediaRTCState"
 import useTitle from "@hooks/useTitle"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
-import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
+import {
+	useSpacesNavigation,
+	useGroupActions,
+	useGroupLoading,
+	useGroupData,
+	useGroupChannels,
+	subscribeGroupSocket,
+} from "@contexts/WithSpaces/stores"
 
 import "@pages/spaces/index.less"
 import "./index.less"
 
-const MembersPanelView = (props) => {
+const MembersPanelView = () => {
 	return (
-		<GroupContext.Provider value={props.group}>
-			<MembersPanel />
-		</GroupContext.Provider>
+		<MembersPanel />
 	)
 }
 
@@ -36,9 +40,21 @@ const GroupPage = (props) => {
 	const [activeKey, setActiveKey] = React.useState("channels")
 
 	const rtcState = useMediaRTCState()
-	const group = useGroup({
-		group_id: props.params.group_id,
-	})
+	
+	const actions = useGroupActions()
+	const loading = useGroupLoading()
+	const data = useGroupData()
+	const channels = useGroupChannels()
+
+	React.useEffect(() => {
+		actions.init(props.params.group_id)
+		const cleanup = subscribeGroupSocket(props.params.group_id)
+		
+		return () => {
+			cleanup()
+			actions.reset()
+		}
+	}, [props.params.group_id])
 
 	const onTopBarItemClick = (key) => {
 		if (key === "channels") {
@@ -51,9 +67,7 @@ const GroupPage = (props) => {
 
 		if (key === "members") {
 			app.layout.draggable.open("group-members", MembersPanelView, {
-				componentProps: {
-					group: group,
-				},
+				componentProps: {},
 			})
 			return
 		}
@@ -80,37 +94,35 @@ const GroupPage = (props) => {
 
 	// set document title when group loads
 	React.useEffect(() => {
-		if (!group.data || !group.channels || group.loading) {
+		if (!data || !channels || loading) {
 			return undefined
 		}
 
-		setDocumentTitle(group.data.name)
-	}, [group.data, group.channels, group.loading])
+		setDocumentTitle(data.name)
+	}, [data, channels, loading])
 
-	if (group.loading) {
+	if (loading) {
 		return <Skeleton />
 	}
 
 	return (
-		<GroupContext.Provider value={group}>
-			<div className="spaces-page group-page">
-				{activeKey === "channels" &&
-					!spaces.channel &&
-					!spaces.subview && (
-						<div className="spaces-page__panel">
-							<GroupHeader />
-							<ChannelsPanel />
-						</div>
-					)}
-
-				{(spaces.channel || spaces.subview) && (
-					<div className="group-page__content-panel">
-						<ContentPanelHeader />
-						<ContentPanelRender />
+		<div className="spaces-page group-page">
+			{activeKey === "channels" &&
+				!spaces.channel &&
+				!spaces.subview && (
+					<div className="spaces-page__panel">
+						<GroupHeader />
+						<ChannelsPanel />
 					</div>
 				)}
-			</div>
-		</GroupContext.Provider>
+
+			{(spaces.channel || spaces.subview) && (
+				<div className="group-page__content-panel">
+					<ContentPanelHeader />
+					<ContentPanelRender />
+				</div>
+			)}
+		</div>
 	)
 }
 

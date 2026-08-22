@@ -13,8 +13,15 @@ import {
 	ContentPanelRender,
 } from "@components/Spaces/Group/ContentPanel"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
-import { GroupContext, useGroup } from "@contexts/WithSpaces/group"
+import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+import {
+	useGroupActions,
+	useGroupLoading,
+	useGroupError,
+	useGroupData,
+	useGroupChannels,
+	subscribeGroupSocket,
+} from "@contexts/WithSpaces/stores"
 
 import useRtcChannelId from "@hooks/useRtcChannelId"
 import useTitle from "@hooks/useTitle"
@@ -29,9 +36,12 @@ const GroupPage = (props) => {
 	const [documentTitle, setDocumentTitle] = useTitle()
 
 	const rtcChannelId = useRtcChannelId()
-	const group = useGroup({
-		group_id: props.params.group_id,
-	})
+	
+	const actions = useGroupActions()
+	const loading = useGroupLoading()
+	const error = useGroupError()
+	const data = useGroupData()
+	const channels = useGroupChannels()
 
 	const savedSizes = React.useMemo(() => SplitterSizes.loadSizes(), [])
 
@@ -39,17 +49,27 @@ const GroupPage = (props) => {
 		SplitterSizes.saveSizes(sizes)
 	}, [])
 
+	React.useEffect(() => {
+		actions.init(props.params.group_id)
+		const cleanup = subscribeGroupSocket(props.params.group_id)
+		
+		return () => {
+			cleanup()
+			actions.reset()
+		}
+	}, [props.params.group_id])
+
 	// set document title when group loads
 	React.useEffect(() => {
-		if (!group.data || group.loading) {
+		if (!data || loading) {
 			return undefined
 		}
 
-		setDocumentTitle(group.data.name)
+		setDocumentTitle(data.name)
 
 		// if no channel is selected, load the first text channel (if any)
 		if (!spaces.channel && !spaces.subview) {
-			const firstTextChannel = group.channels.items.find(
+			const firstTextChannel = channels?.items?.find(
 				(channel) => channel.kind === "chat",
 			)
 
@@ -57,58 +77,56 @@ const GroupPage = (props) => {
 				spaces.navigate({ channel: firstTextChannel._id })
 			}
 		}
-	}, [group.data, group.loading])
+	}, [data, loading])
 
 	return (
-		<GroupContext.Provider value={group}>
-			<Splitter
-				className="group-page"
-				onResizeEnd={handleResizeEnd}
+		<Splitter
+			className="group-page"
+			onResizeEnd={handleResizeEnd}
+		>
+			<Splitter.Panel
+				className="group-page__panel"
+				defaultSize={savedSizes?.[0] ?? 330}
+				min={270}
 			>
-				<Splitter.Panel
-					className="group-page__panel"
-					defaultSize={savedSizes?.[0] ?? 330}
-					min={270}
-				>
-					<GroupHeader />
-					<ChannelsPanel />
-					{rtcChannelId && <VoiceChannelCard />}
-				</Splitter.Panel>
+				<GroupHeader />
+				<ChannelsPanel />
+				{rtcChannelId && <VoiceChannelCard />}
+			</Splitter.Panel>
 
-				<Splitter.Panel
-					className="group-page__panel"
-					min={500}
-				>
-					{group.loading && <Skeleton />}
-					{!group.loading && !group.error && (
-						<div className="group-page__content-panel">
-							<ContentPanelHeader />
-							<ContentPanelRender />
-						</div>
-					)}
-					{group.error && (
-						<Result
-							status="error"
-							title="Error"
-							subTitle={group.error.message}
-						/>
-					)}
-				</Splitter.Panel>
-
-				<Splitter.Panel
-					className="group-page__rightbar"
-					defaultSize={savedSizes?.[2] ?? 300}
-					min={300}
-					collapsible
-				>
-					<MembersPanel />
-
-					<div className="group-page__rightbar__attached">
-						<ToolsBar />
+			<Splitter.Panel
+				className="group-page__panel"
+				min={500}
+			>
+				{loading && <Skeleton />}
+				{!loading && !error && (
+					<div className="group-page__content-panel">
+						<ContentPanelHeader />
+						<ContentPanelRender />
 					</div>
-				</Splitter.Panel>
-			</Splitter>
-		</GroupContext.Provider>
+				)}
+				{error && (
+					<Result
+						status="error"
+						title="Error"
+						subTitle={error.message}
+					/>
+				)}
+			</Splitter.Panel>
+
+			<Splitter.Panel
+				className="group-page__rightbar"
+				defaultSize={savedSizes?.[2] ?? 300}
+				min={300}
+				collapsible
+			>
+				<MembersPanel />
+
+				<div className="group-page__rightbar__attached">
+					<ToolsBar />
+				</div>
+			</Splitter.Panel>
+		</Splitter>
 	)
 }
 
