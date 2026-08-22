@@ -1,3 +1,5 @@
+import type { ExtendedMessage as Message } from "@contexts/WithSpaces/stores/chat/types"
+
 import React from "react"
 import classnames from "classnames"
 import ReactPlayer from "react-player"
@@ -12,9 +14,17 @@ import LinkPreview from "./LinkPreview"
 import { useLiveQuery } from "dexie-react-hooks"
 
 import db from "@contexts/WithSpaces/store"
-import { ExtendedMessage as Message } from "@contexts/WithSpaces/chat/types"
 
 import "./Line.less"
+
+interface LineProps {
+	data: Message
+	headless: boolean
+	type?: "group" | "dm"
+	onReplyPreviewClick?: (replyToId: string) => void
+	isLast?: boolean
+	onReadAck?: (messageId: string) => void
+}
 
 const messageRegexs = [
 	{
@@ -97,18 +107,27 @@ const RenderMessage = ({ messageStr }: { messageStr: string }) => {
 	return <p>{messageStr}</p>
 }
 
-interface LineProps {
-	data: Message
-	headless: boolean
-	type?: "group" | "dm"
-	onReplyPreviewClick?: (replyToId: string) => void
-}
-
 const Line = React.memo(
-	({ data, headless, type, onReplyPreviewClick }: LineProps) => {
-		const dbUserData = useLiveQuery(() => db.users.get(data.user_id))
+	({
+		data,
+		headless,
+		type,
+		onReplyPreviewClick,
+		// isLast,
+		// onReadAck,
+	}: LineProps) => {
+		const dbUserData = useLiveQuery(
+			() => (data.user_id ? db.users.get(data.user_id) : undefined),
+			[data.user_id],
+		)
 		const appUserData =
 			(globalThis as any).app?.userData || (window as any).app?.userData
+
+		// const intersectionRef = useMessageIntersection({
+		// 	messageId: data._id,
+		// 	onAck: isLast ? onReadAck : undefined,
+		// 	delayMs: 5000,
+		// })
 
 		const replyData = useLiveQuery(async () => {
 			if (!data.reply_to_id || !type) return null
@@ -140,6 +159,7 @@ const Line = React.memo(
 		if (isSystemMessage) {
 			return (
 				<div
+					//ref={intersectionRef}
 					data-message-id={data._id}
 					className={classnames(
 						"channel-chat__timeline__line",
@@ -159,6 +179,7 @@ const Line = React.memo(
 
 		return (
 			<div
+				//ref={intersectionRef}
 				data-message-id={data._id}
 				data-message-user-id={data.user_id ?? "unknown"}
 				context-menu="chat-line"

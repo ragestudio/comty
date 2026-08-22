@@ -1,3 +1,5 @@
+import type { ExtendedMessage as Message } from "@contexts/WithSpaces/stores/chat/types"
+
 import React from "react"
 import { Result, Skeleton } from "antd"
 import { DateTime } from "luxon"
@@ -9,10 +11,32 @@ import Button from "@ui/Button"
 import ChatInputBar from "./components/InputBar"
 import Line from "./components/Line"
 
-import useChat from "@contexts/WithSpaces/chat"
-import { ExtendedMessage as Message } from "@contexts/WithSpaces/chat/types"
+import {
+	useGroupData,
+	useChatState,
+	useChatActions,
+	subscribeChatSocket,
+} from "@contexts/WithSpaces/stores"
 
 import "./index.less"
+
+interface ChatProps {
+	_id: string
+	type?: "group" | "dm"
+}
+
+interface ChatInnerProps {
+	_id: string
+	type: "group" | "dm"
+	useChatParam: any
+}
+
+interface ReplyTarget {
+	messageId: string
+	messageUserId: string
+	messageText: string
+	userName: string
+}
 
 // if is the same user, in a 3 minutes window, merge with the previous one
 function shouldMergeWithNextItem(nextItem: Message | undefined, item: Message) {
@@ -50,48 +74,65 @@ const useTriggerValue = (callback: () => void) => {
 	}, [])
 }
 
-interface ChatProps {
-	_id: string
-	type?: "group" | "dm"
-	group?: any
-}
+const ChatInner = ({ _id, type, useChatParam }: ChatInnerProps) => {
+	const data = useGroupData()
 
-interface ChatInnerProps {
-	_id: string
-	type: "group" | "dm"
-	group?: any
-	useChatParam: any
-}
-
-interface ReplyTarget {
-	messageId: string
-	messageUserId: string
-	messageText: string
-	userName: string
-}
-
-const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 	const chatContainerRef = React.useRef<HTMLDivElement>(null)
 	const timelineRef = React.useRef<HTMLDivElement>(null)
-	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 	const [replyTo, setReplyTo] = React.useState<ReplyTarget | null>(null)
+	const [scrollableToBottom, setScrollableToBottom] = React.useState(false)
 
 	const {
 		timeline,
 		loading,
 		error,
+		usersTyping,
+		initialLoading,
+		pausedUpdates,
+	} = useChatState()
+
+	const {
 		send,
 		loadBefore,
 		loadAfter,
 		loadAround,
 		typing,
-		usersTyping,
-		initialLoading,
-		pausedUpdates,
 		setPausedUpdates,
-	} = useChat(type, useChatParam, {
-		onNewMessage: () => handleOnNewMessage(),
-	})
+		sendReadAck,
+		init,
+		reset,
+	} = useChatActions()
+
+	const pausedUpdatesRef = React.useRef(pausedUpdates)
+	pausedUpdatesRef.current = pausedUpdates
+
+	const scrollableToBottomRef = React.useRef(scrollableToBottom)
+	scrollableToBottomRef.current = scrollableToBottom
+
+	React.useEffect(() => {
+		init(type as any, useChatParam)
+
+		const cleanup = subscribeChatSocket(type as any, useChatParam, {
+			onNewMessage: () => {
+				if (!timelineRef.current || pausedUpdatesRef.current) {
+					return
+				}
+
+				if (!scrollableToBottomRef.current) {
+					requestAnimationFrame(() => {
+						requestAnimationFrame(() => {
+							timelineRef.current?.scrollTo(0, 0)
+						})
+					})
+				}
+			},
+		})
+
+		return () => {
+			cleanup()
+			reset()
+		}
+	}, [_id, type])
 
 	const bottomTrigger = useTriggerValue(() => {
 		console.debug("View is BOTTOM, loading lasts messages")
@@ -143,31 +184,11 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		}
 	}, [setPausedUpdates, setScrollableToBottom])
 
-	const scrollableToBottomRef = React.useRef(scrollableToBottom)
-	scrollableToBottomRef.current = scrollableToBottom
-
-	const pausedUpdatesRef = React.useRef(pausedUpdates)
-	pausedUpdatesRef.current = pausedUpdates
-
 	const bottomTriggerRef = React.useRef(bottomTrigger)
 	bottomTriggerRef.current = bottomTrigger
 
 	const setPausedUpdatesRef = React.useRef(setPausedUpdates)
 	setPausedUpdatesRef.current = setPausedUpdates
-
-	const handleOnNewMessage = React.useCallback(() => {
-		if (!timelineRef.current || pausedUpdatesRef.current) {
-			return
-		}
-
-		if (!scrollableToBottomRef.current) {
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					timelineRef.current?.scrollTo(0, 0)
-				})
-			})
-		}
-	}, [])
 
 	const bottomDebounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(
 		null,
@@ -268,6 +289,13 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 		[loadAround, scrollToMessage],
 	)
 
+	// const handleReadAck = React.useCallback(
+	// 	(messageId: string) => {
+	// 		sendReadAck(messageId)
+	// 	},
+	// 	[sendReadAck],
+	// )
+
 	const handleReplyPreviewClick = React.useCallback(
 		(replyToId: string) => {
 			jumpToMessage(replyToId)
@@ -337,7 +365,7 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 			data-is-dm={type === "dm"}
 			data-type={type}
 			data-channel-id={_id}
-			data-group-id={group?.data?._id}
+			data-group-id={data?._id}
 		>
 			<div className="channel-chat__wrapper bg-accent">
 				<div
@@ -396,6 +424,8 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 								headless={headless}
 								type={type}
 								onReplyPreviewClick={handleReplyPreviewClick}
+								isLast={index === 0}
+								// onReadAck={handleReadAck}
 							/>
 						)
 					})}
@@ -446,20 +476,22 @@ const ChatInner = ({ _id, type, group, useChatParam }: ChatInnerProps) => {
 	)
 }
 
-const Chat = ({ _id, type = "group", group }: ChatProps) => {
+const Chat = ({ _id, type = "group" }: ChatProps) => {
+	const data = useGroupData()
+
 	if (!_id || !type) {
 		return null
 	}
 
-	if (type === "group" && !group) {
-		console.error("Chat with type group, must provide a group context")
+	if (type === "group" && !data) {
+		console.error("Chat with type group, must wait for group data")
 		return null
 	}
 
 	let useChatParam: any = {}
 
 	if (type === "group") {
-		useChatParam = { group_id: group.data._id, channel_id: _id }
+		useChatParam = { group_id: data?._id, channel_id: _id }
 	}
 
 	if (type === "dm") {
@@ -470,7 +502,6 @@ const Chat = ({ _id, type = "group", group }: ChatProps) => {
 		<ChatInner
 			_id={_id}
 			type={type}
-			group={group}
 			useChatParam={useChatParam}
 		/>
 	)
