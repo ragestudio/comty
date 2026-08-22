@@ -33,7 +33,3 @@ export interface WebsocketEvent {
 	[event: string]: (core: MediaRTC, data: any) => Promise<void>
 }
 
-export interface VoiceState {
-	muted: boolean
-	deafen: boolean
-}

@@ -1,11 +1,17 @@
+import type {
+	RTC_ConnectTransportPayload,
+	RTC_ProducePayload,
+} from "@comty/shared/types/rtc/events/index"
+
 const sendTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			const result = await this.socket.call("channel:connect_transport", {
+			const payload: RTC_ConnectTransportPayload = {
 				isDm: this.state.isDm ?? false,
 				transportId: this.sendTransport.id,
 				dtlsParameters,
-			})
+			}
+			await this.socket.call("channel:connect_transport", payload)
 
 			callback()
 		} catch (error) {
@@ -19,13 +25,14 @@ const sendTransportHandlers = {
 		errback,
 	) {
 		try {
-			const result = await this.socket.call("channel:produce", {
+			const payload: RTC_ProducePayload = {
 				isDm: this.state.isDm ?? false,
 				transportId: this.sendTransport.id,
 				kind,
 				rtpParameters,
 				appData,
-			})
+			}
+			const result = await this.socket.call("channel:produce", payload)
 
 			callback({ id: result.id })
 		} catch (error) {
@@ -56,11 +63,12 @@ const sendTransportObserver = {
 const recvTransportHandlers = {
 	connect: async function ({ dtlsParameters }, callback, errback) {
 		try {
-			const result = await this.socket.call("channel:connect_transport", {
+			const payload: RTC_ConnectTransportPayload = {
 				isDm: this.state.isDm ?? false,
 				transportId: this.recvTransport.id,
 				dtlsParameters,
-			})
+			}
+			await this.socket.call("channel:connect_transport", payload)
 
 			callback()
 		} catch (error) {

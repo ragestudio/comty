@@ -1,5 +1,6 @@
 import MediaRTC from "../mediartc.core"
 import GroupModel from "@models/groups"
+import type { RTC_JoinPayload } from "@comty/shared/types/rtc/events/index"
 
 export default async function (
 	this: MediaRTC,
@@ -20,11 +21,13 @@ export default async function (
 			self: this,
 		})
 
-		const data = await this.socket.call("channel:join", {
+		const payload: RTC_JoinPayload = {
 			is_dm: false,
 			channel_id: channelData._id,
 			group_id: groupId,
-		})
+		}
+
+		const data = await this.socket.call("channel:join", payload)
 
 		this.console.debug("Channel join data:", data)
 

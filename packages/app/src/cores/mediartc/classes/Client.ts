@@ -1,6 +1,5 @@
-import type { VoiceState } from "../types"
+import type { VoiceState } from "@comty/shared/types/rtc/voiceState"
 import type MediaRTC from "../mediartc.core"
-import type Consumer from "./Consumer"
 import Producer from "./Producer"
 
 export default class Client {
