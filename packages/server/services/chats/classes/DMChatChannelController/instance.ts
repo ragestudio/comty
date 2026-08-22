@@ -1,5 +1,6 @@
 import ChatChannel from "@shared-classes/Spaces/ChatChannel"
 import ActivityModel from "@db/direct_messages_activity"
+import NotificationsModel from "@db/notifications"
 
 function genShortMessage(messageObj) {
 	if (
@@ -110,28 +111,38 @@ export default class DMChatChannel extends ChatChannel {
 
 		await Promise.all([senderActivity.save(), receiverActivity.save()])
 
-		// send in background
+		// create explicit notification for receiver
 		try {
+			const notification = NotificationsModel.obj({
+				_id: this.controller.snowflake.nextId().toString(),
+				user_id: receiver_user_id,
+				type: "dm_message",
+				reference_id: this.channel._id.toString(),
+				sender_id: sender_user_id,
+				data: JSON.stringify({
+					short_message,
+					message_id: message._id,
+				}),
+				created_at: now,
+			})
+
+			await notification.save()
+
+			// send in background
 			this.notifyActivityUpdated(sender_user_id, senderActivity.toRaw())
 			this.notifyActivityUpdated(
 				receiver_user_id,
 				receiverActivity.toRaw(),
 			)
+
+			// also emit notification:new
+			this.controller.server.engine.ws.senders.toUserId(
+				receiver_user_id,
+				"notification:new",
+				notification.toRaw(),
+			)
 		} catch (error) {
 			console.error(error)
 		}
 	}
-
-	// onRead = async (user, messages, users) => {
-	// 	const users_ids = this.channel.pair_key.split("-")
-
-	// 	const [sender_user_id, receiver_user_id] = users_ids.sort((i) => {
-	// 		return i === user._id ? -1 : 1
-	// 	})
-
-	// 	console.log("onRead", {
-	// 		sender_user_id,
-	// 		receiver_user_id,
-	// 	})
-	// }
 }

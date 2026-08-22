@@ -11,9 +11,11 @@ export function genPairKey(id1, id2) {
 	return [id1, id2].sort().join("-")
 }
 
+import type { InferDoc } from "@ragestudio/scylla-odm/types"
+
 // TODO: extend RoomsModel and ActivityModel into one type
-type ExtendedDataRoom = typeof RoomsModel.schema.fields &
-	typeof ActivityModel.schema.fields
+type ExtendedDataRoom = InferDoc<typeof RoomsModel.schema> &
+	InferDoc<typeof ActivityModel.schema> & { user: any }
 
 export default class DMChatChannelController {
 	constructor(server: Server) {
@@ -136,20 +138,22 @@ export default class DMChatChannelController {
 				return null
 			}
 
-			room.last_message_at = activityRef.last_message_at
-			room.to_user_id = activityRef.to_user_id
+			const extendedRoom = {
+				...room,
+				last_message_at: activityRef.last_message_at,
+				to_user_id: activityRef.to_user_id,
+				short_message: activityRef.short_message,
+				direction: activityRef.direction,
+				user: users.get(activityRef.to_user_id),
+			} as ExtendedDataRoom
 
-			room.short_message = activityRef.short_message
-			room.direction = activityRef.direction
-			room.user = users.get(room.to_user_id)
-
-			return room
+			return extendedRoom
 		})
 
 		rooms = rooms.filter((room) => room !== null)
 
 		rooms = rooms.sort((a, b) => {
-			return b.last_message_at - a.last_message_at
+			return b.last_message_at.getTime() - a.last_message_at.getTime()
 		})
 
 		return rooms
