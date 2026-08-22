@@ -101,9 +101,7 @@ const VoiceChannel = () => {
 
 	if (!state.channel) {
 		return (
-			<div className="channel-video-page channel-video-page--empty">
-				<h1>join the channel to start</h1>
-			</div>
+			<div className="channel-video-page channel-video-page--empty"></div>
 		)
 	}
 	if (streams.length === 0) {
