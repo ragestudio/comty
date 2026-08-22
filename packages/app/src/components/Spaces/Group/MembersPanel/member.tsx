@@ -1,4 +1,4 @@
-import type { Member as T_Member } from "@/contexts/WithSpaces/collections/member"
+import type { Member as T_Member } from "@comty/shared/types/spaces/collections/member"
 
 import React from "react"
 import { Tag } from "antd"

@@ -3,18 +3,28 @@ import { Skeleton } from "antd"
 import { Icons } from "@components/Icons"
 import LoadMore from "@components/LoadMore"
 
-import GroupContext from "@contexts/WithSpaces/group"
+import {
+	useGroupLoading,
+	useGroupMembers,
+	useGroupConnections,
+	useGroupDecorations,
+	useGroupActions,
+} from "@contexts/WithSpaces/stores"
 
 import Member from "./member"
 
 import "./index.less"
 
 const MembersPanel = () => {
-	const group = React.useContext(GroupContext)
+	const loading = useGroupLoading()
+	const members = useGroupMembers()
+	const connectedMembers = useGroupConnections()
+	const membersDecorations = useGroupDecorations()
+	const actions = useGroupActions()
 
 	const { online, offline } = React.useMemo(() => {
-		const list = group?.members?.items || []
-		const connectedIds = group?.connectedMembers || []
+		const list = members?.items || []
+		const connectedIds = connectedMembers || []
 
 		const onlineList = []
 		const offlineList = []
@@ -40,7 +50,7 @@ const MembersPanel = () => {
 		}
 
 		return { online: onlineList, offline: offlineList }
-	}, [group.loading, group])
+	}, [loading, members, connectedMembers])
 
 	return (
 		<div className="group-page__members-panel">
@@ -49,17 +59,17 @@ const MembersPanel = () => {
 					<Icons.UsersRound /> Members
 				</h3>
 				<span className="group-page__members-panel__header__members-count">
-					{group?.members?.total_items ?? 0}
+					{members?.total_items ?? 0}
 				</span>
 			</div>
 
-			{(group?.loading || !group?.members?.items) && <Skeleton />}
+			{(loading || !members?.items) && <Skeleton />}
 
-			{!group?.loading && group?.members?.items && (
+			{!loading && members?.items && (
 				<LoadMore
-					hasMore={group?.members?.has_more}
-					loading={group.loading}
-					onBottom={group?.fetchMembers}
+					hasMore={members?.has_more}
+					loading={loading}
+					onBottom={actions.fetchMembers}
 					className="group-page__members-panel__list"
 				>
 					{online.length > 0 && (
@@ -71,7 +81,7 @@ const MembersPanel = () => {
 							member={member}
 							connected={true}
 							decorations={
-								group.membersDecorations[member.user_id]
+								membersDecorations[member.user_id]
 							}
 						/>
 					))}
@@ -85,7 +95,7 @@ const MembersPanel = () => {
 							member={member}
 							connected={false}
 							decorations={
-								group.membersDecorations[member.user_id]
+								membersDecorations[member.user_id]
 							}
 						/>
 					))}
