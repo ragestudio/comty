@@ -38,34 +38,11 @@ export type SerializedMediaChannel = {
 	mediaCodecs: any[]
 }
 
-export type SerializedStateMediaChannel = {
-	__v: number
-	_id: string
-	clients: SerializedClient[]
-	producers: SerializedProducer[]
-	started_at: Date
-}
+import type { Client as SerializedClient } from "@comty/shared/types/rtc/client"
+import type { SerializedProducer } from "@comty/shared/types/rtc/producer"
+import type { StatedChannel as SerializedStateMediaChannel } from "@comty/shared/types/rtc/statedChannel"
 
-export type SerializedClient = {
-	_id: string
-	userId: string
-	user_id: string
-	voice_state: any
-	voiceState: any
-	user?: {
-		_id?: string
-		name?: string
-		avatar?: string
-	}
-}
 
-export type SerializedProducer = {
-	id: string
-	producer_id: string
-	user_id: string
-	kind: string
-	appData: any
-}
 
 export interface SerializedConsumer extends Partial<Consumer> {
 	user_id: string
@@ -276,6 +253,7 @@ export class MediaChannel {
 				_id: c.userId,
 				userId: c.userId,
 				user_id: c.userId,
+				channel_id: this.channelId,
 				voiceState: c.voiceState,
 				voice_state: c.voiceState,
 				user: {

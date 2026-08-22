@@ -1,6 +1,7 @@
+import type { RTCClient } from "@services/rtc/types"
+
 import setFind from "@shared-utils/setFind"
 
-import type { RTCClient } from "@services/rtc/types"
 export type LeaveClientOptions = {
 	emitEventToSelf?: boolean
 }

@@ -1,5 +1,5 @@
 import type { SFUNode } from "./node"
-import type { IPC_CloseRouterPayload } from "@comty/shared/types/rtc"
+import type { IPC_CloseRouterPayload } from "@comty/shared/types/rtc/events/index"
 import type { RtpCapabilities } from "mediasoup/types"
 
 import RemoteRouterTransport from "./transport"

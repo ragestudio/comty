@@ -1,7 +1,7 @@
-import setFind from "@shared-utils/setFind"
 import type MediaChannel from ".."
-
 import type { RTCClient } from "@services/rtc/types"
+
+import setFind from "@shared-utils/setFind"
 
 async function createTransportHandler(this: MediaChannel, client: RTCClient) {
 	try {

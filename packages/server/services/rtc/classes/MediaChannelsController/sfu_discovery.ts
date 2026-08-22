@@ -1,7 +1,7 @@
 import type {
 	IPC_RegisterNodePayload,
 	IPC_UnregisterNodePayload,
-} from "@comty/shared/types/rtc"
+} from "@comty/shared/types/rtc/events/index"
 import type MediaChannelsController from "."
 
 import { EventEmitter } from "tseep/lib/ee-safe"

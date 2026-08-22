@@ -1,15 +1,12 @@
 import type { RTCClient } from "@services/rtc/types"
-export type ConnectTransportPayload = {
-	transportId: string
-	dtlsParameters: any
-}
+import type { RTC_ConnectTransportPayload } from "@comty/shared/types/rtc/events/index"
 
 import setFind from "@shared-utils/setFind"
 
 async function connectTransportHandler(
 	this: any,
 	client: RTCClient,
-	payload: ConnectTransportPayload,
+	payload: RTC_ConnectTransportPayload,
 ) {
 	try {
 		const clientInst = setFind(this.clients, (c: RTCClient) => {

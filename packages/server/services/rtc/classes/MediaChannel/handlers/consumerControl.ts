@@ -1,6 +1,6 @@
 import type { MediaChannel } from ".."
 import type { RTCClient } from "@services/rtc/types"
-import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc"
+import type { IPC_ConsumerControlPayload } from "@comty/shared/types/rtc/events/index"
 
 import setFind from "@shared-utils/setFind"
 

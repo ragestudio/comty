@@ -2,7 +2,7 @@ import type {
 	IPC_ConsumerControlPayload,
 	IPC_RegisterNodePayload,
 	IPC_RequestKeyframePayload,
-} from "@comty/shared/types/rtc"
+} from "@comty/shared/types/rtc/events/index"
 import type { NatsConnection } from "@nats-io/transport-node"
 import type { RouterOptions } from "mediasoup/types"
 
