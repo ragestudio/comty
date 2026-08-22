@@ -1,8 +1,7 @@
 {
 	"name": "@comty/shared",
 	"exports": {
-		"./types/event_data": "./types/event_data.ts",
-		"./types/rtc": "./types/rtc.ts",
+		"./types/*": "./types/*.ts",
 		"./db/*": "./db/*.ts"
 	},
 	"devEngines": {
