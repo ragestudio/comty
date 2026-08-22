@@ -28,10 +28,19 @@ const DMRoom = ({ room, onClick, selected, compact }) => {
 
 			{!compact && (
 				<div className="dmrooms-list__item__content">
-					<h3>
-						{room.user?.username ??
-							room.user?.public_name ??
-							"Deleted user"}
+					<h3 style={{ display: "flex", alignItems: "center" }}>
+						<span
+							style={{
+								flex: 1,
+								overflow: "hidden",
+								textOverflow: "ellipsis",
+								whiteSpace: "nowrap",
+							}}
+						>
+							{room.user?.username ??
+								room.user?.public_name ??
+								"Deleted user"}
+						</span>
 					</h3>
 
 					<p
