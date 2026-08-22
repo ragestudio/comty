@@ -9,7 +9,7 @@ import { authorizedItems } from "@layouts/components/sidebar/inner"
 import SidebarItemsClickHandlers from "@layouts/components/sidebar/itemClickHandlers"
 
 import GroupsList from "@components/Spaces/GroupList"
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
+import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
 
 import QuickSettings from "./quickSettings"
 

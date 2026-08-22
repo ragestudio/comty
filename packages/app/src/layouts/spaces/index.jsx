@@ -14,10 +14,8 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BottomBar from "@layouts/components/@mobile/bottomBar"
 import OptInDialog from "../../components/Spaces/OptInDialog"
 
-import {
-	useSpacesNavigationController,
-	SpacesNavigationContext,
-} from "@contexts/WithSpaces/navigation"
+import ChatsService from "@models/chats"
+import { useSpacesNavigationStore } from "@contexts/WithSpaces/stores"
 
 import "./index.less"
 
@@ -29,7 +27,6 @@ const useIsConnectedToMainSocket = () => {
 	const events = {
 		"wsmanager:main:open": () => setConnected(true),
 		"wsmanager:main:reconnected": () => setConnected(true),
-
 		"wsmanager:main:reconnecting": () => setConnected(false),
 	}
 
@@ -49,11 +46,20 @@ const useIsConnectedToMainSocket = () => {
 }
 
 const SpacesLayout = (props) => {
-	const controller = useSpacesNavigationController()
+	const firstLoad = useSpacesNavigationStore((s) => s.firstLoad)
+	const navActions = useSpacesNavigationStore((s) => s.actions)
 	const isMainSocketConnected = useIsConnectedToMainSocket()
 
 	React.useEffect(() => {
 		app.layout.toggleRootContainerClassname("sidebar-expanded", false)
+	}, [])
+
+	React.useEffect(() => {
+		navActions.initFromUrl()
+		window.addEventListener("popstate", navActions.initFromUrl)
+
+		return () =>
+			window.removeEventListener("popstate", navActions.initFromUrl)
 	}, [])
 
 	React.useEffect(() => {
@@ -67,6 +73,23 @@ const SpacesLayout = (props) => {
 		}
 	}, [])
 
+	React.useEffect(() => {
+		if (isMainSocketConnected) {
+			ChatsService.ack
+				.get()
+				.then((acks) => {
+					app.cores.notifications.state.acks = acks || []
+					app.eventBus.emit(
+						"acks:updated",
+						app.cores.notifications.state.acks,
+					)
+				})
+				.catch((e) => {
+					console.error("Failed to fetch ACKs", e)
+				})
+		}
+	}, [isMainSocketConnected])
+
 	return (
 		<>
 			<BackgroundDecorator />
@@ -79,32 +102,30 @@ const SpacesLayout = (props) => {
 				id="app_layout"
 				className="app_layout"
 			>
-				<SpacesNavigationContext.Provider value={controller}>
-					{!app.isMobile && <Sidebar />}
+				{!app.isMobile && <Sidebar />}
 
-					<Layout.Content
-						id="content_layout"
-						className={classnames(
-							...(props.contentClassnames ?? []),
-							"content_layout",
-							"fade-transverse-active",
-							"spaces-layout",
-						)}
-					>
-						{!isMainSocketConnected && (
-							<div className="socket-indicator">
-								<LoadIcon />
-								<span>Connecting to socket</span>
-							</div>
-						)}
+				<Layout.Content
+					id="content_layout"
+					className={classnames(
+						...(props.contentClassnames ?? []),
+						"content_layout",
+						"fade-transverse-active",
+						"spaces-layout",
+					)}
+				>
+					{!isMainSocketConnected && (
+						<div className="socket-indicator">
+							<LoadIcon />
+							<span>Connecting to socket</span>
+						</div>
+					)}
 
-						{!controller.firstLoad &&
-							props.children &&
-							React.cloneElement(props.children, props)}
-					</Layout.Content>
+					{!firstLoad &&
+						props.children &&
+						React.cloneElement(props.children, props)}
+				</Layout.Content>
 
-					{app.isMobile && <BottomBar />}
-				</SpacesNavigationContext.Provider>
+				{app.isMobile && <BottomBar />}
 			</Layout>
 		</>
 	)
