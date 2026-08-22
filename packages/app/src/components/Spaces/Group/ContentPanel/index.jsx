@@ -5,8 +5,8 @@ import Chat from "@components/Spaces/Chat"
 import VoiceChannel from "@components/Spaces/VoiceChannel"
 import SettingsPanel from "@components/Spaces/Group/SettingsPanel"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/navigation"
-import GroupContext from "@contexts/WithSpaces/group"
+import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+import { useGroupChannels } from "@contexts/WithSpaces/stores"
 
 import "./index.less"
 
@@ -27,7 +27,7 @@ const CONTENT_REGISTRY = {
 	},
 }
 
-const resolveContent = (spaces, group) => {
+const resolveContent = (spaces, channels) => {
 	if (spaces.subview === "settings") {
 		return {
 			type: "settings",
@@ -41,7 +41,7 @@ const resolveContent = (spaces, group) => {
 	}
 
 	const channelData =
-		group?.channels?.items?.find((c) => c._id === spaces.channel) ?? null
+		channels?.items?.find((c) => c._id === spaces.channel) ?? null
 
 	const contentType =
 		spaces.subview === "voice" || channelData?.kind === "voice"
@@ -57,9 +57,9 @@ const resolveContent = (spaces, group) => {
 
 export const ContentPanelHeader = () => {
 	const spaces = useSpacesNavigation()
-	const group = React.useContext(GroupContext)
+	const channels = useGroupChannels()
 
-	const { definition, channelData } = resolveContent(spaces, group)
+	const { definition, channelData } = resolveContent(spaces, channels)
 
 	const title = channelData?.name ?? definition?.title
 	const description = channelData?.description
@@ -90,9 +90,9 @@ export const ContentPanelHeader = () => {
 
 export const ContentPanelRender = () => {
 	const spaces = useSpacesNavigation()
-	const group = React.useContext(GroupContext)
+	const channels = useGroupChannels()
 
-	const { type, definition } = resolveContent(spaces, group)
+	const { type, definition } = resolveContent(spaces, channels)
 
 	if (!type || !definition?.component) {
 		return null
@@ -100,6 +100,5 @@ export const ContentPanelRender = () => {
 
 	return React.createElement(definition.component, {
 		_id: spaces.channel,
-		group,
 	})
 }
