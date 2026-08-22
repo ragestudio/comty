@@ -1,5 +1,13 @@
-export default {
-	fn: async (client, payload) => {
+import type API from "@services/chats/chats.service"
+import type { RTEClient } from "linebridge"
+
+interface SubscribePayload {
+	group_id: string
+	channel_id: string
+}
+
+export default defineRoute<API, "ws">()({
+	fn: async (client: RTEClient, payload: SubscribePayload) => {
 		if (!payload.group_id) {
 			throw new OperationError(400, "Missing group_id")
 		}
@@ -13,4 +21,4 @@ export default {
 
 		await client.subscribe(`chats:channel:${payload.channel_id}`)
 	},
-}
+})

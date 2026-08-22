@@ -13,14 +13,19 @@ export default {
 			throw new OperationError(400, "Missing message_id")
 		}
 
+		if (!payload.update) {
+			throw new OperationError(400, "Missing update")
+		}
+
 		const from_user_id = client.userId
 		const to_user_id = payload.to_user_id
 
 		const channel = await ctx.dmChannels.get(from_user_id, to_user_id)
 
-		return await channel.delete(
-			client.user ?? client.socket.context.user,
+		return await channel.update(
+			(client as any).user ?? client.socket.context.user,
 			payload.message_id,
+			payload.update,
 		)
 	},
 }

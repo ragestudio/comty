@@ -13,26 +13,19 @@ export default {
 			throw new OperationError(400, "Missing channel_id")
 		}
 
+		if (!payload.message_id) {
+			throw new OperationError(400, "Missing message_id")
+		}
+
 		const channel = await ctx.groupChannels.get(
 			payload.group_id,
 			payload.channel_id,
 			client.userId,
 		)
 
-		const userData = client.user ?? client.socket.context.user
-
-		await channel.sendEventToChannelTopic("channel:typing", {
-			user_id: client.userId,
-			user: {
-				_id: userData._id,
-				username: userData.username,
-				avatar: userData.avatar,
-			},
-			group_id: channel.channel.group_id.toString(),
-			channel_id: channel.channel._id.toString(),
-			isTyping: payload.isTyping,
-		})
-
-		return true
+		return await channel.delete(
+			(client as any).user ?? client.socket.context.user,
+			payload.message_id,
+		)
 	},
 }

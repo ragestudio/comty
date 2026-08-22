@@ -1,6 +1,13 @@
-export default {
-	useContexts: ["dmChannels"],
-	fn: async (client, payload, ctx) => {
+import type API from "@services/chats/chats.service"
+import type { RTEClient } from "linebridge"
+
+interface DMSubscribePayload {
+	to_user_id: string
+}
+
+export default defineRoute<API, "ws">()({
+	useContexts: ["dmChannels"] as const,
+	fn: async (client: RTEClient, payload: DMSubscribePayload, ctx) => {
 		if (!client.userId) {
 			throw new OperationError(400, "Missing userId")
 		}
@@ -16,4 +23,4 @@ export default {
 
 		await client.subscribe(`chat:dm:${room._id}`)
 	},
-}
+})

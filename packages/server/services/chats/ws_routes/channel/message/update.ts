@@ -28,7 +28,7 @@ export default {
 		)
 
 		return await channel.update(
-			client.user ?? client.socket.context.user,
+			(client as any).user ?? client.socket.context.user,
 			payload.message_id,
 			payload.update,
 		)
