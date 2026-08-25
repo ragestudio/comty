@@ -13,7 +13,7 @@ import { Icons } from "@components/Icons"
 import LinkPreview from "./LinkPreview"
 import { useLiveQuery } from "dexie-react-hooks"
 
-import db from "@contexts/WithSpaces/store"
+import db from "@/contexts/WithSpaces/db"
 
 import "./Line.less"
 
