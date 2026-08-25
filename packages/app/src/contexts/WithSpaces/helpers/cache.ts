@@ -3,7 +3,7 @@ import type { Channels } from "@comty/shared/types/spaces/channel"
 import type { Group } from "@comty/shared/types/spaces/group"
 import type { Member, Members } from "@comty/shared/types/spaces/member"
 
-import db from "../store"
+import db from "../db"
 
 const CACHED_MEMBERS_PER_GROUP_LIMIT = 2000
 

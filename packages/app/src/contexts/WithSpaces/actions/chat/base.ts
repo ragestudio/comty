@@ -1,0 +1,49 @@
+import { StoreApi } from "zustand"
+import { SpacesChatState } from "../../stores/chat/types"
+
+import { getAdapter } from "../../stores/chat/adapters"
+import * as cache from "../../helpers/cache"
+import db from "../../db"
+
+export type SetChatState = StoreApi<SpacesChatState>["setState"]
+export type GetChatState = StoreApi<SpacesChatState>["getState"]
+
+class ChatActionsBase {
+	setState: SetChatState
+	getState: GetChatState
+
+	constructor(set: SetChatState, get: GetChatState) {
+		this.setState = set
+		this.getState = get
+	}
+
+	get db() {
+		return db
+	}
+
+	get cache() {
+		return cache
+	}
+
+	get state() {
+		return this.getState()
+	}
+
+	get adapter() {
+		const { type } = this.getState()
+
+		if (!type) return null
+
+		return getAdapter(type)
+	}
+
+	get socket() {
+		return (
+			globalThis.__comty_shared_state?.ws?.sockets?.get("main") ??
+			window.app?.cores?.api?.socket?.() ??
+			null
+		)
+	}
+}
+
+export default ChatActionsBase

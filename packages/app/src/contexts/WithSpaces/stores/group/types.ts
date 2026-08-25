@@ -72,6 +72,10 @@ export interface SpacesGroupState {
 	membersDecorations: Record<string, any>
 	loading: boolean
 	error: Error | null
+
+	initGeneration: number
+	userConnections: Map<string, UserConnectionReference>
+	decorationsCache: Map<string, any>
 }
 
 export interface SpacesGroupActions {
@@ -82,7 +86,7 @@ export interface SpacesGroupActions {
 	fetchMembers: () => Promise<void>
 	syncRTCChannels: () => Promise<void>
 	evaluateConnections: (members: Member[]) => Promise<void>
-	evaluateDecorations: (members: Member[]) => Promise<void>
+	evaluateDecorations: (items: (Member | string)[]) => Promise<void>
 	setData: (data: Group | null) => void
 	setChannels: (updater: Channels | ((prev: Channels) => Channels)) => void
 	setMembers: (updater: Members | ((prev: Members) => Members)) => void

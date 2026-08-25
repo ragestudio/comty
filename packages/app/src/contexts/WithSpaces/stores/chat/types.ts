@@ -27,6 +27,11 @@ export interface SpacesChatState {
 	usersTyping: any[]
 	isTyping: boolean
 	pausedUpdates: boolean
+
+	initGeneration: number
+	typingTimeout: any
+	isTypingNetworkState: boolean
+
 	actions: SpacesChatActions
 }
 
@@ -35,7 +40,7 @@ export interface SpacesChatActions {
 	reset: () => void
 	setPausedUpdates: (paused: boolean) => void
 
-	// Methods
+	// methods
 	load: (options?: {
 		beforeId?: string
 		afterId?: string
@@ -49,13 +54,13 @@ export interface SpacesChatActions {
 	sendReadAck: (messageId: string) => void
 	typing: (isTypingNow?: boolean) => void
 
-	// Helpers
+	// helpers
 	pushToTimeline: (
 		newMessages: ExtendedMessage[],
 		position?: "top" | "bottom",
 	) => void
 
-	// Socket Event Handlers
+	// events
 	handleNewMessage: (data: ExtendedMessage & { user?: User }) => void
 	handleMessageDeleted: (data: { _id: string }) => void
 	handleMessageUpdated: (data: any) => void

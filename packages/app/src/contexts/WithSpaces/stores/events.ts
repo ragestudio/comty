@@ -87,11 +87,28 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		socket.on(event, handler)
 	}
 
+	const onReconnect = () => {
+		const state = useSpacesGroupStore.getState()
+		if (state.groupId === groupId) {
+			console.log("[socket] Reconnected! Triggering resilience sync...")
+			state.actions.syncRTCChannels().catch(console.error)
+			
+			if (state.members.items.length > 0) {
+				state.actions.evaluateConnections(state.members.items).catch(console.error)
+				state.actions.evaluateDecorations(state.members.items).catch(console.error)
+			}
+		}
+	}
+
+	socket.on("connect", onReconnect)
+
 	return () => {
 		socket.topics.subscribe("group:unsubscribe", groupId)
 
 		for (const [event, handler] of Object.entries(events)) {
 			socket.off(event, handler)
 		}
+		
+		socket.off("connect", onReconnect)
 	}
 }

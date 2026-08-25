@@ -1,7 +1,7 @@
 import type { ExtendedMessage as Message, ChatSyncState } from "./types"
 
 import { Dexie } from "dexie"
-import db from "../../store"
+import db from "../../db"
 
 export interface ChatAdapter {
 	storeMessage: (message: Message) => Promise<void>
@@ -176,5 +176,6 @@ export const adapters: Record<string, ChatAdapter> = {
 export const getAdapter = (type: string): ChatAdapter => {
 	const adapter = adapters[type]
 	if (!adapter) throw new Error(`invalid chat type: ${type}`)
+
 	return adapter
 }
