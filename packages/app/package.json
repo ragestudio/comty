@@ -79,7 +79,7 @@
 		"react-markdown": "^10.1.0",
 		"react-player": "^3.4.0",
 		"react-rnd": "^10.5.3",
-		"react-router": "^7.18.1",
+		"react-router": "^7.18.2",
 		"react-transition-group": "^4.4.5",
 		"react-turnstile": "^1.1.5",
 		"react-useanimations": "^2.10.0",
