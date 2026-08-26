@@ -1,6 +1,6 @@
 {
 	"name": "@comty/spaces-lib",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": "ragestudio",
 	"license": "MIT",
 	"description": "Core library for Spaces in Comty",
@@ -9,6 +9,7 @@
 	},
 	"type": "module",
 	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": "./dist/index.js",
 		"./actions/*": "./dist/actions/*.js",
