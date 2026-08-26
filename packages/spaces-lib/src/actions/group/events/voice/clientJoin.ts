@@ -2,7 +2,7 @@ import type EventsActions from "../index"
 import type { ClientVoiceJoinPayload } from "../../../../stores/group/types"
 import type { Client } from "@comty/shared/types/rtc/client"
 
-const getCurrentUserId = (): string | undefined => window.app?.userData?._id
+import getCurrentUserId from "../../../../utils/getCurrentUserId"
 
 export default function (
 	this: EventsActions,

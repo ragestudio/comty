@@ -5,8 +5,7 @@ import Chat from "@components/Spaces/Chat"
 import VoiceChannel from "@components/Spaces/VoiceChannel"
 import SettingsPanel from "@components/Spaces/Group/SettingsPanel"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
-import { useGroupChannels } from "@contexts/WithSpaces/stores"
+import { useSpacesNavigation, useGroupChannels } from "@comty/spaces-lib"
 
 import "./index.less"
 

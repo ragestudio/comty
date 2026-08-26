@@ -13,20 +13,21 @@ import {
 	ContentPanelRender,
 } from "@components/Spaces/Group/ContentPanel"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
 import {
+	useSpacesNavigation,
 	useGroupActions,
 	useGroupLoading,
 	useGroupError,
 	useGroupData,
 	useGroupChannels,
 	subscribeGroupSocket,
-} from "@contexts/WithSpaces/stores"
+} from "@comty/spaces-lib"
 
 import useRtcChannelId from "@hooks/useRtcChannelId"
 import useTitle from "@hooks/useTitle"
 
 import SplitterSizes from "./splitter_sizes"
+
 import "@pages/spaces/index.less"
 import "./index.less"
 
@@ -36,7 +37,7 @@ const GroupPage = (props) => {
 	const [documentTitle, setDocumentTitle] = useTitle()
 
 	const rtcChannelId = useRtcChannelId()
-	
+
 	const actions = useGroupActions()
 	const loading = useGroupLoading()
 	const error = useGroupError()
@@ -52,7 +53,7 @@ const GroupPage = (props) => {
 	React.useEffect(() => {
 		actions.init(props.params.group_id)
 		const cleanup = subscribeGroupSocket(props.params.group_id)
-		
+
 		return () => {
 			cleanup()
 			actions.reset()

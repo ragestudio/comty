@@ -2,16 +2,12 @@ import { useSpacesChatStore } from "./useSpacesChatStore"
 
 import GROUP_CONFIG from "./chat/configs/group"
 import DM_CONFIG from "./chat/configs/dm"
+import getSocket from "../utils/getSocket"
 
 const CHAT_CONFIGS: Record<string, any> = {
 	group: GROUP_CONFIG,
 	dm: DM_CONFIG,
 }
-
-const getSocket = () =>
-	(globalThis as any).__comty_shared_state?.ws?.sockets?.get("main") ??
-	(globalThis as any).app?.cores?.api?.socket?.() ??
-	null
 
 export function subscribeChatSocket(
 	type: "group" | "dm",

@@ -1,4 +1,4 @@
-import type { ExtendedMessage as Message } from "@contexts/WithSpaces/stores/chat/types"
+import type { ExtendedMessage as Message } from "@comty/spaces-lib/stores/chat/types"
 
 import React from "react"
 import classnames from "classnames"
@@ -13,7 +13,7 @@ import { Icons } from "@components/Icons"
 import LinkPreview from "./LinkPreview"
 import { useLiveQuery } from "dexie-react-hooks"
 
-import db from "@/contexts/WithSpaces/db"
+import db from "@comty/spaces-lib/db/index"
 
 import "./Line.less"
 

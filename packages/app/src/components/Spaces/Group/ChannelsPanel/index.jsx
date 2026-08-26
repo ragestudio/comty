@@ -5,13 +5,13 @@ import { Icons } from "@components/Icons"
 import ChannelsListItem from "./item"
 
 import {
+	useSpacesNavigation,
 	useGroupLoading,
 	useGroupChannels,
 	useGroupRTC,
 	useGroupData,
 	VALID_CHANNEL_KINDS,
-} from "@contexts/WithSpaces/stores"
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+} from "@comty/spaces-lib"
 
 import "./index.less"
 

@@ -1,0 +1,3 @@
+overrides:
+  "@comty/shared": "link:../shared"
+  "comty.js": "link:../../modules/comty.js"

@@ -3,15 +3,13 @@ import { motion } from "motion/react"
 import classNames from "classnames"
 import { Icons } from "@components/Icons"
 
-import config from "@config"
-
+import QuickSettings from "./quickSettings"
+import { useSpacesNavigation } from "@comty/spaces-lib"
 import { authorizedItems } from "@layouts/components/sidebar/inner"
 import SidebarItemsClickHandlers from "@layouts/components/sidebar/itemClickHandlers"
-
 import GroupsList from "@components/Spaces/GroupList"
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
 
-import QuickSettings from "./quickSettings"
+import config from "@config"
 
 import "./sidebar.less"
 

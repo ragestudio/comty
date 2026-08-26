@@ -8,8 +8,11 @@ import Icons from "@components/Icons"
 
 import imageAverageColor from "@utils/imageAverageColor"
 
-import { useGroupData, useGroupLoading } from "@contexts/WithSpaces/stores"
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+import {
+	useGroupData,
+	useGroupLoading,
+	useSpacesNavigation,
+} from "@comty/spaces-lib"
 
 import "./index.less"
 

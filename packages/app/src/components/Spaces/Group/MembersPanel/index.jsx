@@ -9,7 +9,7 @@ import {
 	useGroupConnections,
 	useGroupDecorations,
 	useGroupActions,
-} from "@contexts/WithSpaces/stores"
+} from "@comty/spaces-lib"
 
 import Member from "./member"
 
@@ -80,9 +80,7 @@ const MembersPanel = () => {
 							key={`online-${member._id}`}
 							member={member}
 							connected={true}
-							decorations={
-								membersDecorations[member.user_id]
-							}
+							decorations={membersDecorations[member.user_id]}
 						/>
 					))}
 
@@ -94,9 +92,7 @@ const MembersPanel = () => {
 							key={`offline-${member._id}`}
 							member={member}
 							connected={false}
-							decorations={
-								membersDecorations[member.user_id]
-							}
+							decorations={membersDecorations[member.user_id]}
 						/>
 					))}
 				</LoadMore>

@@ -1,0 +1,44 @@
+{
+	"name": "@comty/spaces-lib",
+	"version": "1.0.0",
+	"author": "ragestudio",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"type": "module",
+	"main": "./dist/index.js",
+	"exports": {
+		".": "./dist/index.js",
+		"./actions/*": "./dist/actions/*.js",
+		"./db/*": "./dist/db/*.js",
+		"./helpers/*": "./dist/helpers/*.js",
+		"./stores/*": "./dist/stores/*.js",
+		"./utils/*": "./dist/utils/*.js"
+	},
+	"files": [
+		"dist/**/*",
+		"src/**/*",
+		"package.json"
+	],
+	"scripts": {
+		"build": "tsc",
+		"typecheck": "tsc --noEmit"
+	},
+	"peerDependencies": {
+		"@comty/shared": "^0.1.0",
+		"comty.js": "^0.81.0",
+		"dexie": "^4",
+		"zustand": "^5"
+	},
+	"devDependencies": {
+		"typescript": "^7.0.2"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "^11.3.0",
+			"onFail": "download"
+		}
+	}
+}

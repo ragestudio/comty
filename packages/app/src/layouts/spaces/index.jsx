@@ -14,8 +14,7 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BottomBar from "@layouts/components/@mobile/bottomBar"
 import OptInDialog from "../../components/Spaces/OptInDialog"
 
-import ChatsService from "@models/chats"
-import { useSpacesNavigationStore } from "@contexts/WithSpaces/stores"
+import { useSpacesNavigationStore } from "@comty/spaces-lib"
 
 import "./index.less"
 
@@ -73,22 +72,22 @@ const SpacesLayout = (props) => {
 		}
 	}, [])
 
-	React.useEffect(() => {
-		if (isMainSocketConnected) {
-			ChatsService.ack
-				.get()
-				.then((acks) => {
-					app.cores.notifications.state.acks = acks || []
-					app.eventBus.emit(
-						"acks:updated",
-						app.cores.notifications.state.acks,
-					)
-				})
-				.catch((e) => {
-					console.error("Failed to fetch ACKs", e)
-				})
-		}
-	}, [isMainSocketConnected])
+	// React.useEffect(() => {
+	// 	if (isMainSocketConnected) {
+	// 		ChatsService.ack
+	// 			.get()
+	// 			.then((acks) => {
+	// 				app.cores.notifications.state.acks = acks || []
+	// 				app.eventBus.emit(
+	// 					"acks:updated",
+	// 					app.cores.notifications.state.acks,
+	// 				)
+	// 			})
+	// 			.catch((e) => {
+	// 				console.error("Failed to fetch ACKs", e)
+	// 			})
+	// 	}
+	// }, [isMainSocketConnected])
 
 	return (
 		<>

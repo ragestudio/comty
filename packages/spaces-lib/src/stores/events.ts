@@ -1,20 +1,7 @@
+import getSocket from "../utils/getSocket"
 import { useSpacesGroupStore } from "./useSpacesGroupStore"
 
-type SocketInstance = {
-	on: (event: string, handler: (...args: any[]) => void) => void
-	off: (event: string, handler: (...args: any[]) => void) => void
-	topics: {
-		subscribe: (method: string, ...args: any[]) => Promise<any>
-		unsubscribe?: (method: string, ...args: any[]) => Promise<any>
-	}
-}
-
 type StoreApi = typeof useSpacesGroupStore
-
-export const getSocket = (): SocketInstance | null =>
-	globalThis.__comty_shared_state?.ws?.sockets?.get("main") ??
-	app?.cores?.api?.socket?.() ??
-	null
 
 export function buildGroupSocketEvents(groupId: string, store: StoreApi) {
 	const { actions } = store.getState()
@@ -92,10 +79,14 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		if (state.groupId === groupId) {
 			console.log("[socket] Reconnected! Triggering resilience sync...")
 			state.actions.syncRTCChannels().catch(console.error)
-			
+
 			if (state.members.items.length > 0) {
-				state.actions.evaluateConnections(state.members.items).catch(console.error)
-				state.actions.evaluateDecorations(state.members.items).catch(console.error)
+				state.actions
+					.evaluateConnections(state.members.items)
+					.catch(console.error)
+				state.actions
+					.evaluateDecorations(state.members.items)
+					.catch(console.error)
 			}
 		}
 	}
@@ -108,7 +99,7 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		for (const [event, handler] of Object.entries(events)) {
 			socket.off(event, handler)
 		}
-		
+
 		socket.off("connect", onReconnect)
 	}
 }

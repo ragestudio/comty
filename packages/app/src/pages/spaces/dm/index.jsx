@@ -3,7 +3,7 @@ import DMRoomsList from "@components/Spaces/DMRoomsList"
 import DMRoom from "@components/Spaces/DMRoom"
 import ToolsBar from "@layouts/components/toolsBar"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+import { useSpacesNavigation } from "@comty/spaces-lib"
 
 import "@pages/spaces/index.less"
 

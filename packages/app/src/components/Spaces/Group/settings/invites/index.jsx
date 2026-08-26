@@ -4,7 +4,7 @@ import ConfirmButton from "@ui/ConfirmButton"
 import { Icons } from "@components/Icons"
 
 import GroupsModel from "@models/groups"
-import { useGroupData } from "@contexts/WithSpaces/stores"
+import { useGroupData } from "@comty/spaces-lib"
 
 import use from "comty.js/hooks/use"
 import copyToClipboard from "@utils/copyToClipboard"

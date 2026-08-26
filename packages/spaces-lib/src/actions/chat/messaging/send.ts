@@ -2,8 +2,7 @@ import type MessagingActions from "./index"
 
 import { CHAT_CONFIGS } from "../../../stores/chat/constants"
 import { ExtendedMessage } from "../../../stores/chat/types"
-
-const getCurrentUserId = (): string | undefined => window.app?.userData?._id
+import getCurrentUserId from "../../../utils/getCurrentUserId"
 
 export default async function (
 	this: MessagingActions,

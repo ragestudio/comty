@@ -22,15 +22,13 @@ import {
 	useGroupData,
 	useGroupChannels,
 	subscribeGroupSocket,
-} from "@contexts/WithSpaces/stores"
+} from "@comty/spaces-lib"
 
 import "@pages/spaces/index.less"
 import "./index.less"
 
 const MembersPanelView = () => {
-	return (
-		<MembersPanel />
-	)
+	return <MembersPanel />
 }
 
 const GroupPage = (props) => {
@@ -40,7 +38,7 @@ const GroupPage = (props) => {
 	const [activeKey, setActiveKey] = React.useState("channels")
 
 	const rtcState = useMediaRTCState()
-	
+
 	const actions = useGroupActions()
 	const loading = useGroupLoading()
 	const data = useGroupData()
@@ -49,7 +47,7 @@ const GroupPage = (props) => {
 	React.useEffect(() => {
 		actions.init(props.params.group_id)
 		const cleanup = subscribeGroupSocket(props.params.group_id)
-		
+
 		return () => {
 			cleanup()
 			actions.reset()
@@ -107,14 +105,12 @@ const GroupPage = (props) => {
 
 	return (
 		<div className="spaces-page group-page">
-			{activeKey === "channels" &&
-				!spaces.channel &&
-				!spaces.subview && (
-					<div className="spaces-page__panel">
-						<GroupHeader />
-						<ChannelsPanel />
-					</div>
-				)}
+			{activeKey === "channels" && !spaces.channel && !spaces.subview && (
+				<div className="spaces-page__panel">
+					<GroupHeader />
+					<ChannelsPanel />
+				</div>
+			)}
 
 			{(spaces.channel || spaces.subview) && (
 				<div className="group-page__content-panel">

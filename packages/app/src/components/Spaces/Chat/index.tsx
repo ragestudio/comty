@@ -1,4 +1,4 @@
-import type { ExtendedMessage as Message } from "@contexts/WithSpaces/stores/chat/types"
+import type { ExtendedMessage as Message } from "@comty/spaces-lib/stores/chat/types"
 
 import React from "react"
 import { Result, Skeleton } from "antd"
@@ -16,7 +16,7 @@ import {
 	useChatState,
 	useChatActions,
 	subscribeChatSocket,
-} from "@contexts/WithSpaces/stores"
+} from "@comty/spaces-lib"
 
 import "./index.less"
 
@@ -478,6 +478,8 @@ const ChatInner = ({ _id, type, useChatParam }: ChatInnerProps) => {
 
 const Chat = ({ _id, type = "group" }: ChatProps) => {
 	const data = useGroupData()
+
+	console.log("useGroupData():", data)
 
 	if (!_id || !type) {
 		return null

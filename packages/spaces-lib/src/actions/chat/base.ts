@@ -4,6 +4,7 @@ import { SpacesChatState } from "../../stores/chat/types"
 import { getAdapter } from "../../stores/chat/adapters"
 import * as cache from "../../helpers/cache"
 import db from "../../db"
+import getSocket from "../../utils/getSocket"
 
 export type SetChatState = StoreApi<SpacesChatState>["setState"]
 export type GetChatState = StoreApi<SpacesChatState>["getState"]
@@ -38,11 +39,7 @@ class ChatActionsBase {
 	}
 
 	get socket() {
-		return (
-			globalThis.__comty_shared_state?.ws?.sockets?.get("main") ??
-			window.app?.cores?.api?.socket?.() ??
-			null
-		)
+		return getSocket()
 	}
 }
 

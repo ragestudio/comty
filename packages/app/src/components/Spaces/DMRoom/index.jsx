@@ -4,7 +4,7 @@ import { Button } from "antd"
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 
-import { useSpacesNavigation } from "@contexts/WithSpaces/stores"
+import { useSpacesNavigation } from "@comty/spaces-lib"
 
 import Chat from "@components/Spaces/Chat"
 

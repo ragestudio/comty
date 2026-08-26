@@ -1,6 +1,7 @@
 import type { SpacesNavigationState, NavigationType } from "./types"
 
 import { URL_PREFIX, RESERVED_SUBVIEWS } from "./constants"
+import isDesktop from "../../utils/isDesktop"
 
 export function composePathname({
 	type,
@@ -23,7 +24,7 @@ export function composePathname({
 export function parseUrlParts(): Partial<SpacesNavigationState> {
 	let parts: string[] = []
 
-	if (window.app?.isDesktop) {
+	if (isDesktop()) {
 		const hashParts = window.location.hash.replace("#", "").split("/")
 		parts = hashParts
 	} else {
@@ -55,7 +56,7 @@ export function parseUrlParts(): Partial<SpacesNavigationState> {
 export function syncToUrl(state: Partial<SpacesNavigationState>) {
 	const pathname = composePathname(state)
 
-	if (window.app?.isDesktop) {
+	if (isDesktop()) {
 		window.location.hash = `#${pathname}`
 	} else {
 		history.pushState(undefined, "", pathname)

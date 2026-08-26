@@ -1,4 +1,4 @@
-export { VALID_CHANNEL_KINDS } from "./group/constants"
+export { VALID_CHANNEL_KINDS } from "./stores/group/constants"
 
 export {
 	useSpacesGroupStore,
@@ -11,7 +11,7 @@ export {
 	useGroupLoading,
 	useGroupError,
 	useGroupActions,
-} from "./useSpacesGroupStore"
+} from "./stores/useSpacesGroupStore"
 
 export type {
 	SpacesGroupStoreType,
@@ -25,29 +25,25 @@ export type {
 	ProducerOpenPayload,
 	ProducerClosePayload,
 	GroupUpdatePayload,
-} from "./group/types"
+} from "./stores/group/types"
 
 export {
 	useSpacesNavigationStore,
 	useSpacesNavigation,
 	useNavigationActions,
-} from "./useSpacesNavigationStore"
+} from "./stores/useSpacesNavigationStore"
 
 export type {
 	SpacesNavigationStoreType,
 	NavigationType,
-} from "./navigation/types"
+} from "./stores/navigation/types"
 
-export {
-	subscribeGroupSocket,
-	buildGroupSocketEvents,
-	getSocket,
-} from "./events"
+export { subscribeGroupSocket, buildGroupSocketEvents } from "./stores/events"
 
-export * from "./useSpacesChatStore"
-export * from "./chatEvents"
+export * from "./stores/useSpacesChatStore"
+export * from "./stores/chatEvents"
 
-import { useSpacesChatStore } from "./useSpacesChatStore"
+import { useSpacesChatStore } from "./stores/useSpacesChatStore"
 import { useShallow } from "zustand/react/shallow"
 
 export const useChatState = () =>

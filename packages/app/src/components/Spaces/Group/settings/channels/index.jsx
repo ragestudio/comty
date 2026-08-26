@@ -7,7 +7,7 @@ import { Icons } from "@components/Icons"
 import SortableList from "@components/SortableList"
 
 import GroupsModel from "@models/groups"
-import { useGroupData, useGroupChannels } from "@contexts/WithSpaces/stores"
+import { useGroupData, useGroupChannels } from "@comty/spaces-lib"
 
 import "./index.less"
 
@@ -132,7 +132,8 @@ const ChannelsList = ({ onDeleteChannel }) => {
 	const [channels, setChannels] = React.useState([])
 
 	const hasChanges = () => {
-		const originalChannelsIds = groupChannels?.items?.map((c) => c._id) || []
+		const originalChannelsIds =
+			groupChannels?.items?.map((c) => c._id) || []
 		const channelsIds = channels.map((c) => c._id)
 
 		// check if the channels orders are different
