@@ -6,7 +6,7 @@ settings:
 
 overrides:
   '@comty/shared': link:../shared
-  shared: link:../shared
+  '@comty/spaces-lib': link:../spaces-lib
 
 importers:
 
@@ -15,6 +15,9 @@ importers:
       '@comty/shared':
         specifier: link:../shared
         version: link:../shared
+      '@comty/spaces-lib':
+        specifier: link:../spaces-lib
+        version: link:../spaces-lib
       '@dnd-kit/abstract':
         specifier: ^0.5.0
         version: 0.5.0
@@ -97,11 +100,11 @@ importers:
         specifier: ^1.11.21
         version: 1.11.21
       dexie:
-        specifier: ^4.4.4
-        version: 4.4.4
+        specifier: ^4.4.5
+        version: 4.4.5
       dexie-react-hooks:
         specifier: ^4.4.0
-        version: 4.4.0(dexie@4.4.4)(react@19.2.7)
+        version: 4.4.0(dexie@4.4.5)(react@19.2.7)
       dompurify:
         specifier: ^3.4.12
         version: 3.4.12
@@ -2010,8 +2013,8 @@ packages:
       dexie: '>=4.2.0-alpha.1 <5.0.0'
       react: '>=16'
 
-  dexie@4.4.4:
-    resolution: {integrity: sha512-jIwsYI8Os2hgnqc6O49YwFDKGc5v5QjGx0wPVp543ip1F53VFAKMLthV2pQosQcVTv3eAskTWYspOx195PM0FQ==}
+  dexie@4.4.5:
+    resolution: {integrity: sha512-wWCHdihT3dmlUSuNhn5mMZDWSpG0suxjAni7YjjiZdzabZcKmy3uNZGZ7AeYYXBoLbpSXX35fikPLkPC44Osiw==}
 
   doctrine@2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
@@ -5499,12 +5502,12 @@ snapshots:
     dependencies:
       dequal: 2.0.3
 
-  dexie-react-hooks@4.4.0(dexie@4.4.4)(react@19.2.7):
+  dexie-react-hooks@4.4.0(dexie@4.4.5)(react@19.2.7):
     dependencies:
-      dexie: 4.4.4
+      dexie: 4.4.5
       react: 19.2.7
 
-  dexie@4.4.4: {}
+  dexie@4.4.5: {}
 
   doctrine@2.1.0:
     dependencies:
