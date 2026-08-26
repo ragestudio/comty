@@ -1,8 +1,9 @@
 {
 	"name": "@comty/spaces-lib",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": "ragestudio",
 	"license": "MIT",
+	"description": "Core library for Spaces in Comty",
 	"publishConfig": {
 		"access": "public"
 	},
