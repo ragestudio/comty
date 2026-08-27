@@ -11,7 +11,7 @@
 		"axios": "^1.18.1",
 		"cheerio": "^1.2.0",
 		"isbot": "^5.2.1",
-		"linebridge": "^1.8.1",
+		"linebridge": "workspace:*",
 		"live-directory": "^3.0.3",
 		"lru-cache": "^11.5.2",
 		"node-addon-api": "^8.9.0",

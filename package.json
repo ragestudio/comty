@@ -7,11 +7,13 @@
 		"dev:server": "cd packages/server && npm run dev",
 		"dev:client": "cd packages/app && npm run dev",
 		"dev:desktop": "cd packages/desktop && npm run dev",
-		"setup:server": "cd packages/server && npm run setup",
-		"postinstall": "cd packages/app && npm install && cd ../server && npm install"
+		"setup:server": "cd packages/server && npm run setup"
 	},
 	"_web_app_path": "packages/app",
-	"devDependencies": {
-		"typescript": "^6.0.3"
-	}
+    "workspaces": [
+        "packages/*",
+        "packages/server/services/*",
+        "modules/*",
+        "modules/linebridge/*"
+    ]
 }

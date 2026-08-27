@@ -18,7 +18,7 @@
 		"7zip-min": "^3.0.1",
 		"@inquirer/prompts": "^8.5.2",
 		"commander": "^15.0.0",
-		"comty.js": "^0.81.0",
+		"comty.js": "workspace:*",
 		"form-data": "^4.0.6",
 		"formdata-node": "^6.0.3",
 		"glob": "^13.0.6",

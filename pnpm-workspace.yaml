@@ -1,0 +1,23 @@
+# nodeLinker: hoisted
+
+packages:
+  - "packages/*"
+  - "packages/server/services/*"
+  - "modules/*"
+  - "modules/linebridge/*"
+
+linkWorkspacePackages: true
+
+allowBuilds:
+  "xxhash-addon": true
+  "electron": true
+  "electron-winstaller": true
+  "@swc/core": true
+  bcrypt: true
+  bufferutil: true
+  core-js: true
+  esbuild: true
+  mediasoup: true
+  msgpackr-extract: true
+
+blockExoticSubdeps: false
