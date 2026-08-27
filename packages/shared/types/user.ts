@@ -19,3 +19,9 @@ export interface User {
 	roles?: string[]
 	verified?: boolean
 }
+
+export type UserPresenceConnection = {
+	userId: string | number
+	connected: boolean
+	connectionsCount?: number
+}
