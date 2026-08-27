@@ -8,8 +8,6 @@ export default defineRoute<API>()({
 			return {}
 		}
 
-		const { group_id } = req.params
-
 		// TODO: check if the users_id is actually in the group
 		const users_id = req.query.users_id.split(",")
 
