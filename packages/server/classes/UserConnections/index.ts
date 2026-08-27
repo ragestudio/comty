@@ -1,4 +1,5 @@
 import type Redis from "ioredis"
+import type { UserPresenceConnection } from "@comty/shared/types/user"
 import type { Server } from "linebridge"
 
 export type ConnectionEventParams = {
@@ -9,12 +10,6 @@ export type ConnectionEventParams = {
 export type QueryParams = {
 	offset?: number
 	limit?: number
-}
-
-export type UserConn = {
-	userId: string | number
-	connected: boolean
-	connectionsCount?: number
 }
 
 export default class UserConnections {
@@ -108,7 +103,9 @@ export default class UserConnections {
 		return parsedConnections
 	}
 
-	async isUserConnected(userId: string | number): Promise<UserConn> {
+	async isUserConnected(
+		userId: string | number,
+	): Promise<UserPresenceConnection> {
 		if (!userId) {
 			throw new OperationError(400, "missing redis or userId")
 		}
@@ -123,7 +120,9 @@ export default class UserConnections {
 		}
 	}
 
-	async isUsersConnected(userIds: string[] | number[]): Promise<UserConn[]> {
+	async isUsersConnected(
+		userIds: string[] | number[],
+	): Promise<UserPresenceConnection[]> {
 		if (!userIds || !Array.isArray(userIds)) {
 			throw new OperationError(400, "userIds must be an array")
 		}
