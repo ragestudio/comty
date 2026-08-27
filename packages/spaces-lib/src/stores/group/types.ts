@@ -62,7 +62,7 @@ export interface CachedGroup {
 	channels: Channels | null
 }
 
-export interface SpacesGroupState {
+export interface GroupStoreState {
 	groupId: string | null
 	data: Group | null
 	channels: Channels
@@ -78,7 +78,7 @@ export interface SpacesGroupState {
 	decorationsCache: Map<string, any>
 }
 
-export interface SpacesGroupActions {
+export interface GroupStoreActions {
 	init: (groupId: string) => Promise<void>
 	reset: () => void
 	fetchGroup: () => Promise<Group | null>
@@ -117,6 +117,6 @@ export interface SpacesGroupActions {
 	handleProducerClose: (payload: ProducerClosePayload) => void
 }
 
-export type SpacesGroupStoreType = SpacesGroupState & {
-	actions: SpacesGroupActions
+export type GroupStoreType = GroupStoreState & {
+	actions: GroupStoreActions
 }

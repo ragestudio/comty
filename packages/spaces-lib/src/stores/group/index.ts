@@ -1,17 +1,16 @@
+import type { GroupStoreType } from "./types"
+
 import { create } from "zustand"
-import { SpacesGroupStoreType } from "./group/types"
-import { createDefaultChannels, createDefaultMembers } from "./group/constants"
+import { createDefaultChannels, createDefaultMembers } from "./constants"
 
-import GroupFetchingActions from "../actions/group/fetching"
-import GroupEvaluateActions from "../actions/group/evaluate"
-import GroupLifecycleActions from "../actions/group/lifecycle"
-import GroupSettersActions from "../actions/group/setters"
-import GroupEventsActions from "../actions/group/events"
+import GroupFetchingActions from "../../actions/group/fetching"
+import GroupEvaluateActions from "../../actions/group/evaluate"
+import GroupLifecycleActions from "../../actions/group/lifecycle"
+import GroupSettersActions from "../../actions/group/setters"
+import GroupEventsActions from "../../actions/group/events"
+import { useShallow } from "zustand/react/shallow"
 
-export const useSpacesGroupStore = create<SpacesGroupStoreType>()((
-	set,
-	get,
-) => {
+export const GroupStore = create<GroupStoreType>()((set, get) => {
 	const fetchingActions = new GroupFetchingActions(set, get)
 	const evaluateActions = new GroupEvaluateActions(set, get)
 	const lifecycleActions = new GroupLifecycleActions(set, get)
@@ -69,14 +68,13 @@ export const useSpacesGroupStore = create<SpacesGroupStoreType>()((
 	}
 })
 
-export const useGroupData = () => useSpacesGroupStore((s) => s.data)
-export const useGroupChannels = () => useSpacesGroupStore((s) => s.channels)
-export const useGroupMembers = () => useSpacesGroupStore((s) => s.members)
-export const useGroupRTC = () => useSpacesGroupStore((s) => s.statedChannels)
-export const useGroupConnections = () =>
-	useSpacesGroupStore((s) => s.connectedMembers)
-export const useGroupDecorations = () =>
-	useSpacesGroupStore((s) => s.membersDecorations)
-export const useGroupLoading = () => useSpacesGroupStore((s) => s.loading)
-export const useGroupError = () => useSpacesGroupStore((s) => s.error)
-export const useGroupActions = () => useSpacesGroupStore((s) => s.actions)
+export const useGroupStore = () => GroupStore((s) => useShallow((s) => s))
+export const useGroupData = () => GroupStore((s) => s.data)
+export const useGroupChannels = () => GroupStore((s) => s.channels)
+export const useGroupMembers = () => GroupStore((s) => s.members)
+export const useGroupRTC = () => GroupStore((s) => s.statedChannels)
+export const useGroupConnections = () => GroupStore((s) => s.connectedMembers)
+export const useGroupDecorations = () => GroupStore((s) => s.membersDecorations)
+export const useGroupLoading = () => GroupStore((s) => s.loading)
+export const useGroupError = () => GroupStore((s) => s.error)
+export const useGroupActions = () => GroupStore((s) => s.actions)

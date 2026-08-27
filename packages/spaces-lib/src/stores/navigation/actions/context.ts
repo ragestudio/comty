@@ -1,5 +1,6 @@
-import { StoreApi } from "zustand"
-import type { SpacesNavigationStoreType } from "../types"
+import type { NavigationStoreType } from "../types"
 
-export type SetNavState = StoreApi<SpacesNavigationStoreType>["setState"]
-export type GetNavState = StoreApi<SpacesNavigationStoreType>["getState"]
+import { StoreApi } from "zustand"
+
+export type SetNavState = StoreApi<NavigationStoreType>["setState"]
+export type GetNavState = StoreApi<NavigationStoreType>["getState"]

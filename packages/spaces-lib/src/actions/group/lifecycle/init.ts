@@ -1,6 +1,6 @@
 import type LifecycleActions from "./index"
 import type {
-	SpacesGroupActions,
+	GroupStoreActions,
 	CachedGroup,
 } from "../../../stores/group/types"
 
@@ -15,7 +15,7 @@ import db from "../../../db"
 async function deferredCacheCheck(
 	groupId: string,
 	cached: CachedGroup,
-	actions: SpacesGroupActions,
+	actions: GroupStoreActions,
 	isCurrentGeneration: () => boolean,
 ) {
 	try {

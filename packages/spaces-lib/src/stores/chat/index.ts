@@ -1,15 +1,17 @@
+import type { ChatStoreType } from "./types"
+
 import { create } from "zustand"
-import { SpacesChatStoreType } from "./chat/types"
+import { useShallow } from "zustand/react/shallow"
 
-import ChatSettersActions from "../actions/chat/setters"
-import ChatLifecycleActions from "../actions/chat/lifecycle"
-import ChatLoadingActions from "../actions/chat/loading"
-import ChatSyncActions from "../actions/chat/sync"
-import ChatMessagingActions from "../actions/chat/messaging"
-import ChatTypingActions from "../actions/chat/typing"
-import ChatEventsActions from "../actions/chat/events"
+import ChatSettersActions from "../../actions/chat/setters"
+import ChatLifecycleActions from "../../actions/chat/lifecycle"
+import ChatLoadingActions from "../../actions/chat/loading"
+import ChatSyncActions from "../../actions/chat/sync"
+import ChatMessagingActions from "../../actions/chat/messaging"
+import ChatTypingActions from "../../actions/chat/typing"
+import ChatEventsActions from "../../actions/chat/events"
 
-export const useSpacesChatStore = create<SpacesChatStoreType>()((set, get) => {
+export const ChatStore = create<ChatStoreType>()((set, get) => {
 	const settersActions = new ChatSettersActions(set, get)
 	const lifecycleActions = new ChatLifecycleActions(set, get)
 	const loadingActions = new ChatLoadingActions(set, get)
@@ -59,3 +61,20 @@ export const useSpacesChatStore = create<SpacesChatStoreType>()((set, get) => {
 		},
 	}
 })
+
+export const useChatState = () =>
+	ChatStore(
+		useShallow((s) => ({
+			timeline: s.timeline,
+			error: s.error,
+			loading: s.loading,
+			initialLoading: s.initialLoading,
+			usersTyping: s.usersTyping,
+			isTyping: s.isTyping,
+			hasMore: s.hasMore,
+			type: s.type,
+			pausedUpdates: s.pausedUpdates,
+		})),
+	)
+
+export const useChatActions = () => ChatStore((s) => s.actions)

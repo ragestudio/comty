@@ -1,4 +1,4 @@
-import type { SpacesNavigationState, NavigationType } from "./types"
+import type { NavigationStoreType, NavigationType } from "./types"
 
 import { URL_PREFIX, RESERVED_SUBVIEWS } from "./constants"
 import isDesktop from "../../utils/isDesktop"
@@ -8,7 +8,7 @@ export function composePathname({
 	room,
 	channel,
 	subview,
-}: Partial<SpacesNavigationState>): string {
+}: Partial<NavigationStoreType>): string {
 	const parts: (string | null)[] = [URL_PREFIX, type ?? null, room ?? null]
 
 	if (subview && !channel) {
@@ -21,7 +21,7 @@ export function composePathname({
 	return "/" + parts.filter((p) => p != null).join("/")
 }
 
-export function parseUrlParts(): Partial<SpacesNavigationState> {
+export function parseUrlParts(): Partial<NavigationStoreType> {
 	let parts: string[] = []
 
 	if (isDesktop()) {
@@ -53,7 +53,7 @@ export function parseUrlParts(): Partial<SpacesNavigationState> {
 	}
 }
 
-export function syncToUrl(state: Partial<SpacesNavigationState>) {
+export function syncToUrl(state: Partial<NavigationStoreType>) {
 	const pathname = composePathname(state)
 
 	if (isDesktop()) {

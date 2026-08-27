@@ -1,10 +1,22 @@
 import getSocket from "../utils/getSocket"
-import { useSpacesGroupStore } from "./useSpacesGroupStore"
 
-type StoreApi = typeof useSpacesGroupStore
+import { GroupStore } from "./group"
+import { ChatStore } from "./chat"
+import { GroupsListStore } from "./groupsList"
 
-export function buildGroupSocketEvents(groupId: string, store: StoreApi) {
+import GROUP_CONFIG from "./chat/configs/group"
+import DM_CONFIG from "./chat/configs/dm"
+const CHAT_CONFIGS: Record<string, any> = {
+	group: GROUP_CONFIG,
+	dm: DM_CONFIG,
+}
+
+export function buildGroupSocketEvents(
+	groupId: string,
+	store: typeof GroupStore,
+) {
 	const { actions } = store.getState()
+
 	const prefix = `group:${groupId}`
 
 	return {
@@ -66,7 +78,7 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		return () => {}
 	}
 
-	const events = buildGroupSocketEvents(groupId, useSpacesGroupStore)
+	const events = buildGroupSocketEvents(groupId, GroupStore)
 
 	socket.topics.subscribe("group:subscribe", groupId)
 
@@ -75,7 +87,8 @@ export function subscribeGroupSocket(groupId: string): () => void {
 	}
 
 	const onReconnect = () => {
-		const state = useSpacesGroupStore.getState()
+		const state = GroupStore.getState()
+
 		if (state.groupId === groupId) {
 			console.log("[socket] Reconnected! Triggering resilience sync...")
 			state.actions.syncRTCChannels().catch(console.error)
@@ -101,5 +114,80 @@ export function subscribeGroupSocket(groupId: string): () => void {
 		}
 
 		socket.off("connect", onReconnect)
+	}
+}
+
+export function subscribeUserSocket(): () => void {
+	const socket = getSocket()
+
+	if (!socket) {
+		console.warn(
+			"[socket] Socket not available, skipping user subscription",
+		)
+		return () => {}
+	}
+
+	const events = {
+		"groups:membership:created": (payload: any) =>
+			GroupsListStore.getState().actions.handleMembershipCreated(payload),
+		"groups:membership:deleted": (payload: any) =>
+			GroupsListStore.getState().actions.handleMembershipDeleted(payload),
+	}
+
+	for (const [event, handler] of Object.entries(events)) {
+		socket.on(event, handler)
+	}
+
+	return () => {
+		for (const [event, handler] of Object.entries(events)) {
+			socket.off(event, handler)
+		}
+	}
+}
+
+export function subscribeChatSocket(
+	type: "group" | "dm",
+	params: any,
+	events?: { onNewMessage?: (data: any) => void },
+) {
+	const socket = getSocket()
+	const config = CHAT_CONFIGS[type]
+
+	if (!socket || !config) {
+		console.warn("Chat websocket not available or invalid config")
+		return () => {}
+	}
+
+	const subscribeParams = config.params.subscribe(params)
+	const actions = ChatStore.getState().actions
+
+	const handleNewMessage = (data: any) => {
+		actions.handleNewMessage(data)
+		if (events?.onNewMessage) events.onNewMessage(data)
+	}
+	const handleMessageUpdated = (data: any) =>
+		actions.handleMessageUpdated(data)
+	const handleMessageDeleted = (data: any) =>
+		actions.handleMessageDeleted(data)
+	const handleTypingEvent = (data: any) => actions.handleTypingEvent(data)
+
+	socket.on(config.events.message, handleNewMessage)
+	socket.on(config.events.messageUpdated, handleMessageUpdated)
+	socket.on(config.events.messageDeleted, handleMessageDeleted)
+	socket.on(config.events.typing, handleTypingEvent)
+
+	socket.topics
+		.subscribe(config.methods.subscribe, subscribeParams)
+		.catch(console.error)
+
+	return () => {
+		socket.off(config.events.message, handleNewMessage)
+		socket.off(config.events.messageUpdated, handleMessageUpdated)
+		socket.off(config.events.messageDeleted, handleMessageDeleted)
+		socket.off(config.events.typing, handleTypingEvent)
+
+		socket.topics
+			.unsubscribe(config.methods.unsubscribe, subscribeParams)
+			.catch(console.error)
 	}
 }

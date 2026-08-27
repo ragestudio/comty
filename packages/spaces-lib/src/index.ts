@@ -1,64 +1,22 @@
-export { VALID_CHANNEL_KINDS } from "./stores/group/constants"
+// group store
+export * from "./stores/group"
+export * from "./stores/group/constants"
 
-export {
-	useSpacesGroupStore,
-	useGroupData,
-	useGroupChannels,
-	useGroupMembers,
-	useGroupRTC,
-	useGroupConnections,
-	useGroupDecorations,
-	useGroupLoading,
-	useGroupError,
-	useGroupActions,
-} from "./stores/useSpacesGroupStore"
+// groups list store
+export * from "./stores/groupsList"
 
-export type {
-	SpacesGroupStoreType,
-	UserConnectionReference,
-	CachedGroup,
-	MembershipCreatedPayload,
-	MembershipDeletedPayload,
-	ClientVoiceJoinPayload,
-	ClientVoiceLeftPayload,
-	ClientEventPayload,
-	ProducerOpenPayload,
-	ProducerClosePayload,
-	GroupUpdatePayload,
-} from "./stores/group/types"
+// chat store
+export * from "./stores/chat"
 
-export {
-	useSpacesNavigationStore,
-	useSpacesNavigation,
-	useNavigationActions,
-} from "./stores/useSpacesNavigationStore"
+// navigation store
+export * from "./stores/navigation"
 
-export type {
-	SpacesNavigationStoreType,
-	NavigationType,
-} from "./stores/navigation/types"
+// events
+export * from "./stores/events"
 
-export { subscribeGroupSocket, buildGroupSocketEvents } from "./stores/events"
-
-export * from "./stores/useSpacesChatStore"
-export * from "./stores/chatEvents"
-
-import { useSpacesChatStore } from "./stores/useSpacesChatStore"
-import { useShallow } from "zustand/react/shallow"
-
-export const useChatState = () =>
-	useSpacesChatStore(
-		useShallow((s) => ({
-			timeline: s.timeline,
-			error: s.error,
-			loading: s.loading,
-			initialLoading: s.initialLoading,
-			usersTyping: s.usersTyping,
-			isTyping: s.isTyping,
-			hasMore: s.hasMore,
-			type: s.type,
-			pausedUpdates: s.pausedUpdates,
-		})),
-	)
-
-export const useChatActions = () => useSpacesChatStore((s) => s.actions)
+// export types
+export type * from "./stores/events"
+export type * from "./stores/group/types"
+export type * from "./stores/groupsList/types"
+export type * from "./stores/chat/types"
+export type * from "./stores/navigation/types"

@@ -1,13 +1,13 @@
 import { StoreApi } from "zustand"
-import { SpacesChatState } from "../../stores/chat/types"
+import { ChatStoreType } from "../../stores/chat/types"
 
 import { getAdapter } from "../../stores/chat/adapters"
 import * as cache from "../../helpers/cache"
 import db from "../../db"
 import getSocket from "../../utils/getSocket"
 
-export type SetChatState = StoreApi<SpacesChatState>["setState"]
-export type GetChatState = StoreApi<SpacesChatState>["getState"]
+export type SetChatState = StoreApi<ChatStoreType>["setState"]
+export type GetChatState = StoreApi<ChatStoreType>["getState"]
 
 class ChatActionsBase {
 	setState: SetChatState

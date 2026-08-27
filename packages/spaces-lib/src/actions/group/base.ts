@@ -1,8 +1,8 @@
 import { StoreApi } from "zustand"
-import { SpacesGroupStoreType } from "../../stores/group/types"
+import { GroupStoreType } from "../../stores/group/types"
 
-export type SetGroupState = StoreApi<SpacesGroupStoreType>["setState"]
-export type GetGroupState = StoreApi<SpacesGroupStoreType>["getState"]
+export type SetGroupState = StoreApi<GroupStoreType>["setState"]
+export type GetGroupState = StoreApi<GroupStoreType>["getState"]
 
 class GroupActionsBase {
 	setState: SetGroupState

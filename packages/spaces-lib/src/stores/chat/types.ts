@@ -16,7 +16,7 @@ export interface ChatSyncState {
 	has_more_after: boolean
 }
 
-export interface SpacesChatState {
+export interface ChatStoreState {
 	type: "group" | "dm" | null
 	params: any
 	initialLoading: boolean
@@ -31,11 +31,9 @@ export interface SpacesChatState {
 	initGeneration: number
 	typingTimeout: any
 	isTypingNetworkState: boolean
-
-	actions: SpacesChatActions
 }
 
-export interface SpacesChatActions {
+export interface ChatStoreActions {
 	init: (type: "group" | "dm", params: any) => Promise<void>
 	reset: () => void
 	setPausedUpdates: (paused: boolean) => void
@@ -67,4 +65,6 @@ export interface SpacesChatActions {
 	handleTypingEvent: (data: any) => void
 }
 
-export type SpacesChatStoreType = SpacesChatState
+export type ChatStoreType = ChatStoreState & {
+	actions: ChatStoreActions
+}
