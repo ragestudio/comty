@@ -3,11 +3,7 @@ import type FetchingActions from "./index"
 import GroupsModel from "@models/groups"
 
 import { INITIAL_CACHE_PAGE_SIZE } from "../../../stores/group/constants"
-import {
-	cacheMembers,
-	cacheTotalMembers,
-	cacheUsers,
-} from "../../../helpers/cache"
+import { cacheMembers, cacheTotalMembers } from "../../../helpers/cache"
 
 export default async function (this: FetchingActions): Promise<void> {
 	if (!this.state.groupId) return
@@ -23,15 +19,7 @@ export default async function (this: FetchingActions): Promise<void> {
 		if (response?.items) {
 			this.setState({ members: response })
 
-			const users = response.items.map((m: any) => m.user).filter(Boolean)
-			await cacheUsers(users)
-
-			const bareMembers = response.items.map((m: any) => {
-				const { user, ...rest } = m
-				return rest
-			})
-
-			await cacheMembers(this.state.groupId, bareMembers)
+			await cacheMembers(this.state.groupId, response)
 			await cacheTotalMembers(this.state.groupId, response.total_items)
 
 			this.state.actions.evaluateConnections(response.items)
