@@ -1,6 +1,5 @@
 {
 	"name": "search",
 	"dependencies": {
-		"p-map": "^4.0.0"
 	}
 }

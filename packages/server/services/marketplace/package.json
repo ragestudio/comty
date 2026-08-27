@@ -1,7 +1,6 @@
 {
 	"name": "marketplace",
 	"dependencies": {
-		"7zip-min": "^1.4.4",
-		"p-map": "^4.0.0"
+		"7zip-min": "^1.4.4"
 	}
 }
