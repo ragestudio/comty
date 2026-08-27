@@ -1,6 +1,6 @@
 {
 	"name": "@comty/spaces-lib",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"author": "ragestudio",
 	"license": "MIT",
 	"description": "Core library for Spaces in Comty",
@@ -28,10 +28,11 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"peerDependencies": {
-		"@comty/shared": "^0.1.0",
-		"comty.js": "^0.81.0",
+		"@comty/shared": "workspace:*",
+		"comty.js": "workspace:*",
 		"dexie": "^4",
-		"zustand": "^5"
+		"zustand": "^5",
+		"react": "^19"
 	},
 	"devDependencies": {
 		"typescript": "^7.0.2"
