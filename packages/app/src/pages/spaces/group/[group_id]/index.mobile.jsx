@@ -16,7 +16,7 @@ import useMediaRTCState from "@hooks/useMediaRTCState"
 import useTitle from "@hooks/useTitle"
 
 import {
-	useSpacesNavigation,
+	useNavigation,
 	useGroupActions,
 	useGroupLoading,
 	useGroupData,
@@ -32,12 +32,10 @@ const MembersPanelView = () => {
 }
 
 const GroupPage = (props) => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 
 	const [documentTitle, setDocumentTitle] = useTitle()
 	const [activeKey, setActiveKey] = React.useState("channels")
-
-	const rtcState = useMediaRTCState()
 
 	const actions = useGroupActions()
 	const loading = useGroupLoading()

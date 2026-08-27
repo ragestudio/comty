@@ -5,7 +5,7 @@ import { Icons } from "@components/Icons"
 import ChannelsListItem from "./item"
 
 import {
-	useSpacesNavigation,
+	useNavigation,
 	useGroupLoading,
 	useGroupChannels,
 	useGroupRTC,
@@ -21,7 +21,7 @@ const ChannelsPanel = () => {
 	const statedChannels = useGroupRTC()
 	const data = useGroupData()
 
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 
 	const handleOnClickChannel = React.useCallback(
 		(channel) => {

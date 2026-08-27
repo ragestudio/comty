@@ -3,12 +3,12 @@ import DMRoomsList from "@components/Spaces/DMRoomsList"
 import DMRoom from "@components/Spaces/DMRoom"
 import ToolsBar from "@layouts/components/toolsBar"
 
-import { useSpacesNavigation } from "@comty/spaces-lib"
+import { useNavigation } from "@comty/spaces-lib"
 
 import "@pages/spaces/index.less"
 
 const DirectMessageMainPage = () => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 
 	return (
 		<>

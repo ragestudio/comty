@@ -1,4 +1,4 @@
-import use from "comty.js/hooks/use"
+import React from "react"
 import { Result, Skeleton } from "antd"
 import { Icons } from "@components/Icons"
 import classnames from "classnames"
@@ -9,13 +9,13 @@ import { useSortable } from "@dnd-kit/react/sortable"
 import { move } from "@dnd-kit/helpers"
 
 //import useAckNotifications from "@hooks/useAckNotifications"
-import GroupsModel from "@models/groups"
+import { useGroupsList } from "@comty/spaces-lib"
 
 import GroupListItem from "../GroupListItem"
 
 import "./index.less"
 
-const SortableItem = ({ group, index, onClick, selected, unreadBadge }) => {
+const SortableItem = ({ group, index, onClick, selected }: any) => {
 	const sortable = useSortable({ id: group._id, index })
 
 	return (
@@ -29,59 +29,32 @@ const SortableItem = ({ group, index, onClick, selected, unreadBadge }) => {
 	)
 }
 
-const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
-	const { loading, error, result, setResult, repeat } = use(GroupsModel.getMy)
-	//const { pending } = useAckNotifications()
+const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }: any) => {
+	const { groups, loading, error, actions } = useGroupsList()
 
-	const handleMembershipCreated = (data) => {
-		console.debug("groups:membership:created", data)
-		repeat()
-	}
-
-	const handleMembershipDeleted = (data) => {
-		console.debug("groups:membership:deleted", data)
-		repeat()
-	}
+	React.useEffect(() => {
+		actions.fetchGroups()
+	}, [])
 
 	const handleOnDragEndItems = React.useCallback(
-		async (event) => {
+		async (event: any) => {
 			if (!sortable) {
 				return true
 			}
 
-			const newItems = move(result.items, event)
-			const newItemsIds = newItems.map((item) => item._id)
+			const currentIds = groups.map((item) => item._id)
+			const newItemsIds = move(currentIds, event)
 
-			setResult((r) => {
-				r.items = newItems
-				return r
-			})
+			const newItems = newItemsIds.map(
+				(id) => groups.find((item) => item._id === id)!
+			)
 
-			try {
-				const sortResult = await GroupsModel.sort(newItemsIds)
-				console.debug({ sortResult })
-			} catch (err) {
-				console.error("failed to update group order")
-			}
+			actions.setGroups(newItems)
+
+			await actions.sortGroups(newItemsIds)
 		},
-		[sortable, result, setResult],
+		[sortable, groups, actions],
 	)
-
-	React.useEffect(() => {
-		const socket = app.cores.api.socket()
-
-		if (socket) {
-			socket.on("groups:membership:created", handleMembershipCreated)
-			socket.on("groups:membership:deleted", handleMembershipDeleted)
-		}
-
-		return () => {
-			if (socket) {
-				socket.off("groups:membership:created", handleMembershipCreated)
-				socket.off("groups:membership:deleted", handleMembershipDeleted)
-			}
-		}
-	}, [])
 
 	if (error) {
 		return (
@@ -93,13 +66,13 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 		)
 	}
 
-	if (loading) {
+	if (loading || groups === undefined || groups === null) {
 		return <Skeleton active />
 	}
 
 	return (
 		<div className={classnames("groups-list")}>
-			{result.items.length === 0 && (
+			{groups.length === 0 && (
 				<Result
 					status="info"
 					title="No spaces"
@@ -112,11 +85,7 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 					onDragEnd={handleOnDragEndItems}
 					modifiers={[RestrictToVerticalAxis]}
 				>
-					{result.items.map((group, index) => {
-						// const unreadBadge = pending.filter(
-						// 	(n) => n.group_id === group._id,
-						// ).length
-
+					{groups.map((group, index) => {
 						return (
 							<SortableItem
 								key={group._id}
@@ -124,7 +93,6 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 								group={group}
 								onClick={onClickItem}
 								selected={selected === group._id}
-								//unreadBadge={unreadBadge}
 							/>
 						)
 					})}
@@ -132,18 +100,14 @@ const GroupsList = ({ onClickItem, onClickCreateNew, selected, sortable }) => {
 			)}
 
 			{!sortable &&
-				result.items.map((group) => {
-					// const unreadBadge = pending.filter(
-					// 	(n) => n.group_id === group._id,
-					// ).length
-
+				groups.map((group) => {
 					return (
 						<GroupListItem
+							ref={null}
 							key={group._id}
 							group={group}
 							onClick={onClickItem}
 							selected={selected === group._id}
-							//unreadBadge={unreadBadge}
 						/>
 					)
 				})}

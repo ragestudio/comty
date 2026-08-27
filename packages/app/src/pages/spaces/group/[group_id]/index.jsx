@@ -14,7 +14,7 @@ import {
 } from "@components/Spaces/Group/ContentPanel"
 
 import {
-	useSpacesNavigation,
+	useNavigation,
 	useGroupActions,
 	useGroupLoading,
 	useGroupError,
@@ -32,7 +32,7 @@ import "@pages/spaces/index.less"
 import "./index.less"
 
 const GroupPage = (props) => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 
 	const [documentTitle, setDocumentTitle] = useTitle()
 

@@ -4,14 +4,14 @@ import { Button } from "antd"
 import { Icons } from "@components/Icons"
 import UserPreview from "@components/UserPreview"
 
-import { useSpacesNavigation } from "@comty/spaces-lib"
+import { useNavigation } from "@comty/spaces-lib"
 
 import Chat from "@components/Spaces/Chat"
 
 import "./index.less"
 
 const DMChat = ({ to_user_id }) => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 
 	const onClickCall = React.useCallback(() => {
 		app.cores.mediartc.handlers().callUser(to_user_id, {

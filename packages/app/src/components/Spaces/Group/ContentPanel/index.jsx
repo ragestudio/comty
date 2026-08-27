@@ -5,7 +5,7 @@ import Chat from "@components/Spaces/Chat"
 import VoiceChannel from "@components/Spaces/VoiceChannel"
 import SettingsPanel from "@components/Spaces/Group/SettingsPanel"
 
-import { useSpacesNavigation, useGroupChannels } from "@comty/spaces-lib"
+import { useNavigation, useGroupChannels } from "@comty/spaces-lib"
 
 import "./index.less"
 
@@ -55,7 +55,7 @@ const resolveContent = (spaces, channels) => {
 }
 
 export const ContentPanelHeader = () => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 	const channels = useGroupChannels()
 
 	const { definition, channelData } = resolveContent(spaces, channels)
@@ -88,7 +88,7 @@ export const ContentPanelHeader = () => {
 }
 
 export const ContentPanelRender = () => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 	const channels = useGroupChannels()
 
 	const { type, definition } = resolveContent(spaces, channels)

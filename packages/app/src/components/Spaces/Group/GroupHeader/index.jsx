@@ -8,16 +8,12 @@ import Icons from "@components/Icons"
 
 import imageAverageColor from "@utils/imageAverageColor"
 
-import {
-	useGroupData,
-	useGroupLoading,
-	useSpacesNavigation,
-} from "@comty/spaces-lib"
+import { useGroupData, useGroupLoading, useNavigation } from "@comty/spaces-lib"
 
 import "./index.less"
 
 const GroupHeader = () => {
-	const spaces = useSpacesNavigation()
+	const spaces = useNavigation()
 	const data = useGroupData() || {}
 	const loading = useGroupLoading()
 

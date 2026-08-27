@@ -4,17 +4,17 @@ import classNames from "classnames"
 import { Icons } from "@components/Icons"
 
 import QuickSettings from "./quickSettings"
-import { useSpacesNavigation } from "@comty/spaces-lib"
 import { authorizedItems } from "@layouts/components/sidebar/inner"
 import SidebarItemsClickHandlers from "@layouts/components/sidebar/itemClickHandlers"
 import GroupsList from "@components/Spaces/GroupList"
 
+import { useNavigation } from "@comty/spaces-lib"
 import config from "@config"
 
 import "./sidebar.less"
 
 const SpacesSidebar = () => {
-	const { type, room } = useSpacesNavigation()
+	const { type, room } = useNavigation()
 
 	const [compact, setCompact] = React.useState(false)
 

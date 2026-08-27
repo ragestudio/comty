@@ -14,7 +14,7 @@ import TopBar from "@layouts/components/@mobile/topBar"
 import BottomBar from "@layouts/components/@mobile/bottomBar"
 import OptInDialog from "../../components/Spaces/OptInDialog"
 
-import { useSpacesNavigationStore } from "@comty/spaces-lib"
+import { NavigationStore } from "@comty/spaces-lib"
 
 import "./index.less"
 
@@ -45,8 +45,9 @@ const useIsConnectedToMainSocket = () => {
 }
 
 const SpacesLayout = (props) => {
-	const firstLoad = useSpacesNavigationStore((s) => s.firstLoad)
-	const navActions = useSpacesNavigationStore((s) => s.actions)
+	const firstLoad = NavigationStore((s) => s.firstLoad)
+	const navActions = NavigationStore((s) => s.actions)
+
 	const isMainSocketConnected = useIsConnectedToMainSocket()
 
 	React.useEffect(() => {
