@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"
@@ -42,7 +42,7 @@ export default class API extends Server {
 		global.userSyncRooms = this.contexts.userSyncRooms
 		global.syncRoomLyrics = new Map()
 
-		this.contexts.limits = await LimitsClass.get()
+		this.contexts.limits = await LimitsClass.getAll()
 	}
 }
 

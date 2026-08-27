@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 
 import { Worker as SnowflakeWorker } from "@shared-classes/Snowflake"
 

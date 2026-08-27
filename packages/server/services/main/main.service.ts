@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 import path from "path"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
@@ -7,8 +7,6 @@ import RedisClient from "@shared-classes/RedisClient"
 import UserConnections from "@shared-classes/UserConnections"
 
 import SharedMiddlewares from "@shared-middlewares"
-
-import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
 
 export default class API extends Server {
 	static refName = "main"

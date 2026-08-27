@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 
 import ScyllaDb from "@ragestudio/scylla-odm"
 import DbManager from "@shared-classes/DbManager"

@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 import crypto from "node:crypto"
 
 import ScyllaDb from "@ragestudio/scylla-odm"

@@ -1,4 +1,4 @@
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 
 import nodemailer from "nodemailer"
 import DbManager from "@shared-classes/DbManager"

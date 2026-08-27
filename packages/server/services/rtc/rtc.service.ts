@@ -1,6 +1,6 @@
-import type { RtEngineContext } from "linebridge/dist/classes/RtEngine/types"
+import type { RtEngineContext } from "linebridge/src/classes/RtEngine/types"
 
-import { Server } from "linebridge"
+import { Server } from "linebridge/src"
 import ScyllaDb from "@ragestudio/scylla-odm"
 
 import DbManager from "@shared-classes/DbManager"
