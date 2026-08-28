@@ -4,9 +4,12 @@ class ActionsBase<StoreType> {
 	setState: StoreApi<StoreType>["setState"]
 	getState: StoreApi<StoreType>["getState"]
 
-	constructor(store: StoreApi<StoreType>) {
-		this.setState = store.setState
-		this.getState = store.getState
+	constructor(
+		setState: StoreApi<StoreType>["setState"],
+		getState: StoreApi<StoreType>["getState"],
+	) {
+		this.setState = setState
+		this.getState = getState
 	}
 
 	get state() {

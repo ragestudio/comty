@@ -11,11 +11,11 @@ import GroupSettersActions from "../../actions/group/setters"
 import GroupEventsActions from "../../actions/group/events"
 
 export const GroupStore = create<GroupStoreType>()((set, get) => {
-	const fetchingActions = new GroupFetchingActions(GroupStore)
-	const evaluateActions = new GroupEvaluateActions(GroupStore)
-	const lifecycleActions = new GroupLifecycleActions(GroupStore)
-	const settersActions = new GroupSettersActions(GroupStore)
-	const eventsActions = new GroupEventsActions(GroupStore)
+	const fetchingActions = new GroupFetchingActions(set, get)
+	const evaluateActions = new GroupEvaluateActions(set, get)
+	const lifecycleActions = new GroupLifecycleActions(set, get)
+	const settersActions = new GroupSettersActions(set, get)
+	const eventsActions = new GroupEventsActions(set, get)
 
 	return {
 		groupId: null,

@@ -5,7 +5,7 @@ import { useShallow } from "zustand/react/shallow"
 import GroupsListActions from "../../actions/groups-list"
 
 export const GroupsListStore = create<GroupsListStoreType>()((set, get) => {
-	const actions = new GroupsListActions(GroupsListStore)
+	const actions = new GroupsListActions(set, get)
 
 	return {
 		groups: [],
