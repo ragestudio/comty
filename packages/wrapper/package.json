@@ -8,14 +8,14 @@
 	"dependencies": {
 		"7zip-min": "^3.0.1",
 		"@octokit/rest": "^22.0.1",
-		"axios": "^1.18.1",
+		"axios": "^1.20.0",
 		"cheerio": "^1.2.0",
 		"isbot": "^5.2.1",
 		"linebridge": "workspace:*",
 		"live-directory": "^3.0.3",
 		"lru-cache": "^11.5.2",
-		"node-addon-api": "^8.9.0",
-		"node-gyp": "^13.0.1",
-		"sharp": "^0.35.3"
+		"node-addon-api": "^8.9.2",
+		"node-gyp": "^13.0.2",
+		"sharp": "^0.35.4"
 	}
 }
