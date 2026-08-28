@@ -12,13 +12,13 @@ import ChatTypingActions from "../../actions/chat/typing"
 import ChatEventsActions from "../../actions/chat/events"
 
 export const ChatStore = create<ChatStoreType>()((set, get) => {
-	const settersActions = new ChatSettersActions(set, get)
-	const lifecycleActions = new ChatLifecycleActions(set, get)
-	const loadingActions = new ChatLoadingActions(set, get)
-	const syncActions = new ChatSyncActions(set, get)
-	const messagingActions = new ChatMessagingActions(set, get)
-	const typingActions = new ChatTypingActions(set, get)
-	const eventsActions = new ChatEventsActions(set, get)
+	const settersActions = new ChatSettersActions(ChatStore)
+	const lifecycleActions = new ChatLifecycleActions(ChatStore)
+	const loadingActions = new ChatLoadingActions(ChatStore)
+	const syncActions = new ChatSyncActions(ChatStore)
+	const messagingActions = new ChatMessagingActions(ChatStore)
+	const typingActions = new ChatTypingActions(ChatStore)
+	const eventsActions = new ChatEventsActions(ChatStore)
 
 	return {
 		type: null,

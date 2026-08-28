@@ -1,6 +1,7 @@
 import type { GroupStoreType } from "./types"
 
 import { create } from "zustand"
+import { useShallow } from "zustand/react/shallow"
 import { createDefaultChannels, createDefaultMembers } from "./constants"
 
 import GroupFetchingActions from "../../actions/group/fetching"
@@ -8,14 +9,13 @@ import GroupEvaluateActions from "../../actions/group/evaluate"
 import GroupLifecycleActions from "../../actions/group/lifecycle"
 import GroupSettersActions from "../../actions/group/setters"
 import GroupEventsActions from "../../actions/group/events"
-import { useShallow } from "zustand/react/shallow"
 
 export const GroupStore = create<GroupStoreType>()((set, get) => {
-	const fetchingActions = new GroupFetchingActions(set, get)
-	const evaluateActions = new GroupEvaluateActions(set, get)
-	const lifecycleActions = new GroupLifecycleActions(set, get)
-	const settersActions = new GroupSettersActions(set, get)
-	const eventsActions = new GroupEventsActions(set, get)
+	const fetchingActions = new GroupFetchingActions(GroupStore)
+	const evaluateActions = new GroupEvaluateActions(GroupStore)
+	const lifecycleActions = new GroupLifecycleActions(GroupStore)
+	const settersActions = new GroupSettersActions(GroupStore)
+	const eventsActions = new GroupEventsActions(GroupStore)
 
 	return {
 		groupId: null,

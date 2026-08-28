@@ -1,4 +1,5 @@
-import GroupActionsBase from "../base"
+import type { GroupStoreType } from "../../../stores/group/types"
+import ActionsBase from "../../base"
 
 import groupUpdate from "./group/update"
 import channelCreated from "./channels/created"
@@ -18,7 +19,7 @@ import voiceClientEvent from "./voice/clientEvent"
 import voiceProducerOpen from "./voice/producerOpen"
 import voiceProducerClose from "./voice/producerClose"
 
-class EventsActions extends GroupActionsBase {
+class EventsActions extends ActionsBase<GroupStoreType> {
 	handleGroupUpdate: OmitThisParameter<typeof groupUpdate> =
 		groupUpdate.bind(this)
 	handleChannelCreated: OmitThisParameter<typeof channelCreated> =

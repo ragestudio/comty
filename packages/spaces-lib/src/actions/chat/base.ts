@@ -1,33 +1,18 @@
-import { StoreApi } from "zustand"
-import { ChatStoreType } from "../../stores/chat/types"
+import type { ChatStoreType } from "../../stores/chat/types"
+import ActionsBase from "../base"
 
-import { getAdapter } from "../../stores/chat/adapters"
 import * as cache from "../../helpers/cache"
+import { getAdapter } from "../../stores/chat/adapters"
 import db from "../../db"
 import getSocket from "../../utils/getSocket"
 
-export type SetChatState = StoreApi<ChatStoreType>["setState"]
-export type GetChatState = StoreApi<ChatStoreType>["getState"]
-
-class ChatActionsBase {
-	setState: SetChatState
-	getState: GetChatState
-
-	constructor(set: SetChatState, get: GetChatState) {
-		this.setState = set
-		this.getState = get
-	}
-
+class ChatActionsBase extends ActionsBase<ChatStoreType> {
 	get db() {
 		return db
 	}
 
 	get cache() {
 		return cache
-	}
-
-	get state() {
-		return this.getState()
 	}
 
 	get adapter() {

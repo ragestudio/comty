@@ -1,10 +1,11 @@
-import GroupActionsBase from "../base"
+import type { GroupStoreType } from "../../../stores/group/types"
+import ActionsBase from "../../base"
 
 import evaluateConnections from "./connections"
 import evaluateDecorations from "./decorations"
 import evaluateRTC from "./rtc"
 
-class EvaluateActions extends GroupActionsBase {
+class EvaluateActions extends ActionsBase<GroupStoreType> {
 	evaluateConnections: OmitThisParameter<typeof evaluateConnections> =
 		evaluateConnections.bind(this)
 	evaluateDecorations: OmitThisParameter<typeof evaluateDecorations> =
