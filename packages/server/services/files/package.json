@@ -3,7 +3,7 @@
 	"dependencies": {
 		"file-type": "^22.0.1",
 		"mime-types": "^3.0.2",
-		"sharp": "0.35.3",
+		"sharp": "0.35.4",
 		"xxhash-addon": "^2.1.0"
 	}
 }
