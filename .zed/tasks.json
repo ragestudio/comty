@@ -1,0 +1,11 @@
+// Static tasks configuration.
+[
+	{
+		"label": "Project Diagnostics (TypeScript)",
+		"command": "npm --workspaces exec -- tsc --noEmit",
+		"cwd": "$ZED_WORKTREE_ROOT",
+		"use_new_terminal": true,
+		"reveal": "always",
+		"reveal_target": "dock",
+	},
+]

@@ -43,8 +43,5 @@
 # .vscode folder
 .vscode/
 
-# zed folder
-.zed/
-
 # idea folder
 .idea/
