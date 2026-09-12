@@ -11,33 +11,33 @@ export const schema = new Schema(
 	},
 	{
 		_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		channel_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		message: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		attachments: defineColumn<Array<Record<string, string>>>()({
-			type: "frozen<list<map<varchar, varchar>>>",
+			type: "frozen<list<map<Text, Text>>>",
 		}),
 		flags: defineColumn<Array<string>>()({
-			type: "frozen<list<varchar>>",
+			type: "frozen<list<Text>>",
 		}),
 		sticker: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		reply_to_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		nonce: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		updated_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

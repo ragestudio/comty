@@ -10,15 +10,15 @@ export const schema = new Schema(
 	},
 	{
 		user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		file_hash: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		file_name: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: false,
 		}),
 		file_size: defineColumn<number>()({
@@ -26,15 +26,15 @@ export const schema = new Schema(
 			required: false,
 		}),
 		object_path: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		upload_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: false,
 		}),
 		status: defineColumn<"UPLOADING" | "COMPLETED" | "ABORTED">()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		uploaded_parts: defineColumn<string>()({

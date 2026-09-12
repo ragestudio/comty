@@ -10,19 +10,19 @@ export const schema = new Schema(
 	},
 	{
 		_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		group_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		roles: defineColumn<Array<string>>()({
-			type: "frozen<list<varchar>>",
+			type: "frozen<list<Text>>",
 		}),
 		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

@@ -14,26 +14,26 @@ export const schema = new Schema(
 			type: ColumnTypes.Int,
 		}),
 		_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		name: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		description: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		icon: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		cover: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		reachability: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		owner_user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

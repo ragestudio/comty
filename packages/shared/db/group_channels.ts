@@ -13,27 +13,27 @@ export const schema = new Schema(
 			type: ColumnTypes.Bigint,
 		}),
 		_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		group_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		kind: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		name: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		description: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		explicit: defineColumn<boolean>()({
 			type: ColumnTypes.Boolean,
 		}),
 		params: defineColumn<Record<string, string>>()({
-			type: "map<varchar, varchar>",
+			type: "map<Text, Text>",
 		}),
 		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

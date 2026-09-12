@@ -13,19 +13,19 @@ export const schema = new Schema(
 	},
 	{
 		channel_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		log_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		type: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		target_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		actor_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		timestamp: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

@@ -10,7 +10,7 @@ export const schema = new Schema(
 	},
 	{
 		user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		order: defineColumn<Array<string>>()({

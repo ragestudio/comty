@@ -10,15 +10,15 @@ export const schema = new Schema(
 	},
 	{
 		group_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		key: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		issuer_user_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 		}),
 		created_at: defineColumn<Date>()({
 			type: ColumnTypes.Timestamp,

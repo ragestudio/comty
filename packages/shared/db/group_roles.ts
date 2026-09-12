@@ -10,15 +10,15 @@ export const schema = new Schema(
 	},
 	{
 		group_id: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		role_key: defineColumn<string>()({
-			type: ColumnTypes.Varchar,
+			type: ColumnTypes.Text,
 			required: true,
 		}),
 		permissions: defineColumn<Record<string, boolean>>()({
-			type: "map<varchar, boolean>",
+			type: "map<Text, boolean>",
 		}),
 	},
 )
