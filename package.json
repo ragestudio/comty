@@ -10,10 +10,13 @@
 		"setup:server": "cd packages/server && npm run setup"
 	},
 	"_web_app_path": "packages/app",
-    "workspaces": [
-        "packages/*",
-        "packages/server/services/*",
-        "modules/*",
-        "modules/linebridge/*"
-    ]
+	"workspaces": [
+		"packages/*",
+		"packages/server/services/*",
+		"modules/*",
+		"modules/linebridge/*"
+	],
+	"devDependencies": {
+		"prettier": "^3.9.6"
+	}
 }
