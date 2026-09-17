@@ -4,6 +4,8 @@ packages:
   - "packages/*"
   - "packages/server/services/*"
   - "modules/*"
+  - "modules/linebridge/engines/*"
+  - "modules/linebridge/plugins/*"
   - "modules/linebridge/*"
 
 linkWorkspacePackages: true
@@ -21,3 +23,7 @@ allowBuilds:
   msgpackr-extract: true
 
 blockExoticSubdeps: false
+
+minimumReleaseAgeExclude:
+  - "@ragestudio/scylla-odm@0.22.19"
+  - linebridge@2.0.0 || 2.0.1 || 2.0.2 || 2.0.3 || 2.0.4 || 2.0.5 || 2.0.6
