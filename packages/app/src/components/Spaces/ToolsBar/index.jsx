@@ -3,15 +3,15 @@ import React from "react"
 import useToolsBarRenders from "@hooks/useToolsBarRenders"
 import useLayoutInterface from "@hooks/useLayoutInterface"
 
-const ToolsBar = () => {
+const ToolsBar = (props) => {
 	const { topRenders, bottomRenders, setTopRenders, setBottomRenders } =
 		useToolsBarRenders()
 
 	useLayoutInterface("tools_bar", {
 		toggleVisibility: (to) => {
-			setVisible((prev) => {
-				return to ?? !prev
-			})
+			// setVisible((prev) => {
+			// 	return to ?? !prev
+			// })
 		},
 		attachRender: (id, component, props, { position = "bottom" } = {}) => {
 			let stateUpdater = setBottomRenders
@@ -52,9 +52,13 @@ const ToolsBar = () => {
 
 	return [...bottomRenders, ...topRenders]
 		.filter((item) => {
-			if (item.id === "mediartc-channel") {
+			if (
+				Array.isArray(props.filters) &&
+				props.filters.includes(item.id)
+			) {
 				return false
 			}
+
 			return true
 		})
 		.map((render, index) => {
