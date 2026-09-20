@@ -1,25 +1,26 @@
 import React from "react"
 import { Input } from "antd"
 
+import classNames from "classnames"
 import Button from "@ui/Button"
 import Image from "@components/Image"
 import { Icons } from "@components/Icons"
 
 import "./GifPicker.less"
-import classNames from "classnames"
 
 export const GifItem = ({ item, fav, onClick }) => {
-	const { resource_url, metadata } = item
+	const { _id, resource_url, metadata } = item
 
 	const [isFav, setIsFav] = React.useState(fav)
 
-	const onClickFav = async () => {
+	const onClickFav = async (item) => {
 		setIsFav(!isFav)
 
 		await app.cores.api.customRequest({
 			url: "/expressions/gif/fav",
 			method: "POST",
 			data: {
+				id: _id,
 				resource_url: resource_url,
 				metadata: metadata,
 			},
