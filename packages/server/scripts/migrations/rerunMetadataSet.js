@@ -1,5 +1,7 @@
 import DbManager from "@shared-classes/DbManager"
-import { MusicRelease, Track } from "@db_models"
+import Track from "@db_models/tracks"
+import MusicRelease from "@db_models/musicRelease"
+
 import * as FFMPEGLib from "@shared-classes/FFMPEGLib"
 
 // try to parse some queries from argv

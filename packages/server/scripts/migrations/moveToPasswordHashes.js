@@ -1,5 +1,7 @@
 import DbManager from "@shared-classes/DbManager"
-import { User, PasswordHash } from "@db_models"
+
+import User from "@db_models/user"
+import PasswordHash from "@db_models/passwordHash"
 
 async function main() {
 	await global.injectEnvFromInfisical()

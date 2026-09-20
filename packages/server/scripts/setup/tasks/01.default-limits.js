@@ -1,4 +1,4 @@
-import { Config } from "@db_models"
+import Config from "@db_models/config"
 
 const defaultLimits = {
 	maxFileSizeInMB: 100,

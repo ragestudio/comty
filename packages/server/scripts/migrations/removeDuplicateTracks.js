@@ -1,5 +1,5 @@
 import DbManager from "@shared-classes/DbManager"
-import { Track } from "@db_models"
+import Track from "@db_models/track"
 
 async function main() {
 	await global.injectEnvFromInfisical()

@@ -1,21 +1,22 @@
-import path from "node:path"
-import ScyllaDb from "@ragestudio/scylla-odm"
 import InfisicalLib from "linebridge/bootloader/libs/infisical.js"
 
-const dbModelsPath = path.resolve(global["paths"].root, "../shared/db")
+import ScyllaDb from "@ragestudio/scylla-odm/index"
+import resolveDbModelsPath from "../utils/resolveDbModelsPath"
 
 async function main() {
 	await InfisicalLib.LoadFromEnv()
 
 	const db = new ScyllaDb({
-		modelsPath: dbModelsPath,
+		modelsPath: resolveDbModelsPath(),
 	})
 
 	await db.initialize({
 		sync: true,
 	})
 
-	console.log("Sync done")
+	await db.migrate()
+
+	console.log("Migration done")
 	process.exit(0)
 }
 

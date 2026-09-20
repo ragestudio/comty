@@ -1,5 +1,7 @@
 import DbManager from "@shared-classes/DbManager"
-import { TrackLike, MusicLibraryItem } from "@db_models"
+
+import TrackLike from "@db_models/trackLike"
+import MusicLibraryItem from "@db_models/musicLibraryItem"
 
 async function main() {
 	await global.injectEnvFromInfisical()

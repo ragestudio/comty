@@ -1,5 +1,6 @@
 import DbManager from "@shared-classes/DbManager"
-import { Config } from "@db_models"
+
+import Config from "@db_models/config"
 
 import fs from "node:fs/promises"
 import path from "node:path"
