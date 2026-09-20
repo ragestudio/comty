@@ -1,11 +1,15 @@
+import withAuthentication from "./withAuthentication/index.js"
+import withOptionalAuthentication from "./withOptionalAuthentication/index.js"
+import botAuthentication from "./botAuthentication/index.js"
+import onlyAdmin from "./onlyAdmin/index.js"
+import roles from "./roles/index.js"
+
 export default {
-	auth: require("./withAuthentication").default,
-	withAuth: require("./withAuthentication").default,
-	withAuthentication: require("./withAuthentication").default,
-	withOptionalAuthentication: require("./withOptionalAuthentication").default,
-
-	botAuthentication: require("./botAuthentication").default,
-
-	onlyAdmin: require("./onlyAdmin").default,
-	roles: require("./roles").default,
+	auth: withAuthentication,
+	withAuth: withAuthentication,
+	withAuthentication: withAuthentication,
+	withOptionalAuthentication: withOptionalAuthentication,
+	botAuthentication,
+	onlyAdmin,
+	roles,
 }
